@@ -18,9 +18,10 @@ declare(strict_types=1);
 //      request, and the effective values must agree with what the kit installs: APP_ENV production, APP_DEBUG false, the
 //      https origin, key shape, database sessions/cache/queue, the local MySQL account, local private storage, file
 //      maintenance and the stderr log channel.
-//   3. production holds: no live-looking Stripe credential anywhere, and every PRODUCTION_CHECKOUT_* switch and credential
-//      off or blank. Production checkout is a code and review gate, not an environment switch (docs/ops/production-activation-packet.md);
-//      turning it on is a reviewed change to this file together with Sean's explicit authorization.
+//   3. production holds: no live-looking Stripe credential anywhere, every PRODUCTION_CHECKOUT_* switch and credential
+//      off or blank, and the four pre-launch capability flags in PRE_LAUNCH_HOLDS false. Production checkout is a code and
+//      review gate, not an environment switch (docs/ops/production-activation-packet.md); turning it on, or lifting one of the
+//      four flags, is a reviewed change to this file together with Sean's explicit authorization.
 //   4. APP_KEY equals the key of the previous (served) environment, when one is given.
 //
 // What it deliberately does not do: it does not force MAIL_MAILER or STRIPE_MODE itself. The preflight's production profile
@@ -31,6 +32,21 @@ use App\Support\PhpCliBinaryUnavailable;
 use Dotenv\Dotenv;
 use Dotenv\Parser\Parser;
 use Illuminate\Contracts\Console\Kernel;
+
+/**
+ * Pre-launch capability hold, approved by Sean on 2026-10-18: environment key => config key, each refused unless false.
+ * None of these four is gated by environment in the application. An operative free grant and an operator notification are
+ * bound only by an adapter that other code would supply; the public track sitemap build chain is not environment-gated and the
+ * public index serves it in production; V2 listening promotion is a one-way data change. In production this validator is
+ * therefore their only guard. Lifting one is a reviewed change to this file together with Sean's authorization for that
+ * activation. Same keys as scripts/ops/capability-boundary.php (tests/ops pins the agreement). Never printed with a value.
+ */
+const PRE_LAUNCH_HOLDS = [
+    'VASEY_OPERATIVE_FREE_GRANTS_ENABLED' => 'free-grants.operative_enabled',
+    'CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED' => 'inquiries.operator_notifications_enabled',
+    'DISCOVERY_SITEMAP_ENABLED' => 'discovery-sitemap.enabled',
+    'VASEY_LISTENING_V2_PROMOTION_ENABLED' => 'customer-listening.v2_promotion_enabled',
+];
 
 ini_set('display_errors', '0');
 ini_set('log_errors', '0');
@@ -77,6 +93,13 @@ try {
     foreach ($values as $name => $value) {
         if (preg_match('/\APRODUCTION_CHECKOUT_[A-Z_]*ENABLED\z/', (string) $name) === 1) {
             $check('holds.'.strtolower((string) $name), in_array(strtolower((string) $value), ['false', '(false)'], true));
+        }
+    }
+    // The pre-launch capability flags follow the same rule: only the literal false, or unset (the config default is false).
+    // A blank or any other value fails here, before the preflight child and the configuration check below are asked.
+    foreach (array_keys(PRE_LAUNCH_HOLDS) as $name) {
+        if (array_key_exists($name, $values)) {
+            $check('holds.'.strtolower($name), in_array(strtolower((string) $values[$name]), ['false', '(false)'], true));
         }
     }
     if (isset($arguments[4])) {
@@ -166,6 +189,10 @@ try {
         }
         $check('holds.production_credentials', in_array(config('production_checkout.secret_key'), [null, ''], true)
             && in_array(config('production_checkout.funds_mode'), [null, ''], true));
+        // Strictly false, on purpose: a config key that is renamed or removed reads null and fails closed rather than passing.
+        foreach (PRE_LAUNCH_HOLDS as $name => $key) {
+            $check('holds.'.strtolower($name), config($key) === false);
+        }
         // Renderer children started inside FPM requests need a genuine CLI PHP of this exact version and build (M-16).
         // Validate the configured binary as the FPM pool will, with a real probe; the path itself is never printed.
         try {

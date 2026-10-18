@@ -35,6 +35,27 @@ lands, the stage that depends on it stays blocked whatever the environment conta
 | Memberships C2–C5 and Billing259 | Membership sales | CLAUDE-PLAN §3 Phase C |
 | F3: one manual Foundation CI on the final integrated `expected_sha` | S3 | AGENTS.md CI cost policy |
 
+### Pre-launch capability hold (approved by Sean, 2026-10-18)
+
+Four flags have no environment gate in the application, so on production nothing but the validator stops a host `.env` that
+sets one to `true`. `ops/production/validate-runtime.php` refuses each unless it is false (`PRE_LAUNCH_HOLDS` in that file;
+the same keys as `scripts/ops/capability-boundary.php`). A flag in the candidate file passes only as the literal `false` or
+`(false)`; a blank or any other value fails, and an unset flag is allowed because the configuration default is false. The
+effective configuration must also read strictly `false`, so a renamed or removed config key fails closed. A refusal prints
+only the identifier below, never the value.
+
+| Flag | Config key | Identifier on refusal | Why it is held |
+| --- | --- | --- | --- |
+| `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` | `free-grants.operative_enabled` | `holds.vasey_operative_free_grants_enabled` | no environment gate; admits once an adapter is bound by other code, and none is bound today |
+| `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED` | `inquiries.operator_notifications_enabled` | `holds.contact_inquiry_operator_notifications_enabled` | no environment gate; also needs a bound alert transport, and none ships |
+| `DISCOVERY_SITEMAP_ENABLED` | `discovery-sitemap.enabled` | `holds.discovery_sitemap_enabled` | the build chain is not environment-gated and the public index serves track sitemaps in production |
+| `VASEY_LISTENING_V2_PROMOTION_ENABLED` | `customer-listening.v2_promotion_enabled` | `holds.vasey_listening_v2_promotion_enabled` | a one-way data promotion; turning it off afterwards does not undo it |
+
+**Lifting a hold** is a reviewed change to `ops/production/validate-runtime.php` (remove that one entry), made together with
+Sean's explicit authorization for that activation. Setting the flag on the host first does not work: the validator refuses the
+candidate environment, and the deploy stops. `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED` is not in this list because its command
+already refuses production by itself.
+
 ## 2. Inputs only Sean can supply
 
 These come from the `docs/handoff/2026-10-07/CLAUDE-PLAN.md` §4 list. Placeholders in this packet look like `<...>`; none

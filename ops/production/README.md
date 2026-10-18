@@ -29,7 +29,7 @@ off, so a production environment that sets anything else is refused today, by th
 those two values (a real mail transport, live mode) is a reviewed change to the preflight; this kit then follows it without
 an edit. What the validator adds on its own is listed in the header of `validate-runtime.php`: the real-configuration checks
 and the holds (no live-looking Stripe credential anywhere, every `PRODUCTION_CHECKOUT_*` switch the literal `false`, funds
-mode and credentials blank).
+mode and credentials blank, and the four pre-launch capability flags false).
 
 ## Files
 
@@ -141,17 +141,14 @@ These are application or review items this kit deliberately does not do:
    `docs/ops/production-activation-packet.md` (live checkout, the live webhook receiver and its nginx limits, paid delivery
    mounting, membership billing). Each needs Sean's separate authorization.
 5. **Scheduler heartbeat.** The application leaves no trace when no release is due; a ping on schedule success is a reviewed change.
-6. **Pre-launch capability hold (needs Sean's decision).** Neither the preflight production profile nor `ops/production/validate-runtime.php`
-   checks the capability flags or the production-lane flags (the staging deploy gate does, through `scripts/ops/capability-boundary.php`). On
-   production the `VASEY_TEST_*` flags, the support fixture and the synthetic rehearsal catalog flag (`VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED`,
-   whose command refuses production) are already refused by their environment gates, but four flags are held by no
-   validator here (`env.production.example` states each as `false` at lines 210, 217, 223 and 226, and `compose-env.py` keeps a later
-   layer from changing them, but nothing refuses a host `.env` edited to `true`): `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` and `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED`
-   (no environment gate; each admits once an adapter is bound by other code, and none ships today), `DISCOVERY_SITEMAP_ENABLED` (the public
-   index serves track sitemaps in production once it is true) and `VASEY_LISTENING_V2_PROMOTION_ENABLED` (a one-way data promotion with no
-   environment gate). A hold is the same shared check as a validator refusal until each activation is authorized, lifted by a reviewed change.
-   Not implemented here: whether and when to hold them is an activation-order decision. The evidence and the question are in
-   `docs/verification/production-ops-kit-20261017/` (batch K3).
+6. **Pre-launch capability hold (approved by Sean, 2026-10-18).** `ops/production/validate-runtime.php` refuses four flags unless they
+   are false: `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` and `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED` (no environment gate; each admits
+   once an adapter is bound by other code, and none ships today), `DISCOVERY_SITEMAP_ENABLED` (the public index serves track sitemaps in
+   production once it is true) and `VASEY_LISTENING_V2_PROMOTION_ENABLED` (a one-way data promotion with no environment gate). They are
+   the `PRE_LAUNCH_HOLDS` entries in that file, and a refusal is `holds.<lowercase flag name>`. Lifting one is a reviewed change to the
+   validator together with Sean's authorization for that activation; see `docs/ops/production-activation-packet.md` (section 1). The
+   `VASEY_TEST_*` flags, the support fixture and the synthetic rehearsal catalog flag (`VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED`) are
+   refused by their own environment gates or by the preflight, not by this hold.
 
 ## What was and was not verified
 
