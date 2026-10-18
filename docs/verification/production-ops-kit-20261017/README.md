@@ -450,3 +450,11 @@ The pattern is deliberately not `VASEY_STAGING_SYNTHETIC_*`: the production kit'
 | `scripts/ops/test-private-server-preflight.py` | OK |
 | `build-kit.py --check` | ok, 13 files |
 | `shellcheck -S warning` and `bash -n` on `forge-deploy.sh` | clean |
+
+### Third record: narrow re-review of `94c70fd6..28a3c8af`
+
+[APPROVE at `28a3c8af`](independent-rereview-28a3c8af-DECISION.md), imported verbatim. It checked the scrub pattern against all 40 `VASEY_*` names the kit scripts and config heredocs use, confirmed in a scratch build that the derived production script keeps the pattern, and agreed that the synthetic catalog flag should not be held by the deploy gate. Its P3s:
+- P3-A (this packet said the O1 deferrals were already in the deferred ledger, but they were not) is closed by the ledger commit that carries the PR #147 receipt.
+- P3-C (the synthetic line sat under a header claiming the profile validator requires it), P3-D (the CHANGELOG did not record `70573daf`; the K1 entry still said 196 keys) and P3-E (production README item 6 did not name the synthetic flag among the environment-gated ones) are corrected in comments and docs after `28a3c8af`. Template comments only, so `build-kit.py --check` (ok, 13 files), the ops tests (280 OK) and the three validator files (149 tests, 2,693 assertions) were rerun and pass.
+- P3-B (a test that applies the config-key coverage check to the built production `forge-deploy.sh`, so a rename-unsafe pattern fails) and the remaining clause for `scripts/ops/capability-boundary.php` (record why the synthetic flag is not held) go to the next ops batch, with the earlier P3-2, P3-3 and P3-6.
+
