@@ -38,6 +38,12 @@ try {
         throw new RuntimeException;
     }
     $raw = file_get_contents($file);
+    // A UTF-8 byte-order mark (an editor's gift) makes the raw parser below throw, which would otherwise surface only as the
+    // generic runtime.unavailable. Name it, then refuse: the file must be saved as plain UTF-8 without a mark.
+    if (str_starts_with($raw, "\xEF\xBB\xBF")) {
+        $failures[] = 'runtime.byte_order_mark';
+        throw new RuntimeException;
+    }
     $entries = (new Parser)->parse($raw);
     $names = array_map(static fn ($entry) => $entry->getName(), $entries);
     $check('runtime.unique_keys', count($names) === count(array_unique($names)));

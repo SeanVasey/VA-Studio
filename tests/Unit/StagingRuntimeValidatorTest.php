@@ -319,6 +319,15 @@ class StagingRuntimeValidatorTest extends TestCase
         $this->assertSame([], CapabilityBoundary::flagsNotOff(static fn (string $key): bool => false));
     }
 
+    public function test_a_byte_order_mark_is_refused_with_its_own_clear_check(): void
+    {
+        $process = $this->validate("\xEF\xBB\xBF".$this->profile());
+        $this->assertSame(1, $process->getExitCode());
+        $this->assertSame("FAIL runtime.byte_order_mark\nFAIL runtime.unavailable\n", $process->getErrorOutput());
+        // A mark anywhere else is not the case this names; the clean profile still passes.
+        $this->assertSame(0, $this->validate($this->profile())->getExitCode());
+    }
+
     public static function cliBinaries(): array
     {
         return [
