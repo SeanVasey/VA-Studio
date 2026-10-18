@@ -366,3 +366,10 @@ F2a final separate review at `e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08`: **APPRO
 
 
 2026-10-18 C1 synthetic staging catalog (lane C1, branch `harness/staging-synthetic-catalog-20261017`). The first independent review at `09acd13d` was APPROVE WITH CONDITIONS on P2-1 (the `--env` override bypassed the production refusal) and P2-2 (console staff identity without password or attestation). Both were fixed before merge, and the re-review at `cfc4d6a4` approved with both closed. Deferred to the lane's next batch: P3-A (assert generated media never matches a brand file under `assets/` or `public/`), P3-B (the "interactive console" wording, or add `stream_isatty(STDIN)` to this command and `vasey:rights-scope`), P3-C (neutral wording for the generic failure message on `--check`/admission failures), P3-D (test docblock mentions the scanner stand-in).
+
+
+2026-10-18 PR #140 Codex P2s, deferred to C1's next batch with one reply each:
+- r4305244895: compare both resumed rights-evidence fields with `SyntheticRehearsalCatalog::rights()` before verification, and refuse on any difference.
+- r4305244899: on resume, accept existing artwork or preview only when its source hash matches the deterministic generated media for that definition, and otherwise refuse with "media differs".
+
+Both need staff to edit an interrupted synthetic draft between runs on staging; the command refuses production. They join the re-review's P3-A to P3-D.
