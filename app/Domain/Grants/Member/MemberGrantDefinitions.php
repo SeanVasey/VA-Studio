@@ -4,6 +4,7 @@ namespace App\Domain\Grants\Member;
 
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Memberships\Production\MembershipAwardConfiguration;
+use App\Domain\Memberships\Production\MembershipCommitWitness;
 use App\Domain\Memberships\Production\MembershipPolicyStaff;
 use App\Domain\Memberships\Production\MembershipPolicyVersions;
 use App\Models\User;
@@ -39,7 +40,7 @@ final class MemberGrantDefinitions
         $events = $connection->getEventDispatcher();
         $originalManager = (new ReflectionProperty(Connection::class, 'transactionsManager'))->getValue($connection);
         MemberGrantException::require($originalManager === null || get_class($originalManager) === DatabaseTransactionsManager::class, 'changed_transaction');
-        $manager = new DatabaseTransactionsManager;
+        $manager = new MembershipCommitWitness;
         $observer = new MemberGrantAuthoringObserver($connection, $primary, $events, $manager);
         $connection->setTransactionManager($manager);
         $connection->setEventDispatcher($observer);
@@ -104,9 +105,15 @@ final class MemberGrantDefinitions
             $prove();
             $current = $rows->current();
             $observer->prepare($prove);
+            $manager->arm($connection, $primary);
             $connection->commit();
             $observer->requireProof();
         } catch (Throwable $error) {
+            if ($manager->physicallyCommitted()) {
+                // A throwing afterCommit callback or committed delegate followed the witnessed owned commit.
+                // Immutable rows are durable; this is a refused response, never a pre-commit refusal.
+                throw new MemberGrantException('committed_receipt_refused');
+            }
             $observer->abort();
             if ($error instanceof MemberGrantException) {
                 throw $error;
