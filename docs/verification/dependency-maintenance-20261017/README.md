@@ -167,7 +167,7 @@ The original logs are kept; no test, assertion, audit setting, guard or frozen r
   crash-recovered ([log](php-mysql/restart-after-reboot.txt)) and was used for the re-run and baseline above.
 - **Test-time budget exceeded.** SQLite used about 43 minutes of PHPUnit time in the three chunks (plus the short probe, whose timing was not retained), the ten-case native run 58 minutes, the re-run and baseline 12 minutes
   and the abandoned attempt about 43 minutes, well past the 60 to 90 minute target, almost all of it native-database waiting
-  under CPU contention. A planned fourth SQLite group (migration, cast and console tests) was not run.
+  waiting on the database; whether that was CPU contention or storage durability was not measured. A planned fourth SQLite group (migration, cast and console tests) was not run.
 
 ## Untested conditions
 
@@ -195,3 +195,21 @@ application code changes, so there is nothing to unwind in the database.
 Per `AGENTS.md`, the cheap PR preflight on the exact head and a source-bound review of this packet are still needed. In particular the
 reviewer should decide whether the one native error, which is identical on the old and new framework, blocks the merge, and
 whether the broader move the brief's literal command produces (the `symfony/console` 7 to 8 major and the Symfony 8.1 minors) should become its own batch.
+
+## Independent review and lead addendum
+
+A separate reviewer returned APPROVE WITH CONDITIONS at `e0f756e40a616ce37f9affacc982864d285888a0` with no P0 or P1 ([decision record](independent-review-e0f756e4-DECISION.md), imported verbatim). The lead applied both conditions without re-running tests, since neither changes executable code:
+
+- **P2-1:** the native MySQL case fails on both framework versions, so this batch does not cause it, but the cause is not isolated. The first run threw at the 60-second wall-clock deadline check; the re-run and the 13.35.0 baseline threw from the post-commit catch-all that discards the inner cause. "Under CPU contention" was not shown: the server ran with full durability and no load average was kept. The case remains an open release-gate item for a hosted MySQL run (manual Focused feedback or the final Foundation run) or a disposable server with relaxed durability. No native pass is claimed.
+- **P2-2:** the `npm-minor-patch` Dependabot group now excludes the exact-pinned test tools (`@playwright/test`, `playwright`, `playwright-core`, `vitest`, `typescript`, `jsdom`). A Playwright minor would otherwise fail the pinned WebKit backport check and block the whole group.
+
+**Merged head (P3-2).** The head also carries main's PR #139 account-feature code. The lead ran these on the merged head with Laravel 13.36.0, `.env` copied from `.env.example`, and `public/build` absent:
+- the full frontend suite: 66 files, 1,151 tests passed;
+- `npm run typecheck`: exit 0;
+- `ProductionAccountFeaturesHttpTest`: 32 tests, 465 assertions, OK;
+- `ProductionFeatureSourceClosureTest`: 4 tests, 34 assertions, OK.
+
+These are the same counts PR #139 recorded on 13.35.0. Executable code from main changed after the lock commit. The lock itself did not: `1a3844f6` and `e0f756e4` have the same lock files.
+
+**Adjacent pre-existing failure (P3-1), not from this batch.** `ProductionMemberOriginals/MemberGrantDefinitionsTest::test_remaining_config_resolution_hook_refuses_committed_authoring_receipt` fails on SQLite at line 114 (`$calls` is 0) on 13.35.0 as well. It is in the MySQL native selection, and it is recorded for the pre-Foundation sweep.
+

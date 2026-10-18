@@ -21,6 +21,9 @@ updates:
     groups:
       npm-minor-patch:
         update-types: ["minor", "patch"]
+        # Exact pins are reviewed one at a time: Playwright must match the pinned WebKit backport
+        # (scripts/ci/apply-playwright-webkit-offline-backport.mjs), so a bump would fail the whole group.
+        exclude-patterns: ["@playwright/test", "playwright", "playwright-core", "vitest", "typescript", "jsdom"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
