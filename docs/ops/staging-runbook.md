@@ -334,8 +334,8 @@ Before you start:
 3. Testers sign up with a reserved test address: one ending in `.test` (for example `ana@example.test`), `.example`,
    `.invalid` or `.localhost`, or one at `example.com`, `example.net` or `example.org`. No mail is sent, so they
    need no real mailbox. The command never lists or prints a link for any other address, so it can never relay a
-   link for a real person's address. A test account created earlier at any other address cannot get links this way:
-   the tester signs up again at a reserved address, and test purchases already claimed by the old account stay with it.
+   link for a real person's address. A test account created earlier at any other address keeps signing in with its
+   password, but cannot get links this way: if the password is lost, the tester signs up again at a reserved address, and test purchases already claimed by the old account stay with it.
    This reserved-address rule is new with the relay and is listed for Sean's confirmation in the evidence packet.
 
 ```sh

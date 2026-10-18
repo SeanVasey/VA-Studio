@@ -217,3 +217,9 @@ The independent review at `e2d8b6cc` approved with conditions ([decision record]
 - P3-1: a piped password is accepted, as in `vasey:rights-scope` and `vasey:staging-synthetic-catalog`. Require `stream_isatty(STDIN)` in all three, or correct the "interactive console" wording. This joins the existing C1 P3-B item.
 - P3-2: refusal tests for a non-current policy version and for a challenge completed between `message()` and `relay()`, plus the `lstat` and inode checks on their own.
 
+After the narrow re-review at `d160b154` (APPROVE, no P0 to P2), its three P3s were applied before the PR opened:
+- P3-A: the `print` warning and two docblocks still said "the tester who requested it". The warning now says to send a `create account` link only to the tester being onboarded and a `reset password` link only to the person known to own that test account, never in reply to an unsolicited request. Its two test assertions were updated.
+- P3-B: runbook 6a now says an older account at another address keeps signing in with its password and needs a new sign-up only if the password is lost.
+- P3-C: a trailing blank line was removed from this file.
+
+The re-review record is imported verbatim as [independent-rereview-d160b154-DECISION.md](independent-rereview-d160b154-DECISION.md).

@@ -377,7 +377,8 @@ class TestIdentityLinkRelayCommandTest extends TestCase
         $link = 'http://localhost/account/access#enroll.'.$enroll['id'].'.'.$enroll['proof'];
         $this->assertSame(1, substr_count($result['text'], $link));
         $this->assertContains($link, explode(PHP_EOL, $result['text']), 'The link is on a line of its own.');
-        $this->assertStringContainsString('Relay this create account link only to the tester who requested it for '.self::SYNTHETIC, $result['text']);
+        $this->assertStringContainsString('This create account link is for '.self::SYNTHETIC.'. Send it privately', $result['text']);
+        $this->assertStringContainsString('never in reply to an unsolicited request.', $result['text']);
         $this->assertNothingPrivate($result['text'], [$enroll, $other], [$enroll['id']]);
         $this->assertStringNotContainsString($other['id'], $result['text']);
 
@@ -593,7 +594,7 @@ class TestIdentityLinkRelayCommandTest extends TestCase
 
         $print = $this->console(['action' => 'print', 'id' => $linked['id']]);
         $this->assertSame(0, $print['code'], $print['text']);
-        $this->assertStringContainsString('requested it for "<href=https://e.vil>x</>"@example.test.', $print['text']);
+        $this->assertStringContainsString('link is for "<href=https://e.vil>x</>"@example.test. Send it privately', $print['text']);
         $this->assertStringNotContainsString($hidden['id'], $print['text']);
     }
 

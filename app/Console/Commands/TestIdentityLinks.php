@@ -17,7 +17,7 @@ use Throwable;
 
 /**
  * Lets a staging operator list captured test identity messages for synthetic test addresses and print one pending
- * sign-in or recovery link to relay to the tester who requested it. Read-only: it never consumes, extends, re-signs or
+ * sign-in or recovery link to relay to the tester who owns that test account. Read-only: it never consumes, extends, re-signs or
  * changes a link, a challenge or an account. Every rule (environment, capture capability, verification, synthetic
  * recipients, audit) is in {@see TestIdentityLinkRelay}; this command confirms the named staff account at a hidden
  * prompt, records a console attestation where the panel requires the staff factor, and maps outcomes.
@@ -140,8 +140,9 @@ final class TestIdentityLinks extends Command
     {
         $message = $relay->message($id);
         $relayed = $relay->relay($operator, $message, $this->attestationAuditId);
-        $this->warn('TEST ONLY. Relay this '.$this->kind($message).' link only to the tester who requested it for '.$this->recipient($message)
-            .'. It works once and expires at '.TestIdentityLinkRelay::time($message->expiresAt).' UTC.');
+        $this->warn('TEST ONLY. This '.$this->kind($message).' link is for '.$this->recipient($message).'. Send it privately, and only to the tester you are'
+            .' onboarding (create account) or the person you know owns that test account (reset password), never in reply to an unsolicited'
+            .' request. It works once and expires at '.TestIdentityLinkRelay::time($message->expiresAt).' UTC.');
         $this->line($relayed['link']);
         $this->line('relay audit_event='.$relayed['audit_event']);
 

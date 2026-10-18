@@ -21,7 +21,7 @@ use JsonException;
 /**
  * Read-only operator relay for the test identity messages that {@see CustomerIdentityCapture}
  * writes to the private local disk, so a staging operator can hand one sign-in or recovery link to the tester who
- * asked for it without browsing the host filesystem.
+ * owns that test account without browsing the host filesystem.
  *
  * It never writes, renames, deletes, re-signs or extends a capture, a challenge or an account. Its only writes are
  * append-only audit rows: one per listing and one per relayed link (who, when, which challenge; never the link, the
