@@ -21,6 +21,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\Support\CustomerFixtures;
+use Tests\Support\FilamentNotifications;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\MembershipFixtures as F;
 use Tests\TestCase;
@@ -221,14 +222,15 @@ class MembershipAdministrationActionTest extends TestCase
         $before = $this->evidence();
         Log::spy();
         AuditEvent::creating(fn () => throw new RuntimeException('PRIVATE_SYNTHETIC_FAILURE_DETAIL'));
-        $page->callMountedAction()->assertHasActionErrors(['entered_plan'])->assertNotified('The private plan save could not be confirmed');
+        $page->callMountedAction()->assertHasActionErrors(['entered_plan']);
+        // Read the queue while it is still full, and require the expected notification so the privacy checks cannot pass on nothing.
+        FilamentNotifications::sole('The private plan save could not be confirmed', 'danger');
+        FilamentNotifications::assertNoneContain(['PRIVATE_SYNTHETIC_FAILURE_DETAIL', 'Private plan revision saved']);
+        $page->assertNotified('The private plan save could not be confirmed');
         $this->assertConsumed($page);
         $page->assertSet('enteredPlan.allowance', 7);
         $this->assertSame($before, $this->evidence());
         Log::shouldHaveReceived('warning')->once()->with('Private membership authoring could not confirm the result.', ['exception_class' => RuntimeException::class]);
-        $notifications = json_encode(session('filament.claimed_notifications') ?? session('filament.notifications'), JSON_THROW_ON_ERROR);
-        $this->assertStringNotContainsString('PRIVATE_SYNTHETIC_FAILURE_DETAIL', $notifications);
-        $this->assertStringNotContainsString('Private plan revision saved', $notifications);
         $page->callMountedAction()->assertHasActionErrors(['entered_plan']);
         $this->assertSame($before, $this->evidence());
         $this->assertCopyableRecovery($page);

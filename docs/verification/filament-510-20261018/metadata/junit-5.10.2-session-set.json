@@ -1,0 +1,732 @@
+{
+ "CatalogPaginationTest.xml": {
+  "files": 1,
+  "tests": 7,
+  "assertions": 107,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "CheckoutReturnPresentationTest.xml": {
+  "files": 1,
+  "tests": 6,
+  "assertions": 612,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "CustomerAccountCommerceTest.xml": {
+  "files": 1,
+  "tests": 8,
+  "assertions": 65,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "CustomerCommunicationPreferencesHttpTest.xml": {
+  "files": 1,
+  "tests": 16,
+  "assertions": 175,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "CustomerIdentityHttpTest.xml": {
+  "files": 1,
+  "tests": 10,
+  "assertions": 109,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "CustomerListeningExportHttpTest.xml": {
+  "files": 1,
+  "tests": 16,
+  "assertions": 149,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "CustomerListeningLibraryHttpTest.xml": {
+  "files": 1,
+  "tests": 13,
+  "assertions": 111,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "CustomerOrderItemsTest.xml": {
+  "files": 1,
+  "tests": 13,
+  "assertions": 757,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "CustomerOrderReferenceTest.xml": {
+  "files": 1,
+  "tests": 4,
+  "assertions": 478,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "CustomerPurchaseClaimTest.xml": {
+  "files": 1,
+  "tests": 31,
+  "assertions": 338,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "CustomerRefundResolutionHttpTest.xml": {
+  "files": 1,
+  "tests": 17,
+  "assertions": 336,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "CustomerRefundResolutionTest.xml": {
+  "files": 1,
+  "tests": 14,
+  "assertions": 183,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "CustomerSessionHttpTest.xml": {
+  "files": 1,
+  "tests": 9,
+  "assertions": 118,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "DiscoverySitemapRegistrationTest.xml": {
+  "files": 1,
+  "tests": 5,
+  "assertions": 260,
+  "failures": 1,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": [
+   "FAIL Tests\\Feature\\DiscoverySitemapRegistrationTest::test_default_off_keeps_existing_site_index_and_public_routes_have_no_session_stack"
+  ]
+ },
+ "DiscoverySitemapWorkerTest.xml": {
+  "files": 1,
+  "tests": 20,
+  "assertions": 153,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ExclusiveSelectionTest.xml": {
+  "files": 1,
+  "tests": 19,
+  "assertions": 152,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "FreeGrantHttpTest.xml": {
+  "files": 1,
+  "tests": 14,
+  "assertions": 292,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "FreeGrantRegistrationTest.xml": {
+  "files": 1,
+  "tests": 3,
+  "assertions": 153,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "HostedCheckoutTest.xml": {
+  "files": 1,
+  "tests": 47,
+  "assertions": 603,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 1,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "InquiryConversationHttpTest.xml": {
+  "files": 1,
+  "tests": 14,
+  "assertions": 250,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "InquiryHistoryHttpTest.xml": {
+  "files": 1,
+  "tests": 15,
+  "assertions": 371,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "MembershipCustomerHistoryHttpTest.xml": {
+  "files": 1,
+  "tests": 18,
+  "assertions": 134,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "MembershipCustomerLibraryCapabilityTest.xml": {
+  "files": 1,
+  "tests": 8,
+  "assertions": 48,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "OrderInquiryHttpTest.xml": {
+  "files": 1,
+  "tests": 16,
+  "assertions": 251,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "OrderPreparationTest.xml": {
+  "files": 1,
+  "tests": 48,
+  "assertions": 700,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "OwnedTestOrderHistoryTest.xml": {
+  "files": 1,
+  "tests": 15,
+  "assertions": 132,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "PaidGrantHttpJourneyTest.xml": {
+  "files": 1,
+  "tests": 19,
+  "assertions": 648,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "PaidGrantRedeemFrameConjunctTest.xml": {
+  "files": 1,
+  "tests": 1,
+  "assertions": 994,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "PaidGrantRequestInstantTest.xml": {
+  "files": 1,
+  "tests": 14,
+  "assertions": 262,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "PaidGrantRootRegistrationTest.xml": {
+  "files": 1,
+  "tests": 7,
+  "assertions": 77,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "PaidTaxHistoryIndexTest.xml": {
+  "files": 1,
+  "tests": 23,
+  "assertions": 264,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "PaidTaxHttpJourneyTest.xml": {
+  "files": 1,
+  "tests": 12,
+  "assertions": 212,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "PaidTaxRootHttpBoundaryTest.xml": {
+  "files": 1,
+  "tests": 46,
+  "assertions": 891,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "PaidTaxTransportFixtureTest.xml": {
+  "files": 1,
+  "tests": 1,
+  "assertions": 4,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ProductionAccountFeatureAccessTest.xml": {
+  "files": 1,
+  "tests": 9,
+  "assertions": 71,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ProductionAccountFeaturesHttpTest.xml": {
+  "files": 1,
+  "tests": 32,
+  "assertions": 465,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ProductionCheckoutHttpBoundaryTest.xml": {
+  "files": 1,
+  "tests": 16,
+  "assertions": 134,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ProductionCheckoutJourneyTest.xml": {
+  "files": 1,
+  "tests": 7,
+  "assertions": 81,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ProductionCheckoutProviderTest.xml": {
+  "files": 1,
+  "tests": 23,
+  "assertions": 90,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ProductionConsentWithdrawalReaderTest.xml": {
+  "files": 1,
+  "tests": 4,
+  "assertions": 36,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ProductionFreeGrantRequestIdentityTest.xml": {
+  "files": 1,
+  "tests": 2,
+  "assertions": 10,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ProductionHostedEvidenceTest.xml": {
+  "files": 1,
+  "tests": 36,
+  "assertions": 40,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ProductionIdentityCommittedFrameTest.xml": {
+  "files": 1,
+  "tests": 18,
+  "assertions": 118,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 1,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ProductionIdentityHttpTest.xml": {
+  "files": 1,
+  "tests": 8,
+  "assertions": 64,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ProductionIdentityKeyRotationTest.xml": {
+  "files": 1,
+  "tests": 10,
+  "assertions": 71,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ProductionIdentityRegistrationTest.xml": {
+  "files": 1,
+  "tests": 7,
+  "assertions": 118,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ProductionTaxCheckoutHttpBoundaryTest.xml": {
+  "files": 1,
+  "tests": 17,
+  "assertions": 131,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ProductionTaxCheckoutJourneyTest.xml": {
+  "files": 1,
+  "tests": 26,
+  "assertions": 164,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "PromotionPricingHttpTest.xml": {
+  "files": 1,
+  "tests": 5,
+  "assertions": 150,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "PublicDiscoveryIndexTest.xml": {
+  "files": 1,
+  "tests": 23,
+  "assertions": 103,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "PublicInstallMetadataTest.xml": {
+  "files": 1,
+  "tests": 6,
+  "assertions": 160,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "PublicLicenseDisclosureTest.xml": {
+  "files": 1,
+  "tests": 13,
+  "assertions": 140,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "PublicPagesSitemapTest.xml": {
+  "files": 1,
+  "tests": 18,
+  "assertions": 50,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "PublicTrackEmbedTest.xml": {
+  "files": 1,
+  "tests": 18,
+  "assertions": 1034,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "QuoteDisclosureTest.xml": {
+  "files": 1,
+  "tests": 10,
+  "assertions": 211,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "QuoteHttpTest.xml": {
+  "files": 1,
+  "tests": 10,
+  "assertions": 222,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "QuotePricingHttpTest.xml": {
+  "files": 1,
+  "tests": 7,
+  "assertions": 225,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ReviewFree256IdentityRotationTest.xml": {
+  "files": 1,
+  "tests": 3,
+  "assertions": 27,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ServiceProjectRegistrationTest.xml": {
+  "files": 1,
+  "tests": 2,
+  "assertions": 32,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "ServiceProjectReviewRegressionTest.xml": {
+  "files": 1,
+  "tests": 2,
+  "assertions": 18,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "StagingTestCommerceProfileJourneyTest.xml": {
+  "files": 1,
+  "tests": 9,
+  "assertions": 249,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "StripeWebhookTest.xml": {
+  "files": 1,
+  "tests": 53,
+  "assertions": 230,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "SupportAttachmentHttpTest.xml": {
+  "files": 1,
+  "tests": 5,
+  "assertions": 248,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "SupportAttachmentKeyCaptureIndependentTest.xml": {
+  "files": 1,
+  "tests": 1,
+  "assertions": 5,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "SupportAttachmentSessionBindingTest.xml": {
+  "files": 1,
+  "tests": 6,
+  "assertions": 36,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "SupportAttachmentSessionIndependentTest.xml": {
+  "files": 1,
+  "tests": 4,
+  "assertions": 24,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "TestContractIssuanceTest.xml": {
+  "files": 1,
+  "tests": 53,
+  "assertions": 504,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "TestFulfillmentActivationTest.xml": {
+  "files": 1,
+  "tests": 32,
+  "assertions": 238,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "TestOrderFinalizationTest.xml": {
+  "files": 1,
+  "tests": 53,
+  "assertions": 473,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "TestOwnerDeliveryHttpTest.xml": {
+  "files": 1,
+  "tests": 48,
+  "assertions": 2027,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "TestOwnerDeliveryTest.xml": {
+  "files": 1,
+  "tests": 45,
+  "assertions": 336,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "TestPaymentProcessingTest.xml": {
+  "files": 1,
+  "tests": 76,
+  "assertions": 524,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "total": {
+  "files": 72,
+  "tests": 1246,
+  "assertions": 19248,
+  "failures": 1,
+  "errors": 0,
+  "skipped": 2
+ }
+}

@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\Support\EconomicLicenseFixtures;
+use Tests\Support\FilamentNotifications;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\TestCase;
@@ -292,9 +293,10 @@ class LicenseDraftAuthoringActionTest extends TestCase
         Log::spy();
         AuditEvent::creating(fn () => throw new RuntimeException('Synthetic private failure detail'));
         $page->callMountedAction()->assertHasTableActionErrors(['authored_source']);
-        $sent = session('filament.claimed_notifications') ?? session('filament.notifications');
-        $this->assertIsArray($sent);
+        // Read the queued notifications before assertNotified() drains them, and require the expected one so the privacy checks below cannot pass on nothing.
+        $sent = FilamentNotifications::flashed();
         $this->assertCount(1, $sent);
+        $this->assertSame(['The save result could not be confirmed.', 'danger'], [$sent[0]['title'], $sent[0]['status']]);
         $page->assertNotified('The save result could not be confirmed.');
         $this->assertRecovery($page, 'Unconfirmed local source');
         $this->assertSame($before, $this->evidence());

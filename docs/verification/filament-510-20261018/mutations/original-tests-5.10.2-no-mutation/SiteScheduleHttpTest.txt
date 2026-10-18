@@ -1,0 +1,61 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/m3/phpunit.xml
+
+..FFF.FF....F.....                                                18 / 18 (100%)
+
+Time: 00:15.635, Memory: 103.00 MB
+
+There were 6 failures:
+
+1) Tests\Feature\SiteScheduleHttpTest::test_open_schedule_confirmation_reports_a_publication_or_schedule_made_meanwhile@another release was published with data ('publish', 'The published site changed.')
+The Scheduling blocked notification was not sent.
+Failed asserting that null is not null.
+
+/home/user/wt/m3/tests/Feature/SiteScheduleHttpTest.php:51
+/home/user/wt/m3/tests/Feature/SiteScheduleHttpTest.php:135
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\SiteScheduleHttpTest::test_open_schedule_confirmation_reports_a_publication_or_schedule_made_meanwhile@this release was published with data ('publish-target', 'The published site changed.')
+The Scheduling blocked notification was not sent.
+Failed asserting that null is not null.
+
+/home/user/wt/m3/tests/Feature/SiteScheduleHttpTest.php:51
+/home/user/wt/m3/tests/Feature/SiteScheduleHttpTest.php:135
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\SiteScheduleHttpTest::test_open_schedule_confirmation_reports_a_publication_or_schedule_made_meanwhile@another release was scheduled with data ('schedule', 'Another release is already scheduled.')
+The Scheduling blocked notification was not sent.
+Failed asserting that null is not null.
+
+/home/user/wt/m3/tests/Feature/SiteScheduleHttpTest.php:51
+/home/user/wt/m3/tests/Feature/SiteScheduleHttpTest.php:135
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\SiteScheduleHttpTest::test_open_cancel_confirmation_reports_a_schedule_resolved_meanwhile_with_nothing_else_pending@cancelled by another administrator with data ('cancel')
+The Cancellation blocked notification was not sent.
+Failed asserting that null is not null.
+
+/home/user/wt/m3/tests/Feature/SiteScheduleHttpTest.php:51
+/home/user/wt/m3/tests/Feature/SiteScheduleHttpTest.php:191
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\SiteScheduleHttpTest::test_open_cancel_confirmation_reports_a_schedule_resolved_meanwhile_with_nothing_else_pending@replaced by a staff publication with data ('publish')
+The Cancellation blocked notification was not sent.
+Failed asserting that null is not null.
+
+/home/user/wt/m3/tests/Feature/SiteScheduleHttpTest.php:51
+/home/user/wt/m3/tests/Feature/SiteScheduleHttpTest.php:191
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+6) Tests\Feature\SiteScheduleHttpTest::test_open_publish_confirmation_reports_its_release_becoming_active_meanwhile
+The Publication blocked notification was not sent.
+Failed asserting that null is not null.
+
+/home/user/wt/m3/tests/Feature/SiteScheduleHttpTest.php:51
+/home/user/wt/m3/tests/Feature/SiteScheduleHttpTest.php:272
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 18, Assertions: 195, Failures: 6.

@@ -1,0 +1,60 @@
+{
+ "OrderInquiryMigrationTest.xml": {
+  "files": 1,
+  "tests": 8,
+  "assertions": 33,
+  "failures": 1,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": [
+   "FAIL Tests\\Feature\\OrderInquiryMigrationTest::test_empty_owned_roundtrip_and_repeat_install_preserve_unrelated_schema"
+  ]
+ },
+ "ProductionAccountFeaturesDefaultConfigurationTest.xml": {
+  "files": 1,
+  "tests": 3,
+  "assertions": 24,
+  "failures": 1,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": [
+   "FAIL Tests\\Feature\\ProductionAccountFeatures\\ProductionAccountFeaturesDefaultConfigurationTest::test_booted_parents_are_the_exact_closed_default_off_plain_arrays"
+  ]
+ },
+ "ProductionFreeGrantContentionTest.xml": {
+  "files": 1,
+  "tests": 7,
+  "assertions": 32,
+  "failures": 3,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": [
+   "FAIL Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantContentionTest::test_a_deadlock_after_the_customer_write_is_a_fixed_refusal_and_nothing_is_written with data set \"mysql deadlock 1213\"",
+   "FAIL Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantContentionTest::test_a_deadlock_after_the_customer_write_is_a_fixed_refusal_and_nothing_is_written with data set \"mysql lock wait timeout 1205\"",
+   "FAIL Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantContentionTest::test_a_deadlock_after_the_customer_write_is_a_fixed_refusal_and_nothing_is_written with data set \"serialization failure 40001\""
+  ]
+ },
+ "ProductionFreeGrantStalledSourceTest.xml": {
+  "files": 1,
+  "tests": 5,
+  "assertions": 31,
+  "failures": 1,
+  "errors": 0,
+  "skipped": 0,
+  "skipped_outside_census": [],
+  "problems": [
+   "FAIL Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantStalledSourceTest::test_the_deadline_is_checked_before_the_first_read"
+  ]
+ },
+ "total": {
+  "files": 4,
+  "tests": 23,
+  "assertions": 120,
+  "failures": 6,
+  "errors": 0,
+  "skipped": 0
+ }
+}

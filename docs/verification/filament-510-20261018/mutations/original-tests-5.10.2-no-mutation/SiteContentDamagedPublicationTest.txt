@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/m3/phpunit.xml
+
+.F..                                                                4 / 4 (100%)
+
+Time: 00:25.510, Memory: 97.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\SiteContentDamagedPublicationTest::test_a_damaged_publication_record_refuses_publishing_and_sends_staff_to_a_backup
+Failed asserting that null is not null.
+
+/home/user/wt/m3/tests/Feature/SiteContentDamagedPublicationTest.php:97
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 4, Assertions: 55, Failures: 1.

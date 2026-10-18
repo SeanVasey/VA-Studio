@@ -1,0 +1,35 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/m3/phpunit.xml
+
+FF                                                                  2 / 2 (100%)
+
+Time: 00:06.020, Memory: 93.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\LicenseTemplateAuthoringActionTest::test_uncertain_audit_failure_closes_form_without_success_and_logs_only_exception_class@create with data ('create')
+A notification was not sent
+Failed asserting that null is not null.
+
+/home/user/wt/m3/vendor/filament/notifications/src/Notification.php:280
+/home/user/wt/m3/vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+/home/user/wt/m3/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+/home/user/wt/m3/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+/home/user/wt/m3/tests/Feature/LicenseTemplateAuthoringActionTest.php:292
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\LicenseTemplateAuthoringActionTest::test_uncertain_audit_failure_closes_form_without_success_and_logs_only_exception_class@edit with data ('edit')
+A notification was not sent
+Failed asserting that null is not null.
+
+/home/user/wt/m3/vendor/filament/notifications/src/Notification.php:280
+/home/user/wt/m3/vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+/home/user/wt/m3/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+/home/user/wt/m3/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+/home/user/wt/m3/tests/Feature/LicenseTemplateAuthoringActionTest.php:292
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 12, Failures: 2.
