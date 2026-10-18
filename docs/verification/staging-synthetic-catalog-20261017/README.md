@@ -17,9 +17,16 @@ complete before the reboot, and nothing was re-run for unchanged source.
 Its working tree was clean for `app/`, `config/` and `tests/` during the final runs below. The later documentation
 commit changes no code. Results recorded at an earlier commit say so.
 
+**Review delta.** The independent review of `09acd13d` (a merge of `main`) returned APPROVE WITH CONDITIONS, with no
+P0 or P1. The conditions are closed by `c23718c4` (fix) and `a8f162c8` (test). Sections 1–5 below are the original
+evidence at `5f7fe502`. The [review conditions closed](#review-conditions-closed) section records the delta
+evidence at `a8f162c8`.
+
 **What was built.** `vasey:staging-synthetic-catalog` seeds a labelled synthetic catalog for the hosted staging
-rehearsal: six `[SYNTHETIC]` tracks and two TEST PRICE licenses. Its admission is default-off, it refuses in
-production unconditionally, and every write goes through the existing domain services. The design and its reasoning
+rehearsal: six `[SYNTHETIC]` tracks and two TEST PRICE licenses. Its admission is default-off. It refuses when the
+configured or running environment is production or the two differ, and on a catalog that already holds non-synthetic
+published tracks or approved licenses (configuration and catalog checks, not host identity; see the review conditions
+below). Every write goes through the existing domain services. The design and its reasoning
 are in [design.md](design.md). Operator use is in `docs/ops/staging-runbook.md` section 5a.
 
 **New flag.** `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED`, default `false`. It is not yet in the staging template
@@ -184,6 +191,72 @@ is therefore required by an existing invariant. It is in `ops/production/`, not 
   partition proof holds, with 233 selected files, 2,432 selected cases and selection policy sha256 `995aa895…`. The
   new file is not selected. **Native-selection delta: none.** The generated files were deleted afterwards.
 - No driver-branching test was added, and no census JSON or workflow was edited.
+
+## Review conditions closed
+
+All delta results are at `a8f162c8a03f087c0b6d56b3da5e0eb018c7d458`, with a clean working tree for code.
+
+| Finding | Before (at `09acd13d`) | Now |
+| --- | --- | --- |
+| **P2-1** `--env` bypass | The production check read only `app()->environment()`, so `APP_ENV=production … --env=staging` passed it. | The command refuses if `config('app.env')` or `app()->environment()` is `production`, and refuses if the two differ. Two bounded reads against the exact synthetic slugs also refuse a catalog with a published or once-published real track, or an approved real license. |
+| **P2-2** console staff identity | It acted as both accounts by email alone. | It requires an interactive console and both passwords at hidden prompts, with no visible fallback (the `vasey:rights-scope` pattern). On staging it requires `--attest`, which records one `staff.console_attestation` per account (command, role, both IDs, enrollment) before the first write. `--check` stays non-interactive. |
+| **P3-1** blocked state | Not stated. | Runbook §5a opens with "Blocked until the S-6 seller tag is installed, or until Sean decides about a synthetic tag". Reset step 4 reinstalls S-6 and removes any synthetic tag before real masters. |
+| **P3-2** staging write chain | Untested. | A test runs the whole chain under `staging` with enrolled accounts, `--attest`, both passwords and the repository's ClamAV stand-in scanner pattern. All six tracks publish with no readiness blockers. |
+| **P3-3** unexpected errors | Uncaught. | A final `Throwable` catch prints "Stopped: the result is unconfirmed. Re-run the command to resume …". It logs only `exception_class`, following the Filament writer pattern. |
+| **P3-4** environment resets | Reset inline. | Resets run in `finally`, through an `inEnvironment()` helper. A lock-contention refusal test was added. |
+| **P3-5** marker wording, flag refresh, offer prices | Overstated, missing, unchecked. | The CHANGELOG now says offers, revisions, rights and media inherit the marker. The runbook adds a Deploy Now configuration refresh after the flag returns to `false`. A re-run compares a published track's active offers with the definition and reports `present, offers differ from the definition; left unchanged`. |
+
+The overstated claims were corrected to the precise rule in six places:
+
+- the command docblock;
+- the config comment;
+- `design.md` (purpose and admission);
+- this packet's scope;
+- runbook §5a admission;
+- the CHANGELOG.
+
+`design.md` and the runbook no longer say "like every staff-attributed console write". They also state that one
+shell drives both accounts.
+
+**Delta results**
+
+- **Feature file, SQLite:** **19 tests and 806 assertions**, with 0 failures, 0 errors, 0 skips and 0 warnings, in
+  2 min 55 s. Old: 12 tests and 589 or 585 assertions. The production test was renamed from
+  `…refused_unconditionally…` to `test_production_is_refused_even_with_the_flag_and_test_mode`. The seven new cases:
+
+  | Case | What it proves |
+  | --- | --- |
+  | `test_a_production_configuration_is_refused_when_the_running_environment_says_staging` | Detected `staging` with configured `production`: refused for the run and `--check`, no writes. |
+  | `test_a_running_environment_that_differs_from_the_configuration_is_refused` | Detected/configured staging/testing, testing/staging and local/staging: each refused, no writes. |
+  | `test_writes_need_an_interactive_console_both_passwords_and_the_lock` | Refused: `--no-interaction`, `--attest` with `--check`, a wrong operator password, a wrong reviewer password, the reviewer's password at the operator prompt, and a held lock. No writes and no attestation. |
+  | `test_the_password_prompt_never_falls_back_to_visible_input_and_failures_stay_generic` | The prompt is hidden with no fallback. A failure to hide prints only the generic unconfirmed line (no message or path) and logs `exception_class` once. No writes. |
+  | `test_staging_requires_an_attestation_and_then_runs_the_whole_chain_with_enrolled_accounts` | Covers P3-2, as in the table above. Without `--attest`, refused with no writes. With it, the two attestation rows are the first audits of the run, carry the expected context, and the license approvals belong to the reviewer. |
+  | `test_a_catalog_with_a_published_or_once_published_real_track_is_refused` | A never-published real draft is admitted. Once its URL is reserved, the run and `--check` are refused. |
+  | `test_a_catalog_with_an_approved_real_license_is_refused` | A real template without versions is admitted; an approved real license is refused. |
+
+  The re-run case now also deactivates one offer through `DeactivateOffer` and gets the offers-differ report, with
+  no writes.
+- **Related suites, SQLite:** `tests/Unit/ProductionEnvironmentTemplateTest.php`,
+  `tests/Feature/RightsScopeCommandAttestationTest.php` and `tests/Feature/RightsScopeCommandTest.php` passed **23
+  tests and 2,071 assertions**.
+- **Real process:** `artisan` on code identical to `a8f162c8` for `app/` and `config/`, in the scratch environment of
+  section 3, with `--check`:
+
+  | Invocation | Exit | Result |
+  | --- | --- | --- |
+  | `APP_ENV=production … --env=staging` | 1 | Refused in production. |
+  | The same, with `config:cache` built under `APP_ENV=production` | 1 | Refused in production. The cache file was then deleted. |
+  | `APP_ENV=local … --env=staging` | 1 | Refused: "configured environment (APP_ENV) and the running environment differ". |
+
+  These refusals precede any database access.
+- **Pint:** passed on every changed PHP file.
+- **Native MySQL:** not re-run. The new guard uses `where`/`orWhereNotNull`/`whereNotIn`/`whereHas(...)->exists()`
+  with no pattern matching, locking or engine-specific SQL. The remaining changes are console I/O and an existing
+  attestation writer that `RightsScopeCommandAttestationTest` already covers. The MySQL evidence in section 2 is at
+  `5f7fe502`.
+
+**Still open after review.** P3-2 is covered by the test above, but not on the hosted staging server. The
+decision-register entry for the S-6 tag is left to the lead.
 
 ## Untested conditions
 

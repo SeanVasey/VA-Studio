@@ -19,15 +19,22 @@ Testers need to rehearse the hosted staging journey before Sean's 3–10 real tr
 - "Development fixtures must be isolated from production."
 - "Never report a scaffold or mock as implemented commerce."
 
-The design answers them this way. The content cannot be mistaken for real content. The command is off by default,
-runs only in `local`, `testing` or `staging`, and cannot run in production. Every row goes through the real domain
-services, so the rehearsal exercises the real commerce chain rather than a mock of it.
+The design answers them this way.
+
+- The content cannot be mistaken for real content.
+- The command is off by default and admits only `local`, `testing` or `staging`.
+- It refuses when the configured or the running environment is production, or when the two differ.
+- It refuses on a catalog that already holds non-synthetic published tracks or approved licenses.
+
+These are configuration and catalog checks, not proof of host identity. Running it on a production host would take
+a production host misconfigured as staging, with an empty catalog. Every row goes through the real domain services,
+so the rehearsal exercises the real commerce chain rather than a mock of it.
 
 ## Shape
 
 | Piece | File | Role |
 | --- | --- | --- |
-| Command | `app/Console/Commands/StagingSyntheticCatalog.php` | `vasey:staging-synthetic-catalog --operator= --reviewer= [--check]`. Runs admission, takes a cache lock, calls the builder, prints the result. |
+| Command | `app/Console/Commands/StagingSyntheticCatalog.php` | `vasey:staging-synthetic-catalog --operator= --reviewer= [--attest] [--check]`. Runs admission, confirms both passwords, records attestations where required, takes a cache lock, calls the builder, prints the result. |
 | Policy | `app/Domain/Catalog/SyntheticRehearsal/SyntheticRehearsalPolicy.php` | Every admission check, all before the first write. |
 | Definition | `app/Domain/Catalog/SyntheticRehearsal/SyntheticRehearsalCatalog.php` | The fixed labelled catalog: six tracks, two licenses, marker and label constants. |
 | Builder | `app/Domain/Catalog/SyntheticRehearsal/SyntheticRehearsalBuilder.php` | Calls the domain services in admin order, with resume and idempotence. |
@@ -39,20 +46,30 @@ No migration, schema change, route, Filament page or job was added. No existing 
 
 ## Admission (all before any write)
 
-1. **Production first, unconditionally.** `app()->environment('production')` refuses even if the flag is on and
-   Stripe is in test mode.
-2. **Environment.** `TestEnvironment::admitsTestCommerce()` admits exactly `local`, `testing` and `staging`. Lookalike
+1. **Production first.** The command refuses if `config('app.env')` is `production`. That is the configured
+   environment, which a cached configuration keeps. It also refuses if `app()->environment()`, the running
+   environment, is `production`. The flag and Stripe mode make no difference.
+2. **Agreement.** The command refuses if `config('app.env')` and `app()->environment()` differ. Artisan's `--env=`
+   switch changes only the running environment, so `APP_ENV=production … --env=staging` is refused at step 1, and
+   `APP_ENV=local … --env=staging` here. Review finding P2-1.
+3. **Environment.** `TestEnvironment::admitsTestCommerce()` admits exactly `local`, `testing` and `staging`. Lookalike
    names (`Staging`, `staging-eu`, `development`, `prod`, empty) are refused.
-3. **Flag.** `config('staging-synthetic-catalog.enabled') === true`. It is read through a new small config file, so
+4. **Flag.** `config('staging-synthetic-catalog.enabled') === true`. It is read through a new small config file, so
    no shared config file was edited. A string `"true"` or `1` set directly in config is refused. `env()` turns the
    `.env` value `true` into a boolean.
-4. **Stripe test mode.** The same configuration-shape rule as the installation report's staging check:
+5. **Stripe test mode.** The same configuration-shape rule as the installation report's staging check:
    - `STRIPE_MODE=test`;
    - an `sk_test_` secret or none (restricted `rk_` and live keys are refused);
    - no `PRODUCTION_CHECKOUT_FUNDS_MODE=live` and no live production-checkout key.
 
    No provider is contacted.
-5. **Operators.** `--operator` and `--reviewer` name existing staff accounts, created with `vasey:create-admin` as
+6. **Synthetic-only catalog.** Two bounded existence reads against the exact definition slugs:
+   - any track that is published, or was published (its URL is reserved), outside the six synthetic slugs;
+   - any approved or published license version whose template is not one of the two synthetic templates.
+
+   Either one refuses. Exact `whereNotIn` lists use no pattern matching, so collation and `LIKE` semantics play no
+   part. A real draft that was never published does not block.
+7. **Operators.** `--operator` and `--reviewer` name existing staff accounts, created with `vasey:create-admin` as
    the staging runbook already requires. Each account must:
    - have a name starting with `Synthetic `, so writes can never be attributed to Sean's or another real account;
    - pass the `administer-catalog` gate (administrator with a verified email);
@@ -60,12 +77,25 @@ No migration, schema change, route, Filament page or job was added. No existing 
      authenticator.
 
    The two accounts must differ, because license approval refuses the author.
-6. **Media prerequisites.**
+8. **Media prerequisites.**
    - ffmpeg, ffprobe and prlimit are executable, and PHP GD is loaded.
    - The configured seller tag exists in private storage and matches `MEDIA_TAG_SHA256`.
-7. **Lock.** A cache lock refuses a concurrent run before it writes.
+9. **Staff identity (writes only).** Writes require an interactive console. Following `vasey:rights-scope`, the
+   command confirms each account's password at a hidden prompt with no visible fallback, against the current
+   password hash and catalog authority. Where the panel requires staff MFA (staging), the run also needs
+   `--attest`. It then records one append-only `staff.console_attestation` per account through
+   `StaffWriteAuthority::attest()`, recording:
+   - the command;
+   - the role (`synthetic_catalog.operator` or `synthetic_catalog.reviewer`);
+   - both account IDs, in the scope key;
+   - a keyed hash of a per-run reference;
+   - whether the panel rule was required and the account enrolled.
 
-`--check` runs steps 1–6 and prints the plan without writing.
+   Both records are written before the first catalog write. No writer consumes them: they are audit evidence, and
+   every domain service still checks each account's current enrollment. Review finding P2-2.
+10. **Lock.** A cache lock refuses a concurrent run, after the passwords and before any attestation or write.
+
+`--check` runs steps 1–8, prints the plan and writes nothing. It asks for no password and refuses `--attest`.
 
 ## Writes: only through the existing services
 
@@ -143,10 +173,18 @@ schema change.
 
 Each step first looks for the row a previous run left:
 
-- **Published synthetic track.** Reported `already present` if its metadata still matches the definition and it
-  passes readiness. Otherwise it is reported `present, not ready: <blockers>`, or `present, metadata differs from the
-  definition; left unchanged` after a staff edit (for example one that removed `[SYNTHETIC]`). Nothing is written or
-  reverted.
+- **Published synthetic track.** Reported `already present` when three things hold:
+  - its metadata still matches the definition;
+  - its active offers are exactly the two TEST PRICE offers, at their defined prices;
+  - it passes readiness.
+
+  Otherwise it is reported in one of three ways:
+  - `present, metadata differs from the definition; left unchanged`, after a staff edit (for example one that
+    removed `[SYNTHETIC]`);
+  - `present, offers differ from the definition; left unchanged`;
+  - `present, not ready: <blockers>`.
+
+  Nothing is written or reverted.
 - **Withdrawn track** (`published_slug` set, status `draft`). Reported `withdrawn by staff; left unpublished`. It is
   never republished, so the ordinary unpublish action stays a reliable way to hide synthetic content.
 - **Draft synthetic track whose metadata matches the definition.** Resumed. Verified rights, available media
@@ -173,13 +211,16 @@ immutable evidence. Two ways out are documented in `docs/ops/staging-runbook.md`
 
 ## Deliberate limits
 
-- **Rights scopes.** The command does not link scopes. `vasey:rights-scope` requires a password-confirmed,
-  single-use attestation for each write on staging, and duplicating that writer would weaken its design. The command
+- **Rights scopes.** The command does not link scopes. Each link is a separate `vasey:rights-scope` write: its own
+  password confirmation, its own single-use attestation that the writer consumes, and an operator's decision about
+  which scope a revision belongs to. Duplicating that writer here would weaken its design. The command
   prints the follow-up, and the runbook gives the convention: one scope per synthetic track, keys starting
   `synthetic-rehearsal-`.
-- **Console MFA.** A console has no MFA challenge. Like every staff-attributed console write (see
-  `StaffWriteAuthority`), the command relies on the accounts' current enrollment, and shell access to the host stays
-  the controlling credential.
+- **Console identity.** A console has no MFA challenge. The command confirms both passwords and, where MFA is
+  required, records an attestation per account. It also relies on each account's current enrollment, which every
+  domain service checks. One shell still drives both accounts, so the two-person rule for license approval is
+  enforced between accounts, not between people. Shell access plus the two passwords stays the controlling
+  credential.
 - **Stems.** Stems ZIPs and the stems license role are not seeded. Both licenses deliver `download_mp3`, and the WAV
   license also delivers `master_wav`.
 - **Environment templates.** `.env.example` and `ops/production/env.production.example` document the new key

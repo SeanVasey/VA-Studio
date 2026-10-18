@@ -155,6 +155,9 @@ If a job fails, open **Processing details**. `docs/media-processing.md` maps eac
 
 ## 5a. Synthetic rehearsal catalog (optional, before real tracks)
 
+**Blocked until the S-6 seller tag is installed (section 3), or until Sean decides about a synthetic tag.** Without
+a configured tag, the command refuses before writing anything.
+
 `vasey:staging-synthetic-catalog` creates six labelled synthetic tracks, so testers can rehearse the whole journey
 (catalog, player, quote, Stripe test checkout, verified payment, contract PDF, download) before Sean's real tracks
 (S-7) arrive. Sean approved it on 2026-10-17. Nothing it creates is product data:
@@ -164,8 +167,9 @@ If a job fails, open **Processing details**. `docs/media-processing.md` maps eac
 - There are two non-exclusive licenses, each offered on every track:
   - "[SYNTHETIC] TEST PRICE MP3 license" delivers `download_mp3` at 1.11 USD (stored as 111 cents);
   - "[SYNTHETIC] TEST PRICE WAV license" delivers `download_mp3` and `master_wav` at 2.22 USD (222 cents).
-- Every row carries the marker `synthetic-rehearsal`: it is the slug prefix of the tracks and license templates, a
-  track tag, and (as `SYNTHETIC-REHEARSAL-NN:`) the prefix of each rights declaration's provenance.
+- The marker `synthetic-rehearsal` is the slug prefix of the tracks and license templates, a track tag, and (as
+  `SYNTHETIC-REHEARSAL-NN:`) the prefix of each rights declaration's provenance. Offers, revisions and media inherit
+  it through their track or license.
 
 The command generates the audio (30–60 s tones, chords and noise, as WAV masters) with ffmpeg and the artwork (plain
 colours with "SYNTHETIC TEST", no brand mark) with PHP GD, on the host, at run time. The files enter through the
@@ -174,19 +178,25 @@ domain service as the admin, under the same staff authority, MFA, rights, media 
 
 **Admission.** The command checks all of this before it writes anything. A failure prints `Refused: …` and exits 1:
 
-1. `APP_ENV` is `local`, `testing` or `staging`. `production` is refused unconditionally, even with the flag on.
+1. `APP_ENV` is `local`, `testing` or `staging`. The command refuses when the configured environment (`APP_ENV`,
+   including a cached configuration) or the running environment is `production`, even with the flag on. It also
+   refuses when the two differ, for example through `artisan --env=`.
 2. `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED=true`. The default is false. The key is not yet in
    `ops/staging/env.staging.example`; add it to the host's `.env` by hand.
 3. Stripe is in test mode: `STRIPE_MODE=test`, an `sk_test_` key or none, and no live production-checkout setting.
-4. Two existing staff accounts named for this purpose:
+4. The catalog is empty or synthetic-only. A track that is or was published, or an approved license, outside the
+   synthetic definition refuses the run. This is a configuration and catalog check, not proof of host identity.
+5. Two existing staff accounts named for this purpose:
    - `--operator` is the author, rights verifier and publisher;
    - `--reviewer` approves the licenses, because license approval refuses the author.
 
    Both names must start with `Synthetic `, so synthetic writes are never attributed to a real operator. Both need
    catalog authority and, on staging, an enrolled authenticator: the same panel rule every staff write checks.
-5. The approved seller tag is configured and matches its SHA-256 (section 3). Without it the pipeline cannot make a
+   A write run then asks for both passwords at hidden prompts, in an interactive console. On staging it also needs
+   `--attest`: it records one `staff.console_attestation` audit row per account before the first write.
+6. The approved seller tag is configured and matches its SHA-256 (section 3). Without it the pipeline cannot make a
    tagged preview (`tag_not_configured`). The command never generates, replaces or overrides a tag.
-6. ffmpeg, ffprobe, prlimit and PHP GD are available.
+7. ffmpeg, ffprobe, prlimit and PHP GD are available.
 
 **Run.**
 
@@ -195,15 +205,16 @@ art vasey:create-admin   # name: Synthetic Catalog Operator; an email address yo
 art vasey:create-admin   # name: Synthetic Catalog Reviewer
 # Sign in at /admin as each account and enroll the authenticator app (section 2).
 # Forge → Environment: VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED=true, then Deploy Now (configuration refresh).
-art vasey:staging-synthetic-catalog --operator=OPERATOR_EMAIL --reviewer=REVIEWER_EMAIL --check   # admission only
-art vasey:staging-synthetic-catalog --operator=OPERATOR_EMAIL --reviewer=REVIEWER_EMAIL
+art vasey:staging-synthetic-catalog --operator=OPERATOR_EMAIL --reviewer=REVIEWER_EMAIL --check            # admission only, no prompts
+art vasey:staging-synthetic-catalog --operator=OPERATOR_EMAIL --reviewer=REVIEWER_EMAIL --attest           # asks both passwords
 ```
 
 Expect several minutes. ClamAV scans each master, the tag and each artwork, at 15–25 s per scan (section 5). The
 command processes each media run in its own process with the service the media worker uses. A claim token makes
 the two exclusive: whichever claims a run first processes it, and the command waits for the result. It prints one
 line per license and per track, then a table of offer revisions and prices. Exit 0 means every synthetic track is
-published and passes publication readiness. Then set the flag back to `false`.
+published and passes publication readiness. Then set the flag back to `false` in Forge → Environment and click
+Deploy Now, which refreshes the cached configuration as in section 3, so the running value is off too.
 
 The command is a manual writer. Do not run it during a deploy, a backup or a quiesce. A cache lock refuses a second
 concurrent run. If a run is killed, its lock expires after an hour.
@@ -213,8 +224,9 @@ concurrent run. If a run is killed, its lock expires after an hour.
 - The storefront lists six `[SYNTHETIC]` tracks. Each plays its tagged preview and shows the two TEST PRICE licenses.
 - `art vasey:rights-scope list` shows the twelve new revisions. "Prepare order" needs each revision you buy linked to
   a rights scope first (purchase walkthrough, setup step 5). Use one scope per synthetic track, with a key starting
-  `synthetic-rehearsal-`. The command does not link scopes: that writer requires a password-confirmed attestation
-  for every write.
+  `synthetic-rehearsal-`. The command does not link scopes. Each link is its own `vasey:rights-scope` write, with
+  its own password confirmation and single-use attestation, and an operator decides which scope each revision
+  belongs to.
 - Then follow [the purchase walkthrough](staging-test-purchase.md). Run its drills on one synthetic track and buy
   from another, because a drill leaves its offer revision reserved.
 
@@ -224,7 +236,8 @@ concurrent run. If a run is killed, its lock expires after an hour.
 - An interrupted run resumes the unfinished draft (`resumed and published`). After a failed media step, fix the
   cause and run the command again.
 - A row that carries the marker but differs from its definition is refused and left unchanged. A published
-  synthetic track that staff have edited is reported `present, metadata differs from the definition` (exit 1).
+  synthetic track whose metadata or offers staff changed is reported `present, metadata differs …` or
+  `present, offers differ …` (exit 1). Nothing is reverted.
 - A track withdrawn with the ordinary unpublish action is reported `withdrawn by staff; left unpublished`. The
   command never republishes it, and exits 1.
 - The command never creates quotes, orders, payments, grants or contracts.
@@ -238,7 +251,9 @@ storage, with Sean's go-ahead:
 2. Quiesce. As root, drop and recreate the `vasey_staging` schema as in section 9 B step 2, without loading a dump,
    and move the private storage entries aside as in its step 3, without extracting an archive.
 3. Run the migrations on the empty schema: `art migrate --force`.
-4. Reinstall the seller tag (section 3); it lived in the private storage you moved aside.
+4. Reinstall the approved S-6 seller tag (section 3); it lived in the private storage you moved aside. If a
+   synthetic tag was ever configured, remove it, and point `MEDIA_TAG_PATH`/`MEDIA_TAG_SHA256` at S-6 before any
+   real master is processed.
 5. Set `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED=false`, resume, recreate the staff accounts and their MFA
    (section 2), and rerun `art vasey:doctor`.
 
@@ -250,8 +265,10 @@ Stripe keeps its own test-mode records of the rehearsal; they are harmless and s
 - The S-6 seller tag is required. Until it arrives the command refuses. A synthetic tag would have to be configured
   host-wide and would tag every master processed while it is set, and `config/media.php` states that no synthetic
   seller tag exists outside the test suite. Using one is Sean's decision, not this command's.
-- A console has no MFA challenge. Like every staff-attributed console write, the command checks the accounts'
-  current enrollment, and shell access to the host remains the controlling credential.
+- A console has no MFA challenge. The command confirms both passwords, records the staging attestations, and every
+  domain service checks each account's current enrollment. One shell still drives both accounts, so the two-person
+  rule for license approval holds between accounts, not between people. Shell access plus the two passwords remains
+  the controlling credential.
 - It has not yet been run on the hosted staging server.
 
 ## 6. Test purchase: manual post-purchase console steps
