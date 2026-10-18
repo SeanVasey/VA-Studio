@@ -411,3 +411,16 @@ From the re-review at `6066e772` (also deferred to the next Tax batch):
 
 Still Sean's decisions (not deferred findings): the production pre-launch capability hold for the four flags in `ops/production/README.md` item 6, and an environment gate in the policy classes for the two ungated flags.
 
+
+2026-10-18 PR #148 bot findings, confirmed and deferred to the next ops batch with one reply each:
+- Codex P2 r4305404770: after a partial rclone upload, a retry re-encrypts and `--immutable` refuses the new ciphertext, so the set cannot be shipped under its name. Keep the exact ciphertext and checksum until `rclone check` passes, or give each attempt a unique object name and prune failed ones.
+- Codex P2 r4305404773: `host-baseline.sh apply-unattended-upgrades` prints "applied" when `systemctl enable --now` fails. Make that fatal and add a `check` row requiring both apt timers to be enabled and active.
+- Cursor Bugbot Medium r4305410457: staging `provision.sh` disables an opt-in clamd on re-provision. Move the marker guard into staging `provision.sh`, drop the production-only patch, regenerate `semantic-delta.diff`, and add a test.
+
+
+2026-10-18 K3 test identity link relay. Independent review at `e2d8b6cc` (APPROVE WITH CONDITIONS) and re-review at `d160b154` (APPROVE). P2-1 and the doc P3s were fixed before the PR opened. Deferred to the K3 follow-up batch:
+- P3-1: a piped password is accepted. Require `stream_isatty(STDIN)`, or correct the "interactive console" wording, in `vasey:test-identity-links`, `vasey:rights-scope` and `vasey:staging-synthetic-catalog` together (this absorbs C1's P3-B).
+- P3-2: refusal tests for a non-current policy version and for a challenge completed between `message()` and `relay()`, plus the `lstat` and inode checks on their own.
+
+Owner decision, not a finding: Sean to confirm the reserved-address rule (only `.test`, `.example`, `.invalid`, `.localhost`, `example.com`, `example.net` and `example.org` recipients can receive relayed links).
+
