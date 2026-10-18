@@ -1,8 +1,10 @@
 <?php
 
+use App\Domain\Commerce\Models\CheckoutIntent;
 use App\Domain\Commerce\Payments\ProcessStripeReceipt;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
+use App\Domain\Commerce\Payments\VerifyTestPayment;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -32,8 +34,10 @@ try {
         throw new RuntimeException('Payment worker barrier timed out.');
     };
     $gateway = PaymentFixtures::gateway(); $gateway->session = $input['session']; $gateway->payment = $input['payment'];
-    $gateway->onPayment = function (string $id) use ($directory, $worker, $input, $waitFor): array {
-        if (DB::transactionLevel() !== 0 || DB::table('stripe_receipt_work')->where('stripe_webhook_receipt_id', $input['receipt'])->where('state', 'processing')->count() !== 1) {
+    // A worker either processes a retained receipt or reconciles a known intent without a webhook.
+    $reconcile = isset($input['intent']);
+    $gateway->onPayment = function (string $id) use ($directory, $worker, $input, $waitFor, $reconcile): array {
+        if (DB::transactionLevel() !== 0 || (! $reconcile && DB::table('stripe_receipt_work')->where('stripe_webhook_receipt_id', $input['receipt'])->where('state', 'processing')->count() !== 1)) {
             throw new LogicException('Provider I/O preceded a committed claim or retained a transaction.');
         }
         touch($directory.'/provider-'.$worker); $waitFor($directory.'/release-'.$worker);
@@ -44,7 +48,8 @@ try {
     };
     $app->instance(StripeCheckoutGateway::class, $gateway); $app->instance(StripePaymentGateway::class, $gateway);
     file_put_contents($directory.'/ready-'.$worker, (string) $connectionId); $waitFor($directory.'/start-'.$worker);
-    $result = app(ProcessStripeReceipt::class)->handle($input['receipt']);
+    $result = $reconcile ? app(VerifyTestPayment::class)->reconcile(CheckoutIntent::findOrFail($input['intent']))
+        : app(ProcessStripeReceipt::class)->handle($input['receipt']);
     echo json_encode(['outcome' => $result, 'pid' => getmypid(), 'calls' => $gateway->calls], JSON_THROW_ON_ERROR); exit(0);
 } catch (Throwable $error) {
     echo json_encode(['outcome' => 'worker_failed', 'exception' => $error::class], JSON_THROW_ON_ERROR); exit(1);

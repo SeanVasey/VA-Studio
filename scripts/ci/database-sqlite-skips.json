@@ -1121,6 +1121,10 @@
     [
       "Tests\\Feature\\ProductionMembershipBilling\\BillingSubscriptionApprovalTest",
       "test_native_encryption_callback_ddl_cannot_write_an_approval_after_its_implicit_commit"
+    ],
+    [
+      "Tests\\Feature\\TestPaymentConcurrencyTest",
+      "test_reconciliation_racing_a_receipt_worker_for_one_payment_records_one_confirmation"
     ]
   ]
 }
