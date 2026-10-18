@@ -15,10 +15,14 @@ for `systemctl`, `ufw` and the like. No application code, route, config, census 
 | `1dd10a98` fix(ops): keep an opt-in clamd running when staging is re-provisioned | 3 | `ops/staging/provision.sh`, `ops/production/build-kit.py`, `tests/ops/test_clamav_profile.py`, `docs/verification/production-ops-kit-20261017/semantic-delta.diff` |
 | `9b053ae5` test(ops): check the env scrub of the built production forge-deploy.sh | 7 | `tests/ops/test_staging_code_drift.py` |
 | `810794a8` docs(ops): say where the twelve held flags sit and why the synthetic flag is not held | 6, 8 | `ops/staging/env.staging.example`, `scripts/ops/capability-boundary.php` |
-| this packet's commit | docs | `CHANGELOG.md`, this directory |
+| `a1c94023` docs(ops): record the O2 follow-up batch evidence and changelog | docs | `CHANGELOG.md`, this directory |
+| `108c04ae` fix(ops): refuse to overwrite a differing remote backup object on any rclone | R2-1 | `ops/staging/backup.sh`, `tests/ops/test_staging_backup_offhost.py`, `docs/ops/backup-offhost-hardening.md` |
+| `f6cb3b2d` test(ops): pin semantic-delta.diff to build-kit.py --delta | R2-2 | `tests/ops/test_production_kit.py` |
+| this update's commit | docs | `CHANGELOG.md`, this directory |
 
-**Tested source:** every check below ran at `810794a8` (the last code commit). The packet commit adds only documentation; the full
-suite was run again on it, and the lane report gives that SHA.
+**Tested source:** the first-round checks ran at `810794a8` and again at `a1c94023`. After the coordinator's two follow-up items
+(R2-1 and R2-2, below), every check in the verification table ran at `f6cb3b2d`, the last code commit. The commit that updates this
+packet adds only documentation; the full suite was run again on it, and the lane report gives that SHA.
 
 ## Items: what changed, and red/green
 
@@ -50,11 +54,12 @@ output for each is in [`evidence/red-green-and-mutations.txt`](evidence/red-gree
   - The default path is unchanged: `ship()` takes the same branch, and a new assertion checks that it creates nothing in the
     backup directory.
 - **Test.** `test_a_failed_checksum_upload_is_completed_by_a_retry_with_the_same_ciphertext`. The rclone is real, behind a stand-in
-  that fails the first checksum `copyto` and refuses an overwrite with different bytes. The first ship fails and the remote holds
-  only `<set>.tar.age`. The retry succeeds: the remote file is byte-identical to the first attempt's, its digest verifies, it
-  decrypts with the test key, and nothing is left behind.
+  that fails the first checksum upload. The first ship fails and the remote holds only `<set>.tar.age`. The retry succeeds: the
+  remote file is byte-identical to the first attempt's, its digest verifies, it decrypts with the test key, and nothing is left behind.
   - **Red:** `AssertionError: 1 != 0 : flaky-rclone: immutable file modified` (the retry re-encrypted and was refused).
   - **Green:** OK.
+  - In this first round the stand-in also refused overwrites, because the script then used `copyto`, which 1.60.1 lets replace an
+    object. Since R2-1 the script uses `copy --immutable`, the real rclone refuses, and the stand-in only simulates the interruption.
 - **Further tests** (all red at `efb22df3`, green now):
   - the kept copy is private ciphertext only;
   - a copy made for rotated recipients is never sent;
@@ -164,12 +169,61 @@ below failed at least one test:
 The age-header mutation first survived. That is why `test_a_kept_copy_that_is_not_age_ciphertext_is_never_sent` exists. The
 evidence file lists which test caught each mutation.
 
-## Verification at `810794a8`
+## Round 2: the coordinator's follow-up items
+
+### R2-1. Remote immutability on any rclone version (`108c04ae`)
+
+- **Change.** In `ship_encrypted_rclone`, the two `rclone copyto --checksum --immutable` uploads are now
+  `rclone copy --checksum --immutable --include "/<set>.tar.age" <kept copy> <remote>` and the same with `"/<set>.tar.age.sha256"`.
+  Each filter is anchored, so it matches exactly one file and the `recipients.sha256` in the kept copy never leaves. Unchanged:
+  - the order (ciphertext, then digest, then `rclone check --one-way`);
+  - the retry convergence;
+  - the lock and everything else.
+
+  The failure message now also covers a set that already shipped completely.
+- **Proof against the real rclone 1.60.1** with a local-filesystem remote (a named `type = local` remote over a temp dir). Probe in
+  the evidence file:
+  - fresh upload: exit 0;
+  - identical object present: "There was nothing to transfer", exit 0, the file unchanged;
+  - differing object present, same size: exit 6, "immutable file modified", the object kept. A different size gives the same
+    result.
+- **Tests.**
+  - New: `test_a_differing_object_already_on_the_remote_is_refused_and_never_overwritten`. It plants a differing `<set>.tar.age`,
+    and in a second case a differing `<set>.tar.age.sha256`, on the real local remote. The ship fails with "immutable file modified"
+    and the planted bytes are untouched. In the first case the digest is never sent, because the ciphertext goes first.
+  - The retry test now relies on the real rclone for the identical-object case: the stand-in only fails the first checksum upload
+    and keys on the new `copy --include` call.
+  - `test_encrypted_set_goes_to_the_remote_and_decrypts` used to assert that a second ship of the same set succeeds. That held only
+    because `copyto` replaced the remote ciphertext with a fresh encryption. It now asserts that the second ship is refused and both
+    remote objects keep their digests.
+- **Red.** At `a1c94023` (still `copyto`), both planted-object cases fail with "0 == 0 : LOG: shipped ..." because the object was
+  overwritten, and so does the re-ship assertion; 8 failures in all. **Green:** 53 OK.
+- **Mutations**, each failing tests:
+  - either upload put back to `copyto`;
+  - `--immutable` dropped;
+  - the filter dropped;
+  - the digest sent first.
+- **Guide.** `docs/ops/backup-offhost-hardening.md` now states:
+  - what `--immutable` guarantees with this invocation: this script's upload never changes an existing remote object; a differing
+    one is refused and an identical one is accepted as present;
+  - what it does not guarantee: it does not hold against anyone with the credential or other commands; it compares sizes only on a
+    backend without a common hash (not verified); and it cannot serialize writers on different hosts;
+  - that the no-overwrite credential remains the primary control.
+
+### R2-2. The delta snapshot is pinned (`f6cb3b2d`)
+
+`test_the_committed_semantic_delta_snapshot_is_current` (in `tests/ops/test_production_kit.py`) runs
+`python3 -I ops/production/build-kit.py --delta` and compares its output byte for byte with the committed `semantic-delta.diff`. On a
+mismatch it prints the regeneration command and the first lines of the drift.
+- **Red:** a one-line edit to the snapshot (` (edited)` appended to line 1) fails the test with that diff.
+- **Green** again after `git checkout` of the snapshot.
+
+## Verification at `f6cb3b2d`
 
 | Check | Command | Result |
 | --- | --- | --- |
-| Ops tests | `python3 -m unittest discover -s tests/ops -p 'test_*.py'` | **292 OK** (280 before: off-host 45 to 52, monitoring 42 to 44, ClamAV 26 to 28, drift 9 to 10) |
-| Kit build | `python3 -I ops/production/build-kit.py --check` | ok, 13 files; `--delta` identical to the committed snapshot |
+| Ops tests | `python3 -m unittest discover -s tests/ops -p 'test_*.py'` | **294 OK** (280 before: off-host 45 to 53, monitoring 42 to 44, ClamAV 26 to 28, drift 9 to 10, production kit 49 to 50; 292 at `810794a8`) |
+| Kit build | `python3 -I ops/production/build-kit.py --check` | ok, 13 files; `--delta` identical to the committed snapshot, now also pinned by a test |
 | Shell syntax | `bash -n` on `backup.sh`, `provision.sh`, `host-baseline.sh` | ok |
 | Lint | `shellcheck` 0.9.0 at the default severity on `backup.sh` and `host-baseline.sh`; `-S warning` on those, `provision.sh`, `forge-deploy.sh` and the five derived production scripts | clean (`provision.sh` keeps its old SC1091 info at the default severity) |
 | PHP | `php -l` and `vendor/bin/pint --test` on `scripts/ops/capability-boundary.php` | no syntax errors; passed |
@@ -189,17 +243,18 @@ evidence file lists which test caught each mutation.
   - The guide's sentence that `--immutable` "makes a rerun ... an error for changed ones" was false for `copyto` here and is
     corrected.
   - The host's rclone version was not checked.
-  - **For the lead:** whether to move the encrypted path to `rclone copy --immutable` with `--include` filters, so that immutability
-    holds regardless of version, is a reviewed change and was not made here.
-- **No test pins `semantic-delta.diff` to `--delta`.** The snapshot was regenerated and compared by hand (identical). A drift in it
-  would not fail CI. Not added: outside the items.
+  - Acted on in R2-1: the encrypted path now uses `rclone copy --immutable` with anchored `--include` filters.
+  - A consequence: a second ship of a set that already shipped completely is now refused, and the remote copy is left as it was.
+- **No test pinned `semantic-delta.diff` to `--delta`.** Acted on in R2-2.
 - **The deferral ledger still lists these items as open.** After the review, the lead may record them as closed at the reviewed SHA.
 
 ## Not verified (no host)
 
 - No real host: no systemd, no real apt timers, no Forge, no ClamAV re-provision on a real host, no cron.
 - No real remote or real credential: no S3-compatible store, B2 or SFTP, and no object-lock or no-overwrite credential. The
-  overwrite refusal was a stand-in.
+  overwrite refusal was proven with the real rclone 1.60.1 against a local-filesystem remote only.
+- Any other rclone version, including the host's. There is also a backend without a hash in common with the local disk, where
+  rclone compares sizes only.
 - The lock and the retry copy inside the real `nightly`/`predeploy` flow under the control helper, where the helper's fds 7 and 8
   are inherited. That was reasoned (fd 6 is free in both scripts), not run.
 - A process killed between encryption and the rename into the retry copy. The rename is one `rename(2)`, and the staging leftover is

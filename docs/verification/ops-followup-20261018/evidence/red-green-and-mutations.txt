@@ -114,3 +114,71 @@ destination now holds the second bytes
 immutable file modified
 exit=6
 destination kept
+
+################################################################ Round 2 (coordinator follow-up)
+
+################ R2-1: uploads with rclone copy --checksum --immutable --include (tests/ops/test_staging_backup_offhost.py)
+Probe of the new invocation, real rclone, local-filesystem remote:
+rclone v1.60.1-DEV
+-- copy --checksum --immutable --include /<set>.tar.age, fresh
+exit=0
+-- same command, identical object present
+There was nothing to transfer
+exit=0
+-- same command, differing object present (same size)
+immutable file modified
+exit=6
+remote object kept
+
+== GREEN: off-host tests vs the copy --immutable script
+Ran 53 tests in 12.989s
+OK
+== RED again: same tests vs backup.sh at a1c94023 (copyto)
+FAIL: test_a_damaged_kept_copy_is_discarded_and_the_set_encrypted_again
+AssertionError: 0 == 0
+FAIL: test_a_differing_object_already_on_the_remote_is_refused_and_never_overwritten (existing='.tar.age')
+AssertionError: 0 == 0 : LOG: shipped 20261015T030000Z-aaaaaaaaaaaa (age-encrypted via rclone)
+FAIL: test_a_differing_object_already_on_the_remote_is_refused_and_never_overwritten (existing='.tar.age.sha256')
+AssertionError: 0 == 0 : LOG: shipped 20261015T030000Z-aaaaaaaaaaaa (age-encrypted via rclone)
+FAIL: test_a_failed_checksum_upload_is_completed_by_a_retry_with_the_same_ciphertext
+AssertionError: 0 == 0 : LOG: shipped 20261015T030000Z-aaaaaaaaaaaa (age-encrypted via rclone)
+FAIL: test_a_kept_copy_for_other_recipients_is_never_sent
+AssertionError: 0 == 0
+FAIL: test_a_kept_copy_that_is_not_age_ciphertext_is_never_sent
+AssertionError: 0 == 0
+FAIL: test_encrypted_set_goes_to_the_remote_and_decrypts
+AssertionError: 0 == 0 : LOG: shipped 20261015T030000Z-aaaaaaaaaaaa (age-encrypted via rclone)
+FAIL: test_the_kept_copy_is_private_ciphertext_and_never_the_plaintext_set
+AssertionError: 0 == 0
+Ran 53 tests in 12.977s
+FAILED (failures=8)
+backup.sh restored to the fix
+(Red failures other than the planted-object test come from the stand-in now keying on 'copy', which the copyto script never runs,
+ and from the re-ship assertion: under copyto the second ship replaced the remote ciphertext.)
+
+Mutations of the new invocation (tests.ops.test_staging_backup_offhost.RcloneRemote; each restored and compared):
+  R1 ciphertext back to copyto                 FAILED (3) incl. test_a_differing_object_already_on_the_remote_is_refused_and_never_overwritten
+  R2 digest back to copyto                     FAILED (6) incl. the differing-object test (.sha256 case) and the retry test
+  R3 --immutable dropped from the ciphertext   FAILED (3) incl. the differing-object test
+  R4 --include dropped from the ciphertext     FAILED (9 incl. subtests) incl. the retry test (recipients.sha256 reached the remote)
+  R5 digest sent before the ciphertext         FAILED (3) and ERROR (3) incl. the differing-object test (.tar.age case)
+
+################ R2-2: semantic-delta.diff pinned to build-kit.py --delta (tests/ops/test_production_kit.py)
+== GREEN on the committed snapshot
+OK
+== one-line edit to the snapshot:
+== RED
+FAIL: test_the_committed_semantic_delta_snapshot_is_current
+----------------------------------------------------------------------
+AssertionError: docs/verification/production-ops-kit-20261017/semantic-delta.diff is stale; regenerate it with `python3 -I ops/production/build-kit.py --delta > docs/verification/production-ops-kit-20261017/semantic-delta.diff` and review the change:
+--- committed semantic-delta.diff
++++ build-kit.py --delta
+@@ -1,2 +1,2 @@
+---- staging/provision.sh (renamed) (edited)
++--- staging/provision.sh (renamed)
+----------------------------------------------------------------------
+Ran 1 test in 0.069s
+FAILED (failures=1)
+snapshot restored
+== GREEN again
+OK
