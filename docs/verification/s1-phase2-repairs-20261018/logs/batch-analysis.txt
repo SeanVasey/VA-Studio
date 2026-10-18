@@ -1,0 +1,59 @@
+### after, p2b1 (original S1 batch order, this worktree)
+{"tests": 3673, "assertions": 35114, "failures": 1, "errors": 1, "skipped": 260} files 257
+census methods present in run: 91
+UNLISTED skips: []
+Census methods NOT skipped (all cases): []
+Other result tags: []
+--- ERROR Tests\Feature\IsolatedContractRendererAcceptanceTest::test_two_isolated_children_preserve_every_frozen_section_in_the_same_valid_multipage_pdf /home/user/wt/f4/tests/Feature/IsolatedContractRendererAcceptanceTest.php:15
+     Tests\Feature\IsolatedContractRendererAcceptanceTest::test_two_isolated_children_preserve_every_frozen_section_in_the_same_valid_multipage_pdf
+     App\Domain\Contracts\ContractIssuanceException: Test contract issuance is unavailable.
+--- FAILURE Tests\Feature\TestContractIssuanceTest::test_real_isolated_renderer_can_issue_one_private_pdf_from_an_actual_paid_grant /home/user/wt/f4/tests/Feature/TestContractIssuanceTest.php:113
+     Tests\Feature\TestContractIssuanceTest::test_real_isolated_renderer_can_issue_one_private_pdf_from_an_actual_paid_grant
+     Failed asserting that two strings are identical.
+     --- Expected
+     +++ Actual
+     @@ @@
+     -'ready'
+### after, p2b2 (original S1 batch order, this worktree)
+{"tests": 3453, "assertions": 34031, "failures": 1, "errors": 1, "skipped": 342} files 256
+census methods present in run: 115
+UNLISTED skips: []
+Census methods NOT skipped (all cases): []
+Other result tags: []
+--- ERROR Tests\Feature\TestContractProfileSuccessorTest::test_real_scrubbed_child_dispatches_only_the_trusted_successor_implementation /home/user/wt/f4/tests/Feature/TestContractProfileSuccessorTest.php:80
+     Tests\Feature\TestContractProfileSuccessorTest::test_real_scrubbed_child_dispatches_only_the_trusted_successor_implementation
+     App\Domain\Contracts\ContractIssuanceException: Test contract issuance is unavailable.
+--- FAILURE Tests\Feature\TestContractSuccessorActivationTest::test_exact_v2_policy_captures_real_request_and_worker_preserves_one_original /home/user/wt/f4/tests/Feature/TestContractSuccessorActivationTest.php:90
+     Tests\Feature\TestContractSuccessorActivationTest::test_exact_v2_policy_captures_real_request_and_worker_preserves_one_original
+     Failed asserting that two strings are identical.
+     --- Expected
+     +++ Actual
+     @@ @@
+     -'ready'
+### after, extra (88 fixture dependents outside the S1 p2 batches)
+{"tests": 967, "assertions": 11806, "failures": 0, "errors": 0, "skipped": 70} files 88
+census methods present in run: 49
+UNLISTED skips: []
+Census methods NOT skipped (all cases): []
+Other result tags: []
+
+### before, p2b1 (S1 sweep on 4c0854fd)
+{"tests": 3673, "assertions": 35014, "failures": 4, "errors": 6, "skipped": 260} files 257
+census methods present in run: 91
+UNLISTED skips: []
+--- FAILURE Tests\Feature\OrderInquiryMigrationTest::test_empty_owned_roundtrip_and_repeat_install_preserve_unrelated_schema /home/user/wt/s1/tests/Feature/OrderInquiryMigrationTest.php:43
+--- ERROR Tests\Feature\OrderInquiryStaffContextTest::test_actual_retained_context_entry_rechecks_authority_even_after_filament_cached_its_state with data set #0 /home/user/wt/s1/tests/Feature/OrderInquiryStaffContextTest.php:53
+--- ERROR Tests\Feature\OrderInquiryStaffContextTest::test_actual_retained_context_entry_rechecks_authority_even_after_filament_cached_its_state with data set #1 /home/user/wt/s1/tests/Feature/OrderInquiryStaffContextTest.php:53
+--- ERROR Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #0 /home/user/wt/s1/tests/Feature/OrderInquiryTest.php:341
+--- ERROR Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #1 /home/user/wt/s1/tests/Feature/OrderInquiryTest.php:341
+--- ERROR Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #2 /home/user/wt/s1/tests/Feature/OrderInquiryTest.php:341
+--- ERROR Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #3 /home/user/wt/s1/tests/Feature/OrderInquiryTest.php:341
+--- FAILURE Tests\Feature\ProductionFreeGrants\ProductionFreeGrantContentionTest::test_a_deadlock_after_the_customer_write_is_a_fixed_refusal_and_nothing_is_written with data set "mysql deadlock 1213" /home/user/wt/s1/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:58
+--- FAILURE Tests\Feature\ProductionFreeGrants\ProductionFreeGrantContentionTest::test_a_deadlock_after_the_customer_write_is_a_fixed_refusal_and_nothing_is_written with data set "mysql lock wait timeout 1205" /home/user/wt/s1/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:58
+--- FAILURE Tests\Feature\ProductionFreeGrants\ProductionFreeGrantContentionTest::test_a_deadlock_after_the_customer_write_is_a_fixed_refusal_and_nothing_is_written with data set "serialization failure 40001" /home/user/wt/s1/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:58
+### before, p2b2 (S1 sweep on 4c0854fd)
+{"tests": 3453, "assertions": 33998, "failures": 2, "errors": 0, "skipped": 342} files 256
+census methods present in run: 115
+UNLISTED skips: []
+--- FAILURE Tests\Feature\ProductionAccountFeatures\ProductionAccountFeaturesDefaultConfigurationTest::test_booted_parents_are_the_exact_closed_default_off_plain_arrays /home/user/wt/s1/tests/Feature/ProductionAccountFeatures/ProductionAccountFeaturesDefaultConfigurationTest.php:34
+--- FAILURE Tests\Feature\ProductionFreeGrants\ProductionFreeGrantStalledSourceTest::test_the_deadline_is_checked_before_the_first_read /home/user/wt/s1/tests/Feature/ProductionFreeGrants/ProductionFreeGrantStalledSourceTest.php:140

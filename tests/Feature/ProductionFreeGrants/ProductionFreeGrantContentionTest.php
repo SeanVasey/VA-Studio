@@ -9,7 +9,9 @@ use App\Domain\Grants\ProductionFree\ProductionFreeGrantTransactions;
 use Illuminate\Config\Repository;
 use Illuminate\Database\DeadlockException;
 use Illuminate\Database\QueryException;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use PDOException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -62,7 +64,7 @@ final class ProductionFreeGrantContentionTest extends TestCase
         $grants = new ProductionFreeGrants;
         $review = $grants->review($definition['id'], 'Declared Synthetic Buyer', $owner['principal'], $owner['user']);
         $input = $this->assentInput($review);
-        $calls = $this->contendAfterWrite('production_free_origins', $state, $code, $message);
+        $calls = $this->contendAfterWriteOnDecrypt('production_free_origins', $state, $code, $message);
 
         $this->refuses(fn () => $grants->accept($definition['id'], $input, $owner['principal'], $owner['user']));
 
@@ -117,6 +119,46 @@ final class ProductionFreeGrantContentionTest extends TestCase
         });
         Config::clearResolvedInstance('config');
         $this->beforeApplicationDestroyed(fn () => Config::clearResolvedInstance('config'));
+
+        return function () use (&$threw): int {
+            return $threw;
+        };
+    }
+
+    /**
+     * The customer commands run behind the identity metadata admission, which since cbe111ec refuses any config
+     * repository that is not exactly `Illuminate\Config\Repository`; the config seam above therefore cannot reach them.
+     * The encrypter is outside that admission and every command decrypts a row it has just written, inside its
+     * transaction, so the driver exception is thrown from the first decrypt that follows a write to `$table`. The
+     * decorator is built from the booted encrypter's own keys and delegates everything else unchanged.
+     */
+    private function contendAfterWriteOnDecrypt(string $table, string $state, int $code, string $message): \Closure
+    {
+        $threw = 0;
+        $hook = function () use (&$threw, $table, $state, $code, $message): void {
+            if ($threw === 0 && DB::table($table)->count() > 0) {
+                $threw++;
+                throw $this->driverException($state, $code, $message);
+            }
+        };
+        $original = $this->app->make('encrypter');
+        $decorated = new class($original->getKey(), $this->app->make('config')->get('app.cipher'), $hook) extends Encrypter
+        {
+            public function __construct($key, $cipher, private readonly \Closure $hook)
+            {
+                parent::__construct($key, $cipher);
+            }
+
+            public function decrypt($payload, $unserialize = true)
+            {
+                ($this->hook)();
+
+                return parent::decrypt($payload, $unserialize);
+            }
+        };
+        $decorated->previousKeys($original->getPreviousKeys());
+        Crypt::swap($decorated);
+        $this->beforeApplicationDestroyed(fn () => Crypt::clearResolvedInstance('encrypter'));
 
         return function () use (&$threw): int {
             return $threw;

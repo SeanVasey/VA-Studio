@@ -1,0 +1,2 @@
+cbe111eccc9ecbdfe5967b832eb155df2fc9af9d is the first bad commit
+bisect found first bad commit
