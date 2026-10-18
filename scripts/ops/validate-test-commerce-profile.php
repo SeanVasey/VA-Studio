@@ -15,7 +15,7 @@ declare(strict_types=1);
  * --template replaces each documented placeholder with a synthetic value first, so the committed
  * template can be checked for shape. --probe additionally makes one read-only GET /v1/account with
  * the configured test key, and only after every other check passed.
- * Boundary checks: the profile must state ten capability flags explicitly as false (CAPABILITY_FLAGS), none of them or of the
+ * Boundary checks: the profile must state ten capability flags explicitly as false (scripts/ops/capability-boundary.php), none of them or of the
  * other out-of-profile families may be enabled in the booted configuration, and no enabled or mounted flag may be true in any
  * production-lane configuration file (Paid252, Tax255, production customer identity, production free grants and the rest).
  * Exit codes: 0 every check passed, 1 at least one check failed, 2 usage or unreadable file.
@@ -39,7 +39,7 @@ use App\Domain\Delivery\ActivationPolicy;
 use App\Domain\Delivery\TestAccessPolicy;
 use Dotenv\Parser\Parser;
 use Illuminate\Contracts\Console\Kernel;
-use Illuminate\Support\Arr;
+use Vasey\Ops\CapabilityBoundary;
 
 ini_set('display_errors', 'stderr');
 ini_set('log_errors', '0');
@@ -56,33 +56,6 @@ const TEMPLATE_VALUES = [
     '<ASSENT_TEXT>' => 'Synthetic template assent text for test orders only.',
 ];
 
-/**
- * Capability flags the profile must state explicitly, each exactly `false` (environment key => config key). Every default in
- * config/ is false today; a stated line cannot be flipped by a changed default, and an operator who copied an older profile
- * is told which line to add. Admission per flag is recorded in docs/verification/production-ops-kit-20261017/.
- */
-const CAPABILITY_FLAGS = [
-    'VASEY_TEST_SERVICE_PROJECTS_ENABLED' => 'services-projects.test_enabled',
-    'VASEY_TEST_FREE_GRANTS_ENABLED' => 'free-grants.test_enabled',
-    'VASEY_TEST_CUSTOMER_CONSENT_ENABLED' => 'customer-preferences.test_grants_enabled',
-    'VASEY_TEST_UNPAID_RELEASE_ENABLED' => 'unpaid-release.enabled',
-    'VASEY_TEST_REFUND_RESOLUTION_ENABLED' => 'refund-resolution.enabled',
-    'VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED' => 'transactional-notifications.test_enabled',
-    'CONTACT_TEST_ORDER_INQUIRIES_ENABLED' => 'inquiries.test_order_inquiries_enabled',
-    'CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED' => 'inquiries.operator_notifications_enabled',
-    'VASEY_OPERATIVE_FREE_GRANTS_ENABLED' => 'free-grants.operative_enabled',
-    'VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED' => 'support-attachments.fixture_enabled',
-];
-
-/**
- * Configuration files of the production lanes. Paid252 is paid-grants, Tax255 is paid-tax-grants plus production-tax-checkout,
- * and production customer identity and production free grants have their own files. Every `*enabled` or `*mounted` flag in
- * any `production*`, `paid-grants`, `paid-tax-grants` or `member-grants` file must not be strictly true. Today these ship as
- * literal false with no environment switch; the check keeps a future switch from silently opening a lane on staging.
- */
-const PRODUCTION_LANE_PATTERN = '/\A(?:production[-_].+|paid-grants|paid-tax-grants|member-grants)\z/';
-const NAMED_PRODUCTION_LANES = ['paid-grants', 'paid-tax-grants', 'production-tax-checkout', 'production-customer-identity', 'production-free-grants'];
-
 /** Families outside this profile. Each must not be strictly true. */
 const OUT_OF_PROFILE_FLAGS = [
     'production_checkout.http_enabled', 'production_checkout.fresh_checkout_enabled',
@@ -92,8 +65,6 @@ const OUT_OF_PROFILE_FLAGS = [
     'memberships.test_mode_enabled', 'refund-resolution.enabled', 'unpaid-release.enabled',
     'transactional-notifications.test_enabled', 'services-projects.test_enabled',
     'customer-preferences.test_grants_enabled',
-    // Beyond the ten capability flags: both are production-lane or one-way, and neither belongs in a staging profile.
-    'discovery-sitemap.enabled', 'customer-listening.v2_promotion_enabled',
 ];
 
 $usage = static function (string $reason): never {
@@ -130,6 +101,8 @@ if (! is_file($file) || is_link($file) || ! is_readable($file) || filesize($file
 
 $root = dirname(__DIR__, 2);
 require $root.'/vendor/autoload.php';
+// The ten capability flags and the production-lane rule, shared with the staging deploy gate (ops/staging/validate-runtime.php).
+require_once __DIR__.'/capability-boundary.php';
 $raw = (string) file_get_contents($file);
 if ($template) {
     $raw = strtr($raw, TEMPLATE_VALUES);
@@ -178,10 +151,10 @@ if ($entries !== null) {
     $live = array_keys(array_filter($values, static fn (string $v): bool => preg_match('/(?:sk|rk|pk)_live_/', $v) === 1));
     $record('profile.no_live_keys', $live === [], $live === [] ? 'No live-mode key appears in the parsed configuration values.'
         : 'Live-mode key material found in: '.implode(', ', $live).'. Remove it.');
-    $notFalse = array_values(array_filter(array_keys(CAPABILITY_FLAGS), static fn (string $name): bool => ! array_key_exists($name, $values)
+    $notFalse = array_values(array_filter(array_keys(CapabilityBoundary::CAPABILITY_FLAGS), static fn (string $name): bool => ! array_key_exists($name, $values)
         || ! in_array($values[$name], ['false', '(false)'], true)));
     $record('profile.capability_flags_explicit', $notFalse === [], $notFalse === []
-        ? 'All '.count(CAPABILITY_FLAGS).' capability flags are stated explicitly as false.'
+        ? 'All '.count(CapabilityBoundary::CAPABILITY_FLAGS).' capability flags are stated explicitly as false.'
         : 'Capability flags missing or not exactly false: '.implode(', ', $notFalse).'. State each as KEY=false (template section 6).');
 }
 
@@ -328,27 +301,17 @@ if ($booted) {
         fn () => app(CustomerPurchaseClaimPolicy::class)->enabled());
 
     // ---- Boundary
-    $enabled = array_values(array_filter(array_unique([...OUT_OF_PROFILE_FLAGS, ...array_values(CAPABILITY_FLAGS)]),
+    $enabled = array_values(array_filter(array_unique([...OUT_OF_PROFILE_FLAGS, ...array_values(CapabilityBoundary::stagedFlags())]),
         static fn (string $key): bool => config($key) === true));
     $record('boundary.out_of_profile_families_off', $enabled === [], $enabled === []
         ? 'Production checkout, production tax checkout and the other test families are off.'
         : 'Enabled outside this profile: '.implode(', ', $enabled).'.');
-    $laneFiles = array_map(static fn (string $path): string => basename($path, '.php'), glob($root.'/config/*.php') ?: []);
-    $laneFiles = array_values(array_filter($laneFiles, static fn (string $stem): bool => preg_match(PRODUCTION_LANE_PATTERN, $stem) === 1));
-    $open = [];
-    foreach ($laneFiles as $stem) {
-        foreach (Arr::dot((array) config($stem)) as $key => $value) {
-            if ($value === true && preg_match('/(?:enabled|mounted)\z/', (string) $key) === 1) {
-                $open[] = $stem.'.'.$key;
-            }
-        }
-    }
-    $missingLanes = array_diff(NAMED_PRODUCTION_LANES, $laneFiles);
-    $record('boundary.production_lanes_closed', $open === [] && $missingLanes === [], match (true) {
-        $missingLanes !== [] => 'Production lane configuration not found (renamed? update the validator): '.implode(', ', $missingLanes).'.',
-        $open !== [] => 'Production lane flags that are true: '.implode(', ', $open).'.',
+    $lanes = CapabilityBoundary::productionLanes($root.'/config', static fn (string $stem): array => (array) config($stem));
+    $record('boundary.production_lanes_closed', $lanes['open'] === [] && $lanes['missing'] === [], match (true) {
+        $lanes['missing'] !== [] => 'Production lane configuration not found (renamed? update CapabilityBoundary): '.implode(', ', $lanes['missing']).'.',
+        $lanes['open'] !== [] => 'Production lane flags that are true: '.implode(', ', $lanes['open']).'.',
         default => 'Paid252, Tax255, production customer identity, production free grants and the other production lanes ('
-            .count($laneFiles).' configuration files) have no enabled or mounted flag set.',
+            .count($lanes['scanned']).' configuration files) have no enabled or mounted flag set.',
     });
     $attempt('boundary.no_production_checkout_key', 'No production checkout key or funds mode is configured.',
         fn () => in_array(config('production_checkout.secret_key'), [null, ''], true)

@@ -130,11 +130,34 @@ class TheTenFlagsAreExplicit(unittest.TestCase):
                                     "VASEY_LISTENING_V2_PROMOTION_ENABLED": ("customer-listening", "v2_promotion_enabled")}.items():
             self.assertRegex(source(f"config/{config}.php"), rf"'{key}'\s*=>\s*env\('{flag}',\s*false\)")
 
-    def test_the_validator_requires_exactly_these_flags_under_these_config_keys(self):
-        block = re.search(r"const CAPABILITY_FLAGS = \[(.*?)\n\];", source("scripts/ops/validate-test-commerce-profile.php"), re.S)
-        self.assertIsNotNone(block)
-        declared = dict(re.findall(r"'([A-Z_]+)' => '([a-z-]+\.[a-z_]+)'", block.group(1)))
-        self.assertEqual(declared, {flag: f"{config}.{key}" for flag, (config, key) in FLAGS.items()})
+    def test_the_shared_boundary_declares_exactly_these_flags_under_these_config_keys(self):
+        text = source("scripts/ops/capability-boundary.php")
+        for constant, expected in (("CAPABILITY_FLAGS", {flag: f"{config}.{key}" for flag, (config, key) in FLAGS.items()}),
+                                   ("ADDITIONAL_FLAGS", {"DISCOVERY_SITEMAP_ENABLED": "discovery-sitemap.enabled",
+                                                         "VASEY_LISTENING_V2_PROMOTION_ENABLED": "customer-listening.v2_promotion_enabled"})):
+            block = re.search(rf"const {constant} = \[(.*?)\n    \];", text, re.S)
+            self.assertIsNotNone(block, constant)
+            self.assertEqual(dict(re.findall(r"'([A-Z0-9_]+)' => '([a-z-]+\.[a-z0-9_]+)'", block.group(1))), expected, constant)
+
+    def test_both_validators_use_the_shared_boundary_and_neither_keeps_its_own_copy(self):
+        for relative in ("ops/staging/validate-runtime.php", "scripts/ops/validate-test-commerce-profile.php"):
+            text = source(relative)
+            self.assertIn("scripts/ops/capability-boundary.php" if relative.startswith("ops/") else "capability-boundary.php", text, relative)
+            self.assertIn("use Vasey\\Ops\\CapabilityBoundary;", text, relative)
+            self.assertNotIn("const CAPABILITY_FLAGS", text, f"{relative} keeps its own flag list")
+            self.assertNotIn("PRODUCTION_LANE_PATTERN", text.replace("CapabilityBoundary::PRODUCTION_LANE_PATTERN", ""), f"{relative} keeps its own lane rule")
+        gate = source("ops/staging/validate-runtime.php")
+        self.assertIn("CapabilityBoundary::flagsNotOff(", gate)
+        self.assertIn("CapabilityBoundary::productionLanes(", gate)
+        self.assertIn("'runtime.flag_off_'.strtolower(", gate)
+        self.assertIn("'runtime.production_lanes_closed'", gate)
+        # Fail closed when the shared file is absent: a thrown exception becomes the refusal runtime.unavailable.
+        self.assertRegex(gate, r"if \(! is_file\(\$boundary\) \|\| is_link\(\$boundary\)\) \{\s*throw new RuntimeException;")
+
+    def test_the_deploy_gate_checks_every_staged_flag_before_it_passes(self):
+        gate = source("ops/staging/validate-runtime.php")
+        self.assertLess(gate.index("CapabilityBoundary::flagsNotOff("), gate.index('echo "PASS runtime.profile'))
+        self.assertLess(gate.index("CapabilityBoundary::productionLanes("), gate.index('echo "PASS runtime.profile'))
 
     def test_the_two_templates_agree_on_every_flag(self):
         for flag in (*FLAGS, *EXTRA_FALSE):

@@ -294,7 +294,7 @@ because a blank assignment is not an unset key. They are outside the brief's ten
 
 ## Open after K2
 
-- **The deploy gate does not check these flags.** `ops/staging/validate-runtime.php` (run by `forge-deploy.sh` before and after the build) still holds
+- **Closed in batch K3 (below).** The deploy gate did not check these flags. `ops/staging/validate-runtime.php` (run by `forge-deploy.sh` before and after the build) still holds
   only the production-checkout flags. Only `validate-test-commerce-profile.php` checks the ten, and it is run by hand. A Forge `.env` with
   `VASEY_OPERATIVE_FREE_GRANTS_ENABLED=true` would deploy. Mirroring the ten into the deploy validator is a small reviewed change (the production
   validator copies that file's holds); it was not part of the brief.
@@ -303,4 +303,83 @@ because a blank assignment is not an unset key. They are outside the brief's ten
 - The two ungated flags (`VASEY_OPERATIVE_FREE_GRANTS_ENABLED`, `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED`) are a code-level question for the
   application owner: an environment gate in the policy would make staging refuse them structurally. Not changed here (no application edits).
 - Nothing in K2 ran against a real host or a real Stripe account; no `--probe` was run.
+
+---
+
+# Batch K3: the staging deploy gate enforces the capability profile
+
+Brief: close K2's open item 1. `ops/staging/validate-runtime.php`, which `forge-deploy.sh`, `release-step.sh` and `ctl refresh` run before and
+after the build, now refuses a deploy when any of the twelve staged flags is not exactly false or any production-lane flag is enabled or mounted.
+No application file, policy class or config changed.
+
+## What changed
+
+| File | Change |
+| --- | --- |
+| `scripts/ops/capability-boundary.php` (new) | One class, `Vasey\Ops\CapabilityBoundary`, holding the ten capability flags, the two stated beside them, the production-lane rule and the named lanes, plus two pure functions (`flagsNotOff`, `productionLanes`). It boots nothing and reads no environment |
+| `ops/staging/validate-runtime.php` | Loads that file (a missing or symlinked file is a refusal, `runtime.unavailable`), then adds 13 checks: `runtime.flag_off_<environment key, lower case>` for each of the twelve flags, and `runtime.production_lanes_closed`. Everything else is untouched; the 17 existing cases pass unchanged |
+| `scripts/ops/validate-test-commerce-profile.php` | Uses the same class instead of its own lists (K2's constants removed). Same 38 checks, same output, except the not-found message now says "update CapabilityBoundary" |
+| `tests/Unit/StagingRuntimeValidatorTest.php` | 17 to 79 cases (below) |
+| `tests/ops/test_staging_capability_profile.py` | 15 to 17 tests: the shared class is the one list both validators use, neither keeps a copy, the gate calls both functions before it passes and fails closed on a missing file |
+| `ops/staging/README.md` | The `validate-runtime.php` row names the new refusals |
+| `evidence/k3-deploy-gate-runs.txt` | Process-level runs and the mutation results |
+
+## Behavior of the new checks
+
+- **A flag line is optional, a wrong value is not.** The effective configuration value must be exactly boolean `false`. An absent line passes, because every
+  config default is false (the profile validator, run by hand, is what insists on the explicit lines). `true`, `"true"`, `(true)`, `1`, `yes`, `on`, a blank
+  value, `null`, `0` and `no` are all refused, and so is a config key that was renamed or removed (it reads as null), so the gate fails closed until it is
+  updated. `false`, `(false)`, `FALSE` and `"false"` pass.
+- **Both `local` and `staging`.** The interim `APP_ENV=local` profile states the same flags, and `local` admits the support fixture, so the same rule applies.
+- **Output.** One `FAIL` line per refused check, naming the environment key in the id (`runtime.flag_off_vasey_operative_free_grants_enabled`), never a value.
+- **The two flags no policy gates by environment.** `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` (`FreeGrantPolicy.php:12`) and
+  `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED` (`InquiryNotificationWork.php:53`) are the only capabilities where the policy tests no environment. Each is
+  refused in 16 spellings, with stderr asserted to be exactly its own one `FAIL` line; on a `staging` environment as on `local`; and in the process-level
+  runs (`evidence/k3-deploy-gate-runs.txt`). Dropping either from the shared list fails 20 cases.
+- **Production lanes.** `runtime.production_lanes_closed` fails if any `enabled` or `mounted` key is strictly true in a `production-*`, `production_*`,
+  `paid-grants`, `paid-tax-grants` or `member-grants` config file (16 today), or if one of the five named lanes (Paid252, Tax255 in two files, production
+  customer identity, production free grants) no longer exists. Each of those four lane families, and a renamed file, was flipped in the real config in turn and
+  refused. Today these files hold literals with no `env()` call, so the check cannot be tripped from an `.env`; it exists for the day a code change makes one
+  reachable.
+
+## Verification
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Deploy-gate tests | `php vendor/bin/phpunit tests/Unit/StagingRuntimeValidatorTest.php` | 79 cases, 457 assertions pass (17 and 79 before). Per flag: absent passes; enabled is refused by exactly its own check; 12 flags x 4 false spellings pass; all twelve enabled name each once. Lane rule: 11 flips, nested keys, non-strict and non-lane values ignored, 5 renamed lanes, the real config passes. `flagsNotOff`: 7 value types x 12 flags |
+| Profile validator | `php vendor/bin/phpunit tests/Unit/TestCommerceProfileValidatorTest.php`; the validator on the overlay with `--template` | 63 cases pass; `RESULT: PASS (0 of 38 checks failed ...)` |
+| Python guards, all ops tests | `python3 -m unittest discover -s tests/ops -p 'test_*.py'` | 275 tests pass |
+| Neighbours | `ProductionEnvironmentTemplateTest` (6), `test-private-server-preflight.py` (20), `build-kit.py --check` | pass; the delta snapshot is current |
+| Lint | `shellcheck -S warning` over the kit scripts; `pint --test` over the touched PHP | clean; passed |
+| Sensitivity | seven mutations (evidence file), each caught | 16, 30, 20, 20, 1, 5 and 1 failures; files restored |
+| Process level | the real validator on a synthetic candidate, flags set and real config files mutated | `evidence/k3-deploy-gate-runs.txt` |
+
+Effects on an existing host: a Forge `.env` that states any of the twelve as something other than false now fails the next deploy at the pre-quiesce and
+post-build gates (and `ctl refresh`), naming it; one that omits them is unaffected. A release built before this change has no shared file and no
+new checks, since the validator and the file ship together in each release.
+
+## For the lead and Sean: two flags admit on any environment, production included
+
+`VASEY_OPERATIVE_FREE_GRANTS_ENABLED` and `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED` are not environment-gated in their policy classes. Each admits when
+its flag is true and an adapter bound by other code exists (`FreeGrantIdentity`, `InquiryAlertTransport`); the test harness shows that with a stand-in bound they admit on
+`production` and `staging` alike (`evidence/k2-admission-matrix.txt`, matrix 2). No adapter ships in `app/` today, so both are inert, and neither binding is
+made by the application. On staging the only guards are the explicit `false` in both templates and, since this batch, the deploy gate. **Question:** should the
+policy classes gain an environment test (an application change, the owner's decision; none was made here), so that staging refuses them structurally, and what should
+hold them on production until an activation is authorized? Today nothing does (next section).
+
+## Production: the equivalent gap, documented and not changed
+
+- `scripts/ops/private-server-preflight.php --profile=production` forces only seven Stripe test switches to `false` (lines 144 to 156) and
+  `CONTACT_INQUIRIES_ENABLED=false`, then checks shapes. It does not mention the ten capability flags, the two extras or any production-lane config flag.
+- `ops/production/validate-runtime.php` (this lane's file) reuses that preflight and adds live-key and `PRODUCTION_CHECKOUT_*` holds. It has no
+  capability-flag or lane check either.
+- What that means today: on `production` the `VASEY_TEST_*` and fixture flags are refused by their environment gates (matrix 1), and the lane flags are literals with
+  no environment switch, so the exposed surface is the two ungated flags (with an adapter bound) and any lane switch a future change introduces. A production hold
+  would be the same shared check in the production validator, as holds to be lifted by a reviewed change when an activation is authorized. Not done: the brief
+  asked only for documentation of the production gap, and holds on production are a decision about activation order.
+
+## Open after K3
+
+- The question above, for the lead and Sean. The production hold depends on its answer.
+- Nothing here ran on a real host; the process-level runs used a synthetic candidate and no database.
 

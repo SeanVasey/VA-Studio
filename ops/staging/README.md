@@ -41,7 +41,7 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 | `seal-release.py` | Parent-first protected code sealing and safe private environment capture | `/usr/local/libexec/vasey-staging/` |
 | `release-step.sh` | Fixed unprivileged build and migration/cache steps under the enclosing root lease | `/usr/local/libexec/vasey-staging/` |
 | `normalize-mysql-dump.py` | Schema-only charset rendering comparison; preserves retained data bytes | `/usr/local/libexec/vasey-staging/` |
-| `validate-runtime.php` | Isolated real Laravel admission: protected current release before quiesce, built candidate before attachment; rejects key changes | run from each selected release |
+| `validate-runtime.php` | Isolated real Laravel admission: protected current release before quiesce, built candidate before attachment; rejects key changes, any of the twelve capability flags not exactly false (`runtime.flag_off_*`) and any enabled or mounted production-lane flag (`runtime.production_lanes_closed`); shares `scripts/ops/capability-boundary.php` with the profile validator | run from each selected release |
 | `forge-deploy.sh` | Release and activation; Forge's deployment script calls it | run from the Forge checkout |
 | `env.staging.example` | Every `.env.example` variable with staging-safe values and placeholders | pasted into Forge |
 
