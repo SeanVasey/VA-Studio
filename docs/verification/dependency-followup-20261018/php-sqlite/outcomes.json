@@ -29,32 +29,22 @@
  "php-filament-01.xml": {
   "files": 39,
   "tests": 753,
-  "assertions": 4891,
-  "failures": 2,
+  "assertions": 4902,
+  "failures": 0,
   "errors": 0,
   "skipped": 88,
   "skipped_outside_census": [],
-  "problems": [
-   "FAIL Tests\\Feature\\SiteContentDamagedPublicationTest::test_a_damaged_publication_record_refuses_publishing_and_sends_staff_to_a_backup",
-   "FAIL Tests\\Feature\\SiteContentUnavailableHttpTest::test_new_content_draft_reports_unavailable_published_content_instead_of_opening"
-  ]
+  "problems": []
  },
  "php-filament-02.xml": {
   "files": 42,
   "tests": 720,
-  "assertions": 10317,
-  "failures": 6,
+  "assertions": 10342,
+  "failures": 0,
   "errors": 0,
   "skipped": 59,
   "skipped_outside_census": [],
-  "problems": [
-   "FAIL Tests\\Feature\\SiteScheduleHttpTest::test_open_schedule_confirmation_reports_a_publication_or_schedule_made_meanwhile with data set \"another release was published\"",
-   "FAIL Tests\\Feature\\SiteScheduleHttpTest::test_open_schedule_confirmation_reports_a_publication_or_schedule_made_meanwhile with data set \"this release was published\"",
-   "FAIL Tests\\Feature\\SiteScheduleHttpTest::test_open_schedule_confirmation_reports_a_publication_or_schedule_made_meanwhile with data set \"another release was scheduled\"",
-   "FAIL Tests\\Feature\\SiteScheduleHttpTest::test_open_cancel_confirmation_reports_a_schedule_resolved_meanwhile_with_nothing_else_pending with data set \"cancelled by another administrator\"",
-   "FAIL Tests\\Feature\\SiteScheduleHttpTest::test_open_cancel_confirmation_reports_a_schedule_resolved_meanwhile_with_nothing_else_pending with data set \"replaced by a staff publication\"",
-   "FAIL Tests\\Feature\\SiteScheduleHttpTest::test_open_publish_confirmation_reports_its_release_becoming_active_meanwhile"
-  ]
+  "problems": []
  },
  "php-cross.xml": {
   "files": 42,
@@ -69,8 +59,8 @@
  "total": {
   "files": 184,
   "tests": 3061,
-  "assertions": 29132,
-  "failures": 8,
+  "assertions": 29168,
+  "failures": 0,
   "errors": 6,
   "skipped": 335
  }

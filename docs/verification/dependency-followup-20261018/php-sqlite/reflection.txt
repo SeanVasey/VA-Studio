@@ -8,7 +8,7 @@ Configuration: {worktree}/phpunit.xml
 ............................................SSSSSSSSSSS........ 189 / 191 ( 98%)
 ..                                                              191 / 191 (100%)
 
-Time: 17:34.300, Memory: 115.00 MB
+Time: 18:28.991, Memory: 115.00 MB
 
 OK, but some tests were skipped!
 Tests: 191, Assertions: 1448, Skipped: 13.

@@ -1,7 +1,7 @@
-reflection exit 0 seconds 1055
-filament-00 exit 2 seconds 1600
-filament-01 exit 1 seconds 1584
-filament-02 exit 1 seconds 2061
-cross attempt1 killed by harness 2h background limit at 369/560, no JUnit
-cross exit 0 seconds 1169
+reflection exit 0 seconds 1109
+filament-00 exit 2 seconds 1672
+filament-01 exit 0 seconds 1664
+ALLDONE
+filament-02 exit 0 seconds 2133
+cross exit 0 seconds 1179
 ALLDONE

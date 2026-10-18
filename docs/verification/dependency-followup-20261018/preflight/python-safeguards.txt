@@ -1,21 +1,21 @@
 == test-phpunit-shards.py
 ....................................................
 ----------------------------------------------------------------------
-Ran 52 tests in 0.476s
+Ran 52 tests in 0.381s
 
 OK
 test-phpunit-shards.py exit 0
 == test-ci-scope.py
 ...........................
 ----------------------------------------------------------------------
-Ran 27 tests in 5.320s
+Ran 27 tests in 5.003s
 
 OK
 test-ci-scope.py exit 0
 == test-workflow-cadence.py
 ..............
 ----------------------------------------------------------------------
-Ran 14 tests in 0.019s
+Ran 14 tests in 0.014s
 
 OK
 test-workflow-cadence.py exit 0
@@ -75,7 +75,7 @@ test_workflow_never_interpolates_expressions_in_shell_steps (__main__.WorkflowBo
 test_xmlwriter_is_allowed_but_write_and_write_all_permissions_are_rejected (__main__.WorkflowBoundaryTests.test_xmlwriter_is_allowed_but_write_and_write_all_permissions_are_rejected) ... ok
 
 ----------------------------------------------------------------------
-Ran 53 tests in 0.100s
+Ran 53 tests in 0.111s
 
 OK
 test-focused-tests.py exit 0

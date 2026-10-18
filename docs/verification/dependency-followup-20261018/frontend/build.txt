@@ -27,4 +27,4 @@ public/build/assets/PaidGrants-iiA7YxRA.js                                   20.
 public/build/assets/app-BJ2qfcGx.js                                         273.20 kB │ gzip:  68.89 kB
 public/build/assets/customer-account-0HqSHhpU.js                            346.06 kB │ gzip: 108.09 kB
 
-✓ built in 1.38s
+✓ built in 582ms
