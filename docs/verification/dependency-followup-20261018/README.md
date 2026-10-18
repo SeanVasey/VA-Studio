@@ -9,7 +9,7 @@ Lane M2 moves one Composer package and five npm packages, and narrows two Depend
 | **Toolchain** | PHP 8.4.26, Composer 2.8.12, Node 24.22.0, npm 11.19.1. |
 | **Not done** | Nothing was pushed, no PR was opened, commented on or closed, and no workflow was dispatched. |
 
-**Filament 5.10.2 is deferred to lane M3.** The lead decided this after the first round of evidence: Filament's new notification storage breaks or empties eight test files, which need a reviewed migration. See [Filament 5.10.2: deferred to lane M3](#filament-5102-deferred-to-lane-m3).
+**Filament 5.10.2 is deferred to lane M3.** The lead decided this after the first round of evidence: Filament's new notification storage breaks three test files and empties six more (nine in all), which need a reviewed migration. See [Filament 5.10.2: deferred to lane M3](#filament-5102-deferred-to-lane-m3).
 
 **History.** The branch history keeps that first round:
 
@@ -130,7 +130,7 @@ Every skipped case is a method in the reviewed SQLite census `scripts/ci/databas
 - **Cases:** two data sets of `OrderInquiryStaffContextTest::test_actual_retained_context_entry_rechecks_authority_even_after_filament_cached_its_state` and four of `OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit`.
 - **Error:** each throws `AuthorizationException: Staff multi-factor authentication is required for this write.` at `StaffWriteAuthority.php:122`. The path runs `ReviewLicense.php:59` ← `LicenseFixtures::approved()` ← `OrderFixtures` ← `OrderInquiryFixtures`, after the test has made the panel require MFA.
 - **Base control:** [base control](php-sqlite/base-control/base-control.txt) is a scratch `git archive 9225df8c` with main's lock installed: Laravel 13.36.0, Filament 5.8.4, Livewire 4.4.6 ([versions](php-sqlite/base-control/versions.txt)). It fails identically: same six cases, same exception, same throw site.
-- **Base control still applies to main:** between `9225df8c` and `97e865e9`, main changed only `tests/ops/*.py`. No PHP under `app/` or `tests/` changed, so it is the same PHP source.
+- **Base control still applies to main:** between `9225df8c` and `97e865e9`, main changed `ops/` scripts, `tests/ops/*.py`, docs and the CHANGELOG. No PHP under `app/` or `tests/` changed, so it is the same PHP source.
 - **Likely cause (not proved):** `11ab36d7` (2026-10-15, "Require current staff enrollment in catalog, license and exclusive writers"). It came after these tests (2026-10-09), whose fixtures approve a license with an unenrolled reviewer.
 - These belong to the separate repair lane.
 
@@ -189,7 +189,7 @@ These read the same keys. They still pass on 5.10.2 but no longer inspect any no
 - `OfferDraftAuthoringActionTest:307-309`: same.
 - `RightsDeclarationWriterActionTest:317`: same.
 
-The leak-negative assertions for private failure details are silently weakened. M3 should migrate all eight files to read through `NotificationMailbox`, or only through Filament's `assertNotified` and `assertNotNotified`. The leak-negative checks must stay meaningful.
+The leak-negative assertions for private failure details are silently weakened. M3 should migrate all nine files to read through `NotificationMailbox`, or only through Filament's `assertNotified` and `assertNotNotified`. The leak-negative checks must stay meaningful.
 
 ### Diagnostic: the app still sends the right notifications
 
@@ -228,6 +228,16 @@ I checked this read-only with the GitHub tools (`pull_request_read` `get` and `g
 - **`symfony/console` 7.4.20 to 8.1.9, a major,** plus 15 Symfony 8.0 to 8.1 minors, `league/uri*` and `league/commonmark`, `laravel/prompts`, `guzzlehttp/psr7`, `spatie/laravel-package-tools` and `eloquent-power-joins`. Nothing requires these, and none was taken.
 
 Closing #142 needs a lead decision. With the new `exclude-patterns`, Dependabot's next grouped Composer PR would leave out the PDF packages. #142 itself shows that a grouped "minor and patch" Composer PR can still carry a transitive major (`symfony/console` 8.1.9), so the next grouped PR may again include Filament and the Symfony moves.
+
+## Independent review
+
+[`independent-review-1464ebfc-DECISION.md`](independent-review-1464ebfc-DECISION.md): **APPROVE WITH CONDITIONS** at
+`1464ebfc`, no P0 or P1. The condition, R1 (P2), was the M3 file count: nine test files read the old session keys (three fail,
+six become vacuous), not eight. It is corrected in this packet and the CHANGELOG by the commit after the reviewed one, with no
+other change. R2 (P3, the base-control sentence) is corrected the same way. R3 (P3, a `tecnickcom/tc-lib-*` wildcard exclusion
+would also cover the transitive renderers) and R4 (P3, Laravel 13.37.0 behaviour changes outside the packet's summary that no
+code in `app/` reaches; limiter `block()` now times out on `Carbon::now()`, so a frozen-time test of a funnel or throttle could
+hang) are deferred.
 
 ## Untested conditions
 
