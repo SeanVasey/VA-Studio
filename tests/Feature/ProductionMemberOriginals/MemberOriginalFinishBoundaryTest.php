@@ -4,6 +4,7 @@ namespace Tests\Feature\ProductionMemberOriginals;
 
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
+use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Grants\Member\MemberGrantException;
 use App\Domain\Grants\Member\MemberOriginalFinishBoundary;
 use Illuminate\Container\Container;
@@ -78,7 +79,37 @@ class MemberOriginalFinishBoundaryTest extends TestCase
         }
     }
 
-    public function test_positive_control_shared_finish_reaches_unchanged_config_hooks_without_the_member_boundary(): void
+    /**
+     * Positive control in a configuration the identity metadata admission accepts. That admission (#127)
+     * captures only app/database/production-customer-identity metadata, so a callback-free member-grants
+     * withdrawal after frame birth still reaches a completed shared finish. Member configuration freshness
+     * therefore remains the member route's own proof, with this boundary closing callbacks around it.
+     */
+    public function test_positive_control_shared_finish_completes_member_configuration_changes_outside_identity_admission(): void
+    {
+        $application = app();
+        $pdo = DB::connection()->getPdo();
+        $repository = $application->make('config');
+        $repository->set('member-grants.enabled', true);
+        $frame = IdentityCommittedFrame::begin(new CurrentRows($pdo, 'sqlite'), hrtime(true) + 1_000_000_000);
+        try {
+            $this->assertTrue($pdo->inTransaction());
+            $repository->set('member-grants.enabled', false);
+            $frame->finish();
+            $this->assertFalse($repository->get('member-grants.enabled'));
+            $this->assertFalse($pdo->inTransaction());
+            $this->assertSame(0, DB::connection()->transactionLevel());
+        } finally {
+            $frame->close();
+        }
+    }
+
+    /**
+     * Before #127 the shared finish executed an unchanged config hook inside and after its native commit.
+     * Its identity metadata admission now refuses that hook before the hook can run, even without this
+     * boundary; the boundary's own earlier `finish_callbacks` refusal is covered above.
+     */
+    public function test_shared_finish_refuses_unchanged_config_hooks_before_execution_without_the_member_boundary(): void
     {
         $application = app();
         $pdo = DB::connection()->getPdo();
@@ -93,15 +124,21 @@ class MemberOriginalFinishBoundaryTest extends TestCase
             $repository->set('member-grants.enabled', false);
         });
         try {
-            $frame->finish();
-            $this->assertContains(true, $states);
-            $this->assertContains(false, $states);
-            $this->assertFalse($repository->get('member-grants.enabled'));
-            $this->assertFalse($pdo->inTransaction());
+            try {
+                $frame->finish();
+                $this->fail('The shared committed frame must refuse an executable config hook.');
+            } catch (IdentityException $error) {
+                // Reason-less: raised by IdentityMetadataAdmission, not by the frame's committed_frame_required checks.
+                $this->assertSame('unavailable', $error->reason);
+            }
+            $this->assertSame([], $states);
+            $this->assertTrue($repository->get('member-grants.enabled'));
+            $this->assertTrue($pdo->inTransaction());
         } finally {
             $property->setValue($application, $original);
             $frame->close();
         }
+        $this->assertFalse($pdo->inTransaction());
     }
 
     public function test_earlier_callback_work_can_complete_and_be_removed_before_final_admission(): void
