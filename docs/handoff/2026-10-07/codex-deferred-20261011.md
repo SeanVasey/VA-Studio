@@ -363,3 +363,16 @@ F2a final separate review at `e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08`: **APPRO
 
 
 2026-10-18 B4 follow-up batch (lane B4f, branch `harness/account-features-followup-20261017`) fixes PR #127 r4287886519 (hook-list numeric holes) and r4287886535 (playlist create enabled when invalid or at capacity), each with a red/green regression. It also fixes the encrypted-session root cause in `AccountFeatureRequestGuard` (exact allowlist of `Store` and `EncryptedStore`) and rewrites the two stale `ProductionFeatureSourceClosureTest` cases to assert the PR #127 hardened lazy-connection refusal. Independent review approved it at `89f0340d` with no P0/P1. Newly deferred to the next account-feature batch: P2-1 (Rename accepts a whitespace-only name and sends it untrimmed; apply the trimmed guard as `CustomerListeningLibrary.tsx:221` does), P3-2 (pin the Closure clause at capture time), P3-3 (match PHP's trim character set), P3-4 (assert the throw line) and P3-5 (`SupportAttachmentRequestContext` admits any `Store` subclass; consistency pass). P3-1 and P3-6 are packet wording, recorded in the imported decision.
+
+
+2026-10-18 C1 synthetic staging catalog (lane C1, branch `harness/staging-synthetic-catalog-20261017`). The first independent review at `09acd13d` was APPROVE WITH CONDITIONS on P2-1 (the `--env` override bypassed the production refusal) and P2-2 (console staff identity without password or attestation). Both were fixed before merge, and the re-review at `cfc4d6a4` approved with both closed. Deferred to the lane's next batch: P3-A (assert generated media never matches a brand file under `assets/` or `public/`), P3-B (the "interactive console" wording, or add `stream_isatty(STDIN)` to this command and `vasey:rights-scope`), P3-C (neutral wording for the generic failure message on `--check`/admission failures), P3-D (test docblock mentions the scanner stand-in).
+
+
+2026-10-18 PR #140 Codex P2s, deferred to C1's next batch with one reply each:
+- r4305244895: compare both resumed rights-evidence fields with `SyntheticRehearsalCatalog::rights()` before verification, and refuse on any difference.
+- r4305244899: on resume, accept existing artwork or preview only when its source hash matches the deterministic generated media for that definition, and otherwise refuse with "media differs".
+
+Both need staff to edit an interrupted synthetic draft between runs on staging; the command refuses production. They join the re-review's P3-A to P3-D.
+
+
+2026-10-18 PR #141 Codex P2 r4305283401, deferred with one reply: add `@testing-library/dom` and `@testing-library/jest-dom` (both exact pins) to the `npm-minor-patch` `exclude-patterns` in `.github/dependabot.yml`, in the next change that touches that file. It fails safe: a bump would only fail its group PR.

@@ -1065,6 +1065,62 @@
     [
       "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest",
       "test_an_unregistered_memory_alias_cannot_borrow_the_native_selection"
+    ],
+    [
+      "Tests\\Feature\\CustomerListeningFreshnessTest",
+      "test_native_session_temporary_catalog_shadow_is_refused_before_release"
+    ],
+    [
+      "Tests\\Feature\\CustomerListeningMigrationTest",
+      "test_native_foreign_or_drifted_objects_are_never_adopted_or_dropped"
+    ],
+    [
+      "Tests\\Feature\\CustomerListeningMigrationTest",
+      "test_native_session_temporary_shadow_is_never_adopted_or_dropped"
+    ],
+    [
+      "Tests\\Feature\\CustomerSuppressionMigrationTest",
+      "test_native_disabled_fk_checks_and_missing_identity_dependency_are_refused_without_installing"
+    ],
+    [
+      "Tests\\Feature\\CustomerSuppressionMigrationTest",
+      "test_native_replace_cannot_delete_retained_target_or_intent"
+    ],
+    [
+      "Tests\\Feature\\FreeGrantSchemaRecoveryTest",
+      "test_native_composite_dependency_primary_key_is_not_a_unique_id_target"
+    ],
+    [
+      "Tests\\Feature\\PaidGrantSchemaRecoveryTest",
+      "test_native_composite_dependency_primary_key_is_not_a_unique_id_target"
+    ],
+    [
+      "Tests\\Feature\\PaidTaxDownloadJourneyTest",
+      "test_native_new_delivery_public_reads_refuse_while_schema_admission_is_still_pending"
+    ],
+    [
+      "Tests\\Feature\\PaidTaxSchemaRecoveryTest",
+      "test_native_composite_dependency_primary_key_is_not_a_unique_id_target"
+    ],
+    [
+      "Tests\\Feature\\ProductionCheckoutMigrationTest",
+      "test_native_coexisting_table_and_trigger_namespaces_cannot_hide_a_foreign_marker"
+    ],
+    [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
+      "test_native_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema"
+    ],
+    [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
+      "test_native_parent_floor_drift_is_refused_before_the_first_owned_ddl"
+    ],
+    [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantSchemaTest",
+      "test_native_temporary_shadow_of_a_parent_table_is_refused"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\BillingSubscriptionApprovalTest",
+      "test_native_encryption_callback_ddl_cannot_write_an_approval_after_its_implicit_commit"
     ]
   ]
 }

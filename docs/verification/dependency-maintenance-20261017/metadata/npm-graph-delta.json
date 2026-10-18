@@ -1,0 +1,244 @@
+{
+  "tested_source": "1a3844f6be5c205115ca6908684f734d29d663e2",
+  "lockfileVersion": [
+    3,
+    3
+  ],
+  "records_before": 166,
+  "records_after": 164,
+  "root_constraint_changes": {
+    "@inertiajs/react": [
+      "^3.8.0",
+      "^3.9.1"
+    ],
+    "@types/node": [
+      "^24.10.0",
+      "^24.19.2"
+    ],
+    "jsdom": [
+      "30.0.1",
+      "30.1.2"
+    ],
+    "vite": [
+      "^8.3.3",
+      "^8.3.4"
+    ]
+  },
+  "changed_records": [
+    {
+      "path": "node_modules/@asamuzakjp/css-color",
+      "before": "6.0.7",
+      "after": "7.1.7",
+      "dev": true,
+      "engines_after": {
+        "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
+      }
+    },
+    {
+      "path": "node_modules/@asamuzakjp/dom-selector",
+      "before": "8.3.2",
+      "after": "9.2.4",
+      "dev": true,
+      "engines_after": {
+        "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
+      }
+    },
+    {
+      "path": "node_modules/@csstools/color-helpers",
+      "before": "6.1.1",
+      "after": "6.1.2",
+      "dev": true,
+      "engines_after": {
+        "node": ">=20.19.0"
+      }
+    },
+    {
+      "path": "node_modules/@csstools/css-calc",
+      "before": "3.4.0",
+      "after": "3.4.3",
+      "dev": true,
+      "engines_after": {
+        "node": ">=20.19.0"
+      }
+    },
+    {
+      "path": "node_modules/@csstools/css-color-parser",
+      "before": "4.2.3",
+      "after": "4.2.6",
+      "dev": true,
+      "engines_after": {
+        "node": ">=20.19.0"
+      }
+    },
+    {
+      "path": "node_modules/@csstools/css-parser-algorithms",
+      "before": "4.0.0",
+      "after": "4.0.2",
+      "dev": true,
+      "engines_after": {
+        "node": ">=20.19.0"
+      }
+    },
+    {
+      "path": "node_modules/@csstools/css-syntax-patches-for-csstree",
+      "before": "1.1.14",
+      "after": "1.1.15",
+      "dev": true,
+      "engines_after": null
+    },
+    {
+      "path": "node_modules/@csstools/css-tokenizer",
+      "before": "4.0.1",
+      "after": "4.0.2",
+      "dev": true,
+      "engines_after": {
+        "node": ">=20.19.0"
+      }
+    },
+    {
+      "path": "node_modules/@exodus/bytes",
+      "before": "1.15.1",
+      "after": "1.16.0",
+      "dev": true,
+      "engines_after": {
+        "node": "^20.19.0 || ^22.12.0 || >=24.0.0"
+      }
+    },
+    {
+      "path": "node_modules/@inertiajs/core",
+      "before": "3.8.0",
+      "after": "3.9.1",
+      "dev": false,
+      "engines_after": null
+    },
+    {
+      "path": "node_modules/@inertiajs/react",
+      "before": "3.8.0",
+      "after": "3.9.1",
+      "dev": false,
+      "engines_after": null
+    },
+    {
+      "path": "node_modules/@types/node",
+      "before": "24.13.3",
+      "after": "24.19.2",
+      "dev": true,
+      "engines_after": null
+    },
+    {
+      "path": "node_modules/data-urls",
+      "before": "7.0.0",
+      "after": "8.0.0",
+      "dev": true,
+      "engines_after": {
+        "node": "^22.14.0 || >=24.0.0"
+      }
+    },
+    {
+      "path": "node_modules/html-encoding-sniffer",
+      "before": "6.0.0",
+      "after": "7.0.0",
+      "dev": true,
+      "engines_after": {
+        "node": "^22.13.0 || >=24.0.0"
+      }
+    },
+    {
+      "path": "node_modules/jsdom",
+      "before": "30.0.1",
+      "after": "30.1.2",
+      "dev": true,
+      "engines_after": {
+        "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
+      }
+    },
+    {
+      "path": "node_modules/laravel-precognition",
+      "before": "2.1.0",
+      "after": "2.1.1",
+      "dev": false,
+      "engines_after": null
+    },
+    {
+      "path": "node_modules/nanoid",
+      "before": "3.3.18",
+      "after": "3.3.20",
+      "dev": true,
+      "engines_after": {
+        "node": "^10 || ^12 || ^13.7 || ^14 || >=15.0.1"
+      }
+    },
+    {
+      "path": "node_modules/postcss",
+      "before": "8.5.28",
+      "after": "8.5.30",
+      "dev": true,
+      "engines_after": {
+        "node": "^10 || ^12 || >=14"
+      }
+    },
+    {
+      "path": "node_modules/tr46",
+      "before": "6.0.0",
+      "after": "7.0.0",
+      "dev": true,
+      "engines_after": {
+        "node": "^22.14.0 || >=24.0.0"
+      }
+    },
+    {
+      "path": "node_modules/undici",
+      "before": "8.11.0",
+      "after": "8.12.2",
+      "dev": true,
+      "engines_after": {
+        "node": ">=22.19.0"
+      }
+    },
+    {
+      "path": "node_modules/undici-types",
+      "before": "7.18.2",
+      "after": "7.24.6",
+      "dev": true,
+      "engines_after": null
+    },
+    {
+      "path": "node_modules/vite",
+      "before": "8.3.3",
+      "after": "8.3.4",
+      "dev": true,
+      "engines_after": {
+        "node": "^20.19.0 || >=22.12.0"
+      }
+    },
+    {
+      "path": "node_modules/w3c-xmlserializer",
+      "before": "5.0.0",
+      "after": "6.0.0",
+      "dev": true,
+      "engines_after": {
+        "node": "^22.22.2 || ^24.15.0 || >=26.0.0"
+      }
+    },
+    {
+      "path": "node_modules/whatwg-url",
+      "before": "16.0.1",
+      "after": "17.3.0",
+      "dev": true,
+      "engines_after": {
+        "node": "^22.14.0 || >=24.0.0"
+      }
+    }
+  ],
+  "added": [],
+  "removed": [
+    {
+      "path": "node_modules/jsdom/node_modules/whatwg-url",
+      "version": "17.1.2"
+    },
+    {
+      "path": "node_modules/symbol-tree",
+      "version": "3.2.4"
+    }
+  ]
+}

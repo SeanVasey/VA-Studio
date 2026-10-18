@@ -1,0 +1,5 @@
+## stale files removed before restart (found after the container reboot): mysqld.pid mysqld.sock mysqld.sock.lock
+## server.err after restart:
+2026-10-18T00:39:25.675013Z 0 [System] [MY-010229] [Server] Starting XA crash recovery...
+2026-10-18T00:39:25.775846Z 0 [System] [MY-010232] [Server] XA crash recovery finished.
+2026-10-18T00:39:26.449784Z 0 [System] [MY-010931] [Server] /opt/mysql-8.4.11/bin/mysqld: ready for connections. Version: '8.4.11'  socket: '/var/lib/va-mysql84-m1/run/mysqld.sock'  port: 33585  MySQL Community Server - GPL.

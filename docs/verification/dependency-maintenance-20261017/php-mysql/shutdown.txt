@@ -1,0 +1,2 @@
+2026-10-18T00:54:52.984703Z 0 [System] [MY-010910] [Server] /opt/mysql-8.4.11/bin/mysqld: Shutdown complete (mysqld 8.4.11)  MySQL Community Server - GPL.
+2026-10-18T00:54:52.984724Z 0 [System] [MY-015016] [Server] MySQL Server - end.
