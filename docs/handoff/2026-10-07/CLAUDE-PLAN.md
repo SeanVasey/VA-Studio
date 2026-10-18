@@ -322,3 +322,9 @@ F2a final separate review at `e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08`: **APPRO
 
 
 2026-10-17 F2b merged PR #132 at `efa6eea5b007f1f2623c4009c1e9bef737f06bee` on 2026-10-16T01:52:40Z from exact approved head `a6b143ce862f9da6c315dbbbb5884f8c01657653` (final review at `a21658ad`, later delta documentation/evidence only); cheap preflight 38837046611 success; 0 GitHub reviews / 0 threads / 6 contexts; merge tree `35734f47` equals head tree. Receipt reconstructed on 2026-10-17 because the merging session stopped first; nothing from that session exists on GitHub after the merge. Full F2, the 25 native counterparts, raw-worker/later-hook normalization, host, activation and release remain open.
+
+
+2026-10-17 reconciliation merged PR #137 at `345628622d6b431fa42fdfc5318842b722ef3181` from exact head `3a127606ef62af6ff4ade6cc266113a98c63bd5a` (docs only: PR #132 receipt, current pointers, resumption note). Cheap preflight 39053236448 success; the readiness cancellation 39053234617 is the known artifact. The Codex review bot reported its usage limits exhausted and produced no findings.
+
+
+2026-10-17 documentation refresh merged PR #138 at `cca1d18e56ff085c222f5621efbd9e602691f1dc` from exact head `0b2aacfb00a36d64208f6761df54d1b60d207fd2` (allowlisted docs only: README current state, dated historical markers, refreshed task rows, source-read parity status column). Docs-only preflight 39060339721 success with frontend and backend skipped; the readiness cancellation 39060334083 is the known artifact.

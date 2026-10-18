@@ -1,0 +1,35 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/b4f/phpunit.xml
+
+FFF..                                                               5 / 5 (100%)
+
+Time: 00:19.544, Memory: 85.00 MB
+
+There were 3 failures:
+
+1) Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_hook_appended_during_the_commit_phase_keeps_the_list_and_later_operations_available@TransactionCommitting listener with data ('committing')
+The next feature operation must not be refused by the hook list the previous operation left behind. Stored hook keys: [0,2].
+Failed asserting that 'App\Domain\Customers\ProductionFeatures\ProductionFeatureException' is null.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:180
+/home/user/wt/b4f/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_hook_appended_during_the_commit_phase_keeps_the_list_and_later_operations_available@afterCommit callback with data ('after_commit')
+The next feature operation must not be refused by the hook list the previous operation left behind. Stored hook keys: [0,2].
+Failed asserting that 'App\Domain\Customers\ProductionFeatures\ProductionFeatureException' is null.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:180
+/home/user/wt/b4f/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_hook_appended_during_the_commit_phase_keeps_the_list_and_later_operations_available@TransactionCommitted listener with data ('committed')
+The next feature operation must not be refused by the hook list the previous operation left behind. Stored hook keys: [0,2].
+Failed asserting that 'App\Domain\Customers\ProductionFeatures\ProductionFeatureException' is null.
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:180
+/home/user/wt/b4f/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 5, Assertions: 29, Failures: 3.
+exit=1
