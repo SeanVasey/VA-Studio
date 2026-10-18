@@ -184,3 +184,7 @@ No skip was added or removed, so `scripts/ci/database-sqlite-skips.json` and `da
 - The hook census covers console bootstrap and one HTTP request to `/up` in `testing`, not every route or a production `.env`. The grep, though, covers all registration sites in `app/`, `config/`, `bootstrap/` and `routes/`.
 - The staging probe is scratch evidence. The committed protection for the seven gates is the source census plus each gate's existing suites.
 - The positive control in 1a pins that the shared frame's identity admission does not capture member-grants configuration. If a later change widens that admission, the control should be revisited rather than read as a regression.
+
+## Independent review
+
+A separate reviewer approved `7b290b8b` (tested source `30cca9b6`) with no P0, P1 or P2 ([decision record](independent-review-7b290b8b-DECISION.md), imported verbatim). P3-2 (a direct committed-phase `ownerInputs` test) and P3-3 (assert the cause of the receipt refusal) go to the next member-grant batch. P3-4 (the unchanged-file sweep) is tracked as S1 phase 2. P3-1 and P3-5 need no change.
