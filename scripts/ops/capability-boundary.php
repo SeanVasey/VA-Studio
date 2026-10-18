@@ -39,7 +39,9 @@ final class CapabilityBoundary
     /**
      * Stated false in the base staging template beside the ten: production-lane or one-way, so never left to a default.
      * The public track sitemap build chain is not environment-gated; promoting customer listening data to V2 cannot be undone by
-     * turning it off again.
+     * turning it off again. VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED is deliberately not held: it admits only the
+     * `vasey:staging-synthetic-catalog` console command, which refuses production whatever the flag says, and
+     * docs/ops/staging-runbook.md section 5a sets it true for the seeding run (a hold would refuse that documented deploy).
      */
     public const ADDITIONAL_FLAGS = [
         'DISCOVERY_SITEMAP_ENABLED' => 'discovery-sitemap.enabled',

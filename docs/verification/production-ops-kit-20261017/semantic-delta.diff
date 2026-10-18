@@ -44,29 +44,19 @@
 +         workers/vasey-production-workers.conf bin/vasey-production-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh forge-deploy.sh; do
    [ -f "$KIT/$f" ] || die "kit file missing: ops/production/$f"
  done
-@@ -259,5 +257,8 @@
- systemctl enable --now clamav-freshclam >/dev/null
- # clamd is not used (the configured engine is clamscan) and would hold ~1 GiB resident.
--if systemctl list-unit-files clamav-daemon.service >/dev/null 2>&1; then systemctl disable --now clamav-daemon >/dev/null 2>&1 || true; fi
-+# Stop an unused clamd, but never one that ops/clamav/install-clamd.sh configured (its clamd.conf starts with the marker).
-+if ! grep -qs '^# VASEY.AUDIO clamd profile' /etc/clamav/clamd.conf && systemctl list-unit-files clamav-daemon.service >/dev/null 2>&1; then
-+  systemctl disable --now clamav-daemon >/dev/null 2>&1 || true
-+fi
- newest=$(find /var/lib/clamav -maxdepth 1 \( -name 'daily.c[lv]d' -o -name 'main.c[lv]d' \) -printf '%T@\n' | sort -rn | head -1)
- age=$(( $(date +%s) - ${newest%.*} ))
-@@ -450,5 +451,4 @@
+@@ -454,5 +452,4 @@
  VASEY_EXPECTED_APP_ENV=$APP_ENV_EXPECTED
  VASEY_DB_NAME=$DB_NAME
 -VASEY_PROBE_NETRC=/etc/vasey-production/probe.netrc
  VASEY_KEEP_RELEASES=3
  VASEY_BACKUP_KEEP=7
-@@ -466,4 +466,5 @@
+@@ -470,4 +467,5 @@
  install -m 0644 -o root -g root "$KIT/seal-release.py" /usr/local/libexec/vasey-production/seal-release.py
  install -m 0644 -o root -g root "$KIT/release-step.sh" /usr/local/libexec/vasey-production/release-step.sh
 +install -m 0755 -o root -g root "$KIT/forge-deploy.sh" /usr/local/libexec/vasey-production/forge-deploy.sh
  
  render "$KIT/php-fpm/vasey-production.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-production.conf" 0644
-@@ -506,24 +507,5 @@
+@@ -510,24 +508,5 @@
  EOF
  
 -# ---------------------------------------------------------------- 7. access credentials and nginx template
@@ -92,7 +82,7 @@
 +# ---------------------------------------------------------------- 7. nginx template (no basic auth, no probe credentials)
  render "$KIT/nginx/vasey-production.conf" /etc/vasey-production/nginx-site.conf 0644
  
-@@ -538,7 +520,7 @@
+@@ -542,7 +521,7 @@
    helpers             /usr/local/sbin/vasey-production-ctl (sudo for $APP_USER), /usr/local/sbin/vasey-production-backup (cron 03:17 UTC)
    MySQL               schema $DB_NAME; DB_HOST=127.0.0.1 DB_USERNAME=vasey_app
 -  secrets (root only) $SECRETS/db-app.env (paste DB_PASSWORD into Forge > Environment), $BACKUP_CNF, $HTPASSWD, /etc/vasey-production/probe.netrc
