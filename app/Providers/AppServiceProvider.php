@@ -13,6 +13,7 @@ use App\Domain\Customers\ProductionIdentity\Notifications\IdentitySmtpFactory;
 use App\Domain\Grants\Free\FreeGrantRendererProcess;
 use App\Domain\Grants\Paid\PaidGrantRendererProcess;
 use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrantRendererProcess;
 use App\Domain\Media\MediaWorkflowBudget;
 use App\Http\Tax\TaxHttpMount;
 use App\Models\User;
@@ -44,9 +45,9 @@ class AppServiceProvider extends ServiceProvider
             fn ($app) => new PhpCliBinary($app['config']->get('app.php_cli_binary')));
         // The pinned grant renderers spawn PHP_BINARY, which is the FPM daemon outside the CLI; there they get a
         // factory that runs the validated CLI binary instead (PhpCliProcess). In the CLI they are built as before.
-        // Family 256 (production free grants) is deliberately absent: nothing ships binding it, and the step that
-        // composes and mounts it adds its renderer here after review.
-        foreach ([FreeGrantRendererProcess::class, PaidGrantRendererProcess::class, PaidTaxRendererProcess::class] as $renderer) {
+        // Family 256 is included now that its HTTP mount exists. The binding is inert while that mount and the family's
+        // policy stay off: nothing resolves the renderer unless an admitted render runs.
+        foreach ([FreeGrantRendererProcess::class, PaidGrantRendererProcess::class, PaidTaxRendererProcess::class, ProductionFreeGrantRendererProcess::class] as $renderer) {
             $this->app->bind($renderer, function ($app) use ($renderer) {
                 $binary = $app->make(PhpCliBinary::class);
 
