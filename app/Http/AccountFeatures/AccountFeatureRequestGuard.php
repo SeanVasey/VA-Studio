@@ -9,6 +9,7 @@ use Illuminate\Auth\AuthManager;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Container\Container;
 use Illuminate\Http\Request;
+use Illuminate\Session\EncryptedStore;
 use Illuminate\Session\Store;
 use Illuminate\Session\SymfonySessionDecorator;
 use ReflectionProperty;
@@ -45,9 +46,11 @@ final class AccountFeatureRequestGuard
         $guards = self::raw($manager, AuthManager::class, 'guards');
         $guard = is_array($guards) ? ($guards['customer'] ?? null) : null;
         $decorator = self::raw($request, \Symfony\Component\HttpFoundation\Request::class, 'session');
+        // The store must be exactly one of the two classes the framework builds (SESSION_ENCRYPT selects EncryptedStore);
+        // no instanceof and no other subclass. The reflection reads below name Store as the declaring class, which also fits EncryptedStore.
         if ($request::class !== Request::class || ! $guard instanceof SessionGuard || $guard::class !== SessionGuard::class
             || ! $decorator instanceof SymfonySessionDecorator || $decorator::class !== SymfonySessionDecorator::class
-            || $decorator->store::class !== Store::class) {
+            || ! in_array($decorator->store::class, [Store::class, EncryptedStore::class], true)) {
             throw new ProductionFeatureException;
         }
         $this->manager = $manager;

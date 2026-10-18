@@ -138,7 +138,10 @@ final class ProductionFeatureOperation
             if (is_array($currentHooks)) {
                 $remainingHooks = array_filter($currentHooks, fn ($hook) => $hook !== $tail);
                 if ($remainingHooks !== $currentHooks) {
-                    $hooksProperty->setValue($connection, $remainingHooks);
+                    // array_filter keeps keys. Removing our tail from the middle of an extended list would leave a
+                    // numeric gap that the next operation's array_is_list admission refuses, so a list is reindexed.
+                    // An associative replacement is callback-owned and keeps its own keys.
+                    $hooksProperty->setValue($connection, array_is_list($currentHooks) ? array_values($remainingHooks) : $remainingHooks);
                 }
             }
             if ($connection->getEventDispatcher() === $observer) {
