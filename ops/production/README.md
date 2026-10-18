@@ -141,6 +141,15 @@ These are application or review items this kit deliberately does not do:
    `docs/ops/production-activation-packet.md` (live checkout, the live webhook receiver and its nginx limits, paid delivery
    mounting, membership billing). Each needs Sean's separate authorization.
 5. **Scheduler heartbeat.** The application leaves no trace when no release is due; a ping on schedule success is a reviewed change.
+6. **Pre-launch capability hold (needs Sean's decision).** Neither the preflight production profile nor `ops/production/validate-runtime.php`
+   checks the capability flags or the production-lane flags (the staging deploy gate does, through `scripts/ops/capability-boundary.php`). On
+   production the `VASEY_TEST_*` flags and the support fixture are already refused by their environment gates, but four flags are not held by
+   anything here and no template line states them either: `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` and `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED`
+   (no environment gate; each admits once an adapter is bound by other code, and none ships today), `DISCOVERY_SITEMAP_ENABLED` (the public
+   index serves track sitemaps in production once it is true) and `VASEY_LISTENING_V2_PROMOTION_ENABLED` (a one-way data promotion with no
+   environment gate). A hold is the same shared check as a validator refusal until each activation is authorized, lifted by a reviewed change.
+   Not implemented here: whether and when to hold them is an activation-order decision. The evidence and the question are in
+   `docs/verification/production-ops-kit-20261017/` (batch K3).
 
 ## What was and was not verified
 

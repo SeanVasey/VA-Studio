@@ -46,7 +46,9 @@ an issue or the repository; enter each one only in Forge or on the server, as no
   Environment. It is not in the repository.
 - [ ] Stripe **test** values, taken from the Stripe Dashboard in test mode and entered in Forge's Environment only: the account ID
   (`acct_`), the secret key (`sk_test_`) and the webhook signing secret (`whsec_`), or a Stripe CLI login done on the server.
-  A live key (`sk_live_`) or a restricted key (`rk_`) is refused by the deploy and must never be used here.
+  A live-mode key (`sk_live_`, `rk_live_` or `pk_live_`) is refused by the deploy and must never be used here. A restricted key
+  (`rk_test_`) is not refused by the deploy but the test checkout does not accept it: it needs a standard `sk_test_` key, and
+  `scripts/ops/validate-test-commerce-profile.php` fails a restricted one, so use the standard test key.
 
 ## 5. Off-host backup destination (S-10)
 

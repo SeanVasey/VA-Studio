@@ -151,7 +151,7 @@ Nothing was pushed and no application file (`app/`, `routes/`, `bootstrap/`, `co
 
 | # | Kit file | Finding (evidence) | Action |
 | --- | --- | --- | --- |
-| 1 | `ops/staging/forge-deploy.sh` (inherited-environment scrub, lines 60 to 68) | The scrub unsets inherited variables by family before composer hooks and the cache and migration commands, so a value in Forge's deployment shell cannot override the candidate `.env` (Laravel's dotenv never overrides a variable already in the process environment). **43 of the 196 distinct `env()` keys in `config/*.php` were outside every pattern**: `LOG_*`, `AUTH_*`, `DISCOVERY_SITEMAP_ENABLED`, `MYSQL_ATTR_SSL_CA`, `MEMCACHED_*`, `SQS_*`, `DYNAMODB_*`, `BEANSTALKD_*`, `PAPERTRAIL_*`, `SLACK_*`, `POSTMARK_*`, `RESEND_*`, `VASEY_PHP_CLI_BINARY` (`config/app.php:139`, read by `app/Support/PhpCliBinary.php`), `VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED` (`config/support-attachments.php`) and `VASEY_LISTENING_V2_*` (`config/customer-listening.php`). The last three are flags and a renderer path: an inherited value would be baked into `config:cache`. The full key-to-file list is the first block of `evidence/k1-env-key-coverage.txt` | A second `case` arm lists those families. The arm only unsets more inherited variables; the candidate `.env` is unchanged, so a correctly configured host behaves identically. Guarded by `tests/ops/test_staging_code_drift.py` |
+| 1 | `ops/staging/forge-deploy.sh` (inherited-environment scrub, lines 60 to 68) | The scrub unsets inherited variables by family before composer hooks and the cache and migration commands, so a value in Forge's deployment shell cannot override the candidate `.env` (Laravel's dotenv never overrides a variable already in the process environment). **43 of the 196 distinct `env()` keys in `config/*.php` were outside every pattern**: `LOG_*`, `AUTH_*`, `DISCOVERY_SITEMAP_ENABLED`, `MYSQL_ATTR_SSL_CA`, `MEMCACHED_*`, `SQS_*`, `DYNAMODB_*`, `BEANSTALKD_*`, `PAPERTRAIL_*`, `SLACK_*`, `POSTMARK_*`, `RESEND_*`, `VASEY_PHP_CLI_BINARY` (`config/app.php:139`, read by `app/Support/PhpCliBinary.php`), `VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED` (`config/support-attachments.php`) and `VASEY_LISTENING_V2_*` (`config/customer-listening.php`). The last three are flags and a renderer path. Every artisan, composer and validator call already runs under `env -i` or sudo's `env_reset` (`release-step.sh:18,40`, `vasey-staging-ctl:380-385`, `forge-deploy.sh:77`), so this closes a defence-in-depth gap rather than a leak anyone observed: the scrub keeps working if a call is ever added that does not. The full key-to-file list is the first block of `evidence/k1-env-key-coverage.txt` | A second `case` arm lists those families. The arm only unsets more inherited variables; the candidate `.env` is unchanged, so a correctly configured host behaves identically. Guarded by `tests/ops/test_staging_code_drift.py` |
 | 2 | `ops/staging/provision.sh` (PHP check, after line 223) | `composer.json:12` now requires `php ^8.4.1` (it was `^8.4` at `d8aba146`; `composer.json:93` platform `8.4.1`, `composer.lock` platform `^8.4.1`). The kit accepted any 8.4, and an 8.4.0 host would fail `composer install` in the middle of a deploy | A `version_compare` check with a message that names the Forge action. Guarded by the drift test, which reads the floor from `composer.json` |
 | 3 | `ops/staging/provision.sh` (comment before `log_bin_trust_function_creators`), `ops/staging/README.md` (MySQL row, "Why one database account") | The kit said the migrations create about 567 triggers. Measured on MySQL 8.4.11 at `34562862`: **618 triggers, 200 tables, 0 routines, 0 events, 0 views, every definer `vasey_app@127.0.0.1`** (`evidence/k1-mysql-8.4.11-migrate-fresh.txt`). The restore proof's own check reports the same 618 | Figures corrected. No logic uses the number |
 | 4 | `ops/staging/README.md` (paid-routes paragraph), `ops/production/README.md`, comment in both nginx templates | The documents said the paid routes are "not mounted on `main` (PR #56)". Now `config/paid-grants.php` ships `http_mounted` as a literal `false` with no environment switch (`docs/ops/paid-delivery-runtime.md`, "Root registration"); the locations answer 404 for that reason. The 3,900 s `fastcgi_read_timeout` comment called the figure "whole request plus margin"; the runtime guide now treats it as the application's reference value, not a measured guarantee | Wording corrected in the READMEs and the two nginx comments. Behavior (timeouts, locations, pool) unchanged |
@@ -339,8 +339,9 @@ No application file, policy class or config changed.
 - **Production lanes.** `runtime.production_lanes_closed` fails if any `enabled` or `mounted` key is strictly true in a `production-*`, `production_*`,
   `paid-grants`, `paid-tax-grants` or `member-grants` config file (16 today), or if one of the five named lanes (Paid252, Tax255 in two files, production
   customer identity, production free grants) no longer exists. Each of those four lane families, and a renamed file, was flipped in the real config in turn and
-  refused. Today these files hold literals with no `env()` call, so the check cannot be tripped from an `.env`; it exists for the day a code change makes one
-  reachable.
+  refused. Today every one of those files except `production_checkout.php` holds literals with no `env()` call; that one reads the `PRODUCTION_CHECKOUT_*`
+  switches from the environment (already refused by their own checks, which this one repeats), so an `.env` can trip the lane check only through those.
+  The rest of it exists for the day a code change makes another lane reachable.
 
 ## Verification
 
@@ -374,12 +375,54 @@ hold them on production until an activation is authorized? Today nothing does (n
 - `ops/production/validate-runtime.php` (this lane's file) reuses that preflight and adds live-key and `PRODUCTION_CHECKOUT_*` holds. It has no
   capability-flag or lane check either.
 - What that means today: on `production` the `VASEY_TEST_*` and fixture flags are refused by their environment gates (matrix 1), and the lane flags are literals with
-  no environment switch, so the exposed surface is the two ungated flags (with an adapter bound) and any lane switch a future change introduces. A production hold
-  would be the same shared check in the production validator, as holds to be lifted by a reviewed change when an activation is authorized. Not done: the brief
-  asked only for documentation of the production gap, and holds on production are a decision about activation order.
+  no environment switch. Four flags are exposed, held by nothing in the production kit and stated by no production template line:
+  1. `VASEY_OPERATIVE_FREE_GRANTS_ENABLED`: no environment gate (`FreeGrantPolicy.php:12`); admits once a `FreeGrantIdentity` adapter is bound, and none ships.
+  2. `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED`: no environment gate (`InquiryNotificationWork.php:53`); admits once an `InquiryAlertTransport` is bound, and none ships.
+  3. `DISCOVERY_SITEMAP_ENABLED`: `PublicDiscoveryController.php:16` serves the track sitemap index when `APP_ENV=production` and the flag is true; the build and store
+     chain behind it (`SitemapConfiguration::assertEnabled()`) is not environment-gated. Host and content acceptance are separate activation gates.
+  4. `VASEY_LISTENING_V2_PROMOTION_ENABLED`: `ListeningRollout::capture()` (`ListeningRollout.php:13`) has no environment gate; with a review reference it declares a one-way
+     promotion that turning the flag off does not undo (the config comment says so).
+  Plus any lane switch a future change introduces (the lane files are literals today, except `production_checkout.php`, whose switches the production validator already holds).
+  A production hold would be the same shared check in the production validator, as holds lifted by a reviewed change when each activation is authorized. Not done: the
+  brief asked only for documentation, and holds on production are an activation-order decision for Sean. It is listed as item 6 of `ops/production/README.md`, "Open reviewed
+  changes", as "Pre-launch capability hold (needs Sean's decision)".
 
 ## Open after K3
 
 - The question above, for the lead and Sean. The production hold depends on its answer.
 - Nothing here ran on a real host; the process-level runs used a synthetic candidate and no database.
+
+---
+
+# Review conditions: independent review of O1 at `b8d5c59d` (APPROVE WITH CONDITIONS, no P0 or P1)
+
+The independent review (head `52b2d556` merged with main) approved with conditions. Each condition, the commit that closes it, and where the
+old and new evidence sit. Counts in the K1 to K3 sections above are as of their own commits; the current ones are in the last table here.
+
+| Finding | Was | Now | Evidence |
+| --- | --- | --- | --- |
+| **P2-3** a remote without age recipients shipped the whole set in plaintext with a warning | `backup.sh` rclone branch, the old `test_rclone_without_age_sends_the_set_with_a_warning` | `offhost_config_ok` refuses ("would leave this host unencrypted") before any transfer, for `check-offhost` and every ship, unless `backup.conf` sets `VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1` (default `0`, only the literal `1`; `REQUIRE_ENCRYPTION=1` still wins). The no-remote default path, the rsync path and encrypted shipping are unchanged. Commit `48e3c6da` | `tests/ops/test_staging_backup_offhost.py` (45 tests, was 40): refusal in config and in ship with nothing sent, the local set intact and no value printed; allowed only with `1` (`0`, empty, `true`, `yes`, `2` refused); encrypted shipping identical with the opt-in 0 or 1; no effect without a remote or against `REQUIRE_ENCRYPTION`. Five mutations (refusal removed, any non-zero value lifts it, refusal also hits encrypted shipping, cleanup too broad, cleanup follows links) each failed the tests. Docs: `docs/ops/backup-offhost-hardening.md`, "rclone remote" |
+| **P2-1** docs told operators to enable a flag the K3 gate refuses | `ops/staging/env.staging.example:185` ("Lane B may turn one on"), `docs/ops/staging-runbook.md:229` (`VASEY_TEST_FREE_GRANTS_ENABLED=true`) | Both say enabling any of the twelve is a reviewed change to `scripts/ops/capability-boundary.php` (with the templates and tests); the free-grant FPM render check moves into that change. No allow-list added. Commit `9ebfd130` | The gate behavior is unchanged and tested (80 cases). The application feature guides `docs/service-projects.md`, `docs/test-refunded-exception-resolution.md` and `docs/test-unpaid-release.md` describe local and test enablement of a feature and were not edited; on a staging host the same gate applies |
+| **P2-2** production gap incomplete | K3 section named two flags; `ops/production/README.md` had no capability-hold item | The K3 section now names all four exposed flags (`VASEY_OPERATIVE_FREE_GRANTS_ENABLED`, `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED`, `DISCOVERY_SITEMAP_ENABLED`, `VASEY_LISTENING_V2_PROMOTION_ENABLED`) with the citation for each, and `ops/production/README.md` has item 6, "Pre-launch capability hold (needs Sean's decision)". The hold is not implemented | This section's commit (docs) |
+| P3 K1 overstated the `config:cache` risk | README finding 1 and the CHANGELOG said an inherited value "would be baked into `config:cache`" | Reworded as defence in depth: every artisan, composer and validator call already runs under `env -i` or sudo's `env_reset` (`release-step.sh:18,40`, `vasey-staging-ctl:380-388`, `forge-deploy.sh:77`) | Finding 1 above; CHANGELOG |
+| P3 checklist said `rk_` is refused by the deploy | `docs/ops/staging-provisioning-checklist.md:49` | Only `*_live_` keys are refused by the deploy (`forge-deploy.sh:129`); a restricted `rk_test_` key passes the deploy but the test checkout does not accept it and the profile validator fails it | The checklist |
+| P3 "cannot be tripped from an `.env`" | K3 section, production lanes | Reworded: every lane file but `production_checkout.php` holds literals; that one is env-driven (and already refused by its own checks), so an `.env` can trip the lane check only through it | K3 section |
+| P3 BOM gave only `runtime.unavailable` | `ops/staging/validate-runtime.php` | Reports `runtime.byte_order_mark` first, then still refuses. Commit `9ebfd130` | `StagingRuntimeValidatorTest::test_a_byte_order_mark_is_refused_with_its_own_clear_check`; removing the check fails it |
+| P3 two hosts sharing one remote path would prune each other | not documented | Documented as one remote path per host (staging and production never share one) | `docs/ops/backup-offhost-hardening.md`, "Retention" |
+| P3 leftover `.ship.*` directories | never cleaned | The hardened ship removes `.ship.XXXXXX` directories that are real directories, exactly that name shape and untouched for over a day (never a recent one, never a link). Only in the hardened path, so the default path is unchanged. Commit `48e3c6da` | `test_stale_shipping_directories_are_cleared_and_fresh_ones_are_not`; two mutations fail it |
+| P3 ClamAV AppArmor read rule | the installer grants clamd read on the private trees as a precaution | Recorded as a host check: if scans succeed without the two read rules, drop them from `apparmor_block()` in `install-clamd.sh` (it rewrites the block on every run) | `ops/clamav/README.md`, AppArmor |
+
+## Current verification
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Ops tests | `python3 -m unittest discover -s tests/ops -p 'test_*.py'` | 280 tests pass (275 at the review; backup tests 40 to 45) |
+| Deploy gate | `php vendor/bin/phpunit tests/Unit/StagingRuntimeValidatorTest.php` | 80 cases, 464 assertions pass (79 and 457 at the review) |
+| Profile validator | `php vendor/bin/phpunit tests/Unit/TestCommerceProfileValidatorTest.php` | 63 cases, 578 assertions pass |
+| Neighbours | `ProductionEnvironmentTemplateTest` (6), `test-private-server-preflight.py` | pass |
+| Shell | `shellcheck -S warning` over the kit scripts, default severity on `backup.sh`; `bash -n` | clean |
+| Builder | `python3 -I ops/production/build-kit.py --check`; `--delta` against the snapshot | ok, 13 files; delta current |
+| Style | `pint --test` on the touched PHP | passed |
+
+Still not verified: anything on a real host (the reviewer's list stands), a real rclone or rsync remote, and the age restore drill with a real key.
 

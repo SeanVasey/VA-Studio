@@ -62,6 +62,12 @@ Found while preparing this profile (Ubuntu 24.04, ClamAV 1.5.4); each is covered
   `/etc/apparmor.d/local/usr.sbin.clamd` and reloads the profile. Whether AppArmor re-checks a descriptor passed with
   `--fdpass` against the daemon's profile was not testable without an AppArmor host: if a scan fails with `Permission
   denied` or `scanner_unavailable` after the group is right, run `dmesg | grep DENIED`.
+  **Host check, least privilege.** The block grants clamd read access to the private tree (`$ROOT/private/**` and each release's
+  `storage/app/private/**`) as a precaution, because the `--fdpass` behaviour is unknown. If a scan of a file in the private tree
+  succeeds with those two read rules removed from `/etc/apparmor.d/local/usr.sbin.clamd` (reload the profile first, then scan; check
+  `dmesg | grep DENIED` stays empty), drop them from `apparmor_block()` in `install-clamd.sh` (it rewrites the block on every run, so a
+  hand edit would not last): clamd should not be able to read the masters, stems and contracts it is only handed a descriptor for.
+  The `/var/tmp/clamd` rules are needed either way. Run this once on the host and record the result.
 - **freshclam warns on every update:** `Clamd was NOT notified: The RELOAD command is disabled`. That is expected. The
   daemon reloads itself within `SelfCheck` of an update; enabling the socket's `RELOAD` command would let any group member
   trigger a 2 GiB reload peak.
