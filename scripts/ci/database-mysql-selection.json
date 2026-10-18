@@ -248,6 +248,7 @@
     "tests/Support/private-product-draft-worker.php",
     "tests/Support/product-member-refresh-worker.php",
     "tests/Support/production-checkout-race-worker.php",
+    "tests/Support/production-free-race-worker.php",
     "tests/Support/production-identity-race-worker.php",
     "tests/Support/production-track-policy-worker.php",
     "tests/Support/production-track-preparation-replay-worker.php",
