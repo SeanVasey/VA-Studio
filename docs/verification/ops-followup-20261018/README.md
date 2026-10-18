@@ -23,11 +23,14 @@ for `systemctl`, `ufw` and the like. No application code, route, config, census 
 | `22d1bd81` test(ops): host baseline must not accept an enabled-runtime apt timer | R3 P3-4 | `tests/ops/test_monitoring_scripts.py` |
 | `ebc93106` fix(ops): match the clamd profile marker only as the exact first line | R3 P3-5 | `ops/staging/provision.sh`, `tests/ops/test_clamav_profile.py` |
 | `9b360103` test(ops): follow the first-line clamd marker guard in the production kit test | R3 P3-5 | `tests/ops/test_production_kit.py` |
+| `a28a87c5` docs(ops): record the O2 round-three evidence and changelog | docs | `CHANGELOG.md`, this directory |
+| `ed152682` fix(ops): keep the retry copy through an outage and size-check "already shipped" | R4 P2-A, P3-B to P3-D, nit | `ops/staging/backup.sh`, `tests/ops/test_staging_backup_offhost.py`, `docs/ops/backup-offhost-hardening.md` |
 | this update's commit | docs | `CHANGELOG.md`, this directory |
 
 **Tested source:** the first-round checks ran at `810794a8` and again at `a1c94023`; the round-two checks at `f6cb3b2d` and again at
-`cd35fb15`, which the independent review approved with conditions. After the round-three fixes (below), every check in the
-verification table ran at `9b360103`, the last code commit. The commit that updates this packet adds only documentation; the full
+`cd35fb15`, which the independent review approved with conditions; the round-three checks at `9b360103` and `a28a87c5`, which the
+narrow re-review approved with conditions. After the round-four fixes (below), every check in the verification table ran at
+`ed152682`, the last code commit. The commit that updates this packet adds only documentation; the full
 suite was run again on it, and the lane report gives that SHA.
 
 ## Items: what changed, and red/green
@@ -275,11 +278,37 @@ Process notes:
   Both were removed before any commit.
 - A debug step's `git checkout` in round 2 discarded uncommitted test edits, which were re-applied.
 
-## Verification at `9b360103`
+## Round 4: conditions of the narrow re-review of `a28a87c5`
+
+- **P2-A, retries through an outage.**
+  - **Problem.** After a failed transfer, the kept copy was dropped whenever the follow-up `lsf` did not show the ciphertext,
+    including when the listing itself failed. An outage that interrupted the digest upload therefore left a set no retry could
+    complete.
+  - **Fix.** The copy is dropped only when `lsf` succeeded (exit 0 or 3) and showed no ciphertext; otherwise it is kept, and the cap
+    bounds disk use. The log message and the guide are corrected.
+  - **Test:** `test_an_outage_during_the_digest_upload_keeps_the_copy_and_the_retry_converges`, the reviewer's case. The digest
+    upload fails, `lsf` fails while the outage lasts, and the retry afterwards must converge.
+  - **Red:** at `a28a87c5` no copy was kept. **Green:** the retry re-sends the same bytes.
+- **P3-B, "already shipped".**
+  - **Fix.** The record now holds the ciphertext size as well as the digest, and the remote size (`lsf --format sp`) must match. The
+    guide says this is a size check, not a content check.
+  - **Red:** a ciphertext replaced by 34 bytes read as "already shipped". **Green:** refused. A deleted ciphertext is refused as well.
+- **P3-C and the nit.**
+  - `test_the_cap_never_drops_a_reusable_copy_of_the_set_being_shipped` uses a real reusable copy plus two newer copies and asserts
+    "re-sending"; it kills R-b.
+  - `test_a_linked_shipped_record_is_not_trusted` kills R-c.
+  - Both passed at `a28a87c5`, since they guard mutations rather than fix behaviour.
+- **P3-D.** One guide sentence: a deploy runner's time limit (Forge's, if any; not verified) must cover the 600 s wait plus the
+  snapshot, the restore proof and the ship.
+- **Mutations.** R-b, R-c, "copy dropped on a listing failure" and "size not compared" each fail a test. R-a (accept when only the
+  digest name is present) now survives as an equivalent mutant: the size check refuses a missing ciphertext on its own, so the
+  name test no longer changes behaviour. No test can tell the two apart, so none was forced.
+
+## Verification at `ed152682`
 
 | Check | Command | Result |
 | --- | --- | --- |
-| Ops tests | `python3 -m unittest discover -s tests/ops -p 'test_*.py'` | **309 OK** (280 before: off-host 45 to 68, monitoring 42 to 44, ClamAV 26 to 28, drift 9 to 10, production kit 49 to 50; 294 at `cd35fb15`) |
+| Ops tests | `python3 -m unittest discover -s tests/ops -p 'test_*.py'` | **313 OK** (280 before: off-host 45 to 72, monitoring 42 to 44, ClamAV 26 to 28, drift 9 to 10, production kit 49 to 50; 309 at `a28a87c5`) |
 | Kit build | `python3 -I ops/production/build-kit.py --check` | ok, 13 files; `--delta` identical to the committed snapshot, now also pinned by a test |
 | Shell syntax | `bash -n` on `backup.sh`, `provision.sh`, `host-baseline.sh` | ok |
 | Lint | `shellcheck` 0.9.0 at the default severity on `backup.sh` and `host-baseline.sh`; `-S warning` on those, `provision.sh`, `forge-deploy.sh` and the five derived production scripts | clean (`provision.sh` keeps its old SC1091 info at the default severity) |

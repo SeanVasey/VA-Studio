@@ -248,3 +248,23 @@ FAILED (failures=4)
 ################ chunker hash_type = none probe (real rclone 1.60.1)
 copy --checksum --immutable of a differing same-size object: NOTICE 'no hashes in common; falling back to --size-only', exit 0, remote kept (taken as unchanged).
 lsf with anchored includes lists the name; lsf of a path that does not exist exits 3 ('directory not found').
+
+################################################################ Round 4 (narrow re-review of a28a87c5)
+== RED: new tests vs backup.sh at a28a87c5
+FAIL: test_already_shipped_checks_the_remote_ciphertext_size_and_presence (case='replaced')
+AssertionError: 0 == 0 : LOG: off-host retry copies on this host: 0 kept retry copies, 0 bytes
+FAIL: test_an_outage_during_the_digest_upload_keeps_the_copy_and_the_retry_converges
+AssertionError: Lists differ: [] != ['.offhost-retry.20261015T030000Z-aaaaaaaaaaaa']
+Ran 72 tests in 28.380s
+FAILED (failures=2)
+(test_the_cap_never_drops..., test_a_linked_shipped_record... and the 'deleted' subcase pass at a28a87c5: they guard mutations R-b, R-c, R-a)
+== GREEN at ed152682: Ran 72 tests, OK
+
+Mutations of the fixed backup.sh (RcloneRemote; each restored and compared):
+  R-a accept when only the digest name is present: OK []
+  R-b cap may drop the set being shipped: FAILED (failures=1) ['test_the_cap_never_drops_a_reusable_copy_of_the_set_being_shipped']
+  R-c linked shipped record trusted: FAILED (failures=1) ['test_a_linked_shipped_record_is_not_trusted']
+  R-d copy dropped on a listing failure: FAILED (failures=1) ['test_an_outage_during_the_digest_upload_keeps_the_copy_and_the_retry_converges']
+  R-e ciphertext size not compared: FAILED (failures=1) ['test_already_shipped_checks_the_remote_ciphertext_size_and_presence']
+  restored: True
+  R-a is an equivalent mutant now: with the size check, a missing ciphertext (empty remote size) is refused whatever the name test says.
