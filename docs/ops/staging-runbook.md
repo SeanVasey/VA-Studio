@@ -318,6 +318,48 @@ account:
 
 Staff can see read-only state in the admin under **Test contract issuance** and **Test payment exceptions**.
 
+## 6a. Test customer sign-in links
+
+A tester who creates or recovers a test customer account at `/account/create` or `/account/recover` gets no email.
+The test identity transport refuses SMTP and the log mailer and writes each message privately on the host
+([test customer enrollment and recovery](../customer-test-self-service.md)). Relay the link with the read-only
+`vasey:test-identity-links` command. Do not open the capture files by hand.
+
+Before you start:
+
+1. The test-commerce profile enables test identity: `VASEY_TEST_CUSTOMER_ACCOUNTS_ENABLED=true`,
+   `VASEY_TEST_CUSTOMER_IDENTITY_ENABLED=true` and `VASEY_TEST_CUSTOMER_IDENTITY_TRANSPORT=private_capture`
+   (`ops/staging/test-commerce/env.test-commerce.example`). Without all three the command refuses.
+2. You relay as a staff account from section 2, with the authenticator app enrolled.
+3. Testers sign up with a reserved test address: one ending in `.test` (for example `ana@example.test`), `.example`,
+   `.invalid` or `.localhost`, or one at `example.com`, `example.net` or `example.org`. No mail is sent, so they
+   need no real mailbox. The command never lists or prints a link for any other address, so it can never relay a
+   link for a real person's address. A test account created earlier at any other address keeps signing in with its
+   password, but cannot get links this way: if the password is lost, the tester signs up again at a reserved address, and test purchases already claimed by the old account stay with it.
+   This reserved-address rule is new with the relay and is listed for Sean's confirmation in the evidence packet.
+
+```sh
+art vasey:test-identity-links list --operator=OPERATOR_EMAIL --attest
+art vasey:test-identity-links print MESSAGE_ID --operator=OPERATOR_EMAIL --attest
+```
+
+- Both ask for the staff password at a hidden prompt. Staging requires `--attest`, which records one
+  `staff.console_attestation` audit row before anything is read.
+- `list` shows each message's id, recipient, kind (`create account` or `reset password`), creation and expiry
+  times in UTC, and status (`pending`, `expired` or `used`), newest first. It only counts the captures it withholds:
+  those for other addresses, and any that fail verification (changed, linked or misnamed files).
+- `print` prints the link of one pending message on its own line. It refuses expired and used messages. A reserved
+  address proves nothing about who typed it, so send a `create account` link only to the tester you are onboarding,
+  and a `reset password` link only to the person you know owns that test account, never in reply to an unsolicited
+  request. Use a private channel. The link works once, only on this host, and expires ten minutes after the request.
+- Nothing is changed: the link is not used up, extended or re-signed. Each `list` and `print` adds one audit row
+  (`customer.test_identity.links_listed` or `customer.test_identity.link_relayed`). The row names the operator and the
+  challenge, never the link or the address.
+- A link that fails for the tester: run `list` again. An expired or used link needs a new request from the tester.
+  Each address allows four requests an hour. A pending link can still be refused at completion if another link for
+  the same address completed first, or if the account changed.
+- It has not yet been run on the hosted staging server.
+
 ## 7. Renderer children under PHP-FPM (M-16)
 
 **Why.** Contract and grant PDFs render in a bounded child process. Free, production-free and paid grant documents
