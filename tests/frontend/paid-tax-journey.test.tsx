@@ -47,16 +47,19 @@ describe('Tax journey shape validation', () => {
     expect(validTaxListing(listing([{ ...entry(1), createdAt: '2026-10-17 17:39:53' }]))).toBe(false);
     expect(validTaxListing({ ...listing(), schemaVersion: 1 })).toBe(false);
   });
-  it('accepts the exact Tax projection and refuses arithmetic, shape or premature-file drift', () => {
+  it('accepts the exact Tax projection and refuses shape, range or premature-file drift', () => {
     expect(validTaxOrigin(pending)).toBe(true);
     expect(validTaxOrigin(complete)).toBe(true);
     const line = pending.lines[0];
-    for (const bad of [{ ...line, tax: { ...tax, line_total_minor: 5435 } }, { ...line, tax: { ...tax, tax_behavior: 'inclusive', line_total_minor: 5436 } },
-      { ...line, preTax: { ...line.preTax, line_amount_minor: 1 } }, { ...line, tax: { ...tax, automatic_tax: { enabled: true, status: 'requires_location_inputs', provider: 'stripe' } } },
+    for (const bad of [{ ...line, tax: { ...tax, line_total_minor: -1 } }, { ...line, tax: { ...tax, order_tax_minor: 1.5 } }, { ...line, tax: { ...tax, tax_behavior: 'reverse_charge' } },
+      { ...line, tax: { ...tax, line_subtotal_minor: 0 } }, { ...line, preTax: { ...line.preTax, line_amount_minor: 0 } }, { ...line, preTax: { ...line.preTax, currency: 'EUR' } },
+      { ...line, tax: { ...tax, automatic_tax: { enabled: true, status: 'requires_location_inputs', provider: 'stripe' } } },
       { ...line, files: complete.lines[0].files }, { ...line, private: 'x' }, { ...line, assentedAt: '2026-10-17 17:39:52' }]) {
       expect(validTaxOrigin({ ...pending, lines: [bad] })).toBe(false);
     }
     expect(validTaxOrigin({ ...pending, purpose: 'paid-license-grant' })).toBe(false);
+    // The client does not re-derive the tax rule: a structurally valid projection whose amounts relate differently is shown as the server sent it.
+    expect(validTaxOrigin({ ...pending, lines: [{ ...line, tax: { ...tax, line_total_minor: 5435 } }] })).toBe(true);
     expect(validTaxOrigin({ ...complete, lines: [{ ...complete.lines[0], files: [complete.lines[0].files[0]] }] })).toBe(false);
   });
   it('binds status and authorization answers to the open order, line and requested kind', () => {
@@ -96,7 +99,7 @@ describe('Tax journey', () => {
     for (const call of fetcher.mock.calls) {
       expect(call[1]).toMatchObject({ method: 'GET', credentials: 'same-origin', cache: 'no-store', redirect: 'error' });
     }
-    expect(screen.getByText('USD 49.99 + tax 4.37 (exclusive) = 54.36, from the original accepted order.')).toBeInTheDocument();
+    expect(screen.getByText('Subtotal USD 49.99, tax USD 4.37 (exclusive), total USD 54.36, from the original accepted order.')).toBeInTheDocument();
     expect(screen.getByText(pending.lines[0].license.termsText)).toBeInTheDocument();
     expect(document.querySelector('script')).toBeNull();
     expect(screen.queryByRole('button', { name: /Authorize/ })).not.toBeInTheDocument();

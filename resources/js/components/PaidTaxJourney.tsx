@@ -48,6 +48,10 @@ function license(x: unknown): x is License {
     && Array.isArray(x.deliverableRoles) && x.deliverableRoles.length >= 1 && x.deliverableRoles.length <= 3 && x.deliverableRoles.every(k => kind(k) && k !== 'contract')
     && new Set(x.deliverableRoles).size === x.deliverableRoles.length && text(x.termsText);
 }
+/**
+ * Structure and ranges only. How subtotal, tax and total relate (inclusive or exclusive) is a server pricing rule
+ * (`ProductionTaxPaidLineAdapterV2` and the retained projection's own checks), so the client never re-derives it.
+ */
 function amounts(pre: unknown, tax: unknown): boolean {
   if (!obj(pre) || !exact(pre, ['currency', 'line_amount_minor', 'order_subtotal_minor']) || pre.currency !== 'USD' || !int(pre.line_amount_minor, 1, Number.MAX_SAFE_INTEGER)
     || !int(pre.order_subtotal_minor, 1, Number.MAX_SAFE_INTEGER)) return false;
@@ -56,12 +60,8 @@ function amounts(pre: unknown, tax: unknown): boolean {
     || tax.calculator !== 'stripe_checkout_automatic_tax' || tax.currency !== 'USD' || (tax.tax_behavior !== 'exclusive' && tax.tax_behavior !== 'inclusive')) return false;
   const auto = tax.automatic_tax;
   if (!obj(auto) || !exact(auto, ['enabled', 'status', 'provider']) || auto.enabled !== true || auto.status !== 'complete' || !(auto.provider === null || text(auto.provider, 255))) return false;
-  const exclusive = tax.tax_behavior === 'exclusive';
-  return ['line', 'order'].every(scope => {
-    const subtotal = tax[`${scope}_subtotal_minor`], taxed = tax[`${scope}_tax_minor`], total = tax[`${scope}_total_minor`];
-    return int(subtotal, 1, Number.MAX_SAFE_INTEGER) && minor(taxed) && minor(total)
-      && total === (exclusive ? subtotal + taxed : subtotal) && (exclusive || taxed <= subtotal);
-  }) && tax.line_subtotal_minor === pre.line_amount_minor && tax.order_subtotal_minor === pre.order_subtotal_minor;
+  return ['line', 'order'].every(scope => int(tax[`${scope}_subtotal_minor`], 1, Number.MAX_SAFE_INTEGER)
+    && minor(tax[`${scope}_tax_minor`]) && minor(tax[`${scope}_total_minor`]));
 }
 /** Exact Tax projection shape; anything else is refused before display. */
 export function validTaxOrigin(x: unknown): x is TaxOrigin {
@@ -252,7 +252,7 @@ export function PaidTaxJourney() {
         <button type="button" disabled={busy} onClick={savedStatus}>Refresh preparation and download status</button>
         {origin.lines.map(l => <article className="paid-license-line" key={l.id} aria-labelledby={`paid-tax-line-${l.id}`}>
           <h3 id={`paid-tax-line-${l.id}`}>{l.title}</h3>
-          <p>USD {usd(l.tax.line_subtotal_minor)} + tax {usd(l.tax.line_tax_minor)} ({l.tax.tax_behavior}) = {usd(l.tax.line_total_minor)}, from the original accepted order.</p>
+          <p>Subtotal USD {usd(l.tax.line_subtotal_minor)}, tax USD {usd(l.tax.line_tax_minor)} ({l.tax.tax_behavior}), total USD {usd(l.tax.line_total_minor)}, from the original accepted order.</p>
           <p>Declared name: {l.declaredName}</p><p>License accepted: {l.assentedAt.replace('T', ' ').replace('Z', '')} UTC</p>
           <p>Original PDF: {l.documentStatus}; preparation attempts {l.attempts}/5.</p>
           <details><summary>{l.license.name} / retained version {l.license.version}</summary><pre className="paid-license-terms">{l.license.termsText}</pre></details>

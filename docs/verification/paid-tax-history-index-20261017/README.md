@@ -266,3 +266,23 @@ The lead re-ran the T1 checks on `40e92c65`, with dependencies matching its lock
 | `npx tsc --noEmit` | exit 0 |
 
 `ef1261dc` changes no file these checks load. Native MySQL was not re-run on the merged head; the reviewed source's native evidence stands as recorded above.
+
+## Codex P1 on PR #147: client tax arithmetic removed (lead, 2026-10-18)
+
+Codex review r4305333346 (P1) raised the point the independent review had listed as P3-5. `amounts()` in `resources/js/components/PaidTaxJourney.tsx` re-derived the inclusive/exclusive subtotal, tax and total rules that `ProductionTaxPaidLineAdapterV2` enforces on the server. AGENTS.md keeps pricing logic out of UI components, and a server-side change to the contract would have made the page hide a buyer's licenses. An open P1 blocks merge under the freeze-and-batch rule, so it is fixed here rather than deferred.
+
+The change:
+- `amounts()` now checks structure and ranges only: exact keys, the fixed authority, calculator and currency values, `tax_behavior` in {exclusive, inclusive}, a complete automatic-tax block, subtotals of at least 1 and non-negative integer tax and totals. How the amounts relate is left to the server.
+- The display no longer implies a rule. "USD 49.99 + tax 4.37 (exclusive) = 54.36", which also misread inclusive tax, becomes "Subtotal USD 49.99, tax USD 4.37 (exclusive), total USD 54.36".
+- `tests/frontend/paid-tax-journey.test.tsx` swaps its arithmetic refusals for range and shape refusals (negative total, fractional tax, unknown tax behavior, zero subtotal, zero pre-tax amount, non-USD pre-tax currency). It adds one assertion that a structurally valid projection whose amounts relate differently is accepted as the server sent it.
+
+| Check | Result |
+| --- | --- |
+| The two T1 frontend files with the fix | 21 passed (18 + 3) |
+| The new test file against the old `PaidTaxJourney.tsx` (red) | 2 failures: the new acceptance assertion and the new display text |
+| `npx vitest run` (all files) | 68 files, 1,172 tests passed |
+| `npx tsc --noEmit` | exit 0 |
+| `npm run build`, then `scripts/ci/scan-client-bundle.py public/build` | exit 0; 14 bundle files, no hits; `public/build` deleted |
+
+No PHP, route, privacy or authorization code changed.
+

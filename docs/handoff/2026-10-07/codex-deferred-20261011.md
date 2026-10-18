@@ -392,6 +392,6 @@ Both need staff to edit an interrupted synthetic draft between runs on staging; 
 - P3-1: null-safe producer abort in `PaidTaxProjectionRead` index mode;
 - P3-2: a capped locking-list helper on `PaidTaxRows` for the index and status selects;
 - P3-3: distinguish a changed window from a sign-out in `PaidTaxJourney`;
-- P3-5: label the client tax arithmetic in `amounts()` as non-authoritative, or rely on the server projection;
+- (P3-5, the client tax arithmetic in `amounts()`, is fixed in PR #147 itself: Codex raised the same point as P1 r4305333346, so it could not be deferred.)
 - P3-6: `frame-ancestors 'none'` on private shells, including the V1 PaidGrants page;
 - P3-7: a signed-out page response instead of raw JSON.
