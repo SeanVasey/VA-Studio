@@ -18,6 +18,8 @@ final class PaidTaxProjectionRead implements JsonSerializable
 
     private bool $used = false;
 
+    private bool $index = false;
+
     private function __construct() {}
 
     public static function begin(): self
@@ -34,14 +36,32 @@ final class PaidTaxProjectionRead implements JsonSerializable
         $this->deadline = $deadline;
     }
 
+    /**
+     * Owner-only mode for the bounded locator history (PaidTaxReads::index). That list reads only the consumer's own
+     * retained rows and opens no younger producer SourceV2, so no producer receipt exists to close. Its terminal proof is
+     * the original consumer receipt (current owner, exact list window and pure policy) plus the original budget. The mode
+     * is chosen once and explicitly; the producer-backed capture above still cannot complete without its receipt.
+     */
+    public function captureIndex(PaidTaxReadReceipt $owner, PaidTaxDeadline $deadline): void
+    {
+        PaidTaxException::require($this->owner === null && ! $this->used);
+        $deadline->proveCurrent();
+        $this->owner = $owner;
+        $this->deadline = $deadline;
+        $this->index = true;
+    }
+
     public function proveBeforeBytes(): void
     {
-        PaidTaxException::require(! $this->used && $this->owner !== null && $this->producer !== null && $this->deadline !== null);
+        PaidTaxException::require(! $this->used && $this->owner !== null && $this->deadline !== null
+            && ($this->index ? $this->producer === null : $this->producer !== null));
         $this->used = true;
         // Any callback-capable consumer work precedes the producer's fixed raw financial/history closure.
         try {
             $this->owner->proveClosed();
-            $this->producer->proveClosed();
+            if (! $this->index) {
+                $this->producer->proveClosed();
+            }
             $this->owner->proveRawClosed();
             $this->deadline->proveCurrent();
         } catch (Throwable $error) {

@@ -376,3 +376,27 @@ Both need staff to edit an interrupted synthetic draft between runs on staging; 
 
 
 2026-10-18 PR #141 Codex P2 r4305283401, deferred with one reply: add `@testing-library/dom` and `@testing-library/jest-dom` (both exact pins) to the `npm-minor-patch` `exclude-patterns` in `.github/dependabot.yml`, in the next change that touches that file. It fails safe: a bump would only fail its group PR.
+
+
+2026-10-18 PR #146 (F2c). Codex P2s r4305301684 (the packet summary and inventory kept the pre-review 5/14/6 split) and r4305301686 (the resumption ledger still showed M1 as Started) were replied to once each and fixed in the T1 PR's ledger commit. Deferred to the next F2 batch from the independent review at `06a23144`:
+- row 18 `reviewed` (`ptx_s_u3`) and row 23: peer-based counterparts (drop the index before the frame, commit a separate peer at `TransactionCommitting`), or a concrete infeasibility reason;
+- P3-1: say why rows 19 and 24 were not tried with the same peer pattern;
+- P3-2: pin SQLSTATE 45000 and the guard message per table in the REPLACE counterpart;
+- P3-3: pin the `up()` messages in the listening counterparts;
+- P3-4: optional double mutation for the billing red;
+- P3-5: probe `restrict_fk_on_non_standard_key` first and fail with a message naming the server dependency;
+- P3-6: stale skip and comment text in `ProductionFreeGrantSchemaTest` and `ProductionCheckoutMigrationTest`.
+
+
+2026-10-18 T1 paid Tax history index. The independent review at `e947cdb3` approved with no P0 to P2. P3-4 (changelog paging wording) is fixed. Deferred to the next Tax batch:
+- P3-1: null-safe producer abort in `PaidTaxProjectionRead` index mode;
+- P3-2: a capped locking-list helper on `PaidTaxRows` for the index and status selects;
+- P3-3: distinguish a changed window from a sign-out in `PaidTaxJourney`;
+- (P3-5, the client tax arithmetic in `amounts()`, is fixed in PR #147 itself: Codex raised the same point as P1 r4305333346, so it could not be deferred.)
+- P3-6: `frame-ancestors 'none'` on private shells, including the V1 PaidGrants page;
+- P3-7: a signed-out page response instead of raw JSON.
+
+From the re-review at `6066e772` (also deferred to the next Tax batch):
+- P3-B: refusal cases for the `amounts()` checks no test catches (exact keys on `preTax` and `tax`, `authority`, `calculator`, `tax.currency`, `automatic_tax.enabled`, the `preTax.order_subtotal_minor` range);
+- P3-C: acceptance variants for inclusive tax, order scope and a pre-tax/tax subtotal mismatch;
+- P3-D: consider "included" wording for inclusive tax, with a render case.

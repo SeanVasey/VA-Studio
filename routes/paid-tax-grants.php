@@ -4,8 +4,11 @@ use App\Http\Controllers\PaidTaxController;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Support\Facades\Route;
 
+// Shell outside the JSON-forced private prefix: no private Inertia props; the controller repeats the runtime mount guard.
+Route::get('/paid-tax-licenses', [PaidTaxController::class, 'page'])->middleware('throttle:60,1,paid-tax-grants')->name('paid-tax-grants.page');
 Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void {
     $uuid = '[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}';
+    Route::get('/paid-tax-grants/index', [PaidTaxController::class, 'index'])->middleware('throttle:60,1,paid-tax-grants')->block(20, 5)->name('paid-tax-grants.index');
     Route::post('/paid-tax-grants/orders/{order}/finalize', [PaidTaxController::class, 'finalize'])->where('order', $uuid)->middleware('throttle:20,1,paid-tax-grants')->block(20, 5)->name('paid-tax-grants.finalize');
     Route::get('/paid-tax-grants/origins/{batch}', [PaidTaxController::class, 'show'])->where('batch', $uuid)->middleware('throttle:60,1,paid-tax-grants')->block(20, 5)->name('paid-tax-grants.show');
     Route::get('/paid-tax-grants/origins/{batch}/downloads', [PaidTaxController::class, 'downloads'])->where('batch', $uuid)->middleware('throttle:60,1,paid-tax-grants')->block(20, 5)->name('paid-tax-grants.downloads');
