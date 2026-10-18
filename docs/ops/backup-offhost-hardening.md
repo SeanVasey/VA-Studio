@@ -10,7 +10,7 @@ restore proof, and a plain `rsync` of the whole set to `VASEY_BACKUP_DEST` when 
 | --- | --- | --- |
 | Client-side encryption | `VASEY_BACKUP_AGE_RECIPIENTS_FILE` | Tars the verified set and encrypts it with [age](https://age-encryption.org) to public recipients before anything leaves the host |
 | Encryption required | `VASEY_BACKUP_REQUIRE_ENCRYPTION=1` | Refuses to ship at all without recipients |
-| rclone remote | `VASEY_BACKUP_REMOTE` | A named rclone remote as an alternative to rsync over SSH |
+| rclone remote | `VASEY_BACKUP_REMOTE` | A named rclone remote as an alternative to rsync over SSH. **Refused without age recipients** unless `VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1` |
 | Retention | `VASEY_BACKUP_RETENTION=tiered` | Keeps the newest sets plus daily, weekly and monthly representatives; optional pruning on the rclone remote |
 
 Binary-log shipping for point-in-time restore is **not built**: it is a later step, described at the end.
@@ -27,6 +27,7 @@ and not a symlink; the script refuses otherwise. It holds no secrets (the rclone
 VASEY_BACKUP_AGE_RECIPIENTS_FILE=/etc/vasey-production/backup-recipients.txt
 VASEY_BACKUP_REQUIRE_ENCRYPTION=1
 VASEY_BACKUP_REMOTE=vasey-backup:<bucket-or-path>      # or leave unset and use VASEY_BACKUP_DEST (rsync over SSH)
+# VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=0              # leave at 0 (see "rclone remote"); 1 only for an rclone crypt remote
 VASEY_BACKUP_RETENTION=tiered
 VASEY_BACKUP_KEEP=7              # newest sets always kept (also the flat default)
 VASEY_BACKUP_KEEP_DAILY=7
@@ -53,7 +54,8 @@ transport and retention, or the reason it refuses. It never prints a value.
 - **Fail closed.** A missing `age`, a malformed recipient, an empty or non-age output, a failed transfer or too little free space
   stops the ship; nothing is sent as plaintext instead, the temporary encrypted copy is removed and the local set is untouched.
 - **Cost.** Encryption streams `tar | age` into a temporary file under `backups/.ship.*` (0700), so it needs free space of about
-  one more copy of the set; the script checks that first. Shipping runs inside the same maintenance window as the snapshot
+  one more copy of the set; the script checks that first. A run killed mid-transfer can leave its `.ship.*` directory behind; the next
+  hardened ship removes any that has been untouched for more than a day (never a recent one, never a link). Shipping runs inside the same maintenance window as the snapshot
   (`nightly` and `predeploy` call `ship` before the site resumes), so encryption lengthens that window by the time to encrypt and
   upload. Moving the transfer after the resume is a possible later change.
 - **Restore drill (on a machine that has the private key):**
@@ -75,9 +77,15 @@ transport and retention, or the reason it refuses. It never prints a value.
   entering credentials there and nowhere else.
 - `VASEY_BACKUP_DEST` (rsync) and `VASEY_BACKUP_REMOTE` (rclone) are alternatives; setting both is refused.
 - Encrypted sets go with `rclone copyto --checksum --immutable` (two files), then `rclone check --one-way` compares what
-  arrived. `--immutable` makes a rerun harmless for identical bytes and an error for changed ones. Without age recipients an
-  rclone ship sends the plain set directory with a logged warning; use an rclone `crypt` remote or
-  `VASEY_BACKUP_REQUIRE_ENCRYPTION=1`.
+  arrived. `--immutable` makes a rerun harmless for identical bytes and an error for changed ones.
+- **A remote without age recipients is refused.** The set holds the masters, stems, contracts, customer data and `env.backup` (which
+  holds `APP_KEY`), so the script will not send it as stored: `check-offhost` and every ship stop with "would leave this host
+  unencrypted" before anything is transferred, and the local set is untouched. The one exception is an explicit
+  `VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1` in `backup.conf` (default `0`; only the literal `1` counts). Set it only when the remote
+  is an rclone `crypt` remote, or a destination that encrypts at rest and that you accept as the sole protection; this script cannot
+  tell which, so it logs a warning on every such ship and prints `none by this script, explicitly allowed` in `check-offhost`.
+  `VASEY_BACKUP_REQUIRE_ENCRYPTION=1` takes precedence: it refuses without recipients whatever the opt-in says. The opt-in has no effect
+  on the rsync path or on encrypted shipping.
 - Give the host's credential the least it needs: write and list on the backup path, **no delete and no overwrite** (an
   object-lock, versioning or append-only credential at the destination). A host that can delete its own off-host backups can
   lose them to whoever compromises it.
@@ -89,6 +97,9 @@ transport and retention, or the reason it refuses. It never prints a value.
   `VASEY_BACKUP_KEEP_DAILY` days, `_WEEKLY` ISO weeks and `_MONTHLY` months; or the newest set carrying a verified restore
   proof. It can only keep more than the flat rule, never less, and it never prunes `*.FAILED` directories or anything whose name
   is not a well-formed set name. Invalid numbers prune nothing.
+- **One remote path per host.** Pruning decides by set name only (a name is a timestamp plus a release hash, with no host in it), so two
+  hosts that share one `VASEY_BACKUP_REMOTE` path would prune each other's sets. Give each host its own path (staging and production
+  must never share one) before turning pruning on.
 - **Remote pruning is separate and off:** `VASEY_BACKUP_REMOTE_PRUNE=1` applies the same plan to the rclone remote, once a night
   after the site has resumed; it needs `VASEY_BACKUP_REMOTE` and `tiered`, and it is never available for an rsync destination.
   Prefer retention enforced at the destination (lifecycle rules, object lock) and leave this off: a host that prunes its own
@@ -101,7 +112,8 @@ Run locally with real `age`, `rsync` and `rclone` (local backend) against a thro
 kept in a temporary directory and never committed: the encrypt-then-decrypt round trip through both transports (the
 decrypted tree matches byte for byte, the ciphertext contains none of the plaintext markers), the refusals above, the planner
 (including a randomized check that it never keeps fewer sets than the flat rule), remote pruning on a local rclone remote, and
-the unchanged default path. `tests/ops/test_staging_backup_offhost.py` holds them (40 tests).
+the unchanged default path, the refusal of a remote without recipients and its explicit opt-in, and the cleanup of stale staging
+directories. `tests/ops/test_staging_backup_offhost.py` holds them (45 tests).
 **Not verified:** any real remote (S3-compatible, B2, SFTP, another server), rsync over SSH to a real host, the host's cron
 and maintenance-window behaviour with encryption, a restore of a decrypted production-sized set, and the time encryption adds
 to the window.

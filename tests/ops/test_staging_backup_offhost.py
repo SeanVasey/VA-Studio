@@ -9,6 +9,7 @@ import random
 import shutil
 import subprocess
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -135,6 +136,30 @@ class ConfigurationValidation(OffhostBase):
     def test_require_encryption_without_recipients_is_refused(self):
         self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_REQUIRE_ENCRYPTION=1), "VASEY_BACKUP_AGE_RECIPIENTS_FILE is not set")
         self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_REQUIRE_ENCRYPTION="yes"), "must be 0 or 1")
+
+    def test_a_remote_without_recipients_is_refused_unless_explicitly_allowed(self):
+        config = self.root / "rclone.conf"
+        config.write_text("[r]\ntype = local\n")
+        config.chmod(0o600)
+        remote = dict(VASEY_BACKUP_REMOTE="r:p", VASEY_BACKUP_RCLONE_BIN="/bin/true", VASEY_BACKUP_RCLONE_CONFIG=config)
+        run = self.bash("offhost_config_ok", **remote)
+        self.refused(run, "would leave this host unencrypted")
+        self.assertIn("VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1", run.stdout + run.stderr)
+        self.assertNotIn("r:p", run.stdout + run.stderr)
+        # The explicit opt-in, and only the literal 1, lifts it; recipients make it unnecessary.
+        self.assertIn("OK", self.bash("offhost_config_ok && echo OK", VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1, **remote).stdout)
+        for value in ("0", "", "true", "yes", "2"):
+            with self.subTest(value=value):
+                self.assertNotEqual(self.bash("offhost_config_ok", VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=value, **remote).returncode, 0)
+        self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE="true", **remote), "must be 0 or 1")
+        self.assertIn("OK", self.bash("offhost_config_ok && echo OK", VASEY_BACKUP_AGE_RECIPIENTS_FILE=self.recipients(),
+                                      VASEY_BACKUP_AGE_BIN=HAVE["age"], **remote).stdout)
+
+    def test_the_opt_in_does_not_apply_without_a_remote(self):
+        # Nothing to allow: the default path and rsync with recipients are unaffected, and the opt-in cannot weaken REQUIRE_ENCRYPTION.
+        self.assertIn("OK", self.bash("offhost_config_ok && echo OK", VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1).stdout)
+        self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1, VASEY_BACKUP_REQUIRE_ENCRYPTION=1),
+                     "VASEY_BACKUP_AGE_RECIPIENTS_FILE is not set")
 
     def test_rsync_and_rclone_are_alternatives(self):
         self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_DEST="u@h:/p", VASEY_BACKUP_REMOTE="r:p"), "alternatives")
@@ -327,12 +352,61 @@ class RcloneRemote(OffhostBase):
         again = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
         self.assertEqual(again.returncode, 0, again.stdout + again.stderr)
 
-    def test_rclone_without_age_sends_the_set_with_a_warning(self):
+    def test_rclone_without_age_refuses_to_ship_and_sends_nothing(self):
         bk = self.make_set()
         run = self.bash(f'ship "{bk}"', **self.settings)
+        self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("would leave this host unencrypted", run.stdout + run.stderr)
+        self.assertEqual(list(self.remote_dir.iterdir()), [])
+        self.assertEqual([p.name for p in self.backups.iterdir() if p.name.startswith(".ship")], [])
+        self.assertTrue((bk / "env.backup").exists(), "the local set must stay intact")
+        for marker in ("SYNTHETIC_KEY_MARKER", "SYNTHETIC_DATABASE_MARKER"):
+            self.assertNotIn(marker, run.stdout + run.stderr)
+
+    def test_rclone_without_age_ships_only_with_the_explicit_opt_in_and_says_so(self):
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1, **self.settings)
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
-        self.assertIn("no age recipients configured", run.stdout)
+        self.assertIn("VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1 and no age recipients", run.stdout)
+        self.assertIn("unencrypted by this script", run.stdout)
         self.assertTrue((self.remote_dir / bk.name / "database.sql").exists())
+
+    def test_the_opt_in_does_not_change_encrypted_shipping(self):
+        recipients = self.recipients()
+        for allow in (0, 1):
+            with self.subTest(allow=allow):
+                shutil.rmtree(self.remote_dir)
+                self.remote_dir.mkdir()
+                bk = self.backups / set_name("20261015")
+                if not bk.exists():
+                    bk = self.make_set()
+                run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients,
+                                VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=allow, **self.settings)
+                self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+                self.assertIn("age-encrypted via rclone", run.stdout)
+                self.assertNotIn("sent as stored", run.stdout)
+                self.assertEqual(sorted(p.name for p in self.remote_dir.iterdir()), [f"{bk.name}.tar.age", f"{bk.name}.tar.age.sha256"])
+                for artefact in self.remote_dir.iterdir():
+                    self.assertNotIn(b"SYNTHETIC_KEY_MARKER", artefact.read_bytes())
+
+    def test_stale_shipping_directories_are_cleared_and_fresh_ones_are_not(self):
+        recipients = self.recipients()
+        stale, fresh = self.backups / ".ship.OLD123", self.backups / ".ship.NEW456"
+        decoy, link_target = self.backups / ".ship-not-ours", self.root / "outside"
+        for directory in (stale, fresh, decoy, link_target):
+            directory.mkdir()
+            (directory / "leftover.tar.age").write_bytes(b"x")
+        (self.backups / ".ship.LINK00").symlink_to(link_target, target_is_directory=True)
+        old = time.time() - 3 * 86400
+        for directory in (stale, decoy, self.backups / ".ship.LINK00"):
+            os.utime(directory, (old, old), follow_symlinks=False)
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertFalse(stale.exists(), "a staging directory untouched for days is removed")
+        self.assertTrue(fresh.exists(), "a recent one could be a transfer in progress")
+        self.assertTrue(decoy.exists(), "only the exact .ship.XXXXXX name shape is touched")
+        self.assertTrue((self.backups / ".ship.LINK00").is_symlink() and (link_target / "leftover.tar.age").exists(), "a link is never followed")
 
     def test_require_encryption_blocks_the_plain_rclone_path(self):
         bk = self.make_set()
@@ -357,7 +431,8 @@ class RcloneRemote(OffhostBase):
         (self.remote_dir / "README-keep-me.txt").write_text("not a backup set")
         (self.remote_dir / "20261001T000000Z-ffffffffffff.FAILED").mkdir()
         run = self.bash("prune_remote", VASEY_BACKUP_RETENTION="tiered", VASEY_BACKUP_REMOTE_PRUNE=1, VASEY_BACKUP_KEEP=3,
-                        VASEY_BACKUP_KEEP_DAILY=3, VASEY_BACKUP_KEEP_WEEKLY=0, VASEY_BACKUP_KEEP_MONTHLY=0, **self.settings)
+                        VASEY_BACKUP_KEEP_DAILY=3, VASEY_BACKUP_KEEP_WEEKLY=0, VASEY_BACKUP_KEEP_MONTHLY=0,
+                        VASEY_BACKUP_AGE_RECIPIENTS_FILE=self.recipients(), **self.settings)
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
         remaining = sorted(p.name for p in self.remote_dir.iterdir())
         self.assertEqual(remaining, sorted([f"{n}.tar.age{s}" for n in names[-3:] for s in ("", ".sha256")]

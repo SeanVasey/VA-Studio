@@ -51,7 +51,7 @@ fi
 : "${VASEY_BACKUP_AGE_RECIPIENTS_FILE:=}" "${VASEY_BACKUP_AGE_BIN:=/usr/bin/age}" "${VASEY_BACKUP_REQUIRE_ENCRYPTION:=0}"
 : "${VASEY_BACKUP_REMOTE:=}" "${VASEY_BACKUP_RCLONE_BIN:=/usr/bin/rclone}" "${VASEY_BACKUP_RCLONE_CONFIG:=/root/.config/rclone/rclone.conf}"
 : "${VASEY_BACKUP_RETENTION:=}" "${VASEY_BACKUP_KEEP_DAILY:=7}" "${VASEY_BACKUP_KEEP_WEEKLY:=4}" "${VASEY_BACKUP_KEEP_MONTHLY:=6}"
-: "${VASEY_BACKUP_REMOTE_PRUNE:=0}"
+: "${VASEY_BACKUP_REMOTE_PRUNE:=0}" "${VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE:=0}"
 [ "$(id -u "$VASEY_APP_USER")" -gt 0 ] || die "application account must be nonroot"
 
 PRIVATE=$VASEY_ROOT/private
@@ -291,7 +291,8 @@ restore_check() {
 # Everything between here and `ship()` is inert unless VASEY_BACKUP_CONF (or staging.conf) sets one of:
 #   VASEY_BACKUP_AGE_RECIPIENTS_FILE   age PUBLIC recipients; the set is tarred and encrypted before it leaves the host
 #   VASEY_BACKUP_REQUIRE_ENCRYPTION=1  refuse to ship at all unless recipients are configured
-#   VASEY_BACKUP_REMOTE                a named rclone remote (remote:path), an alternative to VASEY_BACKUP_DEST
+#   VASEY_BACKUP_REMOTE                a named rclone remote (remote:path), an alternative to VASEY_BACKUP_DEST; needs age recipients,
+#                                      or VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1 (the set would otherwise leave this host in plaintext)
 #   VASEY_BACKUP_RETENTION=tiered      keep newest VASEY_BACKUP_KEEP sets plus daily/weekly/monthly representatives
 #   VASEY_BACKUP_REMOTE_PRUNE=1        apply the same policy on the rclone remote (nightly only; never for rsync)
 # No private key is ever read or needed here: decryption happens elsewhere, with a key this host never holds.
@@ -308,6 +309,7 @@ offhost_config_ok() {
     log "refused: VASEY_BACKUP_DEST (rsync) and VASEY_BACKUP_REMOTE (rclone) are alternatives; set one"; return 1
   fi
   case "$VASEY_BACKUP_REQUIRE_ENCRYPTION" in 0|1) ;; *) log "refused: VASEY_BACKUP_REQUIRE_ENCRYPTION must be 0 or 1"; return 1 ;; esac
+  case "$VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE" in 0|1) ;; *) log "refused: VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE must be 0 or 1"; return 1 ;; esac
   if [ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ]; then
     f=$VASEY_BACKUP_AGE_RECIPIENTS_FILE
     [ -x "$VASEY_BACKUP_AGE_BIN" ] || { log "refused: age is not installed at the configured path (apt-get install age)"; return 1; }
@@ -335,6 +337,13 @@ offhost_config_ok() {
     [ -f "$VASEY_BACKUP_RCLONE_CONFIG" ] && [ ! -L "$VASEY_BACKUP_RCLONE_CONFIG" ] \
       && [ "$(stat -c '%u %a' -- "$VASEY_BACKUP_RCLONE_CONFIG")" = '0 600' ] \
       || { log "refused: the rclone config must be a root-owned 0600 regular file (it holds the remote's credentials)"; return 1; }
+    # The set holds masters, contracts, customer data and env.backup (APP_KEY). Without age recipients an rclone ship would send
+    # all of it as stored, so a remote without recipients is refused unless the operator states, in backup.conf, that the remote
+    # itself encrypts (an rclone crypt remote, or a destination that encrypts at rest and that they accept as the only protection).
+    if [ -z "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] && [ "$VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE" != 1 ]; then
+      log "refused: VASEY_BACKUP_REMOTE is set without VASEY_BACKUP_AGE_RECIPIENTS_FILE, so the whole set (masters, contracts, customer data, env.backup with APP_KEY) would leave this host unencrypted; set the recipients, or set VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1 only for an rclone crypt remote or a destination you accept as the sole protection"
+      return 1
+    fi
   fi
   case "$VASEY_BACKUP_RETENTION" in
     '') ;;
@@ -390,6 +399,9 @@ ship_hardened() {
     log "WARNING: no off-host destination (VASEY_BACKUP_DEST or VASEY_BACKUP_REMOTE); $name exists on this host only (NOT an off-host backup)"
     return 0
   fi
+  # A run killed mid-transfer leaves its private staging directory behind. Remove only stale ones (untouched for over a day, so never
+  # a transfer in progress: shipping runs once a day under the deploy lock), and only real directories of this exact name shape.
+  find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -name '.ship.??????' -mmin +1440 -exec rm -rf --one-file-system -- {} + 2>/dev/null || true
   stage=$(mktemp -d "$VASEY_BACKUP_DIR/.ship.XXXXXX") || die "cannot create the private shipping directory"
   ship_hardened_transfer "$bk" "$stage" || rc=$?
   rm -rf --one-file-system -- "$stage"
@@ -414,7 +426,7 @@ ship_hardened_transfer() {  # ship_hardened_transfer SET_DIR STAGE_DIR; returns 
   else
     # No recipients: only reachable with an rclone remote (the rsync-only default path never gets here). The operator may
     # use an rclone crypt remote; this script does not know, so it says so in the log.
-    log "WARNING: no age recipients configured; $name is sent as stored (use an rclone crypt remote or an encrypted destination)"
+    log "WARNING: VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1 and no age recipients: $name is sent as stored; the rclone remote or the destination is the only encryption"
     payload=$(remote_join "$name")
     rclone_run copy --checksum --immutable "$bk" "$payload" || return 1
     rclone_run check --one-way "$bk" "$payload" || return 1
@@ -538,7 +550,7 @@ case "${1:-}" in
   ship) ship "${2:?backup directory}" ;;
   check-offhost)
     offhost_config_ok || die "off-host configuration refused"
-    log "off-host configuration ok (encryption: $([ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] && echo age || echo none); transport: $([ -n "$VASEY_BACKUP_REMOTE" ] && echo rclone || { [ -n "$VASEY_BACKUP_DEST" ] && echo rsync || echo none; }); retention: ${VASEY_BACKUP_RETENTION:-flat})"
+    log "off-host configuration ok (encryption: $([ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] && echo age || { [ -n "$VASEY_BACKUP_REMOTE" ] && echo 'none by this script, explicitly allowed' || echo none; }); transport: $([ -n "$VASEY_BACKUP_REMOTE" ] && echo rclone || { [ -n "$VASEY_BACKUP_DEST" ] && echo rsync || echo none; }); retention: ${VASEY_BACKUP_RETENTION:-flat})"
     ;;
   *) die "usage: vasey-staging-backup nightly | predeploy | restore-check DIR | ship DIR | check-offhost" ;;
 esac
