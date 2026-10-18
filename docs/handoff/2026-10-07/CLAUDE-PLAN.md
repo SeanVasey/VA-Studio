@@ -361,4 +361,3 @@ F2a final separate review at `e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08`: **APPRO
 
 
 2026-10-18 F3 foundation repairs merged PR #151 at `9225df8caa03b82f6e043538e6f997fbc6845b7f` from exact head `ed0df8bba4873d99c16936a77beb258da29a7709`: the seven tests the S1 sweep found failing on main, re-pinned to their intent with no production code change (three #127 identity-admission tests, two #131 issuer tests, the #124 Tax pin, seven local-only gate files in the staging census). It also carried the PR #150 receipt and Sean's 2026-10-18 decisions. Tested source `30cca9b6`. Independent review APPROVE at `7b290b8b` (no P0 to P2). Cheap preflight 39102062255 success; 39102057642 is the readiness cancellation. Codex code and security review and Cursor Bugbot clean.
-

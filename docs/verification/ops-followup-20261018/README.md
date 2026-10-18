@@ -359,4 +359,3 @@ All three are imported verbatim by the lead.
 - [Re-review at `c94770ad`](independent-rereview-c94770ad-DECISION.md): APPROVE, with no P0 to P2. Its P3-1 (a malformed shipped record without a size, combined with a failing size listing, passes the check) is deferred to the next ops batch: require digits on both sides and fail the record write when `stat` fails.
 
 No source, script or test changed after `c94770ad`. Later commits are documentation and the main merge.
-
