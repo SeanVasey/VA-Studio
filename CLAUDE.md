@@ -141,7 +141,7 @@ Repo-specific facts and invariants. §1–§12 stay byte-identical across repos;
 - **Stack:** Laravel 13 / PHP 8.4, Filament 5 admin, Inertia 3 + React 19 + TypeScript 7, Vite 8; MySQL 8.4 in production and CI, SQLite locally; Stripe in test mode only.
 - **Package manager:** Composer 2 and npm (Node >=24.15 <25).
 - **Commands:** dev `composer run dev` · gate `composer validate --strict && php artisan test && npm test && npm run build && composer audit && npm audit --audit-level=high`
-- **Deploy:** none configured; the production host is undecided (U-02 in `docs/architecture/decision-register.md`).
+- **Deploy:** none configured. Staging and production will both use Laravel Forge-managed VPSs (staging decided 2026-10-08/09; production platform approved by Sean on 2026-10-18). U-02's region, secrets, backup target and incident ownership remain open (`docs/architecture/decision-register.md`).
 - **Invariants** (§1.8 rules land here): none yet.
 
 ### Current user-authorized handoff — October 7, 2026

@@ -4,11 +4,13 @@ namespace Tests\Feature\ProductionMemberOriginals;
 
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
+use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Grants\Member\MemberGrantDefinitionDocument;
 use App\Domain\Grants\Member\MemberGrantDefinitions;
 use App\Domain\Grants\Member\MemberGrantException;
 use App\Domain\Grants\Member\MemberGrantFactsAuthority;
 use App\Domain\Grants\Member\MemberGrantProfileDocument;
+use App\Domain\Grants\Member\MemberGrantSchema;
 use App\Domain\Grants\Member\MemberOriginalArtifactAuthority;
 use App\Domain\Grants\Member\SealedMemberGrantFacts;
 use App\Domain\Memberships\Production\MembershipReservationAuthority;
@@ -96,8 +98,9 @@ final class MemberGrantFactsCallbackClosureTest extends TestCase
 
             return $plain;
         });
+        $before = $this->memberState();
         Crypt::swap($fake);
-        $refused = false;
+        $refused = null;
         try {
             try {
                 if ($phase === 'current') {
@@ -107,11 +110,26 @@ final class MemberGrantFactsCallbackClosureTest extends TestCase
                     $issuer->committedCallbacks($closure, $frame);
                     $issuer->committedRaw($closure, $frame);
                 }
-            } catch (MemberGrantException) {
-                $refused = true;
+            } catch (MemberGrantException|IdentityException $error) {
+                $refused = $error;
             }
             self::assertGreaterThan(0, $calls, 'The actual retained record decrypt seam must run.');
-            self::assertTrue($refused, 'Changed owner input was admitted after the record decrypt callback.');
+            self::assertNotNull($refused, 'Changed owner input was admitted after the record decrypt callback.');
+            // The shared committed frame's identity metadata admission (#127) captures production-customer-identity,
+            // so that committed change is refused earlier, at committedCallbacks' closing frame proof, before the
+            // member owner-input comparison. Every other case still reaches the member refusal.
+            $frameRefusal = $phase === 'committed' && $change === 'identity_configuration';
+            self::assertSame($frameRefusal ? IdentityException::class : MemberGrantException::class, $refused::class);
+            if ($frameRefusal) {
+                self::assertSame('unavailable', $refused->reason);
+                try {
+                    $issuer->committedRaw($closure, $frame);
+                    self::fail('A refused committed callback phase must not admit its raw phase.');
+                } catch (MemberGrantException $error) {
+                    self::assertSame('facts_phase_required', $error->reason);
+                }
+            }
+            self::assertSame($before, $this->memberState(), 'A refused facts closure writes no member or membership state.');
         } finally {
             Crypt::swap($real);
             $issuer->retire($closure);
@@ -120,5 +138,17 @@ final class MemberGrantFactsCallbackClosureTest extends TestCase
                 DB::rollBack();
             }
         }
+    }
+
+    /** Read inside the caller's transaction or read-only frame, before any rollback can hide a write. */
+    private function memberState(): array
+    {
+        $state = [];
+        foreach ([...MemberGrantSchema::TABLES, 'production_membership_redemptions', 'production_membership_paid_periods',
+            'production_membership_credit_events'] as $table) {
+            $state[$table] = DB::table($table)->get()->map(fn ($row) => (array) $row)->all();
+        }
+
+        return $state;
     }
 }

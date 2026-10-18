@@ -1,0 +1,37 @@
+# meta (runner start/end, HEAD, dirty count, args)
+start 2026-10-18T03:51:21Z head=efb22df3850ba8500b6d424ceedef64649896fe8 dirty=0 engine=mysql-8.4.11:33595 args=--filter /(test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs|test_remaining_config_resolution_hook_refuses_committed_authoring_receipt)/ tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php
+end 2026-10-18T04:13:44Z rc=2 secs=1343
+# PHPUnit output
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/f3/phpunit.xml
+
+...E..F                                                             7 / 7 (100%)
+
+Time: 22:22.268, Memory: 89.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs@committed identity_configuration with data ('committed', 'identity_configuration')
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/home/user/wt/f3/app/Domain/Customers/ProductionIdentity/IdentityMetadataAdmission.php:46
+/home/user/wt/f3/app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php:175
+/home/user/wt/f3/app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php:82
+/home/user/wt/f3/app/Domain/Grants/Member/SealedMemberGrantFacts.php:154
+/home/user/wt/f3/tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php:107
+/home/user/wt/f3/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest::test_remaining_config_resolution_hook_refuses_committed_authoring_receipt
+Failed asserting that 0 is greater than 0.
+
+/home/user/wt/f3/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php:114
+/home/user/wt/f3/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 7, Assertions: 18, Errors: 1, Failures: 1.

@@ -1,0 +1,15 @@
+# meta (runner start/end, HEAD, dirty count, args)
+start 2026-10-18T04:14:36Z head=30cca9b6d444755ee106221bcc4b56638e4a783d dirty=0 args=tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php tests/Feature/StagingEnvironmentAdmissionTest.php
+end 2026-10-18T04:16:08Z rc=0 secs=92
+# PHPUnit output
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/f3/phpunit.xml
+
+................................................................. 65 / 84 ( 77%)
+...................                                               84 / 84 (100%)
+
+Time: 01:31.940, Memory: 99.00 MB
+
+OK (84 tests, 499 assertions)

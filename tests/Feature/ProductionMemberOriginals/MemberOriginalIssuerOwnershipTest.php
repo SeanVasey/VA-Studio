@@ -35,6 +35,7 @@ class MemberOriginalIssuerOwnershipTest extends TestCase
 {
     public function test_public_budget_and_real_service_assembly_cannot_mint_an_owned_source_workflow(): void
     {
+        $this->releaseAdmittedConnections();
         [$source] = $this->assembly();
         $principal = (new ReflectionClass(ProductionCustomerPrincipal::class))->newInstanceWithoutConstructor();
         $this->refused(fn () => $source->capture('unused', 'unused', $principal, new User, MemberOriginalBudget::start()), 'owned_workflow_required');
@@ -56,6 +57,7 @@ class MemberOriginalIssuerOwnershipTest extends TestCase
 
     public function test_unregistered_capture_permit_and_context_shape_never_start_an_inspection(): void
     {
+        $this->releaseAdmittedConnections();
         $issuer = new MembershipReservations;
         $rows = (new ReflectionClass(MembershipRows::class))->newInstanceWithoutConstructor();
         $principal = (new ReflectionClass(ProductionCustomerPrincipal::class))->newInstanceWithoutConstructor();
@@ -101,6 +103,19 @@ class MemberOriginalIssuerOwnershipTest extends TestCase
                 $this->assertSame('private_token', $error->reason);
             }
         }
+    }
+
+    /**
+     * TestCase::setUpTraits opens and admits the default connection before every test (#131). Release
+     * every open connection so the refusal under test must still open none: any database work it began
+     * would reconnect through the manager and appear in DB::getConnections().
+     */
+    private function releaseAdmittedConnections(): void
+    {
+        foreach (array_keys(DB::getConnections()) as $name) {
+            DB::purge($name);
+        }
+        $this->assertSame([], DB::getConnections());
     }
 
     private function assembly(): array

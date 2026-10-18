@@ -51,7 +51,7 @@ class ProductionTaxCheckoutPolicyTest extends TestCase
     public function test_shipped_configuration_is_off_unbound_literal_and_pinned(): void
     {
         $shipped = require config_path('production-tax-checkout.php');
-        $this->assertSame(['enabled' => false, 'committed_read_receipts_enabled' => false,
+        $this->assertSame(['enabled' => false, 'http_mounted' => false, 'committed_read_receipts_enabled' => false,
             'committed_read_receipt_version' => 'production-tax-checkout-committed-read-v2',
             'provider' => null, 'funds_mode' => null, 'account_id' => null, 'return_origin' => null,
             'stripe_sdk_version' => '21.3.2', 'stripe_api_version' => '2026-08-26.dahlia'], $shipped);

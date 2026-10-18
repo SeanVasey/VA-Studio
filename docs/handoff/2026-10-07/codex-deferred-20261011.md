@@ -433,3 +433,9 @@ Owner decision, not a finding: Sean to confirm the reserved-address rule (only `
 - P3-2: load an explicit `CheckoutIntent` column list;
 - P3-3: JSON output with `OUTPUT_RAW`, text output through `OutputFormatter::escape()`.
 
+
+2026-10-18 F3 foundation repairs. Independent review at `7b290b8b` approved with no P0 to P2. Deferred to the next member-grant batch:
+- P3-2: a direct committed-phase `ownerInputs` test, so the member-layer `changed_owner` check for `identity_configuration` keeps its own coverage behind the earlier frame refusal;
+- P3-3: assert the cause of the receipt refusal in `MemberGrantDefinitionsTest::test_remaining_config_resolution_hook_refuses_committed_authoring_receipt`.
+
+Sean's 2026-10-18 decisions close two open questions: the K3 reserved-address rule is confirmed, and the production capability hold is approved (lane O3).

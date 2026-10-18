@@ -1,0 +1,58 @@
+# Booted-application container hook census (production code paths), worktree HEAD efb22df3850ba8500b6d424ceedef64649896fe8
+# Command: env APP_ENV=testing DB_CONNECTION=sqlite DB_DATABASE=:memory: CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync php hooks.php <root> <mode> [path]
+# grep app/ config/ bootstrap/ routes/ for beforeResolving|afterResolving|resolving(|extend(|alias(:
+  app/Domain/Memberships/Production/MembershipAwardConfiguration.php:80:        foreach (['instances', 'bindings', 'aliases', 'extenders', 'beforeResolvingCallbacks', 'resolvingCallbacks', 'afterResolvingCallbacks'] as $property) {
+  app/Domain/Customers/ProductionFeatures/ProductionFeatureConfiguration.php:97:        foreach (['aliases', 'beforeResolvingCallbacks', 'resolvingCallbacks', 'afterResolvingCallbacks', 'extenders'] as $property) {
+  app/Domain/Customers/ProductionIdentity/IdentityMetadataAdmission.php:100:        foreach (['aliases', 'beforeResolvingCallbacks', 'resolvingCallbacks', 'afterResolvingCallbacks', 'extenders'] as $property) {
+  app/Domain/Grants/Member/MemberOriginalConfiguration.php:101:        foreach (['instances', 'bindings', 'aliases', 'extenders', 'beforeResolvingCallbacks', 'resolvingCallbacks', 'afterResolvingCallbacks'] as $property) {
+  app/Domain/Grants/Member/MemberOriginalFinishBoundary.php:56:        foreach (['globalBeforeResolvingCallbacks', 'beforeResolvingCallbacks', 'buildStack', 'with', 'contextual'] as $property) {
+  app/Domain/Grants/Member/MemberActivationReadConfiguration.php:129:        foreach (['instances', 'bindings', 'aliases', 'extenders', 'beforeResolvingCallbacks', 'resolvingCallbacks', 'afterResolvingCallbacks'] as $property) {
+  app/Domain/Grants/Member/MemberActivationConfiguration.php:48:        foreach (['instances', 'bindings', 'aliases', 'extenders', 'beforeResolvingCallbacks', 'resolvingCallbacks', 'afterResolvingCallbacks'] as $property) {
+== mode: console
+globalBeforeResolvingCallbacks=0
+globalResolvingCallbacks=0
+globalAfterResolvingCallbacks=0
+aliases keys=83 critical=[]
+beforeResolvingCallbacks keys=0 critical=[]
+resolvingCallbacks keys=4 critical=[]
+afterResolvingCallbacks keys=9 critical=[]
+extenders keys=1 critical=[]
+contextual keys=0 critical=[]
+deferred critical=[]
+== mode: http /up
+status=200
+globalBeforeResolvingCallbacks=0
+globalResolvingCallbacks=0
+globalAfterResolvingCallbacks=0
+aliases keys=80 critical=[]
+beforeResolvingCallbacks keys=0 critical=[]
+resolvingCallbacks keys=4 critical=[]
+afterResolvingCallbacks keys=9 critical=[]
+extenders keys=1 critical=[]
+contextual keys=0 critical=[]
+deferred critical=[]
+== hooks.php source
+<?php
+// Usage: php hooks.php <repo-root> <http|console> [path]
+chdir($argv[1]);
+require $argv[1].'/vendor/autoload.php';
+$app = require $argv[1].'/bootstrap/app.php';
+$mode = $argv[2];
+if ($mode === 'http') {
+    $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+    $request = Illuminate\Http\Request::create($argv[3] ?? '/', 'GET');
+    $response = $kernel->handle($request);
+    echo "status=".$response->getStatusCode()."\n";
+} else {
+    $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+}
+$r = fn ($p) => (new ReflectionProperty(Illuminate\Container\Container::class, $p))->getValue($app);
+foreach (['globalBeforeResolvingCallbacks', 'globalResolvingCallbacks', 'globalAfterResolvingCallbacks'] as $p) {
+    echo $p.'='.count($r($p))."\n";
+}
+foreach (['aliases', 'beforeResolvingCallbacks', 'resolvingCallbacks', 'afterResolvingCallbacks', 'extenders', 'contextual'] as $p) {
+    $v = $r($p);
+    $hits = array_values(array_intersect(array_keys($v), ['db', 'config', 'env']));
+    echo $p.' keys='.count($v).' critical='.json_encode($hits)."\n";
+}
+echo 'deferred critical='.json_encode(array_values(array_intersect(array_keys((new ReflectionProperty(Illuminate\Foundation\Application::class, 'deferredServices'))->getValue($app)), ['db','config','env'])))."\n";
