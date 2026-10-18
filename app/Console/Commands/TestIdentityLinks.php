@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Throwable;
 
 /**
@@ -122,7 +123,7 @@ final class TestIdentityLinks extends Command
             $this->line('No captured message for a synthetic test address.');
         } else {
             $this->table(['Message id', 'Recipient', 'Kind', 'Created (UTC)', 'Expires (UTC)', 'Status'],
-                array_map(fn (TestIdentityLinkMessage $message): array => [$message->id, $message->recipient, $this->kind($message),
+                array_map(fn (TestIdentityLinkMessage $message): array => [$message->id, $this->recipient($message), $this->kind($message),
                     TestIdentityLinkRelay::time($message->createdAt), TestIdentityLinkRelay::time($message->expiresAt), $message->status], $result['messages']));
         }
         if ($result['withheld'] > 0) {
@@ -139,12 +140,18 @@ final class TestIdentityLinks extends Command
     {
         $message = $relay->message($id);
         $relayed = $relay->relay($operator, $message, $this->attestationAuditId);
-        $this->warn('TEST ONLY. Relay this '.$this->kind($message).' link only to the tester who requested it for '.$message->recipient
+        $this->warn('TEST ONLY. Relay this '.$this->kind($message).' link only to the tester who requested it for '.$this->recipient($message)
             .'. It works once and expires at '.TestIdentityLinkRelay::time($message->expiresAt).' UTC.');
         $this->line($relayed['link']);
         $this->line('relay audit_event='.$relayed['audit_event']);
 
         return self::SUCCESS;
+    }
+
+    /** The address is tester-chosen (a quoted local part may hold `<...>`), so formatter tags in it print literally. */
+    private function recipient(TestIdentityLinkMessage $message): string
+    {
+        return OutputFormatter::escape($message->recipient);
     }
 
     private function kind(TestIdentityLinkMessage $message): string

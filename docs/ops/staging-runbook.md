@@ -334,7 +334,9 @@ Before you start:
 3. Testers sign up with a reserved test address: one ending in `.test` (for example `ana@example.test`), `.example`,
    `.invalid` or `.localhost`, or one at `example.com`, `example.net` or `example.org`. No mail is sent, so they
    need no real mailbox. The command never lists or prints a link for any other address, so it can never relay a
-   link for a real person's address.
+   link for a real person's address. A test account created earlier at any other address cannot get links this way:
+   the tester signs up again at a reserved address, and test purchases already claimed by the old account stay with it.
+   This reserved-address rule is new with the relay and is listed for Sean's confirmation in the evidence packet.
 
 ```sh
 art vasey:test-identity-links list --operator=OPERATOR_EMAIL --attest
@@ -346,9 +348,10 @@ art vasey:test-identity-links print MESSAGE_ID --operator=OPERATOR_EMAIL --attes
 - `list` shows each message's id, recipient, kind (`create account` or `reset password`), creation and expiry
   times in UTC, and status (`pending`, `expired` or `used`), newest first. It only counts the captures it withholds:
   those for other addresses, and any that fail verification (changed, linked or misnamed files).
-- `print` prints the link of one pending message on its own line. It refuses expired and used messages. Send the
-  link only to the tester who asked for that address, over a private channel. It works once, only on this host,
-  and expires ten minutes after the request.
+- `print` prints the link of one pending message on its own line. It refuses expired and used messages. A reserved
+  address proves nothing about who typed it, so send a `create account` link only to the tester you are onboarding,
+  and a `reset password` link only to the person you know owns that test account, never in reply to an unsolicited
+  request. Use a private channel. The link works once, only on this host, and expires ten minutes after the request.
 - Nothing is changed: the link is not used up, extended or re-signed. Each `list` and `print` adds one audit row
   (`customer.test_identity.links_listed` or `customer.test_identity.link_relayed`). The row names the operator and the
   challenge, never the link or the address.

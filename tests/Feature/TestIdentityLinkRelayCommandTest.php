@@ -579,6 +579,24 @@ class TestIdentityLinkRelayCommandTest extends TestCase
         }
     }
 
+    public function test_formatter_tags_in_a_tester_chosen_recipient_print_literally(): void
+    {
+        $this->operator();
+        $hidden = F::request('enroll', '"<fg=black;bg=black>hide</>"@example.test');
+        $linked = F::request('enroll', '"<href=https://e.vil>x</>"@example.test');
+
+        $list = $this->console(['action' => 'list']);
+        $this->assertSame(0, $list['code'], $list['text']);
+        $this->assertStringContainsString('"<fg=black;bg=black>hide</>"@example.test', $list['text']);
+        $this->assertStringContainsString('"<href=https://e.vil>x</>"@example.test', $list['text']);
+        $this->assertStringNotContainsString('"hide"@example.test', $list['text']);
+
+        $print = $this->console(['action' => 'print', 'id' => $linked['id']]);
+        $this->assertSame(0, $print['code'], $print['text']);
+        $this->assertStringContainsString('requested it for "<href=https://e.vil>x</>"@example.test.', $print['text']);
+        $this->assertStringNotContainsString($hidden['id'], $print['text']);
+    }
+
     public function test_no_captures_yet_lists_nothing_and_records_the_listing(): void
     {
         $operator = $this->operator();

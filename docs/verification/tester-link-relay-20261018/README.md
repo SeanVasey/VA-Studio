@@ -66,7 +66,7 @@ is an IANA-reserved, non-deliverable name:
 The repository's own fixtures already use these names (`@example.test`, `@example.invalid`). The private capture
 transport sends no mail, so testers lose nothing by using them. The runbook tells testers to use one. A recipient
 that holds a staff (`is_admin`) account is also withheld. This rule is new. It changes no identity behaviour, only
-what the relay shows, and the reviewer should confirm it.
+what the relay shows. It is an operator and tester policy, so **Sean should confirm it**; the independent review found it sound and fail-safe (every accepted input ends on a reserved name).
 
 **Verification of a capture.** A capture is shown only when every check below passes. Otherwise it is withheld and
 counted.
@@ -193,3 +193,27 @@ These are recorded rather than hidden. All occurred before the commits and were 
 - No push, PR, GitHub comment or workflow dispatch.
 - No edit to an existing domain service, policy, guard, migration, route, config file, `ops/` template, CI census
   file or workflow.
+
+## Independent review and the fix that followed (lead, 2026-10-18)
+
+The independent review at `e2d8b6cc` approved with conditions ([decision record](independent-review-e2d8b6cc-DECISION.md), imported verbatim). It found no P0 or P1.
+
+**P2-1 is fixed before the PR opens.** A tester chooses the recipient address, and a quoted local part such as `"<href=https://e.vil>x</>"@example.test` passes the address rules. The command printed it through Symfony's output formatter, which would render the tags: hidden text or a terminal hyperlink in the operator's console. Both places that print a recipient (the `list` table and the `print` warning) now pass it through `OutputFormatter::escape()`. The new test `test_formatter_tags_in_a_tester_chosen_recipient_print_literally` requires both example addresses to print literally.
+
+| Check | Result |
+| --- | --- |
+| The new test with the fix | OK, 1 test, 13 assertions |
+| The new test against the old command (red) | 1 failure |
+| `TestIdentityLinkRelayCommandTest`, whole file | OK, 16 tests, 1,343 assertions |
+| `pint --test` on the two changed PHP files | passed |
+
+**P3-3 and P3-4 are corrected in documentation.**
+- The reserved-address rule is recorded above for Sean's confirmation.
+- Runbook section 6a tells testers with an older account at another address to sign up again at a reserved address, and says claimed test purchases stay with the old account.
+- `docs/customer-test-self-service.md` now matches the runbook: on hosted staging an operator relays links and never opens capture files by hand.
+- The runbook no longer says to send a link to "the tester who asked". A `reset password` link goes only to the person known to own that test account, never in reply to an unsolicited request.
+
+**Deferred to the K3 follow-up batch:**
+- P3-1: a piped password is accepted, as in `vasey:rights-scope` and `vasey:staging-synthetic-catalog`. Require `stream_isatty(STDIN)` in all three, or correct the "interactive console" wording. This joins the existing C1 P3-B item.
+- P3-2: refusal tests for a non-current policy version and for a challenge completed between `message()` and `relay()`, plus the `lstat` and inode checks on their own.
+
