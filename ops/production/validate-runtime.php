@@ -35,11 +35,13 @@ use Illuminate\Contracts\Console\Kernel;
 
 /**
  * Pre-launch capability hold, approved by Sean on 2026-10-18: environment key => config key, each refused unless false.
- * None of these four is gated by environment in the application. An operative free grant and an operator notification are
- * bound only by an adapter that other code would supply; the public track sitemap build chain is not environment-gated and the
- * public index serves it in production; V2 listening promotion is a one-way data change. In production this validator is
- * therefore their only guard. Lifting one is a reviewed change to this file together with Sean's authorization for that
- * activation. Same keys as scripts/ops/capability-boundary.php (tests/ops pins the agreement). Never printed with a value.
+ * Three have no environment gate in the application: an operative free grant and an operator notification are bound only by an
+ * adapter that other code would supply, and the public track sitemap build chain is not environment-gated while the public index
+ * serves it in production. In production this validator is their only guard. The fourth, V2 listening promotion, is reached
+ * today only through a customer session, which the test customer access path creates in local, testing and staging only, and
+ * the production listening lane does not read it; it is held as defence in depth because promotion is a one-way data change.
+ * Lifting one is a reviewed change to this file together with Sean's authorization for that activation. Same keys as
+ * scripts/ops/capability-boundary.php (tests/ops pins the agreement). Never printed with a value.
  */
 const PRE_LAUNCH_HOLDS = [
     'VASEY_OPERATIVE_FREE_GRANTS_ENABLED' => 'free-grants.operative_enabled',

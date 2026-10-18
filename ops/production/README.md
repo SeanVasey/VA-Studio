@@ -144,7 +144,8 @@ These are application or review items this kit deliberately does not do:
 6. **Pre-launch capability hold (approved by Sean, 2026-10-18).** `ops/production/validate-runtime.php` refuses four flags unless they
    are false: `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` and `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED` (no environment gate; each admits
    once an adapter is bound by other code, and none ships today), `DISCOVERY_SITEMAP_ENABLED` (the public index serves track sitemaps in
-   production once it is true) and `VASEY_LISTENING_V2_PROMOTION_ENABLED` (a one-way data promotion with no environment gate). They are
+   production once it is true) and `VASEY_LISTENING_V2_PROMOTION_ENABLED` (a one-way data promotion; its only consumer needs a customer session, which only the test
+   customer access path creates, so this one is defence in depth). They are
    the `PRE_LAUNCH_HOLDS` entries in that file, and a refusal is `holds.<lowercase flag name>`. Lifting one is a reviewed change to the
    validator together with Sean's authorization for that activation; see `docs/ops/production-activation-packet.md` (section 1). The
    `VASEY_TEST_*` flags, the support fixture and the synthetic rehearsal catalog flag (`VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED`) are

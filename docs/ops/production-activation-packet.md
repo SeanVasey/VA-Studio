@@ -37,10 +37,11 @@ lands, the stage that depends on it stays blocked whatever the environment conta
 
 ### Pre-launch capability hold (approved by Sean, 2026-10-18)
 
-Four flags have no environment gate in the application, so on production nothing but the validator stops a host `.env` that
-sets one to `true`. `ops/production/validate-runtime.php` refuses each unless it is false (`PRE_LAUNCH_HOLDS` in that file;
-the same keys as `scripts/ops/capability-boundary.php`). A flag in the candidate file passes only as the literal `false` or
-`(false)`; a blank or any other value fails, and an unset flag is allowed because the configuration default is false. The
+Three of these flags have no environment gate in the application, so on production nothing but the validator stops a host
+`.env` that sets one to `true`; the fourth, V2 listening promotion, is held as defence in depth (see its row). `ops/production/validate-runtime.php` refuses each unless it is false (`PRE_LAUNCH_HOLDS` in that file;
+the same keys as `scripts/ops/capability-boundary.php`). A flag in the candidate file passes only as `false` or `(false)`, in any
+letter case and quoted or not; a blank or any other value fails, a key written with no `=` is refused as well (the runtime
+would read it as unset; refusing it fails closed), and an unset flag is allowed because the configuration default is false. The
 effective configuration must also read strictly `false`, so a renamed or removed config key fails closed. A refusal prints
 only the identifier below, never the value.
 
@@ -49,11 +50,14 @@ only the identifier below, never the value.
 | `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` | `free-grants.operative_enabled` | `holds.vasey_operative_free_grants_enabled` | no environment gate; admits once an adapter is bound by other code, and none is bound today |
 | `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED` | `inquiries.operator_notifications_enabled` | `holds.contact_inquiry_operator_notifications_enabled` | no environment gate; also needs a bound alert transport, and none ships |
 | `DISCOVERY_SITEMAP_ENABLED` | `discovery-sitemap.enabled` | `holds.discovery_sitemap_enabled` | the build chain is not environment-gated and the public index serves track sitemaps in production |
-| `VASEY_LISTENING_V2_PROMOTION_ENABLED` | `customer-listening.v2_promotion_enabled` | `holds.vasey_listening_v2_promotion_enabled` | a one-way data promotion; turning it off afterwards does not undo it |
+| `VASEY_LISTENING_V2_PROMOTION_ENABLED` | `customer-listening.v2_promotion_enabled` | `holds.vasey_listening_v2_promotion_enabled` | a one-way data promotion; turning it off afterwards does not undo it. Its only consumer needs a customer session, which only the test customer access path creates (local, testing, staging), and the production listening lane does not read it, so this hold is defence in depth |
 
 **Lifting a hold** is a reviewed change to `ops/production/validate-runtime.php` (remove that one entry), made together with
 Sean's explicit authorization for that activation. Setting the flag on the host first does not work: the validator refuses the
-candidate environment, and the deploy stops. `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED` is not in this list because its command
+candidate environment, and the deploy stops. Because a deploy validates the candidate `.env` with the served release's
+validator before it builds, lifting takes two steps: deploy the validator change with the flag still false, then set the flag
+and let the deploy refresh the environment. `PRE_LAUNCH_HOLDS` in `tests/ops/test_production_runtime_validator.py` changes
+with the validator. `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED` is not in this list because its command
 already refuses production by itself.
 
 ## 2. Inputs only Sean can supply

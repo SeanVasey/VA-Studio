@@ -255,10 +255,19 @@ class ProductionRuntimeValidator(unittest.TestCase):
             self.assertRegex(source, r"'" + re.escape(key) + r"'\s*=>\s*env\('[A-Z0-9_]+',\s*false\)", config_key)
 
     def test_the_effective_configuration_must_be_strictly_false(self):
-        # The file check catches a bad value first, so the configuration check cannot be reached by an input file alone.
-        # Pin its shape instead: it iterates the same constant and compares with ===, so null (a missing key) fails closed.
+        # Pin its shape: it iterates the same constant and compares with ===, so null (a missing key) fails closed.
         text = VALIDATOR.read_text()
         self.assertRegex(text, r"foreach \(PRE_LAUNCH_HOLDS as \$name => \$key\) \{\s*\$check\('holds\.'\.strtolower\(\$name\), config\(\$key\) === false\);")
+
+    def test_the_effective_configuration_refuses_what_the_file_check_admits(self):
+        # Interpolation reaches the configuration layer alone: in the file, `${PATH}` resolves to the file's own `PATH=false`, so
+        # the file check sees `false`; the real bootstrap keeps the process PATH (an existing variable wins over the file), so the
+        # flag's effective value is not false and only the configuration check refuses it.
+        for flag in PRE_LAUNCH_HOLDS:
+            with self.subTest(flag=flag):
+                run = self.validate(profile(**{"PATH": "false", flag: "${PATH}"}))
+                self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+                self.assertEqual(run.stderr.split(), ["FAIL", f"holds.{flag.lower()}"], run.stderr)
 
     # ---- host checks and argument handling ----
 
