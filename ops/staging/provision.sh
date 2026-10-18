@@ -221,6 +221,9 @@ command -v npm >/dev/null || die "npm missing"
 command -v composer >/dev/null || die "composer missing (Forge installs Composer 2)"
 command -v python3 >/dev/null || die "python3 missing (restore schema comparison requires it)"
 [ -x "$PHP_BIN" ] && [ -x "$FPM_BIN" ] || die "PHP $PHPV CLI or FPM missing"
+# composer.json requires php ^8.4.1 (composer.lock platform 8.4.1): an older 8.4.0 fails `composer install` in the middle of a deploy.
+"$PHP_BIN" -r 'exit(version_compare(PHP_VERSION, "8.4.1", ">=") ? 0 : 1);' \
+  || die "PHP $("$PHP_BIN" -r 'echo PHP_VERSION;') is older than 8.4.1, which composer.json requires; update PHP 8.4 in Forge (Server, PHP, Update)"
 
 # Extensions vasey:doctor requires (php_runtime) plus what CI installs (final-verification.yml) and the workers need.
 for ext in pdo pdo_mysql pdo_sqlite mbstring intl bcmath gd fileinfo zip curl dom xml xmlwriter posix pcntl ctype iconv tokenizer openssl; do
@@ -404,7 +407,7 @@ mysql_q "GRANT SELECT, SHOW VIEW, TRIGGER, LOCK TABLES, EVENT ON \`$DB_NAME\`.* 
 mysql_q "GRANT SHOW_ROUTINE ON *.* TO 'vasey_backup'@'127.0.0.1'"
 
 # Binary logging stays on (point-in-time recovery). With it on, MySQL refuses CREATE TRIGGER from an account
-# without SUPER (error 1419). The migrations create ~567 triggers, so allow trusted trigger creators instead
+# without SUPER (error 1419). The migrations create 618 triggers (at 34562862), so allow trusted trigger creators instead
 # of granting SUPER: binlog_format is ROW, so the statement-replay risk this guard exists for does not apply,
 # and only vasey_app holds TRIGGER. Deprecated in 8.4 (warning 1287) but still effective; persisted.
 if [ "$(mysql_q 'SELECT @@log_bin')" = 1 ]; then

@@ -62,6 +62,8 @@ ENV_SNAPSHOT=''
 while IFS= read -r name; do
   case "$name" in
     APP_*|DB_*|STRIPE_*|PRODUCTION_*|VASEY_TEST_*|VASEY_OPERATIVE_*|SESSION_*|CACHE_*|QUEUE_*|MAIL_*|FILESYSTEM_DISK|MEDIA_*|CONTACT_*|REDIS_*|AWS_*|BROADCAST_*) unset "$name" ;;
+    # The remaining families config/*.php reads with env(); tests/ops/test_staging_code_drift.py fails when a new one is not covered here.
+    LOG_*|AUTH_*|DISCOVERY_*|MYSQL_ATTR_*|MEMCACHED_*|SQS_*|DYNAMODB_*|BEANSTALKD_*|PAPERTRAIL_*|SLACK_*|POSTMARK_*|RESEND_*|VASEY_PHP_CLI_BINARY|VASEY_SUPPORT_*|VASEY_LISTENING_*) unset "$name" ;;
   esac
 done < <(compgen -e)
 

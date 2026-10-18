@@ -91,7 +91,7 @@ gate before quiesce and again on the built candidate is `ops/production/validate
 limit tables there apply unchanged: `DB_QUEUE_RETRY_AFTER` at least 1200, `stopwaitsecs` 960/120/120/960/120, 210 MiB Livewire
 uploads, 16 MiB elsewhere, 480 s and 3,900 s on the two paid routes with buffering on and a 1 GiB temp cap in
 `/var/lib/nginx/vasey-production-fastcgi` (0700), and the dedicated 7,800 s pool with `listen.backlog = 8`. The paid routes are
-not mounted on `main` (PR #56); until they are, those locations answer 404.
+not mounted (`config/paid-grants.php` ships `http_mounted` as a literal `false`); until that changes, those locations answer 404. The Tax V2 routes under `/paid-tax-grants/` are not covered by these locations; see the staging README's note on them.
 
 ## Logging
 

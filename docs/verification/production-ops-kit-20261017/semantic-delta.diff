@@ -44,7 +44,7 @@
 +         workers/vasey-production-workers.conf bin/vasey-production-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh forge-deploy.sh; do
    [ -f "$KIT/$f" ] || die "kit file missing: ops/production/$f"
  done
-@@ -256,5 +254,8 @@
+@@ -259,5 +257,8 @@
  systemctl enable --now clamav-freshclam >/dev/null
  # clamd is not used (the configured engine is clamscan) and would hold ~1 GiB resident.
 -if systemctl list-unit-files clamav-daemon.service >/dev/null 2>&1; then systemctl disable --now clamav-daemon >/dev/null 2>&1 || true; fi
@@ -54,19 +54,19 @@
 +fi
  newest=$(find /var/lib/clamav -maxdepth 1 \( -name 'daily.c[lv]d' -o -name 'main.c[lv]d' \) -printf '%T@\n' | sort -rn | head -1)
  age=$(( $(date +%s) - ${newest%.*} ))
-@@ -447,5 +448,4 @@
+@@ -450,5 +451,4 @@
  VASEY_EXPECTED_APP_ENV=$APP_ENV_EXPECTED
  VASEY_DB_NAME=$DB_NAME
 -VASEY_PROBE_NETRC=/etc/vasey-production/probe.netrc
  VASEY_KEEP_RELEASES=3
  VASEY_BACKUP_KEEP=7
-@@ -463,4 +463,5 @@
+@@ -466,4 +466,5 @@
  install -m 0644 -o root -g root "$KIT/seal-release.py" /usr/local/libexec/vasey-production/seal-release.py
  install -m 0644 -o root -g root "$KIT/release-step.sh" /usr/local/libexec/vasey-production/release-step.sh
 +install -m 0755 -o root -g root "$KIT/forge-deploy.sh" /usr/local/libexec/vasey-production/forge-deploy.sh
  
  render "$KIT/php-fpm/vasey-production.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-production.conf" 0644
-@@ -503,24 +504,5 @@
+@@ -506,24 +507,5 @@
  EOF
  
 -# ---------------------------------------------------------------- 7. access credentials and nginx template
@@ -92,7 +92,7 @@
 +# ---------------------------------------------------------------- 7. nginx template (no basic auth, no probe credentials)
  render "$KIT/nginx/vasey-production.conf" /etc/vasey-production/nginx-site.conf 0644
  
-@@ -535,7 +517,7 @@
+@@ -538,7 +520,7 @@
    helpers             /usr/local/sbin/vasey-production-ctl (sudo for $APP_USER), /usr/local/sbin/vasey-production-backup (cron 03:17 UTC)
    MySQL               schema $DB_NAME; DB_HOST=127.0.0.1 DB_USERNAME=vasey_app
 -  secrets (root only) $SECRETS/db-app.env (paste DB_PASSWORD into Forge > Environment), $BACKUP_CNF, $HTPASSWD, /etc/vasey-production/probe.netrc
@@ -118,14 +118,14 @@
 +#   bash /usr/local/libexec/vasey-production/forge-deploy.sh "$(git rev-parse HEAD)"
  #
  # The Forge site checkout ($FORGE_SITE_PATH) is only a git mirror and the home of the Forge-managed .env.
-@@ -106,5 +106,5 @@
+@@ -108,5 +108,5 @@
  freeze_runtime_environment
  envget() { grep -E "^$1=" "$RUNTIME_ENV" | tail -n 1 | cut -d= -f2- | sed -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'$/\1/"; }
 -need() { [ "$(envget "$1")" = "$2" ] || die ".env: $1 must be $2 for the staging profile"; }
 +need() { [ "$(envget "$1")" = "$2" ] || die ".env: $1 must be $2 for the production profile"; }
  need APP_ENV "$VASEY_EXPECTED_APP_ENV"
  need APP_DEBUG false
-@@ -118,6 +118,5 @@
+@@ -120,6 +120,5 @@
  need DB_DATABASE "$VASEY_DB_NAME"
  need FILESYSTEM_DISK local
 -need MAIL_MAILER log
@@ -133,7 +133,7 @@
 +need LOG_CHANNEL stderr            # the journal collects stderr; the reviewed preflight profile requires it
  need APP_MAINTENANCE_DRIVER file
  [[ "$(envget APP_KEY)" =~ ^base64:[A-Za-z0-9+/]{43}=$ ]] || die ".env: APP_KEY must be a base64 32-byte key (php artisan key:generate --show)"
-@@ -125,12 +124,6 @@
+@@ -127,12 +126,6 @@
  [ -n "$(envget DB_PASSWORD)" ] || die ".env: DB_PASSWORD is empty"
  [ "$(envget DB_QUEUE_RETRY_AFTER)" -ge 1200 ] 2>/dev/null || die ".env: DB_QUEUE_RETRY_AFTER must be at least 1200"
 -! grep -Eq '(sk|rk|pk)_live_' "$RUNTIME_ENV" || die ".env contains a live Stripe key; staging is test mode only"

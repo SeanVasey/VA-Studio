@@ -30,8 +30,8 @@ Changed: `ops/staging/backup.sh` (opt-in additions only: a `backup.conf` loader 
 default-empty variables, `ship_hardened` and helpers placed after `restore_check` and before `case`, a branch at the top of
 `ship()` taken only when hardening is configured, `prune_local` taking a branch only for `VASEY_BACKUP_RETENTION=tiered`,
 `prune_remote` and `check-offhost`), `ops/staging/README.md` (a pointer paragraph), `CHANGELOG.md`.
-Every other file under `ops/staging/` is untouched. The slices the existing tests cut out of `backup.sh` (`mycnf_ok()` to
-`RC_WORK=""`, and `restore_check()` to its first `install -d`) are unchanged.
+Every other file under `ops/staging/` was untouched by this batch (batch K1 below changed four of them). The slices the existing tests cut out of
+`backup.sh` (`mycnf_ok()` to `RC_WORK=""`, and `restore_check()` to its first `install -d`) are unchanged.
 
 ## How the production kit stays honest to staging
 
@@ -128,3 +128,95 @@ scanner checks against the daemon, cron timing of the monitoring scripts, and Fo
    customer identity is a reviewed change.
 4. Also open, outside this lane: relaxing the preflight's `STRIPE_MODE` and `MAIL_MAILER` requirements, a scheduler heartbeat in the
    application, and every activation in `docs/ops/production-activation-packet.md`.
+
+---
+
+# Batch K1: re-baseline of `ops/staging/` on `34562862`
+
+The staging kit was last aligned with the application at `d8aba146` (PR #68, 2026-10-09). `main` has since gained PRs #69 to #137
+(604 commits in the window, 29 of them PR merge commits). This batch audits the kit against the code as it is now, fixes the drift it found with the
+smallest behavior-preserving changes, and proves that the schema migrates under the kit's own grants. Commit: see the lane report.
+Nothing was pushed and no application file (`app/`, `routes/`, `bootstrap/`, `config/`, census files, workflows) was changed.
+
+## Method
+
+1. `git diff d8aba146 34562862` over `composer.json`/`composer.lock`/`package.json`, `config/`, `routes/`, `bootstrap/`, `database/migrations`,
+   `app/Console`, `docs/ops` and `scripts/ops`, then a read of every new or changed runtime surface that touches a host (queues,
+   storage, processes, upload and delivery routes, environment keys).
+2. Each kit file against the current code, by evidence rather than by reading alone: a script over every `env()` call in `config/`,
+   `composer check-platform-reqs`, a count of `onQueue()` sites, and the migrations run for real (below).
+3. Fixes only where the kit would misbehave or its documentation states something now false. No refactor, no rename.
+
+## Findings and what was done
+
+| # | Kit file | Finding (evidence) | Action |
+| --- | --- | --- | --- |
+| 1 | `ops/staging/forge-deploy.sh` (inherited-environment scrub, lines 60 to 68) | The scrub unsets inherited variables by family before composer hooks and the cache and migration commands, so a value in Forge's deployment shell cannot override the candidate `.env` (Laravel's dotenv never overrides a variable already in the process environment). **43 of the 196 distinct `env()` keys in `config/*.php` were outside every pattern**: `LOG_*`, `AUTH_*`, `DISCOVERY_SITEMAP_ENABLED`, `MYSQL_ATTR_SSL_CA`, `MEMCACHED_*`, `SQS_*`, `DYNAMODB_*`, `BEANSTALKD_*`, `PAPERTRAIL_*`, `SLACK_*`, `POSTMARK_*`, `RESEND_*`, `VASEY_PHP_CLI_BINARY` (`config/app.php:139`, read by `app/Support/PhpCliBinary.php`), `VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED` (`config/support-attachments.php`) and `VASEY_LISTENING_V2_*` (`config/customer-listening.php`). The last three are flags and a renderer path: an inherited value would be baked into `config:cache`. The full key-to-file list is the first block of `evidence/k1-env-key-coverage.txt` | A second `case` arm lists those families. The arm only unsets more inherited variables; the candidate `.env` is unchanged, so a correctly configured host behaves identically. Guarded by `tests/ops/test_staging_code_drift.py` |
+| 2 | `ops/staging/provision.sh` (PHP check, after line 223) | `composer.json:12` now requires `php ^8.4.1` (it was `^8.4` at `d8aba146`; `composer.json:93` platform `8.4.1`, `composer.lock` platform `^8.4.1`). The kit accepted any 8.4, and an 8.4.0 host would fail `composer install` in the middle of a deploy | A `version_compare` check with a message that names the Forge action. Guarded by the drift test, which reads the floor from `composer.json` |
+| 3 | `ops/staging/provision.sh` (comment before `log_bin_trust_function_creators`), `ops/staging/README.md` (MySQL row, "Why one database account") | The kit said the migrations create about 567 triggers. Measured on MySQL 8.4.11 at `34562862`: **618 triggers, 200 tables, 0 routines, 0 events, 0 views, every definer `vasey_app@127.0.0.1`** (`evidence/k1-mysql-8.4.11-migrate-fresh.txt`). The restore proof's own check reports the same 618 | Figures corrected. No logic uses the number |
+| 4 | `ops/staging/README.md` (paid-routes paragraph), `ops/production/README.md`, comment in both nginx templates | The documents said the paid routes are "not mounted on `main` (PR #56)". Now `config/paid-grants.php` ships `http_mounted` as a literal `false` with no environment switch (`docs/ops/paid-delivery-runtime.md`, "Root registration"); the locations answer 404 for that reason. The 3,900 s `fastcgi_read_timeout` comment called the figure "whole request plus margin"; the runtime guide now treats it as the application's reference value, not a measured guarantee | Wording corrected in the READMEs and the two nginx comments. Behavior (timeouts, locations, pool) unchanged |
+| 5 | `ops/staging/nginx/vasey-staging.conf`, `ops/staging/workers/vasey-staging-workers.conf` | **Not fixed, recorded.** The Tax V2 consumer routes (`routes/paid-tax-grants.php`: `/paid-tax-grants/origins/{batch}/document` and `.../authorizations/{authorization}/redeem`) have the same long-running shape as the paid routes but their own paths, so nginx would send them to the 300 s default location and pool. They mount only when `paid-tax-grants.http_mounted` is a literal `true` in `local` or `testing` (`App\Http\Tax\TaxHttpMount`; `docs/ops/paid-tax-http-runtime.md`), so nothing on staging or production reaches them, and no reviewed runtime budget exists for them | A "Not covered here" note in `ops/staging/README.md` names it as a pre-mount condition. Adding locations and pool routing without a reviewed budget would invent one |
+
+## Audited and found current (no change)
+
+- **Queues** (`tests/ops/test_staging_code_drift.py` reads the code). Every `->onQueue('...')` site and `config/media.php` `queue`: `media`,
+  `payments`, `contracts`, `inquiry-alerts`, plus the connection default. The workers listen on exactly those (`--queue=media`, `payments`,
+  `contracts`, `default,inquiry-alerts`). No new queue and no job class with a queue the workers lack since `d8aba146`; job `$timeout`
+  values (900, 90, 30) stay under the enforced `DB_QUEUE_RETRY_AFTER` floor of 1200 (`forge-deploy.sh:128`; `config/queue.php:43`).
+- **MySQL privileges.** `migrate:fresh` under the exact `vasey_app` grants (below) runs all 86 migrations; the 1419 negative control
+  shows `log_bin_trust_function_creators` is still required and still sufficient. No migration uses `SUPER`, `DEFINER`, `GRANT`,
+  `SET GLOBAL`, `LOCK TABLES`, `GET_LOCK`, routines, events or views (greps over `database/migrations`). `SHOW CREATE TABLE`, `information_schema`
+  and temporary tables are used and covered by the grants.
+- **PHP extensions.** `composer check-platform-reqs --no-dev` passes with only the packages the kit installs. Every non-core `ext-*`
+  that `composer.lock` requires (`ctype curl dom fileinfo gd iconv intl mbstring openssl tokenizer xml xmlwriter zip`, plus `pdo_mysql`
+  and `pdo_sqlite` from the doctor) is in both provision lists. The ones not in the list (`filter hash json libxml pcre phar session
+  xmlreader zlib`) are compiled into Ubuntu's `php8.4-common`/`-cli` and present (`php -m`). No new extension was needed since
+  PR #68 (the application checks `gd`, `intl`, `mbstring`, `pdo_sqlite`, `pdo_mysql` with `extension_loaded()`).
+- **Renderer binary.** `VASEY_PHP_CLI_BINARY=/usr/bin/php8.4` is in `ops/staging/env.staging.example:24`. Under FPM `PhpCliBinary` requires it
+  and proves it (`cli` SAPI, same `PHP_VERSION`, same thread safety). The rendering children read it from `config('app.php_cli_binary')`
+  and the Laravel renderers pass their own whitelist of variables, so no other variable is needed.
+- **External binaries.** No line added to `app/`, `scripts/` or `config/` since PR #68 names a new executable (grep for the media, PDF and scanner
+  tools and for `/usr/bin` and `/usr/local/bin` paths; only `/usr/bin/env` matched). `ffmpeg`, `ffprobe`, `prlimit`, `clamscan`,
+  `qpdf` and `pdftotext` remain the set the provisioning step checks. `package.json` `engines.node` is still `>=24.15.0 <25`.
+- **Private storage.** The private disk is `storage/app/private` (`config/filesystems.php`, `local`); the application creates new
+  subdirectories (for example `customer-identity-capture/`, `app/Domain/Customers/CustomerIdentityCapture.php:29`) itself with private
+  visibility, so the provisioning step needs no new directory. The doctor run below raised no storage finding, but its sandbox directory
+  was not provisioned the way the kit does it, so that run is not evidence for the kit's 0700 mode.
+- **Upload and body limits.** The chunk size is still 8 MiB (`SoundKitUploads::CHUNK_BYTES`), the contract and evidence caps 16 MiB,
+  matching the nginx template's 16 MiB default and 210 MiB Livewire location.
+- **Routes and scheduler.** The scheduler still runs one command (`routes/console.php`); the new HTTP surfaces (`/customer/features*`,
+  `/paid-tax-grants/*`, support attachments) are either default-off or gated and need no host-level routing beyond the default location.
+- **The backup path on the new schema.** Real `backup.sh predeploy` with the 8.4.11 tools produced `RESTORE_VERIFIED` and
+  `database_redump=identic` at 200 tables and 618 triggers (`evidence/k1-mysql-8.4.11-migrate-fresh.txt`, item 4).
+
+## Verification
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Migrations under the kit's grants | the exact statements of `provision.sh`, then `php artisan migrate:fresh --force` as `vasey_app` on a private MySQL **8.4.11**, binary log on | trust variable off: fails at `2026_09_04_000002_add_admin_mfa_and_immutable_evidence.php:21` with error 1419. On: 86 migrations, 0 failures, 200 tables, 618 triggers (5 min 35 s) |
+| Backup and restore proof | `backup.sh predeploy` on that schema | `RESTORE_VERIFIED`, `database_redump=identic`, 200 tables, 618 triggers |
+| Doctor | `php artisan vasey:doctor --json` as `vasey_app`, staging profile | 15 pass, 2 fail (`operator`, `frontend_build`: expected on a fresh install), 2 warn (`seller_tag`, `mail_transport`) |
+| Activation caches | `config:cache`, `route:cache`, `view:cache`, `event:cache` | each exit 0 |
+| Shutdown | `mysqladmin shutdown`; the server's log | `Shutdown complete (mysqld 8.4.11)`; no listener or process left |
+| Shell | `bash -n` and `shellcheck -S warning` on `ops/staging/*.sh`, `bin/vasey-staging-ctl`, `ops/production/*.sh`, `ops/monitoring/*.sh`, `ops/clamav/*.sh` | clean. At the default severity `provision.sh` carries SC1091 (info) on `. /etc/os-release`, which this batch did not introduce |
+| Kit build | `python3 -I ops/production/build-kit.py --check` | ok, 13 files. `semantic-delta.diff` regenerated; only hunk offsets changed (the staging files grew), not one content line |
+| Drift tests | `python3 -m unittest tests.ops.test_staging_code_drift` | 9 tests pass; mutations (a scrub family removed, the PHP floor lowered, a queue renamed in the workers file) each fail it; files restored and compared |
+| All ops tests | `python3 -m unittest discover -s tests/ops -p 'test_*.py'` | 258 tests, all pass (the earlier 249 plus the 9 new) |
+| Other tests | `scripts/ops/test-private-server-preflight.py` (20); PHPUnit `StagingRuntimeValidatorTest` (17), `ProductionEnvironmentTemplateTest` (6) | all pass |
+
+## Changed in K1
+
+`ops/staging/forge-deploy.sh` (one comment and one `case` arm), `ops/staging/provision.sh` (the PHP floor check; one comment),
+`ops/staging/README.md` and the two nginx templates and `ops/production/README.md` (wording and figures), `tests/ops/test_staging_code_drift.py`
+(new), `docs/verification/production-ops-kit-20261017/semantic-delta.diff` (regenerated), `evidence/k1-mysql-8.4.11-migrate-fresh.txt` and
+`evidence/k1-env-key-coverage.txt` (new), `CHANGELOG.md`.
+
+## Open after K1
+
+- Tax V2 nginx locations and pool routing, once the Tax V2 routes have a reviewed runtime budget (finding 5).
+- The template-coverage side of the same drift problem (every `config/*.php` key present in the staging or test-commerce template, with a
+  framework-default allowlist) is batch K2.
+- Nothing in K1 was run on a real host; the limits under "Not verifiable without a host" still apply.
+- Interruption record: the usage limit paused the lane and the container rebooted (reported around 00:36 UTC on 2026-10-18) after the K1
+  MySQL proof had finished and its server had shut down cleanly (log time 19:47 UTC on 2026-10-17). No run in this packet was cut off by it;
+  the uncommitted K1 files survived and were re-verified before the commit (below).
