@@ -436,4 +436,17 @@ Both records are imported verbatim by the lead.
   - P3-1 (the production gap said no template states the four flags), P3-4 (the service-project and free-grant guides did not mention the deploy gate) and P3-5 (two behaviours missing from the CHANGELOG) are corrected by the lead in documentation only, after `94c70fd6`.
   - P3-2 (the `.ship.*` cleanup comment overstates the lock; hold a non-blocking `flock` around cleanup and transfer, or correct the comment), P3-3 (two cleanup mutations survive: add a 7-character `.ship.ABCDEFG` decoy and an old-mtime symlink target) and P3-6 (`env.staging.example:174` says "below" for two flags stated above it) touch the script, its tests or a template the kit builder derives from. They are deferred to the next ops batch and recorded in `docs/handoff/2026-10-07/codex-deferred-20261011.md`.
 
-No source, script, template or test changed after `94c70fd6`; the later commits are documentation and the main merge.
+After `94c70fd6`, the lead merged main (`c88bbe3c`, bringing in PRs #140, #141 and #146). Main's C1 command added `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED`, and two drift guards then failed: `test_every_config_key_is_in_a_template_or_the_framework_allowlist` (no staging template stated the key) and `test_every_config_env_key_is_scrubbed_before_artisan_runs` (`forge-deploy.sh` did not scrub it). Commit `70573daf` fixes both:
+- `ops/staging/env.staging.example` states the key as `false`, with its purpose;
+- the second scrub arm in `ops/staging/forge-deploy.sh` covers `VASEY_*_SYNTHETIC_*`;
+- runbook section 5a no longer says the key is missing from the template.
+
+The pattern is deliberately not `VASEY_STAGING_SYNTHETIC_*`: the production kit's mechanical rename would turn that into `VASEY_PRODUCTION_SYNTHETIC_*`, so the production scrub would miss the real key. A scratch build confirms the derived production `forge-deploy.sh` keeps `VASEY_*_SYNTHETIC_*`. The pattern matches none of the kit's own variables (`VASEY_STAGING_CONF`, `VASEY_STAGING_HOST`, `VASEY_APP_USER`, `VASEY_ROOT`, `VASEY_MIRROR`, `VASEY_PHP`, `VASEY_DB_NAME`, `VASEY_EXPECTED_APP_ENV`). The deploy gate does not hold the flag, because it admits only the console command, which refuses production on its own.
+
+| Check at `70573daf` | Result |
+| --- | --- |
+| `python3 -m unittest discover -s tests/ops -p 'test_*.py'` | 280 tests OK (2 failures at `c88bbe3c` before the fix) |
+| `StagingRuntimeValidatorTest`, `TestCommerceProfileValidatorTest`, `ProductionEnvironmentTemplateTest` (SQLite command) | 149 tests, 2,693 assertions OK |
+| `scripts/ops/test-private-server-preflight.py` | OK |
+| `build-kit.py --check` | ok, 13 files |
+| `shellcheck -S warning` and `bash -n` on `forge-deploy.sh` | clean |
