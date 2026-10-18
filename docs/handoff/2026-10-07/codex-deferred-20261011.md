@@ -400,3 +400,14 @@ From the re-review at `6066e772` (also deferred to the next Tax batch):
 - P3-B: refusal cases for the `amounts()` checks no test catches (exact keys on `preTax` and `tax`, `authority`, `calculator`, `tax.currency`, `automatic_tax.enabled`, the `preTax.order_subtotal_minor` range);
 - P3-C: acceptance variants for inclusive tax, order scope and a pre-tax/tax subtotal mismatch;
 - P3-D: consider "included" wording for inclusive tax, with a render case.
+
+
+2026-10-18 O1 production operations kit. Three independent records: `b8d5c59d` (APPROVE WITH CONDITIONS; all three P2s and seven P3s closed), `94c70fd6` (APPROVE) and `28a3c8af` (APPROVE). The re-review P3s corrected in docs before merge are P3-1, P3-4 and P3-5 (second record) and P3-A, P3-C, P3-D and P3-E (third record). Deferred to the next ops batch:
+- P3-2 (second record): the `.ship.*` cleanup comment overstates the lock; hold a non-blocking `flock` around cleanup and transfer in `ops/staging/backup.sh`, or correct the comment;
+- P3-3 (second record): two cleanup mutations survive the tests; add a 7-character `.ship.ABCDEFG` decoy and an old-mtime symlink target;
+- P3-6 (second record) and the related part of P3-C (third record): `ops/staging/env.staging.example:174` says the twelve flags are "below", but two sit above it and an unheld flag now sits below;
+- P3-B (third record): apply the config-key coverage check to the built production `forge-deploy.sh` too, so a scrub pattern that the production rename breaks fails a test;
+- P3-D remainder (third record): one clause in `scripts/ops/capability-boundary.php` recording why `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED` is not held.
+
+Still Sean's decisions (not deferred findings): the production pre-launch capability hold for the four flags in `ops/production/README.md` item 6, and an environment gate in the policy classes for the two ungated flags.
+
