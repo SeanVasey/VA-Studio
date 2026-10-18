@@ -28,12 +28,19 @@ Each lane has one owner and its own worktree and branch from `origin/main`, and 
 
 | Lane | Scope | State |
 | --- | --- | --- |
-| R0 | This reconciliation | Draft PR, docs only |
+| R0 | This reconciliation | Merged as PR #137 |
+| DR | Allowlisted-docs refresh: README current state, dated historical markers, refreshed task rows and a source-read parity status column | Merged as PR #138 (docs-only preflight) |
 | F2c | Inventory the 25 reviewed SQLite-only methods in `scripts/ci/database-mysql-skips.json` against native counterparts. Add meaningful native counterparts and regenerate the exact selection and skip census without altering the pinned prefix assertions. The lane owns the census files | Started |
 | M1 | Dependency maintenance, patch and minor only: `laravel/framework` 13.36.0, `vite` 8.3.4, `@types/node` 24.19.2, `@inertiajs/react` 3.9.1, `jsdom` 30.1.2 | Started |
-| B4f | The two deferred PR #127 P2s, r4287886519 (hook-list numeric holes) and r4287886535 (playlist create enabled when invalid or at capacity) | Started |
+| B4f | The two deferred PR #127 P2s, r4287886519 (hook-list numeric holes) and r4287886535 (playlist create enabled when invalid or at capacity), plus two latent full-suite failures found on the way: the account-feature guard rejected the encrypted session store that `.env.example` enables (every account-feature request would 503), and two stale `ProductionFeatureSourceClosureTest` cases | Independently approved at `89f0340d`; PR carries this ledger update |
 | P1 | Read-only work-package proposals for C4 member HTTP, the Tax UI/history index and the D1 mount/observer/first-byte composition | Done. Recommended order: Tax history index (M), then D1 mount (L), then C4 member HTTP (L). C4 waits on Sean's `explicit_owner_confirmation_v1` decision and an unresolved frozen-renderer launch path under PHP-FPM; C4 and D1 share `routes/web.php`, `bootstrap/app.php` and the census, so they run serially |
 | T1 | Paid Tax history index: a bounded owner-closed `PaidTaxReads::index`, a default-off JSON route under the existing Tax mount, and a page shell that carries no private props, so the Tax privacy rules need no exception. Native coverage goes into the existing `PaidTaxGrantJourneyTest` without census edits | Started; independent review required |
+
+| O1 | Production operations kit (default-off templates, ClamAV config, opt-in encrypted off-host backups, monitoring), then K1 (staging kit re-baseline on current main) and K2 (missing staging capability flags) | Running |
+| C1 | Labelled synthetic staging rehearsal catalog, approved by Sean on 2026-10-17: a default-off, production-refusing command that builds `[SYNTHETIC]` tracks through the real domain services | Built; independent review running. Needs a seller tag on staging (S-6, or Sean's approval of a staging-only synthetic tag) |
+| H1, R1 | Read-only hosting packet (U-02) and parity/release-readiness audit | Done; staging stays Forge + DigitalOcean (decided 2026-10-08), production recommended as a second identical Forge VPS; findings fed DR, O1 and C1 |
+
+**Concurrency note (2026-10-18):** running seven or eight agents at once exhausted the account's usage window and paused every lane together, and the container then rebooted. Interrupted runs are recorded as interrupted. Keep at most about four heavy lanes at a time.
 
 **Held for separate reviewed changes:** Stripe 22 (#71, against the pinned 21.3.2 and API contract), PHPUnit 13 (#134, major), `tc-lib-pdf` and `tc-lib-pdf-font` (#135, #136, which need frozen-resource compatibility evidence), Playwright 1.64 (#103, which needs the pinned WebKit backport rechecked), and the major action bumps (#100–#102).
 

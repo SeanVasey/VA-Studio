@@ -17,7 +17,7 @@ Observed October 16, 2026 UTC; current pointers updated October 17. This is a de
 | Product parity | Existing implementation and work packages remain the basis | Audit and complete the remaining collections/albums, kits, service milestones, merchandise fulfillment, player/PWA and SEO/route requirements; do not infer that a phase heading means an unimplemented feature |
 | Operations/release | Default-off templates, preflight and activation/cutover preparation exist | Actual host/storage/backup/restore/workers/scanner facts, legal/merchant/mail/content inputs, exact final Foundation result and authorized rehearsal/cutover |
 
-The parity register contains 103 acceptance requirements and no completion-status column. The development register has 40 groups, with six dated Accepted labels and many stale free-text statuses; six of forty is not a current code-completion percentage. It supplies scope, not a reliable percent-complete calculation. A task is complete only when its behavior, review and source-bound evidence are recorded; a merge can close a bounded prerequisite while its activation conditions remain open.
+The parity register contains 103 acceptance requirements; since PR #138 it carries a dated source-read status column (`development_status_20261017`), which is a reading of the code, not test or release acceptance. The development register has 40 groups, with six dated Accepted labels and many stale free-text statuses; six of forty is not a current code-completion percentage. It supplies scope, not a reliable percent-complete calculation. A task is complete only when its behavior, review and source-bound evidence are recorded; a merge can close a bounded prerequisite while its activation conditions remain open.
 
 ## Dependency order
 
