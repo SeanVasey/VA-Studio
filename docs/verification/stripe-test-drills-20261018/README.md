@@ -182,4 +182,3 @@ Deferred to the K4 follow-up batch, recorded in `docs/handoff/2026-10-07/codex-d
 - P3-1: on MySQL, read inside `START TRANSACTION READ ONLY` at REPEATABLE READ, so the database enforces read-only and the snapshot is consistent; also reject locking and `INTO` clauses, and remove the connection callback when the command ends;
 - P3-2: load an explicit column list for `CheckoutIntent`;
 - P3-3: print JSON with `OUTPUT_RAW` and escape text output with `OutputFormatter::escape()`.
-
