@@ -221,6 +221,52 @@ class CustomerSuppressionMigrationTest extends TestCase
         }
     }
 
+    public function test_native_replace_cannot_delete_retained_target_or_intent(): void
+    {
+        if (DB::connection()->getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native MySQL REPLACE delete-and-insert path; the SQLite conflict-resolution case is the sibling SQLite-only test.');
+        }
+        $c = CustomerFixtures::account();
+        (new CustomerConsentPreferences)->change($c['principal'], $c['user'], ConsentFixtures::withdraw());
+        foreach (['customer_suppression_targets', 'customer_suppression_intents'] as $table) {
+            $row = (array) DB::table($table)->sole();
+            $before = $row;
+            $keys = implode(',', array_map(fn ($key) => '`'.$key.'`', array_keys($row)));
+            $markers = implode(',', array_fill(0, count($row), '?'));
+            try {
+                // An identical duplicate primary key makes MySQL delete the retained row before inserting the replacement.
+                DB::insert('REPLACE INTO `'.$table.'` ('.$keys.') VALUES ('.$markers.')', array_values($row));
+                $this->fail('Expected retained REPLACE refusal');
+            } catch (QueryException) {
+                $this->assertTrue(true);
+            }
+            $this->assertSame($before, (array) DB::table($table)->sole());
+        }
+    }
+
+    public function test_native_disabled_fk_checks_and_missing_identity_dependency_are_refused_without_installing(): void
+    {
+        if (DB::connection()->getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native MySQL foreign_key_checks session flag; the SQLite PRAGMA case is the sibling SQLite-only test.');
+        }
+        $this->resetSuppression();
+        $pdo = DB::connection()->getPdo();
+        $pdo->exec('SET FOREIGN_KEY_CHECKS=0');
+        try {
+            // Every dependency intact: the disabled session flag alone refuses.
+            $this->refusesBeforeDDL(fn () => (new SuppressionSchema)->up());
+            $this->assertSame([], $this->objects());
+            $pdo->exec('DROP TABLE customer_accounts');
+            $this->refusesBeforeDDL(fn () => (new SuppressionSchema)->up());
+            $this->assertSame([], $this->objects());
+        } finally {
+            $pdo->exec('SET FOREIGN_KEY_CHECKS=1');
+        }
+        $this->assertSame(1, (int) $pdo->query('SELECT @@SESSION.foreign_key_checks')->fetchColumn());
+        $this->refusesBeforeDDL(fn () => (new SuppressionSchema)->up());
+        $this->assertSame([], $this->objects());
+    }
+
     public function test_existing_foreign_index_and_reserved_guard_index_refuse_without_adoption(): void
     {
         DB::unprepared('CREATE INDEX suppression_foreign_index ON customer_suppression_targets (recipient_hmac)');
