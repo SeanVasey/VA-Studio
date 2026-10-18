@@ -48,6 +48,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 - Development tooling: Vite 8.3.3, React plugin 6.1.2 and Vitest 5.0.3, with focused build/test/audit evidence. Automated Node types-major updates wait for a reviewed runtime-major upgrade; the runtime remains Node 24.
 
+- Dependency maintenance (2026-10-17): Laravel framework 13.36.0 (the only Composer record that changes; no transitive package moves), Vite 8.3.4, `@types/node` 24.19.2 (stays on the Node 24 line), Inertia React 3.9.1 and exact jsdom 30.1.2, with focused local evidence in `docs/verification/dependency-maintenance-20261017/`. Stripe 22, PHPUnit 13, the PDF/font packages, Playwright 1.64 and the Actions majors are left unchanged. One native MySQL case (`MemberGrantActivationIntegrationTest::test_independent_confirmations_of_the_same_intent_return_the_first_retained_effect`) errors identically on framework 13.35.0 and 13.36.0 in the local container; it is retained in that packet, not fixed or attributed here.
+
 - The production activation packet, the preparation queue and the Monday plan's interim-environment row now reflect that PR #68 admits Stripe-test commerce on `APP_ENV=staging` (staff MFA required, live mode refused); production-checkout test funds still require `local`/`testing`. The customer-account, self-service identity, service-project and free-grant guides no longer say those test features run only in `local`/`testing`.
 - Decision register: U-01 resolved as `SeanVasey/VA-Studio`. Forge plus a DigitalOcean VPS is recorded as the staging-host decision, not U-02, and the staging sizing specification is `ops/staging/README.md` step 1.
 

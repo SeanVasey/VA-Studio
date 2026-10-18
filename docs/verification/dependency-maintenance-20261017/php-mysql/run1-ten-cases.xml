@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="10" assertions="662" errors="1" failures="0" skipped="0" time="3486.102849">
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingNativeDedupRaceTest" file="{worktree}/tests/Feature/ProductionMembershipBilling/BillingNativeDedupRaceTest.php" tests="1" assertions="15" errors="0" failures="0" skipped="0" time="263.734080">
+      <testcase name="test_two_retrievals_of_one_invoice_give_one_identity_and_two_ordered_observations" file="{worktree}/tests/Feature/ProductionMembershipBilling/BillingNativeDedupRaceTest.php" line="27" class="Tests\Feature\ProductionMembershipBilling\BillingNativeDedupRaceTest" classname="Tests.Feature.ProductionMembershipBilling.BillingNativeDedupRaceTest" assertions="15" time="263.734080"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingNativeDatabaseIntervalOwnershipRaceTest" file="{worktree}/tests/Feature/ProductionMembershipBilling/BillingNativeDatabaseIntervalOwnershipRaceTest.php" tests="1" assertions="34" errors="0" failures="0" skipped="0" time="194.408371">
+      <testcase name="test_two_older_snapshots_cannot_claim_the_same_valid_database_interval_across_ledgers" file="{worktree}/tests/Feature/ProductionMembershipBilling/BillingNativeDatabaseIntervalOwnershipRaceTest.php" line="33" class="Tests\Feature\ProductionMembershipBilling\BillingNativeDatabaseIntervalOwnershipRaceTest" classname="Tests.Feature.ProductionMembershipBilling.BillingNativeDatabaseIntervalOwnershipRaceTest" assertions="34" time="194.408371"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\TransactionalNotificationConcurrencyTest" file="{worktree}/tests/Feature/TransactionalNotificationConcurrencyTest.php" tests="2" assertions="381" errors="0" failures="0" skipped="0" time="671.941246">
+      <testcase name="test_two_independent_enqueues_share_one_intent_and_the_exact_loser_replays_without_writes" file="{worktree}/tests/Feature/TransactionalNotificationConcurrencyTest.php" line="59" class="Tests\Feature\TransactionalNotificationConcurrencyTest" classname="Tests.Feature.TransactionalNotificationConcurrencyTest" assertions="221" time="245.457548">
+        <system-out>{"notification_row_wait":{"requester":46,"blocker":45,"database_name":"vaseyaudio_catalog_import","table_name":"users","index_name":"PRIMARY","lock_type":"RECORD","lock_status":"WAITING","lock_data":"1"}}
+</system-out>
+      </testcase>
+      <testcase name="test_two_independent_dispatches_claim_once_and_the_loser_never_invokes_private_storage" file="{worktree}/tests/Feature/TransactionalNotificationConcurrencyTest.php" line="88" class="Tests\Feature\TransactionalNotificationConcurrencyTest" classname="Tests.Feature.TransactionalNotificationConcurrencyTest" assertions="160" time="426.483698">
+        <system-out>{"notification_row_wait":{"requester":51,"blocker":50,"database_name":"vaseyaudio_catalog_import","table_name":"users","index_name":"PRIMARY","lock_type":"RECORD","lock_status":"WAITING","lock_data":"1"}}
+</system-out>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\SiteScheduleConcurrencyTest" file="{worktree}/tests/Feature/SiteScheduleConcurrencyTest.php" tests="1" assertions="156" errors="0" failures="0" skipped="0" time="384.341155">
+      <testcase name="test_overlapping_scheduler_runs_publish_the_schedule_once" file="{worktree}/tests/Feature/SiteScheduleConcurrencyTest.php" line="98" class="Tests\Feature\SiteScheduleConcurrencyTest" classname="Tests.Feature.SiteScheduleConcurrencyTest" assertions="156" time="384.341155"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\OrderPreparationConcurrencyTest" file="{worktree}/tests/Feature/OrderPreparationConcurrencyTest.php" tests="2" assertions="34" errors="0" failures="0" skipped="0" time="941.801768">
+      <testcase name="test_scope_block_committed_before_owner_mutex_acquisition_prevents_both_orders" file="{worktree}/tests/Feature/OrderPreparationConcurrencyTest.php" line="101" class="Tests\Feature\OrderPreparationConcurrencyTest" classname="Tests.Feature.OrderPreparationConcurrencyTest" assertions="18" time="520.530758"/>
+      <testcase name="test_price_expiry_during_owner_mutex_wait_cannot_create_an_order_or_extend_capacity" file="{worktree}/tests/Feature/OrderPreparationConcurrencyTest.php" line="117" class="Tests\Feature\OrderPreparationConcurrencyTest" classname="Tests.Feature.OrderPreparationConcurrencyTest" assertions="16" time="421.271010"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMemberGrants\MemberGrantActivationIntegrationTest" file="{worktree}/tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php" tests="1" assertions="9" errors="1" failures="0" skipped="0" time="418.118902">
+      <testcase name="test_independent_confirmations_of_the_same_intent_return_the_first_retained_effect" file="{worktree}/tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php" line="112" class="Tests\Feature\ProductionMemberGrants\MemberGrantActivationIntegrationTest" classname="Tests.Feature.ProductionMemberGrants.MemberGrantActivationIntegrationTest" assertions="9" time="418.118902">
+        <error type="App\Domain\Memberships\Production\MembershipException">Tests\Feature\ProductionMemberGrants\MemberGrantActivationIntegrationTest::test_independent_confirmations_of_the_same_intent_return_the_first_retained_effect
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+{worktree}/app/Domain/Memberships/Production/MembershipException.php:16
+{worktree}/app/Domain/Memberships/Production/MembershipReservationContext.php:786
+{worktree}/app/Domain/Memberships/Production/MembershipReservationContext.php:355
+{worktree}/app/Domain/Memberships/Production/MembershipReservationContext.php:212
+{worktree}/app/Domain/Memberships/Production/MembershipReservationObserver.php:85
+{worktree}/vendor/laravel/framework/src/Illuminate/Database/Connection.php:1143
+{worktree}/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:206
+{worktree}/app/Domain/Memberships/Production/MembershipReservationOperations.php:131
+{worktree}/app/Domain/Memberships/Production/MembershipReservationOperations.php:63
+{worktree}/app/Domain/Memberships/Production/MembershipReservationOperations.php:38
+{worktree}/tests/Support/MembershipReservationFixtures.php:105
+{worktree}/tests/Support/MemberActivationFixtures.php:65
+{worktree}/tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php:114
+{worktree}/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest" file="{worktree}/tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php" tests="2" assertions="33" errors="0" failures="0" skipped="0" time="611.757326">
+      <testcase name="test_committing_configuration_change_rolls_back_redemption_and_event" file="{worktree}/tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php" line="58" class="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipReservationOwnershipTest" assertions="17" time="232.137290"/>
+      <testcase name="test_committing_at_honor_deadline_cannot_commit_new_reservation" file="{worktree}/tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php" line="86" class="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipReservationOwnershipTest" assertions="16" time="379.620037"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,33 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: <worktree>/phpunit.xml
+
+..{"notification_row_wait":{"requester":46,"blocker":45,"database_name":"vaseyaudio_catalog_import","table_name":"users","index_name":"PRIMARY","lock_type":"RECORD","lock_status":"WAITING","lock_data":"1"}}
+.{"notification_row_wait":{"requester":51,"blocker":50,"database_name":"vaseyaudio_catalog_import","table_name":"users","index_name":"PRIMARY","lock_type":"RECORD","lock_status":"WAITING","lock_data":"1"}}
+....E..                                                        10 / 10 (100%)
+
+Time: 58:06.116, Memory: 110.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMemberGrants\MemberGrantActivationIntegrationTest::test_independent_confirmations_of_the_same_intent_return_the_first_retained_effect
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+<worktree>/app/Domain/Memberships/Production/MembershipException.php:16
+<worktree>/app/Domain/Memberships/Production/MembershipReservationContext.php:786
+<worktree>/app/Domain/Memberships/Production/MembershipReservationContext.php:355
+<worktree>/app/Domain/Memberships/Production/MembershipReservationContext.php:212
+<worktree>/app/Domain/Memberships/Production/MembershipReservationObserver.php:85
+<worktree>/vendor/laravel/framework/src/Illuminate/Database/Connection.php:1143
+<worktree>/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:206
+<worktree>/app/Domain/Memberships/Production/MembershipReservationOperations.php:131
+<worktree>/app/Domain/Memberships/Production/MembershipReservationOperations.php:63
+<worktree>/app/Domain/Memberships/Production/MembershipReservationOperations.php:38
+<worktree>/tests/Support/MembershipReservationFixtures.php:105
+<worktree>/tests/Support/MemberActivationFixtures.php:65
+<worktree>/tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php:114
+<worktree>/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 10, Assertions: 662, Errors: 1.
