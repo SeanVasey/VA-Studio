@@ -373,3 +373,6 @@ F2a final separate review at `e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08`: **APPRO
 - r4305244899: on resume, accept existing artwork or preview only when its source hash matches the deterministic generated media for that definition, and otherwise refuse with "media differs".
 
 Both need staff to edit an interrupted synthetic draft between runs on staging; the command refuses production. They join the re-review's P3-A to P3-D.
+
+
+2026-10-18 PR #141 Codex P2 r4305283401, deferred with one reply: add `@testing-library/dom` and `@testing-library/jest-dom` (both exact pins) to the `npm-minor-patch` `exclude-patterns` in `.github/dependabot.yml`, in the next change that touches that file. It fails safe: a bump would only fail its group PR.

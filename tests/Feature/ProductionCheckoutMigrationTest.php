@@ -223,6 +223,40 @@ class ProductionCheckoutMigrationTest extends TestCase
         }
     }
 
+    public function test_native_coexisting_table_and_trigger_namespaces_cannot_hide_a_foreign_marker(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native MySQL keeps tables and triggers in separate namespaces; the SQLite case is the sibling SQLite-only test.');
+        }
+        $this->removeFixture();
+        $definitions = CheckoutSchema::statements();
+        // Every owned table first, so the exact first guard below leaves no installation gap behind it.
+        foreach ($definitions as $definition) {
+            if ($definition['type'] === 'table') {
+                DB::unprepared($definition['statement']);
+            }
+        }
+        DB::unprepared('CREATE TABLE pco_0_insert (marker INTEGER) ENGINE=InnoDB');
+        DB::table('pco_0_insert')->insert(['marker' => 9123]);
+        DB::unprepared($definitions['pco_0_insert']['statement']);
+        $this->assertSame(1, DB::table('information_schema.TABLES')->whereRaw('TABLE_SCHEMA = DATABASE()')->where('TABLE_NAME', 'pco_0_insert')->count());
+        $this->assertSame(1, DB::table('information_schema.TRIGGERS')->whereRaw('TRIGGER_SCHEMA = DATABASE()')->where('TRIGGER_NAME', 'pco_0_insert')->count());
+        $writes = [];
+        DB::listen(function (QueryExecuted $event) use (&$writes): void {
+            if (preg_match('/\A\s*(?:CREATE|ALTER|DROP|INSERT|UPDATE|DELETE)\b/i', $event->sql)) {
+                $writes[] = $event->sql;
+            }
+        });
+        try {
+            (new CheckoutSchemaInstaller)->up();
+            $this->fail('Foreign table hidden behind exact trigger.');
+        } catch (\LogicException $error) {
+            $this->assertSame('Production checkout migration refused before further DDL: dictionary identity alias or foreign namespace.', $error->getMessage());
+            $this->assertSame([], $writes);
+            $this->assertSame(9123, DB::table('pco_0_insert')->value('marker'));
+        }
+    }
+
     public function test_native_dictionary_accent_alias_is_rejected_before_creating_the_first_owned_table(): void
     {
         if (DB::getDriverName() !== 'mysql') {

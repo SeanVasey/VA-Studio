@@ -6,6 +6,7 @@ use App\Domain\Customers\Listening\ListeningLibrary;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use LogicException;
+use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Tests\Support\CustomerFixtures;
@@ -120,6 +121,66 @@ class CustomerListeningMigrationTest extends TestCase
             DB::unprepared('DROP TABLE temp.customer_saved_tracks');
         }
         $this->assertTrue(Schema::hasTable('customer_saved_tracks'));
+    }
+
+    public static function nativeDrift(): array
+    {
+        return ['index' => ['CREATE INDEX listening_foreign_index ON customer_saved_tracks (version)'],
+            'column' => ['ALTER TABLE customer_saved_tracks ADD COLUMN foreign_sentinel TEXT'],
+            'trigger' => ["CREATE TRIGGER listening_foreign_trigger BEFORE DELETE ON customer_saved_tracks FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Foreign retained object'"]];
+    }
+
+    #[DataProvider('nativeDrift')]
+    public function test_native_foreign_or_drifted_objects_are_never_adopted_or_dropped(string $ddl): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native MySQL dictionary drift; the SQLite object drift is the sibling SQLite-only test.');
+        }
+        CustomerFixtures::account();
+        DB::unprepared($ddl);
+        $before = $this->nativeDefinition();
+        $history = $this->history();
+        foreach (['up', 'down'] as $method) {
+            try {
+                $this->migration()->$method();
+                $this->fail('Drift was accepted.');
+            } catch (LogicException) {
+                $this->assertSame($before, $this->nativeDefinition());
+                $this->assertSame($history, $this->history());
+            }
+        }
+    }
+
+    public function test_native_session_temporary_shadow_is_never_adopted_or_dropped(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native MySQL session temporary-table shadow; the SQLite temporary catalog is the sibling SQLite-only test.');
+        }
+        $durable = $this->nativeDefinition();
+        DB::unprepared('CREATE TEMPORARY TABLE customer_saved_tracks (private_sentinel TEXT)');
+        DB::table('customer_saved_tracks')->insert(['private_sentinel' => 'SYNTHETIC PRIVATE']);
+        try {
+            foreach (['up', 'down'] as $method) {
+                try {
+                    $this->migration()->$method();
+                    $this->fail('Temporary shadow was accepted.');
+                } catch (LogicException) {
+                    $this->assertSame('SYNTHETIC PRIVATE', DB::table('customer_saved_tracks')->value('private_sentinel'));
+                }
+            }
+        } finally {
+            DB::unprepared('DROP TEMPORARY TABLE customer_saved_tracks');
+        }
+        $this->assertSame($durable, $this->nativeDefinition());
+    }
+
+    /** The table definition SHOW CREATE resolves (including a session temporary shadow) and its durable triggers. */
+    private function nativeDefinition(): array
+    {
+        $pdo = DB::connection()->getPdo();
+
+        return [$pdo->query('SHOW CREATE TABLE `customer_saved_tracks`')->fetch(PDO::FETCH_NUM)[1],
+            $pdo->query("SELECT TRIGGER_NAME,EVENT_MANIPULATION,ACTION_TIMING,ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND EVENT_OBJECT_TABLE='customer_saved_tracks' ORDER BY TRIGGER_NAME")->fetchAll(PDO::FETCH_ASSOC)];
     }
 
     public static function interruptions(): array

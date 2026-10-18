@@ -18,6 +18,7 @@ use App\Domain\Grants\PaidTax\PaidTaxSchema;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -450,6 +451,56 @@ class PaidTaxDownloadJourneyTest extends TestCase
             });
         $this->assertTrue($called);
         $this->assertTrue($refusal, 'Public new-table access succeeded before complete schema admission.');
+        $this->assertDatabaseCount('paid_tax_authorizations', 0);
+        $this->authorize($f);
+        $this->assertDatabaseCount('paid_tax_authorizations', 1);
+    }
+
+    public function test_native_new_delivery_public_reads_refuse_while_schema_admission_is_still_pending(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native MySQL grammar callback; the SQLite pending-admission probe is the sibling SQLite-only test.');
+        }
+        $f = $this->complete();
+        $connection = DB::connection();
+        $original = $connection->getSchemaGrammar();
+        $called = false;
+        $refusal = false;
+        (new PaidTaxCommands)->run($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'],
+            function (array $graph, PaidTaxRows $rows) use ($connection, $original, &$called, &$refusal): array {
+                // Admission compiles the native installation plan; the first CREATE compiles mid-admission.
+                $grammar = new class($connection, $rows, $called, $refusal) extends MySqlGrammar
+                {
+                    public function __construct($connection, private PaidTaxRows $rows, private bool &$called, private bool &$refusal)
+                    {
+                        parent::__construct($connection);
+                    }
+
+                    public function compileCreate(Blueprint $blueprint, Fluent $command)
+                    {
+                        if (! $this->called) {
+                            $this->called = true;
+                            try {
+                                $this->rows->one('paid_tax_authorizations', 'id = ?', [0]);
+                            } catch (PaidTaxException) {
+                                $this->refusal = true;
+                            }
+                        }
+
+                        return parent::compileCreate($blueprint, $command);
+                    }
+                };
+                $connection->setSchemaGrammar($grammar);
+                try {
+                    $rows->admitDelivery();
+                } finally {
+                    $connection->setSchemaGrammar($original);
+                }
+
+                return [];
+            });
+        $this->assertTrue($called);
+        $this->assertTrue($refusal, 'Public new-table access succeeded before complete native schema admission.');
         $this->assertDatabaseCount('paid_tax_authorizations', 0);
         $this->authorize($f);
         $this->assertDatabaseCount('paid_tax_authorizations', 1);
