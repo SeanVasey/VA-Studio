@@ -13,13 +13,14 @@
 # `check` verifies, and prints OK, WARN or CRIT for each:
 #   - ufw is active, denies incoming by default, and allows only the SSH port, 80 and 443;
 #   - nothing but those ports listens on a non-loopback address, and MySQL (3306) never does;
-#   - unattended-upgrades is installed, enabled, and covers the security pocket;
+#   - unattended-upgrades is installed, enabled, and covers the security pocket, and apt-daily.timer and apt-daily-upgrade.timer
+#     are both enabled and active (without them the periodic settings never run);
 #   - a reboot is not pending (kernel and libc updates need one; Automatic-Reboot stays false, so the reboot is a decision);
 #   - sshd refuses password logins and root password logins.
 # The unattended-upgrades drop-in blocks automatic upgrades of the database server and PHP packages (mysql-*, php8.4-*),
 # because each restarts a service that production queues and deploys depend on: upgrade them in a maintenance window with
 # `vasey-<kit>-ctl quiesce` first. Remove those two lines if you prefer otherwise; that is an operator decision.
-# Exit: 0 all OK, 1 any WARN, 2 any CRIT (check); apply actions exit 0 on success.
+# Exit: 0 all OK, 1 any WARN, 2 any CRIT (check); apply actions exit 0 on success and 2 when a step fails.
 set -uo pipefail
 export LC_ALL=C PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
@@ -97,12 +98,18 @@ check_listeners() {
 }
 
 check_upgrades() {
-  local periodic origins
+  local periodic origins timer stopped=()
   if ! "$DPKG" -s unattended-upgrades >/dev/null 2>&1; then report 1 "upgrades: unattended-upgrades is not installed"; return; fi
   periodic=$("$APT_CONFIG" dump 2>/dev/null | sed -n 's/^APT::Periodic::Unattended-Upgrade "\(.*\)";$/\1/p')
   if [ "$periodic" = 1 ]; then report 0 "upgrades: daily unattended upgrades are enabled"; else report 1 "upgrades: APT::Periodic::Unattended-Upgrade is '${periodic:-unset}', not 1"; fi
   origins=$("$APT_CONFIG" dump 2>/dev/null | grep -c 'Unattended-Upgrade::Allowed-Origins.*-security' || true)
   if [ "${origins:-0}" -ge 1 ]; then report 0 "upgrades: the security pocket is allowed"; else report 1 "upgrades: no -security origin in Unattended-Upgrade::Allowed-Origins"; fi
+  # APT::Periodic does nothing unless systemd runs it: apt-daily.timer fetches the lists, apt-daily-upgrade.timer runs the upgrade.
+  for timer in apt-daily.timer apt-daily-upgrade.timer; do
+    [ "$("$SYSTEMCTL" is-enabled "$timer" 2>/dev/null)" = enabled ] && [ "$("$SYSTEMCTL" is-active "$timer" 2>/dev/null)" = active ] || stopped+=("$timer")
+  done
+  if [ "${#stopped[@]}" -eq 0 ]; then report 0 "upgrades: apt-daily.timer and apt-daily-upgrade.timer are enabled and active"
+  else report 1 "upgrades: not enabled and active: ${stopped[*]} (no unattended upgrade runs without both; systemctl enable --now ${stopped[*]})"; fi
   if [ -e "$REBOOT_FLAG" ]; then report 1 "upgrades: a reboot is pending ($(tr '\n' ' ' < "${REBOOT_FLAG}.pkgs" 2>/dev/null | cut -c1-80)); schedule it with a quiesce"; else report 0 "upgrades: no reboot is pending"; fi
 }
 
@@ -121,7 +128,9 @@ apply_unattended_upgrades() {
   [ "$(id -u)" = 0 ] || die "run as root"
   DEBIAN_FRONTEND=noninteractive "$APT_GET" install -y -q unattended-upgrades || die "could not install unattended-upgrades"
   printf '%s\n' "$DROPIN_BODY" > "$APT_DROPIN.new" && chmod 0644 "$APT_DROPIN.new" && mv -f "$APT_DROPIN.new" "$APT_DROPIN" || die "could not write $APT_DROPIN"
-  "$SYSTEMCTL" enable --now apt-daily.timer apt-daily-upgrade.timer >/dev/null 2>&1 || echo "host-baseline: WARNING: could not enable the apt timers"
+  # Without both timers the drop-in above never runs, so this is a failed apply, not a warning.
+  "$SYSTEMCTL" enable --now apt-daily.timer apt-daily-upgrade.timer >/dev/null 2>&1 \
+    || die "could not enable and start apt-daily.timer and apt-daily-upgrade.timer; $APT_DROPIN is written but nothing will run it (inspect with: systemctl status apt-daily.timer apt-daily-upgrade.timer)"
   echo "host-baseline: applied; verify with: host-baseline.sh check   and   unattended-upgrade --dry-run --debug"
 }
 

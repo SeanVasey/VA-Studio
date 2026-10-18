@@ -342,7 +342,18 @@ class HostBaseline(Sandbox):
         self.stub("sshd", f'cat "{self.files["sshd"]}"\n')
         self.stub("dpkg", "exit 0\n")
         self.stub("apt-get", f'echo "apt-get $*" >> "{self.log}"\n')
-        self.stub("systemctl", f'echo "systemctl $*" >> "{self.log}"\n')
+        # Queries answer from one file per unit and state; anything else is a change, logged, and exits with systemctl-exit (0).
+        self.timers = self.root / "timers"
+        self.timers.mkdir()
+        for unit in ("apt-daily.timer", "apt-daily-upgrade.timer"):
+            (self.timers / f"{unit}.enabled").write_text("enabled\n")
+            (self.timers / f"{unit}.active").write_text("active\n")
+        self.stub("systemctl", f"""case "$1" in
+  is-enabled) s=$(cat "{self.timers}/$2.enabled" 2>/dev/null || echo not-found); echo "$s"; [ "$s" = enabled ] ;;
+  is-active) s=$(cat "{self.timers}/$2.active" 2>/dev/null || echo inactive); echo "$s"; [ "$s" = active ] ;;
+  *) echo "systemctl $*" >> "{self.log}"; exit "$(cat "{self.root}/systemctl-exit" 2>/dev/null || echo 0)" ;;
+esac
+""")
         self.env = {"VASEY_UFW": str(self.bin / "ufw"), "VASEY_SS": str(self.bin / "ss"), "VASEY_APT_CONFIG": str(self.bin / "apt-config"),
                     "VASEY_SSHD": str(self.bin / "sshd"), "VASEY_REBOOT_FLAG": str(self.root / "reboot-required"),
                     "VASEY_APT_DROPIN": str(self.root / "52vasey"), "VASEY_DPKG": str(self.bin / "dpkg"),
@@ -404,6 +415,25 @@ class HostBaseline(Sandbox):
         self.assertEqual(pending.returncode, 1)
         self.assertIn("a reboot is pending (linux-image-6.8", pending.stdout)
 
+    def test_both_apt_timers_must_be_enabled_and_active(self):
+        self.assertIn("OK upgrades: apt-daily.timer and apt-daily-upgrade.timer are enabled and active", self.check().stdout)
+        for unit, state, value in (("apt-daily-upgrade.timer", "enabled", "disabled"), ("apt-daily.timer", "active", "inactive"),
+                                   ("apt-daily.timer", "enabled", "masked"), ("apt-daily-upgrade.timer", "enabled", "static"),
+                                   ("apt-daily.timer", "enabled", "enabled-runtime")):
+            with self.subTest(unit=unit, state=state, value=value):
+                path = self.timers / f"{unit}.{state}"
+                path.write_text(value + "\n")
+                run = self.check()
+                self.assertEqual(run.returncode, 1, run.stdout)
+                self.assertIn(f"WARN upgrades: not enabled and active: {unit} ", run.stdout)
+                path.write_text(("enabled" if state == "enabled" else "active") + "\n")
+        for path in self.timers.iterdir():
+            path.unlink()  # neither unit exists
+        run = self.check()
+        self.assertEqual(run.returncode, 1, run.stdout)
+        self.assertIn("WARN upgrades: not enabled and active: apt-daily.timer apt-daily-upgrade.timer ", run.stdout)
+        self.assertFalse(self.log.exists(), "check only queries systemd, it never enables anything")
+
     def test_ssh_findings(self):
         self.files["sshd"].write_text("passwordauthentication yes\npermitrootlogin prohibit-password\n")
         self.assertEqual(self.check().returncode, 1)
@@ -455,6 +485,15 @@ class HostBaseline(Sandbox):
             self.assertIn('APT::Periodic::Unattended-Upgrade "1";', dump.stdout)
             self.assertRegex(dump.stdout, r'Unattended-Upgrade::Allowed-Origins:: ".*-security";')
             self.assertIn('Unattended-Upgrade::Automatic-Reboot "false";', dump.stdout)
+
+    @unittest.skipUnless(IS_ROOT, "apply needs root")
+    def test_apply_unattended_upgrades_fails_when_the_timers_cannot_be_enabled(self):
+        (self.root / "systemctl-exit").write_text("1\n")
+        run = self.run_script("host-baseline.sh", "apply-unattended-upgrades", "--yes", env=self.env)
+        self.assertEqual(run.returncode, 2, run.stdout + run.stderr)
+        self.assertNotIn("applied", run.stdout + run.stderr)
+        self.assertIn("could not enable and start apt-daily.timer and apt-daily-upgrade.timer", run.stderr)
+        self.assertIn("systemctl enable --now apt-daily.timer apt-daily-upgrade.timer", self.log.read_text())
 
     def test_unknown_action_and_port_are_refused(self):
         self.assertEqual(self.run_script("host-baseline.sh", "burn", env=self.env).returncode, 2)

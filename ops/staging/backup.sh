@@ -297,6 +297,11 @@ restore_check() {
 #   VASEY_BACKUP_REMOTE_PRUNE=1        apply the same policy on the rclone remote (nightly only; never for rsync)
 # No private key is ever read or needed here: decryption happens elsewhere, with a key this host never holds.
 SET_NAME_RE='^20[0-9]{6}T[0-9]{6}Z-([0-9a-f]{12}|none)$'
+# At most this many kept retry copies (backups/.offhost-retry.<set>, each about one set's size): the oldest go first.
+RETRY_COPIES_MAX=2
+# Seconds a hardened ship waits for another one to finish; 0 refuses at once. predeploy waits (see the case below).
+SHIP_LOCK_WAIT=0
+ALREADY_SHIPPED=0
 
 hardening_requested() {
   [ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] || [ -n "$VASEY_BACKUP_REMOTE" ] || [ "$VASEY_BACKUP_REQUIRE_ENCRYPTION" = 1 ]
@@ -388,8 +393,104 @@ encrypt_set() {  # encrypt_set SET_DIR STAGE_DIR -> STAGE_DIR/<set>.tar.age and 
   (cd "$stage" && sha256sum -- "$name.tar.age" > "$name.tar.age.sha256") || return 1
 }
 
+# True when DIR holds a complete kept copy of NAME's ciphertext that was encrypted to the recipients configured now.
+retry_copy_ok() {  # retry_copy_ok DIR NAME
+  local dir=$1 name=$2 f
+  [ -d "$dir" ] && [ ! -L "$dir" ] || return 1
+  for f in "$name.tar.age" "$name.tar.age.sha256" recipients.sha256; do
+    [ -f "$dir/$f" ] && [ ! -L "$dir/$f" ] || return 1
+  done
+  [ "$(head -c 21 -- "$dir/$name.tar.age")" = 'age-encryption.org/v1' ] \
+    && (cd "$dir" && sha256sum -- "$name.tar.age" | cmp -s - "$name.tar.age.sha256") \
+    && sha256sum < "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" | cmp -s - "$dir/recipients.sha256"
+}
+
+# Prints which of the given names exist at the top of the remote, sorted. A path that does not exist yet (rclone exit 3) holds none.
+# `lsf` lists names on every backend, with or without hashes.
+remote_names() {  # remote_names NAME...
+  local out n rc=0
+  local -a filters=()
+  for n in "$@"; do filters+=(--include "/$n"); done
+  out=$(rclone_run lsf "${filters[@]}" "$VASEY_BACKUP_REMOTE") || rc=$?
+  case "$rc" in
+    0) printf '%s\n' "$out" | sed '/^$/d' | LC_ALL=C sort ;;
+    3) ;;
+    *) return 1 ;;
+  esac
+}
+
+# Prints the size of NAME at the top of the remote, or nothing when it is absent or the remote cannot be listed.
+remote_size() {  # remote_size NAME
+  rclone_run lsf --format sp --include "/$1" "$VASEY_BACKUP_REMOTE" 2>/dev/null | awk -F';' -v n="$1" '$2 == n { print $1 }'
+}
+
+retry_copies_summary() {  # prints "N kept retry copies, B bytes" for this host
+  local d count=0 bytes=0
+  for d in "$VASEY_BACKUP_DIR"/.offhost-retry.*; do
+    [ -d "$d" ] && [ ! -L "$d" ] || continue
+    count=$((count + 1)); bytes=$((bytes + $(du -sb -- "$d" | cut -f1)))
+  done
+  printf '%s kept retry cop%s, %s bytes' "$count" "$([ "$count" = 1 ] && echo y || echo ies)" "$bytes"
+}
+
+# age to an rclone remote. Each file goes with `rclone copy --immutable` and one anchored `--include`: unlike `copyto`, which rclone
+# 1.60.1 lets replace a differing object, `copy` refuses to change an existing remote object and accepts an identical one as present
+# (docs/ops/backup-offhost-hardening.md). age never encrypts the same set to the same bytes twice, so an attempt that sent part of the
+# set can only be completed by re-sending exactly those bytes. They wait, ciphertext and digests only, in a private per-set directory
+# until the transfer is verified, and only while the remote holds the ciphertext they belong to. A copy encrypted to other recipients,
+# one that no longer matches its digest and one that is not age ciphertext are never sent.
+# Before a fresh encryption the remote must hold neither name: on a backend with no hash in common with the local disk rclone compares
+# sizes only, and age output for one set always has the same size, so `--immutable` alone would take a different ciphertext for the one
+# already there. The exception is a set this host recorded as shipped whose remote digest and ciphertext size still match the record:
+# "already shipped" (a size check of the ciphertext, not a content check).
+ship_encrypted_rclone() {  # ship_encrypted_rclone SET_DIR STAGE_DIR; returns nonzero without exiting
+  local bk=$1 stage=$2 name retry shipped present listed rc=0
+  name=$(basename "$bk")
+  retry=$VASEY_BACKUP_DIR/.offhost-retry.$name
+  shipped=$VASEY_BACKUP_DIR/.offhost-shipped.$name
+  if retry_copy_ok "$retry" "$name"; then
+    log "re-sending the encrypted copy of $name kept from an earlier attempt"
+  else
+    present=$(remote_names "$name.tar.age" "$name.tar.age.sha256") || { log "could not list the remote; nothing was sent"; return 1; }
+    if [ -n "$present" ]; then
+      if [ "$present" = "$name.tar.age"$'\n'"$name.tar.age.sha256" ] && [ -f "$shipped" ] && [ ! -L "$shipped" ] \
+         && rclone_run cat "$(remote_join "$name.tar.age.sha256")" | cmp -s - <(sed -n 1p "$shipped") \
+         && [ "$(sed -n 's/^size=//p' "$shipped")" = "$(remote_size "$name.tar.age")" ]; then
+        ALREADY_SHIPPED=1
+        return 0
+      fi
+      log "refused: the remote already holds ${present//$'\n'/ } and this host has no verified record or usable kept copy for $name; nothing was sent or overwritten. If it is a partial attempt whose kept copy is gone, it cannot be completed: remove that object first"
+      return 1
+    fi
+    rm -rf --one-file-system -- "$retry" || return 1
+    encrypt_set "$bk" "$stage" || return 1
+    sha256sum < "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" > "$stage/recipients.sha256" || return 1
+    mv -T -- "$stage" "$retry" || return 1
+  fi
+  # Verified when rclone check passes (hashes, or sizes where the backend has none) and the remote digest file says what ours says.
+  if ! { rclone_run copy --checksum --immutable --include "/$name.tar.age" "$retry" "$VASEY_BACKUP_REMOTE" \
+         && rclone_run copy --checksum --immutable --include "/$name.tar.age.sha256" "$retry" "$VASEY_BACKUP_REMOTE" \
+         && rclone_run check --one-way --include "$name.tar.age" --include "$name.tar.age.sha256" "$retry" "$VASEY_BACKUP_REMOTE" \
+         && rclone_run cat "$(remote_join "$name.tar.age.sha256")" | cmp -s - "$retry/$name.tar.age.sha256"; }; then
+    # Drop the copy only when the remote was listed and holds no ciphertext of this set; if it could not be listed (an outage, say)
+    # the ciphertext may have landed, so the copy stays for the retry (the cap bounds the disk it takes).
+    listed=$(remote_names "$name.tar.age" 2>/dev/null) || rc=$?
+    if [ "$rc" = 0 ] && [ -z "$listed" ]; then
+      rm -rf --one-file-system -- "$retry"
+      log "the remote holds no ciphertext of $name, so no copy is kept; a later \`ship\` encrypts the set again"
+    else
+      log "kept the encrypted copy of $name in $retry ($([ "$rc" = 0 ] && echo 'the remote holds its ciphertext' || echo 'the remote could not be listed')): a later \`ship\` of this set re-sends the same bytes; a remote object that differs is refused and never overwritten"
+    fi
+    return 1
+  fi
+  { cat -- "$retry/$name.tar.age.sha256" && echo "size=$(stat -c %s -- "$retry/$name.tar.age")"; } > "$shipped.new" \
+    && mv -T -- "$shipped.new" "$shipped" || log "WARNING: could not record $name as shipped"
+  rm -rf --one-file-system -- "$retry" || log "WARNING: could not remove $retry after a verified transfer"
+}
+
 ship_hardened() {
-  local bk=$1 name stage rc=0
+  local bk=$1 name stage retry kept n=0 rc=0
+  local -a others=()
   name=$(basename "$bk")
   [[ "$name" =~ $SET_NAME_RE ]] && [ -d "$bk" ] && [ ! -L "$bk" ] || die "not a backup set directory: $name"
   grep -qx 'result=RESTORE_VERIFIED' "$bk/RESTORE_CHECK" 2>/dev/null \
@@ -399,13 +500,44 @@ ship_hardened() {
     log "WARNING: no off-host destination (VASEY_BACKUP_DEST or VASEY_BACKUP_REMOTE); $name exists on this host only (NOT an off-host backup)"
     return 0
   fi
-  # A run killed mid-transfer leaves its private staging directory behind. Remove only stale ones (untouched for over a day, so never
-  # a transfer in progress: shipping runs once a day under the deploy lock), and only real directories of this exact name shape.
+  # One hardened ship at a time, whatever started it (nightly, a deploy or a manual `ship`): a second one refuses (or, from
+  # predeploy, waits up to SHIP_LOCK_WAIT seconds) before it removes anything, so a live staging directory or a kept retry copy is
+  # never deleted under a running transfer. Pruning (nightly, after the resume) runs outside this lock: it never touches staging
+  # directories or kept copies, and a manual ship of a set that pruning removes at that moment fails rather than ship anything else.
+  [ ! -L "$VASEY_BACKUP_DIR/.offhost.lock" ] || die "refusing a symlinked $VASEY_BACKUP_DIR/.offhost.lock"
+  exec 6>>"$VASEY_BACKUP_DIR/.offhost.lock" || die "cannot open the off-host shipping lock"
+  if [ "$SHIP_LOCK_WAIT" -gt 0 ]; then flock -w "$SHIP_LOCK_WAIT" 6; else flock -n 6; fi \
+    || die "another off-host ship is running (it holds $VASEY_BACKUP_DIR/.offhost.lock; waited ${SHIP_LOCK_WAIT}s); nothing was removed or shipped, retry when it has finished"
+  # A run killed mid-transfer leaves its private staging directory behind. Under the lock no other hardened ship is running, so
+  # one is a leftover; even so, remove only stale ones (untouched for over a day) and only real directories of this exact name shape.
   find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -name '.ship.??????' -mmin +1440 -exec rm -rf --one-file-system -- {} + 2>/dev/null || true
+  # A kept retry copy or shipped record is usable only while its set is here (shipping needs the set and its proof): drop those of
+  # pruned sets.
+  for retry in "$VASEY_BACKUP_DIR"/.offhost-retry.* "$VASEY_BACKUP_DIR"/.offhost-shipped.*; do
+    kept=${retry##*/.offhost-retry.}; kept=${kept##*/.offhost-shipped.}
+    if { [ -d "$retry" ] || [ -f "$retry" ]; } && [ ! -L "$retry" ] && [[ "$kept" =~ $SET_NAME_RE ]] \
+       && [ ! -e "$VASEY_BACKUP_DIR/$kept" ] && [ ! -L "$VASEY_BACKUP_DIR/$kept" ]; then
+      rm -rf --one-file-system -- "$retry"
+    fi
+  done
+  # Cap the kept copies at RETRY_COPIES_MAX in all: keep the newest sets' copies, drop older ones, never the set being shipped.
+  mapfile -t others < <(find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -name '.offhost-retry.20*' -printf '%f\n' | LC_ALL=C sort -r)
+  for retry in "${others[@]}"; do
+    kept=${retry#.offhost-retry.}
+    [[ "$kept" =~ $SET_NAME_RE ]] && [ "$kept" != "$name" ] || continue
+    n=$((n + 1))
+    if [ "$n" -ge "$RETRY_COPIES_MAX" ]; then
+      rm -rf --one-file-system -- "${VASEY_BACKUP_DIR:?}/$retry"
+      log "dropped the kept copy of $kept (at most $RETRY_COPIES_MAX are kept); if the remote holds a partial $kept.tar.age, remove it before shipping that set again"
+    fi
+  done
   stage=$(mktemp -d "$VASEY_BACKUP_DIR/.ship.XXXXXX") || die "cannot create the private shipping directory"
   ship_hardened_transfer "$bk" "$stage" || rc=$?
   rm -rf --one-file-system -- "$stage"
+  exec 6>&-
+  [ -z "$VASEY_BACKUP_REMOTE" ] || log "off-host retry copies on this host: $(retry_copies_summary)"
   [ "$rc" = 0 ] || die "off-host transfer of $name failed; the local set is intact"
+  if [ "$ALREADY_SHIPPED" = 1 ]; then log "$name is already shipped: this host recorded a verified transfer and the remote digest still matches; nothing was sent"; return 0; fi
   log "shipped $name ($([ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] && echo 'age-encrypted' || echo 'unencrypted by this script') via $([ -n "$VASEY_BACKUP_REMOTE" ] && echo rclone || echo rsync))"
 }
 
@@ -413,12 +545,10 @@ ship_hardened_transfer() {  # ship_hardened_transfer SET_DIR STAGE_DIR; returns 
   local bk=$1 stage=$2 name payload
   name=$(basename "$bk")
   if [ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ]; then
-    encrypt_set "$bk" "$stage" || return 1
     if [ -n "$VASEY_BACKUP_REMOTE" ]; then
-      rclone_run copyto --checksum --immutable "$stage/$name.tar.age" "$(remote_join "$name.tar.age")" || return 1
-      rclone_run copyto --checksum --immutable "$stage/$name.tar.age.sha256" "$(remote_join "$name.tar.age.sha256")" || return 1
-      rclone_run check --one-way --include "$name.tar.age" --include "$name.tar.age.sha256" "$stage" "$VASEY_BACKUP_REMOTE" || return 1
+      ship_encrypted_rclone "$bk" "$stage" || return 1
     else
+      encrypt_set "$bk" "$stage" || return 1
       [ -f "$VASEY_BACKUP_SSH_KEY" ] || { log "missing $VASEY_BACKUP_SSH_KEY for rsync to the backup destination"; return 1; }
       rsync -a --chmod=D700,F600 -e "ssh -i $VASEY_BACKUP_SSH_KEY -o BatchMode=yes -o StrictHostKeyChecking=yes" \
         -- "$stage/$name.tar.age" "$stage/$name.tar.age.sha256" "$VASEY_BACKUP_DEST/" || return 1
@@ -544,13 +674,15 @@ case "${1:-}" in
     install -d -m 0700 -o root -g root -- "$VASEY_BACKUP_DIR"
     snapshot
     restore_check "$(cat "$VASEY_BACKUP_DIR/.last")"
+    # A deploy runs this with the site quiesced: wait a bounded time for a manual hardened ship rather than fail the deploy at once.
+    SHIP_LOCK_WAIT=600
     ship "$(cat "$VASEY_BACKUP_DIR/.last")"
     ;;
   restore-check) restore_check "${2:?backup directory}" ;;
   ship) ship "${2:?backup directory}" ;;
   check-offhost)
     offhost_config_ok || die "off-host configuration refused"
-    log "off-host configuration ok (encryption: $([ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] && echo age || { [ -n "$VASEY_BACKUP_REMOTE" ] && echo 'none by this script, explicitly allowed' || echo none; }); transport: $([ -n "$VASEY_BACKUP_REMOTE" ] && echo rclone || { [ -n "$VASEY_BACKUP_DEST" ] && echo rsync || echo none; }); retention: ${VASEY_BACKUP_RETENTION:-flat})"
+    log "off-host configuration ok (encryption: $([ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] && echo age || { [ -n "$VASEY_BACKUP_REMOTE" ] && echo 'none by this script, explicitly allowed' || echo none; }); transport: $([ -n "$VASEY_BACKUP_REMOTE" ] && echo rclone || { [ -n "$VASEY_BACKUP_DEST" ] && echo rsync || echo none; }); retention: ${VASEY_BACKUP_RETENTION:-flat}; $(retry_copies_summary))"
     ;;
   *) die "usage: vasey-staging-backup nightly | predeploy | restore-check DIR | ship DIR | check-offhost" ;;
 esac
