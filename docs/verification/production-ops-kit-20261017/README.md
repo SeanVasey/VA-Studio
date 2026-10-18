@@ -30,7 +30,7 @@ Changed: `ops/staging/backup.sh` (opt-in additions only: a `backup.conf` loader 
 default-empty variables, `ship_hardened` and helpers placed after `restore_check` and before `case`, a branch at the top of
 `ship()` taken only when hardening is configured, `prune_local` taking a branch only for `VASEY_BACKUP_RETENTION=tiered`,
 `prune_remote` and `check-offhost`), `ops/staging/README.md` (a pointer paragraph), `CHANGELOG.md`.
-Every other file under `ops/staging/` was untouched by this batch (batch K1 below changed four of them). The slices the existing tests cut out of
+Every other file under `ops/staging/` was untouched by this batch (batches K1 and K2 below changed some of them). The slices the existing tests cut out of
 `backup.sh` (`mycnf_ok()` to `RC_WORK=""`, and `restore_check()` to its first `install -d`) are unchanged.
 
 ## How the production kit stays honest to staging
@@ -215,8 +215,92 @@ Nothing was pushed and no application file (`app/`, `routes/`, `bootstrap/`, `co
 
 - Tax V2 nginx locations and pool routing, once the Tax V2 routes have a reviewed runtime budget (finding 5).
 - The template-coverage side of the same drift problem (every `config/*.php` key present in the staging or test-commerce template, with a
-  framework-default allowlist) is batch K2.
+  framework-default allowlist) is batch K2, done there.
 - Nothing in K1 was run on a real host; the limits under "Not verifiable without a host" still apply.
 - Interruption record: the usage limit paused the lane and the container rebooted (reported around 00:36 UTC on 2026-10-18) after the K1
   MySQL proof had finished and its server had shut down cleanly (log time 19:47 UTC on 2026-10-17). No run in this packet was cut off by it;
   the uncommitted K1 files survived and were re-verified before the commit (below).
+
+---
+
+# Batch K2: the complete staging capability profile
+
+Brief: put ten capability flags into both staging templates with their correct defaults, make the validator consistent with a staging
+profile, and keep staging refusing Paid252, Tax255, production identity and production free grants. This touches payment-adjacent
+configuration, so this section is written for an independent reviewer: what changed, why each value, and how to see it.
+
+## What changed
+
+| File | Change |
+| --- | --- |
+| `ops/staging/env.staging.example` | The ten flags as explicit `=false` lines with a one-line reason each (the five that were commented are now live lines; two `CONTACT_*` lines sit beside `CONTACT_INQUIRIES_ENABLED`). Also `DISCOVERY_SITEMAP_ENABLED=false`, `VASEY_LISTENING_V2_PROMOTION_ENABLED=false` and the review reference commented, so no config key is left undecided |
+| `ops/staging/test-commerce/env.test-commerce.example` | Section 6 now carries the ten flags as explicit `false` (the old section said "do not add them"); section 7 keeps the genuinely absent keys. No flag value was changed to true; the overlay still enables exactly the ten guest-purchase `_ENABLED` flags it enabled before |
+| `scripts/ops/validate-test-commerce-profile.php` | 36 checks became 38: `profile.capability_flags_explicit` (each of the ten present and exactly `false` or `(false)`) and `boundary.production_lanes_closed`. The out-of-profile list gained the other capability flags, `discovery-sitemap.enabled` and `customer-listening.v2_promotion_enabled`. Nothing was relaxed |
+| `tests/Unit/TestCommerceProfileValidatorTest.php` | 47 to 63 cases: each flag absent and enabled (20 assertions of which checks fail, exactly), accepted and refused spellings, an older profile told exactly what to add, the lanes check, three more broken profiles |
+| `tests/ops/test_staging_capability_profile.py` (new, 15 tests) | Template coverage of every `config/` env key, the ten flags and their defaults, the admission rules read from the policy source, the overlay's exact enabled set, no uncommented production key, test-mode Stripe keys only |
+| `docs/ops/staging-test-purchase.md` | Check count 36 to 38; the copy step explains section 6 |
+| `evidence/k2-admission-matrix.{php,txt}` | The measurement below |
+
+No `app/`, `config/`, `routes/`, census, timing or workflow file changed. The SQLite timing file's case count for the validator test (47) is
+now stale; `scripts/ci/phpunit-shards.py` scales a file that gained cases, so it was left alone.
+
+## The ten flags: default, admission and the value chosen
+
+Each default is `false` in `config/` (the test reads `env('KEY', false)` from the file). Admission is read from the policy class and measured
+in `evidence/k2-admission-matrix.txt`. "Staging" below means `TestEnvironment::admitsTestCommerce()` (`local`, `testing` or `staging`).
+
+| Flag | Admitted on staging when true? | Value in both templates | Reason |
+| --- | --- | --- | --- |
+| `VASEY_TEST_SERVICE_PROJECTS_ENABLED` | yes | `false` | not used by the guest purchase; synthetic preparation only |
+| `VASEY_TEST_FREE_GRANTS_ENABLED` | yes | `false` | renders a PDF inside the web request; the runbook's FPM check comes first |
+| `VASEY_TEST_CUSTOMER_CONSENT_ENABLED` | yes | `false` | no owner-reviewed consent copy exists |
+| `VASEY_TEST_UNPAID_RELEASE_ENABLED` | yes, with its exact JSON policy | `false` | not part of this profile; its policy key stays absent |
+| `VASEY_TEST_REFUND_RESOLUTION_ENABLED` | yes, with its exact JSON policy | `false` | same |
+| `VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED` | yes, with accounts, `private_capture` and the policy version | `false` | not part of this profile |
+| `CONTACT_TEST_ORDER_INQUIRIES_ENABLED` | yes, with the public inquiry setup | `false` | no owner-approved notice or retention reference |
+| `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED` | **not environment-gated**; also needs a bound `InquiryAlertTransport`, none ships | `false` | inert today; never on without a reviewed transport |
+| `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` | **not environment-gated**; needs a bound `FreeGrantIdentity`, none is bound | `false` | production free-grant path: with an adapter bound it admits on production and staging alike (matrix 2). The explicit `false` is the only guard |
+| `VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED` | **no** (`local` and `testing` only) | `false` | staging refuses it even when true; stated so nobody reads `true` as working |
+
+Beyond the ten: `DISCOVERY_SITEMAP_ENABLED` (the build and store chain is not environment-gated; the public index serves it in production only)
+and `VASEY_LISTENING_V2_PROMOTION_ENABLED` (one-way data promotion) are stated `false` in the base template, and the reference is commented
+because a blank assignment is not an unset key. They are outside the brief's ten; they are there so the coverage guard has no undecided key.
+
+## What stays refused
+
+- **Paid252** (`config/paid-grants.php`), **Tax255** (`config/paid-tax-grants.php`, `config/production-tax-checkout.php`), **production customer
+  identity** and **production free grants** ship as literals in `config/` with no `env()` call (asserted for the five files). No profile line
+  reaches them. `boundary.production_lanes_closed` fails if a code change ever sets an `enabled` or `mounted` flag true in any `production*`, `paid-grants`,
+  `paid-tax-grants` or `member-grants` file (16 files today), or renames one of the five named files without updating the validator. Mutating each
+  flag and the rename in turn made it fail, naming the key (`evidence/k2-admission-matrix.txt`).
+- Live payments: unchanged. `STRIPE_MODE=test` and the `sk_test_` only rules are untouched, `profile.no_live_keys` still runs, and the new
+  test asserts neither template holds a live-key shape in any assignment. The overlay's `_ENABLED=true` set is pinned by a test to the ten flags the
+  guest purchase already used.
+
+## Verification
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Validator on the overlay | `php scripts/ops/validate-test-commerce-profile.php --template ops/staging/test-commerce/env.test-commerce.example` | `RESULT: PASS (0 of 38 checks failed ...)`, including the two new checks |
+| Validator tests | `php vendor/bin/phpunit tests/Unit/TestCommerceProfileValidatorTest.php` | 63 tests, 578 assertions, pass (47 and 454 before) |
+| Journey test on the edited overlay | `php vendor/bin/phpunit tests/Feature/StagingTestCommerceProfileJourneyTest.php` | 9 tests pass |
+| Profile guards | `python3 -m unittest tests.ops.test_staging_capability_profile` | 15 tests pass |
+| Neighbours | `StagingRuntimeValidatorTest` (17), `ProductionEnvironmentTemplateTest` (6), `test-private-server-preflight.py` (20) | pass |
+| All ops tests | `python3 -m unittest discover -s tests/ops -p 'test_*.py'` | 273 tests pass (258 + 15) |
+| Style | `vendor/bin/pint --test` on the two PHP files | passed |
+| Sensitivity, templates and sources | a flag line commented, a flag set true, an undecided config key added, a default flipped, an admission rule changed (the fixture admitted on staging, an environment gate added to the operative arm), a flag dropped from the validator, an env switch added to a lane file | each failed the capability guards; files restored and compared |
+| Sensitivity, validator | explicit check made to accept any value; boundary list reduced to the old one | 11 and 3 PHPUnit failures. The lanes check cannot be reached through the profile file, so it is shown by the config mutations above |
+| Admission matrix | `php evidence/k2-admission-matrix.php ENV FLAG [alone\|complete\|bound]`, 3 environments by 10 flags | `evidence/k2-admission-matrix.txt` |
+
+## Open after K2
+
+- **The deploy gate does not check these flags.** `ops/staging/validate-runtime.php` (run by `forge-deploy.sh` before and after the build) still holds
+  only the production-checkout flags. Only `validate-test-commerce-profile.php` checks the ten, and it is run by hand. A Forge `.env` with
+  `VASEY_OPERATIVE_FREE_GRANTS_ENABLED=true` would deploy. Mirroring the ten into the deploy validator is a small reviewed change (the production
+  validator copies that file's holds); it was not part of the brief.
+- A `.env` copied from the overlay before this change lacks the ten lines and now fails `profile.capability_flags_explicit`, naming them.
+  That is intended; the doc says so.
+- The two ungated flags (`VASEY_OPERATIVE_FREE_GRANTS_ENABLED`, `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED`) are a code-level question for the
+  application owner: an environment gate in the policy would make staging refuse them structurally. Not changed here (no application edits).
+- Nothing in K2 ran against a real host or a real Stripe account; no `--probe` was run.
+
