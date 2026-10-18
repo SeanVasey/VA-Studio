@@ -1,0 +1,12 @@
+no change to composer.json/resources/contracts/app/tests/routes/config/database: exit 0
+composer.lock
+package-lock.json
+package.json
+-    "@inertiajs/react": "^3.8.0",
++    "@inertiajs/react": "^3.9.1",
+-    "@types/node": "^24.10.0",
++    "@types/node": "^24.19.2",
+-    "jsdom": "30.0.1",
++    "jsdom": "30.1.2",
+-    "vite": "^8.3.3",
++    "vite": "^8.3.4",
