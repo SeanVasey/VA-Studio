@@ -1,0 +1,17 @@
+Loading composer repositories with package information
+Updating dependencies
+Lock file operations: 2 installs, 11 updates, 0 removals
+  - Locking composer/class-map-generator (1.8.0)
+  - Locking composer/pcre (3.4.0)
+  - Upgrading filament/actions (v5.8.4 => v5.10.2)
+  - Upgrading filament/filament (v5.8.4 => v5.10.2)
+  - Upgrading filament/forms (v5.8.4 => v5.10.2)
+  - Upgrading filament/infolists (v5.8.4 => v5.10.2)
+  - Upgrading filament/notifications (v5.8.4 => v5.10.2)
+  - Upgrading filament/query-builder (v5.8.4 => v5.10.2)
+  - Upgrading filament/schemas (v5.8.4 => v5.10.2)
+  - Upgrading filament/support (v5.8.4 => v5.10.2)
+  - Upgrading filament/tables (v5.8.4 => v5.10.2)
+  - Upgrading filament/widgets (v5.8.4 => v5.10.2)
+  - Upgrading livewire/livewire (v4.4.6 => v4.4.7)
+No security vulnerability advisories found.

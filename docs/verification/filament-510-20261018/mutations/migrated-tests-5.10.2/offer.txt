@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/m3/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:04.463, Memory: 93.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\OfferDraftAuthoringActionTest::test_uncertain_rollback_keeps_inputs_without_disclosing_exception_or_claiming_success
+Failed asserting that '[{"id":"a303185f-c8f5-4d6c-a787-21f6b5d4a184","actions":[],"body":"Keep a copy of your entered changes, then close and reopen to inspect the saved draft before trying again.Synthetic private offer failure detail","color":null,"duration":"persistent","icon":"heroicon-o-x-circle","iconColor":"danger","iconSize":null,"status":"danger","title":"The offer save could not be confirmed","view":null,"viewData":[]}]' [ASCII](length: 409) does not contain "Synthetic private offer failure detail" [ASCII](length: 38).
+
+/home/user/wt/m3/tests/Support/FilamentNotifications.php:88
+/home/user/wt/m3/tests/Feature/OfferDraftAuthoringActionTest.php:306
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 9, Failures: 1.
