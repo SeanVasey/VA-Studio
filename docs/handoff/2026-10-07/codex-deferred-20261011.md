@@ -439,4 +439,3 @@ Owner decision, not a finding: Sean to confirm the reserved-address rule (only `
 - P3-3: assert the cause of the receipt refusal in `MemberGrantDefinitionsTest::test_remaining_config_resolution_hook_refuses_committed_authoring_receipt`.
 
 Sean's 2026-10-18 decisions close two open questions: the K3 reserved-address rule is confirmed, and the production capability hold is approved (lane O3).
-
