@@ -47,6 +47,8 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
         $this->assertFalse((require base_path('config/paid-tax-grants.php'))['http_mounted']);
         $this->assertFalse((require base_path('config/production-tax-checkout.php'))['http_mounted']);
         $this->assertFalse(Route::has('paid-tax-grants.finalize'), $case);
+        $this->assertFalse(Route::has('paid-tax-grants.index'), $case);
+        $this->assertFalse(Route::has('paid-tax-grants.page'), $case);
         $this->assertFalse(Route::has('production.tax-checkout.previews'), $case);
         $this->assertFalse($this->app->bound(TaxCheckoutTransport::class));
         $this->app->afterResolving(PaidTaxPolicy::class, fn () => $this->fail('Off path resolved policy.'));
@@ -60,6 +62,9 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
             $response->assertNotFound()->assertHeader('Content-Type', 'application/json')->assertDontSee('PRIVATE-BODY');
             $this->privateHeaders($response);
         }
+        $this->privateHeaders($this->get('/paid-tax-grants/index', ['Accept' => 'text/html'])->assertNotFound()->assertHeader('Content-Type', 'application/json'));
+        // The shell route is simply absent; its path is outside the private prefix, so ordinary 404 handling applies.
+        $this->get('/paid-tax-licenses')->assertNotFound();
         $this->assertFalse($this->app->resolved(ProductionCustomerSessions::class));
         $this->assertFalse($this->app->resolved(PaidTaxPolicy::class));
         $this->assertSame([], $queries, 'The refused request performed no query.');
@@ -79,8 +84,27 @@ final class PaidTaxRootHttpBoundaryTest extends TestCase
         foreach (['/paid-tax-grants/orders/11111111-1111-4111-8111-111111111111/finalize', '/production/tax-checkout/previews'] as $path) {
             $this->call('POST', $path, [], [], [], ['CONTENT_TYPE' => 'application/json'], '{}')->assertNotFound();
         }
+        $this->assertTrue(Route::has('paid-tax-grants.index'));
+        $this->assertTrue(Route::has('paid-tax-grants.page'));
+        foreach (['/paid-tax-grants/index', '/paid-tax-licenses'] as $path) {
+            // The page is outside the root seam, so its controller repeats the literal runtime mount refusal.
+            $this->privateHeaders($this->get($path, ['Accept' => 'text/html'])->assertNotFound()->assertHeader('Content-Type', 'application/json')
+                ->assertJsonPath('code', 'PAID_TAX_UNAVAILABLE'));
+        }
+        $this->assertFalse($this->app->resolved(PaidTaxPolicy::class), $case);
         $this->assertFalse($this->app->resolved(ProductionCustomerSessions::class), $case);
         $this->assertSame([], $queries, 'The refused request performed no query.');
+    }
+
+    public function test_mounted_page_shell_and_index_still_refuse_while_the_tax_policy_is_off(): void
+    {
+        $this->assertFalse(config('paid-tax-grants.rehearsal_enabled'));
+        foreach (['/paid-tax-licenses', '/paid-tax-grants/index'] as $path) {
+            $this->privateHeaders($this->get($path, ['Accept' => 'text/html'])->assertNotFound()->assertHeader('Content-Type', 'application/json')
+                ->assertJsonPath('code', 'PAID_TAX_UNAVAILABLE'));
+        }
+        $this->get('/paid-tax-licenses?token=PRIVATE-TOKEN')->assertStatus(422)->assertDontSee('PRIVATE-TOKEN');
+        $this->assertFalse($this->app->resolved(ProductionCustomerSessions::class));
     }
 
     public function test_mount_alone_registers_only_unbound_transport_and_keeps_commerce_policies_off(): void

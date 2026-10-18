@@ -8,6 +8,7 @@
 #   vasey-staging-backup predeploy          snapshot + restore-check on an already-quiesced host (deploy, via ctl)
 #   vasey-staging-backup restore-check DIR  re-prove an existing backup directory
 #   vasey-staging-backup ship DIR           copy one backup directory to VASEY_BACKUP_DEST
+#   vasey-staging-backup check-offhost      validate the opt-in age/rclone/retention settings (no network, ships nothing)
 #
 # The dump, archive and verification follow docs/ops/backup-restore-proof.md ("Equivalent MySQL 8.4
 # procedure") step for step. The restore target is a disposable mysqld started here on a private socket
@@ -16,6 +17,8 @@
 #
 # Configuration: /etc/vasey-staging/staging.conf (root-owned, no secrets) and the backup-only MySQL account
 # in /etc/vasey-staging/backup.my.cnf (0600). Nothing here prints a credential, row or private path content.
+# Optional hardening (age encryption, an rclone remote, tiered retention) is off unless /etc/vasey-staging/backup.conf
+# configures it: docs/ops/backup-offhost-hardening.md. The default behaviour is unchanged.
 set -euo pipefail
 umask 077
 export LC_ALL=C PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
@@ -29,10 +32,26 @@ log() { echo "vasey-staging-backup: $(date -u +%FT%TZ) $*"; }
 # shellcheck source=/dev/null
 . "$CONF"
 : "${VASEY_APP_USER:?}" "${VASEY_APP_GROUP:?}" "${VASEY_ROOT:?}" "${VASEY_DB_NAME:?}"
+# Optional, default-off hardening (docs/ops/backup-offhost-hardening.md): age encryption, an rclone remote and tiered
+# retention are configured in this separate root-owned file, because provision.sh rewrites staging.conf on every run and
+# would silently drop them. No file means the behaviour this script always had.
+: "${VASEY_BACKUP_CONF:=/etc/vasey-staging/backup.conf}"
+if [ -e "$VASEY_BACKUP_CONF" ] || [ -L "$VASEY_BACKUP_CONF" ]; then
+  [ -f "$VASEY_BACKUP_CONF" ] && [ ! -L "$VASEY_BACKUP_CONF" ] && [ "$(stat -c %u "$VASEY_BACKUP_CONF")" = 0 ] \
+    && case "$(stat -c %a "$VASEY_BACKUP_CONF")" in 600|640|644|400|440|444) true ;; *) false ;; esac \
+    || die "untrusted $VASEY_BACKUP_CONF (must be a root-owned regular file, not group/world writable)"
+  # shellcheck source=/dev/null
+  . "$VASEY_BACKUP_CONF"
+fi
 : "${VASEY_BACKUP_DIR:=$VASEY_ROOT/backups}" "${VASEY_BACKUP_KEEP:=7}" "${VASEY_BACKUP_MYCNF:=/etc/vasey-staging/backup.my.cnf}"
 : "${VASEY_RESTORE_CHECK_DIR:=/var/lib/mysql-restore-check}" "${VASEY_RESTORE_STRICT_MODES:=1}"
 : "${VASEY_BACKUP_DEST:=}" "${VASEY_BACKUP_SSH_KEY:=/root/.ssh/vasey_staging_backup}"
 : "${VASEY_MYSQLD:=/usr/sbin/mysqld}"
+# Opt-in off-host hardening. Every variable below is unset or off by default, and then changes nothing.
+: "${VASEY_BACKUP_AGE_RECIPIENTS_FILE:=}" "${VASEY_BACKUP_AGE_BIN:=/usr/bin/age}" "${VASEY_BACKUP_REQUIRE_ENCRYPTION:=0}"
+: "${VASEY_BACKUP_REMOTE:=}" "${VASEY_BACKUP_RCLONE_BIN:=/usr/bin/rclone}" "${VASEY_BACKUP_RCLONE_CONFIG:=/root/.config/rclone/rclone.conf}"
+: "${VASEY_BACKUP_RETENTION:=}" "${VASEY_BACKUP_KEEP_DAILY:=7}" "${VASEY_BACKUP_KEEP_WEEKLY:=4}" "${VASEY_BACKUP_KEEP_MONTHLY:=6}"
+: "${VASEY_BACKUP_REMOTE_PRUNE:=0}" "${VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE:=0}"
 [ "$(id -u "$VASEY_APP_USER")" -gt 0 ] || die "application account must be nonroot"
 
 PRIVATE=$VASEY_ROOT/private
@@ -268,8 +287,155 @@ restore_check() {
   log "restore check passed for $(basename "$bk"): $tables tables, $triggers triggers"
 }
 
+# ---- opt-in off-host hardening (docs/ops/backup-offhost-hardening.md) ----
+# Everything between here and `ship()` is inert unless VASEY_BACKUP_CONF (or staging.conf) sets one of:
+#   VASEY_BACKUP_AGE_RECIPIENTS_FILE   age PUBLIC recipients; the set is tarred and encrypted before it leaves the host
+#   VASEY_BACKUP_REQUIRE_ENCRYPTION=1  refuse to ship at all unless recipients are configured
+#   VASEY_BACKUP_REMOTE                a named rclone remote (remote:path), an alternative to VASEY_BACKUP_DEST; needs age recipients,
+#                                      or VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1 (the set would otherwise leave this host in plaintext)
+#   VASEY_BACKUP_RETENTION=tiered      keep newest VASEY_BACKUP_KEEP sets plus daily/weekly/monthly representatives
+#   VASEY_BACKUP_REMOTE_PRUNE=1        apply the same policy on the rclone remote (nightly only; never for rsync)
+# No private key is ever read or needed here: decryption happens elsewhere, with a key this host never holds.
+SET_NAME_RE='^20[0-9]{6}T[0-9]{6}Z-([0-9a-f]{12}|none)$'
+
+hardening_requested() {
+  [ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] || [ -n "$VASEY_BACKUP_REMOTE" ] || [ "$VASEY_BACKUP_REQUIRE_ENCRYPTION" = 1 ]
+}
+
+# Validates the opt-in configuration without any network access. Prints the reason (never a value) and fails closed.
+offhost_config_ok() {
+  local f line recipients=0
+  if [ -n "$VASEY_BACKUP_DEST" ] && [ -n "$VASEY_BACKUP_REMOTE" ]; then
+    log "refused: VASEY_BACKUP_DEST (rsync) and VASEY_BACKUP_REMOTE (rclone) are alternatives; set one"; return 1
+  fi
+  case "$VASEY_BACKUP_REQUIRE_ENCRYPTION" in 0|1) ;; *) log "refused: VASEY_BACKUP_REQUIRE_ENCRYPTION must be 0 or 1"; return 1 ;; esac
+  case "$VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE" in 0|1) ;; *) log "refused: VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE must be 0 or 1"; return 1 ;; esac
+  if [ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ]; then
+    f=$VASEY_BACKUP_AGE_RECIPIENTS_FILE
+    [ -x "$VASEY_BACKUP_AGE_BIN" ] || { log "refused: age is not installed at the configured path (apt-get install age)"; return 1; }
+    [ -f "$f" ] && [ ! -L "$f" ] && [ "$(stat -c %u -- "$f")" = 0 ] && [ "$(( 8#$(stat -c %a -- "$f") & 8#022 ))" = 0 ] \
+      && [ "$(stat -c %s -- "$f")" -le 65536 ] \
+      || { log "refused: the age recipients file must be a root-owned regular file, not group/world writable"; return 1; }
+    while IFS= read -r line || [ -n "$line" ]; do
+      line=${line%$'\r'}
+      case "$line" in
+        ''|'#'*) continue ;;
+        AGE-SECRET-KEY-*) log "refused: the recipients file contains private key material; the host may hold public recipients only"; return 1 ;;
+      esac
+      [[ "$line" =~ ^age1[02-9ac-hj-np-z]{58}$ ]] || { log "refused: a recipients line is not a native age public key (age1...)"; return 1; }
+      recipients=$((recipients + 1))
+    done < "$f"
+    [ "$recipients" -ge 1 ] || { log "refused: the recipients file names no recipient"; return 1; }
+  elif [ "$VASEY_BACKUP_REQUIRE_ENCRYPTION" = 1 ]; then
+    log "refused: VASEY_BACKUP_REQUIRE_ENCRYPTION=1 but VASEY_BACKUP_AGE_RECIPIENTS_FILE is not set"; return 1
+  fi
+  if [ -n "$VASEY_BACKUP_REMOTE" ]; then
+    # A named remote only: a connection string (:backend,key=value:) could carry credentials onto a command line.
+    [[ "$VASEY_BACKUP_REMOTE" =~ ^[A-Za-z0-9][A-Za-z0-9_.-]*:[A-Za-z0-9_./@=-]*$ ]] \
+      || { log "refused: VASEY_BACKUP_REMOTE must be a named rclone remote such as vasey-backup:bucket/path"; return 1; }
+    [ -x "$VASEY_BACKUP_RCLONE_BIN" ] || { log "refused: rclone is not installed at the configured path"; return 1; }
+    [ -f "$VASEY_BACKUP_RCLONE_CONFIG" ] && [ ! -L "$VASEY_BACKUP_RCLONE_CONFIG" ] \
+      && [ "$(stat -c '%u %a' -- "$VASEY_BACKUP_RCLONE_CONFIG")" = '0 600' ] \
+      || { log "refused: the rclone config must be a root-owned 0600 regular file (it holds the remote's credentials)"; return 1; }
+    # The set holds masters, contracts, customer data and env.backup (APP_KEY). Without age recipients an rclone ship would send
+    # all of it as stored, so a remote without recipients is refused unless the operator states, in backup.conf, that the remote
+    # itself encrypts (an rclone crypt remote, or a destination that encrypts at rest and that they accept as the only protection).
+    if [ -z "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] && [ "$VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE" != 1 ]; then
+      log "refused: VASEY_BACKUP_REMOTE is set without VASEY_BACKUP_AGE_RECIPIENTS_FILE, so the whole set (masters, contracts, customer data, env.backup with APP_KEY) would leave this host unencrypted; set the recipients, or set VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1 only for an rclone crypt remote or a destination you accept as the sole protection"
+      return 1
+    fi
+  fi
+  case "$VASEY_BACKUP_RETENTION" in
+    '') ;;
+    tiered)
+      [[ "$VASEY_BACKUP_KEEP" =~ ^[0-9]{1,3}$ ]] && [ "$VASEY_BACKUP_KEEP" -ge 1 ] \
+        && [[ "$VASEY_BACKUP_KEEP_DAILY" =~ ^[0-9]{1,3}$ ]] && [[ "$VASEY_BACKUP_KEEP_WEEKLY" =~ ^[0-9]{1,3}$ ]] \
+        && [[ "$VASEY_BACKUP_KEEP_MONTHLY" =~ ^[0-9]{1,3}$ ]] \
+        || { log "refused: tiered retention counts must be whole numbers (VASEY_BACKUP_KEEP at least 1)"; return 1; } ;;
+    *) log "refused: VASEY_BACKUP_RETENTION must be empty or tiered"; return 1 ;;
+  esac
+  case "$VASEY_BACKUP_REMOTE_PRUNE" in
+    0) ;;
+    1) { [ -n "$VASEY_BACKUP_REMOTE" ] && [ "$VASEY_BACKUP_RETENTION" = tiered ]; } \
+         || { log "refused: VASEY_BACKUP_REMOTE_PRUNE=1 needs VASEY_BACKUP_REMOTE and VASEY_BACKUP_RETENTION=tiered (rsync destinations are never pruned from this host)"; return 1; } ;;
+    *) log "refused: VASEY_BACKUP_REMOTE_PRUNE must be 0 or 1"; return 1 ;;
+  esac
+}
+
+rclone_run() { "$VASEY_BACKUP_RCLONE_BIN" --config "$VASEY_BACKUP_RCLONE_CONFIG" "$@"; }
+
+remote_join() {
+  case "$VASEY_BACKUP_REMOTE" in
+    *:|*/) printf '%s%s' "$VASEY_BACKUP_REMOTE" "$1" ;;
+    *) printf '%s/%s' "$VASEY_BACKUP_REMOTE" "$1" ;;
+  esac
+}
+
+# Tars one verified set and encrypts it to every recipient. The plaintext never leaves the host and no key is needed here.
+encrypt_set() {  # encrypt_set SET_DIR STAGE_DIR -> STAGE_DIR/<set>.tar.age and its .sha256
+  local bk=$1 stage=$2 name need avail
+  name=$(basename "$bk")
+  need=$(du -sb -- "$bk" | cut -f1)
+  avail=$(df --output=avail -B1 -- "$stage" | tail -n 1 | tr -d ' ')
+  [[ "$need" =~ ^[0-9]+$ && "$avail" =~ ^[0-9]+$ ]] && [ "$avail" -gt $((need + need / 20 + 1048576)) ] \
+    || { log "refused: not enough free space in the backup directory for the encrypted copy (needs about the size of the set)"; return 1; }
+  if ! tar --create --file=- --directory="$(dirname "$bk")" -- "$name" \
+       | "$VASEY_BACKUP_AGE_BIN" --encrypt -R "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" -o "$stage/$name.tar.age"; then
+    log "age encryption of $name failed"; return 1
+  fi
+  [ -s "$stage/$name.tar.age" ] && [ "$(head -c 21 -- "$stage/$name.tar.age")" = 'age-encryption.org/v1' ] \
+    || { log "the encrypted file is empty or not an age file"; return 1; }
+  (cd "$stage" && sha256sum -- "$name.tar.age" > "$name.tar.age.sha256") || return 1
+}
+
+ship_hardened() {
+  local bk=$1 name stage rc=0
+  name=$(basename "$bk")
+  [[ "$name" =~ $SET_NAME_RE ]] && [ -d "$bk" ] && [ ! -L "$bk" ] || die "not a backup set directory: $name"
+  grep -qx 'result=RESTORE_VERIFIED' "$bk/RESTORE_CHECK" 2>/dev/null \
+    || die "$name has no verified restore proof; only a proven set is shipped off-host (run restore-check first)"
+  offhost_config_ok || die "off-host configuration refused; nothing was shipped"
+  if [ -z "$VASEY_BACKUP_DEST" ] && [ -z "$VASEY_BACKUP_REMOTE" ]; then
+    log "WARNING: no off-host destination (VASEY_BACKUP_DEST or VASEY_BACKUP_REMOTE); $name exists on this host only (NOT an off-host backup)"
+    return 0
+  fi
+  # A run killed mid-transfer leaves its private staging directory behind. Remove only stale ones (untouched for over a day, so never
+  # a transfer in progress: shipping runs once a day under the deploy lock), and only real directories of this exact name shape.
+  find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -name '.ship.??????' -mmin +1440 -exec rm -rf --one-file-system -- {} + 2>/dev/null || true
+  stage=$(mktemp -d "$VASEY_BACKUP_DIR/.ship.XXXXXX") || die "cannot create the private shipping directory"
+  ship_hardened_transfer "$bk" "$stage" || rc=$?
+  rm -rf --one-file-system -- "$stage"
+  [ "$rc" = 0 ] || die "off-host transfer of $name failed; the local set is intact"
+  log "shipped $name ($([ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] && echo 'age-encrypted' || echo 'unencrypted by this script') via $([ -n "$VASEY_BACKUP_REMOTE" ] && echo rclone || echo rsync))"
+}
+
+ship_hardened_transfer() {  # ship_hardened_transfer SET_DIR STAGE_DIR; returns nonzero without exiting so the caller cleans up
+  local bk=$1 stage=$2 name payload
+  name=$(basename "$bk")
+  if [ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ]; then
+    encrypt_set "$bk" "$stage" || return 1
+    if [ -n "$VASEY_BACKUP_REMOTE" ]; then
+      rclone_run copyto --checksum --immutable "$stage/$name.tar.age" "$(remote_join "$name.tar.age")" || return 1
+      rclone_run copyto --checksum --immutable "$stage/$name.tar.age.sha256" "$(remote_join "$name.tar.age.sha256")" || return 1
+      rclone_run check --one-way --include "$name.tar.age" --include "$name.tar.age.sha256" "$stage" "$VASEY_BACKUP_REMOTE" || return 1
+    else
+      [ -f "$VASEY_BACKUP_SSH_KEY" ] || { log "missing $VASEY_BACKUP_SSH_KEY for rsync to the backup destination"; return 1; }
+      rsync -a --chmod=D700,F600 -e "ssh -i $VASEY_BACKUP_SSH_KEY -o BatchMode=yes -o StrictHostKeyChecking=yes" \
+        -- "$stage/$name.tar.age" "$stage/$name.tar.age.sha256" "$VASEY_BACKUP_DEST/" || return 1
+    fi
+  else
+    # No recipients: only reachable with an rclone remote (the rsync-only default path never gets here). The operator may
+    # use an rclone crypt remote; this script does not know, so it says so in the log.
+    log "WARNING: VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1 and no age recipients: $name is sent as stored; the rclone remote or the destination is the only encryption"
+    payload=$(remote_join "$name")
+    rclone_run copy --checksum --immutable "$bk" "$payload" || return 1
+    rclone_run check --one-way "$bk" "$payload" || return 1
+  fi
+}
+
 ship() {
   local bk=${1:?backup directory}
+  if hardening_requested; then ship_hardened "$bk"; return; fi
   if [ -z "$VASEY_BACKUP_DEST" ]; then
     log "WARNING: VASEY_BACKUP_DEST is unset; $(basename "$bk") exists on this host only (NOT an off-host backup)"
     return 0
@@ -280,7 +446,79 @@ ship() {
   log "shipped $(basename "$bk")"
 }
 
+# Tiered retention planner. stdin: set names (any order, anything malformed is ignored and so never pruned).
+# stdout: the names to prune. Keeps the union of the newest KEEP sets, the newest set of each of the last DAILY
+# days / WEEKLY ISO weeks / MONTHLY months, and PROTECT (the newest set that carries a restore proof).
+# It can only retain more than the flat `keep newest N` rule does, never less.
+retention_plan() {  # retention_plan KEEP DAILY WEEKLY MONTHLY [PROTECT]
+  local keep=$1 daily=$2 weekly=$3 monthly=$4 protect=${5:-} name day week month n=0 d=0 w=0 m=0
+  local -A kept=() seen_day=() seen_week=() seen_month=()
+  local -a names=()
+  mapfile -t names < <(LC_ALL=C sort -r)
+  for name in "${names[@]}"; do
+    [[ "$name" =~ $SET_NAME_RE ]] || continue
+    n=$((n + 1))
+    [ "$n" -le "$keep" ] && kept[$name]=1
+    day=${name:0:8}
+    if [ -z "${seen_day[$day]:-}" ]; then
+      seen_day[$day]=1; d=$((d + 1)); [ "$d" -le "$daily" ] && kept[$name]=1
+    fi
+    week=$(date -u -d "${name:0:4}-${name:4:2}-${name:6:2}" +%G-%V 2>/dev/null) || continue
+    if [ -z "${seen_week[$week]:-}" ]; then
+      seen_week[$week]=1; w=$((w + 1)); [ "$w" -le "$weekly" ] && kept[$name]=1
+    fi
+    month=${name:0:6}
+    if [ -z "${seen_month[$month]:-}" ]; then
+      seen_month[$month]=1; m=$((m + 1)); [ "$m" -le "$monthly" ] && kept[$name]=1
+    fi
+  done
+  [ -z "$protect" ] || kept[$protect]=1
+  for name in "${names[@]}"; do
+    [[ "$name" =~ $SET_NAME_RE ]] || continue
+    [ -n "${kept[$name]:-}" ] || printf '%s\n' "$name"
+  done
+}
+
+prune_local_tiered() {
+  offhost_config_ok || die "retention configuration refused; nothing was pruned"
+  local protect='' d
+  while IFS= read -r d; do
+    if grep -qx 'result=RESTORE_VERIFIED' "$VASEY_BACKUP_DIR/$d/RESTORE_CHECK" 2>/dev/null; then protect=$d; break; fi
+  done < <(find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -name '20*Z-*' ! -name '*.FAILED' -printf '%f\n' | LC_ALL=C sort -r)
+  find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -name '20*Z-*' ! -name '*.FAILED' -printf '%f\n' \
+    | retention_plan "$VASEY_BACKUP_KEEP" "$VASEY_BACKUP_KEEP_DAILY" "$VASEY_BACKUP_KEEP_WEEKLY" "$VASEY_BACKUP_KEEP_MONTHLY" "$protect" \
+    | while IFS= read -r d; do rm -rf --one-file-system -- "${VASEY_BACKUP_DIR:?}/$d"; done
+}
+
+# rclone remotes only, and only when asked (VASEY_BACKUP_REMOTE_PRUNE=1). A host that can delete its own off-host
+# backups can lose them to whoever compromises it: prefer retention enforced at the destination (lifecycle rules or
+# append-only credentials) and leave this off. rsync-over-SSH destinations are never pruned from here.
+prune_remote() {
+  [ "$VASEY_BACKUP_REMOTE_PRUNE" = 1 ] || return 0
+  offhost_config_ok || return 1
+  local listing line entry name count=0
+  local -a doomed=()
+  listing=$(rclone_run lsf "$VASEY_BACKUP_REMOTE") || { log "WARNING: could not list the remote; nothing pruned"; return 1; }
+  mapfile -t doomed < <(printf '%s\n' "$listing" | sed -e 's#/$##' -e 's#\.tar\.age\.sha256$##' -e 's#\.tar\.age$##' | LC_ALL=C sort -u \
+    | retention_plan "$VASEY_BACKUP_KEEP" "$VASEY_BACKUP_KEEP_DAILY" "$VASEY_BACKUP_KEEP_WEEKLY" "$VASEY_BACKUP_KEEP_MONTHLY")
+  for name in "${doomed[@]}"; do
+    [ -n "$name" ] || continue
+    while IFS= read -r line; do
+      entry=${line%/}
+      case "$entry" in
+        "$name"|"$name.tar.age"|"$name.tar.age.sha256") ;;
+        *) continue ;;
+      esac
+      if [ "$line" != "$entry" ]; then rclone_run purge "$(remote_join "$entry")" </dev/null || return 1
+      else rclone_run deletefile "$(remote_join "$entry")" </dev/null || return 1; fi
+    done <<< "$listing"
+    count=$((count + 1))
+  done
+  log "remote retention: pruned $count set(s) beyond the tiered policy"
+}
+
 prune_local() {
+  if [ "$VASEY_BACKUP_RETENTION" = tiered ]; then prune_local_tiered; return; fi
   local keep=$VASEY_BACKUP_KEEP
   find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -name '20*Z-*' ! -name '*.FAILED' -printf '%f\n' \
     | sort -r | tail -n +"$((keep + 1))" | while IFS= read -r d; do rm -rf --one-file-system -- "${VASEY_BACKUP_DIR:?}/$d"; done
@@ -300,6 +538,7 @@ case "${1:-}" in
     if [ -L "$VASEY_ROOT/current" ]; then "$CTL" resume; fi
     [ "$snapshot_status" = 0 ] || die "snapshot, restore proof or shipping failed; resume completed if a release was served"
     prune_local
+    prune_remote || log "WARNING: remote retention did not complete; the remote keeps its sets until the next successful run"
     ;;
   predeploy)
     install -d -m 0700 -o root -g root -- "$VASEY_BACKUP_DIR"
@@ -309,5 +548,9 @@ case "${1:-}" in
     ;;
   restore-check) restore_check "${2:?backup directory}" ;;
   ship) ship "${2:?backup directory}" ;;
-  *) die "usage: vasey-staging-backup nightly | predeploy | restore-check DIR | ship DIR" ;;
+  check-offhost)
+    offhost_config_ok || die "off-host configuration refused"
+    log "off-host configuration ok (encryption: $([ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] && echo age || { [ -n "$VASEY_BACKUP_REMOTE" ] && echo 'none by this script, explicitly allowed' || echo none; }); transport: $([ -n "$VASEY_BACKUP_REMOTE" ] && echo rclone || { [ -n "$VASEY_BACKUP_DEST" ] && echo rsync || echo none; }); retention: ${VASEY_BACKUP_RETENTION:-flat})"
+    ;;
+  *) die "usage: vasey-staging-backup nightly | predeploy | restore-check DIR | ship DIR | check-offhost" ;;
 esac

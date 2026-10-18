@@ -15,6 +15,9 @@ declare(strict_types=1);
  * --template replaces each documented placeholder with a synthetic value first, so the committed
  * template can be checked for shape. --probe additionally makes one read-only GET /v1/account with
  * the configured test key, and only after every other check passed.
+ * Boundary checks: the profile must state ten capability flags explicitly as false (scripts/ops/capability-boundary.php), none of them or of the
+ * other out-of-profile families may be enabled in the booted configuration, and no enabled or mounted flag may be true in any
+ * production-lane configuration file (Paid252, Tax255, production customer identity, production free grants and the rest).
  * Exit codes: 0 every check passed, 1 at least one check failed, 2 usage or unreadable file.
  */
 
@@ -36,6 +39,7 @@ use App\Domain\Delivery\ActivationPolicy;
 use App\Domain\Delivery\TestAccessPolicy;
 use Dotenv\Parser\Parser;
 use Illuminate\Contracts\Console\Kernel;
+use Vasey\Ops\CapabilityBoundary;
 
 ini_set('display_errors', 'stderr');
 ini_set('log_errors', '0');
@@ -97,6 +101,8 @@ if (! is_file($file) || is_link($file) || ! is_readable($file) || filesize($file
 
 $root = dirname(__DIR__, 2);
 require $root.'/vendor/autoload.php';
+// The ten capability flags and the production-lane rule, shared with the staging deploy gate (ops/staging/validate-runtime.php).
+require_once __DIR__.'/capability-boundary.php';
 $raw = (string) file_get_contents($file);
 if ($template) {
     $raw = strtr($raw, TEMPLATE_VALUES);
@@ -145,6 +151,11 @@ if ($entries !== null) {
     $live = array_keys(array_filter($values, static fn (string $v): bool => preg_match('/(?:sk|rk|pk)_live_/', $v) === 1));
     $record('profile.no_live_keys', $live === [], $live === [] ? 'No live-mode key appears in the parsed configuration values.'
         : 'Live-mode key material found in: '.implode(', ', $live).'. Remove it.');
+    $notFalse = array_values(array_filter(array_keys(CapabilityBoundary::CAPABILITY_FLAGS), static fn (string $name): bool => ! array_key_exists($name, $values)
+        || ! in_array($values[$name], ['false', '(false)'], true)));
+    $record('profile.capability_flags_explicit', $notFalse === [], $notFalse === []
+        ? 'All '.count(CapabilityBoundary::CAPABILITY_FLAGS).' capability flags are stated explicitly as false.'
+        : 'Capability flags missing or not exactly false: '.implode(', ', $notFalse).'. State each as KEY=false (template section 6).');
 }
 
 // ---- Boot the real application with this file as its only dotenv source.
@@ -290,10 +301,18 @@ if ($booted) {
         fn () => app(CustomerPurchaseClaimPolicy::class)->enabled());
 
     // ---- Boundary
-    $enabled = array_values(array_filter(OUT_OF_PROFILE_FLAGS, static fn (string $key): bool => config($key) === true));
+    $enabled = array_values(array_filter(array_unique([...OUT_OF_PROFILE_FLAGS, ...array_values(CapabilityBoundary::stagedFlags())]),
+        static fn (string $key): bool => config($key) === true));
     $record('boundary.out_of_profile_families_off', $enabled === [], $enabled === []
         ? 'Production checkout, production tax checkout and the other test families are off.'
         : 'Enabled outside this profile: '.implode(', ', $enabled).'.');
+    $lanes = CapabilityBoundary::productionLanes($root.'/config', static fn (string $stem): array => (array) config($stem));
+    $record('boundary.production_lanes_closed', $lanes['open'] === [] && $lanes['missing'] === [], match (true) {
+        $lanes['missing'] !== [] => 'Production lane configuration not found (renamed? update CapabilityBoundary): '.implode(', ', $lanes['missing']).'.',
+        $lanes['open'] !== [] => 'Production lane flags that are true: '.implode(', ', $lanes['open']).'.',
+        default => 'Paid252, Tax255, production customer identity, production free grants and the other production lanes ('
+            .count($lanes['scanned']).' configuration files) have no enabled or mounted flag set.',
+    });
     $attempt('boundary.no_production_checkout_key', 'No production checkout key or funds mode is configured.',
         fn () => in_array(config('production_checkout.secret_key'), [null, ''], true)
             && in_array(config('production_checkout.funds_mode'), [null, ''], true));

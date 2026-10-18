@@ -14,6 +14,7 @@ use App\Domain\Grants\PaidTax\PaidTaxFiles;
 use App\Domain\Grants\PaidTax\PaidTaxGrants;
 use App\Domain\Grants\PaidTax\PaidTaxPolicy;
 use App\Domain\Grants\PaidTax\PaidTaxProjectionRead;
+use App\Domain\Grants\PaidTax\PaidTaxReads;
 use App\Domain\Grants\PaidTax\PaidTaxRecords;
 use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
 use App\Domain\Grants\PaidTax\PaidTaxRenderInput;
@@ -214,6 +215,47 @@ class PaidTaxGrantJourneyTest extends TestCase
         $this->assertDatabaseCount('paid_tax_order_origins', 0);
         $this->assertFalse(DB::getPdo()->inTransaction());
         $this->assertSame(0, DB::transactionLevel());
+    }
+
+    /** Runs on both drivers: the bounded index's locking read, owner closure and terminal proof under one original frame. */
+    public function test_history_index_lists_only_current_owner_batches_and_refuses_late_withdrawal_before_bytes(): void
+    {
+        $f = $this->paid();
+        $first = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $second = $this->secondPaidTaxOrder($f, 'cs_test_historyindexnative', 'pi_historyindexnative');
+        $newest = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $second['order']['orderId']);
+        $foreign = $this->enrollThroughLocalSmtp('foreign-history-index@example.test');
+        $read = PaidTaxProjectionRead::begin();
+        $list = (new PaidTaxReads)->index($f['buyer']['principal'], $f['buyer']['user'], $read);
+        $read->proveBeforeBytes();
+        $rows = DB::table('paid_tax_order_origins')->orderByDesc('id')->get()->map(fn ($row): array => (array) $row)->all();
+        $this->assertSame([$newest['id'], $first['id']], array_column($rows, 'public_id'));
+        $this->assertSame(['schemaVersion' => 2, 'originLimit' => 20, 'hasMore' => false, 'origins' => array_map(fn (array $row): array => [
+            'id' => $row['public_id'], 'orderId' => $row['order_public_id'], 'createdAt' => str_replace(' ', 'T', $row['created_at']).'Z',
+            'lineCount' => 1, 'provenance' => 'synthetic_rehearsal'], $rows)], $list);
+        $this->assertFalse(DB::getPdo()->inTransaction());
+        $this->assertSame(0, DB::transactionLevel());
+        $read = PaidTaxProjectionRead::begin();
+        $this->assertSame([], (new PaidTaxReads)->index($foreign['principal'], $foreign['user'], $read)['origins']);
+        $read->proveBeforeBytes();
+        $read = PaidTaxProjectionRead::begin();
+        (new PaidTaxReads)->index($f['buyer']['principal'], $f['buyer']['user'], $read);
+        DB::table('customer_accounts')->where('id', $f['buyer']['principal']->accountId)->update(['active' => 0, 'access_version' => DB::raw('access_version + 1')]);
+        try {
+            $read->proveBeforeBytes();
+            $this->fail('A withdrawn owner received index bytes.');
+        } catch (PaidTaxException $error) {
+            $this->assertSame(403, $error->status);
+        }
+        try {
+            (new PaidTaxReads)->index($f['buyer']['principal'], $f['buyer']['user']);
+            $this->fail('A withdrawn owner was listed.');
+        } catch (PaidTaxException $error) {
+            $this->assertSame(403, $error->status);
+        }
+        $this->assertFalse(DB::getPdo()->inTransaction());
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertDatabaseCount('paid_tax_order_origins', 2);
     }
 
     public function test_late_current_owner_withdrawal_rolls_back_origin_and_allows_a_fresh_authorized_retry(): void

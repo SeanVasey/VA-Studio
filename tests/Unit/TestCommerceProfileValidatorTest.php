@@ -24,6 +24,14 @@ class TestCommerceProfileValidatorTest extends TestCase
         '<ASSENT_TEXT>' => 'I accept these synthetic test-only terms.',
     ];
 
+    /** The capability flags the profile must state explicitly as false (validator CAPABILITY_FLAGS). */
+    private const CAPABILITY_FLAGS = [
+        'VASEY_TEST_SERVICE_PROJECTS_ENABLED', 'VASEY_TEST_FREE_GRANTS_ENABLED', 'VASEY_TEST_CUSTOMER_CONSENT_ENABLED',
+        'VASEY_TEST_UNPAID_RELEASE_ENABLED', 'VASEY_TEST_REFUND_RESOLUTION_ENABLED', 'VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED',
+        'CONTACT_TEST_ORDER_INQUIRIES_ENABLED', 'CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED',
+        'VASEY_OPERATIVE_FREE_GRANTS_ENABLED', 'VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED',
+    ];
+
     private string $dir;
 
     protected function setUp(): void
@@ -107,9 +115,9 @@ class TestCommerceProfileValidatorTest extends TestCase
         [$exit, $output, $checks] = $this->validateFile(self::root().'/'.self::TEMPLATE, ['--template']);
 
         $this->assertSame(0, $exit, $output);
-        $this->assertCount(36, $checks);
+        $this->assertCount(38, $checks);
         $this->assertNotContains(false, $checks);
-        $this->assertStringContainsString('RESULT: PASS (0 of 36 checks failed; template mode', $output);
+        $this->assertStringContainsString('RESULT: PASS (0 of 38 checks failed; template mode', $output);
         $this->assertNoSecretPrinted($output);
     }
 
@@ -128,7 +136,7 @@ class TestCommerceProfileValidatorTest extends TestCase
         [$exit, $output, $checks] = $this->validate(self::filled());
 
         $this->assertSame(0, $exit, $output);
-        $this->assertCount(36, $checks);
+        $this->assertCount(38, $checks);
         $this->assertNotContains(false, $checks);
         $this->assertStringContainsString('no Stripe request made', $output);
         $this->assertNoSecretPrinted($output);
@@ -220,6 +228,9 @@ class TestCommerceProfileValidatorTest extends TestCase
             'identity sends mail' => [$set('VASEY_TEST_CUSTOMER_IDENTITY_TRANSPORT', 'mail'), 'customer.identity_private_capture'],
             'production checkout flag' => [$set('PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED', 'true'), 'boundary.out_of_profile_families_off'],
             'free grants enabled' => [$set('VASEY_TEST_FREE_GRANTS_ENABLED', 'true'), 'boundary.out_of_profile_families_off'],
+            'operative free grants enabled' => [$set('VASEY_OPERATIVE_FREE_GRANTS_ENABLED', 'true'), 'boundary.out_of_profile_families_off'],
+            'discovery sitemap enabled' => [$set('DISCOVERY_SITEMAP_ENABLED', 'true'), 'boundary.out_of_profile_families_off'],
+            'listening v2 promotion enabled' => [$set('VASEY_LISTENING_V2_PROMOTION_ENABLED', 'true'), 'boundary.out_of_profile_families_off'],
             'production checkout key' => [$set('PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY', 'sk_test_SyntheticValidatorKey123456'), 'boundary.no_production_checkout_key'],
             'duplicate key' => [static fn (string $p): string => $p."STRIPE_MODE=test\n", 'profile.unique_keys'],
             'single quote inside json' => [$json('I accept these', 'I\'m accepting these'), 'profile.parse'],
@@ -236,6 +247,73 @@ class TestCommerceProfileValidatorTest extends TestCase
         $this->assertFalse($checks[$check], $output);
         $this->assertStringContainsString('RESULT: FAIL', $output);
         $this->assertNoSecretPrinted($output);
+    }
+
+    public static function capabilityFlags(): array
+    {
+        return array_combine(self::CAPABILITY_FLAGS, array_map(static fn (string $flag): array => [$flag], self::CAPABILITY_FLAGS));
+    }
+
+    /** @return list<string> */
+    private static function failedChecks(array $checks): array
+    {
+        return array_keys(array_filter($checks, static fn (bool $ok): bool => ! $ok));
+    }
+
+    #[DataProvider('capabilityFlags')]
+    public function test_each_capability_flag_must_be_stated_false_and_cannot_be_enabled(string $flag): void
+    {
+        // Absent: refused by the explicit-statement check alone, and the message names the key but no value.
+        [$exit, $output, $checks] = $this->validate((string) preg_replace('/^'.$flag.'=.*\n/m', '', self::filled()));
+        $this->assertSame(1, $exit, $output);
+        $this->assertSame(['profile.capability_flags_explicit'], self::failedChecks($checks), $output);
+        $this->assertStringContainsString('missing or not exactly false: '.$flag.'.', $output);
+
+        // Enabled: refused both as a profile statement and by the real configuration boundary.
+        [$exit, $output, $checks] = $this->validate(self::set(self::filled(), $flag, 'true'));
+        $this->assertSame(1, $exit, $output);
+        $this->assertSame(['profile.capability_flags_explicit', 'boundary.out_of_profile_families_off'], self::failedChecks($checks), $output);
+        $this->assertStringContainsString($flag === 'VASEY_OPERATIVE_FREE_GRANTS_ENABLED' ? 'free-grants.operative_enabled' : 'Enabled outside this profile', $output);
+    }
+
+    public function test_only_false_or_parenthesized_false_counts_as_a_stated_capability_flag(): void
+    {
+        foreach (['false', '(false)', '"false"'] as $accepted) {
+            [$exit, $output, $checks] = $this->validate(self::set(self::filled(), 'VASEY_TEST_FREE_GRANTS_ENABLED', $accepted));
+            $this->assertSame(0, $exit, $accepted.PHP_EOL.$output);
+            $this->assertTrue($checks['profile.capability_flags_explicit'], $accepted);
+        }
+        foreach (['False', '0', 'off', '', '(null)', '"true"'] as $refused) {
+            [$exit, $output, $checks] = $this->validate(self::set(self::filled(), 'VASEY_TEST_FREE_GRANTS_ENABLED', $refused));
+            $this->assertSame(1, $exit, $refused.PHP_EOL.$output);
+            $this->assertFalse($checks['profile.capability_flags_explicit'], $refused);
+        }
+    }
+
+    public function test_a_profile_copied_before_the_capability_lines_existed_is_told_exactly_what_to_add(): void
+    {
+        $old = self::filled();
+        foreach (self::CAPABILITY_FLAGS as $flag) {
+            $old = (string) preg_replace('/^'.$flag.'=.*\n/m', '', $old);
+        }
+        [$exit, $output, $checks] = $this->validate($old);
+
+        $this->assertSame(1, $exit, $output);
+        $this->assertSame(['profile.capability_flags_explicit'], self::failedChecks($checks), $output);
+        foreach (self::CAPABILITY_FLAGS as $flag) {
+            $this->assertStringContainsString($flag, $output);
+        }
+        $this->assertStringContainsString('template section 6', $output);
+    }
+
+    /** The negative path needs a changed config file, so it is proven by mutation in the evidence packet, not here. */
+    public function test_the_production_lanes_are_named_and_closed_in_the_real_configuration(): void
+    {
+        [$exit, $output, $checks] = $this->validate(self::filled());
+
+        $this->assertSame(0, $exit, $output);
+        $this->assertTrue($checks['boundary.production_lanes_closed']);
+        $this->assertStringContainsString('Paid252, Tax255, production customer identity, production free grants', $output);
     }
 
     public function test_a_probe_is_never_attempted_while_any_check_fails(): void
