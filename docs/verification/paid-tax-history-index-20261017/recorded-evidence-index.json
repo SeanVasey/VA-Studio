@@ -1,0 +1,549 @@
+{
+  "archive": "recorded-evidence.tar.gz",
+  "archive_sha256": "bca2db1c2d62b974e52882b0595cbacdd6a33e0242f52369e687f455328792df",
+  "tested_source": "3711a7b6542b989f996bd70e01e59b00fedd688f",
+  "fix_commit": "902ac4be2bc1003e091d120c260668259ab2bcb1",
+  "base": "efa6eea5b007f1f2623c4009c1e9bef737f06bee",
+  "members": [
+    {
+      "path": "recorded-evidence/batch-mysql-bounded.log",
+      "bytes": 607,
+      "sha256": "25f1b49bdc36838b1330fefa916cbdd71168753eb45dacc26825467b05f22711"
+    },
+    {
+      "path": "recorded-evidence/batch-mysql.log",
+      "bytes": 302,
+      "sha256": "539fbd9cda522dae8e16d7c9fa67a7119b17829405045e277d1494142f889fbf"
+    },
+    {
+      "path": "recorded-evidence/batch-sqlite.log",
+      "bytes": 3358,
+      "sha256": "627273e031dcc38592e26514d81e46d9ac5d23eb11305974b2509beb4f9530c7"
+    },
+    {
+      "path": "recorded-evidence/e01-sqlite-index/junit.xml",
+      "bytes": 8666,
+      "sha256": "1766a04faad3f59bd6f51f96e594aa79fcc6290e215951bb14a477f79763e60c"
+    },
+    {
+      "path": "recorded-evidence/e01-sqlite-index/meta.txt",
+      "bytes": 830,
+      "sha256": "48d023b810d39f577d07e0b6f9a32cbba387eea88f64517a05c637c30e2e36ea"
+    },
+    {
+      "path": "recorded-evidence/e01-sqlite-index/stdout.txt",
+      "bytes": 288,
+      "sha256": "b0d6ec7a5c9bd89853e72b500354fae16681179eba38fae830e945ac39749b7d"
+    },
+    {
+      "path": "recorded-evidence/e02-sqlite-root-boundary/junit.xml",
+      "bytes": 16294,
+      "sha256": "44b311a01281d7b518be547fa3345d66e860fdaedc33dc883b91069a5a206894"
+    },
+    {
+      "path": "recorded-evidence/e02-sqlite-root-boundary/meta.txt",
+      "bytes": 908,
+      "sha256": "05dd577cc3cd14c5b6f078786286b96305f2761b3cb995be30c62ecaa549e55d"
+    },
+    {
+      "path": "recorded-evidence/e02-sqlite-root-boundary/stdout.txt",
+      "bytes": 287,
+      "sha256": "f0ff807fb96e21e26f5d78338fc2a62b08dd24358e1a6014e5c31a3afabcbb46"
+    },
+    {
+      "path": "recorded-evidence/e03-sqlite-http-journey/junit.xml",
+      "bytes": 4313,
+      "sha256": "5832044bf5236a826847f87c18dfa0c018d103513567f0021af8df1a1c2edccf"
+    },
+    {
+      "path": "recorded-evidence/e03-sqlite-http-journey/meta.txt",
+      "bytes": 896,
+      "sha256": "2112c1d055cdedf729fd7e510c6c312d800e21efb2f91f09cd7bac184a8f4f91"
+    },
+    {
+      "path": "recorded-evidence/e03-sqlite-http-journey/stdout.txt",
+      "bytes": 288,
+      "sha256": "5eb42421eec04347b92df16d0c192f1db0fdd66101c8082048504400fe011f28"
+    },
+    {
+      "path": "recorded-evidence/e04-sqlite-grant-journey/junit.xml",
+      "bytes": 8225,
+      "sha256": "e9dd0fed8da70ecb318f7fbcff35bd345791fa4d859fc07fd5975aeb80e229a2"
+    },
+    {
+      "path": "recorded-evidence/e04-sqlite-grant-journey/meta.txt",
+      "bytes": 900,
+      "sha256": "0b80b9c06f041975d2d9330358171dc986139166a66248b58040b1bdd063c28d"
+    },
+    {
+      "path": "recorded-evidence/e04-sqlite-grant-journey/stdout.txt",
+      "bytes": 288,
+      "sha256": "1985ec05d6aca933cf15eb106ea927fa026a25e4dba2a32a7c68782372829650"
+    },
+    {
+      "path": "recorded-evidence/e05-sqlite-adversarial-download/junit.xml",
+      "bytes": 9491,
+      "sha256": "4d2561877bd55a1f4a6e57fec4e98f5abebaa5e1bfcbed648aa73d8e96d99466"
+    },
+    {
+      "path": "recorded-evidence/e05-sqlite-adversarial-download/meta.txt",
+      "bytes": 1016,
+      "sha256": "8a8d50df9f32205f49c8171d8021bde8abf37deaeabbcb2c15ea6843833b48ff"
+    },
+    {
+      "path": "recorded-evidence/e05-sqlite-adversarial-download/stdout.txt",
+      "bytes": 1843,
+      "sha256": "99eaf6adadb1a32049727611db1d05ccacd2e47a3ee1bcf350eba2bb47a9b56d"
+    },
+    {
+      "path": "recorded-evidence/e06-sqlite-checkout-return/junit.xml",
+      "bytes": 2678,
+      "sha256": "c93d8b63033790dfbec2a23da65046769e0c54586b18b291598b78a1068f6f1b"
+    },
+    {
+      "path": "recorded-evidence/e06-sqlite-checkout-return/meta.txt",
+      "bytes": 918,
+      "sha256": "92c3000ef3c0f22fdcf47e64e0d517d7287982d852690167838cb0a70cf9fff7"
+    },
+    {
+      "path": "recorded-evidence/e06-sqlite-checkout-return/stdout.txt",
+      "bytes": 287,
+      "sha256": "f3855ebd718e292153d4ccbfad495ede47caf66a374b7538d0dcba5c16711495"
+    },
+    {
+      "path": "recorded-evidence/f01-registry-red-branch/meta.txt",
+      "bytes": 101,
+      "sha256": "0e604391db6ce5deecc85e13057b0d814b869aedac48e4bc97c7988ac7ed4f39"
+    },
+    {
+      "path": "recorded-evidence/f01-registry-red-branch/stdout.txt",
+      "bytes": 1414,
+      "sha256": "08db51cc07ea71686f3d2c8e4b3266b2a0e0be000f75c1c2bd1581bfa8a6e72e"
+    },
+    {
+      "path": "recorded-evidence/f02-registry-red-main/meta.txt",
+      "bytes": 101,
+      "sha256": "47a02e7eaca64292ef33ebd964eeb77e6006ad75dbd5764ce05dc1b4ad98882b"
+    },
+    {
+      "path": "recorded-evidence/f02-registry-red-main/stdout.txt",
+      "bytes": 1427,
+      "sha256": "5835ffac5259f3418a1b29b17e40c7144b1757849812e927969ba6bddd284fce"
+    },
+    {
+      "path": "recorded-evidence/f03-registry-green-precommit/meta.txt",
+      "bytes": 142,
+      "sha256": "8bb93e444c7d4c6f67ec26db475b09648d87a91d0cf9fa23d9f0d8738e2c7a5d"
+    },
+    {
+      "path": "recorded-evidence/f03-registry-green-precommit/stdout.txt",
+      "bytes": 192,
+      "sha256": "e09bfb7b99f91310a81ea15f53afa51830716ead6647a520340fc2968228f9d3"
+    },
+    {
+      "path": "recorded-evidence/f03-registry-green-precommit/typecheck.txt",
+      "bytes": 29,
+      "sha256": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+    },
+    {
+      "path": "recorded-evidence/f04-registry-mutation/app.tsx.fixed",
+      "bytes": 2567,
+      "sha256": "8d7f00de910fab15da5181bedd287f2f9efe5999c2dd2ec1de8cf5a41a5bb215"
+    },
+    {
+      "path": "recorded-evidence/f04-registry-mutation/meta.txt",
+      "bytes": 15,
+      "sha256": "461f12a286a5cf17927bb61e00dd71d0624df96d816d941cf0ee545315ecb5e8"
+    },
+    {
+      "path": "recorded-evidence/f04-registry-mutation/stdout.txt",
+      "bytes": 1245,
+      "sha256": "62fb9e0d006597f775b36800f5449b59e5f0955e6331b1a4b3297be06b28bbcc"
+    },
+    {
+      "path": "recorded-evidence/f05-frontend-exact/bundle-scan.txt",
+      "bytes": 77,
+      "sha256": "4643044e223bad44a05d13d4b55bd156f8c8a44ad2f410e352444bf34a3e8d33"
+    },
+    {
+      "path": "recorded-evidence/f05-frontend-exact/meta.txt",
+      "bytes": 105,
+      "sha256": "5c83dcbd8ee31f5fe6c1d401b2cac249ad66fcfd6982b153d14e606aa91842cb"
+    },
+    {
+      "path": "recorded-evidence/f05-frontend-exact/npm-build.txt",
+      "bytes": 2119,
+      "sha256": "5afbe16641ea8ffdd3a4790b1f89d1aa3199c0cf1eaaa61f668748dffe315810"
+    },
+    {
+      "path": "recorded-evidence/f05-frontend-exact/npm-test.txt",
+      "bytes": 649,
+      "sha256": "701714af7b07f8b554c1a8993552d55f3b6123cc7fda8e205f02d65ff80ecb6c"
+    },
+    {
+      "path": "recorded-evidence/f06-frontend-exact/bundle-scan.txt",
+      "bytes": 77,
+      "sha256": "4643044e223bad44a05d13d4b55bd156f8c8a44ad2f410e352444bf34a3e8d33"
+    },
+    {
+      "path": "recorded-evidence/f06-frontend-exact/guard.txt",
+      "bytes": 192,
+      "sha256": "c5a0e9a8c833c96d33266d80bf1bbca6b2ca09de1cd03d1cfd2937b980b1fe42"
+    },
+    {
+      "path": "recorded-evidence/f06-frontend-exact/meta.txt",
+      "bytes": 118,
+      "sha256": "356d91b3815e211fa1fbcf66ed1f5f65fd65a007d66f972ced791fd6cea07092"
+    },
+    {
+      "path": "recorded-evidence/f06-frontend-exact/npm-build.txt",
+      "bytes": 2119,
+      "sha256": "3ceecfa01330528789bf7e757445cc1eaaec027bd1038da6e194cbc2915af685"
+    },
+    {
+      "path": "recorded-evidence/f06-frontend-exact/npm-test.txt",
+      "bytes": 649,
+      "sha256": "ab47b03ee469499b7acbe12bb852d2838b91aaae7d677a5c41200b4b045f1f47"
+    },
+    {
+      "path": "recorded-evidence/m01-mysql-index-case/junit.xml",
+      "bytes": 1423,
+      "sha256": "e1fc058db5797941ec50b4d4008dd32bab70b8a982ca215021ce25a847a1f8f7"
+    },
+    {
+      "path": "recorded-evidence/m01-mysql-index-case/meta.txt",
+      "bytes": 1091,
+      "sha256": "fafc3ef9fbd8446f696d7f5fa687490a65d50b90aa9204cdc9326435d76c441f"
+    },
+    {
+      "path": "recorded-evidence/m01-mysql-index-case/stdout.txt",
+      "bytes": 1146,
+      "sha256": "44a042726349f3877918b019a9d0769df80423f73c9a7679820c5b3b24d9a56d"
+    },
+    {
+      "path": "recorded-evidence/m02-mysql-index-case/junit.xml",
+      "bytes": 609,
+      "sha256": "68e3245117520d4f87fe3ce0703a8ae762c7f7f97c607712760a0b22cd2f08a3"
+    },
+    {
+      "path": "recorded-evidence/m02-mysql-index-case/meta.txt",
+      "bytes": 1143,
+      "sha256": "a69c15c87f265637a89bf0b7afbe1329e334acdcb5c522cae45b2eb4273908fc"
+    },
+    {
+      "path": "recorded-evidence/m02-mysql-index-case/stdout.txt",
+      "bytes": 284,
+      "sha256": "83bb9bf13b5238549e1159a9afe3f19ad4b31be610d834a3af9f8247a5104545"
+    },
+    {
+      "path": "recorded-evidence/m03-mysql-grant-journey-whole/junit.xml",
+      "bytes": 8269,
+      "sha256": "971a50fde1db01f96e73a23047e1c3f98203eaadd1078a96dce9ac049afa1638"
+    },
+    {
+      "path": "recorded-evidence/m03-mysql-grant-journey-whole/meta.txt",
+      "bytes": 1039,
+      "sha256": "d1e557c515eb47c625b5e1d8f34cdf8d6308be109545a5acf15098c692d76d47"
+    },
+    {
+      "path": "recorded-evidence/m03-mysql-grant-journey-whole/stdout.txt",
+      "bytes": 291,
+      "sha256": "ffc9eab4cfeb1a6328e4df15f8014e0e07fa8c6a2c51c204249be9ccb3a32cc0"
+    },
+    {
+      "path": "recorded-evidence/m04-mysql-index-subset/junit.xml",
+      "bytes": 2351,
+      "sha256": "8a9aede702da3a8bd497b86f592cf4dd71dd8c172d53f61377fa2c5de2e6d174"
+    },
+    {
+      "path": "recorded-evidence/m04-mysql-index-subset/meta.txt",
+      "bytes": 1347,
+      "sha256": "2ccce0ea4fa89a944cfad36c64317b7c2bb24de11b310cc2b4c5eaf0d96a99a7"
+    },
+    {
+      "path": "recorded-evidence/m04-mysql-index-subset/stdout.txt",
+      "bytes": 286,
+      "sha256": "60a555313aeafaae23c3c66dfa1ff7408367468d672bfb9366c0ab9bd5fe2dd5"
+    },
+    {
+      "path": "recorded-evidence/m05-mysql-journey-subset/junit.xml",
+      "bytes": 928,
+      "sha256": "1426056cc83a9f5fcfab33b2adf2855b3435ca845343294d5314d7754350cb92"
+    },
+    {
+      "path": "recorded-evidence/m05-mysql-journey-subset/meta.txt",
+      "bytes": 1419,
+      "sha256": "d31b20273d04d73b29726bfd96438b751c6e7e2504b38ecaaeaa80aecb2d4ca7"
+    },
+    {
+      "path": "recorded-evidence/m05-mysql-journey-subset/stdout.txt",
+      "bytes": 286,
+      "sha256": "b08ce9e29d84cbbaab42b13f5380aa631831614ae5c9cf4ee529b1f0ee6a46a6"
+    },
+    {
+      "path": "recorded-evidence/mysql-init.txt",
+      "bytes": 713,
+      "sha256": "90c9e43a9e8c1247a83972598c4786bc58c0df9419f4dfb80cadba55b0211fa8"
+    },
+    {
+      "path": "recorded-evidence/mysql-restart.txt",
+      "bytes": 888,
+      "sha256": "0904b02f85cb1aa258f13934f21db07aa0358df7644f10a680ce38fed2321836"
+    },
+    {
+      "path": "recorded-evidence/mysql-server.err",
+      "bytes": 2528,
+      "sha256": "56f47f89509b2bf80d6befcee6a32e6922614603ea29a4ae0c0cefa0a10e03ec"
+    },
+    {
+      "path": "recorded-evidence/mysql-shutdown.txt",
+      "bytes": 629,
+      "sha256": "59bff0cb1a3093a4cb66ee0c650d13fba6e860b34800d1c724670bf97357c96c"
+    },
+    {
+      "path": "recorded-evidence/mysql-start.txt",
+      "bytes": 200,
+      "sha256": "4b914bcbaa5a1e349d5bff66e4d1ebc7545de4adcaeb02e7b783773aa25b08a7"
+    },
+    {
+      "path": "recorded-evidence/r01-index-first/junit.xml",
+      "bytes": 9929,
+      "sha256": "91f96919cfd684da2494661a3b6742a42f0c149f1ef9a8502f708d4ce312bc22"
+    },
+    {
+      "path": "recorded-evidence/r01-index-first/meta.txt",
+      "bytes": 1097,
+      "sha256": "a6d135690d45f4c8feac20bb7cc777dd8a99fd873a4a6eb1fa49ea445e18ec1b"
+    },
+    {
+      "path": "recorded-evidence/r01-index-first/stdout.txt",
+      "bytes": 2309,
+      "sha256": "5f3a4b21163403df2d7be7a49db841f9e9fb7284ebaa7b10a877131ce59b59c3"
+    },
+    {
+      "path": "recorded-evidence/r02-index-repairs/junit.xml",
+      "bytes": 2859,
+      "sha256": "2cf783fd54d38570721dfe524f66707e6a3a90a28772ab2bd529c85fd9c45d31"
+    },
+    {
+      "path": "recorded-evidence/r02-index-repairs/meta.txt",
+      "bytes": 1348,
+      "sha256": "24cce8619ac49d7c4f5d577a1b61feffbd9f94c779027e318675e28e1dad52b1"
+    },
+    {
+      "path": "recorded-evidence/r02-index-repairs/stdout.txt",
+      "bytes": 690,
+      "sha256": "f3b158f785de394f3fce4291741cf50a5327ac2e629ba76adb95fd92b0a4ee11"
+    },
+    {
+      "path": "recorded-evidence/r03-withdrawal-points/junit.xml",
+      "bytes": 2584,
+      "sha256": "e23efa3ef8d5162a28dff0f1ca100ff5614323c37d680eb526eccec047d325bc"
+    },
+    {
+      "path": "recorded-evidence/r03-withdrawal-points/meta.txt",
+      "bytes": 1236,
+      "sha256": "712f78370d84bf2e58613c798fe9e72eb13361589c779c167d70072edb75be6f"
+    },
+    {
+      "path": "recorded-evidence/r03-withdrawal-points/stdout.txt",
+      "bytes": 2074,
+      "sha256": "c4847b3b6081caae14f6d155581db6e2bdd86d61e637e3d445fcce4920564884"
+    },
+    {
+      "path": "recorded-evidence/r04-boundary/junit.xml",
+      "bytes": 16294,
+      "sha256": "15142b3031895f0a851aaf42305cd08a0431366950715fd9e7dcc5be1f1e3684"
+    },
+    {
+      "path": "recorded-evidence/r04-boundary/meta.txt",
+      "bytes": 1242,
+      "sha256": "36e4eed0bafd62eafe00907bd529d740c6522d384c995a43cec25d9d609c2926"
+    },
+    {
+      "path": "recorded-evidence/r04-boundary/stdout.txt",
+      "bytes": 287,
+      "sha256": "38d026afc1d0535010621042238b5cd111f7b78ab8addcc12cfa36080de50494"
+    },
+    {
+      "path": "recorded-evidence/r05-index-whole-precommit/junit.xml",
+      "bytes": 8666,
+      "sha256": "cda9dabd19d52f4780213dc4806e48533c1cfa8cb96087737ede6fe6fbb481a7"
+    },
+    {
+      "path": "recorded-evidence/r05-index-whole-precommit/meta.txt",
+      "bytes": 1416,
+      "sha256": "0855aaa1ed7997b31cf3424cfa05b102956a95e8e180e4666ebac88bbb3c0d7c"
+    },
+    {
+      "path": "recorded-evidence/r05-index-whole-precommit/stdout.txt",
+      "bytes": 288,
+      "sha256": "3720e3191278abbdf3d327c24cbd8042bf712cb809c0ff2fc0f9742b680b7048"
+    },
+    {
+      "path": "recorded-evidence/r06-frontend-precommit/bundle-scan.txt",
+      "bytes": 88,
+      "sha256": "8d3ce78f02dd50227d57ab3dbd709e555b6720b3a1d0fef1f388c694a29053d9"
+    },
+    {
+      "path": "recorded-evidence/r06-frontend-precommit/npm-build.txt",
+      "bytes": 1860,
+      "sha256": "de0a7674c50a20228df517e351be983fe82c96e49305ac447eabbc57f0676876"
+    },
+    {
+      "path": "recorded-evidence/r06-frontend-precommit/npm-test.txt",
+      "bytes": 667,
+      "sha256": "165aa94b6994d3994f0944ff443e296bcacdcab3cb75e6a11d98dcabe189ce2b"
+    },
+    {
+      "path": "recorded-evidence/r06-frontend-precommit/vite-build-for-scan.txt",
+      "bytes": 1804,
+      "sha256": "8eb2c97f7fea5933873da0581f568bae60d7470d490e847d49a9d491c9adcefc"
+    },
+    {
+      "path": "recorded-evidence/r07-observer-check/junit.xml",
+      "bytes": 586,
+      "sha256": "23588f6b94202527bc54c7f5ed03e25358ece945a8f58a70c8e415aae0a77058"
+    },
+    {
+      "path": "recorded-evidence/r07-observer-check/meta.txt",
+      "bytes": 1462,
+      "sha256": "16b7025b712d86c26fd91f254c7e9e33b2e4784eaca66d408f56142df06a38d0"
+    },
+    {
+      "path": "recorded-evidence/r07-observer-check/stdout.txt",
+      "bytes": 284,
+      "sha256": "672cc24c02d7708189b3492ec186a00f9eab1ec087ac9a176e4a0f9d12a59ac8"
+    },
+    {
+      "path": "recorded-evidence/r08-native-selection-precommit/phpunit-ci-mysql-manifest.json",
+      "bytes": 17539,
+      "sha256": "8b93b1d80b6ec75b8630f103141f6b70f9a3a88e2ec0b1525ea74075bae72430"
+    },
+    {
+      "path": "recorded-evidence/r08-native-selection-precommit/stdout.txt",
+      "bytes": 167,
+      "sha256": "20be2caace8f16baefec300d9685e3db4a94dd46d39310b58bbc59cff5f8b08a"
+    },
+    {
+      "path": "recorded-evidence/s01-native-selection-head/meta.txt",
+      "bytes": 100,
+      "sha256": "345853960c6b752e7242287eb976b50310a5d8ee68b438786a8c983a0b8e930e"
+    },
+    {
+      "path": "recorded-evidence/s01-native-selection-head/phpunit-ci-mysql-manifest.json",
+      "bytes": 17539,
+      "sha256": "8b93b1d80b6ec75b8630f103141f6b70f9a3a88e2ec0b1525ea74075bae72430"
+    },
+    {
+      "path": "recorded-evidence/s01-native-selection-head/stdout.txt",
+      "bytes": 167,
+      "sha256": "20be2caace8f16baefec300d9685e3db4a94dd46d39310b58bbc59cff5f8b08a"
+    },
+    {
+      "path": "recorded-evidence/s02-native-selection-base/meta.txt",
+      "bytes": 100,
+      "sha256": "cf551b1b30091c5f5b1719af76181f900b80d5a6dde0f7c7477d050c667a934b"
+    },
+    {
+      "path": "recorded-evidence/s02-native-selection-base/phpunit-ci-mysql-manifest.json",
+      "bytes": 17539,
+      "sha256": "0f9cf07480456b2a8c798266a04f2a60439e0f794bd3cda611dc55c53a9940fc"
+    },
+    {
+      "path": "recorded-evidence/s02-native-selection-base/stdout.txt",
+      "bytes": 167,
+      "sha256": "d0997310c1766285bca42b1643c02bc890b7e73eb77f9dc8390955d2722b44c1"
+    },
+    {
+      "path": "recorded-evidence/s03-cheap-safeguards/meta.txt",
+      "bytes": 742,
+      "sha256": "ec062bbd90381d07ac82f1f34deb0d20a32a4354fa55eb13ba50f5e04df00e99"
+    },
+    {
+      "path": "recorded-evidence/s03-cheap-safeguards/test-bootstrap-macos.txt",
+      "bytes": 112,
+      "sha256": "1110546504641428709c55fb20cd373b4707b8360308a5804ea90dcb5665b955"
+    },
+    {
+      "path": "recorded-evidence/s03-cheap-safeguards/test-ci-scope.txt",
+      "bytes": 126,
+      "sha256": "42578222e945162ed4ebff618eb084a99be78742eb9f88e28ea14aa65138c867"
+    },
+    {
+      "path": "recorded-evidence/s03-cheap-safeguards/test-database-receipts.txt",
+      "bytes": 161,
+      "sha256": "df45f5ab91bd4b6f375744b5f6a8fde006957139236e5b866755898136904ae2"
+    },
+    {
+      "path": "recorded-evidence/s03-cheap-safeguards/test-focused-tests.txt",
+      "bytes": 9494,
+      "sha256": "df47a97a9addba81069e3bb154e3ab82d77f1a961beb010a38b1ba5efd24a812"
+    },
+    {
+      "path": "recorded-evidence/s03-cheap-safeguards/test-gitlab-database-receipts.txt",
+      "bytes": 132,
+      "sha256": "950db3a449b0204d4721685ca92724e2277058e21062bbad5c1d6cfdb6b0e5b7"
+    },
+    {
+      "path": "recorded-evidence/s03-cheap-safeguards/test-gitlab-writer-feedback.txt",
+      "bytes": 105,
+      "sha256": "bd8b6e98c3fde35b63ab6d268fdd3a11412f774f5efed5e707ad2bef28c91f16"
+    },
+    {
+      "path": "recorded-evidence/s03-cheap-safeguards/test-php-test-runtime.txt",
+      "bytes": 844,
+      "sha256": "032ac20e7ce7e064c0b7719b7192ef06698995ce07ba651916e42cf21c6c90d4"
+    },
+    {
+      "path": "recorded-evidence/s03-cheap-safeguards/test-phpunit-shards.txt",
+      "bytes": 151,
+      "sha256": "60012b1692fbcd90dafb9d544097afb94e05aa7142db97c82f3e027f8287fb31"
+    },
+    {
+      "path": "recorded-evidence/s03-cheap-safeguards/test-publish-github.txt",
+      "bytes": 100,
+      "sha256": "522597959ccc5756c9d89b89390fbe3478d2bae7855d68affc350e87ea6c465b"
+    },
+    {
+      "path": "recorded-evidence/s03-cheap-safeguards/test-workflow-cadence.txt",
+      "bytes": 113,
+      "sha256": "2688e3aac5879831defab5e5f231a6f331e395be82e99f6caef62e863a873ffe"
+    },
+    {
+      "path": "recorded-evidence/s04-pint/base-HandleInertiaRequests.php",
+      "bytes": 523,
+      "sha256": "559d3a5cb591e2e52822e5e1866f0d144b69adfd98f591dd3066605fd9b2945f"
+    },
+    {
+      "path": "recorded-evidence/s04-pint/base-stdout.txt",
+      "bytes": 231,
+      "sha256": "d267ad72f3b9ef37f3d723cebda8852c074236257dcfcb62ad818ac885f9c3dd"
+    },
+    {
+      "path": "recorded-evidence/s04-pint/meta.txt",
+      "bytes": 438,
+      "sha256": "e14a0a05e645b0e833e8381cd030353aad8648d8b574947207e4a9164810c3dd"
+    },
+    {
+      "path": "recorded-evidence/s04-pint/stdout.txt",
+      "bytes": 40,
+      "sha256": "91efebda57f9d1cd67b81d8f3c0bc584b16e471b845060f6a0b957a201c71175"
+    },
+    {
+      "path": "recorded-evidence/tools/t1-batch-mysql-bounded.sh",
+      "bytes": 643,
+      "sha256": "eb3c7da617fbc24a1d4d666acfcc79eb02abcdf218b12bd2ff7d25658caede3d"
+    },
+    {
+      "path": "recorded-evidence/tools/t1-batch-sqlite.sh",
+      "bytes": 654,
+      "sha256": "75ef3acea4cdef700c306a9a3a4d82c9181196170cf9f79a7b27bccdb759fba4"
+    },
+    {
+      "path": "recorded-evidence/tools/t1-run.sh",
+      "bytes": 1712,
+      "sha256": "010202d42663ffbb7dc3d05cdc7efd49179ff3ef13a32880074cb66388c5cf2d"
+    }
+  ]
+}

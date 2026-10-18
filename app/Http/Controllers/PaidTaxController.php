@@ -15,9 +15,11 @@ use App\Http\Middleware\PaidTaxPrivacy;
 use App\Http\Tax\PaidTaxRequestContext;
 use App\Http\Tax\PaidTaxResponseOwner;
 use App\Http\Tax\PaidTaxStreamResponse;
+use App\Http\Tax\TaxHttpMount;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -30,6 +32,32 @@ final class PaidTaxController
 
             return ['origin' => (new PaidTaxGrants)->finalize(...[...$identity, $order, $owner->read()])];
         });
+    }
+
+    /**
+     * Page shell only. Its path is deliberately outside the JSON-forced private prefix, so no PaidTaxPrivacy or root
+     * render exception is needed: it carries no locator, declaration, term, capability or token in Inertia page/history
+     * props, and the browser reads every private value from the JSON endpoints, which enforce their own closures.
+     */
+    public function page(Request $request): Response
+    {
+        try {
+            // The root privacy seam does not cover this path, so a stale cached route table is refused here, before
+            // policy, identity or SQL work.
+            PaidTaxException::require(TaxHttpMount::admitted('paid-tax-grants.http_mounted'), 404);
+            PaidTaxException::require(in_array($request->getRealMethod(), ['GET', 'HEAD'], true) && $request->query->count() === 0
+                && $request->server->get('QUERY_STRING', '') === '' && $request->getContent() === '', 422);
+            $this->identity($request);
+
+            return PaidTaxPrivacy::protect(Inertia::render('PaidTaxLicenses')->toResponse($request));
+        } catch (Throwable $error) {
+            return PaidTaxPrivacy::refusal($error);
+        }
+    }
+
+    public function index(Request $request): Response
+    {
+        return $this->projection($request, fn (array $identity, PaidTaxResponseOwner $owner): array => (new PaidTaxReads)->index(...[...$identity, $owner->read()]));
     }
 
     public function show(string $batch, Request $request): Response
