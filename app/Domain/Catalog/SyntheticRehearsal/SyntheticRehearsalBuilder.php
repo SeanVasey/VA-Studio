@@ -70,6 +70,11 @@ final class SyntheticRehearsalBuilder
                 return ['track' => $track, 'state' => 'present, metadata differs from the definition; left unchanged', 'ready' => false,
                     'revisions' => $this->revisions($track, $licenses)];
             }
+            if (! $this->offersMatch($track, $licenses)) {
+                // Its active offers are no longer exactly the two TEST PRICE offers; they are reported, never changed back.
+                return ['track' => $track, 'state' => 'present, offers differ from the definition; left unchanged', 'ready' => false,
+                    'revisions' => $this->revisions($track, $licenses)];
+            }
             $blockers = app(PublicationReadiness::class)->blockers($track);
 
             return ['track' => $track, 'state' => $blockers === [] ? 'already present' : 'present, not ready: '.implode(' ', $blockers),
@@ -241,6 +246,20 @@ final class SyntheticRehearsalBuilder
         }
 
         return $revisions;
+    }
+
+    /** Exactly one active offer per synthetic license, each at its definition's TEST PRICE, and no other active offer. */
+    private function offersMatch(Track $track, array $licenses): bool
+    {
+        $revisions = $this->revisions($track, $licenses);
+        foreach (SyntheticRehearsalCatalog::licenses() as $key => $definition) {
+            $revision = $revisions[$key] ?? null;
+            if ($revision === null || $revision->price_minor !== $definition['price_minor'] || $revision->currency !== SyntheticRehearsalCatalog::CURRENCY) {
+                return false;
+            }
+        }
+
+        return Offer::query()->where('track_id', $track->id)->where('is_active', true)->count() === count($licenses);
     }
 
     private function terms(array $definition): array

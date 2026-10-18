@@ -2,8 +2,10 @@
 
 namespace App\Domain\Catalog\SyntheticRehearsal;
 
+use App\Domain\Catalog\Models\Track;
 use App\Domain\Media\MediaFailure;
 use App\Domain\Media\PrivateMediaFiles;
+use App\Domain\Rights\Models\LicenseVersion;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use App\Support\Environment\TestEnvironment;
@@ -16,11 +18,20 @@ use Illuminate\Support\Facades\Gate;
  */
 final class SyntheticRehearsalPolicy
 {
-    /** Environment, flag and Stripe mode. Production is refused first and unconditionally. */
+    /**
+     * Environment, flag, Stripe mode and catalog. Production is refused first, whether it is the configured
+     * environment (`config('app.env')`, which a cached configuration keeps) or the running one. Artisan's `--env`
+     * switch changes only the running environment, so the two must also agree. These are configuration checks, not
+     * proof of host identity; the catalog check below keeps the command off a real catalog if every signal is wrong.
+     */
     public function admit(): void
     {
-        if (app()->environment('production') || app()->isProduction()) {
+        $configured = config('app.env');
+        if ($configured === 'production' || app()->environment('production') || app()->isProduction()) {
             $this->refuse('The synthetic rehearsal catalog is refused in production, whatever VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED says.');
+        }
+        if (! is_string($configured) || $configured !== app()->environment()) {
+            $this->refuse('The configured environment (APP_ENV) and the running environment differ, for example through --env; the synthetic rehearsal catalog refuses an ambiguous environment.');
         }
         if (! TestEnvironment::admitsTestCommerce()) {
             $this->refuse('The synthetic rehearsal catalog runs only when APP_ENV is local, testing or staging.');
@@ -30,6 +41,9 @@ final class SyntheticRehearsalPolicy
         }
         if (! $this->stripeTestModeOnly()) {
             $this->refuse('The synthetic rehearsal catalog requires Stripe test mode: STRIPE_MODE=test, an sk_test_ key or none, and no live production checkout configuration.');
+        }
+        if ($this->realCatalogPresent()) {
+            $this->refuse('This catalog has a published (or once published) track or an approved license outside the synthetic definition; the synthetic rehearsal catalog runs only on an empty or synthetic-only catalog.');
         }
     }
 
@@ -100,6 +114,22 @@ final class SyntheticRehearsalPolicy
         if (! hash_equals($sha256, (string) hash_file('sha256', $resolved))) {
             $this->refuse('The configured seller tag does not match MEDIA_TAG_SHA256 (tag_hash_mismatch).');
         }
+    }
+
+    /**
+     * Two bounded existence reads against the exact definition slugs (no pattern matching, so no collation or LIKE
+     * semantics are involved): any track that is or was published, or any approved or published license version,
+     * outside the synthetic definition means this is not a rehearsal-only catalog.
+     */
+    private function realCatalogPresent(): bool
+    {
+        $tracks = array_column(SyntheticRehearsalCatalog::tracks(), 'slug');
+        $licenses = array_column(SyntheticRehearsalCatalog::licenses(), 'slug');
+
+        return Track::query()->where(fn ($query) => $query->where('status', 'published')->orWhereNotNull('published_slug'))
+            ->whereNotIn('slug', $tracks)->exists()
+            || LicenseVersion::query()->whereIn('status', ['approved', 'published'])
+                ->whereHas('template', fn ($query) => $query->whereNotIn('slug', $licenses))->exists();
     }
 
     /** Configuration shape only, as the installation report checks it: no key is used or reported and no provider is contacted. */
