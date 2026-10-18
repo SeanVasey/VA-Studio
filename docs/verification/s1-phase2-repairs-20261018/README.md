@@ -3,7 +3,7 @@
 Lane F4 repairs the 12 failing cases (6 classes) that the local S1 phase 2 sweep found on `main` `4c0854fd`. All six reproduce in isolation on `main` `97e865e9`, so none is test-order pollution. Each was introduced by a recent merge, and in each case the test or its fixture had gone stale against an intended product change. **No production code changed:** every commit touches only `tests/`, this packet and `CHANGELOG.md`. Nothing was pushed, no PR was opened or commented on, and no workflow was dispatched (CI cost policy, AGENTS.md).
 
 - Worktree `/home/user/wt/f4`, branch `harness/s1-phase2-repairs-20261018`, based on `origin/main` at `97e865e985a6a5ec0eb7b35d1d80e0f3b52cd4be` (`97e865e9`).
-- Tested source: `b38dd1f9aa8f9f23b65c04ae0e71f23b50d93b59` (the last test commit). The docs commit that carries this packet and the `CHANGELOG.md` line changes no application or test file.
+- Tested source: `b38dd1f9aa8f9f23b65c04ae0e71f23b50d93b59` (the last test commit), with `laravel/framework` 13.36.0. The docs commit that carries this packet and the `CHANGELOG.md` line changes no application or test file. The branch then merged `main` at `5007a906` (PR #154, `laravel/framework` 13.37.0); the independent review re-ran the six files (53 tests) and a 78-file sample (730 tests, 0 failures, 0 errors, skips all in the census) on 13.37.0 at `80452969`.
 - Runtime: PHP 8.4.26, PHPUnit 12.5.34, SQLite in memory. Lane command: `APP_ENV=testing`, `APP_DEBUG=false`, `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:`, `CACHE_STORE=array`, `SESSION_DRIVER=array`, `QUEUE_CONNECTION=sync`, `CI=true`, `GITHUB_ACTIONS=true`, `--fail-on-phpunit-warning`, `memory_limit=512M`, `public/build` absent. The batch runs used the S1 runner (`env -i`, `PAO_DISABLE=1`, junit log) with the same variables.
 - Sweep logs that found the failures: the lead's scratchpad `s1/` (`p2b1.junit.xml`, `p2b2.junit.xml`, `p2-batch1.txt`, `p2-batch2.txt`).
 
@@ -173,6 +173,14 @@ All counts are SQLite, `CI=true`, `public/build` absent. "Before" is the S1 swee
 | `git diff --check origin/main...HEAD` | clean |
 
 The two batch runs each report two failing cases that are not in the original list. They are the four contract-renderer tests below, and they are an artifact of this lane's vendor directory, not of the repairs: `IsolatedContractRendererAcceptanceTest`, `TestContractIssuanceTest::test_real_isolated_renderer_can_issue_one_private_pdf_from_an_actual_paid_grant`, `TestContractProfileSuccessorTest::test_real_scrubbed_child_dispatches_only_the_trusted_successor_implementation` and `TestContractSuccessorActivationTest::test_exact_v2_policy_captures_real_request_and_worker_preserves_one_original`. They spawn a scrubbed child PHP with `open_basedir` set to the project root, and this worktree's `vendor/` first held symlinks to another worktree's packages, which the child may not read (`IsolatedContractRenderer.php:71`, `render_failed`). With the symlinks replaced by real copies, the four files pass: 74 tests, 597 assertions (`logs/rerun-contract-renderer-files-real-vendor.txt`). None of the five commits touches a file these four use.
+
+## Independent review
+
+[`independent-review-80452969-DECISION.md`](independent-review-80452969-DECISION.md): **APPROVE WITH CONDITIONS** at
+`80452969`, no P0 to P2. Each repair was checked by mutation: the authority re-check, an index recreated on different columns,
+a missing rollback after the customer write, and the two stalled-source tests that had passed vacuously all fail as they
+should. Repairs 1 and 2 share one root cause, so the lane repairs five root causes in six classes. Both conditions (P3: that
+count in the ledger, and this packet's note on the 13.37.0 re-run) are corrected by the commit after the reviewed one.
 
 ## Untested conditions
 
