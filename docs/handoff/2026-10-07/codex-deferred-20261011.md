@@ -448,3 +448,6 @@ Sean's 2026-10-18 decisions close two open questions: the K3 reserved-address ru
 
 
 2026-10-18 M2 dependency follow-up, reviewed at `1464ebfc` (APPROVE WITH CONDITIONS; R1 and R2 corrected before the PR opened). Deferred: R3 (P3, widen the Dependabot Composer exclusion to `tecnickcom/tc-lib-*` so the transitive renderers also get their own PR) and R4 (P3, Laravel 13.37.0 limiter `block()` now times out on `Carbon::now()`; a future frozen-time test of a funnel or throttle could hang; no current code uses one).
+
+
+2026-10-18 M3 Filament 5.10.2, reviewed at `af7d2e6a` (APPROVE WITH CONDITIONS; R1 and R2 corrected before the PR opened). Deferred: **R3 (P2, required before production)** a scheduled deletion of expired `cache` rows, because Filament 5.10 keeps undelivered staff flash notifications as plain-text cache rows that are never purged once expired (they previously sat in the encrypted session); do not use `cache:clear`, which also resets throttles and TOTP replay records. R4 (P3) the TOTP verification lock TTL is 60 s, so a crashed request blocks that staff member's MFA for up to a minute with HTTP 500s; R5 (P3) Filament's login and logout hooks also fire for customer sign-ins; R6 (P3) a code-only rollback to 5.8.4 gives one 500 per touched staff session; R7 (P3) the test helper depends on `NotificationMailbox::flush()` (fails closed).

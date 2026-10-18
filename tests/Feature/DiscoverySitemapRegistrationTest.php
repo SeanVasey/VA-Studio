@@ -15,6 +15,8 @@ final class DiscoverySitemapRegistrationTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
 
+    private const FILAMENT_MAILBOX_MIDDLEWARE = 'Filament\\Notifications\\Http\\Middleware\\InitializeNotificationMailbox';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -44,11 +46,17 @@ final class DiscoverySitemapRegistrationTest extends TestCase
     public function test_default_off_keeps_existing_site_index_and_public_routes_have_no_session_stack(): void
     {
         $this->app->instance('env', 'production');
-        $this->get('/sitemap.xml')->assertOk()->assertSee('https://synthetic.example/site-pages-sitemap.xml', false)->assertDontSee('track-sitemaps', false);
-        $this->get('/track-sitemaps/'.str_repeat('a', 32).'/1.xml')->assertNotFound();
+        $index = $this->get('/sitemap.xml')->assertOk()->assertSee('https://synthetic.example/site-pages-sitemap.xml', false)->assertDontSee('track-sitemaps', false);
+        $missing = $this->get('/track-sitemaps/'.str_repeat('a', 32).'/1.xml')->assertNotFound();
         $route = Route::getRoutes()->getByName('discovery.tracks');
-        $this->assertSame(['throttle:128,1,public-discovery-tracks'], $route->gatherMiddleware());
+        // Filament 5.10 appends its notification-mailbox initializer to every route it sees matched. It acts only when the request
+        // already has a session, so it adds no session stack; the cookie checks below prove none was opened. Any other extra
+        // middleware still breaks the exact comparison.
+        $stack = array_values(array_diff($route->gatherMiddleware(), [self::FILAMENT_MAILBOX_MIDDLEWARE]));
+        $this->assertSame(['throttle:128,1,public-discovery-tracks'], $stack);
         $this->assertFalse(in_array('web', $route->gatherMiddleware(), true));
+        $this->assertSame([], $index->headers->getCookies());
+        $this->assertSame([], $missing->headers->getCookies());
     }
 
     public function test_registered_complete_generation_is_canonical_and_respects_production_evidence_and_epoch(): void

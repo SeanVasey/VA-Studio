@@ -1,0 +1,11 @@
+actions: 34 files differ, 2693 diff lines
+filament: 76 files differ, 3736 diff lines
+forms: 97 files differ, 13306 diff lines
+infolists: 20 files differ, 1979 diff lines
+notifications: 16 files differ, 1797 diff lines
+query-builder: 6 files differ, 436 diff lines
+schemas: 33 files differ, 3418 diff lines
+support: 53 files differ, 4580 diff lines
+tables: 94 files differ, 8451 diff lines
+widgets: 12 files differ, 776 diff lines
+livewire: 1 file differs, 44 diff lines

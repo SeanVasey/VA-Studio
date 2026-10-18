@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/m3/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:03.568, Memory: 93.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\MembershipAdministrationActionTest::test_uncertain_failure_retains_copyable_input_logs_only_exception_class_and_prevents_replay
+Failed asserting that '[{"id":"a3030821-9d0d-4f6b-9f6f-8f6cff92fb52","actions":[],"body":"Keep a copy of your entered policy, then use Back to policy or reopen to inspect saved versions before reviewing again.PRIVATE_SYNTHETIC_FAILURE_DETAIL","color":null,"duration":"persistent","icon":"heroicon-o-x-circle","iconColor":"danger","status":"danger","title":"The private plan save could not be confirmed","view":null,"viewData":[]}]' [ASCII](length: 407) does not contain "PRIVATE_SYNTHETIC_FAILURE_DETAIL" [ASCII](length: 32).
+
+/home/user/wt/m3/tests/Support/FilamentNotifications.php:88
+/home/user/wt/m3/tests/Feature/MembershipAdministrationActionTest.php:228
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 13, Failures: 1.
