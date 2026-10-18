@@ -217,3 +217,6 @@ A separate reviewer returned APPROVE WITH CONDITIONS at `06a231448a1f7a47bc250cc
 - P3-5: probe `restrict_fk_on_non_standard_key` with a named failure;
 - P3-6: stale skip-message and comment text.
 
+## Selection after merging main (lead, 2026-10-18)
+
+After merging main at `65b81f5b` (PRs #139, #140 and #141), the generator proves 2,448 selected MySQL-native tests in 233 files of **9,247** discovered tests in 678 files; 70 files still use fallback timings. The selected count is unchanged. Discovery grew by 29 cases from the newly merged account-feature and synthetic-catalog tests, none of which are native-selected. The GitHub workflow comment now reads 2448 of 9247. The GitLab comment states only the selected count, which is unchanged.
