@@ -216,7 +216,19 @@ datadir with a clean InnoDB/XA crash recovery, and every final native run below 
 | --- | --- | --- | --- | --- |
 | Final | `ProductionFreeGrantCommitObserverTest` (whole file) | 16 / 118 | 0 / 0 / 0 | 0 |
 | Final | `ProductionFreeGrantFirstByteTest` (whole file) | 10 / 96 | 0 / 0 / 0 | 0 |
-| Final | `ProductionFreeGrantSchemaTest` (whole file) | verification pending | | |
+| Final, four chunks | `ProductionFreeGrantSchemaTest`, all 16 methods without data sets | 16 / 168 | 0 / 0 / 2 | 0 each |
+
+The two Schema skips are methods in the reviewed MySQL skip census (`test_a_temporary_shadow_of_a_parent_or_owned_table_is_refused`,
+`test_parent_floor_drift_is_refused_before_the_first_owned_ddl`); no native skip in any final run is unlisted. The 37 data
+sets of `test_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema` are also MySQL-census skips and were
+not run natively (each costs a full migration before it skips); their native counterpart
+`test_native_every_contiguous_empty_installation_prefix_resumes_to_the_exact_schema` ran and passed. A second container
+restart at about 22:00 UTC killed the first whole-file Schema run, and a whole-file attempt with server defaults timed out
+at the lane's 20-minute chunk limit after five cases; it is not counted. The four counted chunks ran at `a5c5a866`, whose
+only difference from the tested source is documentation, on the same datadir restarted with
+`--innodb-flush-log-at-trx-commit=2 --sync-binlog=0` to shorten migrations (durability only; isolation stays
+REPEATABLE-READ). The CommitObserver and FirstByte runs used the server defaults. The server was shut down normally at the
+end (`Shutdown complete`).
 
 What the native cases establish:
 
@@ -308,7 +320,7 @@ tree was verified clean after each reversal.
 ## Untested conditions
 
 - No hosted CI, Focused feedback, Foundation or GitLab run. Nothing was pushed.
-- Native MySQL ran only the three Free files above. The rest of the native selection, including the other native
+- Native MySQL ran only the three Free files above (Schema without its 37 census-skipped data sets). The rest of the native selection, including the other native
   files that use `IdentityCommittedFrame` or the bootstrap privacy chain, was not re-run natively.
 - The 53 affected files ran on SQLite only, with the one load-sensitive Tax failure described above.
 - JSON responses are released after the committed command and a capsule re-proof in the controller, not at a
