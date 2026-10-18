@@ -321,7 +321,7 @@ class CrossFileConsistency(unittest.TestCase):
         self.assertNotIn("systemctl enable --now vasey", provision)
         self.assertNotIn("stripe-listen", provision)
         self.assertNotIn("test-commerce", provision)
-        self.assertIn("grep -qs '^# VASEY.AUDIO clamd profile' /etc/clamav/clamd.conf", provision)
+        self.assertIn("[ \"$(head -n 1 /etc/clamav/clamd.conf 2>/dev/null)\" != '# VASEY.AUDIO clamd profile' ]", provision)
 
     def test_logging_is_journal_for_workers_and_files_have_logrotate(self):
         workers = self.t["workers/vasey-production-workers.conf"]
