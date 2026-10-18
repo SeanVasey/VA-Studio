@@ -1,0 +1,223 @@
+--- staging/provision.sh (renamed)
++++ production/provision.sh
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env bash
+ # shellcheck disable=SC2015  # `test && test || die` is intended: die whenever any test fails.
+-# VASEY.AUDIO private test-mode staging: one-time host provisioning for what Laravel Forge does not do.
++# VASEY.AUDIO production: one-time host provisioning for what Laravel Forge does not do (no basic auth, no test commerce).
+ #
+ # Run as root on the Forge-provisioned server, from the Forge site checkout (the deploy mirror):
+@@ -12,6 +12,5 @@
+ #   --db-name NAME            MySQL schema (default: vasey_production)
+ #   --mysql-admin-defaults F  root-owned 0600 [client] file under protected ancestry (default: root via the local socket)
+-#   --app-env NAME            APP_ENV the deploy insists on (default: staging; local is the earlier interim profile)
+-#   --basic-auth-user NAME    staging basic-auth user; the password is read from the terminal (never an argument)
++#   --app-env NAME            APP_ENV the deploy insists on (production is the only value)
+ #   --skip-packages           do not apt-get anything (re-runs that only refresh config)
+ #
+@@ -38,6 +37,6 @@
+ [ "$(id -u)" -eq 0 ] || die "run as root (sudo bash $0 ...)"
+ 
+-HOST="" APP_USER=forge ROOT=/srv/vasey-production MIRROR="" DB_NAME=vasey_production MYSQL_ADMIN_DEFAULTS="" APP_ENV_EXPECTED=staging
+-BASIC_USER="" SKIP_PACKAGES=0
++HOST="" APP_USER=forge ROOT=/srv/vasey-production MIRROR="" DB_NAME=vasey_production MYSQL_ADMIN_DEFAULTS="" APP_ENV_EXPECTED=production
++SKIP_PACKAGES=0
+ while [ $# -gt 0 ]; do
+   case "$1" in
+@@ -49,5 +48,4 @@
+     --mysql-admin-defaults) MYSQL_ADMIN_DEFAULTS=${2:?}; shift 2 ;;
+     --app-env) APP_ENV_EXPECTED=${2:?}; shift 2 ;;
+-    --basic-auth-user) BASIC_USER=${2:?}; shift 2 ;;
+     --skip-packages) SKIP_PACKAGES=1; shift ;;
+     *) die "unknown option $1" ;;
+@@ -159,5 +157,5 @@
+ [ -z "${MYSQL_ADMIN_DEFAULTS:-}" ] || mysql_admin_defaults_custody
+ [[ "$DB_NAME" =~ ^[a-z][a-z0-9_]{0,40}$ ]] || die "--db-name must match ^[a-z][a-z0-9_]{0,40}$"
+-[[ "$APP_ENV_EXPECTED" =~ ^(local|staging)$ ]] || die "--app-env must be local or staging"
++[ "$APP_ENV_EXPECTED" = production ] || die "--app-env must be production"
+ APP_GROUP=$(id -gn "$APP_USER")
+ APP_HOME=$(getent passwd "$APP_USER" | cut -d: -f6)
+@@ -165,5 +163,5 @@
+ KIT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+ for f in nginx/vasey-production.conf php-fpm/vasey-production.conf php-fpm/vasey-paid-delivery.conf \
+-         workers/vasey-production-workers.conf bin/vasey-production-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh; do
++         workers/vasey-production-workers.conf bin/vasey-production-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh forge-deploy.sh; do
+   [ -f "$KIT/$f" ] || die "kit file missing: ops/production/$f"
+ done
+@@ -259,5 +257,8 @@
+ systemctl enable --now clamav-freshclam >/dev/null
+ # clamd is not used (the configured engine is clamscan) and would hold ~1 GiB resident.
+-if systemctl list-unit-files clamav-daemon.service >/dev/null 2>&1; then systemctl disable --now clamav-daemon >/dev/null 2>&1 || true; fi
++# Stop an unused clamd, but never one that ops/clamav/install-clamd.sh configured (its clamd.conf starts with the marker).
++if ! grep -qs '^# VASEY.AUDIO clamd profile' /etc/clamav/clamd.conf && systemctl list-unit-files clamav-daemon.service >/dev/null 2>&1; then
++  systemctl disable --now clamav-daemon >/dev/null 2>&1 || true
++fi
+ newest=$(find /var/lib/clamav -maxdepth 1 \( -name 'daily.c[lv]d' -o -name 'main.c[lv]d' \) -printf '%T@\n' | sort -rn | head -1)
+ age=$(( $(date +%s) - ${newest%.*} ))
+@@ -450,5 +451,4 @@
+ VASEY_EXPECTED_APP_ENV=$APP_ENV_EXPECTED
+ VASEY_DB_NAME=$DB_NAME
+-VASEY_PROBE_NETRC=/etc/vasey-production/probe.netrc
+ VASEY_KEEP_RELEASES=3
+ VASEY_BACKUP_KEEP=7
+@@ -466,4 +466,5 @@
+ install -m 0644 -o root -g root "$KIT/seal-release.py" /usr/local/libexec/vasey-production/seal-release.py
+ install -m 0644 -o root -g root "$KIT/release-step.sh" /usr/local/libexec/vasey-production/release-step.sh
++install -m 0755 -o root -g root "$KIT/forge-deploy.sh" /usr/local/libexec/vasey-production/forge-deploy.sh
+ 
+ render "$KIT/php-fpm/vasey-production.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-production.conf" 0644
+@@ -506,24 +507,5 @@
+ EOF
+ 
+-# ---------------------------------------------------------------- 7. access credentials and nginx template
+-HTPASSWD=/etc/nginx/vasey-production.htpasswd
+-if [ ! -s "$HTPASSWD" ]; then
+-  [ -t 0 ] || die "basic-auth file missing and no terminal to read a password; re-run interactively"
+-  [ -n "$BASIC_USER" ] || read -r -p "Staging basic-auth user name: " BASIC_USER
+-  [[ "$BASIC_USER" =~ ^[A-Za-z0-9._-]{3,32}$ ]] || die "basic-auth user must be 3-32 of [A-Za-z0-9._-]"
+-  read -r -s -p "Staging basic-auth password (16+ characters): " bpw; echo
+-  read -r -s -p "Repeat: " bpw2; echo
+-  [ "$bpw" = "$bpw2" ] && [ "${#bpw}" -ge 16 ] || die "passwords differ or are shorter than 16 characters"
+-  [[ "$bpw" != *[[:space:]]* ]] || die "the password must not contain whitespace (it is also stored in a netrc file)"
+-  umask 077
+-  printf '%s:%s\n' "$BASIC_USER" "$(printf '%s' "$bpw" | openssl passwd -6 -stdin)" > "$HTPASSWD.tmp"
+-  printf 'machine %s\nlogin %s\npassword %s\n' "$HOST" "$BASIC_USER" "$bpw" > /etc/vasey-production/probe.netrc
+-  umask 022
+-  unset bpw bpw2
+-  chown root:"$NGINX_GROUP" "$HTPASSWD.tmp"; chmod 0640 "$HTPASSWD.tmp"; mv -f "$HTPASSWD.tmp" "$HTPASSWD"
+-fi
+-[ -s /etc/vasey-production/probe.netrc ] || die "/etc/vasey-production/probe.netrc missing: delete $HTPASSWD and re-run to set both"
+-chown root:root /etc/vasey-production/probe.netrc; chmod 0600 /etc/vasey-production/probe.netrc
+-
++# ---------------------------------------------------------------- 7. nginx template (no basic auth, no probe credentials)
+ render "$KIT/nginx/vasey-production.conf" /etc/vasey-production/nginx-site.conf 0644
+ 
+@@ -538,7 +520,7 @@
+   helpers             /usr/local/sbin/vasey-production-ctl (sudo for $APP_USER), /usr/local/sbin/vasey-production-backup (cron 03:17 UTC)
+   MySQL               schema $DB_NAME; DB_HOST=127.0.0.1 DB_USERNAME=vasey_app
+-  secrets (root only) $SECRETS/db-app.env (paste DB_PASSWORD into Forge > Environment), $BACKUP_CNF, $HTPASSWD, /etc/vasey-production/probe.netrc
++  secrets (root only) $SECRETS/db-app.env (paste DB_PASSWORD into Forge > Environment), $BACKUP_CNF
+   nginx site          /etc/vasey-production/nginx-site.conf: fill __SSL_CERT__, __SSL_KEY__, __FORGE_CONF__ from Forge's
+                       generated config, then paste it into Forge > Site > Edit Nginx Configuration
+-Next: ops/production/README.md step 8 onwards.
++Next: ops/production/README.md, "Provisioning, step by step", step 8 onwards.
+ EOF
+--- staging/forge-deploy.sh (renamed)
++++ production/forge-deploy.sh
+@@ -1,5 +1,5 @@
+ #!/usr/bin/env bash
+ # shellcheck disable=SC2015  # `test && test || die` is intended: die whenever any test fails.
+-# VASEY.AUDIO private test-mode staging: release and activation, run by Forge's "Deploy Now" as the site user.
++# VASEY.AUDIO production: release and activation, run by Forge's "Deploy Now" as the site user.
+ #
+ # Forge > Site > Deployment Script (replace Forge's default with exactly these lines):
+@@ -8,5 +8,5 @@
+ #   git fetch --prune origin "$FORGE_SITE_BRANCH"
+ #   git checkout --detach --force FETCH_HEAD
+-#   bash ops/production/forge-deploy.sh "$(git rev-parse HEAD)"
++#   bash /usr/local/libexec/vasey-production/forge-deploy.sh "$(git rev-parse HEAD)"
+ #
+ # The Forge site checkout ($FORGE_SITE_PATH) is only a git mirror and the home of the Forge-managed .env.
+@@ -108,5 +108,5 @@
+ freeze_runtime_environment
+ envget() { grep -E "^$1=" "$RUNTIME_ENV" | tail -n 1 | cut -d= -f2- | sed -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'$/\1/"; }
+-need() { [ "$(envget "$1")" = "$2" ] || die ".env: $1 must be $2 for the staging profile"; }
++need() { [ "$(envget "$1")" = "$2" ] || die ".env: $1 must be $2 for the production profile"; }
+ need APP_ENV "$VASEY_EXPECTED_APP_ENV"
+ need APP_DEBUG false
+@@ -120,6 +120,5 @@
+ need DB_DATABASE "$VASEY_DB_NAME"
+ need FILESYSTEM_DISK local
+-need MAIL_MAILER log
+-need STRIPE_MODE test
++need LOG_CHANNEL stderr            # the journal collects stderr; the reviewed preflight profile requires it
+ need APP_MAINTENANCE_DRIVER file
+ [[ "$(envget APP_KEY)" =~ ^base64:[A-Za-z0-9+/]{43}=$ ]] || die ".env: APP_KEY must be a base64 32-byte key (php artisan key:generate --show)"
+@@ -127,12 +126,6 @@
+ [ -n "$(envget DB_PASSWORD)" ] || die ".env: DB_PASSWORD is empty"
+ [ "$(envget DB_QUEUE_RETRY_AFTER)" -ge 1200 ] 2>/dev/null || die ".env: DB_QUEUE_RETRY_AFTER must be at least 1200"
+-! grep -Eq '(sk|rk|pk)_live_' "$RUNTIME_ENV" || die ".env contains a live Stripe key; staging is test mode only"
+-! grep -Eq '^PRODUCTION_CHECKOUT_[A-Z_]*ENABLED=(true|1)' "$RUNTIME_ENV" || die ".env enables production checkout; staging must not"
+-# Fail closed on ambiguous encodings during the cheap pre-build check. The real dotenv/configuration
+-# gate validates the protected current release before quiesce and the built candidate before attachment.
+-while IFS= read -r flag; do
+-  case "$(envget "$flag")" in false|'(false)'|'') ;; *) die ".env production checkout flags must be false or unset" ;; esac
+-done < <(sed -n 's/^\(PRODUCTION_CHECKOUT_[A-Z_]*ENABLED\)=.*/\1/p' "$RUNTIME_ENV")
+-step "runtime .env passes the staging profile checks (APP_ENV=$VASEY_EXPECTED_APP_ENV, APP_DEBUG=false)"
++# Live Stripe keys and PRODUCTION_CHECKOUT_* switches are not refused here: validate-runtime.php holds them, once, for every path.
++step "runtime .env passes the production profile checks (APP_ENV=$VASEY_EXPECTED_APP_ENV, APP_DEBUG=false)"
+ 
+ # ---------------------------------------------------------------- 1. fresh immutable checkout
+--- staging/bin/vasey-staging-ctl (renamed)
++++ production/bin/vasey-production-ctl
+@@ -45,5 +45,5 @@
+ 
+ : "${VASEY_PRODUCTION_HOST:?}" "${VASEY_APP_USER:?}" "${VASEY_APP_GROUP:?}" "${VASEY_ROOT:?}" "${VASEY_PHP:?}" \
+-  "${VASEY_PHP_FPM_SERVICE:?}" "${VASEY_PROBE_NETRC:?}" "${VASEY_KEEP_RELEASES:=3}"
++  "${VASEY_PHP_FPM_SERVICE:?}" "${VASEY_KEEP_RELEASES:=3}"
+ [ "$(id -u "$VASEY_APP_USER")" -gt 0 ] || die "application account must be nonroot"
+ 
+@@ -158,8 +158,8 @@
+ 
+ # HTTP status of GET / on this host, without depending on DNS or egress: the request goes to the local
+-# nginx with the staging hostname for SNI and the certificate check, and the staging basic-auth
+-# credentials from a 0600 netrc. Maintenance proof needs the exact code: a failed request is not a 503.
++# nginx with the production hostname for SNI and the certificate check, and no credentials (the site has no basic
++# auth). Maintenance proof needs the exact code: a failed request is not a 503.
+ probe() {
+-  curl -sS --noproxy '*' -o /dev/null -w '%{http_code}' --max-time 20 --netrc-file "$VASEY_PROBE_NETRC" \
++  curl -sS --noproxy '*' -o /dev/null -w '%{http_code}' --max-time 20 \
+     --resolve "$VASEY_PRODUCTION_HOST:443:127.0.0.1" "https://$VASEY_PRODUCTION_HOST/" 2>/dev/null || true
+ }
+--- staging/workers/vasey-staging-workers.conf (renamed)
++++ production/workers/vasey-production-workers.conf
+@@ -38,7 +38,6 @@
+ stopasgroup=true
+ redirect_stderr=true
+-stdout_logfile=/var/log/vasey-production/worker-media.log
+-stdout_logfile_maxbytes=20MB
+-stdout_logfile_backups=5
++stdout_logfile=NONE
++stdout_syslog=true
+ 
+ [program:vasey-production-payments]
+@@ -55,7 +54,6 @@
+ stopasgroup=true
+ redirect_stderr=true
+-stdout_logfile=/var/log/vasey-production/worker-payments.log
+-stdout_logfile_maxbytes=20MB
+-stdout_logfile_backups=5
++stdout_logfile=NONE
++stdout_syslog=true
+ 
+ [program:vasey-production-contracts]
+@@ -72,7 +70,6 @@
+ stopasgroup=true
+ redirect_stderr=true
+-stdout_logfile=/var/log/vasey-production/worker-contracts.log
+-stdout_logfile_maxbytes=20MB
+-stdout_logfile_backups=5
++stdout_logfile=NONE
++stdout_syslog=true
+ 
+ ; Kept apart from payments so a 900 s sound-kit job never delays a payment receipt.
+@@ -90,7 +87,6 @@
+ stopasgroup=true
+ redirect_stderr=true
+-stdout_logfile=/var/log/vasey-production/worker-default.log
+-stdout_logfile_maxbytes=20MB
+-stdout_logfile_backups=5
++stdout_logfile=NONE
++stdout_syslog=true
+ 
+ ; Laravel's scheduler (routes/console.php: vasey:publish-scheduled-site-release every minute). schedule:work runs
+@@ -109,7 +105,6 @@
+ stopasgroup=true
+ redirect_stderr=true
+-stdout_logfile=/var/log/vasey-production/scheduler.log
+-stdout_logfile_maxbytes=10MB
+-stdout_logfile_backups=3
++stdout_logfile=NONE
++stdout_syslog=true
+ 
+ [group:vasey-production]

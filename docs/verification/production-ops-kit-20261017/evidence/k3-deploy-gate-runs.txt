@@ -1,0 +1,40 @@
+K3 evidence: the staging deploy gate (ops/staging/validate-runtime.php) refusing the capability profile and the production lanes
+Run 2026-10-18 on the K3 working tree over source 34562862. Each run is the real validator, started as the deploy starts it
+(`env -i PATH=... LC_ALL=C php ops/staging/validate-runtime.php ENV_FILE EXPECTED_ENV HOST DATABASE`), against a synthetic candidate
+.env (APP_ENV=staging, database cache/queue/session, MAIL_MAILER=log, STRIPE_MODE=test, a synthetic password) that passes on its own.
+Only check identifiers are printed, never a value. For the config mutations a file under config/ was changed for one run, then restored
+and compared; `git status` afterwards listed only the K3 files.
+
+baseline (candidate with no capability lines; every config default is false)
+  PASS runtime.profile (isolated file, real configuration, no provider request)            exit 0
+
+the two flags no policy gates by environment
+  candidate + VASEY_OPERATIVE_FREE_GRANTS_ENABLED=true
+    FAIL runtime.flag_off_vasey_operative_free_grants_enabled                              exit 1
+  candidate + CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED=   (blank: not the boolean false)
+    FAIL runtime.flag_off_contact_inquiry_operator_notifications_enabled                   exit 1
+
+production lanes (real config mutated for one run each)
+  config/paid-grants.php              'http_mounted' => true          FAIL runtime.production_lanes_closed   exit 1   (Paid252)
+  config/paid-tax-grants.php          'rehearsal_enabled' => true     FAIL runtime.production_lanes_closed   exit 1   (Tax255)
+  config/production-customer-identity.php  'enabled' => true          FAIL runtime.production_lanes_closed   exit 1   (production identity)
+  config/production-free-grants.php   'enabled' => true               FAIL runtime.production_lanes_closed   exit 1   (production free grants)
+  config/production-free-grants.php   renamed away                    FAIL runtime.production_lanes_closed   exit 1   (a named lane no longer exists)
+
+fail closed
+  scripts/ops/capability-boundary.php moved away                      FAIL runtime.unavailable               exit 1
+  scripts/ops/capability-boundary.php replaced by a symlink           FAIL runtime.unavailable               exit 1
+
+restored: baseline again PASS, exit 0.
+
+PHPUnit mutations of the shared class and the gate (tests/Unit/StagingRuntimeValidatorTest.php, 79 cases; each mutation applied alone, files
+restored and compared afterwards; the unmutated run is 79 of 79):
+  flagsNotOff() refuses only a strict true (instead of anything but false)                16 failures
+  the deploy gate never checks the twelve flags                                           30 failures
+  VASEY_OPERATIVE_FREE_GRANTS_ENABLED dropped from the shared list                        20 failures
+  CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED dropped from the shared list             20 failures
+  the lane rule ignores `mounted`                                                          1 failure
+  named lanes that are missing are not reported                                            5 failures
+  the lane rule uses loose truth (== true)                                                 1 failure
+The wiring of the lane check into the gate (the call itself) is shown by the process-level runs above and pinned by
+tests/ops/test_staging_capability_profile.py; PHPUnit exercises the lane rule through the shared class with synthetic configuration.

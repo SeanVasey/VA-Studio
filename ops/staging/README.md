@@ -41,7 +41,7 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 | `seal-release.py` | Parent-first protected code sealing and safe private environment capture | `/usr/local/libexec/vasey-staging/` |
 | `release-step.sh` | Fixed unprivileged build and migration/cache steps under the enclosing root lease | `/usr/local/libexec/vasey-staging/` |
 | `normalize-mysql-dump.py` | Schema-only charset rendering comparison; preserves retained data bytes | `/usr/local/libexec/vasey-staging/` |
-| `validate-runtime.php` | Isolated real Laravel admission: protected current release before quiesce, built candidate before attachment; rejects key changes | run from each selected release |
+| `validate-runtime.php` | Isolated real Laravel admission: protected current release before quiesce, built candidate before attachment; rejects key changes, any of the twelve capability flags not exactly false (`runtime.flag_off_*`) and any enabled or mounted production-lane flag (`runtime.production_lanes_closed`); shares `scripts/ops/capability-boundary.php` with the profile validator | run from each selected release |
 | `forge-deploy.sh` | Release and activation; Forge's deployment script calls it | run from the Forge checkout |
 | `env.staging.example` | Every `.env.example` variable with staging-safe values and placeholders | pasted into Forge |
 
@@ -144,8 +144,8 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
 
 | Component | Requirement | Why |
 | --- | --- | --- |
-| PHP 8.4 CLI + FPM | `pdo_mysql`, `pdo_sqlite`, `mbstring`, `intl`, `bcmath`, `gd`, `fileinfo`, `zip`, `curl`, `dom`, `xml`, `xmlwriter`, `posix`, `pcntl`, `ctype`, `iconv`, `tokenizer`, `openssl` | `vasey:doctor` `php_runtime` (it requires `pdo_sqlite` even on MySQL), CI's extension list, renderer children, `pcntl` for worker timeouts |
-| MySQL | 8.4, binary log on, `log_bin_trust_function_creators=ON` | about 567 triggers created by a non-root account (see below) |
+| PHP 8.4.1 or newer, CLI + FPM | `pdo_mysql`, `pdo_sqlite`, `mbstring`, `intl`, `bcmath`, `gd`, `fileinfo`, `zip`, `curl`, `dom`, `xml`, `xmlwriter`, `posix`, `pcntl`, `ctype`, `iconv`, `tokenizer`, `openssl` | `vasey:doctor` `php_runtime` (it requires `pdo_sqlite` even on MySQL), CI's extension list, renderer children, `pcntl` for worker timeouts |
+| MySQL | 8.4, binary log on, `log_bin_trust_function_creators=ON` | 618 triggers (at `34562862`) created by a non-root account (see below) |
 | nginx | as Forge installs it (1.24+) | template uses `listen ... ssl http2` |
 | Node.js | `>=24.15.0 <25` (`package.json` engines), installed from NodeSource if Forge's is older | `npm ci && npm run build` |
 | ffmpeg / ffprobe | encoders `libmp3lame`, `pcm_s16le`, `png`, `mjpeg`, `libwebp` | `vasey:doctor` `media_encoders`, previews and artwork |
@@ -185,7 +185,8 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
 
 **Why one database account, and why `log_bin_trust_function_creators`.** On MySQL 8.4 with binary logging on,
 `CREATE TRIGGER` from an account without `SUPER` fails with error 1419. This was verified on a private 8.4.11
-server. The migrations create 567 triggers.
+server. The migrations create 618 triggers (200 tables, no routines, events or views, every definer `vasey_app@127.0.0.1`: measured with
+`migrate:fresh` on MySQL 8.4.11 at `34562862`, see `docs/verification/production-ops-kit-20261017/`).
 
 Granting `SUPER` is far broader than needed. Turning off binary logging would lose point-in-time recovery.
 The variable relaxes only the binlog-safety check for stored-program creators. With `binlog_format=ROW`, the
@@ -285,8 +286,15 @@ Forge Scheduler entry or Forge Daemons as well. Payment pipeline commands that n
 | `/paid-grants/origins/{uuid}/document` | 1 MiB | 3,900 s | `vasey-paid-delivery` |
 | everything else | 16 MiB (8 MiB resumable chunks) | 300 s | default (`request_terminate_timeout=300s`) |
 
-The paid routes are not mounted on `main` yet (PR #56). Until they are, these locations reach Laravel and
-answer 404. Before mounting, run the verification list at the end of `docs/ops/paid-delivery-runtime.md`.
+The paid routes are not mounted: `config/paid-grants.php` ships `http_mounted` as a literal `false` (there is no environment switch).
+Until it is changed, these locations reach Laravel and answer 404. Before mounting, run the verification list at the end of
+`docs/ops/paid-delivery-runtime.md`.
+
+**Not covered here:** the Tax V2 consumer routes (`/paid-tax-grants/origins/{batch}/document` and
+`.../authorizations/{authorization}/redeem`) have the same long-running shape but their own paths, so they would fall into the 300 s
+default location and pool. They mount only when `paid-tax-grants.http_mounted` is a literal `true` in `local` or `testing`
+(`App\Http\Tax\TaxHttpMount`), so nothing on staging or production reaches them, and no reviewed runtime budget exists for them yet
+(`docs/ops/paid-tax-http-runtime.md`). Adding their nginx locations and pool routing is a pre-mount condition, not done here.
 
 Security headers come from nginx:
 - HSTS, `nosniff` and `Permissions-Policy` on every response.
@@ -317,6 +325,12 @@ There is no global CSP: the application sets CSP on the responses that need one.
    runs prune old local sets. A failed resume remains an explicit recovery condition.
 
 `docs/ops/staging-runbook.md` covers setting the destination, retention, and restoring.
+
+Optional, off unless `/etc/vasey-staging/backup.conf` exists: age encryption to public recipients before the copy leaves the
+host, an rclone remote instead of rsync, and tiered retention. The default behaviour above is unchanged. See
+[`docs/ops/backup-offhost-hardening.md`](../../docs/ops/backup-offhost-hardening.md). Opt-in scanner (clamd) and monitoring
+checks live in [`ops/clamav/`](../clamav/README.md) and [`docs/ops/monitoring-and-host-baseline.md`](../../docs/ops/monitoring-and-host-baseline.md).
+The production counterpart of this kit is [`ops/production/`](../production/README.md); it is derived from these files.
 
 A served release must have a singly linked regular environment with one valid literal 32-byte APP_KEY
 before any snapshot is published. The backup profile requires one assignment per line; multiline quoted

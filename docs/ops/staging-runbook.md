@@ -181,8 +181,8 @@ domain service as the admin, under the same staff authority, MFA, rights, media 
 1. `APP_ENV` is `local`, `testing` or `staging`. The command refuses when the configured environment (`APP_ENV`,
    including a cached configuration) or the running environment is `production`, even with the flag on. It also
    refuses when the two differ, for example through `artisan --env=`.
-2. `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED=true`. The default is false. The key is not yet in
-   `ops/staging/env.staging.example`; add it to the host's `.env` by hand.
+2. `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED=true`. The default is false, and
+   `ops/staging/env.staging.example` states it as `false`; set it to `true` on the host only for the seeding run.
 3. Stripe is in test mode: `STRIPE_MODE=test`, an `sk_test_` key or none, and no live production-checkout setting.
 4. The catalog is empty or synthetic-only. A track that is or was published, or an approved license, outside the
    synthetic definition refuses the run. This is a configuration and catalog check, not proof of host identity.
@@ -344,8 +344,10 @@ render failed closed with `render_failed` (`docs/verification/php-cli-resolver-2
 **Host checks.**
 1. `ops/staging/validate-runtime.php` (run by every deploy and `ctl refresh`) fails `runtime.php_cli_binary` unless the
    configured binary passes the same probe the FPM pool will run.
-2. Before enabling free grants (`VASEY_TEST_FREE_GRANTS_ENABLED=true`), render one synthetic document through the real
-   FPM pool and confirm a PDF, not `render_failed`. The harness used for the evidence is in
+2. Free grants stay off on staging: `VASEY_TEST_FREE_GRANTS_ENABLED` must be `false`, and the deploy gate refuses any other value
+   (as it does for the other eleven staged flags). Enabling them is a reviewed change to `scripts/ops/capability-boundary.php`,
+   the templates and their tests. That change should include rendering one synthetic document through the real FPM pool and
+   confirming a PDF, not `render_failed`, before the flag is true on any host. The harness used for the evidence is in
    `docs/verification/php-cli-resolver-20261009/`.
 
 ## 8. Backups and the restore proof
