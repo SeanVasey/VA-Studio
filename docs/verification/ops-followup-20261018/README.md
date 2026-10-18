@@ -349,3 +349,14 @@ Process notes:
 - The disk space kept copies take on a real host, and how long they last under tiered retention (until a retry succeeds or the set
   is pruned).
 - The age restore drill with a real key.
+
+## Independent review records
+
+All three are imported verbatim by the lead.
+
+- [First review at `cd35fb15`](independent-review-cd35fb15-DECISION.md): APPROVE WITH CONDITIONS. P2-1: a re-encrypted set was reported "shipped" on backends with no common hash. P2-2: kept copies accumulated without limit. P3-1 to P3-5 were smaller items. All were fixed in round three.
+- [Re-review at `a28a87c5`](independent-rereview-a28a87c5-DECISION.md): APPROVE WITH CONDITIONS. The prior conditions were closed. A new P2-A: an outage that broke the listing dropped the kept copy, so retries could not converge. P3-B to P3-D and a nit were smaller items. All were fixed in round four.
+- [Re-review at `c94770ad`](independent-rereview-c94770ad-DECISION.md): APPROVE, with no P0 to P2. Its P3-1 (a malformed shipped record without a size, combined with a failing size listing, passes the check) is deferred to the next ops batch: require digits on both sides and fail the record write when `stat` fails.
+
+No source, script or test changed after `c94770ad`. Later commits are documentation and the main merge.
+
