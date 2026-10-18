@@ -241,3 +241,14 @@ The frontend checks ran with `. /opt/nvm/nvm.sh && nvm use 24`, then `npm test`,
 It also holds the frontend logs, the page-registration guard runs f01 to f06, both native-selection manifests, the safeguard and Pint outputs, the MySQL initialization, restart and shutdown records, the server error log and the recorder scripts. `recorded-evidence-index.json` lists each file with its size and SHA-256.
 
 All data in it is synthetic: local loopback-SMTP buyers, a recording synthetic Tax transport and the fixture's fixed testing app key, which is defined in test code and never printed. No real buyer, payment, credential or token is included.
+
+## Independent review
+
+A separate reviewer approved the batch at `e947cdb3e08a570362d3380727384d51b97ab43d` with no P0, P1 or P2 ([decision record](independent-review-e947cdb3-DECISION.md), imported verbatim). P3-4 (the changelog said "20 per page", but there is no paging) is corrected in the changelog. P3-1 to P3-3 and P3-5 to P3-7 are deferred to the next Tax batch and recorded in `docs/handoff/2026-10-07/codex-deferred-20261011.md`:
+- P3-1: null-safe producer abort;
+- P3-2: a capped locking list helper for the index and status selects;
+- P3-3: distinguish a changed window from a sign-out in the client;
+- P3-5: label the client tax arithmetic as non-authoritative, or drop it;
+- P3-6: `frame-ancestors 'none'` on private shells, including the V1 PaidGrants page;
+- P3-7: a signed-out page response.
+
