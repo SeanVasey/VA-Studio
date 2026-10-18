@@ -5,6 +5,7 @@ bash with real `age`, `rsync` and `rclone` against throwaway local directories a
 never kept. Nothing here touches a network, a database or a real host."""
 import datetime
 import fcntl
+import hashlib
 import os
 import random
 import shutil
@@ -351,9 +352,38 @@ class RcloneRemote(OffhostBase):
                                  shell=True, capture_output=True, env={"PATH": "/usr/bin:/bin"})
         self.assertEqual(decrypt.returncode, 0)
         self.assertEqual((restore / bk.name / "private.tar").read_bytes(), (bk / "private.tar").read_bytes())
-        # A second run of the same set is idempotent (--immutable only objects to changed bytes).
+        # Shipping the same set again encrypts it again, and age never repeats its bytes. The remote copy is complete, so the second
+        # ship is refused and both remote objects stay exactly as they were: immutability, not idempotence.
+        shipped = self.remote_digests()
         again = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
-        self.assertEqual(again.returncode, 0, again.stdout + again.stderr)
+        self.assertNotEqual(again.returncode, 0, again.stdout + again.stderr)
+        self.assertIn("never overwritten", again.stdout)
+        self.assertEqual(self.remote_digests(), shipped)
+
+    def remote_digests(self):
+        return {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in self.remote_dir.iterdir()}
+
+    def test_a_differing_object_already_on_the_remote_is_refused_and_never_overwritten(self):
+        # The real rclone of this container (1.60.1) against a local-filesystem remote: no stand-in decides this.
+        recipients = self.recipients()
+        bk = self.make_set()
+        for suffix in (".tar.age", ".tar.age.sha256"):
+            with self.subTest(existing=suffix):
+                shutil.rmtree(self.remote_dir)
+                self.remote_dir.mkdir()
+                shutil.rmtree(self.backups / f".offhost-retry.{bk.name}", ignore_errors=True)
+                planted = self.remote_dir / f"{bk.name}{suffix}"
+                planted.write_bytes(b"an earlier, different object under this name\n")
+                run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+                self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+                self.assertIn("immutable file modified", run.stderr)
+                self.assertEqual(planted.read_bytes(), b"an earlier, different object under this name\n", "refused, not overwritten")
+                names = sorted(p.name for p in self.remote_dir.iterdir())
+                if suffix == ".tar.age":
+                    self.assertEqual(names, [f"{bk.name}.tar.age"], "the ciphertext goes first, so its digest was never sent")
+                else:
+                    self.assertEqual(names, [f"{bk.name}.tar.age", f"{bk.name}.tar.age.sha256"])
+                self.assertEqual(self.retry_copies(), [f".offhost-retry.{bk.name}"])
 
     def test_rclone_without_age_refuses_to_ship_and_sends_nothing(self):
         bk = self.make_set()
@@ -415,21 +445,20 @@ class RcloneRemote(OffhostBase):
         self.assertTrue((self.backups / ".ship.LINK00").is_symlink() and (link_target / "leftover.tar.age").exists(), "a link is never followed")
 
     def flaky_rclone(self):
-        """The real rclone in front of a destination that refuses overwrites, whose first checksum upload fails.
+        """The real rclone, except that the first upload of a checksum file fails, as an interrupted transfer would.
 
-        rclone 1.60.1 (this container's) does not enforce `--immutable` on `copyto`: it replaces a differing object. A newer rclone,
-        or the no-overwrite credential docs/ops/backup-offhost-hardening.md recommends, refuses it, which is the case the retry must
-        survive. So `copyto` onto an existing object with different bytes fails here, as `rclone copy --immutable` does."""
+        Only the failure is simulated. Whether an existing remote object may be replaced is decided by the real rclone: the script's
+        `rclone copy --immutable` refuses a differing object (and accepts an identical one) on this container's 1.60.1."""
         failed_once = self.root / "rclone-failed-once"
         wrapper = self.root / "flaky-rclone"
         wrapper.write_text(f"""#!/bin/bash
 args=("$@")
-if [ "${{args[2]:-}}" = copyto ]; then
-  src=${{args[-2]}} dst=${{args[-1]#vasey-backup:}}
-  if [[ "$dst" == *.tar.age.sha256 ]] && [ ! -e "{failed_once}" ]; then
-    : > "{failed_once}"; echo "flaky-rclone: simulated interrupted upload" >&2; exit 1
-  fi
-  if [ -e "$dst" ] && ! cmp -s "$src" "$dst"; then echo "flaky-rclone: immutable file modified" >&2; exit 1; fi
+if [ "${{args[2]:-}}" = copy ] && [ ! -e "{failed_once}" ]; then
+  for ((i = 3; i < ${{#args[@]}} - 1; i++)); do
+    if [ "${{args[i]}}" = --include ] && [[ "${{args[i + 1]}}" == *.tar.age.sha256 ]]; then
+      : > "{failed_once}"; echo "flaky-rclone: simulated interrupted upload" >&2; exit 1
+    fi
+  done
 fi
 exec "{HAVE['rclone']}" "$@"
 """)

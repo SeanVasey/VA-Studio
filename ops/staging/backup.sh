@@ -400,11 +400,12 @@ retry_copy_ok() {  # retry_copy_ok DIR NAME
     && sha256sum < "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" | cmp -s - "$dir/recipients.sha256"
 }
 
-# age to an rclone remote. A no-overwrite credential at the destination, or an rclone that enforces `--immutable` on `copyto` (1.60.1
-# does not; docs/ops/backup-offhost-hardening.md), refuses changed bytes under an existing name, and age never encrypts the same set to
-# the same bytes twice, so an attempt that sent part of the set can only be completed by re-sending exactly those bytes. They wait,
-# ciphertext and digests only, in a private per-set directory until `rclone check` has passed. A copy encrypted to other recipients,
-# one that no longer matches its digest and one that is not age ciphertext are never sent: the set is encrypted again.
+# age to an rclone remote. Each file goes with `rclone copy --immutable` and one anchored `--include`: unlike `copyto`, which rclone
+# 1.60.1 lets replace a differing object, `copy` refuses to change an existing remote object and accepts an identical one as present
+# (docs/ops/backup-offhost-hardening.md). age never encrypts the same set to the same bytes twice, so an attempt that sent part of the
+# set can only be completed by re-sending exactly those bytes. They wait, ciphertext and digests only, in a private per-set directory
+# until `rclone check` has passed. A copy encrypted to other recipients, one that no longer matches its digest and one that is not
+# age ciphertext are never sent: the set is encrypted again.
 ship_encrypted_rclone() {  # ship_encrypted_rclone SET_DIR STAGE_DIR; returns nonzero without exiting
   local bk=$1 stage=$2 name retry
   name=$(basename "$bk")
@@ -417,10 +418,10 @@ ship_encrypted_rclone() {  # ship_encrypted_rclone SET_DIR STAGE_DIR; returns no
     sha256sum < "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" > "$stage/recipients.sha256" || return 1
     mv -T -- "$stage" "$retry" || return 1
   fi
-  if ! { rclone_run copyto --checksum --immutable "$retry/$name.tar.age" "$(remote_join "$name.tar.age")" \
-         && rclone_run copyto --checksum --immutable "$retry/$name.tar.age.sha256" "$(remote_join "$name.tar.age.sha256")" \
+  if ! { rclone_run copy --checksum --immutable --include "/$name.tar.age" "$retry" "$VASEY_BACKUP_REMOTE" \
+         && rclone_run copy --checksum --immutable --include "/$name.tar.age.sha256" "$retry" "$VASEY_BACKUP_REMOTE" \
          && rclone_run check --one-way --include "$name.tar.age" --include "$name.tar.age.sha256" "$retry" "$VASEY_BACKUP_REMOTE"; }; then
-    log "kept the encrypted copy of $name in $retry: a later \`ship\` of this set re-sends the same bytes. If the remote already holds a different $name.tar.age (from an attempt whose kept copy is gone), that object cannot be completed: remove that object first"
+    log "kept the encrypted copy of $name in $retry: a later \`ship\` of this set re-sends the same bytes. A remote object that differs is refused and never overwritten: if an earlier ship of this set completed, the set is already off-host; if it is a partial attempt whose kept copy is gone, it cannot be completed: remove that object first"
     return 1
   fi
   rm -rf --one-file-system -- "$retry" || log "WARNING: could not remove $retry after a verified transfer"
