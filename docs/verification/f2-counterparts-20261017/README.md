@@ -156,7 +156,7 @@ Each command was run with Node 24:
 
 The same four browser-stage tests, by name, already failed on unchanged base `efa6eea5` before any edit, and the sorted failure lists from the pre-commit run and the `06b55b1e` run are identical. The test bootstraps the browser fixture, which needs a Vite build, and `public/build` is deliberately absent. It runs in the final-verification browser job after `npm run build`, not in the preflight backend-quality job. It is recorded as a pre-existing local environment failure, not as a pass. The same safeguards also ran on the uncommitted census edit before the reboot, with identical results.
 
-`python3 scripts/ci/ci-scope.py classify` was run with a synthetic `pull_request` event from `efa6eea5` to this branch head. It returned mode `full`, because test and policy paths changed. That means preflight would route this candidate through backend-quality, not documentation-only. Its output was written to a scratch directory and the worktree was left clean.
+`python3 scripts/ci/ci-scope.py classify` was run with a synthetic `pull_request` event from `efa6eea5` to this branch head. It returned mode `full`, because test and policy paths changed. That means preflight would route this candidate through backend-quality, not documentation-only. It ran at the packet commit `ca63e8e9`, after the packet itself was committed. Its step output and summary went to a scratch directory. The git-ignored `ci-scope.json` it writes into the worktree was deleted afterwards, leaving the worktree clean.
 
 ## Red/green proofs
 
