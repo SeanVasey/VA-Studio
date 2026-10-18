@@ -258,7 +258,11 @@ if [ ! -s /var/lib/clamav/daily.cvd ] && [ ! -s /var/lib/clamav/daily.cld ]; the
 fi
 systemctl enable --now clamav-freshclam >/dev/null
 # clamd is not used (the configured engine is clamscan) and would hold ~1 GiB resident.
-if systemctl list-unit-files clamav-daemon.service >/dev/null 2>&1; then systemctl disable --now clamav-daemon >/dev/null 2>&1 || true; fi
+# Stop an unused clamd, but never one the opt-in profile in ops/clamav/ configured (the marker is its exact first line), so
+# re-provisioning does not undo that opt-in.
+if [ "$(head -n 1 /etc/clamav/clamd.conf 2>/dev/null)" != '# VASEY.AUDIO clamd profile' ] && systemctl list-unit-files clamav-daemon.service >/dev/null 2>&1; then
+  systemctl disable --now clamav-daemon >/dev/null 2>&1 || true
+fi
 newest=$(find /var/lib/clamav -maxdepth 1 \( -name 'daily.c[lv]d' -o -name 'main.c[lv]d' \) -printf '%T@\n' | sort -rn | head -1)
 age=$(( $(date +%s) - ${newest%.*} ))
 [ "$age" -lt 172800 ] || warn "newest ClamAV daily signature file is $((age / 3600)) h old; the app refuses > 48 h"

@@ -64,7 +64,9 @@ readiness guide and have no script yet.
 
 `host-baseline.sh check` verifies, read-only: `ufw` is active, denies incoming and allows outgoing by default, and allows only
 the SSH port, 80 and 443; nothing but those ports listens beyond loopback and MySQL (3306) never does; `unattended-upgrades` is
-installed, enabled and covers the security pocket; no reboot is pending; `sshd` refuses password logins and root password logins.
+installed, enabled and covers the security pocket; `apt-daily.timer` and `apt-daily-upgrade.timer` are both enabled and active
+(`systemctl is-enabled` says `enabled` and `is-active` says `active`; without them the periodic settings never run, so either one
+missing is a WARN); no reboot is pending; `sshd` refuses password logins and root password logins.
 
 Two actions change the host and each only prints its plan unless given `--yes`:
 
@@ -72,6 +74,8 @@ Two actions change the host and each only prints its plan unless given `--yes`:
   only, `Automatic-Reboot "false"`, and a blacklist for `mysql-.*` and `php8\.4-.*`. Those packages restart services the queues and
   deploys depend on, so upgrade them in a window after `vasey-<kit>-ctl quiesce`. The file is an operator decision: remove
   the blacklist lines to let them upgrade automatically. Kernel and libc updates then need a reboot, which the check reports.
+  It then runs `systemctl enable --now apt-daily.timer apt-daily-upgrade.timer`; if that fails, the action fails (exit 2, no
+  "applied"), because the drop-in does nothing without the timers.
 - `apply-firewall --ssh-port N` sets default deny incoming, allow outgoing, allows `N`, 80 and 443 and enables ufw. It refuses
   without an explicit port, and refuses when run over an SSH session that connected on a different port.
 
@@ -109,7 +113,8 @@ A CDN or reverse proxy in front of the store must not carry the paid-delivery or
 ## What was verified, and what was not
 
 Each script was run for real in bash against scripted stand-ins for `mysql`, `supervisorctl`, `journalctl`, `ufw`, `ss`,
-`apt-config` and `sshd` (`tests/ops/test_monitoring_scripts.py`, 42 tests, including that the queue session is `READ ONLY`,
-that no secret or URL reaches the output, and that the real `apt-config` parses the unattended-upgrades drop-in). The queue SQL
+`apt-config`, `sshd` and `systemctl` (`tests/ops/test_monitoring_scripts.py`, 44 tests, including that the queue session is `READ ONLY`,
+that no secret or URL reaches the output, that the real `apt-config` parses the unattended-upgrades drop-in, and that a timer that
+cannot be enabled fails the apply). The queue SQL
 was run against a real MySQL 8.4.11 (evidence packet). Not verified: any real host, a real supervisor on the host, the journal's
 tagging of supervisor's syslog lines, Forge's ufw and unattended-upgrades defaults, cron timing, or any alert destination.

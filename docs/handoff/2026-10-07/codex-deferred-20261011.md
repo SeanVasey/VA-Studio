@@ -439,3 +439,6 @@ Owner decision, not a finding: Sean to confirm the reserved-address rule (only `
 - P3-3: assert the cause of the receipt refusal in `MemberGrantDefinitionsTest::test_remaining_config_resolution_hook_refuses_committed_authoring_receipt`.
 
 Sean's 2026-10-18 decisions close two open questions: the K3 reserved-address rule is confirmed, and the production capability hold is approved (lane O3).
+
+
+2026-10-18 O2 ops follow-up closes, at `c94770ad`, the PR #148 bot findings Codex r4305404770 (backup retry convergence, now with `rclone copy --immutable`, a remote presence check, digest read-back, bounded kept copies and a recorded size) and r4305404773 (host-baseline timer failure is fatal; a timer check), plus Cursor Bugbot r4305410457 (staging re-provision keeps an opt-in clamd). It also closes the O1 P3s deferred to the ops batch: the cleanup lock and comment (P3-2), the cleanup tests (P3-3), the template wording (P3-6 and P3-C), the production scrub test (P3-B) and the capability-boundary note (P3-D). Deferred to the next ops batch from the third O2 record: P3-1, a malformed shipped record without a size plus a failing size listing passes the "already shipped" check; require digits on both sides and fail the record write when `stat` fails.
