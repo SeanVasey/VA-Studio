@@ -4,7 +4,7 @@ Lane M3 updates the ten `filament/*` packages from 5.8.4 to 5.10.2 and `livewire
 
 | | |
 | --- | --- |
-| **Tested source** | `e5b482c498f0ea59c7c24af92ec4043213071d91` on branch `harness/filament-510-20261018` (tree: `origin/main` at `5007a906` plus the three commits below). |
+| **Tested source** | `e5b482c498f0ea59c7c24af92ec4043213071d91` on branch `harness/filament-510-20261018` (tree: `origin/main` at `5007a906` plus the three commits below). The branch then merged `main` at `7cd95b73` (PR #157); at `af7d2e6a` the lead re-ran the nine migrated files, the sitemap test and the six PR #157 files on 5.10.2 (all pass), and the independent review re-ran 151 Filament files (2,630 tests, 0 failures). |
 | **Commits** | `ab2b001e` test: one version-agnostic notification helper and nine migrated files, on Filament 5.8.4 · `5ffe45e2` test: the one other test the update breaks · `e5b482c4` chore(deps): the lock · the commit after these changes only this directory and `CHANGELOG.md`. The commit order was changed once before this packet, to put the second test fix ahead of the lock; the tree is the same. |
 | **Toolchain** | PHP 8.4.26, Composer 2.8.12, Node 24.22.0. |
 | **Not done** | Nothing was pushed, no PR was opened or commented on, no workflow was dispatched. M2's worktree was only read. |
@@ -130,9 +130,9 @@ How it behaves, measured with a throwaway script against a real `database` cache
 | If it is never rendered? | The row **stays**. Laravel's `DatabaseStore` deletes an expired row only when that exact key is read, the key is never read again, and this repository schedules no cache pruning (`routes/console.php` has one command). The probe shows an expired, unread row still present. Sessions, by contrast, are collected by the session garbage-collection lottery. |
 | Which cache? | `config('filament.cache_store')`, `null` meaning the default store: `database` in `.env.example` and staging, so the `cache` and `cache_locks` tables. An `array` store, or a `file` store not shared by every host, would lose a notification that crosses requests. |
 
-**Does it matter?** The text is operator-facing and staff-only, and before the change it sat in the `sessions` payload, which is also plain text in the same database, so the sensitivity class is unchanged. What changes is retention and place: an undelivered notification can outlive its session in the `cache` table, and it is included in database backups. I looked at all 82 `Notification::make()` lines in `app/`. No body interpolates an exception message (`grep -rn getMessage app/Filament` finds none in a notification), a customer field or a secret. Bodies carry fixed text, validation messages, counts, ids, versions and statuses. The widest is `MediaAssetResource` "Processing details", which prints the run's stored `failure_message`; that string is already in the database and staff-only. The six uncertain-failure tests above are what guarantee exception text never enters a notification, and they now do so on both versions.
+**Does it matter?** The text is operator-facing and staff-only. Before the change it sat in the `sessions` payload, which this project encrypts at rest (`SESSION_ENCRYPT=true` in every environment template, and `ProductionCommerceReadiness` requires `session.encrypt`). After it, an undelivered notification is plain text in the `cache` table. So the update lowers protection at rest for this text, and also changes retention and place: an undelivered notification can outlive its session in the `cache` table, and it is included in database backups. I looked at all 82 `Notification::make()` lines in `app/`. No body interpolates an exception message (`grep -rn getMessage app/Filament` finds none in a notification), a customer field or a secret. Bodies carry fixed text, validation messages, counts, ids, versions and statuses. The widest is `MediaAssetResource` "Processing details", which prints the run's stored `failure_message`; that string is already in the database and staff-only. The six uncertain-failure tests above are what guarantee exception text never enters a notification, and they now do so on both versions.
 
-Recommendations, not done (outside the lane): schedule a deletion of expired `cache` rows (`cache:clear` would also reset the throttles that live in the same store), and say in `docs/ops` that Filament flash messages and TOTP replay records need a shared, persistent cache store.
+**Risk accepted and tracked (independent review R1 and R3):** the content is low-sensitivity, so the update proceeds; a scheduled deletion of expired `cache` rows is a production-preparation requirement, recorded in the deferred ledger. Recommendations, not done (outside the lane): schedule a deletion of expired `cache` rows (`cache:clear` would also reset the throttles that live in the same store), and say in `docs/ops` that Filament flash messages and TOTP replay records need a shared, persistent cache store.
 
 ## Verification
 
@@ -147,7 +147,7 @@ Environment: `APP_ENV=testing APP_DEBUG=false DB_CONNECTION=sqlite DB_DATABASE=:
 | Filament-touching set: 147 files ([list](metadata/selection-filament-147.txt): every test file mentioning Filament, every `*ActionTest` and `Site*` test, and every file mentioning MFA, TOTP or app authentication), 5.8.4 | **2,616 tests, 27,355 assertions: 0 failures, 6 errors, 299 skipped** ([summary](metadata/junit-5.8.4-filament-set.json)) |
 | the same 147 files, 5.10.2 | **identical per file: 2,616 / 27,355 / 0 / 6 / 299** ([summary](metadata/junit-5.10.2-filament-set.json)) |
 | Skips outside `scripts/ci/database-sqlite-skips.json` | none, on both |
-| The 6 errors | the known `OrderInquiryTest` (4) and `OrderInquiryStaffContextTest` (2) "Staff multi-factor authentication is required" errors, the same on both versions; lane F4 owns them |
+| The 6 errors | the known `OrderInquiryTest` (4) and `OrderInquiryStaffContextTest` (2) "Staff multi-factor authentication is required" errors, the same on both versions; PR #157 (lane F4) repaired them, and they pass after the main merge |
 | 72 further files that touch session, cookies or cache headers, 5.10.2 | 1,246 tests, 19,248 assertions, 2 skipped; the one failure is the sitemap test above (now fixed) ([summary](metadata/junit-5.10.2-session-set.json)) |
 | `PublicTrackEmbedRouteCacheTest`, `BrowserLoginRateLimitFixtureTest` (route cache and middleware), 5.10.2 | 4 tests, 761 assertions, OK |
 | `DiscoverySitemapRegistrationTest` after the fix | OK on 5.8.4 (5 tests, 263 assertions) and 5.10.2; StartSession mutation fails it |
@@ -173,7 +173,20 @@ The remaining-files run found six failing cases that are **not caused by Filamen
 | `ProductionFreeGrantContentionTest::test_a_deadlock_after_the_customer_write_is_a_fixed_refusal_and_nothing_is_written` | 3 | `identity_refused` where `contention` is expected |
 | `ProductionFreeGrantStalledSourceTest::test_the_deadline_is_checked_before_the_first_read` | 1 | `artifact_unavailable` where `expired` is expected |
 
-They were not investigated or touched (scope); the lead may want an owner. The six `OrderInquiry*` errors of lane F4 are separate and also unchanged.
+They were not investigated or touched (scope). PR #157 (lane F4) repaired all six; they pass after this branch merged `main`. The six `OrderInquiry*` errors of lane F4 are separate and also unchanged.
+
+## Independent review
+
+[`independent-review-af7d2e6a-DECISION.md`](independent-review-af7d2e6a-DECISION.md): **APPROVE WITH CONDITIONS** at `af7d2e6a`,
+no P0 or P1. The lock references match the upstream tags; the helper follows Filament's own read path and fails closed (a leak,
+a duplicate, an empty queue and a renamed mailbox each fail the six privacy files); the vacuity of main's original checks is
+confirmed on a genuine 5.8.4 tree; the sitemap change keeps the route session-less (a forged session cookie sent to the
+sitemap, embed and Stripe webhook routes starts no session and writes no Filament cache key). The two conditions are
+corrected by the commit after the reviewed one: R1 (P2), this packet's claim that sessions were also plain text (they are
+encrypted; the change is recorded above as a tracked risk), and R2 (P3), the counts made stale by the PR #157 merge. Deferred:
+R3 (P2, before production: scheduled deletion of expired `cache` rows) and R4 to R7 (P3: the 60 s TOTP lock after a crashed
+request, Filament's login hooks firing for customer sign-ins, a code-only rollback's one 500 per touched staff session, and the
+helper's dependency on `flush()`).
 
 ## Not tested
 
