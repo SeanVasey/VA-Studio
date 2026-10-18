@@ -1,0 +1,934 @@
+
+ RUN  v5.0.3 /home/user/wt/b4f
+
+ ❯ tests/frontend/production-account-features.test.tsx (21 tests | 9 failed) 2825ms
+   × disables playlist creation and explains why for a empty name, sending nothing 66ms
+   × disables playlist creation and explains why for a whitespace-only name, sending nothing 58ms
+   × disables playlist creation and explains why for a tab and space only name, sending nothing 59ms
+   × enables playlist creation for a valid name with surrounding spaces, sent trimmed and sends one request 84ms
+   × re-enables creation as soon as a blank name becomes valid and withdraws the explanation 58ms
+   × keeps creation available one below the supplied playlist limit 1100ms
+   × disables creation at the supplied playlist limit even for a valid name, explains it and sends nothing 104ms
+   × explains the capacity limit rather than the blank name when both apply 72ms
+   × keeps the keyboard path: Enter never sends a blank or padded-blank name and creates once for a valid name 128ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/frontend/production-account-features.test.tsx > disables playlist creation and explains why for a empty name, sending nothing
+ FAIL  tests/frontend/production-account-features.test.tsx > disables playlist creation and explains why for a whitespace-only name, sending nothing
+ FAIL  tests/frontend/production-account-features.test.tsx > disables playlist creation and explains why for a tab and space only name, sending nothing
+Error: expect(element).toBeDisabled()
+
+Received element is not disabled:
+  <button
+  class="button"
+/>
+ ❯ tests/frontend/production-account-features.test.tsx:184:18
+    182|   const { fetch, input, create } = await openCreateForm('opaque-create…
+    183|   fireEvent.change(input, { target: { value } });
+    184|   expect(create).toBeDisabled();
+       |                  ^
+    185|   expect(create).not.toHaveAttribute('aria-disabled');
+    186|   expect(input).toBeEnabled();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  tests/frontend/production-account-features.test.tsx > enables playlist creation for a valid name with surrounding spaces, sent trimmed and sends one request
+AssertionError: expected { action: 'create-playlist', …(2) } to deeply equal { action: 'create-playlist', …(2) }
+
+- Expected
++ Received
+
+  {
+    "action": "create-playlist",
+-   "name": "Synthetic mix",
++   "name": "  Synthetic mix  ",
+    "version": 0,
+  }
+
+ ❯ tests/frontend/production-account-features.test.tsx:208:62
+    206|   expect(fetch).toHaveBeenCalledTimes(2);
+    207|   expect(fetch.mock.calls[1][0]).toBe('/customer/features/listening/ch…
+    208|   expect(JSON.parse(fetch.mock.calls[1][1]!.body as string)).toEqual({…
+       |                                                              ^
+    209| });
+    210|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  tests/frontend/production-account-features.test.tsx > re-enables creation as soon as a blank name becomes valid and withdraws the explanation
+Error: expect(element).toBeDisabled()
+
+Received element is not disabled:
+  <button
+  class="button"
+/>
+ ❯ tests/frontend/production-account-features.test.tsx:214:18
+    212|   const { input, create } = await openCreateForm('opaque-create-recove…
+    213|   fireEvent.change(input, { target: { value: '   ' } });
+    214|   expect(create).toBeDisabled();
+       |                  ^
+    215|   fireEvent.change(input, { target: { value: 'Synthetic mix' } });
+    216|   expect(create).toBeEnabled();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  tests/frontend/production-account-features.test.tsx > keeps creation available one below the supplied playlist limit
+TestingLibraryElementError: Unable to find an element with the text: You have reached the limit of 10 playlists. Delete a playlist to create another.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <a
+      class="skip-link"
+      href="#main"
+    >
+      Skip to content
+    </a>
+    <header
+      class="section-pad"
+    >
+      <a
+        href="/"
+      >
+        VASEY.AUDIO
+      </a>
+    </header>
+    <main
+      class="customer-account production-customer-features section-pad"
+      id="main"
+    >
+      <h1>
+        Your listening and preferences
+      </h1>
+      <p
+        role="status"
+        tabindex="-1"
+      />
+      <section
+        aria-labelledby="listening-title"
+      >
+        <h2
+          id="listening-title"
+        >
+          Listening library
+        </h2>
+        <button
+          class="button"
+        >
+          Reload listening library
+        </button>
+        <h3>
+          Saved tracks
+        </h3>
+        <ul />
+        <form
+          class="customer-order-lookup-form"
+        >
+          <label
+            class="customer-account-field"
+          >
+            Find public tracks
+            <input
+              maxlength="100"
+              type="search"
+              value=""
+            />
+          </label>
+          <button
+            class="button"
+          >
+            Search public tracks
+          </button>
+        </form>
+        <label
+          class="customer-account-field"
+        >
+          Selected public track
+          <select>
+            <option
+              value=""
+            >
+              Choose a track
+            </option>
+          </select>
+        </label>
+        <button
+          class="button"
+          disabled=""
+        >
+          Save selected track
+        </button>
+        <form>
+          <label
+            class="customer-account-field"
+          >
+            Playlist name
+            <input
+              maxlength="80"
+              value=""
+            />
+          </label>
+          <button
+            class="button"
+          >
+            Create playlist
+          </button>
+        </form>
+        <h3>
+          Playlists
+        </h3>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 1
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 2
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 3
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 4
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 5
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 6
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 7
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 8
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 9
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 10
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <p>
+          Private notes are unavailable for this library.
+        </p>
+        <button
+          class="button"
+        >
+          Clear listening library
+        </button>
+        <button
+          class="button"
+        >
+          Prepare own library export
+        </button>
+      </section>
+      <section
+        aria-labelledby="preferences-title"
+      >
+        <h2
+          id="preferences-title"
+        >
+          Communication preferences
+        </h2>
+        <button
+          class="button"
+        >
+          Reload communication preferences
+        </button>
+      </section>
+      <button
+        class="button"
+      >
+        Sign out
+      </button>
+    </main>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <a
+      class="skip-link"
+      href="#main"
+    >
+      Skip to content
+    </a>
+    <header
+      class="section-pad"
+    >
+      <a
+        href="/"
+      >
+        VASEY.AUDIO
+      </a>
+    </header>
+    <main
+      class="customer-account production-customer-features section-pad"
+      id="main"
+    >
+      <h1>
+        Your listening and preferences
+      </h1>
+      <p
+        role="status"
+        tabindex="-1"
+      />
+      <section
+        aria-labelledby="listening-title"
+      >
+        <h2
+          id="listening-title"
+        >
+          Listening library
+        </h2>
+        <button
+          class="button"
+        >
+          Reload listening library
+        </button>
+        <h3>
+          Saved tracks
+        </h3>
+        <ul />
+        <form
+          class="customer-order-lookup-form"
+        >
+          <label
+            class="customer-account-field"
+          >
+            Find public tracks
+            <input
+              maxlength="100"
+              type="search"
+              value=""
+            />
+          </label>
+          <button
+            class="button"
+          >
+            Search public tracks
+          </button>
+        </form>
+        <label
+          class="customer-account-field"
+        >
+          Selected public track
+          <select>
+            <option
+              value=""
+            >
+              Choose a track
+            </option>
+          </select>
+        </label>
+        <button
+          class="button"
+          disabled=""
+        >
+          Save selected track
+        </button>
+        <form>
+          <label
+            class="customer-account-field"
+          >
+            Playlist name
+            <input
+              maxlength="80"
+              value=""
+            />
+          </label>
+          <button
+            class="button"
+          >
+            Create playlist
+          </button>
+        </form>
+        <h3>
+          Playlists
+        </h3>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 1
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 2
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 3
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 4
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 5
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 6
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 7
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 8
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 9
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <article>
+          <h4
+            data-private="true"
+          >
+            Synthetic list 10
+          </h4>
+          <ul />
+          <button
+            class="button"
+            disabled=""
+          >
+            Add selected track to playlist
+          </button>
+          <button
+            class="button"
+            disabled=""
+          >
+            Rename playlist
+          </button>
+          <button
+            class="button"
+          >
+            Delete playlist
+          </button>
+        </article>
+        <p>
+          Private notes are unavailable for this library.
+        </p>
+        <button
+          class="button"
+        >
+          Clear listening library
+        </button>
+        <button
+          class="button"
+        >
+          Prepare own library export
+        </button>
+      </section>
+      <section
+        aria-labelledby="preferences-title"
+      >
+        <h2
+          id="preferences-title"
+        >
+          Communication preferences
+        </h2>
+        <button
+          class="button"
+        >
+          Reload communication preferences
+        </button>
+      </section>
+      <button
+        class="button"
+      >
+        Sign out
+      </button>
+    </main>
+  </div>
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ tests/frontend/production-account-features.test.tsx:231:23
+    229|   expect(screen.queryByText(limitHint)).not.toBeInTheDocument();
+    230|   fireEvent.click(create);
+    231|   expect(await screen.findByText(limitHint)).toBeInTheDocument();
+       |                       ^
+    232|   expect(fetch).toHaveBeenCalledTimes(2);
+    233|   expect(JSON.parse(fetch.mock.calls[1][1]!.body as string)).toEqual({…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  tests/frontend/production-account-features.test.tsx > disables creation at the supplied playlist limit even for a valid name, explains it and sends nothing
+Error: expect(element).toBeDisabled()
+
+Received element is not disabled:
+  <button
+  class="button"
+/>
+ ❯ tests/frontend/production-account-features.test.tsx:239:18
+    237|   const { fetch, input, create } = await openCreateForm('opaque-create…
+    238|   fireEvent.change(input, { target: { value: 'Synthetic one too many' …
+    239|   expect(create).toBeDisabled();
+       |                  ^
+    240|   expect(create).not.toHaveAttribute('aria-disabled');
+    241|   expect(screen.getByText(limitHint)).toBeVisible();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  tests/frontend/production-account-features.test.tsx > explains the capacity limit rather than the blank name when both apply
+Error: expect(element).toBeDisabled()
+
+Received element is not disabled:
+  <button
+  class="button"
+/>
+ ❯ tests/frontend/production-account-features.test.tsx:253:18
+    251|   const { fetch, input, create } = await openCreateForm('opaque-create…
+    252|   fireEvent.change(input, { target: { value: '  ' } });
+    253|   expect(create).toBeDisabled();
+       |                  ^
+    254|   expect(create).toHaveAccessibleDescription(limitHint);
+    255|   expect(screen.queryByText(blankHint)).not.toBeInTheDocument();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  tests/frontend/production-account-features.test.tsx > keeps the keyboard path: Enter never sends a blank or padded-blank name and creates once for a valid name
+Error: expect(element).toHaveFocus()
+
+Expected element with focus:
+  <input
+  disabled=""
+  maxlength="80"
+  value="   "
+/>
+Received element with focus:
+  <p
+  role="status"
+  tabindex="-1"
+>
+  The result could not be confirmed. Reload before making another change.
+</p>
+ ❯ tests/frontend/production-account-features.test.tsx:267:17
+    265|   await user.keyboard('{Enter}');
+    266|   await user.keyboard('   {Enter}');
+    267|   expect(input).toHaveFocus();
+       |                 ^
+    268|   expectNoRequestAndLibraryKept(fetch);
+    269|   await user.clear(input);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  9 failed | 12 passed (21)
+   Start at  17:25:56
+   Duration  4.45s (tests 66%, environment 20%, transform 10%, setup 3%, import 2%)
+
+exit=1
