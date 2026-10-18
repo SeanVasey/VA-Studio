@@ -1,0 +1,93 @@
+-            if (self::contended($error)) {
++            if (false && self::contended($error)) {
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/f4/phpunit.xml
+
+EEE                                                                 3 / 3 (100%)
+
+Time: 00:10.926, Memory: 87.00 MB
+
+There were 3 errors:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantContentionTest::test_a_deadlock_after_the_customer_write_is_a_fixed_refusal_and_nothing_is_written@mysql deadlock 1213 with data ('40001', 1213, 'Deadlock found when trying to...action')
+PDOException: Deadlock found when trying to get lock; try restarting transaction
+
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:170
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:141
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:154
+/home/user/wt/f4/vendor/laravel/framework/src/Illuminate/Encryption/Encrypter.php:217
+/home/user/wt/f4/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantRecords.php:27
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantRecords.php:80
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantRows.php:59
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantRows.php:47
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantRows.php:133
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:86
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:215
+/home/user/wt/f4/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/wt/f4/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/wt/f4/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransactions.php:22
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:207
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:50
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:69
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:179
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:69
+/home/user/wt/f4/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantContentionTest::test_a_deadlock_after_the_customer_write_is_a_fixed_refusal_and_nothing_is_written@mysql lock wait timeout 1205 with data ('HY000', 1205, 'Lock wait timeout exceeded; t...action')
+PDOException: Lock wait timeout exceeded; try restarting transaction
+
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:170
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:141
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:154
+/home/user/wt/f4/vendor/laravel/framework/src/Illuminate/Encryption/Encrypter.php:217
+/home/user/wt/f4/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantRecords.php:27
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantRecords.php:80
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantRows.php:59
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantRows.php:47
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantRows.php:133
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:86
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:215
+/home/user/wt/f4/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/wt/f4/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/wt/f4/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransactions.php:22
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:207
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:50
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:69
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:179
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:69
+/home/user/wt/f4/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantContentionTest::test_a_deadlock_after_the_customer_write_is_a_fixed_refusal_and_nothing_is_written@serialization failure 40001 with data ('40001', 0, 'could not serialize access du...update')
+PDOException: could not serialize access due to concurrent update
+
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:170
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:141
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:154
+/home/user/wt/f4/vendor/laravel/framework/src/Illuminate/Encryption/Encrypter.php:217
+/home/user/wt/f4/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantRecords.php:27
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantRecords.php:80
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantRows.php:59
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantRows.php:47
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantRows.php:133
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:86
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:215
+/home/user/wt/f4/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/wt/f4/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/wt/f4/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrantTransactions.php:22
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:207
+/home/user/wt/f4/app/Domain/Grants/ProductionFree/ProductionFreeGrants.php:50
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:69
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:179
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:69
+/home/user/wt/f4/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 3, Assertions: 6, Errors: 3.
