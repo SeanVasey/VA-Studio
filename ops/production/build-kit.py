@@ -157,12 +157,6 @@ PROVISION = [
     Replace('[[ "$APP_ENV_EXPECTED" =~ ^(local|staging)$ ]] || die "--app-env must be local or staging"',
             '[ "$APP_ENV_EXPECTED" = production ] || die "--app-env must be production"',
             "only the production environment"),
-    Replace("if systemctl list-unit-files clamav-daemon.service >/dev/null 2>&1; then systemctl disable --now clamav-daemon >/dev/null 2>&1 || true; fi\n",
-            "# Stop an unused clamd, but never one that ops/clamav/install-clamd.sh configured (its clamd.conf starts with the marker).\n"
-            "if ! grep -qs '^# VASEY.AUDIO clamd profile' /etc/clamav/clamd.conf && systemctl list-unit-files clamav-daemon.service >/dev/null 2>&1; then\n"
-            "  systemctl disable --now clamav-daemon >/dev/null 2>&1 || true\n"
-            "fi\n",
-            "re-provisioning must not undo an opt-in clamd"),
     Replace("VASEY_PROBE_NETRC=/etc/vasey-staging/probe.netrc\n", "", "no probe credentials: production has no basic auth"),
     ReplaceBetween("# ---------------------------------------------------------------- 7. access credentials and nginx template\n",
                    'render "$KIT/nginx/vasey-staging.conf" /etc/vasey-staging/nginx-site.conf 0644\n',
