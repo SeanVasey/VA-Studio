@@ -12,7 +12,8 @@ This is a local development candidate. Nothing has been pushed, no PR is open an
 ## Tested source
 
 - **Code commit:** `3711a7b6542b989f996bd70e01e59b00fedd688f` on branch `harness/tax-history-index-20261017`, with base `origin/main` at `efa6eea5b007f1f2623c4009c1e9bef737f06bee`.
-- **Packet commit:** this packet is a separate documentation-only commit on top. It changes no source, so the evidence below binds to `3711a7b6`.
+- **Packet commits:** this packet is documentation-only. It changes no source, so the Tax evidence below binds to `3711a7b6`.
+- **Separate fix commit:** `902ac4be2bc1003e091d120c260668259ab2bcb1`, outside the Tax lane, changes only `resources/js/app.tsx`, a new frontend guard test and `CHANGELOG.md`. Its own evidence is in [Outside the Tax lane](#outside-the-tax-lane-page-registration-fix). It changes no PHP, so the PHP and native evidence carry unchanged. The full frontend suite and build were rerun at that commit.
 - **Tree state:** every exact-source run recorded `head=3711a7b6…` and an empty tracked diff (SHA-256 of the empty string). The only untracked path was this packet directory.
 - **Frontend binding:** the frontend run (r06) happened just before the commit. All four changed frontend files have Git blob hashes identical to the commit's, and their modification times precede the run's start (17:49:05 UTC). No frontend input changed afterwards.
 - **Tool versions:** PHP 8.4.26, PHPUnit 12.5.34, Laravel 13 and Node 24.22.0, with vitest 5.0.3, TypeScript 7.0.2 and Vite 8. Native runs used Oracle MySQL Community Server 8.4.11 on a private datadir `/var/lib/va-mysql84-t1/data`, port 33587, with its own socket and pid file; no shared instance was used.
@@ -59,6 +60,57 @@ The other 19 cases of `PaidTaxHistoryIndexTest` ran only on SQLite. That file is
   - At base, `app/Http/Middleware/HandleInertiaRequests.php` already failed `ordered_imports` (exit 1, retained).
   - Because this change edits that file, it applies only Pint's import-order fix there.
 - **Preflight safeguard scripts at `3711a7b6`:** all ten exited 0, with 266 Python tests in total. They are `test-phpunit-shards`, `test-ci-scope`, `test-workflow-cadence`, `test-focused-tests`, `test-database-receipts`, `test-gitlab-database-receipts`, `test-gitlab-writer-feedback`, `test-php-test-runtime`, `test-bootstrap-macos` and `test-publish-github`. They include the repository check that every driver-branching test file is selected or residual.
+
+## Outside the Tax lane: page registration fix
+
+This fix is not part of the Tax history index. It was made on this branch at the coordinator's request, because the Tax change already edits `resources/js/app.tsx` and a separate PR would conflict there.
+
+**The gap.** At base `efa6eea5`, the server renders 13 Inertia page names, but `resources/js/app.tsx`'s explicit `resolve()` had no branch for `PaidGrants` (rendered by `PaidGrantController::page`) or `ProductionCustomerFeatures` (rendered by `AccountFeatureController`). Either page would throw "Unknown page" in the browser as soon as its default-off route was mounted.
+
+**The fix.** Commit `902ac4be2bc1003e091d120c260668259ab2bcb1` registers both pages in the same lazy form as `PaidTaxLicenses`. The existing static imports and branch order are unchanged. It also adds a CHANGELOG line under Fixed.
+
+**The guard.** `tests/frontend/inertia-page-registry.test.ts` reads the repository statically, following the `embed-font-assets.test.ts` precedent, and runs three tests:
+- It collects every literal page name passed to `Inertia::render`, `Route::inertia` or `inertia()` in `app/` and `routes/`. Any computed name is refused rather than skipped; none exists today.
+- Every collected name must have a `resolve()` branch and a `resources/js/Pages/<Name>.tsx` file.
+- Every branch must load the Pages file of its own name, and no name may appear twice.
+
+Guard results (the archive keeps each run's output):
+
+| Run | Source | Result |
+| --- | --- | --- |
+| f02, red on main | Detached `efa6eea5` with only the untracked guard file | 1 failed, 2 passed, exit 1. Missing names: exactly `PaidGrants` and `ProductionCustomerFeatures`. |
+| f01, red on the prior branch head | `c172abe8` | 1 failed, 2 passed, exit 1. The same two names. |
+| f03, green | Fixed working tree | 3 passed, exit 0; `npm run typecheck` exit 0. |
+| f04, mutation check | The `PaidGrants` branch temporarily pointed at `./Pages/FreeGrants` | The same-name test failed ("expected 'FreeGrants' to be 'PaidGrants'"), exit 1. The file was then restored byte for byte. |
+
+Frontend results at `902ac4be`:
+
+| Run | Result |
+| --- | --- |
+| f06 guard | 3 passed |
+| f06 `npm test` | 68 files and 1,162 tests passed, exit 0. This includes the 18 Tax journey tests, so the Tax frontend is reconfirmed at this commit. |
+| f06 `npm run build` (`tsc --noEmit` + `vite build`) | exit 0 |
+| f06 bundle secret scan | 14 bundle files, no hits, exit 0 |
+
+`public/build` was deleted afterwards.
+
+f05 ran the same checks at `58573ba0` with identical results. That was the fix commit before I amended it. The amendment changed only a code comment and the commit message, and the built chunk hashes are identical.
+
+**Bundle layout.** With three lazy pages, the bundler (rolldown in Vite 8) hoists the modules they share with the entry into one eagerly loaded chunk, which it named `customer-account`.
+
+| Build | Eager JavaScript files | Eager total |
+| --- | --- | --- |
+| At `3711a7b6` | `app` 617.66 kB | 617.66 kB |
+| At `902ac4be` | `app` 273.05 kB, shared chunk 344.39 kB, runtime 0.58 kB | 618.02 kB |
+
+Eager bytes are therefore essentially unchanged, but the entry now loads three files. The page chunks load only when opened: `PaidGrants` 20.68 kB, `PaidTaxLicenses` 18.46 kB, `ProductionCustomerFeatures` 14.39 kB plus 1.05 kB of CSS.
+
+Nothing that consumes the build assumes a single entry file:
+- Laravel's `@vite` preloads chunk imports from the manifest.
+- `InstallationReport` checks every manifest entry.
+- The offline storefront worker caches only fixed `/brand` assets and `/offline.html`.
+
+No browser (Playwright) run was made, so actual loading of the split chunks in a browser is untested here. The base build at `efa6eea5` was not measured.
 
 ## Native selection delta (for the lead's census reconciliation)
 
@@ -181,11 +233,11 @@ The frontend checks ran with `. /opt/nvm/nvm.sh && nvm use 24`, then `npm test`,
 
 ## Evidence archive
 
-`recorded-evidence.tar.gz` (SHA-256 `9f54d481ee04eeca0e0c86245de7deb8cd04023a2f0d633a0b6a29d5cf2a8e22`) holds 89 files. For every invocation it keeps:
+`recorded-evidence.tar.gz` (SHA-256 `bca2db1c2d62b974e52882b0595cbacdd6a33e0242f52369e687f455328792df`) holds 108 files. For every invocation it keeps:
 - `meta.txt`: HEAD, status, the tracked-diff and untracked hashes, the exact command and the PHP exit code
 - `stdout.txt`
 - `junit.xml`
 
-It also holds the frontend logs, both native-selection manifests, the safeguard and Pint outputs, the MySQL initialization, restart and shutdown records, the server error log and the recorder scripts. `recorded-evidence-index.json` lists each file with its size and SHA-256.
+It also holds the frontend logs, the page-registration guard runs f01 to f06, both native-selection manifests, the safeguard and Pint outputs, the MySQL initialization, restart and shutdown records, the server error log and the recorder scripts. `recorded-evidence-index.json` lists each file with its size and SHA-256.
 
 All data in it is synthetic: local loopback-SMTP buyers, a recording synthetic Tax transport and the fixture's fixed testing app key, which is defined in test code and never printed. No real buyer, payment, credential or token is included.

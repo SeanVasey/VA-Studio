@@ -162,11 +162,14 @@ The journey deliberately leaves out three V1 conveniences:
 | `PaidTaxProjectionRead` | New private flag, new `captureIndex`; `proveBeforeBytes` branches on that flag only; `capture` and `abandon` are unchanged. |
 | `PaidTaxGrants::batchIdentity` | Visibility changed from private to public; body unchanged. |
 | `HandleInertiaRequests` | One extra path in the existing `Vary` branch, plus Pint's import-order fix. That file failed `ordered_imports` at base `efa6eea5`; the README records it. |
-| `resources/js/app.tsx` | One lazy resolver line. |
+| `resources/js/app.tsx` | One lazy resolver line in `3711a7b6`. The later fix commit `902ac4be` adds two more for the V1 pages (see below). |
 
 No schema, migration, census, workflow, V1, producer or identity file changed.
 
-## Adjacent findings (not fixed)
+## Adjacent findings
 
-- `resources/js/app.tsx` does not register the V1 `PaidGrants` page or `ProductionCustomerFeatures`, so those shells would throw "Unknown page" if mounted in a browser.
+- `resources/js/app.tsx` did not register the V1 `PaidGrants` page or `ProductionCustomerFeatures`, so those shells would have thrown "Unknown page" if mounted in a browser.
+  - This is outside the Tax lane.
+  - At the coordinator's request it is fixed on this branch in the separate commit `902ac4be`, to avoid a second PR that conflicts on `app.tsx`.
+  - The README's "Outside the Tax lane" section records that fix and its regression guard.
 - The census and timing files (owned by lane F2c) were not edited. The README reports the native selection delta.

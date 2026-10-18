@@ -1,7 +1,8 @@
 {
   "archive": "recorded-evidence.tar.gz",
-  "archive_sha256": "9f54d481ee04eeca0e0c86245de7deb8cd04023a2f0d633a0b6a29d5cf2a8e22",
+  "archive_sha256": "bca2db1c2d62b974e52882b0595cbacdd6a33e0242f52369e687f455328792df",
   "tested_source": "3711a7b6542b989f996bd70e01e59b00fedd688f",
+  "fix_commit": "902ac4be2bc1003e091d120c260668259ab2bcb1",
   "base": "efa6eea5b007f1f2623c4009c1e9bef737f06bee",
   "members": [
     {
@@ -108,6 +109,101 @@
       "path": "recorded-evidence/e06-sqlite-checkout-return/stdout.txt",
       "bytes": 287,
       "sha256": "f3855ebd718e292153d4ccbfad495ede47caf66a374b7538d0dcba5c16711495"
+    },
+    {
+      "path": "recorded-evidence/f01-registry-red-branch/meta.txt",
+      "bytes": 101,
+      "sha256": "0e604391db6ce5deecc85e13057b0d814b869aedac48e4bc97c7988ac7ed4f39"
+    },
+    {
+      "path": "recorded-evidence/f01-registry-red-branch/stdout.txt",
+      "bytes": 1414,
+      "sha256": "08db51cc07ea71686f3d2c8e4b3266b2a0e0be000f75c1c2bd1581bfa8a6e72e"
+    },
+    {
+      "path": "recorded-evidence/f02-registry-red-main/meta.txt",
+      "bytes": 101,
+      "sha256": "47a02e7eaca64292ef33ebd964eeb77e6006ad75dbd5764ce05dc1b4ad98882b"
+    },
+    {
+      "path": "recorded-evidence/f02-registry-red-main/stdout.txt",
+      "bytes": 1427,
+      "sha256": "5835ffac5259f3418a1b29b17e40c7144b1757849812e927969ba6bddd284fce"
+    },
+    {
+      "path": "recorded-evidence/f03-registry-green-precommit/meta.txt",
+      "bytes": 142,
+      "sha256": "8bb93e444c7d4c6f67ec26db475b09648d87a91d0cf9fa23d9f0d8738e2c7a5d"
+    },
+    {
+      "path": "recorded-evidence/f03-registry-green-precommit/stdout.txt",
+      "bytes": 192,
+      "sha256": "e09bfb7b99f91310a81ea15f53afa51830716ead6647a520340fc2968228f9d3"
+    },
+    {
+      "path": "recorded-evidence/f03-registry-green-precommit/typecheck.txt",
+      "bytes": 29,
+      "sha256": "8fa1cf5506304e8abac55868e7f1a136c9b1dde57a3981a382da4c21ea129a6f"
+    },
+    {
+      "path": "recorded-evidence/f04-registry-mutation/app.tsx.fixed",
+      "bytes": 2567,
+      "sha256": "8d7f00de910fab15da5181bedd287f2f9efe5999c2dd2ec1de8cf5a41a5bb215"
+    },
+    {
+      "path": "recorded-evidence/f04-registry-mutation/meta.txt",
+      "bytes": 15,
+      "sha256": "461f12a286a5cf17927bb61e00dd71d0624df96d816d941cf0ee545315ecb5e8"
+    },
+    {
+      "path": "recorded-evidence/f04-registry-mutation/stdout.txt",
+      "bytes": 1245,
+      "sha256": "62fb9e0d006597f775b36800f5449b59e5f0955e6331b1a4b3297be06b28bbcc"
+    },
+    {
+      "path": "recorded-evidence/f05-frontend-exact/bundle-scan.txt",
+      "bytes": 77,
+      "sha256": "4643044e223bad44a05d13d4b55bd156f8c8a44ad2f410e352444bf34a3e8d33"
+    },
+    {
+      "path": "recorded-evidence/f05-frontend-exact/meta.txt",
+      "bytes": 105,
+      "sha256": "5c83dcbd8ee31f5fe6c1d401b2cac249ad66fcfd6982b153d14e606aa91842cb"
+    },
+    {
+      "path": "recorded-evidence/f05-frontend-exact/npm-build.txt",
+      "bytes": 2119,
+      "sha256": "5afbe16641ea8ffdd3a4790b1f89d1aa3199c0cf1eaaa61f668748dffe315810"
+    },
+    {
+      "path": "recorded-evidence/f05-frontend-exact/npm-test.txt",
+      "bytes": 649,
+      "sha256": "701714af7b07f8b554c1a8993552d55f3b6123cc7fda8e205f02d65ff80ecb6c"
+    },
+    {
+      "path": "recorded-evidence/f06-frontend-exact/bundle-scan.txt",
+      "bytes": 77,
+      "sha256": "4643044e223bad44a05d13d4b55bd156f8c8a44ad2f410e352444bf34a3e8d33"
+    },
+    {
+      "path": "recorded-evidence/f06-frontend-exact/guard.txt",
+      "bytes": 192,
+      "sha256": "c5a0e9a8c833c96d33266d80bf1bbca6b2ca09de1cd03d1cfd2937b980b1fe42"
+    },
+    {
+      "path": "recorded-evidence/f06-frontend-exact/meta.txt",
+      "bytes": 118,
+      "sha256": "356d91b3815e211fa1fbcf66ed1f5f65fd65a007d66f972ced791fd6cea07092"
+    },
+    {
+      "path": "recorded-evidence/f06-frontend-exact/npm-build.txt",
+      "bytes": 2119,
+      "sha256": "3ceecfa01330528789bf7e757445cc1eaaec027bd1038da6e194cbc2915af685"
+    },
+    {
+      "path": "recorded-evidence/f06-frontend-exact/npm-test.txt",
+      "bytes": 649,
+      "sha256": "ab47b03ee469499b7acbe12bb852d2838b91aaae7d677a5c41200b4b045f1f47"
     },
     {
       "path": "recorded-evidence/m01-mysql-index-case/junit.xml",
