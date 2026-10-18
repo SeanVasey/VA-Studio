@@ -1,0 +1,74 @@
+ok property Illuminate\Auth\AuthManager::app
+ok property Illuminate\Auth\AuthManager::guards
+ok property Illuminate\Auth\AuthManager::userResolver
+ok property Illuminate\Auth\SessionGuard::loggedOut
+ok property Illuminate\Auth\SessionGuard::request
+ok property Illuminate\Auth\SessionGuard::session
+ok property Illuminate\Auth\SessionGuard::user
+NOT-A-MEMBER Illuminate\Config\Repository::authority (1 files, e.g. app/Domain/Commerce/ProductionCheckout/CheckoutStaffWriteAdmission.php)
+NOT-A-MEMBER Illuminate\Config\Repository::changed_owner (1 files, e.g. app/Domain/Grants/Member/SealedMemberGrantFacts.php)
+NOT-A-MEMBER Illuminate\Config\Repository::changed_policy (4 files, e.g. app/Domain/Memberships/Production/MembershipAwardConfiguration.php)
+NOT-A-MEMBER Illuminate\Config\Repository::committed_read_frame (1 files, e.g. app/Domain/Commerce/ProductionTaxCheckout/TaxPaidReadContext.php)
+NOT-A-MEMBER Illuminate\Config\Repository::disabled (4 files, e.g. app/Domain/Commerce/ProductionCheckout/FreshCheckoutPolicy.php)
+ok property Illuminate\Config\Repository::items
+ok property Illuminate\Container\Container::abstractAliases
+ok property Illuminate\Container\Container::aliases
+ok property Illuminate\Container\Container::bindings
+ok property Illuminate\Container\Container::buildStack
+ok property Illuminate\Container\Container::contextual
+ok property Illuminate\Container\Container::instance
+ok property Illuminate\Container\Container::instances
+ok method Illuminate\Container\Container::offsetSet
+ok property Illuminate\Container\Container::resolved
+ok property Illuminate\Container\Container::with
+ok property Illuminate\Database\Connection::beforeStartingTransaction
+ok property Illuminate\Database\Connection::config
+ok property Illuminate\Database\Connection::database
+ok property Illuminate\Database\Connection::directPdo
+ok property Illuminate\Database\Connection::directPdoConfig
+ok property Illuminate\Database\Connection::events
+ok property Illuminate\Database\Connection::pdo
+ok property Illuminate\Database\Connection::readPdo
+ok property Illuminate\Database\Connection::readPdoConfig
+ok property Illuminate\Database\Connection::tablePrefix
+ok property Illuminate\Database\Connection::transactions
+ok property Illuminate\Database\Connection::transactionsManager
+ok property Illuminate\Database\DatabaseManager::app
+NOT-A-MEMBER Illuminate\Database\DatabaseManager::changed_configuration (2 files, e.g. app/Domain/Grants/Member/MemberOriginalConfiguration.php)
+NOT-A-MEMBER Illuminate\Database\DatabaseManager::committed_read_frame (2 files, e.g. app/Domain/Commerce/ProductionCheckout/CommittedReadContext.php)
+ok property Illuminate\Database\DatabaseManager::connections
+NOT-A-MEMBER Illuminate\Database\DatabaseManager::finish_route (1 files, e.g. app/Domain/Grants/Member/MemberOriginalFinishBoundary.php)
+NOT-A-MEMBER Illuminate\Database\DatabaseManager::io_frame (1 files, e.g. app/Domain/Grants/Member/MemberOriginalIoFrame.php)
+NOT-A-MEMBER Illuminate\Database\DatabaseManager::write_frame (1 files, e.g. app/Domain/Commerce/ProductionCheckout/CheckoutCommandFrame.php)
+NOT-A-MEMBER Illuminate\Database\DatabaseTransactionsManager::changed_transaction (5 files, e.g. app/Domain/Memberships/Production/MembershipReservationOperations.php)
+NOT-A-MEMBER Illuminate\Database\DatabaseTransactionsManager::committed_read_frame (1 files, e.g. app/Domain/Commerce/ProductionTaxCheckout/TaxPaidReadFrame.php)
+ok property Illuminate\Database\DatabaseTransactionsManager::currentTransaction
+ok property Illuminate\Database\Eloquent\Model::attributeCastCache
+ok property Illuminate\Database\Eloquent\Model::attributes
+ok property Illuminate\Database\Eloquent\Model::casts
+ok property Illuminate\Database\Eloquent\Model::classCastCache
+ok property Illuminate\Database\Eloquent\Model::connection
+ok property Illuminate\Database\Eloquent\Model::exists
+ok property Illuminate\Database\Eloquent\Model::incrementing
+ok property Illuminate\Database\Eloquent\Model::keyType
+ok property Illuminate\Database\Eloquent\Model::original
+ok property Illuminate\Database\Eloquent\Model::primaryKey
+ok property Illuminate\Database\Eloquent\Model::table
+NOT-A-MEMBER Illuminate\Events\Dispatcher::existing_cohort (1 files, e.g. app/Domain/Commerce/ProductionFinancialRetrieval/RetrievalPolicy.php)
+ok property Illuminate\Foundation\Application::deferredServices
+NOT-A-MEMBER Illuminate\Foundation\Application::disabled (1 files, e.g. app/Domain/Commerce/ProductionFinancialRetrieval/RetrievalPolicy.php)
+NOT-A-MEMBER Illuminate\Foundation\Application::finish_route (1 files, e.g. app/Domain/Grants/Member/MemberOriginalFinishBoundary.php)
+NOT-A-MEMBER Illuminate\Foundation\Application::unsupported_container (2 files, e.g. app/Domain/Grants/Member/MemberOriginalConfiguration.php)
+ok property Illuminate\Http\Request::userResolver
+ok property Illuminate\Session\Store::attributes
+ok property Illuminate\Session\Store::id
+ok property Illuminate\Session\Store::name
+NOT-A-MEMBER Illuminate\Support\Collection::committed_read_frame (1 files, e.g. app/Domain/Commerce/ProductionTaxCheckout/TaxPaidReadFrame.php)
+ok property Illuminate\Support\Collection::items
+ok property Illuminate\Support\Facades\Facade::app
+ok property Illuminate\Support\Facades\Facade::resolvedInstance
+ok property Stripe\ApiRequestor::_httpClient
+ok property Symfony\Component\HttpFoundation\ParameterBag::parameters
+ok property Symfony\Component\HttpFoundation\Request::server
+ok property Symfony\Component\HttpFoundation\Request::session
+73 distinct vendor class/member pairs; 17 not declared

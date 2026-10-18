@@ -445,3 +445,6 @@ Sean's 2026-10-18 decisions close two open questions: the K3 reserved-address ru
 
 
 2026-10-18 O3 production capability hold, reviewed at `dccc5852` and `60c40dea` (both APPROVE; R1 to R5 fixed before the PR opened). Deferred to the ops batch: R6 (P3, the four hold keys are a test-pinned copy of the `CapabilityBoundary` entries rather than loaded from it; its docblock still says "two validators"; the consumer side is not pinned) and N1 (P3, two over-long prose lines in the activation packet and the production README).
+
+
+2026-10-18 M2 dependency follow-up, reviewed at `1464ebfc` (APPROVE WITH CONDITIONS; R1 and R2 corrected before the PR opened). Deferred: R3 (P3, widen the Dependabot Composer exclusion to `tecnickcom/tc-lib-*` so the transitive renderers also get their own PR) and R4 (P3, Laravel 13.37.0 limiter `block()` now times out on `Carbon::now()`; a future frozen-time test of a funnel or throttle could hang; no current code uses one).

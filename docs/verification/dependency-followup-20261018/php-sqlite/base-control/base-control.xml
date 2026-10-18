@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="14" assertions="78" errors="6" failures="0" skipped="0" time="29.424381">
+    <testsuite name="Tests\Feature\OrderInquiryStaffContextTest" file="{base-copy}/tests/Feature/OrderInquiryStaffContextTest.php" tests="2" assertions="0" errors="2" failures="0" skipped="0" time="7.760752">
+      <testsuite name="Tests\Feature\OrderInquiryStaffContextTest::test_actual_retained_context_entry_rechecks_authority_even_after_filament_cached_its_state" tests="2" assertions="0" errors="2" failures="0" skipped="0" time="7.760752">
+        <testcase name="test_actual_retained_context_entry_rechecks_authority_even_after_filament_cached_its_state with data set #0" file="{base-copy}/tests/Feature/OrderInquiryStaffContextTest.php" line="53" class="Tests\Feature\OrderInquiryStaffContextTest" classname="Tests.Feature.OrderInquiryStaffContextTest" assertions="0" time="4.225699">
+          <error type="Illuminate\Auth\Access\AuthorizationException">Tests\Feature\OrderInquiryStaffContextTest::test_actual_retained_context_entry_rechecks_authority_even_after_filament_cached_its_state with data set #0
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+{base-copy}/app/Domain/Staff/StaffWriteAuthority.php:122
+{base-copy}/app/Domain/Rights/ReviewLicense.php:59
+{base-copy}/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+{base-copy}/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+{base-copy}/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+{base-copy}/app/Domain/Rights/ReviewLicense.php:52
+{base-copy}/tests/Support/LicenseFixtures.php:42
+{base-copy}/tests/Support/LicenseFixtures.php:51
+{base-copy}/tests/Support/QuoteFixtures.php:24
+{base-copy}/tests/Support/InventoryFixtures.php:28
+{base-copy}/tests/Support/OrderFixtures.php:42
+{base-copy}/tests/Support/OrderInquiryFixtures.php:26
+{base-copy}/tests/Feature/OrderInquiryStaffContextTest.php:61
+{base-copy}/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+        <testcase name="test_actual_retained_context_entry_rechecks_authority_even_after_filament_cached_its_state with data set #1" file="{base-copy}/tests/Feature/OrderInquiryStaffContextTest.php" line="53" class="Tests\Feature\OrderInquiryStaffContextTest" classname="Tests.Feature.OrderInquiryStaffContextTest" assertions="0" time="3.535054">
+          <error type="Illuminate\Auth\Access\AuthorizationException">Tests\Feature\OrderInquiryStaffContextTest::test_actual_retained_context_entry_rechecks_authority_even_after_filament_cached_its_state with data set #1
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+{base-copy}/app/Domain/Staff/StaffWriteAuthority.php:122
+{base-copy}/app/Domain/Rights/ReviewLicense.php:59
+{base-copy}/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+{base-copy}/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+{base-copy}/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+{base-copy}/app/Domain/Rights/ReviewLicense.php:52
+{base-copy}/tests/Support/LicenseFixtures.php:42
+{base-copy}/tests/Support/LicenseFixtures.php:51
+{base-copy}/tests/Support/QuoteFixtures.php:24
+{base-copy}/tests/Support/InventoryFixtures.php:28
+{base-copy}/tests/Support/OrderFixtures.php:42
+{base-copy}/tests/Support/OrderInquiryFixtures.php:26
+{base-copy}/tests/Feature/OrderInquiryStaffContextTest.php:61
+{base-copy}/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\OrderInquiryTest" file="{base-copy}/tests/Feature/OrderInquiryTest.php" tests="4" assertions="0" errors="4" failures="0" skipped="0" time="14.590808">
+      <testsuite name="Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit" tests="4" assertions="0" errors="4" failures="0" skipped="0" time="14.590808">
+        <testcase name="test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #0" file="{base-copy}/tests/Feature/OrderInquiryTest.php" line="341" class="Tests\Feature\OrderInquiryTest" classname="Tests.Feature.OrderInquiryTest" assertions="0" time="3.658620">
+          <error type="Illuminate\Auth\Access\AuthorizationException">Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #0
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+{base-copy}/app/Domain/Staff/StaffWriteAuthority.php:122
+{base-copy}/app/Domain/Rights/ReviewLicense.php:59
+{base-copy}/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+{base-copy}/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+{base-copy}/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+{base-copy}/app/Domain/Rights/ReviewLicense.php:52
+{base-copy}/tests/Support/LicenseFixtures.php:42
+{base-copy}/tests/Support/LicenseFixtures.php:51
+{base-copy}/tests/Support/QuoteFixtures.php:24
+{base-copy}/tests/Support/InventoryFixtures.php:28
+{base-copy}/tests/Support/OrderFixtures.php:42
+{base-copy}/tests/Support/OrderInquiryFixtures.php:26
+{base-copy}/tests/Feature/OrderInquiryTest.php:349
+{base-copy}/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+        <testcase name="test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #1" file="{base-copy}/tests/Feature/OrderInquiryTest.php" line="341" class="Tests\Feature\OrderInquiryTest" classname="Tests.Feature.OrderInquiryTest" assertions="0" time="3.806156">
+          <error type="Illuminate\Auth\Access\AuthorizationException">Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #1
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+{base-copy}/app/Domain/Staff/StaffWriteAuthority.php:122
+{base-copy}/app/Domain/Rights/ReviewLicense.php:59
+{base-copy}/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+{base-copy}/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+{base-copy}/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+{base-copy}/app/Domain/Rights/ReviewLicense.php:52
+{base-copy}/tests/Support/LicenseFixtures.php:42
+{base-copy}/tests/Support/LicenseFixtures.php:51
+{base-copy}/tests/Support/QuoteFixtures.php:24
+{base-copy}/tests/Support/InventoryFixtures.php:28
+{base-copy}/tests/Support/OrderFixtures.php:42
+{base-copy}/tests/Support/OrderInquiryFixtures.php:26
+{base-copy}/tests/Feature/OrderInquiryTest.php:349
+{base-copy}/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+        <testcase name="test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #2" file="{base-copy}/tests/Feature/OrderInquiryTest.php" line="341" class="Tests\Feature\OrderInquiryTest" classname="Tests.Feature.OrderInquiryTest" assertions="0" time="3.562851">
+          <error type="Illuminate\Auth\Access\AuthorizationException">Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #2
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+{base-copy}/app/Domain/Staff/StaffWriteAuthority.php:122
+{base-copy}/app/Domain/Rights/ReviewLicense.php:59
+{base-copy}/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+{base-copy}/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+{base-copy}/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+{base-copy}/app/Domain/Rights/ReviewLicense.php:52
+{base-copy}/tests/Support/LicenseFixtures.php:42
+{base-copy}/tests/Support/LicenseFixtures.php:51
+{base-copy}/tests/Support/QuoteFixtures.php:24
+{base-copy}/tests/Support/InventoryFixtures.php:28
+{base-copy}/tests/Support/OrderFixtures.php:42
+{base-copy}/tests/Support/OrderInquiryFixtures.php:26
+{base-copy}/tests/Feature/OrderInquiryTest.php:349
+{base-copy}/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+        <testcase name="test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #3" file="{base-copy}/tests/Feature/OrderInquiryTest.php" line="341" class="Tests\Feature\OrderInquiryTest" classname="Tests.Feature.OrderInquiryTest" assertions="0" time="3.563181">
+          <error type="Illuminate\Auth\Access\AuthorizationException">Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #3
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+{base-copy}/app/Domain/Staff/StaffWriteAuthority.php:122
+{base-copy}/app/Domain/Rights/ReviewLicense.php:59
+{base-copy}/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+{base-copy}/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+{base-copy}/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+{base-copy}/app/Domain/Rights/ReviewLicense.php:52
+{base-copy}/tests/Support/LicenseFixtures.php:42
+{base-copy}/tests/Support/LicenseFixtures.php:51
+{base-copy}/tests/Support/QuoteFixtures.php:24
+{base-copy}/tests/Support/InventoryFixtures.php:28
+{base-copy}/tests/Support/OrderFixtures.php:42
+{base-copy}/tests/Support/OrderInquiryFixtures.php:26
+{base-copy}/tests/Feature/OrderInquiryTest.php:349
+{base-copy}/vendor/phpunit/phpunit/phpunit:104</error>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\SiteContentDamagedPublicationTest" file="{base-copy}/tests/Feature/SiteContentDamagedPublicationTest.php" tests="1" assertions="16" errors="0" failures="0" skipped="0" time="3.213569">
+      <testcase name="test_a_damaged_publication_record_refuses_publishing_and_sends_staff_to_a_backup" file="{base-copy}/tests/Feature/SiteContentDamagedPublicationTest.php" line="77" class="Tests\Feature\SiteContentDamagedPublicationTest" classname="Tests.Feature.SiteContentDamagedPublicationTest" assertions="16" time="3.213569"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\SiteContentUnavailableHttpTest" file="{base-copy}/tests/Feature/SiteContentUnavailableHttpTest.php" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="2.886881">
+      <testcase name="test_new_content_draft_reports_unavailable_published_content_instead_of_opening" file="{base-copy}/tests/Feature/SiteContentUnavailableHttpTest.php" line="153" class="Tests\Feature\SiteContentUnavailableHttpTest" classname="Tests.Feature.SiteContentUnavailableHttpTest" assertions="8" time="2.886881"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\SiteScheduleHttpTest" file="{base-copy}/tests/Feature/SiteScheduleHttpTest.php" tests="6" assertions="54" errors="0" failures="0" skipped="0" time="0.972371">
+      <testsuite name="Tests\Feature\SiteScheduleHttpTest::test_open_schedule_confirmation_reports_a_publication_or_schedule_made_meanwhile" tests="3" assertions="30" errors="0" failures="0" skipped="0" time="0.536263">
+        <testcase name="test_open_schedule_confirmation_reports_a_publication_or_schedule_made_meanwhile with data set &quot;another release was published&quot;" file="{base-copy}/tests/Feature/SiteScheduleHttpTest.php" line="117" class="Tests\Feature\SiteScheduleHttpTest" classname="Tests.Feature.SiteScheduleHttpTest" assertions="10" time="0.212385"/>
+        <testcase name="test_open_schedule_confirmation_reports_a_publication_or_schedule_made_meanwhile with data set &quot;this release was published&quot;" file="{base-copy}/tests/Feature/SiteScheduleHttpTest.php" line="117" class="Tests\Feature\SiteScheduleHttpTest" classname="Tests.Feature.SiteScheduleHttpTest" assertions="10" time="0.163946"/>
+        <testcase name="test_open_schedule_confirmation_reports_a_publication_or_schedule_made_meanwhile with data set &quot;another release was scheduled&quot;" file="{base-copy}/tests/Feature/SiteScheduleHttpTest.php" line="117" class="Tests\Feature\SiteScheduleHttpTest" classname="Tests.Feature.SiteScheduleHttpTest" assertions="10" time="0.159931"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\SiteScheduleHttpTest::test_open_cancel_confirmation_reports_a_schedule_resolved_meanwhile_with_nothing_else_pending" tests="2" assertions="18" errors="0" failures="0" skipped="0" time="0.299584">
+        <testcase name="test_open_cancel_confirmation_reports_a_schedule_resolved_meanwhile_with_nothing_else_pending with data set &quot;cancelled by another administrator&quot;" file="{base-copy}/tests/Feature/SiteScheduleHttpTest.php" line="177" class="Tests\Feature\SiteScheduleHttpTest" classname="Tests.Feature.SiteScheduleHttpTest" assertions="9" time="0.148844"/>
+        <testcase name="test_open_cancel_confirmation_reports_a_schedule_resolved_meanwhile_with_nothing_else_pending with data set &quot;replaced by a staff publication&quot;" file="{base-copy}/tests/Feature/SiteScheduleHttpTest.php" line="177" class="Tests\Feature\SiteScheduleHttpTest" classname="Tests.Feature.SiteScheduleHttpTest" assertions="9" time="0.150739"/>
+      </testsuite>
+      <testcase name="test_open_publish_confirmation_reports_its_release_becoming_active_meanwhile" file="{base-copy}/tests/Feature/SiteScheduleHttpTest.php" line="261" class="Tests\Feature\SiteScheduleHttpTest" classname="Tests.Feature.SiteScheduleHttpTest" assertions="6" time="0.136525"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

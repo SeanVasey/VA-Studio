@@ -1,0 +1,65 @@
+Loading composer repositories with package information
+Updating dependencies
+Lock file operations: 2 installs, 12 updates, 0 removals
+  - Locking composer/class-map-generator (1.8.0)
+  - Locking composer/pcre (3.4.0)
+  - Upgrading filament/actions (v5.8.4 => v5.10.2)
+  - Upgrading filament/filament (v5.8.4 => v5.10.2)
+  - Upgrading filament/forms (v5.8.4 => v5.10.2)
+  - Upgrading filament/infolists (v5.8.4 => v5.10.2)
+  - Upgrading filament/notifications (v5.8.4 => v5.10.2)
+  - Upgrading filament/query-builder (v5.8.4 => v5.10.2)
+  - Upgrading filament/schemas (v5.8.4 => v5.10.2)
+  - Upgrading filament/support (v5.8.4 => v5.10.2)
+  - Upgrading filament/tables (v5.8.4 => v5.10.2)
+  - Upgrading filament/widgets (v5.8.4 => v5.10.2)
+  - Upgrading laravel/framework (v13.36.0 => v13.37.0)
+  - Upgrading livewire/livewire (v4.4.6 => v4.4.7)
+Writing lock file
+Installing dependencies from lock file (including require-dev)
+Package operations: 2 installs, 12 updates, 0 removals
+  - Syncing laravel/framework (v13.37.0) into cache
+  - Syncing livewire/livewire (v4.4.7) into cache
+  - Syncing filament/support (v5.10.2) into cache
+  - Syncing filament/actions (v5.10.2) into cache
+  - Syncing filament/notifications (v5.10.2) into cache
+  - Syncing filament/schemas (v5.10.2) into cache
+  - Syncing filament/infolists (v5.10.2) into cache
+  - Syncing filament/forms (v5.10.2) into cache
+  - Syncing filament/widgets (v5.10.2) into cache
+  - Syncing filament/query-builder (v5.10.2) into cache
+  - Syncing filament/tables (v5.10.2) into cache
+  - Syncing filament/filament (v5.10.2) into cache
+ 0/2 [>---------------------------]   0%    Failed to download composer/pcre from dist: Could not authenticate against github.com
+    Now trying to download from source
+  - Syncing composer/pcre (3.4.0) into cache
+
+ 1/2 [==============>-------------]  50%    Failed to download composer/class-map-generator from dist: Could not authenticate against github.com
+    Now trying to download from source
+  - Syncing composer/class-map-generator (1.8.0) into cache
+
+ 2/2 [============================] 100%
+  - Upgrading laravel/framework (v13.36.0 => v13.37.0):     Update of laravel/framework failed
+  - Installing composer/pcre (3.4.0): Cloning d5a341b3fb from cache
+  - Installing composer/class-map-generator (1.8.0): Cloning c0efbeb2f3 from cache
+  - Upgrading livewire/livewire (v4.4.6 => v4.4.7):     Update of livewire/livewire failed
+  - Upgrading filament/support (v5.8.4 => v5.10.2):     Update of filament/support failed
+  - Upgrading filament/actions (v5.8.4 => v5.10.2):     Update of filament/actions failed
+  - Upgrading filament/notifications (v5.8.4 => v5.10.2):     Update of filament/notifications failed
+  - Upgrading filament/schemas (v5.8.4 => v5.10.2):     Update of filament/schemas failed
+  - Upgrading filament/infolists (v5.8.4 => v5.10.2):     Update of filament/infolists failed
+  - Upgrading filament/forms (v5.8.4 => v5.10.2):     Update of filament/forms failed
+  - Upgrading filament/widgets (v5.8.4 => v5.10.2):     Update of filament/widgets failed
+  - Upgrading filament/query-builder (v5.8.4 => v5.10.2):     Update of filament/query-builder failed
+  - Upgrading filament/tables (v5.8.4 => v5.10.2):     Update of filament/tables failed
+  - Upgrading filament/filament (v5.8.4 => v5.10.2):     Update of filament/filament failed
+    0 [>---------------------------]    0 [->--------------------------]
+In GitDownloader.php line 155:
+
+  The .git directory is missing from {worktree}/vendor/laravel/framewor
+  k, see https://getcomposer.org/commit-deps for more information
+
+
+update [--with WITH] [--prefer-source] [--prefer-dist] [--prefer-install PREFER-INSTALL] [--dry-run] [--dev] [--no-dev] [--lock] [--no-install] [--no-audit] [--audit-format AUDIT-FORMAT] [--no-autoloader] [--no-suggest] [--no-progress] [-w|--with-dependencies] [-W|--with-all-dependencies] [-v|vv|vvv|--verbose] [-o|--optimize-autoloader] [-a|--classmap-authoritative] [--apcu-autoloader] [--apcu-autoloader-prefix APCU-AUTOLOADER-PREFIX] [--ignore-platform-req IGNORE-PLATFORM-REQ] [--ignore-platform-reqs] [--prefer-stable] [--prefer-lowest] [-m|--minimal-changes] [--patch-only] [-i|--interactive] [--root-reqs] [--bump-after-update [BUMP-AFTER-UPDATE]] [--] [<packages>...]
+
+exit 1 seconds 42

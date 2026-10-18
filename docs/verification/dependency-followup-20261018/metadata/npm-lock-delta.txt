@@ -1,0 +1,14 @@
+root manifest changed
+CHANGED node_modules/@testing-library/user-event 14.6.7 -> 14.6.8 dev=True
+CHANGED node_modules/@types/react-dom 19.2.7 -> 19.3.0 dev=True
+CHANGED node_modules/@vitest/mocker 5.0.3 -> 5.0.4 dev=True
+CHANGED node_modules/@vitest/spy 5.0.3 -> 5.0.4 dev=True
+CHANGED node_modules/chai 6.2.2 -> 6.3.0 dev=True
+CHANGED node_modules/obug 2.1.4 -> 3.0.0 dev=True
+CHANGED node_modules/react 19.3.0 -> 19.3.1 dev=False
+CHANGED node_modules/react-dom 19.3.0 -> 19.3.1 dev=False
+CHANGED node_modules/std-env 4.2.0 -> 4.3.0 dev=True
+CHANGED node_modules/tinybench 6.1.4 -> 6.2.2 dev=True
+CHANGED node_modules/tinyexec 1.3.0 -> 1.3.1 dev=True
+CHANGED node_modules/vitest 5.0.3 -> 5.0.4 dev=True
+lockfileVersion 3

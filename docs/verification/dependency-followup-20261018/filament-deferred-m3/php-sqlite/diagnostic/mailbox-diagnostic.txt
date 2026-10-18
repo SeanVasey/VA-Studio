@@ -1,0 +1,24 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: {worktree}/phpunit.xml
+
+.F......                                                            8 / 8 (100%)
+
+Time: 00:06.943, Memory: 105.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\SiteContentUnavailableHttpTest::test_new_content_draft_reports_unavailable_published_content_instead_of_opening
+A notification was not sent
+Failed asserting that null is not null.
+
+{worktree}/vendor/filament/notifications/src/Notification.php:287
+{worktree}/vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+{worktree}/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+{worktree}/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+{worktree}/tests/Feature/SiteContentUnavailableHttpTest.php:166
+{worktree}/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 8, Assertions: 75, Failures: 1.
