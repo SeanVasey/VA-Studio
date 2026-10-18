@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, expect, it, vi } from 'vitest';
 import ProductionCustomerFeatures from '../../resources/js/Pages/ProductionCustomerFeatures';
 import { boundedFeatureJson, libraryEnvelope, preferencesEnvelope, exportEnvelope } from '../../resources/js/lib/production-account-features';
@@ -79,7 +80,11 @@ it('requires fresh read after an uncertain version conflict and never resends th
   expect(screen.queryByRole('button', { name: 'Create playlist' })).not.toBeInTheDocument();
   expect(fetch).toHaveBeenCalledTimes(2);
   fireEvent.click(screen.getByRole('button', { name: 'Reload listening library' }));
-  expect(await screen.findByRole('button', { name: 'Create playlist' })).toBeEnabled();
+  // The fresh read restores the form with a cleared name, which the blank-name guard keeps disabled until a name is typed.
+  expect(await screen.findByRole('button', { name: 'Create playlist' })).toBeDisabled();
+  expect(screen.getByLabelText('Playlist name')).toBeEnabled();
+  fireEvent.change(screen.getByLabelText('Playlist name'), { target: { value: 'Synthetic next idea' } });
+  expect(screen.getByRole('button', { name: 'Create playlist' })).toBeEnabled();
   expect(fetch).toHaveBeenCalledTimes(3);
   expect(JSON.parse(fetch.mock.calls[1][1]!.body as string)).toEqual({ action: 'create-playlist', name: 'Synthetic private idea', version: 0 });
 });
@@ -155,4 +160,119 @@ it('ends a timed-out mutation attempt and accepts only a fresh read before anoth
   expect(screen.queryByRole('button', { name: 'Clear listening library' })).not.toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Reload listening library' })).toBeEnabled();
   expect(fetch).toHaveBeenCalledTimes(2);
+});
+
+// Create-playlist guard: a UX convenience only. The server (ProductionListeningState) stays authoritative, supplies the playlist
+// limit but no name-length rule, and refuses empty, padded and over-capacity writes. The client treats any failed write as uncertain
+// and clears the library, so avoidable invalid submissions must never leave the page.
+const blankHint = 'Enter a playlist name to create a playlist.';
+const limitHint = `You have reached the limit of ${library.limits.playlists} playlists. Delete a playlist to create another.`;
+const uncertainMessage = 'The result could not be confirmed. Reload before making another change.';
+const playlistsOf = (count: number) => Array.from({ length: count }, (_, index) => ({ id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`, name: `Synthetic list ${index + 1}`, tracks: [] }));
+async function openCreateForm(scope: string, count: number) {
+  const fetch = vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response({ initialized: true, library: { ...library, version: count, playlists: playlistsOf(count) } }));
+  render(<ProductionCustomerFeatures scope={scope} />);
+  fireEvent.click(screen.getByRole('button', { name: 'Reload listening library' }));
+  await screen.findByRole('heading', { name: 'Saved tracks' });
+  return { fetch, input: screen.getByLabelText('Playlist name'), create: screen.getByRole('button', { name: 'Create playlist' }) };
+}
+function expectNoRequestAndLibraryKept(fetch: { mock: { calls: unknown[] } }) {
+  expect(fetch.mock.calls).toHaveLength(1);
+  expect(screen.getByRole('heading', { name: 'Saved tracks' })).toBeInTheDocument();
+  expect(screen.queryByText(uncertainMessage)).not.toBeInTheDocument();
+}
+
+it.each([['empty', ''], ['whitespace-only', '   '], ['tab and space only', ' \t ']])('disables playlist creation and explains why for a %s name, sending nothing', async (kind, value) => {
+  const { fetch, input, create } = await openCreateForm('opaque-create-blank-' + kind, 0);
+  fireEvent.change(input, { target: { value } });
+  expect(create).toBeDisabled();
+  expect(create).not.toHaveAttribute('aria-disabled');
+  expect(input).toBeEnabled();
+  expect(screen.getByText(blankHint)).toBeVisible();
+  expect(input).toHaveAccessibleDescription(blankHint);
+  expect(create).toHaveAccessibleDescription(blankHint);
+  fireEvent.click(create);
+  fireEvent.submit(create.closest('form')!);
+  expectNoRequestAndLibraryKept(fetch);
+});
+
+it.each([['a valid name', 'Synthetic mix', 'Synthetic mix'], ['a valid name with surrounding spaces, sent trimmed', '  Synthetic mix  ', 'Synthetic mix']])('enables playlist creation for %s and sends one request', async (kind, value, sent) => {
+  const { fetch, input, create } = await openCreateForm('opaque-create-valid-' + kind, 0);
+  fetch.mockResolvedValueOnce(response({ initialized: true, library: { ...library, version: 1, playlists: [{ id: '00000000-0000-4000-8000-000000000001', name: sent, tracks: [] }] } }));
+  fireEvent.change(input, { target: { value } });
+  expect(create).toBeEnabled();
+  expect(screen.queryByText(blankHint)).not.toBeInTheDocument();
+  expect(screen.queryByText(limitHint)).not.toBeInTheDocument();
+  expect(input).not.toHaveAttribute('aria-describedby');
+  expect(create).not.toHaveAttribute('aria-describedby');
+  fireEvent.click(create);
+  expect(await screen.findByRole('heading', { name: sent, level: 4 })).toBeInTheDocument();
+  expect(fetch).toHaveBeenCalledTimes(2);
+  expect(fetch.mock.calls[1][0]).toBe('/customer/features/listening/change');
+  expect(JSON.parse(fetch.mock.calls[1][1]!.body as string)).toEqual({ action: 'create-playlist', name: sent, version: 0 });
+});
+
+it('re-enables creation as soon as a blank name becomes valid and withdraws the explanation', async () => {
+  const { input, create } = await openCreateForm('opaque-create-recover', 0);
+  fireEvent.change(input, { target: { value: '   ' } });
+  expect(create).toBeDisabled();
+  fireEvent.change(input, { target: { value: 'Synthetic mix' } });
+  expect(create).toBeEnabled();
+  expect(screen.queryByText(blankHint)).not.toBeInTheDocument();
+  fireEvent.change(input, { target: { value: '' } });
+  expect(create).toBeDisabled();
+  expect(screen.getByText(blankHint)).toBeInTheDocument();
+});
+
+it('keeps creation available one below the supplied playlist limit', async () => {
+  const count = library.limits.playlists - 1;
+  const { fetch, input, create } = await openCreateForm('opaque-create-below-limit', count);
+  fetch.mockResolvedValueOnce(response({ initialized: true, library: { ...library, version: count + 1, playlists: playlistsOf(count + 1) } }));
+  fireEvent.change(input, { target: { value: 'Synthetic last slot' } });
+  expect(create).toBeEnabled();
+  expect(screen.queryByText(limitHint)).not.toBeInTheDocument();
+  fireEvent.click(create);
+  expect(await screen.findByText(limitHint)).toBeInTheDocument();
+  expect(fetch).toHaveBeenCalledTimes(2);
+  expect(JSON.parse(fetch.mock.calls[1][1]!.body as string)).toEqual({ action: 'create-playlist', name: 'Synthetic last slot', version: count });
+});
+
+it('disables creation at the supplied playlist limit even for a valid name, explains it and sends nothing', async () => {
+  const { fetch, input, create } = await openCreateForm('opaque-create-at-limit', library.limits.playlists);
+  fireEvent.change(input, { target: { value: 'Synthetic one too many' } });
+  expect(create).toBeDisabled();
+  expect(create).not.toHaveAttribute('aria-disabled');
+  expect(screen.getByText(limitHint)).toBeVisible();
+  expect(screen.queryByText(blankHint)).not.toBeInTheDocument();
+  expect(input).toHaveAccessibleDescription(limitHint);
+  expect(create).toHaveAccessibleDescription(limitHint);
+  fireEvent.click(create);
+  fireEvent.submit(create.closest('form')!);
+  expectNoRequestAndLibraryKept(fetch);
+});
+
+it('explains the capacity limit rather than the blank name when both apply', async () => {
+  const { fetch, input, create } = await openCreateForm('opaque-create-limit-and-blank', library.limits.playlists);
+  fireEvent.change(input, { target: { value: '  ' } });
+  expect(create).toBeDisabled();
+  expect(create).toHaveAccessibleDescription(limitHint);
+  expect(screen.queryByText(blankHint)).not.toBeInTheDocument();
+  fireEvent.submit(create.closest('form')!);
+  expectNoRequestAndLibraryKept(fetch);
+});
+
+it('keeps the keyboard path: Enter never sends a blank or padded-blank name and creates once for a valid name', async () => {
+  const user = userEvent.setup();
+  const { fetch, input } = await openCreateForm('opaque-create-keyboard', 0);
+  fetch.mockResolvedValueOnce(response({ initialized: true, library: { ...library, version: 1, playlists: [{ id: '00000000-0000-4000-8000-000000000001', name: 'Synthetic keyboard mix', tracks: [] }] } }));
+  await user.click(input);
+  await user.keyboard('{Enter}');
+  await user.keyboard('   {Enter}');
+  expect(input).toHaveFocus();
+  expectNoRequestAndLibraryKept(fetch);
+  await user.clear(input);
+  await user.keyboard('Synthetic keyboard mix{Enter}');
+  expect(await screen.findByRole('heading', { name: 'Synthetic keyboard mix', level: 4 })).toBeInTheDocument();
+  expect(fetch).toHaveBeenCalledTimes(2);
+  expect(JSON.parse(fetch.mock.calls[1][1]!.body as string)).toEqual({ action: 'create-playlist', name: 'Synthetic keyboard mix', version: 0 });
 });
