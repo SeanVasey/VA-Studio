@@ -15,7 +15,8 @@ use Throwable;
  * Short-lived, one-use owner authorization per artifact and its redemption. Bytes are copied into an unlinked
  * private snapshot and hash-verified before the first byte can leave; the authorization deadline bounds the
  * copy and the stream. Snapshots are bounded by `ProductionFreeGrantSpool` (held slots, free-space reserve,
- * read-only reopen and read-back hash). No HTTP route exists here: root mounts the delivery endpoint after review.
+ * read-only reopen and read-back hash). After the redemption commits, the transfer carries a one-use
+ * `ProductionFreeGrantCommittedRead` that must pass before the first byte. HTTP lives in `App\Http\ProductionFree`.
  */
 final class ProductionFreeGrantDownloads
 {
@@ -100,7 +101,9 @@ final class ProductionFreeGrantDownloads
         $snapshotDeadline = hrtime(true) + $before['policy']['snapshot_seconds'] * 1000000000;
         $prepared = $this->snapshot($before, $snapshotDeadline);
         try {
-            $grants->customerCommand($principal, $actor, function (array $policy, ProductionFreeGrantRows $rows, array $binding) use ($inspect, $before, $requested): array {
+            $identity = null;
+            $committed = $grants->customerCommand($principal, $actor, function (array $policy, ProductionFreeGrantRows $rows, array $binding, array $raw) use ($inspect, $before, $requested, &$identity): array {
+                $identity = $raw;
                 $current = $inspect($policy, $rows, $binding);
                 ProductionFreeGrantException::require(CanonicalJson::encode($current) === CanonicalJson::encode($before), 'entitlement_changed');
                 $at = ProductionFreeGrantInput::now();
@@ -116,7 +119,7 @@ final class ProductionFreeGrantDownloads
                         'origin_seal' => $before['graph']['origin']['seal'], 'role' => $before['auth']['role'], 'at' => ProductionFreeGrantInput::iso($at)]);
                 $strip = fn (array $row): array => ProductionFreeGrantRecords::strings(array_diff_key($row, ['payload' => true]));
 
-                // The exact rows this commit leaves behind; the commit observer's graph proof names the redemption.
+                // The exact rows this commit leaves behind; the before-first-byte proof requires them unchanged.
                 return ['origin' => $strip($current['graph']['origin']), 'authorization' => $strip($current['auth']),
                     'redemption' => $strip($rows->one('production_free_redemptions', 'id = ?', [$id])),
                     'original' => $strip($current['graph']['original'])];
@@ -132,11 +135,14 @@ final class ProductionFreeGrantDownloads
             $policy = $before['policy'];
             $seconds = min($policy['transfer_max_seconds'], $policy['transfer_base_seconds'] + intdiv($before['target']['bytes'] + $policy['transfer_min_bytes_per_second'] - 1, $policy['transfer_min_bytes_per_second']));
 
+            // Both deadlines are fixed here, from the redemption commit: the transfer's (on the injectable clock) and the
+            // committed read's (monotonic), which bounds the before-first-byte frame and is never renewed.
             $started = $this->tick();
+            $read = new ProductionFreeGrantCommittedRead($principal, $actor, $identity, $policy, $committed, hrtime(true) + $seconds * 1000000000);
 
             return new ProductionFreeGrantTransfer($prepared, $before['target']['filename'], $before['target']['mime_type'],
                 $started + $seconds * 1000000000, $this->clock, $started,
-                $policy['transfer_min_bytes_per_second'], $policy['transfer_base_seconds']);
+                $policy['transfer_min_bytes_per_second'], $policy['transfer_base_seconds'], $read);
         } catch (Throwable $error) {
             $prepared->close();
             throw $error;
