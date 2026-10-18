@@ -1,0 +1,39 @@
+diff --git a/tests/Feature/SiteContentDamagedPublicationTest.php b/tests/Feature/SiteContentDamagedPublicationTest.php
+index 8653702b..d264357d 100644
+--- a/tests/Feature/SiteContentDamagedPublicationTest.php
++++ b/tests/Feature/SiteContentDamagedPublicationTest.php
+@@ -92,7 +92,7 @@ class SiteContentDamagedPublicationTest extends TestCase
+
+         $this->actingAs($actor);
+         $page = Livewire::test(ListSiteReleases::class)->mountAction('createDraft');
+-        $notification = collect(session('filament.claimed_notifications', session('filament.notifications', [])))
++        $notification = collect((function () { $box = app(\Filament\Notifications\NotificationMailbox::class); $box->flush(); return $box->pull(); })())
+             ->firstWhere('title', 'The published site content is unavailable');
+         $this->assertNotNull($notification);
+         $this->assertStringContainsString('Restore verified data from a backup', (string) $notification['body']);
+diff --git a/tests/Feature/SiteContentUnavailableHttpTest.php b/tests/Feature/SiteContentUnavailableHttpTest.php
+index 1e81aa09..533973a2 100644
+--- a/tests/Feature/SiteContentUnavailableHttpTest.php
++++ b/tests/Feature/SiteContentUnavailableHttpTest.php
+@@ -157,7 +157,7 @@ class SiteContentUnavailableHttpTest extends TestCase
+         $this->corruptActiveRelease($actor);
+
+         $page = Livewire::test(ListSiteReleases::class)->mountAction('createDraft');
+-        $notification = collect(session('filament.claimed_notifications', session('filament.notifications', [])))
++        $notification = collect((function () { $box = app(\Filament\Notifications\NotificationMailbox::class); $box->flush(); return $box->pull(); })())
+             ->firstWhere('title', 'The published site content is unavailable');
+         $this->assertNotNull($notification);
+         // A damaged release is recoverable in the panel, so staff are not sent to a needless backup restore.
+diff --git a/tests/Feature/SiteScheduleHttpTest.php b/tests/Feature/SiteScheduleHttpTest.php
+index 5eb62291..3fc6fba6 100644
+--- a/tests/Feature/SiteScheduleHttpTest.php
++++ b/tests/Feature/SiteScheduleHttpTest.php
+@@ -47,7 +47,7 @@ class SiteScheduleHttpTest extends TestCase
+     /** Read before assertNotified(), which pulls notifications from the session. Livewire requests move them to the claimed key. */
+     private function notificationBody(string $title): string
+     {
+-        $notification = collect(session('filament.claimed_notifications', session('filament.notifications', [])))->firstWhere('title', $title);
++        $notification = collect((function () { $box = app(\Filament\Notifications\NotificationMailbox::class); $box->flush(); return $box->pull(); })())->firstWhere('title', $title);
+         $this->assertNotNull($notification, "The {$title} notification was not sent.");
+
+         return (string) $notification['body'];
