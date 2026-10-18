@@ -18,11 +18,17 @@ for `systemctl`, `ufw` and the like. No application code, route, config, census 
 | `a1c94023` docs(ops): record the O2 follow-up batch evidence and changelog | docs | `CHANGELOG.md`, this directory |
 | `108c04ae` fix(ops): refuse to overwrite a differing remote backup object on any rclone | R2-1 | `ops/staging/backup.sh`, `tests/ops/test_staging_backup_offhost.py`, `docs/ops/backup-offhost-hardening.md` |
 | `f6cb3b2d` test(ops): pin semantic-delta.diff to build-kit.py --delta | R2-2 | `tests/ops/test_production_kit.py` |
+| `cd35fb15` docs(ops): record the O2 round-two evidence and changelog | docs | `CHANGELOG.md`, this directory |
+| `d8cff5e7` fix(ops): refuse to ship over existing remote objects and bound kept copies | R3 P2-1, P2-2, P3-1 to P3-4 | `ops/staging/backup.sh`, `tests/ops/test_staging_backup_offhost.py`, `docs/ops/backup-offhost-hardening.md` |
+| `22d1bd81` test(ops): host baseline must not accept an enabled-runtime apt timer | R3 P3-4 | `tests/ops/test_monitoring_scripts.py` |
+| `ebc93106` fix(ops): match the clamd profile marker only as the exact first line | R3 P3-5 | `ops/staging/provision.sh`, `tests/ops/test_clamav_profile.py` |
+| `9b360103` test(ops): follow the first-line clamd marker guard in the production kit test | R3 P3-5 | `tests/ops/test_production_kit.py` |
 | this update's commit | docs | `CHANGELOG.md`, this directory |
 
-**Tested source:** the first-round checks ran at `810794a8` and again at `a1c94023`. After the coordinator's two follow-up items
-(R2-1 and R2-2, below), every check in the verification table ran at `f6cb3b2d`, the last code commit. The commit that updates this
-packet adds only documentation; the full suite was run again on it, and the lane report gives that SHA.
+**Tested source:** the first-round checks ran at `810794a8` and again at `a1c94023`; the round-two checks at `f6cb3b2d` and again at
+`cd35fb15`, which the independent review approved with conditions. After the round-three fixes (below), every check in the
+verification table ran at `9b360103`, the last code commit. The commit that updates this packet adds only documentation; the full
+suite was run again on it, and the lane report gives that SHA.
 
 ## Items: what changed, and red/green
 
@@ -218,11 +224,62 @@ mismatch it prints the regeneration command and the first lines of the drift.
 - **Red:** a one-line edit to the snapshot (` (edited)` appended to line 1) fails the test with that diff.
 - **Green** again after `git checkout` of the snapshot.
 
-## Verification at `f6cb3b2d`
+## Round 3: conditions of the independent review of `cd35fb15`
+
+The review approved with conditions (no P0 or P1). Each item, red then green; raw output and mutations are in the evidence file.
+
+- **P2-1, false "shipped" on a backend with no common hash** (`d8cff5e7`).
+  - **Problem.** On such a backend rclone compares sizes only, and every age output of one set has the same size.
+  - **Fix.** Before a fresh encryption, the remote is listed with `rclone lsf --include /<set>.tar.age --include /<set>.tar.age.sha256`.
+    This works on any backend; exit 3, a path that does not exist yet, counts as empty. The ship refuses before encrypting if either
+    name exists. After the upload, the remote digest, read back with `rclone cat`, must equal the local one, and `rclone check` must
+    pass.
+  - **Red.** `test_a_partial_upload_then_a_rotation_on_a_backend_without_hashes_is_refused` reproduces the reviewer's case on a real
+    `chunker` remote with `hash_type = none`. At `cd35fb15` it failed with `0 == 0 : LOG: shipped ... (age-encrypted via rclone)`;
+    a forged remote digest also shipped.
+  - **Green.** The ship refuses, the old ciphertext is untouched and no digest is sent. A fresh set still ships to that remote.
+- **P2-2, kept copies.**
+  - A copy is kept only if the remote holds `<set>.tar.age` after the failure. Red at `cd35fb15`: a failed first upload kept one.
+  - At most two copies are kept: the oldest sets' copies go first, and never the copy for the set being shipped. Red: all four
+    were kept.
+  - Every rclone ship logs, and `check-offhost` prints, "N kept retry copies, B bytes". Red: the function did not exist.
+  - The guide sizes the disk for this.
+- **P3-1, deploy against a manual ship.** `predeploy` sets `SHIP_LOCK_WAIT=600`, and the ship uses `flock -w`; a manual `ship` still
+  refuses at once. The test releases a held lock after 2 s and the ship succeeds; with a 1 s bound and the lock still held it fails,
+  saying "waited 1s". The guide documents what happens past the bound.
+- **P3-2, pruning.** It runs outside the lock; this is documented in the guide and in a comment, not moved.
+- **P3-3, repeat ship.**
+  - A verified ship records its digest in `backups/.offhost-shipped.<set>`.
+  - A repeat ship exits 0 with "<set> is already shipped" only when both objects are on the remote and the remote digest matches
+    the record. It encrypts nothing and leaves no copy.
+  - Without the record, or with a changed remote digest, it refuses before encrypting.
+  - Red at `cd35fb15`: the repeat ship failed and left a copy.
+- **P3-4, test gaps.** All six of the reviewer's mutations now fail a test, and each passed before:
+  - `rclone check` removed;
+  - the lock released before the transfer;
+  - the symlink checks in `retry_copy_ok`;
+  - `--checksum` dropped;
+  - the symlinked-lock refusal;
+  - `enabled-runtime` accepted.
+
+  Seven mutations of the new code also fail tests. The missing-path one first survived, which is why
+  `test_the_first_ship_to_a_remote_path_that_does_not_exist_yet_succeeds` exists.
+- **P3-5, the clamd marker.** The guard compares the first line of `clamd.conf` literally (`head -n 1`). Red at `cd35fb15`: the marker
+  on a later line, and the look-alike `# VASEY-AUDIO clamd profile`, both kept a packaged clamd running, in staging and in the
+  derived production script. The production kit test that pinned the old text is updated (`9b360103`). The delta snapshot is
+  unchanged.
+
+Process notes:
+- I committed `ebc93106` before running the full suite, which then showed that pinned assertion failing; `9b360103` fixes it.
+- Two mutation commands briefly left stray empty files in the worktree (`&1` in round 1, `&-` here) through a mistyped redirection.
+  Both were removed before any commit.
+- A debug step's `git checkout` in round 2 discarded uncommitted test edits, which were re-applied.
+
+## Verification at `9b360103`
 
 | Check | Command | Result |
 | --- | --- | --- |
-| Ops tests | `python3 -m unittest discover -s tests/ops -p 'test_*.py'` | **294 OK** (280 before: off-host 45 to 53, monitoring 42 to 44, ClamAV 26 to 28, drift 9 to 10, production kit 49 to 50; 292 at `810794a8`) |
+| Ops tests | `python3 -m unittest discover -s tests/ops -p 'test_*.py'` | **309 OK** (280 before: off-host 45 to 68, monitoring 42 to 44, ClamAV 26 to 28, drift 9 to 10, production kit 49 to 50; 294 at `cd35fb15`) |
 | Kit build | `python3 -I ops/production/build-kit.py --check` | ok, 13 files; `--delta` identical to the committed snapshot, now also pinned by a test |
 | Shell syntax | `bash -n` on `backup.sh`, `provision.sh`, `host-baseline.sh` | ok |
 | Lint | `shellcheck` 0.9.0 at the default severity on `backup.sh` and `host-baseline.sh`; `-S warning` on those, `provision.sh`, `forge-deploy.sh` and the five derived production scripts | clean (`provision.sh` keeps its old SC1091 info at the default severity) |
@@ -244,7 +301,7 @@ mismatch it prints the regeneration command and the first lines of the drift.
     corrected.
   - The host's rclone version was not checked.
   - Acted on in R2-1: the encrypted path now uses `rclone copy --immutable` with anchored `--include` filters.
-  - A consequence: a second ship of a set that already shipped completely is now refused, and the remote copy is left as it was.
+  - A consequence in round two, a refused second ship of a completed set, is replaced in round three by "already shipped" (P3-3).
 - **No test pinned `semantic-delta.diff` to `--delta`.** Acted on in R2-2.
 - **The deferral ledger still lists these items as open.** After the review, the lead may record them as closed at the reviewed SHA.
 
@@ -253,8 +310,9 @@ mismatch it prints the regeneration command and the first lines of the drift.
 - No real host: no systemd, no real apt timers, no Forge, no ClamAV re-provision on a real host, no cron.
 - No real remote or real credential: no S3-compatible store, B2 or SFTP, and no object-lock or no-overwrite credential. The
   overwrite refusal was proven with the real rclone 1.60.1 against a local-filesystem remote only.
-- Any other rclone version, including the host's. There is also a backend without a hash in common with the local disk, where
-  rclone compares sizes only.
+- Any other rclone version, including the host's. A backend without a common hash was exercised only through `chunker` with
+  `hash_type = none`. On such a backend the ciphertext itself is still compared by size only; the digest file is read back.
+- The 600 s lock wait inside a real deploy, and what an operator sees when it runs out.
 - The lock and the retry copy inside the real `nightly`/`predeploy` flow under the control helper, where the helper's fds 7 and 8
   are inherited. That was reasoned (fd 6 is free in both scripts), not run.
 - A process killed between encryption and the rename into the retry copy. The rename is one `rename(2)`, and the staging leftover is
