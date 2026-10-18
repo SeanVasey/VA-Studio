@@ -143,8 +143,9 @@ These are application or review items this kit deliberately does not do:
 5. **Scheduler heartbeat.** The application leaves no trace when no release is due; a ping on schedule success is a reviewed change.
 6. **Pre-launch capability hold (needs Sean's decision).** Neither the preflight production profile nor `ops/production/validate-runtime.php`
    checks the capability flags or the production-lane flags (the staging deploy gate does, through `scripts/ops/capability-boundary.php`). On
-   production the `VASEY_TEST_*` flags and the support fixture are already refused by their environment gates, but four flags are not held by
-   anything here and no template line states them either: `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` and `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED`
+   production the `VASEY_TEST_*` flags and the support fixture are already refused by their environment gates, but four flags are held by no
+   validator here (`env.production.example` states each as `false` at lines 210, 217, 223 and 226, and `compose-env.py` keeps a later
+   layer from changing them, but nothing refuses a host `.env` edited to `true`): `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` and `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED`
    (no environment gate; each admits once an adapter is bound by other code, and none ships today), `DISCOVERY_SITEMAP_ENABLED` (the public
    index serves track sitemaps in production once it is true) and `VASEY_LISTENING_V2_PROMOTION_ENABLED` (a one-way data promotion with no
    environment gate). A hold is the same shared check as a validator refusal until each activation is authorized, lifted by a reviewed change.

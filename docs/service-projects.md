@@ -10,7 +10,7 @@ The workflow is disabled by default. `VASEY_TEST_SERVICE_PROJECTS_ENABLED=true`
 activates it only in `local`, `testing` or `staging` (`TestEnvironment::admitsTestCommerce()`;
 staging was admitted by PR #68), and requires existing synthetic customer
 accounts. The buyer page is `/services/projects`; staff opens `/admin/service-projects`.
-The default-off flag and production environment barrier apply to reads and writes.
+The default-off flag and production environment barrier apply to reads and writes. On a hosted staging server the deploy gate (`ops/staging/validate-runtime.php`, through `scripts/ops/capability-boundary.php`) refuses a candidate `.env` that sets this flag to anything but `false`; enabling it there is a reviewed change to that boundary.
 Retained records are never deleted when access or preparation is withdrawn.
 
 The operator first supplies a private service definition through the existing
