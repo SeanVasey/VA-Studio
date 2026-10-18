@@ -424,3 +424,12 @@ Still Sean's decisions (not deferred findings): the production pre-launch capabi
 
 Owner decision, not a finding: Sean to confirm the reserved-address rule (only `.test`, `.example`, `.invalid`, `.localhost`, `example.com`, `example.net` and `example.org` recipients can receive relayed links).
 
+
+2026-10-18 PR #149 Codex P2 r4305529286, deferred to the K3 follow-up batch with one reply: `vasey:test-identity-links list` reads every capture and runs two lookups each. List only the newest N captures by modification time and report how many older ones were not examined, batch the lookups, and prune expired captures in the identity domain if retention is needed.
+
+
+2026-10-18 K4 Stripe-test drill harness. Independent review at `18f7ed98` (APPROVE WITH CONDITIONS); P2-1, P3-4 and P3-5 corrected in documentation before the PR opened. Deferred to the K4 follow-up batch:
+- P3-1: `vasey:test-commerce-evidence` reads inside `START TRANSACTION READ ONLY` at REPEATABLE READ on MySQL, rejects locking and `INTO` clauses, and removes its connection callback when the command ends;
+- P3-2: load an explicit `CheckoutIntent` column list;
+- P3-3: JSON output with `OUTPUT_RAW`, text output through `OutputFormatter::escape()`.
+
