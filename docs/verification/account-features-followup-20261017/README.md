@@ -286,3 +286,7 @@ Logs: `logs/mysql-native-new-tests.txt`, `logs/mysql-native-release-test.txt`, `
 ## Attribution note
 
 The lane brief asked commits to end with `Co-Authored-By: Claude Opus 5.5`. The session's own commit-attribution instruction names the model that actually did the work, Claude Sonnet 5.5, with the same `Claude-Session` line, and that is what the commits carry.
+
+## Independent review
+
+A separate reviewer approved the batch at `89f0340db45c38d606ef7ca2e00db989eddb6c02` with no P0 or P1 findings ([decision record](independent-review-89f0340d-DECISION.md), imported verbatim). Its P2-1 (Rename accepts a whitespace-only name and sends it untrimmed) and P3-1 to P3-6 are deferred to the next account-feature batch under the freeze-and-batch rule and recorded in `docs/handoff/2026-10-07/codex-deferred-20261011.md`. The reviewer's P3-1 qualifies this packet's attribution of the SourceClosure refusal to laziness alone: the connection-set and config recheck also refuses those cases, so the refusal is over-determined.
