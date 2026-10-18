@@ -59,7 +59,9 @@ transport and retention, or the reason it refuses. It never prints a value.
   before it removes or sends anything. `predeploy` (the nightly run and every deploy go through it, with the site quiesced) waits up
   to 600 seconds instead, so a manual ship that overlaps a deploy delays it rather than failing it mid-operation; if the lock is still
   held after that, the deploy's backup step fails and the control helper leaves the site quiesced with its operation marker for root
-  recovery (`ops/staging/README.md`, operation markers and root recovery). Do not start a long manual ship while a deploy may run. The nightly run and deploys never
+  recovery (`ops/staging/README.md`, operation markers and root recovery). Any time limit of the deploy runner (Forge's, if it has
+  one; not verified here) must cover that 600-second wait plus the snapshot, the restore proof and the ship, or the runner itself can
+  strand the operation marker. Do not start a long manual ship while a deploy may run. The nightly run and deploys never
   compete with each other: `.deploy.lock` already serializes them. Pruning (`nightly`, after the resume) runs outside this lock: it
   never touches staging directories or kept copies, and a manual ship of a set that pruning removes at that moment fails rather than
   ship anything else. The default path takes no such lock.
@@ -108,14 +110,18 @@ transport and retention, or the reason it refuses. It never prints a value.
 
   It does not stop anyone who holds the credential, an attacker on this host included, from deleting or replacing objects with other
   commands, and it cannot serialize writers on different hosts. **The no-overwrite credential below remains the primary control.**
-- **Shipping a set again.** After a verified transfer the host records the digest in `backups/.offhost-shipped.<set>` (one line).
-  A later `ship` of that set exits 0 with "<set> is already shipped" when both remote objects exist and the remote digest still equals
-  the record; it encrypts and sends nothing and leaves no copy. Without the record, or when the remote digest differs, it refuses
-  before encrypting. A record whose set has been pruned is removed by the next hardened ship.
+- **Shipping a set again.** After a verified transfer the host records the digest and the ciphertext's size in
+  `backups/.offhost-shipped.<set>`. A later `ship` of that set exits 0 with "<set> is already shipped" when both remote objects exist,
+  the remote digest still equals the record and the remote ciphertext's size (`rclone lsf --format sp`) equals the recorded size; it
+  encrypts and sends nothing and leaves no copy. Without the record, with a linked record, or when the digest or the size differs or
+  the ciphertext is missing, it refuses before encrypting. The ciphertext itself is not re-read: on every backend this is a size
+  check, not a content check, so a same-size replacement would still read as "already shipped". A record whose set has been pruned is
+  removed by the next hardened ship.
 - **Retrying a failed rclone transfer.** age never produces the same ciphertext twice, so once part of a set has reached the remote
   only its exact bytes can complete it. A failed rclone transfer therefore keeps the ciphertext, its digest and a digest of the
-  recipients file in `backups/.offhost-retry.<set>` (0700, ciphertext and digests only), **but only if the remote then holds
-  `<set>.tar.age`**; if nothing reached it (or the remote cannot be listed) no copy is kept, and a retry encrypts the set again.
+  recipients file in `backups/.offhost-retry.<set>` (0700, ciphertext and digests only). The copy is dropped only when the remote is
+  listed afterwards and holds no `<set>.tar.age`; then a retry encrypts the set again. If the remote cannot be listed (an outage that
+  interrupted the transfer, say), the ciphertext may have landed, so the copy is kept and the retry after the outage re-sends it.
   `vasey-<kit>-backup ship <set directory>` re-sends the kept bytes and removes the copy once the transfer is verified. Nothing
   retries on its own: the nightly run ships its own new set. A kept copy encrypted to other recipients (after a rotation), one that
   no longer matches its digest, one that is not age ciphertext and one that is or contains a link are never sent. If the remote then
@@ -166,7 +172,8 @@ the unchanged default path, the refusal of a remote without recipients and its e
 directories, the shipping lock, the real rclone 1.60.1 refusing a differing remote object and accepting an identical one, and a
 retry after an interrupted checksum upload (only the interruption is simulated; the retry re-sends the first attempt's exact bytes,
 which then decrypt), the presence check and digest read-back on a real `chunker` remote with `hash_type = none`, "already shipped",
-the kept-copy rule and cap, and the bounded lock wait. `tests/ops/test_staging_backup_offhost.py` holds them (68 tests).
+the kept-copy rule and cap, the bounded lock wait, a retry after an outage that also stopped listing, and the size check behind
+"already shipped". `tests/ops/test_staging_backup_offhost.py` holds them (72 tests).
 **Not verified:** any real remote (S3-compatible, B2, SFTP, another server), rsync over SSH to a real host, the host's cron
 and maintenance-window behaviour with encryption, a restore of a decrypted production-sized set, and the time encryption adds
 to the window.

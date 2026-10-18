@@ -710,6 +710,78 @@ fi""")
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
         self.assertEqual(sorted(p.name for p in fresh.iterdir()), [f"{bk.name}.tar.age", f"{bk.name}.tar.age.sha256"])
 
+    def test_an_outage_during_the_digest_upload_keeps_the_copy_and_the_retry_converges(self):
+        # The digest upload fails because the remote went away, and listing it fails too while the outage lasts. Not knowing whether
+        # the ciphertext landed, the copy must stay, so the retry after the outage re-sends the same bytes.
+        recipients = self.recipients()
+        bk = self.make_set()
+        outage, over = self.root / "outage", self.root / "outage-happened"
+        flaky = self.wrapped_rclone("outage-rclone", f"""if [ "${{args[2]:-}}" = copy ] && [ ! -e "{over}" ]; then
+  for ((i = 3; i < ${{#args[@]}} - 1; i++)); do
+    if [ "${{args[i]}}" = --include ] && [[ "${{args[i + 1]}}" == *.tar.age.sha256 ]]; then
+      : > "{outage}"; : > "{over}"; echo "outage: connection reset" >&2; exit 1
+    fi
+  done
+fi
+if [ "${{args[2]:-}}" = lsf ] && [ -e "{outage}" ]; then echo "outage: connection refused" >&2; exit 1; fi""")
+        settings = dict(self.settings, VASEY_BACKUP_RCLONE_BIN=flaky)
+        first = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **settings)
+        self.assertNotEqual(first.returncode, 0, first.stdout + first.stderr)
+        self.assertIn("could not be listed", first.stdout)
+        self.assertEqual(self.retry_copies(), [f".offhost-retry.{bk.name}"])
+        sent = (self.remote_dir / f"{bk.name}.tar.age").read_bytes()
+        outage.unlink()  # the remote is back
+        retry = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **settings)
+        self.assertEqual(retry.returncode, 0, retry.stdout + retry.stderr)
+        self.assertIn("kept from an earlier attempt", retry.stdout)
+        self.assertEqual((self.remote_dir / f"{bk.name}.tar.age").read_bytes(), sent)
+
+    def test_already_shipped_checks_the_remote_ciphertext_size_and_presence(self):
+        # On a backend without hashes this is a size check, not a content check; here a replaced (other size) or deleted
+        # ciphertext must make a repeat ship refuse, not report "already shipped".
+        recipients = self.recipients()
+        for case in ("replaced", "deleted"):
+            with self.subTest(case=case):
+                bk = self.make_set(set_name("20261011" if case == "replaced" else "20261012"))
+                self.assertEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings).returncode, 0)
+                ciphertext = self.remote_dir / f"{bk.name}.tar.age"
+                if case == "replaced":
+                    ciphertext.write_bytes(b"x" * 34)
+                else:
+                    ciphertext.unlink()
+                run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+                self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+                self.assertNotIn("already shipped", run.stdout)
+                self.assertIn("remove that object first", run.stdout)
+
+    def test_a_linked_shipped_record_is_not_trusted(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        self.assertEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings).returncode, 0)
+        record = self.backups / f".offhost-shipped.{bk.name}"
+        outside = self.root / "record-elsewhere"
+        record.rename(outside)
+        record.symlink_to(outside)
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertNotIn("already shipped", run.stdout)
+
+    def test_the_cap_never_drops_a_reusable_copy_of_the_set_being_shipped(self):
+        recipients = self.recipients()
+        oldest = self.make_set(set_name("20261001"))
+        self.assertNotEqual(self.bash(f'ship "{oldest}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients,
+                                      **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=self.flaky_rclone())).returncode, 0)
+        for day in ("20261002", "20261003"):
+            newer = self.make_set(set_name(day))
+            kept = self.backups / f".offhost-retry.{newer.name}"
+            kept.mkdir()
+            (kept / "leftover").write_bytes(b"x")
+        run = self.bash(f'ship "{oldest}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn(f"re-sending the encrypted copy of {oldest.name}", run.stdout)
+        self.assertIn(f"dropped the kept copy of {set_name('20261002')}", run.stdout)
+        self.assertEqual(self.retry_copies(), [f".offhost-retry.{set_name('20261003')}"])
+
     def test_a_retry_copy_is_kept_only_when_the_ciphertext_reached_the_remote(self):
         recipients = self.recipients()
         bk = self.make_set()

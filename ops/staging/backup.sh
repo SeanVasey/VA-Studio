@@ -419,6 +419,11 @@ remote_names() {  # remote_names NAME...
   esac
 }
 
+# Prints the size of NAME at the top of the remote, or nothing when it is absent or the remote cannot be listed.
+remote_size() {  # remote_size NAME
+  rclone_run lsf --format sp --include "/$1" "$VASEY_BACKUP_REMOTE" 2>/dev/null | awk -F';' -v n="$1" '$2 == n { print $1 }'
+}
+
 retry_copies_summary() {  # prints "N kept retry copies, B bytes" for this host
   local d count=0 bytes=0
   for d in "$VASEY_BACKUP_DIR"/.offhost-retry.*; do
@@ -436,9 +441,10 @@ retry_copies_summary() {  # prints "N kept retry copies, B bytes" for this host
 # one that no longer matches its digest and one that is not age ciphertext are never sent.
 # Before a fresh encryption the remote must hold neither name: on a backend with no hash in common with the local disk rclone compares
 # sizes only, and age output for one set always has the same size, so `--immutable` alone would take a different ciphertext for the one
-# already there. The exception is a set this host recorded as shipped whose remote digest still matches the record: "already shipped".
+# already there. The exception is a set this host recorded as shipped whose remote digest and ciphertext size still match the record:
+# "already shipped" (a size check of the ciphertext, not a content check).
 ship_encrypted_rclone() {  # ship_encrypted_rclone SET_DIR STAGE_DIR; returns nonzero without exiting
-  local bk=$1 stage=$2 name retry shipped present
+  local bk=$1 stage=$2 name retry shipped present listed rc=0
   name=$(basename "$bk")
   retry=$VASEY_BACKUP_DIR/.offhost-retry.$name
   shipped=$VASEY_BACKUP_DIR/.offhost-shipped.$name
@@ -448,7 +454,8 @@ ship_encrypted_rclone() {  # ship_encrypted_rclone SET_DIR STAGE_DIR; returns no
     present=$(remote_names "$name.tar.age" "$name.tar.age.sha256") || { log "could not list the remote; nothing was sent"; return 1; }
     if [ -n "$present" ]; then
       if [ "$present" = "$name.tar.age"$'\n'"$name.tar.age.sha256" ] && [ -f "$shipped" ] && [ ! -L "$shipped" ] \
-         && rclone_run cat "$(remote_join "$name.tar.age.sha256")" | cmp -s - "$shipped"; then
+         && rclone_run cat "$(remote_join "$name.tar.age.sha256")" | cmp -s - <(sed -n 1p "$shipped") \
+         && [ "$(sed -n 's/^size=//p' "$shipped")" = "$(remote_size "$name.tar.age")" ]; then
         ALREADY_SHIPPED=1
         return 0
       fi
@@ -465,15 +472,19 @@ ship_encrypted_rclone() {  # ship_encrypted_rclone SET_DIR STAGE_DIR; returns no
          && rclone_run copy --checksum --immutable --include "/$name.tar.age.sha256" "$retry" "$VASEY_BACKUP_REMOTE" \
          && rclone_run check --one-way --include "$name.tar.age" --include "$name.tar.age.sha256" "$retry" "$VASEY_BACKUP_REMOTE" \
          && rclone_run cat "$(remote_join "$name.tar.age.sha256")" | cmp -s - "$retry/$name.tar.age.sha256"; }; then
-    if [ "$(remote_names "$name.tar.age" 2>/dev/null)" = "$name.tar.age" ]; then
-      log "kept the encrypted copy of $name in $retry: the remote holds its ciphertext, and a later \`ship\` of this set re-sends the same bytes; a remote object that differs is refused and never overwritten"
-    else
+    # Drop the copy only when the remote was listed and holds no ciphertext of this set; if it could not be listed (an outage, say)
+    # the ciphertext may have landed, so the copy stays for the retry (the cap bounds the disk it takes).
+    listed=$(remote_names "$name.tar.age" 2>/dev/null) || rc=$?
+    if [ "$rc" = 0 ] && [ -z "$listed" ]; then
       rm -rf --one-file-system -- "$retry"
-      log "no ciphertext of $name is on the remote (or it could not be listed), so no copy is kept; a later \`ship\` encrypts the set again"
+      log "the remote holds no ciphertext of $name, so no copy is kept; a later \`ship\` encrypts the set again"
+    else
+      log "kept the encrypted copy of $name in $retry ($([ "$rc" = 0 ] && echo 'the remote holds its ciphertext' || echo 'the remote could not be listed')): a later \`ship\` of this set re-sends the same bytes; a remote object that differs is refused and never overwritten"
     fi
     return 1
   fi
-  install -m 0600 -- "$retry/$name.tar.age.sha256" "$shipped" || log "WARNING: could not record $name as shipped"
+  { cat -- "$retry/$name.tar.age.sha256" && echo "size=$(stat -c %s -- "$retry/$name.tar.age")"; } > "$shipped.new" \
+    && mv -T -- "$shipped.new" "$shipped" || log "WARNING: could not record $name as shipped"
   rm -rf --one-file-system -- "$retry" || log "WARNING: could not remove $retry after a verified transfer"
 }
 
