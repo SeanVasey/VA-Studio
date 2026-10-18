@@ -1,0 +1,1 @@
+second attempt: 80-case selection stopped by me after ~43 minutes (about 11 schema builds, load average ~9 on 4 cores shared with other lanes); no JUnit written

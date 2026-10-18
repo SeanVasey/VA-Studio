@@ -1,0 +1,8 @@
+version	port	socket	datadir	flush_log	sync_binlog	doublewrite	log_bin	isolation
+8.4.11	33585	/var/lib/va-mysql84-m1/run/mysqld.sock	/var/lib/va-mysql84-m1/data/	1	1	ON	1	REPEATABLE-READ
+Database
+information_schema
+mysql
+performance_schema
+sys
+vaseyaudio_catalog_import

@@ -1,0 +1,58 @@
+{
+  "@playwright/test": {
+    "current": "1.63.0",
+    "wanted": "1.63.0",
+    "latest": "1.64.1",
+    "dependent": "m1",
+    "location": "<worktree>/node_modules/@playwright/test"
+  },
+  "@testing-library/user-event": {
+    "current": "14.6.7",
+    "wanted": "14.6.8",
+    "latest": "14.6.8",
+    "dependent": "m1",
+    "location": "<worktree>/node_modules/@testing-library/user-event"
+  },
+  "@types/node": {
+    "current": "24.19.2",
+    "wanted": "24.19.2",
+    "latest": "26.6.5",
+    "dependent": "m1",
+    "location": "<worktree>/node_modules/@types/node"
+  },
+  "@types/react-dom": {
+    "current": "19.2.7",
+    "wanted": "19.3.0",
+    "latest": "19.3.0",
+    "dependent": "m1",
+    "location": "<worktree>/node_modules/@types/react-dom"
+  },
+  "jsdom": {
+    "current": "30.1.2",
+    "wanted": "30.1.2",
+    "latest": "30.1.3",
+    "dependent": "m1",
+    "location": "<worktree>/node_modules/jsdom"
+  },
+  "react": {
+    "current": "19.3.0",
+    "wanted": "19.3.1",
+    "latest": "19.3.1",
+    "dependent": "m1",
+    "location": "<worktree>/node_modules/react"
+  },
+  "react-dom": {
+    "current": "19.3.0",
+    "wanted": "19.3.1",
+    "latest": "19.3.1",
+    "dependent": "m1",
+    "location": "<worktree>/node_modules/react-dom"
+  },
+  "vitest": {
+    "current": "5.0.3",
+    "wanted": "5.0.3",
+    "latest": "5.0.5",
+    "dependent": "m1",
+    "location": "<worktree>/node_modules/vitest"
+  }
+}

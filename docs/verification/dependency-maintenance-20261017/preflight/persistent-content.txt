@@ -1,0 +1,28 @@
+## PERSISTENT_CONTENT_REQUIRE_PHP=1 node --test scripts/dev/persistent-content.test.mjs
+✔ new workspaces retain separate protected identities without operator credentials or catalog fixtures (36.784439ms)
+✔ every current configuration variable and PHP/proxy override is isolated from the caller (16.164125ms)
+✔ noncanonical, linked, exposed and checkout-owned initialization paths are refused without overwrites (2.009519ms)
+✔ a substituted directory inode and private child link cannot resume an installation (17.025945ms)
+✔ nonsticky writable ancestors and a newly exposed parent refuse init and resume without changing bytes (8.512187ms)
+✔ world access, hard links, poisoned environment/cache and changed schema identities refuse without reset (16.885046ms)
+✔ occupied port is refused without replacing or stopping its listener (11.899352ms)
+✔ a linked build root or manifest is refused before reading or copying external public assets (2.105183ms)
+✔ actual initialization migrates an empty catalog with no account, sale or default legal fixtures (6089.728319ms)
+✔ a failed partial initialization preserves its key and bytes and cannot initialize or serve again (96.421573ms)
+✔ the OS lease rejects concurrent operations and a stale token cannot authorize a boot (6313.479899ms)
+✔ actual hidden operator provisioning stores a password hash and exactly one audited account (7468.978061ms)
+✔ real HTTP keeps empty/private routes, CSRF and foreign-host/storage boundaries with disabled commerce (8049.422045ms)
+✔ real signed Livewire creation and edits, private bytes, key, database and session survive stop and restart (11828.066627ms)
+✔ an actual HTTP router refuses after the owning lease process dies even with its retained token (6353.459966ms)
+✔ tampered direct PHP configuration refuses before migrations or writes (5752.823325ms)
+✔ direct PHP refuses newly exposed parent and ancestor paths before boot and preserves all retained bytes (6075.307911ms)
+✔ direct PHP fails closed when effective UID inspection is disabled without changing private data (6446.849288ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 64749.154558
+exit 0
