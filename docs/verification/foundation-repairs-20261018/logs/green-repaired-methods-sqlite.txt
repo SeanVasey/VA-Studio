@@ -1,0 +1,14 @@
+# meta (runner start/end, HEAD, dirty count, args)
+start 2026-10-18T03:43:33Z head=efb22df3850ba8500b6d424ceedef64649896fe8 dirty=6 args=--filter /(test_positive_control_shared_finish_completes_member_configuration_changes_outside_identity_admission|test_shared_finish_refuses_unchanged_config_hooks_before_execution_without_the_member_boundary|test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs|test_remaining_config_resolution_hook_refuses_committed_authoring_receipt|test_public_budget_and_real_service_assembly_cannot_mint_an_owned_source_workflow|test_unregistered_capture_permit_and_context_shape_never_start_an_inspection|test_shipped_configuration_is_off_unbound_literal_and_pinned|test_source_census_routes_every_admitting_gate_through_the_helper_and_leaves_local_only_gates_explicit)/ tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php tests/Feature/StagingEnvironmentAdmissionTest.php
+end 2026-10-18T03:44:05Z rc=0 secs=32
+# PHPUnit output
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/f3/phpunit.xml
+
+.............                                                     13 / 13 (100%)
+
+Time: 00:31.717, Memory: 89.00 MB
+
+OK (13 tests, 164 assertions)

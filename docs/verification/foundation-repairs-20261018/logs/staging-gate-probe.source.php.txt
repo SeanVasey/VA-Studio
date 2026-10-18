@@ -1,0 +1,132 @@
+<?php
+
+namespace Tests\Scratch;
+
+use App\Domain\Commerce\ProductionFinancialInspection\FinancialInspectionPolicy;
+use App\Domain\Commerce\ProductionTaxCheckout\FreshTaxCheckoutPolicy;
+use App\Domain\Grants\Member\MemberActivationReadConfiguration;
+use App\Domain\Grants\PaidTax\PaidTaxDeliveryPolicy;
+use App\Domain\Grants\PaidTax\PaidTaxPolicy;
+use App\Domain\Grants\PaidTax\PaidTaxRuntime;
+use App\Domain\Memberships\Production\MemberGrantIntent;
+use App\Domain\Memberships\Production\MembershipPolicy;
+use App\Http\Tax\TaxHttpMount;
+use ReflectionClass;
+use ReflectionMethod;
+use ReflectionProperty;
+use Tests\TestCase;
+use Throwable;
+
+/**
+ * Scratch evidence for lane F3 (not committed as a test): each of the seven newly classified gates refuses
+ * `staging` (and `production`, except the member production lane) with otherwise valid inputs, and admits a
+ * positive control in `testing`. Environment is the only variable changed per probe.
+ */
+final class StagingGateProbeTest extends TestCase
+{
+    private function refusedIn(string $environment, callable $probe): bool
+    {
+        $this->app['env'] = $environment;
+        try {
+            $result = $probe();
+
+            return $result === false;
+        } catch (Throwable) {
+            return true;
+        } finally {
+            $this->app['env'] = 'testing';
+        }
+    }
+
+    public function test_tax_http_mount_admits_only_local_testing_with_literal_true(): void
+    {
+        config(['production-tax-checkout.http_mounted' => true, 'paid-tax-grants.http_mounted' => true]);
+        foreach (['production-tax-checkout.http_mounted', 'paid-tax-grants.http_mounted'] as $key) {
+            $this->assertTrue(TaxHttpMount::admitted($key), 'testing positive control');
+            $this->assertTrue($this->refusedIn('staging', fn () => TaxHttpMount::admitted($key)), 'staging');
+            $this->assertTrue($this->refusedIn('production', fn () => TaxHttpMount::admitted($key)), 'production');
+        }
+    }
+
+    public function test_paid_tax_delivery_policy(): void
+    {
+        config(['paid-tax-grants.downloads_enabled' => true]);
+        $this->assertIsArray(PaidTaxDeliveryPolicy::capture(app('config'), 'testing'));
+        foreach (['staging', 'production'] as $environment) {
+            $this->assertTrue($this->refusedIn('testing', fn () => PaidTaxDeliveryPolicy::capture(app('config'), $environment)), $environment);
+        }
+    }
+
+    public function test_paid_tax_policy(): void
+    {
+        $policy = ['schema_version' => 2, 'version' => 'probe', 'purpose' => 'paid-tax-original-delivery',
+            'provenance' => 'synthetic_rehearsal', 'max_downloads' => 3, 'authorization_seconds' => 60];
+        config(['paid-tax-grants.rehearsal_enabled' => true, 'paid-tax-grants.delivery_policy' => $policy]);
+        $this->assertSame($policy, (new PaidTaxPolicy)->capture(), 'testing positive control');
+        foreach (['staging', 'production'] as $environment) {
+            $this->assertTrue($this->refusedIn($environment, fn () => (new PaidTaxPolicy)->capture()), $environment);
+        }
+        config(['production-customer-identity.enabled' => true, 'production-customer-identity.provenance' => 'synthetic_rehearsal']);
+        PaidTaxPolicy::provePure($policy, app('config'), 'testing');
+        foreach (['staging', 'production'] as $environment) {
+            $this->assertTrue($this->refusedIn('testing', fn () => PaidTaxPolicy::provePure($policy, app('config'), $environment)), $environment);
+        }
+    }
+
+    public function test_paid_tax_runtime_and_fresh_tax_policy_environment_admission(): void
+    {
+        foreach ([PaidTaxRuntime::class, FreshTaxCheckoutPolicy::class] as $class) {
+            $method = new ReflectionMethod($class, 'environment');
+            $call = fn (string $environment) => $class === PaidTaxRuntime::class
+                ? $method->invoke(null, $environment, null) : $method->invoke(null, [$environment, null]);
+            $this->assertSame('testing', $call('testing'), $class.' testing positive control');
+            $this->assertSame('local', $call('local'), $class.' local positive control');
+            foreach (['staging', 'production'] as $environment) {
+                $this->assertTrue($this->refusedIn('testing', fn () => $call($environment)), $class.' '.$environment);
+            }
+        }
+        // The public entry also refuses staging (TaxCheckoutPolicy::requireEnabled is already local-only).
+        config(['production-tax-checkout.enabled' => true]);
+        $this->assertTrue($this->refusedIn('staging', fn () => FreshTaxCheckoutPolicy::capture()), 'fresh capture staging');
+    }
+
+    public function test_financial_inspection_policy(): void
+    {
+        config(['production-financial-inspection' => ['enabled' => true, 'purpose' => FinancialInspectionPolicy::PURPOSE,
+            'schema_version' => 1, 'stripe_sdk_version' => '21.3.2', 'stripe_api_version' => '2026-08-26.dahlia']]);
+        $this->assertInstanceOf(FinancialInspectionPolicy::class, FinancialInspectionPolicy::capture(), 'testing positive control');
+        foreach (['staging', 'production'] as $environment) {
+            $this->assertTrue($this->refusedIn($environment, fn () => FinancialInspectionPolicy::capture()), $environment);
+        }
+    }
+
+    public function test_member_activation_read_gate(): void
+    {
+        $gate = function (string $environment, string $provenance, string $driver): bool {
+            $configuration = (new ReflectionClass(MemberActivationReadConfiguration::class))->newInstanceWithoutConstructor();
+            (new ReflectionProperty($configuration, 'baseline'))->setValue($configuration, ['environment' => $environment, 'configuration' => [
+                'member-grants' => ['enabled' => true, 'version' => 1, 'family' => MemberGrantIntent::FAMILY,
+                    'purpose' => MemberGrantIntent::PURPOSE, 'provenance' => $provenance],
+                'production-memberships' => ['enabled' => true, 'version' => MembershipPolicy::VERSION, 'provenance' => $provenance],
+                'database' => ['default' => 'probe', 'connections' => ['probe' => ['driver' => $driver]]],
+            ]]);
+            try {
+                (new ReflectionMethod($configuration, 'gate'))->invoke($configuration);
+
+                return true;
+            } catch (Throwable) {
+                return false;
+            }
+        };
+        $this->assertTrue($gate('testing', 'synthetic_rehearsal', 'sqlite'), 'testing rehearsal positive control');
+        $this->assertTrue($gate('local', 'synthetic_rehearsal', 'mysql'), 'local rehearsal positive control');
+        foreach (['sqlite', 'mysql'] as $driver) {
+            foreach (['synthetic_rehearsal', 'verified_production'] as $provenance) {
+                $this->assertFalse($gate('staging', $provenance, $driver), 'staging '.$provenance.' '.$driver);
+            }
+        }
+        $this->assertFalse($gate('production', 'synthetic_rehearsal', 'mysql'), 'production rehearsal');
+        // Production lane (not staging): verified production on MySQL, as MemberGrantPolicy/MembershipPolicy.
+        $this->assertTrue($gate('production', 'verified_production', 'mysql'), 'production lane');
+    }
+}

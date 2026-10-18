@@ -1,0 +1,174 @@
+# meta (runner start/end, HEAD, dirty count, args)
+start 2026-10-18T03:36:13Z head=efb22df3850ba8500b6d424ceedef64649896fe8 dirty=0 args=--filter /(test_positive_control_shared_finish_reaches_unchanged_config_hooks_without_the_member_boundary|test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs|test_remaining_config_resolution_hook_refuses_committed_authoring_receipt|test_public_budget_and_real_service_assembly_cannot_mint_an_owned_source_workflow|test_unregistered_capture_permit_and_context_shape_never_start_an_inspection|test_shipped_configuration_is_off_unbound_literal_and_pinned|test_source_census_routes_every_admitting_gate_through_the_helper_and_leaves_local_only_gates_explicit)/ tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php tests/Feature/StagingEnvironmentAdmissionTest.php
+end 2026-10-18T03:36:45Z rc=2 secs=32
+# PHPUnit output
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/f3/phpunit.xml
+
+E...E..FFFFF                                                      12 / 12 (100%)
+
+Time: 00:31.172, Memory: 101.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\ProductionMemberOriginals\MemberOriginalFinishBoundaryTest::test_positive_control_shared_finish_reaches_unchanged_config_hooks_without_the_member_boundary
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/home/user/wt/f3/app/Domain/Customers/ProductionIdentity/IdentityMetadataAdmission.php:104
+/home/user/wt/f3/app/Domain/Customers/ProductionIdentity/IdentityMetadataAdmission.php:45
+/home/user/wt/f3/app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php:175
+/home/user/wt/f3/app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php:82
+/home/user/wt/f3/app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php:98
+/home/user/wt/f3/tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php:96
+/home/user/wt/f3/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs@committed identity_configuration with data ('committed', 'identity_configuration')
+App\Domain\Customers\ProductionIdentity\IdentityException: This customer identity request could not be confirmed.
+
+/home/user/wt/f3/app/Domain/Customers/ProductionIdentity/IdentityMetadataAdmission.php:46
+/home/user/wt/f3/app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php:175
+/home/user/wt/f3/app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php:82
+/home/user/wt/f3/app/Domain/Grants/Member/SealedMemberGrantFacts.php:154
+/home/user/wt/f3/tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php:107
+/home/user/wt/f3/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There were 5 failures:
+
+1) Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest::test_remaining_config_resolution_hook_refuses_committed_authoring_receipt
+Failed asserting that 0 is greater than 0.
+
+/home/user/wt/f3/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php:114
+/home/user/wt/f3/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMemberOriginals\MemberOriginalIssuerOwnershipTest::test_public_budget_and_real_service_assembly_cannot_mint_an_owned_source_workflow
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    'sqlite' => Illuminate\Database\SQLiteConnection Object #7941 (
++        'pdo' => Pdo\Sqlite Object #7949 (),
++        'readPdo' => null,
++        'readPdoConfig' => Array &1 [],
++        'directPdo' => null,
++        'directPdoConfig' => Array &2 [],
++        'database' => ':memory:',
++        'readWriteType' => null,
++        'tablePrefix' => '',
++        'config' => Array &3 [
++            'driver' => 'sqlite',
++            'database' => ':memory:',
++            'prefix' => '',
++            'foreign_key_constraints' => true,
++            'busy_timeout' => null,
++            'journal_mode' => null,
++            'synchronous' => null,
++            'transaction_mode' => 'DEFERRED',
+    [... 13464 lines of PHPUnit object diff elided by trim.py; untrimmed log kept in the lane scratchpad ...]
++    ),
++]
+
+/home/user/wt/f3/tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php:41
+/home/user/wt/f3/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMemberOriginals\MemberOriginalIssuerOwnershipTest::test_unregistered_capture_permit_and_context_shape_never_start_an_inspection
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+-Array &0 []
++Array &0 [
++    'sqlite' => Illuminate\Database\SQLiteConnection Object #7727 (
++        'pdo' => Pdo\Sqlite Object #4542 (),
++        'readPdo' => null,
++        'readPdoConfig' => Array &1 [],
++        'directPdo' => null,
++        'directPdoConfig' => Array &2 [],
++        'database' => ':memory:',
++        'readWriteType' => null,
++        'tablePrefix' => '',
++        'config' => Array &3 [
++            'driver' => 'sqlite',
++            'database' => ':memory:',
++            'prefix' => '',
++            'foreign_key_constraints' => true,
++            'busy_timeout' => null,
++            'journal_mode' => null,
++            'synchronous' => null,
++            'transaction_mode' => 'DEFERRED',
+    [... 13464 lines of PHPUnit object diff elided by trim.py; untrimmed log kept in the lane scratchpad ...]
++    ),
++]
+
+/home/user/wt/f3/tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php:69
+/home/user/wt/f3/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutPolicyTest::test_shipped_configuration_is_off_unbound_literal_and_pinned
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     'enabled' => false,
++    'http_mounted' => false,
+     'committed_read_receipts_enabled' => false,
+     'committed_read_receipt_version' => 'production-tax-checkout-committed-read-v2',
+     'provider' => null,
+
+/home/user/wt/f3/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php:54
+/home/user/wt/f3/vendor/phpunit/phpunit/phpunit:104
+
+5) Tests\Feature\StagingEnvironmentAdmissionTest::test_source_census_routes_every_admitting_gate_through_the_helper_and_leaves_local_only_gates_explicit
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+     0 => 'app/Domain/Commerce/ProductionCheckout/ExecutionContextV1.php',
+-    1 => 'app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutPolicy.php',
+-    2 => 'app/Domain/Commerce/ProductionTaxCheckout/TaxExecutionContext.php',
+-    3 => 'app/Domain/Commerce/Readiness/StripeCapabilityPreflight.php',
+-    4 => 'app/Domain/Customers/ProductionIdentity/IdentityPolicy.php',
+-    5 => 'app/Domain/Customers/ProductionIdentity/Notifications/LoopbackSmtp.php',
+-    6 => 'app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php',
+-    7 => 'app/Domain/Grants/Member/MemberGrantPolicy.php',
+-    8 => 'app/Domain/Grants/Paid/PaidGrantPolicy.php',
+-    9 => 'app/Domain/Grants/ProductionFree/ProductionFreeGrantPolicy.php',
+-    10 => 'app/Domain/Memberships/Billing/BillingPolicy.php',
+-    11 => 'app/Domain/Memberships/Production/MembershipPolicy.php',
+-    12 => 'app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php',
+-    13 => 'app/Domain/SupportAttachments/FixtureAttachmentPolicy.php',
+-    14 => 'app/Support/SupportAttachmentUi.php',
++    1 => 'app/Domain/Commerce/ProductionFinancialInspection/FinancialInspectionPolicy.php',
++    2 => 'app/Domain/Commerce/ProductionTaxCheckout/FreshTaxCheckoutPolicy.php',
++    3 => 'app/Domain/Commerce/ProductionTaxCheckout/TaxCheckoutPolicy.php',
++    4 => 'app/Domain/Commerce/ProductionTaxCheckout/TaxExecutionContext.php',
++    5 => 'app/Domain/Commerce/Readiness/StripeCapabilityPreflight.php',
++    6 => 'app/Domain/Customers/ProductionIdentity/IdentityPolicy.php',
++    7 => 'app/Domain/Customers/ProductionIdentity/Notifications/LoopbackSmtp.php',
++    8 => 'app/Domain/Customers/ProductionIdentity/Notifications/SmtpIdentitySettings.php',
++    9 => 'app/Domain/Grants/Member/MemberActivationReadConfiguration.php',
++    10 => 'app/Domain/Grants/Member/MemberGrantPolicy.php',
++    11 => 'app/Domain/Grants/Paid/PaidGrantPolicy.php',
++    12 => 'app/Domain/Grants/PaidTax/PaidTaxDeliveryPolicy.php',
++    13 => 'app/Domain/Grants/PaidTax/PaidTaxPolicy.php',
++    14 => 'app/Domain/Grants/PaidTax/PaidTaxRuntime.php',
++    15 => 'app/Domain/Grants/ProductionFree/ProductionFreeGrantPolicy.php',
++    16 => 'app/Domain/Memberships/Billing/BillingPolicy.php',
++    17 => 'app/Domain/Memberships/Production/MembershipPolicy.php',
++    18 => 'app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php',
++    19 => 'app/Domain/SupportAttachments/FixtureAttachmentPolicy.php',
++    20 => 'app/Http/Tax/TaxHttpMount.php',
++    21 => 'app/Support/SupportAttachmentUi.php',
+ ]
+
+/home/user/wt/f3/tests/Feature/StagingEnvironmentAdmissionTest.php:550
+/home/user/wt/f3/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 12, Assertions: 113, Errors: 2, Failures: 5.

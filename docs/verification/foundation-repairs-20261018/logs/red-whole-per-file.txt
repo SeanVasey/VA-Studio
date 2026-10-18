@@ -1,0 +1,7 @@
+# per-file counts from PHPUnit JUnit XML
+tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php tests 6 assertions 26 failures 0 errors 1 skipped 0 time_s 0.3
+tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php tests 6 assertions 16 failures 0 errors 1 skipped 0 time_s 25.4
+tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php tests 8 assertions 31 failures 1 errors 0 skipped 0 time_s 25.5
+tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php tests 5 assertions 21 failures 2 errors 0 skipped 0 time_s 0.8
+tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutPolicyTest.php tests 43 assertions 142 failures 1 errors 0 skipped 0 time_s 0.8
+tests/Feature/StagingEnvironmentAdmissionTest.php tests 15 assertions 212 failures 1 errors 0 skipped 0 time_s 41.0
