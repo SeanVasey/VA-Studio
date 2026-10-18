@@ -25,7 +25,7 @@ final class ProductionFreeGrantDownloads
     public function __construct(private readonly ?Closure $clock = null) {}
 
     /** Mint one authorization; the bearer token is returned once and only its hash is retained. */
-    public function authorize(string $originId, array $input, ProductionCustomerPrincipal $principal, User $actor): array
+    public function authorize(string $originId, array $input, ProductionCustomerPrincipal $principal, User $actor, ?Closure $authority = null): array
     {
         ProductionFreeGrantInput::uuid($originId);
         ProductionFreeGrantInput::keys($input, ['originSeal', 'role']);
@@ -52,14 +52,24 @@ final class ProductionFreeGrantDownloads
 
             return ['id' => $id, 'token' => $token, 'role' => $input['role'], 'expiresAt' => ProductionFreeGrantInput::iso($expires),
                 'sha256' => $target['sha256'], 'bytes' => $target['bytes'], 'filename' => $target['filename'], 'mimeType' => $target['mime_type']];
-        });
+        }, function (array $policy, ProductionFreeGrantRows $rows, array $binding, array $result) use ($originId): array {
+            // Still the same entitled, unrevoked origin and original, and exactly the authorization row this command wrote.
+            $grants = new ProductionFreeGrants;
+            $graph = $grants->originGraph($originId, (int) $binding['account_id'], $rows);
+            $this->entitled($graph, $binding);
+            $auth = $rows->one('production_free_authorizations', 'id = ?', [$result['id']]);
+            ProductionFreeGrantException::require($auth !== [] && $auth['origin_id'] === $originId, 'entitlement_changed');
+
+            return ['origin' => $grants->project($graph), 'seal' => $graph['origin']['seal'],
+                'authorization' => ProductionFreeGrantRecords::strings(array_diff_key($auth, ['payload' => true]))];
+        }, $authority);
     }
 
     /**
      * Two current-owner transactions surround the verified snapshot. The redemption row is the one-use attempt;
      * a failed snapshot records nothing and the authorization stays usable until it expires.
      */
-    public function redeem(string $authorizationId, string $token, ProductionCustomerPrincipal $principal, User $actor): ProductionFreeGrantTransfer
+    public function redeem(string $authorizationId, string $token, ProductionCustomerPrincipal $principal, User $actor, ?Closure $authority = null): ProductionFreeGrantTransfer
     {
         ProductionFreeGrantInput::uuid($authorizationId);
         ProductionFreeGrantException::require(preg_match('/\A[A-Za-z0-9_-]{43}\z/D', $token) === 1, 'token_refused');
@@ -86,7 +96,7 @@ final class ProductionFreeGrantDownloads
         // The authorization TTL is the valid-to-start deadline: both checks below compare it with the moment this request began, so a slow
         // snapshot cannot turn a started redemption into an expired one. The snapshot has its own bound and the client stream a
         // transfer deadline derived from the size (see below).
-        $before = $grants->customerCommand($principal, $actor, $inspect);
+        $before = $grants->customerCommand($principal, $actor, $inspect, $inspect, $authority);
         $snapshotDeadline = hrtime(true) + $before['policy']['snapshot_seconds'] * 1000000000;
         $prepared = $this->snapshot($before, $snapshotDeadline);
         try {
@@ -104,9 +114,21 @@ final class ProductionFreeGrantDownloads
                     'created_at' => ProductionFreeGrantInput::stored($requested)],
                     ['schema_version' => 'production-free-redemption-v1', 'redemption_id' => $id, 'authorization_id' => $before['auth']['id'],
                         'origin_seal' => $before['graph']['origin']['seal'], 'role' => $before['auth']['role'], 'at' => ProductionFreeGrantInput::iso($at)]);
+                $strip = fn (array $row): array => ProductionFreeGrantRecords::strings(array_diff_key($row, ['payload' => true]));
 
-                return [];
-            });
+                // The exact rows this commit leaves behind; the commit observer's graph proof names the redemption.
+                return ['origin' => $strip($current['graph']['origin']), 'authorization' => $strip($current['auth']),
+                    'redemption' => $strip($rows->one('production_free_redemptions', 'id = ?', [$id])),
+                    'original' => $strip($current['graph']['original'])];
+            }, function (array $policy, ProductionFreeGrantRows $rows, array $binding, array $result) use ($grants, $before): array {
+                // Still the same entitled, unrevoked origin, and exactly one redemption: the row this command wrote.
+                $graph = $grants->originGraph($before['auth']['origin_id'], (int) $binding['account_id'], $rows);
+                $this->entitled($graph, $binding);
+                $redemptions = $rows->all('production_free_redemptions', 'authorization_id = ?', [$before['auth']['id']], 2);
+                ProductionFreeGrantException::require(count($redemptions) === 1 && $redemptions[0]['id'] === $result['redemption']['id'], 'already_redeemed');
+
+                return ['origin' => $grants->project($graph), 'redemption' => ProductionFreeGrantRecords::strings(array_diff_key($redemptions[0], ['payload' => true]))];
+            }, $authority);
             $policy = $before['policy'];
             $seconds = min($policy['transfer_max_seconds'], $policy['transfer_base_seconds'] + intdiv($before['target']['bytes'] + $policy['transfer_min_bytes_per_second'] - 1, $policy['transfer_min_bytes_per_second']));
 
