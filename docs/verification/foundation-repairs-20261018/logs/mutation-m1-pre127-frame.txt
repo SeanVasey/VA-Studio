@@ -1,0 +1,40 @@
+# meta (runner start/end, HEAD, dirty count, args)
+start 2026-10-18T03:44:45Z head=efb22df3850ba8500b6d424ceedef64649896fe8 dirty=7 args=--filter /(test_positive_control_shared_finish_completes_member_configuration_changes_outside_identity_admission|test_shared_finish_refuses_unchanged_config_hooks_before_execution_without_the_member_boundary|test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs|test_remaining_config_resolution_hook_refuses_committed_authoring_receipt)/ tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php
+end 2026-10-18T03:45:14Z rc=1 secs=29
+# PHPUnit output
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/f3/phpunit.xml
+
+.F...F..F                                                           9 / 9 (100%)
+
+Time: 00:28.330, Memory: 87.00 MB
+
+There were 3 failures:
+
+1) Tests\Feature\ProductionMemberOriginals\MemberOriginalFinishBoundaryTest::test_shared_finish_refuses_unchanged_config_hooks_before_execution_without_the_member_boundary
+The shared committed frame must refuse an executable config hook.
+
+/home/user/wt/f3/tests/Feature/ProductionMemberOriginals/MemberOriginalFinishBoundaryTest.php:129
+/home/user/wt/f3/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMemberOriginals\MemberGrantFactsCallbackClosureTest::test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs@committed identity_configuration with data ('committed', 'identity_configuration')
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'App\Domain\Customers\ProductionIdentity\IdentityException'
++'App\Domain\Grants\Member\MemberGrantException'
+
+/home/user/wt/f3/tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php:122
+/home/user/wt/f3/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMemberOriginals\MemberGrantDefinitionsTest::test_remaining_config_resolution_hook_refuses_committed_authoring_receipt
+Failed asserting that 13 is identical to 0.
+
+/home/user/wt/f3/tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php:115
+/home/user/wt/f3/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 9, Assertions: 36, Failures: 3.

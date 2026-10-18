@@ -1,0 +1,14 @@
+# meta (runner start/end, HEAD, dirty count, args)
+start 2026-10-18T03:36:57Z head=efb22df3850ba8500b6d424ceedef64649896fe8 dirty=0 args=tests/Feature/ProductionFeatures/ProductionFeatureSourceClosureTest.php tests/Feature/InquiryNotificationWorkTest.php
+end 2026-10-18T03:37:53Z rc=0 secs=56
+# PHPUnit output
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/f3/phpunit.xml
+
+...................                                               19 / 19 (100%)
+
+Time: 00:55.376, Memory: 89.00 MB
+
+OK (19 tests, 214 assertions)

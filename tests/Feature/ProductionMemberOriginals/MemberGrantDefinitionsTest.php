@@ -109,9 +109,13 @@ final class MemberGrantDefinitionsTest extends TestCase
             });
         });
         $this->refuses(fn () => (new MemberGrantDefinitions)->author($profile, $definition, $author), 'committed_receipt_refused');
-        // Ordinary receipt callbacks may resolve config, but the unchanged hook cannot remain
-        // admitted for IdentityCommittedFrame::finish before or after its native commit.
-        self::assertGreaterThan(0, $calls);
+        // The unchanged hook cannot remain admitted for the committed receipt. Since #127 the shared
+        // IdentityCommittedFrame's metadata admission refuses it at frame birth, before any receipt work
+        // resolves config, so the hook never executes during authoring...
+        self::assertSame(0, $calls);
+        // ...although it stayed registered and live: the next ordinary config resolution runs it.
+        $this->app->make('config');
+        self::assertSame(1, $calls);
         self::assertSame(1, DB::table(MemberGrantRecords::PROFILES)->count());
         self::assertSame(1, DB::table(MemberGrantRecords::DEFINITIONS)->count());
         self::assertFalse(DB::connection()->getPdo()->inTransaction());

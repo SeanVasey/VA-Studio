@@ -143,6 +143,17 @@ class StagingEnvironmentAdmissionTest extends TestCase
         'app/Domain/Grants/Paid/PaidGrantPolicy.php',
         // Service project attachment sources stay local/testing only (synthetic attachment evidence).
         'app/Domain/Services/Projects/Attachments/ServiceProjectAttachmentSourceV1.php',
+        // #117: member activation reads admit rehearsal provenance only in local/testing and refuse verified
+        // production in staging, the same gate as MemberGrantPolicy and MembershipPolicy above.
+        'app/Domain/Grants/Member/MemberActivationReadConfiguration.php',
+        // #120-#125: Tax V2 checkout, paid-tax delivery and financial inspection rehearsals read the captured
+        // environment without resolving it and admit only local/testing; the Tax HTTP mount also needs literal true.
+        'app/Domain/Commerce/ProductionTaxCheckout/FreshTaxCheckoutPolicy.php',
+        'app/Domain/Grants/PaidTax/PaidTaxPolicy.php',
+        'app/Domain/Grants/PaidTax/PaidTaxRuntime.php',
+        'app/Domain/Grants/PaidTax/PaidTaxDeliveryPolicy.php',
+        'app/Http/Tax/TaxHttpMount.php',
+        'app/Domain/Commerce/ProductionFinancialInspection/FinancialInspectionPolicy.php',
     ];
 
     private const LOCAL_TESTING_GATE = '/environment\(\[?\'local\', \'testing\'\]?\)|in_array\(\$[a-zA-Z\[\]\']+, \[\'local\', \'testing\'\], true\)/';

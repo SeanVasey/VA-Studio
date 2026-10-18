@@ -1,0 +1,21 @@
+30cca9b6d444755ee106221bcc4b56638e4a783d
+== python3 scripts/ci/test-focused-tests.py
+----------------------------------------------------------------------
+Ran 53 tests in 0.586s
+
+OK
+rc=0
+== python3 scripts/ci/test-phpunit-shards.py
+----------------------------------------------------------------------
+Ran 52 tests in 0.838s
+
+OK
+rc=0
+== python3 scripts/ci/phpunit-shards.py --shards=4 --prefix=phpunit-ci-local --timings=scripts/ci/phpunit-timings-sqlite.json
+warning: 123 test file(s) have no entry in scripts/ci/phpunit-timings-sqlite.json and use the fallback weight; refresh it with scripts/ci/phpunit-timings.py: tests/Feature/CatalogLicenseStaffMfaTest.php, tests/Feature/FixtureDatabaseAdmissionNativeTest.php, tests/Feature/FixtureDatabaseAdmissionTest.php, tests/Feature/Migration/BeatStarsDryRunCommandTest.php, tests/Feature/PaidGrantRootRegistrationTest.php, ...
+Proved 9368 expanded tests in 680 files across 4 nonempty shards.
+Shard 1: 2212 tests; 170 complete files; estimated 37m 12s.
+Shard 2: 2136 tests; 170 complete files; estimated 37m 12s.
+Shard 3: 2540 tests; 171 complete files; estimated 37m 12s.
+Shard 4: 2480 tests; 169 complete files; estimated 37m 12s.
+rc=0
