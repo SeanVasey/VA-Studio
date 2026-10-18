@@ -4,6 +4,7 @@ Covers the builder (counted anchors, forbidden leftovers, byte-identical copies)
 supervisor and PHP-FPM templates (parsed by supervisor's and php-fpm's own parsers when installed), the nginx template
 (structure, equality of the paid-delivery contract with staging, `nginx -t` when installed), the env composer, and the
 provisioning wrapper's refusals. Nothing is installed and no host is touched."""
+import difflib
 import hashlib
 import importlib.util
 import json
@@ -138,6 +139,19 @@ class KitBuild(unittest.TestCase):
         self.assertLessEqual(sections["bin/vasey-staging-ctl"]["added"] + sections["bin/vasey-staging-ctl"]["removed"], 12)
         self.assertEqual(sections["workers/vasey-staging-workers.conf"]["hunks"], 5)
         self.assertLess(len(delta.splitlines()), 400)
+
+    def test_the_committed_semantic_delta_snapshot_is_current(self):
+        # The review surface is the snapshot: it must be exactly what `--delta` prints now, or a kit change went unrecorded.
+        snapshot = REPO / "docs/verification/production-ops-kit-20261017/semantic-delta.diff"
+        run = subprocess.run([sys.executable, "-I", str(BUILDER), "--delta"], capture_output=True)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        committed = snapshot.read_bytes()
+        if run.stdout != committed:
+            drift = "".join(list(difflib.unified_diff(committed.decode(errors="replace").splitlines(True),
+                                                      run.stdout.decode(errors="replace").splitlines(True),
+                                                      "committed semantic-delta.diff", "build-kit.py --delta", n=1))[:40])
+            self.fail(f"{snapshot.relative_to(REPO)} is stale; regenerate it with "
+                      f"`python3 -I ops/production/build-kit.py --delta > {snapshot.relative_to(REPO)}` and review the change:\n{drift}")
 
     def test_check_mode_builds_and_discards(self):
         run = subprocess.run([sys.executable, "-I", str(BUILDER), "--check"], capture_output=True, text=True)
