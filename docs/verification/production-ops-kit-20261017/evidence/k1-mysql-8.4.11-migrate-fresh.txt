@@ -1,0 +1,63 @@
+K1 proof: `migrate:fresh` under the staging kit's own MySQL grants, on a private MySQL 8.4.11
+Run 2026-10-17 in a cloud container (Ubuntu 24.04), source 34562862 (origin/main) in the lane's worktree. Nothing here touched
+a real host. The server was a private `mysqld` 8.4.11 on its own datadir, a loopback-only port and a private socket, started with
+`--log-bin=binlog` (binary logging on, as the kit leaves it) and `--mysqlx=OFF`, and it was shut down cleanly afterwards.
+Passwords were generated into 0600 files and never printed; nothing below contains one.
+
+1. Grants. The statements are the ones ops/staging/provision.sh issues (lines 310, 354, 362, 396, 403, 404), copied verbatim:
+   SHOW GRANTS FOR 'vasey_app'@'127.0.0.1':
+     GRANT USAGE ON *.* TO `vasey_app`@`127.0.0.1`
+     GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER, CREATE TEMPORARY TABLES, LOCK TABLES, TRIGGER ON `vasey_staging`.* TO `vasey_app`@`127.0.0.1`
+   SHOW GRANTS FOR 'vasey_backup'@'127.0.0.1':
+     GRANT SHOW_ROUTINE ON *.* TO `vasey_backup`@`127.0.0.1`
+     GRANT SELECT, LOCK TABLES, SHOW VIEW, EVENT, TRIGGER ON `vasey_staging`.* TO `vasey_backup`@`127.0.0.1`
+   Server: @@version 8.4.11, @@log_bin 1, @@binlog_format ROW, @@global.log_bin_trust_function_creators 0 (the MySQL default).
+
+2. Negative control. `php artisan migrate:fresh --force` as vasey_app with the profile the kit validates (APP_ENV=staging,
+   database queue/cache/session, MAIL_MAILER=log, STRIPE_MODE=test), trust variable OFF:
+     0001_01_01_000000_create_users_table ... DONE   0001_01_01_000001_create_cache_table ... DONE
+     0001_01_01_000002_create_jobs_table ... DONE    2026_09_04_000001_create_catalog_foundation ... DONE
+     2026_09_04_000002_add_admin_mfa_and_immutable_evidence ... FAIL
+     SQLSTATE[HY000]: General error: 1419 You do not have the SUPER privilege and binary logging is enabled (you *might* want to
+     use the less safe log_bin_trust_function_creators variable) ... SQL: CREATE TRIGGER license_versions_immutable_update ...
+   The failing statement is at database/migrations/2026_09_04_000002_add_admin_mfa_and_immutable_evidence.php:21. So the variable
+   provision.sh sets is necessary, not decoration, and the grants alone do not suffice.
+
+3. With the kit's setting. `SET PERSIST log_bin_trust_function_creators = ON` (provision.sh does the equivalent and persists it),
+   then the same `migrate:fresh --force` as vasey_app:
+     exit 0; 5 min 35 s wall clock; 88 lines ending DONE and 0 FAIL: "Dropping all tables", "Creating migration table" and 86
+     migrations. The last three: 2026_10_13_263000_membership_billing_retrieval_identity (7 s),
+     2026_10_15_252100_paid_tax_grant_origins (1 min 13 s), 2026_10_15_252200_paid_tax_delivery (58 s).
+   Schema afterwards, read as vasey_app: 200 base tables; 618 triggers; every trigger's DEFINER is vasey_app@127.0.0.1; 0 routines,
+   0 events, 0 views. Cross-check as root: 618 triggers, 0 routines. vasey_backup (SELECT, TRIGGER and so on) also sees 618.
+   The kit's earlier figure, 567, was stale: provision.sh's comment and ops/staging/README.md now say 618 (at 34562862).
+
+4. The backup path on that schema. `ops/staging/backup.sh predeploy`, run unmodified as root against this server with the real 8.4.11
+   `mysql`, `mysqldump` and `mysqladmin` (the container has only 8.0 clients on PATH, so they were temporarily linked into
+   /usr/local/bin and removed afterwards) and a private tree owned by an unprivileged user:
+     snapshot written: <stamp>-none
+     restore check passed for <stamp>-none: 200 tables, 618 triggers
+     RESTORE_CHECK: result=RESTORE_VERIFIED, database_redump=identic
+   The first attempt failed with "schema rendering normalization failed; no restore proof published" only because the sandbox did
+   not have normalize-mysql-dump.py at its provisioned path (/usr/local/libexec/vasey-staging/); installing it there, as
+   provision.sh does, produced the result above. The script failed closed and published no proof, as designed.
+
+5. `php artisan vasey:doctor --json` as vasey_app, same profile, before any operator account or front-end build existed:
+     foundation_ready false; 15 pass, 2 fail, 2 warn.
+     fail  operator          (no admin yet: expected before `vasey:create-admin`)
+     fail  frontend_build    (no public/build in the worktree: expected before `npm run build`)
+     warn  seller_tag, warn  mail_transport  (both expected before the owner supplies them)
+   No failure concerns the database, the migrations, the triggers or the PHP runtime.
+
+6. Cache commands that forge-deploy.sh's activation runs, same profile: `config:cache`, `route:cache`, `view:cache` and
+   `event:cache` each exited 0. The generated bootstrap/cache and storage/framework/views files were removed afterwards.
+   (`optimize:clear` itself failed once, after MySQL had been stopped, because the database cache store was unreachable; that is
+   the shutdown order of this proof, not a kit defect.)
+
+7. Shutdown. `mysqladmin shutdown` as root. The server's own log: "Received SHUTDOWN from user root. Shutting down mysqld
+   (Version: 8.4.11)" then "Shutdown complete (mysqld 8.4.11) MySQL Community Server - GPL". Afterwards nothing listened on the
+   port and no `mysqld` process of this datadir remained. The persisted variable at shutdown was log_bin_trust_function_creators=ON
+   (performance_schema.persisted_variables); the datadir was removed at the end of the lane.
+
+Not shown: any other MySQL version (the kit targets 8.4; 8.0 clients were on PATH for unrelated tools), a real host, Forge's own
+MySQL configuration, or an application test run against this server.

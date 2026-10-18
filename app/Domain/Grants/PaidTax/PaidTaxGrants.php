@@ -275,7 +275,8 @@ final class PaidTaxGrants
         return $identity;
     }
 
-    private function batchIdentity(array $batch): array
+    /** Column-derived source identity; the bounded history index compares it with each retained encrypted payload. */
+    public function batchIdentity(array $batch): array
     {
         return $this->sourceIdentity(['order_id' => $batch['order_public_id'], 'request_id' => $batch['request_public_id'],
             'reviewed_session_id' => $batch['reviewed_session_public_id'], ...$batch]);

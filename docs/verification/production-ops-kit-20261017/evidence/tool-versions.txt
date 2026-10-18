@@ -1,0 +1,10 @@
+Tools used for the local verification (cloud container, Ubuntu 24.04, 2026-10-17). None of them touched a real host.
+shellcheck 0.9.0
+nginx/1.24.0 (Ubuntu), nginx-light; run without systemd, as a foreground process on the container only
+PHP 8.4.26 (cli) and php-fpm 8.4.26 (installed, never started)
+supervisor 4.2.5 (python parser only; supervisord never started)
+ClamAV 1.5.4 (clamd run in the foreground as the clamav user on a private socket; official signatures)
+age 1.1.1, rclone v1.60.1 (local backend only), rsync 3.2.7
+AppArmor parser 4.0.1 (-Q -K: syntax only, no kernel)
+MySQL Community Server 8.4.11 (/opt/mysql-8.4.11, private datadir /var/lib/va-mysql84-o1, port 33588, binary log on, ROW)
+Python 3.13.16
