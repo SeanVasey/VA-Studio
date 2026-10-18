@@ -1,0 +1,60 @@
+## python3 scripts/ci/test-phpunit-shards.py
+----------------------------------------------------------------------
+Ran 52 tests in 0.427s
+
+OK
+exit 0
+## python3 scripts/ci/test-ci-scope.py
+----------------------------------------------------------------------
+Ran 27 tests in 5.587s
+
+OK
+exit 0
+## python3 scripts/ci/test-workflow-cadence.py
+----------------------------------------------------------------------
+Ran 14 tests in 0.015s
+
+OK
+exit 0
+## python3 scripts/ci/test-focused-tests.py
+----------------------------------------------------------------------
+Ran 53 tests in 0.126s
+
+OK
+exit 0
+## python3 scripts/ci/test-database-receipts.py
+----------------------------------------------------------------------
+Ran 61 tests in 50.358s
+
+OK
+exit 0
+## python3 scripts/ci/test-gitlab-database-receipts.py
+----------------------------------------------------------------------
+Ran 32 tests in 36.605s
+
+OK
+exit 0
+## python3 scripts/ci/test-gitlab-writer-feedback.py
+----------------------------------------------------------------------
+Ran 7 tests in 0.017s
+
+OK
+exit 0
+## python3 scripts/ci/test-php-test-runtime.py
+----------------------------------------------------------------------
+Ran 5 tests in 0.204s
+
+OK
+exit 0
+## python3 scripts/dev/test-bootstrap-macos.py
+----------------------------------------------------------------------
+Ran 13 tests in 6.044s
+
+OK
+exit 0
+## python3 scripts/test-publish-github.py
+----------------------------------------------------------------------
+Ran 2 tests in 0.089s
+
+OK
+exit 0

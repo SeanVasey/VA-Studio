@@ -78,6 +78,12 @@ function ProductionFeatureJourney({ scope }: { scope: string }) {
   }
   const change = (command: Record<string, unknown>) => { if (data) void request('listening', 'change', { ...command, version: data.version }); };
   const locked = busy || closed || uncertain.listening;
+  // UX guard only; ProductionListeningState stays authoritative. The server supplies the playlist limit but no name-length rule,
+  // so only a non-blank trimmed name and the supplied capacity are checked here. The name is sent trimmed because the server refuses padded names.
+  const trimmedName = name.trim(), playlistLimit = data?.limits.playlists ?? 0, playlistsFull = !!data && data.playlists.length >= playlistLimit;
+  const createHint = playlistsFull ? `You have reached the limit of ${playlistLimit} playlists. Delete a playlist to create another.`
+    : trimmedName === '' ? 'Enter a playlist name to create a playlist.' : null;
+  const createHintId = createHint === null ? undefined : 'create-playlist-hint';
   const item = (value: ListeningItem) => value.available ? <a data-private href={value.track!.href} onClick={() => erase(true)}>{value.track!.title} — {value.track!.artist}</a> : <span>Unavailable track</span>;
   async function search() {
     if (!active.current || closed || pending.current) return;
@@ -110,7 +116,9 @@ function ProductionFeatureJourney({ scope }: { scope: string }) {
           <form className="customer-order-lookup-form" onSubmit={event => { event.preventDefault(); void search(); }}><label className="customer-account-field">Find public tracks<input type="search" value={query} maxLength={100} disabled={busy || closed} onChange={event => setQuery(event.target.value)} /></label><button className="button" disabled={busy || closed}>Search public tracks</button></form>
           <label className="customer-account-field">Selected public track<select disabled={locked} value={track} onChange={event => setTrack(event.target.value)}><option value="">Choose a track</option>{choices.map(choice => <option key={choice.trackId} value={choice.trackId}>{choice.title} — {choice.artist}</option>)}</select></label>
           <button className="button" disabled={locked || !track} onClick={() => change({ action: 'save-track', trackId: track })}>Save selected track</button>
-          <form onSubmit={event => { event.preventDefault(); change({ action: 'create-playlist', name }); }}><label className="customer-account-field">Playlist name<input value={name} maxLength={80} disabled={locked} onChange={event => setName(event.target.value)} /></label><button className="button" disabled={locked}>Create playlist</button></form>
+          <form onSubmit={event => { event.preventDefault(); if (!locked && createHint === null) change({ action: 'create-playlist', name: trimmedName }); }}><label className="customer-account-field">Playlist name<input value={name} maxLength={80} disabled={locked} aria-describedby={createHintId} onChange={event => setName(event.target.value)} /></label>
+            {createHint !== null && <p id="create-playlist-hint">{createHint}</p>}
+            <button className="button" disabled={locked || createHint !== null} aria-describedby={createHintId}>Create playlist</button></form>
           <h3>Playlists</h3>{data.playlists.map(list => <article key={list.id}><h4 data-private>{list.name}</h4><ul>{list.tracks.map(value => <li key={value.trackId}>{item(value)} <button className="button" disabled={locked} onClick={() => change({ action: 'remove-playlist-track', playlistId: list.id, trackId: value.trackId })}>Remove from playlist</button></li>)}</ul>
             <button className="button" disabled={locked || !track} onClick={() => change({ action: 'add-playlist-track', playlistId: list.id, trackId: track })}>Add selected track to playlist</button>
             <button className="button" disabled={locked || !name} onClick={() => change({ action: 'rename-playlist', playlistId: list.id, name })}>Rename playlist</button>

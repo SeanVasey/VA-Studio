@@ -1,0 +1,29 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/b4f/phpunit.xml
+
+...F.                                                               5 / 5 (100%)
+
+Time: 00:20.870, Memory: 85.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionFeatures\ProductionFeatureTransactionEventsTest::test_commit_phase_associative_hook_replacement_keeps_its_keys_and_closures@owned tail kept under a string key beside a foreign hook with data (true)
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    'foreign' => Closure Object #5295 (
++    0 => Closure Object #5295 (
+         0 => Closure Object #5295,
+     ),
+ ]
+
+/home/user/wt/b4f/tests/Feature/ProductionFeatures/ProductionFeatureTransactionEventsTest.php:226
+/home/user/wt/b4f/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 5, Assertions: 51, Failures: 1.
+exit=1

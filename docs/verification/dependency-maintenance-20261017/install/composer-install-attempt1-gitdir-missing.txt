@@ -1,0 +1,42 @@
+Installing dependencies from lock file (including require-dev)
+Verifying lock file contents can be installed on current platform.
+Dependency resolution completed in 0.000 seconds
+Package operations: 0 installs, 1 update, 0 removals
+Updates: laravel/framework:v13.36.0
+  - Syncing laravel/framework (v13.36.0) into cache
+  - Upgrading laravel/framework (v13.35.0 => v13.36.0):     Update of laravel/framework failed
+
+In GitDownloader.php line 155:
+
+  [RuntimeException]
+  The .git directory is missing from <worktree>/vendor/laravel/framewor
+  k, see https://getcomposer.org/commit-deps for more information
+
+
+Exception trace:
+  at phar:///usr/local/bin/composer/src/Composer/Downloader/GitDownloader.php:155
+ Composer\Downloader\GitDownloader->doUpdate() at phar:///usr/local/bin/composer/src/Composer/Downloader/VcsDownloader.php:174
+ Composer\Downloader\VcsDownloader->update() at phar:///usr/local/bin/composer/src/Composer/Downloader/DownloadManager.php:309
+ Composer\Downloader\DownloadManager->update() at phar:///usr/local/bin/composer/src/Composer/Installer/LibraryInstaller.php:316
+ Composer\Installer\LibraryInstaller->updateCode() at phar:///usr/local/bin/composer/src/Composer/Installer/LibraryInstaller.php:180
+ Composer\Installer\LibraryInstaller->update() at phar:///usr/local/bin/composer/src/Composer/Installer/InstallationManager.php:490
+ Composer\Installer\InstallationManager->update() at phar:///usr/local/bin/composer/src/Composer/Installer/InstallationManager.php:381
+ Composer\Installer\InstallationManager->{closure:Composer\Installer\InstallationManager::executeBatch():380}() at phar:///usr/local/bin/composer/vendor/react/promise/src/Internal/FulfilledPromise.php:47
+ React\Promise\Internal\FulfilledPromise->then() at phar:///usr/local/bin/composer/src/Composer/Installer/InstallationManager.php:380
+ Composer\Installer\InstallationManager->executeBatch() at phar:///usr/local/bin/composer/src/Composer/Installer/InstallationManager.php:322
+ Composer\Installer\InstallationManager->downloadAndExecuteBatch() at phar:///usr/local/bin/composer/src/Composer/Installer/InstallationManager.php:221
+ Composer\Installer\InstallationManager->execute() at phar:///usr/local/bin/composer/src/Composer/Installer.php:839
+ Composer\Installer->doInstall() at phar:///usr/local/bin/composer/src/Composer/Installer.php:300
+ Composer\Installer->run() at phar:///usr/local/bin/composer/src/Composer/Command/InstallCommand.php:147
+ Composer\Command\InstallCommand->execute() at phar:///usr/local/bin/composer/vendor/symfony/console/Command/Command.php:298
+ Symfony\Component\Console\Command\Command->run() at phar:///usr/local/bin/composer/vendor/symfony/console/Application.php:1040
+ Symfony\Component\Console\Application->doRunCommand() at phar:///usr/local/bin/composer/vendor/symfony/console/Application.php:301
+ Symfony\Component\Console\Application->doRun() at phar:///usr/local/bin/composer/src/Composer/Console/Application.php:400
+ Composer\Console\Application->doRun() at phar:///usr/local/bin/composer/vendor/symfony/console/Application.php:171
+ Symfony\Component\Console\Application->run() at phar:///usr/local/bin/composer/src/Composer/Console/Application.php:137
+ Composer\Console\Application->run() at phar:///usr/local/bin/composer/bin/composer:98
+ require() at /usr/local/bin/composer:29
+
+install [--prefer-source] [--prefer-dist] [--prefer-install PREFER-INSTALL] [--dry-run] [--download-only] [--dev] [--no-suggest] [--no-dev] [--no-autoloader] [--no-progress] [--no-install] [--audit] [--audit-format AUDIT-FORMAT] [-v|vv|vvv|--verbose] [-o|--optimize-autoloader] [-a|--classmap-authoritative] [--apcu-autoloader] [--apcu-autoloader-prefix APCU-AUTOLOADER-PREFIX] [--ignore-platform-req IGNORE-PLATFORM-REQ] [--ignore-platform-reqs] [--] [<packages>...]
+
+composer install exit 1
