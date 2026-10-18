@@ -1,0 +1,8 @@
+Legend:
+! patch or minor release available - update recommended
+~ major release available - update possible
+filament/filament          5.8.4   ! 5.10.2 A collection of full-stack compo...
+phpunit/phpunit            12.5.34 ~ 13.4.3 The PHP Unit Testing framework.
+stripe/stripe-php          21.3.2  ~ 22.0.0 Stripe PHP Library
+tecnickcom/tc-lib-pdf      8.76.3  ! 8.81.1 PHP PDF Library
+tecnickcom/tc-lib-pdf-font 4.4.1   ! 4.6.2  PHP library containing PDF font ...

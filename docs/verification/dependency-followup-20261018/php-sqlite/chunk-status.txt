@@ -1,0 +1,7 @@
+reflection exit 0 seconds 1109
+filament-00 exit 2 seconds 1672
+filament-01 exit 0 seconds 1664
+ALLDONE
+filament-02 exit 0 seconds 2133
+cross exit 0 seconds 1179
+ALLDONE
