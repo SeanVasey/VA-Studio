@@ -42,7 +42,7 @@ subscribed event for it, the decline wording and the return page as rendered.
 | **New** `StripeTestDrillTest::test_provider_payment_reported_after_a_recorded_expiry_is_quarantined_without_a_grant` | If a provider read ever contradicts a recorded expiry by reporting the session paid, the receipt is quarantined `payment_changed`, reconcile repeats `payment_changed`, the terminal checkout observation is not regressed and no payment or grant exists. |
 
 **Difference from the lane brief.** The brief expected the reservation or hold to be released on expiry. Under the
-existing rules it is not: the staging profile deliberately omits `VASEY_TEST_UNPAID_RELEASE_*`, so an expired order's
+existing rules it is not: the staging profile sets `VASEY_TEST_UNPAID_RELEASE_ENABLED=false` (the validator requires that line), so an expired order's
 reservation stays `pending` as evidence, and release is a separate staff action (Studio → Test unpaid release) that
 needs GET-only proof of a terminal unpaid session. The tests pin the existing rule; nothing was changed.
 
@@ -79,7 +79,7 @@ outage, and the real time from payment to reconciliation against the 15-minute w
 
 ### Evidence helper
 
-`TestCommerceEvidenceCommandTest` (4 methods, 14 cases): all four reference forms give the same snapshot; only `SELECT`
+`TestCommerceEvidenceCommandTest` (5 methods, 14 cases: four plain methods and one with a 10-case data provider): all four reference forms give the same snapshot; only `SELECT`
 statements run (no locking reads); every table is byte-identical afterwards; no gateway call; no buyer name or email,
 owner key, `sk_test_` value, webhook secret, checkout URL, ciphertext, hash or payload in either output form. A write
 attempted by a model listener during the read is refused by the statement guard ("Evidence snapshot unavailable.
@@ -168,3 +168,18 @@ were reverted before committing.
   existing staging journey test (run here as regression) and their own suites.
 - The evidence helper's refusal, not-found and unbound-session cases ran on SQLite only; two of its fourteen cases ran
   natively (run 3).
+
+## Independent review (lead, 2026-10-18)
+
+The independent review at `18f7ed98` approved with conditions ([decision record](independent-review-18f7ed98-DECISION.md), imported verbatim). It found no P0 or P1. It reran the drill and evidence tests, the native reconcile race, every CI self-test and seven mutations, all of which the tests caught.
+
+Corrected in documentation before the PR opened:
+- **P2-1:** the runbook now says the profile validator prints 38 `PASS` lines, not 36. The runbook and this packet now say that `VASEY_TEST_UNPAID_RELEASE_ENABLED` is set to `false` and the validator requires that line, not that the keys are absent.
+- **P3-4:** the attention-outcomes section now says to re-enable webhook delivery (step 4.4) before stopping during drill 4, and to record the endpoint state at the end of every drill session.
+- **P3-5:** the evidence-command test count reads 5 methods and 14 cases.
+
+Deferred to the K4 follow-up batch, recorded in `docs/handoff/2026-10-07/codex-deferred-20261011.md`:
+- P3-1: on MySQL, read inside `START TRANSACTION READ ONLY` at REPEATABLE READ, so the database enforces read-only and the snapshot is consistent; also reject locking and `INTO` clauses, and remove the connection callback when the command ends;
+- P3-2: load an explicit column list for `CheckoutIntent`;
+- P3-3: print JSON with `OUTPUT_RAW` and escape text output with `OutputFormatter::escape()`.
+

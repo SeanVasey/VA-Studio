@@ -26,11 +26,11 @@ The drill numbers match.
 ## Before the first drill
 
 1. Staging is deployed and the test-commerce profile validates: `php scripts/ops/validate-test-commerce-profile.php .env`
-   prints 36 `PASS` lines and `RESULT: PASS` ([setup step 3](staging-test-purchase.md#3-apply-the-profile-on-the-host)).
+   prints 38 `PASS` lines and `RESULT: PASS` ([setup step 3](staging-test-purchase.md#3-apply-the-profile-on-the-host)).
 2. The pipeline runner is installed and logging ([setup step 4](staging-test-purchase.md#4-start-the-pipeline-runner)).
 3. A **dedicated drill offer** is published and linked to its rights scope. Drill 2, and drill 1 if abandoned, leave
    that offer revision reserved for good, because the staging profile has no unpaid release
-   (`VASEY_TEST_UNPAID_RELEASE_*` is deliberately absent). Buy the success paths from a different offer, or use one
+   (`VASEY_TEST_UNPAID_RELEASE_ENABLED` is set to `false`, and the validator requires that line). Buy the success paths from a different offer, or use one
    drill offer per drill.
 4. The operator machine has the Stripe CLI logged in to the drill account (`stripe login`) for drills 2–4. CLI commands
    run in test mode unless `--live` is given: never pass `--live`. The Dashboard works too where noted.
@@ -171,7 +171,7 @@ delivered, and the real time from payment to reconciliation against the 15-minut
 
 ## Attention outcomes
 
-Stop the drill, take a snapshot and record it when you see any of these. Do not replay, re-run or work around them;
+Stop the drill, take a snapshot and record it when you see any of these. If drill 4 is in progress, still do step 4.4 (re-enable delivery) before stopping, and record the endpoint state at the end of every drill session. Do not replay, re-run or work around them;
 they are M-08 inputs.
 
 | Signal | Meaning |
