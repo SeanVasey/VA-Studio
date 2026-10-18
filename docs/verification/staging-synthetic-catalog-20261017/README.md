@@ -271,3 +271,7 @@ decision-register entry for the S-6 tag is left to the lead.
   scopes linked with `vasey:rights-scope` first.
 - No concurrency claim is made for the cache lock against two simultaneous runs on MySQL.
 - The S-6 seller tag is absent on staging today, so the command refuses there until a tag is configured.
+
+## Independent review
+
+The first independent review at `09acd13d` returned APPROVE WITH CONDITIONS ([record](independent-review-09acd13d-DECISION.md)). The re-review of the condition fixes at `cfc4d6a4` returned APPROVE with both conditions closed and no P0, P1 or P2 open ([record](independent-rereview-cfc4d6a4-DECISION.md)). Both records are imported verbatim. Its P3-A to P3-D are deferred to this lane's next batch and recorded in `docs/handoff/2026-10-07/codex-deferred-20261011.md`. Its P3-B qualifies this packet's "interactive console" wording: the command refuses `-n`, but hidden prompts also read piped standard input, and both passwords are still required.

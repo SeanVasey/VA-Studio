@@ -328,3 +328,6 @@ F2a final separate review at `e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08`: **APPRO
 
 
 2026-10-17 documentation refresh merged PR #138 at `cca1d18e56ff085c222f5621efbd9e602691f1dc` from exact head `0b2aacfb00a36d64208f6761df54d1b60d207fd2` (allowlisted docs only: README current state, dated historical markers, refreshed task rows, source-read parity status column). Docs-only preflight 39060339721 success with frontend and backend skipped; the readiness cancellation 39060334083 is the known artifact.
+
+
+2026-10-18 B4 follow-up merged PR #139 at `ec2cc8f4e9a53c0a23b02e695c8e0a5de101a687` from exact head `f4135955e24dde82cc60ab4f39498c5a5b408bad`. Tested source is `2e0f0dee`; the later commits are docs only. Independent review APPROVE at `89f0340d` with no P0/P1. Cheap preflight 39083830648 success; 39083825986 is the readiness cancellation. Codex code and security review and Cursor Bugbot reported no findings. PR #127 threads r4287886519 and r4287886535 were each replied to once and resolved. Fixed: hook-list reindex, playlist-create guard, the encrypted-session guard rejection (every account-feature request returned 503 under `.env.example`), and the two stale SourceClosure tests.
