@@ -23,8 +23,9 @@ use Throwable;
 
 /**
  * Frame-scoped schema proofs (SchemaProofFrame): a complete proof is reused only inside its owned frame, on its own
- * connection, while nothing a same-session statement can change has moved, and never in the terminal phase. Every
- * case runs on both drivers; the MySQL legs use a separate session where SQLite has only one connection.
+ * connection, while nothing a same-session statement can change has moved, and never in the terminal phase; every
+ * reuse still sees new dependent objects. Every case runs on both drivers; the MySQL legs use a separate session where
+ * SQLite has only one connection.
  */
 class MembershipSchemaProofFrameTest extends TestCase
 {
@@ -66,6 +67,51 @@ class MembershipSchemaProofFrameTest extends TestCase
             }
             $this->guards($pdo);
             $this->assertInstanceOf(MembershipAwardTransaction::class, $frame);
+        } finally {
+            DB::rollBack();
+        }
+    }
+
+    public function test_a_dependent_view_created_after_a_remembered_proof_is_refused_at_the_next_guard(): void
+    {
+        $frame = $this->ownedFrame();
+        $pdo = DB::connection()->getPdo();
+        // Another session on MySQL: creating a view takes no metadata lock on the tables it reads.
+        $other = DB::getDriverName() === 'mysql' ? $this->independentConnection() : null;
+        try {
+            $this->guards($pdo);
+            $this->guards($pdo);
+            $sql = 'CREATE VIEW synthetic_origin_view AS SELECT id FROM production_identity_origins';
+            $other === null ? $pdo->exec($sql) : $other->exec($sql);
+            $this->guardsRefusedIn($frame, $pdo);
+        } finally {
+            DB::rollBack();
+            $other?->exec('DROP VIEW IF EXISTS synthetic_origin_view');
+        }
+        $this->guardsOutsideAFrame();
+    }
+
+    public function test_a_session_change_after_a_remembered_proof_sends_the_guards_back_to_a_complete_proof(): void
+    {
+        $frame = $this->ownedFrame();
+        $pdo = DB::connection()->getPdo();
+        try {
+            $this->guards($pdo);
+            $this->guards($pdo);
+            if (DB::getDriverName() === 'mysql') {
+                // SET never commits, so the marker survives; the complete proof requires foreign_key_checks = 1.
+                $pdo->exec('SET SESSION foreign_key_checks=0');
+                try {
+                    $this->guardsRefusedIn($frame, $pdo);
+                } finally {
+                    $pdo->exec('SET SESSION foreign_key_checks=1');
+                }
+            } else {
+                // SQLite ignores this pragma inside a transaction, so the remembered proof stays true.
+                $pdo->exec('PRAGMA foreign_keys=OFF');
+                $this->assertSame(1, (int) $pdo->query('PRAGMA foreign_keys')->fetchColumn());
+            }
+            $this->guards($pdo);
         } finally {
             DB::rollBack();
         }
