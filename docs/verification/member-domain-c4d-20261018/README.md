@@ -301,6 +301,84 @@ worktree was never edited. Each was reverted and the copy compared identical (`d
   redoes this commit.
 - `git diff --check origin/main...HEAD` is clean.
 
+## Native gap characterization: reserve cost, baseline vs C4d
+
+Requested before review, to decide whether the reserve's 60-second overrun is a test-environment artifact, a C4d
+regression or a real latency problem.
+
+### Method
+
+- **Sources.**
+  - *Base:* a temporary detached worktree of `origin/main` `e8dfe3cd`, with a byte copy of this lane's vendor (the same
+    lock), removed afterwards.
+  - *Head:* C4d `b2509f4b`, whose application and test sources equal `47aba91f`.
+- **Test.** Both ran the **same existing** main test, back to back, on the same private MySQL 8.4.11 (port 3351, unix
+  socket): `MembershipReservationLifecycleTest::test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity`.
+  Its fixture runs one owned award, then the test runs one owned reserve.
+- **Measurement.** A MySQL general log per run, summarized per owned transaction by its first
+  `SAVEPOINT va_membership_award_*` and the matching `COMMIT`/`ROLLBACK`.
+- **Server configs.**
+  - *Config A* (the earlier lane config): `innodb_flush_log_at_trx_commit=2`, `--skip-log-bin`, 256M buffer pool,
+    doublewrite off, performance_schema off.
+  - *Config B* (requested): `innodb_flush_log_at_trx_commit=2`, `--skip-log-bin`, `sync_binlog=0`, 512M buffer pool.
+  - Both are durability and caching settings only; isolation is `REPEATABLE-READ` throughout.
+- **Concurrent load.** Lane D1's mysqld (port 3341) was **running during every measurement**
+  (`pgrep -fa mysqld`). Load averages at run start ranged from 2.0 to 7.1.
+
+### Results
+
+| Run | Source | Config | Award (owned txn) | Reserve (owned txn) | Test result |
+| --- | --- | --- | --- | --- | --- |
+| A-base | main `e8dfe3cd` | A | 43.3 s, 70,253 statements, COMMIT | 60.2 s, 95,303 statements, ROLLBACK | error: reserve deadline |
+| A-head | C4d `b2509f4b` | A | 47.3 s, 70,253 statements, COMMIT | 66.0 s, 90,255 statements, ROLLBACK | error: reserve deadline |
+| B-base | main `e8dfe3cd` | B | 47.5 s, 70,253 statements, COMMIT | 63.9 s, 90,255 statements, ROLLBACK | error: reserve deadline |
+| B-head | C4d `b2509f4b` | B | 50.3 s, 70,253 statements, COMMIT | 62.3 s, 90,255 statements, ROLLBACK | error: reserve deadline |
+
+Every award transaction issued exactly 70,253 statements (23,353 prepared executions) on both sources and configs.
+Under config B the reserve issued exactly 90,255 statements on both sources. Per transaction, the attribution
+markers were identical between base and head:
+
+- award: 314 identity-schema inspections, 945 membership-catalog lookups, 1,152 `SELECT DATABASE()`, 5,529
+  `information_schema` executions and 1,072 reads of membership or member data rows;
+- reserve: 412, 1,107, 1,475, 7,005 and 1,197 respectively.
+
+### Conclusions
+
+- **C4d did not change the writers' cost.** Statement counts and their composition are identical. Wall times differ
+  only with load, and the same overrun happens on main.
+- **Not a server-tuning artifact.** Config B made no material difference. The work is statement-latency bound.
+- **A real latency property of the existing writers.** On this 4-CPU container a complete reserve needs about 62 to
+  66 s, while its fixed budget is 60 s, so it is refused at the final check. A faster host shortens this, but the cost
+  scales with the statement count, not with data size. The production risk is that a member reserve takes tens of
+  seconds and fails closed under load.
+- **Native chunk reruns were not attempted.** The tuned reserve still exceeds 60 s on both sources. No cap or deadline
+  was raised.
+
+### Where the statements come from
+
+About 95% of the statements are repeated schema and ownership currentness checks, not ledger data. Data-row reads are
+about 1,100 to 1,200 of roughly 23,000 to 30,000 executions.
+
+- **The dominant unit** is `IdentityMigrationOwnership::inspect`, a whole identity-parent schema inspection of about
+  70 prepared statements: `SHOW CREATE TABLE` for `users`, `customer_accounts`, `quote_owners`, ..., plus
+  `information_schema` constraint, trigger, index and foreign-key lookups. It runs 314 times per award and 412 per
+  reserve.
+- **Call sites.** A call-site count in an instrumented scratch copy attributes those inspections to three repeated
+  guards. It ran the same test on the SQLite path, not committed. Its counts cover the test's reserve and replay calls,
+  so they are proportions, not one-reserve totals.
+  1. Every `MembershipRows::assertCurrent()`, called by each `current()`, `rows()` and `one()` read, calls
+     `MembershipSchema::assertOwned()`, which calls `up(false)`, which re-runs the identity inspection and the
+     membership catalog checks. This is the largest share, for example 100 calls through `MembershipRows::current`
+     in the profiled reserve operations, plus those from `MembershipBillingEvidence::lock`, `SealedMembershipPaidInvoice::proveCurrent`
+     and `CurrentEligibleLicenses::proveCurrent`.
+  2. Every `ProductionCustomerAccess` read (`lock`, `proveCurrent`, `historical`, `verifyHistoricalBinding`) builds
+     `IdentityRows`, whose `assertPermanent()` re-runs the identity inspection. This is the next largest share (160 calls in the profiled
+     reserve operations).
+  3. `BillingSchema::inspect`, via `BillingRetrievalSchema::assertOwned`, also calls `MembershipSchema::assertOwned()`.
+- **Possible fix (a design note for a separate, reviewed lane, not implemented here).** Prove schema ownership once
+  per owned frame and at the terminal raw phases, carrying a frame-scoped schema proof, instead of on every row read.
+  Any such change touches the R-4/currentness guarantees and needs its own review.
+
 ## R-4 and the catalog AUTO_INCREMENT P2
 
 Both are **already fixed on main** by C4a, PR #115, merged as `990020c1` (`docs/verification/member-source-currentness-20261013/`;
@@ -397,8 +475,11 @@ server (Octane or FrankenPHP) would sidestep the problem, but it is a host decis
 - A `PDO::commit()` failure or lost connection during COMMIT in the three writers stays `operation_refused`, an unknown
   outcome. It is not exercised.
 - Index cost: up to 101 complete period audits and member-history captures per call, doubled by the pre-bytes re-run.
-  Representative latency was not measured. Native operations in this shared container already run close to their
-  60-second deadline (below).
+  Representative latency was not measured. The index reuses the same guarded readers as the writers (see the
+  characterization above), so its statement count will be of the same order per period.
+- The existing reserve exceeds its 60-second budget on this container on main as well (62 to 66 s, about 90,000
+  statements). Native positive paths that need a reserve cannot pass here until the writers' guard cost is reduced or a
+  faster host is used.
 - The FPM finding is static analysis plus a direct child-launch reproduction. No FPM pool was run for the member
   renderer.
 - The index has no paging. Periods older than the newest 100 are reported only through `hasMore`.
