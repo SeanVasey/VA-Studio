@@ -21,8 +21,10 @@ resolution) and a cached environment of `local` or `testing`. A string `"true"`,
 | POST | `/production-free-grants/origins/{origin}/authorizations` | JSON `{originSeal, role}` | `ProductionFreeGrantDownloads::authorize` |
 | POST | `/production-free-grants/authorizations/{authorization}/redeem` | form `token`, `_token`, or JSON `{token}` | `ProductionFreeGrantDownloads::redeem` |
 
-All six routes use the web session, real CSRF, session blocking (`block(20, 5)`) and per-route throttles, without
-Inertia. There is no page. The bearer token is only ever in a request body and is retained only as a hash.
+All six routes use the web session, real CSRF, session blocking (`block(20, 5)`) and per-tier throttles, without
+Inertia. Each tier has its own limiter prefix (reads 60, review 30, accept and authorize 20, redeem 20 a minute), so
+library views cannot spend the write or redemption budget. There is no page. The bearer token is only ever in a
+request body and is retained only as a hash.
 
 ## The root seam
 
@@ -53,7 +55,11 @@ token, a cap and a pending original are 409.
   before JSON is returned and before the first header of a download.
 - Every command commits through `ProductionFreeGrantCommitObserver`: ordinary committing listeners run first, then the
   command's terminal proof (graph, capsule, owner, policy) and the permanent parent floor, immediately before the
-  physical commit. A failure after the physical commit is reported as `outcome_unknown`, never as a refusal.
+  physical commit. A failure that rolls back the owned frame is a refusal. A failure after the physical commit is
+  `outcome_unknown`. So is a frame found already gone: a listener's raw or implicit commit (for example DDL on MySQL),
+  or a commit or rollback followed by a reopen, may have made the write durable before the proof. The observer detects
+  that but cannot prevent or undo it, so it is never reported as a refusal. A deadlock or lock wait timeout stays the
+  retryable `contention`.
 - A redemption's response runs the transfer's committed read before its first header: a read-only committed frame
   re-proves the owner and re-reads the exact Free rows without locks, on the transfer's original deadline. A
   withdrawal after the redemption commit (revocation, owner, policy, mount, session) sends no download header and no

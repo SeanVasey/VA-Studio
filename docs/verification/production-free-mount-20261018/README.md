@@ -19,12 +19,17 @@ Filament actions (F-3) and render-worker wiring are out of scope.
 | `5d03dcec965f58fb879b1725d59b0fa31007d5b5` | New D1 tests and the native race worker |
 | `5eae4a1f0b00c5279d05158a699ba87beb9afade` | Census append, branching helper entry, workflow comments |
 | `07e4b0d52b7b01a3e4e8b8ac46e100909ff715b3` | Merge of main `e8dfe3cd` (PR #158, Filament 5.10.2 / Livewire 4.4.7 lock); no conflict, no D1 file touched by main |
+| `0828829382e06d802fed720d060c3f1c098ae201` | Review F1: a vanished owned frame is `outcome_unknown`, with the E1/E1b regression tests |
+| `5aed6e6a7d684fc4d9b5e5cd895ce49573a6dcbf` | Review F2: accept and redemption-commit graph tests |
+| `14b267658f812fe3322bc4cc5b34e87def09bbfd` | Review F4: first-byte column comparison test |
+| `cae94875f721e06cbf9b0b86da68f8f52192e4e0` | Review F5: one throttle prefix per route tier, with its test |
 
 Intermediate commits are not individually green: after `a7505c32` the mount tests arrive in `5d03dcec`, and the census
 lands in `5eae4a1f`.
 
-The tested source is `07e4b0d52b7b01a3e4e8b8ac46e100909ff715b3` (application, tests and census, merged with main `e8dfe3cd`) (application, tests and census). The documentation commit after it changes no
-application, test, route, configuration or census file.
+The original tested source is `07e4b0d52b7b01a3e4e8b8ac46e100909ff715b3` (application, tests and census, merged with
+main `e8dfe3cd`). The review follow-up source is `f98761839ebd9c70fcf19c83e808b2c92dceae5c` (below, under Independent
+review). The documentation commits change no application, test, route, configuration or census file.
 
 ## Design
 
@@ -45,9 +50,13 @@ follows `MembershipReservationObserver`:
 4. Admission is reflection-only and refuses a lost savepoint (raw commit or reopen by a callback), a replaced
    dispatcher or transaction manager, a different primary, a non-depth-one frame, and callback-capable raw metadata
    (below).
-5. A failure before the commit rolls back only the frame this observer owns; a callback-created replacement
-   transaction is left to its owner and the framework level is reset. A failure after the physical commit is the
-   fixed `outcome_unknown`, never a refusal of the write and never retried.
+5. A failure before the commit rolls back only the frame this observer owns, and that is a refusal. A failure after
+   the physical commit is the fixed `outcome_unknown`, never retried. Detection is not prevention: a committing
+   listener's raw or implicit commit (or a commit or rollback followed by a reopen) can make the write durable before
+   the terminal proof runs. When `abort()` then finds the begun frame no longer its own, the command reports
+   `outcome_unknown`, not a refusal (review F1). A callback-created replacement transaction is left to its owner and
+   the framework level is reset. A deadlock or lock wait timeout means the server rolled the frame back and stays
+   `contention`.
 
 Terminal proofs:
 
@@ -153,21 +162,25 @@ body is `{"code": ..., "reason": ...}` with private headers.
 
 ## Tests
 
-New and changed test files (all under `tests/Feature/ProductionFreeGrants/` unless noted):
+New and changed test files (all under `tests/Feature/ProductionFreeGrants/` unless noted; counts at the review follow-up
+source):
 
 | File | Cases | What it proves |
 | --- | --- | --- |
-| `ProductionFreeGrantCommitObserverTest` (new) | 16 (2 native-only) | listeners run once before the proof and the frame is restored; revocation, policy, owner, session-marker and staff-policy withdrawals inside a committing listener roll back; raw reopen, nesting, a Free command inside a Free frame and a replaced dispatcher refuse; four callback-capable metadata plants are refused with zero callbacks in the final proof; native TEMPORARY parent and owned-table shadows planted at commit roll back |
-| `ProductionFreeGrantFirstByteTest` (new) | 10 (2 native-only) | unchanged redemption delivers once; five post-commit withdrawals give zero bytes, retained redemption, `outcome_unknown`; one-use read and original-deadline refusal; refused `begin()` emits nothing; native isolation/lock test and the independent-process race |
-| `ProductionFreeGrantHttpTest` (new) | 38 | cold and runtime default-off for six flag/environment cases; real-route journey; CSRF for JSON and form; 19 raw-intake bounds; contention 503 + `Retry-After`; foreign and withdrawn owners; three post-commit withdrawals send no download header or byte |
+| `ProductionFreeGrantCommitObserverTest` (new) | 19 (2 native-only) | listeners run once before the proof and the frame is restored; revocation (in the authorize and in the accept commit), policy, owner, session-marker and staff-policy withdrawals inside a committing listener roll back; a listener's raw commit, commit then reopen, and rollback then reopen are `outcome_unknown`; nesting, a Free command inside a Free frame and a replaced dispatcher refuse; four callback-capable metadata plants are refused with zero callbacks in the final proof; native TEMPORARY parent and owned-table shadows planted at commit roll back |
+| `ProductionFreeGrantFirstByteTest` (new) | 12 (2 native-only) | unchanged redemption delivers once; five post-commit withdrawals give zero bytes, retained redemption, `outcome_unknown`; a revocation inside the redemption commit rolls the redemption back; a compared column re-sealed after the commit gives zero bytes; one-use read and original-deadline refusal; refused `begin()` emits nothing; native isolation/lock test and the independent-process race |
+| `ProductionFreeGrantHttpTest` (new) | 39 | cold and runtime default-off for six flag/environment cases; real-route journey; CSRF for JSON and form; 19 raw-intake bounds; contention 503 + `Retry-After`; library views do not spend the write or redemption limit; foreign and withdrawn owners; three post-commit withdrawals send no download header or byte |
 | `ProductionFreeGrantHttpBindingTest` (restored ff0) | 26 | the capsule and its twelve withdrawals, through a committed source callback and a retained capsule |
 | `ProductionFreeGrantHttpConfigurationAdmissionTest` (restored ff0) | 9 | callback parents/leaves refused with zero callbacks; nullable cached environment positive |
 | `ProductionFreeGrantApprovalTest`, `ProductionFreeGrantCliRendererTest` (changed) | unchanged counts | the premise "nothing mounts or binds 256" became "the literal default-off mount and the renderer-only binding" |
 | `ReviewFree256IdentityRotationTest` (changed) | unchanged | one direct `customerCommand` call passes the new required `$graph`; assertions unchanged |
 | `tests/Support/production-free-race-worker.php` (new) | n/a | independent-process worker for the native tests |
 
-Red/green: every new protection has a failing control, recorded under Mutations. The two restored ff0 tests were adapted
-onto canonical classes, so their original red controls (on ff0's old source) are not re-run here.
+Red/green: each protection listed under Mutations has a recorded failing control. That is not every protection: the
+independent review found three with none (the accept and redemption-commit graphs, and the first-byte column
+comparison; mutations MH, MG and MD survived). The follow-up adds tests that kill them (Mutations, follow-up table).
+The two restored ff0 tests were adapted onto canonical classes, so their original red controls (on ff0's old source)
+are not re-run here.
 
 Runs at the tested source (vendor below), PHP 8.4.26, PHPUnit 12.5.34, SQLite 3.45.1, `public/build` absent:
 
@@ -276,6 +289,78 @@ M1 to M5 first ran on the uncommitted pre-merge tree; the mutated files (`Produc
 are byte-identical to the tested source. M1 and M2 were repeated at the tested source after the merge. The working
 tree was verified clean after each reversal.
 
+## Independent review
+
+The independent review of `12441893` decided **APPROVE WITH CONDITIONS**, with no P0 or P1. The decision record is
+copied verbatim in [`independent-review-12441893-DECISION.md`](independent-review-12441893-DECISION.md). The follow-up
+commits address these findings:
+
+| Finding | Severity | Change | Evidence |
+| --- | --- | --- | --- |
+| F1 | P2 | `ProductionFreeGrantTransactions::run` reports `outcome_unknown` when the begun owned frame is no longer the observer's to roll back (`abort()` now says whether it rolled back), and when `abort()` itself fails. Contention stays `contention`; a frame that never began stays a refusal. Membership's observer is unchanged. | Three tests (raw commit, commit then reopen, rollback then reopen); all three fail on the previous source with `changed_transaction`. |
+| F2 | P2 | Tests only: a committing listener writes a sealed revocation inside the accept commit and inside the redemption commit. | Both refuse and roll back the command and the revocation. MH and MG now fail. |
+| F4 | P3 | Test only: the redemption row's `bytes` is changed and re-sealed after the commit, with its update guard removed and restored verbatim so the schema proof passes. | Zero bytes, `outcome_unknown`, redemption retained. MD now fails. |
+| F5 | P3 | One throttle prefix per tier: reads (index, show), review, writes (accept, authorize), redeem. Limits unchanged. | 25 library views, then authorize and redeem succeed; with the shared prefix the test gets 429. |
+| F10 | P3 | Packet: duplicated parenthetical removed; the red/green claim restated. | This file. |
+
+Deferred to the D1 follow-up batch (freeze-and-batch rule), unchanged in this source:
+
+- **F3 (P3):** the accept graph re-projects the new origin only. It does not re-prove that the definition is still open
+  at the same availability, or the cap count. Its outcome equals the serial order "accept, then close".
+- **F6 (P3):** `ProductionFreeGrantTransfer::$stream` is public and the committed read is an optional constructor
+  argument, so in-process code could stream without `begin()`. HTTP cannot reach it.
+- **F7 (P3):** JSON is released after the controller's capsule re-proof, not at native send (B4's epoch release is not
+  mirrored). Already listed under Untested conditions.
+- **F8 (P3):** `run()` checks only the default connection for depth zero; ff0's dropped boundary and Membership's
+  `runOwned` require every connection to be idle.
+- **F9 (P3):** the frame's fresh transaction manager is not the container's `db.transactions`, so an `afterCommit` job
+  or listener dispatched by ordinary code during the frame would run before the commit. Family 256 dispatches nothing.
+  Residual.
+
+### Follow-up commits, runs and mutations
+
+| Commit | Content |
+| --- | --- |
+| `8cf31d32975cde6724ef5410652340c3dbd8016b` | Workflow comments: 2481 of 9495 cases in 235 files (discovery, below) |
+| `f98761839ebd9c70fcf19c83e808b2c92dceae5c` | `StagingEnvironmentAdmissionTest` classifies `ProductionFreeHttpMount` as a local-only gate (see below) |
+
+The follow-up tested source is `f98761839ebd9c70fcf19c83e808b2c92dceae5c`. The whole-directory SQLite run used
+`cae94875`; the two later commits change only workflow comments and `StagingEnvironmentAdmissionTest`, which was run
+separately. Vendor unchanged
+(the merged lock above), PHP 8.4.26, PHPUnit 12.5.34, SQLite 3.45.1, `public/build` absent. Native runs used the same
+private MySQL 8.4.11 server (port 3341, server defaults), on the same datadir.
+
+| Run | Source | Scope | Tests / assertions | F / E / S | Exit |
+| --- | --- | --- | --- | --- | --- |
+| SQLite | `08288293` | `ProductionFreeGrantCommitObserverTest` (before the F2 accept case) | 18 / 120 | 0 / 0 / 2 | 0 |
+| SQLite | `cae94875` | `tests/Feature/ProductionFreeGrants` | 300 / 2880 | 0 / 0 / 9 | 0 |
+| SQLite | `f9876183` | `StagingEnvironmentAdmissionTest`, `StagingRuntimeValidatorTest`, `PaidGrantSpoolReservationTest` | 15 / 229, 80 / 464, 5 / 17 | 0 / 0 / 0 each | 0 each |
+| Native | `08288293` | the three raw-commit, commit-reopen and rollback-reopen cases | 3 / 21 | 0 / 0 / 0 | 0 |
+| Native | `cae94875` | the accept- and redemption-commit revocation cases and the column-alteration case (its MySQL branch reads `SHOW CREATE TRIGGER`) | 3 / 24 | 0 / 0 / 0 | 0 |
+
+The nine SQLite skips are the same nine methods as before, all in `scripts/ci/database-sqlite-skips.json`. No new test
+is native-only, so neither skip census changes. Discovery
+(`python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection`,
+exit 0) now proves "2481 selected MySQL-native tests in 235 files (of 9495 discovered tests in 687 files)", 72 untimed
+files; the five added selected cases are the Observer (+3) and FirstByte (+2) cases. The generated files were removed.
+Python safeguards at the follow-up source (Node 24): 52, 27, 14 and 53 OK, all exit 0. `git diff --check
+origin/main...HEAD` is clean.
+
+`StagingEnvironmentAdmissionTest::test_source_census_routes_every_admitting_gate_through_the_helper_and_leaves_local_only_gates_explicit`
+had failed since `a7505c32`: it requires every `local`/`testing` gate in `app/` to be classified, and the mount's gate
+was not. The original affected-file selection (above) did not include this test, so the original runs did not show it.
+The mount is meant to stay off staging, so it is classified as local-only, next to `TaxHttpMount`.
+
+Each mutation was a temporary edit of the committed file, reverted with `git checkout` and checked clean:
+
+| ID | Mutation | Red result |
+| --- | --- | --- |
+| MH | `accept` graph returns `[]` | `test_revocation_inside_the_accept_commit_rolls_back_the_origin_and_the_revocation` fails: the accept succeeds ("Must refuse entitlement_changed") |
+| MG | redemption-commit graph returns `[]` | `test_revocation_inside_the_redemption_commit_rolls_back_the_redemption_and_the_revocation` fails: the redemption succeeds ("Must refuse revoked") |
+| MD | first-byte row equality reduced to `count === 1` | `test_a_compared_column_altered_after_the_redemption_commit_sends_zero_bytes` fails: the transfer writes ("Must refuse outcome_unknown") |
+| F1 control | `ProductionFreeGrantTransactions` and the observer at `12441893` | all three raw-listener cases fail with `changed_transaction` |
+| F5 control | routes at `12441893` (one shared prefix) | the library-views case gets 429 |
+
 ## Census delta
 
 - `scripts/ci/database-sqlite-skips.json`: four MySQL-only methods appended after entry 281 (285 entries; the diff is
@@ -333,5 +418,11 @@ tree was verified clean after each reversal.
   wiring is out of scope and untested over HTTP.
 - No real sources adapter, rights/scanner/catalog proof, approved terms, fonts, host storage or production provenance.
 - The race covers three deterministic interleavings, not a randomized many-iteration stress run.
+- F1: a listener's raw PDO commit, commit then reopen, and rollback then reopen are tested on SQLite and natively. A
+  MySQL implicit commit (for example DDL issued by a listener) takes the same path but has no committed test. The
+  observer detects such a commit only afterwards; it cannot prevent it, so the write may be durable and the answer is
+  `outcome_unknown`.
+- Review findings F3 and F6 to F9 are deferred (Independent review, above) and unchanged in this source.
+- After the review follow-up, native MySQL ran only the six new cases (two runs above), not the three whole files again.
 - The observer cannot qualify SQL past a session TEMPORARY shadow created and dropped entirely between two of its own
   proofs; it refuses any shadow present at the commit and at the first byte (F-4 residual, as recorded in the D1 review).
