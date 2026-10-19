@@ -5,10 +5,12 @@ namespace App\Domain\Memberships\Production;
 use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Memberships\Billing\BillingPolicy;
+use App\Domain\Memberships\Billing\BillingSchema;
 use App\Models\User;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Support\Facades\DB;
+use PDO;
 use ReflectionProperty;
 use Throwable;
 use WeakMap;
@@ -50,8 +52,31 @@ final class MembershipReservationOperations
         return $this->run('expire', $locator, [], $principal, $actor);
     }
 
-    private function run(string $operation, string $locator, array $arguments,
+    /**
+     * Period-addressed entry points for the customer surface (C4d). The domain resolves the retained paid period's
+     * billing-ledger invoice row itself, so a customer request carries only the period id the customer index lists.
+     * The routing confers nothing: the owned context then locks and authenticates the invoice, owner, policy and
+     * period afresh, and the result must name the requested period.
+     */
+    public function reserveInPeriod(string $periodId, string $selection, int $expectedRevision, string $requestKey,
         ProductionCustomerPrincipal $principal, User $actor): array
+    {
+        return $this->run('reserve', '', ['selection' => $selection,
+            'expected_revision' => $expectedRevision, 'request_key' => $requestKey], $principal, $actor, $periodId);
+    }
+
+    public function releaseInPeriod(string $periodId, string $redemptionId, ProductionCustomerPrincipal $principal, User $actor): array
+    {
+        return $this->run('release', '', ['redemption_id' => $redemptionId], $principal, $actor, $periodId);
+    }
+
+    public function expireInPeriod(string $periodId, ProductionCustomerPrincipal $principal, User $actor): array
+    {
+        return $this->run('expire', '', [], $principal, $actor, $periodId);
+    }
+
+    private function run(string $operation, string $locator, array $arguments,
+        ProductionCustomerPrincipal $principal, User $actor, ?string $period = null): array
     {
         // One original 60-second admission deadline includes callbacks, waits, commit and receipt.
         // Checks refuse elapsed authority; this does not guarantee interruption of a blocking wait.
@@ -60,7 +85,7 @@ final class MembershipReservationOperations
         $primaryFailure = null;
         $committed = false;
         try {
-            return $this->runOwned($operation, $locator, $arguments, $principal, $actor, $deadline, $lock, $committed);
+            return $this->runOwned($operation, $locator, $arguments, $principal, $actor, $deadline, $lock, $committed, $period);
         } catch (Throwable $error) {
             $primaryFailure = $error;
             $committed = $committed || ($error instanceof MembershipException && $error->reason === 'committed_receipt_refused');
@@ -76,8 +101,10 @@ final class MembershipReservationOperations
     }
 
     private function runOwned(string $operation, string $locator, array $arguments,
-        ProductionCustomerPrincipal $principal, User $actor, int $deadline, ?MembershipRedemptionWorkflowLock &$lock, bool &$committed): array
+        ProductionCustomerPrincipal $principal, User $actor, int $deadline, ?MembershipRedemptionWorkflowLock &$lock, bool &$committed,
+        ?string $period): array
     {
+        MembershipException::require(($period === null) !== ($locator === ''), 'invalid_value');
         $connection = DB::connection();
         $primary = $connection->getPdo();
         foreach (DB::getConnections() as $source) {
@@ -108,13 +135,16 @@ final class MembershipReservationOperations
         $events = $connection->getEventDispatcher();
         $originalManager = (new ReflectionProperty(Connection::class, 'transactionsManager'))->getValue($connection);
         MembershipException::require($originalManager === null || get_class($originalManager) === DatabaseTransactionsManager::class, 'changed_transaction');
-        $manager = new DatabaseTransactionsManager;
+        $manager = new MembershipCommitWitness;
         $observer = new MembershipReservationObserver($connection, $primary, $configuration, $events, $manager);
         $connection->setTransactionManager($manager);
         $connection->setEventDispatcher($observer);
         try {
             $connection->beginTransaction();
             $rows = $observer->rows();
+            if ($period !== null) {
+                $locator = self::periodLocator($rows, $period);
+            }
             self::$contextPermits ??= new WeakMap;
             self::$contextPermits[$rows] = [$rows->identity(), $configuration, $policy, $membershipConfiguration,
                 $billingPolicy, $billingConfiguration, $principal, $actor, $deadline, $operation, $locator, $arguments];
@@ -126,12 +156,20 @@ final class MembershipReservationOperations
                 unset(self::$contextPermits[$rows]);
             }
             $projection = $context->projection();
+            MembershipException::require($period === null || ($projection['period_id'] ?? null) === $period, 'changed_period');
             $observer->prepare($context);
+            $manager->arm($connection, $primary);
             // PDO commit, scoped afterCommit callbacks and ordinary committed delegates all run.
             $connection->commit();
             $committed = true;
             $observer->requireProof();
         } catch (Throwable $error) {
+            if ($manager->physicallyCommitted()) {
+                // A throwing afterCommit callback or committed delegate followed the witnessed owned commit.
+                // The effect is durable; this is a refused response, never a retryable generic refusal.
+                $committed = true;
+                throw new MembershipException('committed_receipt_refused');
+            }
             try {
                 $observer->abort();
             } catch (Throwable) {
@@ -171,5 +209,22 @@ final class MembershipReservationOperations
             // The regular write may already be durable. This is a refused response, never a retry.
             throw new MembershipException('committed_receipt_refused');
         }
+    }
+
+    /** Nonlocking routing only, inside the owned frame; the context locks and authenticates every source afresh. */
+    private static function periodLocator(MembershipRows $rows, string $periodId): string
+    {
+        MembershipValues::id($periodId);
+        $rows->assertCurrent();
+        (new BillingSchema)->assertOwned($rows->identity());
+        $query = $rows->identity()->prepare('SELECT i.id invoice_id FROM '.(new MembershipSchema)->table(MembershipPeriodRecords::PERIODS)
+            .' p JOIN '.(new BillingSchema)->table(BillingSchema::TABLES[1]).' i ON i.source_invoice_hash = p.source_invoice_hash WHERE p.id = ? LIMIT 2');
+        $query->execute([$periodId]);
+        $route = $query->fetchAll(PDO::FETCH_ASSOC);
+        MembershipException::require(count($route) === 1 && is_string($route[0]['invoice_id']), 'paid_period_absent');
+        MembershipValues::id($route[0]['invoice_id']);
+        $rows->assertCurrent();
+
+        return $route[0]['invoice_id'];
     }
 }

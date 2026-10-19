@@ -63,7 +63,7 @@ final class MembershipAwards
         $events = $connection->getEventDispatcher();
         $originalManager = (new ReflectionProperty(Connection::class, 'transactionsManager'))->getValue($connection);
         MembershipException::require($originalManager === null || get_class($originalManager) === DatabaseTransactionsManager::class, 'changed_transaction');
-        $manager = new DatabaseTransactionsManager;
+        $manager = new MembershipCommitWitness;
         $observer = new MembershipAwardObserver($connection, $primary, $configuration, $events, $manager);
         $connection->setTransactionManager($manager);
         $connection->setEventDispatcher($observer);
@@ -82,10 +82,16 @@ final class MembershipAwards
             }
             $projection = $context->projection();
             $observer->prepare($context);
+            $manager->arm($connection, $primary);
             // PDO commit, scoped afterCommit callbacks and ordinary committed delegates all run.
             $connection->commit();
             $observer->requireProof();
         } catch (Throwable $error) {
+            if ($manager->physicallyCommitted()) {
+                // A throwing afterCommit callback or committed delegate followed the witnessed owned commit.
+                // The award is durable; this is a refused response, never a retryable generic refusal.
+                throw new MembershipException('committed_receipt_refused');
+            }
             try {
                 $observer->abort();
             } catch (Throwable) {

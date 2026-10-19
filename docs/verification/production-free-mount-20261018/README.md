@@ -402,6 +402,20 @@ Each mutation was a temporary edit of the committed file, reverted with `git che
 - A1-7 / F-8 seal-key rotation.
 - `verified_production` provenance: the policy still refuses anything but `synthetic_rehearsal` in `local`/`testing`.
 
+### Re-review of the fixes
+
+[`independent-rereview-b95294e0-DECISION.md`](independent-rereview-b95294e0-DECISION.md): **APPROVE** for the delta
+`12441893..b95294e0` (tested at `f9876183`); every condition met, including the staging census classification the first
+review missed. Two new P3s are deferred: R1, the `! $contended` exemption that keeps a real MySQL deadlock reported as
+`contention` has no test (SQLite's synthetic deadlock leaves the frame open); R2, a listener's rollback-then-reopen is now
+reported as `outcome_unknown` although nothing is durable (conservative, never a false refusal).
+
+### Merge with main after PR #159
+
+The branch merged `main` at `e3e2a180` (PR #159, C4d). The census union keeps main's 287 entries as an exact prefix and
+appends this lane's four (291); the regenerated selection is 2,487 of 9,523 cases in 237 files, and both workflow comments
+say so. The four preflight safeguards pass on the merged tree.
+
 ## Untested conditions
 
 - No hosted CI, Focused feedback, Foundation or GitLab run. Nothing was pushed.
