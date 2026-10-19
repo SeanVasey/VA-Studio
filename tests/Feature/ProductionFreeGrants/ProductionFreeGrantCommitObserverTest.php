@@ -6,10 +6,8 @@ use App\Domain\Grants\ProductionFree\ProductionFreeGrantDefinitions;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantDocuments;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantDownloads;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantException;
-use App\Domain\Grants\ProductionFree\ProductionFreeGrantInput;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantLibrary;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantRequestIdentity;
-use App\Domain\Grants\ProductionFree\ProductionFreeGrantRows;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrants;
 use ArrayObject;
 use Illuminate\Database\Connection;
@@ -20,7 +18,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\Str;
 use ReflectionProperty;
 use Stringable;
 use Tests\Support\ProductionFreeGrantFixtures;
@@ -72,6 +69,20 @@ final class ProductionFreeGrantCommitObserverTest extends TestCase
         $this->assertSame(1, $calls());
         // The command and the listener's write roll back together; nothing partial is committed.
         $this->assertSame(0, DB::table('production_free_authorizations')->count());
+        $this->assertSame(0, DB::table('production_free_revocations')->count());
+        $this->assertIdle();
+    }
+
+    public function test_revocation_inside_the_accept_commit_rolls_back_the_origin_and_the_revocation(): void
+    {
+        [$owner, $definition, $review] = $this->reviewed();
+        // The revocation targets the origin this very command is writing; only the accept graph re-proof can see it.
+        $calls = $this->duringCommit('production_free_origins', function (): void {
+            $this->insertRevocation((string) DB::table('production_free_origins')->value('id'));
+        });
+        $this->refuses(fn () => (new ProductionFreeGrants)->accept($definition['id'], $this->assentInput($review), $owner['principal'], $owner['user']), 'entitlement_changed');
+        $this->assertSame(1, $calls());
+        $this->assertSame(0, DB::table('production_free_origins')->count());
         $this->assertSame(0, DB::table('production_free_revocations')->count());
         $this->assertIdle();
     }
@@ -321,21 +332,6 @@ final class ProductionFreeGrantCommitObserverTest extends TestCase
         return function () use (&$calls): int {
             return $calls;
         };
-    }
-
-    /** A sealed revocation row written inside the current frame, exactly as staff revocation writes it. */
-    private function insertRevocation(string $originId): void
-    {
-        $rows = new ProductionFreeGrantRows;
-        $origin = $rows->one('production_free_origins', 'id = ?', [$originId]);
-        $at = ProductionFreeGrantInput::now();
-        $id = (string) Str::uuid();
-        $actor = $this->staff();
-        $rows->insert('production_free_revocations', ['id' => $id, 'origin_id' => $originId, 'actor_user_id' => (int) $actor->getKey(),
-            'reason_hash' => hash('sha256', 'Synthetic concurrent revocation'), 'created_at' => ProductionFreeGrantInput::stored($at)],
-            ['schema_version' => 'production-free-revocation-v1', 'revocation_id' => $id, 'origin_id' => $originId,
-                'origin_seal' => $origin['seal'], 'reason' => 'Synthetic concurrent revocation', 'actor_user_id' => (int) $actor->getKey(),
-                'at' => ProductionFreeGrantInput::iso($at)]);
     }
 
     private function reviewed(): array

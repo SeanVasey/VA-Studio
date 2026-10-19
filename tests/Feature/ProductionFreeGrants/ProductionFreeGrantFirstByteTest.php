@@ -10,7 +10,9 @@ use App\Domain\Grants\ProductionFree\ProductionFreeGrantLibrary;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrants;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantTransfer;
 use ArrayObject;
+use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Facade;
 use PHPUnit\Framework\Attributes\DataProvider;
 use ReflectionProperty;
@@ -91,6 +93,25 @@ final class ProductionFreeGrantFirstByteTest extends TestCase
             $this->refuses(fn () => (new ProductionFreeGrantDownloads)->redeem($authorization['id'], $authorization['token'], $owner['principal'], $owner['user']),
                 $withdrawal === 'revocation' ? 'revoked' : 'already_redeemed', 'already_redeemed');
         }
+    }
+
+    public function test_revocation_inside_the_redemption_commit_rolls_back_the_redemption_and_the_revocation(): void
+    {
+        [$owner, $authorization, $origin] = $this->authorized('master_wav');
+        $calls = 0;
+        // Only the redemption commit has a redemption row; the revocation lands inside that frame, after the work ran.
+        Event::listen(TransactionCommitting::class, function () use (&$calls, $origin): void {
+            if ($calls === 0 && DB::table('production_free_redemptions')->count() > 0) {
+                $calls++;
+                $this->insertRevocation($origin['id']);
+            }
+        });
+        $this->refuses(fn () => (new ProductionFreeGrantDownloads)->redeem($authorization['id'], $authorization['token'], $owner['principal'], $owner['user']), 'revoked');
+        $this->assertSame(1, $calls);
+        $this->assertSame(0, DB::table('production_free_redemptions')->count());
+        $this->assertSame(0, DB::table('production_free_revocations')->count());
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::connection()->getPdo()->inTransaction());
     }
 
     public function test_the_committed_read_is_one_use_and_refuses_after_its_original_deadline(): void
