@@ -26,8 +26,9 @@ state it proved untrue while that marker still exists?
 
 ### Facts measured on the private 8.4.11 server
 
-Probe scripts are synthetic (database `g1probe`, never application data); outputs are in the lane scratchpad
-(`g1-ev/probe-mdl.txt`, `probe-temporary-ps-on.txt`, `probe-temporary-ps-off.txt`, `probe-temporary-rename.txt`).
+Probe scripts are synthetic (database `g1probe`, never application data). Scripts and outputs are in
+`evidence/probes/` (`mdl.php` with `probe-mdl.txt`; `tmp.php` with `probe-temporary-ps-on.txt` and
+`probe-temporary-ps-off.txt`; `tmp2.php` with `probe-temporary-rename.txt`; `comment.php`).
 Session A opened a transaction and ran one statement; session B, with `lock_wait_timeout=1`, then ran DDL.
 
 | A ran, in its open transaction | B: ALTER, CREATE/DROP TRIGGER on the table, RENAME, DROP, CREATE INDEX, CREATE TABLE with a foreign key to it, ALTER its FK parent | B: CREATE VIEW over it | B: CREATE TRIGGER on another table whose body writes it |
@@ -52,9 +53,12 @@ Same-session statements, inside a transaction holding a savepoint:
 ### Consequences
 
 1. **Another session's DDL on a table this transaction has opened waits** until the transaction ends. The existing full
-   proofs do not hold these locks for the identity parents: in a probe of a frame after both complete proofs on `main`
-   code, `users`, `customer_accounts`, `quote_owners` and `audit_events` held no metadata lock at all, because the
-   identity inspection reads them only through `SHOW CREATE TABLE` and `information_schema`. A remembered proof is
+   proofs do not hold these locks for the identity parents. In a debugging run in which both guards ran their
+   complete proofs inside one transaction, `performance_schema.metadata_locks` showed shared locks on the seven
+   identity tables (opened by the inspection's populated-table probe) and the four membership tables (opened by
+   `MembershipSchema`), but none on `users`, `customer_accounts`, `quote_owners` or `audit_events`, which the identity
+   inspection reads only through `SHOW CREATE TABLE` and `information_schema`. Another session's
+   `ALTER TABLE quote_owners` then succeeded (`evidence/probes/probe-mdl-complete-proofs.txt`). A remembered proof is
    therefore taken only **after** the frame has opened every base table that proof inspects.
 2. **Opening does not cover everything the identity proof inspects.** A view, a routine, or a trigger on some other
    table that reaches the identity tables can be created by another session at any time. These are the identity
@@ -178,8 +182,10 @@ membership `LIMIT 0` opens, so it is not a business-statement count; the busines
   the **identical multiset** of 505 business statements.
 - **Reserve:** `main`'s 804 business statements (it stopped at the deadline) are contained in this branch's 876.
 
-Raw evidence: `g1-ev/measure-*.txt`, `measure-*.glog.txt`, `measure-progress.txt`, `business-sql-base-vs-head.txt` and
-the compressed general logs in the lane scratchpad.
+Evidence: `evidence/measure/` (runner `g1-measure.sh`, per-transaction summaries `measure-*.glog.txt` from
+`g1-glog.py`, PHPUnit output `measure-*.txt`, `measure-progress.txt`, and `business-sql-base-vs-head.txt` from
+`g1-business-sql.py`). The compressed general logs (several MB each) stay in the lane scratchpad
+(`g1-mysql/general-*.log.gz`).
 
 ## Tests
 
@@ -210,7 +216,27 @@ PENDING
 
 ## Mutations
 
-PENDING
+Each mutation was applied to a byte copy of the tested tree (lane scratchpad `g1-mut`, no `.git`), the new test file was run
+on the stated driver (native runs used a separate disposable database, `vaseyaudio_mutg1`, on the same server), and the
+copy was restored and compared byte for byte with the worktree after every run (`restore=clean` in
+`evidence/mutations/mutations.log`). Tool: `g1-mutate.py`; runner: `g1-mut-run.sh` (both in `evidence/mutations/`).
+
+| Mutation | Property it removes | SQLite | Native MySQL 8.4.11 |
+| --- | --- | --- | --- |
+| M1a: MySQL token without the session table counters | memo invalidated on a TEMPORARY shadow (MySQL) | survives (MySQL-only input) | **killed**: `test_a_temporary_shadow_...` |
+| M1b: SQLite token without `sqlite_temp_master` | memo invalidated on a TEMPORARY shadow (SQLite) | **killed**: `test_a_temporary_shadow_...` | not run (SQLite-only input) |
+| M2: one static memo shared by every frame | memo never shared across connections | **killed**: `test_a_remembered_proof_is_never_used_by_another_connection` | survives: the MySQL token itself is per session (connection id, session counters, `foreign_key_checks`), so the second connection's token never matches |
+| M3: token without the owner witness | memo ends with its frame | **killed**: `test_a_remembered_proof_ends_with_its_transaction` | **killed**: same case |
+| M4a: `terminal()` does nothing | terminal re-proof | survives (one connection: the listener's change moves the SQLite catalog token anyway) | **killed**: both terminal cases |
+| M4b: no `beginTerminalProof()` in the reservation observer | terminal re-proof (reserve) | not run | **killed**: `test_the_terminal_phase_...` |
+| M4c: no `beginTerminalProof()` in the award observer | terminal re-proof (award) | not run | **killed**: `test_the_award_terminal_phase_...` |
+| M5: no table opening before the establishing proof | definitions frozen by metadata locks | survives (no metadata locks) | **killed**: `test_definitions_proven_...` (the `ALTER` passed) |
+| M6: no dependents scan on reuse | new dependents seen at the next guard | survives (catalog token) | **killed**: `test_a_dependent_view_...` |
+| M7: MySQL token without the session variables | same-session `SET` detected | survives (MySQL-only input) | **killed**: `test_a_session_change_...` |
+
+Every property has at least one killing test; each surviving cell is a driver that does not depend on the removed
+mechanism (or, for M2 on MySQL, a second independent layer). One earlier native attempt of M1a, M5, M6 and M7 used a
+database name outside the disposable-test admission rule and errored in setup; it is kept in the log and was rerun.
 
 ## CI safeguards
 
