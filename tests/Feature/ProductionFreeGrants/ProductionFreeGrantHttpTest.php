@@ -225,6 +225,18 @@ final class ProductionFreeGrantHttpTest extends TestCase
         $this->assertSame($retry['id'], DB::table('production_free_origins')->value('id'));
     }
 
+    public function test_library_views_do_not_spend_the_write_or_redemption_rate_limit(): void
+    {
+        [, $authorization, $origin, $seal] = $this->authorized();
+        // More reads than the write and redemption limits (20 a minute) allow; each tier has its own budget.
+        for ($i = 0; $i < 25; $i++) {
+            $this->getFree('/production-free-grants/library')->assertOk();
+        }
+        $this->postFree('/production-free-grants/origins/'.$origin['id'].'/authorizations', ['originSeal' => $seal, 'role' => 'contract'])->assertOk();
+        $this->redeem($authorization)->assertOk();
+        $this->assertSame(1, DB::table('production_free_redemptions')->count());
+    }
+
     public function test_foreign_and_withdrawn_owners_are_refused(): void
     {
         [$owner, $authorization, $origin, $seal] = $this->authorized();
