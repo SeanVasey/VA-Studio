@@ -75,10 +75,16 @@ class MembershipSchemaProofFrameTest extends TestCase
 
     public function test_a_dependent_view_created_after_a_remembered_proof_is_refused_at_the_next_guard(): void
     {
+        $other = null;
+        if (DB::getDriverName() === 'mysql') {
+            // Another session: creating a view takes no metadata lock on the tables it reads. Under REPEATABLE READ the
+            // frame's information_schema listings stay at its first dictionary read, for a complete proof as much as for
+            // a reuse; READ COMMITTED reads the current dictionary on every statement, as the committed frames do.
+            DB::connection()->getPdo()->exec('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
+            $other = $this->independentConnection();
+        }
         $frame = $this->ownedFrame();
         $pdo = DB::connection()->getPdo();
-        // Another session on MySQL: creating a view takes no metadata lock on the tables it reads.
-        $other = DB::getDriverName() === 'mysql' ? $this->independentConnection() : null;
         try {
             $this->guards($pdo);
             $this->guards($pdo);
@@ -132,7 +138,7 @@ class MembershipSchemaProofFrameTest extends TestCase
             if (DB::getDriverName() === 'sqlite') {
                 // A separate in-memory database with byte-identical catalogs, only foreign keys off.
                 $source = DB::connection($first)->getPdo();
-                foreach ($source->query("SELECT name, sql FROM main.sqlite_master WHERE sql IS NOT NULL ORDER BY rowid")->fetchAll(PDO::FETCH_NUM) as [$name, $sql]) {
+                foreach ($source->query('SELECT name, sql FROM main.sqlite_master WHERE sql IS NOT NULL ORDER BY rowid')->fetchAll(PDO::FETCH_NUM) as [$name, $sql]) {
                     if (! str_starts_with($name, 'sqlite_')) {
                         $second->exec($sql);
                     }

@@ -28,7 +28,8 @@ state it proved untrue while that marker still exists?
 
 Probe scripts are synthetic (database `g1probe`, never application data). Scripts and outputs are in
 `evidence/probes/` (`mdl.php` with `probe-mdl.txt`; `tmp.php` with `probe-temporary-ps-on.txt` and
-`probe-temporary-ps-off.txt`; `tmp2.php` with `probe-temporary-rename.txt`; `comment.php`).
+`probe-temporary-ps-off.txt`; `tmp2.php` with `probe-temporary-rename.txt`; `comment.php`; `isnap.php` with
+`probe-dictionary-snapshot.txt`).
 Session A opened a transaction and ran one statement; session B, with `lock_wait_timeout=1`, then ran DDL.
 
 | A ran, in its open transaction | B: ALTER, CREATE/DROP TRIGGER on the table, RENAME, DROP, CREATE INDEX, CREATE TABLE with a foreign key to it, ALTER its FK parent | B: CREATE VIEW over it | B: CREATE TRIGGER on another table whose body writes it |
@@ -50,6 +51,14 @@ Same-session statements, inside a transaction holding a savepoint:
   earlier insert is durable.
 - `DROP TEMPORARY TABLE`, `SET SESSION foreign_key_checks=0` and `USE` keep the savepoint.
 
+Visibility of another session's later DDL inside an open `REPEATABLE READ` transaction (`isnap.php`,
+`probe-dictionary-snapshot.txt`): once the transaction has a read view, established by its first consistent read **or
+by its first `information_schema` read**, `information_schema.TABLES`, `VIEWS` and `TRIGGERS` keep showing that
+snapshot; a view, table and trigger created afterwards stay invisible to them until the transaction ends.
+`SHOW CREATE TABLE`, `SHOW CREATE VIEW` and `SHOW CREATE TRIGGER` see them at once. (The code base already relies on
+this: `BillingAwardFence` and `BillingSchema` read current definitions with `SHOW CREATE` for this reason.) A
+`READ COMMITTED` transaction, such as `IdentityCommittedFrame`, takes a new read view per statement and sees them.
+
 ### Consequences
 
 1. **Another session's DDL on a table this transaction has opened waits** until the transaction ends. The existing full
@@ -60,22 +69,30 @@ Same-session statements, inside a transaction holding a savepoint:
    inspection reads only through `SHOW CREATE TABLE` and `information_schema`. Another session's
    `ALTER TABLE quote_owners` then succeeded (`evidence/probes/probe-mdl-complete-proofs.txt`). A remembered proof is
    therefore taken only **after** the frame has opened every base table that proof inspects.
+   On `main` such an `ALTER` would not even be noticed inside the frame: the identity proof reads the parents' columns,
+   indexes and keys from `information_schema`, which keeps the frame's snapshot. Holding the lock is stronger.
 2. **Opening does not cover everything the identity proof inspects.** A view, a routine, or a trigger on some other
-   table that reaches the identity tables can be created by another session at any time. These are the identity
-   inspection's cross-schema dependents scan. It is repeated on **every** reuse, so they are found at the next guard
-   call exactly as before.
+   table that reaches the identity tables can be created by another session at any time. The identity proof finds
+   these with its cross-schema dependents scan, which reads `information_schema`. Under `REPEATABLE READ` (the server
+   default, and the configuration measured here) that scan sees the frame's snapshot, so neither the complete proof
+   on `main` nor a reuse here can see a dependent created after the frame's first dictionary read; it is refused by
+   the committed-read frame (`READ COMMITTED`) and by the next operation. Under `READ COMMITTED` the complete proof
+   would see it at the next guard call, so the frame repeats this scan on **every** reuse, which keeps that behavior
+   (tested with a `READ COMMITTED` frame below).
 3. **Same-session DDL commits implicitly**, except `CREATE TEMPORARY TABLE` (which shadows a table by name) and
    `DROP TEMPORARY TABLE`. Both move the session's `Com_create_table`/`Com_drop_table` counters, which can only be reset
    by a statement that commits implicitly.
 4. **Same-session `SET` and `USE` do not commit.** The guards read `foreign_key_checks` and the selected database, so
    both are part of the token (with `sql_mode` and the connection id, which no guard reads, as conservative extras).
-5. **What remains outside both the locks and the per-reuse checks** is namespace-only state: a new table, index, routine
-   or event whose name collides with a reserved name in another table or schema (for example a table called
+5. **What remains outside both the locks and the per-reuse checks** is namespace-only state: a new table, view, index,
+   routine or event whose name collides with a reserved name in another table or schema (for example a table called
    `pia_address_unique`, a reserved identity index name). Such an object cannot change any read or write the frame
-   performs, because the frame names only its own owned tables and their already-locked triggers. It is still refused:
-   at the terminal pre-commit proof, which is complete and never uses the memo (tested below), and at the next frame.
-   Before this change it was refused at the next guard call. This is the one place where detection moves later; see
-   [Residual differences](#residual-differences-and-untested-conditions).
+   performs, because the frame names only its own owned tables and their already-locked triggers. Under
+   `REPEATABLE READ`, the complete proof sees only the part of this that `SHOW CREATE TABLE` reveals: a table or view
+   carrying a reserved name. That is refused at the terminal pre-commit proof, which is complete and never uses the
+   memo (tested below), and on `main` it was refused at the next guard call. Under `READ COMMITTED`, the
+   `information_schema` part also moves from the next guard call to the terminal proof. These are the only places
+   where detection moves later; see [Residual differences](#residual-differences-and-untested-conditions).
 
 ### Is any table touched before its first proof?
 
@@ -121,7 +138,8 @@ synthetic rehearsal only (`MembershipRows::context`).
   If 1 or 2 fails, the frame closes for good and unregisters; if 3 cannot be read, that call is complete and not
   remembered.
 - **Decision:** a guard whose stored token equals the current token is reused; on MySQL the identity cross-schema
-  dependents scan (`IdentityMigrationOwnership::assertNoDependents`) still runs. Otherwise the frame opens every table
+  dependents scan (`IdentityMigrationOwnership::assertNoDependents`) still runs (meaningful under `READ COMMITTED`;
+  under `REPEATABLE READ` it reads the same snapshot as the establishing proof, see consequence 2). Otherwise the frame opens every table
   the proof inspects (`SELECT * FROM <table> LIMIT 0`, the pattern `MembershipSchema` and `BillingSchema` already use),
   runs the unchanged complete proof, recomputes the token and remembers the proof only if every table opened and the
   token did not move.
@@ -136,7 +154,7 @@ Cost of one reuse on MySQL: 3 statements for the witness, 2 for the token, and 4
 
 | Guard | Where it reuses | Why the reuse is sound |
 | --- | --- | --- |
-| `MembershipSchema::assertOwned` (all `MembershipRows` reads, billing evidence, paid-invoice and eligible-license proofs, and `BillingSchema` owned and retrieval checks) | inside an owned frame, before its terminal phase | Its inputs are the identity proof and the four membership tables' definitions, triggers and namespace. Definitions and triggers of opened tables cannot change (MDL, consequence 1); temporary shadows and session inputs are in the token (3, 4); identity dependents are rescanned (2); namespace collisions are refused at the terminal proof (5). |
+| `MembershipSchema::assertOwned` (all `MembershipRows` reads, billing evidence, paid-invoice and eligible-license proofs, and `BillingSchema` owned and retrieval checks) | inside an owned frame, before its terminal phase | Its inputs are the identity proof and the four membership tables' definitions, triggers and namespace. Definitions and triggers of opened tables cannot change (MDL, consequence 1); temporary shadows and session inputs are in the token (3, 4); identity dependents are rescanned, with the same dictionary visibility the complete proof has under either isolation level (2); namespace collisions are refused at the terminal proof (5). |
 | `IdentityRows::assertPermanent` (every `ProductionCustomerAccess` lock, proof, history and historical-binding read) | the same, and only when the reader has no committed frame | The same argument for the identity proof. Its connection, transaction-level, other-connection, selected-database and `audit_events` checks still run on every call. Committed frames always run the complete proof. |
 | `IdentityMigrationOwnership::inspect` | never: unchanged statements and results | The dependents scan was moved verbatim into a private method that `inspect()` calls at the same point. `IdentityInspectionCostTest` still bounds one native inspection. |
 | `BillingSchema` billing-table checks | never | Unchanged. Only its call to `MembershipSchema::assertOwned` can reuse. |
@@ -195,7 +213,7 @@ drivers, with no skips; where SQLite has only one connection, the MySQL leg uses
 | Case | What it proves |
 | --- | --- |
 | `test_a_temporary_shadow_made_after_a_remembered_proof_is_refused_by_both_guards` | A TEMPORARY `customer_accounts` made after a reuse is refused by both guards; on MySQL a remembered pair costs under a quarter of the complete pair. |
-| `test_a_dependent_view_created_after_a_remembered_proof_is_refused_at_the_next_guard` | A view over `production_identity_origins` (another session on MySQL, holding no lock) is refused at the next guard. |
+| `test_a_dependent_view_created_after_a_remembered_proof_is_refused_at_the_next_guard` | A view over `production_identity_origins` created after a reuse is refused at the next guard. MySQL: created by another session (holding no lock) while the frame runs `READ COMMITTED`, where a complete proof would also see it. SQLite: same connection. |
 | `test_a_session_change_after_a_remembered_proof_sends_the_guards_back_to_a_complete_proof` | MySQL: `SET foreign_key_checks=0` after a reuse is refused. SQLite ignores the pragma inside the transaction. |
 | `test_a_remembered_proof_is_never_used_by_another_connection` | A second connection (SQLite: byte-identical catalogs, foreign keys off; MySQL: same database, `foreign_key_checks=0`) with its own frame proves in full and refuses. |
 | `test_a_remembered_proof_ends_with_its_transaction` | After the frame's commit, a change only a complete proof sees (SQLite: foreign keys off; MySQL: another session's `pia_address_unique` table) is refused in the next transaction, although the old frame is still referenced. |
@@ -208,7 +226,24 @@ policy requires. Neither skip census changed.
 
 ## SQLite results
 
-PENDING
+In-memory SQLite, 152 test files in 13 chunks run one process at a time with the direct PHPUnit command (`APP_ENV=testing
+DB_CONNECTION=sqlite DB_DATABASE=:memory:` ..., `public/build` absent), at `848e7f8e`, whose `app/` and `tests/` equal
+`092f7713` and the final tested SHA's except the formatting-only Pint change to the new test file noted below. Driver,
+chunk list and per-chunk results: `evidence/sqlite/`.
+
+| Chunk | Files | Tests | Assertions | Failures | Errors | Skipped |
+| --- | --- | --- | --- | --- | --- | --- |
+| s01 `tests/Feature/ProductionMembership/` | 9 | 62 | 241 | 0 | 0 | 3 |
+| s02 to s06 `tests/Feature/ProductionMembershipBilling/` (56 files, new file included) | 56 | 406 | 3,504 | 0 | 0 | 35 |
+| s07 `ProductionMemberActivation/` and `ProductionMemberGrants/` | 8 | 53 | 520 | 0 | 0 | 7 |
+| s08, s09 `ProductionMemberOriginals/` | 21 | 199 | 1,119 | 0 | 0 | 9 |
+| s10, s11 every other test file naming `IdentityRows`, `ProductionCustomerAccess` or `IdentityMigrationOwnership` | 28 | 313 | 3,240 | 0 | 0 | 38 |
+| s12 Unit member, billing and identity files, `tests/Unit/ProductionMemberGrants/`, `tests/Unit/ProductionMemberOriginals/` | 27 | 480 | 1,044 | 0 | 0 | 0 |
+| s13 `MembershipCreditMigrationTest`, `StagingEnvironmentAdmissionTest`, `ProductionEnvironmentTemplateTest` | 3 | 59 | 1,997 | 0 | 0 | 0 |
+| **Total** | **152** | **1,572** | **11,665** | **0** | **0** | **92** |
+
+All 92 skips are methods in the reviewed SQLite census `scripts/ci/database-sqlite-skips.json` (data-set cases matched by
+method; `evidence/sqlite/sqlite-census-check.txt`). The new file's eight cases ran in s06 with no skip.
 
 ## Native MySQL 8.4.11 results
 
@@ -231,12 +266,17 @@ copy was restored and compared byte for byte with the worktree after every run (
 | M4b: no `beginTerminalProof()` in the reservation observer | terminal re-proof (reserve) | not run | **killed**: `test_the_terminal_phase_...` |
 | M4c: no `beginTerminalProof()` in the award observer | terminal re-proof (award) | not run | **killed**: `test_the_award_terminal_phase_...` |
 | M5: no table opening before the establishing proof | definitions frozen by metadata locks | survives (no metadata locks) | **killed**: `test_definitions_proven_...` (the `ALTER` passed) |
-| M6: no dependents scan on reuse | new dependents seen at the next guard | survives (catalog token) | **killed**: `test_a_dependent_view_...` |
+| M6: no dependents scan on reuse | new dependents seen at the next guard (`READ COMMITTED`) | survives (catalog token) | **killed**: `test_a_dependent_view_...` (rerun after the test fix below) |
 | M7: MySQL token without the session variables | same-session `SET` detected | survives (MySQL-only input) | **killed**: `test_a_session_change_...` |
 
 Every property has at least one killing test; each surviving cell is a driver that does not depend on the removed
 mechanism (or, for M2 on MySQL, a second independent layer). One earlier native attempt of M1a, M5, M6 and M7 used a
 database name outside the disposable-test admission rule and errored in setup; it is kept in the log and was rerun.
+
+**Invalid first M6 result, kept in the log.** The first native M6 run "failed" in the same way the unmutated test then
+failed in the native chunk run (`n23`): its first draft created the view while the frame ran `REPEATABLE READ`, where
+neither a complete proof nor a reuse can see it (consequence 2). That was not a kill. The test now runs its MySQL leg
+under `READ COMMITTED`; the unmutated test passes and M6 fails it (`mutations.log`, 05:16Z).
 
 ## CI safeguards
 
@@ -245,8 +285,15 @@ PENDING
 ## Residual differences and untested conditions
 
 - **Namespace-only collisions are detected later.** A reserved-name object created by another session while a frame is
-  open (consequence 5) is refused at the terminal proof instead of the next guard call. It cannot affect the frame's
-  reads or writes, and nothing commits past it (`test_the_terminal_phase_...`, `test_the_award_terminal_phase_...`).
+  open (consequence 5) is refused at the terminal proof instead of the next guard call (under `REPEATABLE READ`, the
+  tables and views `SHOW CREATE TABLE` reveals; under `READ COMMITTED`, also the `information_schema` part). It cannot
+  affect the frame's reads or writes, and nothing commits past it (`test_the_terminal_phase_...`,
+  `test_the_award_terminal_phase_...`).
+- **Pre-existing, not changed here:** under `REPEATABLE READ` every `information_schema`-based check of these guards,
+  on `main` as on this branch and in the terminal phase, reads the snapshot taken at the frame's first dictionary read,
+  so another session's later trigger, view, routine or definition change of a table the frame has not opened is seen
+  only by the committed-read frame and the next operation. This lane's table opening removes the last part of that
+  for every inspected table; the rest is recorded as a finding for the guards' owners, not fixed here.
 - **New metadata locks.** The frame now holds shared metadata locks on `users`, `customer_accounts`, `quote_owners` and
   `audit_events` from its first proof to its end; on `main` the reserve already locked the first two rows by reads, and
   the identity and membership tables were already opened by the complete proofs. Another session's DDL on those tables
