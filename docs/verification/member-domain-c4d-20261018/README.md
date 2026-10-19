@@ -105,7 +105,7 @@ cannot be captured twice or adopted by another index call, and it refuses serial
 
 A re-run was chosen over re-proving captured snapshots because `MemberActivationHistoryReader` admits exactly one
 committed frame per snapshot, and a second raw-row reader for the member graph would duplicate that closure. The cost is
-a second complete read, including a brief owner and fence lock.
+a second complete read, including the owner lock and the global `BillingAwardFence` row lock held for the whole read (see the independent review, F3).
 
 Other reads C4e will serve:
 
@@ -201,7 +201,7 @@ was checked:
 | `ProductionMembershipBilling/MembershipCommitWitnessTest` | both | 5 | throwing afterCommit on reserve, release and award; throwing committed delegate; pre-commit control stays generic |
 | `ProductionMemberOriginals/MemberGrantDefinitionsCommitWitnessTest` | both | 1 | throwing afterCommit on definition authoring; dedupe retry |
 | `ProductionMembershipBilling/MembershipNativeCommitWitnessTest` | MySQL only | 3 | the same three writers; commit confirmed from an independent InnoDB session; `innodb_trx` empty; replay |
-| `ProductionMembershipBilling/MembershipCustomerIndexTest` | SQLite (not driver-branching) | 13 | exact projection with no private identifiers; no writes; replay; consumed and released status; 100 bound and sentinel; sentinel authenticated; ledger audit failure; foreign owner; withdrawn owner; withdrawal during commit; pre-bytes success, one use and non-adoption; pre-bytes after withdrawal, ledger change and gate withdrawal; default-off and nested-transaction refusals |
+| `ProductionMembershipBilling/MembershipCustomerIndexTest` | SQLite (not driver-branching) | 12 | exact projection with no private identifiers; no writes; replay; consumed and released status; 100 bound and sentinel; sentinel authenticated; ledger audit failure; foreign owner; withdrawn owner; withdrawal during commit; pre-bytes success, one use and non-adoption; pre-bytes after withdrawal, ledger change and gate withdrawal; default-off and nested-transaction refusals |
 | `ProductionMembershipBilling/MembershipNativeCustomerIndexTest` | MySQL only | 3 | owner, fence, period and redemption rows held (NOWAIT 3572) at commit and released after; the index waits at a writer-held fence (1205) and retains nothing; sequential reserve, then the pre-bytes refusal |
 | `ProductionMembershipBilling/MembershipPeriodAddressedOperationsTest` | both | 4 | period-addressed reserve, expire and release equal the locator results; unknown and malformed ids; another customer's period; a redemption of another period |
 
@@ -463,6 +463,30 @@ server (Octane or FrankenPHP) would sidestep the problem, but it is a host decis
    binds them. Add slow-client bounds, rate limits and the census entries for any native HTTP tests.
 7. Open owner inputs before anything is enabled: display wording, consumption terms, retention text and all approved
    hashes (none approved by the 2026-10-18 decision).
+
+## Independent review
+
+[`independent-review-ef472560-DECISION.md`](independent-review-ef472560-DECISION.md): **APPROVE WITH CONDITIONS** at
+`ef472560`, no P0 or P1; mergeable as a default-off, unmounted development change. The reviewer reran the SQLite suites
+(398 and 794 tests, 0 failures), confirmed the reserve deadline on `main` natively, and, in a characterization copy with only
+the 60 s budgets raised, saw the three native index tests pass (owner, fence and period locks; waiting at a writer-held
+fence; pre-bytes after a reserve). Conditions:
+
+- **Open gates before C4e mounts any route or any member flag or approved hash is set (C2):** native evidence on an exact
+  SHA, with no deadline raised, for the index locks, the writer-held fence, pre-bytes after a reserve, the reservation and
+  release witness and the period-addressed positive path, plus one index latency measurement at about 100 periods.
+- **F3 (P2), a C4e gate:** the customer index holds the global `BillingAwardFence` row lock (`FOR UPDATE`) for its whole read
+  of up to 101 periods, and again for pre-bytes, so a customer-triggered read serializes every member writer across all
+  customers. It must be narrowed or bounded, with measured native latency, before the index is reachable over HTTP.
+- **Performance lane (C3):** prove schema ownership once per owned frame instead of on every row read; tracked as a release
+  blocker (see "Native gap characterization").
+- **Census (C4):** whichever of C4d and D1 merges second redoes the census merge, regenerates the selection, updates both
+  workflow comments and re-runs the safeguards.
+- F11 (the index test has 12 cases, not 13) is corrected above. F4 to F10 (P3) are deferred: no test pins the
+  non-renewable pre-bytes deadline or the witness guard conditions; activation still uses the old classification
+  heuristic (C4e); a lost connection during COMMIT reports `operation_refused`; refusal reasons reveal whether a period
+  exists (C4e must collapse them to one not-found); defense-in-depth checks without tests; the read-view note for the
+  non-locking routing join.
 
 ## Untested conditions
 
