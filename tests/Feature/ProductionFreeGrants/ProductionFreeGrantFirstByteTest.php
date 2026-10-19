@@ -7,7 +7,9 @@ use App\Domain\Grants\ProductionFree\ProductionFreeGrantDocuments;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantDownloads;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantException;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantLibrary;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrantRecords;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrants;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrantSchema;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantTransfer;
 use ArrayObject;
 use Illuminate\Database\Events\TransactionCommitting;
@@ -110,6 +112,27 @@ final class ProductionFreeGrantFirstByteTest extends TestCase
         $this->assertSame(1, $calls);
         $this->assertSame(0, DB::table('production_free_redemptions')->count());
         $this->assertSame(0, DB::table('production_free_revocations')->count());
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::connection()->getPdo()->inTransaction());
+    }
+
+    public function test_a_compared_column_altered_after_the_redemption_commit_sends_zero_bytes(): void
+    {
+        [$owner, $authorization] = $this->authorized('master_wav');
+        $transfer = (new ProductionFreeGrantDownloads)->redeem($authorization['id'], $authorization['token'], $owner['principal'], $owner['user']);
+        // A self-consistent row (re-sealed) under an unchanged schema: only the column-by-column comparison can see it.
+        $this->alterRedemption(function (array $row): array {
+            $row['bytes'] = (int) $row['bytes'] + 1;
+            $row['seal'] = ProductionFreeGrantRecords::seal('production_free_redemptions', $row);
+
+            return $row;
+        });
+        $calls = 0;
+        $this->refuses(fn () => $transfer->writeTo(function () use (&$calls): void {
+            $calls++;
+        }), 'outcome_unknown');
+        $this->assertSame(0, $calls, 'Zero bytes after a compared column changed.');
+        $this->assertSame(1, DB::table('production_free_redemptions')->count());
         $this->assertSame(0, DB::transactionLevel());
         $this->assertFalse(DB::connection()->getPdo()->inTransaction());
     }
@@ -304,6 +327,26 @@ final class ProductionFreeGrantFirstByteTest extends TestCase
             'transactions' => $pdo->query('SELECT trx_mysql_thread_id, trx_state, LEFT(trx_query, 160) query FROM information_schema.INNODB_TRX')->fetchAll(\PDO::FETCH_ASSOC),
             'barriers' => array_map('basename', glob($this->raceDirectory.'/*') ?: []),
         ]));
+    }
+
+    /** Rewrites the single redemption row with its update guard briefly removed, then restores the identical guard. */
+    private function alterRedemption(\Closure $change): void
+    {
+        $table = 'production_free_redemptions';
+        $guard = 'production_free_redemptions_update';
+        $pdo = DB::connection()->getPdo();
+        $sql = DB::getDriverName() === 'mysql'
+            ? (string) $pdo->query('SHOW CREATE TRIGGER `'.$guard.'`')->fetch(\PDO::FETCH_ASSOC)['SQL Original Statement']
+            : (string) $pdo->query("SELECT sql FROM main.sqlite_master WHERE type = 'trigger' AND name = '".$guard."'")->fetchColumn();
+        $this->assertStringContainsString($guard, $sql);
+        $row = (array) DB::table($table)->sole();
+        $pdo->exec(DB::getDriverName() === 'mysql' ? 'DROP TRIGGER `'.$guard.'`' : 'DROP TRIGGER "'.$guard.'"');
+        try {
+            DB::table($table)->where('id', $row['id'])->update($change($row));
+        } finally {
+            $pdo->exec($sql);
+        }
+        (new ProductionFreeGrantSchema)->assertOwned($pdo);
     }
 
     private function secondTransfer(array $owner, array $origin): ProductionFreeGrantTransfer
