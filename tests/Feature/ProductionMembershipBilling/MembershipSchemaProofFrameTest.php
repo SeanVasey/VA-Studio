@@ -5,6 +5,7 @@ namespace Tests\Feature\ProductionMembershipBilling;
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Customers\ProductionIdentity\IdentityRows;
+use App\Domain\Memberships\Production\MembershipAwards;
 use App\Domain\Memberships\Production\MembershipAwardTransaction;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipPeriodRecords;
@@ -237,6 +238,27 @@ class MembershipSchemaProofFrameTest extends TestCase
         }
     }
 
+    public function test_the_award_terminal_phase_proves_in_full_after_remembered_proofs(): void
+    {
+        $fixture = $this->reservationFixture(award: false);
+        $other = DB::getDriverName() === 'mysql' ? $this->independentConnection() : null;
+        $calls = 0;
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, function () use (&$calls, $other): void {
+            $calls++;
+            $sql = 'CREATE TABLE '.self::COLLISION.' (id INTEGER PRIMARY KEY)';
+            $other === null ? DB::connection()->getPdo()->exec($sql) : $other->exec($sql);
+        });
+        try {
+            $this->expectReservationRefused(fn () => (new MembershipAwards)->award($fixture['invoice']['id'],
+                $fixture['buyer']['principal'], $fixture['buyer']['user']));
+            $this->assertSame(1, $calls);
+            $this->assertSame(0, DB::table(MembershipPeriodRecords::PERIODS)->count());
+            $this->assertSame(0, DB::table(MembershipPeriodRecords::EVENTS)->count());
+        } finally {
+            $other?->exec('DROP TABLE IF EXISTS '.self::COLLISION);
+        }
+    }
+
     private function ownedFrame(): MembershipAwardTransaction
     {
         DB::beginTransaction();
@@ -292,6 +314,7 @@ class MembershipSchemaProofFrameTest extends TestCase
         $this->fail('Guard unexpectedly passed.');
     }
 
+    /** A pre-commit refusal of an owned writer: nothing was committed. */
     private function expectReservationRefused(callable $operation): void
     {
         try {
