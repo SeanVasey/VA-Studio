@@ -23,8 +23,9 @@ use Throwable;
  * The frame is owned (owner doc step 3): it must start at framework depth zero on an idle primary, and for its
  * duration the connection's dispatcher is a `ProductionFreeGrantCommitObserver` over a fresh transaction manager.
  * The work receives that observer and registers its terminal proof; ordinary committing listeners run first and the
- * proof re-runs immediately before the physical commit. A failure before the commit rolls back only the owned frame.
- * A failure after the physical commit cannot be a refusal of the write: it is the fixed `outcome_unknown`, never retried.
+ * proof re-runs immediately before the physical commit. A failure that rolls back the owned frame is a refusal. A failure
+ * after the physical commit, or one that finds the frame already gone (a callback's raw or implicit commit, which the
+ * observer detects but cannot prevent), is the fixed `outcome_unknown`, never retried. Deadlocks stay `contention`.
  * The original dispatcher and transaction manager are restored in every outcome.
  */
 final class ProductionFreeGrantTransactions
@@ -98,10 +99,17 @@ final class ProductionFreeGrantTransactions
                     throw $error instanceof ProductionFreeGrantException && $error->reason === 'outcome_unknown'
                         ? $error : new ProductionFreeGrantException('outcome_unknown');
                 }
+                // A deadlock or lock wait timeout means the server rolled the frame back: nothing of it is durable.
+                $contended = self::contended($error) || ($error instanceof ProductionFreeGrantException && $error->reason === 'contention');
                 try {
-                    $observer->abort();
+                    $rolledBack = $observer->abort();
                 } catch (Throwable) {
-                    throw new ProductionFreeGrantException('changed_transaction');
+                    throw new ProductionFreeGrantException('outcome_unknown');
+                }
+                if (! $rolledBack && $observer->began() && ! $contended) {
+                    // The owned frame was no longer ours to roll back: a callback's raw or implicit commit may already have
+                    // made this command's writes durable before the terminal proof. That is an unknown outcome, not a refusal.
+                    throw new ProductionFreeGrantException('outcome_unknown');
                 }
                 throw $error;
             }

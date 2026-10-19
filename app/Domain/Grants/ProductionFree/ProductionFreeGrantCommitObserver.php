@@ -22,7 +22,8 @@ use Throwable;
  * proof (current owner, policy and graph) and the permanent parent floor (F-4) are re-proved on the same primary.
  *
  * The frame carries a random savepoint taken before any ordinary beginning listener, so a callback's raw commit or
- * reopen is detected (the savepoint is gone even when PDO still reports a transaction). A second frame on this
+ * reopen is detected (the savepoint is gone even when PDO still reports a transaction). Detection cannot undo a raw or
+ * implicit commit that already happened, so that outcome is reported as unknown, never as a refusal. A second frame on this
  * connection (nesting), a replaced dispatcher or transaction manager, or a frame without a registered terminal proof
  * refuses the commit. Nothing here retries or renews anything.
  */
@@ -58,11 +59,19 @@ final class ProductionFreeGrantCommitObserver implements Dispatcher
         ProductionFreeGrantException::require($this->proved && ! $this->refused, 'commit_not_proved');
     }
 
+    /** True once the owned frame began and took its savepoint, so writes may have been issued inside it. */
+    public function began(): bool
+    {
+        return $this->marker !== null;
+    }
+
     /**
-     * Roll back only the frame this observer owns. A callback-created replacement transaction (its savepoint is not
-     * ours) is never rolled back; the framework level is reset to idle without touching it.
+     * Roll back only the frame this observer owns, and say whether it did. A callback-created replacement transaction
+     * (its savepoint is not ours) is never rolled back; the framework level is reset to idle without touching it.
+     * `false` after the frame began means its fate is unknown: a raw or implicit commit by a callback may already have
+     * made its writes durable. The observer can detect that, not prevent it.
      */
-    public function abort(): void
+    public function abort(): bool
     {
         $owned = false;
         if ($this->primary->inTransaction()) {
@@ -82,12 +91,14 @@ final class ProductionFreeGrantCommitObserver implements Dispatcher
         if ($owned && $cached === $this->primary && $this->connection->transactionLevel() === 1) {
             $this->connection->rollBack();
 
-            return;
+            return true;
         }
         if ($owned) {
             $this->primary->rollBack();
         }
         $this->connection->setPdo($cached);
+
+        return $owned;
     }
 
     public function dispatch($event, $payload = [], $halt = false)

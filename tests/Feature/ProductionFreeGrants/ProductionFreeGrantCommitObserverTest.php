@@ -29,8 +29,9 @@ use Tests\TestCase;
 /**
  * Owner doc step 3: every Free256 frame is committed only after the ordinary committing listeners have run and the
  * command's terminal proof (owner, policy, graph) plus the permanent parent floor have been re-proved on the same
- * primary. A withdrawal inside a committing listener rolls the whole command back; reopen, nesting and dispatcher drift
- * refuse; the original dispatcher and transaction manager are always restored.
+ * primary. A withdrawal inside a committing listener rolls the whole command back; nesting and dispatcher drift refuse;
+ * a callback's raw commit, rollback or reopen is detected and reported as an unknown outcome, never as a refusal; the
+ * original dispatcher and transaction manager are always restored.
  */
 final class ProductionFreeGrantCommitObserverTest extends TestCase
 {
@@ -118,7 +119,41 @@ final class ProductionFreeGrantCommitObserverTest extends TestCase
         $this->assertIdle();
     }
 
-    public function test_a_raw_reopen_by_a_committing_listener_is_refused_and_the_replacement_is_left_to_its_owner(): void
+    public function test_a_raw_commit_by_a_committing_listener_is_an_unknown_outcome_not_a_refusal(): void
+    {
+        [$owner, $definition, $review] = $this->reviewed();
+        $pdo = DB::connection()->getPdo();
+        $calls = $this->duringCommit('production_free_origins', fn () => $pdo->commit());
+        // The listener made the origin durable before the terminal proof: the observer detects it but cannot undo it.
+        $this->refuses(fn () => (new ProductionFreeGrants)->accept($definition['id'], $this->assentInput($review), $owner['principal'], $owner['user']), 'outcome_unknown');
+        $this->assertSame(1, $calls());
+        $this->assertSame(1, DB::table('production_free_origins')->count());
+        $this->assertIdle();
+    }
+
+    public function test_a_raw_commit_and_reopen_by_a_committing_listener_is_an_unknown_outcome_and_the_replacement_is_left_to_its_owner(): void
+    {
+        [$owner, $definition, $review] = $this->reviewed();
+        $pdo = DB::connection()->getPdo();
+        $calls = $this->duringCommit('production_free_origins', function () use ($pdo): void {
+            $pdo->commit();
+            $pdo->beginTransaction();
+        });
+        try {
+            $this->refuses(fn () => (new ProductionFreeGrants)->accept($definition['id'], $this->assentInput($review), $owner['principal'], $owner['user']), 'outcome_unknown');
+            $this->assertSame(1, $calls());
+            // The callback's replacement transaction is not rolled back by the observer; the framework level is reset.
+            $this->assertTrue($pdo->inTransaction());
+            $this->assertSame(0, DB::transactionLevel());
+        } finally {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+        }
+        $this->assertSame(1, DB::table('production_free_origins')->count());
+    }
+
+    public function test_a_raw_rollback_and_reopen_by_a_committing_listener_is_an_unknown_outcome_and_the_replacement_is_left_to_its_owner(): void
     {
         [$owner, $definition, $review] = $this->reviewed();
         $pdo = DB::connection()->getPdo();
@@ -127,9 +162,9 @@ final class ProductionFreeGrantCommitObserverTest extends TestCase
             $pdo->beginTransaction();
         });
         try {
-            $this->refuses(fn () => (new ProductionFreeGrants)->accept($definition['id'], $this->assentInput($review), $owner['principal'], $owner['user']), 'changed_transaction');
+            // A vanished frame is indistinguishable from a committed one, so it is never reported as a refusal.
+            $this->refuses(fn () => (new ProductionFreeGrants)->accept($definition['id'], $this->assentInput($review), $owner['principal'], $owner['user']), 'outcome_unknown');
             $this->assertSame(1, $calls());
-            // The callback's replacement transaction is not rolled back by the observer; the framework level is reset.
             $this->assertTrue($pdo->inTransaction());
             $this->assertSame(0, DB::transactionLevel());
         } finally {
