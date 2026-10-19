@@ -1125,6 +1125,30 @@
     [
       "Tests\\Feature\\TestPaymentConcurrencyTest",
       "test_reconciliation_racing_a_receipt_worker_for_one_payment_records_one_confirmation"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCommitWitnessTest",
+      "test_native_throwing_after_commit_reservation_is_committed_on_innodb_and_replays"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCommitWitnessTest",
+      "test_native_throwing_after_commit_award_is_committed_on_innodb_and_replays"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCommitWitnessTest",
+      "test_native_throwing_after_commit_authoring_is_committed_on_innodb"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_index_holds_owner_fence_and_period_locks_until_commit_then_releases_them"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_index_waits_at_a_writer_held_fence_and_retains_no_lock_after_refusal"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_index_and_reserve_interleave_sequentially_and_pre_bytes_sees_the_change"
     ]
   ]
 }
