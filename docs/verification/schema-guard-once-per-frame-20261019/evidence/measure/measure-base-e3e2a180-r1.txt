@@ -1,0 +1,31 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/g1/phpunit.xml
+
+E                                                                   1 / 1 (100%)
+
+Time: 08:23.610, Memory: 93.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipReservationLifecycleTest::test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+/home/user/wt/g1/app/Domain/Memberships/Production/MembershipException.php:16
+/home/user/wt/g1/app/Domain/Memberships/Production/MembershipReservationContext.php:786
+/home/user/wt/g1/app/Domain/Memberships/Production/MembershipReservationContext.php:758
+/home/user/wt/g1/app/Domain/Memberships/Production/MembershipReservationContext.php:335
+/home/user/wt/g1/app/Domain/Memberships/Production/MembershipReservationContext.php:212
+/home/user/wt/g1/app/Domain/Memberships/Production/MembershipReservationObserver.php:85
+/home/user/wt/g1/vendor/laravel/framework/src/Illuminate/Database/Connection.php:1143
+/home/user/wt/g1/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:206
+/home/user/wt/g1/app/Domain/Memberships/Production/MembershipReservationOperations.php:163
+/home/user/wt/g1/app/Domain/Memberships/Production/MembershipReservationOperations.php:88
+/home/user/wt/g1/app/Domain/Memberships/Production/MembershipReservationOperations.php:40
+/home/user/wt/g1/tests/Support/MembershipReservationFixtures.php:105
+/home/user/wt/g1/tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php:37
+/home/user/wt/g1/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 13, Errors: 1.

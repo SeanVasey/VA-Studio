@@ -1,0 +1,43 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/phpunit.xml
+
+FFFF                                                                4 / 4 (100%)
+
+Time: 16:58.741, Memory: 110.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\ProductionMemberGrants\MemberObserverTerminalProofTest::test_the_authoring_terminal_phase_proves_in_full_after_remembered_proofs
+Failed asserting that an instance of class PHPUnit\Framework\AssertionFailedError is not an instance of class PHPUnit\Framework\AssertionFailedError.
+
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:134
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:60
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMemberGrants\MemberObserverTerminalProofTest::test_the_original_terminal_phase_proves_in_full_after_remembered_proofs
+App\Domain\Grants\Member\MemberGrantException
+Failed asserting that 'committed_source_refused' [ASCII](length: 24) does not contain "committed" [ASCII](length: 9).
+
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:135
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:71
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMemberGrants\MemberObserverTerminalProofTest::test_the_activation_terminal_phase_proves_in_full_after_remembered_proofs
+App\Domain\Grants\Member\MemberGrantException
+Failed asserting that 'committed_activation_receipt_refused' [ASCII](length: 36) does not contain "committed" [ASCII](length: 9).
+
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:135
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:81
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMemberGrants\MemberObserverTerminalProofTest::test_the_activation_read_terminal_phase_proves_in_full_after_remembered_proofs
+Failed asserting that false is true.
+
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:142
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php:92
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-fix/mut/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 4, Assertions: 60, Failures: 4.

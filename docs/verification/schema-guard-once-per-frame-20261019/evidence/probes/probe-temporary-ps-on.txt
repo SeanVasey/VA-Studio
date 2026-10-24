@@ -1,0 +1,26 @@
+performance_schema=1
+direct               created savepoint_survives survives_drop_temporary temporary=yes rolled_back_insert=yes
+  before={"Com_call_procedure":"0","Com_create_table":"0","Com_drop_table":"0","Com_execute_sql":"0","Com_stmt_execute":"0"}
+  after ={"Com_call_procedure":"0","Com_create_table":"1","Com_drop_table":"0","Com_execute_sql":"0","Com_stmt_execute":"0"}
+like                 created savepoint_survives survives_drop_temporary temporary=yes rolled_back_insert=yes
+  before={"Com_call_procedure":"0","Com_create_table":"0","Com_drop_table":"0","Com_execute_sql":"0","Com_stmt_execute":"0"}
+  after ={"Com_call_procedure":"0","Com_create_table":"1","Com_drop_table":"0","Com_execute_sql":"0","Com_stmt_execute":"0"}
+as_select            created savepoint_survives survives_drop_temporary temporary=yes rolled_back_insert=yes
+  before={"Com_call_procedure":"0","Com_create_table":"0","Com_drop_table":"0","Com_execute_sql":"0","Com_stmt_execute":"0"}
+  after ={"Com_call_procedure":"0","Com_create_table":"1","Com_drop_table":"0","Com_execute_sql":"0","Com_stmt_execute":"0"}
+qualified            created savepoint_survives survives_drop_temporary temporary=yes rolled_back_insert=yes
+  before={"Com_call_procedure":"0","Com_create_table":"0","Com_drop_table":"0","Com_execute_sql":"0","Com_stmt_execute":"0"}
+  after ={"Com_call_procedure":"0","Com_create_table":"1","Com_drop_table":"0","Com_execute_sql":"0","Com_stmt_execute":"0"}
+sql_prepare          created savepoint_survives survives_drop_temporary temporary=yes rolled_back_insert=yes
+  before={"Com_call_procedure":"0","Com_create_table":"0","Com_drop_table":"0","Com_execute_sql":"0","Com_stmt_execute":"0"}
+  after ={"Com_call_procedure":"0","Com_create_table":"1","Com_drop_table":"0","Com_execute_sql":"1","Com_stmt_execute":"1"}
+pdo_native_prepare   created savepoint_survives survives_drop_temporary temporary=yes rolled_back_insert=yes
+  before={"Com_call_procedure":"0","Com_create_table":"0","Com_drop_table":"0","Com_execute_sql":"0","Com_stmt_execute":"0"}
+  after ={"Com_call_procedure":"0","Com_create_table":"1","Com_drop_table":"0","Com_execute_sql":"0","Com_stmt_execute":"1"}
+call_procedure       created savepoint_survives survives_drop_temporary temporary=yes rolled_back_insert=yes
+  before={"Com_call_procedure":"0","Com_create_table":"0","Com_drop_table":"0","Com_execute_sql":"0","Com_stmt_execute":"0"}
+  after ={"Com_call_procedure":"1","Com_create_table":"1","Com_drop_table":"0","Com_execute_sql":"0","Com_stmt_execute":"0"}
+stored_function      created savepoint_survives survives_drop_temporary temporary=yes rolled_back_insert=yes
+  before={"Com_call_procedure":"0","Com_create_table":"0","Com_drop_table":"0","Com_execute_sql":"0","Com_stmt_execute":"0"}
+  after ={"Com_call_procedure":"0","Com_create_table":"1","Com_drop_table":"0","Com_execute_sql":"0","Com_stmt_execute":"0"}
+SET foreign_key_checks / USE keep savepoint: yes, now fk=0

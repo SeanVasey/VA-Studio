@@ -189,28 +189,7 @@ final class IdentityMigrationOwnership
                     }
                 }
             }
-            foreach ($pdo->query('SELECT TRIGGER_SCHEMA,TRIGGER_NAME,EVENT_OBJECT_TABLE,ACTION_STATEMENT FROM information_schema.TRIGGERS')->fetchAll(PDO::FETCH_ASSOC) as $object) {
-                if (isset($guards[$object['TRIGGER_NAME']]) && $object['TRIGGER_SCHEMA'] === $this->database($pdo)) {
-                    continue;
-                }
-                if (($object['TRIGGER_SCHEMA'] === $this->database($pdo) && in_array($object['EVENT_OBJECT_TABLE'], $tables, true))
-                    || $this->dependsOn($pdo, $object['TRIGGER_SCHEMA'], $object['ACTION_STATEMENT'], $tables)) {
-                    $this->reject();
-                }
-            }
-            foreach ($pdo->query('SELECT TABLE_SCHEMA,TABLE_NAME,REFERENCED_TABLE_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA=DATABASE()')->fetchAll(PDO::FETCH_ASSOC) as $key) {
-                if (in_array(strtolower((string) $key['REFERENCED_TABLE_NAME']), $tables, true)
-                    && ($key['TABLE_SCHEMA'] !== $this->database($pdo) || ! in_array($key['TABLE_NAME'], $tables, true))) {
-                    $this->reject();
-                }
-            }
-            foreach (['VIEWS' => ['TABLE_SCHEMA', 'VIEW_DEFINITION'], 'ROUTINES' => ['ROUTINE_SCHEMA', 'ROUTINE_DEFINITION']] as $catalog => [$schema, $column]) {
-                foreach ($pdo->query('SELECT '.$schema.','.$column.' FROM information_schema.'.$catalog)->fetchAll(PDO::FETCH_ASSOC) as $object) {
-                    if ($this->dependsOn($pdo, $object[$schema], $object[$column], $tables)) {
-                        $this->reject();
-                    }
-                }
-            }
+            $this->dependents($pdo, $tables, $guards);
         }
         $missing = false;
         foreach ($present as $installed) {
@@ -230,6 +209,47 @@ final class IdentityMigrationOwnership
         }
 
         return [$present, $populated];
+    }
+
+    /**
+     * The MySQL cross-schema dependents scan of inspect(), alone. A trigger, view or routine that reaches these
+     * tables can be created without a metadata lock on them, so SchemaProofFrame repeats this on every reuse.
+     */
+    public function assertNoDependents(PDO $pdo): void
+    {
+        $this->database = null;
+        $this->batches = [];
+        if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) !== 'mysql') {
+            $this->reject();
+        }
+        $this->dependents($pdo, array_keys(IdentitySchema::definitions()), IdentitySchema::guards('mysql'));
+    }
+
+    /** No foreign trigger, key, view or routine depends on the identity tables (MySQL). */
+    private function dependents(PDO $pdo, array $tables, array $guards): void
+    {
+        foreach ($pdo->query('SELECT TRIGGER_SCHEMA,TRIGGER_NAME,EVENT_OBJECT_TABLE,ACTION_STATEMENT FROM information_schema.TRIGGERS')->fetchAll(PDO::FETCH_ASSOC) as $object) {
+            if (isset($guards[$object['TRIGGER_NAME']]) && $object['TRIGGER_SCHEMA'] === $this->database($pdo)) {
+                continue;
+            }
+            if (($object['TRIGGER_SCHEMA'] === $this->database($pdo) && in_array($object['EVENT_OBJECT_TABLE'], $tables, true))
+                || $this->dependsOn($pdo, $object['TRIGGER_SCHEMA'], $object['ACTION_STATEMENT'], $tables)) {
+                $this->reject();
+            }
+        }
+        foreach ($pdo->query('SELECT TABLE_SCHEMA,TABLE_NAME,REFERENCED_TABLE_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA=DATABASE()')->fetchAll(PDO::FETCH_ASSOC) as $key) {
+            if (in_array(strtolower((string) $key['REFERENCED_TABLE_NAME']), $tables, true)
+                && ($key['TABLE_SCHEMA'] !== $this->database($pdo) || ! in_array($key['TABLE_NAME'], $tables, true))) {
+                $this->reject();
+            }
+        }
+        foreach (['VIEWS' => ['TABLE_SCHEMA', 'VIEW_DEFINITION'], 'ROUTINES' => ['ROUTINE_SCHEMA', 'ROUTINE_DEFINITION']] as $catalog => [$schema, $column]) {
+            foreach ($pdo->query('SELECT '.$schema.','.$column.' FROM information_schema.'.$catalog)->fetchAll(PDO::FETCH_ASSOC) as $object) {
+                if ($this->dependsOn($pdo, $object[$schema], $object[$column], $tables)) {
+                    $this->reject();
+                }
+            }
+        }
     }
 
     /** Retained foundation metadata is a dependency, never something this migration repairs or adopts. */
