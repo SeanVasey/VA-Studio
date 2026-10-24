@@ -9,6 +9,7 @@ use App\Domain\Customers\CustomerAccessPolicy;
 use App\Domain\SiteBuilder\EditorialContent;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteImagePresentation;
+use App\Support\PublicStructuredData;
 use App\Support\StorefrontMetadata;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,6 +28,8 @@ class StorefrontController extends Controller
         $siteContent = app(SiteContent::class)->current();
         $images = app(SiteImagePresentation::class);
         $metadata = app(StorefrontMetadata::class)->forPage($selectedTrack, $siteContent, $images->share($siteContent));
+        $structured = app(PublicStructuredData::class);
+        $metadata['structuredData'] = $selectedTrack === null ? $structured->forHome($metadata) : $structured->forTrack($selectedTrack, $metadata);
 
         return Inertia::render('Storefront', $catalog + ['siteContent' => app(EditorialContent::class)->chrome($siteContent), 'siteImages' => $images->storefront($siteContent),
             'selectedTrack' => $selectedTrack, 'selectedTrackSlug' => $slug, 'commerceEnabled' => false,

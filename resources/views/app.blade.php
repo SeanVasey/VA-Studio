@@ -40,6 +40,10 @@
             <meta data-inertia="twitter:description" name="twitter:description" content="{{ $metadata['description'] }}">
             <meta data-inertia="twitter:image" name="twitter:image" content="{{ $metadata['imageUrl'] }}">
             <meta data-inertia="twitter:image:alt" name="twitter:image:alt" content="{{ $metadata['imageAlt'] }}">
+            @if (is_string($metadata['structuredData'] ?? null))
+                {{-- Raw by design: PublicStructuredData emits ASCII JSON with every <, > and & escaped, so it cannot close this element. --}}
+                <script data-inertia="structured-data" type="application/ld+json">{!! $metadata['structuredData'] !!}</script>
+            @endif
         @endisset
         @endisset
     </x-inertia::head>

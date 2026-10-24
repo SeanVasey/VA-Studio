@@ -6,6 +6,7 @@ use App\Domain\Inquiries\InquiryPolicy;
 use App\Domain\SiteBuilder\EditorialContent;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteImagePresentation;
+use App\Support\PublicStructuredData;
 use App\Support\StorefrontMetadata;
 use App\Support\SupportAttachmentUi;
 use Inertia\Inertia;
@@ -20,6 +21,8 @@ final class EditorialController extends Controller
         $page = app(EditorialContent::class)->page($content, $section, $slug);
         abort_if($page === null, 404);
         $metadata = app(StorefrontMetadata::class)->forEditorial($page, app(SiteImagePresentation::class)->share($content));
+        $collection = $slug === null ? null : app(EditorialContent::class)->page($content, $section, null, false);
+        $metadata['structuredData'] = app(PublicStructuredData::class)->forEditorial($page, $metadata, $collection);
 
         $inquiry = $section === 'contact' ? app(InquiryPolicy::class)->publicSetup($content) : null;
 
