@@ -1140,11 +1140,11 @@
     ],
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
-      "test_native_index_holds_owner_fence_and_period_locks_until_commit_then_releases_them"
+      "test_native_index_holds_owner_and_period_locks_but_not_the_global_fence_then_releases_them"
     ],
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
-      "test_native_index_waits_at_a_writer_held_fence_and_retains_no_lock_after_refusal"
+      "test_native_index_waits_at_a_writer_held_owner_lock_and_retains_no_lock_after_refusal"
     ],
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
@@ -1165,6 +1165,10 @@
     [
       "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantFirstByteTest",
       "test_native_independent_process_revocation_across_the_first_byte"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_index_completes_while_another_customers_writer_holds_the_global_fence"
     ]
   ]
 }
