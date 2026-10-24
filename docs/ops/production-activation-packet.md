@@ -38,8 +38,11 @@ lands, the stage that depends on it stays blocked whatever the environment conta
 ### Pre-launch capability hold (approved by Sean, 2026-10-18)
 
 Three of these flags have no environment gate in the application, so on production nothing but the validator stops a host
-`.env` that sets one to `true`; the fourth, V2 listening promotion, is held as defence in depth (see its row). `ops/production/validate-runtime.php` refuses each unless it is false (`PRE_LAUNCH_HOLDS` in that file;
-the same keys as `scripts/ops/capability-boundary.php`). A flag in the candidate file passes only as `false` or `(false)`, in any
+`.env` that sets one to `true`; the fourth, V2 listening promotion, is held as defence in depth (see its row).
+`ops/production/validate-runtime.php` refuses each unless it is false. It names the four environment keys (`PRE_LAUNCH_HOLDS`
+in that file) and reads each flag's config key from `scripts/ops/capability-boundary.php`, so the hold cannot check a stale
+key; a boundary that is missing, or no longer holds one of the keys, is refused as `runtime.unavailable`.
+A flag in the candidate file passes only as `false` or `(false)`, in any
 letter case and quoted or not; a blank or any other value fails, a key written with no `=` is refused as well (the runtime
 would read it as unset; refusing it fails closed), and an unset flag is allowed because the configuration default is false. The
 effective configuration must also read strictly `false`, so a renamed or removed config key fails closed. A refusal prints
@@ -57,7 +60,7 @@ Sean's explicit authorization for that activation. Setting the flag on the host 
 candidate environment, and the deploy stops. Because a deploy validates the candidate `.env` with the served release's
 validator before it builds, lifting takes two steps: deploy the validator change with the flag still false, then set the flag
 and let the deploy refresh the environment. `PRE_LAUNCH_HOLDS` in `tests/ops/test_production_runtime_validator.py` changes
-with the validator. `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED` is not in this list because its command
+with the validator and the boundary. `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED` is not in this list because its command
 already refuses production by itself.
 
 ## 2. Inputs only Sean can supply

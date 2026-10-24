@@ -2,20 +2,93 @@
 """Execute real isolated PHP bootstrap and startup guards, not browser/scanner acceptance."""
 
 import base64
+import calendar
 import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import secrets
 import shlex
 import shutil
 import sqlite3
 import subprocess
 import tempfile
+import time
 import unittest
 
 
 ROOT = Path(__file__).resolve().parents[2]
+
+# Phases the isolated bootstrap may report (tests/browser/bootstrap.php). Its refusal prints only one of these and a bounded class
+# name, so that fixed line, and nothing else it prints, may appear in a failure message here.
+BOOTSTRAP_PHASES = {
+    "isolation", "stage_identity", "scanner_prerequisite", "application_boot", "effective_configuration", "migrations",
+    "operator_provisioning", "customer_provisioning", "catalog_fixtures", "catalog_manifest", "installation_diagnostics",
+    "customer_purchase", "customer_manifest", "delivery_evidence", "delivery_stream", "customer_manifest_write",
+}
+
+
+def unmet_prerequisites(root=ROOT, clamscan="/usr/bin/clamscan"):
+    """What the CI stage provides before it runs this file, and this checkout may lack.
+
+    The hosted stage runs `npm ci`, `npm run build` and the genuine-scanner installer first. Without them the fixtures fail
+    for environmental reasons that the bare "bootstrap failed" assertion cannot tell apart from a real regression: Playwright
+    is missing, `vasey:doctor` reports `frontend_build` failed (the bootstrap runs it), or the scanner's signatures are older
+    than `media.max_signature_age_seconds`, which the ordinary fixtures refuse by design. This only reports; it never skips.
+    """
+    gaps = []
+    if not (root / "node_modules/playwright-core/lib/coreBundle.js").is_file():
+        gaps.append("node_modules is missing or incomplete (run npm ci)")
+    if not (root / "public/build/manifest.json").is_file():
+        gaps.append("public/build/manifest.json is missing (run npm run build; vasey:doctor's frontend_build check and "
+                    "tests/browser/run.mjs need it, while the PHP unit suite needs it absent, so remove it afterwards)")
+    limit = 172800
+    config = root / "config/media.php"
+    if config.is_file():
+        match = re.search(r"'max_signature_age_seconds'\s*=>\s*(\d+)", config.read_text())
+        limit = int(match.group(1)) if match else limit
+    try:
+        version = subprocess.run([clamscan, "--version"], capture_output=True, text=True, timeout=30, env={"PATH": "/usr/bin:/bin", "TZ": "UTC"}).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        version = ""
+    parts = version.split("/", 2)
+    if not version.startswith("ClamAV ") or len(parts) != 3 or not parts[1].isdigit():
+        gaps.append("the ClamAV scanner prints no signature date (install it and load signatures with freshclam)")
+    else:
+        try:
+            age = time.time() - calendar.timegm(time.strptime(parts[2].strip(), "%a %b %d %H:%M:%S %Y"))
+        except ValueError:
+            age = None
+        if age is None or age > limit or age < -3600:
+            gaps.append("the ClamAV signatures are stale or undated (freshclam; the ordinary fixtures refuse a database older than %d s)" % limit)
+    return gaps
+
+
+def safe_diagnosis(stderr):
+    """The bootstrap's fixed `{phase, exception_class}` line, when stderr ends with exactly that; otherwise nothing."""
+    lines = stderr.splitlines()
+    if not lines:
+        return ""
+    try:
+        record = json.loads(lines[-1])
+    except ValueError:
+        return ""
+    if (not isinstance(record, dict) or set(record) != {"phase", "exception_class"} or record["phase"] not in BOOTSTRAP_PHASES
+            or not isinstance(record["exception_class"], str) or len(record["exception_class"]) > 160
+            or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*(?:\\[A-Za-z_][A-Za-z0-9_]*)*", record["exception_class"])):
+        return ""
+    return " Bootstrap stopped in phase %s (%s)." % (record["phase"], record["exception_class"])
+
+
+def prerequisite_note():
+    gaps = unmet_prerequisites()
+    return " Unmet prerequisites of this stage: " + "; ".join(gaps) + "." if gaps else ""
+
+
+def failure_note(stderr):
+    """Appended to a bootstrap failure message: the safe phase line and every unmet prerequisite of this checkout."""
+    return safe_diagnosis(stderr) + prerequisite_note()
 
 
 class RelatedBrowserStageSafeguards(unittest.TestCase):
@@ -108,6 +181,48 @@ class RelatedBrowserStageSafeguards(unittest.TestCase):
         self.assertEqual(result.stdout, "")
 
 
+class FailureDiagnosisHelpers(unittest.TestCase):
+    """The helpers only explain a failure; these prove they report what is missing and never echo private output."""
+
+    def test_each_missing_prerequisite_is_reported_and_a_complete_checkout_reports_none_of_the_files(self):
+        with tempfile.TemporaryDirectory(prefix="vasey-prerequisites-") as temporary:
+            root = Path(temporary)
+            (root / "config").mkdir()
+            (root / "config/media.php").write_text("<?php return ['max_signature_age_seconds' => 172800];\n")
+            fresh = time.strftime("%a %b %d %H:%M:%S %Y", time.gmtime())
+            scanner = root / "clamscan"
+            scanner.write_text("#!/bin/sh\necho 'ClamAV 1.5.4/28144/%s'\n" % fresh)
+            scanner.chmod(0o700)
+            gaps = unmet_prerequisites(root, str(scanner))
+            self.assertEqual([gap.split(" ")[0] for gap in gaps], ["node_modules", "public/build/manifest.json"])
+            (root / "node_modules/playwright-core/lib").mkdir(parents=True)
+            (root / "node_modules/playwright-core/lib/coreBundle.js").write_text("")
+            (root / "public/build").mkdir(parents=True)
+            (root / "public/build/manifest.json").write_text("{}")
+            self.assertEqual(unmet_prerequisites(root, str(scanner)), [])
+            # A database older than the configured limit is refused by the fixtures, so it is reported.
+            scanner.write_text("#!/bin/sh\necho 'ClamAV 1.5.4/28100/Sat Oct  3 08:00:00 2026'\n")
+            self.assertEqual(len(unmet_prerequisites(root, str(scanner))), 1)
+            self.assertIn("ClamAV signatures are stale", unmet_prerequisites(root, str(scanner))[0])
+            # An undated or absent scanner is reported too.
+            scanner.write_text("#!/bin/sh\necho 'ClamAV 1.5.4'\n")
+            self.assertIn("prints no signature date", unmet_prerequisites(root, str(scanner))[0])
+            self.assertIn("prints no signature date", unmet_prerequisites(root, str(root / "absent"))[0])
+
+    def test_only_the_fixed_phase_line_is_ever_echoed(self):
+        self.assertEqual(safe_diagnosis('{"phase":"installation_diagnostics","exception_class":"RuntimeException"}\n'),
+                         " Bootstrap stopped in phase installation_diagnostics (RuntimeException).")
+        self.assertEqual(safe_diagnosis('Isolated browser fixture setup failed; no browser run was started.\n'
+                                        '{"phase":"customer_purchase","exception_class":"App\\\\Domain\\\\Media\\\\MediaFailure"}\n'),
+                         " Bootstrap stopped in phase customer_purchase (App\\Domain\\Media\\MediaFailure).")
+        for stderr in ["", "private-token\n", '{"phase":"unknown","exception_class":"RuntimeException"}',
+                       '{"phase":"migrations","exception_class":"RuntimeException","message":"private"}',
+                       '{"phase":"migrations","exception_class":"has space"}', '{"phase":"migrations","exception_class":"' + "A" * 161 + '"}',
+                       '{"phase":"migrations","exception_class":["x"]}', '["migrations"]', '{"phase":"migrations"}']:
+            with self.subTest(stderr=stderr[:40]):
+                self.assertEqual(safe_diagnosis(stderr), "")
+
+
 class BrowserBootstrapFixtures(unittest.TestCase):
     PROJECTS = {"chromium-desktop": "CHROMIUM", "webkit-mobile": "WEBKIT"}
 
@@ -177,7 +292,7 @@ class BrowserBootstrapFixtures(unittest.TestCase):
 
     def assert_bootstrapped(self, directory, result):
         # Do not print arbitrary PHP output/environment on failure.
-        self.assertEqual(result.returncode, 0, "The native isolated PHP bootstrap failed.")
+        self.assertEqual(result.returncode, 0, "The native isolated PHP bootstrap failed." + failure_note(result.stderr))
         self.assertTrue(result.stderr == "", "The native bootstrap emitted unexpected diagnostic output.")
         self.assertTrue(result.stdout == "Fresh SQLite migrations, interactive operator command and installation diagnostics passed.\n",
                         "The native bootstrap did not emit its fixed success receipt.")
@@ -342,7 +457,7 @@ class BrowserBootstrapFixtures(unittest.TestCase):
             self.assertTrue(result.stderr == "Isolated browser fixture setup failed; no browser run was started.\n"
                             '{"phase":"isolation","exception_class":"RuntimeException"}\n'
                             "Isolated browser fixture setup failed.\n",
-                            "Runner refusal exposed unexpected fields or values.")
+                            "Runner refusal exposed unexpected fields or values." + prerequisite_note())
             self.assertTrue(observed.is_file(), "The actual runner did not reach its PHP setup process.")
             private_directory = Path(observed.read_text())
             self.assertEqual(private_directory.parent, Path("/tmp"))

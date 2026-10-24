@@ -102,7 +102,13 @@ by at most about an hour plus the run time (independent review R3 of the Filamen
 notification is `SESSION_LIFETIME`). It is a production requirement that the scheduler is
 running, `CACHE_STORE=database` is set, and the cache is one shared persistent store (not `array`, and not a `file` store that
 differs between hosts): otherwise notifications that cross requests and TOTP replay records are lost or not shared. Never clear the
-cache to tidy it; that resets the throttles and the TOTP replay records. Nothing has run on a host (above), and the production host
+cache to tidy it; that resets the throttles and the TOTP replay records. The command prunes every distinct database store the
+application uses (the default, `filament.cache_store`, `cache.limiter` and the database members of a `failover` store); a store of
+another type is left to that store, and a host that moves one of them to a Redis or file store owns its expiry there. Expiry is
+judged by the scheduler host's clock, so when more than one host shares the cache (U-02) every host, the scheduler's included,
+must run NTP time sync (`timedatectl show -p NTPSynchronized` reads `yes`): a scheduler clock ahead of the web hosts by N seconds
+removes rows up to N seconds early, which shortens a throttle window by that much (Laravel's own read path has the same exposure).
+Nothing has run on a host (above), and the production host
 is undecided (U-02), so this is configuration evidence only: see
 [`docs/verification/cache-prune-20261024/README.md`](../../docs/verification/cache-prune-20261024/README.md).
 
@@ -155,11 +161,12 @@ These are application or review items this kit deliberately does not do:
    mounting, membership billing). Each needs Sean's separate authorization.
 5. **Scheduler heartbeat.** The application leaves no trace when no release is due; a ping on schedule success is a reviewed change.
 6. **Pre-launch capability hold (approved by Sean, 2026-10-18).** `ops/production/validate-runtime.php` refuses four flags unless they
-   are false: `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` and `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED` (no environment gate; each admits
-   once an adapter is bound by other code, and none ships today), `DISCOVERY_SITEMAP_ENABLED` (the public index serves track sitemaps in
-   production once it is true) and `VASEY_LISTENING_V2_PROMOTION_ENABLED` (a one-way data promotion; its only consumer needs a customer session, which only the test
-   customer access path creates, so this one is defence in depth). They are
-   the `PRE_LAUNCH_HOLDS` entries in that file, and a refusal is `holds.<lowercase flag name>`. Lifting one is a reviewed change to the
+   are false: `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` and `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED` (no environment gate; each
+   admits once an adapter is bound by other code, and none ships today), `DISCOVERY_SITEMAP_ENABLED` (the public index serves track
+   sitemaps in production once it is true) and `VASEY_LISTENING_V2_PROMOTION_ENABLED` (a one-way data promotion; its only consumer
+   needs a customer session, which only the test customer access path creates, so this one is defence in depth). The validator
+   names them in `PRE_LAUNCH_HOLDS` and reads their config keys from `scripts/ops/capability-boundary.php`; a refusal is
+   `holds.<lowercase flag name>`. Lifting one is a reviewed change to the
    validator together with Sean's authorization for that activation; see `docs/ops/production-activation-packet.md` (section 1). The
    `VASEY_TEST_*` flags, the support fixture and the synthetic rehearsal catalog flag (`VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED`) are
    refused by their own environment gates or by the preflight, not by this hold.

@@ -287,7 +287,10 @@ must share that one database store. Laravel deletes an expired row only when tha
 unexpired row, so throttles, held locks and the TOTP replay records (`forever` is ten years ahead) are untouched. Do not
 substitute `cache:clear` or `cache:flush` in a cron or a runbook: they reset those. Run it by hand with
 `sudo -u forge php /srv/vasey-staging/current/artisan vasey:cache-prune-expired`; it is safe to run at any time and does nothing when
-the default store is not `database`. It starts running on the first scheduler tick after the release that contains it is the served
+no database store is in use. It prunes every distinct database store the application uses (the default, `filament.cache_store`,
+`cache.limiter` and the database members of a `failover` store), so moving one of them to another database store does not reopen the
+backlog; a store of another type is left to that store. Expiry is judged by the scheduler host's clock: staging is one host, but a
+second host sharing the cache needs NTP time sync on both. It starts running on the first scheduler tick after the release that contains it is the served
 `current` (`schedule:work` starts a fresh `schedule:run` process each minute); there is nothing to install. A quiesce stops the
 scheduler, and the prune is a child of `schedule:run`, which the quiesce's process check already waits for.
 

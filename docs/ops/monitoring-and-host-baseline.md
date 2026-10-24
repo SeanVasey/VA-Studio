@@ -31,10 +31,12 @@ is Sean's choice; none is selected and none is configured.
 
 ### Scheduler: what can and cannot be known
 
-The application has **no scheduler heartbeat**. `routes/console.php` runs `vasey:publish-scheduled-site-release` every minute
-with a short overlap lock, and nothing it does leaves a durable record when no release is due. The check therefore combines
+The application has **no scheduler heartbeat**. `routes/console.php` schedules two commands, each with a short overlap lock:
+`vasey:publish-scheduled-site-release` every minute and `vasey:cache-prune-expired` hourly at :23 (expired database-cache rows
+only). Nothing either does leaves a durable record when there is nothing to do. The check therefore combines
 three signals that need no application change: supervisor state, the process's working directory against `current`, and the line
-`schedule:work` prints each minute (`Running ['artisan' vasey:publish-scheduled-site-release]`, observed locally). Production
+`schedule:work` prints each minute (`Running ['artisan' vasey:publish-scheduled-site-release]`, observed locally; the hourly
+prune adds one line at :23 and is not what the check looks for). Production
 workers log through supervisor's `stdout_syslog`, which prefixes each line with the program name; staging writes
 `/var/log/vasey-staging/scheduler.log`, so use `--log-file` there. A real dead-man's-switch for the scheduler would be a reviewed
 application change (a ping on schedule success).
