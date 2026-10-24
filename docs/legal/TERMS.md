@@ -1,92 +1,201 @@
-# Terms of service (draft)
+# VASEY.AUDIO Terms of Sale and Use
 
-**DRAFT FOR OWNER REVIEW. Not published. Not legal advice.**
+> **DRAFT for Sean Vasey's approval — not yet published — not legal advice; qualified legal review recommended before publication.**
+>
+> Draft date: 2026-10-24. Written against source `786fb7c755291184f9e01b4faaab28dbd430d698` (`origin/main`). Draft version label: `terms-draft-2026-10-24`.
+> Text in square brackets is a placeholder. Sections marked **[Proposed — Sean to confirm]** are recommendations, not decisions; sections marked **[For legal review]** use standard protective wording that a qualified reviewer should check. The reviewer appendix at the end is removed before publication.
 
-Prepared 2026-10-10 from the source at `f57e7256891d0d3c117e151a36f7fb967c724ab7`. This draft describes how the VASEY.AUDIO store works today, so that a reviewer can turn it into terms. Every factual statement cites the repository file that proves it. Where the code does not decide a term, the matter is listed under [Sean to decide](#sean-to-decide) and is not written as policy. The same **live-shaped** / **default-off** / **test-only** markers as in `docs/legal/PRIVACY.md` apply: no purchase, account, consent or inquiry feature is enabled for the public today, and every purchase path runs only in Stripe test mode in `local`, `testing` or the hosted `staging` rehearsal (`app/Support/Environment/TestEnvironment.php`; `docs/private-server-readiness.md`, "First sale and cutover remain separate gates").
+**Effective date:** [set on publication]
+**Last updated:** [set on publication]
 
-## 1. Who you are dealing with
+These terms apply when you use the VASEY.AUDIO store at vasey.audio, create an account, or buy or claim a license. Please read them with the license for anything you buy: the license sets out what you may do with the music; these terms cover the store and the purchase.
 
-VASEY.AUDIO is a first-party store: Sean Vasey publishes, shares, licenses and sells his own content to listeners and customers. There is no seller onboarding, tenant store or marketplace (`docs/architecture/decision-register.md`, D-07). The legal name that a contract and these terms should name is not fixed in code: the only seller name the application carries is the `seller.legal_name` an operator supplies in an order policy, and the shipped example is synthetic (`docs/order-preparation.md`, "Boundary and configuration"; `app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php`, `seller_identity`). See [Sean to decide](#sean-to-decide), S-8. The contact address this repository uses for legal matters is `support@vasey.audio` (`CLAUDE.md`, Project Notes).
+## 1. Who we are
 
-## 2. The storefront (live-shaped)
+- **Merchant:** Vasey Multimedia, doing business as VASEY.AUDIO ("VASEY.AUDIO", "we", "us"). We run the store, take your payment as the merchant of record, and deliver your purchase.
+- **Seller and licensor:** Sean Vasey, the producer and owner of the music in the catalog, who grants the licenses sold in the store ("Licensor").
+- **Contact:** support@vasey.audio · [registered postal address — inserted at publication]
 
-- The public catalog lists only tracks that are published with current rights, reviewed offers and verified media; anything else is missing or returns 404 (`docs/track-sharing.md`, "Result"; `docs/track-detail-and-license-disclosure.md`, "Disclosure contract").
-- Previews are tagged audio derivatives prepared from the master; the master, untagged MP3, stems and original artwork are never served publicly (`docs/media-processing.md`, "What the pipeline accepts" and the paragraph beginning "Every upload is private"). No term in the code grants any use of a preview; what a visitor may do with one is undecided (see Sean to decide, acceptable-use rules for previews).
-- Track pages, previews and artwork may be shared and embedded: share metadata is published for every eligible track and a public embed route serves the preview outside the session (`docs/track-sharing.md`; `routes/embeds.php`). Third parties may keep cached previews after a track is withdrawn (`docs/track-sharing.md`).
-- Editorial pages (about, contact, blog, videos) are plain text authored by staff and published as whole site releases (`docs/editorial-content.md`; `app/Domain/SiteBuilder/SiteContentSchema.php`). Video pages load a YouTube or Vimeo player only when the visitor asks for it (`resources/js/components/EditorialVideo.tsx`).
+VASEY.AUDIO is a single-seller store: everything in it is Sean Vasey's own catalog.
 
-## 3. Licenses: what is being sold
+## 2. Agreeing to these terms
 
-- **Each offer sells one immutable published license revision.** Staff author license templates and versions in the administration panel (`app/Filament/Resources/LicenseTemplateResource.php`; `app/Filament/Resources/LicenseVersionResource.php`), a different staff member reviews the frozen submission, and the version is published through an immutable lifecycle; the commercial offer (price, currency, deliverables) is published separately as its own immutable revision (`docs/licensing-and-offers.md`; `docs/typed-license-terms.md`, "Operator workflow"; `docs/license-economic-policies.md`, "Deliberate authoring"). Once reviewed, a template's identity is frozen and changes require a successor (`app/Filament/Resources/LicenseTemplateResource.php`, `frozen()`).
-- **The full terms are shown before purchase.** On a track page, **Read terms & choose** fetches the exact published revision's name, version, type, features, deliverable roles and complete terms text from `/tracks/{slug}/offers/{revision}/license`; nothing editable can change that response (`docs/track-detail-and-license-disclosure.md`, "Disclosure contract"; `routes/web.php`, route `tracks.license`). The same complete disclosures are shown again in the order review and frozen into the order (`docs/order-preparation.md`, "Review and browser contract").
-- **What a license version can say.** The typed model carries usage modes and caps (audio releases, copies/downloads, monetized and non-monetized streams, music videos, live performances, and the rest of the v2 vocabulary), producer credit, deliverables, territory (worldwide or selected countries), duration (perpetual or 1–1,200 months), ownership declarations, a publishing-income entitlement and a recording royalty, each with its complete policy text (`docs/typed-license-terms.md`, "Version 2 vocabulary"; `docs/license-territory-duration.md`; `docs/license-economic-policies.md`, "Exact additive contract"). How these terms of service relate to that license text is not decided by the code; proposed wording is under [Sean to decide](#sean-to-decide), item 14. No cap, rate or ownership allocation is preselected and none exists in the repository (`docs/license-economic-policies.md`; `docs/typed-license-terms.md`).
-- **Prior purchases are retained.** A new license version or offer revision never rewrites a purchased revision; existing grants stay as purchased (`AGENTS.md`, Invariants; `app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php`, `license_terms.prior_grants = retain`).
-- **Exclusive offers** are prepared and sold against a shared rights scope so that two exclusive sales of the same scope cannot both complete; a reserved or pending scope blocks competing selections (`docs/exclusive-selection.md`; `docs/shared-rights-inventory.md`). Exclusive checkout is not admitted outside the test environments, and the reservation lifetime, late-payment rule, pending non-exclusive cutoff and post-refund availability are U-08 (`docs/exclusive-selection.md`; `docs/architecture/decision-register.md`, U-08).
-- **Free licenses** (default-off) require explicit terms authored and separately reviewed by staff, then the customer's declared name and a separate affirmative checkbox; each buyer receives one origin per definition, within a declared capacity, download-attempt cap and token lifetime (`docs/free-grants.md`, "Authoring and assent"). No approved free terms exist yet (`docs/free-grants.md`, "Admission and identity").
+By using the store you agree to these terms and to our [Privacy Policy](PRIVACY.md). When you buy or claim a license you also agree to that license, which you see in full before you confirm. If you do not agree, please do not use the store.
 
-## 4. Ordering and payment (test-only today)
+You must be at least **[18, or the age of majority where you live — Proposed, Sean to confirm]** to create an account or buy a license. If you are younger, a parent or guardian must make the purchase and accept the license on your behalf.
 
-1. **Review selection.** The cart asks the server to review 1–10 published offers; the server freezes price, license, rights and file identities and returns a non-payable review that expires after 15 minutes. Reviewing is not agreement, reservation, payment or a download right (`docs/provisional-quotes.md`; `docs/architecture/decision-register.md`, "Implementation entry — 2026-09-06").
-2. **Prices and tax.** Prices are positive integer USD amounts; promotions apply only through explicit, immutable campaign terms; tax is unresolved until a pricing policy supplies it (`docs/quote-pricing.md`; `docs/promotion-pricing.md`). The pricing policy accepts only a test-scoped USD policy, with tax either `fixed_test` at a rate of 0–10,000 basis points or `provider_calculated` with a maximum rate in the same range (`app/Domain/Commerce/PricingPolicy.php`, `validate()`; `app/Support/Money/MinorUnits.php`, `rate()`). An order review accepts any resulting fixed test tax amount and refuses provider-pending tax (`app/Domain/Commerce/Orders/ReviewOrder.php`, `capture()`; `app/Domain/Commerce/PricingSnapshotV1.php` and `app/Domain/Commerce/PricingSnapshotV3.php`, `tax_status` `provider_pending`). Only the step that starts hosted test Checkout requires the fixed test rate and the tax to be exactly zero (`app/Domain/Commerce/Checkout/CheckoutEvidence.php`, `request()`; `docs/hosted-test-checkout.md`, "Frozen amount mapping"). The server never trusts a client-supplied total (`AGENTS.md`, Invariants; `docs/order-preparation.md`).
-3. **Order review and assent.** Before paying, the buyer sees the complete disclosure of every line, the seller name, the assent text and the amount allocation, supplies a legal name and email, and ticks an initially unchecked assent box. The order freezes exactly what was shown; a changed review requires fresh assent (`docs/order-preparation.md`, "Review and browser contract"). Today the seller name, assent text and `buyer_identity: unverified_guest` come from a synthetic test policy; nothing in the code verifies the buyer's identity (`docs/order-preparation.md`; `docs/test-contract-issuance.md`, "Enablement and prerequisites").
-4. **Payment.** Payment is taken on Stripe's hosted Checkout page, card only, with a 60-minute session; there is no automatic retry queue: a caller-initiated start or reconciliation request may retry session creation only within the order's retained 15-minute window, and after it an unknown outcome requires explicit reconciliation (`docs/hosted-test-checkout.md`, "Explicit test boundary", "Owner API and recovery"). A payment counts only when the application itself retrieves and validates the Stripe session and PaymentIntent; returning to the site, a `paid` field in a stored event or a valid webhook signature does not make an order paid (`docs/hosted-test-checkout.md`, "Immutable binding and observations"; `docs/test-payment-processing.md`).
-5. **Finalization.** After verified payment the server consumes the reserved inventory and promotion capacity, records any exclusive sale and creates one grant per line with the frozen buyer, seller, assent and license input; a confirmation observed after the attempt's expiry becomes a reviewed `paid_exception` instead of an automatic sale (`docs/test-payment-finalization.md`; `docs/architecture/decision-register.md`, D-16).
-6. **Unpaid orders.** Reserved inventory and promotion capacity stay pending until verified finalization or an explicit verified unpaid release (`docs/hosted-test-checkout.md`, "Explicit test boundary"; `docs/test-unpaid-release.md`).
+## 3. Your account
 
-The successful responses in this chain say they are not live: the quote response carries `payable: false` (`app/Http/Controllers/QuoteController.php`), the order review carries `testOnly: true` and `payable: false` (`app/Domain/Commerce/Orders/ReviewOrder.php`), and the hosted checkout projection carries `testOnly: true` (`app/Domain/Commerce/Checkout/HostedCheckout.php`). Error responses carry only a code (`app/Http/Controllers/TestCheckoutController.php`). See `docs/order-preparation.md` and `docs/hosted-test-checkout.md`. The legacy `/checkout` endpoint answers 503 "Checkout is being prepared. No payment has been taken." (`routes/web.php`).
+- You need an account to buy licenses, claim free downloads and download your files. Give us accurate details and keep your email address up to date: it is how you sign in, recover your account and receive order messages.
+- Keep your password private. You are responsible for activity on your account. Tell us at support@vasey.audio straight away if you think someone else has used it.
+- An account is for one person or one business. Do not share it or sell it.
+- You can ask us to close your account at any time. Closing your account does not cancel licenses you already hold, but you will need to keep your own copies of your files and license documents. We keep order and license records as described in the [Privacy Policy](PRIVACY.md).
+- We may suspend or close an account that breaks these terms, is used for fraud, or puts the store or other customers at risk. Where possible we will tell you why first. Licenses you have already paid for stay valid unless they end under their own terms (for example after a refund or chargeback, or a breach of the license).
 
-## 5. What a buyer receives
+## 4. Previews, sharing and embeds
 
-- **A contract document.** One private PDF per purchased line is rendered from the frozen order input and retained as the original; it is never regenerated, and a missing original is restored from backup rather than re-rendered (`docs/test-contract-issuance.md`). The current profile for test issuance is `test-buyer-pdf-v2` (`app/Domain/Contracts/ContractRenderProfileRegistry.php`, `CURRENT_VERSION`); what it prints is listed in `docs/legal/README.md`.
-- **The purchased files.** Exactly the revisions purchased, by role: `contract`, `master_wav`, `download_mp3` and `stems_zip` as the offer included them; the current catalog title, newest revision or any other file is never substituted (`docs/test-owner-delivery.md`, "Internal interfaces and exact identity"; `docs/test-owner-delivery-http.md`, "Owner projection").
-- **How downloads work.** Each download needs a fresh 60-second authorization, at most three new authorizations per order per 60 seconds, and gives one committed stream attempt; an interrupted transfer consumes the attempt and the buyer requests another authorization (`docs/test-owner-delivery.md`, "Authorization, retries and consumption"). These are technical limits "separate from licensed exploitation terms" and "do not establish a lifetime website download cap" (same file, "Explicit configuration"). For a guest order, downloads require the original owning browser session. An order prepared while signed in to a synthetic test account is owned by that account instead: signing in again from a fresh browser, with no copied cookies or storage, finds the same order and downloads its retained contract and files (`docs/verification/customer-account-test-journey.md`). A delivery control can be blocked by staff as a technical restriction, which "is not a refund, license revocation, deletion or exclusive re-listing operation" (same file, "Provisioning and restriction").
-- **Order records.** The buyer's session can list its own orders and their status; a listed status is not proof that files reached the buyer (`docs/test-order-history.md`). Guest orders are not claimable by email; a signed-in test account can claim a guest purchase only by proving the original owning session (`docs/customer-test-self-service.md`, "Activation and transport").
+- Previews on the store are full-length or partial audio with an audible producer tag. They are for listening and choosing a license only. You may not download, rip, record, remix, release or otherwise use a preview, or remove its tag.
+- You may share links to track pages and use the store's own embed player to share previews on other sites. Do not present an embed as your own music or use it in a way that suggests we endorse you.
+- If a track is withdrawn, we remove it from the store. Other sites may still show a cached copy of its preview image for a while; that is outside our control.
 
-## 6. Accounts (test-only today; production identity default-off)
+## 5. Licenses: what you are buying
 
-Customer accounts exist in the source in two forms, and neither is enabled for the public today. Synthetic test accounts are optional fixtures: enrollment and recovery run only where test customer accounts are admitted (`local`, `testing` or the hosted `staging` rehearsal) with a private message capture, passwords need at least 12 characters with letters and numbers and at most 72 UTF-8 bytes, and production enrollment, recovery and notice policy remain open (`app/Domain/Customers/CustomerIdentityPolicy.php`; `app/Domain/Customers/CustomerAccessPolicy.php`; `docs/customer-test-self-service.md`, "Customer journey"; `config/production-customer-identity.php`). A signed-in customer gets a private library (saved tracks, playlists, lyric notes, export and clear), communication preferences and purchase-claim pages (`routes/customer.php`). Access can be withdrawn by the operator; withdrawal keeps the account's orders, contracts and files (`docs/verification/customer-account-test-journey.md`, "Ownership and withdrawal").
+- **You are buying a license, not the music itself.** Unless a license expressly says otherwise, Sean Vasey keeps ownership of the music (the composition and the sound recording of the beat). Your license tells you exactly what you may do with it.
+- **The license you purchase governs your use of the work.** Each license in the store is a fixed, published version. Before you pay, you see its complete text, including what files you get, what you may do, any limits, the term and territory, and any credit or royalty terms. That exact text is frozen into your order and your license document.
+- **Order of precedence.** If these terms and your license disagree about how you may use the music, the license controls. These terms control everything else about using the store and buying (payment, delivery, refunds, accounts, conduct).
+- **We never change a license you already bought.** We may publish new license versions or change prices for future sales. Your existing license stays exactly as you bought it.
+- **License limits are your responsibility.** Some licenses limit, for example, streams, copies or music videos. The store does not track your releases or streams; you must stay within your license's limits and buy a higher license before you exceed them.
+- Our license tiers are summarised on the store and in each license.
 
-A separate production identity flow is implemented but disabled by default and unconfigured. Its routes are mounted at `/customer` (`routes/production-customer-identity.php`, required by `routes/web.php`), but its account creation, recovery and sign-in pages and actions answer 404 unless `IdentityPolicy::enabled()` is true (`app/Http/Controllers/ProductionIdentity/CustomerIdentityController.php`). Outside `local` and `testing` that requires `config/production-customer-identity.php` to enable the `verified_production` provenance, which `staging` never admits, and every value in that file is `false` or `null` (`app/Domain/Customers/ProductionIdentity/IdentityPolicy.php`, `enabled()`). Its email transport has no settings (`config/production-identity-smtp.php`). If it were enabled, it would collect an email address when a customer requests enrollment or recovery, and a name and a password (at least 12 and at most 72 bytes, with an ASCII letter and a digit) when the customer completes it (`app/Domain/Customers/ProductionIdentity/IdentityRequests.php`; `app/Domain/Customers/ProductionIdentity/CompleteIdentity.php`). What it would retain is described in `docs/legal/PRIVACY.md`, section 2.3. This section offers no production account: whether and on what terms one is offered is U-07, under [Sean to decide](#sean-to-decide), item 9.
+## 6. Prices, taxes and payment
 
-## 7. Contact and support
+- **Prices are in U.S. dollars** and are set and calculated by our server. The price you pay is the one shown on your order review. We do not rely on any price or total sent from your browser.
+- **Taxes.** Sales tax, VAT or similar taxes are calculated at checkout based on the billing details you give our payment provider, and shown before you pay. Where tax applies, it is added to the license price unless the order review says the price includes it.
+- **Payment** is taken by our payment provider, Stripe, on its secure hosted checkout page. We do not see or store your full card details. We currently accept card payments.
+- **When an order counts as paid.** Your order is complete only when we have confirmed directly with Stripe that your payment succeeded. Returning to our site from the checkout page is not, by itself, confirmation.
+- **Checkout time limit.** Your order review and checkout are held for a limited time. If it runs out before you pay, start again; prices and availability are re-checked.
+- **Mistakes.** If a price or item is shown in error, we may cancel the order before delivery and refund anything you paid.
+- **Promotions** apply only as stated in the published promotion terms shown at checkout. They cannot be combined or applied afterwards unless those terms say so.
 
-Visitors can send a plain-text inquiry from the published contact page and, within the same browser session, read staff replies and follow up in the application; replies are not emailed and a lost session binding can make the conversation unavailable (`docs/contact-inquiries.md`; `docs/inquiry-conversations.md`). Order-aware support exists only as session-bound inquiry context routes (`routes/inquiry-conversations.php`). The published contact page carries an email address set by staff in the site release (`app/Domain/SiteBuilder/SiteContentSchema.php`, `contact.email`).
+## 7. Reviewing and confirming your order
 
-## 8. Refunds, disputes and chargebacks
+Before you pay, you see an order review with every license you are buying, its complete terms, the files included, the merchant and licensor details, and the price, tax and total. To continue you must enter the name the license should be issued to, and tick a box confirming you agree. We keep an exact record of what you saw and agreed to. If anything in the review changes before you pay (for example a new license version or price), you must review and confirm again.
 
-The code records refund and dispute observations retrieved from Stripe against the order and routes them to a staff-reviewed exception; a refunded exception can release the order's pending resources (`docs/test-payment-financial-observation.md`; `docs/test-refunded-exception-resolution.md`). No refund right, window, partial-refund rule, dispute-access rule or exclusive re-listing rule exists in the code: `refunds_and_disputes` in the production policy is a required owner input with no value (`app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php`; `docs/ops/production-activation-packet.md`, section 2). This is T21 and belongs to [Sean to decide](#sean-to-decide).
+## 8. Delivery and downloads
 
-## 9. Memberships, services and other products
+- **What you get.** After your payment is confirmed, your account shows your order with your license document (PDF) and the files your license includes: an MP3, a WAV master and/or a stems (trackout) archive, as listed in the license. You get exactly the file versions you bought.
+- **How downloads work.** Each download uses a fresh, short-lived link created when you press download. A link works once; if a download is interrupted, request a new one. These are security measures to protect your files, not limits on your license.
+- **Keep your own copies.** We aim to keep your purchases available to download from your account while the store operates, but you should save your files and license document as soon as you receive them. [Proposed — Sean to confirm: re-download availability for at least 12 months after purchase.]
+- **Problems.** If a file is missing, damaged or not what your license lists, email support@vasey.audio with your order reference. We will replace it or, if we cannot, refund that item (section 10).
+- **Technical holds.** We may temporarily pause downloads for an order while we investigate suspected fraud, an open payment dispute or a security problem. A pause is not a refund or a cancellation of your license.
 
-Memberships, service projects, sound kits and other product families exist in the source as default-off development work and are not sold: memberships block on C2–C5 and Billing259 (`docs/ops/production-activation-packet.md`, section 1); service briefs and quotes run only for synthetic customers in `local`, `testing` or the hosted `staging` rehearsal, behind a default-off flag (`app/Domain/Services/Projects/ServiceProjectPolicy.php`; `docs/service-projects.md`); sound-kit intake is private operator work (`docs/sound-kit-intake.md`). Terms for these are not drafted here.
+## 9. Exclusive purchases
 
-## 10. Changes to published content and terms
+Some tracks may be offered under an exclusive license. An exclusive license is limited to one buyer.
 
-Site content is published as whole immutable releases with a retained history; restoring a previous release does not alter any purchase, contract or grant (`docs/site-content-releases.md`, "Failure handling and retained evidence"). Published license versions and offer revisions are immutable; new terms apply only to new purchases (`docs/licensing-and-offers.md`; `AGENTS.md`, Invariants). How these terms of service themselves are versioned, published and accepted is not implemented (`docs/legal/README.md`, "Legal pages").
+- **Reservation during checkout.** When you start checking out an exclusive license, the track is reserved for you for a limited time [Proposed — Sean to confirm: 30 minutes] so nobody else can buy an exclusive or a new non-exclusive license for it meanwhile. If you do not complete payment in time, the reservation ends and the track becomes available again.
+- **Late or competing payments.** If a payment is confirmed after the reservation ended, we review it by hand before anything is delivered. If the exclusive is no longer available, we refund the payment in full.
+- **Earlier non-exclusive licenses stay valid.** Before an exclusive is sold, other customers may have bought non-exclusive licenses for the same track. **Those licenses remain valid** for their own term and limits, and the exclusive buyer takes the exclusive subject to them. We do not cancel or revoke earlier licenses when an exclusive is sold.
+- **After an exclusive sale** we stop selling any new license for that track and remove it from sale. Holders of earlier non-exclusive licenses cannot renew or upgrade them after the exclusive is sold.
+- The exclusive license itself sets out exactly what the exclusive buyer receives (see the license tiers).
 
-## Sean to decide
+## 10. Refunds, cancellations and disputes [Proposed — Sean to confirm]
 
-Nothing in this section is decided by the code. Each item names the register key or input that tracks it.
+Our licenses are digital goods delivered immediately, so we handle refunds as follows.
 
-1. **Seller legal name, address and buyer assent text** (S-8; `MachinePolicyV1` `seller_identity` and `assent`): `docs/handoff/2026-10-08/MONDAY-PLAN.md`, section 4; `app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php`.
-2. **License tiers, terms text and USD prices** (S-8, U-05): authored in Filament, not in this document; nothing is approved yet (`docs/handoff/2026-10-08/MONDAY-PLAN.md`, S-8; `docs/architecture/decision-register.md`, U-05).
-3. **Refund, dispute and chargeback policy** (T21; `refunds_and_disputes`: refund authority, partial refunds, dispute access, exclusive reopening): `app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php`; `docs/ops/production-activation-packet.md`.
-4. **Exclusive reservation lifetime, late-payment policy, pending non-exclusive cutoff and post-refund availability** (U-08; `reservation_and_exclusives`): `docs/architecture/decision-register.md`, U-08; `app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php`.
-5. **Governing law, venue and dispute resolution**: not present anywhere in the code.
-6. **Warranty disclaimers, limitation of liability and indemnities**: not present anywhere in the code.
-7. **Age and eligibility requirements**: not present anywhere in the code.
-8. **Currency, tax registration and tax strategy** (U-04, A3 Tax255): `docs/architecture/decision-register.md`, U-04; `docs/ops/production-activation-packet.md`, sections 1 and 2.
-9. **Buyer identity verification and guest versus account purchasing in production** (U-07): `docs/architecture/decision-register.md`, U-07; `docs/customer-test-self-service.md`.
-10. **Free-license terms text** (`approved-free-terms-v1`): `docs/free-grants.md`, "Admission and identity".
-11. **Acceptable-use rules for previews, embeds and shared links**: the code publishes previews and embeds but states no rule about their use (`docs/track-sharing.md`; `routes/embeds.php`).
-12. **How these terms are published, versioned and accepted** by a buyer at checkout: the order freezes an assent text, but the site has no legal-page type (`app/Domain/SiteBuilder/SiteContentSchema.php`, sections `about`, `contact`, `blog`, `videos` only).
-13. **Membership, service and other product terms** (U-10, U-12): `docs/architecture/decision-register.md`.
-14. **How these terms relate to a license grant.** Proposed wording, not derived from the code: "The license text is the contract term; these terms of service do not add, remove or interpret any license grant." What the code does decide is that the complete license terms are shown before purchase and frozen into the order and the contract document (`docs/order-preparation.md`, "Review and browser contract"; `docs/test-contract-issuance.md`). Nothing in the code states which text prevails if the two conflict.
+- **All sales are final once you have downloaded any file from an order**, except as set out below or where the law gives you a right we cannot exclude.
+- **We will refund a license line** if, within **14 days** of purchase, you tell us that:
+  - you were charged twice for the same license;
+  - the files are missing, damaged or materially different from what the license describes, and we cannot fix this within a reasonable time;
+  - you have not downloaded any file from the order; or
+  - the payment was not authorized by you (we may ask for details to prevent fraud).
+- **How refunds work.** Email support@vasey.audio with your order reference. We review every request and issue approved refunds to your original payment method through Stripe. We can refund a single license line for exactly the price paid for that line (plus its tax). Your bank may take several days to show the refund.
+- **What a refund means for your license.** When a license line is refunded, that license ends. You must stop using the files and must not release, or continue to distribute, anything made with them. We may disable the downloads for that line.
+- **No refunds after release.** We do not refund a license after you have released, distributed or performed music made with it, except for duplicate charges or unauthorized payments.
+- **Exclusive licenses.** Refunds of exclusive licenses are reviewed individually. After a refunded exclusive, we decide after review whether to offer the track again; we will not do so while there is any sign the work has been used.
+- **EEA and UK customers.** You have a legal right to cancel online purchases within 14 days. For digital content, you agree at checkout that delivery starts immediately and that you lose this right once a download has started. Your other statutory rights (for example if files are faulty) are not affected.
+- **Payment disputes and chargebacks.** Please contact us first; most problems can be solved quickly. If you open a dispute with your bank, we may pause downloads for the order while it is reviewed. If a chargeback succeeds, the license ends as if refunded. If a dispute is decided in our favor, we restore access.
+
+## 11. Free downloads
+
+Some tracks may be offered under a free license. Free licenses have their own terms, shown in full before you claim one, and usually allow only non-commercial use. To claim a free license you need an account, enter the name the license is issued to, and tick a box to accept. Each account can claim a given free license once, and free offers can be limited in number or time. A free license never signs you up for marketing.
+
+## 12. Acceptable use
+
+You must not:
+
+- copy, scrape, download or record previews or any part of the store other than through the download features for files you are licensed to receive;
+- share download links, license documents or purchased files with anyone not covered by your license, or resell or give away the beats or stems;
+- try to get around download limits, security measures, reservations or pricing, or access another person's account, orders or files;
+- interfere with the store (for example with automated requests, malware or denial-of-service attacks), or probe or test its security without our written permission (report suspected security problems to support@vasey.audio);
+- use the contact form or attachments to send spam, malware, unlawful content, or content that harasses or threatens anyone;
+- use the store, previews or purchased files to train, fine-tune or test machine-learning or artificial-intelligence systems, except where your license expressly allows it;
+- break any law while using the store.
+
+## 13. Intellectual property
+
+- The music, recordings, artwork, text, design, software and the VASEY.AUDIO name and marks are owned by Sean Vasey or Vasey Multimedia or their licensors and are protected by copyright and trademark law. Apart from the limited permission to use the store and any license you buy, you receive no rights in them.
+- **Copyright complaints.** If you believe something on the store infringes your copyright, email support@vasey.audio with: your contact details; the work you say is infringed; the store page concerned; a statement that you believe in good faith the use is not authorized; a statement, under penalty of perjury, that your notice is accurate and that you are the owner or authorized to act for the owner; and your physical or electronic signature. [Sean to decide whether to register a DMCA designated agent with the U.S. Copyright Office.]
+
+## 14. What you send us
+
+When you send us a message, attachment or listening note, you keep ownership of it. You give us permission to store and use it only to provide the store, answer you and keep records. Do not send anything you do not have the right to share.
+
+## 15. Disclaimers [For legal review]
+
+- The store and previews are provided "as is" and "as available". We do not promise that the store will always be available or error-free.
+- Except as stated in your license, we make no promise that a track will suit your purpose or bring you commercial success.
+- Nothing in these terms limits any rights you have under consumer protection laws that cannot be limited.
+
+## 16. Limitation of liability [For legal review]
+
+- To the fullest extent the law allows, neither Vasey Multimedia nor Sean Vasey is liable for indirect, incidental, special or consequential losses, or for lost profits, revenue, data or opportunities, arising from the store or these terms.
+- To the fullest extent the law allows, our total liability arising from the store or a purchase is limited to the amount you paid for the license concerned, or USD 100 if you paid nothing.
+- These limits do not apply to liability that cannot be limited by law, such as for fraud, or for death or personal injury caused by negligence. A license may set its own liability terms for use of the music.
+
+## 17. Indemnity [For legal review]
+
+You agree to compensate Vasey Multimedia and Sean Vasey for reasonable losses and legal costs arising from your breach of these terms or of a license, including releasing music beyond your license's limits, or from material you add to a work (such as lyrics, vocals or samples) that infringes someone else's rights.
+
+## 18. Governing law and disputes
+
+- These terms, and any dispute about the store or a purchase, are governed by the **laws of the State of Iowa, USA**, without regard to its conflict-of-law rules.
+- Any court proceedings must be brought in the state or federal courts located in Iowa [county — Sean to confirm], and you and we agree to their jurisdiction.
+- If you are a consumer living in the EEA, the UK or another country whose laws give you the right to bring proceedings at home or to rely on mandatory local protections, nothing in this section takes those rights away.
+- Before starting proceedings, please email support@vasey.audio so we can try to resolve the issue informally.
+
+## 19. Changes to these terms
+
+We may update these terms from time to time. Each version has a version label and an effective date. Changes apply to purchases made and use of the store after the new version takes effect; they never change a license you already bought. If a change materially affects account holders, we will give notice on the site or by email before it takes effect.
+
+## 20. General
+
+- These terms, the Privacy Policy and your licenses are the whole agreement between you and us about the store.
+- If any part of these terms is found unenforceable, the rest stays in effect.
+- If we do not enforce a term straight away, we can still enforce it later.
+- You may not transfer your account or these terms. A license may be transferred only as that license allows. We may transfer our rights and duties to a successor of the business, and your licenses stay valid.
+- We are not responsible for delays or failures caused by events beyond our reasonable control.
+- We send notices to the email address on your account. You can send notices to support@vasey.audio.
+
+## 21. Contact
+
+Vasey Multimedia, doing business as VASEY.AUDIO
+[registered postal address — inserted at publication]
+**support@vasey.audio**
+
+---
+
+## Reviewer appendix (remove before publication)
+
+### A. Open items for Sean
+
+1. **Postal address:** supplied by Sean on 2026-10-24 (street line only; city and ZIP still needed); kept out of the public repository and inserted when the page is published through the site content system.
+2. **Iowa venue county** (section 18). Governing law is Iowa, as Sean stated on 2026-10-24.
+3. **Minimum age** (section 2), matching `PRIVACY.md` section 11.
+4. **Refund policy** (section 10): the 14-day window, the "no download" rule and the exclusive review are proposals. Machine-policy values that match this draft: `refund_authority = authoritative_provider_operator_review`, `partial_refunds = exact_line_allocation`, `dispute_access = temporarily_block_while_reconciling`, `exclusive_reopening = qualified_operator_review` (`app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php`). If Sean prefers that a refunded exclusive is never resold, choose `remain_sold` and change the exclusive bullet.
+5. **Exclusive reservation time** (section 9; 30 minutes proposed) and late-payment handling (U-08). Matching machine-policy values: `reservation_seconds = 1800`, `provider_lifetime_seconds` at most Stripe's Checkout session lifetime, `pending_cutoff = block_new_nonexclusive_on_pending_exclusive`, `late_action = paid_exception_operator_reconciliation` (the only supported value), `late_time_basis` to choose.
+6. **Re-download availability** (section 8; 12 months proposed).
+7. **DMCA designated agent** registration (section 13).
+8. **Buyer assent text** for `MachinePolicyV1` `assent.text` (at most 4,096 characters). Proposed: "I am buying the license(s) listed above from Vasey Multimedia dba VASEY.AUDIO, licensed by Sean Vasey. I have read and agree to each license's full terms and to the Terms of Sale and Use. I understand delivery starts immediately after payment, and that once I download a file I lose any right to cancel for a change of mind." Seller legal name for `seller_identity.legal_name`: "Vasey Multimedia dba VASEY.AUDIO".
+9. **Liability cap and indemnity** (sections 16 and 17): standard wording for review.
+
+### B. Where the code does not yet support what this draft says
+
+| Draft statement | Current source | Needed before publication |
+| --- | --- | --- |
+| Account required to buy (section 3) | U-07 is open: `MachinePolicyV1` accepts `verified_account` or `verified_guest_claim`; production customer identity is implemented but default-off (`config/production-customer-identity.php`); test commerce supports guest orders bound to a browser session. | Sean's U-07 choice; enable and configure production identity. |
+| Close account on request (section 3) | No self-service deletion route; operator access withdrawal keeps history (`routes/customer.php`). | Operator procedure (see `PRIVACY.md` appendix B). |
+| Taxes calculated at checkout (section 6) | Stripe Checkout `automatic_tax` is implemented but default-off (`config/production-tax-checkout.php`, `enabled = false`); tax registrations are U-04. The non-tax production checkout path refuses any tax (`HostedEvidence`, `automatic_tax.enabled = false`). | Sean's tax registrations and activation (U-04). |
+| Refunds issued through Stripe after review (section 10) | The application has no refund-sending capability: staff issue refunds in the Stripe dashboard, and the application observes refunds and disputes and releases pending resources (`docs/test-refunded-exception-resolution.md`). A refund does not automatically end downloads, change the grant or relist an exclusive. Production refund tooling (A5/T21) does not exist yet (`docs/ops/production-activation-packet.md`). | A5/T21 production tooling; an operator step to block delivery for a refunded line (the staff delivery block exists for test delivery). |
+| Pause downloads during a dispute (sections 8 and 10) | `dispute_access` is a machine-policy choice; production enforcement is part of the same open work. | As above. |
+| Exclusive reservation and earlier non-exclusive licenses (section 9) | Implemented in the test path: shared rights scopes serialize exclusive and non-exclusive sales, prior grants are never revoked (`docs/exclusive-selection.md`, `docs/shared-rights-inventory.md`; `MachinePolicyV1` `license_terms.prior_grants = retain`). Exclusive offers cannot yet be published for production sale (`docs/licensing-and-offers.md`: "positive USD non-exclusive offers only"; template type "Exclusive (commerce blocked)"). | Exclusive production activation (U-08). |
+| EEA/UK waiver of the cancellation right at checkout (section 10) | The order review shows one assent checkbox with the policy's assent text. | Include the waiver in the assent text (item A.8) or add a separate checkbox. |
+| Download links are short-lived and single-use (section 8) | Implemented: 60-second authorization, one committed attempt, three new authorizations per order per 60 seconds in the test path (`docs/test-owner-delivery.md`); production values come from `MachinePolicyV1` `delivery`. | None. |
+| License limits are contractual (section 5) | Correct: caps such as streams or copies are recorded in the license and frozen into the order; the store does not monitor releases or streams. | None. |
+| Re-download availability for 12 months | No expiry on owner downloads is implemented; availability depends on hosting and backups. | None for the proposal; keep backups (S-10). |
+| No upgrades after an exclusive sale (section 9) | License upgrades are not implemented (U-11; parity row FP-057). | None now; a future upgrade feature must respect this rule. |
 
 ## Change log
 
-- 2026-10-10: first draft from source `f57e7256891d0d3c117e151a36f7fb967c724ab7` (lane `harness/launch-documents`).
-- 2026-10-11: after Codex review on PR #91, the test-only paragraph names which responses carry `testOnly` and `payable` instead of claiming every response carries both.
-- 2026-10-11: after a second independent review of `58cc803`, the uncited sentence on how these terms relate to a license grant moves from section 3 to [Sean to decide](#sean-to-decide), item 14, as proposed wording.
-- 2026-10-11: after a second Codex review, the download rule is the guest-order rule; account-owned test orders are reachable after signing in from a fresh browser.
-- 2026-10-11: after a third Codex review, the preview sentence no longer states a purpose (acceptable use stays undecided), and the checkout window is described as explicit retry eligibility, not automatic retries.
+- 2026-10-10: first evidence-cited draft from source `f57e7256891d0d3c117e151a36f7fb967c724ab7` (lane `harness/launch-documents`), with review rounds on 2026-10-11.
+- 2026-10-24: rewritten as buyer-facing terms of sale and use from source `786fb7c755291184f9e01b4faaab28dbd430d698` after Sean named the merchant (Vasey Multimedia dba VASEY.AUDIO), the seller/licensor (Sean Vasey) and Iowa governing law, and assigned the drafting to the development lead. Adds license precedence, a proposed refund and dispute policy, exclusive reservation and prior-license rules, acceptable use, IP, disclaimers and liability wording for review. Not approved.
