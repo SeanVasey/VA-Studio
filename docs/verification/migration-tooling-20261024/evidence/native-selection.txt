@@ -1,0 +1,1 @@
+Proved 2519 selected MySQL-native tests in 243 files (of 9617 discovered tests in 703 files) across 8 nonempty shards.

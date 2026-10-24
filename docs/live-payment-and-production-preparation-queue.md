@@ -48,3 +48,13 @@ transactions, paid services, production deployment and DNS/cutover pending
 separate authorization. Development, synthetic fixtures and dry runs can proceed
 now. Preserve existing budgets, protections, immutable contracts and source
 obligations throughout preparation.
+
+### Launch gate: one exclusive-sale authority (lane MIG, 2026-10-24)
+
+Before any live exclusive sale, canary or dual-platform interval, exclusive activation
+(`ActivateExclusiveOffer`) and every checkout path that can sell an exclusive must refuse
+unless `ExclusivityAuthority::storeMaySellExclusives()` is true, under a native race test
+against a concurrent `handover`/`revert`. Today nothing in checkout consults the ledger;
+`vasey:exclusivity-authority` only records and rehearses the cutover authority
+(`docs/migration/legacy-history-archive.md`). The wiring belongs to the production-checkout or
+activation lane that owns those files, and the gate stays open until it lands with that test.

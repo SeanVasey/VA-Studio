@@ -16,20 +16,21 @@ VALIDATOR = REPO / "scripts/ops/validate-test-commerce-profile.php"
 ENV_CALL = re.compile(r"""env\(\s*['"]([A-Za-z0-9_]+)['"]""")
 ASSIGNMENT = re.compile(r"^(#?)\s*([A-Z][A-Z0-9_]*)=(.*)$")
 
-# Environment key -> (config file, config key). The ten flags of batch K2, in the validator's CAPABILITY_FLAGS.
+# Environment key -> (config file, config key). The ten flags of batch K2 plus A5's refund/dispute flag, in the validator's CAPABILITY_FLAGS.
 FLAGS = {
     "VASEY_TEST_SERVICE_PROJECTS_ENABLED": ("services-projects", "test_enabled"),
     "VASEY_TEST_FREE_GRANTS_ENABLED": ("free-grants", "test_enabled"),
     "VASEY_TEST_CUSTOMER_CONSENT_ENABLED": ("customer-preferences", "test_grants_enabled"),
     "VASEY_TEST_UNPAID_RELEASE_ENABLED": ("unpaid-release", "enabled"),
     "VASEY_TEST_REFUND_RESOLUTION_ENABLED": ("refund-resolution", "enabled"),
+    "VASEY_TEST_REFUND_DISPUTE_ENABLED": ("refund-dispute", "enabled"),
     "VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED": ("transactional-notifications", "test_enabled"),
     "CONTACT_TEST_ORDER_INQUIRIES_ENABLED": ("inquiries", "test_order_inquiries_enabled"),
     "CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED": ("inquiries", "operator_notifications_enabled"),
     "VASEY_OPERATIVE_FREE_GRANTS_ENABLED": ("free-grants", "operative_enabled"),
     "VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED": ("support-attachments", "fixture_enabled"),
 }
-# Stated explicitly but outside the ten: production-lane or one-way, so never left to a default on staging.
+# Stated explicitly but outside the eleven: production-lane or one-way, so never left to a default on staging.
 EXTRA_FALSE = ("DISCOVERY_SITEMAP_ENABLED", "VASEY_LISTENING_V2_PROMOTION_ENABLED")
 
 # Keys config/ reads that the kit deliberately leaves to Laravel's own defaults: cache and queue back ends the kit does not use
@@ -179,6 +180,8 @@ class AdmissionMatchesTheValues(unittest.TestCase):
         self.assert_source("app/Domain/Notifications/TransactionalNotificationPolicy.php", r"! TestEnvironment::admitsTestCommerce\(\).*?config\('transactional-notifications\.test_enabled'\) !== true")
         self.assert_source("app/Domain/Commerce/UnpaidRelease/UnpaidReleasePolicy.php", r"! TestEnvironment::admitsTestCommerce\(\).*?config\('unpaid-release\.enabled'\) !== true")
         self.assert_source("app/Domain/Commerce/RefundResolution/RefundResolutionPolicy.php", r"app\(UnpaidReleasePolicy::class\)->account\(\).*?config\('refund-resolution\.enabled'\) !== true")
+        self.assert_source("app/Domain/Commerce/RefundDispute/RefundDisputePolicy.php",
+                           r"\$this->account\(\);\s*RefundDisputeException::require\(config\('refund-dispute\.enabled'\) === true.*?TestEnvironment::admitsTestCommerce\(\)")
         self.assert_source("app/Domain/Inquiries/OrderInquiry.php", r"function readable\(\): void\s*\{\s*if \(! TestEnvironment::admitsTestCommerce\(\)\)")
         self.assert_source("app/Domain/Inquiries/OrderInquiry.php", r"config\('inquiries\.test_order_inquiries_enabled'\) !== true")
 

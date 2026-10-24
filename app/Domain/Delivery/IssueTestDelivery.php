@@ -3,6 +3,7 @@
 namespace App\Domain\Delivery;
 
 use App\Domain\Commerce\Models\Order;
+use App\Domain\Commerce\RefundDispute\RefundDisputeAccess;
 use App\Domain\Customers\CustomerAccess;
 use App\Domain\Customers\CustomerPrincipal;
 use App\Domain\Customers\PurchaseAccess;
@@ -75,6 +76,7 @@ final class IssueTestDelivery
                 throw new DeliveryException('changed');
             }
             $currentControl = $evidence->control($fresh, $currentControl, $control->control_version);
+            RefundDisputeAccess::assertClear($locked->id, (int) $target['license_grant_id']);
             $this->replay($locked, $keyHash, $requestHash, $fresh);
             $at = now()->toImmutable()->utc()->startOfSecond();
             if ($at->lessThan($through)) {
