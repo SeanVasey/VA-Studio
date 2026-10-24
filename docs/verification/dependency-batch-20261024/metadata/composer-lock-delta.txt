@@ -1,0 +1,11 @@
+records 160 -> 160
+content-hash same: True
+CHANGED laravel/framework v13.37.0 (685f8d6c) -> v13.38.0 (c42f9abd) | require/require-dev/suggest identical: True
+unchanged-check symfony/console v7.4.20 v7.4.20 OK
+unchanged-check livewire/livewire v4.4.7 v4.4.7 OK
+unchanged-check filament/filament v5.10.2 v5.10.2 OK
+unchanged-check tecnickcom/tc-lib-pdf 8.76.3 8.76.3 OK
+unchanged-check tecnickcom/tc-lib-pdf-font 4.4.1 4.4.1 OK
+unchanged-check stripe/stripe-php v21.3.2 v21.3.2 OK
+unchanged-check phpunit/phpunit 12.5.34 12.5.34 OK
+unchanged-check inertiajs/inertia-laravel v3.5.1 v3.5.1 OK

@@ -1,0 +1,14 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/m4/phpunit.xml
+
+SSSSSSSSSSSSSSSSSSSS.........SSSSSSSS..........Tax withdrawal mutation timing: [{"pdo_transaction":true,"framework_depth":1,"calls":["Tests\\Feature\\PaidTaxDownloadJourneyTest::{closure:{closure:Tests\\Feature\\PaidTaxDownloadJourneyTest::test_late_authorization_key_change_and_source_decryption_owner_withdrawal_roll_back_new_rows():223}:230}","Mockery\\Expectation->_getReturnValue","Mockery\\Expectation->verifyCall","Mockery\\ExpectationDirector->call","Mockery_2_Illuminate_Encryption_Encrypter->_mockery_handleMethodCall","Mockery_2_Illuminate_Encryption_Encrypter->decryptString","Illuminate\\Support\\Facades\\Facade::__callStatic","App\\Domain\\Commerce\\ProductionCheckout\\Evidence::open","App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxCheckoutEvidence::intent","App\\Domain\\Commerce\\ProductionTaxCheckout\\ProductionTaxPaidOrderSourceV2->proveAuthenticatedCurrent","App\\Domain\\Commerce\\ProductionTaxCheckout\\ProductionTaxPaidOrderSourceV2->{closure:App\\Domain\\Commerce\\ProductionTaxCheckout\\ProductionTaxPaidOrderSourceV2::proveRetainedCurrent():86}","App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidReadContext->held","App\\Domain\\Commerce\\ProductionTaxCheckout\\ProductionTaxPaidOrderSourceV2->proveRetainedCurrent","App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidOriginalCommitDispatcher->{closure:App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidOriginalCommitDispatcher::dispatch():170}","App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidReadContext->held","App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidOriginalCommitDispatcher->dispatch"]}]
+.......S........  63 / 138 ( 45%)
+..........SSSSSS...........................SSSSSSSS............ 126 / 138 ( 91%)
+............                                                    138 / 138 (100%)
+
+Time: 25:50.307, Memory: 134.19 MB
+
+OK, but some tests were skipped!
+Tests: 138, Assertions: 907, Skipped: 43.

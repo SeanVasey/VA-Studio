@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="142" assertions="1084" errors="0" failures="0" skipped="58" time="1041.395576">
+    <testsuite name="Tests\Feature\CustomerIdentityHttpTest" file="/home/user/wt/m4/tests/Feature/CustomerIdentityHttpTest.php" tests="10" assertions="109" errors="0" failures="0" skipped="0" time="129.984435">
+      <testcase name="test_real_enrollment_completion_and_recovery_leave_guards_separate_and_old_customer_session_unusable" file="/home/user/wt/m4/tests/Feature/CustomerIdentityHttpTest.php" line="30" class="Tests\Feature\CustomerIdentityHttpTest" classname="Tests.Feature.CustomerIdentityHttpTest" assertions="25" time="22.508195"/>
+      <testcase name="test_unknown_existing_staff_withdrawn_and_case_variants_share_exact_request_response" file="/home/user/wt/m4/tests/Feature/CustomerIdentityHttpTest.php" line="62" class="Tests\Feature\CustomerIdentityHttpTest" classname="Tests.Feature.CustomerIdentityHttpTest" assertions="32" time="12.921472"/>
+      <testcase name="test_feature_and_transport_fail_closed_in_production_and_never_send_or_log_a_proof" file="/home/user/wt/m4/tests/Feature/CustomerIdentityHttpTest.php" line="79" class="Tests\Feature\CustomerIdentityHttpTest" classname="Tests.Feature.CustomerIdentityHttpTest" assertions="8" time="10.200810"/>
+      <testcase name="test_collation_only_legacy_address_matches_keep_the_generic_request_envelope" file="/home/user/wt/m4/tests/Feature/CustomerIdentityHttpTest.php" line="97" class="Tests\Feature\CustomerIdentityHttpTest" classname="Tests.Feature.CustomerIdentityHttpTest" assertions="8" time="12.640780"/>
+      <testcase name="test_csrf_is_required_and_failure_never_flashes_proof_password_or_name" file="/home/user/wt/m4/tests/Feature/CustomerIdentityHttpTest.php" line="109" class="Tests\Feature\CustomerIdentityHttpTest" classname="Tests.Feature.CustomerIdentityHttpTest" assertions="6" time="14.401257"/>
+      <testsuite name="Tests\Feature\CustomerIdentityHttpTest::test_private_boundary_rejects_ambiguous_or_oversized_request_without_echo" tests="5" assertions="30" errors="0" failures="0" skipped="0" time="57.311920">
+        <testcase name="test_private_boundary_rejects_ambiguous_or_oversized_request_without_echo with data set #0" file="/home/user/wt/m4/tests/Feature/CustomerIdentityHttpTest.php" line="128" class="Tests\Feature\CustomerIdentityHttpTest" classname="Tests.Feature.CustomerIdentityHttpTest" assertions="6" time="12.216920"/>
+        <testcase name="test_private_boundary_rejects_ambiguous_or_oversized_request_without_echo with data set #1" file="/home/user/wt/m4/tests/Feature/CustomerIdentityHttpTest.php" line="128" class="Tests\Feature\CustomerIdentityHttpTest" classname="Tests.Feature.CustomerIdentityHttpTest" assertions="6" time="13.239734"/>
+        <testcase name="test_private_boundary_rejects_ambiguous_or_oversized_request_without_echo with data set #2" file="/home/user/wt/m4/tests/Feature/CustomerIdentityHttpTest.php" line="128" class="Tests\Feature\CustomerIdentityHttpTest" classname="Tests.Feature.CustomerIdentityHttpTest" assertions="6" time="10.120028"/>
+        <testcase name="test_private_boundary_rejects_ambiguous_or_oversized_request_without_echo with data set #3" file="/home/user/wt/m4/tests/Feature/CustomerIdentityHttpTest.php" line="128" class="Tests\Feature\CustomerIdentityHttpTest" classname="Tests.Feature.CustomerIdentityHttpTest" assertions="6" time="10.200394"/>
+        <testcase name="test_private_boundary_rejects_ambiguous_or_oversized_request_without_echo with data set #4" file="/home/user/wt/m4/tests/Feature/CustomerIdentityHttpTest.php" line="128" class="Tests\Feature\CustomerIdentityHttpTest" classname="Tests.Feature.CustomerIdentityHttpTest" assertions="6" time="11.534844"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\FreeGrantConcurrencyTest" file="/home/user/wt/m4/tests/Feature/FreeGrantConcurrencyTest.php" tests="1" assertions="0" errors="0" failures="0" skipped="1" time="0.000000">
+      <testcase name="test_observed_two_buyer_scope_wait_cannot_overfill_one_explicit_free_origin_capacity" file="/home/user/wt/m4/tests/Feature/FreeGrantConcurrencyTest.php" line="27" class="Tests\Feature\FreeGrantConcurrencyTest" classname="Tests.Feature.FreeGrantConcurrencyTest" assertions="0" time="0.000000">
+        <skipped/>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\MembershipCreditConcurrencyTest" file="/home/user/wt/m4/tests/Feature/MembershipCreditConcurrencyTest.php" tests="12" assertions="0" errors="0" failures="0" skipped="12" time="0.000000">
+      <testsuite name="Tests\Feature\MembershipCreditConcurrencyTest::test_independent_primary_processes_serialize_exact_ledger_and_plan_effects" tests="7" assertions="0" errors="0" failures="0" skipped="7" time="0.000000">
+        <testcase name="test_independent_primary_processes_serialize_exact_ledger_and_plan_effects with data set &quot;last credit&quot;" file="/home/user/wt/m4/tests/Feature/MembershipCreditConcurrencyTest.php" line="45" class="Tests\Feature\MembershipCreditConcurrencyTest" classname="Tests.Feature.MembershipCreditConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_independent_primary_processes_serialize_exact_ledger_and_plan_effects with data set &quot;duplicate invoice fixture&quot;" file="/home/user/wt/m4/tests/Feature/MembershipCreditConcurrencyTest.php" line="45" class="Tests\Feature\MembershipCreditConcurrencyTest" classname="Tests.Feature.MembershipCreditConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_independent_primary_processes_serialize_exact_ledger_and_plan_effects with data set &quot;stale reviewed revision&quot;" file="/home/user/wt/m4/tests/Feature/MembershipCreditConcurrencyTest.php" line="45" class="Tests\Feature\MembershipCreditConcurrencyTest" classname="Tests.Feature.MembershipCreditConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_independent_primary_processes_serialize_exact_ledger_and_plan_effects with data set &quot;consume before release&quot;" file="/home/user/wt/m4/tests/Feature/MembershipCreditConcurrencyTest.php" line="45" class="Tests\Feature\MembershipCreditConcurrencyTest" classname="Tests.Feature.MembershipCreditConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_independent_primary_processes_serialize_exact_ledger_and_plan_effects with data set &quot;release before consume&quot;" file="/home/user/wt/m4/tests/Feature/MembershipCreditConcurrencyTest.php" line="45" class="Tests\Feature\MembershipCreditConcurrencyTest" classname="Tests.Feature.MembershipCreditConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_independent_primary_processes_serialize_exact_ledger_and_plan_effects with data set &quot;expire before release&quot;" file="/home/user/wt/m4/tests/Feature/MembershipCreditConcurrencyTest.php" line="45" class="Tests\Feature\MembershipCreditConcurrencyTest" classname="Tests.Feature.MembershipCreditConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_independent_primary_processes_serialize_exact_ledger_and_plan_effects with data set &quot;reverse before expiry&quot;" file="/home/user/wt/m4/tests/Feature/MembershipCreditConcurrencyTest.php" line="45" class="Tests\Feature\MembershipCreditConcurrencyTest" classname="Tests.Feature.MembershipCreditConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\MembershipCreditConcurrencyTest::test_committed_authority_withdrawal_wins_exact_user_fence_before_replay_or_write" tests="5" assertions="0" errors="0" failures="0" skipped="5" time="0.000000">
+        <testcase name="test_committed_authority_withdrawal_wins_exact_user_fence_before_replay_or_write with data set &quot;grant role&quot;" file="/home/user/wt/m4/tests/Feature/MembershipCreditConcurrencyTest.php" line="183" class="Tests\Feature\MembershipCreditConcurrencyTest" classname="Tests.Feature.MembershipCreditConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_committed_authority_withdrawal_wins_exact_user_fence_before_replay_or_write with data set &quot;reviewed apply MFA&quot;" file="/home/user/wt/m4/tests/Feature/MembershipCreditConcurrencyTest.php" line="183" class="Tests\Feature\MembershipCreditConcurrencyTest" classname="Tests.Feature.MembershipCreditConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_committed_authority_withdrawal_wins_exact_user_fence_before_replay_or_write with data set &quot;reserve account&quot;" file="/home/user/wt/m4/tests/Feature/MembershipCreditConcurrencyTest.php" line="183" class="Tests\Feature\MembershipCreditConcurrencyTest" classname="Tests.Feature.MembershipCreditConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_committed_authority_withdrawal_wins_exact_user_fence_before_replay_or_write with data set &quot;consume credential&quot;" file="/home/user/wt/m4/tests/Feature/MembershipCreditConcurrencyTest.php" line="183" class="Tests\Feature\MembershipCreditConcurrencyTest" classname="Tests.Feature.MembershipCreditConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_committed_authority_withdrawal_wins_exact_user_fence_before_replay_or_write with data set &quot;read account&quot;" file="/home/user/wt/m4/tests/Feature/MembershipCreditConcurrencyTest.php" line="183" class="Tests\Feature\MembershipCreditConcurrencyTest" classname="Tests.Feature.MembershipCreditConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\PaidGrantDocumentJourneyTest" file="/home/user/wt/m4/tests/Feature/PaidGrantDocumentJourneyTest.php" tests="4" assertions="90" errors="0" failures="0" skipped="0" time="224.600165">
+      <testcase name="test_actual_claim_render_original_and_complete_order_are_idempotent_and_missing_original_is_restore_only" file="/home/user/wt/m4/tests/Feature/PaidGrantDocumentJourneyTest.php" line="121" class="Tests\Feature\PaidGrantDocumentJourneyTest" classname="Tests.Feature.PaidGrantDocumentJourneyTest" assertions="27" time="78.909874"/>
+      <testcase name="test_failed_second_line_retains_first_original_without_any_activation_until_exact_fresh_retry" file="/home/user/wt/m4/tests/Feature/PaidGrantDocumentJourneyTest.php" line="165" class="Tests\Feature\PaidGrantDocumentJourneyTest" classname="Tests.Feature.PaidGrantDocumentJourneyTest" assertions="24" time="63.551308"/>
+      <testcase name="test_busy_original_claim_returns_only_a_fresh_one_use_body_receipt_without_new_claim_or_activation" file="/home/user/wt/m4/tests/Feature/PaidGrantDocumentJourneyTest.php" line="203" class="Tests\Feature\PaidGrantDocumentJourneyTest" classname="Tests.Feature.PaidGrantDocumentJourneyTest" assertions="20" time="46.513961"/>
+      <testcase name="test_credential_withdrawal_during_real_render_cannot_publish_original_or_extend_claim_authority" file="/home/user/wt/m4/tests/Feature/PaidGrantDocumentJourneyTest.php" line="233" class="Tests\Feature\PaidGrantDocumentJourneyTest" classname="Tests.Feature.PaidGrantDocumentJourneyTest" assertions="19" time="35.625021"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductDraftConcurrencyTest" file="/home/user/wt/m4/tests/Feature/ProductDraftConcurrencyTest.php" tests="9" assertions="0" errors="0" failures="0" skipped="9" time="0.000000">
+      <testsuite name="Tests\Feature\ProductDraftConcurrencyTest::test_native_product_wait_serializes_competing_draft_changes" tests="3" assertions="0" errors="0" failures="0" skipped="3" time="0.000000">
+        <testcase name="test_native_product_wait_serializes_competing_draft_changes with data set &quot;edit vs edit&quot;" file="/home/user/wt/m4/tests/Feature/ProductDraftConcurrencyTest.php" line="42" class="Tests\Feature\ProductDraftConcurrencyTest" classname="Tests.Feature.ProductDraftConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_native_product_wait_serializes_competing_draft_changes with data set &quot;edit vs history&quot;" file="/home/user/wt/m4/tests/Feature/ProductDraftConcurrencyTest.php" line="42" class="Tests\Feature\ProductDraftConcurrencyTest" classname="Tests.Feature.ProductDraftConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_native_product_wait_serializes_competing_draft_changes with data set &quot;history vs edit&quot;" file="/home/user/wt/m4/tests/Feature/ProductDraftConcurrencyTest.php" line="42" class="Tests\Feature\ProductDraftConcurrencyTest" classname="Tests.Feature.ProductDraftConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\ProductDraftConcurrencyTest::test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation" tests="5" assertions="0" errors="0" failures="0" skipped="5" time="0.000000">
+        <testcase name="test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation with data set &quot;create&quot;" file="/home/user/wt/m4/tests/Feature/ProductDraftConcurrencyTest.php" line="87" class="Tests\Feature\ProductDraftConcurrencyTest" classname="Tests.Feature.ProductDraftConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation with data set &quot;edit&quot;" file="/home/user/wt/m4/tests/Feature/ProductDraftConcurrencyTest.php" line="87" class="Tests\Feature\ProductDraftConcurrencyTest" classname="Tests.Feature.ProductDraftConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation with data set &quot;history selection&quot;" file="/home/user/wt/m4/tests/Feature/ProductDraftConcurrencyTest.php" line="87" class="Tests\Feature\ProductDraftConcurrencyTest" classname="Tests.Feature.ProductDraftConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation with data set &quot;inspect&quot;" file="/home/user/wt/m4/tests/Feature/ProductDraftConcurrencyTest.php" line="87" class="Tests\Feature\ProductDraftConcurrencyTest" classname="Tests.Feature.ProductDraftConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_required_mfa_withdrawn_during_actor_wait_refuses_product_operation with data set &quot;choices&quot;" file="/home/user/wt/m4/tests/Feature/ProductDraftConcurrencyTest.php" line="87" class="Tests\Feature\ProductDraftConcurrencyTest" classname="Tests.Feature.ProductDraftConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+      <testcase name="test_source_lock_captures_metadata_committed_while_creator_waits" file="/home/user/wt/m4/tests/Feature/ProductDraftConcurrencyTest.php" line="127" class="Tests\Feature\ProductDraftConcurrencyTest" classname="Tests.Feature.ProductDraftConcurrencyTest" assertions="0" time="0.000000">
+        <skipped/>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionCheckoutWriteCommitTest" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutWriteCommitTest.php" tests="12" assertions="90" errors="0" failures="0" skipped="0" time="233.508611">
+      <testcase name="test_committing_persisted_password_withdrawal_rolls_back_order_and_original_password" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutWriteCommitTest.php" line="40" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="8" time="21.931593"/>
+      <testcase name="test_committing_identity_module_withdrawal_rolls_back_order" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutWriteCommitTest.php" line="51" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="8" time="25.148278"/>
+      <testcase name="test_committing_catalog_withdrawal_rolls_back_order_and_track" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutWriteCommitTest.php" line="61" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="8" time="26.514796"/>
+      <testcase name="test_committing_fresh_withdrawal_refuses_new_review_and_retains_original" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutWriteCommitTest.php" line="73" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="7" time="16.631838"/>
+      <testcase name="test_ordinary_committing_caller_write_survives_positive_order_commit_and_observer_restores" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutWriteCommitTest.php" line="95" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="7" time="23.242364"/>
+      <testcase name="test_committing_arrayobject_app_parent_is_refused_without_offset_callbacks" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutWriteCommitTest.php" line="116" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="8" time="24.559772"/>
+      <testcase name="test_committing_statement_class_is_refused_before_statement_callbacks_and_original_claim_is_rolled_back" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutWriteCommitTest.php" line="127" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="7" time="19.680647"/>
+      <testcase name="test_committing_direct_physical_commit_reopen_refuses_and_preserves_replacement_frame" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutWriteCommitTest.php" line="151" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="7" time="19.841692"/>
+      <testcase name="test_committing_dispatcher_replacement_refuses_without_replacing_delegate" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutWriteCommitTest.php" line="182" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="8" time="14.606795"/>
+      <testcase name="test_committing_trusted_actor_mutation_refuses_order" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutWriteCommitTest.php" line="193" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="7" time="12.830086"/>
+      <testcase name="test_committing_nested_framework_frame_refuses_and_rolls_back_original_order" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutWriteCommitTest.php" line="202" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="7" time="12.716942"/>
+      <testcase name="test_original_remaining_review_deadline_is_not_reset_after_committing_listener_delay" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutWriteCommitTest.php" line="212" class="Tests\Feature\ProductionCheckoutWriteCommitTest" classname="Tests.Feature.ProductionCheckoutWriteCommitTest" assertions="8" time="15.803809"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionIdentity\ReviewIdentityKeyRotationAdversarialTest" file="/home/user/wt/m4/tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php" tests="8" assertions="47" errors="0" failures="0" skipped="0" time="64.062418">
+      <testcase name="test_principal_minted_before_rotation_is_refused_by_lock_and_current_after_rotation" file="/home/user/wt/m4/tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php" line="37" class="Tests\Feature\ProductionIdentity\ReviewIdentityKeyRotationAdversarialTest" classname="Tests.Feature.ProductionIdentity.ReviewIdentityKeyRotationAdversarialTest" assertions="4" time="7.510924"/>
+      <testcase name="test_rotation_between_lock_and_prove_current_refuses" file="/home/user/wt/m4/tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php" line="50" class="Tests\Feature\ProductionIdentity\ReviewIdentityKeyRotationAdversarialTest" classname="Tests.Feature.ProductionIdentity.ReviewIdentityKeyRotationAdversarialTest" assertions="3" time="7.815629"/>
+      <testcase name="test_evidence_reforged_in_the_database_under_an_unconfigured_key_is_refused_everywhere" file="/home/user/wt/m4/tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php" line="70" class="Tests\Feature\ProductionIdentity\ReviewIdentityKeyRotationAdversarialTest" classname="Tests.Feature.ProductionIdentity.ReviewIdentityKeyRotationAdversarialTest" assertions="5" time="7.032454"/>
+      <testcase name="test_recovery_issued_before_rotation_completes_after_rotation_and_the_chain_verifies" file="/home/user/wt/m4/tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php" line="87" class="Tests\Feature\ProductionIdentity\ReviewIdentityKeyRotationAdversarialTest" classname="Tests.Feature.ProductionIdentity.ReviewIdentityKeyRotationAdversarialTest" assertions="4" time="6.634959"/>
+      <testcase name="test_copied_binding_is_the_last_verified_observation_and_a_changed_credential_refuses_the_other_pending_recovery" file="/home/user/wt/m4/tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php" line="98" class="Tests\Feature\ProductionIdentity\ReviewIdentityKeyRotationAdversarialTest" classname="Tests.Feature.ProductionIdentity.ReviewIdentityKeyRotationAdversarialTest" assertions="8" time="9.258937"/>
+      <testcase name="test_historical_byte_comparison_refuses_a_bound_binding_recomputed_or_relabelled_under_another_value" file="/home/user/wt/m4/tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php" line="119" class="Tests\Feature\ProductionIdentity\ReviewIdentityKeyRotationAdversarialTest" classname="Tests.Feature.ProductionIdentity.ReviewIdentityKeyRotationAdversarialTest" assertions="10" time="9.000536"/>
+      <testcase name="test_mixed_configuration_window_creates_two_fences_and_then_refuses_every_request_for_the_address" file="/home/user/wt/m4/tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php" line="158" class="Tests\Feature\ProductionIdentity\ReviewIdentityKeyRotationAdversarialTest" classname="Tests.Feature.ProductionIdentity.ReviewIdentityKeyRotationAdversarialTest" assertions="6" time="8.282672"/>
+      <testcase name="test_previous_key_order_and_duplicates_do_not_change_verification_or_the_selected_fence" file="/home/user/wt/m4/tests/Feature/ProductionIdentity/ReviewIdentityKeyRotationAdversarialTest.php" line="176" class="Tests\Feature\ProductionIdentity\ReviewIdentityKeyRotationAdversarialTest" classname="Tests.Feature.ProductionIdentity.ReviewIdentityKeyRotationAdversarialTest" assertions="7" time="8.526307"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest" file="/home/user/wt/m4/tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php" tests="10" assertions="67" errors="0" failures="0" skipped="1" time="71.485974">
+      <testcase name="test_values_copies_and_another_issuer_cannot_adopt_a_start_or_interval" file="/home/user/wt/m4/tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php" line="46" class="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingIssuedRetrievalTest" assertions="9" time="7.157641"/>
+      <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest::test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted" tests="4" assertions="24" errors="0" failures="0" skipped="0" time="36.494940">
+        <testcase name="test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set &quot;start before end&quot;" file="/home/user/wt/m4/tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php" line="70" class="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingIssuedRetrievalTest" assertions="6" time="9.273784"/>
+        <testcase name="test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set &quot;start before append&quot;" file="/home/user/wt/m4/tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php" line="70" class="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingIssuedRetrievalTest" assertions="6" time="9.391064"/>
+        <testcase name="test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set &quot;end before append&quot;" file="/home/user/wt/m4/tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php" line="70" class="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingIssuedRetrievalTest" assertions="6" time="9.907007"/>
+        <testcase name="test_simulated_allocation_replacement_at_the_same_numeric_id_cannot_be_adopted with data set &quot;end before attempt&quot;" file="/home/user/wt/m4/tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php" line="70" class="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingIssuedRetrievalTest" assertions="6" time="7.923085"/>
+      </testsuite>
+      <testcase name="test_replaced_endpoint_after_end_cannot_claim_the_first_invoice_identity" file="/home/user/wt/m4/tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php" line="93" class="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingIssuedRetrievalTest" assertions="6" time="5.110007"/>
+      <testcase name="test_database_end_follows_provider_reads_and_worker_time_cannot_change_paid_time_or_freshness" file="/home/user/wt/m4/tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php" line="107" class="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingIssuedRetrievalTest" assertions="14" time="6.424796"/>
+      <testcase name="test_a_newer_reversal_on_a_clock_behind_worker_is_admitted_after_an_ahead_worker" file="/home/user/wt/m4/tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php" line="135" class="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingIssuedRetrievalTest" assertions="5" time="5.833543"/>
+      <testcase name="test_native_duplicate_first_identity_uses_a_current_read_after_its_earlier_snapshot" file="/home/user/wt/m4/tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php" line="151" class="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingIssuedRetrievalTest" assertions="0" time="4.581183">
+        <skipped/>
+      </testcase>
+      <testcase name="test_failed_first_retrieval_retains_a_database_interval_without_claiming_invoice_ownership" file="/home/user/wt/m4/tests/Feature/ProductionMembershipBilling/BillingIssuedRetrievalTest.php" line="201" class="Tests\Feature\ProductionMembershipBilling\BillingIssuedRetrievalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingIssuedRetrievalTest" assertions="9" time="5.883863"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeSchemaTest" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeSchemaTest.php" tests="3" assertions="0" errors="0" failures="0" skipped="3" time="0.000000">
+      <testcase name="test_native_dictionary_matches_the_generated_guards_and_a_rerun_is_a_no_op" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeSchemaTest.php" line="26" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeSchemaTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutNativeSchemaTest" assertions="0" time="0.000000">
+        <skipped/>
+      </testcase>
+      <testcase name="test_native_timestamp_and_uuid_guards_refuse_malformed_text" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeSchemaTest.php" line="41" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeSchemaTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutNativeSchemaTest" assertions="0" time="0.000000">
+        <skipped/>
+      </testcase>
+      <testcase name="test_native_case_alias_of_a_reserved_constraint_name_is_refused_before_ddl" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutNativeSchemaTest.php" line="56" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutNativeSchemaTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutNativeSchemaTest" assertions="0" time="0.000000">
+        <skipped/>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\RightsDeclarationWriterConcurrencyTest" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" tests="28" assertions="0" errors="0" failures="0" skipped="28" time="0.000000">
+      <testsuite name="Tests\Feature\RightsDeclarationWriterConcurrencyTest::test_current_authority_withdrawal_and_reviewed_verification_serialize_on_the_exact_actor_row" tests="6" assertions="0" errors="0" failures="0" skipped="6" time="0.000000">
+        <testcase name="test_current_authority_withdrawal_and_reviewed_verification_serialize_on_the_exact_actor_row with data set &quot;staff role writer first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="90" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_current_authority_withdrawal_and_reviewed_verification_serialize_on_the_exact_actor_row with data set &quot;staff role withdrawal first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="90" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_current_authority_withdrawal_and_reviewed_verification_serialize_on_the_exact_actor_row with data set &quot;verified email writer first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="90" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_current_authority_withdrawal_and_reviewed_verification_serialize_on_the_exact_actor_row with data set &quot;verified email withdrawal first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="90" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_current_authority_withdrawal_and_reviewed_verification_serialize_on_the_exact_actor_row with data set &quot;MFA enrollment writer first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="90" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_current_authority_withdrawal_and_reviewed_verification_serialize_on_the_exact_actor_row with data set &quot;MFA enrollment withdrawal first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="90" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\RightsDeclarationWriterConcurrencyTest::test_manifest_capture_and_supported_rights_mutation_share_each_exact_affected_track_fence" tests="8" assertions="0" errors="0" failures="0" skipped="8" time="0.000000">
+        <testcase name="test_manifest_capture_and_supported_rights_mutation_share_each_exact_affected_track_fence with data set &quot;append manifest first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="136" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_manifest_capture_and_supported_rights_mutation_share_each_exact_affected_track_fence with data set &quot;append writer first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="136" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_manifest_capture_and_supported_rights_mutation_share_each_exact_affected_track_fence with data set &quot;verify older pending manifest first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="136" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_manifest_capture_and_supported_rights_mutation_share_each_exact_affected_track_fence with data set &quot;verify older pending writer first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="136" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_manifest_capture_and_supported_rights_mutation_share_each_exact_affected_track_fence with data set &quot;retarget source manifest first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="136" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_manifest_capture_and_supported_rights_mutation_share_each_exact_affected_track_fence with data set &quot;retarget source writer first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="136" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_manifest_capture_and_supported_rights_mutation_share_each_exact_affected_track_fence with data set &quot;retarget target manifest first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="136" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_manifest_capture_and_supported_rights_mutation_share_each_exact_affected_track_fence with data set &quot;retarget target writer first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="136" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+      <testcase name="test_opposite_retargets_lock_tracks_in_numeric_order_and_preserve_both_current_pending_rows" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="195" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+        <skipped/>
+      </testcase>
+      <testsuite name="Tests\Feature\RightsDeclarationWriterConcurrencyTest::test_pending_identity_changed_while_verifier_waits_is_refused_without_acquiring_a_new_track_after_rights" tests="2" assertions="0" errors="0" failures="0" skipped="2" time="0.000000">
+        <testcase name="test_pending_identity_changed_while_verifier_waits_is_refused_without_acquiring_a_new_track_after_rights with data set &quot;changed disclosure&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="245" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_pending_identity_changed_while_verifier_waits_is_refused_without_acquiring_a_new_track_after_rights with data set &quot;changed source association&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="245" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+      <testcase name="test_same_actor_legacy_offer_revision_and_rights_writer_complete_without_a_user_fk_track_cycle" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="275" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+        <skipped/>
+      </testcase>
+      <testsuite name="Tests\Feature\RightsDeclarationWriterConcurrencyTest::test_same_actor_catalog_writers_and_rights_creation_complete_in_both_lock_orders" tests="6" assertions="0" errors="0" failures="0" skipped="6" time="0.000000">
+        <testcase name="test_same_actor_catalog_writers_and_rights_creation_complete_in_both_lock_orders with data set &quot;metadata / catalog first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="322" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_same_actor_catalog_writers_and_rights_creation_complete_in_both_lock_orders with data set &quot;metadata / rights first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="322" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_same_actor_catalog_writers_and_rights_creation_complete_in_both_lock_orders with data set &quot;draft / catalog first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="322" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_same_actor_catalog_writers_and_rights_creation_complete_in_both_lock_orders with data set &quot;draft / rights first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="322" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_same_actor_catalog_writers_and_rights_creation_complete_in_both_lock_orders with data set &quot;deactivate / catalog first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="322" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_same_actor_catalog_writers_and_rights_creation_complete_in_both_lock_orders with data set &quot;deactivate / rights first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="322" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\RightsDeclarationWriterConcurrencyTest::test_same_actor_exclusive_writers_and_rights_edit_complete_in_both_lock_orders" tests="4" assertions="0" errors="0" failures="0" skipped="4" time="0.000000">
+        <testcase name="test_same_actor_exclusive_writers_and_rights_edit_complete_in_both_lock_orders with data set &quot;prepare first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="382" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_same_actor_exclusive_writers_and_rights_edit_complete_in_both_lock_orders with data set &quot;rights then prepare&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="382" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_same_actor_exclusive_writers_and_rights_edit_complete_in_both_lock_orders with data set &quot;activate first&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="382" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_same_actor_exclusive_writers_and_rights_edit_complete_in_both_lock_orders with data set &quot;rights then activate&quot;" file="/home/user/wt/m4/tests/Feature/RightsDeclarationWriterConcurrencyTest.php" line="382" class="Tests\Feature\RightsDeclarationWriterConcurrencyTest" classname="Tests.Feature.RightsDeclarationWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\StemsRecordingConcurrencyTest" file="/home/user/wt/m4/tests/Feature/StemsRecordingConcurrencyTest.php" tests="4" assertions="0" errors="0" failures="0" skipped="4" time="0.000000">
+      <testsuite name="Tests\Feature\StemsRecordingConcurrencyTest::test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation" tests="4" assertions="0" errors="0" failures="0" skipped="4" time="0.000000">
+        <testcase name="test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation with data set &quot;conflicting / root transaction&quot;" file="/home/user/wt/m4/tests/Feature/StemsRecordingConcurrencyTest.php" line="40" class="Tests\Feature\StemsRecordingConcurrencyTest" classname="Tests.Feature.StemsRecordingConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation with data set &quot;identical / root transaction&quot;" file="/home/user/wt/m4/tests/Feature/StemsRecordingConcurrencyTest.php" line="40" class="Tests\Feature\StemsRecordingConcurrencyTest" classname="Tests.Feature.StemsRecordingConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation with data set &quot;conflicting / old caller snapshot&quot;" file="/home/user/wt/m4/tests/Feature/StemsRecordingConcurrencyTest.php" line="40" class="Tests\Feature\StemsRecordingConcurrencyTest" classname="Tests.Feature.StemsRecordingConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_conflicting_associations_wait_on_the_track_and_preserve_the_winning_attestation with data set &quot;identical / old caller snapshot&quot;" file="/home/user/wt/m4/tests/Feature/StemsRecordingConcurrencyTest.php" line="40" class="Tests\Feature\StemsRecordingConcurrencyTest" classname="Tests.Feature.StemsRecordingConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\TestPaymentExceptionInspectionTest" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" tests="41" assertions="681" errors="0" failures="0" skipped="0" time="317.753975">
+      <testsuite name="Tests\Feature\TestPaymentExceptionInspectionTest::test_inspection_verifies_each_retained_reason_without_changing_business_evidence" tests="5" assertions="164" errors="0" failures="0" skipped="0" time="43.453412">
+        <testcase name="test_inspection_verifies_each_retained_reason_without_changing_business_evidence with data set #0" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="72" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="33" time="9.349944"/>
+        <testcase name="test_inspection_verifies_each_retained_reason_without_changing_business_evidence with data set #1" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="72" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="33" time="8.704567"/>
+        <testcase name="test_inspection_verifies_each_retained_reason_without_changing_business_evidence with data set #2" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="72" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="32" time="7.894803"/>
+        <testcase name="test_inspection_verifies_each_retained_reason_without_changing_business_evidence with data set #3" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="72" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="33" time="7.815420"/>
+        <testcase name="test_inspection_verifies_each_retained_reason_without_changing_business_evidence with data set #4" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="72" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="33" time="9.688677"/>
+      </testsuite>
+      <testcase name="test_replay_and_policy_withdrawal_keep_the_exception_pending_without_provider_or_storage_work" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="110" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="9" time="7.593149"/>
+      <testsuite name="Tests\Feature\TestPaymentExceptionInspectionTest::test_nonexclusive_and_mixed_order_exceptions_do_not_acquire_or_partially_issue_rights" tests="2" assertions="22" errors="0" failures="0" skipped="0" time="17.629663">
+        <testcase name="test_nonexclusive_and_mixed_order_exceptions_do_not_acquire_or_partially_issue_rights with data set #0" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="165" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="11" time="7.774306"/>
+        <testcase name="test_nonexclusive_and_mixed_order_exceptions_do_not_acquire_or_partially_issue_rights with data set #1" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="165" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="11" time="9.855357"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\TestPaymentExceptionInspectionTest::test_direct_service_reloads_authority_before_decrypting_or_auditing" tests="6" assertions="30" errors="0" failures="0" skipped="0" time="45.662794">
+        <testcase name="test_direct_service_reloads_authority_before_decrypting_or_auditing with data set #0" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="197" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="5" time="7.651638"/>
+        <testcase name="test_direct_service_reloads_authority_before_decrypting_or_auditing with data set #1" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="197" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="5" time="7.331149"/>
+        <testcase name="test_direct_service_reloads_authority_before_decrypting_or_auditing with data set #2" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="197" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="5" time="7.100320"/>
+        <testcase name="test_direct_service_reloads_authority_before_decrypting_or_auditing with data set #3" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="197" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="5" time="7.479928"/>
+        <testcase name="test_direct_service_reloads_authority_before_decrypting_or_auditing with data set #4" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="197" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="5" time="7.564392"/>
+        <testcase name="test_direct_service_reloads_authority_before_decrypting_or_auditing with data set #5" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="197" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="5" time="8.535367"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\TestPaymentExceptionInspectionTest::test_unknown_or_foreign_record_never_falls_back_to_another_account" tests="9" assertions="54" errors="0" failures="0" skipped="0" time="65.583898">
+        <testcase name="test_unknown_or_foreign_record_never_falls_back_to_another_account with data set #0" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="238" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="6" time="7.553623"/>
+        <testcase name="test_unknown_or_foreign_record_never_falls_back_to_another_account with data set #1" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="238" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="6" time="7.797187"/>
+        <testcase name="test_unknown_or_foreign_record_never_falls_back_to_another_account with data set #2" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="238" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="6" time="8.046938"/>
+        <testcase name="test_unknown_or_foreign_record_never_falls_back_to_another_account with data set #3" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="238" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="6" time="7.059608"/>
+        <testcase name="test_unknown_or_foreign_record_never_falls_back_to_another_account with data set #4" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="238" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="6" time="6.997858"/>
+        <testcase name="test_unknown_or_foreign_record_never_falls_back_to_another_account with data set #5" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="238" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="6" time="6.794525"/>
+        <testcase name="test_unknown_or_foreign_record_never_falls_back_to_another_account with data set #6" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="238" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="6" time="6.461116"/>
+        <testcase name="test_unknown_or_foreign_record_never_falls_back_to_another_account with data set #7" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="238" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="6" time="7.657908"/>
+        <testcase name="test_unknown_or_foreign_record_never_falls_back_to_another_account with data set #8" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="238" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="6" time="7.215136"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\TestPaymentExceptionInspectionTest::test_partial_or_corrupted_graph_is_only_attention_and_preserves_the_unverified_evidence" tests="12" assertions="336" errors="0" failures="0" skipped="0" time="90.409613">
+        <testcase name="test_partial_or_corrupted_graph_is_only_attention_and_preserves_the_unverified_evidence with data set #0" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="277" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="28" time="7.402007"/>
+        <testcase name="test_partial_or_corrupted_graph_is_only_attention_and_preserves_the_unverified_evidence with data set #1" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="277" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="28" time="7.259977"/>
+        <testcase name="test_partial_or_corrupted_graph_is_only_attention_and_preserves_the_unverified_evidence with data set #2" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="277" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="28" time="7.765705"/>
+        <testcase name="test_partial_or_corrupted_graph_is_only_attention_and_preserves_the_unverified_evidence with data set #3" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="277" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="28" time="7.112612"/>
+        <testcase name="test_partial_or_corrupted_graph_is_only_attention_and_preserves_the_unverified_evidence with data set #4" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="277" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="28" time="7.593547"/>
+        <testcase name="test_partial_or_corrupted_graph_is_only_attention_and_preserves_the_unverified_evidence with data set #5" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="277" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="28" time="7.300074"/>
+        <testcase name="test_partial_or_corrupted_graph_is_only_attention_and_preserves_the_unverified_evidence with data set #6" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="277" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="28" time="7.989440"/>
+        <testcase name="test_partial_or_corrupted_graph_is_only_attention_and_preserves_the_unverified_evidence with data set #7" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="277" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="28" time="7.808284"/>
+        <testcase name="test_partial_or_corrupted_graph_is_only_attention_and_preserves_the_unverified_evidence with data set #8" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="277" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="28" time="7.471687"/>
+        <testcase name="test_partial_or_corrupted_graph_is_only_attention_and_preserves_the_unverified_evidence with data set #9" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="277" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="28" time="7.513042"/>
+        <testcase name="test_partial_or_corrupted_graph_is_only_attention_and_preserves_the_unverified_evidence with data set #10" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="277" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="28" time="7.331847"/>
+        <testcase name="test_partial_or_corrupted_graph_is_only_attention_and_preserves_the_unverified_evidence with data set #11" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="277" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="28" time="7.861391"/>
+      </testsuite>
+      <testcase name="test_audit_failure_cannot_return_a_verified_projection_or_retain_an_inspection_event" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="296" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="6" time="7.734197"/>
+      <testcase name="test_a_caller_owned_transaction_cannot_receive_an_uncommitted_audit_disclosure" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="317" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="5" time="7.661306"/>
+      <testcase name="test_another_open_connection_also_prevents_uncommitted_inspection" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="336" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="5" time="8.330987"/>
+      <testcase name="test_operator_modal_uses_verified_historical_labels_without_sensitive_material_or_resolution_actions" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="359" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="36" time="8.383287"/>
+      <testcase name="test_corrupt_reason_is_not_reflected_as_a_diagnosis_in_the_operator_modal" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="379" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="6" time="8.161845"/>
+      <testcase name="test_open_modal_denies_reactive_requests_after_staff_or_mfa_withdrawal" file="/home/user/wt/m4/tests/Feature/TestPaymentExceptionInspectionTest.php" line="389" class="Tests\Feature\TestPaymentExceptionInspectionTest" classname="Tests.Feature.TestPaymentExceptionInspectionTest" assertions="8" time="7.149823"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
