@@ -50,7 +50,7 @@ final class SalesReport
     /** @return array{from: string, to: string} the last 30 UTC days ending today */
     public static function defaultRange(): array
     {
-        $today = now()->utc();
+        $today = now()->utc()->toImmutable();
 
         return ['from' => $today->subDays(29)->format('Y-m-d'), 'to' => $today->format('Y-m-d')];
     }
@@ -146,7 +146,7 @@ final class SalesReport
                     $rows[] = [$label, 'tier', null, 'USD', $row['tier'], $row['tier_type'], $row['lines'], $row['gross_minor'], null, null, null, null, 'on-time paid lines'];
                 }
             }
-            foreach ($production['funnel'] as $metric => $count) {
+            foreach (array_sum($production['funnel']) > 0 ? $production['funnel'] : [] as $metric => $count) {
                 $rows[] = ['PRODUCTION CHAIN (all funds modes)', 'funnel', null, null, $metric, null, $count, null, null, null, null, null, null];
             }
         }

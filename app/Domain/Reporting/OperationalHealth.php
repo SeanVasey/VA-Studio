@@ -202,7 +202,7 @@ final class OperationalHealth
         });
 
         return array_merge($metrics, $this->guarded(['media_failed', 'media_stuck', 'media_queued', 'media_quarantined'], 'media processing', function () use ($limits): array {
-            $now = now()->utc();
+            $now = now()->utc()->toImmutable();
             $stuckBefore = $now->subSeconds((int) config('media.claim_lease_seconds'))->format('Y-m-d H:i:s');
             $runs = DB::table('media_processing_runs')->selectRaw('COUNT(CASE WHEN status = \'failed\' THEN 1 END) AS failed,'
                 .' COUNT(CASE WHEN status = \'processing\' AND started_at < ? THEN 1 END) AS stuck,'

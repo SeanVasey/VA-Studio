@@ -17,6 +17,7 @@ final class ReportingFixtures
         $gateway->onCreate = fn (array $params): array => CheckoutFixtures::session($params, CheckoutFixtures::SESSION.$suffix);
         $fixture = CheckoutFixtures::prepared(false, false);
         app(HostedCheckout::class)->start($fixture['order']->public_id, InventoryFixtures::OWNER);
+        $gateway->onCreate = null;
         $gateway->session['status'] = 'complete';
         $gateway->session['payment_status'] = 'paid';
         $gateway->session['url'] = null;
