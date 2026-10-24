@@ -1,0 +1,12 @@
+HEAD fed4571e5df8813a329a5fdb37e09c2ab5646b08
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/mig/phpunit.xml
+
+..                                                                  2 / 2 (100%)
+
+Time: 11:42.956, Memory: 87.00 MB
+
+OK (2 tests, 358 assertions)
+exit=0

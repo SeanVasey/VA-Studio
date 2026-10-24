@@ -57,4 +57,144 @@ Unit (no database): normalizer findings and exceptions, consent, hashes, determi
 
 ## Results
 
-Recorded below after implementation.
+**Tested source:** `fed4571e5df8813a329a5fdb37e09c2ab5646b08` (application, migration, test and CI-comment
+bytes). Later commits on this branch change documentation and evidence only. The branch merged origin/main
+`e5d0d3f2` (PR #168 G1, PR #169 legal drafts) at `ba68a187` before the verification runs. PHP 8.4.26,
+PHPUnit 12.5.34, SQLite in memory; native runs on a private MySQL 8.4.11 (`/opt/mysql-8.4.11/bin/mysqld`, own
+datadir in the session scratchpad, port 3463, database `vaseyaudio_mig`, `VA_LOCAL_DISPOSABLE_MYSQL=vaseyaudio_mig`),
+shut down cleanly afterwards (`mysqladmin shutdown` exit 0); no other lane's server was touched.
+
+### What was built
+
+- `app/Domain/Migration/History/`: `HistoryMapping` (mapping admission), `HistorySourceFiles` (private package
+  admission through `PrivateSourceFiles`; synthetic fixtures only from `tests/Fixtures/`), `HistoryNormalizer`
+  (pure, deterministic `vasey-legacy-history-v1` snapshot with findings, exceptions and review eligibility),
+  `HistoryReconciliation` and `HistoryDelta` (pure), `LegacyArchivePolicy`, `LegacyHistoryArchive` (plan, segmented
+  import, observation), `LegacyGrantReview` (`verified_grant` path), `ExclusivityAuthority` (ledger),
+  `LegacyArchiveRefusal`.
+- `app/Console/Commands/LegacyHistory.php` (`vasey:legacy-history dry-run|import|reconcile|delta|review-grant`) and
+  `app/Console/Commands/ExclusivityAuthorityCommand.php` (`vasey:exclusivity-authority status|declare|freeze|handover|unfreeze|revert`).
+- **Schema (needs independent review):** `database/migrations/2026_10_24_264000_legacy_history_archive.php`, additive and
+  forward-only (`down()` throws before any query; `up()` refuses a retained table): `legacy_history_batches`,
+  `legacy_history_customers`, `legacy_history_orders`, `legacy_history_lines`, `legacy_history_contracts`,
+  `legacy_history_grant_reviews`, `legacy_exclusivity_authority_events`. Every table has UPDATE/DELETE abort triggers
+  (and SQLite REPLACE guards); byte-exact insert guards admit only `marketing_consent = unknown`,
+  `classification = archive_only` (lines), `classification = verified_grant` (reviews) and the authority/transition
+  vocabulary. Foreign keys only to `users` and within the archive. No existing table changes.
+- `config/legacy-archive.php` (`non_local_environments => []`, no environment variable).
+- Fixtures `tests/Fixtures/migration/history-synthetic/{baseline,later}/` (labelled synthetic; ids `synthetic-*`,
+  addresses `@example.invalid`, contract files stating they are not agreements).
+- Tests: `tests/Unit/Migration/HistoryNormalizerTest.php`, `HistoryDeltaTest.php`;
+  `tests/Feature/Migration/LegacyHistoryArchiveTest.php`, `LegacyHistoryCommandTest.php`, `ExclusivityAuthorityTest.php`,
+  `LegacyHistoryArchiveMigrationTest.php`, `ExclusivityAuthorityConcurrencyTest.php` (native only); support
+  `tests/Support/LegacyHistoryFixtures.php`, `ExclusivityAuthorityRace.php`, `exclusivity-authority-race-worker.php`.
+- Docs: `docs/migration/legacy-history-archive.md`, `docs/migration/README.md` row, `CHANGELOG.md`, parity rows
+  FP-098/FP-099/FP-101 set to `implemented_partial`.
+
+### Acceptance criteria
+
+| Criterion | Result | Evidence |
+| --- | --- | --- |
+| A1 dry run default, no writes, environment refusal | met for tested paths | `LegacyHistoryCommandTest`: dry run issues only `SELECT` statements; `staging`, `production`, `local-eu` refused with zero statements; admitted only when `legacy-archive.non_local_environments` names the environment; ambiguous configured/running environment refused; synthetic import refused in production. Mutations M5, M6 killed. |
+| A2 write gating | met | `--write` plus `--snapshot` (dry-run hash), interactive console, hidden password, staff gate and `--attest` (attestation audit row before the write); each missing piece refused with nothing written. Mutation M7 killed. |
+| A3 identities and hashes preserved | met | Normalizer test: source ids, row hashes, record hashes, sheet/mapping hashes, original SHA-256 and size; stable record keys across snapshots. |
+| A4 findings block, nothing defaulted | met | 24-case finding provider plus tampered-hash, unreferenced-file and mapping refusals; command refuses import with findings. Mutation M2a killed. |
+| A5 idempotent and restartable | met | Segments `5/12, 5/7, 5/2, 2/0` then a rerun inserting 0; injected failure at the 7th record rolls the segment back and the next run inserts exactly the remaining 11. Mutation M9 killed. |
+| A6 consent stays unknown | met | Opt-in column ignored and its values absent from the snapshot; mapping refuses a consent field; SQL guard refuses `granted`, `UNKNOWN`, padded values. Mutations M3a, M3b killed. |
+| A7 no write outside the archive | met for tested paths | Every non-`legacy_*`, non-audit table is byte-compared before and after import, rerun, grant review and handover. Mutations M1a, M1b killed. |
+| A8 `verified_grant` separation and evidence | met | The importer is refused (`reviewer_imported_evidence`); a different reviewer records one immutable review, idempotent on repeat; refunded, unpaid, missing-contract, ambiguous-buyer, duplicate-exclusive and tampered-original lines are refused. Mutations M8, M11 killed. |
+| A9 reconciliation fails on any unexplained difference | met | Missing, changed, unexpected, altered-ciphertext, tampered and missing originals, money-column drift. Mutation M2c killed. |
+| A10 delta classification and dispositions | met | Refund, new exclusive sale, restated rows captured; removed records, money/license changes, exclusive changes and changed contract bytes blocking until dispositions bound to both hashes; stale or mismatched dispositions refused. Mutation M10 killed. |
+| A11 single authority | met | Second declaration, handover before freeze, second handover, freeze from the store, unfreeze after a store period refused; handover needs a post-freeze export, the latest prior baseline, both archived and reconciled and a reconciled delta. Native race: two processes, observed InnoDB wait on the ledger, exactly one event. Mutations M4a to M4d killed. |
+| A12 immutability on both engines | met | Schema test on SQLite and natively on MySQL: UPDATE, DELETE and REPLACE refused on all seven tables; unique identity indexes asserted. Mutation M4e killed after the index assertion was added. |
+
+### Commands and exact results
+
+Direct PHPUnit, SQLite (the lane's standard environment: `APP_ENV=testing … DB_CONNECTION=sqlite DB_DATABASE=:memory: …
+PAO_DISABLE=1 php -d memory_limit=512M -r '…require "vendor/phpunit/phpunit/phpunit";' -- --colors=never
+--fail-on-phpunit-warning <files>`):
+
+| Run | Source | Files | Result |
+| --- | --- | --- | --- |
+| New tests | `fed4571e` | 7 new test files | 63 tests, 542 assertions, 2 skipped (the native-only race), exit 0 (`evidence/final-sqlite-new.txt`) |
+| Existing migration/import/normalizer/dry-run and adjacent | `fed4571e` | `BeatStarsExportNormalizerTest`, `BeatStarsDryRunCommandTest`, `CatalogDryRunTest`, `CatalogDryRunCommandTest`, `NormalizedCatalogSourceTest`, `ProtectedCatalogReportTest`, `PersistentCatalogDraftImportTest`, `CustomerConsentAdmissionTest`, `ProductionEnvironmentTemplateTest`, `InstallationReportTest`, `ProductionBuyerAssentObservationsTest` | 360 tests, 3,833 assertions, exit 0 (`evidence/final-sqlite-existing.txt`) |
+| Every migration-pattern test file (51 files, the new schema test included) | `de11fdb4` | `pattern_files` of `scripts/ci/database-mysql-selection.json` | 600 tests, 6,933 assertions, 20 skipped (reviewed SQLite census), exit 0, 46 m 54 s (`evidence/de11fdb4-sqlite-migration-pattern-files.txt`) |
+| Original failure, retained | `de11fdb4` | the existing set | 1 failure: `ProductionEnvironmentTemplateTest` read `env()` in a comment of `config/legacy-archive.php`; fixed in `ebc9025b` (comment wording only) and passing at `fed4571e` (`evidence/de11fdb4-sqlite-existing-FAILED-env-comment.txt`) |
+
+Native MySQL 8.4.11 (same command with `DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3463 DB_DATABASE=vaseyaudio_mig
+VA_LOCAL_DISPOSABLE_MYSQL=vaseyaudio_mig`):
+
+| Run | Source | Result |
+| --- | --- | --- |
+| `LegacyHistoryArchiveMigrationTest`, `LegacyHistoryArchiveTest`, `ExclusivityAuthorityTest`, `LegacyHistoryCommandTest` | `fed4571e` | 23 tests, 291 assertions, exit 0 (`evidence/final-mysql.txt`); also 22/284 at `de11fdb4` |
+| `ExclusivityAuthorityConcurrencyTest` (2 native-only races) | `fed4571e` | 2 tests, 358 assertions (barrier polling varies), exit 0, 11 m 43 s (`evidence/final-mysql-race.txt`); also passed at `de11fdb4` and before commit |
+
+Other checks at `fed4571e`: `python3 scripts/ci/test-phpunit-shards.py` 52 OK, `test-ci-scope.py` 27 OK,
+`test-workflow-cadence.py` 14 OK, `test-focused-tests.py` 53 OK; `composer validate --strict` valid; Pint `--test`
+passed on every new PHP file.
+
+### Census and native selection
+
+- `scripts/ci/database-sqlite-skips.json`: two methods appended (291 → 293), first 150 entries unchanged:
+  `ExclusivityAuthorityConcurrencyTest::test_native_concurrent_freezes_from_one_head_record_exactly_one_event` and
+  `::test_native_concurrent_declarations_on_an_empty_ledger_record_exactly_one_authority`.
+- `scripts/ci/database-mysql-selection.json`: `LegacyHistoryArchiveMigrationTest` added to `pattern_files` (it matches the
+  migration pattern); `ExclusivityAuthorityTest` and `LegacyHistoryArchiveTest` added to the reviewed `include_files`;
+  the race worker added to `branching_helper_files`. MySQL skip census unchanged.
+- `python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection`:
+  **2519 selected MySQL-native tests in 243 files (of 9617 discovered tests in 703 files)**, up from main's 2499 in 239
+  (of 9554 in 696). Count comments updated in `.github/workflows/final-verification.yml` and `.gitlab-ci.yml`; generated
+  `phpunit-ci-mysql-*` files deleted. Timings for the new files use the fallback weight.
+
+### Mutations
+
+`evidence/mutations-5562a372.jsonl`: one mutation at a time on the source, focused tests on SQLite, restored with
+`git checkout`. 19 run, 18 killed on the first pass; the survivor M4e (the ledger's unique `sequence` replaced by a plain
+index) survived on SQLite because the REPLACE guard trigger also refuses a duplicate sequence. `fed4571e` adds a unique-index
+assertion; M4e is then killed (4 tests, 1 failure). Final: 19/19 killed.
+
+| Guard | Mutations (all killed) |
+| --- | --- |
+| No write outside the archive | M1a importer writes `cache`; M1b grant review writes `cache` |
+| Hash checks | M2a declared-hash mismatch ignored; M2b importer stores changed bytes; M2c reconciliation stops re-hashing originals |
+| Consent unknown | M3a normalizer emits `granted`; M3b consent insert guard removed |
+| Single exclusivity authority | M4a handover from the store; M4b handover without freeze; M4c pre-freeze export accepted; M4d unreconciled delta accepted; M4e unique sequence removed |
+| Dry run writes nothing | M5 plan issues a DELETE |
+| Environment refusal | M6 admission always passes |
+| Attestation | M7 write without `--attest` |
+| Separation of duties | M8 importer reviews its own evidence |
+| Idempotency | M9 already-archived records re-inserted |
+| Delta | M10 removed record not blocking |
+| Archive-only | M11 lines classified `verified_grant` at import |
+
+The restated-row delta rule (`fed4571e`'s new unit test) fails against the pre-fix rule (1 failure), confirming it
+pins the bug found by the command test.
+
+### Untested conditions and limits
+
+- **No real BeatStars export has been run (S-9).** Every result is on hand-made synthetic packages. The real order,
+  customer and contract export format, column names, status and license vocabularies, row volume (more than 1,000 rows
+  per sheet must be split), date formats (only `YYYY-MM-DDTHH:MM:SSZ` is accepted) and whether contract originals are
+  exportable at all are unknown; the real run may need a new mapping or an adapter.
+- The store's exclusive activation and checkout do **not** consult `ExclusivityAuthority::storeMaySellExclusives()`.
+  Until that wiring lands (production-checkout/activation lane files), the ledger records and rehearses the cutover
+  authority but does not itself stop a concurrent store sale.
+- No provider (Stripe/PayPal) refund or payment records are reconciled; order status and refunds come only from the
+  export. Download events (M-036), consent/suppression evidence from an ESP (M-037), memberships, services, merch and
+  sound kits (product-family adapters) are not covered. Legacy `track_source_id` values are not linked to store tracks.
+- No customer is linked to a store account; the e-mail HMAC only enables a later exact-match review.
+  `verified_grant` creates no entitlement; activating historical entitlements needs Sean's authorization.
+- The dry run reports to standard output only (counts, codes, keys and hashes); it writes no private report file.
+- Native MySQL covers the four selected files and the races; the full native suite, browser, host, Foundation CI and
+  GitLab were not run. The 51-file migration-pattern SQLite run was at `de11fdb4` (code identical to `fed4571e` except
+  the config comment and the two test additions, which were re-run at `fed4571e`).
+- Independent review of the schema migration and the sensitive services has not happened.
+
+### Next dependencies
+
+1. Independent review of the migration and `app/Domain/Migration/History/*` at the exact SHA.
+2. Sean supplies S-9 (order/customer/contract exports and originals); write the real mapping, run `dry-run` locally,
+   then `reconcile`, with private counts/hashes recorded outside Git.
+3. Wire `storeMaySellExclusives()` into exclusive activation and checkout in the owning lane, with a native race against
+   a handover.
+4. T39 cutover rehearsal using `freeze` → post-freeze export → `import` → `delta` → `handover` → `revert`.
