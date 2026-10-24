@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Console\Commands\TestCommerceEvidence;
 use App\Domain\Commerce\Checkout\HostedCheckout;
 use App\Domain\Commerce\Finalization\FinalizeTestPayment;
 use App\Domain\Commerce\Models\CheckoutIntent;
@@ -11,6 +12,7 @@ use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
 use App\Support\Audit\AuditEvent;
 use Carbon\CarbonImmutable;
+use Illuminate\Console\OutputStyle;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +20,10 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
+use ReflectionMethod;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Tests\Support\CheckoutFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\FinalizationFixtures;
@@ -113,12 +119,119 @@ class TestCommerceEvidenceCommandTest extends TestCase
         }
 
         $this->assertNotEmpty($this->statements);
-        foreach ($this->statements as $sql) {
-            $this->assertMatchesRegularExpression('/\A\s*select\s/i', $sql);
-            $this->assertDoesNotMatchRegularExpression('/\bfor\s+update\b|\block\s+in\s+share\s+mode\b/i', $sql);
-        }
+        $this->assertReadsOnly($this->statements, 1);
         $this->assertSame($before, $this->database(), 'The snapshot writes nothing.');
         $this->assertSame($calls, $this->gateway->calls, 'The snapshot makes no Stripe request.');
+    }
+
+    /**
+     * Every statement of one evidence run is a plain SELECT, framed on MySQL (and only there) by one repeatable-read read-only
+     * transaction: `SET TRANSACTION ISOLATION LEVEL REPEATABLE READ`, `START TRANSACTION READ ONLY`, the reads, `ROLLBACK`.
+     *
+     * @param  list<string>  $statements  the statements of `$runs` consecutive runs
+     */
+    private function assertReadsOnly(array $statements, int $runs): void
+    {
+        $framing = ['set transaction isolation level repeatable read', 'start transaction read only', 'rollback'];
+        $normalized = array_map(fn (string $sql): string => strtolower(trim($sql)), $statements);
+        $reads = array_values(array_filter($statements, fn (string $sql): bool => ! in_array(strtolower(trim($sql)), $framing, true)));
+        $this->assertNotEmpty($reads);
+        foreach ($reads as $sql) {
+            $this->assertTrue(TestCommerceEvidence::isPlainSelect($sql), $sql);
+        }
+        if (DB::getDriverName() !== 'mysql') {
+            $this->assertSame([], array_intersect($normalized, $framing), 'Only MySQL frames the reads.');
+
+            return;
+        }
+        $this->assertSame($runs, count(array_keys($normalized, 'start transaction read only', true)));
+        $this->assertSame($runs, count(array_keys($normalized, 'set transaction isolation level repeatable read', true)));
+        $this->assertSame($runs, count(array_keys($normalized, 'rollback', true)));
+        foreach (array_keys($normalized, 'start transaction read only', true) as $at) {
+            $this->assertSame('set transaction isolation level repeatable read', $normalized[$at - 1], 'The isolation level is set for exactly that transaction.');
+        }
+        $this->assertSame('rollback', end($normalized));
+    }
+
+    public function test_the_statement_guard_refuses_locking_and_into_clauses_and_stays_a_single_inert_callback(): void
+    {
+        foreach (['select 1', 'SELECT `id` FROM `checkout_intents` WHERE `public_id` = ? LIMIT 1', "select count(*) as total from t where a = 'x'"] as $sql) {
+            $this->assertTrue(TestCommerceEvidence::isPlainSelect($sql), $sql);
+        }
+        foreach (['update t set a = 1', 'insert into t values (1)', 'delete from t', 'with x as (select 1) select * from x for update', 'select 1 for update',
+            'select 1 FOR SHARE', 'select 1 lock in share mode', 'select 1 for update skip locked', 'select 1 for no key update', 'select a into outfile \'/tmp/x\' from t',
+            'select a into dumpfile \'/tmp/x\' from t', 'select a into @variable from t', 'select a from t into @variable', '  show tables', 'set @a = 1'] as $sql) {
+            $this->assertFalse(TestCommerceEvidence::isPlainSelect($sql), $sql);
+        }
+        $f = F::started($this->gateway);
+        $statement = 'select 1';
+        CheckoutIntent::retrieved(function () use (&$statement): void {
+            DB::select($statement);
+        });
+        foreach (['select id from checkout_intents for update', 'select id from checkout_intents lock in share mode', 'select 1 into @evidence_variable'] as $sql) {
+            $statement = $sql;
+            [$status, $output] = $this->evidence($f['order']->public_id);
+            $this->assertSame([1, 'Evidence snapshot unavailable. Nothing was written.'], [$status, trim($output)], $sql);
+        }
+        $statement = 'select 1';
+        [$status] = $this->evidence($f['order']->public_id);
+        $this->assertSame(0, $status, 'A plain select inside the snapshot is allowed.');
+
+        // Laravel cannot remove a single callback; the guard is registered once for the connection, so repeated runs add none.
+        $callbacks = fn (): int => count((fn () => $this->beforeExecutingCallbacks)->call(DB::connection()));
+        $before = $callbacks();
+        $this->evidence($f['order']->public_id);
+        $this->evidence($f['order']->public_id, true);
+        $this->assertSame($before, $callbacks());
+        // And once the command has ended the guard is inert: a write by anything else in the process is not refused.
+        $statement = 'select 1';
+        AuditEvent::recordAttributed('synthetic.after_guard', $f['intent'], [], null);
+        $this->assertSame(1, AuditEvent::where('action', 'synthetic.after_guard')->count());
+    }
+
+    public function test_the_snapshot_loads_only_the_checkout_intent_columns_it_uses(): void
+    {
+        $f = F::started($this->gateway);
+        F::receipt($this->gateway->session, 'evt_EvidenceColumns');
+        $loaded = [];
+        CheckoutIntent::retrieved(function (CheckoutIntent $intent) use (&$loaded): void {
+            $loaded[] = array_keys($intent->getAttributes());
+        });
+        foreach ([$f['order']->public_id, $f['intent']->public_id, CheckoutFixtures::SESSION, 'evt_EvidenceColumns'] as $reference) {
+            $loaded = [];
+            [$status, $output] = $this->evidence($reference, true);
+            $this->assertSame(0, $status, $output);
+            $this->assertSame([['id', 'public_id', 'order_id', 'provider_expires_at']], $loaded, $reference);
+        }
+    }
+
+    public function test_stored_markup_prints_literally_in_text_and_json_output(): void
+    {
+        $snapshot = ['schema' => 'vasey-test-commerce-evidence-v1', 'captured_at' => '2026-10-24T12:00:00Z', 'environment' => 'testing',
+            'stripe' => ['mode' => 'test', 'account_id' => 'acct_Synthetic'],
+            'order' => ['id' => 'o', 'created_at' => '<error>c</error>', 'payment_window_ends_at' => null], 'reservation' => null,
+            'checkout' => ['intent_id' => 'i', 'session_id' => 'cs_test_x', 'latest_status' => '<info>complete</info>', 'provider_expires_at' => null],
+            'payment' => ['verified' => false, 'confirmed_at' => null, 'amount_minor' => null, 'currency' => null, 'payment_intent_id' => null,
+                'source' => null, 'confirming_event_id' => null, 'observation_total' => 1, 'observation_outcomes' => ['<comment>confirmed</comment>' => 1],
+                'observations' => [['observed_at' => null, 'outcome' => '<fg=red>x</>', 'source' => 'receipt', 'event_id' => '<bg=red>e</>']]],
+            'receipts' => [['receipt_id' => 1, 'event_id' => 'evt_x', 'event_type' => '<info>t</info>', 'received_at' => null, 'work_state' => '<error>w</error>',
+                'work_outcome' => null, 'attempts' => 1]],
+            'finalization' => ['outcome' => 'paid', 'reason' => '<comment>why</comment>', 'finalized_at' => null],
+            'grants' => ['count' => 0, 'pending_entitlements' => 0, 'contracts_recorded' => 0],
+            'fulfillment' => ['activated' => false, 'activated_at' => null, 'delivery' => null, 'delivery_version' => null],
+            'unpaid_release' => null, 'totals' => ['receipts' => 0, 'verified_payments' => 0, 'license_grants' => 0]];
+        foreach (['text', 'json'] as $method) {
+            $command = app(TestCommerceEvidence::class);
+            $command->setLaravel($this->app);
+            $buffer = new BufferedOutput(OutputInterface::VERBOSITY_NORMAL, true); // decorated: a style tag would be consumed
+            $command->setOutput(new OutputStyle(new ArrayInput([]), $buffer));
+            (new ReflectionMethod($command, $method))->invoke($command, $snapshot);
+            $printed = $buffer->fetch();
+            foreach (['<info>complete</info>', '<comment>confirmed</comment>', '<fg=red>x</>', '<bg=red>e</>', '<info>t</info>', '<error>w</error>', '<comment>why</comment>'] as $markup) {
+                $this->assertStringContainsString($markup, $printed, $method.' keeps '.$markup);
+            }
+            $this->assertStringNotContainsString("\e[", $printed, $method.' applied no style');
+        }
     }
 
     public function test_a_write_attempted_while_the_snapshot_reads_is_refused_and_the_guard_ends_with_the_command(): void
