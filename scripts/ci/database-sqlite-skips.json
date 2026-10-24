@@ -1165,6 +1165,14 @@
     [
       "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantFirstByteTest",
       "test_native_independent_process_revocation_across_the_first_byte"
+    ],
+    [
+      "Tests\\Feature\\Migration\\ExclusivityAuthorityConcurrencyTest",
+      "test_native_concurrent_freezes_from_one_head_record_exactly_one_event"
+    ],
+    [
+      "Tests\\Feature\\Migration\\ExclusivityAuthorityConcurrencyTest",
+      "test_native_concurrent_declarations_on_an_empty_ledger_record_exactly_one_authority"
     ]
   ]
 }

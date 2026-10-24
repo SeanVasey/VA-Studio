@@ -1,0 +1,14 @@
+HEAD 3f8c4336192312d35837f1d68b053eabb017f906
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/mig/phpunit.xml
+
+................................................................. 65 / 70 ( 92%)
+...SS                                                             70 / 70 (100%)
+
+Time: 00:07.349, Memory: 89.00 MB
+
+OK, but some tests were skipped!
+Tests: 70, Assertions: 823, Skipped: 2.
+exit=0
