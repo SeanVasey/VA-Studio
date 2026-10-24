@@ -6,6 +6,8 @@ use App\Domain\Commerce\RefundDispute\Models\RefundDisputeHold;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObject;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObservation;
 use App\Domain\Commerce\RefundDispute\Models\RefundLineAllocation;
+use App\Domain\Commerce\RefundDispute\RefundDisputeException;
+use App\Domain\Commerce\RefundDispute\StaffCommerceDirectory;
 use App\Domain\Delivery\PrepareTestDeliveryStream;
 use App\Filament\Resources\StaffCustomerResource;
 use App\Filament\Resources\StaffCustomerResource\Pages\ListStaffCustomers;
@@ -13,6 +15,7 @@ use App\Filament\Resources\StaffOrderResource;
 use App\Filament\Resources\StaffOrderResource\Pages\ListStaffOrders;
 use App\Models\User;
 use Filament\Facades\Filament;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
 use Tests\Support\DeliveryFixtures;
@@ -108,7 +111,54 @@ class StaffCommerceAdministrationTest extends TestCase
         R::provider($this->financial, [['re_FULL', $f['payment']->amount_minor, 'succeeded']]);
         Livewire::test(ListStaffOrders::class)->mountTableAction('observe', $f['finalization'])->callMountedTableAction()
             ->assertNotified('Check refunds and disputes was not recorded');
-        $this->assertSame(array_fill_keys(R::TABLES, 0), array_replace(R::counts(), ['refund_dispute_work' => 0]));
+        $this->assertSame(array_fill_keys(R::TABLES, 0), R::counts());
         $this->assertSame([], $this->financial->calls);
+    }
+
+    public function test_the_grouped_customer_list_orders_only_by_aggregates_so_mysql_only_full_group_by_accepts_it(): void
+    {
+        $f = DeliveryFixtures::ready($this->payments, true);
+        $this->actingAs(LicenseFixtures::admin());
+        $component = Livewire::test(ListStaffCustomers::class)->assertSuccessful()->assertSee('Guest (no account)');
+        foreach ([null, 'last_finalized_at'] as $sort) {
+            if ($sort !== null) {
+                $component->call('sortTable', $sort)->assertSuccessful();
+            }
+            $query = $component->instance()->getFilteredSortedTableQuery();
+            $orders = $query->getQuery()->orders;
+            $this->assertNotEmpty($orders);
+            foreach ($orders as $order) {
+                // Only raw aggregate expressions: a plain column (Filament's default key sort) is not in the GROUP BY.
+                $this->assertSame('Raw', $order['type'] ?? null, json_encode($order));
+                $this->assertMatchesRegularExpression('/\A(?:MAX|MIN)\(order_finalizations\.(?:finalized_at|id)\) (?:asc|desc)\z/', (string) $order['sql']);
+            }
+            $this->assertSame([$f['finalization']->id], $query->get()->pluck('id')->map(fn ($id) => (int) $id)->all());
+        }
+    }
+
+    public function test_command_dialogs_close_with_a_notice_outside_test_commerce_and_order_evidence_rechecks_authority(): void
+    {
+        $f = DeliveryFixtures::ready($this->payments);
+        $admin = LicenseFixtures::admin();
+        $this->actingAs($admin);
+        config(['payments.stripe.mode' => 'live']);
+        Livewire::test(ListStaffOrders::class)->assertSuccessful()->mountTableAction('observe', $f['finalization'])
+            ->assertNotified('Check refunds and disputes is unavailable');
+        $this->assertSame([], $this->financial->calls);
+        config(['payments.stripe.mode' => 'test']);
+        $directory = app(StaffCommerceDirectory::class);
+        $this->assertSame($f['order']->public_id, $directory->orderFor($f['finalization']->id, $admin)['order']);
+        try {
+            $directory->orderFor($f['finalization']->id, User::factory()->create());
+            $this->fail('A non-staff user read order evidence.');
+        } catch (AuthorizationException) {
+            $this->addToAssertionCount(1);
+        }
+        try {
+            $directory->orderFor($f['finalization']->id + 1000, $admin);
+            $this->fail('An out-of-scope finalization was projected.');
+        } catch (RefundDisputeException $error) {
+            $this->assertSame('not_found', $error->reason);
+        }
     }
 }

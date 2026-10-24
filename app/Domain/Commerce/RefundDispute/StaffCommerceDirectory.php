@@ -71,8 +71,17 @@ final class StaffCommerceDirectory
             'active' => $account === null ? null : (bool) $account->active], 'orders' => $rows->map(fn ($row) => $this->order((int) $row->id))->all()];
     }
 
+    /** One scoped order's evidence projection, after a fresh staff authority and MFA check. */
+    public function orderFor(int $finalizationId, ?User $actor): array
+    {
+        app(RefundDisputeAuthority::class)->staff($actor);
+        RefundDisputeException::require($this->scoped($this->account())->where('order_finalizations.id', $finalizationId)->exists(), 'not_found');
+
+        return $this->order($finalizationId);
+    }
+
     /** One order's evidence projection: lines, grants, refunds/disputes, allocations, holds, effects and download evidence. */
-    public function order(int $finalizationId): array
+    private function order(int $finalizationId): array
     {
         $finalization = OrderFinalization::findOrFail($finalizationId);
         $order = Order::findOrFail($finalization->order_id);

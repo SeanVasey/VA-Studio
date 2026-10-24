@@ -15,6 +15,7 @@ use App\Domain\Commerce\RefundDispute\RefundDisputeLedger;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Delivery\IssueTestDelivery;
 use App\Domain\Delivery\PrepareTestDeliveryStream;
+use App\Domain\Delivery\ReadTestOwnerDelivery;
 use App\Domain\Delivery\RedeemTestDelivery;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
@@ -515,5 +516,86 @@ class RefundDisputeLifecycleTest extends TestCase
         $this->assertSame($calls + 1, count($this->financial->calls));
         $this->assertSame(1, RefundDisputeObservation::count());
         $this->assertSame(1, RefundLineAllocation::count());
+    }
+
+    public function test_an_mfa_enrolled_non_admin_is_refused_by_every_writer_before_any_provider_call(): void
+    {
+        $f = $this->order();
+        R::provider($this->financial, [['re_FULL', $f['paid'], 'succeeded']]);
+        $panel = Filament::getPanel('admin');
+        $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: true);
+        $user = User::factory()->create();
+        $user->saveAppAuthenticationSecret('JBSWY3DPEHPK3PXP');
+        foreach ([
+            fn () => app(RefundDisputeLedger::class)->observe($f['order']->public_id, $user->fresh(), (string) Str::uuid(), 0),
+            fn () => app(RefundDisputeActions::class)->suspendLine($f['order']->public_id, $user->fresh(), (string) Str::uuid(), 0, $f['grant']->public_id),
+            fn () => app(RefundDisputeLedger::class)->review($f['order']->public_id, $user->fresh()),
+        ] as $operation) {
+            try {
+                $operation();
+                $this->fail('A non-admin with MFA reached a refund/dispute operation.');
+            } catch (AuthorizationException) {
+                $this->addToAssertionCount(1);
+            }
+        }
+        $this->assertSame([], $this->financial->calls);
+        $this->assertSame(array_fill_keys(R::TABLES, 0), R::counts());
+    }
+
+    public function test_a_second_allocation_is_capped_by_the_line_s_remaining_total_not_its_original_total(): void
+    {
+        $f = $this->order(true);
+        $totals = $this->totals($f);
+        R::provider($this->financial, [['re_A', $totals[0], 'succeeded']]);
+        R::observe($f['order']->public_id, $this->staff);
+        $first = RefundDisputeObject::where('kind', 'refund')->sole();
+        $this->act('allocate', $f, $first->public_id, [0 => $totals[0]]);
+        R::provider($this->financial, [['re_A', $totals[0], 'succeeded'], ['re_B', 100, 'succeeded']]);
+        R::observe($f['order']->public_id, $this->staff);
+        $second = RefundDisputeObject::where('kind', 'refund')->where('id', '<>', $first->id)->sole();
+        $this->refused('invalid', fn () => $this->act('allocate', $f, $second->public_id, [0 => 100]));
+        $this->assertSame($totals[0], (int) RefundLineAllocation::sum('amount_minor'));
+        $this->act('allocate', $f, $second->public_id, [1 => 100]);
+        $this->assertSame([$totals[0], 100], RefundLineAllocation::orderBy('id')->pluck('amount_minor')->all());
+    }
+
+    public function test_an_exclusive_reopening_decision_refuses_while_a_dispute_is_open_even_for_a_refunded_held_line(): void
+    {
+        $f = $this->order();
+        R::provider($this->financial, [['re_FULL', $f['paid'], 'succeeded']], [['du_ONE', 100, 'needs_response']]);
+        $result = R::observe($f['order']->public_id, $this->staff);
+        $this->assertSame(['full', 'open'], [$result['refundState'], $result['disputeState']]);
+        $this->act('suspendLine', $f, $f['grant']->public_id);
+        $this->assertSame(2, RefundDisputeHold::whereNull('released_at')->count());
+        $this->refused('not_qualified', fn () => $this->act('qualifyExclusiveReopening', $f, $f['grant']->public_id));
+        $this->assertSame(0, RefundDisputeEffect::where('kind', 'exclusive_reopening_qualified')->count());
+    }
+
+    public function test_the_owner_download_projection_reports_an_order_wide_hold_and_its_release(): void
+    {
+        $f = $this->order();
+        $read = fn (): string => app(ReadTestOwnerDelivery::class)->handle($f['order']->public_id, InventoryFixtures::OWNER)['status'];
+        $this->assertSame('available', $read());
+        R::provider($this->financial, [], [['du_ONE', 100, 'needs_response']]);
+        R::observe($f['order']->public_id, $this->staff);
+        $this->assertSame('unavailable', $read());
+        R::provider($this->financial, [], [['du_ONE', 100, 'won']]);
+        R::observe($f['order']->public_id, $this->staff);
+        $this->assertSame('available', $read());
+    }
+
+    public function test_a_policy_change_during_the_provider_read_makes_the_commit_stale_and_writes_nothing(): void
+    {
+        $f = $this->order();
+        R::provider($this->financial, [['re_FULL', $f['paid'], 'succeeded']]);
+        $inner = $this->financial->onInspect;
+        $this->financial->onInspect = function (array $source) use ($inner): array {
+            config(['refund-dispute.policy.dispute_access' => 'operator_review']);
+
+            return $inner($source);
+        };
+        $result = app(RefundDisputeLedger::class)->observe($f['order']->public_id, $this->staff, (string) Str::uuid(), 0);
+        $this->assertSame(['stale', 0], [$result['status'], $result['sequence']]);
+        $this->assertSame([0, 0, 0, 0], [RefundDisputeObservation::count(), RefundLineAllocation::count(), RefundDisputeEffect::count(), RefundDisputeHold::count()]);
     }
 }

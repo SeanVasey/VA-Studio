@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Domain\Commerce\Models\OrderFinalization;
 use App\Domain\Commerce\RefundDispute\RefundDisputeActions;
-use App\Domain\Commerce\RefundDispute\RefundDisputeAuthority;
 use App\Domain\Commerce\RefundDispute\RefundDisputeException;
 use App\Domain\Commerce\RefundDispute\RefundDisputeLedger;
 use App\Domain\Commerce\RefundDispute\StaffCommerceDirectory;
@@ -109,8 +108,17 @@ final class StaffOrderResource extends ReadOnlyCommerceResource
     {
         return Action::make($name)->label($label)->modalHeading($label)->modalDescription($description)
             ->visible(fn (OrderFinalization $record): bool => $record->outcome === 'paid')
-            ->fillForm(fn (OrderFinalization $record): array => ['sequence' => app(RefundDisputeLedger::class)->review(self::orderId($record), Filament::auth()->user())['sequence'],
-                'request_id' => (string) Str::uuid()])
+            ->fillForm(function (OrderFinalization $record, Action $action) use ($label): array {
+                try {
+                    $sequence = app(RefundDisputeLedger::class)->review(self::orderId($record), Filament::auth()->user())['sequence'];
+                } catch (RefundDisputeException $error) {
+                    // Outside test commerce (or for an order out of scope) the dialog closes with a notice instead of an error page.
+                    Notification::make()->title($label.' is unavailable')->body(self::REASONS[$error->reason] ?? self::REASONS['unavailable'])->danger()->send();
+                    $action->cancel();
+                }
+
+                return ['sequence' => $sequence, 'request_id' => (string) Str::uuid()];
+            })
             ->schema([Hidden::make('sequence')->required()->rules(['integer', 'min:0']), Hidden::make('request_id')->required()->rules(['uuid']), ...$fields])
             ->action(function (OrderFinalization $record, array $data, Action $action) use ($run, $label): void {
                 try {
@@ -138,9 +146,7 @@ final class StaffOrderResource extends ReadOnlyCommerceResource
 
     private static function detail(OrderFinalization $record): array
     {
-        app(RefundDisputeAuthority::class)->staff(Filament::auth()->user());
-
-        return app(StaffCommerceDirectory::class)->order((int) $record->getKey());
+        return app(StaffCommerceDirectory::class)->orderFor((int) $record->getKey(), Filament::auth()->user());
     }
 
     private static function options(OrderFinalization $record, string $kind): array
