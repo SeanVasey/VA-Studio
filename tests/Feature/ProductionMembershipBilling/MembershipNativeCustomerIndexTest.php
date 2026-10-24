@@ -291,7 +291,8 @@ while ($waiters === [] && microtime(true) < $deadline) {
     $trx = $watch->prepare("SELECT trx_mysql_thread_id FROM information_schema.INNODB_TRX WHERE trx_state = 'LOCK WAIT' AND trx_mysql_thread_id <> ?");
     $trx->execute([$self]);
     $waiters = array_map('intval', $trx->fetchAll(PDO::FETCH_COLUMN));
-    usleep(20000);
+    // INNODB_TRX is a cache that InnoDB refreshes only after 0.1 s without a read; faster polling keeps it stale.
+    usleep(250000);
 }
 $rows = json_decode(file_get_contents($directory.'/rows.json'), true, 8, JSON_THROW_ON_ERROR);
 foreach (['production_membership_paid_periods' => $rows['period'], 'production_membership_credit_events' => $rows['event']] as $table => $row) {
@@ -361,7 +362,8 @@ while ($waiters === [] && microtime(true) < $deadline) {
     $trx = $watch->prepare("SELECT trx_mysql_thread_id FROM information_schema.INNODB_TRX WHERE trx_state = 'LOCK WAIT' AND trx_mysql_thread_id <> ?");
     $trx->execute([$writer]);
     $waiters = array_map('intval', $trx->fetchAll(PDO::FETCH_COLUMN));
-    usleep(20000);
+    // INNODB_TRX is a cache that InnoDB refreshes only after 0.1 s without a read; faster polling keeps it stale.
+    usleep(250000);
 }
 touch($directory.'/commit-release');
 echo json_encode(['waiters' => $waiters]);
