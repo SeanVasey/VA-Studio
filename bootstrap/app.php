@@ -6,6 +6,7 @@ use App\Http\Middleware\CustomerPrivacy;
 use App\Http\Middleware\FreeGrantPrivacy;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InquiryPrivacy;
+use App\Http\Middleware\LegacyRedirects;
 use App\Http\Middleware\PaidGrantPrivacy;
 use App\Http\Middleware\PaidTaxPrivacy;
 use App\Http\Middleware\PrivateTrackReviewPrivacy;
@@ -63,6 +64,7 @@ $application = Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(TaxRootPrivacy::class);
         $middleware->prepend(AccountFeaturePrivacy::class);
         $middleware->prepend(ProductionFreePrivacy::class);
+        $middleware->append(LegacyRedirects::class); // FP-100, default-off: config/legacy-redirects.php
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);
     })
