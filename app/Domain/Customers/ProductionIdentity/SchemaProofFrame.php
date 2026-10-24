@@ -22,9 +22,13 @@ use WeakReference;
  *
  * - the owner's witness (its marker, released and re-set) proves the same physical transaction on the same
  *   connection and PDO; a commit, rollback, implicit commit or lost marker fails it and closes this frame for good;
- * - MySQL: the session inputs a statement can change without committing: the connection id, selected database,
- *   foreign_key_checks, sql_mode and the session CREATE/DROP TABLE counters. CREATE TEMPORARY TABLE is the only
- *   way MySQL shadows a table without an implicit commit, and every such path increments Com_create_table;
+ * - MySQL: the session inputs that the complete proofs read, or that change what their reads return, and that a
+ *   statement can change without committing: the connection id, selected database, foreign_key_checks, sql_mode,
+ *   sql_select_limit, character_set_results and the session CREATE/DROP TABLE counters. It is not every session
+ *   setting, and a setting changed and restored again between two guards is never seen by a guard at all; a setting
+ *   still in effect at commit meets the complete terminal proofs. CREATE TEMPORARY TABLE is the only way MySQL
+ *   shadows a table without an implicit commit, and every such path (a trigger body included) increments
+ *   Com_create_table;
  * - SQLite: the complete main and temp catalogs and the attached database list. SQLite DDL is transactional, so the
  *   same connection can change any schema object without ending the transaction; there are no metadata locks.
  *
@@ -157,7 +161,9 @@ final class SchemaProofFrame
         }
         try {
             if ($this->driver === 'mysql') {
-                $session = $this->primary->query('SELECT CONNECTION_ID(), DATABASE(), @@SESSION.foreign_key_checks, @@SESSION.sql_mode')->fetchAll(PDO::FETCH_NUM);
+                // sql_select_limit and character_set_results change what a proof's own reads return without a commit.
+                $session = $this->primary->query('SELECT CONNECTION_ID(), DATABASE(), @@SESSION.foreign_key_checks, @@SESSION.sql_mode, '
+                    .'@@SESSION.sql_select_limit, @@SESSION.character_set_results')->fetchAll(PDO::FETCH_NUM);
                 $counters = $this->primary->query("SHOW SESSION STATUS WHERE Variable_name IN ('Com_create_table', 'Com_drop_table')")->fetchAll(PDO::FETCH_NUM);
                 $names = array_column($counters, 0);
                 sort($names);

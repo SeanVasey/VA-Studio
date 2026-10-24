@@ -78,6 +78,7 @@
     "tests/Feature/ProductionMemberGrants/MemberGrantActivationRetentionTest.php",
     "tests/Feature/ProductionMemberGrants/MemberGrantOrdinaryLifecycleTest.php",
     "tests/Feature/ProductionMemberGrants/MemberLicenseAuthorizationPhaseTest.php",
+    "tests/Feature/ProductionMemberGrants/MemberObserverTerminalProofTest.php",
     "tests/Feature/ProductionMemberOriginals/MemberActivationCouplingSchemaTest.php",
     "tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php",
     "tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php",

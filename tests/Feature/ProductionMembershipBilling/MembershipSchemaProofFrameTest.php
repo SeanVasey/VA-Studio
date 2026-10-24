@@ -106,12 +106,22 @@ class MembershipSchemaProofFrameTest extends TestCase
             $this->guards($pdo);
             $this->guards($pdo);
             if (DB::getDriverName() === 'mysql') {
-                // SET never commits, so the marker survives; the complete proof requires foreign_key_checks = 1.
-                $pdo->exec('SET SESSION foreign_key_checks=0');
-                try {
-                    $this->guardsRefusedIn($frame, $pdo);
-                } finally {
-                    $pdo->exec('SET SESSION foreign_key_checks=1');
+                // SET never commits, so the marker survives. The complete proof requires foreign_key_checks = 1, and its
+                // own dictionary reads come back truncated under sql_select_limit or re-encoded under character_set_results.
+                $results = (string) $pdo->query('SELECT @@SESSION.character_set_results')->fetchColumn();
+                foreach ([['SET SESSION foreign_key_checks=0', 'SET SESSION foreign_key_checks=1', false],
+                    ['SET SESSION sql_select_limit=2', 'SET SESSION sql_select_limit=DEFAULT', true],
+                    ['SET SESSION character_set_results=utf32', 'SET SESSION character_set_results='.$pdo->quote($results), true]] as [$change, $undo, $any]) {
+                    // A fresh remembered proof under the frame's current session state...
+                    $this->guards($pdo);
+                    $this->guards($pdo);
+                    $pdo->exec($change);
+                    try {
+                        // ...is not reused once one of the token's session inputs moved: the complete proof refuses.
+                        $this->guardsRefusedIn($frame, $pdo, $any);
+                    } finally {
+                        $pdo->exec($undo);
+                    }
                 }
             } else {
                 // SQLite ignores this pragma inside a transaction, so the remembered proof stays true.
@@ -272,11 +282,14 @@ class MembershipSchemaProofFrameTest extends TestCase
         return new MembershipAwardTransaction(DB::connection(), DB::connection()->getPdo());
     }
 
-    /** Both guards refuse while $frame (kept alive by this argument) is still registered for $pdo. */
-    private function guardsRefusedIn(MembershipAwardTransaction $frame, PDO $pdo): void
+    /**
+     * Both guards refuse while $frame (kept alive by this argument) is still registered for $pdo. $any accepts any
+     * refusal: a complete proof whose own reads come back truncated or re-encoded can fail on a missing key first.
+     */
+    private function guardsRefusedIn(MembershipAwardTransaction $frame, PDO $pdo, bool $any = false): void
     {
-        $this->refused(fn () => (new MembershipSchema)->assertOwned($pdo), LogicException::class);
-        $this->refused(fn () => IdentityRows::from(new CurrentRows($pdo, DB::getDriverName())), IdentityException::class);
+        $this->refused(fn () => (new MembershipSchema)->assertOwned($pdo), $any ? Throwable::class : LogicException::class);
+        $this->refused(fn () => IdentityRows::from(new CurrentRows($pdo, DB::getDriverName())), $any ? Throwable::class : IdentityException::class);
         $this->assertInstanceOf(MembershipAwardTransaction::class, $frame);
     }
 
@@ -313,7 +326,7 @@ class MembershipSchemaProofFrameTest extends TestCase
         try {
             $operation();
         } catch (Throwable $error) {
-            $this->assertInstanceOf($class, $error);
+            $this->assertInstanceOf($class, $error, $error::class.': '.$error->getMessage());
 
             return;
         }
