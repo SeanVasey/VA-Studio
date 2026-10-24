@@ -35,7 +35,7 @@ final class HistorySourceFiles
 
     /**
      * @return array{mapping: string, sheets: array<string, string>, contracts: array<string, string>, synthetic_repository_fixture: bool}
-     *     contract file name => exact original bytes, sorted by name
+     *                                                                                                                                     contract file name => exact original bytes, sorted by name
      */
     public function read(string $directory): array
     {
