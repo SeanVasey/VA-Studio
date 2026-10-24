@@ -3,6 +3,7 @@
 namespace App\Domain\Memberships\Production;
 
 use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
+use App\Domain\Customers\ProductionIdentity\SchemaProofFrame;
 use Illuminate\Support\Facades\DB;
 use LogicException;
 use PDO;
@@ -24,7 +25,8 @@ final class MembershipSchema
     public function assertOwned(PDO $pdo): void
     {
         MembershipException::require(DB::connection()->getPdo() === $pdo, 'changed_connection');
-        $this->up(false);
+        // Complete once per owned frame token, after its tables are held; complete every time outside one.
+        SchemaProofFrame::prove($pdo, 'membership', [...SchemaProofFrame::identityTables(), ...$this->mysqlNames()], fn () => $this->up(false));
     }
 
     public function up(bool $ddl = true): void

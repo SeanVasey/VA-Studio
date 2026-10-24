@@ -1,0 +1,3 @@
+14 junit files {'tests': 1776, 'assertions': 11020, 'failures': 0, 'errors': 0, 'skipped': 85}
+skipped cases 85 outside census 0 []
+failed/errored []

@@ -1,0 +1,29 @@
+s01 started 2026-10-24T13:46:49Z head=a1414f1c dirty=0
+s01 finished 2026-10-24T13:49:21Z exit=0 seconds=152 tests=12 assertions=149 failures=0 errors=0 skipped=0
+s02 started 2026-10-24T13:49:21Z head=a1414f1c dirty=0
+s02 finished 2026-10-24T13:57:34Z exit=0 seconds=493 tests=57 assertions=616 failures=0 errors=0 skipped=7
+s03 started 2026-10-24T13:57:34Z head=a1414f1c dirty=0
+s03 finished 2026-10-24T14:04:05Z exit=0 seconds=391 tests=81 assertions=528 failures=0 errors=0 skipped=5
+s04 started 2026-10-24T14:04:05Z head=a1414f1c dirty=0
+s04 finished 2026-10-24T14:06:45Z exit=0 seconds=160 tests=118 assertions=591 failures=0 errors=0 skipped=4
+s05 started 2026-10-24T14:06:45Z head=a1414f1c dirty=0
+s05 finished 2026-10-24T14:09:50Z exit=0 seconds=185 tests=62 assertions=241 failures=0 errors=0 skipped=3
+s06 started 2026-10-24T14:09:50Z head=a1414f1c dirty=0
+s06 finished 2026-10-24T14:12:23Z exit=0 seconds=153 tests=47 assertions=344 failures=0 errors=0 skipped=6
+s07 started 2026-10-24T14:12:23Z head=a1414f1c dirty=0
+s07 finished 2026-10-24T14:15:36Z exit=0 seconds=193 tests=65 assertions=332 failures=0 errors=0 skipped=10
+s08 started 2026-10-24T14:15:36Z head=a1414f1c dirty=0
+s08 finished 2026-10-24T14:24:46Z exit=0 seconds=550 tests=176 assertions=1569 failures=0 errors=0 skipped=1
+s09 started 2026-10-24T14:24:46Z head=a1414f1c dirty=0
+s09 finished 2026-10-24T14:35:08Z exit=0 seconds=622 tests=73 assertions=691 failures=0 errors=0 skipped=17
+s10 started 2026-10-24T14:35:08Z head=a1414f1c dirty=0
+s10 finished 2026-10-24T14:41:47Z exit=0 seconds=399 tests=45 assertions=568 failures=0 errors=0 skipped=1
+s11 started 2026-10-24T14:41:47Z head=a1414f1c dirty=0
+s11 finished 2026-10-24T14:51:03Z exit=0 seconds=556 tests=170 assertions=998 failures=0 errors=0 skipped=13
+s12 started 2026-10-24T14:51:03Z head=a1414f1c dirty=0
+s12 finished 2026-10-24T14:55:35Z exit=0 seconds=272 tests=90 assertions=469 failures=0 errors=0 skipped=9
+s13 started 2026-10-24T14:55:35Z head=a1414f1c dirty=0
+s13 finished 2026-10-24T14:56:27Z exit=0 seconds=52 tests=480 assertions=1044 failures=0 errors=0 skipped=0
+s14 started 2026-10-24T14:56:27Z head=a1414f1c dirty=0
+s14 finished 2026-10-24T15:17:44Z exit=0 seconds=1277 tests=300 assertions=2880 failures=0 errors=0 skipped=9
+all done 2026-10-24T15:17:44Z

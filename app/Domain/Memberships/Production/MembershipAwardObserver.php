@@ -82,6 +82,7 @@ final class MembershipAwardObserver implements Dispatcher
         if ($committing) {
             MembershipException::require($this->context !== null && ! $this->proved, 'commit_not_proved');
             $this->admit();
+            $this->transaction->beginTerminalProof();
             $this->context->proveCurrent();
             $this->rows()->assertCurrent();
             $this->admit();
