@@ -16,9 +16,9 @@ use Throwable;
  * happened in between.
  *
  * A change the source can legitimately make after the baseline is captured automatically: a new record, a refund
- * (status moves forward and the refunded amount grows), a completed payment, restated raw cells or changed
- * customer contact details. Everything else (a removed record, a changed amount, track, license, buyer or date,
- * changed original contract bytes, a changed exclusive line other than its refund) is blocking until the operator
+ * (status moves forward and the refunded amount grows), a completed payment, restated raw cells, a changed display
+ * name or a case-only address spelling. Everything else (a changed customer address, a removed record, a changed
+ * amount, track, license, buyer or date, changed original contract bytes, a changed exclusive line other than its refund) is blocking until the operator
  * records an explicit disposition bound to both snapshot hashes. Any blocking item without one is unexplained, and
  * the delta does not reconcile.
  */
@@ -159,7 +159,9 @@ final class HistoryDelta
         $restated = ['row', 'row_sha256'];
 
         return match ($cohort) {
-            'customer' => $only([...$restated, 'email', 'email_normalized', 'display_name'])
+            // A changed address changes who a later exact-match link would reach, so it needs an owner disposition;
+            // a case-only spelling, a display name or restated cells are captured.
+            'customer' => $only([...$restated, 'email', 'display_name'])
                 ? ['customer_details_changed', false] : ['customer_identity_changed', true],
             'order' => match (true) {
                 $only(['status', 'refunded_minor']) && $this->forward($before['status'], $after['status'])
@@ -183,7 +185,7 @@ final class HistoryDelta
         return $before === $after || in_array($after, self::STATUS_FORWARD[$before] ?? [], true);
     }
 
-    /** @return array<string, array{disposition: string, reason: string}> keyed `cohort:record_key` */
+    /** @return array<string, array{disposition: string, reason_sha256: string}> keyed `cohort:record_key` */
     private function dispositions(string $bytes, string $baselineHash, string $laterHash, array $items): array
     {
         $this->require(strlen($bytes) <= 1048576, 'dispositions_invalid');
@@ -207,7 +209,8 @@ final class HistoryDelta
             $this->require(isset($blocking[$key]), 'dispositions_unknown_item');
             $this->require($entry instanceof stdClass && $this->keys($entry, ['disposition', 'reason'])
                 && in_array($entry->disposition, self::DISPOSITIONS, true) && CellText::identity($entry->reason), 'dispositions_invalid');
-            $result[(string) $key] = ['disposition' => $entry->disposition, 'reason' => $entry->reason];
+            // The report keeps only a hash of the reason: an owner's note may name a buyer.
+            $result[(string) $key] = ['disposition' => $entry->disposition, 'reason_sha256' => hash('sha256', $entry->reason)];
         }
 
         return $result;

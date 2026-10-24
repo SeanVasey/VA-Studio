@@ -2,6 +2,7 @@
 
 use App\Domain\Migration\History\ExclusivityAuthority;
 use App\Domain\Migration\History\LegacyArchiveRefusal;
+use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
@@ -56,9 +57,13 @@ try {
             $wait($directory.'/commit');
         }
     });
+    $actor = User::findOrFail($input['actor_id']);
+    $reference = 'SYNTHETIC race reference '.$worker;
+    // Recorded (and committed) before the transaction, as the console command does.
+    $attestation = StaffWriteAuthority::attest($actor, 'vasey:exclusivity-authority', ExclusivityAuthority::attestationAction($input['transition']),
+        ExclusivityAuthority::ATTESTATION_SCOPE, null, $reference);
     try {
-        $result = app(ExclusivityAuthority::class)->transition($input['transition'], User::findOrFail($input['actor_id']),
-            'SYNTHETIC race reference '.$worker, null, true);
+        $result = app(ExclusivityAuthority::class)->transition($input['transition'], $actor, $reference, $attestation, true);
         $output = ['outcome' => $result['outcome'], 'to' => $result['to'], 'sequence' => $result['sequence']];
     } catch (LegacyArchiveRefusal $refusal) {
         $output = ['outcome' => 'refused', 'reason' => $refusal->reason];

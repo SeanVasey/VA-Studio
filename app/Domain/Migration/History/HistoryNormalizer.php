@@ -38,7 +38,7 @@ final class HistoryNormalizer
 
     private const MONEY = '/\A\$?(0|[1-9][0-9]{0,9})(?:\.([0-9]{1,2}))?\z/D';
 
-    /** @var list<array{scope: string, sheet: string, row: ?int, source_id: ?string, code: string, column: ?string}> */
+    /** @var list<array{scope: string, sheet: string, row: ?int, source_id_sha256: ?string, code: string, column: ?string}> */
     private array $findings = [];
 
     /** @var list<array{cohort: string, record_key: string, code: string}> */
@@ -248,7 +248,7 @@ final class HistoryNormalizer
             foreach (['source_order_id' => [$orderId, $synthetic], 'source_line_id' => [$lineId, false],
                 'track_source_id' => [$c['track_source_id'], $synthetic]] as $field => [$value, $namespaced]) {
                 if (! $this->identifier($value, $namespaced)) {
-                    $this->finding('row', 'orders', $row['row'], is_string($orderId) ? CellText::detail($orderId) : null, $this->identifierCode($value, $namespaced), $field);
+                    $this->finding('row', 'orders', $row['row'], is_string($orderId) ? $orderId : null, $this->identifierCode($value, $namespaced), $field);
                     $ok = false;
                 }
             }
@@ -489,7 +489,8 @@ final class HistoryNormalizer
         }
         foreach (array_keys($files) as $file) {
             if (! isset($referenced[$file])) {
-                $this->finding('sheet', 'contracts', null, null, 'unreferenced_contract_file', CellText::detail((string) $file));
+                // Contract file names often carry a buyer's name or address: report only the name's hash.
+                $this->finding('sheet', 'contracts', null, null, 'unreferenced_contract_file', 'file_sha256:'.hash('sha256', (string) $file));
             }
         }
         ksort($contracts, SORT_STRING);
@@ -575,8 +576,10 @@ final class HistoryNormalizer
 
     private function finding(string $scope, string $sheet, ?int $row, ?string $sourceId, string $code, ?string $column): void
     {
+        // A finding names the sheet row and a hash of the source id, never the id itself: some exports key customers
+        // by address, and findings are printed to the operator's console.
         $this->findings[] = ['scope' => $scope, 'sheet' => $sheet, 'row' => $row,
-            'source_id' => $sourceId === null ? null : CellText::detail($sourceId), 'code' => $code, 'column' => $column];
+            'source_id_sha256' => $sourceId === null ? null : hash('sha256', $sourceId), 'code' => $code, 'column' => $column];
     }
 
     private function exception(string $cohort, string $recordKey, string $code): void

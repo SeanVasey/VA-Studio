@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Domain\Migration\History;
 
+use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -33,6 +35,9 @@ final class LegacyHistoryArchive
     public const CONTRACT_PREFIX = 'legacy-history/contracts';
 
     public const SEGMENT_ACTION = 'legacy_history.import_segment';
+
+    /** The console attestation one import segment consumes (`StaffWriteAuthority`). */
+    public const ATTESTATION_ACTION = 'legacy-history.import';
 
     /** cohort => table, in insertion order (a line follows its order; a contract follows its line). */
     public const TABLES = ['customers' => 'legacy_history_customers', 'orders' => 'legacy_history_orders',
@@ -66,13 +71,17 @@ final class LegacyHistoryArchive
     /**
      * Archive at most `$limit` pending records of the snapshot in one transaction.
      *
+     * The segment needs the actor's current staff authority (locked), the admin panel's staff MFA rule where it
+     * applies, and a fresh, recorded console attestation bound to this actor and snapshot, which the segment spends.
+     *
      * @param  array<string, string>  $contractFiles  original contract bytes by source file name
      * @param  callable(int): void|null  $afterRecord  called after each inserted record (interruption tests)
      * @return array{batch_id: int, processed: int, pending: int, total: int, complete: bool}
      */
-    public function import(array $snapshot, string $snapshotSha256, array $contractFiles, User $actor, ?int $attestationAuditId,
+    public function import(array $snapshot, string $snapshotSha256, array $contractFiles, User $actor, StaffWriteAuthority $attestation,
         int $limit, ?callable $afterRecord = null): array
     {
+        (new LegacyArchivePolicy)->admit();
         if ($limit < 1 || $limit > 1000) {
             throw new LegacyArchiveRefusal('limit_invalid');
         }
@@ -80,12 +89,11 @@ final class LegacyHistoryArchive
             throw new LegacyArchiveRefusal('snapshot_mismatch');
         }
 
-        return DB::transaction(function () use ($snapshot, $snapshotSha256, $contractFiles, $actor, $attestationAuditId, $limit, $afterRecord): array {
+        return DB::transaction(function () use ($snapshot, $snapshotSha256, $contractFiles, $actor, $attestation, $limit, $afterRecord): array {
             // Current, locked staff authority: a revoked operator cannot continue an import it started.
-            if (! Gate::forUser($actor)->allows('administer-catalog', true)) {
-                throw new LegacyArchiveRefusal('actor_refused');
-            }
-            $batch = $this->batch($snapshot, $snapshotSha256, $actor, $attestationAuditId);
+            $current = self::authorize($actor, $attestation, self::ATTESTATION_ACTION, self::attestationScope($snapshotSha256), $snapshotSha256);
+            $attestationAuditId = $attestation->auditEventId;
+            $batch = $this->batch($snapshot, $snapshotSha256, $current, $attestationAuditId);
             $processed = 0;
             $pendingTotal = 0;
             foreach (self::TABLES as $cohort => $table) {
@@ -99,14 +107,14 @@ final class LegacyHistoryArchive
 
                         continue;
                     }
-                    $this->insert($cohort, $record, $batch, $contractFiles);
+                    $this->insert($cohort, $record, $batch, $contractFiles, $current->id, $attestationAuditId);
                     $processed++;
                     if ($afterRecord !== null) {
                         $afterRecord($processed);
                     }
                 }
             }
-            AuditEvent::create(['actor_id' => $actor->id, 'action' => self::SEGMENT_ACTION, 'subject_type' => 'legacy_history_batch',
+            AuditEvent::create(['actor_id' => $current->id, 'action' => self::SEGMENT_ACTION, 'subject_type' => 'legacy_history_batch',
                 'subject_id' => $batch, 'context' => ['snapshot_sha256' => $snapshotSha256, 'processed' => $processed,
                     'pending' => $pendingTotal, 'attestation_audit_id' => $attestationAuditId]]);
 
@@ -162,6 +170,75 @@ final class LegacyHistoryArchive
         }
 
         return ['records' => $records, 'unexpected' => $unexpected, 'integrity_failures' => $integrity];
+    }
+
+    public static function attestationScope(string $snapshotSha256): string
+    {
+        return 'legacy-history:'.$snapshotSha256;
+    }
+
+    /**
+     * Inside the caller's transaction: lock the actor row and require current staff authority, the panel's staff MFA
+     * rule (required wherever the panel requires it) and the bound, fresh, recorded attestation, which is spent here.
+     */
+    public static function authorize(User $actor, StaffWriteAuthority $attestation, string $action, string $scope, string $reference): User
+    {
+        if (! Gate::forUser($actor)->allows('administer-catalog', true)) {
+            throw new LegacyArchiveRefusal('actor_refused');
+        }
+        $current = User::query()->lockForUpdate()->find($actor->getKey());
+        try {
+            StaffWriteAuthority::require($current);
+            StaffWriteAuthority::requireFor($current, $attestation, $action, $scope, null, $reference);
+        } catch (AuthorizationException) {
+            throw new LegacyArchiveRefusal('staff_authority_refused');
+        }
+
+        return $current;
+    }
+
+    /** cohort => record key => record hash of one snapshot: what that export contains. */
+    public static function members(array $snapshot): array
+    {
+        $members = [];
+        foreach (array_keys(self::TABLES) as $cohort) {
+            $members[$cohort] = [];
+            foreach ($snapshot[$cohort] as $record) {
+                $members[$cohort][$record['record_key']] = $record['record_sha256'];
+            }
+            ksort($members[$cohort], SORT_STRING);
+        }
+
+        return $members;
+    }
+
+    /** The newest archived export of a source system (by watermark), or null. */
+    public static function currentBatch(string $sourceSystem): ?object
+    {
+        return DB::table('legacy_history_batches')->where('source_system', $sourceSystem)
+            ->orderByDesc('source_as_of')->orderByDesc('id')->first();
+    }
+
+    /** @return array<string, array<string, string>>|null the batch's members when every member row is archived, else null */
+    public static function completeMembers(object $batch): ?array
+    {
+        $members = json_decode($batch->members, true, 8, JSON_THROW_ON_ERROR);
+        if (CanonicalJson::hash($members) !== $batch->members_sha256) {
+            return null;
+        }
+        foreach (self::TABLES as $cohort => $table) {
+            foreach (array_chunk(array_keys($members[$cohort] ?? []), 500, true) as $keys) {
+                $found = 0;
+                foreach (DB::table($table)->whereIn('record_key', $keys)->get(['record_key', 'record_sha256']) as $row) {
+                    $found += ($members[$cohort][$row->record_key] ?? null) === $row->record_sha256 ? 1 : 0;
+                }
+                if ($found !== count($keys)) {
+                    return null;
+                }
+            }
+        }
+
+        return $members;
     }
 
     /** Storage path of one original, addressed by its SHA-256 only (no source name, no customer detail). */
@@ -258,14 +335,15 @@ final class LegacyHistoryArchive
     /** The batch row is created by the first segment and locked by every segment; its identity can never change. */
     private function batch(array $snapshot, string $snapshotSha256, User $actor, ?int $attestationAuditId): int
     {
+        $members = self::members($snapshot);
         $identity = ['snapshot_id' => $snapshot['snapshot_id'], 'source_system' => $snapshot['source_system'],
             'acquisition_method' => $snapshot['acquisition_method'], 'acquired_at' => $snapshot['acquired_at'],
             'source_as_of' => $snapshot['source_as_of'], 'transform_version' => $snapshot['transform_version'],
-            'expected_records' => $this->total($snapshot)];
+            'expected_records' => $this->total($snapshot), 'members_sha256' => CanonicalJson::hash($members)];
         $row = DB::table('legacy_history_batches')->where('snapshot_sha256', $snapshotSha256)->lockForUpdate()->first();
         if ($row === null) {
             return (int) DB::table('legacy_history_batches')->insertGetId(['snapshot_sha256' => $snapshotSha256] + $identity
-                + ['actor_id' => $actor->id, 'attestation_audit_id' => $attestationAuditId, 'created_at' => now()]);
+                + ['members' => CanonicalJson::encode($members), 'actor_id' => $actor->id, 'attestation_audit_id' => $attestationAuditId, 'created_at' => now()]);
         }
         foreach ($identity as $column => $value) {
             if ((string) $row->{$column} !== (string) $value) {
@@ -276,10 +354,11 @@ final class LegacyHistoryArchive
         return (int) $row->id;
     }
 
-    private function insert(string $cohort, array $record, int $batch, array $contractFiles): void
+    private function insert(string $cohort, array $record, int $batch, array $contractFiles, int $actorId, int $attestationAuditId): void
     {
         $common = ['batch_id' => $batch, 'record_key' => $record['record_key'], 'record_sha256' => $record['record_sha256'],
-            'record_ciphertext' => Crypt::encryptString(CanonicalJson::encode($record)), 'created_at' => now()];
+            'record_ciphertext' => Crypt::encryptString(CanonicalJson::encode($record)), 'actor_id' => $actorId,
+            'attestation_audit_id' => $attestationAuditId, 'created_at' => now()];
         $row = match ($cohort) {
             'customers' => ['source_customer_id' => $record['source_customer_id'], 'email_hmac' => self::emailHmac($record['email_normalized']),
                 'marketing_consent' => $record['marketing_consent']],

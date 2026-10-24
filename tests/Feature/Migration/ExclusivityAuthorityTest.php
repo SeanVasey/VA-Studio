@@ -52,7 +52,7 @@ class ExclusivityAuthorityTest extends TestCase
         $this->assertFalse($this->authority->storeMaySellExclusives());
 
         $before = LegacyHistoryFixtures::nonArchiveState();
-        $dry = $this->authority->transition('handover', $this->operator, 'x', null, false, $this->evidence($baseline, $later));
+        $dry = LegacyHistoryFixtures::transition($this->authority, 'handover', $this->operator, 'x', false, $this->evidence($baseline, $later));
         $this->assertSame('not_written', $dry['outcome']);
         $this->assertSame(2, DB::table(ExclusivityAuthority::TABLE)->count());
         $handover = $this->record('handover', $this->evidence($baseline, $later));
@@ -171,7 +171,7 @@ class ExclusivityAuthorityTest extends TestCase
 
     private function record(string $transition, ?array $handover = null): array
     {
-        return $this->authority->transition($transition, $this->operator, 'SYNTHETIC evidence for '.$transition, null, true, $handover);
+        return LegacyHistoryFixtures::transition($this->authority, $transition, $this->operator, 'SYNTHETIC evidence for '.$transition, true, $handover);
     }
 
     private function assertRefused(string $reason, string $transition, ?array $handover = null): void
@@ -179,7 +179,7 @@ class ExclusivityAuthorityTest extends TestCase
         $count = DB::table(ExclusivityAuthority::TABLE)->count();
         foreach ([false, true] as $write) {
             try {
-                $this->authority->transition($transition, $this->operator, 'SYNTHETIC', null, $write, $handover);
+                LegacyHistoryFixtures::transition($this->authority, $transition, $this->operator, 'SYNTHETIC', $write, $handover);
                 $this->fail($transition.' was admitted; expected '.$reason);
             } catch (LegacyArchiveRefusal $refusal) {
                 $this->assertSame($reason, $refusal->reason);
@@ -198,7 +198,7 @@ class ExclusivityAuthorityTest extends TestCase
 
     private function import(array $package, int $limit = 1000): void
     {
-        (new LegacyHistoryArchive)->import($package['snapshot'], $package['sha'], $package['files'], $this->operator, null, $limit);
+        LegacyHistoryFixtures::import($package['snapshot'], $package['sha'], $package['files'], $this->operator, $limit);
     }
 
     /** @return array{0: array, 1: array} both packages archived */

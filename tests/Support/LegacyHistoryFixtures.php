@@ -2,6 +2,11 @@
 
 namespace Tests\Support;
 
+use App\Domain\Migration\History\ExclusivityAuthority;
+use App\Domain\Migration\History\LegacyGrantReview;
+use App\Domain\Migration\History\LegacyHistoryArchive;
+use App\Domain\Staff\StaffWriteAuthority;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -66,6 +71,31 @@ final class LegacyHistoryFixtures
         chmod($base.'/private/file.json', 0600);
 
         return $base.'/private/file.json';
+    }
+
+    /** A console attestation exactly as the commands record it (one per write; each write spends it). */
+    public static function attestation(User $actor, string $action, string $scope, string $reference): StaffWriteAuthority
+    {
+        return StaffWriteAuthority::attest($actor, 'vasey:legacy-history', $action, $scope, null, $reference);
+    }
+
+    public static function import(array $snapshot, string $sha, array $files, User $actor, int $limit, ?callable $afterRecord = null): array
+    {
+        return (new LegacyHistoryArchive)->import($snapshot, $sha, $files, $actor,
+            self::attestation($actor, LegacyHistoryArchive::ATTESTATION_ACTION, LegacyHistoryArchive::attestationScope($sha), $sha), $limit, $afterRecord);
+    }
+
+    public static function review(LegacyGrantReview $review, string $line, User $reviewer, string $reference, bool $write): array
+    {
+        return $review->review($line, $reviewer, $reference, $write
+            ? self::attestation($reviewer, LegacyGrantReview::ATTESTATION_ACTION, LegacyGrantReview::attestationScope($line), $reference) : null, $write);
+    }
+
+    public static function transition(ExclusivityAuthority $authority, string $transition, User $actor, string $reference, bool $write, ?array $handover = null): array
+    {
+        return $authority->transition($transition, $actor, $reference, $write
+            ? self::attestation($actor, ExclusivityAuthority::attestationAction($transition), ExclusivityAuthority::ATTESTATION_SCOPE, $reference) : null,
+            $write, $handover);
     }
 
     public static function cleanup(): void

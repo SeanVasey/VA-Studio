@@ -47,7 +47,7 @@ class LegacyHistoryArchiveTest extends TestCase
 
         $segments = [];
         do {
-            $segment = $this->archive->import($snapshot, $sha, $loaded['source']['contracts'], $importer, null, 5);
+            $segment = LegacyHistoryFixtures::import($snapshot, $sha, $loaded['source']['contracts'], $importer, 5);
             $segments[] = [$segment['processed'], $segment['pending'], $segment['complete']];
         } while (! $segment['complete']);
         $this->assertSame([[5, 12, false], [5, 7, false], [5, 2, false], [2, 0, true]], $segments);
@@ -61,7 +61,7 @@ class LegacyHistoryArchiveTest extends TestCase
         $this->assertSame(['ambiguous_customer_identity' => 2, 'contract_original_missing' => 1], $report['explained_exceptions']);
 
         // A re-run inserts nothing, creates no second batch and leaves every other table untouched.
-        $again = $this->archive->import($snapshot, $sha, $loaded['source']['contracts'], $importer, null, 1000);
+        $again = LegacyHistoryFixtures::import($snapshot, $sha, $loaded['source']['contracts'], $importer, 1000);
         $this->assertSame([0, 0, true], [$again['processed'], $again['pending'], $again['complete']]);
         $this->assertSame([4, 4, 5, 4, 1], $this->tableCounts());
         $this->assertSame($before, LegacyHistoryFixtures::nonArchiveState());
@@ -85,10 +85,10 @@ class LegacyHistoryArchiveTest extends TestCase
         $importer = LicenseFixtures::admin();
         $loaded = $this->archive->load(LegacyHistoryFixtures::privateCopy('baseline'));
         [$snapshot, $sha, $files] = [$loaded['result']['snapshot'], $loaded['result']['snapshot_sha256'], $loaded['source']['contracts']];
-        $this->archive->import($snapshot, $sha, $files, $importer, null, 6);
+        LegacyHistoryFixtures::import($snapshot, $sha, $files, $importer, 6);
         $committed = $this->tableCounts();
         try {
-            $this->archive->import($snapshot, $sha, $files, $importer, null, 1000, function (int $count): void {
+            LegacyHistoryFixtures::import($snapshot, $sha, $files, $importer, 1000, function (int $count): void {
                 if ($count === 7) {
                     throw new RuntimeException('Synthetic interruption');
                 }
@@ -98,7 +98,7 @@ class LegacyHistoryArchiveTest extends TestCase
             $this->assertSame('Synthetic interruption', $error->getMessage());
         }
         $this->assertSame($committed, $this->tableCounts());
-        $resumed = $this->archive->import($snapshot, $sha, $files, $importer, null, 1000);
+        $resumed = LegacyHistoryFixtures::import($snapshot, $sha, $files, $importer, 1000);
         $this->assertSame([11, 0, true], [$resumed['processed'], $resumed['pending'], $resumed['complete']]);
         $this->assertSame([4, 4, 5, 4, 1], $this->tableCounts());
         $this->assertSame('reconciled', $this->archive->reconcile($snapshot, $sha)['result']);
@@ -109,7 +109,7 @@ class LegacyHistoryArchiveTest extends TestCase
         $importer = LicenseFixtures::admin();
         $loaded = $this->archive->load(LegacyHistoryFixtures::privateCopy('baseline'));
         [$snapshot, $sha, $files] = [$loaded['result']['snapshot'], $loaded['result']['snapshot_sha256'], $loaded['source']['contracts']];
-        $this->archive->import($snapshot, $sha, $files, $importer, null, 1000);
+        LegacyHistoryFixtures::import($snapshot, $sha, $files, $importer, 1000);
         $contracts = DB::table('legacy_history_contracts')->orderBy('id')->get();
         Storage::disk('local')->put($contracts[0]->storage_path, "SYNTHETIC substituted bytes\n");
         Storage::disk('local')->delete($contracts[1]->storage_path);
@@ -120,7 +120,7 @@ class LegacyHistoryArchiveTest extends TestCase
         $this->assertSame(2, $report['unexplained']);
 
         $this->expectExceptionObject(new LegacyArchiveRefusal('snapshot_mismatch'));
-        $this->archive->import(['snapshot_id' => 'changed'] + $snapshot, $sha, $files, $importer, null, 1000);
+        LegacyHistoryFixtures::import(['snapshot_id' => 'changed'] + $snapshot, $sha, $files, $importer, 1000);
     }
 
     public function test_contract_bytes_that_differ_from_the_snapshot_are_refused_at_write_time(): void
@@ -130,7 +130,7 @@ class LegacyHistoryArchiveTest extends TestCase
         $files = $loaded['source']['contracts'];
         $files['synthetic-contract-1001-1.txt'] .= 'SYNTHETIC drift';
         try {
-            $this->archive->import($loaded['result']['snapshot'], $loaded['result']['snapshot_sha256'], $files, $importer, null, 1000);
+            LegacyHistoryFixtures::import($loaded['result']['snapshot'], $loaded['result']['snapshot_sha256'], $files, $importer, 1000);
             $this->fail('Changed contract bytes were archived.');
         } catch (LegacyArchiveRefusal $refusal) {
             $this->assertSame('contract_source_changed', $refusal->reason);
@@ -143,13 +143,13 @@ class LegacyHistoryArchiveTest extends TestCase
         $importer = LicenseFixtures::admin();
         $baseline = $this->archive->load(LegacyHistoryFixtures::privateCopy('baseline'))['result'];
         $later = $this->archive->load(LegacyHistoryFixtures::privateCopy('later'));
-        $this->archive->import($baseline['snapshot'], $baseline['snapshot_sha256'], $later['source']['contracts'], $importer, null, 1000);
+        LegacyHistoryFixtures::import($baseline['snapshot'], $baseline['snapshot_sha256'], $later['source']['contracts'], $importer, 1000);
 
         $revoked = LicenseFixtures::admin();
         $revoked->is_admin = false;
         $revoked->save();
         try {
-            $this->archive->import($later['result']['snapshot'], $later['result']['snapshot_sha256'], $later['source']['contracts'], $revoked, null, 1000);
+            LegacyHistoryFixtures::import($later['result']['snapshot'], $later['result']['snapshot_sha256'], $later['source']['contracts'], $revoked, 1000);
             $this->fail('A non-staff account imported.');
         } catch (LegacyArchiveRefusal $refusal) {
             $this->assertSame('actor_refused', $refusal->reason);
@@ -158,7 +158,7 @@ class LegacyHistoryArchiveTest extends TestCase
         $plan = $this->archive->plan($later['result']['snapshot'], $later['result']['snapshot_sha256']);
         $this->assertSame(['customers' => ['create' => 1, 'skip' => 4], 'orders' => ['create' => 2, 'skip' => 3],
             'lines' => ['create' => 3, 'skip' => 3], 'contracts' => ['create' => 1, 'skip' => 4]], $plan['cohorts']);
-        $this->archive->import($later['result']['snapshot'], $later['result']['snapshot_sha256'], $later['source']['contracts'], $importer, null, 1000);
+        LegacyHistoryFixtures::import($later['result']['snapshot'], $later['result']['snapshot_sha256'], $later['source']['contracts'], $importer, 1000);
         $this->assertSame([5, 6, 8, 5, 2], $this->tableCounts());
         // The baseline's versions stay; both snapshots reconcile against the same immutable archive.
         $this->assertSame('reconciled', $this->archive->reconcile($baseline['snapshot'], $baseline['snapshot_sha256'])['result']);
@@ -171,7 +171,7 @@ class LegacyHistoryArchiveTest extends TestCase
         $reviewer = LicenseFixtures::admin();
         $loaded = $this->archive->load(LegacyHistoryFixtures::privateCopy('baseline'));
         $snapshot = $loaded['result']['snapshot'];
-        $this->archive->import($snapshot, $loaded['result']['snapshot_sha256'], $loaded['source']['contracts'], $importer, null, 1000);
+        LegacyHistoryFixtures::import($snapshot, $loaded['result']['snapshot_sha256'], $loaded['source']['contracts'], $importer, 1000);
         $lines = [];
         foreach ($snapshot['lines'] as $line) {
             $lines[$line['source_order_id'].'/'.$line['source_line_id']] = $line['record_key'];
@@ -181,19 +181,19 @@ class LegacyHistoryArchiveTest extends TestCase
         $this->assertSame('archive_only', $review->classification($exclusive));
         $before = LegacyHistoryFixtures::nonArchiveState();
 
-        $self = $review->review($exclusive, $importer, 'SYNTHETIC review reference', null, false);
+        $self = LegacyHistoryFixtures::review($review, $exclusive, $importer, 'SYNTHETIC review reference', false);
         $this->assertSame(['reviewer_imported_evidence'], $self['blockers']);
         try {
-            $review->review($exclusive, $importer, 'SYNTHETIC review reference', null, true);
+            LegacyHistoryFixtures::review($review, $exclusive, $importer, 'SYNTHETIC review reference', true);
             $this->fail('The importer reviewed its own evidence.');
         } catch (LegacyArchiveRefusal $refusal) {
             $this->assertSame('not_eligible', $refusal->reason);
         }
 
-        $recorded = $review->review($exclusive, $reviewer, 'SYNTHETIC review reference', null, true);
+        $recorded = LegacyHistoryFixtures::review($review, $exclusive, $reviewer, 'SYNTHETIC review reference', true);
         $this->assertSame('recorded', $recorded['outcome']);
         $this->assertSame('verified_grant', $review->classification($exclusive));
-        $this->assertSame('unchanged', $review->review($exclusive, $reviewer, 'SYNTHETIC review reference', null, true)['outcome']);
+        $this->assertSame('unchanged', LegacyHistoryFixtures::review($review, $exclusive, $reviewer, 'SYNTHETIC review reference', true)['outcome']);
         $row = DB::table('legacy_history_grant_reviews')->sole();
         $this->assertSame($recorded['evidence_sha256'], $row->evidence_sha256);
         $this->assertStringNotContainsString('SYNTHETIC review reference', json_encode($row));
@@ -204,7 +204,7 @@ class LegacyHistoryArchiveTest extends TestCase
             'synthetic-ord-1004/1' => ['ambiguous_customer_identity', 'contract_absent', 'payment_reference_missing']] as $line => $blockers) {
             $this->assertSame($blockers, $review->inspect($lines[$line])['blockers'], $line);
             try {
-                $review->review($lines[$line], $reviewer, 'SYNTHETIC review reference', null, true);
+                LegacyHistoryFixtures::review($review, $lines[$line], $reviewer, 'SYNTHETIC review reference', true);
                 $this->fail($line.' was reviewed.');
             } catch (LegacyArchiveRefusal $refusal) {
                 $this->assertSame('not_eligible', $refusal->reason);
@@ -230,11 +230,11 @@ class LegacyHistoryArchiveTest extends TestCase
             return $parts;
         }));
         $this->assertSame([], $loaded['result']['findings']);
-        $this->archive->import($loaded['result']['snapshot'], $loaded['result']['snapshot_sha256'], $loaded['source']['contracts'], $importer, null, 1000);
+        LegacyHistoryFixtures::import($loaded['result']['snapshot'], $loaded['result']['snapshot_sha256'], $loaded['source']['contracts'], $importer, 1000);
         $review = new LegacyGrantReview;
         foreach ($loaded['result']['snapshot']['lines'] as $line) {
             if ($line['track_source_id'] === 'synthetic-track-03') {
-                $this->assertContains('duplicate_exclusive_sale', $review->review($line['record_key'], $reviewer, 'SYNTHETIC', null, false)['blockers']);
+                $this->assertContains('duplicate_exclusive_sale', LegacyHistoryFixtures::review($review, $line['record_key'], $reviewer, 'SYNTHETIC', false)['blockers']);
             }
         }
         $this->assertSame(0, DB::table('legacy_history_grant_reviews')->count());
@@ -245,7 +245,7 @@ class LegacyHistoryArchiveTest extends TestCase
     {
         $importer = LicenseFixtures::admin();
         $loaded = $this->archive->load(LegacyHistoryFixtures::privateCopy('baseline'));
-        $this->archive->import($loaded['result']['snapshot'], $loaded['result']['snapshot_sha256'], $loaded['source']['contracts'], $importer, null, 1);
+        LegacyHistoryFixtures::import($loaded['result']['snapshot'], $loaded['result']['snapshot_sha256'], $loaded['source']['contracts'], $importer, 1);
         $batch = DB::table('legacy_history_batches')->sole();
         $this->assertSame([$loaded['result']['snapshot_sha256'], 'synthetic-history-baseline', 'synthetic_fixture', '2026-09-01T00:00:00Z', 17],
             [$batch->snapshot_sha256, $batch->snapshot_id, $batch->acquisition_method, $batch->source_as_of, (int) $batch->expected_records]);

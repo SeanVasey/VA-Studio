@@ -50,6 +50,10 @@ return new class extends Migration
             $table->char('source_as_of', 20);
             $table->string('transform_version', 80);
             $table->unsignedInteger('expected_records');
+            // Every (cohort, record key, record hash) of the snapshot, so the latest export of a source shows what it
+            // still contains: a record a later export dropped or changed no longer supports a review.
+            $table->longText('members');
+            $table->char('members_sha256', 64);
             $table->foreignId('actor_id')->constrained('users')->restrictOnDelete();
             $table->unsignedBigInteger('attestation_audit_id')->nullable();
             $table->timestamp('created_at')->useCurrent();
@@ -64,6 +68,9 @@ return new class extends Migration
             $table->char('email_hmac', 64)->index();
             $table->string('marketing_consent', 16);
             $table->longText('record_ciphertext');
+            // Who inserted this row (a segment may be run by another operator than the batch creator).
+            $table->foreignId('actor_id')->constrained('users')->restrictOnDelete();
+            $table->unsignedBigInteger('attestation_audit_id')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->unique(['record_key', 'record_sha256']);
         });
@@ -81,6 +88,9 @@ return new class extends Migration
             $table->unsignedBigInteger('refunded_minor');
             $table->char('ordered_at', 20);
             $table->longText('record_ciphertext');
+            // Who inserted this row (a segment may be run by another operator than the batch creator).
+            $table->foreignId('actor_id')->constrained('users')->restrictOnDelete();
+            $table->unsignedBigInteger('attestation_audit_id')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->unique(['record_key', 'record_sha256']);
         });
@@ -101,6 +111,9 @@ return new class extends Migration
             $table->char('currency', 3);
             $table->string('classification', 16);
             $table->longText('record_ciphertext');
+            // Who inserted this row (a segment may be run by another operator than the batch creator).
+            $table->foreignId('actor_id')->constrained('users')->restrictOnDelete();
+            $table->unsignedBigInteger('attestation_audit_id')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->unique(['record_key', 'record_sha256']);
         });
@@ -117,6 +130,9 @@ return new class extends Migration
             $table->string('media_type', 64);
             $table->string('storage_path', 255);
             $table->longText('record_ciphertext');
+            // Who inserted this row (a segment may be run by another operator than the batch creator).
+            $table->foreignId('actor_id')->constrained('users')->restrictOnDelete();
+            $table->unsignedBigInteger('attestation_audit_id')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->unique(['record_key', 'record_sha256']);
         });

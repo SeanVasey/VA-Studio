@@ -146,7 +146,7 @@ class LegacyHistoryCommandTest extends TestCase
         $this->assertSame([0, 'reconciled'], [$exit, $summary['code']]);
 
         $loaded = (new LegacyHistoryArchive)->load($baseline);
-        (new LegacyHistoryArchive)->import($loaded['result']['snapshot'], $loaded['result']['snapshot_sha256'], $loaded['source']['contracts'], $this->operator, null, 1000);
+        LegacyHistoryFixtures::import($loaded['result']['snapshot'], $loaded['result']['snapshot_sha256'], $loaded['source']['contracts'], $this->operator, 1000);
         $line = null;
         foreach ($loaded['result']['snapshot']['lines'] as $record) {
             if ($record['source_order_id'] === 'synthetic-ord-1002') {

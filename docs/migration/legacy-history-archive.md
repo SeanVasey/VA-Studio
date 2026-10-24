@@ -68,7 +68,9 @@ USD only and become integer cents (`12`, `12.5`, `$12.50`); `1,299.00`, negative
 ## Commands
 
 All output is one canonical JSON line of counts, codes, record keys and hashes: no e-mail address, name, payment
-reference, path or contract text. Exit codes: `0` clean/complete/reconciled, `1` refused or failed, `2` import
+reference, path or contract text. Findings name the sheet row and `source_id_sha256` (never the id), an unreferenced
+contract file appears only as `file_sha256:<hash of its name>`, and a delta disposition's reason appears only as
+`reason_sha256`. Unmapped columns are reported by their header text, which comes from the export's header row. Exit codes: `0` clean/complete/reconciled, `1` refused or failed, `2` import
 segment committed with more pending, `3` findings or unexplained differences.
 
 ```sh
@@ -88,7 +90,14 @@ php artisan vasey:exclusivity-authority handover --actor-id 7 --baseline <previo
 ```
 
 Every write confirms the staff account's password at a hidden prompt (interactive console only) and records a
-`staff.console_attestation` audit row first; `--attest` is required in every environment for these commands.
+`staff.console_attestation` audit row first; `--attest` is required in every environment for these commands. The
+domain services enforce it again inside the write transaction (review condition C4): the actor's staff authority is
+re-read under lock, the admin panel's staff MFA rule applies wherever the panel requires it (`StaffWriteAuthority::require`),
+and the attestation must be recorded, belong to the actor, be at most 900 seconds old and be bound to the exact write
+(import: `legacy-history.import` on the snapshot hash; review: `legacy-history.review-grant` on the line and reference;
+ledger: `exclusivity-authority.<transition>` on the reference). Each write spends its attestation
+(`StaffWriteAuthority::requireFor`), so one console invocation admits one segment, review or transition.
+`requireFor` refuses outside `local`, `testing` and `staging`, so admitting production needs a separate design decision.
 
 ### Dry run and findings
 
@@ -133,10 +142,16 @@ unexplained, and the result is `reconciled` only with zero unexplained differenc
 ### Historical grants: `archive_only` and `verified_grant`
 
 Every archived line is `archive_only`: kept for history, with no download right. `review-grant --write` lets a staff
-reviewer who did not import any of the evidence classify one line as `verified_grant`, only when the stored archive
-still proves it: order `paid`, nothing refunded, a payment reference, an unambiguous buyer, exactly one stored original
-contract whose bytes match their hash, and no competing unrefunded sale of the same exclusive. The review is one
-immutable row bound to that exact line version and its evidence hashes. `verified_grant` is still not an entitlement:
+reviewer classify one line as `verified_grant`. The reviewer must not have inserted any evidence row the review relies
+on (line, order, buyer, contract: each row records its inserting actor) nor created those rows' batches. Every
+condition is re-derived against the newest archived export of the source (by watermark), which must be fully archived
+(`latest_export_not_archived` otherwise): the line, order, buyer and contract must still be in that export with the
+archived hashes (`evidence_removed` otherwise), the order `paid` with nothing refunded and a payment reference, the buyer
+unambiguous in that export, exactly one stored original contract whose bytes match their hash, and no competing
+unrefunded sale of the same exclusive. The review is one immutable row bound to that exact line version and its
+evidence hashes. `classification()` repeats the derivation: when a later export drops the evidence or changes it (for
+example the buyer's address), the review no longer counts (`reviewed_evidence_changed`) and the line reads
+`archive_only` again; a new line version may be reviewed afresh. `verified_grant` is still not an entitlement:
 nothing reads it to grant a download. Turning verified historical grants into active entitlements is a separate,
 reviewed import that needs Sean's authorization.
 
@@ -144,8 +159,8 @@ reviewed import that needs Sean's authorization.
 
 `delta` compares a baseline package with a later package of the same source system (the later watermark must be
 newer). New records, refunds (status moves forward and the refunded amount grows), completed payments, restated raw
-rows and changed customer contact details are captured automatically. Removed records, changed amounts, tracks,
-licenses, buyers or dates, changed original contract bytes and any change to an exclusive line other than its refund
+rows, changed display names and case-only address spellings are captured automatically. Changed customer addresses,
+removed records, changed amounts, tracks, licenses, buyers or dates, changed original contract bytes and any change to an exclusive line other than its refund
 are blocking. A blocking item is explained only by an operator dispositions file bound to both snapshot hashes:
 
 ```json
@@ -168,7 +183,7 @@ The ledger is append-only; at most one authority sells exclusives at any moment:
 | --- | --- | --- |
 | `declare` | (empty) → `beatstars` | The ledger is empty. |
 | `freeze` | `beatstars` → `frozen` | BeatStars exclusive sales are stopped first (the reference points to the evidence). |
-| `handover` | `frozen` → `vasey_store` | The later package's watermark is at or after the freeze; the baseline is the latest archived export before it; both packages are fully archived and reconcile; their delta reconciles (with dispositions where needed). |
+| `handover` | `frozen` → `vasey_store` | The later package's watermark is at or after the freeze; the baseline is the latest archived export before it; both packages are fully archived and reconcile; their delta reconciles (with dispositions where needed). The watermark is the operator's `source_as_of` declaration in `mapping.json`, so the handover reference must point to evidence of when the post-freeze export was actually taken. |
 | `revert` | `vasey_store` → `frozen` | Rollback starts by stopping the store; sold exclusives stay sold. |
 | `unfreeze` | `frozen` → `beatstars` | Only for a freeze that directly followed BeatStars. After a store period it is refused (`source_resale_unproven`): reopening BeatStars first needs proof it cannot resell what the store sold. |
 
@@ -181,7 +196,8 @@ transitions serialize on the ledger head (`SELECT … FOR UPDATE`) and the uniqu
 
 `ExclusivityAuthority::storeMaySellExclusives()` is true only while `vasey_store` holds the authority. **The store's
 exclusive activation and checkout do not consult it yet**: wiring it in touches checkout and inventory files owned by
-the production-checkout/activation lanes and is listed as remaining work. Until then the ledger is the cutover record
+the production-checkout/activation lanes. It is recorded as a launch gate in
+`docs/live-payment-and-production-preparation-queue.md` and in tasks T39/T40. Until then the ledger is the cutover record
 and rehearsal tool, not an enforced checkout gate.
 
 ## Verification

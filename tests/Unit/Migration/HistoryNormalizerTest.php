@@ -95,7 +95,7 @@ class HistoryNormalizerTest extends TestCase
         $source['mapping'] = json_encode($mapping);
         $result = (new HistoryNormalizer)->normalize($source);
         $this->assertNull($result['snapshot']);
-        $this->assertSame([['scope' => 'sheet', 'sheet' => 'customers', 'row' => null, 'source_id' => null, 'code' => 'unmapped_column', 'column' => 'Marketing Opt-In']], $result['findings']);
+        $this->assertSame([['scope' => 'sheet', 'sheet' => 'customers', 'row' => null, 'source_id_sha256' => null, 'code' => 'unmapped_column', 'column' => 'Marketing Opt-In']], $result['findings']);
 
         $mapping['customers']['columns']['marketing_consent'] = 'Marketing Opt-In';
         $this->expectExceptionObject(new InvalidArgumentException('mapping_columns'));

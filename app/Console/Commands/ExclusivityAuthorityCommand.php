@@ -69,10 +69,10 @@ final class ExclusivityAuthorityCommand extends Command
                 return self::SUCCESS;
             }
             $actor = $this->authorized();
-            $attestation = StaffWriteAuthority::attest($actor, 'vasey:exclusivity-authority', $action, 'exclusivity-authority', null,
-                (string) $this->option('reference'));
+            $attestation = StaffWriteAuthority::attest($actor, 'vasey:exclusivity-authority', ExclusivityAuthority::attestationAction($action),
+                ExclusivityAuthority::ATTESTATION_SCOPE, null, (string) $this->option('reference'));
             $this->attestationAuditId = $attestation->auditEventId;
-            $result = $authority->transition($action, $actor, (string) $this->option('reference'), $attestation->auditEventId, true, $handover);
+            $result = $authority->transition($action, $actor, (string) $this->option('reference'), $attestation, true, $handover);
             $this->emit(['code' => 'transition_recorded', 'result' => $result, 'attestation_audit_id' => $attestation->auditEventId]);
 
             return self::SUCCESS;

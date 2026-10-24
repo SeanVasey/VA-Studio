@@ -190,11 +190,11 @@ final class LegacyHistory extends Command
             return $this->refuse('snapshot_mismatch');
         }
         $actor = $this->authorized();
-        $attestation = StaffWriteAuthority::attest($actor, 'vasey:legacy-history', 'import', 'legacy-history:'.$result['snapshot_sha256'], null,
-            $result['snapshot_sha256']);
+        $attestation = StaffWriteAuthority::attest($actor, 'vasey:legacy-history', LegacyHistoryArchive::ATTESTATION_ACTION,
+            LegacyHistoryArchive::attestationScope($result['snapshot_sha256']), null, $result['snapshot_sha256']);
         $this->attestationAuditId = $attestation->auditEventId;
         $outcome = $archive->import($result['snapshot'], $result['snapshot_sha256'], $loaded['source']['contracts'], $actor,
-            $attestation->auditEventId, (int) $this->option('limit'));
+            $attestation, (int) $this->option('limit'));
         $this->emit(['code' => $outcome['complete'] ? 'import_complete' : 'import_partial', 'snapshot_sha256' => $result['snapshot_sha256'],
             'batch_id' => $outcome['batch_id'], 'processed' => $outcome['processed'], 'pending' => $outcome['pending'], 'total' => $outcome['total'],
             'attestation_audit_id' => $attestation->auditEventId, 'entitlements_created' => 0]);
@@ -248,10 +248,10 @@ final class LegacyHistory extends Command
             return $result['eligible'] ? self::SUCCESS : self::UNRECONCILED;
         }
         $reviewer = $this->authorized();
-        $attestation = StaffWriteAuthority::attest($reviewer, 'vasey:legacy-history', 'review-grant', 'legacy-line:'.$line, null,
-            (string) $this->option('reference'));
+        $attestation = StaffWriteAuthority::attest($reviewer, 'vasey:legacy-history', LegacyGrantReview::ATTESTATION_ACTION,
+            LegacyGrantReview::attestationScope($line), null, (string) $this->option('reference'));
         $this->attestationAuditId = $attestation->auditEventId;
-        $result = $review->review($line, $reviewer, (string) $this->option('reference'), $attestation->auditEventId, true);
+        $result = $review->review($line, $reviewer, (string) $this->option('reference'), $attestation, true);
         $this->emit(['code' => 'review_'.$result['outcome'], 'line_record_key' => $line, 'classification' => LegacyGrantReview::CLASSIFICATION,
             'evidence_sha256' => $result['evidence_sha256'], 'attestation_audit_id' => $attestation->auditEventId, 'entitlements_created' => 0]);
 

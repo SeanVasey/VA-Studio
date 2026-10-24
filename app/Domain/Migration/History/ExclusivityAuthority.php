@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Migration\History;
 
+use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -37,6 +38,14 @@ final class ExclusivityAuthority
 
     public const TRANSITIONS = ['declare', 'freeze', 'handover', 'unfreeze', 'revert'];
 
+    /** Attestation scope; the attestation action is `exclusivity-authority.<transition>`. */
+    public const ATTESTATION_SCOPE = 'exclusivity-authority';
+
+    public static function attestationAction(string $transition): string
+    {
+        return 'exclusivity-authority.'.$transition;
+    }
+
     /** The latest event, or null before any declaration. */
     public function current(): ?object
     {
@@ -55,8 +64,9 @@ final class ExclusivityAuthority
      * @param  array{baseline: array, later: array, dispositions: ?string}|null  $handover  the two normalized snapshots for `handover`
      * @return array{transition: string, from: ?string, to: string, sequence: int, outcome: string, delta_sha256: ?string}
      */
-    public function transition(string $transition, User $actor, string $reference, ?int $attestationAuditId, bool $write, ?array $handover = null): array
+    public function transition(string $transition, User $actor, string $reference, ?StaffWriteAuthority $attestation, bool $write, ?array $handover = null): array
     {
+        (new LegacyArchivePolicy)->admit();
         if (! in_array($transition, self::TRANSITIONS, true)) {
             throw new LegacyArchiveRefusal('transition_unknown');
         }
@@ -75,9 +85,15 @@ final class ExclusivityAuthority
         if (! $write) {
             return $plan(false) + ['outcome' => 'not_written'];
         }
+        if ($attestation === null) {
+            throw new LegacyArchiveRefusal('attestation_required');
+        }
         try {
-            return DB::transaction(function () use ($plan, $transition, $actor, $reference, $attestationAuditId): array {
+            return DB::transaction(function () use ($plan, $transition, $actor, $reference, $attestation): array {
+                // The ledger head is locked first, so a competing transition waits there; the attestation is then spent.
                 $result = $plan(true);
+                $actor = LegacyHistoryArchive::authorize($actor, $attestation, self::attestationAction($transition), self::ATTESTATION_SCOPE, $reference);
+                $attestationAuditId = $attestation->auditEventId;
                 $id = DB::table(self::TABLE)->insertGetId(['sequence' => $result['sequence'], 'authority' => $result['to'],
                     'transition' => $transition, 'reference_hmac' => hash_hmac('sha256', 'vasey-exclusivity-authority-v1|'.$reference, (string) config('app.key')),
                     'baseline_snapshot_sha256' => $result['baseline_snapshot_sha256'], 'later_snapshot_sha256' => $result['later_snapshot_sha256'],

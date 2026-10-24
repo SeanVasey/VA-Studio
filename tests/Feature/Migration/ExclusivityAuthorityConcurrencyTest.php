@@ -26,7 +26,7 @@ class ExclusivityAuthorityConcurrencyTest extends TestCase
     public function test_native_concurrent_freezes_from_one_head_record_exactly_one_event(): void
     {
         [$first, $second] = [LicenseFixtures::admin(), LicenseFixtures::admin()];
-        app(ExclusivityAuthority::class)->transition('declare', $first, 'SYNTHETIC declaration', null, true);
+        LegacyHistoryFixtures::transition(app(ExclusivityAuthority::class), 'declare', $first, 'SYNTHETIC declaration', true);
         $race = ExclusivityAuthorityRace::run($this, [['actor_id' => $first->id, 'transition' => 'freeze'], ['actor_id' => $second->id, 'transition' => 'freeze']], 0);
         $this->assertTrue($race['observed_wait']);
         $this->assertSame(['outcome' => 'recorded', 'to' => 'frozen', 'sequence' => 2], array_intersect_key($race['results'][0], array_flip(['outcome', 'to', 'sequence'])));

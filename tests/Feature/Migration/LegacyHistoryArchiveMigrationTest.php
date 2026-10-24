@@ -121,12 +121,12 @@ class LegacyHistoryArchiveMigrationTest extends TestCase
     {
         $this->user ??= LicenseFixtures::admin()->id;
         $hash = str_repeat('a', 64);
-        $common = ['record_key' => $hash, 'record_sha256' => $hash, 'record_ciphertext' => 'synthetic', 'created_at' => now()];
+        $common = ['record_key' => $hash, 'record_sha256' => $hash, 'record_ciphertext' => 'synthetic', 'actor_id' => $this->user, 'created_at' => now()];
 
         return [
             'legacy_history_batches' => ['snapshot_sha256' => $hash, 'snapshot_id' => 'synthetic', 'source_system' => 'synthetic', 'acquisition_method' => 'synthetic_fixture',
                 'acquired_at' => '2026-09-01T01:00:00Z', 'source_as_of' => '2026-09-01T00:00:00Z', 'transform_version' => 'v1', 'expected_records' => 1,
-                'actor_id' => $this->user, 'created_at' => now()],
+                'members' => '{}', 'members_sha256' => $hash, 'actor_id' => $this->user, 'created_at' => now()],
             'legacy_history_customers' => ['batch_id' => $this->batch ?: null, 'source_customer_id' => 'synthetic-cust', 'email_hmac' => $hash, 'marketing_consent' => 'unknown'] + $common,
             'legacy_history_orders' => ['batch_id' => $this->batch ?: null, 'source_order_id' => 'synthetic-ord', 'customer_record_key' => $hash, 'status' => 'paid',
                 'currency' => 'USD', 'total_minor' => 100, 'refunded_minor' => 0, 'ordered_at' => '2026-08-01T00:00:00Z'] + $common,
