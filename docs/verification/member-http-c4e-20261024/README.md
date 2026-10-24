@@ -249,12 +249,34 @@ Vendor: a byte copy of `/home/user/wt/o4/vendor` (same `composer.lock` as `a08e7
 
 ### Final confirmation on the final source
 
-PENDING: recorded in the packet commit that follows the final runs.
+**Tested source: `b3deef84`.** Its application, route, bootstrap and configuration files equal `7892227f`; the commits
+after it change tests, census, documentation and one workflow comment only. The packet commit that follows changes
+only this file and the GitHub workflow count comment. `git status --short` was empty at the start of every run.
+
+| Run | HEAD | Selection | Result |
+| --- | --- | --- | --- |
+| fin1a | `c06886f8` | `tests/Feature/ProductionMembershipHttp` (mount test and the HTTP test before its last two assertions) | 38 tests, 1,460 assertions, exit 0, 270 s |
+| fin1e | `b3deef84` | `MembershipHttpTest` | 5 tests, 416 assertions, exit 0, 261 s |
+| fin1b | `b3deef84` | `MembershipCustomerIndexAvailabilityTest` | 4 tests, 69 assertions, exit 0 |
+| fin1c | `b3deef84` | `MemberActivationCommitWitnessTest` | 3 tests, 50 assertions, exit 0 |
+| fin1d | `b3deef84` | `StagingEnvironmentAdmissionTest` | 15 tests, 231 assertions, exit 0 |
+| fin2a | `c06886f8` | `MembershipCustomerIndexTest` | 12 tests, 191 assertions, exit 0, 576 s |
+| fin2b | `b3deef84` | `MembershipPeriodAddressedOperationsTest` | 4 tests, 69 assertions, exit 0 |
+| fin2c | `b3deef84` | `MembershipCommitWitnessTest` | 5 tests, 94 assertions, exit 0 |
+| fin2d | `b3deef84` | `MembershipNativeCustomerIndexTest` | 4 skipped on SQLite (census), exit 0 |
+| finOA | `c06886f8` | first 10 files of `tests/Feature/ProductionMemberOriginals` | 70 tests, 244 assertions, 5 skipped (native-only), exit 0 |
+| finOB | `b3deef84` | the other 11 files of `tests/Feature/ProductionMemberOriginals` | 129 tests, 875 assertions, 4 skipped (native-only), exit 0 |
+| selection | `b3deef84` | `phpunit-shards.py ... --mysql-native-selection` | exit 0, 2488 of 9569 in 237 files; generated files deleted |
+| safeguards | `b3deef84` + comment | the four `scripts/ci/test-*.py` | 52, 27, 14, 53 tests OK; each exit 0 |
+
+`c06886f8` differs from `b3deef84` only in `MembershipHttpTest.php` (two added body-shape assertions), which fin1e ran
+at `b3deef84`. `tests/Feature/ProductionMemberGrants` (grants1, 25 tests, 7 native skips) ran at `5cd139b5`, whose
+application sources equal `b3deef84`; only `MemberActivationCommitWitnessTest` changed since, and fin1c ran it.
 
 ## Mutations
 
 Each mutant was applied in a hard-link copy of the worktree (`scratchpad/c4e-mut`) by atomic file replacement, so
-the tested worktree was never written; each was reverted and compared byte for byte, and `diff -rq app routes tests`
+the tested worktree was never written; each was reverted and compared byte for byte, and `diff -rq app routes`
 against the worktree was empty at the end. Driver and specs: `scratchpad/c4e-mut-driver/`.
 
 | ID | Mutation | Test run | Result |
@@ -287,7 +309,8 @@ against the worktree was empty at the end. Driver and specs: `scratchpad/c4e-mut
   old names no longer exist, and the census must match the skipped methods exactly.
 - The MySQL skip census is unchanged: no new test is SQLite-only.
 - `phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json
-  --mysql-native-selection`: exit 0, 2488 selected of 9568 discovered cases in 237 selected files (was 2487 of 9523).
+  --mysql-native-selection`: exit 0, 2488 selected of 9569 discovered cases in 237 selected files (was 2487 of 9523).
+  First proved as 2488 of 9568 at `5cd139b5`; the one F6 case added in `b05f63fc` makes 9569, re-proved at `b3deef84`.
   The generated `phpunit-ci-mysql-*` files and manifest were deleted. Both workflow count comments updated.
 
 ## Phase B: native evidence plan (after G1 merges)
