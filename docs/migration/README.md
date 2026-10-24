@@ -30,6 +30,8 @@ All imported material requires source identity, acquired-at time, raw hash or va
 
 The route file contains proposals, not deployed redirects. Preserve paths when useful and avoid redirecting authenticated routes into public pages. BeatStars-owned hostnames cannot be redirected without verified control.
 
+The reviewed decision for each row lives in `resources/legacy-redirects/map.json` and is checked with `php artisan vasey:redirects-validate`; the redirect layer is default-off. See [legacy-redirects.md](legacy-redirects.md).
+
 
 ## Editorial implementation checkpoint — September 29, 2026
 
