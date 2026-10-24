@@ -105,7 +105,7 @@ final class ReviewFree256IdentityRotationTest extends TestCase
                     $this->rotate([$this->keyF]);
 
                     return ['account' => $binding['account_id']];
-                });
+                }, fn (array $policy, ProductionFreeGrantRows $rows, array $binding): array => ['account' => $binding['account_id']]);
         });
         $this->assertTrue($ran, 'lock() and durableBinding() ran before the rotation.');
         $this->assertSame(0, DB::transactionLevel());

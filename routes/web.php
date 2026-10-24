@@ -12,6 +12,7 @@ use App\Http\Controllers\TestExceptionResolutionController;
 use App\Http\Controllers\TestOwnerDeliveryController;
 use App\Http\Middleware\CustomerCommerceAccess;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\ProductionFree\ProductionFreeHttpMount;
 use App\Http\Tax\TaxHttpMount;
 use Illuminate\Support\Facades\Route;
 
@@ -82,4 +83,9 @@ if (TaxHttpMount::admitted('paid-tax-grants.http_mounted')) {
 }
 if (TaxHttpMount::admitted('production-tax-checkout.http_mounted')) {
     require __DIR__.'/production-tax-checkout.php';
+}
+// Family 256 (production free grants): registered only for the literal `production-free-grants.http_mounted` true in
+// local/testing. The shipped value is false; ProductionFreePrivacy repeats the check on every request.
+if (ProductionFreeHttpMount::admitted()) {
+    require __DIR__.'/production-free-grants.php';
 }
