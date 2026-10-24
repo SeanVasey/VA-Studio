@@ -155,3 +155,25 @@ The files ran in 18 chunks of 12, interleaved so that heavy files spread, by two
 
 - Composer: `filament/filament` 5.10.2 to 5.10.3 and `inertiajs/inertia-laravel` 3.5.1 to 3.5.2 (patches). Livewire is the separate lane.
 - npm: `vite` 8.3.4 to 8.3.5 (patch, `^8.3.4` already allows it). `@types/node` 26 is a major, and a Dependabot rule ignores it. `npm outdated` lists jsdom's "Latest" as 29.1.1, which looks like an artefact: the registry's `latest` dist-tag is 30.1.3, the version now locked.
+
+## Merged-tree addendum (independent review)
+
+Everything above was measured on the pre-merge tree (base `e3e2a180`, lock commit `0989a5b8`). The branch then merged `origin/main`
+at `5b0a6606`, which brought Livewire 4.4.8 (GHSA-mhf7-xp6r-6qrc, through PR #165), the D1 production free-grant HTTP mount and the
+`vasey:cache-prune-expired` schedule (PR #166). On the merged HEAD `30f12ed8`:
+
+- The lock diff against main is exactly `laravel/framework` 13.37.0 to 13.38.0 in `composer.lock` and the five npm records above.
+  `composer audit --locked` reports **no advisories**, so the Livewire rows above (audit exit 1, Livewire 4.4.7, "red on main") describe the
+  pre-merge tree only.
+- The app now schedules two commands: `vasey:publish-scheduled-site-release` (`withoutOverlapping(5)`) and `vasey:cache-prune-expired`
+  (`hourlyAt(23)`, `withoutOverlapping(10)`). Neither is a scheduled unique job, so the 13.38 unique-lock release change does not apply.
+- The PHP suite has 694 test files on the merged tree (688 before the merge).
+- The [independent review](independent-review-30f12ed8-DECISION.md) (APPROVE WITH CONDITIONS, no P0 or P1) re-read every changed upstream
+  line, probed the 413 key-size guard in-process (it counts key bytes only, never values or files; the resumable upload endpoints cap
+  bodies far earlier) and ran 54 files on the merged tree: 671 tests, 8,512 assertions, 0 failures, 0 errors, 19 census skips, plus
+  `tsc` and Vitest (1,172 tests). Its P2-1 (these stale statements) is fixed by this addendum and the CHANGELOG wording. P3-2 adds
+  harmless upstream changes missing from the table above: `Collection::mode()` with floats, `whereBetween` with collection bounds,
+  memory frees in `chunk`/`lazy`, `UniqueJobSkipped` for skipped unique broadcasts and the serialized `countCrashesAsExceptions` property.
+- `npm run build` on the merged HEAD succeeds and `scripts/ci/scan-client-bundle.py` finds no secret names in its 14 files.
+- Still untested: native MySQL against 13.38 with Livewire 4.4.8, the rest of the PHP suite, browser specs, reverse-proxy limits and
+  queued-payload compatibility during a rolling deploy.
