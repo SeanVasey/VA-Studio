@@ -204,7 +204,7 @@ return new class extends Migration
                 "{$b('reason')} IN ('dispute_reconciling', 'dispute_staff_hold', 'refund_suspension') AND {$uuid('public_id')} AND {$order}"
                 .' AND NEW.released_effect_id IS NULL AND NEW.released_at IS NULL'
                 ." AND ((NEW.reason = 'refund_suspension' AND NEW.license_grant_id IS NOT NULL AND {$grant}) OR (NEW.reason <> 'refund_suspension' AND NEW.license_grant_id IS NULL))"
-                ." AND EXISTS (SELECT 1 FROM refund_dispute_effects e WHERE e.id = NEW.applied_effect_id AND e.order_id = NEW.order_id"
+                .' AND EXISTS (SELECT 1 FROM refund_dispute_effects e WHERE e.id = NEW.applied_effect_id AND e.order_id = NEW.order_id'
                 ." AND e.kind IN ('dispute_hold_applied', 'dispute_staff_hold_applied', 'refund_suspension_applied'))"
                 .' AND NOT EXISTS (SELECT 1 FROM refund_dispute_holds x WHERE x.id = NEW.id OR x.public_id = NEW.public_id OR x.applied_effect_id = NEW.applied_effect_id)'],
             // One release only: every identity column is unchanged and the release pair moves from NULL to set.
@@ -212,7 +212,7 @@ return new class extends Migration
                 "{$same('id')} AND {$same('public_id')} AND {$same('order_id')} AND {$same('license_grant_id')} AND {$same('reason')}"
                 ." AND {$same('applied_effect_id')} AND {$same('created_at')} AND OLD.released_at IS NULL AND OLD.released_effect_id IS NULL"
                 .' AND NEW.released_at IS NOT NULL AND NEW.released_at >= OLD.created_at AND NEW.released_effect_id IS NOT NULL'
-                ." AND EXISTS (SELECT 1 FROM refund_dispute_effects e WHERE e.id = NEW.released_effect_id AND e.order_id = OLD.order_id"
+                .' AND EXISTS (SELECT 1 FROM refund_dispute_effects e WHERE e.id = NEW.released_effect_id AND e.order_id = OLD.order_id'
                 ." AND e.kind IN ('dispute_hold_released', 'hold_released_by_staff'))"],
             'refund_dispute_holds_delete' => ['refund_dispute_holds', 'delete', null],
         ];

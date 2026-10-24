@@ -21,7 +21,7 @@ final class RefundDisputeStatus extends Model
 
     protected static function booted(): void
     {
-        static::updating(fn () => throw new LogicException('Refund and dispute evidence is immutable.'));
-        static::deleting(fn () => throw new LogicException('Refund and dispute evidence must be retained.'));
+        self::updating(fn () => throw new LogicException('Refund and dispute evidence is immutable.'));
+        self::deleting(fn () => throw new LogicException('Refund and dispute evidence must be retained.'));
     }
 }

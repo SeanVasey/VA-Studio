@@ -22,13 +22,13 @@ final class RefundDisputeHold extends Model
 
     protected static function booted(): void
     {
-        static::updating(function (self $hold): void {
+        self::updating(function (self $hold): void {
             if ($hold->isDirty(['id', 'public_id', 'order_id', 'license_grant_id', 'reason', 'applied_effect_id', 'created_at'])
                 || $hold->getOriginal('released_at') !== null || ! $hold->isDirty(['released_at', 'released_effect_id'])
                 || $hold->released_at === null || $hold->released_effect_id === null) {
                 throw new LogicException('A refund or dispute hold changes only once, when it is released.');
             }
         });
-        static::deleting(fn () => throw new LogicException('Refund and dispute holds must be retained.'));
+        self::deleting(fn () => throw new LogicException('Refund and dispute holds must be retained.'));
     }
 }

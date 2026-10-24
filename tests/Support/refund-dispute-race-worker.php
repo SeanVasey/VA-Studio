@@ -13,7 +13,9 @@ use App\Domain\Delivery\IssueTestDelivery;
 use App\Domain\Delivery\PrepareTestDeliveryStream;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
+use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -51,8 +53,8 @@ try {
     Storage::forgetDisk('local');
     RefundDisputeFixtures::configure($input['policy']);
     ExclusiveSelectionFixtures::configure();
-    \Illuminate\Support\Carbon::setTestNow($input['now']);
-    \Carbon\CarbonImmutable::setTestNow($input['now']);
+    Carbon::setTestNow($input['now']);
+    CarbonImmutable::setTestNow($input['now']);
     DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
     $connectionId = (int) DB::selectOne('SELECT CONNECTION_ID() AS connection_id')->connection_id;
     $waitFor = function (string $path): void {

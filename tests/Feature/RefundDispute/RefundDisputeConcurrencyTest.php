@@ -4,6 +4,7 @@ namespace Tests\Feature\RefundDispute;
 
 use App\Domain\Commerce\Models\ExclusiveSale;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeHold;
+use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObservation;
 use App\Domain\Commerce\RefundDispute\RefundDisputeActions;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Delivery\IssueTestDelivery;
@@ -136,6 +137,6 @@ class RefundDisputeConcurrencyTest extends TestCase
             file_put_contents($path, json_encode($summary, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
         }
         $this->assertSame(46, R::sequence($f['order']->public_id, $f['staff']));
-        $this->assertSame(16, \App\Domain\Commerce\RefundDispute\Models\RefundDisputeObservation::where('order_id', $f['order']->id)->count());
+        $this->assertSame(16, RefundDisputeObservation::where('order_id', $f['order']->id)->count());
     }
 }

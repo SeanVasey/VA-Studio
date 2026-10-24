@@ -5,6 +5,7 @@ namespace Tests\Feature\RefundDispute;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeEffect;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeHold;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObservation;
+use App\Domain\Commerce\RefundDispute\RefundDisputeActions;
 use App\Domain\Delivery\PrepareTestDeliveryStream;
 use App\Models\User;
 use Illuminate\Database\QueryException;
@@ -46,7 +47,7 @@ class RefundDisputeMigrationTest extends TestCase
         R::observe($f['order']->public_id, $staff);
         R::provider($financial, [['re_ONE', $paid, 'succeeded']], [['du_ONE', $paid, 'won']]);
         R::observe($f['order']->public_id, $staff);
-        app(\App\Domain\Commerce\RefundDispute\RefundDisputeActions::class)->suspendLine($f['order']->public_id, $staff, (string) Str::uuid(),
+        app(RefundDisputeActions::class)->suspendLine($f['order']->public_id, $staff, (string) Str::uuid(),
             R::sequence($f['order']->public_id, $staff), $f['grant']->public_id);
 
         return $f + ['staff' => $staff];

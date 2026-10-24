@@ -22,11 +22,11 @@ final class RefundDisputeWork extends Model
 
     protected static function booted(): void
     {
-        static::updating(function (self $work): void {
+        self::updating(function (self $work): void {
             if ($work->isDirty(['id', 'order_id', 'created_at']) || $work->sequence < $work->getOriginal('sequence')) {
                 throw new LogicException('Refund and dispute coordination is monotonic.');
             }
         });
-        static::deleting(fn () => throw new LogicException('Refund and dispute coordination must be retained.'));
+        self::deleting(fn () => throw new LogicException('Refund and dispute coordination must be retained.'));
     }
 }

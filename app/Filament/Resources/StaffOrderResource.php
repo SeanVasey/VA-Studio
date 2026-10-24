@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Domain\Commerce\Models\OrderFinalization;
 use App\Domain\Commerce\RefundDispute\RefundDisputeActions;
+use App\Domain\Commerce\RefundDispute\RefundDisputeAuthority;
 use App\Domain\Commerce\RefundDispute\RefundDisputeException;
 use App\Domain\Commerce\RefundDispute\RefundDisputeLedger;
 use App\Domain\Commerce\RefundDispute\StaffCommerceDirectory;
@@ -137,7 +138,7 @@ final class StaffOrderResource extends ReadOnlyCommerceResource
 
     private static function detail(OrderFinalization $record): array
     {
-        app(\App\Domain\Commerce\RefundDispute\RefundDisputeAuthority::class)->staff(Filament::auth()->user());
+        app(RefundDisputeAuthority::class)->staff(Filament::auth()->user());
 
         return app(StaffCommerceDirectory::class)->order((int) $record->getKey());
     }
