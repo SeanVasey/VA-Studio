@@ -1,9 +1,10 @@
 # C4e phase A: default-off member HTTP over the C4d member domain
 
 Lane C4e, phase A, October 24, 2026, branch `harness/member-http-c4e-20261024`, from `origin/main`
-`a08e79ca` (PR #165, D1). Phase A is the code and SQLite evidence. Native MySQL evidence (phase B) runs only after
-lane G1 (schema ownership once per frame) merges, because the existing writers overrun their fixed 60-second budget on
-this host without it.
+`a08e79ca` (PR #165, D1). Phase A is the code and SQLite evidence. Phase B, the native MySQL evidence, ran after G1
+merged, on `origin/main` `707649a6` merged into the branch as `34fd070c` (see
+[Phase B: native results](#phase-b-native-results-on-the-merged-source-october-24)); it found that the index does not
+fit its budget beyond a few periods (F9).
 
 This is a local development candidate. Nothing is pushed, no PR is open and no workflow was dispatched.
 
@@ -309,7 +310,7 @@ Decision: **APPROVE** (`scratchpad/c4e-rereview-9d1e09f6.md`), N1 and N2 fixed, 
 | R1 | The read view was always created before the owner lock (identity schema proofs read `production_identity_*` rows at statement 304; the first `FOR UPDATE` was statement 1203), so an index waiting behind a same-owner writer that changed something it reads was refused deterministically (`changed_period_window`; shown natively) | `lockOwnerFirst`: the frame's first statement locks the owner's `users` row; a locking read creates no read view. Schema proofs were not reordered (identity domain, lane G1). SQLite census pins the order; the native test `test_native_index_waiting_behind_a_same_owner_writer_reads_that_writers_commit` pins the behaviour |
 | R2 | "After the owner lock it requests no further lock" was false: re-proofs re-lock the owner rows and `verifyHistoricalBinding` locks the owner's historical challenges | Wording corrected (class docblock, this packet) |
 | R3 | Nothing pinned that writers keep the locking defaults | Census asserts both defaults (`capturePeriod` `consistentRead=false`, `definitionByHash` `committed=false`) and that every writer call site passes no flag |
-| R4 | History-side stale race only by code reading | Native test `test_native_index_waiting_behind_a_same_owner_release_reads_the_released_history` with the genuine release worker (phase B) |
+| R4 | History-side stale race only by code reading | Native test `test_native_index_waiting_behind_a_same_owner_release_reads_the_released_history` with the genuine release worker; passed in phase B at `34fd070c` and `8cddd8b4` |
 
 Commit `aafafabb` carries R1 to R3 and the two new native cases. A pre-G1 attempt to show R1 natively was not
 conclusive: before G1 the index spends tens of seconds in schema guards before its first statement, so the writer
@@ -525,12 +526,115 @@ merged SHA (C4e rebased or merged onto main with G1), one PHPUnit process per ch
    another customer's real award runs, showing neither waits. If 100 periods exceeds the 60 s budget after G1, that is
    a finding (lower the bound or page), not a cap to raise.
 
+## Phase B: native results on the merged source (October 24)
+
+### Source
+
+- `origin/main` `707649a6` (through PR #170, including G1 as PR #168) merged into the branch as `34fd070c` (merge
+  commit; conflicts only in `bootstrap/app.php`, `CHANGELOG.md`, the resumption note and the two count comments).
+- `bd3172c6`: ledger receipts only. `8cddd8b4`: test-only fix to two watchers in
+  `MembershipNativeCustomerIndexTest` (below). Application code is identical at `34fd070c`, `bd3172c6` and `8cddd8b4`.
+- Vendor from the merged lock (`laravel/framework` 13.38.0, `livewire/livewire` 4.4.8); `composer install` reports
+  nothing to install.
+- Census 296 entries (main's 291 unchanged and first, then this branch's), pinned first-150 hash `d93da4e7…`
+  unchanged. Native selection regenerated with `phpunit-shards.py --mysql-native-selection` on the merged tree: 2504 of
+  9647 cases in 239 files (main 2499 of 9595); both count comments updated. The branch's own comment had been 2 cases
+  stale since the R1 and R4 tests were added. Safeguards `test-phpunit-shards.py` 52, `test-ci-scope.py` 27,
+  `test-workflow-cadence.py` 14, `test-focused-tests.py` 53: all OK.
+
+### SQLite on `34fd070c`
+
+Three PHPUnit processes, CI environment (`APP_KEY` set, `CI=true`, `:memory:`), run alongside the native chain, so
+the wall times are not representative:
+
+| Run | Files | Result |
+| --- | --- | --- |
+| mA | `ProductionMembershipHttp`, `ProductionMemberGrants`, `ProductionMemberActivation`, `ProductionMembership` | 161 tests, 2,415 assertions, 0 failures, 0 errors, 10 skips (3,350 s) |
+| mB | `ProductionMembershipBilling` | 416 tests, 3,627 assertions, 0 failures, 0 errors, 40 skips (4,776 s) |
+| mC | `ProductionIdentity`, `ProductionMemberOriginals`, the three `LegacyRedirect*` files, `StagingEnvironmentAdmissionTest`, `CustomerIdentityHttpTest`, `PublicStructuredDataTest` | 342 tests, 2,183 assertions, 0 failures, 0 errors, 20 skips (3,639 s) |
+
+Every skipped method is in the SQLite census and no census method ran (checked from the JUnit files). A first attempt
+without `APP_KEY` was discarded.
+
+### Native MySQL
+
+Private `/opt/mysql-8.4.11/bin/mysqld` 8.4.11, own datadir in the session scratchpad, port 3407 (checked free with
+`ss -ltnp`), `REPEATABLE-READ`, `performance_schema` on, binary log off, `innodb_flush_log_at_trx_commit=2`, database
+`vaseyaudio_c4e_b`, `VA_LOCAL_DISPOSABLE_MYSQL`, no deadline or lock-wait timeout raised, one PHPUnit process per
+method or file with the real `memberActivationFixture()` (award, reserve, authored member definition). The container
+restarted once mid-run; the server was restarted on the same datadir.
+
+| Case | Source | Result |
+| --- | --- | --- |
+| `test_native_index_locks_only_the_owner_rows_until_commit_then_releases_them` | `34fd070c` | OK, 29 assertions: inside the index the owner's `users` and `customer_accounts` rows probe as held (3572); fence, plan, definition, profile, the owner's period and redemption free; nothing retained |
+| `test_native_index_waits_at_a_writer_held_owner_lock_and_retains_no_lock_after_refusal` | `34fd070c` | OK, 23 assertions: 1205 at the held `users` row, nothing retained |
+| `test_native_index_and_a_zero_period_index_complete_while_other_sessions_hold_the_fence_and_shared_rows` | `34fd070c` | OK, 21 assertions |
+| `test_native_index_never_waits_when_another_session_takes_the_definition_then_the_plan_mid_index` (reverse order) | `34fd070c` | OK, 15 assertions: the other session's plan request was granted while the index was open |
+| `test_native_same_plan_award_for_another_customer_runs_while_the_index_is_open` | `34fd070c` | OK, 21 assertions: a real award for a second customer took the plan row while the index was open, never waited on it, and committed |
+| `test_native_index_waiting_behind_a_same_owner_writer_reads_that_writers_commit` (R1) | `8cddd8b4` | OK, 15 assertions: the index waited at the owner row, the writer committed a new period, the index listed it and pre-bytes passed. Earlier runs failed; see below |
+| `test_native_index_waiting_behind_a_same_owner_release_reads_the_released_history` (R4) | `34fd070c` and `8cddd8b4` | OK both times, 16 assertions: a genuine release (separate process) committed while the index waited at the owner row; the index listed the reservation as released |
+| `test_native_index_and_reserve_interleave_sequentially_and_pre_bytes_sees_the_change` | `34fd070c` | OK, 16 assertions: a reserve after the index makes pre-bytes refuse `changed_before_bytes`; the next index shows both reservations |
+| `MembershipNativeCommitWitnessTest` (C4d C2) | `34fd070c` | OK, 3 tests, 55 assertions |
+| `MembershipCommitWitnessTest` (reserve, delegate, release witness) | `34fd070c` | OK, 5 tests, 94 assertions |
+| `MembershipPeriodAddressedOperationsTest` (period-addressed positive path) | `34fd070c` | OK, 4 tests, 69 assertions |
+| `MemberActivationCommitWitnessTest` | `8cddd8b4` | OK, 3 tests, 50 assertions |
+| `MembershipHttpTest`, one process per method | `8cddd8b4` | OK, 5 tests, 416 assertions (journey 129, one not-found 148, outcome-unknown then converge 34, committed write with refused receipt is submitted 46, index body withheld when pre-bytes refuses 59) |
+
+R1 failed twice before the fix, for a test reason. First, under a host load of about 8 on 4 cores (SQLite running
+alongside), the index passed the owner lock but its 60 s budget ran out in the period loop (`operation_deadline`).
+Then, on an idle host, the index waited 50 s at the owner row and failed with 1205, because the writer never saw it
+waiting. An instrumented copy showed why: the writer's watcher polled `information_schema.INNODB_TRX` every 20 ms,
+and InnoDB refreshes that cache only after 0.1 s without a read, so the watcher kept seeing only its own transaction.
+Under load the polls had been spaced out enough to work. `8cddd8b4` polls every 250 ms in both INNODB_TRX watchers
+(R1 and R4); the `performance_schema` probes were not affected.
+
+### Index latency (scratch harness, not committed)
+
+`memberActivationFixture()` plus synthetic older sealed periods in the retained format (one month apart), one call
+being `MembershipCustomerRead::begin()`, `index()` and `proveBeforeBytes()`, which share the index's 60 s budget. Idle
+host, `8cddd8b4` application code:
+
+| Periods | Calls | Index s | Pre-bytes s | Total s | Statements per call (general log) |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 3 + 1 logged | 10.1 to 11.4 | 10.1 to 10.9 | 20.5 to 21.8 | 9,416 (1,982 `information_schema`, 62 `FOR UPDATE`) |
+| 2 | 3 + 1 logged | 12.9 to 16.0 | 12.5 to 17.9 | 25.5 to 33.5 | 13,448 |
+| 3 | 3 + 1 logged | 18.3 to 26.3 | 20.7 to 28.3 | 39.0 to 52.8 | 17,480 |
+| 5 | 2 | 29.6, 30.6 | 28.8, 29.4 | 58.5 (completed), 60.0 (refused) | not logged |
+| 10 | 2 | first call refused inside the index at 60.1 s; second index 55.4 | second: refused after 5.7 | 60.1, 61.1 (both refused) | 31,655 before the refusal in an earlier logged run |
+| 100 | 1 | refused at 60.2 s | none | 60.2 (refused) | not logged |
+
+Every `FOR UPDATE` in a logged call is on the owner's own T23 rows (`users`, `customer_accounts`,
+`production_identity_origins`, `production_identity_verifications`, `production_identity_challenges`). Statements grow
+by 4,032 per additional period per call (about 2,016 per pass), mostly identity schema inspection repeated per period:
+per extra period 48 each of `SHOW CREATE TABLE` on `users`, `customer_accounts` and `quote_owners`, 188 `SELECT
+DATABASE()` and the `information_schema` constraint lookups. Wall time also rose across repeated calls at the same
+size, which is not explained here. Refusals at the budget surfaced as `operation_deadline`, `owner_refused` or
+`index_refused` depending on where the deadline struck; every refused call threw before its pre-bytes check passed.
+
+100 periods while another customer's real award runs (2 repetitions): the index refused `operation_deadline` at 61.4 s
+and 61.9 s; the award committed (period ids recorded) about 44 to 46 s after the index started, while the index was
+still open, held the shared plan row during the index and never appeared in `performance_schema.data_lock_waits`
+blocked by the index's connection. The award took longer than G1's idle 19 s because both shared the host.
+
+### Finding F9 (blocks any mount): the index does not fit its budget beyond a few periods
+
+After G1, one index call (index plus pre-bytes) takes about 20 s at one period and reaches the 60 s budget at about
+five periods; at 10 and 100 periods it always refuses. `MembershipCustomerIndex::LIMIT` is 100
+(`MembershipPolicy::MAX_PERIODS`), so a customer with more than four or five paid periods would get a permanent
+refusal. This is the case the plan named: a finding, not a cap to raise. The cost is per-period identity schema
+inspection on the read path (the writers' frames got G1's once-per-frame proof; the index's per-period historical and
+access proofs did not) plus the full pre-bytes re-run. Options, for review: carry G1's once-per-frame schema proof
+into the index's per-period proofs; lower the page size to what fits with margin and page older periods; make the
+pre-bytes check a cheaper currentness comparison rather than a second full pass. The lane does not choose here; the
+member HTTP index must not be mounted anywhere until this is resolved.
+
 ## Untested conditions
 
-- No native MySQL evidence on an exact SHA for anything in this lane (phase B). The pre-G1 probe above is
-  characterization on a probe fixture.
-- The history-side stale-snapshot race (re-review R4: a redemption or event committed during the owner-lock wait) is
-  exercised only by the phase B real-fixture run; pre-G1 only the window case ran natively.
+- Finding F9 (phase B): the index plus pre-bytes exceeds its 60 s budget at about five periods and always at 10 and
+  100; unresolved.
+- Phase B native evidence is from one private server on one host, one PHPUnit process per case; the R1 and R4 races
+  each ran once successfully after the watcher fix (R4 also once before it).
+- The scratch latency harness is not committed and measured one fixture shape (one plan, one reservation).
 - A same-owner writer that locks the owner's identity rows without taking `users` first would not be ordered by
   `lockOwnerFirst`; every `ProductionCustomerAccess::lock` caller reads `users` first.
 - The real same-plan writer case and the reverse-order case run in one process with one or two independent sessions;
