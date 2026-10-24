@@ -12,10 +12,23 @@ before merge. No deadline, cap or budget was raised, no guard was removed from a
 
 On the same private MySQL 8.4.11 with the same configuration, the existing test
 `MembershipReservationLifecycleTest::test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity`
-fails on `main` (reserve 65.1 s, 90,255 statements, rolled back at its deadline) and passes on this branch (reserve
-24.5 s, 36,676 statements, committed). The award falls from 48.0 s and 70,253 statements to 17.7 s and 28,075. The
-award transaction's business statements (everything except schema checks and savepoints) are the identical multiset on
-both sources. Details, method and caveats are under [Measurements](#measurements-before-and-after).
+fails on `main` (reserve 65.1 s and 64.8 s in two runs, rolled back at its deadline) and passes on this branch
+(reserve 24.5 s and 22.7 s, 36,676 statements, committed). The award falls from 48.0 to 55.5 s and 70,253 statements to
+17.7 to 18.0 s and 28,075. The award transaction's business statements (everything except schema checks and
+savepoints) are the identical multiset on both sources. Details, method and caveats are under [Measurements](#measurements-before-and-after).
+
+## Tested source and commits
+
+| Commit | Content |
+| --- | --- |
+| `b192f0ef` | `perf(memberships)`: `SchemaProofFrame`, the two guards, `MembershipAwardTransaction`, six observer lines, the extracted dependents scan |
+| `855999c0`, `4671441f`, `092f7713` | the new test file (5, then 7, then 8 cases) and its MySQL `include_files` entry |
+| `848e7f8e`, `38dbe999` | this packet and the CHANGELOG entry (documentation only) |
+| `ee18412a` | the native dependent-view leg under `READ COMMITTED`, Pint formatting of the test file, packet revisions |
+
+**Tested SHA: `ee18412a`.** `app/` is byte-identical from `b192f0ef` to `ee18412a` (`git diff b192f0ef ee18412a -- app`
+is empty), so every measurement and native run of an earlier commit exercised the final application code. The commits
+after `ee18412a` add only documentation and evidence files.
 
 ## What can change a proven schema inside one owned frame
 
@@ -139,12 +152,14 @@ synthetic rehearsal only (`MembershipRows::context`).
   remembered.
 - **Decision:** a guard whose stored token equals the current token is reused; on MySQL the identity cross-schema
   dependents scan (`IdentityMigrationOwnership::assertNoDependents`) still runs (meaningful under `READ COMMITTED`;
-  under `REPEATABLE READ` it reads the same snapshot as the establishing proof, see consequence 2). Otherwise the frame opens every table
-  the proof inspects (`SELECT * FROM <table> LIMIT 0`, the pattern `MembershipSchema` and `BillingSchema` already use),
-  runs the unchanged complete proof, recomputes the token and remembers the proof only if every table opened and the
-  token did not move.
+  under `REPEATABLE READ` it reads the same snapshot as the establishing proof, see consequence 2). Otherwise the
+  frame opens every table the proof inspects (`SELECT * FROM <table> LIMIT 0`, the pattern `MembershipSchema` and
+  `BillingSchema` already use), runs the unchanged complete proof, recomputes the token and remembers the proof only if
+  every table opened and the token did not move.
 - **Terminal phase:** each owned observer calls `beginTerminalProof()` at the start of its post-delegate committing
   block. From there to the commit nothing is reused or remembered: every guard proves in full, exactly as on `main`.
+  `MemberGrantAuthoringObserver`'s committing check now also requires its frame object, which always exists once a
+  proof closure was prepared (it is created at the same transaction beginning).
 - **Rollback path:** `protectFailure()` closes the frame first.
 
 Cost of one reuse on MySQL: 3 statements for the witness, 2 for the token, and 4 dictionary scans (plus at most one
@@ -174,34 +189,40 @@ which include its TEMPORARY-shadow cases, ran natively on this branch (below).
 
 - **Server:** private MySQL 8.4.11 (`/opt/mysql-8.4.11/bin/mysqld`), its own datadir, port 3371,
   `innodb_flush_log_at_trx_commit=2`, `--skip-log-bin`, `sync_binlog=0`, 512M buffer pool, `performance_schema=OFF`,
-  `REPEATABLE-READ`: C4d's "config B". No other mysqld ran on the host; the host's unrelated full-suite job did
-  (one-minute load 3.1 at the `main` run and 3.6 at the branch run).
-- **Sources:** *before* is this worktree at `e3e2a180` before any edit; *after* is `b192f0ef`, whose `app/` tree equals
-  the final tested SHA's.
+  `REPEATABLE-READ`: C4d's "config B". No other mysqld ran on the host, and no other session used this server during a
+  measurement.
+- **Two pairs, each run back to back.** Pair 1 ran while the host's unrelated full-suite job was running (one-minute
+  load 3.1 and 3.6); pair 2 ran after it ended (load 0.4 and 1.1).
+- **Sources:** pair 1 *before* is this worktree at `e3e2a180` before any edit, *after* is `b192f0ef`; pair 2 *before*
+  is a byte copy whose `app/` is `git archive e3e2a180 app` (it differs from this branch only in the 11 changed `app/`
+  files), *after* is the worktree at `ee18412a`. Both *after* sources have the final `app/` tree.
 - **Method:** the general log during one run of the test above, summarized per owned transaction (from its first
   `SAVEPOINT va_membership_award_*` to its `COMMIT`/`ROLLBACK`) with C4d's script. "Statements" counts general-log
   entries, so a prepared statement counts three times (prepare, execute, close), as in C4d.
 
-| Owned transaction | `main` `e3e2a180` | This branch `b192f0ef` |
-| --- | --- | --- |
-| Fixture award | 48.0 s, 70,253 statements (23,353 prepared executions), COMMIT | 17.7 s, 28,075 (9,211), COMMIT |
-| Reserve under test | 65.1 s, 90,255 statements (30,002), **ROLLBACK at the 60 s deadline** | 24.5 s, 36,676 (12,018), COMMIT |
-| Exact retry | not reached | 20.0 s, 32,941, COMMIT |
-| Award replay | not reached | 15.1 s, 25,990, COMMIT |
-| Test result | 1 error (reserve deadline), 13 assertions | OK, 21 assertions |
-| Identity inspections (`SHOW CREATE TABLE users`), award / reserve | 314 / 412 | 74 / 94 |
-| Membership catalog lookups, award / reserve | 945 / 1,107 | 315 / 351 |
+| Owned transaction | `main`, pair 1 | `main`, pair 2 | This branch, pair 1 | This branch, pair 2 |
+| --- | --- | --- | --- | --- |
+| Fixture award | 48.0 s, 70,253 statements (23,353 prepared executions), COMMIT | 55.5 s, 70,253, COMMIT | 17.7 s, 28,075 (9,211), COMMIT | 18.0 s, 28,075, COMMIT |
+| Reserve under test | 65.1 s, 90,255 (30,002), **ROLLBACK at the 60 s deadline** | 64.8 s, 83,405, **ROLLBACK at the deadline** | 24.5 s, 36,676 (12,018), COMMIT | 22.7 s, 36,676, COMMIT |
+| Exact retry | not reached | not reached | 20.0 s, 32,941, COMMIT | 21.3 s, 32,941, COMMIT |
+| Award replay | not reached | not reached | 15.1 s, 25,990, COMMIT | 16.5 s, 25,990, COMMIT |
+| Test result | 1 error (reserve deadline), 13 assertions | the same | OK, 21 assertions | OK, 21 assertions |
+| Identity inspections (`SHOW CREATE TABLE users`), award / reserve | 314 / 412 | 314 / 378 | 74 / 94 | 74 / 94 |
+| Membership catalog lookups, award / reserve | 945 / 1,107 | 945 / 1,035 | 315 / 351 | 315 / 351 |
 
-The `main` figures reproduce C4d's config-B counts exactly (70,253 and 90,255). The remaining identity inspections are
-the complete terminal-phase proofs plus one establishing proof per guard. C4d's "data rows" marker also counts the
-membership `LIMIT 0` opens, so it is not a business-statement count; the business comparison is:
+The branch's statement counts are identical in both pairs; `main`'s award count is identical, and its reserve count
+depends on how far it got before the deadline. Pair 1 reproduces C4d's config-B counts exactly (70,253 and 90,255).
+Wall times vary by up to 16 percent between runs of the same source on this shared container. The remaining identity
+inspections are the complete terminal-phase proofs plus one establishing proof per guard. C4d's "data rows" marker
+also counts the membership `LIMIT 0` opens, so it is not a business-statement count; the business comparison is:
 
 - **Award:** after removing schema checks, savepoint operations, `LIMIT 0` opens and session reads, both sources issue
-  the **identical multiset** of 505 business statements.
-- **Reserve:** `main`'s 804 business statements (it stopped at the deadline) are contained in this branch's 876.
+  the **identical multiset** of 505 business statements, in both pairs.
+- **Reserve:** `main`'s business statements (804 and 744; it stopped at the deadline) are contained in this branch's
+  876, in both pairs.
 
 Evidence: `evidence/measure/` (runner `g1-measure.sh`, per-transaction summaries `measure-*.glog.txt` from
-`g1-glog.py`, PHPUnit output `measure-*.txt`, `measure-progress.txt`, and `business-sql-base-vs-head.txt` from
+`g1-glog.py`, PHPUnit output `measure-*.txt`, `measure-progress.txt`, and `business-sql-base-vs-head*.txt` from
 `g1-business-sql.py`). The compressed general logs (several MB each) stay in the lane scratchpad
 (`g1-mysql/general-*.log.gz`).
 
@@ -226,10 +247,11 @@ policy requires. Neither skip census changed.
 
 ## SQLite results
 
-In-memory SQLite, 152 test files in 13 chunks run one process at a time with the direct PHPUnit command (`APP_ENV=testing
-DB_CONNECTION=sqlite DB_DATABASE=:memory:` ..., `public/build` absent), at `848e7f8e`, whose `app/` and `tests/` equal
-`092f7713` and the final tested SHA's except the formatting-only Pint change to the new test file noted below. Driver,
-chunk list and per-chunk results: `evidence/sqlite/`.
+In-memory SQLite, 152 test files in 13 chunks run one process at a time with the direct PHPUnit command
+(`APP_ENV=testing DB_CONNECTION=sqlite DB_DATABASE=:memory:` ..., `public/build` absent), at `848e7f8e`. Its `app/`
+equals the final tested SHA's; its `tests/` differ only in the new test file, whose final version (the
+`READ COMMITTED` native leg and Pint formatting, `ee18412a`) was then run again on SQLite: 8 cases, 53 assertions, no
+skip (`final-newfile-sqlite.txt`). Driver, chunk list and per-chunk results: `evidence/sqlite/`.
 
 | Chunk | Files | Tests | Assertions | Failures | Errors | Skipped |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -247,7 +269,33 @@ method; `evidence/sqlite/sqlite-census-check.txt`). The new file's eight cases r
 
 ## Native MySQL 8.4.11 results
 
-PENDING
+Same private server and configuration as the measurements, no deadline or budget raised. Every case ran as its own
+PHPUnit process (`g1-mysql.sh --filter '/::<method>$/' <file>`, fresh migrations per case), 74 chunks of at most 476 s.
+Chunks n01 to n55 ran in this worktree on database `vaseyaudio_g1` at `092f7713` to `ee18412a`; n57 to n74 ran in a
+byte copy whose `app/` and `tests/` were compared with the worktree before each chunk (`copy_app_tests=identical`), on
+database `vaseyaudio_mutg1`. `app/` is identical across all those commits. Both runners ran at once for part of the
+time, each in its own tree and database. `evidence/native/native-progress.txt` records every start, finish, head and
+source check; `native-summary.txt` totals the junit files.
+
+| File | Cases | Result |
+| --- | --- | --- |
+| `MembershipReservationLifecycleTest` (C4d: failed at the reserve deadline) | 6 | 6 passed, 122 assertions |
+| `MembershipNativeCommitWitnessTest` (C4d: 3 failures) | 3 | 3 passed, 55 assertions |
+| `MembershipCommitWitnessTest`, including reservation, committed delegate and release (C4d: failed at the deadline) | 5 | 5 passed, 94 assertions |
+| `MembershipNativeCustomerIndexTest` (C4d: errors in the reserve fixture) | 3 | 3 passed, 56 assertions |
+| `MembershipPeriodAddressedOperationsTest` (C4d: reserve deadline) | 4 | 4 passed, 69 assertions |
+| `MembershipNativeCatalogCurrentnessTest` (PR #115, TEMPORARY shadow) | 3 | 3 passed, 36 assertions |
+| `MembershipEligibleLicenseProofTest` (PR #115, TEMPORARY shadow) | 16 | 16 passed, 125 assertions |
+| `MemberGrantSourceAdmissionTest` (PR #115, R-4 native source admission) | 12 | 11 passed, 1 skipped (the SQLite-only case, in the MySQL census), 51 assertions |
+| `MembershipSchemaPreparationTest` | 13 | 13 passed, 40 assertions |
+| `IdentityInspectionCostTest` | 1 | passed (one complete inspection stays under its 110-statement bound) |
+| `MembershipSchemaProofFrameTest` (new), final version | 8 | **8 passed, 60 assertions**, one process (31.7 min), in a byte copy identical to `ee18412a` (`final-newfile-mysql.txt`) |
+
+Earlier native runs of the new file are kept: `native-new-r1.txt` (5 cases, a draft that dropped its frame object, so
+one case failed for that reason), `native-new-r2.txt` (5 cases, all passed), and chunks n22 to n28 and n74 of the
+pre-fix version, where `n23` (the dependent-view case under `REPEATABLE READ`) failed as consequence 2 explains. Chunk
+n56 ran twice at once by accident (both runners), which corrupted its junit file although both outputs show it passed;
+it was rerun alone (`chunk-n56-rerun.*`, passed).
 
 ## Mutations
 
@@ -255,6 +303,9 @@ Each mutation was applied to a byte copy of the tested tree (lane scratchpad `g1
 on the stated driver (native runs used a separate disposable database, `vaseyaudio_mutg1`, on the same server), and the
 copy was restored and compared byte for byte with the worktree after every run (`restore=clean` in
 `evidence/mutations/mutations.log`). Tool: `g1-mutate.py`; runner: `g1-mut-run.sh` (both in `evidence/mutations/`).
+The application code under mutation is the final `app/` tree. The SQLite matrix ran against the 7-case version of the
+test file (`4671441f`) and the native runs against the 8-case version (`092f7713`), except the M6 rerun, which used the
+final version (`ee18412a`); the killing cases themselves differ between those versions only by Pint formatting.
 
 | Mutation | Property it removes | SQLite | Native MySQL 8.4.11 |
 | --- | --- | --- | --- |
@@ -280,7 +331,25 @@ under `READ COMMITTED`; the unmutated test passes and M6 fails it (`mutations.lo
 
 ## CI safeguards
 
-PENDING
+At `ee18412a` (and earlier at `092f7713`, same results): `python3 scripts/ci/test-phpunit-shards.py` 52 tests OK,
+`test-ci-scope.py` 27 OK, `test-workflow-cadence.py` 14 OK, `test-focused-tests.py` 53 OK (`evidence/safeguards-*.txt`).
+The repository-level partition with the reviewed MySQL selection,
+`python3 scripts/ci/phpunit-shards.py --shards=24 --prefix=phpunit-ci-mysql --mysql-native-selection`, exited 0:
+"Proved 2464 selected MySQL-native tests in 236 files (of 9426 discovered tests in 689 files) across 24 nonempty
+shards", with the new file selected through `include_files` (`evidence/shards-mysql-selection.txt`; the generated
+`phpunit-ci-mysql-*` files were deleted). Neither skip census (`database-sqlite-skips.json`, `database-mysql-skips.json`)
+changed. Pint (`vendor/bin/pint --test`) passes on every changed PHP file after formatting the new test file.
+`git diff --check origin/main...HEAD` is clean.
+
+## Commands
+
+All from the worktree, with nice and at most two PHPUnit processes at a time.
+
+- SQLite: `env APP_ENV=testing APP_DEBUG=false APP_KEY=base64:<random> DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync CI=true GITHUB_ACTIONS=true PAO_DISABLE=1 php -d memory_limit=512M -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --fail-on-phpunit-warning <files>` (`evidence/sqlite/g1-sqlite.sh`, `g1-sqlite-driver.sh`).
+- Native: the same with `DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3371 DB_USERNAME=root DB_DATABASE=vaseyaudio_g1 VA_LOCAL_DISPOSABLE_MYSQL=vaseyaudio_g1` and the server's socket (`evidence/native/g1-mysql.sh`, `g1-chunk-driver.sh`; server start `g1-mysqld-start.sh`).
+- Measurement: `evidence/measure/g1-measure.sh <label>` (general log on, the one test, general log off, summary).
+- Mutations: `evidence/mutations/g1-mut-run.sh <mutation> <sqlite|mysql> [filter]`.
+- Safeguards: `python3 scripts/ci/test-phpunit-shards.py`, `test-ci-scope.py`, `test-workflow-cadence.py`, `test-focused-tests.py`; `python3 scripts/ci/phpunit-shards.py --shards=24 --prefix=phpunit-ci-mysql --mysql-native-selection`; `vendor/bin/pint --test <changed PHP files>`; `git diff --check origin/main...HEAD`.
 
 ## Residual differences and untested conditions
 

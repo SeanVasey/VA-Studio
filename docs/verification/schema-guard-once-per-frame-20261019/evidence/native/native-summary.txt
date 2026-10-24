@@ -1,0 +1,13 @@
+MembershipReservationLifecycleTest.php {'chunks': 6, 'tests': 6, 'assertions': 122, 'failures': 0, 'errors': 0, 'skipped': 0}
+MembershipNativeCommitWitnessTest.php {'chunks': 3, 'tests': 3, 'assertions': 55, 'failures': 0, 'errors': 0, 'skipped': 0}
+MembershipCommitWitnessTest.php {'chunks': 5, 'tests': 5, 'assertions': 94, 'failures': 0, 'errors': 0, 'skipped': 0}
+MembershipNativeCustomerIndexTest.php {'chunks': 3, 'tests': 3, 'assertions': 56, 'failures': 0, 'errors': 0, 'skipped': 0}
+MembershipPeriodAddressedOperationsTest.php {'chunks': 4, 'tests': 4, 'assertions': 69, 'failures': 0, 'errors': 0, 'skipped': 0}
+MembershipSchemaProofFrameTest.php {'chunks': 8, 'tests': 8, 'assertions': 58, 'failures': 1, 'errors': 0, 'skipped': 0}
+MembershipNativeCatalogCurrentnessTest.php {'chunks': 3, 'tests': 3, 'assertions': 36, 'failures': 0, 'errors': 0, 'skipped': 0}
+IdentityInspectionCostTest.php {'chunks': 1, 'tests': 1, 'assertions': 6, 'failures': 0, 'errors': 0, 'skipped': 0}
+MembershipEligibleLicenseProofTest.php {'chunks': 16, 'tests': 16, 'assertions': 125, 'failures': 0, 'errors': 0, 'skipped': 0}
+MemberGrantSourceAdmissionTest.php {'chunks': 12, 'tests': 12, 'assertions': 51, 'failures': 0, 'errors': 0, 'skipped': 1}
+MembershipSchemaPreparationTest.php {'chunks': 13, 'tests': 13, 'assertions': 40, 'failures': 0, 'errors': 0, 'skipped': 0}
+TOTAL {'chunks': 74, 'tests': 74, 'assertions': 712, 'failures': 1, 'errors': 0, 'skipped': 1}
+non-clean chunks [('n23', 'test_a_dependent_view_created_after_a_remembered_proof_is_refused_at_the_next_guard', {'tests': 1, 'assertions': 2, 'failures': 1, 'errors': 0, 'skipped': 0}), ('n51', 'test_sqlite_verified_member_refuses_both_honest_and_mislabeled_configuration_before_factories', {'tests': 1, 'assertions': 0, 'failures': 0, 'errors': 0, 'skipped': 1})]

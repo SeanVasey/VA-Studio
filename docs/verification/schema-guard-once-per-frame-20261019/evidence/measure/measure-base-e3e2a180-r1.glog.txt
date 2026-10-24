@@ -1,0 +1,38 @@
+TXN 48.0s statements=70253 end=COMMIT commands={'Query': 194, 'Prepare': 23353, 'Execute': 23353, 'Close stmt': 23353} information_schema=11058 savepoint_ops=193
+    23353 Close stmt 
+     1152 Prepare SELECT DATABASE()
+     1152 Execute SELECT DATABASE()
+      314 Prepare SHOW CREATE TABLE `users`
+      314 Execute SHOW CREATE TABLE `users`
+      314 Prepare SHOW CREATE TABLE `customer_accounts`
+      314 Execute SHOW CREATE TABLE `customer_accounts`
+      314 Prepare SHOW CREATE TABLE `quote_owners`
+      314 Execute SHOW CREATE TABLE `quote_owners`
+      314 Prepare WITH lookup AS (SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFER
+      314 Execute WITH lookup AS (SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFER
+      314 Prepare WITH lookup AS (SELECT CONSTRAINT_NAME, TABLE_NAME AS identity_key FROM information_schema.TABLE_CONSTRAINTS WHE
+   marker identity_inspect(SHOW CREATE users)                314
+   marker identityrows_guard(SHOW CREATE audit_events)       65
+   marker membership_schema(membership_lookup)               945
+   marker select_database                                    1152
+   marker information_schema_any                             5529
+   marker data_rows(production_membership_*/member_* FROM)   1072
+TXN 65.1s statements=90255 end=ROLLBACK commands={'Query': 247, 'Prepare': 30004, 'Execute': 30002, 'Close stmt': 30002} information_schema=14010 savepoint_ops=246
+    30002 Close stmt 
+     1475 Prepare SELECT DATABASE()
+     1475 Execute SELECT DATABASE()
+      412 Prepare SHOW CREATE TABLE `users`
+      412 Execute SHOW CREATE TABLE `users`
+      412 Prepare SHOW CREATE TABLE `customer_accounts`
+      412 Execute SHOW CREATE TABLE `customer_accounts`
+      412 Prepare SHOW CREATE TABLE `quote_owners`
+      412 Execute SHOW CREATE TABLE `quote_owners`
+      412 Prepare WITH lookup AS (SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFER
+      412 Execute WITH lookup AS (SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFER
+      412 Prepare WITH lookup AS (SELECT CONSTRAINT_NAME, TABLE_NAME AS identity_key FROM information_schema.TABLE_CONSTRAINTS WHE
+   marker identity_inspect(SHOW CREATE users)                412
+   marker identityrows_guard(SHOW CREATE audit_events)       103
+   marker membership_schema(membership_lookup)               1107
+   marker select_database                                    1475
+   marker information_schema_any                             7005
+   marker data_rows(production_membership_*/member_* FROM)   1197
