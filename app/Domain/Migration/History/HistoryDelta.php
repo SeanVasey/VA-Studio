@@ -173,7 +173,7 @@ final class HistoryDelta
             },
             'contract' => in_array('sha256', $fields, true) || in_array('bytes', $fields, true)
                 ? ['contract_original_changed', true]
-                : ($only([...$restated, 'declared_sha256']) && $before['declared_sha256'] === null
+                : ($only($restated) || ($only([...$restated, 'declared_sha256']) && $before['declared_sha256'] === null)
                     ? ['contract_row_restated', false] : ['contract_link_changed', true]),
         };
     }
