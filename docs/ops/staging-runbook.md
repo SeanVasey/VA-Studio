@@ -192,7 +192,8 @@ domain service as the admin, under the same staff authority, MFA, rights, media 
 
    Both names must start with `Synthetic `, so synthetic writes are never attributed to a real operator. Both need
    catalog authority and, on staging, an enrolled authenticator: the same panel rule every staff write checks.
-   A write run then asks for both passwords at hidden prompts, in an interactive console. On staging it also needs
+   A write run then asks for both passwords at hidden prompts, in an interactive session (the command refuses `--no-interaction`; it
+   does not require standard input to be a terminal, so the confirmed passwords, not the terminal, are the gate). On staging it also needs
    `--attest`: it records one `staff.console_attestation` audit row per account before the first write.
 6. The approved seller tag is configured and matches its SHA-256 (section 3). Without it the pipeline cannot make a
    tagged preview (`tag_not_configured`). The command never generates, replaces or overrides a tag.
@@ -347,7 +348,9 @@ art vasey:test-identity-links print MESSAGE_ID --operator=OPERATOR_EMAIL --attes
   `staff.console_attestation` audit row before anything is read.
 - `list` shows each message's id, recipient, kind (`create account` or `reset password`), creation and expiry
   times in UTC, and status (`pending`, `expired` or `used`), newest first. It only counts the captures it withholds:
-  those for other addresses, and any that fail verification (changed, linked or misnamed files).
+  those for other addresses, and any that fail verification (changed, linked or misnamed files). Captures are never
+  deleted, so a listing examines only the newest 50 by file modification time (`--limit=N`, at most 200) and says how many
+  older ones it did not examine; `print` still finds an older capture by its id.
 - `print` prints the link of one pending message on its own line. It refuses expired and used messages. A reserved
   address proves nothing about who typed it, so send a `create account` link only to the tester you are onboarding,
   and a `reset password` link only to the person you know owns that test account, never in reply to an unsolicited

@@ -476,7 +476,7 @@ class StagingSyntheticCatalogTest extends TestCase
     public function test_writes_need_an_interactive_console_both_passwords_and_the_lock(): void
     {
         $this->operators();
-        $this->assertRefusedWithoutWrites(['--no-interaction' => true], 'interactive trusted console to confirm both staff passwords');
+        $this->assertRefusedWithoutWrites(['--no-interaction' => true], 'interactive session (not --no-interaction) to confirm both staff passwords at hidden prompts');
         $this->assertRefusedWithoutWrites(['--check' => true, '--attest' => true], '--attest does not apply to --check');
         $this->assertRefusedWithoutWrites([], 'password was not confirmed', [StagingSyntheticCatalog::OPERATOR_PROMPT => 'wrong-password']);
         $this->assertRefusedWithoutWrites([], 'password was not confirmed', [StagingSyntheticCatalog::OPERATOR_PROMPT => $this->passwords[0],

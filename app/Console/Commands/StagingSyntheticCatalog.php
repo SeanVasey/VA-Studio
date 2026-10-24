@@ -24,7 +24,7 @@ use Throwable;
  * can rehearse catalog → player → quote → Stripe test checkout → verified payment → contract → download before real
  * tracks exist. Default off. It refuses when the configured or running environment is production or the two differ,
  * outside local, testing and staging, unless Stripe is in test mode, and on a catalog that already holds non-synthetic
- * published tracks or approved licenses. Writes need both staff passwords at hidden prompts in an interactive console.
+ * published tracks or approved licenses. Writes need both staff passwords at hidden prompts in an interactive session; the command checks `--no-interaction`, not that standard input is a terminal, so a piped password is accepted and the confirmed passwords are the gate.
  */
 final class StagingSyntheticCatalog extends Command
 {
@@ -84,7 +84,7 @@ final class StagingSyntheticCatalog extends Command
             return self::SUCCESS;
         }
         if (! $this->input->isInteractive()) {
-            return $this->refuse('Synthetic catalog writes require an interactive trusted console to confirm both staff passwords.');
+            return $this->refuse('Synthetic catalog writes require an interactive session (not --no-interaction) to confirm both staff passwords at hidden prompts.');
         }
         // Both accounts act in this run, so each password is confirmed. One shell still drives both accounts.
         if (! $this->confirmed($operator, self::OPERATOR_PROMPT) || ! $this->confirmed($reviewer, self::REVIEWER_PROMPT)) {

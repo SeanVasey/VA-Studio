@@ -57,7 +57,7 @@ final class ManageRightsScopes extends Command
                 return $this->list();
             }
             if (! $this->input->isInteractive()) {
-                return $this->refuse('Rights scope writes require an interactive trusted console to confirm the staff password.');
+                return $this->refuse('Rights scope writes require an interactive session (not --no-interaction) to confirm the staff password at a hidden prompt.');
             }
             $actor = $this->authenticate();
             if ($actor === null) {
