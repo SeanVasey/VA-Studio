@@ -4,6 +4,8 @@ namespace Tests\Support;
 
 use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantDefinitions;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrantInput;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrantRows;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantSources;
 use App\Models\User;
 use Filament\Facades\Filament;
@@ -93,6 +95,21 @@ trait ProductionFreeGrantFixtures
         return [...['requestKey' => (string) Str::uuid(), 'definitionHash' => $review['definition']['definition_hash'],
             'termsHash' => $review['definition']['terms_hash'], 'availabilityId' => $review['definition']['availability_id'],
             'declaredName' => $review['declaredName'], 'affirmed' => true, 'displayHash' => $review['displayHash']], ...$overrides];
+    }
+
+    /** A sealed revocation row written inside the current frame, exactly as staff revocation writes it. */
+    protected function insertRevocation(string $originId): void
+    {
+        $rows = new ProductionFreeGrantRows;
+        $origin = $rows->one('production_free_origins', 'id = ?', [$originId]);
+        $at = ProductionFreeGrantInput::now();
+        $id = (string) Str::uuid();
+        $actor = $this->staff();
+        $rows->insert('production_free_revocations', ['id' => $id, 'origin_id' => $originId, 'actor_user_id' => (int) $actor->getKey(),
+            'reason_hash' => hash('sha256', 'Synthetic concurrent revocation'), 'created_at' => ProductionFreeGrantInput::stored($at)],
+            ['schema_version' => 'production-free-revocation-v1', 'revocation_id' => $id, 'origin_id' => $originId,
+                'origin_seal' => $origin['seal'], 'reason' => 'Synthetic concurrent revocation', 'actor_user_id' => (int) $actor->getKey(),
+                'at' => ProductionFreeGrantInput::iso($at)]);
     }
 
     private function removeTree(string $path): void

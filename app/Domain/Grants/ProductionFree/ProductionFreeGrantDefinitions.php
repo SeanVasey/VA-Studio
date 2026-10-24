@@ -186,15 +186,20 @@ final class ProductionFreeGrantDefinitions
     /** One staff transaction: policy, locked current staff row first, MFA/gate re-proved after every callback. */
     public function staffCommand(User $actor, callable $work, callable $project): array
     {
-        return ProductionFreeGrantTransactions::run(function () use ($actor, $work, $project): array {
+        return ProductionFreeGrantTransactions::run(function (ProductionFreeGrantCommitObserver $commit) use ($actor, $work, $project): array {
             $policy = (new ProductionFreeGrantPolicy)->current();
             $rows = new ProductionFreeGrantRows;
             $staff = new ProductionFreeGrantStaff;
             $raw = $staff->lock($actor, $rows);
             $result = $work($policy, $rows);
-            $staff->proveCurrent($actor, $rows, $raw);
-            (new ProductionFreeGrantPolicy)->prove($policy);
-            $rows->assertCurrent();
+            $terminal = function () use ($staff, $actor, $rows, $raw, $policy): void {
+                $staff->proveCurrent($actor, $rows, $raw);
+                (new ProductionFreeGrantPolicy)->prove($policy);
+                $rows->assertCurrent();
+            };
+            $terminal();
+            // Re-run by the commit observer after the ordinary committing listeners: staff authority, policy and frame.
+            $commit->terminal($terminal);
 
             return $project($result);
         });

@@ -17,9 +17,9 @@ use Tests\Support\ProductionFreeGrantFixtures;
 use Tests\TestCase;
 
 /**
- * M-16 for family 256. Nothing ships binding this family (ProductionFreeGrantApprovalTest), so the container builds its
- * renderer plainly even outside the CLI. The step that composes and mounts the family adds the PhpCliProcess binding;
- * these tests bind it the same way to prove the pinned renderer's child then runs the validated CLI binary.
+ * M-16 for family 256. The step that mounts the family's HTTP (D1) binds its renderer like the other grant families: the
+ * container builds it plainly in the CLI and with the PhpCliProcess factory outside it. These tests also bind it
+ * explicitly to prove the pinned renderer's child then runs the validated CLI binary.
  */
 final class ProductionFreeGrantCliRendererTest extends TestCase
 {
@@ -32,11 +32,11 @@ final class ProductionFreeGrantCliRendererTest extends TestCase
         $this->freeSetup();
     }
 
-    public function test_the_shipped_container_never_binds_the_family_256_renderer(): void
+    public function test_the_shipped_container_binds_the_family_256_renderer_like_the_other_families(): void
     {
         $this->assertNull($this->factoryOf(app(ProductionFreeGrantRendererProcess::class)));
         $this->simulateFpm(PHP_BINARY);
-        $this->assertNull($this->factoryOf(app(ProductionFreeGrantRendererProcess::class)));
+        $this->assertInstanceOf(Closure::class, $this->factoryOf(app(ProductionFreeGrantRendererProcess::class)));
     }
 
     /** What the composition step binds: the same outside-the-CLI factory the shipped families use. */

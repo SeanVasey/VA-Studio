@@ -10,15 +10,24 @@ use LogicException;
  * One verified private snapshot with metadata derived from the re-proved authorization, never browser input.
  * The transfer deadline (derived from the asset size and the policy's minimum rate, not the authorization TTL) bounds every
  * chunk; an expired stream stops and reports it.
+ *
+ * A transfer from `ProductionFreeGrantDownloads::redeem` carries the redemption's one-use committed read. `begin()` runs
+ * it once, before the first byte (an HTTP response calls it before its first header); `writeTo()` calls `begin()` itself
+ * when nobody did. A refusal closes the snapshot and no byte is written. Only a bare snapshot built directly, with no
+ * committed redemption behind it, has no such proof.
  */
 final class ProductionFreeGrantTransfer
 {
     private int $lastTick = 0;
 
+    private bool $begun = false;
+
+    private bool $admitted = false;
+
     public function __construct(public readonly PreparedDeliveryStream $stream, public readonly string $filename,
         public readonly string $mimeType, private readonly int $deadline, private readonly ?Closure $clock = null,
         private readonly ?int $startedNs = null, private readonly ?int $minimumRate = null,
-        private readonly ?int $baseSeconds = null)
+        private readonly ?int $baseSeconds = null, private readonly ?ProductionFreeGrantCommittedRead $committed = null)
     {
         $progress = [$startedNs, $minimumRate, $baseSeconds];
         if (count(array_filter($progress, fn ($value) => $value !== null)) !== 0
@@ -30,10 +39,31 @@ final class ProductionFreeGrantTransfer
         $this->lastTick = $startedNs ?? 0;
     }
 
+    /** The before-first-byte proof, once, on the original deadline. A refusal closes the snapshot. */
+    public function begin(): void
+    {
+        if ($this->begun) {
+            return;
+        }
+        $this->begun = true;
+        try {
+            $this->within(0);
+            $this->committed?->proveBeforeBytes();
+            $this->within(0);
+            $this->admitted = true;
+        } catch (\Throwable $error) {
+            $this->stream->close();
+            throw $error;
+        }
+    }
+
     /** The consumer must accept each complete chunk or throw; the stream is closed in every outcome. */
     public function writeTo(callable $consumer): void
     {
         try {
+            $this->begin();
+            // A refused begin() closed the snapshot already; nothing may be written after it.
+            ProductionFreeGrantException::require($this->admitted, 'outcome_unknown');
             $this->within(0);
             $input = $this->stream->stream();
             if (fseek($input, 0) !== 0) {
