@@ -71,6 +71,11 @@ final class MembershipHttpTest extends TestCase
         $this->assertCount(1, $index['periods'][0]['reservations']);
 
         $before = DB::table(MembershipReservationRecords::TABLE)->count();
+        // A body of the wrong shape is refused before the domain is called.
+        $this->privateJson($this->postMember('/production-memberships/periods/'.$period.'/reservations', ['offerId' => (string) $fixture['selection'],
+            'expectedRevision' => (string) $fixture['expected_revision'], 'requestKey' => self::REQUEST_KEY]))->assertStatus(422)->assertExactJson(['code' => 'MEMBERSHIP_UNAVAILABLE']);
+        $this->privateJson($this->postMember('/production-memberships/periods/'.$period.'/expire', ['force' => true]))->assertStatus(422);
+        $this->assertSame($before, DB::table(MembershipReservationRecords::TABLE)->count());
         $result = $this->privateJson($this->reserve($fixture, $period))->assertOk()->json('result');
         $this->assertSame(['periodId', 'status', 'balances', 'redemptionId', 'creditAmount', 'honorDeadline'], array_keys($result));
         $this->assertSame([$period, 'reserved', 1], [$result['periodId'], $result['status'], $result['creditAmount']]);
