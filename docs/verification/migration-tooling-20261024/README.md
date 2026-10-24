@@ -190,6 +190,15 @@ pins the bug found by the command test.
   the config comment and the two test additions, which were re-run at `fed4571e`).
 - Independent review of the schema migration and the sensitive services has not happened.
 
+### Post-merge check (origin/main `707649a6`, PR #170 T36)
+
+Main moved after the tested source. Merge `b9ae0606` resolves the `CHANGELOG.md` and workflow count-comment conflicts
+(T36 added tests, no migration and no census change). On `b9ae0606`: native selection proof 2519 selected in 243 files
+of 9658 discovered in 707 (comment updated); the four safeguards 52/27/14/53 OK; a focused SQLite run of the seven new
+test files plus `ProductionEnvironmentTemplateTest`, `InstallationReportTest` and `BeatStarsExportNormalizerTest`:
+194 tests, 3,083 assertions, 2 skipped, exit 0 (`evidence/postmerge-b9ae0606-sqlite.txt`). The native MySQL and
+51-file runs were not repeated on the merge; T36's application files do not intersect this lane's.
+
 ### Next dependencies
 
 1. Independent review of the migration and `app/Domain/Migration/History/*` at the exact SHA.
