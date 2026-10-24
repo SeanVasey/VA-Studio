@@ -42,11 +42,12 @@ final class RefundDisputeAuthority
     public function lock(string $orderPublicId, ?User $actor): array
     {
         RefundDisputeException::require(DB::transactionLevel() > 0, 'unavailable');
+        // Environment, flag and policy refuse before any row is locked or read.
+        $policy = app(RefundDisputePolicy::class)->current();
         $current = $actor?->exists ? User::whereKey($actor->getKey())->lockForUpdate()->first() : null;
         if (! $current || ! Gate::forUser($current)->allows('administer-catalog') || ! AdminMultiFactor::satisfiedBy($current, lockForUpdate: true)) {
             throw new AuthorizationException;
         }
-        $policy = app(RefundDisputePolicy::class)->current();
         [$order, $finalization] = $this->paidOrder($orderPublicId, app(RefundDisputePolicy::class)->account());
         $locked = Order::whereKey($order->id)->lockForUpdate()->first();
         RefundDisputeException::require($locked !== null && hash_equals($locked->public_id, $orderPublicId), 'not_found');

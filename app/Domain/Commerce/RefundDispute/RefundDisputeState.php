@@ -119,7 +119,9 @@ final class RefundDisputeState
 
     private static function key(mixed $object): ?string
     {
-        if (! is_array($object) || array_keys($object) !== ['kind', 'hash', 'amount', 'currency', 'status']
+        $keys = is_array($object) ? array_keys($object) : [];
+        sort($keys, SORT_STRING);
+        if ($keys !== ['amount', 'currency', 'hash', 'kind', 'status']
             || ! in_array($object['kind'], ['refund', 'dispute'], true) || ! is_string($object['hash'])
             || preg_match('/\A[a-f0-9]{64}\z/D', $object['hash']) !== 1 || ! is_int($object['amount'])
             || $object['amount'] < 1 || $object['amount'] > 99999999 || ! is_string($object['currency'])

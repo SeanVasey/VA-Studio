@@ -103,12 +103,16 @@ final class RefundDisputeCase
             && ($payload['request_id'] ?? null) === $observation->request_id && ($payload['sequence'] ?? null) === $observation->sequence
             && ($payload['outcome'] ?? null) === $observation->outcome && ($payload['policy_hash'] ?? null) === $observation->policy_hash
             && is_array($payload['objects'] ?? null), 'unavailable');
+        $snapshot = [];
         foreach ($payload['objects'] as $object) {
-            $row = $objects[($object['kind'] ?? '').':'.($object['hash'] ?? '')] ?? null;
-            RefundDisputeException::require($row !== null && $row->amount_minor === $object['amount'] && $row->currency === $object['currency'], 'unavailable');
+            $row = is_array($object) ? ($objects[($object['kind'] ?? '').':'.($object['hash'] ?? '')] ?? null) : null;
+            RefundDisputeException::require($row !== null && $row->amount_minor === ($object['amount'] ?? null)
+                && $row->currency === ($object['currency'] ?? null) && is_string($object['status'] ?? null), 'unavailable');
+            $snapshot[] = ['kind' => $object['kind'], 'hash' => $object['hash'], 'amount' => $object['amount'],
+                'currency' => $object['currency'], 'status' => $object['status']];
         }
 
-        return $payload['objects'];
+        return $snapshot;
     }
 
     /** Current status of each object in the latest accepted snapshot, keyed by object id. */
