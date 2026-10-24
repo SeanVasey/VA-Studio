@@ -18,11 +18,13 @@ use Illuminate\Support\Facades\Gate;
  * Every condition is re-derived against the newest archived export of the line's source system, which must be
  * fully archived: the line, its order, its buyer and its original contract must still be in that export with the
  * archived hashes (a later export that drops or changes any of them withdraws the evidence). The order must be paid
- * with nothing refunded and carry a payment reference, the buyer must be unambiguous in that export, the line must
- * have exactly one stored original whose bytes still match their hash, and no other unrefunded sale of the same
- * exclusive may remain. The reviewer must hold current staff authority, satisfy the panel's staff MFA rule, present
- * a fresh attestation bound to this line and reference, and must not have inserted (or created the batch of) any
- * evidence row the review relies on. Only then is one immutable review row recorded, bound to that exact line
+ * with nothing refunded and carry a payment reference, the buyer must be unambiguous, the line must have exactly one
+ * stored original whose bytes still match their hash, and no other unrefunded sale of the same exclusive may remain.
+ * Those last three read every other record's latest archived version across all exports, so an export that merely
+ * omits a competing record can never clear a blocker (only a newer version of that record can). The reviewer must
+ * hold current staff authority, satisfy the panel's staff MFA rule, present a fresh attestation bound to this line and
+ * reference, and must not have inserted (or created the batch of) any evidence row the review relies on, nor created
+ * or run a segment of the newest export, whose member list decides what is current. Only then is one immutable review row recorded, bound to that exact line
  * version and the evidence hashes.
  *
  * `classification()` repeats the whole derivation: a review counts only while the current evidence still hashes to
@@ -147,6 +149,10 @@ final class LegacyGrantReview
             return $result + ['blockers' => ['evidence_removed']];
         }
         $result['line_id'] = (int) $line->id;
+        // Blockers that depend on other records (a competing exclusive sale, a buyer sharing the address, a second
+        // contract) read each record's latest archived version across every export of the source, so a later export
+        // that merely omits a record can never clear a blocker; only a newer version of that record can.
+        $latest = $this->latestVersions($sourceSystem);
         $lineRecord = LegacyHistoryArchive::decrypt($line);
         $order = $this->member('legacy_history_orders', $members['orders'], $line->order_record_key);
         $orderRecord = $order === null ? null : LegacyHistoryArchive::decrypt($order);
@@ -172,7 +178,7 @@ final class LegacyGrantReview
             $blockers[] = 'evidence_removed';
         } else {
             foreach (DB::table('legacy_history_customers')->where('email_hmac', $customer->email_hmac)->where('record_key', '<>', $customer->record_key)->get() as $other) {
-                if (($members['customers'][$other->record_key] ?? null) === $other->record_sha256) {
+                if (($latest['customers'][$other->record_key] ?? null) === $other->record_sha256) {
                     $blockers[] = 'ambiguous_customer_identity';
                     break;
                 }
@@ -180,7 +186,7 @@ final class LegacyGrantReview
         }
         $contracts = [];
         foreach (DB::table('legacy_history_contracts')->where('line_record_key', $lineRecordKey)->orderBy('id')->get() as $row) {
-            if (($members['contracts'][$row->record_key] ?? null) === $row->record_sha256) {
+            if (($latest['contracts'][$row->record_key] ?? null) === $row->record_sha256) {
                 $contracts[] = $row;
             }
         }
@@ -189,6 +195,8 @@ final class LegacyGrantReview
             $blockers[] = 'contract_absent';
         } elseif (count($contracts) > 1) {
             $blockers[] = 'multiple_contracts';
+        } elseif (($members['contracts'][$contracts[0]->record_key] ?? null) !== $contracts[0]->record_sha256) {
+            $blockers[] = 'evidence_removed';
         } else {
             $contract = $contracts[0];
             if (LegacyHistoryArchive::decrypt($contract) === null
@@ -199,10 +207,10 @@ final class LegacyGrantReview
         if ((bool) $line->exclusive) {
             foreach (DB::table('legacy_history_lines')->where('track_source_id', $line->track_source_id)->where('exclusive', true)
                 ->where('record_key', '<>', $lineRecordKey)->orderBy('id')->get() as $other) {
-                if (($members['lines'][$other->record_key] ?? null) !== $other->record_sha256) {
+                if (($latest['lines'][$other->record_key] ?? null) !== $other->record_sha256) {
                     continue;
                 }
-                $otherOrder = $this->member('legacy_history_orders', $members['orders'], $other->order_record_key);
+                $otherOrder = $this->member('legacy_history_orders', $latest['orders'], $other->order_record_key);
                 if ($otherOrder !== null && in_array($otherOrder->status, ['paid', 'partially_refunded', 'unknown'], true)
                     && (int) $other->refunded_minor < (int) $other->amount_minor) {
                     $blockers[] = 'duplicate_exclusive_sale';
@@ -210,13 +218,19 @@ final class LegacyGrantReview
                 }
             }
         }
-        // Separation of duties: whoever inserted any evidence row this review relies on, or created its batch, cannot review it.
+        // Separation of duties: whoever inserted any evidence row this review relies on, created its batch, or created or
+        // ran any segment of the newest export (whose member list decides what is current) cannot review it.
         if ($reviewer !== null) {
             $rows = array_values(array_filter([$line, $order, $customer, $contract]));
             $importers = array_map(static fn (object $row): int => (int) $row->actor_id, $rows);
-            $batchActors = DB::table('legacy_history_batches')->whereIn('id', array_map(static fn (object $row): int => (int) $row->batch_id, $rows))
+            $batchActors = DB::table('legacy_history_batches')->whereIn('id', [...array_map(static fn (object $row): int => (int) $row->batch_id, $rows), (int) $batch->id])
                 ->pluck('actor_id')->map(static fn ($id): int => (int) $id)->all();
-            if (in_array((int) $reviewer->id, [...$importers, ...$batchActors], true)) {
+            $newestActors = DB::table('audit_events')->where('action', LegacyHistoryArchive::SEGMENT_ACTION)->where('subject_type', 'legacy_history_batch')
+                ->where('subject_id', $batch->id)->pluck('actor_id')->map(static fn ($id): int => (int) $id)->all();
+            foreach (LegacyHistoryArchive::TABLES as $table) {
+                $newestActors = [...$newestActors, ...DB::table($table)->where('batch_id', $batch->id)->distinct()->pluck('actor_id')->map(static fn ($id): int => (int) $id)->all()];
+            }
+            if (in_array((int) $reviewer->id, [...$importers, ...$batchActors, ...$newestActors], true)) {
                 $blockers[] = 'reviewer_imported_evidence';
             }
         }
@@ -233,6 +247,22 @@ final class LegacyGrantReview
 
         return ['line_record_key' => $lineRecordKey, 'line_id' => (int) $line->id, 'eligible' => $blockers === [], 'blockers' => $blockers,
             'evidence_sha256' => $blockers === [] ? $evidence : null];
+    }
+
+    /**
+     * cohort => record key => hash of the record's latest archived version: the version in the newest export (by
+     * watermark) that contains the key. A record that a later export omits keeps its last archived version.
+     */
+    private function latestVersions(string $sourceSystem): array
+    {
+        $latest = array_fill_keys(array_keys(LegacyHistoryArchive::TABLES), []);
+        foreach (DB::table('legacy_history_batches')->where('source_system', $sourceSystem)->orderByDesc('source_as_of')->orderByDesc('id')->get(['members']) as $batch) {
+            foreach (json_decode($batch->members, true, 8, JSON_THROW_ON_ERROR) as $cohort => $records) {
+                $latest[$cohort] += $records;
+            }
+        }
+
+        return $latest;
     }
 
     /** The stored row of one record as the given export contains it, or null when that export no longer has it. */

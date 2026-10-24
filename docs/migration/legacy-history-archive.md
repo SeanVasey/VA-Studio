@@ -143,15 +143,20 @@ unexplained, and the result is `reconciled` only with zero unexplained differenc
 
 Every archived line is `archive_only`: kept for history, with no download right. `review-grant --write` lets a staff
 reviewer classify one line as `verified_grant`. The reviewer must not have inserted any evidence row the review relies
-on (line, order, buyer, contract: each row records its inserting actor) nor created those rows' batches. Every
+on (line, order, buyer, contract: each row records its inserting actor), nor created those rows' batches, nor created
+or run any segment of the newest export of the source (whose member list decides what is current). Every
 condition is re-derived against the newest archived export of the source (by watermark), which must be fully archived
 (`latest_export_not_archived` otherwise): the line, order, buyer and contract must still be in that export with the
 archived hashes (`evidence_removed` otherwise), the order `paid` with nothing refunded and a payment reference, the buyer
-unambiguous in that export, exactly one stored original contract whose bytes match their hash, and no competing
-unrefunded sale of the same exclusive. The review is one immutable row bound to that exact line version and its
+unambiguous, exactly one stored original contract whose bytes match their hash, and no competing unrefunded sale of
+the same exclusive. The last three read every other record's latest archived version across all exports, so an export
+that omits a competing sale, a customer sharing the address or a second contract never clears the blocker; only a
+newer version of that record does (for example the competing sale refunded). Clearing a blocker by an owner-approved
+removal is not supported yet; such a line stays `archive_only`. The review is one immutable row bound to that exact line version and its
 evidence hashes. `classification()` repeats the derivation: when a later export drops the evidence or changes it (for
 example the buyer's address), the review no longer counts (`reviewed_evidence_changed`) and the line reads
-`archive_only` again; a new line version may be reviewed afresh. `verified_grant` is still not an entitlement:
+`archive_only` again; a new line version may be reviewed afresh, but the same line version cannot be reviewed again
+(the review row is unique per line version), so it stays `archive_only` even after an owner disposition. `verified_grant` is still not an entitlement:
 nothing reads it to grant a download. Turning verified historical grants into active entitlements is a separate,
 reviewed import that needs Sean's authorization.
 

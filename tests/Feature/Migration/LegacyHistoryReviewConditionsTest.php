@@ -55,6 +55,82 @@ class LegacyHistoryReviewConditionsTest extends TestCase
         $this->assertSame('recorded', LegacyHistoryFixtures::review($review, $line, $c, 'SYNTHETIC', true)['outcome']);
     }
 
+    public function test_c1_prime_omitting_a_competing_record_from_a_newer_export_never_clears_a_blocker_or_admits_its_importer(): void
+    {
+        [$a, $b, $c] = [LicenseFixtures::admin(), LicenseFixtures::admin(), LicenseFixtures::admin()];
+        $competing = "synthetic-ord-1009,1,synthetic-cust-001,2026-08-09T10:00:00Z,Completed,synthetic-track-03,Exclusive Rights,500,0,synthetic-pay-1009,USD\n";
+        $sharing = "synthetic-cust-009,Buyer.One@example.invalid,SYNTHETIC Buyer Nine,\n";
+        $baseline = $this->load('baseline', function (array $parts) use ($competing, $sharing): array {
+            $parts['orders'] .= $competing;
+            $parts['customers'] .= $sharing;
+
+            return $parts;
+        });
+        LegacyHistoryFixtures::import($baseline['snapshot'], $baseline['sha'], $baseline['files'], $a, 1000);
+        $review = new LegacyGrantReview;
+        $exclusive = $this->line($baseline['snapshot'], 'synthetic-ord-1002');
+        $basic = $this->line($baseline['snapshot'], 'synthetic-ord-1001');
+        $this->assertSame(['duplicate_exclusive_sale'], $review->inspect($exclusive)['blockers']);
+        $this->assertSame(['ambiguous_customer_identity'], $review->inspect($basic)['blockers']);
+
+        // Probe D: B archives a "later export" that is the baseline minus the competing sale and the sharing customer.
+        // Every member is already archived, so B inserts nothing and the batch is complete.
+        $omitting = $this->load('baseline', fn (array $parts): array => ['mapping' => $this->newer($parts['mapping'])] + $parts);
+        $this->assertSame(0, LegacyHistoryFixtures::import($omitting['snapshot'], $omitting['sha'], $omitting['files'], $b, 1000)['processed']);
+        foreach ([$exclusive => 'duplicate_exclusive_sale', $basic => 'ambiguous_customer_identity'] as $line => $blocker) {
+            $this->assertSame([$blocker], $review->inspect($line)['blockers'], 'An omission must not clear '.$blocker);
+            $this->assertEqualsCanonicalizing([$blocker, 'reviewer_imported_evidence'], LegacyHistoryFixtures::review($review, $line, $b, 'SYNTHETIC', false)['blockers']);
+            foreach ([$b, $c] as $reviewer) {
+                $this->refused('not_eligible', fn () => LegacyHistoryFixtures::review($review, $line, $reviewer, 'SYNTHETIC', true));
+            }
+            $this->assertSame('archive_only', $review->classification($line));
+        }
+
+        // A real newer version clears it: the competing sale refunded. B created that export, so only C may review.
+        $refunded = $this->load('baseline', function (array $parts) use ($competing, $sharing): array {
+            $parts['mapping'] = str_replace(['2026-10-01T01:00:00Z', '2026-10-01T00:00:00Z'], ['2026-10-02T01:00:00Z', '2026-10-02T00:00:00Z'], $this->newer($parts['mapping']));
+            $parts['orders'] .= str_replace(['Completed', '500,0,'], ['Refunded', '500,500,'], $competing);
+            $parts['customers'] .= $sharing;
+
+            return $parts;
+        });
+        // B creates that export's batch with one record; D runs the remaining segment. Both shaped what is current.
+        $d = LicenseFixtures::admin();
+        LegacyHistoryFixtures::import($refunded['snapshot'], $refunded['sha'], $refunded['files'], $b, 1);
+        $this->assertTrue(LegacyHistoryFixtures::import($refunded['snapshot'], $refunded['sha'], $refunded['files'], $d, 1000)['complete']);
+        $this->assertSame([], $review->inspect($exclusive)['blockers']);
+        foreach ([$b, $d] as $shaper) {
+            $this->assertSame(['reviewer_imported_evidence'], LegacyHistoryFixtures::review($review, $exclusive, $shaper, 'SYNTHETIC', false)['blockers']);
+            $this->refused('not_eligible', fn () => LegacyHistoryFixtures::review($review, $exclusive, $shaper, 'SYNTHETIC', true));
+        }
+        $this->assertSame('recorded', LegacyHistoryFixtures::review($review, $exclusive, $c, 'SYNTHETIC', true)['outcome']);
+        $this->assertSame('verified_grant', $review->classification($exclusive));
+        $this->assertSame(['ambiguous_customer_identity'], $review->inspect($basic)['blockers']);
+    }
+
+    public function test_c1_prime_omitting_a_second_contract_does_not_clear_multiple_contracts(): void
+    {
+        [$a, $b] = [LicenseFixtures::admin(), LicenseFixtures::admin()];
+        $baseline = $this->load('baseline', function (array $parts): array {
+            $parts['contracts'] .= "synthetic-contract-1001-1b,synthetic-ord-1001,1,synthetic-contract-1001-1b.txt,\n";
+            $parts['files']['synthetic-contract-1001-1b.txt'] = "SYNTHETIC CONTRACT ORIGINAL 1001-1b (second copy)\n";
+
+            return $parts;
+        });
+        LegacyHistoryFixtures::import($baseline['snapshot'], $baseline['sha'], $baseline['files'], $a, 1000);
+        $line = $this->line($baseline['snapshot'], 'synthetic-ord-1001');
+        $review = new LegacyGrantReview;
+        $this->assertSame(['multiple_contracts'], $review->inspect($line)['blockers']);
+        $omitting = $this->load('baseline', fn (array $parts): array => ['mapping' => $this->newer($parts['mapping'])] + $parts);
+        LegacyHistoryFixtures::import($omitting['snapshot'], $omitting['sha'], $omitting['files'], $b, 1000);
+        $this->assertSame(['multiple_contracts'], $review->inspect($line)['blockers']);
+    }
+
+    private function newer(string $mapping): string
+    {
+        return str_replace(['2026-09-01T01:00:00Z', '2026-09-01T00:00:00Z'], ['2026-10-01T01:00:00Z', '2026-10-01T00:00:00Z'], $mapping);
+    }
+
     public function test_c3_a_later_export_that_drops_the_evidence_or_changes_the_buyer_withdraws_a_review(): void
     {
         [$importer, $reviewer] = [LicenseFixtures::admin(), LicenseFixtures::admin()];
