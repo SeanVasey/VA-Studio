@@ -2,14 +2,18 @@
 
 namespace Tests\Feature\ProductionMembershipBilling;
 
+use App\Domain\Grants\Member\MemberActivationHistoryInspection;
 use App\Domain\Grants\Member\MemberActivationHistoryReader;
 use App\Domain\Grants\Member\MemberGrantPolicy;
+use App\Domain\Grants\Member\MemberGrantRows;
 use App\Domain\Memberships\Billing\BillingAwardFence;
+use App\Domain\Memberships\Production\MembershipAwardContext;
 use App\Domain\Memberships\Production\MembershipCustomerIndex;
 use App\Domain\Memberships\Production\MembershipCustomerRead;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipLedgerAudit;
 use App\Domain\Memberships\Production\MembershipPeriodRecords;
+use App\Domain\Memberships\Production\MembershipReservationContext;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
@@ -79,7 +83,12 @@ class MembershipCustomerIndexAvailabilityTest extends TestCase
         // read adds FOR UPDATE; SQLite has no row locks, so the call shape is pinned here and the native NOWAIT tests
         // prove it on InnoDB.
         $source = file_get_contents(base_path('app/Domain/Memberships/Production/MembershipCustomerIndex.php'));
-        $this->assertStringNotContainsString('FOR UPDATE', $source);
+        // The only locking statement written here is the frame's first one, on the owner's users row (re-review R1).
+        $this->assertSame(1, substr_count($source, 'FOR UPDATE'));
+        $this->assertStringContainsString("'SELECT id FROM `'.\$database.'`.`users` WHERE id = ? FOR UPDATE'", $source);
+        $frame = substr($source, strpos($source, '$projection = DB::transaction(function ()'));
+        $this->assertLessThan(strpos($frame, 'new MembershipRows'), strpos($frame, '$this->lockOwnerFirst($primary, $principal->userId);'),
+            'The owner row is locked before the first consistent read (the schema proofs in MembershipRows).');
         $this->assertStringNotContainsString('$rows->one(', $source);
         $this->assertStringNotContainsString('$rows->rows(', $source);
         $this->assertSame(1, substr_count($source, '->lock('));
@@ -90,6 +99,19 @@ class MembershipCustomerIndexAvailabilityTest extends TestCase
         }
         $this->assertSame(1, substr_count($source, 'capturePeriod($row[\'id\'], $rows, consistentRead: true)'));
         $this->assertSame(1, substr_count($source, '->capturePeriod('));
+        // Re-review R3: both opt-ins default to locking, and every writer keeps that default.
+        $capture = (new ReflectionClass(MemberActivationHistoryReader::class))->getMethod('capturePeriod')->getParameters()[2];
+        $this->assertSame(['consistentRead', false], [$capture->getName(), $capture->getDefaultValue()]);
+        $byHash = (new ReflectionClass(MemberGrantRows::class))->getMethod('definitionByHash')->getParameters()[1];
+        $this->assertSame(['committed', false], [$byHash->getName(), $byHash->getDefaultValue()]);
+        foreach ([MembershipAwardContext::class => 1, MembershipReservationContext::class => 2, MemberActivationHistoryInspection::class => 1] as $writer => $count) {
+            $code = file_get_contents((new ReflectionClass($writer))->getFileName());
+            $this->assertSame($count, preg_match_all('/->capturePeriod\(([^()]|\([^()]*\))*\)/', $code, $sites), $writer);
+            foreach ($sites[0] as $site) {
+                $this->assertSame(1, substr_count($site, ','), $writer.' keeps the locking capture: '.$site);
+            }
+            $this->assertStringNotContainsString('consistentRead', $code, $writer);
+        }
         $reader = file_get_contents((new ReflectionClass(MemberActivationHistoryReader::class))->getFileName());
         $this->assertStringContainsString('\'consistent_read\' => $consistentRead', $reader);
         $this->assertStringContainsString('&& ! $committed && ! ($state[\'consistent_read\'] ?? false) ? \' FOR UPDATE\' : \'\'', $reader);

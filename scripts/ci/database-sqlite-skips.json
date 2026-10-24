@@ -1177,6 +1177,14 @@
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
       "test_native_same_plan_award_for_another_customer_runs_while_the_index_is_open"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_index_waiting_behind_a_same_owner_writer_reads_that_writers_commit"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_index_waiting_behind_a_same_owner_release_reads_the_released_history"
     ]
   ]
 }

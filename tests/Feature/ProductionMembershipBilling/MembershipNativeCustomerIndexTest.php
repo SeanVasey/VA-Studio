@@ -13,6 +13,10 @@ use App\Domain\Memberships\Billing\BillingSubscriptionApprovals;
 use App\Domain\Memberships\Production\MembershipCustomerIndex;
 use App\Domain\Memberships\Production\MembershipCustomerRead;
 use App\Domain\Memberships\Production\MembershipException;
+use App\Domain\Memberships\Production\MembershipInvoiceBinding;
+use App\Domain\Memberships\Production\MembershipPeriodRecords;
+use App\Domain\Memberships\Production\MembershipPolicyVersions;
+use App\Domain\Memberships\Production\MembershipRecords;
 use App\Domain\Memberships\Production\MembershipRows;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Events\TransactionBeginning;
@@ -256,6 +260,129 @@ class MembershipNativeCustomerIndexTest extends TestCase
         $this->assertSame(2, DB::table('production_membership_paid_periods')->count());
     }
 
+    public function test_native_index_waiting_behind_a_same_owner_writer_reads_that_writers_commit(): void
+    {
+        // Re-review R1: a same-owner writer holds the owner's users row; the index waits at its first statement. The
+        // writer then commits a new sealed period for the owner. Because the index creates its read view only after
+        // the owner row is granted, it lists the new period instead of refusing at the terminal proof.
+        $fixture = $this->indexFixture();
+        [$period, $event] = $this->sealedOlderPeriod($fixture);
+        $config = DB::connection()->getConfig();
+        $parent = (int) DB::connection()->getPdo()->query('SELECT CONNECTION_ID()')->fetchColumn();
+        $this->directory = storage_path('framework/testing/membership-index-owner-writer-'.Str::uuid());
+        (new Filesystem)->makeDirectory($this->directory, 0700, true);
+        file_put_contents($this->directory.'/rows.json', json_encode(['period' => $period, 'event' => $event], JSON_THROW_ON_ERROR));
+        $code = <<<'PHP'
+[, $host, $port, $database, $user, $password, $userId, $parent, $directory] = $argv;
+$open = fn () => new PDO('mysql:host='.$host.';port='.$port.';dbname='.$database, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+$writer = $open();
+$watch = $open();
+$writer->exec('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
+$writer->beginTransaction();
+$lock = $writer->prepare('SELECT id FROM users WHERE id = ? FOR UPDATE');
+$lock->execute([$userId]);
+$lock->fetchAll();
+touch($directory.'/locked');
+$self = (int) $writer->query('SELECT CONNECTION_ID()')->fetchColumn();
+$waiters = [];
+$deadline = microtime(true) + 100;
+while ($waiters === [] && microtime(true) < $deadline) {
+    // Any other transaction waiting for a lock on this private server is the index (the test's own connection).
+    $trx = $watch->prepare("SELECT trx_mysql_thread_id FROM information_schema.INNODB_TRX WHERE trx_state = 'LOCK WAIT' AND trx_mysql_thread_id <> ?");
+    $trx->execute([$self]);
+    $waiters = array_map('intval', $trx->fetchAll(PDO::FETCH_COLUMN));
+    usleep(20000);
+}
+$rows = json_decode(file_get_contents($directory.'/rows.json'), true, 8, JSON_THROW_ON_ERROR);
+foreach (['production_membership_paid_periods' => $rows['period'], 'production_membership_credit_events' => $rows['event']] as $table => $row) {
+    $insert = $writer->prepare('INSERT INTO '.$table.' ('.implode(', ', array_keys($row)).') VALUES ('.implode(', ', array_fill(0, count($row), '?')).')');
+    $insert->execute(array_values($row));
+}
+$writer->commit();
+echo json_encode(['waiters' => $waiters, 'parent' => (int) $parent]);
+PHP;
+        $this->worker = new Process([PHP_BINARY, '-r', $code, '--', (string) $config['host'], (string) $config['port'], (string) $config['database'],
+            (string) $config['username'], (string) $config['password'], (string) $fixture['buyer']['principal']->userId, (string) $parent, $this->directory], base_path(), null, null, 200);
+        $this->worker->start();
+        $deadline = hrtime(true) + 30_000_000_000;
+        while (! is_file($this->directory.'/locked')) {
+            clearstatcache();
+            if (! $this->worker->isRunning() || hrtime(true) >= $deadline) {
+                $this->fail('The same-owner writer did not lock the owner row: '.$this->worker->getErrorOutput());
+            }
+            usleep(5000);
+        }
+        $read = MembershipCustomerRead::begin();
+        $index = (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read);
+        $read->proveBeforeBytes();
+        $this->worker->wait();
+        $this->assertSame(0, $this->worker->getExitCode(), $this->worker->getErrorOutput());
+        $observed = json_decode($this->worker->getOutput(), true, 4, JSON_THROW_ON_ERROR);
+        $this->assertSame([$parent], $observed['waiters'], 'The index waited at the owner row while the writer held it.');
+        $this->assertSame([DB::table('production_membership_paid_periods')->where('account_id', $fixture['buyer']['principal']->accountId)
+            ->orderByDesc('period_start')->value('id'), $period['id']], array_column($index['periods'], 'id'));
+    }
+
+    public function test_native_index_waiting_behind_a_same_owner_release_reads_the_released_history(): void
+    {
+        // Re-review R4: the history-side stale-snapshot race with a real writer. The owner's genuine release (separate
+        // process) holds the owner lock with its release event written, at its committing delegate. The index waits at
+        // the owner row; only then is the release allowed to commit. The index must list the reservation as released.
+        $fixture = $this->indexFixture();
+        $this->directory = storage_path('framework/testing/membership-index-release-'.Str::uuid());
+        (new Filesystem)->makeDirectory($this->directory, 0700, true);
+        $db = DB::connection()->getConfig();
+        $honor = CarbonImmutable::parse($fixture['reservation']['honor_deadline'], 'UTC')->format('Y-m-d H:i:s.u');
+        $input = ['role' => 'release', 'hold' => true, 'user_id' => (int) $fixture['buyer']['user']->id,
+            'definition_id' => $fixture['member_authored']->definitionId, 'redemption_id' => $fixture['reservation']['redemption_id'],
+            'invoice_id' => $fixture['invoice']['id'], 'confirm_at' => CarbonImmutable::now('UTC')->format('Y-m-d H:i:s.u'), 'operation_at' => $honor,
+            'configuration' => ['production-customer-identity' => config('production-customer-identity'),
+                'production-memberships' => config('production-memberships'), 'production-membership-billing' => config('production-membership-billing'),
+                'member-grants' => config('member-grants'), 'filesystems.disks.local' => config('filesystems.disks.local'), 'media' => config('media')]];
+        $environment = ['APP_ENV' => 'testing', 'APP_DEBUG' => 'false', 'APP_KEY' => 'base64:'.base64_encode(str_repeat('P', 32)),
+            'DB_CONNECTION' => 'mysql', 'DB_URL' => '', 'DB_HOST' => (string) $db['host'], 'DB_PORT' => (string) $db['port'],
+            'DB_DATABASE' => (string) $db['database'], 'DB_USERNAME' => (string) $db['username'], 'DB_PASSWORD' => (string) $db['password'],
+            'DB_SOCKET' => (string) ($db['unix_socket'] ?? ''), 'CACHE_STORE' => 'array', 'SESSION_DRIVER' => 'array', 'QUEUE_CONNECTION' => 'sync',
+            'VA_MEMBER_ACTIVATION_RELEASE_RACE_ONLY' => '1', 'VA_MEMBER_ACTIVATION_RELEASE_RACE_DIRECTORY' => $this->directory];
+        $this->worker = new Process([PHP_BINARY, base_path('tests/Support/member-activation-release-race-worker.php')], base_path(), $environment,
+            json_encode($input, JSON_THROW_ON_ERROR), 400);
+        $this->worker->start();
+        $this->awaitFile('ready-release', 150);
+        $writer = json_decode(file_get_contents($this->directory.'/ready-release'), true, 8, JSON_THROW_ON_ERROR)['connection_id'];
+        touch($this->directory.'/start-release');
+        $this->awaitFile('held-release', 90);
+        // A watcher lets the release commit only once the index waits at the owner row the release holds.
+        $code = <<<'PHP'
+[, $host, $port, $database, $user, $password, $writer, $directory] = $argv;
+$watch = new PDO('mysql:host='.$host.';port='.$port.';dbname='.$database, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+$waiters = [];
+$deadline = microtime(true) + 15;
+while ($waiters === [] && microtime(true) < $deadline) {
+    $trx = $watch->prepare("SELECT trx_mysql_thread_id FROM information_schema.INNODB_TRX WHERE trx_state = 'LOCK WAIT' AND trx_mysql_thread_id <> ?");
+    $trx->execute([$writer]);
+    $waiters = array_map('intval', $trx->fetchAll(PDO::FETCH_COLUMN));
+    usleep(20000);
+}
+touch($directory.'/commit-release');
+echo json_encode(['waiters' => $waiters]);
+PHP;
+        $watcher = new Process([PHP_BINARY, '-r', $code, '--', (string) $db['host'], (string) $db['port'], (string) $db['database'],
+            (string) $db['username'], (string) $db['password'], (string) $writer, $this->directory], base_path(), null, null, 60);
+        $watcher->start();
+        $parent = (int) DB::connection()->getPdo()->query('SELECT CONNECTION_ID()')->fetchColumn();
+        $read = MembershipCustomerRead::begin();
+        $index = (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read);
+        $read->proveBeforeBytes();
+        $watcher->wait();
+        $this->worker->wait();
+        $this->assertSame([$parent], json_decode($watcher->getOutput(), true, 4, JSON_THROW_ON_ERROR)['waiters'], $watcher->getErrorOutput());
+        $this->assertSame(0, $this->worker->getExitCode(), $this->worker->getErrorOutput());
+        $result = json_decode($this->worker->getOutput(), true, 16, JSON_THROW_ON_ERROR);
+        $this->assertSame([], $result['errors']);
+        $statuses = array_column($index['periods'][0]['reservations'], 'status', 'id');
+        $this->assertSame('released', $statuses[$fixture['reservation']['redemption_id']]);
+    }
+
     public function test_native_index_and_reserve_interleave_sequentially_and_pre_bytes_sees_the_change(): void
     {
         $fixture = $this->indexFixture();
@@ -304,6 +431,36 @@ class MembershipNativeCustomerIndexTest extends TestCase
             'definition' => ['SELECT id FROM production_member_definitions WHERE id = ?', $fixture['member_authored']->definitionId],
             'profile' => ['SELECT id FROM production_member_profiles WHERE id = ?', $fixture['member_authored']->profileId],
         ];
+    }
+
+    private function awaitFile(string $name, int $seconds): void
+    {
+        $deadline = hrtime(true) + $seconds * 1_000_000_000;
+        while (! is_file($this->directory.'/'.$name)) {
+            clearstatcache();
+            if (! $this->worker->isRunning() || hrtime(true) >= $deadline) {
+                $this->fail('Worker did not reach '.$name.': '.$this->worker->getOutput().$this->worker->getErrorOutput());
+            }
+            usleep(5000);
+        }
+    }
+
+    /** One older sealed period and its award event for the same owner, in the exact retained format (not inserted). */
+    private function sealedOlderPeriod(array $fixture): array
+    {
+        $real = (array) DB::table(MembershipPeriodRecords::PERIODS)->where('account_id', $fixture['buyer']['principal']->accountId)->sole();
+        $award = (array) DB::table(MembershipPeriodRecords::EVENTS)->where('period_id', $real['id'])->where('kind', 'award')->sole();
+        $plan = (array) DB::table(MembershipRecords::TABLE)->where('id', $real['plan_version_id'])->sole();
+        $policy = MembershipPolicyVersions::document($plan)->binding($plan['id']);
+        $originId = (int) $real['identity_origin_id'];
+        $invoice = MembershipPeriodRecords::historicalInvoice($real, $award, $policy, $originId);
+        $move = static fn (?string $at): ?string => $at === null ? null : gmdate('Y-m-d H:i:s', strtotime($at.' UTC') - 2678400);
+        $copy = new MembershipInvoiceBinding(hash('sha256', 'native-index-owner-writer-invoice'), hash('sha256', 'native-index-owner-writer-graph'),
+            $invoice->providerScopeHash, $invoice->amountMinor, $invoice->currency, $move($invoice->periodStart), $move($invoice->periodEnd),
+            $invoice->planPolicyHash, $invoice->originalTermsHash, $invoice->originalBuyerBinding, $invoice->provenance, $move($invoice->paidAt),
+            $invoice->planVersionId);
+
+        return MembershipPeriodRecords::create($copy, $policy, $originId, $fixture['buyer']['principal']->durableBinding());
     }
 
     /** A second, verified customer's approved subscription and paid, observed invoice on the same plan. */
