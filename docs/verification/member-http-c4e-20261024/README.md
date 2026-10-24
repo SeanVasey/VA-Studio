@@ -616,6 +616,18 @@ and 61.9 s; the award committed (period ids recorded) about 44 to 46 s after the
 still open, held the shared plan row during the index and never appeared in `performance_schema.data_lock_waits`
 blocked by the index's connection. The award took longer than G1's idle 19 s because both shared the host.
 
+### Second integration with main (`8f166c5a`, PRs #171 and #172)
+
+After phase B, `origin/main` `8f166c5a` was merged as `3f3d8672`: census 302 entries (main's 297 first, this branch's
+two in-place renames at 284 and 285, then its five appended methods; first-150 hash `d93da4e7…` unchanged), native
+selection regenerated at 2562 of 9753 cases in 248 files (main 2557 of 9701), safeguards 52/27/14/53 and
+`test-database-receipts.py` 61 OK. Main's changes there (MIG and A5 migrations and code, capability boundary) do not
+touch the member index or HTTP code. Focused checks on `3f3d8672`: SQLite `MembershipHttpMountTest`,
+`StagingEnvironmentAdmissionTest`, `StagingRuntimeValidatorTest`, `TestCommerceProfileValidatorTest`,
+`MembershipCustomerIndexAvailabilityTest` and `MemberActivationCommitWitnessTest`: 202 tests, 2,558 assertions, OK;
+native `test_native_index_locks_only_the_owner_rows_until_commit_then_releases_them`: OK, 29 assertions. The rest of
+phase B was not repeated on `3f3d8672`.
+
 ### Finding F9 (blocks any mount): the index does not fit its budget beyond a few periods
 
 After G1, one index call (index plus pre-bytes) takes about 20 s at one period and reaches the 60 s budget at about
@@ -657,6 +669,8 @@ member HTTP index must not be mounted anywhere until this is resolved.
 
 ## Cleanup
 
-The pre-G1 server (port 3407) was shut down with `mysqladmin shutdown`, and its datadir, the probe copy and the
-mutation copies were removed. Logs and JUnit files stay in `scratchpad/c4e-ev/runs/`; mutation drivers and results
-in `scratchpad/c4e-mut-driver/`.
+The pre-G1 server (port 3407) was shut down with `mysqladmin shutdown` after phase A; it was later started again for
+the R1 work and for phase B (restarted once on the same datadir after a container restart) and shut down with
+`mysqladmin shutdown` after the last phase B run. Its datadir, the probe copies and the mutation copies were removed.
+Logs and JUnit files stay in `scratchpad/c4e-ev/runs/` and `scratchpad/c4e-ev/runs-b/`; the scratch latency harness
+and its JSONL results in `scratchpad/c4e-ev/latency/`; mutation drivers and results in `scratchpad/c4e-mut-driver/`.
