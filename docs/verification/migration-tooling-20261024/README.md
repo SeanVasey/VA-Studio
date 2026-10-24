@@ -199,6 +199,47 @@ test files plus `ProductionEnvironmentTemplateTest`, `InstallationReportTest` an
 194 tests, 3,083 assertions, 2 skipped, exit 0 (`evidence/postmerge-b9ae0606-sqlite.txt`). The native MySQL and
 51-file runs were not repeated on the merge; T36's application files do not intersect this lane's.
 
+### Independent review round (`d456ee3b`, APPROVE WITH CONDITIONS, no P0/P1)
+
+The record is outside the repository (session scratchpad `mig-review-d456ee3b.md`). Fixed in `86a51c6e` and `8b66d788`,
+each with a regression test in `tests/Feature/Migration/LegacyHistoryReviewConditionsTest.php` (and one assertion in
+`HistoryNormalizerTest`):
+
+| Condition | Fix | Regression proof |
+| --- | --- | --- |
+| C1 / P2-1 separation of duties | Each customer, order, line and contract row records its inserting `actor_id` (and attestation id). The reviewer must differ from every inserting actor and every batch creator of the rows the review relies on. | `test_c1_…`: A creates the batch, B imports 16 rows; neither A nor B can review, C can. Mutation R1 (batch creators only, the old rule) killed. |
+| C3 / P2-2 stale `verified_grant` | Batches record their snapshot members (`members`, `members_sha256`). Eligibility and `classification()` re-derive against the newest fully archived export of the source: `latest_export_not_archived`, `evidence_removed`, `reviewed_evidence_changed`. Delta capture now blocks a changed customer address (P3-6). | `test_c3_…`: partial later export, removed exclusive, changed buyer address. Mutations R2 (evaluate against the line's own batch, the old behaviour), R3a, R3b, R8 killed. |
+| C2 / P2-3 personal data in output | Findings carry `source_id_sha256` instead of the raw id; an unreferenced file appears only as `file_sha256:<hash>`; delta dispositions keep `reason_sha256`. | `test_c2_…` asserts no address, name, payment reference, file name or path on every action: dry-run, import (dry and write), reconcile, delta (with and without dispositions), review-grant (dry and write), authority status, declare (dry and write) and handover (dry). Mutations R4, R5, R5b killed (R5b survived until the normalizer test assertion was added). |
+| C4 / P2-4 attestation and MFA | `import`, `review` and `transition` take a `StaffWriteAuthority` and, inside the write transaction, lock the actor, apply `StaffWriteAuthority::require` (panel staff MFA rule) and `requireFor` (bound action/scope/reference, recorded, fresh within 900 s, spent once). The services also apply `LegacyArchivePolicy::admit()` (P3-7). | `test_c4_…`: wrong snapshot, other actor, wrong action, stale and reused attestations refused; missing attestation refused; in admitted `staging` an unenrolled admin is refused and an enrolled one admitted. Mutations R6, R7 killed. |
+| C5 / P3-4 launch gate | Explicit gate in `docs/live-payment-and-production-preparation-queue.md`, T39/T40 `done_when`, FP-101 note; FP-099 note on unlinked track ids (P3-5); handover guide note on operator-declared watermarks (P3-1). | Documentation. |
+
+Also: a review that loses a race on the unique line id is refused as `review_changed_concurrently`. The unmerged
+migration gains columns only (still additive, forward-only, prefix `264000` kept; lane A5 renames its file to
+`264100`). Run against the `d456ee3b` sources, the new regression file fails 5 of 5 (4 errors from the changed service
+signatures, 1 assertion failure for C2); the mutations above show each fix's semantic failure on the new code.
+Deferred P3s (P3-2, P3-3, P3-8, P3-9) are in `docs/handoff/2026-10-07/codex-deferred-20261011.md`.
+
+**Tested source for this round: `41681c840d3d72466e19126a52ce9e2015204b55`** (application code identical to `8b66d788`;
+`41681c84` fixes two native-only test defects found on MySQL at `8b66d788`: a missing import in the native race test,
+which SQLite skips, and a DISTINCT with ORDER BY that MySQL refuses with 3065; both original failure logs are kept).
+
+| Run | Source | Result |
+| --- | --- | --- |
+| SQLite, the 8 MIG test files | `41681c84` | 68 tests, 794 assertions, 2 skipped (native races), exit 0 (`evidence/review-41681c84-sqlite-new.txt`) |
+| SQLite, existing migration/import and adjacent files (the earlier 11 plus `MigrationRecompilationTest`, `CustomerConsentMigrationTest`) | `8b66d788` (same application code) | 381 tests, 4,037 assertions, exit 0 (`evidence/review-8b66d788-sqlite-existing.txt`) |
+| Native MySQL 8.4.11, schema, archive, authority, command and review-conditions files | `41681c84` | 28 tests, 461 assertions, exit 0 (`evidence/review-41681c84-mysql.txt`) |
+| Native MySQL, two-process races | `41681c84` | 2 tests, 262 assertions, exit 0 (`evidence/review-41681c84-mysql-race.txt`) |
+| Original native failures, retained | `8b66d788` | 28 tests, 1 error (C1 test DISTINCT/ORDER BY); races 1 error (missing import), the other race passed |
+| Safeguards and `composer validate --strict` | `8b66d788` | 52 / 27 / 14 / 53 OK; valid |
+| Review-fix mutations | `86a51c6e` + `8b66d788` | 10/10 killed (R5b after the added assertion) (`evidence/review-mutations-86a51c6e.jsonl`) |
+
+Fresh private `mysqld` (`/opt/mysql-8.4.11`, new datadir in the scratchpad, port 3463 after `ss -ltnp`; other lanes
+were on 3391 and 3407 and were not touched), database `vaseyaudio_mig`; shut down with exit 0 and its datadir removed.
+Census: SQLite skip census unchanged (293); `LegacyHistoryReviewConditionsTest` added to the reviewed `include_files`;
+native selection **2524 selected tests in 244 files of 9663 discovered in 708**; workflow and GitLab comments updated.
+The 51-file migration-pattern SQLite run was not repeated (last at `de11fdb4`); the amended migration is exercised by
+every test above on both engines.
+
 ### Next dependencies
 
 1. Independent review of the migration and `app/Domain/Migration/History/*` at the exact SHA.
