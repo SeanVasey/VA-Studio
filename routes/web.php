@@ -12,6 +12,7 @@ use App\Http\Controllers\TestExceptionResolutionController;
 use App\Http\Controllers\TestOwnerDeliveryController;
 use App\Http\Middleware\CustomerCommerceAccess;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Membership\MembershipHttpMount;
 use App\Http\ProductionFree\ProductionFreeHttpMount;
 use App\Http\Tax\TaxHttpMount;
 use Illuminate\Support\Facades\Route;
@@ -88,4 +89,9 @@ if (TaxHttpMount::admitted('production-tax-checkout.http_mounted')) {
 // local/testing. The shipped value is false; ProductionFreePrivacy repeats the check on every request.
 if (ProductionFreeHttpMount::admitted()) {
     require __DIR__.'/production-free-grants.php';
+}
+// Member HTTP (C4e): registered only for the literal `production-memberships.http_mounted` true in local/testing. The
+// shipped value is false; MembershipPrivacy repeats the check on every request.
+if (MembershipHttpMount::admitted()) {
+    require __DIR__.'/production-memberships.php';
 }

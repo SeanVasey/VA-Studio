@@ -18,6 +18,7 @@ use App\Http\Middleware\SupportAttachmentPrivacy;
 use App\Http\Middleware\TaxRootPrivacy;
 use App\Http\Middleware\TestDeliveryPrivacy;
 use App\Http\Middleware\TestExceptionResolutionPrivacy;
+use App\Http\Membership\MembershipPrivacy;
 use App\Http\ProductionFree\ProductionFreePrivacy;
 use App\Http\Responses\InquiryResponse;
 use App\Http\Responses\PublicTrackEmbedResponse;
@@ -63,15 +64,21 @@ $application = Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(TaxRootPrivacy::class);
         $middleware->prepend(AccountFeaturePrivacy::class);
         $middleware->prepend(ProductionFreePrivacy::class);
+        $middleware->prepend(MembershipPrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'proof', 'requestKey', 'token', 'nonce', 'declarations', 'name', 'body', 'trackIds', 'noticeVersion', 'noticeHash', 'affirmative']);
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => ProductionFreePrivacy::matches($request) || AccountFeaturePrivacy::matches($request) || TaxRootPrivacy::matches($request) || ((CustomerPrivacy::matches($request) || ServiceProjectPrivacy::matches($request)) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
+            fn (Request $request) => MembershipPrivacy::matches($request) || ProductionFreePrivacy::matches($request) || AccountFeaturePrivacy::matches($request) || TaxRootPrivacy::matches($request) || ((CustomerPrivacy::matches($request) || ServiceProjectPrivacy::matches($request)) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
         );
         $exceptions->report(function (Throwable $exception) {
+            if (MembershipPrivacy::matches(request())) {
+                MembershipPrivacy::report($exception);
+
+                return false;
+            }
             if (ProductionFreePrivacy::matches(request())) {
                 ProductionFreePrivacy::report($exception);
 
@@ -203,6 +210,11 @@ $application = Application::configure(basePath: dirname(__DIR__))
         // Middleware failures occur before the controller. Keep those private and
         // generic too, including in debug mode, without changing other routes.
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
+            if (MembershipPrivacy::matches($request)) {
+                $status = $exception instanceof LockTimeoutException ? 503 : ($exception instanceof ValidationException ? 422 : $response->getStatusCode());
+
+                return $status >= 400 ? MembershipPrivacy::error($status, $response->headers->all()) : MembershipPrivacy::protect($response);
+            }
             if (ProductionFreePrivacy::matches($request)) {
                 $status = $exception instanceof LockTimeoutException ? 503 : ($exception instanceof ValidationException ? 422 : $response->getStatusCode());
 
