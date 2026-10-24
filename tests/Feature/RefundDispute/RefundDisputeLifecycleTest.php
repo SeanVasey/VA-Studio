@@ -395,6 +395,8 @@ class RefundDisputeLifecycleTest extends TestCase
         R::observe($f['order']->public_id, $this->staff);
         $refund = RefundDisputeObject::where('kind', 'refund')->sole();
         $this->act('allocate', $f, $refund->public_id, [0 => $totals[0]]);
+        // A reopening decision needs the refunded exclusive grant's downloads to be held first.
+        $this->refused('not_qualified', fn () => $this->act('qualifyExclusiveReopening', $f, $this->grant($f, 0)->public_id));
         $this->act('suspendLine', $f, $this->grant($f, 0)->public_id);
         $decision = $this->act('qualifyExclusiveReopening', $f, $this->grant($f, 0)->public_id);
         $this->assertSame('exclusive_reopening_qualified', $decision['effects'][0]['kind']);
