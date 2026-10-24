@@ -57,9 +57,17 @@ final readonly class IdentityRows
                 throw new IdentityException;
             }
             // Install-time admission is insufficient: callbacks may introduce temporary aliases after commit.
-            [$present] = (new IdentityMigrationOwnership)->inspect($this->primary, $this->driver);
-            if (in_array(false, $present, true)) {
-                throw new IdentityException;
+            $inspect = function (): void {
+                [$present] = (new IdentityMigrationOwnership)->inspect($this->primary, $this->driver);
+                if (in_array(false, $present, true)) {
+                    throw new IdentityException;
+                }
+            };
+            if ($this->committedFrame === null) {
+                // Complete once per owned membership frame token; complete every time outside one (SchemaProofFrame).
+                SchemaProofFrame::prove($this->primary, 'identity', SchemaProofFrame::identityTables(), $inspect);
+            } else {
+                $inspect();
             }
             // Audit writes are also permanent; the migration's parent inspection covers the other parents.
             if ($this->driver === 'sqlite') {
