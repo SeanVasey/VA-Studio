@@ -17,7 +17,7 @@ Scope rows: FP-068 *Refund and dispute lifecycle* (T21) and FP-040 *Orders custo
 
 New:
 - `config/refund-dispute.php`
-- `database/migrations/2026_10_24_264000_refund_dispute_lifecycle.php` (**schema change, additive and forward-only; needs independent review**)
+- `database/migrations/2026_10_24_264100_refund_dispute_lifecycle.php` (**schema change, additive and forward-only; needs independent review**)
 - `app/Domain/Commerce/RefundDispute/*` (policy, state machine, provider observation ledger, allocation, effects, access holds, staff read model)
 - `app/Filament/Resources/StaffCustomerResource.php` and its `Pages/`, plus `resources/views/admin/staff-customer-*.blade.php`
 - `tests/Feature/RefundDispute/*`, `tests/Support/RefundDisputeFixtures.php`
@@ -121,7 +121,7 @@ Every native run's server was stopped by the wrapper and its datadir removed (po
 
 ## Schema change (needs independent review)
 
-`database/migrations/2026_10_24_264000_refund_dispute_lifecycle.php`: seven new tables, 21 SQLite/MySQL triggers; no existing table, column, index or trigger is altered. SQLite and MySQL parity was exercised by the migration suite on both engines.
+`database/migrations/2026_10_24_264100_refund_dispute_lifecycle.php`: seven new tables, 21 SQLite/MySQL triggers; no existing table, column, index or trigger is altered. SQLite and MySQL parity was exercised by the migration suite on both engines.
 
 ## Files changed
 

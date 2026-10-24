@@ -24,7 +24,7 @@ class RefundDisputeMigrationTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
 
-    private const MIGRATION = 'migrations/2026_10_24_264000_refund_dispute_lifecycle.php';
+    private const MIGRATION = 'migrations/2026_10_24_264100_refund_dispute_lifecycle.php';
 
     protected function setUp(): void
     {

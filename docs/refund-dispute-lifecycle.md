@@ -31,7 +31,7 @@ Derived states: refund `none | partial | full` (succeeded only); dispute `none |
 
 ## Ledger and effects
 
-Additive migration `2026_10_24_264000_refund_dispute_lifecycle` (forward-only; `down()` always refuses) adds seven tables with SQLite and MySQL guards:
+Additive migration `2026_10_24_264100_refund_dispute_lifecycle` (forward-only; `down()` always refuses) adds seven tables with SQLite and MySQL guards:
 
 | Table | Contents |
 | --- | --- |

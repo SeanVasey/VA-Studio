@@ -44,7 +44,7 @@ class PromotionMigrationTest extends TestCase
         // Remove the empty additive notification child before its retained parents.
         $notices = require database_path('migrations/2026_10_06_231000_test_transactional_notifications.php');
         // Drop the empty, forward-only A5 refund/dispute child first; its guards name the order tables rebuilt below.
-        $refundDispute = require database_path('migrations/2026_10_24_264000_refund_dispute_lifecycle.php');
+        $refundDispute = require database_path('migrations/2026_10_24_264100_refund_dispute_lifecycle.php');
         $this->assertDatabaseCount('transactional_notices', 0);
         $this->assertDatabaseCount('transactional_notice_attempts', 0);
         \Tests\Support\RefundDisputeFixtures::dropEmptyTables();

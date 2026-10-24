@@ -33,8 +33,14 @@ final class StaffCustomerResource extends ReadOnlyCommerceResource
                 TextColumn::make('order_count')->label('Orders'),
                 TextColumn::make('paid_minor')->label('Paid (minor units, USD)'),
                 TextColumn::make('active_holds')->label('Active download holds'),
-                TextColumn::make('last_finalized_at')->label('Last order (UTC)')->dateTime('Y-m-d H:i:s', 'UTC')->sortable(),
-            ])->defaultSort('last_finalized_at', 'desc')->paginated([10, 25, 50])->defaultPaginationPageOption(25)
+                TextColumn::make('last_finalized_at')->label('Last order (UTC)')->dateTime('Y-m-d H:i:s', 'UTC')
+                    ->sortable(query: fn (Builder $query, string $direction): Builder => self::sort($query, $direction)),
+            ])
+            // The query is grouped per customer: sort only by aggregates, newest order first with the anchor finalization as
+            // a deterministic tie-breaker, and never let Filament append the ungrouped `order_finalizations.id` key sort
+            // (MySQL ONLY_FULL_GROUP_BY refuses it).
+            ->defaultSort(fn (Builder $query, string $direction): Builder => self::sort($query, $direction), 'desc')->defaultKeySort(false)
+            ->paginated([10, 25, 50])->defaultPaginationPageOption(25)
             ->recordUrl(null)->recordActions([
                 Action::make('customerDetail')->label('Customer detail')->modalHeading('Test customer detail')
                     ->modalContent(fn (OrderFinalization $record) => view('admin.staff-customer-detail', [
@@ -43,6 +49,13 @@ final class StaffCustomerResource extends ReadOnlyCommerceResource
             ])->toolbarActions([])
             ->emptyStateHeading('No test customers')
             ->emptyStateDescription('Only customers with retained test orders for the configured account appear here.');
+    }
+
+    private static function sort(Builder $query, string $direction): Builder
+    {
+        $direction = $direction === 'asc' ? 'asc' : 'desc';
+
+        return $query->orderByRaw('MAX(order_finalizations.finalized_at) '.$direction)->orderByRaw('MIN(order_finalizations.id) '.$direction);
     }
 
     public static function getPages(): array
