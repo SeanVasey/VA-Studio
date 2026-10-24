@@ -73,7 +73,13 @@ final class MemberActivationHistoryReader
         $this->issued = new WeakMap;
     }
 
-    public function capturePeriod(string $periodId, MembershipRows $rows): MemberActivationHistorySnapshot
+    /**
+     * `$consistentRead` (the customer index only, C4e review N1/N2): the current phases read with plain consistent
+     * reads instead of FOR UPDATE, so a read of one owner's history never holds or waits for a row or gap lock. The
+     * caller holds the owner's T23 lock, re-proves the same rows in the same snapshot and, after commit, in a fresh
+     * committed frame; any difference refuses. Writers keep the default, locking capture.
+     */
+    public function capturePeriod(string $periodId, MembershipRows $rows, bool $consistentRead = false): MemberActivationHistorySnapshot
     {
         MemberGrantDocumentValues::id($periodId);
         $schema = MemberGrantCurrentSchema::pin($rows);
@@ -82,7 +88,7 @@ final class MemberActivationHistoryReader
         $state = ['rows' => $rows, 'pdo' => $rows->identity(), 'schema' => $schema,
             'driver' => MemberGrantCurrentSchema::captureDriver($schema), 'periodId' => $periodId,
             'tables' => array_map(static fn (string $table): string => $prefix.$table.'`', self::TABLES),
-            'frame' => null, 'pending' => false];
+            'frame' => null, 'pending' => false, 'consistent_read' => $consistentRead];
         $captured = self::read($state, false);
         $history = self::history($captured);
         MemberGrantCurrentSchema::assertCurrent($schema, $rows);
@@ -312,7 +318,8 @@ final class MemberActivationHistoryReader
         }
         $columns[] = 'CASE WHEN '.implode(' OR ', $oversized).' THEN 1 ELSE 0 END AS `__oversized`';
         $statement = $state['pdo']->prepare('SELECT '.implode(', ', $columns).' FROM '.$state['tables'][$table]
-            .' WHERE '.$where.' ORDER BY id LIMIT '.$limit.($state['driver'] === 'mysql' && ! $committed ? ' FOR UPDATE' : ''));
+            .' WHERE '.$where.' ORDER BY id LIMIT '.$limit
+            .($state['driver'] === 'mysql' && ! $committed && ! ($state['consistent_read'] ?? false) ? ' FOR UPDATE' : ''));
         $statement->execute($bindings);
         $result = [];
         try {

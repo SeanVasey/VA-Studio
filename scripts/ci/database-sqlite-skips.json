@@ -1140,7 +1140,7 @@
     ],
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
-      "test_native_index_holds_owner_and_period_locks_but_not_the_global_fence_then_releases_them"
+      "test_native_index_locks_only_the_owner_rows_until_commit_then_releases_them"
     ],
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
@@ -1168,7 +1168,15 @@
     ],
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
-      "test_native_index_completes_while_another_customers_writer_holds_the_global_fence"
+      "test_native_index_and_a_zero_period_index_complete_while_other_sessions_hold_the_fence_and_shared_rows"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_index_never_waits_when_another_session_takes_the_definition_then_the_plan_mid_index"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_same_plan_award_for_another_customer_runs_while_the_index_is_open"
     ]
   ]
 }

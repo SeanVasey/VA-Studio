@@ -22,19 +22,29 @@ use Throwable;
 use WeakMap;
 
 /**
- * Bounded, read-only customer index of the authenticated owner's retained membership periods (C4d).
+ * Bounded, read-only customer index of the authenticated owner's retained membership periods (C4d, locking revised in
+ * C4e after review N1/N2).
  *
- * One transaction locks the current owner first, then at most LIMIT + 1 of the owner's periods. It takes no global
- * lock: every writer of an owner's period, credit event, redemption and activation rows (award, reserve, release,
- * expire and the activation inspection) takes that same owner's T23 lock before its first membership read and holds
- * it to commit, so the owner lock alone serializes the index against every writer of the rows it reads (C4e, review
- * F3 option a). The global billing award fence, which serializes all customers' writers, is therefore not taken.
- * Every fetched period, the sentinel included, is authenticated through its complete retained ledger audit
- * (MembershipLedgerAudit::verify over the exact member-history scope) against the retained invoice semantics, the
- * period's immutable plan and the current owner's original buyer binding. Current proofs repeat before commit; a
- * read-only committed frame repeats them after commit as the terminal proof. The output carries period, redemption
- * and definition identifiers only: no provider or billing-ledger identifier, hash, ciphertext or seal. A listed id
- * confers nothing; every writer and reader re-runs its own complete source closure.
+ * Locks. One transaction takes exactly one set of row locks: the current owner's T23 identity rows
+ * (`ProductionCustomerAccess::lock`, the same rows and order every membership writer locks first and holds to commit).
+ * Every other read in the frame (the period window, each period's events, redemptions and member graph, and the
+ * shared plan-version, member-profile and member-definition rows) is a plain consistent read with no lock. So the
+ * index never waits for, and never holds, any lock another customer's transaction needs: not the global billing award
+ * fence, not a shared plan or definition row, and no row or gap of another owner's ranges. After the owner lock it
+ * requests no further lock, so it cannot be part of a lock-order cycle with any writer, activation or other index.
+ *
+ * Correctness. All consistent reads of one REPEATABLE READ transaction see one transactionally consistent snapshot, so
+ * no torn state between period, events, redemptions and member graph can be audited. While the owner lock is held no
+ * writer of this owner's rows can commit. If the snapshot predates a writer that committed before the owner lock was
+ * granted, the audited state is consistent but older; the terminal proof after commit (a new read-only committed frame,
+ * whose snapshot follows the index commit) re-reads the window, every period's complete history and the support rows
+ * and refuses on any difference, and the pre-bytes proof repeats the whole read. Plan, profile and definition rows are
+ * append-only and immutable (their UPDATE and DELETE triggers always refuse and are re-proved by every guarded read),
+ * so a missing row can only refuse. Every fetched period, the sentinel included, is authenticated through its complete
+ * retained ledger audit (MembershipLedgerAudit::verify) against the retained invoice semantics, the period's immutable
+ * plan and the current owner's original buyer binding. The output carries period, redemption and definition
+ * identifiers only: no provider or billing-ledger identifier, hash, ciphertext or seal. A listed id confers nothing;
+ * every writer and reader re-runs its own complete source closure.
  */
 final class MembershipCustomerIndex
 {
@@ -126,22 +136,24 @@ final class MembershipCustomerIndex
                 $rows = new MembershipRows;
                 MembershipException::require($rows->identity() === $primary, 'changed_primary');
                 $access = new ProductionCustomerAccess;
-                // Current-owner lock first, then membership rows: a subsequence of the writers' owner, fence, membership
-                // order, so no cycle can form. The owner lock serializes every writer of this owner's rows (F3).
+                // The owner's T23 rows are the only locks this frame takes; it serializes every writer of the owner's
+                // rows (F3). Everything after it is a consistent read, so the index never waits on another customer.
                 $identity = $access->lock($principal, $actor, $rows->current());
                 $grantConfiguration = $grants->currentFor($rows);
                 MembershipException::require($membership['provenance'] === $principal->provenance
                     && $grantConfiguration['provenance'] === $principal->provenance, 'provenance');
                 $admit();
                 $current = $access->durableBinding($principal);
+                // Shared immutable facts (plan versions, member profiles and definitions): consistent reads, no locks.
+                $facts = new MemberGrantRows($rows, MemberGrantCurrentSchema::pin($rows));
                 $table = $this->periodTable($rows);
-                $window = $this->window($rows->identity(), $rows->driver(), $table, $principal->accountId, true);
+                $window = $this->window($rows->identity(), $rows->driver(), $table, $principal->accountId);
                 $periods = [];
                 foreach ($window as $row) {
-                    $periods[] = $this->period($rows, $history, $access, $row, $principal, $identity, $current, $state);
+                    $periods[] = $this->period($rows, $facts, $history, $access, $row, $principal, $identity, $current, $state);
                     $admit();
                 }
-                $definition = $this->definition($rows, $grantConfiguration);
+                $definition = $this->definition($facts, $grantConfiguration);
                 $state += ['rows' => $rows, 'access' => $access, 'identity' => $identity, 'table' => $table, 'account' => $principal->accountId,
                     'window' => $window, 'periods' => $periods, 'definition' => $definition, 'grants' => $grantConfiguration];
                 $result = $this->projection($periods, $definition, $principal);
@@ -203,7 +215,7 @@ final class MembershipCustomerIndex
     }
 
     /** One fetched period (sentinel included): exact scope, retained invoice semantics and complete audit. */
-    private function period(MembershipRows $rows, MemberActivationHistoryReader $history, ProductionCustomerAccess $access,
+    private function period(MembershipRows $rows, MemberGrantRows $facts, MemberActivationHistoryReader $history, ProductionCustomerAccess $access,
         array $row, ProductionCustomerPrincipal $principal, array $identity, array $current, array &$state): array
     {
         MembershipException::require(is_string($row['id'] ?? null), 'tampered');
@@ -211,11 +223,14 @@ final class MembershipCustomerIndex
         MembershipException::require((string) $row['account_id'] === (string) $principal->accountId
             && (string) $row['user_id'] === (string) $principal->userId
             && (string) $row['identity_origin_id'] === (string) $identity['origin']['id'], 'foreign_period');
-        $snapshot = $history->capturePeriod($row['id'], $rows);
+        // Consistent reads only (N1, N2): no lock on the owner's member rows or on the shared facts they reference.
+        $snapshot = $history->capturePeriod($row['id'], $rows, consistentRead: true);
         $state['snapshots'][] = $snapshot;
         $scope = $snapshot->scope();
         MembershipException::require(MembershipRecords::strings($scope['period']) === MembershipRecords::strings($row), 'changed_period');
-        $plan = $rows->one(MembershipRecords::TABLE, 'id = ?', [$row['plan_version_id']]);
+        $rows->assertCurrent();
+        $plan = $facts->plan($row['plan_version_id'], true);
+        $rows->assertCurrent();
         MembershipException::require($plan !== [], 'policy_facts_absent');
         $policy = MembershipPolicyVersions::document($plan)->binding($plan['id']);
         MembershipException::require($policy->provenance === $principal->provenance, 'provenance');
@@ -245,16 +260,15 @@ final class MembershipCustomerIndex
     }
 
     /** The single approved member definition, applicable only to periods of its own plan version. */
-    private function definition(MembershipRows $rows, array $grants): array
+    private function definition(MemberGrantRows $reader, array $grants): array
     {
-        $reader = new MemberGrantRows($rows, MemberGrantCurrentSchema::pin($rows));
-        $definition = $reader->definitionByHash($grants['approved_definition_hash']);
+        $definition = $reader->definitionByHash($grants['approved_definition_hash'], true);
         MembershipException::require($definition !== [], 'facts_absent');
-        $profile = $reader->profile($definition['profile_id']);
+        $profile = $reader->profile($definition['profile_id'], true);
         MembershipException::require($profile !== [], 'facts_absent');
         $snapshot = MemberGrantRecords::snapshot($profile, $definition);
         $planId = $snapshot->definitionDocument->value()['plan_version_id'];
-        $plan = $reader->plan($planId);
+        $plan = $reader->plan($planId, true);
         SealedMemberGrantFacts::plan($plan, $snapshot);
         MembershipException::require($snapshot->factsBinding->definitionHash === $grants['approved_definition_hash']
             && $snapshot->profileBinding->profileHash === $grants['approved_profile_hash']
@@ -303,26 +317,27 @@ final class MembershipCustomerIndex
     private function raw(PDO $primary, string $driver, array $state, bool $committed): void
     {
         MembershipAwardConfiguration::plainPrimary($primary);
-        $window = $this->window($primary, $driver, $state['table'], $state['account'], ! $committed);
+        $window = $this->window($primary, $driver, $state['table'], $state['account']);
         MembershipException::require(self::rows($window) === self::rows($state['window']), 'changed_period_window');
         $definition = $state['definition'];
         $reader = $definition['reader'];
-        MembershipException::require(MembershipRecords::strings($reader->definition($definition['id'], $committed)) === MembershipRecords::strings($definition['definition'])
-            && MembershipRecords::strings($reader->profile($definition['profile']['id'], $committed)) === MembershipRecords::strings($definition['profile'])
-            && MembershipRecords::strings($reader->plan($definition['plan']['id'], $committed)) === MembershipRecords::strings($definition['plan']), 'changed_definition');
+        // Consistent reads in the current phase too (N1, N2); byte-identical or refused.
+        MembershipException::require(MembershipRecords::strings($reader->definition($definition['id'], true)) === MembershipRecords::strings($definition['definition'])
+            && MembershipRecords::strings($reader->profile($definition['profile']['id'], true)) === MembershipRecords::strings($definition['profile'])
+            && MembershipRecords::strings($reader->plan($definition['plan']['id'], true)) === MembershipRecords::strings($definition['plan']), 'changed_definition');
         foreach ($state['periods'] as $period) {
-            $plan = $reader->plan($period['plan']['id'], $committed);
+            $plan = $reader->plan($period['plan']['id'], true);
             MembershipException::require(MembershipRecords::strings($plan) === MembershipRecords::strings($period['plan']), 'changed_policy_facts');
         }
         MembershipAwardConfiguration::plainPrimary($primary);
     }
 
     /** The owner's newest LIMIT periods plus one sentinel, in one fixed order; rows only, never authority. */
-    private function window(PDO $primary, string $driver, string $table, int $accountId, bool $locking): array
+    private function window(PDO $primary, string $driver, string $table, int $accountId): array
     {
         MembershipAwardConfiguration::plainPrimary($primary);
         $statement = $primary->prepare('SELECT * FROM '.$table.' WHERE account_id = ? ORDER BY period_start DESC, id DESC LIMIT '
-            .(self::LIMIT + 1).($locking && $driver === 'mysql' ? ' FOR UPDATE' : ''));
+            .(self::LIMIT + 1));
         $statement->execute([$accountId]);
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
         MembershipException::require(count($rows) <= self::LIMIT + 1, 'technical_bound');

@@ -13,6 +13,7 @@ use App\Domain\Memberships\Production\MembershipPeriodRecords;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use ReflectionClass;
 use Tests\Support\FinalizationDatabaseMigrations;
@@ -69,6 +70,52 @@ class MembershipCustomerIndexAvailabilityTest extends TestCase
         $index = (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read);
         $read->proveBeforeBytes();
         $this->assertCount(1, $index['periods']);
+    }
+
+    public function test_index_locks_only_the_owner_and_reads_everything_else_without_row_locks(): void
+    {
+        // Review N1/N2: after the owner's T23 lock the index takes no lock at all, so it neither holds nor waits for a
+        // row or gap another customer's transaction needs, and it cannot join a lock-order cycle. On MySQL a locking
+        // read adds FOR UPDATE; SQLite has no row locks, so the call shape is pinned here and the native NOWAIT tests
+        // prove it on InnoDB.
+        $source = file_get_contents(base_path('app/Domain/Memberships/Production/MembershipCustomerIndex.php'));
+        $this->assertStringNotContainsString('FOR UPDATE', $source);
+        $this->assertStringNotContainsString('$rows->one(', $source);
+        $this->assertStringNotContainsString('$rows->rows(', $source);
+        $this->assertSame(1, substr_count($source, '->lock('));
+        preg_match_all('/\$(?:reader|facts)->(plan|profile|definition|definitionByHash|profileByHash)\((?:[^()]|\([^()]*\))*\)/', $source, $calls);
+        $this->assertGreaterThanOrEqual(8, count($calls[0]));
+        foreach ($calls[0] as $call) {
+            $this->assertStringEndsWith(', true)', $call, 'Shared facts are read without a row lock: '.$call);
+        }
+        $this->assertSame(1, substr_count($source, 'capturePeriod($row[\'id\'], $rows, consistentRead: true)'));
+        $this->assertSame(1, substr_count($source, '->capturePeriod('));
+        $reader = file_get_contents((new ReflectionClass(MemberActivationHistoryReader::class))->getFileName());
+        $this->assertStringContainsString('\'consistent_read\' => $consistentRead', $reader);
+        $this->assertStringContainsString('&& ! $committed && ! ($state[\'consistent_read\'] ?? false) ? \' FOR UPDATE\' : \'\'', $reader);
+
+        // The premise, on the real schema: those rows can never change or disappear, so an unlocked read can only
+        // miss a row committed after the read view (a refusal), never see a different one.
+        $fixture = $this->memberActivationFixture();
+        $rows = ['production_membership_plan_versions' => $fixture['plan']['id'],
+            'production_member_definitions' => $fixture['member_authored']->definitionId,
+            'production_member_profiles' => $fixture['member_authored']->profileId];
+        foreach ($rows as $table => $id) {
+            foreach (['update', 'delete'] as $operation) {
+                try {
+                    $operation === 'update'
+                        ? DB::table($table)->where('id', $id)->update(['created_at' => '2000-01-01 00:00:00'])
+                        : DB::table($table)->where('id', $id)->delete();
+                    $this->fail($operation.' of '.$table.' must be refused by its retention trigger.');
+                } catch (QueryException $error) {
+                    $this->assertStringContainsString('Retain production', $error->getMessage(), $table.' '.$operation);
+                }
+            }
+            $this->assertSame(1, DB::table($table)->where('id', $id)->count());
+        }
+        $read = MembershipCustomerRead::begin();
+        $this->assertCount(1, (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read)['periods']);
+        $read->proveBeforeBytes();
     }
 
     public function test_pre_bytes_inside_the_original_deadline_is_released(): void

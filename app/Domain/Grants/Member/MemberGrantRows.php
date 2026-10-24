@@ -38,9 +38,10 @@ final class MemberGrantRows
         return $this->one(MemberGrantRecords::PROFILES, 'profile_hash = ?', [$hash], false);
     }
 
-    public function definitionByHash(string $hash): array
+    /** `$committed` true reads without a row lock, as every other reader here (append-only, trigger-immutable rows). */
+    public function definitionByHash(string $hash, bool $committed = false): array
     {
-        return $this->one(MemberGrantRecords::DEFINITIONS, 'definition_hash = ?', [$hash], false);
+        return $this->one(MemberGrantRecords::DEFINITIONS, 'definition_hash = ?', [$hash], $committed);
     }
 
     public function plan(string $id, bool $committed = false): array
