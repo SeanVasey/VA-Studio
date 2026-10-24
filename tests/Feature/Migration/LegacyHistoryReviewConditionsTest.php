@@ -45,7 +45,7 @@ class LegacyHistoryReviewConditionsTest extends TestCase
         LegacyHistoryFixtures::import($baseline['snapshot'], $baseline['sha'], $baseline['files'], $a, 1);
         LegacyHistoryFixtures::import($baseline['snapshot'], $baseline['sha'], $baseline['files'], $b, 1000);
         $this->assertSame([$a->id], DB::table('legacy_history_batches')->pluck('actor_id')->map(fn ($id) => (int) $id)->all());
-        $this->assertSame([$a->id, $b->id], DB::table('legacy_history_customers')->orderBy('id')->distinct()->pluck('actor_id')->map(fn ($id) => (int) $id)->all());
+        $this->assertSame([$a->id, $b->id], array_values(array_unique(DB::table('legacy_history_customers')->orderBy('id')->pluck('actor_id')->map(fn ($id) => (int) $id)->all())));
         $line = $this->line($baseline['snapshot'], 'synthetic-ord-1002');
         $review = new LegacyGrantReview;
         foreach ([$a, $b] as $importer) {

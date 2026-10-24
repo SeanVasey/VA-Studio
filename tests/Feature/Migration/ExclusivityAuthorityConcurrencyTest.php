@@ -6,6 +6,7 @@ use App\Domain\Migration\History\ExclusivityAuthority;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\ExclusivityAuthorityRace;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\LegacyHistoryFixtures;
 use Tests\Support\LicenseFixtures;
 use Tests\TestCase;
 
