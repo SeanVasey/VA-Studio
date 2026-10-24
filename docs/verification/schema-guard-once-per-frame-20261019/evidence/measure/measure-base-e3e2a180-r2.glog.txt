@@ -1,5 +1,5 @@
 TXN 55.5s statements=70253 end=COMMIT commands={'Query': 194, 'Prepare': 23353, 'Execute': 23353, 'Close stmt': 23353} information_schema=11058 savepoint_ops=193
-    23353 Close stmt 
+    23353 Close stmt
      1152 Prepare SELECT DATABASE()
      1152 Execute SELECT DATABASE()
       314 Prepare SHOW CREATE TABLE `users`
@@ -18,7 +18,7 @@ TXN 55.5s statements=70253 end=COMMIT commands={'Query': 194, 'Prepare': 23353, 
    marker information_schema_any                             5529
    marker data_rows(production_membership_*/member_* FROM)   1072
 TXN 64.8s statements=83405 end=ROLLBACK commands={'Query': 231, 'Prepare': 27726, 'Execute': 27724, 'Close stmt': 27724} information_schema=12940 savepoint_ops=230
-    27724 Close stmt 
+    27724 Close stmt
      1361 Prepare SELECT DATABASE()
      1361 Execute SELECT DATABASE()
       378 Prepare SHOW CREATE TABLE `users`

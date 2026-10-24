@@ -223,7 +223,7 @@ also counts the membership `LIMIT 0` opens, so it is not a business-statement co
 
 Evidence: `evidence/measure/` (runner `g1-measure.sh`, per-transaction summaries `measure-*.glog.txt` from
 `g1-glog.py`, PHPUnit output `measure-*.txt`, `measure-progress.txt`, and `business-sql-base-vs-head*.txt` from
-`g1-business-sql.py`). The compressed general logs (several MB each) stay in the lane scratchpad
+`g1-business-sql.py`; trailing whitespace was stripped from the copied text files). The compressed general logs (several MB each) stay in the lane scratchpad
 (`g1-mysql/general-*.log.gz`).
 
 ## Tests

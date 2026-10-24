@@ -1,5 +1,5 @@
 TXN 17.7s statements=28075 end=COMMIT commands={'Query': 442, 'Prepare': 9211, 'Execute': 9211, 'Close stmt': 9211} information_schema=4618 savepoint_ops=441
-     9211 Close stmt 
+     9211 Close stmt
       996 Prepare SELECT DATABASE()
       996 Execute SELECT DATABASE()
       221 Query SAVEPOINT va_membership_award_1a83a66739cf5aa076c0dd52dca450a2
@@ -18,7 +18,7 @@ TXN 17.7s statements=28075 end=COMMIT commands={'Query': 442, 'Prepare': 9211, '
    marker information_schema_any                             2309
    marker data_rows(production_membership_*/member_* FROM)   516
 TXN 24.5s statements=36676 end=COMMIT commands={'Query': 620, 'Prepare': 12020, 'Execute': 12018, 'Close stmt': 12018} information_schema=5836 savepoint_ops=619
-    12018 Close stmt 
+    12018 Close stmt
      1372 Prepare SELECT DATABASE()
      1372 Execute SELECT DATABASE()
       315 Prepare SELECT TABLE_NAME,TABLE_TYPE,ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=? AND LOWER(TABLE_NAME)=?
@@ -37,7 +37,7 @@ TXN 24.5s statements=36676 end=COMMIT commands={'Query': 620, 'Prepare': 12020, 
    marker information_schema_any                             2918
    marker data_rows(production_membership_*/member_* FROM)   550
 TXN 20.0s statements=32941 end=COMMIT commands={'Query': 482, 'Prepare': 10821, 'Execute': 10819, 'Close stmt': 10819} information_schema=5266 savepoint_ops=481
-    10819 Close stmt 
+    10819 Close stmt
      1133 Prepare SELECT DATABASE()
      1133 Execute SELECT DATABASE()
       260 Prepare SELECT TABLE_NAME,TABLE_TYPE,ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=? AND LOWER(TABLE_NAME)=?
@@ -56,7 +56,7 @@ TXN 20.0s statements=32941 end=COMMIT commands={'Query': 482, 'Prepare': 10821, 
    marker information_schema_any                             2633
    marker data_rows(production_membership_*/member_* FROM)   499
 TXN 15.1s statements=25990 end=COMMIT commands={'Query': 364, 'Prepare': 8542, 'Execute': 8542, 'Close stmt': 8542} information_schema=4202 savepoint_ops=363
-     8542 Close stmt 
+     8542 Close stmt
       842 Prepare SELECT DATABASE()
       842 Execute SELECT DATABASE()
       182 Query SAVEPOINT va_membership_award_7c990fe2cf86add96bac6c5afa75f4d9
