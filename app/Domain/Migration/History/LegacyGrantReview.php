@@ -8,6 +8,7 @@ use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
@@ -64,6 +65,19 @@ final class LegacyGrantReview
             throw new LegacyArchiveRefusal('attestation_required');
         }
 
+        try {
+            return $this->record($lineRecordKey, $reviewer, $reference, $attestation);
+        } catch (QueryException $error) {
+            // Two reviews of one line version raced and the unique line_id refused the later one; nothing of it was written.
+            if (in_array((string) $error->getCode(), ['23000', '40001'], true)) {
+                throw new LegacyArchiveRefusal('review_changed_concurrently');
+            }
+            throw $error;
+        }
+    }
+
+    private function record(string $lineRecordKey, User $reviewer, string $reference, StaffWriteAuthority $attestation): array
+    {
         return DB::transaction(function () use ($lineRecordKey, $reviewer, $reference, $attestation): array {
             $current = LegacyHistoryArchive::authorize($reviewer, $attestation, self::ATTESTATION_ACTION, self::attestationScope($lineRecordKey), $reference);
             $result = $this->evaluate($lineRecordKey, $current);

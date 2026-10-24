@@ -64,6 +64,7 @@
     "tests/Feature/LicenseTemplateAuthoringTest.php",
     "tests/Feature/Migration/ExclusivityAuthorityTest.php",
     "tests/Feature/Migration/LegacyHistoryArchiveTest.php",
+    "tests/Feature/Migration/LegacyHistoryReviewConditionsTest.php",
     "tests/Feature/PaidTaxAdversarialJourneyTest.php",
     "tests/Feature/PaidTaxDeliverySchemaRecoveryTest.php",
     "tests/Feature/PaidTaxDownloadJourneyTest.php",

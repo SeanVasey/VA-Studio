@@ -144,6 +144,11 @@ class HistoryNormalizerTest extends TestCase
         $this->assertNull($result['snapshot']);
         $this->assertNull($result['snapshot_sha256']);
         $this->assertContains($code, array_column($result['findings'], 'code'), json_encode($result['findings']));
+        // Findings are printed to the console: a source id appears only as its hash, never verbatim.
+        $this->assertDoesNotMatchRegularExpression('/synthetic-(?:cust|ord|contract)-|@/', json_encode($result['findings']));
+        foreach ($result['findings'] as $finding) {
+            $this->assertTrue($finding['source_id_sha256'] === null || preg_match('/\A[a-f0-9]{64}\z/', $finding['source_id_sha256']) === 1);
+        }
     }
 
     public function test_an_unreferenced_contract_file_is_a_finding(): void
