@@ -51,8 +51,11 @@ class TestOrderFinalizationMigrationTest extends TestCase
         $refundResolution = require database_path('migrations/2026_10_06_000047_test_refund_resolutions.php');
         // Remove the empty additive notification child before its retained parents.
         $notices = require database_path('migrations/2026_10_06_231000_test_transactional_notifications.php');
+        // Drop the empty, forward-only A5 refund/dispute child first; its guards name the order tables rebuilt below.
+        $refundDispute = require database_path('migrations/2026_10_24_264000_refund_dispute_lifecycle.php');
         $this->assertDatabaseCount('transactional_notices', 0);
         $this->assertDatabaseCount('transactional_notice_attempts', 0);
+        \Tests\Support\RefundDisputeFixtures::dropEmptyTables();
         $notices->down();
         $purchaseClaims->down();
         $refundResolution->down();
@@ -69,6 +72,7 @@ class TestOrderFinalizationMigrationTest extends TestCase
         $refundResolution->up();
         $purchaseClaims->up();
         $notices->up();
+        $refundDispute->up();
         foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
         $this->assertSame($before, $this->finalizationSchemaRows($tables));
         foreach ($this->finalizationSchemaTables() as $table) { $this->assertDatabaseCount($table, 0); }

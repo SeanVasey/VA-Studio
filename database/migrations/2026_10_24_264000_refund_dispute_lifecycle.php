@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Schema;
  * existence and order binding are checked by insert guards rather than foreign keys. That keeps the existing
  * empty-table roundtrips of the order/finalization migrations independent of this later child. Foreign keys
  * are kept to `users` and between the new tables. Every new table is append-only except two narrow, guarded
- * transitions: the coordination row's monotonic sequence/claim and a hold's single release.
+ * transitions: the coordination row's monotonic sequence/claim and a hold's single release. Rollback refuses.
  */
 return new class extends Migration
 {
@@ -125,16 +125,10 @@ return new class extends Migration
         }
     }
 
+    /** Forward-only: refund and dispute evidence is retained, so operational rollback always refuses before any query. */
     public function down(): void
     {
-        foreach (self::TABLES as $table) {
-            if (Schema::hasTable($table) && DB::table($table)->exists()) {
-                throw new LogicException('Refund and dispute evidence must be retained.');
-            }
-        }
-        foreach (self::TABLES as $table) {
-            Schema::dropIfExists($table);
-        }
+        throw new LogicException('Retain refund and dispute evidence; this migration is forward-only.');
     }
 
     /** @return array<string, array{0: string, 1: string, 2: ?string}> */

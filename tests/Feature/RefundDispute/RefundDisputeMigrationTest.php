@@ -122,10 +122,21 @@ class RefundDisputeMigrationTest extends TestCase
         $this->assertSame($before, $this->rows());
     }
 
-    public function test_populated_rollback_refuses_and_an_empty_roundtrip_restores_every_guard(): void
+    public function test_rollback_always_refuses_and_an_empty_disposable_rebuild_restores_every_guard(): void
     {
         $migration = require database_path(self::MIGRATION);
-        $migration->down();
+        $queries = 0;
+        DB::listen(function () use (&$queries): void {
+            $queries++;
+        });
+        try {
+            $migration->down();
+            $this->fail('Empty refund/dispute rollback was accepted.');
+        } catch (LogicException $error) {
+            $this->assertStringContainsString('forward-only', $error->getMessage());
+            $this->assertSame(0, $queries);
+        }
+        R::dropEmptyTables();
         foreach (R::TABLES as $table) {
             $this->assertFalse(Schema::hasTable($table));
         }
@@ -136,10 +147,10 @@ class RefundDisputeMigrationTest extends TestCase
             $migration->down();
             $this->fail('Populated refund/dispute rollback was accepted.');
         } catch (LogicException $error) {
-            $this->assertStringContainsString('retained', $error->getMessage());
+            $this->assertStringContainsString('Retain refund and dispute evidence', $error->getMessage());
         }
         $this->assertSame($before, $this->rows());
-        $this->rejected(fn () => DB::table('refund_dispute_effects')->delete(), 'effects delete after roundtrip');
+        $this->rejected(fn () => DB::table('refund_dispute_effects')->delete(), 'effects delete after rebuild');
         $this->assertSame(1, User::whereKey($f['staff']->id)->count());
     }
 }

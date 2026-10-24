@@ -76,6 +76,15 @@ final class RefundDisputeFixtures
         return app(RefundDisputeLedger::class)->observe($orderPublicId, $actor, $requestId ?? (string) Str::uuid(), self::sequence($orderPublicId, $actor));
     }
 
+    /**
+     * Disposable-fixture removal of the empty A5 tables (their triggers go with them) so an older migration's empty
+     * roundtrip can rebuild the order tables they name. The migration's own down() always refuses.
+     */
+    public static function dropEmptyTables(): void
+    {
+        CapabilityRollbackFixture::dropEmptyLeavesFirst(self::TABLES);
+    }
+
     public static function counts(): array
     {
         return array_combine(self::TABLES, array_map(fn (string $table): int => DB::table($table)->count(), self::TABLES));
