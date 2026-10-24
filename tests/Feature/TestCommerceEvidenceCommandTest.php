@@ -243,7 +243,7 @@ class TestCommerceEvidenceCommandTest extends TestCase
         [$status, $output] = $this->evidence($f['order']->public_id);
         $this->assertSame([1, 'Evidence snapshot unavailable. Nothing was written.'], [$status, trim($output)]);
         $this->assertSame($audits, AuditEvent::count());
-        $this->assertNotContains(false, array_map(fn ($sql) => preg_match('/\A\s*select\s/i', $sql) === 1, $this->statements));
+        $this->assertReadsOnly($this->statements, 1);
         // The guard is scoped to the command: ordinary writes in the same process still work afterwards.
         AuditEvent::recordAttributed('synthetic.after_snapshot', $f['intent'], [], null);
         $this->assertSame($audits + 1, AuditEvent::count());
