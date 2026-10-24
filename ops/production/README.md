@@ -97,8 +97,9 @@ not mounted (`config/paid-grants.php` ships `http_mounted` as a literal `false`)
 
 The kit's scheduler is the same `schedule:work` program as staging (derived from the staging workers file), so it runs
 `vasey:cache-prune-expired` hourly at :23 once a release containing it is served. That command deletes only expired rows from
-the `cache` and `cache_locks` tables, so plain-text Filament flash notifications and stale throttle counters do not outlive their
-`SESSION_LIFETIME` (independent review R3 of the Filament 5.10.2 update). It is a production requirement that the scheduler is
+the `cache` and `cache_locks` tables, so a plain-text Filament flash notification or stale throttle counter outlives its own TTL
+by at most about an hour plus the run time (independent review R3 of the Filament 5.10.2 update; the TTL of an undelivered
+notification is `SESSION_LIFETIME`). It is a production requirement that the scheduler is
 running, `CACHE_STORE=database` is set, and the cache is one shared persistent store (not `array`, and not a `file` store that
 differs between hosts): otherwise notifications that cross requests and TOTP replay records are lost or not shared. Never clear the
 cache to tidy it; that resets the throttles and the TOTP replay records. Nothing has run on a host (above), and the production host

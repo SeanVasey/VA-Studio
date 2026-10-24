@@ -141,3 +141,10 @@ No census or selection edit was needed: the test branches on no driver and skips
 - **The Redis, file and memcached stores.** They expire their own entries; the command is a deliberate no-op there.
 - **A failing delete on a real driver.** The failure path is exercised with a throwing query listener, not a real constraint or deadlock error.
 - **Pint** is not enforced (open standard gap); no PHP style tool was run.
+
+## Independent review
+
+[`independent-review-4cbcf81d-DECISION.md`](independent-review-4cbcf81d-DECISION.md): **APPROVE** at `4cbcf81d`, no P0 to P2. The reviewer
+reran the file on SQLite and on its own MySQL 8.4.11 (19 tests, 112 assertions each), caught eight of nine mutations, pruned 200k expired
+rows and 20k expired locks in 27 s on MySQL with every live row kept, and ran a second-session refresh race with no refreshed key lost.
+P3-2 (production README wording) is fixed in the docs commit; P3-1 and P3-3 to P3-5 are in the deferred ledger.
