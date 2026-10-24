@@ -129,6 +129,7 @@
     "tests/Feature/ServiceSupportAttachmentsTest.php",
     "tests/Feature/SupportAttachmentSchemaTest.php",
     "tests/Feature/SupportAttachmentsTest.php",
+    "tests/Feature/TestCommerceEvidenceCommandTest.php",
     "tests/Unit/SchemaQualifierDelimiterTest.php"
   ],
   "residual_files": [

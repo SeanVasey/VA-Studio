@@ -367,15 +367,21 @@ F2a final separate review at `e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08`: **APPRO
 
 2026-10-18 C1 synthetic staging catalog (lane C1, branch `harness/staging-synthetic-catalog-20261017`). The first independent review at `09acd13d` was APPROVE WITH CONDITIONS on P2-1 (the `--env` override bypassed the production refusal) and P2-2 (console staff identity without password or attestation). Both were fixed before merge, and the re-review at `cfc4d6a4` approved with both closed. Deferred to the lane's next batch: P3-A (assert generated media never matches a brand file under `assets/` or `public/`), P3-B (the "interactive console" wording, or add `stream_isatty(STDIN)` to this command and `vasey:rights-scope`), P3-C (neutral wording for the generic failure message on `--check`/admission failures), P3-D (test docblock mentions the scanner stand-in).
 
+**Resolved by lane DEF-OPS (2026-10-24), see `docs/verification/deferred-ops-20261024/README.md`:** P3-A (no generated file equals a public or brand file), P3-B (wording, with K3 P3-1), P3-C (no resumable-write claim before the write phase) and P3-D (test docblock) are fixed.
+
 
 2026-10-18 PR #140 Codex P2s, deferred to C1's next batch with one reply each:
 - r4305244895: compare both resumed rights-evidence fields with `SyntheticRehearsalCatalog::rights()` before verification, and refuse on any difference.
 - r4305244899: on resume, accept existing artwork or preview only when its source hash matches the deterministic generated media for that definition, and otherwise refuse with "media differs".
 
+**Resolved by lane DEF-OPS (2026-10-24), see `docs/verification/deferred-ops-20261024/README.md`:** r4305244895 (both rights fields must equal the definition) and r4305244899 (an interrupted source or ready derivative must have the generated file's source hash) are fixed with tests that were shown red against the old code.
+
 Both need staff to edit an interrupted synthetic draft between runs on staging; the command refuses production. They join the re-review's P3-A to P3-D.
 
 
 2026-10-18 PR #141 Codex P2 r4305283401, deferred with one reply: add `@testing-library/dom` and `@testing-library/jest-dom` (both exact pins) to the `npm-minor-patch` `exclude-patterns` in `.github/dependabot.yml`, in the next change that touches that file. It fails safe: a bump would only fail its group PR.
+
+**Resolved by lane DEF-OPS (2026-10-24), see `docs/verification/deferred-ops-20261024/README.md`:** already fixed on main by the dependency batch (both packages are in the `npm-minor-patch` `exclude-patterns`); verified, nothing built.
 
 
 2026-10-18 PR #146 (F2c). Codex P2s r4305301684 (the packet summary and inventory kept the pre-review 5/14/6 split) and r4305301686 (the resumption ledger still showed M1 as Started) were replied to once each and fixed in the T1 PR's ledger commit. Deferred to the next F2 batch from the independent review at `06a23144`:
@@ -409,6 +415,8 @@ From the re-review at `6066e772` (also deferred to the next Tax batch):
 - P3-B (third record): apply the config-key coverage check to the built production `forge-deploy.sh` too, so a scrub pattern that the production rename breaks fails a test;
 - P3-D remainder (third record): one clause in `scripts/ops/capability-boundary.php` recording why `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED` is not held.
 
+**Resolved by lane DEF-OPS (2026-10-24), see `docs/verification/deferred-ops-20261024/README.md`:** the O1 P3s were closed by O2 (verified on main); the remaining O2 P3-1 below is fixed with a red/green test.
+
 Still Sean's decisions (not deferred findings): the production pre-launch capability hold for the four flags in `ops/production/README.md` item 6, and an environment gate in the policy classes for the two ungated flags.
 
 
@@ -417,21 +425,29 @@ Still Sean's decisions (not deferred findings): the production pre-launch capabi
 - Codex P2 r4305404773: `host-baseline.sh apply-unattended-upgrades` prints "applied" when `systemctl enable --now` fails. Make that fatal and add a `check` row requiring both apt timers to be enabled and active.
 - Cursor Bugbot Medium r4305410457: staging `provision.sh` disables an opt-in clamd on re-provision. Move the marker guard into staging `provision.sh`, drop the production-only patch, regenerate `semantic-delta.diff`, and add a test.
 
+**Resolved by lane DEF-OPS (2026-10-24), see `docs/verification/deferred-ops-20261024/README.md`:** closed by O2 at `c94770ad` (see the O2 entry).
+
 
 2026-10-18 K3 test identity link relay. Independent review at `e2d8b6cc` (APPROVE WITH CONDITIONS) and re-review at `d160b154` (APPROVE). P2-1 and the doc P3s were fixed before the PR opened. Deferred to the K3 follow-up batch:
 - P3-1: a piped password is accepted. Require `stream_isatty(STDIN)`, or correct the "interactive console" wording, in `vasey:test-identity-links`, `vasey:rights-scope` and `vasey:staging-synthetic-catalog` together (this absorbs C1's P3-B).
 - P3-2: refusal tests for a non-current policy version and for a challenge completed between `message()` and `relay()`, plus the `lstat` and inode checks on their own.
+
+**Resolved by lane DEF-OPS (2026-10-24), see `docs/verification/deferred-ops-20261024/README.md`:** P3-1 by correcting the wording in the three commands (an interactive session is checked, not a terminal; recorded why), P3-2 by the policy-version and completed-between-check refusal tests. The inode comparison is a race-only defence in depth and is not separately testable without a production seam, so it stays covered only with the lstat checks (documented, not built).
 
 Owner decision, not a finding: Sean to confirm the reserved-address rule (only `.test`, `.example`, `.invalid`, `.localhost`, `example.com`, `example.net` and `example.org` recipients can receive relayed links).
 
 
 2026-10-18 PR #149 Codex P2 r4305529286, deferred to the K3 follow-up batch with one reply: `vasey:test-identity-links list` reads every capture and runs two lookups each. List only the newest N captures by modification time and report how many older ones were not examined, batch the lookups, and prune expired captures in the identity domain if retention is needed.
 
+**Resolved by lane DEF-OPS (2026-10-24), see `docs/verification/deferred-ops-20261024/README.md`:** `list` examines only the newest N captures by modification time (`--limit`, default 50, maximum 200), reports how many older ones it did not examine, and batches the challenge and staff-address lookups. Pruning captures in the identity domain stays unbuilt: nothing here needs a retention policy yet, and it is a domain change outside this lane.
+
 
 2026-10-18 K4 Stripe-test drill harness. Independent review at `18f7ed98` (APPROVE WITH CONDITIONS); P2-1, P3-4 and P3-5 corrected in documentation before the PR opened. Deferred to the K4 follow-up batch:
 - P3-1: `vasey:test-commerce-evidence` reads inside `START TRANSACTION READ ONLY` at REPEATABLE READ on MySQL, rejects locking and `INTO` clauses, and removes its connection callback when the command ends;
 - P3-2: load an explicit `CheckoutIntent` column list;
 - P3-3: JSON output with `OUTPUT_RAW`, text output through `OutputFormatter::escape()`.
+
+**Resolved by lane DEF-OPS (2026-10-24), see `docs/verification/deferred-ops-20261024/README.md`:** P3-1 (MySQL read-only repeatable-read transaction, locking and INTO refused, one inert guard per connection), P3-2 (explicit column list) and P3-3 (raw JSON, escaped text) are fixed with tests; the MySQL framing was also run natively.
 
 
 2026-10-18 F3 foundation repairs. Independent review at `7b290b8b` approved with no P0 to P2. Deferred to the next member-grant batch:
@@ -446,8 +462,12 @@ Sean's 2026-10-18 decisions close two open questions: the K3 reserved-address ru
 
 2026-10-18 O3 production capability hold, reviewed at `dccc5852` and `60c40dea` (both APPROVE; R1 to R5 fixed before the PR opened). Deferred to the ops batch: R6 (P3, the four hold keys are a test-pinned copy of the `CapabilityBoundary` entries rather than loaded from it; its docblock still says "two validators"; the consumer side is not pinned) and N1 (P3, two over-long prose lines in the activation packet and the production README).
 
+**Resolved by lane DEF-OPS (2026-10-24), see `docs/verification/deferred-ops-20261024/README.md`:** R6 (the hold names its four environment keys and reads the config keys from `CapabilityBoundary`; docblock and consumer pinned by tests) and N1 (rewrapped) are fixed.
+
 
 2026-10-18 M2 dependency follow-up, reviewed at `1464ebfc` (APPROVE WITH CONDITIONS; R1 and R2 corrected before the PR opened). Deferred: R3 (P3, widen the Dependabot Composer exclusion to `tecnickcom/tc-lib-*` so the transitive renderers also get their own PR) and R4 (P3, Laravel 13.37.0 limiter `block()` now times out on `Carbon::now()`; a future frozen-time test of a funnel or throttle could hang; no current code uses one).
+
+**Resolved by lane DEF-OPS (2026-10-24), see `docs/verification/deferred-ops-20261024/README.md`:** R3 is fixed (`tecnickcom/tc-lib-*`). R4 stays a note: no test uses a frozen-time funnel or throttle, so there is nothing to change.
 
 
 2026-10-18 M3 Filament 5.10.2, reviewed at `af7d2e6a` (APPROVE WITH CONDITIONS; R1 and R2 corrected before the PR opened). Deferred: **R3 (P2, required before production)** a scheduled deletion of expired `cache` rows, because Filament 5.10 keeps undelivered staff flash notifications as plain-text cache rows that are never purged once expired (they previously sat in the encrypted session); do not use `cache:clear`, which also resets throttles and TOTP replay records. R4 (P3) the TOTP verification lock TTL is 60 s, so a crashed request blocks that staff member's MFA for up to a minute with HTTP 500s; R5 (P3) Filament's login and logout hooks also fire for customer sign-ins; R6 (P3) a code-only rollback to 5.8.4 gives one 500 per touched staff session; R7 (P3) the test helper depends on `NotificationMailbox::flush()` (fails closed).
@@ -460,6 +480,8 @@ Sean's 2026-10-18 decisions close two open questions: the K3 reserved-address ru
 
 
 2026-10-24 O4 expired cache-row pruning, reviewed at `4cbcf81d` (APPROVE, no P0 to P2). P3-2 (production README wording) fixed before the PR. Deferred P3: P3-1 no test proves the configured `connection` and `lock_connection` are used (a regression to the default connection would prune the wrong table, still only expired rows); P3-3 only the default store is pruned, so moving `filament.cache_store` or `cache.limiter` to another database store, or a `failover` default, silently reopens the backlog; P3-4 the scheduler host's clock decides expiry, so several hosts need NTP (Laravel's read path shares this); P3-5 the staging workers conf header and `docs/ops/monitoring-and-host-baseline.md` still describe a one-command scheduler.
+
+**Resolved by lane DEF-OPS (2026-10-24), see `docs/verification/deferred-ops-20261024/README.md`:** P3-1 (configured connection and lock connection tested on separate connections), P3-3 (the command prunes every distinct database store the application uses), P3-4 (NTP requirement) and P3-5 (scheduler descriptions, semantic-delta snapshot regenerated) are fixed.
 
 
 2026-10-24 G1 schema ownership once per frame, reviewed at `627025c4` (APPROVE, no P0 or P1). R-1 (P2, terminal re-proof untested for the four member observers) and R-3 to R-6 (P3: `sql_select_limit` and `character_set_results` added to the MySQL frame token; packet consequence 1 and the TEMPORARY path list corrected; a migration runbook note) were fixed before the PR, tested at `6a10c7c5`. Deferred: **R-2 (P2, pre-existing, for the guards' owners)** under `REPEATABLE READ`, `information_schema` is frozen at the frame's first consistent or dictionary read, so a view, routine or trigger that another session creates mid-frame on a table the frame has not opened is missed until the next operation, on `main` and on this branch alike (G1's table pins already block definition changes to every inspected table; options: read dependents through a `READ COMMITTED` or `SHOW`-based path, or document per-operation detection); R-7 (P3, note) under `REPEATABLE READ` the per-reuse dependents rescan reads the same snapshot as the establishing proof, so it is pure cost (4 dictionary scans per reuse, 157 in one award); keep it while `READ COMMITTED` frames can reach these guards.
