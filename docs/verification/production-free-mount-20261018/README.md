@@ -410,11 +410,20 @@ review missed. Two new P3s are deferred: R1, the `! $contended` exemption that k
 `contention` has no test (SQLite's synthetic deadlock leaves the frame open); R2, a listener's rollback-then-reopen is now
 reported as `outcome_unknown` although nothing is durable (conservative, never a false refusal).
 
+### Full SQLite suite at the tested SHA (lead)
+
+Every PHPUnit file at `f9876183` (687 files in eight shards, the CI backend-sqlite environment, `public/build` absent,
+`laravel/framework` 13.37.0 and Filament 5.10.2): **9,495 tests, 97,163 assertions, 0 failures, 0 errors, 707 skipped**, and
+every skip is a reviewed census method (no unlisted skip, and no census method that ran unskipped). This includes
+`StagingEnvironmentAdmissionTest` and the Tax receipt test that once failed under load.
+
 ### Merge with main after PR #159
 
 The branch merged `main` at `e3e2a180` (PR #159, C4d). The census union keeps main's 287 entries as an exact prefix and
 appends this lane's four (291); the regenerated selection is 2,487 of 9,523 cases in 237 files, and both workflow comments
-say so. The four preflight safeguards pass on the merged tree.
+say so. The four preflight safeguards pass on the merged tree, and the merged tree's focused run (the whole Free
+directory, the four C4d member test files and `StagingEnvironmentAdmissionTest`; 40 files) gave 337 tests, 3,472 assertions,
+0 failures, 0 errors and 9 census skips.
 
 ## Untested conditions
 
