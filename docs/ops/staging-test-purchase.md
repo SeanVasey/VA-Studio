@@ -50,7 +50,7 @@ Both are captured into each immutable test order. Changing them later affects ne
 
 ### 3. Apply the profile on the host
 
-1. Open `ops/staging/test-commerce/env.test-commerce.example`. Copy every key into the host's private `.env`, keeping exactly one copy of each key. Section 1 (runtime) and section 6 (the ten capability flags, each stated `false`) normally already exist in the base staging `.env` (`ops/staging/env.staging.example` states them the same way); make sure the values match and keep one copy. The validator refuses a profile that omits any of the ten, naming the missing keys, so a `.env` copied before section 6 existed needs those lines added.
+1. Open `ops/staging/test-commerce/env.test-commerce.example`. Copy every key into the host's private `.env`, keeping exactly one copy of each key. Section 1 (runtime) and section 6 (the eleven capability flags, each stated `false`) normally already exist in the base staging `.env` (`ops/staging/env.staging.example` states them the same way); make sure the values match and keep one copy. The validator refuses a profile that omits any of the eleven, naming the missing keys, so a `.env` copied before section 6 existed needs those lines added.
 2. Replace every placeholder: `<STAGING_HOST>` (host name only), `<acct_ID>` (twice: `STRIPE_ACCOUNT_ID` and inside `VASEY_TEST_PRICING_POLICY`), `<sk_test_KEY>`, `<whsec_SECRET>`, `<SELLER_LEGAL_NAME>`, `<ASSENT_TEXT>`.
 3. Validate, as the application user, from the application root:
 
