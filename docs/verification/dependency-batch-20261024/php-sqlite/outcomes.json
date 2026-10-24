@@ -1,0 +1,190 @@
+{
+ "c00.xml": {
+  "files": 12,
+  "tests": 163,
+  "assertions": 1646,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 3,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c01.xml": {
+  "files": 12,
+  "tests": 138,
+  "assertions": 907,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 43,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c02.xml": {
+  "files": 12,
+  "tests": 92,
+  "assertions": 610,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 43,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c03.xml": {
+  "files": 12,
+  "tests": 185,
+  "assertions": 2416,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 8,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c04.xml": {
+  "files": 12,
+  "tests": 162,
+  "assertions": 2239,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 7,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c05.xml": {
+  "files": 12,
+  "tests": 95,
+  "assertions": 1499,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 18,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c06.xml": {
+  "files": 12,
+  "tests": 160,
+  "assertions": 2767,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 53,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c07.xml": {
+  "files": 12,
+  "tests": 171,
+  "assertions": 1771,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 15,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c08.xml": {
+  "files": 12,
+  "tests": 232,
+  "assertions": 1727,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 23,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c09.xml": {
+  "files": 12,
+  "tests": 142,
+  "assertions": 1084,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 58,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c10.xml": {
+  "files": 12,
+  "tests": 179,
+  "assertions": 1118,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 14,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c11.xml": {
+  "files": 12,
+  "tests": 236,
+  "assertions": 2005,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 3,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c12.xml": {
+  "files": 12,
+  "tests": 123,
+  "assertions": 666,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 7,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c13.xml": {
+  "files": 12,
+  "tests": 155,
+  "assertions": 1217,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 14,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c14.xml": {
+  "files": 12,
+  "tests": 197,
+  "assertions": 948,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 46,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c15.xml": {
+  "files": 12,
+  "tests": 151,
+  "assertions": 1925,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 13,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c16.xml": {
+  "files": 12,
+  "tests": 156,
+  "assertions": 5119,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 18,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "c17.xml": {
+  "files": 12,
+  "tests": 247,
+  "assertions": 2703,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 13,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "total": {
+  "files": 216,
+  "tests": 2984,
+  "assertions": 32367,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 399
+ }
+}
