@@ -13,6 +13,7 @@ Baseline prepared 2026-09-04 from all three owner-provided attachments, public V
 | `legacy_route_inventory.csv` | 20 proposed legacy route mappings requiring actual browser/catalog verification |
 | `cutover_runbook.md` | Acquisition, dry-run, reconciliation, launch gates and rollback procedure |
 | `beatstars-export-normalization.md` | Operator guide for the BeatStars CSV normalizer and read-only dry run (M-09/M-10): mapping file, findings, exit codes and the 1 MiB snapshot limit |
+| `legacy-history-archive.md` | Operator guide for the history archive (orders, lines, customers, original contracts; M-033 to M-037), delta capture (M-050) and the exclusivity authority ledger (M-023): synthetic-tested only, `archive_only` by default, no entitlement import |
 
 ## Reading the records
 
