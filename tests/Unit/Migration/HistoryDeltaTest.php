@@ -76,6 +76,26 @@ class HistoryDeltaTest extends TestCase
         }
     }
 
+    public function test_rows_that_only_move_within_a_sheet_are_restated_not_blocking(): void
+    {
+        [$baseline, $later] = $this->snapshots(function (array $source): array {
+            // Moving the first contract row to the end shifts every other contract row number.
+            $lines = explode("\n", rtrim($source['sheets']['contracts'], "\n"));
+            $header = array_shift($lines);
+            $lines[] = array_shift($lines);
+            $source['sheets']['contracts'] = $header."\n".implode("\n", $lines)."\n";
+
+            return $source;
+        });
+        $report = (new HistoryDelta)->compare($baseline, $later);
+        $contracts = array_values(array_filter($report['items'], static fn (array $item): bool => $item['cohort'] === 'contract' && $item['change'] === 'changed'));
+        $this->assertNotSame([], $contracts);
+        foreach ($contracts as $item) {
+            $this->assertSame(['contract_row_restated', false, ['row']], [$item['category'], $item['blocking'], $item['fields']]);
+        }
+        $this->assertSame('reconciled', $report['result']);
+    }
+
     public function test_changed_money_terms_exclusives_and_contract_bytes_are_blocking(): void
     {
         [$baseline, $later] = $this->snapshots(function (array $source): array {

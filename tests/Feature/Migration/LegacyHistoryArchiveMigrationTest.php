@@ -47,6 +47,23 @@ class LegacyHistoryArchiveMigrationTest extends TestCase
         }
     }
 
+    public function test_identity_columns_carry_real_unique_indexes_on_both_engines(): void
+    {
+        $expected = ['legacy_history_batches' => [['snapshot_sha256']], 'legacy_history_customers' => [['record_key', 'record_sha256']],
+            'legacy_history_orders' => [['record_key', 'record_sha256']], 'legacy_history_lines' => [['record_key', 'record_sha256']],
+            'legacy_history_contracts' => [['record_key', 'record_sha256']], 'legacy_history_grant_reviews' => [['line_id']],
+            'legacy_exclusivity_authority_events' => [['sequence']]];
+        foreach ($expected as $table => $uniques) {
+            $actual = [];
+            foreach (Schema::getIndexes($table) as $index) {
+                if ($index['unique'] && ! $index['primary']) {
+                    $actual[] = $index['columns'];
+                }
+            }
+            $this->assertSame($uniques, $actual, $table);
+        }
+    }
+
     public function test_every_archive_row_is_immutable_against_update_delete_and_replace(): void
     {
         foreach (array_keys($this->rows()) as $table) {
