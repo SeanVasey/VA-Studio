@@ -86,6 +86,20 @@ final class HistorySourceFiles
         return ['mapping' => $mapping, 'sheets' => $sheets, 'contracts' => $contracts, 'synthetic_repository_fixture' => $inside];
     }
 
+    /** One private operator file beside a package, such as delta dispositions (owner names and reasons). */
+    public function sideFile(string $path, int $maximum = 1048576): string
+    {
+        $this->path($path);
+        $repository = dirname(__DIR__, 4);
+        if ($path === $repository || str_starts_with($path, $repository.'/')) {
+            $this->require(str_starts_with($path, $repository.'/tests/Fixtures/'), 'source_inside_repository');
+
+            return $this->fixture($path, $maximum);
+        }
+
+        return $this->private($path, $maximum);
+    }
+
     private function private(string $path, int $maximum): string
     {
         try {

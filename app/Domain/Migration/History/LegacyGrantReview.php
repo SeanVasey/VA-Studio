@@ -74,6 +74,16 @@ final class LegacyGrantReview
         });
     }
 
+    /** Read-only eligibility without a reviewer identity; the write re-evaluates with authority and separation of duties. */
+    public function inspect(string $lineRecordKey): array
+    {
+        if (preg_match('/\A[a-f0-9]{64}\z/D', $lineRecordKey) !== 1) {
+            throw new LegacyArchiveRefusal('line_invalid');
+        }
+
+        return $this->evaluate($lineRecordKey, null);
+    }
+
     /** The current classification of a line: `verified_grant` only when its latest version carries a review. */
     public function classification(string $lineRecordKey): ?string
     {
@@ -85,7 +95,7 @@ final class LegacyGrantReview
         return DB::table('legacy_history_grant_reviews')->where('line_id', $line->id)->exists() ? self::CLASSIFICATION : HistoryNormalizer::CLASSIFICATION;
     }
 
-    private function evaluate(string $lineRecordKey, User $reviewer): array
+    private function evaluate(string $lineRecordKey, ?User $reviewer): array
     {
         $blockers = [];
         $line = $this->latest('legacy_history_lines', 'record_key', $lineRecordKey);
@@ -149,7 +159,7 @@ final class LegacyGrantReview
         // Separation of duties: whoever archived any of this evidence cannot also review it.
         $importers = DB::table('legacy_history_batches')->whereIn('id', array_filter([$line->batch_id, $order->batch_id, $customer?->batch_id, $contract?->batch_id]))
             ->pluck('actor_id')->map(static fn ($id): int => (int) $id)->all();
-        if (in_array($reviewer->id, $importers, true)) {
+        if ($reviewer !== null && in_array($reviewer->id, $importers, true)) {
             $blockers[] = 'reviewer_imported_evidence';
         }
         sort($blockers, SORT_STRING);
