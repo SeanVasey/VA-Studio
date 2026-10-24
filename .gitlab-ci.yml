@@ -110,11 +110,11 @@ backend-quality:
 
 backend-mysql:
   extends: .database
-  # Twenty-four shards of the reviewed native selection (2456 cases in 235 files; 1765 when GitHub run 38037183233 ran), the same partition as GitHub's. GitHub
+  # Twenty-four shards of the reviewed native selection (2487 cases in 237 files; 1765 when GitHub run 38037183233 ran), the same partition as GitHub's. GitHub
   # Foundation run 38037183233 ran all 24 on hosted MySQL 8.4: 58 to 109 minutes each and 124.5 minutes for
   # shard 1, which is BulkReplaceLicenseDraftSourceTest alone, so more shards cannot shorten it; with the
   # timings regenerated from that run the then-selected other shards balanced at about 87 minutes.
-  # C4a discovery uses fallback weights for 70 newer files; its estimates are not executed timings.
+  # C4a discovery uses fallback weights for 72 newer files; its estimates are not executed timings.
   # GitLab.com hosted runners kill any job at 3 hours regardless of this setting, so the limit stays
   # 175 minutes. GitLab's small runners are unmeasured: dispatch GitLab only after this measured shard 1 is
   # judged to fit them, and split that test file if GitLab would exceed this limit.

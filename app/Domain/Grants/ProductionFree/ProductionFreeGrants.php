@@ -7,6 +7,7 @@ use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Models\User;
 use App\Support\CanonicalJson;
+use Closure;
 use Illuminate\Support\Str;
 
 /**
@@ -17,22 +18,24 @@ use Illuminate\Support\Str;
 final class ProductionFreeGrants
 {
     /** Typed review of the exact open definition; the returned display hash is what assent must echo. */
-    public function review(string $definitionId, string $declaredName, ProductionCustomerPrincipal $principal, User $actor): array
+    public function review(string $definitionId, string $declaredName, ProductionCustomerPrincipal $principal, User $actor, ?Closure $authority = null): array
     {
         ProductionFreeGrantInput::uuid($definitionId);
         ProductionFreeGrantInput::text($declaredName, 120);
         ProductionFreeGrantRenderable::require(declaredName: $declaredName);
-
-        return $this->customerCommand($principal, $actor, function (array $policy, ProductionFreeGrantRows $rows) use ($definitionId, $declaredName): array {
+        $read = function (array $policy, ProductionFreeGrantRows $rows) use ($definitionId, $declaredName): array {
             $graph = $this->admissible($definitionId, $policy, $rows);
             $display = $this->display($graph);
 
             return ['definition' => $display, 'declaredName' => $declaredName, 'displayHash' => $this->displayHash($display, $declaredName)];
-        });
+        };
+
+        // A read: its own result is the graph the commit re-proves.
+        return $this->customerCommand($principal, $actor, $read, $read, $authority);
     }
 
     /** One original grant per account and definition. The same request key replays the same origin, nothing more. */
-    public function accept(string $definitionId, array $input, ProductionCustomerPrincipal $principal, User $actor): array
+    public function accept(string $definitionId, array $input, ProductionCustomerPrincipal $principal, User $actor, ?Closure $authority = null): array
     {
         ProductionFreeGrantInput::uuid($definitionId);
         ProductionFreeGrantInput::keys($input, ['requestKey', 'definitionHash', 'termsHash', 'availabilityId', 'declaredName', 'affirmed', 'displayHash']);
@@ -93,7 +96,8 @@ final class ProductionFreeGrants
             ProductionFreeGrantException::require($rows->count('production_free_origins', 'definition_id = ?', [$definitionId]) === $count + 1, 'cap_reached');
 
             return $this->project($this->originGraph($id, (int) $binding['account_id'], $rows));
-        });
+        }, fn (array $policy, ProductionFreeGrantRows $rows, array $binding, array $result): array => $this->project($this->originGraph($result['id'], (int) $binding['account_id'], $rows)),
+            $authority);
     }
 
     /** Staff revocation stops future delivery; the original assent, render and earlier redemptions are retained. */
@@ -200,11 +204,18 @@ final class ProductionFreeGrants
             'artifacts' => $artifacts];
     }
 
-    /** One customer transaction: policy, identity locked first and re-proved last with the original raw evidence. */
-    public function customerCommand(ProductionCustomerPrincipal $principal, User $actor, callable $work): array
+    /**
+     * One customer transaction: policy, identity locked first and re-proved last with the original raw evidence.
+     *
+     * `$work($policy, $rows, $binding, $raw)` does the command; `$graph($policy, $rows, $binding, $result)` is a pure read of
+     * what the command depends on (for a read, the work itself). Its value is captured after the work and must be
+     * identical when the commit observer re-runs the terminal proof after the ordinary committing listeners, followed by
+     * the optional request-bound `$authority` (the HTTP capsule), the fixed owner proof and the policy proof.
+     */
+    public function customerCommand(ProductionCustomerPrincipal $principal, User $actor, callable $work, callable $graph, ?Closure $authority = null): array
     {
         try {
-            return ProductionFreeGrantTransactions::run(function () use ($principal, $actor, $work): array {
+            return ProductionFreeGrantTransactions::run(function (ProductionFreeGrantCommitObserver $commit) use ($principal, $actor, $work, $graph, $authority): array {
                 $policy = (new ProductionFreeGrantPolicy)->current();
                 $rows = new ProductionFreeGrantRows;
                 $access = new ProductionCustomerAccess;
@@ -212,10 +223,27 @@ final class ProductionFreeGrants
                 $binding = $access->durableBinding($principal);
                 ProductionFreeGrantException::require($principal->provenance === $policy['provenance'] && $binding['provenance'] === $policy['provenance']
                     && (int) $binding['account_id'] === $principal->accountId && (int) $binding['user_id'] === $principal->userId, 'provenance');
-                $result = $work($policy, $rows, $binding);
-                $access->proveCurrent($principal, $actor, $rows->reader, $raw);
-                (new ProductionFreeGrantPolicy)->prove($policy);
-                $rows->assertCurrent();
+                $result = $work($policy, $rows, $binding, $raw);
+                // A read is its own graph, so its result is already the value to compare at the commit.
+                $expected = CanonicalJson::encode($graph === $work ? $result : $graph($policy, $rows, $binding, $result));
+                $fixed = function () use ($principal, $actor, $authority, $access, $policy, $rows, $raw): void {
+                    if ($authority !== null) {
+                        $authority();
+                    }
+                    $access->proveCurrent($principal, $actor, $rows->reader, $raw);
+                    (new ProductionFreeGrantPolicy)->prove($policy);
+                    $rows->assertCurrent();
+                };
+                $fixed();
+                $commit->terminal(function () use ($graph, $fixed, $policy, $rows, $binding, $result, $expected): void {
+                    try {
+                        // Graph first: it may run extensible source code. The fixed capsule, owner and policy proofs follow it.
+                        ProductionFreeGrantException::require(CanonicalJson::encode($graph($policy, $rows, $binding, $result)) === $expected, 'entitlement_changed');
+                        $fixed();
+                    } catch (IdentityException) {
+                        throw new ProductionFreeGrantException('identity_refused');
+                    }
+                });
 
                 return $result;
             });

@@ -18,7 +18,7 @@ final class ProductionFreeGrantDocuments
     public function render(string $originId): array
     {
         ProductionFreeGrantInput::uuid($originId);
-        $claim = ProductionFreeGrantTransactions::run(function () use ($originId): array {
+        $claim = ProductionFreeGrantTransactions::run(function (ProductionFreeGrantCommitObserver $commit) use ($originId): array {
             $policy = (new ProductionFreeGrantPolicy)->current();
             $rows = new ProductionFreeGrantRows;
             $graph = $this->graph($originId, $rows);
@@ -37,8 +37,7 @@ final class ProductionFreeGrantDocuments
                 $this->work($rows, $graph, count($graph['work']), 'claimed', $claimId, $lease, $now);
                 $graph = $this->graph($originId, $rows);
             }
-            (new ProductionFreeGrantPolicy)->prove($policy);
-            $rows->assertCurrent();
+            $this->terminal($commit, $policy, $rows, $originId, $graph);
 
             return $graph;
         });
@@ -53,7 +52,7 @@ final class ProductionFreeGrantDocuments
             ProductionFreeGrantException::require(hash_equals(CanonicalJson::hash($payload['profile']), $rendered->profileHash), 'profile_changed');
             $artifact = (new ProductionFreeGrantFiles)->store($originId, $work['claim_id'], $rendered);
 
-            return ProductionFreeGrantTransactions::run(function () use ($originId, $claim, $work, $input, $rendered, $artifact): array {
+            return ProductionFreeGrantTransactions::run(function (ProductionFreeGrantCommitObserver $commit) use ($originId, $claim, $work, $input, $rendered, $artifact): array {
                 $policy = (new ProductionFreeGrantPolicy)->current();
                 $rows = new ProductionFreeGrantRows;
                 $current = $this->graph($originId, $rows);
@@ -70,8 +69,7 @@ final class ProductionFreeGrantDocuments
                     'profile_hash' => $rendered->profileHash, 'input_hash' => $manifest['input_hash'], 'text_digest' => $rendered->textDigest,
                     'created_at' => ProductionFreeGrantInput::stored($now)], $manifest);
                 $published = $this->graph($originId, $rows);
-                (new ProductionFreeGrantPolicy)->prove($policy);
-                $rows->assertCurrent();
+                $this->terminal($commit, $policy, $rows, $originId, $published);
 
                 return (new ProductionFreeGrants)->project($published);
             });
@@ -88,13 +86,13 @@ final class ProductionFreeGrantDocuments
     public function recover(string $originId): array
     {
         ProductionFreeGrantInput::uuid($originId);
-        $graph = ProductionFreeGrantTransactions::run(function () use ($originId): array {
+        $graph = ProductionFreeGrantTransactions::run(function (ProductionFreeGrantCommitObserver $commit) use ($originId): array {
             $policy = (new ProductionFreeGrantPolicy)->current();
             $rows = new ProductionFreeGrantRows;
             $graph = $this->graph($originId, $rows);
             ProductionFreeGrantException::require($graph['original'] !== [], 'original_unavailable');
             ProductionFreeGrantRenderProfile::requireCurrent($graph['payload']['profile']);
-            (new ProductionFreeGrantPolicy)->prove($policy);
+            $this->terminal($commit, $policy, $rows, $originId, $graph);
 
             return $graph;
         });
@@ -105,6 +103,22 @@ final class ProductionFreeGrantDocuments
             && hash_equals($graph['original']['sha256'], $rendered->sha256) && $rendered->pdfBytes === $stored, 'render_drift');
 
         return ['originId' => $originId, 'sha256' => $graph['original']['sha256'], 'bytes' => strlen($stored), 'identical' => true];
+    }
+
+    /**
+     * The worker command's terminal proof, run now and again by the commit observer after the ordinary committing
+     * listeners: the same render state of the origin, the same policy and the same frame.
+     */
+    private function terminal(ProductionFreeGrantCommitObserver $commit, array $policy, ProductionFreeGrantRows $rows, string $originId, array $graph): void
+    {
+        $expected = CanonicalJson::encode(self::renderState($graph));
+        $terminal = function () use ($policy, $rows, $originId, $expected): void {
+            ProductionFreeGrantException::require(CanonicalJson::encode(self::renderState($this->graph($originId, $rows))) === $expected, 'claim_superseded');
+            (new ProductionFreeGrantPolicy)->prove($policy);
+            $rows->assertCurrent();
+        };
+        $terminal();
+        $commit->terminal($terminal);
     }
 
     /** Worker read of one origin; ownership is checked by the customer reads, not here. */
@@ -141,8 +155,9 @@ final class ProductionFreeGrantDocuments
     private function fail(string $originId, array $work): void
     {
         try {
-            ProductionFreeGrantTransactions::run(function () use ($originId, $work): void {
+            ProductionFreeGrantTransactions::run(function (ProductionFreeGrantCommitObserver $commit) use ($originId, $work): void {
                 $rows = new ProductionFreeGrantRows;
+                $commit->terminal(fn () => $rows->assertCurrent());
                 $graph = $this->graph($originId, $rows);
                 $last = $graph['work'] === [] ? null : $graph['work'][array_key_last($graph['work'])];
                 $now = ProductionFreeGrantInput::now();

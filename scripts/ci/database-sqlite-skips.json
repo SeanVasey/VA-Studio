@@ -1149,6 +1149,22 @@
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
       "test_native_index_and_reserve_interleave_sequentially_and_pre_bytes_sees_the_change"
+    ],
+    [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantCommitObserverTest",
+      "test_native_temporary_owned_table_shadow_planted_at_commit_rolls_the_frame_back"
+    ],
+    [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantCommitObserverTest",
+      "test_native_temporary_parent_shadow_planted_at_commit_rolls_the_frame_back"
+    ],
+    [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantFirstByteTest",
+      "test_native_first_byte_frame_is_read_only_read_committed_and_never_waits_for_row_locks"
+    ],
+    [
+      "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantFirstByteTest",
+      "test_native_independent_process_revocation_across_the_first_byte"
     ]
   ]
 }
