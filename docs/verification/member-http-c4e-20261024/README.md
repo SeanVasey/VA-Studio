@@ -91,10 +91,13 @@ CHANGELOG, docblock and runtime doc were wrong and are corrected here.
 
 The design now in `MembershipCustomerIndex` (commit listed under Tested source):
 
-- **One set of locks.** The only locking read in the index frame is `ProductionCustomerAccess::lock` on the current
-  owner's T23 rows (`users`, the single `customer_accounts` row, origin, verifications and challenge, `FOR UPDATE` on
-  MySQL through `IdentityRows::rows`, in that fixed order). These are the same rows, in the same order, that every
-  membership writer locks first and holds to commit.
+- **Owner-scoped locks only.** The frame's first statement is a locking read of the owner's `users` row
+  (`lockOwnerFirst`, added after the re-review, R1). Then `ProductionCustomerAccess::lock` locks the current owner's
+  T23 rows (`users`, the single `customer_accounts` row, origin, verifications and challenge, `FOR UPDATE` on MySQL
+  through `IdentityRows::rows`, in that fixed order), the same rows in the same order that every membership writer
+  locks first and holds to commit. The only further locking reads are re-locks of the same owner rows by the current
+  and historical identity proofs, and the owner's historical challenge rows locked by `verifyHistoricalBinding`
+  (`ProductionCustomerAccess.php:177`; re-review R2).
 - **Everything else is a consistent read.** The period window (no `FOR UPDATE`), each period's events, redemptions and
   member graph (`MemberActivationHistoryReader::capturePeriod(..., consistentRead: true)`, a new opt-in mode; writers
   keep the locking default), each period's plan row and the approved definition, profile and plan
@@ -109,8 +112,15 @@ Why this is correct (consistency):
 2. Every writer of the owner's rows is enumerated in the table below. Each takes the owner lock before its first
    membership read and holds it to commit; award and reserve bind the principal to the invoice's original buyer
    (`SealedMembershipPaidInvoice::sameOwner`). While the index holds the owner lock, none of them can commit.
-3. If the snapshot predates a writer that committed before the owner lock was granted, the audited state is
-   consistent but older. The terminal proof after the index commits runs in a new read-only committed frame
+3. The snapshot follows the owner lock. MySQL creates the REPEATABLE READ read view at the first consistent read,
+   and the identity schema proofs in `new MembershipRows` and `ProductionCustomerAccess::lock` read identity rows
+   (`SELECT id FROM production_identity_* LIMIT 1`, `IdentityMigrationOwnership::inspect`) before any `FOR UPDATE`.
+   The first phase A design therefore always created the view before the owner lock: an index that waited behind a
+   same-owner writer audited the pre-write state and was refused by the terminal proof (the re-reviewer showed this
+   natively, R1). `lockOwnerFirst` makes the frame's very first statement a locking read of the owner's `users` row,
+   which creates no read view, so the view is created after every same-owner writer holding that row has committed.
+   The schema proofs were not reordered: they live in the identity domain and are changed by lane G1. A defensive
+   layer remains: the terminal proof after the index commits runs in a new read-only committed frame
    (`IdentityCommittedFrame`, a new transaction whose snapshot follows the index commit). It re-reads the window,
    every period's complete history and the support rows and refuses on any difference (`changed_period_window`,
    `changed_history`, `changed_policy_facts`). The pre-bytes proof repeats the whole read and compares the projection.
@@ -139,8 +149,9 @@ Why this removes N1 and N2 (availability):
 - The index never holds or requests a lock on the fence, a shared plan, definition or profile row, or any row or gap
   of the owner's membership tables. No other customer's writer, activation or index can wait for it there, and it
   cannot wait for them there.
-- After the owner lock it requests no further lock. Its only waits are while acquiring the owner's T23 rows, which
-  only transactions acting for the same owner hold. A lock-order cycle through the index would need another
+- After the owner lock its only further locks are on the same owner's identity rows (re-proofs and historical
+  challenges; R2). Its only waits are therefore on rows of that owner, which only transactions acting for the same
+  owner hold. A lock-order cycle through the index would need another
   transaction that holds a later one of those rows and waits for an earlier one; every `ProductionCustomerAccess::lock`
   caller uses the same order. Identity-domain operations on the same owner (sign-in, recovery) lock the same rows in
   their own order; that pre-existing exposure is shared by every membership writer and was not changed here.
@@ -149,11 +160,11 @@ Why this removes N1 and N2 (availability):
   identity insert into an adjacent gap. Gap requests never wait, so this cannot form a cycle; every membership writer
   has the same exposure.
 
-Cost of the change, recorded as an untested condition: if the read view was created before the owner lock was granted
-and a same-owner writer committed during that wait, the index refuses (one not-found response; the next request
-succeeds) instead of waiting and answering as the locking design did. The snapshot is created at the first
-consistent read; the index's first membership read follows the owner lock, but schema checks before it may touch
-table metadata. Phase B measures this with a same-owner write during the owner-lock wait.
+Freshness (re-review R1, fixed): before `lockOwnerFirst`, every index that waited behind a same-owner writer that
+changed something it reads was refused (`changed_period_window`) — deterministically, not occasionally. With the
+owner row locked first, such an index answers with the writer's commit included. The native test
+`test_native_index_waiting_behind_a_same_owner_writer_reads_that_writers_commit` pins this (results below); the
+SQLite census pins that `lockOwnerFirst` precedes `new MembershipRows`.
 
 Option (b) (restore the fence and lower the bound) was not needed: the unlocked design is safe by the argument above
 and removes the shared contention instead of bounding it.
@@ -288,6 +299,22 @@ table above) ran in the pre-G1 probe copy the same way.
 On SQLite the lock-shape mutants are killed by a source census, because SQLite has no row locks; the native probe
 kills the plan, window, history and fence mutants by behaviour (NOWAIT 3572). The definition-read mutant (SM3) has no
 native kill in the probe (the n1 definition probe would show it; not run as a separate mutant).
+
+## Independent re-review at `9d1e09f6` and follow-up
+
+Decision: **APPROVE** (`scratchpad/c4e-rereview-9d1e09f6.md`), N1 and N2 fixed, no P0 to P2. Its P3 findings:
+
+| ID | Finding | Resolution |
+| --- | --- | --- |
+| R1 | The read view was always created before the owner lock (identity schema proofs read `production_identity_*` rows at statement 304; the first `FOR UPDATE` was statement 1203), so an index waiting behind a same-owner writer that changed something it reads was refused deterministically (`changed_period_window`; shown natively) | `lockOwnerFirst`: the frame's first statement locks the owner's `users` row; a locking read creates no read view. Schema proofs were not reordered (identity domain, lane G1). SQLite census pins the order; the native test `test_native_index_waiting_behind_a_same_owner_writer_reads_that_writers_commit` pins the behaviour |
+| R2 | "After the owner lock it requests no further lock" was false: re-proofs re-lock the owner rows and `verifyHistoricalBinding` locks the owner's historical challenges | Wording corrected (class docblock, this packet) |
+| R3 | Nothing pinned that writers keep the locking defaults | Census asserts both defaults (`capturePeriod` `consistentRead=false`, `definitionByHash` `committed=false`) and that every writer call site passes no flag |
+| R4 | History-side stale race only by code reading | Native test `test_native_index_waiting_behind_a_same_owner_release_reads_the_released_history` with the genuine release worker (phase B) |
+
+Commit `aafafabb` carries R1 to R3 and the two new native cases. A pre-G1 attempt to show R1 natively was not
+conclusive: before G1 the index spends tens of seconds in schema guards before its first statement, so the writer
+stand-in's wait bound expired first (the index still listed the writer's period, but the wait was not observed), and
+the pre-bytes re-run overran the shared 60 s budget. The evidence is the phase B run on the merged G1 source below.
 
 ## Files changed
 
@@ -473,7 +500,7 @@ session scratchpad, unused port, `performance_schema` on (the same-plan writer c
 merged SHA (C4e rebased or merged onto main with G1), one PHPUnit process per chunk, with the real
 `memberActivationFixture()` (award and reserve):
 
-1. `MembershipNativeCustomerIndexTest`, all six methods:
+1. `MembershipNativeCustomerIndexTest`, all seven methods:
    - only the owner's T23 rows held inside the index; fence, plan, definition, profile, the owner's period and
      redemption free; nothing retained after commit;
    - a wait (1205) at a writer-held owner `users` row, nothing retained;
@@ -483,9 +510,11 @@ merged SHA (C4e rebased or merged onto main with G1), one PHPUnit process per ch
      is still open, and the index completes (the N2 order);
    - a real same-plan award for another customer, in a separate process, runs from the start of the index transaction
      to its commit and never waits for a lock the index holds;
+   - an index waiting behind a same-owner writer at the owner row lists that writer's committed period;
    - pre-bytes after a reserve.
-2. A same-owner reserve that commits while the index waits at the owner lock: record whether the index answers or
-   refuses (`changed_period_window` or `changed_before_bytes`), to measure the cost noted above.
+2. Re-review R4: the same-owner wait race with a reserve (a redemption and reserve event committed while the index
+   waits at the owner row) next to the existing pre-bytes-after-reserve case, alongside the committed window case
+   `test_native_index_waiting_behind_a_same_owner_writer_reads_that_writers_commit`.
 3. The C4d C2 cases: `MembershipNativeCommitWitnessTest` reservation case, `MembershipCommitWitnessTest` reserve,
    delegate and release on MySQL (reservation and release witness), and the `MembershipPeriodAddressedOperationsTest`
    positive path.
@@ -500,8 +529,10 @@ merged SHA (C4e rebased or merged onto main with G1), one PHPUnit process per ch
 
 - No native MySQL evidence on an exact SHA for anything in this lane (phase B). The pre-G1 probe above is
   characterization on a probe fixture.
-- The lock design's freshness cost: a same-owner write that commits during the index's owner-lock wait may make the
-  index refuse if its read view predates the wait. Not measured (phase B item 2).
+- The history-side stale-snapshot race (re-review R4: a redemption or event committed during the owner-lock wait) is
+  exercised only by the phase B real-fixture run; pre-G1 only the window case ran natively.
+- A same-owner writer that locks the owner's identity rows without taking `users` first would not be ordered by
+  `lockOwnerFirst`; every `ProductionCustomerAccess::lock` caller reads `users` first.
 - The real same-plan writer case and the reverse-order case run in one process with one or two independent sessions;
   there is no long-running multi-process race.
 - Identity-domain operations (sign-in, recovery) on the same owner lock the owner's identity rows in their own order;

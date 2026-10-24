@@ -75,8 +75,8 @@ response. Tests bind the real producers as `tests/Support/MemberActivationFixtur
 
 ## Locks taken by the index
 
-The index locks exactly the current owner's T23 identity rows (the rows every membership writer locks first) and
-reads everything else without locks: its period window, the owner's history and the shared plan-version,
+The index locks only the current owner's identity rows (the owner's `users` row first, then the T23 rows every
+membership writer locks first, plus the owner's historical challenge rows) and reads everything else without locks: its period window, the owner's history and the shared plan-version,
 member-definition and member-profile rows. It re-proves those reads after commit in a new read-only frame and again
 before bytes, so a concurrent change only refuses. It holds neither the billing award fence nor any shared row, so a
 customer's index does not wait for, or block, another customer's award, reserve, release, expire, activation or index.
