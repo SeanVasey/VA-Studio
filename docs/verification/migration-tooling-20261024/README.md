@@ -302,3 +302,9 @@ The re-review's P3s are in the ledger:
 3. Wire `storeMaySellExclusives()` into exclusive activation and checkout in the owning lane, with a native race against
    a handover.
 4. T39 cutover rehearsal using `freeze` → post-freeze export → `import` → `delta` → `handover` → `revert`.
+
+## Independent review records
+
+- [`independent-mig-review-d456ee3b-DECISION.md`](independent-mig-review-d456ee3b-DECISION.md): APPROVE WITH CONDITIONS (C1 to C5).
+- [`independent-mig-rereview-41681c84-DECISION.md`](independent-mig-rereview-41681c84-DECISION.md): APPROVE WITH CONDITIONS (C1′).
+- [`independent-mig-c1prime-3f8c4336-DECISION.md`](independent-mig-c1prime-3f8c4336-DECISION.md): APPROVE WITH CONDITIONS; R-2 (P2) and V3 (P3) deferred as gates before `verified_grant` is consumed (deferred ledger, 2026-10-24).
