@@ -14,7 +14,6 @@ use App\Domain\Grants\Member\MemberGrantRecords;
 use App\Domain\Grants\Member\MemberGrantRows;
 use App\Domain\Grants\Member\MemberOriginalFinishBoundary;
 use App\Domain\Grants\Member\SealedMemberGrantFacts;
-use App\Domain\Memberships\Billing\BillingAwardFence;
 use App\Models\User;
 use App\Support\CanonicalJson;
 use Illuminate\Support\Facades\DB;
@@ -25,8 +24,11 @@ use WeakMap;
 /**
  * Bounded, read-only customer index of the authenticated owner's retained membership periods (C4d).
  *
- * One transaction locks the current owner first, then the fixed billing award fence that every award, reserve,
- * release, expire and activation takes before any membership row, then at most LIMIT + 1 of the owner's periods.
+ * One transaction locks the current owner first, then at most LIMIT + 1 of the owner's periods. It takes no global
+ * lock: every writer of an owner's period, credit event, redemption and activation rows (award, reserve, release,
+ * expire and the activation inspection) takes that same owner's T23 lock before its first membership read and holds
+ * it to commit, so the owner lock alone serializes the index against every writer of the rows it reads (C4e, review
+ * F3 option a). The global billing award fence, which serializes all customers' writers, is therefore not taken.
  * Every fetched period, the sentinel included, is authenticated through its complete retained ledger audit
  * (MembershipLedgerAudit::verify over the exact member-history scope) against the retained invoice semantics, the
  * period's immutable plan and the current owner's original buyer binding. Current proofs repeat before commit; a
@@ -124,9 +126,9 @@ final class MembershipCustomerIndex
                 $rows = new MembershipRows;
                 MembershipException::require($rows->identity() === $primary, 'changed_primary');
                 $access = new ProductionCustomerAccess;
-                // Current-owner lock first, then the fixed fence, then membership rows: the writers' lock order.
+                // Current-owner lock first, then membership rows: a subsequence of the writers' owner, fence, membership
+                // order, so no cycle can form. The owner lock serializes every writer of this owner's rows (F3).
                 $identity = $access->lock($principal, $actor, $rows->current());
-                (new BillingAwardFence)->lock($rows->identity());
                 $grantConfiguration = $grants->currentFor($rows);
                 MembershipException::require($membership['provenance'] === $principal->provenance
                     && $grantConfiguration['provenance'] === $principal->provenance, 'provenance');
