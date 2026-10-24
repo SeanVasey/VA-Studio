@@ -240,6 +240,60 @@ native selection **2524 selected tests in 244 files of 9663 discovered in 708**;
 The 51-file migration-pattern SQLite run was not repeated (last at `de11fdb4`); the amended migration is exercised by
 every test above on both engines.
 
+### Re-review round (`41681c84`, APPROVE WITH CONDITIONS, no P0/P1): C1′
+
+The re-review (scratchpad `mig-rereview-41681c84.md`, probe D) found R-1 (P2). Eligibility depended on the newest
+fully archived export's member list, but the reviewer exclusion did not cover that export's creator or segment actors.
+B could archive a "later export" equal to the baseline minus a competing exclusive sale (or minus a customer sharing the
+buyer's address), insert 0 rows, and then review the line alone.
+
+Fixed in `ff5f6c20` in two layers:
+
+1. **Absence never clears a blocker.** The blockers that depend on other records (`duplicate_exclusive_sale`,
+   `ambiguous_customer_identity`, `multiple_contracts`) read each record's latest archived version across all exports of
+   the source. An omitted record keeps its last version. Only a newer version clears the blocker, for example the
+   competing sale refunded.
+2. **The newest export's shapers are excluded.** Its batch creator, every segment actor recorded in the segment audit
+   events, and every actor who inserted a row in it cannot review.
+
+The coordinator asked for a reconciled-delta requirement as well. It is subsumed: an absence cannot clear a blocker under
+any condition, so no delta needs to be recorded first. The cost is that an owner-approved removal cannot clear a blocker
+either; such a line stays `archive_only` (documented in the guide; the ledger records it as unsupported).
+
+Layer 2 still matters with layer 1 in place. A newer version can clear a blocker legitimately, and whoever created that
+newer export must not be the one to review on it. `test_c1_prime_…` has B create the refunded export and D run its
+second segment; both are refused and C is admitted.
+
+Regression tests:
+
+- `test_c1_prime_omitting_a_competing_record_…` covers probe D for both blocker kinds plus the legitimate newer-version path.
+- `test_c1_prime_omitting_a_second_contract_…` covers the second-contract case.
+
+Against the `41681c84` review code both fail (2 tests, 2 failures; `evidence/rereview-tests-against-41681c84-review-code.txt`).
+
+Mutations (`evidence/rereview-mutations-ff5f6c20.txt`):
+
+- Killed: RR1 (segment actors not excluded), RR2 (exclusive read from newest members), RR3 (ambiguity read from newest
+  members), RR5 (contract multiplicity read from newest members; killed after the second-contract test was added).
+- RR4 (batch creator not excluded) survives as an equivalent mutation: the creator always runs the first segment, so it
+  is already a recorded segment actor. The check is kept as defence in depth.
+
+Wording: the packet and the deferred ledger now say the first P2-1 fix covered inserted and batch-created rows only.
+The re-review's P3s are in the ledger:
+
+- The operator-declared watermark is unbounded.
+- `reviewed_evidence_changed` is permanent for a line version (also documented in the guide).
+- RR-M2 is an equivalent mutation.
+
+**Tested source: `3f8c4336192312d35837f1d68b053eabb017f906`.**
+
+| Run | Result |
+| --- | --- |
+| SQLite, the 8 MIG test files | 70 tests, 823 assertions, 2 skipped (native-only races), exit 0 (`evidence/rereview-3f8c4336-sqlite-mig.txt`) |
+| Native MySQL 8.4.11, `LegacyHistoryReviewConditionsTest` | 7 tests, 199 assertions, exit 0, on a fresh private `mysqld` (port 3463 after `ss -ltnp`, socket `/tmp/migr3.sock`, own datadir; the other lanes' 3407, 3497 and 3613 were not touched), shut down with exit 0 and its datadir removed (`evidence/rereview-3f8c4336-mysql-review-conditions.txt`) |
+| Safeguards and `composer validate --strict` | 52 / 27 / 14 / 53 OK; valid |
+| Native selection | 2526 selected tests in 244 files of 9665 discovered in 708; both CI comments updated; skip censuses unchanged |
+
 ### Next dependencies
 
 1. Independent review of the migration and `app/Domain/Migration/History/*` at the exact SHA.
