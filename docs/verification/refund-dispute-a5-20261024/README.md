@@ -176,3 +176,9 @@ The native runs used `6ab0c98f`; `0e9520aa` only renames the four policy environ
 - Not wired: the production checkout chain (`FinancialReadPlan` output into this ledger), paid-grant/Tax/free/member delivery paths, per-grant holds in the owner download projection (enforced at issuance and redemption only), and a console operator command. (The staging capability boundary now pins `VASEY_TEST_REFUND_DISPUTE_ENABLED`; see the review round.)
 - Not implemented by design: provider refund initiation, license revocation, exclusive relisting, inventory restock, customer-facing refund messaging.
 - Independent review of the schema change and the money/access paths has not happened.
+
+## Independent review records and merge with main
+
+- [`independent-a5-review-470a79f7-DECISION.md`](independent-a5-review-470a79f7-DECISION.md): REJECT (P1: grouped customer list fails on MySQL with error 1055), plus P2s and P3s.
+- [`independent-a5-rereview-0e9520aa-DECISION.md`](independent-a5-rereview-0e9520aa-DECISION.md): APPROVE WITH CONDITIONS. The P1, every P2 and the P3s are fixed or documented; the remaining conditions are partial MySQL evidence (Foundation runs the full suites), the census union at merge, and Sean's policy values and U-08.
+- Merge `51e81694` brought in main `62e0296d` (PR #171, lane MIG). The SQLite census was unioned (main's 293 entries first, then A5's four: 297), and the native selection was regenerated as 2,557 of 9,701 cases in 248 files. The four safeguards and `test-database-receipts.py` pass. With both new migrations present (`264000` MIG and `264100` A5), the combined migration set passed on SQLite: the A5 and MIG migration tests, the seven older roundtrips, `ProductionBuyerAssentObservationsTest` and `StaffCommerceAdministrationTest`, 81 tests and 1,033 assertions.
