@@ -17,7 +17,7 @@ final class PublicStructuredData
     private const BRAND = 'VASEY.AUDIO';
 
     /** Owning brand per the repository's project notes; never VASEY/AI. */
-    private const OWNER = 'Sean Vasey Productions';
+    private const OWNER = 'Vasey Multimedia';
 
     private const LOGO_PATH = '/brand/vasey-audio-logo.png';
 

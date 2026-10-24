@@ -9,7 +9,7 @@ Branch `harness/domain-continuity-t36-20261024`, based on `786fb7c755291184f9e01
 - `app/Domain/Migration/LegacyRedirects/*` (new): map loader, validator and request resolver.
 - `app/Http/Middleware/LegacyRedirects.php` (new): global middleware, inert unless the flag is the literal `true`.
 - `app/Console/Commands/ValidateLegacyRedirects.php` (new): `vasey:redirects-validate`.
-- `config/legacy-redirects.php` (new) and one documented `.env.example` line.
+- `config/legacy-redirects.php` (new): the flag is a code literal, so no `.env.example` line was added.
 - `resources/legacy-redirects/map.json` (new): the reviewed, versioned map, one entry per inventory row.
 - `app/Support/PublicStructuredData.php` (new): schema.org JSON-LD for public pages.
 - Small edits: `app/Http/Controllers/StorefrontController.php`, `app/Http/Controllers/EditorialController.php` (attach structured data), `resources/views/app.blade.php` (server fallback tag), `resources/js/components/MetadataHead.tsx` and `resources/js/lib/catalog.ts` (keep the tag through Inertia navigation).
@@ -121,3 +121,12 @@ Each mutation was applied in a separate detached worktree of `9453334f` (`/home/
 ### Next dependency
 
 Resolving the 15 rows needs: live-site URL verification and owner control (cutover runbook), the public pages they would target (catalog listing, collections, kits, services, merch, memberships, licensing, legal pages) and the production customer-account decision U-07 for `/account/*`. Activation needs Sean's cutover authorization, a map with `--require-resolved` passing, and a reviewed change of the code-literal flag.
+
+## Independent review
+
+[Decision record](independent-review-8d2dcf3b-DECISION.md): **APPROVE WITH CONDITIONS** at `8d2dcf3b`, no P0 to P2; ten reviewer mutations all killed.
+Applied before the PR: P3-1 and P3-3 (guide notes on `/account/*` sources and public-only route targets), P3-5 (this
+README's `.env.example` sentence) and P3-6: the Organization's `parentOrganization` is now Vasey Multimedia, the merchant of
+record that does business as VASEY.AUDIO (Sean, 2026-10-24), instead of Sean Vasey Productions. Deferred: P3-2 (the map is
+re-read on every eligible request when enabled; a broken map would warn on each) and P3-4 (a cached 301 can outlive an
+unpublished target by up to an hour; nothing leaks).

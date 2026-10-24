@@ -40,6 +40,13 @@ There is no wildcard or pattern syntax, because no inventory row needs one. Sour
 
 Redirects run before the web middleware group, so they start no session and set no cookie.
 
+Two cautions for future map entries (independent review, 2026-10-24):
+
+- An `/account/*` source would not behave as described above: the prepended `CustomerPrivacy` middleware runs first, answers
+  any query string with 422 and replaces `Cache-Control` with `private, no-store`. All five account rows are unresolved today.
+- A `redirect` to a named route is checked for GET and no parameters only, not for being public. A reviewer adding one must
+  confirm the target is a public page.
+
 ## Validation rules
 
 `vasey:redirects-validate` fails (exit 1) when the inventory hash or row count differs from the pin, an inventory row has no entry, an entry is not an inventory row or its host/path differs, a `retained` path is not served, a `redirect` or `gone` path is served by a route (dead configuration), or a target is invalid: a missing or non-GET route, a route needing parameters, a non-https or non-allowlisted external URL, an external URL back to a legacy host, or a target that is another entry's source (chain) or its own source (loop). A content target that is not public right now is a warning, because the request path answers 404 until it is published. `--require-resolved` also fails while any row is unresolved; that is the cutover gate.

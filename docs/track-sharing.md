@@ -40,7 +40,7 @@ Added 2026-10-24 (lane T36, FP-014). `PublicStructuredData` adds one `<script ty
 
 | Page | schema.org types | Source |
 | --- | --- | --- |
-| Home | `Organization` (VASEY.AUDIO, parent organization Sean Vasey Productions, the existing `/brand/vasey-audio-logo.png`) and `WebSite` | Brand constants and the page metadata description |
+| Home | `Organization` (VASEY.AUDIO, parent organization Vasey Multimedia, the existing `/brand/vasey-audio-logo.png`) and `WebSite` | Brand constants and the page metadata description |
 | Public track | `MusicRecording` (title, artist as `MusicGroup`, genre, canonical URL, verified artwork) and a two-item `BreadcrumbList` | The filtered public catalog projection and the page metadata |
 | Blog entry | `BlogPosting` (headline, description, canonical URL, publisher) and a three-item `BreadcrumbList` | The active verified site release |
 

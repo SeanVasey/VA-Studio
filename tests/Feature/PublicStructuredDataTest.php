@@ -96,7 +96,7 @@ class PublicStructuredDataTest extends TestCase
         $this->assertSame([
             ['@type' => 'Organization', '@id' => 'https://audio.example.test/#organization', 'name' => 'VASEY.AUDIO',
                 'url' => 'https://audio.example.test/', 'logo' => 'https://audio.example.test/brand/vasey-audio-logo.png',
-                'parentOrganization' => ['@type' => 'Organization', 'name' => 'Sean Vasey Productions']],
+                'parentOrganization' => ['@type' => 'Organization', 'name' => 'Vasey Multimedia']],
             ['@type' => 'WebSite', '@id' => 'https://audio.example.test/#website', 'name' => 'VASEY.AUDIO', 'url' => 'https://audio.example.test/',
                 'description' => $this->get('/', $this->inertia())->json('props.metadata.description'),
                 'publisher' => ['@id' => 'https://audio.example.test/#organization']],
