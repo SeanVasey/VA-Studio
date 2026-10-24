@@ -18,7 +18,7 @@ class ProductionEnvironmentTemplateTest extends TestCase
     /** Config files whose env() keys belong to the payment/production preparation families. */
     private const FAMILY_CONFIG = ['production_checkout', 'payments', 'commerce', 'contracts', 'delivery', 'customer',
         'customer-suppression', 'production-customer-identity', 'production-identity-smtp', 'memberships',
-        'production-memberships', 'member-grants', 'free-grants', 'refund-resolution', 'unpaid-release', 'transactional-notifications'];
+        'production-memberships', 'member-grants', 'free-grants', 'refund-resolution', 'refund-dispute', 'unpaid-release', 'transactional-notifications'];
 
     /** Family config read in code only. Activation is a reviewed code change, never an environment switch. */
     private const CODE_LITERAL_FAMILY = ['customer-suppression', 'production-customer-identity', 'production-identity-smtp',

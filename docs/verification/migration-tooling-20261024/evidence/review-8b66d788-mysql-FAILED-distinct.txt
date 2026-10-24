@@ -1,0 +1,38 @@
+HEAD 8b66d78849f5b6025b82f5d2b8b0d28f096a26a5 mysqld 8.4.11
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/mig/phpunit.xml
+
+.......................E....                                      28 / 28 (100%)
+
+Time: 05:47.804, Memory: 91.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\Migration\LegacyHistoryReviewConditionsTest::test_c1_an_operator_who_inserted_any_evidence_row_cannot_review_it_even_in_another_operators_batch
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 3065 Expression #1 of ORDER BY clause is not in SELECT list, references column 'vaseyaudio_mig.legacy_history_customers.id' which is not in SELECT list; this is incompatible with DISTINCT (Connection: mysql, Host: 127.0.0.1, Port: 3463, Database: vaseyaudio_mig, SQL: select distinct `actor_id` from `legacy_history_customers` order by `id` asc)
+
+/home/user/wt/mig/vendor/laravel/framework/src/Illuminate/Database/Connection.php:864
+/home/user/wt/mig/vendor/laravel/framework/src/Illuminate/Database/Connection.php:820
+/home/user/wt/mig/vendor/laravel/framework/src/Illuminate/Database/Connection.php:433
+/home/user/wt/mig/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3640
+/home/user/wt/mig/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3900
+/home/user/wt/mig/tests/Feature/Migration/LegacyHistoryReviewConditionsTest.php:48
+/home/user/wt/mig/vendor/phpunit/phpunit/phpunit:104
+
+Caused by
+PDOException: SQLSTATE[HY000]: General error: 3065 Expression #1 of ORDER BY clause is not in SELECT list, references column 'vaseyaudio_mig.legacy_history_customers.id' which is not in SELECT list; this is incompatible with DISTINCT
+
+/home/user/wt/mig/vendor/laravel/framework/src/Illuminate/Database/Connection.php:442
+/home/user/wt/mig/vendor/laravel/framework/src/Illuminate/Database/Connection.php:853
+/home/user/wt/mig/vendor/laravel/framework/src/Illuminate/Database/Connection.php:820
+/home/user/wt/mig/vendor/laravel/framework/src/Illuminate/Database/Connection.php:433
+/home/user/wt/mig/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3640
+/home/user/wt/mig/vendor/laravel/framework/src/Illuminate/Database/Query/Builder.php:3900
+/home/user/wt/mig/tests/Feature/Migration/LegacyHistoryReviewConditionsTest.php:48
+/home/user/wt/mig/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 28, Assertions: 455, Errors: 1.
+exit=2

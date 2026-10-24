@@ -3,6 +3,7 @@
 namespace App\Domain\Delivery;
 
 use App\Domain\Commerce\Models\Order;
+use App\Domain\Commerce\RefundDispute\RefundDisputeAccess;
 use App\Domain\Customers\CustomerAccess;
 use App\Domain\Customers\CustomerPrincipal;
 use App\Domain\Customers\PurchaseAccess;
@@ -78,6 +79,7 @@ final class RedeemTestDelivery
                     throw new DeliveryException('changed');
                 }
                 $control = $evidence->control($fresh, $control, $current->control_version);
+                RefundDisputeAccess::assertClear($locked->id, (int) $current->license_grant_id);
                 $redemption = TestDeliveryRedemption::where('test_delivery_authorization_id', $current->id)->lockForUpdate()->first();
                 if ($redemption) {
                     $evidence->verifyRedemption($redemption, $current, $fresh, $freshTarget);
