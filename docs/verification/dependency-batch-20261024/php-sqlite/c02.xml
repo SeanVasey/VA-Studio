@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="92" assertions="610" errors="0" failures="0" skipped="43" time="643.842241">
+    <testsuite name="Tests\Feature\BulkTrackTagsConcurrencyTest" file="/home/user/wt/m4/tests/Feature/BulkTrackTagsConcurrencyTest.php" tests="3" assertions="0" errors="0" failures="0" skipped="3" time="0.000000">
+      <testcase name="test_overlapping_batches_with_separate_actors_wait_on_the_shared_track_and_the_loser_has_no_partial_changes" file="/home/user/wt/m4/tests/Feature/BulkTrackTagsConcurrencyTest.php" line="29" class="Tests\Feature\BulkTrackTagsConcurrencyTest" classname="Tests.Feature.BulkTrackTagsConcurrencyTest" assertions="0" time="0.000000">
+        <skipped/>
+      </testcase>
+      <testsuite name="Tests\Feature\BulkTrackTagsConcurrencyTest::test_authority_withdrawal_and_batch_serialize_on_the_persisted_actor_row" tests="2" assertions="0" errors="0" failures="0" skipped="2" time="0.000000">
+        <testcase name="test_authority_withdrawal_and_batch_serialize_on_the_persisted_actor_row with data set &quot;batch locks first&quot;" file="/home/user/wt/m4/tests/Feature/BulkTrackTagsConcurrencyTest.php" line="74" class="Tests\Feature\BulkTrackTagsConcurrencyTest" classname="Tests.Feature.BulkTrackTagsConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_authority_withdrawal_and_batch_serialize_on_the_persisted_actor_row with data set &quot;withdrawal locks first&quot;" file="/home/user/wt/m4/tests/Feature/BulkTrackTagsConcurrencyTest.php" line="74" class="Tests\Feature\BulkTrackTagsConcurrencyTest" classname="Tests.Feature.BulkTrackTagsConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\DiscoverySitemapConcurrencyTest" file="/home/user/wt/m4/tests/Feature/DiscoverySitemapConcurrencyTest.php" tests="1" assertions="0" errors="0" failures="0" skipped="1" time="7.980676">
+      <testcase name="test_native_same_ordinal_retry_and_different_completion_pointer_cas_have_observed_contention" file="/home/user/wt/m4/tests/Feature/DiscoverySitemapConcurrencyTest.php" line="16" class="Tests\Feature\DiscoverySitemapConcurrencyTest" classname="Tests.Feature.DiscoverySitemapConcurrencyTest" assertions="0" time="7.980676">
+        <skipped/>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\LicenseWriterConcurrencyTest" file="/home/user/wt/m4/tests/Feature/LicenseWriterConcurrencyTest.php" tests="14" assertions="0" errors="0" failures="0" skipped="14" time="0.000000">
+      <testsuite name="Tests\Feature\LicenseWriterConcurrencyTest::test_license_and_offer_publication_complete_in_both_orders_with_exact_user_or_license_fences" tests="4" assertions="0" errors="0" failures="0" skipped="4" time="0.000000">
+        <testcase name="test_license_and_offer_publication_complete_in_both_orders_with_exact_user_or_license_fences with data set &quot;same actor / license first&quot;" file="/home/user/wt/m4/tests/Feature/LicenseWriterConcurrencyTest.php" line="51" class="Tests\Feature\LicenseWriterConcurrencyTest" classname="Tests.Feature.LicenseWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_license_and_offer_publication_complete_in_both_orders_with_exact_user_or_license_fences with data set &quot;same actor / offer first&quot;" file="/home/user/wt/m4/tests/Feature/LicenseWriterConcurrencyTest.php" line="51" class="Tests\Feature\LicenseWriterConcurrencyTest" classname="Tests.Feature.LicenseWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_license_and_offer_publication_complete_in_both_orders_with_exact_user_or_license_fences with data set &quot;distinct actors / license first&quot;" file="/home/user/wt/m4/tests/Feature/LicenseWriterConcurrencyTest.php" line="51" class="Tests\Feature\LicenseWriterConcurrencyTest" classname="Tests.Feature.LicenseWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_license_and_offer_publication_complete_in_both_orders_with_exact_user_or_license_fences with data set &quot;distinct actors / offer first&quot;" file="/home/user/wt/m4/tests/Feature/LicenseWriterConcurrencyTest.php" line="51" class="Tests\Feature\LicenseWriterConcurrencyTest" classname="Tests.Feature.LicenseWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+      <testsuite name="Tests\Feature\LicenseWriterConcurrencyTest::test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes" tests="10" assertions="0" errors="0" failures="0" skipped="10" time="0.000000">
+        <testcase name="test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes with data set &quot;create / writer first&quot;" file="/home/user/wt/m4/tests/Feature/LicenseWriterConcurrencyTest.php" line="114" class="Tests\Feature\LicenseWriterConcurrencyTest" classname="Tests.Feature.LicenseWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes with data set &quot;create / withdrawal first&quot;" file="/home/user/wt/m4/tests/Feature/LicenseWriterConcurrencyTest.php" line="114" class="Tests\Feature\LicenseWriterConcurrencyTest" classname="Tests.Feature.LicenseWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes with data set &quot;update / writer first&quot;" file="/home/user/wt/m4/tests/Feature/LicenseWriterConcurrencyTest.php" line="114" class="Tests\Feature\LicenseWriterConcurrencyTest" classname="Tests.Feature.LicenseWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes with data set &quot;update / withdrawal first&quot;" file="/home/user/wt/m4/tests/Feature/LicenseWriterConcurrencyTest.php" line="114" class="Tests\Feature\LicenseWriterConcurrencyTest" classname="Tests.Feature.LicenseWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes with data set &quot;submit / writer first&quot;" file="/home/user/wt/m4/tests/Feature/LicenseWriterConcurrencyTest.php" line="114" class="Tests\Feature\LicenseWriterConcurrencyTest" classname="Tests.Feature.LicenseWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes with data set &quot;submit / withdrawal first&quot;" file="/home/user/wt/m4/tests/Feature/LicenseWriterConcurrencyTest.php" line="114" class="Tests\Feature\LicenseWriterConcurrencyTest" classname="Tests.Feature.LicenseWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes with data set &quot;approve / writer first&quot;" file="/home/user/wt/m4/tests/Feature/LicenseWriterConcurrencyTest.php" line="114" class="Tests\Feature\LicenseWriterConcurrencyTest" classname="Tests.Feature.LicenseWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes with data set &quot;approve / withdrawal first&quot;" file="/home/user/wt/m4/tests/Feature/LicenseWriterConcurrencyTest.php" line="114" class="Tests\Feature\LicenseWriterConcurrencyTest" classname="Tests.Feature.LicenseWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes with data set &quot;publish / writer first&quot;" file="/home/user/wt/m4/tests/Feature/LicenseWriterConcurrencyTest.php" line="114" class="Tests\Feature\LicenseWriterConcurrencyTest" classname="Tests.Feature.LicenseWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_all_license_mutations_serialize_current_role_withdrawal_before_resource_and_actor_fk_writes with data set &quot;publish / withdrawal first&quot;" file="/home/user/wt/m4/tests/Feature/LicenseWriterConcurrencyTest.php" line="114" class="Tests\Feature\LicenseWriterConcurrencyTest" classname="Tests.Feature.LicenseWriterConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\OrderInquiryConcurrencyTest" file="/home/user/wt/m4/tests/Feature/OrderInquiryConcurrencyTest.php" tests="11" assertions="0" errors="0" failures="0" skipped="11" time="0.000000">
+      <testsuite name="Tests\Feature\OrderInquiryConcurrencyTest::test_current_publication_operator_and_customer_fences_serialize_both_commit_orders" tests="11" assertions="0" errors="0" failures="0" skipped="11" time="0.000000">
+        <testcase name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders with data set &quot;exact duplicate&quot;" file="/home/user/wt/m4/tests/Feature/OrderInquiryConcurrencyTest.php" line="47" class="Tests\Feature\OrderInquiryConcurrencyTest" classname="Tests.Feature.OrderInquiryConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders with data set &quot;publication admission first&quot;" file="/home/user/wt/m4/tests/Feature/OrderInquiryConcurrencyTest.php" line="47" class="Tests\Feature\OrderInquiryConcurrencyTest" classname="Tests.Feature.OrderInquiryConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders with data set &quot;publication withdrawal first&quot;" file="/home/user/wt/m4/tests/Feature/OrderInquiryConcurrencyTest.php" line="47" class="Tests\Feature\OrderInquiryConcurrencyTest" classname="Tests.Feature.OrderInquiryConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders with data set &quot;role admission first&quot;" file="/home/user/wt/m4/tests/Feature/OrderInquiryConcurrencyTest.php" line="47" class="Tests\Feature\OrderInquiryConcurrencyTest" classname="Tests.Feature.OrderInquiryConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders with data set &quot;role withdrawal first&quot;" file="/home/user/wt/m4/tests/Feature/OrderInquiryConcurrencyTest.php" line="47" class="Tests\Feature\OrderInquiryConcurrencyTest" classname="Tests.Feature.OrderInquiryConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders with data set &quot;mfa admission first&quot;" file="/home/user/wt/m4/tests/Feature/OrderInquiryConcurrencyTest.php" line="47" class="Tests\Feature\OrderInquiryConcurrencyTest" classname="Tests.Feature.OrderInquiryConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders with data set &quot;mfa withdrawal first&quot;" file="/home/user/wt/m4/tests/Feature/OrderInquiryConcurrencyTest.php" line="47" class="Tests\Feature\OrderInquiryConcurrencyTest" classname="Tests.Feature.OrderInquiryConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders with data set &quot;credential admission first&quot;" file="/home/user/wt/m4/tests/Feature/OrderInquiryConcurrencyTest.php" line="47" class="Tests\Feature\OrderInquiryConcurrencyTest" classname="Tests.Feature.OrderInquiryConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders with data set &quot;credential withdrawal first&quot;" file="/home/user/wt/m4/tests/Feature/OrderInquiryConcurrencyTest.php" line="47" class="Tests\Feature\OrderInquiryConcurrencyTest" classname="Tests.Feature.OrderInquiryConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders with data set &quot;account admission first&quot;" file="/home/user/wt/m4/tests/Feature/OrderInquiryConcurrencyTest.php" line="47" class="Tests\Feature\OrderInquiryConcurrencyTest" classname="Tests.Feature.OrderInquiryConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_current_publication_operator_and_customer_fences_serialize_both_commit_orders with data set &quot;account withdrawal first&quot;" file="/home/user/wt/m4/tests/Feature/OrderInquiryConcurrencyTest.php" line="47" class="Tests\Feature\OrderInquiryConcurrencyTest" classname="Tests.Feature.OrderInquiryConcurrencyTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\PaidTaxDownloadNativeTest" file="/home/user/wt/m4/tests/Feature/PaidTaxDownloadNativeTest.php" tests="3" assertions="0" errors="0" failures="0" skipped="3" time="21.209053">
+      <testcase name="test_native_duplicate_authorizations_join_one_immutable_result_after_current_buyer_serialization" file="/home/user/wt/m4/tests/Feature/PaidTaxDownloadNativeTest.php" line="78" class="Tests\Feature\PaidTaxDownloadNativeTest" classname="Tests.Feature.PaidTaxDownloadNativeTest" assertions="0" time="5.961793">
+        <skipped/>
+      </testcase>
+      <testsuite name="Tests\Feature\PaidTaxDownloadNativeTest::test_native_redemption_duplicate_and_last_attempt_races_keep_one_spent_attempt" tests="2" assertions="0" errors="0" failures="0" skipped="2" time="15.247261">
+        <testcase name="test_native_redemption_duplicate_and_last_attempt_races_keep_one_spent_attempt with data set &quot;same authorization&quot;" file="/home/user/wt/m4/tests/Feature/PaidTaxDownloadNativeTest.php" line="110" class="Tests\Feature\PaidTaxDownloadNativeTest" classname="Tests.Feature.PaidTaxDownloadNativeTest" assertions="0" time="7.061329">
+          <skipped/>
+        </testcase>
+        <testcase name="test_native_redemption_duplicate_and_last_attempt_races_keep_one_spent_attempt with data set &quot;last retained attempt across two authorizations&quot;" file="/home/user/wt/m4/tests/Feature/PaidTaxDownloadNativeTest.php" line="110" class="Tests\Feature\PaidTaxDownloadNativeTest" classname="Tests.Feature.PaidTaxDownloadNativeTest" assertions="0" time="8.185932">
+          <skipped/>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionCheckoutNativeRaceTest" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutNativeRaceTest.php" tests="2" assertions="0" errors="0" failures="0" skipped="2" time="0.000000">
+      <testsuite name="Tests\Feature\ProductionCheckoutNativeRaceTest::test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order" tests="2" assertions="0" errors="0" failures="0" skipped="2" time="0.000000">
+        <testcase name="test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order with data set #0" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutNativeRaceTest.php" line="59" class="Tests\Feature\ProductionCheckoutNativeRaceTest" classname="Tests.Feature.ProductionCheckoutNativeRaceTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+        <testcase name="test_competing_assent_waits_on_exact_original_buyer_and_preserves_one_order with data set #1" file="/home/user/wt/m4/tests/Feature/ProductionCheckoutNativeRaceTest.php" line="59" class="Tests\Feature\ProductionCheckoutNativeRaceTest" classname="Tests.Feature.ProductionCheckoutNativeRaceTest" assertions="0" time="0.000000">
+          <skipped/>
+        </testcase>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantStaffMfaTest" file="/home/user/wt/m4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantStaffMfaTest.php" tests="3" assertions="21" errors="0" failures="0" skipped="0" time="26.443070">
+      <testcase name="test_the_shipped_panel_rule_does_not_require_mfa_here" file="/home/user/wt/m4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantStaffMfaTest.php" line="34" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantStaffMfaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantStaffMfaTest" assertions="3" time="7.140089"/>
+      <testcase name="test_staff_without_enrolled_mfa_is_refused_for_every_staff_action" file="/home/user/wt/m4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantStaffMfaTest.php" line="40" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantStaffMfaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantStaffMfaTest" assertions="15" time="11.854882"/>
+      <testcase name="test_enrollment_removed_after_the_actor_was_loaded_is_refused" file="/home/user/wt/m4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantStaffMfaTest.php" line="76" class="Tests\Feature\ProductionFreeGrants\ProductionFreeGrantStaffMfaTest" classname="Tests.Feature.ProductionFreeGrants.ProductionFreeGrantStaffMfaTest" assertions="3" time="7.448099"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" file="/home/user/wt/m4/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" tests="13" assertions="33" errors="0" failures="0" skipped="3" time="95.192998">
+      <testcase name="test_fresh_schema_owned_retry_preserves_t23_and_has_no_incoming_child_dependencies" file="/home/user/wt/m4/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="26" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="2" time="8.118970"/>
+      <testcase name="test_owned_contiguous_empty_prefix_resumes_but_hole_before_retained_guard_refuses" file="/home/user/wt/m4/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="36" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="3" time="7.839663"/>
+      <testcase name="test_foreign_table_same_as_reserved_guard_refuses_without_dropping_marker" file="/home/user/wt/m4/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="48" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="2" time="7.149744"/>
+      <testcase name="test_native_foreign_check_reserves_actual_global_symbol_before_any_owned_ddl" file="/home/user/wt/m4/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="57" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="0" time="7.668820">
+        <skipped/>
+      </testcase>
+      <testcase name="test_native_foreign_table_local_unique_does_not_pollute_owned_fk_dictionary" file="/home/user/wt/m4/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="71" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="0" time="8.038414">
+        <skipped/>
+      </testcase>
+      <testcase name="test_native_changed_enum_check_is_not_normalized_into_owned_provenance" file="/home/user/wt/m4/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="84" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="0" time="7.441851">
+        <skipped/>
+      </testcase>
+      <testcase name="test_data_bearing_partial_guard_prefix_refuses_and_retains_original_plan" file="/home/user/wt/m4/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="95" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="3" time="7.680286"/>
+      <testcase name="test_single_invoice_is_global_immutable_and_cannot_bind_different_persisted_owner" file="/home/user/wt/m4/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="109" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="5" time="7.018399"/>
+      <testcase name="test_reserved_intent_stays_pending_until_exact_distinct_member_purpose_terminal_event" file="/home/user/wt/m4/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="123" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="7" time="6.303693"/>
+      <testcase name="test_request_key_cannot_be_reused_across_periods_or_award_fabricate_grant_fields" file="/home/user/wt/m4/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="149" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="3" time="6.003398"/>
+      <testcase name="test_raw_reader_closes_after_framework_commit_and_direct_pdo_commit_reopen" file="/home/user/wt/m4/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="162" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="3" time="8.642577"/>
+      <testcase name="test_raw_reader_refuses_shadow_floor_and_preserves_owned_rows" file="/home/user/wt/m4/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="183" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="2" time="7.038490"/>
+      <testcase name="test_down_refuses_without_query_or_schema_mutation" file="/home/user/wt/m4/tests/Feature/ProductionMembership/MembershipSchemaPreparationTest.php" line="201" class="Tests\Feature\ProductionMembership\MembershipSchemaPreparationTest" classname="Tests.Feature.ProductionMembership.MembershipSchemaPreparationTest" assertions="3" time="6.248695"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" tests="25" assertions="228" errors="0" failures="0" skipped="6" time="359.016984">
+      <testsuite name="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest::test_live_current_license_cap_expires_during_the_ordinary_commit_delegate_and_clears_its_callback" tests="2" assertions="32" errors="0" failures="0" skipped="0" time="50.312538">
+        <testcase name="test_live_current_license_cap_expires_during_the_ordinary_commit_delegate_and_clears_its_callback with data set &quot;order&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="94" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="16" time="21.184632"/>
+        <testcase name="test_live_current_license_cap_expires_during_the_ordinary_commit_delegate_and_clears_its_callback with data set &quot;request&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="94" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="16" time="29.127906"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest::test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry" tests="4" assertions="60" errors="0" failures="0" skipped="0" time="69.235367">
+        <testcase name="test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set &quot;order&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="209" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="14" time="14.805888"/>
+        <testcase name="test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set &quot;request&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="209" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="15" time="17.957273"/>
+        <testcase name="test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set &quot;binding&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="209" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="16" time="19.550474"/>
+        <testcase name="test_late_configuration_withdrawal_rolls_back_each_new_write_and_its_callback_before_a_valid_retry with data set &quot;reviewed&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="209" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="15" time="16.921732"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest::test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence" tests="2" assertions="23" errors="0" failures="0" skipped="0" time="28.626913">
+        <testcase name="test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set &quot;binding&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="261" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="12" time="13.717636"/>
+        <testcase name="test_historical_owner_key_withdrawal_in_a_committing_delegate_rolls_back_new_provider_evidence with data set &quot;reviewed&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="261" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="11" time="14.909277"/>
+      </testsuite>
+      <testcase name="test_new_request_preserves_the_inclusive_creation_time_provider_lifetime_boundary" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="311" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="7" time="12.472700"/>
+      <testsuite name="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest::test_global_provider_identity_reuse_in_an_unrelated_request_refuses_before_commit" tests="2" assertions="25" errors="0" failures="0" skipped="0" time="28.161397">
+        <testcase name="test_global_provider_identity_reuse_in_an_unrelated_request_refuses_before_commit with data set &quot;binding&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="337" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="13" time="13.424664"/>
+        <testcase name="test_global_provider_identity_reuse_in_an_unrelated_request_refuses_before_commit with data set &quot;reviewed&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="337" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="12" time="14.736733"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest::test_historical_provider_evidence_survives_a_committing_password_change_even_if_current_status_refuses" tests="2" assertions="21" errors="0" failures="0" skipped="0" time="27.249797">
+        <testcase name="test_historical_provider_evidence_survives_a_committing_password_change_even_if_current_status_refuses with data set &quot;binding&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="416" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="10" time="12.959455"/>
+        <testcase name="test_historical_provider_evidence_survives_a_committing_password_change_even_if_current_status_refuses with data set &quot;reviewed&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="416" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="11" time="14.290342"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest::test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry" tests="4" assertions="48" errors="0" failures="0" skipped="0" time="62.340018">
+        <testcase name="test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set &quot;order catalog&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="457" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="12" time="13.881226"/>
+        <testcase name="test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set &quot;request catalog&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="457" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="12" time="15.860575"/>
+        <testcase name="test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set &quot;order credential&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="457" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="12" time="16.851172"/>
+        <testcase name="test_current_credential_or_catalog_withdrawal_refuses_new_order_and_request_before_a_clean_retry with data set &quot;request credential&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="457" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="12" time="15.747045"/>
+      </testsuite>
+      <testcase name="test_paid_review_retains_the_admitted_transport_identity_from_before_provider_reads" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="500" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="5" time="20.395176"/>
+      <testsuite name="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest::test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment" tests="4" assertions="0" errors="0" failures="0" skipped="4" time="30.672521">
+        <testcase name="test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set &quot;order&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="545" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="0" time="6.993154">
+          <skipped/>
+        </testcase>
+        <testcase name="test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set &quot;request&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="545" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="0" time="8.219722">
+          <skipped/>
+        </testcase>
+        <testcase name="test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set &quot;binding&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="545" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="0" time="6.324218">
+          <skipped/>
+        </testcase>
+        <testcase name="test_native_nontransactional_owned_table_refuses_before_any_new_write_even_with_a_misleading_comment with data set &quot;reviewed&quot;" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="545" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="0" time="9.135427">
+          <skipped/>
+        </testcase>
+      </testsuite>
+      <testcase name="test_native_global_binding_capture_reads_a_peer_commit_after_the_repeatable_read_snapshot" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="580" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="0" time="8.384291">
+        <skipped/>
+      </testcase>
+      <testcase name="test_native_raw_plan_row_wait_is_bounded_restored_and_cannot_commit_staged_work_or_touch_a_peer_frame" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="668" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="0" time="6.039248">
+        <skipped/>
+      </testcase>
+      <testcase name="test_late_paid_exception_retains_the_original_observation_after_current_offer_withdrawal_and_order_expiry" file="/home/user/wt/m4/tests/Feature/ProductionTaxCheckout/ProductionTaxCheckoutCommitAdmissionTest.php" line="735" class="Tests\Feature\ProductionTaxCheckout\ProductionTaxCheckoutCommitAdmissionTest" classname="Tests.Feature.ProductionTaxCheckout.ProductionTaxCheckoutCommitAdmissionTest" assertions="7" time="15.127019"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\PromotionPricingHttpTest" file="/home/user/wt/m4/tests/Feature/PromotionPricingHttpTest.php" tests="5" assertions="150" errors="0" failures="0" skipped="0" time="20.507544">
+      <testcase name="test_identifier_only_command_returns_versioned_private_pricing_and_preserves_old_quote_contract" file="/home/user/wt/m4/tests/Feature/PromotionPricingHttpTest.php" line="47" class="Tests\Feature\PromotionPricingHttpTest" classname="Tests.Feature.PromotionPricingHttpTest" assertions="30" time="10.384720"/>
+      <testcase name="test_foreign_sessions_and_login_context_cannot_access_or_reserve_promotions" file="/home/user/wt/m4/tests/Feature/PromotionPricingHttpTest.php" line="65" class="Tests\Feature\PromotionPricingHttpTest" classname="Tests.Feature.PromotionPricingHttpTest" assertions="14" time="2.581427"/>
+      <testcase name="test_malformed_bodies_and_client_policy_amounts_are_rejected" file="/home/user/wt/m4/tests/Feature/PromotionPricingHttpTest.php" line="76" class="Tests\Feature\PromotionPricingHttpTest" classname="Tests.Feature.PromotionPricingHttpTest" assertions="60" time="2.384878"/>
+      <testcase name="test_real_csrf_and_shared_quote_creation_throttle_apply" file="/home/user/wt/m4/tests/Feature/PromotionPricingHttpTest.php" line="88" class="Tests\Feature\PromotionPricingHttpTest" classname="Tests.Feature.PromotionPricingHttpTest" assertions="26" time="2.712843"/>
+      <testcase name="test_production_rejection_and_unexpected_errors_keep_private_generic_responses" file="/home/user/wt/m4/tests/Feature/PromotionPricingHttpTest.php" line="103" class="Tests\Feature\PromotionPricingHttpTest" classname="Tests.Feature.PromotionPricingHttpTest" assertions="20" time="2.443676"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\SoundKitDraftAdminTest" file="/home/user/wt/m4/tests/Feature/SoundKitDraftAdminTest.php" tests="8" assertions="139" errors="0" failures="0" skipped="0" time="63.537174">
+      <testcase name="test_only_current_verified_staff_can_open_the_page_and_there_is_no_delete_or_commerce_action" file="/home/user/wt/m4/tests/Feature/SoundKitDraftAdminTest.php" line="59" class="Tests\Feature\SoundKitDraftAdminTest" classname="Tests.Feature.SoundKitDraftAdminTest" assertions="15" time="6.290881"/>
+      <testcase name="test_real_create_edit_and_validation_use_versioned_domain_saves" file="/home/user/wt/m4/tests/Feature/SoundKitDraftAdminTest.php" line="75" class="Tests\Feature\SoundKitDraftAdminTest" classname="Tests.Feature.SoundKitDraftAdminTest" assertions="30" time="7.315597"/>
+      <testcase name="test_real_zip_upload_and_processor_result_are_inspectable_without_private_paths_or_rights_claims" file="/home/user/wt/m4/tests/Feature/SoundKitDraftAdminTest.php" line="90" class="Tests\Feature\SoundKitDraftAdminTest" classname="Tests.Feature.SoundKitDraftAdminTest" assertions="30" time="8.956299"/>
+      <testcase name="test_stale_editor_and_upload_keep_newer_draft_and_ignore_caller_revision_fields" file="/home/user/wt/m4/tests/Feature/SoundKitDraftAdminTest.php" line="118" class="Tests\Feature\SoundKitDraftAdminTest" classname="Tests.Feature.SoundKitDraftAdminTest" assertions="12" time="7.939471"/>
+      <testcase name="test_upload_field_does_not_describe_or_accept_a_stored_path_and_unsafe_zip_is_a_visible_error" file="/home/user/wt/m4/tests/Feature/SoundKitDraftAdminTest.php" line="130" class="Tests\Feature\SoundKitDraftAdminTest" classname="Tests.Feature.SoundKitDraftAdminTest" assertions="13" time="6.959418"/>
+      <testcase name="test_retry_queues_only_a_retained_waiting_revision_from_this_kit" file="/home/user/wt/m4/tests/Feature/SoundKitDraftAdminTest.php" line="142" class="Tests\Feature\SoundKitDraftAdminTest" classname="Tests.Feature.SoundKitDraftAdminTest" assertions="30" time="8.971895"/>
+      <testcase name="test_action_identity_revision_and_history_cannot_be_changed_from_the_caller" file="/home/user/wt/m4/tests/Feature/SoundKitDraftAdminTest.php" line="158" class="Tests\Feature\SoundKitDraftAdminTest" classname="Tests.Feature.SoundKitDraftAdminTest" assertions="4" time="8.248042"/>
+      <testcase name="test_mounted_upload_and_retained_inspection_recheck_current_authority_and_mfa" file="/home/user/wt/m4/tests/Feature/SoundKitDraftAdminTest.php" line="173" class="Tests\Feature\SoundKitDraftAdminTest" classname="Tests.Feature.SoundKitDraftAdminTest" assertions="5" time="8.855571"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\TestContractSuccessorActivationTest" file="/home/user/wt/m4/tests/Feature/TestContractSuccessorActivationTest.php" tests="4" assertions="39" errors="0" failures="0" skipped="0" time="49.954742">
+      <testcase name="test_explicit_legacy_policy_is_refused_before_current_request_capture" file="/home/user/wt/m4/tests/Feature/TestContractSuccessorActivationTest.php" line="75" class="Tests\Feature\TestContractSuccessorActivationTest" classname="Tests.Feature.TestContractSuccessorActivationTest" assertions="3" time="11.481166"/>
+      <testcase name="test_exact_v2_policy_captures_real_request_and_worker_preserves_one_original" file="/home/user/wt/m4/tests/Feature/TestContractSuccessorActivationTest.php" line="90" class="Tests\Feature\TestContractSuccessorActivationTest" classname="Tests.Feature.TestContractSuccessorActivationTest" assertions="15" time="14.113842"/>
+      <testcase name="test_pending_v1_preserves_request_and_never_substitutes_current_v2_on_absent_runtime" file="/home/user/wt/m4/tests/Feature/TestContractSuccessorActivationTest.php" line="128" class="Tests\Feature\TestContractSuccessorActivationTest" classname="Tests.Feature.TestContractSuccessorActivationTest" assertions="11" time="12.839866"/>
+      <testcase name="test_retained_v1_original_reads_remain_available_and_missing_bytes_are_restore_only" file="/home/user/wt/m4/tests/Feature/TestContractSuccessorActivationTest.php" line="157" class="Tests\Feature\TestContractSuccessorActivationTest" classname="Tests.Feature.TestContractSuccessorActivationTest" assertions="10" time="11.519867"/>
+    </testsuite>
+  </testsuite>
+</testsuites>
