@@ -73,11 +73,22 @@ producer is installed". Without `MembershipPaidInvoiceAuthority`, `MembershipPol
 `MembershipEligibleLicenseAuthority` and `MemberGrantAuthority` bindings every mounted route is the not-found
 response. Tests bind the real producers as `tests/Support/MemberActivationFixtures.php` does.
 
+## Locks taken by the index
+
+The index locks exactly the current owner's T23 identity rows (the rows every membership writer locks first) and
+reads everything else without locks: its period window, the owner's history and the shared plan-version,
+member-definition and member-profile rows. It re-proves those reads after commit in a new read-only frame and again
+before bytes, so a concurrent change only refuses. It holds neither the billing award fence nor any shared row, so a
+customer's index does not wait for, or block, another customer's award, reserve, release, expire, activation or index.
+Native evidence for this is phase B (see the packet).
+
 ## Before anything is enabled
 
 - Native MySQL evidence on an exact SHA with no deadline raised (review C2): index locks without the global fence, a
-  wait at a writer-held owner lock, completion while another customer holds the fence, pre-bytes after a reserve, the
-  reservation and release witness, the period-addressed positive path and index latency at 1, 10 and 100 periods.
+  wait at a writer-held owner lock, completion while other sessions hold the fence and the shared plan, definition and
+  profile rows, no wait when the definition and plan are taken in the reverse order mid-index, a real same-plan award
+  for another customer during the index, pre-bytes after a reserve, the reservation and release witness, the
+  period-addressed positive path and index latency at 1, 10 and 100 periods.
   This runs after lane G1 (schema ownership once per frame) merges.
 - Owner inputs: display wording, consumption and retention terms, and every policy, definition, profile and terms
   hash. None is approved by the 2026-10-18 decision.

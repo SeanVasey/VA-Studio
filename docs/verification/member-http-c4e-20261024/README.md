@@ -81,39 +81,82 @@ lane does not mount activation.
 
 ### Domain fixes
 
-**F3, option (a): the customer index no longer takes the global billing award fence.** `MembershipCustomerIndex`
-now locks the current owner and then the owner's period window, never `BillingAwardFence`. The pre-bytes re-run uses
-the same path, so it no longer takes the fence either.
+**F3, revised after the independent review (N1, N2): the index locks only the owner.** The first phase A commit
+(`a97b49bf`) dropped `BillingAwardFence` but kept `FOR UPDATE` on everything else the index reads. The review at
+`b3deef84` showed that this still serialized every customer behind the shared plan-version, member-definition and
+member-profile rows (N1: every award, reserve, release, expire and activation of every customer on the plan locks the
+plan row; even a zero-period index locked plan, definition and profile), and that without the fence those shared rows
+were locked in conflicting orders (N2: an InnoDB 1213 deadlock reproduced natively). The claims in the earlier packet,
+CHANGELOG, docblock and runtime doc were wrong and are corrected here.
 
-Why the owner lock is enough. The index reads one owner's periods, credit events, redemptions and member-activation
-graph. Every code path that writes those rows was enumerated (`INSERT`/`UPDATE` under `app/Domain/Memberships` and
-`app/Domain/Grants/Member`):
+The design now in `MembershipCustomerIndex` (commit listed under Tested source):
+
+- **One set of locks.** The only locking read in the index frame is `ProductionCustomerAccess::lock` on the current
+  owner's T23 rows (`users`, the single `customer_accounts` row, origin, verifications and challenge, `FOR UPDATE` on
+  MySQL through `IdentityRows::rows`, in that fixed order). These are the same rows, in the same order, that every
+  membership writer locks first and holds to commit.
+- **Everything else is a consistent read.** The period window (no `FOR UPDATE`), each period's events, redemptions and
+  member graph (`MemberActivationHistoryReader::capturePeriod(..., consistentRead: true)`, a new opt-in mode; writers
+  keep the locking default), each period's plan row and the approved definition, profile and plan
+  (`MemberGrantRows` with its existing non-locking flag; `definitionByHash` gained the same optional flag). The current
+  proof re-reads the same rows in the same snapshot.
+- **Pre-bytes** re-runs the same path, so it takes the same single lock.
+
+Why this is correct (consistency):
+
+1. All consistent reads of one REPEATABLE READ InnoDB transaction see one transactionally consistent snapshot, so the
+   index can never audit a torn state (for example a reserve event without its redemption).
+2. Every writer of the owner's rows is enumerated in the table below. Each takes the owner lock before its first
+   membership read and holds it to commit; award and reserve bind the principal to the invoice's original buyer
+   (`SealedMembershipPaidInvoice::sameOwner`). While the index holds the owner lock, none of them can commit.
+3. If the snapshot predates a writer that committed before the owner lock was granted, the audited state is
+   consistent but older. The terminal proof after the index commits runs in a new read-only committed frame
+   (`IdentityCommittedFrame`, a new transaction whose snapshot follows the index commit). It re-reads the window,
+   every period's complete history and the support rows and refuses on any difference (`changed_period_window`,
+   `changed_history`, `changed_policy_facts`). The pre-bytes proof repeats the whole read and compares the projection.
+   Staleness can therefore only refuse, never be released.
+4. Plan versions, member profiles and member definitions are append-only and immutable: their UPDATE and DELETE
+   triggers are `0 = 1` (`MembershipSchema::guards`, `MemberGrantSchema::guards`), their ids and hashes are unique
+   (insert guards and unique keys on `policy_hash`, `profile_hash`, `definition_hash`), and every guarded read
+   re-proves the exact triggers (`MembershipRows::assertCurrent`, `MemberGrantCurrentSchema::assertCurrent`). None of
+   them has a status, retirement or current-pointer column; currentness is the approved hashes in configuration,
+   which the index captures and re-proves. What a writer's `FOR UPDATE` on these rows protects is only the ordinary
+   locking-reader default; there is no state a locking read could exclude that an unlocked read could see. An
+   unlocked read can only miss a row committed after the read view, which refuses (`facts_absent`,
+   `policy_facts_absent`, `history_scope`). The availability test also proves on the real schema that UPDATE and
+   DELETE of those three rows are refused.
 
 | Writer | Rows written | Owner lock before its first membership read |
 | --- | --- | --- |
-| `MembershipAwardContext` (award) | period, award event | `access->lock` at line 73, before the invoice evidence and its fence |
+| `MembershipAwardContext` (award) | period, award event | `access->lock` at line 73 |
 | `MembershipReservationContext` reserve, release, expire | redemption, reserve/release/expire events | `access->lock` at line 130, first lock in the constructor |
-| `MembershipReservationContext` `inspect` (activation capture) and `MemberActivationInspection::insertActivation` | consume event, activation, member origin and artifact rows | the same constructor (line 130) runs first, inside the same owned transaction |
-| `MembershipPolicyVersions`, `MemberGrantRows` (staff) | plan versions, member profiles and definitions | immutable append-only rows; the index reads them by id or approved hash and compares raw bytes in its current and committed proofs |
-| `BillingLedger`, `BillingWebhookIntake`, `BillingSubscriptionApprovals` | billing rows and hints | not read by the index: it reconstructs the invoice semantics from the sealed period payload |
+| `MembershipReservationContext` `inspect` (activation capture) and `MemberActivationInspection::insertActivation` | consume event, activation, member origin and artifact rows | the same constructor (line 130), inside the same owned transaction |
+| `MembershipPolicyVersions`, `MemberGrantRows` (staff) | plan versions, member profiles and definitions | none needed: append-only, immutable rows, read unlocked and compared byte for byte |
+| `BillingLedger`, `BillingWebhookIntake`, `BillingSubscriptionApprovals` | billing rows and hints | not read by the index |
 
-`ProductionCustomerAccess::lock` reads the actor's `users` row, its single `customer_accounts` row, the origin,
-verification and challenge rows with `FOR UPDATE` on MySQL (`IdentityRows::rows`). Award and reserve bind the
-principal to the invoice's original buyer, so a writer that changes owner A's rows holds A's `users` and
-`customer_accounts` row locks from before its first membership read until it commits. The index takes the same locks
-first and holds them until it commits, so it sees every one of A's writers either wholly before or wholly after. The
-fence serialized the index against every customer's writers and added no consistency for A's rows.
+Why this removes N1 and N2 (availability):
 
-Lock order stays acyclic: writers take owner, fence, membership rows; the index takes owner, membership rows, a
-subsequence of the same order. A writer for owner B that addresses A's period locks B's owner and the fence, then
-refuses at the invoice owner check without writing. The index for A never waits for B's owner row or the fence.
+- The index never holds or requests a lock on the fence, a shared plan, definition or profile row, or any row or gap
+  of the owner's membership tables. No other customer's writer, activation or index can wait for it there, and it
+  cannot wait for them there.
+- After the owner lock it requests no further lock. Its only waits are while acquiring the owner's T23 rows, which
+  only transactions acting for the same owner hold. A lock-order cycle through the index would need another
+  transaction that holds a later one of those rows and waits for an earlier one; every `ProductionCustomerAccess::lock`
+  caller uses the same order. Identity-domain operations on the same owner (sign-in, recovery) lock the same rows in
+  their own order; that pre-existing exposure is shared by every membership writer and was not changed here.
+- Residual cross-customer effect: the owner lock's own reads (`customer_accounts` by `user_id`, origins by
+  `account_id`, verifications by `origin_id`) take next-key locks, whose gaps can briefly delay another customer's
+  identity insert into an adjacent gap. Gap requests never wait, so this cannot form a cycle; every membership writer
+  has the same exposure.
 
-Limits, recorded as untested conditions: on SQLite there are no row locks (local and testing only; verified
-production requires MySQL); the native lock evidence is phase B; the terminal proof after commit takes no lock, as
-before, and still refuses a concurrent change.
+Cost of the change, recorded as an untested condition: if the read view was created before the owner lock was granted
+and a same-owner writer committed during that wait, the index refuses (one not-found response; the next request
+succeeds) instead of waiting and answering as the locking design did. The snapshot is created at the first
+consistent read; the index's first membership read follows the owner lock, but schema checks before it may touch
+table metadata. Phase B measures this with a same-owner write during the owner-lock wait.
 
-Option (b) (lower the bound) was not chosen. It keeps the global serialization, and the bound already is the owner's
-own retained periods (at most 101 rows).
+Option (b) (restore the fence and lower the bound) was not needed: the unlocked design is safe by the argument above
+and removes the shared contention instead of bounding it.
 
 **F4.** `MembershipCustomerIndexAvailabilityTest` uses the existing synthetic monotonic membership clock
 (`MembershipAwardMonotonicClock`, the namespaced `hrtime` used by `MembershipAwardDeadlineTest`). No production seam
@@ -161,6 +204,12 @@ Operator detail is in `docs/ops/production-membership-http-runtime.md`.
 - **Rate limits.** Reads `throttle:10,1,production-memberships-reads`, writes `throttle:10,1,production-memberships-writes`,
   plus `block(20, 5)`. Same IP-keyed signature as D1.
 - **Body.** JSON only, at most 1 KiB, parsed by D1's `ProductionFreeBody::json` duplicate-key pass (reused, not edited).
+- **Index body allowlist (review N6, added after the review).** The index projection is rebuilt from exact key lists
+  at every level (index, period, balances, applicable definition, reservation). Any other key refuses with the one
+  not-found response, so a new domain field cannot reach a customer unreviewed.
+- **No session before the seam (review N3, added after the review).** The runtime-withdrawal test asserts that an
+  unmounted request carries no session cookie, and the shipped-gates test that a mounted one does, so removing the
+  seam's own mount check (which the controller check would otherwise mask) now fails.
 
 ### Not built in phase A, and why
 
@@ -172,6 +221,73 @@ Operator detail is in `docs/ops/production-membership-http-runtime.md`.
 | Capability bindings in `AppServiceProvider` | Installing the invoice, license and grant producers is not part of the C4 approval |
 | Frontend page | Customer wording is an unapproved owner input |
 | Per-customer rate-limit key | D1 parity first; a follow-up |
+
+## Independent review at `b3deef84` and follow-up
+
+Decision: **APPROVE WITH CONDITIONS** (`scratchpad/c4e-review-b3deef84.md`), no P0 or P1. The HTTP layer, F4, F6, the
+census rename and the tests held. Findings and their resolution:
+
+| ID | Sev | Finding | Resolution |
+| --- | --- | --- | --- |
+| N1 | P2 | The index still took `FOR UPDATE` on the shared plan, definition and profile rows that every same-plan writer locks, so customers still serialized; even a zero-period index locked them. The F3 claims were wrong | The index now locks only the owner's T23 rows (design and proof under F3 above); claims corrected in this packet, `CHANGELOG.md`, the class docblock, the runtime doc and the native test docblock |
+| N2 | P2 | Without the fence those shared rows were locked in conflicting orders (index plan then definition; zero-period index definition then plan; activation plan then definition); native 1213 | Same change: the index requests no lock after the owner lock, so no cycle through shared or membership rows can include it |
+| N3 | P3 | Removing the seam's own mount check passed every test, but issued a session cookie | Cookie absence asserted for unmounted requests, presence for mounted ones (mutant SM7 killed) |
+| N4 | P3 | F6 commit-throws fallback unpinned | Kept as an untested condition; activation is not mounted |
+| N5 | P3 | Non-membership writer failure is 503; billing evidence read before the owner comparison (pre-existing) | Noted under untested conditions |
+| N6 | P3 | Index body had no HTTP allowlist | Exact key allowlist at every level (mutants SM6, SM6b killed) |
+| N7 | P3 | Per-IP rate limits | Deferred: a per-customer limiter before any non-local mount |
+
+Follow-up commits (local only):
+
+| Commit | Content |
+| --- | --- |
+| `bde867f6` | Index locks only the owner's T23 rows; consistent-read history capture; non-locking `definitionByHash`; source census and on-schema immutability test; native cases; census (two renamed in place at 284 and 291, two appended, 294 entries) |
+| `a9147db8` | N6 index allowlist; N3 cookie assertions |
+| `9d1e09f6` | Native selection count: 2490 of 9573 cases in 237 files |
+| (packet commit) | This section, the corrected F3 text, the probe and the phase B plan |
+
+Two files beyond the work package's stated ownership were edited, each with an opt-in default-preserving parameter:
+`app/Domain/Grants/Member/MemberActivationHistoryReader.php` (`consistentRead`) and
+`app/Domain/Grants/Member/MemberGrantRows.php` (`definitionByHash(..., $committed)`). Lane G1 does not touch either;
+every existing caller keeps the locking default.
+
+**Tested source for the follow-up: `9d1e09f6`.** The packet commit after it changes only documentation.
+
+SQLite runs on the follow-up (the brief's direct PHPUnit command, in-memory SQLite, `public/build` absent; `git status
+--short` empty at the start of each final run):
+
+| Run | HEAD | Selection | Result |
+| --- | --- | --- | --- |
+| f2A | `9d1e09f6` | `tests/Feature/ProductionMembershipHttp` | 39 tests, 1,508 assertions, exit 0 |
+| f2B | `9d1e09f6` | `MembershipCustomerIndexAvailabilityTest`, `MembershipCustomerIndexTest` | 17 tests, 300 assertions, exit 0 |
+| f2C | `9d1e09f6` | `tests/Feature/ProductionMemberGrants` (writers' locking history capture unchanged) | 26 tests, 488 assertions, 7 native skips, exit 0 |
+| f2D | `9d1e09f6` | `MembershipPeriodAddressedOperationsTest`, `MembershipCommitWitnessTest`, `MembershipNativeCustomerIndexTest`, `StagingEnvironmentAdmissionTest` | 30 tests, 394 assertions, 6 native skips, exit 0 |
+| f2E | `9d1e09f6` | `MemberActivationHistoryReaderTest`, `MemberActivationHistoryQueriesTest`, `tests/Feature/ProductionMemberActivation` | 49 tests, 139 assertions, exit 0 |
+| idx2 | working tree | `MembershipCustomerIndexTest` | 1 error in the reserve fixture (`private_bytes`): a hard-link copy made during the run changed a fixture file's link count; not a code fault. Re-run idx3: 12 tests, 191 assertions, exit 0 |
+| safeguards | `9d1e09f6` content | the four `scripts/ci/test-*.py` | 52, 27, 14, 53 tests OK; each exit 0 |
+| selection | `9d1e09f6` content | `phpunit-shards.py ... --mysql-native-selection` | exit 0, 2490 of 9573 in 237 files |
+
+`git merge-tree` of `9d1e09f6` with G1's current head `a1414f1c` reports conflicts only in the two workflow count
+comments and `docs/handoff/2026-10-17/RESUMPTION.md`; no application file overlaps.
+
+Mutations of the follow-up. SQLite mutants ran in a hard-link copy by atomic replacement, each restored and compared;
+`diff -rq app routes` against the worktree was empty before the copy was removed. Native mutants (NM, in the probe
+table above) ran in the pre-G1 probe copy the same way.
+
+| ID | Mutation | Test | Result |
+| --- | --- | --- | --- |
+| SM1 | window `FOR UPDATE` inside the index transaction | availability lock-shape census | **Killed** (also NM2b natively) |
+| SM2 | per-period plan read back to `$rows->one(...)` | same | **Killed** (also NM1 natively) |
+| SM3 | `definitionByHash` locking | same | **Killed** |
+| SM4 | history capture without `consistentRead` | same | **Killed** (also NM4 natively) |
+| SM5 | history reader ignores `consistent_read` | same | **Killed** |
+| SM6 | `indexBody` returns its input unchecked | mount test, allowlist | **Killed** |
+| SM6b | controller sends the raw projection | mount test, allowlist | **Killed** |
+| SM7 | seam's own mount check removed (review R11) | mount test, runtime withdrawal (cookie) | **Killed** (7 failures) |
+
+On SQLite the lock-shape mutants are killed by a source census, because SQLite has no row locks; the native probe
+kills the plan, window, history and fence mutants by behaviour (NOWAIT 3572). The definition-read mutant (SM3) has no
+native kill in the probe (the n1 definition probe would show it; not run as a separate mutant).
 
 ## Files changed
 
@@ -247,7 +363,7 @@ Vendor: a byte copy of `/home/user/wt/o4/vendor` (same `composer.lock` as `a08e7
 | composer | same | `composer validate --strict` | valid, exit 0 |
 | diff | final | `git diff --check a08e79ca..HEAD`; a pattern grep of the diff for live or test keys, webhook secrets, private keys and passwords | clean; none |
 
-### Final confirmation on the final source
+### Final confirmation on the first candidate (`b3deef84`, before the review)
 
 **Tested source: `b3deef84`.** Its application, route, bootstrap and configuration files equal `7892227f`; the commits
 after it change tests, census, documentation and one workflow comment only. The packet commit that follows changes
@@ -302,55 +418,110 @@ against the worktree was empty at the end. Driver and specs: `scratchpad/c4e-mut
 
 ## Census and selection
 
-- `scripts/ci/database-sqlite-skips.json`: the two renamed `MembershipNativeCustomerIndexTest` methods keep their
-  positions (284 and 285, beyond the hash-pinned first 150); the new
-  `test_native_index_completes_while_another_customers_writer_holds_the_global_fence` is appended (291 to 292 entries).
-  The first-150 hash is unchanged (`d93da4e7…`). This is a rename in place plus one append, not a pure append: the
-  old names no longer exist, and the census must match the skipped methods exactly.
-- The MySQL skip census is unchanged: no new test is SQLite-only.
+- `scripts/ci/database-sqlite-skips.json`, final state 294 entries (main had 291). All changes lie beyond the
+  hash-pinned first 150 (`d93da4e7…`, unchanged); indexes are 0-based:
+  - entry 284: `test_native_index_holds_owner_fence_and_period_locks_until_commit_then_releases_them` (C4d) renamed in
+    place, finally to `test_native_index_locks_only_the_owner_rows_until_commit_then_releases_them`;
+  - entry 285: renamed in place to `test_native_index_waits_at_a_writer_held_owner_lock_and_retains_no_lock_after_refusal`;
+  - entry 291 (appended in phase A, renamed in the follow-up):
+    `test_native_index_and_a_zero_period_index_complete_while_other_sessions_hold_the_fence_and_shared_rows`;
+  - entries 292 and 293 appended: `test_native_index_never_waits_when_another_session_takes_the_definition_then_the_plan_mid_index`
+    and `test_native_same_plan_award_for_another_customer_runs_while_the_index_is_open`.
+
+  Renames in place are not a pure append; they are required because the census must match the skipped methods
+  exactly and the old names no longer exist (the reviewer accepted this).
+- The MySQL skip census is unchanged: no new test is SQLite-only. The same-plan writer case reuses the existing
+  `tests/Support/membership-award-race-worker.php`, already in the native selection's helper list.
 - `phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json
-  --mysql-native-selection`: exit 0, 2488 selected of 9569 discovered cases in 237 selected files (was 2487 of 9523).
-  First proved as 2488 of 9568 at `5cd139b5`; the one F6 case added in `b05f63fc` makes 9569, re-proved at `b3deef84`.
-  The generated `phpunit-ci-mysql-*` files and manifest were deleted. Both workflow count comments updated.
+  --mysql-native-selection` at `9d1e09f6`'s content: exit 0, 2490 selected of 9573 discovered cases in 237 selected
+  files (main: 2487 of 9523). Generated `phpunit-ci-mysql-*` files deleted; both workflow count comments updated.
+
+## Pre-G1 native probe of the revised lock design
+
+Characterization only, not acceptance: a private Oracle MySQL 8.4.11 (`/opt/mysql-8.4.11/bin/mysqld`, own datadir under
+the session scratchpad, port 3407, `performance_schema` on, `REPEATABLE-READ`, `--skip-log-bin`,
+`--innodb-flush-log-at-trx-commit=2`), database `vaseyaudio_c4e_preg1`, `VA_LOCAL_DISPOSABLE_MYSQL`, one PHPUnit process
+at a time, no deadline raised. It ran the committed `MembershipNativeCustomerIndexTest` methods from a hard-link scratch
+copy of the worktree in which only `indexFixture()` differs: it awards without a reserve (as the reviewer's probe did),
+because the reserve overruns its 60 s budget on this host before G1, and it accepts a `committed_receipt_refused`
+award receipt (the award is durable; its post-commit proof can overrun). Application sources were byte-identical to
+the tested source.
+
+| Run | Method (or mutant) | Result |
+| --- | --- | --- |
+| n1 | `test_native_index_locks_only_the_owner_rows_until_commit_then_releases_them` | **OK** (1 test, 28 assertions, 335 s): inside the index, NOWAIT gives `owner_account` and `owner_user` 3572; `fence`, `plan`, `definition`, `profile` and the owner's `period` 0; after commit all 0 |
+| n2 | `test_native_index_waits_at_a_writer_held_owner_lock_and_retains_no_lock_after_refusal` | **OK** (1/23, 283 s): 1205 at the held `users` row, nothing retained. The fixture award's receipt was `committed_receipt_refused` (post-commit proof overran pre-G1; the award is durable) |
+| n3 | `test_native_index_and_a_zero_period_index_complete_while_other_sessions_hold_the_fence_and_shared_rows` | **OK** (1/22, 385 s): with another session holding the fence, plan, definition and profile `FOR UPDATE` and a 1 s wait bound, the member's index (plus pre-bytes) and a zero-period customer's index both complete; the session still held all four |
+| n4 | `test_native_index_never_waits_when_another_session_takes_the_definition_then_the_plan_mid_index` | **OK** (1/16, 425 s): inside the index's period phase another session took the definition, then requested the plan asynchronously; its plan request was already granted at the index's commit point, and the index completed (the N2 order, which deadlocked before) |
+| n5, n5b | `test_native_same_plan_award_for_another_customer_runs_while_the_index_is_open` (first two versions) | n5: the award for another customer succeeded with no wait on the index, but the test's own result assertion was wrong (`??` on a null). n5b: the test waited for the whole award inside the index, which then exceeded its own 60 s budget pre-G1 (`operation_deadline`). Both were test-structure faults, fixed |
+| n5c | the same method, final version | **OK** (1/22, 383 s): a real award for a second customer on the same plan, in a separate process started with the index transaction, took the shared plan row (or finished) while the index was open, never appeared in `performance_schema.data_lock_waits` blocked by the index's connection, and completed; the index completed with its one period |
+| NM1 | index plan read back to `$rows->one(...)` (locking) | **Killed**: n1 sees `plan` 3572 |
+| NM2 | window `FOR UPDATE` in every phase | Killed, but incidentally (the read-only committed frame refuses `FOR UPDATE`, 1792); replaced by NM2b |
+| NM2b | window `FOR UPDATE` only inside the index transaction | **Killed**: n1 sees `period` 3572 |
+| NM3 | fence re-added after the owner lock | **Killed**: n1 sees `fence` 3572 |
+| NM4 | history capture back to its locking default | **Killed**: n1 sees `period` 3572 |
+
+Not covered by the probe: the activation-specific shared reads of the history reader (they occur only for periods
+with activations, which need a reserve) and the reservation-dependent pre-bytes case; both are phase B with the real
+fixture. The server was shut down and its datadir removed after the runs (see Cleanup).
 
 ## Phase B: native evidence plan (after G1 merges)
 
 Run on a private `/opt/mysql-8.4.11/bin/mysqld` (never `/usr/sbin/mysqld`, which is 8.0), own datadir under the
-session scratchpad, unused port, `VA_LOCAL_DISPOSABLE_MYSQL`, database `vaseyaudio_member_c4e`, `REPEATABLE-READ`,
-no deadline raised, on the exact merged SHA (C4e rebased or merged onto main with G1), one PHPUnit process per chunk.
+session scratchpad, unused port, `performance_schema` on (the same-plan writer case reads `data_lock_waits`),
+`VA_LOCAL_DISPOSABLE_MYSQL`, database `vaseyaudio_member_c4e`, `REPEATABLE-READ`, no deadline raised, on the exact
+merged SHA (C4e rebased or merged onto main with G1), one PHPUnit process per chunk, with the real
+`memberActivationFixture()` (award and reserve):
 
-1. `MembershipNativeCustomerIndexTest` (three of its four methods are new or renamed by F3):
-   owner and period locks held with the fence free; a wait (1205) at a writer-held owner `users` row with nothing
-   retained; completion while another session holds the fence; pre-bytes after a reserve.
-2. `MembershipNativeCommitWitnessTest` reservation case and `MembershipCommitWitnessTest` reserve, delegate and release
-   cases on MySQL (the reservation and release witness).
-3. `MembershipPeriodAddressedOperationsTest` positive case on MySQL.
-4. `MemberActivationCommitWitnessTest` and `MembershipHttpTest` on MySQL (F6 and the HTTP mapping natively).
-5. F3 latency. A scratch harness (not committed): build `memberActivationFixture()`, add synthetic older periods in
-   the retained format (as `MembershipCustomerIndexTest::syntheticPeriods`) to reach 1, 10 and 100 periods; for each,
-   time three index plus pre-bytes calls and record statements per call from a general log. Then, with another
-   customer's session holding `production_membership_billing_award_fence` `FOR UPDATE`, repeat the 100-period call
-   to show it completes and does not wait, and have that session run a real award for another customer while the
-   index of 100 periods runs, to show neither waits for the other. Report wall time and statement counts; if the
-   100-period index exceeds its own 60 s budget after G1, that is a finding (lower the bound or page), not a cap to
-   raise.
-
-The pre-G1 native probe the brief allowed was not attempted: every native case above needs `memberActivationFixture`,
-whose reserve overruns its fixed 60 s budget on this host before G1 (C4d packet and review N2), so a pre-G1 run
-would measure the known writer overrun, not the index.
+1. `MembershipNativeCustomerIndexTest`, all six methods:
+   - only the owner's T23 rows held inside the index; fence, plan, definition, profile, the owner's period and
+     redemption free; nothing retained after commit;
+   - a wait (1205) at a writer-held owner `users` row, nothing retained;
+   - the member's and a zero-period customer's index complete while another session holds the fence, plan,
+     definition and profile rows;
+   - mid-index, another session takes the definition and then the plan: its plan request is granted while the index
+     is still open, and the index completes (the N2 order);
+   - a real same-plan award for another customer, in a separate process, runs from the start of the index transaction
+     to its commit and never waits for a lock the index holds;
+   - pre-bytes after a reserve.
+2. A same-owner reserve that commits while the index waits at the owner lock: record whether the index answers or
+   refuses (`changed_period_window` or `changed_before_bytes`), to measure the cost noted above.
+3. The C4d C2 cases: `MembershipNativeCommitWitnessTest` reservation case, `MembershipCommitWitnessTest` reserve,
+   delegate and release on MySQL (reservation and release witness), and the `MembershipPeriodAddressedOperationsTest`
+   positive path.
+4. `MemberActivationCommitWitnessTest` and `MembershipHttpTest` on MySQL.
+5. Index latency at 1, 10 and 100 periods (scratch harness, not committed): `memberActivationFixture()` plus synthetic
+   older periods in the retained format (as `MembershipCustomerIndexTest::syntheticPeriods`); three index plus
+   pre-bytes calls each, wall time and statements per call from a general log; then the 100-period index while
+   another customer's real award runs, showing neither waits. If 100 periods exceeds the 60 s budget after G1, that is
+   a finding (lower the bound or page), not a cap to raise.
 
 ## Untested conditions
 
-- No native MySQL evidence for anything in this lane (phase B). The F3 fence removal is proved natively only by the
-  phase B NOWAIT and latency runs; on SQLite it is pinned by a source census and by behaviour.
-- No independent-process race between the index and a writer; the argument is the owner-lock enumeration above.
-- The per-period history reads on MySQL: if any is a non-locking consistent read taken before the owner lock is
-  granted, a writer that committed while the index waited would make the index refuse (fail closed), not leak. Not
-  exercised.
+- No native MySQL evidence on an exact SHA for anything in this lane (phase B). The pre-G1 probe above is
+  characterization on a probe fixture.
+- The lock design's freshness cost: a same-owner write that commits during the index's owner-lock wait may make the
+  index refuse if its read view predates the wait. Not measured (phase B item 2).
+- The real same-plan writer case and the reverse-order case run in one process with one or two independent sessions;
+  there is no long-running multi-process race.
+- Identity-domain operations (sign-in, recovery) on the same owner lock the owner's identity rows in their own order;
+  a cycle with the index there is possible in principle, as with every membership writer, and is not exercised.
+- Gap locks taken by the owner lock's own reads can briefly delay another customer's identity insert into an adjacent
+  gap; not measured.
 - `PDO::commit()` that throws while the PDO still reports a transaction (for example a lost connection with a stale
   status) is reported by activation as `source_refused` and by the writers as `operation_refused`. HTTP presents the
-  writers' case as outcome-unknown; activation is not mounted.
+  writers' case as outcome-unknown; activation is not mounted (review N4: the activation fallback stays unpinned).
+- A writer failure before commit that is not a `MembershipException` (for example a billing decrypt error) is
+  outcome-unknown (503), and for a known foreign period id the billing evidence is read before the owner comparison
+  (pre-existing, review N5).
 - No HTTP evidence under PHP-FPM, a real web server, a proxy or a browser. No slow-client bound beyond the session
   block and the throttle.
-- Rate limits are per client address (D1 parity), not per customer.
+- Rate limits are per client address (D1 parity), not per customer (review N7); a per-customer limiter is required
+  before any non-local mount.
 - No Foundation run, no hosted CI, no host, provider or production evidence.
+
+## Cleanup
+
+The pre-G1 server (port 3407) was shut down with `mysqladmin shutdown`, and its datadir, the probe copy and the
+mutation copies were removed. Logs and JUnit files stay in `scratchpad/c4e-ev/runs/`; mutation drivers and results
+in `scratchpad/c4e-mut-driver/`.
