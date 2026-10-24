@@ -270,11 +270,26 @@ outright and started on the new release.
 | `vasey-staging-payments` | `payments` | `ProcessStripeReceiptJob`, `FinalizeTestPaymentJob` (90 s, 1 try) | `--timeout=90 --tries=1` | 120 |
 | `vasey-staging-contracts` | `contracts` | `IssueTestContractJob` (90 s, 1 try; renders in a PHP CLI child) | `--timeout=90 --tries=1` | 120 |
 | `vasey-staging-default` | `default,inquiry-alerts` | `ProcessSoundKit` (900 s), `BuildDiscoverySitemapWindow` (30 s), `RetrieveMembershipInvoice`, `DeliverProductionIdentityNotice`, `NotifyInquiryOperatorJob` (30 s) | `--timeout=120 --tries=1` (jobs' own values win) | 960 |
-| `vasey-staging-scheduler` | n/a | `schedule:work`, which equals the documented every-minute cron: `vasey:publish-scheduled-site-release` | n/a | 120 |
+| `vasey-staging-scheduler` | n/a | `schedule:work`, which equals the documented every-minute cron: `vasey:publish-scheduled-site-release` every minute and `vasey:cache-prune-expired` hourly at :23 (see "Cache housekeeping" below) | n/a | 120 |
 
 `DB_QUEUE_RETRY_AFTER=1200` exceeds the longest job (900 s) and the media claim lease (960 s). Don't add a
 Forge Scheduler entry or Forge Daemons as well. Payment pipeline commands that need a schedule or a loop
 (receipt processing, reconciliation, activation) belong to Lane B (`ops/staging/test-commerce/`).
+
+### Cache housekeeping
+
+`CACHE_STORE=database` is required here (the deploy script refuses anything else): per-buyer heavy-work locks, the login and
+other throttles, Filament's TOTP replay records and, since Filament 5.10, undelivered staff flash notifications (plain text, kept
+for `SESSION_LIFETIME` minutes, 480 on staging) all live in the `cache` and `cache_locks` tables, so every web process and worker
+must share that one database store. Laravel deletes an expired row only when that exact key is read, so the scheduler also runs
+`vasey:cache-prune-expired` hourly at :23 (independent review R3 of the Filament 5.10.2 update). It deletes rows whose
+`expiration` is at or before now, in batches of 1,000 keys, from both tables, and prints counts only. It never deletes an
+unexpired row, so throttles, held locks and the TOTP replay records (`forever` is ten years ahead) are untouched. Do not
+substitute `cache:clear` or `cache:flush` in a cron or a runbook: they reset those. Run it by hand with
+`sudo -u forge php /srv/vasey-staging/current/artisan vasey:cache-prune-expired`; it is safe to run at any time and does nothing when
+the default store is not `database`. It starts running on the first scheduler tick after the release that contains it is the served
+`current` (`schedule:work` starts a fresh `schedule:run` process each minute); there is nothing to install. A quiesce stops the
+scheduler, and the prune is a child of `schedule:run`, which the quiesce's process check already waits for.
 
 ### Limits in nginx and PHP
 
