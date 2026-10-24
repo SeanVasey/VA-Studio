@@ -102,7 +102,13 @@ by at most about an hour plus the run time (independent review R3 of the Filamen
 notification is `SESSION_LIFETIME`). It is a production requirement that the scheduler is
 running, `CACHE_STORE=database` is set, and the cache is one shared persistent store (not `array`, and not a `file` store that
 differs between hosts): otherwise notifications that cross requests and TOTP replay records are lost or not shared. Never clear the
-cache to tidy it; that resets the throttles and the TOTP replay records. Nothing has run on a host (above), and the production host
+cache to tidy it; that resets the throttles and the TOTP replay records. The command prunes every distinct database store the
+application uses (the default, `filament.cache_store`, `cache.limiter` and the database members of a `failover` store); a store of
+another type is left to that store, and a host that moves one of them to a Redis or file store owns its expiry there. Expiry is
+judged by the scheduler host's clock, so when more than one host shares the cache (U-02) every host, the scheduler's included,
+must run NTP time sync (`timedatectl show -p NTPSynchronized` reads `yes`): a scheduler clock ahead of the web hosts by N seconds
+removes rows up to N seconds early, which shortens a throttle window by that much (Laravel's own read path has the same exposure).
+Nothing has run on a host (above), and the production host
 is undecided (U-02), so this is configuration evidence only: see
 [`docs/verification/cache-prune-20261024/README.md`](../../docs/verification/cache-prune-20261024/README.md).
 
