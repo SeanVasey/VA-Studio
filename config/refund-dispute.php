@@ -9,9 +9,9 @@
 return [
     'enabled' => env('VASEY_TEST_REFUND_DISPUTE_ENABLED', false),
     'policy' => [
-        'refund_authority' => env('VASEY_REFUND_DISPUTE_REFUND_AUTHORITY'),
-        'partial_refunds' => env('VASEY_REFUND_DISPUTE_PARTIAL_REFUNDS'),
-        'dispute_access' => env('VASEY_REFUND_DISPUTE_DISPUTE_ACCESS'),
-        'exclusive_reopening' => env('VASEY_REFUND_DISPUTE_EXCLUSIVE_REOPENING'),
+        'refund_authority' => env('VASEY_TEST_REFUND_DISPUTE_REFUND_AUTHORITY'),
+        'partial_refunds' => env('VASEY_TEST_REFUND_DISPUTE_PARTIAL_REFUNDS'),
+        'dispute_access' => env('VASEY_TEST_REFUND_DISPUTE_DISPUTE_ACCESS'),
+        'exclusive_reopening' => env('VASEY_TEST_REFUND_DISPUTE_EXCLUSIVE_REOPENING'),
     ],
 ];
