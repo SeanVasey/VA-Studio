@@ -89,7 +89,7 @@ with the direct-PHPUnit command from `CLAUDE.md`'s working facts.
 | `TestCommerceEvidenceCommandTest` | 17 tests, 227 assertions, OK |
 | `StagingSyntheticCatalogTest` and `PruneExpiredCacheRowsTest` together | 51 tests, 1045 assertions, OK |
 | every `scripts/ci/test-*.py` except the browser stage | rc 0 (ci-scope 27, database-receipts 61, focused-tests 53, gitlab-database-receipts 32, gitlab-setup 12, gitlab-writer-feedback 7, php-test-runtime 5, workflow-cadence 14); `test-phpunit-shards.py` (52) failed once, see below, rc 0 after the selection change |
-| every `tests/ops/*.py` | rc 0, 28 files; backup 74, validator 28, kit 50, capability profile 17, monitoring 44 |
+| every `tests/ops/*.py` | rc 0, 20 files; backup 74, validator 28, kit 50, capability profile 17, monitoring 44 |
 | `python3 ops/production/build-kit.py --check` | `build-kit: ok, 13 files` |
 | `composer validate --strict` | `./composer.json is valid` |
 | `python3 scripts/ci/test-related-browser-stage.py FailureDiagnosisHelpers` | 2 tests OK |
@@ -139,8 +139,10 @@ Security-relevant or sensitive changes, in priority order:
    failover members). Deletion safety is unchanged (`expiration <= cutoff`, cutoff read once, delete re-checks it). Confirm a TOTP
    replay record or a held lock in a non-default database store cannot be expired early by this reading of the store list.
 3. `app/Domain/Customers/TestIdentityLinks/TestIdentityLinkRelay.php`: the listing's verification was split into a file-level and a
-   challenge-level phase with batched lookups. Every check of the old `verified()` is kept, in the same order of strictness; the staff
-   address lookup now uses `LOWER(email) IN (...)` in chunks of 500.
+   challenge-level phase with batched lookups. Every check of the old `verified()` is kept except one: the staff-address exclusion now
+   matches in PHP with ASCII `strtolower` after `LOWER(email) IN (...)` in chunks of 500, so on MySQL it is narrower than the old
+   collation-aware `LOWER(email) = ?` (accented or trailing-space staff addresses are no longer withheld; independent review P3-1,
+   deferred).
 4. `app/Domain/Catalog/SyntheticRehearsal/SyntheticRehearsalBuilder.php` and `ops/staging/backup.sh` (off-host shipped-record logic).
 5. `app/Console/Commands/TestCommerceEvidence.php`: the read-only transaction framing on MySQL.
 
@@ -150,3 +152,12 @@ Security-relevant or sensitive changes, in priority order:
 - A separate test of the `fstat` inode comparison (K3 P3-2): race-only, needs a production seam.
 - M2 R4: a note for any future frozen-time test; no code uses one.
 - Browser-stage ordinary cases and Chromium/WebKit journeys: need the hosted runner's genuine ClamAV signatures.
+
+## Independent review
+
+[Decision record](independent-review-faceb5f8-DECISION.md): **APPROVE WITH CONDITIONS** at `faceb5f8`, no P0 to P2; all seven focus areas
+hold their safety property (production hold fails closed for every damaged-boundary case; the prune deletes only `expiration <= cutoff`
+in every store; the evidence command is read-only on native MySQL). The condition, correcting the identity-relay sentence above, is
+applied here. Deferred to the per-lane batch: P3-1 (staff-address exclusion narrower on MySQL; let the database match recipients and add
+a mixed-case test), P3-2 (SQL comments get a locking clause past the evidence guard; MySQL still refuses `FOR UPDATE` in READ ONLY but
+allows `FOR SHARE`) and P3-3 (the new `backup.sh` digit and `stat` guards are not pinned by tests).
