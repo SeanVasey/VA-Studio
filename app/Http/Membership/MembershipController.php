@@ -38,15 +38,20 @@ final class MembershipController
             $read = MembershipCustomerRead::begin();
             $index = (new MembershipCustomerIndex)->index($identity->principal(), $identity->actor(), $read);
             $response = MembershipPrivacy::json(['index' => $index]);
-            // Pre-bytes (operations step 6, review C2): the prebuilt body leaves only after a fresh owned re-read.
-            $identity->proveCurrent();
-            $read->proveBeforeBytes();
-            $identity->proveCurrent();
-            MembershipException::require(MembershipHttpMount::admitted(), 'not_mounted');
-
-            return $response;
         } catch (Throwable $error) {
             return MembershipPrivacy::refusal($error);
+        }
+        try {
+            // Pre-bytes (operations step 6, review C2): the prebuilt body leaves only after a fresh owned re-read, the
+            // capsule and the mount. Any refusal withholds the body behind the one not-found response.
+            $identity->proveCurrent();
+            $read->proveBeforeBytes();
+            MembershipException::require(MembershipHttpMount::admitted(), 'not_mounted');
+            $identity->proveCurrent();
+
+            return $response;
+        } catch (Throwable) {
+            return MembershipPrivacy::notFound();
         }
     }
 
