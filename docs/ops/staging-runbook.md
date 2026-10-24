@@ -239,6 +239,13 @@ concurrent run. If a run is killed, its lock expires after an hour.
 - A row that carries the marker but differs from its definition is refused and left unchanged. A published
   synthetic track whose metadata or offers staff changed is reported `present, metadata differs …` or
   `present, offers differ …` (exit 1). Nothing is reverted.
+- When a run resumes an interrupted draft, two more things must be exactly what the definition generates, or it refuses
+  (exit 1, nothing changed): the rights declaration (both its provenance and its sample disclosure) and the media. A source
+  an earlier run took in, or a ready preview or artwork, is accepted only when its source file has the SHA-256 of the file the
+  definition generates now. Staff who replaced a draft's upload, or whose draft declaration was edited, get
+  `… has a rights declaration that differs …` or `… has master_wav media that differs …`. The master is bit-exact; the
+  artwork PNG comes from GD, so a changed PHP GD or zlib build can trigger the same refusal for an interrupted draft. Nothing
+  is edited back; the remedy is the reset described under "Removing it before real content" below.
 - A track withdrawn with the ordinary unpublish action is reported `withdrawn by staff; left unpublished`. The
   command never republishes it, and exits 1.
 - The command never creates quotes, orders, payments, grants or contracts.

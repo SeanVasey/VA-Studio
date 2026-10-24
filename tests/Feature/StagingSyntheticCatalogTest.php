@@ -18,6 +18,7 @@ use App\Domain\Rights\Models\LicenseTemplate;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\Models\RightsDeclaration;
 use App\Domain\Rights\SaveLicenseTemplate;
+use App\Domain\Rights\SaveRightsDeclaration;
 use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
@@ -29,8 +30,11 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Testing\PendingCommand;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -43,8 +47,9 @@ use Tests\TestCase;
 
 /**
  * The labelled synthetic staging rehearsal catalog: admission refusals before any write, and a real run through the
- * domain services. Media uses real ffmpeg generation, real derivatives and the real pipeline; only the malware engine is
- * the existing test-only scanner, and the seller tag is the existing test-only fixture tag.
+ * domain services. Media uses real ffmpeg generation, real derivatives and the real pipeline. Two inputs are fixtures
+ * here and are not exercised by the command itself: the malware verdict comes from the test-only scanner, and the seller
+ * tag is the test-only fixture tag.
  */
 class StagingSyntheticCatalogTest extends TestCase
 {
@@ -395,6 +400,95 @@ class StagingSyntheticCatalogTest extends TestCase
         $this->assertSame(2, LicenseVersion::where('status', 'published')->count());
     }
 
+    public function test_an_unexpected_failure_in_the_write_phase_reports_an_unconfirmed_result_and_how_to_resume(): void
+    {
+        $this->operators();
+        // A model hook throws a plain exception inside the first domain write, after the run lock is held.
+        LicenseTemplate::creating(function (): void {
+            throw new RuntimeException('Unexpected failure at /private/path.');
+        });
+        $this->catalog()->expectsOutputToContain('Stopped: the result is unconfirmed. Re-run the command to resume; finished steps are kept and nothing is duplicated.')
+            ->doesntExpectOutputToContain('/private/path')->assertExitCode(1);
+        $this->assertSame(0, LicenseTemplate::count());
+    }
+
+    public function test_a_check_run_that_fails_unexpectedly_does_not_claim_a_resumable_write(): void
+    {
+        $this->operators();
+        // --check is an admission run, so its generic failure must not talk about resuming or finished steps. A model hook
+        // throws a plain exception while the command resolves its two accounts.
+        User::retrieved(function (): void {
+            throw new RuntimeException('Unexpected at /private/path.');
+        });
+
+        $this->catalog(['--check' => true])->expectsOutputToContain('nothing was written. Re-run it.')
+            ->doesntExpectOutputToContain('finished steps are kept')->doesntExpectOutputToContain('/private/path')->assertExitCode(1);
+    }
+
+    /** @return array<string, array{0: string, 1: string}> */
+    public static function editedRightsFields(): array
+    {
+        return ['sample disclosure' => ['sample_disclosure', 'No samples. (Edited by staff.)'],
+            'provenance after the marker prefix' => ['provenance_reference', ' Also uses a purchased sample pack.']];
+    }
+
+    #[DataProvider('editedRightsFields')]
+    public function test_a_resumed_rights_declaration_must_match_the_definition_in_both_evidence_fields(string $field, string $edit): void
+    {
+        [$operator] = $this->operators();
+        $definition = SyntheticRehearsalCatalog::tracks()[0];
+        $track = app(SaveTrackMetadata::class)->handle(null, SyntheticRehearsalCatalog::metadata($definition), $operator);
+        // Staff edited one field of the interrupted draft's pending declaration. The marker prefix is still there.
+        $rights = SyntheticRehearsalCatalog::rights($definition, $track->id);
+        $rights[$field] = $field === 'provenance_reference' ? $rights[$field].$edit : $edit;
+        app(SaveRightsDeclaration::class)->create($rights, $operator);
+        $this->assertStringStartsWith(SyntheticRehearsalCatalog::PROVENANCE_PREFIX.$definition['number'].':', $rights['provenance_reference']);
+
+        $this->catalog()->expectsOutputToContain($definition['slug'].' has a rights declaration that differs from the synthetic definition; it was left unchanged.')
+            ->assertExitCode(1);
+
+        $this->assertSame(['pending'], $track->rightsDeclarations()->pluck('status')->all(), 'the edited claim was not verified');
+        $this->assertSame($rights[$field], $track->rightsDeclarations()->sole()->{$field}, 'and not changed back');
+        $this->assertSame(0, $track->assets()->count() + Offer::where('track_id', $track->id)->count());
+        $this->assertSame(0, Track::where('status', 'published')->count());
+    }
+
+    public function test_an_interrupted_source_that_is_not_the_generated_media_is_refused_unchanged(): void
+    {
+        [$operator] = $this->operators();
+        $definitions = SyntheticRehearsalCatalog::tracks();
+        // Staff left their own upload under the name the run looks for; its hash is not the generated master's.
+        $track = app(SaveTrackMetadata::class)->handle(null, SyntheticRehearsalCatalog::metadata($definitions[0]), $operator);
+        $bytes = MediaFixtures::wav(1.2, 330);
+        $key = 'quarantine/'.Str::uuid().'/source.bin';
+        Storage::disk('local')->put($key, $bytes);
+        $source = MediaAsset::create(['track_id' => $track->id, 'role' => 'master_wav', 'disk' => 'local', 'storage_path' => $key,
+            'original_name' => $definitions[0]['slug'].'-master.wav', 'mime_type' => 'audio/x-wav', 'size_bytes' => strlen($bytes),
+            'sha256' => hash('sha256', $bytes), 'status' => 'quarantined']);
+        $this->catalog()->expectsOutputToContain($definitions[0]['slug'].' has master_wav media that differs from the synthetic definition; it was left unchanged.')
+            ->assertExitCode(1);
+        $this->assertSame(['quarantined', 0], [$source->fresh()->status, $source->runs()->count()], 'it was not processed');
+        $this->assertSame([$source->id], $track->assets()->pluck('id')->all(), 'nothing was uploaded beside it');
+        $this->assertSame(0, Offer::where('track_id', $track->id)->count());
+        $this->assertSame('draft', $track->fresh()->status);
+
+    }
+
+    public function test_a_ready_preview_that_derives_from_another_source_is_refused_unchanged(): void
+    {
+        [$operator] = $this->operators();
+        $definition = SyntheticRehearsalCatalog::tracks()[0];
+        // A ready preview and artwork exist, but they derive from other sources than the generated media.
+        $track = app(SaveTrackMetadata::class)->handle(null, SyntheticRehearsalCatalog::metadata($definition), $operator);
+        MediaFixtures::readyTrackMedia($track, $operator);
+        $assets = $track->assets()->count();
+        $this->catalog()->expectsOutputToContain($definition['slug'].' has master_wav media that differs from the synthetic definition; it was left unchanged.')
+            ->assertExitCode(1);
+        $this->assertSame($assets, $track->assets()->count(), 'no asset was added or replaced');
+        $this->assertSame(0, Offer::where('track_id', $track->id)->count());
+        $this->assertSame('draft', $track->fresh()->status);
+    }
+
     public function test_a_failed_media_step_stops_the_run_and_a_rerun_retries_the_same_source(): void
     {
         $this->operators();
@@ -471,6 +565,22 @@ class StagingSyntheticCatalogTest extends TestCase
             $this->assertSame(['width' => 600, 'height' => 600, 'sanitized' => true], $artwork->technical_metadata);
         }
         $this->assertSame([$operator->id], RightsDeclaration::distinct()->pluck('verified_by')->all());
+
+        // No generated file, source or derivative, is byte-identical to any brand or public file in the repository.
+        $generated = MediaAsset::whereNotNull('sha256')->pluck('sha256')->unique()->all();
+        $this->assertGreaterThan(12, count($generated));
+        $brand = [];
+        // `assets/` holds source marks once the official identity lands; compare against whichever of the two exist.
+        foreach (array_filter(['assets', 'public'], fn (string $directory): bool => is_dir(base_path($directory))) as $directory) {
+            $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(base_path($directory), \FilesystemIterator::SKIP_DOTS));
+            foreach ($iterator as $file) {
+                if ($file->isFile() && ! $file->isLink() && $file->getSize() < 50_000_000) {
+                    $brand[hash_file('sha256', $file->getPathname())] = $directory.'/'.substr($file->getPathname(), strlen(base_path($directory)) + 1);
+                }
+            }
+        }
+        $this->assertNotEmpty($brand, 'The repository has brand or public files to compare against.');
+        $this->assertSame([], array_values(array_intersect_key($brand, array_flip($generated))));
     }
 
     public function test_writes_need_an_interactive_console_both_passwords_and_the_lock(): void
@@ -516,7 +626,9 @@ class StagingSyntheticCatalogTest extends TestCase
         $this->assertSame(['hidden' => true, 'fallback' => false], $observed);
         $this->assertSame($before, $this->census());
         $text = $buffer->fetch();
-        $this->assertStringContainsString('Stopped: the result is unconfirmed. Re-run the command to resume', $text);
+        // The failure came at the password prompt, before the write phase: the resume wording would be false here.
+        $this->assertStringContainsString('Stopped: the command could not complete before its write phase began, so nothing was written. Re-run it.', $text);
+        $this->assertStringNotContainsString('result is unconfirmed', $text);
         $this->assertStringNotContainsString('Unable to hide', $text);
         $this->assertStringNotContainsString('/private/path', $text);
     }
