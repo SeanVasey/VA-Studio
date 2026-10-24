@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\ProductionMembershipHttp;
 
+use App\Domain\Memberships\Production\MembershipException;
+use App\Http\Membership\MembershipController;
 use App\Http\Membership\MembershipHttpMount;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Application;
@@ -80,8 +82,9 @@ final class MembershipHttpMountTest extends TestCase
         config(['production-memberships.http_mounted' => $flag]);
         $this->app->instance('env', $environment);
         $queries = $this->queries();
-        $this->notFound($this->getMember('/production-memberships/periods'));
-        $this->notFound($this->postMember('/production-memberships/periods/'.self::PERIOD.'/expire', []));
+        // Refused before the web stack: no session is started, so no session cookie is issued (review N3).
+        $this->notFound($this->getMember('/production-memberships/periods'))->assertCookieMissing(config('session.cookie'));
+        $this->notFound($this->postMember('/production-memberships/periods/'.self::PERIOD.'/expire', []))->assertCookieMissing(config('session.cookie'));
         $this->assertSame([], $queries());
     }
 
@@ -105,6 +108,8 @@ final class MembershipHttpMountTest extends TestCase
         foreach ($responses as $response) {
             $this->notFound($response);
         }
+        // A mounted request does run the session stack (the cookie the runtime-withdrawal case must not see).
+        $responses[0]->assertCookie(config('session.cookie'));
     }
 
     /** @return array<string, array{0:string,1:string,2:?string,3:array,4:int}> */
@@ -173,6 +178,33 @@ final class MembershipHttpMountTest extends TestCase
             $this->notFound($this->postMember('/production-memberships/periods/'.self::PERIOD.'/reservations/'.self::PERIOD.'/release', []));
         }
         $this->privateJson($this->postMember('/production-memberships/periods/'.self::PERIOD.'/expire', []))->assertStatus(429);
+    }
+
+    public function test_the_index_body_is_rebuilt_from_an_exact_key_allowlist(): void
+    {
+        $body = new \ReflectionMethod(MembershipController::class, 'indexBody');
+        $reservation = ['id' => self::PERIOD, 'offerId' => 1, 'offerRevisionId' => 2, 'creditAmount' => 1, 'reservedAt' => '2026-10-13 12:00:00',
+            'honorDeadline' => '2026-10-13 12:05:00', 'status' => 'reserved', 'closedAt' => null];
+        $period = ['id' => self::PERIOD, 'planVersionId' => self::PERIOD, 'periodStart' => '2026-10-01 00:00:00', 'periodEnd' => '2026-11-01 00:00:00',
+            'creditExpiresAt' => null, 'allowance' => 3, 'balances' => ['available' => 2, 'reserved' => 1, 'consumed' => 0, 'expired' => 0],
+            'applicableDefinition' => ['id' => self::PERIOD], 'reservations' => [$reservation]];
+        $index = ['schemaVersion' => 1, 'periodLimit' => 100, 'hasMore' => false, 'provenance' => 'synthetic_rehearsal', 'periods' => [$period]];
+        $this->assertSame($index, $body->invoke(null, $index));
+        // The controller sends only the rebuilt body.
+        $this->assertStringContainsString("MembershipPrivacy::json(['index' => self::indexBody(\$index)])",
+            file_get_contents(base_path('app/Http/Membership/MembershipController.php')));
+        // Any other key at any level is refused, never passed through.
+        foreach ([[...$index, 'invoiceId' => 'x'], [...$index, 'periods' => [[...$period, 'seal' => 'x']]],
+            [...$index, 'periods' => [[...$period, 'reservations' => [[...$reservation, 'intentHash' => 'x']]]]],
+            [...$index, 'periods' => [[...$period, 'balances' => [...$period['balances'], 'debt' => 1]]]],
+            [...$index, 'periods' => [[...$period, 'applicableDefinition' => ['id' => self::PERIOD, 'hash' => 'x']]]]] as $tampered) {
+            try {
+                $body->invoke(null, $tampered);
+                $this->fail('An unlisted index key must be refused.');
+            } catch (MembershipException $error) {
+                $this->assertSame('tampered', $error->reason);
+            }
+        }
     }
 
     private function getMember(string $path): TestResponse

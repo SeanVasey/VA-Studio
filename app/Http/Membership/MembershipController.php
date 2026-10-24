@@ -37,7 +37,7 @@ final class MembershipController
             MembershipException::require($this->body($request) === [], 'invalid_input');
             $read = MembershipCustomerRead::begin();
             $index = (new MembershipCustomerIndex)->index($identity->principal(), $identity->actor(), $read);
-            $response = MembershipPrivacy::json(['index' => $index]);
+            $response = MembershipPrivacy::json(['index' => self::indexBody($index)]);
         } catch (Throwable $error) {
             return MembershipPrivacy::refusal($error);
         }
@@ -114,6 +114,44 @@ final class MembershipController
         } catch (Throwable) {
             return MembershipPrivacy::submitted();
         }
+    }
+
+    private const INDEX_KEYS = ['schemaVersion', 'periodLimit', 'hasMore', 'provenance', 'periods'];
+
+    private const PERIOD_KEYS = ['id', 'planVersionId', 'periodStart', 'periodEnd', 'creditExpiresAt', 'allowance', 'balances',
+        'applicableDefinition', 'reservations'];
+
+    private const RESERVATION_KEYS = ['id', 'offerId', 'offerRevisionId', 'creditAmount', 'reservedAt', 'honorDeadline', 'status', 'closedAt'];
+
+    private const BALANCE_KEYS = ['available', 'reserved', 'consumed', 'expired'];
+
+    /**
+     * Review N6: the index body is rebuilt from an exact key allowlist. A domain projection with any other key is
+     * refused (the one not-found response), so a new domain field can never reach a customer unreviewed.
+     */
+    private static function indexBody(array $index): array
+    {
+        $exact = static function (mixed $value, array $keys): array {
+            MembershipException::require(is_array($value) && array_keys($value) === $keys, 'tampered');
+
+            return $value;
+        };
+        $index = $exact($index, self::INDEX_KEYS);
+        MembershipException::require(array_is_list($index['periods']), 'tampered');
+        $periods = [];
+        foreach ($index['periods'] as $period) {
+            $period = $exact($period, self::PERIOD_KEYS);
+            MembershipException::require(array_is_list($period['reservations']), 'tampered');
+            $reservations = [];
+            foreach ($period['reservations'] as $reservation) {
+                $reservations[] = $exact($reservation, self::RESERVATION_KEYS);
+            }
+            $definition = $period['applicableDefinition'] === null ? null : ['id' => $exact($period['applicableDefinition'], ['id'])['id']];
+            $periods[] = [...$period, 'balances' => $exact($period['balances'], self::BALANCE_KEYS),
+                'applicableDefinition' => $definition, 'reservations' => $reservations];
+        }
+
+        return [...$index, 'periods' => $periods];
     }
 
     /** Allowlisted receipt fields only: period and redemption ids, status, credit, honor deadline and balances. */
