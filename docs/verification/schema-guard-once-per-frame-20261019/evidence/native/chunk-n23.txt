@@ -1,0 +1,21 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/g1/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 02:45.949, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipSchemaProofFrameTest::test_a_dependent_view_created_after_a_remembered_proof_is_refused_at_the_next_guard
+Guard unexpectedly passed.
+
+/home/user/wt/g1/tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php:314
+/home/user/wt/g1/tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php:272
+/home/user/wt/g1/tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php:87
+/home/user/wt/g1/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 2, Failures: 1.

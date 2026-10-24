@@ -1,0 +1,23 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-mut/phpunit.xml
+
+E                                                                   1 / 1 (100%)
+
+Time: 06:19.445, Memory: 95.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipReservationLifecycleTest::test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-mut/app/Domain/Memberships/Production/MembershipReservationOperations.php:181
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-mut/app/Domain/Memberships/Production/MembershipReservationOperations.php:88
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-mut/app/Domain/Memberships/Production/MembershipReservationOperations.php:40
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-mut/tests/Support/MembershipReservationFixtures.php:105
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-mut/tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php:37
+/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/g1-mut/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 13, Errors: 1.

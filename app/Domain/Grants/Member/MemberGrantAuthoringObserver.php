@@ -74,7 +74,8 @@ final class MemberGrantAuthoringObserver implements Dispatcher
         }
         if ($committing) {
             $this->admit();
-            MemberGrantException::require($this->proof !== null, 'commit_not_proved');
+            MemberGrantException::require($this->proof !== null && $this->transaction !== null, 'commit_not_proved');
+            $this->transaction->beginTerminalProof();
             ($this->proof)();
             $this->admit();
             $this->proved = true;

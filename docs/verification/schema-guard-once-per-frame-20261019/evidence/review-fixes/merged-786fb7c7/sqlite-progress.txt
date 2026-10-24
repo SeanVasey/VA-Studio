@@ -1,0 +1,7 @@
+t01 started 2026-10-24T15:19:03Z head=7b21cc76 dirty=0
+t01 finished 2026-10-24T15:21:12Z exit=0 seconds=129 tests=12 assertions=149 failures=0 errors=0 skipped=0
+t02 started 2026-10-24T15:21:12Z head=7b21cc76 dirty=0
+t02 finished 2026-10-24T15:29:12Z exit=0 seconds=480 tests=57 assertions=616 failures=0 errors=0 skipped=7
+t03 started 2026-10-24T15:29:12Z head=7b21cc76 dirty=0
+t03 finished 2026-10-24T15:40:31Z exit=0 seconds=679 tests=159 assertions=917 failures=0 errors=0 skipped=14
+all done 2026-10-24T15:40:31Z

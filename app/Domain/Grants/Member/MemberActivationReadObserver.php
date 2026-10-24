@@ -92,6 +92,7 @@ final class MemberActivationReadObserver implements Dispatcher
         if ($committing) {
             MemberGrantException::require($this->context !== null && ! $this->proved, 'commit_not_proved');
             $this->admit();
+            $this->transaction->beginTerminalProof();
             $this->rows()->assertCurrent();
             $this->admit();
             $this->context->proveCurrent();
