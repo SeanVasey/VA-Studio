@@ -184,7 +184,7 @@ class RefundDisputeLifecycleTest extends TestCase
         $required = RefundDisputeEffect::where('kind', 'allocation_required')->sole();
         $refund = RefundDisputeObject::where('kind', 'refund')->sole();
         $this->assertSame($refund->id, $required->refund_dispute_object_id);
-        foreach ([[0 => $amount - 1], [0 => $totals[0], 5 => 100], [0 => $amount], [0 => $totals[0] + 100, 1 => 0], ['0' => $amount], [0 => -100, 1 => $amount + 100]] as $lines) {
+        foreach ([[0 => $totals[0], 1 => 99], [0 => $totals[0], 1 => 101], [0 => $amount - 1], [0 => $totals[0], 5 => 100], [0 => $amount], [0 => $totals[0] + 100, 1 => 0], ['0' => $amount], [0 => -100, 1 => $amount + 100]] as $lines) {
             try {
                 $this->act('allocate', $f, $refund->public_id, $lines);
                 $this->fail('An inexact allocation was accepted.');
