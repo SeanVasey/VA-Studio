@@ -1,0 +1,84 @@
+=== BASELINE
+OK (19 tests, 113 assertions)
+=== MUTATION strict < instead of <=
+1) Tests\Feature\PruneExpiredCacheRowsTest::test_the_boundary_is_the_one_the_store_itself_uses
+2) Tests\Feature\PruneExpiredCacheRowsTest::test_forever_keys_the_totp_replay_record_and_live_throttles_are_never_deleted
+3) Tests\Feature\PruneExpiredCacheRowsTest::test_expired_locks_go_and_held_locks_stay_held
+4) Tests\Feature\PruneExpiredCacheRowsTest::test_an_unread_filament_notification_is_removed_after_its_ttl_and_a_fresh_one_is_kept
+FAILURES!
+Tests: 19, Assertions: 109, Failures: 4.
+=== MUTATION strict < in delete recheck only
+1) Tests\Feature\PruneExpiredCacheRowsTest::test_the_boundary_is_the_one_the_store_itself_uses
+2) Tests\Feature\PruneExpiredCacheRowsTest::test_forever_keys_the_totp_replay_record_and_live_throttles_are_never_deleted
+3) Tests\Feature\PruneExpiredCacheRowsTest::test_expired_locks_go_and_held_locks_stay_held
+4) Tests\Feature\PruneExpiredCacheRowsTest::test_an_unread_filament_notification_is_removed_after_its_ttl_and_a_fresh_one_is_kept
+FAILURES!
+Tests: 19, Assertions: 109, Failures: 4.
+=== MUTATION delete everything (no expiration filter, select)
+1) Tests\Feature\PruneExpiredCacheRowsTest::test_it_deletes_in_bounded_batches_across_more_than_one_batch
+FAILURES!
+Tests: 19, Assertions: 107, Failures: 1.
+=== MUTATION delete everything (no recheck in delete)
+1) Tests\Feature\PruneExpiredCacheRowsTest::test_a_row_refreshed_after_selection_survives_the_delete
+FAILURES!
+Tests: 19, Assertions: 113, Failures: 1.
+=== MUTATION ignore forever encoding: cutoff + 10y
+1) Tests\Feature\PruneExpiredCacheRowsTest::test_it_deletes_expired_rows_and_keeps_every_unexpired_row
+2) Tests\Feature\PruneExpiredCacheRowsTest::test_the_boundary_is_the_one_the_store_itself_uses
+3) Tests\Feature\PruneExpiredCacheRowsTest::test_forever_keys_the_totp_replay_record_and_live_throttles_are_never_deleted
+4) Tests\Feature\PruneExpiredCacheRowsTest::test_expired_locks_go_and_held_locks_stay_held
+5) Tests\Feature\PruneExpiredCacheRowsTest::test_it_deletes_in_bounded_batches_across_more_than_one_batch
+6) Tests\Feature\PruneExpiredCacheRowsTest::test_a_row_refreshed_after_selection_survives_the_delete
+7) Tests\Feature\PruneExpiredCacheRowsTest::test_it_uses_the_configured_tables_not_fixed_names
+8) Tests\Feature\PruneExpiredCacheRowsTest::test_an_unread_filament_notification_is_removed_after_its_ttl_and_a_fresh_one_is_kept
+FAILURES!
+Tests: 19, Assertions: 87, Failures: 8.
+=== MUTATION cutoff far future (delete forever keys)
+1) Tests\Feature\PruneExpiredCacheRowsTest::test_it_deletes_expired_rows_and_keeps_every_unexpired_row
+2) Tests\Feature\PruneExpiredCacheRowsTest::test_the_boundary_is_the_one_the_store_itself_uses
+3) Tests\Feature\PruneExpiredCacheRowsTest::test_forever_keys_the_totp_replay_record_and_live_throttles_are_never_deleted
+4) Tests\Feature\PruneExpiredCacheRowsTest::test_expired_locks_go_and_held_locks_stay_held
+5) Tests\Feature\PruneExpiredCacheRowsTest::test_it_deletes_in_bounded_batches_across_more_than_one_batch
+6) Tests\Feature\PruneExpiredCacheRowsTest::test_a_row_refreshed_after_selection_survives_the_delete
+7) Tests\Feature\PruneExpiredCacheRowsTest::test_it_uses_the_configured_tables_not_fixed_names
+8) Tests\Feature\PruneExpiredCacheRowsTest::test_an_unread_filament_notification_is_removed_after_its_ttl_and_a_fresh_one_is_kept
+FAILURES!
+Tests: 19, Assertions: 87, Failures: 8.
+=== MUTATION no batching (limit huge)
+1) Tests\Feature\PruneExpiredCacheRowsTest::test_it_deletes_in_bounded_batches_across_more_than_one_batch
+2) Tests\Feature\PruneExpiredCacheRowsTest::test_an_exact_multiple_of_the_batch_ends_on_an_empty_select
+FAILURES!
+Tests: 19, Assertions: 107, Failures: 2.
+=== MUTATION locks not pruned
+1) Tests\Feature\PruneExpiredCacheRowsTest::test_expired_locks_go_and_held_locks_stay_held
+2) Tests\Feature\PruneExpiredCacheRowsTest::test_a_lock_that_expired_by_time_is_removed
+3) Tests\Feature\PruneExpiredCacheRowsTest::test_the_lock_table_is_batched_too
+4) Tests\Feature\PruneExpiredCacheRowsTest::test_it_uses_the_configured_tables_not_fixed_names
+5) Tests\Feature\PruneExpiredCacheRowsTest::test_a_failure_prints_the_class_and_code_but_never_the_message_and_still_prunes_the_other_table
+FAILURES!
+Tests: 19, Assertions: 106, Failures: 5.
+=== MUTATION runs on non-database store
+1) Tests\Feature\PruneExpiredCacheRowsTest::test_a_non_database_default_store_is_a_no_op_with_a_clear_message
+FAILURES!
+Tests: 19, Assertions: 96, Failures: 1.
+=== MUTATION prints exception message
+1) Tests\Feature\PruneExpiredCacheRowsTest::test_a_failure_prints_the_class_and_code_but_never_the_message_and_still_prunes_the_other_table
+FAILURES!
+Tests: 19, Assertions: 110, Failures: 1.
+=== MUTATION delete everything (flush-like: no filter in select or delete)
+1) Tests\Feature\PruneExpiredCacheRowsTest::test_it_deletes_expired_rows_and_keeps_every_unexpired_row
+2) Tests\Feature\PruneExpiredCacheRowsTest::test_the_boundary_is_the_one_the_store_itself_uses
+3) Tests\Feature\PruneExpiredCacheRowsTest::test_forever_keys_the_totp_replay_record_and_live_throttles_are_never_deleted
+4) Tests\Feature\PruneExpiredCacheRowsTest::test_expired_locks_go_and_held_locks_stay_held
+5) Tests\Feature\PruneExpiredCacheRowsTest::test_it_deletes_in_bounded_batches_across_more_than_one_batch
+6) Tests\Feature\PruneExpiredCacheRowsTest::test_a_row_refreshed_after_selection_survives_the_delete
+7) Tests\Feature\PruneExpiredCacheRowsTest::test_it_uses_the_configured_tables_not_fixed_names
+8) Tests\Feature\PruneExpiredCacheRowsTest::test_an_unread_filament_notification_is_removed_after_its_ttl_and_a_fresh_one_is_kept
+FAILURES!
+Tests: 19, Assertions: 87, Failures: 8.
+1) Tests\Feature\PruneExpiredCacheRowsTest::test_it_is_scheduled_hourly_with_a_short_overlap_lock_and_never_as_a_clear
+FAILURES!
+Tests: 1, Assertions: 3, Failures: 1.
+1) Tests\Feature\PruneExpiredCacheRowsTest::test_it_is_scheduled_hourly_with_a_short_overlap_lock_and_never_as_a_clear
+FAILURES!
+Tests: 1, Assertions: 4, Failures: 1.
