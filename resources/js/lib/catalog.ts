@@ -66,6 +66,8 @@ export interface PageMetadata {
   imageType?: string | null;
   type: 'website' | 'music.song';
   robots: 'index, follow' | 'noindex, nofollow';
+  /** Server-built schema.org JSON-LD with <, > and & escaped; absent outside production and on previews. */
+  structuredData?: string | null;
 }
 export interface CatalogFilters { q: string; genre: string; sort: 'featured' | 'tempo' | 'title' }
 export interface CatalogPage {
