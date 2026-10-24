@@ -123,6 +123,7 @@
     "tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php",
     "tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php",
     "tests/Feature/RefundDispute/RefundDisputeLifecycleTest.php",
+    "tests/Feature/RefundDispute/StaffCommerceAdministrationTest.php",
     "tests/Feature/ReviewedLicenseDraftTest.php",
     "tests/Feature/ReviewedOfferDraftTest.php",
     "tests/Feature/RightsScopeCommandAttestationTest.php",

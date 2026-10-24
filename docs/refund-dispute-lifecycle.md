@@ -52,7 +52,13 @@ Writers lock actor User → Order → coordination row → current reads of the 
 
 ## Staff administration
 
-Filament **Test commerce → Test customers** (read-only list, customer detail) and **Test orders and refunds** (order evidence, plus the seven commands above). Both pages reauthorize `administer-catalog` and the panel MFA rule on every Livewire request; every command reaches the domain service, which rechecks authority, MFA (locked re-read), policy and sequence. Guest customers appear by a keyed reference, never by their owner key.
+Filament **Test commerce → Test customers** (read-only list, customer detail) and **Test orders and refunds** (a read-only order evidence action plus six commands: check refunds and disputes, allocate a partial refund, suspend line downloads, place a dispute hold, release a hold, record an exclusive reopening decision). Both pages reauthorize `administer-catalog` and the panel MFA rule on every Livewire request; every command reaches the domain service, which rechecks authority, MFA (locked re-read), policy and sequence. Order evidence (`StaffCommerceDirectory::orderFor`) rechecks staff authority and account scope itself. The customer list is grouped per customer, so it sorts only by aggregates (newest order, then the anchor finalization) and disables Filament's default key sort, which MySQL `ONLY_FULL_GROUP_BY` would refuse. Outside test commerce a command dialog closes with a notice. Guest customers appear by a keyed reference, never by their owner key.
+
+## Known limitations
+
+- **Stuck after attention.** While the latest ledger entry is `attention`, every staff command refuses (`not_observed`) until a later check is accepted. If the provider keeps reporting the same drift, the case and its holds stay frozen; there is no staff override. Conversely, an open dispute that arrives together with an unrelated drift places no reconciling hold, because attention applies no effect. Both need an operator-runbook step before real use.
+- **Automatic multi-refund split.** When several unallocated refunds together complete a full refund, each line's total is exact but the split of each refund across lines follows line order and is not unique. A later `succeeded → failed` reversal therefore frees whichever lines that refund happened to cover; a review effect is recorded and holds are not released automatically.
+- **Coverage.** Only the Stripe-test order chain is covered. Paid-grant, Tax, free and member delivery serve different order sources and do not check holds; any future refund/dispute coverage of those chains must add hold checks there.
 
 ## Verification
 
