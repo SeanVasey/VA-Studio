@@ -1165,6 +1165,22 @@
     [
       "Tests\\Feature\\ProductionFreeGrants\\ProductionFreeGrantFirstByteTest",
       "test_native_independent_process_revocation_across_the_first_byte"
+    ],
+    [
+      "Tests\\Feature\\RefundDispute\\RefundDisputeConcurrencyTest",
+      "test_a_committed_suspension_wins_the_order_row_and_refuses_a_waiting_download_authorization"
+    ],
+    [
+      "Tests\\Feature\\RefundDispute\\RefundDisputeConcurrencyTest",
+      "test_an_authorization_that_commits_first_is_followed_by_a_waiting_suspension_that_refuses_further_authorization"
+    ],
+    [
+      "Tests\\Feature\\RefundDispute\\RefundDisputeConcurrencyTest",
+      "test_a_qualified_exclusive_reopening_decision_never_admits_a_competing_exclusive_purchase"
+    ],
+    [
+      "Tests\\Feature\\RefundDispute\\RefundDisputeConcurrencyTest",
+      "test_writer_latency_sits_well_inside_the_lease_and_authorization_windows"
     ]
   ]
 }
