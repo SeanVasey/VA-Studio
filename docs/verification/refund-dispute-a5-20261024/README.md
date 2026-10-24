@@ -1,6 +1,6 @@
 # Lane A5 work package: refund and dispute lifecycle, staff customer/order administration
 
-Status: **implemented on branch `harness/refund-dispute-a5-20261024`, not pushed, not reviewed.** Cut from `origin/main` `e5d0d3f2`. The work-package statement below was committed first (`08b8b516`); results follow it. Tested source: `470a79f7bce978bb56f9527d8e964305f898e5a7`.
+Status: **implemented on branch `harness/refund-dispute-a5-20261024`; first independent review REJECT at `470a79f7` (one P1), fixes in the review round below; not pushed.** Cut from `origin/main` `e5d0d3f2`, merged with `origin/main` `707649a6` in `3afcea0d`. The work-package statement below was committed first (`08b8b516`). Tested source after the review round: `0e9520aa3397fa1ce4bcd001074aefb072d85f6c` (first round: `470a79f7`).
 
 Scope rows: FP-068 *Refund and dispute lifecycle* (T21) and FP-040 *Orders customers contracts and refunds* (T19) in `docs/remaining-parity-coverage.csv`; lane A5 in `docs/handoff/2026-10-24/COMPLETION-PLAN.md`.
 
@@ -128,6 +128,44 @@ Every native run's server was stopped by the wrapper and its datadir removed (po
 New: `config/refund-dispute.php`; the migration above; `app/Domain/Commerce/RefundDispute/` (`RefundDisputePolicy`, `RefundDisputeException`, `RefundDisputeState`, `RefundDisputeCase`, `RefundDisputeAuthority`, `RefundDisputeLedger`, `RefundDisputeEffects`, `RefundDisputeActions`, `RefundDisputeAccess`, `StaffCommerceDirectory`, seven models); `app/Filament/Resources/StaffOrderResource.php`, `StaffCustomerResource.php` and their `Pages/`; `resources/views/admin/staff-order-detail.blade.php`, `staff-customer-detail.blade.php`; `tests/Feature/RefundDispute/*` (4 files), `tests/Unit/RefundDisputeStateTest.php`, `tests/Support/RefundDisputeFixtures.php`, `RefundDisputeRace.php`, `refund-dispute-race-worker.php`; `docs/refund-dispute-lifecycle.md`; this packet.
 
 Edited: `app/Domain/Delivery/IssueTestDelivery.php`, `RedeemTestDelivery.php`, `ReadTestOwnerDelivery.php` (one hold check each); seven existing migration roundtrip tests (drop the empty A5 tables first); `tests/Unit/ProductionEnvironmentTemplateTest.php` (`refund-dispute` family); `.env.example`, `ops/production/env.production.example`, `ops/staging/env.staging.example` (default-off keys); `scripts/ci/database-sqlite-skips.json` (four appended methods, first 150 unchanged), `scripts/ci/database-mysql-selection.json` (migration test in `pattern_files`, lifecycle test in `include_files`, two race helpers in `branching_helper_files`); count comments in `.github/workflows/final-verification.yml` and `.gitlab-ci.yml`; `CHANGELOG.md`; `docs/remaining-parity-coverage.csv` (FP-040, FP-068 notes).
+
+## Review round (independent review REJECT at `470a79f7`)
+
+Record: `scratchpad/a5-review-470a79f7.md`. Every fix below has a test that fails on the old code (mutation runs in an isolated worktree copy, one at a time, restored after each; `scratchpad/a5-ev/mutations-review-round.json`).
+
+| Finding | Fix | Commit | Regression test and old-code result |
+| --- | --- | --- | --- |
+| P1 Test customers page errors on every MySQL render (grouped query plus Filament's default `ORDER BY order_finalizations.id`, ERROR 1055 `ONLY_FULL_GROUP_BY`) | Sort only by aggregates: `MAX(order_finalizations.finalized_at)` then `MIN(order_finalizations.id)` (deterministic tie-breaker), used for the default sort and the column sort; Filament's default key sort disabled | `ad5b7cb9` | `test_the_grouped_customer_list_orders_only_by_aggregates_so_mysql_only_full_group_by_accepts_it` asserts every ORDER BY entry is a raw aggregate and executes the query; old string sort: killed (SQLite). Native MySQL: the whole administration suite passes (below); `StaffCommerceAdministrationTest` is now in `include_files`. |
+| P2-1 staging boundary did not pin the flag | `VASEY_TEST_REFUND_DISPUTE_ENABLED` added to `CapabilityBoundary::CAPABILITY_FLAGS` (eleven flags) and stated `false` in both staging templates; the staging profile test pins `RefundDisputePolicy`'s admission rule; production still refuses through `TestEnvironment` | `29063cc5` | `tests/ops/test_staging_capability_profile.py`, `StagingRuntimeValidatorTest` (11 flags), `TestCommerceProfileValidatorTest` (new data-provider case); `validate-test-commerce-profile.php --template` PASS 38/38, "All 11 capability flags are stated explicitly as false" |
+| (found while running all `tests/ops`) `forge-deploy.sh` did not scrub `VASEY_REFUND_DISPUTE_*` | Policy keys renamed to `VASEY_TEST_REFUND_DISPUTE_*`, covered by the existing `VASEY_TEST_*` scrub arm; no ops script changed | `0e9520aa` | `tests/ops/test_staging_code_drift.py` failed 2 before, passes after |
+| P2-2 R1 gate under lock | — (code was correct) | `3a9e73cd` | `test_an_mfa_enrolled_non_admin_is_refused_by_every_writer_before_any_provider_call`: killed |
+| P2-2 R2 remaining-capacity cap | — | `3a9e73cd` | `test_a_second_allocation_is_capped_by_the_line_s_remaining_total_not_its_original_total`: killed |
+| P2-2 R6 open-dispute bar on the exclusive decision | — | `3a9e73cd` | `test_an_exclusive_reopening_decision_refuses_while_a_dispute_is_open_even_for_a_refunded_held_line`: killed |
+| P2-2 R7 owner projection hold | — | `3a9e73cd` | `test_the_owner_download_projection_reports_an_order_wide_hold_and_its_release`: killed |
+| P2-2 R10 policy-hash recheck at commit | — | `3a9e73cd` | `test_a_policy_change_during_the_provider_read_makes_the_commit_stale_and_writes_nothing`: killed |
+| P2-3 migration prefix clash with MIG | Renamed to `2026_10_24_264100_refund_dispute_lifecycle.php`; every literal path updated; merged `origin/main` `707649a6` (T36, PR #170) with a merge commit; CHANGELOG and workflow comment conflicts resolved | `ad5b7cb9`, `3afcea0d` | SQLite census unchanged by main: 295 entries, first-150 hash `d93da4e7…514c71c` matches the pin; native selection regenerated after adding the admin suite |
+| P3 stray root `PROGRESS.md` | Removed | `ad5b7cb9` | — |
+| P3 masked work-table assertion | Asserted unmasked | `3a9e73cd` | — |
+| P3 docs "seven commands" | Six commands plus the read-only order evidence action | `6ab0c98f` | — |
+| P3 public `StaffCommerceDirectory::order()` | Now private; `orderFor()` rechecks staff authority, MFA and account scope | `3a9e73cd` | covered in `test_command_dialogs_close_with_a_notice_outside_test_commerce_and_order_evidence_rechecks_authority` (non-staff refused, out-of-scope `not_found`) |
+| P3 command modal outside test commerce | `fillForm` catches the refusal, notifies and cancels the dialog | `3a9e73cd` | same test with `payments.stripe.mode=live`; old code: error, killed |
+| P3 stuck-after-attention, arbitrary multi-refund split, other delivery paths | Recorded as known limitations in `docs/refund-dispute-lifecycle.md` | `6ab0c98f` | — |
+
+### Review-round results
+
+| Check | Source | Actual result |
+| --- | --- | --- |
+| A5 suites on SQLite: `tests/Feature/RefundDispute`, `tests/Unit/RefundDisputeStateTest.php`, `ProductionEnvironmentTemplateTest`, `StagingRuntimeValidatorTest`, `TestCommerceProfileValidatorTest` | `0e9520aa` | OK, 185 tests, 3,260 assertions, 4 skipped (native census methods), 4 m 19 s |
+| Touched-suite sample on SQLite: TestOwnerDelivery, TestOwnerDeliveryProjection, TestPaymentFinancialObservation, TestCommerceOperations, TestRefundResolutionResource, the seven A5-aware migration roundtrips, CustomerConsent and CustomerListening migrations | `0e9520aa` | OK, 195 tests, 1,983 assertions, 4 skipped (existing), 18 m 41 s |
+| Native MySQL 8.4.11 (fresh private `/opt/mysql-8.4.11/bin/mysqld`, port 3489 free per `ss -ltnp`, datadir under the scratchpad): `StaffCommerceAdministrationTest` | `6ab0c98f` | OK, 5 tests, 88 assertions, 19 m 38 s |
+| Native MySQL: `RefundDisputeMigrationTest` (2) plus the two delivery races | `6ab0c98f` | OK, 4 tests, 94 assertions, 15 m 10 s |
+| Native MySQL: exclusive-purchase race and writer latency | `6ab0c98f` | OK, 2 tests, 19 assertions, 7 m 6 s; observation p50 182.6 ms / max 205.5 ms, suspend+release p50 155.5 ms / max 172.9 ms (15 each) |
+| All `tests/ops/test_*.py` and `scripts/ops/test-*.py` (22 files) | `0e9520aa` | all OK |
+| Safeguards: `test-phpunit-shards.py` 52, `test-ci-scope.py` 27, `test-workflow-cadence.py` 14, `test-focused-tests.py` 53, plus `test-database-receipts.py` 61 | `0e9520aa` | all OK |
+| `composer validate --strict` | `0e9520aa` | valid |
+| Native selection (`phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection`) | `3a9e73cd` + admin include | Proved 2,530 selected tests in 243 files (of 9,631 discovered); comments updated from main's 2,499/9,595/239; generated files deleted |
+
+The native runs used `6ab0c98f`; `0e9520aa` only renames the four policy environment keys (config file, templates, docs), and the tests set those values through `config()`, so the native evidence covers the same behavior. Each native server was stopped by the wrapper and its datadir removed; no other lane's server was touched.
 
 ## Untested conditions and remaining work
 
