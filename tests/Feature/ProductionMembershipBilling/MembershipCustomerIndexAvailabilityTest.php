@@ -12,6 +12,7 @@ use App\Domain\Memberships\Production\MembershipLedgerAudit;
 use App\Domain\Memberships\Production\MembershipPeriodRecords;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Events\TransactionBeginning;
+use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Support\Facades\DB;
 use ReflectionClass;
 use Tests\Support\FinalizationDatabaseMigrations;
@@ -110,8 +111,14 @@ class MembershipCustomerIndexAvailabilityTest extends TestCase
             $calls++;
             MembershipAwardMonotonicClock::advance(31);
         });
+        $committed = 0;
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitted::class, function () use (&$committed): void {
+            $committed++;
+        });
         $this->refused(fn () => $read->proveBeforeBytes(), 'operation_deadline');
         $this->assertSame(1, $calls);
+        // The original deadline stops the re-run inside its transaction: it never reaches its commit.
+        $this->assertSame(0, $committed);
         $this->assertSame(0, DB::transactionLevel());
     }
 

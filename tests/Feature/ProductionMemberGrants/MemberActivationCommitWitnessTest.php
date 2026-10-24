@@ -62,6 +62,36 @@ class MemberActivationCommitWitnessTest extends TestCase
         $this->assertSame(0, DB::transactionLevel());
     }
 
+    public function test_the_witness_keeps_a_committed_confirmation_committed_when_a_callback_reopens_a_transaction(): void
+    {
+        $fixture = $this->memberActivationFixture();
+        [$issuer, $input] = $this->reviewInput($fixture);
+        $primary = DB::connection()->getPdo();
+        $armed = true;
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, function () use (&$armed, $primary): void {
+            if (! $armed || ! self::inside(MemberOriginalSourceCapture::class, 'inspectActivation')) {
+                return;
+            }
+            $armed = false;
+            DB::afterCommit(static function () use ($primary): void {
+                // After the owned physical commit a callback leaves a foreign transaction open, so an idle-PDO check
+                // alone would now read "not committed". Only the witness still knows the effect is durable.
+                $primary->beginTransaction();
+
+                throw new RuntimeException('synthetic afterCommit failure with a reopened transaction');
+            });
+        });
+        try {
+            $this->refused(fn () => $issuer->confirm($fixture['member_authored']->definitionId, $fixture['reservation']['redemption_id'],
+                $input, $fixture['buyer']['principal'], $fixture['buyer']['user']), 'committed_activation_receipt_refused');
+        } finally {
+            if ($primary->inTransaction()) {
+                $primary->rollBack();
+            }
+        }
+        $this->assertFalse($armed);
+    }
+
     public function test_idle_pdo_before_the_owned_commit_call_is_a_pre_commit_refusal(): void
     {
         $fixture = $this->memberActivationFixture();

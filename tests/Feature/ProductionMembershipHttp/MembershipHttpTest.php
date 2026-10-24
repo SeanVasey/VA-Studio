@@ -100,9 +100,15 @@ final class MembershipHttpTest extends TestCase
         DB::listen(function ($event) use (&$queries): void {
             $queries[] = $event->sql;
         });
+        // The domain reads with raw PDO, which query events do not see; its transactions are visible.
+        $transactions = 0;
+        DB::connection()->getEventDispatcher()->listen(TransactionBeginning::class, static function () use (&$transactions): void {
+            $transactions++;
+        });
         $this->notFound($this->getMember('/production-memberships/periods'));
         $this->notFound($this->reserve($fixture, $period));
         $this->assertSame([], $queries);
+        $this->assertSame(0, $transactions);
     }
 
     public function test_every_refusal_is_the_one_not_found_response(): void
