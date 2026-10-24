@@ -134,6 +134,8 @@ How it behaves, measured with a throwaway script against a real `database` cache
 
 **Risk accepted and tracked (independent review R1 and R3):** the content is low-sensitivity, so the update proceeds; a scheduled deletion of expired `cache` rows is a production-preparation requirement, recorded in the deferred ledger. Recommendations, not done (outside the lane): schedule a deletion of expired `cache` rows (`cache:clear` would also reset the throttles that live in the same store), and say in `docs/ops` that Filament flash messages and TOTP replay records need a shared, persistent cache store.
 
+**R3 status (October 24, 2026): implemented in lane O4, pending review.** `vasey:cache-prune-expired` is scheduled hourly and deletes only expired `cache` and `cache_locks` rows; the `docs/ops` note is in `ops/staging/README.md` and `ops/production/README.md` ("Cache housekeeping"). The evidence, the forever-key proof and what is still untested on a host: [`docs/verification/cache-prune-20261024/README.md`](../cache-prune-20261024/README.md). Until that branch is merged and a host's scheduler has run it, the retention gap this section describes is still open.
+
 ## Verification
 
 The 147-, 72- and 2-file runs were made at `29bc5add`, the tree of `e5b482c4` before the commit reorder, which differs only in `DiscoverySitemapRegistrationTest.php`; that file was re-run at the tip on both versions. The 5.8.4 runs of the migrated files and of the 147-file set are at `ab2b001e`.
@@ -184,7 +186,7 @@ confirmed on a genuine 5.8.4 tree; the sitemap change keeps the route session-le
 sitemap, embed and Stripe webhook routes starts no session and writes no Filament cache key). The two conditions are
 corrected by the commit after the reviewed one: R1 (P2), this packet's claim that sessions were also plain text (they are
 encrypted; the change is recorded above as a tracked risk), and R2 (P3), the counts made stale by the PR #157 merge. Deferred:
-R3 (P2, before production: scheduled deletion of expired `cache` rows) and R4 to R7 (P3: the 60 s TOTP lock after a crashed
+R3 (P2, before production: scheduled deletion of expired `cache` rows; implemented on lane O4's branch, see [`../cache-prune-20261024/`](../cache-prune-20261024/README.md)) and R4 to R7 (P3: the 60 s TOTP lock after a crashed
 request, Filament's login hooks firing for customer sign-ins, a code-only rollback's one 500 per touched staff session, and the
 helper's dependency on `flush()`).
 
