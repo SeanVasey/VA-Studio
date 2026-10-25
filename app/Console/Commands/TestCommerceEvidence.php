@@ -23,17 +23,23 @@ use App\Domain\Delivery\Models\TestFulfillmentActivation;
 use App\Support\Environment\TestEnvironment;
 use Carbon\CarbonInterface;
 use Illuminate\Console\Command;
+use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LogicException;
 use RuntimeException;
+use Symfony\Component\Console\Formatter\OutputFormatter;
+use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
+use WeakMap;
 
 /**
  * Minimized, read-only evidence snapshot of one Stripe TEST order for the M-07 drill packet
  * (docs/ops/stripe-test-drills.md). It reads plaintext ledger columns only: no decryption, no
  * provider request, no buyer details, owner keys, checkout URLs, ciphertext or credentials, and
- * every database statement it issues must be a SELECT. It refuses production, an ambiguous
+ * every database statement it issues must be a plain SELECT (no locking clause, no INTO). On MySQL the reads run in one
+ * `START TRANSACTION READ ONLY` at REPEATABLE READ, so the snapshot is internally consistent and the server itself refuses a
+ * write. It refuses production, an ambiguous
  * environment, anything outside local, testing and staging, and any Stripe live-mode configuration.
  */
 final class TestCommerceEvidence extends Command
@@ -45,14 +51,23 @@ final class TestCommerceEvidence extends Command
 
     public const RECEIPT_LIMIT = 50;
 
+    /** The only checkout intent columns the snapshot uses; the rest of the row (buyer-side and provider detail) is never loaded. */
+    private const INTENT_COLUMNS = ['id', 'public_id', 'order_id', 'provider_expires_at'];
+
     protected $signature = 'vasey:test-commerce-evidence
         {reference : Order UUID, checkout intent UUID, Stripe test session (cs_test_...) or event (evt_...) ID}
         {--json : Emit one JSON object instead of key=value lines}';
 
     protected $description = 'Print a minimized read-only Stripe TEST evidence snapshot for one order (local, testing or staging only; no writes, no Stripe requests).';
 
-    /** Set only while this command reads, so the statement guard never affects other work in the process. */
-    private bool $reading = false;
+    /**
+     * One statement guard per connection object, registered once and switched on only while a snapshot reads. Laravel offers no
+     * way to remove a single `beforeExecuting` callback, so the callback holds nothing but its switch (never this command) and
+     * is inert once the command ends; a later run reuses it instead of adding another.
+     *
+     * @var WeakMap<Connection, object{active: bool}>|null
+     */
+    private static ?WeakMap $guards = null;
 
     public function handle(): int
     {
@@ -70,13 +85,11 @@ final class TestCommerceEvidence extends Command
             return self::FAILURE;
         }
         $connection = DB::connection();
-        $connection->beforeExecuting(function (string $query): void {
-            if ($this->reading && preg_match('/\A\s*select\s/i', $query) !== 1) {
-                throw new LogicException('The evidence snapshot issues SELECT statements only.');
-            }
-        });
+        $guard = self::guard($connection);
+        $framed = false;
         try {
-            $this->reading = true;
+            $framed = $this->beginReadOnly($connection);
+            $guard->active = true;
             $snapshot = $this->snapshot($account, $reference);
         } catch (Throwable $error) {
             // No message, query, path or provider detail leaves the console; the log keeps only the class.
@@ -85,7 +98,10 @@ final class TestCommerceEvidence extends Command
 
             return self::FAILURE;
         } finally {
-            $this->reading = false;
+            $guard->active = false;
+            if ($framed) {
+                $this->endReadOnly($connection);
+            }
         }
         if ($snapshot === null) {
             $this->error('No Stripe test order matches that reference for the configured account.');
@@ -93,13 +109,70 @@ final class TestCommerceEvidence extends Command
             return self::FAILURE;
         }
         if ($this->option('json')) {
-            $snapshot['payment']['observation_outcomes'] = (object) $snapshot['payment']['observation_outcomes'];
-            $this->line(json_encode($snapshot, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            $this->json($snapshot);
         } else {
             $this->text($snapshot);
         }
 
         return self::SUCCESS;
+    }
+
+    private static function guard(Connection $connection): object
+    {
+        self::$guards ??= new WeakMap;
+        if (! isset(self::$guards[$connection])) {
+            $guard = new class
+            {
+                public bool $active = false;
+            };
+            $connection->beforeExecuting(static function (string $query) use ($guard): void {
+                if ($guard->active && ! self::isPlainSelect($query)) {
+                    throw new LogicException('The evidence snapshot issues plain SELECT statements only.');
+                }
+            });
+            self::$guards[$connection] = $guard;
+        }
+
+        return self::$guards[$connection];
+    }
+
+    /** A SELECT with no locking clause and no INTO (`INTO OUTFILE`, `INTO DUMPFILE`, `INTO @variable`). */
+    public static function isPlainSelect(string $query): bool
+    {
+        return preg_match('/\A\s*select\s/i', $query) === 1
+            && preg_match('/\bfor\s+(?:update|share|no\s+key\s+update|key\s+share)\b|\block\s+in\s+share\s+mode\b|\binto\b/i', $query) !== 1;
+    }
+
+    /**
+     * MySQL: one read-only transaction at REPEATABLE READ, so every query reads the same snapshot and the server refuses a
+     * write whatever the statement guard misses. The framing statements run before the guard is switched on. Inside a transaction
+     * the caller already holds (it must not be committed implicitly) and on other engines the reads are not framed.
+     */
+    private function beginReadOnly(Connection $connection): bool
+    {
+        if ($connection->getDriverName() !== 'mysql' || $connection->transactionLevel() > 0) {
+            return false;
+        }
+        $connection->unprepared('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');
+        $connection->unprepared('START TRANSACTION READ ONLY');
+
+        return true;
+    }
+
+    private function endReadOnly(Connection $connection): void
+    {
+        try {
+            $connection->unprepared('ROLLBACK');
+        } catch (Throwable $error) {
+            Log::warning('Test commerce evidence read-only transaction did not close cleanly.', ['exception_class' => $error::class]);
+        }
+    }
+
+    /** Raw output: the console formatter would read `<...>` inside a value as a style tag. */
+    private function json(array $snapshot): void
+    {
+        $snapshot['payment']['observation_outcomes'] = (object) $snapshot['payment']['observation_outcomes'];
+        $this->output->writeln(json_encode($snapshot, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT), OutputInterface::OUTPUT_RAW);
     }
 
     /** Mirrors the staging synthetic catalog admission: both environment sources must agree, and nothing live. */
@@ -144,8 +217,8 @@ final class TestCommerceEvidence extends Command
         if (OrderRequest::uuid($reference)) {
             $orderId = Order::query()->where('public_id', $reference)->value('id');
 
-            return $orderId !== null ? $scoped()->where('order_id', $orderId)->first()
-                : $scoped()->where('public_id', $reference)->first();
+            return $orderId !== null ? $scoped()->where('order_id', $orderId)->first(self::INTENT_COLUMNS)
+                : $scoped()->where('public_id', $reference)->first(self::INTENT_COLUMNS);
         }
         $session = str_starts_with($reference, 'evt_')
             ? StripeWebhookReceipt::query()->where('account_id', $account)->where('livemode', false)
@@ -157,7 +230,7 @@ final class TestCommerceEvidence extends Command
         $intentId = CheckoutSession::query()->where('account_id', $account)->where('mode', 'test')
             ->where('provider_session_id', $session)->value('checkout_intent_id');
 
-        return $intentId === null ? null : $scoped()->whereKey($intentId)->first();
+        return $intentId === null ? null : $scoped()->whereKey($intentId)->first(self::INTENT_COLUMNS);
     }
 
     private function snapshot(string $account, string $reference): ?array
@@ -256,8 +329,9 @@ final class TestCommerceEvidence extends Command
 
     private function text(array $s): void
     {
+        // Values are escaped: a stored string containing `<...>` must print literally, not be read as a console style tag.
         $value = fn (mixed $item): string => match (true) {
-            $item === null => '-', $item === true => 'yes', $item === false => 'no', default => (string) $item,
+            $item === null => '-', $item === true => 'yes', $item === false => 'no', default => OutputFormatter::escape((string) $item),
         };
         $pairs = fn (array $items): string => implode(' ', array_map(fn ($key) => $key.'='.$value($items[$key]), array_keys($items)));
         $this->line('VASEY.AUDIO Stripe TEST evidence snapshot ('.$s['schema'].'). Read-only: no writes, no Stripe requests.');
@@ -266,7 +340,7 @@ final class TestCommerceEvidence extends Command
         $this->line('reservation '.($s['reservation'] === null ? 'none' : $pairs($s['reservation'])));
         $this->line('checkout '.$pairs($s['checkout']));
         $payment = $s['payment'];
-        $outcomes = $payment['observation_outcomes'] === [] ? '-' : implode(',', array_map(fn ($outcome) => $outcome.':'.$payment['observation_outcomes'][$outcome], array_keys($payment['observation_outcomes'])));
+        $outcomes = $payment['observation_outcomes'] === [] ? '-' : implode(',', array_map(fn ($outcome) => OutputFormatter::escape((string) $outcome).':'.$payment['observation_outcomes'][$outcome], array_keys($payment['observation_outcomes'])));
         $this->line('payment '.$pairs(array_diff_key($payment, array_flip(['observation_outcomes', 'observations']))).' observation_outcomes='.$outcomes);
         foreach ($payment['observations'] as $observation) {
             $this->line('payment_observation '.$pairs($observation));

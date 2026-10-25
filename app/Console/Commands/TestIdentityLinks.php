@@ -18,7 +18,10 @@ use Throwable;
 /**
  * Lets a staging operator list captured test identity messages for synthetic test addresses and print one pending
  * sign-in or recovery link to relay to the tester who owns that test account. Read-only: it never consumes, extends, re-signs or
- * changes a link, a challenge or an account. Every rule (environment, capture capability, verification, synthetic
+ * changes a link, a challenge or an account. The password prompt is hidden when the input is a terminal; the command checks
+ * that the session is interactive (not `--no-interaction`), not that standard input is a terminal, so a piped password is
+ * accepted: the confirmed password and the staff authority are the gate, not the terminal.
+ * Every rule (environment, capture capability, verification, synthetic
  * recipients, audit) is in {@see TestIdentityLinkRelay}; this command confirms the named staff account at a hidden
  * prompt, records a console attestation where the panel requires the staff factor, and maps outcomes.
  */
@@ -30,6 +33,7 @@ final class TestIdentityLinks extends Command
         {action : list or print}
         {id? : The message id that list printed (print only)}
         {--operator= : Email of the staff account relaying links; its password is confirmed at a hidden prompt}
+        {--limit=50 : list only: examine the newest N captures by file modification time, 1 to 200}
         {--attest : Record a console attestation in the audit log before any capture is read (required where staff MFA is required)}';
 
     protected $description = 'List captured test identity messages for synthetic test addresses and print one pending link to relay (local, testing or staging only).';
@@ -60,6 +64,10 @@ final class TestIdentityLinks extends Command
         if ($action === 'list' && $id !== null) {
             return $this->invalid('list takes no message id.');
         }
+        $limit = filter_var($this->option('limit'), FILTER_VALIDATE_INT);
+        if ($limit === false || $limit < 1 || $limit > TestIdentityLinkRelay::MAX_LIST_LIMIT) {
+            return $this->invalid('--limit must be a whole number from 1 to '.TestIdentityLinkRelay::MAX_LIST_LIMIT.'.');
+        }
         if ($action === 'print' && ! TestIdentityLinkRelay::isMessageId($id)) {
             return $this->invalid('print needs the message id that list printed (a lowercase UUID).');
         }
@@ -70,7 +78,7 @@ final class TestIdentityLinks extends Command
             return $this->refuse($refusal->getMessage());
         }
         if (! $this->input->isInteractive()) {
-            return $this->refuse('The relay requires an interactive trusted console to confirm the staff password.');
+            return $this->refuse('The relay requires an interactive session (not --no-interaction) to confirm the staff password at a hidden prompt.');
         }
         $operator = $this->confirmed($operator);
         if ($operator === null) {
@@ -84,7 +92,7 @@ final class TestIdentityLinks extends Command
             $this->attest($operator, $action, $id);
         }
         try {
-            return $action === 'list' ? $this->list($relay, $operator) : $this->print($relay, $operator, $id);
+            return $action === 'list' ? $this->list($relay, $operator, $limit) : $this->print($relay, $operator, $id);
         } catch (TestIdentityLinkRefusal $refusal) {
             return $this->refuse($refusal->getMessage());
         }
@@ -114,9 +122,9 @@ final class TestIdentityLinks extends Command
         $this->line('attestation=recorded audit_event='.$attestation->auditEventId);
     }
 
-    private function list(TestIdentityLinkRelay $relay, User $operator): int
+    private function list(TestIdentityLinkRelay $relay, User $operator, int $limit): int
     {
-        $result = $relay->messages();
+        $result = $relay->messages($limit);
         $audit = $relay->recordListing($operator, $result, $this->attestationAuditId);
         $this->warn('TEST ONLY. Environment: '.app()->environment().'. Captured test identity messages for synthetic test addresses, newest first.');
         if ($result['messages'] === []) {
@@ -129,6 +137,10 @@ final class TestIdentityLinks extends Command
         if ($result['withheld'] > 0) {
             $this->line($result['withheld'].' capture(s) withheld: not a verified message for a synthetic test address '
                 .'(.test, .example, .invalid, .localhost, example.com, example.net or example.org). Nothing from them is shown.');
+        }
+        if ($result['not_examined'] > 0) {
+            $this->line($result['not_examined'].' older capture(s) not examined: this listing reads the newest '.$limit
+                .' by file modification time. Raise --limit (at most '.TestIdentityLinkRelay::MAX_LIST_LIMIT.') to look further back.');
         }
         $this->line('listing audit_event='.$audit);
         $this->line('To relay one pending link: php artisan vasey:test-identity-links print MESSAGE_ID --operator=EMAIL'.($this->option('attest') ? ' --attest' : ''));

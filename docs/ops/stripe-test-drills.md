@@ -55,7 +55,7 @@ Append; never overwrite. Keep failed and refused runs and label them. Label ever
 
 | Command | Shows | Writes? |
 | --- | --- | --- |
-| `art vasey:test-commerce-evidence <REF> [--json]` | One order's minimized state: reservation, checkout status, payment (verified, source, confirming event), payment observations, webhook receipts with their work state and outcome, finalization, grant count, fulfillment, unpaid release and account-wide test totals | No: SELECT statements only, no Stripe request, no decryption |
+| `art vasey:test-commerce-evidence <REF> [--json]` | One order's minimized state: reservation, checkout status, payment (verified, source, confirming event), payment observations, webhook receipts with their work state and outcome, finalization, grant count, fulfillment, unpaid release and account-wide test totals | No: plain SELECT statements only (a locking clause or INTO is refused), read in one read-only repeatable-read transaction on MySQL so the snapshot is consistent; no Stripe request, no decryption |
 | `art vasey:stripe-inbox --limit=10` | Recent receipts: event ID, type, session ID, received time | No |
 | `art vasey:doctor --json` | Redacted installation report | No |
 | `php scripts/ops/validate-test-commerce-profile.php .env` | Profile checks; no values printed | No (reads the file you pass) |

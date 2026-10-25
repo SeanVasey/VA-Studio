@@ -444,7 +444,7 @@ retry_copies_summary() {  # prints "N kept retry copies, B bytes" for this host
 # already there. The exception is a set this host recorded as shipped whose remote digest and ciphertext size still match the record:
 # "already shipped" (a size check of the ciphertext, not a content check).
 ship_encrypted_rclone() {  # ship_encrypted_rclone SET_DIR STAGE_DIR; returns nonzero without exiting
-  local bk=$1 stage=$2 name retry shipped present listed rc=0
+  local bk=$1 stage=$2 name retry shipped present listed recorded remote size rc=0
   name=$(basename "$bk")
   retry=$VASEY_BACKUP_DIR/.offhost-retry.$name
   shipped=$VASEY_BACKUP_DIR/.offhost-shipped.$name
@@ -453,9 +453,11 @@ ship_encrypted_rclone() {  # ship_encrypted_rclone SET_DIR STAGE_DIR; returns no
   else
     present=$(remote_names "$name.tar.age" "$name.tar.age.sha256") || { log "could not list the remote; nothing was sent"; return 1; }
     if [ -n "$present" ]; then
+      # Both sizes must be plain digits and equal: a record with no size, and a listing that returned none, are not a match.
       if [ "$present" = "$name.tar.age"$'\n'"$name.tar.age.sha256" ] && [ -f "$shipped" ] && [ ! -L "$shipped" ] \
          && rclone_run cat "$(remote_join "$name.tar.age.sha256")" | cmp -s - <(sed -n 1p "$shipped") \
-         && [ "$(sed -n 's/^size=//p' "$shipped")" = "$(remote_size "$name.tar.age")" ]; then
+         && recorded=$(sed -n 's/^size=//p' "$shipped") && remote=$(remote_size "$name.tar.age") \
+         && [[ "$recorded" =~ ^[0-9]+$ ]] && [[ "$remote" =~ ^[0-9]+$ ]] && [ "$recorded" = "$remote" ]; then
         ALREADY_SHIPPED=1
         return 0
       fi
@@ -483,8 +485,15 @@ ship_encrypted_rclone() {  # ship_encrypted_rclone SET_DIR STAGE_DIR; returns no
     fi
     return 1
   fi
-  { cat -- "$retry/$name.tar.age.sha256" && echo "size=$(stat -c %s -- "$retry/$name.tar.age")"; } > "$shipped.new" \
-    && mv -T -- "$shipped.new" "$shipped" || log "WARNING: could not record $name as shipped"
+  # The size comes first so a failed stat cannot leave a record that has a digest and an empty size.
+  if size=$(stat -c %s -- "$retry/$name.tar.age") && [[ "$size" =~ ^[0-9]+$ ]] \
+     && { cat -- "$retry/$name.tar.age.sha256" && echo "size=$size"; } > "$shipped.new" \
+     && mv -T -- "$shipped.new" "$shipped"; then
+    :
+  else
+    rm -f -- "$shipped.new" 2>/dev/null || true
+    log "WARNING: could not record $name as shipped"
+  fi
   rm -rf --one-file-system -- "$retry" || log "WARNING: could not remove $retry after a verified transfer"
 }
 
