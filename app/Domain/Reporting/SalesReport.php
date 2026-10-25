@@ -202,15 +202,15 @@ final class SalesReport
     {
         $bucket = self::bucket('f.finalized_at', $period['granularity']);
         $rows = $this->testScope($account, $period, ['paid', 'paid_exception'])->leftJoin('refund_dispute_observations as r', ReportingQueries::latestObserved(...))
-            ->selectRaw($bucket.' AS period, p.currency AS currency,'
+            ->selectRaw($bucket.' AS bucket_label, p.currency AS currency,'
                 ." COUNT(CASE WHEN f.outcome = 'paid' THEN 1 END) AS orders,"
                 ." COALESCE(SUM(CASE WHEN f.outcome = 'paid' THEN p.amount_minor END), 0) AS gross_minor,"
                 ." COALESCE(SUM(CASE WHEN f.outcome = 'paid' THEN r.succeeded_refund_minor END), 0) AS refunded_minor,"
                 ." COUNT(CASE WHEN f.outcome = 'paid_exception' THEN 1 END) AS exception_orders,"
                 ." COALESCE(SUM(CASE WHEN f.outcome = 'paid_exception' THEN p.amount_minor END), 0) AS exception_gross_minor")
-            ->groupBy('period', 'p.currency')->orderBy('period')->orderBy('p.currency')->get();
+            ->groupBy('bucket_label', 'p.currency')->orderBy('bucket_label')->orderBy('p.currency')->get();
 
-        return $rows->map(fn ($row): array => ['period' => (string) $row->period, 'currency' => (string) $row->currency, 'orders' => (int) $row->orders,
+        return $rows->map(fn ($row): array => ['period' => (string) $row->bucket_label, 'currency' => (string) $row->currency, 'orders' => (int) $row->orders,
             'gross_minor' => (int) $row->gross_minor, 'refunded_minor' => (int) $row->refunded_minor,
             'net_minor' => (int) $row->gross_minor - (int) $row->refunded_minor, 'exception_orders' => (int) $row->exception_orders,
             'exception_gross_minor' => (int) $row->exception_gross_minor])->all();
@@ -366,12 +366,12 @@ final class SalesReport
             }
             $bucket = self::bucket('p.observed_at', $period['granularity'], iso: true);
             $payments = fn (): Builder => DB::table('production_checkout_payments as p')->where('p.observed_at', '>=', $period['startIso'])->where('p.observed_at', '<', $period['endIso']);
-            $periods = $payments()->selectRaw($bucket.' AS period, p.funds_mode AS funds_mode,'
+            $periods = $payments()->selectRaw($bucket.' AS bucket_label, p.funds_mode AS funds_mode,'
                 ." COUNT(CASE WHEN p.outcome = 'on_time' THEN 1 END) AS orders,"
                 ." COALESCE(SUM(CASE WHEN p.outcome = 'on_time' THEN p.amount_minor END), 0) AS gross_minor,"
                 ." COUNT(CASE WHEN p.outcome = 'paid_exception' THEN 1 END) AS exception_orders,"
                 ." COALESCE(SUM(CASE WHEN p.outcome = 'paid_exception' THEN p.amount_minor END), 0) AS exception_gross_minor")
-                ->groupBy('period', 'p.funds_mode')->orderBy('period')->orderBy('p.funds_mode')->get();
+                ->groupBy('bucket_label', 'p.funds_mode')->orderBy('bucket_label')->orderBy('p.funds_mode')->get();
             $tiers = $payments()->join('production_checkout_order_lines as l', 'l.order_id', '=', 'p.order_id')
                 ->join('license_versions as v', 'v.id', '=', 'l.license_version_id')->join('license_templates as t', 't.id', '=', 'v.license_template_id')
                 ->where('p.outcome', 'on_time')
@@ -380,7 +380,7 @@ final class SalesReport
             $modes = [];
             foreach ($periods as $row) {
                 $mode = $row->funds_mode === 'live' ? 'live' : 'rehearsal';
-                $modes[$mode]['periods'][] = ['period' => (string) $row->period, 'orders' => (int) $row->orders, 'gross_minor' => (int) $row->gross_minor,
+                $modes[$mode]['periods'][] = ['period' => (string) $row->bucket_label, 'orders' => (int) $row->orders, 'gross_minor' => (int) $row->gross_minor,
                     'exception_orders' => (int) $row->exception_orders, 'exception_gross_minor' => (int) $row->exception_gross_minor];
             }
             foreach ($tiers as $row) {
