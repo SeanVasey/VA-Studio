@@ -32,22 +32,25 @@ use App\Support\PhpCliBinaryUnavailable;
 use Dotenv\Dotenv;
 use Dotenv\Parser\Parser;
 use Illuminate\Contracts\Console\Kernel;
+use Vasey\Ops\CapabilityBoundary;
 
 /**
- * Pre-launch capability hold, approved by Sean on 2026-10-18: environment key => config key, each refused unless false.
+ * Pre-launch capability hold, approved by Sean on 2026-10-18: the environment keys of the four flags, each refused unless false.
  * Three have no environment gate in the application: an operative free grant and an operator notification are bound only by an
  * adapter that other code would supply, and the public track sitemap build chain is not environment-gated while the public index
  * serves it in production. In production this validator is their only guard. The fourth, V2 listening promotion, is reached
  * today only through a customer session, which the test customer access path creates in local, testing and staging only, and
  * the production listening lane does not read it; it is held as defence in depth because promotion is a one-way data change.
- * Lifting one is a reviewed change to this file together with Sean's authorization for that activation. Same keys as
- * scripts/ops/capability-boundary.php (tests/ops pins the agreement). Never printed with a value.
+ * Lifting one is a reviewed change to this file together with Sean's authorization for that activation. The config key of each
+ * flag is not restated here: it is read from scripts/ops/capability-boundary.php, the definition shared with the staging deploy
+ * gate and the profile validator, so a renamed key cannot leave this gate checking a stale one. A key the boundary no longer
+ * holds fails closed (runtime.unavailable). Never printed with a value.
  */
 const PRE_LAUNCH_HOLDS = [
-    'VASEY_OPERATIVE_FREE_GRANTS_ENABLED' => 'free-grants.operative_enabled',
-    'CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED' => 'inquiries.operator_notifications_enabled',
-    'DISCOVERY_SITEMAP_ENABLED' => 'discovery-sitemap.enabled',
-    'VASEY_LISTENING_V2_PROMOTION_ENABLED' => 'customer-listening.v2_promotion_enabled',
+    'VASEY_OPERATIVE_FREE_GRANTS_ENABLED',
+    'CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED',
+    'DISCOVERY_SITEMAP_ENABLED',
+    'VASEY_LISTENING_V2_PROMOTION_ENABLED',
 ];
 
 ini_set('display_errors', '0');
@@ -73,6 +76,17 @@ $scratch = null;
 try {
     $root = dirname(__DIR__, 2);
     require $root.'/vendor/autoload.php';
+    // The shared capability boundary: a missing file is a refusal (runtime.unavailable), never a silent skip, because this
+    // validator is the only guard some of the held flags have in production.
+    $boundary = $root.'/scripts/ops/capability-boundary.php';
+    if (! is_file($boundary) || is_link($boundary)) {
+        throw new RuntimeException;
+    }
+    require_once $boundary;
+    $holdKeys = array_intersect_key(CapabilityBoundary::stagedFlags(), array_flip(PRE_LAUNCH_HOLDS));
+    if (count($holdKeys) !== count(PRE_LAUNCH_HOLDS)) {
+        throw new RuntimeException;
+    }
     // The preflight demands a canonical absolute path itself; refuse anything else before it is asked.
     $check('runtime.arguments_shape', $expected === 'production' && str_starts_with($file, '/')
         && preg_match('/\A[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+\z/', $host) === 1
@@ -99,7 +113,7 @@ try {
     }
     // The pre-launch capability flags follow the same rule: only the literal false, or unset (the config default is false).
     // A blank or any other value fails here, before the preflight child and the configuration check below are asked.
-    foreach (array_keys(PRE_LAUNCH_HOLDS) as $name) {
+    foreach (PRE_LAUNCH_HOLDS as $name) {
         if (array_key_exists($name, $values)) {
             $check('holds.'.strtolower($name), in_array(strtolower((string) $values[$name]), ['false', '(false)'], true));
         }
@@ -192,7 +206,7 @@ try {
         $check('holds.production_credentials', in_array(config('production_checkout.secret_key'), [null, ''], true)
             && in_array(config('production_checkout.funds_mode'), [null, ''], true));
         // Strictly false, on purpose: a config key that is renamed or removed reads null and fails closed rather than passing.
-        foreach (PRE_LAUNCH_HOLDS as $name => $key) {
+        foreach ($holdKeys as $name => $key) {
             $check('holds.'.strtolower($name), config($key) === false);
         }
         // Renderer children started inside FPM requests need a genuine CLI PHP of this exact version and build (M-16).

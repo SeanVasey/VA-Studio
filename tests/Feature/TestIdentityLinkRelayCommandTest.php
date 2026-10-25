@@ -3,7 +3,10 @@
 namespace Tests\Feature;
 
 use App\Console\Commands\TestIdentityLinks;
+use App\Domain\Customers\CustomerIdentityPolicy;
 use App\Domain\Customers\Models\CustomerIdentityChallenge;
+use App\Domain\Customers\TestIdentityLinks\TestIdentityLinkMessage;
+use App\Domain\Customers\TestIdentityLinks\TestIdentityLinkRefusal;
 use App\Domain\Customers\TestIdentityLinks\TestIdentityLinkRelay;
 use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
@@ -253,7 +256,7 @@ class TestIdentityLinkRelayCommandTest extends TestCase
         $operator->forceFill(['email_verified_at' => now()])->save();
         $before = [$this->state(), AuditEvent::count()];
 
-        $this->assertRefused($this->console(['action' => 'list'], interactive: false), 'The relay requires an interactive trusted console');
+        $this->assertRefused($this->console(['action' => 'list'], interactive: false), 'The relay requires an interactive session (not --no-interaction) to confirm the staff password at a hidden prompt.');
         foreach (['wrong-password', '', null, CustomerFixtures::PASSWORD] as $password) {
             $result = $this->console(['action' => 'list'], $password);
             $this->assertRefused($result, 'Operator authority was refused: the staff password was not confirmed. No link was printed and nothing was recorded.', 1);
@@ -360,7 +363,7 @@ class TestIdentityLinkRelayCommandTest extends TestCase
         [$listed] = $this->audits(TestIdentityLinkRelay::LISTED);
         $this->assertSame([$operator->id, User::class, $operator->id], [$listed->actor_id, $listed->subject_type, $listed->subject_id]);
         $this->assertSame(['schema_version' => 1, 'command' => 'vasey:test-identity-links', 'shown' => 2, 'pending' => 2, 'withheld' => 1,
-            'test_only' => true, 'environment' => 'testing', 'attestation_audit_id' => null], $listed->context);
+            'not_examined' => 0, 'test_only' => true, 'environment' => 'testing', 'attestation_audit_id' => null], $listed->context);
         $this->assertStringContainsString('listing audit_event='.$listed->id, $text);
         $this->assertSame($f['account']->id, CustomerIdentityChallenge::where('public_id', $recover['id'])->value('account_id'));
     }
@@ -418,8 +421,8 @@ class TestIdentityLinkRelayCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/'.preg_quote($used['id'], '/').'.*\|\s*used\s*\|/', $result['text']);
         $this->assertMatchesRegularExpression('/'.preg_quote($expired['id'], '/').'.*\|\s*expired\s*\|/', $result['text']);
         $this->assertMatchesRegularExpression('/'.preg_quote($fresh['id'], '/').'.*\|\s*pending\s*\|/', $result['text']);
-        $this->assertSame(['shown' => 3, 'pending' => 1, 'withheld' => 0],
-            array_intersect_key($this->audits(TestIdentityLinkRelay::LISTED)[0]->context, array_flip(['shown', 'pending', 'withheld'])));
+        $this->assertSame(['shown' => 3, 'pending' => 1, 'withheld' => 0, 'not_examined' => 0],
+            array_intersect_key($this->audits(TestIdentityLinkRelay::LISTED)[0]->context, array_flip(['shown', 'pending', 'withheld', 'not_examined'])));
 
         $result = $this->console(['action' => 'print', 'id' => $used['id']]);
         $this->assertRefused($result, 'That link was already used at ', 1);
@@ -608,5 +611,156 @@ class TestIdentityLinkRelayCommandTest extends TestCase
         $this->assertSame([$operator->id], array_map(fn (AuditEvent $row): int => $row->actor_id, $this->audits(TestIdentityLinkRelay::LISTED)));
         $this->assertRefused($this->console(['action' => 'print', 'id' => (string) Str::uuid()]), 'No relayable capture has that id.', 1);
         $this->assertFalse(is_dir($this->directory()), 'The relay creates no directory.');
+    }
+
+    /** @return list<array{id: string, proof: string}> Captures created oldest first, whose file times run the opposite way. */
+    private function requestsWithReversedFileTimes(int $count): array
+    {
+        $bodies = [];
+        for ($i = 0; $i < $count; $i++) {
+            $this->travel(2)->seconds();
+            $bodies[] = F::request('enroll', 'tester-'.$i.'@example.test');
+        }
+        // The newest file time belongs to the first-created capture: the listing must follow the file time, not the challenge.
+        foreach ($bodies as $i => $body) {
+            touch($this->capturePath($body['id']), 1_800_000_000 + ($count - $i) * 10);
+        }
+
+        return $bodies;
+    }
+
+    public function test_the_list_examines_only_the_newest_captures_by_file_time_and_counts_the_rest(): void
+    {
+        $this->operator();
+        $bodies = $this->requestsWithReversedFileTimes(5);
+        $before = [$this->state(), AuditEvent::count()];
+
+        $result = $this->console(['action' => 'list', '--limit' => '2']);
+
+        $this->assertSame(0, $result['code'], $result['text']);
+        $this->assertStringContainsString($bodies[0]['id'], $result['text']);
+        $this->assertStringContainsString($bodies[1]['id'], $result['text']);
+        foreach ([2, 3, 4] as $older) {
+            $this->assertStringNotContainsString($bodies[$older]['id'], $result['text']);
+            $this->assertStringNotContainsString('tester-'.$older.'@example.test', $result['text']);
+        }
+        $this->assertStringContainsString('3 older capture(s) not examined: this listing reads the newest 2 by file modification time.', $result['text']);
+        $this->assertStringNotContainsString('withheld', $result['text'], 'older captures are not examined, which is not withholding');
+        $this->assertSame($before[0], $this->state());
+        $this->assertSame(['shown' => 2, 'withheld' => 0, 'not_examined' => 3],
+            array_intersect_key($this->audits(TestIdentityLinkRelay::LISTED)[0]->context, array_flip(['shown', 'withheld', 'not_examined'])));
+
+        // Printing one older capture by its id still works: the bound limits only what a listing reads.
+        $print = $this->console(['action' => 'print', 'id' => $bodies[4]['id']]);
+        $this->assertSame(0, $print['code'], $print['text']);
+    }
+
+    public function test_a_listing_reads_the_challenges_and_staff_addresses_in_one_query_each(): void
+    {
+        $this->operator();
+        $this->requestsWithReversedFileTimes(6);
+        $relay = app(TestIdentityLinkRelay::class);
+        $queries = [];
+        DB::listen(function ($query) use (&$queries): void {
+            $queries[] = strtolower($query->sql);
+        });
+        foreach ([2, 6, 50] as $limit) {
+            $queries = [];
+            $result = $relay->messages($limit);
+            $challengeSelects = array_filter($queries, fn (string $sql): bool => str_contains($sql, 'customer_identity_challenges'));
+            $userSelects = array_filter($queries, fn (string $sql): bool => str_contains($sql, '"users"') || str_contains($sql, '`users`'));
+            $this->assertCount(min($limit, 6), $result['messages']);
+            $this->assertCount(1, $challengeSelects, 'limit '.$limit.': one challenge lookup for the whole listing');
+            $this->assertCount(1, $userSelects, 'limit '.$limit.': one staff-address lookup for the whole listing');
+        }
+    }
+
+    public function test_the_list_limit_is_validated_before_anything_is_read(): void
+    {
+        $this->operator();
+        $body = F::request('enroll', self::SYNTHETIC);
+        $before = [$this->state(), AuditEvent::count()];
+        foreach (['0', '-1', '201', 'abc', '1.5', ''] as $bad) {
+            $result = $this->console(['action' => 'list', '--limit' => $bad]);
+            $this->assertSame(2, $result['code'], 'limit '.var_export($bad, true).': '.$result['text']);
+            $this->assertStringContainsString('Invalid input: --limit must be a whole number from 1 to 200. Nothing was read.', $result['text']);
+            $this->assertSame(0, $result['asked']);
+            $this->assertStringNotContainsString($body['id'], $result['text']);
+        }
+        $this->assertSame($before[0], $this->state());
+        $this->assertSame($before[1], AuditEvent::count());
+        $this->assertSame(0, $this->console(['action' => 'list', '--limit' => '200'])['code']);
+    }
+
+    public function test_a_capture_whose_challenge_is_not_on_the_current_policy_version_is_withheld(): void
+    {
+        $this->operator();
+        $current = F::request('enroll', self::SYNTHETIC);
+        $source = DB::table('customer_identity_challenges')->where('public_id', $current['id'])->first();
+        // A challenge row cannot be edited (retained by trigger), so two further pending rows are inserted, one on a retired policy
+        // version and one on the current one, each with a capture exactly as the writer would have stored it. Only the version differs.
+        $writer = $this->capture($current['id']);
+        $plant = function (string $id, string $version, string $seed) use ($source, $writer, $current): string {
+            $proof = hash('sha256', 'proof-'.$seed);
+            DB::table('customer_identity_challenges')->insert([
+                'public_id' => $id, 'address_key' => $source->address_key, 'request_hash' => hash('sha256', 'request-'.$seed),
+                'purpose' => 'enroll', 'policy_version' => $version, 'email' => $source->email,
+                'proof_hash' => hash('sha256', $proof), 'state' => 'pending', 'created_at' => $source->created_at, 'expires_at' => $source->expires_at,
+            ]);
+            file_put_contents($this->capturePath($id), json_encode(['id' => $id, 'url' => str_replace([$current['id'], $current['proof']], [$id, $proof], $writer['url'])] + $writer));
+
+            return $proof;
+        };
+        $oldId = '3c0d6a52-8f61-4c0e-9d75-0a5e1b6f2c11';
+        $twinId = '5d1e7b63-9a72-4d1f-8e86-1b6f2c3d4e22';
+        $proof = $plant($oldId, 'customer-local-identity-v0-retired', 'retired');
+        $plant($twinId, CustomerIdentityPolicy::VERSION, 'twin');
+
+        $list = $this->console(['action' => 'list']);
+        $this->assertSame(0, $list['code'], $list['text']);
+        $this->assertStringContainsString($current['id'], $list['text']);
+        $this->assertStringContainsString($twinId, $list['text'], 'the same capture on the current policy is relayable');
+        $this->assertStringNotContainsString($oldId, $list['text']);
+        $this->assertStringContainsString('1 capture(s) withheld', $list['text']);
+        $print = $this->console(['action' => 'print', 'id' => $oldId]);
+        $this->assertRefused($print, 'No relayable capture has that id.', 1);
+        $this->assertStringNotContainsString($proof, $print['text']);
+        $this->assertSame([], $this->audits(TestIdentityLinkRelay::RELAYED));
+    }
+
+    public function test_a_challenge_completed_or_changed_between_checking_and_relaying_is_refused_without_an_audit_row(): void
+    {
+        $operator = $this->operator();
+        $relay = app(TestIdentityLinkRelay::class);
+        $completed = F::request('enroll', self::SYNTHETIC);
+        $removed = F::request('enroll', 'tester-removed@example.test');
+        $checkedCompleted = $relay->message($completed['id']);
+        $checkedRemoved = $relay->message($removed['id']);
+        $this->assertSame('pending', $checkedCompleted->status);
+
+        // The tester used the link after the operator's check had passed.
+        F::complete($completed);
+        try {
+            $relay->relay($operator, $checkedCompleted, null);
+            $this->fail('A link used since it was checked must not be relayed.');
+        } catch (TestIdentityLinkRefusal $refusal) {
+            $this->assertStringContainsString('That link was already used at ', $refusal->getMessage());
+        }
+
+        // A message that no longer matches a retained challenge (rows are never deleted, so this stands in for any mismatch
+        // between what was checked and what is retained now): an unknown challenge key and another challenge's key both refuse.
+        $other = CustomerIdentityChallenge::where('public_id', $removed['id'])->sole();
+        foreach ([999_999_999, $completedKey = CustomerIdentityChallenge::where('public_id', $completed['id'])->value('id')] as $key) {
+            $mismatched = new TestIdentityLinkMessage($key, $removed['id'], 'enroll', 'tester-removed@example.test', $other->created_at,
+                $other->expires_at, null, TestIdentityLinkMessage::PENDING, $checkedRemoved->link());
+            try {
+                $relay->relay($operator, $mismatched, null);
+                $this->fail('A message that does not match its retained challenge must not be relayed.');
+            } catch (TestIdentityLinkRefusal $refusal) {
+                $this->assertStringContainsString('That message changed while it was being checked. List again.', $refusal->getMessage());
+            }
+        }
+        $this->assertNotNull($completedKey);
+        $this->assertSame([], $this->audits(TestIdentityLinkRelay::RELAYED));
     }
 }
