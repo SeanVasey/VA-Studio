@@ -86,8 +86,15 @@ class MembershipCustomerIndexAvailabilityTest extends TestCase
         // The only locking statement written here is the frame's first one, on the owner's users row (re-review R1).
         $this->assertSame(1, substr_count($source, 'FOR UPDATE'));
         $this->assertStringContainsString("'SELECT id FROM `'.\$database.'`.`users` WHERE id = ? FOR UPDATE'", $source);
-        $frame = substr($source, strpos($source, '$projection = DB::transaction(function ()'));
-        $this->assertLessThan(strpos($frame, 'new MembershipRows'), strpos($frame, '$this->lockOwnerFirst($primary, $principal->userId);'),
+        $frameAt = strpos($source, '$projection = DB::transaction(function ()');
+        $this->assertIsInt($frameAt);
+        $frame = substr($source, $frameAt);
+        // strpos returns false when a call is missing, and false compares below any int, so pin both positions first.
+        $lockAt = strpos($frame, '$this->lockOwnerFirst($primary, $principal->userId);');
+        $rowsAt = strpos($frame, 'new MembershipRows');
+        $this->assertIsInt($lockAt, 'The frame locks the owner row (re-review R1).');
+        $this->assertIsInt($rowsAt);
+        $this->assertLessThan($rowsAt, $lockAt,
             'The owner row is locked before the first consistent read (the schema proofs in MembershipRows).');
         $this->assertStringNotContainsString('$rows->one(', $source);
         $this->assertStringNotContainsString('$rows->rows(', $source);

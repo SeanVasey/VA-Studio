@@ -236,7 +236,7 @@ Operator detail is in `docs/ops/production-membership-http-runtime.md`.
 
 ## Independent review at `b3deef84` and follow-up
 
-Decision: **APPROVE WITH CONDITIONS** (`scratchpad/c4e-review-b3deef84.md`), no P0 or P1. The HTTP layer, F4, F6, the
+Decision: **APPROVE WITH CONDITIONS** ([`independent-c4e-review-b3deef84-DECISION.md`](independent-c4e-review-b3deef84-DECISION.md)), no P0 or P1. The HTTP layer, F4, F6, the
 census rename and the tests held. Findings and their resolution:
 
 | ID | Sev | Finding | Resolution |
@@ -303,7 +303,7 @@ native kill in the probe (the n1 definition probe would show it; not run as a se
 
 ## Independent re-review at `9d1e09f6` and follow-up
 
-Decision: **APPROVE** (`scratchpad/c4e-rereview-9d1e09f6.md`), N1 and N2 fixed, no P0 to P2. Its P3 findings:
+Decision: **APPROVE** ([`independent-c4e-rereview-9d1e09f6-DECISION.md`](independent-c4e-rereview-9d1e09f6-DECISION.md)), N1 and N2 fixed, no P0 to P2. Its P3 findings:
 
 | ID | Finding | Resolution |
 | --- | --- | --- |
@@ -446,7 +446,10 @@ against the worktree was empty at the end. Driver and specs: `scratchpad/c4e-mut
 
 ## Census and selection
 
-- `scripts/ci/database-sqlite-skips.json`, final state 294 entries (main had 291). All changes lie beyond the
+This section records the state at `9d1e09f6`; the phase B and integration sections give the current counts (302
+entries; 2562 of 9753 cases in 248 files after the merge of main at `8f166c5a`).
+
+- `scripts/ci/database-sqlite-skips.json`, state at `9d1e09f6` 294 entries (main had 291). All changes lie beyond the
   hash-pinned first 150 (`d93da4e7…`, unchanged); indexes are 0-based:
   - entry 284: `test_native_index_holds_owner_fence_and_period_locks_until_commit_then_releases_them` (C4d) renamed in
     place, finally to `test_native_index_locks_only_the_owner_rows_until_commit_then_releases_them`;
@@ -666,6 +669,30 @@ member HTTP index must not be mounted anywhere until this is resolved.
 - Rate limits are per client address (D1 parity), not per customer (review N7); a per-customer limiter is required
   before any non-local mount.
 - No Foundation run, no hosted CI, no host, provider or production evidence.
+
+## Final independent review at `ad1647ff`
+
+Decision: **APPROVE WITH CONDITIONS**
+([`independent-c4e-final-review-ad1647ff-DECISION.md`](independent-c4e-final-review-ad1647ff-DECISION.md)), no P0 to P2.
+Merging with F9 open is safe: the routes load only when `production-memberships.http_mounted` is the literal `true` in
+a cached `local` or `testing` environment, the shipped value is `false`, `MembershipPrivacy` repeats the check on every
+request before any session or SQL, and the staging admission census lists the mount class. Conditions: F9 and N7 stay
+blockers for any mount.
+
+- The R1 fix holds natively: in a general log at `ad1647ff` the owner's `users` locking read is the first statement after
+  `START TRANSACTION`. A mutant without `lockOwnerFirst` was killed by both native races (R1 at the post-commit
+  proof with `changed_period_window`, R4 at the post-commit history proof).
+- `8cddd8b4` is test-only; the watchers still assert that the index was seen waiting.
+- Census (302 entries, first-150 hash unchanged), selection (2562 of 9753 in 248 files) and the five safeguard scripts
+  were re-checked; the ledger figures match the phase B evidence.
+
+Findings and resolution:
+
+| ID | Finding | Resolution |
+| --- | --- | --- |
+| P3-1 | The SQLite order check passed with `lockOwnerFirst` deleted: `strpos` returned `false`, which compares below any int | Fixed before the PR: both positions must be ints before the order comparison. The deletion mutant now fails `test_index_locks_only_the_owner_and_reads_everything_else_without_row_locks` (1 test, 4 assertions, 1 failure); the unmutated file passes (5 tests, 126 assertions) |
+| P3-2 | The R3 census does not cover the `definitionByHash` call site in `MemberGrantDefinitions.php` or future writer classes; today's code is correct | Deferred to the per-lane batch (`docs/handoff/2026-10-07/codex-deferred-20261011.md`) |
+| P3-3 | "Census and selection" gave the `9d1e09f6` counts without saying so | Fixed: the section now says it records the state at `9d1e09f6` and points to the current counts |
 
 ## Cleanup
 
