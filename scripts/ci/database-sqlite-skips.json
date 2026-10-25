@@ -1189,6 +1189,22 @@
     [
       "Tests\\Feature\\RefundDispute\\RefundDisputeConcurrencyTest",
       "test_writer_latency_sits_well_inside_the_lease_and_authorization_windows"
+    ],
+    [
+      "Tests\\Feature\\CustomerComms\\CustomerDataRightsConcurrencyTest",
+      "test_a_deletion_request_committed_while_a_duplicate_waits_is_returned_instead_of_a_second_request"
+    ],
+    [
+      "Tests\\Feature\\CustomerComms\\CustomerDataRightsConcurrencyTest",
+      "test_a_rejection_committed_while_an_approval_waits_leaves_the_customer_untouched"
+    ],
+    [
+      "Tests\\Feature\\CustomerComms\\CustomerDataRightsConcurrencyTest",
+      "test_an_export_waiting_behind_an_access_withdrawal_is_denied_without_rows"
+    ],
+    [
+      "Tests\\Feature\\CustomerComms\\CustomerDataRightsConcurrencyTest",
+      "test_a_download_committed_while_a_second_download_waits_cannot_return_the_export_twice"
     ]
   ]
 }

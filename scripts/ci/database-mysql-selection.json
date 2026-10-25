@@ -6,6 +6,8 @@
   "file_pattern": "^tests/(?:Feature|Unit)/(?:[A-Za-z0-9]+/)*[A-Za-z0-9]*Migration[A-Za-z0-9]*Test\\.php$",
   "pattern_files": [
     "tests/Feature/CustomerAccountMigrationTest.php",
+    "tests/Feature/CustomerComms/CustomerDataRequestMigrationTest.php",
+    "tests/Feature/CustomerComms/LegalSiteSchemaMigrationTest.php",
     "tests/Feature/CustomerConsentMigrationTest.php",
     "tests/Feature/CustomerIdentityMigrationTest.php",
     "tests/Feature/CustomerInquiryMigrationTest.php",
@@ -60,6 +62,8 @@
   ],
   "include_files": [
     "tests/Feature/BulkReplaceLicenseDraftSourceTest.php",
+    "tests/Feature/CustomerComms/CustomerDataRightsTest.php",
+    "tests/Feature/CustomerComms/TransactionalMailTest.php",
     "tests/Feature/CustomerListeningFreshnessTest.php",
     "tests/Feature/FreeGrantSchemaRecoveryTest.php",
     "tests/Feature/LicenseTemplateAuthoringTest.php",
@@ -224,6 +228,7 @@
     "tests/Support/commerce-audit-actor-worker.php",
     "tests/Support/contract-race-worker.php",
     "tests/Support/customer-access-worker.php",
+    "tests/Support/customer-data-rights-worker.php",
     "tests/Support/customer-identity-worker.php",
     "tests/Support/customer-purchase-claim-worker.php",
     "tests/Support/delivery-race-worker.php",

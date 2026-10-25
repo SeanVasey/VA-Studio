@@ -17,11 +17,12 @@ use Illuminate\Support\Arr;
 final class CapabilityBoundary
 {
     /**
-     * The eleven capability flags, environment key => config key. Each defaults to false in config/ and both staging templates state
-     * each as `false`. Eight are admitted on staging by TestEnvironment::admitsTestCommerce() and are off because the rehearsal does not
-     * use them; the support-attachment fixture is local and testing only; and VASEY_OPERATIVE_FREE_GRANTS_ENABLED and
-     * CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED are not gated by environment at all (an adapter bound by other code is the only
-     * other condition), so on staging the template line and the deploy gate are their only guards.
+     * The thirteen capability flags, environment key => config key. Each defaults to false in config/ and both staging templates state
+     * each as `false`. Nine are admitted on staging by TestEnvironment::admitsTestCommerce() and are off because the rehearsal does not
+     * use them; the support-attachment fixture is local and testing only; and VASEY_OPERATIVE_FREE_GRANTS_ENABLED,
+     * CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED and VASEY_TRANSACTIONAL_MAIL_ENABLED are not gated by environment outside local
+     * and testing (an adapter or operator configuration is the only other condition), so on staging the template line and the deploy
+     * gate are their only guards.
      */
     public const CAPABILITY_FLAGS = [
         'VASEY_TEST_SERVICE_PROJECTS_ENABLED' => 'services-projects.test_enabled',
@@ -31,6 +32,8 @@ final class CapabilityBoundary
         'VASEY_TEST_REFUND_RESOLUTION_ENABLED' => 'refund-resolution.enabled',
         'VASEY_TEST_REFUND_DISPUTE_ENABLED' => 'refund-dispute.enabled',
         'VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED' => 'transactional-notifications.test_enabled',
+        'VASEY_CUSTOMER_DATA_RIGHTS_ENABLED' => 'customer-data-rights.enabled',
+        'VASEY_TRANSACTIONAL_MAIL_ENABLED' => 'transactional-mail.enabled',
         'CONTACT_TEST_ORDER_INQUIRIES_ENABLED' => 'inquiries.test_order_inquiries_enabled',
         'CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED' => 'inquiries.operator_notifications_enabled',
         'VASEY_OPERATIVE_FREE_GRANTS_ENABLED' => 'free-grants.operative_enabled',
@@ -38,7 +41,7 @@ final class CapabilityBoundary
     ];
 
     /**
-     * Stated false in the base staging template beside the eleven: production-lane or one-way, so never left to a default.
+     * Stated false in the base staging template beside the thirteen: production-lane or one-way, so never left to a default.
      * The public track sitemap build chain is not environment-gated; promoting customer listening data to V2 cannot be undone by
      * turning it off again. VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED is deliberately not held: it admits only the
      * `vasey:staging-synthetic-catalog` console command, which refuses production whatever the flag says, and
@@ -59,7 +62,7 @@ final class CapabilityBoundary
     /** Lanes the brief names (Paid252, Tax255, production customer identity, production free grants): a rename must update this. */
     public const NAMED_PRODUCTION_LANES = ['paid-grants', 'paid-tax-grants', 'production-tax-checkout', 'production-customer-identity', 'production-free-grants'];
 
-    /** @return array<string, string> environment key => config key, the eleven and the two */
+    /** @return array<string, string> environment key => config key, the thirteen and the two */
     public static function stagedFlags(): array
     {
         return [...self::CAPABILITY_FLAGS, ...self::ADDITIONAL_FLAGS];
