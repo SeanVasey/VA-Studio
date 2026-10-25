@@ -69,12 +69,12 @@ class OperationalHealthTest extends TestCase
         $this->assertSame([2, 'attention'], [$queue['stripe_receipts_waiting']['value'], $queue['stripe_receipts_waiting']['state']]);
         $this->assertSame(1, $queue['stripe_receipts_quarantined']['value']);
 
-        $inquiry = fn (string $state, int $n, string $at) => ['public_id' => '00000000-0000-4000-8000-00000000000'.$n, 'owner_hash' => str_repeat('a', 64), 'request_key' => str_repeat((string) $n, 64),
+        $inquiry = fn (string $state, int $n, string $at) => ['public_id' => '00000000-0000-4000-8000-00000000000'.$n, 'owner_hash' => str_repeat('a', 64), 'request_key' => '10000000-0000-4000-8000-00000000000'.$n,
             'payload_hash' => str_repeat('b', 64), 'payload' => '{}', 'privacy_notice' => 'SYNTHETIC', 'privacy_notice_hash' => str_repeat('c', 64),
             'retention_policy_reference' => 'SYNTHETIC', 'operator_user_id' => $this->admin->id, 'site_release_id' => 1, 'site_content_hash' => str_repeat('d', 64),
             'state' => 'new', 'version' => 0, 'created_at' => $at, 'updated_at' => $at];
         DB::table('customer_inquiries')->insert([$inquiry('new', 1, $now->subDays(3)->format('Y-m-d H:i:s')), $inquiry('new', 2, $now->format('Y-m-d H:i:s')), $inquiry('read', 3, $now->format('Y-m-d H:i:s'))]);
-        DB::table('customer_inquiries')->where('request_key', str_repeat('3', 64))->update(['state' => 'read', 'version' => 1]);
+        DB::table('customer_inquiries')->where('request_key', '10000000-0000-4000-8000-000000000003')->update(['state' => 'read', 'version' => 1]);
         $run = fn (string $status, ?string $started, string $created) => ['source_asset_id' => random_int(1, 1000000), 'requested_by' => $this->admin->id, 'profile_version' => 'SYNTHETIC',
             'profile_fingerprint' => bin2hex(random_bytes(8)), 'input_sha256' => str_repeat('e', 64), 'profile' => '{}', 'status' => $status, 'started_at' => $started, 'created_at' => $created, 'updated_at' => $created];
         DB::table('media_processing_runs')->insert([$run('failed', null, $now->format('Y-m-d H:i:s')), $run('processing', $now->subHour()->format('Y-m-d H:i:s'), $now->subHour()->format('Y-m-d H:i:s')),
