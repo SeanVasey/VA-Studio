@@ -7,6 +7,7 @@ use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Memberships\Production\MemberGrantIntent;
 use App\Domain\Memberships\Production\MembershipActivationCapture;
 use App\Domain\Memberships\Production\MembershipActivationCapturePermit;
+use App\Domain\Memberships\Production\MembershipCommitWitness;
 use App\Domain\Memberships\Production\MembershipPolicyBinding;
 use App\Domain\Memberships\Production\MembershipReservations;
 use App\Domain\Memberships\Production\MembershipRows;
@@ -379,7 +380,8 @@ final class MemberOriginalSourceCapture
         $events = $connection->getEventDispatcher();
         $originalManager = (new ReflectionProperty(Connection::class, 'transactionsManager'))->getValue($connection);
         MemberGrantException::require($originalManager === null || get_class($originalManager) === DatabaseTransactionsManager::class, 'changed_transaction');
-        $manager = new DatabaseTransactionsManager;
+        // The callback manager also witnesses the owned physical commit (C4e, review F6), as in the three C4d writers.
+        $manager = new MembershipCommitWitness;
         $observer = new MemberActivationObserver($connection, $primary, $configuration, $events, $manager);
         $idle->assertStillIdle();
         $budget->assertCurrent();
@@ -388,6 +390,7 @@ final class MemberOriginalSourceCapture
         $inspection = null;
         $rows = null;
         $committed = false;
+        $committing = false;
         try {
             try {
                 $connection->beginTransaction();
@@ -441,15 +444,19 @@ final class MemberOriginalSourceCapture
                 if ($materialized !== null) {
                     $inspection->insertActivation();
                 }
+                $manager->arm($connection, $primary);
+                $committing = true;
                 $connection->commit();
                 $committed = true;
                 $observer->requireCommittedOwnership();
             } catch (Throwable $error) {
-                // A normal afterCommit delegate can throw after the PDO commit but before return.
-                // An idle captured PDO cannot justify claiming rollback of the effect.
-                $committedOrIdle = $committed || ! $primary->inTransaction();
+                // The witness proves the owned PDO commit returned, so a throwing afterCommit callback or committed
+                // delegate keeps the committed classification. Before the owned commit call, an idle PDO (a foreign
+                // rollback, a failed begin) is no longer misread as committed. Only a commit call that ends with an
+                // idle PDO and no witness (PDO::commit() itself threw) stays conservatively committed-unknown.
+                $committedOrUnknown = $committed || $manager->physicallyCommitted() || ($committing && ! $primary->inTransaction());
                 $observer->abort();
-                throw new MemberGrantException($committedOrIdle ? 'committed_activation_receipt_refused' : 'source_refused', previous: $error);
+                throw new MemberGrantException($committedOrUnknown ? 'committed_activation_receipt_refused' : 'source_refused', previous: $error);
             } finally {
                 // Do not overwrite callback-installed dispatcher/manager state belonging to somebody else.
                 if ($connection->getEventDispatcher() === $observer) {
