@@ -118,7 +118,8 @@ class SalesReportTest extends TestCase
         $this->assertSame($csv['sha256'], AuditEvent::where('action', 'reporting.sales_exported')->orderByDesc('id')->first()->context['sha256']);
         $this->assertSame(hash('sha256', $csv['csv']), $audit->context['sha256']);
         $this->assertSame($this->admin->id, $audit->actor_id);
-        $this->assertSame(['from' => '2026-09-29', 'to' => '2026-10-03', 'granularity' => 'day'], array_intersect_key($audit->context, array_flip(['from', 'to', 'granularity'])));
+        // MySQL's JSON column normalises key order, so compare the context as a set of pairs.
+        $this->assertEqualsCanonicalizing(['from' => '2026-09-29', 'to' => '2026-10-03', 'granularity' => 'day'], array_intersect_key($audit->context, array_flip(['from', 'to', 'granularity'])));
         $lines = array_map('str_getcsv', explode("\n", trim($csv['csv'])));
         $this->assertSame(['environment', 'record', 'period', 'currency', 'tier', 'tier_type', 'count', 'gross_minor', 'discount_minor', 'tax_minor', 'refunded_minor', 'net_minor', 'note'], $lines[0]);
         $periodRows = array_values(array_filter($lines, fn (array $row): bool => $row[1] === 'period'));
