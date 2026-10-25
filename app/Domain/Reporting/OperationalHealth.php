@@ -70,7 +70,7 @@ final class OperationalHealth
                 $table = (string) config('queue.connections.database.table', 'jobs');
                 $now = now()->utc()->timestamp;
                 $row = $db->table($table)->selectRaw('COUNT(CASE WHEN reserved_at IS NULL AND available_at <= ? THEN 1 END) AS ready,'
-                    .' COUNT(CASE WHEN reserved_at IS NULL AND available_at > ? THEN 1 END) AS delayed,'
+                    .' COUNT(CASE WHEN reserved_at IS NULL AND available_at > ? THEN 1 END) AS scheduled_later,'
                     .' COUNT(CASE WHEN reserved_at IS NOT NULL THEN 1 END) AS reserved,'
                     .' MIN(CASE WHEN reserved_at IS NULL AND available_at <= ? THEN available_at END) AS oldest_ready', [$now, $now, $now])->first();
                 $age = $row->oldest_ready === null ? 0 : max(0, $now - (int) $row->oldest_ready);
@@ -78,7 +78,7 @@ final class OperationalHealth
 
                 return [
                     self::metric('queue_ready', 'Jobs waiting', (int) $row->ready, (int) $row->ready > 0 && $age > $limit ? 'attention' : 'ok',
-                        (int) $row->delayed.' more are scheduled for later.'),
+                        (int) $row->scheduled_later.' more are scheduled for later.'),
                     self::metric('queue_oldest', 'Oldest waiting job', $age, $age > $limit ? 'attention' : 'ok',
                         $row->oldest_ready === null ? 'Nothing is waiting.' : 'Seconds since it became available; attention above '.$limit.' seconds.'),
                     self::metric('queue_reserved', 'Jobs running', (int) $row->reserved, 'ok', 'Currently reserved by a worker. A worker that stopped leaves these until the retry window ends.'),

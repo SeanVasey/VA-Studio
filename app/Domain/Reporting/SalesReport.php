@@ -375,7 +375,7 @@ final class SalesReport
             $tiers = $payments()->join('production_checkout_order_lines as l', 'l.order_id', '=', 'p.order_id')
                 ->join('license_versions as v', 'v.id', '=', 'l.license_version_id')->join('license_templates as t', 't.id', '=', 'v.license_template_id')
                 ->where('p.outcome', 'on_time')
-                ->selectRaw('t.id AS template_id, t.name AS tier, t.type AS tier_type, p.funds_mode AS funds_mode, COUNT(*) AS lines, COALESCE(SUM(l.amount_minor), 0) AS gross_minor')
+                ->selectRaw('t.id AS template_id, t.name AS tier, t.type AS tier_type, p.funds_mode AS funds_mode, COUNT(*) AS line_count, COALESCE(SUM(l.amount_minor), 0) AS gross_minor')
                 ->groupBy('t.id', 't.name', 't.type', 'p.funds_mode')->orderBy('p.funds_mode')->orderBy('t.id')->get();
             $modes = [];
             foreach ($periods as $row) {
@@ -385,7 +385,7 @@ final class SalesReport
             }
             foreach ($tiers as $row) {
                 $mode = $row->funds_mode === 'live' ? 'live' : 'rehearsal';
-                $modes[$mode]['tiers'][] = ['tier' => (string) $row->tier, 'tier_type' => (string) $row->tier_type, 'lines' => (int) $row->lines, 'gross_minor' => (int) $row->gross_minor];
+                $modes[$mode]['tiers'][] = ['tier' => (string) $row->tier, 'tier_type' => (string) $row->tier_type, 'lines' => (int) $row->line_count, 'gross_minor' => (int) $row->gross_minor];
             }
             foreach ($modes as $mode => $section) {
                 $modes[$mode] = ($section + ['periods' => [], 'tiers' => []]) + ['label' => self::ENVIRONMENTS[$mode], 'currency' => 'USD',
