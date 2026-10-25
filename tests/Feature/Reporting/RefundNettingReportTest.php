@@ -110,19 +110,38 @@ class RefundNettingReportTest extends TestCase
         $this->assertSame($gross, array_sum(array_column($report['tiers']['rows'], 'net_minor')));
         $this->assertSame(1, $this->health()['refund_reversals']);
 
+        // 3b. A second refund succeeds for the other line. The reversed refund's retained allocation must not leak into the
+        // exclusive tier: only status-aware netting shows the exclusive tier at zero and the plain tier refunded.
+        $refunds = [['re_REPORT', $totals[0], 'failed'], ['re_SECOND', $totals[1], 'succeeded']];
+        R::provider($this->financial, $refunds);
+        $observe();
+        $second = RefundDisputeObject::where('kind', 'refund')->get()->first(fn (RefundDisputeObject $object): bool => $object->amount_minor === $totals[1]);
+        app(RefundDisputeActions::class)->allocate($a['order']->public_id, $this->admin, (string) Str::uuid(), R::sequence($a['order']->public_id, $this->admin),
+            $second->public_id, [1 => $totals[1]]);
+        $this->assertSame($totals[0] + $totals[1], (int) RefundLineAllocation::sum('amount_minor'));
+        $report = $this->test();
+        $this->assertSame([$totals[1], $gross - $totals[1]], [$report['currencies']['USD']['refunded_minor'], $report['currencies']['USD']['net_minor']]);
+        $byType = [];
+        foreach ($report['tiers']['rows'] as $row) {
+            $byType[$row['tier_type']] = ($byType[$row['tier_type']] ?? 0) + $row['refunded_minor'];
+        }
+        $this->assertSame(['exclusive' => 0, 'non-exclusive' => $totals[1]], $byType);
+        $this->assertSame([], $report['tiers']['unattributed_refund_minor']);
+        $this->assertSame($gross - $totals[1], array_sum(array_column($report['tiers']['rows'], 'net_minor')));
+
         // 4. Disputes: an open dispute holds downloads under the configured policy; a lost one is counted separately.
-        R::provider($this->financial, [['re_REPORT', $totals[0], 'failed']], [['du_REPORT', $paidA, 'needs_response']]);
+        R::provider($this->financial, $refunds, [['du_REPORT', $paidA, 'needs_response']]);
         $observe();
         $this->assertSame([1, 0, 1], [$this->health()['refund_open_disputes'], $this->health()['refund_lost_disputes'], $this->health()['refund_holds']]);
-        R::provider($this->financial, [['re_REPORT', $totals[0], 'failed']], [['du_REPORT', $paidA, 'lost']]);
+        R::provider($this->financial, $refunds, [['du_REPORT', $paidA, 'lost']]);
         $observe();
         $this->assertSame([0, 1], [$this->health()['refund_open_disputes'], $this->health()['refund_lost_disputes']]);
         // Evidence the state machine rejects (the refund amount changed) is attention, and never changes the accepted state.
-        R::provider($this->financial, [['re_REPORT', $totals[0] + 1, 'failed']], [['du_REPORT', $paidA, 'lost']]);
+        R::provider($this->financial, [['re_REPORT', $totals[0] + 1, 'failed'], $refunds[1]], [['du_REPORT', $paidA, 'lost']]);
         $this->assertSame('attention', $observe()['outcome']);
         $health = $this->health();
         $this->assertSame([1, 0, 1], [$health['refund_attention'], $health['refund_open_disputes'], $health['refund_lost_disputes']]);
-        $this->assertSame($gross, $this->test()['currencies']['USD']['net_minor'], 'A rejected observation does not move the figures.');
+        $this->assertSame($gross - $totals[1], $this->test()['currencies']['USD']['net_minor'], 'A rejected observation does not move the figures.');
 
         Livewire::test(CommerceAttentionWidget::class)->assertSee('Refund or dispute evidence needing attention')
             ->assertSeeHtml('data-metric="refund_reversals" data-state="attention"')->assertSeeHtml('data-metric="refund_lost_disputes" data-state="attention"');

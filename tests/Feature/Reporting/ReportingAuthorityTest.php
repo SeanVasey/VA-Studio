@@ -3,6 +3,7 @@
 namespace Tests\Feature\Reporting;
 
 use App\Domain\Reporting\CustomerSegments;
+use App\Domain\Reporting\OperationalHealth;
 use App\Domain\Reporting\SalesReport;
 use App\Filament\Pages\CustomerSegmentsPage;
 use App\Filament\Pages\SalesReportPage;
@@ -90,7 +91,46 @@ class ReportingAuthorityTest extends TestCase
         foreach (self::COMPONENTS as $component) {
             $mounted[$component]->call('$refresh')->assertForbidden();
         }
+        // A model retained by a caller must not outlive the removed role or the withdrawn enrollment: the user row is re-read.
+        $retained = $this->staff(true);
+        $withdrawn = $this->staff(true);
+        $this->mfaRequired(true);
+        User::whereKey($withdrawn->id)->update(['app_authentication_secret' => null]);
+        User::whereKey($admin->id)->update(['is_admin' => true]);
+        $admin->refresh();
+        User::whereKey($admin->id)->update(['is_admin' => false]);
+        $this->assertTrue($admin->is_admin, 'The retained model still claims the removed role.');
+        $this->assertNotNull($withdrawn->getAppAuthenticationSecret(), 'The retained model still claims the withdrawn enrollment.');
+        $this->mfaRequired(false);
+        foreach ([$admin, $this->actingUserWithoutRow()] as $stale) {
+            foreach ([fn () => app(OperationalHealth::class)->section('queue', $stale), fn () => app(SalesReport::class)->build($stale, '2026-10-01', '2026-10-02', 'day'),
+                fn () => app(CustomerSegments::class)->overview($stale)] as $read) {
+                try {
+                    $read();
+                    $this->fail('A retained or phantom staff model read reporting data.');
+                } catch (AuthorizationException) {
+                    $this->addToAssertionCount(1);
+                }
+            }
+        }
+        $this->mfaRequired(true);
+        try {
+            app(OperationalHealth::class)->section('queue', $withdrawn);
+            $this->fail('A retained model with a withdrawn enrollment read health.');
+        } catch (AuthorizationException) {
+            $this->addToAssertionCount(1);
+        }
+        $this->assertTrue($retained->is_admin);
+        $this->mfaRequired(false);
         $this->assertSame(0, AuditEvent::where('action', 'like', 'reporting.%')->count());
+    }
+
+    private function actingUserWithoutRow(): User
+    {
+        $ghost = new User(['name' => 'ghost', 'email' => 'ghost@example.test']);
+        $ghost->id = 999999;
+
+        return $ghost;
     }
 
     public function test_pages_over_http_and_the_dashboard_show_widgets_only_to_staff(): void
