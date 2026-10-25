@@ -117,6 +117,13 @@ class ProductionSeparationReportTest extends TestCase
         $this->assertSame([[], [], []], [$empty['test']['currencies'], $empty['test']['periods'], $empty['production']['modes']]);
         Livewire::test(SalesReportPage::class)->set('from', '2020-01-01')->set('to', '2020-01-31')->set('granularity', 'month')
             ->assertSee('No paid test orders were recorded in this period.')->assertSee('No production checkout payments were recorded in this period.');
+        // Payments retained under a different Stripe account are not in scope for the configured test account.
+        $account = config('payments.stripe.account_id');
+        config(['payments.stripe.account_id' => 'acct_OTHERACCOUNT1']);
+        $other = app(SalesReport::class)->build($this->admin, $day, $day, 'day');
+        $this->assertSame([[], 0], [$other['test']['currencies'], $health()['payment_exceptions']]);
+        config(['payments.stripe.account_id' => $account]);
+        $this->assertSame(1, $health()['payment_exceptions']);
         Schema::disableForeignKeyConstraints();
         Schema::drop('production_checkout_payments');
         $missing = app(SalesReport::class)->build($this->admin, $day, $day, 'day')['production'];
