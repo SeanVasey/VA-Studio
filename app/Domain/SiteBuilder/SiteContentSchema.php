@@ -42,9 +42,29 @@ final class SiteContentSchema
     /** A v3 release starts with every image slot on its built-in image. */
     public const NO_IMAGES = ['hero' => null, 'studio' => null, 'share' => null];
 
+    /** Schema versions carrying the optional editorial pages (D-23). */
+    public const EDITORIAL_VERSIONS = [2, 3, 4, 5];
+
+    /** Schema versions carrying site image references (D-25). */
+    public const IMAGE_VERSIONS = [3, 4, 5];
+
+    /** Schema versions carrying related-track identities on blog and video entries. */
+    public const RELATED_TRACK_VERSIONS = [4, 5];
+
+    /** Version 5 adds the legal pages; a release without legal text keeps an older version. */
+    public const LEGAL_VERSION = 5;
+
+    /** Legal page slots and their public paths under /legal/. */
+    public const LEGAL_DOCUMENTS = ['privacy', 'terms', 'licenses'];
+
+    public const NO_LEGAL = ['privacy' => null, 'terms' => null, 'licenses' => null];
+
+    /** Characters across one legal document's headings and paragraphs; the 2026-10-24 privacy draft is about 30,000. */
+    public const LEGAL_DOCUMENT_MAX_CHARACTERS = 120000;
+
     public static function validate(array $content): array
     {
-        if (in_array($content['schema_version'] ?? null, [2, 3, 4], true)) {
+        if (in_array($content['schema_version'] ?? null, self::EDITORIAL_VERSIONS, true)) {
             return self::validateEditorial($content);
         }
         $text = fn (int $max): array => ['required', 'string', 'max:'.$max, function (string $attribute, mixed $value, \Closure $fail): void {
@@ -105,9 +125,17 @@ final class SiteContentSchema
             }
         }
         $version = $content['schema_version'];
+        if ($version === self::LEGAL_VERSION) {
+            foreach (self::LEGAL_DOCUMENTS as $document) {
+                if (is_array($content['legal'][$document] ?? null)) {
+                    $destinations[] = '/legal/'.$document;
+                }
+            }
+        }
         $rules = [
-            'content' => ['required', 'array:schema_version,hero,studio,footer,navigation,seo,about,contact,blog,videos'.(in_array($version, [3, 4], true) ? ',images' : '')],
-            'content.schema_version' => ['required', 'integer', Rule::in([2, 3, 4])],
+            'content' => ['required', 'array:schema_version,hero,studio,footer,navigation,seo,about,contact,blog,videos'
+                .(in_array($version, self::IMAGE_VERSIONS, true) ? ',images' : '').($version === self::LEGAL_VERSION ? ',legal' : '')],
+            'content.schema_version' => ['required', 'integer', Rule::in(self::EDITORIAL_VERSIONS)],
             'content.hero' => ['required', 'array:eyebrow,title,line_two,description'],
             'content.hero.eyebrow' => $text(120), 'content.hero.title' => $text(80),
             'content.hero.line_two' => $text(80), 'content.hero.description' => $text(600),
@@ -143,11 +171,11 @@ final class SiteContentSchema
             } else {
                 $rules[$prefix.'.entries'] = ['required', 'array', 'list', 'min:1', 'max:30'];
                 $rules[$prefix.'.entries.*'] = ['required', 'array:'.($section === 'blog'
-                    ? 'slug,title,description,paragraphs' : 'slug,title,description,provider,video_id').($version === 4 ? ',related_track_ids' : '')];
+                    ? 'slug,title,description,paragraphs' : 'slug,title,description,provider,video_id').(in_array($version, self::RELATED_TRACK_VERSIONS, true) ? ',related_track_ids' : '')];
                 $rules[$prefix.'.entries.*.slug'] = ['required', 'string', 'max:80', 'distinct:strict', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/D'];
                 $rules[$prefix.'.entries.*.title'] = $text(120);
                 $rules[$prefix.'.entries.*.description'] = $text(300);
-                if ($version === 4) {
+                if (in_array($version, self::RELATED_TRACK_VERSIONS, true)) {
                     $rules[$prefix.'.entries.*.related_track_ids'] = ['present', 'array', 'list', 'max:6'];
                     // Distinctness belongs to each entry, not to the entire wildcard expansion: an article and a video
                     // may deliberately link the same track. Empty lists are valid; strings are never retained as IDs.
@@ -175,8 +203,11 @@ final class SiteContentSchema
                 }
             }
         }
-        if (in_array($version, [3, 4], true)) {
+        if (in_array($version, self::IMAGE_VERSIONS, true)) {
             $rules += self::imageRules($content, $text);
+        }
+        if ($version === self::LEGAL_VERSION) {
+            $rules += self::legalRules($content, $text);
         }
         if (($content['contact'] ?? null) !== null) {
             $rules['content.contact.email'] = ['required', 'string', 'max:254', function (string $attribute, mixed $value, \Closure $fail): void {
@@ -186,8 +217,60 @@ final class SiteContentSchema
             }];
         }
         Validator::make(['content' => $content], $rules)->validate();
+        if ($version === self::LEGAL_VERSION && array_filter($content['legal'], 'is_array') === []) {
+            // A release without legal text keeps the older schema, so older application code can still read it.
+            throw ValidationException::withMessages(['content.legal' => 'Include at least one legal page, or save the release without legal pages.']);
+        }
 
         return $content;
+    }
+
+    /**
+     * Legal pages carry staff-pasted approved text as bounded plain text: headings and paragraphs only, no markup or links.
+     * The approval reference is retained staff evidence and is never part of the public projection (EditorialContent).
+     */
+    private static function legalRules(array $content, \Closure $text): array
+    {
+        $rules = ['content.legal' => ['required', 'array:'.implode(',', self::LEGAL_DOCUMENTS)]];
+        $legal = is_array($content['legal'] ?? null) ? $content['legal'] : [];
+        foreach (self::LEGAL_DOCUMENTS as $document) {
+            $prefix = 'content.legal.'.$document;
+            $rules[$prefix] = ['present', 'nullable', 'array:title,description,version,effective_date,approval_reference,sections'];
+            if (! is_array($legal[$document] ?? null)) {
+                continue;
+            }
+            $rules += [
+                $prefix.'.title' => $text(120),
+                $prefix.'.description' => $text(300),
+                // A short token such as "1", "2026-10" or "v1.2"; it names the approved text, not a schema.
+                $prefix.'.version' => ['required', 'string', 'max:32', 'regex:/\A[0-9A-Za-z](?:[0-9A-Za-z.-]{0,30}[0-9A-Za-z])?\z/D'],
+                $prefix.'.effective_date' => ['required', 'string', 'regex:/\A[0-9]{4}-[0-9]{2}-[0-9]{2}\z/D', function (string $attribute, mixed $value, \Closure $fail): void {
+                    $date = is_string($value) ? \DateTimeImmutable::createFromFormat('!Y-m-d', $value, new \DateTimeZone('UTC')) : false;
+                    if ($date === false || $date->format('Y-m-d') !== $value || (int) $date->format('Y') < 2000 || (int) $date->format('Y') > 2100) {
+                        $fail('Use a real effective date as YYYY-MM-DD.');
+                    }
+                }],
+                $prefix.'.approval_reference' => $text(200),
+                $prefix.'.sections' => ['required', 'array', 'list', 'min:1', 'max:60', function (string $attribute, mixed $value, \Closure $fail): void {
+                    $characters = 0;
+                    foreach (is_array($value) ? $value : [] as $section) {
+                        $characters += is_string($section['heading'] ?? null) ? mb_strlen($section['heading']) : 0;
+                        foreach (is_array($section['paragraphs'] ?? null) ? $section['paragraphs'] : [] as $paragraph) {
+                            $characters += is_string($paragraph) ? mb_strlen($paragraph) : 0;
+                        }
+                    }
+                    if ($characters > self::LEGAL_DOCUMENT_MAX_CHARACTERS) {
+                        $fail('Keep each legal page within '.number_format(self::LEGAL_DOCUMENT_MAX_CHARACTERS).' characters.');
+                    }
+                }],
+                $prefix.'.sections.*' => ['required', 'array:heading,paragraphs'],
+                $prefix.'.sections.*.heading' => $text(160),
+                $prefix.'.sections.*.paragraphs' => ['required', 'array', 'list', 'min:1', 'max:40'],
+                $prefix.'.sections.*.paragraphs.*' => $text(4000),
+            ];
+        }
+
+        return $rules;
     }
 
     /**

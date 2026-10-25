@@ -66,7 +66,7 @@ final class SiteRelatedTracks
     /** Called only for a newly validated immutable release, never to revalidate current commercial availability. */
     public function validateIdentities(array $content): void
     {
-        if (($content['schema_version'] ?? null) !== 4) {
+        if (! in_array($content['schema_version'] ?? null, SiteContentSchema::RELATED_TRACK_VERSIONS, true)) {
             return;
         }
         $paths = [];

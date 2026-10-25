@@ -148,8 +148,8 @@ We may keep information longer where the law requires it, or to establish, exerc
 
 ## 8. How we protect information
 
-- Sensitive records (orders, license documents, payment notifications, contact messages, attachments, listening notes, consent records and delivery records) are encrypted in our database. Passwords are stored only as one-way hashes.
-- Purchased files, stems and license documents are kept in private storage that is never publicly reachable. Every download needs a valid license and a fresh, short-lived authorization, and each authorization works once.
+- Sensitive database records (order records, license and payment records, payment notifications, contact messages, listening notes, consent records and delivery records) are encrypted in our database. Passwords are stored only as one-way hashes.
+- Files are stored privately but are not encrypted by the application: purchased files and stems, license document PDFs and the original files attached to contact messages are kept in private storage that is never publicly reachable, protected by server access controls and encrypted backups. Every download needs a valid license and a fresh, short-lived authorization, and each authorization works once.
 - The site is served over HTTPS. Account and order pages tell browsers and search engines not to cache or index them.
 - Staff sign in to the store administration with multi-factor authentication, and staff access to customer records is logged.
 - Uploaded files are scanned for malware before anyone can open them.
@@ -250,6 +250,7 @@ These are honest gaps between the drafted policy and the current source. Each ne
 | Account required to buy | Production buyer identity accepts `verified_account` or `verified_guest_claim` (`MachinePolicyV1`, `buyer_identity.mode`); test commerce also supports guest orders bound to a browser session. U-07 is open. | If Sean picks guest checkout, revise sections 3.2 and 3.3. |
 | GPC treated as an opt-out | No code reads the GPC header; nothing is sold or shared, so there is nothing to switch off. | None, unless sale or sharing is ever introduced. |
 | Material-change notice by email | No email provider is configured. | Email provider (item A.5). |
+| Section 8 says which records are encrypted (corrected 2026-10-24, deferred Codex P2 from PR #169) | Only database records are encrypted (encrypted Eloquent casts and `Crypt` on the stored payloads). Contract PDFs and support-attachment originals are written in plain bytes to private local storage: `ContractFiles` writes `contracts/test/{request}/{claim}/original.pdf` and `AttachmentFiles` writes `original.bin`, both mode 0600 under the private disk. Masters, stems and media originals are private files too. Backups are encrypted (`ops/staging/backup.sh`, age). | **Prerequisite** if the published text is to promise encryption of files at rest: host disk or volume encryption on the production server (U-02/U-03), or application-level file encryption, before section 8 may say files are encrypted. Until then keep the corrected wording. |
 
 ### C. Evidence map
 
@@ -274,3 +275,4 @@ The earlier evidence-cited description of the data flows (draft of 2026-10-10, s
 
 - 2026-10-10: first evidence-cited draft from source `f57e7256891d0d3c117e151a36f7fb967c724ab7` (lane `harness/launch-documents`), with review rounds on 2026-10-10 and 2026-10-11.
 - 2026-10-24: rewritten as a complete buyer-facing privacy policy from source `786fb7c755291184f9e01b4faaab28dbd430d698` after Sean named the controller (Vasey Multimedia dba VASEY.AUDIO) and the seller/licensor (Sean Vasey) and assigned the drafting to the development lead. Adds legal bases, California categories, proposed retention periods, a cookie table, transfers and rights handling; moves code evidence and enforcement gaps to the reviewer appendix. Not approved.
+- 2026-10-24 (lane CX): section 8 corrected so it no longer says files are encrypted; only database records are. File encryption at rest added to reviewer appendix B as a prerequisite for any stronger wording (deferred Codex P2 from PR #169). Still not approved; published only through the site content legal page type once Sean approves the text.

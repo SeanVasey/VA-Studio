@@ -1,10 +1,22 @@
 export interface SiteContent {
-  schema_version: 1 | 2 | 3 | 4;
+  schema_version: 1 | 2 | 3 | 4 | 5;
   hero: { eyebrow: string; title: string; line_two: string; description: string };
   studio: { eyebrow: string; title: string; line_two: string; lead: string; paragraphs: string[] };
   footer: { description: string };
-  navigation: { label: string; href: '/' | '/#catalog' | '/#licenses' | '/#studio' | '/about' | '/contact' | '/blog' | '/videos' }[];
+  navigation: { label: string; href: '/' | '/#catalog' | '/#licenses' | '/#studio' | '/about' | '/contact' | '/blog' | '/videos' | LegalPath }[];
   seo: { title: string; description: string };
+  /** Published legal pages (schema 5), listed in the footer by title. */
+  legal_links?: { title: string; path: LegalPath }[];
+}
+
+export type LegalPath = '/legal/privacy' | '/legal/terms' | '/legal/licenses';
+
+/** One published legal document. The approval reference stays with the staff record and is never sent to the browser. */
+export interface LegalDocument {
+  document: 'privacy' | 'terms' | 'licenses';
+  version: string;
+  effectiveDate: string;
+  sections: { heading: string; paragraphs: string[] }[];
 }
 
 /** One prepared size of a site image (D-25). */
@@ -54,8 +66,8 @@ export interface EditorialEntrySummary {
 }
 
 export interface EditorialDescriptor {
-  section: 'about' | 'contact' | 'blog' | 'videos';
-  kind: 'page' | 'collection' | 'entry';
+  section: 'about' | 'contact' | 'blog' | 'videos' | 'legal';
+  kind: 'page' | 'collection' | 'entry' | 'legal';
   path: string;
   title: string;
   description: string;
@@ -65,6 +77,7 @@ export interface EditorialDescriptor {
   contactHref: string | null;
   video: { provider: 'youtube' | 'vimeo'; videoId: string; watchUrl: string } | null;
   relatedTracks?: { title: string; artist: string; href?: string }[];
+  legal?: LegalDocument;
 }
 
 /** A private preview never sends an internal content link outside its saved release. */
