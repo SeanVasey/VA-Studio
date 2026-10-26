@@ -1,6 +1,6 @@
 # Lane CX work package: customer communications and data rights mechanisms
 
-Status: **work-package statement, committed before implementation.** Branch `harness/customer-comms-cx-20261024`, cut from `origin/main` `8f166c5a`. Not pushed.
+Status: **implemented on branch `harness/customer-comms-cx-20261024`; independent review pending; not pushed.** Cut from `origin/main` `8f166c5a`. The work-package statement below was committed first (`d37a718f`); implementation and evidence follow it. Tested source: see "Evidence".
 
 Scope rows (`docs/remaining-parity-coverage.csv`): FP-005 *License comparison and policy pages*, FP-075 *Receipt and fulfillment notifications*, FP-082 *Customer export deletion retention*, with FP-076, FP-081 and FP-091 recorded only where this lane touches them. Lane CX in `docs/handoff/2026-10-24/COMPLETION-PLAN.md`; legal index `docs/legal/README.md`.
 
@@ -77,3 +77,41 @@ Not built unless trivially small: the suppression foundation (`config/customer-s
 ## Not touched
 
 `bootstrap/app.php`, `config/production-memberships.php`, `app/Http/Membership/*` and the membership domain (C4e); `app/Filament/Widgets` and reporting resources (REP); `app/Domain/Migration/*` (MIG); public discovery and sitemap (SEO). `routes/web.php` receives one isolated `require` line.
+
+## Status at handoff (2026-10-26)
+
+Lane CX stopped at a checkpoint for handoff to another harness. Nothing is pushed. `origin/main` (`dd587603`, PRs #173 DEF-OPS and #174 C4e) is **not merged** into this branch; the branch is based on `8f166c5a`.
+
+### Done (commits on `harness/customer-comms-cx-20261024`)
+
+- `d37a718f` work-package statement (above).
+- `9f58bfbf` FP-005 legal pages: site content schema v5 (`legal.privacy|terms|licenses`, version, effective date, staff-only approval reference, plain-text sections), `/legal/{privacy|terms|licenses}` from the active published release only (`routes/legal-pages.php`, one `require` in `routes/web.php`), staff preview pattern `…/preview/legal/{doc}`, Filament editor fields, footer links, frontend rendering. Migration `2026_10_24_268100_site_release_images_schema_v5` (image insert guard admits v3–v5; reviewed-pattern down kept). **`docs/legal/PRIVACY.md` section 8 encryption fix is done**: it now says only database records are encrypted, contract PDFs and attachment originals are private but not encrypted, and appendix B lists file encryption at rest as a prerequisite for stronger wording.
+- `fa785f48` FP-082 customer data export/deletion (`docs/customer-data-rights.md`). Migration `2026_10_24_268200_customer_data_requests` (forward-only).
+- `fa4352c2` FP-075 order-ready email adapter (`docs/transactional-mail.md`). Migration `2026_10_24_268300_transactional_mail_deliveries` (forward-only).
+- `70e909f0` staging capability boundary (thirteen flags), env templates, forge-deploy scrub, SQLite census append (four `CustomerDataRightsConcurrencyTest` methods), MySQL selection (+2 pattern files, +2 include files, worker as branching helper; proved 2614 of 9801 cases in 253 files), CHANGELOG, docs.
+- FP-081/FP-091 ESP suppression adapter: not built (U-13), as planned.
+
+### Results so far (summaries in `evidence/summary.md`)
+
+- SQLite: `tests/Feature/CustomerComms` 96 tests, 765 assertions, 4 census skips; site content, editorial, image, schedule, inquiry, customer account/consent/listening/identity/claim, notification and ops validator suites OK except the three failures below. `npx tsc --noEmit` 0; `npx vitest run` 1174 passed plus `tests/frontend/legal-pages.test.tsx`.
+- Native MySQL 8.4.11 on `70e909f0`: legal migration guard 4/4, data-rights races 4/4, data-rights and mail database guards 2/2 OK; `CustomerDataRequestMigrationTest` 1 failure (below).
+- Mutations M1–M14 all killed (M13 killed by an error: the database guard refuses the second transition).
+- Safeguards: `test-phpunit-shards.py` 52 OK (after the branching-helper entry), `test-ci-scope.py` 27, `test-workflow-cadence.py` 14, `test-focused-tests.py` 53, `test-database-receipts.py` 61 OK; ops Python tests OK (`test_staging_code_drift.py` after the scrub fix, `test_production_kit.py`, `test_staging_capability_profile.py`); `composer validate --strict` valid; Pint clean on changed files.
+
+### Known failures to fix first (unverified until fixed)
+
+1. **SQLite migration roundtrips** `QuotePricingMigrationTest`, `OrderPreparationMigrationTest`, `HostedCheckoutMigrationTest` error: they drop `transactional_notices` mid-roundtrip and a later SQLite `ALTER TABLE` rebuild validates every trigger, and `transactional_mail_deliveries_insert` names `transactional_notices` (`no such table: main.transactional_notices`). Recommended fix: remove the `EXISTS (SELECT 1 FROM transactional_notices …)` clause from that insert trigger in `2026_10_24_268300_transactional_mail_deliveries.php` (keep the unique `notice_id` and shape checks; `TransactionalMailAdapter::queueOrderReady` already proves the notice under its row lock), update `docs/transactional-mail.md` "Records", and drop the "unknown intent" case from `TransactionalMailTest::test_database_guards_allow_one_forward_path_per_intent` (or assert the domain refusal instead). Alternative: drop the empty table in those tests as A5 does with `RefundDisputeFixtures::dropEmptyTables()`. Check `TestOrderFinalizationMigrationTest`, `TestContractIssuanceMigrationTest`, `TestFulfillmentActivationMigrationTest`, `SharedInventoryMigrationTest`, `TestPaymentEvidenceMigrationTest` and `CustomerAccountMigrationTest` too.
+2. **Native** `CustomerDataRequestMigrationTest::test_schema_installs_every_guard…`: trigger-name order differs on MySQL (`information_schema` ordering vs the expected sorted list). Sort the actual list in PHP (`sort($names)`) in `triggers()`; the guard set itself is complete.
+3. Remaining SQLite files of the related run were not reached before the stop: `TransactionalNotificationTest`, `CustomerPurchaseClaimTest` (partial), `CustomerSuppression*`; rerun them.
+
+### Next steps
+
+1. Fix items 1–2, run on SQLite (the direct PHPUnit command from the lane brief, e.g. `… -- --colors=never --fail-on-phpunit-warning tests/Feature/CustomerComms tests/Feature/QuotePricingMigrationTest.php tests/Feature/OrderPreparationMigrationTest.php tests/Feature/HostedCheckoutMigrationTest.php tests/Feature/TransactionalNotificationTest.php`).
+2. `git merge origin/main` (`dd587603`). Union `scripts/ci/database-sqlite-skips.json` with main's entries first and the four CX methods appended (pinned first-150 hash must not change); union `database-mysql-selection.json` lists; rerun `python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection`, update the count comments in `.github/workflows/final-verification.yml` and `.gitlab-ci.yml`, delete `phpunit-ci-mysql-*`. Recheck the migration prefixes `2026_10_24_2681xx`–`2683xx` are still unique after the merge, and reconcile `scripts/ops/capability-boundary.php`, the env templates and their tests if DEF-OPS changed them. C4e touched `routes/web.php`: keep the single `require __DIR__.'/legal-pages.php';` line.
+3. Rerun the four safeguards, `test-database-receipts.py`, `tests/ops/*.py`, `composer validate --strict`, `npx tsc --noEmit`, `npx vitest run` on the merged head.
+4. Native MySQL (private server, own datadir and port): `LegalSiteSchemaMigrationTest`, `CustomerDataRequestMigrationTest`, `CustomerDataRightsConcurrencyTest`, the `database_guards` tests in `CustomerDataRightsTest` and `TransactionalMailTest`. Each MySQL test does a full `migrate:fresh` (about 4–5 minutes per test on a loaded 4-core host).
+5. Independent review of the three migrations and the privacy/identity code; then preflight and expected-SHA merge per AGENTS.md.
+
+### Not verified
+
+Real SMTP/provider, sender DNS, staging host, production policy, and Sean's approval of any legal text or retention schedule. Sitemap entries for legal pages (SEO lane) and production-order receipts (PCC) are not built.
