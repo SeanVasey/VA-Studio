@@ -640,6 +640,9 @@ into the index's per-period proofs; lower the page size to what fits with margin
 pre-bytes check a cheaper currentness comparison rather than a second full pass. The lane does not choose here; the
 member HTTP index must not be mounted anywhere until this is resolved.
 
+Fix in progress (lane F9, branch `harness/member-index-f9-20261024`, unreviewed, not fully verified): see
+`docs/verification/member-index-f9-20261024/README.md`, including its status at handoff.
+
 ## Untested conditions
 
 - Finding F9 (phase B): the index plus pre-bytes exceeds its 60 s budget at about five periods and always at 10 and
