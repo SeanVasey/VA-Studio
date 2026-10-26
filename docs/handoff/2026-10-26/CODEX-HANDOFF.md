@@ -45,6 +45,10 @@ The prompt Sean gives the Codex session is in [`CODEX-PROMPT.md`](CODEX-PROMPT.m
     - `ad1647ff`: APPROVE WITH CONDITIONS. F9 and N7 block any mount. P3-1 and P3-3 were fixed in `3629a135`; P3-2 is deferred.
   - Records: `docs/verification/member-http-c4e-20261024/`.
 - **PR #173 note:** its Codex security review hung for more than 75 minutes. A re-request started only a code review, which was clean. It was merged on the independent review, with the stall recorded.
+- **Open PRs at the checkpoint:** only Dependabot.
+  - Minor and patch groups: #175 (Composer) and #176 (vite 8.3.5).
+  - Pins and majors: #164 and #162 (tc-lib-pdf, excluded from the group on purpose by M2/DEF-OPS), #161 (PHPUnit 13, major), #145 (Playwright, exact-pinned), #100–#102 (Actions majors), #71 (stripe-php 22, major).
+  - Treat them as a dependency batch under `AGENTS.md` and CLAUDE §6: patch/minor ride along when the gate stays green; each major gets its own commit with its changelog reviewed.
 - **Nothing is live.**
   - Every production capability is default-off.
   - No live key, payment, deploy, DNS change or customer import has happened.
