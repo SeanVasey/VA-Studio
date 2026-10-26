@@ -1,0 +1,4 @@
+sq-avail1 exit=0 secs=73 :: OK (5 tests, 123 assertions) 
+sq-avail2 exit=0 secs=154 :: OK (7 tests, 180 assertions) 
+my-avail1 exit=0 secs=2690 :: OK (7 tests, 180 assertions) 
+my-growth1 exit=0 secs=311 :: OK (1 test, 18 assertions) 

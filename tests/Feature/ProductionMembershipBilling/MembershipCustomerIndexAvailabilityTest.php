@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\ProductionMembershipBilling;
 
+use App\Domain\Customers\ProductionIdentity\SchemaProofFrame;
 use App\Domain\Grants\Member\MemberActivationHistoryInspection;
 use App\Domain\Grants\Member\MemberActivationHistoryReader;
 use App\Domain\Grants\Member\MemberGrantPolicy;
@@ -18,8 +19,12 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Events\TransactionBeginning;
 use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Mockery;
+use PDO;
 use ReflectionClass;
+use ReflectionProperty;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\MemberActivationFixtures;
 use Tests\Support\MembershipAwardMonotonicClock;
@@ -97,7 +102,7 @@ class MembershipCustomerIndexAvailabilityTest extends TestCase
         foreach ($calls[0] as $call) {
             $this->assertStringEndsWith(', true)', $call, 'Shared facts are read without a row lock: '.$call);
         }
-        $this->assertSame(1, substr_count($source, 'capturePeriod($row[\'id\'], $rows, consistentRead: true)'));
+        $this->assertSame(1, substr_count($source, 'capturePeriod($row[\'id\'], $rows, consistentRead: true, schema: $schema)'));
         $this->assertSame(1, substr_count($source, '->capturePeriod('));
         // Re-review R3: both opt-ins default to locking, and every writer keeps that default.
         $capture = (new ReflectionClass(MemberActivationHistoryReader::class))->getMethod('capturePeriod')->getParameters()[2];
@@ -135,6 +140,131 @@ class MembershipCustomerIndexAvailabilityTest extends TestCase
             }
             $this->assertSame(1, DB::table($table)->where('id', $id)->count());
         }
+        $read = MembershipCustomerRead::begin();
+        $this->assertCount(1, (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read)['periods']);
+        $read->proveBeforeBytes();
+    }
+
+    public function test_index_proves_schema_once_per_owned_frame_and_completely_in_its_terminal_phases(): void
+    {
+        // F9: the index reads every period inside one owned frame with G1's frame-scoped schema proofs, member-grant
+        // proofs included, and verifies each distinct retained buyer binding once. Its raw phases prove the member-grant
+        // schema once around all periods. Every phase that releases or compares stays complete: the owned terminal
+        // phase begins before the current identity and grant proofs, and the committed frame proves in full.
+        $source = file_get_contents(base_path('app/Domain/Memberships/Production/MembershipCustomerIndex.php'));
+        // strpos returns false for a missing call, and false compares below any int: every position is pinned first.
+        $at = function (string $haystack, string $needle, bool $last = false): int {
+            $position = $last ? strrpos($haystack, $needle) : strpos($haystack, $needle);
+            $this->assertIsInt($position, 'Missing: '.$needle);
+
+            return $position;
+        };
+        $frame = substr($source, $at($source, '$projection = DB::transaction(function ()'));
+        $this->assertSame(1, substr_count($source, '$owned = new MembershipAwardTransaction($connection, $primary, memberGrantProofs: true);'));
+        $this->assertLessThan($at($frame, '$owned = new MembershipAwardTransaction('), $at($frame, '$this->lockOwnerFirst($primary, $principal->userId);'));
+        $this->assertLessThan($at($frame, '$rows = new MembershipRows($owned);'), $at($frame, '$owned = new MembershipAwardTransaction('));
+        $terminal = $at($frame, '$owned->beginTerminalProof();');
+        $this->assertSame(1, substr_count($source, '->beginTerminalProof();'));
+        foreach (['$history->currentCallbacks(', '$access->proveHistoricalBindingCurrent('] as $memo) {
+            $this->assertLessThan($terminal, $at($frame, $memo), $memo.' runs in the memo phase.');
+        }
+        $current = substr($frame, 0, $at($frame, 'return $result;'));
+        foreach (['$grants->proveCurrent(', '$access->proveCurrent(', '$history->currentRawAll(', '$rows->assertCurrent();'] as $complete) {
+            $this->assertGreaterThan($terminal, $at($current, $complete, true), $complete.' runs in the terminal phase.');
+        }
+        foreach (['->currentRaw(', '->committedRaw(', '->committedCallbacks('] as $perPeriod) {
+            $this->assertStringNotContainsString($perPeriod, $source);
+        }
+        $this->assertSame(1, substr_count($source, '$history->committedCallbacksAll('));
+        $this->assertSame(1, substr_count($source, '$history->committedRawAll('));
+        $this->assertSame(1, substr_count($source, '->verifyHistoricalBinding('));
+        $this->assertSame(1, substr_count($source, '$state[\'historical\'][$key] ??= $access->verifyHistoricalBinding($buyer, $rows->current());'));
+        // Writers keep their complete member-grant proofs: only the index opts in.
+        foreach (['MembershipAwardObserver', 'MembershipReservationObserver'] as $observer) {
+            $code = file_get_contents(base_path('app/Domain/Memberships/Production/'.$observer.'.php'));
+            $this->assertStringContainsString('new MembershipAwardTransaction($this->connection, $this->primary);', $code);
+        }
+        foreach (['MemberActivationReadObserver', 'MemberOriginalObserver', 'MemberActivationObserver'] as $observer) {
+            $code = file_get_contents(base_path('app/Domain/Grants/Member/'.$observer.'.php'));
+            $this->assertStringContainsString('new MembershipAwardTransaction($this->connection, $this->primary);', $code);
+        }
+        $this->assertSame(1, preg_match_all('/memberGrantProofs: true/', implode("\n", array_map(
+            static fn (string $file): string => (string) file_get_contents($file), glob(base_path('app/Domain/{Memberships,Grants}/*/*.php'), GLOB_BRACE)))));
+
+        $fixture = $this->memberActivationFixture();
+        $read = MembershipCustomerRead::begin();
+        $this->assertCount(1, (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read)['periods']);
+        $read->proveBeforeBytes();
+    }
+
+    public function test_index_terminal_phase_proves_in_full_after_remembered_proofs(): void
+    {
+        // As MemberObserverTerminalProofTest for the writers: while the index frame still answers from memory, a table
+        // appears under a reserved identity index name. On MySQL another session creates it, which takes no metadata
+        // lock and moves no frame token, so only a complete proof sees it, and the owned terminal phase must refuse it
+        // before the index commits (the committed frame would refuse it only after the commit). On SQLite the
+        // same-connection DDL moves the catalog token, so the next guard proves in full at once.
+        $fixture = $this->memberActivationFixture();
+        $collision = 'pia_address_unique';
+        $other = null;
+        if (DB::getDriverName() === 'mysql') {
+            $config = DB::connection()->getConfig();
+            $address = empty($config['unix_socket']) ? 'host='.$config['host'].';port='.$config['port'] : 'unix_socket='.$config['unix_socket'];
+            $other = new PDO('mysql:'.$address.';dbname='.$config['database'].';charset=utf8mb4', $config['username'], $config['password'],
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+            $other->exec('SET SESSION lock_wait_timeout=3, innodb_lock_wait_timeout=3');
+        }
+        $primary = DB::connection()->getPdo();
+        $seen = (object) ['frame' => null, 'terminal' => null, 'remembered' => null];
+        $real = Crypt::getFacadeRoot();
+        $hook = Mockery::mock();
+        $hook->shouldReceive('encryptString')->andReturnUsing(fn ($plain) => $real->encryptString($plain));
+        $hook->shouldReceive('decryptString')->andReturnUsing(function ($ciphertext) use ($real, $seen, $primary, $other, $collision) {
+            if ($seen->frame === null && DB::transactionLevel() === 1) {
+                $frames = (new ReflectionProperty(SchemaProofFrame::class, 'frames'))->getValue();
+                $frame = $frames !== null && isset($frames[$primary]) ? $frames[$primary]->get() : null;
+                $remembered = $frame instanceof SchemaProofFrame ? array_keys((new ReflectionProperty(SchemaProofFrame::class, 'proofs'))->getValue($frame)) : [];
+                if (in_array('identity', $remembered, true) && in_array('membership', $remembered, true)) {
+                    $seen->frame = $frame;
+                    $seen->terminal = (new ReflectionProperty(SchemaProofFrame::class, 'terminal'))->getValue($frame);
+                    $seen->remembered = $remembered;
+                    $sql = 'CREATE TABLE '.$collision.' (id INTEGER PRIMARY KEY)';
+                    $other === null ? $primary->exec($sql) : $other->exec($sql);
+                }
+            }
+
+            return $real->decryptString($ciphertext);
+        });
+        $committed = 0;
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitted::class, function () use (&$committed): void {
+            $committed++;
+        });
+        Crypt::swap($hook);
+        try {
+            (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user']);
+            $this->fail('The index admitted a reserved-name collision.');
+        } catch (MembershipException $error) {
+            $this->assertNotSame('operation_deadline', $error->reason);
+        } finally {
+            Crypt::swap($real);
+            $other?->exec('DROP TABLE IF EXISTS '.$collision);
+        }
+        $this->assertInstanceOf(SchemaProofFrame::class, $seen->frame, 'No owned index frame was remembering proofs.');
+        $this->assertFalse($seen->terminal);
+        $this->assertNotEmpty(array_filter($seen->remembered, static fn (string $guard): bool => str_starts_with($guard, 'member_grant:')),
+            'Member-grant proofs are remembered in the index frame.');
+        // Refused inside the index transaction, before its commit.
+        $this->assertSame(0, $committed);
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse($primary->inTransaction());
+        if ($other !== null) {
+            // MySQL: the refusal came from the owned terminal phase, which disabled the memo first.
+            $this->assertTrue((new ReflectionProperty(SchemaProofFrame::class, 'terminal'))->getValue($seen->frame));
+        } else {
+            // SQLite: the collision was the refused transaction's own DDL and rolled back with it.
+            $this->assertFalse(DB::getSchemaBuilder()->hasTable($collision));
+        }
+        // The index answers again once the collision is gone.
         $read = MembershipCustomerRead::begin();
         $this->assertCount(1, (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read)['periods']);
         $read->proveBeforeBytes();

@@ -1209,6 +1209,10 @@
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
       "test_native_index_waiting_behind_a_same_owner_release_reads_the_released_history"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_index_schema_proofs_per_call_do_not_grow_with_the_number_of_periods"
     ]
   ]
 }
