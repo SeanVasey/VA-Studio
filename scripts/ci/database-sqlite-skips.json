@@ -1140,11 +1140,11 @@
     ],
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
-      "test_native_index_holds_owner_fence_and_period_locks_until_commit_then_releases_them"
+      "test_native_index_locks_only_the_owner_rows_until_commit_then_releases_them"
     ],
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
-      "test_native_index_waits_at_a_writer_held_fence_and_retains_no_lock_after_refusal"
+      "test_native_index_waits_at_a_writer_held_owner_lock_and_retains_no_lock_after_refusal"
     ],
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
@@ -1189,6 +1189,26 @@
     [
       "Tests\\Feature\\RefundDispute\\RefundDisputeConcurrencyTest",
       "test_writer_latency_sits_well_inside_the_lease_and_authorization_windows"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_index_and_a_zero_period_index_complete_while_other_sessions_hold_the_fence_and_shared_rows"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_index_never_waits_when_another_session_takes_the_definition_then_the_plan_mid_index"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_same_plan_award_for_another_customer_runs_while_the_index_is_open"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_index_waiting_behind_a_same_owner_writer_reads_that_writers_commit"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_index_waiting_behind_a_same_owner_release_reads_the_released_history"
     ]
   ]
 }

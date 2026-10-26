@@ -200,8 +200,8 @@
 +stdout_logfile=NONE
 +stdout_syslog=true
  
- ; Laravel's scheduler (routes/console.php: vasey:publish-scheduled-site-release every minute). schedule:work runs
-@@ -109,7 +105,6 @@
+ ; Laravel's scheduler (routes/console.php: vasey:publish-scheduled-site-release every minute, vasey:cache-prune-expired hourly
+@@ -110,7 +106,6 @@
  stopasgroup=true
  redirect_stderr=true
 -stdout_logfile=/var/log/vasey-production/scheduler.log

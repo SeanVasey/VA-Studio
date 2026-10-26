@@ -754,6 +754,39 @@ if [ "${{args[2]:-}}" = lsf ] && [ -e "{outage}" ]; then echo "outage: connectio
                 self.assertNotIn("already shipped", run.stdout)
                 self.assertIn("remove that object first", run.stdout)
 
+    def test_a_record_without_a_size_is_not_a_match_when_the_size_listing_fails(self):
+        # Two empty sizes used to compare equal: a record that lost its size line and a size listing that failed (nothing printed)
+        # passed "already shipped" on the digest alone. Both sizes must be digits.
+        recipients = self.recipients()
+        bk = self.make_set()
+        self.assertEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings).returncode, 0)
+        record = self.backups / f".offhost-shipped.{bk.name}"
+        self.assertRegex(record.read_text(), r"\nsize=[0-9]+\n\Z")
+        record.write_text(record.read_text().splitlines()[0] + "\n")
+        blind = self.wrapped_rclone("no-size-rclone", """for a in "${args[@]}"; do
+  if [ "$a" = --format ]; then echo "listing failed" >&2; exit 1; fi
+done""")
+        shipped = self.remote_digests()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=blind))
+        self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertNotIn("already shipped", run.stdout)
+        self.assertIn("remove that object first", run.stdout)
+        self.assertEqual(self.remote_digests(), shipped)
+        # The same record, with a working size listing, still does not match: the recorded size is not digits.
+        again = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertNotEqual(again.returncode, 0, again.stdout + again.stderr)
+        self.assertNotIn("already shipped", again.stdout)
+
+    def test_a_record_that_cannot_be_written_is_reported_and_leaves_no_partial_record(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        record = self.backups / f".offhost-shipped.{bk.name}"
+        (self.backups / f"{record.name}.new").mkdir()  # the temporary record name is taken, so the write fails
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn(f"WARNING: could not record {bk.name} as shipped", run.stdout)
+        self.assertFalse(record.exists())
+
     def test_a_linked_shipped_record_is_not_trusted(self):
         recipients = self.recipients()
         bk = self.make_set()

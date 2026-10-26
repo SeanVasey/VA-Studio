@@ -156,6 +156,8 @@ class StagingEnvironmentAdmissionTest extends TestCase
         'app/Domain/Commerce/ProductionFinancialInspection/FinancialInspectionPolicy.php',
         // D1: the family 256 HTTP mount, like the Tax mount, needs the literal true and a local/testing cached environment.
         'app/Http/ProductionFree/ProductionFreeHttpMount.php',
+        // C4e: the member HTTP mount, like the family 256 mount, needs the literal true and a local/testing cached environment.
+        'app/Http/Membership/MembershipHttpMount.php',
     ];
 
     private const LOCAL_TESTING_GATE = '/environment\(\[?\'local\', \'testing\'\]?\)|in_array\(\$[a-zA-Z\[\]\']+, \[\'local\', \'testing\'\], true\)/';
