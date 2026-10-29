@@ -183,3 +183,14 @@ Laravel's SQLite grammar emits no `FOR UPDATE`, so the native run is the proof.
 
 Not re-run natively: the A5 writer suites. `RefundDisputeCase::load()` keeps its locking behaviour for every existing caller (the new
 parameter defaults to true), and the A5 suites pass on SQLite, but a native A5 pass belongs to the PR's final verification.
+
+## Re-review of the fixes at `622a4920`
+
+Decision: **APPROVE** ([`independent-rep-rereview-622a4920-DECISION.md`](independent-rep-rereview-622a4920-DECISION.md)),
+no new P0 to P2; both conditions of the first review are met. Native MySQL 8.4.11 on the reviewer's own server:
+`SalesReportLockFreeTest` OK (1 test, 11 assertions), a mutant that restores the report's row locks (L1) killed, the A5
+`RefundDisputeConcurrencyTest` OK (4 tests, 50 assertions), the A5 lifecycle writer cases OK (3 tests, 52 assertions) and
+`RefundDisputeMigrationTest` OK (2 tests, 63 assertions), so the A5 writers keep their locking default. Mutants M4, K4, K5,
+K6, K13, K15, the production-account exclusion, the CSV whitespace case and both CSV count rows are killed. Non-blocking
+P3s: R-1 (exclude production accounts positively by marking test accounts, for the U-13 follow-up), R-2 (the per-order
+snapshot transaction is untested defence), and a space followed by a tab before `=` is not neutralized.

@@ -1,5 +1,7 @@
 # Resumption after the stopped Codex session — 2026-10-17
 
+> **2026-10-29:** Sean cancelled the Codex handoff; the Claude harness resumed the lead. The [handoff note](../2026-10-26/CODEX-HANDOFF.md) is history. The lane rows below are current.
+>
 > **2026-10-26:** the Claude harness handed the remaining work to Codex at main `dd587603` (PR #174). Start at [`docs/handoff/2026-10-26/CODEX-HANDOFF.md`](../2026-10-26/CODEX-HANDOFF.md); the lane rows below are current through that checkpoint.
 
 Sean reported that the last Codex session appeared frozen or unfinished and asked the Claude harness to reconcile interrupted work and resume development. Root `AGENTS.md` still governs, including the October 6 CI cost policy. This note records what was found, what was reconciled, and who owns each lane now.
