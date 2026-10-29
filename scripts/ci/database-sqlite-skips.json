@@ -1225,6 +1225,10 @@
     [
       "Tests\\Feature\\CustomerComms\\CustomerDataRightsConcurrencyTest",
       "test_a_download_committed_while_a_second_download_waits_cannot_return_the_export_twice"
+    ],
+    [
+      "Tests\\Feature\\CustomerComms\\CustomerDataRightsConcurrencyTest",
+      "test_an_export_committed_while_an_approval_waits_is_purged_by_that_approval"
     ]
   ]
 }

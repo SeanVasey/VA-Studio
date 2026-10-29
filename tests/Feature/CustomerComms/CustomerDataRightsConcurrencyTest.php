@@ -89,6 +89,34 @@ class CustomerDataRightsConcurrencyTest extends TestCase
         $this->assertSame($user, (array) DB::table('users')->where('id', $f['user']->id)->first());
     }
 
+    public function test_an_export_committed_while_an_approval_waits_is_purged_by_that_approval(): void
+    {
+        $f = F::account();
+        $request = app(CustomerDataRights::class)->requestDeletion(app(CustomerAccess::class)->principal($f['user']), $f['user'])['requestId'];
+        $staff = LicenseFixtures::admin();
+        $staff->forceFill(['app_authentication_secret' => 'JBSWY3DPEHPK3PXP'])->save();
+        $result = $this->race(['operation' => 'approve', 'actor_id' => $staff->id, 'request_id' => $request, 'version' => 0], $f['user']->id,
+            function () use ($f): void {
+                // The export transaction holds the same customer user row the approval waits for, and commits first.
+                $now = now()->startOfSecond();
+                $id = DB::table('customer_data_requests')->insertGetId(['public_id' => '77777777-7777-4777-8777-777777777777',
+                    'customer_account_id' => $f['account']->id, 'kind' => 'export', 'state' => 'ready', 'open_slot' => 1, 'version' => 0,
+                    'created_at' => $now, 'updated_at' => $now]);
+                $detail = CanonicalJson::encode(['kind' => 'export']);
+                DB::table('customer_data_request_events')->insert(['request_id' => $id, 'sequence' => 1, 'event' => 'requested',
+                    'detail' => $detail, 'detail_hash' => hash('sha256', $detail), 'created_at' => $now]);
+                DB::table('customer_data_exports')->insert(['request_id' => $id, 'ciphertext' => encrypt('{"synthetic":true}', false),
+                    'content_hash' => str_repeat('c', 64), 'token_hash' => str_repeat('d', 64), 'size_bytes' => 18,
+                    'expires_at' => $now->copy()->addMinutes(15), 'created_at' => $now]);
+            });
+        $this->assertSame('saved', $result['result'], json_encode($result));
+        $this->assertSame('purged', $result['value']['actions']['pending_exports']);
+        $export = DB::table('customer_data_requests')->where('public_id', '77777777-7777-4777-8777-777777777777')->sole();
+        $this->assertSame(['expired', null], [$export->state, $export->open_slot]);
+        $this->assertNull(DB::table('customer_data_exports')->where('request_id', $export->id)->value('ciphertext'));
+        $this->assertFalse(CustomerAccount::find($f['account']->id)->active);
+    }
+
     public function test_an_export_waiting_behind_an_access_withdrawal_is_denied_without_rows(): void
     {
         $f = F::account();

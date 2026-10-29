@@ -25,10 +25,11 @@ The JSON is encrypted at rest with the application key (`customer_data_exports.c
 
 **Approval refuses while any retention value is unset.** Once configured, approval:
 
+- expires every open export of the account and purges its encrypted file in the same transaction (the export holds the pre-erasure profile and the customer can no longer download it); the request moves to `expired` with an `export_expired` event whose reason is `deletion_approved`, and the approval records `pending_exports: purged` (independent CX review F1). Export preparation and approval both lock the customer user row first, so an export that commits while approval waits is purged by that approval, and an export requested after approval is refused because access is withdrawn;
 - withdraws customer access (`customer_accounts.active` false, access version incremented) and ends database sessions;
 - erases the listening library (`customer_saved_tracks`);
 - replaces the sign-in profile: name `Erased customer`, email `erased+<account id>@erased.invalid`, a random password, no verification;
-- **keeps** orders, order lines, finalizations, license grants, contracts, verified payments, purchase claims, delivery records, consent and suppression ledgers, inquiries, identity challenges and audit events exactly as they are, and records each class with its retention class in the request's `deletion_completed` event together with the configured retention values and policy reference.
+- **keeps** orders, order lines, finalizations, license grants, contracts, verified payments, purchase claims, delivery records, consent and suppression ledgers, inquiries, identity challenges, order-ready intents (`transactional_notices`, whose encrypted capture holds the recipient email) and their mail deliveries, data request records and export rows (contents purged) and audit events exactly as they are, and records each class with its retention class in the request's `deletion_completed` event together with the configured retention values and policy reference.
 
 Name and email inside retained order snapshots and contracts stay there: they are part of the financial and license record. Consent stays as recorded; nothing infers or rewrites it. Staff accounts are never erased through this workflow. Rejection needs a plain-text reason (no customer details) and changes no customer data.
 
@@ -45,7 +46,7 @@ Name and email inside retained order snapshots and contracts stay there: they ar
 | `VASEY_CUSTOMER_DATA_RETENTION_CORRESPONDENCE_YEARS` | Inquiries, replies, attachments (1–100). |
 | `VASEY_CUSTOMER_DATA_RETENTION_SECURITY_YEARS` | Audit events, identity challenges, download authorizations (1–100). |
 
-These values are recorded with each approval; no code yet purges retained records when a period ends. A purge of immutable records needs its own reviewed migration and Sean's schedule.
+These values are recorded with each approval; no code yet purges retained records when a period ends. Follow-up (independent CX review F4): schedule `vasey:customer-data-exports-prune` once a production host exists (U-02); until then the export lifetime is a download window, not a storage limit, except that deletion approval purges open exports. A purge of immutable records needs its own reviewed migration and Sean's schedule.
 
 ## Records
 

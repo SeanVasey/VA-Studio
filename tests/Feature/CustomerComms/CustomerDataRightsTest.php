@@ -325,7 +325,7 @@ class CustomerDataRightsTest extends TestCase
 
         $result = app(CustomerDataRights::class)->approveDeletion($request, $staff, 0);
 
-        $this->assertSame(['customer_access' => 'withdrawn', 'listening_library' => 'erased', 'sessions' => 'none', 'sign_in_profile' => 'pseudonymized'], $result['actions']);
+        $this->assertSame(['customer_access' => 'withdrawn', 'pending_exports' => 'none', 'listening_library' => 'erased', 'sessions' => 'none', 'sign_in_profile' => 'pseudonymized'], $result['actions']);
         $after = $this->snapshot();
         $this->assertSame(array_slice($after['audit_events'], 0, count($before['audit_events'])), $before['audit_events']);
         unset($after['audit_events'], $before['audit_events']);
@@ -357,6 +357,66 @@ class CustomerDataRightsTest extends TestCase
         $this->postJson('/account/data-requests/export', ['confirm' => true])->assertForbidden();
         $this->assertSame($before['customer_consent_states'], DB::table('customer_consent_states')->orderBy('id')->get()->map(fn ($row) => (array) $row)->all());
         $this->expectRefusal(fn () => app(CustomerDataRights::class)->approveDeletion($request, $staff, 1), DataRightsException::class, 'request_changed');
+    }
+
+    public function test_approval_purges_a_prepared_export_in_the_same_transaction_and_records_it(): void
+    {
+        $this->retention();
+        $customer = F::account(['name' => 'Synthetic Export Erasable', 'email' => 'export.erasable@example.test']);
+        $rights = app(CustomerDataRights::class);
+        $principal = fn () => app(CustomerAccess::class)->principal($customer['user']->fresh());
+        // An export downloaded earlier is already purged; it must stay exactly as it is.
+        $old = $rights->requestExport($principal(), $customer['user']);
+        $rights->download($principal(), $customer['user'], $old['requestId'], $old['downloadToken']);
+        $downloaded = (array) DB::table('customer_data_exports')->sole();
+        $this->travel(61)->minutes();
+        $ready = $rights->requestExport($principal(), $customer['user']);
+        $deletion = $rights->requestDeletion($principal(), $customer['user'])['requestId'];
+        $staff = $this->staff();
+
+        // A refused approval (stale version) leaves the prepared export untouched: the purge belongs to the approval.
+        $this->expectRefusal(fn () => $rights->approveDeletion($deletion, $staff, 1), DataRightsException::class, 'request_changed');
+        $this->assertNotNull(CustomerDataExport::where('request_id', CustomerDataRequest::where('public_id', $ready['requestId'])->value('id'))->value('ciphertext'));
+
+        $result = $rights->approveDeletion($deletion, $staff, 0);
+
+        $this->assertSame('purged', $result['actions']['pending_exports']);
+        $request = CustomerDataRequest::where('public_id', $ready['requestId'])->sole();
+        $this->assertSame(['expired', null], [$request->state, $request->open_slot]);
+        $export = DB::table('customer_data_exports')->where('request_id', $request->id)->sole();
+        $this->assertSame([null, null], [$export->ciphertext, $export->consumed_at]);
+        $this->assertNotNull($export->purged_at);
+        $this->assertEquals($downloaded, (array) DB::table('customer_data_exports')->where('id', $downloaded['id'])->sole());
+        $event = DB::table('customer_data_request_events')->where('request_id', $request->id)->where('event', 'export_expired')->sole();
+        $this->assertSame('deletion_approved', json_decode($event->detail, true)['reason']);
+        $this->assertNull($event->actor_user_id);
+        $completed = DB::table('customer_data_request_events')->where('event', 'deletion_completed')->sole();
+        $retained = array_column(json_decode($completed->detail, true)['retained'], null, 'record');
+        $this->assertEquals(['retention' => 'security_records_years', 'reason' => 'ledger_retained_contents_purged', 'count' => 2],
+            array_diff_key($retained['customer_data_exports'], ['record' => true]));
+        foreach (['transactional_notices', 'transactional_mail_deliveries'] as $record) {
+            $this->assertSame(['correspondence_records_years', 0], [$retained[$record]['retention'], $retained[$record]['count']]);
+        }
+        $this->assertSame(0, DB::table('customer_data_exports')->whereNotNull('ciphertext')->count());
+        // Replay is refused and changes nothing further.
+        $events = DB::table('customer_data_request_events')->count();
+        $this->expectRefusal(fn () => $rights->approveDeletion($deletion, $staff, 1), DataRightsException::class, 'request_changed');
+        $this->assertSame($events, DB::table('customer_data_request_events')->count());
+    }
+
+    public function test_approval_never_erases_an_account_that_became_staff(): void
+    {
+        $this->retention();
+        $customer = F::account(['name' => 'Synthetic Promoted', 'email' => 'promoted@example.test']);
+        $deletion = app(CustomerDataRights::class)->requestDeletion(app(CustomerAccess::class)->principal($customer['user']), $customer['user'])['requestId'];
+        User::whereKey($customer['user']->id)->update(['is_admin' => true]);
+        $user = (array) DB::table('users')->where('id', $customer['user']->id)->first();
+        $account = (array) DB::table('customer_accounts')->where('id', $customer['account']->id)->first();
+        $this->expectRefusal(fn () => app(CustomerDataRights::class)->approveDeletion($deletion, $this->staff(), 0), DataRightsException::class, 'staff_account');
+        $this->assertSame($user, (array) DB::table('users')->where('id', $customer['user']->id)->first());
+        $this->assertSame($account, (array) DB::table('customer_accounts')->where('id', $customer['account']->id)->first());
+        $this->assertSame('received', CustomerDataRequest::sole()->state);
+        $this->assertSame(0, AuditEvent::where('action', 'customer.data_deletion.completed')->count());
     }
 
     public function test_database_guards_keep_requests_forward_only_events_append_only_and_exports_purge_only(): void

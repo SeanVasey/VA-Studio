@@ -39,6 +39,8 @@ final class CustomerDataRights
         'customer_consent_events' => 'consent_records_years', 'customer_suppression_records' => 'consent_records_years',
         'inquiries' => 'correspondence_records_years', 'audit_events' => 'security_records_years',
         'identity_challenges' => 'security_records_years', 'customer_data_requests' => 'security_records_years',
+        'transactional_notices' => 'correspondence_records_years', 'transactional_mail_deliveries' => 'correspondence_records_years',
+        'customer_data_exports' => 'security_records_years',
     ];
 
     /** @return array{requestId: string, downloadToken: string, expiresAt: string, sizeBytes: int} */
@@ -190,7 +192,12 @@ final class CustomerDataRights
                 throw new DataRightsException(409, 'staff_account');
             }
             $at = $this->now();
-            $actions = ['customer_access' => 'already_withdrawn', 'listening_library' => 'none', 'sessions' => 'none', 'sign_in_profile' => 'pseudonymized'];
+            $actions = ['customer_access' => 'already_withdrawn', 'pending_exports' => 'none', 'listening_library' => 'none', 'sessions' => 'none', 'sign_in_profile' => 'pseudonymized'];
+            // A prepared export holds the pre-erasure profile and the customer can no longer download it: purge it now, under the
+            // same customer locks an export request takes (user -> account -> request), so none can be left behind or added.
+            if ($this->purgeOpenExports($account->id, $at, 'deletion_approved') > 0) {
+                $actions['pending_exports'] = 'purged';
+            }
             if ($account->active) {
                 $account->forceFill(['active' => false, 'access_version' => $account->access_version + 1, 'updated_at' => $at])->save();
                 $actions['customer_access'] = 'withdrawn';
@@ -277,13 +284,30 @@ final class CustomerDataRights
         }
     }
 
-    private function expire(CustomerDataRequest $request, CustomerDataExport $export, CarbonImmutable $at): void
+    /** Expires and purges every open export of the account, whatever its window. Caller holds the customer user and account locks. */
+    private function purgeOpenExports(int $accountId, CarbonImmutable $at, string $reason): int
+    {
+        $purged = 0;
+        $requests = CustomerDataRequest::where('customer_account_id', $accountId)->where('kind', 'export')->where('open_slot', 1)->orderBy('id')->lockForUpdate()->get();
+        foreach ($requests as $request) {
+            $export = CustomerDataExport::where('request_id', $request->id)->lockForUpdate()->first();
+            if ($export === null || $export->purged_at !== null) {
+                throw new DataRightsException(503, 'export_state_invalid');
+            }
+            $this->expire($request, $export, $at, $reason);
+            $purged++;
+        }
+
+        return $purged;
+    }
+
+    private function expire(CustomerDataRequest $request, CustomerDataExport $export, CarbonImmutable $at, string $reason = 'window_elapsed'): void
     {
         if ($request->state === 'ready') {
             $this->resolve($request, 'expired', $at);
         }
         $export->forceFill(['ciphertext' => null, 'purged_at' => $at])->save();
-        $this->event($request, 'export_expired', null, ['expires_at' => $export->expires_at->toIso8601ZuluString()], $at);
+        $this->event($request, 'export_expired', null, ['expires_at' => $export->expires_at->toIso8601ZuluString(), 'reason' => $reason], $at);
     }
 
     private function open(CustomerAccount $account, string $kind, string $publicId, CarbonImmutable $at): CustomerDataRequest
@@ -355,10 +379,17 @@ final class CustomerDataRights
             'customer_purchase_claims' => DB::table('customer_purchase_claims')->where('account_id', $account->id)->count(),
             'customer_consent_events' => DB::table('customer_consent_events')->where('customer_account_id', $account->id)->count(),
             'inquiries' => $orders === [] ? 0 : DB::table('inquiry_order_contexts')->whereIn('order_id', $orders)->count(),
+            'transactional_notices' => DB::table('transactional_notices')->where('account_id', $account->id)->count(),
+            'transactional_mail_deliveries' => DB::table('transactional_mail_deliveries as d')->join('transactional_notices as n', 'n.id', '=', 'd.notice_id')
+                ->where('n.account_id', $account->id)->count(),
+            'customer_data_exports' => DB::table('customer_data_exports as x')->join('customer_data_requests as r', 'r.id', '=', 'x.request_id')
+                ->where('r.customer_account_id', $account->id)->count(),
         ];
         $retained = [];
         foreach (self::RETAINED as $record => $class) {
-            $retained[] = ['record' => $record, 'retention' => $class, 'reason' => 'immutable_record_retained'] + (array_key_exists($record, $counts) ? ['count' => $counts[$record]] : []);
+            // Export rows stay as request evidence; their contents are purged before this record is written.
+            $reason = $record === 'customer_data_exports' ? 'ledger_retained_contents_purged' : 'immutable_record_retained';
+            $retained[] = ['record' => $record, 'retention' => $class, 'reason' => $reason] + (array_key_exists($record, $counts) ? ['count' => $counts[$record]] : []);
         }
 
         return $retained;

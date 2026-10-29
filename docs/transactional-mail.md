@@ -10,6 +10,15 @@ The private test order-ready intents (`transactional_notices`, type `test_order_
 2. The job claims the row (`queued → submitting`) in a committed transaction, re-verifies authority, decrypts the intent's recipient and order reference, and sends one plain-text message through the configured SMTP mailer: a `TEST ORDER — REHEARSAL ONLY` notice with the order reference, an instruction to sign in, and support@vasey.audio. It contains no link, token, price, file name or legal text.
 3. Outcome: `accepted`, or `failed` (configuration missing or changed, customer access withdrawn, intent unreadable — all before any transport call), or `uncertain` when the transport raised an error after the attempt began. Nothing leaves `queued` twice, and an `uncertain` delivery is never retried automatically: check the provider's logs before acting. The customer's order page remains the source of truth for a paid order whose email failed.
 
+**A delivery stuck in `submitting`.** If a worker dies after committing `queued → submitting` and before the transport call or the final transition (process killed, host restart), the row stays `submitting`. It is never resent: nothing moves a row out of `submitting` except the job that claimed it, and the claim only starts from `queued`. It is also not yet reported anywhere (independent CX review F5; a follow-up adds it to an operator listing). Because the transport may or may not have been reached, treat it like `uncertain`: check the provider's logs for the delivery id (the `X-Vasey-Delivery` header) before acting. Operators find such rows with a read-only query:
+
+```sql
+SELECT public_id, notice_public_id, started_at
+FROM transactional_mail_deliveries
+WHERE state = 'submitting' AND started_at < UTC_TIMESTAMP() - INTERVAL 15 MINUTE  -- SQLite: datetime('now', '-15 minutes')
+ORDER BY started_at;
+```
+
 Logs carry the delivery id and exception class only; audit events carry ids, states and reasons. No email address or message body is logged.
 
 ## Refusal unless an operator configures it

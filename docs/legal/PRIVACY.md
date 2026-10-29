@@ -107,8 +107,8 @@ We share personal information only with the service providers below, who process
 | --- | --- | --- |
 | **Stripe, Inc.** and its affiliates | Payment processing, fraud checks and tax calculation on Stripe's hosted checkout page | The amounts, item names and order references we send; everything you enter on Stripe's page. Stripe acts as an independent controller for some purposes, such as fraud prevention and its legal duties. |
 | **Hosting provider**: our servers are managed with **Laravel Forge** on a virtual private server from [**DigitalOcean** — Sean to confirm for production] | Runs the store, its database and its private file storage | All data stored by the store, held on our servers |
-| **File storage provider**: [our own server's private disk / Cloudflare R2 / an Amazon S3-compatible service — Sean to choose] | Stores purchased files, license PDFs and backups | Files and encrypted backups |
-| **Backup storage**: [off-site backup provider — Sean to choose] | Keeps encrypted copies of the database and private files so we can recover from failures | Encrypted backup files. Backups are encrypted before they leave our server. |
+| **File storage provider**: [our own server's private disk / Cloudflare R2 / an Amazon S3-compatible service — Sean to choose] | Stores purchased files, license PDFs and backups | Files and backups |
+| **Backup storage**: [off-site backup provider — Sean to choose] | Keeps copies of the database and private files so we can recover from failures | Backup files of the database and private files |
 | **Email delivery provider**: [name of email/SMTP provider — Sean to choose] | Sends account verification, password recovery and order messages, and marketing email only if you opted in | Your email address and the message content |
 | **YouTube (Google) / Vimeo** | Video playback, only after you press "Load video" | Your IP address and what their player collects |
 | **Professional advisers** (accountants, lawyers) | Accounting, tax and legal advice | What they need for the task, under confidentiality duties |
@@ -142,14 +142,14 @@ The periods below are what we intend to apply. **[Proposed — Sean to confirm e
 | Listening library | Until you clear it or your account is closed. |
 | Marketing choice and suppression records | For as long as we hold your email address, plus 3 years, so we can prove consent or keep honoring an opt-out. |
 | Contact messages, replies and attachments | 2 years after the last message in the conversation, unless the conversation concerns an order or a legal claim, in which case as long as the order records. |
-| Backups | Encrypted backups rotate: up to 7 daily, 4 weekly and 6 monthly copies. Deleted information can remain in a backup for up to about 6 months until that backup is replaced. We do not restore deleted personal information from backups except to recover from a failure. |
+| Backups | Backups rotate: up to 7 daily, 4 weekly and 6 monthly copies. Deleted information can remain in a backup for up to about 6 months until that backup is replaced. We do not restore deleted personal information from backups except to recover from a failure. |
 
 We may keep information longer where the law requires it, or to establish, exercise or defend a legal claim.
 
 ## 8. How we protect information
 
 - Sensitive database records (order records, license and payment records, payment notifications, contact messages, listening notes, consent records and delivery records) are encrypted in our database. Passwords are stored only as one-way hashes.
-- Files are stored privately but are not encrypted by the application: purchased files and stems, license document PDFs and the original files attached to contact messages are kept in private storage that is never publicly reachable, protected by server access controls and encrypted backups. Every download needs a valid license and a fresh, short-lived authorization, and each authorization works once.
+- Files are stored privately but are not encrypted by the application: purchased files and stems, license document PDFs and the original files attached to contact messages are kept in private storage that is never publicly reachable, protected by server access controls. Every download needs a valid license and a fresh, short-lived authorization, and each authorization works once.
 - The site is served over HTTPS. Account and order pages tell browsers and search engines not to cache or index them.
 - Staff sign in to the store administration with multi-factor authentication, and staff access to customer records is logged.
 - Uploaded files are scanned for malware before anyone can open them.
@@ -250,7 +250,7 @@ These are honest gaps between the drafted policy and the current source. Each ne
 | Account required to buy | Production buyer identity accepts `verified_account` or `verified_guest_claim` (`MachinePolicyV1`, `buyer_identity.mode`); test commerce also supports guest orders bound to a browser session. U-07 is open. | If Sean picks guest checkout, revise sections 3.2 and 3.3. |
 | GPC treated as an opt-out | No code reads the GPC header; nothing is sold or shared, so there is nothing to switch off. | None, unless sale or sharing is ever introduced. |
 | Material-change notice by email | No email provider is configured. | Email provider (item A.5). |
-| Section 8 says which records are encrypted (corrected 2026-10-24, deferred Codex P2 from PR #169) | Only database records are encrypted (encrypted Eloquent casts and `Crypt` on the stored payloads). Contract PDFs and support-attachment originals are written in plain bytes to private local storage: `ContractFiles` writes `contracts/test/{request}/{claim}/original.pdf` and `AttachmentFiles` writes `original.bin`, both mode 0600 under the private disk. Masters, stems and media originals are private files too. Backups are encrypted (`ops/staging/backup.sh`, age). | **Prerequisite** if the published text is to promise encryption of files at rest: host disk or volume encryption on the production server (U-02/U-03), or application-level file encryption, before section 8 may say files are encrypted. Until then keep the corrected wording. |
+| Section 8 says which records are encrypted (corrected 2026-10-24, deferred Codex P2 from PR #169) | Only database records are encrypted (encrypted Eloquent casts and `Crypt` on the stored payloads). Contract PDFs and support-attachment originals are written in plain bytes to private local storage: `ContractFiles` writes `contracts/test/{request}/{claim}/original.pdf` and `AttachmentFiles` writes `original.bin`, both mode 0600 under the private disk. Masters, stems and media originals are private files too. Backup encryption is opt-in and off by default: `ops/staging/backup.sh` encrypts with age only when `/etc/vasey-staging/backup.conf` names recipients, and `VASEY_BACKUP_REQUIRE_ENCRYPTION` defaults to `0`; the production backup target is open (U-02, S-10). Sections 5, 7 and 8 therefore make no encryption claim for backups (corrected 2026-10-29, independent CX review F2). | **Prerequisites** before the published text may promise either: (1) files at rest, host disk or volume encryption on the production server (U-02/U-03) or application-level file encryption; (2) backups, `VASEY_BACKUP_REQUIRE_ENCRYPTION=1` with age recipients configured and verified on the production backup target (U-02, S-10). Until then keep the corrected wording. |
 
 ### C. Evidence map
 
@@ -267,7 +267,7 @@ The earlier evidence-cited description of the data flows (draft of 2026-10-10, s
 - Consent and suppression: `database/migrations/2026_10_07_250000_customer_consent.php`; `config/customer-preferences.php`; `config/customer-suppression.php`; `MachinePolicyV1` (`privacy.marketing_consent = explicit_purpose_only`, `privacy.unknown_consent = remain_unknown`, `recovery.purchase_implies_marketing = false`).
 - Inquiries and attachments: `docs/contact-inquiries.md`; `docs/inquiry-conversations.md`; `docs/verification/support-attachments-20261007.md`.
 - Free grants: `docs/free-grants.md`; `app/Domain/Grants/Free/FreeGrantSources.php`.
-- Backups: `ops/staging/backup.sh` (tiered defaults 7 daily, 4 weekly, 6 monthly; age encryption); `ops/production/README.md`.
+- Backups: `ops/staging/backup.sh` (tiered defaults 7 daily, 4 weekly, 6 monthly; optional age encryption, off by default); `ops/production/README.md`.
 - Hosting: `docs/architecture/decision-register.md` (Forge for production, 2026-10-18; Forge with DigitalOcean for staging).
 - Malware scanning: `ops/production/README.md` (`clamscan` on the host); `docs/media-processing.md`.
 
@@ -276,3 +276,4 @@ The earlier evidence-cited description of the data flows (draft of 2026-10-10, s
 - 2026-10-10: first evidence-cited draft from source `f57e7256891d0d3c117e151a36f7fb967c724ab7` (lane `harness/launch-documents`), with review rounds on 2026-10-10 and 2026-10-11.
 - 2026-10-24: rewritten as a complete buyer-facing privacy policy from source `786fb7c755291184f9e01b4faaab28dbd430d698` after Sean named the controller (Vasey Multimedia dba VASEY.AUDIO) and the seller/licensor (Sean Vasey) and assigned the drafting to the development lead. Adds legal bases, California categories, proposed retention periods, a cookie table, transfers and rights handling; moves code evidence and enforcement gaps to the reviewer appendix. Not approved.
 - 2026-10-24 (lane CX): section 8 corrected so it no longer says files are encrypted; only database records are. File encryption at rest added to reviewer appendix B as a prerequisite for any stronger wording (deferred Codex P2 from PR #169). Still not approved; published only through the site content legal page type once Sean approves the text.
+- 2026-10-29 (lane CX, independent review F2): sections 5, 7 and 8 no longer say backups are encrypted, because backup encryption is opt-in and off by default and the production backup target is open; the appendix B row lists enforced backup encryption as a second prerequisite. Still not approved.
