@@ -4,10 +4,14 @@ import os, sys, json
 SRC = '/home/user/wt/f9'
 MUT = os.environ.get('MUT_ROOT', '<scratch>/f9-mut')
 IDX = 'app/Domain/Memberships/Production/MembershipCustomerIndex.php'
+CTL = 'app/Http/Membership/MembershipController.php'
 MUTANTS = {
+  'K1': [(CTL, "return $keys === ['expectedRevision', 'offerId', 'requestKey']", "return array_keys($body) === ['offerId', 'expectedRevision', 'requestKey']")],
+  'K2': [(CTL, "return $keys === ['expectedRevision', 'offerId', 'requestKey']", "return array_diff($keys, ['expectedRevision', 'offerId', 'requestKey']) === []")],
   'P1': [(IDX, '''                $owned = new MembershipAwardTransaction($connection, $primary, memberGrantProofs: true);
-                $rows = new MembershipRows($owned);''', '''                $owned = new MembershipAwardTransaction($connection, $primary, memberGrantProofs: true);
-                $rows = new MembershipRows;''')],
+                $rows = new MembershipRows($owned);''', '''                $rows = new MembershipRows;'''),
+         (IDX, '''                $owned->beginTerminalProof();
+''', '')],
   'P2': [(IDX, 'memberGrantProofs: true);', 'memberGrantProofs: false);')],
   'P3': [(IDX, "$state['historical'][$key] ??= $access->verifyHistoricalBinding($buyer, $rows->current());",
                "$state['historical'][$key] = $access->verifyHistoricalBinding($buyer, $rows->current());"),

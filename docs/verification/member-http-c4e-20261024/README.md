@@ -643,13 +643,14 @@ into the index's per-period proofs; lower the page size to what fits with margin
 pre-bytes check a cheaper currentness comparison rather than a second full pass. The lane does not choose here; the
 member HTTP index must not be mounted anywhere until this is resolved.
 
-Fix in progress (lane F9, branch `harness/member-index-f9-20261024`, unreviewed, not fully verified): see
-`docs/verification/member-index-f9-20261024/README.md`, including its status at handoff.
+Fixed pending independent review in lane F9 (branch `harness/member-index-f9-20261024`): 100 periods complete in
+about 27 to 30 s on native MySQL 8.4.11; see `docs/verification/member-index-f9-20261024/README.md`. The index stays
+unmounted, and N7 still blocks any non-local mount.
 
 ## Untested conditions
 
 - Finding F9 (phase B): the index plus pre-bytes exceeds its 60 s budget at about five periods and always at 10 and
-  100; unresolved.
+  100 on this source; fixed pending review in lane F9 (`docs/verification/member-index-f9-20261024/`).
 - Phase B native evidence is from one private server on one host, one PHPUnit process per case; the R1 and R4 races
   each ran once successfully after the watcher fix (R4 also once before it).
 - The scratch latency harness is not committed and measured one fixture shape (one plan, one reservation).

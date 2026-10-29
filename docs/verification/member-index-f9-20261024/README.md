@@ -1,13 +1,15 @@
 # F9: member customer index latency (lane F9)
 
-Lane F9, branch `harness/member-index-f9-20261024`, from the C4e head `ad1647ff`. It fixes finding F9 of the C4e
-packet (`docs/verification/member-http-c4e-20261024/README.md`, "Finding F9"): one customer index call plus its
-pre-bytes proof took about 20 s at one paid period on native MySQL 8.4.11, reached the fixed 60 s budget at about five
-periods and always refused at 10 and 100 (the page size is 100).
+Lane F9, branch `harness/member-index-f9-20261024`, from the C4e head `ad1647ff`, merged with `origin/main` `a8f17e5c`
+(through PR #177, which carries C4e as PR #174). It fixes finding F9 of the C4e packet
+(`docs/verification/member-http-c4e-20261024/README.md`, "Finding F9"): one customer index call plus its pre-bytes
+proof took about 20 s at one paid period on native MySQL 8.4.11, reached the fixed 60 s budget at about five periods and
+always refused at 10 and 100 (the page size is 100). It also carries the Codex P2 on PR #174 (thread r4369151991):
+`reserve()` refused a valid JSON body whose keys came in another order.
 
-This is a local, unreviewed development candidate. Nothing is pushed, no PR is open, no workflow was dispatched. The
-member HTTP mount stays default-off and is not mounted anywhere new. **The work stopped at a handoff checkpoint; read
-[Status at handoff](#status-at-handoff-2026-10-26) first.**
+This is a local development candidate, pending independent review. Nothing is pushed by this lane, no PR is open, no
+workflow was dispatched. The member HTTP mount stays default-off and is not mounted anywhere new; review N7 (per-client
+rate limits) still blocks any non-local mount. The handoff status of 2026-10-26 is superseded by this packet.
 
 ## Cause
 
@@ -17,23 +19,25 @@ schema proof about 8 times, and verified the same retained buyer binding three t
 proof), each with two complete identity proofs. Pre-bytes repeats the whole read. Writers had G1's once-per-frame proof
 (`SchemaProofFrame`, PR #168); the index did not.
 
-## Change (application code)
+## Change
 
 | File | Change |
 | --- | --- |
-| `app/Domain/Memberships/Production/MembershipCustomerIndex.php` | Right after `lockOwnerFirst` the frame opens `new MembershipAwardTransaction($connection, $primary, memberGrantProofs: true)` and builds `MembershipRows` on it, so the identity and membership guards prove completely once per frame token (G1). All periods share one member-grant schema snapshot. Each distinct retained buyer binding is verified once per frame (`$state['historical']`, `bindings()`); every period still checks its own binding equals it and the origin. `$owned->beginTerminalProof()` runs before `$grants->proveCurrent` and `$access->proveCurrent`, so from there to the commit every guard proves completely, as before. The raw phases use `currentRawAll`, `committedCallbacksAll` and `committedRawAll` |
+| `app/Domain/Memberships/Production/MembershipCustomerIndex.php` | Right after `lockOwnerFirst` the frame opens `new MembershipAwardTransaction($connection, $primary, memberGrantProofs: true)` and builds `MembershipRows` on it, so the identity and membership guards prove completely once per frame token (G1). All periods share one member-grant schema snapshot. Each distinct retained buyer binding is verified once per frame (`$state['historical']`, `bindings()`); every period still checks its own binding fields and origin. `$owned->beginTerminalProof()` runs before `$grants->proveCurrent` and `$access->proveCurrent`, so from there to the commit every guard proves completely, as before. The raw phases use `currentRawAll`, `committedCallbacksAll` and `committedRawAll` |
 | `app/Domain/Memberships/Production/MembershipAwardTransaction.php` | Optional `memberGrantProofs` constructor flag (default `false`) and `memoizesMemberGrantProofs()`. Writers construct it unchanged |
 | `app/Domain/Grants/Member/MemberGrantCurrentSchema.php` | `pin`/`assertCurrent` route the inspection through `SchemaProofFrame::prove` (guard `member_grant:<plan hash>`, member tables pinned) only when the owned transaction opted in; every writer and every committed-frame proof (`assertCommitted`) inspects in full on each call, as before |
-| `app/Domain/Grants/Member/MemberActivationHistoryReader.php` | `capturePeriod(..., ?MemberGrantSchemaSnapshot $schema = null)` re-proves a caller-pinned snapshot instead of a new pin (writers keep the default). New `currentRawAll`, `committedCallbacksAll`, `committedRawAll`: one complete schema proof before (and, for the raw phases, after) the re-reads of all periods that share one snapshot, instead of per period. The per-period methods are unchanged for writers |
+| `app/Domain/Grants/Member/MemberActivationHistoryReader.php` | `capturePeriod(..., ?MemberGrantSchemaSnapshot $schema = null)` re-proves a caller-pinned snapshot instead of a new pin (writers keep the default). New `currentRawAll`, `committedCallbacksAll`, `committedRawAll`: one complete schema proof before (and, for the raw phases, after) the re-reads of all periods sharing one snapshot. The per-period methods are unchanged for writers |
+| `app/Http/Membership/MembershipController.php` | `reserve()` compares the sorted key set (`expectedRevision`, `offerId`, `requestKey`): any order, none missing, none extra; value checks unchanged. The order-strict checks on server-built structures (index allowlist, receipt balances) are unchanged |
 
-Why it keeps the C4e security properties (for review):
+Why the C4e security properties hold (for review):
 
 - **Locks unchanged.** No new locking statement; the frame's first statement is still the owner `users` lock (R1). The
-  savepoint and the `SELECT ... LIMIT 0` pins that the memo adds run after it and create no read view and no row lock.
+  savepoint and the `SELECT ... LIMIT 0` pins the memo adds run after it and take no row lock. The native lock, wait,
+  reverse-order, same-plan writer, R1 and R4 cases all pass (below).
 - **Memo soundness is G1's argument.** A remembered proof is reused only while the frame token (marker witness,
-  session inputs, `Com_create_table`/`Com_drop_table`, SQLite catalogs) is unchanged and the inspected tables are
-  pinned by metadata locks; every MySQL reuse repeats the identity dependents scan. A schema or session change refuses
-  (fail-closed). The member-grant inspection only checks owned tables, their triggers and the namespace inventory, so
+  session inputs, `Com_create_table`/`Com_drop_table`, SQLite catalogs) is unchanged and the inspected tables are held
+  by metadata locks; every MySQL reuse repeats the identity dependents scan. A schema or session change refuses
+  (fail-closed). The member-grant inspection checks only owned tables, their triggers and the namespace inventory, so
   the same argument covers it; a namespace-only collision is seen by the complete terminal proofs.
 - **Terminal re-proof.** The owned terminal phase (before the commit) proves every guard completely; the committed
   read-only frame keeps complete proofs (`IdentityRows::committed`, `assertCommitted`), now once around all periods
@@ -45,109 +49,135 @@ Why it keeps the C4e security properties (for review):
 - **Batched raw phases.** No callback runs inside `currentRawAll`/`committedRawAll`; reads of all periods sit between
   two complete proofs in one transaction holding the pins. In `committedCallbacksAll` a callback between periods can
   only be refused later by the complete proofs of `committedRawAll`, before `finish()`.
-- **Pre-bytes** still re-runs the complete owned read and the committed proof (it is not made cheaper); it benefits
-  from the same frame proofs. A cheaper currentness comparison was not needed.
+- **Pre-bytes** still re-runs the complete owned read and the committed proof under the original deadline; it gets
+  faster from the same frame proofs. A cheaper currentness comparison, a smaller page or paging was not needed.
 
 ## Measurements (private MySQL 8.4.11, one PHPUnit process)
 
-Scratch harness `evidence/F9IndexLatencyProbe.php.txt` (the C4e latency harness, parametrized): `memberActivationFixture()`
-plus synthetic older sealed periods in the retained format; one call is `MembershipCustomerRead::begin()`, `index()` and
-`proveBeforeBytes()` under the one 60 s budget. Statements per call from the session's `Questions` counter. The host
-was **not idle**: other lanes ran PHPUnit and mysqld concurrently, load average about 4 to 5 on 4 cores.
+Scratch harness `evidence/F9IndexLatencyProbe.php.txt` (the C4e latency harness, parametrized; not committed as a
+test): `memberActivationFixture()` plus synthetic older sealed periods in the retained format; one call is
+`MembershipCustomerRead::begin()`, `index()` and `proveBeforeBytes()` under the one 60 s budget. Statements per call
+from the session's `Questions` counter. The host was **not idle**: other lanes ran PHPUnit and mysqld concurrently
+(load average about 4 to 5 on 4 cores for both runs).
 
-| Periods | Before (`ad1647ff`) total s | Before statements | Before outcome | After total s | After statements | After outcome |
+"After" is the merged source `56cf3ead` (application code equal to the final head); "before" is `ad1647ff`.
+
+| Periods | Before total s | Before statements | Before outcome | After total s | After statements | After outcome |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 19.0 to 19.6 | 9,416 | completed | 8.5 to 9.6 | 5,088 | completed |
-| 3 | 35.0 to 35.7 | 17,480 | completed | 8.9 to 9.6 | 5,640 | completed |
-| 5 | 52.3; 60.0 | 25,544; 25,471 | completed; refused (`index_refused` in pre-bytes) | 9.2 to 10.6 | 6,192 | completed |
-| 10 | 61.4; 60.4 | 27,975; 28,895 (cut off) | refused (`operation_deadline`) both | 10.8 | 7,572 | completed |
-| 100 | 60.9; 60.9 | 29,043 (cut off) | refused (`operation_deadline`, in the index) both | 33.3 to 34.9 | 32,412 | completed (3 of 3) |
+| 1 | 19.0 to 19.6 | 9,416 | completed | 7.6 to 8.6 | 5,088 | completed (4 of 4) |
+| 3 | 35.0 to 35.7 | 17,480 | completed | 8.7 to 9.3 | 5,640 | completed (3 of 3) |
+| 5 | 52.3; 60.0 | 25,544; 25,471 | completed; refused (`index_refused` in pre-bytes) | 8.4 to 9.1 | 6,192 | completed (3 of 3) |
+| 10 | 61.4; 60.4 | 27,975; 28,895 (cut off) | refused (`operation_deadline`) both | 9.9 to 10.4 | 7,572 | completed (3 of 3) |
+| 100 | 60.9; 60.9 | 29,043 (cut off) | refused (`operation_deadline`, in the index) both | 27.4 to 30.2 | 32,412 | completed (3 of 3) |
 
-- `SHOW CREATE TABLE` per call: before 5,354 at one period and growing; after 2,324 at every size (1 to 100).
+- `SHOW CREATE TABLE` per call: before 5,354 at one period and growing; after 2,324 at every size from 1 to 100.
 - Statements per extra period and call: before about 4,032; after 276.
-- At 100 periods after the fix, 58 % of wall time is the identity dependents scan that G1 repeats on every memo reuse
+- **100 periods with another customer's real award running** (harness `test_concurrent_award_at_100`, 2 repetitions):
+  the index completed in 33.4 s and 34.0 s (the harness also samples `performance_schema` every 300 ms from inside the
+  index); the award, in a separate process started with the index transaction, committed about 19 to 21 s in while the
+  index was still open, held the shared plan row during the index, and never appeared in
+  `performance_schema.data_lock_waits` blocked by the index's connection. Before the fix (C4e phase B) the same case
+  refused at 61.4 s and 61.9 s.
+- At 100 periods, 58 % of wall time is the identity dependents scan G1 repeats on every memo reuse
   (`information_schema` KEY_COLUMN_USAGE, TRIGGERS, VIEWS, ROUTINES; about 16 ms per reuse, about 7 reuses per period
-  and pass): `evidence/glog-time-after-100-periods.txt`. Phase breakdowns: `evidence/glog-phases-*.txt`. Raw JSONL:
-  `evidence/result-scaling-*.jsonl`.
+  and pass): `evidence/glog-time-after-100-periods.txt`.
 - The "before" run's process had loaded every affected class before the working tree was edited (its counts equal the
   C4e phase B numbers exactly: 9,416 and 17,480).
+
+Raw rows: `evidence/result-scaling-before.jsonl`, `result-scaling-final.jsonl`, `result-concurrent.jsonl` (and the
+pre-merge `result-scaling-dev1.jsonl`, `result-scaling-prof1.jsonl`). Phase breakdowns: `evidence/glog-phases-*.txt`.
 
 ## Tests added or changed
 
 | Test | Engines | What it pins |
 | --- | --- | --- |
-| `MembershipNativeCustomerIndexTest::test_native_index_schema_proofs_per_call_do_not_grow_with_the_number_of_periods` | MySQL only (appended to the SQLite skip census, entry 303) | Session counters, not timing: `Com_show_create_table` and `Com_show_create_trigger` per call are equal at 1 and 3 periods and nonzero; all statements per extra period and call < 500 |
-| `MembershipCustomerIndexAvailabilityTest::test_index_proves_schema_once_per_owned_frame_and_completely_in_its_terminal_phases` | both | Source census: owned frame with `memberGrantProofs: true` after the owner lock, terminal phase before the current identity and grant proofs and the raw phase, batched raw/committed calls, one binding verification site, writers construct the transaction without the flag; plus a behaviour run |
+| `MembershipNativeCustomerIndexTest::test_native_index_schema_proofs_per_call_do_not_grow_with_the_number_of_periods` | MySQL only (SQLite skip census entry 303, appended) | Session counters, not timing: `Com_show_create_table` and `Com_show_create_trigger` per call are equal at 1 and 3 periods and nonzero; all statements per extra period and call < 500 |
+| `MembershipCustomerIndexAvailabilityTest::test_index_proves_schema_once_per_owned_frame_and_completely_in_its_terminal_phases` | both | Source census (every position pinned as an int first): owned frame with `memberGrantProofs: true` after the owner lock, terminal phase before the current identity and grant proofs and the raw phase, batched raw and committed calls, one binding verification site, writers construct the transaction without the flag; plus a behaviour run |
 | `MembershipCustomerIndexAvailabilityTest::test_index_terminal_phase_proves_in_full_after_remembered_proofs` | both | As G1's `MemberObserverTerminalProofTest`: while the index frame remembers identity, membership and `member_grant:` proofs, a table appears under a reserved identity index name (another session on MySQL); the index refuses before its commit, and on MySQL the frame is terminal |
 | `MembershipCustomerIndexAvailabilityTest::test_index_locks_only_the_owner_and_reads_everything_else_without_row_locks` | both | Census literal updated to the new `capturePeriod(..., schema: $schema)` call (no assertion removed) |
+| `MembershipHttpTest::test_reserve_accepts_its_three_keys_in_any_order_and_refuses_a_missing_or_extra_key` | both | A reordered valid body reaches the domain (reserve, then the original order replays it); missing, extra, replaced and wrong-typed reordered bodies are 422 with no write |
 
 SQLite cannot count raw PDO statements (no trace hook in PHP 8.4 `Pdo\Sqlite`, and `MembershipRows` refuses
 application functions), so the statement-count regression is native-only; on SQLite the terminal test's frame-state
-assertions catch a missing frame or a missing `member_grant:` memo.
+assertions catch a missing frame or a missing `member_grant:` memo. Because the terminal test branches on the driver,
+`MembershipCustomerIndexAvailabilityTest` joins the reviewed native include list
+(`scripts/ci/database-mysql-selection.json`).
 
-## Status at handoff (2026-10-26)
+## Census and selection
 
-**Done (on this branch, one WIP commit on `ad1647ff`):** the application change above, the three tests, the census
-entry, this packet and its evidence summaries.
+- `scripts/ci/database-sqlite-skips.json`: main's 302 entries first and unchanged, this lane's one method appended (303);
+  first-150 hash `d93da4e7…` unchanged. The MySQL skip census is unchanged.
+- `python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection`:
+  exit 0, 2,587 of 9,778 cases in 250 files (main 2,579 of 9,774 in 249); both count comments updated; generated files
+  deleted.
+- Safeguards on `56cf3ead`: `test-phpunit-shards.py` 52, `test-ci-scope.py` 27, `test-workflow-cadence.py` 14,
+  `test-focused-tests.py` 53, `test-database-receipts.py` 61: all OK. (Before the include-list entry,
+  `test-phpunit-shards.py` failed on the new driver-branching file, which is how it was found.)
 
-**Verified so far** (`evidence/test-runs.txt`; application code equal to the commit):
+## Test results
 
-- SQLite `MembershipCustomerIndexAvailabilityTest`: 7 tests, 180 assertions, OK.
-- Native MySQL 8.4.11 `MembershipCustomerIndexAvailabilityTest`: 7 tests, 180 assertions, OK (includes the terminal
-  test against another session). The later hardening of the census test's position checks (`$at` helper, after
-  3629a135's lesson) has not been re-run.
-- Native `test_native_index_schema_proofs_per_call_do_not_grow_with_the_number_of_periods`: OK, 18 assertions.
-- Latency table above.
+Direct PHPUnit (`--fail-on-phpunit-warning`), `public/build` absent, `APP_KEY` set, CI environment. Native: private
+`/opt/mysql-8.4.11/bin/mysqld` 8.4.11 on its own datadir and port, `REPEATABLE-READ`, `performance_schema` on, binary
+log off, `VA_LOCAL_DISPOSABLE_MYSQL`, one database per chain. Application code at every run below equals the final
+head (`56cf3ead` and later commits change documentation only).
 
-**Not verified / not done:**
+| Run | Selection | Result |
+| --- | --- | --- |
+| SQLite sA | `ProductionMembershipHttp`, `ProductionMemberGrants`, `ProductionMemberActivation`, `ProductionMembership`, `StagingEnvironmentAdmissionTest` | 177 tests, 2,746 assertions, 10 skips, OK |
+| SQLite sB | `ProductionMembershipBilling` | 419 tests, 3,700 assertions, 41 skips, OK |
+| SQLite sC | `ProductionMemberOriginals`, `ProductionIdentity` | 276 tests, 1,494 assertions, 20 skips, OK |
+| Native, one process per method | all 9 `MembershipNativeCustomerIndexTest` methods: owner-only locks (29 assertions), wait at a writer-held owner lock (23), fence/shared rows held elsewhere (21), reverse order (15), same-plan award for another customer (21), **R1** same-owner writer (15), **R4** genuine release (16), index then reserve then pre-bytes (16), new growth test (18) | each OK |
+| Native, one process per method | all 6 `MembershipHttpTest` methods: journey (129), key order (100), one not-found (148), outcome unknown then converge (34), committed write with refused receipt is submitted (46), index body withheld when pre-bytes refuses (59) | each OK |
+| Native | `MembershipNativeCommitWitnessTest` | 3 tests, 55 assertions, OK |
+| Native | `MembershipCommitWitnessTest` | 5 tests, 94 assertions, OK |
+| Native | `MembershipPeriodAddressedOperationsTest` | 4 tests, 69 assertions, OK |
+| Native | `MemberActivationCommitWitnessTest` | 3 tests, 50 assertions, OK |
+| Native | G1 `MembershipSchemaProofFrameTest` | 8 tests, 66 assertions, OK |
+| Native | G1 `MemberObserverTerminalProofTest` | 4 tests, 92 assertions, OK |
+| Native | `MembershipCustomerIndexAvailabilityTest` | 7 tests, 196 assertions, OK |
+| Native | `MembershipCustomerIndexTest` (includes the 100-period page and sentinel cases) | in progress at this commit (recorded in the next commit) |
 
-1. Merge `origin/main` (now includes PR #174 as `dd587603`) into this branch. Expect a small conflict in
-   `MembershipCustomerIndexAvailabilityTest.php` (3629a135 hardened the owner-lock order check next to the edited
-   `capturePeriod` literal; keep both) and in `scripts/ci/database-sqlite-skips.json` (union: main's entries first and
-   in main's order, then this branch's one appended entry; first-150 hash `d93da4e7…` must not change).
-2. Codex P2 from PR #174 (thread r4369151991) is **not in**: `app/Http/Membership/MembershipController.php` `reserve()`
-   validates `array_keys($body) === ['offerId', 'expectedRevision', 'requestKey']`, so a valid reordered body is a 422.
-   Fix: compare the key set regardless of order (for example sort a copy of `array_keys($body)` and compare with the
-   sorted expected list, or `count($body) === 3` plus `array_key_exists` for each), leaving every value check as is.
-   Leave the order-strict checks at about lines 135 and 161 (server-built structures). Add to
-   `tests/Feature/ProductionMembershipHttp/MembershipHttpTest.php` (or the mount test) a case that a reordered valid
-   body reaches the domain and cases that an extra or a missing key is still 422. Record it as fixed in the deferred
-   ledger.
-3. Regenerate the native selection after the merge and update both count comments (`.github/workflows/final-verification.yml`
-   about line 151, `.gitlab-ci.yml` about line 113; main base 2579 of 9774 in 249 files, plus this branch's new native
-   method): `python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection`,
-   then `rm -f phpunit-ci-mysql-*`. Run `python3 scripts/ci/test-phpunit-shards.py`, `test-ci-scope.py`,
-   `test-workflow-cadence.py`, `test-focused-tests.py`, `test-database-receipts.py`.
-4. Native MySQL re-runs on the merged head (one process per method or file, private 8.4.11, `VA_LOCAL_DISPOSABLE_MYSQL`):
-   all of `MembershipNativeCustomerIndexTest` (the 8 C4e cases including R1
-   `test_native_index_waiting_behind_a_same_owner_writer_reads_that_writers_commit` and R4
-   `test_native_index_waiting_behind_a_same_owner_release_reads_the_released_history`, plus the new one),
-   `MembershipNativeCommitWitnessTest`, `MembershipCommitWitnessTest`, `MembershipPeriodAddressedOperationsTest`,
-   `MemberActivationCommitWitnessTest`, `MembershipHttpTest`, and, because `MembershipAwardTransaction`,
-   `MemberGrantCurrentSchema` and the history reader changed, G1's `MembershipSchemaProofFrameTest` and
-   `MemberObserverTerminalProofTest`.
-5. SQLite on the merged head: `tests/Feature/ProductionMembershipHttp`, `ProductionMemberGrants`,
-   `ProductionMemberActivation`, `ProductionMembership`, `ProductionMembershipBilling`, `ProductionMemberOriginals`,
-   `ProductionIdentity`, `StagingEnvironmentAdmissionTest` (the C4e phase B mA/mB/mC sets; roughly three hours of CPU).
-   Direct PHPUnit command from the C4e packet, `public/build` absent.
-6. Latency after the merge at 1, 5, 10 and 100 periods with the harness copied into `tests/` temporarily (do not commit
-   it), and the 100-period case with another customer's real award running concurrently
-   (`test_concurrent_award_at_100` in the harness), showing the award never appears in
-   `performance_schema.data_lock_waits` blocked by the index. Not run after the fix yet.
-7. Mutations (driver `evidence/mutate.py`, run in a hard-link copy, never the worktree): P1 index without the owned
-   frame, P2 `memberGrantProofs: false`, P3 binding dedup removed, P4 per-period committed callbacks: expected killed by
-   the native growth test (P1, P2 also by the SQLite terminal test). T1 `beginTerminalProof()` removed: expected killed
-   natively by the terminal test (the index would commit before the committed frame refuses). T2 to T4 (committed-frame
-   proofs removed): expected killed by existing tests such as
-   `MembershipCustomerIndexTest::test_owner_withdrawal_while_the_index_commits_refuses_the_terminal_proof`. None run.
-8. CHANGELOG entry and the C4e packet / deferred-ledger F9 entries: mark F9 "fixed pending review" only after 1 to 6.
+Every SQLite skip is in the SQLite census and no census method ran (checked from the JUnit files).
 
-**Further margin, if wanted (not done):** 100 periods takes about 33 s on a loaded host. Most of the rest is G1's
-per-reuse dependents scan, which under REPEATABLE READ returns the frame's dictionary snapshot; skipping it there, or
-removing per-period guard calls that sit next to each other with no callback between, would cut it further but changes
-G1 or C4d guard density and needs its own review. Paging or a smaller page was not needed.
+Three native index methods first errored in a run where two native processes and a SQLite mutation chain of this lane
+ran beside other lanes (load average about 7): each failed inside the fixture's own reserve (a writer this lane does
+not change), with `operation_refused` or `committed_receipt_refused`, the writer's 60 s budget under load. Re-run one
+process at a time, all passed (the table above).
+
+## Mutations
+
+Each mutant was applied in a hard-link copy of the worktree by atomic file replacement (driver `evidence/mutate.py`),
+restored and compared (`diff -rq app` empty after every restore). The worktree was never written.
+
+| ID | Mutation | Tests | Result |
+| --- | --- | --- | --- |
+| P1 | No owned frame (`new MembershipRows`, no terminal call): per-period proving restored | native growth test (`Com_show_create_table` 5,354 at 1 period vs 6,982 at 3); SQLite terminal test (no frame) and census | **Killed** |
+| P2 | `memberGrantProofs: false` | native growth test (`Com_show_create_table` 2,450 vs 2,702); SQLite terminal test (no `member_grant:` memo) and census | **Killed** |
+| P3 | Binding dedup removed (verify and prove per period) | native growth test (2,324 vs 2,968); SQLite census | **Killed** |
+| P4 | Committed callbacks per period again | native growth test (2,324 vs 2,408); SQLite census | **Killed** |
+| T1 | `beginTerminalProof()` removed | native terminal test: the index committed (one `TransactionCommitted`) before the committed frame refused; SQLite census only (on SQLite same-connection DDL moves the catalog token, so the next proof is complete anyway: equivalent there) | **Killed** natively |
+| T2 | Committed-frame `proveCommitted` removed | existing `MembershipCustomerIndexTest::test_owner_withdrawal_while_the_index_commits_refuses_the_terminal_proof` on SQLite and natively ("Expected an explicit membership refusal") | **Killed** |
+| T3 | Committed raw phase (`committedRawAll`) removed | SQLite census; behaviour survives on SQLite (`MembershipCustomerIndexTest` 12/12) and natively (terminal test 21 assertions, owner-withdrawal-during-commit test 14) | Census only; see Untested conditions |
+| T4 | Committed callbacks phase removed | every index call refuses (`history_snapshot`): SQLite availability 6 errors, `MembershipCustomerIndexTest` 8 errors; native terminal test (the index never answers) | **Killed** |
+| K1 | `reserve()` back to the order-strict key list | new HTTP test (422 for the reordered body) | **Killed** |
+| K2 | `reserve()` accepts any subset of the keys | new HTTP test (503 instead of 422 for a missing key) | **Killed** |
 
 ## Untested conditions
 
-Everything in "Not verified" above, plus: one fixture shape (one plan, one binding, one reservation); a binding change
-between periods (owner recovery) only by code reading; no HTTP, PHP-FPM or production evidence; no Foundation run.
+- One fixture shape (one plan, one buyer binding, one reservation); periods whose bindings differ (owner recovery
+  between periods) are covered by code reading only.
+- The host was shared and loaded for every timing; there is no idle-host latency. Timings are one server on one host.
+- T3 has no behavioural kill: the committed raw phase re-reads what `committedCallbacksAll` just read in the same
+  committed frame with no callback between, so only a change made by a callback in between would differ; as before F9
+  (per-period `committedRaw`), nothing exercises that.
+- Under REPEATABLE READ the per-reuse dependents scan sees the frame's snapshot; skipping it or merging adjacent guard
+  calls would cut the remaining time further but changes G1 or C4d guard density and needs its own review.
+- No HTTP evidence under PHP-FPM, a real web server, a proxy or a browser; no Foundation run, hosted CI, host, provider
+  or production evidence. The mount stays default-off; N7 (per-customer rate limit) is still required before any
+  non-local mount.
+
+## Cleanup
+
+The private server was shut down with `mysqladmin shutdown` after the last run, and the hard-link mutation copy was
+removed. Scratch logs and JUnit files stay in the session scratchpad, outside the repository; the summaries the packet
+relies on are in `evidence/`.
