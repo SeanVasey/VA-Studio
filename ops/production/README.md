@@ -148,17 +148,19 @@ key comes back from the hash-verified `env.backup`.
 
 These are application or review items this kit deliberately does not do:
 
-1. **`trustProxies`** is not configured in the application. Behind a CDN or reverse proxy the client address, scheme and rate
-   limits are wrong until a reviewed change configures it against a reviewed address list. See the CDN note in the monitoring
-   guide.
+1. **`trustProxies`** is now explicit (lane PCC): `App\Http\Middleware\ExplicitTrustProxies` trusts only the reviewed
+   `TRUSTED_PROXIES` list, blank (none) by default, which is right behind this kit's own nginx. A CDN in front still needs a
+   reviewed address list and the checks in the monitoring guide's CDN note before the nginx `set_real_ip_from` block is enabled.
 2. **Managed or remote MySQL.** The kit, the validator and the schema's trigger definers assume `DB_HOST=127.0.0.1` and the
    account `vasey_app@127.0.0.1`. A managed database needs a reviewed relaxation of that in the validator and the deploy,
    and a decision about trigger definers.
-3. **Production identity mail.** The preflight production profile requires `MAIL_MAILER=log`; a real SMTP transport for production
-   customer identity is a reviewed change to the preflight and the application.
-4. **Preflight production profile:** `STRIPE_MODE` and `MAIL_MAILER` as above, and every activation in
+3. **Production identity mail.** The preflight production profile requires `MAIL_MAILER=log` unless
+   `VASEY_PRODUCTION_REAL_MAIL_ADMITTED=true` (then `smtp` with implicit TLS). Production identity SMTP composes its settings from
+   `PRODUCTION_IDENTITY_SMTP_*` only after the code literal in `config/production-identity-smtp.php` is flipped in a reviewed change.
+4. **Preflight production profile:** `STRIPE_MODE=test` unless `VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED=true` (then `live`, and the
+   validator admits an `sk_live_` key as `PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY` only). Every activation in
    `docs/ops/production-activation-packet.md` (live checkout, the live webhook receiver and its nginx limits, paid delivery
-   mounting, membership billing). Each needs Sean's separate authorization.
+   mounting, membership billing) still needs a reviewed change and Sean's separate authorization.
 5. **Scheduler heartbeat.** The application leaves no trace when no release is due; a ping on schedule success is a reviewed change.
 6. **Pre-launch capability hold (approved by Sean, 2026-10-18).** `ops/production/validate-runtime.php` refuses four flags unless they
    are false: `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` and `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED` (no environment gate; each
