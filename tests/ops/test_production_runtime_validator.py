@@ -253,6 +253,16 @@ class ProductionRuntimeValidator(unittest.TestCase):
                 self.assertEqual(run.returncode, 1, run.stderr)
                 self.assertTrue(any(line.startswith("FAIL holds.production_checkout") or line.startswith("FAIL holds.") for line in run.stderr.splitlines()), run.stderr)
 
+    def test_the_operator_reconciliation_switch_and_the_composition_literal_are_held(self):
+        # Lane PCC: the operator command's switch is held like every other checkout switch, and the code-literal mount is held in
+        # the effective configuration, so lifting either is a reviewed change to this file.
+        self.failed(self.validate(profile() + "PRODUCTION_CHECKOUT_OPERATOR_RECONCILIATION_ENABLED=true\n"),
+                    "holds.production_checkout_operator_reconciliation_enabled")
+        self.assertEqual(self.validate(profile() + "PRODUCTION_CHECKOUT_OPERATOR_RECONCILIATION_ENABLED=false\n").returncode, 0)
+        text = VALIDATOR.read_text()
+        self.assertIn("'committed_read_receipts_enabled', 'operator_reconciliation_enabled'] as $flag", text)
+        self.assertIn("$check('holds.production_checkout_mounted', config('production_checkout.mounted') === false);", text)
+
     def test_the_documented_off_values_are_accepted_and_a_blank_assignment_is_not(self):
         for value in ("false", "(false)"):
             with self.subTest(value=value):

@@ -198,7 +198,7 @@ class ProductionCheckoutJourneyTest extends TestCase
         $this->app[Kernel::class]->prependMiddleware(ProductionCheckoutPrivacy::class);
         Route::middleware('web')->group(base_path('routes/production-checkout.php'));
         Route::middleware('web')->group(base_path('routes/production-customer-identity.php'));
-        config(['production_checkout.http_enabled' => true]);
+        config(['production_checkout.http_enabled' => true, 'production_checkout.mounted' => true]);
         // A cached guard actor without the new authenticated credential marker has no checkout authority.
         $this->actingAs($f['buyer']['user'], 'customer');
         $body = ['reviewId' => $f['review']['reviewId'], 'reviewHash' => $f['review']['reviewHash'], 'accepted' => true, 'requestKey' => 'synthetic-http-order'];

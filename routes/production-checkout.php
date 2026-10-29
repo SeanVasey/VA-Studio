@@ -4,7 +4,8 @@ use App\Http\Controllers\ProductionCheckoutController;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Support\Facades\Route;
 
-// Root composition explicitly registers this file, provider and early privacy middleware.
+// Required from routes/web.php only when ProductionCheckoutMount admits (lane PCC); ProductionCheckoutPrivacy is prepended in
+// bootstrap/app.php and the provider is registered by AppServiceProvider behind the same gate.
 Route::withoutMiddleware(HandleInertiaRequests::class)->prefix('production/checkout')->name('production.checkout.')->group(function (): void {
     Route::post('reviews', [ProductionCheckoutController::class, 'review'])->middleware('throttle:10,1,production-checkout-write')->block(20, 5)->name('reviews');
     Route::post('orders', [ProductionCheckoutController::class, 'accept'])->middleware('throttle:10,1,production-checkout-write')->block(20, 5)->name('orders');

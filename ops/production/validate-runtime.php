@@ -215,9 +215,11 @@ try {
         // Proxy trust is an explicit, bounded list or none; a wildcard or malformed list is refused here (the middleware trusts none).
         $check('runtime.trusted_proxies', TrustedProxyList::parse(config('trusted-proxies.proxies')) !== null);
         foreach (['http_enabled', 'fresh_checkout_enabled', 'reconciliation_enabled', 'provider_io_enabled',
-            'exemption_authoring_enabled', 'committed_read_receipts_enabled'] as $flag) {
+            'exemption_authoring_enabled', 'committed_read_receipts_enabled', 'operator_reconciliation_enabled'] as $flag) {
             $check('holds.production_checkout_'.$flag, config('production_checkout.'.$flag) === false);
         }
+        // The composition gate is a code literal (lane PCC); lifting it is a reviewed change here too, with Sean's authorization.
+        $check('holds.production_checkout_mounted', config('production_checkout.mounted') === false);
         $check('holds.production_credentials', $liveStripe
             ? (in_array(config('production_checkout.secret_key'), [null, ''], true) || $liveSecret(config('production_checkout.secret_key')))
                 && in_array(config('production_checkout.funds_mode'), [null, '', 'live'], true)

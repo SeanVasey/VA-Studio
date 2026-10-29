@@ -15,6 +15,7 @@ use App\Domain\Grants\Paid\PaidGrantRendererProcess;
 use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantRendererProcess;
 use App\Domain\Media\MediaWorkflowBudget;
+use App\Http\ProductionCheckout\ProductionCheckoutMount;
 use App\Http\Tax\TaxHttpMount;
 use App\Models\User;
 use App\Support\PhpCliBinary;
@@ -35,6 +36,10 @@ class AppServiceProvider extends ServiceProvider
     {
         if (TaxHttpMount::admitted('production-tax-checkout.http_mounted')) {
             $this->app->register(ProductionTaxCheckoutServiceProvider::class);
+        }
+        // Lane PCC: production checkout's provider binding exists only behind its literal-false composition gate.
+        if (ProductionCheckoutMount::admitted()) {
+            $this->app->register(ProductionCheckoutServiceProvider::class);
         }
         $this->app->bind(IdentityNoticeTransport::class,
             fn ($app) => IdentitySmtpFactory::make($app, $app['config']));

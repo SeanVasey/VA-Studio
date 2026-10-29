@@ -86,7 +86,7 @@ try {
         $check('runtime.maintenance', config('app.maintenance.driver') === 'file');
         $check('runtime.stripe_mode', config('payments.stripe.mode') === 'test');
         foreach (['http_enabled', 'fresh_checkout_enabled', 'reconciliation_enabled', 'provider_io_enabled',
-            'exemption_authoring_enabled', 'committed_read_receipts_enabled'] as $flag) {
+            'exemption_authoring_enabled', 'committed_read_receipts_enabled', 'operator_reconciliation_enabled'] as $flag) {
             $check('runtime.production_'.$flag, config('production_checkout.'.$flag) === false);
         }
         $check('runtime.production_credentials', in_array(config('production_checkout.secret_key'), [null, ''], true)
