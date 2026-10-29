@@ -24,12 +24,16 @@ class CustomerDataRequestMigrationTest extends TestCase
         return require database_path('migrations/2026_10_24_268200_customer_data_requests.php');
     }
 
+    /** Installed guard names in byte order: MySQL's information_schema collation orders "_" differently from SQLite. */
     private function triggers(): array
     {
-        return DB::getDriverName() === 'sqlite'
-            ? DB::table('sqlite_master')->where('type', 'trigger')->whereIn('tbl_name', self::TABLES)->orderBy('name')->pluck('name')->all()
+        $names = DB::getDriverName() === 'sqlite'
+            ? DB::table('sqlite_master')->where('type', 'trigger')->whereIn('tbl_name', self::TABLES)->pluck('name')->all()
             : DB::table('information_schema.TRIGGERS')->where('TRIGGER_SCHEMA', DB::getDatabaseName())->whereIn('EVENT_OBJECT_TABLE', self::TABLES)
-                ->orderBy('TRIGGER_NAME')->pluck('TRIGGER_NAME')->all();
+                ->pluck('TRIGGER_NAME')->all();
+        sort($names, SORT_STRING);
+
+        return $names;
     }
 
     public function test_schema_installs_every_guard_and_refuses_rollback_and_reinstallation_even_when_empty(): void

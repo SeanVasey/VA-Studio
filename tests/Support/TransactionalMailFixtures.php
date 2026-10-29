@@ -3,7 +3,10 @@
 namespace Tests\Support;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Assert;
 use RuntimeException;
 use Symfony\Component\Process\Process;
 
@@ -37,6 +40,23 @@ final class TransactionalMailFixtures
         $facts['retention']['log_policy_reference'] = 'retention.logs-synthetic';
 
         return $facts;
+    }
+
+    /**
+     * Disposable roundtrip fixtures only: the delivery insert guard names transactional_notices, so a test that rolls the
+     * notification family back first disposes of this verified-empty child (dropping a table drops its triggers), exactly as
+     * it does for the A5 refund/dispute tables. The operational migration itself is forward-only and never rolls back.
+     */
+    public static function dropEmptyDeliveries(): void
+    {
+        Assert::assertSame(0, DB::table('transactional_mail_deliveries')->count(), 'Disposable fixture table transactional_mail_deliveries must be empty.');
+        Schema::drop('transactional_mail_deliveries');
+    }
+
+    /** Reinstalls the delivery table and its guards after the notification family has been recreated. */
+    public static function restoreDeliveries(): void
+    {
+        (require database_path('migrations/2026_10_24_268300_transactional_mail_deliveries.php'))->up();
     }
 
     /** Writes the facts (mode 0600), runs the real preflight on them, writes its report, and configures the adapter. */
