@@ -214,6 +214,15 @@ class ProductionRuntimeValidator(unittest.TestCase):
         self.failed(self.validate(profile(DB_USERNAME="somebody_else")), "runtime.database")
         self.failed(self.validate(profile(DB_SOCKET="/var/run/mysqld/mysqld.sock")), "runtime.database")
 
+    def test_proxy_trust_is_an_explicit_bounded_list_or_none(self):
+        for value in ("", "10.0.0.5", "173.245.48.0/20,2400:cb00::/32"):
+            with self.subTest(value=value):
+                self.assertEqual(self.validate(profile(TRUSTED_PROXIES=value)).returncode, 0)
+        for value in ("*", "**", "REMOTE_ADDR", "0.0.0.0/0", "10.0.0.5,*", "proxy.synthetic.invalid"):
+            with self.subTest(value=value):
+                run = self.validate(profile(TRUSTED_PROXIES=f"'{value}'"))
+                self.assertEqual(run.stderr.split(), ["FAIL", "runtime.trusted_proxies"], run.stderr)
+
     def test_the_php_cli_binary_is_probed(self):
         run = self.validate(profile(VASEY_PHP_CLI_BINARY="/nonexistent/php"))
         self.failed(run, "runtime.php_cli_binary")

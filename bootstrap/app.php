@@ -3,6 +3,7 @@
 use App\Http\AccountFeatures\AccountFeatureHttpKernel;
 use App\Http\AccountFeatures\AccountFeaturePrivacy;
 use App\Http\Middleware\CustomerPrivacy;
+use App\Http\Middleware\ExplicitTrustProxies;
 use App\Http\Middleware\FreeGrantPrivacy;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InquiryPrivacy;
@@ -31,6 +32,7 @@ use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -66,6 +68,9 @@ $application = Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(AccountFeaturePrivacy::class);
         $middleware->prepend(ProductionFreePrivacy::class);
         $middleware->prepend(MembershipPrivacy::class);
+        // Explicit, non-permissive proxy trust (PCC), outermost so every seam above sees the same client address and scheme.
+        $middleware->remove(TrustProxies::class);
+        $middleware->prepend(ExplicitTrustProxies::class);
         $middleware->append(LegacyRedirects::class); // FP-100, default-off: config/legacy-redirects.php
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);

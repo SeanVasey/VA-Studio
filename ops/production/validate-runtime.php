@@ -30,6 +30,7 @@ declare(strict_types=1);
 // PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY and nowhere else, and PRODUCTION_CHECKOUT_FUNDS_MODE may be blank or `live`. Every
 // PRODUCTION_CHECKOUT_*_ENABLED switch stays held false whatever the flags say: admitting live credentials is not activation.
 // The effective admissions (config/production-runtime.php) must agree with the file.
+use App\Support\Http\TrustedProxyList;
 use App\Support\PhpCliBinary;
 use App\Support\PhpCliBinaryUnavailable;
 use Dotenv\Dotenv;
@@ -211,6 +212,8 @@ try {
         $check('runtime.filesystem', config('filesystems.default') === 'local');
         $check('runtime.maintenance', config('app.maintenance.driver') === 'file');
         $check('runtime.log_channel', config('logging.default') === 'stderr');
+        // Proxy trust is an explicit, bounded list or none; a wildcard or malformed list is refused here (the middleware trusts none).
+        $check('runtime.trusted_proxies', TrustedProxyList::parse(config('trusted-proxies.proxies')) !== null);
         foreach (['http_enabled', 'fresh_checkout_enabled', 'reconciliation_enabled', 'provider_io_enabled',
             'exemption_authoring_enabled', 'committed_read_receipts_enabled'] as $flag) {
             $check('holds.production_checkout_'.$flag, config('production_checkout.'.$flag) === false);
