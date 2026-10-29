@@ -34,7 +34,7 @@ final class ProductionCheckoutMountTest extends TestCase
     public function createApplication()
     {
         $app = require Application::inferBasePath().'/bootstrap/app.php';
-        $this->traitsUsedByTest = class_uses_recursive(static::class);
+        $this->traitsUsedByTest = class_uses_recursive(self::class);
         $app->afterBootstrapping(LoadConfiguration::class, function (Application $app): void {
             $app['env'] = $this->checkoutEnvironment;
             $app['config']->set('production_checkout.mounted', $this->checkoutMount);
