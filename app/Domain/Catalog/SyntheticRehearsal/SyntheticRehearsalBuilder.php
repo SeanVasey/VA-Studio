@@ -147,11 +147,13 @@ final class SyntheticRehearsalBuilder
     private function rights(Track $track, array $definition, User $operator): void
     {
         $latest = $track->rightsDeclarations()->latest('id')->first();
+        $expected = SyntheticRehearsalCatalog::rights($definition, $track->id);
         if ($latest === null) {
-            $latest = app(SaveRightsDeclaration::class)->create(SyntheticRehearsalCatalog::rights($definition, $track->id), $operator);
-        } elseif (! is_string($latest->provenance_reference)
-            || ! str_starts_with($latest->provenance_reference, SyntheticRehearsalCatalog::PROVENANCE_PREFIX.$definition['number'].':')) {
-            $this->refuse($definition['slug'].' has a rights declaration without the synthetic marker; it was left unchanged.');
+            $latest = app(SaveRightsDeclaration::class)->create($expected, $operator);
+        } elseif ($latest->provenance_reference !== $expected['provenance_reference'] || $latest->sample_disclosure !== $expected['sample_disclosure']) {
+            // Both evidence fields must be exactly what the definition writes: the marker prefix alone would let staff edit the
+            // sample disclosure or the rest of the provenance and have this run verify the edited claim as rehearsal evidence.
+            $this->refuse($definition['slug'].' has a rights declaration that differs from the synthetic definition; it was left unchanged.');
         }
         if ($latest->status === 'verified') {
             return;
@@ -160,30 +162,70 @@ final class SyntheticRehearsalBuilder
         $verifier->verifyReviewed($verifier->review($latest, $operator), $operator);
     }
 
+    /**
+     * Brings in the preview and artwork a track needs. Anything this run did not just generate must trace to the generated
+     * source: a ready derivative is kept, and an interrupted source is processed again, only when the source's SHA-256 is that
+     * of the deterministic file the definition generates; otherwise staff replaced it and the run refuses, changing nothing.
+     */
     private function media(Track $track, array $definition, User $operator): void
     {
-        $generator = app(SyntheticRehearsalMedia::class);
         foreach (['master_wav' => 'preview_tagged', 'artwork' => 'artwork'] as $role => $output) {
             $current = $track->assets()->where('role', $output)->where('status', 'ready')->latest('id')->first();
             if ($current !== null && app(VerifiedMedia::class)->available($current)) {
+                $parent = $current->parent_asset_id === null ? null : MediaAsset::query()->find($current->parent_asset_id);
+                $this->requireGenerated($definition, $role, $parent?->sha256);
+
                 continue;
             }
             // A source an interrupted run already took in is processed again (a failed run is re-queued), not re-uploaded.
             $name = $definition['slug'].($role === 'artwork' ? '-artwork.png' : '-master.wav');
             $source = MediaAsset::query()->where('track_id', $track->id)->whereNull('parent_asset_id')->where('role', $role)
                 ->where('status', 'quarantined')->where('original_name', $name)->latest('id')->first();
-            if ($source === null) {
-                $files = app(PrivateMediaFiles::class);
-                $workspace = $files->workspace();
-                try {
-                    $path = $role === 'artwork' ? $generator->artwork($definition, $workspace) : $generator->master($definition, $workspace);
-                    // The upload-origin flag adapts a file this process just generated, as resumable completion does.
-                    $source = app(IngestMediaUpload::class)->handle($track, new UploadedFile($path, $name, null, UPLOAD_ERR_OK, true), $role, $operator);
-                } finally {
-                    $files->cleanup($workspace);
-                }
+            if ($source !== null) {
+                $this->requireGenerated($definition, $role, $source->sha256);
+            } else {
+                $source = $this->ingest($track, $definition, $role, $name, $operator);
             }
             $this->process(app(QueueMediaProcessing::class)->handle($source, $operator), $definition['slug']);
+        }
+    }
+
+    private function ingest(Track $track, array $definition, string $role, string $name, User $operator): MediaAsset
+    {
+        $files = app(PrivateMediaFiles::class);
+        $workspace = $files->workspace();
+        try {
+            $path = $this->generate($definition, $role, $workspace);
+
+            // The upload-origin flag adapts a file this process just generated, as resumable completion does.
+            return app(IngestMediaUpload::class)->handle($track, new UploadedFile($path, $name, null, UPLOAD_ERR_OK, true), $role, $operator);
+        } finally {
+            $files->cleanup($workspace);
+        }
+    }
+
+    private function generate(array $definition, string $role, string $workspace): string
+    {
+        $generator = app(SyntheticRehearsalMedia::class);
+
+        return $role === 'artwork' ? $generator->artwork($definition, $workspace) : $generator->master($definition, $workspace);
+    }
+
+    /**
+     * Refuses unless the given source hash is that of the file the definition generates now. The master is bit-exact; the
+     * artwork is a GD PNG, so a changed GD or zlib build can also differ, which this refusal reports like a replaced file.
+     */
+    private function requireGenerated(array $definition, string $role, ?string $sourceHash): void
+    {
+        $files = app(PrivateMediaFiles::class);
+        $workspace = $files->workspace();
+        try {
+            $generated = hash_file('sha256', $this->generate($definition, $role, $workspace));
+        } finally {
+            $files->cleanup($workspace);
+        }
+        if (! is_string($sourceHash) || ! is_string($generated) || ! hash_equals($generated, $sourceHash)) {
+            $this->refuse($definition['slug'].' has '.$role.' media that differs from the synthetic definition; it was left unchanged.');
         }
     }
 

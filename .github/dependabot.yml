@@ -9,8 +9,10 @@ updates:
     groups:
       composer-minor-patch:
         update-types: ["minor", "patch"]
-        # The PDF libraries render frozen contract PDFs and fonts, so each bump needs its own compatibility evidence.
-        exclude-patterns: ["tecnickcom/tc-lib-pdf", "tecnickcom/tc-lib-pdf-font"]
+        # The PDF libraries render frozen contract PDFs and fonts, so each bump needs its own compatibility evidence. The wildcard
+        # also covers the transitive renderers (barcode, color, file, unicode and the other tc-lib-pdf-* parts) that
+        # resources/contracts/*/profile-assets.json pin, so each of them gets its own PR too.
+        exclude-patterns: ["tecnickcom/tc-lib-*"]
   - package-ecosystem: npm
     directory: /
     schedule:

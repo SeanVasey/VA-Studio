@@ -16,6 +16,11 @@ use Throwable;
  * text for `session.lifetime` minutes; a notification that is never rendered would stay in the table, and in every backup,
  * indefinitely (independent review R3 of the Filament 5.10.2 update). Rate-limiter counters accumulate the same way.
  *
+ * Every distinct database store in use is pruned: the default store, `filament.cache_store`, `cache.limiter` and the database
+ * stores of a `failover` store, each connection and table pair once. A table of another store type (file, Redis, array) is left
+ * to that store. On a store whose `connection` or `lock_connection` differs from the default, the rows of that connection are
+ * the ones pruned, never the default connection's.
+ *
  * Never use `cache:clear` or `Cache::flush()` for this. They delete unexpired rows as well: the throttle counters, the
  * "forever" TOTP replay records (`filament:auth:app_authentication:code:*`) and the held locks that live in the same tables.
  *
@@ -48,30 +53,31 @@ final class PruneExpiredCacheRows extends Command
             return self::INVALID;
         }
 
-        $storeName = config('cache.default');
-        $store = is_string($storeName) ? config('cache.stores.'.$storeName) : null;
-        if (! is_array($store) || ($store['driver'] ?? null) !== 'database') {
+        $rowTargets = $lockTargets = [];
+        if (! $this->targets($rowTargets, $lockTargets)) {
+            $this->error('The database cache store configuration is incomplete; nothing was pruned.');
+
+            return self::FAILURE;
+        }
+        if ($rowTargets === []) {
+            $default = config('cache.default');
+            $store = is_string($default) ? config('cache.stores.'.$default) : null;
             $this->info(sprintf('Nothing to prune: the default cache store uses the "%s" driver, not "database".',
                 is_array($store) ? (is_string($store['driver'] ?? null) ? $store['driver'] : 'unknown') : 'unknown'));
 
             return self::SUCCESS;
         }
 
-        $table = $store['table'] ?? null;
-        $connection = $store['connection'] ?? null;
-        $lockTable = $store['lock_table'] ?? 'cache_locks';
-        $lockConnection = $store['lock_connection'] ?? $connection;
-        if (! is_string($table) || $table === '' || ! is_string($lockTable) || $lockTable === ''
-            || ! (is_string($connection) || $connection === null) || ! (is_string($lockConnection) || $lockConnection === null)) {
-            $this->error('The database cache store configuration is incomplete; nothing was pruned.');
-
-            return self::FAILURE;
-        }
-
         $cutoff = CarbonImmutable::now()->getTimestamp();
         $failed = false;
-        $rows = $this->prune('cache rows', DB::connection($connection), $table, $cutoff, $batch, $failed);
-        $locks = $this->prune('cache locks', DB::connection($lockConnection), $lockTable, $cutoff, $batch, $failed);
+        $rows = 0;
+        foreach ($rowTargets as [$connection, $table]) {
+            $rows += $this->prune('cache rows', DB::connection($connection), $table, $cutoff, $batch, $failed);
+        }
+        $locks = 0;
+        foreach ($lockTargets as [$connection, $table]) {
+            $locks += $this->prune('cache locks', DB::connection($connection), $table, $cutoff, $batch, $failed);
+        }
         if ($failed) {
             return self::FAILURE;
         }
@@ -79,6 +85,61 @@ final class PruneExpiredCacheRows extends Command
         $this->info(sprintf('Pruned %d expired cache row(s) and %d expired cache lock(s); batch size %d.', $rows, $locks, $batch));
 
         return self::SUCCESS;
+    }
+
+    /**
+     * The tables to prune: those of every distinct database store the application reads and writes through. That is the default
+     * store, the one Filament keeps flash notifications in (`filament.cache_store`, the default when null), the rate limiter's
+     * (`cache.limiter`, the default when null) and any database store a `failover` store lists. Moving one of them to another
+     * database store therefore cannot reopen the backlog unnoticed (independent review P3-3 of the pruning command). Each
+     * connection and table pair is listed once, whatever number of stores share it.
+     *
+     * @param  list<array{0: ?string, 1: string}>  $rowTargets
+     * @param  list<array{0: ?string, 1: string}>  $lockTargets
+     * @return bool false when a database store's configuration is incomplete
+     */
+    private function targets(array &$rowTargets, array &$lockTargets): bool
+    {
+        $default = config('cache.default');
+        $names = [];
+        foreach ([$default, config('filament.cache_store') ?? $default, config('cache.limiter') ?? $default] as $name) {
+            $this->expand($name, $names);
+        }
+        foreach (array_keys($names) as $name) {
+            $store = config('cache.stores.'.$name);
+            if (! is_array($store) || ($store['driver'] ?? null) !== 'database') {
+                continue;
+            }
+            $table = $store['table'] ?? null;
+            $connection = $store['connection'] ?? null;
+            $lockTable = $store['lock_table'] ?? 'cache_locks';
+            $lockConnection = $store['lock_connection'] ?? $connection;
+            if (! is_string($table) || $table === '' || ! is_string($lockTable) || $lockTable === ''
+                || ! (is_string($connection) || $connection === null) || ! (is_string($lockConnection) || $lockConnection === null)) {
+                return false;
+            }
+            $rowTargets[(string) $connection."\0".$table] = [$connection, $table];
+            $lockTargets[(string) $lockConnection."\0".$lockTable] = [$lockConnection, $lockTable];
+        }
+        $rowTargets = array_values($rowTargets);
+        $lockTargets = array_values($lockTargets);
+
+        return true;
+    }
+
+    /** Adds a store name and, for a `failover` store, the stores it lists (each name once, so a cycle ends). */
+    private function expand(mixed $name, array &$names): void
+    {
+        if (! is_string($name) || isset($names[$name])) {
+            return;
+        }
+        $names[$name] = true;
+        $store = config('cache.stores.'.$name);
+        if (is_array($store) && ($store['driver'] ?? null) === 'failover' && is_array($store['stores'] ?? null)) {
+            foreach ($store['stores'] as $member) {
+                $this->expand($member, $names);
+            }
+        }
     }
 
     private function prune(string $what, ConnectionInterface $connection, string $table, int $cutoff, int $batch, bool &$failed): int

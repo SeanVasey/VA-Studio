@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -253,7 +254,7 @@ class PruneExpiredCacheRowsTest extends TestCase
     {
         $this->row('old', $this->now - 1);
         $this->row('old-lock', $this->now - 1, 'cache_locks');
-        foreach (['array', 'file', 'failover'] as $store) {
+        foreach (['array', 'file'] as $store) {
             config(['cache.default' => $store]);
             [$exit, $output] = $this->prune();
             $this->assertSame(0, $exit, $store);
@@ -285,6 +286,159 @@ class PruneExpiredCacheRowsTest extends TestCase
         $this->assertStringContainsString('Pruned 2 expired cache row(s) and 1 expired cache lock(s)', $output);
         $this->assertSame(['named-default-live'], $this->keys('cache'));
         $this->assertSame(['named-locks-live'], $this->keys('cache_locks'));
+    }
+
+    /**
+     * Two separate in-memory SQLite connections stand in for DB_CACHE_CONNECTION and DB_CACHE_LOCK_CONNECTION. They are their own
+     * databases, so creating their tables never touches the test transaction on the default connection.
+     *
+     * @return array{0: string, 1: string}
+     */
+    private function separateCacheConnections(): array
+    {
+        $names = ['prune_probe_rows', 'prune_probe_locks'];
+        foreach ($names as $name) {
+            config(['database.connections.'.$name => ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '', 'foreign_key_constraints' => false]]);
+            DB::purge($name);
+            Schema::connection($name)->create('cache', fn ($table) => $this->cacheColumns($table));
+            Schema::connection($name)->create('cache_locks', fn ($table) => $this->cacheColumns($table));
+        }
+
+        return $names;
+    }
+
+    private function cacheColumns($table): void
+    {
+        $table->string('key')->primary();
+        $table->mediumText('value')->nullable();
+        $table->string('owner')->nullable();
+        $table->integer('expiration')->index();
+    }
+
+    private function probeRow(string $connection, string $table, string $key, int $expiration): void
+    {
+        DB::connection($connection)->table($table)->insert(['key' => $key, 'value' => 'v', 'owner' => 'o', 'expiration' => $expiration]);
+    }
+
+    public function test_it_prunes_the_configured_connection_and_lock_connection_not_the_default_one(): void
+    {
+        [$rows, $locks] = $this->separateCacheConnections();
+        // The default connection holds expired rows too: a regression to DB::connection() would prune these instead.
+        $this->row('default-expired', $this->now - 1);
+        $this->row('default-lock-expired', $this->now - 1, 'cache_locks');
+        $this->probeRow($rows, 'cache', 'rows-expired', $this->now - 1);
+        $this->probeRow($rows, 'cache', 'rows-live', $this->now + 60);
+        $this->probeRow($locks, 'cache_locks', 'locks-expired', $this->now - 1);
+        $this->probeRow($locks, 'cache_locks', 'locks-live', $this->now + 60);
+        // The rows connection must not be asked for the lock table, or the lock connection for the rows.
+        $this->probeRow($rows, 'cache_locks', 'rows-connection-lock-table', $this->now - 1);
+        $this->probeRow($locks, 'cache', 'locks-connection-row-table', $this->now - 1);
+        config(['cache.stores.database.connection' => $rows, 'cache.stores.database.lock_connection' => $locks]);
+
+        [$exit, $output] = $this->prune();
+
+        $this->assertSame(0, $exit);
+        $this->assertStringContainsString('Pruned 1 expired cache row(s) and 1 expired cache lock(s)', $output);
+        $this->assertSame(['rows-live'], DB::connection($rows)->table('cache')->pluck('key')->all());
+        $this->assertSame(['locks-live'], DB::connection($locks)->table('cache_locks')->pluck('key')->all());
+        $this->assertSame(['rows-connection-lock-table'], DB::connection($rows)->table('cache_locks')->pluck('key')->all());
+        $this->assertSame(['locks-connection-row-table'], DB::connection($locks)->table('cache')->pluck('key')->all());
+        $this->assertSame(['default-expired'], $this->keys(), 'the default connection was not pruned');
+        $this->assertSame(['default-lock-expired'], $this->keys('cache_locks'));
+    }
+
+    public function test_the_lock_connection_defaults_to_the_store_connection(): void
+    {
+        [$rows] = $this->separateCacheConnections();
+        $this->probeRow($rows, 'cache', 'rows-expired', $this->now - 1);
+        $this->probeRow($rows, 'cache_locks', 'locks-expired', $this->now - 1);
+        $this->row('default-expired', $this->now - 1);
+        config(['cache.stores.database.connection' => $rows, 'cache.stores.database.lock_connection' => null]);
+
+        [, $output] = $this->prune();
+
+        $this->assertStringContainsString('Pruned 1 expired cache row(s) and 1 expired cache lock(s)', $output);
+        $this->assertSame([], DB::connection($rows)->table('cache_locks')->pluck('key')->all());
+        $this->assertSame(['default-expired'], $this->keys());
+    }
+
+    public function test_a_failover_default_prunes_its_database_member(): void
+    {
+        // Review P3-3: a failover default over `database` used to print "Nothing to prune" and leave the backlog.
+        $this->row('failover-expired', $this->now - 1);
+        $this->row('failover-live', $this->now + 60);
+        config(['cache.default' => 'failover']);
+
+        [$exit, $output] = $this->prune();
+
+        $this->assertSame(0, $exit);
+        $this->assertStringContainsString('Pruned 1 expired cache row(s)', $output);
+        $this->assertSame(['failover-live'], $this->keys());
+    }
+
+    public function test_a_failover_cycle_ends(): void
+    {
+        config(['cache.stores.loop-a' => ['driver' => 'failover', 'stores' => ['loop-b', 'database']],
+            'cache.stores.loop-b' => ['driver' => 'failover', 'stores' => ['loop-a']], 'cache.default' => 'loop-a']);
+        $this->row('loop-expired', $this->now - 1);
+
+        [$exit] = $this->prune();
+
+        $this->assertSame(0, $exit);
+        $this->assertSame([], $this->keys());
+    }
+
+    public function test_a_database_store_used_only_by_the_limiter_or_by_filament_is_pruned_too(): void
+    {
+        // Review P3-3: the default is `array` here, but the limiter and Filament are pointed at separate database stores. The
+        // backlog would otherwise reopen silently while the command reported "Nothing to prune".
+        [$limiter, $filament] = $this->separateCacheConnections();
+        $this->probeRow($limiter, 'cache', 'limiter-expired', $this->now - 1);
+        $this->probeRow($limiter, 'cache', 'limiter-live', $this->now + 60);
+        $this->probeRow($filament, 'cache', 'filament-expired', $this->now - 1);
+        $this->probeRow($filament, 'cache_locks', 'filament-lock-expired', $this->now - 1);
+        $this->row('default-database-expired', $this->now - 1);
+        config([
+            'cache.default' => 'array',
+            'cache.stores.limiter-db' => ['driver' => 'database', 'connection' => $limiter, 'table' => 'cache', 'lock_connection' => $limiter, 'lock_table' => 'cache_locks'],
+            'cache.stores.filament-db' => ['driver' => 'database', 'connection' => $filament, 'table' => 'cache', 'lock_connection' => $filament, 'lock_table' => 'cache_locks'],
+            'cache.limiter' => 'limiter-db',
+            'filament.cache_store' => 'filament-db',
+        ]);
+
+        [$exit, $output] = $this->prune();
+
+        $this->assertSame(0, $exit);
+        $this->assertStringContainsString('Pruned 2 expired cache row(s) and 1 expired cache lock(s)', $output);
+        $this->assertSame(['limiter-live'], DB::connection($limiter)->table('cache')->pluck('key')->all());
+        $this->assertSame([], DB::connection($filament)->table('cache')->pluck('key')->all());
+        $this->assertSame([], DB::connection($filament)->table('cache_locks')->pluck('key')->all());
+        $this->assertSame(['default-database-expired'], $this->keys(), 'the default store is not a database store here, so its table is not touched');
+    }
+
+    public function test_a_table_shared_by_several_stores_is_pruned_once(): void
+    {
+        $this->row('shared-expired-1', $this->now - 1);
+        $this->row('shared-expired-2', $this->now - 2);
+        $statements = $this->recordDeletes();
+        config(['cache.stores.limiter-db' => config('cache.stores.database'), 'cache.limiter' => 'limiter-db', 'filament.cache_store' => 'database']);
+
+        [, $output] = $this->prune();
+
+        $this->assertStringContainsString('Pruned 2 expired cache row(s) and 0 expired cache lock(s)', $output);
+        $this->assertCount(1, array_filter($statements(), fn (array $s): bool => str_contains($s['sql'], 'cache"') || str_contains($s['sql'], 'cache`')));
+    }
+
+    public function test_an_incomplete_non_default_database_store_fails_without_pruning_anything(): void
+    {
+        $this->row('default-expired', $this->now - 1);
+        config(['cache.stores.broken' => ['driver' => 'database', 'table' => ''], 'cache.limiter' => 'broken']);
+
+        [$exit, $output] = $this->prune();
+
+        $this->assertSame(1, $exit);
+        $this->assertSame('The database cache store configuration is incomplete; nothing was pruned.', $output);
+        $this->assertSame(['default-expired'], $this->keys());
     }
 
     public function test_it_reads_the_default_store_configuration_not_a_store_named_database(): void

@@ -53,6 +53,11 @@ final class TestIdentityLinkRelay
     /** The writer's directory on the private local disk. Never printed. */
     private const DIRECTORY = 'customer-identity-capture';
 
+    /** How many captures a listing examines by default, and the most it may be asked to. Older ones are counted, not read. */
+    public const DEFAULT_LIST_LIMIT = 50;
+
+    public const MAX_LIST_LIMIT = 200;
+
     /** A real capture is well under 1 KiB; anything larger is not one. */
     private const MAX_BYTES = 8192;
 
@@ -143,38 +148,45 @@ final class TestIdentityLinkRelay
     }
 
     /**
-     * Every verified capture for a synthetic recipient, newest first, and how many entries were withheld.
+     * The verified captures for a synthetic recipient among the newest `$limit` by file modification time, newest first by
+     * challenge creation, how many entries were withheld, and how many older captures were not examined at all. A staging
+     * installation accumulates one capture per request and nothing here deletes them, so a listing reads and verifies a
+     * bounded number: one stat per entry (to order them), then one file read per examined capture and one query each for
+     * their challenges and for staff addresses, not two queries per capture.
      *
-     * @return array{messages: list<TestIdentityLinkMessage>, withheld: int}
+     * @return array{messages: list<TestIdentityLinkMessage>, withheld: int, not_examined: int}
      */
-    public function messages(): array
+    public function messages(int $limit = self::DEFAULT_LIST_LIMIT): array
     {
+        $limit = max(1, min($limit, self::MAX_LIST_LIMIT));
         $origin = $this->origin();
         $directory = $this->directory();
         if ($directory === null) {
-            return ['messages' => [], 'withheld' => 0];
+            return ['messages' => [], 'withheld' => 0, 'not_examined' => 0];
         }
         $names = @scandir($directory);
         if ($names === false) {
             $this->refuse('The private capture directory could not be read.');
         }
-        $messages = [];
         $withheld = 0;
+        $candidates = [];
         foreach ($names as $name) {
             if ($name === '.' || $name === '..') {
                 continue;
             }
-            $message = preg_match('/\A('.self::UUID.')\.json\z/D', $name, $match) === 1 ? $this->verified($directory, $match[1], $origin) : null;
-            if ($message === null) {
+            $stat = preg_match('/\A('.self::UUID.')\.json\z/D', $name, $match) === 1 ? @lstat($directory.'/'.$name) : false;
+            if ($stat === false) {
                 $withheld++;
 
                 continue;
             }
-            $messages[] = $message;
+            $candidates[] = [$stat['mtime'], $match[1]];
         }
-        usort($messages, fn (TestIdentityLinkMessage $a, TestIdentityLinkMessage $b): int => [$b->createdAt->getTimestamp(), $b->id] <=> [$a->createdAt->getTimestamp(), $a->id]);
+        usort($candidates, fn (array $a, array $b): int => [$b[0], $a[1]] <=> [$a[0], $b[1]]);
+        $examined = array_slice($candidates, 0, $limit);
+        $result = $this->verifiedBatch($directory, array_column($examined, 1), $origin);
 
-        return ['messages' => $messages, 'withheld' => $withheld];
+        return ['messages' => $result['messages'], 'withheld' => $withheld + $result['withheld'], 'not_examined' => count($candidates) - count($examined)];
     }
 
     /** The one verified capture with this id; a missing or withheld capture refuses alike. */
@@ -185,7 +197,7 @@ final class TestIdentityLinkRelay
         }
         $origin = $this->origin();
         $directory = $this->directory();
-        $message = $directory === null ? null : $this->verified($directory, $id, $origin);
+        $message = $directory === null ? null : ($this->verifiedBatch($directory, [$id], $origin)['messages'][0] ?? null);
         if ($message === null) {
             $this->refuse('No relayable capture has that id. It does not exist, or it is withheld because it is not a verified message for a synthetic test address.');
         }
@@ -231,7 +243,7 @@ final class TestIdentityLinkRelay
      * Records the listing before it is shown (counts only, never addresses), as staff reads of private inquiries are
      * audited. A failed record shows nothing.
      *
-     * @param  array{messages: list<TestIdentityLinkMessage>, withheld: int}  $result
+     * @param  array{messages: list<TestIdentityLinkMessage>, withheld: int, not_examined?: int}  $result
      */
     public function recordListing(User $operator, array $result, ?int $attestationAuditId): int
     {
@@ -244,7 +256,7 @@ final class TestIdentityLinkRelay
                 'subject_type' => User::class, 'subject_id' => $current->id,
                 'context' => [
                     'schema_version' => 1, 'command' => self::COMMAND, 'shown' => count($result['messages']),
-                    'pending' => $pending, 'withheld' => $result['withheld'], 'test_only' => true,
+                    'pending' => $pending, 'withheld' => $result['withheld'], 'not_examined' => $result['not_examined'] ?? 0, 'test_only' => true,
                     'environment' => app()->environment(), 'attestation_audit_id' => $attestationAuditId,
                 ],
                 'created_at' => CarbonImmutable::now()->utc()->startOfSecond(),
@@ -306,7 +318,59 @@ final class TestIdentityLinkRelay
         return $origin;
     }
 
-    private function verified(string $directory, string $id, string $origin): ?TestIdentityLinkMessage
+    /**
+     * Verifies the named captures together: each file is read and checked on its own, then the retained challenges and the
+     * staff addresses are looked up once for the whole set.
+     *
+     * @param  list<string>  $ids
+     * @return array{messages: list<TestIdentityLinkMessage>, withheld: int}
+     */
+    private function verifiedBatch(string $directory, array $ids, string $origin): array
+    {
+        $withheld = 0;
+        $captures = [];
+        foreach ($ids as $id) {
+            $capture = $this->capture($directory, $id, $origin);
+            if ($capture === null) {
+                $withheld++;
+
+                continue;
+            }
+            $captures[$id] = $capture;
+        }
+        if ($captures === []) {
+            return ['messages' => [], 'withheld' => $withheld];
+        }
+        $challenges = CustomerIdentityChallenge::query()->whereIn('public_id', array_keys($captures))->get()->keyBy('public_id');
+        $recipients = array_values(array_unique(array_column($captures, 'recipient')));
+        $staff = [];
+        foreach (array_chunk($recipients, 500) as $chunk) {
+            $placeholders = implode(',', array_fill(0, count($chunk), '?'));
+            foreach (User::query()->whereRaw('LOWER(email) IN ('.$placeholders.')', $chunk)->where('is_admin', true)->pluck('email') as $email) {
+                $staff[strtolower((string) $email)] = true;
+            }
+        }
+        $messages = [];
+        foreach ($captures as $id => $capture) {
+            $message = $this->matched($capture, $challenges->get($id), isset($staff[$capture['recipient']]));
+            if ($message === null) {
+                $withheld++;
+
+                continue;
+            }
+            $messages[] = $message;
+        }
+        usort($messages, fn (TestIdentityLinkMessage $a, TestIdentityLinkMessage $b): int => [$b->createdAt->getTimestamp(), $b->id] <=> [$a->createdAt->getTimestamp(), $a->id]);
+
+        return ['messages' => $messages, 'withheld' => $withheld];
+    }
+
+    /**
+     * The file-level checks: the writer's exact shape, the link on this installation's origin and a synthetic recipient.
+     *
+     * @return array{data: array<string, mixed>, id: string, recipient: string, proof: string}|null
+     */
+    private function capture(string $directory, string $id, string $origin): ?array
     {
         $data = $this->read($directory.'/'.$id.'.json');
         if ($data === null) {
@@ -325,9 +389,21 @@ final class TestIdentityLinkRelay
         if ($recipient === null || ! str_starts_with($data['url'], $prefix) || preg_match('/\A[a-f0-9]{64}\z/D', $proof) !== 1) {
             return null;
         }
-        $challenge = CustomerIdentityChallenge::query()->where('public_id', $id)->first();
-        if ($challenge === null || $challenge->public_id !== $id || $challenge->policy_version !== CustomerIdentityPolicy::VERSION
-            || $challenge->purpose !== $data['purpose'] || ! hash_equals($challenge->proof_hash, hash('sha256', $proof))
+
+        return ['data' => $data, 'id' => $id, 'recipient' => $recipient, 'proof' => $proof];
+    }
+
+    /**
+     * The retained-challenge checks: the same id, purpose, current policy, recipient, expiry and proof hash, and a recipient
+     * that is not a staff address.
+     *
+     * @param  array{data: array<string, mixed>, id: string, recipient: string, proof: string}  $capture
+     */
+    private function matched(array $capture, ?CustomerIdentityChallenge $challenge, bool $staffAddress): ?TestIdentityLinkMessage
+    {
+        $data = $capture['data'];
+        if ($challenge === null || $challenge->public_id !== $capture['id'] || $challenge->policy_version !== CustomerIdentityPolicy::VERSION
+            || $challenge->purpose !== $data['purpose'] || ! hash_equals($challenge->proof_hash, hash('sha256', $capture['proof']))
             || $challenge->expires_at->toISOString() !== $data['expiresAt']) {
             return null;
         }
@@ -337,12 +413,11 @@ final class TestIdentityLinkRelay
             return null;
         }
         $status = $this->status($challenge);
-        if (! is_string($email) || ! hash_equals($email, $recipient) || $status === null
-            || User::query()->whereRaw('LOWER(email) = ?', [$recipient])->where('is_admin', true)->exists()) {
+        if (! is_string($email) || ! hash_equals($email, $capture['recipient']) || $status === null || $staffAddress) {
             return null;
         }
 
-        return new TestIdentityLinkMessage($challenge->id, $id, $challenge->purpose, $recipient, $challenge->created_at,
+        return new TestIdentityLinkMessage($challenge->id, $capture['id'], $challenge->purpose, $capture['recipient'], $challenge->created_at,
             $challenge->expires_at, $challenge->completed_at, $status, $data['url']);
     }
 

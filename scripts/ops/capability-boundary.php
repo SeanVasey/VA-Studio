@@ -7,9 +7,10 @@ namespace Vasey\Ops;
 use Illuminate\Support\Arr;
 
 /**
- * The staging capability profile's boundary, in one place so the two validators that enforce it cannot drift apart:
- * ops/staging/validate-runtime.php (the deploy gate, which refuses a deploy) and scripts/ops/validate-test-commerce-profile.php
- * (the profile validator an operator runs by hand). Evidence and the reason for each flag:
+ * The capability boundary, in one place so the validators that enforce it cannot drift apart: ops/staging/validate-runtime.php
+ * (the staging deploy gate, which refuses a deploy), scripts/ops/validate-test-commerce-profile.php (the profile validator an
+ * operator runs by hand) and ops/production/validate-runtime.php (the production admission, which takes the config key of each
+ * of its four pre-launch hold flags from here and names only their environment keys). Evidence and the reason for each flag:
  * docs/verification/production-ops-kit-20261017/ (batches K2 and K3).
  *
  * This file only reads values handed to it; it boots nothing, reads no environment and prints nothing.
