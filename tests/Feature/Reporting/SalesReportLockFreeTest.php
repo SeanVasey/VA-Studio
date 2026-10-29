@@ -89,9 +89,9 @@ class SalesReportLockFreeTest extends TestCase
         // meaningful: the same session does show locks after an explicit locking read.
         DB::beginTransaction();
         $build();
-        $transaction = DB::selectOne('SELECT trx_id FROM information_schema.innodb_trx WHERE trx_mysql_thread_id = CONNECTION_ID()');
-        $this->assertNotNull($transaction, 'The report ran inside a transaction.');
-        $locks = fn (): int => (int) DB::selectOne('SELECT COUNT(*) AS locks FROM performance_schema.data_locks WHERE ENGINE_TRANSACTION_ID = ?', [$transaction->trx_id])->locks;
+        // The report's session, found by thread rather than by transaction id (a read-write transaction gets a new id on its first lock).
+        $locks = fn (): int => (int) DB::selectOne('SELECT COUNT(*) AS locks FROM performance_schema.data_locks WHERE THREAD_ID = '
+            .'(SELECT THREAD_ID FROM performance_schema.threads WHERE PROCESSLIST_ID = CONNECTION_ID())')->locks;
         $this->assertSame(0, $locks());
         DB::select('SELECT id FROM refund_line_allocations WHERE order_id = ? FOR UPDATE', [$order]);
         $this->assertGreaterThan(0, $locks());

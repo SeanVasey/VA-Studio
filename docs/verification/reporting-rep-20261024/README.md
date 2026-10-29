@@ -36,20 +36,20 @@ customer data export/deletion routes (lane CX).
 2. **Money.** Integer minor units with an explicit currency, grouped by currency. Gross is `verified_payments.amount_minor`.
    Refunds come only from the A5 ledger and are status-aware: order totals use the latest *observed* observation's
    `succeeded_refund_minor`, so a succeeded refund that later failed stops counting; license-tier refunds go through
-   `RefundDisputeCase::load(...)->refundedByLine()` (never a raw sum of allocations, which would keep counting a reversed
-   refund). Succeeded refunds with no line allocation are reported as "unallocated", not guessed into a tier.
-3. **Test versus production.** Two sources, never summed: the retained test commerce chain (`order_finalizations.mode =
+   `RefundDisputeCase::load(..., forUpdate: false)->refundedByLine()` in a snapshot transaction, with no row locks (never a raw sum
+   of allocations, which would keep counting a reversed refund). Succeeded refunds with no line allocation are reported as "unallocated", not guessed into a tier.
+3. **Test versus production.** Two sources, never summed (the production funnel counts only orders prepared, labelled unsplit): the retained test commerce chain (`order_finalizations.mode =
    'test'`, labelled TEST) and the production checkout chain (`production_checkout_*`), split by `funds_mode` (`live` is
    Production, `test` is a rehearsal with test funds, labelled). The A5 refund ledger exists for test orders only, so the
    production section shows gross only and says refunds are not recorded there. A section with no rows says so.
 4. **Honest unavailability.** Each metric carries `ok` / `attention` / `unavailable`; an unreadable source (queue
    connection other than `database`, missing table, no recorded evidence) is shown as unavailable with the reason, never as zero.
-5. **Customer segments.** First-party customer accounts and their test-chain orders only; production identity accounts are
-   not covered (U-07/U-13). A customer is in a marketing segment only when `email_marketing` consent is verified granted:
+5. **Customer segments.** First-party customer accounts and their test-chain orders only; accounts created by the production
+   identity path (a `production_identity_origins` row) are excluded (U-07/U-13). A customer is in a marketing segment only when `email_marketing` consent is verified granted:
    latest event granted, bound to the currently configured notice, recipient unchanged, grants runtime enabled, no
    suppression record. Everything else is `unknown`, `withdrawn` or `granted_unverified` and is excluded. The mechanism is
    default-off (`REPORTING_CUSTOMER_SEGMENTS_ENABLED`, `REPORTING_CUSTOMER_EXPORT_ENABLED`,
-   `REPORTING_MARKETING_SEGMENT_ENABLED`). No email address, name or order content is read for the export.
+   `REPORTING_MARKETING_SEGMENT_ENABLED`). No email address, name or order content is exported; an account's email is read only to verify a grant's recipient binding.
 6. **MySQL.** Every grouped query selects only grouped columns and aggregates; Filament tables are not used for grouped
    data (no default key sort); period bucketing uses a driver-aware expression selected as an alias and grouped by it.
 7. **Exports** record one append-only `audit_events` row (actor, filters, row count, SHA-256 of the file) before the file is
@@ -122,8 +122,7 @@ or the page `boot`/`canAccess` layer; the read model still refuses, so these are
 - Browser specs (Playwright) were not run; the admin dashboard now shows four more widgets.
 - No provider, real data or real host; the production-section tests use hand-built rows with foreign keys off (shape-valid, not a real checkout journey).
 - Multi-currency totals are grouped by currency but only USD can occur today, so only USD is exercised.
-- `finalized_at` has no index; the period scan is unmeasured on a large table. `RefundDisputeCase::load()` takes momentary `FOR UPDATE`
-  locks on refunded orders (at most 200 per report); a non-locking variant would touch the A5 domain.
+- Several period and dashboard scans are unindexed and unmeasured on a large table (see `docs/staff-reporting.md`, Known limits).
 - The customer export is deliberately contact-free; marketing use needs U-13 (processor, unsubscribe path) and is not built.
 - Customer segments stay off (`REPORTING_*` flags) until U-13; FP-069 waits on U-11. Independent review of authority, refund netting and
   consent filtering is still required before merge.
