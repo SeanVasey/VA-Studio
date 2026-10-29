@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\ProductionCheckoutComposition;
 
+use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionCheckout\CheckoutSchema;
 use App\Domain\Commerce\ProductionCheckout\ExecutionContextV1;
+use App\Domain\Commerce\ProductionCheckout\HostedCheckout;
 use App\Domain\Commerce\ProductionCheckout\ProviderGateway;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
@@ -115,6 +117,35 @@ final class ProductionCheckoutReconcileCommandTest extends TestCase
         } finally {
             $this->app->instance('env', 'testing');
         }
+    }
+
+    /** @return array<string, array{0: string, 1: mixed}> */
+    public static function domainSwitches(): array
+    {
+        return ['operator off' => ['production_checkout.operator_reconciliation_enabled', false],
+            'operator string' => ['production_checkout.operator_reconciliation_enabled', 'true'],
+            'reconciliation off' => ['production_checkout.reconciliation_enabled', false]];
+    }
+
+    /** The domain method repeats both switch checks, so a caller that skips the command's checks is refused too. */
+    #[DataProvider('domainSwitches')]
+    public function test_the_domain_operator_path_refuses_on_its_own_without_both_switches(string $key, mixed $value): void
+    {
+        [$f, $gateway] = $this->order();
+        $f['gateway']->paid = true;
+        $before = self::evidence();
+        $retrieves = $gateway->retrieves;
+        config([$key => $value]);
+        foreach (['operatorReconcile', 'operatorStatus'] as $method) {
+            try {
+                app(HostedCheckout::class)->{$method}($f['order']['orderId']);
+                $this->fail($method.' ran without its switches.');
+            } catch (CheckoutException $error) {
+                $this->assertSame('disabled', $error->reason, $method);
+            }
+        }
+        $this->assertSame($retrieves, $gateway->retrieves);
+        $this->assertSame($before, self::evidence());
     }
 
     public function test_it_retrieves_retains_a_verified_payment_and_is_idempotent(): void
