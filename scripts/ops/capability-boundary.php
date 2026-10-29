@@ -39,15 +39,19 @@ final class CapabilityBoundary
     ];
 
     /**
-     * Stated false in the base staging template beside the eleven: production-lane or one-way, so never left to a default.
+     * Stated false in the base staging template beside the eleven: production-lane, production-only or one-way, so never left to a default.
      * The public track sitemap build chain is not environment-gated; promoting customer listening data to V2 cannot be undone by
      * turning it off again. VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED is deliberately not held: it admits only the
      * `vasey:staging-synthetic-catalog` console command, which refuses production whatever the flag says, and
      * docs/ops/staging-runbook.md section 5a sets it true for the seeding run (a hold would refuse that documented deploy).
+     * The two production admissions (lane PCC) are production-profile only: a real mail transport and Stripe live mode are never
+     * admitted on staging, so the staging gates refuse either unless it is false (the production validator reads them itself).
      */
     public const ADDITIONAL_FLAGS = [
         'DISCOVERY_SITEMAP_ENABLED' => 'discovery-sitemap.enabled',
         'VASEY_LISTENING_V2_PROMOTION_ENABLED' => 'customer-listening.v2_promotion_enabled',
+        'VASEY_PRODUCTION_REAL_MAIL_ADMITTED' => 'production-runtime.real_mail_admitted',
+        'VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED' => 'production-runtime.live_stripe_admitted',
     ];
 
     /**
@@ -60,7 +64,7 @@ final class CapabilityBoundary
     /** Lanes the brief names (Paid252, Tax255, production customer identity, production free grants): a rename must update this. */
     public const NAMED_PRODUCTION_LANES = ['paid-grants', 'paid-tax-grants', 'production-tax-checkout', 'production-customer-identity', 'production-free-grants'];
 
-    /** @return array<string, string> environment key => config key, the eleven and the two */
+    /** @return array<string, string> environment key => config key, the eleven and the four */
     public static function stagedFlags(): array
     {
         return [...self::CAPABILITY_FLAGS, ...self::ADDITIONAL_FLAGS];

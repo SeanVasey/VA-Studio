@@ -24,9 +24,12 @@ declare(strict_types=1);
 //      four flags, is a reviewed change to this file together with Sean's explicit authorization.
 //   4. APP_KEY equals the key of the previous (served) environment, when one is given.
 //
-// What it deliberately does not do: it does not force MAIL_MAILER or STRIPE_MODE itself. The preflight's production profile
-// currently requires `log` and `test` for them, so today this validator inherits those values; relaxing them (a real mail
-// transport, live mode) is a reviewed change to the preflight, and this file follows it without an edit.
+// Admissions (lane PCC). MAIL_MAILER and STRIPE_MODE are the preflight's: `log` and `test` unless the candidate file sets
+// VASEY_PRODUCTION_REAL_MAIL_ADMITTED or VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED to exactly `true` (then `smtp` with implicit TLS,
+// and `live`). This file adds only what the live flag changes in its holds: an `sk_live_` value is admitted as
+// PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY and nowhere else, and PRODUCTION_CHECKOUT_FUNDS_MODE may be blank or `live`. Every
+// PRODUCTION_CHECKOUT_*_ENABLED switch stays held false whatever the flags say: admitting live credentials is not activation.
+// The effective admissions (config/production-runtime.php) must agree with the file.
 use App\Support\PhpCliBinary;
 use App\Support\PhpCliBinaryUnavailable;
 use Dotenv\Dotenv;
@@ -102,7 +105,16 @@ try {
     $names = array_map(static fn ($entry) => $entry->getName(), $entries);
     $check('runtime.unique_keys', count($names) === count(array_unique($names)));
     $values = Dotenv::parse($raw);
-    $check('holds.no_live_provider_credential', ! preg_match('/(?:sk|rk|pk)_live_/', implode("\n", array_filter($values, 'is_string'))));
+    // Admissions: exact `true` only. The preflight child below refuses any value other than `true` or `false` by identifier.
+    $realMail = ($values['VASEY_PRODUCTION_REAL_MAIL_ADMITTED'] ?? null) === 'true';
+    $liveStripe = ($values['VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED'] ?? null) === 'true';
+    $liveSecret = static fn (mixed $value): bool => is_string($value) && preg_match('/\Ask_live_[A-Za-z0-9]{1,240}\z/D', $value) === 1;
+    $scanned = $values;
+    if ($liveStripe && $liveSecret($scanned['PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY'] ?? null)) {
+        // The one admitted place for a live key. Restricted (rk_) and publishable (pk_) keys stay refused everywhere.
+        unset($scanned['PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY']);
+    }
+    $check('holds.no_live_provider_credential', ! preg_match('/(?:sk|rk|pk)_live_/', implode("\n", array_filter($scanned, 'is_string'))));
     $check('runtime.no_cache_override', array_filter($names, static fn ($name) => preg_match('/\AAPP_[A-Z_]*CACHE\z/', $name)) === []);
     // A production-checkout switch is accepted only as the literal false the template ships, or unset. A blank assignment is
     // not the same as unset (the application's env() default does not apply to it), and the configuration check below refuses it.
@@ -203,8 +215,14 @@ try {
             'exemption_authoring_enabled', 'committed_read_receipts_enabled'] as $flag) {
             $check('holds.production_checkout_'.$flag, config('production_checkout.'.$flag) === false);
         }
-        $check('holds.production_credentials', in_array(config('production_checkout.secret_key'), [null, ''], true)
-            && in_array(config('production_checkout.funds_mode'), [null, ''], true));
+        $check('holds.production_credentials', $liveStripe
+            ? (in_array(config('production_checkout.secret_key'), [null, ''], true) || $liveSecret(config('production_checkout.secret_key')))
+                && in_array(config('production_checkout.funds_mode'), [null, '', 'live'], true)
+            : in_array(config('production_checkout.secret_key'), [null, ''], true)
+                && in_array(config('production_checkout.funds_mode'), [null, ''], true));
+        // The admissions as the application reads them must be the file's. MAIL_MAILER and STRIPE_MODE stay the preflight's.
+        $check('runtime.production_admissions', config('production-runtime.real_mail_admitted') === $realMail
+            && config('production-runtime.live_stripe_admitted') === $liveStripe);
         // Strictly false, on purpose: a config key that is renamed or removed reads null and fails closed rather than passing.
         foreach ($holdKeys as $name => $key) {
             $check('holds.'.strtolower($name), config($key) === false);

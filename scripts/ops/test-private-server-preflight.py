@@ -274,6 +274,101 @@ class PreflightTests(unittest.TestCase):
         self.assertEqual(report["profile"], "staging")
         self.assertTrue(report["runtime_inspection_requested"])
 
+    # PCC: real mail and Stripe live mode are admitted in the production profile only behind an exact `true` flag.
+    REAL_MAIL = "VASEY_PRODUCTION_REAL_MAIL_ADMITTED"
+    LIVE_STRIPE = "VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED"
+
+    def real_mail(self, source=None):
+        source = configured() if source is None else source
+        for key, value in {
+            self.REAL_MAIL: "true", "MAIL_MAILER": "smtp", "MAIL_SCHEME": "smtps", "MAIL_HOST": "smtp.synthetic-mail-provider.com",
+            "MAIL_PORT": "465", "MAIL_USERNAME": "synthetic-user", "MAIL_PASSWORD": SENTINEL, "MAIL_FROM_ADDRESS": "support@vasey.audio",
+        }.items():
+            source = replace(source, key, value)
+        return source
+
+    def live_stripe(self, source=None):
+        source = configured() if source is None else source
+        return replace(replace(source, self.LIVE_STRIPE, "true"), "STRIPE_MODE", "live")
+
+    def test_production_still_forces_log_mail_and_test_mode_without_an_exact_true_flag(self):
+        explicit_false = replace(replace(configured(), self.REAL_MAIL, "false"), self.LIVE_STRIPE, "false")
+        for label, source in [("unset", configured()), ("false", explicit_false)]:
+            with self.subTest(flags=label):
+                self.assertEqual(self.run_check(source)["result"], "FILE_CHECKS_PASSED")
+                self.blocked(self.run_check(replace(source, "MAIL_MAILER", "smtp")), "baseline_mail_mailer")
+                self.blocked(self.run_check(replace(source, "STRIPE_MODE", "live")), "baseline_stripe_mode")
+        # A complete transport without the flag is still refused, and so is live mode without its flag.
+        self.blocked(self.run_check(replace(self.real_mail(), self.REAL_MAIL, "false")), "baseline_mail_mailer")
+        self.blocked(self.run_check(replace(self.live_stripe(), self.LIVE_STRIPE, "false")), "baseline_stripe_mode")
+
+    def test_admission_flags_accept_only_the_exact_literals_and_a_malformed_flag_admits_nothing(self):
+        for key in [self.REAL_MAIL, self.LIVE_STRIPE]:
+            for value in ["", "TRUE", "True", "1", "yes", "(true)", "on", SENTINEL]:
+                with self.subTest(key=key, value=value):
+                    source = self.real_mail() if key == self.REAL_MAIL else self.live_stripe()
+                    report = self.run_check(replace(source, key, value))
+                    self.blocked(report, "production_admission_boolean_" + key.lower())
+                    self.blocked(report, "baseline_mail_mailer" if key == self.REAL_MAIL else "baseline_stripe_mode")
+                    self.assertNotIn(SENTINEL, json.dumps(report))
+
+    def test_real_mail_flag_admits_only_a_complete_implicit_tls_smtp_transport(self):
+        report = self.run_check(self.real_mail())
+        self.assertEqual(report["result"], "FILE_CHECKS_PASSED")
+        self.assertIn({"id": "production_mail_implicit_tls", "status": "pass"}, report["checks"])
+        self.blocked(self.run_check(replace(self.real_mail(), "MAIL_MAILER", "log")), "baseline_mail_mailer")
+        self.blocked(self.run_check(replace(self.real_mail(), "MAIL_MAILER", "sendmail")), "baseline_mail_mailer")
+        for key, value, check in [
+            ("MAIL_SCHEME", "smtp", "production_mail_implicit_tls"),
+            ("MAIL_SCHEME", "", "production_mail_implicit_tls"),
+            ("MAIL_PORT", "587", "production_mail_implicit_tls"),
+            ("MAIL_HOST", "", "production_mail_host_shape"),
+            ("MAIL_HOST", "127.0.0.1", "production_mail_host_shape"),
+            ("MAIL_HOST", "smtp.synthetic.test", "production_mail_host_shape"),
+            ("MAIL_HOST", "localhost", "production_mail_host_shape"),
+            ("MAIL_USERNAME", "", "production_mail_credentials_present"),
+            ("MAIL_USERNAME", "null", "production_mail_credentials_present"),
+            ("MAIL_PASSWORD", "", "production_mail_credentials_present"),
+            ("MAIL_FROM_ADDRESS", "not-an-address", "production_mail_sender_shape"),
+            ("MAIL_URL", "smtps://" + SENTINEL + "@smtp.synthetic-mail-provider.com", "production_mail_no_url_override"),
+        ]:
+            with self.subTest(key=key, value=value):
+                report = self.run_check(replace(self.real_mail(), key, value))
+                self.blocked(report, check)
+                self.assertNotIn(SENTINEL, json.dumps(report))
+        # Real mail admits neither live mode nor any test-commerce switch.
+        self.blocked(self.run_check(replace(self.real_mail(), "STRIPE_MODE", "live")), "baseline_stripe_mode")
+        self.blocked(self.run_check(replace(self.real_mail(), "STRIPE_TEST_CHECKOUT_ENABLED", "true")), "baseline_stripe_test_checkout_enabled")
+
+    def test_live_flag_admits_live_mode_only_and_requires_it(self):
+        self.assertEqual(self.run_check(self.live_stripe())["result"], "FILE_CHECKS_PASSED")
+        # With the flag the mode must be live: an explicit flag never leaves the mode ambiguous.
+        self.blocked(self.run_check(replace(self.live_stripe(), "STRIPE_MODE", "test")), "baseline_stripe_mode")
+        self.blocked(self.run_check(replace(self.live_stripe(), "MAIL_MAILER", "smtp")), "baseline_mail_mailer")
+        for key in ["STRIPE_WEBHOOK_ENABLED", "STRIPE_TEST_PAYMENT_PROCESSING_ENABLED", "VASEY_TEST_DELIVERY_ACCESS_ENABLED"]:
+            self.blocked(self.run_check(replace(self.live_stripe(), key, "true")), "baseline_" + key.lower())
+        self.blocked(self.run_check(replace(self.live_stripe(), "STRIPE_TEST_SECRET_KEY", SENTINEL)), "inactive_stripe_test_secret_key")
+        self.assertEqual(self.run_check(self.live_stripe(self.real_mail()))["result"], "FILE_CHECKS_PASSED")
+
+    def test_identity_smtp_values_stay_blank_unless_real_mail_is_admitted(self):
+        for part in ["HOST", "PASSWORD", "REVISION"]:
+            key = "PRODUCTION_IDENTITY_SMTP_" + part
+            with self.subTest(key=key):
+                report = self.run_check(replace(configured(), key, SENTINEL))
+                self.blocked(report, "inactive_" + key.lower())
+                self.assertNotIn(SENTINEL, json.dumps(report))
+                self.assertEqual(self.run_check(replace(self.real_mail(), key, SENTINEL))["result"], "FILE_CHECKS_PASSED")
+
+    def test_staging_admits_neither_production_flag(self):
+        explicit_false = replace(replace(staging(), self.REAL_MAIL, "false"), self.LIVE_STRIPE, "false")
+        self.assertEqual(self.staged(explicit_false)["result"], "FILE_CHECKS_PASSED")
+        for key in [self.REAL_MAIL, self.LIVE_STRIPE]:
+            for value in ["true", "", "TRUE"]:
+                with self.subTest(key=key, value=value):
+                    self.blocked(self.staged(replace(staging(), key, value)), "staging_no_" + key.lower())
+        self.blocked(self.staged(self.live_stripe(staging())), "baseline_stripe_mode")
+        self.blocked(self.staged(self.real_mail(staging())), "baseline_mail_mailer")
+
     def test_invalid_arguments_and_missing_file_are_safe_failures(self):
         self.blocked(self.run_check(arguments=["--runtime"]), "usage_template_or_absolute_env_file_with_optional_runtime")
         self.blocked(self.run_check(), "input_canonical_regular_file")

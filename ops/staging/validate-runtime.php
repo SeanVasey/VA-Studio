@@ -91,7 +91,7 @@ try {
         }
         $check('runtime.production_credentials', in_array(config('production_checkout.secret_key'), [null, ''], true)
             && in_array(config('production_checkout.funds_mode'), [null, ''], true));
-        // Capability profile (docs/verification/production-ops-kit-20261017, batch K3). The eleven flags and the two stated beside them must
+        // Capability profile (docs/verification/production-ops-kit-20261017, batch K3). The eleven flags and the four stated beside them must
         // be exactly false in the effective configuration: an absent line is fine (every config default is false), but true, "1", blank
         // and "yes" are refused, and so is a config key that no longer exists (null). VASEY_OPERATIVE_FREE_GRANTS_ENABLED and
         // CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED have no environment gate in their policy classes, so here and in the template

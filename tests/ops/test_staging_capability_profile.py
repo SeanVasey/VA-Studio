@@ -31,7 +31,8 @@ FLAGS = {
     "VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED": ("support-attachments", "fixture_enabled"),
 }
 # Stated explicitly but outside the eleven: production-lane or one-way, so never left to a default on staging.
-EXTRA_FALSE = ("DISCOVERY_SITEMAP_ENABLED", "VASEY_LISTENING_V2_PROMOTION_ENABLED")
+EXTRA_FALSE = ("DISCOVERY_SITEMAP_ENABLED", "VASEY_LISTENING_V2_PROMOTION_ENABLED", "VASEY_PRODUCTION_REAL_MAIL_ADMITTED",
+               "VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED")
 
 # Keys config/ reads that the kit deliberately leaves to Laravel's own defaults: cache and queue back ends the kit does not use
 # (it runs database cache, queue and session on one MySQL), providers it does not use (mail is log, no Postmark, Resend, Slack,
@@ -128,14 +129,18 @@ class TheTenFlagsAreExplicit(unittest.TestCase):
             text = source(f"config/{config}.php")
             self.assertRegex(text, rf"'{re.escape(key)}'\s*=>\s*env\('{flag}',\s*false\)", f"config/{config}.php {key}")
         for flag, (config, key) in {"DISCOVERY_SITEMAP_ENABLED": ("discovery-sitemap", "enabled"),
-                                    "VASEY_LISTENING_V2_PROMOTION_ENABLED": ("customer-listening", "v2_promotion_enabled")}.items():
+                                    "VASEY_LISTENING_V2_PROMOTION_ENABLED": ("customer-listening", "v2_promotion_enabled"),
+                                    "VASEY_PRODUCTION_REAL_MAIL_ADMITTED": ("production-runtime", "real_mail_admitted"),
+                                    "VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED": ("production-runtime", "live_stripe_admitted")}.items():
             self.assertRegex(source(f"config/{config}.php"), rf"'{key}'\s*=>\s*env\('{flag}',\s*false\)")
 
     def test_the_shared_boundary_declares_exactly_these_flags_under_these_config_keys(self):
         text = source("scripts/ops/capability-boundary.php")
         for constant, expected in (("CAPABILITY_FLAGS", {flag: f"{config}.{key}" for flag, (config, key) in FLAGS.items()}),
                                    ("ADDITIONAL_FLAGS", {"DISCOVERY_SITEMAP_ENABLED": "discovery-sitemap.enabled",
-                                                         "VASEY_LISTENING_V2_PROMOTION_ENABLED": "customer-listening.v2_promotion_enabled"})):
+                                                         "VASEY_LISTENING_V2_PROMOTION_ENABLED": "customer-listening.v2_promotion_enabled",
+                                                         "VASEY_PRODUCTION_REAL_MAIL_ADMITTED": "production-runtime.real_mail_admitted",
+                                                         "VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED": "production-runtime.live_stripe_admitted"})):
             block = re.search(rf"const {constant} = \[(.*?)\n    \];", text, re.S)
             self.assertIsNotNone(block, constant)
             self.assertEqual(dict(re.findall(r"'([A-Z0-9_]+)' => '([a-z-]+\.[a-z0-9_]+)'", block.group(1))), expected, constant)
