@@ -127,7 +127,7 @@
                     @endif
                 @endforeach
                 <table>
-                    <caption>Production checkout funnel (events in the period)</caption>
+                    <caption>Production checkout funnel (orders prepared; not split by funds mode, paid counts are in the tables above)</caption>
                     <tbody>
                     @foreach ($production['funnel'] as $metric => $count)
                         <tr><th scope="row">{{ str_replace('_', ' ', $metric) }}</th><td>{{ $count }}</td></tr>

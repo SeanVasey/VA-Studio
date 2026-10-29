@@ -69,6 +69,7 @@ class CustomerSegmentsTest extends TestCase
         $c5 = CustomerFixtures::account();      // no purchase, verified granted
         $c6 = CustomerFixtures::account();      // purchaser, granted, then the account email changed
         $c7 = CustomerFixtures::account();      // no purchase, withdrew then granted again: suppression record exists
+        $c8 = CustomerFixtures::account();      // verified granted, but the account was deactivated
         $o1 = CustomerFixtures::ready($c1['user'], 'ONE');
         $o1b = CustomerFixtures::ready($c1['user'], 'ONEB');
         $o2 = CustomerFixtures::ready($c2['user'], 'TWO');
@@ -79,6 +80,8 @@ class CustomerSegmentsTest extends TestCase
         $this->consent($c6, 'grant');
         $this->consent($c7, 'withdraw');
         $this->consent($c7, 'grant', 1);
+        $this->consent($c8, 'grant');
+        CustomerFixtures::withdraw($c8);
         User::whereKey($c6['user']->id)->update(['email' => 'moved-away@example.test']);
         $paid = fn (array ...$orders): int => array_sum(array_map(fn (array $o): int => $o['payment']->amount_minor, $orders));
 
@@ -88,10 +91,10 @@ class CustomerSegmentsTest extends TestCase
 
         $overview = app(CustomerSegments::class)->overview($this->admin);
         $this->assertTrue($overview['available']);
-        $this->assertSame(6, $overview['accounts']);
+        $this->assertSame(7, $overview['accounts']);
         $this->assertSame(['purchasers' => 3, 'repeat_purchasers' => 1, 'refunded_purchasers' => 0, 'no_purchase' => 3, 'marketing_email_eligible' => 2],
             array_map(fn (array $segment): ?int => $segment['count'], $overview['segments']));
-        $this->assertSame(['unknown' => 1, 'withdrawn' => 1, 'granted' => 2, 'granted_unverified' => 2], $overview['consent']);
+        $this->assertSame(['unknown' => 1, 'withdrawn' => 1, 'granted' => 3, 'granted_unverified' => 2], $overview['consent']);
 
         // Marketing: exactly the two verified accounts; unknown, withdrawn, stale-recipient and suppressed accounts are absent.
         $marketing = $this->csv('marketing_email_eligible');
@@ -102,7 +105,8 @@ class CustomerSegmentsTest extends TestCase
         sort($expected);
         $this->assertSame($expected, $references);
         $this->assertSame(['granted'], array_values(array_unique(array_column(array_slice($marketing['table'], 1), 4))));
-        foreach ([$c2, $c4, $c6, $c7] as $excluded) {
+        // c8 is verified granted but inactive: an inactive account is never marketed to and is not an active no-purchase account.
+        foreach ([$c2, $c4, $c6, $c7, $c8] as $excluded) {
             $this->assertStringNotContainsString($excluded['account']->public_id, $marketing['csv']);
         }
         $this->assertSame(['customer_reference', 'environment', 'segment', 'account_active', 'email_marketing_consent', 'orders', 'first_order_date_utc',
@@ -123,6 +127,7 @@ class CustomerSegmentsTest extends TestCase
         $noPurchase = $this->csv('no_purchase');
         $this->assertSame(['0||0'], array_values(array_unique(array_map(fn (array $row): string => $row[5].'|'.$row[8].'|'.$row[9], array_slice($noPurchase['table'], 1)))));
         $this->assertSame(3, $noPurchase['customers']);
+        $this->assertStringNotContainsString($c8['account']->public_id, $noPurchase['csv']);
 
         // Minimal fields: no contact data, names, access keys or order identifiers leave the application.
         foreach ([$marketing['csv'], $purchasers['csv'], $noPurchase['csv']] as $csv) {

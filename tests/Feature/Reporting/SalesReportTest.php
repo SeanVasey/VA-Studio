@@ -55,7 +55,7 @@ class SalesReportTest extends TestCase
         $a = DeliveryFixtures::ready($this->payments, true);
         $this->travelTo(CarbonImmutable::parse('2026-10-01 12:00:00', 'UTC'));
         $b = ReportingFixtures::single($this->payments, 'B');
-        $this->travelTo(CarbonImmutable::parse('2026-10-02 23:59:59', 'UTC'));
+        $this->travelTo(CarbonImmutable::parse('2026-10-03 00:00:00', 'UTC'));
         $c = ReportingFixtures::single($this->payments, 'C');
         $this->travelTo(CarbonImmutable::parse('2026-10-05 09:00:00', 'UTC'));
         $paid = fn (array $f): int => $f['payment']->amount_minor;
@@ -72,10 +72,12 @@ class SalesReportTest extends TestCase
         $this->assertSame(['USD' => ['orders' => 3, 'gross_minor' => $gross, 'refunded_minor' => 0, 'net_minor' => $gross, 'exception_orders' => 0, 'exception_gross_minor' => 0]],
             $month['test']['currencies']);
         $day = $this->report('2026-09-29', '2026-10-03', 'day');
-        $this->assertSame([['2026-09-30', $paid($a)], ['2026-10-01', $paid($b)], ['2026-10-02', $paid($c)]],
+        $this->assertSame([['2026-09-30', $paid($a)], ['2026-10-01', $paid($b)], ['2026-10-03', $paid($c)]],
             array_map(fn (array $row): array => [$row['period'], $row['gross_minor']], $day['test']['periods']));
-        // Half-open UTC day boundaries: the 23:59:59 order is on the 2nd and absent from a report that ends on the 1st.
-        $this->assertSame($paid($a) + $paid($b), $this->report('2026-09-30', '2026-10-01', 'day')['test']['currencies']['USD']['gross_minor']);
+        // Half-open UTC day boundaries: the order finalized exactly at midnight belongs to the 3rd, not to a report that ends on the 2nd
+        // (and a report starting on the 3rd has it), so adjacent periods never double count.
+        $this->assertSame($paid($a) + $paid($b), $this->report('2026-09-30', '2026-10-02', 'day')['test']['currencies']['USD']['gross_minor']);
+        $this->assertSame($paid($c), $this->report('2026-10-03', '2026-10-04', 'day')['test']['currencies']['USD']['gross_minor']);
         $this->assertSame([], $this->report('2026-08-01', '2026-08-31', 'month')['test']['currencies']);
 
         // Tier totals come from the hash-verified pricing evidence and equal the independent read of each verified original.

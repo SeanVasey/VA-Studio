@@ -5,13 +5,16 @@ namespace App\Domain\Reporting;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\Environment\TestEnvironment;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Staff-only, consent-aware segmentation of first-party customer accounts. Default-off (owner policy U-13).
  *
- * Scope: the first-party customer accounts and their retained test-chain orders. Production identity accounts are not
- * covered. The export reads no email address, name or order content: its fields are a pseudonymous account reference, the
+ * Scope: the first-party customer accounts and their retained test-chain orders. Accounts created by the production identity
+ * path are excluded. The export contains no email address, name or order content (the account's email is read only to verify
+ * the consent recipient binding and is never exported): its fields are a pseudonymous account reference, the
  * segment, the labelled marketing consent state and purchase aggregates in integer minor units per currency. The screen
  * shows counts only; rows leave the application only through the audited export. Marketing consent is never inferred: only
  * verified granted consent enters a marketing segment.
@@ -49,8 +52,8 @@ final class CustomerSegments
         $this->authority->staff($actor);
         $flags = self::flags();
         $base = ['flags' => $flags, 'environment' => self::ENVIRONMENT, 'available' => false, 'reason' => null, 'accounts' => null, 'segments' => [], 'consent' => [],
-            'notes' => ['Production identity accounts are not covered: that path is default-off and its policy is open (U-07, U-13).',
-                'No email address, name or order content is read. Marketing consent is never inferred from a purchase or an import.']];
+            'notes' => ['Accounts created by the production identity path are excluded: that path is default-off and its policy is open (U-07, U-13).',
+                'No email address, name or order content is exported (an account email is read only to verify a consent grant\'s recipient binding). Marketing consent is never inferred from a purchase or an import.']];
         if (! $flags['enabled']) {
             return ['reason' => 'Customer segmentation is off. Enable it only after the owner approves retention, consent purposes and processors (U-13).'] + $base;
         }
@@ -115,12 +118,12 @@ final class CustomerSegments
     private function population(): array
     {
         $cap = (int) config('reporting.customer_segments.account_cap');
-        ReportingException::require(DB::table('customer_accounts')->count() <= $cap, 'too_large');
-        $accounts = DB::table('customer_accounts')->orderBy('id')->get(['id', 'public_id', 'user_id', 'active'])->all();
+        ReportingException::require(self::syntheticAccounts()->count() <= $cap, 'too_large');
+        $accounts = self::syntheticAccounts()->orderBy('id')->get(['id', 'public_id', 'user_id', 'active'])->all();
         $account = TestEnvironment::admitsTestCommerce() ? ReportingQueries::testAccount() : null;
         $purchases = [];
         if ($account !== null) {
-            $rows = DB::table('customer_accounts as ca')->join('orders as o', 'o.owner_key', '=', 'ca.owner_key')
+            $rows = self::syntheticAccounts('ca')->join('orders as o', 'o.owner_key', '=', 'ca.owner_key')
                 ->join('order_finalizations as f', 'f.order_id', '=', 'o.id')->join('verified_payments as p', 'p.id', '=', 'f.verified_payment_id')
                 ->leftJoin('refund_dispute_observations as r', ReportingQueries::latestObserved(...))
                 ->where('f.mode', 'test')->where('f.outcome', 'paid')->where('p.mode', 'test')->where('p.account_id', $account)->whereColumn('p.order_id', 'o.id')
@@ -135,6 +138,21 @@ final class CustomerSegments
         $consent = (new CustomerConsentStatus)->forAccounts(array_column(array_map(fn (object $row): array => [(int) $row->id, (int) $row->user_id], $accounts), 1, 0));
 
         return ['accounts' => $accounts, 'purchases' => $purchases, 'consent' => $consent, 'purchases_available' => $account !== null];
+    }
+
+    /**
+     * The population this screen may label TEST: first-party accounts that were not created by the production identity path.
+     * Production identity enrolment (CompleteIdentity) inserts real customers into the same table and records an origin row for
+     * each; they are excluded here, and no segment over production customers exists until the owner decides U-07 and U-13.
+     */
+    private static function syntheticAccounts(string $alias = 'customer_accounts'): Builder
+    {
+        $query = DB::table($alias === 'customer_accounts' ? 'customer_accounts' : 'customer_accounts as '.$alias);
+        if (Schema::hasTable('production_identity_origins')) {
+            $query->whereNotExists(fn (Builder $origin) => $origin->selectRaw('1')->from('production_identity_origins as pio')->whereColumn('pio.account_id', $alias.'.id'));
+        }
+
+        return $query;
     }
 
     /** @return list<object>|null null when the segment cannot be evaluated truthfully */

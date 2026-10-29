@@ -14,7 +14,11 @@ class ReportingCsvTest extends TestCase
         foreach (['=HYPERLINK("http://example.invalid")', '+1+1', '-2+3', '@SUM(A1)', "\tcmd", "\rcmd"] as $text) {
             yield $text => [$text, "'".$text];
         }
+        foreach ([' =1+1', "\n=1+1", "  \n@SUM(A1)"] as $text) {
+            yield 'leading whitespace '.json_encode($text) => [$text, "'".$text];
+        }
         yield 'plain' => ['Standard lease', 'Standard lease'];
+        yield 'spaced word' => [' hello', ' hello'];
         yield 'inner equals' => ['a=b', 'a=b'];
         yield 'empty' => ['', ''];
         yield 'null' => [null, ''];

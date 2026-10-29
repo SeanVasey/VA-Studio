@@ -46,9 +46,14 @@ final class RefundDisputeCase
         public readonly array $original,
     ) {}
 
-    /** @param  array  $original  the verified original order payload (ReadOrder::verify) */
-    public static function load(Order $order, OrderFinalization $finalization, array $original): self
+    /**
+     * @param  array  $original  the verified original order payload (ReadOrder::verify)
+     * @param  bool  $forUpdate  writers keep the default and read under row locks after taking the Order row. Read-only
+     *                           reporting passes false: plain consistent reads, so it never waits on or blocks a writer.
+     */
+    public static function load(Order $order, OrderFinalization $finalization, array $original, bool $forUpdate = true): self
     {
+        $lock = static fn ($query) => $forUpdate ? $query->lockForUpdate() : $query;
         $payment = VerifiedPayment::findOrFail($finalization->verified_payment_id);
         $pricing = $original['pricing']['snapshot'] ?? null;
         RefundDisputeException::require($payment->order_id === $order->id && $payment->currency === 'USD' && is_array($pricing)
@@ -71,19 +76,19 @@ final class RefundDisputeCase
             && $grants->count() === count($lines), 'unavailable');
 
         $objects = [];
-        foreach (RefundDisputeObject::where('order_id', $order->id)->orderBy('id')->lockForUpdate()->get() as $object) {
+        foreach ($lock(RefundDisputeObject::where('order_id', $order->id)->orderBy('id'))->get() as $object) {
             $objects[$object->kind.':'.$object->object_hash] = $object;
         }
-        $latest = RefundDisputeObservation::where('order_id', $order->id)->orderByDesc('sequence')->lockForUpdate()->first();
-        $observed = RefundDisputeObservation::where('order_id', $order->id)->where('outcome', 'observed')
-            ->orderByDesc('sequence')->lockForUpdate()->first();
+        $latest = $lock(RefundDisputeObservation::where('order_id', $order->id)->orderByDesc('sequence'))->first();
+        $observed = $lock(RefundDisputeObservation::where('order_id', $order->id)->where('outcome', 'observed')
+            ->orderByDesc('sequence'))->first();
         $snapshot = $observed === null ? [] : self::snapshot($observed, $order, $objects);
         $allocations = [];
-        foreach (RefundLineAllocation::where('order_id', $order->id)->orderBy('id')->lockForUpdate()->get() as $allocation) {
+        foreach ($lock(RefundLineAllocation::where('order_id', $order->id)->orderBy('id'))->get() as $allocation) {
             RefundDisputeException::require(isset($lines[$allocation->order_line_id]) && $allocation->currency === 'USD', 'unavailable');
             $allocations[$allocation->refund_dispute_object_id][$allocation->order_line_id] = $allocation->amount_minor;
         }
-        $holds = RefundDisputeHold::where('order_id', $order->id)->whereNull('released_at')->orderBy('id')->lockForUpdate()->get()->all();
+        $holds = $lock(RefundDisputeHold::where('order_id', $order->id)->whereNull('released_at')->orderBy('id'))->get()->all();
 
         return new self($order, $finalization, $payment, $payment->amount_minor, 'USD', $lines, $objects, $snapshot,
             $latest, $observed, $allocations, $holds, $original);

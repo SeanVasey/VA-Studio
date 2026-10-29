@@ -40,7 +40,8 @@ final class SalesReport
         'Periods are UTC calendar days or months.',
         'Gross is the verified payment amount including any tax. Net is gross minus succeeded refunds.',
         'Test and production figures are never summed. Test figures are synthetic and are not revenue.',
-        'Paid exceptions are payments received without a license being granted; they are reported separately and are not in net.',
+        'Paid exceptions are payments received without a license being granted; they are reported separately and are not in net. A paid exception later refunded through exception resolution stays in the exception gross: no refund amount is recorded for it.',
+        'Net is gross minus succeeded refunds only. Lost disputes (chargebacks) are not deducted; they appear on the dashboard.',
         'The funnel counts events in the period, not a cohort, and applies no bot or replay filter: quotes include anonymous visitors.',
         'Membership billing, services, merchandise and the tax-calculated production checkout are not part of this report.',
     ];
@@ -123,8 +124,14 @@ final class SalesReport
                 }
                 foreach ($test['tiers']['unattributed_refund_minor'] as $currency => $amount) {
                     $rows[] = [self::ENVIRONMENTS['test'], 'unattributed_refund', null, $currency, null, null, null, null, null, null, $amount, null,
-                        'succeeded refund not allocated to a tier line'];
+                        'succeeded refund not attributed to a tier line: no line allocation recorded, or the order could not be read or verified (see the unreadable and unverified rows)'];
                 }
+                $rows[] = [self::ENVIRONMENTS['test'], 'tier_unverified_orders', null, null, null, null, $test['tiers']['unverified_orders'], null, null, null, null, null,
+                    'paid orders in the period totals but not in the tier rows because their pricing evidence did not verify'];
+                $rows[] = [self::ENVIRONMENTS['test'], 'tier_unreadable_refund_orders', null, null, null, null, $test['tiers']['unreadable_refund_orders'], null, null, null, null, null,
+                    'refunded orders whose refund case could not be read; their refunds are in the unattributed rows'];
+            } else {
+                $rows[] = [self::ENVIRONMENTS['test'], 'tiers_unavailable', null, null, null, null, null, null, null, null, null, null, (string) $test['tiers']['reason']];
             }
             foreach ($test['funnel']['counts'] as $metric => $count) {
                 $rows[] = [self::ENVIRONMENTS['test'], 'funnel', null, null, $metric, null, $count, null, null, null, null, null, null];
@@ -146,8 +153,9 @@ final class SalesReport
                     $rows[] = [$label, 'tier', null, 'USD', $row['tier'], $row['tier_type'], $row['lines'], $row['gross_minor'], null, null, null, null, 'on-time paid lines'];
                 }
             }
-            foreach (array_sum($production['funnel']) > 0 ? $production['funnel'] : [] as $metric => $count) {
-                $rows[] = ['PRODUCTION CHAIN (all funds modes)', 'funnel', null, null, $metric, null, $count, null, null, null, null, null, null];
+            if ($production['funnel']['orders_prepared'] > 0) {
+                $rows[] = ['PRODUCTION CHAIN (not split by funds mode)', 'funnel', null, null, 'orders_prepared', null, $production['funnel']['orders_prepared'], null, null, null, null, null,
+                    'orders are prepared before a funds mode is chosen; paid counts are in the period rows of each funds mode'];
             }
         }
 
@@ -280,9 +288,14 @@ final class SalesReport
         }
         foreach ($refunded as $entry) {
             try {
-                $order = Order::findOrFail($entry['order_id']);
-                $case = RefundDisputeCase::load($order, OrderFinalization::findOrFail($entry['finalization_id']), app(ReadOrder::class)->verify($order));
-                $byLine = $case->refundedByLine();
+                // Plain consistent reads in one snapshot transaction: no FOR UPDATE, so the report never waits on or blocks an A5
+                // writer (the ledger tables are not indexed by order for locking reads, which would lock whole tables).
+                $byLine = DB::transaction(function () use ($entry): array {
+                    $order = Order::findOrFail($entry['order_id']);
+
+                    return RefundDisputeCase::load($order, OrderFinalization::findOrFail($entry['finalization_id']), app(ReadOrder::class)->verify($order), forUpdate: false)
+                        ->refundedByLine();
+                });
             } catch (Throwable) {
                 $unreadable++;
                 $unattributed[$entry['currency']] = ($unattributed[$entry['currency']] ?? 0) + $entry['succeeded'];
@@ -394,8 +407,9 @@ final class SalesReport
                     'exception_gross_minor' => array_sum(array_column($section['periods'] ?? [], 'exception_gross_minor'))];
             }
             ksort($modes);
-            $funnel = ['orders_prepared' => DB::table('production_checkout_orders')->where('created_at', '>=', $period['startIso'])->where('created_at', '<', $period['endIso'])->count(),
-                'payments_on_time' => array_sum(array_column($modes, 'orders')), 'payments_after_expiry' => array_sum(array_column($modes, 'exception_orders'))];
+            // Only orders prepared can be counted without a funds mode (an order has none until its payment intent). Paid counts stay
+            // inside each funds-mode section; nothing here sums live and rehearsal figures.
+            $funnel = ['orders_prepared' => DB::table('production_checkout_orders')->where('created_at', '>=', $period['startIso'])->where('created_at', '<', $period['endIso'])->count()];
 
             return ['available' => true, 'reason' => null, 'modes' => $modes, 'funnel' => $funnel];
         } catch (Throwable $error) {

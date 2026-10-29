@@ -5,6 +5,7 @@ namespace Tests\Feature\Reporting;
 use App\Domain\Reporting\CustomerSegments;
 use App\Domain\Reporting\OperationalHealth;
 use App\Domain\Reporting\SalesReport;
+use App\Domain\Reporting\StaffReportingAuthority;
 use App\Filament\Pages\CustomerSegmentsPage;
 use App\Filament\Pages\SalesReportPage;
 use App\Filament\Widgets\CommerceAttentionWidget;
@@ -123,6 +124,32 @@ class ReportingAuthorityTest extends TestCase
         $this->assertTrue($retained->is_admin);
         $this->mfaRequired(false);
         $this->assertSame(0, AuditEvent::where('action', 'like', 'reporting.%')->count());
+    }
+
+    public function test_export_authority_rereads_enrollment_from_the_database_even_when_panel_mfa_is_optional(): void
+    {
+        // With optional panel MFA the shared MFA helper returns early, so only the exporter's own enrollment read can refuse a
+        // retained model whose enrollment was withdrawn.
+        $this->mfaRequired(false);
+        $admin = $this->staff(true);
+        $retained = User::find($admin->id);
+        User::whereKey($admin->id)->update(['app_authentication_secret' => null]);
+        $this->assertNotNull($retained->getAppAuthenticationSecret());
+        try {
+            app(StaffReportingAuthority::class)->exporter($retained);
+            $this->fail('exporter() accepted a retained model whose enrollment was withdrawn.');
+        } catch (AuthorizationException) {
+            $this->addToAssertionCount(1);
+        }
+        $this->assertSame($admin->id, app(StaffReportingAuthority::class)->exporter($this->staffEnrolledAgain($admin))->id);
+    }
+
+    private function staffEnrolledAgain(User $user): User
+    {
+        $fresh = User::findOrFail($user->id);
+        $fresh->saveAppAuthenticationSecret('JBSWY3DPEHPK3PXP');
+
+        return $fresh;
     }
 
     private function actingUserWithoutRow(): User

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Reporting;
 
 use App\Domain\Commerce\Operations\TestPaymentExceptionOperations;
+use App\Domain\Commerce\RefundResolution\ResolveRefundedTestException;
 use App\Domain\Reporting\OperationalHealth;
 use App\Domain\Reporting\SalesReport;
 use App\Filament\Pages\SalesReportPage;
@@ -60,7 +61,8 @@ class ProductionSeparationReportTest extends TestCase
 
     public function test_production_and_test_figures_are_separate_and_labelled_and_paid_exceptions_stay_out_of_net(): void
     {
-        $exception = RefundResolutionFixtures::exception(R::bind($this->app)[0]);
+        [$payments, $financial] = R::bind($this->app);
+        $exception = RefundResolutionFixtures::exception($payments);
         $paid = $exception['payment']->amount_minor;
         $day = $exception['record']->finalized_at->utc()->format('Y-m-d');
         $license = LicenseFixtures::published($this->admin);
@@ -89,13 +91,14 @@ class ProductionSeparationReportTest extends TestCase
             array_map(fn (array $row): array => array_diff_key($row, ['template_id' => 1]), $live['tiers']));
         $rehearsal = $production['modes']['rehearsal'];
         $this->assertSame(['PRODUCTION CHAIN (test funds, rehearsal)', 1, 1200], [$rehearsal['label'], $rehearsal['orders'], $rehearsal['gross_minor']]);
-        $this->assertSame(['orders_prepared' => 4, 'payments_on_time' => 3, 'payments_after_expiry' => 1], $production['funnel']);
+        // Orders have no funds mode until their payment intent, so only orders prepared is counted outside a mode section.
+        $this->assertSame(['orders_prepared' => 4], $production['funnel']);
 
         // The CSV labels every row's environment; production rows say refunds are not recorded.
         $rows = app(SalesReport::class)->csvRows($report);
         $environments = array_values(array_unique(array_column($rows, 0)));
         sort($environments);
-        $this->assertSame(['PRODUCTION (live funds)', 'PRODUCTION CHAIN (all funds modes)', 'PRODUCTION CHAIN (test funds, rehearsal)', 'TEST (synthetic, Stripe test mode)'], $environments);
+        $this->assertSame(['PRODUCTION (live funds)', 'PRODUCTION CHAIN (not split by funds mode)', 'PRODUCTION CHAIN (test funds, rehearsal)', 'TEST (synthetic, Stripe test mode)'], $environments);
         foreach ($rows as $row) {
             if (str_starts_with($row[0], 'PRODUCTION (live') && $row[1] === 'period') {
                 $this->assertSame('refunds are not recorded for production orders', $row[12]);
@@ -124,6 +127,15 @@ class ProductionSeparationReportTest extends TestCase
         $this->assertSame([[], 0], [$other['test']['currencies'], $health()['payment_exceptions']]);
         config(['payments.stripe.account_id' => $account]);
         $this->assertSame(1, $health()['payment_exceptions']);
+        // An exception that staff resolve after a verified full refund leaves the awaiting-review count, and, because no refund amount is
+        // recorded for exceptions, stays in the exception gross and out of net.
+        $financial->onInspect = RefundResolutionFixtures::fullRefund(...);
+        $resolver = app(ResolveRefundedTestException::class);
+        $this->assertSame('released', $resolver->resolve($exception['record']->public_id, $this->admin, (string) Str::uuid(),
+            $resolver->review($exception['record']->public_id, $this->admin)['sequence'])['status']);
+        $this->assertSame([0, 0], [$health()['payment_exceptions'], $health()['payment_exceptions_flagged']]);
+        $after = app(SalesReport::class)->build($this->admin, $day, $day, 'day')['test']['currencies']['USD'];
+        $this->assertSame([0, 0, 1, $paid], [$after['gross_minor'], $after['net_minor'], $after['exception_orders'], $after['exception_gross_minor']]);
         Schema::disableForeignKeyConstraints();
         Schema::drop('production_checkout_payments');
         $missing = app(SalesReport::class)->build($this->admin, $day, $day, 'day')['production'];
