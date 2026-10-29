@@ -81,6 +81,90 @@ final class HostedCheckout
         return $this->status($principal, $buyer, $orderId);
     }
 
+    /**
+     * Operator recovery for `vasey:production-checkout-reconcile` (lane PCC; the command also requires the composition gate).
+     * The same authoritative retrieval and the same persistence as reconcile(), without a buyer principal: nothing is projected
+     * to a buyer, so no buyer credential is needed, and the money observation is retained whatever the buyer's access state.
+     * Retrieval only: it never creates a Checkout Session or a PaymentIntent and never confirms a payment from anything but the
+     * retrieved session and PaymentIntent. A repeated run with unchanged provider state writes nothing (record() deduplicates
+     * the session binding, the payment and an unchanged observation); a provider failure appends at most one `uncertain`
+     * observation. The locator is used only while no session is bound, and HostedEvidence::session() refuses a session that
+     * does not belong to this order's intent.
+     *
+     * @return array{orderId: string, fundsMode: string, paymentStatus: string, outcome: ?string, checkoutStatus: ?string, observations: int}
+     */
+    public function operatorReconcile(string $orderId, ?string $verifiedLocator = null): array
+    {
+        self::requireOperator();
+        $prepared = CommandTransaction::run(function (Records $rows) use ($orderId): array {
+            self::requireOperator();
+            $order = OrderEvidence::order($rows, $rows->one('order', $orderId));
+            $intents = $rows->selector('intent', 'order_id = ?', [$order['row']['id']]);
+            CheckoutException::require(count($intents) === 1, 'intent_required');
+            $intent = HostedEvidence::intent($rows, $order, $intents[0]);
+            OrderEvidence::proveRetained($rows, $order['raw']);
+            HostedEvidence::proveRetained($rows, $intent['raw']);
+
+            return compact('order', 'intent');
+        });
+        $context = $prepared['order']['context'];
+        $origin = HostedEvidence::requireGateway($this->gateway, $context);
+        $bound = $prepared['intent']['session']['provider_session_id'] ?? null;
+        $sessionId = $bound ?? $verifiedLocator;
+        CheckoutException::require(OwnAccountStripeGateway::sessionId($sessionId, $context->fundsMode), 'locator_required');
+        CheckoutException::require($verifiedLocator === null || $bound === null || $verifiedLocator === $bound, 'locator_mismatch');
+        try {
+            $session = $this->gateway->retrieve($context, $sessionId);
+            $safe = HostedEvidence::session($session, $prepared['intent']['body']);
+            $payment = $safe['payment_intent_id'] === null ? null : $this->gateway->paymentIntent($context, $safe['payment_intent_id']);
+            HostedEvidence::financial($session, $payment, $prepared['intent']['body']);
+            $observed = CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z');
+            $this->record($prepared['intent']['row']['public_id'], $session, $payment, $origin, $observed);
+        } catch (Throwable) {
+            $this->uncertain($prepared['intent']['row']['public_id']);
+            throw new CheckoutException('provider_uncertain', 503);
+        }
+
+        return $this->operatorStatus($orderId);
+    }
+
+    /** Retained-evidence summary for the operator: identifiers and states only, no buyer, session URL or provider body. */
+    public function operatorStatus(string $orderId): array
+    {
+        self::requireOperator();
+
+        return CommandTransaction::run(function (Records $rows) use ($orderId): array {
+            $order = OrderEvidence::order($rows, $rows->one('order', $orderId));
+            $records = $rows->selector('intent', 'order_id = ?', [$order['row']['id']]);
+            CheckoutException::require(count($records) <= 1);
+            $result = ['orderId' => $order['row']['public_id'], 'fundsMode' => $order['context']->fundsMode, 'paymentStatus' => 'unverified',
+                'outcome' => null, 'checkoutStatus' => null, 'observations' => 0];
+            if ($records !== []) {
+                $intent = HostedEvidence::intent($rows, $order, $records[0]);
+                $result['observations'] = count($intent['observations']);
+                if ($intent['payment'] !== null) {
+                    $result['paymentStatus'] = 'verified';
+                    $result['outcome'] = $intent['payment']['outcome'];
+                }
+                if ($intent['last'] !== null) {
+                    $result['checkoutStatus'] = $intent['last']['kind'] === 'uncertain' ? 'unknown'
+                        : HostedEvidence::session($intent['last']['detail']['session'], $intent['body'])['status'];
+                }
+                HostedEvidence::proveRetained($rows, $intent['raw']);
+            }
+            OrderEvidence::proveRetained($rows, $order['raw']);
+
+            return $result;
+        });
+    }
+
+    /** Both explicit switches; provider I/O is the gateway's own refusal and the composition gate is the command's. */
+    private static function requireOperator(): void
+    {
+        CheckoutException::require(config('production_checkout.operator_reconciliation_enabled') === true
+            && config('production_checkout.reconciliation_enabled') === true, 'disabled', 503);
+    }
+
     private function prepare(ProductionCustomerPrincipal $principal, User $buyer, string $orderId, bool $create): array
     {
         return CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $orderId, $create): array {
