@@ -21,8 +21,14 @@ class ProductionEnvironmentTemplateTest extends TestCase
         'production-memberships', 'member-grants', 'free-grants', 'refund-resolution', 'refund-dispute', 'unpaid-release', 'transactional-notifications'];
 
     /** Family config read in code only. Activation is a reviewed code change, never an environment switch. */
-    private const CODE_LITERAL_FAMILY = ['customer-suppression', 'production-customer-identity', 'production-identity-smtp',
+    private const CODE_LITERAL_FAMILY = ['customer-suppression', 'production-customer-identity',
         'production-memberships', 'member-grants'];
+
+    /**
+     * Family config whose activation is still a code literal but whose values come from the environment (lane PCC): the
+     * environment can supply settings, never select or enable them. Each file is pinned in its own test below.
+     */
+    private const LITERAL_ACTIVATION_FAMILY = ['production-identity-smtp'];
 
     /**
      * Framework/other keys not yet documented in .env.example (recorded 2026-10-07). Shrink-only: a new
@@ -192,6 +198,54 @@ class ProductionEnvironmentTemplateTest extends TestCase
         foreach ($shared as $key => $value) {
             $this->assertSame($host[$key], $value, $key.' differs between the production and private-server templates.');
             $this->assertContains($key, self::familyKeys(), $key.' is a host baseline key; keep it only in '.self::HOST_TEMPLATE.'.');
+        }
+    }
+
+    public function test_identity_smtp_activation_is_a_code_literal_and_the_environment_never_enables_it(): void
+    {
+        $template = file_get_contents(self::path(self::TEMPLATE));
+        foreach (self::LITERAL_ACTIVATION_FAMILY as $name) {
+            $this->assertStringContainsString('config/'.$name.'.php', $template, $name.' is not described in the template.');
+        }
+        $path = self::path('config/production-identity-smtp.php');
+        $source = file_get_contents($path);
+        $this->assertSame(1, substr_count($source, '$enabled = false;'));
+        $this->assertSame(1, preg_match_all('/\$enabled\s*=(?!=)/', $source), 'The activation literal is assigned exactly once.');
+        $this->assertStringContainsString("'enabled' => \$enabled,", $source);
+        $this->assertStringContainsString("'settings' => \$enabled === true ? \$settings() : null,", $source);
+        // No environment key decides activation: every env() read sits inside the settings closure.
+        $this->assertStringNotContainsString('env(', substr($source, 0, (int) strpos($source, '$settings = static function')));
+        $this->assertStringNotContainsString('env(', substr($source, (int) strpos($source, 'return [', (int) strpos($source, '};'))));
+        $keys = ['HOST' => 'smtp.synthetic-provider.com', 'PORT' => '465', 'SECURITY' => 'implicit_tls', 'SENDER' => 'support@vasey.audio',
+            'HELLO' => 'vasey.audio', 'USERNAME' => 'synthetic-user', 'PASSWORD' => 'SyntheticOnly', 'REVISION' => '11111111-1111-4111-8111-111111111111'];
+        try {
+            foreach ($keys as $key => $value) {
+                putenv('PRODUCTION_IDENTITY_SMTP_'.$key.'='.$value);
+                $_ENV['PRODUCTION_IDENTITY_SMTP_'.$key] = $_SERVER['PRODUCTION_IDENTITY_SMTP_'.$key] = $value;
+            }
+            putenv('PRODUCTION_IDENTITY_SMTP_ENABLED=true');
+            // Every value set, the shipped literal still composes nothing.
+            $this->assertSame(['enabled' => false, 'settings' => null], require $path);
+            // With the literal flipped (a reviewed code change) the values compose one closed production capsule.
+            $flipped = tempnam(sys_get_temp_dir(), 'vasey-smtp-');
+            file_put_contents($flipped, str_replace('$enabled = false;', '$enabled = true;', $source));
+            try {
+                $this->assertSame(['enabled' => true, 'settings' => ['mode' => 'production', 'host' => $keys['HOST'], 'port' => 465,
+                    'security' => $keys['SECURITY'], 'sender' => $keys['SENDER'], 'hello' => $keys['HELLO'], 'username' => $keys['USERNAME'],
+                    'password' => $keys['PASSWORD'], 'revision' => $keys['REVISION']]], require $flipped);
+                foreach (['46S', '0', '+465', '465.0'] as $port) {
+                    putenv('PRODUCTION_IDENTITY_SMTP_PORT='.$port);
+                    $_ENV['PRODUCTION_IDENTITY_SMTP_PORT'] = $_SERVER['PRODUCTION_IDENTITY_SMTP_PORT'] = $port;
+                    $this->assertSame($port, (require $flipped)['settings']['port'], 'A non-integer port stays a string and is refused.');
+                }
+            } finally {
+                unlink($flipped);
+            }
+        } finally {
+            foreach ([...array_keys($keys), 'ENABLED'] as $key) {
+                putenv('PRODUCTION_IDENTITY_SMTP_'.$key);
+                unset($_ENV['PRODUCTION_IDENTITY_SMTP_'.$key], $_SERVER['PRODUCTION_IDENTITY_SMTP_'.$key]);
+            }
         }
     }
 

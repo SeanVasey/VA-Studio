@@ -185,6 +185,13 @@ class ProductionRuntimeValidator(unittest.TestCase):
             with self.subTest(key=key):
                 self.failed(self.validate(base + f"{key}=true\n"), "holds." + key.lower())
 
+    def test_identity_smtp_values_need_the_real_mail_flag_and_settings_need_it_too(self):
+        self.failed(self.validate(profile(PRODUCTION_IDENTITY_SMTP_PASSWORD=SENTINEL)), "preflight.inactive_production_identity_smtp_password")
+        self.assertEqual(self.validate(profile(**self.REAL_MAIL, PRODUCTION_IDENTITY_SMTP_PASSWORD=SENTINEL)).returncode, 0)
+        # Composed settings exist only once the code literal is flipped; the hold then still needs the real mail flag.
+        self.assertIn("$check('holds.production_identity_smtp', $realMail || config('production-identity-smtp.settings') === null);",
+                      VALIDATOR.read_text())
+
     def test_a_malformed_flag_admits_nothing(self):
         for value in ("TRUE", "1", "yes", "", "(true)"):
             with self.subTest(value=value):

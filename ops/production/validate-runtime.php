@@ -223,6 +223,8 @@ try {
                 && in_array(config('production_checkout.funds_mode'), [null, '', 'live'], true)
             : in_array(config('production_checkout.secret_key'), [null, ''], true)
                 && in_array(config('production_checkout.funds_mode'), [null, ''], true));
+        // Production identity SMTP composes settings only from its reviewed code literal, and only with real mail admitted.
+        $check('holds.production_identity_smtp', $realMail || config('production-identity-smtp.settings') === null);
         // The admissions as the application reads them must be the file's. MAIL_MAILER and STRIPE_MODE stay the preflight's.
         $check('runtime.production_admissions', config('production-runtime.real_mail_admitted') === $realMail
             && config('production-runtime.live_stripe_admitted') === $liveStripe);
