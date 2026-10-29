@@ -116,6 +116,7 @@
     "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
     "tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php",
     "tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php",
+    "tests/Feature/ProductionMembershipBilling/MembershipCustomerIndexAvailabilityTest.php",
     "tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
     "tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php",
     "tests/Feature/ProductionMembershipBilling/MembershipHistoryFinishBoundaryTest.php",
