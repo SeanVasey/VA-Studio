@@ -72,7 +72,7 @@ customer data export/deletion routes (lane CX).
 `tests/Feature/Reporting/*` (SQLite for logic, the files listed in `database-mysql-selection.json` on native MySQL), plus the four
 CI safeguards and `composer validate --strict`. Mutation tests for the authority gates, refund netting and consent filter.
 
-## Final results (2026-10-29)
+## Final results (2026-10-29), as first finished at `2162703c`; see "Results after the review fixes" below for the current figures
 
 Supersedes the 2026-10-26 handoff status (the Codex handoff was cancelled and the lane finished here). Branch
 `harness/reporting-rep-20261024`, merged head `2162703c` (merges `origin/main` `a8f17e5c`, which is `dd587603` plus docs-only handoff
@@ -114,7 +114,7 @@ tier refunds from raw allocation sums; order refunds counting every observation 
 rehearsal funds merged into live; consent: any grant verified, suppression ignored, recipient change ignored, notice binding ignored;
 marketing segment admitting unknown; export ignoring the disabled flag; export adding an email column; unreadable queue shown as zero;
 widget and page entry points unauthorized together with the read model; unscoped test account.
-Survived (3, by design): M4 (retained user model: the gate and MFA helper re-read the user themselves, so equivalent), M16 (removes only
+Survived (3, by design; the review showed M4 was not equivalent and it is now killed, see the resolution below): M4 (retained user model), M16 (removes only
 the redundant consent assertion on export rows; the primary filter remains and M15 kills it), M23/M24 (remove only the widget `canView`
 or the page `boot`/`canAccess` layer; the read model still refuses, so these are defence in depth).
 
@@ -131,3 +131,55 @@ or the page `boot`/`canAccess` layer; the read model still refuses, so these are
 SQLite: `env APP_ENV=testing APP_DEBUG=false APP_KEY=base64:$(head -c32 /dev/zero | base64) DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync CI=true GITHUB_ACTIONS=true PAO_DISABLE=1 php -d memory_limit=512M -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' -- --colors=never --fail-on-phpunit-warning tests/Feature/Reporting tests/Unit/ReportingCsvTest.php`
 (a real `vendor/` for this lock file, no `public/build`). Native: the same with `DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=<free> DB_SOCKET= DB_DATABASE=vaseyaudio_x DB_USERNAME=root DB_PASSWORD=<private> VA_LOCAL_DISPOSABLE_MYSQL=vaseyaudio_x`
 against a private MySQL 8.4 on its own datadir, one file per run. Selection: `python3 scripts/ci/phpunit-shards.py --shards=24 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection`, then delete `phpunit-ci-mysql-*`.
+
+## Independent review and resolution (2026-10-29)
+
+Review of `ebdc9ca4`: [independent-rep-review-ebdc9ca4-DECISION.md](independent-rep-review-ebdc9ca4-DECISION.md), APPROVE WITH CONDITIONS, no
+P0 or P1. All findings were fixed or documented before the PR; the fix commits are on this branch after `ebdc9ca4`
+(`d5f29a1c` code and tests, `535ee73d` lock-probe correction, plus the docs commit that records the final results).
+
+| Finding | Resolution |
+| --- | --- |
+| P2-2 report took `FOR UPDATE` reads (whole-table lock scope on MySQL, wait, silent mislabel) | Fixed. `RefundDisputeCase::load()` gained `bool $forUpdate = true` (writers unchanged); the report calls it with `forUpdate: false` inside a snapshot transaction. `SalesReportLockFreeTest` (every engine: no locking statement in a report or export; native MySQL: a second session holding the order's A5 ledger locks neither delays the report (under 1.5 s with a 2 s lock timeout) nor changes its figures, and `performance_schema.data_locks` shows no lock for the report's thread, with a positive control). Mutant L1 (locking again) is killed on native MySQL (on SQLite the grammar drops `FOR UPDATE`, so there it survives by construction). The CSV now has `tier_unverified_orders`, `tier_unreadable_refund_orders` and `tiers_unavailable` rows and an accurate unattributed note. The missing `refund_line_allocations(order_id)` index is a follow-up (no migration in this lane). |
+| P2-1 segments read production identity accounts and labelled them TEST | Fixed. Accounts with a `production_identity_origins` row are excluded from the population, the purchase join and the caps. `CustomerSegmentsEdgeTest` inserts an account with an origin row and asserts it is absent from counts, consent distribution and every export. Docs corrected. |
+| P3-1 M4 not equivalent | Fixed. `test_export_authority_rereads_enrollment_from_the_database_even_when_panel_mfa_is_optional` kills M4; the earlier claim that M4 is equivalent was wrong and is withdrawn. |
+| P3-2 K4, K5, K6, K13, K15 | Tests added, all five killed (see mutants). No code defect was exposed. K7 and K9 stay surviving by design (the consent write path and insert guards make them unreachable). |
+| P3-3 production funnel summed funds modes | Fixed. The production funnel now carries only `orders_prepared`, labelled as not split (an order has no funds mode until its payment intent); paid counts live inside each funds-mode section. |
+| P3-4 net excludes lost disputes; refunded paid exceptions stay in exception gross | Documented on the page, in the CSV notes and in `docs/staff-reporting.md`; a test pins the refunded-exception behaviour (resolved through the real exception resolution flow). |
+| P3-5 claim that no email is read | Corrected in the docs, code comments and page notes: the account email is read only to verify a grant's recipient binding and is never exported. |
+| P3-6 unindexed scans, segments recompute per change | Deferred, documented under Known limits in `docs/staff-reporting.md`. |
+| P3-7 CSV leading whitespace and newline before a formula character | Fixed in `ReportingCsv::cell()` (look past leading spaces and line feeds) with unit cases. Full-width formula characters remain un-neutralised (documented). |
+
+### Results after the review fixes (2026-10-29, tested code `d5f29a1c`, lock probe corrected in `535ee73d`)
+
+Native MySQL 8.4.11 (private mysqld, own datadir, port 3417, `ONLY_FULL_GROUP_BY`), one file per run:
+
+| File | Result |
+| --- | --- |
+| SalesReportLockFreeTest (new) | OK, 1 test, 11 assertions |
+| ReportingAuthorityTest | OK, 4 tests, 90 assertions |
+| SalesReportTest | OK, 1 test, 47 assertions |
+| CustomerSegmentsEdgeTest (new) | OK, 2 tests, 14 assertions |
+| CustomerSegmentsTest | OK, 2 tests, 111 assertions |
+| RefundNettingReportTest | OK, 1 test, 31 assertions (tiers through the non-locking read) |
+| ProductionSeparationReportTest | OK, 1 test, 29 assertions |
+
+`OperationalHealthTest` was not re-run natively: nothing it exercises changed since the passing run at `2162703c`. The first run of
+the new lock test passed every native assertion (no locking SQL, no wait, unchanged figures, zero locks for the report's thread) and
+failed only its positive control, which probed by transaction id; it now probes by thread and passes.
+
+SQLite at `d5f29a1c`: `tests/Feature/Reporting` plus `tests/Unit/ReportingCsvTest.php` 31 tests, 426 assertions; the A5 suites
+(`tests/Feature/RefundDispute`, `RefundDisputeStateTest`) 34 tests, 495 assertions, 4 skipped native census methods as before;
+regression sample (FoundationTest, LicensingAdminTest, TestCommerceOperationsTest, CustomerIdentityHttpTest, CustomerRefundResolutionTest)
+75 tests, 755 assertions. Safeguards 52, 27, 14, 53 OK; `composer validate --strict` valid. Native selection regenerated:
+**2593 cases in 257 files of 9805 discovered** (two files and four selected cases added: SalesReportLockFreeTest, CustomerSegmentsEdgeTest,
+plus one new case in ReportingAuthorityTest); the count comments in both CI files are updated. No census skip was added.
+
+Mutants added for the review findings, SQLite, killed: M4 (retained model), K4 (paid exceptions as purchases), K5 (segment refunds
+ignored), K6 (inactive account in marketing), K13 (resolved exceptions counted as awaiting), K15 (inclusive period end), P1 (production
+accounts not excluded), C1 (leading whitespace in CSV), C2 (CSV omits the unreadable count). L1 (the report locks rows again) is
+killed on native MySQL by `SalesReportLockFreeTest` (assertion on the executed SQL, run at `535ee73d`); on SQLite it survives because
+Laravel's SQLite grammar emits no `FOR UPDATE`, so the native run is the proof.
+
+Not re-run natively: the A5 writer suites. `RefundDisputeCase::load()` keeps its locking behaviour for every existing caller (the new
+parameter defaults to true), and the A5 suites pass on SQLite, but a native A5 pass belongs to the PR's final verification.
