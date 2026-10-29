@@ -24,7 +24,7 @@ use Throwable;
  * can rehearse catalog → player → quote → Stripe test checkout → verified payment → contract → download before real
  * tracks exist. Default off. It refuses when the configured or running environment is production or the two differ,
  * outside local, testing and staging, unless Stripe is in test mode, and on a catalog that already holds non-synthetic
- * published tracks or approved licenses. Writes need both staff passwords at hidden prompts in an interactive console.
+ * published tracks or approved licenses. Writes need both staff passwords at hidden prompts in an interactive session; the command checks `--no-interaction`, not that standard input is a terminal, so a piped password is accepted and the confirmed passwords are the gate.
  */
 final class StagingSyntheticCatalog extends Command
 {
@@ -45,6 +45,9 @@ final class StagingSyntheticCatalog extends Command
     /** Audit rows of the attestations this invocation recorded, so a later stop does not imply that nothing changed. */
     private array $attestationAuditIds = [];
 
+    /** True once the write phase began (the run lock is held); before it nothing can have been written. */
+    private bool $writeStarted = false;
+
     public function handle(SyntheticRehearsalPolicy $policy, SyntheticRehearsalBuilder $builder): int
     {
         try {
@@ -52,8 +55,11 @@ final class StagingSyntheticCatalog extends Command
         } catch (Throwable $error) {
             // No message, path or trace leaves the console; the log keeps only the exception class.
             Log::warning('Synthetic rehearsal catalog could not confirm the result.', ['exception_class' => $error::class]);
-            $this->error('Stopped: the result is unconfirmed. Re-run the command to resume; finished steps are kept and nothing is duplicated.'
-                .$this->attestationNote());
+            // Before the write phase there is nothing to resume, so the resume wording would be false for --check and for an
+            // admission or password failure.
+            $this->error($this->writeStarted
+                ? 'Stopped: the result is unconfirmed. Re-run the command to resume; finished steps are kept and nothing is duplicated.'.$this->attestationNote()
+                : 'Stopped: the command could not complete before its write phase began, so nothing was written. Re-run it.');
 
             return self::FAILURE;
         }
@@ -84,7 +90,7 @@ final class StagingSyntheticCatalog extends Command
             return self::SUCCESS;
         }
         if (! $this->input->isInteractive()) {
-            return $this->refuse('Synthetic catalog writes require an interactive trusted console to confirm both staff passwords.');
+            return $this->refuse('Synthetic catalog writes require an interactive session (not --no-interaction) to confirm both staff passwords at hidden prompts.');
         }
         // Both accounts act in this run, so each password is confirmed. One shell still drives both accounts.
         if (! $this->confirmed($operator, self::OPERATOR_PROMPT) || ! $this->confirmed($reviewer, self::REVIEWER_PROMPT)) {
@@ -98,6 +104,7 @@ final class StagingSyntheticCatalog extends Command
         if (! $lock->get()) {
             return $this->refuse('Another synthetic catalog run holds the lock.');
         }
+        $this->writeStarted = true;
         try {
             if ($this->option('attest')) {
                 $this->attest($operator, $reviewer);

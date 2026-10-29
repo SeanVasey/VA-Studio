@@ -18,7 +18,7 @@ VALIDATOR = REPO / "ops/production/validate-runtime.php"
 PHP = os.environ.get("PHP_BIN") or shutil.which("php8.4") or shutil.which("php")
 SENTINEL = "SyntheticPrivateRuntimeMarker1247"
 HOST = "shop.synthetic.invalid"
-# Pre-launch hold (Sean, 2026-10-18): environment key => config key, as ops/production/validate-runtime.php states them.
+# Pre-launch hold (Sean, 2026-10-18): environment key => config key. The validator names the keys; the boundary supplies the config keys.
 PRE_LAUNCH_HOLDS = {
     "VASEY_OPERATIVE_FREE_GRANTS_ENABLED": "free-grants.operative_enabled",
     "CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED": "inquiries.operator_notifications_enabled",
@@ -233,19 +233,31 @@ class ProductionRuntimeValidator(unittest.TestCase):
         self.failed(run, "holds.vasey_listening_v2_promotion_enabled")
         self.assertNotIn("preflight.", run.stderr)
 
-    def test_the_hold_keys_agree_with_the_staging_capability_boundary(self):
+    def test_the_hold_keys_are_the_shared_capability_boundary_entries(self):
+        # The validator names only the four environment keys; each config key comes from scripts/ops/capability-boundary.php,
+        # the definition the staging deploy gate and the profile validator also read, so there is no second copy to drift.
         text = VALIDATOR.read_text()
         block = re.search(r"const PRE_LAUNCH_HOLDS = \[(.*?)\n\];", text, re.S)
         self.assertIsNotNone(block, "PRE_LAUNCH_HOLDS constant block not found")
-        pairs = dict(re.findall(r"'([A-Z0-9_]+)' => '([a-z0-9_.-]+)',", block.group(1)))
-        self.assertEqual(pairs, PRE_LAUNCH_HOLDS)
-        # The staging boundary is the other definition of the same env key => config key map; read it by running PHP.
+        self.assertNotIn("=>", block.group(1), "the hold list must name environment keys only, not restate config keys")
+        names = re.findall(r"'([A-Z0-9_]+)',", block.group(1))
+        self.assertEqual(names, list(PRE_LAUNCH_HOLDS))
+        # The boundary is read by running PHP: it must hold every named key, with the config key the hold is expected to read.
         script = ("require $argv[1]; echo json_encode(array_intersect_key(Vasey\\Ops\\CapabilityBoundary::stagedFlags(), "
                   "array_flip(array_slice($argv, 2))));")
         run = subprocess.run([PHP, "-r", script, str(REPO / "scripts/ops/capability-boundary.php"), *PRE_LAUNCH_HOLDS],
                              capture_output=True, text=True, timeout=60)
         self.assertEqual(run.returncode, 0, run.stderr)
-        self.assertEqual(json.loads(run.stdout), pairs)
+        self.assertEqual(json.loads(run.stdout), PRE_LAUNCH_HOLDS)
+
+    def test_the_consumer_reads_the_boundary_and_fails_closed_without_it(self):
+        # Pin the consumer side: the boundary file is required (a missing or linked file is runtime.unavailable, never a skip),
+        # the map is derived from CapabilityBoundary::stagedFlags(), a key the boundary lost throws, and no config key is restated.
+        text = VALIDATOR.read_text()
+        self.assertRegex(text, r"\$boundary = \$root\.'/scripts/ops/capability-boundary\.php';\s*if \(! is_file\(\$boundary\) \|\| is_link\(\$boundary\)\) \{\s*throw new RuntimeException;\s*\}\s*require_once \$boundary;")
+        self.assertRegex(text, r"\$holdKeys = array_intersect_key\(CapabilityBoundary::stagedFlags\(\), array_flip\(PRE_LAUNCH_HOLDS\)\);\s*if \(count\(\$holdKeys\) !== count\(PRE_LAUNCH_HOLDS\)\) \{\s*throw new RuntimeException;")
+        for config_key in PRE_LAUNCH_HOLDS.values():
+            self.assertNotIn(f"'{config_key}'", text, f"{config_key} must come from the boundary, not be restated")
 
     def test_the_hold_config_keys_exist_with_a_false_default(self):
         # A renamed or removed config key would read null and fail closed in the validator; this proves they exist today.
@@ -257,7 +269,7 @@ class ProductionRuntimeValidator(unittest.TestCase):
     def test_the_effective_configuration_must_be_strictly_false(self):
         # Pin its shape: it iterates the same constant and compares with ===, so null (a missing key) fails closed.
         text = VALIDATOR.read_text()
-        self.assertRegex(text, r"foreach \(PRE_LAUNCH_HOLDS as \$name => \$key\) \{\s*\$check\('holds\.'\.strtolower\(\$name\), config\(\$key\) === false\);")
+        self.assertRegex(text, r"foreach \(\$holdKeys as \$name => \$key\) \{\s*\$check\('holds\.'\.strtolower\(\$name\), config\(\$key\) === false\);")
 
     def test_the_effective_configuration_refuses_what_the_file_check_admits(self):
         # Interpolation reaches the configuration layer alone: in the file, `${PATH}` resolves to the file's own `PATH=false`, so

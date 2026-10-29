@@ -146,6 +146,8 @@ Repo-specific facts and invariants. §1–§12 stay byte-identical across repos;
 
 ### Current user-authorized handoff — October 7, 2026
 
+**Current (2026-10-26):** the Claude harness handed the remaining work to Codex at main `dd587603` (PR #174) because of usage limits. Read `docs/handoff/2026-10-26/CODEX-HANDOFF.md` first; lanes F9, CX and REP are pushed work-in-progress branches, and PCC has not started.
+
 **Superseded for current work (2026-10-17):** the Codex session stopped after merging PR #132, and the Claude Code harness resumed the lead. Read `docs/handoff/2026-10-17/RESUMPTION.md` first, then the October 15 agenda. The October 11 Codex handoff is history: PR #96 merged as `92f940cc` after its rejection was fixed and re-reviewed (`docs/handoff/2026-10-12/CODEX-CHECKPOINT.md`).
 
 Read `docs/handoff/2026-10-07/CLAUDE-PLAN.md` first (plan, lane protocol, state ledger), then `docs/handoff/2026-10-07/README.md` and its branch inventory. Sean requested completion/push of current development batches and handoff of remaining implementation to another harness. Preserve reviewed main, unfinished branches, original failures and immutable originals as separately attributed source.
