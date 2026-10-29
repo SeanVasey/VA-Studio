@@ -327,7 +327,9 @@ final class CustomerDataRights
 
     private function event(CustomerDataRequest $request, string $event, ?User $actor, array $detail, CarbonImmutable $at): void
     {
-        $sequence = (int) CustomerDataRequestEvent::where('request_id', $request->id)->max('sequence') + 1;
+        // A locking read: under REPEATABLE READ a plain MAX() can come from a snapshot taken before this transaction waited for the
+        // customer locks, and miss events another transaction committed meanwhile (an export prepared while an approval waited).
+        $sequence = (int) CustomerDataRequestEvent::where('request_id', $request->id)->lockForUpdate()->max('sequence') + 1;
         $encoded = CanonicalJson::encode($detail);
         CustomerDataRequestEvent::create(['request_id' => $request->id, 'sequence' => $sequence, 'event' => $event,
             'actor_user_id' => $actor?->id, 'detail' => $encoded, 'detail_hash' => hash('sha256', $encoded), 'created_at' => $at]);
