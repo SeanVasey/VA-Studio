@@ -419,3 +419,13 @@ F2a final separate review at `e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08`: **APPRO
 2026-10-26 Handoff to Codex at main `dd587603` (Sean, usage limits): lanes F9, CX and REP pushed as work-in-progress branches with a status-at-handoff section in each packet; PCC not started. Entry point: `docs/handoff/2026-10-26/CODEX-HANDOFF.md`.
 
 2026-10-29 Lane CX (FP-005, FP-075, FP-082) resumed after the cancelled Codex handoff and verified on merged head `0bd4519c` (main `a8f17e5c` merged into branch `harness/customer-comms-cx-20261024`; fixes `dce310cd`). The work is default-off: site content schema v5 legal pages (`/legal/{privacy,terms,licenses}` only from a published release), customer data export and deletion (approval refuses while U-13 retention is unset), and an order-ready mail adapter (refuses without a sender, SMTP mailer and a passing preflight receipt). The `PRIVACY.md` §8 encryption wording is corrected. Results: native MySQL 8.4.11 13/13; SQLite 55 files, 1,025 tests, 82 census skips, no failures; `tsc` 0; vitest 1,177; safeguards 52/27/14/53 plus receipts 61; mutations M1–M16 killed. Census 306 (main first), selection 2,636 of 9,874 cases in 254 files. Three migrations (`2026_10_24_268100`, `268200`, `268300`) need independent review. Not pushed by the lane. Packet: `docs/verification/customer-comms-cx-20261024/README.md`.
+
+2026-10-29 Lane CX independent review of `733b02f7`: APPROVE WITH CONDITIONS, no P0 or P1 (record imported as `docs/verification/customer-comms-cx-20261024/independent-cx-review-733b02f7-DECISION.md`). All findings resolved before the PR opens.
+- F1 (P2, condition C1): deletion approval now purges open exports in the same transaction (`105f37a2`), with a regression test, a native race test and mutants M17/M18 killed.
+- F2 (P2): `PRIVACY.md` makes no backup encryption claim.
+- F3: staff-account refusal test (mutant M19/R11 killed).
+- F6: `RETAINED` completed (M20 killed).
+- F4 and F5: documented follow-ups (scheduled prune once a host exists; stuck `submitting` query).
+
+Census 307 (main first). Selection 2,639 of 9,877 cases in 254 files (`3e0bd1aa`). Native and SQLite results are in the packet.
+

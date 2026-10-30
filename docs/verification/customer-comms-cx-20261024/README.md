@@ -131,3 +131,39 @@ Mutations on the fixes: **M15** (remove the notice proof from the delivery inser
 
 1. Independent review of the three migrations (`2026_10_24_268100`, `268200`, `268300`) and of the privacy/identity code (data rights, mail adapter, legal page projection).
 2. Then cheap preflight, complete inventory and an expected-SHA merge, per AGENTS.md.
+
+## Independent review and resolution (2026-10-29)
+
+The independent review of `733b02f7` returned **APPROVE WITH CONDITIONS**, with no P0 or P1. The record is imported byte-original as [`independent-cx-review-733b02f7-DECISION.md`](independent-cx-review-733b02f7-DECISION.md). The reviewer's mutants R1–R17 and the populated native migration and rollback check are described there. Every finding was fixed or recorded before the PR opened.
+
+| Finding | Severity | Resolution | Commit | Evidence |
+| --- | --- | --- | --- | --- |
+| F1: deletion approval left a prepared export (with the pre-erasure profile) decryptable, and the request stayed `ready` | P2, condition C1 | Inside the approval transaction, after the customer user → account → request locks, `purgeOpenExports()` locks every open export of the account. Each one moves `ready → expired` and its ciphertext is purged, with an `export_expired` event (reason `deletion_approved`). The approval's `actions` records `pending_exports: purged`. The existing triggers already admit exactly this transition: export `ready → expired` without staff or hash, and a purge without consumption. No trigger was widened. | `105f37a2` | `CustomerDataRightsTest::test_approval_purges_a_prepared_export_in_the_same_transaction_and_records_it` turns the reviewer's probe into a test. A refused (stale) approval leaves the export intact; an already-downloaded export is unchanged; a replay is refused with no new events. Native race `test_an_export_committed_while_an_approval_waits_is_purged_by_that_approval`. Mutants M17 (no purge) and M18 (request expired, ciphertext kept) are killed. |
+| F2: `PRIVACY.md` claimed encrypted backups | P2 (docs) | Sections 5, 7 and 8 no longer say backups are encrypted. The appendix B row states that age encryption in `ops/staging/backup.sh` is opt-in and off by default (`VASEY_BACKUP_REQUIRE_ENCRYPTION=0`) and that the production target is open. It lists enforced backup encryption as a second prerequisite. `backup.sh` is unchanged. | `105f37a2` | Text diff; evidence map line corrected. |
+| F3: staff-account refusal untested (R11 survived) | P3 | New test: an account promoted to staff after its deletion request is refused with `staff_account`, and the user, account and request rows are unchanged. | `105f37a2` | `test_approval_never_erases_an_account_that_became_staff`; mutant M19 (R11) killed. |
+| F4: expired export ciphertext stays until the next export or a manual prune | P3 | Follow-up recorded: schedule `vasey:customer-data-exports-prune` once a production host exists (U-02). Deletion approval now purges open exports (F1). | `105f37a2` (docs) | `docs/customer-data-rights.md`. |
+| F5: a delivery stuck in `submitting` after a worker crash is not visible | P3 | Documented: the delivery is never resent, is not yet reported, and should be treated like `uncertain`. The operator query is given. A report in an operator listing is a follow-up, because it is not trivial to add with tests in this batch. | `105f37a2` (docs) | `docs/transactional-mail.md`. |
+| F6: retention record omitted retained classes holding personal data | P3 | `RETAINED` now lists `transactional_notices` and `transactional_mail_deliveries` (correspondence) and `customer_data_exports` (security; reason `ledger_retained_contents_purged`), each with a count. | `105f37a2` | Asserted in the F1 test; mutant M20 killed. |
+
+**Is there a real race between export preparation and approval?** Yes, but it is serialized. Export preparation (`requestExport`) is a single transaction that first takes the customer user and account rows (`CustomerAccess::lock`). Approval takes the staff row, then the same customer user and account rows, then the request and export rows. There is no intermediate export state visible to another transaction, so there is no "mid-preparation" export.
+
+- If the export commits first, the approval waits on the user row and then locks and purges it with locking reads. A locking read sees the committed row even under REPEATABLE READ. The new native race test proves this.
+- If the approval commits first, a waiting export is denied because access was withdrawn. The existing native race test `test_an_export_waiting_behind_an_access_withdrawal_is_denied_without_rows` covers this.
+
+**The native race found a real defect in the first F1 fix.** On `3e0bd1aa` the new race test failed on MySQL 8.4.11: the worker's approval raised a `QueryException`. Under REPEATABLE READ, `event()` read `MAX(sequence)` without a lock. Its snapshot was taken by the approval's first unlocked read, before it waited on the customer user row, so it missed the event that the export transaction committed meanwhile and collided on the unique `(request_id, sequence)` key. The approval rolled back whole, so the database state stayed safe. `f553a10f` reads the sequence with a locking read (`FOR UPDATE`), and the race and every native test that writes events then pass. SQLite cannot show this defect, because it has no snapshot isolation between connections in these tests. The failing run on `3e0bd1aa` is mutant M21 (the locking read removed): it is killed natively.
+
+**Census and selection after the fixes:** the SQLite skip census has 307 entries (main's 302 first, then the five CX race methods). The native selection is proved as 2,639 of 9,877 cases in 254 files, and both count comments are updated (`3e0bd1aa`).
+
+### Results after the review fixes
+
+All results are on `f553a10f` unless stated otherwise. Commits after `f553a10f` change documentation only.
+
+- **Native MySQL 8.4.11** (private server):
+  - **On `3e0bd1aa`** (identical to `f553a10f` apart from the event-sequence read): `LegalSiteSchemaMigrationTest` 5 OK, `CustomerDataRequestMigrationTest` 2 OK, the duplicate-request and rejection races OK.
+  - **On `f553a10f`:** the new export/approval race and the rejection race OK (2 tests, 139 assertions); the access-withdrawal and double-download races (2 tests, 99 assertions) and both `database_guards` tests (2 tests, 27 assertions) OK.
+  - **Total: 14 of 14** CX native tests.
+- **SQLite:**
+  - `tests/Feature/CustomerComms` on `f553a10f`: 99 tests, 788 assertions, 5 census skips.
+  - On `105f37a2`, every suite the reviewer ran, all OK: the nine notification roundtrips, `SiteRelatedTrackImageMigrationTest`, `TransactionalNotificationMigrationTest`, `SiteImageMigrationTest`, `SiteContentTest`, `SiteEditorialHttpTest`, `SiteEditorialContentTest`, `InstallationReportTest`, `StagingRuntimeValidatorTest`, `ProductionEnvironmentTemplateTest`, `TestCommerceProfileValidatorTest`, `SiteImageReleaseTest`, `TransactionalNotificationTest` and `CustomerAccountMigrationTest`. That is 23 files with no failures.
+- **Safeguards on `3e0bd1aa`:** `test-phpunit-shards.py` 52, `test-ci-scope.py` 27, `test-workflow-cadence.py` 14, `test-focused-tests.py` 53, `test-database-receipts.py` 61, `test_staging_capability_profile.py` 18, `test_staging_code_drift.py` 10, all OK. `composer validate --strict` reports valid. The census has 307 entries with main's 302 as an exact prefix.
+- **Mutations:** M17–M20 killed on `105f37a2` (SQLite); M21 (no locking read) killed natively on `3e0bd1aa`.

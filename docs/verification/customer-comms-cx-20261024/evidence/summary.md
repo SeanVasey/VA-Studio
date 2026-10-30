@@ -110,3 +110,39 @@ Totals: 55 files, 1025 tests, 15839 assertions, 82 skips (all reviewed MySQL-onl
 ## Earlier run on `70e909f0` (superseded)
 
 Native 10 of 12 then (the `CustomerDataRequestMigrationTest` trigger-order assertion failed on MySQL); SQLite roundtrips `QuotePricing`, `OrderPreparation` and `HostedCheckout` errored. Both fixed in `dce310cd`; see the packet.
+
+## After the independent review (2026-10-29/30)
+
+### Native MySQL 8.4.11
+- legal-a 22:27:11 HEAD=3e0bd1aa dirty=0: OK (3 tests, 26 assertions) exit=0 22:45:49
+- legal-b 22:45:49 HEAD=3e0bd1aa dirty=1: OK (2 tests, 11 assertions) exit=0 22:56:25
+- rights-mig 22:56:25 HEAD=3e0bd1aa dirty=2: OK (2 tests, 10 assertions) exit=0 23:03:46
+- race-a 23:03:46 HEAD=3e0bd1aa dirty=4: OK (2 tests, 125 assertions) exit=0 23:14:46
+- race-b 23:14:46 HEAD=3e0bd1aa dirty=4: OK (2 tests, 117 assertions) exit=0 23:27:16
+- race-c 23:27:16 HEAD=3e0bd1aa dirty=4: Tests: 1, Assertions: 79, Failures: 1. exit=1 23:31:45
+- guards 23:31:45 HEAD=3e0bd1aa dirty=4: OK (2 tests, 27 assertions) exit=0 23:43:54
+- race-c-fix 23:44:23 HEAD=f553a10f dirty=4: OK (2 tests, 139 assertions) exit=0 23:58:01
+- race-b2 23:58:45 HEAD=f553a10f dirty=4: OK (2 tests, 99 assertions) exit=0 00:09:49
+- guards2 00:09:49 HEAD=f553a10f dirty=4: OK (2 tests, 27 assertions) exit=0 00:19:11
+
+`race-c` on `3e0bd1aa` failed (worker QueryException: event sequence read from a stale REPEATABLE READ snapshot); fixed in `f553a10f` and passing in `race-c2`. `dirty` counts are documentation files only. Final CX native set: 14 of 14 (legal 5 and data-request migration 2 on `3e0bd1aa`; races 5 and guards 2 on `f553a10f`).
+
+### SQLite
+- On `105f37a2`: `tests/Feature/CustomerComms` OK, but some tests were skipped! Tests: 99, Assertions: 788, Skipped: 5.; `tests/Feature/HostedCheckoutMigrationTest.php` OK (8 tests, 138 assertions); `tests/Feature/OrderPreparationMigrationTest.php` OK (2 tests, 56 assertions); `tests/Feature/PromotionMigrationTest.php` OK (1 test, 33 assertions); `tests/Feature/QuotePricingMigrationTest.php` OK (1 test, 35 assertions); `tests/Feature/SharedInventoryMigrationTest.php` OK (1 test, 43 assertions); `tests/Feature/TestContractIssuanceMigrationTest.php` OK (13 tests, 172 assertions); `tests/Feature/TestFulfillmentActivationMigrationTest.php` OK (8 tests, 81 assertions); `tests/Feature/TestOrderFinalizationMigrationTest.php` OK (15 tests, 237 assertions); `tests/Feature/TestPaymentEvidenceMigrationTest.php` OK (20 tests, 205 assertions); `tests/Feature/SiteRelatedTrackImageMigrationTest.php` OK (37 tests, 335 assertions); `tests/Feature/TransactionalNotificationMigrationTest.php` OK (20 tests, 270 assertions); `tests/Feature/SiteImageMigrationTest.php` OK (1 test, 8 assertions); `tests/Feature/SiteContentTest.php` OK (11 tests, 54 assertions); `tests/Feature/SiteEditorialHttpTest.php` OK (11 tests, 695 assertions); `tests/Feature/SiteEditorialContentTest.php` OK (10 tests, 118 assertions); `tests/Feature/InstallationReportTest.php` OK (34 tests, 153 assertions); `tests/Unit/StagingRuntimeValidatorTest.php` OK (83 tests, 503 assertions); `tests/Unit/ProductionEnvironmentTemplateTest.php` OK (6 tests, 1829 assertions); `tests/Unit/TestCommerceProfileValidatorTest.php` OK (66 tests, 599 assertions); `tests/Feature/SiteImageReleaseTest.php` OK (7 tests, 59 assertions); `tests/Feature/TransactionalNotificationTest.php` OK (52 tests, 334 assertions); `tests/Feature/CustomerAccountMigrationTest.php` OK (7 tests, 561 assertions)
+- `tests/Feature/CustomerComms` on `f553a10f`: OK, but some tests were skipped! Tests: 99, Assertions: 788, Skipped: 5.
+
+### Safeguards on `3e0bd1aa`
+- scripts/ci/test-phpunit-shards.py: Ran 52 tests in 3.411s OK
+- scripts/ci/test-ci-scope.py: Ran 27 tests in 10.220s OK
+- scripts/ci/test-workflow-cadence.py: Ran 14 tests in 0.528s OK
+- scripts/ci/test-focused-tests.py: Ran 53 tests in 0.192s OK
+- scripts/ci/test-database-receipts.py: Ran 61 tests in 73.907s OK
+- tests/ops/test_staging_capability_profile.py: Ran 18 tests in 1.307s OK
+- tests/ops/test_staging_code_drift.py: Ran 10 tests in 0.585s OK
+
+### Mutations
+- M17 approval does not purge open exports KILLED FAILURES! | Tests: 1, Assertions: 4, Failures: 1. (at `105f37a2`)
+- M18 purge keeps the ciphertext (request expired only) KILLED FAILURES! | Tests: 1, Assertions: 6, Failures: 1. (at `105f37a2`)
+- M19 (R11) staff-account refusal removed KILLED FAILURES! | Tests: 1, Assertions: 2, Failures: 1. (at `105f37a2`)
+- M20 retention record omits the new classes KILLED ERRORS! | Tests: 1, Assertions: 10, Errors: 1. (at `105f37a2`)
+- M21 event sequence read without a lock: KILLED natively (the `race-c` run on `3e0bd1aa` is this mutant)
