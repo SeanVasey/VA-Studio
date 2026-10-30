@@ -74,6 +74,7 @@ Recovery checkpoint, September 30: [PR #84](https://github.com/VASEYDEV/VASEYAUD
 - [Protected operator track review](docs/verification/private-track-review.md): current descriptive metadata, actual publication blockers and verified artwork/tagged audio in a close-only staff modal.
 - [Reviewed manual publication guards](docs/verification/track-publication-guards.md): confirmations bound to current metadata/publication revisions with fresh authority and atomic counter/audit writes; track scheduling remains open.
 - [Read-only publication manifest foundation](docs/verification/track-publication-manifest-foundation.md): immutable internal identity for current ready metadata, rights, derivatives and active commercial evidence; later reviewed apply and scheduling remain separate.
+- [Staff reporting and operations views](docs/staff-reporting.md): read-only operational health widgets, a sales and conversion report with an audited CSV export (test and production never mixed, refunds netted status-aware) and a default-off consent-aware customer segment export.
 - [Catalog pagination](docs/catalog-pagination.md): bounded server browsing and off-page saved-selection reconciliation.
 - [Public track sharing](docs/track-sharing.md): canonical URLs, server-rendered social metadata, Inertia navigation and publication privacy.
 - [Track details and full license terms](docs/track-detail-and-license-disclosure.md): published offer disclosure, resilient selection, persistent playback and browser verification scope.
