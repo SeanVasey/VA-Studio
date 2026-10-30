@@ -428,4 +428,5 @@ F2a final separate review at `e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08`: **APPRO
 - F4 and F5: documented follow-ups (scheduled prune once a host exists; stuck `submitting` query).
 
 Census 307 (main first). Selection 2,639 of 9,877 cases in 254 files (`3e0bd1aa`). Native and SQLite results are in the packet.
-
+- The native race found an event-sequence REPEATABLE READ defect in the first F1 fix; it is fixed by a locking read (`f553a10f`, mutant M21 killed natively). CX native tests: 14/14.
+- Merged main `76fb9338` (symfony/mime CVE) as `a4a2dbd4`: `composer audit` clean; safeguards OK; selection 2,639 of 9,877 cases in 254 files; CustomerComms SQLite 99 tests OK.

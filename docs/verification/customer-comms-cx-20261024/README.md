@@ -167,3 +167,13 @@ All results are on `f553a10f` unless stated otherwise. Commits after `f553a10f` 
   - On `105f37a2`, every suite the reviewer ran, all OK: the nine notification roundtrips, `SiteRelatedTrackImageMigrationTest`, `TransactionalNotificationMigrationTest`, `SiteImageMigrationTest`, `SiteContentTest`, `SiteEditorialHttpTest`, `SiteEditorialContentTest`, `InstallationReportTest`, `StagingRuntimeValidatorTest`, `ProductionEnvironmentTemplateTest`, `TestCommerceProfileValidatorTest`, `SiteImageReleaseTest`, `TransactionalNotificationTest` and `CustomerAccountMigrationTest`. That is 23 files with no failures.
 - **Safeguards on `3e0bd1aa`:** `test-phpunit-shards.py` 52, `test-ci-scope.py` 27, `test-workflow-cadence.py` 14, `test-focused-tests.py` 53, `test-database-receipts.py` 61, `test_staging_capability_profile.py` 18, `test_staging_code_drift.py` 10, all OK. `composer validate --strict` reports valid. The census has 307 entries with main's 302 as an exact prefix.
 - **Mutations:** M17–M20 killed on `105f37a2` (SQLite); M21 (no locking read) killed natively on `3e0bd1aa`.
+
+### Final merged head (2026-10-30)
+
+`a4a2dbd4` merges `origin/main` `76fb9338` (PR #179: `symfony/mime` 8.1.10 and `polyfill-mbstring` 1.43.3 for CVE-2026-45070, lockfile only). After `composer install`:
+
+- `composer audit` reports "No security vulnerability advisories found". `composer validate --strict` reports valid.
+- Safeguards all OK: `test-phpunit-shards.py` 52, `test-ci-scope.py` 27, `test-workflow-cadence.py` 14, `test-focused-tests.py` 53.
+- The native selection is re-proved unchanged: 2,639 of 9,877 cases in 254 files.
+- SQLite: `tests/Feature/CustomerComms` 99 tests, 788 assertions, 5 census skips. `TransactionalNotificationTest` 52 OK. `InquiryNotificationWorkTest` 15 OK.
+- The native MySQL set was not rerun after this lockfile-only merge. Its last native run was the 14 of 14 above on `f553a10f`/`3e0bd1aa`.
