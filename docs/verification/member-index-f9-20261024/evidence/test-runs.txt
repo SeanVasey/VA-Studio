@@ -59,3 +59,7 @@ nM-T3-terminal exit=0 secs=468 :: OK (1 test, 21 assertions)
 nM-T4-terminal exit=2 secs=307 :: ERRORS! Tests: 1, Assertions: 20, Errors: 1.
 nM-T2-withdrawal exit=1 secs=340 :: FAILURES! Tests: 1, Assertions: 13, Failures: 1.
 nM-T3-withdrawal exit=0 secs=535 :: OK (1 test, 14 assertions)
+nB-MembershipCustomerIndexTest exit=2 secs=4950 :: ERRORS! Tests: 12, Assertions: 187, Errors: 2.
+fin-sq-avail-http exit=0 secs=201 :: OK (41 tests, 1288 assertions)
+fin-sq-keyorder exit=0 secs=54 :: OK (1 test, 100 assertions)
+fin-native-growth exit=0 secs=387 :: OK (1 test, 18 assertions)

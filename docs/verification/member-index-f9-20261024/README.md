@@ -1,7 +1,8 @@
 # F9: member customer index latency (lane F9)
 
 Lane F9, branch `harness/member-index-f9-20261024`, from the C4e head `ad1647ff`, merged with `origin/main` `a8f17e5c`
-(through PR #177, which carries C4e as PR #174). It fixes finding F9 of the C4e packet
+(through PR #177, which carries C4e as PR #174) and then `76fca3d7` (PRs #178 REP and #179, the symfony/mime security
+update). It fixes finding F9 of the C4e packet
 (`docs/verification/member-http-c4e-20261024/README.md`, "Finding F9"): one customer index call plus its pre-bytes
 proof took about 20 s at one paid period on native MySQL 8.4.11, reached the fixed 60 s budget at about five periods and
 always refused at 10 and 100 (the page size is 100). It also carries the Codex P2 on PR #174 (thread r4369151991):
@@ -108,9 +109,10 @@ assertions catch a missing frame or a missing `member_grant:` memo. Because the 
 - `scripts/ci/database-sqlite-skips.json`: main's 302 entries first and unchanged, this lane's one method appended (303);
   first-150 hash `d93da4e7…` unchanged. The MySQL skip census is unchanged.
 - `python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection`:
-  exit 0, 2,587 of 9,778 cases in 250 files (main 2,579 of 9,774 in 249); both count comments updated; generated files
+  exit 0, 2,587 of 9,778 cases in 250 files on the first merge (main 2,579 of 9,774 in 249), and 2,601 of 9,809 cases
+  in 258 files after the second merge (main 2,593 of 9,805 in 257); both count comments updated; generated files
   deleted.
-- Safeguards on `56cf3ead`: `test-phpunit-shards.py` 52, `test-ci-scope.py` 27, `test-workflow-cadence.py` 14,
+- Safeguards on `56cf3ead` and again on the second merge `308a40ae`: `test-phpunit-shards.py` 52, `test-ci-scope.py` 27, `test-workflow-cadence.py` 14,
   `test-focused-tests.py` 53, `test-database-receipts.py` 61: all OK. (Before the include-list entry,
   `test-phpunit-shards.py` failed on the new driver-branching file, which is how it was found.)
 
@@ -118,8 +120,8 @@ assertions catch a missing frame or a missing `member_grant:` memo. Because the 
 
 Direct PHPUnit (`--fail-on-phpunit-warning`), `public/build` absent, `APP_KEY` set, CI environment. Native: private
 `/opt/mysql-8.4.11/bin/mysqld` 8.4.11 on its own datadir and port, `REPEATABLE-READ`, `performance_schema` on, binary
-log off, `VA_LOCAL_DISPOSABLE_MYSQL`, one database per chain. Application code at every run below equals the final
-head (`56cf3ead` and later commits change documentation only).
+log off, `VA_LOCAL_DISPOSABLE_MYSQL`, one database per chain. The runs below are on `56cf3ead`;
+the commits after it change documentation, plus the second merge (see below), which touches none of this lane's code.
 
 | Run | Selection | Result |
 | --- | --- | --- |
@@ -135,7 +137,7 @@ head (`56cf3ead` and later commits change documentation only).
 | Native | G1 `MembershipSchemaProofFrameTest` | 8 tests, 66 assertions, OK |
 | Native | G1 `MemberObserverTerminalProofTest` | 4 tests, 92 assertions, OK |
 | Native | `MembershipCustomerIndexAvailabilityTest` | 7 tests, 196 assertions, OK |
-| Native | `MembershipCustomerIndexTest` (includes the 100-period page and sentinel cases) | in progress at this commit (recorded in the next commit) |
+| Native (not in the native selection) | `MembershipCustomerIndexTest` | 12 tests, 187 assertions: 10 OK, including `test_bound_is_one_hundred_periods_and_the_sentinel_only_reports_more` (100 periods plus the sentinel, natively); 2 errors by construction: `test_sentinel_row_is_authenticated_like_every_listed_period` and `test_ledger_audit_failure_refuses_the_whole_index` reseal an event by editing `sqlite_master` (MySQL 1064), so they are SQLite-only and the file is not natively selected |
 
 Every SQLite skip is in the SQLite census and no census method ran (checked from the JUnit files).
 
@@ -175,6 +177,15 @@ restored and compared (`diff -rq app` empty after every restore). The worktree w
 - No HTTP evidence under PHP-FPM, a real web server, a proxy or a browser; no Foundation run, hosted CI, host, provider
   or production evidence. The mount stays default-off; N7 (per-customer rate limit) is still required before any
   non-local mount.
+
+### After the second merge (`308a40ae`)
+
+The second merge changes no member-domain, HTTP, route, bootstrap or configuration file of this lane (it adds lane
+REP's reporting files and updates `symfony/mime` and `symfony/polyfill-mbstring`). After
+`rm -rf vendor/symfony/mime vendor/symfony/polyfill-mbstring && composer install`: `composer audit` reports no advisories,
+`composer validate --strict` passes. Focused checks: SQLite `MembershipCustomerIndexAvailabilityTest` plus
+`MembershipHttpMountTest` 41 tests, 1,288 assertions, OK; SQLite key-order test 1 test, 100 assertions, OK; native growth
+test 1 test, 18 assertions, OK. The full suites above ran on `56cf3ead`, whose member code equals this head.
 
 ## Cleanup
 
