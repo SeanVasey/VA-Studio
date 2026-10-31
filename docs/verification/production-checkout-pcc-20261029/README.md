@@ -1,6 +1,7 @@
 # Lane PCC work package: production commerce composition, default-off
 
-Status: **work package stated before coding (this section); results are filled in below as they land. Not pushed.** Cut
+Status: **implemented on branch `harness/production-checkout-pcc-20261029`; not pushed; independent payment/auth review not yet
+done.** The work-package statement (sections Split to Tests) was committed first (`071d9f80`). Cut
 from `origin/main` `a8f17e5cbd509a822e2c283bdd501177b43c11c0` (`dd587603` plus docs-only handoff files) on branch
 `harness/production-checkout-pcc-20261029`.
 
@@ -114,4 +115,82 @@ Not touched: `app/Http/Membership`, `app/Domain/Memberships` (F9), customer comm
 
 ## Results
 
-(Filled in after implementation.)
+### Commits
+
+PCC-a (operations; cut here to merge PCC-a alone): `c18efdc9` admissions in the preflight and validator, boundary and
+templates; `228adbfc` explicit `trustProxies`; `9d99529d` identity SMTP through configuration with a literal activation;
+`ab9e6336` PCC-a docs. PCC-b (composition): `1382f151` mount gate, provider registration, route mount and privacy seam;
+`793efaa3` operator reconcile command; `7a39ac62` exclusivity authority wiring; `0515b15f` domain refusal test (mutation M10);
+then the PCC-b docs and this results section.
+
+### What is wired, and what stays inert
+
+| Item | Shipped state | What turning it on needs |
+| --- | --- | --- |
+| Mount gate `production_checkout.mounted` | literal `false`; closed in every environment; staging never mounts even with `true` | reviewed code change to the literal **and** to `ops/production/validate-runtime.php` (`holds.production_checkout_mounted`), Sean's authorization |
+| `ProductionCheckoutServiceProvider`, `routes/production-checkout.php` | registered/required only through the gate; not registered today | the gate |
+| `ProductionCheckoutPrivacy` | prepended globally; unmounted or withdrawn path is the private 404 before any SQL; mounted but `http_enabled` off is the private 503 | the gate plus `PRODUCTION_CHECKOUT_HTTP_ENABLED` (held false in production) |
+| `vasey:production-checkout-reconcile` | refuses (`not_mounted`/`disabled`) | the gate plus `PRODUCTION_CHECKOUT_OPERATOR_RECONCILIATION_ENABLED`, `..._RECONCILIATION_ENABLED`, `..._PROVIDER_IO_ENABLED` (all held false in production), provider configuration |
+| Exclusivity authority | consulted for any exclusive or scoped selection; such a selection is refused in every case | a production exclusive consumer (not built) and U-08 |
+| Real mail / live Stripe mode in the production profile | refused unless `VASEY_PRODUCTION_REAL_MAIL_ADMITTED` / `VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED` is exactly `true` | Sean's provider and mode decisions; the flags never lift a checkout switch |
+| Identity SMTP settings | `settings` null (literal `$enabled = false;`) | reviewed literal flip, real-mail flag, `PRODUCTION_IDENTITY_SMTP_*` in the host secret store |
+| `trustProxies` | active now: trusts no proxy (blank list); never the framework's `.on-forge.com` catch-all | a reviewed `TRUSTED_PROXIES` list only if a CDN is placed in front |
+
+`trustProxies` is the one change that alters running behaviour by default: on an ordinary host it is the same (no proxy was
+trusted), and on an `.on-forge.com`/`.on-vapor.com` host or Laravel Cloud forwarded headers are no longer trusted.
+
+### A5 wiring: pushed back, proposed design
+
+Not implemented (see "Not in this lane"). Proposed for a separate reviewed lane: (1) a production refund/dispute ledger keyed
+by `production_checkout_orders.id` (new additive tables mirroring `refund_dispute_*`, or one `order_family` column with a
+composite unique key, decided in review); (2) a production financial read path, since `FinancialReadPlan`/`RetrievalPolicy`
+pin `payments.stripe.mode=test` and an `sk_test_` key, built on `ProductionPaidOrderSourceV1` plus the own-account gateway;
+(3) the A5 state machine and allocation reused against the production order lines, with effects limited to recorded holds
+until production grants exist; (4) replay safety by the same `(order_id, request_id)` and `(order_id, sequence)` keys A5 uses.
+Policy values stay unset (owner question 10).
+
+### Test results (SQLite direct PHPUnit, PHP 8.4.26; Python 3)
+
+RESULTS_PLACEHOLDER
+
+### Mutation checks
+
+Each mutation was applied to the file, the named tests run, and the file restored
+(`/tmp/.../pcc-ev/mutate.py`, kept outside the repository):
+
+| Mutation | Tests | Result |
+| --- | --- | --- |
+| M1 gate admits truthy values (`== true`) | `ProductionCheckoutMountTest` | killed (6 failures) |
+| M2 gate admits staging | `ProductionCheckoutMountTest` | killed (2) |
+| M3 gate ignores the environment | `ProductionCheckoutMountTest` | killed (6) |
+| M4 privacy seam skips the runtime mount check | `ProductionCheckoutMountTest` | killed (19) |
+| M5 provider registered without the gate | `ProductionCheckoutMountTest` | killed (15) |
+| M6 exclusivity authority not consulted | `ProductionCheckoutExclusivityTest` | killed (11) |
+| M7 exclusivity authority inverted | `ProductionCheckoutExclusivityTest` | killed (5) |
+| M8 unreadable ledger treated as "yes" | `ProductionCheckoutExclusivityTest` | killed (1) |
+| M9 gate not called from `CurrentSelection::load` | `ProductionCheckoutExclusivityTest` | killed (5) |
+| M10 domain operator path skips its operator switch | `ProductionCheckoutReconcileCommandTest` | survived at first (the command checks the same switch first); killed (2) after `0515b15f` added a direct domain test |
+
+### Census and native MySQL
+
+No engine-skipping test method was added, so `scripts/ci/database-sqlite-skips.json` and the native selection are unchanged.
+No locking or race claim is made: the operator command reuses `HostedCheckout::record()`/`uncertain()`, whose concurrency rests
+on the existing unique keys (session per intent, payment per intent, observation sequence per intent). Native MySQL was not run.
+
+### Named conflicts
+
+- `config/production-identity-smtp.php` was in the template test's code-literal family ("reads no environment"). The brief asks
+  for SMTP settings through configuration with documented variables; the file now reads `PRODUCTION_IDENTITY_SMTP_*` inside a
+  closure that runs only when the literal `$enabled` is true, and the test pins that instead. Activation stays a code change.
+- The reviewed mount pattern admits only local/testing; this gate also admits production (assumption 1). Reviewers should
+  decide whether production admission belongs in the gate now or in the later activation change.
+
+### Untested conditions
+
+- No real Stripe account, live key, SMTP provider, CDN or host; every provider fact is the synthetic fixture.
+- Native MySQL 8.4, browser, Foundation CI and GitLab were not run. The full PHP suite was run on SQLite only as recorded above.
+- The production environment cases boot the application with `env=production` inside PHPUnit; a real production boot with a
+  config cache and `route:cache` was not exercised (the runtime seam re-checks the gate on every request for a stale table).
+- The operator command has no sweep mode; recovery is one order at a time.
+- With a non-empty `TRUSTED_PROXIES`, global seams prepended by packages (Inertia) run before `ExplicitTrustProxies`; they do not
+  read the client address.
