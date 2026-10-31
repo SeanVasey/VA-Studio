@@ -312,6 +312,11 @@ class CustomerDataRights
      * which every writer of this account's requests takes first, and transactions run at READ COMMITTED, so the plain discovery
      * read sees every committed request; no range of the shared open-slot index is locked.
      *
+     * The F1 purge at deletion approval depends on READ COMMITTED here: under REPEATABLE READ this plain read would use the
+     * snapshot taken before the user-row wait and miss an export committed while the approval waited, leaving its contents
+     * unpurged. CustomerDataRightsConcurrencyTest::test_an_export_committed_while_an_approval_waits_is_purged_by_that_approval
+     * (native MySQL) fails if that regresses.
+     *
      * @return list<CustomerDataRequest>
      */
     private function openExports(int $accountId): array
