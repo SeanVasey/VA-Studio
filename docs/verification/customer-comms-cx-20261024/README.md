@@ -134,7 +134,7 @@ Mutations on the fixes: **M15** (remove the notice proof from the delivery inser
 
 ## Independent review and resolution (2026-10-29)
 
-The independent review of `733b02f7` returned **APPROVE WITH CONDITIONS**, with no P0 or P1. The record is imported byte-original as [`independent-cx-review-733b02f7-DECISION.md`](independent-cx-review-733b02f7-DECISION.md). The reviewer's mutants R1–R17 and the populated native migration and rollback check are described there. Every finding was fixed or recorded before the PR opened.
+The independent review of `733b02f7` returned **APPROVE WITH CONDITIONS**, with no P0 or P1. The record is imported byte-original as [`independent-cx-review-733b02f7-DECISION.md`](independent-cx-review-733b02f7-DECISION.md). The re-review of `16687e9f` (APPROVE WITH CONDITIONS; F1, F2, F3 and F6 verified; new P2 F7) is imported as [`independent-cx-rereview-16687e9f-DECISION.md`](independent-cx-rereview-16687e9f-DECISION.md). The reviewer's mutants R1–R17 and the populated native migration and rollback check are described there. Every finding was fixed or recorded before the PR opened.
 
 | Finding | Severity | Resolution | Commit | Evidence |
 | --- | --- | --- | --- | --- |
@@ -144,6 +144,7 @@ The independent review of `733b02f7` returned **APPROVE WITH CONDITIONS**, with 
 | F4: expired export ciphertext stays until the next export or a manual prune | P3 | Follow-up recorded: schedule `vasey:customer-data-exports-prune` once a production host exists (U-02). Deletion approval now purges open exports (F1). | `105f37a2` (docs) | `docs/customer-data-rights.md`. |
 | F5: a delivery stuck in `submitting` after a worker crash is not visible | P3 | Documented: the delivery is never resent, is not yet reported, and should be treated like `uncertain`. The operator query is given. A report in an operator listing is a follow-up, because it is not trivial to add with tests in this batch. | `105f37a2` (docs) | `docs/transactional-mail.md`. |
 | F6: retention record omitted retained classes holding personal data | P3 | `RETAINED` now lists `transactional_notices` and `transactional_mail_deliveries` (correspondence) and `customer_data_exports` (security; reason `ledger_retained_contents_purged`), each with a count. | `105f37a2` | Asserted in the F1 test; mutant M20 killed. |
+| F7 (re-review of `16687e9f`): range locking reads on shared indexes made unrelated customers wait (event `MAX() FOR UPDATE`) and deadlock (open-slot `FOR UPDATE`) | P2, condition C2 | (a) Each request keeps `last_event_sequence` (migration 268200 amended; it is not on main). The event insert guard requires `sequence = counter + 1`, and the counter may advance only by one to an event that exists, so no read over the event index is needed. (b) The open-slot checks are plain reads, serialized by the customer `users` row lock with the unique open-slot index as backstop, mapped to a clean 409. Open exports are discovered, then locked by primary key. (c) Every data-rights transaction runs at READ COMMITTED, set per attempt, with three attempts on a deadlock or lock-wait timeout. The prune command uses the same helper. Contention that outlives the retries answers 503 `try_again` with `Retry-After` instead of the generic customer error. | `2872c10e` | New native race `test_unrelated_customers_request_deletion_together_while_an_approval_is_in_flight_without_waits_or_deadlocks`: no wait on the other customers' connections, zero deadlocks, exact sequences and counters. SQLite tests for the counter guards, the unique backstop, retry and exhaustion, and the contention response. Mutants M22–M27 and M29 killed; M28 is equivalent. |
 
 **Is there a real race between export preparation and approval?** Yes, but it is serialized. Export preparation (`requestExport`) is a single transaction that first takes the customer user and account rows (`CustomerAccess::lock`). Approval takes the staff row, then the same customer user and account rows, then the request and export rows. There is no intermediate export state visible to another transaction, so there is no "mid-preparation" export.
 
@@ -177,3 +178,91 @@ All results are on `f553a10f` unless stated otherwise. Commits after `f553a10f` 
 - The native selection is re-proved unchanged: 2,639 of 9,877 cases in 254 files.
 - SQLite: `tests/Feature/CustomerComms` 99 tests, 788 assertions, 5 census skips. `TransactionalNotificationTest` 52 OK. `InquiryNotificationWorkTest` 15 OK.
 - The native MySQL set was not rerun after this lockfile-only merge. Its last native run was the 14 of 14 above on `f553a10f`/`3e0bd1aa`.
+
+## Re-review F7 resolution (2026-10-31)
+
+The independent re-review of `16687e9f` returned APPROVE WITH CONDITIONS. It verified F1, F2, F3 and F6, raised no P0 or P1, and found one new P2:
+
+- **F7a, event level (new in `f553a10f`):** the event sequence was read with a locking `MAX()`. That X-locked the next key, or the supremum, of the shared `(request_id, sequence)` index, so an unrelated customer's new request waited for a whole approval.
+- **F7b, request level (since `733b02f7`):** the open-slot checks used `FOR UPDATE`. Two customers requesting deletion at once both locked the supremum of `customer_data_requests_open_unique`, inserted, and deadlocked.
+
+The record is imported as `independent-cx-rereview-16687e9f-DECISION.md`.
+
+### Fix (`2872c10e`, fixtures `a9123898`)
+
+Every writer already takes the customer's `users` row first, and the staff and prune paths lock the request row by primary key. Those row locks are the serialization points, so the range locks were removed.
+
+1. **Counter.** `customer_data_requests.last_event_sequence` was added. Migration `268200` is amended; it is not on main and stays forward-only. The guards are:
+   - **insert guard:** the counter starts at 0;
+   - **event insert guard:** an event's sequence must equal the parent counter plus one;
+   - **counter update guard:** the counter may advance by exactly one, only to an event that exists, with every other column unchanged;
+   - **state transition:** it must leave the counter unchanged.
+
+   With the unique `(request_id, sequence)` key, sequences are gap-free. `event()` inserts the event and then advances the counter on the request row it already holds.
+2. **No range locks.** The open-slot checks are plain reads. The unique open-slot index is the backstop. A violation on insert maps to a clean `409` (`deletion_pending` or `export_pending`), and a test proves that path. Open exports are discovered with a plain read and then locked one by one by primary key.
+3. **READ COMMITTED with retries.** Every data-rights transaction is one READ COMMITTED transaction, set per attempt because `SET TRANSACTION` applies to the next transaction only, with three attempts on a deadlock or lock-wait timeout.
+   - Plain reads after the user-row wait then see committed work. This is what lets approval still purge an export committed while it waited (F1).
+   - InnoDB takes no gap locks at this level.
+   - `pruneExpired` uses the same helper, so it retries deadlocks too.
+4. **Contention response.** Contention that outlives the retries answers `503` with `reason: try_again` and `Retry-After: 5`. Before this fix, an unhandled exception on `/account/*` already became the generic customer-privacy `503` ("Sign-in could not be completed"), not a raw 500 as the re-review inferred, so the message was misleading rather than a crash. Any other database error keeps that generic response.
+
+### Is a concurrent duplicate open request still impossible?
+
+Yes. Two requests of the same kind for one account both take the customer `users` row FOR UPDATE first, so they serialize. The second then reads the first's committed row, because it runs at READ COMMITTED, and replays or refuses.
+
+If a writer ever skipped the user lock, the unique `(customer_account_id, kind, open_slot)` index would refuse the insert. `open()` maps that to a `409`; see `test_the_unique_open_slot_index_refuses_a_second_open_request_cleanly`, which calls `open()` past the service's own check. The native race `test_a_deletion_request_committed_while_a_duplicate_waits_is_returned_instead_of_a_second_request` covers the serialized path.
+
+### New native race
+
+`test_unrelated_customers_request_deletion_together_while_an_approval_is_in_flight_without_waits_or_deadlocks`:
+
+1. Staff approval of customer X is paused after its final audit write, so it holds every lock it takes, including X's purged export and the newest events.
+2. Customers Y and Z, created after X so their rows land at both index tails, are each paused right after their open-slot check and then released together.
+3. The test asserts:
+   - Y and Z both finish while the approval is still paused;
+   - `performance_schema.data_lock_waits` never shows Y's or Z's connection waiting;
+   - InnoDB's `lock_deadlocks` counter does not move;
+   - after the approval is released, every request's events are exactly 1..n and its counter equals n.
+
+### Results on `a9123898` (the merged head with F7; main `a926f98b` merged in `27e14ee6`)
+
+- **Native MySQL 8.4.11:** 15 of 15 CX native tests pass, one test per run on a private server with its own datadir and port 3467, every run at `HEAD=a9123898`. The `dirty` working-tree files were documentation only.
+  - `race-unrelated` 1 test, 315 assertions
+  - `race-duplicate` 1 test, 117 assertions
+  - `race-rejection` 1 test, 82 assertions
+  - `race-withdrawal` 1 test, 85 assertions
+  - `race-download` 1 test, 62 assertions
+  - `race-export` 1 test, 98 assertions
+  - `guards-rights` 1 test, 27 assertions
+  - `guards-mail` 1 test, 9 assertions
+  - `rights-mig-schema` 1 test, 7 assertions
+  - `rights-mig-populated` 1 test, 3 assertions
+  - `legal-migrated_schema` 1 test, 17 assertions
+  - `legal-late_image` 1 test, 5 assertions
+  - `legal-down_refuses` 1 test, 4 assertions
+  - `legal-round_trip` 1 test, 7 assertions
+  - `legal-foreign_or_missing` 1 test, 4 assertions
+- **SQLite:**
+  - `tests/Feature/CustomerComms` on `a9123898`: 103 tests, 817 assertions, 6 census skips (the six native races).
+  - On `27e14ee6`: `QuotePricing`, `OrderPreparation` and `HostedCheckout` migration roundtrips, `CustomerAccountMigrationTest`, `TransactionalNotificationTest`, and the `StagingRuntimeValidator`, `TestCommerceProfileValidator` and `ProductionEnvironmentTemplate` unit tests all OK.
+- **All of `tests/ops`** pass on `a9123898`, 20 files including `test_staging_protected_configuration` (3 OK in this container).
+- **Safeguards:** `test-phpunit-shards.py` 52, `test-ci-scope.py` 27, `test-workflow-cadence.py` 14, `test-focused-tests.py` 53, all OK. `test-database-receipts.py` 61 OK on `27e14ee6`.
+- **Composer:** `composer audit` reports no advisories. `composer validate --strict` reports valid.
+- **Census and selection:** the SQLite skip census has 308 entries (main's 302 first, then the six CX races). The native selection is proved as 2,657 of 9,912 cases in 262 files, and both count comments match.
+- **Mutants:**
+
+| Mutant | Engine | Commit | Result | Killed by |
+| --- | --- | --- | --- | --- |
+| M22: locking `MAX()` event sequence at REPEATABLE READ | native | `27e14ee6` | killed | the unrelated-customers race: "A new request waited for the approval in flight." |
+| M23: locking open-slot checks at REPEATABLE READ | native | `27e14ee6` | killed | the unrelated-customers race |
+| M24: REPEATABLE READ, counter and plain reads kept | native | `a9123898` | killed (`Failures: 1`) | the export-committed-while-approval-waits race (approval misses the export) |
+| M25: no unique-index mapping in `open()` | SQLite | `27e14ee6` | killed | |
+| M26: no retry on contention | SQLite | `27e14ee6` | killed | |
+| M27: controller does not map lingering contention | SQLite | `27e14ee6` | killed | |
+| M29: counter update does not require its event | SQLite | `27e14ee6` | killed | |
+| M28: counter may advance by more than one | SQLite | `27e14ee6` | **equivalent** | survives because the `EXISTS` clause already forces `+1`: an event at counter+2 cannot exist before the counter reaches counter+1 |
+
+  The first M24 run on `27e14ee6` errored only because that race's raw fixture lacked the new counter (fixed in `a9123898`), so it was rerun.
+- **Process note:** while stopping my own native runner I once used `pkill -P <runner pid>`, which signals only that runner's child. I then stopped the remaining processes by exact PID. No other lane's process or server was signalled.
+
+**Not tested:** concurrent HTTP load end to end, the full native selection, Foundation CI, browser specs and the frontend on this head. F7 changed no frontend file.

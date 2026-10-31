@@ -438,3 +438,11 @@ Census 307 (main first). Selection 2,639 of 9,877 cases in 254 files (`3e0bd1aa`
 2026-10-29 REP re-review of `622a4920` (tested code `d5f29a1c`) APPROVE: no new P0 to P2; native `SalesReportLockFreeTest` OK and its lock-restoring mutant killed; A5 concurrency, lifecycle writers and migration pass natively, so the writers keep their locking default. Non-blocking P3s R-1, R-2 and the space-plus-tab CSV case deferred.
 
 2026-10-30 SEC2 merged PR #179 at `76fb9338c1b33a7b59e43b6b33f6206f0669bfe5` from exact head `db3561d6`: `symfony/mime` 8.0.15 → 8.1.10 (and `symfony/polyfill-mbstring` 1.43.3) for CVE-2026-45070 / PKSA-wtxr-p26d-nn42 (reported 2026-10-28), which had turned `composer audit` red on main and every open PR. Lock and CHANGELOG only; 30 mail, MIME and upload test files on SQLite 604 tests / 9,821 assertions, 0 failures (34 MySQL-only skips); `composer audit` clean. Preflight 40977566101 is the readiness cancellation; replacement 40977577499 success. Codex code and security reviews clean.
+
+2026-10-31 Lane CX re-review of `16687e9f`: APPROVE WITH CONDITIONS (F1, F2, F3 and F6 verified). The record is imported as `independent-cx-rereview-16687e9f-DECISION.md`. New P2 F7 (range locking reads on shared indexes) is fixed in `2872c10e`:
+- a per-request `last_event_sequence` counter (migration 268200 amended; forward-only);
+- plain open-slot reads with the unique index as a clean-409 backstop;
+- READ COMMITTED with three attempts per command, prune included;
+- lingering contention answers 503 `try_again`.
+
+Main `a926f98b` merged as `27e14ee6`; fixtures `a9123898`. Native 15/15 including the new two-customer race with an approval in flight (no waits, no deadlocks). CustomerComms SQLite 103 OK. All `tests/ops` OK. Census 308; selection 2,657 of 9,912 cases in 262 files. Mutants: M22, M23 and M24 killed natively; M25, M26, M27 and M29 killed; M28 equivalent.
