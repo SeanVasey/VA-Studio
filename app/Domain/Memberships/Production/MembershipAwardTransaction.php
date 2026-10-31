@@ -20,7 +20,12 @@ final class MembershipAwardTransaction
 
     private readonly SchemaProofFrame $proofs;
 
-    public function __construct(private readonly Connection $connection, private readonly PDO $primary)
+    /**
+     * `$memberGrantProofs` (the customer index frame only, F9): the member-grant schema guard joins the frame-scoped
+     * memo as well. Writers keep the default: their member-grant proofs stay complete on every call, as before.
+     */
+    public function __construct(private readonly Connection $connection, private readonly PDO $primary,
+        private readonly bool $memberGrantProofs = false)
     {
         $this->database = $connection->getDatabaseName();
         $this->name = $connection->getName();
@@ -53,6 +58,12 @@ final class MembershipAwardTransaction
     public function beginTerminalProof(): void
     {
         $this->proofs->terminal();
+    }
+
+    /** Whether MemberGrantCurrentSchema may answer from this frame's memo (never for writers). */
+    public function memoizesMemberGrantProofs(): bool
+    {
+        return $this->memberGrantProofs;
     }
 
     /** Never roll back a callback-created replacement transaction. No callbacks precede ownership. */

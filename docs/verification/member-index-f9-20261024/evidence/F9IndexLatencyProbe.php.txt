@@ -1,0 +1,423 @@
+<?php
+
+namespace Tests\Feature\ProductionMembershipBilling;
+
+use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Memberships\Billing\BillingDatabaseInstant;
+use App\Domain\Memberships\Billing\BillingLedger;
+use App\Domain\Memberships\Billing\BillingPolicy;
+use App\Domain\Memberships\Billing\BillingSettlement;
+use App\Domain\Memberships\Billing\BillingSnapshots;
+use App\Domain\Memberships\Billing\BillingSubscriptionApprovals;
+use App\Domain\Memberships\Production\MembershipCustomerIndex;
+use App\Domain\Memberships\Production\MembershipCustomerRead;
+use App\Domain\Memberships\Production\MembershipInvoiceBinding;
+use App\Domain\Memberships\Production\MembershipPeriodRecords;
+use App\Domain\Memberships\Production\MembershipPolicyVersions;
+use App\Domain\Memberships\Production\MembershipRecords;
+use App\Domain\Memberships\Production\MembershipRows;
+use Illuminate\Database\Events\TransactionBeginning;
+use Illuminate\Database\Events\TransactionCommitting;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use PDO;
+use Symfony\Component\Process\Process;
+use Tests\Support\BillingStripeFixtures;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\MemberActivationFixtures;
+use Tests\TestCase;
+
+/**
+ * SCRATCH latency harness for the C4e phase B packet (not committed). Times the customer index plus the pre-bytes proof
+ * at 1, 10 and 100 owned periods, and the 100-period index while another customer's real award runs. Statement counts
+ * come from the server's general log between markers written on the index connection.
+ */
+class F9IndexLatencyProbe extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+    use MemberActivationFixtures;
+
+    private const REPS = 5;
+
+    private ?PDO $independent = null;
+
+    private array $workers = [];
+
+    private array $directories = [];
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->assertSame('mysql', DB::getDriverName());
+        $this->memberActivationSetup();
+        DB::connection()->getPdo()->exec('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
+    }
+
+    protected function tearDown(): void
+    {
+        foreach ($this->workers as $worker) {
+            if ($worker->isRunning()) {
+                $worker->stop(1);
+            }
+        }
+        foreach ($this->directories as $directory) {
+            (new Filesystem)->deleteDirectory($directory);
+        }
+        $this->independent?->exec('SET GLOBAL general_log = 0');
+        parent::tearDown();
+    }
+
+    private const OUT = '<scratch>/f9-ev/latency/';
+
+    public function test_scaling(): void
+    {
+        $fixture = $this->memberActivationFixture();
+        $have = 1;
+        $sizes = array_map('intval', explode(',', getenv('F9_SIZES') ?: '1,5,10,100'));
+        $calls = (int) (getenv('F9_CALLS') ?: 2);
+        $logged = array_map('intval', array_filter(explode(',', (string) getenv('F9_LOG'))));
+        $tag = getenv('F9_TAG') ?: 'run';
+        foreach ($sizes as $target) {
+            $this->addOlderPeriods($fixture, $have, $target);
+            $have = $target;
+            for ($i = 1; $i <= $calls; $i++) {
+                $this->line('scaling-'.$tag, $this->timedCall($fixture, $tag.'-'.$target.'-'.$i, false) + ['periods' => $target]);
+            }
+            if (in_array($target, $logged, true)) {
+                $this->line('scaling-'.$tag, $this->timedCall($fixture, $tag.'-'.$target.'-log', true) + ['periods' => $target, 'general_log' => true]);
+            }
+        }
+        $this->assertSame($have, DB::table('production_membership_paid_periods')->count());
+    }
+
+    public function test_concurrent_award_at_100(): void
+    {
+        $fixture = $this->memberActivationFixture();
+        $this->addOlderPeriods($fixture, 1, 100);
+        $real = \Illuminate\Support\Facades\Crypt::getFacadeRoot();
+        for ($rep = 1; $rep <= 2; $rep++) {
+            $award = $this->otherCustomerAward($fixture, 'LAT'.$rep);
+            [$worker, $directory] = $this->awardWorker($award, $rep);
+            $writer = json_decode(file_get_contents($directory.'/ready-0'), true, 8, JSON_THROW_ON_ERROR)['connection_id'];
+            $parent = (int) DB::connection()->getPdo()->query('SELECT CONNECTION_ID()')->fetchColumn();
+            $state = ['started' => false, 'blocked' => false, 'samples' => 0, 'writer_holds_plan' => false, 'award_done_at' => null, 'last' => 0];
+            $t0 = hrtime(true);
+            $hook = \Mockery::mock();
+            $hook->shouldReceive('decryptString')->andReturnUsing(function ($ciphertext) use ($real, &$state, $directory, $worker, $parent, $writer, $fixture, $t0) {
+                if (self::inside(MembershipCustomerIndex::class, 'collectOwned')) {
+                    if (! $state['started']) {
+                        $state['started'] = true;
+                        touch($directory.'/start-0');
+                    }
+                    if (hrtime(true) - $state['last'] > 300_000_000) {
+                        $state['last'] = hrtime(true);
+                        $state['samples']++;
+                        $state['blocked'] = $state['blocked'] || $this->blockedBy($parent);
+                        if ($worker->isRunning()) {
+                            $state['writer_holds_plan'] = $state['writer_holds_plan'] || $this->holdsRow($writer, 'production_membership_plan_versions', $fixture['plan']['id']);
+                        } elseif ($state['award_done_at'] === null) {
+                            $state['award_done_at'] = round((hrtime(true) - $t0) / 1e9, 1);
+                        }
+                    }
+                }
+
+                return $real->decryptString($ciphertext);
+            });
+            $hook->shouldReceive('encryptString')->andReturnUsing(fn ($plain) => $real->encryptString($plain));
+            \Illuminate\Support\Facades\Crypt::swap($hook);
+            $outcome = 'completed';
+            try {
+                $read = MembershipCustomerRead::begin();
+                (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read);
+                $read->proveBeforeBytes();
+            } catch (\App\Domain\Memberships\Production\MembershipException $error) {
+                $outcome = 'refused:'.$error->reason;
+            } finally {
+                \Illuminate\Support\Facades\Crypt::swap($real);
+            }
+            $indexEnd = round((hrtime(true) - $t0) / 1e9, 1);
+            $worker->wait();
+            $awardEnd = round((hrtime(true) - $t0) / 1e9, 1);
+            $result = json_decode($worker->getOutput(), true, 16, JSON_THROW_ON_ERROR);
+            $this->line('concurrent', ['rep' => $rep, 'index_outcome' => $outcome, 'index_seconds' => $indexEnd,
+                'award_seen_finished_during_index_at_s' => $state['award_done_at'], 'award_joined_at_s' => $awardEnd,
+                'award_error' => array_key_exists('error_class', $result) ? $result['error_class'] : 'missing',
+                'award_period_id' => $result['value']['period_id'] ?? null, 'award_waited_on_index' => $state['blocked'],
+                'award_held_plan_while_index_open' => $state['writer_holds_plan'], 'samples' => $state['samples'], 'index_started' => $state['started']]);
+            $this->assertArrayHasKey('error_class', $result);
+            $this->assertNull($result['error_class'], json_encode($result));
+            $this->assertIsString($result['value']['period_id'] ?? null);
+            $this->assertFalse($state['blocked']);
+        }
+    }
+
+    public function test_r1_debug(): void
+    {
+        $fixture = $this->memberActivationFixture();
+        $real = (array) DB::table(MembershipPeriodRecords::PERIODS)->where('account_id', $fixture['buyer']['principal']->accountId)->sole();
+        $award = (array) DB::table(MembershipPeriodRecords::EVENTS)->where('period_id', $real['id'])->where('kind', 'award')->sole();
+        $plan = (array) DB::table(MembershipRecords::TABLE)->where('id', $real['plan_version_id'])->sole();
+        $policy = MembershipPolicyVersions::document($plan)->binding($plan['id']);
+        $originId = (int) $real['identity_origin_id'];
+        $invoice = MembershipPeriodRecords::historicalInvoice($real, $award, $policy, $originId);
+        $move = static fn (?string $at): ?string => $at === null ? null : gmdate('Y-m-d H:i:s', strtotime($at.' UTC') - 2678400);
+        $copy = new MembershipInvoiceBinding(hash('sha256', 'native-index-owner-writer-invoice'), hash('sha256', 'native-index-owner-writer-graph'),
+            $invoice->providerScopeHash, $invoice->amountMinor, $invoice->currency, $move($invoice->periodStart), $move($invoice->periodEnd),
+            $invoice->planPolicyHash, $invoice->originalTermsHash, $invoice->originalBuyerBinding, $invoice->provenance, $move($invoice->paidAt),
+            $invoice->planVersionId);
+        [$period, $event] = MembershipPeriodRecords::create($copy, $policy, $originId, $fixture['buyer']['principal']->durableBinding());
+        $config = DB::connection()->getConfig();
+        $parent = (int) DB::connection()->getPdo()->query('SELECT CONNECTION_ID()')->fetchColumn();
+        $directory = storage_path('framework/testing/membership-index-r1debug-'.Str::uuid());
+        (new Filesystem)->makeDirectory($directory, 0700, true);
+        $this->directories[] = $directory;
+        file_put_contents($directory.'/rows.json', json_encode(['period' => $period, 'event' => $event], JSON_THROW_ON_ERROR));
+        $code = <<<'PHP'
+[, $host, $port, $database, $user, $password, $userId, $parent, $directory] = $argv;
+$t = fn ($m) => file_put_contents($directory.'/trace', sprintf("%.3f %s\n", microtime(true), $m), FILE_APPEND);
+$t('argv '.json_encode(array_slice($argv, 1, 3)));
+$open = fn () => new PDO('mysql:host='.$host.';port='.$port.';dbname='.$database, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+$writer = $open();
+$watch = $open();
+$writer->exec('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
+$writer->beginTransaction();
+$lock = $writer->prepare('SELECT id FROM users WHERE id = ? FOR UPDATE');
+$lock->execute([$userId]);
+$t('locked rows='.count($lock->fetchAll()));
+touch($directory.'/locked');
+$self = (int) $writer->query('SELECT CONNECTION_ID()')->fetchColumn();
+$t('self='.$self.' parent='.$parent);
+$waiters = [];
+$deadline = microtime(true) + 100;
+$last = 0;
+while ($waiters === [] && microtime(true) < $deadline) {
+    $trx = $watch->prepare("SELECT trx_mysql_thread_id FROM information_schema.INNODB_TRX WHERE trx_state = 'LOCK WAIT' AND trx_mysql_thread_id <> ?");
+    $trx->execute([$self]);
+    $waiters = array_map('intval', $trx->fetchAll(PDO::FETCH_COLUMN));
+    if (microtime(true) - $last > 1) {
+        $last = microtime(true);
+        $t('trx '.json_encode($watch->query('SELECT trx_mysql_thread_id, trx_state, trx_query FROM information_schema.INNODB_TRX')->fetchAll(PDO::FETCH_NUM)));
+    }
+    usleep(20000);
+}
+$t('waiters='.json_encode($waiters));
+$rows = json_decode(file_get_contents($directory.'/rows.json'), true, 8, JSON_THROW_ON_ERROR);
+foreach (['production_membership_paid_periods' => $rows['period'], 'production_membership_credit_events' => $rows['event']] as $table => $row) {
+    $insert = $writer->prepare('INSERT INTO '.$table.' ('.implode(', ', array_keys($row)).') VALUES ('.implode(', ', array_fill(0, count($row), '?')).')');
+    $insert->execute(array_values($row));
+    $t('inserted '.$table);
+}
+$writer->commit();
+$t('committed');
+echo json_encode(['waiters' => $waiters, 'parent' => (int) $parent]);
+PHP;
+        $worker = new Process([PHP_BINARY, '-r', $code, '--', (string) $config['host'], (string) $config['port'], (string) $config['database'],
+            (string) $config['username'], (string) $config['password'], (string) $fixture['buyer']['principal']->userId, (string) $parent, $directory], base_path(), null, null, 200);
+        $worker->start();
+        $this->workers[] = $worker;
+        while (! is_file($directory.'/locked')) {
+            clearstatcache();
+            if (! $worker->isRunning()) {
+                $this->fail('child died: '.$worker->getErrorOutput());
+            }
+            usleep(5000);
+        }
+        file_put_contents($directory.'/trace', sprintf("%.3f parent index start\n", microtime(true)), FILE_APPEND);
+        $outcome = 'ok';
+        try {
+            $read = MembershipCustomerRead::begin();
+            $index = (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read);
+            file_put_contents($directory.'/trace', sprintf("%.3f parent index done periods=%d\n", microtime(true), count($index['periods'])), FILE_APPEND);
+            $read->proveBeforeBytes();
+        } catch (\Throwable $e) {
+            $outcome = get_class($e).' '.($e->reason ?? '').' '.($e->getPrevious()?->getMessage() ?? '');
+        }
+        file_put_contents($directory.'/trace', sprintf("%.3f parent end %s\n", microtime(true), $outcome), FILE_APPEND);
+        $worker->wait();
+        file_put_contents(self::OUT.'r1-debug.txt', file_get_contents($directory.'/trace')."\nSTDOUT ".$worker->getOutput()."\nSTDERR ".$worker->getErrorOutput()."\nEXIT ".$worker->getExitCode()."\n");
+        $this->assertSame('ok', $outcome);
+    }
+
+    private function timedCall(array $fixture, string $label, bool $logged): array
+    {
+        $pdo = DB::connection()->getPdo();
+        if ($logged) {
+            $log = '<scratch>/f9-ev/latency/glog-'.$label.'.log';
+            @unlink($log);
+            $this->independent()->exec("SET GLOBAL general_log_file = '".$log."'");
+            $this->independent()->exec('SET GLOBAL general_log = 1');
+        }
+        $before = $this->counters($pdo);
+        $pdo->query("SELECT 'va-lat-start-".$label."'")->fetchAll();
+        $t0 = hrtime(true);
+        $t1 = null;
+        $outcome = 'completed';
+        $count = null;
+        try {
+            $read = MembershipCustomerRead::begin();
+            $index = (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read);
+            $t1 = hrtime(true);
+            $count = count($index['periods']);
+            $read->proveBeforeBytes();
+        } catch (\App\Domain\Memberships\Production\MembershipException $error) {
+            $outcome = 'refused:'.$error->reason.($t1 === null ? ' (in index)' : ' (in pre-bytes)');
+        }
+        $t2 = hrtime(true);
+        $pdo->query("SELECT 'va-lat-end-".$label."'")->fetchAll();
+        if ($logged) {
+            $this->independent()->exec('SET GLOBAL general_log = 0');
+        }
+        $after = $this->counters($pdo);
+        $delta = [];
+        foreach ($after as $name => $value) {
+            $delta[$name] = $value - ($before[$name] ?? 0);
+        }
+
+        return ['label' => $label, 'outcome' => $outcome, 'listed' => $count, 'index_s' => $t1 === null ? null : round(($t1 - $t0) / 1e9, 2),
+            'pre_bytes_s' => $t1 === null ? null : round(($t2 - $t1) / 1e9, 2), 'total_s' => round(($t2 - $t0) / 1e9, 2),
+            'statements' => $delta['Questions'] - 3, 'show_create_table' => $delta['Com_show_create_table'], 'com_select' => $delta['Com_select']];
+    }
+
+    private function counters(PDO $pdo): array
+    {
+        $rows = $pdo->query("SHOW SESSION STATUS WHERE Variable_name IN ('Questions', 'Com_show_create_table', 'Com_select')")->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        return array_map('intval', $rows);
+    }
+
+    private function line(string $file, array $row): void
+    {
+        file_put_contents(self::OUT.'result-'.$file.'.jsonl', json_encode($row + ['at' => gmdate('H:i:s')])."\n", FILE_APPEND);
+    }
+
+    /** Older sealed periods in the exact retained format, each one month (31 days) before the previous. */
+    private function addOlderPeriods(array $fixture, int $from, int $to): void
+    {
+        $real = (array) DB::table(MembershipPeriodRecords::PERIODS)->where('account_id', $fixture['buyer']['principal']->accountId)
+            ->orderByDesc('period_start')->first();
+        $award = (array) DB::table(MembershipPeriodRecords::EVENTS)->where('period_id', $real['id'])->where('kind', 'award')->sole();
+        $plan = (array) DB::table(MembershipRecords::TABLE)->where('id', $real['plan_version_id'])->sole();
+        $policy = MembershipPolicyVersions::document($plan)->binding($plan['id']);
+        $originId = (int) $real['identity_origin_id'];
+        $invoice = MembershipPeriodRecords::historicalInvoice($real, $award, $policy, $originId);
+        for ($k = $from; $k < $to; $k++) {
+            $move = static fn (?string $at): ?string => $at === null ? null : gmdate('Y-m-d H:i:s', strtotime($at.' UTC') - $k * 2678400);
+            $copy = new MembershipInvoiceBinding(hash('sha256', 'latency-invoice-'.$k), hash('sha256', 'latency-graph-'.$k),
+                $invoice->providerScopeHash, $invoice->amountMinor, $invoice->currency, $move($invoice->periodStart), $move($invoice->periodEnd),
+                $invoice->planPolicyHash, $invoice->originalTermsHash, $invoice->originalBuyerBinding, $invoice->provenance, $move($invoice->paidAt),
+                $invoice->planVersionId);
+            [$period, $event] = MembershipPeriodRecords::create($copy, $policy, $originId, $fixture['buyer']['principal']->durableBinding());
+            DB::table(MembershipPeriodRecords::PERIODS)->insert($period);
+            DB::table(MembershipPeriodRecords::EVENTS)->insert($event);
+        }
+    }
+
+    private function otherCustomerAward(array $fixture, string $suffix): array
+    {
+        $references = [BillingStripeFixtures::CUSTOMER => 'cus_SYN'.$suffix, BillingStripeFixtures::SUBSCRIPTION => 'sub_SYN'.$suffix,
+            BillingStripeFixtures::INVOICE => 'in_SYN'.$suffix, BillingStripeFixtures::INVOICE_PAYMENT => 'inpay_SYN'.$suffix,
+            BillingStripeFixtures::PAYMENT_INTENT => 'pi_SYN'.$suffix, BillingStripeFixtures::CHARGE => 'ch_SYN'.$suffix,
+            BillingStripeFixtures::BALANCE_TRANSACTION => 'txn_SYN'.$suffix, 'il_SYNTHETIC' => 'il_SYN'.$suffix, 'si_SYNTHETIC' => 'si_SYN'.$suffix];
+        $replace = function (mixed $value) use (&$replace, $references): mixed {
+            if (! is_array($value)) {
+                return is_string($value) ? ($references[$value] ?? $value) : $value;
+            }
+            $result = [];
+            foreach ($value as $key => $item) {
+                $result[is_string($key) ? ($references[$key] ?? $key) : $key] = $replace($item);
+            }
+
+            return $result;
+        };
+        $buyer = $this->enrollThroughLocalSmtp('latency-writer-'.strtolower($suffix).'@example.test');
+        $approved = DB::transaction(fn () => (new BillingSubscriptionApprovals)->approve($fixture['plan']['id'], $references[BillingStripeFixtures::CUSTOMER],
+            $references[BillingStripeFixtures::SUBSCRIPTION], BillingStripeFixtures::PRICE, $buyer['principal'], $buyer['user'], $fixture['staff'], new MembershipRows));
+        $ledger = new BillingLedger;
+        $approval = $ledger->binding($approved['id'], (new BillingPolicy)->current());
+        $invoice = $ledger->invoice($approval, $references[BillingStripeFixtures::INVOICE]);
+        $start = $ledger->startRetrieval();
+        $graph = $replace(BillingStripeFixtures::graph());
+        $interval = $ledger->endRetrieval($start);
+        $retrievedAt = BillingDatabaseInstant::fromNativeValue($interval->databaseAt, 0)->seconds();
+        $projected = BillingStripeFixtures::snapshots($graph, $retrievedAt);
+        $snapshots = new BillingSnapshots($references[BillingStripeFixtures::INVOICE], $projected->account, $projected->invoice,
+            $projected->lines, $projected->payments, $projected->paymentIntents, $projected->charges,
+            $projected->balanceTransactions, $projected->subscription, $retrievedAt, IdentityPolicy::REHEARSAL);
+        $ledger->append($invoice, BillingSettlement::evaluate($snapshots, $approval['expectation']), IdentityPolicy::REHEARSAL, $interval);
+
+        return ['buyer' => $buyer, 'invoice' => $invoice];
+    }
+
+    private function awardWorker(array $award, int $rep): array
+    {
+        $directory = storage_path('framework/testing/membership-index-latency-'.Str::uuid());
+        (new Filesystem)->makeDirectory($directory, 0700, true);
+        $this->directories[] = $directory;
+        $db = DB::connection()->getConfig();
+        $environment = ['APP_ENV' => 'testing', 'APP_DEBUG' => 'false', 'APP_KEY' => 'base64:'.base64_encode(str_repeat('P', 32)),
+            'DB_CONNECTION' => 'mysql', 'DB_URL' => '', 'DB_HOST' => (string) $db['host'], 'DB_PORT' => (string) $db['port'],
+            'DB_DATABASE' => (string) $db['database'], 'DB_USERNAME' => (string) $db['username'], 'DB_PASSWORD' => (string) $db['password'],
+            'DB_SOCKET' => (string) ($db['unix_socket'] ?? ''), 'CACHE_STORE' => 'array', 'SESSION_DRIVER' => 'array', 'QUEUE_CONNECTION' => 'sync',
+            'VA_MEMBERSHIP_AWARD_RACE_ONLY' => '1', 'VA_MEMBERSHIP_AWARD_RACE_DIRECTORY' => $directory, 'VA_MEMBERSHIP_AWARD_RACE_WORKER' => '0'];
+        $input = ['operation' => 'award', 'user_id' => (int) $award['buyer']['user']->id, 'invoice_id' => $award['invoice']['id'],
+            'configuration' => ['production-customer-identity' => config('production-customer-identity'),
+                'production-memberships' => config('production-memberships'), 'production-membership-billing' => config('production-membership-billing')]];
+        $worker = new Process([PHP_BINARY, base_path('tests/Support/membership-award-race-worker.php')], base_path(), $environment,
+            json_encode($input, JSON_THROW_ON_ERROR), 200);
+        $worker->start();
+        $this->workers[] = $worker;
+        $deadline = hrtime(true) + 30_000_000_000;
+        while (! is_file($directory.'/ready-0')) {
+            clearstatcache();
+            if (! $worker->isRunning() || hrtime(true) >= $deadline) {
+                $this->fail('Award worker did not reach its barrier: '.$worker->getOutput().$worker->getErrorOutput());
+            }
+            usleep(5000);
+        }
+
+        return [$worker, $directory];
+    }
+
+    private function holdsRow(int $session, string $table, string $id): bool
+    {
+        $statement = $this->independent()->prepare("SELECT COUNT(*) FROM performance_schema.data_locks locks
+            JOIN performance_schema.threads holder ON holder.THREAD_ID = locks.THREAD_ID
+            WHERE holder.PROCESSLIST_ID = ? AND locks.OBJECT_NAME = ? AND locks.INDEX_NAME = 'PRIMARY' AND locks.LOCK_TYPE = 'RECORD'
+            AND locks.LOCK_MODE LIKE 'X%' AND locks.LOCK_STATUS = 'GRANTED' AND locks.LOCK_DATA LIKE ?");
+        $statement->execute([$session, $table, '%'.$id.'%']);
+
+        return (int) $statement->fetchColumn() > 0;
+    }
+
+    private function blockedBy(int $blocker): bool
+    {
+        $statement = $this->independent()->prepare('SELECT COUNT(*) FROM performance_schema.data_lock_waits waits
+            JOIN performance_schema.threads blocker ON blocker.THREAD_ID = waits.BLOCKING_THREAD_ID WHERE blocker.PROCESSLIST_ID = ?');
+        $statement->execute([$blocker]);
+
+        return (int) $statement->fetchColumn() > 0;
+    }
+
+    private static function inside(string $class, string $method): bool
+    {
+        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 80) as $frame) {
+            if (($frame['class'] ?? null) === $class && ($frame['function'] ?? null) === $method) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function independent(): PDO
+    {
+        if ($this->independent === null) {
+            $config = DB::connection()->getConfig();
+            $this->independent = new PDO('mysql:host='.$config['host'].';port='.$config['port'].';dbname='.$config['database'],
+                $config['username'], $config['password'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        }
+
+        return $this->independent;
+    }
+}

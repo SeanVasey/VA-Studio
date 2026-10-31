@@ -12,6 +12,7 @@ use App\Domain\Grants\Member\MemberGrantCurrentSchema;
 use App\Domain\Grants\Member\MemberGrantPolicy;
 use App\Domain\Grants\Member\MemberGrantRecords;
 use App\Domain\Grants\Member\MemberGrantRows;
+use App\Domain\Grants\Member\MemberGrantSchemaSnapshot;
 use App\Domain\Grants\Member\MemberOriginalFinishBoundary;
 use App\Domain\Grants\Member\SealedMemberGrantFacts;
 use App\Models\User;
@@ -127,19 +128,23 @@ final class MembershipCustomerIndex
         $grants = new MemberGrantPolicy;
         $finish = MemberOriginalFinishBoundary::capture();
         $history = new MemberActivationHistoryReader;
-        $state = ['snapshots' => []];
+        $state = ['snapshots' => [], 'historical' => []];
         $admit = function () use ($configuration, $policy, $membership, $deadline): void {
             $configuration->admit();
             $policy->proveConfiguration($membership);
             MembershipException::require(hrtime(true) < $deadline, 'operation_deadline');
         };
         try {
-            $projection = DB::transaction(function () use ($principal, $actor, $primary, $grants, $finish, $history, $admit, $membership, &$state): array {
+            $projection = DB::transaction(function () use ($principal, $actor, $connection, $primary, $grants, $finish, $history, $admit, $membership, &$state): array {
                 // Re-review R1: the owner's user row is locked by the frame's very first statement, before any
                 // consistent read (the schema proofs below read identity rows), so the read view is created only after
                 // every same-owner writer that held the row has committed.
                 $this->lockOwnerFirst($primary, $principal->userId);
-                $rows = new MembershipRows;
+                // F9: one owned frame with G1's frame-scoped schema proofs (SchemaProofFrame), member-grant proofs
+                // included, so each guard proves completely once per frame token rather than once per period. The
+                // terminal phase below proves every guard completely again before the commit.
+                $owned = new MembershipAwardTransaction($connection, $primary, memberGrantProofs: true);
+                $rows = new MembershipRows($owned);
                 MembershipException::require($rows->identity() === $primary, 'changed_primary');
                 $access = new ProductionCustomerAccess;
                 // The owner's T23 rows are the only locks this frame takes; it serializes every writer of the owner's
@@ -151,12 +156,14 @@ final class MembershipCustomerIndex
                 $admit();
                 $current = $access->durableBinding($principal);
                 // Shared immutable facts (plan versions, member profiles and definitions): consistent reads, no locks.
-                $facts = new MemberGrantRows($rows, MemberGrantCurrentSchema::pin($rows));
+                // Every period's history capture shares this one schema snapshot (F9).
+                $schema = MemberGrantCurrentSchema::pin($rows);
+                $facts = new MemberGrantRows($rows, $schema);
                 $table = $this->periodTable($rows);
                 $window = $this->window($rows->identity(), $rows->driver(), $table, $principal->accountId);
                 $periods = [];
                 foreach ($window as $row) {
-                    $periods[] = $this->period($rows, $facts, $history, $access, $row, $principal, $identity, $current, $state);
+                    $periods[] = $this->period($rows, $facts, $schema, $history, $access, $row, $principal, $identity, $current, $state);
                     $admit();
                 }
                 $definition = $this->definition($facts, $grantConfiguration);
@@ -167,15 +174,19 @@ final class MembershipCustomerIndex
                 foreach ($periods as $period) {
                     $history->currentCallbacks($period['snapshot'], $rows);
                     $this->audit($period);
-                    $access->proveHistoricalBindingCurrent($period['invoice']->originalBuyerBinding, $rows->current(), $period['historical']);
                 }
+                // Each distinct retained buyer binding once (F9); every period's binding is one of them.
+                foreach (self::bindings($periods) as [$binding, $historical]) {
+                    $access->proveHistoricalBindingCurrent($binding, $rows->current(), $historical);
+                }
+                // Owned terminal phase (G1): from here to the commit every schema guard proves completely, never from
+                // the memo, exactly as before F9.
+                $owned->beginTerminalProof();
                 $grants->proveCurrent($grantConfiguration, $rows);
                 $access->proveCurrent($principal, $actor, $rows->current(), $identity);
                 $admit();
                 $finish->assertFrame($rows->identity(), false);
-                foreach ($periods as $period) {
-                    $history->currentRaw($period['snapshot'], $rows);
-                }
+                $history->currentRawAll(array_column($periods, 'snapshot'), $rows);
                 $this->raw($rows->identity(), $rows->driver(), $state, false);
                 $rows->assertCurrent();
                 $finish->assertFrame($rows->identity(), false);
@@ -189,18 +200,18 @@ final class MembershipCustomerIndex
             try {
                 $frame->assertActive();
                 MembershipException::require($frame->reader()->identityPrimary() === $primary, 'changed_primary');
+                $history->committedCallbacksAll(array_column($state['periods'], 'snapshot'), $frame);
                 foreach ($state['periods'] as $period) {
-                    $history->committedCallbacks($period['snapshot'], $frame);
                     $this->audit($period);
-                    $state['access']->proveHistoricalBindingCommitted($period['invoice']->originalBuyerBinding, $frame, $period['historical']);
+                }
+                foreach (self::bindings($state['periods']) as [$binding, $historical]) {
+                    $state['access']->proveHistoricalBindingCommitted($binding, $frame, $historical);
                 }
                 $state['access']->proveCommitted($principal, $actor, $frame, $state['identity']);
                 $grants->proveCapturedConfiguration($state['grants']);
                 $admit();
                 $finish->assertFrame($primary, true);
-                foreach ($state['periods'] as $period) {
-                    $history->committedRaw($period['snapshot'], $frame);
-                }
+                $history->committedRawAll(array_column($state['periods'], 'snapshot'), $frame);
                 $frame->assertActive();
                 $this->raw($primary, $state['rows']->driver(), $state, true);
                 $finish->assertFrame($primary, true);
@@ -221,8 +232,8 @@ final class MembershipCustomerIndex
     }
 
     /** One fetched period (sentinel included): exact scope, retained invoice semantics and complete audit. */
-    private function period(MembershipRows $rows, MemberGrantRows $facts, MemberActivationHistoryReader $history, ProductionCustomerAccess $access,
-        array $row, ProductionCustomerPrincipal $principal, array $identity, array $current, array &$state): array
+    private function period(MembershipRows $rows, MemberGrantRows $facts, MemberGrantSchemaSnapshot $schema, MemberActivationHistoryReader $history,
+        ProductionCustomerAccess $access, array $row, ProductionCustomerPrincipal $principal, array $identity, array $current, array &$state): array
     {
         MembershipException::require(is_string($row['id'] ?? null), 'tampered');
         MembershipValues::id($row['id']);
@@ -230,7 +241,7 @@ final class MembershipCustomerIndex
             && (string) $row['user_id'] === (string) $principal->userId
             && (string) $row['identity_origin_id'] === (string) $identity['origin']['id'], 'foreign_period');
         // Consistent reads only (N1, N2): no lock on the owner's member rows or on the shared facts they reference.
-        $snapshot = $history->capturePeriod($row['id'], $rows, consistentRead: true);
+        $snapshot = $history->capturePeriod($row['id'], $rows, consistentRead: true, schema: $schema);
         $state['snapshots'][] = $snapshot;
         $scope = $snapshot->scope();
         MembershipException::require(MembershipRecords::strings($scope['period']) === MembershipRecords::strings($row), 'changed_period');
@@ -248,13 +259,40 @@ final class MembershipCustomerIndex
         MembershipException::require($buyer['account_id'] === $principal->accountId && $buyer['user_id'] === $principal->userId
             && $buyer['origin_id'] === $current['origin_id'] && $buyer['account_public_id'] === $current['account_public_id']
             && $invoice->provenance === $principal->provenance, 'foreign_period');
-        $historical = $access->verifyHistoricalBinding($buyer, $rows->current());
+        // F9: each distinct retained binding is verified once per frame. The owner's identity rows it reads are locked
+        // by this frame (T23) and the rest is immutable history, so a repeat in the same frame reads the same rows.
+        $key = CanonicalJson::encode($buyer);
+        $state['historical'][$key] ??= $access->verifyHistoricalBinding($buyer, $rows->current());
+        $historical = $state['historical'][$key];
         MembershipException::require((string) $historical['origin']['id'] === (string) $identity['origin']['id'], 'foreign_period');
         $period = ['snapshot' => $snapshot, 'plan' => $plan, 'policy' => $policy, 'invoice' => $invoice,
             'historical' => $historical, 'origin_id' => (int) $identity['origin']['id']];
         $period['audit'] = $this->audit($period);
 
         return $period;
+    }
+
+    /**
+     * The distinct retained buyer bindings of the periods with their verified historical evidence, in first-seen order.
+     * Periods sharing a binding share one verification, so their evidence is identical; anything else refuses.
+     *
+     * @return list<array{0: array, 1: array}>
+     */
+    private static function bindings(array $periods): array
+    {
+        $distinct = [];
+        foreach ($periods as $period) {
+            $binding = $period['invoice']->originalBuyerBinding;
+            $key = CanonicalJson::encode($binding);
+            if (isset($distinct[$key])) {
+                MembershipException::require(CanonicalJson::encode($distinct[$key][1]) === CanonicalJson::encode($period['historical']), 'changed_history');
+
+                continue;
+            }
+            $distinct[$key] = [$binding, $period['historical']];
+        }
+
+        return array_values($distinct);
     }
 
     private function audit(array $period): array

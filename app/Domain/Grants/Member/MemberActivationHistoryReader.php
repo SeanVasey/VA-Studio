@@ -78,11 +78,21 @@ final class MemberActivationHistoryReader
      * reads instead of FOR UPDATE, so a read of one owner's history never holds or waits for a row or gap lock. The
      * caller holds the owner's T23 lock, re-proves the same rows in the same snapshot and, after commit, in a fresh
      * committed frame; any difference refuses. Writers keep the default, locking capture.
+     *
+     * `$schema` (the customer index only, F9): a snapshot the caller pinned on the same rows, re-proved here instead of
+     * a new pin, so every period of one index shares one schema snapshot and the raw phases can prove it once around
+     * all periods (currentRawAll, committedRawAll). Writers keep the default, a fresh pin per capture.
      */
-    public function capturePeriod(string $periodId, MembershipRows $rows, bool $consistentRead = false): MemberActivationHistorySnapshot
+    public function capturePeriod(string $periodId, MembershipRows $rows, bool $consistentRead = false,
+        ?MemberGrantSchemaSnapshot $schema = null): MemberActivationHistorySnapshot
     {
         MemberGrantDocumentValues::id($periodId);
-        $schema = MemberGrantCurrentSchema::pin($rows);
+        if ($schema === null) {
+            $schema = MemberGrantCurrentSchema::pin($rows);
+        } else {
+            $rows->assertCurrent();
+            MemberGrantCurrentSchema::assertCurrent($schema, $rows);
+        }
         $profile = MemberGrantCurrentSchema::table($schema, self::TABLES['profiles']);
         $prefix = substr($profile, 0, -strlen(self::TABLES['profiles'].'`'));
         $state = ['rows' => $rows, 'pdo' => $rows->identity(), 'schema' => $schema,
@@ -118,7 +128,86 @@ final class MemberActivationHistoryReader
         MemberGrantCurrentSchema::assertCurrent($state['schema'], $rows);
     }
 
+    /**
+     * currentRaw for every snapshot of one index frame (F9): one complete schema proof before and one after the raw
+     * re-reads of all periods, instead of two per period. Every snapshot must have been captured on these rows with
+     * the one shared schema snapshot; the caller has entered its owned terminal phase, so both proofs are complete.
+     * No callback runs between the two proofs.
+     *
+     * @param  list<MemberActivationHistorySnapshot>  $snapshots
+     */
+    public function currentRawAll(array $snapshots, MembershipRows $rows): void
+    {
+        $states = [];
+        foreach ($snapshots as $snapshot) {
+            $states[] = $this->currentState($snapshot, $rows);
+        }
+        if ($states === []) {
+            return;
+        }
+        $schema = self::sharedSchema($states);
+        MemberGrantCurrentSchema::assertCurrent($schema, $rows);
+        foreach ($states as $state) {
+            self::equal($state['captured'], self::read($state, false));
+        }
+        MemberGrantCurrentSchema::assertCurrent($schema, $rows);
+    }
+
+    /**
+     * committedRaw for every snapshot of one index frame (F9): one complete committed schema proof before and one after
+     * the raw re-reads of all periods. Every snapshot must already have passed committedCallbacks in this frame.
+     *
+     * @param  list<MemberActivationHistorySnapshot>  $snapshots
+     */
+    public function committedRawAll(array $snapshots, IdentityCommittedFrame $f): void
+    {
+        $states = [];
+        foreach ($snapshots as $snapshot) {
+            $state = $this->state($snapshot);
+            MemberGrantException::require($state['frame'] === $f && ! $state['pending'], 'history_snapshot');
+            $states[] = $state;
+        }
+        if ($states === []) {
+            return;
+        }
+        $schema = self::sharedSchema($states);
+        MemberGrantCurrentSchema::assertCommitted($schema, $f);
+        foreach ($states as $state) {
+            self::equal($state['captured'], self::read($state, true));
+        }
+        MemberGrantCurrentSchema::assertCommitted($schema, $f);
+    }
+
     public function committedCallbacks(MemberActivationHistorySnapshot $s, IdentityCommittedFrame $f): void
+    {
+        $this->committedCallback($s, $f, true);
+    }
+
+    /**
+     * committedCallbacks for every snapshot of one index frame (F9): one complete committed schema proof before the
+     * committed re-reads, comparisons and history checks of all periods, instead of one per period. The caller's raw
+     * phase (committedRawAll) proves the schema completely again after every read and before the frame can finish, so
+     * anything a callback changes is refused before any output is released.
+     *
+     * @param  list<MemberActivationHistorySnapshot>  $snapshots
+     */
+    public function committedCallbacksAll(array $snapshots, IdentityCommittedFrame $f): void
+    {
+        $states = [];
+        foreach ($snapshots as $snapshot) {
+            $states[] = $this->state($snapshot);
+        }
+        if ($states === []) {
+            return;
+        }
+        $f->assertActive();
+        MemberGrantCurrentSchema::assertCommitted(self::sharedSchema($states), $f);
+        foreach ($snapshots as $snapshot) {
+            $this->committedCallback($snapshot, $f, false);
+        }
+    }
+
+    private function committedCallback(MemberActivationHistorySnapshot $s, IdentityCommittedFrame $f, bool $proveSchema): void
     {
         $state = $this->state($s);
         MemberGrantException::require(! $state['pending'] && ($state['frame'] === null || $state['frame'] === $f), 'history_snapshot');
@@ -126,7 +215,9 @@ final class MemberActivationHistoryReader
         $this->issued[$s] = $pending;
         try {
             $f->assertActive();
-            MemberGrantCurrentSchema::assertCommitted($state['schema'], $f);
+            if ($proveSchema) {
+                MemberGrantCurrentSchema::assertCommitted($state['schema'], $f);
+            }
             $actual = self::read($state, true);
             self::equal($state['captured'], $actual);
             self::history($actual);
@@ -152,6 +243,18 @@ final class MemberActivationHistoryReader
     public function retire(MemberActivationHistorySnapshot $s): void
     {
         unset($this->issued[$s]);
+    }
+
+    /** One schema snapshot, one primary and one rows object for every state, or refused. */
+    private static function sharedSchema(array $states): MemberGrantSchemaSnapshot
+    {
+        $first = $states[0];
+        foreach ($states as $state) {
+            MemberGrantException::require($state['schema'] === $first['schema'] && $state['rows'] === $first['rows']
+                && $state['pdo'] === $first['pdo'] && $state['driver'] === $first['driver'] && $state['tables'] === $first['tables'], 'history_snapshot');
+        }
+
+        return $first['schema'];
     }
 
     private function state(MemberActivationHistorySnapshot $s): array
