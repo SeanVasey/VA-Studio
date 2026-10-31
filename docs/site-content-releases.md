@@ -67,6 +67,17 @@ Once a release that uses an image is published, the image is public at its own c
 
 A release without images is saved exactly as before, so code that predates site images can still read it.
 
+## Legal pages
+
+Lane CX (FP-005) adds three optional legal pages to a release: **Privacy policy**, **Terms** and **License comparison**, public at `/legal/privacy`, `/legal/terms` and `/legal/licenses` once a release that includes them is published. A release with any legal page is saved as schema version 5 (version 4 plus `legal`); leaving every legal page out keeps the existing v2/v3/v4 choice, and retained releases keep their hashes. Evidence: [lane CX packet](verification/customer-comms-cx-20261024/README.md).
+
+1. In a content draft, open **Privacy policy page**, **Terms page** or **License comparison page** and select **Include … page**. Paste only text that has been approved for publication: the drafts in `docs/legal/` are not approved and must not be pasted until Sean approves them.
+2. Enter a page title (120) and description (300), a **Version** (a short label such as `1` or `2026-11`, shown on the page), an **Effective date** (`YYYY-MM-DD`, shown on the page) and an **Approval reference** (who approved this exact text and where that is recorded; kept with the release for staff and never shown publicly).
+3. Add sections: a heading (160) and one to forty paragraphs (4,000 each), up to sixty sections and 120,000 characters per page. Text is plain: markup, `<`, `>` and control characters are refused, and there are no links. Line breaks inside a paragraph are kept. The postal address, once complete, is pasted here at publication, never committed to the repository.
+4. Preview at `/admin/site-releases/{release}/preview/legal/{privacy|terms|licenses}` (private, no-store, noindex), then publish as usual. Navigation can link an included legal page; the footer lists every published legal page.
+
+Until a release with legal pages is published, every legal route answers `404`. Restoring an older release withdraws them.
+
 ## Original schema-v1 fields
 
 All values are bounded plain text, with no markup or unsupported keys. Label length is at most 120 characters. These are the original integer schema-version `1` fields; new editor copies use schema version `2` and its additional bounded fields, or version `3`, which adds site image references ([D-25](architecture/D-25-editable-site-images.md)), when they use an image.

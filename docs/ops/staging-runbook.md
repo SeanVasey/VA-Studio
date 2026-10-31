@@ -397,7 +397,7 @@ render failed closed with `render_failed` (`docs/verification/php-cli-resolver-2
 1. `ops/staging/validate-runtime.php` (run by every deploy and `ctl refresh`) fails `runtime.php_cli_binary` unless the
    configured binary passes the same probe the FPM pool will run.
 2. Free grants stay off on staging: `VASEY_TEST_FREE_GRANTS_ENABLED` must be `false`, and the deploy gate refuses any other value
-   (as it does for the other eleven staged flags). Enabling them is a reviewed change to `scripts/ops/capability-boundary.php`,
+   (as it does for the other fourteen staged flags). Enabling them is a reviewed change to `scripts/ops/capability-boundary.php`,
    the templates and their tests. That change should include rendering one synthetic document through the real FPM pool and
    confirming a PDF, not `render_failed`, before the flag is true on any host. The harness used for the evidence is in
    `docs/verification/php-cli-resolver-20261009/`.

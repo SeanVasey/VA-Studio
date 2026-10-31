@@ -16,7 +16,8 @@ VALIDATOR = REPO / "scripts/ops/validate-test-commerce-profile.php"
 ENV_CALL = re.compile(r"""env\(\s*['"]([A-Za-z0-9_]+)['"]""")
 ASSIGNMENT = re.compile(r"^(#?)\s*([A-Z][A-Z0-9_]*)=(.*)$")
 
-# Environment key -> (config file, config key). The ten flags of batch K2 plus A5's refund/dispute flag, in the validator's CAPABILITY_FLAGS.
+# Environment key -> (config file, config key). The ten flags of batch K2 plus A5's refund/dispute flag and lane CX's data rights and
+# order-ready email flags, in the validator's CAPABILITY_FLAGS.
 FLAGS = {
     "VASEY_TEST_SERVICE_PROJECTS_ENABLED": ("services-projects", "test_enabled"),
     "VASEY_TEST_FREE_GRANTS_ENABLED": ("free-grants", "test_enabled"),
@@ -25,12 +26,14 @@ FLAGS = {
     "VASEY_TEST_REFUND_RESOLUTION_ENABLED": ("refund-resolution", "enabled"),
     "VASEY_TEST_REFUND_DISPUTE_ENABLED": ("refund-dispute", "enabled"),
     "VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED": ("transactional-notifications", "test_enabled"),
+    "VASEY_CUSTOMER_DATA_RIGHTS_ENABLED": ("customer-data-rights", "enabled"),
+    "VASEY_TRANSACTIONAL_MAIL_ENABLED": ("transactional-mail", "enabled"),
     "CONTACT_TEST_ORDER_INQUIRIES_ENABLED": ("inquiries", "test_order_inquiries_enabled"),
     "CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED": ("inquiries", "operator_notifications_enabled"),
     "VASEY_OPERATIVE_FREE_GRANTS_ENABLED": ("free-grants", "operative_enabled"),
     "VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED": ("support-attachments", "fixture_enabled"),
 }
-# Stated explicitly but outside the eleven: production-lane or one-way, so never left to a default on staging.
+# Stated explicitly but outside the thirteen: production-lane or one-way, so never left to a default on staging.
 EXTRA_FALSE = ("DISCOVERY_SITEMAP_ENABLED", "VASEY_LISTENING_V2_PROMOTION_ENABLED")
 
 # Keys config/ reads that the kit deliberately leaves to Laravel's own defaults: cache and queue back ends the kit does not use
@@ -183,6 +186,9 @@ class AdmissionMatchesTheValues(unittest.TestCase):
         self.assert_source("app/Domain/Commerce/RefundDispute/RefundDisputePolicy.php",
                            r"\$this->account\(\);\s*RefundDisputeException::require\(config\('refund-dispute\.enabled'\) === true.*?TestEnvironment::admitsTestCommerce\(\)")
         self.assert_source("app/Domain/Inquiries/OrderInquiry.php", r"function readable\(\): void\s*\{\s*if \(! TestEnvironment::admitsTestCommerce\(\)\)")
+        self.assert_source("app/Domain/Customers/DataRights/DataRightsPolicy.php",
+                           r"config\('customer-data-rights\.enabled'\) === true && app\(CustomerAccessPolicy::class\)->enabled\(\)")
+        self.assert_source("app/Domain/Customers/CustomerAccessPolicy.php", gate + r" && config\('customer\.test_accounts_enabled'\) === true")
         self.assert_source("app/Domain/Inquiries/OrderInquiry.php", r"config\('inquiries\.test_order_inquiries_enabled'\) !== true")
 
     def test_the_support_fixture_is_admitted_in_local_and_testing_only(self):
@@ -203,6 +209,13 @@ class AdmissionMatchesTheValues(unittest.TestCase):
             text = path.read_text()
             self.assertNotRegex(text, r"implements\s+InquiryAlertTransport", f"{path}: an alert transport now ships; re-review the flag")
             self.assertNotRegex(text, r"(?:bind|singleton|instance)\(\s*(?:InquiryAlertTransport|FreeGrantIdentity)::class", f"{path}: a binding now exists")
+
+    def test_order_ready_email_is_ungated_outside_local_and_testing_and_refuses_without_preflight_facts(self):
+        policy = "app/Domain/Notifications/Mail/TransactionalMailPolicy.php"
+        self.assert_source(policy, r"config\('transactional-mail\.enabled'\) !== true")
+        self.assert_source(policy, r"app\(\)->environment\('local', 'testing'\) && ! Mail::getFacadeRoot\(\) instanceof MailFake")
+        self.assert_source(policy, r"'DECLARED_FACTS_VALID'")
+        self.assertNotIn("admitsTestCommerce", source(policy), "the order-ready email gained an environment gate: update the profile comment")
 
     def test_the_production_lanes_have_no_environment_switch(self):
         for lane in ("paid-grants", "paid-tax-grants", "production-tax-checkout", "production-customer-identity", "production-free-grants"):

@@ -418,6 +418,19 @@ F2a final separate review at `e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08`: **APPRO
 
 2026-10-26 Handoff to Codex at main `dd587603` (Sean, usage limits): lanes F9, CX and REP pushed as work-in-progress branches with a status-at-handoff section in each packet; PCC not started. Entry point: `docs/handoff/2026-10-26/CODEX-HANDOFF.md`.
 
+2026-10-29 Lane CX (FP-005, FP-075, FP-082) resumed after the cancelled Codex handoff and verified on merged head `0bd4519c` (main `a8f17e5c` merged into branch `harness/customer-comms-cx-20261024`; fixes `dce310cd`). The work is default-off: site content schema v5 legal pages (`/legal/{privacy,terms,licenses}` only from a published release), customer data export and deletion (approval refuses while U-13 retention is unset), and an order-ready mail adapter (refuses without a sender, SMTP mailer and a passing preflight receipt). The `PRIVACY.md` §8 encryption wording is corrected. Results: native MySQL 8.4.11 13/13; SQLite 55 files, 1,025 tests, 82 census skips, no failures; `tsc` 0; vitest 1,177; safeguards 52/27/14/53 plus receipts 61; mutations M1–M16 killed. Census 306 (main first), selection 2,636 of 9,874 cases in 254 files. Three migrations (`2026_10_24_268100`, `268200`, `268300`) need independent review. Not pushed by the lane. Packet: `docs/verification/customer-comms-cx-20261024/README.md`.
+
+2026-10-29 Lane CX independent review of `733b02f7`: APPROVE WITH CONDITIONS, no P0 or P1 (record imported as `docs/verification/customer-comms-cx-20261024/independent-cx-review-733b02f7-DECISION.md`). All findings resolved before the PR opens.
+- F1 (P2, condition C1): deletion approval now purges open exports in the same transaction (`105f37a2`), with a regression test, a native race test and mutants M17/M18 killed.
+- F2 (P2): `PRIVACY.md` makes no backup encryption claim.
+- F3: staff-account refusal test (mutant M19/R11 killed).
+- F6: `RETAINED` completed (M20 killed).
+- F4 and F5: documented follow-ups (scheduled prune once a host exists; stuck `submitting` query).
+
+Census 307 (main first). Selection 2,639 of 9,877 cases in 254 files (`3e0bd1aa`). Native and SQLite results are in the packet.
+- The native race found an event-sequence REPEATABLE READ defect in the first F1 fix; it is fixed by a locking read (`f553a10f`, mutant M21 killed natively). CX native tests: 14/14.
+- Merged main `76fb9338` (symfony/mime CVE) as `a4a2dbd4`: `composer audit` clean; safeguards OK; selection 2,639 of 9,877 cases in 254 files; CustomerComms SQLite 99 tests OK.
+
 2026-10-29 REP reporting and operations views (FP-028, FP-089, FP-090; default-off segments, read-only) finished on `harness/reporting-rep-20261024` at `2162703c` (merge of main `a8f17e5c`; app code last changed in `5c94a0e8`, tests in `ff294363`). Native MySQL 8.4.11 at the merged head: six reporting files OK (3+2+1+2+1+1 tests); SQLite reporting 23 tests/393 assertions and a 66-test regression sample OK; safeguards 52/27/14/53 and `composer validate --strict` pass; native selection 2589 cases in 255 files. Mutations 22 of 25 killed (survivors are redundant layers). Not run: browser specs, any real provider or host. Independent review pending; FP-069 waits on U-11, customer segments on U-13.
 
 2026-10-29 REP independent review of `ebdc9ca4` APPROVE WITH CONDITIONS (no P0/P1); fixes on `harness/reporting-rep-20261024` (code `d5f29a1c`, lock probe `535ee73d`): the sales report no longer takes FOR UPDATE reads (`RefundDisputeCase::load(forUpdate: false)`, snapshot transaction; native lock test with a concurrent A5 writer and a `data_locks` probe), segments exclude production identity accounts, CSV carries the unverified and unreadable counts, production funnel no longer sums funds modes, CSV neutralises leading whitespace; new tests kill M4, K4, K5, K6, K13, K15. Native MySQL 8.4.11: seven reporting files OK; SQLite reporting 31 tests, A5 suites 34, regression sample 75; selection 2593 cases in 257 files. Deferred: unindexed scans, `refund_line_allocations(order_id)` index (A5 follow-up), full-width CSV characters. Record: `docs/verification/reporting-rep-20261024/independent-rep-review-ebdc9ca4-DECISION.md`.
@@ -425,6 +438,14 @@ F2a final separate review at `e4aeffe70b6ba4ca5ce12a08253697d8bb4c3a08`: **APPRO
 2026-10-29 REP re-review of `622a4920` (tested code `d5f29a1c`) APPROVE: no new P0 to P2; native `SalesReportLockFreeTest` OK and its lock-restoring mutant killed; A5 concurrency, lifecycle writers and migration pass natively, so the writers keep their locking default. Non-blocking P3s R-1, R-2 and the space-plus-tab CSV case deferred.
 
 2026-10-30 SEC2 merged PR #179 at `76fb9338c1b33a7b59e43b6b33f6206f0669bfe5` from exact head `db3561d6`: `symfony/mime` 8.0.15 → 8.1.10 (and `symfony/polyfill-mbstring` 1.43.3) for CVE-2026-45070 / PKSA-wtxr-p26d-nn42 (reported 2026-10-28), which had turned `composer audit` red on main and every open PR. Lock and CHANGELOG only; 30 mail, MIME and upload test files on SQLite 604 tests / 9,821 assertions, 0 failures (34 MySQL-only skips); `composer audit` clean. Preflight 40977566101 is the readiness cancellation; replacement 40977577499 success. Codex code and security reviews clean.
+
+2026-10-31 Lane CX re-review of `16687e9f`: APPROVE WITH CONDITIONS (F1, F2, F3 and F6 verified). The record is imported as `independent-cx-rereview-16687e9f-DECISION.md`. New P2 F7 (range locking reads on shared indexes) is fixed in `2872c10e`:
+- a per-request `last_event_sequence` counter (migration 268200 amended; forward-only);
+- plain open-slot reads with the unique index as a clean-409 backstop;
+- READ COMMITTED with three attempts per command, prune included;
+- lingering contention answers 503 `try_again`.
+
+Main `a926f98b` merged as `27e14ee6`; fixtures `a9123898`. Native 15/15 including the new two-customer race with an approval in flight (no waits, no deadlocks). CustomerComms SQLite 103 OK. All `tests/ops` OK. Census 308; selection 2,657 of 9,912 cases in 262 files. Mutants: M22, M23 and M24 killed natively; M25, M26, M27 and M29 killed; M28 equivalent.
 
 2026-10-31 OPS-FIX merged PR #181 at `a926f98bea76e680482c61125ba042c2ce6bfd6f` from exact head `02056de7` (tested `0fff60ab`): registers REP's `REPORTING_*` customer-segmentation flags in both env templates and the `forge-deploy.sh` inherited-env scrub, which PR #178 had omitted (`tests/ops/test_staging_capability_profile.py` and `test_staging_code_drift.py` failed on main; the development preflight does not run `tests/ops`). `build-kit --check` ok. Preflight 41180329853 is the readiness cancellation; replacement 41180338179 success. Codex code and security reviews clean. Lanes that add environment keys must run `tests/ops`.
 

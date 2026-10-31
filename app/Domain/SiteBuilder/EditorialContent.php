@@ -14,14 +14,54 @@ final class EditorialContent
             return $verifiedContent;
         }
 
-        return array_intersect_key($verifiedContent, array_flip([
+        $chrome = array_intersect_key($verifiedContent, array_flip([
             'schema_version', 'hero', 'studio', 'footer', 'navigation', 'seo',
         ]));
+        if ($verifiedContent['schema_version'] === SiteContentSchema::LEGAL_VERSION) {
+            // The footer lists published legal pages by title and path only; their text belongs to their own route.
+            $chrome['legal_links'] = [];
+            foreach (SiteContentSchema::LEGAL_DOCUMENTS as $document) {
+                if (is_array($verifiedContent['legal'][$document] ?? null)) {
+                    $chrome['legal_links'][] = ['title' => $verifiedContent['legal'][$document]['title'], 'path' => '/legal/'.$document];
+                }
+            }
+        }
+
+        return $chrome;
+    }
+
+    /**
+     * One published legal document, or null when the release predates legal pages or leaves the slot empty. The approval
+     * reference is staff evidence and is deliberately not projected.
+     */
+    public function legal(array $verifiedContent, string $document): ?array
+    {
+        if (($verifiedContent['schema_version'] ?? null) !== SiteContentSchema::LEGAL_VERSION
+            || ! in_array($document, SiteContentSchema::LEGAL_DOCUMENTS, true)
+            || ! is_array($verifiedContent['legal'][$document] ?? null)) {
+            return null;
+        }
+        $selected = $verifiedContent['legal'][$document];
+
+        return [
+            'section' => 'legal', 'kind' => 'legal', 'path' => '/legal/'.$document,
+            'title' => $selected['title'], 'description' => $selected['description'],
+            'paragraphs' => [], 'entries' => [], 'email' => null, 'contactHref' => null, 'video' => null,
+            'legal' => [
+                'document' => $document, 'version' => $selected['version'], 'effectiveDate' => $selected['effective_date'],
+                'sections' => array_map(fn (array $section): array => [
+                    'heading' => $section['heading'], 'paragraphs' => $section['paragraphs'],
+                ], $selected['sections']),
+            ],
+        ];
     }
 
     public function page(array $verifiedContent, string $section, ?string $slug = null, bool $includeRelatedHref = true): ?array
     {
-        if (! in_array($verifiedContent['schema_version'] ?? null, [2, 3, 4], true)
+        if ($section === 'legal') {
+            return $slug === null ? null : $this->legal($verifiedContent, $slug);
+        }
+        if (! in_array($verifiedContent['schema_version'] ?? null, SiteContentSchema::EDITORIAL_VERSIONS, true)
             || ! in_array($section, ['about', 'contact', 'blog', 'videos'], true)
             || ($verifiedContent[$section] ?? null) === null) {
             return null;
@@ -72,7 +112,7 @@ final class EditorialContent
             ];
         }
 
-        if ($entry !== null && $verifiedContent['schema_version'] === 4) {
+        if ($entry !== null && in_array($verifiedContent['schema_version'], SiteContentSchema::RELATED_TRACK_VERSIONS, true)) {
             $page['relatedTracks'] = app(PublicCatalog::class)->relatedLinks($entry['related_track_ids'], $includeRelatedHref);
         }
 

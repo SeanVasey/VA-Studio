@@ -50,7 +50,7 @@ final class SiteContent
             ]);
             $images->index($release, $content);
             AuditEvent::record('site.release.created', $release, ['content_hash' => $release->content_hash, 'schema_version' => $release->schema_version]
-                + (in_array($release->schema_version, [3, 4], true) ? ['images' => array_map(fn (array $reference): int => $reference['id'], SiteImageReferences::of($content))] : []), $actor->id);
+                + (in_array($release->schema_version, SiteContentSchema::IMAGE_VERSIONS, true) ? ['images' => array_map(fn (array $reference): int => $reference['id'], SiteImageReferences::of($content))] : []), $actor->id);
 
             return $release;
         });
@@ -369,7 +369,7 @@ final class SiteContent
     {
         $this->actor($actor);
         $release = SiteRelease::find($releaseId);
-        if (in_array($release?->schema_version, [3, 4], true) && is_array($release->content)) {
+        if (in_array($release?->schema_version, SiteContentSchema::IMAGE_VERSIONS, true) && is_array($release->content)) {
             app(SiteImageReferences::class)->verifyFiles($release->content);
         }
     }
@@ -377,7 +377,7 @@ final class SiteContent
     private function imageFilesIntact(int $releaseId): bool
     {
         $release = SiteRelease::find($releaseId);
-        if (! in_array($release?->schema_version, [3, 4], true) || ! is_array($release->content)) {
+        if (! in_array($release?->schema_version, SiteContentSchema::IMAGE_VERSIONS, true) || ! is_array($release->content)) {
             return true;
         }
         try {
@@ -392,13 +392,13 @@ final class SiteContent
     private function content(SiteRelease $release): array
     {
         $content = $release->content;
-        if (! in_array($release->schema_version, [1, 2, 3, 4], true) || $release->canonicalization_version !== CanonicalJson::VERSION
+        if (! in_array($release->schema_version, [1, ...SiteContentSchema::EDITORIAL_VERSIONS], true) || $release->canonicalization_version !== CanonicalJson::VERSION
             || ! is_array($content) || ($content['schema_version'] ?? null) !== $release->schema_version
             || ! hash_equals($release->content_hash, CanonicalJson::hash($content))) {
             throw ValidationException::withMessages(['publication' => 'The retained site release failed its integrity check.']);
         }
         $content = SiteContentSchema::validate($content);
-        if (in_array($release->schema_version, [3, 4], true)) {
+        if (in_array($release->schema_version, SiteContentSchema::IMAGE_VERSIONS, true)) {
             app(SiteImageReferences::class)->verify($release, $content);
         }
 

@@ -35,12 +35,19 @@ export default function Editorial({ siteContent, editorial, sitePreview = false,
     <MetadataHead metadata={metadata} publicInstallation={!sitePreview} />
     <a className="skip-link" href="#main">Skip to content</a>
     {sitePreview && <div className="preview-banner">PRIVATE CONTENT PREVIEW <span>Visible only to staff. Purchasing and external actions are disabled.</span></div>}
-    <SiteHeader {...chrome} currentPath={`/${editorial.section}`} />
+    <SiteHeader {...chrome} currentPath={editorial.section === 'legal' ? editorial.path : `/${editorial.section}`} />
     <main id="main" className="editorial-page section-pad">
       <div className="editorial-heading"><p className="eyebrow">VASEY.AUDIO / {editorial.section}</p>
         {editorial.kind === 'entry' && <a className="text-link editorial-back" href={href(`/${editorial.section}`)} onClick={navigate}>Back to {editorial.section === 'blog' ? 'blog' : 'videos'} <Icon name="arrow" size={16} /></a>}
         <h1 id="editorial-title" tabIndex={-1}>{editorial.title}</h1><p className="editorial-description">{editorial.description}</p>
       </div>
+      {editorial.legal && <div className="editorial-prose legal-document">
+        <p className="legal-meta">Version {editorial.legal.version} · Effective <time dateTime={editorial.legal.effectiveDate}>{editorial.legal.effectiveDate}</time></p>
+        {editorial.legal.sections.map((section, index) => <section key={index} aria-labelledby={`legal-section-${index}`}>
+          <h2 id={`legal-section-${index}`}>{section.heading}</h2>
+          {section.paragraphs.map((paragraph, position) => <p key={position}>{paragraph}</p>)}
+        </section>)}
+      </div>}
       {editorial.paragraphs.length > 0 && <div className="editorial-prose">{editorial.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div>}
       {editorial.kind === 'collection' && <div className="editorial-list">{editorial.entries.map((entry, index) => <article className="editorial-entry" key={entry.slug}>
         <span className="editorial-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><div><h2><a href={href(entry.path)} onClick={navigate}>{entry.title}</a></h2><p>{entry.description}</p><a className="text-link" href={href(entry.path)} onClick={navigate} aria-label={`${editorial.section === 'blog' ? 'Read' : 'View'} ${entry.title}`}>{editorial.section === 'blog' ? 'Read article' : 'View video'} <Icon name="arrow" size={16} /></a></div>

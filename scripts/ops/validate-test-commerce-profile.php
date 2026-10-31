@@ -15,7 +15,7 @@ declare(strict_types=1);
  * --template replaces each documented placeholder with a synthetic value first, so the committed
  * template can be checked for shape. --probe additionally makes one read-only GET /v1/account with
  * the configured test key, and only after every other check passed.
- * Boundary checks: the profile must state eleven capability flags explicitly as false (scripts/ops/capability-boundary.php), none of them or of the
+ * Boundary checks: the profile must state thirteen capability flags explicitly as false (scripts/ops/capability-boundary.php), none of them or of the
  * other out-of-profile families may be enabled in the booted configuration, and no enabled or mounted flag may be true in any
  * production-lane configuration file (Paid252, Tax255, production customer identity, production free grants and the rest).
  * Exit codes: 0 every check passed, 1 at least one check failed, 2 usage or unreadable file.
@@ -101,7 +101,7 @@ if (! is_file($file) || is_link($file) || ! is_readable($file) || filesize($file
 
 $root = dirname(__DIR__, 2);
 require $root.'/vendor/autoload.php';
-// The eleven capability flags and the production-lane rule, shared with the staging deploy gate (ops/staging/validate-runtime.php).
+// The thirteen capability flags and the production-lane rule, shared with the staging deploy gate (ops/staging/validate-runtime.php).
 require_once __DIR__.'/capability-boundary.php';
 $raw = (string) file_get_contents($file);
 if ($template) {

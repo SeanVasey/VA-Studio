@@ -48,12 +48,15 @@ class TestContractIssuanceMigrationTest extends TestCase
         $notices = require database_path('migrations/2026_10_06_231000_test_transactional_notifications.php');
         $this->assertDatabaseCount('transactional_notices', 0);
         $this->assertDatabaseCount('transactional_notice_attempts', 0);
+        // The empty lane CX mail-delivery child names transactional_notices in its insert guard; dispose of it first.
+        \Tests\Support\TransactionalMailFixtures::dropEmptyDeliveries();
         $notices->down();
         $delivery->down(); $fulfillmentActivations->down(); $migration->down();
         foreach ($this->contractSchemaTables() as $table) { $this->assertFalse(Schema::hasTable($table)); }
         $this->assertSame($retained, F::retained());
         $migration->up(); $fulfillmentActivations->up(); $delivery->up();
         $notices->up();
+        \Tests\Support\TransactionalMailFixtures::restoreDeliveries();
         foreach ($this->contractSchemaTables() as $table) { $this->assertDatabaseCount($table, 0); }
         $this->assertSame($retained, F::retained());
         $this->assertSame('pending', DB::table('pending_entitlements')->sole()->state);

@@ -7,6 +7,7 @@ use App\Domain\Media\BoundedMediaProcess;
 use App\Domain\Media\MalwareScanner;
 use App\Domain\Media\PrivateMediaFiles;
 use App\Domain\SiteBuilder\Models\SiteRelease;
+use App\Domain\SiteBuilder\SiteContentSchema;
 use App\Domain\SiteBuilder\SiteImageReferences;
 use App\Models\User;
 use App\Support\Environment\TestEnvironment;
@@ -146,7 +147,7 @@ final class InstallationReport
         // A damaged stored file of an image in the active release is already missing from the live site; each file is hashed.
         $check('site_images', false, function (): bool {
             $release = SiteRelease::find(DB::table('site_publications')->where('id', 1)->value('active_release_id'));
-            if (in_array($release?->schema_version, [3, 4], true) && is_array($release->content)) {
+            if (in_array($release?->schema_version, SiteContentSchema::IMAGE_VERSIONS, true) && is_array($release->content)) {
                 app(SiteImageReferences::class)->verifyFiles($release->content);
             }
 
