@@ -162,7 +162,7 @@ class TransactionalMailTest extends TestCase
         $this->assertSame(['deliveryId' => $delivery->public_id, 'state' => 'accepted', 'replayed' => true], $adapter->queueOrderReady($f['notice']['notificationId']));
         (new DeliverTransactionalMail($delivery->public_id))->handle($adapter);
         $this->assertSame('accepted', $adapter->deliver($delivery->public_id)['state']);
-        $this->artisan('vasey:transactional-mail-queue')->expectsOutput('queued=0 skipped=0')->assertSuccessful();
+        $this->artisan('vasey:transactional-mail-queue')->expectsOutput('queued=0 skipped=0 superseded=0')->assertSuccessful();
         Mail::assertSentCount(1);
         $this->assertSame(1, TransactionalMailDelivery::count());
         $this->assertSame(['notification.mail.queued', 'notification.mail.submitting', 'notification.mail.accepted'],
@@ -217,7 +217,7 @@ class TransactionalMailTest extends TestCase
         $this->runQueuedMail();
         $this->assertSame(['deliveryId' => $delivery, 'state' => 'uncertain', 'reason' => 'transport_uncertain'], $adapter->status($delivery));
         $adapter->deliver($delivery);
-        $this->artisan('vasey:transactional-mail-queue')->expectsOutput('queued=0 skipped=0')->assertSuccessful();
+        $this->artisan('vasey:transactional-mail-queue')->expectsOutput('queued=0 skipped=0 superseded=0')->assertSuccessful();
         $this->assertSame(1, Mail::getFacadeRoot()->attempts);
         $this->assertNotEmpty($this->logs);
         $this->assertNoPersonalData($f['user']->email);
@@ -228,14 +228,56 @@ class TransactionalMailTest extends TestCase
         Mail::fake();
         $intents = [N::ready(suffix: 'A'), N::ready(suffix: 'B'), N::ready(suffix: 'C')];
         M::configure();
-        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=2 skipped=0')->assertSuccessful();
-        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=1 skipped=0')->assertSuccessful();
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=2 skipped=0 superseded=0')->assertSuccessful();
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=1 skipped=0 superseded=0')->assertSuccessful();
         $this->artisan('vasey:transactional-mail-queue', ['--limit' => 101])->assertExitCode(2);
         $this->assertSame(3, $this->runQueuedMail());
         Mail::assertSentCount(3);
         foreach ($intents as $intent) {
             Mail::assertSent(OrderReadyMail::class, fn (OrderReadyMail $mail): bool => $mail->hasTo($intent['user']->email));
         }
+    }
+
+    public function test_refused_intents_ahead_of_a_valid_one_never_hold_the_batch_and_only_superseded_access_leaves_the_pending_set(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        $withdrawn = [N::ready(suffix: 'W1'), N::ready(suffix: 'W2')];
+        $changed = [N::ready(suffix: 'E1'), N::ready(suffix: 'E2')];
+        $valid = N::ready(suffix: 'OK');
+        M::configure();
+        // Oldest first: two intents whose customer access was withdrawn (the account's access version moved on, so they can never
+        // verify again), then two whose recipient changed (refused today, but reversible), then one valid intent.
+        foreach ($withdrawn as $f) {
+            DB::transaction(function () use ($f): void {
+                $account = CustomerAccount::whereKey($f['account']->id)->lockForUpdate()->sole();
+                $account->update(['active' => false, 'access_version' => $account->access_version + 1]);
+            });
+        }
+        $emails = array_map(fn (array $f): string => $f['user']->email, $changed);
+        foreach ($changed as $i => $f) {
+            $f['user']->forceFill(['email' => 'changed-'.$i.'@example.invalid'])->save();
+        }
+        $deliveryFor = fn (array $f): bool => TransactionalMailDelivery::where('notice_public_id', $f['notice']['notificationId'])->exists();
+
+        // Before the fix the batch held the four refused intents forever and the valid one was never queued.
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=1 skipped=2 reasons=unavailable=2 superseded=2')->assertSuccessful();
+        $this->assertSame([false, false, false, false, true], array_map($deliveryFor, [...$withdrawn, ...$changed, $valid]));
+        // Refused intents record nothing and stay pending; superseded ones are counted, never retried and never written.
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=0 skipped=2 reasons=unavailable=2 superseded=2')->assertSuccessful();
+        $this->assertSame(1, TransactionalMailDelivery::count());
+
+        // A transient refusal (the intent policy switched off) leaves every pending intent pending, with nothing recorded.
+        $changed[0]['user']->forceFill(['email' => $emails[0]])->save();
+        config(['transactional-notifications.test_enabled' => false]);
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=0 skipped=2 reasons=unavailable=2 superseded=2')->assertSuccessful();
+        $this->assertSame(1, TransactionalMailDelivery::count());
+        // Once the policy is back and the recipient restored, the refused intent is queued after all.
+        config(['transactional-notifications.test_enabled' => true]);
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=1 skipped=1 reasons=unavailable=1 superseded=2')->assertSuccessful();
+        $this->assertSame([true, false], array_map($deliveryFor, $changed));
+        $this->assertSame(2, $this->runQueuedMail());
+        Mail::assertSentCount(2);
     }
 
     public function test_database_guards_allow_one_forward_path_per_intent(): void
