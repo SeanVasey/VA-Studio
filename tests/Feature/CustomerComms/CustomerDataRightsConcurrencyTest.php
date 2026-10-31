@@ -58,10 +58,11 @@ class CustomerDataRightsConcurrencyTest extends TestCase
                 $now = now()->startOfSecond();
                 $id = DB::table('customer_data_requests')->insertGetId(['public_id' => '33333333-3333-4333-8333-333333333333',
                     'customer_account_id' => $f['account']->id, 'kind' => 'deletion', 'state' => 'received', 'open_slot' => 1, 'version' => 0,
-                    'created_at' => $now, 'updated_at' => $now]);
+                    'last_event_sequence' => 0, 'created_at' => $now, 'updated_at' => $now]);
                 $detail = CanonicalJson::encode(['kind' => 'deletion']);
                 DB::table('customer_data_request_events')->insert(['request_id' => $id, 'sequence' => 1, 'event' => 'requested',
                     'detail' => $detail, 'detail_hash' => hash('sha256', $detail), 'created_at' => $now]);
+                DB::table('customer_data_requests')->where('id', $id)->update(['last_event_sequence' => 1]);
             });
         $this->assertSame('saved', $result['result'], json_encode($result));
         $this->assertSame(['requestId' => '33333333-3333-4333-8333-333333333333', 'state' => 'received', 'replayed' => true], $result['value']);
@@ -101,10 +102,11 @@ class CustomerDataRightsConcurrencyTest extends TestCase
                 $now = now()->startOfSecond();
                 $id = DB::table('customer_data_requests')->insertGetId(['public_id' => '77777777-7777-4777-8777-777777777777',
                     'customer_account_id' => $f['account']->id, 'kind' => 'export', 'state' => 'ready', 'open_slot' => 1, 'version' => 0,
-                    'created_at' => $now, 'updated_at' => $now]);
+                    'last_event_sequence' => 0, 'created_at' => $now, 'updated_at' => $now]);
                 $detail = CanonicalJson::encode(['kind' => 'export']);
                 DB::table('customer_data_request_events')->insert(['request_id' => $id, 'sequence' => 1, 'event' => 'requested',
                     'detail' => $detail, 'detail_hash' => hash('sha256', $detail), 'created_at' => $now]);
+                DB::table('customer_data_requests')->where('id', $id)->update(['last_event_sequence' => 1]);
                 DB::table('customer_data_exports')->insert(['request_id' => $id, 'ciphertext' => encrypt('{"synthetic":true}', false),
                     'content_hash' => str_repeat('c', 64), 'token_hash' => str_repeat('d', 64), 'size_bytes' => 18,
                     'expires_at' => $now->copy()->addMinutes(15), 'created_at' => $now]);
