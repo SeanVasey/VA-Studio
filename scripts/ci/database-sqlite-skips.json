@@ -1229,6 +1229,10 @@
     [
       "Tests\\Feature\\CustomerComms\\CustomerDataRightsConcurrencyTest",
       "test_an_export_committed_while_an_approval_waits_is_purged_by_that_approval"
+    ],
+    [
+      "Tests\\Feature\\CustomerComms\\CustomerDataRightsConcurrencyTest",
+      "test_unrelated_customers_request_deletion_together_while_an_approval_is_in_flight_without_waits_or_deadlocks"
     ]
   ]
 }

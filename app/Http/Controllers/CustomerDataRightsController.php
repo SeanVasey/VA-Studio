@@ -8,6 +8,7 @@ use App\Domain\Customers\DataRights\DataRightsException;
 use App\Domain\Customers\DataRights\DataRightsPolicy;
 use App\Http\Middleware\CustomerPrivacy;
 use App\Support\CommerceRequestIdentity;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use JsonException;
 use stdClass;
@@ -77,6 +78,12 @@ final class CustomerDataRightsController
             return $this->error(403, 'sign_in_required');
         } catch (DataRightsException $error) {
             return $this->error($error->status, $error->reason);
+        } catch (QueryException $error) {
+            // A deadlock or lock-wait timeout that outlived the service's retries is contention, not a fault: ask the customer to retry.
+            if (CustomerDataRights::concurrencyError($error)) {
+                return $this->error(503, 'try_again')->header('Retry-After', '5');
+            }
+            throw $error;
         }
     }
 
@@ -111,7 +118,7 @@ final class CustomerDataRightsController
 
     private function error(int $status, string $reason): Response
     {
-        $message = match ($status) {
+        $message = $reason === 'try_again' ? 'Your data request could not be completed right now. Please try again in a few seconds.' : match ($status) {
             404 => 'This request is not available.',
             409 => 'A request of this kind is already open. Check your requests before trying again.',
             410 => 'This export is no longer available. Request a new export.',

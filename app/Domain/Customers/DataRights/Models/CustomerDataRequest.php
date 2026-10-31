@@ -15,7 +15,7 @@ final class CustomerDataRequest extends Model
 
     protected function casts(): array
     {
-        return ['customer_account_id' => 'integer', 'open_slot' => 'integer', 'version' => 'integer', 'resolved_by' => 'integer',
+        return ['customer_account_id' => 'integer', 'open_slot' => 'integer', 'version' => 'integer', 'last_event_sequence' => 'integer', 'resolved_by' => 'integer',
             'created_at' => 'immutable_datetime', 'updated_at' => 'immutable_datetime', 'resolved_at' => 'immutable_datetime'];
     }
 }

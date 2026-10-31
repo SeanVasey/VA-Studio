@@ -25,13 +25,38 @@ DB::statement('SET SESSION innodb_lock_wait_timeout = 15');
 DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
 $directory = getenv('VASEY_DATA_RIGHTS_RACE_DIRECTORY');
 $deadline = microtime(true) + 20;
-file_put_contents($directory.'/ready', json_encode(['connection_id' => $connection, 'pid' => getmypid()], JSON_THROW_ON_ERROR));
-while (! is_file($directory.'/start')) {
+$barrier = array_key_exists('barrier', $input) ? $input['barrier'] : 'start';
+file_put_contents($directory.'/'.($input['name'] ?? 'ready'), json_encode(['connection_id' => $connection, 'pid' => getmypid()], JSON_THROW_ON_ERROR));
+while ($barrier !== null && ! is_file($directory.'/'.$barrier)) {
     if (microtime(true) > $deadline) {
         throw new RuntimeException('Customer data rights worker barrier timed out.');
     }
     usleep(10000);
     clearstatcache();
+}
+// Optional pause right after the Nth query matching every pause_sql needle (first attempt only), until <dir>/<release> exists.
+if (isset($input['pause_sql'])) {
+    $seen = 0;
+    $released = false;
+    DB::listen(function ($query) use (&$seen, &$released, $input, $directory): void {
+        foreach ($input['pause_sql'] as $needle) {
+            if (! str_contains($query->sql, $needle)) {
+                return;
+            }
+        }
+        if (! $released && ++$seen === $input['pause_at']) {
+            file_put_contents($directory.'/'.$input['name'].'.paused', (string) DB::selectOne('SELECT CONNECTION_ID() AS id')->id);
+            $deadline = microtime(true) + 60;
+            while (! is_file($directory.'/'.$input['release'])) {
+                if (microtime(true) > $deadline) {
+                    throw new RuntimeException('Customer data rights worker pause timed out.');
+                }
+                usleep(5000);
+                clearstatcache();
+            }
+            $released = true;
+        }
+    });
 }
 $rights = app(CustomerDataRights::class);
 $reason = null;

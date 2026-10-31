@@ -36,6 +36,9 @@ return new class extends Migration
             // 1 while the request is open, NULL once resolved: at most one open request of each kind per account.
             $table->unsignedTinyInteger('open_slot')->nullable();
             $table->unsignedInteger('version');
+            // The sequence of the request's newest event. Every event writer already holds this row FOR UPDATE, so the next
+            // sequence comes from here instead of a range read over the shared event index (independent re-review F7).
+            $table->unsignedInteger('last_event_sequence');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
             $table->dateTime('resolved_at')->nullable();
@@ -95,19 +98,26 @@ return new class extends Migration
         $oldKind = $text('OLD.kind');
         $oldState = $text('OLD.state');
 
-        $requestInsert = "{$uuid} AND NEW.version = 0 AND NEW.open_slot = 1 AND NEW.resolved_at IS NULL AND NEW.resolved_by IS NULL"
+        $requestInsert = "{$uuid} AND NEW.version = 0 AND NEW.last_event_sequence = 0 AND NEW.open_slot = 1 AND NEW.resolved_at IS NULL AND NEW.resolved_by IS NULL"
             .' AND NEW.resolution_hash IS NULL AND NEW.created_at IS NOT NULL AND NEW.updated_at = NEW.created_at'
             ." AND (({$kind} = 'export' AND {$state} = 'ready') OR ({$kind} = 'deletion' AND {$state} = 'received'))";
-        $requestUpdate = $same(['id', 'public_id', 'customer_account_id', 'kind', 'created_at'])
+        // Exactly one of two updates: the counter advances by one to an event already written for this request, with every
+        // other column unchanged; or the single open-to-terminal transition, with the counter unchanged.
+        $counter = $same(['id', 'public_id', 'customer_account_id', 'kind', 'state', 'open_slot', 'version', 'created_at', 'updated_at',
+            'resolved_at', 'resolved_by', 'resolution_hash'])
+            .' AND NEW.last_event_sequence = OLD.last_event_sequence + 1'
+            .' AND EXISTS (SELECT 1 FROM customer_data_request_events e WHERE e.request_id = OLD.id AND e.sequence = NEW.last_event_sequence)';
+        $requestUpdate = '('.$counter.') OR ('.$same(['id', 'public_id', 'customer_account_id', 'kind', 'created_at', 'last_event_sequence'])
             .' AND NEW.version = OLD.version + 1 AND OLD.open_slot = 1 AND NEW.open_slot IS NULL'
             .' AND NEW.resolved_at IS NOT NULL AND NEW.updated_at = NEW.resolved_at AND NEW.updated_at >= OLD.updated_at'
             ." AND (({$oldKind} = 'export' AND {$oldState} = 'ready' AND {$state} IN ('downloaded', 'expired')"
             .' AND NEW.resolved_by IS NULL AND NEW.resolution_hash IS NULL)'
             ." OR ({$oldKind} = 'deletion' AND {$oldState} = 'received' AND {$state} IN ('completed', 'rejected')"
-            .' AND NEW.resolved_by IS NOT NULL AND NEW.resolution_hash IS NOT NULL AND '.$hex('NEW.resolution_hash', 64).'))';
+            .' AND NEW.resolved_by IS NOT NULL AND NEW.resolution_hash IS NOT NULL AND '.$hex('NEW.resolution_hash', 64).')))';
         $eventInsert = $text('NEW.event').' IN ('.self::EVENTS.') AND '.$hex('NEW.detail_hash', 64)
-            .' AND EXISTS (SELECT 1 FROM customer_data_requests r WHERE r.id = NEW.request_id)'
-            .' AND NEW.sequence = COALESCE((SELECT MAX(e.sequence) FROM customer_data_request_events e WHERE e.request_id = NEW.request_id), 0) + 1';
+            // The next sequence after the parent's counter; the unique (request_id, sequence) key refuses a second event before the
+            // counter advances, and the counter can advance only to an event that exists, so sequences stay gap-free.
+            .' AND EXISTS (SELECT 1 FROM customer_data_requests r WHERE r.id = NEW.request_id AND NEW.sequence = r.last_event_sequence + 1)';
         $exportInsert = 'NEW.ciphertext IS NOT NULL AND NEW.consumed_at IS NULL AND NEW.purged_at IS NULL AND NEW.expires_at > NEW.created_at'
             .' AND '.$hex('NEW.content_hash', 64).' AND '.$hex('NEW.token_hash', 64)
             ." AND EXISTS (SELECT 1 FROM customer_data_requests r WHERE r.id = NEW.request_id AND {$text('r.kind')} = 'export' AND {$text('r.state')} = 'ready')";

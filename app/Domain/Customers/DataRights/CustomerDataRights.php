@@ -13,6 +13,8 @@ use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\ConcurrencyErrorDetector;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -25,11 +27,15 @@ use Throwable;
 /**
  * Customer export and deletion requests (FP-082). Customers act only on their own account through the locked principal.
  * Staff resolve deletion requests; approval refuses until the retention schedule is configured and never deletes or
- * rewrites orders, contracts, grants, payment evidence, inquiries, consent or audit records.
+ * rewrites orders, contracts, grants, payment evidence, inquiries, consent or audit records. Not final: the controller's
+ * contention mapping is tested with a substitute.
  */
-final class CustomerDataRights
+class CustomerDataRights
 {
     public const LIST_LIMIT = 20;
+
+    /** Attempts per command on a deadlock or lock-wait timeout, as the other writers use. */
+    public const ATTEMPTS = 3;
 
     /** Records a deletion keeps, with the retention class that governs each. */
     public const RETAINED = [
@@ -51,11 +57,13 @@ final class CustomerDataRights
         $this->outside();
         [$ttl, $limit] = [$policy->exportTtlMinutes(), $policy->exportMaxBytes()];
 
-        return DB::transaction(function () use ($principal, $actor, $ttl, $limit): array {
+        return $this->transaction(function () use ($principal, $actor, $ttl, $limit): array {
             [$user, $account] = $this->lockCustomer($principal, $actor);
             $at = $this->now();
             $this->expireDue($account->id, $at);
-            if (CustomerDataRequest::where('customer_account_id', $account->id)->where('kind', 'export')->where('open_slot', 1)->lockForUpdate()->exists()) {
+            // Serialized per account by the customer user row lock; the unique open-slot index is the backstop (open()). A locking range
+            // read here would lock the shared index tail and make unrelated customers wait and deadlock (re-review F7).
+            if (CustomerDataRequest::where('customer_account_id', $account->id)->where('kind', 'export')->where('open_slot', 1)->exists()) {
                 throw new DataRightsException(409, 'export_pending');
             }
             $requestId = (string) Str::uuid();
@@ -76,7 +84,7 @@ final class CustomerDataRights
             AuditEvent::recordAttributed('customer.data_export.ready', $request, ['request_id' => $requestId, 'size_bytes' => strlen($json)], $user->id);
 
             return ['requestId' => $requestId, 'downloadToken' => $token, 'expiresAt' => $expires->toIso8601ZuluString(), 'sizeBytes' => strlen($json)];
-        }, 3);
+        });
     }
 
     /** Single use: the same signed-in customer and the one-time token; the ciphertext is purged in the same transaction. */
@@ -87,7 +95,7 @@ final class CustomerDataRights
         if (! $this->uuid($requestId) || preg_match('/\A[a-f0-9]{64}\z/D', $token) !== 1) {
             throw new DataRightsException(404, 'export_not_found');
         }
-        $outcome = DB::transaction(function () use ($principal, $actor, $requestId, $token): array {
+        $outcome = $this->transaction(function () use ($principal, $actor, $requestId, $token): array {
             [$user, $account] = $this->lockCustomer($principal, $actor);
             $request = CustomerDataRequest::where('public_id', $requestId)->where('customer_account_id', $account->id)
                 ->where('kind', 'export')->lockForUpdate()->first();
@@ -121,7 +129,7 @@ final class CustomerDataRights
             AuditEvent::recordAttributed('customer.data_export.downloaded', $request, ['request_id' => $request->public_id], $user->id);
 
             return ['status' => 200, 'json' => $json];
-        }, 3);
+        });
         if ($outcome['status'] !== 200) {
             throw new DataRightsException($outcome['status'], $outcome['reason']);
         }
@@ -135,9 +143,9 @@ final class CustomerDataRights
         app(DataRightsPolicy::class)->requireEnabled();
         $this->outside();
 
-        return DB::transaction(function () use ($principal, $actor): array {
+        return $this->transaction(function () use ($principal, $actor): array {
             [$user, $account] = $this->lockCustomer($principal, $actor);
-            $open = CustomerDataRequest::where('customer_account_id', $account->id)->where('kind', 'deletion')->where('open_slot', 1)->lockForUpdate()->first();
+            $open = CustomerDataRequest::where('customer_account_id', $account->id)->where('kind', 'deletion')->where('open_slot', 1)->first();
             if ($open !== null) {
                 return ['requestId' => $open->public_id, 'state' => $open->state, 'replayed' => true];
             }
@@ -146,7 +154,7 @@ final class CustomerDataRights
             AuditEvent::recordAttributed('customer.data_deletion.requested', $request, ['request_id' => $request->public_id], $user->id);
 
             return ['requestId' => $request->public_id, 'state' => $request->state, 'replayed' => false];
-        }, 3);
+        });
     }
 
     /** The requester's own requests, newest first; an unexpired-looking export past its time reads as expired. */
@@ -155,7 +163,7 @@ final class CustomerDataRights
         app(DataRightsPolicy::class)->requireEnabled();
         $this->outside();
 
-        return DB::transaction(function () use ($principal, $actor): array {
+        return $this->transaction(function () use ($principal, $actor): array {
             [, $account] = $this->lockCustomer($principal, $actor);
             $at = $this->now();
             $rows = CustomerDataRequest::where('customer_account_id', $account->id)->orderByDesc('id')->limit(self::LIST_LIMIT)->get();
@@ -184,7 +192,7 @@ final class CustomerDataRights
         $retention = $policy->retention();
         $this->outside();
 
-        return DB::transaction(function () use ($policy, $retention, $requestId, $actor, $expectedVersion): array {
+        return $this->transaction(function () use ($policy, $retention, $requestId, $actor, $expectedVersion): array {
             $staff = $policy->staff($actor);
             [$request, $user, $account] = $this->lockForStaff($requestId, $expectedVersion);
             if ($user->is_admin) {
@@ -222,7 +230,7 @@ final class CustomerDataRights
                 'resolution_hash' => $hash, 'retention_policy_reference' => $retention['policy_reference']], $staff->id);
 
             return ['requestId' => $request->public_id, 'state' => 'completed', 'resolutionHash' => $hash, 'actions' => $actions];
-        }, 3);
+        });
     }
 
     /** Staff rejection with a short plain-text reason. No customer data changes. */
@@ -236,7 +244,7 @@ final class CustomerDataRights
         }
         $this->outside();
 
-        return DB::transaction(function () use ($policy, $requestId, $actor, $expectedVersion, $reason): array {
+        return $this->transaction(function () use ($policy, $requestId, $actor, $expectedVersion, $reason): array {
             $staff = $policy->staff($actor);
             [$request] = $this->lockForStaff($requestId, $expectedVersion);
             $at = $this->now();
@@ -247,7 +255,7 @@ final class CustomerDataRights
             AuditEvent::recordAttributed('customer.data_deletion.rejected', $request, ['request_id' => $request->public_id, 'resolution_hash' => $hash], $staff->id);
 
             return ['requestId' => $request->public_id, 'state' => 'rejected', 'resolutionHash' => $hash];
-        }, 3);
+        });
     }
 
     /** Purges every expired, still-open export. Operator command; also applied lazily before an account's next export. */
@@ -257,7 +265,7 @@ final class CustomerDataRights
         $count = 0;
         $ids = CustomerDataExport::whereNull('purged_at')->where('expires_at', '<=', $this->now())->orderBy('id')->limit(max(1, min($limit, 500)))->pluck('request_id');
         foreach ($ids as $id) {
-            $count += DB::transaction(function () use ($id): int {
+            $count += $this->transaction(function () use ($id): int {
                 $request = CustomerDataRequest::whereKey($id)->lockForUpdate()->first();
                 $export = CustomerDataExport::where('request_id', $id)->lockForUpdate()->first();
                 $at = $this->now();
@@ -275,8 +283,7 @@ final class CustomerDataRights
 
     private function expireDue(int $accountId, CarbonImmutable $at): void
     {
-        $requests = CustomerDataRequest::where('customer_account_id', $accountId)->where('kind', 'export')->where('open_slot', 1)->lockForUpdate()->get();
-        foreach ($requests as $request) {
+        foreach ($this->openExports($accountId) as $request) {
             $export = CustomerDataExport::where('request_id', $request->id)->lockForUpdate()->first();
             if ($export !== null && $export->purged_at === null && $at->greaterThanOrEqualTo($export->expires_at)) {
                 $this->expire($request, $export, $at);
@@ -288,8 +295,7 @@ final class CustomerDataRights
     private function purgeOpenExports(int $accountId, CarbonImmutable $at, string $reason): int
     {
         $purged = 0;
-        $requests = CustomerDataRequest::where('customer_account_id', $accountId)->where('kind', 'export')->where('open_slot', 1)->orderBy('id')->lockForUpdate()->get();
-        foreach ($requests as $request) {
+        foreach ($this->openExports($accountId) as $request) {
             $export = CustomerDataExport::where('request_id', $request->id)->lockForUpdate()->first();
             if ($export === null || $export->purged_at !== null) {
                 throw new DataRightsException(503, 'export_state_invalid');
@@ -299,6 +305,26 @@ final class CustomerDataRights
         }
 
         return $purged;
+    }
+
+    /**
+     * The account's open export requests, each then locked by primary key and re-checked. The caller holds the customer user row,
+     * which every writer of this account's requests takes first, and transactions run at READ COMMITTED, so the plain discovery
+     * read sees every committed request; no range of the shared open-slot index is locked.
+     *
+     * @return list<CustomerDataRequest>
+     */
+    private function openExports(int $accountId): array
+    {
+        $open = [];
+        foreach (CustomerDataRequest::where('customer_account_id', $accountId)->where('kind', 'export')->where('open_slot', 1)->orderBy('id')->pluck('id') as $id) {
+            $request = CustomerDataRequest::whereKey($id)->lockForUpdate()->first();
+            if ($request !== null && $request->open_slot === 1) {
+                $open[] = $request;
+            }
+        }
+
+        return $open;
     }
 
     private function expire(CustomerDataRequest $request, CustomerDataExport $export, CarbonImmutable $at, string $reason = 'window_elapsed'): void
@@ -312,8 +338,18 @@ final class CustomerDataRights
 
     private function open(CustomerAccount $account, string $kind, string $publicId, CarbonImmutable $at): CustomerDataRequest
     {
-        $request = CustomerDataRequest::create(['public_id' => $publicId, 'customer_account_id' => $account->id, 'kind' => $kind,
-            'state' => $kind === 'export' ? 'ready' : 'received', 'open_slot' => 1, 'version' => 0, 'created_at' => $at, 'updated_at' => $at]);
+        try {
+            $request = CustomerDataRequest::create(['public_id' => $publicId, 'customer_account_id' => $account->id, 'kind' => $kind,
+                'state' => $kind === 'export' ? 'ready' : 'received', 'open_slot' => 1, 'version' => 0, 'last_event_sequence' => 0,
+                'created_at' => $at, 'updated_at' => $at]);
+        } catch (QueryException $error) {
+            // The unique open-slot index refuses a second open request of the same kind for the account. The customer user row lock
+            // makes this unreachable through this service; if it ever fires, refuse cleanly instead of failing with a 500.
+            if (self::uniqueViolation($error)) {
+                throw new DataRightsException(409, $kind === 'export' ? 'export_pending' : 'deletion_pending');
+            }
+            throw $error;
+        }
         $this->event($request, 'requested', null, ['kind' => $kind], $at);
 
         return $request;
@@ -327,12 +363,13 @@ final class CustomerDataRights
 
     private function event(CustomerDataRequest $request, string $event, ?User $actor, array $detail, CarbonImmutable $at): void
     {
-        // A locking read: under REPEATABLE READ a plain MAX() can come from a snapshot taken before this transaction waited for the
-        // customer locks, and miss events another transaction committed meanwhile (an export prepared while an approval waited).
-        $sequence = (int) CustomerDataRequestEvent::where('request_id', $request->id)->lockForUpdate()->max('sequence') + 1;
+        // Every caller holds this request row FOR UPDATE (created in this transaction, or locked by primary key), so its counter is the
+        // current newest sequence. No read over the shared event index is needed (re-review F7; it replaced a locking MAX()).
+        $sequence = $request->last_event_sequence + 1;
         $encoded = CanonicalJson::encode($detail);
         CustomerDataRequestEvent::create(['request_id' => $request->id, 'sequence' => $sequence, 'event' => $event,
             'actor_user_id' => $actor?->id, 'detail' => $encoded, 'detail_hash' => hash('sha256', $encoded), 'created_at' => $at]);
+        $request->forceFill(['last_event_sequence' => $sequence])->save();
     }
 
     /** @return array{0: User, 1: CustomerAccount} user then account, the order every customer command uses */
@@ -395,6 +432,40 @@ final class CustomerDataRights
         }
 
         return $retained;
+    }
+
+    /**
+     * Each data-rights command is one READ COMMITTED transaction, retried up to three times on a deadlock or lock-wait timeout. The
+     * row locks every command takes first (customer user, then account, then request rows by primary key) are the serialization
+     * points. READ COMMITTED gives each plain read a fresh view after those waits and takes no gap locks, so unrelated customers
+     * never wait on each other's index ranges. Set per attempt: SET TRANSACTION applies to the next transaction only.
+     */
+    private function transaction(\Closure $callback): mixed
+    {
+        for ($attempt = 1; ; $attempt++) {
+            try {
+                if (DB::getDriverName() === 'mysql') {
+                    DB::statement('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
+                }
+
+                return DB::transaction($callback);
+            } catch (QueryException $error) {
+                if ($attempt >= self::ATTEMPTS || ! self::concurrencyError($error)) {
+                    throw $error;
+                }
+            }
+        }
+    }
+
+    public static function concurrencyError(Throwable $error): bool
+    {
+        return (new ConcurrencyErrorDetector)->causedByConcurrencyError($error);
+    }
+
+    private static function uniqueViolation(QueryException $error): bool
+    {
+        return ($error->errorInfo[0] ?? null) === '23000' && (($error->errorInfo[1] ?? null) === 1062
+            || str_contains((string) ($error->errorInfo[2] ?? ''), 'UNIQUE constraint failed'));
     }
 
     private function now(): CarbonImmutable

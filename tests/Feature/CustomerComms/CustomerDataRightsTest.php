@@ -3,6 +3,7 @@
 namespace Tests\Feature\CustomerComms;
 
 use App\Domain\Customers\CustomerAccess;
+use App\Domain\Customers\CustomerPrincipal;
 use App\Domain\Customers\DataRights\CustomerDataRights;
 use App\Domain\Customers\DataRights\DataRightsException;
 use App\Domain\Customers\DataRights\Models\CustomerDataExport;
@@ -419,6 +420,75 @@ class CustomerDataRightsTest extends TestCase
         $this->assertSame(0, AuditEvent::where('action', 'customer.data_deletion.completed')->count());
     }
 
+    public function test_the_unique_open_slot_index_refuses_a_second_open_request_cleanly(): void
+    {
+        $customer = F::account();
+        $rights = app(CustomerDataRights::class);
+        $first = $rights->requestDeletion(app(CustomerAccess::class)->principal($customer['user']), $customer['user']);
+        $before = [DB::table('customer_data_requests')->count(), DB::table('customer_data_request_events')->count()];
+        // Bypass the service's own open check, as a concurrent writer that skipped the user-row lock would: the unique index refuses
+        // the insert and the service maps it to a clean 409, never a 500.
+        $open = fn () => $this->open(CustomerAccount::find($customer['account']->id), 'deletion', '44444444-4444-4444-8444-444444444444', now()->toImmutable()->startOfSecond());
+        $this->expectRefusal(fn () => DB::transaction(fn () => $open->call($rights)), DataRightsException::class, 'deletion_pending');
+        $this->assertSame($before, [DB::table('customer_data_requests')->count(), DB::table('customer_data_request_events')->count()]);
+        $this->assertSame($first['requestId'], CustomerDataRequest::where('open_slot', 1)->sole()->public_id);
+    }
+
+    public function test_contention_that_outlives_the_retries_is_a_clean_try_again_response(): void
+    {
+        $customer = F::account();
+        $this->login($customer);
+        $calls = 0;
+        app()->instance(CustomerDataRights::class, new class($calls) extends CustomerDataRights
+        {
+            public function __construct(private int &$calls) {}
+
+            public function requestDeletion(CustomerPrincipal $principal, User $actor): array
+            {
+                $this->calls++;
+                throw new QueryException('mysql', 'insert into `customer_data_requests` ...', [],
+                    new \PDOException('SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'));
+            }
+        });
+        $this->postJson('/account/data-requests/deletion', ['confirm' => true])->assertStatus(503)
+            ->assertHeader('Retry-After', '5')->assertHeader('Cache-Control', 'no-store, private')
+            ->assertJsonPath('reason', 'try_again')->assertJsonPath('code', 'CUSTOMER_DATA_REQUEST_UNAVAILABLE');
+        $this->assertSame(1, $calls);
+        // Any other database failure is not relabelled as contention: it keeps the generic customer-privacy error.
+        app()->instance(CustomerDataRights::class, new class extends CustomerDataRights
+        {
+            public function requestDeletion(CustomerPrincipal $principal, User $actor): array
+            {
+                throw new QueryException('mysql', 'select 1', [], new \PDOException('SQLSTATE[42S02]: Base table or view not found'));
+            }
+        });
+        $this->postJson('/account/data-requests/deletion', ['confirm' => true])->assertStatus(503)
+            ->assertJsonPath('code', 'CUSTOMER_SIGN_IN_UNAVAILABLE')->assertJsonMissingPath('reason');
+    }
+
+    public function test_service_retries_a_deadlock_and_gives_up_after_three_attempts(): void
+    {
+        $customer = F::account();
+        $thrown = 0;
+        $limit = 2;
+        DB::connection()->beforeExecuting(function (string $query) use (&$thrown, &$limit): void {
+            if (str_starts_with($query, 'insert into "customer_data_requests"') && $thrown < $limit) {
+                $thrown++;
+                throw new QueryException('sqlite', $query, [], new \PDOException('Deadlock found when trying to get lock; try restarting transaction'));
+            }
+        });
+        $principal = fn () => app(CustomerAccess::class)->principal($customer['user']->fresh());
+        // Two deadlocks, then success on the third attempt: one request, events 1..1.
+        $result = app(CustomerDataRights::class)->requestDeletion($principal(), $customer['user']);
+        $this->assertSame([2, false, 1], [$thrown, $result['replayed'], DB::table('customer_data_requests')->count()]);
+        $this->assertSame(1, (int) DB::table('customer_data_requests')->value('last_event_sequence'));
+        // Three deadlocks exhaust the attempts and surface the original error, with nothing written.
+        [$thrown, $limit] = [0, 3];
+        $this->expectRefusal(fn () => app(CustomerDataRights::class)->requestExport($principal(), $customer['user']), QueryException::class);
+        $this->assertSame(3, $thrown);
+        $this->assertSame(1, DB::table('customer_data_requests')->count());
+    }
+
     public function test_database_guards_keep_requests_forward_only_events_append_only_and_exports_purge_only(): void
     {
         $customer = F::account();
@@ -426,6 +496,9 @@ class CustomerDataRightsTest extends TestCase
         $ready = $this->postJson('/account/data-requests/export', ['confirm' => true])->assertCreated()->json('export');
         $request = DB::table('customer_data_requests')->sole();
         $export = DB::table('customer_data_exports')->sole();
+        // The counter names the newest event: requested (1) and export_ready (2).
+        $this->assertSame(2, (int) $request->last_event_sequence);
+        $this->assertSame([1, 2], DB::table('customer_data_request_events')->where('request_id', $request->id)->orderBy('sequence')->pluck('sequence')->map(fn ($v) => (int) $v)->all());
         $attempts = [
             'reopen state' => fn () => DB::table('customer_data_requests')->where('id', $request->id)->update(['state' => 'received', 'version' => 1]),
             'skip version' => fn () => DB::table('customer_data_requests')->where('id', $request->id)->update(['state' => 'downloaded', 'version' => 2, 'open_slot' => null, 'resolved_at' => now(), 'updated_at' => now()]),
@@ -439,6 +512,17 @@ class CustomerDataRightsTest extends TestCase
             'delete event' => fn () => DB::table('customer_data_request_events')->delete(),
             'event gap' => fn () => DB::table('customer_data_request_events')->insert(['request_id' => $request->id, 'sequence' => 9, 'event' => 'export_expired',
                 'detail' => '{}', 'detail_hash' => hash('sha256', '{}'), 'created_at' => now()]),
+            'duplicate event sequence' => fn () => DB::table('customer_data_request_events')->insert(['request_id' => $request->id, 'sequence' => 2, 'event' => 'export_expired',
+                'detail' => '{}', 'detail_hash' => hash('sha256', '{}'), 'created_at' => now()]),
+            'counter without its event' => fn () => DB::table('customer_data_requests')->where('id', $request->id)->update(['last_event_sequence' => 3]),
+            'counter skips ahead' => fn () => DB::table('customer_data_requests')->where('id', $request->id)->update(['last_event_sequence' => 4]),
+            'counter goes back' => fn () => DB::table('customer_data_requests')->where('id', $request->id)->update(['last_event_sequence' => 1]),
+            'counter with a version bump' => fn () => DB::table('customer_data_requests')->where('id', $request->id)->update(['last_event_sequence' => 3, 'version' => 1]),
+            'transition moving the counter' => fn () => DB::table('customer_data_requests')->where('id', $request->id)->update(['state' => 'expired', 'open_slot' => null,
+                'version' => 1, 'resolved_at' => now(), 'updated_at' => now(), 'last_event_sequence' => 3]),
+            'insert with a counter' => fn () => DB::table('customer_data_requests')->insert(['public_id' => '33333333-3333-4333-8333-333333333333',
+                'customer_account_id' => $customer['account']->id, 'kind' => 'deletion', 'state' => 'received', 'open_slot' => 1, 'version' => 0,
+                'last_event_sequence' => 1, 'created_at' => now(), 'updated_at' => now()]),
             'swap token' => fn () => DB::table('customer_data_exports')->where('id', $export->id)->update(['token_hash' => str_repeat('b', 64)]),
             'extend expiry' => fn () => DB::table('customer_data_exports')->where('id', $export->id)->update(['expires_at' => now()->addDay()]),
             'consume without purge' => fn () => DB::table('customer_data_exports')->where('id', $export->id)->update(['consumed_at' => now()]),

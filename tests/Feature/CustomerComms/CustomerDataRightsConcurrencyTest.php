@@ -146,6 +146,93 @@ class CustomerDataRightsConcurrencyTest extends TestCase
         $this->assertNull(DB::table('customer_data_exports')->value('ciphertext'));
     }
 
+    /**
+     * Re-review F7: two other customers request deletion at the same moment while staff approval of customer X is in flight and
+     * holds every lock it takes (paused after its final audit write). Neither new request may wait on X's rows or on each other,
+     * no deadlock may occur, and every request's event sequence and counter stay exact.
+     */
+    public function test_unrelated_customers_request_deletion_together_while_an_approval_is_in_flight_without_waits_or_deadlocks(): void
+    {
+        $x = F::account();
+        $rights = app(CustomerDataRights::class);
+        $rights->requestExport(app(CustomerAccess::class)->principal($x['user']->fresh()), $x['user']);
+        $deletion = $rights->requestDeletion(app(CustomerAccess::class)->principal($x['user']->fresh()), $x['user'])['requestId'];
+        // Created after X, so their requests and events land at the tails of the shared indexes, next to X's newest entries.
+        $y = F::account();
+        $z = F::account();
+        $staff = LicenseFixtures::admin();
+        $staff->forceFill(['app_authentication_secret' => 'JBSWY3DPEHPK3PXP'])->save();
+        $deadlocks = fn (): int => (int) DB::selectOne("SELECT COUNT AS c FROM information_schema.INNODB_METRICS WHERE NAME = 'lock_deadlocks'")->c;
+        $before = $deadlocks();
+        $directory = storage_path('framework/testing/customer-data-rights-'.Str::uuid());
+        $fs = new Filesystem;
+        $fs->makeDirectory($directory, 0700, true);
+        $procs = [];
+        try {
+            $procs['approve'] = $this->worker($directory, ['name' => 'approve', 'barrier' => null, 'operation' => 'approve', 'actor_id' => $staff->id,
+                'request_id' => $deletion, 'version' => 0, 'pause_sql' => ['insert into `audit_events`'], 'pause_at' => 1, 'release' => 'release-approve']);
+            $this->await(fn () => is_file($directory.'/approve.paused'), $procs['approve']);
+            foreach (['y' => $y, 'z' => $z] as $name => $customer) {
+                $procs[$name] = $this->worker($directory, ['name' => $name, 'barrier' => null, 'operation' => 'deletion', 'actor_id' => $customer['user']->id,
+                    'principal' => $this->principal($customer), 'pause_sql' => ['from `customer_data_requests`', '`open_slot`'], 'pause_at' => 1, 'release' => 'release-yz']);
+                $this->await(fn () => is_file($directory.'/'.$name.'.paused'), $procs[$name]);
+            }
+            $connections = array_map(fn (string $name): int => (int) file_get_contents($directory.'/'.$name.'.paused'), ['approve' => 'approve', 'y' => 'y', 'z' => 'z']);
+            touch($directory.'/release-yz');
+            $waits = [];
+            $deadline = microtime(true) + 30;
+            while (($procs['y']->isRunning() || $procs['z']->isRunning()) && microtime(true) < $deadline) {
+                foreach (DB::select('SELECT r.PROCESSLIST_ID AS requester, b.PROCESSLIST_ID AS blocker FROM performance_schema.data_lock_waits w
+                    JOIN performance_schema.threads r ON r.THREAD_ID = w.REQUESTING_THREAD_ID JOIN performance_schema.threads b ON b.THREAD_ID = w.BLOCKING_THREAD_ID') as $wait) {
+                    $waits[] = (array) $wait;
+                }
+                usleep(5000);
+            }
+            $this->assertFalse($procs['y']->isRunning() || $procs['z']->isRunning(), 'A new request waited for the approval in flight.');
+            $this->assertTrue($procs['approve']->isRunning(), 'The approval finished before the new requests were checked.');
+            $this->assertSame([], array_values(array_filter($waits, fn (array $w): bool => in_array((int) $w['requester'], $connections, true))));
+            foreach (['y', 'z'] as $name) {
+                $result = json_decode($procs[$name]->getOutput(), true, 16, JSON_THROW_ON_ERROR);
+                $this->assertSame(['saved', false], [$result['result'], $result['value']['replayed']], json_encode($result));
+            }
+            touch($directory.'/release-approve');
+            $procs['approve']->wait();
+            $approval = json_decode($procs['approve']->getOutput(), true, 16, JSON_THROW_ON_ERROR);
+            $this->assertSame('saved', $approval['result'], json_encode($approval));
+            $this->assertSame('purged', $approval['value']['actions']['pending_exports']);
+        } finally {
+            foreach ($procs as $process) {
+                if ($process->isRunning()) {
+                    $process->stop(1);
+                }
+            }
+            $fs->deleteDirectory($directory);
+        }
+        $this->assertSame(0, $deadlocks() - $before, 'InnoDB detected a deadlock.');
+        foreach (DB::table('customer_data_requests')->orderBy('id')->get() as $request) {
+            $sequences = DB::table('customer_data_request_events')->where('request_id', $request->id)->orderBy('sequence')->pluck('sequence')->map(fn ($v) => (int) $v)->all();
+            $this->assertSame(range(1, count($sequences)), $sequences);
+            $this->assertSame(count($sequences), (int) $request->last_event_sequence);
+        }
+        $this->assertSame(2, DB::table('customer_data_requests')->whereIn('customer_account_id', [$y['account']->id, $z['account']->id])->where('state', 'received')->count());
+    }
+
+    private function worker(string $directory, array $input): Process
+    {
+        $input += ['at' => now()->toIso8601String(), 'retention' => self::RETENTION];
+        $database = DB::connection()->getConfig();
+        $process = new Process([PHP_BINARY, base_path('tests/Support/customer-data-rights-worker.php')], base_path(), [
+            'APP_ENV' => 'testing', 'APP_DEBUG' => 'false', 'APP_KEY' => config('app.key'), 'DB_CONNECTION' => 'mysql', 'DB_URL' => '',
+            'DB_HOST' => (string) $database['host'], 'DB_PORT' => (string) $database['port'], 'DB_DATABASE' => (string) $database['database'],
+            'DB_USERNAME' => (string) $database['username'], 'DB_PASSWORD' => (string) $database['password'], 'DB_SOCKET' => (string) ($database['unix_socket'] ?? ''),
+            'DB_CHARSET' => (string) $database['charset'], 'DB_COLLATION' => (string) $database['collation'],
+            'CACHE_STORE' => 'array', 'SESSION_DRIVER' => 'array', 'QUEUE_CONNECTION' => 'sync', 'VASEY_DATA_RIGHTS_RACE_DIRECTORY' => $directory,
+        ], json_encode($input, JSON_THROW_ON_ERROR), 90);
+        $process->start();
+
+        return $process;
+    }
+
     /** The parent holds the customer user row, waits until the worker blocks on exactly that row, commits $change, then reads the result. */
     private function race(array $input, int $userId, callable $change): array
     {
