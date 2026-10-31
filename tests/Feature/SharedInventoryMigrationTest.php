@@ -42,6 +42,8 @@ class SharedInventoryMigrationTest extends TestCase
         $this->assertDatabaseCount('transactional_notices', 0);
         $this->assertDatabaseCount('transactional_notice_attempts', 0);
         \Tests\Support\RefundDisputeFixtures::dropEmptyTables();
+        // The empty lane CX mail-delivery child names transactional_notices in its insert guard; dispose of it first.
+        \Tests\Support\TransactionalMailFixtures::dropEmptyDeliveries();
         $notices->down();
         $purchaseClaims->down();
         $refundResolution->down();
@@ -69,6 +71,7 @@ class SharedInventoryMigrationTest extends TestCase
         $refundResolution->up();
         $purchaseClaims->up();
         $notices->up();
+        \Tests\Support\TransactionalMailFixtures::restoreDeliveries();
         $refundDispute->up();
         $orderInquiries->up();
         foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }

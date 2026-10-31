@@ -22,6 +22,7 @@ require __DIR__.'/production-customer-identity.php';
 require __DIR__.'/production-account-features.php';
 require __DIR__.'/support-attachments.php';
 require __DIR__.'/support-attachment-pages.php';
+require __DIR__.'/legal-pages.php';
 
 Route::get('/', [StorefrontController::class, 'index'])->middleware('throttle:120,1')->name('home');
 Route::get('/{section}/{slug?}', EditorialController::class)

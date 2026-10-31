@@ -1,0 +1,12 @@
+{"label":"dev1-1-1","outcome":"completed","listed":1,"index_s":4.92,"pre_bytes_s":4.51,"total_s":9.43,"statements":5088,"show_create_table":2324,"com_select":2224,"periods":1,"at":"00:09:18"}
+{"label":"dev1-1-2","outcome":"completed","listed":1,"index_s":4.31,"pre_bytes_s":4.23,"total_s":8.53,"statements":5088,"show_create_table":2324,"com_select":2224,"periods":1,"at":"00:09:26"}
+{"label":"dev1-1-log","outcome":"completed","listed":1,"index_s":5.03,"pre_bytes_s":4.21,"total_s":9.25,"statements":5088,"show_create_table":2324,"com_select":2224,"periods":1,"general_log":true,"at":"00:09:36"}
+{"label":"dev1-3-1","outcome":"completed","listed":3,"index_s":5.02,"pre_bytes_s":4.58,"total_s":9.59,"statements":5640,"show_create_table":2324,"com_select":2612,"periods":3,"at":"00:09:45"}
+{"label":"dev1-3-2","outcome":"completed","listed":3,"index_s":4.44,"pre_bytes_s":4.48,"total_s":8.92,"statements":5640,"show_create_table":2324,"com_select":2612,"periods":3,"at":"00:09:54"}
+{"label":"dev1-3-log","outcome":"completed","listed":3,"index_s":4.33,"pre_bytes_s":4.71,"total_s":9.04,"statements":5640,"show_create_table":2324,"com_select":2612,"periods":3,"general_log":true,"at":"00:10:03"}
+{"label":"dev1-5-1","outcome":"completed","listed":5,"index_s":5.01,"pre_bytes_s":5.55,"total_s":10.55,"statements":6192,"show_create_table":2324,"com_select":3000,"periods":5,"at":"00:10:14"}
+{"label":"dev1-5-2","outcome":"completed","listed":5,"index_s":4.67,"pre_bytes_s":4.57,"total_s":9.24,"statements":6192,"show_create_table":2324,"com_select":3000,"periods":5,"at":"00:10:23"}
+{"label":"dev1-10-1","outcome":"completed","listed":10,"index_s":5.37,"pre_bytes_s":5.42,"total_s":10.79,"statements":7572,"show_create_table":2324,"com_select":3970,"periods":10,"at":"00:10:34"}
+{"label":"dev1-10-2","outcome":"completed","listed":10,"index_s":5.4,"pre_bytes_s":5.4,"total_s":10.8,"statements":7572,"show_create_table":2324,"com_select":3970,"periods":10,"at":"00:10:45"}
+{"label":"dev1-100-1","outcome":"completed","listed":100,"index_s":16.35,"pre_bytes_s":18.54,"total_s":34.89,"statements":32412,"show_create_table":2324,"com_select":21430,"periods":100,"at":"00:11:20"}
+{"label":"dev1-100-2","outcome":"completed","listed":100,"index_s":16.36,"pre_bytes_s":17.05,"total_s":33.41,"statements":32412,"show_create_table":2324,"com_select":21430,"periods":100,"at":"00:11:53"}

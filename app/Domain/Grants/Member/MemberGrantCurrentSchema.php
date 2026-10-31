@@ -4,6 +4,7 @@ namespace App\Domain\Grants\Member;
 
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
+use App\Domain\Customers\ProductionIdentity\SchemaProofFrame;
 use App\Domain\Memberships\Production\MembershipAwardTransaction;
 use App\Domain\Memberships\Production\MembershipRows;
 use Illuminate\Config\Repository;
@@ -43,18 +44,20 @@ final class MemberGrantCurrentSchema
         $owned = self::property($rows, MembershipRows::class, 'ownedTransaction');
         if ($owned === null) {
             $state['marker'] = self::property($rows, MembershipRows::class, 'marker');
+            $state['memo'] = false;
         } else {
             MemberGrantException::require($owned instanceof MembershipAwardTransaction
                 && self::property($owned, MembershipAwardTransaction::class, 'primary') === $state['primary']
                 && self::property($owned, MembershipAwardTransaction::class, 'connection') === $state['connection'], 'changed_primary');
             $state['marker'] = self::property($owned, MembershipAwardTransaction::class, 'marker');
+            $state['memo'] = $owned->memoizesMemberGrantProofs();
         }
         MemberGrantException::require(is_string($state['marker'])
             && preg_match('/\A(?:membership_|va_membership_award_)[a-f0-9]{32}\z/D', $state['marker']) === 1, 'changed_primary');
         try {
             self::context($state, 1);
             self::marker($state['primary'], $state['marker']);
-            self::inspect($state);
+            self::inspectOwned($state);
             self::context($state, 1);
             self::marker($state['primary'], $state['marker']);
         } catch (Throwable $error) {
@@ -88,7 +91,7 @@ final class MemberGrantCurrentSchema
         try {
             self::context($state, 1);
             self::marker($state['primary'], $state['marker']);
-            self::inspect($state);
+            self::inspectOwned($state);
             self::context($state, 1);
             self::marker($state['primary'], $state['marker']);
         } catch (Throwable $error) {
@@ -243,6 +246,22 @@ final class MemberGrantCurrentSchema
         $collations = array_column($pdo->query('PRAGMA collation_list')->fetchAll(PDO::FETCH_NUM), 1);
         sort($collations);
         MemberGrantException::require($collations === ['BINARY', 'NOCASE', 'RTRIM'], 'sqlite_application_collation');
+    }
+
+    /**
+     * In an owned frame that opted in (the customer index, F9), the complete inspection runs once per frame token through
+     * SchemaProofFrame, after every inspected table is held, and fully again in the owned terminal phase. Every other
+     * caller, every writer included, and every committed-frame proof inspects in full on each call, as before.
+     */
+    private static function inspectOwned(array $state): void
+    {
+        if ($state['memo'] !== true) {
+            self::inspect($state);
+
+            return;
+        }
+        SchemaProofFrame::prove($state['primary'], 'member_grant:'.hash('sha256', serialize($state['plan'])),
+            array_values(array_column($state['plan']['tables'], 'name')), static fn () => self::inspect($state));
     }
 
     private static function inspect(array $state): void

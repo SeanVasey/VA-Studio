@@ -403,6 +403,66 @@ PHP;
         $this->assertSame(['available' => 1, 'reserved' => 2, 'consumed' => 0, 'expired' => 0], $second['periods'][0]['balances']);
     }
 
+    public function test_native_index_schema_proofs_per_call_do_not_grow_with_the_number_of_periods(): void
+    {
+        // F9: before the fix every period re-ran the complete identity, membership and member-grant schema proofs in
+        // the index and again in its committed proof and pre-bytes re-run (about 4,000 more statements per period and
+        // call), so the index reached its fixed 60-second budget at about five periods. Each guard now proves completely
+        // once per owned frame plus once in each terminal phase. Counted per call on this session's own server
+        // counters, not timed: the complete proofs are exactly the SHOW CREATE statements, and those must not change
+        // with the number of periods, while every other statement per extra period stays bounded.
+        $fixture = $this->indexFixture();
+        $one = $this->indexStatements($fixture);
+        $this->olderPeriods($fixture, 2);
+        $three = $this->indexStatements($fixture);
+        $this->assertSame([1, 3], [$one['periods'], $three['periods']]);
+        $this->assertGreaterThan(0, $one['Com_show_create_table'], 'The complete proofs still run.');
+        $this->assertGreaterThan(0, $one['Com_show_create_trigger'], 'The complete member-grant proofs still run.');
+        $this->assertSame($one['Com_show_create_table'], $three['Com_show_create_table']);
+        $this->assertSame($one['Com_show_create_trigger'], $three['Com_show_create_trigger']);
+        $this->assertLessThan(500, intdiv($three['Questions'] - $one['Questions'], 2), 'Statements per extra period and call.');
+    }
+
+    /** One index call plus its pre-bytes proof, with this session's statement counters before and after. */
+    private function indexStatements(array $fixture): array
+    {
+        $pdo = DB::connection()->getPdo();
+        $counters = static fn (): array => array_map('intval', $pdo->query("SHOW SESSION STATUS WHERE Variable_name IN
+            ('Questions', 'Com_show_create_table', 'Com_show_create_trigger')")->fetchAll(PDO::FETCH_KEY_PAIR));
+        $before = $counters();
+        $read = MembershipCustomerRead::begin();
+        $index = (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read);
+        $read->proveBeforeBytes();
+        $after = $counters();
+        $delta = ['periods' => count($index['periods'])];
+        foreach (['Questions', 'Com_show_create_table', 'Com_show_create_trigger'] as $name) {
+            $delta[$name] = $after[$name] - $before[$name];
+        }
+
+        return $delta;
+    }
+
+    /** $count older sealed periods with their award events for the same owner, in the exact retained format. */
+    private function olderPeriods(array $fixture, int $count): void
+    {
+        $real = (array) DB::table(MembershipPeriodRecords::PERIODS)->where('id', $fixture['reservation']['period_id'])->sole();
+        $award = (array) DB::table(MembershipPeriodRecords::EVENTS)->where('period_id', $real['id'])->where('kind', 'award')->sole();
+        $plan = (array) DB::table(MembershipRecords::TABLE)->where('id', $real['plan_version_id'])->sole();
+        $policy = MembershipPolicyVersions::document($plan)->binding($plan['id']);
+        $originId = (int) $real['identity_origin_id'];
+        $invoice = MembershipPeriodRecords::historicalInvoice($real, $award, $policy, $originId);
+        for ($index = 1; $index <= $count; $index++) {
+            $move = static fn (?string $at): ?string => $at === null ? null : gmdate('Y-m-d H:i:s', strtotime($at.' UTC') - $index * 2678400);
+            $copy = new MembershipInvoiceBinding(hash('sha256', 'native-index-older-invoice-'.$index), hash('sha256', 'native-index-older-graph-'.$index),
+                $invoice->providerScopeHash, $invoice->amountMinor, $invoice->currency, $move($invoice->periodStart), $move($invoice->periodEnd),
+                $invoice->planPolicyHash, $invoice->originalTermsHash, $invoice->originalBuyerBinding, $invoice->provenance, $move($invoice->paidAt),
+                $invoice->planVersionId);
+            [$period, $event] = MembershipPeriodRecords::create($copy, $policy, $originId, $fixture['buyer']['principal']->durableBinding());
+            DB::table(MembershipPeriodRecords::PERIODS)->insert($period);
+            DB::table(MembershipPeriodRecords::EVENTS)->insert($event);
+        }
+    }
+
     /** The real activation fixture (award, reserve and the authored member definition); phase B runs it after G1. */
     protected function indexFixture(): array
     {

@@ -493,6 +493,8 @@ input[type='range'] { accent-color: var(--va-action); cursor: pointer; min-width
 .editorial-back { margin-bottom: 24px; min-height: 44px; }
 .editorial-prose { max-width: 72ch; padding-top: 38px; }
 .editorial-prose p { margin-bottom: 24px; font-size: 16px; line-height: 1.8; white-space: pre-line; overflow-wrap: anywhere; }
+.legal-meta { font-family: var(--va-font-mono); font-size: 11px; color: var(--va-text-muted); letter-spacing: .04em; }
+.legal-document h2 { font-family: var(--va-font-section); font-size: clamp(24px, 3vw, 32px); font-weight: 400; line-height: 1.2; letter-spacing: 0; margin: 40px 0 16px; overflow-wrap: anywhere; }
 .editorial-list { max-width: 960px; }
 ol.editorial-list { list-style: none; margin: 0; padding: 0; }
 .editorial-entry { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 24px; padding: 36px 0; border-bottom: 1px solid var(--va-rule); }

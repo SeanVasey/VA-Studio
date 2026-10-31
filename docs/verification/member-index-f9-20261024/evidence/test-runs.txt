@@ -1,0 +1,65 @@
+sq-avail1 exit=0 secs=73 :: OK (5 tests, 123 assertions)
+lat-before exit=0 secs=719 :: OK (1 test, 14 assertions)
+lat-dev1 exit=0 secs=379 :: OK (1 test, 14 assertions)
+lat-prof1 exit=0 secs=425 :: OK (1 test, 14 assertions)
+sq-avail2 exit=0 secs=154 :: OK (7 tests, 180 assertions)
+my-avail1 exit=0 secs=2690 :: OK (7 tests, 180 assertions)
+my-growth1 exit=0 secs=311 :: OK (1 test, 18 assertions)
+sq-keyorder1 exit=0 secs=60 :: OK (1 test, 100 assertions)
+lat-final exit=0 secs=511 :: OK (1 test, 14 assertions)
+lat-concurrent exit=0 secs=441 :: OK (1 test, 23 assertions)
+mutsq-P1-avail exit=2 secs=69 :: ERRORS! Tests: 7, Assertions: 137, Errors: 5, Failures: 2.
+mutsq-P2-avail exit=1 secs=81 :: FAILURES! Tests: 7, Assertions: 144, Failures: 2.
+mutsq-P3-avail exit=1 secs=142 :: FAILURES! Tests: 7, Assertions: 177, Failures: 1.
+mutsq-P4-avail exit=1 secs=115 :: FAILURES! Tests: 7, Assertions: 173, Failures: 1.
+mutsq-T1-avail exit=1 secs=97 :: FAILURES! Tests: 7, Assertions: 156, Failures: 1.
+nA-idx-test_native_index_locks_only_the_owner_rows_until_commit_then_releases_them exit=2 secs=659 :: ERRORS! Tests: 1, Assertions: 9, Errors: 1.
+mutsq-T2-avail exit=0 secs=125 :: OK (7 tests, 196 assertions)
+mutsq-T3-avail exit=1 secs=112 :: FAILURES! Tests: 7, Assertions: 175, Failures: 1.
+mutsq-T4-avail exit=2 secs=119 :: ERRORS! Tests: 7, Assertions: 164, Errors: 6, Failures: 1.
+mutsq-T2-idx exit=1 secs=251 :: FAILURES! Tests: 12, Assertions: 190, Failures: 1.
+nA-idx-test_native_index_waits_at_a_writer_held_owner_lock_and_retains_no_lock_after_refusal exit=2 secs=536 :: ERRORS! Tests: 1, Assertions: 9, Errors: 1.
+mutsq-T3-idx exit=0 secs=236 :: OK (12 tests, 191 assertions)
+mutsq-T4-idx exit=2 secs=222 :: ERRORS! Tests: 12, Assertions: 157, Errors: 8.
+mutsq-K1-http exit=1 secs=19 :: FAILURES! Tests: 1, Assertions: 95, Failures: 1.
+mutsq-K2-http exit=1 secs=17 :: FAILURES! Tests: 1, Assertions: 24, Failures: 1.
+nA-idx-test_native_index_and_a_zero_period_index_complete_while_other_sessions_hold_the_fence_and_shared_rows exit=2 secs=557 :: ERRORS! Tests: 1, Assertions: 9, Errors: 1.
+nB-MembershipNativeCommitWitnessTest exit=0 secs=1732 :: OK (3 tests, 55 assertions)
+mutsq-P1b-avail exit=1 secs=143 :: FAILURES! Tests: 7, Assertions: 141, Failures: 2.
+sA exit=0 secs=1325 :: OK, but some tests were skipped! Tests: 177, Assertions: 2746, Skipped: 10.
+nB-MembershipCommitWitnessTest exit=0 secs=2025 :: OK (5 tests, 94 assertions)
+nB-MembershipPeriodAddressedOperationsTest exit=0 secs=1585 :: OK (4 tests, 69 assertions)
+sB exit=0 secs=2762 :: OK, but some tests were skipped! Tests: 419, Assertions: 3700, Skipped: 41.
+nB-MemberActivationCommitWitnessTest exit=0 secs=1606 :: OK (3 tests, 50 assertions)
+sC exit=0 secs=1324 :: OK, but some tests were skipped! Tests: 276, Assertions: 1494, Skipped: 20.
+nB-MembershipSchemaProofFrameTest exit=0 secs=1595 :: OK (8 tests, 66 assertions)
+nB-MemberObserverTerminalProofTest exit=0 secs=1322 :: OK (4 tests, 92 assertions)
+nB-MembershipCustomerIndexAvailabilityTest exit=0 secs=1765 :: OK (7 tests, 196 assertions)
+nA-idx-test_native_index_locks_only_the_owner_rows_until_commit_then_releases_them exit=0 secs=216 :: OK (1 test, 29 assertions)
+nA-idx-test_native_index_waits_at_a_writer_held_owner_lock_and_retains_no_lock_after_refusal exit=0 secs=177 :: OK (1 test, 23 assertions)
+nA-idx-test_native_index_and_a_zero_period_index_complete_while_other_sessions_hold_the_fence_and_shared_rows exit=0 secs=303 :: OK (1 test, 21 assertions)
+nA-idx-test_native_index_never_waits_when_another_session_takes_the_definition_then_the_plan_mid_index exit=0 secs=258 :: OK (1 test, 15 assertions)
+nA-idx-test_native_same_plan_award_for_another_customer_runs_while_the_index_is_open exit=0 secs=291 :: OK (1 test, 21 assertions)
+nA-idx-test_native_index_waiting_behind_a_same_owner_writer_reads_that_writers_commit exit=0 secs=255 :: OK (1 test, 15 assertions)
+nA-idx-test_native_index_waiting_behind_a_same_owner_release_reads_the_released_history exit=0 secs=360 :: OK (1 test, 16 assertions)
+nA-idx-test_native_index_and_reserve_interleave_sequentially_and_pre_bytes_sees_the_change exit=0 secs=296 :: OK (1 test, 16 assertions)
+nA-idx-test_native_index_schema_proofs_per_call_do_not_grow_with_the_number_of_periods exit=0 secs=245 :: OK (1 test, 18 assertions)
+nA-http-test_journey_index_reserve_replay_and_release_through_the_mounted_routes exit=0 secs=369 :: OK (1 test, 129 assertions)
+nA-http-test_reserve_accepts_its_three_keys_in_any_order_and_refuses_a_missing_or_extra_key exit=0 secs=320 :: OK (1 test, 100 assertions)
+nA-http-test_every_refusal_is_the_one_not_found_response exit=0 secs=311 :: OK (1 test, 148 assertions)
+nA-http-test_a_generic_writer_refusal_is_outcome_unknown_and_the_same_request_then_converges exit=0 secs=265 :: OK (1 test, 34 assertions)
+nA-http-test_a_committed_write_with_a_refused_receipt_is_submitted_never_a_refusal exit=0 secs=246 :: OK (1 test, 46 assertions)
+nA-http-test_the_index_body_is_withheld_when_the_pre_bytes_re_read_refuses exit=0 secs=258 :: OK (1 test, 59 assertions)
+nM-P1-growth exit=1 secs=216 :: FAILURES! Tests: 1, Assertions: 16, Failures: 1.
+nM-P2-growth exit=1 secs=536 :: FAILURES! Tests: 1, Assertions: 16, Failures: 1.
+nM-P3-growth exit=1 secs=372 :: FAILURES! Tests: 1, Assertions: 16, Failures: 1.
+nM-P4-growth exit=1 secs=306 :: FAILURES! Tests: 1, Assertions: 16, Failures: 1.
+nM-T1-terminal exit=1 secs=294 :: FAILURES! Tests: 1, Assertions: 17, Failures: 1.
+nM-T3-terminal exit=0 secs=468 :: OK (1 test, 21 assertions)
+nM-T4-terminal exit=2 secs=307 :: ERRORS! Tests: 1, Assertions: 20, Errors: 1.
+nM-T2-withdrawal exit=1 secs=340 :: FAILURES! Tests: 1, Assertions: 13, Failures: 1.
+nM-T3-withdrawal exit=0 secs=535 :: OK (1 test, 14 assertions)
+nB-MembershipCustomerIndexTest exit=2 secs=4950 :: ERRORS! Tests: 12, Assertions: 187, Errors: 2.
+fin-sq-avail-http exit=0 secs=201 :: OK (41 tests, 1288 assertions)
+fin-sq-keyorder exit=0 secs=54 :: OK (1 test, 100 assertions)
+fin-native-growth exit=0 secs=387 :: OK (1 test, 18 assertions)

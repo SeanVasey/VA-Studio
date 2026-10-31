@@ -13,13 +13,14 @@ require_once dirname(__DIR__, 2).'/scripts/ops/capability-boundary.php';
 class StagingRuntimeValidatorTest extends TestCase
 {
     /**
-     * The eleven capability flags and the four stated beside them (batches K2 and K3, lane PCC). Written out here on purpose: removing one from
+     * The thirteen capability flags and the four stated beside them (batches K2 and K3, lane PCC). Written out here on purpose: removing one from
      * scripts/ops/capability-boundary.php must fail a test, not silently shrink what the test checks.
      */
     private const STAGED_FLAGS = [
         'VASEY_TEST_SERVICE_PROJECTS_ENABLED', 'VASEY_TEST_FREE_GRANTS_ENABLED', 'VASEY_TEST_CUSTOMER_CONSENT_ENABLED',
         'VASEY_TEST_UNPAID_RELEASE_ENABLED', 'VASEY_TEST_REFUND_RESOLUTION_ENABLED', 'VASEY_TEST_REFUND_DISPUTE_ENABLED',
-        'VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED', 'CONTACT_TEST_ORDER_INQUIRIES_ENABLED', 'CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED',
+        'VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED', 'VASEY_CUSTOMER_DATA_RIGHTS_ENABLED', 'VASEY_TRANSACTIONAL_MAIL_ENABLED',
+        'CONTACT_TEST_ORDER_INQUIRIES_ENABLED', 'CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED',
         'VASEY_OPERATIVE_FREE_GRANTS_ENABLED', 'VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED',
         'DISCOVERY_SITEMAP_ENABLED', 'VASEY_LISTENING_V2_PROMOTION_ENABLED',
         'VASEY_PRODUCTION_REAL_MAIL_ADMITTED', 'VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED',
@@ -122,10 +123,10 @@ class StagingRuntimeValidatorTest extends TestCase
         return array_combine(self::STAGED_FLAGS, array_map(static fn (string $flag): array => [$flag], self::STAGED_FLAGS));
     }
 
-    public function test_the_shared_boundary_lists_exactly_the_fifteen_flags(): void
+    public function test_the_shared_boundary_lists_exactly_the_seventeen_flags(): void
     {
         $this->assertSame(self::STAGED_FLAGS, array_keys(CapabilityBoundary::stagedFlags()));
-        $this->assertSame(11, count(CapabilityBoundary::CAPABILITY_FLAGS));
+        $this->assertSame(13, count(CapabilityBoundary::CAPABILITY_FLAGS));
         foreach (self::UNGATED_FLAGS as $flag) {
             $this->assertArrayHasKey($flag, CapabilityBoundary::CAPABILITY_FLAGS);
         }

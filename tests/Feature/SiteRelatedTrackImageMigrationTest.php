@@ -30,6 +30,8 @@ class SiteRelatedTrackImageMigrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // The later schema-v5 successor (2026_10_24_268100) replaces this guard; these cases exercise 000032 in its own context.
+        (require database_path('migrations/2026_10_24_268100_site_release_images_schema_v5.php'))->down();
         $this->actor = User::factory()->create();
     }
 
