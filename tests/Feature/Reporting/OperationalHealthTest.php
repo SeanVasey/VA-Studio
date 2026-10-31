@@ -94,11 +94,34 @@ class OperationalHealthTest extends TestCase
         Livewire::test(ContentPipelineWidget::class)->assertSee('Inquiries not yet read');
     }
 
+    public function test_a_reservation_older_than_the_configured_retry_window_is_a_stalled_attention_metric_not_a_running_job(): void
+    {
+        config(['queue.default' => 'database', 'queue.connections.database.retry_after' => 600]);
+        $now = now()->utc()->toImmutable();
+        $job = fn (int $reserved) => ['queue' => 'default', 'payload' => '{}', 'attempts' => 1, 'reserved_at' => $reserved,
+            'available_at' => $reserved - 60, 'created_at' => $reserved - 60];
+        // Reserved 5 seconds ago and 599 seconds ago: running. Exactly 600 seconds ago and an hour ago: the queue treats these
+        // reservations as expired (reserved_at <= now - retry_after) and hands the jobs out again.
+        DB::table('jobs')->insert([$job($now->subSeconds(5)->timestamp), $job($now->subSeconds(599)->timestamp),
+            $job($now->subSeconds(600)->timestamp), $job($now->subHour()->timestamp)]);
+        $queue = $this->metrics('queue');
+        $this->assertSame([2, 'ok'], [$queue['queue_reserved']['value'], $queue['queue_reserved']['state']]);
+        $this->assertSame([2, 'attention'], [$queue['queue_stalled']['value'], $queue['queue_stalled']['state']]);
+        $this->assertStringContainsString('600', $queue['queue_stalled']['detail']);
+        Livewire::test(QueueHealthWidget::class)->assertSee('Jobs stalled past the retry window')
+            ->assertSeeHtml('data-metric="queue_stalled" data-state="attention"');
+
+        // The window is read from the configuration: a longer one makes the same reservations running again.
+        config(['queue.connections.database.retry_after' => 7200]);
+        $queue = $this->metrics('queue');
+        $this->assertSame([4, 0, 'ok'], [$queue['queue_reserved']['value'], $queue['queue_stalled']['value'], $queue['queue_stalled']['state']]);
+    }
+
     public function test_unreadable_unrecorded_and_out_of_scope_sources_are_unavailable_not_zero_and_non_staff_are_refused(): void
     {
         config(['queue.default' => 'sync', 'queue.failed.driver' => 'file']);
         $queue = $this->metrics('queue');
-        foreach (['queue_ready', 'queue_oldest', 'queue_reserved', 'failed_jobs'] as $key) {
+        foreach (['queue_ready', 'queue_oldest', 'queue_reserved', 'queue_stalled', 'failed_jobs'] as $key) {
             $this->assertSame([null, 'unavailable'], [$queue[$key]['value'], $queue[$key]['state']], $key);
         }
         $this->assertStringContainsString("'sync'", $queue['queue_ready']['detail']);
