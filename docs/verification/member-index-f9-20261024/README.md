@@ -192,3 +192,24 @@ test 1 test, 18 assertions, OK. The full suites above ran on `56cf3ead`, whose m
 The private server was shut down with `mysqladmin shutdown` after the last run, and the hard-link mutation copy was
 removed. Scratch logs and JUnit files stay in the session scratchpad, outside the repository; the summaries the packet
 relies on are in `evidence/`.
+
+## Independent review at `8bdfcd27`
+
+Decision: **APPROVE WITH CONDITIONS** ([`independent-f9-review-8bdfcd27-DECISION.md`](independent-f9-review-8bdfcd27-DECISION.md)),
+no P0 or P1. Memo reuse for the member-grant guard fails closed (a concurrent `CREATE TRIGGER` waited behind the frame's
+metadata lock; a namespace-only collision was refused at the pre-commit terminal phase with no commit); C4e's pinned
+properties hold natively (R1, R4, owner-only locks, the same-plan award for another customer; mutants P1, P2 and T1
+killed); binding dedup is sound with a real owner recovery between periods (4 periods, 2 bindings, both engines); T3 is
+acceptable as census-only because the committed frame is read-only; the key-order fix accepts no malformed body.
+
+| ID | Finding | Resolution |
+| --- | --- | --- |
+| F9-R1 (P2) | At host load 5 to 9 the reviewer measured the same statement counts as the author (5,088 and 32,412 per call) but 100-period calls of 53.9 to 60.4 s, 3 of 6 refused at the 60 s deadline, and the concurrent-award case refused at 60.3 s | Condition accepted: the fix removes the per-period growth, but a full 100-period page has no proven headroom and stays a mount gate with N7. The CHANGELOG, the C4e packet, the resumption row and the deferred ledger no longer say "fixed". Options for the follow-up: a smaller page, fewer G1 identity dependents scans (58 % of the remaining time), or a measurement on the target host |
+| F9-R2 (P3) | T3 (committed raw re-read removed) has census-only coverage | Deferred: add a test that the committed frame is read-only |
+| F9-R3 (P3) | Each distinct binding costs one complete committed identity proof; many recoveries are slower (fails closed, unmeasured) | Deferred |
+| F9-R4 (P3) | The reviewer's recovery probe could become a test | Deferred |
+| F9-R5 (P3) | Trailing whitespace in `evidence/glog.py` | Fixed |
+
+The reviewer could not measure an idle host or production hardware; G1's `MemberObserverTerminalProofTest` passed 3 of 4
+methods under load 8 to 10 (the fourth failed twice inside its writer fixture's deadline, not in index code; the author's
+run passed 4 of 4).

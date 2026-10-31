@@ -27,7 +27,7 @@ name = 'pre-tx'
 for e in seg:
     u = e[3].upper()
     if u.startswith('START TRANSACTION') or u.startswith('BEGIN'):
-        phase += 1; name = f'tx{phase}'; 
+        phase += 1; name = f'tx{phase}';
     phases[name][kind(e[3])] += 1
     phases[name]['TOTAL'] += 1
 for n,c in phases.items():
