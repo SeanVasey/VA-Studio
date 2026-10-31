@@ -116,6 +116,37 @@ final class MembershipHttpTest extends TestCase
         $this->assertSame(0, $transactions);
     }
 
+    public function test_reserve_accepts_its_three_keys_in_any_order_and_refuses_a_missing_or_extra_key(): void
+    {
+        // Codex P2 on PR #174: JSON object members are unordered, so a valid body in another key order must reach the
+        // domain; the key set itself stays exact and every value check is unchanged.
+        $fixture = $this->memberActivationFixture();
+        $period = $fixture['reservation']['period_id'];
+        $this->actAs($fixture['buyer']);
+        $path = '/production-memberships/periods/'.$period.'/reservations';
+        $valid = ['offerId' => (string) $fixture['selection'], 'expectedRevision' => $fixture['expected_revision'], 'requestKey' => self::REQUEST_KEY];
+        $before = DB::table(MembershipReservationRecords::TABLE)->count();
+        $refused = [
+            'missing key' => ['offerId' => $valid['offerId'], 'requestKey' => $valid['requestKey']],
+            'extra key' => [...$valid, 'force' => true],
+            'extra key, reordered' => ['force' => true, 'requestKey' => $valid['requestKey'], 'offerId' => $valid['offerId'], 'expectedRevision' => $valid['expectedRevision']],
+            'replaced key' => ['offerId' => $valid['offerId'], 'expectedRevisions' => $valid['expectedRevision'], 'requestKey' => $valid['requestKey']],
+            'reordered with a wrong value type' => ['requestKey' => $valid['requestKey'], 'expectedRevision' => (string) $valid['expectedRevision'], 'offerId' => $valid['offerId']],
+        ];
+        foreach ($refused as $case => $body) {
+            $this->privateJson($this->postMember($path, $body))->assertStatus(422)->assertExactJson(['code' => 'MEMBERSHIP_UNAVAILABLE']);
+            $this->assertSame($before, DB::table(MembershipReservationRecords::TABLE)->count(), $case);
+        }
+        $reordered = ['requestKey' => $valid['requestKey'], 'expectedRevision' => $valid['expectedRevision'], 'offerId' => $valid['offerId']];
+        $this->assertNotSame(array_keys($valid), array_keys($reordered));
+        $result = $this->privateJson($this->postMember($path, $reordered))->assertOk()->json('result');
+        $this->assertSame([$period, 'reserved', 1], [$result['periodId'], $result['status'], $result['creditAmount']]);
+        $this->assertSame($before + 1, DB::table(MembershipReservationRecords::TABLE)->count());
+        // The same request in the original key order is the same retained reservation (replay), so order carries no meaning.
+        $this->assertSame($result, $this->reserve($fixture, $period)->assertOk()->json('result'));
+        $this->assertSame($before + 1, DB::table(MembershipReservationRecords::TABLE)->count());
+    }
+
     public function test_every_refusal_is_the_one_not_found_response(): void
     {
         $fixture = $this->memberActivationFixture();

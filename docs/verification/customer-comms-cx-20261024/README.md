@@ -266,3 +266,20 @@ If a writer ever skipped the user lock, the unique `(customer_account_id, kind, 
 - **Process note:** while stopping my own native runner I once used `pkill -P <runner pid>`, which signals only that runner's child. I then stopped the remaining processes by exact PID. No other lane's process or server was signalled.
 
 **Not tested:** concurrent HTTP load end to end, the full native selection, Foundation CI, browser specs and the frontend on this head. F7 changed no frontend file.
+
+## Second re-review at `e6f46cdd` (F7 fix)
+
+Decision: **APPROVE** ([`independent-cx-rereview2-e6f46cdd-DECISION.md`](independent-cx-rereview2-e6f46cdd-DECISION.md)),
+F7 resolved, no new P0 to P2. Natively through the real service code: the request-level probe (two customers requesting
+deletion) holds no row locks at the pause, waits for nothing and deadlocks 0 times; the event-level probe (an approval
+paused with all its locks against another customer's deletion) shows only record locks on each side's own rows, no
+wait and no deadlock. Every forbidden counter or event write tried in raw SQL was refused; on a populated database the
+209 existing tables are unchanged and `migrate:rollback --step=3` refuses at `268300`. A second open request for one
+account cannot coexist (user-row lock, then the unique index, error 1062 mapped to 409). READ COMMITTED is load-bearing
+for the F1 purge (mutant C fails the purge race). Mutants A (locked MAX restored), C, A+C and B+C are killed; B alone
+survives as expected (a locking read on an empty range takes no gap lock under READ COMMITTED).
+
+Deferred P3 notes: N1 the export document is assembled under READ COMMITTED, so its sections can reflect slightly
+different moments if the customer's own order changes mid-build; N2 retried lock-wait timeouts can hold a request up to
+about 150 s before the 503; N3 the Filament staff actions show a generic error page for a database error that outlives
+the retries; N4 record at the open-export lookup that the F1 purge depends on READ COMMITTED.

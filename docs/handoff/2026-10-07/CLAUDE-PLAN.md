@@ -446,3 +446,7 @@ Census 307 (main first). Selection 2,639 of 9,877 cases in 254 files (`3e0bd1aa`
 - lingering contention answers 503 `try_again`.
 
 Main `a926f98b` merged as `27e14ee6`; fixtures `a9123898`. Native 15/15 including the new two-customer race with an approval in flight (no waits, no deadlocks). CustomerComms SQLite 103 OK. All `tests/ops` OK. Census 308; selection 2,657 of 9,912 cases in 262 files. Mutants: M22, M23 and M24 killed natively; M25, M26, M27 and M29 killed; M28 equivalent.
+
+2026-10-31 OPS-FIX merged PR #181 at `a926f98bea76e680482c61125ba042c2ce6bfd6f` from exact head `02056de7` (tested `0fff60ab`): registers REP's `REPORTING_*` customer-segmentation flags in both env templates and the `forge-deploy.sh` inherited-env scrub, which PR #178 had omitted (`tests/ops/test_staging_capability_profile.py` and `test_staging_code_drift.py` failed on main; the development preflight does not run `tests/ops`). `build-kit --check` ok. Preflight 41180329853 is the readiness cancellation; replacement 41180338179 success. Codex code and security reviews clean. Lanes that add environment keys must run `tests/ops`.
+
+2026-10-31 F9 independent review of `8bdfcd27` APPROVE WITH CONDITIONS (no P0/P1): per-period schema-proof growth removed and C4e's pinned properties hold natively, but condition F9-R1 (P2): at host load 5 to 9 the reviewer measured 100-period calls of 53.9 to 60.4 s with 3 of 6 refused (fail closed), so a full 100-period page stays a mount gate with N7. F9-R2 to R4 deferred, R5 fixed.

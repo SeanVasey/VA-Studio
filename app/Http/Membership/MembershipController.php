@@ -61,7 +61,11 @@ final class MembershipController
             return (new MembershipReservationOperations)->reserveInPeriod($period, $body['offerId'], $body['expectedRevision'],
                 $body['requestKey'], $identity->principal(), $identity->actor());
         }, function (array $body): bool {
-            return array_keys($body) === ['offerId', 'expectedRevision', 'requestKey']
+            // Exactly these three keys, in any order (JSON object members are unordered): none missing, none extra.
+            $keys = array_keys($body);
+            sort($keys, SORT_STRING);
+
+            return $keys === ['expectedRevision', 'offerId', 'requestKey']
                 && is_string($body['offerId']) && preg_match(self::OFFER, $body['offerId']) === 1
                 && is_int($body['expectedRevision']) && $body['expectedRevision'] > 0
                 && is_string($body['requestKey']) && preg_match(self::REQUEST_KEY, $body['requestKey']) === 1;
