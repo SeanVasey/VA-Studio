@@ -280,6 +280,40 @@ class TransactionalMailTest extends TestCase
         Mail::assertSentCount(2);
     }
 
+    public function test_the_stuck_listing_reports_only_deliveries_in_submitting_past_the_threshold_and_writes_nothing(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        $intents = [N::ready(suffix: 'S1'), N::ready(suffix: 'S2'), N::ready(suffix: 'S3')];
+        M::configure();
+        $adapter = app(TransactionalMailAdapter::class);
+        $ids = array_map(fn (array $f): string => $adapter->queueOrderReady($f['notice']['notificationId'])['deliveryId'], $intents);
+        $this->artisan('vasey:transactional-mail-stuck')->expectsOutput('stuck=0 minutes=15')->assertSuccessful();
+        // A worker claimed two deliveries (queued -> submitting, the only forward step the guard allows here) and stopped.
+        $now = now()->utc()->startOfSecond();
+        $claim = fn (string $id, $at) => DB::table('transactional_mail_deliveries')->where('public_id', $id)->update(['state' => 'submitting', 'version' => 1, 'started_at' => $at]);
+        $claim($ids[0], $now->copy()->subMinutes(40));
+        $claim($ids[1], $now->copy()->subMinutes(5));
+        // A third was claimed an hour ago and finished: no longer submitting, so never listed however old its claim.
+        $claim($ids[2], $now->copy()->subHour());
+        DB::table('transactional_mail_deliveries')->where('public_id', $ids[2])->update(['state' => 'accepted', 'version' => 2,
+            'message_hash' => str_repeat('a', 64), 'finished_at' => $now->copy()->subMinutes(59)]);
+        $before = [DB::table('transactional_mail_deliveries')->orderBy('id')->get()->toJson(), AuditEvent::count()];
+        $notice = fn (int $i): string => TransactionalMailDelivery::where('public_id', $ids[$i])->value('notice_public_id');
+        $line = fn (int $i, $at): string => 'delivery='.$ids[$i].' notice='.$notice($i).' started_at='.$at->format('Y-m-d H:i:s').' UTC';
+
+        $this->artisan('vasey:transactional-mail-stuck')->expectsOutput('stuck=1 minutes=15')->expectsOutput($line(0, $now->copy()->subMinutes(40)))
+            ->doesntExpectOutput($line(1, $now->copy()->subMinutes(5)))->assertSuccessful();
+        $this->artisan('vasey:transactional-mail-stuck', ['--minutes' => 2])->expectsOutput('stuck=2 minutes=2')
+            ->expectsOutput($line(0, $now->copy()->subMinutes(40)))->expectsOutput($line(1, $now->copy()->subMinutes(5)))
+            ->doesntExpectOutput($line(2, $now->copy()->subHour()))->assertSuccessful();
+        foreach (['0', '10081', 'x'] as $invalid) {
+            $this->artisan('vasey:transactional-mail-stuck', ['--minutes' => $invalid])->assertExitCode(2);
+        }
+        $this->assertSame($before, [DB::table('transactional_mail_deliveries')->orderBy('id')->get()->toJson(), AuditEvent::count()], 'The listing is read-only.');
+        Mail::assertNothingOutgoing();
+    }
+
     public function test_database_guards_allow_one_forward_path_per_intent(): void
     {
         Mail::fake();
