@@ -209,6 +209,11 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 - CI's browser job may run for 35 minutes instead of 15. Installing the browsers usually takes 1 to 4.5 minutes, but took 14 on a slow runner, and the old limit cancelled the job 38 seconds into its tests (CI run 36740802516). The tests take 7 to 9 minutes.
 - Public storefront and editorial pages answer a generic, uncacheable 503 when the published site content fails its integrity check. They used to redirect to the site root in a loop, or back to the referring site. Missing content rows fail the same way instead of answering 404. The outage is logged with its reason (at most once a minute while the cache works), and New content draft reports it with the recovery that applies instead of breaking.
 
+
+### Fixed
+
+- Staging and production ops kits now know REP's three customer-segmentation flags (`REPORTING_CUSTOMER_SEGMENTS_ENABLED`, `REPORTING_CUSTOMER_EXPORT_ENABLED`, `REPORTING_MARKETING_SEGMENT_ENABLED`): both env templates list them as `false` with the U-13 reason, and `forge-deploy.sh` unsets the `REPORTING_*` family from the inherited shell like every other config family. PR #178 added the keys without them, so `tests/ops/test_staging_capability_profile.py` and `tests/ops/test_staging_code_drift.py` failed on main (the development preflight does not run `tests/ops`).
+
 ### Security
 
 - `symfony/mime` 8.0.15 → 8.1.10 (with `symfony/polyfill-mbstring` 1.43.0 → 1.43.3) for CVE-2026-45070 (PKSA-wtxr-p26d-nn42, email header injection via non-token characters in MIME parameter names, reported 2026-10-28). No 8.0.x release carries the fix. `composer audit` failed on main and on every open PR until this change.
