@@ -168,7 +168,8 @@ class SalesReportRefundSnapshotTest extends TestCase
         $other->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $committed = false;
         DB::listen(function (QueryExecuted $query) use (&$committed, $other, $object, $line, $first): void {
-            if ($committed || DB::transactionLevel() === 0 || ! str_contains($query->sql, 'refund_dispute_observations') || ! str_contains($query->sql, 'outcome')) {
+            // RefundDisputeCase::load()'s read of the latest accepted observation (the report's own aggregate reads select columns).
+            if ($committed || preg_match('/\Aselect \* from [`"]refund_dispute_observations[`"] where .*outcome/i', $query->sql) !== 1) {
                 return;
             }
             $committed = true;
