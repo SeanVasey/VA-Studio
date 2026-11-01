@@ -100,3 +100,17 @@ The host is shared with other lanes. Load average was about 7 to 13 on 4 cores t
   about 7 minutes on this host's MySQL.
 - No full-suite or Foundation run. No staging run. The staging test chain uses the same code, so this fix also removes the
   hosted symptom, but that was not observed on a host.
+
+## Independent review at `0fb1c93e`
+
+Decision: **APPROVE** ([`independent-con-review-0fb1c93e-DECISION.md`](independent-con-review-0fb1c93e-DECISION.md)),
+no P0 to P2. Storing exactly the decision second is correct in all five `contract_render_work` saves; the equality checks
+(`ReadGrantContract`, `ActivationEvidence`) and the ordering check (`ContractEvidence`) are unchanged; the triggers still
+refuse the drift (with the fix reverted the claim breaks the lease rule and the retry breaks the retry-delay rule).
+Native: the new test 5/39 and `TestContractIssuanceConcurrencyTest` 4/68. The other domains with the same Eloquent
+pattern have no real second-boundary defect: their models set `$timestamps = false`, and the one exposed save (account
+withdrawal) drifts `updated_at` by at most a second against a trigger that only forbids going backwards.
+
+Deferred P3s: P3-1 the retries-exhausted quarantine save has no second-crossing case; P3-2 `withoutTimestamps` covers
+every save of the model during its callback (each callback saves once today); P3-3 the account withdrawal save in
+`CustomerDataRights` can drift `customer_accounts.updated_at` by one second (nothing compares it for equality).
