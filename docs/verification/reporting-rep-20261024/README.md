@@ -194,3 +194,50 @@ no new P0 to P2; both conditions of the first review are met. Native MySQL 8.4.1
 K6, K13, K15, the production-account exclusion, the CSV whitespace case and both CSV count rows are killed. Non-blocking
 P3s: R-1 (exclude production accounts positively by marking test accounts, for the U-13 follow-up), R-2 (the per-order
 snapshot transaction is untested defence), and a space followed by a tab before `=` is not neutralized.
+
+## Follow-up batch FUB-1 (2026-10-31)
+
+Branch `harness/followups-rep-cx-20261031` from `origin/main` `8bb1ab24` (PRs #178 and #183 merged). Deferred findings from this
+lane's PR and reviews, each fixed with a regression test that fails without the fix, or left deferred with a reason. Ledger:
+`docs/handoff/2026-10-07/codex-deferred-20261011.md` (2026-10-31 FUB-1 entry).
+
+| Finding | Resolution | Commit | Test |
+| --- | --- | --- | --- |
+| Codex P2 r4418610921: the tier netting read each order's succeeded total from the period aggregate, before the per-order snapshot, so a refund recorded in between left a negative `unattributed_refund_minor` | Fixed. The succeeded total is the case's latest accepted observation, read inside the same snapshot transaction as `refundedByLine()`. A case whose line refunds exceed its succeeded total is counted as unreadable (its earlier succeeded total is shown as unattributed); a negative remainder is never added. | `75b913f5` | `SalesReportRefundSnapshotTest`: a refund and then a reversal recorded between the two reads; the inconsistent-case guard |
+| Review R-2: the per-order snapshot transaction was untested | Fixed with a native-only test: a second MySQL session commits an allocation after the snapshot read the order's accepted observation and before it reads the allocations; the report keeps the earlier consistent view, and the next report attributes it. Census entry appended (main's 309 entries first). | `75b913f5`, `ff79e2c2` | `test_native_the_order_snapshot_does_not_see_an_allocation_committed_while_it_reads` |
+| Codex P2 r4418610931: the page hid the unverified and unreadable counts and unattributed refunds whenever the tier table had no rows | Fixed. The table stays conditional on rows; the warnings render whenever the tier section is available. | `fa4ec1c8` | `SalesReportViewTest` (every order excluded, rows present, section unavailable) |
+| Codex P2 r4419244931: a `jobs` row reserved longer ago than `retry_after` counted as running/ok | Fixed. New `queue_stalled` attention metric ("Jobs stalled past the retry window") using `queue.connections.database.retry_after` (connector default 60) and the queue's own expiry rule `reserved_at <= now - retry_after`; `queue_reserved` counts only reservations inside the window. | `5d3fdc31` | `OperationalHealthTest::test_a_reservation_older_than_the_configured_retry_window_is_a_stalled_attention_metric_not_a_running_job` |
+| P3: a space followed by a tab before a formula character was not neutralised | Fixed. `ReportingCsv::cell()` skips every ASCII whitespace character (space, tab, LF, CR, NUL, VT, FF) before checking for a trigger. | `5002d79c` | `ReportingCsvTest` (seven new cases) |
+| P3-6: unindexed period scans and no `refund_line_allocations(order_id)` index | Still deferred: needs a migration. | | |
+| R-1: exclude production accounts positively by marking test accounts | Still deferred: needs a migration and the U-13 policy decision. | | |
+
+`docs/staff-reporting.md` describes the snapshot rule, the warnings, the stalled metric and the whitespace rule.
+
+### Mutants (one at a time, each killed)
+
+| Mutant | Engine | Result |
+| --- | --- | --- |
+| M1: the original code (aggregate succeeded total, any non-zero remainder added) | SQLite | killed (negative unattributed amount) |
+| M2: aggregate succeeded total, negative remainder dropped | SQLite | killed (the reversal phase shows a stale unattributed amount) |
+| M3: no inconsistent-case guard | SQLite | killed |
+| R2: the per-order snapshot transaction removed | native | killed: the report attributed the allocation committed mid-read (unattributed `[]`, tier refund 122975, expected the reverse) |
+| V1: the original view (warnings inside the rows branch) | SQLite | killed |
+| H1: running counts every reservation | SQLite | killed |
+| H2: stalled uses `<` instead of `<=` | SQLite | killed |
+| H3: a fixed 90-second window instead of the configured one | SQLite | killed |
+| C1: the original whitespace set (space and LF only) | SQLite | killed (5 cases fail) |
+
+### Results
+
+Native MySQL 8.4.11 (private `mysqld`, own datadir, port 3491, `ONLY_FULL_GROUP_BY`, REPEATABLE READ default; stopped by
+`mysqladmin shutdown` and the datadir removed afterwards), one file per run: `SalesReportRefundSnapshotTest` OK (3 tests, 17 assertions, at
+`68d840d8`; its native method again at `ff79e2c2`: OK, 1 test, 4 assertions), `OperationalHealthTest` OK (3, 90), `RefundNettingReportTest` OK (1, 31),
+`SalesReportLockFreeTest` OK (1, 11), `SalesReportTest` OK (1, 47), `SalesReportViewTest` OK (1, 11).
+SQLite: `tests/Feature/Reporting` plus `tests/Unit/ReportingCsvTest.php` 43 tests, 466 assertions, 1 skipped (the native-only method).
+Census: 310 entries (main's 309 first, one appended). Native selection regenerated: **2671 cases in 264 files of 9931 discovered**
+(was 2665 in 263 of 9916); both count comments updated. Safeguards `test-phpunit-shards` 52, `test-ci-scope` 27,
+`test-workflow-cadence` 14, `test-focused-tests` 53, `test-database-receipts` 61: OK. All 20 `tests/ops` files OK. `composer audit`:
+no advisories; `composer validate --strict`: valid.
+
+Not tested: browser specs, the full native selection, Foundation CI, and a real queue worker dying (the stalled metric is tested on
+hand-written `jobs` rows).
