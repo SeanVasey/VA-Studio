@@ -352,8 +352,16 @@ class TransactionalMailTest extends TestCase
         $this->artisan('vasey:transactional-mail-stuck', ['--minutes' => 2])->expectsOutput('stuck=2 minutes=2')
             ->expectsOutput($line(0, $now->copy()->subMinutes(40)))->expectsOutput($line(1, $now->copy()->subMinutes(5)))
             ->doesntExpectOutput($line(2, $now->copy()->subHour()))->assertSuccessful();
+        // The listing is capped (at most 100 rows, fewer with --max); the count and a more= line still cover every stuck delivery.
+        $this->artisan('vasey:transactional-mail-stuck', ['--minutes' => 2, '--max' => 1])->expectsOutput('stuck=2 minutes=2')
+            ->expectsOutput($line(0, $now->copy()->subMinutes(40)))->doesntExpectOutput($line(1, $now->copy()->subMinutes(5)))
+            ->expectsOutput('more=1')->assertSuccessful();
+        $this->artisan('vasey:transactional-mail-stuck', ['--minutes' => 2, '--max' => 100])->doesntExpectOutput('more=0')->assertSuccessful();
         foreach (['0', '10081', 'x'] as $invalid) {
             $this->artisan('vasey:transactional-mail-stuck', ['--minutes' => $invalid])->assertExitCode(2);
+        }
+        foreach (['0', '101', 'x'] as $invalid) {
+            $this->artisan('vasey:transactional-mail-stuck', ['--max' => $invalid])->assertExitCode(2);
         }
         $this->assertSame($before, [DB::table('transactional_mail_deliveries')->orderBy('id')->get()->toJson(), AuditEvent::count()], 'The listing is read-only.');
         Mail::assertNothingOutgoing();

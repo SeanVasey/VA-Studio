@@ -14,7 +14,8 @@ final class ListStuckTransactionalMail extends Command
 {
     public const MAX_LISTED = 100;
 
-    protected $signature = 'vasey:transactional-mail-stuck {--minutes=15 : Minimum time in submitting, 1 to 10080 minutes}';
+    protected $signature = 'vasey:transactional-mail-stuck {--minutes=15 : Minimum time in submitting, 1 to 10080 minutes}'
+        .' {--max=100 : Rows listed, 1 to 100; the count always covers every stuck delivery}';
 
     protected $description = 'List order-ready email deliveries stuck in submitting (read-only).';
 
@@ -26,15 +27,21 @@ final class ListStuckTransactionalMail extends Command
 
             return self::INVALID;
         }
+        $max = filter_var($this->option('max'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => self::MAX_LISTED]]);
+        if ($max === false) {
+            $this->error('Use max from 1 to '.self::MAX_LISTED.'.');
+
+            return self::INVALID;
+        }
         $before = now()->utc()->subMinutes($minutes)->format('Y-m-d H:i:s');
         $stuck = fn () => DB::table('transactional_mail_deliveries')->where('state', 'submitting')->where('started_at', '<', $before);
         $total = $stuck()->count();
         $this->line('stuck='.$total.' minutes='.$minutes);
-        foreach ($stuck()->orderBy('started_at')->orderBy('id')->limit(self::MAX_LISTED)->get(['public_id', 'notice_public_id', 'started_at']) as $row) {
+        foreach ($stuck()->orderBy('started_at')->orderBy('id')->limit($max)->get(['public_id', 'notice_public_id', 'started_at']) as $row) {
             $this->line('delivery='.$row->public_id.' notice='.$row->notice_public_id.' started_at='.$row->started_at.' UTC');
         }
-        if ($total > self::MAX_LISTED) {
-            $this->line('more='.($total - self::MAX_LISTED));
+        if ($total > $max) {
+            $this->line('more='.($total - $max));
         }
 
         return self::SUCCESS;
