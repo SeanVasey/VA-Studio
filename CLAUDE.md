@@ -146,7 +146,9 @@ Repo-specific facts and invariants. §1–§12 stay byte-identical across repos;
 
 ### Current user-authorized handoff — October 7, 2026
 
-**Current (2026-10-29):** Sean cancelled the Codex handoff and the Claude Code harness resumed the lead; `docs/handoff/2026-10-26/CODEX-HANDOFF.md` is history (still accurate for the routine, the merge discipline and the owner inputs). Lane state lives in `docs/handoff/2026-10-17/RESUMPTION.md`.
+**Current (2026-11-01):** the Claude Code harness handed the lead to Codex because of usage limits. Read `docs/handoff/2026-11-01/CODEX-HANDOFF.md` first; the paste-ready prompt is `docs/handoff/2026-11-01/CODEX-PROMPT.md`. Lane state lives in `docs/handoff/2026-10-17/RESUMPTION.md`.
+
+**Superseded (2026-10-29):** Sean cancelled the Codex handoff and the Claude Code harness resumed the lead; `docs/handoff/2026-10-26/CODEX-HANDOFF.md` is history (still accurate for the routine, the merge discipline and the owner inputs).
 
 **Superseded for current work (2026-10-17):** the Codex session stopped after merging PR #132, and the Claude Code harness resumed the lead. Read `docs/handoff/2026-10-17/RESUMPTION.md` first, then the October 15 agenda. The October 11 Codex handoff is history: PR #96 merged as `92f940cc` after its rejection was fixed and re-reviewed (`docs/handoff/2026-10-12/CODEX-CHECKPOINT.md`).
 

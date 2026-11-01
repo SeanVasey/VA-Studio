@@ -150,6 +150,7 @@
     "tests/Feature/SupportAttachmentSchemaTest.php",
     "tests/Feature/SupportAttachmentsTest.php",
     "tests/Feature/TestCommerceEvidenceCommandTest.php",
+    "tests/Feature/TestContractSecondBoundaryTest.php",
     "tests/Unit/SchemaQualifierDelimiterTest.php"
   ],
   "residual_files": [

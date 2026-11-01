@@ -333,3 +333,35 @@ No failure is in PCC code or tests.
    reviewed exact SHA under the CI cost policy (no automatic matrices; one Foundation run for the final integrated candidate).
 4. Separate lanes: A5 production ledger (design above), Paid252/Tax production mounts, the contract second-boundary fix, and
    the `TransactionalMailPolicy` census classification.
+
+
+## Codex resumption (2026-11-01)
+
+Work continues in `/workspace/VA-Studio-pcc` on the existing PCC branch, from pushed
+`cacc9fb0`, integrating main `2ab0c41e946e30cc402afc8ec107a3670e399abd`.
+The prior handoff status above is historical. Both pre-existing defects are fixed
+on this main (CON and the transactional-mail census classification). The PR #186
+merge receipt rides in `CLAUDE-PLAN.md`.
+
+Ownership and acceptance remain the work package above: keep every capability
+default-off, finish the prescribed four-shard local SQLite suite, rerun timeouts
+alone, run ops tests and safeguards, obtain independent payment/auth review of
+the tested SHA, then publish one PCC PR and use the required preflight/review gates.
+No later lane starts before PCC completes. No Foundation dispatch is authorized here.
+
+The new workspace lacked PHP and sudo. An isolated local Docker container
+`va-pcc-runtime-20261101` supplies Debian 13 / PHP 8.4.27 and the required extensions,
+Composer, Python, ffmpeg, qpdf and Poppler. It mounts `/workspace`; checks execute as
+UID/GID 1000, with worktree-owned Composer autoload metadata and the existing locked
+packages. All 160 installed package versions and dist references match composer.lock.
+The worktree has `.env` copied from `.env.example` and no `public/build`.
+This runtime differs from the prior PHP 8.4.26 evidence; prior native MySQL results
+remain historical, not a new execution claim.
+
+Merge resolution: only Foundation's native-selection count comment conflicted.
+The SQLite skip census equals main byte-for-byte, preserving its pinned prefix.
+Regenerated with `python3 scripts/ci/phpunit-shards.py --shards=8
+--prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json
+--mysql-native-selection`: 2678 selected cases in 265 files of 10042 discovered
+cases in 743 files, exit 0; both workflow comments reflect that discovery.
+This is discovery only, not native test execution.
