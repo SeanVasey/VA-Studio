@@ -112,7 +112,7 @@ The prompt Sean gives the Codex session is in [`CODEX-PROMPT.md`](CODEX-PROMPT.m
    - Defer each P2 or P3 bot finding with one thread reply naming the follow-up lane, resolve the thread, and record it in the deferred ledger.
    - No single-finding pushes.
 9. **After merge.** Add a dated row to `CLAUDE-PLAN.md`, update the lane row in `RESUMPTION.md`, and merge the new main into every open lane branch.
-10. **Lanes that add environment keys must run `tests/ops`** (`python3 tests/ops/test_*.py`). The development preflight
+10. **Lanes that add environment keys must run `tests/ops`** (`python3 -m unittest discover -s tests/ops -p 'test_*.py'`; 326 tests OK at `1c2d55a2`). The development preflight
     does not run it, which is how PR #178 merged with two red ops checks (fixed by #181).
 11. **Concurrency.** Three or four lanes at once saturate the 4-core host (load 8 to 13); native timing claims made under
     that load are not idle-host numbers, and fixtures with 60 s budgets start failing in their own setup. Run native
@@ -154,8 +154,9 @@ The prompt Sean gives the Codex session is in [`CODEX-PROMPT.md`](CODEX-PROMPT.m
 5. **Before the single final Foundation run:**
    - fix `scripts/ci/test-related-browser-stage.py` (fails 4 of 12 on main for environment reasons: no `public/build`
      and blocked ClamAV signatures; DEF-OPS added diagnostics; it runs only in Foundation and GitLab);
-   - `tests/ops/test_staging_protected_configuration.py` fails in the cloud container since `a8f17e5c` (its
-     "probe-proven CLI PHP" admission refuses); confirm it passes on a host with a real PHP-FPM before relying on it;
+   - `tests/ops/test_staging_protected_configuration.py` failed in the cloud container after `a8f17e5c` (its
+     "probe-proven CLI PHP" admission refused); it passes again at `1c2d55a2` (3 tests OK), so the failure was
+     environmental. Rerun it on the staging host before relying on it;
    - then one manual Foundation dispatch with the exact reviewed 40-character `expected_sha`.
 6. **Dependabot:** the open PRs listed in the checkpoint, as one batch per the rules above.
 

@@ -29,8 +29,8 @@ B. The member HTTP mount gates: F9-R1 (100-period headroom) and N7 (a per-custom
    R4. MembershipHttpMount stays literal-false until both land.
 C. The deferred-finding batches. The MIG verified_grant gates come first, because they block activating that mode.
 D. The remaining completion-plan lanes: PF1, CAT, UXA, DEF-ID, FND.
-E. Before the single final Foundation run: fix scripts/ci/test-related-browser-stage.py, and confirm
-   tests/ops/test_staging_protected_configuration.py on a host with real PHP-FPM.
+E. Before the single final Foundation run: fix scripts/ci/test-related-browser-stage.py, and rerun
+   tests/ops/test_staging_protected_configuration.py on the staging host.
 F. Dependabot: the open PRs and the 4 security alerts on main, as one batch (CLAUDE.md section 6).
 
 Rules that held this project together:
@@ -39,7 +39,8 @@ Rules that held this project together:
 - The census scripts/ci/database-sqlite-skips.json is append-only (the first 150 entries are hash-pinned). When
   merging, take main's entries first, then the branch's. Regenerate the native selection and both workflow count
   comments.
-- Any lane that adds environment keys runs python3 tests/ops/test_*.py; the preflight does not.
+- Any lane that adds environment keys runs
+  python3 -m unittest discover -s tests/ops -p 'test_*.py'; the preflight does not.
 - Freeze-and-batch: merge once preflight is green, the independent review approves and no P0/P1 is open. Defer each
   P2/P3 bot finding with one thread reply and a deferred-ledger entry. No single-finding pushes.
 - Never weaken, skip or quarantine tests or audits. Never claim a result you did not run. Record untested
