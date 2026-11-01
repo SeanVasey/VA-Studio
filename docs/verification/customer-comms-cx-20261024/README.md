@@ -346,3 +346,13 @@ Results, code at `6dc045f6`:
   fresh server.
 - Census 310 entries (main's 309 an exact prefix); native selection **2673 cases in 264 files of 9945 discovered**, both count comments
   updated. Safeguards 52, 27, 14, 53, 61 OK; all 20 `tests/ops` files OK; `composer audit` no advisories.
+
+## FUB-1 re-review at `cae73127`
+
+Decision: **APPROVE** ([`independent-fub1-rereview-cae73127-DECISION.md`](independent-fub1-rereview-cae73127-DECISION.md)),
+no P0 to P2; condition C1 met. The contention classifier was checked against real driver errors on both engines (MySQL
+1205 and 1213/40001 and SQLite 5 are contention; 1062, 1064 with a lock phrase bound, missing tables and SQLite 19 are not).
+Deferred P3 notes: P3-1 `authority_withdrawn` also covers global, possibly transient configuration refusals, so in
+`deliver()` a temporary configuration problem fails that delivery (the safe direction); P3-2 the queue command exits 0
+when some intents hit `error`; P3-3 (pre-existing) a dispatch failure after commit leaves a delivery `queued` with no job,
+which the stuck listing does not show; P3-4 no test covers the `QuoteException`/`DeliveryException` mapping.
