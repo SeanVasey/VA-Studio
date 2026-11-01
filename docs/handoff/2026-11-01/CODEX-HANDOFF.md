@@ -19,7 +19,7 @@ The prompt Sean gives the Codex session is in [`CODEX-PROMPT.md`](CODEX-PROMPT.m
 
 ## Checkpoint
 
-- **Main:** `MAIN_SHA` (PR #MAIN_PR merge, MAIN_DATE).
+- **Main:** `1c2d55a2` (PR #185 merge, 2026-11-01), plus this handoff PR.
 - **Merged since the October 26 handoff:**
 
   | PR | Lane | Content | Merge |
@@ -30,7 +30,7 @@ The prompt Sean gives the Codex session is in [`CODEX-PROMPT.md`](CODEX-PROMPT.m
   | #182 | F9 | Member index proves schema guards once per owned frame | `c203f779` |
   | #183 | CX | Legal pages, order-ready mail, customer data rights (default-off) | `8bb1ab24` |
   | #184 | FUB-1 | REP and CX follow-up fixes | `3e8a1fd7` |
-LANE_MERGE_ROWS
+  | #185 | CON | Contract work transitions stored at exactly their decision second | `1c2d55a2` |
 
   Every receipt is in `CLAUDE-PLAN.md`.
 - **Nothing is live.** Every production capability is default-off. No live key, payment, deploy, DNS change or customer
@@ -53,14 +53,16 @@ LANE_MERGE_ROWS
   - Evidence so far: mutations M1 to M10 killed; 22 targeted suites OK (372 tests); native MySQL 16 tests / 103 assertions
     OK; ops tests and safeguards OK. The full SQLite suite never finished (container restarts); every failure seen so far
     is classified in the packet as a load timeout or pre-existing on main, and none is in PCC code.
-  - Both pre-existing failures it found are fixed by this handoff: the contract second-boundary defect (CON, PR #185) and
+  - Both pre-existing failures it found are fixed by this handoff: the contract second-boundary defect (CON, merged as PR #185) and
     the `TransactionalMailPolicy.php` census entry (`10a6281a`, in this PR).
   - **Next:** merge the new main into the branch; finish the full SQLite suite (packet "What remains", step 1); have an
     independent payment/auth review of the exact head, using the focus list in step 2 (the production admission in the
     mount gate is a named conflict for the reviewer to decide); then PR and merge per the routine below.
   - Not in PCC, pushed back to their own lanes: A5 `FinancialReadPlan` production wiring, and the Paid252 and Tax
     production mounts.
-- **CON, contract second-boundary fix:** CON_STATE
+- **CON, contract second-boundary fix: merged as PR #185 (`1c2d55a2`).** Review APPROVE at `0fb1c93e`, no P0 to P2;
+  P3-1 to P3-3 are in the deferred ledger. The new test is in the native MySQL selection. Packet:
+  `docs/verification/contract-second-boundary-20261101/README.md`.
 - **Census fix on main:** `StagingEnvironmentAdmissionTest`'s source census failed on main since `8bb1ab24` because CX's
   `TransactionalMailPolicy.php` has a local/testing gate and was not listed. `10a6281a` (this PR) adds it to
   `LOCAL_ONLY_FILES` with a reason: it is a refusal, not an admission. The test is OK (15 tests, 233 assertions).
@@ -94,7 +96,7 @@ LANE_MERGE_ROWS
      python3 scripts/ci/phpunit-shards.py --shards=8 --prefix=phpunit-ci-mysql --timings=scripts/ci/phpunit-timings-mysql.json --mysql-native-selection
      ```
 
-     Main prints SELECTION_COUNT.
+     Main prints 2678 of 9950 cases in 265 files.
    - Update the count comments in `.github/workflows/final-verification.yml` (about line 151) and `.gitlab-ci.yml` (about line 113), then `rm -f phpunit-ci-mysql-*`.
    - Run the safeguards: `scripts/ci/test-phpunit-shards.py`, `test-ci-scope.py`, `test-workflow-cadence.py`, `test-focused-tests.py`, `test-database-receipts.py`.
 5. **Mutation checks** on every security-relevant guard. Record killed and surviving mutants in the packet.

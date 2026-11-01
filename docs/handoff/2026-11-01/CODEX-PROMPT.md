@@ -4,8 +4,8 @@ Paste the block below into Codex, with the repository `SeanVasey/VA-Studio` atta
 
 ```text
 You are taking over development of the VASEY.AUDIO store (SeanVasey/VA-Studio) from the Claude Code harness, which
-stopped at a clean checkpoint because of usage limits. Start from the latest main. The code checkpoint is MAIN_SHA
-(PR #MAIN_PR); the handoff documents merged on top of it. Nothing is live.
+stopped at a clean checkpoint because of usage limits. Start from the latest main. The code checkpoint is 1c2d55a2
+(PR #185); the handoff documents merged on top of it. Nothing is live.
 
 Read first, in order, and follow them:
 1. AGENTS.md. It governs. That includes the October 6 CI cost policy: no routine full MySQL/SQLite/browser
