@@ -7,6 +7,7 @@ use App\Domain\Customers\ProductionIdentity\AccountAdmissionGuards;
 use App\Domain\Customers\ProductionIdentity\AccountAdmissionUpgrade;
 use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
 use App\Domain\Customers\ProductionIdentity\IdentitySchema;
+use App\Domain\Customers\ProductionIdentity\SchemaProofFrame;
 use App\Support\MigrationDefinitions;
 use Illuminate\Support\Facades\DB;
 use LogicException;
@@ -129,6 +130,187 @@ final class AccountAdmissionGuardUpgradeTest extends TestCase
             }
         } finally {
             $pdo->exec('DROP TABLE account_upgrade_foreign_key');
+        }
+    }
+
+    public function test_migration_only_scanner_accepts_legitimate_triggers_and_refuses_foreign_or_altered_dependency(): void
+    {
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $driver = $connection->getDriverName();
+        $inspect = fn () => (new IdentityMigrationOwnership)->assertAccountUpgradeDependents($pdo, $driver);
+        $inspect(); // A fresh composed install includes real legacy, identity, consent, feature and membership consumers.
+        $this->assertTrue(true);
+        $pdo->exec('CREATE TABLE account_upgrade_trigger_target (id integer NOT NULL)');
+        $sql = $driver === 'mysql'
+            ? 'CREATE TRIGGER account_upgrade_foreign_trigger BEFORE INSERT ON account_upgrade_trigger_target FOR EACH ROW SET @account_upgrade_test=(SELECT COUNT(*) FROM customer_accounts)'
+            : 'CREATE TRIGGER account_upgrade_foreign_trigger BEFORE INSERT ON account_upgrade_trigger_target BEGIN SELECT id FROM customer_accounts; END';
+        $pdo->exec($sql);
+        try {
+            $this->assertDependencyRefused($inspect);
+        } finally {
+            $pdo->exec('DROP TRIGGER account_upgrade_foreign_trigger');
+            $pdo->exec('DROP TABLE account_upgrade_trigger_target');
+        }
+        $name = 'customer_consent_events_retain_insert';
+        $source = MigrationDefinitions::load('2026_10_07_250000_customer_consent.php');
+        $definition = (new ReflectionMethod($source, 'triggers'))->invoke($source, $driver)[$name];
+        $pdo->exec('DROP TRIGGER '.$name);
+        $pdo->exec('CREATE TRIGGER '.$name.' BEFORE INSERT ON customer_consent_events '.($driver === 'mysql'
+            ? 'FOR EACH ROW SET @account_upgrade_test=1' : 'BEGIN SELECT 1; END'));
+        try {
+            // Removing the account predicate altogether must not evade the account-reaching source allowlist.
+            $this->assertDependencyRefused($inspect);
+        } finally {
+            $pdo->exec('DROP TRIGGER '.$name);
+            $pdo->exec($definition['sql']);
+        }
+        $inspect();
+        $this->assertTrue(true);
+    }
+
+    public function test_native_account_frame_captures_once_reuses_cheaply_and_proves_terminal_in_full(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Physical account MDL and native query counters.');
+        }
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $calls = 0;
+        $connection->beginTransaction();
+        $pdo->exec('SAVEPOINT account_upgrade_frame');
+        $frame = SchemaProofFrame::open($connection, $pdo, static function () use ($pdo): void {
+            $pdo->exec('RELEASE SAVEPOINT account_upgrade_frame');
+            $pdo->exec('SAVEPOINT account_upgrade_frame');
+        });
+        $prove = function () use ($pdo, &$calls): void {
+            $calls++;
+            AccountAdmissionGuards::stable($pdo, 'mysql');
+        };
+        $read = static fn (): int => (int) $pdo->query("SHOW SESSION STATUS LIKE 'Questions'")->fetch(PDO::FETCH_NUM)[1];
+        try {
+            $start = $read();
+            SchemaProofFrame::prove($pdo, 'account-test', ['customer_accounts'], $prove);
+            $first = $read() - $start - 1;
+            $start = $read();
+            SchemaProofFrame::prove($pdo, 'account-test', ['customer_accounts'], $prove);
+            $hit = $read() - $start - 1;
+            $this->assertSame(1, $calls);
+            $this->assertLessThan(intdiv($first, 2), $hit);
+            $this->assertLessThanOrEqual(15, $hit, 'A memo hit must not repeat the roughly twenty-statement full account floor.');
+            $pins = (new \ReflectionProperty($frame, 'accountProofs'))->getValue($frame);
+            $this->assertSame(AccountAdmissionGuards::V2, $pins['account-test']['version']);
+            $this->assertMatchesRegularExpression('/\A[a-f0-9]{64}\z/', $pins['account-test']['fingerprint']);
+            $frame->terminal();
+            SchemaProofFrame::prove($pdo, 'account-test', ['customer_accounts'], $prove);
+            $this->assertSame(2, $calls);
+            fwrite(STDERR, "account frame: first={$first}, hit={$hit}, full callbacks={$calls}\n");
+        } finally {
+            $frame->close();
+            $connection->rollBack();
+        }
+    }
+
+    public function test_native_memo_rechecks_reserved_names_created_without_account_metadata_lock(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Independent native namespace changes outside account MDL.');
+        }
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $other = $this->independentMysql();
+        $other->exec('CREATE TABLE account_upgrade_namespace_target (id integer PRIMARY KEY)');
+        $cases = [
+            ['CREATE TABLE customer_accounts_insert (id integer)', 'DROP TABLE customer_accounts_insert'],
+            ['CREATE PROCEDURE customer_accounts_insert() SELECT 1', 'DROP PROCEDURE customer_accounts_insert'],
+            ['CREATE EVENT customer_accounts_insert ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL 1 DAY DISABLE DO SET @account_upgrade_test=1', 'DROP EVENT customer_accounts_insert'],
+            ['CREATE TRIGGER customer_accounts_insert AFTER INSERT ON account_upgrade_namespace_target FOR EACH ROW SET @account_upgrade_test=1', 'DROP TRIGGER customer_accounts_insert'],
+            ['ALTER TABLE account_upgrade_namespace_target ADD UNIQUE KEY customer_accounts_insert(id)', 'ALTER TABLE account_upgrade_namespace_target DROP INDEX customer_accounts_insert'],
+        ];
+        try {
+            foreach ($cases as [$create, $drop]) {
+                // As in existing native frame-dependent tests: current dictionary visibility is a separate test input.
+                $pdo->exec('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
+                $connection->beginTransaction();
+                $pdo->exec('SAVEPOINT account_upgrade_namespace');
+                $frame = SchemaProofFrame::open($connection, $pdo, static function () use ($pdo): void {
+                    $pdo->exec('RELEASE SAVEPOINT account_upgrade_namespace');
+                    $pdo->exec('SAVEPOINT account_upgrade_namespace');
+                });
+                $created = false;
+                try {
+                    $prove = fn () => AccountAdmissionGuards::stable($pdo, 'mysql');
+                    SchemaProofFrame::prove($pdo, 'account-namespace', ['customer_accounts'], $prove);
+                    SchemaProofFrame::prove($pdo, 'account-namespace', ['customer_accounts'], $prove);
+                    $other->exec($create);
+                    $created = true;
+                    $this->assertDependencyRefused(fn () => SchemaProofFrame::prove($pdo, 'account-namespace', ['customer_accounts'], $prove));
+                } finally {
+                    $frame->close();
+                    $connection->rollBack();
+                    if ($created) {
+                        $other->exec($drop);
+                    }
+                }
+            }
+        } finally {
+            $other->exec('DROP TABLE account_upgrade_namespace_target');
+        }
+    }
+
+    public function test_native_trigger_dependency_qualification_refuses_target_and_allows_similar_named_peer(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native cross-schema stored trigger resolution.');
+        }
+        $pdo = DB::connection()->getPdo();
+        $database = DB::connection()->getDatabaseName();
+        $peer = $database.'-account-guard-peer';
+        $quote = static fn (string $name): string => '`'.str_replace('`', '``', $name).'`';
+        $statement = $pdo->prepare('SELECT SCHEMA_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME=?');
+        $statement->execute([$peer]);
+        $this->assertSame([], $statement->fetchAll());
+        $pdo->exec('CREATE DATABASE '.$quote($peer));
+        try {
+            $pdo->exec('CREATE TABLE '.$quote($peer).'.customer_accounts (id integer PRIMARY KEY)');
+            $pdo->exec('CREATE TABLE '.$quote($peer).'.trigger_target (id integer PRIMARY KEY)');
+            foreach (['customer_accounts', $quote($peer).'.customer_accounts', $quote($database).'.customer_accounts'] as $index => $reference) {
+                $pdo->exec('CREATE TRIGGER '.$quote($peer).'.account_upgrade_peer BEFORE INSERT ON '.$quote($peer).'.trigger_target FOR EACH ROW SET @account_upgrade_test=(SELECT COUNT(*) FROM '.$reference.')');
+                try {
+                    $inspect = fn () => (new IdentityMigrationOwnership)->assertAccountUpgradeDependents($pdo, 'mysql');
+                    if ($index === 2) {
+                        $this->assertDependencyRefused($inspect);
+                    } else {
+                        $inspect();
+                        $this->assertTrue(true);
+                    }
+                } finally {
+                    $pdo->exec('DROP TRIGGER '.$quote($peer).'.account_upgrade_peer');
+                }
+            }
+        } finally {
+            $pdo->exec('DROP DATABASE '.$quote($peer));
+        }
+    }
+
+    private function independentMysql(): PDO
+    {
+        $config = DB::connection()->getConfig();
+        $address = empty($config['unix_socket']) ? 'host='.$config['host'].';port='.$config['port'] : 'unix_socket='.$config['unix_socket'];
+        $pdo = new PDO('mysql:'.$address.';dbname='.$config['database'].';charset=utf8mb4', $config['username'], $config['password'],
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_STRINGIFY_FETCHES => false]);
+        $pdo->exec('SET SESSION lock_wait_timeout=3, innodb_lock_wait_timeout=3');
+
+        return $pdo;
+    }
+
+    private function assertDependencyRefused(callable $inspect): void
+    {
+        try {
+            $inspect();
+            $this->fail('Foreign or altered account-reaching trigger was admitted.');
+        } catch (LogicException) {
+            $this->assertTrue(true);
         }
     }
 

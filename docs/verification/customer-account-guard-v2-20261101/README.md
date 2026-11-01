@@ -121,3 +121,111 @@ non-evidence. No DB/native/schema execution, build, hosted CI or push occurred.
 No native actual-domain acceptance, latency/headroom, member-trial acceptance,
 merge or mount activation is claimed. Independent actual-source migration review
 and all required focused evidence remain open. No original member sweep restart.
+
+## Consolidated repair after independent source review
+
+Source `ad864105` received REQUEST CHANGES with two confirmed P1 findings; the
+byte-exact decision is copied under `design/independent-source-ad864105-decision.md`.
+No P0 guard-removal finding was reported. One local consolidated repair addresses
+both findings before another source review, push or native run.
+
+The earlier paragraph describing full account classification on every MySQL token
+is superseded: full stable account version/fingerprint is now captured ONLY while
+a full proof is running after account-table pinning in the exact physical
+transaction. Each remembered guard retains that captured state beside its existing
+witness/session/counter token. Ordinary memo hits do not call the full account
+classifier. They retain the original identity dependent scan and add one bounded
+targeted UNION catalog statement for old/new reserved names on non-account tables,
+foreign triggers, routines, events, indexes and constraints. Another connection
+cannot alter/drop/create the account table's triggers, columns, indexes or FKs
+under its held MDL. Same-connection persistent DDL implicitly commits and loses the
+physical witness; temporary shadows move the existing counters. A moved token
+causes full proof again, and terminal() clears both the memo and captured versions
+and continues complete proofs. SQLite's full catalog token is unchanged.
+
+The migration-only account dependent floor now scans actual triggers on BOTH
+engines. MySQL reuses the existing precise selected-database qualifier and dynamic
+SQL handling; unqualified same-named peer schemas do not become dependencies.
+A reaching trigger is admitted only for the selected exact schema plus exact
+source-backed name/table/BEFORE event/body/action-order tuple. Canonical names in
+that selected schema are checked even if a mutation removes their account
+reference altogether. NULL/unreadable definitions refuse. SQLite checks exact
+canonical stored SQL and owner table in main; foreign main/temp account-reaching
+triggers refuse. No ordinary runtime dependency contract was broadened.
+
+Canonical dependency definitions come from fixed existing source factories:
+identity schema guards; unchanged legacy challenge/purchase/notification and
+consent migration definitions; preference suppression and production feature
+trigger builders; production membership/billing/member-original/free-grant
+builders; unchanged credit-foundation conditions reconstructed with its exact
+DDL-emission format without invoking its writer; and the selected account guard
+set. This is a fixed source allowlist, never a copy of installed trigger bodies.
+All original source/fixture bytes remain unchanged. Native/SQLite actual stored
+SQL agreement for these factories remains an execution gate.
+
+Added focused test SOURCE (all DB legs still UNEXECUTED):
+
+- Fresh legitimate composed trigger dependencies pass their migration-only floor;
+  a new foreign-table account-reading trigger refuses; an altered canonical
+  consent trigger with its account predicate removed still refuses (both engines).
+- Native exact frame captures V2 once, compares actual Questions counters for full
+  versus remembered proof, asserts hit<=15 and less than half the first proof,
+  and proves terminal callback runs again. Original native inspection bound110
+  remains unchanged and queued.
+- Native independent-session table/routine/disabled-event/foreign-trigger/unique
+  reserved-name insertions after a remembered proof refuse at the next boundary.
+  Like existing frame dependency tests, that dictionary-visibility case explicitly
+  uses READ COMMITTED as a test input; production isolation is untouched. It does
+  not establish REPEATABLE READ catalogue visibility or actual-domain isolation.
+- Native peer-schema trigger controls distinguish unqualified peer references,
+  qualified similarly named peer database references, and explicit references to
+  the actual target database. The test owns a newly absent synthetic peer schema
+  and removes only that schema afterwards; no such DB test has run yet.
+- Pure no-DB unreadable dependency definition refusal supplements the earlier
+  definition tests. This is not a live privilege-restricted metadata test.
+
+All earlier ledger/process interruption, metadata/advisory failure, composed
+admission, native originalguard/collision/real enrollment/resource and row/contract
+snapshot gates remain open. Added test source is not actual execution evidence.
+No source review, native behavior or member headroom acceptance is inferred.
+
+Repair static receipt: PHP8.4.27 lint5 affected PHP files PASS; Pint `--test`5
+PASS; pure unit3tests/9assertions PASS (0.001s). `git diff --check` PASS.
+Exact command for the pure run (explicit own source bootstrap, shared vendor
+read-only, no application/DB boot):
+
+```sh
+docker exec --user 1000:1000 --workdir /workspace/VA-Studio-account-guard-v2 va-pcc-runtime-20261101 php /workspace/VA-Studio/vendor/bin/phpunit --no-configuration --bootstrap /workspace/account-lock-evidence/static-bootstrap.php tests/Unit/AccountAdmissionGuardDefinitionTest.php
+```
+
+Private final repair receipts: `/workspace/account-lock-evidence/guard-v2-repair-static/{lint,pint,unit}.log`.
+Copied review decision SHA256 matches original:
+`45f2e5fe6408ba2b36084d8885d3229209f74beba8f1d8728c09c99c84deda33`.
+No DB lease has been received and no DB test or DDL has run on this batch.
+
+### Integration test census manifest (source only)
+
+New Unit class `AccountAdmissionGuardDefinitionTest`: all3 methods run without
+engine skips: `test_mysql_v2_changes_only_the_named_insert_collision_expression`,
+`test_sqlite_has_only_the_retained_v1_contract`,
+`test_unreadable_stored_dependency_definition_refuses_closed`.
+
+New Feature class `ProductionIdentity/AccountAdmissionGuardUpgradeTest`:9 methods:
+
+| Method (without test_ prefix) | Engine condition / exact skip reason |
+| --- | --- |
+| fresh_ordering_and_populated_up_down_preserve_old_definitions_and_every_retained_row | Both; no skip |
+| existing_transaction_is_refused_without_trigger_changes | Both; no skip |
+| migration_only_dependency_floor_refuses_foreign_view_and_incoming_key_before_ddl | Both; no skip |
+| migration_only_scanner_accepts_legitimate_triggers_and_refuses_foreign_or_altered_dependency | Both; no skip |
+| exact_interrupted_overlap_is_migration_only_and_resumes_in_both_directions | driver!=mysql: `Only MySQL uses overlapping trigger DDL.` |
+| native_account_frame_captures_once_reuses_cheaply_and_proves_terminal_in_full | driver!=mysql: `Physical account MDL and native query counters.` |
+| native_memo_rechecks_reserved_names_created_without_account_metadata_lock | driver!=mysql: `Independent native namespace changes outside account MDL.` |
+| native_trigger_dependency_qualification_refuses_target_and_allows_similar_named_peer | driver!=mysql: `Native cross-schema stored trigger resolution.` |
+| sqlite_down_noop_still_refuses_a_missing_guard | driver!=sqlite: `SQLite-specific verified no-op.` |
+
+Expected source counts: SQLite feature5run/4native skips; MySQL feature8run/1SQLite
+skip; pure unit3run on either. No new environment key or execution flag. No shared
+census, workflow or ledger edit; coordinator must union these new methods into the
+final integrated candidate and regenerate native selection/counts. These source
+counts are not executed test results.

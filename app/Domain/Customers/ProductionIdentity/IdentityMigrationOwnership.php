@@ -3,9 +3,17 @@
 namespace App\Domain\Customers\ProductionIdentity;
 
 use App\Domain\Catalog\Discovery\DiscoveryEpoch;
+use App\Domain\Customers\Preferences\Suppression\SuppressionSchema;
+use App\Domain\Customers\ProductionFeatures\ProductionFeatureSchema;
+use App\Domain\Grants\Member\MemberGrantSchema;
+use App\Domain\Grants\ProductionFree\ProductionFreeGrantSchema;
+use App\Domain\Memberships\Billing\BillingSchema;
+use App\Domain\Memberships\Production\MembershipSchema;
+use App\Support\MigrationDefinitions;
 use LogicException;
 use PDO;
 use PDOException;
+use ReflectionMethod;
 
 /** Exact empty DDL-prefix recovery; ownership admission performs no application/query callbacks. */
 final class IdentityMigrationOwnership
@@ -243,9 +251,16 @@ final class IdentityMigrationOwnership
     public function assertAccountUpgradeDependents(PDO $pdo, string $driver): void
     {
         $allowed = $this->accountChildKeys();
+        $canonical = $this->accountDependentTriggers($pdo, $driver);
         if ($driver === 'sqlite') {
             foreach (['main' => 'sqlite_master', 'temp' => 'sqlite_temp_master'] as $schema => $catalog) {
-                foreach ($pdo->query('SELECT type,name,sql FROM '.$catalog)->fetchAll(PDO::FETCH_ASSOC) as $object) {
+                foreach ($pdo->query('SELECT type,name,tbl_name,sql FROM '.$catalog)->fetchAll(PDO::FETCH_ASSOC) as $object) {
+                    if ($object['type'] === 'trigger' && ($this->references($object['sql'], ['customer_accounts']) || ($schema === 'main' && isset($canonical[$object['name']])))) {
+                        $expected = $canonical[$object['name']] ?? null;
+                        if ($schema !== 'main' || $expected === null || $object['tbl_name'] !== $expected['table'] || $object['sql'] !== $expected['sql']) {
+                            $this->reject();
+                        }
+                    }
                     if ($object['type'] === 'view' && $this->references($object['sql'], ['customer_accounts'])) {
                         $this->reject();
                     }
@@ -277,6 +292,18 @@ final class IdentityMigrationOwnership
                 }
             }
         }
+        foreach ($pdo->query('SELECT TRIGGER_SCHEMA,TRIGGER_NAME,EVENT_OBJECT_TABLE,EVENT_MANIPULATION,ACTION_TIMING,ACTION_STATEMENT,ACTION_ORDER FROM information_schema.TRIGGERS')->fetchAll(PDO::FETCH_ASSOC) as $trigger) {
+            $reaches = $this->dependsOn($pdo, $trigger['TRIGGER_SCHEMA'], $trigger['ACTION_STATEMENT'], ['customer_accounts']);
+            if (! $reaches && ! ($trigger['TRIGGER_SCHEMA'] === $this->database($pdo) && isset($canonical[$trigger['TRIGGER_NAME']]))) {
+                continue;
+            }
+            $expected = $canonical[$trigger['TRIGGER_NAME']] ?? null;
+            if ($trigger['TRIGGER_SCHEMA'] !== $this->database($pdo) || $expected === null || $trigger['EVENT_OBJECT_TABLE'] !== $expected['table']
+                || $trigger['EVENT_MANIPULATION'] !== $expected['event'] || $trigger['ACTION_TIMING'] !== 'BEFORE'
+                || $trigger['ACTION_STATEMENT'] !== $expected['body'] || (int) $trigger['ACTION_ORDER'] !== $expected['order']) {
+                $this->reject();
+            }
+        }
         $sql = "SELECT k.TABLE_SCHEMA,k.TABLE_NAME,k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_NAME,k.REFERENCED_COLUMN_NAME,k.ORDINAL_POSITION,r.UPDATE_RULE,r.DELETE_RULE FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA AND r.TABLE_NAME=k.TABLE_NAME AND r.CONSTRAINT_NAME=k.CONSTRAINT_NAME WHERE k.REFERENCED_TABLE_SCHEMA=DATABASE() AND k.REFERENCED_TABLE_NAME='customer_accounts'";
         foreach ($pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC) as $key) {
             $expected = $allowed[$key['TABLE_NAME']][$key['COLUMN_NAME']] ?? null;
@@ -286,6 +313,67 @@ final class IdentityMigrationOwnership
                 $this->reject();
             }
         }
+    }
+
+    /** Source-backed definitions only: never learn a legitimate dependency from installed names/bodies. */
+    private function accountDependentTriggers(PDO $pdo, string $driver): array
+    {
+        $definitions = [];
+        foreach (['2026_10_06_000045_customer_identity_challenges.php' => 'guards',
+            '2026_10_06_000048_customer_purchase_claims.php' => 'guards',
+            '2026_10_06_231000_test_transactional_notifications.php' => 'guards',
+            '2026_10_07_250000_customer_consent.php' => 'triggers'] as $file => $method) {
+            $migration = MigrationDefinitions::load($file);
+            $definitions[] = (new ReflectionMethod($migration, $method))->invoke($migration, ...($method === 'triggers' ? [$driver] : []));
+        }
+        foreach ([SuppressionSchema::class,
+            ProductionFeatureSchema::class] as $class) {
+            $builder = new $class;
+            $definitions[] = (new ReflectionMethod($builder, 'triggers'))->invoke($builder, $driver);
+        }
+        foreach ([MembershipSchema::class,
+            BillingSchema::class,
+            MemberGrantSchema::class,
+            ProductionFreeGrantSchema::class] as $class) {
+            $builder = new $class;
+            foreach ($class::TABLES as $table) {
+                $definitions[] = (new ReflectionMethod($builder, 'guards'))->invoke($builder, $table, $driver, $table, $builder->table($table));
+            }
+        }
+        $credit = MigrationDefinitions::load('2026_10_06_230000_membership_credit_foundation.php');
+        $creditGuards = [];
+        foreach ((new ReflectionMethod($credit, 'conditions'))->invoke($credit) as $table => $when) {
+            $name = $table.'_insert';
+            $when = "COALESCE(($when),1)";
+            // Exact emission of that historical migration's guard(), without invoking its DDL writer.
+            $creditGuards[$name] = $driver === 'sqlite'
+                ? "CREATE TRIGGER $name BEFORE INSERT ON $table WHEN $when BEGIN SELECT RAISE(ABORT, 'Retain membership credit evidence'); END"
+                : "CREATE TRIGGER $name BEFORE INSERT ON $table FOR EACH ROW BEGIN IF $when THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Retain membership credit evidence'; END IF; END";
+        }
+        $account = AccountAdmissionGuards::migrationState($pdo, $driver);
+        $definitions = [...$definitions, $creditGuards, IdentitySchema::guards($driver), $account['guards']];
+        $result = [];
+        foreach ($definitions as $guards) {
+            foreach ($guards as $name => $guard) {
+                $sql = is_array($guard) ? $guard['sql'] : $guard;
+                if (! $this->references($sql, ['customer_accounts'])) {
+                    continue;
+                }
+                if (preg_match('/\ACREATE TRIGGER [`"]?([a-z0-9_]+)[`"]? BEFORE (INSERT|UPDATE|DELETE) ON (?:main\.)?[`"]?([a-z0-9_]+)[`"]?/i', $sql, $header) !== 1
+                    || $header[1] !== $name) {
+                    $this->reject();
+                }
+                $body = $driver === 'mysql' ? explode(' FOR EACH ROW ', $sql, 2)[1] : '';
+                $expected = ['table' => $header[3], 'event' => strtoupper($header[2]), 'sql' => $sql, 'body' => $body,
+                    'order' => $account['version'] === AccountAdmissionGuards::OVERLAP && $name === AccountAdmissionGuards::NEW_INSERT ? 2 : 1];
+                if (isset($result[$name]) && $result[$name] !== $expected) {
+                    $this->reject();
+                }
+                $result[$name] = $expected;
+            }
+        }
+
+        return $result;
     }
 
     /** Exact account-facing FK tuples from unchanged historical schema definitions. Absence grants no creation authority. */

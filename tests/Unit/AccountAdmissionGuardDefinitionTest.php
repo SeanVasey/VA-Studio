@@ -3,8 +3,10 @@
 namespace Tests\Unit;
 
 use App\Domain\Customers\ProductionIdentity\AccountAdmissionGuards;
+use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
 use LogicException;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 final class AccountAdmissionGuardDefinitionTest extends TestCase
 {
@@ -28,5 +30,11 @@ final class AccountAdmissionGuardDefinitionTest extends TestCase
         $this->assertCount(3, AccountAdmissionGuards::definitions('sqlite', AccountAdmissionGuards::V1));
         $this->expectException(LogicException::class);
         AccountAdmissionGuards::definitions('sqlite', AccountAdmissionGuards::V2);
+    }
+
+    public function test_unreadable_stored_dependency_definition_refuses_closed(): void
+    {
+        $this->expectException(LogicException::class);
+        (new ReflectionMethod(IdentityMigrationOwnership::class, 'references'))->invoke(new IdentityMigrationOwnership, null, ['customer_accounts']);
     }
 }

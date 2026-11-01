@@ -79,7 +79,29 @@ final class AccountAdmissionGuards
     /** The only ordinary runtime admission: complete stable V1 or V2. */
     public static function stable(PDO $pdo, string $driver): array
     {
-        return self::inspect($pdo, $driver, false);
+        $state = self::inspect($pdo, $driver, false);
+        SchemaProofFrame::captureAccountProof($pdo, $state);
+
+        return $state;
+    }
+
+    /** Only the namespace classes not protected by the account table MDL; one bounded targeted catalog statement. */
+    public static function assertUnpinnedNamespace(PDO $pdo): void
+    {
+        $names = [self::OLD_INSERT, self::NEW_INSERT, 'customer_accounts_update', 'customer_accounts_delete'];
+        $reserved = ['customer_accounts', ...$names];
+        $branches = [];
+        $values = [];
+        foreach ([['TABLES', 'TABLE_SCHEMA', 'TABLE_NAME', $names], ['TRIGGERS', 'TRIGGER_SCHEMA', 'TRIGGER_NAME', $reserved],
+            ['ROUTINES', 'ROUTINE_SCHEMA', 'ROUTINE_NAME', $reserved], ['EVENTS', 'EVENT_SCHEMA', 'EVENT_NAME', $reserved],
+            ['STATISTICS', 'TABLE_SCHEMA', 'INDEX_NAME', $reserved], ['TABLE_CONSTRAINTS', 'CONSTRAINT_SCHEMA', 'CONSTRAINT_NAME', $reserved]] as [$catalog, $schema, $column, $lookups]) {
+            $branches[] = "SELECT 1 FROM information_schema.$catalog WHERE $schema=DATABASE() AND $column IN (".implode(',', array_fill(0, count($lookups), '?')).')'
+                .($catalog === 'TRIGGERS' ? " AND BINARY EVENT_OBJECT_TABLE<>BINARY 'customer_accounts'" : '');
+            $values = [...$values, ...$lookups];
+        }
+        if (self::query($pdo, implode(' UNION ALL ', $branches), $values) !== []) {
+            self::refuse();
+        }
     }
 
     /** Migration-only classifier additionally admits the one exact ordered overlap prefix. */
