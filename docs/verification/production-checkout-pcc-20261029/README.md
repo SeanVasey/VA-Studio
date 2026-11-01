@@ -1,7 +1,7 @@
 # Lane PCC work package: production commerce composition, default-off
 
-Status: **implemented on branch `harness/production-checkout-pcc-20261029`; not pushed; independent payment/auth review not yet
-done.** The work-package statement (sections Split to Tests) was committed first (`071d9f80`). Cut
+Status: **implemented on branch `harness/production-checkout-pcc-20261029`, main `8bb1ab24` merged; not pushed; independent
+payment/auth review not yet done.** The work-package statement (sections Split to Tests) was committed first (`071d9f80`). Cut
 from `origin/main` `a8f17e5cbd509a822e2c283bdd501177b43c11c0` (`dd587603` plus docs-only handoff files) on branch
 `harness/production-checkout-pcc-20261029`.
 
@@ -121,7 +121,10 @@ PCC-a (operations; cut here to merge PCC-a alone): `c18efdc9` admissions in the 
 templates; `228adbfc` explicit `trustProxies`; `9d99529d` identity SMTP through configuration with a literal activation;
 `ab9e6336` PCC-a docs. PCC-b (composition): `1382f151` mount gate, provider registration, route mount and privacy seam;
 `793efaa3` operator reconcile command; `7a39ac62` exclusivity authority wiring; `0515b15f` domain refusal test (mutation M10);
-then the PCC-b docs and this results section.
+`6ee56088` PCC-b docs; `b28d4125` this results section. Merges of main: `0f93ed22` (`76fca3d7`, REP and symfony/mime),
+`5110d74c` (`a926f98b`), `bcce3975` (`8bb1ab24`, F9 and CX); `93a5eefb` and `4f0ce701` refresh the native-selection comment.
+Merge conflicts were resolved keeping both sides (CHANGELOG, the staging deploy scrub, the capability boundary's flag count and
+comments, the staging validator comment, the two boundary tests).
 
 ### What is wired, and what stays inert
 
@@ -151,7 +154,44 @@ Policy values stay unset (owner question 10).
 
 ### Test results (SQLite direct PHPUnit, PHP 8.4.26; Python 3)
 
-RESULTS_PLACEHOLDER
+All runs use the direct PHPUnit invocation with an in-memory SQLite database (`APP_ENV=testing`, `CACHE_STORE=array`,
+`QUEUE_CONNECTION=sync`, `public/build` absent) unless stated. Counts are exact; times are on a shared, heavily loaded host.
+
+Targeted, at `0515b15f` (before the merges):
+
+| Suite | Result |
+| --- | --- |
+| Production checkout: the 3 new composition files, 15 existing `ProductionCheckout*` feature files, `ProductionCommerceReadinessTest`, `StripeCapabilityPreflightTest`, `ProductionCheckoutConfigTest`, `ProductionCheckoutProviderTest`, `ProductionHostedEvidenceTest` | OK, 372 tests, 2690 assertions, 9 skipped (native-only census methods), 21 m 14 s |
+| Admission, boundary and ops units: `StagingEnvironmentAdmissionTest`, `StagingRuntimeValidatorTest`, `TestCommerceProfileValidatorTest`, `ProductionEnvironmentTemplateTest`, `TrustedProxyListTest`, `ExplicitTrustProxiesTest`, `ProductionIdentitySmtpBindingTest`, `MembershipHttpMountTest`, `ProductionFreeGrantHttpTest`, `ExclusivityAuthorityTest` | OK, 297 tests, 5630 assertions |
+| Mount gate alone (`ProductionCheckoutMountTest`) | OK, 24 tests, 766 assertions |
+| Reconcile command (`ProductionCheckoutReconcileCommandTest`) | OK, 16 tests (13 before `0515b15f` added 3) |
+| Exclusivity (`ProductionCheckoutExclusivityTest`) | OK, 14 tests, 41 assertions |
+
+On the merged head `4f0ce701` (main `8bb1ab24` merged):
+
+| Check | Result |
+| --- | --- |
+| Every `tests/ops/test_*.py` and `scripts/ops/test-*.py` (22 files) | all OK, including `test_staging_protected_configuration`, `test_staging_capability_profile` and `test_staging_code_drift` |
+| Safeguards `test-phpunit-shards.py`, `test-ci-scope.py`, `test-workflow-cadence.py`, `test-focused-tests.py`, `test-database-receipts.py` | OK: 52, 27, 14, 53, 61 tests |
+| `composer audit` (after reinstalling `symfony/mime` 8.1.10 and `polyfill-mbstring`) | no advisories |
+| `composer validate --strict` | valid |
+| Native selection (`phpunit-shards.py --shards=8 ... --mysql-native-selection`) | 2665 selected cases in 263 files of 10008 discovered (main's selection; PCC adds no native-only method); generated files deleted |
+| Full SQLite suite | FULLSUITE_TOKEN |
+
+Full-suite history, recorded honestly: four earlier full runs (at `6ee56088`, `5110d74c` twice, `4f0ce701` once) were killed by
+container restarts before every shard finished. One shard that did finish (shard 3 of 4 at `5110d74c`, 2474 tests) had 1 error
+and 1 failure: `RightsDeclarationWriterTest::test_new_pending_and_verified_successors_preserve_paid_history_contract_bytes_and_original_verification`
+and `InquiryBrowserCatalogCleanupTest::test_failed_withdrawal_audit_keeps_the_ready_track_site_release_and_private_history_unchanged`.
+They are not order-dependent: the same shard run alone in its exact order passed (2474 tests, 25057 assertions, 256 skipped,
+2 h 0 m), and both classes pass alone (39 tests). Root cause, found and reproduced on main `8bb1ab24`: a pre-existing
+second-boundary defect in test-contract issuance (`RenderTestContract` completion save vs `ReadGrantContract`'s
+`issued_at == work.updated_at` check; Eloquent rewrites an unchanged `updated_at` when the clock crosses a second before the
+save), which quarantines the work with `evidence_changed` and makes the fixtures throw "Synthetic contract did not issue".
+A deterministic probe fails on main the same way. Both tests depend on it; neither touches PCC code. Handed to its own fix lane.
+
+Native MySQL 8.4.11 (private `/opt/mysql-8.4.11/bin/mysqld`, own datadir under `/home/user/notes/pcc-ev`, socket
+`/tmp/pcc-my/s`, port 3517 checked free with `ss -ltnp`; the server was stopped by its own PID and the datadir removed):
+NATIVE_TOKEN
 
 ### Mutation checks
 
@@ -173,9 +213,12 @@ Each mutation was applied to the file, the named tests run, and the file restore
 
 ### Census and native MySQL
 
-No engine-skipping test method was added, so `scripts/ci/database-sqlite-skips.json` and the native selection are unchanged.
-No locking or race claim is made: the operator command reuses `HostedCheckout::record()`/`uncertain()`, whose concurrency rests
-on the existing unique keys (session per intent, payment per intent, observation sequence per intent). Native MySQL was not run.
+No engine-skipping test method was added, so `scripts/ci/database-sqlite-skips.json` is main's, unioned at every merge, and the
+native selection is main's (2665 cases in 263 files). No new locking or race claim is made: the operator command reuses
+`HostedCheckout::record()`/`uncertain()`, whose concurrency rests on the existing unique keys (session per intent, payment per
+intent, observation sequence per intent), and the exclusivity gate adds one plain read of the authority ledger inside the
+existing checkout frame, only for exclusive or scoped selections, which are refused either way. The native run above checks that
+those paths and the moved rights-scope locking read work on MySQL; it is not race evidence.
 
 ### Named conflicts
 
@@ -188,7 +231,8 @@ on the existing unique keys (session per intent, payment per intent, observation
 ### Untested conditions
 
 - No real Stripe account, live key, SMTP provider, CDN or host; every provider fact is the synthetic fixture.
-- Native MySQL 8.4, browser, Foundation CI and GitLab were not run. The full PHP suite was run on SQLite only as recorded above.
+- Native MySQL covered only the selected exclusivity and reconcile cases above; no race test was added or run. Browser,
+  Foundation CI and GitLab were not run. The full PHP suite ran on SQLite only.
 - The production environment cases boot the application with `env=production` inside PHPUnit; a real production boot with a
   config cache and `route:cache` was not exercised (the runtime seam re-checks the gate on every request for a stale table).
 - The operator command has no sweep mode; recovery is one order at a time.
