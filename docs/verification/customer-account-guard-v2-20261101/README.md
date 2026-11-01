@@ -258,3 +258,38 @@ Feature source census now11 methods (SQLite5run/6native skips; MySQL10run/1SQLit
 skip). Shared census untouched. PHP lint/Pint for this modified test file pass.
 Ledger/process worker and actual CompleteIdentity/MDL controls remain the next
 planned test source after the mandatory RR gate; they are not claimed implemented.
+
+## Native RR attempt: environment stop BEFORE test body (not acceptance)
+
+Exact tested source32aea697bcb0743c87cc33f7471f11ce0a25c120; own local image
+mysql8.4.11/id4aae07a2, own container va-account-guard-mysql-20261101, private33089,
+retained own datadir `/workspace/account-guard-evidence-20261101/mysql-data`.
+Server context before fixture: REPEATABLE-READ and standard six strict SQL modes.
+Container limits512MiB/CPU1, buffer64MiB/maxconn32. No other server was modified.
+
+First launcher filter erroneously anchored at `^test_` selected no tests, exit1;
+`native-early-rr-gate.*` retains this NO-EXECUTION receipt. Corrected the selection
+only to class-qualified method suffix with new receipt label; no first test was
+rerun. Actual command inside the existing PHP runtime/user1000:
+
+```sh
+bash /workspace/account-guard-evidence-20261101/run-case.sh 32aea697bcb0743c87cc33f7471f11ce0a25c120 mysql native-early-rr-gate-selected '::test_native_early_repeatable_read_snapshot_refuses_new_reserved_namespace_on_memo_hit$' 172.17.0.5 tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php
+```
+
+Actual result: ERROR1test/0assertions,108.610s, exit2 during migrate:fresh at the
+historical paid_order_origins guard creation. SQLSTATE2002 connection refused;
+Docker confirms owned server exited137/OOMKilled=true at its512MiB cgroup limit.
+This is an environment failure, not observed RR visibility or admission failure.
+The test body, late account upgrade, RR snapshot and namespace assertion were NOT
+reached. No native acceptance or PFS owner-lock receipt exists for this attempt.
+
+Stopped immediately after this unexpected result; no native retry/restart or next
+DB method. Owned datadir/logs retained; server stopped by OOM. Confirmed0 active
+PHP processes in the runtime after completion, and returned serial lease to root
+for its between-method work. Resource correction/retry requires root scheduling.
+Private receipts `native-early-rr-gate-selected.*`, `native-server-context.txt`,
+`native-server.log`, `native-early-rr-server-state.txt`.
+Log SHA25670d69e89e91571f7f771fc2ff5144cfe7d5d821b25fa55a09ec4107e4c38357b;
+JUnit47ea7a71149026b3cfa3bb04a655ea9be8dc0d275b26d142f7bbc1dc5b1abb73;
+server-state9b93f760ca2ebb4400312a81b7c16055111713d5612b871aabde2df4789376fd.
+All native RR/MDL/ledger/process/domain-isolation and cost gates remain open.
