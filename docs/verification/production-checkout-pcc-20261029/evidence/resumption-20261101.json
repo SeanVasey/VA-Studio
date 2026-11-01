@@ -1,0 +1,279 @@
+{
+  "source_sha": "db5e4b9342f08ede28d35c49524990d7777bfbcc",
+  "base_sha": "2ab0c41e946e30cc402afc8ec107a3670e399abd",
+  "runtime": "Local Docker va-pcc-runtime-20261101; Debian13; PHP8.4.27; SQLite3.46.1; PHPUnit12.5.34",
+  "original_full_sweep": {
+    "cases": 10042,
+    "assertions": 105104,
+    "skips": 732,
+    "failures": 3,
+    "errors": 2,
+    "result": "Completed with failures; not a full-suite pass; not restarted or duplicated",
+    "shards": [
+      {
+        "source_sha": "db5e4b9342f08ede28d35c49524990d7777bfbcc",
+        "process_exit": 1,
+        "reported_cases": 2511,
+        "assertions": 22933,
+        "skipped_cases": 155,
+        "identities_and_census_skips_match": true,
+        "strict_receipt_verifier": "refused: JUnit records a failure or error",
+        "failures": [
+          {
+            "identity": "Tests\\Feature\\TestContractSuccessorActivationTest::test_exact_v2_policy_captures_real_request_and_worker_preserves_one_original",
+            "kind": "failure",
+            "time_seconds": "4.456377"
+          }
+        ],
+        "shard": 1,
+        "started_at": "2026-11-01T11:29:12Z",
+        "finished_at": "2026-11-01T13:06:33Z",
+        "artifact_sha256": {
+          ".log": "b3eaec2025ee936d4fd62785c79bb3f2988aaa478b0b7df8fd9e47d850722764",
+          ".junit.xml": "141bb2795549cea40cdf30c489f6ceb40d7e6324c8d38ddb6ee2359798d7eafb"
+        },
+        "expected_inventory_sha256": "83f164eaf61b8581568ec50754b45ded864fb9eb228cb412222051f204e930a7"
+      },
+      {
+        "source_sha": "db5e4b9342f08ede28d35c49524990d7777bfbcc",
+        "process_exit": 2,
+        "reported_cases": 2511,
+        "assertions": 26067,
+        "skipped_cases": 199,
+        "identities_and_census_skips_match": true,
+        "strict_receipt_verifier": "refused: JUnit records a failure or error",
+        "failures": [
+          {
+            "identity": "Tests\\Feature\\IsolatedContractRendererAcceptanceTest::test_two_isolated_children_preserve_every_frozen_section_in_the_same_valid_multipage_pdf",
+            "kind": "error",
+            "time_seconds": "0.065039"
+          },
+          {
+            "identity": "Tests\\Feature\\TestContractIssuanceTest::test_real_isolated_renderer_can_issue_one_private_pdf_from_an_actual_paid_grant",
+            "kind": "failure",
+            "time_seconds": "4.911150"
+          },
+          {
+            "identity": "Tests\\Feature\\TestContractProfileSuccessorTest::test_real_scrubbed_child_dispatches_only_the_trusted_successor_implementation",
+            "kind": "error",
+            "time_seconds": "0.056460"
+          }
+        ],
+        "shard": 2,
+        "started_at": "2026-11-01T13:06:33Z",
+        "finished_at": "2026-11-01T14:33:22Z",
+        "artifact_sha256": {
+          ".log": "ee2ce7114708af9fc1d6930a3a21866d1799e19a55a94ba27f22b2e44f434c48",
+          ".junit.xml": "30262056dc6b75d04f3b97faa2eec4ce8ede6721a3f7bcaa3d5b1cec51e74690"
+        },
+        "expected_inventory_sha256": "2be4fbe540888d6ca7dd2763fc2dad4ce0fbcf5c691b1dcd48ecf6f37a8a2fed"
+      },
+      {
+        "source_sha": "db5e4b9342f08ede28d35c49524990d7777bfbcc",
+        "process_exit": 0,
+        "reported_cases": 2510,
+        "assertions": 31642,
+        "skipped_cases": 126,
+        "identities_and_census_skips_match": true,
+        "strict_receipt_verifier": "separate standard verification required",
+        "failures": [],
+        "shard": 3,
+        "started_at": "2026-11-01T14:33:22Z",
+        "finished_at": "2026-11-01T16:25:07Z",
+        "artifact_sha256": {
+          ".log": "c739688f07ac6511b5078d4333886469fd94caf161d2a2d83e2dadf550e4d42f",
+          ".junit.xml": "7f44f9d765f16da3fcbf92c1ca9ff9dfc41b927ffa5b019308067abc6e9a802d"
+        },
+        "expected_inventory_sha256": "689278dcf8199471618311dec34e07ef3b2c35d2e18a43fff6bbba84759a295a"
+      },
+      {
+        "source_sha": "db5e4b9342f08ede28d35c49524990d7777bfbcc",
+        "process_exit": 1,
+        "reported_cases": 2510,
+        "assertions": 24462,
+        "skipped_cases": 252,
+        "identities_and_census_skips_match": true,
+        "strict_receipt_verifier": "refused: JUnit records a failure or error",
+        "failures": [
+          {
+            "identity": "Tests\\Feature\\PruneExpiredCacheRowsTest::test_expired_locks_go_and_held_locks_stay_held",
+            "kind": "failure",
+            "time_seconds": "0.022701"
+          }
+        ],
+        "shard": 4,
+        "started_at": "2026-11-01T16:25:07Z",
+        "finished_at": "2026-11-01T17:36:56Z",
+        "artifact_sha256": {
+          ".log": "f33f47f37624d436b80e846c47d7b06ad1a348dbbf73c7f1f81220e15d7b3416",
+          ".junit.xml": "fa86ed5682466cee1e351a1ef38aa037182c2593bdb09f73c79e422b274af083"
+        },
+        "expected_inventory_sha256": "77921a287ac04e8358c437e255d422ae2c363ff07db6a6109e5eefff922231ef"
+      }
+    ]
+  },
+  "runtime_containment": {
+    "worktree": "/workspace/VA-Studio-pcc",
+    "original_preserved": "/workspace/pcc-evidence/VA-Studio-pcc-vendor-original",
+    "copied_files": 41197,
+    "file_hash_map_sha256": "650c8fe30d33248385ceb5e26f18d377f88281ed8dc30f8bce7874ce74028191",
+    "all_bytes_equal": true,
+    "remaining_vendor_symlinks": 0,
+    "all_vendor_realpaths_project_contained": true,
+    "source_changed": false,
+    "autoload_regeneration": "completed separately, composer dump-autoload --optimize --no-scripts exit0"
+  },
+  "locked_package_verification": {
+    "unchanged_package_files": 41184,
+    "locked_packages": 160,
+    "versions_and_dist_references_match": true
+  },
+  "autoload_probe": {
+    "same_open_basedir": "/workspace/VA-Studio-pcc",
+    "original_exit": 255,
+    "contained_exit": 0,
+    "original_log_sha256": "2dc83b38ce6aefeb39edd5ea9468303c491413f07314d0dff28dec863f38c34d",
+    "contained_log_sha256": "8da6996efba7346c4228a2349646927500f219b85639b9932b55c5796ac5458d"
+  },
+  "focused_renderers": [
+    {
+      "name": "renderer-acceptance-case",
+      "source_sha": "db5e4b9342f08ede28d35c49524990d7777bfbcc",
+      "exit": 0,
+      "cases": 1,
+      "assertions": 25,
+      "skips": 0,
+      "errors": 0,
+      "failures": 0,
+      "log_sha256": "4d9661303370450cb067b735aa6089119fbb945d28154e6fccd4a0b204930f05",
+      "junit_sha256": "215c8534ad1e2f45ffc5f5ec643f0936e453a99947b248fa1efcb40dbce11969"
+    },
+    {
+      "name": "renderer-acceptance-class-empty-filter",
+      "exit": 1,
+      "result": "No tests executed; invalid empty selection retained, corrected commands omit filter"
+    },
+    {
+      "name": "renderer-acceptance-class",
+      "source_sha": "db5e4b9342f08ede28d35c49524990d7777bfbcc",
+      "exit": 0,
+      "cases": 1,
+      "assertions": 25,
+      "skips": 0,
+      "errors": 0,
+      "failures": 0,
+      "log_sha256": "f3f6a727fa3b8b09abeb1cba4a4adc8ea5365aad976edf73978a445c7cd721c4",
+      "junit_sha256": "85de383c09cbb4983b42cfdf8ac82bc9fce724dfc70a6c05747b3e505b5c1e80"
+    },
+    {
+      "name": "renderer-issuance-case",
+      "source_sha": "db5e4b9342f08ede28d35c49524990d7777bfbcc",
+      "exit": 0,
+      "cases": 1,
+      "assertions": 9,
+      "skips": 0,
+      "errors": 0,
+      "failures": 0,
+      "log_sha256": "a2965d127e6f522509d0b8cb4187f62e2a5026303f977244fb62a47422ed1159",
+      "junit_sha256": "57d6a3fd463948acea1f67a08c51238a0f8c1ead62cfdd5d5053bb815dbf27a1"
+    },
+    {
+      "name": "renderer-issuance-class-empty-filter",
+      "exit": 1,
+      "result": "No tests executed; invalid empty selection retained, corrected commands omit filter"
+    },
+    {
+      "name": "renderer-issuance-class",
+      "source_sha": "db5e4b9342f08ede28d35c49524990d7777bfbcc",
+      "exit": 0,
+      "cases": 53,
+      "assertions": 504,
+      "skips": 0,
+      "errors": 0,
+      "failures": 0,
+      "log_sha256": "eb005485efae2d0ebadb5ade053da95a999dfa0835665f81fe39f28e559b5c07",
+      "junit_sha256": "09885b14a46097917cec36c3fb4d8e9ede9a3043d34234d320ce0f68180955db"
+    },
+    {
+      "name": "renderer-profile-case",
+      "source_sha": "db5e4b9342f08ede28d35c49524990d7777bfbcc",
+      "exit": 0,
+      "cases": 1,
+      "assertions": 3,
+      "skips": 0,
+      "errors": 0,
+      "failures": 0,
+      "log_sha256": "520549960ea74192a38b394f114e6c9f83fef91efb9c5d943a8c1f9544171920",
+      "junit_sha256": "0ddd81a36974cc9538ea0854c7a4e54eb4073d5e9fddeb088a42ba8dff830798"
+    },
+    {
+      "name": "renderer-profile-class-empty-filter",
+      "exit": 1,
+      "result": "No tests executed; invalid empty selection retained, corrected commands omit filter"
+    },
+    {
+      "name": "renderer-profile-class",
+      "source_sha": "db5e4b9342f08ede28d35c49524990d7777bfbcc",
+      "exit": 0,
+      "cases": 16,
+      "assertions": 29,
+      "skips": 0,
+      "errors": 0,
+      "failures": 0,
+      "log_sha256": "e8079bdc63c4de215b9961376d61315bd49e3f88461c17c71ad51d031c3650f2",
+      "junit_sha256": "f380a95a55b88dd349194005dff9bfcd6c33f37dd6c02faa7f4c48d208416f14"
+    },
+    {
+      "name": "renderer-successor-case",
+      "source_sha": "db5e4b9342f08ede28d35c49524990d7777bfbcc",
+      "exit": 0,
+      "cases": 1,
+      "assertions": 15,
+      "skips": 0,
+      "errors": 0,
+      "failures": 0,
+      "log_sha256": "cec89f0b8d546eb0c01ec0e93c9bbd5cc98b22bd591ecef52cb4cd74fae5f8d2",
+      "junit_sha256": "f0562f6dd5c6e65274877fca625fb89a5f49212d379ee7718b58639213eb3413"
+    },
+    {
+      "name": "renderer-successor-class-empty-filter",
+      "exit": 1,
+      "result": "No tests executed; invalid empty selection retained, corrected commands omit filter"
+    },
+    {
+      "name": "renderer-successor-class",
+      "source_sha": "db5e4b9342f08ede28d35c49524990d7777bfbcc",
+      "exit": 0,
+      "cases": 4,
+      "assertions": 39,
+      "skips": 0,
+      "errors": 0,
+      "failures": 0,
+      "log_sha256": "64c5c757052b0724ab16b791056d9966a496b045b2be0c6ab812defcfea828e2",
+      "junit_sha256": "af8f0e8c05b878d49c6cc82b48c5d0c63309027ac412f0f96a68eebd6ec5cba9"
+    }
+  ],
+  "baseline_cache_failure": [
+    {
+      "name": "cache-prefix-case",
+      "source_sha": "db5e4b9342f08ede28d35c49524990d7777bfbcc",
+      "exit": 1,
+      "cases": 1,
+      "assertions": 3,
+      "failure": "Same two retained lock keys compared in opposite order after stripping a configured prefix",
+      "log_sha256": "5cd3e4115abf2868341690d5f2bed50e335693de62efd0b850721143ea5c063a",
+      "junit_sha256": "2ec41c3343b3b7fdb842bf62f76303131e59651572d939158ebe9cb3cf042e5c"
+    },
+    {
+      "name": "cache-prefix-main-case",
+      "source_sha": "2ab0c41e946e30cc402afc8ec107a3670e399abd",
+      "exit": 1,
+      "cases": 1,
+      "assertions": 3,
+      "failure": "Same two retained lock keys compared in opposite order after stripping a configured prefix",
+      "log_sha256": "b74d0480a12421569e349a3eae243529e82e5a83296acc92c9c4ca73bb5baefa",
+      "junit_sha256": "8d9419f58a89b4152dcae5e3b9f03f76dd3326b39dfeb5d90534920b4c3b297c"
+    }
+  ],
+  "raw_artifacts": "Retained outside Git in /workspace/pcc-evidence; public record contains safe counts, test identities and hashes only"
+}

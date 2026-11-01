@@ -1,6 +1,8 @@
 # Lane PCC work package: production commerce composition, default-off
 
-Status: **implemented on branch `harness/production-checkout-pcc-20261029`, main `8bb1ab24` merged; not pushed; independent
+Current status (2026-11-01): **default-off source independently approved at `db5e4b9342f08ede28d35c49524990d7777bfbcc`; original full SQLite sweep completed with failures, classified below; final evidence carry review and PR gates pending.** No full-suite pass is claimed.
+
+Historical status before Codex continuation: **implemented on branch `harness/production-checkout-pcc-20261029`, main `8bb1ab24` merged; not pushed; independent
 payment/auth review not yet done.** The work-package statement (sections Split to Tests) was committed first (`071d9f80`). Cut
 from `origin/main` `a8f17e5cbd509a822e2c283bdd501177b43c11c0` (`dd587603` plus docs-only handoff files) on branch
 `harness/production-checkout-pcc-20261029`.
@@ -65,7 +67,7 @@ Not touched: `app/Http/Membership`, `app/Domain/Memberships` (F9), customer comm
    `PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY` and `PRODUCTION_CHECKOUT_FUNDS_MODE` admitted only as blank or `live`. Every
    `PRODUCTION_CHECKOUT_*_ENABLED` switch and the mount stay held false by the validator whatever the flag says: admitting live
    credentials is not activating checkout.
-4. "Real mail" in production means `MAIL_MAILER=smtp` with a bounded host, port 465 or 587, a sender address and a username,
+4. "Real mail" in production means `MAIL_MAILER=smtp` with a bounded host, SMTPS on port 465, a sender address and a username,
    checked by shape only. Without the flag the baseline stays `log`.
 5. Production identity SMTP values come from `PRODUCTION_IDENTITY_SMTP_*`, but only a literal `$enabled = false;` in
    `config/production-identity-smtp.php` composes them into `settings`; the environment supplies values and never selects or
@@ -347,7 +349,7 @@ Ownership and acceptance remain the work package above: keep every capability
 default-off, finish the prescribed four-shard local SQLite suite, rerun timeouts
 alone, run ops tests and safeguards, obtain independent payment/auth review of
 the tested SHA, then publish one PCC PR and use the required preflight/review gates.
-No later lane starts before PCC completes. No Foundation dispatch is authorized here.
+Later lanes may prepare isolated source while acceptance and merges retain the coordinated order. No Foundation dispatch is authorized here.
 
 The new workspace lacked PHP and sudo. An isolated local Docker container
 `va-pcc-runtime-20261101` supplies Debian 13 / PHP 8.4.27 and the required extensions,
@@ -365,3 +367,126 @@ Regenerated with `python3 scripts/ci/phpunit-shards.py --shards=8
 --mysql-native-selection`: 2678 selected cases in 265 files of 10042 discovered
 cases in 743 files, exit 0; both workflow comments reflect that discovery.
 This is discovery only, not native test execution.
+
+
+## Codex verification closeout (2026-11-01)
+
+Tested source: `db5e4b9342f08ede28d35c49524990d7777bfbcc`, main baseline
+`2ab0c41e946e30cc402afc8ec107a3670e399abd`. The committed source remained
+frozen throughout the four sequential SQLite shards. Later evidence/ledger
+changes are documentation only; no application, test, workflow or lockfile change
+is inferred from this record.
+
+Runtime: isolated local Docker `va-pcc-runtime-20261101`, Debian 13, PHP 8.4.27,
+SQLite 3.46.1, PHPUnit 12.5.34. All 160 Composer lock references match installed
+packages; each worktree owns its Composer metadata. `.env` is the example and
+`public/build` is absent. This is local verification, with no provider or host call.
+
+| Check | Actual result |
+| --- | --- |
+| Original full SQLite sweep | completed 10042 cases / 105104 assertions / 732 exact census skips; 3 failures, 2 errors; exits 1/2/0/1; not a full-suite pass |
+| Current mount test | exit 0, 24 tests / 766 assertions |
+| Independent proxy/mount selection | exit 0, 59 tests / 829 assertions |
+| `tests/ops`, equipped root runtime with official ClamAV 1.5.4 | exit 0, 334 tests, no skips |
+| Private-server / email preflight Python checks | exit 0, 26 / 31 tests |
+| Shards / CI-scope / cadence / focused / receipts safeguards | exit 0, 52 / 27 / 14 / 53 / 61 tests |
+| Composer strict validation / locked audit | exit 0, valid / no advisories |
+| Native MySQL selection discovery | exit 0, 2678 cases / 265 files of 10042 cases / 743 files; not execution |
+| Focused Pint, 30 changed PHP files | 28 pass; 2 baseline findings reproduced on exact main bytes |
+
+Initial setup failures remain retained: unprivileged ops run had 36 missing
+account-lookup errors and 81 tool/root skips; equipped root with Debian ClamAV
+1.4.3 had one unsupported `EnableVersionCommand` failure. Installing official
+ClamAV 1.5.4 in the isolated runtime resolved that compatibility problem; no test
+was weakened or skipped. Initial Composer audit exit 100 was a CA-chain setup
+failure; existing workspace public CAs were installed and TLS verification stayed
+on. The final locked audit exited 0 with no advisories.
+
+Pint's two findings (`bootstrap/app.php` unary/not spacing and `routes/web.php`
+import order) match exact main file bytes, outside preflight's formatting selection;
+this is not a full Pint pass. Native MySQL 16/103 and mutation evidence above remain
+historical source-specific evidence. No new native locking/race/latency claim is made.
+No Foundation, GitLab, browser, real SMTP/Stripe account, staging host or production
+activation was exercised; those acceptance boundaries remain open.
+
+Independent source decision: `independent-pcc-review-db5e4b93-DECISION.md`, separate
+non-author agent `/root/pcc_payment_auth_review`, approves default-off development
+source with no P0-P2, conditional on full evidence completion. Named mount and
+SMTP conflicts were accepted. P3-3 documentation is corrected to SMTPS/465; P3-1
+buyer-withdrawal operator regression and P3-2 composed SMTP hold behavioral coverage
+are deferred to the PCC follow-up batch. Final evidence carry review and remote
+PR gates remain pending.
+
+### Full sweep and failure disposition
+
+The original runner completed on the unchanged source from 11:29:12Z to 17:36:56Z.
+It was neither restarted nor duplicated. Selection: 10042 cases in 743 files.
+
+| Shard | Exit | Cases | Assertions | Census skips | Failures / errors |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 1 | 2511 | 22933 | 155 | 1 / 0 |
+| 2 | 2 | 2511 | 26067 | 199 | 1 / 2 |
+| 3 | 0 | 2510 | 31642 | 126 | 0 / 0 |
+| 4 | 1 | 2510 | 24462 | 252 | 1 / 0 |
+
+All original case identities, ownership, counters and exact engine-skip identities
+match the generated selection and committed census. The repository's standard
+receipt verifier correctly rejects shards 1, 2 and 4 because their reports retain
+failures; shard 3 passes it. A separate inspection preserves failed results while
+checking their identities and skips. It does not convert them into passing receipts.
+Safe summaries and original artifact hashes: [resumption evidence](evidence/resumption-20261101.json).
+Raw logs, JUnit, inventories and process exits remain outside Git in the local
+`/workspace/pcc-evidence` directory.
+
+Four original failures/errors are runtime setup failures in actual isolated PDF
+rendering: `TestContractSuccessorActivationTest::test_exact_v2_policy_captures_real_request_and_worker_preserves_one_original`,
+`IsolatedContractRendererAcceptanceTest::test_two_isolated_children_preserve_every_frozen_section_in_the_same_valid_multipage_pdf`,
+`TestContractIssuanceTest::test_real_isolated_renderer_can_issue_one_private_pdf_from_an_actual_paid_grant`,
+and `TestContractProfileSuccessorTest::test_real_scrubbed_child_dispatches_only_the_trusted_successor_implementation`.
+The initial worktree-owned Composer metadata used shared package symlinks resolving
+outside the project. `IsolatedContractRenderer` correctly holds `open_basedir` to
+the project and its scratch directory, so the child refused that external autoload.
+An independent no-database probe with the same project restriction exited 255
+with the explicit `symfony/polyfill-mbstring` denial.
+
+Only after every original shard finished, the original vendor layout was preserved
+and all 41197 files were copied byte-identically inside PCC. No symlinks or
+escaping vendor realpaths remain. After `composer dump-autoload --optimize
+--no-scripts`, all 41184 package files remained byte-identical and all 160 versions
+and dist references matched the lock. The identical restricted autoload probe
+then exited 0. No source, package version, renderer limit or isolation boundary
+changed. Each of the four failed renderer cases passed alone (4 tests / 52
+assertions total), followed serially by their complete classes:
+
+| Class | Exit | Tests | Assertions | Skips |
+| --- | --- | --- | --- | --- |
+| TestContractSuccessorActivationTest | 0 | 4 | 39 | 0 |
+| IsolatedContractRendererAcceptanceTest | 0 | 1 | 25 | 0 |
+| TestContractIssuanceTest | 0 | 53 | 504 | 0 |
+| TestContractProfileSuccessorTest | 0 | 16 | 29 | 0 |
+
+The corrected direct PHPUnit commands use the same CI environment above,
+`--fail-on-phpunit-warning`, `--log-junit=<receipt>`, and the named file; an individual
+case adds `--filter=<exact_method>`. Four initial class invocations accidentally
+used an empty filter and executed no tests (exit 1); their original outputs are
+retained separately. The corrected class commands omit the filter entirely.
+Neither those empty selections nor the original full failures are counted as passes.
+
+The fifth failure is pre-existing on exact main `2ab0c41e946e30cc402afc8ec107a3670e399abd`:
+`PruneExpiredCacheRowsTest::test_expired_locks_go_and_held_locks_stay_held` line 156.
+It reproduces alone on PCC and in a separate exact-main worktree with its own
+Composer metadata and example environment (each exit 1, 1 test / 3 assertions).
+Both the test and `PruneExpiredCacheRows` are unchanged from main. The query orders
+raw keys before the test removes the configured prefix: with `APP_NAME=VASEY.AUDIO`,
+`live-lock` sorts before `vaseyaudio-cache-held-synthetic`. The assertion expects
+the same two retained keys in the opposite order. The observed result contains
+both held/live locks; this failure is in the test's prefix-sensitive comparison.
+No cache assertion or production pruning code was changed here. A deterministic
+prefix-independent assertion repair is assigned to the DEF-OPS follow-up batch;
+the failed full and focused baseline results remain visible. Later assertions in
+that failing method are not claimed exercised by these failed invocations.
+
+This is completed full-suite execution plus classified failures and focused runtime
+correction evidence. It is **not** a fresh green full-suite receipt, native MySQL
+proof, final-candidate acceptance or activation authorization. No additional full
+sweep was started.
