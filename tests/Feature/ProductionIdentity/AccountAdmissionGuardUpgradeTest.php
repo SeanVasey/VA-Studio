@@ -293,6 +293,83 @@ final class AccountAdmissionGuardUpgradeTest extends TestCase
         }
     }
 
+    public function test_native_early_repeatable_read_snapshot_refuses_new_reserved_namespace_on_memo_hit(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native early REPEATABLE READ snapshot and independent namespace visibility.');
+        }
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $other = $this->independentMysql();
+        $this->assertSame('REPEATABLE-READ', $pdo->query('SELECT @@SESSION.transaction_isolation')->fetchColumn());
+        $connection->beginTransaction();
+        // Establish an actual early consistent data snapshot BEFORE the first full ownership proof.
+        $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
+        $pdo->exec('SAVEPOINT account_upgrade_early_rr');
+        $frame = SchemaProofFrame::open($connection, $pdo, static function () use ($pdo): void {
+            $pdo->exec('RELEASE SAVEPOINT account_upgrade_early_rr');
+            $pdo->exec('SAVEPOINT account_upgrade_early_rr');
+        });
+        $created = false;
+        $calls = 0;
+        $prove = function () use ($pdo, &$calls): void {
+            $calls++;
+            AccountAdmissionGuards::stable($pdo, 'mysql');
+        };
+        try {
+            SchemaProofFrame::prove($pdo, 'account-early-rr', ['customer_accounts'], $prove);
+            SchemaProofFrame::prove($pdo, 'account-early-rr', ['customer_accounts'], $prove);
+            $this->assertSame(1, $calls);
+            $other->exec('CREATE TABLE customer_accounts_insert (id integer PRIMARY KEY)');
+            $created = true;
+            $this->assertDependencyRefused(fn () => SchemaProofFrame::prove($pdo, 'account-early-rr', ['customer_accounts'], $prove));
+        } finally {
+            $frame->close();
+            $connection->rollBack();
+            if ($created) {
+                $other->exec('DROP TABLE customer_accounts_insert');
+            }
+        }
+    }
+
+    public function test_native_same_connection_implicit_ddl_invalidates_witness_before_memo_reuse(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native implicit DDL commit and physical transaction witness.');
+        }
+        $connection = DB::connection();
+        $pdo = $connection->getPdo();
+        $connection->beginTransaction();
+        $pdo->exec('SAVEPOINT account_upgrade_implicit');
+        $frame = SchemaProofFrame::open($connection, $pdo, static function () use ($pdo): void {
+            $pdo->exec('RELEASE SAVEPOINT account_upgrade_implicit');
+            $pdo->exec('SAVEPOINT account_upgrade_implicit');
+        });
+        $calls = 0;
+        $prove = function () use ($pdo, &$calls): void {
+            $calls++;
+            AccountAdmissionGuards::stable($pdo, 'mysql');
+        };
+        $created = false;
+        try {
+            SchemaProofFrame::prove($pdo, 'account-implicit', ['customer_accounts'], $prove);
+            SchemaProofFrame::prove($pdo, 'account-implicit', ['customer_accounts'], $prove);
+            $this->assertSame(1, $calls);
+            $pdo->exec('CREATE TABLE account_upgrade_implicit_commit (id integer PRIMARY KEY)');
+            $created = true;
+            $this->assertFalse($pdo->inTransaction());
+            SchemaProofFrame::prove($pdo, 'account-implicit', ['customer_accounts'], $prove);
+            $this->assertSame(2, $calls, 'Lost physical witness must execute a complete callback instead of reusing its proof.');
+            $this->assertTrue((new \ReflectionProperty($frame, 'closed'))->getValue($frame));
+        } finally {
+            $frame->close();
+            $connection->rollBack();
+            if ($created) {
+                $pdo->exec('DROP TABLE account_upgrade_implicit_commit');
+            }
+        }
+    }
+
     private function independentMysql(): PDO
     {
         $config = DB::connection()->getConfig();

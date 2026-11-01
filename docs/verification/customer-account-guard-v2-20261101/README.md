@@ -229,3 +229,32 @@ skip; pure unit3run on either. No new environment key or execution flag. No shar
 census, workflow or ledger edit; coordinator must union these new methods into the
 final integrated candidate and regenerate native selection/counts. These source
 counts are not executed test results.
+
+## First authorized actual SQLite receipt and native RR gate
+
+Root granted the serial account verification lease after conditional exact-source
+approval at a7146511. Own tiny Composer metadata/shared-package symlinks resolve
+App and Tests to this worktree on PHP8.4.27. First bounded existing SQLite file
+ran clean a71465118df2f8e9a79d85f8dd5e63e89f9d6a5c using external run-case.sh:
+9 total /32 assertions /4 EXACT expected native-only skips, exit0,22.438s.
+Thus5 actual SQLite cases passed, including fresh/populated migration coordinator,
+source-backed composed dependency allowlist and foreign/altered dependency legs.
+Receipt `/workspace/account-guard-evidence-20261101/sqlite-upgrade-initial.*`.
+No native acceptance follows from it.
+
+Added two native-only gate methods before broader native acceptance work:
+`test_native_early_repeatable_read_snapshot_refuses_new_reserved_namespace_on_memo_hit`
+(driver!=mysql skip: `Native early REPEATABLE READ snapshot and independent namespace visibility.`),
+and `test_native_same_connection_implicit_ddl_invalidates_witness_before_memo_reuse`
+(driver!=mysql skip: `Native implicit DDL commit and physical transaction witness.`).
+The RR case establishes an actual users consistent snapshot BEFORE its first full
+account proof, then creates a formerly absent reserved name from another PDO and
+requires the next memo boundary to refuse. No isolation change or RC workaround.
+This is the first native feasibility gate; an observed RR visibility failure
+requires a new reviewed design before further native acceptance execution.
+The witness case separately requires full callback after same-session implicit
+commit, rather than a stale proof hit. Both methods are source-only until run.
+Feature source census now11 methods (SQLite5run/6native skips; MySQL10run/1SQLite
+skip). Shared census untouched. PHP lint/Pint for this modified test file pass.
+Ledger/process worker and actual CompleteIdentity/MDL controls remain the next
+planned test source after the mandatory RR gate; they are not claimed implemented.
