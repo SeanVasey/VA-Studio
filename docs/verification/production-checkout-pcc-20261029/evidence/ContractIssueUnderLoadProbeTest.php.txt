@@ -1,0 +1,50 @@
+<?php
+
+namespace Tests\Feature\PccScratch;
+
+use App\Domain\Commerce\Payments\StripeCheckoutGateway;
+use App\Domain\Commerce\Payments\StripePaymentGateway;
+use App\Domain\Contracts\ContractRenderer;
+use Filament\Facades\Filament;
+use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\ActivationFixtures;
+use Tests\Support\ContractFixtures;
+use Tests\Support\DeliveryFixtures;
+use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\FinalizationFixtures;
+use Tests\Support\PaymentFixtures;
+use Tests\TestCase;
+
+/** UNTRACKED SCRATCH PROBE (lane PCC investigation, never committed): the shard-3 contract-issuance chain, repeated under load. */
+final class ContractIssueUnderLoadProbeTest extends TestCase
+{
+    use FinalizationDatabaseMigrations;
+
+    public static function runs(): array
+    {
+        return array_map(fn (int $i): array => [$i], range(1, 12));
+    }
+
+    #[DataProvider('runs')]
+    public function test_issue(int $run): void
+    {
+        $this->withoutVite();
+        $this->fakePrivateMediaStorage();
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        DeliveryFixtures::configure();
+        $this->app->instance(ContractRenderer::class, ContractFixtures::renderer());
+        $gateway = PaymentFixtures::gateway();
+        $this->app->instance(StripeCheckoutGateway::class, $gateway);
+        $this->app->instance(StripePaymentGateway::class, $gateway);
+        $started = microtime(true);
+        try {
+            ActivationFixtures::issue(ContractFixtures::finalize(FinalizationFixtures::confirm(PaymentFixtures::started($gateway))));
+        } catch (\LogicException $error) {
+            $this->fail('run '.$run.' after '.round(microtime(true) - $started, 2).'s: '.$error->getMessage().' work='
+                .json_encode(DB::table('contract_render_work')->get(['state', 'reason', 'attempts', 'lease_expires_at', 'next_attempt_at'])->all())
+                .' now='.now()->toIso8601String());
+        }
+        $this->assertTrue(true);
+    }
+}

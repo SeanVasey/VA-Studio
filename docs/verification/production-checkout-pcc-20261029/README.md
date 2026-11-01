@@ -176,7 +176,7 @@ On the merged head `4f0ce701` (main `8bb1ab24` merged):
 | `composer audit` (after reinstalling `symfony/mime` 8.1.10 and `polyfill-mbstring`) | no advisories |
 | `composer validate --strict` | valid |
 | Native selection (`phpunit-shards.py --shards=8 ... --mysql-native-selection`) | 2665 selected cases in 263 files of 10008 discovered (main's selection; PCC adds no native-only method); generated files deleted |
-| Full SQLite suite | FULLSUITE_TOKEN |
+| Full SQLite suite (16 shards at `4f0ce701`) | incomplete: 9 of 16 shards finished; see "Status at handoff" |
 
 Full-suite history, recorded honestly: four earlier full runs (at `6ee56088`, `5110d74c` twice, `4f0ce701` once) were killed by
 container restarts before every shard finished. One shard that did finish (shard 3 of 4 at `5110d74c`, 2474 tests) had 1 error
@@ -187,16 +187,19 @@ They are not order-dependent: the same shard run alone in its exact order passed
 second-boundary defect in test-contract issuance (`RenderTestContract` completion save vs `ReadGrantContract`'s
 `issued_at == work.updated_at` check; Eloquent rewrites an unchanged `updated_at` when the clock crosses a second before the
 save), which quarantines the work with `evidence_changed` and makes the fixtures throw "Synthetic contract did not issue".
-A deterministic probe fails on main the same way. Both tests depend on it; neither touches PCC code. Handed to its own fix lane.
+A deterministic probe fails on main the same way (`contract-second-boundary.md`, `evidence/`). Both tests depend on it; neither touches PCC code. Handed to its own fix lane.
 
 Native MySQL 8.4.11 (private `/opt/mysql-8.4.11/bin/mysqld`, own datadir under `/home/user/notes/pcc-ev`, socket
 `/tmp/pcc-my/s`, port 3517 checked free with `ss -ltnp`; the server was stopped by its own PID and the datadir removed):
-NATIVE_TOKEN
+OK, 16 tests, 103 assertions, 1 h 39 m, at `4f0ce701` (code identical to the final head). Cases: the five ledger states,
+the hosted re-check, the unreadable ledger and the non-exclusive path from `ProductionCheckoutExclusivityTest`; idempotent
+retrieval, provider failure, lost-create locator, the three domain switch refusals and two pre-query refusals (unmounted,
+operator off) from `ProductionCheckoutReconcileCommandTest`. The pure detection data sets were not repeated natively.
 
 ### Mutation checks
 
 Each mutation was applied to the file, the named tests run, and the file restored
-(`/tmp/.../pcc-ev/mutate.py`, kept outside the repository):
+(the harness is kept as `evidence/mutate.py.txt`):
 
 | Mutation | Tests | Result |
 | --- | --- | --- |
@@ -238,3 +241,95 @@ those paths and the moved rights-scope locking read work on MySQL; it is not rac
 - The operator command has no sweep mode; recovery is one order at a time.
 - With a non-empty `TRUSTED_PROXIES`, global seams prepended by packages (Inertia) run before `ExplicitTrustProxies`; they do not
   read the client address.
+
+## Status at handoff (2026-11-01)
+
+Head: branch `harness/production-checkout-pcc-20261029`, main `3e8a1fd7` merged (`31a90d7b`), selection comment refreshed
+(`93e8d87c`), then this section. Not pushed, no PR, no review yet. Everything below is reproducible from the repository alone.
+
+### Split
+
+One branch, cut into two reviewable halves: **PCC-a** (operations) ends at `ab9e6336`; **PCC-b** (composition) is
+`1382f151` to `0515b15f` plus docs. PCC-a has no dependency on PCC-b. The reconcile command sits in PCC-b because it needs the
+composition gate and provider binding.
+
+### Wired versus inert
+
+See "What is wired, and what stays inert" above. In short: the mount gate (`production_checkout.mounted`, literal `false`,
+held by the production validator) is the only way in; behind it sit the provider registration, the route mount, the privacy
+seam's runtime re-check and the operator reconcile command, and every `PRODUCTION_CHECKOUT_*` switch stays as shipped. The
+exclusivity authority is consulted for exclusive or scoped selections, which are refused either way. Real mail and live Stripe
+mode are admitted in the production preflight only behind exact `true` flags that never lift a checkout switch. Identity SMTP
+composes nothing until its code literal is flipped. `trustProxies` is the one default behaviour change: no proxy is trusted,
+including on `.on-forge.com` hosts. Not done (pushed back): A5 `FinancialReadPlan` wiring, Paid252/Tax production mounts.
+
+### Results so far
+
+| Evidence | Head | Result |
+| --- | --- | --- |
+| Mutations M1 to M10 (gate, privacy seam, provider registration, exclusivity refusal, ledger failure, call site, domain operator switch) | `0515b15f` | all killed (M10 after `0515b15f`) |
+| Targeted production checkout suites (22 files) | `0515b15f` | OK, 372 tests, 2690 assertions, 9 skipped |
+| Admission, boundary and ops PHPUnit units (10 files) | `0515b15f` | OK, 297 tests, 5630 assertions |
+| Native MySQL 8.4.11, exclusivity and reconcile cases | `4f0ce701` | OK, 16 tests, 103 assertions |
+| All 22 `tests/ops/test_*.py` and `scripts/ops/test-*.py` | `93e8d87c` | all OK |
+| Safeguards (shards, ci-scope, workflow cadence, focused tests, database receipts) | `93e8d87c` | OK: 52, 27, 14, 53, 61 |
+| `composer audit` | `93e8d87c` | no advisories |
+| Native selection | `93e8d87c` | 2673 cases in 264 files of 10037 discovered (main's selection) |
+
+Full SQLite suite, 16 shards at `4f0ce701` (`phpunit-shards.py --shards=16 --prefix=phpunit-ci-local`); the run was stopped by
+a container restart before it finished:
+
+| Shard | Result |
+| --- | --- |
+| 1 | OK, 626 tests, 10306 assertions, 25 skipped |
+| 2 | OK, 626 tests, 3963 assertions, 54 skipped |
+| 3 | 626 tests, 8196 assertions, 2 errors, 2 failures, 30 skipped (classified below) |
+| 4 | OK, 626 tests, 7646 assertions, 32 skipped |
+| 5 | 626 tests, 5215 assertions, 1 failure, 56 skipped (classified below) |
+| 6 | OK, 626 tests, 7191 assertions, 10 skipped |
+| 7 | OK, 626 tests, 7504 assertions, 38 skipped |
+| 8 | stopped at 567 of 626, no failure or error before the stop |
+| 9 | OK, 625 tests, 5746 assertions, 66 skipped |
+| 10, 11, 12 | stopped at 378, 189 and 252 of 625, no failure or error before the stop |
+| 13 to 16 | not run |
+
+Earlier 4-shard runs were also stopped by restarts; the one complete shard (3 of 4 at `5110d74c`) is covered in "Test results".
+
+### Failure classification
+
+| Failure | Class | Evidence |
+| --- | --- | --- |
+| `OfferDraftBrowserEvidenceTest` (2 cases): `ProcessTimedOutException` from a child PHP boot with a fixed timeout | load timeout | passes alone at `93e8d87c`: OK, 2 tests, 82 assertions |
+| `ProductionTaxCommittedReadReceiptTest` `original-budget` / `expiry` | load timeout (a wall-clock budget) | passes alone: OK, 1 test, 11 assertions |
+| `CustomerListeningNotesCapacityTest` `maximum ASCII characters` (503 instead of 422) | load timeout | passes alone: OK, 2 tests, 96 assertions |
+| `StagingEnvironmentAdmissionTest::test_source_census_routes_every_admitting_gate_through_the_helper_and_leaves_local_only_gates_explicit` | pre-existing on main | the only unlisted gate file is `app/Domain/Notifications/Mail/TransactionalMailPolicy.php` (lane CX), which has a local/testing gate but is not in `LOCAL_ONLY_FILES` on main `8bb1ab24` or `3e8a1fd7`; it fails the same way alone on the merged head. `ProductionCheckoutMount` admits `local`, `testing` and `production`, so it does not match the census pattern and is not part of this failure. Fix belongs to CX/main (classify the file) |
+| `RightsDeclarationWriterTest` one case and `InquiryBrowserCatalogCleanupTest` one case (4-shard run, `5110d74c`) | pre-existing on main, timing-dependent | contract second-boundary defect, reproduced deterministically on main; `contract-second-boundary.md`; handed to its own fix lane |
+
+No failure is in PCC code or tests.
+
+### What remains, with commands
+
+1. Finish the full SQLite suite on the final head (the shards above were stopped). From the worktree root, with `public/build`
+   absent and `.env` copied from `.env.example`:
+
+   ```
+   python3 scripts/ci/phpunit-shards.py --shards=4 --prefix=phpunit-ci-local
+   for n in 1 2 3 4; do
+     env APP_ENV=testing APP_DEBUG=false APP_KEY=base64:$(head -c32 /dev/zero | base64) DB_CONNECTION=sqlite DB_DATABASE=:memory: \
+       DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync CI=true GITHUB_ACTIONS=true PAO_DISABLE=1 \
+       php -d memory_limit=1024M -r '$GLOBALS["_composer_autoload_path"]=getcwd()."/vendor/autoload.php"; require "vendor/phpunit/phpunit/phpunit";' \
+       -- --colors=never --fail-on-phpunit-warning --configuration=phpunit-ci-local-$n.xml
+   done
+   rm -f phpunit-ci-local-*
+   ```
+
+   Expect the census failure above until main classifies `TransactionalMailPolicy.php`; rerun any timeout alone before
+   classifying it.
+2. Independent payment/auth review of the actual head, focused on: the mount gate's production admission (assumption 1); the
+   privacy seam's 404 ordering; `HostedCheckout::operatorReconcile` (buyer-independent persistence, locator rule); the
+   validator's live-key admission and holds; `ExplicitTrustProxies` (header set, outermost position, `.on-forge.com`); the
+   identity SMTP literal versus the old code-literal rule (named conflict); the exclusivity gate's detection rule.
+3. Open the PR from `harness/production-checkout-pcc-20261029` with what/why/verified from this packet; merge only at the
+   reviewed exact SHA under the CI cost policy (no automatic matrices; one Foundation run for the final integrated candidate).
+4. Separate lanes: A5 production ledger (design above), Paid252/Tax production mounts, the contract second-boundary fix, and
+   the `TransactionalMailPolicy` census classification.
