@@ -1,6 +1,6 @@
 # Lane PCC work package: production commerce composition, default-off
 
-Current status (2026-11-01): **default-off source independently approved at `db5e4b9342f08ede28d35c49524990d7777bfbcc`; original full SQLite sweep completed with failures, classified below; final evidence carry review and PR gates pending.** No full-suite pass is claimed.
+Current status (2026-11-01): **default-off source independently approved at `db5e4b9342f08ede28d35c49524990d7777bfbcc`; original full SQLite sweep completed with failures, classified below; final evidence carry approved at `9c68984de27dc2c077e226653f63ee4f842ec33e`; PR gates pending.** No full-suite pass is claimed.
 
 Historical status before Codex continuation: **implemented on branch `harness/production-checkout-pcc-20261029`, main `8bb1ab24` merged; not pushed; independent
 payment/auth review not yet done.** The work-package statement (sections Split to Tests) was committed first (`071d9f80`). Cut
@@ -414,7 +414,7 @@ non-author agent `/root/pcc_payment_auth_review`, approves default-off developme
 source with no P0-P2, conditional on full evidence completion. Named mount and
 SMTP conflicts were accepted. P3-3 documentation is corrected to SMTPS/465; P3-1
 buyer-withdrawal operator regression and P3-2 composed SMTP hold behavioral coverage
-are deferred to the PCC follow-up batch. Final evidence carry review and remote
+are deferred to the PCC follow-up batch. Final evidence carry is approved at `9c68984de27dc2c077e226653f63ee4f842ec33e`; remote
 PR gates remain pending.
 
 ### Full sweep and failure disposition
@@ -490,3 +490,16 @@ This is completed full-suite execution plus classified failures and focused runt
 correction evidence. It is **not** a fresh green full-suite receipt, native MySQL
 proof, final-candidate acceptance or activation authorization. No additional full
 sweep was started.
+
+### Independent final evidence carry approval
+
+Separate non-author Sol6.1 reviewer `/root/pcc_finish_sol61/pcc_final_carry_review`
+approved candidate `9c68984de27dc2c077e226653f63ee4f842ec33e`, no new P0-P2.
+The reviewer independently checked source equivalence, original and focused
+artifacts/hashes/counters/census, contained package bytes and realpaths, and the
+exact-main cache failure. [The immutable decision](independent-pcc-final-carry-9c68984d-DECISION.md)
+is imported byte-for-byte (SHA-256 `be9961c97be3ce4d0cb5f3ad28063ca5c504c1acf2e8f1dbfb8db6d2b4afe82c`).
+It approves the local evidence boundary for default-off development under the CI
+cost policy while preserving the original failed full sweep and final acceptance
+gates. This carry changes documentation only. The exact PR head still requires
+remote preflight, Codex code/security, Bugbot and expected-head merge.
