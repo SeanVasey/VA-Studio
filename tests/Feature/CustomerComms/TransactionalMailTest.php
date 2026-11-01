@@ -280,6 +280,51 @@ class TransactionalMailTest extends TestCase
         Mail::assertSentCount(2);
     }
 
+    public function test_a_customer_or_purchase_refusal_on_an_older_intent_is_skipped_and_never_stops_the_batch(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        $unverified = N::ready(suffix: 'UNVERIFIED');
+        $broken = N::ready(suffix: 'BROKEN');
+        $valid = N::ready(suffix: 'VALID');
+        M::configure();
+        // The oldest customer's email is no longer verified: CustomerAccess refuses with its own exception, and the account row
+        // (so its access version) is untouched, so the intent is not superseded. Before the fix every run threw here.
+        $unverified['user']->forceFill(['email_verified_at' => null])->save();
+        // The next intent hits an unexpected database error on its first read; it is skipped too, with only its class logged.
+        $poisoned = $broken['notice']['notificationId'];
+        DB::beforeExecuting(function (string $sql, array $bindings) use ($poisoned): void {
+            if (str_contains($sql, 'transactional_notices') && in_array($poisoned, $bindings, true)) {
+                throw new QueryException(DB::getName(), $sql, $bindings, new RuntimeException('Synthetic database failure'));
+            }
+        });
+        $deliveryFor = fn (array $f): bool => TransactionalMailDelivery::where('notice_public_id', $f['notice']['notificationId'])->exists();
+
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])
+            ->expectsOutput('queued=1 skipped=2 reasons=authority_withdrawn=1,error=1 superseded=0')->assertSuccessful();
+        $this->assertSame([false, false, true], array_map($deliveryFor, [$unverified, $broken, $valid]));
+        $this->assertTrue(collect($this->logs)->contains(fn (string $line): bool => str_contains($line, 'Order-ready intent could not be queued.')
+            && str_contains($line, trim(json_encode(QueryException::class), '"'))));
+        $this->assertNoPersonalData($unverified['user']->email);
+    }
+
+    public function test_a_customer_refusal_after_the_claim_fails_the_delivery_instead_of_leaving_it_submitting(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        $f = N::ready(suffix: 'DELIVER');
+        M::configure();
+        $adapter = app(TransactionalMailAdapter::class);
+        $id = $adapter->queueOrderReady($f['notice']['notificationId'])['deliveryId'];
+        // Access is lost between queueing and delivery without an access-version change.
+        $f['user']->forceFill(['email_verified_at' => null])->save();
+        $this->assertSame(['deliveryId' => $id, 'state' => 'failed', 'reason' => 'authority_withdrawn'], $adapter->deliver($id));
+        Mail::assertNothingOutgoing();
+        $this->artisan('vasey:transactional-mail-stuck', ['--minutes' => 1])->expectsOutput('stuck=0 minutes=1')->assertSuccessful();
+        $this->assertSame(['notification.mail.queued', 'notification.mail.submitting', 'notification.mail.failed'],
+            AuditEvent::where('action', 'like', 'notification.mail.%')->orderBy('id')->pluck('action')->all());
+    }
+
     public function test_the_stuck_listing_reports_only_deliveries_in_submitting_past_the_threshold_and_writes_nothing(): void
     {
         Mail::fake();

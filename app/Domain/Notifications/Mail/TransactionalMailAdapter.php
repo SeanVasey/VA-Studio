@@ -3,7 +3,10 @@
 namespace App\Domain\Notifications\Mail;
 
 use App\Domain\Commerce\Orders\OrderRequest;
+use App\Domain\Commerce\QuoteException;
+use App\Domain\Customers\CustomerAccessException;
 use App\Domain\Customers\CustomerIdentityPolicy;
+use App\Domain\Delivery\DeliveryException;
 use App\Domain\Notifications\Models\TransactionalMailDelivery;
 use App\Domain\Notifications\Models\TransactionalNotice;
 use App\Domain\Notifications\NotificationException;
@@ -36,7 +39,7 @@ final class TransactionalMailAdapter
             throw new NotificationException;
         }
         // The intent must still verify against current customer and purchase authority before anything is recorded.
-        app(TestTransactionalNotifications::class)->status($noticeId);
+        $this->verifyAuthority($noticeId);
 
         return DB::transaction(function () use ($noticeId, $configuration): array {
             $notice = TransactionalNotice::where('public_id', $noticeId)->lockForUpdate()->first();
@@ -91,7 +94,7 @@ final class TransactionalMailAdapter
         }
         try {
             // Withdrawn customer access, changed purchase evidence or a disabled intent policy refuse before any transport.
-            app(TestTransactionalNotifications::class)->status($claimed['notice']);
+            $this->verifyAuthority($claimed['notice']);
             $intent = $this->intent($claimed['notice_id'], $claimed['notice']);
         } catch (NotificationException $error) {
             return $this->transition($deliveryId, 'submitting', 'failed', $error->reason === 'intent_unreadable' ? 'intent_unreadable' : 'authority_withdrawn');
@@ -120,6 +123,21 @@ final class TransactionalMailAdapter
         }
 
         return ['deliveryId' => $delivery->public_id, 'state' => $delivery->state, 'reason' => $delivery->reason];
+    }
+
+    /**
+     * Re-verifies the intent against current customer and purchase authority. The customer, purchase and delivery checks behind
+     * it refuse with their own domain exceptions (email no longer verified, account became staff, a claim or purchase that no
+     * longer verifies, activation evidence changed); those are per-intent authority refusals, reported as one. Anything else
+     * (a database error, a defect) is not relabelled and propagates.
+     */
+    private function verifyAuthority(string $noticeId): void
+    {
+        try {
+            app(TestTransactionalNotifications::class)->status($noticeId);
+        } catch (CustomerAccessException|QuoteException|DeliveryException) {
+            throw new NotificationException('authority_withdrawn');
+        }
     }
 
     /** @return array{email: string, order: string} the verified recipient and order reference from the encrypted intent */

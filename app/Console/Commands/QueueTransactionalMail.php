@@ -8,6 +8,8 @@ use App\Domain\Notifications\NotificationException;
 use Illuminate\Console\Command;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * Queues one email for each private order-ready intent that has none yet (FP-075), in a bounded batch. Refuses, recording
@@ -62,6 +64,10 @@ final class QueueTransactionalMail extends Command
                 } catch (NotificationException $error) {
                     // Not provably permanent: it stays pending for the next run, and this run moves on to newer intents.
                     $skipped[$error->reason] = ($skipped[$error->reason] ?? 0) + 1;
+                } catch (Throwable $error) {
+                    // An unexpected error on one intent (a database error, a defect) recorded nothing; it must not stop the batch.
+                    Log::warning('Order-ready intent could not be queued.', ['exception_class' => $error::class]);
+                    $skipped['error'] = ($skipped['error'] ?? 0) + 1;
                 }
                 if ($handled >= $limit) {
                     break;
