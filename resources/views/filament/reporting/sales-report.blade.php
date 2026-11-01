@@ -62,16 +62,19 @@
                 @endif
                 @if (! $test['tiers']['available'])
                     <p data-unavailable="tiers">License tier breakdown unavailable: {{ $test['tiers']['reason'] }}</p>
-                @elseif ($test['tiers']['rows'] !== [])
-                    <table>
-                        <caption>Test lines by license tier (minor units; paid includes tax)</caption>
-                        <thead><tr><th scope="col">Tier</th><th scope="col">Type</th><th scope="col">Currency</th><th scope="col">Lines</th><th scope="col">Base (minor)</th><th scope="col">Discount (minor)</th><th scope="col">Tax (minor)</th><th scope="col">Paid (minor)</th><th scope="col">Refunded (minor)</th><th scope="col">Net (minor)</th></tr></thead>
-                        <tbody>
-                        @foreach ($test['tiers']['rows'] as $row)
-                            <tr><th scope="row">{{ $row['tier'] }}</th><td>{{ $row['tier_type'] }}</td><td>{{ $row['currency'] }}</td><td>{{ $row['lines'] }}</td><td>{{ $row['base_minor'] }}</td><td>{{ $row['discount_minor'] }}</td><td>{{ $row['tax_minor'] }}</td><td>{{ $row['paid_minor'] }}</td><td>{{ $row['refunded_minor'] }}</td><td>{{ $row['net_minor'] }}</td></tr>
-                        @endforeach
-                        </tbody>
-                    </table>
+                @else
+                    {{-- The table needs rows; the warnings below do not. When every paid order is excluded they are the only tier figures. --}}
+                    @if ($test['tiers']['rows'] !== [])
+                        <table>
+                            <caption>Test lines by license tier (minor units; paid includes tax)</caption>
+                            <thead><tr><th scope="col">Tier</th><th scope="col">Type</th><th scope="col">Currency</th><th scope="col">Lines</th><th scope="col">Base (minor)</th><th scope="col">Discount (minor)</th><th scope="col">Tax (minor)</th><th scope="col">Paid (minor)</th><th scope="col">Refunded (minor)</th><th scope="col">Net (minor)</th></tr></thead>
+                            <tbody>
+                            @foreach ($test['tiers']['rows'] as $row)
+                                <tr><th scope="row">{{ $row['tier'] }}</th><td>{{ $row['tier_type'] }}</td><td>{{ $row['currency'] }}</td><td>{{ $row['lines'] }}</td><td>{{ $row['base_minor'] }}</td><td>{{ $row['discount_minor'] }}</td><td>{{ $row['tax_minor'] }}</td><td>{{ $row['paid_minor'] }}</td><td>{{ $row['refunded_minor'] }}</td><td>{{ $row['net_minor'] }}</td></tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    @endif
                     @foreach ($test['tiers']['unattributed_refund_minor'] as $currency => $amount)
                         <p>Succeeded refunds not attributed to a tier ({{ $currency }}): {{ $amount }} minor units (no line allocation recorded, or the order could not be read).</p>
                     @endforeach

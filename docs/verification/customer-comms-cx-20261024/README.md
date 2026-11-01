@@ -283,3 +283,76 @@ Deferred P3 notes: N1 the export document is assembled under READ COMMITTED, so 
 different moments if the customer's own order changes mid-build; N2 retried lock-wait timeouts can hold a request up to
 about 150 s before the 503; N3 the Filament staff actions show a generic error page for a database error that outlives
 the retries; N4 record at the open-export lookup that the F1 purge depends on READ COMMITTED.
+
+## Follow-up batch FUB-1 (2026-10-31)
+
+Branch `harness/followups-rep-cx-20261031` from `origin/main` `8bb1ab24`. Deferred CX findings, each fixed with a regression test
+that fails without the fix, or left deferred with a reason. Ledger: `docs/handoff/2026-10-07/codex-deferred-20261011.md`
+(2026-10-31 FUB-1 entry).
+
+| Finding | Resolution | Commit | Test |
+| --- | --- | --- | --- |
+| Codex P2 r4432808542: refused order-ready intents filled every `vasey:transactional-mail-queue` batch, so newer valid intents were never queued | Fixed without a migration. A terminal refusal row is not possible: the delivery insert guard admits only `queued`, `queued → failed` admits only `not_configured`/`configuration_changed`, and reaching `authority_withdrawn` would need a fabricated `submitting` claim; notices are immutable. Instead: (1) an intent whose customer access version has been superseded (the account guard allows only `+1` steps, so it can never verify again) is excluded from the pending set by the query and reported as `superseded=N`, with nothing written; (2) every other refusal stays pending, is counted under `skipped` with its reason, and the run keeps scanning past it, examining at most `4 × --limit` intents. `--limit` now counts emails queued per run. Transient refusals (intent policy off, recipient changed) stay pending and are queued once they clear. | `b9cdc005` | `TransactionalMailTest::test_refused_intents_ahead_of_a_valid_one_never_hold_the_batch_and_only_superseded_access_leaves_the_pending_set`; existing command expectations gain ` superseded=0` |
+| N3: Filament staff data-rights actions showed a generic error page for database contention that outlived the retries | Fixed. A concurrency `QueryException` (Laravel's detector, as the service uses) becomes a persistent "Request not changed … Try again in a moment." notification and a warning log with the exception class only; the transaction rolled back, so nothing changed. Any other database error is rethrown. | `035c9a8d` | `CustomerDataRequestAdminTest::test_database_contention_that_outlives_the_retries_is_a_try_again_notification_and_other_database_errors_are_not_hidden` (three attempts observed) |
+| N4: record at the open-export lookup that the F1 purge depends on READ COMMITTED | Done (comment naming the F1 race test). | `7f7086ec` | the existing native F1 race |
+| F5: no operator view of deliveries stuck in `submitting` | Fixed. Read-only `vasey:transactional-mail-stuck {--minutes=15}`: `stuck=N`, then delivery id, notice id and claim time (UTC), oldest first, at most 100 (`more=N`). Writes nothing, prints no recipient. Replaces the hand-written SQL in `docs/transactional-mail.md`. | `68d840d8` | `TransactionalMailTest::test_the_stuck_listing_reports_only_deliveries_in_submitting_past_the_threshold_and_writes_nothing` |
+| N1: the export document is assembled under READ COMMITTED | Still deferred: a consistency trade-off, not a defect; a single snapshot would bring back the gap-lock and F1 issues the re-reviews closed. | | |
+| N2: retried lock-wait timeouts can hold a request up to about 150 s | Still deferred: the retry budget and lock-wait timeout are an owner judgement call. | | |
+| F4: schedule the export prune | Still deferred: needs a host and scheduler. | | |
+
+### Mutants (one at a time, SQLite, each killed)
+
+| Mutant | Result |
+| --- | --- |
+| X1: no superseded exclusion | killed (the expected command output was not printed; 2 failures) |
+| X2: no scan past refusals (`budget = limit`) | killed (the expected command output was not printed; 2 failures) |
+| N3-M1: no `QueryException` mapping | killed (the exception escapes the action) |
+| N3-M2: every `QueryException` mapped to "try again" | killed (the non-contention error is hidden) |
+| F5-M1: listing ignores the state | killed (the finished delivery is listed) |
+| F5-M2: listing ignores `--minutes` | killed |
+
+### Results
+
+Native MySQL 8.4.11 (private `mysqld`, own datadir, port 3491; stopped by `mysqladmin shutdown`, datadir removed), at `68d840d8`:
+`TransactionalMailTest` (the eight methods other than the configuration data provider, including both new ones) OK (8 tests, 112 assertions);
+`CustomerDataRequestAdminTest` OK (3, 62); the F1 race `test_an_export_committed_while_an_approval_waits_is_purged_by_that_approval` OK (1, 48).
+SQLite: `tests/Feature/CustomerComms` 106 tests, 870 assertions, 6 census skips (the six native races). No CX native-only test was added.
+Safeguards, `tests/ops`, `composer audit` and the selection counts: see the REP packet's FUB-1 results (same branch and run).
+
+Not tested: a real worker dying mid-send (the stuck rows are written through the guard's own `queued → submitting` step), real SMTP,
+real lock contention reaching the staff action (it is injected as a lock-wait timeout on every attempt), browser specs, Foundation CI.
+
+### Review fixes (after `c86ceb0c`)
+
+Independent review of `c86ceb0c`: APPROVE WITH CONDITIONS, record and resolution table in
+[`independent-fub1-review-c86ceb0c-DECISION.md`](independent-fub1-review-c86ceb0c-DECISION.md). Fixed: F1 (P2) and F2 in `38a93b08`
+(customer, purchase and delivery refusals become `authority_withdrawn` in `queueOrderReady()` and `deliver()`; any other per-intent
+error is counted as `error` and the run continues), F4 in `435e44e8` (stuck-listing `--max` and cap test), `043a61a0` (contention judged
+by driver error code: MySQL 1213, 1205, SQLSTATE 40001; SQLite 5 or 6) and `6dc045f6` (tier-versus-order totals note). F3 (the scan
+restarts at the oldest intent each run) is documented as a bound and deferred.
+
+Mutants, SQLite, each killed: G1 mapping removed (both new tests fail); G2 command catch-all removed; M13 cap raised to 100000; a
+`more=` line against a fixed 100; K1 Laravel's message detector restored (unit test: 8 of 12 cases fail; the staff test fails on the
+lock-wait phrase in a duplicate-key error); K2 SQLite code 19 accepted as contention.
+
+Results, code at `6dc045f6`:
+- SQLite: `tests/Feature/Reporting`, `tests/Unit/ReportingCsvTest.php` and `tests/Unit/CustomerDataRightsContentionTest.php` 55 tests,
+  478 assertions, 1 skipped (the native-only method); `tests/Feature/CustomerComms` 108 tests, 893 assertions, 6 census skips.
+- Native MySQL 8.4.11 (private `mysqld`, own datadir, port 3491, stopped by `mysqladmin shutdown`, datadir removed): `TransactionalMailTest`,
+  every method except the configuration data provider, including both new ones, the stuck listing and the database guards: OK (5 tests,
+  68 assertions) and OK (5, 67), run in two halves on two databases; `CustomerDataRequestAdminTest` OK (3, 62);
+  `CustomerDataRightsTest::test_contention_that_outlives_the_retries_is_a_clean_try_again_response` OK (1, 11); the F1 race OK (1, 79);
+  `CustomerDataRightsContentionTest` OK (12, 12). A container restart interrupted the first native mail run; it was rerun in full on a
+  fresh server.
+- Census 310 entries (main's 309 an exact prefix); native selection **2673 cases in 264 files of 9945 discovered**, both count comments
+  updated. Safeguards 52, 27, 14, 53, 61 OK; all 20 `tests/ops` files OK; `composer audit` no advisories.
+
+## FUB-1 re-review at `cae73127`
+
+Decision: **APPROVE** ([`independent-fub1-rereview-cae73127-DECISION.md`](independent-fub1-rereview-cae73127-DECISION.md)),
+no P0 to P2; condition C1 met. The contention classifier was checked against real driver errors on both engines (MySQL
+1205 and 1213/40001 and SQLite 5 are contention; 1062, 1064 with a lock phrase bound, missing tables and SQLite 19 are not).
+Deferred P3 notes: P3-1 `authority_withdrawn` also covers global, possibly transient configuration refusals, so in
+`deliver()` a temporary configuration problem fails that delivery (the safe direction); P3-2 the queue command exits 0
+when some intents hit `error`; P3-3 (pre-existing) a dispatch failure after commit leaves a delivery `queued` with no job,
+which the stuck listing does not show; P3-4 no test covers the `QuoteException`/`DeliveryException` mapping.

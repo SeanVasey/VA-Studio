@@ -27,7 +27,7 @@ final class OperationalHealth
 
     /** Labels for metrics that can be marked unavailable when their source cannot be read. */
     private const LABELS = [
-        'queue_ready' => 'Jobs waiting', 'queue_oldest' => 'Oldest waiting job', 'queue_reserved' => 'Jobs running',
+        'queue_ready' => 'Jobs waiting', 'queue_oldest' => 'Oldest waiting job', 'queue_reserved' => 'Jobs running', 'queue_stalled' => 'Jobs stalled past the retry window',
         'failed_jobs' => 'Failed jobs', 'failed_jobs_recent' => 'Failed in the last 24 hours',
         'stripe_receipts_waiting' => 'Payment webhook receipts not yet processed', 'stripe_receipts_quarantined' => 'Payment webhook receipts quarantined',
         'payment_exceptions' => 'Payment exceptions awaiting review', 'payment_exceptions_flagged' => 'Exceptions marked for further review',
@@ -61,18 +61,23 @@ final class OperationalHealth
         $metrics = [];
         $default = (string) config('queue.default');
         if ($default !== 'database') {
-            foreach (['queue_ready', 'queue_oldest', 'queue_reserved'] as $key) {
+            foreach (['queue_ready', 'queue_oldest', 'queue_reserved', 'queue_stalled'] as $key) {
                 $metrics[] = self::unavailable($key, self::LABELS[$key], "The queue connection is '{$default}'; only the database queue can be read by the application.");
             }
         } else {
-            $metrics = array_merge($metrics, $this->guarded(['queue_ready', 'queue_oldest', 'queue_reserved'], 'jobs', function (): array {
+            $metrics = array_merge($metrics, $this->guarded(['queue_ready', 'queue_oldest', 'queue_reserved', 'queue_stalled'], 'jobs', function (): array {
                 $db = DB::connection(config('queue.connections.database.connection'));
                 $table = (string) config('queue.connections.database.table', 'jobs');
                 $now = now()->utc()->timestamp;
+                // The database queue treats a reservation at or before now minus retry_after as expired (its worker is presumed
+                // gone) and hands the job out again; the same window and default as the queue connector, so the two never disagree.
+                $retryAfter = (int) (config('queue.connections.database.retry_after') ?? 60);
+                $expired = $now - $retryAfter;
                 $row = $db->table($table)->selectRaw('COUNT(CASE WHEN reserved_at IS NULL AND available_at <= ? THEN 1 END) AS ready,'
                     .' COUNT(CASE WHEN reserved_at IS NULL AND available_at > ? THEN 1 END) AS scheduled_later,'
-                    .' COUNT(CASE WHEN reserved_at IS NOT NULL THEN 1 END) AS reserved,'
-                    .' MIN(CASE WHEN reserved_at IS NULL AND available_at <= ? THEN available_at END) AS oldest_ready', [$now, $now, $now])->first();
+                    .' COUNT(CASE WHEN reserved_at > ? THEN 1 END) AS reserved,'
+                    .' COUNT(CASE WHEN reserved_at <= ? THEN 1 END) AS stalled,'
+                    .' MIN(CASE WHEN reserved_at IS NULL AND available_at <= ? THEN available_at END) AS oldest_ready', [$now, $now, $expired, $expired, $now])->first();
                 $age = $row->oldest_ready === null ? 0 : max(0, $now - (int) $row->oldest_ready);
                 $limit = (int) config('reporting.health.queue_age_attention_seconds');
 
@@ -81,7 +86,9 @@ final class OperationalHealth
                         (int) $row->scheduled_later.' more are scheduled for later.'),
                     self::metric('queue_oldest', 'Oldest waiting job', $age, $age > $limit ? 'attention' : 'ok',
                         $row->oldest_ready === null ? 'Nothing is waiting.' : 'Seconds since it became available; attention above '.$limit.' seconds.'),
-                    self::metric('queue_reserved', 'Jobs running', (int) $row->reserved, 'ok', 'Currently reserved by a worker. A worker that stopped leaves these until the retry window ends.'),
+                    self::metric('queue_reserved', 'Jobs running', (int) $row->reserved, 'ok', 'Reserved by a worker within the last '.$retryAfter.' seconds (the retry window).'),
+                    self::metric('queue_stalled', 'Jobs stalled past the retry window', (int) $row->stalled, (int) $row->stalled > 0 ? 'attention' : 'ok',
+                        'Reserved '.$retryAfter.' or more seconds ago and not finished: the worker likely stopped. The next worker to poll the queue takes these again.'),
                 ];
             }));
         }
