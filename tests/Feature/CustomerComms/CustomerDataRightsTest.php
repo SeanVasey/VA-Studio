@@ -446,8 +446,9 @@ class CustomerDataRightsTest extends TestCase
             public function requestDeletion(CustomerPrincipal $principal, User $actor): array
             {
                 $this->calls++;
-                throw new QueryException('mysql', 'insert into `customer_data_requests` ...', [],
-                    new \PDOException('SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'));
+                $deadlock = new \PDOException('SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction');
+                $deadlock->errorInfo = ['40001', 1213, 'Deadlock found when trying to get lock; try restarting transaction'];
+                throw new QueryException('mysql', 'insert into `customer_data_requests` ...', [], $deadlock);
             }
         });
         $this->postJson('/account/data-requests/deletion', ['confirm' => true])->assertStatus(503)
@@ -474,15 +475,17 @@ class CustomerDataRightsTest extends TestCase
         DB::connection()->beforeExecuting(function (string $query) use (&$thrown, &$limit): void {
             if (str_starts_with($query, 'insert into "customer_data_requests"') && $thrown < $limit) {
                 $thrown++;
-                throw new QueryException('sqlite', $query, [], new \PDOException('Deadlock found when trying to get lock; try restarting transaction'));
+                $busy = new \PDOException('SQLSTATE[HY000]: General error: 5 database is locked');
+                $busy->errorInfo = ['HY000', 5, 'database is locked'];
+                throw new QueryException('sqlite', $query, [], $busy);
             }
         });
         $principal = fn () => app(CustomerAccess::class)->principal($customer['user']->fresh());
-        // Two deadlocks, then success on the third attempt: one request, events 1..1.
+        // Two lock failures (SQLITE_BUSY), then success on the third attempt: one request, events 1..1.
         $result = app(CustomerDataRights::class)->requestDeletion($principal(), $customer['user']);
         $this->assertSame([2, false, 1], [$thrown, $result['replayed'], DB::table('customer_data_requests')->count()]);
         $this->assertSame(1, (int) DB::table('customer_data_requests')->value('last_event_sequence'));
-        // Three deadlocks exhaust the attempts and surface the original error, with nothing written.
+        // Three exhaust the attempts and surface the original error, with nothing written.
         [$thrown, $limit] = [0, 3];
         $this->expectRefusal(fn () => app(CustomerDataRights::class)->requestExport($principal(), $customer['user']), QueryException::class);
         $this->assertSame(3, $thrown);

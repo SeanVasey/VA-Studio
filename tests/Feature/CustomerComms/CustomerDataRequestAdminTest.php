@@ -96,24 +96,27 @@ class CustomerDataRequestAdminTest extends TestCase
         config(['customer-data-rights.retention' => ['policy_reference' => 'Synthetic SR-1', 'financial_records_years' => 7,
             'consent_records_years' => 3, 'correspondence_records_years' => 2, 'security_records_years' => 1]]);
         $this->actingAs($this->staff());
-        // Every attempt of the service's transaction fails at its first read of the request, as a lock-wait timeout would.
+        // Every attempt of the service's transaction fails at its first read of the request with MySQL's lock-wait timeout (1205).
         $failure = null;
         $attempts = 0;
         DB::beforeExecuting(function (string $sql, array $bindings) use (&$failure, &$attempts): void {
             if ($failure !== null && DB::transactionLevel() > 0 && str_contains($sql, 'customer_data_requests') && str_contains($sql, 'public_id')) {
                 $attempts++;
-                throw new QueryException(DB::getName(), $sql, $bindings, new PDOException($failure));
+                $driver = new PDOException($failure[2]);
+                $driver->errorInfo = $failure;
+                throw new QueryException('mysql', $sql, $bindings, $driver);
             }
         });
-        $failure = 'SQLSTATE[HY000]: General error: 1205 Lock wait timeout exceeded; try restarting transaction';
+        $failure = ['HY000', 1205, 'Lock wait timeout exceeded; try restarting transaction'];
         Livewire::test(ListCustomerDataRequests::class)->callTableAction('approveDeletion', $request)
             ->assertNotified(Notification::make()->danger()->title('Request not changed')->body('The database was busy and nothing was changed. Try again in a moment.')->persistent());
         $this->assertSame(3, $attempts, 'The service retried before giving up.');
         $this->assertSame('received', $request->fresh()->state);
         $this->assertTrue(CustomerAccount::find($customer['account']->id)->active);
 
-        // A database error that is not contention is a defect: it is not turned into a "try again" message.
-        $failure = 'SQLSTATE[23000]: Integrity constraint violation: synthetic';
+        // A database error that is not contention is a defect: it is not turned into a "try again" message, even when its text
+        // (which carries the SQL and bound values) contains a contention phrase. Only the driver code decides.
+        $failure = ['23000', 1062, "Duplicate entry 'Lock wait timeout exceeded; try restarting transaction' synthetic"];
         try {
             Livewire::test(ListCustomerDataRequests::class)->callTableAction('approveDeletion', $request);
             $this->fail('A non-contention database error was hidden.');

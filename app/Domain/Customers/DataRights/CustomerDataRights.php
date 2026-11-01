@@ -13,7 +13,6 @@ use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
-use Illuminate\Database\ConcurrencyErrorDetector;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +20,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use PDOException;
 use SensitiveParameter;
 use Throwable;
 
@@ -462,9 +462,29 @@ class CustomerDataRights
         }
     }
 
+    /**
+     * A deadlock or lock wait, judged only by the driver's own error code in the exception chain, never by message text (a
+     * query exception's message carries the SQL and its bound values, which can contain any phrase): MySQL 1213 (deadlock),
+     * 1205 (lock wait timeout) or SQLSTATE 40001; SQLite SQLITE_BUSY (5) or SQLITE_LOCKED (6).
+     */
     public static function concurrencyError(Throwable $error): bool
     {
-        return (new ConcurrencyErrorDetector)->causedByConcurrencyError($error);
+        $driver = $error instanceof QueryException ? config('database.connections.'.$error->getConnectionName().'.driver') : null;
+        for ($current = $error; $current !== null; $current = $current->getPrevious()) {
+            $info = $current instanceof QueryException || $current instanceof PDOException ? $current->errorInfo : null;
+            if (! is_array($info) || ! isset($info[1]) || ! is_int($info[1])) {
+                continue;
+            }
+            $contended = match ($driver) {
+                'sqlite' => in_array($info[1], [5, 6], true),
+                default => ($info[0] ?? null) === '40001' || in_array($info[1], [1213, 1205], true),
+            };
+            if ($contended) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static function uniqueViolation(QueryException $error): bool
