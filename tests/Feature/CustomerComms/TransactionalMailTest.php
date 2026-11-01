@@ -162,7 +162,7 @@ class TransactionalMailTest extends TestCase
         $this->assertSame(['deliveryId' => $delivery->public_id, 'state' => 'accepted', 'replayed' => true], $adapter->queueOrderReady($f['notice']['notificationId']));
         (new DeliverTransactionalMail($delivery->public_id))->handle($adapter);
         $this->assertSame('accepted', $adapter->deliver($delivery->public_id)['state']);
-        $this->artisan('vasey:transactional-mail-queue')->expectsOutput('queued=0 skipped=0')->assertSuccessful();
+        $this->artisan('vasey:transactional-mail-queue')->expectsOutput('queued=0 skipped=0 superseded=0')->assertSuccessful();
         Mail::assertSentCount(1);
         $this->assertSame(1, TransactionalMailDelivery::count());
         $this->assertSame(['notification.mail.queued', 'notification.mail.submitting', 'notification.mail.accepted'],
@@ -217,7 +217,7 @@ class TransactionalMailTest extends TestCase
         $this->runQueuedMail();
         $this->assertSame(['deliveryId' => $delivery, 'state' => 'uncertain', 'reason' => 'transport_uncertain'], $adapter->status($delivery));
         $adapter->deliver($delivery);
-        $this->artisan('vasey:transactional-mail-queue')->expectsOutput('queued=0 skipped=0')->assertSuccessful();
+        $this->artisan('vasey:transactional-mail-queue')->expectsOutput('queued=0 skipped=0 superseded=0')->assertSuccessful();
         $this->assertSame(1, Mail::getFacadeRoot()->attempts);
         $this->assertNotEmpty($this->logs);
         $this->assertNoPersonalData($f['user']->email);
@@ -228,14 +228,143 @@ class TransactionalMailTest extends TestCase
         Mail::fake();
         $intents = [N::ready(suffix: 'A'), N::ready(suffix: 'B'), N::ready(suffix: 'C')];
         M::configure();
-        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=2 skipped=0')->assertSuccessful();
-        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=1 skipped=0')->assertSuccessful();
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=2 skipped=0 superseded=0')->assertSuccessful();
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=1 skipped=0 superseded=0')->assertSuccessful();
         $this->artisan('vasey:transactional-mail-queue', ['--limit' => 101])->assertExitCode(2);
         $this->assertSame(3, $this->runQueuedMail());
         Mail::assertSentCount(3);
         foreach ($intents as $intent) {
             Mail::assertSent(OrderReadyMail::class, fn (OrderReadyMail $mail): bool => $mail->hasTo($intent['user']->email));
         }
+    }
+
+    public function test_refused_intents_ahead_of_a_valid_one_never_hold_the_batch_and_only_superseded_access_leaves_the_pending_set(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        $withdrawn = [N::ready(suffix: 'W1'), N::ready(suffix: 'W2')];
+        $changed = [N::ready(suffix: 'E1'), N::ready(suffix: 'E2')];
+        $valid = N::ready(suffix: 'OK');
+        M::configure();
+        // Oldest first: two intents whose customer access was withdrawn (the account's access version moved on, so they can never
+        // verify again), then two whose recipient changed (refused today, but reversible), then one valid intent.
+        foreach ($withdrawn as $f) {
+            DB::transaction(function () use ($f): void {
+                $account = CustomerAccount::whereKey($f['account']->id)->lockForUpdate()->sole();
+                $account->update(['active' => false, 'access_version' => $account->access_version + 1]);
+            });
+        }
+        $emails = array_map(fn (array $f): string => $f['user']->email, $changed);
+        foreach ($changed as $i => $f) {
+            $f['user']->forceFill(['email' => 'changed-'.$i.'@example.invalid'])->save();
+        }
+        $deliveryFor = fn (array $f): bool => TransactionalMailDelivery::where('notice_public_id', $f['notice']['notificationId'])->exists();
+
+        // Before the fix the batch held the four refused intents forever and the valid one was never queued.
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=1 skipped=2 reasons=unavailable=2 superseded=2')->assertSuccessful();
+        $this->assertSame([false, false, false, false, true], array_map($deliveryFor, [...$withdrawn, ...$changed, $valid]));
+        // Refused intents record nothing and stay pending; superseded ones are counted, never retried and never written.
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=0 skipped=2 reasons=unavailable=2 superseded=2')->assertSuccessful();
+        $this->assertSame(1, TransactionalMailDelivery::count());
+
+        // A transient refusal (the intent policy switched off) leaves every pending intent pending, with nothing recorded.
+        $changed[0]['user']->forceFill(['email' => $emails[0]])->save();
+        config(['transactional-notifications.test_enabled' => false]);
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=0 skipped=2 reasons=unavailable=2 superseded=2')->assertSuccessful();
+        $this->assertSame(1, TransactionalMailDelivery::count());
+        // Once the policy is back and the recipient restored, the refused intent is queued after all.
+        config(['transactional-notifications.test_enabled' => true]);
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])->expectsOutput('queued=1 skipped=1 reasons=unavailable=1 superseded=2')->assertSuccessful();
+        $this->assertSame([true, false], array_map($deliveryFor, $changed));
+        $this->assertSame(2, $this->runQueuedMail());
+        Mail::assertSentCount(2);
+    }
+
+    public function test_a_customer_or_purchase_refusal_on_an_older_intent_is_skipped_and_never_stops_the_batch(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        $unverified = N::ready(suffix: 'UNVERIFIED');
+        $broken = N::ready(suffix: 'BROKEN');
+        $valid = N::ready(suffix: 'VALID');
+        M::configure();
+        // The oldest customer's email is no longer verified: CustomerAccess refuses with its own exception, and the account row
+        // (so its access version) is untouched, so the intent is not superseded. Before the fix every run threw here.
+        $unverified['user']->forceFill(['email_verified_at' => null])->save();
+        // The next intent hits an unexpected database error on its first read; it is skipped too, with only its class logged.
+        $poisoned = $broken['notice']['notificationId'];
+        DB::beforeExecuting(function (string $sql, array $bindings) use ($poisoned): void {
+            if (str_contains($sql, 'transactional_notices') && in_array($poisoned, $bindings, true)) {
+                throw new QueryException(DB::getName(), $sql, $bindings, new RuntimeException('Synthetic database failure'));
+            }
+        });
+        $deliveryFor = fn (array $f): bool => TransactionalMailDelivery::where('notice_public_id', $f['notice']['notificationId'])->exists();
+
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])
+            ->expectsOutput('queued=1 skipped=2 reasons=authority_withdrawn=1,error=1 superseded=0')->assertSuccessful();
+        $this->assertSame([false, false, true], array_map($deliveryFor, [$unverified, $broken, $valid]));
+        $this->assertTrue(collect($this->logs)->contains(fn (string $line): bool => str_contains($line, 'Order-ready intent could not be queued.')
+            && str_contains($line, trim(json_encode(QueryException::class), '"'))));
+        $this->assertNoPersonalData($unverified['user']->email);
+    }
+
+    public function test_a_customer_refusal_after_the_claim_fails_the_delivery_instead_of_leaving_it_submitting(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        $f = N::ready(suffix: 'DELIVER');
+        M::configure();
+        $adapter = app(TransactionalMailAdapter::class);
+        $id = $adapter->queueOrderReady($f['notice']['notificationId'])['deliveryId'];
+        // Access is lost between queueing and delivery without an access-version change.
+        $f['user']->forceFill(['email_verified_at' => null])->save();
+        $this->assertSame(['deliveryId' => $id, 'state' => 'failed', 'reason' => 'authority_withdrawn'], $adapter->deliver($id));
+        Mail::assertNothingOutgoing();
+        $this->artisan('vasey:transactional-mail-stuck', ['--minutes' => 1])->expectsOutput('stuck=0 minutes=1')->assertSuccessful();
+        $this->assertSame(['notification.mail.queued', 'notification.mail.submitting', 'notification.mail.failed'],
+            AuditEvent::where('action', 'like', 'notification.mail.%')->orderBy('id')->pluck('action')->all());
+    }
+
+    public function test_the_stuck_listing_reports_only_deliveries_in_submitting_past_the_threshold_and_writes_nothing(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        $intents = [N::ready(suffix: 'S1'), N::ready(suffix: 'S2'), N::ready(suffix: 'S3')];
+        M::configure();
+        $adapter = app(TransactionalMailAdapter::class);
+        $ids = array_map(fn (array $f): string => $adapter->queueOrderReady($f['notice']['notificationId'])['deliveryId'], $intents);
+        $this->artisan('vasey:transactional-mail-stuck')->expectsOutput('stuck=0 minutes=15')->assertSuccessful();
+        // A worker claimed two deliveries (queued -> submitting, the only forward step the guard allows here) and stopped.
+        $now = now()->utc()->startOfSecond();
+        $claim = fn (string $id, $at) => DB::table('transactional_mail_deliveries')->where('public_id', $id)->update(['state' => 'submitting', 'version' => 1, 'started_at' => $at]);
+        $claim($ids[0], $now->copy()->subMinutes(40));
+        $claim($ids[1], $now->copy()->subMinutes(5));
+        // A third was claimed an hour ago and finished: no longer submitting, so never listed however old its claim.
+        $claim($ids[2], $now->copy()->subHour());
+        DB::table('transactional_mail_deliveries')->where('public_id', $ids[2])->update(['state' => 'accepted', 'version' => 2,
+            'message_hash' => str_repeat('a', 64), 'finished_at' => $now->copy()->subMinutes(59)]);
+        $before = [DB::table('transactional_mail_deliveries')->orderBy('id')->get()->toJson(), AuditEvent::count()];
+        $notice = fn (int $i): string => TransactionalMailDelivery::where('public_id', $ids[$i])->value('notice_public_id');
+        $line = fn (int $i, $at): string => 'delivery='.$ids[$i].' notice='.$notice($i).' started_at='.$at->format('Y-m-d H:i:s').' UTC';
+
+        $this->artisan('vasey:transactional-mail-stuck')->expectsOutput('stuck=1 minutes=15')->expectsOutput($line(0, $now->copy()->subMinutes(40)))
+            ->doesntExpectOutput($line(1, $now->copy()->subMinutes(5)))->assertSuccessful();
+        $this->artisan('vasey:transactional-mail-stuck', ['--minutes' => 2])->expectsOutput('stuck=2 minutes=2')
+            ->expectsOutput($line(0, $now->copy()->subMinutes(40)))->expectsOutput($line(1, $now->copy()->subMinutes(5)))
+            ->doesntExpectOutput($line(2, $now->copy()->subHour()))->assertSuccessful();
+        // The listing is capped (at most 100 rows, fewer with --max); the count and a more= line still cover every stuck delivery.
+        $this->artisan('vasey:transactional-mail-stuck', ['--minutes' => 2, '--max' => 1])->expectsOutput('stuck=2 minutes=2')
+            ->expectsOutput($line(0, $now->copy()->subMinutes(40)))->doesntExpectOutput($line(1, $now->copy()->subMinutes(5)))
+            ->expectsOutput('more=1')->assertSuccessful();
+        $this->artisan('vasey:transactional-mail-stuck', ['--minutes' => 2, '--max' => 100])->doesntExpectOutput('more=0')->assertSuccessful();
+        foreach (['0', '10081', 'x'] as $invalid) {
+            $this->artisan('vasey:transactional-mail-stuck', ['--minutes' => $invalid])->assertExitCode(2);
+        }
+        foreach (['0', '101', 'x'] as $invalid) {
+            $this->artisan('vasey:transactional-mail-stuck', ['--max' => $invalid])->assertExitCode(2);
+        }
+        $this->assertSame($before, [DB::table('transactional_mail_deliveries')->orderBy('id')->get()->toJson(), AuditEvent::count()], 'The listing is read-only.');
+        Mail::assertNothingOutgoing();
     }
 
     public function test_database_guards_allow_one_forward_path_per_intent(): void

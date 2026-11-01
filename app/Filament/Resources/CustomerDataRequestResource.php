@@ -15,6 +15,8 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use UnitEnum;
 
@@ -104,6 +106,15 @@ final class CustomerDataRequestResource extends ReadOnlyCommerceResource
             $action->cancel();
         } catch (ValidationException $error) {
             Notification::make()->danger()->title('Request not changed')->body(implode(' ', array_merge(...array_values($error->errors()))))->persistent()->send();
+            $action->cancel();
+        } catch (QueryException $error) {
+            // Contention that outlived the service's retries rolled the whole transaction back, so nothing changed and a retry is
+            // safe. Any other database error is a defect and keeps the framework's error handling and report.
+            if (! CustomerDataRights::concurrencyError($error)) {
+                throw $error;
+            }
+            Log::warning('Customer data request action hit lasting database contention.', ['exception_class' => $error::class]);
+            Notification::make()->danger()->title('Request not changed')->body('The database was busy and nothing was changed. Try again in a moment.')->persistent()->send();
             $action->cancel();
         } finally {
             $livewire->expectedRequestVersion = null;
