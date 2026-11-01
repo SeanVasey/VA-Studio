@@ -3,6 +3,7 @@
 use App\Http\AccountFeatures\AccountFeatureHttpKernel;
 use App\Http\AccountFeatures\AccountFeaturePrivacy;
 use App\Http\Middleware\CustomerPrivacy;
+use App\Http\Middleware\ExplicitTrustProxies;
 use App\Http\Middleware\FreeGrantPrivacy;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InquiryPrivacy;
@@ -10,6 +11,7 @@ use App\Http\Middleware\LegacyRedirects;
 use App\Http\Middleware\PaidGrantPrivacy;
 use App\Http\Middleware\PaidTaxPrivacy;
 use App\Http\Middleware\PrivateTrackReviewPrivacy;
+use App\Http\Middleware\ProductionCheckoutPrivacy;
 use App\Http\Middleware\ProductionIdentity\IdentityPrivacy;
 use App\Http\Middleware\ResumableUploadPrivacy;
 use App\Http\Middleware\ServiceProjectPrivacy;
@@ -22,6 +24,7 @@ use App\Http\Middleware\TestExceptionResolutionPrivacy;
 use App\Http\Membership\MembershipPrivacy;
 use App\Http\ProductionFree\ProductionFreePrivacy;
 use App\Http\Responses\InquiryResponse;
+use App\Http\Responses\ProductionCheckoutResponse;
 use App\Http\Responses\PublicTrackEmbedResponse;
 use App\Http\Responses\SupportAttachmentResponse;
 use App\Http\Responses\TestDeliveryResponse;
@@ -31,6 +34,7 @@ use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -66,6 +70,10 @@ $application = Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(AccountFeaturePrivacy::class);
         $middleware->prepend(ProductionFreePrivacy::class);
         $middleware->prepend(MembershipPrivacy::class);
+        $middleware->prepend(ProductionCheckoutPrivacy::class); // lane PCC: unmounted is the private 404 before any session or SQL
+        // Explicit, non-permissive proxy trust (PCC), outermost so every seam above sees the same client address and scheme.
+        $middleware->remove(TrustProxies::class);
+        $middleware->prepend(ExplicitTrustProxies::class);
         $middleware->append(LegacyRedirects::class); // FP-100, default-off: config/legacy-redirects.php
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);
@@ -73,9 +81,18 @@ $application = Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'proof', 'requestKey', 'token', 'nonce', 'declarations', 'name', 'body', 'trackIds', 'noticeVersion', 'noticeHash', 'affirmative']);
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => MembershipPrivacy::matches($request) || ProductionFreePrivacy::matches($request) || AccountFeaturePrivacy::matches($request) || TaxRootPrivacy::matches($request) || ((CustomerPrivacy::matches($request) || ServiceProjectPrivacy::matches($request)) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
+            fn (Request $request) => ProductionCheckoutResponse::matches($request) || MembershipPrivacy::matches($request) || ProductionFreePrivacy::matches($request) || AccountFeaturePrivacy::matches($request) || TaxRootPrivacy::matches($request) || ((CustomerPrivacy::matches($request) || ServiceProjectPrivacy::matches($request)) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
         );
         $exceptions->report(function (Throwable $exception) {
+            if (ProductionCheckoutResponse::matches(request())) {
+                try {
+                    // Never exception text, SQL bindings, provider bodies or identity proofs.
+                    Log::error('Production checkout request failed.', ['exception_class' => $exception::class]);
+                } catch (Throwable) { /* Preserve the private response. */
+                }
+
+                return false;
+            }
             if (MembershipPrivacy::matches(request())) {
                 MembershipPrivacy::report($exception);
 
@@ -212,6 +229,11 @@ $application = Application::configure(basePath: dirname(__DIR__))
         // Middleware failures occur before the controller. Keep those private and
         // generic too, including in debug mode, without changing other routes.
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
+            if (ProductionCheckoutResponse::matches($request)) {
+                $status = $exception instanceof LockTimeoutException ? 503 : ($exception instanceof ValidationException ? 422 : $response->getStatusCode());
+
+                return $status >= 400 ? ProductionCheckoutResponse::error($status) : ProductionCheckoutResponse::protect($response);
+            }
             if (MembershipPrivacy::matches($request)) {
                 $status = $exception instanceof LockTimeoutException ? 503 : ($exception instanceof ValidationException ? 422 : $response->getStatusCode());
 

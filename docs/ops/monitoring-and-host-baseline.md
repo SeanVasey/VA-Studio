@@ -102,7 +102,9 @@ A CDN or reverse proxy in front of the store must not carry the paid-delivery or
 - **What "bypass" means in practice.** Cloudflare proxies per hostname, not per path. Either leave the store hostname unproxied
   (DNS only) until a reviewed change exists, or serve paid delivery and operator uploads from a separate unproxied hostname. The
   second needs an application change (routes, cookies and `APP_URL` assume one origin), so it is a reviewed change, not a setting.
-- **`trustProxies` is not configured in the application.** Behind any proxy, Laravel would see the proxy's address and scheme:
+- **`trustProxies` is explicit and trusts nothing by default (lane PCC).** `App\Http\Middleware\ExplicitTrustProxies` honours only
+  the reviewed `TRUSTED_PROXIES` list (no wildcard, never the framework's `.on-forge.com` catch-all, only `X-Forwarded-For`,
+  `-Proto` and `-Port`). The rest of this note still applies to adding a CDN. Before that change, behind any proxy, Laravel would see the proxy's address and scheme:
   rate limits would key on the proxy, `HTTPS` detection and secure-cookie behaviour depend on forwarded headers, and the access
   log would name the proxy. Configuring it is **a required, reviewed application change, and it is not implemented here**: a
   reviewed list of proxy addresses (never "trust all"), the forwarded headers to honour, and tests that a client outside the list

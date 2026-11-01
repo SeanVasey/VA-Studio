@@ -134,10 +134,78 @@ class ProductionRuntimeValidator(unittest.TestCase):
             with self.subTest(identifier=identifier):
                 self.failed(self.validate(profile(**override)), "preflight.result", identifier)
 
-    def test_mail_and_stripe_mode_are_inherited_from_the_preflight_today(self):
-        # The kit itself forces neither; the reviewed production profile still does. Relaxing them is a preflight change.
-        self.failed(self.validate(profile(MAIL_MAILER="smtp")), "preflight.baseline_mail_mailer")
-        self.failed(self.validate(profile(STRIPE_MODE="live")), "preflight.baseline_stripe_mode")
+    def test_mail_and_stripe_mode_are_inherited_from_the_preflight_without_the_admission_flags(self):
+        # The defaults are unchanged: without an exact `true` flag the preflight still requires `log` and `test`.
+        for flags in ({}, {"VASEY_PRODUCTION_REAL_MAIL_ADMITTED": "false", "VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED": "false"}):
+            with self.subTest(flags=flags):
+                self.assertEqual(self.validate(profile(**flags)).returncode, 0)
+                self.failed(self.validate(profile(MAIL_MAILER="smtp", **flags)), "preflight.baseline_mail_mailer")
+                self.failed(self.validate(profile(STRIPE_MODE="live", **flags)), "preflight.baseline_stripe_mode")
+
+    # ---- admissions (lane PCC) ----
+
+    REAL_MAIL = {"VASEY_PRODUCTION_REAL_MAIL_ADMITTED": "true", "MAIL_MAILER": "smtp", "MAIL_SCHEME": "smtps",
+                 "MAIL_HOST": "smtp.synthetic-mail-provider.com", "MAIL_PORT": "465", "MAIL_USERNAME": "synthetic-user",
+                 "MAIL_PASSWORD": SENTINEL, "MAIL_FROM_ADDRESS": "support@vasey.audio"}
+    LIVE = {"VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED": "true", "STRIPE_MODE": "live"}
+    LIVE_KEY = "sk_" + "live_SYNTHETICONLY1234"
+
+    def test_the_real_mail_flag_admits_an_implicit_tls_transport_and_nothing_else(self):
+        run = self.validate(profile(**self.REAL_MAIL))
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.failed(self.validate(profile(**{**self.REAL_MAIL, "MAIL_SCHEME": "smtp"})), "preflight.production_mail_implicit_tls")
+        self.failed(self.validate(profile(**{**self.REAL_MAIL, "STRIPE_MODE": "live"})), "preflight.baseline_stripe_mode")
+        self.failed(self.validate(profile(**self.REAL_MAIL) + f"PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY={self.LIVE_KEY}\n"),
+                    "holds.no_live_provider_credential")
+
+    def test_the_live_flag_admits_a_live_secret_key_in_its_one_place_only(self):
+        self.assertEqual(self.validate(profile(**self.LIVE)).returncode, 0)
+        run = self.validate(profile(**self.LIVE) + f"PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY={self.LIVE_KEY}\nPRODUCTION_CHECKOUT_FUNDS_MODE=live\n")
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertNotIn(self.LIVE_KEY, run.stdout + run.stderr)
+        for extra, identifier in (
+            (f"MEMBERSHIP_BILLING_STRIPE_SECRET_KEY={self.LIVE_KEY}\n", "holds.no_live_provider_credential"),
+            ("PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY=rk_" + "live_SYNTHETICONLY1234\n", "holds.no_live_provider_credential"),
+            ("PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY=pk_" + "live_SYNTHETICONLY1234\n", "holds.no_live_provider_credential"),
+            (f"PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY={self.LIVE_KEY}!\n", "holds.no_live_provider_credential"),
+            ("PRODUCTION_CHECKOUT_FUNDS_MODE=test\n", "holds.production_credentials"),
+            ("PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY=sk_" + "test_SYNTHETICONLY1234\n", "holds.production_credentials"),
+        ):
+            with self.subTest(identifier=identifier, extra=extra.split("=")[0]):
+                self.failed(self.validate(profile(**self.LIVE) + extra), identifier)
+        self.failed(self.validate(profile(**{**self.LIVE, "MAIL_PASSWORD": self.LIVE_KEY})), "holds.no_live_provider_credential")
+
+    def test_live_admission_never_lifts_a_production_checkout_switch_or_a_pre_launch_hold(self):
+        base = profile(**self.LIVE) + f"PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY={self.LIVE_KEY}\nPRODUCTION_CHECKOUT_FUNDS_MODE=live\n"
+        for switch in ("PRODUCTION_CHECKOUT_ENABLED", "PRODUCTION_CHECKOUT_HTTP_ENABLED", "PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED",
+                       "PRODUCTION_CHECKOUT_RECONCILIATION_ENABLED"):
+            with self.subTest(switch=switch):
+                self.failed(self.validate(base + f"{switch}=true\n"), "holds." + switch.lower())
+        for key in PRE_LAUNCH_HOLDS:
+            with self.subTest(key=key):
+                self.failed(self.validate(base + f"{key}=true\n"), "holds." + key.lower())
+
+    def test_identity_smtp_values_need_the_real_mail_flag_and_settings_need_it_too(self):
+        self.failed(self.validate(profile(PRODUCTION_IDENTITY_SMTP_PASSWORD=SENTINEL)), "preflight.inactive_production_identity_smtp_password")
+        self.assertEqual(self.validate(profile(**self.REAL_MAIL, PRODUCTION_IDENTITY_SMTP_PASSWORD=SENTINEL)).returncode, 0)
+        # Composed settings exist only once the code literal is flipped; the hold then still needs the real mail flag.
+        self.assertIn("$check('holds.production_identity_smtp', $realMail || config('production-identity-smtp.settings') === null);",
+                      VALIDATOR.read_text())
+
+    def test_a_malformed_flag_admits_nothing(self):
+        for value in ("TRUE", "1", "yes", "", "(true)"):
+            with self.subTest(value=value):
+                run = self.validate(profile(**{**self.LIVE, "VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED": value})
+                                    + f"PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY={self.LIVE_KEY}\n")
+                self.failed(run, "holds.no_live_provider_credential")
+                run = self.validate(profile(**{**self.LIVE, "VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED": value}))
+                self.failed(run, "preflight.production_admission_boolean_vasey_production_live_stripe_admitted", "preflight.baseline_stripe_mode")
+
+    def test_the_effective_admissions_must_match_the_file(self):
+        # `${PATH}` resolves to the file's own PATH in the file checks (PATH must come first) but to the process PATH in the real
+        # bootstrap, so only the configuration checks see the difference.
+        run = self.validate(profile(**{"PATH": "true", **self.LIVE, "VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED": "${PATH}"}))
+        self.assertEqual(run.stderr.split(), ["FAIL", "runtime.production_admissions"], run.stderr)
 
     def test_file_custody_is_the_preflights(self):
         self.failed(self.validate(profile(), mode=0o644), "preflight.input_permissions")
@@ -152,6 +220,15 @@ class ProductionRuntimeValidator(unittest.TestCase):
         self.failed(self.validate(profile(DB_HOST="db.synthetic.invalid")), "runtime.database")
         self.failed(self.validate(profile(DB_USERNAME="somebody_else")), "runtime.database")
         self.failed(self.validate(profile(DB_SOCKET="/var/run/mysqld/mysqld.sock")), "runtime.database")
+
+    def test_proxy_trust_is_an_explicit_bounded_list_or_none(self):
+        for value in ("", "10.0.0.5", "173.245.48.0/20,2400:cb00::/32"):
+            with self.subTest(value=value):
+                self.assertEqual(self.validate(profile(TRUSTED_PROXIES=value)).returncode, 0)
+        for value in ("*", "**", "REMOTE_ADDR", "0.0.0.0/0", "10.0.0.5,*", "proxy.synthetic.invalid"):
+            with self.subTest(value=value):
+                run = self.validate(profile(TRUSTED_PROXIES=f"'{value}'"))
+                self.assertEqual(run.stderr.split(), ["FAIL", "runtime.trusted_proxies"], run.stderr)
 
     def test_the_php_cli_binary_is_probed(self):
         run = self.validate(profile(VASEY_PHP_CLI_BINARY="/nonexistent/php"))
@@ -175,6 +252,16 @@ class ProductionRuntimeValidator(unittest.TestCase):
                 run = self.validate(profile() + assignment + "\n")
                 self.assertEqual(run.returncode, 1, run.stderr)
                 self.assertTrue(any(line.startswith("FAIL holds.production_checkout") or line.startswith("FAIL holds.") for line in run.stderr.splitlines()), run.stderr)
+
+    def test_the_operator_reconciliation_switch_and_the_composition_literal_are_held(self):
+        # Lane PCC: the operator command's switch is held like every other checkout switch, and the code-literal mount is held in
+        # the effective configuration, so lifting either is a reviewed change to this file.
+        self.failed(self.validate(profile() + "PRODUCTION_CHECKOUT_OPERATOR_RECONCILIATION_ENABLED=true\n"),
+                    "holds.production_checkout_operator_reconciliation_enabled")
+        self.assertEqual(self.validate(profile() + "PRODUCTION_CHECKOUT_OPERATOR_RECONCILIATION_ENABLED=false\n").returncode, 0)
+        text = VALIDATOR.read_text()
+        self.assertIn("'committed_read_receipts_enabled', 'operator_reconciliation_enabled'] as $flag", text)
+        self.assertIn("$check('holds.production_checkout_mounted', config('production_checkout.mounted') === false);", text)
 
     def test_the_documented_off_values_are_accepted_and_a_blank_assignment_is_not(self):
         for value in ("false", "(false)"):

@@ -27,13 +27,34 @@ lands, the stage that depends on it stays blocked whatever the environment conta
 | A2: Paid252 consumer and whole-order delivery | S3 | `docs/handoff/2026-10-07/owners/paid-delivery-native-operations.md` |
 | A3: Tax255 (`automatic_tax`, SourceV2, V2 consumer) | S3 unless every order qualifies for declared exemption; that alternative itself needs the exemption-authoring step in §6 (a reviewed owner allowlist commit plus `PRODUCTION_CHECKOUT_EXEMPTION_AUTHORING_ENABLED`), because every new order's review requires a `basis_public_id` | CLAUDE-PLAN §3 A3; `HostedCheckout::prepare()`, `TaxExemptions::basis()` |
 | No live webhook receiver. `VerifyStripeWebhook` refuses production environments and any mode other than test; production checkout reconciles only by authoritative retrieval | S3 webhook drills | `app/Domain/Commerce/Payments/VerifyStripeWebhook.php`; `vasey:stripe-preflight` check `production_webhook_receiver` |
-| Production checkout isn't registered: `ProductionCheckoutServiceProvider` isn't in `bootstrap/providers.php` and `routes/production-checkout.php` isn't mounted, so the env flags have no HTTP effect yet | S2b production-checkout test funds (not the test checkout chain), S3 | root composition step |
+| **Code composed, default-off (lane PCC).** `ProductionCheckoutServiceProvider` is registered by `AppServiceProvider` and `routes/production-checkout.php` is required by `routes/web.php` only when `ProductionCheckoutMount` admits: the code literal `production_checkout.mounted` (shipped `false`) and an environment of `local`, `testing` or `production` (staging never mounts). `ProductionCheckoutPrivacy` is prepended globally and answers an unmounted or withdrawn route with the private 404 before any SQL. Still blocking: the literal is false and `ops/production/validate-runtime.php` holds it (`holds.production_checkout_mounted`), so mounting is a reviewed change to both, with Sean's authorization | S2b production-checkout test funds (not the test checkout chain), S3 | `app/Http/ProductionCheckout/ProductionCheckoutMount.php`; `docs/verification/production-checkout-pcc-20261029/` |
 | `ExecutionContextV1` refuses `funds_mode=test` outside `local`/`testing`. The test checkout/processing policies no longer refuse a staging host: since PR #68 at `d8aba146` they admit `APP_ENV=staging` through `App\Support\Environment\TestEnvironment`, which requires staff MFA and refuses live mode (corrected 2026-10-10; `docs/private-server-readiness.md`, "First sale and cutover remain separate gates") | Production-checkout test funds on a staging host (S2b) | `ExecutionContextV1::make`; `TestEnvironment::admitsTestCommerce` in `CheckoutPolicy`, `PaymentProcessingPolicy` |
-| There is no operator command for production reconciliation (only `HostedCheckout::reconcile` behind HTTP) | S2b production-checkout test funds (not the test checkout chain), S3 recovery drills | `app/Domain/Commerce/ProductionCheckout/HostedCheckout.php` |
-| A5: refunds and disputes (T21) | S3 refunds | CLAUDE-PLAN §3 A5 |
+| **Closed in code (lane PCC):** `vasey:production-checkout-reconcile {order} [--session=]` retrieves and retains one order's provider state through the reconcile route's persistence (retrieval only, idempotent, buyer-independent). It refuses unless the mount admits and `PRODUCTION_CHECKOUT_OPERATOR_RECONCILIATION_ENABLED`, `..._RECONCILIATION_ENABLED` and `..._PROVIDER_IO_ENABLED` are true, all held false in production by the validator. No sweep mode yet | S2b production-checkout test funds (not the test checkout chain), S3 recovery drills | `app/Console/Commands/ReconcileProductionCheckout.php`, `HostedCheckout::operatorReconcile` |
+| A5: refunds and disputes (T21). The A5 mechanism exists for the test chain only; production checkout's `FinancialReadPlan` output is **not** wired into its ledger (lane PCC pushed it back: the ledger keys rows by test-chain `orders.id` and acts on test-chain grants, and `FinancialReadPlan` is pinned to Stripe test mode; it needs a schema decision and a production read path) | S3 refunds | CLAUDE-PLAN §3 A5; `docs/verification/production-checkout-pcc-20261029/` |
+| Exclusive inventory in production checkout. The chain sells non-exclusive v1 only and refuses exclusive or scoped inventory in every case; since lane PCC it consults `ExclusivityAuthority::storeMaySellExclusives()` first (`exclusivity_authority` while the store is not the single authority). Selling exclusives in production needs a production exclusive consumer and U-08 | Exclusive live sales | `app/Domain/Commerce/ProductionCheckout/ExclusiveInventoryGate.php` |
 | Production entitlements, delivery, identity, contracts and refunds are still test-only | S3 | `vasey:commerce-readiness` `implementation` checks (all `blocked`) |
 | Memberships C2–C5 and Billing259 | Membership sales | CLAUDE-PLAN §3 Phase C |
 | F3: one manual Foundation CI on the final integrated `expected_sha` | S3 | AGENTS.md CI cost policy |
+
+### Production admissions and proxy trust (lane PCC, PCC-a)
+
+These are configuration switches inside reviewed code; none of them activates commerce.
+
+- **Real mail.** The preflight production profile requires `MAIL_MAILER=log` unless the candidate file sets
+  `VASEY_PRODUCTION_REAL_MAIL_ADMITTED=true`; it then requires `MAIL_MAILER=smtp`, `MAIL_SCHEME=smtps` on port 465, a provider
+  host, credentials and a sender address (shapes only), and admits the `PRODUCTION_IDENTITY_SMTP_*` values, which otherwise must
+  stay blank. Production identity SMTP still composes nothing until the `$enabled` literal in `config/production-identity-smtp.php`
+  is flipped in a reviewed change; the validator refuses composed settings without the flag (`holds.production_identity_smtp`).
+- **Stripe live mode.** `STRIPE_MODE=test` is required unless `VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED=true`, which requires
+  `STRIPE_MODE=live`. The validator then admits an `sk_live_` value only as `PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY` and funds
+  mode only blank or `live`; restricted and publishable live keys stay refused everywhere. Every `PRODUCTION_CHECKOUT_*_ENABLED`
+  switch stays held false, so admitting live credentials is not activating checkout.
+- Either flag accepts only `true` or `false` (or unset); any other value blocks. Staging refuses both (preflight, the capability
+  boundary and the staging deploy gate), and `config/production-runtime.php` must agree with the file
+  (`runtime.production_admissions`).
+- **`trustProxies` is configured.** `App\Http\Middleware\ExplicitTrustProxies` replaces the framework middleware: it trusts only the
+  reviewed `TRUSTED_PROXIES` list (blank, so none, by default), never a wildcard or the framework's `.on-forge.com` catch-all, and
+  honours only `X-Forwarded-For`, `-Proto` and `-Port`. The validator refuses a permissive or malformed list (`runtime.trusted_proxies`).
 
 ### Pre-launch capability hold (approved by Sean, 2026-10-18)
 
@@ -79,7 +100,7 @@ of them has a value here.
 | Legal pages (privacy, terms) | S3 | `docs/legal/` (open adoption gap) |
 | Production host, region, topology, backups, incident owner (U-02) and storage choice (U-03) | S1 | `ops/private-server/env.example` inputs; this packet's S1 commands |
 | Storefront origin and DNS plan | S1 staging subdomain, S3 cutover | `APP_URL`, `PRODUCTION_CHECKOUT_RETURN_ORIGIN`; cutover runbook DNS section |
-| Sender domain, DNS (SPF/DKIM/DMARC) and SMTP provider | Customer identity and notices | `config/production-identity-smtp.php` `settings` (a code change), `MAIL_*` |
+| Sender domain, DNS (SPF/DKIM/DMARC) and SMTP provider | Customer identity and notices | `PRODUCTION_IDENTITY_SMTP_*` and `MAIL_*` (host secret store), `VASEY_PRODUCTION_REAL_MAIL_ADMITTED=true`, and flipping the `$enabled` literal in `config/production-identity-smtp.php` (a reviewed code change) |
 | BeatStars exports | Migration (D2) | Content onboarding packet |
 | Review lifetime (30–3600 s) | S2b production-checkout test funds, S3 | `PRODUCTION_CHECKOUT_REVIEW_LIFETIME_SECONDS` |
 

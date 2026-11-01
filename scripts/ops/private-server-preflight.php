@@ -13,7 +13,9 @@ set_error_handler(static function (int $severity): never {
 $checks = [];
 $mode = 'configuration';
 $runtime = false;
-// production (the default) demands every test path off; staging admits only the Stripe-test commerce chain.
+// production (the default) demands every test path off, `log` mail and Stripe test mode unless the file sets
+// VASEY_PRODUCTION_REAL_MAIL_ADMITTED or VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED to exactly `true`; staging admits only the
+// Stripe-test commerce chain and neither admission.
 $profile = 'production';
 $root = dirname(__DIR__, 2);
 $record = static function (string $id, bool $ok) use (&$checks): void {
@@ -140,6 +142,23 @@ try {
     $value = static fn (string $key): string => (string) ($env[$key] ?? '');
     $is = static fn (string $key, string $expected): bool => array_key_exists($key, $env) && $value($key) === $expected;
 
+    // Production admissions (PCC): a real mail transport and Stripe live mode are admitted only when this file sets the
+    // matching flag to exactly `true`. Unset or `false` keeps the reviewed defaults (`log`, `test`); any other value, a blank
+    // included, blocks. Staging admits neither: each flag must be unset or `false` there. Shapes only, never values.
+    $admissionFlags = ['VASEY_PRODUCTION_REAL_MAIL_ADMITTED', 'VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED'];
+    $admitted = array_fill_keys($admissionFlags, false);
+    foreach ($admissionFlags as $key) {
+        $explicit = ! array_key_exists($key, $env) || $is($key, 'true') || $is($key, 'false');
+        if ($profile === 'production') {
+            $record('production_admission_boolean_'.strtolower($key), $explicit);
+            $admitted[$key] = $explicit && $is($key, 'true');
+        } else {
+            $record('staging_no_'.strtolower($key), ! array_key_exists($key, $env) || $is($key, 'false'));
+        }
+    }
+    $realMail = $admitted['VASEY_PRODUCTION_REAL_MAIL_ADMITTED'];
+    $liveStripe = $admitted['VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED'];
+
     // Test-commerce switches: forced off in production; in staging each must still be an explicit boolean.
     $testSwitches = ['STRIPE_WEBHOOK_ENABLED', 'STRIPE_TEST_CHECKOUT_ENABLED', 'STRIPE_TEST_PAYMENT_PROCESSING_ENABLED',
         'STRIPE_TEST_FINALIZATION_ENABLED', 'VASEY_TEST_CONTRACT_ISSUANCE_ENABLED',
@@ -149,9 +168,22 @@ try {
         'SESSION_DRIVER' => 'database', 'SESSION_ENCRYPT' => 'true', 'SESSION_DOMAIN' => 'null',
         'SESSION_SECURE_COOKIE' => 'true', 'SESSION_HTTP_ONLY' => 'true', 'SESSION_SAME_SITE' => 'lax',
         'CACHE_STORE' => 'database', 'QUEUE_CONNECTION' => 'database', 'FILESYSTEM_DISK' => 'local',
-        'LOG_CHANNEL' => 'stderr', 'LOG_LEVEL' => 'info', 'MAIL_MAILER' => 'log', 'STRIPE_MODE' => 'test',
-        'CONTACT_INQUIRIES_ENABLED' => 'false',
+        'LOG_CHANNEL' => 'stderr', 'LOG_LEVEL' => 'info', 'MAIL_MAILER' => $realMail ? 'smtp' : 'log',
+        'STRIPE_MODE' => $liveStripe ? 'live' : 'test', 'CONTACT_INQUIRIES_ENABLED' => 'false',
     ];
+    if ($realMail) {
+        // Implicit TLS only: Symfony's `smtp` scheme upgrades with STARTTLS only when the server offers it, so a downgrade
+        // would send credentials and mail in clear. Port 587 with required STARTTLS would be a separate reviewed change.
+        $host = $value('MAIL_HOST');
+        $record('production_mail_implicit_tls', $is('MAIL_SCHEME', 'smtps') && $is('MAIL_PORT', '465'));
+        $record('production_mail_host_shape', strlen($host) <= 253 && filter_var($host, FILTER_VALIDATE_IP) === false
+            && preg_match('/\A(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z](?:[a-z0-9-]{0,61}[a-z0-9])?\z/D', $host) === 1
+            && preg_match('/\.(?:test|invalid|localhost|example|local)\z/D', $host) !== 1);
+        $record('production_mail_credentials_present', trim($value('MAIL_USERNAME')) !== '' && $value('MAIL_PASSWORD') !== ''
+            && ! in_array(strtolower($value('MAIL_USERNAME')), ['null', '(null)'], true));
+        $record('production_mail_sender_shape', filter_var($value('MAIL_FROM_ADDRESS'), FILTER_VALIDATE_EMAIL) !== false);
+        $record('production_mail_no_url_override', $value('MAIL_URL') === '');
+    }
     if ($profile === 'production') {
         $baseline += array_fill_keys($testSwitches, 'false');
     }
@@ -190,6 +222,12 @@ try {
     if ($profile === 'production') {
         foreach ($reserved as $key) {
             $record('inactive_'.strtolower($key), $value($key) === '');
+        }
+        // Production identity SMTP values (config/production-identity-smtp.php) stay blank unless real mail is admitted.
+        if (! $realMail) {
+            foreach (['HOST', 'PORT', 'SECURITY', 'SENDER', 'HELLO', 'USERNAME', 'PASSWORD', 'REVISION'] as $part) {
+                $record('inactive_production_identity_smtp_'.strtolower($part), $value('PRODUCTION_IDENTITY_SMTP_'.$part) === '');
+            }
         }
     }
     $required = ['APP_URL', 'APP_KEY', 'DB_HOST', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD',

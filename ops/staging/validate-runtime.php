@@ -86,12 +86,12 @@ try {
         $check('runtime.maintenance', config('app.maintenance.driver') === 'file');
         $check('runtime.stripe_mode', config('payments.stripe.mode') === 'test');
         foreach (['http_enabled', 'fresh_checkout_enabled', 'reconciliation_enabled', 'provider_io_enabled',
-            'exemption_authoring_enabled', 'committed_read_receipts_enabled'] as $flag) {
+            'exemption_authoring_enabled', 'committed_read_receipts_enabled', 'operator_reconciliation_enabled'] as $flag) {
             $check('runtime.production_'.$flag, config('production_checkout.'.$flag) === false);
         }
         $check('runtime.production_credentials', in_array(config('production_checkout.secret_key'), [null, ''], true)
             && in_array(config('production_checkout.funds_mode'), [null, ''], true));
-        // Capability profile (docs/verification/production-ops-kit-20261017, batch K3). The thirteen flags and the two stated beside them must
+        // Capability profile (docs/verification/production-ops-kit-20261017, batch K3). The thirteen flags and the four stated beside them must
         // be exactly false in the effective configuration: an absent line is fine (every config default is false), but true, "1", blank
         // and "yes" are refused, and so is a config key that no longer exists (null). VASEY_OPERATIVE_FREE_GRANTS_ENABLED and
         // CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED have no environment gate in their policy classes, so here and in the template

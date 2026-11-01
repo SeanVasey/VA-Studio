@@ -13,6 +13,7 @@ use App\Http\Controllers\TestOwnerDeliveryController;
 use App\Http\Middleware\CustomerCommerceAccess;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Membership\MembershipHttpMount;
+use App\Http\ProductionCheckout\ProductionCheckoutMount;
 use App\Http\ProductionFree\ProductionFreeHttpMount;
 use App\Http\Tax\TaxHttpMount;
 use Illuminate\Support\Facades\Route;
@@ -95,4 +96,9 @@ if (ProductionFreeHttpMount::admitted()) {
 // shipped value is false; MembershipPrivacy repeats the check on every request.
 if (MembershipHttpMount::admitted()) {
     require __DIR__.'/production-memberships.php';
+}
+// Production checkout (lane PCC): registered only for the literal `production_checkout.mounted` true in local, testing or
+// production. The shipped value is false; ProductionCheckoutPrivacy repeats the check on every request.
+if (ProductionCheckoutMount::admitted()) {
+    require __DIR__.'/production-checkout.php';
 }

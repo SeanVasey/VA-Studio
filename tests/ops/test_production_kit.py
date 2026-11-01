@@ -489,7 +489,8 @@ class NginxTemplate(unittest.TestCase):
     def test_proxy_trust_is_off_and_only_illustrated(self):
         live = [l for l in self.CONF.splitlines() if re.match(r"\s*(set_real_ip_from|real_ip_header|real_ip_recursive)\b", l)]
         self.assertEqual(live, [])
-        self.assertIn("trustProxies is not configured", self.CONF)
+        # The application trusts no proxy by default (ExplicitTrustProxies, lane PCC); nginx's real-IP block stays commented.
+        self.assertIn("the application trusts no proxy by default", self.CONF)
 
     @unittest.skipUnless(shutil.which("nginx"), "nginx is not installed")
     def test_nginx_accepts_the_rendered_template(self):

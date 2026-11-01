@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\ProductionCheckout\ProductionCheckoutMount;
 use App\Http\Responses\ProductionCheckoutResponse as PrivateResponse;
 use Closure;
 use Illuminate\Http\Request;
@@ -9,13 +10,20 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
-/** Integrator must prepend globally so unmatched methods and CSRF/session/throttle failures are private too. */
+/**
+ * Prepended globally in bootstrap/app.php so unmatched methods and CSRF/session/throttle failures are private too. A stale cached
+ * route table never overrides the literal composition gate: an unmounted request is the private 404 before any session,
+ * identity or SQL work (lane PCC, the same seam as MembershipPrivacy).
+ */
 final class ProductionCheckoutPrivacy
 {
     public function handle(Request $request, Closure $next): Response
     {
         if (! PrivateResponse::matches($request)) {
             return $next($request);
+        }
+        if (! ProductionCheckoutMount::admitted()) {
+            return PrivateResponse::error(404);
         }
         if (config('production_checkout.http_enabled') !== true) {
             return PrivateResponse::error(503);
