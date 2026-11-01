@@ -92,9 +92,9 @@ The host is shared with other lanes. Load average was about 7 to 13 on 4 cores t
 
 ## Untested conditions
 
-- The new test is not in the reviewed MySQL CI selection (`database-mysql-selection.json`), so hosted MySQL shards will not
-  run it. Its MySQL evidence is the local native run above. Adding it to `include_files` is a selection-policy decision for
-  the lead.
+- `0fb1c93e` added the new test to `database-mysql-selection.json` `include_files`, so hosted MySQL shards now select it
+  (2678 of 9950 cases in 265 files; both count comments updated). No hosted MySQL shard has run it yet; its MySQL evidence
+  is the local native run above.
 - MySQL runs of the existing contract suites were limited to the native race tests and to the `TestContractIssuanceTest`
   cases that exercise the changed writes, listed above. The full contract suites ran on SQLite only, because one test takes
   about 7 minutes on this host's MySQL.
