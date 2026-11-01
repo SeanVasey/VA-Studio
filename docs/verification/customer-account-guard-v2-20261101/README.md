@@ -1,5 +1,10 @@
 # Customer-account admission v2 prerequisite
 
+Current status: **STOP / NOT ACCEPTED**. The actual early native RR snapshot gate
+failed: a newly created reserved table escaped a remembered account proof. See
+final receipt below. No further native acceptance case is authorized until a
+separately reviewed namespace/currentness design resolves this failure.
+
 Base main `a7bc63cc5c5785353f13e882f49d0ab9dcff55b3`, excluding unaccepted member
 paging/history trial. Approved design and byte-exact independent decision are in
 `design/`; all P0/P1 conditions are acceptance requirements.
@@ -293,3 +298,59 @@ Log SHA25670d69e89e91571f7f771fc2ff5144cfe7d5d821b25fa55a09ec4107e4c38357b;
 JUnit47ea7a71149026b3cfa3bb04a655ea9be8dc0d275b26d142f7bbc1dc5b1abb73;
 server-state9b93f760ca2ebb4400312a81b7c16055111713d5612b871aabde2df4789376fd.
 All native RR/MDL/ledger/process/domain-isolation and cost gates remain open.
+
+## Actual native early RR failure — mandatory stop, prerequisite NOT ACCEPTED
+
+Root authorized correcting only owned container resources after the512MiB OOM:
+`docker update --memory 2g --memory-swap 2g va-account-guard-mysql-20261101`, then
+restart only that container. Actual limits2147483648bytes memory and swap (no
+swap allowance), CPU1000000000 unchanged. Same own Oracle8.4.11 image/datadir/
+private33089 and IP172.17.0.5. Recovery log records completed XA crash recovery;
+readiness confirms unchanged REPEATABLE-READ and six strict SQL modes. Previous
+OOM/no-tests receipts remain failures/non-execution, never passes.
+
+One exact same method ran alone on clean doc-head
+`3a984889e481637d0ee4c4f3eef0cc404c58e0b5` (actual PHP/test source32aea697):
+
+```sh
+bash /workspace/account-guard-evidence-20261101/run-case.sh 3a984889e481637d0ee4c4f3eef0cc404c58e0b5 mysql native-early-rr-memory2g '::test_native_early_repeatable_read_snapshot_refuses_new_reserved_namespace_on_memo_hit$' 172.17.0.5 tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php
+```
+
+**FAILED1test/4assertions,155.987s, exit1.** Fresh full native migrations completed
+as the setup prerequisite; this time the actual test body ran. It asserted native
+REPEATABLE-READ, established an early consistent users snapshot before the first
+complete account proof, and asserted that complete proof ran only once across
+initial/memo calls. A distinct PDO successfully created reserved TABLE
+`customer_accounts_insert`; the next remembered proof returned successfully
+instead of refusing. The generic reused assertion text says “Foreign or altered
+account-reaching trigger was admitted”; its actual object in this case is the
+reserved TABLE, not a trigger. This is a confirmed early-RR catalog visibility/
+namespace admission defect, not environment failure or performance acceptance.
+No production isolation was changed, and the RC-only test is not a substitute.
+
+Evidence is the exact test source/oracles, successful independent DDL call,
+non-refusal and retained framework failure receipt. No live historical SQL_TEXT,
+held-state catalog dump or PFS lock trace was captured by this test; none is
+claimed. It diagnoses namespace visibility, not account INSERT owner-isolation.
+
+The test's finally block closed frame/rolled back and dropped only its created
+reserved table. Independent cleanup receipt confirms0 such tables remain,
+account guards exactly delete/insert_v2/update at action_order1, unchanged native
+context. Confirmed0 active PHP afterwards. Own server stays up with retained
+synthetic datadir; no other server/data modified. Stop upheld: no next cost110,
+memo-cost, ledger/process/domain or collision native method ran. No counter-bound,
+proof-density, guard, SQLmode or isolation workaround was introduced. No retry of
+this actual visibility failure is authorized without a new reviewed design.
+
+Private receipts `/workspace/account-guard-evidence-20261101/`:
+`native-early-rr-memory2g.{log,junit.xml,sha,exit,started,finished}`,
+`native-memory2g-{config,context}.txt`, `native-memory2g-recovery.log`,
+`native-early-rr-memory2g-cleanup.txt`.
+Log SHA25680251361f12a37a89784f33ccd646bc8b0ae6677a7cf335e49f4d3639ed39f98;
+JUnitb3479d4859b4f13bc72283e6c660433f82d0f7b2a2cd6a3a5b950e49ad6b7833;
+cleanupd4322aac09bcc8fbcd4d45984cc96ad7892b60b2d188f79606a3bd0b39b5de7e.
+Conditional source review is copied byte-exact under design; it anticipated this
+mandatory stop and is not native acceptance. The prerequisite, original member
+trial and mount remain unaccepted/false. Other required verification remains
+open, including actual Laravel process/ledger and generated-id/FK domain controls;
+external worker drafts/plans are not implemented or executed acceptance evidence.
