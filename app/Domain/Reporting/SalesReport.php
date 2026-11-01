@@ -289,12 +289,19 @@ final class SalesReport
         foreach ($refunded as $entry) {
             try {
                 // Plain consistent reads in one snapshot transaction: no FOR UPDATE, so the report never waits on or blocks an A5
-                // writer (the ledger tables are not indexed by order for locking reads, which would lock whole tables).
-                $byLine = DB::transaction(function () use ($entry): array {
+                // writer (the ledger tables are not indexed by order for locking reads, which would lock whole tables). The order's
+                // succeeded total is taken from the same snapshot as its line refunds: the aggregate read above can be older, and a
+                // refund recorded in between would otherwise be attributed to tiers without being counted (a negative remainder).
+                [$byLine, $succeeded] = DB::transaction(function () use ($entry): array {
                     $order = Order::findOrFail($entry['order_id']);
+                    $case = RefundDisputeCase::load($order, OrderFinalization::findOrFail($entry['finalization_id']), app(ReadOrder::class)->verify($order), forUpdate: false);
+                    $byLine = $case->refundedByLine();
+                    $succeeded = (int) ($case->latestObserved?->succeeded_refund_minor ?? 0);
+                    // One snapshot cannot attribute more than it counts as succeeded; if it does, the case is inconsistent and is
+                    // reported as unreadable rather than as a negative unattributed amount.
+                    ReportingException::require(array_sum($byLine) <= $succeeded, 'inconsistent_refund_case');
 
-                    return RefundDisputeCase::load($order, OrderFinalization::findOrFail($entry['finalization_id']), app(ReadOrder::class)->verify($order), forUpdate: false)
-                        ->refundedByLine();
+                    return [$byLine, $succeeded];
                 });
             } catch (Throwable) {
                 $unreadable++;
@@ -309,8 +316,8 @@ final class SalesReport
                     $attributed += $amount;
                 }
             }
-            if ($entry['succeeded'] - $attributed !== 0) {
-                $unattributed[$entry['currency']] = ($unattributed[$entry['currency']] ?? 0) + $entry['succeeded'] - $attributed;
+            if ($succeeded - $attributed > 0) {
+                $unattributed[$entry['currency']] = ($unattributed[$entry['currency']] ?? 0) + $succeeded - $attributed;
             }
         }
         $rows = array_values(array_map(fn (array $row): array => $row + ['net_minor' => $row['paid_minor'] - $row['refunded_minor']], $tiers));

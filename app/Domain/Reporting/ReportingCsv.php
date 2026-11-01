@@ -31,8 +31,8 @@ final class ReportingCsv
         if (is_int($value) || $text === '') {
             return $text;
         }
-        // Whitespace before the trigger ("\n=1+1", " =1+1") is skipped by some spreadsheets, so look past it.
-        $first = ltrim($text, " \n")[0] ?? '';
+        // Whitespace before the trigger (" =1+1", "\n=1+1", " \t=1+1", any mix) is skipped by some spreadsheets, so look past all of it.
+        $first = ltrim($text, " \t\n\r\0\x0B\f")[0] ?? '';
         if (! in_array($text[0], ['=', '+', '-', '@', "\t", "\r"], true) && ! in_array($first, ['=', '+', '-', '@'], true)) {
             return $text;
         }

@@ -17,7 +17,7 @@ never shown as zero.
 
 | Section | Reads | Unavailable when |
 | --- | --- | --- |
-| Background work | database queue (ready, oldest age, running), failed jobs, Stripe webhook receipt work | queue connection is not `database`, failed-job store is not a database store, table unreadable |
+| Background work | database queue (ready, oldest age, running, stalled: reserved longer than the connection's `retry_after`), failed jobs, Stripe webhook receipt work | queue connection is not `database`, failed-job store is not a database store, table unreadable |
 | Commerce attention (test commerce) | payment exceptions awaiting review, A5 refund/dispute attention, open and lost disputes, active holds, unallocated succeeded refunds, recorded refund reversals | outside `local`/`testing`/`staging`, Stripe test account not configured |
 | Inquiries and media pipeline | inquiries in `new`, media runs failed, past their claim lease, queued, uploads in quarantine | table unreadable |
 | Not recorded by the application | scheduler last run, backup and restore evidence, host health | always: the application stores none of this |
@@ -49,12 +49,17 @@ Integer minor units with an explicit currency, grouped by currency.
   is unavailable and shows the exact order-level totals. Period filters on `order_finalizations.finalized_at` have no index; the
   scan is bounded by the period and acceptable at current volumes, and an index would be a schema change outside this lane.
 - **No row locks**: the tier netting reads the A5 case through `RefundDisputeCase::load(..., forUpdate: false)` inside a snapshot
-  transaction (plain consistent reads). It never waits on or blocks an A5 writer; `SalesReportLockFreeTest` proves it on native MySQL
+  transaction (plain consistent reads), and takes the order's succeeded total from that same snapshot, so a refund recorded after
+  the period totals were read cannot leave a negative unattributed amount; a case that attributes more than its succeeded total is
+  counted as unreadable. Because the period totals and each order's snapshot are separate reads, the tier refunded and unattributed
+  totals on one page or CSV can be newer than (and add up to more than) the order-level refunded total when a refund lands between
+  them; they are never negative and never drop a refund. It never waits on or blocks an A5 writer; `SalesReportLockFreeTest` proves it on native MySQL
   with a writer holding the order's ledger locks and a `performance_schema.data_locks` probe. Writers keep the default `forUpdate: true`.
 - **CSV export**: one flat file with an `environment` column on every row; one audit row (actor, period, row count, SHA-256 of
   the file). Tier data carries the same caveats as the page: `tier_unverified_orders` and `tier_unreadable_refund_orders` rows,
-  and a `tiers_unavailable` row with the reason when the caps apply. Cells that start like a spreadsheet formula, including after
-  leading spaces or line feeds, are prefixed with an apostrophe.
+  and a `tiers_unavailable` row with the reason when the caps apply. The page shows the same counts and unattributed refunds
+  whenever the tier section is available, even when every paid order is excluded from the tier table. Cells that start like a
+  spreadsheet formula, including after any mix of leading ASCII whitespace (spaces, tabs, line breaks), are prefixed with an apostrophe.
 
 ## Customer segments (FP-090), default-off
 

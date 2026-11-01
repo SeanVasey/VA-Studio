@@ -1237,6 +1237,10 @@
     [
       "Tests\\Feature\\CustomerComms\\CustomerDataRightsConcurrencyTest",
       "test_unrelated_customers_request_deletion_together_while_an_approval_is_in_flight_without_waits_or_deadlocks"
+    ],
+    [
+      "Tests\\Feature\\Reporting\\SalesReportRefundSnapshotTest",
+      "test_native_the_order_snapshot_does_not_see_an_allocation_committed_while_it_reads"
     ]
   ]
 }
