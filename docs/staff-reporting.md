@@ -51,7 +51,9 @@ Integer minor units with an explicit currency, grouped by currency.
 - **No row locks**: the tier netting reads the A5 case through `RefundDisputeCase::load(..., forUpdate: false)` inside a snapshot
   transaction (plain consistent reads), and takes the order's succeeded total from that same snapshot, so a refund recorded after
   the period totals were read cannot leave a negative unattributed amount; a case that attributes more than its succeeded total is
-  counted as unreadable. It never waits on or blocks an A5 writer; `SalesReportLockFreeTest` proves it on native MySQL
+  counted as unreadable. Because the period totals and each order's snapshot are separate reads, the tier refunded and unattributed
+  totals on one page or CSV can be newer than (and add up to more than) the order-level refunded total when a refund lands between
+  them; they are never negative and never drop a refund. It never waits on or blocks an A5 writer; `SalesReportLockFreeTest` proves it on native MySQL
   with a writer holding the order's ledger locks and a `performance_schema.data_locks` probe. Writers keep the default `forUpdate: true`.
 - **CSV export**: one flat file with an `environment` column on every row; one audit row (actor, period, row count, SHA-256 of
   the file). Tier data carries the same caveats as the page: `tier_unverified_orders` and `tier_unreadable_refund_orders` rows,
