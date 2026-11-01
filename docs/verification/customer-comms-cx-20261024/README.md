@@ -321,3 +321,28 @@ Safeguards, `tests/ops`, `composer audit` and the selection counts: see the REP 
 
 Not tested: a real worker dying mid-send (the stuck rows are written through the guard's own `queued → submitting` step), real SMTP,
 real lock contention reaching the staff action (it is injected as a lock-wait timeout on every attempt), browser specs, Foundation CI.
+
+### Review fixes (after `c86ceb0c`)
+
+Independent review of `c86ceb0c`: APPROVE WITH CONDITIONS, record and resolution table in
+[`independent-fub1-review-c86ceb0c-DECISION.md`](independent-fub1-review-c86ceb0c-DECISION.md). Fixed: F1 (P2) and F2 in `38a93b08`
+(customer, purchase and delivery refusals become `authority_withdrawn` in `queueOrderReady()` and `deliver()`; any other per-intent
+error is counted as `error` and the run continues), F4 in `435e44e8` (stuck-listing `--max` and cap test), `043a61a0` (contention judged
+by driver error code: MySQL 1213, 1205, SQLSTATE 40001; SQLite 5 or 6) and `6dc045f6` (tier-versus-order totals note). F3 (the scan
+restarts at the oldest intent each run) is documented as a bound and deferred.
+
+Mutants, SQLite, each killed: G1 mapping removed (both new tests fail); G2 command catch-all removed; M13 cap raised to 100000; a
+`more=` line against a fixed 100; K1 Laravel's message detector restored (unit test: 8 of 12 cases fail; the staff test fails on the
+lock-wait phrase in a duplicate-key error); K2 SQLite code 19 accepted as contention.
+
+Results, code at `6dc045f6`:
+- SQLite: `tests/Feature/Reporting`, `tests/Unit/ReportingCsvTest.php` and `tests/Unit/CustomerDataRightsContentionTest.php` 55 tests,
+  478 assertions, 1 skipped (the native-only method); `tests/Feature/CustomerComms` 108 tests, 893 assertions, 6 census skips.
+- Native MySQL 8.4.11 (private `mysqld`, own datadir, port 3491, stopped by `mysqladmin shutdown`, datadir removed): `TransactionalMailTest`,
+  every method except the configuration data provider, including both new ones, the stuck listing and the database guards: OK (5 tests,
+  68 assertions) and OK (5, 67), run in two halves on two databases; `CustomerDataRequestAdminTest` OK (3, 62);
+  `CustomerDataRightsTest::test_contention_that_outlives_the_retries_is_a_clean_try_again_response` OK (1, 11); the F1 race OK (1, 79);
+  `CustomerDataRightsContentionTest` OK (12, 12). A container restart interrupted the first native mail run; it was rerun in full on a
+  fresh server.
+- Census 310 entries (main's 309 an exact prefix); native selection **2673 cases in 264 files of 9945 discovered**, both count comments
+  updated. Safeguards 52, 27, 14, 53, 61 OK; all 20 `tests/ops` files OK; `composer audit` no advisories.

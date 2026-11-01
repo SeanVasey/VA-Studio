@@ -241,3 +241,10 @@ no advisories; `composer validate --strict`: valid.
 
 Not tested: browser specs, the full native selection, Foundation CI, and a real queue worker dying (the stalled metric is tested on
 hand-written `jobs` rows).
+
+### Review fixes (after `c86ceb0c`)
+
+The FUB-1 independent review (record in the CX packet, `independent-fub1-review-c86ceb0c-DECISION.md`) found no REP defect. Its F4 note
+that tier refunds can be newer than order-level totals on one render is documented in `docs/staff-reporting.md` (`6dc045f6`). REP code is
+unchanged since `ff79e2c2`; the Reporting SQLite run at `6dc045f6` is 55 tests (with the CSV and contention unit files), 478 assertions,
+1 skipped. The native selection is now 2673 cases in 264 files of 9945 discovered (CX tests added).
