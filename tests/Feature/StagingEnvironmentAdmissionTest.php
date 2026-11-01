@@ -158,6 +158,9 @@ class StagingEnvironmentAdmissionTest extends TestCase
         'app/Http/ProductionFree/ProductionFreeHttpMount.php',
         // C4e: the member HTTP mount, like the family 256 mount, needs the literal true and a local/testing cached environment.
         'app/Http/Membership/MembershipHttpMount.php',
+        // CX: order-ready mail refuses in local/testing unless Mail is faked, so a development run can never send; it is a
+        // refusal, not an admission, and staging relies on its configured sender and pinned preflight receipt instead.
+        'app/Domain/Notifications/Mail/TransactionalMailPolicy.php',
     ];
 
     private const LOCAL_TESTING_GATE = '/environment\(\[?\'local\', \'testing\'\]?\)|in_array\(\$[a-zA-Z\[\]\']+, \[\'local\', \'testing\'\], true\)/';
