@@ -223,3 +223,64 @@ docker exec --user 1000:1000 --workdir /workspace/VA-Studio-account-guard-v2 va-
 Python syntax was compiled with `compile(source,path,'exec')`; loading run.py with
 runpy (non-main) and calling preflight('invalid') raised the expected refusal
 before its first Docker/native command. No valid launcher invocation occurred.
+
+## Consolidated launcher boundedness repair after fd23 source review
+
+Independent exact-source fd23 review requested one P1 repair before any native
+run; copied byte-exact as independent-source-fd23e205-decision.md. The fd23
+probe/launcher NEVER executed. This is a DRIVER-ONLY safety batch: probe.php,
+its103-operation catalog, actual frozen helper require/prepared bindings,
+app-shaped oracles, all production PHP and existing tests remain byte-identical.
+
+The older watchdog prose above is superseded by explicit finite host timing:
+
+- Each Git/Docker preflight command has5s timeout, with stdout/stderr/status
+  retained, including timeout partial bytes. A fresh private receipt directory
+  now exists BEFORE those commands; preflight failure writes
+  STOP_PREFLIGHT_NO_SQL and starts no native PHP/SQL.
+- Native stream supervision sends cancellation at120s, makes at most ONE
+  verified-owned-PHP abort command attempt at135s (<=10s and remaining budget),
+  and stops reading at150s even if stream stays open, process is alive, abort
+  kills no target, no READY exists, or Docker exits while another owner holds
+  stdout. No blocking read or indefinite final wait exists. Only normal EOF
+  may wait <=1s for its exit status, within the same150s budget.
+- Final server cleanup audit is bounded5s. Its timeout retains exact partial
+  stdout/stderr/raw/status and produces STOP_CLEANUP_UNVERIFIED, never a pass.
+  Four preflight calls plus native supervision/audit are bounded separately
+  (<=20s preflight +150s stream +5s audit, excluding ordinary local file/process
+  setup). No application deadline/budget changes.
+
+If actual PHP termination cannot be proved, a hard bound fires or audit cannot
+verify cleanup, launcher result is **STOP_CLEANUP_UNVERIFIED**, cleanup_verified
+false, lease_returnable false. All raw/partial/manifest/identities/scratch state
+remain for coordinator cleanup. It never kills an unknown PHP/server PID and
+never interprets Docker client death/CLI timeout as inner PHP cleanup. The single
+abort remains the same ownership-verified inside-runtime routine. A no-target
+abort cannot extend the host loop beyond its final bound. Server audit success
+alone cannot override unknown process termination.
+
+Added test_launcher.py is a manual host-only pure test file, outside the shared
+application census. Fake clock/selector/process/subprocess cases cover open
+stream/no READY/abort kills none, exited Docker with inherited stream, hung abort,
+hung preflight, hung audit, byte-exact non-UTF8 timeout partials, retained
+manifest/raw/partial receipts, no-identity audit refusal, normal EOF requiring
+server audit and bounded EOF/exit-status race. No Docker, PHP runtime or SQL is
+invoked by these tests. New source remains unexecuted natively and requires a
+fresh exact-source independent review plus root lease.
+
+Repair verification actually executed (HOST PURE/STATIC ONLY):
+
+```sh
+python -B -m unittest discover -s docs/verification/account-rr-metadata-mechanism-20261101 -p test_launcher.py -v
+```
+
+PASS10 fake-path tests,0.004s. Python compile checks for run.py/test_launcher.py
+and git diff --check pass. No runtime/container/native command was invoked in this
+repair batch; real stalled-Docker/audit behavior and the one native experiment
+remain unexecuted. SQL/PHP hash remains
+6f5dd6d8d79b89c21602249d9035a425988835146c81aec81dfab1c033781c5d;
+new run.py072f978ddb86f20802b959718a9b3deb25c0c05e2c11bde3e02f11c77ba2f199;
+test_launcher.py1122d47d121c669e8850658d5ab9fe426e302641095995597ddc219ef2258910.
+The initial fd23 run.py hash above is historical and superseded by this repair.
+Copied decision hash5dda6cfac22c192608d451657e0c91a60ef4611009b04440967daf5bd60fd380.
+No execution permission follows from these pure checks.
