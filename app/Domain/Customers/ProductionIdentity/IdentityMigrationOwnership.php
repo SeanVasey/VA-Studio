@@ -17,12 +17,23 @@ final class IdentityMigrationOwnership
 
     public function inspect(PDO $pdo, string $driver): array
     {
+        return $this->inspectState($pdo, $driver, false);
+    }
+
+    /** Only the additive account migration may inspect the exact ordered overlap. */
+    public function inspectForAccountUpgrade(PDO $pdo, string $driver): array
+    {
+        return $this->inspectState($pdo, $driver, true);
+    }
+
+    private function inspectState(PDO $pdo, string $driver, bool $accountUpgrade): array
+    {
         $this->database = null;
         $this->batches = [];
         if (! in_array($driver, ['sqlite', 'mysql'], true) || $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) !== $driver) {
             $this->reject();
         }
-        $this->dependencies($pdo, $driver);
+        $this->dependencies($pdo, $driver, $accountUpgrade);
         $definitions = IdentitySchema::definitions();
         $guards = IdentitySchema::guards($driver);
         $tables = array_keys($definitions);
@@ -225,6 +236,88 @@ final class IdentityMigrationOwnership
         $this->dependents($pdo, array_keys(IdentitySchema::definitions()), IdentitySchema::guards('mysql'));
     }
 
+    /**
+     * Migration-only additional parent floor. Known child FK tuples are retained, never adopted/repaired;
+     * this does not expand ordinary runtime identity-table dependent admission.
+     */
+    public function assertAccountUpgradeDependents(PDO $pdo, string $driver): void
+    {
+        $allowed = $this->accountChildKeys();
+        if ($driver === 'sqlite') {
+            foreach (['main' => 'sqlite_master', 'temp' => 'sqlite_temp_master'] as $schema => $catalog) {
+                foreach ($pdo->query('SELECT type,name,sql FROM '.$catalog)->fetchAll(PDO::FETCH_ASSOC) as $object) {
+                    if ($object['type'] === 'view' && $this->references($object['sql'], ['customer_accounts'])) {
+                        $this->reject();
+                    }
+                    if ($object['type'] !== 'table') {
+                        continue;
+                    }
+                    foreach ($pdo->query('PRAGMA '.$schema.'.foreign_key_list("'.str_replace('"', '""', $object['name']).'")')->fetchAll(PDO::FETCH_ASSOC) as $key) {
+                        if (strtolower($key['table']) === 'customer_accounts') {
+                            $expected = $allowed[$object['name']][$key['from']] ?? null;
+                            if ($schema !== 'main' || $expected === null || $key['table'] !== 'customer_accounts' || $key['to'] !== 'id' || (int) $key['seq'] !== 0
+                                || $key['on_update'] !== $expected[1] || $key['on_delete'] !== 'RESTRICT') {
+                                $this->reject();
+                            }
+                        }
+                    }
+                }
+            }
+
+            return;
+        }
+        if ($driver !== 'mysql' || $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) !== $driver) {
+            $this->reject();
+        }
+        $this->database = null;
+        foreach (['VIEWS' => ['TABLE_SCHEMA', 'VIEW_DEFINITION'], 'ROUTINES' => ['ROUTINE_SCHEMA', 'ROUTINE_DEFINITION']] as $catalog => [$schema, $column]) {
+            foreach ($pdo->query('SELECT '.$schema.','.$column.' FROM information_schema.'.$catalog)->fetchAll(PDO::FETCH_ASSOC) as $object) {
+                if ($this->dependsOn($pdo, $object[$schema], $object[$column], ['customer_accounts'])) {
+                    $this->reject();
+                }
+            }
+        }
+        $sql = "SELECT k.TABLE_SCHEMA,k.TABLE_NAME,k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_NAME,k.REFERENCED_COLUMN_NAME,k.ORDINAL_POSITION,r.UPDATE_RULE,r.DELETE_RULE FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA AND r.TABLE_NAME=k.TABLE_NAME AND r.CONSTRAINT_NAME=k.CONSTRAINT_NAME WHERE k.REFERENCED_TABLE_SCHEMA=DATABASE() AND k.REFERENCED_TABLE_NAME='customer_accounts'";
+        foreach ($pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC) as $key) {
+            $expected = $allowed[$key['TABLE_NAME']][$key['COLUMN_NAME']] ?? null;
+            if ($key['TABLE_SCHEMA'] !== $this->database($pdo) || $expected === null || $key['CONSTRAINT_NAME'] !== $expected[0]
+                || $key['REFERENCED_TABLE_NAME'] !== 'customer_accounts' || $key['REFERENCED_COLUMN_NAME'] !== 'id' || (int) $key['ORDINAL_POSITION'] !== 1
+                || $key['UPDATE_RULE'] !== $expected[1] || $key['DELETE_RULE'] !== 'RESTRICT') {
+                $this->reject();
+            }
+        }
+    }
+
+    /** Exact account-facing FK tuples from unchanged historical schema definitions. Absence grants no creation authority. */
+    private function accountChildKeys(): array
+    {
+        $keys = [];
+        foreach (['customer_identity_challenges' => ['account_id', 'result_account_id'], 'customer_purchase_claims' => ['account_id'],
+            'membership_credit_buckets' => ['customer_account_id'], 'transactional_notices' => ['account_id'],
+            'service_projects' => ['customer_account_id'], 'customer_data_requests' => ['customer_account_id']] as $table => $columns) {
+            foreach ($columns as $column) {
+                $keys[$table][$column] = [$table.'_'.$column.'_foreign', 'NO ACTION'];
+            }
+        }
+        foreach (['free_origins', 'free_authorizations', 'paid_order_origins', 'paid_authorizations', 'paid_tax_order_origins', 'paid_tax_authorizations'] as $table) {
+            $keys[$table]['account_id'] = [$table.'_account', 'NO ACTION'];
+        }
+        foreach (['customer_consent_events', 'customer_consent_states', 'customer_suppression_targets'] as $table) {
+            $keys[$table]['customer_account_id'] = [$table.'_customer_account_id_fk', 'RESTRICT'];
+        }
+        $keys['customer_saved_tracks']['customer_account_id'] = ['customer_saved_tracks_account_fk', 'RESTRICT'];
+        $keys['production_identity_origins']['account_id'] = ['pio_account_fk', 'NO ACTION'];
+        $keys['production_identity_verifications']['account_id'] = ['piv_account_fk', 'NO ACTION'];
+        $keys['production_account_feature_bindings']['account_id'] = ['production_account_feature_bindings_account_id_fk', 'RESTRICT'];
+        foreach (['production_membership_paid_periods' => 0, 'production_membership_billing_subscriptions' => 0,
+            'production_member_origins' => 3, 'production_free_origins' => 2, 'production_free_authorizations' => 1,
+            'production_free_redemptions' => 2] as $table => $index) {
+            $keys[$table]['account_id'] = [$table.'_f'.$index, 'RESTRICT'];
+        }
+
+        return $keys;
+    }
+
     /** No foreign trigger, key, view or routine depends on the identity tables (MySQL). */
     private function dependents(PDO $pdo, array $tables, array $guards): void
     {
@@ -253,12 +346,12 @@ final class IdentityMigrationOwnership
     }
 
     /** Retained foundation metadata is a dependency, never something this migration repairs or adopts. */
-    private function dependencies(PDO $pdo, string $driver): void
+    private function dependencies(PDO $pdo, string $driver, bool $accountUpgrade): void
     {
         if ((int) $pdo->query($driver === 'sqlite' ? 'PRAGMA foreign_keys' : 'SELECT @@SESSION.foreign_key_checks')->fetchColumn() !== 1) {
             $this->reject();
         }
-        $guards = $this->parentGuards($driver);
+        $guards = $this->parentGuards($pdo, $driver, $accountUpgrade);
         $namespace = ['users' => ['table', 'users'], 'customer_accounts' => ['table', 'customer_accounts'], 'quote_owners' => ['table', 'quote_owners']];
         foreach ($guards as $name => $guard) {
             $namespace[$name] = ['trigger', $guard['table']];
@@ -424,23 +517,10 @@ final class IdentityMigrationOwnership
         };
     }
 
-    private function parentGuards(string $driver): array
+    private function parentGuards(PDO $pdo, string $driver, bool $accountUpgrade): array
     {
-        $sqlite = $driver === 'sqlite';
-        $changed = $sqlite ? 'NEW.id IS NOT OLD.id OR NEW.public_id IS NOT OLD.public_id OR NEW.user_id IS NOT OLD.user_id OR NEW.owner_key IS NOT OLD.owner_key OR NEW.created_at IS NOT OLD.created_at'
-            : 'NOT (NEW.id <=> OLD.id) OR NOT (BINARY NEW.public_id <=> BINARY OLD.public_id) OR NOT (NEW.user_id <=> OLD.user_id) OR NOT (BINARY NEW.owner_key <=> BINARY OLD.owner_key) OR NOT (NEW.created_at <=> OLD.created_at)';
-        $shape = $sqlite ? "length(NEW.owner_key) != 64 OR NEW.owner_key GLOB '*[^0-9a-f]*' OR length(NEW.public_id) != 36 OR NEW.public_id GLOB '*[^0-9a-f-]*'"
-            : "NOT REGEXP_LIKE(NEW.owner_key, '^[0-9a-f]{64}$', 'c') OR NOT REGEXP_LIKE(NEW.public_id, '^[0-9a-f-]{36}$', 'c')";
-        $collision = 'EXISTS (SELECT 1 FROM customer_accounts WHERE id=NEW.id OR public_id=NEW.public_id OR user_id=NEW.user_id OR owner_key=NEW.owner_key)';
-        $conditions = ['INSERT' => "$shape OR $collision OR NEW.active != 1 OR NEW.access_version != 1 OR NEW.created_at IS NULL OR NEW.updated_at IS NULL OR NOT EXISTS (SELECT 1 FROM users WHERE id=NEW.user_id AND is_admin=0 AND email_verified_at IS NOT NULL)",
-            'UPDATE' => "$changed OR NEW.active NOT IN (0,1) OR NEW.active=OLD.active OR OLD.access_version >= 4294967294 OR NEW.access_version != OLD.access_version+1 OR NEW.updated_at IS NULL OR NEW.updated_at < OLD.updated_at", 'DELETE' => '1=1'];
-        $guards = [];
-        foreach ($conditions as $event => $condition) {
-            $name = 'customer_accounts_'.strtolower($event);
-            $body = "BEGIN IF $condition THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Customer identity is retained'; END IF; END";
-            $guards[$name] = ['table' => 'customer_accounts', 'event' => $event, 'body' => $body,
-                'sql' => "CREATE TRIGGER $name BEFORE $event ON customer_accounts WHEN $condition BEGIN SELECT RAISE(ABORT, 'Customer identity is retained'); END"];
-        }
+        $state = $accountUpgrade ? AccountAdmissionGuards::migrationState($pdo, $driver) : AccountAdmissionGuards::stable($pdo, $driver);
+        $guards = $state['guards'];
         foreach (['update', 'delete'] as $operation) {
             $name = 'quote_owners_immutable_'.$operation;
             $guards[$name] = ['table' => 'quote_owners', 'event' => strtoupper($operation),

@@ -170,7 +170,10 @@ final class SchemaProofFrame
                 if (count($session) !== 1 || $names !== ['Com_create_table', 'Com_drop_table']) {
                     return null;
                 }
-                $state = [$session, $counters];
+                // Bind the selected whole stable account namespace/version on every proof boundary,
+                // including memo hits. Overlap or foreign version names never reuse a V1 proof.
+                $account = AccountAdmissionGuards::stable($this->primary, 'mysql');
+                $state = [$session, $counters, $account['version'], $account['fingerprint']];
             } else {
                 // No WHERE or ORDER BY: these catalog reads call no function and compare no text.
                 $state = [$this->primary->query('SELECT type, name, tbl_name, sql FROM main.sqlite_master')->fetchAll(PDO::FETCH_NUM),

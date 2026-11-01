@@ -3,11 +3,10 @@
 namespace App\Domain\Customers\Preferences;
 
 use App\Domain\Catalog\Discovery\DiscoveryEpoch;
-use App\Support\MigrationDefinitions;
+use App\Domain\Customers\ProductionIdentity\AccountAdmissionGuards;
 use LogicException;
 use PDO;
 use PDOException;
-use ReflectionMethod;
 
 /** Read-only admission against the retained identity schema; never repairs/adopts dependencies. */
 final class ConsentMigrationAdmission
@@ -42,14 +41,19 @@ final class ConsentMigrationAdmission
 
     public function dependencies(): void
     {
+        $this->inspectDependencies(AccountAdmissionGuards::stable($this->pdo, $this->driver)['guards']);
+    }
+
+    /** Migration-only exact overlap admission; ordinary dependencies() never takes this path. */
+    public function dependenciesForAccountUpgrade(): void
+    {
+        $this->inspectDependencies(AccountAdmissionGuards::migrationState($this->pdo, $this->driver)['guards']);
+    }
+
+    private function inspectDependencies(array $guards): void
+    {
         if ((int) $this->pdo->query($this->driver === 'sqlite' ? 'PRAGMA foreign_keys' : 'SELECT @@SESSION.foreign_key_checks')->fetchColumn() !== 1) {
             $this->refuse();
-        }
-        $migration = MigrationDefinitions::load('2026_10_06_000040_customer_accounts.php');
-        // Reuse the unchanged authoritative guard definitions without running up/down or DDL.
-        $guards = [];
-        foreach ((new ReflectionMethod($migration, 'guards'))->invoke($migration) as $name => $guard) {
-            $guards[$name] = ['table' => 'customer_accounts', 'event' => $guard['operation'], 'timing' => 'BEFORE', 'body' => $guard['body'], 'sql' => $guard['statement']];
         }
         foreach (DiscoveryEpoch::guards($this->driver) as $name => $guard) {
             if ($guard['table'] === 'users') {
