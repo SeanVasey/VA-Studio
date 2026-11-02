@@ -22,7 +22,8 @@
   "tests/Unit/ProductionIdentity/CatalogBatchPlanTest.php": [
     "test_identity_batch_keeps_original_native_predicate_and_binds_names_as_values",
     "test_membership_batch_retains_binary_qualification_ordering_and_parameter_relations",
-    "test_nonbatch_catalog_and_wrong_parameter_shape_cannot_gain_compiled_sql_authority"
+    "test_nonbatch_catalog_and_wrong_parameter_shape_cannot_gain_compiled_sql_authority",
+    "test_both_membership_catalog_consumers_use_closed_enums_for_every_batch_call"
   ],
   "tests/Unit/ProductionIdentity/CatalogPrivacyTest.php": [
     "test_live_identity_comparison_requires_same_writer_principal_roles_and_schema",

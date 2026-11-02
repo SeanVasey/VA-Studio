@@ -34,4 +34,26 @@ final class CatalogBatchPlanTest extends TestCase
         $this->expectException(LogicException::class);
         (new ReflectionMethod(CurrentCatalog::class, 'membershipPlan'))->invoke(null, CatalogRead::GlobalViews, ['one' => []], 'one');
     }
+
+    public function test_both_membership_catalog_consumers_use_closed_enums_for_every_batch_call(): void
+    {
+        $root = dirname(__DIR__, 3);
+        $consumers = [];
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root.'/app')) as $file) {
+            if ($file->isFile() && $file->getExtension() === 'php') {
+                $source = file_get_contents($file->getPathname());
+                if (str_contains($source, 'new MembershipSchemaCatalog(')) {
+                    $consumers[] = $file->getPathname();
+                    preg_match_all('/\$catalog->(?:named|rows)\(([^,]+),/', $source, $calls);
+                    self::assertCount(9, $calls[1], $file->getPathname());
+                    foreach ($calls[1] as $argument) {
+                        self::assertMatchesRegularExpression('/\ACatalogRead::[A-Z0-9]+\z/', $argument);
+                        self::assertInstanceOf(CatalogRead::class, constant(CatalogRead::class.'::'.substr($argument, strlen('CatalogRead::'))));
+                    }
+                }
+            }
+        }
+        sort($consumers);
+        self::assertSame([$root.'/app/Domain/Memberships/Billing/BillingSchema.php', $root.'/app/Domain/Memberships/Production/MembershipSchema.php'], $consumers);
+    }
 }

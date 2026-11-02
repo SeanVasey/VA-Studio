@@ -93,14 +93,14 @@ companion and close BEFORE existing DDL. Existing same-primary advisory lock,
 no-active-TX, per-DDL reinspection/order/overlap/ledger/down/rollback semantics
 are unchanged. No migration file or historical factory output is edited.
 
-Pre-freeze review issue (OPEN, root source feedback, not a native failure):
+Historical pre-freeze review issue (resolved on source at2dfa; native acceptance OPEN):
 post-connect UUID/role/TLS comparison alone cannot prevent a coherently tampered
 raw+resolved endpoint descriptor from sending credentials to a foreign target
 BEFORE refusal. A fail-closed PRE-CONSTRUCTION target-to-captured-primary binding
 is mandatory before candidate freeze. PDO host info+server @@port catches common
 direct-profile mismatches but does not alone prove original forwarded/NAT peer
-port or DNS target. A process-owned native socket tuple binding is under narrow
-assessment; no product target-binding completeness is claimed yet. No new PDO
+port or DNS target. A process-owned native socket tuple binding was subsequently implemented and
+source-reviewed for the narrow supported profile below; native proof remains open. No new PDO
 has been constructed/executed in preparation. Keep source unaccepted until this
 boundary and its negatives are coherent and independently reviewed.
 
@@ -128,11 +128,12 @@ memo15 are unchanged totals, with handshake count/time reported separately.
 New native accounting regression compares the companion meter with actual
 server Questions rather than assuming API calls alone cover hidden setup.
 
-New native-only test source in CurrentCatalogAdmissionTest has SIX methods:
+New native-only test source in CurrentCatalogAdmissionTest has SEVEN methods:
 - test_native_nested_boundary_reuses_one_companion_and_last_close_releases_server_session
 - test_native_companion_statement_accounting_matches_server_including_constructor_setup_and_context
 - test_native_primary_attribute_changes_invalidate_retained_companion_without_reconnect
 - test_native_failed_memo_ends_companion_and_restoration_uses_complete_unframed_proof
+- test_native_coherent_endpoint_and_feasible_tls_downgrade_refuse_before_constructor_attempt
 - test_native_raw_config_and_resolver_callbacks_refuse_before_factory_or_callback_execution
 - test_native_unframed_complete_proofs_refuse_new_namespace_under_early_primary_snapshot
 All are UNEXECUTED. SQLite condition: DB driver is not mysql; exact shared reason
@@ -308,3 +309,52 @@ execution. The accepted74c3 diagnostic neither accepts this production repair no
 proves those budgets. Old migration/V1 fixture output and prior packet bytes are
 unchanged. Member trial remains excluded, unaccepted and mountfalse. No envkeys,
 shared census/ledger/workflow edits, DB execution, push or PR occurred.
+
+## Caller-contract repair ownership (pre-edit)
+
+Extend owned source to app/Domain/Memberships/Billing/BillingSchema.php only.
+The exact2dfa native fixture failed before the test body: MembershipSchemaCatalog
+now requires CatalogRead but nine Billing callers retained strings. Convert all
+nine to existing byte-identical enum values, with no string fallback. Add one
+explicit inspection lease around existing read-only graph planning; close it in
+finally before the existing DDL loop. All guard predicates, bindings, order and
+primary authority remain unchanged. Audit every changed public signature's
+transitive consumers. Native receipt native-2dfa82b2-earlyrr-01 remains exit2,
+54.155seconds,0assertions/body-unreached, with final cleanup allzero; no retry is
+authorized in this source-preparation batch.
+
+## Complete public-signature consumer audit and bounded repair
+
+Mechanical app diff versus74c3 identifies exactly TWO changed preexisting public
+signatures: MembershipSchemaCatalog::named(string→CatalogRead) and
+::rows(string→CatalogRead). All other public additions are new capability APIs,
+not altered preexisting contracts. Repository-wide app/tests symbol and batch-call
+search is retained in CALLER-CONTRACT-AUDIT.txt: exactly two constructors,
+MembershipSchema and BillingSchema; each has nine batch calls. All18 now use
+existing CatalogRead cases. No alias/other consumer appeared in the symbol scan.
+BILLING-EXACT-ENUM-MAP.json records each of the nine original SQL strings and
+its exact existing enum (no query text, predicate, bindings, order or guard edit).
+The new pure transitive-consumer regression enumerates app PHP constructors and
+checks every batch call's closed enum, covering the missed billing path.
+
+Billing's lease surrounds its existing parent/full graph read-only planning and
+closes in finally BEFORE its existing DDL loop; retained read-only calls close at
+the same boundary. Nested primary parent proofs share that explicit operation
+lease. No billing guard/freshness scope, migration output or DDL behavior was
+redesigned. Source/lint/pure results below supersede only current-source hashes;
+the 2dfa native fixture TypeError receipt remains unchanged and is not a pass.
+
+Final caller-repair verification: lint26/26 and Pint--test26 PASS; final-byte pure
+selection33tests/345assertions PASS,PHP8.4.27,1.397seconds,exit0. Commands/output
+and all26 source hashes are in catalog-billing-repair-{static,pure}.json; hashes
+match SOURCE-SHA256.txt exactly. This adds one generic method, now24generic +
+7native-only methods in NEW-TEST-METHODS.json. No native rerun or DB operation
+occurred during repair. Native2dfa setup failure/cleanup receipts are copied
+without alteration; original full log/JUnit remain at the private receipt path.
+
+Unchanged raw Billing I_S reads remain in interval/retrieval trigger checks and
+the no-catalog namespace fallback (current lines511,647,780). They are outside
+this exact caller-contract repair and do not establish broader billing freshness
+acceptance. The existing installer/upgrade primary SHOW/TEMP/session/lock/DDL
+logic is retained. A single lexical planning lease closes before the unchanged
+DDL loop; no per-statement DDL restructuring was introduced.
