@@ -19,3 +19,16 @@ NET>=23 remains conditional: header single-evaluation, ordinal equivalence and
 warning-free lossless encoding need proof. Per-group warning queries would exceed
 110. These missing proofs are explicit blockers, not assumed passing counts.
 No implementation/test/migration source changed. Full110 remains OPEN/FAILED.
+
+## Authorized implementation inventory BEFORE edits
+
+Owned changes: new ProductionIdentity/CatalogGroup.php and CatalogGroupPlan.php
+(fixed registry/recipes/compiler only), existing CurrentCatalog.php (private
+streaming decoder/native Pdo\\Mysql warnings/group execution), CatalogLease.php
+(closed group entry), AccountAdmissionGuards.php and IdentityMigrationOwnership.php
+(same-stage routing only); new Unit/ProductionIdentity/CatalogGroupContractTest.php
+and Feature/ProductionIdentity/CatalogGroupDifferentialTest.php. No Billing API,
+MembershipSchemaCatalog, old test/migration/fixture, config or other app change.
+New packet files carry review/result/source manifests. No native execution.
+The P1 nullability fixes are applied to the design schema before generating fixed
+source registry. Current110/15 windows/limits and memo dependents remain unchanged.
