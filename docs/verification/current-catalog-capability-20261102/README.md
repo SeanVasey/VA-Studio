@@ -156,3 +156,19 @@ and race limits must remain explicit. Unix/implicit-localhost/hostname/proxy/
 unprovable profiles initially REFUSE CONSTRUCTION; pure descriptor socket
 precedence/TLS semantics remain supported without claiming constructor support.
 No downgrade to hostinfo+@@port-only proof or credential-bearing target probe.
+
+Root explicitly authorized wrapper-gate PROPOSAL (predeclared before edit):
+accept ONLY exact native stream_wrapper_restore('file') already-native/no-op
+E_NOTICE under a fixed trusted temporary handler. Every other notice/result/
+exception refuses BEFORE /proc/newPDO and permanently taints this PHP execution
+lifetime via private non-resettable latch. If the native function restored an
+altered file wrapper, that request-local PHP-global side effect ALREADY happened;
+never claim refusal left it unchanged. No other wrapper restoration or caller
+callback is allowed. Restore exact previous error handler in finally without
+invoking it. Isolated CLI negatives must prove no hostile wrapper/error-handler
+callbacks, zero constructor attempts, and repair-then-retry still refuses. The
+proposal remains subject to independent source review, not production adoption.
+Trusted PHP runtime/code/autoload/native-extension assumptions remain explicit;
+this does not defend against arbitrary PHP execution/reflection or a compromised
+kernel/extension. Native pointer/no-op attestation is more than wrapper names or
+readlink, which exact PHP source proved insufficient. No new DB/network test.
