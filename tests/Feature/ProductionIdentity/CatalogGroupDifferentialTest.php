@@ -15,6 +15,7 @@ use PDO;
 use Pdo\Mysql;
 use ReflectionMethod;
 use ReflectionProperty;
+use Tests\Support\ExplainNoteSnapshot;
 use Tests\Support\ProductionIdentityFixture;
 use Tests\TestCase;
 
@@ -168,6 +169,8 @@ final class CatalogGroupDifferentialTest extends TestCase
                         $covered[] = $familyIndex;
                     }
                     $statement = $native->prepare('EXPLAIN FORMAT=JSON '.$stream['sql']);
+                    $prepareWarnings = $native->getWarningCount();
+                    self::assertSame(0, $prepareWarnings);
                     foreach ($stream['bindings'] as $position => $value) {
                         self::assertTrue($statement->bindValue($position + 1, $value, PDO::PARAM_STR));
                     }
@@ -176,10 +179,15 @@ final class CatalogGroupDifferentialTest extends TestCase
                         self::assertTrue($statement->bindValue(57, 131044, PDO::PARAM_INT));
                         self::assertTrue($statement->bindValue(58, 16777216 - 4096 - 7336, PDO::PARAM_INT));
                     }
-                    $statement->execute();
+                    self::assertTrue($statement->execute());
+                    $executeWarnings = $native->getWarningCount();
                     $json = $statement->fetchColumn();
-                    self::assertSame(0, $native->getWarningCount());
+                    $fetchWarnings = $native->getWarningCount();
+                    $snapshot = ExplainNoteSnapshot::capture($native, $statement, $prepareWarnings, $executeWarnings, $fetchWarnings);
                     self::assertTrue($statement->closeCursor());
+                    fwrite(STDERR, 'EXPLAIN diagnostics: '.json_encode(['group' => $group->value, 'stream' => $streamIndex, 'counts' => $snapshot['counts'], 'rows' => $snapshot['rows']], JSON_THROW_ON_ERROR)."\n");
+                    ExplainNoteSnapshot::requireOnlyExplainNote($snapshot);
+                    self::assertTrue(true, 'Complete matched EXPLAIN-only Note 1003 provenance.');
                     $explain = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
                     $materialized = 0;
                     $shared = 0;
@@ -216,6 +224,76 @@ final class CatalogGroupDifferentialTest extends TestCase
             unset($native,$catalog);
         } finally {
             $lease->close();
+        }
+    }
+
+    public function test_native_explain_note_policy_rejects_real_conversion_warning_and_preserves_production_zero_guard(): void
+    {
+        $primary = DB::connection()->getPdo();
+        $lease = CatalogLease::open($primary);
+        $statement = null;
+        try {
+            $catalog = (new ReflectionProperty($lease, 'catalog'))->getValue($lease);
+            $native = (new ReflectionProperty($catalog, 'catalog'))->getValue($catalog);
+            // Genuine known EXPLAIN positive BEFORE expected negative classification.
+            $plan = CatalogGroupPlan::build(CatalogGroup::A0_ACCOUNT_TABLE, AccountAdmissionGuards::V2);
+            $statement = $native->prepare('EXPLAIN FORMAT=JSON '.$plan['sql']);
+            $prepareWarnings = $native->getWarningCount();
+            self::assertSame(0, $prepareWarnings);
+            foreach ($plan['bindings'] as $position => $value) {
+                self::assertTrue($statement->bindValue($position + 1, $value, PDO::PARAM_STR));
+            }
+            self::assertTrue($statement->execute());
+            $executeWarnings = $native->getWarningCount();
+            $positivePayload = $statement->fetchColumn();
+            self::assertIsString($positivePayload);
+            unset($positivePayload);
+            $positive = ExplainNoteSnapshot::capture($native, $statement, $prepareWarnings, $executeWarnings, $native->getWarningCount());
+            self::assertTrue($statement->closeCursor());
+            $statement = null;
+            ExplainNoteSnapshot::requireOnlyExplainNote($positive);
+            self::assertTrue(true, 'Known native EXPLAIN positive establishes capture/classifier availability.');
+            // EXACT existing warning-envelope expression: a counterfactual Warning, not EXPLAIN.
+            $statement = $native->prepare("SELECT JSON_ARRAY(JSON_ARRAY('I',CAST(CAST('catalog-not-integer' AS UNSIGNED) AS CHAR CHARACTER SET utf8mb4))) AS payload");
+            $prepareWarnings = $native->getWarningCount();
+            self::assertSame(0, $prepareWarnings);
+            self::assertTrue($statement->execute());
+            $executeWarnings = $native->getWarningCount();
+            $negativePayload = $statement->fetchColumn();
+            self::assertIsString($negativePayload);
+            unset($negativePayload);
+            $fetchWarnings = $native->getWarningCount();
+            self::assertGreaterThan(0, $fetchWarnings);
+            // BEFORE SHOW can replace diagnostic area: ordinary production guard still refuses ANY warning.
+            try {
+                (new ReflectionMethod(CurrentCatalog::class, 'requireNoWarnings'))->invoke(null, $native);
+                self::fail('Production zero-warning guard accepted a real conversion diagnostic.');
+            } catch (LogicException) {
+                self::assertTrue(true);
+            }
+            $negative = ExplainNoteSnapshot::capture($native, $statement, $prepareWarnings, $executeWarnings, $fetchWarnings);
+            self::assertTrue($statement->closeCursor());
+            $statement = null;
+            self::assertNotEmpty(array_filter($negative['rows'], fn (array $row): bool => $row['level'] === 'Warning'));
+            fwrite(STDERR, 'Conversion diagnostic negative: '.json_encode($negative, JSON_THROW_ON_ERROR)."\n");
+            try {
+                ExplainNoteSnapshot::requireOnlyExplainNote($negative);
+                self::fail('EXPLAIN-only note policy accepted the real conversion Warning.');
+            } catch (LogicException) {
+                self::assertTrue(true);
+            }
+            self::assertFalse($native->getAttribute(PDO::ATTR_EMULATE_PREPARES));
+            self::assertTrue($native->getAttribute(Mysql::ATTR_USE_BUFFERED_QUERY));
+            unset($native, $catalog);
+        } finally {
+            try {
+                if ($statement !== null) {
+                    $statement->closeCursor();
+                }
+            } finally {
+                unset($statement, $native, $catalog);
+                $lease->close();
+            }
         }
     }
 
