@@ -1,0 +1,221 @@
+{
+  "files": [
+    {
+      "path": "app/Domain/Customers/Preferences/ConsentMigrationAdmission.php",
+      "sha256": "58494d326738ca8d99a11fcac95ca2f1da6162d0a29c6811e7a3f978664201fc",
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/Preferences/ConsentMigrationAdmission.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/AccountAdmissionGuards.php",
+      "sha256": "8dccf1ca6ad5ab8f97f1b2708b0d218b9f7b894185913291674f7dc29cc13553",
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/AccountAdmissionGuards.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/AccountAdmissionUpgrade.php",
+      "sha256": "f7b3a13b3586283569cc83e12718de4381f4581f7318346984b1842413056acf",
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/AccountAdmissionUpgrade.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/CatalogLease.php",
+      "sha256": "4b1f400ed1f394d59189326f5cb8c551e5db311fb3cc5a840537950b1813b60a",
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/CatalogLease.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/CatalogRead.php",
+      "sha256": "718bda8098fae34b4aea8ab09424b997ac940955f398b22d65e3c3f073bd6da8",
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/CatalogRead.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/CatalogSocketBinding.php",
+      "sha256": "f69c0921bd71d4d6455573f89360cce23e1be8314d4920a6e74f5f5c71d77551",
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/CatalogSocketBinding.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/CatalogWriterDescriptor.php",
+      "sha256": "689d29736f78fd4d2246ef462a2b7865bd254142057489f9fa07c039578b4bc0",
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/CatalogWriterDescriptor.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/CurrentCatalog.php",
+      "sha256": "83e023b112f0d605846b9d73f856abee19c8780f6d78701a62ca31905e46fa53",
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/CurrentCatalog.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityHistoricalPlainRows.php",
+      "sha256": "8d1401d7b01d590eddad62f827a880c2c88c5be0076bf9d85444e0ad9f06ec1c",
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/IdentityHistoricalPlainRows.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "sha256": "31f854e8c31cec24cc67ca6a9afb421dc9825cf1ae16a2e0c3f753810236c31c",
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/IdentityRows.php",
+      "sha256": "a9d63eb34e360326fd6e629c14af62f9a2d185fe94e9f442ef9a7115f98d3374",
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/IdentityRows.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "app/Domain/Customers/ProductionIdentity/SchemaProofFrame.php",
+      "sha256": "f86a2ef341145bfbe70c28afb0b0e3cbb841e975ace736a22b275741a243b090",
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/SchemaProofFrame.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "app/Domain/Grants/Member/MemberGrantCurrentSchema.php",
+      "sha256": "ed415c8a51ac0e2778b4c742c1ec6b09cdeb7f296e9388755ddb668f3bd19138",
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Grants/Member/MemberGrantCurrentSchema.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipSchema.php",
+      "sha256": "e3c22a6a34e81b4e3780fe298d364f3760ee00802f07b0eb179cfdd2a3c1f72e",
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Memberships/Production/MembershipSchema.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "app/Domain/Memberships/Production/MembershipSchemaCatalog.php",
+      "sha256": "bd682fe837cd06d926b4d5fe55c3f4ec297a3a6657b70425329346c10555ffec",
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Memberships/Production/MembershipSchemaCatalog.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php",
+      "sha256": "f954654a5257b4065a23caea521dc9c4b128d5676815e395a9a027627d9fbfdc",
+      "exit": 0,
+      "stdout": "No syntax errors detected in tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/CurrentCatalogAdmissionTest.php",
+      "sha256": "c86832c062f42493e95cf6a3d563e7e0c2ff0c75dea41f88e8f793459fac537a",
+      "exit": 0,
+      "stdout": "No syntax errors detected in tests/Feature/ProductionIdentity/CurrentCatalogAdmissionTest.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php",
+      "sha256": "f9a80fc0da2e125eae6dfa2ff9a10d937f83e4cf76f611aabe4e3744e101ba18",
+      "exit": 0,
+      "stdout": "No syntax errors detected in tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "tests/Unit/ProductionIdentity/CatalogBatchPlanTest.php",
+      "sha256": "15c24fdb23622aba077293d22fa517e0d522be10dd0172be9a71c3aa22e9bb73",
+      "exit": 0,
+      "stdout": "No syntax errors detected in tests/Unit/ProductionIdentity/CatalogBatchPlanTest.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "tests/Unit/ProductionIdentity/CatalogNativeProviderTest.php",
+      "sha256": "5ff3fc89b565bbcd48563ba9559e3812f1e009dcbec1f007c129ca24180992f0",
+      "exit": 0,
+      "stdout": "No syntax errors detected in tests/Unit/ProductionIdentity/CatalogNativeProviderTest.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "tests/Unit/ProductionIdentity/CatalogPrivacyTest.php",
+      "sha256": "d8765d76f9dd5c5f27bc1d803d975af4d69768fc8f5df0e11f97e7e4e1b009c5",
+      "exit": 0,
+      "stdout": "No syntax errors detected in tests/Unit/ProductionIdentity/CatalogPrivacyTest.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "tests/Unit/ProductionIdentity/CatalogReadTest.php",
+      "sha256": "b58c2c54694eaed83b631c2e82a45d6addcc174b9b4c64ef75d10b050708c458",
+      "exit": 0,
+      "stdout": "No syntax errors detected in tests/Unit/ProductionIdentity/CatalogReadTest.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "tests/Unit/ProductionIdentity/CatalogSocketBindingTest.php",
+      "sha256": "9f06611f12331fad6c599487407ef63a49c2ad825ec6a1cee0c6121b367fffbe",
+      "exit": 0,
+      "stdout": "No syntax errors detected in tests/Unit/ProductionIdentity/CatalogSocketBindingTest.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "tests/Unit/ProductionIdentity/CatalogWriterDescriptorTest.php",
+      "sha256": "6f7afe27d6a3e3eb557478b6d7291da42689f91119aae096e9309f1bc6d5b147",
+      "exit": 0,
+      "stdout": "No syntax errors detected in tests/Unit/ProductionIdentity/CatalogWriterDescriptorTest.php\n",
+      "stderr": ""
+    },
+    {
+      "path": "tests/Unit/ProductionIdentity/fixtures/disabled-catalog-function.php",
+      "sha256": "3b775e093d5f07a972d0b37153e6b541b1f986e0c0a25e174914ce37651ee09d",
+      "exit": 0,
+      "stdout": "No syntax errors detected in tests/Unit/ProductionIdentity/fixtures/disabled-catalog-function.php\n",
+      "stderr": ""
+    }
+  ],
+  "pint": {
+    "command": [
+      "docker",
+      "exec",
+      "--user",
+      "1000:1000",
+      "--workdir",
+      "/workspace/VA-Studio-account-guard-v2",
+      "va-pcc-runtime-20261101",
+      "php",
+      "/workspace/VA-Studio/vendor/laravel/pint/builds/pint",
+      "--test",
+      "app/Domain/Customers/Preferences/ConsentMigrationAdmission.php",
+      "app/Domain/Customers/ProductionIdentity/AccountAdmissionGuards.php",
+      "app/Domain/Customers/ProductionIdentity/AccountAdmissionUpgrade.php",
+      "app/Domain/Customers/ProductionIdentity/CatalogLease.php",
+      "app/Domain/Customers/ProductionIdentity/CatalogRead.php",
+      "app/Domain/Customers/ProductionIdentity/CatalogSocketBinding.php",
+      "app/Domain/Customers/ProductionIdentity/CatalogWriterDescriptor.php",
+      "app/Domain/Customers/ProductionIdentity/CurrentCatalog.php",
+      "app/Domain/Customers/ProductionIdentity/IdentityHistoricalPlainRows.php",
+      "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php",
+      "app/Domain/Customers/ProductionIdentity/IdentityRows.php",
+      "app/Domain/Customers/ProductionIdentity/SchemaProofFrame.php",
+      "app/Domain/Grants/Member/MemberGrantCurrentSchema.php",
+      "app/Domain/Memberships/Production/MembershipSchema.php",
+      "app/Domain/Memberships/Production/MembershipSchemaCatalog.php",
+      "tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php",
+      "tests/Feature/ProductionIdentity/CurrentCatalogAdmissionTest.php",
+      "tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php",
+      "tests/Unit/ProductionIdentity/CatalogBatchPlanTest.php",
+      "tests/Unit/ProductionIdentity/CatalogNativeProviderTest.php",
+      "tests/Unit/ProductionIdentity/CatalogPrivacyTest.php",
+      "tests/Unit/ProductionIdentity/CatalogReadTest.php",
+      "tests/Unit/ProductionIdentity/CatalogSocketBindingTest.php",
+      "tests/Unit/ProductionIdentity/CatalogWriterDescriptorTest.php",
+      "tests/Unit/ProductionIdentity/fixtures/disabled-catalog-function.php"
+    ],
+    "exit": 0,
+    "stdout": "\n  .........................\n\n  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 Laravel  \n    PASS   .......................................................... 25 files  \n\n",
+    "stderr": ""
+  }
+}

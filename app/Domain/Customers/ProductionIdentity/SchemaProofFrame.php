@@ -56,6 +56,8 @@ final class SchemaProofFrame
 
     private ?array $pendingAccount = null;
 
+    private ?CatalogLease $catalogLifetime = null;
+
     private bool $terminal = false;
 
     private bool $closed = false;
@@ -77,6 +79,7 @@ final class SchemaProofFrame
 
             return $frame;
         }
+        $frame->catalogLifetime = CatalogLease::open($primary, false);
         self::$frames ??= new WeakMap;
         self::$frames[$primary] = WeakReference::create($frame);
 
@@ -128,6 +131,8 @@ final class SchemaProofFrame
     public function close(): void
     {
         $this->closed = true;
+        $this->catalogLifetime?->close();
+        $this->catalogLifetime = null;
         $this->proofs = [];
         $this->accountProofs = [];
         if (self::$frames !== null && isset(self::$frames[$this->primary]) && self::$frames[$this->primary]->get() === $this) {
@@ -137,6 +142,27 @@ final class SchemaProofFrame
 
     /** @param  list<string>  $tables */
     private function consult(string $guard, array $tables, Closure $prove): void
+    {
+        $lease = null;
+        try {
+            $lease = CatalogLease::open($this->primary);
+            $this->consultCurrent($guard, $tables, $prove);
+        } catch (Throwable $error) {
+            // A failed companion/proof cannot poison a later complete, unframed guard after caller restoration.
+            // End this memo permanently; never replace its companion or reuse its proof after failure.
+            $this->close();
+            throw $error;
+        } finally {
+            try {
+                $lease?->close();
+            } catch (Throwable $error) {
+                $this->close();
+                throw $error;
+            }
+        }
+    }
+
+    private function consultCurrent(string $guard, array $tables, Closure $prove): void
     {
         $token = $this->terminal || $this->closed ? null : $this->token();
         if ($token === null) {

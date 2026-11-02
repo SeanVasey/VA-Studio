@@ -99,7 +99,8 @@ final class AccountAdmissionGuards
                 .($catalog === 'TRIGGERS' ? " AND BINARY EVENT_OBJECT_TABLE<>BINARY 'customer_accounts'" : '');
             $values = [...$values, ...$lookups];
         }
-        if (self::query($pdo, implode(' UNION ALL ', $branches), $values) !== []) {
+        if (CatalogRead::AccountUnpinned->value !== implode(' UNION ALL ', $branches)
+            || self::query($pdo, CatalogRead::AccountUnpinned, $values) !== []) {
             self::refuse();
         }
     }
@@ -111,6 +112,16 @@ final class AccountAdmissionGuards
     }
 
     private static function inspect(PDO $pdo, string $driver, bool $transition): array
+    {
+        $lease = CatalogLease::open($pdo);
+        try {
+            return self::inspectCurrent($pdo, $driver, $transition);
+        } finally {
+            $lease->close();
+        }
+    }
+
+    private static function inspectCurrent(PDO $pdo, string $driver, bool $transition): array
     {
         if (! in_array($driver, ['sqlite', 'mysql'], true) || $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) !== $driver) {
             self::refuse();
@@ -171,7 +182,7 @@ final class AccountAdmissionGuards
             if (! is_string($database) || $database === '') {
                 self::refuse();
             }
-            $table = self::query($pdo, 'SELECT TABLE_NAME,TABLE_TYPE,ENGINE,TABLE_COLLATION,TABLE_COMMENT,CREATE_OPTIONS FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?', ['customer_accounts']);
+            $table = self::query($pdo, CatalogRead::Q3C5185ED551F, ['customer_accounts']);
             if ($table !== [['TABLE_NAME' => 'customer_accounts', 'TABLE_TYPE' => 'BASE TABLE', 'ENGINE' => 'InnoDB', 'TABLE_COLLATION' => 'utf8mb4_unicode_ci', 'TABLE_COMMENT' => '', 'CREATE_OPTIONS' => '']]) {
                 self::refuse();
             }
@@ -188,18 +199,16 @@ final class AccountAdmissionGuards
                     }
                 }
             }
-            $placeholders = implode(',', array_fill(0, count($names), '?'));
-            if (self::query($pdo, 'SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME IN ('.$placeholders.')', $names) !== []) {
+            if (self::query($pdo, CatalogRead::AccountTables, $names) !== []) {
                 self::refuse();
             }
             $reserved = ['customer_accounts', ...$names];
-            $placeholders = implode(',', array_fill(0, count($reserved), '?'));
             foreach ([['ROUTINES', 'ROUTINE_SCHEMA', 'ROUTINE_NAME'], ['EVENTS', 'EVENT_SCHEMA', 'EVENT_NAME'], ['STATISTICS', 'TABLE_SCHEMA', 'INDEX_NAME'], ['TABLE_CONSTRAINTS', 'CONSTRAINT_SCHEMA', 'CONSTRAINT_NAME']] as [$catalog, $schema, $column]) {
-                if (self::query($pdo, "SELECT $column FROM information_schema.$catalog WHERE $schema=DATABASE() AND $column IN ($placeholders)", $reserved) !== []) {
+                if (self::query($pdo, CatalogRead::namespace($catalog, true), $reserved) !== []) {
                     self::refuse();
                 }
             }
-            $rows = self::query($pdo, 'SELECT TRIGGER_NAME,EVENT_OBJECT_TABLE,EVENT_MANIPULATION,ACTION_TIMING,ACTION_STATEMENT,ACTION_ORDER,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION,DEFINER FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND (EVENT_OBJECT_TABLE=? OR TRIGGER_NAME IN (?,?,?,?)) ORDER BY TRIGGER_NAME', ['customer_accounts', ...$names]);
+            $rows = self::query($pdo, CatalogRead::Q01CED6344452, ['customer_accounts', ...$names]);
             $installed = array_column($rows, 'TRIGGER_NAME');
             sort($installed);
             $version = null;
@@ -231,7 +240,7 @@ final class AccountAdmissionGuards
                 $definer = $row['DEFINER'];
             }
             // The forced equality paths must remain their complete, visible unique keys.
-            $indexes = self::query($pdo, 'SELECT INDEX_NAME,COLUMN_NAME,NON_UNIQUE,SEQ_IN_INDEX,INDEX_TYPE,SUB_PART,COLLATION,EXPRESSION,IS_VISIBLE,INDEX_COMMENT FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY INDEX_NAME,SEQ_IN_INDEX', ['customer_accounts']);
+            $indexes = self::query($pdo, CatalogRead::Q54EFEC87F80D, ['customer_accounts']);
             usort($indexes, fn ($a, $b) => strcmp($a['INDEX_NAME'], $b['INDEX_NAME']) ?: $a['SEQ_IN_INDEX'] <=> $b['SEQ_IN_INDEX']);
             $expectedIndexes = [];
             foreach (['PRIMARY' => 'id', 'customer_accounts_owner_key_unique' => 'owner_key', 'customer_accounts_public_id_unique' => 'public_id', 'customer_accounts_user_id_unique' => 'user_id'] as $name => $column) {
@@ -264,7 +273,7 @@ final class AccountAdmissionGuards
                 'EXTRA' => $extra, 'CHARACTER_SET_NAME' => $text ? 'utf8mb4' : null, 'COLLATION_NAME' => $text ? 'utf8mb4_unicode_ci' : null,
                 'COLUMN_COMMENT' => '', 'GENERATION_EXPRESSION' => ''];
         }
-        if (self::query($pdo, 'SELECT COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,EXTRA,CHARACTER_SET_NAME,COLLATION_NAME,COLUMN_COMMENT,GENERATION_EXPRESSION FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY ORDINAL_POSITION', ['customer_accounts']) !== $expected) {
+        if (self::query($pdo, CatalogRead::QD9E74E9B8F9D, ['customer_accounts']) !== $expected) {
             self::refuse();
         }
         $expected = [];
@@ -273,18 +282,15 @@ final class AccountAdmissionGuards
                 'REFERENCED_TABLE_SCHEMA' => $database, 'REFERENCED_TABLE_NAME' => $target, 'REFERENCED_COLUMN_NAME' => $key,
                 'UPDATE_RULE' => 'NO ACTION', 'DELETE_RULE' => 'RESTRICT'];
         }
-        if (self::query($pdo, 'SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFERENCED_COLUMN_NAME,r.UPDATE_RULE,r.DELETE_RULE FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA AND r.CONSTRAINT_NAME=k.CONSTRAINT_NAME AND r.TABLE_NAME=k.TABLE_NAME WHERE k.TABLE_SCHEMA=DATABASE() AND k.TABLE_NAME=? AND k.REFERENCED_TABLE_NAME IS NOT NULL ORDER BY k.COLUMN_NAME', ['customer_accounts']) !== $expected
-            || self::query($pdo, 'SELECT COUNT(*) count FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?', ['customer_accounts']) !== [['count' => 6]]) {
+        if (self::query($pdo, CatalogRead::Q3A0D56156905, ['customer_accounts']) !== $expected
+            || self::query($pdo, CatalogRead::QB894B1A4D034, ['customer_accounts']) !== [['count' => 6]]) {
             self::refuse();
         }
     }
 
-    private static function query(PDO $pdo, string $sql, array $values): array
+    private static function query(PDO $pdo, CatalogRead $query, array $values): array
     {
-        $statement = $pdo->prepare($sql);
-        $statement->execute($values);
-
-        return $statement->fetchAll(PDO::FETCH_ASSOC);
+        return CatalogLease::read($pdo, $query, $values);
     }
 
     private static function refuse(): never

@@ -111,9 +111,7 @@ final readonly class IdentityRows
                 if ($this->connection->getDatabaseName() !== $this->schema || $this->primary->query('SELECT DATABASE()')->fetchColumn() !== $this->schema) {
                     throw new IdentityException;
                 }
-                $statement = $this->primary->prepare('SELECT TABLE_NAME,TABLE_TYPE,ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=? AND LOWER(TABLE_NAME)=?');
-                $statement->execute([$this->schema, $table]);
-                $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+                $rows = CatalogLease::read($this->primary, CatalogRead::Q2598A65A62C5, [$this->schema, $table]);
                 $shown = $this->primary->query('SHOW CREATE TABLE '.$qualified)->fetch(PDO::FETCH_ASSOC);
                 if (count($rows) !== 1 || $rows[0]['TABLE_NAME'] !== $table || $rows[0]['TABLE_TYPE'] !== 'BASE TABLE' || $rows[0]['ENGINE'] !== 'InnoDB'
                     || ! is_string($shown['Create Table'] ?? null) || str_starts_with($shown['Create Table'], 'CREATE TEMPORARY TABLE ')) {

@@ -1,0 +1,46 @@
+{
+  "tests/Unit/ProductionIdentity/CatalogNativeProviderTest.php": [
+    "test_native_noop_gate_restores_exact_previous_handler_without_invoking_it",
+    "test_altered_provider_is_restored_but_refused_and_lifetime_taint_blocks_repair_retry",
+    "test_missing_provider_refuses_after_restoration_without_calling_ambient_handler",
+    "test_disabled_globals_redeclared_in_php_are_refused_without_calling_replacements",
+    "test_unknown_or_duplicate_notice_cannot_authorize_or_be_repaired",
+    "test_nonexact_result_or_missing_notice_permanently_refuses",
+    "test_fresh_native_context_has_no_ambient_options_or_notification_callback"
+  ],
+  "tests/Unit/ProductionIdentity/CatalogWriterDescriptorTest.php": [
+    "test_canonical_tcp_and_laravel_socket_precedence_preserve_tls",
+    "test_empty_url_handoff_matches_real_laravel_no_url_parser_without_redirecting_writer",
+    "test_untrusted_shapes_options_injection_and_writer_mismatch_refuse"
+  ],
+  "tests/Unit/ProductionIdentity/CatalogSocketBindingTest.php": [
+    "test_literal_ipv4_and_ipv6_native_words_bind_the_unique_owned_primary_peer",
+    "test_target_matching_other_owned_socket_never_selects_it_instead_of_primary",
+    "test_unowned_ambiguous_missing_nonestablished_and_malformed_snapshots_refuse",
+    "test_hostname_unix_status_source_identity_and_declared_port_mismatches_refuse"
+  ],
+  "tests/Unit/ProductionIdentity/CatalogBatchPlanTest.php": [
+    "test_identity_batch_keeps_original_native_predicate_and_binds_names_as_values",
+    "test_membership_batch_retains_binary_qualification_ordering_and_parameter_relations",
+    "test_nonbatch_catalog_and_wrong_parameter_shape_cannot_gain_compiled_sql_authority"
+  ],
+  "tests/Unit/ProductionIdentity/CatalogPrivacyTest.php": [
+    "test_live_identity_comparison_requires_same_writer_principal_roles_and_schema",
+    "test_primary_tls_cannot_lose_all_tls_material_before_any_constructor_attempt",
+    "test_private_capability_debug_and_serialization_do_not_export_configuration_or_pdo"
+  ],
+  "tests/Unit/ProductionIdentity/CatalogReadTest.php": [
+    "test_closed_operations_cannot_select_business_rows_or_accept_caller_sql",
+    "test_namespace_union_preserves_six_exact_catalogs_and_original_binding_slots",
+    "test_foreign_pdo_getter_callback_is_refused_before_it_can_execute"
+  ],
+  "tests/Feature/ProductionIdentity/CurrentCatalogAdmissionTest.php": [
+    "test_native_nested_boundary_reuses_one_companion_and_last_close_releases_server_session",
+    "test_native_companion_statement_accounting_matches_server_including_constructor_setup_and_context",
+    "test_native_primary_attribute_changes_invalidate_retained_companion_without_reconnect",
+    "test_native_failed_memo_ends_companion_and_restoration_uses_complete_unframed_proof",
+    "test_native_coherent_endpoint_and_feasible_tls_downgrade_refuse_before_constructor_attempt",
+    "test_native_raw_config_and_resolver_callbacks_refuse_before_factory_or_callback_execution",
+    "test_native_unframed_complete_proofs_refuse_new_namespace_under_early_primary_snapshot"
+  ]
+}

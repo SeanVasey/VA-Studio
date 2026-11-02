@@ -5,6 +5,7 @@ namespace Tests\Feature\ProductionIdentity;
 use App\Domain\Customers\Preferences\ConsentMigrationAdmission;
 use App\Domain\Customers\ProductionIdentity\AccountAdmissionGuards;
 use App\Domain\Customers\ProductionIdentity\AccountAdmissionUpgrade;
+use App\Domain\Customers\ProductionIdentity\CurrentCatalog;
 use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
 use App\Domain\Customers\ProductionIdentity\IdentitySchema;
 use App\Domain\Customers\ProductionIdentity\SchemaProofFrame;
@@ -187,7 +188,7 @@ final class AccountAdmissionGuardUpgradeTest extends TestCase
             $calls++;
             AccountAdmissionGuards::stable($pdo, 'mysql');
         };
-        $read = static fn (): int => (int) $pdo->query("SHOW SESSION STATUS LIKE 'Questions'")->fetch(PDO::FETCH_NUM)[1];
+        $read = static fn (): int => (int) $pdo->query("SHOW SESSION STATUS LIKE 'Questions'")->fetch(PDO::FETCH_NUM)[1] + CurrentCatalog::statementCount();
         try {
             $start = $read();
             SchemaProofFrame::prove($pdo, 'account-test', ['customer_accounts'], $prove);
@@ -197,7 +198,7 @@ final class AccountAdmissionGuardUpgradeTest extends TestCase
             $hit = $read() - $start - 1;
             $this->assertSame(1, $calls);
             $this->assertLessThan(intdiv($first, 2), $hit);
-            $this->assertLessThanOrEqual(15, $hit, 'A memo hit must not repeat the roughly twenty-statement full account floor.');
+            $this->assertLessThanOrEqual(15, $hit, 'Total primary plus companion SQL must retain the memo budget.');
             $pins = (new \ReflectionProperty($frame, 'accountProofs'))->getValue($frame);
             $this->assertSame(AccountAdmissionGuards::V2, $pins['account-test']['version']);
             $this->assertMatchesRegularExpression('/\A[a-f0-9]{64}\z/', $pins['account-test']['fingerprint']);

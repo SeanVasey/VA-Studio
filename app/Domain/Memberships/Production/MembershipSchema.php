@@ -2,6 +2,8 @@
 
 namespace App\Domain\Memberships\Production;
 
+use App\Domain\Customers\ProductionIdentity\CatalogLease;
+use App\Domain\Customers\ProductionIdentity\CatalogRead;
 use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
 use App\Domain\Customers\ProductionIdentity\SchemaProofFrame;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +34,16 @@ final class MembershipSchema
     public function up(bool $ddl = true): void
     {
         $pdo = DB::connection()->getPdo();
+        $lease = CatalogLease::open($pdo);
+        try {
+            $this->inspectUp($pdo, $ddl);
+        } finally {
+            $lease->close();
+        }
+    }
+
+    private function inspectUp(PDO $pdo, bool $ddl): void
+    {
         $driver = DB::getDriverName();
         MembershipException::require(in_array($driver, ['sqlite', 'mysql'], true), 'schema');
         [$parents] = (new IdentityMigrationOwnership)->inspect($pdo, $driver);
@@ -78,7 +90,7 @@ final class MembershipSchema
                 $statement->execute([$name]);
                 MembershipException::require(array_diff($statement->fetchAll(PDO::FETCH_COLUMN), array_keys($guards)) === [], 'schema');
             } else {
-                $objects = $catalog->named('SELECT TABLE_NAME, TABLE_TYPE, ENGINE, TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND BINARY TABLE_SCHEMA = BINARY DATABASE() AND lower(TABLE_NAME) = lower(?)', $this->mysqlNames(), $name);
+                $objects = $catalog->named(CatalogRead::QB759388A923D, $this->mysqlNames(), $name);
                 MembershipException::require(count($objects) <= 1 && ($objects === [] || $objects[0]['TABLE_NAME'] === $name), 'schema_namespace');
                 $actual = $objects[0] ?? false;
                 if ($actual !== false) {
@@ -97,7 +109,7 @@ final class MembershipSchema
                     MembershipException::require($actual === ['TABLE_TYPE' => 'BASE TABLE', 'ENGINE' => 'InnoDB', 'TABLE_COLLATION' => 'utf8mb4_bin'], 'schema');
                     $this->mysqlDefinition($pdo, $name, $definition, $catalog);
                 }
-                $actualGuards = $catalog->named('SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() AND BINARY TRIGGER_SCHEMA = BINARY DATABASE() AND EVENT_OBJECT_TABLE = ?', $this->mysqlNames(), $name);
+                $actualGuards = $catalog->named(CatalogRead::Q17F6CDE46309, $this->mysqlNames(), $name);
                 MembershipException::require(array_diff(array_column($actualGuards, 'TRIGGER_NAME'), array_keys($guards)) === [], 'schema');
             }
             MembershipException::require(! (($absent || $prefixEnded) && $actual !== false), 'schema_prefix');
@@ -115,7 +127,7 @@ final class MembershipSchema
                         MembershipException::require($row['type'] === 'trigger' && $row['tbl_name'] === $name && $this->sql($row['sql']) === $this->sql($expected['sql']), 'schema');
                     }
                 } else {
-                    $objects = $catalog->named('SELECT TRIGGER_NAME, EVENT_OBJECT_TABLE, EVENT_MANIPULATION, ACTION_TIMING, ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() AND BINARY TRIGGER_SCHEMA = BINARY DATABASE() AND lower(TRIGGER_NAME) = lower(?)', $this->mysqlGuardNames(), $guard);
+                    $objects = $catalog->named(CatalogRead::QA587267279FC, $this->mysqlGuardNames(), $guard);
                     MembershipException::require(count($objects) <= 1 && ($objects === [] || $objects[0]['TRIGGER_NAME'] === $guard), 'schema_namespace');
                     $row = $objects[0] ?? false;
                     if ($row !== false) {
@@ -331,11 +343,11 @@ final class MembershipSchema
                     $constraints[$name.'_f'.$index] = 'FOREIGN KEY';
                 }
                 foreach ($constraints as $symbol => $type) {
-                    $objects = $catalog->rows('SELECT CONSTRAINT_NAME, TABLE_NAME, CONSTRAINT_TYPE FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND CONSTRAINT_TYPE = ? AND CONSTRAINT_NAME = ?', $namespaceParameters, $symbol);
+                    $objects = $catalog->rows(CatalogRead::Q646B96B0C726, $namespaceParameters, $symbol);
                     MembershipException::require($objects === [] || $objects === [['CONSTRAINT_NAME' => $symbol, 'TABLE_NAME' => $name, 'CONSTRAINT_TYPE' => $type]], 'schema_namespace');
                 }
             }
-            $rows = $pdo->query("SELECT TABLE_NAME AS name, 'table' AS type FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND BINARY TABLE_SCHEMA = BINARY DATABASE() UNION ALL SELECT TRIGGER_NAME AS name, 'trigger' AS type FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() AND BINARY TRIGGER_SCHEMA = BINARY DATABASE()")->fetchAll(PDO::FETCH_ASSOC);
+            $rows = CatalogLease::read($pdo, CatalogRead::Q02BD298FB369);
             foreach ($reserved as $expected) {
                 if ($expected['type'] === 'trigger') {
                     try {
@@ -405,7 +417,7 @@ final class MembershipSchema
 
     private function mysqlDefinition(PDO $pdo, string $name, array $definition, MembershipSchemaCatalog $catalog): void
     {
-        $columns = $catalog->named('SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA, COLLATION_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND BINARY TABLE_SCHEMA = BINARY DATABASE() AND TABLE_NAME = ? ORDER BY ORDINAL_POSITION', $this->mysqlNames(), $name);
+        $columns = $catalog->named(CatalogRead::Q3AA887855776, $this->mysqlNames(), $name);
         MembershipException::require(array_column($columns, 'COLUMN_NAME') === array_keys($definition['columns']), 'schema');
         foreach ($columns as $column) {
             $expected = $definition['columns'][$column['COLUMN_NAME']];
@@ -431,7 +443,7 @@ final class MembershipSchema
         ksort($actual);
         ksort($wanted);
         MembershipException::require($actual === $wanted, 'schema');
-        $constraints = $catalog->named('SELECT CONSTRAINT_NAME, CONSTRAINT_TYPE FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = DATABASE() AND BINARY TABLE_SCHEMA = BINARY DATABASE() AND TABLE_NAME = ?', $this->mysqlNames(), $name);
+        $constraints = $catalog->named(CatalogRead::QD85B53840949, $this->mysqlNames(), $name);
         $actual = array_column($constraints, 'CONSTRAINT_TYPE', 'CONSTRAINT_NAME');
         $wanted = ['PRIMARY' => 'PRIMARY KEY', $name.'_bounds' => 'CHECK'];
         foreach ($definition['unique'] as $index => $parts) {
@@ -442,16 +454,16 @@ final class MembershipSchema
         foreach (array_keys($definition['foreign']) as $index => $column) {
             $target = $definition['foreign'][$column];
             $wanted[$name.'_f'.$index] = 'FOREIGN KEY';
-            $foreign = $catalog->rows('SELECT COLUMN_NAME, REFERENCED_TABLE_SCHEMA, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, ORDINAL_POSITION FROM information_schema.KEY_COLUMN_USAGE WHERE CONSTRAINT_SCHEMA = DATABASE() AND BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND BINARY TABLE_NAME = BINARY ? AND CONSTRAINT_NAME = ?', $foreignParameters, $name.'_f'.$index);
+            $foreign = $catalog->rows(CatalogRead::Q67FBDF0A6079, $foreignParameters, $name.'_f'.$index);
             MembershipException::require($foreign === [['COLUMN_NAME' => $column, 'REFERENCED_TABLE_SCHEMA' => $schema, 'REFERENCED_TABLE_NAME' => $this->physical($target), 'REFERENCED_COLUMN_NAME' => 'id', 'ORDINAL_POSITION' => 1]], 'schema');
-            $foreign = $catalog->rows('SELECT UNIQUE_CONSTRAINT_SCHEMA, UNIQUE_CONSTRAINT_NAME, REFERENCED_TABLE_NAME, MATCH_OPTION, UPDATE_RULE, DELETE_RULE FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND BINARY TABLE_NAME = BINARY ? AND CONSTRAINT_NAME = ?', $foreignParameters, $name.'_f'.$index);
+            $foreign = $catalog->rows(CatalogRead::Q0A90E1BF7361, $foreignParameters, $name.'_f'.$index);
             MembershipException::require($foreign === [['UNIQUE_CONSTRAINT_SCHEMA' => $schema, 'UNIQUE_CONSTRAINT_NAME' => 'PRIMARY', 'REFERENCED_TABLE_NAME' => $this->physical($target), 'MATCH_OPTION' => 'NONE', 'UPDATE_RULE' => 'RESTRICT', 'DELETE_RULE' => 'RESTRICT']], 'schema');
         }
         ksort($actual);
         ksort($wanted);
         MembershipException::require($actual === $wanted, 'schema');
         $checks = array_combine($this->mysqlNames(), array_map(fn (string $table): array => [$table, $table.'_bounds'], $this->mysqlNames()));
-        $rows = $catalog->rows("SELECT c.CHECK_CLAUSE, t.ENFORCED FROM information_schema.CHECK_CONSTRAINTS c JOIN information_schema.TABLE_CONSTRAINTS t ON t.CONSTRAINT_SCHEMA = c.CONSTRAINT_SCHEMA AND t.CONSTRAINT_NAME = c.CONSTRAINT_NAME AND BINARY t.CONSTRAINT_SCHEMA = BINARY c.CONSTRAINT_SCHEMA AND BINARY t.CONSTRAINT_NAME = BINARY c.CONSTRAINT_NAME WHERE t.TABLE_SCHEMA = DATABASE() AND BINARY t.TABLE_SCHEMA = BINARY DATABASE() AND BINARY t.TABLE_NAME = BINARY ? AND t.CONSTRAINT_TYPE = 'CHECK' AND t.CONSTRAINT_NAME = ?", $checks, $name);
+        $rows = $catalog->rows(CatalogRead::Q17D835DCD480, $checks, $name);
         MembershipException::require(count($rows) === 1 && $rows[0]['ENFORCED'] === 'YES' && $this->check($rows[0]['CHECK_CLAUSE']) === $this->check($definition['check']), 'schema');
     }
 

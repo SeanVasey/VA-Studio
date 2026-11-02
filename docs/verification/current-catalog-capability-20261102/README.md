@@ -172,3 +172,139 @@ Trusted PHP runtime/code/autoload/native-extension assumptions remain explicit;
 this does not defend against arbitrary PHP execution/reflection or a compromised
 kernel/extension. Native pointer/no-op attestation is more than wrapper names or
 readlink, which exact PHP source proved insufficient. No new DB/network test.
+
+## Prepared implementation and explicit activation limits
+
+The source implements the declared enum-only current catalog boundary, not
+repository-wide metadata/factory repair. Old CapabilityMigrationOwnership and
+other unrelated framework inspectors retain inherited activation conditions;
+no runtime dependency scope was expanded into migration-only foreign account
+admission. The latter still rejects unknown incoming FK/view/routine/trigger
+objects against its exact source-backed allowlist. Existing table/guard/index/
+constraint/FK/charset/SQL-mode/shape/private-field/audit ownership checks remain.
+
+Constructor profile is explicitly PHP8.4.27/Linux/mysqlnd/literal-IP direct TCP
+with visible own PROCESSLIST client IP+source port and unique own kernel inode/
+ESTABLISHED association. Hostnames, Unix/implicitlocalhost, reverse-DNS client
+names, forwarded/NAT/proxy/ambiguous/proc-hidden cases REFUSE before credential
+constructor. Pure descriptor validation still preserves Laravel socket precedence,
+null/empty URL equivalence and supported TLS options; that is NOT constructor
+support for Unix. Existing Forge/staging/production kits mandate127.0.0.1 and no
+skip-name-resolve configuration was found: PROCESSLIST reverse-DNS may make that
+real topology unsupported. Refusal is correct until proved. Container-IP
+mechanism/source evidence is NOT staging compatibility or deployment readiness.
+
+Before newPDO, the target is selected by primary own client endpoint among OWN
+ESTABLISHED sockets, never requested endpoint first; requested literal IP/port
+must equal actual peer and direct server port. Reprove immediately before the
+attempt counter/newPDO. Fixed own proc paths, byte/line/fd bounds and native-word
+IPv4/IPv6 decoding have pure controls. Real PDO-to-proc association is UNRUN.
+No OS process, FFI, packet IO, stream takeover, other PID, arbitrary path or
+provider callback is used in product code. All relevant globals are fully
+qualified and required internal before use; disabled/redeclared functions taint
+and refuse without invocation. A fresh empty/no-notifier context is explicitly
+passed to directory and file operations. readlink lacks a context and exact
+PHP source establishes its native direct syscall behavior, not wrapper identity.
+
+File-provider attestation accepts only the exact native already-global/no-op
+E_NOTICE under a trusted handler. Changed/missing provider may ALREADY be restored
+by native PHP before refusal; it is then permanently tainted for this execution
+lifetime. Existing lease/current-catalog reuse checks the same taint and cannot
+continue. Private poison has no reset API; recovery requires a fresh trusted
+execution (PHP-FPM request statics reset versus long-running CLI worker restart
+must be understood). Exact prior error handler is restored without invocation.
+Trust assumptions are explicit: native PHP8.4.27 baseline/loaded code/autoload/
+extensions/kernel/proc/network namespace, one execution thread, no coroutine
+or asynchronous user signal/extension hook changing state inside the critical
+section, no arbitrary PHP/RCE/reflection changing private state. This is not an
+assertion that all PHP execution or native extensions can be adversarial safely.
+
+Primary actual TLS cipher/version is read BEFORE construction. If TLS is active,
+removing all corresponding SSL request material or disabling verification refuses
+before an attempt; plaintext/TLS profile mismatches refuse. Supported CA/CAPATH/
+CERT/KEY/CIPHER options are retained and verification remains true. This proves
+requested target/material/verification preconditions under the stated runtime;
+it does NOT recover an immutable historical CA/client-certificate identity from
+PDO or prove unexecuted TLS negotiation/profile compatibility. Postconnection
+UUID/principal/login/roles/schema/session/TLS/transport checks remain mandatory.
+Native TLS positive/downgrade behavior is UNRUN. The new native negative method
+prints whether the coherent TLS-removal subcase was actually selected; no-TLS
+profiles report that subcase UNEXECUTED rather than manufacture a TLS pass.
+
+No new environment key, feature enable, provider binding, public route, primary
+SET/isolation/snapshot, guard removal, ledger rewrite or migration edit occurred.
+The original account/member trials remain unaccepted and mount false. New
+metadata-session lock timeouts1second are bounded companion-only initialization;
+original business/advisory/DDL locks and original owners' deadlines are unchanged.
+
+## Actual preparation evidence and failures retained
+
+Current full pure invocation uses only the existing runtime, own Composer
+metadata and shared immutable PHPUnit package; no Laravel/application bootstrap,
+PDO construction, DB/network connection or native probe occurs. The isolated
+provider children intentionally change ONLY their disposable CLI wrapper/default
+context/error-handler state and prove its specified effects. Latest pre-final
+selection:32tests/306assertions PASS, including original3 guard-definition cases.
+The final static receipt/hashes below apply to the frozen candidate's code.
+
+Preparation failures retained honestly: first shared-autoload unit run had2
+class-not-found errors/0assertions; loading both Composer initializers then caused
+class redeclaration. External pure launcher now sets official
+_composer_autoload_path to this worktree BEFORE shared PHPUnit loading; an
+intermediate duplicate-constant warning was eliminated. Initial isolated provider
+run had2 harness errors because PHPUnit assertion autoload executed while file
+wrapper was disabled. The unsupported window is now assertion-free until native
+restore/refusal; checks execute only after native provider restoration. Provider
+4/27 and full32/306 then passed. These were pure harness failures, not native
+factory failures or passes, and no DB/native retry occurred.
+
+Actual provider evidence: native PHP8.4.27 no-op returns TRUE plus exactly severity8
+message `stream_wrapper_restore(): file:// was never changed, nothing to restore`.
+Altered/missing file providers are restored-but-refused, no hostile wrapper/error
+handler callbacks execute, constructor attempts remain0, retry remains tainted,
+old catalog boundary refuses and invalidates; previous error handler is exact.
+Disabled/redeclared restore/set_error_handler/fopen/opendir subprocesses each
+refuse without calling replacements and without DB/network. Wrong/duplicate
+notice or nonexact result permanently refuses. Fresh context has no inherited
+options/notification callback. These controls do NOT execute proc/PDO association.
+
+## Frozen implementation verification (2026-11-02)
+
+Final static checks: all25 changed/new PHP files passed `php -l`; Pint `--test`
+passed25files without editing bytes. Exact commands, outputs and per-file SHA256
+are committed in `catalog-final-static-20261102.json` and `SOURCE-SHA256.txt`.
+The final pure command in `catalog-final-pure-20261102.json` passed32tests/
+306assertions on PHP8.4.27 in1.266seconds, exit0. Its source hashes exactly equal
+all25 lint/Pint source hashes; these bytes are the frozen implementation. No
+source edits occurred between those checks and freeze. This selection includes
+isolated provider mutation subprocesses and original guard definitions; it opens
+no DB/network and does not bootstrap Laravel. Earlier harness failures above
+remain failures with their concrete repairs, rather than omitted attempts.
+
+The earlier open preconstruction proposal is now implemented for review through
+CatalogSocketBinding's exact internal-function/provider/own-kernel tuple floor;
+this resolves source preparation only. The provider decision is copied byte exact.
+Construction supports only the documented PHP8.4.27/Linux/mysqlnd/literal-IP
+TCP profile. Existing Forge/staging/production kits mandate127.0.0.1, and no
+skip-name-resolve setting was found. PROCESSLIST reverse-DNS can therefore make
+those deployments unsupported: refusal is required, and direct container-IP
+mechanism evidence is not staging compatibility. Native endpoint association,
+coherent endpoint/TLS negatives and all production factory behavior are UNRUN.
+
+`NEW-TEST-METHODS.json` enumerates every new generic/native test method. The seven
+CurrentCatalogAdmissionTest methods are native-only and remain UNEXECUTED; their
+exact SQLite skip is `Native MySQL catalog companion sessions and primary RR
+authority.` when the configured driver is not mysql. No skips were executed in
+this pure selection. The original early-RR failure remains retained/unaccepted.
+
+Queued acceptance, subject to independent exact-source review and root DB lease:
+original EARLY-RR framework regression first; native constructor endpoint/TLS and
+canonical configuration failures; full/memo/terminal/lease/witness/dependent
+regressions; fresh/composed/populated/actual Laravel process-ledger interruption
+and restart; original IdentityInspectionCost110 and memo15 using TOTAL primary
+plus companion/factory/setup/handshake accounting; actual account-PK held-owner
+controls in both orderings with generated IDs/FKs. Added test source is not
+execution. The accepted74c3 diagnostic neither accepts this production repair nor
+proves those budgets. Old migration/V1 fixture output and prior packet bytes are
+unchanged. Member trial remains excluded, unaccepted and mountfalse. No envkeys,
+shared census/ledger/workflow edits, DB execution, push or PR occurred.

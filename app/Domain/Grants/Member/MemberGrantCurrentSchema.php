@@ -3,6 +3,8 @@
 namespace App\Domain\Grants\Member;
 
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
+use App\Domain\Customers\ProductionIdentity\CatalogLease;
+use App\Domain\Customers\ProductionIdentity\CatalogRead;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Customers\ProductionIdentity\SchemaProofFrame;
 use App\Domain\Memberships\Production\MembershipAwardTransaction;
@@ -318,6 +320,16 @@ final class MemberGrantCurrentSchema
 
     private static function mysql(array $state): void
     {
+        $lease = CatalogLease::open($state['primary']);
+        try {
+            self::mysqlCurrent($state);
+        } finally {
+            $lease->close();
+        }
+    }
+
+    private static function mysqlCurrent(array $state): void
+    {
         $pdo = $state['primary'];
         $reserved = [];
         foreach ($state['plan']['tables'] as $table) {
@@ -342,13 +354,11 @@ final class MemberGrantCurrentSchema
                 }
             }
         }
-        // Supplementary namespace/unknown-trigger inventory. RR may retain this inventory; all owned
-        // table structures and all 16 required known triggers above use current SHOW, never this snapshot.
-        $statement = $pdo->prepare("SELECT TABLE_NAME name, 'table' type, TABLE_NAME owner FROM information_schema.TABLES WHERE BINARY TABLE_SCHEMA = BINARY ? UNION ALL SELECT TRIGGER_NAME name, 'trigger' type, EVENT_OBJECT_TABLE owner FROM information_schema.TRIGGERS WHERE BINARY TRIGGER_SCHEMA = BINARY ?");
-        $statement->execute([$state['schema'], $state['schema']]);
+        // Current permanent namespace inventory; primary SHOW/temporary facts above remain authoritative.
+        $inventory = CatalogLease::read($pdo, CatalogRead::Q905B0CAE1976, [$state['schema'], $state['schema']]);
         $seen = [];
         $names = array_column($state['plan']['tables'], 'name');
-        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        foreach ($inventory as $row) {
             $key = strtolower($row['name']);
             if (isset($reserved[$key])) {
                 MemberGrantException::require(! isset($seen[$key]) && $reserved[$key] === ['name' => $row['name'], 'type' => $row['type']], 'schema_namespace');

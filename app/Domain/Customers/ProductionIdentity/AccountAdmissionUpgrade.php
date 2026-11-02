@@ -108,6 +108,16 @@ final class AccountAdmissionUpgrade
     /** Both existing independent foundation inspectors retain their complete metadata/dependent proofs. */
     private function inspect(PDO $pdo, string $driver, string $database): array
     {
+        $lease = CatalogLease::open($pdo);
+        try {
+            return $this->inspectCurrent($pdo, $driver, $database);
+        } finally {
+            $lease->close();
+        }
+    }
+
+    private function inspectCurrent(PDO $pdo, string $driver, string $database): array
+    {
         $before = AccountAdmissionGuards::migrationState($pdo, $driver);
         $identity = new IdentityMigrationOwnership;
         $identity->inspectForAccountUpgrade($pdo, $driver);
