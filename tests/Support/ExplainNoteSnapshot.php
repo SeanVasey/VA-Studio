@@ -10,9 +10,9 @@ use Throwable;
 /** EXPLAIN test provenance ONLY. Ordinary production queries still require zero diagnostics. */
 final class ExplainNoteSnapshot
 {
-    public static function capture(Mysql $pdo, PDOStatement $offender, int $prepare, int $execute, int $firstFetch): array
+    public static function capture(Mysql $pdo, PDOStatement $offender, int $beforeExecute, int $execute, int $firstFetch): array
     {
-        return self::run(new NativeExplainNoteTransport($pdo, $offender), ['prepare' => $prepare, 'execute' => $execute, 'first_fetch' => $firstFetch]);
+        return self::run(new NativeExplainNoteTransport($pdo, $offender), ['before_execute' => $beforeExecute, 'execute' => $execute, 'first_fetch' => $firstFetch]);
     }
 
     private static function run(ExplainNoteTransport $transport, array $counts): array
@@ -25,7 +25,7 @@ final class ExplainNoteSnapshot
         $rows = [];
         $getterWarnings = null;
         try {
-            if (array_keys($counts) !== ['prepare', 'execute', 'first_fetch'] || $counts['prepare'] !== 0
+            if (array_keys($counts) !== ['before_execute', 'execute', 'first_fetch'] || $counts['before_execute'] !== 0
                 || ! is_int($counts['execute']) || ! is_int($counts['first_fetch'])
                 || $counts['execute'] < 0 || $counts['execute'] > 8 || $counts['first_fetch'] < 0 || $counts['first_fetch'] > 8
                 || $transport->emulated() !== false) {
@@ -100,8 +100,8 @@ final class ExplainNoteSnapshot
         $counts = $snapshot['counts'] ?? null;
         $rows = $snapshot['rows'] ?? null;
         if (array_keys($snapshot) !== ['counts', 'rows', 'offender_eof', 'restored', 'diagnostic_closed', 'getter_warnings']
-            || ! is_array($counts) || array_keys($counts) !== ['prepare', 'execute', 'first_fetch', 'eof']
-            || $counts !== ['prepare' => 0, 'execute' => 1, 'first_fetch' => 1, 'eof' => 1]
+            || ! is_array($counts) || array_keys($counts) !== ['before_execute', 'execute', 'first_fetch', 'eof']
+            || $counts !== ['before_execute' => 0, 'execute' => 1, 'first_fetch' => 1, 'eof' => 1]
             || $snapshot['getter_warnings'] !== 0 || $snapshot['offender_eof'] !== true || $snapshot['restored'] !== true || $snapshot['diagnostic_closed'] !== true
             || ! is_array($rows) || ! array_is_list($rows) || count($rows) !== 1
             || ! is_array($rows[0]) || array_keys($rows[0]) !== ['level', 'code', 'message_bytes']

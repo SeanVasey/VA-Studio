@@ -16,6 +16,7 @@ use Pdo\Mysql;
 use ReflectionMethod;
 use ReflectionProperty;
 use Tests\Support\ExplainNoteSnapshot;
+use Tests\Support\ExplainPrepareSnapshot;
 use Tests\Support\ProductionIdentityFixture;
 use Tests\TestCase;
 
@@ -170,7 +171,10 @@ final class CatalogGroupDifferentialTest extends TestCase
                     }
                     $statement = $native->prepare('EXPLAIN FORMAT=JSON '.$stream['sql']);
                     $prepareWarnings = $native->getWarningCount();
-                    self::assertSame(0, $prepareWarnings);
+                    $prepareProof = ExplainPrepareSnapshot::capture($native, $statement, $prepareWarnings);
+                    self::assertSame($prepareWarnings, $prepareProof['count']);
+                    $beforeExecute = $native->getWarningCount();
+                    self::assertSame(0, $beforeExecute);
                     foreach ($stream['bindings'] as $position => $value) {
                         self::assertTrue($statement->bindValue($position + 1, $value, PDO::PARAM_STR));
                     }
@@ -183,7 +187,7 @@ final class CatalogGroupDifferentialTest extends TestCase
                     $executeWarnings = $native->getWarningCount();
                     $json = $statement->fetchColumn();
                     $fetchWarnings = $native->getWarningCount();
-                    $snapshot = ExplainNoteSnapshot::capture($native, $statement, $prepareWarnings, $executeWarnings, $fetchWarnings);
+                    $snapshot = ExplainNoteSnapshot::capture($native, $statement, $beforeExecute, $executeWarnings, $fetchWarnings);
                     self::assertTrue($statement->closeCursor());
                     fwrite(STDERR, 'EXPLAIN diagnostics: '.json_encode(['group' => $group->value, 'stream' => $streamIndex, 'counts' => $snapshot['counts'], 'rows' => $snapshot['rows']], JSON_THROW_ON_ERROR)."\n");
                     ExplainNoteSnapshot::requireOnlyExplainNote($snapshot);
@@ -235,28 +239,46 @@ final class CatalogGroupDifferentialTest extends TestCase
         try {
             $catalog = (new ReflectionProperty($lease, 'catalog'))->getValue($lease);
             $native = (new ReflectionProperty($catalog, 'catalog'))->getValue($catalog);
-            // Genuine known EXPLAIN positive BEFORE expected negative classification.
-            $plan = CatalogGroupPlan::build(CatalogGroup::A0_ACCOUNT_TABLE, AccountAdmissionGuards::V2);
-            $statement = $native->prepare('EXPLAIN FORMAT=JSON '.$plan['sql']);
-            $prepareWarnings = $native->getWarningCount();
-            self::assertSame(0, $prepareWarnings);
-            foreach ($plan['bindings'] as $position => $value) {
-                self::assertTrue($statement->bindValue($position + 1, $value, PDO::PARAM_STR));
+            // Both clean A0 and genuine positive A1 prepare stages, SAME statements retained.
+            foreach ([CatalogGroup::A0_ACCOUNT_TABLE, CatalogGroup::A1_ACCOUNT_AFTER_SHOW] as $positiveGroup) {
+                $plan = CatalogGroupPlan::build($positiveGroup, AccountAdmissionGuards::V2);
+                $statement = $native->prepare('EXPLAIN FORMAT=JSON '.$plan['sql']);
+                $prepareWarnings = $native->getWarningCount();
+                if ($positiveGroup === CatalogGroup::A0_ACCOUNT_TABLE) {
+                    self::assertSame(0, $prepareWarnings);
+                } else {
+                    self::assertGreaterThan(0, $prepareWarnings);
+                    try {
+                        (new ReflectionMethod(CurrentCatalog::class, 'requireNoWarnings'))->invoke(null, $native);
+                        self::fail('Production zero guard accepted prepare notes.');
+                    } catch (LogicException) {
+                        self::assertTrue(true);
+                    }
+                }
+                $prepareProof = ExplainPrepareSnapshot::capture($native, $statement, $prepareWarnings);
+                self::assertSame($prepareWarnings, $prepareProof['count']);
+                $beforeExecute = $native->getWarningCount();
+                self::assertSame(0, $beforeExecute);
+                foreach ($plan['bindings'] as $position => $value) {
+                    self::assertTrue($statement->bindValue($position + 1, $value, PDO::PARAM_STR));
+                }
+                self::assertTrue($statement->execute());
+                $executeWarnings = $native->getWarningCount();
+                $positivePayload = $statement->fetchColumn();
+                self::assertIsString($positivePayload);
+                unset($positivePayload);
+                $positive = ExplainNoteSnapshot::capture($native, $statement, $beforeExecute, $executeWarnings, $native->getWarningCount());
+                self::assertTrue($statement->closeCursor());
+                $statement = null;
+                ExplainNoteSnapshot::requireOnlyExplainNote($positive);
+                self::assertTrue(true, 'Same prepared statement completed strict execute Note1003 proof.');
             }
-            self::assertTrue($statement->execute());
-            $executeWarnings = $native->getWarningCount();
-            $positivePayload = $statement->fetchColumn();
-            self::assertIsString($positivePayload);
-            unset($positivePayload);
-            $positive = ExplainNoteSnapshot::capture($native, $statement, $prepareWarnings, $executeWarnings, $native->getWarningCount());
-            self::assertTrue($statement->closeCursor());
-            $statement = null;
-            ExplainNoteSnapshot::requireOnlyExplainNote($positive);
-            self::assertTrue(true, 'Known native EXPLAIN positive establishes capture/classifier availability.');
             // EXACT existing warning-envelope expression: a counterfactual Warning, not EXPLAIN.
             $statement = $native->prepare("SELECT JSON_ARRAY(JSON_ARRAY('I',CAST(CAST('catalog-not-integer' AS UNSIGNED) AS CHAR CHARACTER SET utf8mb4))) AS payload");
             $prepareWarnings = $native->getWarningCount();
             self::assertSame(0, $prepareWarnings);
+            $beforeExecute = $native->getWarningCount();
+            self::assertSame(0, $beforeExecute);
             self::assertTrue($statement->execute());
             $executeWarnings = $native->getWarningCount();
             $negativePayload = $statement->fetchColumn();
@@ -271,7 +293,7 @@ final class CatalogGroupDifferentialTest extends TestCase
             } catch (LogicException) {
                 self::assertTrue(true);
             }
-            $negative = ExplainNoteSnapshot::capture($native, $statement, $prepareWarnings, $executeWarnings, $fetchWarnings);
+            $negative = ExplainNoteSnapshot::capture($native, $statement, $beforeExecute, $executeWarnings, $fetchWarnings);
             self::assertTrue($statement->closeCursor());
             $statement = null;
             self::assertNotEmpty(array_filter($negative['rows'], fn (array $row): bool => $row['level'] === 'Warning'));
@@ -279,6 +301,12 @@ final class CatalogGroupDifferentialTest extends TestCase
             try {
                 ExplainNoteSnapshot::requireOnlyExplainNote($negative);
                 self::fail('EXPLAIN-only note policy accepted the real conversion Warning.');
+            } catch (LogicException) {
+                self::assertTrue(true);
+            }
+            try {
+                ExplainPrepareSnapshot::requireOnlyResolutionRows($negative['rows']);
+                self::fail('Prepare row-family classifier accepted actual EXECUTED CAST Warning.');
             } catch (LogicException) {
                 self::assertTrue(true);
             }

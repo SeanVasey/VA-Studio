@@ -15,6 +15,8 @@ interface ExplainNoteTransport
 
     public function warningRows(): iterable;
 
+    public function prepareWarningRows(): iterable;
+
     public function closeDiagnostic(): bool;
 
     public function closeOffender(): bool;

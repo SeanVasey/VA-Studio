@@ -55,6 +55,14 @@ final class NativeExplainNoteTransport implements ExplainNoteTransport
         }
     }
 
+    public function prepareWarningRows(): iterable
+    {
+        $this->diagnostic = $this->pdo->query('SHOW WARNINGS LIMIT 32');
+        while (($row = $this->diagnostic->fetch(PDO::FETCH_ASSOC)) !== false) {
+            yield $row;
+        }
+    }
+
     public function closeDiagnostic(): bool
     {
         if ($this->diagnostic === null) {

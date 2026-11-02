@@ -8,12 +8,13 @@ use ReflectionMethod;
 use RuntimeException;
 use Tests\Support\ExplainNoteSnapshot;
 use Tests\Support\ExplainNoteTransport;
+use Tests\Support\ExplainPrepareSnapshot;
 
 final class ExplainNoteSnapshotTest extends TestCase
 {
     private function valid(): array
     {
-        return ['counts' => ['prepare' => 0, 'execute' => 1, 'first_fetch' => 1, 'eof' => 1], 'rows' => [['level' => 'Note', 'code' => 1003, 'message_bytes' => 17]], 'offender_eof' => true, 'restored' => true, 'diagnostic_closed' => true, 'getter_warnings' => 0];
+        return ['counts' => ['before_execute' => 0, 'execute' => 1, 'first_fetch' => 1, 'eof' => 1], 'rows' => [['level' => 'Note', 'code' => 1003, 'message_bytes' => 17]], 'offender_eof' => true, 'restored' => true, 'diagnostic_closed' => true, 'getter_warnings' => 0];
     }
 
     public function test_exact_complete_note_is_the_only_accepted_classification(): void
@@ -35,14 +36,14 @@ final class ExplainNoteSnapshotTest extends TestCase
         }
         $s = $this->valid();
         $s['rows'][] = ['level' => 'Warning', 'code' => 1292, 'message_bytes' => 1];
-        $s['counts'] = ['prepare' => 0, 'execute' => 2, 'first_fetch' => 2, 'eof' => 2];
+        $s['counts'] = ['before_execute' => 0, 'execute' => 2, 'first_fetch' => 2, 'eof' => 2];
         $bad[] = $s;
         foreach (['offender_eof', 'restored', 'diagnostic_closed'] as $field) {
             $s = $this->valid();
             $s[$field] = false;
             $bad[] = $s;
         }
-        foreach (['prepare', 'execute', 'first_fetch', 'eof'] as $field) {
+        foreach (['before_execute', 'execute', 'first_fetch', 'eof'] as $field) {
             foreach (['1', true, -1, 9] as $value) {
                 $s = $this->valid();
                 $s['counts'][$field] = $value;
@@ -50,7 +51,7 @@ final class ExplainNoteSnapshotTest extends TestCase
             }
         }
         $s = $this->valid();
-        $s['counts'] = ['prepare' => 0, 'execute' => 0, 'first_fetch' => 0, 'eof' => 0];
+        $s['counts'] = ['before_execute' => 0, 'execute' => 0, 'first_fetch' => 0, 'eof' => 0];
         $s['rows'] = [];
         $bad[] = $s;
         $s = $this->valid();
@@ -109,7 +110,7 @@ final class ExplainNoteSnapshotTest extends TestCase
         $transport = new ExplainNoteFake;
         $transport->rows = [$valid, ['Level' => 'Warning', 'Code' => 1292, 'Message' => 'x']];
         $transport->count = 2;
-        $snapshot = $this->capture($transport, ['prepare' => 0, 'execute' => 2, 'first_fetch' => 2]);
+        $snapshot = $this->capture($transport, ['before_execute' => 0, 'execute' => 2, 'first_fetch' => 2]);
         try {
             ExplainNoteSnapshot::requireOnlyExplainNote($snapshot);
             self::fail('Mixed complete Note and Warning accepted.');
@@ -131,7 +132,7 @@ final class ExplainNoteSnapshotTest extends TestCase
                 self::assertNotContains('show', $transport->operations);
             }
         }
-        foreach ([['prepare' => 1, 'execute' => 1, 'first_fetch' => 1], ['prepare' => 0, 'execute' => '1', 'first_fetch' => 1], ['prepare' => 0, 'execute' => 1, 'first_fetch' => 2]] as $counts) {
+        foreach ([['before_execute' => 1, 'execute' => 1, 'first_fetch' => 1], ['before_execute' => 0, 'execute' => '1', 'first_fetch' => 1], ['before_execute' => 0, 'execute' => 1, 'first_fetch' => 2]] as $counts) {
             $transport = new ExplainNoteFake;
             $this->refuses($transport, $counts);
             self::assertNotContains('show', $transport->operations);
@@ -153,12 +154,84 @@ final class ExplainNoteSnapshotTest extends TestCase
         }
     }
 
-    private function capture(ExplainNoteFake $transport, array $counts = ['prepare' => 0, 'execute' => 1, 'first_fetch' => 1]): array
+    public function test_prepare_zero_and_positive_complete_snapshots_keep_unexecuted_offender_alive(): void
+    {
+        foreach ([0, 1, 16, 32] as $count) {
+            $t = new ExplainNoteFake;
+            $t->count = $count;
+            $t->rows = array_fill(0, $count, ['Level' => 'Note', 'Code' => 1276, 'Message' => 'PRIVATE_SQL_SENTINEL']);
+            $snapshot = (new ReflectionMethod(ExplainPrepareSnapshot::class, 'run'))->invoke(null, $t, $count);
+            ExplainPrepareSnapshot::requireOnlyResolutionNotes($snapshot);
+            self::assertSame($count, $snapshot['count']);
+            self::assertNotContains('eof', $t->operations, 'Unexecuted offender must NEVER be fetched.');
+            self::assertFalse($t->offenderClosed);
+            self::assertTrue($t->diagnosticClosed);
+            self::assertFalse($t->emulation);
+            self::assertSame(['mode', 'set_true', 'mode', 'show', 'count', 'set_false', 'mode', 'close_diagnostic'], $t->operations);
+            self::assertStringNotContainsString('PRIVATE_SQL_SENTINEL', serialize($snapshot));
+        }
+    }
+
+    public function test_prepare_mixed_wrong_stage_count_type_caps_and_protocol_failures_refuse(): void
+    {
+        $valid = ['Level' => 'Note', 'Code' => 1276, 'Message' => 'PRIVATE_SQL_SENTINEL'];
+        $cases = [[], [$valid, $valid], [['Level' => 'Warning', 'Code' => 1292, 'Message' => 'x']], [['Level' => 'Note', 'Code' => 1003, 'Message' => 'x']], [['Level' => 'Note', 'Code' => '1276', 'Message' => 'x']], [['Level' => 'Note', 'Code' => 1276, 'Message' => []]], [['Level' => 'Note', 'Code' => 1276, 'Message' => str_repeat('x', 131073)]], array_fill(0, 33, $valid), [$valid, ['Level' => 'Error', 'Code' => 1276, 'Message' => 'x']]];
+        foreach ($cases as $rows) {
+            $t = new ExplainNoteFake;
+            $t->rows = $rows;
+            try {
+                (new ReflectionMethod(ExplainPrepareSnapshot::class, 'run'))->invoke(null, $t, 1);
+                self::fail('Prepare family accepted unsafe metadata.');
+            } catch (LogicException $e) {
+                self::assertNull($e->getPrevious());
+                self::assertStringNotContainsString('PRIVATE_SQL_SENTINEL', $e->getMessage());
+            }
+            self::assertNotContains('eof', $t->operations);
+            self::assertTrue($t->offenderClosed);
+            self::assertTrue($t->diagnosticClosed);
+        }
+        foreach (['initial_mode', 'set_true', 'wrong_true', 'rows_throw', 'rows_partial_throw', 'getter_warning', 'set_false', 'wrong_false', 'close_false', 'close_throw'] as $fault) {
+            $t = new ExplainNoteFake;
+            $t->rows = [$valid];
+            $t->fault = $fault;
+            try {
+                (new ReflectionMethod(ExplainPrepareSnapshot::class, 'run'))->invoke(null, $t, 1);
+                self::fail('Prepare protocol failure admitted.');
+            } catch (LogicException) {
+                self::assertTrue(true);
+            }
+            self::assertTrue($t->offenderClosed);
+            self::assertContains('close_diagnostic', $t->operations);
+            self::assertNotContains('eof', $t->operations);
+        }
+        foreach ([-1, 33] as $count) {
+            $t = new ExplainNoteFake;
+            try {
+                (new ReflectionMethod(ExplainPrepareSnapshot::class, 'run'))->invoke(null, $t, $count);
+                self::fail('Prepare count cap admitted.');
+            } catch (LogicException) {
+                self::assertNotContains('show', $t->operations);
+            }
+        }
+        $snapshot = ['phase' => 'prepare', 'count' => 0, 'rows' => [], 'offender_unexecuted' => true, 'restored' => true, 'diagnostic_closed' => true, 'getter_warnings' => 0];
+        foreach (['phase' => 'execute', 'count' => '0', 'offender_unexecuted' => false, 'restored' => false, 'diagnostic_closed' => false, 'getter_warnings' => 1] as $key => $value) {
+            $bad = $snapshot;
+            $bad[$key] = $value;
+            try {
+                ExplainPrepareSnapshot::requireOnlyResolutionNotes($bad);
+                self::fail('Wrong stage/incomplete prepare snapshot accepted.');
+            } catch (LogicException) {
+                self::assertTrue(true);
+            }
+        }
+    }
+
+    private function capture(ExplainNoteFake $transport, array $counts = ['before_execute' => 0, 'execute' => 1, 'first_fetch' => 1]): array
     {
         return (new ReflectionMethod(ExplainNoteSnapshot::class, 'run'))->invoke(null, $transport, $counts);
     }
 
-    private function refuses(ExplainNoteFake $transport, array $counts = ['prepare' => 0, 'execute' => 1, 'first_fetch' => 1]): void
+    private function refuses(ExplainNoteFake $transport, array $counts = ['before_execute' => 0, 'execute' => 1, 'first_fetch' => 1]): void
     {
         try {
             $this->capture($transport, $counts);
@@ -241,6 +314,11 @@ final class ExplainNoteFake implements ExplainNoteTransport
                 throw new RuntimeException('Synthetic PRIVATE_SQL_SENTINEL incomplete stream.');
             }
         }
+    }
+
+    public function prepareWarningRows(): iterable
+    {
+        return $this->warningRows();
     }
 
     public function closeDiagnostic(): bool
