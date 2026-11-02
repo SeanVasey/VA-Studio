@@ -184,3 +184,25 @@ are required. Overflow is transaction/savepoint control only, not full witness
 or MDL acceptance. All original strict typed/multiset/order/oversize/EXPLAIN
 oracles remain. No new methods/skips; six native methods UNRUN. No native/DB/
 bootstrap/profiler/PFS/global/CI/push/PR action occurred in this repair.
+
+## Native3592 compiler repair — declared before source edit
+
+ONE approved read-only diagnostic at frozen7cae reproduced fixed A1 PREPARE
+PDOException HY000/3592 after actual canonical factory success. Template SHA256
+36940bdd2038ed5d3f0cd3482a41d5660677d9d25d2910a0f24255d852a9fa66,30binds/7families.
+Execute/EOF/column metadata/decoder and postprepare warning count were UNREACHED;
+no SHOW WARNINGS/retry occurred. Restore succeeded; expected invalid-capability
+lease-close refusal was followed by verified all-zero DB/PHP/ownCLI cleanup and
+unchanged source. Original six proof bodies remain UNRUN; full133FAIL remains.
+
+Root exact Oracle mysql-8.4.11 share/messages_to_clients.txt blob
+fb157bb8b0ead3c78c9755803e548a49ac1dea48 line8213 maps3592 to
+ER_WINDOW_ILLEGAL_ORDER_BY, legacy positional ORDER/PARTITION expression rejected.
+The direct single-slot compiler emitted bare PARTITION BY0. Minimal owned repair:
+ONLY compiler omits PARTITION for direct families; multi-slot retains qualified
+s.identity_lookup. One partition/window, slot0/header/order/binds/guard facts are
+preserved. Existing pure window-count assertion is normalized from the literal
+PARTITION prefix to ROW_NUMBER OVER prefix (same assertion/count, still requires
+a window per family); all native six proof oracles remain untouched. Regenerate
+fixed plans and source-hash receipts; no other app/guard/limit/warning/factory/
+primary-stage change, no native rerun until exact independent source approval.

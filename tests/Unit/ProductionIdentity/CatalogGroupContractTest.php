@@ -22,7 +22,7 @@ final class CatalogGroupContractTest extends TestCase
                 $old += count($plan['families']);
                 self::assertSame(count($plan['bindings']), substr_count($plan['sql'], '?'));
                 self::assertLessThanOrEqual(1024, count($plan['bindings']));
-                self::assertSame(count($plan['families']), substr_count($plan['sql'], 'ROW_NUMBER() OVER (PARTITION BY'));
+                self::assertSame(count($plan['families']), substr_count($plan['sql'], 'ROW_NUMBER() OVER ('));
                 self::assertStringEndsWith('ORDER BY family,slot,kind,CAST(ordinal AS UNSIGNED)', $plan['sql']);
                 self::assertStringNotContainsString('LIMIT ', $plan['sql']);
                 foreach ($plan['families'] as $family) {

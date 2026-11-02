@@ -430,7 +430,8 @@ final class CatalogGroupPlan
             $bindings = [...$bindings, ...$plan['bindings']];
             $name = 'catalog_family_'.$index;
             // A window-bearing CTE is nonmergeable. Its single materialization is shared by header and rows.
-            $ctes[] = $name.' AS (SELECT s.*, '.$slot.' AS catalog_slot, ROW_NUMBER() OVER (PARTITION BY '.$slot.($order === '' ? '' : ' ORDER BY '.$order).') AS catalog_ordinal FROM ('.$plan['sql'].') s)';
+            $window = ($direct === null ? 'PARTITION BY '.$slot : '').($order === '' ? '' : ($direct === null ? ' ' : '').'ORDER BY '.$order);
+            $ctes[] = $name.' AS (SELECT s.*, '.$slot.' AS catalog_slot, ROW_NUMBER() OVER ('.$window.') AS catalog_ordinal FROM ('.$plan['sql'].') s)';
             $slots = implode(' UNION ALL ', array_map(fn (int $n): string => 'SELECT '.$n.' AS catalog_slot', array_keys($plan['names'])));
             $branches[] = 'SELECT '.$index.' AS family, expected.catalog_slot AS slot, 0 AS kind, CAST(0 AS CHAR CHARACTER SET utf8mb4) AS ordinal, CAST(JSON_ARRAY(CAST(COALESCE(actual.total,0) AS CHAR CHARACTER SET utf8mb4)) AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_bin AS payload FROM ('.$slots.') expected LEFT JOIN (SELECT catalog_slot, COUNT(*) AS total FROM '.$name.' GROUP BY catalog_slot) actual ON actual.catalog_slot=expected.catalog_slot';
             $cells = [];
