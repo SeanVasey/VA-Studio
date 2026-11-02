@@ -40,5 +40,21 @@
     "public_sha256": "a80ec9aeb6a0959cab30d1a6c733daa25d39f55a59cfe90a8dba07b9466efc0e",
     "sanitized": true,
     "scope": "Pre-final source/evidence/runner assessment, not final post-mutation approval"
+  },
+  {
+    "file": "independent-timer-code-baseline-0159eec3-decision.md",
+    "original_sha256": "81a89e2742db3ad2f966514261116cf27bf3352955a270657e9518d09bff8fbe",
+    "public_sha256": "ed2ac4623cf3bb267612e0234481431f429c4dda47256c436c409df115ac903f",
+    "sanitized": true,
+    "scope": "Exact 0159 timer delta conditional fit and accepted selected 20/1323 baseline; historical mutation-pending status is followed by the separate six-actual decision",
+    "redaction": "Absolute local checkout path only; public carry preamble added; verdict and limitations unchanged"
+  },
+  {
+    "file": "independent-timer-six-mutations-0159eec3-decision.md",
+    "original_sha256": "f45c2c4dad5dd118ceb13c690e71586c95ee0d9a0d7616fe2bca2d7b136ad2e1",
+    "public_sha256": "8da19f5c04a05af21066013ad9cd3eb00d3b099af966f30e9f3b70a88942cd60",
+    "sanitized": true,
+    "scope": "Accepted six bounded SQLite mutant classifications, six expected failures/98 assertions; no exhaustive/native/backend acceptance",
+    "redaction": "Absolute local source root only; public carry preamble added; verdict and limitations unchanged"
   }
 ]

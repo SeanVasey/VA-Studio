@@ -43,3 +43,23 @@ At this checkpoint B1 real typed native owner `56509` is **RUNNING/pending**;
 no pass or account acceptance is inferred. F9/account/history/cost and target
 cache/backend gates remain open. Membership mounting stays literal-false; no
 CI dispatch, publication, live payment, deployment or customer import occurred.
+
+## Timer publication evidence carry — 2026-11-02
+
+[Timer actual results](timer-actual-results.md) and [whitelisted summary/recorded
+commands](timer-actual-summary.json) now carry the existing `0159` evidence:
+20 positive tests/1,323 assertions separately from six expected mutant failures/
+98 assertions, with the original timeout, v2 M01 UNKNOWN and old native scopes
+preserved. The [code/baseline decision](independent-timer-code-baseline-0159eec3-decision.md)
+and [six-actual decision](independent-timer-six-mutations-0159eec3-decision.md) are
+public-safe copies of the existing independent assessments, indexed with original
+and carried hashes in [independent-decisions.json](independent-decisions.json).
+This is a documentation carry, not a new review/test pass. N7-F1 implementation
+is default-off; intended-backend/shared-cache acceptance remains held. The
+deferred ledger retains the original finding and appends its current status.
+
+ROOT's later account checkpoint supersedes the prior RUNNING B1 note: separate
+a9b typed differential 1/1,081 passed, six cleanup checks clean, lease returned.
+Physical native owner `73355` is RUNNING with no outcome claimed here. Required
+external code/security reviews completed on frozen `e883`; new timer publication
+remains ROOT's one coherent PR #188 update after its necessary gates.
