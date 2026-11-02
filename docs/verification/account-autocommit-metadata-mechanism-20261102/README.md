@@ -142,3 +142,51 @@ Repair preparation actuals: lint2/Pint --test2 PASS;89pure contract assertions/8
 probe.php SHA256 `55998a7ce2c8d33b9e46106590dfb5328a3961560b66b34e6d5168d6730b1377`.
 companion_test.php SHA256 `7e9550a1c35e81b7080ca4770af9273c9c251b1538703868501b377bc8376269`.
 run.py SHA256 `8db59ead986da3de1a726b7b69ad90b196daa985fffa5b0b852700f606d85aa9`.
+
+### 9040 native relation STOP retained; oracle-only source correction
+
+One9040 run stopped outer2/1.7949s at the unsupported table-count assertion,
+with final cleanup verifiedall0; raw acmeta-20261102T003414Z-4dd39a388a97 remains
+INCOMPLETE. Its native TABLES.TABLE_NAME was utf8mb3_bin/lower_case_table_names0.
+Uppercase/accent tables were successfully created but excluded by the unchanged
+original lowercase/unaccented IN relation. Publisher and companion returned the
+same canonical BASE+VIEW2. All seven epoch2 selected/peer row sets matched, but
+later subtype/alias/context/primarywitness/TEMP/cost phases were unreached.
+These are partial observations, not completed currentness/repair acceptance.
+Byte-exact independent STOP decision and read-only analysis are retained here.
+
+This source adds ONE fixed metadata SQL operation `relation.inventory` to both
+existing publisher and SAME companion allowlist (81→82 declared operations).
+BINARY exact four-name WHERE proves canonical BASE TABLE, canonical VIEW,
+uppercase BASE TABLE and accented BASE TABLE independently of collision. It
+projects original native IN and case/accent/PAD equalities without LOWER,
+COLLATE, PHP folding, or changing any existing namespace predicate. BINARY is
+ONLY the independent existence filter, never a replacement production relation.
+Each complete publisher/companion inventory must match exactly; missing/extra/
+duplicate/wrong-type objects or absent/non-native booleans STOP. Canonical BASE
+and VIEW must each have native reserved_match1. Complete original filtered sets
+remain equal to fresh publisher AND native projection. Individual unchanged
+relation queries must equal their publisher-projected sets on both connections.
+A genuine native FALSE alias membership can produce an empty relation ONLY
+while the alias's exact existence/type is separately proven. Accented canonical
+mask is removed by retaining every exact name+native flag; padded-literal
+membership is separate from the rejected trailing-space CREATE1103 control.
+No arbitrary >=3 count or nonempty-case assumption remains. Other positive
+catalog/subtype/FK-only/peer qualification checks remain unchanged.
+
+Pure regression covers canonical-only original relation despite four actual
+objects, native TRUE alias case/accent relations, native FALSE PAD, missing alias
+and canonical, exact spelling versus folded/duplicate names, wrong alias/canonical
+types, hidden/invalid boolean, missing canonical membership, extra duplicate,
+stale inventory/flag, filtered-set mismatch, accent canonical mask and PAD
+mismatch. These are pure synthetic oracle cases, not native comparison results.
+All product/oldpacket/helper/primary/RR/MDL/witness/TEMP/warning/publication-wait/
+watchdog/launcher semantics remain unchanged. No replay9040 or new native run
+occurred. New exact independent review must confirm diagnostic correction before
+one root-scheduled run; full strategy/110/15/account/member acceptance stays open.
+
+Current preparation actuals: lint2/Pint --test2 PASS;90contract assertions/82IDs plus24native-relation oracle assertions PASS;23warning/13cleanup and10launcher tests PASS, all0DBconnections. Host exact-source comparison PASS: existing specs SQL/catalog predicates unchanged, ONLY one relation.inventory query added; warning/worker/resource/transport/witness/cleanup/publication/context functions unchanged. Launcher/product/tests/migrations/oldpacket unchanged. Current source hashes supersede historical hashes for this revision:
+
+probe.php SHA256 `af79aaa0091dc5fcb8a306c8fca782ee6cd57009477be1f55d48e94813be2416`.
+relation_test.php SHA256 `e9aa88294784fdd1e0119b1abf704f740e7dc32a51c3c2acb7fedb86a7a2ee64`.
+run.py SHA256 `8db59ead986da3de1a726b7b69ad90b196daa985fffa5b0b852700f606d85aa9`.

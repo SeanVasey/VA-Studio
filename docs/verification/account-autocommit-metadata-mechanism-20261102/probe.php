@@ -199,6 +199,7 @@ function specs(array $m): array
         'publish.peer.qualified' => "CREATE TRIGGER $peer.peer_qualified_anchor AFTER INSERT ON $peer.foreign_target FOR EACH ROW SET @rrns_peer_qualified=(SELECT COUNT(*) FROM $peer.snapshot_anchor)",
         'publish.peer.target' => "CREATE TRIGGER $peer.peer_target_anchor AFTER INSERT ON $peer.foreign_target FOR EACH ROW SET @rrns_target=(SELECT COUNT(*) FROM $q.snapshot_anchor)",
         'publish.anchor' => "INSERT INTO $q.snapshot_anchor VALUES(2)",
+        'relation.inventory' => "SELECT TABLE_NAME,TABLE_TYPE,TABLE_NAME IN ('customer_accounts_insert','customer_accounts_insert_v2','customer_accounts_update','customer_accounts_delete') AS reserved_match,TABLE_NAME='customer_accounts_update' AS case_match,TABLE_NAME='customer_accounts_insert' AS accent_match,TABLE_NAME='customer_accounts_insert ' AS pad_match FROM information_schema.TABLES WHERE TABLE_SCHEMA='$s' AND BINARY TABLE_NAME IN (BINARY 'customer_accounts_insert',BINARY 'customer_accounts_delete',BINARY 'CUSTOMER_ACCOUNTS_UPDATE',BINARY 'custómer_accounts_insert')",
         'relation.case' => "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA='$s' AND TABLE_NAME='customer_accounts_update'",
         'relation.accent' => "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA='$s' AND TABLE_NAME='customer_accounts_insert'",
         'relation.pad' => "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA='$s' AND TABLE_NAME='customer_accounts_insert '",
@@ -267,7 +268,7 @@ function publicationWaitAllowed(string $role, string $id): bool
 }
 function companionOperation(string $id): bool
 {
-    return in_array($id, ['context', 'questions', 'warnings', 'app.primitive', 'app.show.account', 'app.show.insert', 'app.show.insert_v2', 'app.show.update', 'app.show.delete', 'warning.clean.before', 'warning.positive', 'warning.clean.after', 'warning.missing', 'visible.controls', 'dictionary.collations', 'relation.case', 'relation.accent', 'relation.pad'], true)
+    return in_array($id, ['context', 'questions', 'warnings', 'app.primitive', 'app.show.account', 'app.show.insert', 'app.show.insert_v2', 'app.show.update', 'app.show.delete', 'warning.clean.before', 'warning.positive', 'warning.clean.after', 'warning.missing', 'visible.controls', 'dictionary.collations', 'relation.case', 'relation.accent', 'relation.pad', 'relation.inventory'], true)
         || in_array($id, array_map(fn ($kind) => 'plain.'.$kind, array_keys(catalog('fixed'))), true);
 }
 function worker(array $m, string $role): never
@@ -366,6 +367,7 @@ if (($argv[1] ?? '') === '--warning-self-test') {
 }
 if (($argv[1] ?? '') === '--self-test') {
     require __DIR__.'/companion_test.php';
+    require __DIR__.'/relation_test.php';
     exit(0);
 }
 if (($argv[1] ?? '') === '--abort') {
@@ -730,6 +732,43 @@ function primaryWitness(): void
     }
     note(['event' => 'primary_mdl_witness', 'locks' => $locks]);
 }
+function assertNativeRelation(array $actual, array $expected): void
+{
+    if (ordered($actual) !== ordered($expected)) {
+        throw new RuntimeException('Exact native dictionary relation mismatch');
+    }
+}
+/** Exact published objects are independent positives; membership is evaluated by native SQL. */
+function nativeRelationProjection(array $inventory): array
+{
+    $expected = ['customer_accounts_insert' => 'BASE TABLE', 'customer_accounts_delete' => 'VIEW', 'CUSTOMER_ACCOUNTS_UPDATE' => 'BASE TABLE', 'custómer_accounts_insert' => 'BASE TABLE'];
+    $seen = [];
+    $projection = ['reserved' => [], 'case' => [], 'accent' => [], 'pad' => []];
+    foreach ($inventory as $row) {
+        $name = $row['TABLE_NAME'] ?? null;
+        if (! is_string($name) || ! isset($expected[$name]) || isset($seen[$name]) || ($row['TABLE_TYPE'] ?? null) !== $expected[$name] || count($row) !== 6) {
+            throw new RuntimeException('Exact published object inventory missing/mistyped/duplicated');
+        }
+        $seen[$name] = true;
+        foreach (['reserved', 'case', 'accent', 'pad'] as $kind) {
+            $flag = $row[$kind.'_match'] ?? null;
+            if (! in_array($flag, [0, 1], true)) {
+                throw new RuntimeException('Native relation boolean unavailable');
+            }
+            if ($flag === 1) {
+                $projection[$kind][] = $kind === 'reserved' ? ['TABLE_NAME' => $name, 'TABLE_TYPE' => $row['TABLE_TYPE']] : ['TABLE_NAME' => $name];
+            }
+        }
+        if (in_array($name, ['customer_accounts_insert', 'customer_accounts_delete'], true) && $row['reserved_match'] !== 1) {
+            throw new RuntimeException('Canonical BASE/VIEW absent from native reserved relation');
+        }
+    }
+    if (count($seen) !== count($expected)) {
+        throw new RuntimeException('Exact published alias object missing');
+    }
+
+    return $projection;
+}
 function catalogEpoch(int $epoch): void
 {
     global $m,$sql,$primaryContext;
@@ -761,9 +800,6 @@ function catalogEpoch(int $epoch): void
         }
     }
     if ($epoch === 2) {
-        if (! in_array('VIEW', array_column($fresh['tables'], 'TABLE_TYPE'), true) || count($fresh['tables']) < 3) {
-            throw new RuntimeException('Second epoch table/view/alias positives missing');
-        }
         foreach (['CHECK', 'FOREIGN KEY', 'UNIQUE'] as $type) {
             if (! in_array($type, array_column($fresh['constraints'], 'CONSTRAINT_TYPE'), true)) {
                 throw new RuntimeException('Missing constraint subtype');
@@ -783,12 +819,17 @@ function catalogEpoch(int $epoch): void
                 throw new RuntimeException('Peer qualification control differs');
             }
         }
-        foreach (['relation.case', 'relation.accent', 'relation.pad'] as $id) {
-            $expected = ordered(cleanCommand('publisher', $id)['rows']);
-            if ($expected === [] || ordered(cleanCommand('companion', $id)['rows']) !== $expected) {
-                throw new RuntimeException('Dictionary alias relation differs');
-            }
+        $inventory = ordered(cleanCommand('publisher', 'relation.inventory')['rows']);
+        $companionInventory = ordered(cleanCommand('companion', 'relation.inventory')['rows']);
+        $projected = nativeRelationProjection($inventory);
+        assertNativeRelation($companionInventory, $inventory);
+        assertNativeRelation($fresh['tables'], $projected['reserved']);
+        foreach (['case', 'accent', 'pad'] as $relation) {
+            $expected = ordered($projected[$relation]);
+            assertNativeRelation(cleanCommand('publisher', 'relation.'.$relation)['rows'], $expected);
+            assertNativeRelation(cleanCommand('companion', 'relation.'.$relation)['rows'], $expected);
         }
+        note(['event' => 'exact_inventory_native_relations', 'inventory' => $inventory, 'projected' => $projected]);
     }
     boundContext('companion', $primaryContext);
     primaryWitness();
