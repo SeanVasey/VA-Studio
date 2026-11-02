@@ -20,11 +20,20 @@ final class CatalogGroupContractTest extends TestCase
             foreach (CatalogGroup::cases() as $group) {
                 $plan = CatalogGroupPlan::build($group, $version);
                 $old += count($plan['families']);
-                self::assertSame(count($plan['bindings']), substr_count($plan['sql'], '?'));
-                self::assertLessThanOrEqual(1024, count($plan['bindings']));
-                self::assertSame(count($plan['families']), substr_count($plan['sql'], 'ROW_NUMBER() OVER ('));
-                self::assertStringEndsWith('ORDER BY family,slot,kind,CAST(ordinal AS UNSIGNED)', $plan['sql']);
-                self::assertStringNotContainsString('LIMIT ', $plan['sql']);
+                $streams = $group === CatalogGroup::I2_RESERVED_NAMES ? $plan['i2_split'] : [$plan];
+                $covered = [];
+                foreach ($streams as $index => $stream) {
+                    self::assertSame(count($stream['bindings']) + ($group === CatalogGroup::I2_RESERVED_NAMES && $index === 1 ? 2 : 0), substr_count($stream['sql'], '?'));
+                    self::assertLessThanOrEqual(1024, count($stream['bindings']));
+                    self::assertSame(count($stream['families']), substr_count($stream['sql'], 'ROW_NUMBER() OVER ('));
+                    self::assertStringEndsWith('ORDER BY family,slot,kind,CAST(ordinal AS UNSIGNED)', $stream['sql']);
+                    self::assertStringNotContainsString('LIMIT ', $stream['sql']);
+                    foreach (array_keys($stream['families']) as $familyIndex) {
+                        self::assertNotContains($familyIndex, $covered);
+                        $covered[] = $familyIndex;
+                    }
+                }
+                self::assertSame(array_keys($plan['families']), $covered);
                 foreach ($plan['families'] as $family) {
                     self::assertInstanceOf(CatalogRead::class, constant(CatalogRead::class.'::'.$family['enum']));
                     self::assertNotEmpty($family['names']);
@@ -32,6 +41,100 @@ final class CatalogGroupContractTest extends TestCase
                 }
             }
             self::assertSame(36, $old);
+        }
+    }
+
+    public function test_i2_shared_framing_reserve_and_exact_residual_boundaries(): void
+    {
+        $residual = new ReflectionMethod(CurrentCatalog::class, 'i2Residual');
+        self::assertSame(['records' => 131072, 'bytes' => 16773120], $residual->invoke(null, ['bytes' => 4096, 'records' => 0]));
+        self::assertSame(['records' => 28, 'bytes' => 7336], $residual->invoke(null, ['bytes' => 16769880, 'records' => 131044]));
+        foreach ([['bytes' => 16769881, 'records' => 0], ['bytes' => 4096, 'records' => 131045], ['bytes' => 4095, 'records' => 0],
+            ['bytes' => '4096', 'records' => 0], ['bytes' => true, 'records' => 0], ['bytes' => PHP_INT_MAX, 'records' => 0],
+            ['bytes' => 4096, 'records' => -1], ['bytes' => 4096, 'records' => '0'], ['records' => 0, 'bytes' => 4096]] as $bad) {
+            try {
+                $residual->invoke(null, $bad);
+                self::fail('Malformed/exhausted residual accepted.');
+            } catch (LogicException) {
+                self::assertTrue(true);
+            }
+        }
+        // Independent charge arithmetic: ALL future failure headers, never one marker or a second framing reserve.
+        self::assertSame(7336, 28 * (256 + strlen('[null]')));
+        self::assertSame(16777216, 16769880 + 28 * (256 + strlen('[null]')));
+        self::assertSame(131072, 131044 + 28);
+        self::assertSame(18712, 4096 + 56 * (256 + strlen('["0"]')));
+    }
+
+    public function test_i2_first_receiver_reserves_all_future_headers_at_exact_byte_and_record_thresholds(): void
+    {
+        $plan = CatalogGroupPlan::build(CatalogGroup::I2_RESERVED_NAMES, AccountAdmissionGuards::V2);
+        $family = [0 => $plan['families'][0]];
+        $wire = [];
+        foreach ($plan['families'][0]['names'] as $slot => $name) {
+            $wire[] = ['group_id' => CatalogGroup::I2_RESERVED_NAMES->value, 'family' => 0, 'slot' => $slot, 'kind' => 0, 'ordinal' => '0', 'payload' => '["0"]'];
+        }
+        $decode = new ReflectionMethod(CurrentCatalog::class, 'decodeGroup');
+        // Inject only a prior private receiving charge: independent expected cost of this28-header stream=7308.
+        $stage = ['bytes' => 16762572, 'records' => 131016];
+        $decode->invokeArgs(null, [CatalogGroup::I2_RESERVED_NAMES, $family, $wire, &$stage, true]);
+        self::assertSame(['bytes' => 16769880, 'records' => 131044], $stage);
+        foreach ([['bytes' => 16762573, 'records' => 131016], ['bytes' => 16762572, 'records' => 131017]] as $start) {
+            $stage = $start;
+            try {
+                $decode->invokeArgs(null, [CatalogGroup::I2_RESERVED_NAMES, $family, $wire, &$stage, true]);
+                self::fail('First stream consumed future invalid-header reserve.');
+            } catch (LogicException) {
+                self::assertSame($start, $stage);
+            }
+        }
+    }
+
+    public function test_i2_receiver_aggregates_both_complete_streams_and_never_updates_stage_on_failure(): void
+    {
+        $plan = CatalogGroupPlan::build(CatalogGroup::I2_RESERVED_NAMES, AccountAdmissionGuards::V2);
+        self::assertSame(['i2_split', 'families'], array_keys($plan));
+        $stage = ['bytes' => 4096, 'records' => 0];
+        $decode = new ReflectionMethod(CurrentCatalog::class, 'decodeGroup');
+        foreach ([0, 1] as $index) {
+            $wire = [];
+            foreach ($plan['families'][$index]['names'] as $slot => $name) {
+                $wire[] = ['group_id' => CatalogGroup::I2_RESERVED_NAMES->value, 'family' => $index, 'slot' => $slot, 'kind' => 0, 'ordinal' => '0', 'payload' => '["0"]'];
+            }
+            $result = $decode->invokeArgs(null, [CatalogGroup::I2_RESERVED_NAMES, [$index => $plan['families'][$index]], $wire, &$stage, $index === 0]);
+            self::assertCount(28, reset($result));
+            self::assertSame(4096 + ($index + 1) * 7308, $stage['bytes']);
+            self::assertSame(($index + 1) * 28, $stage['records']);
+        }
+        $family = [1 => $plan['families'][1]];
+        $good = $wire;
+        $invalid = $wire;
+        foreach ($invalid as &$header) {
+            $header['payload'] = '[null]';
+        }
+        unset($header);
+        foreach ([$invalid, array_slice($good, 1), [...$good, $good[0]], array_reverse($good)] as $badWire) {
+            $stage = ['bytes' => 16769880, 'records' => 131044];
+            $before = $stage;
+            try {
+                $decode->invokeArgs(null, [CatalogGroup::I2_RESERVED_NAMES, $family, $badWire, &$stage, false]);
+                self::fail('Partial/invalid second family accepted.');
+            } catch (LogicException) {
+                self::assertSame($before, $stage, 'Failed private decoding publishes no accounting/result.');
+            }
+        }
+        // Whole valid empty second stream fits exact aggregate record bound and the reserved byte allowance.
+        $stage = ['bytes' => 16769880, 'records' => 131044];
+        $decode->invokeArgs(null, [CatalogGroup::I2_RESERVED_NAMES, $family, $good, &$stage, false]);
+        self::assertSame(['bytes' => 16777188, 'records' => 131072], $stage);
+        foreach ([['bytes' => 16769909, 'records' => 0], ['bytes' => 4096, 'records' => 131045]] as $start) {
+            $stage = $start;
+            try {
+                $decode->invokeArgs(null, [CatalogGroup::I2_RESERVED_NAMES, $family, $good, &$stage, false]);
+                self::fail('Aggregate receiving overflow accepted.');
+            } catch (LogicException) {
+                self::assertSame($start, $stage);
+            }
         }
     }
 

@@ -211,6 +211,14 @@ final class CurrentCatalog
 
     public function group(CatalogGroup $group, string $version): array
     {
+        if ($group === CatalogGroup::I2_RESERVED_NAMES) {
+            try {
+                return $this->i2(CatalogGroupPlan::build($group, $version));
+            } catch (Throwable) {
+                $this->invalidate();
+                self::refuse();
+            }
+        }
         $plan = CatalogGroupPlan::build($group, $version);
         $this->requireCurrent();
         if ($this->boundaries < 1 || ! $this->catalog instanceof Mysql) {
@@ -251,6 +259,103 @@ final class CurrentCatalog
         }
     }
 
+    /** Closed I2 stage only. Neither residuals nor first-family facts escape this operation. */
+    private function i2(array $plan): array
+    {
+        $statement = null;
+        try {
+            $this->requireCurrent();
+            if ($this->boundaries < 1 || ! $this->catalog instanceof Mysql
+                || array_keys($plan) !== ['i2_split', 'families'] || array_keys($plan['i2_split']) !== [0, 1]
+                || array_keys($plan['families']) !== [0, 1]) {
+                self::refuse();
+            }
+            $stage = ['bytes' => 4096, 'records' => 0];
+            $result = [];
+            foreach ($plan['i2_split'] as $index => $stream) {
+                $this->requireCurrent();
+                if (array_keys($stream) !== ['sql', 'bindings', 'families']
+                    || $stream['families'] !== [$index => $plan['families'][$index]]
+                    || count($plan['families'][$index]['names']) !== 28
+                    || $this->catalog->getAttribute(Mysql::ATTR_USE_BUFFERED_QUERY) !== true) {
+                    self::refuse();
+                }
+                $residual = self::i2Residual($stage);
+                if (! $this->catalog->setAttribute(Mysql::ATTR_USE_BUFFERED_QUERY, false)
+                    || $this->catalog->getAttribute(Mysql::ATTR_USE_BUFFERED_QUERY) !== false) {
+                    self::refuse();
+                }
+                self::$companionStatements++;
+                $statement = $this->catalog->prepare($stream['sql']);
+                self::requireNoWarnings($this->catalog);
+                $bindings = $stream['bindings'];
+                if (count($bindings) !== 56 || ! array_all($bindings, fn ($v): bool => is_string($v))) {
+                    self::refuse();
+                }
+                foreach ($bindings as $position => $value) {
+                    if (! $statement->bindValue($position + 1, $value, PDO::PARAM_STR)) {
+                        self::refuse();
+                    }
+                }
+                if ($index === 1) {
+                    foreach ([$residual['records'], $residual['bytes']] as $position => $value) {
+                        if (! $statement->bindValue(57 + $position, $value, PDO::PARAM_INT)) {
+                            self::refuse();
+                        }
+                    }
+                }
+                // execute(array) would replace the explicit PARAM_INT residual bindings.
+                if (! $statement->execute()) {
+                    self::refuse();
+                }
+                self::requireNoWarnings($this->catalog);
+                if (! $statement->setFetchMode(PDO::FETCH_ASSOC)) {
+                    self::refuse();
+                }
+                $decoded = self::decodeGroup(CatalogGroup::I2_RESERVED_NAMES, $stream['families'], $statement, $stage, $index === 0);
+                self::requireNoWarnings($this->catalog);
+                if (! $statement->closeCursor() || $this->catalog->inTransaction()) {
+                    self::refuse();
+                }
+                $statement = null;
+                if (! $this->catalog->setAttribute(Mysql::ATTR_USE_BUFFERED_QUERY, true)
+                    || $this->catalog->getAttribute(Mysql::ATTR_USE_BUFFERED_QUERY) !== true) {
+                    self::refuse();
+                }
+                if ($index === 0) {
+                    self::i2Residual($stage); // Future invalid headers still fit BEFORE second prepare.
+                }
+                if (array_intersect_key($result, $decoded) !== [] || count($decoded) !== 1) {
+                    self::refuse();
+                }
+                $result += $decoded;
+            }
+            $this->requireCurrent();
+            $expected = array_map(fn (array $family): string => constant(CatalogRead::class.'::'.$family['enum'])->value, $plan['families']);
+            if (array_keys($result) !== $expected) {
+                self::refuse();
+            }
+
+            return $result;
+        } catch (Throwable) {
+            unset($statement, $result, $decoded, $stage);
+            $this->invalidate();
+            self::refuse();
+        }
+    }
+
+    /** Private native-int residuals; no caller budget or cross-call state. */
+    private static function i2Residual(array $stage): array
+    {
+        if (array_keys($stage) !== ['bytes', 'records'] || ! is_int($stage['bytes']) || ! is_int($stage['records'])
+            || $stage['bytes'] < 4096 || $stage['bytes'] > 16777216 - 7336
+            || $stage['records'] < 0 || $stage['records'] > 131072 - 28) {
+            self::refuse();
+        }
+
+        return ['records' => 131072 - $stage['records'], 'bytes' => 16777216 - $stage['bytes']];
+    }
+
     private static function requireNoWarnings(Mysql $pdo): void
     {
         if ($pdo::class !== Mysql::class || ! (new ReflectionMethod(Mysql::class, 'getWarningCount'))->isInternal() || $pdo->getWarningCount() !== 0) {
@@ -273,13 +378,15 @@ final class CurrentCatalog
     }
 
     /** Only the fixed source plan and private PDO stream enter this decoder. No caller decoder/schema API. */
-    private static function decodeGroup(CatalogGroup $group, array $families, iterable $wire): array
+    private static function decodeGroup(CatalogGroup $group, array $families, iterable $wire, ?array &$stage = null, bool $reserveFuture = false): array
     {
         $result = [];
         $counts = [];
         $seen = [];
-        $bytes = 4096;
-        $rows = 0;
+        $bytes = $stage['bytes'] ?? 4096;
+        $rows = $stage['records'] ?? 0;
+        $byteLimit = $reserveFuture ? 16777216 - 7336 : 16777216;
+        $recordLimit = $reserveFuture ? 131072 - 28 : 131072;
         $previous = [-1, -1, -1, 0];
         foreach ($families as $family) {
             $result[constant(CatalogRead::class.'::'.$family['enum'])->value] = array_fill_keys($family['names'], []);
@@ -294,7 +401,7 @@ final class CurrentCatalog
             }
             $size = strlen($record['payload']);
             $bytes += $size + 256;
-            if ($bytes > 16777216 || $size > 8388608 || ++$rows > 131072) {
+            if ($bytes > $byteLimit || $size > 8388608 || ++$rows > $recordLimit) {
                 self::refuse();
             }
             $ordinal = self::decimal($record['ordinal'], 65536);
@@ -350,6 +457,10 @@ final class CurrentCatalog
                     self::refuse();
                 }
             }
+        }
+
+        if ($stage !== null) {
+            $stage = ['bytes' => $bytes, 'records' => $rows];
         }
 
         return $result;

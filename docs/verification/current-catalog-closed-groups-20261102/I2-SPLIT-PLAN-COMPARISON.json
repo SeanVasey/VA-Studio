@@ -1,0 +1,7 @@
+{
+  "non_i2_plan_full_objects_byte_equivalent_json_values": 27,
+  "i2_all_versions_original_families_and_bind_vectors_preserved": true,
+  "standalone_identityPlan_byte_unchanged": true,
+  "native_executed": false,
+  "source_method_tail_comparison": "PASS both private identityPlan-to-EOF unchanged"
+}

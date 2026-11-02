@@ -405,6 +405,7 @@ final class CatalogGroupPlan
         $ctes = [];
         $branches = [];
         $bindings = [];
+        $i2Parts = [];
         foreach ($families as $index => &$family) {
             $query = constant(CatalogRead::class.'::'.$family['enum']);
             [$names, $direct] = self::recipe($group, $query, $version);
@@ -441,10 +442,29 @@ final class CatalogGroupPlan
                 $cells[] = 'JSON_ARRAY(IF('.$cell." IS NULL,'N','".($column['php_kind'] === 'int' ? 'I' : 'S')."'),".$value.')';
             }
             $branches[] = 'SELECT '.$index.' AS family, encoded.catalog_slot AS slot, 1 AS kind, CAST(encoded.catalog_ordinal AS CHAR CHARACTER SET utf8mb4) AS ordinal, CASE WHEN OCTET_LENGTH(encoded.payload)>8388608 THEN NULL ELSE encoded.payload END AS payload FROM (SELECT r.catalog_slot,r.catalog_ordinal,CAST(JSON_ARRAY('.implode(',', $cells).') AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_bin AS payload FROM '.$name.' r) encoded';
+            if ($group === CatalogGroup::I2_RESERVED_NAMES) {
+                $i2Parts[$index] = ['cte' => $ctes[array_key_last($ctes)], 'branches' => array_slice($branches, -2), 'bindings' => $plan['bindings']];
+            }
         }
         unset($family);
         if (count($bindings) > 1024 || ! array_all($bindings, fn ($v): bool => is_string($v) && strlen($v) <= 4096)) {
             throw new LogicException('Closed catalog bind limit.');
+        }
+
+        if ($group === CatalogGroup::I2_RESERVED_NAMES) {
+            $streams = [];
+            foreach ($i2Parts as $index => $part) {
+                if (count($families[$index]['names']) !== 28) {
+                    throw new LogicException('Fixed I2 header reserve required.');
+                }
+                $records = $index === 0 ? '131044' : '?';
+                $bytes = $index === 0 ? 'SUM(OCTET_LENGTH(payload)+256)+4096+7336<=16777216' : 'SUM(OCTET_LENGTH(payload)+256)<=?';
+                $gate = 'catalog_gate AS (SELECT (COUNT(*)<='.$records.' AND SUM(payload IS NULL)=0 AND '.$bytes." AND MAX(CASE WHEN kind=0 THEN CAST(JSON_UNQUOTE(JSON_EXTRACT(payload,'$[0]')) AS UNSIGNED) ELSE 0 END)<=65536) AS valid FROM catalog_wire)";
+                $sql = 'WITH '.$part['cte'].', catalog_wire AS ('.implode(' UNION ALL ', $part['branches']).'), '.$gate." SELECT 'I2_RESERVED_NAMES' AS group_id,w.family,w.slot,w.kind,w.ordinal,CASE WHEN g.valid THEN w.payload ELSE CAST('[null]' AS CHAR CHARACTER SET utf8mb4) COLLATE utf8mb4_bin END AS payload FROM catalog_wire w CROSS JOIN catalog_gate g WHERE g.valid OR w.kind=0 ORDER BY family,slot,kind,CAST(ordinal AS UNSIGNED)";
+                $streams[$index] = ['sql' => $sql, 'bindings' => $part['bindings'], 'families' => [$index => $families[$index]]];
+            }
+
+            return ['i2_split' => $streams, 'families' => $families];
         }
 
         // UNION ALL prevents merging; the complete wire (ALL families/names/rows) is materialized once.

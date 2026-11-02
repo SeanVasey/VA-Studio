@@ -160,41 +160,58 @@ final class CatalogGroupDifferentialTest extends TestCase
             $native = (new ReflectionProperty($catalog, 'catalog'))->getValue($catalog);
             foreach (CatalogGroup::cases() as $group) {
                 $plan = CatalogGroupPlan::build($group, AccountAdmissionGuards::V2);
-                $statement = $native->prepare('EXPLAIN FORMAT=JSON '.$plan['sql']);
-                $statement->execute($plan['bindings']);
-                $json = $statement->fetchColumn();
-                self::assertSame(0, $native->getWarningCount());
-                self::assertTrue($statement->closeCursor());
-                $explain = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-                $materialized = 0;
-                $shared = 0;
-                $windowIds = [];
-                $sharedIds = [];
-                $walk = function (array $node) use (&$walk, &$materialized, &$shared, &$windowIds, &$sharedIds): void {
-                    if (isset($node['windowing'],$node['select_id'])) {
-                        $windowIds[] = $node['select_id'];
+                $streams = $group === CatalogGroup::I2_RESERVED_NAMES ? $plan['i2_split'] : [$plan];
+                $covered = [];
+                foreach ($streams as $streamIndex => $stream) {
+                    foreach (array_keys($stream['families']) as $familyIndex) {
+                        self::assertNotContains($familyIndex, $covered);
+                        $covered[] = $familyIndex;
                     }
-                    foreach ($node as $key => $value) {
-                        if ($key === 'materialized_from_subquery') {
-                            $materialized++;
-                        }
-                        if ($key === 'sharing_temporary_table_with') {
-                            $shared++;
-                            self::assertIsArray($value);
-                            self::assertArrayHasKey('select_id', $value);
-                            $sharedIds[] = $value['select_id'];
-                        }
-                        if (is_array($value)) {
-                            $walk($value);
-                        }
+                    $statement = $native->prepare('EXPLAIN FORMAT=JSON '.$stream['sql']);
+                    foreach ($stream['bindings'] as $position => $value) {
+                        self::assertTrue($statement->bindValue($position + 1, $value, PDO::PARAM_STR));
                     }
-                };
-                $walk($explain);
-                $windowIds = array_values(array_unique($windowIds));
-                self::assertCount(count($plan['families']), $windowIds, $group->value.' exact window-bearing family materializations');
-                self::assertSame([], array_values(array_diff($windowIds, $sharedIds)), $group->value.' every family window must be shared by header and row consumers');
-                self::assertGreaterThanOrEqual(count($plan['families']), $materialized, $group->value);
-                self::assertGreaterThanOrEqual(count($plan['families']), $shared, 'Every family must have a shared materialization, not separate header/row evaluation: '.$group->value);
+                    if ($group === CatalogGroup::I2_RESERVED_NAMES && $streamIndex === 1) {
+                        // EXPLAIN-only representative legal residuals; production derives ACTUAL first-stream charge.
+                        self::assertTrue($statement->bindValue(57, 131044, PDO::PARAM_INT));
+                        self::assertTrue($statement->bindValue(58, 16777216 - 4096 - 7336, PDO::PARAM_INT));
+                    }
+                    $statement->execute();
+                    $json = $statement->fetchColumn();
+                    self::assertSame(0, $native->getWarningCount());
+                    self::assertTrue($statement->closeCursor());
+                    $explain = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+                    $materialized = 0;
+                    $shared = 0;
+                    $windowIds = [];
+                    $sharedIds = [];
+                    $walk = function (array $node) use (&$walk, &$materialized, &$shared, &$windowIds, &$sharedIds): void {
+                        if (isset($node['windowing'],$node['select_id'])) {
+                            $windowIds[] = $node['select_id'];
+                        }
+                        foreach ($node as $key => $value) {
+                            if ($key === 'materialized_from_subquery') {
+                                $materialized++;
+                            }
+                            if ($key === 'sharing_temporary_table_with') {
+                                $shared++;
+                                self::assertIsArray($value);
+                                self::assertArrayHasKey('select_id', $value);
+                                $sharedIds[] = $value['select_id'];
+                            }
+                            if (is_array($value)) {
+                                $walk($value);
+                            }
+                        }
+                    };
+                    $walk($explain);
+                    $windowIds = array_values(array_unique($windowIds));
+                    self::assertCount(count($stream['families']), $windowIds, $group->value.' exact window-bearing family materializations');
+                    self::assertSame([], array_values(array_diff($windowIds, $sharedIds)), $group->value.' every family window must be shared by header and row consumers');
+                    self::assertGreaterThanOrEqual(count($stream['families']), $materialized, $group->value);
+                    self::assertGreaterThanOrEqual(count($stream['families']), $shared, 'Every family must have a shared materialization, not separate header/row evaluation: '.$group->value);
+                }
+                self::assertSame(array_keys($plan['families']), $covered, $group->value.' complete stream family coverage');
             }
             unset($native,$catalog);
         } finally {
