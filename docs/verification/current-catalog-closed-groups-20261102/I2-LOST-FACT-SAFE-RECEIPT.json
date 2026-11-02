@@ -1,0 +1,23 @@
+{
+  "source": "caa90a076451da61556b8313fa72685578a57d1c",
+  "classification": "MISMATCH_REPRODUCED_NOT_ADMITTED",
+  "raw_target_header_declared_rows": 0,
+  "raw_target_R": 0,
+  "decoded_target": 0,
+  "original_statistics": {
+    "all_source_names_strict_multiset_equal": true,
+    "target_original_count": 1,
+    "target_decoded_count": 1,
+    "target_strict_multiset_equal": true
+  },
+  "original_constraints": {
+    "all_source_names_strict_multiset_equal": false,
+    "target_original_count": 1,
+    "target_decoded_count": 0,
+    "target_strict_multiset_equal": false
+  },
+  "all_captured_warning_counts_zero": true,
+  "cleanup_verified": true,
+  "scope_limit": "Original diagnostic primitives unbuffered; proof original buffered. No engine/OOM cause or acceptance claim.",
+  "private_evidence_reference": "/workspace/account-guard-evidence-20261101/i2diag-20261102T041921Z-f9634204636f"
+}

@@ -206,3 +206,38 @@ PARTITION prefix to ROW_NUMBER OVER prefix (same assertion/count, still requires
 a window per family); all native six proof oracles remain untouched. Regenerate
 fixed plans and source-hash receipts; no other app/guard/limit/warning/factory/
 primary-stage change, no native rerun until exact independent source approval.
+
+## Named lookup join repair — scope declared before edit
+
+Actual controlled321assert failure and retained-state3read reproduction establish
+I2 family1/slot0 native header0/R0/decoded0 versus original target1, zero warnings.
+Loss is upstream of decoder in that condition; no exact engine/optimizer cause
+or OOM attribution is proved. Root authorizes private CatalogGroupPlan named
+lookup compiler ONLY: one existing NO_MERGE(lookup) hint on one joined SELECT,
+integer-only positions, CASE exact original per-name predicates, same IN/binds.
+CurrentCatalog::identityPlan remains ORIGINAL differential oracle. No decoder,
+factory, caller, guard, direct-family, native test, cap or validation-stage edit.
+Regenerate plans/source hashes; run existing40/912/static; exact independent
+review and root lease must precede any new pinned I2 control/native query.
+
+Final named-join source checks: compiler lint/Pint--test PASS; existing pure
+selection40tests/912assertions PASS,PHP8.4.27,1.367seconds,exit0. Commands/output
+and30 final source hashes in named-join-repair-{static,pure}.json and refreshed
+IMPLEMENTATION-SOURCE-SHA256.txt. All tests (including six native proof oracles),
+CurrentCatalog original compiler/decoder/factory and all other app bytes are
+UNCHANGEDcaa. Direct12templates byte-identical;18namedtemplates retain exact
+binds/families and use integerCASEjoin. NAMED-LOOKUP-JOIN-REPAIR.md gives pointwise
+NULL/duplicate/collation/type/order/parameter equivalence argument and unrun native
+limits. Prior clone-compiler token-identity statements describe historical pre-
+repair source; ORIGINAL oracle remains untouched while PRIVATE group compiler now
+intentionally differs. No new test was added or assertion weakened.
+
+I2-LOST-FACT-SAFE-RECEIPT.json retains actual oldnativewire absence versus positive
+original, not a result for this source. Native query/EXPLAIN/test/bootstrap/restart/
+new-pinned diagnostic have NOT run on this candidate. Conditional107/full110,
+all group/version/alias/materialization/type/warning/resource/composition and
+originalOOM fit/repeatability remain unaccepted. Next MUST be reviewed/re-pinned
+three-read I2 control first under a new ROOT lease; no native queue advancement
+or cost run is authorized by source/static success. App flags/member trial stay
+defaultoff/unaccepted; no sourceoutsidecompiler/testmigrations/sharedledgers/env
+keys/workflows/push/PR changes occurred.

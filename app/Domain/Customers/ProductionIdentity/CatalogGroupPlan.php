@@ -514,11 +514,12 @@ final class CatalogGroupPlan
         $order = isset($part[7]) && $part[7] !== '' ? \explode(',', $part[7]) : [];
         $ordering = \implode('', \array_map(fn (int $index, string $column): string => ', '.$column.' AS identity_order_'.$index, \array_keys($order), $order));
         $predicate = $part[4].'identity_key'.$part[6].'=?';
-        $branches = \array_map(fn (int $position): string => 'SELECT /*+ NO_MERGE(lookup) */ '.$position.' AS identity_lookup, lookup.* FROM lookup WHERE '.$predicate, \array_keys($names));
+        $positions = \implode(' UNION ALL ', \array_map(fn (int $position): string => 'SELECT '.$position.' AS identity_lookup', \array_keys($names)));
+        $cases = \implode(' ', \array_map(fn (int $position): string => 'WHEN '.$position.' THEN '.$predicate, \array_keys($names)));
         // IN is the disjunction of the branch equalities (same operands, same comparison collation),
         // so the prefilter keeps exactly the rows some branch would match, including LOWER() aliases.
         $prefilter = ' AND '.$part[4].$part[5].$part[6].' IN ('.\implode(',', \array_fill(0, \count($names), '?')).')';
-        $statement = 'WITH lookup AS (SELECT '.$part[1].', '.$part[5].' AS identity_key'.$ordering.' FROM '.$part[2].' WHERE '.$part[3].$prefilter.') '.\implode(' UNION ALL ', $branches)
+        $statement = 'WITH lookup AS (SELECT '.$part[1].', '.$part[5].' AS identity_key'.$ordering.' FROM '.$part[2].' WHERE '.$part[3].$prefilter.') SELECT /*+ NO_MERGE(lookup) */ positions.identity_lookup, lookup.* FROM lookup JOIN ('.$positions.') positions ON CASE positions.identity_lookup '.$cases.' ELSE FALSE END'
             .($order === [] ? '' : ' ORDER BY identity_lookup'.\implode('', \array_map(fn (int $index): string => ', identity_order_'.$index, \array_keys($order))));
 
         return ['sql' => $statement, 'bindings' => [...$names, ...$names], 'names' => $names];
