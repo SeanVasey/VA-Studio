@@ -427,3 +427,45 @@ These commands used the existing runtime only for static/pure PHP, no bootstrap.
 Source SHA256: probe `2ef0801f4fe9a3fc2423e26852c2c3fe896edd32778d5845b92bda5071b0a427`;
 capability test `b86cb374bbf26e9a7df9293dfc76a2d632eb22256c46adc84af2ea9f5b126a4c`;
 unchanged launcher `072f978ddb86f20802b959718a9b3deb25c0c05e2c11bde3e02f11c77ba2f199`.
+
+### b80ddf6c cleanup STOP and close-before-observation preparation
+
+The original b80ddf6c run remains STOP/INCOMPLETE. Exact independent decision
+and read-only diagnosis are retained alongside this README. After each finished
+app-shaped/ordinary arm's existing witness and rollback (and unchanged Questions
+where present), cleanup now explicitly closes that owned PDO/PHP client, checks
+successful child exit, then checks exact server connection/thread absence plus
+transactions/MDL/data. First and every subsequent sample is retained as
+`arm_cleanup_sample`; only a final all-zero sample records release verification.
+An actual session/MDL/data residue, unknown identity, instrumentation/query error,
+failed close/exit or budget expiry stops; only transaction-table residue may
+settle. No rollback/candidate retry is added. Completed-client close transport,
+exit waiting and observation share one1second deadline; successive transaction
+observations are at least150ms apart. No new SQL begins after that deadline.
+Synchronous PDO metadata queries remain subject to the unchanged external hard
+watchdog: the local deadline detects overrun on return, and does not claim to
+interrupt an arbitrarily stalled C-driver call within1second. This limitation
+requires explicit exact-source review; no native completion run is claimed.
+
+Actual preparation commands used existing runtime ONLY for PHP lint/Pint/pure
+checks, following root's explicit clarification; no Laravel/bootstrap/DB or
+container lifecycle action occurred:
+
+```
+docker exec --user 1000:1000 va-pcc-runtime-20261101 php -l /workspace/VA-Studio-account-guard-v2/docs/verification/account-rr-metadata-mechanism-20261101/probe.php
+docker exec --user 1000:1000 va-pcc-runtime-20261101 php -l /workspace/VA-Studio-account-guard-v2/docs/verification/account-rr-metadata-mechanism-20261101/cleanup_test.php
+docker exec --user 1000:1000 --workdir /workspace/VA-Studio-account-guard-v2 va-pcc-runtime-20261101 php /workspace/VA-Studio/vendor/bin/pint docs/verification/account-rr-metadata-mechanism-20261101/probe.php docs/verification/account-rr-metadata-mechanism-20261101/cleanup_test.php
+```
+
+Lint2/Pint2 PASS. Same PHP command with probe.php `--cleanup-self-test` PASS13
+policy assertions, `--self-test` PASS40 capability assertions/107operation IDs,
+`--warning-self-test` PASS23 assertions; all0DBconnections. Host Python byte
+comparisons PASS unchanged catalog/specs107 SQL, capability/warning functions,
+and launcher against b80ddf6c; diff-check PASS. These pure policy checks do not
+execute actual close/PHP exit/server query failures; those native paths and
+later families remain unexecuted and require independent review/future lease.
+
+Prepared source SHA256: probe
+`e1f3eff14fa12b2bc5eb1fe8620a17010a90b68119b7611ea5a1191838149253`;
+cleanup pure test
+`56ae75ea119cee7b63e6888142e52321162bf9c153fa4c8600cfd3af8ff2b31f`.

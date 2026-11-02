@@ -345,6 +345,10 @@ function worker(array $m, string $role): never
     $pdo = null;
     exit(0);
 }
+if (($argv[1] ?? '') === '--cleanup-self-test') {
+    require __DIR__.'/cleanup_test.php';
+    exit(0);
+}
 if (($argv[1] ?? '') === '--warning-self-test') {
     require __DIR__.'/warning_transport_test.php';
     exit(0);
@@ -493,10 +497,10 @@ function resources(): array
         return ['unavailable' => $e->errorInfo];
     }
 }
-function receive(string $role, string $event): array
+function receive(string $role, string $event, ?float $outerDeadline = null): array
 {
     global $cells,$dir;
-    $deadline = microtime(true) + 8;
+    $deadline = min(microtime(true) + 8, $outerDeadline ?? INF);
     $samples = [];
     $started = false;
     while (microtime(true) < $deadline) {
@@ -543,14 +547,14 @@ function receive(string $role, string $event): array
     note(['event' => 'FIRST_TIMEOUT', 'role' => $role, 'resources' => resources()]);
     throw new RuntimeException('Owned statement/transport deadline; no retry');
 }
-function request(string $role, string $id): array
+function request(string $role, string $id, ?float $outerDeadline = null): array
 {
     global $cells,$pending,$sql;
     note(['event' => 'statement_requested', 'role' => $role, 'id' => $id, 'sql' => $id === 'close' ? null : ($sql[$id] ?? null)]);
     $pending = ['role' => $role, 'id' => $id];
     fwrite($cells[$role]['pipes'][0], json_encode(['id' => $id], JSON_THROW_ON_ERROR)."\n");
     fflush($cells[$role]['pipes'][0]);
-    $result = receive($role, $id === 'close' ? 'closed' : 'result');
+    $result = receive($role, $id === 'close' ? 'closed' : 'result', $outerDeadline);
     $pending = null;
     if ($id !== 'close' && ($result['id'] ?? null) !== $id) {
         throw new RuntimeException('Statement result identity mismatch');
@@ -579,33 +583,71 @@ function witness(string $role): void
     must($role, 'savepoint');
     note(['event' => 'witness_preserved', 'role' => $role]);
 }
+function cleanupObservation(array $sample, float $remaining): string
+{
+    foreach (['sessions', 'transactions', 'metadata_locks', 'data_locks'] as $key) {
+        if (! isset($sample[$key]) || ! is_array($sample[$key])) {
+            throw new RuntimeException('Cleanup observation unavailable');
+        }
+    }
+    if ($sample['sessions'] !== [] || $sample['metadata_locks'] !== [] || $sample['data_locks'] !== []) {
+        throw new RuntimeException('Finished client session/locks remain after close');
+    }
+    if ($remaining <= 0) {
+        throw new RuntimeException('Cleanup observation deadline');
+    }
+    if ($sample['transactions'] === []) {
+        return 'clean';
+    }
+    if ($remaining <= 0.150) {
+        throw new RuntimeException('Cleanup transaction observation did not settle');
+    }
+
+    return 'settle';
+}
 function released(string $role): void
 {
-    global $observer,$owned,$resourceAvailable;
+    global $observer,$owned,$resourceAvailable,$cells;
+    $deadline = microtime(true) + 1.0;
     $id = $owned[$role]['connection_id'];
     $thread = $owned[$role]['thread_id'];
-    $transactions = $observer->query('SELECT trx_mysql_thread_id FROM information_schema.INNODB_TRX WHERE trx_mysql_thread_id='.(int) $id)->fetchAll(PDO::FETCH_ASSOC);
-    try {
-        $locks = $thread > 0 ? $observer->query('SELECT OBJECT_TYPE,OBJECT_SCHEMA,OBJECT_NAME,LOCK_STATUS FROM performance_schema.metadata_locks WHERE OWNER_THREAD_ID='.(int) $thread)->fetchAll(PDO::FETCH_ASSOC) : [];
-    } catch (PDOException $error) {
-        note(['event' => 'release_lock_check_inconclusive', 'role' => $role, 'error' => $error->errorInfo]);
-        $resourceAvailable = false;
-        $locks = [];
+    if (! $resourceAvailable || ! is_int($id) || $id <= 0 || ! is_int($thread) || $thread <= 0) {
+        throw new RuntimeException('Cleanup identity/instrumentation unavailable');
     }
-    $data = [];
-    try {
-        if ($thread > 0) {
-            $data = $observer->query('SELECT THREAD_ID,OBJECT_SCHEMA,OBJECT_NAME,LOCK_STATUS FROM performance_schema.data_locks WHERE THREAD_ID='.(int) $thread)->fetchAll(PDO::FETCH_ASSOC);
+    request($role, 'close', $deadline);
+    do {
+        $status = proc_get_status($cells[$role]['process']);
+        if (! $status['running']) {
+            if ($status['exitcode'] !== 0) {
+                throw new RuntimeException('Finished client exit not successful');
+            }
+            break;
         }
-    } catch (PDOException $error) {
-        $resourceAvailable = false;
-        note(['event' => 'release_data_check_inconclusive', 'role' => $role, 'error' => $error->errorInfo]);
-    }
-    note(['event' => 'arm_release_verified', 'role' => $role, 'transactions' => $transactions, 'metadata_locks' => $locks, 'data_locks' => $data]);
-    if ($transactions !== [] || $locks !== [] || $data !== []) {
-        note(['event' => 'rollback_not_released', 'role' => $role, 'transactions' => $transactions, 'locks' => $locks]);
-        throw new RuntimeException('Owned arm locks/transaction remain after rollback');
-    }
+        if (microtime(true) >= $deadline) {
+            throw new RuntimeException('Finished client exit deadline');
+        }
+        usleep(5000);
+    } while (true);
+    note(['event' => 'finished_client_exit', 'role' => $role, 'connection_id' => $id, 'thread_id' => $thread, 'status' => $status]);
+    $sample = 0;
+    do {
+        if (microtime(true) >= $deadline) {
+            throw new RuntimeException('Cleanup observation deadline');
+        }
+        $sessions = $observer->query('SELECT THREAD_ID,PROCESSLIST_ID FROM performance_schema.threads WHERE THREAD_ID='.(int) $thread.' OR PROCESSLIST_ID='.(int) $id)->fetchAll(PDO::FETCH_ASSOC);
+        $transactions = $observer->query('SELECT trx_mysql_thread_id FROM information_schema.INNODB_TRX WHERE trx_mysql_thread_id='.(int) $id)->fetchAll(PDO::FETCH_ASSOC);
+        $locks = $observer->query('SELECT OBJECT_TYPE,OBJECT_SCHEMA,OBJECT_NAME,LOCK_STATUS FROM performance_schema.metadata_locks WHERE OWNER_THREAD_ID='.(int) $thread)->fetchAll(PDO::FETCH_ASSOC);
+        $data = $observer->query('SELECT THREAD_ID,OBJECT_SCHEMA,OBJECT_NAME,LOCK_STATUS FROM performance_schema.data_locks WHERE THREAD_ID='.(int) $thread)->fetchAll(PDO::FETCH_ASSOC);
+        note(['event' => 'arm_cleanup_sample', 'role' => $role, 'sample' => $sample++, 'sessions' => $sessions, 'transactions' => $transactions, 'metadata_locks' => $locks, 'data_locks' => $data, 'remaining_seconds' => $deadline - microtime(true)]);
+        $disposition = cleanupObservation(['sessions' => $sessions, 'transactions' => $transactions, 'metadata_locks' => $locks, 'data_locks' => $data], $deadline - microtime(true));
+        if ($disposition === 'clean') {
+            note(['event' => 'arm_release_verified', 'role' => $role, 'transactions' => [], 'metadata_locks' => [], 'data_locks' => [], 'sessions' => []]);
+
+            return;
+        }
+        // Only transaction-catalog residue may settle; no candidate/rollback retry.
+        usleep(150000);
+    } while (true);
 }
 function finishArm(string $role): void
 {
