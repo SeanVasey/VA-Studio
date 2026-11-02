@@ -15,6 +15,7 @@ use PDO;
 use Pdo\Mysql;
 use ReflectionMethod;
 use ReflectionProperty;
+use Tests\Support\ExplainFamilyProjection;
 use Tests\Support\ExplainNoteSnapshot;
 use Tests\Support\ExplainPrepareSnapshot;
 use Tests\Support\ProductionIdentityFixture;
@@ -218,6 +219,9 @@ final class CatalogGroupDifferentialTest extends TestCase
                     };
                     $walk($explain);
                     $windowIds = array_values(array_unique($windowIds));
+                    if (in_array($group, [CatalogGroup::A0_ACCOUNT_TABLE, CatalogGroup::A1_ACCOUNT_AFTER_SHOW], true)) {
+                        fwrite(STDERR, 'EXPLAIN structure: '.json_encode(['group' => $group->value, 'stream' => $streamIndex, 'projection' => ExplainFamilyProjection::project($explain, count($stream['families']))], JSON_THROW_ON_ERROR)."\n");
+                    }
                     self::assertCount(count($stream['families']), $windowIds, $group->value.' exact window-bearing family materializations');
                     self::assertSame([], array_values(array_diff($windowIds, $sharedIds)), $group->value.' every family window must be shared by header and row consumers');
                     self::assertGreaterThanOrEqual(count($stream['families']), $materialized, $group->value);
