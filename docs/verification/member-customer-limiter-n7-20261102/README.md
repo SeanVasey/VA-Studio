@@ -63,3 +63,7 @@ a9b typed differential 1/1,081 passed, six cleanup checks clean, lease returned.
 Physical native owner `73355` is RUNNING with no outcome claimed here. Required
 external code/security reviews completed on frozen `e883`; new timer publication
 remains ROOT's one coherent PR #188 update after its necessary gates.
+
+## Timer candidate discovery and safeguards
+
+ROOT regenerated the native partition at documentation head `a8d4a9cd`: **2,679 selected cases / 266 files**, from **10,063 discovered cases / 746 files**, across eight nonempty shards. This lists cases; it executes no product tests. The 103 untimed selected files retain the reviewed fallback weights. Both workflow count comments now match; generated shard files were removed. The five local CI safeguards passed **207 tests**. [Commands and counts](timer-ci-discovery.json) distinguish this metadata check from the selected behavioral results at unchanged `0159`. No census entries, mount, workflow behavior, dependency or production environment keys changed.
