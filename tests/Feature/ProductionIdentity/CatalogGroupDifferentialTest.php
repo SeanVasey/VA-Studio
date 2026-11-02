@@ -219,6 +219,170 @@ final class CatalogGroupDifferentialTest extends TestCase
         }
     }
 
+    /** Fixed reflected second-gate primitive, NOT naturally exhausted public-stage capacity. */
+    public function test_native_i2_second_gate_preserves_positive_facts_and_emits_all_reserved_invalid_headers(): void
+    {
+        $primary = DB::connection()->getPdo();
+        $lease = CatalogLease::open($primary);
+        try {
+            $catalog = (new ReflectionProperty($lease, 'catalog'))->getValue($lease);
+            $native = (new ReflectionProperty($catalog, 'catalog'))->getValue($catalog);
+            $plan = CatalogGroupPlan::build(CatalogGroup::I2_RESERVED_NAMES, AccountAdmissionGuards::V2);
+            $stream = $plan['i2_split'][1];
+            $original = CatalogLease::identity($primary, CatalogRead::Q6546FD85F02A, $plan['families'][1]['names']);
+            self::assertNotEmpty($original[$plan['families'][1]['names'][0]], 'Canonical original target positive required.');
+            foreach ([[131044, 16773120], [28, 7336]] as $control => [$recordBudget, $byteBudget]) {
+                self::assertTrue($native->setAttribute(Mysql::ATTR_USE_BUFFERED_QUERY, false));
+                $statement = $native->prepare($stream['sql']);
+                self::assertSame(0, $native->getWarningCount());
+                foreach ($stream['bindings'] as $position => $value) {
+                    self::assertTrue($statement->bindValue($position + 1, $value, PDO::PARAM_STR));
+                }
+                self::assertTrue($statement->bindValue(57, $recordBudget, PDO::PARAM_INT));
+                self::assertTrue($statement->bindValue(58, $byteBudget, PDO::PARAM_INT));
+                self::assertTrue($statement->execute());
+                self::assertSame(0, $native->getWarningCount());
+                $wire = [];
+                $charge = 0;
+                while (($row = $statement->fetch(PDO::FETCH_ASSOC)) !== false) {
+                    self::assertLessThan(131072, count($wire));
+                    self::assertIsString($row['payload']);
+                    self::assertLessThanOrEqual(8388608, strlen($row['payload']));
+                    $charge += 256 + strlen($row['payload']);
+                    self::assertLessThanOrEqual($byteBudget, $charge);
+                    self::assertLessThan($recordBudget, count($wire));
+                    $wire[] = $row;
+                }
+                self::assertSame(0, $native->getWarningCount());
+                self::assertTrue($statement->closeCursor());
+                unset($statement);
+                self::assertTrue($native->setAttribute(Mysql::ATTR_USE_BUFFERED_QUERY, true));
+                self::assertTrue($native->getAttribute(Mysql::ATTR_USE_BUFFERED_QUERY));
+                if ($control === 0) {
+                    $decoded = (new ReflectionMethod(CurrentCatalog::class, 'decodeGroup'))->invoke(null, CatalogGroup::I2_RESERVED_NAMES, $stream['families'], $wire);
+                    foreach ($original as $name => $rows) {
+                        $left = array_map(serialize(...), $rows);
+                        $right = array_map(serialize(...), $decoded[CatalogRead::Q6546FD85F02A->value][$name]);
+                        sort($left, SORT_STRING);
+                        sort($right, SORT_STRING);
+                        self::assertSame($left, $right, 'FULL second-family positive native typed bags.');
+                    }
+                } else {
+                    self::assertCount(28, $wire);
+                    self::assertSame(7336, $charge);
+                    foreach ($wire as $slot => $record) {
+                        self::assertSame(['group_id' => CatalogGroup::I2_RESERVED_NAMES->value, 'family' => 1, 'slot' => $slot, 'kind' => 0, 'ordinal' => '0', 'payload' => '[null]'], $record);
+                    }
+                    try {
+                        (new ReflectionMethod(CurrentCatalog::class, 'decodeGroup'))->invoke(null, CatalogGroup::I2_RESERVED_NAMES, $stream['families'], $wire);
+                        self::fail('Invalid reserved headers admitted as absent facts.');
+                    } catch (LogicException) {
+                        self::assertTrue(true);
+                    }
+                }
+            }
+            unset($native, $catalog);
+        } finally {
+            if (isset($native)) {
+                self::assertTrue($native->setAttribute(Mysql::ATTR_USE_BUFFERED_QUERY, true));
+                self::assertTrue($native->getAttribute(Mysql::ATTR_USE_BUFFERED_QUERY));
+            }
+            unset($statement, $native, $catalog);
+            $lease->close();
+        }
+    }
+
+    /** Fixed test-only reflected fault descriptors; canonical public positives run BEFORE each fault. */
+    public function test_native_i2_first_and_second_prepare_failures_invalidate_without_partial_result_or_reuse(): void
+    {
+        $connection = DB::connection();
+        $primary = $connection->getPdo();
+        foreach ([0, 1] as $faultStream) {
+            $lease = null;
+            $connection->beginTransaction();
+            $primary->exec('SAVEPOINT catalog_i2_fault');
+            try {
+                $lease = CatalogLease::open($primary);
+                $catalog = (new ReflectionProperty($lease, 'catalog'))->getValue($lease);
+                $identity = (new ReflectionProperty($catalog, 'catalogIdentity'))->getValue($catalog);
+                $companionId = $identity['connection_id'];
+                self::assertIsInt($companionId);
+                $visible = $primary->prepare('SELECT COUNT(*) FROM performance_schema.threads WHERE PROCESSLIST_ID=?');
+                self::assertTrue($visible->execute([$companionId]));
+                self::assertSame(1, (int) $visible->fetchColumn(), 'Owned live companion positive visibility.');
+                self::assertTrue($visible->closeCursor());
+                unset($visible, $identity); // Never retain a private PDO reference across failure.
+                $plan = CatalogGroupPlan::build(CatalogGroup::I2_RESERVED_NAMES, AccountAdmissionGuards::V2);
+                $positive = CatalogLease::group($primary, CatalogGroup::I2_RESERVED_NAMES, AccountAdmissionGuards::V2);
+                foreach ($plan['families'] as $family) {
+                    $query = constant(CatalogRead::class.'::'.$family['enum']);
+                    $original = CatalogLease::identity($primary, $query, $family['names']);
+                    self::assertNotEmpty($original[$family['names'][0]], 'Both canonical original family targets required.');
+                    self::assertSame(array_keys($original), array_keys($positive[$query->value]));
+                    foreach ($original as $name => $rows) {
+                        $left = array_map(serialize(...), $rows);
+                        $right = array_map(serialize(...), $positive[$query->value][$name]);
+                        sort($left, SORT_STRING);
+                        sort($right, SORT_STRING);
+                        self::assertSame($left, $right, 'Genuine public split path positive before reflected fault.');
+                    }
+                }
+                unset($positive, $original, $rows, $left, $right);
+                // Fixed syntax error only: no user SQL, production seam, callback, custom PDO, or schema mutation.
+                $plan['i2_split'][$faultStream]['sql'] = 'SELECT FROM';
+                $before = CurrentCatalog::accounting();
+                $published = null;
+                try {
+                    $published = (new ReflectionMethod(CurrentCatalog::class, 'i2'))->invoke($catalog, $plan);
+                    self::fail('Faulted stage returned partial metadata.');
+                } catch (LogicException) {
+                    self::assertNull($published);
+                }
+                self::assertSame($before['companion_sql'] + $faultStream + 1, CurrentCatalog::accounting()['companion_sql'],
+                    $faultStream === 1 ? 'Second prepare reached only AFTER completed first decode/close/restore.' : 'First refusal issued no second prepare.');
+                self::assertNull((new ReflectionProperty($catalog, 'catalog'))->getValue($catalog));
+                self::assertTrue((new ReflectionProperty($catalog, 'failed'))->getValue($catalog));
+                $failed = CurrentCatalog::accounting();
+                foreach ([fn () => $catalog->group(CatalogGroup::I2_RESERVED_NAMES, AccountAdmissionGuards::V2),
+                    fn () => CatalogLease::group($primary, CatalogGroup::I2_RESERVED_NAMES, AccountAdmissionGuards::V2)] as $retry) {
+                    try {
+                        $retry();
+                        self::fail('Failed capability or registry transparently reused/replaced.');
+                    } catch (LogicException) {
+                        self::assertTrue(true);
+                    }
+                }
+                self::assertSame($failed, CurrentCatalog::accounting(), 'No further statement/constructor/handshake attempt.');
+                $release = $primary->prepare('SELECT COUNT(*) FROM performance_schema.threads WHERE PROCESSLIST_ID=?');
+                $deadline = hrtime(true) + 1000000000;
+                $samples = [];
+                do {
+                    self::assertTrue($release->execute([$companionId]));
+                    $remaining = (int) $release->fetchColumn();
+                    self::assertTrue($release->closeCursor());
+                    $samples[] = $remaining;
+                    if ($remaining === 0) {
+                        break;
+                    }
+                    usleep(150000);
+                } while (hrtime(true) < $deadline);
+                fwrite(STDERR, 'I2 fault release samples: '.json_encode(['fault_stream' => $faultStream, 'samples' => $samples], JSON_THROW_ON_ERROR)."\n");
+                self::assertSame(0, $remaining, 'Owned failed companion session actually released.');
+                self::assertTrue($primary->inTransaction());
+                $primary->exec('ROLLBACK TO SAVEPOINT catalog_i2_fault');
+            } finally {
+                try {
+                    $lease?->close();
+                } catch (LogicException) { /* Refusal remains permanent; external audit still required. */
+                }
+                if ($connection->transactionLevel() > 0) {
+                    $connection->rollBack();
+                }
+                unset($retry, $catalog, $lease, $plan, $release);
+            }
+        }
+    }
+
     public function test_native_oversized_complete_catalog_refuses_and_releases_failed_companion_preserving_primary_savepoint(): void
     {
         $connection = DB::connection();

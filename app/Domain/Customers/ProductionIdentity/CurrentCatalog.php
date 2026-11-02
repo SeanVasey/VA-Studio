@@ -338,8 +338,9 @@ final class CurrentCatalog
 
             return $result;
         } catch (Throwable) {
-            unset($statement, $result, $decoded, $stage);
+            // Refusal is monotonic BEFORE potentially blocking native statement destruction/drain.
             $this->invalidate();
+            unset($statement, $result, $decoded, $stage);
             self::refuse();
         }
     }
