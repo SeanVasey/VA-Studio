@@ -85,3 +85,10 @@ within the outer inspection; owned SchemaProofFrame holds a lifetime lease and
 opens a validated boundary for each consultation/terminal proof. Weak references
 alone cannot extend companion life; last close destroys its private PDO. No
 unbounded global factory or indefinite metadata-proof cache is introduced.
+
+Predeclared addition before editing: AccountAdmissionUpgrade.php ONLY its private
+read-only inspect phase receives an outer explicit CatalogLease, so composed
+before/identity/migration-dependent/consent/after proofs share one scoped native
+companion and close BEFORE existing DDL. Existing same-primary advisory lock,
+no-active-TX, per-DDL reinspection/order/overlap/ledger/down/rollback semantics
+are unchanged. No migration file or historical factory output is edited.
