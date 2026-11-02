@@ -155,7 +155,7 @@ final class MembershipNativeCustomerRateLimitTest extends TestCase
                             $receipt['exit'] = $worker->getExitCode();
                             $receipt['terminal'] = ! $running && $receipt['exit'] !== null;
                             $receipt['running'] = $running;
-                            $receipt['signaled'] = $worker->isSignaled();
+                            $receipt['signaled'] = $worker->hasBeenSignaled();
                             $receipt['signal'] = $receipt['signaled'] ? $worker->getTermSignal() : null;
                         } catch (Throwable $error) {
                             $receipt['terminal'] = false;

@@ -7,7 +7,7 @@
     "app/Http/Membership/MembershipCustomerLimiter.php": "a59113347b9114269ad109660e200999d5201faad5b6aa6acb8cadeb80ff4571",
     "app/Http/Membership/MembershipController.php": "abe30eb9abaf67d766bf736a97ebd0e0410b6ebfb3ccff7aecd75910182a1a2b",
     "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php": "e0a522b2033c9363209f4dd4229ea2e31b530ef068a4d750288285f55419275b",
-    "tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php": "9c222708a1dfbd2984292668dbbb64550dd07145404e9395d9460d7b57a598e9",
+    "tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php": "ed67665e038e5448fb10d5cf35cb02df0cb873a4c7d01b4258386e75bdf5914f",
     "tests/Support/membership-customer-limiter-worker.php": "45a8cec53891c170374b61232aca607d84e0f98baee613cdc5f57b1bf72c200a"
   },
   "unchanged_from_main": {
@@ -39,7 +39,8 @@
     "unchanged_product_helper_controller_prior_lint_pint": "PASS exact80bcd893 bytes retained",
     "final_native_test_and_worker_lint_pint": "PASS; native format-only import order after initial styleFAIL, re-lintnative exit0; worker unchanged finalall5PintPASS",
     "final_all_five_php_lint": "PASS: all5 before format; native re-linted after sole import-order format edit, other4 byte-identical",
-    "final_all_five_pint": "PASS exit0; original de93 styleFAIL preserved separately, not relabeled green"
+    "final_all_five_pint": "PASS exit0; original de93 styleFAIL preserved separately, not relabeled green",
+    "native_observer_API_repair": "LockedSymfonyProcess8.0.13 hasBeenSignaled replaces nonexistent isSignaled; pure4API/3syntheticnonSTARTED+READYUNKNOWNcheckPASS; no actualworker launched. Actual25e nativeFAIL1/672 preserved."
   },
   "execution_counts": {
     "laravel_bootstraps": 0,
@@ -50,6 +51,7 @@
     "CI": 0
   },
   "required_next": [
+    "Independent exact native-status API repair source review BEFORE any rerun; no native lease currently",
     "Bounded independent exact formatted P2 source re-review; allbehavior/mutantsUNRUN",
     "Independent exact source security/auth/cache/native-worker/refusal-oracle review",
     "ROOT explicit SQLite/native lease after account isolation; all selected actual tests/mutations unrun",
