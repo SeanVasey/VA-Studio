@@ -1,0 +1,58 @@
+{
+  "status": "SOURCE PREPARATION ONLY; no current feature/native/mutation acceptance",
+  "base_main": "a7bc63cc5c5785353f13e882f49d0ab9dcff55b3",
+  "remote_main_verified": "git ls-remote origin refs/heads/main exacta7bc; local refs/heads/main absent, existing object used, no unexpected remote movement",
+  "member_extraction_source": "29ce932b7279953a011dd18041ddd4c1df66f306",
+  "sha256": {
+    "app/Http/Membership/MembershipCustomerLimiter.php": "a59113347b9114269ad109660e200999d5201faad5b6aa6acb8cadeb80ff4571",
+    "app/Http/Membership/MembershipController.php": "abe30eb9abaf67d766bf736a97ebd0e0410b6ebfb3ccff7aecd75910182a1a2b",
+    "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php": "e0a522b2033c9363209f4dd4229ea2e31b530ef068a4d750288285f55419275b",
+    "tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php": "661d31c9d8272808e763627a9f0723a164273abd52079923ff57e4d46e0dd436",
+    "tests/Support/membership-customer-limiter-worker.php": "05ef50e1c240a028778bb8802c6f484fd756ee6a04f64a435f8eec38dd63bacd"
+  },
+  "unchanged_from_main": {
+    "routes/production-memberships.php": "5bd1db356498d6088a1e639854a449f546e4fccee3e8ad5036eee65d3cd8b046",
+    "config/production-memberships.php": "b3718442b8361ebd43977d71a94f636ba497b6494ee194349a917dcbdd572c9b",
+    "config/cache.php": "ee4ad2bba1edfcff52e9599f37371f2370d0b167cc226ce72d46cdf6edf2dc55",
+    "app/Http/Membership/MembershipHttpMount.php": "0695f9f69004e4a89bc27e5635c8121e982dd7a4aff257d09f2821840d3d14be",
+    "app/Http/Membership/MembershipPrivacy.php": "ce3930146717d187f778f3c581cbc425759445f8ac2adbbfbab9d3bdb1a853c9",
+    "app/Domain/Memberships/Production/MembershipCustomerIndex.php": "564280b5a499beeda3ea71bcf4fbaff98bd95bcff6b5c190bc731e266c3b27a2",
+    "app/Domain/Memberships/Production/MembershipCustomerRead.php": "2140c4f2b471b76983b929aab7375c63bcf4ed49af3647f8ad6b281dc6c75413",
+    "app/Domain/Memberships/Production/MembershipHttpBinding.php": "7494c27553334b0d75d54aa362653ed065ca2b014205108689fee5572b6c9a12",
+    "tests/Feature/ProductionMembershipHttp/MembershipHttpTest.php": "dbfdea1d1748d307feffc2a2f330418a2ba5cf5ae31b707233110815cd39a05c",
+    "tests/Feature/ProductionMembershipHttp/MembershipHttpMountTest.php": "6de72673fb0d1adc035f5b17782f51852d7a33d7546eb3ec217466992ed18362",
+    "composer.lock": "254ed9b69326c8d8d02735b40fa4d61cbad560f73bc72cab47255a986a743ce8",
+    "composer.json": "d1a5bd0e099f2f6ed34448b16a84425129038849a95f09b51e353a5d04caf908"
+  },
+  "controller_exact_two_insertions": true,
+  "helper_and_fixed_worker_exact_member": true,
+  "no_external_vendor_symlinks": true,
+  "prepared_http_cases": 6,
+  "prepared_native_cases": 1,
+  "mutation_plans": 14,
+  "mutation_exactmatches_static": true,
+  "all_mutations_UNRUN": true,
+  "sourceprep_checks": {
+    "php_lint_four_other_final_files": "PASS exit0",
+    "pint_four_other_final_files": "PASS exit0",
+    "http_test_earlier_lint_pint_sha256": "cf63f50fc35d2e95f41c85acb206f7d6a5b85187920f4165cd4042360e46f63d",
+    "http_test_final_lint_pint": "PENDING shared-runtime PHP pause; source-only later404body correction after earlier5-file PASS. No final-current pass claimed.",
+    "git_diff_check": "PASS",
+    "static_scope_and_mutation_checks": "PASS"
+  },
+  "execution_counts": {
+    "laravel_bootstraps": 0,
+    "phpunit_feature_or_native": 0,
+    "workers": 0,
+    "SQL_or_DB": 0,
+    "mutations": 0,
+    "CI": 0
+  },
+  "required_next": [
+    "Final owned HTTP test PHP-l/Pint after ROOT releases static PHP slot",
+    "Independent exact source security/auth/cache/native-worker/refusal-oracle review",
+    "ROOT explicit SQLite/native lease after account isolation; all selected actual tests/mutations unrun",
+    "Exact tested-SHA evidence review; ROOT-owned census/receipt/preflight/code/security/Bugbot/expected-head publication gates",
+    "F9/account/history and mountfalse gates remain independent/open; no C or MIG reorder"
+  ]
+}

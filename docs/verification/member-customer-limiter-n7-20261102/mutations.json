@@ -1,0 +1,246 @@
+{
+  "status": "SOURCE ONLY, no runner/execution; all14 UNRUN",
+  "execution_contract": "Future explicit lease/review only. One exact mutant/process at a time; capture baseSHA/actualdiff/full exit/JUnit. Only genuine named behavioral assertion red counts; API/type/setup/no-tests errors STOP, never kills. Finally restore exact bytes/hash/global clean before next. Preserve timeouts and rerun alone before classifying; no automatic next after failure.",
+  "mutations": [
+    {
+      "name": "key-ip",
+      "path": "app/Http/Membership/MembershipCustomerLimiter.php",
+      "edits": [
+        {
+          "before": "$principal->accountId",
+          "after": "request()->ip()"
+        }
+      ],
+      "selection": {
+        "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+        "filter": "test_read_bucket_survives_ip_session_and_recovery_changes_and_expires"
+      },
+      "expected_meaningful_assertion": "Recovered/session/IP/accessVersion variants must retain exhausted customer bucket:429/no domain entry.",
+      "status": "UNRUN; in-memory exact-match static validation only"
+    },
+    {
+      "name": "key-session",
+      "path": "app/Http/Membership/MembershipCustomerLimiter.php",
+      "edits": [
+        {
+          "before": "$principal->accountId",
+          "after": "request()->session()->getId()"
+        }
+      ],
+      "selection": {
+        "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+        "filter": "test_read_bucket_survives_ip_session_and_recovery_changes_and_expires"
+      },
+      "expected_meaningful_assertion": "Recovered/session/IP/accessVersion variants must retain exhausted customer bucket:429/no domain entry.",
+      "status": "UNRUN; in-memory exact-match static validation only"
+    },
+    {
+      "name": "key-access-version",
+      "path": "app/Http/Membership/MembershipCustomerLimiter.php",
+      "edits": [
+        {
+          "before": "$principal->accountId",
+          "after": "$principal->accessVersion"
+        }
+      ],
+      "selection": {
+        "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+        "filter": "test_read_bucket_survives_ip_session_and_recovery_changes_and_expires"
+      },
+      "expected_meaningful_assertion": "Recovered/session/IP/accessVersion variants must retain exhausted customer bucket:429/no domain entry.",
+      "status": "UNRUN; in-memory exact-match static validation only"
+    },
+    {
+      "name": "omit-tier",
+      "path": "app/Http/Membership/MembershipCustomerLimiter.php",
+      "edits": [
+        {
+          "before": "[$principal->provenance, $principal->accountId, $tier]",
+          "after": "[$principal->provenance, $principal->accountId]"
+        }
+      ],
+      "selection": {
+        "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+        "filter": "test_customers_and_read_write_tiers_have_distinct_buckets_and_all_write_routes_share_one"
+      },
+      "expected_meaningful_assertion": "Read exhaustion must not consume first write admission; separate customers remain independent.",
+      "status": "UNRUN; in-memory exact-match static validation only"
+    },
+    {
+      "name": "omit-read-admission",
+      "path": "app/Http/Membership/MembershipController.php",
+      "edits": [
+        {
+          "before": "(new MembershipCustomerLimiter)->admit($identity, 'reads');",
+          "after": "// deliberate counterfactual: no read admission"
+        }
+      ],
+      "selection": {
+        "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+        "filter": "test_read_bucket_survives_ip_session_and_recovery_changes_and_expires"
+      },
+      "expected_meaningful_assertion": "Eleventh real read must be429 and not enter domain.",
+      "status": "UNRUN; in-memory exact-match static validation only"
+    },
+    {
+      "name": "omit-write-admission",
+      "path": "app/Http/Membership/MembershipController.php",
+      "edits": [
+        {
+          "before": "(new MembershipCustomerLimiter)->admit($identity, 'writes');",
+          "after": "// deliberate counterfactual: no write admission"
+        }
+      ],
+      "selection": {
+        "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+        "filter": "test_customers_and_read_write_tiers_have_distinct_buckets_and_all_write_routes_share_one"
+      },
+      "expected_meaningful_assertion": "Eleventh invalid-period write must be429 before any write domain entry.",
+      "status": "UNRUN; in-memory exact-match static validation only"
+    },
+    {
+      "name": "charge-write-after-domain",
+      "path": "app/Http/Membership/MembershipController.php",
+      "edits": [
+        {
+          "before": "            (new MembershipCustomerLimiter)->admit($identity, 'writes');\n",
+          "after": ""
+        },
+        {
+          "before": "            $result = $operation($identity, $body);",
+          "after": "            $result = $operation($identity, $body);\n            (new MembershipCustomerLimiter)->admit($identity, 'writes');"
+        }
+      ],
+      "selection": {
+        "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+        "filter": "test_customers_and_read_write_tiers_have_distinct_buckets_and_all_write_routes_share_one"
+      },
+      "expected_meaningful_assertion": "Refusing write domain still consumes bucket; only charging success fails eleventh429.",
+      "status": "UNRUN; in-memory exact-match static validation only"
+    },
+    {
+      "name": "charge-read-after-domain",
+      "path": "app/Http/Membership/MembershipController.php",
+      "edits": [
+        {
+          "before": "            (new MembershipCustomerLimiter)->admit($identity, 'reads');\n",
+          "after": ""
+        },
+        {
+          "before": "            $index = (new MembershipCustomerIndex)->index($identity->principal(), $identity->actor(), $read);",
+          "after": "            $index = (new MembershipCustomerIndex)->index($identity->principal(), $identity->actor(), $read);\n            (new MembershipCustomerLimiter)->admit($identity, 'reads');"
+        }
+      ],
+      "selection": {
+        "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+        "filter": "test_refused_first_page_domain_reads_still_consume_admission_before_domain"
+      },
+      "expected_meaningful_assertion": "Ten exact-stack before-transaction domain refusals charged; eleventh429 and refusal counter stays10.",
+      "status": "UNRUN; in-memory exact-match static validation only"
+    },
+    {
+      "name": "cache-errors-fail-open",
+      "path": "app/Http/Membership/MembershipCustomerLimiter.php",
+      "edits": [
+        {
+          "before": "$hits = $limiter->hit($key, 60);",
+          "after": "try { $hits = $limiter->hit($key, 60); } catch (\\Throwable) { return; }"
+        }
+      ],
+      "selection": {
+        "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+        "filter": "test_cache_exception_is_a_private_pre_operation_failure_for_reads_and_writes"
+      },
+      "expected_meaningful_assertion": "Cache failure must503 with0 domain calls; no success or outcome-unknown.",
+      "status": "UNRUN; in-memory exact-match static validation only"
+    },
+    {
+      "name": "omit-post-cache-reproof",
+      "path": "app/Http/Membership/MembershipCustomerLimiter.php",
+      "edits": [
+        {
+          "before": "        // Store resolution, lock and cache operations may invoke extensible callbacks.\n        $identity->proveCurrent();",
+          "after": "        // deliberate counterfactual: no final capsule proof"
+        }
+      ],
+      "selection": {
+        "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+        "filter": "test_cache_callbacks_cannot_change_identity_or_steal_the_admission_lease_before_domain_work"
+      },
+      "expected_meaningful_assertion": "Session-changing callback must403/0 domain entries.",
+      "status": "UNRUN; in-memory exact-match static validation only"
+    },
+    {
+      "name": "ignore-configured-store",
+      "path": "app/Http/Membership/MembershipCustomerLimiter.php",
+      "edits": [
+        {
+          "before": "Cache::store(config('cache.limiter'))",
+          "after": "Cache::store(config('cache.default'))"
+        }
+      ],
+      "selection": {
+        "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+        "filter": "test_configured_store_is_used_and_a_contended_admission_lock_fails_before_domain"
+      },
+      "expected_meaningful_assertion": "Distinct configured-store held lock must503 before domain.",
+      "status": "UNRUN; in-memory exact-match static validation only"
+    },
+    {
+      "name": "truthy-store-fallback",
+      "path": "app/Http/Membership/MembershipCustomerLimiter.php",
+      "edits": [
+        {
+          "before": "Cache::store(config('cache.limiter'))",
+          "after": "Cache::store(config('cache.limiter') ?: config('cache.default'))"
+        }
+      ],
+      "selection": {
+        "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+        "filter": "test_configured_store_is_used_and_a_contended_admission_lock_fails_before_domain"
+      },
+      "expected_meaningful_assertion": "Literal configured name0 held lock must503, never default-store admission.",
+      "status": "UNRUN; in-memory exact-match static validation only"
+    },
+    {
+      "name": "omit-critical-section",
+      "path": "app/Http/Membership/MembershipCustomerLimiter.php",
+      "edits": [
+        {
+          "before": "if (! $lock->get())",
+          "after": "if (false)"
+        },
+        {
+          "before": "\n                || ! $lock->isOwnedByCurrentProcess()",
+          "after": ""
+        },
+        {
+          "before": "            if (! $lock->release() || $lock->isOwnedByCurrentProcess()) {",
+          "after": "            if (false) {"
+        }
+      ],
+      "selection": {
+        "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+        "filter": "test_configured_store_is_used_and_a_contended_admission_lock_fails_before_domain"
+      },
+      "expected_meaningful_assertion": "Parent-held admission lock must refuse503; no unlocked domain entry.",
+      "status": "UNRUN; in-memory exact-match static validation only"
+    },
+    {
+      "name": "unbounded-retry-after",
+      "path": "app/Http/Membership/MembershipCustomerLimiter.php",
+      "edits": [
+        {
+          "before": "max(1, min(60, $limiter->availableIn($key)))",
+          "after": "max(1, $limiter->availableIn($key))"
+        }
+      ],
+      "selection": {
+        "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+        "filter": "test_configured_store_is_used_and_a_contended_admission_lock_fails_before_domain"
+      },
+      "expected_meaningful_assertion": "Corrupted long timer must produce bounded Retry-After60.",
+      "status": "UNRUN; in-memory exact-match static validation only"
+    }
+  ]
+}
