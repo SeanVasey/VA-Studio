@@ -63,3 +63,25 @@ work counted; memo bound15 with ALL participating PDOs; terminal complete proof;
 fresh/composed/populated/real Laravel ledger interruption; actual account owner
 orderings/generated IDs/FKs/resource cases. Any failure preserves first receipt
 and blocks acceptance. No bound increase/skip or isolation workaround.
+
+Predeclared concrete file inventory before product edits:
+new ProductionIdentity/CatalogWriterDescriptor.php,CatalogRead.php,
+CurrentCatalog.php,CatalogLease.php; modified AccountAdmissionGuards.php,
+IdentityMigrationOwnership.php,SchemaProofFrame.php,IdentityRows.php,
+IdentityHistoricalPlainRows.php; Preferences/ConsentMigrationAdmission.php;
+Memberships/Production/MembershipSchemaCatalog.php,MembershipSchema.php;
+Grants/Member/MemberGrantCurrentSchema.php. Focused tests under Unit and
+Feature/ProductionIdentity for descriptor, closed queries, lifecycle/currentness;
+IdentityInspectionCostTest measurement may be strengthened, bound110 unchanged.
+No rewrite of older CapabilityMigrationOwnership: inherited framework metadata/
+factory activation conditions remain explicit outside this account prerequisite.
+If exact integration needs another source file, document/coordinate first.
+
+Closed operation design: enum source-backed SQL templates, with companion SQL
+execution PRIVATE. Identity/membership batch compilers accept enum templates and
+bindings, never caller SQL/callback/PDO. Existing native equality/qualification/
+UNION/CTE semantics are retained. Explicit nestable operation leases share only
+within the outer inspection; owned SchemaProofFrame holds a lifetime lease and
+opens a validated boundary for each consultation/terminal proof. Weak references
+alone cannot extend companion life; last close destroys its private PDO. No
+unbounded global factory or indefinite metadata-proof cache is introduced.
