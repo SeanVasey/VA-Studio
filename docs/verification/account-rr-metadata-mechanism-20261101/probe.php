@@ -204,6 +204,19 @@ function specs(array $m): array
 
     return $base;
 }
+function informationSchemaLockError(string $id, array $error): bool
+{
+    if (! preg_match('/\A(share|update)\.(?:tables|triggers|routines|events|indexes|constraints|peer_scope|union)\z/', $id, $match)) {
+        return false;
+    }
+    $clause = $match[1] === 'share' ? 'LOCK IN SHARE MODE' : 'FOR UPDATE';
+
+    return $error === ['state' => 'HY000', 'code' => 3550, 'message' => "SQLSTATE[HY000]: General error: 3550 Information schema queries do not support the '$clause' clause."];
+}
+function exactCapabilityWarning(array $error, array $warnings): bool
+{
+    return $warnings === [['Level' => 'Error', 'Code' => $error['code'], 'Message' => substr($error['message'], strlen('SQLSTATE[HY000]: General error: 3550 '))]];
+}
 function capability(string $id, array $error): bool
 {
     if (! preg_match('/\A(?:share|update)\./', $id)) {
@@ -211,7 +224,7 @@ function capability(string $id, array $error): bool
     }
     [$state,$code] = [$error['state'], $error['code']];
 
-    return in_array([$state, $code], [['42000', 1064], ['42000', 1235], ['HY000', 1221]], true)
+    return informationSchemaLockError($id, $error) || in_array([$state, $code], [['42000', 1064], ['42000', 1235], ['HY000', 1221]], true)
         || (in_array([$state, $code], [['42000', 1044], ['42000', 1142]], true) && str_contains(strtolower($error['message']), 'information_schema'));
 }
 function emit(array $event): void
@@ -347,6 +360,7 @@ if (($argv[1] ?? '') === '--self-test') {
         || ! str_contains($q['base.target'], 'plain_parent_support') || ! str_contains($q['publish.fk'], 'customer_accounts_update')) {
         throw new RuntimeException('Pure finite SQL contract failed');
     }
+    require __DIR__.'/capability_test.php';
     emit(['pure' => 'PASS', 'operation_ids' => count($q), 'database_connections' => 0]);
     exit(0);
 }
@@ -817,6 +831,9 @@ try {
                     continue;
                 }
                 if (capability($id, $result['error'])) {
+                    if ($result['error']['code'] === 3550 && ! exactCapabilityWarning($result['error'], $warnings)) {
+                        throw new RuntimeException('Information schema capability warning provenance mismatch');
+                    }
                     $unsupported = true;
                     note(['event' => 'unsupported_family', 'role' => $arm, 'id' => $id, 'error' => $result['error']]);
                     break;

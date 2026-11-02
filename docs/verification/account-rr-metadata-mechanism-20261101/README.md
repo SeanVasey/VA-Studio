@@ -372,3 +372,58 @@ warning_transport_test.phpc45da8b1853f6da0e5e01ff74357655717988ebb38b06c001be066
 Previous source hashes are retained as historical source/STOP references, not
 current native passing evidence. Future native warning controls/metadata
 candidates remain unexecuted and require exact-source approval/lease.
+
+### d1c587 native STOP retained; narrow capability preparation
+
+The single approved d1c587 run at private receipt
+`rrns-20261102T000549Z-7c2c663fd07e` stopped (outer exit2,2.55963s).
+Termination and zero owned clients/transactions/locks were verified;
+all scratch schemas/objects remain retained. It is INCOMPLETE, not acceptance.
+The app-shaped helper again admitted the reserved TABLE after publication.
+All four named native warning controls passed: clean, Warning1292, clean,
+Error1146; diagnostic attribute traces were false→true→false with restoration.
+The seven plain catalog observations (six selected catalog classes plus peer
+scope) differed from fresh positives under the retained early RR view.
+
+First `share.tables` failed HY000/3550 with exact PDO message
+`SQLSTATE[HY000]: General error: 3550 Information schema queries do not support the 'LOCK IN SHARE MODE' clause.`
+The immediate same-PDO warning was exactly Error3550 with the server message
+without PDO's prefix. There was no1295 contamination. The strict unknown-error
+STOP was correct for that frozen source. No later family ran.
+
+This source-only repair recognizes that exact state/code/message for the
+predeclared share catalog/union IDs, and the separately source-backed exact
+`FOR UPDATE` message for the update IDs. It requires the single matching
+Error3550 warning row; missing/extra/changed warnings still STOP. Unsupported
+means neither absence nor currentness. Existing per-arm witness and complete
+rollback precede the next independent predeclared arm. SQL, actual helper,
+attributes, launcher, and all other error/warning oracles are unchanged.
+UPDATE remains UNEXECUTED; its message is a source-backed classification only.
+
+Exact public MySQL tag `mysql-8.4.11`, `sql/sql_base.cc` lines5733–5760
+checks DD tables beneath I_S system views, rejects qualifying lock types with
+`FOR UPDATE`, and requests `HA_EXTRA_NO_READ_LOCKING`; lines6164–6179 reject
+system-view shared locking with `LOCK IN SHARE MODE`. The former expressly
+exempts `SQLCOM_LOCK_TABLES`; this is not a general statement that every DML
+context or every I_S implementation has identical behavior. No DML experiment,
+locking workaround, or production mechanism is selected.
+Sources: https://github.com/mysql/mysql-server/blob/mysql-8.4.11/sql/sql_base.cc
+and https://github.com/mysql/mysql-server/blob/mysql-8.4.11/share/messages_to_clients.txt
+(`ER_IS_QUERY_INVALID_CLAUSE`, line8089). Local immutable downloads outside Git:
+`sql/sql_base.cc` SHA256909949e672a5f557f3ada9783f2b929d7ff82bc63c0fa630bc813582b7b29279;
+messages SHA256e331fe816f3dfe9f8382baadc60a1f45dd8f3409f24752030c6d858593f5379c.
+
+No replay or database operation occurred during this repair preparation.
+Independent exact source review and a future root-assigned lease are required
+before execution. SHOW/currentness, lock safety, full/terminal runtime proofs,
+110/15 cost limits, domain isolation, and account prerequisite acceptance remain
+unproven.
+
+Actual preparation checks: PHP8.4.27 lint2 PASS; Pint2 PASS;
+`php probe.php --self-test` PASS40 pure capability assertions and107 fixed
+operation IDs,0 database connections; `php probe.php --warning-self-test`
+PASS23 pure assertions,0 database connections; `git diff --check` PASS.
+These commands used the existing runtime only for static/pure PHP, no bootstrap.
+Source SHA256: probe `2ef0801f4fe9a3fc2423e26852c2c3fe896edd32778d5845b92bda5071b0a427`;
+capability test `b86cb374bbf26e9a7df9293dfc76a2d632eb22256c46adc84af2ea9f5b126a4c`;
+unchanged launcher `072f978ddb86f20802b959718a9b3deb25c0c05e2c11bde3e02f11c77ba2f199`.
