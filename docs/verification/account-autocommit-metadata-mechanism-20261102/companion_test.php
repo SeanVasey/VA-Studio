@@ -32,4 +32,37 @@ foreach (['publish.check', 'publish.table', 'base.visible.fk', 'create.selected'
 foreach (['publish.unknown', 'warnings', 'plain.tables', 'context', 'publish.check.extra'] as $id) {
     $check(! publicationWaitAllowed('publisher', $id));
 }
+// Audit every declared key shape per table, irrespective of uniqueness/name.
+// An identical PRIMARY shape on a different table is not a duplicate index.
+$shapes = [];
+$add = function (string $table, string $columns) use (&$shapes, $check): void {
+    $shape = str_replace(' ', '', $columns);
+    $check(! isset($shapes[$table][$shape]));
+    $shapes[$table][$shape] = true;
+};
+foreach ($sql as $id => $query) {
+    if (preg_match('/\ACREATE TABLE ([^ (]+)\((.*)\) ENGINE=InnoDB\z/', $query, $table)) {
+        if (str_contains($table[2], 'PRIMARY KEY')) {
+            preg_match('/\A([a-z_]+) INT PRIMARY KEY/', $table[2], $primary);
+            $add($table[1], $primary[1]);
+        }
+        preg_match_all('/(?:UNIQUE )?KEY [a-z_]+\(([^)]+)\)/', $table[2], $keys);
+        foreach ($keys[1] as $columns) {
+            $add($table[1], $columns);
+        }
+    } elseif (preg_match('/\ACREATE INDEX [a-z_]+ ON ([^ (]+)\(([^)]+)\)\z/', $query, $index)) {
+        $add($index[1], $index[2]);
+    } elseif (preg_match('/\AALTER TABLE ([^ (]+) ADD CONSTRAINT [a-z_]+ UNIQUE\(([^)]+)\)\z/', $query, $unique)) {
+        $add($unique[1], $unique[2]);
+    }
+}
+$target = qi(schemas('012345abcdef')[0]).'.foreign_target';
+$targetShapes = array_keys($shapes[$target]);
+sort($targetShapes);
+$check($targetShapes === ['id', 'parent_id', 'reserved_value', 'unique_value', 'visible_value']);
+$check(str_contains($sql['base.visible.index'], '(visible_value)'));
+$check(str_contains($sql['publish.index'], '(reserved_value)'));
+$check(str_contains($sql['publish.unique'], '(unique_value)'));
+$check(str_contains($sql['base.target'], 'KEY plain_parent_support(parent_id)'));
+$check(str_contains($sql['publish.fk'], 'FOREIGN KEY(parent_id)'));
 emit(['pure_companion_contract' => 'PASS', 'assertions' => $count, 'operation_ids' => count($sql), 'database_connections' => 0, 'native_mechanism_execution' => false]);

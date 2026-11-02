@@ -107,3 +107,38 @@ contract pure test `b3fa1d3d27f4e74d5705cf938e68a8c1c8e43e888ee9995132821f67679f
 All native currentness/identity/witness/resource/publication/cost controls in
 this NEW mechanism remain UNEXECUTED. Production namespace P1 and actual domain/
 ledger/full/terminal/member acceptance remain unresolved; mount false.
+
+### Pre-execution2ee fixture repair (NO run)
+
+The independent2ee decision's superseding addendum WITHDREW execution approval:
+visible_control_index(v), reserved index(v), and later UNIQUE(v) overlapped.
+The preserved3238 native receipt had already recorded Warning1831 for duplicate
+index creation. 2ee was NEVER EXECUTED; no receipt is a pass. Strict warning
+rejection correctly makes that old fixture unsuitable; no1831 exception exists.
+
+Only the NEW packet's fixed synthetic target/index DDL changes:
+foreign_target retains id,v,parent_id and adds dedicated visible_value,
+reserved_value,unique_value. visible_control_index uses visible_value;
+customer_accounts_insert index uses reserved_value;
+customer_accounts UNIQUE uses unique_value. CHECK remains on v, and separate
+plain_parent_support(parent_id) remains for both FK constraints. Consequently
+reserved FK customer_accounts_update still has no reserved supporting index,
+and CHECK/UNIQUE/FK are still independent catalog subtypes. No key or namespace
+name, publication schedule, helper/query semantics, warning handling or resource
+oracle changed. All other schema tables' primary keys remain scoped to their
+own distinct tables. No historical migration, product/test, prior107packet,
+watchdog or launcher source changed.
+
+Pure source contract now audits EVERY declared CREATE TABLE inline primary/key,
+CREATE INDEX and ADD UNIQUE shape by qualified table, rejecting duplicate
+column shapes regardless of index name/uniqueness, then requires the target's
+exact five shapes: id,parent_id,visible_value,reserved_value,unique_value. It
+also pins the dedicated visible/reserved/UNIQUE and nonreserved FK support DDL.
+This is static fixture evidence, not proof native warnings are absent. Native
+publication completion and all companion/currentness controls remain UNRUN.
+
+Repair preparation actuals: lint2/Pint --test2 PASS;89pure contract assertions/81fixed IDs PASS; inherited23warning/13cleanup and10launcher checks PASS;0DBconnections. Host exact-diff assertion PASS: probe differs from2ee by ONLY the four fixed DDL replacements above; launcher/product/tests/migrations/prior packet unchanged. No native run/retry. Current hashes (supersede earlier2ee source hashes for this prepared revision):
+
+probe.php SHA256 `55998a7ce2c8d33b9e46106590dfb5328a3961560b66b34e6d5168d6730b1377`.
+companion_test.php SHA256 `7e9550a1c35e81b7080ca4770af9273c9c251b1538703868501b377bc8376269`.
+run.py SHA256 `8db59ead986da3de1a726b7b69ad90b196daa985fffa5b0b852700f606d85aa9`.
