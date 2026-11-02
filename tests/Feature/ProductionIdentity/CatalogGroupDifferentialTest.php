@@ -19,6 +19,7 @@ use ReflectionProperty;
 use Tests\Support\ExplainFailureObserver;
 use Tests\Support\ExplainNoteSnapshot;
 use Tests\Support\ExplainPrepareSnapshot;
+use Tests\Support\ExplainSharedMaterialization;
 use Tests\Support\ExplainWindowIds;
 use Tests\Support\ProductionIdentityFixture;
 use Tests\TestCase;
@@ -219,8 +220,18 @@ final class CatalogGroupDifferentialTest extends TestCase
                     $walk($explain);
                     $windowIds = array_values(array_unique($windowIds));
                     try {
-                        self::assertCount(count($stream['families']), $windowIds, $group->value.' exact window-bearing family materializations');
-                        self::assertSame([], array_values(array_diff($windowIds, $sharedIds)), $group->value.' every family window must be shared by header and row consumers');
+                        if ($group === CatalogGroup::A2_ACCOUNT_FLOOR) {
+                            try {
+                                $proof = ExplainSharedMaterialization::proveA2V2($explain, $stream, AccountAdmissionGuards::V2, $streamIndex);
+                            } catch (LogicException $refusal) {
+                                self::fail($refusal->getMessage());
+                            }
+                            self::assertSame([0, 1, 2], array_keys($proof['families']));
+                            self::assertSame(6, $proof['branches']);
+                        } else {
+                            self::assertCount(count($stream['families']), $windowIds, $group->value.' exact window-bearing family materializations');
+                            self::assertSame([], array_values(array_diff($windowIds, $sharedIds)), $group->value.' every family window must be shared by header and row consumers');
+                        }
                         self::assertGreaterThanOrEqual(count($stream['families']), $materialized, $group->value);
                         self::assertGreaterThanOrEqual(count($stream['families']), $shared, 'Every family must have a shared materialization, not separate header/row evaluation: '.$group->value);
                     } catch (ExpectationFailedException $original) {

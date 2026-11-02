@@ -241,3 +241,37 @@ three-read I2 control first under a new ROOT lease; no native queue advancement
 or cost run is authorized by source/static success. App flags/member trial stay
 defaultoff/unaccepted; no sourceoutsidecompiler/testmigrations/sharedledgers/env
 keys/workflows/push/PR changes occurred.
+
+## A2 repository oracle preparation — 2026-11-02
+
+Prepared from `a9b48dafb64dbf34e3ca0397d1b5b17d56bb5bb0`: the test-only
+`ExplainSharedMaterialization` helper pins the A2 v2 source SQL, bindings and
+three family recipes. It proves six ordered header/row branches, unique shared
+family definitions, distinct gate/wire/helper/family roles and the gate's actual
+wire dependency. Families 0/1 still require their own actual window; only exact
+family 2 (`QB894B1A4D034`, the known scalar COUNT recipe) may omit its window.
+Every graph window must belong to a proven family. Synthetic positive/negative
+graphs cover branch order/completeness, missing/crosswired consumers, unrelated
+references, duplicate definitions, ordinary windows, IDs/aliases and graph caps.
+No saved native graph or external grammar package is a runtime dependency.
+
+Only the A2 assertion branch in the existing physical native method changes.
+Other group assertions, complete family coverage, warning provenance, cursor/
+lease cleanup, source compiler, production code and 110/15/resource limits stay
+intact. Native08 qualified standalone A2 v2 grammar only; it does not accept this
+repository candidate, all groups/families, v1/overlap, original execution context,
+typed facts, currentness, or cost. The original expected-3/actual-2 failure and
+133-over-110 result remain historical failures, not overwritten passes.
+
+Source preparation only: PHP lint, formatter and all tests are **UNRUN**. ROOT
+owns execution and admission. Queued pure selection is
+`php vendor/bin/phpunit tests/Unit/ProductionIdentity/ExplainSharedMaterializationTest.php`
+plus existing `ExplainWindowIdsTest`, `ExplainFailureObserverTest` and
+`CatalogGroupContractTest`. After focused checks and independent review of the
+actual tested candidate, ROOT can select the existing
+`CatalogGroupDifferentialTest::test_native_window_relations_are_materialized_and_shared_between_headers_and_rows`
+on private Oracle MySQL 8.4.11 within the original bounded runtime envelope.
+This method emits minimized diagnostic STDERR; its runner needs an explicitly
+selected diagnostic contract, not the typed-only adapter's empty-STDERR rule.
+That result still does not close the remaining native correctness/currentness,
+direct/Domain/migration/ledger/restart/race or cost gates.
