@@ -1,5 +1,5 @@
 {
-  "status": "SOURCE PREPARATION ONLY; no current feature/native/mutation acceptance",
+  "status": "Actual focused evidence recorded; final actual-evidence/head review pending",
   "base_main": "a7bc63cc5c5785353f13e882f49d0ab9dcff55b3",
   "remote_main_verified": "git ls-remote origin refs/heads/main exacta7bc; local refs/heads/main absent, existing object used, no unexpected remote movement",
   "member_extraction_source": "29ce932b7279953a011dd18041ddd4c1df66f306",
@@ -30,7 +30,7 @@
   "prepared_native_cases": 1,
   "mutation_plans": 14,
   "mutation_exactmatches_static": true,
-  "all_mutations_UNRUN": true,
+  "all_mutations_UNRUN": false,
   "sourceprep_checks": {
     "http_test_earlier_lint_pint_sha256": "cf63f50fc35d2e95f41c85acb206f7d6a5b85187920f4165cd4042360e46f63d",
     "http_test_final_lint_pint": "PASS final current bytes; PHP8.4.27 lint exit0/Pintv1.32.1 final5filecheck exit0",
@@ -51,14 +51,14 @@
     "CI": 0
   },
   "required_next": [
-    "Independent exact native-status API repair source review BEFORE any rerun; no native lease currently",
-    "Bounded independent exact formatted P2 source re-review; allbehavior/mutantsUNRUN",
-    "Independent exact source security/auth/cache/native-worker/refusal-oracle review",
-    "ROOT explicit SQLite/native lease after account isolation; all selected actual tests/mutations unrun",
-    "Exact tested-SHA evidence review; ROOT-owned census/receipt/preflight/code/security/Bugbot/expected-head publication gates",
-    "F9/account/history and mountfalse gates remain independent/open; no C or MIG reorder"
+    "Final independent actual-evidence/head review with25eSQLite bytecarry/fbbnative+mutations",
+    "Coordinator separate shared-file/PCCreceipt/preflight/security/Bugbot/expected-head gates",
+    "No mount activation or F9/account/history/member-before-MIG reorder"
   ],
   "helper_exact_member": true,
   "native_worker_changed_for_epoch_instrumentation": true,
-  "native_harness_repair": "One live60s epoch (actual timer samples and conservative55s monotonic span) before any cap classification; expired/changed/unavailable STOP_UNCLASSIFIED. Independent per-worker cleanup, terminal/unknown facts and nested clock/diagnostic cleanup. Real server audit remains UNVERIFIED/leasefalse."
+  "native_harness_repair": "One live60s epoch (actual timer samples and conservative55s monotonic span) before any cap classification; expired/changed/unavailable STOP_UNCLASSIFIED. Independent per-worker cleanup, terminal/unknown facts and nested clock/diagnostic cleanup. Real server audit remains UNVERIFIED/leasefalse.",
+  "historical_source_preparation_status": "SOURCE PREPARATION ONLY; no current feature/native/mutation acceptance",
+  "actual_evidence": "actual-evidence.json",
+  "actual_tests_source_sha": "fbb802782c51c790fb4dcfcbb9f052fd9d9dfced"
 }

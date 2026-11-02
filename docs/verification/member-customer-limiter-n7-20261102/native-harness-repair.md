@@ -1,6 +1,8 @@
+> Historical checkpoint: de93 source-only repair. UNRUN/PENDING statements below describe that checkpoint; see actual-results.md for current source-separated evidence.
+
 # Native harness source repair — UNRUN
 
-Both complete80bcd893 source decisions are copied exactly alongside this note. Auth/cache/HTTP scope found no confirmed P0/P1 and was source-fit for the next stage, never execution acceptance. Native reviewer required two P2 harness repairs. Original80bcd893 source remains unrun/source-only, not a native failure. This batch changes only owned native test/worker + own packet; runtime helper/controller, six HTTP cases and all main invariants are unchanged.
+The original80bcd893 decisions were copied at preparation; current public copies are explicitly sanitized and bound to original digests. Auth/cache/HTTP scope found no confirmed P0/P1 and was source-fit for the next stage, never execution acceptance. Native reviewer required two P2 harness repairs. Original80bcd893 source remains unrun/source-only, not a native failure. This batch changes only owned native test/worker + own packet; runtime helper/controller, six HTTP cases and all main invariants are unchanged.
 
 ## One actually live counter epoch before cap classification
 

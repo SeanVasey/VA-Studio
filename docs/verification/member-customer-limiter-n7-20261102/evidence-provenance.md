@@ -1,8 +1,10 @@
+> Historical checkpoint: initial80b source preparation. UNRUN/PENDING statements below describe that checkpoint; see actual-results.md for current source-separated evidence.
+
 # Evidence boundary and future selections
 
 This isolated candidate has **NO feature/native/mutation execution evidence**. Its base was freshly remotely verified main `a7bc63cc5c5785353f13e882f49d0ab9dcff55b3`. Extraction source member `29ce932b7279953a011dd18041ddd4c1df66f306` is not accepted as a whole. No F9/history/account repair is copied.
 
-Historical mixed-branch results (raw prefixes `/workspace/member-evidence/`, adjacent SHA/exit/XML/log artifacts) remain exact old-source evidence only:
+Historical mixed-branch results (raw prefixes `<private execution archive>`, adjacent SHA/exit/XML/log artifacts) remain exact old-source evidence only:
 
 | Source | Actual result | Raw prefix |
 | --- | --- | --- |

@@ -1,5 +1,5 @@
 {
-  "status": "SOURCE ONLY, no runner/execution; all14 UNRUN",
+  "status": "Actual14expectedbehavioralkills/0survivors, exactrestore; see actual-evidence.json",
   "execution_contract": "Future explicit lease/review only. One exact mutant/process at a time; capture baseSHA/actualdiff/full exit/JUnit. Only genuine named behavioral assertion red counts; API/type/setup/no-tests errors STOP, never kills. Finally restore exact bytes/hash/global clean before next. Preserve timeouts and rerun alone before classifying; no automatic next after failure.",
   "mutations": [
     {
@@ -16,7 +16,9 @@
         "filter": "test_read_bucket_survives_ip_session_and_recovery_changes_and_expires"
       },
       "expected_meaningful_assertion": "Recovered/session/IP/accessVersion variants must retain exhausted customer bucket:429/no domain entry.",
-      "status": "UNRUN; in-memory exact-match static validation only"
+      "status": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION attemporarilymutatedfbb, restored",
+      "historical_preparation_status": "UNRUN; in-memory exact-match static validation only",
+      "evidence_index": "actual-evidence.json"
     },
     {
       "name": "key-session",
@@ -32,7 +34,9 @@
         "filter": "test_read_bucket_survives_ip_session_and_recovery_changes_and_expires"
       },
       "expected_meaningful_assertion": "Recovered/session/IP/accessVersion variants must retain exhausted customer bucket:429/no domain entry.",
-      "status": "UNRUN; in-memory exact-match static validation only"
+      "status": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION attemporarilymutatedfbb, restored",
+      "historical_preparation_status": "UNRUN; in-memory exact-match static validation only",
+      "evidence_index": "actual-evidence.json"
     },
     {
       "name": "key-access-version",
@@ -48,7 +52,9 @@
         "filter": "test_read_bucket_survives_ip_session_and_recovery_changes_and_expires"
       },
       "expected_meaningful_assertion": "Recovered/session/IP/accessVersion variants must retain exhausted customer bucket:429/no domain entry.",
-      "status": "UNRUN; in-memory exact-match static validation only"
+      "status": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION attemporarilymutatedfbb, restored",
+      "historical_preparation_status": "UNRUN; in-memory exact-match static validation only",
+      "evidence_index": "actual-evidence.json"
     },
     {
       "name": "omit-tier",
@@ -64,7 +70,9 @@
         "filter": "test_customers_and_read_write_tiers_have_distinct_buckets_and_all_write_routes_share_one"
       },
       "expected_meaningful_assertion": "Read exhaustion must not consume first write admission; separate customers remain independent.",
-      "status": "UNRUN; in-memory exact-match static validation only"
+      "status": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION attemporarilymutatedfbb, restored",
+      "historical_preparation_status": "UNRUN; in-memory exact-match static validation only",
+      "evidence_index": "actual-evidence.json"
     },
     {
       "name": "omit-read-admission",
@@ -80,7 +88,9 @@
         "filter": "test_read_bucket_survives_ip_session_and_recovery_changes_and_expires"
       },
       "expected_meaningful_assertion": "Eleventh real read must be429 and not enter domain.",
-      "status": "UNRUN; in-memory exact-match static validation only"
+      "status": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION attemporarilymutatedfbb, restored",
+      "historical_preparation_status": "UNRUN; in-memory exact-match static validation only",
+      "evidence_index": "actual-evidence.json"
     },
     {
       "name": "omit-write-admission",
@@ -96,7 +106,9 @@
         "filter": "test_customers_and_read_write_tiers_have_distinct_buckets_and_all_write_routes_share_one"
       },
       "expected_meaningful_assertion": "Eleventh invalid-period write must be429 before any write domain entry.",
-      "status": "UNRUN; in-memory exact-match static validation only"
+      "status": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION attemporarilymutatedfbb, restored",
+      "historical_preparation_status": "UNRUN; in-memory exact-match static validation only",
+      "evidence_index": "actual-evidence.json"
     },
     {
       "name": "charge-write-after-domain",
@@ -116,7 +128,9 @@
         "filter": "test_customers_and_read_write_tiers_have_distinct_buckets_and_all_write_routes_share_one"
       },
       "expected_meaningful_assertion": "Refusing write domain still consumes bucket; only charging success fails eleventh429.",
-      "status": "UNRUN; in-memory exact-match static validation only"
+      "status": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION attemporarilymutatedfbb, restored",
+      "historical_preparation_status": "UNRUN; in-memory exact-match static validation only",
+      "evidence_index": "actual-evidence.json"
     },
     {
       "name": "charge-read-after-domain",
@@ -136,7 +150,9 @@
         "filter": "test_refused_first_page_domain_reads_still_consume_admission_before_domain"
       },
       "expected_meaningful_assertion": "Ten exact-stack before-transaction domain refusals charged; eleventh429 and refusal counter stays10.",
-      "status": "UNRUN; in-memory exact-match static validation only"
+      "status": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION attemporarilymutatedfbb, restored",
+      "historical_preparation_status": "UNRUN; in-memory exact-match static validation only",
+      "evidence_index": "actual-evidence.json"
     },
     {
       "name": "cache-errors-fail-open",
@@ -152,7 +168,9 @@
         "filter": "test_cache_exception_is_a_private_pre_operation_failure_for_reads_and_writes"
       },
       "expected_meaningful_assertion": "Cache failure must503 with0 domain calls; no success or outcome-unknown.",
-      "status": "UNRUN; in-memory exact-match static validation only"
+      "status": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION attemporarilymutatedfbb, restored",
+      "historical_preparation_status": "UNRUN; in-memory exact-match static validation only",
+      "evidence_index": "actual-evidence.json"
     },
     {
       "name": "omit-post-cache-reproof",
@@ -168,7 +186,9 @@
         "filter": "test_cache_callbacks_cannot_change_identity_or_steal_the_admission_lease_before_domain_work"
       },
       "expected_meaningful_assertion": "Session-changing callback must403/0 domain entries.",
-      "status": "UNRUN; in-memory exact-match static validation only"
+      "status": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION attemporarilymutatedfbb, restored",
+      "historical_preparation_status": "UNRUN; in-memory exact-match static validation only",
+      "evidence_index": "actual-evidence.json"
     },
     {
       "name": "ignore-configured-store",
@@ -184,7 +204,9 @@
         "filter": "test_configured_store_is_used_and_a_contended_admission_lock_fails_before_domain"
       },
       "expected_meaningful_assertion": "Distinct configured-store held lock must503 before domain.",
-      "status": "UNRUN; in-memory exact-match static validation only"
+      "status": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION attemporarilymutatedfbb, restored",
+      "historical_preparation_status": "UNRUN; in-memory exact-match static validation only",
+      "evidence_index": "actual-evidence.json"
     },
     {
       "name": "truthy-store-fallback",
@@ -200,7 +222,9 @@
         "filter": "test_configured_store_is_used_and_a_contended_admission_lock_fails_before_domain"
       },
       "expected_meaningful_assertion": "Literal configured name0 held lock must503, never default-store admission.",
-      "status": "UNRUN; in-memory exact-match static validation only"
+      "status": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION attemporarilymutatedfbb, restored",
+      "historical_preparation_status": "UNRUN; in-memory exact-match static validation only",
+      "evidence_index": "actual-evidence.json"
     },
     {
       "name": "omit-critical-section",
@@ -224,7 +248,9 @@
         "filter": "test_configured_store_is_used_and_a_contended_admission_lock_fails_before_domain"
       },
       "expected_meaningful_assertion": "Parent-held admission lock must refuse503; no unlocked domain entry.",
-      "status": "UNRUN; in-memory exact-match static validation only"
+      "status": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION attemporarilymutatedfbb, restored",
+      "historical_preparation_status": "UNRUN; in-memory exact-match static validation only",
+      "evidence_index": "actual-evidence.json"
     },
     {
       "name": "unbounded-retry-after",
@@ -240,7 +266,11 @@
         "filter": "test_configured_store_is_used_and_a_contended_admission_lock_fails_before_domain"
       },
       "expected_meaningful_assertion": "Corrupted long timer must produce bounded Retry-After60.",
-      "status": "UNRUN; in-memory exact-match static validation only"
+      "status": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION attemporarilymutatedfbb, restored",
+      "historical_preparation_status": "UNRUN; in-memory exact-match static validation only",
+      "evidence_index": "actual-evidence.json"
     }
-  ]
+  ],
+  "historical_preparation_status": "SOURCE ONLY, no runner/execution; all14 UNRUN",
+  "executed_original_plans_sha256": "0db0eb45f749fd88b643e69af6357cf36b2d3770fd0418ef4eb44aa1701fbc03"
 }

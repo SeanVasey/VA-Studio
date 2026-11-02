@@ -1,6 +1,8 @@
+> Sanitized public carry: private execution paths/endpoint identifiers removed. Original SHA256: `5ebcf33fa07db948866a58a37e6ebf63d1e985e5e09ec0bd871635012861bfb3`. Verdict and technical limits preserved; not a byte-exact copy.
+
 # Independent N7 auth/cache and HTTP-oracle source review
 
-Exact clean `80bcd89353adb141a3e754710d82f7f3eb078477`, `/workspace/VA-Studio-n7-isolated`, compared with main `a7bc63cc5c5785353f13e882f49d0ab9dcff55b3`. Read packet first, AGENTS, complete limiter/controller delta and six HTTP tests, actual capsule/privacy/domain/route/cache/framework call contracts. Native worker and fourteen mutation-plan execution fitness are assigned to the other reviewer and are not duplicated here.
+Exact clean `80bcd89353adb141a3e754710d82f7f3eb078477`, `<private evidence/worktree>`, compared with main `a7bc63cc5c5785353f13e882f49d0ab9dcff55b3`. Read packet first, AGENTS, complete limiter/controller delta and six HTTP tests, actual capsule/privacy/domain/route/cache/framework call contracts. Native worker and fourteen mutation-plan execution fitness are assigned to the other reviewer and are not duplicated here.
 
 **Decision: source fit for the next reviewed static/focused verification stage; no confirmed P0/P1 defect found in this auth/cache/HTTP-oracle scope.** This is not current test/native/publication/mount acceptance or permission to overlap the exclusive account case. Final HTTP test lint/Pint remains PENDING, all new six HTTP/native/mutation behaviors are UNRUN, and final tested-SHA evidence review is mandatory.
 

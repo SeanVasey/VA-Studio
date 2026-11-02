@@ -1,6 +1,8 @@
+> Sanitized public carry: private execution paths/endpoint identifiers removed. Original SHA256: `813a29fd46af08bafe51ec959edb18e1403fc94af3961946413f5d1af569fb2c`. Verdict and technical limits preserved; not a byte-exact copy.
+
 # N7 native worker/test/mutation source review — 80bcd893
 
-Decision: TWO P2 NATIVE-HARNESS REPAIRS before native execution readiness; no supported P0/P1 product finding in this assigned scope. Exact clean `80bcd89353adb141a3e754710d82f7f3eb078477`, `/workspace/VA-Studio-n7-isolated`. Read AGENTS, own packet, complete native test/worker/limiter, relevant HTTP mutation oracles and installed Symfony process implementation. Runtime auth/HTTP six-case review is separately assigned; this is not a duplicate whole HTTP acceptance. No PHP/Composer/lint/test/Laravel/process/signal/DB/Docker action performed. Source parsing/hash/in-memory replacement checks only; all manifest hashes match and all fourteen mutation edit hunks uniquely match with named selections present.
+Decision: TWO P2 NATIVE-HARNESS REPAIRS before native execution readiness; no supported P0/P1 product finding in this assigned scope. Exact clean `80bcd89353adb141a3e754710d82f7f3eb078477`, `<private evidence/worktree>`. Read AGENTS, own packet, complete native test/worker/limiter, relevant HTTP mutation oracles and installed Symfony process implementation. Runtime auth/HTTP six-case review is separately assigned; this is not a duplicate whole HTTP acceptance. No PHP/Composer/lint/test/Laravel/process/signal/DB/Docker action performed. Source parsing/hash/in-memory replacement checks only; all manifest hashes match and all fourteen mutation edit hunks uniquely match with named selections present.
 
 ## P2 — native cap oracle does not establish one live sixty-second counter epoch
 
@@ -24,4 +26,4 @@ The fourteen mutations are PLANS ONLY, no runner or kills. In-memory exact-match
 
 No F9/controller continuation/history/account source is imported. Main route/index/config/mount/auth/privacy manifests match; shipped mount remainsfalse. Old native1/825 belongs only to its old exact mixed source and cannot accept this head, the deterministic held-lock refinement, or these mutations. Final current HTTP PHP-l/Pint remains explicitly pending under the shared-runtime pause; no request here authorizes it.
 
-Next: repair the two native-harness issues as one owned batch, refresh manifest, complete pending static checks only after ROOT releases that slot, then exact source review and explicit isolated33087 native lease. All new HTTP/native/mutation outcomes remain UNRUN. No production/merge/mount/launch or F9/account/history acceptance follows.
+Next: repair the two native-harness issues as one owned batch, refresh manifest, complete pending static checks only after ROOT releases that slot, then exact source review and explicit isolated native native lease. All new HTTP/native/mutation outcomes remain UNRUN. No production/merge/mount/launch or F9/account/history acceptance follows.

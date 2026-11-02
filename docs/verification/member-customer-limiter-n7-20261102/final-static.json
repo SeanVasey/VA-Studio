@@ -6,27 +6,27 @@
   "pint_phar_sha256": "4b88d36765c0d8fa0f9683b29ebee5f6d5a76dffcdecc0e143b8455af2d2e095",
   "commands": [
     {
-      "command": "docker exec --user 1000:1000 -w /workspace/VA-Studio-n7-isolated va-pcc-runtime-20261101 sh -c 'php -v && php -l app/Http/Membership/MembershipCustomerLimiter.php && php -l app/Http/Membership/MembershipController.php && php -l tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php && php -l tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php && php -l tests/Support/membership-customer-limiter-worker.php'",
+      "command": "docker exec --user 1000:1000 -w <private execution archive> <isolated PHP runtime> sh -c 'php -v && php -l app/Http/Membership/MembershipCustomerLimiter.php && php -l app/Http/Membership/MembershipController.php && php -l tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php && php -l tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php && php -l tests/Support/membership-customer-limiter-worker.php'",
       "exit": 0,
       "result": "PHP8.4.27/all5syntaxPASS"
     },
     {
-      "command": "docker exec --user 1000:1000 -w /workspace/VA-Studio-n7-isolated va-pcc-runtime-20261101 php vendor/laravel/pint/builds/pint --test app/Http/Membership/MembershipCustomerLimiter.php app/Http/Membership/MembershipController.php tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php tests/Support/membership-customer-limiter-worker.php",
+      "command": "docker exec --user 1000:1000 -w <private execution archive> <isolated PHP runtime> php vendor/laravel/pint/builds/pint --test app/Http/Membership/MembershipCustomerLimiter.php app/Http/Membership/MembershipController.php tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php tests/Support/membership-customer-limiter-worker.php",
       "exit": 1,
       "result": "ORIGINALFAIL nativefile style only; exact stdout retained final-static-first-attempt.txt"
     },
     {
-      "command": "docker exec --user 1000:1000 -w /workspace/VA-Studio-n7-isolated va-pcc-runtime-20261101 php vendor/laravel/pint/builds/pint tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php",
+      "command": "docker exec --user 1000:1000 -w <private execution archive> <isolated PHP runtime> php vendor/laravel/pint/builds/pint tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php",
       "exit": 0,
       "result": "ROOTauthorizedtargetedformat; onlyThrowableimportmoved"
     },
     {
-      "command": "docker exec --user 1000:1000 -w /workspace/VA-Studio-n7-isolated va-pcc-runtime-20261101 php -l tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php",
+      "command": "docker exec --user 1000:1000 -w <private execution archive> <isolated PHP runtime> php -l tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php",
       "exit": 0,
       "result": "finalnativePHPsyntaxPASS"
     },
     {
-      "command": "docker exec --user 1000:1000 -w /workspace/VA-Studio-n7-isolated va-pcc-runtime-20261101 php vendor/laravel/pint/builds/pint --test app/Http/Membership/MembershipCustomerLimiter.php app/Http/Membership/MembershipController.php tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php tests/Support/membership-customer-limiter-worker.php",
+      "command": "docker exec --user 1000:1000 -w <private execution archive> <isolated PHP runtime> php vendor/laravel/pint/builds/pint --test app/Http/Membership/MembershipCustomerLimiter.php app/Http/Membership/MembershipController.php tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php tests/Support/membership-customer-limiter-worker.php",
       "exit": 0,
       "result": "final5filesPASS"
     }
