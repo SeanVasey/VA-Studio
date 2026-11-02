@@ -1,0 +1,21 @@
+> Sanitized public carry: private execution paths/endpoint identifiers removed. Original SHA256: `aad8564066613ba2b59cd65970c07fba76a74461f8f1efd391b6b4a228e25ff9`. Verdict and technical limits preserved; not a byte-exact copy.
+
+# N7 isolated mutation runner source review — fbb preparation
+
+Decision: SOURCE/CONTRACT FIT for ONE ROOT-authorized isolated batch after the shared PHP/native slot is released. No supported P0–P2 finding requiring repair. This review does not start or authorize execution by itself.
+
+Read complete runner.py, plans.json, setup-manifest.json, EXECUTION-CONTRACT.md and frozen hashes under `<private evidence/worktree>`. Runner SHA256 `9d9d508b38baf4f9627042d587bbf9ffa405f6d0c5ffb1ee0d9fc4ed6c50b105`, contract SHA256 `9d6a17f171dad463874b5aa02a1f7749e0f7beb59ec2383f24ca3d62f1764172`, and all frozen hashes match. Read-only checks independently confirm both sandbox/review trees exactfbb/clean/five hashes, unique non-hardlinked mutable sandbox sources, example env equality and absent public/build. No runner/default validator, PHP, baseline, mutant, process/runtime/native/DB/Docker action executed by reviewer. Vendor tuple/inode preparation remains setup evidence; no package operation was performed here.
+
+Safe proposed scope is fixed: sandbox-only full six-method6/437 baseline first, then fourteen sequential selected SQLite HTTP mutants, fresh process each; review tree never mutated. Allowed paths are only the limiter/controller, test file fixed, edits uniquely matched, exact mutated bytes and sole changed path/hunk checked. Backup/hash/expected and actual diff retained; finally exact original bytes/mode are atomically restored and five hashes/global Git cleanliness/baseline-tree equality are verified before continuing. Failed/unknown restore cannot lead to another mutant. Whole-context one-hunk recording does not misrepresent2/3-operand composed mutants as independent kills.
+
+Failure classification is conservative: actual exact selected method/class/file/count1, nonzero real assertion count, exit1, one failure/no error/skip, allowed PHPUnit assertion exception, expected test-file trace and predeclared exact behavioral message are all required for a kill. Unexpected meaningful assertion is STOP/review-first, never broadened mid-run. SURVIVED remains honest. Baseline must actually pass exact six identities/437 without child outcomes before mutation. Runtime version/warning/risky/incomplete/parse/no-tests/timeout/process uncertainty all STOP. No counterfactual has run or been killed yet.
+
+Each PHP invocation has owned in-runtime timeout600s/TERM+10sKILL and host625s wait. Foreground subprocess.run waits/reaps the host CLI; a killed Docker CLI alone is not treated as backend cleanup. Actual PID file plus scoped before/after process snapshots, own PID absence/no new remainingPHP and no timeout are required before classification. If backend/daemon/process audit is uncertain, restore source but STOP with no next case/retry/recovery; ROOT must separately resolve actors. These bounds are per invocation, not a universal kernel/daemon cleanup guarantee or a single600s whole-batch claim. No stale-PID/broad signal/runtime stop is added.
+
+Evidence lives in exclusive0700 output/private files; stdout emits safe classification counts only. No raw log/auth/session/config is printed publicly. Private process snapshots contain only pid/ppid/etime/comm. Restored source and first raw evidence survive unexpected outcomes; no automatic retry, setup repair or next fixture after STOP. Readiness/merge/F9/mount/native admission and fourteen individual operand kills are not claimed.
+
+Exact prospective command after ROOT releases F14's active PHP slot and grants one batch scope:
+
+`python3 <private evidence/worktree> --execute-reviewed-batch`
+
+Use this frozen preparation only, unique `mutations-fbb-RUN01` with no artifact reuse. Retain actual baseline/JUnit/commands/process/restore receipts, honest survivors and remainingUNRUN at first STOP. Final tested-source sensitive review and ROOT publication gates remain open. No production fix, test weakening, native/MySQL fixture, shared vendor/census/workflow/ledger edit or launch authority follows.

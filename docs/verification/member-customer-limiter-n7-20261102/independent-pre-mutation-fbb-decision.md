@@ -1,0 +1,30 @@
+> Sanitized public carry: private execution paths/endpoint identifiers removed. Original SHA256: `bb9253b2ed2f5c61827e7a3a357d80f86d74627318db987e933f2de3839193f0`. Verdict and technical limits preserved; not a byte-exact copy.
+
+# N7 sensitive source/evidence preliminary assessment — fbb
+
+Disposition: PRELIMINARY FAVORABLE, no supported new P0–P2 source/evidence finding. Final approval is withheld pending actual fourteen mutation receipts, census/final-head reconciliation and ROOT's requested final review. This is not permission to execute, publish or activate.
+
+Reviewed exact N7 candidate `fbb802782c51c790fb4dcfcbb9f052fd9d9dfced`, complete limiter/two-call controller delta, prior80 auth/cache/HTTP decision, source carry and private SQLite/native receipts. No PHP/test/process/runtime/SQL/DB/Docker or rerun performed. Raw configuration/cookie/secret files were not read or exposed. Mutant sandbox remains separately prepared; no mutant result is claimed.
+
+## Actual focused evidence verified
+
+- SQLite at25e: raw JUnit/actual result record six limiter cases437 assertions, six unchanged HTTP cases516 assertions and34 mount cases1092 assertions:46/2045 total, errors/failures/skips0, actual outer0/no timeout. Each before/after source receipt is identical. Exact app/helper/controller, six HTTP test, worker and unchanged main regression test bytes carry from25e to fbb. Therefore these remain valid carried selected-case evidence, not a false assertion that46 tests executed on fbb. Only native observer getter changed for the corrected native run.
+- Native RUN02 atfbb: actual single selected test1/724, errors/failures/skips0, outer0/no timeout,200.616s outer duration. All published native artifact hashes match their actual files. Raw final receipt has28 observations, one live same timer over5.359513842s, final counter10; every nonnull timer sample is the same live deadline with remaining≤60. Outcomes10 admitted/7quota/11contention; concurrent5admitted/11contention. Sequential fill reaches ten and ends429. Separate parent-held lock requires[503,503] and unavailable child probe, while admission-completion lock probe is available.
+- All four raw worker receipts are actual terminal/not-running/exit0/not-signaled, final process cleanup verified with no cleanup errors. Receipt lease_returnable remainsfalse pending external server audit; this separation is correct. ROOT's external audit independently records same Oracle8.4.11 UUID/REPEATABLE-READ/profile,0 real peers/trx/data locks/waits/non-auditor MDL includingNULL/pending, no runtimePHP/own PID absent, clean exactfbb/five source hashes and complete audit. This is later external quiescence evidence, not fabricated inside the test.
+- Original RUN01 remains FAIL1/672 with four observer Error/UNKNOWN receipts despite earlier successful body facts. Corrected hasBeenSignaled API and RUN02 do not rewrite RUN01. Original overbroad Daemon-counter preflight STOP and later scoped attribution remain separate; no historical client identity overclaim or timeout-to-pass rewriting is warranted.
+
+## Sensitive source assessment
+
+Production scope remains new limiter plus exactly two admission calls: read before MembershipCustomerRead/index, writes in the shared common path before domain operation. Genuine request capsule is proved before key derivation and again after extensible cache callbacks. Stable provenance/account/tier key separates accounts/read-write buckets without IP/session/recovery/access-version splitting. Existing domain/identity/ledger/currentness reproof, body validation, mount, IP/session guards and private error handling remain unchanged.
+
+Same configured cache repository backs nonblocking5s lock and RateLimiter, including literal0 store. LockProvider required; failed get refuses503 without releasing another owner. Ten/minute charge precedes domain, validates actual hit/count/TTL/current lease ownership, and finally requires release/no ownership. Unsupported/backend/error/stolen lease refuse privately; quota429 Retry-After clamped1..60. Final capsule proof precedes successful domain entry. This admits requests, never grants membership/payment/license authority or holds a domain-wide lock. Pre-quota identity proof can still perform necessary SQL; no-domain-entry does not mean zero SQL.
+
+Six HTTP focused cases and unchanged main guards cover real main routes/capsules/private headers/first-page success, controlled transaction-entry refusal charged before domain, common write tier/distinct account/read tier, configured/0 stores, unsupported/cache faults, callbacks and stolen lease. The refusal seam is a test-only before-transaction exact-stack callback, not a full execution of failed domain body. Main mount remainsfalse; no F9 continuation/history/account migration or new environment/dependency/policy import appears.
+
+## Evidence limits and remaining gates
+
+Native RUN02 proves ONE actual shared database-cache epoch and one deterministic held-lock case, not724 race trials, all schedules, multi-host enforcement or intended deployment cache certification. Five-second lock is not an HTTP/cache-network SLA; neither5.359s admission span nor200s test duration establishes latency/headroom/cost bounds. Array-store SQLite checks are local semantics. A genuine atomic shared supported backend and actual deployment sharing remain operational prerequisites. No malicious lying backend assurance is claimed.
+
+All fourteen mutations remain plans pending fresh private sandbox baseline and real assertion-red/survivor/restoration receipts; composed2/3-site mutants cannot imply independent operand kills. Unexpected assertion/error/setup/no-tests/timeout/process/restore uncertainty must stay STOP with no automatic next or retry. Final sensitive tested-head decision must reconcile exact mutations, all restoration/cleanliness, final receipt/census/publication checks and any intervening source change.
+
+No activation, F9/account/history closure, mount enablement, member/MIG order change, launch or main publication approval follows from this preliminary assessment. ROOT retains the final task after mutation evidence exists.

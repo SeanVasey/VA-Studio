@@ -35,6 +35,7 @@ final class MembershipController
             MembershipException::require(MembershipHttpMount::admitted(), 'not_mounted');
             $identity = MembershipHttpBinding::forRequest($request);
             MembershipException::require($this->body($request) === [], 'invalid_input');
+            (new MembershipCustomerLimiter)->admit($identity, 'reads');
             $read = MembershipCustomerRead::begin();
             $index = (new MembershipCustomerIndex)->index($identity->principal(), $identity->actor(), $read);
             $response = MembershipPrivacy::json(['index' => self::indexBody($index)]);
@@ -97,6 +98,7 @@ final class MembershipController
             if (! $valid($body)) {
                 return MembershipPrivacy::error(422);
             }
+            (new MembershipCustomerLimiter)->admit($identity, 'writes');
             $identity->proveCurrent();
         } catch (Throwable $error) {
             // Nothing was attempted yet: an ordinary refusal.

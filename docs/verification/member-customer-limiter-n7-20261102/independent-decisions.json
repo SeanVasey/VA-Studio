@@ -1,0 +1,60 @@
+[
+  {
+    "file": "independent-auth-cache-http-80bcd893-decision.md",
+    "original_sha256": "5ebcf33fa07db948866a58a37e6ebf63d1e985e5e09ec0bd871635012861bfb3",
+    "public_sha256": "2737e102dffcb196457a0c733bb1b676638b25cbf394ebf99ce2f7eeb01926ba",
+    "sanitized": true,
+    "scope": "Pre-final source/evidence/runner assessment, not final post-mutation approval"
+  },
+  {
+    "file": "independent-native-worker-80bcd893-decision.md",
+    "original_sha256": "813a29fd46af08bafe51ec959edb18e1403fc94af3961946413f5d1af569fb2c",
+    "public_sha256": "fee663dab3b67fb3290d898f947b46e27276e93a2c125b2c0689ea8f946f84ad",
+    "sanitized": true,
+    "scope": "Pre-final source/evidence/runner assessment, not final post-mutation approval"
+  },
+  {
+    "file": "independent-native-worker-25e5a7c2-decision.md",
+    "original_sha256": "3f39d2a71d8b97c5de0470bd8553a03ebfb0990d7eca311280079a397da8bb79",
+    "public_sha256": "95ad10f2617b1d4424c44b8792b13d6d6bbe695254726ad47accaa306075b950",
+    "sanitized": true,
+    "scope": "Pre-final source/evidence/runner assessment, not final post-mutation approval"
+  },
+  {
+    "file": "independent-status-api-fbb80278-decision.md",
+    "original_sha256": "df2ef7e80b7ac69803b718f552bce78520cc8a42a79364084bb1c583883aba9e",
+    "public_sha256": "c0892ff545b63029cb84e21cd7f59194e4757f3a8c2b995a9aba29fc6caac1d3",
+    "sanitized": true,
+    "scope": "Pre-final source/evidence/runner assessment, not final post-mutation approval"
+  },
+  {
+    "file": "independent-pre-mutation-fbb-decision.md",
+    "original_sha256": "bb9253b2ed2f5c61827e7a3a357d80f86d74627318db987e933f2de3839193f0",
+    "public_sha256": "fac7518ef66a511bcf3c744260b4b5d9530b50a467437631334dd41c960a7122",
+    "sanitized": true,
+    "scope": "Pre-final source/evidence/runner assessment, not final post-mutation approval"
+  },
+  {
+    "file": "independent-mutation-runner-fbb-decision.md",
+    "original_sha256": "aad8564066613ba2b59cd65970c07fba76a74461f8f1efd391b6b4a228e25ff9",
+    "public_sha256": "a80ec9aeb6a0959cab30d1a6c733daa25d39f55a59cfe90a8dba07b9466efc0e",
+    "sanitized": true,
+    "scope": "Pre-final source/evidence/runner assessment, not final post-mutation approval"
+  },
+  {
+    "file": "independent-timer-code-baseline-0159eec3-decision.md",
+    "original_sha256": "81a89e2742db3ad2f966514261116cf27bf3352955a270657e9518d09bff8fbe",
+    "public_sha256": "ed2ac4623cf3bb267612e0234481431f429c4dda47256c436c409df115ac903f",
+    "sanitized": true,
+    "scope": "Exact 0159 timer delta conditional fit and accepted selected 20/1323 baseline; historical mutation-pending status is followed by the separate six-actual decision",
+    "redaction": "Absolute local checkout path only; public carry preamble added; verdict and limitations unchanged"
+  },
+  {
+    "file": "independent-timer-six-mutations-0159eec3-decision.md",
+    "original_sha256": "f45c2c4dad5dd118ceb13c690e71586c95ee0d9a0d7616fe2bca2d7b136ad2e1",
+    "public_sha256": "8da19f5c04a05af21066013ad9cd3eb00d3b099af966f30e9f3b70a88942cd60",
+    "sanitized": true,
+    "scope": "Accepted six bounded SQLite mutant classifications, six expected failures/98 assertions; no exhaustive/native/backend acceptance",
+    "redaction": "Absolute local source root only; public carry preamble added; verdict and limitations unchanged"
+  }
+]

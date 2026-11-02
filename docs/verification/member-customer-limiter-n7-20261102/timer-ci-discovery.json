@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "executable_tested_source": "0159eec3e3a20874b6b7bc16c3bd92840f57baa8",
+  "discovery_head": "a8d4a9cd844f7db8ab0c6f0bd57b8f628fc681b3",
+  "later_changes": "documentation and workflow count comments only",
+  "runtime": "PHP 8.4.27; Python in the owned existing PHP container",
+  "command": [
+    "python3",
+    "scripts/ci/phpunit-shards.py",
+    "--shards=8",
+    "--prefix=phpunit-ci-mysql",
+    "--timings=scripts/ci/phpunit-timings-mysql.json",
+    "--mysql-native-selection"
+  ],
+  "discovery": {
+    "selected_cases": 2679,
+    "selected_files": 266,
+    "all_cases": 10063,
+    "all_files": 746,
+    "shards": 8,
+    "untimed_selected_files_using_fallback": 103,
+    "actual_test_execution": false
+  },
+  "workflow_count_comments_updated": [
+    ".github/workflows/final-verification.yml",
+    ".gitlab-ci.yml"
+  ],
+  "generated_configs_removed": true,
+  "safeguards": {
+    "test-phpunit-shards.py": {
+      "tests": 52,
+      "result": "PASS",
+      "command": [
+        "python3",
+        "scripts/ci/test-phpunit-shards.py"
+      ]
+    },
+    "test-ci-scope.py": {
+      "tests": 27,
+      "result": "PASS",
+      "command": [
+        "python3",
+        "scripts/ci/test-ci-scope.py"
+      ]
+    },
+    "test-workflow-cadence.py": {
+      "tests": 14,
+      "result": "PASS",
+      "command": [
+        "python3",
+        "scripts/ci/test-workflow-cadence.py"
+      ]
+    },
+    "test-focused-tests.py": {
+      "tests": 53,
+      "result": "PASS",
+      "command": [
+        "python3",
+        "scripts/ci/test-focused-tests.py"
+      ]
+    },
+    "test-database-receipts.py": {
+      "tests": 61,
+      "result": "PASS",
+      "command": [
+        "python3",
+        "scripts/ci/test-database-receipts.py"
+      ]
+    }
+  },
+  "total_safeguard_tests": 207,
+  "native_matrices_or_foundation_dispatched": false,
+  "production_acceptance": false
+}

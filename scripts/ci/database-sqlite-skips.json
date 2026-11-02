@@ -1241,6 +1241,10 @@
     [
       "Tests\\Feature\\Reporting\\SalesReportRefundSnapshotTest",
       "test_native_the_order_snapshot_does_not_see_an_allocation_committed_while_it_reads"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipHttp\\MembershipNativeCustomerRateLimitTest",
+      "test_native_database_limiter_caps_independent_process_admissions_and_releases_its_lock"
     ]
   ]
 }
