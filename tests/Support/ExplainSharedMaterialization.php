@@ -137,7 +137,7 @@ final class ExplainSharedMaterialization
         }
         self::require(count(array_unique($ids)) === 6, 'distinct branch owners');
         $families = [];
-        $windows = [];
+        $familyDefinitions = [];
         foreach ([0, 1, 2] as $family) {
             $header = self::namedTables($operands[2 * $family], ['expected', 'actual']);
             $helper = $this->definition(self::target($header['actual'])['key']);
@@ -159,15 +159,13 @@ final class ExplainSharedMaterialization
             self::require(($this->references[$key] ?? 0) >= 1, 'family reuse');
             self::require(count($this->aliases[$alias] ?? []) === 1
                 && self::target($this->aliases[$alias][0])['key'] === $key, 'unique family alias');
-            $owners = ExplainWindowIds::collect(['query_block' => $definition['block']]);
-            self::require($owners === [$key] || ($family === 2 && $owners === []), 'family own window');
             $families[$family] = $key;
-            $windows[$family] = $owners;
+            $familyDefinitions[$family] = $definition;
         }
         if ($wire['kind'] === 'anonymous') {
             self::require(($wire['materialized']['using_temporary_table'] ?? null) === true
-                && ! array_key_exists('windowing', $wire['block'])
-                && count($this->anonymous) === 1, 'anonymous wire shape');
+                && ! array_key_exists('windowing', $wire['block']), 'anonymous wire shape');
+            $this->internalAnonymous($wire, $familyDefinitions, $ids);
             // MySQL's anonymous UNION is represented by its first IMMEDIATE operand,
             // only after all six source-bound roles pass. Never make it a window owner.
             $wire['key'] = $ids[0];
@@ -182,6 +180,12 @@ final class ExplainSharedMaterialization
         self::require(($this->references[$wire['key']] ?? 0) >= 1, 'wire reuse');
         $this->role($wire);
         self::require(count($this->roles) === 8, 'complete distinct roles');
+        $windows = [];
+        foreach ($familyDefinitions as $family => $definition) {
+            $owners = ExplainWindowIds::collect(['query_block' => $definition['block']]);
+            self::require($owners === [$definition['key']] || ($family === 2 && $owners === []), 'family own window');
+            $windows[$family] = $owners;
+        }
         $allWindows = ExplainWindowIds::collect($graph);
         $familyWindows = array_merge(...array_values($windows));
         sort($allWindows);
@@ -189,6 +193,52 @@ final class ExplainSharedMaterialization
         self::require($allWindows === $familyWindows, 'only proven family windows');
 
         return ['families' => $families, 'windows' => $windows, 'branches' => 6];
+    }
+
+    /** Internal frames are excluded from every role/window/reference proof. */
+    private function internalAnonymous(array $wire, array $families, array $branchIds): void
+    {
+        self::require(count(array_filter($this->anonymous, fn (array $node): bool => $node['path'] === $wire['path'])) === 1, 'unique anonymous wire path');
+        self::require(count($this->roles) === 7, 'complete protected roles');
+        $protected = array_values(array_unique([...array_column($this->roles, 'key'), ...$branchIds]));
+        $counts = [1 => 0, 2 => 0];
+        $exclude = function (array $node) use (&$exclude, $protected): void {
+            self::require(! array_key_exists('windowing', $node), 'internal anonymous window');
+            self::require(! array_key_exists('select_id', $node) || ! in_array($node['select_id'], $protected, true), 'internal anonymous protected ID');
+            if (array_key_exists('sharing_temporary_table_with', $node)) {
+                self::require(! in_array($node['sharing_temporary_table_with']['select_id'], $protected, true), 'internal anonymous protected reference');
+            }
+            foreach ($node as $child) {
+                if (is_array($child)) {
+                    $exclude($child);
+                }
+            }
+        };
+        foreach ($this->anonymous as $extra) {
+            if ($extra['path'] === $wire['path']) {
+                continue;
+            }
+            $nearest = null;
+            foreach ($this->roles as $role) {
+                if (count($extra['path']) > count($role['path'])
+                    && array_slice($extra['path'], 0, count($role['path'])) === $role['path']
+                    && ($nearest === null || count($role['path']) > count($nearest['path']))) {
+                    $nearest = $role;
+                }
+            }
+            // An outer family prefix cannot hide a nearer gate/header/other family role.
+            $family = null;
+            foreach ([1, 2] as $candidate) {
+                if ($nearest !== null && $nearest['path'] === $families[$candidate]['path']) {
+                    $family = $candidate;
+                }
+            }
+            self::require($family !== null, 'internal anonymous confinement');
+            self::require(++$counts[$family] <= 1, 'internal anonymous cardinality');
+            // index() already bounded every array and validated all present IDs/references.
+            // Include the complete materialization payload, not merely its first operand.
+            $exclude($extra['materialized']);
+        }
     }
 
     private function definition(int $key): array

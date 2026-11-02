@@ -252,6 +252,178 @@ final class ExplainSharedMaterializationTest extends TestCase
         self::refuses($bad, 'graph cap');
     }
 
+    public function test_two_internal_anonymous_frames_preserve_the_proven_shared_wire_and_families(): void
+    {
+        // Synthetic counterpart of the bounded counterexample: one internal frame
+        // in each of families 1/2. The original f378 helper refuses this graph.
+        $graph = self::graph();
+        self::addInternalFrame($graph, 1, 100);
+        self::addInternalFrame($graph, 2, 200);
+        self::assertSame(self::prove(self::graph()), self::prove($graph));
+        foreach ([1, 2] as $family) {
+            $single = self::graph();
+            self::addInternalFrame($single, $family, 100 * $family);
+            self::assertSame([30, 31, 32], self::prove($single)['families']);
+        }
+    }
+
+    public function test_anonymous_extras_outside_or_under_gate_header_or_family_zero_refuse(): void
+    {
+        $bad = self::graph();
+        $bad['unrelated'] = ['table' => self::anonymousFrame(100)];
+        self::refuses($bad, 'internal anonymous confinement');
+        $bad = self::graph();
+        self::addInternalFrame($bad, 0, 100);
+        self::refuses($bad, 'internal anonymous confinement');
+        foreach (['gate', 'header'] as $role) {
+            $bad = self::graph();
+            if ($role === 'gate') {
+                $block = &$bad['query_block']['nested_loop'][1]['table']['materialized_from_subquery']['query_block'];
+            } else {
+                $branches = &self::branches($bad);
+                $block = &$branches[2]['query_block']['nested_loop'][1]['table']['materialized_from_subquery']['query_block'];
+            }
+            $block['attached_subqueries'] = [['query_block' => ['select_id' => 900, 'table' => self::anonymousFrame(100)]]];
+            self::refuses($bad, 'internal anonymous confinement');
+            unset($block, $branches);
+        }
+    }
+
+    public function test_nearest_header_or_gate_cannot_borrow_an_outer_allowed_family_path(): void
+    {
+        foreach (['header', 'gate'] as $role) {
+            $bad = self::graph();
+            $branches = &self::branches($bad);
+            if ($role === 'header') {
+                $moved = $branches[4]['query_block']['nested_loop'][1]['table'];
+                $branches[4]['query_block']['nested_loop'][1]['table'] = self::reference('actual', 22);
+            } else {
+                $moved = $bad['query_block']['nested_loop'][1]['table'];
+                $bad['query_block']['nested_loop'][1]['table'] = self::reference('g', 80);
+            }
+            unset($branches);
+            $moved['materialized_from_subquery']['query_block']['attached_subqueries'] = [
+                ['query_block' => ['select_id' => 900, 'table' => self::anonymousFrame(100)]],
+            ];
+            $family = &self::familyBlock($bad, 1);
+            $family['attached_subqueries'] = [['query_block' => ['select_id' => 901, 'table' => $moved]]];
+            self::refuses($bad, 'internal anonymous confinement');
+            unset($family);
+        }
+    }
+
+    public function test_internal_frames_cannot_borrow_any_protected_role_or_immediate_branch_id_or_reference(): void
+    {
+        // All seven proven role IDs and all six immediate wire operand IDs,
+        // including the first operand used only as the anonymous wire reference.
+        foreach ([80, 20, 30, 21, 31, 22, 32, 10, 11, 12, 13, 14, 15] as $id) {
+            $bad = self::graph();
+            self::addInternalFrame($bad, 1, $id);
+            self::refuses($bad, 'internal anonymous protected ID');
+            $bad = self::graph();
+            self::addInternalFrame($bad, 2, 200);
+            $extra = &self::internalBlock($bad, 2);
+            $extra['union_result']['query_specifications'][0]['query_block']['table'] = self::reference('dictionary', $id);
+            self::refuses($bad, 'internal anonymous protected reference');
+            unset($extra);
+        }
+        foreach ([[], false] as $window) {
+            $bad = self::graph();
+            self::addInternalFrame($bad, 1, 100);
+            $extra = &self::internalBlock($bad, 1);
+            $extra['union_result']['query_specifications'][0]['query_block']['windowing'] = $window;
+            self::refuses($bad, 'internal anonymous window');
+            unset($extra);
+        }
+    }
+
+    public function test_each_allowed_family_has_at_most_one_extra_and_named_wire_policy_is_unchanged(): void
+    {
+        foreach ([1, 2] as $family) {
+            $bad = self::graph();
+            self::addInternalFrame($bad, $family, 100);
+            $block = &self::familyBlock($bad, $family);
+            $block['attached_subqueries'] = [['query_block' => ['select_id' => 900, 'table' => self::anonymousFrame(100)]]];
+            self::refuses($bad, 'internal anonymous cardinality');
+            unset($block);
+        }
+        $bad = self::graph();
+        self::addInternalFrame($bad, 1, 100);
+        $extra = &self::internalBlock($bad, 1);
+        $extra['union_result']['query_specifications'][0]['query_block']['table'] = self::anonymousFrame(300);
+        self::refuses($bad, 'internal anonymous cardinality');
+        unset($extra);
+        $bad = self::graph(anonymous: false);
+        self::addInternalFrame($bad, 1, 100);
+        self::refuses($bad, 'unresolved anonymous definition');
+    }
+
+    public function test_allowed_internal_frames_do_not_relax_selected_wire_or_consumer_boundaries(): void
+    {
+        $graph = self::graph();
+        self::addInternalFrame($graph, 1, 100);
+        self::addInternalFrame($graph, 2, 200);
+        foreach (['missing', 'false', 'window'] as $mutation) {
+            $bad = $graph;
+            $wire = &$bad['query_block']['nested_loop'][0]['table']['materialized_from_subquery'];
+            if ($mutation === 'missing') {
+                unset($wire['using_temporary_table']);
+            } elseif ($mutation === 'false') {
+                $wire['using_temporary_table'] = false;
+            } else {
+                $wire['query_block']['windowing'] = [];
+            }
+            self::refuses($bad, 'anonymous wire shape');
+            unset($wire);
+        }
+        $bad = $graph;
+        $bad['query_block']['nested_loop'][0]['table'] = self::reference('w', 10);
+        self::refuses($bad, 'wire full definition');
+        $bad = $graph;
+        $branches = &self::branches($bad);
+        $branches[1]['query_block']['table'] = self::reference('r', 31);
+        self::refuses($bad, 'header row target');
+        unset($branches);
+        $bad = $graph;
+        $bad['query_block']['nested_loop'][1]['table']['materialized_from_subquery']['query_block']['table'] = self::reference('catalog_wire', 11);
+        self::refuses($bad, 'wire consumer target');
+    }
+
+    private static function anonymousFrame(int $firstId): array
+    {
+        return self::full('dictionary_frame', ['union_result' => ['query_specifications' => [
+            ['query_block' => ['select_id' => $firstId, 'table' => ['table_name' => 'dictionary_a']]],
+            ['query_block' => ['select_id' => $firstId + 1, 'table' => ['table_name' => 'dictionary_b']]],
+        ]]]);
+    }
+
+    private static function addInternalFrame(array &$graph, int $family, int $firstId): void
+    {
+        $block = &self::familyBlock($graph, $family);
+        if (isset($block['windowing'])) {
+            $block['windowing']['table'] = self::anonymousFrame($firstId);
+        } else {
+            $block['table'] = self::anonymousFrame($firstId);
+        }
+    }
+
+    private static function &familyBlock(array &$graph, int $family): array
+    {
+        $branches = &self::branches($graph);
+
+        return $branches[2 * $family]['query_block']['nested_loop'][1]['table']['materialized_from_subquery']['query_block']['grouping_operation']['table']['materialized_from_subquery']['query_block'];
+    }
+
+    private static function &internalBlock(array &$graph, int $family): array
+    {
+        $block = &self::familyBlock($graph, $family);
+        if (isset($block['windowing'])) {
+            return $block['windowing']['table']['materialized_from_subquery']['query_block'];
+        }
+
+        return $block['table']['materialized_from_subquery']['query_block'];
+    }
+
     private static function prove(array $graph): array
     {
         return ExplainSharedMaterialization::proveA2V2($graph, self::plan(), AccountAdmissionGuards::V2, 0);

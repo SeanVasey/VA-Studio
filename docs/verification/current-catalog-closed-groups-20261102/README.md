@@ -275,3 +275,30 @@ This method emits minimized diagnostic STDERR; its runner needs an explicitly
 selected diagnostic contract, not the typed-only adapter's empty-STDERR rule.
 That result still does not close the remaining native correctness/currentness,
 direct/Domain/migration/ledger/restart/race or cost gates.
+
+## A2 internal anonymous-frame correction — 2026-11-02
+
+The physical selection at `f3785b581028035e865985796367f858a9023e0a`
+failed at 1 test/104 assertions on the global one-anonymous-definition rule.
+ROOT's bounded observations found the selected wire plus one internal anonymous
+definition in each of proven families 1 and 2; none were outside or nearest to
+gate/header/family 0 roles. The extras had no windows or protected IDs/references.
+That original failure remains; the observations do not accept a corrected source.
+
+The helper now permits **zero or one extra per family 1/2**, classified by the
+nearest strict ancestor among all seven proven roles. Every extra subtree must
+exclude all windowing and every ID/reference belonging to those roles or the six
+immediate wire operands. The selected wire remains unique at its exact path,
+true-temporary and without its own window. Named-wire policy, SQL/recipe pins,
+ordered header/row sharing, distinct roles, global windows and caps are unchanged.
+Only helper/unit source and this note change; Feature, app and compiler do not.
+
+The authored regression
+`test_two_internal_anonymous_frames_preserve_the_proven_shared_wire_and_families`
+contains both internal frames and is queued for ROOT to demonstrate old-helper
+failure/new-helper success. Added negatives cover other locations, nearer header/
+gate roles, protected role/branch IDs and references, windows, duplicate/nested
+extras, named wires and selected-wire/crosswire boundaries. All earlier tests
+remain. **PHP/lint/Pint/pure/native checks are UNRUN for this correction.** ROOT
+owns those checks and the next bounded physical selection; no new runtime or
+110/15/currentness/F9 acceptance follows from this source preparation.
