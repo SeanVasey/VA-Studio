@@ -4,6 +4,7 @@
 use App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions;
 use App\Domain\Memberships\Production\MembershipHttpBinding;
 use App\Http\Membership\MembershipCustomerLimiter;
+use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,21 +37,29 @@ while (! file_exists($directory.'/start') && hrtime(true) < $deadline) {
 if (! file_exists($directory.'/start')) {
     throw new LogicException('Native admission start signal missing.');
 }
+if (CarbonImmutable::hasTestNow()) {
+    throw new LogicException('Native admission epoch requires real time.');
+}
+$principal = $identity->principal();
+$key = 'production-memberships-customer:'.hash('sha256', json_encode([$principal->provenance, $principal->accountId, 'reads'], JSON_THROW_ON_ERROR));
+$cache = Cache::store(config('cache.limiter'));
 $outcomes = [];
+$epoch = [];
 for ($i = 0; $i < (int) $attempts; $i++) {
+    $before = ['mono' => hrtime(true), 'wall' => time(), 'timer' => $cache->get($key.':timer')];
     try {
         (new MembershipCustomerLimiter)->admit($identity, 'reads');
         $outcomes[] = 200;
     } catch (HttpExceptionInterface $error) {
         $outcomes[] = $error->getStatusCode();
     }
+    $epoch[] = ['before' => $before, 'after' => ['mono' => hrtime(true), 'wall' => time(), 'timer' => $cache->get($key.':timer')],
+        'status' => $outcomes[array_key_last($outcomes)]];
 }
 // A final sequential worker also proves successful admission has released its cache lock.
-$principal = $identity->principal();
-$key = 'production-memberships-customer:'.hash('sha256', json_encode([$principal->provenance, $principal->accountId, 'reads'], JSON_THROW_ON_ERROR));
 $probe = Cache::store(config('cache.limiter'))->getStore()->lock($key.':admission', 5);
 $released = $probe->get();
 if ($released) {
     $probe->release();
 }
-echo json_encode(['outcomes' => $outcomes, 'lock_available_after' => $released], JSON_THROW_ON_ERROR), PHP_EOL;
+echo json_encode(['outcomes' => $outcomes, 'epoch' => $epoch, 'lock_available_after' => $released], JSON_THROW_ON_ERROR), PHP_EOL;
