@@ -11,3 +11,35 @@ Runtime/test source: `fbb802782c51c790fb4dcfcbb9f052fd9d9dfced`, based on main `
 Source/API/static preparation and older mixed-source history remain in evidence-provenance.md, native-harness-repair.md, status-api-repair.md and their manifests. Those historical UNRUN/PENDING paragraphs describe their original checkpoints; actual-evidence.json is the current evidence index. Commands in historical records are sanitized public forms; private raw command digests bind exact originals. No private logs, raw configuration, customers, credentials or native connection details are carried here.
 
 Final runtime/test bytes remain exactlyfbb; evidence/CI metadata changes do not imply a new behavioral run. All publication/shared census/workflow/ledger/PCC receipt edits are coordinator-owned. Shipped gates stay closed; F9/account/history/target deployment cache/complete acceptance and independent final head/preflight/security/Bugbot/expected-head review remain. No CI dispatch, push, PR or merge is authorized by this packet.
+
+## Timer follow-up and current-main integration — 2026-11-02
+
+This checkpoint supersedes earlier current-status statements without changing
+their source-bound evidence. ROOT reports required external Codex code/security
+review **COMPLETED** on frozen PR #188 head
+`e883fae652b3a19f204a95f5ba33709d3dae68e4`; the prior payer-quota blocker is
+historical. Those reviews do not approve the timer follow-up or a new head.
+
+The timer candidate is `0159eec3e3a20874b6b7bc16c3bd92840f57baa8`: 20 selected
+methods / 1,323 assertions passed across six disjoint bounded processes; six
+specified mutants were killed with 98 negative-control assertions. Independent
+code/baseline and mutation assessments accepted those bounded results. This is
+not a single-process 20-method pass, exhaustive guard coverage, or native/shared
+backend acceptance. The original single-process timeout/unknown completed counts,
+earlier v2 M01 UNKNOWN classification and older native RUN01 failure remain;
+the older 14 mutations are not credited as current timer-delta coverage.
+
+Exact PR #189 main `3998060b41370707df50fbf7c7bdbf2f4c50a321` is integrated in
+the existing timer worktree, with `0159` preserved at backup ref
+`backup/member-timer-epoch-0159-before-main-20261102`. Only documentation changed
+relative to `0159`; the sole conflict was the merge ledger's appended rows,
+resolved main-first. Executable code/tests, census and workflow bytes remain
+unchanged, and no tests or generators ran for this preparation. The PR #189
+merge receipt is appended to `docs/handoff/2026-10-07/CLAUDE-PLAN.md`.
+
+ROOT owns the subsequent census regeneration/safeguards, focused N7 checks,
+independent review of the exact tested candidate and one push/review batch.
+At this checkpoint B1 real typed native owner `56509` is **RUNNING/pending**;
+no pass or account acceptance is inferred. F9/account/history/cost and target
+cache/backend gates remain open. Membership mounting stays literal-false; no
+CI dispatch, publication, live payment, deployment or customer import occurred.

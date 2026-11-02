@@ -285,3 +285,10 @@ about 5 back-to-back weeks of agent work. This is an order-of-magnitude estimate
 - Re-measure parity after each wave using the same `development_status` vocabulary. Report "launch rows accepted"
   separately from "implemented". Never present a percentage of the 40 task groups as completion
   (`remaining-development-plan.md`).
+
+
+## 2026-11-02 — Completion-plan update
+
+The [Astra reset board](../2026-11-02/ASTRA-DEVELOPMENT-RESET.md) is the current execution plan, based on verified main `a7bc63cc5c5785353f13e882f49d0ab9dcff55b3`. The counts and dates in this original plan remain historical, not current acceptance. PCC has merged default-off. Account/catalog correctness, history adoption and composed member performance now lead the engineering path; required N7 external security review is separately quota-blocked. Prepared MIG/A5/DEF-OPS evidence is retained for ordered integration after B.
+
+Keep the November 1 B → C → D → E → F order, with disjoint source preparation during real runtime/review waits and the single Foundation run on the final integrated source. The reset removes coordinator-created per-fixture review/document loops while preserving meaningful tests, sensitive-code review, private custody, security checks and release boundaries. Existing owner decisions are not reopened. Sean's outstanding scope, commercial and host/provider inputs remain the relevant launch gates; they do not block unrelated reversible development.
