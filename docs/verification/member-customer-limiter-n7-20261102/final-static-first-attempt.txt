@@ -1,0 +1,16 @@
+PHP 8.4.27 (cli) (built: Oct 21 2026 07:53:46) (NTS)
+Copyright (c) The PHP Group
+Built by Debian
+Zend Engine v4.4.27, Copyright (c) Zend Technologies
+    with Zend OPcache v8.4.27, Copyright (c), by Zend Technologies
+No syntax errors detected in app/Http/Membership/MembershipCustomerLimiter.php
+No syntax errors detected in app/Http/Membership/MembershipController.php
+No syntax errors detected in tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php
+No syntax errors detected in tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php
+No syntax errors detected in tests/Support/membership-customer-limiter-worker.php
+
+  ...⨯.
+
+  ──────────────────────────────────────────────────────────────────── Laravel  
+    FAIL   ............................................ 5 files, 1 style issue  
+  ⨯ tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php unary_operator_spaces, not_operator_with_successor_space, ordered_imports

@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use RuntimeException;
-use Throwable;
 use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\MemberActivationFixtures;
 use Tests\TestCase;
+use Throwable;
 
 final class MembershipNativeCustomerRateLimitTest extends TestCase
 {
