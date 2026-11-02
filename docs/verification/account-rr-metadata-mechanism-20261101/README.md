@@ -1,4 +1,8 @@
-# Bounded raw RR metadata mechanism probe — SOURCE PREPARATION ONLY
+# Bounded raw RR metadata mechanism probe — STOP / INCOMPLETE
+
+One approved d1c46bf2 raw run STOPPED on diagnostic warning provenance; no
+metadata candidate qualified. A diagnostic-only warning transport repair is now
+source preparation, requiring new exact review and lease. See final section.
 
 Production application PHP is frozen at c2b455a1 (PHP/test32aea697); account and
 member acceptance remain stopped. Independent design approval permits preparing
@@ -284,3 +288,87 @@ test_launcher.py1122d47d121c669e8850658d5ab9fe426e302641095995597ddc219ef2258910
 The initial fd23 run.py hash above is historical and superseded by this repair.
 Copied decision hash5dda6cfac22c192608d451657e0c91a60ef4611009b04440967daf5bd60fd380.
 No execution permission follows from these pure checks.
+
+## Actual d1 native STOP and diagnostic-only warning transport preparation
+
+One exact approved d1c46bf246223eaf5526edfce97c48949090b99d run actually executed.
+Raw directory `/workspace/account-guard-evidence-20261101/rrns-20261101T235256Z-6674bbf4d807`.
+Outerexit2/2.158850724s, driverexit1, STOP_CLEANUP_VERIFIED, termination proven,
+0owned clients/transactions/metadata/data locks, lease returnable. ALL scratch
+objects/schema remain. Copied independent actual assessment and read-only analysis
+are in this packet; neither is mechanism/production acceptance.
+
+Actual app-shaped cell reproduced admission BEFORE/AFTER ONLY canonical TABLE
+creation through the frozen native prepared helper, intended selected scratch,
+old anchor1 and fresh table positive (event353). Later plain.tables returned[]
+under retainedRR while fresh catalog saw canonical objects. The diagnostic
+warnings id then returned Error1295 as rows (not PDOException) and strict oracle
+correctly STOPPED. All18 warning fetches had the same1295, including after actual
+PAD1103. No SHARE/UPDATE/locked UNION/SHOW candidate qualified or ran. Prior DDL
+warning-free status cannot be inferred retrospectively.
+
+Read-only exact-version upstream PHP8.4.27/MySQL8.4.11 source corroborates the
+suspected diagnostic contamination path: PDO::query invokes preparer; native
+SHOW WARNINGS prepare is rejected1295; PDO falls back to text execution that can
+report that new condition. No wire sequence was captured, so this remains a
+source-supported inference pending native provenance controls. Source URLs,
+line references and private source-file hashes are in d1c46bf2-warning-analysis.md.
+No SQL replay was used for this diagnosis.
+
+Root authorized ONE warning-diagnostic-only source preparation batch after the
+independent STOP decision. Actual app primitive, candidate/publication SQL,
+unsupported pairs, warning-presence STOP, all alias/peer/first-wait/witness oracles
+and bounded run.py remain unchanged. Production PHP/old tests remain unchanged.
+
+New directWarnings() accepts ONLY the fixed SHOW WARNINGS command on SAME PDO.
+It requires original ATTR_EMULATE_PREPARES=false; switches client flag true only
+for that diagnostic command, fetches/closes cursor, restores EXACT saved value in
+finally and requires nativefalse restored. Before/during/after/stage/restoration
+are logged. Every non-warning native worker command also checks nativefalse before
+execution. Client get/set does not send SQL according to driver source; native
+controls still must verify actual installed behavior. No statement may intervene
+on producer PDO before warning retrieval. Any get/set/query/fetch/close/restore
+failure stops; no retry or fallback and no1295/warning filtering.
+
+A new independent warning_control session is inserted AFTER the immutable actual
+app-shaped sequence and BEFORE later candidate qualification. It runs four
+predeclared native producers, each immediately followed by the same-PDO direct
+getter, with exact rows/mode checks and final same connection/UUID/selectedDB/RR:
+
+| Fixed producer | Required diagnostic rows (native UNEXECUTED) |
+| --- | --- |
+| SELECT1 AS rrns_warning_clean_before | [] |
+| SELECT CAST('rrns_warning_positive_v1' AS UNSIGNED) AS rrns_warning_value | Exactly Warning1292, `Truncated incorrect INTEGER value: 'rrns_warning_positive_v1'` |
+| SELECT1 AS rrns_warning_clean_after | [] (positive cleared, no invented1295) |
+| SELECT * FROM owned.rrns_warning_missing_control (never created) | Producer exact42S02/1146, then exactly Error1146 `Table '<owned>.rrns_warning_missing_control' doesn't exist` |
+
+No routine/event/domain/authority data is invoked or mutated by controls. The
+native control behavior above is a strict proposed oracle, NOT an executed pass.
+Any unknown/extra/missing warning, mismatched source, failed mode restoration or
+connection difference STOPs. Original candidate warning STOP is unchanged.
+
+Four declared native producer ids expand103→107. Existing client/candidate ids,
+actual frozen helper and source/native modes are preserved; the warning getter is
+the sole temporary emulated command. New CLI --warning-self-test loads only pure
+fake-PDO tests (no parent PDO constructor/connection/application bootstrap).
+Those cover clean/unchanged warning rows (including1295), initial native mode,
+query/PDO/fetch/cursor failures, set/get exceptions, exact restoration and failed
+restoration with no retry. Pure results do not prove the native control session.
+
+New exact-source independent review plus one future root/MIG between-method lease
+are REQUIRED before any further diagnostic run. It must use fresh internal
+schemas/output; old STOP/evidence are retained unchanged. Full/terminal behavior,
+110/15 costs, real account/ledger/member acceptance and mount remain blocked.
+
+Diagnostic repair actual STATIC/PURE evidence only: PHP8.4.27 lint2/Pint2 PASS;
+`php probe.php --warning-self-test` PASS23 assertions/0DB connections/
+native_control_execution=false; `php probe.php --self-test` PASS107 operation ids/
+0DB connections; diff --check PASS. Both commands run inside existing contained
+PHP/user1000 without app bootstrap or real PDO connection. No DB/native replay,
+setup/restart/global/privilege/isolation change or CI occurred during preparation.
+Bounded launcher run.py remains072f978ddb86f20802b959718a9b3deb25c0c05e2c11bde3e02f11c77ba2f199.
+New probe.phpe219812bf9202141d87097263ee142249cfcfa6dcf0831fd7df31298cd000737;
+warning_transport_test.phpc45da8b1853f6da0e5e01ff74357655717988ebb38b06c001be066b5af5beac5.
+Previous source hashes are retained as historical source/STOP references, not
+current native passing evidence. Future native warning controls/metadata
+candidates remain unexecuted and require exact-source approval/lease.

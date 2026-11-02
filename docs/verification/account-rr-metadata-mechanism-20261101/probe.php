@@ -14,6 +14,61 @@ final class RRNSPreparedStatement extends PDOStatement
         return parent::execute($params);
     }
 }
+/** Fixed diagnostic command only. Native candidate/primitive preparation is never changed. */
+function directWarnings(PDO $pdo, ?callable $record = null): array
+{
+    $mode = ['protocol' => 'COM_QUERY_WARNING_ONLY', 'before' => null, 'during' => null, 'after' => null, 'restored' => false, 'stage' => 'read_before'];
+    try {
+        $before = $pdo->getAttribute(PDO::ATTR_EMULATE_PREPARES);
+    } catch (Throwable $error) {
+        if ($record !== null) {
+            $record($mode);
+        } throw $error;
+    }
+    $mode['before'] = $before;
+    if ($before !== false) {
+        if ($record !== null) {
+            $record($mode);
+        } throw new RuntimeException('Warning diagnostic requires nativefalse before entry');
+    }
+    try {
+        $mode['stage'] = 'set_warning_mode';
+        if (! $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true)) {
+            throw new RuntimeException('Warning diagnostic mode set failed');
+        }
+        $mode['during'] = $pdo->getAttribute(PDO::ATTR_EMULATE_PREPARES);
+        if ($mode['during'] !== true) {
+            throw new RuntimeException('Warning diagnostic direct mode not established');
+        }
+        $mode['stage'] = 'query';
+        $statement = $pdo->query('SHOW WARNINGS');
+        if (! $statement instanceof PDOStatement) {
+            throw new RuntimeException('Warning diagnostic statement unavailable');
+        }
+        $mode['stage'] = 'fetch';
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $mode['stage'] = 'close';
+        if (! $statement->closeCursor()) {
+            throw new RuntimeException('Warning diagnostic cursor close failed');
+        }
+        $mode['stage'] = 'complete';
+    } finally {
+        try {
+            $restore = $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, $before);
+            $mode['after'] = $pdo->getAttribute(PDO::ATTR_EMULATE_PREPARES);
+            $mode['restored'] = $restore && $mode['after'] === $before && $mode['after'] === false;
+            if (! $mode['restored']) {
+                throw new RuntimeException('Warning diagnostic exact native mode restoration failed');
+            }
+        } finally {
+            if ($record !== null) {
+                $record($mode);
+            }
+        }
+    }
+
+    return ['rows' => $rows, 'diagnostic_mode' => $mode];
+}
 function schemas(string $token): array
 {
     if (! preg_match('/\A[a-f0-9]{12}\z/', $token)) {
@@ -90,6 +145,10 @@ function specs(array $m): array
         'in_transaction' => 'SELECT @@SESSION.transaction_isolation isolation_level',
         'rollback' => 'ROLLBACK',
         'warnings' => 'SHOW WARNINGS',
+        'warning.clean.before' => 'SELECT 1 AS rrns_warning_clean_before',
+        'warning.positive' => "SELECT CAST('rrns_warning_positive_v1' AS UNSIGNED) AS rrns_warning_value",
+        'warning.clean.after' => 'SELECT 1 AS rrns_warning_clean_after',
+        'warning.missing' => "SELECT * FROM $q.rrns_warning_missing_control",
         'questions' => "SHOW SESSION STATUS LIKE 'Questions'",
         'publish.table' => "CREATE TABLE $q.customer_accounts_insert(id INT PRIMARY KEY) ENGINE=InnoDB",
         'publish.case' => "CREATE TABLE $q.CUSTOMER_ACCOUNTS_UPDATE(id INT PRIMARY KEY) ENGINE=InnoDB",
@@ -201,7 +260,7 @@ function connect(array $m, bool $selected): PDO
 }
 function worker(array $m, string $role): never
 {
-    $allowed = ['bootstrap', 'publisher', 'app_shape', 'plain', 'share', 'share_union', 'update', 'update_union', 'show'];
+    $allowed = ['bootstrap', 'publisher', 'warning_control', 'app_shape', 'plain', 'share', 'share_union', 'update', 'update_union', 'show'];
     if (! in_array($role, $allowed, true)) {
         throw new RuntimeException('Unknown owned cell');
     }
@@ -234,7 +293,15 @@ function worker(array $m, string $role): never
         emit(['event' => 'start', 'role' => $role, 'id' => $id]);
         $began = hrtime(true);
         try {
-            if ($id === 'app.primitive') {
+            if ($id === 'warnings') {
+                $diagnostic = directWarnings($pdo, static function (array $mode) use ($role, $id): void {
+                    emit(['event' => 'diagnostic_mode', 'role' => $role, 'id' => $id, 'mode' => $mode]);
+                });
+                $result = $diagnostic + ['error' => null];
+            } elseif ($id === 'app.primitive') {
+                if ($pdo->getAttribute(PDO::ATTR_EMULATE_PREPARES) !== false) {
+                    throw new RuntimeException('Native primitive mode changed');
+                }
                 $GLOBALS['rrns_statement_id'] = $id;
                 require_once '/workspace/VA-Studio-account-guard-v2/app/Domain/Customers/ProductionIdentity/AccountAdmissionGuards.php';
                 try {
@@ -245,16 +312,28 @@ function worker(array $m, string $role): never
                 }
                 $result = ['rows' => [], 'error' => null, 'primitive_outcome' => $primitiveOutcome];
             } else {
+                if ($pdo->getAttribute(PDO::ATTR_EMULATE_PREPARES) !== false) {
+                    throw new RuntimeException('Native candidate mode changed');
+                }
                 $statement = $pdo->query($sql[$id]);
                 $rows = $statement->columnCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : [];
                 $result = ['rows' => $rows, 'error' => null];
             }
         } catch (PDOException $e) {
             $result = ['rows' => [], 'error' => ['state' => $e->errorInfo[0] ?? $e->getCode(), 'code' => (int) ($e->errorInfo[1] ?? 0), 'message' => $e->getMessage()]];
+        } catch (Throwable $e) {
+            if ($id !== 'warnings') {
+                throw $e;
+            }
+            $result = ['rows' => [], 'error' => ['state' => 'DIAGNOSTIC', 'code' => 0, 'class' => $e::class, 'message' => $e->getMessage()]];
         }
         emit(['event' => 'result', 'role' => $role, 'id' => $id, 'sql' => $sql[$id], 'seconds' => (hrtime(true) - $began) / 1e9, 'pdo_in_transaction' => $pdo->inTransaction()] + $result);
     }
     $pdo = null;
+    exit(0);
+}
+if (($argv[1] ?? '') === '--warning-self-test') {
+    require __DIR__.'/warning_transport_test.php';
     exit(0);
 }
 if (($argv[1] ?? '') === '--self-test') {
@@ -411,7 +490,7 @@ function receive(string $role, string $event): array
             throw new RuntimeException('Host cancelled ordered transport');
         }
         foreach (lines($role) as $line) {
-            if (($line['event'] ?? null) === 'prepared_sql') {
+            if (in_array($line['event'] ?? null, ['prepared_sql', 'diagnostic_mode'], true)) {
                 note($line);
 
                 continue;
@@ -632,6 +711,39 @@ try {
     if (($after['primitive_outcome'] ?? null) !== 'admitted') {
         throw new RuntimeException('Unknown app-shaped outcome');
     }
+    spawnCell('warning_control');
+    $warningContext = must('warning_control', 'context');
+    if ($warningContext[0]['server_uuid'] !== $observerContext[0]['server_uuid'] || $warningContext[0]['principal'] !== $observerContext[0]['principal'] || $warningContext[0]['roles'] !== $observerContext[0]['roles'] || $warningContext[0]['isolation_level'] !== 'REPEATABLE-READ' || $warningContext[0]['selected_db'] !== $m['schemas'][0]) {
+        throw new RuntimeException('Warning control context mismatch');
+    }
+    foreach (['warning.clean.before', 'warning.positive', 'warning.clean.after', 'warning.missing'] as $control) {
+        $producer = request('warning_control', $control);
+        if ($control === 'warning.missing') {
+            if (($producer['error']['state'] ?? null) !== '42S02' || ($producer['error']['code'] ?? null) !== 1146) {
+                throw new RuntimeException('Named warning error control did not produce exact1146');
+            }
+        } elseif ($producer['error'] !== null) {
+            throw new RuntimeException('Native warning control producer failed');
+        }
+        // No SQL on this producer PDO between the preceding native command and the direct diagnostic getter.
+        $diagnostic = request('warning_control', 'warnings');
+        $expected = [];
+        if ($control === 'warning.positive') {
+            $expected = [['Level' => 'Warning', 'Code' => 1292, 'Message' => "Truncated incorrect INTEGER value: 'rrns_warning_positive_v1'"]];
+        }
+        if ($control === 'warning.missing') {
+            $expected = [['Level' => 'Error', 'Code' => 1146, 'Message' => "Table '".$m['schemas'][0].".rrns_warning_missing_control' doesn't exist"]];
+        }
+        if ($diagnostic['error'] !== null || $diagnostic['rows'] !== $expected || ($diagnostic['diagnostic_mode']['before'] ?? null) !== false || ($diagnostic['diagnostic_mode']['during'] ?? null) !== true || ($diagnostic['diagnostic_mode']['after'] ?? null) !== false || ($diagnostic['diagnostic_mode']['restored'] ?? false) !== true) {
+            throw new RuntimeException('Warning provenance/control or native restoration failed; no warning suppression');
+        }
+        note(['event' => 'warning_control_verified', 'control' => $control, 'rows' => $diagnostic['rows'], 'mode' => $diagnostic['diagnostic_mode']]);
+    }
+    $warningAfter = must('warning_control', 'context');
+    if ($warningAfter[0]['connection_id'] !== $warningContext[0]['connection_id'] || $warningAfter[0]['server_uuid'] !== $warningContext[0]['server_uuid'] || $warningAfter[0]['selected_db'] !== $m['schemas'][0] || $warningAfter[0]['isolation_level'] !== 'REPEATABLE-READ') {
+        throw new RuntimeException('Warning control physical connection changed');
+    }
+    request('warning_control', 'close');
     foreach (array_keys($sql) as $id) {
         if (! str_starts_with($id, 'publish.') || in_array($id, ['publish.table', 'publish.anchor'], true)) {
             continue;
