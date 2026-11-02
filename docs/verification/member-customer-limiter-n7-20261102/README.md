@@ -1,5 +1,7 @@
 # N7 isolated customer limiter — actual focused evidence
 
+Final independent review **APPROVE WITH CONDITIONS** at `33a3bffd9912b219e47415723ab7d6858fbbc04d`, with no supported open P0–P2: [immutable decision](independent-n7-review-33a3bffd-DECISION.md). This commit carries that decision byte-exact and this approval-status note only; all other reviewed bytes remain unchanged. Earlier pre-final pending statements below describe the preceding packet checkpoint. Required replacement preflight, Codex code/security, Bugbot and expected-head merge gates remain open; membership mounting remains disabled.
+
 Runtime/test source: `fbb802782c51c790fb4dcfcbb9f052fd9d9dfced`, based on main `a7bc63cc5c5785353f13e882f49d0ab9dcff55b3`. Product change is one helper plus exactly two controller admission calls. Main routes/index signature/domain/auth/privacy/IP/session guards/migrations/dependencies and shipped membership mountfalse are unchanged. No F9/history/account repair is imported; this is the first B gate, not C advancement or mount acceptance.
 
 [Actual results](actual-results.md) and [machine-readable evidence](actual-evidence.json) separate46SQLite/2045assertions carried at25e, native25e RUN01 **FAIL1/672**, correctedfbb RUN02 PASS1/724, newfbb sandbox baseline6/437, and14 expected selected mutation kills/0survivors. All original failures/setup STOPs remain visible. No cross-SHA full-pass total,724 race-trial claim or independent operand coverage is made.
