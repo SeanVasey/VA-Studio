@@ -10,6 +10,7 @@ use PDO;
 use Pdo\Mysql;
 use PDOStatement;
 use ReflectionClass;
+use ReflectionMethod;
 use ReflectionProperty;
 use Throwable;
 
@@ -73,10 +74,15 @@ final class CurrentCatalog
             if ($binding !== CatalogSocketBinding::attest($primary, $descriptor, $this->identity, $this->transportIdentity['connection_status'])) {
                 self::refuse();
             }
+            if (! (new ReflectionClass(Mysql::class))->isInternal() || ! (new ReflectionMethod(Mysql::class, 'getWarningCount'))->isInternal()) {
+                self::refuse();
+            }
             self::$connectionAttempts++;
             $connectStarted = \hrtime(true);
             try {
-                $this->catalog = new PDO($descriptor['dsn'], $descriptor['username'], $descriptor['password'], $descriptor['options']);
+                $options = $descriptor['options'];
+                $options[Mysql::ATTR_USE_BUFFERED_QUERY] = true;
+                $this->catalog = new Mysql($descriptor['dsn'], $descriptor['username'], $descriptor['password'], $options);
             } finally {
                 self::$connectNanoseconds += \hrtime(true) - $connectStarted;
             }
@@ -198,6 +204,152 @@ final class CurrentCatalog
                 }
             }
             $result[$name][] = $row;
+        }
+
+        return $result;
+    }
+
+    public function group(CatalogGroup $group, string $version): array
+    {
+        $plan = CatalogGroupPlan::build($group, $version);
+        $this->requireCurrent();
+        if ($this->boundaries < 1 || ! $this->catalog instanceof Mysql) {
+            self::refuse();
+        }
+        try {
+            if ($this->catalog->getAttribute(Mysql::ATTR_USE_BUFFERED_QUERY) !== true
+                || ! $this->catalog->setAttribute(Mysql::ATTR_USE_BUFFERED_QUERY, false)
+                || $this->catalog->getAttribute(Mysql::ATTR_USE_BUFFERED_QUERY) !== false) {
+                self::refuse();
+            }
+            self::$companionStatements++;
+            $statement = $this->catalog->prepare($plan['sql']);
+            self::requireNoWarnings($this->catalog);
+            if (! $statement->execute($plan['bindings'])) {
+                self::refuse();
+            }
+            self::requireNoWarnings($this->catalog);
+            if (! $statement->setFetchMode(PDO::FETCH_ASSOC)) {
+                self::refuse();
+            }
+            $decoded = self::decodeGroup($group, $plan['families'], $statement);
+            // Entire unbuffered result and final EOF consumed; capture status BEFORE close/next SQL.
+            self::requireNoWarnings($this->catalog);
+            if (! $statement->closeCursor() || $this->catalog->inTransaction()) {
+                self::refuse();
+            }
+
+            if (! $this->catalog->setAttribute(Mysql::ATTR_USE_BUFFERED_QUERY, true)
+                || $this->catalog->getAttribute(Mysql::ATTR_USE_BUFFERED_QUERY) !== true) {
+                self::refuse();
+            }
+
+            return $decoded;
+        } catch (Throwable) {
+            $this->invalidate();
+            self::refuse();
+        }
+    }
+
+    private static function requireNoWarnings(Mysql $pdo): void
+    {
+        if ($pdo::class !== Mysql::class || ! (new ReflectionMethod(Mysql::class, 'getWarningCount'))->isInternal() || $pdo->getWarningCount() !== 0) {
+            self::refuse();
+        }
+    }
+
+    private static function decimal(mixed $value, int $limit): int
+    {
+        if (! is_string($value) || preg_match('/\A(?:0|[1-9][0-9]*)\z/D', $value) !== 1
+            || strlen($value) > strlen((string) $limit) || (strlen($value) === strlen((string) $limit) && strcmp($value, (string) $limit) > 0)) {
+            self::refuse();
+        }
+        $number = (int) $value;
+        if ((string) $number !== $value) {
+            self::refuse();
+        }
+
+        return $number;
+    }
+
+    /** Only the fixed source plan and private PDO stream enter this decoder. No caller decoder/schema API. */
+    private static function decodeGroup(CatalogGroup $group, array $families, iterable $wire): array
+    {
+        $result = [];
+        $counts = [];
+        $seen = [];
+        $bytes = 4096;
+        $rows = 0;
+        $previous = [-1, -1, -1, 0];
+        foreach ($families as $family) {
+            $result[constant(CatalogRead::class.'::'.$family['enum'])->value] = array_fill_keys($family['names'], []);
+        }
+        foreach ($wire as $record) {
+            if (! is_array($record) || array_keys($record) !== ['group_id', 'family', 'slot', 'kind', 'ordinal', 'payload']
+                || $record['group_id'] !== $group->value
+                || ! is_int($record['family']) || ! is_int($record['slot']) || ! is_int($record['kind'])
+                || ! isset($families[$record['family']]) || ! isset($families[$record['family']]['names'][$record['slot']])
+                || ! in_array($record['kind'], [0, 1], true) || ! is_string($record['payload'])) {
+                self::refuse();
+            }
+            $size = strlen($record['payload']);
+            $bytes += $size + 256;
+            if ($bytes > 16777216 || $size > 8388608 || ++$rows > 131072) {
+                self::refuse();
+            }
+            $ordinal = self::decimal($record['ordinal'], 65536);
+            $position = [$record['family'], $record['slot'], $record['kind'], $ordinal];
+            if ($position <= $previous) {
+                self::refuse();
+            } $previous = $position;
+            $cells = json_decode($record['payload'], false, 16, JSON_THROW_ON_ERROR | JSON_BIGINT_AS_STRING);
+            if (! is_array($cells) || ! array_is_list($cells)) {
+                self::refuse();
+            }
+            $f = $record['family'];
+            $slot = $record['slot'];
+            $key = $f.':'.$slot;
+            if ($record['kind'] === 0) {
+                if ($ordinal !== 0 || isset($counts[$key]) || count($cells) !== 1) {
+                    self::refuse();
+                }
+                $counts[$key] = self::decimal($cells[0], 65536);
+                $seen[$key] = 0;
+
+                continue;
+            }
+            if (! isset($counts[$key]) || $ordinal !== ++$seen[$key] || $ordinal > $counts[$key]
+                || count($cells) !== count($families[$f]['columns'])) {
+                self::refuse();
+            }
+            $row = [];
+            foreach ($families[$f]['columns'] as $n => $column) {
+                $cell = $cells[$n];
+                if (! is_array($cell) || ! array_is_list($cell) || count($cell) !== 2) {
+                    self::refuse();
+                }
+                if ($cell[0] === 'N') {
+                    if ($cell[1] !== null || ! $column['nullable']) {
+                        self::refuse();
+                    } $value = null;
+                } elseif ($column['php_kind'] === 'int' && $cell[0] === 'I') {
+                    $value = self::decimal($cell[1], PHP_INT_MAX);
+                } elseif ($column['php_kind'] === 'string' && $cell[0] === 'S' && is_string($cell[1]) && strlen($cell[1]) <= 8388608) {
+                    $value = $cell[1];
+                } else {
+                    self::refuse();
+                }
+                $row[$column['key']] = $value;
+            }
+            $result[constant(CatalogRead::class.'::'.$families[$f]['enum'])->value][$families[$f]['names'][$slot]][] = $row;
+        }
+        foreach ($families as $f => $family) {
+            foreach ($family['names'] as $slot => $name) {
+                $key = $f.':'.$slot;
+                if (! isset($counts[$key]) || $seen[$key] !== $counts[$key]) {
+                    self::refuse();
+                }
+            }
         }
 
         return $result;

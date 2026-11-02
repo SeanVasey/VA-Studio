@@ -64,6 +64,16 @@ final class CatalogLease
         }
     }
 
+    public static function group(PDO $primary, CatalogGroup $group, string $version = AccountAdmissionGuards::V2): array
+    {
+        $lease = self::open($primary);
+        try {
+            return $lease->catalog?->group($group, $version) ?? throw new LogicException('Native catalog required.');
+        } finally {
+            $lease->close();
+        }
+    }
+
     public static function identity(PDO $primary, CatalogRead $query, array $names): array
     {
         $lease = self::open($primary);

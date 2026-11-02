@@ -85,6 +85,21 @@ final class AccountAdmissionGuards
         return $state;
     }
 
+    /** Complete parent proof with fixed same-stage groups; safe without a caller frame/cache. */
+    public static function identityParentStable(PDO $pdo, string $driver): array
+    {
+        $state = self::inspect($pdo, $driver, false, true);
+        SchemaProofFrame::captureAccountProof($pdo, $state);
+
+        return $state;
+    }
+
+    /** Same migration-only ordered overlap contract, using fixed parent-inspection groups. */
+    public static function identityParentMigrationState(PDO $pdo, string $driver): array
+    {
+        return self::inspect($pdo, $driver, true, true);
+    }
+
     /** Only the namespace classes not protected by the account table MDL; one bounded targeted catalog statement. */
     public static function assertUnpinnedNamespace(PDO $pdo): void
     {
@@ -111,17 +126,17 @@ final class AccountAdmissionGuards
         return self::inspect($pdo, $driver, true);
     }
 
-    private static function inspect(PDO $pdo, string $driver, bool $transition): array
+    private static function inspect(PDO $pdo, string $driver, bool $transition, bool $grouped = false): array
     {
         $lease = CatalogLease::open($pdo);
         try {
-            return self::inspectCurrent($pdo, $driver, $transition);
+            return self::inspectCurrent($pdo, $driver, $transition, $grouped);
         } finally {
             $lease->close();
         }
     }
 
-    private static function inspectCurrent(PDO $pdo, string $driver, bool $transition): array
+    private static function inspectCurrent(PDO $pdo, string $driver, bool $transition, bool $grouped): array
     {
         if (! in_array($driver, ['sqlite', 'mysql'], true) || $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) !== $driver) {
             self::refuse();
@@ -199,16 +214,17 @@ final class AccountAdmissionGuards
                     }
                 }
             }
-            if (self::query($pdo, CatalogRead::AccountTables, $names) !== []) {
+            $group = $grouped ? CatalogLease::group($pdo, CatalogGroup::A1_ACCOUNT_AFTER_SHOW) : null;
+            if (($group === null ? self::query($pdo, CatalogRead::AccountTables, $names) : $group[CatalogRead::AccountTables->value]['']) !== []) {
                 self::refuse();
             }
             $reserved = ['customer_accounts', ...$names];
             foreach ([['ROUTINES', 'ROUTINE_SCHEMA', 'ROUTINE_NAME'], ['EVENTS', 'EVENT_SCHEMA', 'EVENT_NAME'], ['STATISTICS', 'TABLE_SCHEMA', 'INDEX_NAME'], ['TABLE_CONSTRAINTS', 'CONSTRAINT_SCHEMA', 'CONSTRAINT_NAME']] as [$catalog, $schema, $column]) {
-                if (self::query($pdo, CatalogRead::namespace($catalog, true), $reserved) !== []) {
+                if (($group === null ? self::query($pdo, CatalogRead::namespace($catalog, true), $reserved) : $group[CatalogRead::namespace($catalog, true)->value]['']) !== []) {
                     self::refuse();
                 }
             }
-            $rows = self::query($pdo, CatalogRead::Q01CED6344452, ['customer_accounts', ...$names]);
+            $rows = ($group === null ? self::query($pdo, CatalogRead::Q01CED6344452, ['customer_accounts', ...$names]) : $group[CatalogRead::Q01CED6344452->value]['']);
             $installed = array_column($rows, 'TRIGGER_NAME');
             sort($installed);
             $version = null;
@@ -240,7 +256,7 @@ final class AccountAdmissionGuards
                 $definer = $row['DEFINER'];
             }
             // The forced equality paths must remain their complete, visible unique keys.
-            $indexes = self::query($pdo, CatalogRead::Q54EFEC87F80D, ['customer_accounts']);
+            $indexes = ($group === null ? self::query($pdo, CatalogRead::Q54EFEC87F80D, ['customer_accounts']) : $group[CatalogRead::Q54EFEC87F80D->value]['']);
             usort($indexes, fn ($a, $b) => strcmp($a['INDEX_NAME'], $b['INDEX_NAME']) ?: $a['SEQ_IN_INDEX'] <=> $b['SEQ_IN_INDEX']);
             $expectedIndexes = [];
             foreach (['PRIMARY' => 'id', 'customer_accounts_owner_key_unique' => 'owner_key', 'customer_accounts_public_id_unique' => 'public_id', 'customer_accounts_user_id_unique' => 'user_id'] as $name => $column) {
@@ -249,7 +265,7 @@ final class AccountAdmissionGuards
             if ($indexes !== $expectedIndexes) {
                 self::refuse();
             }
-            self::mysqlFloor($pdo, $database);
+            self::mysqlFloor($pdo, $database, $grouped);
             $metadata = [$database, $table, $rows, $indexes];
         }
 
@@ -258,11 +274,12 @@ final class AccountAdmissionGuards
     }
 
     /** Complete retained account columns/outgoing keys, in addition to guard/index ownership. */
-    private static function mysqlFloor(PDO $pdo, string $database): void
+    private static function mysqlFloor(PDO $pdo, string $database, bool $grouped): void
     {
         if ((int) $pdo->query('SELECT @@SESSION.foreign_key_checks')->fetchColumn() !== 1) {
             self::refuse();
         }
+        $group = $grouped ? CatalogLease::group($pdo, CatalogGroup::A2_ACCOUNT_FLOOR) : null;
         $expected = [];
         foreach (['id' => ['bigint unsigned', 'NO', 'auto_increment'], 'public_id' => ['char(36)', 'NO', ''],
             'user_id' => ['bigint unsigned', 'NO', ''], 'owner_key' => ['char(64)', 'NO', ''],
@@ -273,7 +290,7 @@ final class AccountAdmissionGuards
                 'EXTRA' => $extra, 'CHARACTER_SET_NAME' => $text ? 'utf8mb4' : null, 'COLLATION_NAME' => $text ? 'utf8mb4_unicode_ci' : null,
                 'COLUMN_COMMENT' => '', 'GENERATION_EXPRESSION' => ''];
         }
-        if (self::query($pdo, CatalogRead::QD9E74E9B8F9D, ['customer_accounts']) !== $expected) {
+        if (($group === null ? self::query($pdo, CatalogRead::QD9E74E9B8F9D, ['customer_accounts']) : $group[CatalogRead::QD9E74E9B8F9D->value]['']) !== $expected) {
             self::refuse();
         }
         $expected = [];
@@ -282,8 +299,8 @@ final class AccountAdmissionGuards
                 'REFERENCED_TABLE_SCHEMA' => $database, 'REFERENCED_TABLE_NAME' => $target, 'REFERENCED_COLUMN_NAME' => $key,
                 'UPDATE_RULE' => 'NO ACTION', 'DELETE_RULE' => 'RESTRICT'];
         }
-        if (self::query($pdo, CatalogRead::Q3A0D56156905, ['customer_accounts']) !== $expected
-            || self::query($pdo, CatalogRead::QB894B1A4D034, ['customer_accounts']) !== [['count' => 6]]) {
+        if (($group === null ? self::query($pdo, CatalogRead::Q3A0D56156905, ['customer_accounts']) : $group[CatalogRead::Q3A0D56156905->value]['']) !== $expected
+            || ($group === null ? self::query($pdo, CatalogRead::QB894B1A4D034, ['customer_accounts']) : $group[CatalogRead::QB894B1A4D034->value]['']) !== [['count' => 6]]) {
             self::refuse();
         }
     }

@@ -1,0 +1,7 @@
+{
+  "mysql-8.4.11-dd-system-views-tables.cc": "da2521a2f8bda09b5d4bb89e8cc5707054c7eac80a582646731409ed3d9b7671",
+  "mysql-8.4.11-sql-sql_lex.cc": "f5004495d5c1263d8e16c7b17e72ed0d2ca408cfe3a942868a8463f10ead7024",
+  "mysql-8.4.11-sql-sql_derived.cc": "020a8b7082f888eac6b25a842fc199abf8222d08e6e0d5ff3657dd92eb42a9e4",
+  "php-8.4.27-mysql_driver.c": "9d63ea770010ed5f3837a64025a5885bfa3bc266bc20d1b1dbfd2c939b2734aa",
+  "php-8.4.27-mysql_statement.c": "3a7be4170ad448306b28abc215c508c961d7f07752b8ec4be28d0f8c342f8105"
+}

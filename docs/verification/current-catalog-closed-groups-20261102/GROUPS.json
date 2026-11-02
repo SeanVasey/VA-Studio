@@ -27,13 +27,13 @@
           {
             "key": "ENGINE",
             "php_kind": "string",
-            "nullable": false,
+            "nullable": true,
             "expression": "ENGINE"
           },
           {
             "key": "TABLE_COLLATION",
             "php_kind": "string",
-            "nullable": false,
+            "nullable": true,
             "expression": "TABLE_COLLATION"
           },
           {
@@ -45,7 +45,7 @@
           {
             "key": "CREATE_OPTIONS",
             "php_kind": "string",
-            "nullable": false,
+            "nullable": true,
             "expression": "CREATE_OPTIONS"
           }
         ],
@@ -232,7 +232,7 @@
           {
             "key": "COLUMN_NAME",
             "php_kind": "string",
-            "nullable": false,
+            "nullable": true,
             "expression": "COLUMN_NAME"
           },
           {
@@ -262,7 +262,7 @@
           {
             "key": "COLLATION",
             "php_kind": "string",
-            "nullable": false,
+            "nullable": true,
             "expression": "COLLATION"
           },
           {
@@ -575,7 +575,7 @@
           {
             "key": "ENGINE",
             "php_kind": "string",
-            "nullable": false,
+            "nullable": true,
             "expression": "ENGINE"
           },
           {
@@ -593,13 +593,13 @@
           {
             "key": "TABLE_COLLATION",
             "php_kind": "string",
-            "nullable": false,
+            "nullable": true,
             "expression": "TABLE_COLLATION"
           },
           {
             "key": "CREATE_OPTIONS",
             "php_kind": "string",
-            "nullable": false,
+            "nullable": true,
             "expression": "CREATE_OPTIONS"
           }
         ],
@@ -685,7 +685,7 @@
           {
             "key": "COLUMN_NAME",
             "php_kind": "string",
-            "nullable": false,
+            "nullable": true,
             "expression": "COLUMN_NAME"
           },
           {
@@ -715,7 +715,7 @@
           {
             "key": "COLLATION",
             "php_kind": "string",
-            "nullable": false,
+            "nullable": true,
             "expression": "COLLATION"
           },
           {
@@ -897,13 +897,13 @@
           {
             "key": "ENGINE",
             "php_kind": "string",
-            "nullable": false,
+            "nullable": true,
             "expression": "ENGINE"
           },
           {
             "key": "CREATE_OPTIONS",
             "php_kind": "string",
-            "nullable": false,
+            "nullable": true,
             "expression": "CREATE_OPTIONS"
           },
           {
@@ -915,7 +915,7 @@
           {
             "key": "TABLE_COLLATION",
             "php_kind": "string",
-            "nullable": false,
+            "nullable": true,
             "expression": "TABLE_COLLATION"
           }
         ],
@@ -1050,7 +1050,7 @@
           {
             "key": "COLUMN_NAME",
             "php_kind": "string",
-            "nullable": false,
+            "nullable": true,
             "expression": "COLUMN_NAME"
           },
           {
@@ -1080,7 +1080,7 @@
           {
             "key": "COLLATION",
             "php_kind": "string",
-            "nullable": false,
+            "nullable": true,
             "expression": "COLLATION"
           },
           {

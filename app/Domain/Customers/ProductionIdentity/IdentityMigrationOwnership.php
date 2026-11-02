@@ -23,6 +23,10 @@ final class IdentityMigrationOwnership
     /** @var array<string, array<string, list<array<string, mixed>>>> per-inspection batched per-name results */
     private array $batches = [];
 
+    private array $groups = [];
+
+    private string $accountVersion = AccountAdmissionGuards::V2;
+
     public function inspect(PDO $pdo, string $driver): array
     {
         return $this->inspectState($pdo, $driver, false);
@@ -48,6 +52,7 @@ final class IdentityMigrationOwnership
     {
         $this->database = null;
         $this->batches = [];
+        $this->groups = [];
         if (! in_array($driver, ['sqlite', 'mysql'], true) || $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) !== $driver) {
             $this->reject();
         }
@@ -139,9 +144,9 @@ final class IdentityMigrationOwnership
                 }
             }
         } else {
-            $namedTables = $this->lookups($pdo, CatalogRead::QEDBF704DA857,
+            $namedTables = $this->groupLookups($pdo, CatalogGroup::I0_IDENTITY_NAMESPACE, CatalogRead::QEDBF704DA857,
                 [...$parents, ...$tables, ...array_keys($guards), ...$reserved]);
-            $namedTriggers = $this->lookups($pdo, CatalogRead::QDE6EB7150A9B,
+            $namedTriggers = $this->groupLookups($pdo, CatalogGroup::I0_IDENTITY_NAMESPACE, CatalogRead::QDE6EB7150A9B,
                 [...$reserved, ...array_keys($guards), ...$tables]);
             foreach ([...$parents, ...$tables] as $table) {
                 $rows = $namedTables[$table];
@@ -202,8 +207,8 @@ final class IdentityMigrationOwnership
                     $this->reject();
                 }
             }
-            $namedIndexes = $this->lookups($pdo, CatalogRead::QECFE2D2F4FCD, $reserved);
-            $namedConstraints = $this->lookups($pdo, CatalogRead::Q6546FD85F02A, $reserved);
+            $namedIndexes = $this->groupLookups($pdo, CatalogGroup::I2_RESERVED_NAMES, CatalogRead::QECFE2D2F4FCD, $reserved);
+            $namedConstraints = $this->groupLookups($pdo, CatalogGroup::I2_RESERVED_NAMES, CatalogRead::Q6546FD85F02A, $reserved);
             foreach ($definitions as $table => $definition) {
                 foreach ([...array_keys($definition['unique']), ...array_keys($definition['foreign'])] as $name) {
                     foreach ($namedIndexes[$name] as $index) {
@@ -218,7 +223,7 @@ final class IdentityMigrationOwnership
                     }
                 }
             }
-            $this->dependents($pdo, $tables, $guards);
+            $this->dependents($pdo, $tables, $guards, true);
         }
         $missing = false;
         foreach ($present as $installed) {
@@ -258,6 +263,7 @@ final class IdentityMigrationOwnership
     {
         $this->database = null;
         $this->batches = [];
+        $this->groups = [];
         if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) !== 'mysql') {
             $this->reject();
         }
@@ -437,9 +443,10 @@ final class IdentityMigrationOwnership
     }
 
     /** No foreign trigger, key, view or routine depends on the identity tables (MySQL). */
-    private function dependents(PDO $pdo, array $tables, array $guards): void
+    private function dependents(PDO $pdo, array $tables, array $guards, bool $full = false): void
     {
-        foreach (CatalogLease::read($pdo, CatalogRead::Q7BC108FBFFA5) as $object) {
+        $group = $full ? CatalogLease::group($pdo, CatalogGroup::D0_FULL_DEPENDENTS, $this->accountVersion) : null;
+        foreach (($group === null ? CatalogLease::read($pdo, CatalogRead::Q7BC108FBFFA5) : $group[CatalogRead::Q7BC108FBFFA5->value]['']) as $object) {
             if (isset($guards[$object['TRIGGER_NAME']]) && $object['TRIGGER_SCHEMA'] === $this->database($pdo)) {
                 continue;
             }
@@ -448,14 +455,14 @@ final class IdentityMigrationOwnership
                 $this->reject();
             }
         }
-        foreach (CatalogLease::read($pdo, CatalogRead::Q037BE6D6C820) as $key) {
+        foreach (($group === null ? CatalogLease::read($pdo, CatalogRead::Q037BE6D6C820) : $group[CatalogRead::Q037BE6D6C820->value]['']) as $key) {
             if (in_array(strtolower((string) $key['REFERENCED_TABLE_NAME']), $tables, true)
                 && ($key['TABLE_SCHEMA'] !== $this->database($pdo) || ! in_array($key['TABLE_NAME'], $tables, true))) {
                 $this->reject();
             }
         }
         foreach (['VIEWS' => ['TABLE_SCHEMA', 'VIEW_DEFINITION'], 'ROUTINES' => ['ROUTINE_SCHEMA', 'ROUTINE_DEFINITION']] as $catalog => [$schema, $column]) {
-            foreach (CatalogLease::read($pdo, CatalogRead::dependencies($catalog)) as $object) {
+            foreach (($group === null ? CatalogLease::read($pdo, CatalogRead::dependencies($catalog)) : $group[CatalogRead::dependencies($catalog)->value]['']) as $object) {
                 if ($this->dependsOn($pdo, $object[$schema], $object[$column], $tables)) {
                     $this->reject();
                 }
@@ -476,11 +483,11 @@ final class IdentityMigrationOwnership
         }
         if ($driver === 'mysql') {
             $names = array_keys($namespace);
-            $exact = ['tables' => $this->lookups($pdo, CatalogRead::QA8762690E619, $names),
-                'triggers' => $this->lookups($pdo, CatalogRead::Q38A05D78DB1E, $names)];
+            $exact = ['tables' => $this->groupLookups($pdo, CatalogGroup::P0_PARENT_NAMESPACE, CatalogRead::QA8762690E619, $names),
+                'triggers' => $this->groupLookups($pdo, CatalogGroup::P0_PARENT_NAMESPACE, CatalogRead::Q38A05D78DB1E, $names)];
             foreach ([['ROUTINES', 'ROUTINE_SCHEMA', 'ROUTINE_NAME'], ['EVENTS', 'EVENT_SCHEMA', 'EVENT_NAME'],
                 ['STATISTICS', 'TABLE_SCHEMA', 'INDEX_NAME'], ['TABLE_CONSTRAINTS', 'CONSTRAINT_SCHEMA', 'CONSTRAINT_NAME']] as [$dictionary, $schema, $column]) {
-                $exact[$dictionary] = $this->lookups($pdo, CatalogRead::namespace($dictionary), $names);
+                $exact[$dictionary] = $this->groupLookups($pdo, CatalogGroup::P0_PARENT_NAMESPACE, CatalogRead::namespace($dictionary), $names);
             }
         }
         foreach ($namespace as $name => [$kind, $owner]) {
@@ -590,7 +597,7 @@ final class IdentityMigrationOwnership
                 }
             }
         }
-        $bodies = $driver === 'sqlite' ? [] : $this->lookups($pdo, CatalogRead::Q95556A0350AB, array_keys($guards));
+        $bodies = $driver === 'sqlite' ? [] : $this->groupLookups($pdo, CatalogGroup::P2_PARENT_GUARDS, CatalogRead::Q95556A0350AB, array_keys($guards));
         foreach ($guards as $name => $guard) {
             $expected = $driver === 'sqlite' ? [['sql' => $guard['sql']]] : [['EVENT_OBJECT_TABLE' => $guard['table'], 'EVENT_MANIPULATION' => $guard['event'], 'ACTION_TIMING' => $guard['timing'] ?? 'BEFORE', 'ACTION_STATEMENT' => $guard['body']]];
             $actual = $driver === 'sqlite' ? $this->query($pdo, "SELECT sql FROM main.sqlite_master WHERE type='trigger' AND name=?", [$name])
@@ -637,7 +644,8 @@ final class IdentityMigrationOwnership
 
     private function parentGuards(PDO $pdo, string $driver, bool $accountUpgrade): array
     {
-        $state = $accountUpgrade ? AccountAdmissionGuards::migrationState($pdo, $driver) : AccountAdmissionGuards::stable($pdo, $driver);
+        $state = $accountUpgrade ? AccountAdmissionGuards::identityParentMigrationState($pdo, $driver) : AccountAdmissionGuards::identityParentStable($pdo, $driver);
+        $this->accountVersion = $state['version'];
         $guards = $state['guards'];
         foreach (['update', 'delete'] as $operation) {
             $name = 'quote_owners_immutable_'.$operation;
@@ -793,7 +801,13 @@ final class IdentityMigrationOwnership
     /** One name's rows from a per-inspection batch of the same single-name statement over all $names. */
     private function named(PDO $pdo, CatalogRead $sql, string $name, array $names): array
     {
-        $this->batches[$sql->value] ??= $this->lookups($pdo, $sql, $names);
+        $group = match ($sql) {
+            CatalogRead::Q9D29C0ADA7EE,CatalogRead::QD9E74E9B8F9D,CatalogRead::Q54EFEC87F80D,CatalogRead::QD29EA5375536,CatalogRead::Q357FD211BAA0 => CatalogGroup::P1_PARENT_SHAPE,
+            CatalogRead::QB2684ECFE856 => CatalogGroup::P2_PARENT_GUARDS,
+            CatalogRead::Q88ED11D61B97,CatalogRead::Q603824C0D074,CatalogRead::Q26706FA791A1,CatalogRead::QD3A32C45A22D => CatalogGroup::I1_IDENTITY_SHAPE,
+            default => null,
+        };
+        $this->batches[$sql->value] ??= $group === null ? $this->lookups($pdo, $sql, $names) : $this->groupLookups($pdo, $group, $sql, $names);
 
         return $this->batches[$sql->value][$name] ?? throw new LogicException('Unbatched identity dictionary name.');
     }
@@ -810,6 +824,17 @@ final class IdentityMigrationOwnership
     private function lookups(PDO $pdo, CatalogRead $sql, array $names): array
     {
         return CatalogLease::identity($pdo, $sql, $names);
+    }
+
+    private function groupLookups(PDO $pdo, CatalogGroup $group, CatalogRead $query, array $names): array
+    {
+        $this->groups[$group->value] ??= CatalogLease::group($pdo, $group, $this->accountVersion);
+        $rows = $this->groups[$group->value][$query->value] ?? throw new LogicException('Closed group family required.');
+        if (array_keys($rows) !== array_values(array_unique($names))) {
+            throw new LogicException('Closed group name recipe required.');
+        }
+
+        return $rows;
     }
 
     /** Read once per inspection; the per-row comparisons below previously re-queried it. */
