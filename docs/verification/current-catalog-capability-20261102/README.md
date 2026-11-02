@@ -92,3 +92,67 @@ before/identity/migration-dependent/consent/after proofs share one scoped native
 companion and close BEFORE existing DDL. Existing same-primary advisory lock,
 no-active-TX, per-DDL reinspection/order/overlap/ledger/down/rollback semantics
 are unchanged. No migration file or historical factory output is edited.
+
+Pre-freeze review issue (OPEN, root source feedback, not a native failure):
+post-connect UUID/role/TLS comparison alone cannot prevent a coherently tampered
+raw+resolved endpoint descriptor from sending credentials to a foreign target
+BEFORE refusal. A fail-closed PRE-CONSTRUCTION target-to-captured-primary binding
+is mandatory before candidate freeze. PDO host info+server @@port catches common
+direct-profile mismatches but does not alone prove original forwarded/NAT peer
+port or DNS target. A process-owned native socket tuple binding is under narrow
+assessment; no product target-binding completeness is claimed yet. No new PDO
+has been constructed/executed in preparation. Keep source unaccepted until this
+boundary and its negatives are coherent and independently reviewed.
+
+`@@SESSION.transaction_isolation` is a SESSION DEFAULT, not proof of active
+one-shot SET TRANSACTION isolation. New private context names it session_isolation;
+actual primary physical transaction/witness/committed-frame mode remains with
+existing owners (the committed data-rights frame deliberately uses one-shot RC).
+No primary isolation or transaction behavior is changed.
+
+Additional preserved-read/lifecycle details in the in-progress batch:
+primary and companion must retain natural PDO CASE and NULL coercion, native
+statement/error/emulation/stringify/persistence attributes. Moving catalogs must
+not hide a primary read-semantic mutation formerly exposed by its own metadata
+rows. Any failed frame consultation permanently unregisters/closes ONLY the
+schema proof memo and companion; physical business transaction/witness remain
+owned. If the caller restores a rejected session setting, later guards use the
+existing COMPLETE unframed fallback, never a silently replaced memo companion.
+Explicit lease holder counts force PDO closure and registry removal at last
+lease even if an exception/debug reference retains the capability object.
+
+Factory counts use the fresh server Questions snapshot (including its own read
+and any native constructor SQL), then every setup/context/catalog statement;
+primary Questions delta includes primary capture/transport checks. Full110 and
+memo15 are unchanged totals, with handshake count/time reported separately.
+New native accounting regression compares the companion meter with actual
+server Questions rather than assuming API calls alone cover hidden setup.
+
+New native-only test source in CurrentCatalogAdmissionTest has SIX methods:
+- test_native_nested_boundary_reuses_one_companion_and_last_close_releases_server_session
+- test_native_companion_statement_accounting_matches_server_including_constructor_setup_and_context
+- test_native_primary_attribute_changes_invalidate_retained_companion_without_reconnect
+- test_native_failed_memo_ends_companion_and_restoration_uses_complete_unframed_proof
+- test_native_raw_config_and_resolver_callbacks_refuse_before_factory_or_callback_execution
+- test_native_unframed_complete_proofs_refuse_new_namespace_under_early_primary_snapshot
+All are UNEXECUTED. SQLite condition: DB driver is not mysql; exact shared reason
+`Native MySQL catalog companion sessions and primary RR authority.`
+Existing native early-RR, full110, memo15/terminal, namespace/dependent and
+MembershipSchemaProofFrame session-restoration cases remain mandatory/UNRUN on
+this product batch. No shared census/workflow/ledger has been edited.
+
+Root-directed preconstruction binding contract (before new helper edit): add
+ProductionIdentity/CatalogSocketBinding.php plus pure/native-negative test source.
+Initial constructor supports ONLY Linux+mysqlnd+literal-IP direct TCP whose own
+primary client IP/source port identifies exactly one OWN ESTABLISHED kernel
+socket via fixed /proc/self/fd inode and /proc/self/net/tcp{6} snapshots. Select
+by primary own-session client endpoint BEFORE considering requested target;
+require descriptor target equal actual peer and repeat immediately before newPDO.
+Own PROCESSLIST context is piggybacked in existing SQL. Missing/hidden/malformed/
+ambiguous/NAT-association/proc/provider failure refuses before constructor. No
+other PID, arbitrary paths/provider/callback, packet IO, FFI, stream takeover,
+external process or env read. Fixed builtin filesystem/error-handler assumptions
+and race limits must remain explicit. Unix/implicit-localhost/hostname/proxy/
+unprovable profiles initially REFUSE CONSTRUCTION; pure descriptor socket
+precedence/TLS semantics remain supported without claiming constructor support.
+No downgrade to hostinfo+@@port-only proof or credential-bearing target probe.
