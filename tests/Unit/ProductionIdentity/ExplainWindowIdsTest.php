@@ -94,4 +94,22 @@ final class ExplainWindowIdsTest extends TestCase
             self::assertTrue(true);
         }
     }
+
+    public function test_anonymous_nonwindow_wrappers_reset_ownership_without_borrowing_outer_or_sibling_ids(): void
+    {
+        self::assertSame([], ExplainWindowIds::collect(['query_block' => ['union_result' => ['query_specifications' => []]]]));
+        self::assertSame([9], ExplainWindowIds::collect(['query_block' => ['select_id' => 7, 'query_block' => ['query_specifications' => [['query_block' => ['select_id' => 9, 'ordering_operation' => ['windowing' => []]]]]]]]));
+        $bad = [['query_block' => ['windowing' => []]],
+            ['query_block' => ['select_id' => 7, 'query_block' => ['ordering_operation' => ['windowing' => []]]]],
+            ['query_block' => ['query_specifications' => [['query_block' => ['select_id' => 9]], ['ordering_operation' => ['windowing' => []]]]]],
+            ['query_block' => ['select_id' => null]], ['query_block' => ['select_id' => '9']], ['query_block' => ['select_id' => false]], ['query_block' => ['select_id' => 1000001]], ['query_block' => false]];
+        foreach ($bad as $plan) {
+            try {
+                ExplainWindowIds::collect($plan);
+                self::fail('Anonymous window borrowed an ID or malformed present ID accepted.');
+            } catch (LogicException) {
+                self::assertTrue(true);
+            }
+        }
+    }
 }

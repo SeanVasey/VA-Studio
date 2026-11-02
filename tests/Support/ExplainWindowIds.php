@@ -24,10 +24,10 @@ final class ExplainWindowIds
             foreach ($node as $key => $value) {
                 if ($key === 'query_block') {
                     // A new block is a HARD ownership boundary; never inherit on missing/malformed ID.
-                    if (! is_array($value) || ! isset($value['select_id']) || ! is_int($value['select_id']) || $value['select_id'] < 1 || $value['select_id'] > 1000000) {
+                    if (! is_array($value) || (array_key_exists('select_id', $value) && (! is_int($value['select_id']) || $value['select_id'] < 1 || $value['select_id'] > 1000000))) {
                         throw new LogicException('Malformed query block owner.');
                     }
-                    $walk($value, $value['select_id'], $depth + 1);
+                    $walk($value, array_key_exists('select_id', $value) ? $value['select_id'] : null, $depth + 1);
                 } elseif (is_array($value)) {
                     // Table aliases/shared references never supply or carry window ownership.
                     $next = in_array($key, ['table', 'sharing_temporary_table_with'], true) ? null : $owner;
