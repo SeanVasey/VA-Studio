@@ -18,6 +18,7 @@ use ReflectionProperty;
 use Tests\Support\ExplainFamilyProjection;
 use Tests\Support\ExplainNoteSnapshot;
 use Tests\Support\ExplainPrepareSnapshot;
+use Tests\Support\ExplainWindowIds;
 use Tests\Support\ProductionIdentityFixture;
 use Tests\TestCase;
 
@@ -196,12 +197,9 @@ final class CatalogGroupDifferentialTest extends TestCase
                     $explain = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
                     $materialized = 0;
                     $shared = 0;
-                    $windowIds = [];
+                    $windowIds = ExplainWindowIds::collect($explain);
                     $sharedIds = [];
-                    $walk = function (array $node) use (&$walk, &$materialized, &$shared, &$windowIds, &$sharedIds): void {
-                        if (isset($node['windowing'],$node['select_id'])) {
-                            $windowIds[] = $node['select_id'];
-                        }
+                    $walk = function (array $node) use (&$walk, &$materialized, &$shared, &$sharedIds): void {
                         foreach ($node as $key => $value) {
                             if ($key === 'materialized_from_subquery') {
                                 $materialized++;

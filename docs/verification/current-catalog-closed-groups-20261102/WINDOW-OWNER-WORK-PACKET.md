@@ -1,0 +1,14 @@
+# Structural window-owner correction — SOURCE ONLY, before runtime/commit
+
+Own test-only ExplainWindowIds collector, additive3pure tests, featurewalker IDcollection seam, thispacket. Actualfcf projection proves all7 A1windows/sharingIDs, last2 windows nested underordering_operation with nearestquery_block50/59; oldco-location logic counts5. Collector resolves ONLY nearest actualquery_block/nativepositiveintegerID, hardreset/refusal at EACH malformed/missing nestedblock; scopebyvalue sibling-safe, noowner fromtablealias/sharedref/arbitraryselect_id. Alloriginalexactcount/perIDsharing/materialized/sharedminima/dedup/familycoverage/SQL/bind/fixture/sequence/warning policies unchanged. No application/database/compiler/factory change.
+
+PureSOURCE authentic7familyshape reproducesold5→correct7withunchangedexpectation; direct/nested/sibling/orphan/malformed/nestedboundary/sharedreference/tablealias negatives prepared. Existing resultauthority remainsoriginal assertions. All11streams36families unrun atpatch, historicalfailures retained. Root+independentreview required beforePHP/runtime/commit/native. No PHP/Docker/SQL/probe/process action performed. Suggested staticcommands same pinned boundedcheckharness: scopedPintformat3files,3lints,Pint--test,bootstrap-freecatalog-pure-phpunit --no-configuration tests/Unit/ProductionIdentity tests/Unit/AccountAdmissionGuardDefinitionTest.php. Actualchecks PENDINGrootreview/slot, no passingclaim.
+
+
+## Actual final checks / P2 controls
+
+Rootauthorized4thgenericpuremethod adds exactownerID1000000positive/1000001refusal, duplicatewindowsdedup, depth/8192visitedcaps, unchangednativeper-IDoracleexpression []===array_values(array_diff(windowIDs,sharedIDs)) rejectingmissingref. Authenticminimalnative shape old5→correct7 uses SAMEseven expectedIDs; existingoracle count stays7. Collector behavior changed only routinePintformat after reviewedfd98source, no newalgorithm.
+
+Actualimmutable receipt `/workspace/account-guard-evidence-20261101/window-owner-static-01.json` SHA719bc8c22e6ebbcd6246ddde1d17c9b5a518c17b4e9045426cc39bbcbb1bf17f:6sequentialCLI0/reaped/EOF/emptystderr, scopedPintformat3files(two routineSupport/unitstylefixes;featureunchanged),3php-l,Pint--test,bootstrap-freepureselection. Actual57tests/1446assertions/PHP8.4.27/1.509s. Pinnedruntime640... as1000/runtime60TERM5/host75/128KiB. Final3sourcehashes matchreceipt. Noapplicationbootstrap/PDO/DB/native; noownedprocessactive/slotreturned. Earlier pendingcheckstext preparationhistory superseded here.
+
+Finalnativeexactcount/perIDsharing/materialized+sharedminima/completefamilycoverage tail byte-identicalfcf fromfirstcountassertion onward. AlloriginalSQL/binds/fixtures/order/warningproofs unchanged. ProductionApp/databasediffEMPTY. Fourgenericpuremethods new; nativecount/skipreason unchanged(rootownscensus). Exactpatchreviewbeforecommit/native required; no nativeexecutionatthesebytes, all11/36gatesopen and priorFAILs unchanged.
