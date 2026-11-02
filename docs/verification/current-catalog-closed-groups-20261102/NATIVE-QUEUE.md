@@ -21,7 +21,7 @@ Proposed individual method order in CatalogGroupDifferentialTest.php:
 2. test_native_every_fixed_group_matches_original_typed_rows_in_v1_v2_and_ordered_overlap
 3. test_native_window_relations_are_materialized_and_shared_between_headers_and_rows
 4. test_native_view_functional_unordered_indexes_unicode_defaults_aliases_and_global_definitions_match_original
-5. test_native_oversized_complete_catalog_emits_only_invalid_headers_and_refuses_without_losing_primary_witness
+5. test_native_oversized_complete_catalog_refuses_and_releases_failed_companion_preserving_primary_savepoint
 6. test_native_grouped_and_original_parent_entries_both_refuse_partial_and_foreign_guard_sets
 
 Exact command shape (root fills only reviewed SHA/unique label/current own IP):
@@ -60,3 +60,15 @@ all namespace/dependent classes; actual account-PK owner control both orderings,
 generated IDs/FKs/collision/replace/resource evidence. No member gate/mount/main
 acceptance, CI, PR, deploy, headroom or target-host performance follows from this
 source preparation or eventual limited differential success.
+
+Test-only0542 review repair: canonical entry positives are separate from raw
+family comparison. Adverse objects first get raw original/group differential
+and all four expected ownership refusals, then restored canonical positives.
+Partial/foreign negatives have all-four version/fingerprint positives before
+and after each mutation. Overflow adds visible-owned-session positive, failed
+capability and registry non-reuse, unchanged constructor attempt counter, no
+retained native PDO, bounded session-release samples, and primary transaction/
+savepoint preservation. This is NOT full frame witness/MDL/terminal composition.
+Warning reflection remains getter/EOF/shared primitive proof ONLY; not an
+organically warned production group execution or full invalidation proof.
+ALL six methods remain UNRUN;0542 queue was held and never executed.

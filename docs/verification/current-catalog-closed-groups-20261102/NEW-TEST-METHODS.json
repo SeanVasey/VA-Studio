@@ -14,7 +14,7 @@
       "test_native_view_functional_unordered_indexes_unicode_defaults_aliases_and_global_definitions_match_original",
       "test_native_warning_count_observes_prepare_execute_full_eof_without_sql_and_rejects_warned_transport",
       "test_native_window_relations_are_materialized_and_shared_between_headers_and_rows",
-      "test_native_oversized_complete_catalog_emits_only_invalid_headers_and_refuses_without_losing_primary_witness",
+      "test_native_oversized_complete_catalog_refuses_and_releases_failed_companion_preserving_primary_savepoint",
       "test_native_grouped_and_original_parent_entries_both_refuse_partial_and_foreign_guard_sets"
     ]
   },

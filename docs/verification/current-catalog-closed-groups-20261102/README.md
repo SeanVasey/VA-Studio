@@ -151,3 +151,36 @@ Historical SOURCE-SHA256.json and STATIC-DESIGN-CHECK.json pin the prior docs-on
 candidate. Original full133FAIL and memo14PASS receipts are copied byte exact;
 133>110 remains the binding failed gate until an actual reviewed candidate passes
 unchanged acceptance. Theoretical107 is capacity arithmetic only, never a promise.
+
+## Test/packet-only review repair BEFORE edit
+
+Read complete independent source decision0542: one source-predicted test composition
+P1 (canonical admission called after publishing forbidden objects), no confirmed
+new product bypass. Own only CatalogGroupDifferentialTest.php and this packet.
+Split direct canonical entry positives from raw family comparison; prove all four
+entries before/after guard negatives, and original/grouped refusal after adverse
+raw equivalence. Overflow proof must additionally show failed capability cannot
+reuse/reconnect and its actual companion session releases without a retained PDO
+reflection reference. Retain primary transaction/savepoint control explicitly;
+this is NOT full SchemaProofFrame witness/MDL/terminal composition. Warning
+reflection is getter/EOF/shared refusal-primitive proof only. All production/runtime
+bytes stay EXACT0542; no native execution/profiler/PFS/global action authorized.
+
+Final TEST/packet-only repair checks: target feature file lint/Pint--test PASS;
+exact cheap pure selection40tests/912assertions PASS,PHP8.4.27,exit0. Actual
+commands/results and all30 current source hashes are in
+closed-group-test-repair-{static,pure}.json. All app/runtime/database/config/
+Composer/old fixture bytes are IDENTICAL to0542 (empty scoped Git diff), so
+production source assessment remains scoped there; only the one new feature
+proof source changed. IMPLEMENTATION-SOURCE-SHA256.txt maps the current bytes;
+prior closed-group-final receipts remain historical0542 evidence. Expected
+LogicExceptions cannot mask never-working entries because complete direct
+version/fingerprint positives now run for all four entries before and after
+each negative mutation. Raw adverse differential never invokes canonical
+admission first. Failed-capability/public registry reuse both refuse without
+new construction; native PDO reflection references are unset before refusal,
+then private property NULL and actual previously visible session disappearance
+are required. Overflow is transaction/savepoint control only, not full witness
+or MDL acceptance. All original strict typed/multiset/order/oversize/EXPLAIN
+oracles remain. No new methods/skips; six native methods UNRUN. No native/DB/
+bootstrap/profiler/PFS/global/CI/push/PR action occurred in this repair.

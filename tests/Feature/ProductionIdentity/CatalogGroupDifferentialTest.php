@@ -37,23 +37,28 @@ final class CatalogGroupDifferentialTest extends TestCase
         $connection = DB::connection();
         $pdo = $connection->getPdo();
         $upgrade = new AccountAdmissionUpgrade;
-        $this->compareAll(AccountAdmissionGuards::V2);
+        $this->assertCanonicalEntries(AccountAdmissionGuards::V2);
+        $this->compareRawFamilies(AccountAdmissionGuards::V2);
         $upgrade->down($connection);
         try {
-            $this->compareAll(AccountAdmissionGuards::V1);
+            $this->assertCanonicalEntries(AccountAdmissionGuards::V1);
+            $this->compareRawFamilies(AccountAdmissionGuards::V1);
             $guard = AccountAdmissionGuards::definitions('mysql', AccountAdmissionGuards::OVERLAP)[AccountAdmissionGuards::NEW_INSERT];
             $sql = str_replace('FOR EACH ROW ', 'FOR EACH ROW FOLLOWS `'.AccountAdmissionGuards::OLD_INSERT.'` ', $guard['sql']);
             $pdo->exec($sql);
-            $this->compareAll(AccountAdmissionGuards::OVERLAP);
+            $this->assertCanonicalEntries(AccountAdmissionGuards::OVERLAP);
+            $this->compareRawFamilies(AccountAdmissionGuards::OVERLAP);
         } finally {
             $upgrade->up($connection);
         }
+        $this->assertCanonicalEntries(AccountAdmissionGuards::V2);
     }
 
     public function test_native_view_functional_unordered_indexes_unicode_defaults_aliases_and_global_definitions_match_original(): void
     {
         $pdo = DB::connection()->getPdo();
         self::assertSame(0, (int) $pdo->query('SELECT @@lower_case_table_names')->fetchColumn(), 'This literal-name native profile requires exact case-distinct dictionary objects.');
+        $this->assertCanonicalEntries(AccountAdmissionGuards::V2);
         $created = [];
         try {
             foreach ([
@@ -67,7 +72,7 @@ final class CatalogGroupDifferentialTest extends TestCase
                 $pdo->exec($sql);
                 $created[] = $undo;
             }
-            $this->compareAll(AccountAdmissionGuards::V2);
+            $this->compareRawFamilies(AccountAdmissionGuards::V2);
             $lease = CatalogLease::open($pdo);
             try {
                 $shape = CatalogLease::group($pdo, CatalogGroup::P1_PARENT_SHAPE);
@@ -77,11 +82,13 @@ final class CatalogGroupDifferentialTest extends TestCase
                 $namespace = CatalogLease::group($pdo, CatalogGroup::I0_IDENTITY_NAMESPACE);
                 self::assertNotEmpty(array_filter($namespace[CatalogRead::QEDBF704DA857->value]['customer_accounts'], fn (array $r): bool => $r['TABLE_NAME'] === 'CUSTOMER_ACCOUNTS' && $r['ENGINE'] === null && $r['TABLE_COLLATION'] === null));
                 // Facts remain representable; accepting these altered ownership schemas is never authorized.
-                try {
-                    AccountAdmissionGuards::stable($pdo, 'mysql');
-                    self::fail('Reserved foreign event admitted.');
-                } catch (LogicException) {
-                    self::assertTrue(true);
+                foreach (['stable', 'identityParentStable', 'migrationState', 'identityParentMigrationState'] as $entry) {
+                    try {
+                        AccountAdmissionGuards::$entry($pdo, 'mysql');
+                        self::fail('Reserved foreign event admitted.');
+                    } catch (LogicException) {
+                        self::assertTrue(true);
+                    }
                 }
             } finally {
                 $lease->close();
@@ -91,6 +98,7 @@ final class CatalogGroupDifferentialTest extends TestCase
                 $pdo->exec($undo);
             }
         }
+        $this->assertCanonicalEntries(AccountAdmissionGuards::V2);
     }
 
     public function test_native_warning_count_observes_prepare_execute_full_eof_without_sql_and_rejects_warned_transport(): void
@@ -194,7 +202,7 @@ final class CatalogGroupDifferentialTest extends TestCase
         }
     }
 
-    public function test_native_oversized_complete_catalog_emits_only_invalid_headers_and_refuses_without_losing_primary_witness(): void
+    public function test_native_oversized_complete_catalog_refuses_and_releases_failed_companion_preserving_primary_savepoint(): void
     {
         $connection = DB::connection();
         $pdo = $connection->getPdo();
@@ -209,6 +217,11 @@ final class CatalogGroupDifferentialTest extends TestCase
             $lease = CatalogLease::open($pdo);
             $catalog = (new ReflectionProperty($lease, 'catalog'))->getValue($lease);
             $native = (new ReflectionProperty($catalog, 'catalog'))->getValue($catalog);
+            $companionId = (int) $native->query('SELECT CONNECTION_ID()')->fetchColumn();
+            $visible = $pdo->prepare('SELECT COUNT(*) FROM performance_schema.threads WHERE PROCESSLIST_ID=?');
+            $visible->execute([$companionId]);
+            self::assertSame(1, (int) $visible->fetchColumn(), 'Positive owned companion visibility before teardown.');
+            $visible->closeCursor();
             $plan = CatalogGroupPlan::build(CatalogGroup::D0_FULL_DEPENDENTS, AccountAdmissionGuards::V2);
             self::assertTrue($native->setAttribute(Mysql::ATTR_USE_BUFFERED_QUERY, false));
             $statement = $native->prepare($plan['sql']);
@@ -229,12 +242,42 @@ final class CatalogGroupDifferentialTest extends TestCase
             self::assertSame(array_sum(array_map(fn (array $f): int => count($f['names']), $plan['families'])), $headers);
             self::assertLessThanOrEqual(16777216, $wireBytes);
             unset($statement,$native,$catalog);
+            $beforeAttempts = CurrentCatalog::accounting()['connection_attempts'];
             try {
                 CatalogLease::group($pdo, CatalogGroup::D0_FULL_DEPENDENTS);
                 self::fail('Oversized catalog partially admitted.');
             } catch (LogicException) {
                 self::assertTrue(true);
             }
+            $failed = (new ReflectionProperty($lease, 'catalog'))->getValue($lease);
+            self::assertNull((new ReflectionProperty($failed, 'catalog'))->getValue($failed), 'No reflected native PDO remains to prevent release.');
+            foreach ([
+                fn () => $failed->group(CatalogGroup::D0_FULL_DEPENDENTS, AccountAdmissionGuards::V2),
+                fn () => CatalogLease::read($pdo, CatalogRead::GlobalViews),
+            ] as $retry) {
+                try {
+                    $retry();
+                    self::fail('Failed capability reused or transparently replaced.');
+                } catch (LogicException) {
+                    self::assertTrue(true);
+                }
+            }
+            self::assertSame($beforeAttempts, CurrentCatalog::accounting()['connection_attempts']);
+            $release = $pdo->prepare('SELECT COUNT(*) FROM performance_schema.threads WHERE PROCESSLIST_ID=?');
+            $releaseDeadline = hrtime(true) + 1000000000;
+            $releaseSamples = [];
+            do {
+                $release->execute([$companionId]);
+                $remaining = (int) $release->fetchColumn();
+                $release->closeCursor();
+                $releaseSamples[] = $remaining;
+                if ($remaining === 0) {
+                    break;
+                }
+                usleep(150000);
+            } while (hrtime(true) < $releaseDeadline);
+            fwrite(STDERR, 'overflow companion release samples: '.json_encode($releaseSamples, JSON_THROW_ON_ERROR)."\n");
+            self::assertSame(0, $remaining, 'Failed companion must actually disappear from server sessions.');
             self::assertTrue($pdo->inTransaction());
             $pdo->exec('ROLLBACK TO SAVEPOINT catalog_group_overflow');
         } finally {
@@ -252,6 +295,7 @@ final class CatalogGroupDifferentialTest extends TestCase
     public function test_native_grouped_and_original_parent_entries_both_refuse_partial_and_foreign_guard_sets(): void
     {
         $pdo = DB::connection()->getPdo();
+        $this->assertCanonicalEntries(AccountAdmissionGuards::V2);
         $guard = AccountAdmissionGuards::definitions('mysql', AccountAdmissionGuards::V2)['customer_accounts_update'];
         $pdo->exec('DROP TRIGGER customer_accounts_update');
         try {
@@ -266,6 +310,7 @@ final class CatalogGroupDifferentialTest extends TestCase
         } finally {
             $pdo->exec($guard['sql']);
         }
+        $this->assertCanonicalEntries(AccountAdmissionGuards::V2);
         $pdo->exec('CREATE TRIGGER catalog_diff_foreign BEFORE INSERT ON customer_accounts FOR EACH ROW SET @catalog_diff_foreign=1');
         try {
             foreach (['stable', 'identityParentStable', 'migrationState', 'identityParentMigrationState'] as $entry) {
@@ -279,12 +324,19 @@ final class CatalogGroupDifferentialTest extends TestCase
         } finally {
             $pdo->exec('DROP TRIGGER catalog_diff_foreign');
         }
+        $this->assertCanonicalEntries(AccountAdmissionGuards::V2);
     }
 
-    private function compareAll(string $version): void
+    private function assertCanonicalEntries(string $version): void
     {
         $primary = DB::connection()->getPdo();
-        self::assertSame(AccountAdmissionGuards::migrationState($primary, 'mysql'), AccountAdmissionGuards::identityParentMigrationState($primary, 'mysql'));
+        $expected = AccountAdmissionGuards::migrationState($primary, 'mysql');
+        foreach (['migrationState', 'identityParentMigrationState', ...($version === AccountAdmissionGuards::OVERLAP ? [] : ['stable', 'identityParentStable'])] as $entry) {
+            $actual = AccountAdmissionGuards::$entry($primary, 'mysql');
+            self::assertSame($version, $actual['version']);
+            self::assertMatchesRegularExpression('/\A[a-f0-9]{64}\z/', $actual['fingerprint']);
+            self::assertSame($expected, $actual, $entry.' complete positive version/fingerprint equivalence');
+        }
         if ($version !== AccountAdmissionGuards::OVERLAP) {
             self::assertSame(AccountAdmissionGuards::stable($primary, 'mysql'), AccountAdmissionGuards::identityParentStable($primary, 'mysql'));
         } else {
@@ -297,6 +349,10 @@ final class CatalogGroupDifferentialTest extends TestCase
                 }
             }
         }
+    }
+
+    private function compareRawFamilies(string $version): void
+    {
         $pdo = DB::connection()->getPdo();
         $lease = CatalogLease::open($pdo);
         try {
