@@ -63,6 +63,10 @@
       "test_sqlite_down_noop_still_refuses_a_missing_guard"
     ],
     [
+      "Tests\\Feature\\ProductionMemberGrants\\MemberActivationCommitWitnessTest",
+      "test_sqlite_real_commit_constraint_failure_keeps_the_activation_pre_commit_refusal"
+    ],
+    [
       "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest",
       "test_sqlite_verified_member_refuses_both_honest_and_mislabeled_configuration_before_factories"
     ],
