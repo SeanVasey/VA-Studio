@@ -49,6 +49,15 @@ final class SchemaProofFrame
     /** @var array<string, string> guard => frame token captured before its last complete proof */
     private array $proofs = [];
 
+    /** @var array<string, array{version: string, fingerprint: string}> exact account state captured under table MDL */
+    private array $accountProofs = [];
+
+    private bool $collectingAccount = false;
+
+    private ?array $pendingAccount = null;
+
+    private ?CatalogLease $catalogLifetime = null;
+
     private bool $terminal = false;
 
     private bool $closed = false;
@@ -70,6 +79,7 @@ final class SchemaProofFrame
 
             return $frame;
         }
+        $frame->catalogLifetime = CatalogLease::open($primary, false);
         self::$frames ??= new WeakMap;
         self::$frames[$primary] = WeakReference::create($frame);
 
@@ -94,6 +104,15 @@ final class SchemaProofFrame
         $frame->consult($guard, $tables, $prove);
     }
 
+    /** Called only after the closed classifier has completed a full stable account proof. */
+    public static function captureAccountProof(PDO $primary, array $state): void
+    {
+        $frame = self::$frames !== null && isset(self::$frames[$primary]) ? self::$frames[$primary]->get() : null;
+        if ($frame instanceof self && $frame->primary === $primary && $frame->collectingAccount) {
+            $frame->pendingAccount = ['version' => $state['version'], 'fingerprint' => $state['fingerprint']];
+        }
+    }
+
     /** Identity base tables whose definitions the identity ownership proof and IdentityRows inspect. */
     public static function identityTables(): array
     {
@@ -105,13 +124,17 @@ final class SchemaProofFrame
     {
         $this->terminal = true;
         $this->proofs = [];
+        $this->accountProofs = [];
     }
 
     /** Forget every proof and unregister; a closed frame never answers from memory again. */
     public function close(): void
     {
         $this->closed = true;
+        $this->catalogLifetime?->close();
+        $this->catalogLifetime = null;
         $this->proofs = [];
+        $this->accountProofs = [];
         if (self::$frames !== null && isset(self::$frames[$this->primary]) && self::$frames[$this->primary]->get() === $this) {
             unset(self::$frames[$this->primary]);
         }
@@ -119,6 +142,27 @@ final class SchemaProofFrame
 
     /** @param  list<string>  $tables */
     private function consult(string $guard, array $tables, Closure $prove): void
+    {
+        $lease = null;
+        try {
+            $lease = CatalogLease::open($this->primary);
+            $this->consultCurrent($guard, $tables, $prove);
+        } catch (Throwable $error) {
+            // A failed companion/proof cannot poison a later complete, unframed guard after caller restoration.
+            // End this memo permanently; never replace its companion or reuse its proof after failure.
+            $this->close();
+            throw $error;
+        } finally {
+            try {
+                $lease?->close();
+            } catch (Throwable $error) {
+                $this->close();
+                throw $error;
+            }
+        }
+    }
+
+    private function consultCurrent(string $guard, array $tables, Closure $prove): void
     {
         $token = $this->terminal || $this->closed ? null : $this->token();
         if ($token === null) {
@@ -129,16 +173,39 @@ final class SchemaProofFrame
         if (($this->proofs[$guard] ?? null) === $token) {
             if ($this->driver === 'mysql') {
                 (new IdentityMigrationOwnership)->assertNoDependents($this->primary);
+                if (isset($this->accountProofs[$guard])) {
+                    AccountAdmissionGuards::assertUnpinnedNamespace($this->primary);
+                }
             }
 
             return;
         }
-        unset($this->proofs[$guard]);
+        unset($this->proofs[$guard], $this->accountProofs[$guard]);
         $pinned = $this->pin($tables);
-        $prove();
-        // Remember only a proof whose tables are all held and whose token did not move while it ran.
-        if ($pinned && $this->token() === $token) {
+        $accountPinned = $pinned && $this->driver === 'mysql' && in_array('customer_accounts', $tables, true);
+        $previousPending = $this->pendingAccount;
+        $previousCollecting = $this->collectingAccount;
+        $this->pendingAccount = null;
+        $this->collectingAccount = $accountPinned;
+        $capturedAccount = null;
+        try {
+            $prove();
+            if ($accountPinned && $this->pendingAccount === null) {
+                // A proof not otherwise using the account classifier still captures its exact stable parent version.
+                AccountAdmissionGuards::stable($this->primary, 'mysql');
+            }
+            $capturedAccount = $this->pendingAccount;
+        } finally {
+            $this->collectingAccount = $previousCollecting;
+            $this->pendingAccount = $previousPending;
+        }
+        // Account/table trigger DDL is excluded by the held MDL. Same-session DDL commits and loses the witness;
+        // temporary shadows change the token counters. Non-MDL reserved namespace escapes are rechecked on reuse.
+        if ($pinned && (! $accountPinned || $capturedAccount !== null) && $this->token() === $token) {
             $this->proofs[$guard] = $token;
+            if ($accountPinned) {
+                $this->accountProofs[$guard] = $capturedAccount;
+            }
         }
     }
 

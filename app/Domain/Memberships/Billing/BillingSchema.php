@@ -2,6 +2,8 @@
 
 namespace App\Domain\Memberships\Billing;
 
+use App\Domain\Customers\ProductionIdentity\CatalogLease;
+use App\Domain\Customers\ProductionIdentity\CatalogRead;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipSchema;
 use App\Domain\Memberships\Production\MembershipSchemaCatalog;
@@ -77,149 +79,154 @@ final class BillingSchema
         $pdo = DB::connection()->getPdo();
         $driver = DB::getDriverName();
         BillingException::require(in_array($driver, ['sqlite', 'mysql'], true), 'schema');
-        if (! $billingTablesLocked) {
-            // Membership ownership includes the complete identity parent floor, once.
-            // Plan versions are the 257 parent of every subscription binding.
-            try {
-                (new MembershipSchema)->assertOwned($pdo);
-            } catch (MembershipException $exception) {
-                if ($exception->reason === 'parent_floor') {
-                    throw new BillingException('parent_floor');
-                }
+        $lease = CatalogLease::open($pdo);
+        try {
+            if (! $billingTablesLocked) {
+                // Membership ownership includes the complete identity parent floor, once.
+                // Plan versions are the 257 parent of every subscription binding.
+                try {
+                    (new MembershipSchema)->assertOwned($pdo);
+                } catch (MembershipException $exception) {
+                    if ($exception->reason === 'parent_floor') {
+                        throw new BillingException('parent_floor');
+                    }
 
-                throw $exception;
-            }
-        }
-        if ($driver === 'mysql' && ! $ddl) {
-            // Retained graphs must already contain every table. Pin them before batching;
-            // actual transaction ownership and all current SHOW/shadow checks remain separate.
-            foreach (self::TABLES as $logical) {
-                try {
-                    $pdo->query('SELECT * FROM '.$this->table($logical).' LIMIT 0')->fetchAll(PDO::FETCH_ASSOC);
-                } catch (\PDOException) {
-                    throw new BillingException('schema');
+                    throw $exception;
                 }
             }
-        }
-        $retrievalStage ??= $this->hasRetrievalColumns($pdo, $driver) ? BillingRetrievalSchema::COMPLETE : 0;
-        $catalog = $driver === 'mysql' ? new MembershipSchemaCatalog($pdo) : null;
-        $this->assertNamespace($pdo, $driver, $billingTablesLocked, $catalog, $retrievalStage);
-        // The later fence is optional for historical migrations, but never an unowned extra trigger.
-        (new BillingAwardFence)->assertEventGuardIfPresent($pdo, $billingTablesLocked);
-        $plans = [];
-        $absent = false;
-        $prefixEnded = false;
-        foreach (self::TABLES as $logical) {
-            $table = $this->table($logical);
-            $name = DB::connection()->getTablePrefix().$logical;
-            $definition = $this->definition($logical, $driver, $retrievalStage);
-            $create = 'CREATE TABLE '.$table.' ('.$definition['sql'].')'.($driver === 'mysql' ? ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin' : '');
-            $guards = $this->guards($logical, $driver, $name, $table, $retrievalStage);
-            $allowedGuards = array_keys($guards);
-            if ($logical === self::TABLES[3]) {
-                $allowedGuards[] = (new BillingAwardFence)->eventGuardName();
-            }
-            if ($driver === 'sqlite') {
-                $statement = $pdo->prepare('SELECT name, tbl_name FROM sqlite_temp_master');
-                $statement->execute();
-                foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $object) {
-                    BillingException::require(! in_array(strtolower($object['name']), array_map(strtolower(...), [$name, ...array_keys($guards)]), true) && strtolower($object['tbl_name']) !== strtolower($name), 'shadowed_schema');
-                }
-                $statement = $pdo->prepare('SELECT name, type, sql FROM main.sqlite_master WHERE lower(name) = lower(?)');
-                $statement->execute([$name]);
-                $objects = $statement->fetchAll(PDO::FETCH_ASSOC);
-                BillingException::require(count($objects) <= 1 && ($objects === [] || $objects[0]['name'] === $name), 'schema_namespace');
-                $actual = $objects[0] ?? false;
-                if ($actual !== false) {
-                    BillingException::require($actual['type'] === 'table' && $this->sql($actual['sql']) === $this->sql(str_replace('main.', '', $create)), 'schema');
-                    $indexes = $pdo->query('PRAGMA main.index_list("'.$name.'")')->fetchAll(PDO::FETCH_ASSOC);
-                    BillingException::require(count($indexes) === $this->autoindexes($logical, $driver) + count($definition['extra_unique']), 'schema');
-                    foreach ($definition['extra_unique'] as $suffix => $parts) {
-                        $index = $name.'_'.$suffix;
-                        $matches = array_values(array_filter($indexes, fn (array $row): bool => $row['name'] === $index));
-                        BillingException::require(count($matches) === 1 && $matches[0]['unique'] === 1 && $matches[0]['origin'] === 'c' && $matches[0]['partial'] === 0, 'schema');
-                        $actualParts = $pdo->query('PRAGMA main.index_info("'.$index.'")')->fetchAll(PDO::FETCH_ASSOC);
-                        BillingException::require(array_column($actualParts, 'name') === $parts, 'schema');
-                    }
-                }
-                $statement = $pdo->prepare("SELECT name FROM main.sqlite_master WHERE type = 'trigger' AND tbl_name = ?");
-                $statement->execute([$name]);
-                BillingException::require(array_diff($statement->fetchAll(PDO::FETCH_COLUMN), $allowedGuards) === [], 'schema');
-            } else {
-                $objects = $catalog->named('SELECT TABLE_NAME, TABLE_TYPE, ENGINE, TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND BINARY TABLE_SCHEMA = BINARY DATABASE() AND lower(TABLE_NAME) = lower(?)', $this->mysqlNames(), $name);
-                BillingException::require(count($objects) <= 1 && ($objects === [] || $objects[0]['TABLE_NAME'] === $name), 'schema_namespace');
-                $actual = $objects[0] ?? false;
-                if ($actual !== false) {
-                    unset($actual['TABLE_NAME']);
-                }
-                // SHOW also resolves a local temporary table when no durable table exists.
-                try {
-                    $shown = $pdo->query('SHOW CREATE TABLE '.$table)->fetch(PDO::FETCH_NUM);
-                    BillingException::require(! str_contains(strtoupper($shown[1]), 'TEMPORARY'), 'shadowed_schema');
-                } catch (\PDOException $error) {
-                    if ($actual !== false || $error->getCode() !== '42S02') {
-                        throw $error;
-                    }
-                }
-                if ($actual !== false) {
-                    BillingException::require($actual === ['TABLE_TYPE' => 'BASE TABLE', 'ENGINE' => 'InnoDB', 'TABLE_COLLATION' => 'utf8mb4_bin'], 'schema');
-                    $ownedCheck = $this->mysqlDefinition($pdo, $name, $definition, $catalog);
-                    // An earlier dictionary snapshot cannot establish the opened table's current structure.
-                    $this->mysqlShownDefinition($shown[1], $name, $definition, $ownedCheck);
-                }
-                $actualGuards = $catalog->named('SELECT TRIGGER_NAME FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() AND BINARY TRIGGER_SCHEMA = BINARY DATABASE() AND EVENT_OBJECT_TABLE = ?', $this->mysqlNames(), $name);
-                BillingException::require(array_diff(array_column($actualGuards, 'TRIGGER_NAME'), $allowedGuards) === [], 'schema');
-            }
-            BillingException::require(! (($absent || $prefixEnded) && $actual !== false), 'schema_prefix');
-            $absent = $absent || $actual === false;
-            $prefixEnded = $prefixEnded || $actual === false;
-            $missing = [];
-            foreach ($guards as $guard => $expected) {
-                if ($driver === 'sqlite') {
-                    $statement = $pdo->prepare('SELECT name, type, tbl_name, sql FROM main.sqlite_master WHERE lower(name) = lower(?)');
-                    $statement->execute([$guard]);
-                    $objects = $statement->fetchAll(PDO::FETCH_ASSOC);
-                    BillingException::require(count($objects) <= 1 && ($objects === [] || $objects[0]['name'] === $guard), 'schema_namespace');
-                    $row = $objects[0] ?? false;
-                    if ($row !== false) {
-                        BillingException::require($row['type'] === 'trigger' && $row['tbl_name'] === $name && $this->sql($row['sql']) === $this->sql($expected['sql']), 'schema');
-                    }
-                } else {
-                    $objects = $catalog->named('SELECT TRIGGER_NAME, EVENT_OBJECT_TABLE, EVENT_MANIPULATION, ACTION_TIMING, ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE() AND BINARY TRIGGER_SCHEMA = BINARY DATABASE() AND lower(TRIGGER_NAME) = lower(?)', $this->mysqlGuardNames(), $guard);
-                    BillingException::require(count($objects) <= 1 && ($objects === [] || $objects[0]['TRIGGER_NAME'] === $guard), 'schema_namespace');
-                    $row = $objects[0] ?? false;
-                    if ($row !== false) {
-                        BillingException::require($row['EVENT_OBJECT_TABLE'] === $name && $row['EVENT_MANIPULATION'] === $expected['event'] && $row['ACTION_TIMING'] === 'BEFORE' && $this->sql($row['ACTION_STATEMENT']) === $this->sql($expected['body']), 'schema');
-                    }
-                    // The subject is pinned above (or locked by the upgrader). Named SHOW reads
-                    // its current required guard even when information_schema retains an old snapshot.
+            if ($driver === 'mysql' && ! $ddl) {
+                // Retained graphs must already contain every table. Pin them before batching;
+                // actual transaction ownership and all current SHOW/shadow checks remain separate.
+                foreach (self::TABLES as $logical) {
                     try {
-                        $current = $pdo->query('SHOW CREATE TRIGGER `'.$guard.'`')->fetch(PDO::FETCH_ASSOC);
-                        $original = $current['SQL Original Statement'] ?? null;
-                        BillingException::require($row !== false && is_string($original) && ($offset = strpos($original, ' TRIGGER ')) !== false, 'schema');
-                        $wanted = 'TRIGGER `'.$guard.'` BEFORE '.$expected['event'].' ON `'.$name.'` FOR EACH ROW '.$expected['body'];
-                        BillingException::require($this->sql(substr($original, $offset + 1)) === $this->sql($wanted), 'schema');
+                        $pdo->query('SELECT * FROM '.$this->table($logical).' LIMIT 0')->fetchAll(PDO::FETCH_ASSOC);
+                    } catch (\PDOException) {
+                        throw new BillingException('schema');
+                    }
+                }
+            }
+            $retrievalStage ??= $this->hasRetrievalColumns($pdo, $driver) ? BillingRetrievalSchema::COMPLETE : 0;
+            $catalog = $driver === 'mysql' ? new MembershipSchemaCatalog($pdo) : null;
+            $this->assertNamespace($pdo, $driver, $billingTablesLocked, $catalog, $retrievalStage);
+            // The later fence is optional for historical migrations, but never an unowned extra trigger.
+            (new BillingAwardFence)->assertEventGuardIfPresent($pdo, $billingTablesLocked);
+            $plans = [];
+            $absent = false;
+            $prefixEnded = false;
+            foreach (self::TABLES as $logical) {
+                $table = $this->table($logical);
+                $name = DB::connection()->getTablePrefix().$logical;
+                $definition = $this->definition($logical, $driver, $retrievalStage);
+                $create = 'CREATE TABLE '.$table.' ('.$definition['sql'].')'.($driver === 'mysql' ? ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin' : '');
+                $guards = $this->guards($logical, $driver, $name, $table, $retrievalStage);
+                $allowedGuards = array_keys($guards);
+                if ($logical === self::TABLES[3]) {
+                    $allowedGuards[] = (new BillingAwardFence)->eventGuardName();
+                }
+                if ($driver === 'sqlite') {
+                    $statement = $pdo->prepare('SELECT name, tbl_name FROM sqlite_temp_master');
+                    $statement->execute();
+                    foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $object) {
+                        BillingException::require(! in_array(strtolower($object['name']), array_map(strtolower(...), [$name, ...array_keys($guards)]), true) && strtolower($object['tbl_name']) !== strtolower($name), 'shadowed_schema');
+                    }
+                    $statement = $pdo->prepare('SELECT name, type, sql FROM main.sqlite_master WHERE lower(name) = lower(?)');
+                    $statement->execute([$name]);
+                    $objects = $statement->fetchAll(PDO::FETCH_ASSOC);
+                    BillingException::require(count($objects) <= 1 && ($objects === [] || $objects[0]['name'] === $name), 'schema_namespace');
+                    $actual = $objects[0] ?? false;
+                    if ($actual !== false) {
+                        BillingException::require($actual['type'] === 'table' && $this->sql($actual['sql']) === $this->sql(str_replace('main.', '', $create)), 'schema');
+                        $indexes = $pdo->query('PRAGMA main.index_list("'.$name.'")')->fetchAll(PDO::FETCH_ASSOC);
+                        BillingException::require(count($indexes) === $this->autoindexes($logical, $driver) + count($definition['extra_unique']), 'schema');
+                        foreach ($definition['extra_unique'] as $suffix => $parts) {
+                            $index = $name.'_'.$suffix;
+                            $matches = array_values(array_filter($indexes, fn (array $row): bool => $row['name'] === $index));
+                            BillingException::require(count($matches) === 1 && $matches[0]['unique'] === 1 && $matches[0]['origin'] === 'c' && $matches[0]['partial'] === 0, 'schema');
+                            $actualParts = $pdo->query('PRAGMA main.index_info("'.$index.'")')->fetchAll(PDO::FETCH_ASSOC);
+                            BillingException::require(array_column($actualParts, 'name') === $parts, 'schema');
+                        }
+                    }
+                    $statement = $pdo->prepare("SELECT name FROM main.sqlite_master WHERE type = 'trigger' AND tbl_name = ?");
+                    $statement->execute([$name]);
+                    BillingException::require(array_diff($statement->fetchAll(PDO::FETCH_COLUMN), $allowedGuards) === [], 'schema');
+                } else {
+                    $objects = $catalog->named(CatalogRead::QB759388A923D, $this->mysqlNames(), $name);
+                    BillingException::require(count($objects) <= 1 && ($objects === [] || $objects[0]['TABLE_NAME'] === $name), 'schema_namespace');
+                    $actual = $objects[0] ?? false;
+                    if ($actual !== false) {
+                        unset($actual['TABLE_NAME']);
+                    }
+                    // SHOW also resolves a local temporary table when no durable table exists.
+                    try {
+                        $shown = $pdo->query('SHOW CREATE TABLE '.$table)->fetch(PDO::FETCH_NUM);
+                        BillingException::require(! str_contains(strtoupper($shown[1]), 'TEMPORARY'), 'shadowed_schema');
                     } catch (\PDOException $error) {
-                        if (($error->errorInfo[1] ?? null) !== 1360) {
+                        if ($actual !== false || $error->getCode() !== '42S02') {
                             throw $error;
                         }
-                        BillingException::require($row === false, 'schema');
+                    }
+                    if ($actual !== false) {
+                        BillingException::require($actual === ['TABLE_TYPE' => 'BASE TABLE', 'ENGINE' => 'InnoDB', 'TABLE_COLLATION' => 'utf8mb4_bin'], 'schema');
+                        $ownedCheck = $this->mysqlDefinition($pdo, $name, $definition, $catalog);
+                        // An earlier dictionary snapshot cannot establish the opened table's current structure.
+                        $this->mysqlShownDefinition($shown[1], $name, $definition, $ownedCheck);
+                    }
+                    $actualGuards = $catalog->named(CatalogRead::Q17F6CDE46309, $this->mysqlNames(), $name);
+                    BillingException::require(array_diff(array_column($actualGuards, 'TRIGGER_NAME'), $allowedGuards) === [], 'schema');
+                }
+                BillingException::require(! (($absent || $prefixEnded) && $actual !== false), 'schema_prefix');
+                $absent = $absent || $actual === false;
+                $prefixEnded = $prefixEnded || $actual === false;
+                $missing = [];
+                foreach ($guards as $guard => $expected) {
+                    if ($driver === 'sqlite') {
+                        $statement = $pdo->prepare('SELECT name, type, tbl_name, sql FROM main.sqlite_master WHERE lower(name) = lower(?)');
+                        $statement->execute([$guard]);
+                        $objects = $statement->fetchAll(PDO::FETCH_ASSOC);
+                        BillingException::require(count($objects) <= 1 && ($objects === [] || $objects[0]['name'] === $guard), 'schema_namespace');
+                        $row = $objects[0] ?? false;
+                        if ($row !== false) {
+                            BillingException::require($row['type'] === 'trigger' && $row['tbl_name'] === $name && $this->sql($row['sql']) === $this->sql($expected['sql']), 'schema');
+                        }
+                    } else {
+                        $objects = $catalog->named(CatalogRead::QA587267279FC, $this->mysqlGuardNames(), $guard);
+                        BillingException::require(count($objects) <= 1 && ($objects === [] || $objects[0]['TRIGGER_NAME'] === $guard), 'schema_namespace');
+                        $row = $objects[0] ?? false;
+                        if ($row !== false) {
+                            BillingException::require($row['EVENT_OBJECT_TABLE'] === $name && $row['EVENT_MANIPULATION'] === $expected['event'] && $row['ACTION_TIMING'] === 'BEFORE' && $this->sql($row['ACTION_STATEMENT']) === $this->sql($expected['body']), 'schema');
+                        }
+                        // The subject is pinned above (or locked by the upgrader). Named SHOW reads
+                        // its current required guard even when information_schema retains an old snapshot.
+                        try {
+                            $current = $pdo->query('SHOW CREATE TRIGGER `'.$guard.'`')->fetch(PDO::FETCH_ASSOC);
+                            $original = $current['SQL Original Statement'] ?? null;
+                            BillingException::require($row !== false && is_string($original) && ($offset = strpos($original, ' TRIGGER ')) !== false, 'schema');
+                            $wanted = 'TRIGGER `'.$guard.'` BEFORE '.$expected['event'].' ON `'.$name.'` FOR EACH ROW '.$expected['body'];
+                            BillingException::require($this->sql(substr($original, $offset + 1)) === $this->sql($wanted), 'schema');
+                        } catch (\PDOException $error) {
+                            if (($error->errorInfo[1] ?? null) !== 1360) {
+                                throw $error;
+                            }
+                            BillingException::require($row === false, 'schema');
+                        }
+                    }
+                    $legacyInterval = $intervalUpgrade && $actual !== false && $guard === $name.'_interval';
+                    BillingException::require(! ($prefixEnded && $row !== false), 'schema_prefix');
+                    $prefixEnded = $prefixEnded || ($row === false && ! $legacyInterval);
+                    if ($row === false) {
+                        $missing[] = $expected['sql'];
                     }
                 }
-                $legacyInterval = $intervalUpgrade && $actual !== false && $guard === $name.'_interval';
-                BillingException::require(! ($prefixEnded && $row !== false), 'schema_prefix');
-                $prefixEnded = $prefixEnded || ($row === false && ! $legacyInterval);
-                if ($row === false) {
-                    $missing[] = $expected['sql'];
+                $onlyInterval = $intervalUpgrade && isset($guards[$name.'_interval']) && $missing === [$guards[$name.'_interval']['sql']];
+                if ($actual !== false && $missing !== [] && ! $onlyInterval) {
+                    BillingException::require($pdo->query('SELECT 1 FROM '.$table.' LIMIT 1')->fetchColumn() === false, 'retained_unguarded_schema');
                 }
+                BillingException::require($ddl || ($actual !== false && ($missing === [] || $onlyInterval)), 'schema');
+                BillingException::require($actual !== false || count($missing) === count($guards), 'schema');
+                $plans[] = ['create' => $actual === false ? $create : null, 'guards' => $missing];
             }
-            $onlyInterval = $intervalUpgrade && isset($guards[$name.'_interval']) && $missing === [$guards[$name.'_interval']['sql']];
-            if ($actual !== false && $missing !== [] && ! $onlyInterval) {
-                BillingException::require($pdo->query('SELECT 1 FROM '.$table.' LIMIT 1')->fetchColumn() === false, 'retained_unguarded_schema');
-            }
-            BillingException::require($ddl || ($actual !== false && ($missing === [] || $onlyInterval)), 'schema');
-            BillingException::require($actual !== false || count($missing) === count($guards), 'schema');
-            $plans[] = ['create' => $actual === false ? $create : null, 'guards' => $missing];
+        } finally {
+            $lease->close();
         }
         // Inspect the entire existing graph before the first write, including later drift/foreign names.
         if ($ddl) {
@@ -766,7 +773,7 @@ final class BillingSchema
                     $constraints[$name.'_f'.$index] = 'FOREIGN KEY';
                 }
                 foreach ($constraints as $symbol => $type) {
-                    $objects = $catalog->rows('SELECT CONSTRAINT_NAME, TABLE_NAME, CONSTRAINT_TYPE FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND CONSTRAINT_TYPE = ? AND CONSTRAINT_NAME = ?', $namespaceParameters, $symbol);
+                    $objects = $catalog->rows(CatalogRead::Q646B96B0C726, $namespaceParameters, $symbol);
                     BillingException::require($objects === [] || $objects === [['CONSTRAINT_NAME' => $symbol, 'TABLE_NAME' => $name, 'CONSTRAINT_TYPE' => $type]], 'schema_namespace');
                 }
             }
@@ -851,7 +858,7 @@ final class BillingSchema
 
     private function mysqlDefinition(PDO $pdo, string $name, array $definition, MembershipSchemaCatalog $catalog): string
     {
-        $columns = $catalog->named('SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA, COLLATION_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND BINARY TABLE_SCHEMA = BINARY DATABASE() AND TABLE_NAME = ? ORDER BY ORDINAL_POSITION', $this->mysqlNames(), $name);
+        $columns = $catalog->named(CatalogRead::Q3AA887855776, $this->mysqlNames(), $name);
         BillingException::require(array_column($columns, 'COLUMN_NAME') === array_keys($definition['columns']), 'schema');
         foreach ($columns as $column) {
             $expected = $definition['columns'][$column['COLUMN_NAME']];
@@ -880,7 +887,7 @@ final class BillingSchema
         ksort($actual);
         ksort($wanted);
         BillingException::require($actual === $wanted, 'schema');
-        $constraints = $catalog->named('SELECT CONSTRAINT_NAME, CONSTRAINT_TYPE FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = DATABASE() AND BINARY TABLE_SCHEMA = BINARY DATABASE() AND TABLE_NAME = ?', $this->mysqlNames(), $name);
+        $constraints = $catalog->named(CatalogRead::QD85B53840949, $this->mysqlNames(), $name);
         $actual = array_column($constraints, 'CONSTRAINT_TYPE', 'CONSTRAINT_NAME');
         $wanted = ['PRIMARY' => 'PRIMARY KEY', $name.'_bounds' => 'CHECK'];
         foreach ($definition['unique'] as $index => $parts) {
@@ -894,16 +901,16 @@ final class BillingSchema
         foreach (array_keys($definition['foreign']) as $index => $column) {
             $target = $definition['foreign'][$column];
             $wanted[$name.'_f'.$index] = 'FOREIGN KEY';
-            $foreign = $catalog->rows('SELECT COLUMN_NAME, REFERENCED_TABLE_SCHEMA, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME, ORDINAL_POSITION FROM information_schema.KEY_COLUMN_USAGE WHERE CONSTRAINT_SCHEMA = DATABASE() AND BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND BINARY TABLE_NAME = BINARY ? AND CONSTRAINT_NAME = ?', $foreignParameters, $name.'_f'.$index);
+            $foreign = $catalog->rows(CatalogRead::Q67FBDF0A6079, $foreignParameters, $name.'_f'.$index);
             BillingException::require($foreign === [['COLUMN_NAME' => $column, 'REFERENCED_TABLE_SCHEMA' => $schema, 'REFERENCED_TABLE_NAME' => $this->physical($target), 'REFERENCED_COLUMN_NAME' => 'id', 'ORDINAL_POSITION' => 1]], 'schema');
-            $foreign = $catalog->rows('SELECT UNIQUE_CONSTRAINT_SCHEMA, UNIQUE_CONSTRAINT_NAME, REFERENCED_TABLE_NAME, MATCH_OPTION, UPDATE_RULE, DELETE_RULE FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND BINARY CONSTRAINT_SCHEMA = BINARY DATABASE() AND BINARY TABLE_NAME = BINARY ? AND CONSTRAINT_NAME = ?', $foreignParameters, $name.'_f'.$index);
+            $foreign = $catalog->rows(CatalogRead::Q0A90E1BF7361, $foreignParameters, $name.'_f'.$index);
             BillingException::require($foreign === [['UNIQUE_CONSTRAINT_SCHEMA' => $schema, 'UNIQUE_CONSTRAINT_NAME' => 'PRIMARY', 'REFERENCED_TABLE_NAME' => $this->physical($target), 'MATCH_OPTION' => 'NONE', 'UPDATE_RULE' => 'RESTRICT', 'DELETE_RULE' => 'RESTRICT']], 'schema');
         }
         ksort($actual);
         ksort($wanted);
         BillingException::require($actual === $wanted, 'schema');
         $checks = array_combine($this->mysqlNames(), array_map(fn (string $table): array => [$table, $table.'_bounds'], $this->mysqlNames()));
-        $rows = $catalog->rows("SELECT c.CHECK_CLAUSE, t.ENFORCED FROM information_schema.CHECK_CONSTRAINTS c JOIN information_schema.TABLE_CONSTRAINTS t ON t.CONSTRAINT_SCHEMA = c.CONSTRAINT_SCHEMA AND t.CONSTRAINT_NAME = c.CONSTRAINT_NAME AND BINARY t.CONSTRAINT_SCHEMA = BINARY c.CONSTRAINT_SCHEMA AND BINARY t.CONSTRAINT_NAME = BINARY c.CONSTRAINT_NAME WHERE t.TABLE_SCHEMA = DATABASE() AND BINARY t.TABLE_SCHEMA = BINARY DATABASE() AND BINARY t.TABLE_NAME = BINARY ? AND t.CONSTRAINT_TYPE = 'CHECK' AND t.CONSTRAINT_NAME = ?", $checks, $name);
+        $rows = $catalog->rows(CatalogRead::Q17D835DCD480, $checks, $name);
         BillingException::require(count($rows) === 1 && $rows[0]['ENFORCED'] === 'YES' && $this->check($rows[0]['CHECK_CLAUSE']) === $this->check($definition['check']), 'schema');
 
         return $rows[0]['CHECK_CLAUSE'];

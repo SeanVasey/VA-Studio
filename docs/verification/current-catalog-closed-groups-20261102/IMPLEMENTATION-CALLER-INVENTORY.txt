@@ -1,0 +1,91 @@
+COMMAND ["rg", "-n", "CatalogGroup|identityParentStable|identityParentMigrationState|AccountAdmissionGuards::(stable|migrationState)", "app", "tests"]
+app/Domain/Customers/Preferences/ConsentMigrationAdmission.php:66:        $this->inspectDependencies(AccountAdmissionGuards::stable($this->pdo, $this->driver)['guards']);
+app/Domain/Customers/Preferences/ConsentMigrationAdmission.php:82:        $this->inspectDependencies(AccountAdmissionGuards::migrationState($this->pdo, $this->driver)['guards']);
+app/Domain/Customers/ProductionIdentity/AccountAdmissionGuards.php:89:    public static function identityParentStable(PDO $pdo, string $driver): array
+app/Domain/Customers/ProductionIdentity/AccountAdmissionGuards.php:98:    public static function identityParentMigrationState(PDO $pdo, string $driver): array
+app/Domain/Customers/ProductionIdentity/AccountAdmissionGuards.php:217:            $group = $grouped ? CatalogLease::group($pdo, CatalogGroup::A1_ACCOUNT_AFTER_SHOW) : null;
+app/Domain/Customers/ProductionIdentity/AccountAdmissionGuards.php:282:        $group = $grouped ? CatalogLease::group($pdo, CatalogGroup::A2_ACCOUNT_FLOOR) : null;
+app/Domain/Customers/ProductionIdentity/AccountAdmissionUpgrade.php:121:        $before = AccountAdmissionGuards::migrationState($pdo, $driver);
+app/Domain/Customers/ProductionIdentity/AccountAdmissionUpgrade.php:126:        $after = AccountAdmissionGuards::migrationState($pdo, $driver);
+app/Domain/Customers/ProductionIdentity/CatalogLease.php:67:    public static function group(PDO $primary, CatalogGroup $group, string $version = AccountAdmissionGuards::V2): array
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:147:            $namedTables = $this->groupLookups($pdo, CatalogGroup::I0_IDENTITY_NAMESPACE, CatalogRead::QEDBF704DA857,
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:149:            $namedTriggers = $this->groupLookups($pdo, CatalogGroup::I0_IDENTITY_NAMESPACE, CatalogRead::QDE6EB7150A9B,
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:210:            $namedIndexes = $this->groupLookups($pdo, CatalogGroup::I2_RESERVED_NAMES, CatalogRead::QECFE2D2F4FCD, $reserved);
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:211:            $namedConstraints = $this->groupLookups($pdo, CatalogGroup::I2_RESERVED_NAMES, CatalogRead::Q6546FD85F02A, $reserved);
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:389:        $account = AccountAdmissionGuards::migrationState($pdo, $driver);
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:448:        $group = $full ? CatalogLease::group($pdo, CatalogGroup::D0_FULL_DEPENDENTS, $this->accountVersion) : null;
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:486:            $exact = ['tables' => $this->groupLookups($pdo, CatalogGroup::P0_PARENT_NAMESPACE, CatalogRead::QA8762690E619, $names),
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:487:                'triggers' => $this->groupLookups($pdo, CatalogGroup::P0_PARENT_NAMESPACE, CatalogRead::Q38A05D78DB1E, $names)];
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:490:                $exact[$dictionary] = $this->groupLookups($pdo, CatalogGroup::P0_PARENT_NAMESPACE, CatalogRead::namespace($dictionary), $names);
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:600:        $bodies = $driver === 'sqlite' ? [] : $this->groupLookups($pdo, CatalogGroup::P2_PARENT_GUARDS, CatalogRead::Q95556A0350AB, array_keys($guards));
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:647:        $state = $accountUpgrade ? AccountAdmissionGuards::identityParentMigrationState($pdo, $driver) : AccountAdmissionGuards::identityParentStable($pdo, $driver);
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:805:            CatalogRead::Q9D29C0ADA7EE,CatalogRead::QD9E74E9B8F9D,CatalogRead::Q54EFEC87F80D,CatalogRead::QD29EA5375536,CatalogRead::Q357FD211BAA0 => CatalogGroup::P1_PARENT_SHAPE,
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:806:            CatalogRead::QB2684ECFE856 => CatalogGroup::P2_PARENT_GUARDS,
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:807:            CatalogRead::Q88ED11D61B97,CatalogRead::Q603824C0D074,CatalogRead::Q26706FA791A1,CatalogRead::QD3A32C45A22D => CatalogGroup::I1_IDENTITY_SHAPE,
+app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:829:    private function groupLookups(PDO $pdo, CatalogGroup $group, CatalogRead $query, array $names): array
+app/Domain/Customers/ProductionIdentity/CatalogGroup.php:6:enum CatalogGroup: string
+app/Domain/Customers/ProductionIdentity/SchemaProofFrame.php:195:                AccountAdmissionGuards::stable($this->primary, 'mysql');
+app/Domain/Customers/ProductionIdentity/CurrentCatalog.php:212:    public function group(CatalogGroup $group, string $version): array
+app/Domain/Customers/ProductionIdentity/CurrentCatalog.php:214:        $plan = CatalogGroupPlan::build($group, $version);
+app/Domain/Customers/ProductionIdentity/CurrentCatalog.php:276:    private static function decodeGroup(CatalogGroup $group, array $families, iterable $wire): array
+app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php:9:final class CatalogGroupPlan
+app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php:399:    public static function build(CatalogGroup $group, string $version): array
+app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php:460:    private static function recipe(CatalogGroup $group, CatalogRead $query, string $version): array
+app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php:482:            CatalogGroup::A0_ACCOUNT_TABLE, CatalogGroup::A2_ACCOUNT_FLOOR => [[], ['customer_accounts']],
+app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php:483:            CatalogGroup::A1_ACCOUNT_AFTER_SHOW => [[], match ($query) {
+app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php:489:            CatalogGroup::P0_PARENT_NAMESPACE => [[...$parents, ...$guards], null],
+app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php:490:            CatalogGroup::P1_PARENT_SHAPE => [$parents, null],
+app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php:491:            CatalogGroup::P2_PARENT_GUARDS => [$query === CatalogRead::Q95556A0350AB ? $guards : $parents, null],
+app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php:492:            CatalogGroup::I0_IDENTITY_NAMESPACE => [$query === CatalogRead::QEDBF704DA857 ? [...$parents, ...$tables, ...$identityGuards, ...$reserved] : [...$reserved, ...$identityGuards, ...$tables], null],
+app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php:493:            CatalogGroup::I1_IDENTITY_SHAPE => [$tables, null],
+app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php:494:            CatalogGroup::I2_RESERVED_NAMES => [$reserved, null],
+app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php:495:            CatalogGroup::D0_FULL_DEPENDENTS => [[], []],
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:6:use App\Domain\Customers\ProductionIdentity\CatalogGroup;
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:7:use App\Domain\Customers\ProductionIdentity\CatalogGroupPlan;
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:14:final class CatalogGroupContractTest extends TestCase
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:20:            foreach (CatalogGroup::cases() as $group) {
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:21:                $plan = CatalogGroupPlan::build($group, $version);
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:40:        $families = CatalogGroupPlan::build(CatalogGroup::A2_ACCOUNT_FLOOR, AccountAdmissionGuards::V2)['families'];
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:61:        $plans = [CatalogGroup::A0_ACCOUNT_TABLE, CatalogGroup::P1_PARENT_SHAPE, CatalogGroup::I0_IDENTITY_NAMESPACE, CatalogGroup::A1_ACCOUNT_AFTER_SHOW, CatalogGroup::I1_IDENTITY_SHAPE];
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:63:            foreach (CatalogGroupPlan::build($group, AccountAdmissionGuards::V2)['families'] as $family) {
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:76:        $families = CatalogGroupPlan::build(CatalogGroup::A0_ACCOUNT_TABLE, AccountAdmissionGuards::V2)['families'];
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:118:        $families = CatalogGroupPlan::build(CatalogGroup::A2_ACCOUNT_FLOOR, AccountAdmissionGuards::V2)['families'];
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:137:        $family = CatalogGroupPlan::build(CatalogGroup::A1_ACCOUNT_AFTER_SHOW, AccountAdmissionGuards::V2)['families'][0];
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:151:        foreach (['stable', 'migrationState', 'identityParentStable', 'identityParentMigrationState'] as $method) {
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:173:        $group = CatalogGroup::A0_ACCOUNT_TABLE;
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:174:        $families = CatalogGroupPlan::build($group, AccountAdmissionGuards::V2)['families'];
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:176:        foreach ([$header, ['group_id' => CatalogGroup::A2_ACCOUNT_FLOOR->value] + $header] as $wire) {
+tests/Unit/ProductionIdentity/CatalogGroupContractTest.php:206:            'Q3C5185ED551F' => CatalogGroup::A0_ACCOUNT_TABLE, 'QD9E74E9B8F9D' => CatalogGroup::A2_ACCOUNT_FLOOR, 'AccountTables' => CatalogGroup::A1_ACCOUNT_AFTER_SHOW
+tests/Feature/ProductionIdentity/CurrentCatalogAdmissionTest.php:120:            AccountAdmissionGuards::stable($pdo, 'mysql');
+tests/Feature/ProductionIdentity/CurrentCatalogAdmissionTest.php:241:            AccountAdmissionGuards::stable($pdo, 'mysql');
+tests/Feature/ProductionIdentity/CurrentCatalogAdmissionTest.php:245:            foreach ([fn () => AccountAdmissionGuards::stable($pdo, 'mysql'), fn () => (new IdentityMigrationOwnership)->inspect($pdo, 'mysql')] as $proof) {
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:7:use App\Domain\Customers\ProductionIdentity\CatalogGroup;
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:8:use App\Domain\Customers\ProductionIdentity\CatalogGroupPlan;
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:22:final class CatalogGroupDifferentialTest extends TestCase
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:73:                $shape = CatalogLease::group($pdo, CatalogGroup::P1_PARENT_SHAPE);
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:77:                $namespace = CatalogLease::group($pdo, CatalogGroup::I0_IDENTITY_NAMESPACE);
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:81:                    AccountAdmissionGuards::stable($pdo, 'mysql');
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:153:            foreach (CatalogGroup::cases() as $group) {
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:154:                $plan = CatalogGroupPlan::build($group, AccountAdmissionGuards::V2);
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:212:            $plan = CatalogGroupPlan::build(CatalogGroup::D0_FULL_DEPENDENTS, AccountAdmissionGuards::V2);
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:233:                CatalogLease::group($pdo, CatalogGroup::D0_FULL_DEPENDENTS);
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:258:            foreach (['stable', 'identityParentStable', 'migrationState', 'identityParentMigrationState'] as $entry) {
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:271:            foreach (['stable', 'identityParentStable', 'migrationState', 'identityParentMigrationState'] as $entry) {
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:287:        self::assertSame(AccountAdmissionGuards::migrationState($primary, 'mysql'), AccountAdmissionGuards::identityParentMigrationState($primary, 'mysql'));
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:289:            self::assertSame(AccountAdmissionGuards::stable($primary, 'mysql'), AccountAdmissionGuards::identityParentStable($primary, 'mysql'));
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:291:            foreach (['stable', 'identityParentStable'] as $entry) {
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:303:            foreach (CatalogGroup::cases() as $group) {
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:304:                $plan = CatalogGroupPlan::build($group, $version);
+tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php:308:                    [$names,$direct] = (new ReflectionMethod(CatalogGroupPlan::class, 'recipe'))->invoke(null, $group, $query, $version);
+tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php:69:        $this->assertSame(AccountAdmissionGuards::OVERLAP, AccountAdmissionGuards::migrationState($pdo, 'mysql')['version']);
+tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php:83:        $before = AccountAdmissionGuards::stable($connection->getPdo(), $connection->getDriverName())['fingerprint'];
+tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php:93:        $this->assertSame($before, AccountAdmissionGuards::stable($connection->getPdo(), $connection->getDriverName())['fingerprint']);
+tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php:111:        $before = AccountAdmissionGuards::stable($pdo, $driver)['fingerprint'];
+tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php:118:                $this->assertSame($before, AccountAdmissionGuards::stable($pdo, $driver)['fingerprint']);
+tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php:130:                $this->assertSame($before, AccountAdmissionGuards::stable($pdo, $driver)['fingerprint']);
+tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php:189:            AccountAdmissionGuards::stable($pdo, 'mysql');
+tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php:243:                    $prove = fn () => AccountAdmissionGuards::stable($pdo, 'mysql');
+tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php:318:            AccountAdmissionGuards::stable($pdo, 'mysql');
+tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php:352:            AccountAdmissionGuards::stable($pdo, 'mysql');
+tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php:400:        $this->assertSame($version, AccountAdmissionGuards::stable($pdo, $driver)['version']);
+tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php:410:        foreach ([fn () => AccountAdmissionGuards::stable($pdo, 'mysql'),

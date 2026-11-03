@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\ProductionIdentity;
 
+use App\Domain\Customers\ProductionIdentity\AccountAdmissionUpgrade;
 use App\Domain\Customers\ProductionIdentity\IdentitySchema;
 use Illuminate\Support\Facades\DB;
 use LogicException;
@@ -18,6 +19,8 @@ final class ProductionIdentityDependencyAdmissionTest extends TestCase
     {
         parent::setUp();
         $this->identitySetup();
+        // Historical dependency mutations target their original exact V1 names.
+        (new AccountAdmissionUpgrade)->down(DB::connection());
     }
 
     public static function parentFloors(): array

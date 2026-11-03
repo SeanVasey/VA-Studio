@@ -1,0 +1,14 @@
+{
+  "check": "Python source/hash/JSON/arithmetic inspection only; no PHP/bootstrap/DB",
+  "source": "7347a2b8a72248d191f55c8269cb99b1f1b74266",
+  "groups": 10,
+  "old_materializations": 36,
+  "new_materializations": 10,
+  "gross_savings": 26,
+  "hypothetical_total_if_zero_new_SQL": 107,
+  "net_savings_status": "CONDITIONAL_NOT_ESTABLISHED: envelope/header/ordinal/warning contracts require proof",
+  "source_files": 11,
+  "enum_sql_mismatches": 0,
+  "implementation_test_migration_changes": 0,
+  "result": "PASS_STATIC_DESIGN_CONSISTENCY"
+}

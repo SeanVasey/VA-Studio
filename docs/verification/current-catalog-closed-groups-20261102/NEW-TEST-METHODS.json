@@ -1,0 +1,26 @@
+{
+  "methods": {
+    "tests/Unit/ProductionIdentity/CatalogGroupContractTest.php": [
+      "test_fixed_plans_preserve_original_family_names_bindings_and_nonmergeable_ordered_relation",
+      "test_ordered_cell_roundtrip_keeps_null_native_integers_numeric_text_unicode_and_key_order",
+      "test_native_view_and_functional_index_nulls_are_representable_before_ownership_refusal",
+      "test_malformed_missing_duplicate_empty_truncated_types_ordinals_overflow_and_caps_refuse_whole_group",
+      "test_decimal_ordinals_above_nine_and_aggregate_wire_cap_are_exact",
+      "test_existing_standalone_entry_signatures_and_closed_parent_consumer_selection_remain_distinct",
+      "test_missing_and_cross_group_tags_cannot_supply_another_groups_rows"
+    ],
+    "tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php": [
+      "test_native_every_fixed_group_matches_original_typed_rows_in_v1_v2_and_ordered_overlap",
+      "test_native_view_functional_unordered_indexes_unicode_defaults_aliases_and_global_definitions_match_original",
+      "test_native_warning_count_observes_prepare_execute_full_eof_without_sql_and_rejects_warned_transport",
+      "test_native_window_relations_are_materialized_and_shared_between_headers_and_rows",
+      "test_native_oversized_complete_catalog_refuses_and_releases_failed_companion_preserving_primary_savepoint",
+      "test_native_grouped_and_original_parent_entries_both_refuse_partial_and_foreign_guard_sets"
+    ]
+  },
+  "generic_count": 7,
+  "native_only_count": 6,
+  "native_skip_condition": "DB::getDriverName() !== 'mysql'",
+  "native_skip_reason": "Native MySQL staged catalog differential and warning EOF controls.",
+  "actual_native_runs": 0
+}

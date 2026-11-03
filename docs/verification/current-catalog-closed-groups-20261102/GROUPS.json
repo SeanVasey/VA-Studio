@@ -1,0 +1,1346 @@
+[
+  {
+    "group_id": "A0_ACCOUNT_TABLE",
+    "stage": "unchanged singleton account TABLE before primary SHOWs",
+    "old_materializations": 1,
+    "new_materializations": 1,
+    "saving": 0,
+    "families": [
+      {
+        "enum": "Q3C5185ED551F",
+        "sql": "SELECT TABLE_NAME,TABLE_TYPE,ENGINE,TABLE_COLLATION,TABLE_COMMENT,CREATE_OPTIONS FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?",
+        "sql_sha256": "3c5185ed551f647dd46426012e18c988ed0ccf2b19faf793cc10edcebf048cff",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "TABLE_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_NAME"
+          },
+          {
+            "key": "TABLE_TYPE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_TYPE"
+          },
+          {
+            "key": "ENGINE",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "ENGINE"
+          },
+          {
+            "key": "TABLE_COLLATION",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "TABLE_COLLATION"
+          },
+          {
+            "key": "TABLE_COMMENT",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_COMMENT"
+          },
+          {
+            "key": "CREATE_OPTIONS",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "CREATE_OPTIONS"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      }
+    ]
+  },
+  {
+    "group_id": "A1_ACCOUNT_AFTER_SHOW",
+    "stage": "after all account SHOWs, before primary foreign_key_checks",
+    "old_materializations": 7,
+    "new_materializations": 1,
+    "saving": 6,
+    "families": [
+      {
+        "enum": "AccountTables",
+        "sql": "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME IN (?,?,?,?)",
+        "sql_sha256": "d757203f271c87f0884bf9950ad8a7f5f3aa7a9d611aaedc73dd535fe3dd4422",
+        "original_bind_arity": 4,
+        "ordered_columns": [
+          {
+            "key": "TABLE_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_NAME"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "AccountRoutineNames",
+        "sql": "SELECT ROUTINE_NAME FROM information_schema.ROUTINES WHERE ROUTINE_SCHEMA=DATABASE() AND ROUTINE_NAME IN (?,?,?,?,?)",
+        "sql_sha256": "b731ca12babd98a187efb2edb6a08044a8a19e392ef9560888bb2ebc343af533",
+        "original_bind_arity": 5,
+        "ordered_columns": [
+          {
+            "key": "ROUTINE_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "ROUTINE_NAME"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "AccountEventNames",
+        "sql": "SELECT EVENT_NAME FROM information_schema.EVENTS WHERE EVENT_SCHEMA=DATABASE() AND EVENT_NAME IN (?,?,?,?,?)",
+        "sql_sha256": "6cfebf2c8c1d4efb6ec84a5f20261b68fc759b83455dc530a8d78eb107792048",
+        "original_bind_arity": 5,
+        "ordered_columns": [
+          {
+            "key": "EVENT_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "EVENT_NAME"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "AccountIndexNames",
+        "sql": "SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND INDEX_NAME IN (?,?,?,?,?)",
+        "sql_sha256": "728080ede4781b6f0573fe4af87236c21f9f56848ec0df89039d84cf76ace516",
+        "original_bind_arity": 5,
+        "ordered_columns": [
+          {
+            "key": "INDEX_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "INDEX_NAME"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "AccountConstraintNames",
+        "sql": "SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND CONSTRAINT_NAME IN (?,?,?,?,?)",
+        "sql_sha256": "d47ef160082c6bb6dda37cf4295f0484050ea4ab787b588308fc9f5627aff3a7",
+        "original_bind_arity": 5,
+        "ordered_columns": [
+          {
+            "key": "CONSTRAINT_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "CONSTRAINT_NAME"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "Q01CED6344452",
+        "sql": "SELECT TRIGGER_NAME,EVENT_OBJECT_TABLE,EVENT_MANIPULATION,ACTION_TIMING,ACTION_STATEMENT,ACTION_ORDER,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION,DEFINER FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND (EVENT_OBJECT_TABLE=? OR TRIGGER_NAME IN (?,?,?,?)) ORDER BY TRIGGER_NAME",
+        "sql_sha256": "01ced6344452324bd61c9fd201ace699bae744f07192b846178e456b36607ceb",
+        "original_bind_arity": 5,
+        "ordered_columns": [
+          {
+            "key": "TRIGGER_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TRIGGER_NAME"
+          },
+          {
+            "key": "EVENT_OBJECT_TABLE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "EVENT_OBJECT_TABLE"
+          },
+          {
+            "key": "EVENT_MANIPULATION",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "EVENT_MANIPULATION"
+          },
+          {
+            "key": "ACTION_TIMING",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "ACTION_TIMING"
+          },
+          {
+            "key": "ACTION_STATEMENT",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "ACTION_STATEMENT"
+          },
+          {
+            "key": "ACTION_ORDER",
+            "php_kind": "int",
+            "nullable": false,
+            "expression": "ACTION_ORDER"
+          },
+          {
+            "key": "SQL_MODE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "SQL_MODE"
+          },
+          {
+            "key": "CHARACTER_SET_CLIENT",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "CHARACTER_SET_CLIENT"
+          },
+          {
+            "key": "COLLATION_CONNECTION",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "COLLATION_CONNECTION"
+          },
+          {
+            "key": "DATABASE_COLLATION",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "DATABASE_COLLATION"
+          },
+          {
+            "key": "DEFINER",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "DEFINER"
+          }
+        ],
+        "original_order_by": "TRIGGER_NAME",
+        "result_order": "original SQL order"
+      },
+      {
+        "enum": "Q54EFEC87F80D",
+        "sql": "SELECT INDEX_NAME,COLUMN_NAME,NON_UNIQUE,SEQ_IN_INDEX,INDEX_TYPE,SUB_PART,COLLATION,EXPRESSION,IS_VISIBLE,INDEX_COMMENT FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY INDEX_NAME,SEQ_IN_INDEX",
+        "sql_sha256": "54efec87f80d72775b48f85389522e8b0dbf5018e026399140aca7a1ae7c4aed",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "INDEX_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "INDEX_NAME"
+          },
+          {
+            "key": "COLUMN_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "COLUMN_NAME"
+          },
+          {
+            "key": "NON_UNIQUE",
+            "php_kind": "int",
+            "nullable": false,
+            "expression": "NON_UNIQUE"
+          },
+          {
+            "key": "SEQ_IN_INDEX",
+            "php_kind": "int",
+            "nullable": false,
+            "expression": "SEQ_IN_INDEX"
+          },
+          {
+            "key": "INDEX_TYPE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "INDEX_TYPE"
+          },
+          {
+            "key": "SUB_PART",
+            "php_kind": "int",
+            "nullable": true,
+            "expression": "SUB_PART"
+          },
+          {
+            "key": "COLLATION",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "COLLATION"
+          },
+          {
+            "key": "EXPRESSION",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "EXPRESSION"
+          },
+          {
+            "key": "IS_VISIBLE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "IS_VISIBLE"
+          },
+          {
+            "key": "INDEX_COMMENT",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "INDEX_COMMENT"
+          }
+        ],
+        "original_order_by": "INDEX_NAME,SEQ_IN_INDEX",
+        "result_order": "original SQL order"
+      }
+    ]
+  },
+  {
+    "group_id": "A2_ACCOUNT_FLOOR",
+    "stage": "after account primary foreign_key_checks",
+    "old_materializations": 3,
+    "new_materializations": 1,
+    "saving": 2,
+    "families": [
+      {
+        "enum": "QD9E74E9B8F9D",
+        "sql": "SELECT COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,EXTRA,CHARACTER_SET_NAME,COLLATION_NAME,COLUMN_COMMENT,GENERATION_EXPRESSION FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY ORDINAL_POSITION",
+        "sql_sha256": "d9e74e9b8f9d45d1e5197635a1ac17b10b37d7d62984d208ebfb181621a2e5ba",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "COLUMN_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "COLUMN_NAME"
+          },
+          {
+            "key": "COLUMN_TYPE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "COLUMN_TYPE"
+          },
+          {
+            "key": "IS_NULLABLE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "IS_NULLABLE"
+          },
+          {
+            "key": "COLUMN_DEFAULT",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "COLUMN_DEFAULT"
+          },
+          {
+            "key": "EXTRA",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "EXTRA"
+          },
+          {
+            "key": "CHARACTER_SET_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "CHARACTER_SET_NAME"
+          },
+          {
+            "key": "COLLATION_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "COLLATION_NAME"
+          },
+          {
+            "key": "COLUMN_COMMENT",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "COLUMN_COMMENT"
+          },
+          {
+            "key": "GENERATION_EXPRESSION",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "GENERATION_EXPRESSION"
+          }
+        ],
+        "original_order_by": "ORDINAL_POSITION",
+        "result_order": "original SQL order"
+      },
+      {
+        "enum": "Q3A0D56156905",
+        "sql": "SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFERENCED_COLUMN_NAME,r.UPDATE_RULE,r.DELETE_RULE FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA AND r.CONSTRAINT_NAME=k.CONSTRAINT_NAME AND r.TABLE_NAME=k.TABLE_NAME WHERE k.TABLE_SCHEMA=DATABASE() AND k.TABLE_NAME=? AND k.REFERENCED_TABLE_NAME IS NOT NULL ORDER BY k.COLUMN_NAME",
+        "sql_sha256": "3a0d561569052d86f2ca470c56b9d94627e2af54841904581ac80f6ecab40651",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "CONSTRAINT_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "k.CONSTRAINT_NAME"
+          },
+          {
+            "key": "COLUMN_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "k.COLUMN_NAME"
+          },
+          {
+            "key": "REFERENCED_TABLE_SCHEMA",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "k.REFERENCED_TABLE_SCHEMA"
+          },
+          {
+            "key": "REFERENCED_TABLE_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "k.REFERENCED_TABLE_NAME"
+          },
+          {
+            "key": "REFERENCED_COLUMN_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "k.REFERENCED_COLUMN_NAME"
+          },
+          {
+            "key": "UPDATE_RULE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "r.UPDATE_RULE"
+          },
+          {
+            "key": "DELETE_RULE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "r.DELETE_RULE"
+          }
+        ],
+        "original_order_by": "k.COLUMN_NAME",
+        "result_order": "original SQL order"
+      },
+      {
+        "enum": "QB894B1A4D034",
+        "sql": "SELECT COUNT(*) count FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?",
+        "sql_sha256": "b894b1a4d034212b2c2d1a9973fea7ae909ee76a91a393bc21c3ac590da527e3",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "count",
+            "php_kind": "int",
+            "nullable": false,
+            "expression": "COUNT(*) count"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      }
+    ]
+  },
+  {
+    "group_id": "P0_PARENT_NAMESPACE",
+    "stage": "after account classifier; before namespace SHOW loop",
+    "old_materializations": 6,
+    "new_materializations": 1,
+    "saving": 5,
+    "families": [
+      {
+        "enum": "QA8762690E619",
+        "sql": "SELECT TABLE_NAME name,'table' type,TABLE_NAME tbl_name FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?",
+        "sql_sha256": "a8762690e619cb390f295da85efa57b250ddae3bbfb248418f92fb8ace42c5bf",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "name",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_NAME name"
+          },
+          {
+            "key": "type",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "'table' type"
+          },
+          {
+            "key": "tbl_name",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_NAME tbl_name"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "Q38A05D78DB1E",
+        "sql": "SELECT TRIGGER_NAME name,'trigger' type,EVENT_OBJECT_TABLE tbl_name FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME=?",
+        "sql_sha256": "38a05d78db1ef6ef626ce30727c3c948f5b7807cf4dd522003b907078a82285e",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "name",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TRIGGER_NAME name"
+          },
+          {
+            "key": "type",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "'trigger' type"
+          },
+          {
+            "key": "tbl_name",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "EVENT_OBJECT_TABLE tbl_name"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "RoutineName",
+        "sql": "SELECT ROUTINE_NAME FROM information_schema.ROUTINES WHERE ROUTINE_SCHEMA=DATABASE() AND ROUTINE_NAME=?",
+        "sql_sha256": "f25820930acba11077ba7c858cf0f8b561147d19f26b8cdce672d8686681e9a4",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "ROUTINE_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "ROUTINE_NAME"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "EventName",
+        "sql": "SELECT EVENT_NAME FROM information_schema.EVENTS WHERE EVENT_SCHEMA=DATABASE() AND EVENT_NAME=?",
+        "sql_sha256": "efd8520cb2423ca8f328e0d332bdbfb86c7d32acd211cae0a3607b81d49ba3ca",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "EVENT_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "EVENT_NAME"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "IndexName",
+        "sql": "SELECT INDEX_NAME FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND INDEX_NAME=?",
+        "sql_sha256": "441c51ffc8ec1e68c447c7defd48dec7b06c08911823010afa002deca8727a54",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "INDEX_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "INDEX_NAME"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "ConstraintName",
+        "sql": "SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND CONSTRAINT_NAME=?",
+        "sql_sha256": "1bdb0afc842aaf49188462d025ce6368c8fe7c346738cb74077f9ee1655de2e4",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "CONSTRAINT_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "CONSTRAINT_NAME"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      }
+    ]
+  },
+  {
+    "group_id": "P1_PARENT_SHAPE",
+    "stage": "first users parent lookup after namespace SHOW loop; before first uncached database() at customer_accounts expectations",
+    "old_materializations": 5,
+    "new_materializations": 1,
+    "saving": 4,
+    "families": [
+      {
+        "enum": "Q9D29C0ADA7EE",
+        "sql": "SELECT ENGINE,TABLE_TYPE,TABLE_COMMENT,TABLE_COLLATION,CREATE_OPTIONS FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?",
+        "sql_sha256": "9d29c0ada7ee615828f2fec5b7d6ecfb38cf6bf149732a565270436ada513ed0",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "ENGINE",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "ENGINE"
+          },
+          {
+            "key": "TABLE_TYPE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_TYPE"
+          },
+          {
+            "key": "TABLE_COMMENT",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_COMMENT"
+          },
+          {
+            "key": "TABLE_COLLATION",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "TABLE_COLLATION"
+          },
+          {
+            "key": "CREATE_OPTIONS",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "CREATE_OPTIONS"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "QD9E74E9B8F9D",
+        "sql": "SELECT COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,EXTRA,CHARACTER_SET_NAME,COLLATION_NAME,COLUMN_COMMENT,GENERATION_EXPRESSION FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY ORDINAL_POSITION",
+        "sql_sha256": "d9e74e9b8f9d45d1e5197635a1ac17b10b37d7d62984d208ebfb181621a2e5ba",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "COLUMN_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "COLUMN_NAME"
+          },
+          {
+            "key": "COLUMN_TYPE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "COLUMN_TYPE"
+          },
+          {
+            "key": "IS_NULLABLE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "IS_NULLABLE"
+          },
+          {
+            "key": "COLUMN_DEFAULT",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "COLUMN_DEFAULT"
+          },
+          {
+            "key": "EXTRA",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "EXTRA"
+          },
+          {
+            "key": "CHARACTER_SET_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "CHARACTER_SET_NAME"
+          },
+          {
+            "key": "COLLATION_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "COLLATION_NAME"
+          },
+          {
+            "key": "COLUMN_COMMENT",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "COLUMN_COMMENT"
+          },
+          {
+            "key": "GENERATION_EXPRESSION",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "GENERATION_EXPRESSION"
+          }
+        ],
+        "original_order_by": "ORDINAL_POSITION",
+        "result_order": "original SQL order"
+      },
+      {
+        "enum": "Q54EFEC87F80D",
+        "sql": "SELECT INDEX_NAME,COLUMN_NAME,NON_UNIQUE,SEQ_IN_INDEX,INDEX_TYPE,SUB_PART,COLLATION,EXPRESSION,IS_VISIBLE,INDEX_COMMENT FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY INDEX_NAME,SEQ_IN_INDEX",
+        "sql_sha256": "54efec87f80d72775b48f85389522e8b0dbf5018e026399140aca7a1ae7c4aed",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "INDEX_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "INDEX_NAME"
+          },
+          {
+            "key": "COLUMN_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "COLUMN_NAME"
+          },
+          {
+            "key": "NON_UNIQUE",
+            "php_kind": "int",
+            "nullable": false,
+            "expression": "NON_UNIQUE"
+          },
+          {
+            "key": "SEQ_IN_INDEX",
+            "php_kind": "int",
+            "nullable": false,
+            "expression": "SEQ_IN_INDEX"
+          },
+          {
+            "key": "INDEX_TYPE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "INDEX_TYPE"
+          },
+          {
+            "key": "SUB_PART",
+            "php_kind": "int",
+            "nullable": true,
+            "expression": "SUB_PART"
+          },
+          {
+            "key": "COLLATION",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "COLLATION"
+          },
+          {
+            "key": "EXPRESSION",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "EXPRESSION"
+          },
+          {
+            "key": "IS_VISIBLE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "IS_VISIBLE"
+          },
+          {
+            "key": "INDEX_COMMENT",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "INDEX_COMMENT"
+          }
+        ],
+        "original_order_by": "INDEX_NAME,SEQ_IN_INDEX",
+        "result_order": "original SQL order"
+      },
+      {
+        "enum": "QD29EA5375536",
+        "sql": "SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFERENCED_COLUMN_NAME,r.UPDATE_RULE,r.DELETE_RULE FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA AND r.CONSTRAINT_NAME=k.CONSTRAINT_NAME AND r.TABLE_NAME=k.TABLE_NAME WHERE k.TABLE_SCHEMA=DATABASE() AND k.REFERENCED_TABLE_NAME IS NOT NULL AND k.TABLE_NAME=? ORDER BY k.COLUMN_NAME",
+        "sql_sha256": "d29ea5375536279fa019d2896a9cc1a16c2fc975f68c3f585d70063b9c5e94ec",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "CONSTRAINT_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "k.CONSTRAINT_NAME"
+          },
+          {
+            "key": "COLUMN_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "k.COLUMN_NAME"
+          },
+          {
+            "key": "REFERENCED_TABLE_SCHEMA",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "k.REFERENCED_TABLE_SCHEMA"
+          },
+          {
+            "key": "REFERENCED_TABLE_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "k.REFERENCED_TABLE_NAME"
+          },
+          {
+            "key": "REFERENCED_COLUMN_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "k.REFERENCED_COLUMN_NAME"
+          },
+          {
+            "key": "UPDATE_RULE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "r.UPDATE_RULE"
+          },
+          {
+            "key": "DELETE_RULE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "r.DELETE_RULE"
+          }
+        ],
+        "original_order_by": "k.COLUMN_NAME",
+        "result_order": "original SQL order"
+      },
+      {
+        "enum": "Q357FD211BAA0",
+        "sql": "SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?",
+        "sql_sha256": "357fd211baa0497d74771ffa74c3b98eb0860adf978906364cfb16191329d33c",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "CONSTRAINT_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "CONSTRAINT_NAME"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      }
+    ]
+  },
+  {
+    "group_id": "P2_PARENT_GUARDS",
+    "stage": "after complete parent shape loop and cached database binding",
+    "old_materializations": 2,
+    "new_materializations": 1,
+    "saving": 1,
+    "families": [
+      {
+        "enum": "Q95556A0350AB",
+        "sql": "SELECT EVENT_OBJECT_TABLE,EVENT_MANIPULATION,ACTION_TIMING,ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND TRIGGER_NAME=?",
+        "sql_sha256": "95556a0350abd381faf498594e85792d47bb263ea3ed8dfdb842ed410b4d7b12",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "EVENT_OBJECT_TABLE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "EVENT_OBJECT_TABLE"
+          },
+          {
+            "key": "EVENT_MANIPULATION",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "EVENT_MANIPULATION"
+          },
+          {
+            "key": "ACTION_TIMING",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "ACTION_TIMING"
+          },
+          {
+            "key": "ACTION_STATEMENT",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "ACTION_STATEMENT"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "QB2684ECFE856",
+        "sql": "SELECT TRIGGER_NAME name FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND EVENT_OBJECT_TABLE=? ORDER BY TRIGGER_NAME",
+        "sql_sha256": "b2684ecfe8562b58bb8ad2f94607512e6aa71a17bba943cc5cb01bd76d963593",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "name",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TRIGGER_NAME name"
+          }
+        ],
+        "original_order_by": "TRIGGER_NAME",
+        "result_order": "original SQL order"
+      }
+    ]
+  },
+  {
+    "group_id": "I0_IDENTITY_NAMESPACE",
+    "stage": "before first identity primary SHOW",
+    "old_materializations": 2,
+    "new_materializations": 1,
+    "saving": 1,
+    "families": [
+      {
+        "enum": "QEDBF704DA857",
+        "sql": "SELECT TABLE_NAME,TABLE_TYPE,ENGINE,CREATE_OPTIONS,TABLE_COMMENT,TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND LOWER(TABLE_NAME)=?",
+        "sql_sha256": "edbf704da857324a2980e8b86a67a37d833d5259a657689271c0abb90bf2a5ba",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "TABLE_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_NAME"
+          },
+          {
+            "key": "TABLE_TYPE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_TYPE"
+          },
+          {
+            "key": "ENGINE",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "ENGINE"
+          },
+          {
+            "key": "CREATE_OPTIONS",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "CREATE_OPTIONS"
+          },
+          {
+            "key": "TABLE_COMMENT",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_COMMENT"
+          },
+          {
+            "key": "TABLE_COLLATION",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "TABLE_COLLATION"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "QDE6EB7150A9B",
+        "sql": "SELECT TRIGGER_NAME,EVENT_OBJECT_TABLE,EVENT_MANIPULATION,ACTION_TIMING,ACTION_STATEMENT FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND LOWER(TRIGGER_NAME)=?",
+        "sql_sha256": "de6eb7150a9bc6103ea94ee29d9796ef0f4106ec5540aa02a8a68f98b392a156",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "TRIGGER_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TRIGGER_NAME"
+          },
+          {
+            "key": "EVENT_OBJECT_TABLE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "EVENT_OBJECT_TABLE"
+          },
+          {
+            "key": "EVENT_MANIPULATION",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "EVENT_MANIPULATION"
+          },
+          {
+            "key": "ACTION_TIMING",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "ACTION_TIMING"
+          },
+          {
+            "key": "ACTION_STATEMENT",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "ACTION_STATEMENT"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      }
+    ]
+  },
+  {
+    "group_id": "I1_IDENTITY_SHAPE",
+    "stage": "after first identity primary SHOW; existing batch names all identity tables",
+    "old_materializations": 4,
+    "new_materializations": 1,
+    "saving": 3,
+    "families": [
+      {
+        "enum": "Q88ED11D61B97",
+        "sql": "SELECT COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_COMMENT,GENERATION_EXPRESSION,EXTRA,CHARACTER_SET_NAME,COLLATION_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY ORDINAL_POSITION",
+        "sql_sha256": "88ed11d61b974e2fdd08dbb4b8bf28648fcefc3d7d005c9b0350b79580939fb5",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "COLUMN_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "COLUMN_NAME"
+          },
+          {
+            "key": "COLUMN_TYPE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "COLUMN_TYPE"
+          },
+          {
+            "key": "IS_NULLABLE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "IS_NULLABLE"
+          },
+          {
+            "key": "COLUMN_DEFAULT",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "COLUMN_DEFAULT"
+          },
+          {
+            "key": "COLUMN_COMMENT",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "COLUMN_COMMENT"
+          },
+          {
+            "key": "GENERATION_EXPRESSION",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "GENERATION_EXPRESSION"
+          },
+          {
+            "key": "EXTRA",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "EXTRA"
+          },
+          {
+            "key": "CHARACTER_SET_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "CHARACTER_SET_NAME"
+          },
+          {
+            "key": "COLLATION_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "COLLATION_NAME"
+          }
+        ],
+        "original_order_by": "ORDINAL_POSITION",
+        "result_order": "original SQL order"
+      },
+      {
+        "enum": "Q603824C0D074",
+        "sql": "SELECT INDEX_NAME,COLUMN_NAME,NON_UNIQUE,SUB_PART,EXPRESSION,INDEX_TYPE,COLLATION,IS_VISIBLE,INDEX_COMMENT FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? ORDER BY INDEX_NAME,SEQ_IN_INDEX",
+        "sql_sha256": "603824c0d0747e4c83773f8a5d3e31fa482bbc0a9b8e1eb253d0b89f160789e1",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "INDEX_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "INDEX_NAME"
+          },
+          {
+            "key": "COLUMN_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "COLUMN_NAME"
+          },
+          {
+            "key": "NON_UNIQUE",
+            "php_kind": "int",
+            "nullable": false,
+            "expression": "NON_UNIQUE"
+          },
+          {
+            "key": "SUB_PART",
+            "php_kind": "int",
+            "nullable": true,
+            "expression": "SUB_PART"
+          },
+          {
+            "key": "EXPRESSION",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "EXPRESSION"
+          },
+          {
+            "key": "INDEX_TYPE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "INDEX_TYPE"
+          },
+          {
+            "key": "COLLATION",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "COLLATION"
+          },
+          {
+            "key": "IS_VISIBLE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "IS_VISIBLE"
+          },
+          {
+            "key": "INDEX_COMMENT",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "INDEX_COMMENT"
+          }
+        ],
+        "original_order_by": "INDEX_NAME,SEQ_IN_INDEX",
+        "result_order": "original SQL order"
+      },
+      {
+        "enum": "Q26706FA791A1",
+        "sql": "SELECT k.CONSTRAINT_NAME,k.COLUMN_NAME,k.REFERENCED_TABLE_SCHEMA,k.REFERENCED_TABLE_NAME,k.REFERENCED_COLUMN_NAME,k.ORDINAL_POSITION,r.UPDATE_RULE,r.DELETE_RULE FROM information_schema.KEY_COLUMN_USAGE k JOIN information_schema.REFERENTIAL_CONSTRAINTS r ON r.CONSTRAINT_SCHEMA=k.CONSTRAINT_SCHEMA AND r.CONSTRAINT_NAME=k.CONSTRAINT_NAME WHERE k.TABLE_SCHEMA=DATABASE() AND k.TABLE_NAME=?",
+        "sql_sha256": "26706fa791a192720a2f9ee01a2f5b4480f9e3041abe272ab0e51490b8ce319a",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "CONSTRAINT_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "k.CONSTRAINT_NAME"
+          },
+          {
+            "key": "COLUMN_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "k.COLUMN_NAME"
+          },
+          {
+            "key": "REFERENCED_TABLE_SCHEMA",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "k.REFERENCED_TABLE_SCHEMA"
+          },
+          {
+            "key": "REFERENCED_TABLE_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "k.REFERENCED_TABLE_NAME"
+          },
+          {
+            "key": "REFERENCED_COLUMN_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "k.REFERENCED_COLUMN_NAME"
+          },
+          {
+            "key": "ORDINAL_POSITION",
+            "php_kind": "int",
+            "nullable": false,
+            "expression": "k.ORDINAL_POSITION"
+          },
+          {
+            "key": "UPDATE_RULE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "r.UPDATE_RULE"
+          },
+          {
+            "key": "DELETE_RULE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "r.DELETE_RULE"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "QD3A32C45A22D",
+        "sql": "SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA=DATABASE() AND CONSTRAINT_TYPE='CHECK' AND TABLE_NAME=?",
+        "sql_sha256": "d3a32c45a22d7e9f96390898551e782f0092e408f364b822b6a353a6734c0da4",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "CONSTRAINT_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "CONSTRAINT_NAME"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      }
+    ]
+  },
+  {
+    "group_id": "I2_RESERVED_NAMES",
+    "stage": "after identity table/guard validation and negative primary SHOWs",
+    "old_materializations": 2,
+    "new_materializations": 1,
+    "saving": 1,
+    "families": [
+      {
+        "enum": "QECFE2D2F4FCD",
+        "sql": "SELECT TABLE_NAME,INDEX_NAME FROM information_schema.STATISTICS WHERE TABLE_SCHEMA=DATABASE() AND LOWER(INDEX_NAME)=?",
+        "sql_sha256": "ecfe2d2f4fcd274ff4c3906fce764d4573f49d44eca7b4d6b331eadd5d3277cb",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "TABLE_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_NAME"
+          },
+          {
+            "key": "INDEX_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "INDEX_NAME"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "Q6546FD85F02A",
+        "sql": "SELECT TABLE_NAME,CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND LOWER(CONSTRAINT_NAME)=?",
+        "sql_sha256": "6546fd85f02ac6ca5092c1fc6f7a27271c57be6e869481bde29cc6dbc774aca3",
+        "original_bind_arity": 1,
+        "ordered_columns": [
+          {
+            "key": "TABLE_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_NAME"
+          },
+          {
+            "key": "CONSTRAINT_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "CONSTRAINT_NAME"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      }
+    ]
+  },
+  {
+    "group_id": "D0_FULL_DEPENDENTS",
+    "stage": "full inspect only after reserved-name validation; database already cached",
+    "old_materializations": 4,
+    "new_materializations": 1,
+    "saving": 3,
+    "families": [
+      {
+        "enum": "Q7BC108FBFFA5",
+        "sql": "SELECT TRIGGER_SCHEMA,TRIGGER_NAME,EVENT_OBJECT_TABLE,ACTION_STATEMENT FROM information_schema.TRIGGERS",
+        "sql_sha256": "7bc108fbffa58429d51dace71131bee60db0beae927886901e613a0a3aeb6fca",
+        "original_bind_arity": 0,
+        "ordered_columns": [
+          {
+            "key": "TRIGGER_SCHEMA",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TRIGGER_SCHEMA"
+          },
+          {
+            "key": "TRIGGER_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TRIGGER_NAME"
+          },
+          {
+            "key": "EVENT_OBJECT_TABLE",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "EVENT_OBJECT_TABLE"
+          },
+          {
+            "key": "ACTION_STATEMENT",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "ACTION_STATEMENT"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "Q037BE6D6C820",
+        "sql": "SELECT TABLE_SCHEMA,TABLE_NAME,REFERENCED_TABLE_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA=DATABASE()",
+        "sql_sha256": "037be6d6c8208cfcc3e69db106daea29add7f85ca4ebd77ab40792f9d19a4545",
+        "original_bind_arity": 0,
+        "ordered_columns": [
+          {
+            "key": "TABLE_SCHEMA",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_SCHEMA"
+          },
+          {
+            "key": "TABLE_NAME",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_NAME"
+          },
+          {
+            "key": "REFERENCED_TABLE_NAME",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "REFERENCED_TABLE_NAME"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "GlobalViews",
+        "sql": "SELECT TABLE_SCHEMA,VIEW_DEFINITION FROM information_schema.VIEWS",
+        "sql_sha256": "547cdc5616bd425f993e5aaf5b0782feef099029209c704a3727847e3ed5261c",
+        "original_bind_arity": 0,
+        "ordered_columns": [
+          {
+            "key": "TABLE_SCHEMA",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "TABLE_SCHEMA"
+          },
+          {
+            "key": "VIEW_DEFINITION",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "VIEW_DEFINITION"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      },
+      {
+        "enum": "GlobalRoutines",
+        "sql": "SELECT ROUTINE_SCHEMA,ROUTINE_DEFINITION FROM information_schema.ROUTINES",
+        "sql_sha256": "d151c1be22130f79d94ac0b7dc3f64009b4c1c896b791761dbac89bb52f85bd4",
+        "original_bind_arity": 0,
+        "ordered_columns": [
+          {
+            "key": "ROUTINE_SCHEMA",
+            "php_kind": "string",
+            "nullable": false,
+            "expression": "ROUTINE_SCHEMA"
+          },
+          {
+            "key": "ROUTINE_DEFINITION",
+            "php_kind": "string",
+            "nullable": true,
+            "expression": "ROUTINE_DEFINITION"
+          }
+        ],
+        "original_order_by": null,
+        "result_order": "unordered multiplicity; retain exact consumer refusal/strict singleton checks"
+      }
+    ]
+  }
+]

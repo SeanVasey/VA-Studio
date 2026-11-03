@@ -1,0 +1,99 @@
+{
+  "checks": [
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "/workspace/VA-Studio/vendor/laravel/pint/builds/pint",
+        "app/Domain/Customers/ProductionIdentity/CurrentCatalog.php",
+        "tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php"
+      ],
+      "exit": 0,
+      "stdout": "\n  ..\n\n  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 Laravel  \n    PASS   ........................................................... 2 files  \n\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "-l",
+        "app/Domain/Customers/ProductionIdentity/CurrentCatalog.php"
+      ],
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/CurrentCatalog.php\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "-l",
+        "tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php"
+      ],
+      "exit": 0,
+      "stdout": "No syntax errors detected in tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "/workspace/VA-Studio/vendor/laravel/pint/builds/pint",
+        "--test",
+        "app/Domain/Customers/ProductionIdentity/CurrentCatalog.php",
+        "tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php"
+      ],
+      "exit": 0,
+      "stdout": "\n  ..\n\n  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 Laravel  \n    PASS   ........................................................... 2 files  \n\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "/workspace/account-guard-evidence-20261101/catalog-pure-phpunit.php",
+        "--no-configuration",
+        "tests/Unit/ProductionIdentity",
+        "tests/Unit/AccountAdmissionGuardDefinitionTest.php"
+      ],
+      "exit": 0,
+      "stdout": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\nRuntime:       PHP 8.4.27\n\n...........................................                       43 / 43 (100%)\n\nTime: 00:01.357, Memory: 26.50 MB\n\nOK (43 tests, 1100 assertions)\n",
+      "stderr": ""
+    }
+  ],
+  "source_sha256": {
+    "app/Domain/Customers/ProductionIdentity/CurrentCatalog.php": "546c0b1f9b42be4e487d57cb514743015ac4cdef17b1671c3e22285f3015cd6d",
+    "tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php": "654207f7354da596e8274f6c52a10feb81b8efa73031cc2551225582a48337c3"
+  },
+  "native_executed": false
+}

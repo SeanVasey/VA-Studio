@@ -1,0 +1,20 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.27
+Configuration: /workspace/VA-Studio-account-guard-v2/phpunit.xml
+
+identity inspection: 133 total SQL (90 primary + 43 companion), 1 native handshakes/1.0 ms, 204.5 ms total
+F                                                                   1 / 1 (100%)
+
+Time: 01:47.510, Memory: 83.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionIdentity\IdentityInspectionCostTest::test_one_native_inspection_issues_a_small_fixed_number_of_statements
+Failed asserting that 133 is equal to 110 or is less than 110.
+
+/workspace/VA-Studio-account-guard-v2/tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php:52
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 8, Failures: 1.

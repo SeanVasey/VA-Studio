@@ -1,0 +1,11 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.27
+Configuration: /workspace/VA-Studio-account-guard-v2/phpunit.xml
+
+account frame: first=31, hit=14, full callbacks=2
+.                                                                   1 / 1 (100%)
+
+Time: 02:31.171, Memory: 83.00 MB
+
+OK (1 test, 8 assertions)

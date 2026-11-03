@@ -1,0 +1,27 @@
+app/Domain/Memberships/Billing/BillingSchema.php:9:use App\Domain\Memberships\Production\MembershipSchemaCatalog;
+app/Domain/Memberships/Billing/BillingSchema.php:109:            $catalog = $driver === 'mysql' ? new MembershipSchemaCatalog($pdo) : null;
+app/Domain/Memberships/Billing/BillingSchema.php:153:                    $objects = $catalog->named(CatalogRead::QB759388A923D, $this->mysqlNames(), $name);
+app/Domain/Memberships/Billing/BillingSchema.php:174:                    $actualGuards = $catalog->named(CatalogRead::Q17F6CDE46309, $this->mysqlNames(), $name);
+app/Domain/Memberships/Billing/BillingSchema.php:192:                        $objects = $catalog->named(CatalogRead::QA587267279FC, $this->mysqlGuardNames(), $guard);
+app/Domain/Memberships/Billing/BillingSchema.php:712:    private function assertNamespace(PDO $pdo, string $driver, bool $billingTablesLocked = false, ?MembershipSchemaCatalog $catalog = null, int $retrievalStage = 0): void
+app/Domain/Memberships/Billing/BillingSchema.php:776:                    $objects = $catalog->rows(CatalogRead::Q646B96B0C726, $namespaceParameters, $symbol);
+app/Domain/Memberships/Billing/BillingSchema.php:859:    private function mysqlDefinition(PDO $pdo, string $name, array $definition, MembershipSchemaCatalog $catalog): string
+app/Domain/Memberships/Billing/BillingSchema.php:861:        $columns = $catalog->named(CatalogRead::Q3AA887855776, $this->mysqlNames(), $name);
+app/Domain/Memberships/Billing/BillingSchema.php:890:        $constraints = $catalog->named(CatalogRead::QD85B53840949, $this->mysqlNames(), $name);
+app/Domain/Memberships/Billing/BillingSchema.php:904:            $foreign = $catalog->rows(CatalogRead::Q67FBDF0A6079, $foreignParameters, $name.'_f'.$index);
+app/Domain/Memberships/Billing/BillingSchema.php:906:            $foreign = $catalog->rows(CatalogRead::Q0A90E1BF7361, $foreignParameters, $name.'_f'.$index);
+app/Domain/Memberships/Billing/BillingSchema.php:913:        $rows = $catalog->rows(CatalogRead::Q17D835DCD480, $checks, $name);
+app/Domain/Memberships/Production/MembershipSchema.php:62:        $catalog = $driver === 'mysql' ? new MembershipSchemaCatalog($pdo) : null;
+app/Domain/Memberships/Production/MembershipSchema.php:93:                $objects = $catalog->named(CatalogRead::QB759388A923D, $this->mysqlNames(), $name);
+app/Domain/Memberships/Production/MembershipSchema.php:112:                $actualGuards = $catalog->named(CatalogRead::Q17F6CDE46309, $this->mysqlNames(), $name);
+app/Domain/Memberships/Production/MembershipSchema.php:130:                    $objects = $catalog->named(CatalogRead::QA587267279FC, $this->mysqlGuardNames(), $guard);
+app/Domain/Memberships/Production/MembershipSchema.php:299:    private function assertNamespace(PDO $pdo, string $driver, ?MembershipSchemaCatalog $catalog): void
+app/Domain/Memberships/Production/MembershipSchema.php:346:                    $objects = $catalog->rows(CatalogRead::Q646B96B0C726, $namespaceParameters, $symbol);
+app/Domain/Memberships/Production/MembershipSchema.php:418:    private function mysqlDefinition(PDO $pdo, string $name, array $definition, MembershipSchemaCatalog $catalog): void
+app/Domain/Memberships/Production/MembershipSchema.php:420:        $columns = $catalog->named(CatalogRead::Q3AA887855776, $this->mysqlNames(), $name);
+app/Domain/Memberships/Production/MembershipSchema.php:446:        $constraints = $catalog->named(CatalogRead::QD85B53840949, $this->mysqlNames(), $name);
+app/Domain/Memberships/Production/MembershipSchema.php:457:            $foreign = $catalog->rows(CatalogRead::Q67FBDF0A6079, $foreignParameters, $name.'_f'.$index);
+app/Domain/Memberships/Production/MembershipSchema.php:459:            $foreign = $catalog->rows(CatalogRead::Q0A90E1BF7361, $foreignParameters, $name.'_f'.$index);
+app/Domain/Memberships/Production/MembershipSchema.php:466:        $rows = $catalog->rows(CatalogRead::Q17D835DCD480, $checks, $name);
+app/Domain/Memberships/Production/MembershipSchemaCatalog.php:10:final class MembershipSchemaCatalog
+tests/Unit/ProductionIdentity/CatalogBatchPlanTest.php:45:                if (str_contains($source, 'new MembershipSchemaCatalog(')) {
