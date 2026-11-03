@@ -302,3 +302,111 @@ extras, named wires and selected-wire/crosswire boundaries. All earlier tests
 remain. **PHP/lint/Pint/pure/native checks are UNRUN for this correction.** ROOT
 owns those checks and the next bounded physical selection; no new runtime or
 110/15/currentness/F9 acceptance follows from this source preparation.
+
+## Integration selection map — November 3
+
+The new sparse integration branch composes immutable application source
+`a9b48dafb64dbf34e3ca0397d1b5b17d56bb5bb0`, main
+`04e45a0ace13b8f58bde93581c88f2d3489a409c`, the complete f378/02 oracle
+changes and the c962 N7 receipt. No conflict resolution changed executable bytes.
+Account domain/migration source remains a9b; N7 remains main04; the physical test
+and helper remain `02f18b391e74fd78626d22e7821192c8198e1320`.
+This composition has **no runtime acceptance yet**. ROOT owns runtime, discovery
+regeneration, focused checks and independent review of the actual tested source.
+
+Completed component evidence is carried, not rerun for metadata: a9b typed
+1/1,081, cost1/8 (108 total SQL), memo1/8 (first31/hit14/full2), populated
+up/down1/15 and overlap1/12 passed, each with six clean cleanup checks. The 02
+helper/unit selection passed16/163 and the physical method passed1/880 against
+a9b application bytes. Original expected3/actual2, cost133/110 and f378 physical
+1/104 failures remain. The new regression fails the old helper as expected;
+that control is not a positive pass or extra mutant kill. Observer qualification
+passed only its exact permission/capability contract; `lease_release` still
+awaits a verified product result.
+
+The following is a finite queue, not a request for a full suite. All method names
+below have the literal prefix `test_`. `U`, `G`, `C` name classes under
+`tests/Feature/ProductionIdentity/`; their current Git blob hashes are:
+
+| Alias / class | Exact source blob |
+| --- | --- |
+| U — AccountAdmissionGuardUpgradeTest | `f17ae7fcf74c5907cd0433bb9c8bb9012645aaca` (a9b) |
+| G — CatalogGroupDifferentialTest | `16bb95120db58ded1710a9d4b391337eee654e6c` (02) |
+| C — CurrentCatalogAdmissionTest | `7d76183ff1f6094c82eacdf212f5953b46d43993` (a9b) |
+
+| Dependency / disposition | Exact remaining selectors |
+| --- | --- |
+| Qualified observer; product result pending | C::native_nested_boundary_reuses_one_companion_and_last_close_releases_server_session |
+| Existing eight-key native queue; do not duplicate | U::native_early_repeatable_read_snapshot_refuses_new_reserved_namespace_on_memo_hit; U::native_same_connection_implicit_ddl_invalidates_witness_before_memo_reuse; C::native_companion_statement_accounting_matches_server_including_constructor_setup_and_context; C::native_primary_attribute_changes_invalidate_retained_companion_without_reconnect; C::native_failed_memo_ends_companion_and_restoration_uses_complete_unframed_proof; C::native_unframed_complete_proofs_refuse_new_namespace_under_early_primary_snapshot; C::native_raw_config_and_resolver_callbacks_refuse_before_factory_or_callback_execution; G::native_grouped_and_original_parent_entries_both_refuse_partial_and_foreign_guard_sets |
+| Remaining migration refusal methods; no exact-a9b actual carried | U::existing_transaction_is_refused_without_trigger_changes; U::migration_only_dependency_floor_refuses_foreign_view_and_incoming_key_before_ddl; U::migration_only_scanner_accepts_legitimate_triggers_and_refuses_foreign_or_altered_dependency |
+| Remaining native namespace methods; exact peer-schema privilege/ownership requires qualification | U::native_memo_rechecks_reserved_names_created_without_account_metadata_lock; U::native_trigger_dependency_qualification_refuses_target_and_allows_similar_named_peer — the latter CREATE/DROPs the owned-name `-account-guard-peer` schema and its triggers. Owned-primary-schema grants do not qualify it; never infer a global grant. |
+| Remaining native group adversity; old mechanism/pure results do not establish these product methods | G::native_view_functional_unordered_indexes_unicode_defaults_aliases_and_global_definitions_match_original; G::native_warning_count_observes_prepare_execute_full_eof_without_sql_and_rejects_warned_transport; G::native_explain_note_policy_rejects_real_conversion_warning_and_preserves_production_zero_guard; G::native_i2_second_gate_preserves_positive_facts_and_emits_all_reserved_invalid_headers; G::native_i2_first_and_second_prepare_failures_invalidate_without_partial_result_or_reuse; G::native_oversized_complete_catalog_refuses_and_releases_failed_companion_preserving_primary_savepoint |
+| SQLite only | U::sqlite_down_noop_still_refuses_a_missing_guard |
+| Separate actual endpoint/TLS profile; outside the empty-output menu | C::native_coherent_endpoint_and_feasible_tls_downgrade_refuse_before_constructor_attempt; plaintext-only execution cannot credit its TLS subcase. Owned04 has no selected public CA export or certificate-to-admitted-IP proof. Canonical MYSQL_ATTR_SSL_CA with verify_server_cert=true may be selected only after that proof, with no verify-off, hostname swap or server reload. Require the original SELECTED_PRIMARY_TLS line plus JUnit; UNEXECUTED_NO_PRIMARY_TLS_PROFILE remains endpoint-only. |
+
+Minimal composed-domain selections use existing source, unchanged from main04
+(full source reference above). Prefix each method below with `test_`; paths are
+under `tests/Feature/`. These are meaningful consumers of the changed account
+proof, not a repeat of N7's unchanged cache-only controls or six mutants:
+
+| File / exact Git blob | Selected method and purpose |
+| --- | --- |
+| ProductionMembershipHttp/MembershipCustomerRateLimitTest.php — `9369cad66a5911484cf49adb63ddd2be8870d817` | read_bucket_survives_ip_session_and_recovery_changes_and_expires; cache_callbacks_cannot_change_identity_or_steal_the_admission_lease_before_domain_work — real identity/member schema composition and callback refusal. |
+| ProductionIdentity/ProductionIdentityJourneyTest.php — `0771d846f66f99e09a24806851b005ceba788360` | recovery_preserves_original_origin_and_historical_act_and_revokes_old_principal — direct writer/current/historical behavior. |
+| ProductionIdentity/ProductionIdentityRuntimeTest.php — `97230fd61d225833144d4135ad5714e1e4a7f9c9` | current_and_original_historical_authority_refuse_every_owned_temporary_source_shadow — five existing provider cases; each exact target is selected separately. |
+| ProductionFeatures/ProductionFeatureJourneyTest.php — `9d7e462ad527f359951a9644580913d84d8e1a3f` | unknown_initialize_grant_withdraw_and_repeated_withdraw_retain_production_pointer — consent/feature parent composition. |
+| ProductionSuppression/ProductionSuppressionJourneyTest.php — `bca8273f624fefa8803ce880b566a32eac7eb389` | withdraw_attempt_committed_before_transport_unknown_without_resend_until_inspect_confirms — downstream suppression and retained consent. |
+| ProductionAccountFeatures/ProductionAccountFeaturesDefaultConfigurationTest.php — `c17d15188fff66d420067a2f6142a20dbab83c25` | production_environment_refuses_every_feature_with_shipped_defaults — production-mode default-off refusal only; not a production-host/bootstrap compatibility claim. |
+
+The source-only inner invocation is `php -d memory_limit=512M vendor/bin/phpunit
+--filter '^.*::test_EXACT_METHOD$' tests/Feature/EXACT_FILE.php`, with those literal
+placeholders replaced from this map. ROOT must bind it into the existing bounded
+admitted runner; this is not permission for an unwrapped invocation. Data-provider
+methods require an exact single provider selection. Native catalog composition
+needs Oracle8.4.11; SQLite is not its substitute. SMTP fixtures require the existing
+private loopback sink, and sparse files/dependencies must be materialized through
+ROOT's existing runtime preparation. Keep method-specific output contracts: the
+physical and cost cases intentionally emit diagnostic STDERR. The oversized
+catalog case requires the qualified threads observer and a profile supporting its
+8,388,609-byte view body (including max_allowed_packet); it emits
+`overflow companion release samples: <JSON integer array>` and cannot use an
+unmodified empty-STDERR contract.
+
+Three concrete later gates are distinct from these selected regressions:
+
+- **Native race:** unchanged `ProductionIdentityNativeRaceTest.php`, blob
+  `6fe9cbeb99c5747a727ed8350d52d25831e43962`, selects
+  `test_competing_completion_waits_on_exact_address_and_retains_one_verification`
+  (four existing enroll/recover × same/conflicting providers), then
+  `test_committed_credential_withdrawal_wins_exact_user_fence_before_recovery`.
+  Its worker blob is `b7432df17d7243786ea605fb7217f992d6a96392`. Existing 35-second
+  workers and 15-second exact-wait barriers remain; performance_schema threads,
+  data_locks and data_lock_waits visibility must be separately qualified. The
+  single threads SELECT grant is not proof of the other two.
+- **Real migration ledger/restart:** existing separate candidate
+  `b0bf7fd3cc9e7f842817830a20a49551f01ca4d1` prepares
+  `AccountAdmissionMigratorTest::test_normal_migrator_process_interruption_and_genuine_ledger_resume`,
+  blob `c55df3c281305b52a29d0913a087bfd5cb97d195`, providers up-overlap,
+  down-overlap, up-end, down-end. It has source-fitness evidence only and is based
+  on7347. Rebind/review its exact app/framework/callsite pins and genuine current
+  fixture once; use its one-provider supervisor, not the generic command above.
+  Do not import it silently or create a replacement harness. Direct coordinator
+  calls in U's passing methods do not prove normal Laravel ledger interruption.
+- **Account-only owner progress:** original member candidate
+  `29ce932b7279953a011dd18041ddd4c1df66f306` contains
+  `docs/verification/member-mount-gates-20261101/IdentityHistoryLockProbeTest.php`,
+  blob `7f54cb963403ac12218addc073ad6167eec2a551`, method
+  `test_diagnostic_account_lock_only_new_origin`. It is historical failed
+  diagnostic source, not a ready selection: it changes PFS instrumentation and
+  writes private traces. A bounded current-source adaptation must preserve real
+  CompleteIdentity and prove both owner orderings without those unapproved side
+  effects. Generic address-lock races cannot replace this account-PK gate.
+
+The census appends exactly22 new native-only methods (U6/G9/C7) after main's
+complete ordered prefix; the existing cost entry is retained and the SQLite-only
+method is excluded. ROOT still regenerates discovery/counts. No production env
+or config keys were added: the factory/descriptor/socket code uses existing
+canonical connection fields. Harness selectors are not new production keys.
+Query groups, catalog transport and the authorization migration still require
+independent review of the final tested candidate; source comparisons waive none
+of those gates. No Format F source, host activation, mount or live action is added.
