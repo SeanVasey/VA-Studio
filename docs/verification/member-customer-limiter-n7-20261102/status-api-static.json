@@ -1,0 +1,38 @@
+{
+  "status": "PURE API + STATIC ONLY; actual25eRUN01 remainsFAIL1/672",
+  "locked_symfony_process_version": "v8.0.13",
+  "locked_source_ref": "4f23d9c7637ead9ed19f697fe93cb87fd9b379d4",
+  "process_php_sha256": "73c4e31230f9602768b73cda3451ed7ec0dddc20ddef6cc0d6795ea879600c39",
+  "php_version": "8.4.27",
+  "pint_version": "v1.32.1",
+  "commands": [
+    {
+      "command": "php -l tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php",
+      "exit": 0
+    },
+    {
+      "command": "php -l docs/verification/member-customer-limiter-n7-20261102/status-api-pure.php",
+      "exit": 0
+    },
+    {
+      "command": "php docs/verification/member-customer-limiter-n7-20261102/status-api-pure.php",
+      "exit": 0,
+      "result": "PURE locked4API contract; oldmethod rejected;3synthetic terminal/exit cases;READY UNKNOWN. No actualchild/cleanup evidence."
+    },
+    {
+      "command": "php vendor/laravel/pint/builds/pint --test tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php docs/verification/member-customer-limiter-n7-20261102/status-api-pure.php",
+      "exit": 0
+    }
+  ],
+  "source_sha256": {
+    "app/Http/Membership/MembershipCustomerLimiter.php": "a59113347b9114269ad109660e200999d5201faad5b6aa6acb8cadeb80ff4571",
+    "app/Http/Membership/MembershipController.php": "abe30eb9abaf67d766bf736a97ebd0e0410b6ebfb3ccff7aecd75910182a1a2b",
+    "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php": "e0a522b2033c9363209f4dd4229ea2e31b530ef068a4d750288285f55419275b",
+    "tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php": "ed67665e038e5448fb10d5cf35cb02df0cb873a4c7d01b4258386e75bdf5914f",
+    "tests/Support/membership-customer-limiter-worker.php": "45a8cec53891c170374b61232aca607d84e0f98baee613cdc5f57b1bf72c200a"
+  },
+  "pure_script_sha256": "8a5692a5e315ab7c42de9d0dda2c95a84f471f88f46897184a8448c604231e54",
+  "runtime_code_delta": "ONLYnative isSignaled->hasBeenSignaled; no worker/product/HTTP/oracle/limit changes",
+  "actual_new_behavioral_runs": 0,
+  "all14mutants": "UNRUN"
+}

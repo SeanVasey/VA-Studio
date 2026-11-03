@@ -1,0 +1,34 @@
+# Independent final N7 source and evidence decision
+
+**APPROVE WITH CONDITIONS for focused development publication/merge of exact `33a3bffd9912b219e47415723ab7d6858fbbc04d`. No supported open P0–P2 finding was identified.** This is not activation, launch, full-suite acceptance or closure of F9/account/history/deployment prerequisites.
+
+Reviewed the actual sensitive executable source, tests, locked API repair and raw focused evidence through the final frozen candidate, including packet-only `6031a59bf89fd143598cb493ebe03d91c67cee28` and the final shared metadata commit. Final application/test/config/route/database/bootstrap/dependency bytes are identical to tested executable source `fbb802782c51c790fb4dcfcbb9f052fd9d9dfced`. Final changes after that tested source are evidence, documentation, census and workflow comments. No test, PHP, process, runtime, database or container action was performed by this reviewer.
+
+## Sensitive behavior
+
+The product change is one customer limiter plus exactly two controller admission calls. It proves the genuine request capsule, derives the stable provenance/account/read-or-write tier key, uses the same configured repository for a nonblocking atomic lock and counter, charges before domain entry, checks count/TTL/current ownership, requires release and reproves the capsule after extensible cache work. Cache/store/ownership failures refuse privately; quota responses clamp Retry-After to1–60. All write routes share one write tier; reads are separate. Existing authentication, domain/ledger reproofs, privacy, IP/session guards, routes, migrations and dependencies remain unchanged.
+
+This is request admission, not membership/payment/license authority or in-flight domain serialization. The shipped member mount remains literalfalse. No F9/history/account migration or new production environment key is imported.
+
+## Verified focused evidence and exact carry
+
+- SQLite at `25e5a7c2e77d50645f457b63c90b2c0337b12613`: six limiter cases/437 assertions, six unchanged HTTP cases/516 assertions and34 mount cases/1092 assertions:46/2045, actual outerexit0, no errors/failures/skips/timeouts. Relevant product, HTTP, worker and regression consumers are byte-identical in fbb and the final candidate. These are carried25e results, not46 new executions on the final head.
+- Native RUN02 atfbb: one selected test/724 assertions passed, actual outerexit0/no timeout. Raw28-sample evidence proves one unchanged live60s counter epoch over5.3595s, counter10 and ten total admissions; sequential fill ends429. Separate real held-lock observations are[503,503], with parent ownership checked after child completion. All four workers have actual terminal/non-running/exit0/not-signaled receipts. External audit independently confirms the same actual Oracle8.4.11 identity, no other real clients/transactions/data locks/waits/non-auditor MDL includingNULL/pending, no remaining testPHP, and exact clean source hashes.
+- Original native RUN01 at25e remains FAIL1/672 with four process-observer Error/UNKNOWN receipts. The locked Symfony getter repair and corrected RUN02 do not rewrite that failure. Original setup/preflight STOPs and later attribution/recovery remain separately recorded.
+- Mutation batch at exactfbb: a fresh isolated sandbox baseline actually passed6/437, followed by fourteen distinct selected plans, each producing its predeclared meaningful behavioral assertion failure: testcount1/failure1/errors0/skips0/actual exit1. No survivor, timeout, unexpected assertion, API/setup/no-tests error or restoration uncertainty was counted as a kill. Backups, exact planned replacements, mutated hashes and actual patches match; every case restored exact original bytes and both source trees' cleanliness/hashes. Actual foreground completion and post-process absence were recorded. Two charge-after-domain mutants have two operands and the critical-section mutant has three: these are composed-plan kills, not independent operand coverage.
+- Five local CI safeguard selections record207 control tests passing. Regenerated discovery lists10049 cases/745 files, selecting2679 unique native cases/266 files across24 nonempty shards. All listed discovery artifact hashes match. Discovery is not execution of that selection;103 fallback timing-weight files are disclosed.
+
+## Census, receipt and publication review
+
+The SQLite-skip census appends only the new native method:310→311, with the entire prior310-entry prefix and original first150 unchanged. No historical skip/assertion intent is weakened. Both CI workflow edits are count comments only; no triggers, audits or gates are relaxed. The PCC187 handoff/changelog receipts preserve original nongreen/full-suite limitations and default-off boundaries.
+
+The final packet distinguishes testedfbb,25e carry, failed RUN01, corrected RUN02, sandbox baseline/mutations and metadata-only final commits. Prior independent decisions are explicitly marked sanitized copies with provenance, not falsely byte-exact originals. Publication inspection found no private execution endpoints, credential locations, raw private logs, customer data or secret material in the N7 packet. The public summaries agree with inspected raw evidence and preserve uncertainty/untested limits.
+
+## Approval conditions
+
+1. ROOT may add only this decision byte-exact and one factual approval-status note, then prove every other reviewed byte unchanged. Any executable/test/oracle/census/workflow behavior change requires a new exact review; documentation-only carry must remain explicit.
+2. Complete the required cheap replacement preflight, code/security and Bugbot review and repository protections before an expected-head merge. Preserve all actual failures and evidence; no check bypass or routine full matrix is required by this decision. Final integrated verification remains governed by the existing CI cost policy.
+3. Keep membership mounting/activation disabled. F9 headroom, account/history prerequisites, target deployment shared-cache proof and host/provider/cutover obligations remain independent gates requiring their own evidence and authorization.
+4. Describe the scope honestly: one native epoch/held-lock case, not724 race trials/all schedules/multi-host certification; local SQLite semantics and selected counterfactuals, not exhaustive correctness; no end-to-end SLA, latency/headroom/cost or malicious-backend guarantee. Controlled transaction-entry refusal does not claim full execution of a failing domain body. No full Foundation/browser/other-domain matrix was run for this isolated change.
+
+Subject to these conditions, the exact reviewed candidate is suitable for the authorized focused development merge. Nothing is live and this decision supplies no mount, deployment, data migration or launch authorization.

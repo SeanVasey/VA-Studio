@@ -1,0 +1,399 @@
+{
+  "scope": "CARRY_OF_EXISTING_0159_SELECTED_SQLITE_EVIDENCE_NOT_A_NEW_EXECUTION",
+  "classification": "Only public source identifiers/hashes, safe summary counts, fixed outcomes and source command vectors; no raw private payloads or body digests. Local execution root is replaced.",
+  "source_records": [
+    {
+      "source": "member-timer-epoch-packet-draft-0159eec3-01/README.md",
+      "sha256": "7e4ccb17f2b88718263f43606961fc86adb06597a27db4feb255d79e81c0ce68",
+      "kind": "existing source/results draft"
+    },
+    {
+      "source": "member-timer-epoch-baseline-0159eec3-01/SAFE-SUMMARY.json",
+      "sha256": "ed02932a57a5ac37c6b777530e7483b9ec549a0e13dc11d491b61e9dfea1e256",
+      "kind": "safe baseline summary"
+    },
+    {
+      "source": "member-timer-epoch-mutation-results-0159eec3-20261102-01/SAFE-AGGREGATE.json",
+      "sha256": "65cccd07103d2b9e34e384139a6610cdb132fb3b80c5df0fa04f6829368b75fa",
+      "kind": "safe mutation summary"
+    },
+    {
+      "source": "member-timer-epoch-sqlite-remaining-0159eec3-01/selection-index.json",
+      "sha256": "5e5d09224f4abf5e817ae6996274718e14672b62347a2b3671d666c8399cf190",
+      "kind": "public source command vectors at batches[].command"
+    },
+    {
+      "source": "member-timer-epoch-mutants-source-20261102-03/EXECUTION.json",
+      "sha256": "ab6214fcf17712f281fa370e40f15cfb288a0507fd5413c63a6a94cff5cec376",
+      "kind": "public source command vectors at cases[].host_argv"
+    },
+    {
+      "source": "member-timer-epoch-static-20261102-01/static-runner.py",
+      "sha256": "a9aa67f37ad5ec4e1f7d2ba1efe1a972836017c71df6f50f0a8aff3f0cf470f9",
+      "kind": "public static runner source"
+    },
+    {
+      "source": "member-timer-epoch-sqlite-alone-0159eec3-01/run-sqlite.py",
+      "sha256": "202a82d789db6da945fd30d88f660f56e577ce4a6ac9ad94ed0f98dfeffc69d2",
+      "kind": "public isolated baseline runner source"
+    }
+  ],
+  "positive_baseline": {
+    "commit": "0159eec3e3a20874b6b7bc16c3bd92840f57baa8",
+    "source_sha256": {
+      "app/Http/Membership/MembershipCustomerLimiter.php": "435317c4616023611e739936ecf06662cc85b735dec956ac05051e4c01849e9d",
+      "tests/Feature/ProductionMembershipHttp/MembershipCustomerLimiterEpochTest.php": "4cd426131afbfa771cd8cb79910d43b4d3b0cc1959ce5b06b10fde0f113eac77",
+      "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php": "e0a522b2033c9363209f4dd4229ea2e31b530ef068a4d750288285f55419275b"
+    },
+    "coverage": {
+      "assertions": 1323,
+      "errors": 0,
+      "failures": 0,
+      "method_sets_disjoint": true,
+      "new_timing_assertions": 886,
+      "new_timing_tests": 14,
+      "single_process20_pass_claimed": false,
+      "six_separate_passing_processes": true,
+      "skipped": 0,
+      "tests": 20,
+      "unchanged_assertions": 437,
+      "unchanged_tests": 6,
+      "union_equals_exact_source20": true
+    },
+    "runs": [
+      {
+        "selection": "isolated-first-method",
+        "methods": [
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerLimiterEpochTest::test_real_array_fractional_tail_admits_both_tiers_caps_at_ten_and_starts_fresh_only_after_expiry"
+        ],
+        "phpunit": {
+          "assertions": 93,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 1
+        }
+      },
+      {
+        "selection": "batch-01-new-4",
+        "methods": [
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerLimiterEpochTest::test_real_file_store_expires_at_the_integer_boundary_and_creates_one_new_epoch",
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerLimiterEpochTest::test_partial_stale_and_corrupt_states_refuse_without_a_hit_or_reset",
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerLimiterEpochTest::test_canonical_decimal_timer_and_counter_are_accepted_and_full_quota_headers_remain_bounded",
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerLimiterEpochTest::test_expiry_during_the_hit_refuses_once_and_the_next_request_keeps_the_new_epochs_consumed_hit"
+        ],
+        "phpunit": {
+          "assertions": 425,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 4
+        }
+      },
+      {
+        "selection": "batch-02-new-4",
+        "methods": [
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerLimiterEpochTest::test_timer_expiry_between_snapshot_reads_refuses_without_attempting_a_hit",
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerLimiterEpochTest::test_missing_corrupt_or_replaced_post_hit_timers_and_counter_changes_never_enter_domain",
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerLimiterEpochTest::test_expired_array_owner_without_successor_refuses_before_hit_and_after_one_consumed_hit",
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerLimiterEpochTest::test_delays_inside_post_hit_owner_release_and_post_release_callbacks_refuse"
+        ],
+        "phpunit": {
+          "assertions": 200,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 4
+        }
+      },
+      {
+        "selection": "batch-03-new-5",
+        "methods": [
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerLimiterEpochTest::test_lease_deadline_equality_and_observed_backward_time_refuse_with_before_deadline_control",
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerLimiterEpochTest::test_monotonic_budget_refuses_a_bounded_real_stall_even_with_frozen_wall_time",
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerLimiterEpochTest::test_successor_ownership_and_release_failures_never_enter_domain",
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerLimiterEpochTest::test_a_contended_real_lock_refuses_without_count_mutation_or_releasing_its_owner",
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerLimiterEpochTest::test_final_identity_withdrawal_refuses_and_successful_domain_entry_sees_the_lock_released"
+        ],
+        "phpunit": {
+          "assertions": 168,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 5
+        }
+      },
+      {
+        "selection": "batch-04-old-3",
+        "methods": [
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerRateLimitTest::test_read_bucket_survives_ip_session_and_recovery_changes_and_expires",
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerRateLimitTest::test_refused_first_page_domain_reads_still_consume_admission_before_domain",
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerRateLimitTest::test_customers_and_read_write_tiers_have_distinct_buckets_and_all_write_routes_share_one"
+        ],
+        "phpunit": {
+          "assertions": 293,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 3
+        }
+      },
+      {
+        "selection": "batch-05-old-3",
+        "methods": [
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerRateLimitTest::test_configured_store_is_used_and_a_contended_admission_lock_fails_before_domain",
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerRateLimitTest::test_cache_exception_is_a_private_pre_operation_failure_for_reads_and_writes",
+          "Tests\\Feature\\ProductionMembershipHttp\\MembershipCustomerRateLimitTest::test_cache_callbacks_cannot_change_identity_or_steal_the_admission_lease_before_domain_work"
+        ],
+        "phpunit": {
+          "assertions": 144,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 3
+        }
+      }
+    ],
+    "original_20_case_attempt": {
+      "status": "TIMEOUT_UNCLASSIFIED",
+      "phpunit_exit": 124,
+      "inner_seconds": 120,
+      "junit_bytes": 0,
+      "completed": "UNKNOWN",
+      "cause_classified": false
+    }
+  },
+  "negative_experiments": {
+    "totals": {
+      "assertions": 98,
+      "errors": 0,
+      "failures": 6,
+      "killed_mutants": 6,
+      "skipped": 0,
+      "survived_mutants": 0,
+      "tests": 6,
+      "unknown_v3_mutants": 0
+    },
+    "cases": [
+      {
+        "id": "M01",
+        "classification": "KILLED_SQLITE_ONLY",
+        "method": "test_real_array_fractional_tail_admits_both_tiers_caps_at_ten_and_starts_fresh_only_after_expiry",
+        "credited_first_failure_branch": "first fractional-tail read",
+        "branch_limit": "Later tail/tier/count-cap and fresh-epoch assertions are not separately credited by this failing run.",
+        "phpunit": {
+          "assertions": 19,
+          "errors": 0,
+          "failures": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "actual_target_phpunit_exit": 1,
+        "outside_owner_exit": 0
+      },
+      {
+        "id": "M02",
+        "classification": "KILLED_SQLITE_ONLY",
+        "method": "test_missing_corrupt_or_replaced_post_hit_timers_and_counter_changes_never_enter_domain",
+        "credited_first_failure_branch": "first missing_timer iteration",
+        "branch_limit": "Later corrupt/replaced timer and altered/missing counter iterations are not credited.",
+        "phpunit": {
+          "assertions": 13,
+          "errors": 0,
+          "failures": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "actual_target_phpunit_exit": 1,
+        "outside_owner_exit": 0
+      },
+      {
+        "id": "M03",
+        "classification": "KILLED_SQLITE_ONLY",
+        "method": "test_expired_array_owner_without_successor_refuses_before_hit_and_after_one_consumed_hit",
+        "credited_first_failure_branch": "first before-hit stale-owner stage",
+        "branch_limit": "The later during-hit stage is not credited.",
+        "phpunit": {
+          "assertions": 13,
+          "errors": 0,
+          "failures": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "actual_target_phpunit_exit": 1,
+        "outside_owner_exit": 0
+      },
+      {
+        "id": "M04",
+        "classification": "KILLED_SQLITE_ONLY",
+        "method": "test_monotonic_budget_refuses_a_bounded_real_stall_even_with_frozen_wall_time",
+        "credited_first_failure_branch": "frozen-wall real-stall refusal",
+        "branch_limit": "This proves the selected local monotonic-bound regression only, without a backend-concurrency claim.",
+        "phpunit": {
+          "assertions": 13,
+          "errors": 0,
+          "failures": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "actual_target_phpunit_exit": 1,
+        "outside_owner_exit": 0
+      },
+      {
+        "id": "M05",
+        "classification": "KILLED_SQLITE_ONLY",
+        "method": "test_successor_ownership_and_release_failures_never_enter_domain",
+        "credited_first_failure_branch": "first false-release iteration after successor control",
+        "branch_limit": "The later still-owned release iteration is not credited.",
+        "phpunit": {
+          "assertions": 27,
+          "errors": 0,
+          "failures": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "actual_target_phpunit_exit": 1,
+        "outside_owner_exit": 0
+      },
+      {
+        "id": "M06",
+        "classification": "KILLED_SQLITE_ONLY",
+        "method": "test_final_identity_withdrawal_refuses_and_successful_domain_entry_sees_the_lock_released",
+        "credited_first_failure_branch": "first identity-withdrawal status assertion",
+        "branch_limit": "The later released-lock/domain-entry control is not credited.",
+        "phpunit": {
+          "assertions": 13,
+          "errors": 0,
+          "failures": 1,
+          "skipped": 0,
+          "tests": 1
+        },
+        "actual_target_phpunit_exit": 1,
+        "outside_owner_exit": 0
+      }
+    ],
+    "original_v2_M01": {
+      "classification": "UNKNOWN",
+      "not_rewritten_or_retroactively_credited": true
+    }
+  },
+  "recorded_commands": [
+    {
+      "selection": "static",
+      "argv": [
+        "python3",
+        "<local-source-root>/member-timer-epoch-static-20261102-01/static-runner.py",
+        "--root-static-lease-01"
+      ]
+    },
+    {
+      "selection": "isolated-first-method",
+      "argv": [
+        "python3",
+        "<local-source-root>/member-timer-epoch-sqlite-alone-0159eec3-01/run-sqlite.py",
+        "--root-sqlite-alone-lease-01"
+      ]
+    },
+    {
+      "selection": "batch-01-new-4",
+      "argv": [
+        "python3",
+        "<local-source-root>/member-timer-epoch-sqlite-remaining-0159eec3-01/batch-01-new-4/run-sqlite.py",
+        "--root-remaining-batch-lease-01"
+      ]
+    },
+    {
+      "selection": "batch-02-new-4",
+      "argv": [
+        "python3",
+        "<local-source-root>/member-timer-epoch-sqlite-remaining-0159eec3-01/batch-02-new-4/run-sqlite.py",
+        "--root-remaining-batch-lease-01"
+      ]
+    },
+    {
+      "selection": "batch-03-new-5",
+      "argv": [
+        "python3",
+        "<local-source-root>/member-timer-epoch-sqlite-remaining-0159eec3-01/batch-03-new-5/run-sqlite.py",
+        "--root-remaining-batch-lease-01"
+      ]
+    },
+    {
+      "selection": "batch-04-old-3",
+      "argv": [
+        "python3",
+        "<local-source-root>/member-timer-epoch-sqlite-remaining-0159eec3-01/batch-04-old-3/run-sqlite.py",
+        "--root-remaining-batch-lease-01"
+      ]
+    },
+    {
+      "selection": "batch-05-old-3",
+      "argv": [
+        "python3",
+        "<local-source-root>/member-timer-epoch-sqlite-remaining-0159eec3-01/batch-05-old-3/run-sqlite.py",
+        "--root-remaining-batch-lease-01"
+      ]
+    },
+    {
+      "selection": "M01",
+      "argv": [
+        "/usr/bin/python3",
+        "<local-source-root>/member-timer-epoch-mutants-source-20261102-03/M01/run-sqlite.py",
+        "--root-single-mutant-lease-01"
+      ]
+    },
+    {
+      "selection": "M02",
+      "argv": [
+        "/usr/bin/python3",
+        "<local-source-root>/member-timer-epoch-mutants-source-20261102-03/M02/run-sqlite.py",
+        "--root-single-mutant-lease-01"
+      ]
+    },
+    {
+      "selection": "M03",
+      "argv": [
+        "/usr/bin/python3",
+        "<local-source-root>/member-timer-epoch-mutants-source-20261102-03/M03/run-sqlite.py",
+        "--root-single-mutant-lease-01"
+      ]
+    },
+    {
+      "selection": "M04",
+      "argv": [
+        "/usr/bin/python3",
+        "<local-source-root>/member-timer-epoch-mutants-source-20261102-03/M04/run-sqlite.py",
+        "--root-single-mutant-lease-01"
+      ]
+    },
+    {
+      "selection": "M05",
+      "argv": [
+        "/usr/bin/python3",
+        "<local-source-root>/member-timer-epoch-mutants-source-20261102-03/M05/run-sqlite.py",
+        "--root-single-mutant-lease-01"
+      ]
+    },
+    {
+      "selection": "M06",
+      "argv": [
+        "/usr/bin/python3",
+        "<local-source-root>/member-timer-epoch-mutants-source-20261102-03/M06/run-sqlite.py",
+        "--root-single-mutant-lease-01"
+      ]
+    }
+  ],
+  "command_note": "Recorded historical commands only, not a rerun instruction or runtime authorization. Prefix replacement is the only argv normalization.",
+  "decisions": [
+    {
+      "file": "independent-timer-code-baseline-0159eec3-decision.md",
+      "original_sha256": "81a89e2742db3ad2f966514261116cf27bf3352955a270657e9518d09bff8fbe",
+      "scope": "Conditional exact-source fit and accepted selected baseline; later mutation assessment is separate"
+    },
+    {
+      "file": "independent-timer-six-mutations-0159eec3-decision.md",
+      "original_sha256": "f45c2c4dad5dd118ceb13c690e71586c95ee0d9a0d7616fe2bca2d7b136ad2e1",
+      "scope": "Accepted six bounded SQLite mutation classifications, not exhaustive or native/backend acceptance"
+    }
+  ]
+}
