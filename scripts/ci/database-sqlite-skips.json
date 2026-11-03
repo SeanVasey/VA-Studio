@@ -1345,6 +1345,10 @@
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
       "test_native_recovered_index_allows_foreign_award_without_cross_owner_history_locks"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipSchemaProofFrameTest",
+      "test_native_result_charset_alone_invalidates_a_remembered_complete_proof"
     ]
   ]
 }

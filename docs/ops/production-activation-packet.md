@@ -238,7 +238,8 @@ php artisan migrate:status
 # table. <EVIDENCE_DIR> is this stage's evidence directory (§7).
 # Migrate only with every writer quiesced, as above, never beside live member operations. An owned membership frame
 # holds shared metadata locks on users, customer_accounts, quote_owners, audit_events and the production_identity_*
-# and membership tables until it commits or rolls back (at most its 60 s deadline). DDL on one of those tables waits
+# and membership tables until it commits or rolls back. The 60 s application deadline is sampled between work;
+# it does not interrupt blocking SQL or bound the time needed for rollback/cleanup. DDL on one of those tables waits
 # behind an open frame, and while it waits MySQL queues every later read and write of that table from other
 # sessions behind it, so logins and audit writes stall too. The same holds for any manual or hotfix DDL: quiesce
 # first, or run it with a short `SET SESSION lock_wait_timeout` so a queued statement gives up instead of stalling
