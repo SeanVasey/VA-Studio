@@ -149,7 +149,7 @@ class MembershipSchemaProofFrameTest extends TestCase
         $prove = function () use ($pdo, &$calls): void {
             // Exercise the existing complete guards, not a fabricated schema or PDO double.
             $this->guards($pdo);
-            ++$calls;
+            $calls++;
         };
         $consult = static fn () => SchemaProofFrame::prove($pdo, self::class.'::result_charset', ['users'], $prove);
         $otherLegs = static fn (): array => [
