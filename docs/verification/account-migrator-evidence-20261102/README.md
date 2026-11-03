@@ -153,3 +153,36 @@ signals, timings, caps and acceptance rules remain unchanged. Reverse-byte
 normalization restores a524 outside the declared diagnostic additions/stages;
 Git whitespace check passes. ROOT owns independent review/lint and one justified
 diagnostic execution. No runtime/test/lint was run by this source author.
+
+
+## Exact server foreground classification — 2026-11-03
+
+Diagnostic115689bc failed at pre-worker-clients before interruption worker launch.
+ROOT's separate read-only baseline with zero fixture application connections
+identified one actual server thread named `thread/sql/compress_gtid_table`, TYPE
+FOREGROUND, command Daemon, positive processlist ID, NULL user and NULL database.
+The other foreground row was the probe. This establishes the oracle's overbroad
+client assumption, not an application companion leak. The first boolean parser
+attempt refused NULL SUM results; the corrected COALESCE probe supplied these
+flags. Root receipts: ACCOUNT-LEDGER-FOREGROUND-BASELINE-20261103.json and its
+classification receipt. No event_scheduler exception is introduced.
+
+The test-only AccountMigratorForeground helper classifies exactly that identity,
+at most once, separately from real `thread/sql/one_connection` clients. Unknown
+names, identity/shape ambiguity, duplicate thread/session IDs and malformed IDs
+refuse. Client enumeration, quiescence and remembered worker attribution use the
+same classifier. Recognized internal metadata remains explicit in the private
+journal. Every real client remains counted; global transaction/lock/wait/orphan
+queries are byte-unchanged and still include resources belonging to this daemon.
+No production source, privileges, profiles, deadlines, caps, skips, process or
+signal protocol changes.
+
+Adversarial pure PHP test source covers exact classification, other real clients,
+unknown names, wrong command/schema/user/type, malformed and duplicate identities,
+and missing/extra row shapes. ROOT's later focused command (not run by author):
+`php vendor/bin/phpunit tests/Unit/ProductionIdentity/AccountMigratorForegroundTest.php --fail-on-phpunit-warning`.
+Author checks are source-only: original resource method byte equality, original
+client/quiescence assertions retained, declared pin refresh and Git whitespace.
+No PHP, lint, tests, database, generator or runtime ran for this correction.
+All four provider acceptances remain open; ROOT independently reviews and runs
+focused controls before any further provider execution.

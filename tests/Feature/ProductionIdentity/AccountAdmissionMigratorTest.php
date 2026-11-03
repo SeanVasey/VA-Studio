@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Queue;
 use LogicException;
 use PDO;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\AccountMigratorForeground;
 use Tests\Support\ConsentFixtures;
 use Tests\Support\CustomerFixtures;
 use Tests\Support\ProductionIdentityFixture;
@@ -245,7 +246,8 @@ final class AccountAdmissionMigratorTest extends TestCase
     {
         $pdo = $this->pdo();
         $parent = (int) $pdo->query('SELECT CONNECTION_ID()')->fetchColumn();
-        $clients = $this->clientIds();
+        $foreground = $this->foreground();
+        $clients = array_map('intval', array_column($foreground['clients'], 'PROCESSLIST_ID'));
         $statement = $pdo->prepare('SELECT THREAD_ID FROM performance_schema.threads WHERE PROCESSLIST_ID=?');
         $statement->execute([$parent]);
         $auditorThread = $statement->fetchColumn();
@@ -253,7 +255,8 @@ final class AccountAdmissionMigratorTest extends TestCase
         $rawRead = DB::connection()->getRawReadPdo(); // Never resolve a read closure or create a reader.
         $readState = $rawRead === null ? 'null' : ($rawRead instanceof \Closure ? 'closure' : ($rawRead instanceof PDO ? 'pdo' : 'unexpected'));
         if ($readState === 'unexpected') { throw new LogicException('Diagnostic raw reader type unavailable.'); }
-        $facts = ['foreground_count' => count($clients), 'auditor_present' => in_array($parent, $clients, true),
+        $facts = ['foreground_count' => count($clients) + count($foreground['internal']),
+            'recognized_internal_count' => count($foreground['internal']), 'client_count' => count($clients), 'auditor_present' => in_array($parent, $clients, true),
             'non_auditor_count' => count(array_filter($clients, static fn (int $id): bool => $id !== $parent)),
             'advisory_present' => $this->advisoryOwner() !== null, 'raw_read_state' => $readState,
             'raw_read_is_writer' => $rawRead === $pdo,
@@ -627,7 +630,20 @@ final class AccountAdmissionMigratorTest extends TestCase
 
     private function clientIds(): array
     {
-        return array_map('intval', $this->pdo()->query("SELECT PROCESSLIST_ID FROM performance_schema.threads WHERE TYPE='FOREGROUND' AND PROCESSLIST_ID IS NOT NULL ORDER BY PROCESSLIST_ID")->fetchAll(PDO::FETCH_COLUMN));
+        return array_map('intval', array_column($this->foreground()['clients'], 'PROCESSLIST_ID'));
+    }
+
+    private function foreground(): array
+    {
+        $rows = $this->pdo()->query("SELECT t.THREAD_ID,t.NAME,t.TYPE,t.PROCESSLIST_ID,t.PROCESSLIST_COMMAND,t.PROCESSLIST_DB,(t.PROCESSLIST_USER IS NULL) AS USER_IS_NULL,t.INSTRUMENTED,e.EVENT_ID,e.END_EVENT_ID FROM performance_schema.threads t LEFT JOIN performance_schema.events_statements_current e ON e.THREAD_ID=t.THREAD_ID WHERE t.TYPE='FOREGROUND' AND t.PROCESSLIST_ID IS NOT NULL ORDER BY t.PROCESSLIST_ID")->fetchAll(PDO::FETCH_ASSOC);
+        $classified = AccountMigratorForeground::classify($rows);
+        // Keep the recognized nonclient explicit in private evidence; never attribute it to a worker.
+        if ($classified['internal'] !== []) {
+            $event = ['kind' => 'recognized-server-internal', 'threads' => $classified['internal']];
+            if (! in_array($event, $this->events, true)) { $this->events[] = $event; }
+        }
+
+        return $classified;
     }
 
     private function advisoryOwner(): ?int
@@ -645,8 +661,7 @@ final class AccountAdmissionMigratorTest extends TestCase
         $this->assertSame('YES', $enabled, 'Native current-statement evidence unavailable.');
         $instruments = $this->pdo()->query("SELECT NAME FROM performance_schema.setup_instruments WHERE NAME IN ('statement/sql/select','statement/sql/create_trigger','statement/sql/drop_trigger') AND ENABLED='YES'")->fetchAll(PDO::FETCH_COLUMN);
         $this->assertCount(3, $instruments, 'Required native DDL/SELECT instruments unavailable.');
-        $s = $this->pdo()->prepare("SELECT t.THREAD_ID,t.PROCESSLIST_ID,t.PROCESSLIST_COMMAND,t.PROCESSLIST_DB,t.INSTRUMENTED,e.EVENT_ID,e.END_EVENT_ID FROM performance_schema.threads t LEFT JOIN performance_schema.events_statements_current e ON e.THREAD_ID=t.THREAD_ID WHERE t.TYPE='FOREGROUND' AND t.PROCESSLIST_ID IS NOT NULL AND t.PROCESSLIST_ID<>?");
-        $s->execute([$parent]); $rows = $s->fetchAll(PDO::FETCH_ASSOC);
+        $rows = array_values(array_filter($this->foreground()['clients'], static fn (array $row): bool => (int) $row['PROCESSLIST_ID'] !== $parent));
         if ($rows === [] || ! in_array($primary, array_map('intval', array_column($rows, 'PROCESSLIST_ID')), true)) { return false; }
         foreach ($rows as $row) {
             if ($row['PROCESSLIST_COMMAND'] !== 'Sleep' || $row['PROCESSLIST_DB'] !== DB::getDatabaseName() || $row['INSTRUMENTED'] !== 'YES'
@@ -686,9 +701,8 @@ final class AccountAdmissionMigratorTest extends TestCase
 
     private function rememberThreads(int $parent): void
     {
-        $statement = $this->pdo()->prepare("SELECT THREAD_ID,PROCESSLIST_ID FROM performance_schema.threads WHERE TYPE='FOREGROUND' AND PROCESSLIST_ID IS NOT NULL AND PROCESSLIST_ID<>?");
-        $statement->execute([$parent]);
-        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        foreach ($this->foreground()['clients'] as $row) {
+            if ((int) $row['PROCESSLIST_ID'] === $parent) { continue; }
             $this->ownedThreads[] = (int) $row['THREAD_ID']; $this->ownedSessions[] = (int) $row['PROCESSLIST_ID'];
         }
         $this->ownedThreads = array_values(array_unique($this->ownedThreads));
