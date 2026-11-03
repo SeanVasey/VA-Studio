@@ -243,6 +243,12 @@ also passed ROOT lint. Production, strict result evaluator, process protocol,
 global resource queries and resource/time caps were not changed by these fixes.
 
 **Before a PR, supervised CI routing and environment portability remain OPEN.**
+The source-only [runtime producer slice](../../../scripts/ci/account-ledger/README.md)
+adds a controlled signed-package runtime build, independent root-owned qualification
+and finite HOST controls. It has not built or qualified a runtime and explicitly
+cannot admit native ledger execution. Required serial routing, owned MySQL observer
+qualification and portable origin/loader binding remain open; Feature discovery
+and the accepted process/ledger assertions are unchanged.
 The dedicated one-provider supervisor class is not presently compatible with
 ordinary shard execution. No skip/census row or normal-CI pass is claimed.
 Next work is explicit supervised routing/portable admission plus F9 focused

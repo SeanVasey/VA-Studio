@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "factory_manifest_sha256": "23ba75c8f111e4f821de76c4718acbaa616eebc9d26abf9b5f137c9182df7efc",
+  "platform": "linux/amd64",
+  "mysql": {
+    "image_id": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+    "repo_digest": "mysql@sha256:0f51e63e537a1f176423fa03ef559aabe6fa4372a53160a44bc7e75da7d15364",
+    "version": "8.4.11"
+  },
+  "runtime": {
+    "php_binary": "/usr/bin/php8.4",
+    "php_binary_sha256": "c984d1f078b3b0c457520723e36ab0fdf34d53a587495784228e2e52e7e23e44",
+    "php_version": "8.4.27",
+    "php_modules": {
+      "pdo": "ac2844ee61acf01996836c4191a993f84de834dcb757297db808c643a1175956",
+      "mysqlnd": "d596c5e9501d14561f4a4c3a5a1e75ab928c0ad86174a10ececafdcd13afdd9c",
+      "pdo_mysql": "8c1a5db7ba8f484fd93d4ba7848fba37da08b635fd16ee274d22e42f978bbd94",
+      "mbstring": "9b45931319c412327d3a48305971f15468ef1357af227d056db84acddc127bc3",
+      "ctype": "45f4e349c2692834ee3d559c4a5a0320911e94c7c4db61e6fb63bd5e644ef839",
+      "tokenizer": "e030f6bce84ee8bfc8037012cd90666668f95e79b13fcf8d929eab479f576e02",
+      "iconv": "6bfa5a6b7eab255d763301508f7baef3643f0c474f5ab59a146f4d6570d59905"
+    },
+    "python_binary": "/usr/bin/python3.13",
+    "python_binary_sha256": "889c603f0d17cb54060951bcf4c4f9b8c9ebd9e52b392c70209bbb9755d797d9",
+    "python_version": "3.13.5",
+    "base_repo_digest": "debian@sha256:f6b08b09a05725f9431502d3b5714f5c4576e82c1a84fa1debe0c24a7e0c3ec4",
+    "recipe": "Runtime.Dockerfile"
+  }
+}
