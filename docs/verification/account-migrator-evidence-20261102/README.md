@@ -112,3 +112,25 @@ pidfd/SCM protocol or ledger acceptance; those executions remain unrun.
 The earlier no-measurement statements describe the source carry; this rebind uses
 ROOT's retained receipt and performs no new runtime probe. Its 16 HOST controls
 passed; the unchanged 17 supervisor controls were not rerun.
+
+
+## Raw supervisor descriptor correction — 2026-11-03
+
+First up-overlap at `dca37900848cc942c632bb757b458905ac678ebe` failed before
+journal/database setup: the original buffering-option assertion rejected -1.
+Failing01 remains immutable; it is not a provider pass. ROOT's separate no-DB
+reflection probe reproduced the actual original method refusal under pinned
+PHP8.4.27, then proved exact datagram delivery and reply while the stream was
+still open, without fflush, followed by the actual pause/close method. Metadata
+was PHP/tcp_socket, r+, php://fd/7, nonseekable/nonblocking; fstat was a socket.
+
+Only openSupervisorChannel now requires that exact raw-socket contract before
+accepting buffering-option result0 or unsupported-1. Open/nonblocking remain
+mandatory. All full-frame writes, nonce/SCM credentials, sole reapers,
+close-before-spawn/reopen, signal protocol, deadlines and provider assertions
+remain unchanged. No socket_import_stream alias is introduced. Feature source
+pin is refreshed; launcher, worker, supervisor and runtime identity pins are
+unchanged. Pure host reverse-byte comparison and Git whitespace checks passed;
+ROOT owns patched-method no-DB regression, PHP lint and provider execution.
+No runtime/test was executed for this fix by its source author. All four provider
+actuals remain unpassed; this is no ledger or launch acceptance.

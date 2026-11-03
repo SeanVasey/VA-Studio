@@ -500,8 +500,22 @@ final class AccountAdmissionMigratorTest extends TestCase
     private function openSupervisorChannel(): void
     {
         $this->supervisorChannel = fopen('php://fd/7', 'r+');
-        if ($this->supervisorChannel === false || ! stream_set_blocking($this->supervisorChannel, false)
-            || stream_set_write_buffer($this->supervisorChannel, 0) !== 0) {
+        if ($this->supervisorChannel === false || ! stream_set_blocking($this->supervisorChannel, false)) {
+            throw new LogicException('Reviewed private supervisor channel unavailable.');
+        }
+        $metadata = stream_get_meta_data($this->supervisorChannel);
+        $stat = fstat($this->supervisorChannel);
+        if (($metadata['wrapper_type'] ?? null) !== 'PHP'
+            || ($metadata['stream_type'] ?? null) !== 'tcp_socket'
+            || ($metadata['uri'] ?? null) !== 'php://fd/7'
+            || ($metadata['mode'] ?? null) !== 'r+'
+            || ($metadata['seekable'] ?? null) !== false
+            || ($metadata['blocked'] ?? null) !== false
+            || $stat === false || ($stat['mode'] & 0170000) !== 0140000) {
+            throw new LogicException('Reviewed private supervisor channel unavailable.');
+        }
+        // Pinned PHP's raw socket writes directly; its buffering option may be unsupported.
+        if (! in_array(stream_set_write_buffer($this->supervisorChannel, 0), [0, -1], true)) {
             throw new LogicException('Reviewed private supervisor channel unavailable.');
         }
     }
