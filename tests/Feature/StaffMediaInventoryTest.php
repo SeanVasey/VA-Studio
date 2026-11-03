@@ -3,9 +3,9 @@
 namespace Tests\Feature;
 
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Commerce\Models\PendingEntitlement;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
-use App\Domain\Commerce\Models\PendingEntitlement;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\ReadStaffMediaInventory;
 use App\Models\User;
