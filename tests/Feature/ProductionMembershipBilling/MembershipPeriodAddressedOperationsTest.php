@@ -2,23 +2,23 @@
 
 namespace Tests\Feature\ProductionMembershipBilling;
 
-use App\Domain\Memberships\Production\MembershipBillingEvidence;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipPeriodRecords;
 use App\Domain\Memberships\Production\MembershipReservationOperations;
 use App\Domain\Memberships\Production\MembershipReservationRecords;
-use App\Domain\Memberships\Production\SealedMembershipPaidInvoice;
 use App\Http\Membership\MembershipPrivacy;
 use Carbon\CarbonImmutable;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Mockery;
 use RuntimeException;
 use Tests\Support\BillingStripeFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\MembershipAwardMonotonicClock;
 use Tests\Support\MembershipReservationFixtures;
 use Tests\TestCase;
+
+// Install namespace resolution before fixture setup or any original billing clock call.
+class_exists(MembershipAwardMonotonicClock::class);
 
 /** The customer surface addresses a paid period by its listed id; the domain resolves the billing row. */
 class MembershipPeriodAddressedOperationsTest extends TestCase
@@ -105,7 +105,7 @@ class MembershipPeriodAddressedOperationsTest extends TestCase
         $fixture = $this->reservationFixture();
         $periods = DB::table(MembershipPeriodRecords::PERIODS)->orderBy('id')->get()->map(static fn (object $row): array => (array) $row)->all();
         $events = DB::table(MembershipPeriodRecords::EVENTS)->orderBy('id')->get()->map(static fn (object $row): array => (array) $row)->all();
-        [$failure, $calls] = $this->withBillingDecryptFailure(fn (object $counter) => $this->capturedRefusal(fn () =>
+        [$failure, $calls] = $this->withBillingSampleFailure(fn (object $counter) => $this->capturedRefusal(fn () =>
             (new MembershipReservationOperations)->reserveInPeriod($fixture['award']['period_id'], $fixture['selection'],
                 $fixture['expected_revision'], 'unexpected-billing', $fixture['buyer']['principal'], $fixture['buyer']['user'])));
         $this->assertSame(1, $calls, 'The real billing-evidence path must reach the failure.');
@@ -135,7 +135,7 @@ class MembershipPeriodAddressedOperationsTest extends TestCase
         $operations = new MembershipReservationOperations;
         $request = fn (string $period): array => $operations->reserveInPeriod($period, $fixture['selection'],
             $fixture['expected_revision'], 'foreign-ordering', $other['principal'], $other['user']);
-        [$failures, $calls] = $this->withBillingDecryptFailure(function (object $counter) use ($request, $fixture): array {
+        [$failures, $calls] = $this->withBillingSampleFailure(function (object $counter) use ($request, $fixture): array {
             $unknown = $this->capturedRefusal(fn () => $request((string) Str::uuid()));
             $this->assertSame(0, $counter->calls, 'An absent period must not read any invoice evidence.');
             $foreign = $this->capturedRefusal(fn () => $request($fixture['award']['period_id']));
@@ -160,31 +160,20 @@ class MembershipPeriodAddressedOperationsTest extends TestCase
         $this->assertFalse(DB::connection()->getPdo()->inTransaction());
     }
 
-    /** Existing Crypt seam, restricted to the actual sealed invoice's billing read. */
-    private function withBillingDecryptFailure(callable $work): array
+    /** Throw at the original clock sample after native-PDO checks, outside decrypt's tamper catch. */
+    private function withBillingSampleFailure(callable $work): array
     {
-        $real = Crypt::getFacadeRoot();
         $counter = (object) ['calls' => 0];
-        $interceptor = Mockery::mock();
-        $interceptor->shouldReceive('decryptString')->andReturnUsing(function ($ciphertext) use ($real, $counter) {
-            $billing = $sealed = false;
-            foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 60) as $frame) {
-                $billing = $billing || (($frame['class'] ?? null) === MembershipBillingEvidence::class && ($frame['function'] ?? null) === 'read');
-                $sealed = $sealed || (($frame['class'] ?? null) === SealedMembershipPaidInvoice::class && ($frame['function'] ?? null) === 'lock');
-            }
-            if ($billing && $sealed) {
-                $counter->calls++;
+        $prior = MembershipAwardMonotonicClock::$onBillingReadSample;
+        MembershipAwardMonotonicClock::$onBillingReadSample = static function () use ($counter): never {
+            $counter->calls++;
 
-                throw new RuntimeException('SYNTHETIC private billing failure: never a public response body');
-            }
-
-            return $real->decryptString($ciphertext);
-        });
-        Crypt::swap($interceptor);
+            throw new RuntimeException('SYNTHETIC private billing failure: never a public response body');
+        };
         try {
             $result = $work($counter);
         } finally {
-            Crypt::swap($real);
+            MembershipAwardMonotonicClock::$onBillingReadSample = $prior;
         }
 
         return [$result, $counter->calls];
