@@ -38,7 +38,22 @@ final class CheckoutSchemaInstaller
         }
     }
 
-    private function preflight(array $statements): array
+    /** Migration-only preflight: the entire retained graph must exist; only these two access paths may be absent. */
+    public function assertReportingUpgrade(): void
+    {
+        $present = $this->preflight(CheckoutSchema::statements(), true);
+        $reporting = [];
+        foreach (CheckoutSchema::REPORTING_INDEXES as $indexes) {
+            $reporting = [...$reporting, ...array_keys($indexes)];
+        }
+        foreach ($present as $name => $exists) {
+            if (! $exists && ! in_array($name, $reporting, true)) {
+                $this->reject('incomplete reporting upgrade prerequisite');
+            }
+        }
+    }
+
+    private function preflight(array $statements, bool $reportingUpgrade = false): array
     {
         $driver = DB::getDriverName();
         if (! in_array($driver, ['mysql', 'sqlite'], true)) {
@@ -76,7 +91,7 @@ final class CheckoutSchemaInstaller
         $database = DB::getDatabaseName();
         $names = [...array_keys($statements)];
         foreach ($tables as $definition) {
-            $names = [...$names, ...array_keys($definition['unique'])];
+            $names = [...$names, ...array_keys($definition['unique']), ...array_keys($definition['indexes'])];
             foreach ($definition['foreign'] as $field => $parent) {
                 $names[] = $definition['prefix'].'_f_'.$field;
             }
@@ -93,7 +108,7 @@ final class CheckoutSchemaInstaller
                     $this->reject('dictionary identity alias or foreign namespace');
                 }
                 if ($expectedType === 'table') {
-                    $this->mysqlTable($name, $tables[$name], $object);
+                    $this->mysqlTable($name, $tables[$name], $object, $reportingUpgrade);
                 } else {
                     $expected = $statements[$name];
                     $identity = DB::selectOne('SELECT CURRENT_USER() AS definer, @@SESSION.sql_mode AS sql_mode');
@@ -160,7 +175,7 @@ final class CheckoutSchemaInstaller
         return $present;
     }
 
-    private function mysqlTable(string $table, array $definition, array $object): void
+    private function mysqlTable(string $table, array $definition, array $object, bool $reportingUpgrade = false): void
     {
         if ($object['TABLE_NAME'] !== $table || $object['TABLE_TYPE'] !== 'BASE TABLE' || $object['ENGINE'] !== 'InnoDB'
             || $object['TABLE_COLLATION'] !== 'utf8mb4_unicode_ci' || $object['CREATE_OPTIONS'] !== '' || $object['TABLE_COMMENT'] !== '') {
@@ -183,6 +198,9 @@ final class CheckoutSchemaInstaller
         foreach ($definition['foreign'] as $field => $parent) {
             $indexes[$definition['prefix'].'_f_'.$field] = [1, [$field]];
         }
+        foreach ($definition['indexes'] as $name => $fields) {
+            $indexes[$name] = [1, $fields];
+        }
         $actual = [];
         foreach (DB::select('SELECT INDEX_NAME, NON_UNIQUE, SEQ_IN_INDEX, COLUMN_NAME, INDEX_TYPE, SUB_PART, COLLATION, EXPRESSION, IS_VISIBLE FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? ORDER BY INDEX_NAME, SEQ_IN_INDEX', [$database, $table]) as $index) {
             if ($index->INDEX_TYPE !== 'BTREE' || $index->SUB_PART !== null || $index->COLLATION !== 'A' || $index->EXPRESSION !== null || $index->IS_VISIBLE !== 'YES') {
@@ -192,6 +210,13 @@ final class CheckoutSchemaInstaller
             $actual[$index->INDEX_NAME][1][] = $index->COLUMN_NAME;
             if ((int) $index->SEQ_IN_INDEX !== count($actual[$index->INDEX_NAME][1])) {
                 $this->reject('index ordering');
+            }
+        }
+        if ($reportingUpgrade) {
+            foreach ($definition['indexes'] as $name => $fields) {
+                if (! isset($actual[$name])) {
+                    unset($indexes[$name]);
+                }
             }
         }
         ksort($indexes);

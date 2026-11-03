@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\DB;
 /** Entirely additive immutable commerce records; no historical checkout table or guard is changed. */
 final class CheckoutSchema
 {
+    /** Additive period access paths; never uniqueness or payment authority. */
+    public const REPORTING_INDEXES = [
+        'production_checkout_orders' => ['pco_orders_reporting_created_at_index' => ['created_at']],
+        'production_checkout_payments' => ['pco_payments_reporting_observed_at_index' => ['observed_at']],
+    ];
+
     public const TABLES = [
         'authority' => 'production_checkout_exemption_authorities',
         'basis' => 'production_checkout_exemption_bases',
@@ -45,7 +51,8 @@ final class CheckoutSchema
                 $indexes[$prefix.'_u'.$i] = $fields;
             }
             $definitions[self::TABLES[$kind]] = ['prefix' => $prefix, 'columns' => $base + $columns, 'unique' => $indexes,
-                'foreign' => $foreign + (isset($columns['candidate_id']) ? ['candidate_id' => 'production_track_capability_candidates'] : [])];
+                'foreign' => $foreign + (isset($columns['candidate_id']) ? ['candidate_id' => 'production_track_capability_candidates'] : []),
+                'indexes' => self::REPORTING_INDEXES[self::TABLES[$kind]] ?? []];
         }
 
         return $definitions;
@@ -70,12 +77,18 @@ final class CheckoutSchema
                 foreach ($definition['foreign'] as $field => $parent) {
                     $parts[] = 'KEY '.$definition['prefix'].'_f_'.$field.' ('.$field.')';
                 }
+                foreach ($definition['indexes'] as $name => $fields) {
+                    $parts[] = 'KEY '.$name.' ('.implode(', ', $fields).')';
+                }
             }
             $sql = 'CREATE TABLE '.$table.' ('.implode(', ', $parts).')'.($mysql ? ' ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci' : '');
             $statements[$table] = ['type' => 'table', 'table' => $table, 'statement' => $sql];
             if (! $mysql) {
                 foreach ($definition['unique'] as $name => $fields) {
                     $statements[$name] = ['type' => 'index', 'table' => $table, 'statement' => 'CREATE UNIQUE INDEX '.$name.' ON '.$table.' ('.implode(', ', $fields).')'];
+                }
+                foreach ($definition['indexes'] as $name => $fields) {
+                    $statements[$name] = ['type' => 'index', 'table' => $table, 'statement' => 'CREATE INDEX '.$name.' ON '.$table.' ('.implode(', ', $fields).')'];
                 }
             }
         }
