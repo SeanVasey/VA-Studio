@@ -113,14 +113,21 @@ final class AccountAdmissionMigratorTest extends TestCase
         try {
             if ($direction === 'up') {
                 $this->normal('down'); // Real Laravel rollback, never manual ledger DELETE.
+                $this->stage = 'post-down-stable-v1';
                 $this->stable(AccountAdmissionGuards::V1);
+                $this->stage = 'post-down-ledger';
                 $this->assertCount(0, $this->ledger());
             }
+            $this->stage = 'pre-worker-retained';
             $this->assertSame($rows, $this->retained());
+            $this->stage = 'pre-worker-other-ledger';
             $this->assertSame($ledger, $this->otherLedger());
+            $this->stage = 'pre-worker-ledger';
             $beforeLedger = $this->ledger();
             $parent = (int) $this->pdo()->query('SELECT CONNECTION_ID()')->fetchColumn();
+            $this->stage = 'pre-worker-clients';
             $this->assertSame([$parent], $this->clientIds(), 'Own fixture must be quiescent except the identified auditor.');
+            $this->stage = 'pre-worker-resources';
             $this->assertSame(0, $this->resources($parent, false), 'Unknown non-auditor native resources prevent attribution.');
             $child = $this->start($direction, $cut);
             $ready = $this->message($child, 'ready', 15);
@@ -183,6 +190,7 @@ final class AccountAdmissionMigratorTest extends TestCase
                 'final_ledger' => $this->ledger(), 'other_ledger_sha256' => $this->otherLedger(), 'retained_hashes' => $this->retained()];
         } catch (\Throwable $error) {
             $this->firstFailure ??= ['stage' => $this->stage, 'class' => $error::class, 'source_line' => $error->getLine(), 'message_sha256' => hash('sha256', $error->getMessage())];
+            $this->firstFailure['feature_trace_site'] ??= $this->featureTraceSite($error);
         } finally {
             $this->holdDeadline = null;
             // No PDO, marker, drain, diagnostic file or assertion may precede the core process attempts.
@@ -192,11 +200,19 @@ final class AccountAdmissionMigratorTest extends TestCase
                     $this->cleanupFailures[] = ['stage' => 'registration-unknown', 'verified' => false];
                 }
             } finally {
+                // Diagnostics run only after core process cleanup and never replace the original audit.
+                try {
+                    $this->events[] = ['kind' => 'post-process-native-counts', 'facts' => $this->nativeAuditFacts()];
+                } catch (\Throwable $error) {
+                    $this->cleanupFailures[] = ['stage' => 'native-diagnostic', 'class' => $error::class,
+                        'feature_trace_site' => $this->featureTraceSite($error), 'verified' => false];
+                }
                 try {
                     $this->stage = 'final-native-audit';
                     $this->released((int) $this->pdo()->query('SELECT CONNECTION_ID()')->fetchColumn());
                 } catch (\Throwable $error) {
-                    $this->cleanupFailures[] = ['stage' => 'native-audit', 'class' => $error::class, 'verified' => false];
+                    $this->cleanupFailures[] = ['stage' => 'native-audit', 'class' => $error::class,
+                        'feature_trace_site' => $this->featureTraceSite($error), 'verified' => false];
                 } finally {
                     try {
                         $this->journal('final', true);
@@ -211,6 +227,47 @@ final class AccountAdmissionMigratorTest extends TestCase
         if ($this->firstFailure !== null || $this->cleanupFailures !== []) {
             $this->fail('Migrator diagnostic STOP; first failure and independent cleanup failures are in private safe journal; unavailable cleanup is UNVERIFIED.');
         }
+    }
+
+    private function featureTraceSite(\Throwable $error): ?array
+    {
+        foreach ($error->getTrace() as $frame) {
+            if (($frame['file'] ?? null) === __FILE__ && is_int($frame['line'] ?? null) && is_string($frame['function'] ?? null)) {
+                return ['file' => 'tests/Feature/ProductionIdentity/AccountAdmissionMigratorTest.php',
+                    'line' => $frame['line'], 'function' => $frame['function']];
+            }
+        }
+
+        return null; // Explicitly unavailable; never copy exception arguments or messages.
+    }
+
+    private function nativeAuditFacts(): array
+    {
+        $pdo = $this->pdo();
+        $parent = (int) $pdo->query('SELECT CONNECTION_ID()')->fetchColumn();
+        $clients = $this->clientIds();
+        $statement = $pdo->prepare('SELECT THREAD_ID FROM performance_schema.threads WHERE PROCESSLIST_ID=?');
+        $statement->execute([$parent]);
+        $auditorThread = $statement->fetchColumn();
+        if ($auditorThread === false) { throw new LogicException('Diagnostic auditor identity unavailable.'); }
+        $rawRead = DB::connection()->getRawReadPdo(); // Never resolve a read closure or create a reader.
+        $readState = $rawRead === null ? 'null' : ($rawRead instanceof \Closure ? 'closure' : ($rawRead instanceof PDO ? 'pdo' : 'unexpected'));
+        if ($readState === 'unexpected') { throw new LogicException('Diagnostic raw reader type unavailable.'); }
+        $facts = ['foreground_count' => count($clients), 'auditor_present' => in_array($parent, $clients, true),
+            'non_auditor_count' => count(array_filter($clients, static fn (int $id): bool => $id !== $parent)),
+            'advisory_present' => $this->advisoryOwner() !== null, 'raw_read_state' => $readState,
+            'raw_read_is_writer' => $rawRead === $pdo,
+            'wait_count' => (int) $pdo->query('SELECT COUNT(*) FROM performance_schema.data_lock_waits')->fetchColumn()];
+        foreach ([['transactions', 'information_schema.innodb_trx', 'trx_mysql_thread_id', $parent],
+            ['data_locks', 'performance_schema.data_locks', 'THREAD_ID', (int) $auditorThread],
+            ['metadata_locks', 'performance_schema.metadata_locks', 'OWNER_THREAD_ID', (int) $auditorThread]] as [$key, $table, $column, $id]) {
+            $statement = $pdo->prepare('SELECT COUNT(*) FROM '.$table.' WHERE '.$column.'<>? OR '.$column.' IS NULL');
+            $statement->execute([$id]);
+            $facts[$key.'_non_auditor_count'] = (int) $statement->fetchColumn();
+            $facts[$key.'_orphan_count'] = (int) $pdo->query('SELECT COUNT(*) FROM '.$table.' WHERE '.$column.' IS NULL')->fetchColumn();
+        }
+
+        return $facts;
     }
 
     private function pdo(): PDO

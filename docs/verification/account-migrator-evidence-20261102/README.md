@@ -134,3 +134,22 @@ unchanged. Pure host reverse-byte comparison and Git whitespace checks passed;
 ROOT owns patched-method no-DB regression, PHP lint and provider execution.
 No runtime/test was executed for this fix by its source author. All four provider
 actuals remain unpassed; this is no ledger or launch acceptance.
+
+
+## Post-down diagnostic carry — 2026-11-03
+
+Corrected a524 up-overlap reached1055 assertions but failed before interruption
+worker/cut; preparatory normal-down exited0/reaped. Original failure and final
+native audit remain unresolved, not a connection-leak finding or ledger pass.
+Outer six cleanup/returned lease do not replace inner UNVERIFIED native cleanup.
+Only diagnostics are added: closed post-down/pre-worker stage labels, first
+Feature trace site (relative file/line/function only), and post-process-cleanup
+native counts/booleans plus unresolved raw-read-PDO state. No message/argument
+content or new diagnostic hashes are emitted. Existing firstFailure/hash fields
+remain. Diagnostics use only already qualified tables and never resolve a reader,
+disconnect, purge, whitelist or change assertions. Diagnostic errors are explicit
+cleanup failures; the original final audit still executes. Protocol, ownership,
+signals, timings, caps and acceptance rules remain unchanged. Reverse-byte
+normalization restores a524 outside the declared diagnostic additions/stages;
+Git whitespace check passes. ROOT owns independent review/lint and one justified
+diagnostic execution. No runtime/test/lint was run by this source author.
