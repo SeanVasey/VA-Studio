@@ -12,6 +12,12 @@ use App\Domain\Media\RecordingAssociation;
 /** Resolve and lock authoritative selections; called only inside a database transaction. */
 final class QuoteSelection
 {
+    /** No kit license/deliverable policy exists yet; a technical snapshot cannot enter a payable track line. */
+    public function resolveFamily(\App\Domain\Catalog\FamilyRevisionSelection $selection): never
+    {
+        throw new QuoteException('FAMILY_LICENSE_POLICY_UNSET', 409);
+    }
+
     public function resolve(array $items, bool $freshDigests): array
     {
         // All tracks, then all offers, in stable numeric order; compatible with publication's track-before-offer order.
