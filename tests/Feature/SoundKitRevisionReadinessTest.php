@@ -61,7 +61,9 @@ class SoundKitRevisionReadinessTest extends TestCase
     {
         $this->assertFalse(config('product-families.wav_sample_kit.technical_revision_preparation'));
         $queries = [];
-        DB::listen(function (QueryExecuted $query) use (&$queries): void { $queries[] = $query->sql; });
+        DB::listen(function (QueryExecuted $query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
         $selection = $this->selection('11111111-2222-3333-4444-555555555555', str_repeat('a', 64));
         foreach ([false, null, 1, 'true'] as $value) {
             config(['product-families.wav_sample_kit.technical_revision_preparation' => $value]);

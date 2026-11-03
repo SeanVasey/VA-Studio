@@ -30,8 +30,12 @@ class FamilyRevisionSelectionTest extends TestCase
             'missing hash' => [array_diff_key($valid, ['manifestHash' => true])],
             'malformed revision' => [array_replace($valid, ['revisionId' => '../private/archive'])],
             'integer revision' => [array_replace($valid, ['revisionId' => 1])],
-            'coercion callback' => [array_replace($valid, ['revisionId' => new class implements \Stringable {
-                public function __toString(): string { throw new \LogicException('Must not coerce a revision.'); }
+            'coercion callback' => [array_replace($valid, ['revisionId' => new class implements \Stringable
+            {
+                public function __toString(): string
+                {
+                    throw new \LogicException('Must not coerce a revision.');
+                }
             }])],
             'noncanonical hash' => [array_replace($valid, ['manifestHash' => str_repeat('A', 64)])],
             'short hash' => [array_replace($valid, ['manifestHash' => 'a'])],
