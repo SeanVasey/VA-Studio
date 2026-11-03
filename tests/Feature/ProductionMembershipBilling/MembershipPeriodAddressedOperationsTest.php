@@ -2,13 +2,19 @@
 
 namespace Tests\Feature\ProductionMembershipBilling;
 
+use App\Domain\Memberships\Production\MembershipBillingEvidence;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipPeriodRecords;
 use App\Domain\Memberships\Production\MembershipReservationOperations;
 use App\Domain\Memberships\Production\MembershipReservationRecords;
+use App\Domain\Memberships\Production\SealedMembershipPaidInvoice;
+use App\Http\Membership\MembershipPrivacy;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Mockery;
+use RuntimeException;
 use Tests\Support\BillingStripeFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\MembershipReservationFixtures;
@@ -92,6 +98,106 @@ class MembershipPeriodAddressedOperationsTest extends TestCase
         $this->refused(fn () => (new MembershipReservationOperations)->releaseInPeriod($second['award']['period_id'], $saved['redemption_id'],
             $second['buyer']['principal'], $second['buyer']['user']), 'reservation_absent');
         $this->assertSame(2, DB::table(MembershipPeriodRecords::EVENTS)->where('period_id', $first['award']['period_id'])->count());
+    }
+
+    public function test_unexpected_billing_failure_keeps_unknown_outcome_private_and_rolls_back(): void
+    {
+        $fixture = $this->reservationFixture();
+        $periods = DB::table(MembershipPeriodRecords::PERIODS)->orderBy('id')->get()->map(static fn (object $row): array => (array) $row)->all();
+        $events = DB::table(MembershipPeriodRecords::EVENTS)->orderBy('id')->get()->map(static fn (object $row): array => (array) $row)->all();
+        [$failure, $calls] = $this->withBillingDecryptFailure(fn (object $counter) => $this->capturedRefusal(fn () =>
+            (new MembershipReservationOperations)->reserveInPeriod($fixture['award']['period_id'], $fixture['selection'],
+                $fixture['expected_revision'], 'unexpected-billing', $fixture['buyer']['principal'], $fixture['buyer']['user'])));
+        $this->assertSame(1, $calls, 'The real billing-evidence path must reach the failure.');
+        $this->assertSame('operation_refused', $failure->reason);
+        $response = MembershipPrivacy::refusal($failure, true);
+        $this->assertSame(503, $response->getStatusCode());
+        $this->assertSame(['code' => 'MEMBERSHIP_OUTCOME_UNKNOWN', 'refresh' => true, 'retry' => 'same_request'],
+            json_decode($response->getContent(), true, 8, JSON_THROW_ON_ERROR));
+        $this->assertSame('1', $response->headers->get('Retry-After'));
+        $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
+        $this->assertSame($periods, DB::table(MembershipPeriodRecords::PERIODS)->orderBy('id')->get()->map(static fn (object $row): array => (array) $row)->all());
+        $this->assertSame($events, DB::table(MembershipPeriodRecords::EVENTS)->orderBy('id')->get()->map(static fn (object $row): array => (array) $row)->all());
+        $this->assertSame(0, DB::table(MembershipReservationRecords::TABLE)->count());
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::connection()->getPdo()->inTransaction());
+        // Same public request is still operative after fault removal; no success was fabricated by the failure path.
+        $saved = (new MembershipReservationOperations)->reserveInPeriod($fixture['award']['period_id'], $fixture['selection'],
+            $fixture['expected_revision'], 'unexpected-billing', $fixture['buyer']['principal'], $fixture['buyer']['user']);
+        $this->assertSame($fixture['award']['period_id'], $saved['period_id']);
+        $this->assertSame(1, DB::table(MembershipReservationRecords::TABLE)->count());
+    }
+
+    public function test_known_foreign_period_reads_billing_before_owner_refusal_but_unknown_period_does_not(): void
+    {
+        $fixture = $this->reservationFixture();
+        $other = $this->enrollThroughLocalSmtp('period-ordering@example.test');
+        $operations = new MembershipReservationOperations;
+        $request = fn (string $period): array => $operations->reserveInPeriod($period, $fixture['selection'],
+            $fixture['expected_revision'], 'foreign-ordering', $other['principal'], $other['user']);
+        [$failures, $calls] = $this->withBillingDecryptFailure(function (object $counter) use ($request, $fixture): array {
+            $unknown = $this->capturedRefusal(fn () => $request((string) Str::uuid()));
+            $this->assertSame(0, $counter->calls, 'An absent period must not read any invoice evidence.');
+            $foreign = $this->capturedRefusal(fn () => $request($fixture['award']['period_id']));
+
+            return [$unknown, $foreign];
+        });
+        $this->assertSame(1, $calls, 'The retained foreign period currently reaches billing before sameOwner.');
+        $this->assertSame('paid_period_absent', $failures[0]->reason);
+        $this->assertSame('operation_refused', $failures[1]->reason);
+        $unknown = MembershipPrivacy::refusal($failures[0], true);
+        $foreign = MembershipPrivacy::refusal($failures[1], true);
+        $this->assertSame(404, $unknown->getStatusCode());
+        $this->assertSame(['code' => 'MEMBERSHIP_NOT_FOUND'], json_decode($unknown->getContent(), true, 8, JSON_THROW_ON_ERROR));
+        $this->assertSame(503, $foreign->getStatusCode());
+        $this->assertSame(['code' => 'MEMBERSHIP_OUTCOME_UNKNOWN', 'refresh' => true, 'retry' => 'same_request'],
+            json_decode($foreign->getContent(), true, 8, JSON_THROW_ON_ERROR));
+        // Removing the fault reaches the real owner comparison; no foreign reservation may be issued.
+        $this->refused(fn () => $request($fixture['award']['period_id']), 'invoice_owner_mismatch');
+        $this->assertSame(0, DB::table(MembershipReservationRecords::TABLE)->count());
+        $this->assertSame(1, DB::table(MembershipPeriodRecords::EVENTS)->count());
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::connection()->getPdo()->inTransaction());
+    }
+
+    /** Existing Crypt seam, restricted to the actual sealed invoice's billing read. */
+    private function withBillingDecryptFailure(callable $work): array
+    {
+        $real = Crypt::getFacadeRoot();
+        $counter = (object) ['calls' => 0];
+        $interceptor = Mockery::mock();
+        $interceptor->shouldReceive('decryptString')->andReturnUsing(function ($ciphertext) use ($real, $counter) {
+            $billing = $sealed = false;
+            foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 60) as $frame) {
+                $billing = $billing || (($frame['class'] ?? null) === MembershipBillingEvidence::class && ($frame['function'] ?? null) === 'read');
+                $sealed = $sealed || (($frame['class'] ?? null) === SealedMembershipPaidInvoice::class && ($frame['function'] ?? null) === 'lock');
+            }
+            if ($billing && $sealed) {
+                $counter->calls++;
+
+                throw new RuntimeException('SYNTHETIC private billing failure: never a public response body');
+            }
+
+            return $real->decryptString($ciphertext);
+        });
+        Crypt::swap($interceptor);
+        try {
+            $result = $work($counter);
+        } finally {
+            Crypt::swap($real);
+        }
+
+        return [$result, $counter->calls];
+    }
+
+    private function capturedRefusal(callable $work): MembershipException
+    {
+        try {
+            $work();
+            $this->fail('The writer must refuse rather than invent a receipt.');
+        } catch (MembershipException $error) {
+            return $error;
+        }
     }
 
     private function refused(callable $work, string $reason): void

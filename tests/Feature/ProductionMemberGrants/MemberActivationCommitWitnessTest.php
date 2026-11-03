@@ -10,6 +10,8 @@ use Illuminate\Database\Events\TransactionCommitting;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Mockery;
+use PDO;
+use PDOException;
 use RuntimeException;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\MemberActivationFixtures;
@@ -122,6 +124,63 @@ class MemberActivationCommitWitnessTest extends TestCase
         }
         $this->assertSame(1, $rolledBack);
         $this->assertMemberOriginalEffectsUnchanged($before);
+    }
+
+    /** A real SQLite commit failure; no replacement PDO, mock commit, or thrown commit delegate. */
+    public function test_sqlite_real_commit_constraint_failure_keeps_the_activation_pre_commit_refusal(): void
+    {
+        if (DB::getDriverName() !== 'sqlite') {
+            $this->markTestSkipped('Deferred FK commit failure uses the actual SQLite PDO; native MySQL has no deferred FK equivalent.');
+        }
+        $fixture = $this->memberActivationFixture();
+        [$issuer, $input] = $this->reviewInput($fixture);
+        $before = $this->memberOriginalEffects();
+        $auditCount = DB::table('audit_events')->count();
+        $missingActor = (int) DB::table('users')->max('id') + 100000;
+        $primary = DB::connection()->getPdo();
+        $this->assertSame(1, (int) $primary->query('PRAGMA foreign_keys')->fetchColumn());
+        $this->assertSame(0, (int) $primary->query('PRAGMA defer_foreign_keys')->fetchColumn());
+        $injected = 0;
+        $transactional = false;
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, function () use ($primary, $missingActor, &$injected, &$transactional): void {
+            if ($injected !== 0 || ! self::inside(MemberOriginalSourceCapture::class, 'inspectActivation')) {
+                return;
+            }
+            // Keep the exact admitted schema and foreign_keys=ON. This existing FK is checked at the physical
+            // commit after the delegate returns and the original observer's full terminal proof has run.
+            $primary->exec('PRAGMA defer_foreign_keys=ON');
+            $statement = $primary->prepare('INSERT INTO audit_events (actor_id, action, subject_type, subject_id, context) VALUES (?, ?, ?, ?, ?)');
+            $statement->execute([$missingActor, 'synthetic.commit.failure', 'synthetic', 1, '{}']);
+            $injected++;
+            $transactional = $primary->inTransaction();
+        });
+        try {
+            $error = $this->refused(fn () => $issuer->confirm($fixture['member_authored']->definitionId, $fixture['reservation']['redemption_id'],
+                $input, $fixture['buyer']['principal'], $fixture['buyer']['user']), 'source_refused');
+        } finally {
+            // Snapshot product cleanup before any test-only recovery can hide a retained transaction.
+            $depthAfterProduct = DB::transactionLevel();
+            $transactionAfterProduct = $primary->inTransaction();
+            $deferAfterProduct = (int) $primary->query('PRAGMA defer_foreign_keys')->fetchColumn();
+            if ($transactionAfterProduct) {
+                DB::connection()->rollBack();
+            }
+            $primary->exec('PRAGMA defer_foreign_keys=OFF');
+        }
+        $this->assertSame(0, $depthAfterProduct);
+        $this->assertFalse($transactionAfterProduct, 'The original observer must roll back its still-active owned PDO after commit failure.');
+        $this->assertSame(0, $deferAfterProduct);
+        $this->assertSame(1, $injected, 'Fault setup must return successfully; an INSERT/delegate exception is not commit failure.');
+        $this->assertTrue($transactional);
+        $this->assertInstanceOf(PDOException::class, $error->getPrevious());
+        $cause = $error->getPrevious();
+        $this->assertSame('23000', (string) $cause->getCode());
+        $physicalCommit = array_filter($cause->getTrace(), static fn (array $frame): bool =>
+            in_array($frame['class'] ?? null, [PDO::class, 'Pdo\\Sqlite'], true) && ($frame['function'] ?? null) === 'commit');
+        $this->assertNotEmpty($physicalCommit, 'The exception must originate in actual internal PDO::commit, not a callback.');
+        $this->assertSame($auditCount, DB::table('audit_events')->count());
+        $this->assertMemberOriginalEffectsUnchanged($before);
+        $this->assertSame(0, (int) $primary->query('PRAGMA defer_foreign_keys')->fetchColumn());
     }
 
     private function reviewInput(array $fixture): array

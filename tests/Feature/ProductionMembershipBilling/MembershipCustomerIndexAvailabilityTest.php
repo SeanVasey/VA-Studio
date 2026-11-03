@@ -152,6 +152,77 @@ class MembershipCustomerIndexAvailabilityTest extends TestCase
         $read->proveBeforeBytes();
     }
 
+    public function test_r3_census_classifies_every_history_and_definition_hash_call_under_app(): void
+    {
+        $sources = [];
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(app_path(), \FilesystemIterator::SKIP_DOTS)) as $file) {
+            if ($file->isFile() && $file->getExtension() === 'php') {
+                $sources[substr($file->getPathname(), strlen(base_path()) + 1)] = file_get_contents($file->getPathname());
+            }
+        }
+        // Closed census: a new writer (even with the safe default) requires explicit review here. Keep the older
+        // reflection/default, writer-count, index opt-in and real retention assertions above as separate checks.
+        $this->assertSame([
+            'app/Domain/Grants/Member/MemberActivationHistoryInspection.php' => [
+                '->capturePeriod($redemption[\'period_id\'],$rows)',
+            ],
+            'app/Domain/Grants/Member/MemberGrantDefinitions.php' => [
+                '->definitionByHash($definition->hash())',
+            ],
+            'app/Domain/Memberships/Production/MembershipAwardContext.php' => [
+                '->capturePeriod($this->period[\'id\'],$rows)',
+            ],
+            'app/Domain/Memberships/Production/MembershipCustomerIndex.php' => [
+                '->capturePeriod($row[\'id\'],$rows,consistentRead:true,schema:$schema)',
+                '->definitionByHash($grants[\'approved_definition_hash\'],true)',
+            ],
+            'app/Domain/Memberships/Production/MembershipReservationContext.php' => [
+                '->capturePeriod($this->period[\'id\'],$this->rows)',
+                '->capturePeriod($this->period[\'id\'],$this->rows)',
+            ],
+        ], self::r3CallsiteCensus($sources));
+    }
+
+    public function test_r3_census_detects_writer_opt_ins_new_writers_and_unparsed_calls(): void
+    {
+        $safe = ['writer.php' => '$reader->definitionByHash($definition->hash()); $history->capturePeriod($id, $rows);'];
+        $expected = ['writer.php' => ['->definitionByHash($definition->hash())', '->capturePeriod($id,$rows)']];
+        $this->assertSame($expected, self::r3CallsiteCensus($safe));
+        foreach ([
+            '$reader->definitionByHash($definition->hash(), true); $history->capturePeriod($id, $rows);',
+            '$reader->definitionByHash($definition->hash(), committed: true); $history->capturePeriod($id, $rows);',
+            '$reader->definitionByHash($definition->hash()); $history->capturePeriod($id, $rows, consistentRead: true);',
+            '$reader -> definitionByHash ($definition->hash(), $flag); $history->capturePeriod($id, $rows);',
+        ] as $changed) {
+            $this->assertNotSame($expected, self::r3CallsiteCensus(['writer.php' => $changed]));
+        }
+        foreach (['$reader->definitionByHash($hash);', '$history->capturePeriod($id, $rows);'] as $newWriter) {
+            $this->assertNotSame($expected, self::r3CallsiteCensus($safe + ['future/writer.php' => $newWriter]));
+        }
+        // The existing bounded expression parser must not silently omit a newly more deeply nested call.
+        $this->assertSame(['writer.php' => ['UNPARSED_CALLSITE']], self::r3CallsiteCensus([
+            'writer.php' => '$reader->definitionByHash($definition->hash(normalize($value)));',
+        ]));
+    }
+
+    /** Existing R3 bounded call parser, applied exhaustively; unsupported syntax is a census failure, not omission. */
+    private static function r3CallsiteCensus(array $sources): array
+    {
+        $census = [];
+        foreach ($sources as $path => $code) {
+            $starts = preg_match_all('/->\s*(?:capturePeriod|definitionByHash)\s*\(/', $code);
+            $parsed = preg_match_all('/->\s*(?:capturePeriod|definitionByHash)\s*\((?:[^()]|\([^()]*\))*\)/', $code, $calls);
+            if ($starts !== $parsed) {
+                $census[$path] = ['UNPARSED_CALLSITE'];
+            } elseif ($starts > 0) {
+                $census[$path] = array_map(static fn (string $call): string => preg_replace('/\s+/', '', $call), $calls[0]);
+            }
+        }
+        ksort($census);
+
+        return $census;
+    }
+
     public function test_index_proves_schema_once_per_owned_frame_and_completely_in_its_terminal_phases(): void
     {
         // F9: the index reads every period inside one owned frame with G1's frame-scoped schema proofs, member-grant
