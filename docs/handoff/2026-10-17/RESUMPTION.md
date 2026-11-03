@@ -96,3 +96,55 @@ Account B1's real typed V1/V2/ordered-overlap method passed at unchanged `a9b48d
 - Canonical application a9b48daf passed typed1/1081, inspection1/8 (108 SQL against110), memo1/8 (hit14 against15; two full callbacks), and all11 fixed acceptance methods in separate native processes: up/down15, overlap12, lease release6 and eight queued cases totaling80 assertions. The corrected02 physical oracle passed1/880 over a9b application code; its unit selection passed16/163. Original failures and UNKNOWN results remain preserved.
 - Owned fixture04 qualified only the selected test PFS/peer permissions, a64MiB packet limit and same-app EOF/close. Its public certificate did not verify for the required chain/purpose/admitted IP; verified TLS remains open. Actual discovery proved2706 selected native cases in269 files, of10166 cases in762 files, across eight nonempty shards; listing ran zero product cases. The333-entry SQLite census retains main's complete311-entry prefix and first150 pinned entries. The sorted26-entry MySQL census adds only the exact SQLite-only down-noop. Both workflow count comments are updated. All207 HOST safeguards passed; affected52+61 passed again after the final census change. No new production environment key was added.
 - Source SHAs, SAFE receipt hashes and the finite development-PR boundary are recorded in docs/verification/current-catalog-closed-groups-20261102/INTEGRATION-CHECKPOINT-20261103.md. Next:23 integrated native cases, focused unit checks and the separate SQLite case, then final exact-tested-SHA review, preflight, Code/Security and Bugbot. The source review has no validated P0–P2 finding so far; final approval awaits actual integrated results. Ledger crash recovery, native races/account-PK progress, Format F custody, F9/full100, target-host and verified-TLS gates remain explicit follow-ups. The HTTP mount stays literal-false. No Foundation run or live action occurred.
+
+
+## 2026-11-03 — four supervised native ledger providers complete
+
+Sean selected Sol6.1 for coordination. This dated receipt supersedes older
+pending-ledger/runtime-owner prose; original evidence remains source-scoped.
+Main PR #190 is already merged at `048244a6baf893a5d5f5581e466f353af24faaf7`
+from expected tested head162d. No new core source review cycle is opened.
+
+ROOT completed the four original ledger providers in **four separate serial
+processes**, on exact tested source
+`903342971842c50970f688ab86d65e384c7e95c5`, manifest
+`ef7fe271d7f908110506cf890c062e0afb2e06ca73d7af57b7845abe0694412c`:
+up-overlap **2067** assertions (80117), down-overlap **1126** (82960),
+up-end **2785** (52613), down-end **1942** (69904): **4 cases /7920 assertions**.
+Each outer owner exited0/reaped, exact candidate parent/worker/ordinary-restart
+origins and all registered process lineage passed, native result was positive
+with no failures/errors/skips/warnings, EOF/private capture passed, and all six
+cleanup checks plus returned lease passed. All runtime owners are CLOSED.
+Runtime was the qualified private Oracle MySQL8.4.11/PHP8.4.27 fixture. This is
+bounded local ledger cut/restart evidence, not a full suite, target-host proof,
+normal-shard compatibility or global launch acceptance.
+
+Prior failures stay retained: initial raw-supervisor buffering refusal was
+corrected only for the proven native socket contract; the post-down foreground
+failure was traced to the server's exact internal GTID daemon, classified with
+unknown owners still refused;31e completed its native work but retained outer
+STOP2 because ANSI color bytes failed the strict summary regex. The launcher
+then added `--colors=never` with its exact loader binding. No failed unchanged
+source was automatically retried. ROOT's classifier pure controls passed
+**36 tests /39 assertions** with **three PHP lints**; the later changed loader
+also passed ROOT lint. Production, strict result evaluator, process protocol,
+global resource queries and resource/time caps were not changed by these fixes.
+
+**Before a PR, supervised CI routing and environment portability remain OPEN.**
+The dedicated one-provider supervisor class is not presently compatible with
+ordinary shard execution. No skip/census row or normal-CI pass is claimed.
+Next work is explicit supervised routing/portable admission plus F9 focused
+checks. Clean F9 composition is
+`4ecc9f567cc6e8b8cdf74d6e9d634c817424b4f8` at
+`/workspace/VA-Studio-f9-main`; its actuals are UNRUN. N7 and identity/history
+sources are untouched there. The old29ce six-file history trial remains
+unaccepted; the corrected preparation precursor is
+`70765666858c8200ebf806c1e010112da0ee72c6`. Request60/MAX100, real recovery
+pools, account-PK progress, target-host/shared-cache and other B gates remain.
+Membership mounting stays literal-false.
+
+The two dirty V1 census/helper metadata files remain ROOT-owned and unrun;
+finite V1 actuals remain pending. MIG then the remaining C lanes stay behind B,
+with verified_grant/default-off boundaries intact. No Foundation/CI dispatch,
+push/PR/merge, install, deployment, live keys/payments, DNS, customer import or
+BeatStars retirement occurred in this docs batch.

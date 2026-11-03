@@ -208,3 +208,64 @@ normalizing only the added color literal and loader hash restores the original
 launcher exactly. No mirror test, PHP/lint/runtime/SQL execution or automatic
 retry accompanies this change. ROOT reviews and owns one justified subsequent
 provider execution; every prior outer STOP remains retained.
+
+
+## 2026-11-03 — four supervised native ledger providers complete
+
+Sean selected Sol6.1 for coordination. This dated receipt supersedes older
+pending-ledger/runtime-owner prose; original evidence remains source-scoped.
+Main PR #190 is already merged at `048244a6baf893a5d5f5581e466f353af24faaf7`
+from expected tested head162d. No new core source review cycle is opened.
+
+ROOT completed the four original ledger providers in **four separate serial
+processes**, on exact tested source
+`903342971842c50970f688ab86d65e384c7e95c5`, manifest
+`ef7fe271d7f908110506cf890c062e0afb2e06ca73d7af57b7845abe0694412c`:
+up-overlap **2067** assertions (80117), down-overlap **1126** (82960),
+up-end **2785** (52613), down-end **1942** (69904): **4 cases /7920 assertions**.
+Each outer owner exited0/reaped, exact candidate parent/worker/ordinary-restart
+origins and all registered process lineage passed, native result was positive
+with no failures/errors/skips/warnings, EOF/private capture passed, and all six
+cleanup checks plus returned lease passed. All runtime owners are CLOSED.
+Runtime was the qualified private Oracle MySQL8.4.11/PHP8.4.27 fixture. This is
+bounded local ledger cut/restart evidence, not a full suite, target-host proof,
+normal-shard compatibility or global launch acceptance.
+
+Prior failures stay retained: initial raw-supervisor buffering refusal was
+corrected only for the proven native socket contract; the post-down foreground
+failure was traced to the server's exact internal GTID daemon, classified with
+unknown owners still refused;31e completed its native work but retained outer
+STOP2 because ANSI color bytes failed the strict summary regex. The launcher
+then added `--colors=never` with its exact loader binding. No failed unchanged
+source was automatically retried. ROOT's classifier pure controls passed
+**36 tests /39 assertions** with **three PHP lints**; the later changed loader
+also passed ROOT lint. Production, strict result evaluator, process protocol,
+global resource queries and resource/time caps were not changed by these fixes.
+
+**Before a PR, supervised CI routing and environment portability remain OPEN.**
+The dedicated one-provider supervisor class is not presently compatible with
+ordinary shard execution. No skip/census row or normal-CI pass is claimed.
+Next work is explicit supervised routing/portable admission plus F9 focused
+checks. Clean F9 composition is
+`4ecc9f567cc6e8b8cdf74d6e9d634c817424b4f8` at
+`/workspace/VA-Studio-f9-main`; its actuals are UNRUN. N7 and identity/history
+sources are untouched there. The old29ce six-file history trial remains
+unaccepted; the corrected preparation precursor is
+`70765666858c8200ebf806c1e010112da0ee72c6`. Request60/MAX100, real recovery
+pools, account-PK progress, target-host/shared-cache and other B gates remain.
+Membership mounting stays literal-false.
+
+The two dirty V1 census/helper metadata files remain ROOT-owned and unrun;
+finite V1 actuals remain pending. MIG then the remaining C lanes stay behind B,
+with verified_grant/default-off boundaries intact. No Foundation/CI dispatch,
+push/PR/merge, install, deployment, live keys/payments, DNS, customer import or
+BeatStars retirement occurred in this docs batch.
+
+Exact source-safe outer receipt hashes:
+
+| Provider | SAFE SHA256 |
+| --- | --- |
+| up-overlap | `6d7abe5333c9b48552b818923a2a4e0bbf7befcd497b19d0367691b923e5c8f0` |
+| down-overlap | `ccf85cc2da6ff394decb943aa30b4b59f3850ac84fd523be44e831864214df2b` |
+| up-end | `2ab0f64c957a8d1d134cd64910b70ea42ed709ab23058b26cbd78e9ce9cdeab7` |
+| down-end | `9fd05040e4e7e39a373c9da4f71308410f7c36e4b99fd6c0893b433c04dca207` |
