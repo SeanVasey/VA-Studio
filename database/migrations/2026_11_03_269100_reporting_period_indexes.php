@@ -56,26 +56,74 @@ return new class extends Migration
      */
     private function installed(): array
     {
+        $driver = DB::getDriverName();
+        if (! in_array($driver, ['sqlite', 'mysql'], true)) {
+            throw new LogicException('Reporting indexes require SQLite or MySQL.');
+        }
+        $sqlite = $driver === 'sqlite' ? $this->sqliteCatalog() : null;
         $installed = [];
         foreach (self::INDEXES as $table => [$column, $name]) {
             if (! Schema::hasTable($table)) {
                 throw new LogicException('Reporting index prerequisite table is missing: '.$table);
             }
-            $matches = array_values(array_filter(Schema::getIndexes($table), fn (array $index): bool => $index['name'] === $name));
-            if ($matches !== [] && (count($matches) !== 1 || $matches[0]['columns'] !== [$column]
-                || $matches[0]['unique'] !== false || $matches[0]['primary'] !== false)) {
-                throw new LogicException('Reporting index definition differs; existing schema and data are unchanged: '.$name);
+            if ($sqlite !== null) {
+                // Inspect native keys before any helper can flatten expression/collation metadata.
+                if (isset($sqlite[$name])) {
+                    $listed = array_values(array_filter(DB::select('PRAGMA main.index_list("'.$table.'")'),
+                        fn (object $index): bool => $index->name === $name));
+                    $keys = array_values(array_filter(DB::select('PRAGMA main.index_xinfo("'.$name.'")'),
+                        fn (object $key): bool => (int) $key->key === 1));
+                    if (count($listed) !== 1 || (int) $listed[0]->unique !== 0 || $listed[0]->origin !== 'c'
+                        || (int) $listed[0]->partial !== 0 || count($keys) !== 1 || (int) $keys[0]->cid < 0
+                        || $keys[0]->name !== $column || (int) $keys[0]->desc !== 0 || $keys[0]->coll !== 'BINARY') {
+                        throw new LogicException('Reporting index definition differs; existing schema and data are unchanged: '.$name);
+                    }
+                }
+                $installed[$table] = isset($sqlite[$name]);
+
+                continue;
             }
-            if ($matches !== [] && DB::getDriverName() === 'mysql') {
-                $native = DB::select('SELECT INDEX_TYPE, SUB_PART, COLLATION, EXPRESSION, IS_VISIBLE FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND INDEX_NAME = ? ORDER BY SEQ_IN_INDEX', [DB::getDatabaseName(), $table, $name]);
-                if (count($native) !== 1 || $native[0]->INDEX_TYPE !== 'BTREE' || $native[0]->SUB_PART !== null
+            // MySQL names remain table-scoped, but aliases and expression keys must not disappear through a helper.
+            $native = DB::select('SELECT INDEX_NAME, NON_UNIQUE, SEQ_IN_INDEX, COLUMN_NAME, INDEX_TYPE, SUB_PART, COLLATION, EXPRESSION, IS_VISIBLE FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?'
+                .' AND CONVERT(INDEX_NAME USING utf8mb3) COLLATE utf8mb3_general_ci = CONVERT(? USING utf8mb3) COLLATE utf8mb3_general_ci ORDER BY SEQ_IN_INDEX', [DB::getDatabaseName(), $table, $name]);
+            if ($native !== []) {
+                if (count($native) !== 1 || $native[0]->INDEX_NAME !== $name || (int) $native[0]->NON_UNIQUE !== 1
+                    || (int) $native[0]->SEQ_IN_INDEX !== 1 || $native[0]->COLUMN_NAME !== $column
+                    || $native[0]->INDEX_TYPE !== 'BTREE' || $native[0]->SUB_PART !== null
                     || $native[0]->COLLATION !== 'A' || $native[0]->EXPRESSION !== null || $native[0]->IS_VISIBLE !== 'YES') {
                     throw new LogicException('Reporting index definition differs; existing schema and data are unchanged: '.$name);
                 }
             }
-            $installed[$table] = $matches !== [];
+            $installed[$table] = $native !== [];
         }
 
         return $installed;
+    }
+
+    /** SQLite names are database-global; prove every reserved name before either direction can issue DDL. */
+    private function sqliteCatalog(): array
+    {
+        $owners = [];
+        foreach (self::INDEXES as $table => [, $name]) {
+            $owners[$name] = $table;
+        }
+        $names = array_keys($owners);
+        $slots = implode(',', array_fill(0, count($names), '?'));
+        // A temp name (or temp target-table shadow) must never redirect an unqualified schema operation.
+        $temporary = DB::select('SELECT type, name, tbl_name FROM sqlite_temp_master WHERE name COLLATE NOCASE IN ('.$slots.')'
+            .' OR (type = \'table\' AND name COLLATE NOCASE IN ('.$slots.'))', [...$names, ...array_keys(self::INDEXES)]);
+        if ($temporary !== []) {
+            throw new LogicException('Reporting index definition differs; temporary reserved namespace is not owned.');
+        }
+        $found = [];
+        foreach (DB::select('SELECT type, name, tbl_name, sql FROM main.sqlite_master WHERE name COLLATE NOCASE IN ('.$slots.')', $names) as $object) {
+            if (! isset($owners[$object->name]) || isset($found[$object->name]) || $object->type !== 'index'
+                || $object->tbl_name !== $owners[$object->name] || ! is_string($object->sql)) {
+                throw new LogicException('Reporting index definition differs; reserved namespace is not owned.');
+            }
+            $found[$object->name] = true;
+        }
+
+        return $found;
     }
 };

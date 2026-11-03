@@ -56,10 +56,10 @@ class ReportingIndexesTest extends TestCase
         $result = [];
         foreach (self::INDEXES as $table => [, $name]) {
             $result[$table] = [
-                'rows' => DB::table($table)->orderBy('id')->get()->toJson(),
+                'rows' => DB::table(DB::getDriverName() === 'sqlite' ? 'main.'.$table : $table)->orderBy('id')->get()->toJson(),
                 'columns' => Schema::getColumns($table),
                 'foreign_keys' => Schema::getForeignKeys($table),
-                'other_indexes' => array_values(array_filter(Schema::getIndexes($table), fn (array $index): bool => $index['name'] !== $name)),
+                'other_indexes' => $this->otherIndexes($table, $name),
             ];
         }
         $triggers = DB::getDriverName() === 'sqlite'
@@ -71,6 +71,26 @@ class ReportingIndexesTest extends TestCase
         $this->assertNotEmpty($triggers);
 
         return [$result, $triggers];
+    }
+
+    private function otherIndexes(string $table, string $owned): array
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            $rows = [];
+            foreach (DB::select('PRAGMA main.index_list("'.$table.'")') as $index) {
+                if ($index->name !== $owned) {
+                    $identity = (array) $index;
+                    unset($identity['seq']); // Catalog enumeration position changes when another index is removed.
+                    $rows[$index->name] = [$identity, array_map(static fn (object $key): array => (array) $key,
+                        DB::select('PRAGMA main.index_xinfo("'.str_replace('"', '""', $index->name).'")'))];
+                }
+            }
+            ksort($rows);
+
+            return array_values($rows);
+        }
+
+        return array_map(static fn (object $row): array => (array) $row, DB::select('SELECT INDEX_NAME, NON_UNIQUE, SEQ_IN_INDEX, COLUMN_NAME, INDEX_TYPE, SUB_PART, COLLATION, EXPRESSION, IS_VISIBLE FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND INDEX_NAME <> ? ORDER BY INDEX_NAME, SEQ_IN_INDEX', [DB::getDatabaseName(), $table, $owned]));
     }
 
     private function ddlDuring(callable $operation): array
@@ -197,5 +217,115 @@ class ReportingIndexesTest extends TestCase
             }));
             $this->assertSame($before, [$this->retained(), array_map(fn (string $table): array => Schema::getIndexes($table), array_keys(self::INDEXES))]);
         }
+    }
+
+    public function test_native_index_shapes_are_not_adopted_or_removed_in_either_direction(): void
+    {
+        $name = self::INDEXES['quotes'][1];
+        $quoted = '`'.$name.'`';
+        $shapes = DB::getDriverName() === 'sqlite' ? [
+            'unique' => 'CREATE UNIQUE INDEX '.$quoted.' ON quotes (created_at)',
+            'partial' => 'CREATE INDEX '.$quoted.' ON quotes (created_at) WHERE created_at IS NOT NULL',
+            'descending' => 'CREATE INDEX '.$quoted.' ON quotes (created_at DESC)',
+            'collation' => 'CREATE INDEX '.$quoted.' ON quotes (created_at COLLATE NOCASE)',
+            'expression' => 'CREATE INDEX '.$quoted.' ON quotes (date(created_at))',
+        ] : [
+            'unique' => 'CREATE UNIQUE INDEX '.$quoted.' ON quotes (created_at)',
+            'case_alias' => 'CREATE INDEX `'.strtoupper($name).'` ON quotes (created_at)',
+            'descending' => 'CREATE INDEX '.$quoted.' ON quotes (created_at DESC)',
+            'invisible' => 'CREATE INDEX '.$quoted.' ON quotes (created_at) INVISIBLE',
+            'expression' => 'CREATE INDEX '.$quoted.' ON quotes ((DATE(created_at)))',
+        ];
+        foreach ($shapes as $kind => $statement) {
+            Schema::table('quotes', fn (Blueprint $table) => $table->dropIndex($name));
+            DB::unprepared($statement);
+            try {
+                $before = [$this->retained(), $this->indexCatalog()];
+                foreach (['up', 'down'] as $direction) {
+                    $this->assertReportingRefusal($direction, $kind);
+                    $this->assertSame($before, [$this->retained(), $this->indexCatalog()], $kind.' '.$direction);
+                }
+            } finally {
+                Schema::table('quotes', fn (Blueprint $table) => $table->dropIndex($name));
+                $this->migration()->up();
+            }
+        }
+        $this->assertIndexes(true);
+    }
+
+    public function test_reserved_names_are_preflighted_in_the_actual_engine_namespace_before_up_or_down(): void
+    {
+        $last = self::INDEXES['refund_line_allocations'][1];
+        if (DB::getDriverName() === 'mysql') {
+            // Unlike SQLite, the same index name on a foreign MySQL table is not a collision.
+            DB::unprepared('CREATE TABLE rep_foreign_holder (marker INT NOT NULL) ENGINE=InnoDB');
+            DB::table('rep_foreign_holder')->insert(['marker' => 9123]);
+            DB::unprepared('CREATE INDEX `'.$last.'` ON rep_foreign_holder (marker)');
+            $before = $this->indexCatalog();
+            try {
+                $this->migration()->down();
+                $this->assertSame([9123], DB::table('rep_foreign_holder')->pluck('marker')->all());
+                $this->migration()->up();
+                $this->assertSame($before, $this->indexCatalog());
+                $this->assertSame([9123], DB::table('rep_foreign_holder')->pluck('marker')->all());
+            } finally {
+                DB::unprepared('DROP TABLE rep_foreign_holder');
+            }
+
+            return;
+        }
+        foreach (['foreign_index', 'foreign_case_index', 'foreign_table', 'foreign_case_table', 'foreign_trigger', 'temp_index', 'temp_case_index', 'temp_table', 'temp_target_shadow'] as $kind) {
+            foreach (['up', 'down'] as $direction) {
+                // An early missing index would be created by up; an early installed one would be dropped by down.
+                if ($direction === 'up') {
+                    Schema::table('quotes', fn (Blueprint $table) => $table->dropIndex(self::INDEXES['quotes'][1]));
+                }
+                Schema::table('refund_line_allocations', fn (Blueprint $table) => $table->dropIndex($last));
+                $temporary = str_starts_with($kind, 'temp_');
+                $holder = $kind === 'temp_table' ? $last : ($kind === 'temp_target_shadow' ? 'quotes'
+                    : (in_array($kind, ['foreign_table', 'foreign_case_table'], true) ? ($kind === 'foreign_case_table' ? strtoupper($last) : $last) : 'rep_foreign_holder'));
+                $namespace = $temporary ? 'temp' : 'main';
+                DB::unprepared('CREATE '.($temporary ? 'TEMP ' : '').'TABLE "'.$holder.'" (id INTEGER PRIMARY KEY, marker INTEGER NOT NULL)');
+                DB::unprepared('INSERT INTO '.$namespace.'."'.$holder.'" (marker) VALUES (9123)');
+                if (in_array($kind, ['foreign_index', 'foreign_case_index', 'temp_index', 'temp_case_index'], true)) {
+                    $index = str_contains($kind, 'case') ? strtoupper($last) : $last;
+                    DB::unprepared('CREATE INDEX '.$namespace.'."'.$index.'" ON "'.$holder.'" (marker)');
+                } elseif ($kind === 'foreign_trigger') {
+                    DB::unprepared('CREATE TRIGGER "'.$last.'" BEFORE INSERT ON "'.$holder.'" BEGIN SELECT 1; END');
+                }
+                try {
+                    $before = [$this->retained(), $this->indexCatalog(), DB::table($namespace.'.'.$holder)->pluck('marker')->all()];
+                    $this->assertReportingRefusal($direction, $kind);
+                    $this->assertSame($before, [$this->retained(), $this->indexCatalog(), DB::table($namespace.'.'.$holder)->pluck('marker')->all()], $kind.' '.$direction);
+                } finally {
+                    DB::unprepared('DROP TABLE '.$namespace.'."'.$holder.'"');
+                    $this->migration()->up();
+                }
+            }
+        }
+        $this->assertIndexes(true);
+    }
+
+    private function assertReportingRefusal(string $direction, string $case): void
+    {
+        $this->assertSame([], $this->ddlDuring(function () use ($direction, $case): void {
+            try {
+                $this->migration()->{$direction}();
+                $this->fail($case.' was adopted or removed by '.$direction);
+            } catch (LogicException $error) {
+                $this->assertStringContainsString('Reporting index definition differs', $error->getMessage());
+            }
+        }), $case.' '.$direction.' must refuse before any DDL');
+    }
+
+    private function indexCatalog(): array
+    {
+        $rows = static fn (array $objects): array => array_map(static fn (object $row): array => (array) $row, $objects);
+        if (DB::getDriverName() === 'sqlite') {
+            return [$rows(DB::select('SELECT type, name, tbl_name, rootpage, sql FROM main.sqlite_master ORDER BY type, name')),
+                $rows(DB::select('SELECT type, name, tbl_name, rootpage, sql FROM sqlite_temp_master ORDER BY type, name'))];
+        }
+
+        return $rows(DB::select('SELECT TABLE_NAME, INDEX_NAME, NON_UNIQUE, SEQ_IN_INDEX, COLUMN_NAME, INDEX_TYPE, SUB_PART, COLLATION, EXPRESSION, IS_VISIBLE FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME, INDEX_NAME, SEQ_IN_INDEX', [DB::getDatabaseName()]));
     }
 }
