@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\ProductionMembershipBilling;
 
+use App\Domain\Customers\ProductionCustomerSessions;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Grants\Member\MemberActivationHistoryReader;
 use App\Domain\Memberships\Billing\BillingAwardFence;
@@ -259,6 +260,82 @@ class MembershipNativeCustomerIndexTest extends TestCase
         $this->assertNull($result['error_class'], json_encode($result));
         $this->assertIsString($result['value']['period_id'] ?? null);
         $this->assertSame(2, DB::table('production_membership_paid_periods')->count());
+    }
+
+    public function test_native_recovered_index_allows_foreign_award_without_cross_owner_history_locks(): void
+    {
+        $fixture = $this->indexFixture();
+        $oldBinding = $fixture['buyer']['principal']->durableBinding();
+        CarbonImmutable::setTestNow(CarbonImmutable::now('UTC')->addSeconds(3601));
+        $this->completeIdentity($this->requestIdentity('recover'));
+        $current = (new ProductionCustomerSessions)->authenticate('buyer@example.test', 'MailboxPassword123');
+        $this->assertNotNull($current);
+        $newBinding = $current['principal']->durableBinding();
+        $this->assertSame($oldBinding['origin_id'], $newBinding['origin_id']);
+        $this->assertNotSame($oldBinding['verification_observation_id'], $newBinding['verification_observation_id']);
+        $fixture['buyer'] = $current;
+        // One additional retained period uses the real recovered binding, in the original manual probe format.
+        $real = (array) DB::table(MembershipPeriodRecords::PERIODS)->where('id', $fixture['reservation']['period_id'])->sole();
+        $event = (array) DB::table(MembershipPeriodRecords::EVENTS)->where('period_id', $real['id'])->where('kind', 'award')->sole();
+        $plan = (array) DB::table(MembershipRecords::TABLE)->where('id', $real['plan_version_id'])->sole();
+        $policy = MembershipPolicyVersions::document($plan)->binding($plan['id']);
+        $invoice = MembershipPeriodRecords::historicalInvoice($real, $event, $policy, (int) $real['identity_origin_id']);
+        $move = static fn (?string $at): ?string => $at === null ? null : gmdate('Y-m-d H:i:s', strtotime($at.' UTC') - 2678400);
+        $copy = new MembershipInvoiceBinding(hash('sha256', 'recovered-index-invoice'), hash('sha256', 'recovered-index-graph'),
+            $invoice->providerScopeHash, $invoice->amountMinor, $invoice->currency, $move($invoice->periodStart), $move($invoice->periodEnd),
+            $invoice->planPolicyHash, $invoice->originalTermsHash, $newBinding, $invoice->provenance,
+            $move($invoice->paidAt), $invoice->planVersionId);
+        [$period, $event] = MembershipPeriodRecords::create($copy, $policy, (int) $real['identity_origin_id'], $newBinding);
+        DB::table(MembershipPeriodRecords::PERIODS)->insert($period);
+        DB::table(MembershipPeriodRecords::EVENTS)->insert($event);
+        $this->assertSame(2, DB::table(MembershipPeriodRecords::PERIODS)->where('account_id', $current['principal']->accountId)
+            ->distinct()->count('owner_binding_hash'));
+        // Clear fixture clocks before the original physical overlap protocol.
+        CarbonImmutable::setTestNow();
+        $award = $this->otherCustomerAward($fixture);
+        $this->assertNotSame($current['principal']->accountId, $award['buyer']['principal']->accountId);
+        $worker = $this->awardWorker($award);
+        $writer = json_decode(file_get_contents($this->directory.'/ready-0'), true, 8, JSON_THROW_ON_ERROR)['connection_id'];
+        $parent = (int) DB::connection()->getPdo()->query('SELECT CONNECTION_ID()')->fetchColumn();
+        $started = false;
+        $waitedOnIndex = false;
+        $overlap = null;
+        DB::connection()->getEventDispatcher()->listen(TransactionBeginning::class, function () use (&$started): void {
+            if (! $started && self::inside(MembershipCustomerIndex::class, 'collectOwned')) {
+                $started = true;
+                touch($this->directory.'/start-0');
+            }
+        });
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, function () use (&$started, &$waitedOnIndex, &$overlap, $worker, $parent, $writer, $fixture): void {
+            if (! $started || $overlap !== null) {
+                return;
+            }
+            // Still inside the index transaction: wait until the writer holds the shared plan row or has finished.
+            $deadline = hrtime(true) + 40_000_000_000;
+            do {
+                $waitedOnIndex = $waitedOnIndex || $this->blockedBy($parent);
+                if (! $worker->isRunning()) {
+                    $overlap = 'finished';
+                } elseif ($this->holdsRow($writer, 'production_membership_plan_versions', $fixture['plan']['id'])) {
+                    $overlap = 'holds_plan';
+                }
+                usleep(20000);
+            } while ($overlap === null && hrtime(true) < $deadline);
+            $overlap ??= 'neither';
+        });
+        $read = MembershipCustomerRead::begin();
+        $index = (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read);
+        $read->proveBeforeBytes();
+        $worker->wait();
+        $result = json_decode($worker->getOutput(), true, 16, JSON_THROW_ON_ERROR);
+        $this->assertTrue($started);
+        $this->assertContains($overlap, ['holds_plan', 'finished'], 'The same-plan writer did not reach the shared plan row while the index was open.');
+        $this->assertFalse($waitedOnIndex, 'The same-plan writer waited for a lock held by the index.');
+        $this->assertCount(2, $index['periods']);
+        $this->assertArrayHasKey('error_class', $result);
+        $this->assertNull($result['error_class'], json_encode($result));
+        $this->assertIsString($result['value']['period_id'] ?? null);
+        $this->assertSame(3, DB::table('production_membership_paid_periods')->count());
     }
 
     public function test_native_index_waiting_behind_a_same_owner_writer_reads_that_writers_commit(): void
