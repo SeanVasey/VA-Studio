@@ -57,7 +57,7 @@ DRIVER_BRANCHING = re.compile(
     r"getDriverName|ATTR_DRIVER_NAME|\[\s*['\"]driver['\"]\s*\]|->driver\b(?!\s*\()"
     r"|(?:getenv|env)\(\s*['\"]DB_CONNECTION['\"]|\$_(?:ENV|SERVER)\[\s*['\"]DB_CONNECTION['\"]\s*\]")
 # A PHPUnit test class file; everything else under tests/ is a helper (support, worker, fixture or browser script).
-TEST_FILE = re.compile(r"tests/(?:Feature|Unit)/(?:[A-Za-z0-9_]+/)*[A-Za-z0-9_]+Test\.php")
+TEST_FILE = re.compile(r"tests/(?:Feature|Unit|Supervised)/(?:[A-Za-z0-9_]+/)*[A-Za-z0-9_]+Test\.php")
 SQLITE_SKIP_POLICY = "scripts/ci/database-sqlite-skips.json"
 MYSQL_SKIP_POLICY = "scripts/ci/database-mysql-skips.json"
 
@@ -231,13 +231,36 @@ def branching_coverage_errors(root: Path, paths: list[str], selection: Selection
     is a reviewed policy edit. Proving which tests use a helper would need call-graph analysis.
     """
     tests, helpers = driver_branching_files(root, paths)
+    supervised = required_supervised_files(root, paths)
     selected, residual = statically_selected(selection), set(selection.residual_files)
-    errors = [f"driver-branching test file neither selected nor residual: {name}" for name in sorted(tests - selected - residual)]
+    errors = [f"driver-branching test file neither selected nor residual: {name}" for name in sorted(tests - selected - residual - supervised)]
     errors += [f"residual file no longer branches on the driver: {name}" for name in sorted(residual - tests)]
     errors += [f"residual file is selected: {name}" for name in sorted(residual & selected)]
     errors += [f"driver-branching helper not in branching_helper_files: {name}" for name in sorted(helpers - set(selection.branching_helper_files))]
     errors += [f"branching_helper_files entry no longer branches: {name}" for name in sorted(set(selection.branching_helper_files) - helpers)]
     return errors
+
+
+def required_supervised_files(root: Path, paths: list[str]) -> set[str]:
+    """Explicit required native inventory, never a skip/helper/residual classification."""
+    actual = {name for name in paths if name.startswith('tests/Supervised/') and name.endswith('.php')}
+    registry = root / 'scripts/ci/account-ledger/selection.json'
+    if not registry.exists():
+        if actual:
+            raise PartitionError('Supervised tests lack their required selection inventory')
+        return set()
+    value = json.loads(registry.read_bytes())
+    if not (type(value) is dict and value.get('required_job') == 'backend-ledger'
+            and value.get('providers') == ['up-overlap', 'down-overlap', 'up-end', 'down-end']
+            and value.get('ordinary_discovery') is False and actual == {value.get('file')}):
+        raise PartitionError('Required supervised selection differs from its complete source inventory')
+    normalized = (root / value['file']).read_text().replace(
+        'namespace Tests\\Supervised\\ProductionIdentity;', 'namespace Tests\\Feature\\ProductionIdentity;').replace(
+        "$GLOBALS['accountMigratorQualifiedRuntime']['php_binary_sha256'] ?? null, hash_file('sha256', PHP_BINARY)",
+        "$pins['php_binary_sha256'], hash_file('sha256', PHP_BINARY)")
+    if hashlib.sha256(normalized.encode()).hexdigest() != value.get('normalized_test_sha256'):
+        raise PartitionError('Original four-provider assertions changed; review supervised inventory')
+    return actual
 
 
 def driver_branching_files(root: Path, paths: list[str]) -> tuple[set[str], set[str]]:

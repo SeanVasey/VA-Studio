@@ -17,6 +17,7 @@ import re
 import stat
 import sys
 import time
+from network import build_flags
 
 from capture import Capture
 
@@ -162,7 +163,8 @@ class Producer(Capture):
     def build(self, probes):
         # The sealed directory is a closed build context; .dockerignore excludes
         # candidate code, credentials, descriptor and unrelated checkout files.
-        image = self.command(["docker", "build", "--quiet", "--pull", "--no-cache",
+        os.environ['DOCKER_BUILDKIT'] = '1'
+        image = self.command(["docker", "build", "--quiet", "--pull", "--no-cache", *build_flags(),
                               "--network=default", "--platform=linux/amd64", "--file",
                               str(probes / "Runtime.Dockerfile"), str(probes)], "trusted-build", seconds=240).strip()
         require(re.fullmatch(r"sha256:[0-9a-f]{64}", image), "built-image-id")
@@ -216,8 +218,8 @@ class Producer(Capture):
             # Backend cleanup is separate and requires the actual wait result and observed removal.
             self.limit = min(self.end, time.monotonic() + 20)
             if container and re.fullmatch(r"[0-9a-f]{64}", container):
-                self.command(["docker", "kill", "--signal=TERM", container], "stop")
-                require(self.command(["docker", "wait", container], "wait") == "143\n", "runtime-wait")
+                self.command(["docker", "kill", "--signal=KILL", container], "stop")
+                require(self.command(["docker", "wait", container], "wait") == "137\n", "runtime-wait")
                 self.command(["docker", "rm", container], "remove")
                 require(self.command(["docker", "ps", "-a", "--filter", "id=" + container,
                                       "--format", "{{.ID}}"], "removed") == "", "runtime-removal")
@@ -262,7 +264,7 @@ def main():
     require(os.geteuid() == 0 and SHA.fullmatch(args.expected_sha)
             and HASH.fullmatch(args.policy_sha256) and HASH.fullmatch(args.source_manifest_sha256), "independent-root-producer")
     # Root must seal this exact reviewed source directory before invocation.
-    sources = ("runtime-producer.py", "capture.py", "runtime-policy.json", "runtime-probe.php", "runtime-probe.py", "Runtime.Dockerfile", ".dockerignore", "source-snapshot.py")
+    sources = ("runtime-producer.py", "capture.py", "runtime-policy.json", "runtime-probe.php", "runtime-probe.py", "Runtime.Dockerfile", ".dockerignore", "source-snapshot.py", "network.py")
     for name in sources:
         trusted_path(HERE / name)
     manifest_path = trusted_path(HERE / "source-manifest.json")

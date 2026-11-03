@@ -53,6 +53,9 @@ POLICY_FILES = (
     "scripts/ci/database-sqlite-skips.json", "scripts/ci/database-mysql-selection.json", "scripts/ci/database-mysql-skips.json",
     "composer.json", "composer.lock", "package.json", "package-lock.json",
     "scripts/ci/phpunit-timings-mysql.json", "scripts/ci/phpunit-timings-sqlite.json",
+    "scripts/ci/account-ledger/selection.json", "scripts/ci/account-ledger/source-manifest.json",
+    "scripts/ci/account-ledger/receipts.py", "scripts/ci/account-ledger/bootstrap.py",
+    "scripts/ci/account-ledger/controller.py", "scripts/ci/account-ledger/suite.py",
 )
 COUNTS = {"mysql": 24, "sqlite": 2}
 SQLITE_SKIP_POLICY = "scripts/ci/database-sqlite-skips.json"

@@ -112,9 +112,7 @@ def create_owner(runtime_descriptor, source_root, expected_sha, directory, nonce
             and data['facts']['built_image_id'] == data['runtime_image'], 'runtime-source-provenance')
     directory.mkdir(mode=0o700)
     directory.chmod(0o700)
-    (directory / 'docker-config').mkdir(mode=0o700)
     os.environ['PATH'] = '/usr/bin:/bin'
-    os.environ['DOCKER_CONFIG'] = str(directory / 'docker-config')
     factory = load_factory()
     selected = copy.deepcopy(factory.SPEC)
     selected.update(controller_uid=0, container_name='va-ledger-mysql-' + nonce,
@@ -303,8 +301,8 @@ def qualify_observer(owner, selected):
     finally:
         owner.limit = min(owner.end, time.monotonic() + 20)
         if container and re.fullmatch('[0-9a-f]{64}', container):
-            owner.command(['docker', 'kill', '--signal=TERM', container], 'observer_stop')
-            require(owner.command(['docker', 'wait', container], 'observer_wait') == '143\n', 'observer-wait')
+            owner.command(['docker', 'kill', '--signal=KILL', container], 'observer_stop')
+            require(owner.command(['docker', 'wait', container], 'observer_wait') == '137\n', 'observer-wait')
             owner.command(['docker', 'rm', container], 'observer_remove')
             require(owner.command(['docker', 'ps', '-a', '--filter', 'id=' + container, '--format', '{{.ID}}'], 'observer_removed') == '', 'observer-removal')
             cleanup = True

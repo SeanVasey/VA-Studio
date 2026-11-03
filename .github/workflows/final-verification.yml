@@ -133,6 +133,7 @@ jobs:
         run: |
           python3 scripts/ci/test-ci-scope.py
           python3 scripts/ci/test-workflow-cadence.py
+          for ledger_control in scripts/ci/account-ledger/test-*.py; do python3 -B "$ledger_control"; done
           python3 scripts/ci/test-focused-tests.py
           python3 scripts/ci/test-database-receipts.py
           python3 scripts/ci/test-gitlab-database-receipts.py
@@ -140,6 +141,40 @@ jobs:
           python3 scripts/ci/test-php-test-runtime.py
           python3 scripts/dev/test-bootstrap-macos.py
           python3 scripts/test-publish-github.py
+
+  backend-ledger:
+    needs: [scope, backend-quality, frontend]
+    if: needs.scope.outputs.mode != 'docs'
+    runs-on: ubuntu-latest
+    # Includes bounded controlled builds, qualification and four serial native envelopes.
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Verify the exact ledger candidate
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: python3 scripts/ci/verify-final-candidate.py
+      - name: Run the required four serial supervised ledger providers
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha }}
+        run: |
+          sudo --preserve-env=HTTP_PROXY,HTTPS_PROXY,NO_PROXY,http_proxy,https_proxy,no_proxy,DOCKER_CONFIG,CODEX_PROXY_CERT,SSL_CERT_FILE python3 -E -s scripts/ci/account-ledger/bootstrap.py --platform=github --event="$GITHUB_EVENT_NAME" --event-sha="$GITHUB_SHA" --expected-sha="$EXPECTED_SHA" --run-id="$GITHUB_RUN_ID" --run-attempt="$GITHUB_RUN_ATTEMPT"
+      - name: Retain required supervised ledger receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: backend-ledger-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ledger-up-overlap.json
+            ledger-down-overlap.json
+            ledger-up-end.json
+            ledger-down-end.json
+            ledger-suite.json
+          retention-days: 7
+          if-no-files-found: error
+          overwrite: false
 
   backend-mysql:
     # Do not start costly suites for a candidate that already fails preflight.
@@ -310,7 +345,7 @@ jobs:
     # Preserve the required check name and explicitly validate the selected mode.
     # Runtime mode requires every full database, frontend, browser and quality job.
     if: always()
-    needs: [scope, documentation, backend-quality, backend-mysql, backend-sqlite, frontend, operator-browser, related-browser]
+    needs: [scope, documentation, backend-quality, backend-mysql, backend-sqlite, backend-ledger, frontend, operator-browser, related-browser]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -329,6 +364,11 @@ jobs:
         env:
           RECEIPT_GITHUB_TOKEN: ${{ github.token }}
         run: python3 scripts/ci/database-receipts.py collect
+      - name: Require all four current-run supervised ledger receipts
+        if: needs.scope.outputs.mode == 'full'
+        env:
+          RECEIPT_GITHUB_TOKEN: ${{ github.token }}
+        run: python3 scripts/ci/account-ledger/receipts.py collect
       - name: Retain database collection and full-only shadow decision
         if: needs.scope.outputs.mode == 'full'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

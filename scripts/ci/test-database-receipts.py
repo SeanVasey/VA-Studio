@@ -913,15 +913,15 @@ class WorkflowTests(unittest.TestCase):
 
     def test_workflow_preserves_runtime_conditions_matrices_events_and_no_reuse_output(self):
         workflow = (Path(__file__).parents[2] / ".github/workflows/final-verification.yml").read_text()
-        self.assertEqual(6, workflow.count("if: needs.scope.outputs.mode != 'docs'"))
+        self.assertEqual(7, workflow.count("if: needs.scope.outputs.mode != 'docs'"))
         for retained in ("workflow_dispatch:", "expected_sha:", "shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]", "shard: [1, 2]",
                          "--fail-on-phpunit-warning --display-warnings", "npm audit --audit-level=high", "npm run test:browser",
-                         "needs: [scope, documentation, backend-quality, backend-mysql, backend-sqlite, frontend, operator-browser, related-browser]",
+                         "needs: [scope, documentation, backend-quality, backend-mysql, backend-sqlite, backend-ledger, frontend, operator-browser, related-browser]",
                          "  related-browser:", "run: bash tests/browser/install-related-scanner.sh", "run: node tests/browser/run-related.mjs"):
             self.assertIn(retained, workflow)
         for forbidden in ("  push:", "  pull_request:", "pull_request_target", "workflow_run:", "continue-on-error", "reuse_enabled", "outputs.reuse", "contents: write", "actions: write", "secrets."):
             self.assertNotIn(forbidden, workflow)
-        self.assertEqual(1, workflow.count("RECEIPT_GITHUB_TOKEN:"))
+        self.assertEqual(2, workflow.count("RECEIPT_GITHUB_TOKEN:"))
         self.assertEqual("full", receipt.shadow_decision()["execution_mode"])
 
 

@@ -125,6 +125,7 @@ jobs:
         run: |
           python3 scripts/ci/test-ci-scope.py
           python3 scripts/ci/test-workflow-cadence.py
+          for ledger_control in scripts/ci/account-ledger/test-*.py; do python3 -B "$ledger_control"; done
           python3 scripts/ci/test-focused-tests.py
           python3 scripts/ci/test-database-receipts.py
           python3 scripts/ci/test-gitlab-database-receipts.py

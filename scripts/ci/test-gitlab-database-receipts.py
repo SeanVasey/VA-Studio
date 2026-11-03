@@ -24,6 +24,10 @@ fixtures = module('legacy_receipt_fixtures', 'test-database-receipts.py')
 proof = native.proof
 H = fixtures.H
 ROOT = Path(fixtures.ROOT)
+ledger_fixture_spec = importlib.util.spec_from_file_location('synthetic_ledger_receipt_fixtures',
+    Path(__file__).parent / 'account-ledger/test-receipts.py')
+ledger_fixtures = importlib.util.module_from_spec(ledger_fixture_spec)
+ledger_fixture_spec.loader.exec_module(ledger_fixtures)
 NOW = datetime.now(timezone.utc)
 
 
@@ -94,6 +98,13 @@ class FakeGitlab:
             if name in native.DATABASE_JOBS:
                 engine, shard = native.DATABASE_JOBS[name]
                 self.replace(identifier, evidence(engine, shard, job, mysql_rows=mysql_rows))
+            if name == 'backend-ledger':
+                raw = fixtures.zipped(ledger_fixtures.fixture('a' * 40, 123, identifier))
+                self.archives[identifier] = raw
+                filename = f'ledger-123-{identifier}.zip'
+                job['artifacts'] = [{'file_type': 'archive', 'filename': filename,
+                                     'size': len(raw), 'file_format': 'zip'}]
+                job['artifacts_expire_at'] = at(3600)
         self.calls = 0
 
     def get(self, path):
@@ -173,7 +184,8 @@ class NativeCollectorTests(unittest.TestCase):
     def test_twenty_six_complete_native_archives_without_legacy_metadata_remain_outer_pending(self):
         value = self.collect(FakeGitlab())
         self.assertEqual(26, len(value['database_receipts']))
-        self.assertEqual(32, len(value['upstream_jobs']))
+        self.assertEqual(33, len(value['upstream_jobs']))
+        self.assertTrue(value['required_supervised_ledger']['strict_four_provider_receipts'])
         self.assertFalse(value['reuse_enabled'])
         self.assertIn('pending', value['outer_acceptance'])
         self.assertTrue(all('authenticated exact-job' in a['digest_origin'] for a in value['artifacts']))
@@ -181,6 +193,23 @@ class NativeCollectorTests(unittest.TestCase):
         self.assertEqual(1, sum(r['results']['skipped_cases'] for r in value['database_receipts'] if r['engine'] == 'mysql'))
         self.assertEqual(len(fixtures.ROWS) - 1, sum(r['results']['executed_cases'] for r in value['database_receipts'] if r['engine'] == 'sqlite'))
         self.assertIn('native selection', value['mysql_scope'])
+
+    def test_required_ledger_archive_cannot_omit_case_or_redeem_failed_cleanup(self):
+        for failure in ('missing', 'cleanup'):
+            api = FakeGitlab()
+            job = next(row for row in api.rows if row['name'] == 'backend-ledger')
+            files = ledger_fixtures.fixture('a' * 40, 123, job['id'])
+            if failure == 'missing':
+                del files['ledger-down-end.json']
+            else:
+                data = proof.json_data(files['ledger-down-end.json'])
+                data['cleanup']['resources'] = False
+                files['ledger-down-end.json'] = proof.canonical(data)
+            raw = fixtures.zipped(files)
+            api.archives[job['id']] = raw
+            job['artifacts'][0]['size'] = len(raw)
+            with self.subTest(failure=failure), self.assertRaises(proof.ReceiptError):
+                self.collect(api)
 
     def test_sqlite_skipped_identity_not_executed_on_mysql_rejects_even_when_selection_agrees(self):
         def forged(full, pairs, selection):

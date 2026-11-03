@@ -234,6 +234,7 @@
     "tests/Support/ProductionIdentityFixture.php",
     "tests/Support/ProductionTrackPreparationReplayRace.php",
     "tests/Support/RefundDisputeRace.php",
+    "tests/Support/account-admission-migrator-worker.php",
     "tests/Support/activation-race-worker.php",
     "tests/Support/bulk-replace-license-draft-source-worker.php",
     "tests/Support/checkout-race-worker.php",

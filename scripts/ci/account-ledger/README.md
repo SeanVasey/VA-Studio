@@ -1,125 +1,121 @@
-# Ledger CI runtime producer — source implementation
+# Required supervised account ledger CI — source candidate
 
-This directory contains source implementations of the controlled runtime build,
-sealed Git source snapshot, owned MySQL factory and same-account observer qualifier.
-None has been executed natively for this candidate. **It does not yet implement
-required CI routing or native admission.** The existing four-provider Feature test and its
-accepted supervisor/worker/pins remain untouched; no skip or discovery exclusion
-has been introduced. Do not open the ledger PR as CI-portable on this evidence.
+Both manual Foundation mirrors now require `backend-ledger`, the same common
+bootstrap/controller/suite, and strict current-run receipts for all four serial
+providers: `up-overlap`, `down-overlap`, `up-end`, `down-end`. The existing exact40
+`expected_sha`/moved-ref checks precede allocation in both jobs. Bootstrap also
+requires HEAD and the manual event SHA to equal the requested commit before
+snapshotting it. No automatic full matrix, dispatch, prior-run reuse or optional
+ledger gate was added.
 
-## Source and trust boundary
+This is **source implementation and HOST validation, not a runtime or CI pass**.
+The local native proof at90334297 remains historical and source-scoped. Do not
+promote it to proof of these builds, namespaces, loaders or workflow jobs.
 
-The controlled build uses Debian base
+## Owned source, runtime and controller
+
+`source-snapshot.py` verifies the actual Git commit, reconstructed tree and every
+archive blob, and seals root-owned source under `/run/va-ledger-<nonce>`. It copies
+no working-tree files, `.git`, ambient `.env`, submodules or tracked symlinks.
+The acceptance UID cannot alter the source, descriptors or root audit directories.
+`RUNNER_TEMP` and writable ancestors cannot satisfy the producer path checks.
+
+`Runtime.Dockerfile` uses the pinned Debian base
 `debian@sha256:f6b08b09a05725f9431502d3b5714f5c4576e82c1a84fa1debe0c24a7e0c3ec4`,
-the observed official signed trixie/trixie-updates/trixie-security sources and
-exact PHP `8.4.27-1~deb13u1` / Python `3.13.5-2+deb13u5` packages. APT performs
-its normal Release/Packages/package signature-chain, expiry and transport checks.
-No unsigned installer or disabled verification is used. These moving mirrors
-provide controlled provisioning, **not snapshot reproducibility**. If an exact
-package is unavailable, provisioning fails; there is no version fallback.
+official signed trixie/trixie-updates/trixie-security selectors, exact PHP
+`8.4.27-1~deb13u1`, and exact full Python/libpython/stdlib `3.13.5-2+deb13u5`.
+Composer is a signed distro build tool. Full resolved package/download inventories
+and signed APT indices remain associated with the resulting immutable image ID.
+Moving signed mirrors provide controlled provisioning, not snapshot reproducibility.
+Unavailable exact packages or mismatched retained binary/module hashes stop admission.
+No ambient binary or the historical Debian-base image ID is self-admitted as PHP.
 
-ROOT observed that historical image ID `394ffa2d…` identifies the Debian base,
-not a complete PHP/Python image. The producer therefore never treats that ID or
-base RepoDigest as a qualified runtime. It builds a new image, obtains its full
-immutable ID through its owned bounded Docker CLI, verifies Linux/amd64, and
-checks actual PHP/Python/module hashes against the independently retained pins.
-The image retains signed APT indices and source selectors. The runtime-only
-descriptor retains the full installed package inventory and downloaded `.deb`
-SHA256 inventory, plus their built-image association.
+The private privileged controller copies Docker28.4 and buildx from the official
+linux/amd64 `docker@sha256:b0ea6e8d57b28d04a6999591fdd0f10de8717e956f4f4b6128d2a8cf57b27eb9`.
+Public config12af9dba and published buildxv0.28.0 binary SHA256
+`696bc104bac3bb708eff1af3f8bbc09fda0fd88f5757c1f9b404a35117889224` establish source
+provenance/path association only; actual files/builds remain unqualified.
+The source checks actual engine28.4/API1.51/commit249d679, cgroup-v2/cgroupfs and
+published buildx bytes. Inner dockerd and producer run in the same PID namespace;
+outer-host PIDs are never substituted for its `inspect.State.Pid` observations.
+The daemon exposes only its private Unix socket, owns its data directory, and uses
+explicit nested networks. Workers have no socket, privileged mode or host PID/network.
 
-The controller retains the accepted factory's Docker 28.4.0/API1.51/commit249d679,
-Linux/amd64, cgroup-v2/cgroupfs profile. The existing accepted `capture.py` is copied
-byte-for-byte (SHA256 `39bd4cb691387b9eb838e8b1454d0ac992bc3da367c7788bf7ad822515d31c8f`)
-from public factory manifest
-`23ba75c8f111e4f821de76c4718acbaa616eebc9d26abf9b5f137c9182df7efc`.
-It preserves combined 64 KiB capture, EOF/reaping, no-stderr acceptance and bounded
-commands. Provisioning has WORK480 plus one cleanup20 reserve inside 500 seconds.
-The ledger supervisor's own deadlines and protocol are unchanged.
+Inherited Docker client configuration/registry credential selectors are preserved,
+not replaced or opened by the source helper. Only selected proxy variables reach
+the daemon. Builds use transient required combined-CA secrets for networked RUNs;
+Composer gets a read-only CA mount and verified TLS settings. Session CA material is
+not copied into image layers, and there is no direct-egress/TLS-verification bypass.
 
-The future trusted workflow must first verify exact `expected_sha`, copy and seal
-the reviewed producer source into a root-owned tree outside the acceptance UID,
-verify its source-manifest hash using trusted bootstrap commands, and invoke the
-producer with clean Python environment (`python3 -E -s`). Self-checks in this
-program are defense in depth; they cannot authenticate already executing code.
-Every source/output ancestor must be root-owned and unwritable by other users.
-The producer refuses symlinks, writable ancestors, duplicate JSON keys, unknown
-policy fields, ambient image tags and unpinned recipes. Only ROOT has Docker
-access. The probe container runs UID/GID1000, read-only, with no network, all
-capabilities dropped, no-new-privileges, 512 MiB, no swap, and no socket or writable
-source mount. It has no sudo/host namespace/device mount.
+## Qualification and real provider execution
 
-`source-snapshot.py` implements source sealing directly under `/run/va-ledger-<nonce>`,
-avoiding writable `RUNNER_TEMP` ancestors. It verifies the commit object's SHA1,
-reconstructs its Git tree from a closed regular-blob listing, and verifies every
-archive member's blob identity before writing sealed root-owned source. It never
-copies working-tree files, symlinks, submodules, `.git` or ambient `.env` files.
-The runtime producer requires this source root, rechecks every source SHA256/blob
-identity and binds the actual tree to its descriptor. This replaces the earlier
-requested-SHA-only association.
+The MySQL factory retains the accepted private bootstrap/replacement, ownership,
+resource and bounded Admin/archive transports. HOST reverse-normalization controls
+prove the finite root/path/nonce/source substitutions; accepted `capture.py`, Admin
+and archive code remain byte-identical. Service-only source checks do not claim a
+Composer dependency audit. The observer port retains the accepted native SQL body:
+real1142/1227 denials, exact six-to-ten scoped grants, unchanged instrumentation and
+positive own-thread/current-event/global visibility witnesses from the same account.
 
-`service-producer.py` supplies callable factory/qualification phases for the future
-root suite coordinator; it has no standalone native entrypoint. Creation/private
-bootstrap/replacement/memory/ownership algorithms reuse the accepted factory.
-HOST controls reverse the declared root/private-path/nonce/source substitutions and
-verify exact original hashes. Admin transport/private archive code are byte-identical.
-The copied historical `RUNTIME-SPEC.json` supplies accepted resource/profile constants,
-not admission of its old local PHP container: the wrapper supplies the independently
-built image, fresh names, root private directories and controller-observed bridge
-anchor. The bridge remains an explicit shared bridge, not network isolation.
+Dependencies install only from the reviewed lock with scripts/plugins disabled,
+then audit, stop/remove the installer, verify locked package identities and retained
+critical vendor pins, and seal the complete output inventory. No lockfile changes.
+The ROOT job descriptor binds those qualified artifacts, source, service and case;
+its credential and public admission files are root-owned read-only mounts.
+Acceptance UID1000 cannot produce or change admission. Reusable test acceptance
+reads the independently qualified binary profile rather than a local executable pin.
 
-The service phase checks sealed source without claiming a Composer dependency
-audit; no candidate/vendor PHP runs here. Its observer phase preserves the accepted
-native PDO query/permission/EOF/close body byte-for-byte. It establishes the exact
-six-row baseline, requires real 1142/1227 denials, dispatches one scoped grant delta,
-verifies the exact six-to-ten transition and unchanged instrumentation/mode, then
-requires positive own-thread/current-event and global visibility witnesses from the
-same application identity. The immutable ROOT descriptor/secret mount uses root0444/
-root0440 with GID1000; acceptance cannot mutate or create admission. No credential
-values enter source or receipts. Observer qualification is recorded only after probe
-container cleanup and service identity/memory rechecks. The coordinator retains the
-service lease; this does not establish six ledger cleanup checks or a provider pass.
+The accepted supervisor, SCM credentials/nonce/FD7, two-phase pidfd custody, sole
+reapers and WORK480/cleanup20 logic are reused. Native outer600/kill10, PHP512M,
+64KiB capture, genuine Laravel ledger/retained rows and ordinary artisan restarts
+remain required. Parent Prepared origins, killed-worker lineage and every normal
+restart origin are checked. No native mock, direct multi-provider PHPUnit run or
+retry is accepted. Each actual outer exit must be zero, captured and reaped.
 
-After profile checks, actual TERM/wait143/removal and complete CLI transport are
-required. A failed/uncertain allocation produces no qualification descriptor;
-unknown backend state is not a returned lease. Descriptor publication is exclusive,
-root-owned, mode0444, fsynced and cannot follow/replace an existing file. The
-fresh root-owned output directory also retains mode0400 progress with intended
-name, immutable created ID and closed CLI outcomes; raw process output is excluded.
-This preserves ownership for investigation when provisioning fails.
-The descriptor deliberately says `kind=runtime-qualification-only`,
-`native_admitted=false`, and `requested_candidate_sha`: it does not establish
-candidate application origins, a live service lease, native cleanup or acceptance.
+All six postflight checks run before teardown, on failure too: owned state, server
+profile, strict whole-server foreground/orphan/transaction/lock/wait resources,
+PHP absence, memory and exact source/dependencies. Failure remains unverified;
+killing a container cannot redeem a receipt. Setup-only PID1 sleep containers use
+owned SIGKILL/actual137/removal rather than relying on ignored default SIGTERM.
+The service shuts down through its own handler with actual0 before owned removal.
 
-## Remaining implementation and verification
+The exact four-provider class is explicitly inventoried in `selection.json` under
+`tests/Supervised`; namespace and qualified-profile binding normalize to the original
+accepted test bytes. It is neither a helper, residual nor skip. Both required gates
+collect all four real receipts; ordinary shard source censuses remain ordinary
+censuses. The pure foreground classifier stays Unit. The fixed native worker is
+transparently listed in the existing driver-branching helper policy.
 
-Before required routing can replace ordinary Feature discovery:
+## Verification and remaining qualification
 
-1. Wire trusted workflow bootstrap/controller provisioning. Hosted controller
-   compatibility with the strict Docker/cgroup profile is unverified; do not
-   relax it implicitly. Build this exact recipe, run PHP syntax and both profile
-   probes, and inspect the actual package/download closure and image identity.
-2. Compose the owned MySQL/observer adapter into the root suite coordinator and
-   implement final cleanup using all six accepted ledger audits and returned-lease
-   checks. Execute and qualify the port. Runtime/observer visibility alone cannot
-   establish a clean server or provider pass.
-3. Port root/vendor bindings and all parent/worker/ordinary-restart origin checks
-   together from the immutable reviewed adapter. Supply a separate closed,
-   root-owned **native** job descriptor; acceptance cannot create or alter it.
-4. Reuse the accepted sole-reaper pidfd/SCM/nonce/FD7 supervisor for exactly the
-   four serial original keys, preserve real Laravel ledger/retained-data/restart
-   checks, capture each outer exit, then require all four strict current-run receipts
-   in the existing manual final gate. Preserve exact40 `expected_sha` and cost policy.
-5. Only with that complete required route, relocate the supervised class from
-   ordinary Feature discovery and update source pins/census transparently. The
-   pure foreground classifier stays Unit. No unconditional skip/quarantine.
+HOST controls execute no PHP, SQL, Docker, installation, Git snapshot, native
+supervision or CI. They cover source-object identity, provenance/ownership,
+immutable descriptor/publication, runtime/observer contracts, original supervisor
+controls, strict receipt refusals, workflow parity and moved-ref gating. Run:
 
-HOST verification: `python3 -B scripts/ci/account-ledger/test-runtime-producer.py`
-executes finite policy/provenance/isolation/ownership/publication/cleanup-failure
-controls. It does not execute Docker, PHP, SQL, native supervision or CI. No native
-claim follows from scripted transport responses in these controls.
-Additional finite HOST controls are `test-source-snapshot.py` and
-`test-service-producer.py` in this directory; they execute no Git snapshot, PHP,
-SQL, Docker or credential reads. These currently pass 18 + 6 + 7 tests.
+```
+for ledger_control in scripts/ci/account-ledger/test-*.py; do python3 -B "$ledger_control"; done
+```
 
-No runtime build, package installation, PHP lint, Docker/native invocation,
-workflow dispatch, push, PR or merge was performed for this source slice.
+The cheap preflight and both manual quality jobs run those HOST controls. Existing
+scope/cadence/shard/database/GitLab receipt controls are also required.
+Recorded source verification: 68 ledger HOST controls, 27 scope, 14 cadence,
+52 shard, 61 database-receipt and 33 GitLab-receipt controls pass (255 total).
+All 27 Python sources parse; source/parent-entry pins and Git whitespace checks pass.
+These include synthetic receipt fixtures, not native execution evidence.
+
+No controlled image build, PHP lint, native probe/provider, workflow dispatch,
+package installation, push, PR or merge ran for this source candidate. GitHub's
+outer Docker/buildx/sudo capability and GitLab's privileged nested-controller
+capability are **UNQUALIFIED**; missing capability fails the required job and blocks
+release. No runner configuration or host permissions were changed.
+
+This local execution user is UID1000 and has no sudo executable. The ROOT-only
+producer/path guards were preserved. A separately reviewed owned root transport
+container could later perform local bootstrap; that execution design is unrun.
+
+ROOT next reviews the frozen source, then in its free runtime slot validates PHP
+syntax and the controlled build/controller/observer/dependency/loader boundaries,
+and executes the four original providers serially with authoritative outer exits
+and all six audits. Preserve failures and qualify each actual source; reserve full
+Foundation dispatch for the final integrated exact reviewed SHA under the cost policy.

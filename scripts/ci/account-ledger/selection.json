@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "required_job": "backend-ledger",
+  "file": "tests/Supervised/ProductionIdentity/AccountAdmissionMigratorTest.php",
+  "class": "Tests\\Supervised\\ProductionIdentity\\AccountAdmissionMigratorTest",
+  "method": "test_normal_migrator_process_interruption_and_genuine_ledger_resume",
+  "providers": [
+    "up-overlap",
+    "down-overlap",
+    "up-end",
+    "down-end"
+  ],
+  "ordinary_discovery": false,
+  "execution": "four-serial-independent-supervised-processes",
+  "native_engine": "Oracle MySQL 8.4.11",
+  "worker_php": "8.4.27",
+  "supervisor_python": "3.13.5",
+  "normalized_test_sha256": "cd4b3f1ca3e5fbffde7dc54a1563050507556c80d9c5c83d1fbfe956e969b475"
+}

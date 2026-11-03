@@ -31,7 +31,7 @@ POLICY = tuple(dict.fromkeys((".gitlab-ci.yml", "scripts/ci/verify-final-candida
     "scripts/ci/test-gitlab-setup.py", "scripts/dev/test-bootstrap-macos.py", *proof.POLICY_FILES)))
 DATABASE_JOBS = {f"backend-{engine}: [{shard}]": (engine, shard)
                  for engine, count in COUNTS.items() for shard in range(1, count + 1)}
-UPSTREAM = {"provenance-access", "frontend", "backend-quality", "related-browser",
+UPSTREAM = {"provenance-access", "frontend", "backend-quality", "backend-ledger", "related-browser",
             "operator-browser: [chromium-desktop]", "operator-browser: [webkit-mobile]", *DATABASE_JOBS}
 
 
@@ -348,6 +348,13 @@ def collect(root: Path, env: dict, api: Gitlab) -> dict:
     identity = source(root, env)
     pipeline_provenance(api, identity, env)
     jobs = accept_jobs(api.jobs(identity["pipeline_id"]), identity, number(env, "CI_JOB_ID"))
+    ledger_spec = importlib.util.spec_from_file_location("native_ledger_receipts", ROOT / "scripts/ci/account-ledger/receipts.py")
+    ledger = importlib.util.module_from_spec(ledger_spec)
+    ledger_spec.loader.exec_module(ledger)
+    try:
+        ledger_receipts = ledger.collect_gitlab(api, jobs["backend-ledger"], identity, proof, timestamp, datetime.now(timezone.utc))
+    except ledger.Refusal:
+        raise proof.ReceiptError("Required current-pipeline supervised ledger receipts refused") from None
     receipts, artifacts = [], []
     inventories = {engine: [] for engine in COUNTS}
     full = None
@@ -392,6 +399,7 @@ def collect(root: Path, env: dict, api: Gitlab) -> dict:
     return {"schema_version": 1, "purpose": "gitlab-current-pipeline-database-collection",
             "outer_acceptance": "pending; this aggregate and pipeline must subsequently succeed",
             "source": identity, "upstream_jobs": {name: jobs[name]["id"] for name in sorted(UPSTREAM)},
+            "required_supervised_ledger": ledger_receipts,
             "artifacts": artifacts, "database_receipts": receipts, "reuse_enabled": False,
             "sqlite_skip_policy": "exact reviewed methods only; every counterpart executed on genuine MySQL",
             "mysql_skip_policy": "exact reviewed SQLite-only methods inside the selection; every counterpart executed on SQLite",

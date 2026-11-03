@@ -242,17 +242,21 @@ source was automatically retried. ROOT's classifier pure controls passed
 also passed ROOT lint. Production, strict result evaluator, process protocol,
 global resource queries and resource/time caps were not changed by these fixes.
 
-**Before a PR, supervised CI routing and environment portability remain OPEN.**
-The source-only [runtime producer slice](../../../scripts/ci/account-ledger/README.md)
-adds a controlled signed-package runtime build, independent root-owned qualification
-and finite HOST controls. It has not built or qualified a runtime and explicitly
-cannot admit native ledger execution. Required serial routing, owned MySQL observer
-qualification and portable origin/loader binding remain open; Feature discovery
-and the accepted process/ledger assertions are unchanged.
-The dedicated one-provider supervisor class is not presently compatible with
-ordinary shard execution. No skip/census row or normal-CI pass is claimed.
-Next work is explicit supervised routing/portable admission plus F9 focused
-checks. Clean F9 composition is
+**Portable supervised CI source is implemented; actual qualification remains OPEN.**
+The [required ledger route](../../../scripts/ci/account-ledger/README.md) wires both
+manual exact-SHA Foundation mirrors to one controlled root producer/controller,
+owned MySQL observer qualification, portable parent/worker/restart origins and four
+serial supervised receipts. Both aggregate gates require all four current-run
+receipts. Only together with those required routes, the original class moves to
+the explicit supervised inventory; it is not a skip, residual or helper. Its
+namespace and qualified-profile binding normalize to the original assertions.
+The classifier stays Unit; accepted protocol/worker/production sources are preserved.
+HOST controls pass; no build, PHP lint, native provider, CI pass or dispatch is claimed
+for the new route. Privileged GitLab capability and local root transport remain
+unqualified, with failure blocking acceptance.
+
+The following F9 paragraph is the historical fa1d7e17 source checkpoint, not new
+execution evidence from this CI work. Clean F9 composition is
 `4ecc9f567cc6e8b8cdf74d6e9d634c817424b4f8` at
 `/workspace/VA-Studio-f9-main`; its actuals are UNRUN. N7 and identity/history
 sources are untouched there. The old29ce six-file history trial remains

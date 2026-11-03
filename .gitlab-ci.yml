@@ -69,6 +69,7 @@ backend-quality:
     - python3 scripts/ci/test-ci-scope.py
     - python3 scripts/ci/test-focused-tests.py
     - python3 scripts/ci/test-database-receipts.py
+    - for ledger_control in scripts/ci/account-ledger/test-*.py; do python3 -B "$ledger_control"; done
     - python3 scripts/ci/test-gitlab-writer-feedback.py
     - python3 scripts/ci/test-gitlab-database-receipts.py
     - python3 scripts/ci/test-gitlab-setup.py
@@ -202,6 +203,26 @@ related-browser:
     expire_in: 7 days
     paths: [playwright-report-related/, test-results-related/]
 
+backend-ledger:
+  stage: verify
+  needs: [provenance-access, backend-quality, frontend]
+  # A runner with privileged nested-Docker capability is required. Missing
+  # capability fails qualification; no skip, optional job or invented runner tag.
+  image:
+    name: docker@sha256:b0ea6e8d57b28d04a6999591fdd0f10de8717e956f4f4b6128d2a8cf57b27eb9
+    entrypoint: [""]
+  timeout: 110m
+  before_script:
+    - apk add --no-cache python3 git procps
+  script:
+    - python3 scripts/ci/verify-final-candidate.py --gitlab
+    - python3 -E -s scripts/ci/account-ledger/bootstrap.py --platform=gitlab --event="$CI_PIPELINE_SOURCE" --event-sha="$CI_COMMIT_SHA" --expected-sha="$EXPECTED_SHA" --run-id="$CI_PIPELINE_ID" --run-attempt="$CI_JOB_ID" --start-local-daemon
+  artifacts:
+    when: always
+    name: 'ledger-$CI_PIPELINE_ID-$CI_JOB_ID'
+    expire_in: 7 days
+    paths: [ledger-up-overlap.json, ledger-down-overlap.json, ledger-up-end.json, ledger-down-end.json, ledger-suite.json]
+
 backend:
   stage: accept
   image: python:3.12-bookworm
@@ -212,6 +233,8 @@ backend:
     - job: frontend
       artifacts: false
     - job: backend-quality
+      artifacts: false
+    - job: backend-ledger
       artifacts: false
     - job: backend-mysql
       artifacts: false

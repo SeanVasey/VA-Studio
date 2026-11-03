@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\ProductionIdentity;
+namespace Tests\Supervised\ProductionIdentity;
 
 use App\Domain\Customers\Preferences\ConsentMigrationAdmission;
 use App\Domain\Customers\Preferences\CustomerConsentPreferences;
@@ -76,7 +76,7 @@ final class AccountAdmissionMigratorTest extends TestCase
         $this->assertSame('vaseyaudio_production_identity', DB::getDatabaseName());
         $this->assertSame(false, config('app.debug'));
         $pins = json_decode(file_get_contents(base_path('docs/verification/account-migrator-evidence-20261102/pins.json')), true, 16, JSON_THROW_ON_ERROR);
-        $this->assertSame($pins['php_binary_sha256'], hash_file('sha256', PHP_BINARY));
+        $this->assertSame($GLOBALS['accountMigratorQualifiedRuntime']['php_binary_sha256'] ?? null, hash_file('sha256', PHP_BINARY));
         foreach ($pins['sha256'] as $path => $hash) {
             $this->assertSame($hash, hash_file('sha256', base_path($path)), 'Pinned source moved; refresh/review before execution.');
         }

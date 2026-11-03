@@ -132,7 +132,9 @@ class OwnershipControls(unittest.TestCase):
                 if stage == 'signed-download-closure':
                     return 'b' * 64 + '  /usr/share/va-ledger/debs/example_1_amd64.deb\n'
                 if stage == 'wait':
-                    return '0\n' if failure == 'wait' else '143\n'
+                    return '0\n' if failure == 'wait' else '137\n'
+                if stage == 'stop':
+                    self.assertIn('--signal=KILL', arguments)
                 if stage == 'removed' and failure == 'transport':
                     instance.receipt['transport_uncertain'] = True
                 return ''
@@ -189,7 +191,7 @@ class OwnershipControls(unittest.TestCase):
     def test_source_manifest_binds_exact_producer_and_probes(self):
         manifest = json.loads((HERE / 'source-manifest.json').read_bytes())
         self.assertEqual(set(manifest), {'runtime-producer.py', 'runtime-policy.json', 'capture.py',
-                                        'runtime-probe.php', 'runtime-probe.py', 'Runtime.Dockerfile', '.dockerignore', 'source-snapshot.py'})
+                                        'runtime-probe.php', 'runtime-probe.py', 'Runtime.Dockerfile', '.dockerignore', 'source-snapshot.py', 'network.py'})
         for name, expected in manifest.items():
             self.assertEqual(hashlib.sha256((HERE / name).read_bytes()).hexdigest(), expected, name)
 
