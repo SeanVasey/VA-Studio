@@ -1,9 +1,9 @@
 # Ledger CI runtime producer — source implementation
 
-This directory implements the first independent provisioning phase. It builds
-and qualifies the runtime without executing candidate application code, reading
-credentials or creating a MySQL service. **It does not yet implement required CI
-routing or native admission.** The existing four-provider Feature test and its
+This directory contains source implementations of the controlled runtime build,
+sealed Git source snapshot, owned MySQL factory and same-account observer qualifier.
+None has been executed natively for this candidate. **It does not yet implement
+required CI routing or native admission.** The existing four-provider Feature test and its
 accepted supervisor/worker/pins remain untouched; no skip or discovery exclusion
 has been introduced. Do not open the ledger PR as CI-portable on this evidence.
 
@@ -48,6 +48,37 @@ access. The probe container runs UID/GID1000, read-only, with no network, all
 capabilities dropped, no-new-privileges, 512 MiB, no swap, and no socket or writable
 source mount. It has no sudo/host namespace/device mount.
 
+`source-snapshot.py` implements source sealing directly under `/run/va-ledger-<nonce>`,
+avoiding writable `RUNNER_TEMP` ancestors. It verifies the commit object's SHA1,
+reconstructs its Git tree from a closed regular-blob listing, and verifies every
+archive member's blob identity before writing sealed root-owned source. It never
+copies working-tree files, symlinks, submodules, `.git` or ambient `.env` files.
+The runtime producer requires this source root, rechecks every source SHA256/blob
+identity and binds the actual tree to its descriptor. This replaces the earlier
+requested-SHA-only association.
+
+`service-producer.py` supplies callable factory/qualification phases for the future
+root suite coordinator; it has no standalone native entrypoint. Creation/private
+bootstrap/replacement/memory/ownership algorithms reuse the accepted factory.
+HOST controls reverse the declared root/private-path/nonce/source substitutions and
+verify exact original hashes. Admin transport/private archive code are byte-identical.
+The copied historical `RUNTIME-SPEC.json` supplies accepted resource/profile constants,
+not admission of its old local PHP container: the wrapper supplies the independently
+built image, fresh names, root private directories and controller-observed bridge
+anchor. The bridge remains an explicit shared bridge, not network isolation.
+
+The service phase checks sealed source without claiming a Composer dependency
+audit; no candidate/vendor PHP runs here. Its observer phase preserves the accepted
+native PDO query/permission/EOF/close body byte-for-byte. It establishes the exact
+six-row baseline, requires real 1142/1227 denials, dispatches one scoped grant delta,
+verifies the exact six-to-ten transition and unchanged instrumentation/mode, then
+requires positive own-thread/current-event and global visibility witnesses from the
+same application identity. The immutable ROOT descriptor/secret mount uses root0444/
+root0440 with GID1000; acceptance cannot mutate or create admission. No credential
+values enter source or receipts. Observer qualification is recorded only after probe
+container cleanup and service identity/memory rechecks. The coordinator retains the
+service lease; this does not establish six ledger cleanup checks or a provider pass.
+
 After profile checks, actual TERM/wait143/removal and complete CLI transport are
 required. A failed/uncertain allocation produces no qualification descriptor;
 unknown backend state is not a returned lease. Descriptor publication is exclusive,
@@ -55,8 +86,7 @@ root-owned, mode0444, fsynced and cannot follow/replace an existing file. The
 fresh root-owned output directory also retains mode0400 progress with intended
 name, immutable created ID and closed CLI outcomes; raw process output is excluded.
 This preserves ownership for investigation when provisioning fails.
-The
-descriptor deliberately says `kind=runtime-qualification-only`,
+The descriptor deliberately says `kind=runtime-qualification-only`,
 `native_admitted=false`, and `requested_candidate_sha`: it does not establish
 candidate application origins, a live service lease, native cleanup or acceptance.
 
@@ -68,10 +98,10 @@ Before required routing can replace ordinary Feature discovery:
    compatibility with the strict Docker/cgroup profile is unverified; do not
    relax it implicitly. Build this exact recipe, run PHP syntax and both profile
    probes, and inspect the actual package/download closure and image identity.
-2. Port the accepted public MySQL factory, ownership/secret transport and observer
-   qualifier together. Preserve Oracle8.4.11 identity, exact grants/instrumentation,
-   positive visibility witnesses, full unknown-foreground/global-resource audits,
-   all six cleanup checks and returned lease. Runtime qualification is insufficient.
+2. Compose the owned MySQL/observer adapter into the root suite coordinator and
+   implement final cleanup using all six accepted ledger audits and returned-lease
+   checks. Execute and qualify the port. Runtime/observer visibility alone cannot
+   establish a clean server or provider pass.
 3. Port root/vendor bindings and all parent/worker/ordinary-restart origin checks
    together from the immutable reviewed adapter. Supply a separate closed,
    root-owned **native** job descriptor; acceptance cannot create or alter it.
@@ -87,6 +117,9 @@ HOST verification: `python3 -B scripts/ci/account-ledger/test-runtime-producer.p
 executes finite policy/provenance/isolation/ownership/publication/cleanup-failure
 controls. It does not execute Docker, PHP, SQL, native supervision or CI. No native
 claim follows from scripted transport responses in these controls.
+Additional finite HOST controls are `test-source-snapshot.py` and
+`test-service-producer.py` in this directory; they execute no Git snapshot, PHP,
+SQL, Docker or credential reads. These currently pass 18 + 6 + 7 tests.
 
 No runtime build, package installation, PHP lint, Docker/native invocation,
 workflow dispatch, push, PR or merge was performed for this source slice.

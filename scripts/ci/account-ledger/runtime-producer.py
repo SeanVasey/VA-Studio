@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -255,12 +256,13 @@ def main():
     parser.add_argument("--policy-sha256", required=True)
     parser.add_argument("--source-manifest-sha256", required=True)
     parser.add_argument("--expected-sha", required=True)
+    parser.add_argument("--source-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     require(os.geteuid() == 0 and SHA.fullmatch(args.expected_sha)
             and HASH.fullmatch(args.policy_sha256) and HASH.fullmatch(args.source_manifest_sha256), "independent-root-producer")
     # Root must seal this exact reviewed source directory before invocation.
-    sources = ("runtime-producer.py", "capture.py", "runtime-policy.json", "runtime-probe.php", "runtime-probe.py", "Runtime.Dockerfile", ".dockerignore")
+    sources = ("runtime-producer.py", "capture.py", "runtime-policy.json", "runtime-probe.php", "runtime-probe.py", "Runtime.Dockerfile", ".dockerignore", "source-snapshot.py")
     for name in sources:
         trusted_path(HERE / name)
     manifest_path = trusted_path(HERE / "source-manifest.json")
@@ -272,6 +274,11 @@ def main():
     for name, digest in manifest.items():
         require(type(digest) is str and HASH.fullmatch(digest)
                 and hashlib.sha256((HERE / name).read_bytes()).hexdigest() == digest, "producer-source-pin")
+    require(HERE == args.source_root / 'scripts/ci/account-ledger', 'producer-candidate-source-root')
+    spec = importlib.util.spec_from_file_location('ledger_source_snapshot', HERE / 'source-snapshot.py')
+    snapshot = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(snapshot)
+    witness = snapshot.verify(args.source_root, args.expected_sha)
     raw = (HERE / "runtime-policy.json").read_bytes()
     require(hashlib.sha256(raw).hexdigest() == args.policy_sha256, "reviewed-policy-pin")
     value = policy(load(raw))
@@ -280,6 +287,7 @@ def main():
     facts = Producer(args.output).qualify(value, HERE, secrets.token_hex(16))
     publish(args.output, {"schema": 1, "kind": "runtime-qualification-only", "native_admitted": False,
                           "requested_candidate_sha": args.expected_sha, "policy_sha256": args.policy_sha256,
+                          "candidate_tree_oid": witness['tree_oid'], "candidate_source_verified": True,
                           "source_manifest_sha256": args.source_manifest_sha256,
                           "runtime_image": facts["built_image_id"], "facts": facts})
 

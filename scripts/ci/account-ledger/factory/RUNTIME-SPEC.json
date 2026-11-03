@@ -1,0 +1,70 @@
+{
+  "status": "SOURCE_ONLY_UNALLOCATED",
+  "controller_uid": 1000,
+  "container_name": "va-account-real-versions-20261102-04",
+  "volume_name": "va-account-real-data-20261102-04",
+  "owner_label": "va.account.physical-facts",
+  "host_port": 33107,
+  "container_port": 3306,
+  "bridge_name": "bridge",
+  "bridge_id": "bad1a8af50031b09a57dc3793141b4b1a884ac0cab5c96a999c25d147cff13ec",
+  "image_id": "sha256:4aae07a2c195abb9b3e92449443b39b51212f555a35ff8f93da0e82683f45de8",
+  "repo_digest": "mysql@sha256:0f51e63e537a1f176423fa03ef559aabe6fa4372a53160a44bc7e75da7d15364",
+  "mysql_version": "8.4.11",
+  "php_id": "640745494b2ca4121b3b878aceb0a7dfea3740529fd2a1b015666f1b6e2dd55d",
+  "php_name": "/va-pcc-runtime-20261101",
+  "php_image": "sha256:394ffa2d2ac8f5c9f45148f22bad3587429bceb19c93b88e8595f1e3f7892853",
+  "php_created": "2026-11-01T11:27:04.859060965Z",
+  "php_network_mode": "bridge",
+  "php_runtime_binary": "/usr/bin/php8.4",
+  "php_runtime_binary_sha256": "c984d1f078b3b0c457520723e36ab0fdf34d53a587495784228e2e52e7e23e44",
+  "php_modules": {
+    "pdo": "ac2844ee61acf01996836c4191a993f84de834dcb757297db808c643a1175956",
+    "mysqlnd": "d596c5e9501d14561f4a4c3a5a1e75ab928c0ad86174a10ececafdcd13afdd9c",
+    "pdo_mysql": "8c1a5db7ba8f484fd93d4ba7848fba37da08b635fd16ee274d22e42f978bbd94",
+    "mbstring": "9b45931319c412327d3a48305971f15468ef1357af227d056db84acddc127bc3",
+    "ctype": "45f4e349c2692834ee3d559c4a5a0320911e94c7c4db61e6fb63bd5e644ef839",
+    "tokenizer": "e030f6bce84ee8bfc8037012cd90666668f95e79b13fcf8d929eab479f576e02",
+    "iconv": "6bfa5a6b7eab255d763301508f7baef3643f0c474f5ab59a146f4d6570d59905"
+  },
+  "php_version": "8.4.27",
+  "profile_observation": {
+    "path": "/workspace/account-guard-evidence-20261101/php-execution-host-profile-observation-20261102-01.json",
+    "sha256": "465934981c951b842e4293ccd4765481b2c758536a9f9b278ce799c90183110a"
+  },
+  "profile_review": {
+    "path": "/workspace/account-guard-evidence-20261101/independent-php-execution-host-profile-46593498-DECISION.md",
+    "sha256": "eceeb2a8c868c2cec7b3de85d9e80346c9fd8ba718c73226059bd0dd47f336ea"
+  },
+  "ownership_directory": "/workspace/account-guard-evidence-20261101/real-versions-runtime-04",
+  "provision_seconds": 240,
+  "provision_outer_seconds": 250,
+  "startup_seconds_each_phase": 55,
+  "rpc_seconds": 12,
+  "stop_retain_seconds": 60,
+  "resources": {
+    "memory_bytes": 2147483648,
+    "memory_swap_bytes": 2147483648,
+    "nano_cpus": 1000000000,
+    "pids_limit": 256,
+    "buffer_pool_bytes": 67108864,
+    "minimum_host_cpus": 2,
+    "minimum_host_memavailable_bytes": 3221225472,
+    "minimum_owned_volume_free_bytes": 3221225472,
+    "minimum_private_free_bytes": 268435456
+  },
+  "startup_logging": {
+    "Type": "local",
+    "Config": {
+      "max-size": "16k",
+      "max-file": "1",
+      "compress": "false"
+    }
+  },
+  "network_claim": "EXPLICIT_SHARED_PREEXISTING_BRIDGE_NOT_ISOLATION",
+  "bootstrap_network": "none",
+  "main_bind_address": "0.0.0.0",
+  "main_host_bind_address": "127.0.0.1",
+  "credentials": "private root socket rotation + distinct nonempty owned TCP fixture password; NO values/digests in source/args/reports",
+  "admission": "Native remains BLOCKED pending separately reviewed actual provisioning and new frozen RUNTIME-ADMISSION data"
+}

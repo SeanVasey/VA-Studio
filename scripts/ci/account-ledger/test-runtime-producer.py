@@ -189,7 +189,7 @@ class OwnershipControls(unittest.TestCase):
     def test_source_manifest_binds_exact_producer_and_probes(self):
         manifest = json.loads((HERE / 'source-manifest.json').read_bytes())
         self.assertEqual(set(manifest), {'runtime-producer.py', 'runtime-policy.json', 'capture.py',
-                                        'runtime-probe.php', 'runtime-probe.py', 'Runtime.Dockerfile', '.dockerignore'})
+                                        'runtime-probe.php', 'runtime-probe.py', 'Runtime.Dockerfile', '.dockerignore', 'source-snapshot.py'})
         for name, expected in manifest.items():
             self.assertEqual(hashlib.sha256((HERE / name).read_bytes()).hexdigest(), expected, name)
 
