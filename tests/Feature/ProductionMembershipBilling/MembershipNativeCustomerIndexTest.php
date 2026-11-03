@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\ProductionMembershipBilling;
 
-use App\Domain\Customers\ProductionCustomerSessions;
+use App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Grants\Member\MemberActivationHistoryReader;
 use App\Domain\Memberships\Billing\BillingAwardFence;
