@@ -14,6 +14,7 @@ use Throwable;
 /**
  * Queues one email for each private order-ready intent that has none yet (FP-075), in a bounded batch. Refuses, recording
  * nothing, unless the transactional mail configuration is admitted. Prints counts and fixed reasons only.
+ * Finishes the batch and prints its summary before returning failure for any unexpected per-intent error.
  *
  * An intent bound to a customer access version that has since been superseded (access withdrawn or the account erased; the
  * version only ever increases) can never verify again, so it leaves the pending set without any row being written. Every other
@@ -44,6 +45,7 @@ final class QueueTransactionalMail extends Command
             return self::FAILURE;
         }
         $queued = 0;
+        $hadUnexpectedError = false;
         $handled = 0;
         $examined = 0;
         $skipped = [];
@@ -66,6 +68,7 @@ final class QueueTransactionalMail extends Command
                     $skipped[$error->reason] = ($skipped[$error->reason] ?? 0) + 1;
                 } catch (Throwable $error) {
                     // An unexpected error on one intent (a database error, a defect) recorded nothing; it must not stop the batch.
+                    $hadUnexpectedError = true;
                     Log::warning('Order-ready intent could not be queued.', ['exception_class' => $error::class]);
                     $skipped['error'] = ($skipped['error'] ?? 0) + 1;
                 }
@@ -79,7 +82,7 @@ final class QueueTransactionalMail extends Command
         $this->line('queued='.$queued.' skipped='.array_sum($skipped).($skipped === [] ? '' : ' reasons='.http_build_query($skipped, '', ','))
             .' superseded='.$superseded);
 
-        return self::SUCCESS;
+        return $hadUnexpectedError ? self::FAILURE : self::SUCCESS;
     }
 
     /** Order-ready intents with no delivery row, joined to the customer account they were captured for. */
