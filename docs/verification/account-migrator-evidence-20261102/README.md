@@ -77,9 +77,10 @@ overlap10, registration2, bounded output/private custody and sole reapers remain
   or runtime environment were read or changed here.
 
 Only static source comparison, AST parsing, tracked-source hashes and lock/callsite
-checks were performed. The unchanged 17 pure controls were not repeated. No PHP,
-test, worker, signal, Docker, SQL, migration, native probe or runtime preparation
-was executed. No census or workflow change is included; ROOT must integrate this
+checks were performed. The a041 source carry did not repeat the 17 pure controls; the current
+runtime-wiring preparation subsequently ran those unchanged HOST controls as
+reported below. No PHP, native test, worker, signal, Docker, SQL, migration,
+native probe or runtime preparation was executed. No census or workflow change is included; ROOT must integrate this
 new native method and regenerate discovery when the follow-up is selected.
 
 ## Candidate runtime wiring — source only
