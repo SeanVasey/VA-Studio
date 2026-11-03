@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
 """Runtime identity/API availability only; accepted supervisor proves actual custody."""
 import hashlib
+import argparse
 import json
 import os
 from pathlib import Path
 import signal
 import socket
+import select
+import selectors
+import struct
 import sys
+import tempfile
+import time
 
 try:
     spec = json.loads(Path('/qualification/runtime-policy.json').read_bytes())['runtime']

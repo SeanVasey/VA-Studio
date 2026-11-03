@@ -22,7 +22,9 @@ RUN set -eu; \
       php8.4-curl=8.4.27-1~deb13u1 \
       php8.4-sqlite3=8.4.27-1~deb13u1 \
       python3.13-minimal=3.13.5-2+deb13u5 \
-      libpython3.13-minimal=3.13.5-2+deb13u5; \
+      libpython3.13-minimal=3.13.5-2+deb13u5 \
+      python3.13=3.13.5-2+deb13u5 \
+      libpython3.13-stdlib=3.13.5-2+deb13u5; \
     dpkg-query -W -f='${binary:Package}\t${Version}\t${Architecture}\n' > /usr/share/va-ledger/package-closure.txt; \
     sha256sum /usr/share/va-ledger/debs/*.deb > /usr/share/va-ledger/download-closure.sha256; \
     cp -a /etc/apt/sources.list.d /usr/share/va-ledger/apt-sources; \

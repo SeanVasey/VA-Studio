@@ -203,6 +203,8 @@ class OwnershipControls(unittest.TestCase):
         self.assertIn('FROM debian@sha256:f6b08b09a05725f9431502d3b5714f5c4576e82c1a84fa1debe0c24a7e0c3ec4', recipe)
         self.assertIn('php8.4-cli=8.4.27-1~deb13u1', recipe)
         self.assertIn('python3.13-minimal=3.13.5-2+deb13u5', recipe)
+        self.assertIn('python3.13=3.13.5-2+deb13u5', recipe)
+        self.assertIn('libpython3.13-stdlib=3.13.5-2+deb13u5', recipe)
         for unsafe in ('--allow-unauthenticated', 'trusted=yes', 'Check-Valid-Until=false',
                        'Verify-Peer=false', 'curl ', 'wget ', 'ADD ', 'COPY '):
             self.assertNotIn(unsafe, recipe)
