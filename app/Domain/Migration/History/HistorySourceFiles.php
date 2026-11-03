@@ -75,7 +75,8 @@ final class HistorySourceFiles
                 }
                 $this->require(count($contracts) < self::MAX_CONTRACT_FILES, 'source_too_many_contracts');
                 $this->require(preg_match('/[\x00-\x1f\x7f\/]/', $entry) === 0 && strlen($entry) <= 255, 'source_contract_name');
-                $bytes = $read($contractDirectory.'/'.$entry, self::MAX_CONTRACT_BYTES);
+                $bytes = $inside ? $this->fixture($contractDirectory.'/'.$entry, self::MAX_CONTRACT_BYTES, true)
+                    : $this->private($contractDirectory.'/'.$entry, self::MAX_CONTRACT_BYTES, true);
                 $total += strlen($bytes);
                 $this->require($total <= self::MAX_TOTAL_CONTRACT_BYTES, 'source_contracts_too_large');
                 $contracts[$entry] = $bytes;
@@ -100,20 +101,20 @@ final class HistorySourceFiles
         return $this->private($path, $maximum);
     }
 
-    private function private(string $path, int $maximum): string
+    private function private(string $path, int $maximum, bool $allowEmpty = false): string
     {
         try {
-            return (new PrivateSourceFiles)->protectedFile($path, $maximum)['bytes'];
+            return (new PrivateSourceFiles)->protectedFile($path, $maximum, $allowEmpty)['bytes'];
         } catch (InvalidArgumentException) {
             throw new InvalidArgumentException('source_not_private');
         }
     }
 
     /** A checked-in synthetic fixture: a regular, link-free file read through one descriptor whose identity holds. */
-    private function fixture(string $path, int $maximum): string
+    private function fixture(string $path, int $maximum, bool $allowEmpty = false): string
     {
         $stat = $this->path($path);
-        $this->require(($stat['mode'] & 0170000) === 0100000 && $stat['size'] > 0 && $stat['size'] <= $maximum, 'source_file');
+        $this->require(($stat['mode'] & 0170000) === 0100000 && ($allowEmpty || $stat['size'] > 0) && $stat['size'] <= $maximum, 'source_file');
         $handle = @fopen($path, 'rb');
         $this->require($handle !== false, 'source_file');
         try {

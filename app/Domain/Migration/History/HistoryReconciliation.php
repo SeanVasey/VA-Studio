@@ -20,8 +20,6 @@ final class HistoryReconciliation
 {
     public const PURPOSE = 'vasey-legacy-history-reconciliation-v1';
 
-    private const COHORTS = ['customers', 'orders', 'lines', 'contracts'];
-
     /**
      * @param  array{records: array<string, array<string, array{record_sha256: string, total_minor?: int, refunded_minor?: int, currency?: string, artifact?: string}>>,
      *     unexpected: array<string, list<string>>, integrity_failures: list<array{cohort: string, record_key: string, code: string}>}  $observed
@@ -33,7 +31,7 @@ final class HistoryReconciliation
     {
         $cohorts = [];
         $unexplained = 0;
-        foreach (self::COHORTS as $cohort) {
+        foreach (array_keys(LegacyHistoryArchive::tablesForSnapshot($snapshot)) as $cohort) {
             $expected = array_column($snapshot[$cohort], null, 'record_key');
             $stored = $observed['records'][$cohort] ?? [];
             $missing = [];

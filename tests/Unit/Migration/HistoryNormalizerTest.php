@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Migration;
 
+use App\Domain\Migration\History\CompetingExclusiveSale;
 use App\Domain\Migration\History\HistoryMapping;
 use App\Domain\Migration\History\HistoryNormalizer;
 use App\Domain\Migration\History\HistorySourceFiles;
@@ -25,7 +26,7 @@ class HistoryNormalizerTest extends TestCase
         $result = (new HistoryNormalizer)->normalize($source);
         $this->assertSame($result, (new HistoryNormalizer)->normalize(self::fixture()));
         $this->assertSame([], $result['findings']);
-        $this->assertSame(['customers' => 4, 'orders' => 4, 'lines' => 5, 'contracts' => 4, 'contract_files' => 4, 'findings' => 0, 'exceptions' => 3], $result['counts']);
+        $this->assertSame(['customers' => 4, 'orders' => 4, 'lines' => 5, 'contracts' => 4, 'contract_declarations' => 5, 'contract_files' => 4, 'findings' => 0, 'exceptions' => 3], $result['counts']);
         $snapshot = $result['snapshot'];
         $this->assertSame(CanonicalJson::hash($snapshot), $result['snapshot_sha256']);
         $this->assertSame(HistoryNormalizer::SCHEMA, $snapshot['schema']);
@@ -180,6 +181,52 @@ class HistoryNormalizerTest extends TestCase
         $line = array_column($snapshot['lines'], null, 'source_order_id')['synthetic-ord-1002'];
         $this->assertSame(['contract_original_missing'], $snapshot['eligibility'][$line['record_key']]['blockers']);
         $this->assertSame(['ambiguous_customer_identity' => 2, 'contract_original_missing' => 2], $this->codes($snapshot['exceptions']));
+    }
+
+    public function test_v2_preserves_actual_v1_records_and_records_every_missing_original_declaration(): void
+    {
+        $v1 = json_decode(file_get_contents(dirname(__DIR__, 2).'/Fixtures/migration/history-synthetic/snapshots/baseline-v1.json'), true, 32, JSON_THROW_ON_ERROR);
+        $v2 = (new HistoryNormalizer)->normalize(self::fixture())['snapshot'];
+        foreach (['customers', 'orders', 'lines', 'contracts'] as $cohort) {
+            $this->assertSame(CanonicalJson::encode($v1[$cohort]), CanonicalJson::encode($v2[$cohort]), $cohort);
+        }
+        $this->assertSame('vasey-legacy-history-v2', $v2['schema']);
+        $this->assertSame('vasey-legacy-history-transform-v2', $v2['transform_version']);
+        $this->assertCount(5, $v2['contract_declarations']);
+        $missing = array_values(array_filter($v2['contract_declarations'], fn ($declaration) => $declaration['supplied_original'] === null));
+        $this->assertCount(1, $missing);
+        $this->assertArrayNotHasKey('storage_path', $missing[0]);
+        $this->assertArrayNotHasKey('bytes', $missing[0]);
+        $this->assertArrayNotHasKey('sha256', $missing[0]);
+        $this->assertSame(hash('sha256', "vasey-legacy-history-v1\ncontract\n".$v2['source_system']."\n".$missing[0]['source_contract_id']), $missing[0]['record_key']);
+    }
+
+    public function test_genuine_empty_original_is_present_evidence_with_zero_bytes(): void
+    {
+        $source = self::fixture();
+        $name = 'synthetic-contract-1001-1.txt';
+        $source['contracts'][$name] = '';
+        $source['sheets']['contracts'] = preg_replace('/('.preg_quote($name, '/').',)[a-f0-9]{64}/', '$1'.hash('sha256', ''), $source['sheets']['contracts']);
+        $result = (new HistoryNormalizer)->normalize($source);
+        $this->assertSame([], $result['findings']);
+        $declaration = array_values(array_filter($result['snapshot']['contract_declarations'], fn ($row) => $row['file_name'] === $name))[0];
+        $this->assertSame(0, $declaration['supplied_original']['bytes']);
+        $this->assertSame(hash('sha256', ''), $declaration['supplied_original']['sha256']);
+    }
+
+    public function test_zero_value_exclusives_compete_until_source_explicitly_marks_a_refund(): void
+    {
+        $this->assertTrue(CompetingExclusiveSale::remains('unknown', 0, 0));
+        $this->assertTrue(CompetingExclusiveSale::remains('partially_refunded', 100, 50));
+        $this->assertFalse(CompetingExclusiveSale::remains('paid', 100, 100));
+        foreach (['Completed' => true, 'Refunded' => false] as $status => $competes) {
+            $source = self::fixture();
+            $source['sheets']['orders'] = str_replace('Exclusive Rights,500,0,', 'Exclusive Rights,0,0,', $source['sheets']['orders']);
+            $source['sheets']['orders'] .= "synthetic-ord-1009,1,synthetic-cust-001,2026-08-09T10:00:00Z,$status,synthetic-track-03,Exclusive Rights,0,0,synthetic-pay-1009,USD\n";
+            $result = (new HistoryNormalizer)->normalize($source);
+            $this->assertSame([], $result['findings']);
+            $this->assertSame($competes ? 2 : 0, $this->codes($result['snapshot']['exceptions'])['duplicate_exclusive_sale'] ?? 0);
+        }
     }
 
     public function test_an_exclusive_sold_twice_is_kept_for_both_buyers_and_flagged_without_revocation(): void

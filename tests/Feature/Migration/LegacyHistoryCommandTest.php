@@ -42,8 +42,8 @@ class LegacyHistoryCommandTest extends TestCase
         $this->assertSame(0, $exit, $output);
         $this->assertSame('dry_run_clean', $summary['code']);
         $this->assertSame(0, $summary['database_writes']);
-        $this->assertEquals(['customers' => 4, 'orders' => 4, 'lines' => 5, 'contracts' => 4, 'contract_files' => 4, 'findings' => 0, 'exceptions' => 3], $summary['counts']);
-        $this->assertSame(17, $summary['plan']['pending']);
+        $this->assertEquals(['customers' => 4, 'orders' => 4, 'lines' => 5, 'contracts' => 4, 'contract_declarations' => 5, 'contract_files' => 4, 'findings' => 0, 'exceptions' => 3], $summary['counts']);
+        $this->assertSame(22, $summary['plan']['pending']);
         $this->assertSame(['ambiguous_customer_identity' => 2, 'contract_original_missing' => 1], $summary['exceptions']);
         $this->assertSame(3, $summary['eligible_for_review']);
         $this->assertSame('archive_only', $summary['classification']);
@@ -133,7 +133,10 @@ class LegacyHistoryCommandTest extends TestCase
             return $parts;
         });
         [$exit, $summary] = $this->invoke('delta', ['--source' => $baseline, '--later' => $removed]);
-        $this->assertSame([3, 'unreconciled', 4], [$exit, $summary['code'], $summary['report']['unexplained']]);
+        $blocking = array_values(array_filter($summary['report']['items'], fn ($item) => $item['blocking']));
+        $this->assertEqualsCanonicalizing(['customer', 'order', 'line', 'contract', 'contract_declaration'], array_column($blocking, 'cohort'));
+        // Removed buyer/order/line/original plus its v2 contract declaration.
+        $this->assertSame([3, 'unreconciled', 5], [$exit, $summary['code'], $summary['report']['unexplained']]);
         $items = [];
         foreach ($summary['report']['items'] as $item) {
             if ($item['blocking']) {

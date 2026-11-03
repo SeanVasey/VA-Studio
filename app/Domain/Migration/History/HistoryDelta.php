@@ -33,7 +33,7 @@ final class HistoryDelta
     private const COHORTS = ['customers' => 'customer', 'orders' => 'order', 'lines' => 'line', 'contracts' => 'contract'];
 
     private const STATUS_FORWARD = [
-        'unpaid' => ['paid'],
+        'unpaid' => ['paid', 'partially_refunded', 'refunded'],
         'paid' => ['partially_refunded', 'refunded'],
         'partially_refunded' => ['refunded'],
     ];
@@ -42,8 +42,16 @@ final class HistoryDelta
     public function compare(array $baseline, array $later, ?string $dispositionBytes = null): array
     {
         foreach ([$baseline, $later] as $snapshot) {
-            $this->require(($snapshot['schema'] ?? null) === HistoryNormalizer::SCHEMA
-                && ($snapshot['transform_version'] ?? null) === HistoryNormalizer::TRANSFORM, 'delta_snapshot');
+            try {
+                LegacyHistoryArchive::tablesForSnapshot($snapshot);
+            } catch (LegacyArchiveRefusal) {
+                throw new InvalidArgumentException('delta_snapshot');
+            }
+        }
+        $this->require($baseline['schema'] === $later['schema'] && $baseline['transform_version'] === $later['transform_version'], 'delta_version_mismatch');
+        $cohorts = self::COHORTS;
+        if ($baseline['transform_version'] === HistoryNormalizer::TRANSFORM) {
+            $cohorts['contract_declarations'] = 'contract_declaration';
         }
         $this->require($baseline['source_system'] === $later['source_system'] && $baseline['currency'] === $later['currency'], 'delta_source_system');
         $this->require($later['source_as_of'] > $baseline['source_as_of'], 'delta_watermark_order');
@@ -52,7 +60,7 @@ final class HistoryDelta
 
         $items = [];
         $counts = [];
-        foreach (self::COHORTS as $cohort => $singular) {
+        foreach ($cohorts as $cohort => $singular) {
             $before = array_column($baseline[$cohort], null, 'record_key');
             $after = array_column($later[$cohort], null, 'record_key');
             $counts[$cohort] = ['baseline' => count($before), 'later' => count($after), 'new' => 0, 'changed' => 0, 'removed' => 0, 'unchanged' => 0];
@@ -164,7 +172,10 @@ final class HistoryDelta
             'customer' => $only([...$restated, 'email', 'display_name'])
                 ? ['customer_details_changed', false] : ['customer_identity_changed', true],
             'order' => match (true) {
-                $only(['status', 'refunded_minor']) && $this->forward($before['status'], $after['status'])
+                $only($restated) => ['source_row_restated', false],
+                $only([...$restated, 'status', 'refunded_minor', 'payment_reference'])
+                    && $this->paymentReferenceForward($before, $after)
+                    && $this->forward($before['status'], $after['status'])
                     && $after['refunded_minor'] >= $before['refunded_minor'] => [$before['status'] === 'unpaid' ? 'payment_completed' : 'refund', false],
                 default => ['order_terms_changed', true],
             },
@@ -173,11 +184,30 @@ final class HistoryDelta
                 $only([...$restated, 'refunded_minor']) && $after['refunded_minor'] > $before['refunded_minor'] => ['refund', false],
                 default => [$before['exclusive'] || $after['exclusive'] ? 'exclusive_line_changed' : 'line_terms_changed', true],
             },
+            'contract_declaration' => ($only($restated) || ($only([...$restated, 'supplied_original'])
+                && $before['supplied_original'] !== null && $after['supplied_original'] !== null
+                && $before['supplied_original']['sha256'] === $after['supplied_original']['sha256']
+                && $before['supplied_original']['bytes'] === $after['supplied_original']['bytes'])) ? ['contract_declaration_row_restated', false] : ['contract_declaration_changed', true],
             'contract' => in_array('sha256', $fields, true) || in_array('bytes', $fields, true)
                 ? ['contract_original_changed', true]
                 : ($only($restated) || ($only([...$restated, 'declared_sha256']) && $before['declared_sha256'] === null)
                     ? ['contract_row_restated', false] : ['contract_link_changed', true]),
         };
+    }
+
+    private function paymentReferenceForward(array $before, array $after): bool
+    {
+        if ($before['status'] === 'unpaid' && $after['status'] !== 'unpaid'
+            && (! is_string($after['payment_reference']) || trim($after['payment_reference']) === '')) {
+            return false;
+        }
+        if ($before['payment_reference'] === $after['payment_reference']) {
+            return true;
+        }
+
+        return $before['status'] === 'unpaid' && $before['payment_reference'] === null
+            && in_array($after['status'], ['paid', 'partially_refunded', 'refunded'], true)
+            && is_string($after['payment_reference']) && trim($after['payment_reference']) !== '';
     }
 
     private function forward(string $before, string $after): bool

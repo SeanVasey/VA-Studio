@@ -5,6 +5,7 @@ namespace Tests\Unit\Migration;
 use App\Domain\Migration\History\HistoryDelta;
 use App\Domain\Migration\History\HistoryNormalizer;
 use App\Domain\Migration\History\HistoryReconciliation;
+use App\Domain\Migration\History\LegacyHistoryArchive;
 use App\Support\CanonicalJson;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +27,7 @@ class HistoryDeltaTest extends TestCase
         $this->assertSame(['baseline' => 4, 'later' => 5, 'new' => 1, 'changed' => 0, 'removed' => 0, 'unchanged' => 4], $report['counts']['contracts']);
         $categories = array_count_values(array_column($report['items'], 'category'));
         ksort($categories);
-        $this->assertSame(['new_record' => 4, 'refund' => 2, 'source_row_restated' => 1], $categories);
+        $this->assertSame(['new_record' => 5, 'refund' => 2, 'source_row_restated' => 1], $categories);
         $newExclusive = $this->line($later, 'synthetic-ord-1005', '1');
         $this->assertSame(['new' => [$newExclusive], 'changed' => [], 'removed' => []], $report['exclusive_sales']);
         $this->assertSame([['record_key' => $this->line($later, 'synthetic-ord-1001', '2'), 'refunded_minor_delta' => 4999]], $report['refunds']);
@@ -49,8 +50,8 @@ class HistoryDeltaTest extends TestCase
         $report = (new HistoryDelta)->compare($baseline, $later);
         $this->assertSame('unreconciled', $report['result']);
         $removed = array_values(array_filter($report['items'], static fn (array $item): bool => $item['change'] === 'removed'));
-        $this->assertSame(['contract', 'line', 'order'], array_column($removed, 'cohort'));
-        $this->assertSame(3, $report['unexplained']);
+        $this->assertSame(['contract', 'contract_declaration', 'line', 'order'], array_column($removed, 'cohort'));
+        $this->assertSame(4, $report['unexplained']);
 
         $items = [];
         foreach ($removed as $item) {
@@ -60,7 +61,7 @@ class HistoryDeltaTest extends TestCase
             'baseline_snapshot_sha256' => $report['baseline']['snapshot_sha256'], 'later_snapshot_sha256' => $report['later']['snapshot_sha256'], 'items' => $items];
         $explained = (new HistoryDelta)->compare($baseline, $later, json_encode($dispositions));
         $this->assertSame('reconciled', $explained['result']);
-        $this->assertSame(3, $explained['dispositions']);
+        $this->assertSame(4, $explained['dispositions']);
 
         foreach ([
             'dispositions_mismatch' => ['later_snapshot_sha256' => str_repeat('0', 64)] + $dispositions,
@@ -114,7 +115,7 @@ class HistoryDeltaTest extends TestCase
             }
         }
         sort($blocking);
-        $this->assertSame(['contract:contract_original_changed', 'line:exclusive_line_changed', 'line:line_terms_changed',
+        $this->assertSame(['contract:contract_original_changed', 'contract_declaration:contract_declaration_changed', 'line:exclusive_line_changed', 'line:line_terms_changed',
             'order:order_terms_changed'], $blocking);
         $this->assertSame('unreconciled', $report['result']);
         $this->assertContains($this->line($later, 'synthetic-ord-1002', '1'), $report['exclusive_sales']['changed']);
@@ -182,10 +183,80 @@ class HistoryDeltaTest extends TestCase
         }
     }
 
+    public function test_payment_completion_and_skipped_refund_exports_preserve_reference_boundaries(): void
+    {
+        [$baseline, $later] = $this->snapshots();
+        $before = $baseline['orders'][0];
+        $before['status'] = 'unpaid';
+        $before['payment_reference'] = null;
+        $before['refunded_minor'] = 0;
+        $baseline['orders'] = [$before];
+        $baseline['orders'][0]['record_sha256'] = HistoryNormalizer::recordHash($before);
+        foreach (['paid' => 0, 'partially_refunded' => 1, 'refunded' => $before['total_minor']] as $status => $refund) {
+            $after = array_replace($before, ['status' => $status, 'payment_reference' => 'SYNTHETIC payment', 'refunded_minor' => $refund]);
+            $after['record_sha256'] = HistoryNormalizer::recordHash($after);
+            $later['orders'] = [$after];
+            $orders = array_values(array_filter((new HistoryDelta)->compare($baseline, $later)['items'], fn ($item) => $item['cohort'] === 'order'));
+            $this->assertSame(['payment_completed', false], [$orders[0]['category'], $orders[0]['blocking']]);
+        }
+        $baseline['orders'] = [$after];
+        foreach ([null, 'SYNTHETIC replacement'] as $reference) {
+            $later['orders'] = [array_replace($after, ['payment_reference' => $reference])];
+            $later['orders'][0]['record_sha256'] = HistoryNormalizer::recordHash($later['orders'][0]);
+            $orders = array_values(array_filter((new HistoryDelta)->compare($baseline, $later)['items'], fn ($item) => $item['cohort'] === 'order'));
+            $this->assertTrue($orders[0]['blocking']);
+        }
+    }
+
+    public function test_v1_delta_read_support_and_mixed_or_unknown_version_refusal_are_explicit(): void
+    {
+        $v1 = json_decode(file_get_contents(dirname(__DIR__, 2).'/Fixtures/migration/history-synthetic/snapshots/baseline-v1.json'), true, 32, JSON_THROW_ON_ERROR);
+        $laterV1 = array_replace($v1, ['source_as_of' => '2026-10-01T00:00:00Z']);
+        $this->assertSame('reconciled', (new HistoryDelta)->compare($v1, $laterV1)['result']);
+        [$v2] = $this->snapshots();
+        $v2['source_as_of'] = '2026-10-01T00:00:00Z';
+        foreach ([['delta_version_mismatch', $v1, $v2], ['delta_snapshot', $v2, array_replace($v2, ['transform_version' => 'unknown'])],
+            ['delta_snapshot', $v2, $v2 + ['unknown_cohort' => []]]] as [$reason, $a, $b]) {
+            try {
+                (new HistoryDelta)->compare($a, $b);
+                $this->fail('Unknown or mixed version admitted.');
+            } catch (InvalidArgumentException $error) {
+                $this->assertSame($reason, $error->getMessage());
+            }
+        }
+    }
+
+    public function test_payment_lifecycle_refuses_economic_identity_and_reference_reversals(): void
+    {
+        [$baseline, $later] = $this->snapshots();
+        $before = array_replace($baseline['orders'][0], ['status' => 'partially_refunded', 'refunded_minor' => 1, 'payment_reference' => 'SYNTHETIC existing payment']);
+        $before['record_sha256'] = HistoryNormalizer::recordHash($before);
+        $baseline['orders'] = [$before];
+        foreach ([['payment_reference' => null], ['payment_reference' => 'SYNTHETIC replacement'], ['refunded_minor' => 0],
+            ['status' => 'paid'], ['total_minor' => $before['total_minor'] + 1], ['currency' => 'EUR'],
+            ['customer_record_key' => str_repeat('a', 64)], ['ordered_at' => '2026-01-01T00:00:00Z']] as $changes) {
+            $after = array_replace($before, $changes);
+            $after['record_sha256'] = HistoryNormalizer::recordHash($after);
+            $later['orders'] = [$after];
+            $orders = array_values(array_filter((new HistoryDelta)->compare($baseline, $later)['items'], fn ($item) => $item['cohort'] === 'order'));
+            $this->assertTrue($orders[0]['blocking'], json_encode(array_keys($changes)));
+        }
+        $before = array_replace($before, ['status' => 'unpaid', 'refunded_minor' => 0, 'payment_reference' => null]);
+        $before['record_sha256'] = HistoryNormalizer::recordHash($before);
+        $baseline['orders'] = [$before];
+        foreach ([null, '', '  '] as $reference) {
+            $after = array_replace($before, ['status' => 'paid', 'payment_reference' => $reference]);
+            $after['record_sha256'] = HistoryNormalizer::recordHash($after);
+            $later['orders'] = [$after];
+            $orders = array_values(array_filter((new HistoryDelta)->compare($baseline, $later)['items'], fn ($item) => $item['cohort'] === 'order'));
+            $this->assertTrue($orders[0]['blocking']);
+        }
+    }
+
     private function perfect(array $snapshot): array
     {
         $records = [];
-        foreach (['customers', 'orders', 'lines', 'contracts'] as $cohort) {
+        foreach (array_keys(LegacyHistoryArchive::tablesForSnapshot($snapshot)) as $cohort) {
             foreach ($snapshot[$cohort] as $record) {
                 $records[$cohort][$record['record_key']] = ['record_sha256' => $record['record_sha256']]
                     + ($cohort === 'orders' ? ['total_minor' => $record['total_minor'], 'refunded_minor' => $record['refunded_minor'], 'currency' => $record['currency']] : [])

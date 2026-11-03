@@ -1,0 +1,364 @@
+{
+    "schema": "vasey-legacy-history-v1",
+    "transform_version": "vasey-legacy-history-transform-v1",
+    "canonicalization_version": "vasey-json-v1",
+    "snapshot_id": "synthetic-history-baseline",
+    "source_system": "synthetic/beatstars-history",
+    "operator_reference": "SYNTHETIC fixture written by hand for lane MIG; not an export",
+    "acquisition_method": "synthetic_fixture",
+    "acquired_at": "2026-09-01T01:00:00Z",
+    "source_as_of": "2026-09-01T00:00:00Z",
+    "currency": "USD",
+    "inputs": {
+        "mapping_sha256": "7edbf698e73adde9c385db4465bbaa0db3d9d82603b53ce90b3c08fe33b987ce",
+        "sheets": {
+            "customers": {
+                "name": "customers.csv",
+                "sha256": "c45fcf09e1d8e5ff2296fbbcc7833d3561c0ad44234c77104be1f384841d6346",
+                "bytes": 321,
+                "records": 4
+            },
+            "orders": {
+                "name": "orders.csv",
+                "sha256": "df6e0b92de2cfc622ff9d831fd44d1529c58c0c95b3bff783b7f835ffd8c0c45",
+                "bytes": 757,
+                "records": 5
+            },
+            "contracts": {
+                "name": "contracts.csv",
+                "sha256": "857c3abc69df1b501539ed5a76aeffe113793204ae376b8103cdb50c22d77ab2",
+                "bytes": 682,
+                "records": 6
+            }
+        },
+        "contract_files": {
+            "count": 4,
+            "bytes": 700
+        }
+    },
+    "customers": [
+        {
+            "record_key": "4b55a4433f48aa8527751baec3256dcc9dcb42f52ee1f8416f267ac00824838e",
+            "source_customer_id": "synthetic-cust-001",
+            "row": 2,
+            "row_sha256": "52a28623a8bc1c2a94bcdf94291a4e54e5c6cf723cd75d8db7d6a67f1963616b",
+            "email": "buyer.one@example.invalid",
+            "email_normalized": "buyer.one@example.invalid",
+            "display_name": "SYNTHETIC Buyer One",
+            "marketing_consent": "unknown",
+            "record_sha256": "5ae85b60bfe583372dbf6a16d479df5ac6885286da394531eead5c83ed68fda1"
+        },
+        {
+            "record_key": "c6099daecbaaaa07f884dd70be903453259f75f44d086c216e6fe0a2e8eaa435",
+            "source_customer_id": "synthetic-cust-004",
+            "row": 5,
+            "row_sha256": "deeacfff8fa5a2cca06d940509869a473c815b19eafb2bd866f3dbea49b6d1a8",
+            "email": "Shared.Buyer@example.invalid",
+            "email_normalized": "shared.buyer@example.invalid",
+            "display_name": "SYNTHETIC Buyer Four",
+            "marketing_consent": "unknown",
+            "record_sha256": "5a09748c70e4fe8b961e8eb9e9c109c409ffb70464a6b986d4a8a554d70c29ae"
+        },
+        {
+            "record_key": "de1f7fcaf1dc9818e80e34f8dba1ff3e74e897b7f569077cf728bfb7ff75819a",
+            "source_customer_id": "synthetic-cust-003",
+            "row": 4,
+            "row_sha256": "a49c76f74f431f378100558f2706b3f5c1871363a328df1375eb79620805711b",
+            "email": "shared.buyer@example.invalid",
+            "email_normalized": "shared.buyer@example.invalid",
+            "display_name": "SYNTHETIC Buyer Three",
+            "marketing_consent": "unknown",
+            "record_sha256": "eb246f07e6bc4f3aff2a52076077653f41bad3d74da1a795572fbdcf114ec450"
+        },
+        {
+            "record_key": "ec9f75b1276deef2b0c7a1091f9d8fe579861eb7d5eabd6a1140c24a1a3adf70",
+            "source_customer_id": "synthetic-cust-002",
+            "row": 3,
+            "row_sha256": "dbd7394e4815288fba071e70a12ec083c094f1ebdfb743d836848a49a696ae14",
+            "email": "buyer.two@example.invalid",
+            "email_normalized": "buyer.two@example.invalid",
+            "display_name": "SYNTHETIC Buyer Two",
+            "marketing_consent": "unknown",
+            "record_sha256": "d1322dea57005c393f5d5f4ccac63896dbe82a39cdbbbcf0c37561ad2652b1fc"
+        }
+    ],
+    "orders": [
+        {
+            "record_key": "18b4730fa33a9071c129d16095eb02dc620c8081546caef3e7d539f15e554a0e",
+            "source_order_id": "synthetic-ord-1002",
+            "source_customer_id": "synthetic-cust-002",
+            "customer_record_key": "ec9f75b1276deef2b0c7a1091f9d8fe579861eb7d5eabd6a1140c24a1a3adf70",
+            "ordered_at": "2026-08-03T12:30:00Z",
+            "status": "paid",
+            "currency": "USD",
+            "total_minor": 50000,
+            "refunded_minor": 0,
+            "payment_reference": "synthetic-pay-1002",
+            "line_record_keys": [
+                "b95c8f50c7aef573076c0dd885b7ea891641fe32073616fd78bf02e0b69319bb"
+            ],
+            "record_sha256": "99ce94d42b2df6baf2f0fd0939e5ac004f477ee683ae1817fb686a8cf7a2a663"
+        },
+        {
+            "record_key": "2b51f28ee6796d12325aaf1d63cbc1e6cfb65c9767259363d7682abe5b496c35",
+            "source_order_id": "synthetic-ord-1003",
+            "source_customer_id": "synthetic-cust-003",
+            "customer_record_key": "de1f7fcaf1dc9818e80e34f8dba1ff3e74e897b7f569077cf728bfb7ff75819a",
+            "ordered_at": "2026-08-05T09:15:00Z",
+            "status": "refunded",
+            "currency": "USD",
+            "total_minor": 2999,
+            "refunded_minor": 2999,
+            "payment_reference": "synthetic-pay-1003",
+            "line_record_keys": [
+                "e80585a05a163636a161f66dc4dfc04fac1966e20d4195d6a486c525f6f1bba3"
+            ],
+            "record_sha256": "5df76a357928138e9a610e38209bb4bfa6390be5ef37c3495178ffa4217a27a0"
+        },
+        {
+            "record_key": "7bf8dd0fa87b3beee66f06d9062fd12df10f129c3ddd061f85ef0d811ea94c9d",
+            "source_order_id": "synthetic-ord-1001",
+            "source_customer_id": "synthetic-cust-001",
+            "customer_record_key": "4b55a4433f48aa8527751baec3256dcc9dcb42f52ee1f8416f267ac00824838e",
+            "ordered_at": "2026-08-01T10:00:00Z",
+            "status": "paid",
+            "currency": "USD",
+            "total_minor": 7998,
+            "refunded_minor": 0,
+            "payment_reference": "synthetic-pay-1001",
+            "line_record_keys": [
+                "1de62e676048a577e8cc32849f336dc7f4af6794d8ce8886e4bcd585ea8bd60e",
+                "de21629eb2db9daebdbc394347ead692633d10b5b2f2f167833f546576a424e7"
+            ],
+            "record_sha256": "e21ac5f1499802d5df9c24c64838c8c94291c303decc1365403c9e15ce033d34"
+        },
+        {
+            "record_key": "7eccfefee61d0576d1258589ab1575deeabceb89618c16a00c835b96ee7d7081",
+            "source_order_id": "synthetic-ord-1004",
+            "source_customer_id": "synthetic-cust-004",
+            "customer_record_key": "c6099daecbaaaa07f884dd70be903453259f75f44d086c216e6fe0a2e8eaa435",
+            "ordered_at": "2026-08-07T18:45:00Z",
+            "status": "paid",
+            "currency": "USD",
+            "total_minor": 2999,
+            "refunded_minor": 0,
+            "payment_reference": null,
+            "line_record_keys": [
+                "e7ab803561ae6a33b7d91cdedb896591425122bbc820edb1cfaf77a6244941e4"
+            ],
+            "record_sha256": "e19c984468dad92a915be4dfb64480c42f8360ff153556625885ddc9ac3b02cb"
+        }
+    ],
+    "lines": [
+        {
+            "record_key": "1de62e676048a577e8cc32849f336dc7f4af6794d8ce8886e4bcd585ea8bd60e",
+            "source_order_id": "synthetic-ord-1001",
+            "source_line_id": "2",
+            "order_record_key": "7bf8dd0fa87b3beee66f06d9062fd12df10f129c3ddd061f85ef0d811ea94c9d",
+            "row": 3,
+            "row_sha256": "9c6718bd7437a5201b178d16cd413c855c56526dd5ceff0ee0047c89eae196f3",
+            "track_source_id": "synthetic-track-02",
+            "license_name": "Premium Lease",
+            "license_label": "premium-lease",
+            "exclusive": false,
+            "amount_minor": 4999,
+            "refunded_minor": 0,
+            "currency": "USD",
+            "classification": "archive_only",
+            "record_sha256": "6bc929b6f5e0b03019f5342224f90547aa87115869456f32abb1628f59e45522"
+        },
+        {
+            "record_key": "b95c8f50c7aef573076c0dd885b7ea891641fe32073616fd78bf02e0b69319bb",
+            "source_order_id": "synthetic-ord-1002",
+            "source_line_id": "1",
+            "order_record_key": "18b4730fa33a9071c129d16095eb02dc620c8081546caef3e7d539f15e554a0e",
+            "row": 4,
+            "row_sha256": "ba481c8eb5bed60b657c60e3ed4297b28c57090064e6e3fe66b63e9ad1897e04",
+            "track_source_id": "synthetic-track-03",
+            "license_name": "Exclusive Rights",
+            "license_label": "exclusive-rights",
+            "exclusive": true,
+            "amount_minor": 50000,
+            "refunded_minor": 0,
+            "currency": "USD",
+            "classification": "archive_only",
+            "record_sha256": "88726d65ef8fdc1742c66855572dd436e8d9742b10a60a53e9f4d4e895e80da4"
+        },
+        {
+            "record_key": "de21629eb2db9daebdbc394347ead692633d10b5b2f2f167833f546576a424e7",
+            "source_order_id": "synthetic-ord-1001",
+            "source_line_id": "1",
+            "order_record_key": "7bf8dd0fa87b3beee66f06d9062fd12df10f129c3ddd061f85ef0d811ea94c9d",
+            "row": 2,
+            "row_sha256": "01e50f4ae996d45fe8920c0cef20ba062b58410ac9f3c07b3c1dd46e9d6de923",
+            "track_source_id": "synthetic-track-01",
+            "license_name": "Basic Lease",
+            "license_label": "basic-lease",
+            "exclusive": false,
+            "amount_minor": 2999,
+            "refunded_minor": 0,
+            "currency": "USD",
+            "classification": "archive_only",
+            "record_sha256": "63814bb2a45d1e3e20a12457ab1ecf5231b50cec2f652272b0efd72f8bad6f3f"
+        },
+        {
+            "record_key": "e7ab803561ae6a33b7d91cdedb896591425122bbc820edb1cfaf77a6244941e4",
+            "source_order_id": "synthetic-ord-1004",
+            "source_line_id": "1",
+            "order_record_key": "7eccfefee61d0576d1258589ab1575deeabceb89618c16a00c835b96ee7d7081",
+            "row": 6,
+            "row_sha256": "b1c80e03f5899e4987206ba9612d7bbb8471af7ee9ee26c84366c2c26fbca86b",
+            "track_source_id": "synthetic-track-04",
+            "license_name": "Basic Lease",
+            "license_label": "basic-lease",
+            "exclusive": false,
+            "amount_minor": 2999,
+            "refunded_minor": 0,
+            "currency": "USD",
+            "classification": "archive_only",
+            "record_sha256": "8e7cc2604d9a873c074665b12608b21cd146e5b9fb22b51b8afdc231357bd4d3"
+        },
+        {
+            "record_key": "e80585a05a163636a161f66dc4dfc04fac1966e20d4195d6a486c525f6f1bba3",
+            "source_order_id": "synthetic-ord-1003",
+            "source_line_id": "1",
+            "order_record_key": "2b51f28ee6796d12325aaf1d63cbc1e6cfb65c9767259363d7682abe5b496c35",
+            "row": 5,
+            "row_sha256": "379dae1c32ada5c27248c548244984c3753342c904244ceefdade52a66ba86e2",
+            "track_source_id": "synthetic-track-01",
+            "license_name": "Basic Lease",
+            "license_label": "basic-lease",
+            "exclusive": false,
+            "amount_minor": 2999,
+            "refunded_minor": 2999,
+            "currency": "USD",
+            "classification": "archive_only",
+            "record_sha256": "bb4a90efa2be4383679dafaa23b6e2596978e2b7c840c8301bd0336cb552d3d1"
+        }
+    ],
+    "contracts": [
+        {
+            "record_key": "08939bc500e2174fcbf15cc73dbc7122fc0e7941b07b83c1fb078044dada9d56",
+            "source_contract_id": "synthetic-contract-1003-1",
+            "source_order_id": "synthetic-ord-1003",
+            "source_line_id": "1",
+            "order_record_key": "2b51f28ee6796d12325aaf1d63cbc1e6cfb65c9767259363d7682abe5b496c35",
+            "line_record_key": "e80585a05a163636a161f66dc4dfc04fac1966e20d4195d6a486c525f6f1bba3",
+            "row": 5,
+            "row_sha256": "5b7a962c3901bd9932f0bd6fd3f214994f8f3fd20ca59970e3d75917ba220c3b",
+            "file_name": "synthetic-contract-1003-1.txt",
+            "media_type": "text/plain",
+            "sha256": "74cc2c45ff0d65902b2178c2457ed207c4e2c8e1f2cb2de19c98426015d20a92",
+            "bytes": 175,
+            "declared_sha256": "74cc2c45ff0d65902b2178c2457ed207c4e2c8e1f2cb2de19c98426015d20a92",
+            "record_sha256": "69d752be3f08ef045cc3587f1c18445b70914247126202f27300b5994b021f33"
+        },
+        {
+            "record_key": "5dfae4cfe7214886ac3fafe571d25a4ba15f4dab968702969fd58afc46b27cca",
+            "source_contract_id": "synthetic-contract-1002-1",
+            "source_order_id": "synthetic-ord-1002",
+            "source_line_id": "1",
+            "order_record_key": "18b4730fa33a9071c129d16095eb02dc620c8081546caef3e7d539f15e554a0e",
+            "line_record_key": "b95c8f50c7aef573076c0dd885b7ea891641fe32073616fd78bf02e0b69319bb",
+            "row": 4,
+            "row_sha256": "c110ac06d9c6a10b2f24de8a6f80af8fa72352843a955e6505125ef8e6a68172",
+            "file_name": "synthetic-contract-1002-1.txt",
+            "media_type": "text/plain",
+            "sha256": "c3cc311bb4d76f87ed38292679130a2dd523fb76f3d7099167b6381a6bf21cf0",
+            "bytes": 175,
+            "declared_sha256": "c3cc311bb4d76f87ed38292679130a2dd523fb76f3d7099167b6381a6bf21cf0",
+            "record_sha256": "cbddbf6f57bcf40944210a4026bb61c7d6a52079eb5d614f6f370c7137087b93"
+        },
+        {
+            "record_key": "7bc60d6bbfc09894c2897e84a573e712a042e31d557a28df6cba3894329c72db",
+            "source_contract_id": "synthetic-contract-1001-2",
+            "source_order_id": "synthetic-ord-1001",
+            "source_line_id": "2",
+            "order_record_key": "7bf8dd0fa87b3beee66f06d9062fd12df10f129c3ddd061f85ef0d811ea94c9d",
+            "line_record_key": "1de62e676048a577e8cc32849f336dc7f4af6794d8ce8886e4bcd585ea8bd60e",
+            "row": 3,
+            "row_sha256": "b82e5b4853256a029b2e3772652562da3d0265fdbca1d2a40e0f5d03e512f7c2",
+            "file_name": "synthetic-contract-1001-2.txt",
+            "media_type": "text/plain",
+            "sha256": "07fea18328fe53dd95ec66965cf8eef840acd67bd87caf1ac32e0685f42a7abc",
+            "bytes": 175,
+            "declared_sha256": null,
+            "record_sha256": "44f23d68cdec38c324c882ff0651657636c89ab371d7216a07c6eb39d73ac358"
+        },
+        {
+            "record_key": "d4d16f4f7c6dca65b0b4a883c71822255f2b3cde83f6fd143a4e777f4af24768",
+            "source_contract_id": "synthetic-contract-1001-1",
+            "source_order_id": "synthetic-ord-1001",
+            "source_line_id": "1",
+            "order_record_key": "7bf8dd0fa87b3beee66f06d9062fd12df10f129c3ddd061f85ef0d811ea94c9d",
+            "line_record_key": "de21629eb2db9daebdbc394347ead692633d10b5b2f2f167833f546576a424e7",
+            "row": 2,
+            "row_sha256": "87115184dcef96f415f754c96e9d7e6f429e70bf3fa884bd376d25bf23696c5e",
+            "file_name": "synthetic-contract-1001-1.txt",
+            "media_type": "text/plain",
+            "sha256": "72f2b4ebde3d5ea7508be7b386846e0c35777c976108222407ce363cc6acd252",
+            "bytes": 175,
+            "declared_sha256": "72f2b4ebde3d5ea7508be7b386846e0c35777c976108222407ce363cc6acd252",
+            "record_sha256": "146f8e477bb54d7da7c383e904bb10a1e7be742a33999ee1d7c8558bb58a8e44"
+        }
+    ],
+    "exceptions": [
+        {
+            "cohort": "customer",
+            "record_key": "c6099daecbaaaa07f884dd70be903453259f75f44d086c216e6fe0a2e8eaa435",
+            "code": "ambiguous_customer_identity"
+        },
+        {
+            "cohort": "customer",
+            "record_key": "de1f7fcaf1dc9818e80e34f8dba1ff3e74e897b7f569077cf728bfb7ff75819a",
+            "code": "ambiguous_customer_identity"
+        },
+        {
+            "cohort": "line",
+            "record_key": "de21629eb2db9daebdbc394347ead692633d10b5b2f2f167833f546576a424e7",
+            "code": "contract_original_missing"
+        },
+        {
+            "cohort": "line",
+            "record_key": "e7ab803561ae6a33b7d91cdedb896591425122bbc820edb1cfaf77a6244941e4",
+            "code": "contract_original_missing"
+        }
+    ],
+    "eligibility": {
+        "1de62e676048a577e8cc32849f336dc7f4af6794d8ce8886e4bcd585ea8bd60e": {
+            "eligible": true,
+            "blockers": [],
+            "contract_record_key": "7bc60d6bbfc09894c2897e84a573e712a042e31d557a28df6cba3894329c72db"
+        },
+        "b95c8f50c7aef573076c0dd885b7ea891641fe32073616fd78bf02e0b69319bb": {
+            "eligible": true,
+            "blockers": [],
+            "contract_record_key": "5dfae4cfe7214886ac3fafe571d25a4ba15f4dab968702969fd58afc46b27cca"
+        },
+        "de21629eb2db9daebdbc394347ead692633d10b5b2f2f167833f546576a424e7": {
+            "eligible": false,
+            "blockers": [
+                "contract_original_missing"
+            ],
+            "contract_record_key": "d4d16f4f7c6dca65b0b4a883c71822255f2b3cde83f6fd143a4e777f4af24768"
+        },
+        "e7ab803561ae6a33b7d91cdedb896591425122bbc820edb1cfaf77a6244941e4": {
+            "eligible": false,
+            "blockers": [
+                "ambiguous_customer_identity",
+                "contract_original_missing",
+                "payment_reference_missing"
+            ],
+            "contract_record_key": null
+        },
+        "e80585a05a163636a161f66dc4dfc04fac1966e20d4195d6a486c525f6f1bba3": {
+            "eligible": false,
+            "blockers": [
+                "ambiguous_customer_identity",
+                "line_refunded",
+                "order_not_paid"
+            ],
+            "contract_record_key": "08939bc500e2174fcbf15cc73dbc7122fc0e7941b07b83c1fb078044dada9d56"
+        }
+    }
+}

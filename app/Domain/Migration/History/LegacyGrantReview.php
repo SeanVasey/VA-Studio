@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Gate;
  * fully archived: the line, its order, its buyer and its original contract must still be in that export with the
  * archived hashes (a later export that drops or changes any of them withdraws the evidence). The order must be paid
  * with nothing refunded and carry a payment reference, the buyer must be unambiguous, the line must have exactly one
- * stored original whose bytes still match their hash, and no other unrefunded sale of the same exclusive may remain.
+ * retained declaration with an exact stored original whose bytes still match their hash, and no other unrefunded sale of the same exclusive may remain.
  * Those last three read every other record's latest archived version across all exports, so an export that merely
  * omits a competing record can never clear a blocker (only a newer version of that record can). The reviewer must
  * hold current staff authority, satisfy the panel's staff MFA rule, present a fresh attestation bound to this line and
@@ -28,7 +28,8 @@ use Illuminate\Support\Facades\Gate;
  * version and the evidence hashes.
  *
  * `classification()` repeats the whole derivation: a review counts only while the current evidence still hashes to
- * what was reviewed. `verified_grant` records that the historical evidence supports a grant the buyer once received.
+ * what was reviewed. Source systems with any v1 batch lack declaration-completeness proof and refuse; historical
+ * declaration relinks also remain blockers without a separate retained authorization design. `verified_grant` records that the historical evidence supports a grant the buyer once received.
  * It is not a download right and creates no entitlement, grant, account or delivery: activating historical
  * entitlements is a separate import that needs Sean's authorization (AGENTS.md release boundary).
  */
@@ -141,8 +142,26 @@ final class LegacyGrantReview
         $batch = LegacyHistoryArchive::currentBatch($sourceSystem);
         $members = $batch === null ? null : LegacyHistoryArchive::completeMembers($batch);
         $result = ['line_record_key' => $lineRecordKey, 'line_id' => null, 'eligible' => false, 'evidence_sha256' => null];
+        $transforms = DB::table('legacy_history_batches')->where('source_system', $sourceSystem)->distinct()->pluck('transform_version')->all();
+        foreach ($transforms as $transform) {
+            LegacyHistoryArchive::tablesForTransform($transform);
+        }
+        if (in_array(HistoryNormalizer::TRANSFORM_V1, $transforms, true)) {
+            return $result + ['blockers' => ['declaration_history_coverage_unproven']];
+        }
+        if ($batch === null || $batch->transform_version !== HistoryNormalizer::TRANSFORM) {
+            return $result + ['blockers' => ['declaration_completeness_unproven']];
+        }
         if ($members === null) {
             return $result + ['blockers' => ['latest_export_not_archived']];
+        }
+        // A prior interrupted export may advertise a brand-new competitor or an intermediate relink whose
+        // row never committed. Physical candidate discovery cannot prove those absent associations irrelevant.
+        // Resolve every retained membership, including superseded versions, before deriving eligibility.
+        foreach (DB::table('legacy_history_batches')->where('source_system', $sourceSystem)->where('id', '<>', $batch->id)->get() as $retainedBatch) {
+            if (LegacyHistoryArchive::completeMembers($retainedBatch) === null) {
+                return $result + ['blockers' => ['retained_export_not_archived']];
+            }
         }
         $line = $this->member('legacy_history_lines', $members['lines'], $lineRecordKey);
         if ($line === null) {
@@ -163,6 +182,7 @@ final class LegacyGrantReview
             return $result + ['blockers' => ['evidence_removed']];
         }
         $blockers = [];
+        $consulted = [];
         if ($orderRecord['status'] !== 'paid') {
             $blockers[] = 'order_not_paid';
         }
@@ -177,56 +197,101 @@ final class LegacyGrantReview
             $customer = null;
             $blockers[] = 'evidence_removed';
         } else {
-            foreach (DB::table('legacy_history_customers')->where('email_hmac', $customer->email_hmac)->where('record_key', '<>', $customer->record_key)->get() as $other) {
-                if (($latest['customers'][$other->record_key] ?? null) === $other->record_sha256) {
+            foreach ($this->competingVersions('legacy_history_customers', $latest['customers'],
+                DB::table('legacy_history_customers')->where('email_hmac', $customer->email_hmac)->where('record_key', '<>', $customer->record_key)->pluck('record_key')->all()) as $other) {
+                $consulted[] = $other;
+                if ($other->email_hmac === $customer->email_hmac) {
                     $blockers[] = 'ambiguous_customer_identity';
-                    break;
                 }
             }
         }
-        $contracts = [];
-        foreach (DB::table('legacy_history_contracts')->where('line_record_key', $lineRecordKey)->orderBy('id')->get() as $row) {
-            if (($latest['contracts'][$row->record_key] ?? null) === $row->record_sha256) {
-                $contracts[] = $row;
+        $declarations = [];
+        $candidateKeys = [...DB::table('legacy_history_contracts')->where('line_record_key', $lineRecordKey)->pluck('record_key')->all(),
+            ...DB::table('legacy_history_contract_declarations')->where('line_record_key', $lineRecordKey)->pluck('record_key')->all()];
+        foreach (array_unique($candidateKeys) as $key) {
+            if (! isset($latest['contract_declarations'][$key])) {
+                $blockers[] = 'declaration_completeness_unproven';
+
+                continue;
             }
+            $declaration = $this->requiredVersion('legacy_history_contract_declarations', $latest['contract_declarations'], $key);
+            $consulted[] = $declaration;
+            // Every retained association matters, including an intermediate relink followed by a move back.
+            foreach (DB::table('legacy_history_contract_declarations')->where('record_key', $key)->get() as $history) {
+                $historyRecord = LegacyHistoryArchive::decrypt($history);
+                if ($historyRecord === null || $history->line_record_key !== $historyRecord['line_record_key']
+                    || $history->order_record_key !== $historyRecord['order_record_key']) {
+                    throw new LegacyArchiveRefusal('archive_integrity');
+                }
+                $consulted[] = $history;
+                if ($history->original_id !== null) {
+                    $historicalOriginal = DB::table('legacy_history_contracts')->where('id', $history->original_id)->first();
+                    if ($historicalOriginal === null || LegacyHistoryArchive::decrypt($historicalOriginal) === null
+                        || $historicalOriginal->record_key !== $history->record_key
+                        || $historicalOriginal->record_sha256 !== $history->supplied_original_record_sha256) {
+                        throw new LegacyArchiveRefusal('archive_integrity');
+                    }
+                    $consulted[] = $historicalOriginal;
+                }
+                if ($history->line_record_key !== $lineRecordKey || $history->order_record_key !== $line->order_record_key) {
+                    $blockers[] = 'contract_declaration_relinked';
+                }
+            }
+            if ($declaration->original_id !== null) {
+                $original = DB::table('legacy_history_contracts')->where('id', $declaration->original_id)->first();
+                if ($original === null || LegacyHistoryArchive::decrypt($original) === null) {
+                    throw new LegacyArchiveRefusal('archive_integrity');
+                }
+                $consulted[] = $original;
+            }
+            $declarations[] = $declaration;
         }
         $contract = null;
-        if ($contracts === []) {
+        $selectedDeclaration = null;
+        if ($declarations === []) {
             $blockers[] = 'contract_absent';
-        } elseif (count($contracts) > 1) {
+        } elseif (count($declarations) > 1) {
             $blockers[] = 'multiple_contracts';
-        } elseif (($members['contracts'][$contracts[0]->record_key] ?? null) !== $contracts[0]->record_sha256) {
-            $blockers[] = 'evidence_removed';
         } else {
-            $contract = $contracts[0];
-            if (LegacyHistoryArchive::decrypt($contract) === null
-                || LegacyHistoryArchive::artifactState($contract->storage_path, $contract->original_sha256, (int) $contract->original_bytes) !== 'verified') {
+            $selectedDeclaration = $declarations[0];
+            if (($members['contract_declarations'][$selectedDeclaration->record_key] ?? null) !== $selectedDeclaration->record_sha256) {
+                $blockers[] = 'evidence_removed';
+            }
+            $declarationRecord = LegacyHistoryArchive::decrypt($selectedDeclaration);
+            if ($selectedDeclaration->original_id === null) {
+                $blockers[] = 'contract_original_missing';
+            } elseif ($declarationRecord === null || ! LegacyHistoryArchive::declarationIntact($selectedDeclaration, $declarationRecord)) {
                 $blockers[] = 'contract_original_unverified';
+            } else {
+                $contract = DB::table('legacy_history_contracts')->where('id', $selectedDeclaration->original_id)->first();
+                if (($members['contracts'][$contract->record_key] ?? null) !== $contract->record_sha256) {
+                    $blockers[] = 'evidence_removed';
+                }
             }
         }
         if ((bool) $line->exclusive) {
-            foreach (DB::table('legacy_history_lines')->where('track_source_id', $line->track_source_id)->where('exclusive', true)
-                ->where('record_key', '<>', $lineRecordKey)->orderBy('id')->get() as $other) {
-                if (($latest['lines'][$other->record_key] ?? null) !== $other->record_sha256) {
-                    continue;
-                }
-                $otherOrder = $this->member('legacy_history_orders', $latest['orders'], $other->order_record_key);
-                if ($otherOrder !== null && in_array($otherOrder->status, ['paid', 'partially_refunded', 'unknown'], true)
-                    && (int) $other->refunded_minor < (int) $other->amount_minor) {
+            foreach ($this->competingVersions('legacy_history_lines', $latest['lines'],
+                DB::table('legacy_history_lines')->where('track_source_id', $line->track_source_id)->where('exclusive', true)
+                    ->where('record_key', '<>', $lineRecordKey)->pluck('record_key')->all()) as $other) {
+                $consulted[] = $other;
+                $otherOrder = $this->requiredVersion('legacy_history_orders', $latest['orders'], $other->order_record_key);
+                $consulted[] = $otherOrder;
+                if ($other->track_source_id === $line->track_source_id && (bool) $other->exclusive
+                    && CompetingExclusiveSale::remains($otherOrder->status, (int) $other->amount_minor, (int) $other->refunded_minor)) {
                     $blockers[] = 'duplicate_exclusive_sale';
-                    break;
                 }
             }
         }
         // Separation of duties: whoever inserted any evidence row this review relies on, created its batch, or created or
         // ran any segment of the newest export (whose member list decides what is current) cannot review it.
         if ($reviewer !== null) {
-            $rows = array_values(array_filter([$line, $order, $customer, $contract]));
+            $rows = array_values(array_filter([$line, $order, $customer, $contract, ...$consulted]));
             $importers = array_map(static fn (object $row): int => (int) $row->actor_id, $rows);
-            $batchActors = DB::table('legacy_history_batches')->whereIn('id', [...array_map(static fn (object $row): int => (int) $row->batch_id, $rows), (int) $batch->id])
+            $batchIds = array_values(array_unique([...array_map(static fn (object $row): int => (int) $row->batch_id, $rows), (int) $batch->id]));
+            $batchActors = DB::table('legacy_history_batches')->whereIn('id', $batchIds)
                 ->pluck('actor_id')->map(static fn ($id): int => (int) $id)->all();
             $newestActors = DB::table('audit_events')->where('action', LegacyHistoryArchive::SEGMENT_ACTION)->where('subject_type', 'legacy_history_batch')
-                ->where('subject_id', $batch->id)->pluck('actor_id')->map(static fn ($id): int => (int) $id)->all();
+                ->whereIn('subject_id', $batchIds)->pluck('actor_id')->map(static fn ($id): int => (int) $id)->all();
             foreach (LegacyHistoryArchive::TABLES as $table) {
                 $newestActors = [...$newestActors, ...DB::table($table)->where('batch_id', $batch->id)->distinct()->pluck('actor_id')->map(static fn ($id): int => (int) $id)->all()];
             }
@@ -234,7 +299,9 @@ final class LegacyGrantReview
                 $blockers[] = 'reviewer_imported_evidence';
             }
         }
-        $evidence = $customer !== null && $contract !== null ? CanonicalJson::hash(['line_record_sha256' => $line->record_sha256,
+        $evidence = $customer !== null && $contract !== null ? CanonicalJson::hash(['purpose' => 'vasey-legacy-grant-evidence-v2',
+            'snapshot_sha256' => $batch->snapshot_sha256, 'declaration_record_key' => $selectedDeclaration->record_key,
+            'declaration_record_sha256' => $selectedDeclaration->record_sha256, 'line_record_sha256' => $line->record_sha256,
             'order_record_sha256' => $order->record_sha256, 'customer_record_sha256' => $customer->record_sha256,
             'contract_record_sha256' => $contract->record_sha256, 'original_sha256' => $contract->original_sha256]) : null;
         // A review of this very line version whose evidence has since changed (for example the buyer) no longer stands.
@@ -249,6 +316,25 @@ final class LegacyGrantReview
             'evidence_sha256' => $blockers === [] ? $evidence : null];
     }
 
+    /** Resolve historical candidate keys before filtering current values: clearing versions are evidence too. */
+    private function competingVersions(string $table, array $versions, array $keys): array
+    {
+        return array_map(fn (string $key): object => $this->requiredVersion($table, $versions, $key), array_values(array_intersect(array_unique($keys), array_keys($versions))));
+    }
+
+    private function requiredVersion(string $table, array $versions, string $key): object
+    {
+        $row = $this->member($table, $versions, $key);
+        if ($row === null || LegacyHistoryArchive::decrypt($row) === null) {
+            throw new LegacyArchiveRefusal('archive_integrity');
+        }
+        if (! DB::table('legacy_history_batches')->where('id', $row->batch_id)->exists()) {
+            throw new LegacyArchiveRefusal('archive_integrity');
+        }
+
+        return $row;
+    }
+
     /**
      * cohort => record key => hash of the record's latest archived version: the version in the newest export (by
      * watermark) that contains the key. A record that a later export omits keeps its last archived version.
@@ -256,8 +342,8 @@ final class LegacyGrantReview
     private function latestVersions(string $sourceSystem): array
     {
         $latest = array_fill_keys(array_keys(LegacyHistoryArchive::TABLES), []);
-        foreach (DB::table('legacy_history_batches')->where('source_system', $sourceSystem)->orderByDesc('source_as_of')->orderByDesc('id')->get(['members']) as $batch) {
-            foreach (json_decode($batch->members, true, 8, JSON_THROW_ON_ERROR) as $cohort => $records) {
+        foreach (DB::table('legacy_history_batches')->where('source_system', $sourceSystem)->orderByDesc('source_as_of')->orderByDesc('id')->get() as $batch) {
+            foreach (LegacyHistoryArchive::batchMembers($batch) as $cohort => $records) {
                 $latest[$cohort] += $records;
             }
         }

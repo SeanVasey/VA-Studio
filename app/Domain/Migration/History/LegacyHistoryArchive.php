@@ -41,7 +41,8 @@ final class LegacyHistoryArchive
 
     /** cohort => table, in insertion order (a line follows its order; a contract follows its line). */
     public const TABLES = ['customers' => 'legacy_history_customers', 'orders' => 'legacy_history_orders',
-        'lines' => 'legacy_history_lines', 'contracts' => 'legacy_history_contracts'];
+        'lines' => 'legacy_history_lines', 'contracts' => 'legacy_history_contracts',
+        'contract_declarations' => 'legacy_history_contract_declarations'];
 
     /** Read and normalize one source package. Pure: no database, no write. */
     public function load(string $directory): array
@@ -56,7 +57,7 @@ final class LegacyHistoryArchive
     {
         $cohorts = [];
         $pending = 0;
-        foreach (self::TABLES as $cohort => $table) {
+        foreach (self::tablesForSnapshot($snapshot) as $cohort => $table) {
             $present = $this->present($table, $snapshot[$cohort]);
             $create = count(array_filter($snapshot[$cohort], static fn (array $record): bool => ! isset($present[$record['record_key']."\n".$record['record_sha256']])));
             $cohorts[$cohort] = ['create' => $create, 'skip' => count($snapshot[$cohort]) - $create];
@@ -96,7 +97,7 @@ final class LegacyHistoryArchive
             $batch = $this->batch($snapshot, $snapshotSha256, $current, $attestationAuditId);
             $processed = 0;
             $pendingTotal = 0;
-            foreach (self::TABLES as $cohort => $table) {
+            foreach (self::tablesForSnapshot($snapshot) as $cohort => $table) {
                 $present = $this->present($table, $snapshot[$cohort]);
                 foreach ($snapshot[$cohort] as $record) {
                     if (isset($present[$record['record_key']."\n".$record['record_sha256']])) {
@@ -136,7 +137,7 @@ final class LegacyHistoryArchive
         $records = [];
         $unexpected = [];
         $integrity = [];
-        foreach (self::TABLES as $cohort => $table) {
+        foreach (self::tablesForSnapshot($snapshot) as $cohort => $table) {
             $expected = [];
             foreach ($snapshot[$cohort] as $record) {
                 $expected[$record['record_key']."\n".$record['record_sha256']] = true;
@@ -201,7 +202,7 @@ final class LegacyHistoryArchive
     public static function members(array $snapshot): array
     {
         $members = [];
-        foreach (array_keys(self::TABLES) as $cohort) {
+        foreach (array_keys(self::tablesForSnapshot($snapshot)) as $cohort) {
             $members[$cohort] = [];
             foreach ($snapshot[$cohort] as $record) {
                 $members[$cohort][$record['record_key']] = $record['record_sha256'];
@@ -222,12 +223,13 @@ final class LegacyHistoryArchive
     /** @return array<string, array<string, string>>|null the batch's members when every member row is archived, else null */
     public static function completeMembers(object $batch): ?array
     {
-        $members = json_decode($batch->members, true, 8, JSON_THROW_ON_ERROR);
-        if (CanonicalJson::hash($members) !== $batch->members_sha256) {
+        try {
+            $members = self::batchMembers($batch);
+        } catch (LegacyArchiveRefusal) {
             return null;
         }
-        foreach (self::TABLES as $cohort => $table) {
-            foreach (array_chunk(array_keys($members[$cohort] ?? []), 500, true) as $keys) {
+        foreach (self::tablesForTransform($batch->transform_version) as $cohort => $table) {
+            foreach (array_chunk(array_keys($members[$cohort]), 500, true) as $keys) {
                 $found = 0;
                 foreach (DB::table($table)->whereIn('record_key', $keys)->get(['record_key', 'record_sha256']) as $row) {
                     $found += ($members[$cohort][$row->record_key] ?? null) === $row->record_sha256 ? 1 : 0;
@@ -236,6 +238,79 @@ final class LegacyHistoryArchive
                     return null;
                 }
             }
+        }
+
+        return $members;
+    }
+
+    /** Version admission is explicit; old records are never upgraded or given declarations in memory. */
+    public static function tablesForSnapshot(array $snapshot): array
+    {
+        $transform = $snapshot['transform_version'] ?? '';
+        $schema = match ($transform) {
+            HistoryNormalizer::TRANSFORM_V1 => HistoryNormalizer::SCHEMA_V1,
+            HistoryNormalizer::TRANSFORM => HistoryNormalizer::SCHEMA,
+            default => throw new LegacyArchiveRefusal('snapshot_version'),
+        };
+        if (($snapshot['schema'] ?? null) !== $schema) {
+            throw new LegacyArchiveRefusal('snapshot_version');
+        }
+        $tables = self::tablesForTransform($transform);
+        $fields = [...array_keys($tables), 'schema', 'transform_version', 'canonicalization_version', 'snapshot_id', 'source_system',
+            'operator_reference', 'acquisition_method', 'acquired_at', 'source_as_of', 'currency', 'inputs', 'exceptions', 'eligibility'];
+        if (array_diff(array_keys($snapshot), $fields) !== [] || array_diff($fields, array_keys($snapshot)) !== []) {
+            throw new LegacyArchiveRefusal('snapshot_cohorts');
+        }
+        foreach ($tables as $cohort => $table) {
+            if (! isset($snapshot[$cohort]) || ! is_array($snapshot[$cohort]) || ! array_is_list($snapshot[$cohort])) {
+                throw new LegacyArchiveRefusal('snapshot_cohorts');
+            }
+        }
+        if ($transform === HistoryNormalizer::TRANSFORM_V1 && array_key_exists('contract_declarations', $snapshot)) {
+            throw new LegacyArchiveRefusal('snapshot_cohorts');
+        }
+
+        return $tables;
+    }
+
+    public static function tablesForTransform(string $transform): array
+    {
+        return match ($transform) {
+            HistoryNormalizer::TRANSFORM_V1 => array_slice(self::TABLES, 0, 4, true),
+            HistoryNormalizer::TRANSFORM => self::TABLES,
+            default => throw new LegacyArchiveRefusal('snapshot_version'),
+        };
+    }
+
+    /** Exact versioned cohort vocabulary and hashes; missing declaration cohort is never an empty proof. */
+    public static function batchMembers(object $batch): array
+    {
+        try {
+            $members = json_decode($batch->members, true, 8, JSON_THROW_ON_ERROR);
+        } catch (Throwable) {
+            throw new LegacyArchiveRefusal('archive_integrity');
+        }
+        $tables = self::tablesForTransform($batch->transform_version);
+        if (! is_array($members) || array_diff(array_keys($members), array_keys($tables)) !== []
+            || array_diff(array_keys($tables), array_keys($members)) !== []
+            || CanonicalJson::hash($members) !== $batch->members_sha256) {
+            throw new LegacyArchiveRefusal('archive_integrity');
+        }
+        $count = 0;
+        foreach ($members as $records) {
+            if (! is_array($records)) {
+                throw new LegacyArchiveRefusal('archive_integrity');
+            }
+            foreach ($records as $key => $hash) {
+                if (! is_string($key) || ! is_string($hash) || preg_match('/\A[a-f0-9]{64}\z/D', $key) !== 1
+                    || preg_match('/\A[a-f0-9]{64}\z/D', $hash) !== 1) {
+                    throw new LegacyArchiveRefusal('archive_integrity');
+                }
+            }
+            $count += count($records);
+        }
+        if ($count !== (int) $batch->expected_records) {
+            throw new LegacyArchiveRefusal('archive_integrity');
         }
 
         return $members;
@@ -295,6 +370,7 @@ final class LegacyHistoryArchive
                 && (int) $row->refunded_minor === $record['refunded_minor'] && $row->status === $record['status'] && $row->currency === $record['currency'],
             isset($row->amount_minor) => (int) $row->amount_minor === $record['amount_minor'] && (int) $row->refunded_minor === $record['refunded_minor']
                 && (bool) $row->exclusive === $record['exclusive'] && $row->classification === HistoryNormalizer::CLASSIFICATION,
+            property_exists($row, 'original_id') => self::declarationIntact($row, $record),
             isset($row->original_sha256) => $row->original_sha256 === $record['sha256'] && (int) $row->original_bytes === $record['bytes']
                 && $row->storage_path === self::contractPath($record['sha256']),
             default => false,
@@ -329,7 +405,7 @@ final class LegacyHistoryArchive
 
     private function total(array $snapshot): int
     {
-        return array_sum(array_map(static fn (string $cohort): int => count($snapshot[$cohort]), array_keys(self::TABLES)));
+        return array_sum(array_map(static fn (string $cohort): int => count($snapshot[$cohort]), array_keys(self::tablesForSnapshot($snapshot))));
     }
 
     /** The batch row is created by the first segment and locked by every segment; its identity can never change. */
@@ -369,11 +445,61 @@ final class LegacyHistoryArchive
                 'source_line_id' => $record['source_line_id'], 'track_source_id' => $record['track_source_id'],
                 'license_label' => $record['license_label'], 'exclusive' => $record['exclusive'], 'amount_minor' => $record['amount_minor'],
                 'refunded_minor' => $record['refunded_minor'], 'currency' => $record['currency'], 'classification' => $record['classification']],
+            'contract_declarations' => $this->declarationColumns($record),
             'contracts' => ['line_record_key' => $record['line_record_key'], 'source_contract_id' => $record['source_contract_id'],
                 'original_sha256' => $record['sha256'], 'original_bytes' => $record['bytes'], 'media_type' => $record['media_type'],
                 'storage_path' => $this->storeOriginal($record, $contractFiles)],
         };
         DB::table(self::TABLES[$cohort])->insert($common + $row);
+    }
+
+    private function declarationColumns(array $record): array
+    {
+        $supplied = $record['supplied_original'];
+        $original = $supplied === null ? null : DB::table('legacy_history_contracts')->where('record_key', $record['record_key'])
+            ->where('record_sha256', $supplied['record_sha256'])->first();
+        $columns = ['line_record_key' => $record['line_record_key'], 'order_record_key' => $record['order_record_key'],
+            'source_contract_id' => $record['source_contract_id'], 'original_id' => $original?->id,
+            'supplied_original_record_sha256' => $supplied['record_sha256'] ?? null,
+            'supplied_original_sha256' => $supplied['sha256'] ?? null, 'supplied_original_bytes' => $supplied['bytes'] ?? null];
+        if (! self::declarationIntact((object) ($columns + ['record_key' => $record['record_key']]), $record)) {
+            throw new LegacyArchiveRefusal('contract_original_unverified');
+        }
+
+        return $columns;
+    }
+
+    /** Re-derive both declaration metadata and its exact immutable original link, including stored artifact bytes. */
+    public static function declarationIntact(object $row, array $record): bool
+    {
+        if ($row->line_record_key !== $record['line_record_key'] || $row->order_record_key !== $record['order_record_key']
+            || $row->source_contract_id !== $record['source_contract_id']) {
+            return false;
+        }
+        $supplied = $record['supplied_original'];
+        if ($supplied === null) {
+            return $row->original_id === null && $row->supplied_original_record_sha256 === null
+                && $row->supplied_original_sha256 === null && $row->supplied_original_bytes === null;
+        }
+        if ($row->original_id === null || $row->supplied_original_record_sha256 !== $supplied['record_sha256']
+            || $row->supplied_original_sha256 !== $supplied['sha256'] || (int) $row->supplied_original_bytes !== $supplied['bytes']) {
+            return false;
+        }
+        $original = DB::table('legacy_history_contracts')->where('id', $row->original_id)->first();
+        $originalRecord = $original === null ? null : self::decrypt($original);
+        if ($originalRecord === null || $original->record_key !== $row->record_key || $original->record_sha256 !== $supplied['record_sha256']
+            || $original->original_sha256 !== $supplied['sha256'] || (int) $original->original_bytes !== $supplied['bytes']
+            || $original->storage_path !== self::contractPath($supplied['sha256'])) {
+            return false;
+        }
+        foreach (['source_contract_id', 'source_order_id', 'source_line_id', 'order_record_key', 'line_record_key', 'row', 'row_sha256', 'file_name', 'media_type', 'declared_sha256'] as $field) {
+            if (($originalRecord[$field] ?? null) !== ($record[$field] ?? null)) {
+                return false;
+            }
+        }
+
+        return $originalRecord['sha256'] === $supplied['sha256'] && $originalRecord['bytes'] === $supplied['bytes']
+            && self::artifactState($original->storage_path, $supplied['sha256'], $supplied['bytes']) === 'verified';
     }
 
     /**

@@ -11,7 +11,7 @@ use InvalidArgumentException;
 
 /**
  * Pure, deterministic normalizer from one history source package (see HistorySourceFiles) to the
- * `vasey-legacy-history-v1` snapshot. It opens no database, writes nothing and never boots Laravel.
+ * `vasey-legacy-history-v2` snapshot. It opens no database, writes nothing and never boots Laravel.
  *
  * Every value comes from the sheets, the contract files or the mapping. Nothing is defaulted: an undeclared
  * column, an unknown status or license, an unparseable amount, a broken reference or a contract whose bytes do
@@ -24,9 +24,17 @@ use InvalidArgumentException;
  */
 final class HistoryNormalizer
 {
-    public const SCHEMA = 'vasey-legacy-history-v1';
+    public const SCHEMA_V1 = 'vasey-legacy-history-v1';
 
-    public const TRANSFORM = 'vasey-legacy-history-transform-v1';
+    public const TRANSFORM_V1 = 'vasey-legacy-history-transform-v1';
+
+    public const RECORD_KEY_NAMESPACE = self::SCHEMA_V1;
+
+    public const SCHEMA = 'vasey-legacy-history-v2';
+
+    public const TRANSFORM = 'vasey-legacy-history-transform-v2';
+
+    private array $declarations = [];
 
     public const CLASSIFICATION = 'archive_only';
 
@@ -51,6 +59,7 @@ final class HistoryNormalizer
     public function normalize(array $source): array
     {
         $this->findings = [];
+        $this->declarations = [];
         $this->exceptions = [];
         $mapping = (new HistoryMapping)->decode($source['mapping']);
         $synthetic = $mapping['acquisition_method'] === 'synthetic_fixture';
@@ -72,10 +81,10 @@ final class HistoryNormalizer
         $customers = $this->customers($sheets['customers'], $mapping, $synthetic);
         [$orders, $lines] = $this->orders($sheets['orders'], $mapping, $synthetic, $customers);
         $contracts = $this->contracts($sheets['contracts'], $mapping, $synthetic, $lines, $source['contracts']);
-        $eligibility = $this->eligibility($customers, $orders, $lines, $contracts);
+        $eligibility = $this->eligibility($customers, $orders, $lines, $this->declarations);
 
         $counts = ['customers' => count($customers), 'orders' => count($orders), 'lines' => count($lines),
-            'contracts' => count($contracts), 'contract_files' => count($source['contracts']),
+            'contracts' => count($contracts), 'contract_declarations' => count($this->declarations), 'contract_files' => count($source['contracts']),
             'findings' => count($this->findings), 'exceptions' => count($this->exceptions)];
         $findings = $this->findings;
         usort($findings, static fn (array $a, array $b): int => [array_search($a['sheet'], array_keys(HistorySourceFiles::SHEETS), true), $a['row'] ?? 0, $a['code'], $a['column'] ?? '']
@@ -90,7 +99,7 @@ final class HistoryNormalizer
                 'acquisition_method' => $mapping['acquisition_method'], 'acquired_at' => $mapping['acquired_at'],
                 'source_as_of' => $mapping['source_as_of'], 'currency' => $mapping['currency'], 'inputs' => $inputs,
                 'customers' => array_values($customers), 'orders' => array_values($orders), 'lines' => array_values($lines),
-                'contracts' => array_values($contracts), 'exceptions' => array_values(array_unique($exceptions, SORT_REGULAR)),
+                'contracts' => array_values($contracts), 'contract_declarations' => array_values($this->declarations), 'exceptions' => array_values(array_unique($exceptions, SORT_REGULAR)),
                 'eligibility' => $eligibility];
             $counts['exceptions'] = count($snapshot['exceptions']);
         }
@@ -102,7 +111,7 @@ final class HistoryNormalizer
     /** Stable identity of one source record across snapshots of the same source system. */
     public static function recordKey(string $cohort, string $sourceSystem, string ...$sourceIds): string
     {
-        return hash('sha256', self::SCHEMA."\n".$cohort."\n".$sourceSystem."\n".implode("\n", $sourceIds));
+        return hash('sha256', self::RECORD_KEY_NAMESPACE."\n".$cohort."\n".$sourceSystem."\n".implode("\n", $sourceIds));
     }
 
     /** The record hash binds every field except the hash itself. */
@@ -377,8 +386,7 @@ final class HistoryNormalizer
         // An exclusive sold more than once (not fully refunded) is preserved for every buyer and flagged; never revoked.
         $exclusive = [];
         foreach ($lines as $line) {
-            if ($line['exclusive'] && in_array($orders[$line['order_record_key']]['status'], ['paid', 'partially_refunded', 'unknown'], true)
-                && $line['refunded_minor'] < $line['amount_minor']) {
+            if ($line['exclusive'] && CompetingExclusiveSale::remains($orders[$line['order_record_key']]['status'], $line['amount_minor'], $line['refunded_minor'])) {
                 $exclusive[$line['track_source_id']][] = $line['record_key'];
             }
         }
@@ -473,19 +481,26 @@ final class HistoryNormalizer
                 continue;
             }
             $key = self::recordKey('contract', $mapping['source_system'], $id);
-            if ($bytes === null) {
-                // A declared original that was not supplied is an exception; no contract text is ever produced for it.
-                $this->exception('line', $line['record_key'], 'contract_original_missing');
-
-                continue;
-            }
-            $record = ['record_key' => $key, 'source_contract_id' => $id, 'source_order_id' => $line['source_order_id'],
+            $declaration = ['record_key' => $key, 'source_contract_id' => $id, 'source_order_id' => $line['source_order_id'],
                 'source_line_id' => $line['source_line_id'], 'order_record_key' => $line['order_record_key'],
                 'line_record_key' => $line['record_key'], 'row' => $row['row'], 'row_sha256' => $row['row_sha256'],
                 'file_name' => $name, 'media_type' => $mapping['contracts']['media_types'][$extension],
-                'sha256' => hash('sha256', $bytes), 'bytes' => strlen($bytes), 'declared_sha256' => $declared];
-            $record['record_sha256'] = self::recordHash($record);
-            $contracts[$key] = $record;
+                'declared_sha256' => $declared, 'supplied_original' => null];
+            if ($bytes === null) {
+                $this->exception('line', $line['record_key'], 'contract_original_missing');
+            } else {
+                // Original records retain their exact v1 shape/hash; declarations do not synthesize an artifact.
+                $record = $declaration;
+                unset($record['supplied_original']);
+                $record['sha256'] = hash('sha256', $bytes);
+                $record['bytes'] = strlen($bytes);
+                $record['record_sha256'] = self::recordHash($record);
+                $contracts[$key] = $record;
+                $declaration['supplied_original'] = ['record_sha256' => $record['record_sha256'],
+                    'sha256' => $record['sha256'], 'bytes' => $record['bytes']];
+            }
+            $declaration['record_sha256'] = self::recordHash($declaration);
+            $this->declarations[$key] = $declaration;
         }
         foreach (array_keys($files) as $file) {
             if (! isset($referenced[$file])) {
@@ -494,6 +509,7 @@ final class HistoryNormalizer
             }
         }
         ksort($contracts, SORT_STRING);
+        ksort($this->declarations, SORT_STRING);
 
         return $contracts;
     }

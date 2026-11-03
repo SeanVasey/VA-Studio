@@ -103,6 +103,19 @@ class LegacyHistoryReviewConditionsTest extends TestCase
             $this->assertSame(['reviewer_imported_evidence'], LegacyHistoryFixtures::review($review, $exclusive, $shaper, 'SYNTHETIC', false)['blockers']);
             $this->refused('not_eligible', fn () => LegacyHistoryFixtures::review($review, $exclusive, $shaper, 'SYNTHETIC', true));
         }
+        // R-2: C's newer omission must not launder the actors who authored the retained clearing version.
+        $omittingAgain = $this->load('baseline', function (array $parts): array {
+            $parts['mapping'] = str_replace(['2026-09-01T01:00:00Z', '2026-09-01T00:00:00Z'],
+                ['2026-10-03T01:00:00Z', '2026-10-03T00:00:00Z'], $parts['mapping']);
+
+            return $parts;
+        });
+        LegacyHistoryFixtures::import($omittingAgain['snapshot'], $omittingAgain['sha'], $omittingAgain['files'], $c, 1000);
+        foreach ([$b, $d] as $shaper) {
+            $this->assertContains('reviewer_imported_evidence', LegacyHistoryFixtures::review($review, $exclusive, $shaper, 'SYNTHETIC', false)['blockers']);
+            $this->refused('not_eligible', fn () => LegacyHistoryFixtures::review($review, $exclusive, $shaper, 'SYNTHETIC', true));
+        }
+        $c = LicenseFixtures::admin();
         $this->assertSame('recorded', LegacyHistoryFixtures::review($review, $exclusive, $c, 'SYNTHETIC', true)['outcome']);
         $this->assertSame('verified_grant', $review->classification($exclusive));
         $this->assertSame(['ambiguous_customer_identity'], $review->inspect($basic)['blockers']);
@@ -124,6 +137,88 @@ class LegacyHistoryReviewConditionsTest extends TestCase
         $omitting = $this->load('baseline', fn (array $parts): array => ['mapping' => $this->newer($parts['mapping'])] + $parts);
         LegacyHistoryFixtures::import($omitting['snapshot'], $omitting['sha'], $omitting['files'], $b, 1000);
         $this->assertSame(['multiple_contracts'], $review->inspect($line)['blockers']);
+    }
+
+    public function test_an_incomplete_intermediate_export_cannot_hide_a_retained_competitor(): void
+    {
+        [$a, $b, $c] = [LicenseFixtures::admin(), LicenseFixtures::admin(), LicenseFixtures::admin()];
+        $sale = "synthetic-ord-1009,1,synthetic-cust-001,2026-08-09T10:00:00Z,Completed,synthetic-track-03,Exclusive Rights,500,0,synthetic-pay-1009,USD\n";
+        $baseline = $this->load('baseline', function (array $parts) use ($sale): array {
+            $parts['orders'] .= $sale;
+
+            return $parts;
+        });
+        LegacyHistoryFixtures::import($baseline['snapshot'], $baseline['sha'], $baseline['files'], $a, 1000);
+        $partial = $this->load('baseline', function (array $parts) use ($sale): array {
+            $parts['mapping'] = $this->newer($parts['mapping']);
+            $parts['orders'] .= str_replace(['Completed', '500,0,'], ['Refunded', '500,500,'], $sale);
+
+            return $parts;
+        });
+        $this->assertFalse(LegacyHistoryFixtures::import($partial['snapshot'], $partial['sha'], $partial['files'], $b, 1)['complete']);
+        $omitting = $this->load('baseline', function (array $parts): array {
+            $parts['mapping'] = str_replace(['2026-09-01T01:00:00Z', '2026-09-01T00:00:00Z'],
+                ['2026-10-03T01:00:00Z', '2026-10-03T00:00:00Z'], $parts['mapping']);
+
+            return $parts;
+        });
+        LegacyHistoryFixtures::import($omitting['snapshot'], $omitting['sha'], $omitting['files'], $c, 1000);
+        $review = new LegacyGrantReview;
+        $line = $this->line($baseline['snapshot'], 'synthetic-ord-1002');
+        $this->assertSame(['retained_export_not_archived'], $review->inspect($line)['blockers']);
+        $this->assertTrue(LegacyHistoryFixtures::import($partial['snapshot'], $partial['sha'], $partial['files'], $b, 1000)['complete']);
+        $this->assertSame([], $review->inspect($line)['blockers']);
+        $this->assertContains('reviewer_imported_evidence', LegacyHistoryFixtures::review($review, $line, $b, 'SYNTHETIC', false)['blockers']);
+    }
+
+    public function test_moved_competitor_versions_keep_their_authors_excluded_after_copy_and_omission(): void
+    {
+        foreach (['customer', 'line', 'contract'] as $kind) {
+            foreach ([false, true] as $copy) {
+                [$a, $b, $c, $d] = [LicenseFixtures::admin(), LicenseFixtures::admin(), LicenseFixtures::admin(), LicenseFixtures::admin()];
+                // Distinct source namespace keeps each synthetic scenario independent in this test transaction.
+                $make = function (array $parts, int $stage) use ($kind, $copy): array {
+                    $parts['mapping'] = str_replace('synthetic/beatstars-history', 'synthetic/'.$kind.($copy ? '-copy' : '-omit'), $parts['mapping']);
+                    if ($stage > 0) {
+                        $parts['mapping'] = str_replace(['2026-09-01T01:00:00Z', '2026-09-01T00:00:00Z'],
+                            ['2026-10-0'.$stage.'T01:00:00Z', '2026-10-0'.$stage.'T00:00:00Z'], $parts['mapping']);
+                    }
+                    if ($stage < 2 || $copy) {
+                        $moved = $stage > 0;
+                        if ($kind === 'customer') {
+                            $parts['customers'] .= 'synthetic-cust-009,'.($moved ? 'moved@example.invalid' : 'Buyer.One@example.invalid').",SYNTHETIC Buyer Nine,\n";
+                        } elseif ($kind === 'line') {
+                            $parts['orders'] .= 'synthetic-ord-1009,1,synthetic-cust-001,2026-08-09T10:00:00Z,Completed,'.($moved ? 'synthetic-track-moved' : 'synthetic-track-03').",Exclusive Rights,500,0,synthetic-pay-1009,USD\n";
+                        } else {
+                            $parts['contracts'] .= 'synthetic-contract-extra,synthetic-ord-1001,'.($moved ? '2' : '1').",synthetic-extra.txt,\n";
+                            $parts['files']['synthetic-extra.txt'] = "SYNTHETIC extra original\n";
+                        }
+                    }
+
+                    return $parts;
+                };
+                $baseline = $this->load('baseline', fn ($parts) => $make($parts, 0));
+                LegacyHistoryFixtures::import($baseline['snapshot'], $baseline['sha'], $baseline['files'], $a, 1000);
+                $clearing = $this->load('baseline', fn ($parts) => $make($parts, 1));
+                LegacyHistoryFixtures::import($clearing['snapshot'], $clearing['sha'], $clearing['files'], $b, 1000);
+                $later = $this->load('baseline', fn ($parts) => $make($parts, 2));
+                LegacyHistoryFixtures::import($later['snapshot'], $later['sha'], $later['files'], $c, 1000);
+                $line = $this->line($baseline['snapshot'], $kind === 'line' ? 'synthetic-ord-1002' : 'synthetic-ord-1001');
+                $review = new LegacyGrantReview;
+                $this->assertContains('reviewer_imported_evidence', LegacyHistoryFixtures::review($review, $line, $b, 'SYNTHETIC', false)['blockers'], $kind);
+                if ($kind === 'contract') {
+                    $this->assertContains('contract_declaration_relinked', $review->inspect($line)['blockers']);
+                    $this->assertContains('multiple_contracts', $review->inspect($line)['blockers']);
+                    $this->refused('not_eligible', fn () => LegacyHistoryFixtures::review($review, $line, $d, 'SYNTHETIC', true));
+
+                    continue;
+                }
+                $this->assertSame([], $review->inspect($line)['blockers'], $kind);
+                $this->assertContains('reviewer_imported_evidence', LegacyHistoryFixtures::review($review, $line, $b, 'SYNTHETIC', false)['blockers'], $kind);
+                $this->refused('not_eligible', fn () => LegacyHistoryFixtures::review($review, $line, $b, 'SYNTHETIC', true));
+                $this->assertSame('recorded', LegacyHistoryFixtures::review($review, $line, $d, 'SYNTHETIC', true)['outcome']);
+            }
+        }
     }
 
     private function newer(string $mapping): string

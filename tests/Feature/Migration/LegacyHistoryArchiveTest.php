@@ -10,6 +10,7 @@ use App\Support\CanonicalJson;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Tests\Support\LegacyHistoryFixtures;
 use Tests\Support\LicenseFixtures;
@@ -50,8 +51,8 @@ class LegacyHistoryArchiveTest extends TestCase
             $segment = LegacyHistoryFixtures::import($snapshot, $sha, $loaded['source']['contracts'], $importer, 5);
             $segments[] = [$segment['processed'], $segment['pending'], $segment['complete']];
         } while (! $segment['complete']);
-        $this->assertSame([[5, 12, false], [5, 7, false], [5, 2, false], [2, 0, true]], $segments);
-        $this->assertSame(17, $segment['total']);
+        $this->assertSame([[5, 17, false], [5, 12, false], [5, 7, false], [5, 2, false], [2, 0, true]], $segments);
+        $this->assertSame(22, $segment['total']);
         $this->assertSame([4, 4, 5, 4, 1], $this->tableCounts());
 
         $report = $this->archive->reconcile($snapshot, $sha);
@@ -67,7 +68,7 @@ class LegacyHistoryArchiveTest extends TestCase
         $this->assertSame($before, LegacyHistoryFixtures::nonArchiveState());
         $this->assertSame(['archive_only'], DB::table('legacy_history_lines')->distinct()->pluck('classification')->all());
         $this->assertSame(['unknown'], DB::table('legacy_history_customers')->distinct()->pluck('marketing_consent')->all());
-        $this->assertSame(5, DB::table('audit_events')->where('action', LegacyHistoryArchive::SEGMENT_ACTION)->count());
+        $this->assertSame(6, DB::table('audit_events')->where('action', LegacyHistoryArchive::SEGMENT_ACTION)->count());
 
         // Originals are byte-exact, private and addressed by hash; personal data is stored only encrypted.
         foreach (DB::table('legacy_history_contracts')->get() as $row) {
@@ -99,7 +100,7 @@ class LegacyHistoryArchiveTest extends TestCase
         }
         $this->assertSame($committed, $this->tableCounts());
         $resumed = LegacyHistoryFixtures::import($snapshot, $sha, $files, $importer, 1000);
-        $this->assertSame([11, 0, true], [$resumed['processed'], $resumed['pending'], $resumed['complete']]);
+        $this->assertSame([16, 0, true], [$resumed['processed'], $resumed['pending'], $resumed['complete']]);
         $this->assertSame([4, 4, 5, 4, 1], $this->tableCounts());
         $this->assertSame('reconciled', $this->archive->reconcile($snapshot, $sha)['result']);
     }
@@ -117,7 +118,10 @@ class LegacyHistoryArchiveTest extends TestCase
         $this->assertSame('unreconciled', $report['result']);
         $this->assertSame([$contracts[0]->record_key], $report['artifacts']['hash_mismatch']);
         $this->assertSame([$contracts[1]->record_key], $report['artifacts']['missing']);
-        $this->assertSame(2, $report['unexplained']);
+        // Two original integrity failures, two artifact failures, and their two linked declarations.
+        $this->assertEqualsCanonicalizing([$contracts[0]->record_key, $contracts[1]->record_key],
+            array_column(array_filter($report['integrity_failures'], fn ($failure) => $failure['cohort'] === 'contract_declarations'), 'record_key'));
+        $this->assertSame(6, $report['unexplained']);
 
         $this->expectExceptionObject(new LegacyArchiveRefusal('snapshot_mismatch'));
         LegacyHistoryFixtures::import(['snapshot_id' => 'changed'] + $snapshot, $sha, $files, $importer, 1000);
@@ -157,7 +161,7 @@ class LegacyHistoryArchiveTest extends TestCase
 
         $plan = $this->archive->plan($later['result']['snapshot'], $later['result']['snapshot_sha256']);
         $this->assertSame(['customers' => ['create' => 1, 'skip' => 4], 'orders' => ['create' => 2, 'skip' => 3],
-            'lines' => ['create' => 3, 'skip' => 3], 'contracts' => ['create' => 1, 'skip' => 4]], $plan['cohorts']);
+            'lines' => ['create' => 3, 'skip' => 3], 'contracts' => ['create' => 1, 'skip' => 4], 'contract_declarations' => ['create' => 1, 'skip' => 5]], $plan['cohorts']);
         LegacyHistoryFixtures::import($later['result']['snapshot'], $later['result']['snapshot_sha256'], $later['source']['contracts'], $importer, 1000);
         $this->assertSame([5, 6, 8, 5, 2], $this->tableCounts());
         // The baseline's versions stay; both snapshots reconcile against the same immutable archive.
@@ -201,7 +205,7 @@ class LegacyHistoryArchiveTest extends TestCase
         $this->assertFalse(DB::table('audit_events')->where('action', LegacyGrantReview::REVIEW_ACTION)->sole()->context === null);
 
         foreach (['synthetic-ord-1003/1' => ['ambiguous_customer_identity', 'line_refunded', 'order_not_paid'],
-            'synthetic-ord-1004/1' => ['ambiguous_customer_identity', 'contract_absent', 'payment_reference_missing']] as $line => $blockers) {
+            'synthetic-ord-1004/1' => ['ambiguous_customer_identity', 'contract_original_missing', 'payment_reference_missing']] as $line => $blockers) {
             $this->assertSame($blockers, $review->inspect($lines[$line])['blockers'], $line);
             try {
                 LegacyHistoryFixtures::review($review, $lines[$line], $reviewer, 'SYNTHETIC review reference', true);
@@ -218,12 +222,19 @@ class LegacyHistoryArchiveTest extends TestCase
         $this->assertSame(1, DB::table('legacy_history_grant_reviews')->count());
     }
 
-    public function test_a_second_unrefunded_exclusive_sale_blocks_review_of_both(): void
+    public static function exclusiveAmounts(): array
+    {
+        return ['positive' => [500], 'zero' => [0]];
+    }
+
+    #[DataProvider('exclusiveAmounts')]
+    public function test_a_second_unrefunded_exclusive_sale_blocks_review_of_both(int $amount): void
     {
         $importer = LicenseFixtures::admin();
         $reviewer = LicenseFixtures::admin();
-        $loaded = $this->archive->load(LegacyHistoryFixtures::privateCopy('baseline', function (array $parts): array {
-            $parts['orders'] .= "synthetic-ord-1009,1,synthetic-cust-001,2026-08-09T10:00:00Z,Completed,synthetic-track-03,Exclusive Rights,500,0,synthetic-pay-1009,USD\n";
+        $loaded = $this->archive->load(LegacyHistoryFixtures::privateCopy('baseline', function (array $parts) use ($amount): array {
+            $parts['orders'] = str_replace('Exclusive Rights,500,0,', "Exclusive Rights,$amount,0,", $parts['orders']);
+            $parts['orders'] .= "synthetic-ord-1009,1,synthetic-cust-001,2026-08-09T10:00:00Z,Completed,synthetic-track-03,Exclusive Rights,$amount,0,synthetic-pay-1009,USD\n";
             $parts['contracts'] .= "synthetic-contract-1009-1,synthetic-ord-1009,1,synthetic-contract-1009-1.txt,\n";
             $parts['files']['synthetic-contract-1009-1.txt'] = "SYNTHETIC CONTRACT ORIGINAL 1009-1\n";
 
@@ -235,6 +246,12 @@ class LegacyHistoryArchiveTest extends TestCase
         foreach ($loaded['result']['snapshot']['lines'] as $line) {
             if ($line['track_source_id'] === 'synthetic-track-03') {
                 $this->assertContains('duplicate_exclusive_sale', LegacyHistoryFixtures::review($review, $line['record_key'], $reviewer, 'SYNTHETIC', false)['blockers']);
+                try {
+                    LegacyHistoryFixtures::review($review, $line['record_key'], $reviewer, 'SYNTHETIC duplicate exclusive', true);
+                    $this->fail('Duplicate exclusive sale admitted');
+                } catch (LegacyArchiveRefusal $exception) {
+                    $this->assertSame('not_eligible', $exception->reason);
+                }
             }
         }
         $this->assertSame(0, DB::table('legacy_history_grant_reviews')->count());
@@ -247,7 +264,12 @@ class LegacyHistoryArchiveTest extends TestCase
         $loaded = $this->archive->load(LegacyHistoryFixtures::privateCopy('baseline'));
         LegacyHistoryFixtures::import($loaded['result']['snapshot'], $loaded['result']['snapshot_sha256'], $loaded['source']['contracts'], $importer, 1);
         $batch = DB::table('legacy_history_batches')->sole();
-        $this->assertSame([$loaded['result']['snapshot_sha256'], 'synthetic-history-baseline', 'synthetic_fixture', '2026-09-01T00:00:00Z', 17],
+        $snapshot = $loaded['result']['snapshot'];
+        $this->assertSame([4, 4, 5, 4, 5], array_map(fn ($cohort) => count($snapshot[$cohort]),
+            ['customers', 'orders', 'lines', 'contracts', 'contract_declarations']));
+        $this->assertEqualsCanonicalizing(['synthetic-contract-1001-1', 'synthetic-contract-1001-2', 'synthetic-contract-1002-1',
+            'synthetic-contract-1003-1', 'synthetic-contract-1004-1'], array_column($snapshot['contract_declarations'], 'source_contract_id'));
+        $this->assertSame([$loaded['result']['snapshot_sha256'], 'synthetic-history-baseline', 'synthetic_fixture', '2026-09-01T00:00:00Z', 22],
             [$batch->snapshot_sha256, $batch->snapshot_id, $batch->acquisition_method, $batch->source_as_of, (int) $batch->expected_records]);
         $this->assertSame(CanonicalJson::hash($loaded['result']['snapshot']), $batch->snapshot_sha256);
         $this->assertInstanceOf(User::class, User::find($batch->actor_id));
