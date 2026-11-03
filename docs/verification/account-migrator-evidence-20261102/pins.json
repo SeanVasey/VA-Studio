@@ -74,6 +74,6 @@
     "source_carry": "Feature, fixed worker, supervisor and pure controls remain byte-identical b0bf/a041. Launcher changes only supported PHP binary literal and fixed external private parent entry; no process protocol or deadline change."
   },
   "migrator_run_method_expression": "$migration->{$method}();",
-  "supervisor_python_version": "3.12.14",
-  "supervisor_python_binary_sha256": "fa67443527ed9647f760d807e2a38f26340757123e643c4639cf273ed15d5ea7"
+  "supervisor_python_version": "3.13.5",
+  "supervisor_python_binary_sha256": "889c603f0d17cb54060951bcf4c4f9b8c9ebd9e52b392c70209bbb9755d797d9"
 }

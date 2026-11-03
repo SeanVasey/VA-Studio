@@ -17,7 +17,7 @@ The original worktree and historical review packets remain untouched.
 query compiler files, and candidate bootstrap/console/config source. Coordinator
 call lines72/15/20 and migration lines13/18 remain exact. `composer.lock` is unchanged:
 Laravel13.38.0, source `c42f9abd4a3d2f9a3cd6be109255ddce8092ceb8`. Framework
-line518 and vendor/PHP/Python binary hashes remain **prior expected pins**, checked
+line518 and vendor/PHP binary hashes remain **prior expected pins**, checked
 by the existing runtime code when eventually invoked; no binary/vendor contents or
 metadata were read or newly measured during this carry. Current component cost108
 and memo first31/hit14/full2 do not turn the old cost133 failure into a ledger pass.
@@ -27,7 +27,7 @@ and memo first31/hit14/full2 do not turn the old cost133 failure into a ledger p
 `AccountAdmissionMigratorTest::test_normal_migrator_process_interruption_and_genuine_ledger_resume`
 has exactly four providers: `up-overlap`, `down-overlap`, `up-end`, `down-end`.
 After ROOT qualifies the candidate, the existing launcher takes **one** provider:
-`python3 docs/verification/account-migrator-evidence-20261102/run-one.py up-overlap`.
+`/usr/bin/python3.13 docs/verification/account-migrator-evidence-20261102/run-one.py up-overlap`.
 This is a queued inner selection, not authorization to invoke it now. No automatic
 next case/retry, direct PHPUnit invocation or new fixture follows from this note.
 
@@ -72,7 +72,7 @@ overlap10, registration2, bounded output/private custody and sole reapers remain
   The launcher now selects `/usr/bin/php8.4`, matching frozen04's source specification,
   with the unchanged prior binary hash. ROOT must verify the actual binary and
   runtime before execution. No executable/symlink metadata was inspected here.
-  Actual PHP8.4.27/PCNTL/POSIX, Python3.12.14, pidfd/SCM credentials, descriptor
+  Actual PHP8.4.27/PCNTL/POSIX, Python3.13.5, pidfd/SCM credentials, descriptor
   handoff and private output custody still require verification. No credentials
   or runtime environment were read or changed here.
 
@@ -101,3 +101,14 @@ Source controls and pins do not establish a migration/restart pass.
 Current source checks: the unchanged 17 supervisor controls and 15 external
 HOST controls passed. PHP syntax, native execution, live binary/observer
 qualification and all four ledger providers remain unrun for this candidate.
+
+The future launcher runs inside the existing PHP container, where ROOT's public
+identity receipt observed Python3.13.5 at `/usr/bin/python3.13`, SHA256
+`889c603f0d17cb54060951bcf4c4f9b8c9ebd9e52b392c70209bbb9755d797d9`.
+The outer driver now selects that exact path and the tracked identity pins match.
+Host Python3.12.14 / `fa67443527ed9647f760d807e2a38f26340757123e643c4639cf273ed15d5ea7`
+remains separate historical host evidence. Interpreter identity is not actual
+pidfd/SCM protocol or ledger acceptance; those executions remain unrun.
+The earlier no-measurement statements describe the source carry; this rebind uses
+ROOT's retained receipt and performs no new runtime probe. Its 16 HOST controls
+passed; the unchanged 17 supervisor controls were not rerun.
