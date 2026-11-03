@@ -5,10 +5,11 @@ follow-up source candidate, not a core-account PR blocker or runtime-ready packe
 **Execution requires ROOT's fixture qualification and candidate runtime/autoload
 binding.** No permission decision is waiting on Sean.
 
-The test, fixed worker, launcher, supervisor and pure-control files are byte-identical
+The test, fixed worker, supervisor and pure-control files are byte-identical
 to **`b0bf7fd3cc9e7f842817830a20a49551f01ca4d1`**. That candidate carries independent
 source-fitness approval for **`dd63d26cfa466bbcfef312a6fe2263fccccf1b50`** and
 author-reported **17 pure controls**; those remain historical source evidence.
+The launcher now binds `/usr/bin/php8.4` and one hash-checked external parent entry.
 No algorithm, assertion, audit, signal schedule, custody or deadline changed here.
 The original worktree and historical review packets remain untouched.
 
@@ -68,10 +69,9 @@ overlap10, registration2, bounded output/private custody and sole reapers remain
   existing reflection/source pins. Do not share old7347/a9b application autoload
   metadata. The exact minimum remaining preparation is candidate-bound dependency
   autoload/runtime wiring; no product bootstrap change or new supervisor is needed.
-  The carried launcher selects `/usr/bin/php`; frozen04's source specification
-  selects `/usr/bin/php8.4` with the same prior binary hash. ROOT must verify the
-  former resolves to that pinned binary, or coordinate a one-line launcher path
-  binding before execution. No executable/symlink metadata was inspected here.
+  The launcher now selects `/usr/bin/php8.4`, matching frozen04's source specification,
+  with the unchanged prior binary hash. ROOT must verify the actual binary and
+  runtime before execution. No executable/symlink metadata was inspected here.
   Actual PHP8.4.27/PCNTL/POSIX, Python3.12.14, pidfd/SCM credentials, descriptor
   handoff and private output custody still require verification. No credentials
   or runtime environment were read or changed here.
@@ -81,3 +81,22 @@ checks were performed. The unchanged 17 pure controls were not repeated. No PHP,
 test, worker, signal, Docker, SQL, migration, native probe or runtime preparation
 was executed. No census or workflow change is included; ROOT must integrate this
 new native method and regenerate discovery when the follow-up is selected.
+
+## Candidate runtime wiring — source only
+
+`account-ledger-runtime-v1` is an external fixed adapter. Its parent entry preserves
+the approved private descriptor loader, uses the canonical PHPUnit entry explicitly,
+and maps App/Tests/Database to this candidate while borrowing only verified locked
+dependencies. An additive private INI carries that source binding to the unchanged
+worker and ordinary artisan restart. The killed worker has a source-binding record
+joined to the original supervisor PID and existing ready/stack/reflection proof;
+restart application origins are observed without migration-event instrumentation.
+The parent retains the actual Prepared application-origin witness. No product
+environment configuration, migration/ledger implementation or supervisor protocol
+changes. ROOT must materialize the declared candidate source/dependency link,
+qualify the observer profile, review the exact candidate and run one provider.
+Source controls and pins do not establish a migration/restart pass.
+
+Current source checks: the unchanged 17 supervisor controls and 15 external
+HOST controls passed. PHP syntax, native execution, live binary/observer
+qualification and all four ledger providers remain unrun for this candidate.

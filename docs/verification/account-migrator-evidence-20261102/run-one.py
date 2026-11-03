@@ -17,7 +17,9 @@ import tempfile
 import time
 from supervision import CASES, Supervision
 
-PHP = '/usr/bin/php'
+PHP = '/usr/bin/php8.4'
+ENTRY = '/workspace/account-guard-evidence-20261101/account-ledger-runtime-v1/parent-entry.php'
+ENTRY_HASH = 'f9c5b502b8757f79a49ff6766036c0483d98e042f29acaf33ed3996696fde64d'
 PHP_HASH = 'c984d1f078b3b0c457520723e36ab0fdf34d53a587495784228e2e52e7e23e44'
 MAX_FRAME = 2048
 
@@ -51,7 +53,7 @@ def engine(root, case, nonce, endpoint, gate):
         pins = json.loads(Path('docs/verification/account-migrator-evidence-20261102/pins.json').read_text())
         if sys.version.split()[0] != pins['supervisor_python_version'] or hashlib.sha256(Path(sys.executable).read_bytes()).hexdigest() != pins['supervisor_python_binary_sha256']:
             os._exit(125)
-        if hashlib.sha256(Path(PHP).read_bytes()).hexdigest() != PHP_HASH:
+        if hashlib.sha256(Path(PHP).read_bytes()).hexdigest() != PHP_HASH or hashlib.sha256(Path(ENTRY).read_bytes()).hexdigest() != ENTRY_HASH:
             os._exit(125)
         evidence = Path(tempfile.mkdtemp(prefix='account-migrator-one-'))
         evidence.chmod(0o700)
@@ -65,13 +67,7 @@ def engine(root, case, nonce, endpoint, gate):
         os.set_inheritable(7, True)
         if endpoint.fileno() != 7:
             endpoint.close()
-        expression = ('$GLOBALS["accountMigratorSelectedCase"]=$argv[1];'
-                      '$GLOBALS["accountMigratorEvidenceDirectory"]=$argv[2];'
-                      '$GLOBALS["accountMigratorSupervisorNonce"]=$argv[3];'
-                      '$argv=array_merge([$argv[0]],array_slice($argv,4));'
-                      '$_SERVER["argv"]=$argv;$_SERVER["argc"]=count($argv);'
-                      'require "vendor/phpunit/phpunit/phpunit";')
-        command = [PHP, '-r', expression, case, str(evidence), nonce, '--filter',
+        command = [PHP, '-d', 'memory_limit=512M', ENTRY, case, str(evidence), nonce, '--filter',
                    'test_normal_migrator_process_interruption_and_genuine_ledger_resume.*"' + case + '"',
                    '--stop-on-failure', '--stop-on-error', '--stop-on-warning', '--fail-on-risky',
                    '--fail-on-warning', '--fail-on-incomplete', '--fail-on-skipped', '--log-junit', str(evidence / 'junit.xml'),
