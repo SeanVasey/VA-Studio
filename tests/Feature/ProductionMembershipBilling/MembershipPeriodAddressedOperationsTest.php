@@ -105,9 +105,8 @@ class MembershipPeriodAddressedOperationsTest extends TestCase
         $fixture = $this->reservationFixture();
         $periods = DB::table(MembershipPeriodRecords::PERIODS)->orderBy('id')->get()->map(static fn (object $row): array => (array) $row)->all();
         $events = DB::table(MembershipPeriodRecords::EVENTS)->orderBy('id')->get()->map(static fn (object $row): array => (array) $row)->all();
-        [$failure, $calls] = $this->withBillingSampleFailure(fn (object $counter) => $this->capturedRefusal(fn () =>
-            (new MembershipReservationOperations)->reserveInPeriod($fixture['award']['period_id'], $fixture['selection'],
-                $fixture['expected_revision'], 'unexpected-billing', $fixture['buyer']['principal'], $fixture['buyer']['user'])));
+        [$failure, $calls] = $this->withBillingSampleFailure(fn (object $counter) => $this->capturedRefusal(fn () => (new MembershipReservationOperations)->reserveInPeriod($fixture['award']['period_id'], $fixture['selection'],
+            $fixture['expected_revision'], 'unexpected-billing', $fixture['buyer']['principal'], $fixture['buyer']['user'])));
         $this->assertSame(1, $calls, 'The real billing-evidence path must reach the failure.');
         $this->assertSame('operation_refused', $failure->reason);
         $response = MembershipPrivacy::refusal($failure, true);
