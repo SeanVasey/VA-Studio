@@ -52,12 +52,12 @@ use WeakMap;
 final class MembershipCustomerIndex
 {
     /** Newest periods shown; one further sentinel row only reports that older periods exist. */
-    public const LIMIT = MembershipPolicy::MAX_PERIODS;
+    public const LIMIT = 10;
 
     /** @var WeakMap<MembershipCustomerRead, array>|null */
     private static ?WeakMap $reads = null;
 
-    public function index(ProductionCustomerPrincipal $principal, User $actor, ?MembershipCustomerRead $read = null): array
+    public function index(ProductionCustomerPrincipal $principal, User $actor, ?MembershipCustomerRead $read = null, ?string $before = null): array
     {
         // One original 60-second budget covers this read and any later pre-bytes proof; it is never renewed.
         $deadline = hrtime(true) + 60_000_000_000;
@@ -67,10 +67,10 @@ final class MembershipCustomerIndex
             // Claimed before any work: a failed index leaves the read unusable, never capturable later.
             self::$reads[$read] = ['state' => 'claimed'];
         }
-        [$projection, $baseline] = $this->collect($principal, $actor, $deadline);
+        [$projection, $baseline] = $this->collect($principal, $actor, $deadline, $before);
         if ($read !== null) {
             self::$reads[$read] = ['state' => 'captured', 'index' => $this, 'principal' => $principal, 'actor' => $actor,
-                'deadline' => $deadline, 'projection' => $projection, 'baseline' => $baseline];
+                'before' => $before, 'deadline' => $deadline, 'projection' => $projection, 'baseline' => $baseline];
         }
 
         return $projection;
@@ -91,16 +91,16 @@ final class MembershipCustomerIndex
         }
         MembershipException::require(is_array($entry) && $entry['state'] === 'captured', 'foreign_customer_read');
         MembershipException::require(hrtime(true) < $entry['deadline'], 'operation_deadline');
-        [$projection, $baseline] = $entry['index']->collect($entry['principal'], $entry['actor'], $entry['deadline']);
+        [$projection, $baseline] = $entry['index']->collect($entry['principal'], $entry['actor'], $entry['deadline'], $entry['before']);
         MembershipException::require(CanonicalJson::encode($projection) === CanonicalJson::encode($entry['projection'])
             && $baseline === $entry['baseline'], 'changed_before_bytes');
         MembershipException::require(hrtime(true) < $entry['deadline'], 'operation_deadline');
     }
 
-    private function collect(ProductionCustomerPrincipal $principal, User $actor, int $deadline): array
+    private function collect(ProductionCustomerPrincipal $principal, User $actor, int $deadline, ?string $before): array
     {
         try {
-            return $this->collectOwned($principal, $actor, $deadline);
+            return $this->collectOwned($principal, $actor, $deadline, $before);
         } catch (MembershipException $error) {
             throw $error;
         } catch (IdentityException $error) {
@@ -110,7 +110,7 @@ final class MembershipCustomerIndex
         }
     }
 
-    private function collectOwned(ProductionCustomerPrincipal $principal, User $actor, int $deadline): array
+    private function collectOwned(ProductionCustomerPrincipal $principal, User $actor, int $deadline, ?string $before): array
     {
         MembershipException::require(hrtime(true) < $deadline, 'operation_deadline');
         $connection = DB::connection();
@@ -135,7 +135,7 @@ final class MembershipCustomerIndex
             MembershipException::require(hrtime(true) < $deadline, 'operation_deadline');
         };
         try {
-            $projection = DB::transaction(function () use ($principal, $actor, $connection, $primary, $grants, $finish, $history, $admit, $membership, &$state): array {
+            $projection = DB::transaction(function () use ($before, $principal, $actor, $connection, $primary, $grants, $finish, $history, $admit, $membership, &$state): array {
                 // Re-review R1: the owner's user row is locked by the frame's very first statement, before any
                 // consistent read (the schema proofs below read identity rows), so the read view is created only after
                 // every same-owner writer that held the row has committed.
@@ -160,23 +160,25 @@ final class MembershipCustomerIndex
                 $schema = MemberGrantCurrentSchema::pin($rows);
                 $facts = new MemberGrantRows($rows, $schema);
                 $table = $this->periodTable($rows);
-                $window = $this->window($rows->identity(), $rows->driver(), $table, $principal->accountId);
+                $anchor = $this->anchor($rows->identity(), $table, $principal->accountId, $before);
+                $window = $this->window($rows->identity(), $rows->driver(), $table, $principal->accountId, $anchor);
                 $periods = [];
+                $anchorPeriod = $anchor === null ? null : $this->period($rows, $facts, $schema, $history, $access, $anchor, $principal, $identity, $current, $state);
                 foreach ($window as $row) {
                     $periods[] = $this->period($rows, $facts, $schema, $history, $access, $row, $principal, $identity, $current, $state);
                     $admit();
                 }
                 $definition = $this->definition($facts, $grantConfiguration);
                 $state += ['rows' => $rows, 'access' => $access, 'identity' => $identity, 'table' => $table, 'account' => $principal->accountId,
-                    'window' => $window, 'periods' => $periods, 'definition' => $definition, 'grants' => $grantConfiguration];
+                    'before' => $before, 'anchor' => $anchor, 'window' => $window, 'periods' => $anchorPeriod === null ? $periods : [...$periods, $anchorPeriod], 'definition' => $definition, 'grants' => $grantConfiguration];
                 $result = $this->projection($periods, $definition, $principal);
                 // Current proof: callback-capable work first, then raw comparisons on the captured primary only.
-                foreach ($periods as $period) {
+                foreach ($state['periods'] as $period) {
                     $history->currentCallbacks($period['snapshot'], $rows);
                     $this->audit($period);
                 }
                 // Each distinct retained buyer binding once (F9); every period's binding is one of them.
-                foreach (self::bindings($periods) as [$binding, $historical]) {
+                foreach (self::bindings($state['periods']) as [$binding, $historical]) {
                     $access->proveHistoricalBindingCurrent($binding, $rows->current(), $historical);
                 }
                 // Owned terminal phase (G1): from here to the commit every schema guard proves completely, never from
@@ -186,7 +188,7 @@ final class MembershipCustomerIndex
                 $access->proveCurrent($principal, $actor, $rows->current(), $identity);
                 $admit();
                 $finish->assertFrame($rows->identity(), false);
-                $history->currentRawAll(array_column($periods, 'snapshot'), $rows);
+                $history->currentRawAll(array_column($state['periods'], 'snapshot'), $rows);
                 $this->raw($rows->identity(), $rows->driver(), $state, false);
                 $rows->assertCurrent();
                 $finish->assertFrame($rows->identity(), false);
@@ -223,7 +225,12 @@ final class MembershipCustomerIndex
                 $frame->close();
             }
 
-            return [$projection, ['membership' => $membership, 'member_grants' => $state['grants']]];
+            return [$projection, ['membership' => $membership, 'member_grants' => $state['grants'],
+                'anchor' => $state['anchor'] === null ? null : MembershipRecords::strings($state['anchor']),
+                'window' => self::rows($state['window']),
+                // Non-displayed anchor and sentinel history must remain identical across pre-bytes too.
+                'audited_scopes' => array_map(static fn (array $period): array => [
+                    'scope' => $period['snapshot']->scope(), 'history' => $period['snapshot']->value()->rows()], $state['periods'])]];
         } finally {
             foreach ($state['snapshots'] as $snapshot) {
                 $history->retire($snapshot);
@@ -380,7 +387,10 @@ final class MembershipCustomerIndex
     private function raw(PDO $primary, string $driver, array $state, bool $committed): void
     {
         MembershipAwardConfiguration::plainPrimary($primary);
-        $window = $this->window($primary, $driver, $state['table'], $state['account']);
+        $anchor = $this->anchor($primary, $state['table'], $state['account'], $state['before']);
+        MembershipException::require($anchor === null ? $state['anchor'] === null
+            : MembershipRecords::strings($anchor) === MembershipRecords::strings($state['anchor']), 'changed_period_anchor');
+        $window = $this->window($primary, $driver, $state['table'], $state['account'], $anchor);
         MembershipException::require(self::rows($window) === self::rows($state['window']), 'changed_period_window');
         $definition = $state['definition'];
         $reader = $definition['reader'];
@@ -396,16 +406,33 @@ final class MembershipCustomerIndex
     }
 
     /** The owner's newest LIMIT periods plus one sentinel, in one fixed order; rows only, never authority. */
-    private function window(PDO $primary, string $driver, string $table, int $accountId): array
+    private function window(PDO $primary, string $driver, string $table, int $accountId, ?array $anchor): array
     {
         MembershipAwardConfiguration::plainPrimary($primary);
-        $statement = $primary->prepare('SELECT * FROM '.$table.' WHERE account_id = ? ORDER BY period_start DESC, id DESC LIMIT '
+        $boundary = $anchor === null ? '' : ' AND (period_start < ? OR (period_start = ? AND id < ?))';
+        $statement = $primary->prepare('SELECT * FROM '.$table.' WHERE account_id = ?'.$boundary.' ORDER BY period_start DESC, id DESC LIMIT '
             .(self::LIMIT + 1));
-        $statement->execute([$accountId]);
+        $statement->execute($anchor === null ? [$accountId] : [$accountId, $anchor['period_start'], $anchor['period_start'], $anchor['id']]);
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
         MembershipException::require(count($rows) <= self::LIMIT + 1, 'technical_bound');
 
         return $rows;
+    }
+
+    /** Resolve only an owned retained row; callers supply an id, never ordering facts or authority. */
+    private function anchor(PDO $primary, string $table, int $accountId, ?string $before): ?array
+    {
+        MembershipAwardConfiguration::plainPrimary($primary);
+        if ($before === null) {
+            return null;
+        }
+        MembershipValues::id($before);
+        $statement = $primary->prepare('SELECT * FROM '.$table.' WHERE account_id = ? AND id = ?');
+        $statement->execute([$accountId, $before]);
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+        MembershipException::require(count($rows) === 1, 'foreign_period');
+
+        return $rows[0];
     }
 
     private function periodTable(MembershipRows $rows): string

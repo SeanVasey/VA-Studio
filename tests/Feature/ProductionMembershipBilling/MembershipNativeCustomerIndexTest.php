@@ -3,6 +3,7 @@
 namespace Tests\Feature\ProductionMembershipBilling;
 
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Grants\Member\MemberActivationHistoryReader;
 use App\Domain\Memberships\Billing\BillingAwardFence;
 use App\Domain\Memberships\Billing\BillingDatabaseInstant;
 use App\Domain\Memberships\Billing\BillingLedger;
@@ -423,15 +424,77 @@ PHP;
         $this->assertLessThan(500, intdiv($three['Questions'] - $one['Questions'], 2), 'Statements per extra period and call.');
     }
 
+    public function test_native_page_statement_count_stays_bounded_when_total_history_grows(): void
+    {
+        $fixture = $this->indexFixture();
+        $this->olderPeriods($fixture, 99);
+        $cursor = DB::table(MembershipPeriodRecords::PERIODS)->orderByDesc('period_start')->orderByDesc('id')->offset(49)->value('id');
+        $first = $this->indexStatements($fixture);
+        $middle = $this->indexStatements($fixture, $cursor);
+        $this->olderPeriods($fixture, 101, 99);
+        $largerFirst = $this->indexStatements($fixture);
+        $largerMiddle = $this->indexStatements($fixture, $cursor);
+        $this->assertSame(201, DB::table(MembershipPeriodRecords::PERIODS)->count());
+        $this->assertSame(10, $first['periods']);
+        $this->assertSame(10, $middle['periods']);
+        $this->assertSame($first, $largerFirst, 'First-page work is independent of total owned history.');
+        $this->assertSame($middle, $largerMiddle, 'Continuation work, including anchor and sentinel, is bounded.');
+    }
+
+    public function test_native_committed_index_frame_refuses_temporary_table_creation_before_raw_proof(): void
+    {
+        $fixture = $this->indexFixture();
+        $activation = $this->activateMemberFixture($fixture);
+        $this->assertSame($fixture['reservation']['redemption_id'], $activation->redemptionId);
+        $primary = DB::connection()->getPdo();
+        $real = Crypt::getFacadeRoot();
+        $observed = null;
+        $hook = Mockery::mock();
+        $hook->shouldReceive('encryptString')->andReturnUsing(fn ($plain) => $real->encryptString($plain));
+        $hook->shouldReceive('decryptString')->andReturnUsing(function ($ciphertext) use ($real, $primary, &$observed) {
+            $committed = false;
+            foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 80) as $frame) {
+                if (($frame['class'] ?? '') === MemberActivationHistoryReader::class
+                    && ($frame['function'] ?? '') === 'committedCallbacksAll') {
+                    $committed = true;
+                }
+            }
+            if ($observed === null && $committed && DB::transactionLevel() === 0 && $primary->inTransaction()) {
+                try {
+                    $primary->exec('CREATE TEMPORARY TABLE production_membership_paid_periods (shadow_only INT)');
+                    $observed = ['created'];
+                    $primary->exec('DROP TEMPORARY TABLE production_membership_paid_periods');
+                } catch (PDOException $error) {
+                    $observed = [$error->errorInfo[0] ?? null, $error->errorInfo[1] ?? null];
+                }
+            }
+
+            return $real->decryptString($ciphertext);
+        });
+        Crypt::swap($hook);
+        try {
+            $read = MembershipCustomerRead::begin();
+            $index = (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read);
+            $read->proveBeforeBytes();
+        } finally {
+            Crypt::swap($real);
+        }
+        $this->assertSame(['25006', 1792], $observed, 'The actual committed frame is READ ONLY before its raw proof.');
+        $this->assertCount(1, $index['periods']);
+        // The shadow would have only shadow_only; the retained table still supplies its real seal column.
+        $this->assertIsString($primary->query('SELECT seal FROM production_membership_paid_periods LIMIT 1')->fetchColumn());
+        $this->assertFalse($primary->inTransaction());
+    }
+
     /** One index call plus its pre-bytes proof, with this session's statement counters before and after. */
-    private function indexStatements(array $fixture): array
+    private function indexStatements(array $fixture, ?string $cursor = null): array
     {
         $pdo = DB::connection()->getPdo();
         $counters = static fn (): array => array_map('intval', $pdo->query("SHOW SESSION STATUS WHERE Variable_name IN
             ('Questions', 'Com_show_create_table', 'Com_show_create_trigger')")->fetchAll(PDO::FETCH_KEY_PAIR));
         $before = $counters();
         $read = MembershipCustomerRead::begin();
-        $index = (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read);
+        $index = (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read, before: $cursor);
         $read->proveBeforeBytes();
         $after = $counters();
         $delta = ['periods' => count($index['periods'])];
@@ -443,7 +506,7 @@ PHP;
     }
 
     /** $count older sealed periods with their award events for the same owner, in the exact retained format. */
-    private function olderPeriods(array $fixture, int $count): void
+    private function olderPeriods(array $fixture, int $count, int $offset = 0): void
     {
         $real = (array) DB::table(MembershipPeriodRecords::PERIODS)->where('id', $fixture['reservation']['period_id'])->sole();
         $award = (array) DB::table(MembershipPeriodRecords::EVENTS)->where('period_id', $real['id'])->where('kind', 'award')->sole();
@@ -451,7 +514,7 @@ PHP;
         $policy = MembershipPolicyVersions::document($plan)->binding($plan['id']);
         $originId = (int) $real['identity_origin_id'];
         $invoice = MembershipPeriodRecords::historicalInvoice($real, $award, $policy, $originId);
-        for ($index = 1; $index <= $count; $index++) {
+        for ($index = $offset + 1; $index <= $offset + $count; $index++) {
             $move = static fn (?string $at): ?string => $at === null ? null : gmdate('Y-m-d H:i:s', strtotime($at.' UTC') - $index * 2678400);
             $copy = new MembershipInvoiceBinding(hash('sha256', 'native-index-older-invoice-'.$index), hash('sha256', 'native-index-older-graph-'.$index),
                 $invoice->providerScopeHash, $invoice->amountMinor, $invoice->currency, $move($invoice->periodStart), $move($invoice->periodEnd),
@@ -526,12 +589,12 @@ PHP;
     }
 
     /** A second, verified customer's approved subscription and paid, observed invoice on the same plan. */
-    private function otherCustomerAward(array $fixture): array
+    private function otherCustomerAward(array $fixture, int $sequence = 2): array
     {
-        $references = [BillingStripeFixtures::CUSTOMER => 'cus_SYNTHETICINDEX2', BillingStripeFixtures::SUBSCRIPTION => 'sub_SYNTHETICINDEX2',
-            BillingStripeFixtures::INVOICE => 'in_SYNTHETICINDEX2', BillingStripeFixtures::INVOICE_PAYMENT => 'inpay_SYNTHETICINDEX2',
-            BillingStripeFixtures::PAYMENT_INTENT => 'pi_SYNTHETICINDEX2', BillingStripeFixtures::CHARGE => 'ch_SYNTHETICINDEX2',
-            BillingStripeFixtures::BALANCE_TRANSACTION => 'txn_SYNTHETICINDEX2', 'il_SYNTHETIC' => 'il_SYNTHETICINDEX2', 'si_SYNTHETIC' => 'si_SYNTHETICINDEX2'];
+        $references = [BillingStripeFixtures::CUSTOMER => 'cus_SYNTHETICINDEX'.$sequence, BillingStripeFixtures::SUBSCRIPTION => 'sub_SYNTHETICINDEX'.$sequence,
+            BillingStripeFixtures::INVOICE => 'in_SYNTHETICINDEX'.$sequence, BillingStripeFixtures::INVOICE_PAYMENT => 'inpay_SYNTHETICINDEX'.$sequence,
+            BillingStripeFixtures::PAYMENT_INTENT => 'pi_SYNTHETICINDEX'.$sequence, BillingStripeFixtures::CHARGE => 'ch_SYNTHETICINDEX'.$sequence,
+            BillingStripeFixtures::BALANCE_TRANSACTION => 'txn_SYNTHETICINDEX'.$sequence, 'il_SYNTHETIC' => 'il_SYNTHETICINDEX'.$sequence, 'si_SYNTHETIC' => 'si_SYNTHETICINDEX'.$sequence];
         $replace = function (mixed $value) use (&$replace, $references): mixed {
             if (! is_array($value)) {
                 return is_string($value) ? ($references[$value] ?? $value) : $value;
@@ -543,7 +606,7 @@ PHP;
 
             return $result;
         };
-        $buyer = $this->enrollThroughLocalSmtp('native-index-writer@example.test');
+        $buyer = $this->enrollThroughLocalSmtp('native-index-writer'.$sequence.'@example.test');
         $approved = DB::transaction(fn () => (new BillingSubscriptionApprovals)->approve($fixture['plan']['id'], $references[BillingStripeFixtures::CUSTOMER],
             $references[BillingStripeFixtures::SUBSCRIPTION], BillingStripeFixtures::PRICE, $buyer['principal'], $buyer['user'], $fixture['staff'], new MembershipRows));
         $ledger = new BillingLedger;
@@ -571,6 +634,7 @@ PHP;
             'DB_CONNECTION' => 'mysql', 'DB_URL' => '', 'DB_HOST' => (string) $db['host'], 'DB_PORT' => (string) $db['port'],
             'DB_DATABASE' => (string) $db['database'], 'DB_USERNAME' => (string) $db['username'], 'DB_PASSWORD' => (string) $db['password'],
             'DB_SOCKET' => (string) ($db['unix_socket'] ?? ''), 'CACHE_STORE' => 'array', 'SESSION_DRIVER' => 'array', 'QUEUE_CONNECTION' => 'sync',
+            'VA_MEMBERSHIP_AWARD_REAL_WALL_CLOCK' => getenv('VA_MEMBER_INDEX_PHYSICAL_PROBE') === '1' ? '1' : '0',
             'VA_MEMBERSHIP_AWARD_RACE_ONLY' => '1', 'VA_MEMBERSHIP_AWARD_RACE_DIRECTORY' => $this->directory, 'VA_MEMBERSHIP_AWARD_RACE_WORKER' => '0'];
         $input = ['operation' => 'award', 'user_id' => (int) $award['buyer']['user']->id, 'invoice_id' => $award['invoice']['id'],
             'configuration' => ['production-customer-identity' => config('production-customer-identity'),
