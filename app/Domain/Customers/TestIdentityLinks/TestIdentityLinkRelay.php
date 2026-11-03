@@ -345,9 +345,16 @@ final class TestIdentityLinkRelay
         $recipients = array_values(array_unique(array_column($captures, 'recipient')));
         $staff = [];
         foreach (array_chunk($recipients, 500) as $chunk) {
-            $placeholders = implode(',', array_fill(0, count($chunk), '?'));
-            foreach (User::query()->whereRaw('LOWER(email) IN ('.$placeholders.')', $chunk)->where('is_admin', true)->pluck('email') as $email) {
-                $staff[strtolower((string) $email)] = true;
+            // Project the requested recipient, rather than re-keying the stored staff address in PHP:
+            // LOWER(email)'s database collation may also equate accents or trailing spaces.
+            $matches = null;
+            foreach ($chunk as $recipient) {
+                $query = User::query()->selectRaw('? AS relay_recipient', [$recipient])
+                    ->whereRaw('LOWER(email) = ?', [$recipient])->where('is_admin', true);
+                $matches = $matches === null ? $query : $matches->unionAll($query);
+            }
+            foreach ($matches->pluck('relay_recipient') as $recipient) {
+                $staff[(string) $recipient] = true;
             }
         }
         $messages = [];

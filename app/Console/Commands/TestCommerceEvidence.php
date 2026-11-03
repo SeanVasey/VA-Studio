@@ -136,10 +136,13 @@ final class TestCommerceEvidence extends Command
         return self::$guards[$connection];
     }
 
-    /** A SELECT with no locking clause and no INTO (`INTO OUTFILE`, `INTO DUMPFILE`, `INTO @variable`). */
+    /** An uncommented SELECT with no locking clause and no INTO (`INTO OUTFILE`, `INTO DUMPFILE`, `INTO @variable`). */
     public static function isPlainSelect(string $query): bool
     {
-        return preg_match('/\A\s*select\s/i', $query) === 1
+        // Generated snapshot queries do not need comments. Refuse them, including MySQL executable comments,
+        // before checking tokens so comments cannot split or introduce locking/INTO clauses.
+        return ! str_contains($query, '/*') && ! str_contains($query, '--') && ! str_contains($query, '#')
+            && preg_match('/\A\s*select\s/i', $query) === 1
             && preg_match('/\bfor\s+(?:update|share|no\s+key\s+update|key\s+share)\b|\block\s+in\s+share\s+mode\b|\binto\b/i', $query) !== 1;
     }
 

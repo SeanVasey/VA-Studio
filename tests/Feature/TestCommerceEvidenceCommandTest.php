@@ -153,6 +153,23 @@ class TestCommerceEvidenceCommandTest extends TestCase
         $this->assertSame('rollback', end($normalized));
     }
 
+    public function test_the_statement_guard_refuses_comment_splitting_and_executable_comments(): void
+    {
+        foreach ([
+            'select 1 for/*c*/update', 'select 1 FOR/**/SHARE',
+            'select 1 lock/**/in share mode', 'select 1 lock in/**/share mode',
+            "select a in/**/to outfile 'x' from t", 'select 1 /*!80000 FOR SHARE */',
+            'select 1 /*! FOR UPDATE */', 'select 1 /* ordinary comment */',
+            "select 1 -- comment\nFOR SHARE", "select 1 # comment\nFOR SHARE",
+        ] as $sql) {
+            $this->assertFalse(TestCommerceEvidence::isPlainSelect($sql), $sql);
+        }
+        foreach (['select 1', 'SELECT `id` FROM `checkout_intents` WHERE `public_id` = ?',
+            "select count(*) as total from t where a = 'ordinary value'"] as $sql) {
+            $this->assertTrue(TestCommerceEvidence::isPlainSelect($sql), $sql);
+        }
+    }
+
     public function test_the_statement_guard_refuses_locking_and_into_clauses_and_stays_a_single_inert_callback(): void
     {
         foreach (['select 1', 'SELECT `id` FROM `checkout_intents` WHERE `public_id` = ? LIMIT 1', "select count(*) as total from t where a = 'x'"] as $sql) {
@@ -168,7 +185,7 @@ class TestCommerceEvidenceCommandTest extends TestCase
         CheckoutIntent::retrieved(function () use (&$statement): void {
             DB::select($statement);
         });
-        foreach (['select id from checkout_intents for update', 'select id from checkout_intents lock in share mode', 'select 1 into @evidence_variable'] as $sql) {
+        foreach (['select id from checkout_intents FOR/**/SHARE', 'select id from checkout_intents for/*c*/update', 'select id from checkout_intents /*!80000 FOR SHARE */', 'select id from checkout_intents for update', 'select id from checkout_intents lock in share mode', 'select 1 into @evidence_variable'] as $sql) {
             $statement = $sql;
             [$status, $output] = $this->evidence($f['order']->public_id);
             $this->assertSame([1, 'Evidence snapshot unavailable. Nothing was written.'], [$status, trim($output)], $sql);

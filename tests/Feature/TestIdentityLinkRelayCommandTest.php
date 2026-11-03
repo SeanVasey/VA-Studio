@@ -362,8 +362,12 @@ class TestIdentityLinkRelayCommandTest extends TestCase
         $this->assertSame($before[1] + 1, AuditEvent::count());
         [$listed] = $this->audits(TestIdentityLinkRelay::LISTED);
         $this->assertSame([$operator->id, User::class, $operator->id], [$listed->actor_id, $listed->subject_type, $listed->subject_id]);
-        $this->assertSame(['schema_version' => 1, 'command' => 'vasey:test-identity-links', 'shown' => 2, 'pending' => 2, 'withheld' => 1,
-            'not_examined' => 0, 'test_only' => true, 'environment' => 'testing', 'attestation_audit_id' => null], $listed->context);
+        $expectedContext = ['schema_version' => 1, 'command' => 'vasey:test-identity-links', 'shown' => 2, 'pending' => 2, 'withheld' => 1,
+            'not_examined' => 0, 'test_only' => true, 'environment' => 'testing', 'attestation_audit_id' => null];
+        $actualContext = $listed->context;
+        ksort($expectedContext, SORT_STRING);
+        ksort($actualContext, SORT_STRING);
+        $this->assertSame($expectedContext, $actualContext);
         $this->assertStringContainsString('listing audit_event='.$listed->id, $text);
         $this->assertSame($f['account']->id, CustomerIdentityChallenge::where('public_id', $recover['id'])->value('account_id'));
     }
@@ -391,9 +395,13 @@ class TestIdentityLinkRelayCommandTest extends TestCase
         [$relayed] = $this->audits(TestIdentityLinkRelay::RELAYED);
         $challenge = CustomerIdentityChallenge::where('public_id', $enroll['id'])->sole();
         $this->assertSame([$operator->id, CustomerIdentityChallenge::class, $challenge->id], [$relayed->actor_id, $relayed->subject_type, $relayed->subject_id]);
-        $this->assertSame(['schema_version' => 1, 'command' => 'vasey:test-identity-links', 'challenge_id' => $enroll['id'], 'purpose' => 'enroll',
+        $expectedContext = ['schema_version' => 1, 'command' => 'vasey:test-identity-links', 'challenge_id' => $enroll['id'], 'purpose' => 'enroll',
             'policy_version' => 'customer-local-identity-v1', 'account_id' => null, 'expires_at' => $challenge->expires_at->toIso8601String(),
-            'test_only' => true, 'environment' => 'testing', 'attestation_audit_id' => null], $relayed->context);
+            'test_only' => true, 'environment' => 'testing', 'attestation_audit_id' => null];
+        $actualContext = $relayed->context;
+        ksort($expectedContext, SORT_STRING);
+        ksort($actualContext, SORT_STRING);
+        $this->assertSame($expectedContext, $actualContext);
         $evidence = json_encode($relayed->getAttributes());
         foreach ([$enroll['proof'], self::SYNTHETIC, '/account/access'] as $private) {
             $this->assertStringNotContainsString($private, $evidence);
@@ -475,6 +483,38 @@ class TestIdentityLinkRelayCommandTest extends TestCase
         }
         $this->assertSame([], $this->audits(TestIdentityLinkRelay::RELAYED));
         $this->assertSame($before[0], $this->state());
+    }
+
+    public function test_staff_recipient_exclusion_uses_database_case_and_collation_matching(): void
+    {
+        $this->operator();
+        $variants = ['CASE-STAFF@EXAMPLE.TEST'];
+        if (DB::getDriverName() === 'mysql') {
+            // Pin an accent-insensitive PAD SPACE collation; the default MySQL 8 collation need not pad.
+            DB::statement('ALTER TABLE users MODIFY email VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL');
+            $variants[] = 'cásé-staff@example.test';
+            $variants[] = 'case-staff@example.test   ';
+        }
+        $body = F::request('enroll', 'case-staff@example.test');
+        foreach ($variants as $email) {
+            $staff = User::factory()->create(['email' => $email, 'is_admin' => true]);
+            $this->assertTrue(User::query()->whereRaw('LOWER(email) = ?', ['case-staff@example.test'])
+                ->where('is_admin', true)->exists(), 'The fixture must match in the database.');
+            $listing = $this->console(['action' => 'list']);
+            $this->assertSame(0, $listing['code']);
+            $this->assertStringContainsString('1 capture(s) withheld', $listing['text']);
+            $this->assertNothingPrivate($listing['text'], [$body]);
+            $this->assertStringNotContainsString($email, $listing['text']);
+            $this->assertStringNotContainsString($body['id'], $listing['text']);
+            $printed = $this->console(['action' => 'print', 'id' => $body['id']]);
+            $this->assertRefused($printed, 'No relayable capture has that id.', 1);
+            $this->assertNothingPrivate($printed['text'], [$body]);
+            $staff->delete();
+        }
+        // A collating non-admin account must not hide a genuine synthetic customer capture.
+        User::factory()->create(['email' => 'CASE-STAFF@EXAMPLE.TEST', 'is_admin' => false]);
+        $this->assertCount(1, app(TestIdentityLinkRelay::class)->messages()['messages']);
+        $this->assertSame([], $this->audits(TestIdentityLinkRelay::RELAYED));
     }
 
     public function test_tampered_capture_json_is_withheld_and_never_printed(): void
