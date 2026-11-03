@@ -186,3 +186,25 @@ client/quiescence assertions retained, declared pin refresh and Git whitespace.
 No PHP, lint, tests, database, generator or runtime ran for this correction.
 All four provider acceptances remain open; ROOT independently reviews and runs
 focused controls before any further provider execution.
+
+
+## Plain console output correction — 2026-11-03
+
+ROOT's up-overlap at31e03684 completed its intended native work: JUnit1 test,
+2143 assertions,136.686720 seconds, no failures/errors/skips/warnings, nativeexit0.
+Supervisor provisional/lease were true, root exit0, three tokens terminal
+(exits0,9,0), one held cut and no first/cleanup failures. These are source-scoped
+inner results. The outer receipt remains STOP2, SAFE
+`e6446a48ef8ab2671458d086f8bb56ce7aedb8fe8d330c0962780623087b5aa4`:
+its unchanged strict success-summary evaluator rejected ANSI-colored console
+bytes. ROOT confirmed no warning markers. No outer pass or exit0 is inferred.
+
+The launcher now supplies only `--colors=never` as the additional PHPUnit CLI
+argument. Its exact external loader agrees on that argument and argc17; the
+launcher refreshes the loader hash. All other argv, strict evaluation, process
+protocol, assertions, resource checks, caps and deadlines remain unchanged.
+Prior31e external binding/manifest/entry are retained once. Source AST comparison
+normalizing only the added color literal and loader hash restores the original
+launcher exactly. No mirror test, PHP/lint/runtime/SQL execution or automatic
+retry accompanies this change. ROOT reviews and owns one justified subsequent
+provider execution; every prior outer STOP remains retained.

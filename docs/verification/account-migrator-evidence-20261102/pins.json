@@ -18,7 +18,7 @@
     "vendor/laravel/framework/src/Illuminate/Database/Console/Migrations/RollbackCommand.php": "22237f25306a9f72cb35c034e365ee9450764bcef59affed87d443d3efa2df82",
     "tests/Support/account-admission-migrator-worker.php": "60035ae363f59ff330f3fe968949ba2513f906236cab33792ca68aec605ef7f3",
     "tests/Feature/ProductionIdentity/AccountAdmissionMigratorTest.php": "cd4b3f1ca3e5fbffde7dc54a1563050507556c80d9c5c83d1fbfe956e969b475",
-    "docs/verification/account-migrator-evidence-20261102/run-one.py": "a5cbd208f22c3ee0f60007460683a80afed97613dc20f80d49c44b48e833dbe9",
+    "docs/verification/account-migrator-evidence-20261102/run-one.py": "2c70eab8f0d916e7499869a45a25720bb90cbba1f1c630969490257f6133b3b5",
     "docs/verification/account-migrator-evidence-20261102/supervision.py": "3ebe50cb2ce23a4b40175a423652c1c77df61370b400703ada1f8e347c6465fe",
     "docs/verification/account-migrator-evidence-20261102/test_supervision_pure.py": "8b14b7389a5d2b6a6184afc2424a5b810b9580d164d200f1d6594fac867f0912",
     "composer.lock": "254ed9b69326c8d8d02735b40fa4d61cbad560f73bc72cab47255a986a743ce8",

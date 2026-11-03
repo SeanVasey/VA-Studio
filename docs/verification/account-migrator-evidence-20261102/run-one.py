@@ -19,7 +19,7 @@ from supervision import CASES, Supervision
 
 PHP = '/usr/bin/php8.4'
 ENTRY = '/workspace/account-guard-evidence-20261101/account-ledger-runtime-v1/parent-entry.php'
-ENTRY_HASH = 'f9c5b502b8757f79a49ff6766036c0483d98e042f29acaf33ed3996696fde64d'
+ENTRY_HASH = '81cb3e4821c628776dc5609d9672ed34e1e422ed07b9adfafcff0be69bcb9f23'
 PHP_HASH = 'c984d1f078b3b0c457520723e36ab0fdf34d53a587495784228e2e52e7e23e44'
 MAX_FRAME = 2048
 
@@ -67,7 +67,7 @@ def engine(root, case, nonce, endpoint, gate):
         os.set_inheritable(7, True)
         if endpoint.fileno() != 7:
             endpoint.close()
-        command = [PHP, '-d', 'memory_limit=512M', ENTRY, case, str(evidence), nonce, '--filter',
+        command = [PHP, '-d', 'memory_limit=512M', ENTRY, case, str(evidence), nonce, '--colors=never', '--filter',
                    'test_normal_migrator_process_interruption_and_genuine_ledger_resume.*"' + case + '"',
                    '--stop-on-failure', '--stop-on-error', '--stop-on-warning', '--fail-on-risky',
                    '--fail-on-warning', '--fail-on-incomplete', '--fail-on-skipped', '--log-junit', str(evidence / 'junit.xml'),
