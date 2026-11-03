@@ -1,5 +1,7 @@
 # F9 paging composition on current main — source only
 
+> Current result pointer (2026-11-03): the [final verification record](final-verification-20261103.md) records later exact-source tests, all four complete physical pools and the independent decision. This original source-preparation packet and its original UNRUN statements remain historical.
+
 Base: `048244a6baf893a5d5f5581e466f353af24faaf7` (`origin/main`, verified locally).
 Paging/probe source: `70765666858c8200ebf806c1e010112da0ee72c6`.
 The initially supplied full precursor SHA used `f8200`; the local Git-resolved

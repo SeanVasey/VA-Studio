@@ -1,5 +1,7 @@
 # Existing identity-history access path correction — source packet
 
+> Current result pointer (2026-11-03): the [final verification record](final-verification-20261103.md) records later exact-source tests, all four complete physical pools and the independent decision. This original source-preparation packet and its original UNRUN statements remain historical.
+
 Base `06c33a6028d88f084467b2286bb5c60f5d12c0e8`; isolated branch `codex/f9-history-access-path-20261103`. ROOT explicitly expanded the bounded scope after actual diagnostic 12692: the index parent held X on a `production_identity_verifications` PRIMARY row belonging to the award owner; the award requested X REC_NOT_GAP. The index-owner EXPLAIN chose PRIMARY/id; the award-owner plan chose existing `piv_sequence_unique` by origin. The observer SELECT permission repair is private fixture work, not this product patch.
 
 Owned files: this packet, `app/Domain/Customers/ProductionIdentity/IdentityRows.php`, and `tests/Feature/ProductionMembershipBilling/MembershipNativeCustomerIndexTest.php`. No physical schema/index definition, migration, policy, nonlocking capability, manual physical probe, worker, guard or deadline change. No six-file history trial is carried.
