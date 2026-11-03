@@ -16,7 +16,7 @@ namespace Tests\MemberMountGatesProbe {
             if (! self::$active || ! str_starts_with($data, IdentityPolicy::VERSION."\0owner\0")) {
                 return;
             }
-            $matches = $historical = false;
+            $matches = $historical = $retained = false;
             $phase = 'capture';
             foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 40) as $frame) {
                 if (($frame['class'] ?? '') === IdentityPolicy::class
@@ -26,6 +26,7 @@ namespace Tests\MemberMountGatesProbe {
                 if (($frame['class'] ?? '') === ProductionCustomerAccess::class) {
                     $method = $frame['function'] ?? '';
                     $historical = $historical || $method === 'historical';
+                    $retained = $retained || in_array($method, ['verifyHistoricalBinding', 'verifyHistoricalBindingCommitted'], true);
                     if ($method === 'proveHistoricalBindingCurrent') {
                         $phase = 'current';
                     } elseif ($method === 'proveHistoricalBindingCommitted') {
@@ -33,8 +34,9 @@ namespace Tests\MemberMountGatesProbe {
                     }
                 }
             }
-            // Under the asserted single-key fixture there is one owner-match MAC per historical verification.
-            if ($matches && $historical) {
+            // Count retained-binding proofs only; current-principal read() also validates historical evidence.
+            // Under the asserted single-key fixture each retained verification has one owner-match MAC.
+            if ($matches && $historical && $retained) {
                 self::$counts[$phase]++;
             }
         }
