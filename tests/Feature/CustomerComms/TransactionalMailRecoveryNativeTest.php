@@ -86,7 +86,10 @@ class TransactionalMailRecoveryNativeTest extends TestCase
         M::configure();
         $id = app(TransactionalMailAdapter::class)->queueOrderReady($f['notice']['notificationId'])['deliveryId'];
         $input = ['mode' => 'deliver', 'delivery_id' => $id, 'policy' => config('transactional-mail'),
-            'mailer_name' => M::MAILER, 'mailer' => config('mail.mailers.'.M::MAILER)];
+            'mailer_name' => M::MAILER, 'mailer' => config('mail.mailers.'.M::MAILER),
+            // The fixtures enable these test policies in-process only; the worker must re-verify under the same ones.
+            'authority' => ['customer' => config('customer'), 'delivery' => config('delivery'), 'payments' => config('payments'),
+                'transactional-notifications' => config('transactional-notifications')]];
         $a = $this->start($input);
         $b = $this->start($input);
         touch($a['directory'].'/start');

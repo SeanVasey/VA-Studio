@@ -15,7 +15,7 @@ try {
     require __DIR__.'/../../vendor/autoload.php';
     $app = require __DIR__.'/../../bootstrap/app.php';
     $app->make(Kernel::class)->bootstrap();
-    $input = json_decode(stream_get_contents(STDIN), true, 16, JSON_THROW_ON_ERROR);
+    $input = json_decode(stream_get_contents(STDIN), true, 64, JSON_THROW_ON_ERROR);
     $directory = $input['directory'];
     $database = DB::getDatabaseName();
     $declared = getenv('VA_LOCAL_DISPOSABLE_MYSQL') === $database
@@ -50,6 +50,9 @@ try {
     };
     if ($input['mode'] === 'deliver') {
         config(['transactional-mail' => $input['policy'], 'mail.mailers.'.$input['mailer_name'] => $input['mailer']]);
+        foreach (['customer', 'delivery', 'payments', 'transactional-notifications'] as $key) {
+            config([$key => $input['authority'][$key]]);
+        }
         $manager = app('mail.manager');
         Mail::swap(new class($manager, $publish, $wait) extends MailFake
         {
