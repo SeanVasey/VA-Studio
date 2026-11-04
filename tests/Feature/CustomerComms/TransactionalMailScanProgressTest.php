@@ -166,10 +166,15 @@ class TransactionalMailScanProgressTest extends TestCase
         $pdo->exec('DROP TABLE '.Schema::TABLE);
         $pdo->exec('CREATE VIEW '.Schema::TABLE.' AS SELECT 1 AS sentinel');
         try {
-            $migration->up();
-            $this->fail('Foreign progress view was adopted.');
-        } catch (LogicException) {
-            $this->assertSame(1, (int) $pdo->query('SELECT sentinel FROM '.Schema::TABLE)->fetchColumn());
+            try {
+                $migration->up();
+                $this->fail('Foreign progress view was adopted.');
+            } catch (LogicException) {
+                $this->assertSame(1, (int) $pdo->query('SELECT sentinel FROM '.Schema::TABLE)->fetchColumn());
+            }
+        } finally {
+            // migrate:fresh drops tables but not views on MySQL; a leftover view would refuse every later migration.
+            $pdo->exec('DROP VIEW IF EXISTS '.Schema::TABLE);
         }
     }
 
