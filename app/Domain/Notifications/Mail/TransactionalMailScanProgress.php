@@ -140,9 +140,13 @@ final class TransactionalMailScanProgress
             if ($begun && $connection->getRawPdo() === $pdo && $pdo->inTransaction()) {
                 try {
                     $pdo->exec('ROLLBACK TO SAVEPOINT '.$anchor);
-                    $pdo->rollBack();
                 } catch (Throwable) {
                     // No usable reservation escapes; preserve uncertain/foreign state for the caller.
+                }
+                try {
+                    // Separate, so a failed savepoint rollback never leaves the progress-row lock held.
+                    $pdo->rollBack();
+                } catch (Throwable) {
                 }
             }
             throw new NotificationException('scan_progress_unavailable');
