@@ -40,17 +40,26 @@ Oracle MySQL 8.4.11 and include the cherry-picked identity fix `a2144d4a` (lane 
 
 | Run | Source | Result |
 | --- | --- | --- |
-| Original positive | `7f467682` (284abdc4 + a2144d4a) | **STOP**: 7 assertions, then `Current private catalog admission required.` at the first consult after changing `character_set_results` ([log](original-failure-native-positive-284abdc4-ipv6.log)) |
+| Original positive | `7f467682` (284abdc4 + a2144d4a) | **STOP**: 7 assertions, then `Current private catalog admission required.` at the first consult after changing `character_set_results` ([log](original-failure-native-positive-284abdc4-ipv6.txt)) |
 | Revised positive | `eb1cd7b7` (9a99e6b9 + a2144d4a) | OK, 1 test, 14 assertions |
 | Token-only mutant (2ba71e16's one-line change) on the revised test | `eb1cd7b7` + mutant, restored after | survives: OK, 1 test, 14 assertions |
 
-Cause of the STOP: every framed consult opens `CatalogLease`, and `CurrentCatalog::verifyLive()` re-reads the session context
-(`CONTEXT` includes `@@SESSION.character_set_results`) and refuses when it differs from the captured identity. That check
+Cause of the STOP: every framed consult opens `CatalogLease`; when no other catalog boundary is open, `enter()` runs
+`CurrentCatalog::verifyLive()`, whose `context()` requires `character_set_results = utf8mb4` and then compares the context with
+the captured identity, so it refuses. That check
 arrived with the account guard (PR #190), after this test was designed, so its premise (the complete proof reruns and passes
 under a changed result charset) no longer holds. The revised test asserts the behaviour that does hold: the changed charset is
 never answered from the remembered proof (callback count stays 1), the frame closes, and after restoring the charset the next
 consult reruns the real complete proof.
 
-N-1 is therefore closed by the lease's context check, not by the token leg. Removing the token's result-charset leg is not
-observable in a framed consult (the mutant survives), so that leg is defence in depth only. No mutation kill is claimed.
+N-1 is therefore closed by the lease's context check for top-level framed consults, not by the token leg. Removing the token's
+result-charset leg is not observable there (the mutant survives), and no mutation kill is claimed. One residual path relies on the
+token alone: a framed consult nested inside an already open boundary skips `verifyLive()` (for example `BillingSchema.php:82`
+then `MembershipSchema::assertOwned`). It is not exploitable today, because the outermost `enter()` and `leave()` both verify
+and no code changes the charset inside an open boundary. A nested-boundary test that would kill the token mutant is deferred.
 Independent review of `9a99e6b9` is still required before merge.
+
+Independent review of `9a99e6b9`/`ef82ff36`: **APPROVE WITH CONDITIONS** ([decision](independent-g1-revised-review-9a99e6b9-DECISION.md)).
+P2-1 (the failure log was gitignored) is fixed by storing it as `.txt`; P3-2 (a third consult proves the frame is closed, not
+cleared), P3-3 (assert the refusal message) and P3-4 (the latin1/utf8mb4 branch could never run) are fixed in the test; P3-1
+(nested-boundary token test) and P3-5 (the sibling test's comment and the other token legs) are deferred to the G1 follow-up.

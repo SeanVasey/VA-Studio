@@ -135,6 +135,10 @@ class MembershipSchemaProofFrameTest extends TestCase
         }
     }
 
+    /**
+     * G1 N-1: a result-charset change alone must never be answered from a remembered proof. Inside an owned frame the
+     * catalog lease refuses first and closes the frame (the name predates that guard and is pinned by the skip census).
+     */
     public function test_native_result_charset_alone_invalidates_a_remembered_complete_proof(): void
     {
         if (DB::getDriverName() !== 'mysql') {
@@ -142,8 +146,9 @@ class MembershipSchemaProofFrameTest extends TestCase
         }
         $pdo = DB::connection()->getPdo();
         $results = $pdo->query('SELECT @@SESSION.character_set_results')->fetchColumn();
-        $this->assertIsString($results);
-        $changed = $results === 'latin1' ? 'utf8mb4' : 'latin1';
+        // A frame can only open on the canonical utf8mb4 session (CurrentCatalog::context requires it).
+        $this->assertSame('utf8mb4', $results);
+        $changed = 'latin1';
         $frame = $this->ownedFrame();
         $calls = 0;
         $prove = function () use ($pdo, &$calls): void {
@@ -171,7 +176,12 @@ class MembershipSchemaProofFrameTest extends TestCase
             $this->assertSame(1, DB::connection()->transactionLevel());
             // The frame's catalog lease re-reads the session context (character_set_results included) on every consult,
             // so a changed result charset refuses and closes the frame before any remembered proof could answer.
-            $this->refused($consult, LogicException::class);
+            try {
+                $consult();
+                $this->fail('A changed result charset must refuse the framed consult.');
+            } catch (LogicException $error) {
+                $this->assertSame('Current private catalog admission required.', $error->getMessage());
+            }
             $this->assertSame(1, $calls, 'A changed result charset must never be answered from the remembered proof.');
             $pdo->exec('SET SESSION character_set_results='.$pdo->quote($results));
             $this->assertSame($results, $pdo->query('SELECT @@SESSION.character_set_results')->fetchColumn());
@@ -179,6 +189,8 @@ class MembershipSchemaProofFrameTest extends TestCase
             // Restoring the charset does not revive the closed frame: the next consult runs the real complete proof.
             $consult();
             $this->assertSame(2, $calls, 'A closed frame never answers from memory again.');
+            $consult();
+            $this->assertSame(3, $calls, 'The frame is closed, not merely cleared: it never remembers a proof again.');
         } finally {
             try {
                 $pdo->exec('SET SESSION character_set_results='.$pdo->quote($results));
