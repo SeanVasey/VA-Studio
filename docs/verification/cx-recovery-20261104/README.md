@@ -97,3 +97,10 @@ Deferred to the ledger: P3-2 (MySQL snapshot fixed before the cursor lock), P3-3
 workers to wait on the row; the stale check runs after the pass), P3-4 (ownership checks on every reservation), P3-5 (wake has no
 age threshold; documented as an operator step), P3-6 (SQLite install not atomic), P3-7 notes. Still untested: real SMTP, a real
 queue worker or broker, the full PHP suite, Foundation CI. A focused re-review of the fixes is required before publication.
+
+Focused re-review of `0ac17c58`: **APPROVE WITH CONDITIONS** ([decision](independent-cx-recovery-rereview-0ac17c58-DECISION.md)).
+N1 (the worker was missing from `branching_helper_files`), N2 (stale cleanup comment) and N4 (two docs phrases) are fixed in
+`2eba75c8`. C1 checked on a scratch integration of `2eba75c8` with the C4 census commit `6d96042f` (merge `25c4a912`, clean):
+`test-phpunit-shards.py`, `test-ci-scope.py`, `test-workflow-cadence.py`, `test-focused-tests.py` and `test-database-receipts.py`
+all OK; SQLite skip census 338 unique entries; native selection proves 2777 of 10237 cases in 275 files. C2 (count comments) and
+C3 (ledger rows, including marking FUB-1 F3 addressed) are done in the publishing PR.
