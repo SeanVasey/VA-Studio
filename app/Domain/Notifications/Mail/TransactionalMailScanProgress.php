@@ -136,7 +136,8 @@ final class TransactionalMailScanProgress
 
             return $result;
         } catch (Throwable $error) {
-            // A missing anchor means the frame changed. Never roll back replacement or peer work.
+            // Only this frame issues transaction control on its raw PDO, and a reconnect changes getRawPdo(), so this never
+            // reaches replacement or peer work.
             if ($begun && $connection->getRawPdo() === $pdo && $pdo->inTransaction()) {
                 try {
                     $pdo->exec('ROLLBACK TO SAVEPOINT '.$anchor);
