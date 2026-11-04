@@ -169,19 +169,16 @@ class MembershipSchemaProofFrameTest extends TestCase
             $frame->admit($pdo);
             $this->assertTrue($pdo->inTransaction());
             $this->assertSame(1, DB::connection()->transactionLevel());
-            $consult();
-            $this->assertSame(2, $calls, 'Changing only result charset must rerun the real complete proof.');
-            $consult();
-            $this->assertSame(2, $calls);
-            $this->assertSame($before, $otherLegs());
+            // The frame's catalog lease re-reads the session context (character_set_results included) on every consult,
+            // so a changed result charset refuses and closes the frame before any remembered proof could answer.
+            $this->refused($consult, LogicException::class);
+            $this->assertSame(1, $calls, 'A changed result charset must never be answered from the remembered proof.');
             $pdo->exec('SET SESSION character_set_results='.$pdo->quote($results));
             $this->assertSame($results, $pdo->query('SELECT @@SESSION.character_set_results')->fetchColumn());
             $this->assertSame($before, $otherLegs());
-            $frame->admit($pdo);
+            // Restoring the charset does not revive the closed frame: the next consult runs the real complete proof.
             $consult();
-            $this->assertSame(3, $calls, 'Restoring the original result charset must invalidate the changed-state proof.');
-            $consult();
-            $this->assertSame(3, $calls);
+            $this->assertSame(2, $calls, 'A closed frame never answers from memory again.');
         } finally {
             try {
                 $pdo->exec('SET SESSION character_set_results='.$pdo->quote($results));
@@ -191,6 +188,7 @@ class MembershipSchemaProofFrameTest extends TestCase
         }
         $this->assertFalse($pdo->inTransaction());
         $this->assertSame(0, DB::connection()->transactionLevel());
+        $this->guardsOutsideAFrame();
     }
 
     public function test_a_remembered_proof_is_never_used_by_another_connection(): void
