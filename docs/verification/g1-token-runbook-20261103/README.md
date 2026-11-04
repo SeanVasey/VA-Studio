@@ -63,3 +63,5 @@ Independent review of `9a99e6b9`/`ef82ff36`: **APPROVE WITH CONDITIONS** ([decis
 P2-1 (the failure log was gitignored) is fixed by storing it as `.txt`; P3-2 (a third consult proves the frame is closed, not
 cleared), P3-3 (assert the refusal message) and P3-4 (the latin1/utf8mb4 branch could never run) are fixed in the test; P3-1
 (nested-boundary token test) and P3-5 (the sibling test's comment and the other token legs) are deferred to the G1 follow-up.
+
+After the review fixes: the revised positive at `ffa20efb` (ff9f0a0a + a2144d4a) is OK, 1 test, 15 assertions, natively.
