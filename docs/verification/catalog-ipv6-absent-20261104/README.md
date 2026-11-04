@@ -54,3 +54,15 @@ reviewed policy, not a silent edit. Hosted MySQL shards also use the `mysql:8.4`
 ## Untested
 
 Independent review, the full native identity suites, a real Forge host, Foundation CI.
+
+## Independent review at `a2144d4a`
+
+Decision: **APPROVE** ([`independent-acc-ipv6-review-a2144d4a-DECISION.md`](independent-acc-ipv6-review-a2144d4a-DECISION.md)),
+no P0 to P2. The empty table can only drop refusals caused by corrupt kernel output, never cause a false binding: tcp rows
+decode to four bytes and tcp6 rows to sixteen, so each request matches rows from one table only.
+
+- P3-2 (the decision logic was untested) and P3-3 (the reasoning was undocumented) are fixed in the next commit: a
+  host-conditional `snapshot()` test (the read path on IPv6 hosts, the substitution here) and the docblock. Mutation: with the
+  substitution disabled, the new test errors on this host (killed). `tests/Unit/ProductionIdentity/` OK, 75 tests, 1653 assertions.
+- P3-1 (the presence check uses `file_exists`, which leaves no `plainfile` wrapper evidence) is deferred: it needs attacker
+  PHP code inside the process and, per the review, still cannot produce a false binding.

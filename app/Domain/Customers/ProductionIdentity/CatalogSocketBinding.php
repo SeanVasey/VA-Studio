@@ -306,6 +306,10 @@ final class CatalogSocketBinding
     /**
      * Without the IPv6 stack the kernel exposes neither if_inet6 nor tcp6, and no IPv6 socket can exist, so the empty
      * table is the complete snapshot. A present IPv4 table is still required, and any present IPv6 file is read in full.
+     * The empty table can never cause a false binding: prove() compares addresses byte for byte, tcp rows decode to four
+     * bytes and tcp6 rows (IPv4-mapped included) to sixteen, so an IPv4 primary never matches a tcp6 row and an IPv6
+     * primary finds no match and refuses. The IPv6 module cannot be unloaded, so absent now means absent when the primary
+     * socket and the fd snapshot were made. This relies on a real Linux procfs (not WSL1, gVisor or a FUSE /proc).
      */
     private static function ipv6Table(mixed $context): string
     {

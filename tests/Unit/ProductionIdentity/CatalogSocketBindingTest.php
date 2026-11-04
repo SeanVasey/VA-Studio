@@ -5,6 +5,7 @@ namespace Tests\Unit\ProductionIdentity;
 use App\Domain\Customers\ProductionIdentity\CatalogSocketBinding;
 use LogicException;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 final class CatalogSocketBindingTest extends TestCase
 {
@@ -51,6 +52,24 @@ final class CatalogSocketBindingTest extends TestCase
         self::assertSame('192.0.2.1', $actual['remote_ip']);
         $this->expectException(LogicException::class);
         CatalogSocketBinding::prove(['socket' => '', 'host' => '2001:db8:0:0:0:0:0:1', 'port' => 3306], ['server_port' => 3306, 'client_endpoint' => '[::1]:50000'], '2001:db8::1 via TCP/IP', ['12345'], self::HEADER, CatalogSocketBinding::ABSENT_IPV6_TABLE);
+    }
+
+    public function test_snapshot_substitutes_the_absent_table_only_on_a_kernel_without_ipv6(): void
+    {
+        if (\PHP_OS_FAMILY !== 'Linux' || ! is_readable('/proc/self/net/tcp')) {
+            self::markTestSkipped('Linux procfs host control.');
+        }
+        // Host-conditional: CI runners with IPv6 cover the read path, a host booted without IPv6 covers the substitution.
+        $absent = ! file_exists('/proc/self/net/tcp6') && ! file_exists('/proc/self/net/if_inet6');
+        [$inodes, $tcp, $tcp6] = (new ReflectionMethod(CatalogSocketBinding::class, 'snapshot'))->invoke(null);
+        self::assertTrue(array_is_list($inodes));
+        self::assertMatchesRegularExpression('/\A\s*sl\s+local_address\s/', $tcp);
+        if ($absent) {
+            self::assertSame(CatalogSocketBinding::ABSENT_IPV6_TABLE, $tcp6);
+        } else {
+            self::assertNotSame(CatalogSocketBinding::ABSENT_IPV6_TABLE, $tcp6);
+            self::assertMatchesRegularExpression('/\A\s*sl\s+local_address\s/', $tcp6);
+        }
     }
 
     public function test_target_matching_other_owned_socket_never_selects_it_instead_of_primary(): void
