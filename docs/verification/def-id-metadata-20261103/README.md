@@ -49,3 +49,26 @@ Only read-only source inspection, code/test preparation and `git diff --check` o
 Material compatibility checks remain: full raw metadata scanning adds work at generic boundaries; target request budgets must remain unchanged. Previously tolerated noncanonical facade/connection/config metadata now refuses earlier. Witness metadata closure includes the existing guard's full admitted app/database/identity snapshots; confirm legitimate callbacks do not need to mutate those captured values. Generic metadata selection deliberately does not confer owned-transaction authority; original per-context proofs must still reject foreign PDO/depth/frame changes. Existing account/B4 admissions retain their strict owned-primary defaults. No broad refactor, key retirement or policy decision is bundled.
 
 Scope limit: this closes the specifically prepared held/generic/witness/current-policy boundaries, not every legacy identity or initial connection-resolution entrypoint. CommandTransaction's earlier DB::connection/getPdo initialization and legacy IdentityDatabase/IdentityRows entrypoints remain unchanged. They are not silently certified by these sentinels. Any later expansion must name a concrete remaining call path and preserve legitimate initialization behavior; no broad rewrite is bundled here.
+
+## Claude harness execution and review (2026-11-04)
+
+The statements above describe the author's source-only preparation on Codex's branch. These runs are new, on branch
+`claude/def-id-20261104`; native runs include the cherry-picked identity fix `a2144d4a` (lane ACC-IPV6) this kernel needs.
+
+`a9b5060c` fixes one test defect: five facade-surface cases called `ReflectionProperty::getRawValue()` on the static
+`Facade::$resolvedInstance` and errored with a TypeError before exercising anything; static properties now use `getValue()`.
+
+| Check | Source | Result |
+| --- | --- | --- |
+| Both new files, SQLite, PHP 8.4.27 | `2bed2004` | 53 tests, 5 errors (the TypeError above) |
+| Both new files, SQLite | `a9b5060c` | OK, 53 tests, 169 assertions |
+| Baseline: both new files overlaid on unmodified `main` `048244a6`, SQLite | main + tests | 40 of 53 fail (callbacks fired or refusal missing), 0 errors; the 13 compatibility positives pass |
+| Affected existing suites (packet list), SQLite | `a9b5060c` | OK, 98 tests, 665 assertions, 2 skipped (native-only) |
+| Native: both new files, `ProductionCheckoutSourceTransactionTest`, `ProductionCheckoutCommittedReceiptTest` | `c0f992e0` (a9b5060c + a2144d4a) | first run stopped by the harness's 60-minute limit at 66 of 76 with no failure (the first three files, 64 cases, complete); `ProductionCheckoutCommittedReceiptTest` rerun alone: OK, 12 tests, 56 assertions |
+
+Independent security review of `a9b5060c`: **APPROVE WITH CONDITIONS** ([decision](independent-defid-review-a9b5060c-DECISION.md)), no
+P0 to P2. Conditions: the native selection (above) and this evidence record. Deferred P3s: P3-1 a resolved-but-unconnected second
+connection makes the post-commit check refuse (document "default connection only on checkout paths" or pin it); P3-2 the
+no-database test resolves the default connection in setUp; P3-3 negative cases assert only the exception class; P3-5 the witness
+freezes `app.*`/`database.*`/identity config and the connection set between capture and commit (a lingering locale change
+refuses). Untested: real commit/peer races beyond the selection, mounted checkout routes (mount is false), Octane, the full suite.
