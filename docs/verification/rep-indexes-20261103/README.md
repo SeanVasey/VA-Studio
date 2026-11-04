@@ -90,3 +90,10 @@ Independent repair review of `eb5ee434`: **APPROVE WITH CONDITIONS** ([decision]
 The diagnosis is right and the ID change alone is necessary and sufficient. P2-1 (the unreachable allocation fallback would
 hide an automatic-allocation regression) and P3-1 (the unneeded clock move) are fixed in the following commit, and P3-2/P3-3 in
 this section and the wording above. The two affected methods are re-run at that commit (results below).
+
+| Two affected methods after the repair review, SQLite | `58cf71a0` | OK, 2 tests, 113 assertions |
+| Two affected methods after the repair review, private MySQL 8.4.11 | `cb19c18e` (58cf71a0 + a2144d4a) | OK, 2 tests, 113 assertions |
+
+Still unrun from the original plan: the seven native EXPLAIN diagnostics (their v2 packet is in Codex's private workspace, which
+did not transfer) and the original UI companion. Neither is needed for the index migration's correctness; the EXPLAIN plans would
+only document access paths and support no performance claim.
