@@ -43,6 +43,16 @@ final class CatalogSocketBindingTest extends TestCase
         self::assertSame('2001:db8::1', $actual['remote_ip']);
     }
 
+    public function test_absent_ipv6_table_contributes_no_row_and_cannot_bind_an_ipv6_primary(): void
+    {
+        $little = pack('S', 1) === "\x01\0";
+        $row4 = $little ? $this->row() : $this->row('0A000002:C350', 'C0000201:0CEA');
+        $actual = $this->proof($this->writer(), $this->context(), ['12345'], self::HEADER.$row4, CatalogSocketBinding::ABSENT_IPV6_TABLE);
+        self::assertSame('192.0.2.1', $actual['remote_ip']);
+        $this->expectException(LogicException::class);
+        CatalogSocketBinding::prove(['socket' => '', 'host' => '2001:db8:0:0:0:0:0:1', 'port' => 3306], ['server_port' => 3306, 'client_endpoint' => '[::1]:50000'], '2001:db8::1 via TCP/IP', ['12345'], self::HEADER, CatalogSocketBinding::ABSENT_IPV6_TABLE);
+    }
+
     public function test_target_matching_other_owned_socket_never_selects_it_instead_of_primary(): void
     {
         // Primary is forwarded33089; a DIFFERENT own socket matches requested3306. Filtering target first is unsafe.

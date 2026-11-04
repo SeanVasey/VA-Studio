@@ -19,6 +19,9 @@ final class CatalogSocketBinding
 
     private const MAX_FDS = 4096;
 
+    /** The IPv6 table of a kernel built or booted without IPv6: it holds no socket, so it adds no row to the proof. */
+    public const ABSENT_IPV6_TABLE = "  sl  local_address remote_address st tx_queue rx_queue tr tm->when retrnsmt uid timeout inode\n";
+
     public static function requireUntainted(): void
     {
         if (self::$tainted) {
@@ -32,7 +35,7 @@ final class CatalogSocketBinding
         // Disabled functions may be redeclared in PHP. Qualification alone does not make them native.
         foreach (['stream_wrapper_restore', 'set_error_handler', 'restore_error_handler', 'stream_context_create',
             'stream_context_get_options', 'stream_context_get_params', 'opendir', 'readdir', 'readlink', 'closedir',
-            'fopen', 'stream_get_meta_data', 'stream_get_contents', 'feof', 'fclose', 'is_resource', 'is_string',
+            'fopen', 'file_exists', 'stream_get_meta_data', 'stream_get_contents', 'feof', 'fclose', 'is_resource', 'is_string',
             'is_int', 'is_array', 'is_object', 'is_numeric', 'in_array', 'count', 'array_is_list', 'array_all',
             'array_values', 'array_unique', 'array_shift', 'array_slice', 'array_map', 'array_keys', 'array_column',
             'array_fill', 'array_fill_keys', 'array_merge', 'array_combine', 'array_diff', 'array_key_exists',
@@ -282,7 +285,7 @@ final class CatalogSocketBinding
                 }
             }
 
-            return [\array_values(\array_unique($inodes)), self::fixedFile(false, $context), self::fixedFile(true, $context)];
+            return [\array_values(\array_unique($inodes)), self::fixedFile(false, $context), self::ipv6Table($context)];
         } catch (Throwable) {
             self::$tainted = true;
             self::refuse();
@@ -298,6 +301,19 @@ final class CatalogSocketBinding
                 }
             }
         }
+    }
+
+    /**
+     * Without the IPv6 stack the kernel exposes neither if_inet6 nor tcp6, and no IPv6 socket can exist, so the empty
+     * table is the complete snapshot. A present IPv4 table is still required, and any present IPv6 file is read in full.
+     */
+    private static function ipv6Table(mixed $context): string
+    {
+        if (! \file_exists('/proc/self/net/tcp6') && ! \file_exists('/proc/self/net/if_inet6') && \file_exists('/proc/self/net/tcp')) {
+            return self::ABSENT_IPV6_TABLE;
+        }
+
+        return self::fixedFile(true, $context);
     }
 
     private static function fixedFile(bool $ipv6, mixed $context): string
