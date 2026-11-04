@@ -68,3 +68,17 @@ When ROOT schedules a physical/runtime slot against the exact committed source a
 4. Review the actual new source/result and remaining limits before D integration. Runtime failure requires diagnosis, not weakening bounds/unknown classification or skipping cases. No publication before the existing B/C/D order.
 
 Existing `MediaWriterAuthorityTest`, `PrivateMediaRevisionRootsTest` and `PrivateTrackReviewTest` are adjacent authority/privacy/retention seams; this slice edits none of them. There is no schema, env-key, dependency, mount or policy change, so no new Ops/environment matrix is introduced. No new Sean decision is required for this read-only source slice.
+
+## Claude harness execution (2026-11-04)
+
+Codex's checkpoint records an approved source/format carry for `b17d1fba`, but that record is in the private workspace that did not
+transfer. These runs are new; the native run includes the cherry-picked identity fix `a2144d4a` (lane ACC-IPV6) this kernel needs.
+
+| Check | Source | Result |
+| --- | --- | --- |
+| `php -l` and Pint on both PHP files | `b17d1fba` | clean |
+| `StaffMediaInventoryTest`, SQLite, PHP 8.4.27 | `b17d1fba` | OK, 10 tests, 48 assertions |
+| `StaffMediaInventoryTest`, private MySQL 8.4.11 | `27e416ac` (b17d1fba + a2144d4a) | OK, 10 tests, 48 assertions |
+
+Still untested: any HTTP/Filament caller (none exists), browser, Foundation CI. An independent review of the exact source is
+requested before publication because the prior record is unavailable.
