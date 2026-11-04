@@ -88,3 +88,5 @@ next commit: F1 (P2, no test held an unknown asset at `reference_coverage=incomp
 killed), F3 (overflow and mixed-null group totals now tested) and F5 (this packet's stale UNRUN line). SQLite after the fixes:
 OK, 11 tests, 59 assertions. Deferred: F2 (exact key-set privacy assertions), F4 (no-read-before-MFA-refusal proof), F6 (notes for
 a future HTTP caller: strict integer input, rate limit, private no-store response, windows are the oldest 200 rows).
+
+After the review fixes, natively: `StaffMediaInventoryTest` at `7d949f36` (cdec9597 + a2144d4a) is OK, 11 tests, 59 assertions.
