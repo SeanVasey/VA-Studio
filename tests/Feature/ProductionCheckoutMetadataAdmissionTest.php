@@ -227,7 +227,8 @@ class ProductionCheckoutMetadataAdmissionTest extends TestCase
             });
             $object = $this->connection;
         }
-        $before = $property->getRawValue($object);
+        // Facade::$resolvedInstance is static: getRawValue() needs an object, so a static property is read with getValue().
+        $before = $object === null ? $property->getValue() : $property->getRawValue($object);
         if (in_array($surface, ['connection', 'peer'], true)) {
             $config = (new ReflectionProperty(Connection::class, 'config'))->getRawValue($this->connection);
             $sentinel = new CheckoutMetadataGetterSentinel($this->primary, '', '', $config);

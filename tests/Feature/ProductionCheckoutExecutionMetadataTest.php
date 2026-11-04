@@ -84,7 +84,9 @@ class ProductionCheckoutExecutionMetadataTest extends TestCase
         $property = new ReflectionProperty(Container::class, 'beforeResolvingCallbacks');
         $before = $property->getRawValue($this->app);
         $callbacks = 0;
-        $this->app->beforeResolving('config', function () use (&$callbacks): void { $callbacks++; });
+        $this->app->beforeResolving('config', function () use (&$callbacks): void {
+            $callbacks++;
+        });
         $failure = null;
         try {
             ExecutionContextV1::current($machine);
