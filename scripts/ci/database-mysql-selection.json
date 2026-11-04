@@ -63,6 +63,9 @@
   "include_files": [
     "tests/Feature/BulkReplaceLicenseDraftSourceTest.php",
     "tests/Feature/CustomerComms/CustomerDataRightsTest.php",
+    "tests/Feature/CustomerComms/TransactionalMailRecoveryNativeTest.php",
+    "tests/Feature/CustomerComms/TransactionalMailRecoveryTest.php",
+    "tests/Feature/CustomerComms/TransactionalMailScanProgressTest.php",
     "tests/Feature/CustomerComms/TransactionalMailTest.php",
     "tests/Feature/CustomerListeningFreshnessTest.php",
     "tests/Feature/FreeGrantSchemaRecoveryTest.php",

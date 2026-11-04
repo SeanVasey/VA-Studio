@@ -10,6 +10,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Queue\Events\JobQueueing;
 use Illuminate\Queue\QueueManager;
+use Illuminate\Queue\QueueServiceProvider;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
@@ -49,7 +50,10 @@ class TransactionalMailRecoveryTest extends TestCase
         $f = N::ready(suffix: 'PUSH'.($afterPush ? 'AFTER' : 'BEFORE'));
         M::configure();
         config(['queue.default' => 'database', 'queue.connections.database.connection' => DB::getDefaultConnection()]);
-        Queue::swap(new QueueManager(app()));
+        $queues = new QueueManager(app());
+        // A bare manager has no connectors; register the framework's own so the real database connector runs.
+        (new QueueServiceProvider(app()))->registerConnectors($queues);
+        Queue::swap($queues);
         $armed = true;
         $hits = 0;
         Event::listen($afterPush ? JobQueued::class : JobQueueing::class, function (object $event) use (&$armed, &$hits): void {
