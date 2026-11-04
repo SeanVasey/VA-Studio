@@ -91,6 +91,8 @@ The diagnosis is right and the ID change alone is necessary and sufficient. P2-1
 hide an automatic-allocation regression) and P3-1 (the unneeded clock move) are fixed in the following commit, and P3-2/P3-3 in
 this section and the wording above. The two affected methods are re-run at that commit (results below).
 
+| Check | Source | Result |
+| --- | --- | --- |
 | Two affected methods after the repair review, SQLite | `58cf71a0` | OK, 2 tests, 113 assertions |
 | Two affected methods after the repair review, private MySQL 8.4.11 | `cb19c18e` (58cf71a0 + a2144d4a) | OK, 2 tests, 113 assertions |
 
