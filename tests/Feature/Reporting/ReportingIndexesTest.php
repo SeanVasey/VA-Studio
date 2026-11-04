@@ -2,8 +2,6 @@
 
 namespace Tests\Feature\Reporting;
 
-use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObject;
-use App\Domain\Commerce\RefundDispute\RefundDisputeActions;
 use App\Domain\Reporting\OperationalHealth;
 use App\Domain\Reporting\SalesReport;
 use App\Models\User;
@@ -13,7 +11,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 use LogicException;
 use Tests\Support\DeliveryFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
@@ -126,19 +123,13 @@ class ReportingIndexesTest extends TestCase
         $staff = LicenseFixtures::admin();
         $staff->saveAppAuthenticationSecret('JBSWY3DPEHPK3PXP');
         $this->actingAs($staff);
-        // Provider IDs allow only an alphanumeric suffix; observation follows the genuine payment.
-        $this->travelTo($fixture['payment']->confirmed_at->toImmutable()->addSecond());
+        // Provider IDs allow only an alphanumeric suffix after the prefix (PaymentFinancialEvidence::id).
         R::provider($financial, [['re_REPORTINGINDEX', $fixture['payment']->amount_minor, 'succeeded']]);
         $this->assertSame('full', R::observe($fixture['order']->public_id, $staff)['refundState']);
-        if (DB::table('refund_line_allocations')->where('order_id', $fixture['order']->id)->count() === 0) {
-            $refund = RefundDisputeObject::where('order_id', $fixture['order']->id)->where('kind', 'refund')->sole();
-            $lines = [];
-            foreach ($fixture['original']['lines'] as $position => $line) {
-                $lines[$position] = $line['pricing']['total_minor'];
-            }
-            app(RefundDisputeActions::class)->allocate($fixture['order']->public_id, $staff, (string) Str::uuid(),
-                R::sequence($fixture['order']->public_id, $staff), $refund->public_id, $lines);
-        }
+        // The accepted full observation allocates automatically in the same transaction; no fallback may stand in for it.
+        $this->assertSame(['automatic_full_refund'], DB::table('refund_line_allocations')->where('order_id', $fixture['order']->id)
+            ->distinct()->pluck('source')->all(), 'full refund is allocated automatically');
+        $this->assertSame((int) $fixture['payment']->amount_minor, (int) DB::table('refund_line_allocations')->where('order_id', $fixture['order']->id)->sum('amount_minor'));
         foreach (['quotes', 'orders', 'order_finalizations', 'refund_line_allocations'] as $table) {
             $this->assertGreaterThan(0, DB::table($table)->count(), $table.' has genuine retained evidence');
         }
