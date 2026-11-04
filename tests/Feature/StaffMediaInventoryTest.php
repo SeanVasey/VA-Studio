@@ -192,6 +192,12 @@ class StaffMediaInventoryTest extends TestCase
         $this->assertContains('retained_json_and_encrypted_references_not_inspected', $report['unknown_reasons']);
         $this->assertArrayNotHasKey('safe_to_delete', $report['assets'][0]);
         $this->assertArrayNotHasKey('unreferenced', $report['assets'][0]);
+        // Even with every window exhausted, unknown never becomes complete coverage (an unreferenced reading).
+        $this->assertSame('incomplete', $report['assets'][0]['reference_coverage']);
+        $this->assertSame('incomplete', $report['reference_coverage']);
+        foreach ($report['reference_windows'] as $window) {
+            $this->assertFalse($window['has_more']);
+        }
     }
 
     public function test_missing_recorded_size_does_not_become_zero_bytes(): void
@@ -202,6 +208,24 @@ class StaffMediaInventoryTest extends TestCase
         $report = app(ReadStaffMediaInventory::class)->handle($actor);
         $this->assertNull($report['assets'][0]['recorded_bytes']);
         $this->assertNull($report['bytes_by_role_status'][0]['recorded_bytes']);
+    }
+
+    public function test_group_totals_become_unknown_on_overflow_or_any_missing_size(): void
+    {
+        $actor = LicenseFixtures::admin();
+        $this->asset(PHP_INT_MAX, 'artwork', 'quarantined');
+        $this->asset(1, 'artwork', 'quarantined');
+        $mixed = $this->asset(5, 'preview', 'quarantined');
+        $this->asset(7, 'preview', 'quarantined');
+        DB::table('media_assets')->where('id', $mixed->id)->update(['size_bytes' => null]);
+        $groups = [];
+        foreach (app(ReadStaffMediaInventory::class)->handle($actor)['bytes_by_role_status'] as $group) {
+            $groups[$group['role']] = $group;
+        }
+        $this->assertSame(2, $groups['artwork']['asset_count']);
+        $this->assertNull($groups['artwork']['recorded_bytes'], 'An overflowing sum is unknown, never a float or a wrapped total.');
+        $this->assertSame(2, $groups['preview']['asset_count']);
+        $this->assertNull($groups['preview']['recorded_bytes'], 'One missing size makes the group total unknown.');
     }
 
     public function test_an_existing_transaction_cannot_supply_a_stale_inventory_view(): void

@@ -58,7 +58,7 @@ No private media bytes, paths, filenames, technical metadata, hashes, URLs, cust
 
 ## Actual verification and ROOT execution handoff
 
-Source-only preparation. **All PHP lint, Pint, PHPUnit, SQLite/MySQL, native, HTTP/browser and CI checks are UNRUN.** No runtime, Docker, vendor materialization, dependency installation or media tool invocation was performed by the author. `git diff --check` is a whitespace check only.
+Source-only preparation by the author. **At preparation time, all PHP lint, Pint, PHPUnit, SQLite/MySQL, native, HTTP/browser and CI checks were UNRUN** (the harness results are recorded below). No runtime, Docker, vendor materialization, dependency installation or media tool invocation was performed by the author. `git diff --check` is a whitespace check only.
 
 When ROOT schedules a physical/runtime slot against the exact committed source and approved dependencies:
 
@@ -82,3 +82,9 @@ transfer. These runs are new; the native run includes the cherry-picked identity
 
 Still untested: any HTTP/Filament caller (none exists), browser, Foundation CI. An independent review of the exact source is
 requested before publication because the prior record is unavailable.
+
+Independent review of `b17d1fba`: **APPROVE** ([decision](independent-cat-review-b17d1fba-DECISION.md)), no P0 or P1. Fixed in the
+next commit: F1 (P2, no test held an unknown asset at `reference_coverage=incomplete`; the mutant setting `complete` now fails,
+killed), F3 (overflow and mixed-null group totals now tested) and F5 (this packet's stale UNRUN line). SQLite after the fixes:
+OK, 11 tests, 59 assertions. Deferred: F2 (exact key-set privacy assertions), F4 (no-read-before-MFA-refusal proof), F6 (notes for
+a future HTTP caller: strict integer input, rate limit, private no-store response, windows are the oldest 200 rows).
