@@ -35,3 +35,16 @@ admin/customer/member states, further editorial/product families, human screen r
 native forced-color paint and physical devices remain open. This transport does not
 establish backend publication, payment, entitlement or WCAG/launch acceptance. Integration
 remains in D after B/C; no install, typecheck, build, browser/product test, CI or publication ran here.
+
+## Claude harness checks at `bcb08f67` (2026-11-04)
+
+| Check | Result |
+| --- | --- |
+| `npm ci` (Node 24.22.0) | 123 packages; `@axe-core/playwright@4.14.0` resolved from the committed lock |
+| `npm audit --audit-level=high` | 0 vulnerabilities |
+| `npm run typecheck` (includes `tests/browser`) | clean |
+| `npm test` (vitest) | 70 files, 1177 tests passed |
+| `npm run build` | built |
+| `accessibility-public.spec.ts` via `npm run test:browser` wrapper, chromium-desktop, preinstalled Chromium 1194 through an untracked config | not executed: the wrapper's isolated fixture setup refused in phase `customer_purchase` with `MediaFailure` before any browser started. This container cannot fetch ClamAV signatures (known limitation), so the browser spec needs CI or a host with a working scanner |
+
+No WCAG result is claimed from this harness.
