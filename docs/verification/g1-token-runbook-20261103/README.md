@@ -32,3 +32,25 @@ Each observer creates the existing MembershipAwardTransaction on TransactionBegi
 Append exactly one pair to existing methods in scripts/ci/database-sqlite-skips.json, preserving all336 prior rows/order and pinned150 d93da4e7a13a8c6aff8f97f363eb6d93dde884bad53c9ae50eeb0ed32514c71c. Native test explicitly skips SQLite and is classified, not mislabeled SQLite proof. Existing MySQL include_files already selects MembershipSchemaProofFrameTest.php; no native policy expansion/strict guard change. Enumeration/count comments wait actual future integrated discovery; no counts guessed. Do not replay unrelated full classes/matrices or claim original native evidence current.
 
 ROOT later: actual PHP syntax/Pint check of this one changed test; exact selected native discovery then one original test on private Oracle8.4.11 under existing qualified source/vendor/admission/all6/capture/EOF/reap/cleanup protocol. Preserve normal native600/655/512MiB/64KiB/cleanup30, exact one-method JUnit positive assertions/noFESW/genuine App/source origins. Native/mutation UNRUN; no PHP/Docker/SQL/fixture/vendor operation by source author. Independent source review required before merge; no push/PR/merge/activation here.
+
+## Claude harness execution (2026-11-04)
+
+Codex's sealed v2 execution packet and runtime did not transfer; these runs are new. Native runs use this harness's private
+Oracle MySQL 8.4.11 and include the cherry-picked identity fix `a2144d4a` (lane ACC-IPV6), which this kernel needs.
+
+| Run | Source | Result |
+| --- | --- | --- |
+| Original positive | `7f467682` (284abdc4 + a2144d4a) | **STOP**: 7 assertions, then `Current private catalog admission required.` at the first consult after changing `character_set_results` ([log](original-failure-native-positive-284abdc4-ipv6.log)) |
+| Revised positive | `eb1cd7b7` (9a99e6b9 + a2144d4a) | OK, 1 test, 14 assertions |
+| Token-only mutant (2ba71e16's one-line change) on the revised test | `eb1cd7b7` + mutant, restored after | survives: OK, 1 test, 14 assertions |
+
+Cause of the STOP: every framed consult opens `CatalogLease`, and `CurrentCatalog::verifyLive()` re-reads the session context
+(`CONTEXT` includes `@@SESSION.character_set_results`) and refuses when it differs from the captured identity. That check
+arrived with the account guard (PR #190), after this test was designed, so its premise (the complete proof reruns and passes
+under a changed result charset) no longer holds. The revised test asserts the behaviour that does hold: the changed charset is
+never answered from the remembered proof (callback count stays 1), the frame closes, and after restoring the charset the next
+consult reruns the real complete proof.
+
+N-1 is therefore closed by the lease's context check, not by the token leg. Removing the token's result-charset leg is not
+observable in a framed consult (the mutant survives), so that leg is defence in depth only. No mutation kill is claimed.
+Independent review of `9a99e6b9` is still required before merge.
