@@ -146,7 +146,9 @@ Repo-specific facts and invariants. §1–§12 stay byte-identical across repos;
 
 ### Current user-authorized handoff — October 7, 2026
 
-**Current (2026-11-01):** the Claude Code harness handed the lead to Codex because of usage limits. Read `docs/handoff/2026-11-01/CODEX-HANDOFF.md` first; the paste-ready prompt is `docs/handoff/2026-11-01/CODEX-PROMPT.md`. Lane state lives in `docs/handoff/2026-10-17/RESUMPTION.md`.
+**Current (2026-11-05):** the Claude Code harness resumed from Codex's 2026-11-04 checkpoint, merged B (PR #191) and verified the C/D lanes on pushed `claude/*` branches. Read `docs/handoff/2026-11-05/HANDOFF.md` first. Lane state lives in `docs/handoff/2026-10-17/RESUMPTION.md`.
+
+**Superseded (2026-11-01):** the Claude Code harness handed the lead to Codex because of usage limits (`docs/handoff/2026-11-01/CODEX-HANDOFF.md`).
 
 **Superseded (2026-10-29):** Sean cancelled the Codex handoff and the Claude Code harness resumed the lead; `docs/handoff/2026-10-26/CODEX-HANDOFF.md` is history (still accurate for the routine, the merge discipline and the owner inputs).
 
