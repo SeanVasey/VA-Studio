@@ -52,6 +52,14 @@ remain only in its bundle.
 4. Still open, design only: C4e N4 idle-PDO, the REP EXPLAIN diagnostics and UI companion (their packets stayed in Codex's
    workspace), the account-ledger CI hosted checks.
 
+## Found while publishing this checkpoint
+
+- Main's `composer audit` turned red on 2026-11-04 (new Symfony advisories), which fails every PR's preflight. This PR
+  carries the patch/minor lock bump (see CHANGELOG, Security). Merge main into each lane branch before its PR.
+- `PruneExpiredCacheRowsTest::test_expired_locks_go_and_held_locks_stay_held` fails on `main` `f766e354` in this harness
+  (lock key order `live-lock`, `held-synthetic`), 3 of 3 runs, with or without the bump. Codex's T36 branch changes that test
+  file; check whether it already repairs this before writing a new fix.
+
 ## Decisions for Sean (unchanged unless noted)
 
 - **Exact PHP pin (new).** `CatalogSocketBinding::attest` accepts only PHP 8.4.27. CI (`setup-php` '8.4') and Forge install the
