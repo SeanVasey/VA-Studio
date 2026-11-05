@@ -69,6 +69,10 @@ final class MembershipHttpTest extends TestCase
         $this->assertSame(1, $preBytes(), 'The index body was released after exactly one pre-bytes re-read.');
         $this->assertSame((new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user']), $index);
         $this->assertCount(1, $index['periods'][0]['reservations']);
+        $older = $this->privateJson($this->getMember('/production-memberships/periods/before/'.$period))->assertOk()->json('index');
+        $this->assertSame([], $older['periods']);
+        $this->assertFalse($older['hasMore']);
+        $this->assertSame(10, $older['periodLimit']);
 
         $before = DB::table(MembershipReservationRecords::TABLE)->count();
         // A body of the wrong shape is refused before the domain is called.
@@ -160,6 +164,7 @@ final class MembershipHttpTest extends TestCase
         $this->notFound($this->postMember('/production-memberships/periods/'.$period.'/reservations/'.$redemption.'/release', []));
         $this->notFound($this->postMember('/production-memberships/periods/'.$period.'/expire', []));
         $this->assertSame([], $this->getMember('/production-memberships/periods')->assertOk()->json('index.periods'));
+        $this->notFound($this->getMember('/production-memberships/periods/before/'.$period));
         // The owner: an unknown period, a non-v4 id, an unknown redemption and a not-yet-expired credit.
         $this->actAs($fixture['buyer']);
         $this->notFound($this->reserve($fixture, (string) Str::uuid()));

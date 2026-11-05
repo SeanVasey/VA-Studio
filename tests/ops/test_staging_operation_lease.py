@@ -3,6 +3,7 @@ import fcntl
 import os
 from pathlib import Path
 import pwd
+import re
 import signal
 import shutil
 import subprocess
@@ -45,6 +46,8 @@ if [ "$2" = install ]; then
   printf '{}' > RELEASE_PATH/vendor/composer/installed.json
 fi
 if { [ "$2" = migrate ] && [ "${3:-}" = --force ]; } || [ "$2" = install ]; then
+  : > ENTERED_PATH
+  sleep 0.05
   echo $$ > ENTERED_PATH
   while [ ! -e FINISH_PATH ]; do sleep 0.01; done
   [ ! -e FAIL_PATH ] || exit 23
@@ -108,12 +111,18 @@ cmd_attach() { echo attach >> "$TRACE"; }
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True)
 
     def wait_entered(self, process):
+        def pid_published():
+            try:
+                return re.fullmatch(r"[1-9][0-9]*\n", self.entered.read_text()) is not None
+            except FileNotFoundError:
+                return False
+
         deadline = time.monotonic() + 5
-        while not self.entered.exists() and process.poll() is None and time.monotonic() < deadline:
+        while not pid_published() and process.poll() is None and time.monotonic() < deadline:
             time.sleep(0.01)
-        if not self.entered.exists():
+        if not pid_published():
             out, err = process.communicate(timeout=2)
-            self.fail("migration child did not enter: " + out + err)
+            self.fail("migration child did not publish a complete PID: " + out + err)
 
     def cleanup_process(self, process):
         self.finish.touch()

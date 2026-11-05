@@ -1333,6 +1333,18 @@
     [
       "Tests\\Feature\\ProductionIdentity\\CurrentCatalogAdmissionTest",
       "test_native_unframed_complete_proofs_refuse_new_namespace_under_early_primary_snapshot"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_page_statement_count_stays_bounded_when_total_history_grows"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_committed_index_frame_refuses_temporary_table_creation_before_raw_proof"
+    ],
+    [
+      "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCustomerIndexTest",
+      "test_native_recovered_index_allows_foreign_award_without_cross_owner_history_locks"
     ]
   ]
 }

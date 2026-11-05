@@ -65,7 +65,7 @@ final class MembershipHttpMountTest extends TestCase
         $this->refreshApplication();
         $this->assertFalse((require base_path('config/production-memberships.php'))['http_mounted']);
         $this->assertFalse(MembershipHttpMount::admitted());
-        foreach (['index', 'reserve', 'release', 'expire'] as $name) {
+        foreach (['index', 'before', 'reserve', 'release', 'expire'] as $name) {
             $this->assertFalse(Route::has('production-memberships.'.$name), $name);
         }
         $queries = $this->queries();
@@ -83,6 +83,7 @@ final class MembershipHttpMountTest extends TestCase
         $this->app->instance('env', $environment);
         $queries = $this->queries();
         // Refused before the web stack: no session is started, so no session cookie is issued (review N3).
+        $this->notFound($this->getMember('/production-memberships/periods/before/'.self::PERIOD))->assertCookieMissing(config('session.cookie'));
         $this->notFound($this->getMember('/production-memberships/periods'))->assertCookieMissing(config('session.cookie'));
         $this->notFound($this->postMember('/production-memberships/periods/'.self::PERIOD.'/expire', []))->assertCookieMissing(config('session.cookie'));
         $this->assertSame([], $queries());
@@ -90,7 +91,7 @@ final class MembershipHttpMountTest extends TestCase
 
     public function test_mounted_routes_with_the_shipped_membership_gates_are_the_one_not_found_response(): void
     {
-        foreach (['index', 'reserve', 'release', 'expire'] as $name) {
+        foreach (['index', 'before', 'reserve', 'release', 'expire'] as $name) {
             $this->assertTrue(Route::has('production-memberships.'.$name), $name);
         }
         $this->assertFalse(config('production-memberships.enabled'));
@@ -98,6 +99,7 @@ final class MembershipHttpMountTest extends TestCase
         $this->assertFalse(config('member-grants.enabled'));
         $responses = [
             $this->getMember('/production-memberships/periods'),
+            $this->getMember('/production-memberships/periods/before/'.self::PERIOD),
             $this->postMember('/production-memberships/periods/'.self::PERIOD.'/reservations', ['offerId' => '1', 'expectedRevision' => 1, 'requestKey' => str_repeat('k', 16)]),
             $this->postMember('/production-memberships/periods/'.self::PERIOD.'/reservations/'.self::PERIOD.'/release', []),
             $this->postMember('/production-memberships/periods/'.self::PERIOD.'/expire', []),
@@ -126,6 +128,8 @@ final class MembershipHttpMountTest extends TestCase
             'declared oversize' => ['POST', $reserve, '{}', ['CONTENT_LENGTH' => '1025'], 413],
             'range' => ['GET', '/production-memberships/periods', null, ['HTTP_RANGE' => 'bytes=0-1'], 422],
             'query string' => ['GET', '/production-memberships/periods?requestKey=PRIVATE-REQUEST-KEY', '', [], 422],
+            'continuation query string' => ['GET', '/production-memberships/periods/before/'.self::PERIOD.'?before=x', '', [], 422],
+            'continuation with a body' => ['GET', '/production-memberships/periods/before/'.self::PERIOD, 'x', [], 422],
             'get with a body' => ['GET', '/production-memberships/periods', 'x', [], 422],
             'compressed body' => ['POST', $reserve, '{}', ['HTTP_CONTENT_ENCODING' => 'gzip'], 415],
             'foreign origin' => ['POST', $reserve, '{}', ['HTTP_ORIGIN' => 'https://foreign.invalid'], 403],

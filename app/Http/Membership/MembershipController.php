@@ -29,7 +29,7 @@ final class MembershipController
 
     private const OFFER = '/\A[1-9][0-9]{0,15}\z/D';
 
-    public function index(Request $request): Response
+    public function index(Request $request, ?string $period = null): Response
     {
         try {
             MembershipException::require(MembershipHttpMount::admitted(), 'not_mounted');
@@ -37,7 +37,7 @@ final class MembershipController
             MembershipException::require($this->body($request) === [], 'invalid_input');
             (new MembershipCustomerLimiter)->admit($identity, 'reads');
             $read = MembershipCustomerRead::begin();
-            $index = (new MembershipCustomerIndex)->index($identity->principal(), $identity->actor(), $read);
+            $index = (new MembershipCustomerIndex)->index($identity->principal(), $identity->actor(), $read, before: $period);
             $response = MembershipPrivacy::json(['index' => self::indexBody($index)]);
         } catch (Throwable $error) {
             return MembershipPrivacy::refusal($error);

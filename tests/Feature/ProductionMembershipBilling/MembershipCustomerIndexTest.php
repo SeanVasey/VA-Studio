@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\ProductionMembershipBilling;
 
+use App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions;
 use App\Domain\Memberships\Production\MembershipCustomerIndex;
 use App\Domain\Memberships\Production\MembershipCustomerRead;
 use App\Domain\Memberships\Production\MembershipException;
@@ -44,7 +45,7 @@ class MembershipCustomerIndexTest extends TestCase
         $index = $this->index($fixture);
         $period = (array) DB::table(MembershipPeriodRecords::PERIODS)->sole();
         $redemption = (array) DB::table(MembershipReservationRecords::TABLE)->sole();
-        $this->assertSame(['schemaVersion' => 1, 'periodLimit' => 100, 'hasMore' => false, 'provenance' => 'synthetic_rehearsal',
+        $this->assertSame(['schemaVersion' => 1, 'periodLimit' => 10, 'hasMore' => false, 'provenance' => 'synthetic_rehearsal',
             'periods' => [[
                 'id' => $period['id'], 'planVersionId' => $fixture['plan']['id'], 'periodStart' => $period['period_start'],
                 'periodEnd' => $period['period_end'], 'creditExpiresAt' => $period['credit_expires_at'], 'allowance' => 3,
@@ -89,21 +90,21 @@ class MembershipCustomerIndexTest extends TestCase
         }
     }
 
-    public function test_bound_is_one_hundred_periods_and_the_sentinel_only_reports_more(): void
+    public function test_page_bound_is_ten_periods_and_the_sentinel_only_reports_more(): void
     {
         $fixture = $this->memberActivationFixture();
-        $this->syntheticPeriods($fixture, 99);
+        $this->syntheticPeriods($fixture, 9);
         $full = $this->index($fixture);
-        $this->assertCount(100, $full['periods']);
+        $this->assertCount(10, $full['periods']);
         $this->assertFalse($full['hasMore']);
         $this->assertSame($fixture['reservation']['period_id'], $full['periods'][0]['id']);
         $starts = array_column($full['periods'], 'periodStart');
         $sorted = $starts;
         rsort($sorted);
         $this->assertSame($sorted, $starts);
-        $oldest = $this->syntheticPeriods($fixture, 1, 100)[0];
+        $oldest = $this->syntheticPeriods($fixture, 1, 10)[0];
         $more = $this->index($fixture);
-        $this->assertCount(100, $more['periods']);
+        $this->assertCount(10, $more['periods']);
         $this->assertTrue($more['hasMore']);
         $this->assertSame(array_column($full['periods'], 'id'), array_column($more['periods'], 'id'));
         $this->assertNotContains($oldest, array_column($more['periods'], 'id'));
@@ -112,11 +113,152 @@ class MembershipCustomerIndexTest extends TestCase
     public function test_sentinel_row_is_authenticated_like_every_listed_period(): void
     {
         $fixture = $this->memberActivationFixture();
-        $this->syntheticPeriods($fixture, 99);
-        $sentinel = $this->syntheticPeriods($fixture, 1, 100)[0];
+        $this->syntheticPeriods($fixture, 9);
+        $sentinel = $this->syntheticPeriods($fixture, 1, 10)[0];
         // A correctly sealed but inconsistent first award in the sentinel alone refuses the whole index.
         $this->resealEvent($sentinel, ['after_available' => 2]);
         $this->refused(fn () => $this->index($fixture), 'tampered');
+    }
+
+    public function test_one_hundred_and_one_periods_are_reachable_without_missing_or_duplicate_rows(): void
+    {
+        $fixture = $this->memberActivationFixture();
+        $this->syntheticPeriods($fixture, 99);
+        $hundred = $this->traverse($fixture);
+        $this->assertCount(100, $hundred);
+        $oldest = $this->syntheticPeriods($fixture, 1, 100)[0];
+        $this->assertSame([...$hundred, $oldest], $this->traverse($fixture));
+    }
+
+    public function test_timestamp_ties_use_a_strict_id_boundary_and_pre_bytes_keeps_the_cursor(): void
+    {
+        $fixture = $this->memberActivationFixture();
+        $this->syntheticPeriods($fixture, 20, ties: true);
+        $expected = DB::table(MembershipPeriodRecords::PERIODS)->orderByDesc('period_start')->orderByDesc('id')->pluck('id')->all();
+        $this->assertSame($expected, $this->traverse($fixture));
+        $first = $this->index($fixture);
+        $anchor = $first['periods'][9]['id'];
+        $read = MembershipCustomerRead::begin();
+        $next = (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read, before: $anchor);
+        $this->assertSame(array_slice($expected, 10, 10), array_column($next['periods'], 'id'));
+        $read->proveBeforeBytes();
+        // Re-reading the first page would differ and refuse this successful continuation proof.
+        $this->assertNotContains($anchor, array_column($next['periods'], 'id'));
+    }
+
+    public function test_anchor_requires_owned_complete_history_even_when_it_is_not_displayed(): void
+    {
+        $fixture = $this->memberActivationFixture();
+        $other = $this->enrollThroughLocalSmtp('anchor-other@example.test');
+        $anchor = $fixture['reservation']['period_id'];
+        $this->refused(fn () => (new MembershipCustomerIndex)->index($other['principal'], $other['user'], before: $anchor), 'foreign_period');
+        $this->refused(fn () => (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'],
+            before: '00000000-0000-4000-8000-000000000000'), 'foreign_period');
+        $this->refused(fn () => (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], before: 'bad'), 'invalid_value');
+        $read = MembershipCustomerRead::begin();
+        $this->assertSame([], (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read, before: $anchor)['periods']);
+        $this->resealEvent($anchor, ['after_available' => 2]);
+        $this->refused(fn () => $read->proveBeforeBytes(), 'tampered');
+        $this->refused(fn () => (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], before: $anchor), 'tampered');
+    }
+
+    public function test_valid_ledger_change_to_a_non_displayed_anchor_withholds_prebuilt_page(): void
+    {
+        $fixture = $this->memberActivationFixture();
+        $this->syntheticPeriods($fixture, 2);
+        $anchor = $fixture['reservation']['period_id'];
+        $read = MembershipCustomerRead::begin();
+        $page = (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read, before: $anchor);
+        $this->assertCount(2, $page['periods']);
+        $this->reserveFixture($fixture, 'later-anchor-only-reservation');
+        $this->assertSame($page, (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], before: $anchor));
+        $this->refused(fn () => $read->proveBeforeBytes(), 'changed_before_bytes');
+    }
+
+    public function test_newer_insertions_do_not_shift_continuations_or_hide_an_older_live_reservation(): void
+    {
+        $fixture = $this->memberActivationFixture();
+        // Synthetic prepaid future periods sort ahead of the real, still-reserved period.
+        $this->syntheticPeriods($fixture, 10, -11);
+        $first = $this->index($fixture);
+        $this->assertTrue($first['hasMore']);
+        $this->assertNotContains($fixture['reservation']['period_id'], array_column($first['periods'], 'id'));
+        $cursor = $first['periods'][9]['id'];
+        $read = MembershipCustomerRead::begin();
+        $older = (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], $read, before: $cursor);
+        $this->assertSame([$fixture['reservation']['period_id']], array_column($older['periods'], 'id'));
+        $this->assertSame($fixture['reservation']['redemption_id'], $older['periods'][0]['reservations'][0]['id']);
+        $this->assertSame('reserved', $older['periods'][0]['reservations'][0]['status']);
+        $this->syntheticPeriods($fixture, 1, -12);
+        $this->assertSame($older, (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], before: $cursor));
+        $read->proveBeforeBytes();
+    }
+
+    public function test_a_new_window_row_committed_with_the_index_refuses_its_terminal_reread(): void
+    {
+        $fixture = $this->memberActivationFixture();
+        $armed = true;
+        DB::connection()->getEventDispatcher()->listen(TransactionCommitting::class, function () use ($fixture, &$armed): void {
+            if ($armed) {
+                $armed = false;
+                // A commit delegate changes the selected window after the owned terminal proof.
+                $this->syntheticPeriods($fixture, 1, -2);
+            }
+        });
+        $this->refused(fn () => $this->index($fixture), 'changed_period_window');
+        $this->assertFalse($armed);
+    }
+
+    public function test_recovered_owner_lists_mixed_old_and_new_retained_buyer_bindings_and_passes_pre_bytes(): void
+    {
+        $fixture = $this->memberActivationFixture();
+        $this->syntheticPeriods($fixture, 1);
+        $oldBinding = $fixture['buyer']['principal']->durableBinding();
+        $this->completeIdentity($this->requestIdentity('recover'));
+        $recovered = (new ProductionCustomerSessions)->authenticate('buyer@example.test', 'MailboxPassword123');
+        $this->assertNotNull($recovered);
+        $newBinding = $recovered['principal']->durableBinding();
+        $this->assertSame($oldBinding['origin_id'], $newBinding['origin_id']);
+        $this->assertNotSame($oldBinding['verification_observation_id'], $newBinding['verification_observation_id']);
+        $current = [...$fixture, 'buyer' => $recovered];
+        $this->syntheticPeriods($current, 1, 2, buyerBinding: $newBinding);
+        // A newly retained period can still refer to the old, independently authenticated original buyer binding.
+        $this->syntheticPeriods($current, 1, 3, buyerBinding: $oldBinding);
+        $read = MembershipCustomerRead::begin();
+        $index = (new MembershipCustomerIndex)->index($recovered['principal'], $recovered['user'], $read);
+        $this->assertCount(4, $index['periods']);
+        $this->assertSame(DB::table(MembershipPeriodRecords::PERIODS)->orderByDesc('period_start')->orderByDesc('id')->pluck('id')->all(),
+            array_column($index['periods'], 'id'));
+        $read->proveBeforeBytes();
+        // A validly sealed invoice cannot borrow the old binding's proof for a conflicting newer observation hash.
+        $invalid = [...$newBinding, 'verification_observation_hash' => str_repeat('0', 64)];
+        $this->syntheticPeriods($current, 1, 4, buyerBinding: $invalid);
+        $this->refused(fn () => $this->index($current), 'owner_refused');
+    }
+
+    /** Compare the entire traversal against independently ordered persisted ids, including the final empty case. */
+    private function traverse(array $fixture): array
+    {
+        $expected = DB::table(MembershipPeriodRecords::PERIODS)->where('account_id', $fixture['buyer']['principal']->accountId)
+            ->orderByDesc('period_start')->orderByDesc('id')->pluck('id')->all();
+        $ids = [];
+        $cursor = null;
+        do {
+            $page = (new MembershipCustomerIndex)->index($fixture['buyer']['principal'], $fixture['buyer']['user'], before: $cursor);
+            $this->assertSame(10, $page['periodLimit']);
+            $this->assertLessThanOrEqual(10, count($page['periods']));
+            $pageIds = array_column($page['periods'], 'id');
+            $ids = [...$ids, ...$pageIds];
+            $this->assertCount(count(array_unique($ids)), $ids);
+            if ($page['hasMore']) {
+                $this->assertCount(10, $pageIds);
+                $cursor = $pageIds[9];
+            }
+            $this->assertLessThanOrEqual(count($expected), count($ids));
+        } while ($page['hasMore']);
+        $this->assertSame($expected, $ids);
+
+        return $ids;
     }
 
     public function test_ledger_audit_failure_refuses_the_whole_index(): void
@@ -131,7 +273,7 @@ class MembershipCustomerIndexTest extends TestCase
     {
         $fixture = $this->memberActivationFixture();
         $other = $this->enrollThroughLocalSmtp('second-member@example.test');
-        $this->assertSame(['schemaVersion' => 1, 'periodLimit' => 100, 'hasMore' => false, 'provenance' => 'synthetic_rehearsal',
+        $this->assertSame(['schemaVersion' => 1, 'periodLimit' => 10, 'hasMore' => false, 'provenance' => 'synthetic_rehearsal',
             'periods' => []], (new MembershipCustomerIndex)->index($other['principal'], $other['user']));
         $this->assertCount(1, $this->index($fixture)['periods']);
     }
@@ -211,7 +353,7 @@ class MembershipCustomerIndexTest extends TestCase
     }
 
     /** Older adjacent synthetic periods in the exact retained format, inserted below the real writers' newest one. */
-    private function syntheticPeriods(array $fixture, int $count, int $offset = 0): array
+    private function syntheticPeriods(array $fixture, int $count, int $offset = 0, bool $ties = false, ?array $buyerBinding = null): array
     {
         $real = (array) DB::table(MembershipPeriodRecords::PERIODS)->where('id', $fixture['reservation']['period_id'])->sole();
         $award = (array) DB::table(MembershipPeriodRecords::EVENTS)->where('period_id', $real['id'])->where('kind', 'award')->sole();
@@ -221,12 +363,12 @@ class MembershipCustomerIndexTest extends TestCase
         $invoice = MembershipPeriodRecords::historicalInvoice($real, $award, $policy, $originId);
         $ids = [];
         for ($index = 1; $index <= $count; $index++) {
-            $shift = ($offset + $index) * 2678400;
+            $shift = $ties ? 0 : ($offset + $index) * 2678400;
             $move = static fn (?string $at): ?string => $at === null ? null : gmdate('Y-m-d H:i:s', strtotime($at.' UTC') - $shift);
             $copy = new MembershipInvoiceBinding(hash('sha256', 'synthetic-index-invoice-'.($offset + $index)),
                 hash('sha256', 'synthetic-index-graph-'.($offset + $index)), $invoice->providerScopeHash, $invoice->amountMinor,
                 $invoice->currency, $move($invoice->periodStart), $move($invoice->periodEnd), $invoice->planPolicyHash,
-                $invoice->originalTermsHash, $invoice->originalBuyerBinding, $invoice->provenance, $move($invoice->paidAt), $invoice->planVersionId);
+                $invoice->originalTermsHash, $buyerBinding ?? $invoice->originalBuyerBinding, $invoice->provenance, $shift < 0 ? $invoice->paidAt : $move($invoice->paidAt), $invoice->planVersionId);
             [$period, $event] = MembershipPeriodRecords::create($copy, $policy, $originId, $fixture['buyer']['principal']->durableBinding());
             DB::table(MembershipPeriodRecords::PERIODS)->insert($period);
             DB::table(MembershipPeriodRecords::EVENTS)->insert($event);

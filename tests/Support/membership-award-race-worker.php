@@ -31,7 +31,9 @@ if (! in_array($input['operation'] ?? null, ['award', 'hint'], true)
     throw new LogicException('Unknown synthetic award worker configuration.');
 }
 config($input['configuration']);
-CarbonImmutable::setTestNow('2026-10-13 12:00:00 UTC');
+if (getenv('VA_MEMBERSHIP_AWARD_REAL_WALL_CLOCK') !== '1') {
+    CarbonImmutable::setTestNow('2026-10-13 12:00:00 UTC');
+}
 Queue::fake();
 $app->instance(MembershipPaidInvoiceAuthority::class, new SealedMembershipPaidInvoice);
 $app->instance(MembershipPolicyFactsAuthority::class, new SealedMembershipPolicyFacts);
@@ -64,6 +66,7 @@ while (! is_file($directory.'/start-'.$worker)) {
     usleep(5000);
     clearstatcache();
 }
+$operationStarted = hrtime(true);
 $value = null;
 $errorClass = null;
 $reason = null;
@@ -82,5 +85,9 @@ try {
     $errorClass = get_class($error);
     $reason = property_exists($error, 'reason') ? $error->reason : null;
 }
-echo json_encode(['value' => $value, 'error_class' => $errorClass, 'reason' => $reason,
-    'connection_id' => $connectionId, 'pid' => getmypid(), 'transaction_level' => DB::transactionLevel(), 'pdo_transaction' => $pdo->inTransaction()], JSON_THROW_ON_ERROR);
+$output = ['value' => $value, 'error_class' => $errorClass, 'reason' => $reason,
+    'connection_id' => $connectionId, 'pid' => getmypid(), 'transaction_level' => DB::transactionLevel(), 'pdo_transaction' => $pdo->inTransaction()];
+if (getenv('VA_MEMBERSHIP_AWARD_REAL_WALL_CLOCK') === '1') {
+    $output['elapsed_seconds'] = (hrtime(true) - $operationStarted) / 1e9;
+}
+echo json_encode($output, JSON_THROW_ON_ERROR);

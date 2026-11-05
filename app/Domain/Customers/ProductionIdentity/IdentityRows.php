@@ -135,7 +135,12 @@ final readonly class IdentityRows
     public function rows(string $table, string $where, array $bindings, ?int $limit = null): array
     {
         $this->assertTable($table);
-        $statement = $this->primary->prepare('SELECT * FROM '.$this->table($table).' WHERE '.$where.' ORDER BY id'.($limit === null ? '' : ' LIMIT '.$limit)
+        // The exact schema proof admits this existing unique origin prefix. Keep locking and id ordering, but
+        // prevent an optimizer PRIMARY scan from locking another origin's observations before filtering them.
+        $index = $this->driver === 'mysql' && $this->committedFrame === null
+            && $table === 'production_identity_verifications' && $where === 'origin_id = ?'
+            ? ' FORCE INDEX (`piv_sequence_unique`)' : '';
+        $statement = $this->primary->prepare('SELECT * FROM '.$this->table($table).$index.' WHERE '.$where.' ORDER BY id'.($limit === null ? '' : ' LIMIT '.$limit)
             .($this->driver === 'mysql' && $this->committedFrame === null ? ' FOR UPDATE' : ''));
         $statement->execute($bindings);
 

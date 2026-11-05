@@ -1,0 +1,24 @@
+# Existing identity-history access path correction — source packet
+
+> Current result pointer (2026-11-03): the [final verification record](final-verification-20261103.md) records later exact-source tests, all four complete physical pools and the independent decision. This original source-preparation packet and its original UNRUN statements remain historical.
+
+Base `06c33a6028d88f084467b2286bb5c60f5d12c0e8`; isolated branch `codex/f9-history-access-path-20261103`. ROOT explicitly expanded the bounded scope after actual diagnostic 12692: the index parent held X on a `production_identity_verifications` PRIMARY row belonging to the award owner; the award requested X REC_NOT_GAP. The index-owner EXPLAIN chose PRIMARY/id; the award-owner plan chose existing `piv_sequence_unique` by origin. The observer SELECT permission repair is private fixture work, not this product patch.
+
+Owned files: this packet, `app/Domain/Customers/ProductionIdentity/IdentityRows.php`, and `tests/Feature/ProductionMembershipBilling/MembershipNativeCustomerIndexTest.php`. No physical schema/index definition, migration, policy, nonlocking capability, manual physical probe, worker, guard or deadline change. No six-file history trial is carried.
+
+The only production SQL delta will be `FORCE INDEX (piv_sequence_unique)` for native locking verification reads with the exact existing `origin_id = ?` predicate. `WHERE`, bindings, `ORDER BY id`, LIMIT and FOR UPDATE remain intact. SQLite, committed read-only and every other query retain original SQL. This applies to both current-principal and retained historical reads, since both use the same locking shape. It makes no claim that locking is removed or own-origin gap locks disappear.
+
+Index admission already exists: IdentitySchema defines the unique `(origin_id,sequence)` index. IdentityRows constructor assertPermanent invokes IdentityMigrationOwnership::inspect (or the exact owned SchemaProofFrame proof); mysqlTable compares all index names, ordered columns, uniqueness, BTREE type, visibility, absence of prefixes/expressions/comments exactly. Every read still calls assertTable. Within an admitted transaction schema/MDL and the unchanged frame witness fence the admitted definition; existing terminal/current checks are retained. No weaker name-only admission is introduced.
+
+Acceptance: new native original-App regression creates a real recovery after the original retained period, proves two distinct observations under the same origin, retains one additional period sealed with that recovered binding (the original period keeps its old binding), then runs the original same-plan foreign-award overlap protocol with unchanged 40-second overlap/worker/barrier limits. It proves index and pre-bytes closure, award success and no sampled wait on index. Existing same-owner lock/writer/release and immutable-prefix refusal selections remain mandatory. Original manual full 100 traversal, nine samples/workers and physical pools 1/2/10/12 remain the final gate, unchanged.
+
+Runtime commands for ROOT (serialized native only):
+
+- `vendor/bin/phpunit --filter test_native_recovered_index_allows_foreign_award_without_cross_owner_history_locks tests/Feature/ProductionMembershipBilling/MembershipNativeCustomerIndexTest.php`
+- Carry `test_native_index_locks_only_the_owner_rows_until_commit_then_releases_them`, `test_native_index_waits_at_a_writer_held_owner_lock_and_retains_no_lock_after_refusal`, both `test_native_index_waiting_behind_a_same_owner_*` methods from that file.
+- SQLite original `test_recovered_owner_lists_mixed_old_and_new_retained_buyer_bindings_and_passes_pre_bytes` in MembershipCustomerIndexTest (includes immutable-prefix conflict refusal); native identity schema/index mutation/refusal tests as selected by ROOT.
+- Baseline reproduction is the unchanged original manual `test_physical_pages_with_real_recovered_bindings` at old06c, with `VA_MEMBER_INDEX_PHYSICAL_PROBE=1 VA_MEMBER_INDEX_BINDINGS=2` and the already qualified original-App driver. Actual12692 is that baseline failure evidence; never claim a newly added selector existed on06c. ROOT may source-bind only the new test method onto06c for a focused old-App comparison, keeping its exact bytes and recording the overlay; that overlay is not old06c execution without qualification.
+
+UNRUN: PHP/lint/SQL/tests/install/vendor/materialization/runtime. Source-only checks and exact final diff are recorded after implementation. Old evidence remains bound to old source. No push/PR/merge or runtime acceptance is claimed.
+
+Source checks: `git diff --check` passed. Static review confirmed exact three-path scope and unchanged manual probe, schema/ownership and worker blobs. Runtime remains UNRUN; ROOT must qualify the exact final commit.
