@@ -263,6 +263,14 @@ class ProductionRuntimeValidator(unittest.TestCase):
         self.assertIn("'committed_read_receipts_enabled', 'operator_reconciliation_enabled'] as $flag", text)
         self.assertIn("$check('holds.production_checkout_mounted', config('production_checkout.mounted') === false);", text)
 
+    def test_both_contract_identity_literals_are_held(self):
+        # D-30: each checkout's contract identity capture is a code literal; lifting either is a reviewed change to this file.
+        text = VALIDATOR.read_text()
+        self.assertIn("$check('holds.production_checkout_contract_identity_v2', config('production_checkout.contract_identity_v2') === false);", text)
+        self.assertIn("$check('holds.production_tax_checkout_contract_identity_v2', "
+                      "config('production-tax-checkout.contract_identity_v2') === false);", text)
+        self.assertEqual(self.validate(profile()).returncode, 0)
+
     def test_the_documented_off_values_are_accepted_and_a_blank_assignment_is_not(self):
         for value in ("false", "(false)"):
             with self.subTest(value=value):

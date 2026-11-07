@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Domain\Commerce\ContractIdentity\ContractGlyphCoverage;
 use App\Domain\Commerce\ContractIdentity\ContractIdentityDeclarationV2;
+use App\Domain\Commerce\ContractIdentity\ContractIdentityStatements;
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Rights\LicenseTerritories;
 use App\Support\CanonicalJson;
@@ -196,6 +197,25 @@ class ContractIdentityDeclarationV2Test extends TestCase
                 $this->addToAssertionCount(1);
             }
         }
+    }
+
+    /**
+     * The client echoes only the version, so a version must name exactly one text. Changing an approved statement's wording
+     * without a new version fails here; a new wording adds a new pinned entry.
+     */
+    public function test_each_approved_statement_version_is_pinned_to_the_hash_of_its_exact_text(): void
+    {
+        $pinned = [
+            'individual-legal-name-confirmation-v1' => '33c2396ddf79074ee3d3d119d8dba92aaac2b7f52f1d2f92bf2a30cf0c7c536d',
+            'business-legal-name-confirmation-v1' => 'd6c98ec7054aa591cb4bbe91e734b49c32ab500842a4b4f79a833a1d0fa98c81',
+        ];
+        $current = [];
+        foreach (ContractIdentityStatements::TEXTS as $statement) {
+            $current[$statement['statement_version']] = hash('sha256', $statement['text']);
+        }
+        $this->assertSame($pinned, $current);
+        $this->assertSame($pinned, array_column(ContractIdentityStatements::current(), 'statement_hash', 'statement_version'));
+        $this->assertSame($pinned, array_column(ContractIdentityStatements::offered(), 'statementHash', 'statementVersion'));
     }
 
     public function test_the_displayed_statement_version_must_be_the_one_offered_for_the_buyers_type(): void

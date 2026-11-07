@@ -52,8 +52,8 @@ final class ProductionCheckout
             if ($existing !== []) {
                 $retained = OrderEvidence::review($rows, $existing[0]);
                 CheckoutException::require($retained['row']['request_hash'] === $hash);
-                self::retainedIdentity($retained['body']['buyer_declarations']);
                 self::requireOwner($binding, $retained['body']['buyer']);
+                self::retainedIdentity($retained['body']['buyer_declarations']);
                 Evidence::same([$retained['row']], $rows->selector('review', 'buyer_origin_id = ? AND request_key = ?', [$binding['origin_id'], $digest]));
                 OrderEvidence::proveRetained($rows, $retained['raw']);
                 $this->access->proveCurrent($principal, $buyer, $rows->current, $access);

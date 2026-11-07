@@ -58,12 +58,15 @@ not use a separate record.
     reviewed declaration unchanged. Exclusive stays unreachable: `false` is passed and `ExclusiveInventoryGate` is unchanged.
   - **Statement binding (step 6, both checkouts):** the declaration input echoes the `statementVersion` the client displayed
     next to the tick (`ContractIdentityDeclarationV2::fromDisplayedInput`). It must equal the offered statement for the
-    buyer's licensee type (`hash_equals`), or the request refuses with `changed`. A new wording is always a new version, so
-    the version names the exact text. The echo was chosen over a preview commitment because V1 has no commitment before its
+    buyer's licensee type (`hash_equals`), or the request refuses with `changed`. The server checks the version the client
+    says it displayed; it cannot see the screen. A new wording is always a new version, and a test pins each approved
+    version to the SHA-256 of its exact text, so a wording change without a new version fails. The offer also lists each
+    statement's `statementHash` for display; the echo stays on the version. The echo was chosen over a preview commitment because V1 has no commitment before its
     review: the review request is the first thing the server sees. Two gate-state guards complete it:
     - V2: with the gate on, the preview commitment also carries `contract_identity: buyer-contract-identity-v2`, so a gate
       flip between preview and order changes the commitment and refuses with `changed`. `TaxCheckoutEvidence::order`
-      rebuilds that commitment from whether the frozen declaration is v2.
+      rebuilds that commitment from whether the frozen declaration is v2. Gate-on tax orders written under step 5 (local
+      and testing only, never collected) lack the marker and no longer open.
     - V1: assent refuses (`changed`) when the reviewed declaration's kind (v2 or name-only) differs from the gate now.
       Replaying an existing assent still returns the retained order, as `read()` does; it writes nothing.
   - **Evidence (step 6):** `TaxCheckoutEvidence::order` requires the body's declarations to equal the request's and
@@ -179,4 +182,10 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
    - the V1 HTTP review endpoint already passes the `buyer` object through unchanged, but no route serves
      `contractIdentityOffer()` yet; one must exist before the V1 mount admits buyers with the gate on.
 7. The binder requirement, inside contract increments 3 and 4.
-8. Activation, together with the profile, after steps 2, 3a and 3b merge and U-13 retention values are approved.
+8. Activation, together with the profile, after steps 2, 3a and 3b merge and U-13 retention values are approved. Also
+   required before activation (step 6 review, P3-2 and P3-3):
+   - V1 `HostedCheckout::initiate` must re-verify a v2 declaration before any money moves. For both checkouts, decide
+     whether a re-verification failure at reconcile refuses, or records the paid order and escalates it (money captured but
+     unreconciled);
+   - name-only orders left unpaid stay payable after the gate opens. Either `initiate` refuses legacy declarations while the
+     gate is on, or the activation runbook drains or expires them first.
