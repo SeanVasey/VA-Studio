@@ -1,0 +1,101 @@
+# REP P3-6 — bounded leading-index source preparation
+
+Base `b5d1467bbe00743d0d7298dc2a6d9687c9fec388`; isolated sparse branch. SOURCE ONLY: PHP/Pint/tests/SQL/native EXPLAIN/up/down/runtime are UNRUN. No performance claim or P3-6 closure. Integration order, default-off mounts, customer-segment/U-13 choices and reporting arithmetic remain unchanged.
+
+## Owned contract, recorded before edits
+
+Own new migration `2026_11_03_269100_reporting_period_indexes.php`, new ReportingIndexesTest and ReportingProductionIndexesTest, this packet, and only two coordinated App files: ProductionCheckout/CheckoutSchema.php and CheckoutSchemaInstaller.php. ROOT expressly authorized the two App paths after the exact-index admission dependency was identified. Do not edit SalesReport, queries, totals, customer populations, authorizations, original migrations, original test bodies, fixtures, census, routes/providers/config, boards or dependencies. Every new index is non-unique and must have a source-backed leading predicate; no uniqueness/key policy or guessed covering-index layout.
+
+Read AGENTS, staff-reporting/work package, D-16 retained-finalization architecture, actual SalesReport/RefundDisputeCase, all current migration references and production checkout definitions/installer and existing native schema-test inventory. A historical four-index source prep `07e2f68a4b6685937d10ea832a91070409218262` exists on a different older base. Only its guarded migration/test patterns were reused and extended; that historical worktree/source is untouched and not cherry-picked wholesale. None of its previous evidence is acceptance for this source.
+
+## Query and equivalent-index inventory
+
+| Actual predicate / caller | Existing equivalent leading access path at b5 | Added index |
+| --- | --- | --- |
+| SalesReport:191, quotes created_at >=start,<end | None. PK id, public_id unique, owner_key/idempotency unique start other columns. | quotes_reporting_created_at_index(created_at) |
+| SalesReport:192, orders created_at >=start,<end | None. PK/public_id, quote_id, quote_pricing_id, owner_key/idempotency uniqueness do not lead with time. | orders_reporting_created_at_index(created_at) |
+| SalesReport:370–374 testScope, finalized_at range, residual mode/outcome, verified-payment PK join | None. PK/public_id, unique order_id/verified_payment_id/order_attempt_id do not lead with finalized_at. | order_finalizations_reporting_finalized_at_index(finalized_at) |
+| SalesReport:195, released_at range | None. test_unpaid_releases has identity/order/attempt/intent/session/event/request uniqueness, no released_at prefix. | test_unpaid_releases_reporting_released_at_index(released_at) |
+| SalesReport:388, production payment observed_at ISO UTC range | None. PK/public, intent/session/order uniqueness and account/funds/provider uniqueness start other columns. | pco_payments_reporting_observed_at_index(observed_at) |
+| SalesReport:419, production order created_at ISO UTC range | None. PK/public, review and buyer/request uniqueness do not lead with created_at. | pco_orders_reporting_created_at_index(created_at) |
+| SalesReport:295–301 → RefundDisputeCase:87, allocation WHERE order_id=? ORDER BY id | None. PK/public; unique(refund_dispute_object_id,order_line_id) leads with object, not order_id. order_id is deliberately unsignedBigInteger, not an automatically indexed FK. | refund_line_allocations_reporting_order_id_index(order_id) |
+
+No later source migration adds equivalent prefixes. Existing order_lines(order_id,position), refund object order-leading identity, refund observation(order_id,sequence), hold(order_id,released_at), verified-payment and pricing/definition PK lookups already serve their corresponding equality/ordering access paths: no duplicate indexes added. A single finalized_at range index is chosen rather than inventing a mode/outcome/covering layout; residual filters and join strategy are unchanged. Allocation's order_id prefix works with the existing integer PK suffix ordering on SQLite/InnoDB; native EXPLAIN must still show the actual plan. Date bucketing/aggregation is unchanged; indexes do not promise to eliminate grouping/sorts or all historical reads.
+
+## Closed production admission and migration behavior
+
+The V1 production installer rejects unknown indexes, exact SQLite SQL drift and native BTREE/prefix/expression/visibility/order drift. Merely adding a production index in Schema::table would violate that contract. The schema now explicitly declares only the two named production reporting indexes. Fresh SQLite/MySQL installation creates them using the same canonical definition; normal installer preflight expects the exact new index inventory. Existing uniqueness, FK, columns/charset/options, guards and source/namespace proofs remain.
+
+A new migration-only assertReportingUpgrade() reuses the full preflight and requires every existing table/guard/unique/FK object to be present. It permits absence only of the two fixed declaration indexes. Unknown/malformed indexes and aliases still refuse. MySQL validation removes only an absent expected reporting entry for this specific preflight; an actual unexpected or malformed entry is never ignored. Normal up()/admission uses the strict default and does not permit missing indexes. No caller/source primitive beyond this migration opts into upgrade preflight.
+
+The new migration preflights all seven owned names before DDL, rejecting wrong columns/unique/primary and native partial/expression/descending/invisible/non-BTREE variants. It also preflights the complete production graph before any index creation. Existing correct owned indexes are no-ops, partial correct DDL can resume, conflicts are neither replaced nor removed, missing prerequisite tables refuse. The two SQLite production CREATE INDEX statements use exact canonical spelling, not alternate Schema-builder quoting. After up, strict installer up must accept the complete graph without DDL. A fresh schema already has its two declared production indexes, so the later migration does not duplicate them.
+
+Down drops only the seven exact owned indexes after whole-menu/production preflight. It never drops a table, row, column, trigger, FK, unique or other index. **Removing required production indexes does not leave current-source production admission valid.** Operational rollback needs matching old source or forward up again; the new production test explicitly checks strict refusal in the down interval. No product operations are promised during that interval. MySQL DDL may implicitly commit and may require locks; this source is not live migration approval or zero-downtime proof.
+
+## Meaningful new tests and limits
+
+ReportingIndexesTest reuses the existing disposable FinalizationDatabaseMigrations lifecycle and synthetic A5/report fixtures. Four methods cover fresh/no-op/down/up schema retention; genuine populated test-order/refund evidence with identical reports and original guard enforcement; interrupted partial-index resumption creating only missing entries; and a late-menu malformed index refusing BOTH directions before any DDL or evidence change. Metadata comparison includes rows, columns, FKs, all non-owned indexes and full trigger definitions. Real populated assertions cover quotes/orders/finalizations/allocations; no fabricated populated unpaid-release claim.
+
+ReportingProductionIndexesTest adds two methods. One uses the original ProductionCheckoutJourneyFixture to obtain real enrolled/catalog/assent/order/payment history (synthetic rehearsal gateway, no external payment) with FK/guard admission intact, compares all production rows/columns/FKs and exact rehearsal report totals across down/up, checks migration-only old-graph qualification, strict current-admission refusal while indexes are removed, and strict/no-op restoration. The other tests unknown and malformed production indexes against BOTH strict and migration-only preflight, then malformed migration up/down with no DDL/data change. It does not disable FKs, replace PDO, mock schema admission or invent historical production rows.
+
+All eight methods are shared-engine source definitions, not executed tests. Existing ProductionCheckoutMigrationTest has native dictionary/alias/foreign identity/partial install controls and already appears in the native selection inventory. No original test or skip/census is changed here. New class discovery/routing requires normal later integration from measured inventory, not guessed counts.
+
+## Finite ROOT validation — all UNRUN
+
+1. Verify exact committed source/loader/vendor/runtime bindings; lint/Pint the five changed/new PHP files. Source author ran only diff whitespace/static inspection, not PHP.
+2. On the admitted disposable SQLite profile run the two new affected files (eight methods) and the original applicable ProductionCheckoutMigrationTest methods with normal engine routing. Preserve original assertions/cache/parser/capture/EOF/reap/source/runtime guards. Actual SQLite setup/driver/fixture failures must be retained rather than papered over.
+3. On original Oracle MySQL8.4.11, serially run the six new shared methods under the existing exclusive supervisor/all-six cleanup/lease protocol. Preserve native strict session/index dictionary assertions. Select existing native schema adversarial controls for foreign reserved namespace, exact empty-prefix/interruption, accent dictionary aliases, foreign constraints and routines as appropriate to the two-file installer delta; use the existing controls, not a new framework/matrix or weakened admission.
+4. Capture native EXPLAIN/access-path evidence on the actual source query shapes: the six half-open period ranges and allocation order equality with id ordering, plus the finalization joined scope. Use a bounded representative admitted fixture distribution and record row cardinality/period bounds and actual chosen/possible keys. Inspect ordinary optimizer plans; do not add FORCE INDEX/query changes or infer use/speed from index presence or SQLite. Tiny/empty fixtures can legitimately choose scans: record that limitation rather than invent a speed threshold or claimed improvement. Any further index tuning must follow that concrete evidence.
+5. Compare raw retained rows, trigger/FK/index identities and unchanged report sections/totals before/after upgrade and rollback/restoration, including original refund success→failure netting and period boundaries using existing report tests. Production totals stay separated by funds mode; no customer-segment/U-13 or money policy change. No native performance, successful migration or schema-admission pass follows from source alone.
+
+ROOT owns later independent source review, runtime execution, discovery/census and integrated source binding. P3-6 remains pending until the finite actual migration/admission/report/native access-path evidence exists. No board, push/PR, deploy, key, live resource, vendor/install or routine Foundation action is part of this preparation.
+
+
+## Single source repair for independent REP-R1 / REP-R2
+
+Independent exact `abc9ecbac57c2647ae984516962a5a71068a2286` review requested changes for two P2 source findings: incomplete SQLite native shape proof could adopt/remove a partial/DESC/COLLATE/expression path; expected-table-only lookup missed SQLite global reserved-name collisions and could allow earlier DDL before a later conflict. The original abc9 source and review remain historical. ROOT's five PHP lints/Pint at abc9 do not validate this changed source. No behavioral reproduction or pass is claimed.
+
+The coherent repair changes only this migration, ReportingIndexesTest and this packet. The seven index definitions, two production App files, report/segment code, all prior test assertions and production test file remain unchanged. Before either direction can issue DDL, the migration now censuses all seven SQLite reserved names in main/temp catalogs case-insensitively, then requires exact name/type/owning-table identity and a single actual main index object. Temp reserved objects and temp target-table shadows refuse. A missing main name is accepted as absent only after that complete namespace observation.
+
+SQLite present-index validation now uses main.index_list/main.index_xinfo directly, not flattened Schema column metadata: ordinary user-created c origin, nonunique, nonpartial, exactly one explicit key, nonnegative column identity, exact intended column, ascending order and default BINARY collation. The implicit non-key rowid suffix is not counted. Expressions refuse via native key identity before framework flattening. Production canonical SQL identity remains additionally required by the unchanged strict checkout installer.
+
+Native MySQL retains its table-scoped namespace: same name on a different nonproduction table is not declared a collision. Native owned-name observation reads exact STATISTICS metadata directly, with case/accent dictionary comparison followed by exact name/column/sequence/unique/BTREE/prefix/expression/order/visibility checks. This avoids expression flattening and catches same-table aliases before DDL without ignoring foreign native table namespaces.
+
+Two additional shared test methods are source-defined, UNRUN. Shape controls on SQLite cover unique, partial, descending, alternate collation and expression indexes; native controls cover unique, case alias, descending, invisible and functional indexes. Each requires both up/down refusal, zero migration DDL, identical retained rows/guards/FKs/non-owned indexes and full catalog identity. Namespace controls on SQLite cover a late name on a foreign index/table/trigger, case aliases, temp index/table/case aliases and a temp target shadow; each tests early-missing up and early-installed down with untouched foreign marker/catalog. Native uses a positive same-name foreign-table control across down/up to prevent importing SQLite's global rule. Test metadata snapshots use actual native arrays (not object identity or flattened expressions); SQLite row reads explicitly qualify main, and only volatile index-list enumeration position is excluded from the non-owned-index snapshot. Actual key order and full catalog remain captured.
+
+ROOT's finite next execution is the same affected two-file SQLite/native menu, now eight methods, after new exact-source lint/Pint/loader binding. The original abc9 lint receipt stays historical. All repaired PHP/test/SQL/native/access-path behavior is UNRUN. New functional-index DDL and catalog controls are source preparation, not proven setup or native acceptance; preserve any actual setup failure. No new matrix/concurrency framework, policy, census or existing guard exception is introduced. The independent two-finding batch is addressed in source together; actual closure still requires bounded review/execution against the repaired commit.
+
+## Interrupted-task fixture repair after ROOT's first actual a0 SQLite8
+
+ROOT actual attempt `rep-indexes-sqlite-a0c6cc83-new_all8-01.php` completed 8 tests / 301 assertions with 2 failures and 0 errors, skips or warnings. Original source/origins/App8, EOF/reap and quiet/all-six lease cleanup passed. Both failures were the two methods calling populated(): full refund expected, null observed before migration assertions. Other six actual cases were positive, including R1/R2 and genuine production migration. This failed source/attempt and sealed execution packets remain immutable. It is not a passing eight-case run.
+
+The source-supported direct cause is the fixture refund ID `re_REPORTING_INDEX`: PaymentFinancialEvidence::id requires `prefix_[A-Za-z0-9]{1,120}`, so its second underscore is invalid. Financial capture refuses; RefundDisputeLedger::retrieve converts that to attention/null, hence null refundState. Repaired ID `re_REPORTINGINDEX` satisfies the original rule. No evidence supports changing that rule or expected full state. (At eb5ee434 the helper also moved the clock one second past confirmation. The independent repair review showed that move is not needed: the ledger's only time guard accepts an observation in the same second, and the old ID alone reproduces the failure while the new ID alone passes. The Claude harness removed the move.)
+
+All existing full-refund/allocation/evidence/guard/report/totals assertions are retained. (At eb5ee434 a fallback allocated through RefundDisputeActions::allocate when no allocation existed. It never ran, and it would have hidden a regression in automatic allocation, so the Claude harness replaced it with assertions that the allocation sources are exactly `automatic_full_refund` and sum to the payment amount.) App/migration/policy and other test bodies are unchanged. This is one coherent test-fixture repair; no PHP/SQL/runtime reproduction or pass by the author. ROOT may run only the two affected populated-upgrade/partial-restart methods after exact-source packet rebind and carry the unchanged six only with explicit source/method equivalence and their original actual scope. No automatic first-six replay or new native run is requested.
+
+The sealed EXPLAIN v1 operator has a separate source-validated fixture binding problem: ReportingFixtures::single suffixes its payment ID while R::provider hardcodes refund.payment_intent to the unsuffixed default. A new external v2 must bind that synthetic provider response to its actual returned payment ID, and observe after confirmation; old v1 stays unchanged. Its public allocation fallback is already present and must remain. All repaired product/EXPLAIN PHP and behavior remains UNRUN until ROOT qualification.
+
+## Claude harness verification and repair review (2026-11-04)
+
+The private runtime packets cited above did not transfer; these runs are new and bound to the stated commits. Native runs
+include the cherry-picked identity fix `a2144d4a` (lane ACC-IPV6), which this harness's kernel needs before any identity migration.
+
+| Check | Source | Result |
+| --- | --- | --- |
+| Both new REP files, SQLite, PHP 8.4.26 | `eb5ee434` | OK, 8 tests, 408 assertions |
+| Both new REP files, private MySQL 8.4.11, PHP 8.4.27 | `527150b4` (eb5ee434 + a2144d4a) | OK, 8 tests, 293 assertions |
+| Affected SQLite selection: `ProductionCheckoutMigrationTest`, `ProductionTaxCheckoutMigrationTest`, `tests/Feature/Reporting` | `527150b4` | OK, 56 tests, 1222 assertions, 7 skipped (native-only, as the census expects) |
+
+Independent repair review of `eb5ee434`: **APPROVE WITH CONDITIONS** ([decision](independent-rep-repair-review-eb5ee434-DECISION.md)).
+The diagnosis is right and the ID change alone is necessary and sufficient. P2-1 (the unreachable allocation fallback would
+hide an automatic-allocation regression) and P3-1 (the unneeded clock move) are fixed in the following commit, and P3-2/P3-3 in
+this section and the wording above. The two affected methods are re-run at that commit (results below).
+
+| Check | Source | Result |
+| --- | --- | --- |
+| Two affected methods after the repair review, SQLite | `58cf71a0` | OK, 2 tests, 113 assertions |
+| Two affected methods after the repair review, private MySQL 8.4.11 | `cb19c18e` (58cf71a0 + a2144d4a) | OK, 2 tests, 113 assertions |
+
+Still unrun from the original plan: the seven native EXPLAIN diagnostics (their v2 packet is in Codex's private workspace, which
+did not transfer) and the original UI companion. Neither is needed for the index migration's correctness; the EXPLAIN plans would
+only document access paths and support no performance claim.
