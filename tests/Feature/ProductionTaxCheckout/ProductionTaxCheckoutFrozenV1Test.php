@@ -27,9 +27,12 @@ class ProductionTaxCheckoutFrozenV1Test extends TestCase
     ];
 
     /**
-     * REP reporting period indexes (abc9ecba, merged in #196; independent review
-     * docs/verification/rep-indexes-20261103/independent-rep-repair-review-eb5ee434-DECISION.md) added two period indexes
-     * and their exact upgrade admission. Additive only: no column, uniqueness, guard or payment authority changed.
+     * REP reporting period indexes (abc9ecba, merged in #196). The independent review of exact abc9ecba covered these
+     * bytes; its two P2s (REP-R1, REP-R2) were in the migration only, and the repair left both files unchanged
+     * (docs/verification/rep-indexes-20261103/README.md, "Single source repair", and its verification tables).
+     * The change adds two nonunique single-column indexes plus a migration-only upgrade preflight
+     * (assertReportingUpgrade); strict installer admission is unchanged apart from now requiring the two indexes.
+     * No column, uniqueness, foreign key, trigger or payment path changed.
      */
     public const REVIEWED_SUCCESSORS = [
         'app/Domain/Commerce/ProductionCheckout/CheckoutSchema.php' => 'ecbb168a283213666380d21a4d89430c289fb95e4be9fd77e6cf78de6e3f2357',
