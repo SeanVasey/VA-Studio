@@ -30,13 +30,15 @@ final class LegacyRedirectResolver
         if (preg_match(LegacyRedirectMap::PATH_PATTERN, $path) !== 1) {
             return null;
         }
+        $mapPath = (string) config('legacy-redirects.map_path');
         try {
-            $map = LegacyRedirectMap::fromFile((string) config('legacy-redirects.map_path'));
-        } catch (LegacyRedirectMapInvalid $invalid) {
-            Log::warning('Legacy redirect map refused; no legacy redirects are served.', ['problems' => array_slice($invalid->problems, 0, 10)]);
+            $map = LegacyRedirectMap::fromFile($mapPath);
+        } catch (LegacyRedirectMapInvalid) {
+            app(LegacyRedirectMapWarnings::class)->invalid($mapPath);
 
             return null;
         }
+        app(LegacyRedirectMapWarnings::class)->repaired($mapPath);
         $entry = $map->entryForPath($path);
         if ($entry === null || ! in_array($entry['disposition'], ['redirect', 'gone'], true)) {
             return null;
