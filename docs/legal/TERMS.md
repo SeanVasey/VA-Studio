@@ -59,7 +59,7 @@ You must be at least **[18, or the age of majority where you live — Proposed, 
 
 ## 7. Reviewing and confirming your order
 
-Before you pay, you see an order review with every license you are buying, its complete terms, the files included, the merchant and licensor details, and the price, tax and total. To continue you must enter the name the license should be issued to, and tick a box confirming you agree. We keep an exact record of what you saw and agreed to. If anything in the review changes before you pay (for example a new license version or price), you must review and confirm again.
+Before you pay, you see an order review with every license you are buying, its complete terms, the files included, the merchant and licensor details, and the price, tax and total. To continue you must enter your full legal name and confirm that it is correct, your postal address and, for an exclusive license, the artist name the license should show, and tick a box confirming you agree. These details are printed on your license document exactly as you enter them, so check them before you pay. Our license documents can print only certain characters; if a character cannot be printed, the order review asks you to enter the details using supported characters. If you later find a mistake, contact support@vasey.audio: we add a correction note to your order, and the license document stays as issued. We keep an exact record of what you saw and agreed to. If anything in the review changes before you pay (for example a new license version or price), you must review and confirm again.
 
 ## 8. Delivery and downloads
 
@@ -178,6 +178,7 @@ Vasey Multimedia, doing business as VASEY.AUDIO
 7. **DMCA designated agent** registration (section 13).
 8. **Buyer assent text** for `MachinePolicyV1` `assent.text` (at most 4,096 characters). Proposed: "I am buying the license(s) listed above from Vasey Multimedia dba VASEY.AUDIO, licensed by Sean Vasey. I have read and agree to each license's full terms and to the Terms of Sale and Use. I understand delivery starts immediately after payment, and that once I download a file I lose any right to cancel for a change of mind." Seller legal name for `seller_identity.legal_name`: "Vasey Multimedia dba VASEY.AUDIO".
 9. **Liability cap and indemnity** (sections 16 and 17): standard wording for review.
+10. **Legal-name confirmation statement** (section 7). The order review shows a short statement next to the confirmation tick; its version and hash are frozen into the order. Proposed: "I confirm that this is my full legal name and that the license should be issued to me under it." Also to decide: whether a business may be the licensee, which would need a different statement and field.
 
 ### B. Where the code does not yet support what this draft says
 
@@ -193,9 +194,11 @@ Vasey Multimedia, doing business as VASEY.AUDIO
 | Download links are short-lived and single-use (section 8) | Implemented: 60-second authorization, one committed attempt, three new authorizations per order per 60 seconds in the test path (`docs/test-owner-delivery.md`); production values come from `MachinePolicyV1` `delivery`. | None. |
 | License limits are contractual (section 5) | Correct: caps such as streams or copies are recorded in the license and frozen into the order; the store does not monitor releases or streams. | None. |
 | Re-download availability for 12 months | No expiry on owner downloads is implemented; availability depends on hosting and backups. | None for the proposal; keep backups (S-10). |
+| Legal name confirmation, postal address and exclusive artist name at order review; correction notes (section 7) | Designed in `docs/architecture/D-30-buyer-contract-identity.md`; only a pure validator exists (`ContractIdentityDeclarationV2`). Neither checkout collects these fields yet, capture sits behind a literal-false gate, and no correction-note tooling exists. | D-30 steps 3 to 8, the `vasey-license-pdf-v1` profile, and a support correction-note procedure. |
 | No upgrades after an exclusive sale (section 9) | License upgrades are not implemented (U-11; parity row FP-057). | None now; a future upgrade feature must respect this rule. |
 
 ## Change log
 
 - 2026-10-10: first evidence-cited draft from source `f57e7256891d0d3c117e151a36f7fb967c724ab7` (lane `harness/launch-documents`), with review rounds on 2026-10-11.
 - 2026-10-24: rewritten as buyer-facing terms of sale and use from source `786fb7c755291184f9e01b4faaab28dbd430d698` after Sean named the merchant (Vasey Multimedia dba VASEY.AUDIO), the seller/licensor (Sean Vasey) and Iowa governing law, and assigned the drafting to the development lead. Adds license precedence, a proposed refund and dispute policy, exclusive reservation and prior-license rules, acceptable use, IP, disclaimers and liability wording for review. Not approved.
+- 2026-11-07 (D-30 step 2): section 7 now says order review collects a confirmed full legal name, a postal address and, for an exclusive license, an artist name (Sean's decisions C-1, C-2 and D-1). It also states that unsupported characters are refused and that a reported mistake gets a correction note while the license stays as issued (Sean, 2026-11-07). Appendix A item 10 proposes the confirmation statement; appendix B records that collection is not implemented yet. Not approved.
