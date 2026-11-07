@@ -15,6 +15,7 @@ use App\Domain\Grants\Paid\PaidGrantDownloads;
 use App\Domain\Grants\Paid\PaidGrantRecords;
 use App\Domain\Grants\Paid\PaidGrants;
 use App\Domain\Grants\PaidTax\PaidTaxDocuments;
+use App\Domain\Grants\PaidTax\PaidTaxDownloads;
 use App\Domain\Grants\PaidTax\PaidTaxGrants;
 use App\Domain\Grants\PaidTax\PaidTaxRecords;
 use Carbon\CarbonImmutable;
@@ -188,6 +189,62 @@ class PaidGrantDataExportTest extends TestCase
         foreach (['storage_path', 'contracts/paid-tax-v2/', $row['provider_session_id'], $row['provider_payment_id'], $row['provider_account']] as $absent) {
             $this->assertStringNotContainsString($absent, $json);
         }
+    }
+
+    public function test_paid_tax_download_history_exports_and_refuses_misfiled_authorizations(): void
+    {
+        config(['paid-tax-grants.downloads_enabled' => true]);
+        $f = $this->paidTax(true);
+        $line = $f['batch']['lines'][0];
+        $downloads = new PaidTaxDownloads;
+        $authorize = fn (string $kind): array => $downloads->authorize($f['batch']['id'], $line['id'], ['requestKey' => (string) Str::uuid(),
+            'originHash' => $line['originHash'], 'kind' => $kind, 'nonce' => bin2hex(random_bytes(32))], $f['buyer']['principal'], $f['buyer']['user']);
+        $contract = $authorize('contract');
+        $downloads->redeem($f['batch']['id'], $contract['id'], $contract['token'], $f['buyer']['principal'], $f['buyer']['user'])
+            ->writeTo(static function (string $chunk): void {});
+        $authorize('master_wav');
+        $account = self::account($f['buyer']);
+        $exported = fn (): array => app(PaidGrantExportSection::class)->build($account)['paidTaxGrantOrders'][0]['lines'][0]['downloads'];
+
+        $sections = app(PaidGrantExportSection::class)->build($account);
+        $history = $sections['paidTaxGrantOrders'][0]['lines'][0]['downloads'];
+        $this->assertSame([['kind', 'authorizedAt', 'redeemedAt'], ['kind', 'authorizedAt', 'redeemedAt']], array_map('array_keys', $history));
+        $this->assertSame(['contract', 'master_wav'], array_column($history, 'kind'));
+        $this->assertMatchesRegularExpression('/\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ\z/', $history[0]['redeemedAt']);
+        $this->assertNull($history[1]['redeemedAt']);
+        $this->assertSame(self::counts([0, 0, 0, 0, 0], [1, 1, 1, 2, 1]), PaidGrantExportSection::counts($account));
+        $json = json_encode($sections, JSON_THROW_ON_ERROR);
+        foreach (DB::table('paid_tax_authorizations')->get() as $authorization) {
+            foreach ([$authorization->public_id, $authorization->request_key, $authorization->token_hash, $authorization->request_hash] as $absent) {
+                $this->assertStringNotContainsString($absent, $json);
+            }
+        }
+
+        // Each column or sealed field that binds the authorization to the exported line refuses when it names something else.
+        $this->dropTriggers(['paid_tax_authorizations']);
+        $row = (array) DB::table('paid_tax_authorizations')->orderBy('id')->first();
+        foreach ([['origin_public_id' => '00000000-0000-4000-8000-0000000000ee'], ['batch_public_id' => '00000000-0000-4000-8000-0000000000ee'],
+            ['origin_hash' => str_repeat('b', 64)], ['target' => 'stems_zip'], ['payload_hash' => str_repeat('0', 64)]] as $change) {
+            DB::table('paid_tax_authorizations')->where('id', $row['id'])->update($change);
+            $this->refusesExport($account);
+            DB::table('paid_tax_authorizations')->where('id', $row['id'])->update(array_intersect_key($row, $change));
+            $this->assertCount(2, $exported(), (string) array_key_first($change));
+        }
+        $payload = PaidTaxRecords::decode($row);
+        foreach ([['schema_version' => 'paid-authorization-v1'], ['origin_hash' => str_repeat('a', 64)], ['kind' => 'stems_zip']] as $change) {
+            DB::table('paid_tax_authorizations')->where('id', $row['id'])->update(PaidTaxRecords::encode([...$payload, ...$change]));
+            $this->refusesExport($account);
+            DB::table('paid_tax_authorizations')->where('id', $row['id'])->update(PaidTaxRecords::encode($payload));
+            $this->assertCount(2, $exported(), (string) array_key_first($change));
+        }
+
+        // Moved to another account: the requester's export no longer reads it, and the other account's export refuses it.
+        $other = self::account($this->enrollThroughLocalSmtp('other.buyer@example.test'));
+        DB::table('paid_tax_authorizations')->where('id', $row['id'])->update(['account_id' => $other]);
+        $this->assertSame(['master_wav'], array_column($exported(), 'kind'));
+        $this->assertSame([1, 0], [PaidGrantExportSection::counts($account)['paid_tax_authorizations'], PaidGrantExportSection::counts($account)['paid_tax_redemptions']]);
+        $this->assertSame([1, 1], [PaidGrantExportSection::counts($other)['paid_tax_authorizations'], PaidGrantExportSection::counts($other)['paid_tax_redemptions']]);
+        $this->refusesExport($other);
     }
 
     public function test_a_paid_copy_whose_seal_or_buyer_binding_does_not_match_refuses_the_export(): void

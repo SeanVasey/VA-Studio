@@ -113,8 +113,9 @@ linked to the order. No superseding contract version is issued.
     every line must repeat it. Originals and authorizations must seal one of the account's exported lines.
   - Provider session, payment and account identifiers are deliberately not exported.
   - The ten paid tables (order origins, grant origins, originals, authorizations, redemptions per chain) and the bases are on
-    the `RETAINED` list under `financial_records_years`. Authorizations and redemptions hold `account_id`, the target and
-    times (tax authorizations also `actor_id`), and their `_retain` triggers keep them.
+    the `RETAINED` list under `financial_records_years`. Authorizations hold `account_id`, the target and times (tax
+    authorizations also `actor_id`); redemptions hold their `authorization_id` and creation time. Their `_retain` triggers keep
+    both.
   - Document work and fulfillments hold only states and hashes, so they are neither exported nor listed.
 
   Deletion approval stays refused until U-13 retention values are approved.
