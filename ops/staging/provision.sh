@@ -429,6 +429,20 @@ if [ "$(mysql_q 'SELECT @@log_bin')" = 1 ]; then
   mysql_q "SET PERSIST log_bin_trust_function_creators = ON" 2>/dev/null
   [ "$(mysql_q 'SELECT @@global.log_bin_trust_function_creators')" = 1 ] || die "could not set log_bin_trust_function_creators"
 fi
+# The identity layer admits its metadata companion connection only when PROCESSLIST names the client by a literal IP
+# (CatalogSocketBinding). With host-name resolution on (MySQL's default), a 127.0.0.1 client appears as localhost:<port>
+# and every identity migration and request refuses ("Current private catalog admission required"). Accounts here are
+# addressed by IP, % or localhost only, so resolving names is not needed. skip_name_resolve is read-only at runtime:
+# persist it and restart mysqld once; reruns find it already on and do nothing.
+if [ "$(mysql_q 'SELECT @@skip_name_resolve')" != 1 ]; then
+  named=$(mysql_q "SELECT COUNT(*) FROM mysql.user WHERE host NOT IN ('%','localhost') AND host NOT REGEXP '^[0-9.%]+$' AND host NOT LIKE '%:%'")
+  [ "$named" = 0 ] || die "MySQL accounts addressed by host name exist; resolve them before enabling skip_name_resolve"
+  mysql_q "SET PERSIST_ONLY skip_name_resolve = ON"
+  systemctl restart mysql
+  for _ in $(seq 1 60); do mysql_q 'SELECT 1' >/dev/null 2>&1 && break; sleep 1; done
+  [ "$(mysql_q 'SELECT @@skip_name_resolve')" = 1 ] || die "skip_name_resolve did not take effect after restarting MySQL"
+  info "MySQL skip_name_resolve enabled (persisted; mysqld restarted once)"
+fi
 mysql_q "SELECT @@bind_address" | grep -E '^(127\.0\.0\.1|localhost|::1)$' >/dev/null \
   || warn "MySQL bind_address is $(mysql_q 'SELECT @@bind_address'); keep port 3306 closed in the Forge firewall"
 info "MySQL $myver: schema $DB_NAME, accounts vasey_app and vasey_backup (127.0.0.1 only)"
