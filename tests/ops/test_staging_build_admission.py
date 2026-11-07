@@ -49,6 +49,12 @@ if ($profile !== EXPECTED_PROFILE || (fileperms('.env') & 0777) !== 0600) {
     fwrite(STDERR, "Composer hooks booted without the frozen private staging profile\\n");
     exit(23);
 }
+$home = getenv('HOME'); $composerHome = getenv('COMPOSER_HOME');
+if (!is_string($home) || !is_dir($home) || !is_string($composerHome) || !str_starts_with($composerHome, $home . '/')
+    || str_starts_with(realpath($home), realpath(getcwd()))) {
+    fwrite(STDERR, "Composer ran without a private build home outside the release\n");
+    exit(24);
+}
 file_put_contents('hook-profile.sha256', hash('sha256', $profile));
 mkdir('vendor/composer', 0755, true);
 file_put_contents('vendor/autoload.php', '<?php');
@@ -56,7 +62,8 @@ file_put_contents('vendor/composer/installed.json', '{}');
 """.replace("EXPECTED_PROFILE", json.dumps(profile)))
             composer.chmod(0o755)
             npm = commands / "npm"
-            npm.write_text('#!/bin/bash\nset -eu\nmkdir -p public/build\nprintf "{}" > public/build/manifest.json\n')
+            npm.write_text('#!/bin/bash\nset -eu\n[ -d "$HOME" ] && [ -n "$npm_config_cache" ] || exit 25\n'
+                           'mkdir -p public/build\nprintf "{}" > public/build/manifest.json\n')
             npm.chmod(0o755)
             config = root / "staging.conf"
             config.write_text("\n".join(name + "=" + shlex.quote(value) for name, value in {
@@ -71,6 +78,7 @@ file_put_contents('vendor/composer/installed.json', '{}');
                                  env={"PATH": str(commands) + ":/usr/bin:/bin", "LC_ALL": "C"},
                                  capture_output=True, text=True)
             self.assertEqual(run.returncode, 0, run.stderr)
+            self.assertEqual(0o700, (root / "tmp/build-home").stat().st_mode & 0o777)
             self.assertEqual((release / "hook-profile.sha256").read_text(), hashlib.sha256(profile.encode()).hexdigest())
             self.assertEqual(candidate.read_text(), profile, "build changed the captured profile")
             self.assertEqual((release / ".env").read_text(), profile)
