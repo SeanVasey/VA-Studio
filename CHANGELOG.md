@@ -158,6 +158,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Fixed
 
+- Ops scripts that set `pipefail` no longer decide a check with a piped `grep -q` (`ops/staging/provision.sh`, `ops/clamav/install-clamd.sh`, `ops/monitoring/scheduler-liveness-check.sh`). `grep -q` exits at its first match, the writer then dies of SIGPIPE and `pipefail` fails the check although the text was there: the first staging provision on the Forge Laravel VPS (Ubuntu 24.04, PHP 8.4.27 installed) stopped with "php8.4 packages unavailable". The checks now read all input (`grep … >/dev/null`); `tests/ops/test_pipefail_grep.py` keeps the pattern out. The derived production kit's semantic delta snapshot is regenerated (line offsets only).
+
 - Staff reporting and customer communications follow-up batch (lane FUB-1, deferred findings from PRs #178 and #183):
   - The sales report takes each order's succeeded refund total from the same snapshot transaction as its per-line refunds, so a refund recorded after the period totals were read can no longer show a negative unattributed amount; a case that attributes more than it counts is listed as unreadable (Codex P2 r4418610921, review R-2).
   - The sales report page shows the unverified and unreadable order counts and unattributed refunds whenever the tier section is available, also when every paid order is excluded from the tier table (Codex P2 r4418610931).
