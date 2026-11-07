@@ -1,9 +1,9 @@
 # VASEY.AUDIO Privacy Policy
 
-> **DRAFT for Sean Vasey's approval — not yet published — not legal advice; qualified legal review recommended before publication.**
+> **Approved by Sean Vasey on 2026-11-07 — not yet published — not legal advice; qualified legal review recommended before publication.**
 >
 > Draft date: 2026-10-24. Written against source `786fb7c755291184f9e01b4faaab28dbd430d698` (`origin/main`). Draft version label: `privacy-draft-2026-10-24`.
-> Text in square brackets is a placeholder or a proposal that Sean must confirm. Items marked **[Proposed — Sean to confirm]** are recommendations, not decisions. The reviewer appendix at the end (sections A to C) is for Sean and the reviewer and is removed before publication.
+> Approved 2026-11-07 against source `534b686b`; the proposals in earlier drafts (cookie lifetime, retention periods) are approved as written. Text still in square brackets is a placeholder or a choice that must be filled before publication (appendix A). The reviewer appendix at the end (sections A to C) is for Sean and the reviewer and is removed before publication.
 
 **Effective date:** [set on publication]
 **Last updated:** [set on publication]
@@ -93,7 +93,7 @@ We use only cookies that are needed for the site to work. We do not use analytic
 
 | Name | Type | Purpose | Lifetime |
 | --- | --- | --- | --- |
-| `vaseyaudio-session` (default name) | First-party, HTTP-only, `SameSite=Lax`, secure over HTTPS | Keeps you signed in and keeps your cart and checkout together. | Ends after [120] minutes of inactivity **[Proposed — Sean to confirm]** |
+| `vaseyaudio-session` (default name) | First-party, HTTP-only, `SameSite=Lax`, secure over HTTPS | Keeps you signed in and keeps your cart and checkout together. | Ends after 120 minutes of inactivity |
 | `XSRF-TOKEN` | First-party | Protects forms from cross-site request forgery. | Same as the session |
 | `sessionStorage` entries (`vaseyaudio-cart-v1`, `vaseyaudio-quote-attempt-v1`, `vaseyaudio-order-recovery-v1`) | Browser storage, not sent to us automatically | Recover your cart, review and order status after a reload. | Until the browser tab session ends |
 | YouTube or Vimeo cookies | Third-party | Set by the video provider **only after you press "Load video"**. | Set by the provider |
@@ -129,7 +129,7 @@ Malware scanning uses ClamAV running on our own server; your files are not sent 
 
 ## 7. How long we keep information
 
-The periods below are what we intend to apply. **[Proposed — Sean to confirm each period.]**
+The periods below are what we intend to apply (approved by Sean on 2026-11-07).
 
 | Information | How long |
 | --- | --- |
@@ -230,9 +230,9 @@ Vasey Multimedia, doing business as VASEY.AUDIO
 3. **File storage provider:** private server disk, Cloudflare R2 or an S3-compatible service (U-03).
 4. **Off-site backup provider** (S-10).
 5. **Email/SMTP provider name** for account and order messages, and whether a marketing email provider will be used (U-13). Until chosen, the code sends no email (`config/mail.php` defaults to `log`; `config/production-identity-smtp.php` is null).
-6. **Retention periods in section 7**, if Sean wants different ones (U-13).
+6. **Retention periods in section 7: approved by Sean on 2026-11-07** with this policy. The reviewed deletion workflow that enforces them is still open (appendix B).
 7. **Minimum age** (18 / age of majority proposed) in section 11, matching `TERMS.md`.
-8. **Session lifetime** (120 minutes is the code default; the staging template uses 480).
+8. **Session lifetime: 120 minutes, approved by Sean on 2026-11-07** (the code default; the staging template still uses 480 for testing).
 9. **Marketing notice text** for `email_marketing` (`config/customer-preferences.php` is null) and the contact-form privacy notice and retention reference (`CONTACT_INQUIRIES_PRIVACY_NOTICE`, `CONTACT_INQUIRIES_RETENTION_REFERENCE`). Both can quote sections 3.5, 6 and 7 of this draft.
 10. **Customers imported from BeatStars** (U-09): no import code exists. If customer records are imported, add a short section telling those customers how their data arrived; consent stays unknown.
 
@@ -281,3 +281,4 @@ The earlier evidence-cited description of the data flows (draft of 2026-10-10, s
 - 2026-10-29 (lane CX, independent review F2): sections 5, 7 and 8 no longer say backups are encrypted, because backup encryption is opt-in and off by default and the production backup target is open; the appendix B row lists enforced backup encryption as a second prerequisite. Still not approved.
 - 2026-11-07 (D-30 step 2): sections 3.3, 7 and 10.3 disclose the legal-name confirmation, postal address and Exclusive artist name that order review will collect (Sean's decisions C-1, C-2 and D-1), and that the address is never taken from Stripe or account data. Appendix B records that collection is not implemented yet. Still not approved.
 - 2026-11-07 (later): sections 3.3 and the license-document row add the name of the person accepting a license for a business, after Sean decided that a business may be the licensee. Still not approved.
+- 2026-11-07: **approved by Sean Vasey** ("I approve privacy and terms"), including the proposed cookie lifetime and the section 7 retention periods. Placeholders and the choices listed in appendix A (postal address, hosting provider and region, storage, backup and email providers, minimum age, notice texts) must still be filled before publication, and appendix B gaps still constrain what may be published. Publication goes through the site content legal page type.

@@ -1,9 +1,9 @@
 # VASEY.AUDIO Terms of Sale and Use
 
-> **DRAFT for Sean Vasey's approval — not yet published — not legal advice; qualified legal review recommended before publication.**
+> **Approved by Sean Vasey on 2026-11-07 — not yet published — not legal advice; qualified legal review recommended before publication.**
 >
 > Draft date: 2026-10-24. Written against source `786fb7c755291184f9e01b4faaab28dbd430d698` (`origin/main`). Draft version label: `terms-draft-2026-10-24`.
-> Text in square brackets is a placeholder. Sections marked **[Proposed — Sean to confirm]** are recommendations, not decisions; sections marked **[For legal review]** use standard protective wording that a qualified reviewer should check. The reviewer appendix at the end is removed before publication.
+> Approved 2026-11-07 against source `534b686b`; the proposals in earlier drafts (re-download period, exclusive reservation time, refund policy, buyer assent text) are approved as written. Text still in square brackets is a placeholder or a choice that must be filled before publication (appendix A); sections marked **[For legal review]** use standard protective wording that a qualified reviewer should still check. The reviewer appendix at the end is removed before publication.
 
 **Effective date:** [set on publication]
 **Last updated:** [set on publication]
@@ -65,7 +65,7 @@ Before you pay, you see an order review with every license you are buying, its c
 
 - **What you get.** After your payment is confirmed, your account shows your order with your license document (PDF) and the files your license includes: an MP3, a WAV master and/or a stems (trackout) archive, as listed in the license. You get exactly the file versions you bought.
 - **How downloads work.** Each download uses a fresh, short-lived link created when you press download. A link works once; if a download is interrupted, request a new one. These are security measures to protect your files, not limits on your license.
-- **Keep your own copies.** We aim to keep your purchases available to download from your account while the store operates, but you should save your files and license document as soon as you receive them. [Proposed — Sean to confirm: re-download availability for at least 12 months after purchase.]
+- **Keep your own copies.** We aim to keep your purchases available to download from your account while the store operates, but you should save your files and license document as soon as you receive them. Purchases stay available to re-download for at least 12 months after purchase.
 - **Problems.** If a file is missing, damaged or not what your license lists, email support@vasey.audio with your order reference. We will replace it or, if we cannot, refund that item (section 10).
 - **Technical holds.** We may temporarily pause downloads for an order while we investigate suspected fraud, an open payment dispute or a security problem. A pause is not a refund or a cancellation of your license.
 
@@ -73,13 +73,13 @@ Before you pay, you see an order review with every license you are buying, its c
 
 Some tracks may be offered under an exclusive license. An exclusive license is limited to one buyer.
 
-- **Reservation during checkout.** When you start checking out an exclusive license, the track is reserved for you for a limited time [Proposed — Sean to confirm: 30 minutes] so nobody else can buy an exclusive or a new non-exclusive license for it meanwhile. If you do not complete payment in time, the reservation ends and the track becomes available again.
+- **Reservation during checkout.** When you start checking out an exclusive license, the track is reserved for you for a limited time (30 minutes) so nobody else can buy an exclusive or a new non-exclusive license for it meanwhile. If you do not complete payment in time, the reservation ends and the track becomes available again.
 - **Late or competing payments.** If a payment is confirmed after the reservation ended, we review it by hand before anything is delivered. If the exclusive is no longer available, we refund the payment in full.
 - **Earlier non-exclusive licenses stay valid.** Before an exclusive is sold, other customers may have bought non-exclusive licenses for the same track. **Those licenses remain valid** for their own term and limits, and the exclusive buyer takes the exclusive subject to them. We do not cancel or revoke earlier licenses when an exclusive is sold.
 - **After an exclusive sale** we stop selling any new license for that track and remove it from sale. Holders of earlier non-exclusive licenses cannot renew or upgrade them after the exclusive is sold.
 - The exclusive license itself sets out exactly what the exclusive buyer receives (see the license tiers).
 
-## 10. Refunds, cancellations and disputes [Proposed — Sean to confirm]
+## 10. Refunds, cancellations and disputes
 
 Our licenses are digital goods delivered immediately, so we handle refunds as follows.
 
@@ -172,11 +172,11 @@ Vasey Multimedia, doing business as VASEY.AUDIO
 1. **Postal address:** supplied by Sean on 2026-10-24 (street line only; city and ZIP still needed); kept out of the public repository and inserted when the page is published through the site content system.
 2. **Iowa venue county** (section 18). Governing law is Iowa, as Sean stated on 2026-10-24.
 3. **Minimum age** (section 2), matching `PRIVACY.md` section 11.
-4. **Refund policy** (section 10): the 14-day window, the "no download" rule and the exclusive review are proposals. Machine-policy values that match this draft: `refund_authority = authoritative_provider_operator_review`, `partial_refunds = exact_line_allocation`, `dispute_access = temporarily_block_while_reconciling`, `exclusive_reopening = qualified_operator_review` (`app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php`). If Sean prefers that a refunded exclusive is never resold, choose `remain_sold` and change the exclusive bullet.
-5. **Exclusive reservation time** (section 9; 30 minutes proposed) and late-payment handling (U-08). Matching machine-policy values: `reservation_seconds = 1800`, `provider_lifetime_seconds` at most Stripe's Checkout session lifetime, `pending_cutoff = block_new_nonexclusive_on_pending_exclusive`, `late_action = paid_exception_operator_reconciliation` (the only supported value), `late_time_basis` to choose.
-6. **Re-download availability** (section 8; 12 months proposed).
+4. **Refund policy** (section 10): **approved by Sean on 2026-11-07** (the 14-day window, the "no download" rule and the exclusive review). Machine-policy values that match this draft: `refund_authority = authoritative_provider_operator_review`, `partial_refunds = exact_line_allocation`, `dispute_access = temporarily_block_while_reconciling`, `exclusive_reopening = qualified_operator_review` (`app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php`). If Sean prefers that a refunded exclusive is never resold, choose `remain_sold` and change the exclusive bullet.
+5. **Exclusive reservation time** (section 9; **30 minutes, approved by Sean on 2026-11-07**) and late-payment handling (U-08). Matching machine-policy values: `reservation_seconds = 1800`, `provider_lifetime_seconds` at most Stripe's Checkout session lifetime, `pending_cutoff = block_new_nonexclusive_on_pending_exclusive`, `late_action = paid_exception_operator_reconciliation` (the only supported value), `late_time_basis` to choose.
+6. **Re-download availability** (section 8; **12 months, approved by Sean on 2026-11-07**).
 7. **DMCA designated agent** registration (section 13).
-8. **Buyer assent text** for `MachinePolicyV1` `assent.text` (at most 4,096 characters). Proposed: "I am buying the license(s) listed above from Vasey Multimedia dba VASEY.AUDIO, licensed by Sean Vasey. I have read and agree to each license's full terms and to the Terms of Sale and Use. I understand delivery starts immediately after payment, and that once I download a file I lose any right to cancel for a change of mind." Seller legal name for `seller_identity.legal_name`: "Vasey Multimedia dba VASEY.AUDIO".
+8. **Buyer assent text** for `MachinePolicyV1` `assent.text` (at most 4,096 characters). **Approved by Sean on 2026-11-07:** "I am buying the license(s) listed above from Vasey Multimedia dba VASEY.AUDIO, licensed by Sean Vasey. I have read and agree to each license's full terms and to the Terms of Sale and Use. I understand delivery starts immediately after payment, and that once I download a file I lose any right to cancel for a change of mind." Seller legal name for `seller_identity.legal_name`: "Vasey Multimedia dba VASEY.AUDIO".
 9. **Liability cap and indemnity** (sections 16 and 17): standard wording for review.
 10. **Legal-name confirmation statements** (section 7). The order review shows a short statement next to the confirmation tick; its version and hash are frozen into the order.
     - **Individual: approved by Sean on 2026-11-07.** "I confirm that this is my full legal name and that the license should be issued to me under it." Sean approved the section 7 wording above the business paragraph on the same day.
@@ -206,3 +206,4 @@ Vasey Multimedia, doing business as VASEY.AUDIO
 - 2026-11-07 (D-30 step 2): section 7 now says order review collects a confirmed full legal name, a postal address and, for an exclusive license, an artist name (Sean's decisions C-1, C-2 and D-1). It also states that unsupported characters are refused and that a reported mistake gets a correction note while the license stays as issued (Sean, 2026-11-07). Appendix A item 10 proposes the confirmation statement; appendix B records that collection is not implemented yet. Not approved.
 - 2026-11-07: Sean approved the section 7 order-review wording and the individual confirmation statement (A.10), and decided that a business may be the licensee. Section 7 adds a proposed "Buying for a business" paragraph, and A.10 proposes the business statement; both await approval. The rest of the draft is still not approved.
 - 2026-11-07 (later): Sean approved the business confirmation statement (A.10) and the section 7 "Buying for a business" paragraph. The rest of the draft is still not approved.
+- 2026-11-07: **approved by Sean Vasey** ("I approve privacy and terms"), including the refund policy, the 30-minute exclusive reservation, 12-month re-download availability and the buyer assent text. Still to fill before publication: postal address, Iowa venue county, minimum age and the DMCA agent decision (appendix A); the **[For legal review]** wording awaits a qualified reviewer, and appendix B gaps still constrain what may be published.
