@@ -18,7 +18,7 @@
 #   4. the Forge .env validated for the staging profile and installed 0600;
 #   5. one root lease encloses build/sealing; activation freshly quiesces under its own retained lease;
 #   6. a backup of the database, private storage and .env, and an isolated restore proof, before migrating;
-#   7. maintenance in the new release, migrate --pretend, migrate --force, config/route/view/event caches,
+#   7. maintenance in the new release, migrate --force (no --pretend: raw-PDO DDL ignores it), config/route/view/event caches,
 #      vasey:doctor, redacted readiness reports;
 #   8. atomic switch of `current`, PHP-FPM and workers started on it and proven, maintenance lifted, GET / = 200.
 # No storage:link: nothing uses the public disk (previews, artwork and site images stream through controllers).

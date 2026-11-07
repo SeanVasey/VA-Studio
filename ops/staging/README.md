@@ -148,7 +148,7 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
 | Component | Requirement | Why |
 | --- | --- | --- |
 | PHP 8.4.1 or newer, CLI + FPM | `pdo_mysql`, `pdo_sqlite`, `mbstring`, `intl`, `bcmath`, `gd`, `fileinfo`, `zip`, `curl`, `dom`, `xml`, `xmlwriter`, `posix`, `pcntl`, `ctype`, `iconv`, `tokenizer`, `openssl` | `vasey:doctor` `php_runtime` (it requires `pdo_sqlite` even on MySQL), CI's extension list, renderer children, `pcntl` for worker timeouts |
-| MySQL | 8.4, binary log on, `log_bin_trust_function_creators=ON` | 618 triggers (at `34562862`) created by a non-root account (see below) |
+| MySQL | 8.4, binary log on, `log_bin_trust_function_creators=ON`, `skip_name_resolve=ON` | 618 triggers (at `34562862`) created by a non-root account (see below) |
 | nginx | as Forge installs it (1.24+; nginx.org 1.31.8 on the current Forge Laravel VPS) | `nginx.conf` must include `conf.d/*.conf` at http level (provision.sh checks); the classic wrapper uses `listen ... ssl http2` |
 | Node.js | `>=24.15.0 <25` (`package.json` engines), installed from NodeSource if Forge's is older | `npm ci && npm run build` |
 | ffmpeg / ffprobe | encoders `libmp3lame`, `pcm_s16le`, `png`, `mjpeg`, `libwebp` | `vasey:doctor` `media_encoders`, previews and artwork |
@@ -170,6 +170,7 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
    - `vasey_app@127.0.0.1`, the runtime and migration account, with schema-scoped `SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, INDEX, REFERENCES, TRIGGER, CREATE TEMPORARY TABLES, LOCK TABLES`;
    - `vasey_backup@127.0.0.1`, the backup account, with `SELECT, SHOW VIEW, TRIGGER, LOCK TABLES, EVENT` plus global `SHOW_ROUTINE`;
    - `SET PERSIST log_bin_trust_function_creators = ON`.
+   - `SET PERSIST_ONLY skip_name_resolve = ON` and one `mysqld` restart, when it is off. The identity layer admits its metadata companion connection only when PROCESSLIST names the client by a literal IP; with name resolution on, a 127.0.0.1 client is shown as `localhost`. It refuses first if any account is addressed by a host name.
    It never rotates an existing password.
    `/root/vasey-staging-secrets` must have canonical protected ancestry. An existing app account requires
    a regular root-owned 0600 single-link `db-app.env` containing exactly the generated username/password
@@ -232,7 +233,7 @@ renaming that account breaks every guarded write.
 6. Still inside that invocation, snapshot takes a backup and **restore proof** before anything is migrated,
    including a first-install retry. A no-current set explicitly has no historical environment/key.
 7. The fixed helper runs these steps as the application user in the new release while root retains both locks:
-   - `artisan down`, then `migrate --pretend` (evidence only; see the runbook), then `migrate --force`;
+   - `artisan down`, then `migrate --force` (no `--pretend` dry run: identity migrations run DDL through the raw PDO, which pretend mode cannot intercept);
    - `config:cache`, `route:cache`, `view:cache`, `event:cache` (all verified to work with this codebase);
    - `vasey:doctor`, plus redacted `commerce-readiness` and `stripe-preflight` JSON.
 8. The same root invocation verifies stopped web/workers, maintenance and attached private storage, then switches `current` atomically. Its internal resume then:
