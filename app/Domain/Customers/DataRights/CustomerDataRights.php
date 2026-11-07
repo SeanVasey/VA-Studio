@@ -93,7 +93,8 @@ class CustomerDataRights
             ]);
             $this->event($request, 'export_ready', null, ['size_bytes' => strlen($json), 'expires_at' => $expires->toIso8601ZuluString(),
                 'sections' => array_map('count', array_intersect_key($document, array_flip(['orders', 'licenseGrants', 'consent', 'inquiries',
-                'productionCheckoutReviews', 'productionCheckoutOrders', 'productionTaxCheckoutOrders'])))], $at);
+                'productionCheckoutReviews', 'productionCheckoutOrders', 'productionTaxCheckoutOrders', 'productionCheckoutExemptionBases',
+                'paidGrantOrders', 'paidTaxGrantOrders'])))], $at);
             AuditEvent::recordAttributed('customer.data_export.ready', $request, ['request_id' => $requestId, 'size_bytes' => strlen($json)], $user->id);
 
             return ['requestId' => $requestId, 'downloadToken' => $token, 'expiresAt' => $expires->toIso8601ZuluString(), 'sizeBytes' => strlen($json)];

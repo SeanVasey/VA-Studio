@@ -511,6 +511,10 @@ class CustomerDataRightsTest extends TestCase
         // The counter names the newest event: requested (1) and export_ready (2).
         $this->assertSame(2, (int) $request->last_event_sequence);
         $this->assertSame([1, 2], DB::table('customer_data_request_events')->where('request_id', $request->id)->orderBy('sequence')->pluck('sequence')->map(fn ($v) => (int) $v)->all());
+        // The ready event summarizes every list section of the document, schema 3 sections included.
+        $readyEvent = json_decode(DB::table('customer_data_request_events')->where('request_id', $request->id)->where('event', 'export_ready')->value('detail'), true);
+        $this->assertSame(['consent', 'inquiries', 'licenseGrants', 'orders', 'paidGrantOrders', 'paidTaxGrantOrders', 'productionCheckoutExemptionBases',
+            'productionCheckoutOrders', 'productionCheckoutReviews', 'productionTaxCheckoutOrders'], collect($readyEvent['sections'])->keys()->sort()->values()->all());
         $attempts = [
             'reopen state' => fn () => DB::table('customer_data_requests')->where('id', $request->id)->update(['state' => 'received', 'version' => 1]),
             'skip version' => fn () => DB::table('customer_data_requests')->where('id', $request->id)->update(['state' => 'downloaded', 'version' => 2, 'open_slot' => null, 'resolved_at' => now(), 'updated_at' => now()]),
