@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\CustomerComms;
 
+use App\Domain\Commerce\QuoteException;
 use App\Domain\Customers\Models\CustomerAccount;
+use App\Domain\Delivery\DeliveryException;
 use App\Domain\Notifications\Mail\OrderReadyMail;
 use App\Domain\Notifications\Mail\TransactionalMailAdapter;
 use App\Domain\Notifications\Models\TransactionalMailDelivery;
@@ -301,11 +303,115 @@ class TransactionalMailTest extends TestCase
         $deliveryFor = fn (array $f): bool => TransactionalMailDelivery::where('notice_public_id', $f['notice']['notificationId'])->exists();
 
         $this->artisan('vasey:transactional-mail-queue', ['--limit' => 2])
-            ->expectsOutput('queued=1 skipped=2 reasons=authority_withdrawn=1,error=1 superseded=0')->assertSuccessful();
+            ->expectsOutput('queued=1 skipped=2 reasons=authority_withdrawn=1,error=1 superseded=0')->assertFailed();
         $this->assertSame([false, false, true], array_map($deliveryFor, [$unverified, $broken, $valid]));
         $this->assertTrue(collect($this->logs)->contains(fn (string $line): bool => str_contains($line, 'Order-ready intent could not be queued.')
             && str_contains($line, trim(json_encode(QueryException::class), '"'))));
         $this->assertNoPersonalData($unverified['user']->email);
+        Mail::assertNothingOutgoing();
+        Queue::assertPushed(DeliverTransactionalMail::class, 1);
+        $this->assertSame(1, $this->runQueuedMail());
+        Mail::assertSentCount(1);
+        Mail::assertSent(OrderReadyMail::class, fn (OrderReadyMail $mail): bool => $mail->hasTo($valid['user']->email));
+        Mail::assertNotSent(OrderReadyMail::class, fn (OrderReadyMail $mail): bool => $mail->hasTo($unverified['user']->email)
+            || $mail->hasTo($broken['user']->email));
+    }
+
+    public function test_a_batch_with_only_authority_refusals_succeeds_without_delivery_rows_or_mail(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        $f = N::ready(suffix: 'REFUSEDONLY');
+        M::configure();
+        $f['user']->forceFill(['email_verified_at' => null])->save();
+
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 1])
+            ->expectsOutput('queued=0 skipped=1 reasons=authority_withdrawn=1 superseded=0')->assertSuccessful();
+        $this->assertNoDeliveries();
+        Queue::assertNotPushed(DeliverTransactionalMail::class);
+        Mail::assertNothingOutgoing();
+        $this->assertNoPersonalData($f['user']->email);
+    }
+
+    public static function purchaseAuthorityRefusals(): array
+    {
+        return ['quote' => ['quote'], 'delivery' => ['delivery']];
+    }
+
+    #[DataProvider('purchaseAuthorityRefusals')]
+    public function test_purchase_domain_refusals_before_queue_leave_no_delivery_and_allow_a_later_valid_intent(string $kind): void
+    {
+        Mail::fake();
+        Queue::fake();
+        $refused = N::ready(suffix: 'QUEUE'.strtoupper($kind));
+        $valid = N::ready(suffix: 'QUEUEVALID'.strtoupper($kind));
+        M::configure();
+        $hits = 0;
+        $this->refuseNoticeAuthorityWith($refused['notice']['notificationId'], $kind, $hits);
+        $adapter = app(TransactionalMailAdapter::class);
+
+        try {
+            $adapter->queueOrderReady($refused['notice']['notificationId']);
+            $this->fail('A purchase-domain refusal reached delivery creation.');
+        } catch (NotificationException $error) {
+            $this->assertSame('authority_withdrawn', $error->reason);
+        }
+        $this->assertSame(1, $hits);
+        $this->assertNoDeliveries();
+        Queue::assertNotPushed(DeliverTransactionalMail::class);
+        Mail::assertNothingOutgoing();
+
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 1])
+            ->expectsOutput('queued=1 skipped=1 reasons=authority_withdrawn=1 superseded=0')->assertSuccessful();
+        $this->assertSame(2, $hits);
+        $this->assertDatabaseMissing('transactional_mail_deliveries', ['notice_public_id' => $refused['notice']['notificationId']]);
+        $this->assertDatabaseHas('transactional_mail_deliveries', ['notice_public_id' => $valid['notice']['notificationId'], 'state' => 'queued']);
+        $this->assertDatabaseCount('transactional_mail_deliveries', 1);
+        Queue::assertPushed(DeliverTransactionalMail::class, 1);
+        Mail::assertNothingOutgoing();
+        $this->assertSame(1, $this->runQueuedMail());
+        Mail::assertSentCount(1);
+        Mail::assertSent(OrderReadyMail::class, fn (OrderReadyMail $mail): bool => $mail->hasTo($valid['user']->email));
+        Mail::assertNotSent(OrderReadyMail::class, fn (OrderReadyMail $mail): bool => $mail->hasTo($refused['user']->email));
+        $this->assertNoPersonalData($refused['user']->email);
+    }
+
+    #[DataProvider('purchaseAuthorityRefusals')]
+    public function test_purchase_domain_refusals_after_claim_retain_failed_state_without_mail_and_allow_a_later_valid_intent(string $kind): void
+    {
+        Mail::fake();
+        Queue::fake();
+        $refused = N::ready(suffix: 'CLAIM'.strtoupper($kind));
+        $valid = N::ready(suffix: 'CLAIMVALID'.strtoupper($kind));
+        M::configure();
+        $adapter = app(TransactionalMailAdapter::class);
+        $id = $adapter->queueOrderReady($refused['notice']['notificationId'])['deliveryId'];
+        $hits = 0;
+        $this->refuseNoticeAuthorityWith($refused['notice']['notificationId'], $kind, $hits);
+
+        $this->assertSame(['deliveryId' => $id, 'state' => 'failed', 'reason' => 'authority_withdrawn'], $adapter->deliver($id));
+        $this->assertSame(1, $hits);
+        $failed = TransactionalMailDelivery::where('public_id', $id)->sole();
+        $this->assertSame(2, $failed->version);
+        $this->assertNotNull($failed->started_at);
+        $this->assertNotNull($failed->finished_at);
+        $this->assertNull($failed->message_hash);
+        $retained = $failed->getRawOriginal();
+        Mail::assertNothingOutgoing();
+        $this->artisan('vasey:transactional-mail-stuck', ['--minutes' => 1])->expectsOutput('stuck=0 minutes=1')->assertSuccessful();
+        $this->assertSame(['notification.mail.queued', 'notification.mail.submitting', 'notification.mail.failed'],
+            AuditEvent::where('action', 'like', 'notification.mail.%')->orderBy('id')->pluck('action')->all());
+
+        $this->artisan('vasey:transactional-mail-queue', ['--limit' => 1])
+            ->expectsOutput('queued=1 skipped=0 superseded=0')->assertSuccessful();
+        Queue::assertPushed(DeliverTransactionalMail::class, 2);
+        $this->assertSame(2, $this->runQueuedMail(), 'The old failed wake-up is harmless and the later valid delivery still runs.');
+        $this->assertSame(1, $hits);
+        $this->assertSame($retained, $failed->fresh()->getRawOriginal());
+        Mail::assertSentCount(1);
+        Mail::assertSent(OrderReadyMail::class, fn (OrderReadyMail $mail): bool => $mail->hasTo($valid['user']->email));
+        Mail::assertNotSent(OrderReadyMail::class, fn (OrderReadyMail $mail): bool => $mail->hasTo($refused['user']->email));
+        $this->assertNoPersonalData($refused['user']->email);
     }
 
     public function test_a_customer_refusal_after_the_claim_fails_the_delivery_instead_of_leaving_it_submitting(): void
@@ -407,6 +513,20 @@ class TransactionalMailTest extends TestCase
             }
         }
         Mail::assertSentCount(1);
+    }
+
+    /** Inject only the named domain exception at the real authority status read; other intents use their genuine graph. */
+    private function refuseNoticeAuthorityWith(string $noticeId, string $kind, int &$hits): void
+    {
+        DB::beforeExecuting(function (string $sql, array $bindings) use ($noticeId, $kind, &$hits): void {
+            if (str_contains($sql, 'transactional_notices') && in_array($noticeId, $bindings, true)) {
+                $hits++;
+                throw match ($kind) {
+                    'quote' => new QuoteException('ORDER_NOT_FOUND', 404),
+                    'delivery' => new DeliveryException('not_found'),
+                };
+            }
+        });
     }
 
     /** The customer fixtures fake the queue; run each pushed one-attempt wake-up (and any duplicate push) exactly as a worker would. */

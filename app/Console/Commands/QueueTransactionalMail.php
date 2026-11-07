@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Domain\Notifications\Mail\TransactionalMailAdapter;
 use App\Domain\Notifications\Mail\TransactionalMailPolicy;
+use App\Domain\Notifications\Mail\TransactionalMailScanProgress;
 use App\Domain\Notifications\NotificationException;
 use Illuminate\Console\Command;
 use Illuminate\Database\Query\Builder;
@@ -14,10 +15,11 @@ use Throwable;
 /**
  * Queues one email for each private order-ready intent that has none yet (FP-075), in a bounded batch. Refuses, recording
  * nothing, unless the transactional mail configuration is admitted. Prints counts and fixed reasons only.
+ * Finishes the batch and prints its summary before returning failure for any unexpected per-intent error.
  *
  * An intent bound to a customer access version that has since been superseded (access withdrawn or the account erased; the
  * version only ever increases) can never verify again, so it leaves the pending set without any row being written. Every other
- * refusal stays pending, and the run keeps scanning past it, up to a fixed bound, so refused intents never block newer ones.
+ * refusal stays pending. Durable finite passes consider later intents and revisit refusals after wraparound.
  */
 final class QueueTransactionalMail extends Command
 {
@@ -28,7 +30,7 @@ final class QueueTransactionalMail extends Command
 
     protected $description = 'Queue order-ready emails for private test order-ready intents; refuses unless mail is configured.';
 
-    public function handle(TransactionalMailAdapter $adapter, TransactionalMailPolicy $policy): int
+    public function handle(TransactionalMailAdapter $adapter, TransactionalMailPolicy $policy, TransactionalMailScanProgress $progress): int
     {
         $limit = filter_var($this->option('limit'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 100]]);
         if ($limit === false) {
@@ -44,34 +46,43 @@ final class QueueTransactionalMail extends Command
             return self::FAILURE;
         }
         $queued = 0;
+        $hadUnexpectedError = false;
         $handled = 0;
         $examined = 0;
         $skipped = [];
-        $after = 0;
         $budget = $limit * self::SCAN_FACTOR;
-        while ($handled < $limit && $examined < $budget) {
-            $page = $this->withoutDelivery()->where(fn (Builder $query) => $query->whereNull('a.id')->orWhereColumn('a.access_version', '<=', 'n.access_version'))
-                ->where('n.id', '>', $after)->orderBy('n.id')->limit(min($limit, $budget - $examined))->get(['n.id', 'n.public_id']);
-            if ($page->isEmpty()) {
+        $cycle = null;
+        try {
+            $cycle = $progress->start('new_intents');
+        } catch (Throwable $error) {
+            $hadUnexpectedError = true;
+            $skipped['error'] = 1;
+            Log::warning('Order-ready intent could not be queued.', ['exception_class' => $error::class]);
+        }
+        while ($cycle !== null && $handled < $limit && $examined < $budget) {
+            try {
+                $notice = $progress->reserve('new_intents', $cycle);
+            } catch (Throwable $error) {
+                $hadUnexpectedError = true;
+                $skipped['error'] = ($skipped['error'] ?? 0) + 1;
+                Log::warning('Order-ready intent could not be queued.', ['exception_class' => $error::class]);
                 break;
             }
-            foreach ($page as $notice) {
-                $after = (int) $notice->id;
-                $examined++;
-                try {
-                    $adapter->queueOrderReady($notice->public_id)['replayed'] ? null : $queued++;
-                    $handled++;
-                } catch (NotificationException $error) {
-                    // Not provably permanent: it stays pending for the next run, and this run moves on to newer intents.
-                    $skipped[$error->reason] = ($skipped[$error->reason] ?? 0) + 1;
-                } catch (Throwable $error) {
-                    // An unexpected error on one intent (a database error, a defect) recorded nothing; it must not stop the batch.
-                    Log::warning('Order-ready intent could not be queued.', ['exception_class' => $error::class]);
-                    $skipped['error'] = ($skipped['error'] ?? 0) + 1;
-                }
-                if ($handled >= $limit) {
-                    break;
-                }
+            if ($notice === null) {
+                break;
+            }
+            $examined++;
+            try {
+                $adapter->queueOrderReady($notice['public_id'])['replayed'] ? null : $queued++;
+                $handled++;
+            } catch (NotificationException $error) {
+                // Durable consideration advances even on refusal; the next finite pass revisits it.
+                $skipped[$error->reason] = ($skipped[$error->reason] ?? 0) + 1;
+            } catch (Throwable $error) {
+                // A post-commit dispatch error may have retained queued work; queued recovery owns that gap.
+                $hadUnexpectedError = true;
+                Log::warning('Order-ready intent could not be queued.', ['exception_class' => $error::class]);
+                $skipped['error'] = ($skipped['error'] ?? 0) + 1;
             }
         }
         $superseded = $this->withoutDelivery()->whereColumn('a.access_version', '>', 'n.access_version')->count();
@@ -79,7 +90,7 @@ final class QueueTransactionalMail extends Command
         $this->line('queued='.$queued.' skipped='.array_sum($skipped).($skipped === [] ? '' : ' reasons='.http_build_query($skipped, '', ','))
             .' superseded='.$superseded);
 
-        return self::SUCCESS;
+        return $hadUnexpectedError ? self::FAILURE : self::SUCCESS;
     }
 
     /** Order-ready intents with no delivery row, joined to the customer account they were captured for. */

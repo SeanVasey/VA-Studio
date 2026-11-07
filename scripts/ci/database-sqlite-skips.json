@@ -1349,6 +1349,14 @@
     [
       "Tests\\Feature\\ProductionMembershipBilling\\MembershipSchemaProofFrameTest",
       "test_native_result_charset_alone_invalidates_a_remembered_complete_proof"
+    ],
+    [
+      "Tests\\Feature\\CustomerComms\\TransactionalMailRecoveryNativeTest",
+      "test_native_concurrent_progress_reservations_have_distinct_committed_ids_and_no_stale_cycle_write"
+    ],
+    [
+      "Tests\\Feature\\CustomerComms\\TransactionalMailRecoveryNativeTest",
+      "test_native_duplicate_jobs_have_one_committed_claim_and_one_fake_transport_without_terminal_reopen"
     ]
   ]
 }
