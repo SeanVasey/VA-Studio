@@ -481,7 +481,13 @@ render "$KIT/php-fpm/vasey-staging.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-stagin
 render "$KIT/php-fpm/vasey-paid-delivery.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-paid-delivery.conf" 0644
 "$FPM_BIN" -t >/dev/null 2>&1 || { "$FPM_BIN" -t; die "PHP-FPM configuration test failed"; }
 systemctl reload "$FPM_SERVICE" || systemctl restart "$FPM_SERVICE"
-[ -S /run/php/vasey-staging.sock ] && [ -S /run/php/vasey-paid-delivery.sock ] || die "FPM pool sockets missing after reload"
+# The reload is a USR2 re-exec that systemctl does not wait for: the new pools' sockets appear about
+# two seconds later (seen on the staging host). Wait for them rather than test once.
+for _ in $(seq 1 30); do
+  [ -S /run/php/vasey-staging.sock ] && [ -S /run/php/vasey-paid-delivery.sock ] && break
+  sleep 1
+done
+[ -S /run/php/vasey-staging.sock ] && [ -S /run/php/vasey-paid-delivery.sock ] || die "FPM pool sockets missing 30 s after reload"
 
 render "$KIT/workers/vasey-staging-workers.conf" /etc/supervisor/conf.d/vasey-staging.conf 0644
 systemctl enable --now supervisor >/dev/null
