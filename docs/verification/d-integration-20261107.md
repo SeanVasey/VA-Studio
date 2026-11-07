@@ -7,7 +7,7 @@ Publication record for the D batch, stacked on C2 (`claude/c2-deferred-batch-202
 | CAT bounded staff media inventory | `2fc74539` | [`cat-media-inventory-20261103/`](cat-media-inventory-20261103/README.md) | APPROVE; F1/F3/F5 fixed | SQLite 11/59; native 11/59 |
 | DEF-ID checkout metadata admission | `9278d79c` | [`def-id-metadata-20261103/`](def-id-metadata-20261103/README.md) | APPROVE WITH CONDITIONS, met | SQLite 53/169 (40/53 fail on unmodified main); affected 98/665; native 76 |
 | UXA public accessibility spec | `614b9d5d` | [`accessibility-public-20261102.md`](accessibility-public-20261102.md) | no application code | npm audit 0, typecheck, vitest 1177, build; the axe browser spec needs a host with ClamAV signatures |
-| PF1-A sound kit technical readiness | `f4f03a84` | PF1 packet on that branch | Codex: existing conditions fulfilled | unit 13/14 plus original A5 UI 12/88 (Codex) |
+| PF1-A sound kit technical readiness | `f4f03a84` | [`pf1-a-technical-revision-20261103/`](pf1-a-technical-revision-20261103/README.md) | Codex: existing conditions fulfilled | unit 13/14 plus original A5 UI 12/88 (Codex) |
 
 ## Integration changes (this PR only)
 
