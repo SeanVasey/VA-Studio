@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * The requester's production checkout records for the data export (D-30): V1 reviews and orders and V2 tax checkout orders,
- * each with the buyer declarations frozen into it. Rows are found through the account's one production identity origin
+ * each with the buyer declarations frozen into it, and the exemption bases that hold the buyer's qualified exemption
+ * attestation (whose buyer binding is sealed inside the qualification request). Rows are found through the account's one production identity origin
  * (`production_identity_origins.account_id` is unique) and read with plain, non-locking selects, as the data-rights READ
  * COMMITTED transaction requires: the pinned checkout readers take row locks and must not run here. Every row is opened with
  * its hash checked before decryption, and its own sealed buyer binding must name the same origin and account, so a misfiled
@@ -22,6 +23,7 @@ final class ProductionCheckoutExportSection
 {
     /** Retained production checkout records that carry buyer data, with their sealed purpose. */
     public const RECORDS = [
+        'production_checkout_exemption_bases' => ['purpose' => 'production_checkout_exemption_basis', 'section' => 'productionCheckoutExemptionBases'],
         'production_checkout_reviews' => ['purpose' => 'production_checkout_review', 'section' => 'productionCheckoutReviews'],
         'production_checkout_orders' => ['purpose' => 'production_checkout_order', 'section' => 'productionCheckoutOrders'],
         'production_tax_checkout_orders' => ['purpose' => 'production_tax_checkout_order', 'section' => 'productionTaxCheckoutOrders'],
@@ -30,7 +32,7 @@ final class ProductionCheckoutExportSection
     /** Per table, as for test orders: counted before any payload is loaded, so an oversized export refuses cheaply. */
     public const MAX_RECORDS = CustomerDataExportDocument::MAX_ORDERS;
 
-    /** @return array{productionCheckoutReviews: list<array>, productionCheckoutOrders: list<array>, productionTaxCheckoutOrders: list<array>} */
+    /** @return array{productionCheckoutExemptionBases: list<array>, productionCheckoutReviews: list<array>, productionCheckoutOrders: list<array>, productionTaxCheckoutOrders: list<array>} */
     public function build(int $accountId): array
     {
         $origin = self::origin($accountId);
@@ -55,7 +57,8 @@ final class ProductionCheckoutExportSection
         return $counts;
     }
 
-    private static function origin(int $accountId): ?string
+    /** The account's one production identity origin (`account_id` is unique there), or null when it has none. */
+    public static function origin(int $accountId): ?string
     {
         self::installed('production_identity_origins');
         $origin = DB::table('production_identity_origins')->where('account_id', $accountId)->value('public_id');
@@ -95,12 +98,23 @@ final class ProductionCheckoutExportSection
             } catch (CheckoutException) {
                 throw new DataRightsException(503, 'production_record_unavailable');
             }
-            $buyer = $body['buyer'] ?? null;
+            $basis = $table === CheckoutSchema::TABLES['basis'];
+            // A basis seals its buyer binding inside the qualification request and carries an attestation, not declarations.
+            $buyer = $basis ? ($body['request']['buyer'] ?? null) : ($body['buyer'] ?? null);
             if (! hash_equals($origin, (string) $row['buyer_origin_id']) || ! is_array($buyer)
                 || ! is_string($buyer['origin_id'] ?? null) || ! hash_equals($origin, $buyer['origin_id'])
                 || ($buyer['account_id'] ?? null) !== $accountId
-                || ! is_array($body['buyer_declarations'] ?? null)) {
+                || ($basis ? ! is_array($body['request']['attestation'] ?? null) || ! is_int($body['tax_minor'] ?? null) || ! is_int($body['total_minor'] ?? null)
+                    : ! is_array($body['buyer_declarations'] ?? null))) {
                 throw new DataRightsException(503, 'production_record_unavailable');
+            }
+            if ($basis) {
+                $attestation = $body['request']['attestation'];
+
+                return ['id' => $row['public_id'], 'createdAt' => CarbonImmutable::parse($row['created_at'], 'UTC')->toIso8601ZuluString(),
+                    'attestation' => array_intersect_key($attestation, array_flip(['qualified_exemption_confirmed', 'reference', 'source_sha256',
+                        'effective_from', 'effective_until'])),
+                    'taxMinor' => $body['tax_minor'], 'totalMinor' => $body['total_minor']];
             }
 
             return ['id' => $row['public_id'], 'createdAt' => CarbonImmutable::parse($row['created_at'], 'UTC')->toIso8601ZuluString(),

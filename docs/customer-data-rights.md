@@ -15,16 +15,25 @@ All routes sit under `/account/data-requests` and answer `404` until `customer-d
 
 ### The export
 
-The document holds only the requester's own records, selected through the signed-in principal's account and owner key, never by an identifier in the request: the account (id, name, email, created), orders (the same projection as order history, original or explicitly saved purchases, each ownership-checked), the license grants of those orders, the marketing consent ledger, inquiries linked to those orders (subject and message), and production checkout records with the buyer declarations frozen into them (export schema 2, D-30):
+The document holds only the requester's own records, selected through the signed-in principal's account and owner key, never by an identifier in the request: the account (id, name, email, created), orders (the same projection as order history, original or explicitly saved purchases, each ownership-checked), the license grants of those orders, the marketing consent ledger, inquiries linked to those orders (subject and message), and production checkout records with the buyer declarations frozen into them (export schema 3, D-30):
 - `productionCheckoutReviews`, `productionCheckoutOrders` and `productionTaxCheckoutOrders`;
-- each holds an id, the creation time, `buyerDeclarations` and, for orders, plain amount and line-count columns.
+- each holds an id, the creation time, `buyerDeclarations` and, for orders, plain amount and line-count columns;
+- `productionCheckoutExemptionBases`: the buyer's qualified exemption attestation (reference, source SHA-256, effective dates) with the zero tax and total it approved. The qualifying staff member is not exported.
 
-They are found through the account's production identity origin with plain, non-locking reads. Each row is opened with its hash checked and must carry a sealed buyer binding for the same origin and account. Otherwise, or if a production table is missing, the export refuses with `503 production_record_unavailable`.
+They are found through the account's production identity origin with plain, non-locking reads. Each row is opened with its hash checked and must carry a sealed buyer binding for the same origin and account (a basis seals it inside its qualification request). Otherwise, or if a production table is missing, the export refuses with `503 production_record_unavailable`.
+
+Schema 3 also adds the paid-grant copies of those declarations (`PaidGrantExportSection`). The V1 paid and V2 paid-tax grant chains run only in `local` and `testing` today (`PaidGrantPolicy`, `PaidTaxPolicy`):
+- `paidGrantOrders` and `paidTaxGrantOrders`: one entry per paid order (id, order id, creation time), each with its lines (id, position, title, the copied `buyerDeclarations`) and, once rendered, the original contract's SHA-256, size and preparation time (`contractOriginal`, otherwise `null`).
+- Paid orders are found through the account (`account_id`) only, and their lines and originals only through those orders, with plain, non-locking reads.
+- Each payload is opened with its hash checked. The order's sealed original buyer must name the account's production origin and the account, and every line must repeat that binding. Otherwise, or if a paid table is missing, the export refuses with `503 production_record_unavailable`.
+
+Download authorizations, redemptions, document work and fulfillment records hold only hashes and states, so they are not exported.
 
 Inquiries sent from a browser session without an order are not linked to an account and are not included. These exports refuse with `413`, and the customer contacts support@vasey.audio:
 - over `export_max_bytes` (default 1 MiB);
 - over 500 orders;
-- over 500 records in any one production checkout table, counted before any is opened.
+- over 500 records in any one production checkout table, counted before any is opened;
+- over 500 paid orders, or 2,000 paid lines or originals, in either paid-grant chain, counted before any is opened.
 
 Production-signed-in customers cannot reach these routes yet (D-30 step 3b).
 
@@ -40,7 +49,7 @@ The JSON is encrypted at rest with the application key (`customer_data_exports.c
 - withdraws customer access (`customer_accounts.active` false, access version incremented) and ends database sessions;
 - erases the listening library (`customer_saved_tracks`);
 - replaces the sign-in profile: name `Erased customer`, email `erased+<account id>@erased.invalid`, a random password, no verification;
-- **keeps** orders, order lines, finalizations, license grants, contracts, verified payments, purchase claims, delivery records, production checkout reviews and orders (V1) and tax checkout orders (V2), consent and suppression ledgers, inquiries, identity challenges, order-ready intents (`transactional_notices`, whose encrypted capture holds the recipient email) and their mail deliveries, data request records and export rows (contents purged) and audit events exactly as they are, and records each class with its retention class in the request's `deletion_completed` event together with the configured retention values and policy reference.
+- **keeps** orders, order lines, finalizations, license grants, contracts, verified payments, purchase claims, delivery records, production checkout reviews and orders (V1), tax checkout orders (V2) and exemption bases, the paid-grant order origins, grant origins and originals of both paid chains (`paid_*`, `paid_tax_*`), consent and suppression ledgers, inquiries, identity challenges, order-ready intents (`transactional_notices`, whose encrypted capture holds the recipient email) and their mail deliveries, data request records and export rows (contents purged) and audit events exactly as they are, and records each class with its retention class in the request's `deletion_completed` event together with the configured retention values and policy reference.
 
 Name and email inside retained order snapshots and contracts stay there: they are part of the financial and license record. Consent stays as recorded; nothing infers or rewrites it. Staff accounts are never erased through this workflow. Rejection needs a plain-text reason (no customer details) and changes no customer data.
 

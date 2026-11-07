@@ -102,6 +102,17 @@ linked to the order. No superseding contract version is issued.
   - Each record is opened with its hash checked, and its sealed buyer binding must name the same origin. Otherwise the export
     refuses with `production_record_unavailable`.
   - The three tables are on the deletion `RETAINED` list under `financial_records_years`.
+- Export schema 3 adds the exemption attestation and the paid-grant copies of the declarations:
+  - `production_checkout_exemption_bases` joins `ProductionCheckoutExportSection`. Its buyer binding is sealed inside the
+    qualification request. The qualifying staff member is not exported.
+  - `PaidGrantExportSection` covers the V1 paid and V2 paid-tax chains. For each chain it exports the order origins, the grant
+    origins that copy `buyer_declarations` verbatim, and the manifests of the originals rendered from them.
+  - Paid orders are found through `account_id` only, and their lines and originals only through those orders.
+  - Each payload is opened with its hash checked. The sealed original buyer must name the requester's origin and account, and
+    every line must repeat it.
+  - The six paid tables and the bases are on the `RETAINED` list under `financial_records_years`.
+  - Download authorizations, redemptions, document work and fulfillments hold only hashes and states, so they are neither
+    exported nor listed.
 
   Deletion approval stays refused until U-13 retention values are approved.
 - **Gap: production customers cannot reach data rights yet.** The export and deletion routes resolve only a test-account
@@ -122,10 +133,10 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
      evidence.
    - **3b:** a data-rights entry point for production-signed-in customers. It belongs with the production identity mount
      (U-07).
-   - **Before activation (step 8):** the paid-grant copies of the declarations (`paid_*` and `paid_tax_*` origins and originals,
-     local and testing only today) must also be exported and retained.
-   - **Follow-up:** `production_checkout_exemption_bases`, which is the buyer's exemption attestation and not a declaration,
-     should be exported and retained too.
+   - **Before activation (step 8), done:** the paid-grant copies of the declarations (`paid_*` and `paid_tax_*` origins and
+     originals, local and testing only today) are exported and retained (export schema 3, `PaidGrantExportSection`).
+   - **Follow-up, done:** `production_checkout_exemption_bases`, which is the buyer's exemption attestation and not a
+     declaration, is exported and retained (export schema 3).
 4. A pure `ContractIdentityDeclarationV2` validator and formatter.
 5. V2 tax checkout wiring behind the gate. Needs independent review and a native MySQL journey.
 6. V1 checkout wiring.

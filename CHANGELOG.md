@@ -10,6 +10,13 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Added
 
+- Customer data export covers the paid-grant copies of the buyer declarations and the buyer's exemption attestation (D-30, before activation). Export schema 3.
+  - **Paid-grant copies:** `paidGrantOrders` and `paidTaxGrantOrders` list the requester's V1 paid and V2 paid-tax grant order origins, each line's copied declarations and, once rendered, the original contract's hash and size. These chains still run only in `local` and `testing`.
+  - **Exemption attestation:** `productionCheckoutExemptionBases` exports the attestation without the qualifying staff member.
+  - **Reads:** paid orders are found through the account only, and lines and originals only through those orders, with plain, non-locking reads. Caps are counted first: 500 paid orders, 2,000 lines or originals per chain.
+  - **Checks:** each payload is opened with its hash checked. The sealed buyer binding must name the requester's production origin and account, and each paid line must repeat it. Otherwise, or if a table is missing, the export refuses with `503 production_record_unavailable`.
+  - **Deletion:** `paid_order_origins`, `paid_grant_origins`, `paid_originals`, their `paid_tax_*` counterparts and `production_checkout_exemption_bases` join the retained list under `financial_records_years`, with counts.
+  - See `docs/customer-data-rights.md` and `docs/architecture/D-30-buyer-contract-identity.md`.
 - Customer data export covers production checkout records (D-30 step 3a). Export schema 2 adds the requester's V1 production checkout reviews and orders and V2 tax checkout orders, each with its frozen buyer declarations.
   - **Reads:** records are found through the account's production identity origin with plain, non-locking reads, capped at 500 per table, counted first.
   - **Checks:** each record is opened with its hash checked and must carry a sealed buyer binding for the same origin and account. Otherwise, or if a production table is missing, the export refuses with `503 production_record_unavailable`.
