@@ -46,8 +46,12 @@ final class PaidGrantExportSection
     /** Lines, and originals, per chain: the ten lines a paid order may hold (the origin insert guard), times the order cap. */
     public const MAX_LINES = self::MAX_RECORDS * 10;
 
-    /** Download authorizations, and redemptions, per chain. */
-    public const MAX_DOWNLOADS = self::MAX_RECORDS * 10;
+    /**
+     * Download authorizations, and redemptions, per chain. A line is authorized once per kind and per attempt, and unused
+     * authorizations are retained, so this allows ten per line rather than one: an export of a long-lived account should
+     * not refuse permanently. Each entry is three small fields.
+     */
+    public const MAX_DOWNLOADS = self::MAX_LINES * 10;
 
     /** @return array{paidGrantOrders: list<array>, paidTaxGrantOrders: list<array>} */
     public function build(int $accountId): array

@@ -34,7 +34,7 @@ Inquiries sent from a browser session without an order are not linked to an acco
 - over `export_max_bytes` (default 1 MiB);
 - over 500 orders;
 - over 500 records in any one production checkout table, counted before any is opened;
-- over 500 paid orders, or 5,000 paid lines, originals, download authorizations or redemptions (ten lines per order), in either paid-grant chain, counted before any is opened.
+- over 500 paid orders, 5,000 paid lines or originals (ten lines per order), or 50,000 download authorizations or redemptions (ten per line), in either paid-grant chain, counted before any is opened.
 
 Production-signed-in customers cannot reach these routes yet (D-30 step 3b).
 

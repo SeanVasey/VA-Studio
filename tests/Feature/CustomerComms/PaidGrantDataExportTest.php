@@ -387,7 +387,7 @@ class PaidGrantDataExportTest extends TestCase
                 'request_key' => sprintf('00000000-0000-4000-9000-%012d', $i), 'token_hash' => hash('sha256', 'pad'.$i),
                 'payload' => 'x', 'payload_hash' => str_repeat('0', 64)];
         }
-        foreach (array_chunk($padding, 50) as $chunk) {
+        foreach (array_chunk($padding, 500) as $chunk) {
             DB::table('paid_authorizations')->insert($chunk);
         }
         $this->refusesExport($account, 413, 'export_too_large');
