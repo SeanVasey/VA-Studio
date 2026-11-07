@@ -36,6 +36,11 @@ final class IdentityHistoricalConfigurationAdmissionTest extends TestCase
         $extension = new HistoricalConfigurationParentCallback($parent === 'items' ? $before : $before[$parent]);
         $items = $before;
         $items = $parent === 'items' ? $extension : array_replace($items, [$parent => $extension]);
+        // Positive control: the same capture is admitted while every configuration parent is a plain array.
+        DB::transaction(function (): void {
+            $this->assertInstanceOf(IdentityOriginalCommitWitness::class,
+                IdentityOriginalCommitWitness::capture(new CurrentRows(DB::connection()->getPdo(), DB::getDriverName()), hrtime(true) + 30_000_000_000));
+        });
         $refused = false;
         DB::transaction(function () use ($property, $repo, $items, $before, &$refused): void {
             $reader = new CurrentRows(DB::connection()->getPdo(), DB::getDriverName());
@@ -43,7 +48,10 @@ final class IdentityHistoricalConfigurationAdmissionTest extends TestCase
             try {
                 IdentityOriginalCommitWitness::capture($reader, hrtime(true) + 30_000_000_000);
             } catch (IdentityException $error) {
-                $refused = $error->reason === 'historical_plain_configuration_required';
+                // Since #197 the raw metadata admission (IdentityMetadataAdmission::capture) runs first and refuses an
+                // ArrayAccess parent with its own reason, still before any parent callback; configuration admission is the
+                // second line. Either refusal is acceptable; the control below rules out a vacuous generic refusal.
+                $refused = in_array($error->reason, ['unavailable', 'historical_plain_configuration_required'], true);
             } finally {
                 $property->setValue($repo, $before);
             }

@@ -49,14 +49,73 @@ Existing originals stay byte-preserved, and v1 and v2 stay registered for retain
 
 1. **License sources.** Author the six templates as license versions (source text, plus v4 terms mapped from the tier
    variables), and get human review. This needs a live target, which means staging.
-2a. **Buyer identity capture (C-1, C-2).** Legal name and postal address at the agreement step. They are validated, stored
+2. **Buyer identity capture (C-1, C-2).** Legal name and postal address at the agreement step. They are validated, stored
     encrypted with the grant input, covered by retention and data-rights export/deletion, and disclosed in the privacy policy
     first. Never inferred from payment or account data.
-2. **Variable binding.** A closed map from the frozen grant input to the template variables. Any unknown or unfilled placeholder
+3. **Variable binding.** A closed map from the frozen grant input to the template variables. Any unknown or unfilled placeholder
    refuses issuance, and nothing is substituted silently. This includes golden synthetic fixtures.
-3. **Profile `vasey-license-pdf-v1`.** Pin the fonts, logo and signature hash, the template layout and the renderer graph.
+4. **Profile `vasey-license-pdf-v1`.** Pin the fonts, logo and signature hash, the template layout and the renderer graph.
    Determinism tests and a mutation check prove that a changed signature or font refuses issuance.
-4. **Activation.** Select the profile for new issuance only, never rerendering old originals. Independent review is required.
+5. **Activation.** Select the profile for new issuance only, never rerendering old originals. Independent review is required.
 
-The current `tc-lib` pins and the held `tc-lib` updates (Dependabot #162/#164) are re-evaluated in increment 3. A new profile is
+The current `tc-lib` pins and the held `tc-lib` updates (Dependabot #162/#164) are re-evaluated in increment 4. A new profile is
 the one place a renderer upgrade can land safely.
+
+## Variable map (increment 3 design, 2026-11-07)
+
+The six templates use 22 placeholders, and each one needs exactly one source. Two layers already exist:
+
+- **License-level `{{…}}` variables** in a license version's authored source. `LicenseSourceVariables::render` substitutes them
+  at authoring time from the structured terms (`LicenseTerms::sourceValues`). It rejects unknown keys and requires every
+  terms statement to appear.
+- **Purchase-level fields** in the frozen grant input (`PaidGrantRenderInput`). These are `effective_at`,
+  `buyer.declarations.legal_name` (already declared at checkout), the seller, the line's track title and artist, and the
+  amounts. Nothing substitutes them into a template yet; increment 3 adds that binder.
+
+| Placeholder (count) | Layer | Source |
+| --- | --- | --- |
+| `CONTRACT_DATE` (18) | purchase | `effective_at`, as a UTC calendar date |
+| `CUSTOMER_FULLNAME` (11) | purchase | `buyer.declarations.legal_name` (C-2) |
+| `CUSTOMER_ADDRESS` (5) | purchase | the new declared postal address (C-1, increment 2). Refuses until it is captured. |
+| `CUSTOMER_ALIAS` (2, Exclusive) | purchase | the declared artist/stage name, asked at Exclusive checkout (D-1, decided) |
+| `PRODUCT_TITLE` (7) | purchase | the line's frozen `offer_snapshot.product.title` |
+| `PRODUCT_PRICE` (6), `PRODUCT_PRICE_WORD` (1) | purchase | the line's frozen amount in minor units, with words from a fixed deterministic speller |
+| `LICENSE_NAME` (10) | purchase | the frozen `license.name` |
+| `PRODUCER_ALIAS` (19) | license constant | the seller's display alias, fixed in each license source |
+| `STATE_PROVINCE_COUNTRY` (14) | license constant | "State of Iowa, United States", fixed in each license source |
+| `FILE_TYPE` (5) | license | deliverables from `required_asset_roles` |
+| `PUBLISHING_RIGHTS` (6) | license | v4 `publishing_income` / ownership statements |
+| `DISTRIBUTE_COPIES` (5) | license | usage `copies_downloads` |
+| `NUMBER_OF_RADIO_STATIONS` (5) | license | usage `radio_stations` |
+| `MONETIZED_MUSIC_VIDEOS` (5), `_WORD` (5) | license | usage `music_videos` |
+| `AUDIO_STREAMS` (5) | license | usage `monetized_streams` |
+| `NON_MONETIZED_VIDEO_STREAMS_ALLOWED` (5) | license | usage `non_monetized_streams` |
+| `MONETIZED_VIDEO_STREAMS_ALLOWED` (5) | license | **gap: G-1** |
+| `FREE_DOWNLOADS` (5) | license | **gap: G-1** |
+| `PERFORMANCES_FOR_PROFIT` (5), `PERFORMANCES_NOT_FOR_PROFIT` (5) | license | **gap: G-1** (one `live_performances` slot for two terms) |
+
+### G-1: the usage schema cannot express Sean's tiers
+
+Sean's tiers distinguish four things the typed usage schema (`TypedLicenseTerms::USAGE`) has no slot for:
+
+- monetized video streams, separately from audio streams;
+- free downloads;
+- for-profit performances;
+- not-for-profit performances (the schema has only one combined performances slot).
+
+There are two ways to bridge this:
+
+- **Write the values as literal text** in the license source. The required `{{…}}` statement schedule would then summarise the
+  same rights in coarser categories, so the prose and the schedule could disagree. A buyer could read a contract that
+  contradicts itself.
+- **A schema v5 with those slots.** This is the correct fix. Each value is entered once and then reaches the prose, the
+  schedule, the storefront disclosure and the contract identically. It extends the reviewed licensing model, so it needs its
+  own increment and independent review before increment 1 can author the six licenses.
+
+**Decided 2026-11-07 by Sean: schema v5**, delivered as its own reviewed increment before increment 1.
+
+### D-1: `CUSTOMER_ALIAS` in the Exclusive template
+
+The Exclusive agreement names the buyer's performing name ("the musical performance of {CUSTOMER_ALIAS}"). Checkout has no
+such field. **Decided 2026-11-07 by Sean:** Exclusive checkout asks for the buyer's artist/stage name, in addition to the legal name.
+It is frozen into the grant input with the identity fields from increment 2.
