@@ -144,6 +144,8 @@
     "tests/Feature/Reporting/ProductionSeparationReportTest.php",
     "tests/Feature/Reporting/RefundNettingReportTest.php",
     "tests/Feature/Reporting/ReportingAuthorityTest.php",
+    "tests/Feature/Reporting/ReportingIndexesTest.php",
+    "tests/Feature/Reporting/ReportingProductionIndexesTest.php",
     "tests/Feature/Reporting/SalesReportLockFreeTest.php",
     "tests/Feature/Reporting/SalesReportTest.php",
     "tests/Feature/ReviewedLicenseDraftTest.php",
