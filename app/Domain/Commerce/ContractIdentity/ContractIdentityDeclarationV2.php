@@ -6,8 +6,9 @@ use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Rights\LicenseTerritories;
 
 /**
- * D-30 buyer contract identity: the legal name the buyer confirms, a structured postal address and, for Exclusive,
- * an artist name. Pure: it validates checkout input into the frozen `buyer_declarations` shape, re-verifies a stored
+ * D-30 buyer contract identity: who the licensee is (an individual, or a business acting through a named
+ * representative), the legal name the buyer confirms, a structured postal address and, for Exclusive, an
+ * artist name. Pure: it validates checkout input into the frozen `buyer_declarations` shape, re-verifies a stored
  * declaration and formats `{CUSTOMER_ADDRESS}`. Nothing here is wired into a checkout yet.
  *
  * Shape errors refuse with `invalid`; a well-formed value the pinned contract fonts cannot print refuses with
@@ -19,6 +20,9 @@ final class ContractIdentityDeclarationV2
     public const SCHEMA = 'buyer-contract-identity-v2';
 
     public const MEANING = 'buyer_declared_contract_identity';
+
+    /** An individual licenses in their own name; a business licenses in its name through the person accepting for it. */
+    public const LICENSEE_TYPES = ['individual', 'business'];
 
     private const LEGAL_NAME_BYTES = 255;
 
@@ -48,12 +52,24 @@ final class ContractIdentityDeclarationV2
     /**
      * Checkout input (camelCase) to the canonical declaration.
      *
-     * @param  array{statement_version: string, statement_hash: string}  $statement  the confirmation text the buyer saw
+     * $statements holds the confirmation text offered for each licensee type, as
+     * `['individual' => ['statement_version' => ..., 'statement_hash' => ...], 'business' => [...]]`. The buyer's type
+     * selects the one they saw. A type with no approved statement is left out, so it cannot be chosen. Each
+     * statement's version starts with its type (`individual-…`, `business-…`), and the two must differ, so a
+     * miskeyed map cannot freeze one type's statement for the other.
+     *
+     * @param  array<string, array{statement_version: string, statement_hash: string}>  $statements
      */
-    public static function fromInput(array $input, bool $exclusive, array $statement, ContractGlyphCoverage $coverage): array
+    public static function fromInput(array $input, bool $exclusive, array $statements, ContractGlyphCoverage $coverage): array
     {
-        self::keys($input, ['legalName', 'legalNameConfirmed', 'postalAddress'], ['artistName']);
+        self::keys($input, ['licenseeType', 'legalName', 'legalNameConfirmed', 'postalAddress'], ['representativeName', 'artistName']);
         CheckoutException::require($input['legalNameConfirmed'] === true, 'invalid', 422);
+        CheckoutException::require(in_array($input['licenseeType'], self::LICENSEE_TYPES, true), 'invalid', 422);
+        CheckoutException::require(array_diff(array_keys($statements), self::LICENSEE_TYPES) === [], 'invalid', 422);
+        $hashes = array_column(array_filter($statements, 'is_array'), 'statement_hash');
+        CheckoutException::require(count($hashes) === count(array_unique($hashes)), 'invalid', 422);
+        $statement = $statements[$input['licenseeType']] ?? null;
+        CheckoutException::require(is_array($statement), 'invalid', 422);
         self::statement($statement);
         $address = $input['postalAddress'];
         CheckoutException::require(is_array($address), 'invalid', 422);
@@ -68,10 +84,13 @@ final class ContractIdentityDeclarationV2
             }
         }
         $artist = self::trimmed($input['artistName'] ?? null);
+        $representative = self::trimmed($input['representativeName'] ?? null);
 
         return self::verify([
             'schema' => self::SCHEMA,
+            'licensee_type' => $input['licenseeType'],
             'legal_name' => self::trimmed($input['legalName']),
+            'representative_name' => $representative === '' ? null : $representative,
             'legal_name_confirmation' => ['confirmed' => true, 'statement_version' => $statement['statement_version'], 'statement_hash' => $statement['statement_hash']],
             'postal_address' => $postal,
             'artist_name' => $artist === '' ? null : $artist,
@@ -83,17 +102,29 @@ final class ContractIdentityDeclarationV2
     public static function verify(mixed $declaration, bool $exclusive, ContractGlyphCoverage $coverage): array
     {
         CheckoutException::require(self::isV2($declaration), 'invalid', 422);
-        self::keys($declaration, ['schema', 'legal_name', 'legal_name_confirmation', 'postal_address', 'artist_name', 'identity_meaning']);
+        self::keys($declaration, ['schema', 'licensee_type', 'legal_name', 'representative_name', 'legal_name_confirmation',
+            'postal_address', 'artist_name', 'identity_meaning']);
         CheckoutException::require($declaration['identity_meaning'] === self::MEANING, 'invalid', 422);
+        CheckoutException::require(in_array($declaration['licensee_type'], self::LICENSEE_TYPES, true), 'invalid', 422);
 
         $confirmation = $declaration['legal_name_confirmation'];
         CheckoutException::require(is_array($confirmation), 'invalid', 422);
         self::keys($confirmation, ['confirmed', 'statement_version', 'statement_hash']);
         CheckoutException::require($confirmation['confirmed'] === true, 'invalid', 422);
         self::statement(['statement_version' => $confirmation['statement_version'], 'statement_hash' => $confirmation['statement_hash']]);
+        // The frozen statement must be the one for this licensee type: its version names the type.
+        CheckoutException::require(is_string($declaration['licensee_type'])
+            && str_starts_with($confirmation['statement_version'], $declaration['licensee_type'].'-'), 'invalid', 422);
 
         $printed = [];
         $printed[] = self::text($declaration['legal_name'], self::LEGAL_NAME_BYTES);
+
+        // A business needs the name of the person accepting for it; an individual has no representative.
+        $business = $declaration['licensee_type'] === 'business';
+        CheckoutException::require(($declaration['representative_name'] !== null) === $business, 'invalid', 422);
+        if ($business) {
+            $printed[] = self::text($declaration['representative_name'], self::LEGAL_NAME_BYTES);
+        }
 
         CheckoutException::require($declaration['artist_name'] === null || $exclusive, 'invalid', 422);
         CheckoutException::require($declaration['artist_name'] !== null || ! $exclusive, 'invalid', 422);
@@ -163,11 +194,14 @@ final class ContractIdentityDeclarationV2
         return $value;
     }
 
-    /** Printable: no refused codepoint, at least one letter or digit, and every codepoint drawn by every pinned face. */
+    /**
+     * Printable: no refused codepoint, at least one cased or other letter or decimal digit (a modifier letter such as
+     * U+02BC or a number such as ½ alone does not count), and every codepoint drawn by every pinned face.
+     */
     private static function printable(string $value, ContractGlyphCoverage $coverage): bool
     {
         return preg_match(self::REFUSED, str_replace(' ', '', $value)) === 0
-            && preg_match('/[\p{L}\p{N}]/u', $value) === 1
+            && preg_match('/[\p{Lu}\p{Ll}\p{Lt}\p{Lo}\p{Nd}]/u', $value) === 1
             && $coverage->covers($value);
     }
 
