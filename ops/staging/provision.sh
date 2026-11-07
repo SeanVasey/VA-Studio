@@ -167,6 +167,9 @@ for f in nginx/vasey-staging.conf php-fpm/vasey-staging.conf php-fpm/vasey-paid-
          workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh; do
   [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"
 done
+for f in nginx/vasey-staging-http.conf nginx/vasey-staging-classic.conf; do  # the http-level helpers and the whole-file wrapper
+  [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"
+done
 
 PHPV=8.4
 PHP_BIN=/usr/bin/php$PHPV
@@ -543,6 +546,35 @@ fi
 chown root:root /etc/vasey-staging/probe.netrc; chmod 0600 /etc/vasey-staging/probe.netrc
 
 render "$KIT/nginx/vasey-staging.conf" /etc/vasey-staging/nginx-site.conf 0644
+render "$KIT/nginx/vasey-staging-classic.conf" /etc/vasey-staging/nginx-classic.conf 0644
+
+# http-level helpers (limit_req_zone, map) the site body uses. Forge edits only the inside of the site's server block,
+# where they are not allowed, so they live in conf.d, which nginx.conf includes at http level and Forge never writes.
+# Each name may be defined once per nginx: refuse clearly if an older whole-file site still defines them.
+NGINX_HTTP_CONF=/etc/nginx/conf.d/vasey-staging.conf
+command -v nginx >/dev/null 2>&1 || die "nginx not found (Forge installs it)"
+[ -d /etc/nginx/conf.d ] && [ ! -L /etc/nginx/conf.d ] || die "/etc/nginx/conf.d must be a directory"
+grep -Eq '^[[:space:]]*include[[:space:]]+(/etc/nginx/)?conf\.d/\*\.conf;' /etc/nginx/nginx.conf \
+  || die "/etc/nginx/nginx.conf does not include conf.d/*.conf at http level; the site's rate-limit zones and header maps live there"
+nginx_dupes=$(grep -rlE --exclude-dir=conf.d -e 'zone=vasey_staging_(general|webhook):' \
+  -e '^[[:space:]]*map[[:space:]]+[^[:space:]]+[[:space:]]+\$vasey_staging_(referrer_policy|robots|frame_options)\b' /etc/nginx 2>/dev/null || true)
+[ -z "$nginx_dupes" ] || die "these nginx files already define the staging zones or maps: $(echo $nginx_dupes); that is the older
+  whole-file site template. Put the interim or Forge default site config back (README step 7), then re-run"
+nginx_previous=""
+if [ -e "$NGINX_HTTP_CONF" ]; then
+  [ -f "$NGINX_HTTP_CONF" ] && [ ! -L "$NGINX_HTTP_CONF" ] || die "$NGINX_HTTP_CONF must be a regular file"
+  nginx_previous=/etc/vasey-staging/nginx-http.conf.previous
+  cp -p "$NGINX_HTTP_CONF" "$nginx_previous"
+fi
+install -m 0644 -o root -g root "$KIT/nginx/vasey-staging-http.conf" "$NGINX_HTTP_CONF.tmp"
+mv -f "$NGINX_HTTP_CONF.tmp" "$NGINX_HTTP_CONF"
+if ! nginx_test=$(nginx -t 2>&1); then
+  if [ -n "$nginx_previous" ]; then mv -f "$nginx_previous" "$NGINX_HTTP_CONF"; else rm -f "$NGINX_HTTP_CONF"; fi
+  printf '%s\n' "$nginx_test" >&2
+  die "nginx -t failed with $NGINX_HTTP_CONF installed; it was put back as before"
+fi
+[ -z "$nginx_previous" ] || rm -f "$nginx_previous"
+systemctl reload nginx || die "nginx reload failed after a passing nginx -t"
 
 # ---------------------------------------------------------------- summary
 cat <<EOF
@@ -555,7 +587,8 @@ provision: done for $HOST
   helpers             /usr/local/sbin/vasey-staging-ctl (sudo for $APP_USER), /usr/local/sbin/vasey-staging-backup (cron 03:17 UTC)
   MySQL               schema $DB_NAME; DB_HOST=127.0.0.1 DB_USERNAME=vasey_app
   secrets (root only) $SECRETS/db-app.env (paste DB_PASSWORD into Forge > Environment), $BACKUP_CNF, $HTPASSWD, /etc/vasey-staging/probe.netrc
-  nginx site          /etc/vasey-staging/nginx-site.conf: fill __SSL_CERT__, __SSL_KEY__, __FORGE_CONF__ from Forge's
-                      generated config, then paste it into Forge > Site > Edit Nginx Configuration
+  nginx http helpers  $NGINX_HTTP_CONF (installed, nginx -t passed, reloaded)
+  nginx site body     /etc/vasey-staging/nginx-site.conf: install it as the site's nginx configuration (Forge > Site >
+                      Edit Nginx Configuration, or the site API); README step 7. Whole-file hosts: nginx-classic.conf there
 Next: ops/staging/README.md step 8 onwards.
 EOF
