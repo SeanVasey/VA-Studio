@@ -1,6 +1,6 @@
 > Typed usage terms are now available for new drafts. See [typed license terms](typed-license-terms.md) for the current editor, required variables, explicit legacy mapping and compatible migration. The v1 workflow below remains supported for retained revisions; it is not silently upgraded.
 
-Current authoring uses [ownership and economic policy schema v4](license-economic-policies.md), retaining the historical workflows below.
+Current authoring uses [tier usage schema v5](license-usage-v5.md): the [schema v4](license-economic-policies.md) declarations with one usage slot per tier limit. The historical workflows below are retained.
 
 # Licensing and published offers
 
@@ -91,4 +91,11 @@ For operational rollback, deactivate affected offers or unpublish affected track
 
 ## Ownership and economic policy declarations
 
-New drafts now use [schema v4](license-economic-policies.md): explicit ownership policy references, publishing income and recording royalties, plus complete retained policy text. Earlier v1–v3 evidence and ordinary successor schemas remain compatible. **Define economic policies** deliberately maps a v3 predecessor without default rights or rates. Full policy bytes are frozen with review and commercial evidence; buyer disclosure and contracts remain WP-05/WP-08 dependencies. See [verification](verification/license-economics.md).
+Schema v4 drafts use [these declarations](license-economic-policies.md): explicit ownership policy references, publishing income and recording royalties, plus complete retained policy text. Earlier v1–v3 evidence and ordinary successor schemas remain compatible. **Define economic policies** deliberately maps a v3 predecessor without default rights or rates. Full policy bytes are frozen with review and commercial evidence; buyer disclosure and contracts remain WP-05/WP-08 dependencies. See [verification](verification/license-economics.md).
+
+## Tier usage limits (schema v5)
+
+New drafts use [schema v5](license-usage-v5.md). It keeps every v4 declaration and replaces the usage vocabulary with ten
+slots, so audio streams, monetized and non-monetized video streams, free downloads and the two kinds of performance are
+separate limits. **Define tier usage limits** maps a v4 predecessor and copies only the declarations whose meaning is unchanged.
+Versions on schemas 1 to 4 keep their validation, statements, previews and review evidence byte for byte.

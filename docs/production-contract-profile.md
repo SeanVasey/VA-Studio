@@ -11,6 +11,8 @@ below is met.
   (`test-buyer-pdf-v1`, with v2 as a candidate). It uses DejaVu Sans with no branding, and Sean's contract text never reaches it.
 - License versions already keep an authored source text, typed and economic terms (schema v4) and frozen policy text, all
   reviewed and immutable once published. They are the natural home for Sean's template text.
+- G-1 (tier usage limits) is implemented as [license terms schema v5](license-usage-v5.md): one usage slot for each tier
+  limit, so increment 1 maps every tier variable to its own statement.
 - Sean has six VASEY.AUDIO templates (Basic, Premium, Premium Plus, Unlimited, Custom Beat, Exclusive), kept in private
   storage. They are derived from his verbatim BeatStars contracts:
   - BeatStars references are removed and the undefined placeholders are fixed.
