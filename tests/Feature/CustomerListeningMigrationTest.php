@@ -65,7 +65,9 @@ class CustomerListeningMigrationTest extends TestCase
             $this->assertSame(0, $queries, 'down must refuse without probing or touching any object.');
         }
         try {
-            $this->artisan('migrate:rollback', ['--step' => 1])->run();
+            // Later migrations run after this one, so --step counts back to it; --path alone would skip the newest as "Migration not found".
+            $this->artisan('migrate:rollback', ['--path' => [database_path('migrations/2026_10_07_242000_customer_saved_tracks.php')], '--realpath' => true,
+                '--step' => array_search('2026_10_07_242000_customer_saved_tracks', array_column(app('migration.repository')->getMigrations(PHP_INT_MAX), 'migration'), true) + 1, '--force' => true])->run();
             $this->fail('Repository rollback accepted.');
         } catch (LogicException) {
             $this->assertSame($before, $this->history());
