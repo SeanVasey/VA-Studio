@@ -13,9 +13,9 @@ use PHPUnit\Framework\TestCase;
 
 class ContractIdentityDeclarationV2Test extends TestCase
 {
-    private const STATEMENT = ['statement_version' => 'legal-name-confirmation-v1', 'statement_hash' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'];
+    private const STATEMENT = ['statement_version' => 'individual-legal-name-confirmation-v1', 'statement_hash' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'];
 
-    private const BUSINESS_STATEMENT = ['statement_version' => 'business-name-confirmation-v1', 'statement_hash' => 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'];
+    private const BUSINESS_STATEMENT = ['statement_version' => 'business-legal-name-confirmation-v1', 'statement_hash' => 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'];
 
     private const STATEMENTS = ['individual' => self::STATEMENT, 'business' => self::BUSINESS_STATEMENT];
 
@@ -119,6 +119,25 @@ class ContractIdentityDeclarationV2Test extends TestCase
         $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(array_diff_key(self::input(), ['licenseeType' => true]), false, self::STATEMENTS, self::coverage()));
         $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(), false, [...self::STATEMENTS, 'trust' => self::STATEMENT], self::coverage()));
         $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(), false, [self::STATEMENT], self::coverage()));
+    }
+
+    public function test_a_frozen_statement_must_belong_to_the_licensee_type(): void
+    {
+        $individual = ContractIdentityDeclarationV2::fromInput(self::input(), false, self::STATEMENTS, self::coverage());
+        $business = ContractIdentityDeclarationV2::fromInput(self::input(['licenseeType' => 'business', 'representativeName' => 'Zoë Émile']),
+            false, self::STATEMENTS, self::coverage());
+
+        // Swapped statements in stored evidence refuse.
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::verify([...$business, 'legal_name_confirmation' => $individual['legal_name_confirmation']], false, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::verify([...$individual, 'legal_name_confirmation' => $business['legal_name_confirmation']], false, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::verify([...$individual, 'legal_name_confirmation' => ['confirmed' => true, 'statement_version' => 'individualx-v1', 'statement_hash' => self::STATEMENT['statement_hash']]], false, self::coverage()));
+
+        // A miskeyed or duplicated map refuses at capture.
+        $swapped = ['individual' => self::BUSINESS_STATEMENT, 'business' => self::STATEMENT];
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(), false, $swapped, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(['licenseeType' => 'business', 'representativeName' => 'Zoë Émile']), false, $swapped, self::coverage()));
+        $same = ['individual' => self::STATEMENT, 'business' => ['statement_version' => 'business-legal-name-confirmation-v1', 'statement_hash' => self::STATEMENT['statement_hash']]];
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(), false, $same, self::coverage()));
     }
 
     public function test_artist_name_is_required_if_and_only_if_the_order_is_exclusive(): void
@@ -239,6 +258,7 @@ class ContractIdentityDeclarationV2Test extends TestCase
         $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput(self::input([], ['lines' => ['1 Main St', $value]]), false, self::STATEMENTS, self::coverage()));
         $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput(self::input([], ['locality' => $value]), false, self::STATEMENTS, self::coverage()));
         $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput(self::input([], ['region' => $value]), false, self::STATEMENTS, self::coverage()));
+        $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput(self::input(['licenseeType' => 'business', 'representativeName' => $value]), false, self::STATEMENTS, self::coverage()));
     }
 
     public function test_a_shape_error_is_reported_before_a_character_problem(): void

@@ -18,7 +18,9 @@ not use a separate record.
 
 - **Licensee.** A business may be the licensee (Sean, 2026-11-07). For a business, `legal_name` is the business's full
   legal name and `representative_name` is the person accepting the license for it; for an individual it is `null`. Each
-  type has its own confirmation statement, and the buyer's type selects which one is frozen. A type whose statement is not
+  type has its own confirmation statement, and the buyer's type selects which one is frozen. A statement's version starts
+  with its type (`individual-…` or `business-…`), and the two statements must have different hashes. `verify()` refuses a
+  declaration whose frozen statement belongs to the other type. A type whose statement is not
   approved is not offered, so the validator refuses it.
 - **Statements.** The individual statement is approved (Sean, 2026-11-07): "I confirm that this is my full legal name and
   that the license should be issued to me under it." The business statement is a proposal awaiting approval (TERMS

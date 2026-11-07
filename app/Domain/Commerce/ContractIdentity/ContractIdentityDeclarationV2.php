@@ -7,7 +7,8 @@ use App\Domain\Rights\LicenseTerritories;
 
 /**
  * D-30 buyer contract identity: who the licensee is (an individual, or a business acting through a named
- * representative), the legal name the buyer confirms, a structured postal address and, for Exclusive, an artist name. Pure: it validates checkout input into the frozen `buyer_declarations` shape, re-verifies a stored
+ * representative), the legal name the buyer confirms, a structured postal address and, for Exclusive, an
+ * artist name. Pure: it validates checkout input into the frozen `buyer_declarations` shape, re-verifies a stored
  * declaration and formats `{CUSTOMER_ADDRESS}`. Nothing here is wired into a checkout yet.
  *
  * Shape errors refuse with `invalid`; a well-formed value the pinned contract fonts cannot print refuses with
@@ -53,7 +54,9 @@ final class ContractIdentityDeclarationV2
      *
      * $statements holds the confirmation text offered for each licensee type, as
      * `['individual' => ['statement_version' => ..., 'statement_hash' => ...], 'business' => [...]]`. The buyer's type
-     * selects the one they saw. A type with no approved statement is left out, so it cannot be chosen.
+     * selects the one they saw. A type with no approved statement is left out, so it cannot be chosen. Each
+     * statement's version starts with its type (`individual-…`, `business-…`), and the two must differ, so a
+     * miskeyed map cannot freeze one type's statement for the other.
      *
      * @param  array<string, array{statement_version: string, statement_hash: string}>  $statements
      */
@@ -63,6 +66,8 @@ final class ContractIdentityDeclarationV2
         CheckoutException::require($input['legalNameConfirmed'] === true, 'invalid', 422);
         CheckoutException::require(in_array($input['licenseeType'], self::LICENSEE_TYPES, true), 'invalid', 422);
         CheckoutException::require(array_diff(array_keys($statements), self::LICENSEE_TYPES) === [], 'invalid', 422);
+        $hashes = array_column(array_filter($statements, 'is_array'), 'statement_hash');
+        CheckoutException::require(count($hashes) === count(array_unique($hashes)), 'invalid', 422);
         $statement = $statements[$input['licenseeType']] ?? null;
         CheckoutException::require(is_array($statement), 'invalid', 422);
         self::statement($statement);
@@ -107,6 +112,9 @@ final class ContractIdentityDeclarationV2
         self::keys($confirmation, ['confirmed', 'statement_version', 'statement_hash']);
         CheckoutException::require($confirmation['confirmed'] === true, 'invalid', 422);
         self::statement(['statement_version' => $confirmation['statement_version'], 'statement_hash' => $confirmation['statement_hash']]);
+        // The frozen statement must be the one for this licensee type: its version names the type.
+        CheckoutException::require(is_string($declaration['licensee_type'])
+            && str_starts_with($confirmation['statement_version'], $declaration['licensee_type'].'-'), 'invalid', 422);
 
         $printed = [];
         $printed[] = self::text($declaration['legal_name'], self::LEGAL_NAME_BYTES);
