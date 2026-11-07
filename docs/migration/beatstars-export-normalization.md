@@ -3,8 +3,9 @@
 **Implemented scope (M-09, M-10):** a mapping-driven normalizer from a BeatStars CSV export
 into the `vasey-private-catalog-drafts-v1` draft format that
 `app/Domain/Migration/CatalogOnboarding` consumes, and a dry-run report that applies nothing.
-No real BeatStars export has been inspected (input S-9 is still open); the tool was built and
-proven against the hand-made synthetic sheet in `tests/Fixtures/migration/beatstars-synthetic/`.
+The tool was built and proven against the hand-made synthetic sheet in
+`tests/Fixtures/migration/beatstars-synthetic/`. The real export (S-9) arrived on 2026-11-07 and dry-runs clean after a
+documented derivation: [`beatstars-catalog-dry-run-20261107`](../verification/beatstars-catalog-dry-run-20261107/README.md).
 Its behaviour on the real export depends on the mapping Sean writes for it.
 
 The dry run never applies. It opens no database, writes no draft, media, offer, license, rights
@@ -187,4 +188,4 @@ test (`tests/Feature/Migration/BeatStarsDryRunCommandTest.php`): byte-identical 
 runs, zero SQL statements during an in-process run, unchanged catalog and draft tables, the
 emitted snapshot admitted by `PrivateSourceFiles`, and the findings copy producing exactly
 `unmapped_column` and `missing_rights_reference`. The dry run opens no database on any driver,
-so MySQL adds no evidence for it. Behaviour on the real export is unproven until S-9 is supplied.
+so MySQL adds no evidence for it. The real export's result is in `docs/verification/beatstars-catalog-dry-run-20261107/`.
