@@ -23,7 +23,7 @@ holds its contract, review records and exact-source results from the Claude harn
 | Check | Result |
 | --- | --- |
 | The five CI safeguard suites | all OK |
-| Every test file C2 changes, SQLite | SQLITE_RESULT |
+| Every test file C2 changes (9 files), SQLite, at `02a16313` | OK, 78 tests, 1066 assertions, 3 skipped (native-only, as the census expects) |
 
 Native runs for these lanes are in their packets (each on its lane head plus `a2144d4a`, which C2 now carries itself).
 Not run here: the integrated native selection, browser, Foundation CI.
