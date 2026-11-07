@@ -74,11 +74,15 @@ class Replace:
 
 @dataclass
 class ReplaceBetween:
-    """Replace from `start` (inclusive) up to `end` (exclusive); each marker must occur exactly once, start before end."""
+    """Replace from `start` (inclusive) up to `end` (exclusive); each marker must occur exactly once, start before end.
+
+    `removed_sha256` pins the exact staging text being dropped, so a staging addition inside the region (a new location,
+    a deny rule) stops the build instead of silently vanishing from production."""
     start: str
     end: str
     new: str
     why: str
+    removed_sha256: str
 
 
 @dataclass
@@ -105,6 +109,10 @@ def _apply(name, text, patch):
         begin, finish = text.index(patch.start), text.index(patch.end)
         if begin >= finish:
             raise BuildError(f"{name}: patch '{patch.why}' markers are out of order")
+        removed = hashlib.sha256(text[begin:finish].encode()).hexdigest()
+        if removed != patch.removed_sha256:
+            raise BuildError(f"{name}: patch '{patch.why}' would remove different staging text (sha256 {removed}); "
+                             "the staging file changed under it: re-review this patch")
         return text[:begin] + patch.new + text[finish:]
     found = len(re.findall(patch.pattern, text, re.M))
     if found != patch.count:
@@ -162,7 +170,7 @@ PROVISION = [
     ReplaceBetween("# ---------------------------------------------------------------- 7. access credentials and nginx template\n",
                    'render "$KIT/nginx/vasey-staging.conf" /etc/vasey-staging/nginx-site.conf 0644\n',
                    "# ---------------------------------------------------------------- 7. nginx template (no basic auth, no probe credentials)\n",
-                   "no htpasswd or netrc"),
+                   "no htpasswd or netrc", removed_sha256="82f8b71e143dbf7b98c5948df79aeb9219c228c3f7942dd83ecca46a7f661d2d"),
     Replace("workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh; do",
             "workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh forge-deploy.sh; do",
             "the kit includes the deploy script"),
@@ -200,7 +208,7 @@ FORGE_DEPLOY = [
             "the production holds live in the validator only"),
     ReplaceBetween("# Fail closed on ambiguous encodings during the cheap pre-build check.",
                    'step "runtime .env passes the staging profile checks',
-                   "", "the checkout-switch loop moves into the validator"),
+                   "", "the checkout-switch loop moves into the validator", removed_sha256="d35f6f1a053e2a7bc768965fd891d3f05d92cb388b37d3bccfd09642e11011dd"),
     Replace('step "runtime .env passes the staging profile checks (APP_ENV=$VASEY_EXPECTED_APP_ENV, APP_DEBUG=false)"',
             'step "runtime .env passes the production profile checks (APP_ENV=$VASEY_EXPECTED_APP_ENV, APP_DEBUG=false)"', "message"),
 ]
@@ -253,7 +261,8 @@ NGINX_BODY = [
     Replace("(including test deliveries of private masters)", "(including paid deliveries of private masters)", "comment"),
     Replace("add_header X-Robots-Tag $vasey_staging_robots always;\n", "", "no robots header: the application decides indexing"),
     ReplaceBetween("# ---- Stripe test webhook: the only unauthenticated entry point ----\n",
-                   "# ---- Paid-delivery long routes", "", "no webhook location: production has no webhook receiver"),
+                   "# ---- Paid-delivery long routes", "", "no webhook location: production has no webhook receiver",
+                   removed_sha256="8d23d9295789f809c571f773fca436c2d5acfeae5b1146f50c0cc5122864f224"),
     Replace('    add_header X-Robots-Tag "noindex, nofollow, noarchive" always;\n', "", "no robots header on the build output either"),
     Replace("access_log /var/log/nginx/vasey-staging-access.log;\n"
             "error_log  /var/log/nginx/vasey-staging-error.log error;\n",

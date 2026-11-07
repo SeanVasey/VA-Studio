@@ -150,6 +150,24 @@ class Split(unittest.TestCase):
         self.assertEqual(args_of(tree, "include"), [["forge-conf/__FORGE_CONF__/before/*"], ["forge-conf/__FORGE_CONF__/after/*"]])
 
 
+class RegionPins(unittest.TestCase):
+    def test_a_staging_addition_inside_a_removed_region_stops_the_build(self):
+        """build-kit removes whole staging regions (the webhook location, step 7's credentials, the switch loop); each
+        removal is pinned by hash, so a new location or deny rule added inside one cannot vanish from production."""
+        with tempfile.TemporaryDirectory() as directory:
+            staging = Path(directory) / "staging"
+            shutil.copytree(STAGING, staging)
+            conf = staging / "nginx/vasey-staging.conf"
+            text = conf.read_text()
+            marker = "# ---- Paid-delivery long routes"
+            self.assertEqual(1, text.count(marker))
+            conf.write_text(text.replace(marker, "location ^~ /secret/ { return 404; }\n\n" + marker))
+            run = subprocess.run([sys.executable, "-I", str(REPO / "ops/production/build-kit.py"), "--check",
+                                  "--staging-dir", str(staging)], capture_output=True, text=True)
+            self.assertNotEqual(0, run.returncode)
+            self.assertIn("would remove different staging text", run.stdout + run.stderr)
+
+
 class RootStrategy(unittest.TestCase):
     def test_every_location_sets_the_release_root_and_nothing_aliases(self):
         self.assertGreaterEqual(len(LOCATIONS), 9)
