@@ -12,8 +12,7 @@ final class ContractBindingException extends RuntimeException
 {
     public const REASONS = [
         'unsupported_input', 'contract_identity_missing', 'contract_identity_invalid', 'license_type_unsupported',
-        'license_schema_unsupported', 'license_terms_mismatch', 'license_terms_invalid', 'usage_prohibited',
-        'publishing_share_unbound', 'currency_unsupported', 'amount_invalid', 'number_out_of_range', 'value_invalid',
+        'license_schema_unsupported', 'license_terms_mismatch', 'license_terms_invalid', 'publishing_share_unbound', 'currency_unsupported', 'amount_invalid', 'number_out_of_range', 'value_invalid', 'unsupported_characters',
         'unknown_placeholder', 'missing_value', 'malformed_template',
     ];
 

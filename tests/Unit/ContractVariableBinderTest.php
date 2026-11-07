@@ -10,6 +10,7 @@ use App\Domain\Contracts\Production\ContractVariableBinder;
 use App\Domain\Grants\Paid\PaidGrantRenderInput;
 use App\Domain\Grants\PaidTax\PaidTaxRenderInput;
 use App\Domain\Rights\LicenseDisclosure;
+use App\Domain\Rights\TieredLicenseTerms;
 use App\Support\CanonicalJson;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
@@ -100,21 +101,54 @@ class ContractVariableBinderTest extends TestCase
         }
     }
 
-    /** The frozen V2 tax render input exactly as `PaidTaxRenderInput::fromOrigin` builds it. */
-    private static function taxInput(array $declaration, array $license, int $amount = 150050, string $acceptedAt = '2026-11-07T23:59:59Z', int $tax = 0): array
+    /**
+     * The frozen V2 tax render input exactly as `PaidTaxRenderInput::fromOrigin` builds it, with the real adapter's
+     * `pre_tax` and `tax` keys. `$amount` is the frozen line subtotal: the fee for a tax-exclusive line, the gross for an
+     * inclusive one.
+     */
+    private static function taxInput(array $declaration, array $license, int $amount = 150050, string $acceptedAt = '2026-11-07T23:59:59Z',
+        int $tax = 0, string $behavior = 'exclusive'): array
     {
         $assent = ['accepted' => true, 'accepted_at' => $acceptedAt, 'statement_version' => 'synthetic'];
+        $total = $behavior === 'exclusive' ? $amount + $tax : $amount;
         $source = ['schema_version' => 2, 'producer' => 'production_tax_checkout_v2', 'provenance' => 'synthetic_rehearsal', 'order_id' => 'order-1', 'line_id' => 'line-1',
             'buyer' => ['provenance' => 'synthetic_rehearsal'], 'buyer_declarations' => $declaration,
             'product' => ['id' => 5, 'slug' => 'synthetic-track', 'title' => 'Synthetic Track Title', 'artist' => 'Synthetic Artist'],
-            'assent' => $assent, 'assent_hash' => CanonicalJson::hash($assent), 'license_version_id' => $license['id'], 'license' => $license,
+            'assent' => $assent, 'license_version_id' => $license['id'], 'license' => $license,
             'pre_tax' => ['currency' => 'USD', 'line_amount_minor' => $amount, 'order_subtotal_minor' => $amount],
-            'tax' => ['currency' => 'USD', 'line_subtotal_minor' => $amount, 'line_tax_minor' => $tax, 'line_total_minor' => $amount + $tax]];
+            'tax' => ['authority' => 'provider_calculated_buyer_reviewed', 'calculator' => 'stripe_checkout_automatic_tax',
+                'automatic_tax' => ['enabled' => true, 'status' => 'complete'], 'tax_behavior' => $behavior, 'currency' => 'USD',
+                'line_subtotal_minor' => $amount, 'line_tax_minor' => $tax, 'line_total_minor' => $total,
+                'order_subtotal_minor' => $amount, 'order_tax_minor' => $tax, 'order_total_minor' => $total]];
+
+        return self::reseal(PaidTaxRenderInput::fromOrigin(['origin_id' => '00000000-0000-4000-8000-000000000001', 'source' => self::sealSource($source),
+            'disclosure' => self::disclosure($license), 'assets' => ['files' => [], 'raw_hash' => str_repeat('6', 64)],
+            'delivery_policy' => ['schema_version' => 'synthetic']]));
+    }
+
+    /** The producers' self-hashes: each hashed value beside its hash, then the whole line's `source_hash`. */
+    private static function sealSource(array $source): array
+    {
+        unset($source['source_hash']);
+        foreach (['buyer' => 'buyer_binding_hash', 'product' => 'product_hash', 'assent' => 'assent_hash', 'license' => 'license_hash'] as $value => $hash) {
+            $source[$hash] = CanonicalJson::hash($source[$value]);
+        }
         $source['source_hash'] = CanonicalJson::hash($source);
 
-        return PaidTaxRenderInput::fromOrigin(['origin_id' => '00000000-0000-4000-8000-000000000001', 'source' => $source,
-            'disclosure' => self::disclosure($license), 'assets' => ['files' => [], 'raw_hash' => str_repeat('6', 64)],
-            'delivery_policy' => ['schema_version' => 'synthetic']]);
+        return $source;
+    }
+
+    /** Re-derive every hash and commitment after a test edits the frozen source, so the edit itself is what is tested. */
+    private static function reseal(array $input): array
+    {
+        $source = self::sealSource($input['source']);
+        $input['source'] = $source;
+        $input['assent'] = $source['assent'];
+        $input['source_commitments'] = ['source_hash' => $source['source_hash'], 'asset_graph_hash' => $input['source_commitments']['asset_graph_hash'],
+            'license_source_hash' => $source['license']['source_hash'], 'license_submission_hash' => $source['license']['submission_hash'],
+            'license_review_hash' => $source['license']['review_evidence_hash'], 'assent_hash' => $source['assent_hash']];
+
+        return $input;
     }
 
     /** The frozen V1 render input exactly as `PaidGrantRenderInput::fromOrigin` builds it. */
@@ -124,14 +158,13 @@ class ContractVariableBinderTest extends TestCase
         $source = ['schema_version' => 1, 'producer' => 'production_checkout_v1', 'provenance' => 'synthetic_rehearsal',
             'buyer' => ['provenance' => 'synthetic_rehearsal'], 'buyer_declarations' => $declaration,
             'product' => ['id' => 6, 'slug' => 'other-track', 'title' => 'Other Synthetic Title', 'artist' => 'Synthetic Artist'],
-            'assent' => $assent, 'assent_hash' => CanonicalJson::hash($assent), 'license_version_id' => $license['id'], 'license' => $license,
+            'assent' => $assent, 'license_version_id' => $license['id'], 'license' => $license,
             'amounts' => ['currency' => 'USD', 'subtotal_minor' => $amount, 'tax_minor' => 0, 'total_minor' => $amount],
             'line_amount_minor' => $amount, 'line_tax_minor' => 0];
-        $source['source_hash'] = CanonicalJson::hash($source);
 
-        return PaidGrantRenderInput::fromOrigin(['origin_id' => '00000000-0000-4000-8000-000000000002', 'source' => $source,
+        return self::reseal(PaidGrantRenderInput::fromOrigin(['origin_id' => '00000000-0000-4000-8000-000000000002', 'source' => self::sealSource($source),
             'disclosure' => self::disclosure($license), 'assets' => ['files' => [], 'raw_hash' => str_repeat('7', 64)],
-            'delivery_policy' => ['schema_version' => 'synthetic']]);
+            'delivery_policy' => ['schema_version' => 'synthetic']]));
     }
 
     private static function bind(array $input, ?array $terms = null): array
@@ -198,7 +231,7 @@ class ContractVariableBinderTest extends TestCase
             'PRODUCER_ALIAS' => 'Synthetic Producer Alias',
             'STATE_PROVINCE_COUNTRY' => 'Synthetic State, Synthetic Country',
             'FILE_TYPE' => 'MP3',
-            'PUBLISHING_RIGHTS' => '50%',
+            'PUBLISHING_RIGHTS' => '50.00%',
             'DISTRIBUTE_COPIES' => 'unlimited',
             'NUMBER_OF_RADIO_STATIONS' => '2',
             'MONETIZED_MUSIC_VIDEOS' => '2,147,483,647',
@@ -222,7 +255,7 @@ class ContractVariableBinderTest extends TestCase
         $this->assertSame('MC Example', $values['CUSTOMER_ALIAS']);
         $this->assertSame('Émile Example', $values['CUSTOMER_FULLNAME']);
         $this->assertSame('3 Test Avenue, Toronto, ON, Canada', $values['CUSTOMER_ADDRESS']);
-        $this->assertSame(['$1.00', 'one dollar', 'WAV master and Stems ZIP', '12.5%', 'February 28, 2026'],
+        $this->assertSame(['$1.00', 'one dollar', 'WAV master and Stems ZIP', '12.50%', 'February 28, 2026'],
             [$values['PRODUCT_PRICE'], $values['PRODUCT_PRICE_WORD'], $values['FILE_TYPE'], $values['PUBLISHING_RIGHTS'], $values['CONTRACT_DATE']]);
 
         $template = 'SYNTHETIC. On {CONTRACT_DATE}, {CUSTOMER_FULLNAME} residing at {CUSTOMER_ADDRESS} ({CUSTOMER_ALIAS}) '
@@ -233,7 +266,7 @@ class ContractVariableBinderTest extends TestCase
             .'shows {PERFORMANCES_FOR_PROFIT}/{PERFORMANCES_NOT_FOR_PROFIT}. {CUSTOMER_ALIAS}.';
         $this->assertSame('SYNTHETIC. On February 28, 2026, Émile Example residing at 3 Test Avenue, Toronto, ON, Canada (MC Example) '
             .'licensed "Synthetic Track Title" under Synthetic Exclusive for $1.00 (one dollar) from Synthetic Producer Alias, '
-            .'Synthetic State, Synthetic Country. Files: WAV master and Stems ZIP; publishing 12.5%; copies 1,500; '
+            .'Synthetic State, Synthetic Country. Files: WAV master and Stems ZIP; publishing 12.50%; copies 1,500; '
             .'radio 2; videos 1 (one); audio 250,000; video unlimited/50,000; free 3,000; shows 21/unlimited. MC Example.',
             ContractVariableBinder::substitute($template, $values));
     }
@@ -305,11 +338,16 @@ class ContractVariableBinderTest extends TestCase
         $this->refuses('license_terms_mismatch', null, fn () => self::bind($input, self::terms(['usage.free_downloads.limit' => 3001])));
     }
 
-    public function test_a_prohibited_use_or_no_publishing_share_has_no_value_to_bind(): void
+    public function test_a_prohibited_use_prints_zero_and_no_publishing_share_still_refuses(): void
     {
+        // Sean, 2026-11-07: a prohibited use prints 0 and its clause stays verbatim.
         foreach (ContractVariableBinder::USAGE as $placeholder => $slot) {
             $terms = self::terms(['usage.'.$slot => ['mode' => 'prohibited']]);
-            $this->refuses('usage_prohibited', $placeholder, fn () => self::bind(self::taxInput(self::individual(), self::license($terms))));
+            $values = self::bind(self::taxInput(self::individual(), self::license($terms)));
+            $this->assertSame('0', $values[$placeholder]);
+            if ($slot === 'music_videos') {
+                $this->assertSame('zero', $values['MONETIZED_MUSIC_VIDEOS_WORD']);
+            }
         }
         $terms = self::terms(['publishing_income' => ['mode' => 'none', 'policy_key' => 'economic-fixture']]);
         $this->refuses('publishing_share_unbound', 'PUBLISHING_RIGHTS', fn () => self::bind(self::taxInput(self::individual(), self::license($terms))));
@@ -319,22 +357,160 @@ class ContractVariableBinderTest extends TestCase
     {
         $this->refuses('amount_invalid', null, fn () => self::bind(self::taxInput(self::individual(), self::license(self::terms()), 0)));
         $this->refuses('amount_invalid', null, fn () => self::bind(self::taxInput(self::individual(), self::license(self::terms()), 2147483648)));
-        // The license price is the pre-tax line amount; tax never reaches the contract figure or words.
-        $taxed = self::bind(self::taxInput(self::individual(), self::license(self::terms()), 1999, '2026-11-07T23:59:59Z', 160));
-        $this->assertSame(['$19.99', 'nineteen dollars and ninety-nine cents'], [$taxed['PRODUCT_PRICE'], $taxed['PRODUCT_PRICE_WORD']]);
         $this->assertSame('$21,474,836.47', self::bind(self::taxInput(self::individual(), self::license(self::terms()), 2147483647))['PRODUCT_PRICE']);
         $input = self::taxInput(self::individual(), self::license(self::terms()));
         $input['source']['pre_tax']['currency'] = 'EUR';
-        $this->refuses('currency_unsupported', null, fn () => self::bind($input));
+        $input['source']['tax']['currency'] = 'EUR';
+        $this->refuses('currency_unsupported', null, fn () => self::bind(self::reseal($input)));
         $input = self::taxInput(self::individual(), self::license(self::terms()));
         $input['source']['tax']['line_subtotal_minor']++;
-        $this->refuses('amount_invalid', null, fn () => self::bind($input));
+        $this->refuses('amount_invalid', null, fn () => self::bind(self::reseal($input)));
         $input = self::taxInput(self::individual(), self::license(self::terms()));
         $input['source']['pre_tax']['line_amount_minor'] = '150050';
-        $this->refuses('amount_invalid', null, fn () => self::bind($input));
+        $this->refuses('amount_invalid', null, fn () => self::bind(self::reseal($input)));
         $input = self::v1Input(self::individual(), self::license(self::terms()));
         $input['source']['amounts']['currency'] = 'usd';
-        $this->refuses('currency_unsupported', null, fn () => self::bind($input));
+        $this->refuses('currency_unsupported', null, fn () => self::bind(self::reseal($input)));
+        // V1 orders are tax-exempt; a V1 line carrying tax refuses instead of printing a taxed figure.
+        $input = self::v1Input(self::individual(), self::license(self::terms()));
+        $input['source']['line_tax_minor'] = 5;
+        $this->refuses('amount_invalid', null, fn () => self::bind(self::reseal($input)));
+    }
+
+    public function test_the_contract_states_the_pre_tax_license_fee_for_either_tax_behavior(): void
+    {
+        // Tax-exclusive: the subtotal is the fee; the tax is added on top and never printed.
+        $exclusive = self::bind(self::taxInput(self::individual(), self::license(self::terms()), 1999, '2026-11-07T23:59:59Z', 160, 'exclusive'));
+        $this->assertSame(['$19.99', 'nineteen dollars and ninety-nine cents'], [$exclusive['PRODUCT_PRICE'], $exclusive['PRODUCT_PRICE_WORD']]);
+        // Tax-inclusive: the subtotal is the gross, so the fee is the subtotal less the line's own tax, exactly.
+        $inclusive = self::bind(self::taxInput(self::individual(), self::license(self::terms()), 2159, '2026-11-07T23:59:59Z', 160, 'inclusive'));
+        $this->assertSame(['$19.99', 'nineteen dollars and ninety-nine cents'], [$inclusive['PRODUCT_PRICE'], $inclusive['PRODUCT_PRICE_WORD']]);
+        $this->assertSame('$21.59', self::bind(self::taxInput(self::individual(), self::license(self::terms()), 2159, '2026-11-07T23:59:59Z', 0, 'inclusive'))['PRODUCT_PRICE']);
+        // Inclusive tax equal to the gross leaves no fee; missing tax, an unknown behavior or totals that disagree refuse.
+        $this->refuses('amount_invalid', null, fn () => self::bind(self::taxInput(self::individual(), self::license(self::terms()), 500, '2026-11-07T23:59:59Z', 500, 'inclusive')));
+        foreach ([['tax.line_tax_minor', null], ['tax.line_tax_minor', -1], ['tax.tax_behavior', 'mixed'], ['tax.line_total_minor', 2160]] as [$path, $value]) {
+            $input = self::taxInput(self::individual(), self::license(self::terms()), 2159, '2026-11-07T23:59:59Z', 160, 'inclusive');
+            Arr::set($input['source'], $path, $value);
+            $this->refuses('amount_invalid', null, fn () => self::bind(self::reseal($input)));
+        }
+        $input = self::taxInput(self::individual(), self::license(self::terms()), 2159, '2026-11-07T23:59:59Z', 160, 'inclusive');
+        unset($input['source']['tax']['line_tax_minor']);
+        $this->refuses('amount_invalid', null, fn () => self::bind(self::reseal($input)));
+        $input = self::taxInput(self::individual(), self::license(self::terms()), 1999, '2026-11-07T23:59:59Z', 160, 'exclusive');
+        $input['source']['tax']['line_total_minor'] = 1999;
+        $this->refuses('amount_invalid', null, fn () => self::bind(self::reseal($input)));
+    }
+
+    public function test_hash_commitments_must_match_the_frozen_values(): void
+    {
+        // A stale title under an unchanged hash: the title no longer matches product_hash or source_hash.
+        $input = self::taxInput(self::individual(), self::license(self::terms()));
+        $input['source']['product']['title'] = 'Edited Title';
+        $this->refuses('unsupported_input', null, fn () => self::bind($input));
+        // Even with product_hash recomputed, the line's source_hash still names the original title.
+        $input['source']['product_hash'] = CanonicalJson::hash($input['source']['product']);
+        $this->refuses('unsupported_input', null, fn () => self::bind($input));
+        $this->assertSame('Edited Title', self::bind(self::reseal($input))['PRODUCT_TITLE']);
+
+        // An edited product, license, assent or buyer binding whose own hash is stale refuses even when source_hash,
+        // the commitments and the assent copy are all recomputed around it.
+        foreach (['product' => 'slug', 'license' => 'model_hash', 'assent' => 'statement_version', 'buyer' => 'provenance'] as $value => $key) {
+            $input = self::taxInput(self::individual(), self::license(self::terms()));
+            $input['source'][$value][$key] = 'changed';
+            $unhashed = $input['source'];
+            unset($unhashed['source_hash']);
+            $input['source']['source_hash'] = CanonicalJson::hash($unhashed);
+            $input['source_commitments']['source_hash'] = $input['source']['source_hash'];
+            $input['assent'] = $input['source']['assent'];
+            $this->refuses('unsupported_input', null, fn () => self::bind($input));
+            $this->assertIsArray(self::bind(self::reseal($input)));
+        }
+        $base = self::taxInput(self::individual(), self::license(self::terms()));
+        // Zeroed, missing, extra or drifted commitments.
+        $zeroed = $base;
+        $zeroed['source_commitments'] = array_fill_keys(array_keys($base['source_commitments']), str_repeat('0', 64));
+        $this->refuses('unsupported_input', null, fn () => self::bind($zeroed));
+        foreach (array_keys($base['source_commitments']) as $key) {
+            $one = $base;
+            $one['source_commitments'][$key] = $key === 'asset_graph_hash' ? 'not-a-hash' : str_repeat('0', 64);
+            $this->refuses('unsupported_input', null, fn () => self::bind($one));
+            $missing = $base;
+            unset($missing['source_commitments'][$key]);
+            $this->refuses('unsupported_input', null, fn () => self::bind($missing));
+        }
+        $extra = $base;
+        $extra['source_commitments']['other'] = str_repeat('0', 64);
+        $this->refuses('unsupported_input', null, fn () => self::bind($extra));
+        $assent = $base;
+        $assent['assent']['statement_version'] = 'changed';
+        $this->refuses('unsupported_input', null, fn () => self::bind($assent));
+        $v1 = self::v1Input(self::individual(), self::license(self::terms()));
+        $v1['source']['line_amount_minor'] = 7600;
+        $this->refuses('unsupported_input', null, fn () => self::bind($v1));
+        // A snapshot without review evidence freezes a null review hash, and that null is the commitment.
+        $unreviewed = array_replace(self::license(self::terms()), ['review_evidence_id' => null, 'review_evidence_hash' => null]);
+        $input = self::taxInput(self::individual(), $unreviewed);
+        $this->assertNull($input['source_commitments']['license_review_hash']);
+        $this->assertSame('Synthetic Track Title', self::bind($input)['PRODUCT_TITLE']);
+        $input['source_commitments']['license_review_hash'] = str_repeat('5', 64);
+        $this->refuses('unsupported_input', null, fn () => self::bind($input));
+    }
+
+    public static function unprintable(): array
+    {
+        return ['bidi override' => ["Track\u{202E}kcarT"], 'zero width space' => ["Tra\u{200B}ck"], 'next line' => ["Track\u{0085}X"],
+            'line separator' => ["Track\u{2028}X"], 'replacement character' => ["Track\u{FFFD}"], 'combining mark' => ["T\u{0301}rack"],
+            'uncovered CJK' => ['Track 中文'], 'punctuation only' => ['!!!']];
+    }
+
+    #[DataProvider('unprintable')]
+    public function test_title_license_name_and_constants_follow_the_d30_printability_rule(string $value): void
+    {
+        $input = self::taxInput(self::individual(), self::license(self::terms()));
+        $input['source']['product']['title'] = $value;
+        $this->refuses('unsupported_characters', 'PRODUCT_TITLE', fn () => self::bind(self::reseal($input)));
+
+        $license = self::license(self::terms(), 'non-exclusive', $value);
+        $this->refuses('unsupported_characters', 'LICENSE_NAME', fn () => self::bind(self::taxInput(self::individual(), $license)));
+
+        $input = self::taxInput(self::individual(), self::license(self::terms()));
+        foreach ([[new ContractLicenseConstants($value, 'Synthetic Place'), 'PRODUCER_ALIAS'], [new ContractLicenseConstants('Synthetic Alias', $value), 'STATE_PROVINCE_COUNTRY']] as [$constants, $placeholder]) {
+            $this->refuses('unsupported_characters', $placeholder, fn () => ContractVariableBinder::bind($input, self::terms(), $constants, self::coverage()));
+        }
+    }
+
+    public function test_title_and_license_name_are_byte_capped(): void
+    {
+        foreach ([255 => true, 256 => false, 100000 => false] as $bytes => $binds) {
+            $input = self::taxInput(self::individual(), self::license(self::terms()));
+            $input['source']['product']['title'] = str_repeat('a', $bytes);
+            if ($binds) {
+                $this->assertSame(str_repeat('a', $bytes), self::bind(self::reseal($input))['PRODUCT_TITLE']);
+            } else {
+                $this->refuses('value_invalid', 'PRODUCT_TITLE', fn () => self::bind(self::reseal($input)));
+                $this->refuses('value_invalid', 'LICENSE_NAME', fn () => self::bind(self::taxInput(self::individual(), self::license(self::terms(), 'non-exclusive', str_repeat('a', $bytes)))));
+            }
+        }
+    }
+
+    public function test_a_business_licensee_on_an_exclusive_line(): void
+    {
+        $buyer = array_replace(self::business(), ['artist_name' => 'Example Collective']);
+        $values = self::bind(self::taxInput($buyer, self::license(self::terms(), 'exclusive', 'Synthetic Exclusive')));
+
+        $this->assertSame(['Example Records Ltd', 'Example Collective', '2 Sample Road, London, SW1A 1AA, United Kingdom'],
+            [$values['CUSTOMER_FULLNAME'], $values['CUSTOMER_ALIAS'], $values['CUSTOMER_ADDRESS']]);
+        $this->assertNotContains('Ada Example', $values);
+        $this->assertSame(ContractVariableBinder::PLACEHOLDERS, array_keys($values));
+    }
+
+    public function test_the_publishing_share_matches_the_licenses_statement_schedule(): void
+    {
+        foreach ([1 => '0.01%', 1250 => '12.50%', 5000 => '50.00%', 10000 => '100.00%'] as $bps => $printed) {
+            $terms = self::terms(['publishing_income.licensor_bps' => $bps]);
+            $this->assertSame($printed, self::bind(self::taxInput(self::individual(), self::license($terms)))['PUBLISHING_RIGHTS']);
+            $this->assertStringContainsString('licensor share is '.$printed.' of', app(TieredLicenseTerms::class)->statements($terms)['publishing_income']);
+        }
     }
 
     public function test_unsupported_shapes_and_license_types_refuse(): void
@@ -356,7 +532,7 @@ class ContractVariableBinderTest extends TestCase
         $this->refuses('unsupported_input', null, fn () => self::bind($renamed));
         $title = $input;
         $title['source']['product']['title'] = " Padded\n";
-        $this->refuses('value_invalid', 'PRODUCT_TITLE', fn () => self::bind($title));
+        $this->refuses('value_invalid', 'PRODUCT_TITLE', fn () => self::bind(self::reseal($title)));
     }
 
     public function test_substitution_refuses_unknown_placeholders_missing_values_and_malformed_braces(): void
@@ -372,6 +548,9 @@ class ContractVariableBinderTest extends TestCase
         $this->refuses('missing_value', 'CONTRACT_DATE', fn () => ContractVariableBinder::substitute('{CONTRACT_DATE}', []));
         $this->refuses('missing_value', 'CONTRACT_DATE', fn () => ContractVariableBinder::substitute('{CONTRACT_DATE}', ['CONTRACT_DATE' => '']));
         $this->refuses('missing_value', 'CONTRACT_DATE', fn () => ContractVariableBinder::substitute('x', ['CONTRACT_DATE' => null]));
+        foreach (["Line\nBreak", "Tab\tbed", "Null\0", "Del\x7f"] as $control) {
+            $this->refuses('value_invalid', 'PRODUCT_TITLE', fn () => ContractVariableBinder::substitute('{PRODUCT_TITLE}', [...$values, 'PRODUCT_TITLE' => $control]));
+        }
         foreach (['{{usage.audio_streams}}', '{CONTRACT_DATE', 'CONTRACT_DATE}', '{CONTRACT_{DATE}}', "\xff{CONTRACT_DATE}"] as $template) {
             $this->refuses('malformed_template', null, fn () => ContractVariableBinder::substitute($template, $values));
         }

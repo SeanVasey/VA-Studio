@@ -11,9 +11,10 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 ### Added
 
 - Production contract variable binder (increment 3 of `docs/production-contract-profile.md`, D-30 step 7 as far as a pure binder goes). `ContractVariableBinder::bind` maps one frozen paid line (`PaidTaxRenderInput` or `PaidGrantRenderInput`) plus its schema 5 license terms to the closed set of 22 template placeholders, and `substitute` fills `{NAME}` placeholders in one pass.
-  - **Refuses, never defaults:** unknown or unfilled placeholders, stray braces, legacy buyer declarations (`contract_identity_missing`), any non-v5 terms, terms that differ from the line's frozen terms, prohibited uses, a missing publishing share, non-USD or out-of-range prices.
+  - **Refuses, never defaults:** unknown or unfilled placeholders, stray braces, legacy buyer declarations (`contract_identity_missing`), any non-v5 terms, terms that differ from the line's frozen terms, a stale hash or source commitment, a title, license name or constant that fails the D-30 printability rule or the 255-byte cap, a missing publishing share, non-USD or out-of-range prices.
+  - **Sean's decisions (2026-11-07, with counsel):** the contract states the pre-tax license fee (tax-inclusive lines subtract the line's own tax exactly); prohibited uses print `0`; the publishing share uses the statement schedule's form (`12.50%`); the producer alias and governing place stay caller inputs.
   - **Pure:** no database, file, clock or locale. Prices come from integer minor units with a fixed English speller; `CONTRACT_DATE` is the UTC date of `effective_at`.
-  - **Not wired** into issuance, renderers or any profile. Fixtures are synthetic. Open formatting and wording questions are listed in the plan.
+  - **Not wired** into issuance, renderers or any profile. Fixtures are synthetic. Increment 4 gates are listed in the plan.
 - Customer data export covers production checkout records (D-30 step 3a). Export schema 2 adds the requester's V1 production checkout reviews and orders and V2 tax checkout orders, each with its frozen buyer declarations.
   - **Reads:** records are found through the account's production identity origin with plain, non-locking reads, capped at 500 per table, counted first.
   - **Checks:** each record is opened with its hash checked and must carry a sealed buyer binding for the same origin and account. Otherwise, or if a production table is missing, the export refuses with `503 production_record_unavailable`.

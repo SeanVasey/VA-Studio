@@ -184,6 +184,15 @@ final class ContractIdentityDeclarationV2
         return implode(', ', $parts);
     }
 
+    /**
+     * The D-30 printability rule on its own, for other contract text set in the same pinned faces (the contract
+     * binder's track title, license name and license constants). The caller checks shape and byte caps first.
+     */
+    public static function isPrintable(string $value, ContractGlyphCoverage $coverage): bool
+    {
+        return self::printable($value, $coverage);
+    }
+
     /** A trimmed, non-empty, bounded value of valid UTF-8 with no C0/DEL, as the legacy legal-name rule. */
     private static function text(mixed $value, int $bytes): string
     {

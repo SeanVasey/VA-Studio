@@ -51,6 +51,14 @@ final class ContractVariableBinder
     /** The catalog's price bound (`PricingSnapshotV3`). */
     private const PRICE_MAX = 2147483647;
 
+    /** Byte cap for the track title and license name, as the legal name's. */
+    private const TEXT_BYTES = 255;
+
+    /** Each frozen value and the self-hash the producer stored beside it. */
+    private const HASHED = ['buyer' => 'buyer_binding_hash', 'product' => 'product_hash', 'assent' => 'assent_hash', 'license' => 'license_hash'];
+
+    private const COMMITMENTS = ['source_hash', 'asset_graph_hash', 'license_source_hash', 'license_submission_hash', 'license_review_hash', 'assent_hash'];
+
     /**
      * Bind one paid line.
      *
@@ -83,6 +91,7 @@ final class ContractVariableBinder
         foreach ($values as $name => $value) {
             ContractBindingException::require(in_array($name, self::PLACEHOLDERS, true), 'unknown_placeholder', (string) $name);
             ContractBindingException::require(is_string($value) && $value !== '' && mb_check_encoding($value, 'UTF-8'), 'missing_value', $name);
+            ContractBindingException::require(preg_match('/[\x00-\x1f\x7f]/', $value) !== 1, 'value_invalid', $name);
         }
         ContractBindingException::require(mb_check_encoding($template, 'UTF-8'), 'malformed_template');
         $parts = preg_split('/\{([^{}]*)\}/u', $template, -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -109,6 +118,7 @@ final class ContractVariableBinder
         $source = $input['source'] ?? null;
         ContractBindingException::require(is_array($family) && ($input['purpose'] ?? null) === $family['purpose'] && is_array($source)
             && ($source['schema_version'] ?? null) === $family['source_schema'] && ($source['producer'] ?? null) === $family['producer'], 'unsupported_input');
+        self::commitments($input, $source);
 
         // CONTRACT_DATE: the UTC calendar date of the frozen assent instant.
         $effective = $input['effective_at'] ?? null;
@@ -142,32 +152,29 @@ final class ContractVariableBinder
             throw new ContractBindingException('contract_identity_invalid');
         }
 
-        // Price: the frozen pre-tax line amount in USD minor units.
-        [$amount, $currency] = $family['source_schema'] === 2
-            ? [$source['pre_tax']['line_amount_minor'], $source['pre_tax']['currency']]
-            : [$source['line_amount_minor'], $source['amounts']['currency']];
+        // Price: the pre-tax license fee in USD minor units (Sean, 2026-11-07), never the taxed or gross figure.
+        [$amount, $currency] = $family['source_schema'] === 2 ? self::taxedLicenseFee($source) : self::exemptLicenseFee($source);
         ContractBindingException::require($currency === 'USD', 'currency_unsupported');
-        ContractBindingException::require(is_int($amount) && $amount >= 1 && $amount <= self::PRICE_MAX
-            && ($family['source_schema'] === 1 || $amount === $source['tax']['line_subtotal_minor']), 'amount_invalid');
+        ContractBindingException::require(is_int($amount) && $amount >= 1 && $amount <= self::PRICE_MAX, 'amount_invalid');
 
         $values = [
             'CONTRACT_DATE' => $instant->format('F j, Y'),
             'CUSTOMER_FULLNAME' => $declaration['legal_name'],
             'CUSTOMER_ADDRESS' => ContractIdentityDeclarationV2::customerAddress($declaration['postal_address']),
             'CUSTOMER_ALIAS' => $exclusive ? $declaration['artist_name'] : null,
-            'PRODUCT_TITLE' => self::text($source['product']['title'], 'PRODUCT_TITLE'),
+            'PRODUCT_TITLE' => self::text($source['product']['title'], 'PRODUCT_TITLE', self::TEXT_BYTES, $coverage),
             'PRODUCT_PRICE' => ContractNumberWords::usd($amount),
             'PRODUCT_PRICE_WORD' => ContractNumberWords::dollars($amount),
-            'LICENSE_NAME' => self::text($license['name'], 'LICENSE_NAME'),
-            'PRODUCER_ALIAS' => $constants->producerAlias,
-            'STATE_PROVINCE_COUNTRY' => $constants->stateProvinceCountry,
+            'LICENSE_NAME' => self::text($license['name'], 'LICENSE_NAME', self::TEXT_BYTES, $coverage),
+            'PRODUCER_ALIAS' => self::text($constants->producerAlias, 'PRODUCER_ALIAS', self::TEXT_BYTES, $coverage),
+            'STATE_PROVINCE_COUNTRY' => self::text($constants->stateProvinceCountry, 'STATE_PROVINCE_COUNTRY', self::TEXT_BYTES, $coverage),
             'FILE_TYPE' => self::fileTypes($terms['required_asset_roles']),
             'PUBLISHING_RIGHTS' => self::publishing($terms['publishing_income']),
         ];
         foreach (self::USAGE as $placeholder => $slot) {
-            $values[$placeholder] = self::usage($terms['usage'][$slot], $placeholder, false);
+            $values[$placeholder] = self::usage($terms['usage'][$slot], false);
         }
-        $values['MONETIZED_MUSIC_VIDEOS_WORD'] = self::usage($terms['usage']['music_videos'], 'MONETIZED_MUSIC_VIDEOS_WORD', true);
+        $values['MONETIZED_MUSIC_VIDEOS_WORD'] = self::usage($terms['usage']['music_videos'], true);
 
         $bound = [];
         foreach (self::PLACEHOLDERS as $placeholder) {
@@ -181,24 +188,82 @@ final class ContractVariableBinder
         return $bound;
     }
 
-    /** A limited use prints its limit, an unlimited one "unlimited"; a prohibited use has no value to print. */
-    private static function usage(array $use, string $placeholder, bool $words): string
+    /**
+     * Every hash commitment the producer froze must still match the values beside it, so an edited title, license or
+     * assent with a stale hash never binds. Recomputed exactly as the producers compute them (`CanonicalJson::hash`).
+     */
+    private static function commitments(array $input, array $source): void
+    {
+        $unhashed = $source;
+        unset($unhashed['source_hash']);
+        $ok = is_string($source['source_hash'] ?? null) && hash_equals(CanonicalJson::hash($unhashed), $source['source_hash']);
+        foreach (self::HASHED as $value => $hash) {
+            $ok = $ok && array_key_exists($value, $source) && is_string($source[$hash] ?? null) && hash_equals(CanonicalJson::hash($source[$value]), $source[$hash]);
+        }
+        $commitments = $input['source_commitments'] ?? null;
+        $license = $source['license'] ?? null;
+        ContractBindingException::require($ok && is_array($commitments) && is_array($license) && count($commitments) === count(self::COMMITMENTS)
+            && array_diff(self::COMMITMENTS, array_keys($commitments)) === []
+            && $commitments['source_hash'] === $source['source_hash'] && $commitments['assent_hash'] === $source['assent_hash']
+            && array_key_exists('source_hash', $license) && $commitments['license_source_hash'] === $license['source_hash']
+            && array_key_exists('submission_hash', $license) && $commitments['license_submission_hash'] === $license['submission_hash']
+            && array_key_exists('review_evidence_hash', $license) && $commitments['license_review_hash'] === $license['review_evidence_hash']
+            && is_string($commitments['asset_graph_hash']) && preg_match('/\A[0-9a-f]{64}\z/', $commitments['asset_graph_hash']) === 1
+            && ($input['assent'] ?? null) === $source['assent'], 'unsupported_input');
+    }
+
+    /**
+     * V2: the pre-tax license fee. Tax-exclusive lines frozen the fee as the subtotal; tax-inclusive lines frozen the
+     * gross, so the fee is the subtotal less the line's own tax, exactly, in integer minor units.
+     *
+     * @return array{0: mixed, 1: mixed}
+     */
+    private static function taxedLicenseFee(array $source): array
+    {
+        $tax = $source['tax'];
+        $subtotal = $source['pre_tax']['line_amount_minor'];
+        $taxed = $tax['line_tax_minor'] ?? null;
+        ContractBindingException::require(is_int($subtotal) && $subtotal === $tax['line_subtotal_minor'] && is_int($taxed) && $taxed >= 0
+            && $tax['currency'] === $source['pre_tax']['currency'], 'amount_invalid');
+        $fee = match ($tax['tax_behavior'] ?? null) {
+            'exclusive' => $tax['line_total_minor'] === $subtotal + $taxed ? $subtotal : null,
+            'inclusive' => $tax['line_total_minor'] === $subtotal ? $subtotal - $taxed : null,
+            default => null,
+        };
+        // A fee of zero or less (inclusive tax equal to the gross) is refused by the caller's 1..PRICE_MAX bound.
+        ContractBindingException::require(is_int($fee), 'amount_invalid');
+
+        return [$fee, $source['pre_tax']['currency']];
+    }
+
+    /** V1 orders are tax-exempt: the line carries no tax, so its amount is the license fee. */
+    private static function exemptLicenseFee(array $source): array
+    {
+        ContractBindingException::require($source['line_tax_minor'] === 0 && ($source['amounts']['tax_minor'] ?? null) === 0, 'amount_invalid');
+
+        return [$source['line_amount_minor'], $source['amounts']['currency']];
+    }
+
+    /** A limited use prints its limit, an unlimited one "unlimited", a prohibited one zero (Sean, 2026-11-07). */
+    private static function usage(array $use, bool $words): string
     {
         return match ($use['mode']) {
             'limited' => $words ? ContractNumberWords::spell($use['limit']) : number_format($use['limit'], 0, '.', ','),
             'unlimited' => 'unlimited',
-            'prohibited' => throw new ContractBindingException('usage_prohibited', $placeholder),
+            'prohibited' => $words ? ContractNumberWords::spell(0) : '0',
         };
     }
 
-    /** The licensor's share of publishing income, as a percentage with no trailing zeros ("50%", "12.5%"). */
+    /**
+     * The licensor's share of publishing income in the statement schedule's own form (`EconomicLicenseTerms`,
+     * "12.50%"), so one contract never prints the share two ways. Mode `none` has no share to print.
+     */
     private static function publishing(array $publishing): string
     {
         ContractBindingException::require($publishing['mode'] === 'share', 'publishing_share_unbound', 'PUBLISHING_RIGHTS');
         $bps = $publishing['licensor_bps'];
-        $fraction = rtrim(str_pad((string) ($bps % 100), 2, '0', STR_PAD_LEFT), '0');
 
-        return intdiv($bps, 100).($fraction === '' ? '' : '.'.$fraction).'%';
+        return intdiv($bps, 100).'.'.str_pad((string) ($bps % 100), 2, '0', STR_PAD_LEFT).'%';
     }
 
     /** Deliverables in the reviewed label vocabulary and order: "MP3, WAV master and Stems ZIP". */
@@ -211,10 +276,12 @@ final class ContractVariableBinder
         return $labels === [] ? $last : implode(', ', $labels).' and '.$last;
     }
 
-    private static function text(mixed $value, string $placeholder): string
+    /** Shape and byte cap first (`value_invalid`), then the D-30 printability rule (`unsupported_characters`). */
+    private static function text(mixed $value, string $placeholder, int $bytes, ContractGlyphCoverage $coverage): string
     {
-        ContractBindingException::require(is_string($value) && $value !== '' && mb_check_encoding($value, 'UTF-8')
+        ContractBindingException::require(is_string($value) && $value !== '' && strlen($value) <= $bytes && mb_check_encoding($value, 'UTF-8')
             && trim($value) === $value && preg_match('/[\x00-\x1f\x7f]/', $value) !== 1, 'value_invalid', $placeholder);
+        ContractBindingException::require(ContractIdentityDeclarationV2::isPrintable($value, $coverage), 'unsupported_characters', $placeholder);
 
         return $value;
     }
