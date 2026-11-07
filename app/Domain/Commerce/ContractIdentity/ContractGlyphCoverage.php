@@ -30,7 +30,8 @@ final class ContractGlyphCoverage
     }
 
     /**
-     * Intersect the width tables (`cw`, keyed by codepoint) of tc-lib-pdf-font generated metric files.
+     * Intersect the width tables (`cw`, keyed by codepoint) of tc-lib-pdf-font generated metric files, counting only
+     * glyphs with a positive advance width.
      *
      * @param  list<string>  $paths
      */
@@ -47,11 +48,14 @@ final class ContractGlyphCoverage
                 throw new InvalidArgumentException('Font metrics lack a width table.');
             }
             $face = [];
-            foreach (array_keys($metrics['cw']) as $key) {
-                if (! is_int($key)) {
-                    throw new InvalidArgumentException('Font width table keys must be codepoints.');
+            foreach ($metrics['cw'] as $key => $width) {
+                if (! is_int($key) || ! is_int($width) && ! is_float($width)) {
+                    throw new InvalidArgumentException('Font width table entries must map codepoints to widths.');
                 }
-                $face[$key] = true;
+                // A zero-width glyph (U+FFFC in DejaVu) draws nothing a reader can see, so it is not coverage.
+                if ($width > 0) {
+                    $face[$key] = true;
+                }
             }
             $common = $common === null ? $face : array_intersect_key($common, $face);
         }

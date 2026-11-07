@@ -59,7 +59,9 @@ class ContractIdentityDeclarationV2Test extends TestCase
         ], $declaration);
         $this->assertSame($declaration, ContractIdentityDeclarationV2::verify($declaration, false, self::coverage()));
         // Key order does not change the frozen hash the order chain binds.
-        $this->assertSame(CanonicalJson::hash($declaration), CanonicalJson::hash(array_reverse($declaration, true)));
+        $reordered = array_reverse([...$declaration, 'postal_address' => array_reverse($declaration['postal_address'], true),
+            'legal_name_confirmation' => array_reverse($declaration['legal_name_confirmation'], true)], true);
+        $this->assertSame(CanonicalJson::hash($declaration), CanonicalJson::hash($reordered));
         $this->assertSame('1 Example Street, Suite 2, Springfield, IA, 50000-1234, United States',
             ContractIdentityDeclarationV2::customerAddress($declaration['postal_address']));
     }
@@ -166,6 +168,17 @@ class ContractIdentityDeclarationV2Test extends TestCase
             'Arabic, which the face draws but would not shape' => ['محمد'],
             'CJK, which the face lacks' => ['王小明'],
             'thumbs-up emoji U+1F44D, which the face lacks' => ["Name \u{1F44D}"],
+            'braille pattern blank U+2800 alone' => ["\u{2800}"],
+            'braille pattern blank U+2800 between words' => ["John\u{2800}Smith"],
+            'object replacement U+FFFC, zero width' => ["Zoe\u{FFFC}"],
+            'replacement character U+FFFD' => ["Zo\u{FFFD}"],
+            'Kelvin sign U+212A (NFC is K)' => ["\u{212A}elvin"],
+            'Angstrom sign U+212B (NFC is Å)' => ["\u{212B}sa"],
+            'Ohm sign U+2126' => ["\u{2126}mega"],
+            'Greek question mark U+037E' => ["Name\u{37E}"],
+            'Greek oxia U+1F71' => ["\u{1F71}lpha"],
+            'punctuation only' => ['.'],
+            'symbols only' => ['-- ¶'],
         ];
     }
 
@@ -194,6 +207,31 @@ class ContractIdentityDeclarationV2Test extends TestCase
         }
     }
 
+    public function test_no_accepted_codepoint_changes_under_nfc_and_none_draws_at_zero_width(): void
+    {
+        // Guards the pinned REFUSED list: if a face or Unicode update adds a covered codepoint that NFC rewrites,
+        // this fails instead of letting two spellings of one printed name hash differently.
+        $fonts = dirname(__DIR__, 2).'/resources/contracts/test-v2/fonts/generated/';
+        $regular = json_decode((string) file_get_contents($fonts.'dejavusans.json'), true)['cw'];
+        $bold = json_decode((string) file_get_contents($fonts.'dejavusansb.json'), true)['cw'];
+        $accepted = 0;
+        foreach (array_keys(array_intersect_key($regular, $bold)) as $codepoint) {
+            $character = mb_chr($codepoint, 'UTF-8');
+            try {
+                ContractIdentityDeclarationV2::fromInput(self::input(['legalName' => 'A'.$character]), false, self::STATEMENT, self::coverage());
+            } catch (CheckoutException) {
+                continue;
+            }
+            $accepted++;
+            $this->assertTrue(\Normalizer::isNormalized($character, \Normalizer::FORM_C), sprintf('U+%04X', $codepoint));
+            $this->assertGreaterThan(0, $regular[$codepoint], sprintf('U+%04X', $codepoint));
+            $this->assertGreaterThan(0, $bold[$codepoint], sprintf('U+%04X', $codepoint));
+            $this->assertSame(0, preg_match('/[\p{C}\p{M}\p{Z}]/u', str_replace(' ', '', $character)), sprintf('U+%04X', $codepoint));
+        }
+        // The accepted repertoire is pinned: a face, PCRE or list change must be reviewed, not absorbed.
+        $this->assertSame(4899, $accepted);
+    }
+
     public function test_every_pinned_country_name_is_printable_in_the_pinned_faces(): void
     {
         $this->assertCount(249, LicenseTerritories::COUNTRIES);
@@ -208,7 +246,8 @@ class ContractIdentityDeclarationV2Test extends TestCase
             ['statement_version' => 'v1', 'statement_hash' => strtoupper(self::STATEMENT['statement_hash'])],
             ['statement_version' => 'v1', 'statement_hash' => 'abc'],
             ['statement_version' => 'v1'],
-            [...self::STATEMENT, 'extra' => 1]] as $statement) {
+            [...self::STATEMENT, 'extra' => 1],
+            [...self::STATEMENT, 'confirmed' => false]] as $statement) {
             $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(), false, $statement, self::coverage()));
         }
     }
@@ -224,6 +263,11 @@ class ContractIdentityDeclarationV2Test extends TestCase
             'missing artist key' => array_diff_key($declaration, ['artist_name' => true]),
             'blank optional kept' => [...$declaration, 'postal_address' => [...$declaration['postal_address'], 'region' => '']],
             'untrimmed line' => [...$declaration, 'postal_address' => [...$declaration['postal_address'], 'lines' => ['1 Example Street ']]],
+            'lines not a list' => [...$declaration, 'postal_address' => [...$declaration['postal_address'], 'lines' => [1 => '1 Example Street']]],
+            'country key missing' => [...$declaration, 'postal_address' => array_diff_key($declaration['postal_address'], ['country' => true])],
+            'postal code trailing newline' => [...$declaration, 'postal_address' => [...$declaration['postal_address'], 'postalCode' => "50000\n"]],
+            'statement version trailing newline' => [...$declaration, 'legal_name_confirmation' => [...$declaration['legal_name_confirmation'], 'statement_version' => "v1\n"]],
+            'confirmation extra key' => [...$declaration, 'legal_name_confirmation' => [...$declaration['legal_name_confirmation'], 'at' => 'now']],
         ];
         foreach ($mutations as $name => $mutation) {
             try {
@@ -255,6 +299,9 @@ class ContractIdentityDeclarationV2Test extends TestCase
         $this->assertTrue($regular->covers(mb_chr($codepoint, 'UTF-8')));
         $this->assertFalse(self::coverage()->covers(mb_chr($codepoint, 'UTF-8')));
         $this->assertFalse(self::coverage()->covers("\xC3\x28"));
+        // U+FFFC is in both width tables at width 0; a zero-width glyph is not coverage.
+        $this->assertFalse(self::coverage()->covers("\u{FFFC}"));
+        $this->assertFalse($regular->covers("\u{FFFC}"));
 
         foreach ([[], [$fonts.'missing.json'], [__FILE__]] as $paths) {
             try {

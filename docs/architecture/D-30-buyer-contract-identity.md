@@ -41,19 +41,34 @@ fonts cannot print are refused at checkout** (Sean, 2026-11-07). The buyer is as
 
 The character rule (implemented in `ContractIdentityDeclarationV2`) applies to the legal name, the artist name, the address
 lines, the locality and the region. A shape error (`invalid`) is always reported before a character problem
-(`unsupported_characters`). A value is printable only when both of the following hold:
+(`unsupported_characters`). Byte caps apply to the trimmed value. A postal code must also start and end with a letter or
+digit. A value is printable only when all of the following hold:
 
-- It contains no format, private-use, unassigned or C1 codepoint (`\p{C}`: bidi overrides and isolates, zero-width
-  characters, soft hyphen, BOM), no combining mark (`\p{M}`), no space other than U+0020, and no right-to-left script
-  (Hebrew, Arabic, Syriac, Thaana, N'Ko, Samaritan, Mandaic). The pinned DejaVu faces draw some of these, but the printed
-  text could then differ from what a reader sees, or be reordered or left unshaped.
-- Every codepoint is in the width table of every pinned face (`ContractGlyphCoverage`). With the `test-v2` regular and bold
-  faces, that is 5,778 shared codepoints. They include Latin, Greek and Cyrillic, and every pinned country name. CJK is not
-  covered.
+- It contains none of these:
+  - a format, private-use, unassigned or C1 codepoint (`\p{C}`: bidi overrides and isolates, zero-width characters, soft
+    hyphen, BOM);
+  - a combining mark (`\p{M}`);
+  - a space other than U+0020;
+  - a right-to-left script (Hebrew, Arabic, Syriac, Thaana, N'Ko, Samaritan, Mandaic);
+  - U+2800 BRAILLE PATTERN BLANK, which draws as a visible-width blank;
+  - U+FFFC or U+FFFD;
+  - one of the 26 covered codepoints that NFC replaces, such as the Kelvin and Ångström signs and the Greek oxia forms.
 
-Decomposed text is refused, not normalized, so the stored value is exactly what was sent; the checkout UI should send
-NFC. Before the gate opens, the `vasey-license-pdf-v1` profile must bind the coverage to its own pinned faces, and its
-render review must confirm the accepted repertoire.
+  The pinned DejaVu faces draw some of these, but the printed text could then differ from what a reader sees or from the
+  stored bytes, or be reordered or left unshaped.
+- It contains at least one letter or digit, so a field can't be only punctuation or symbols.
+- Every codepoint has a positive-width glyph in every pinned face (`ContractGlyphCoverage`).
+
+With the `test-v2` regular and bold faces, 5,562 codepoints have a positive-width glyph in both faces, and the rule accepts
+4,899 of them. That count is pinned by a test. The accepted set covers Latin, Greek and Cyrillic and every pinned country
+name; CJK is not covered.
+
+Decomposed text is refused, not normalized, so the stored value is exactly what was sent; the checkout UI should send NFC.
+The refused list is pinned rather than computed from normalization data. The category and script classes still come from
+the runtime's PCRE Unicode tables, so a PHP upgrade that moves the pinned count must be reviewed before stored declarations
+are re-verified with it. Before the gate opens, the `vasey-license-pdf-v1` profile must bind the coverage to its own pinned
+faces, and its render review must confirm the accepted repertoire. That review should also check address layout, because a
+buyer-entered line can itself name a country.
 
 ## Corrections
 

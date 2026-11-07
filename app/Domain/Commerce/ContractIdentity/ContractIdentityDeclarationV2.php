@@ -33,6 +33,19 @@ final class ContractIdentityDeclarationV2
     private const ADDRESS_BYTES = 512;
 
     /**
+     * Refused even where the pinned faces draw them: format, private-use, unassigned and C1 codepoints (bidi overrides
+     * and isolates, zero-width characters, soft hyphen, BOM), combining marks, spaces other than U+0020, right-to-left
+     * scripts, U+2800 BRAILLE PATTERN BLANK (a visible-width blank), U+FFFC and U+FFFD, and the 26 covered codepoints
+     * that NFC replaces with another (Kelvin and Ångström signs, Greek oxia forms and similar), which print like their
+     * canonical spelling but store different bytes. The list is pinned rather than computed so that re-verifying frozen
+     * evidence does not depend on the runtime's normalization tables.
+     */
+    private const REFUSED = '/[\p{C}\p{M}\p{Z}\p{Hebrew}\p{Arabic}\p{Syriac}\p{Thaana}\p{Nko}\p{Samaritan}\p{Mandaic}'
+        .'\x{2800}\x{FFFC}\x{FFFD}'
+        .'\x{0374}\x{037E}\x{0387}\x{1F71}\x{1F73}\x{1F75}\x{1F77}\x{1F79}\x{1F7B}\x{1F7D}\x{1FBB}\x{1FBE}\x{1FC9}'
+        .'\x{1FCB}\x{1FD3}\x{1FDB}\x{1FE3}\x{1FEB}\x{1FEE}\x{1FEF}\x{1FF9}\x{1FFB}\x{1FFD}\x{2126}\x{212A}\x{212B}]/u';
+
+    /**
      * Checkout input (camelCase) to the canonical declaration.
      *
      * @param  array{statement_version: string, statement_hash: string}  $statement  the confirmation text the buyer saw
@@ -77,7 +90,7 @@ final class ContractIdentityDeclarationV2
         CheckoutException::require(is_array($confirmation), 'invalid', 422);
         self::keys($confirmation, ['confirmed', 'statement_version', 'statement_hash']);
         CheckoutException::require($confirmation['confirmed'] === true, 'invalid', 422);
-        self::statement($confirmation);
+        self::statement(['statement_version' => $confirmation['statement_version'], 'statement_hash' => $confirmation['statement_hash']]);
 
         $printed = [];
         $printed[] = self::text($declaration['legal_name'], self::LEGAL_NAME_BYTES);
@@ -150,21 +163,17 @@ final class ContractIdentityDeclarationV2
         return $value;
     }
 
-    /**
-     * Refuses format, private-use, unassigned and C1 codepoints (bidi overrides and isolates, zero-width characters,
-     * soft hyphen, BOM), combining marks, spaces other than U+0020 and right-to-left scripts, then anything the
-     * pinned faces lack. The faces draw some of the refused codepoints, but those would let the printed text differ
-     * from what a reader sees, or reorder it.
-     */
+    /** Printable: no refused codepoint, at least one letter or digit, and every codepoint drawn by every pinned face. */
     private static function printable(string $value, ContractGlyphCoverage $coverage): bool
     {
-        return preg_match('/[\p{C}\p{M}\p{Z}\p{Hebrew}\p{Arabic}\p{Syriac}\p{Thaana}\p{Nko}\p{Samaritan}\p{Mandaic}]/u',
-            str_replace(' ', '', $value)) !== 1 && $coverage->covers($value);
+        return preg_match(self::REFUSED, str_replace(' ', '', $value)) === 0
+            && preg_match('/[\p{L}\p{N}]/u', $value) === 1
+            && $coverage->covers($value);
     }
 
     private static function statement(array $statement): void
     {
-        self::keys($statement, ['statement_version', 'statement_hash'], ['confirmed']);
+        self::keys($statement, ['statement_version', 'statement_hash']);
         CheckoutException::require(is_string($statement['statement_version'])
             && preg_match('/\A[a-z0-9][a-z0-9.-]{0,63}\z/', $statement['statement_version']) === 1
             && is_string($statement['statement_hash']) && preg_match('/\A[0-9a-f]{64}\z/', $statement['statement_hash']) === 1, 'invalid', 422);
