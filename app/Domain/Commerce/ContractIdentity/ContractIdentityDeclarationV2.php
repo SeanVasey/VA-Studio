@@ -9,8 +9,8 @@ use App\Domain\Rights\LicenseTerritories;
  * D-30 buyer contract identity: who the licensee is (an individual, or a business acting through a named
  * representative), the legal name the buyer confirms, a structured postal address and, for Exclusive, an
  * artist name. Pure: it validates checkout input into the frozen `buyer_declarations` shape, re-verifies a stored
- * declaration and formats `{CUSTOMER_ADDRESS}`. The production tax checkout freezes it behind the default-off
- * `contract_identity_v2` gate (local/testing only).
+ * declaration and formats `{CUSTOMER_ADDRESS}`. The production tax checkout and the V1 checkout review each freeze it behind
+ * their own default-off `contract_identity_v2` gate (local/testing only).
  *
  * Shape errors refuse with `invalid`; a well-formed value the pinned contract fonts cannot print refuses with
  * `unsupported_characters`, so the buyer can be asked to enter supported characters. Values are never rewritten
@@ -103,6 +103,39 @@ final class ContractIdentityDeclarationV2
             'artist_name' => $artist === '' ? null : $artist,
             'identity_meaning' => self::MEANING,
         ], $exclusive, $coverage);
+    }
+
+    /**
+     * fromInput() bound to what the buyer was shown: `statementVersion` echoes the version of the confirmation statement the
+     * client displayed next to the tick. It must equal the offered statement for the buyer's licensee type (`hash_equals`),
+     * so a wording change between display and submission refuses with `changed` instead of freezing text the buyer never
+     * saw. Shape errors still refuse first with `invalid`. A new wording is always a new version
+     * (ContractIdentityStatements), so the version names the exact text.
+     *
+     * @param  array<string, array{statement_version: string, statement_hash: string}>  $statements
+     */
+    public static function fromDisplayedInput(array $input, bool $exclusive, array $statements, ContractGlyphCoverage $coverage): array
+    {
+        CheckoutException::require(array_key_exists('statementVersion', $input) && is_string($input['statementVersion']), 'invalid', 422);
+        $displayed = $input['statementVersion'];
+        unset($input['statementVersion']);
+        $declaration = self::fromInput($input, $exclusive, $statements, $coverage);
+        CheckoutException::require(hash_equals($declaration['legal_name_confirmation']['statement_version'], $displayed), 'changed');
+
+        return $declaration;
+    }
+
+    /**
+     * Re-verify a declaration read back from sealed checkout evidence against the pinned contract faces. A refusal here is
+     * an integrity failure of stored evidence, not a buyer input error, so it surfaces as the evidence refusal (`changed`).
+     */
+    public static function verifyRetained(mixed $declaration, bool $exclusive): void
+    {
+        try {
+            self::verify($declaration, $exclusive, ContractGlyphCoverage::pinnedContractFaces());
+        } catch (CheckoutException) {
+            throw new CheckoutException;
+        }
     }
 
     /** Re-verify a frozen declaration exactly; any drift from the canonical shape refuses. */

@@ -198,6 +198,56 @@ class ContractIdentityDeclarationV2Test extends TestCase
         }
     }
 
+    public function test_the_displayed_statement_version_must_be_the_one_offered_for_the_buyers_type(): void
+    {
+        $declaration = ContractIdentityDeclarationV2::fromDisplayedInput(self::input(['statementVersion' => self::STATEMENT['statement_version']]),
+            false, self::STATEMENTS, self::coverage());
+        $this->assertSame(ContractIdentityDeclarationV2::fromInput(self::input(), false, self::STATEMENTS, self::coverage()), $declaration);
+        $business = ContractIdentityDeclarationV2::fromDisplayedInput(self::input(['licenseeType' => 'business', 'legalName' => 'Example Records LLC',
+            'representativeName' => 'Zoë Émile', 'statementVersion' => self::BUSINESS_STATEMENT['statement_version']]), false, self::STATEMENTS, self::coverage());
+        $this->assertSame(self::BUSINESS_STATEMENT['statement_version'], $business['legal_name_confirmation']['statement_version']);
+
+        // The wording changed after the buyer saw it: the server now offers a new version, so the echoed one refuses.
+        $reworded = [...self::STATEMENTS, 'individual' => ['statement_version' => 'individual-legal-name-confirmation-v2', 'statement_hash' => str_repeat('c', 64)]];
+        foreach ([
+            'statement changed after display' => [self::input(['statementVersion' => self::STATEMENT['statement_version']]), $reworded],
+            'the other type\'s statement' => [self::input(['statementVersion' => self::BUSINESS_STATEMENT['statement_version']]), self::STATEMENTS],
+            'a prefix of the offered version' => [self::input(['statementVersion' => 'individual-legal-name-confirmation']), self::STATEMENTS],
+        ] as $name => [$input, $statements]) {
+            try {
+                ContractIdentityDeclarationV2::fromDisplayedInput($input, false, $statements, self::coverage());
+                $this->fail($name);
+            } catch (CheckoutException $e) {
+                $this->assertSame(['changed', 409], [$e->reason, $e->status], $name);
+            }
+        }
+        // A missing or non-string echo is a shape error, and other shape errors still report before a statement mismatch.
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromDisplayedInput(self::input(), false, self::STATEMENTS, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromDisplayedInput(self::input(['statementVersion' => null]), false, self::STATEMENTS, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromDisplayedInput(self::input(['statementVersion' => ['x']]), false, self::STATEMENTS, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromDisplayedInput(self::input(['statementVersion' => 'stale', 'legalNameConfirmed' => false]),
+            false, self::STATEMENTS, self::coverage()));
+    }
+
+    public function test_a_retained_declaration_that_no_longer_verifies_is_an_evidence_refusal(): void
+    {
+        $declaration = ContractIdentityDeclarationV2::fromInput(self::input(['legalName' => 'Zoë Émile']), false, self::STATEMENTS, self::coverage());
+        ContractIdentityDeclarationV2::verifyRetained($declaration, false);
+        foreach ([
+            'unprintable name' => [[...$declaration, 'legal_name' => '王小明'], false],
+            'artist name on a non-exclusive order' => [[...$declaration, 'artist_name' => 'DJ Example'], false],
+            'exclusive without an artist name' => [$declaration, true],
+            'legacy shape' => [['legal_name' => 'Zoë Émile', 'identity_meaning' => 'buyer_declared_legal_name'], false],
+        ] as $name => [$retained, $exclusive]) {
+            try {
+                ContractIdentityDeclarationV2::verifyRetained($retained, $exclusive);
+                $this->fail($name);
+            } catch (CheckoutException $e) {
+                $this->assertSame(['changed', 409], [$e->reason, $e->status], $name);
+            }
+        }
+    }
+
     public function test_artist_name_is_required_if_and_only_if_the_order_is_exclusive(): void
     {
         $exclusive = ContractIdentityDeclarationV2::fromInput(self::input(['artistName' => ' DJ Example ']), true, self::STATEMENTS, self::coverage());

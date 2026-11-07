@@ -1,8 +1,9 @@
 # D-30 — Buyer contract identity: legal name, postal address and Exclusive artist name
 
-Status: decided design, 2026-11-07. Nothing is implemented or collected yet. It implements increment 2 of the
-[production contract profile](../production-contract-profile.md). It records Sean's decisions C-1, C-2 and D-1 from
-2026-11-07, plus his follow-up decisions below: corrections, unsupported characters, and business licensees.
+Status: decided design, 2026-11-07. Steps 4–6 are implemented behind literal-false gates; nothing is collected yet. It
+implements increment 2 of the [production contract profile](../production-contract-profile.md). It records Sean's
+decisions C-1, C-2 and D-1 from 2026-11-07, plus his follow-up decisions below: corrections, unsupported characters, and
+business licensees.
 
 ## Decision
 
@@ -33,8 +34,8 @@ not use a separate record.
 - **Legacy orders.** Orders that keep the two-key shape (`legal_name`, `identity_meaning`) stay byte-identical and valid.
   The contract binder accepts only v2 declarations and refuses legacy ones with `contract_identity_missing`. Their originals
   keep the existing paid profile and are never re-rendered.
-- **Paths.** V2 `ProductionTaxCheckout` is the primary target, then V1 `ProductionCheckout::review`. Both are unmounted
-  today. Exclusive has no production path yet (`ExclusiveInventoryGate`), so the artist name is reachable only on the test
+- **Paths.** V2 `ProductionTaxCheckout` (step 5) and V1 `ProductionCheckout::review` (step 6) both capture it behind their
+  own gates. Both are unmounted today. Exclusive has no production path yet (`ExclusiveInventoryGate`), so the artist name is reachable only on the test
   path until a production Exclusive consumer exists.
 - **Gate.** Capture sits behind a literal-false `contract_identity_v2` gate. The gate opens together with the
   `vasey-license-pdf-v1` profile, because the current paid renderers print every input field.
@@ -49,7 +50,28 @@ not use a separate record.
       restricted to the profile's `allowed_scripts`, so checkout refuses what the paid renderers would refuse after payment
       (Armenian and Georgian, for example, which DejaVu draws);
     - the preview offers the licensee types and statement texts.
-  - **Gate off:** the order path and preview response are unchanged.
+  - **Implemented for the V1 checkout (step 6):** `production_checkout.contract_identity_v2`, a separate literal `false`,
+    admitted only as an exact `true` in `local` or `testing` (`ContractIdentityPolicy::contractIdentityV2()`). With it on,
+    `ProductionCheckout::review` requires the v2 declaration from the same statements and faces and refuses the name-only
+    shape. `ProductionCheckout::contractIdentityOffer()` lists the licensee types and statements, and the review response
+    shows the identity the order will bind (type, names, the formatted address and the statement version). Assent copies the
+    reviewed declaration unchanged. Exclusive stays unreachable: `false` is passed and `ExclusiveInventoryGate` is unchanged.
+  - **Statement binding (step 6, both checkouts):** the declaration input echoes the `statementVersion` the client displayed
+    next to the tick (`ContractIdentityDeclarationV2::fromDisplayedInput`). It must equal the offered statement for the
+    buyer's licensee type (`hash_equals`), or the request refuses with `changed`. A new wording is always a new version, so
+    the version names the exact text. The echo was chosen over a preview commitment because V1 has no commitment before its
+    review: the review request is the first thing the server sees. Two gate-state guards complete it:
+    - V2: with the gate on, the preview commitment also carries `contract_identity: buyer-contract-identity-v2`, so a gate
+      flip between preview and order changes the commitment and refuses with `changed`. `TaxCheckoutEvidence::order`
+      rebuilds that commitment from whether the frozen declaration is v2.
+    - V1: assent refuses (`changed`) when the reviewed declaration's kind (v2 or name-only) differs from the gate now.
+      Replaying an existing assent still returns the retained order, as `read()` does; it writes nothing.
+  - **Evidence (step 6):** `TaxCheckoutEvidence::order` requires the body's declarations to equal the request's and
+    re-verifies a v2 declaration (`verifyRetained`). V1 `OrderEvidence` is hash-frozen, so it keeps only its equality checks
+    (which v2 declarations pass) and `ProductionCheckout` re-verifies v2 declarations where it opens a review or an order.
+    A retained declaration that no longer verifies refuses as evidence (`changed`), not as buyer input.
+  - **Gate off:** request hashes, sealed review and order bodies, the tax preview commitment and every response are
+    byte-identical; tests rebuild the original bytes and compare them.
 
 ## Validation and rendering
 
@@ -142,12 +164,19 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
 5. V2 tax checkout wiring behind the gate. Needs independent review and a native MySQL journey. Before activation (step 8):
    - the statement texts and the printable set must be rebound to the `vasey-license-pdf-v1` profile's own faces, and the
      accepted set must stay a subset of that renderer's own input rule, with a test;
-   - the statement the buyer saw must be bound to the one frozen: the client sends back the displayed statement version,
-     checked with `hash_equals` against the server's, or the offered statements join the preview commitment. Today the order
-     freezes the server's current statement, which is safe only while each type has one version;
-   - gate-on tests must cover `initiate`, `reconcile` and the paid-tax grant render with a v2 declaration, a gate flip between
-     preview and order and on replay, and a business order without a representative;
-   - `TaxCheckoutEvidence::order` should check that the body's declarations equal the request's, as V1 `OrderEvidence` does.
-6. V1 checkout wiring.
+   - [x] the statement the buyer saw must be bound to the one frozen (done in step 6: the client echoes the displayed
+     statement version, checked with `hash_equals`);
+   - [ ] gate-on tests must cover `initiate`, `reconcile` and the paid-tax grant render with a v2 declaration. (Step 6 added
+     the other tests this item listed: a gate flip between preview and order and on replay, and a business order without a
+     representative.)
+   - [x] `TaxCheckoutEvidence::order` checks that the body's declarations equal the request's (done in step 6).
+6. V1 checkout wiring behind its own gate, with the statement binding and evidence checks above (done). Before activation
+   (step 8):
+   - gate-on tests must cover `HostedCheckout::initiate` and `reconcile`, the V1 paid source and the paid grant render with a
+     v2 declaration;
+   - `HostedCheckout` and the V1 paid source open orders through the frozen `OrderEvidence` without re-verifying v2
+     declarations; decide whether they must, or whether the binder's own check (step 7) is enough;
+   - the V1 HTTP review endpoint already passes the `buyer` object through unchanged, but no route serves
+     `contractIdentityOffer()` yet; one must exist before the V1 mount admits buyers with the gate on.
 7. The binder requirement, inside contract increments 3 and 4.
 8. Activation, together with the profile, after steps 2, 3a and 3b merge and U-13 retention values are approved.
