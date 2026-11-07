@@ -83,6 +83,7 @@
     "tests/Feature/PersistentCatalogDraftImportTest.php",
     "tests/Feature/PrivateProductDraftSchemaTest.php",
     "tests/Feature/ProductionCheckoutExemptionAuthorityTest.php",
+    "tests/Feature/ProductionCheckoutMetadataAdmissionTest.php",
     "tests/Feature/ProductionFeatures/ProductionFeatureReleaseTest.php",
     "tests/Feature/ProductionFinancialRetrieval/FinancialReadPlanTest.php",
     "tests/Feature/ProductionIdentityAdapters/ProductionFeatureMetadataAdmissionTest.php",
