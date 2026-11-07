@@ -17,12 +17,14 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * The requester's own records, read inside the caller's locked transaction: account, orders (original or explicitly saved
- * purchases), license grants of those orders, consent ledger and order-linked inquiries. Every row is selected by the
+ * purchases), license grants of those orders, consent ledger, order-linked inquiries and production checkout records with
+ * their buyer declarations (`ProductionCheckoutExportSection`). Every row is selected by the
  * locked principal's account or owner key, never by an identifier from the request.
  */
 final class CustomerDataExportDocument
 {
-    public const SCHEMA = 1;
+    /** 2 adds the production checkout sections (D-30). */
+    public const SCHEMA = 2;
 
     public const MAX_ORDERS = 500;
 
@@ -47,7 +49,7 @@ final class CustomerDataExportDocument
             'licenseGrants' => $this->grants($orderIds),
             'consent' => $this->consent($account->id),
             'inquiries' => $this->inquiries($orderIds),
-        ];
+        ] + app(ProductionCheckoutExportSection::class)->build($account->id);
     }
 
     /** @return array<int, array> keyed by internal order id */

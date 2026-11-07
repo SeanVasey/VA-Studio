@@ -47,6 +47,9 @@ class CustomerDataRights
         'identity_challenges' => 'security_records_years', 'customer_data_requests' => 'security_records_years',
         'transactional_notices' => 'correspondence_records_years', 'transactional_mail_deliveries' => 'correspondence_records_years',
         'customer_data_exports' => 'security_records_years',
+        // D-30: production checkout records that carry buyer declarations (ProductionCheckoutExportSection::RECORDS).
+        'production_checkout_reviews' => 'financial_records_years', 'production_checkout_orders' => 'financial_records_years',
+        'production_tax_checkout_orders' => 'financial_records_years',
     ];
 
     /** @return array{requestId: string, downloadToken: string, expiresAt: string, sizeBytes: int} */
@@ -80,7 +83,8 @@ class CustomerDataRights
                 'token_hash' => hash('sha256', $token), 'size_bytes' => strlen($json), 'expires_at' => $expires, 'created_at' => $at,
             ]);
             $this->event($request, 'export_ready', null, ['size_bytes' => strlen($json), 'expires_at' => $expires->toIso8601ZuluString(),
-                'sections' => array_map('count', array_intersect_key($document, array_flip(['orders', 'licenseGrants', 'consent', 'inquiries'])))], $at);
+                'sections' => array_map('count', array_intersect_key($document, array_flip(['orders', 'licenseGrants', 'consent', 'inquiries',
+                'productionCheckoutReviews', 'productionCheckoutOrders', 'productionTaxCheckoutOrders'])))], $at);
             AuditEvent::recordAttributed('customer.data_export.ready', $request, ['request_id' => $requestId, 'size_bytes' => strlen($json)], $user->id);
 
             return ['requestId' => $requestId, 'downloadToken' => $token, 'expiresAt' => $expires->toIso8601ZuluString(), 'sizeBytes' => strlen($json)];
@@ -428,7 +432,7 @@ class CustomerDataRights
                 ->where('n.account_id', $account->id)->count(),
             'customer_data_exports' => DB::table('customer_data_exports as x')->join('customer_data_requests as r', 'r.id', '=', 'x.request_id')
                 ->where('r.customer_account_id', $account->id)->count(),
-        ];
+        ] + ProductionCheckoutExportSection::counts($account->id);
         $retained = [];
         foreach (self::RETAINED as $record => $class) {
             // Export rows stay as request evidence; their contents are purged before this record is written.

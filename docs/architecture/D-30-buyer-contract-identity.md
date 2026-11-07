@@ -105,8 +105,20 @@ linked to the order. No superseding contract version is issued.
   exposing only `legal_name`.
 - Retention: these fields follow the order and license financial-record period, and survive account closure, as the name
   does today.
-- The customer data export must include production checkout orders and their declarations, which it does not today.
+- The customer data export includes production checkout records and their declarations (export schema 2,
+  `ProductionCheckoutExportSection`):
+  - It covers V1 reviews and orders and V2 tax checkout orders.
+  - They are found through the account's production identity origin and read with plain, non-locking selects.
+  - Each record is opened with its hash checked, and its sealed buyer binding must name the same origin. Otherwise the export
+    refuses with `production_record_unavailable`.
+  - The three tables are on the deletion `RETAINED` list under `financial_records_years`.
+
   Deletion approval stays refused until U-13 retention values are approved.
+- **Gap: production customers cannot reach data rights yet.** The export and deletion routes resolve only a test-account
+  session (`CommerceRequestIdentity`, `_customer_access`). `DataRightsPolicy` is enabled only where test commerce is
+  admitted. A production-signed-in customer therefore gets `sign_in_required`. Both account kinds use the same
+  `customer_accounts` table, so the export document already covers their records. What is missing is an entry point that
+  admits a production principal. That entry point is step 3b, and it must land before collection starts.
 - `docs/legal/PRIVACY.md` and `TERMS.md` must disclose the new fields and the new assent text before collection starts.
 
 ## Sequence
@@ -115,10 +127,18 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
 
 1. This record.
 2. Legal draft updates, for Sean's approval.
-3. Data-rights export and retained-table coverage. Needs independent review and native MySQL evidence.
+3. Data rights.
+   - **3a:** export and retained-table coverage of production checkout records. Needs independent review and native MySQL
+     evidence.
+   - **3b:** a data-rights entry point for production-signed-in customers. It belongs with the production identity mount
+     (U-07).
+   - **Before activation (step 8):** the paid-grant copies of the declarations (`paid_*` and `paid_tax_*` origins and originals,
+     local and testing only today) must also be exported and retained.
+   - **Follow-up:** `production_checkout_exemption_bases`, which is the buyer's exemption attestation and not a declaration,
+     should be exported and retained too.
 4. A pure `ContractIdentityDeclarationV2` validator and formatter.
 5. V2 tax checkout wiring behind the gate. Needs independent review and a native MySQL journey. Before activation, the
    statement texts and the printable set must be rebound to the `vasey-license-pdf-v1` profile's own faces.
 6. V1 checkout wiring.
 7. The binder requirement, inside contract increments 3 and 4.
-8. Activation, together with the profile, after steps 2–3 merge and U-13 retention values are approved.
+8. Activation, together with the profile, after steps 2, 3a and 3b merge and U-13 retention values are approved.

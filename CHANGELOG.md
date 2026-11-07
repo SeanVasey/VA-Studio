@@ -10,6 +10,12 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Added
 
+- Customer data export covers production checkout records (D-30 step 3a). Export schema 2 adds the requester's V1 production checkout reviews and orders and V2 tax checkout orders, each with its frozen buyer declarations.
+  - **Reads:** records are found through the account's production identity origin with plain, non-locking reads, capped at 500 per table, counted first.
+  - **Checks:** each record is opened with its hash checked and must carry a sealed buyer binding for the same origin and account. Otherwise, or if a production table is missing, the export refuses with `503 production_record_unavailable`.
+  - **Deletion:** the three tables join the deletion record's retained list under `financial_records_years`.
+  - **Not yet reachable by production customers:** data rights still admits only test-account sessions (step 3b).
+  - See `docs/customer-data-rights.md` and `docs/architecture/D-30-buyer-contract-identity.md`.
 - License terms schema v5 (tier usage limits, gap G-1): ten separate usage slots (audio streams, monetized and non-monetized video streams, monetized music videos, free downloads, for-profit and not-for-profit performances, plus the unchanged audio releases, copies and radio stations) on top of the unchanged v4 declarations. New drafts author v5; **Define tier usage limits** maps a v4 version without inferring any new limit. Schemas 1 to 4 render byte-identically (v4 golden fixtures added). Migration `2026_11_07_270100_license_tier_usage_terms` replaces the license review-state guard so it also admits the `vasey-license-review-html-v5` renderer (needs independent review). See `docs/license-usage-v5.md`.
 - Transactional mail: a durable scan position for `vasey:transactional-mail-queue` (refused intents no longer starve newer ones; deferred finding FUB-1 F3) and `vasey:transactional-mail-wake-queued`, which re-requests the original job for `queued` deliveries after a lost broker push. Default-off; nothing is sent.
 - Member HTTP customer admission limits (N7): ten admissions per minute for each authenticated customer and read/write tier, shared across sessions and client addresses through the configured cache store. A short atomic cache lock, private refusal responses and identity reproof protect admission before domain work. The member HTTP mount remains literal-false; F9 headroom and deployment-specific shared-cache proof remain open. Evidence: `docs/verification/member-customer-limiter-n7-20261102/`.

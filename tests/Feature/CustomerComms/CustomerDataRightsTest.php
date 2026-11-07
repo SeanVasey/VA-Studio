@@ -130,7 +130,9 @@ class CustomerDataRightsTest extends TestCase
             ->assertOk()->assertHeader('Content-Disposition', 'attachment; filename="vasey-audio-data-export.json"')
             ->assertHeader('Cache-Control', 'no-store, private');
         $document = json_decode($response->getContent(), true, 64, JSON_THROW_ON_ERROR);
-        $this->assertSame(1, $document['exportSchema']);
+        $this->assertSame(2, $document['exportSchema']);
+        // A test account has no production identity origin, so the production checkout sections are present and empty.
+        $this->assertSame([[], [], []], [$document['productionCheckoutReviews'], $document['productionCheckoutOrders'], $document['productionTaxCheckoutOrders']]);
         $this->assertSame(['id' => $alice['account']->public_id, 'name' => 'Synthetic Alice', 'email' => 'alice.export@example.test'],
             array_intersect_key($document['account'], array_flip(['id', 'name', 'email'])));
         $this->assertSame([$aliceOrder['order']->public_id], array_column($document['orders'], 'id'));
@@ -350,6 +352,10 @@ class CustomerDataRightsTest extends TestCase
         $this->assertEquals(['retention' => 'financial_records_years', 'reason' => 'immutable_record_retained', 'count' => 1],
             array_diff_key($retained['orders'], ['record' => true]));
         $this->assertSame(1, $retained['customer_consent_events']['count']);
+        foreach (['production_checkout_reviews', 'production_checkout_orders', 'production_tax_checkout_orders'] as $record) {
+            $this->assertEquals(['retention' => 'financial_records_years', 'reason' => 'immutable_record_retained', 'count' => 0],
+                array_diff_key($retained[$record], ['record' => true]), $record);
+        }
         $this->assertSame($staff->id, $event->actor_user_id);
         $this->assertSame(1, AuditEvent::where('action', 'customer.data_deletion.completed')->where('actor_id', $staff->id)->count());
         $this->assertStringNotContainsString('erasable@example.test', AuditEvent::where('action', 'like', 'customer.data_%')->get()->toJson());
