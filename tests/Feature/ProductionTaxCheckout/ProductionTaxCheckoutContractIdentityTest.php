@@ -24,6 +24,7 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
     {
         parent::setUp();
         config(['app.key' => 'base64:'.base64_encode(str_repeat('h', 32))]);
+        $this->identitySetup();
     }
 
     private function checkout(): array
