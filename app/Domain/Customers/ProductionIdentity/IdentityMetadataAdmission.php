@@ -47,6 +47,35 @@ final class IdentityMetadataAdmission
         }
     }
 
+    /** Plain metadata only; callers retain their own original PDO/frame ownership proofs. */
+    public static function resolvedConnectionMetadata(): Connection
+    {
+        $metadata = self::inspect(null, false);
+
+        return $metadata['connections'][$metadata['default']];
+    }
+
+    /** Checkout policy may be read before any database connection has been initialized. */
+    public static function checkoutConfiguration(): array
+    {
+        [$app, $instances, $repository] = self::applicationMetadata();
+        $items = self::array($repository, Repository::class, 'items');
+        $policy = $items['production_checkout'] ?? null;
+        if (! is_array($policy)) {
+            throw new IdentityException;
+        }
+        $remaining = 4096;
+
+        return [self::plain($policy, $remaining), self::environment($app, $instances)];
+    }
+
+    public static function applicationEnvironment(): string
+    {
+        [$app, $instances] = self::applicationMetadata();
+
+        return self::environment($app, $instances);
+    }
+
     /** Avoid Eloquent ID getters/casts even after canonical metadata has been admitted. */
     public static function actorId(User $actor): int
     {
@@ -78,7 +107,7 @@ final class IdentityMetadataAdmission
         return (int) $id;
     }
 
-    private static function inspect(?PDO $ownedPrimary): array
+    private static function applicationMetadata(): array
     {
         $app = Container::getInstance();
         if ($app::class !== Application::class) {
@@ -86,10 +115,7 @@ final class IdentityMetadataAdmission
         }
         $instances = self::array($app, Container::class, 'instances');
         $repository = $instances['config'] ?? null;
-        $manager = $instances['db'] ?? null;
-        if (! $repository instanceof Repository || $repository::class !== Repository::class
-            || ! $manager instanceof DatabaseManager || $manager::class !== DatabaseManager::class
-            || self::raw($manager, DatabaseManager::class, 'app') !== $app) {
+        if (! $repository instanceof Repository || $repository::class !== Repository::class) {
             throw new IdentityException;
         }
         foreach (['globalBeforeResolvingCallbacks', 'globalResolvingCallbacks', 'globalAfterResolvingCallbacks'] as $property) {
@@ -108,8 +134,20 @@ final class IdentityMetadataAdmission
         self::resolverMetadata($app);
         $resolved = (new ReflectionProperty(Facade::class, 'resolvedInstance'))->getValue();
         if ((new ReflectionProperty(Facade::class, 'app'))->getValue() !== $app || ! is_array($resolved)
-            || (array_key_exists('db', $resolved) && $resolved['db'] !== $manager)
+            || (array_key_exists('db', $resolved) && $resolved['db'] !== ($instances['db'] ?? null))
             || (array_key_exists('config', $resolved) && $resolved['config'] !== $repository)) {
+            throw new IdentityException;
+        }
+
+        return [$app, $instances, $repository];
+    }
+
+    private static function inspect(?PDO $ownedPrimary, bool $requireOwnership = true): array
+    {
+        [$app, $instances, $repository] = self::applicationMetadata();
+        $manager = $instances['db'] ?? null;
+        if (! $manager instanceof DatabaseManager || $manager::class !== DatabaseManager::class
+            || self::raw($manager, DatabaseManager::class, 'app') !== $app) {
             throw new IdentityException;
         }
         $items = self::array($repository, Repository::class, 'items');
@@ -150,7 +188,8 @@ final class IdentityMetadataAdmission
             if ($primary->getAttribute(PDO::ATTR_STATEMENT_CLASS) !== [PDOStatement::class]
                 || $primary->getAttribute(PDO::ATTR_DRIVER_NAME) !== $config['driver']
                 || $primary->getAttribute(PDO::ATTR_ERRMODE) !== PDO::ERRMODE_EXCEPTION
-                || (($level !== 0 || $primary->inTransaction()) && ($name !== $default || $primary !== $ownedPrimary))) {
+                || ($requireOwnership && ($level !== 0 || $primary->inTransaction())
+                    && ($name !== $default || $primary !== $ownedPrimary))) {
                 throw new IdentityException;
             }
             $primaries[$name] = [$primary, $config['driver'], $name, $database, $prefix];
