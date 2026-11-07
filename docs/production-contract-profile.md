@@ -88,11 +88,11 @@ The six templates use 22 placeholders, and each one needs exactly one source. Tw
 | `DISTRIBUTE_COPIES` (5) | license | usage `copies_downloads` |
 | `NUMBER_OF_RADIO_STATIONS` (5) | license | usage `radio_stations` |
 | `MONETIZED_MUSIC_VIDEOS` (5), `_WORD` (5) | license | usage `music_videos` |
-| `AUDIO_STREAMS` (5) | license | usage `monetized_streams` |
-| `NON_MONETIZED_VIDEO_STREAMS_ALLOWED` (5) | license | usage `non_monetized_streams` |
-| `MONETIZED_VIDEO_STREAMS_ALLOWED` (5) | license | **gap: G-1** |
-| `FREE_DOWNLOADS` (5) | license | **gap: G-1** |
-| `PERFORMANCES_FOR_PROFIT` (5), `PERFORMANCES_NOT_FOR_PROFIT` (5) | license | **gap: G-1** (one `live_performances` slot for two terms) |
+| `AUDIO_STREAMS` (5) | license | v5 usage `audio_streams` |
+| `NON_MONETIZED_VIDEO_STREAMS_ALLOWED` (5) | license | v5 usage `non_monetized_video_streams` |
+| `MONETIZED_VIDEO_STREAMS_ALLOWED` (5) | license | v5 usage `monetized_video_streams` (G-1) |
+| `FREE_DOWNLOADS` (5) | license | v5 usage `free_downloads` (G-1) |
+| `PERFORMANCES_FOR_PROFIT` (5), `PERFORMANCES_NOT_FOR_PROFIT` (5) | license | v5 usage `for_profit_performances`, `not_for_profit_performances` (G-1) |
 
 ### G-1: the usage schema cannot express Sean's tiers
 
@@ -112,7 +112,7 @@ There are two ways to bridge this:
   schedule, the storefront disclosure and the contract identically. It extends the reviewed licensing model, so it needs its
   own increment and independent review before increment 1 can author the six licenses.
 
-**Decided 2026-11-07 by Sean: schema v5**, delivered as its own reviewed increment before increment 1.
+**Decided 2026-11-07 by Sean: schema v5**, delivered as its own reviewed increment before increment 1. Implemented in [license terms schema v5](license-usage-v5.md).
 
 ### D-1: `CUSTOMER_ALIAS` in the Exclusive template
 
