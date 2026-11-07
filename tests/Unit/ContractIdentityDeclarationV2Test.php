@@ -140,6 +140,64 @@ class ContractIdentityDeclarationV2Test extends TestCase
         $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(), false, $same, self::coverage()));
     }
 
+    public function test_every_offered_statement_is_validated_not_only_the_selected_one(): void
+    {
+        foreach ([
+            'malformed business entry' => [...self::STATEMENTS, 'business' => ['x' => 1]],
+            'business entry not an array' => [...self::STATEMENTS, 'business' => 'junk'],
+            'business hash is an array' => [...self::STATEMENTS, 'business' => ['statement_version' => 'business-v1', 'statement_hash' => ['a']]],
+            'business version names the other type' => [...self::STATEMENTS, 'business' => ['statement_version' => 'individual-other-v1', 'statement_hash' => self::BUSINESS_STATEMENT['statement_hash']]],
+            'bare type prefix' => ['individual' => ['statement_version' => 'individual-', 'statement_hash' => self::STATEMENT['statement_hash']]],
+        ] as $name => $statements) {
+            try {
+                ContractIdentityDeclarationV2::fromInput(self::input(), false, $statements, self::coverage());
+                $this->fail($name);
+            } catch (CheckoutException $e) {
+                $this->assertSame('invalid', $e->reason, $name);
+            }
+        }
+        $declaration = ContractIdentityDeclarationV2::fromInput(self::input(), false, self::STATEMENTS, self::coverage());
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::verify([...$declaration,
+            'legal_name_confirmation' => ['confirmed' => true, 'statement_version' => 'individual-', 'statement_hash' => self::STATEMENT['statement_hash']]], false, self::coverage()));
+    }
+
+    public function test_the_pinned_contract_faces_load_from_the_verified_profile_without_a_booted_application(): void
+    {
+        $faces = ContractGlyphCoverage::pinnedContractFaces();
+        $this->assertSame($faces, ContractGlyphCoverage::pinnedContractFaces());
+        $this->assertTrue($faces->covers('Zoë Émile'));
+        $this->assertTrue($faces->covers('Ελένη Παπαδοπούλου'));
+        $this->assertTrue($faces->covers('Анна Иванова'));
+        $this->assertFalse($faces->covers('王'));
+    }
+
+    public function test_the_pinned_faces_accept_nothing_the_paid_renderers_script_rule_refuses(): void
+    {
+        $faces = ContractGlyphCoverage::pinnedContractFaces();
+        // DejaVu draws Armenian and Georgian, but the test-buyer-pdf-v2 profile allows only Latin, Greek, Cyrillic and
+        // Common, so the paid-tax renderer would refuse these after payment; checkout must refuse them first.
+        $this->assertTrue(self::coverage()->covers('Արամ Պետրոսյան'));
+        $this->assertFalse($faces->covers('Արամ Պետրոսյան'));
+        $this->assertTrue(self::coverage()->covers('ნინო ბერიძე'));
+        $this->assertFalse($faces->covers('ნინო ბერიძე'));
+        $this->assertSame(0, preg_match('/[^\p{Latin}\p{Greek}\p{Cyrillic}\p{Common}]/u', implode('', array_map(
+            fn (int $codepoint): string => mb_chr($codepoint, 'UTF-8'),
+            array_filter(range(0, 0xFFFF), fn (int $codepoint): bool => ($codepoint < 0xD800 || $codepoint > 0xDFFF)
+                && $faces->covers(mb_chr($codepoint, 'UTF-8')))))));
+    }
+
+    public function test_a_script_restriction_refuses_empty_or_malformed_script_names(): void
+    {
+        foreach ([[], ['latin'], ['Latin}\\p{Han'], [1]] as $scripts) {
+            try {
+                self::coverage()->restrictedToScripts($scripts);
+                $this->fail(json_encode($scripts));
+            } catch (InvalidArgumentException) {
+                $this->addToAssertionCount(1);
+            }
+        }
+    }
+
     public function test_artist_name_is_required_if_and_only_if_the_order_is_exclusive(): void
     {
         $exclusive = ContractIdentityDeclarationV2::fromInput(self::input(['artistName' => ' DJ Example ']), true, self::STATEMENTS, self::coverage());

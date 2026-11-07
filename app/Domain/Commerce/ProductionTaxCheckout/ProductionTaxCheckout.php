@@ -2,6 +2,9 @@
 
 namespace App\Domain\Commerce\ProductionTaxCheckout;
 
+use App\Domain\Commerce\ContractIdentity\ContractGlyphCoverage;
+use App\Domain\Commerce\ContractIdentity\ContractIdentityDeclarationV2;
+use App\Domain\Commerce\ContractIdentity\ContractIdentityStatements;
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionCheckout\CommandTransaction;
 use App\Domain\Commerce\ProductionCheckout\CurrentSelection;
@@ -58,11 +61,11 @@ final class ProductionTaxCheckout
         TaxCheckoutPolicy::requireEnabled();
         $fresh = FreshTaxCheckoutPolicy::capture();
         CheckoutException::require($accepted === true && Evidence::hash($previewHash), 'invalid', 422);
-        Evidence::keys($buyerDeclarations, ['legalName']);
-        CheckoutException::require(is_string($buyerDeclarations['legalName']) && strlen($buyerDeclarations['legalName']) <= 255
-            && trim($buyerDeclarations['legalName']) !== '' && mb_check_encoding($buyerDeclarations['legalName'], 'UTF-8')
-            && ! preg_match('/[\x00-\x1f\x7f]/u', $buyerDeclarations['legalName']), 'invalid', 422);
-        $declarations = ['legal_name' => trim($buyerDeclarations['legalName']), 'identity_meaning' => 'buyer_declared_legal_name'];
+        $declarations = TaxCheckoutPolicy::contractIdentityV2()
+            // D-30: the licensee identity a production contract binds. This checkout sells non-exclusive licenses only.
+            ? ContractIdentityDeclarationV2::fromInput($buyerDeclarations, false, ContractIdentityStatements::current(),
+                ContractGlyphCoverage::pinnedContractFaces())
+            : self::legacyDeclarations($buyerDeclarations);
         $items = PreparationSelection::items($items);
         $digest = Evidence::key($key);
 
@@ -347,9 +350,25 @@ final class ProductionTaxCheckout
         });
     }
 
+    /** The original name-only declaration, unchanged while contract identity capture is off. */
+    private static function legacyDeclarations(array $buyerDeclarations): array
+    {
+        Evidence::keys($buyerDeclarations, ['legalName']);
+        CheckoutException::require(is_string($buyerDeclarations['legalName']) && strlen($buyerDeclarations['legalName']) <= 255
+            && trim($buyerDeclarations['legalName']) !== '' && mb_check_encoding($buyerDeclarations['legalName'], 'UTF-8')
+            && ! preg_match('/[\x00-\x1f\x7f]/u', $buyerDeclarations['legalName']), 'invalid', 422);
+
+        return ['legal_name' => trim($buyerDeclarations['legalName']), 'identity_meaning' => 'buyer_declared_legal_name'];
+    }
+
     private static function termsProjection(array $commitment, array $selection): array
     {
-        return ['candidateId' => $commitment['candidate']['candidate_id'], 'seller' => $commitment['seller'], 'assent' => $commitment['assent'],
+        $contractIdentity = TaxCheckoutPolicy::contractIdentityV2()
+            ? ['contractIdentity' => ['licenseeTypes' => ContractIdentityDeclarationV2::LICENSEE_TYPES,
+                'statements' => ContractIdentityStatements::offered()]]
+            : [];
+
+        return $contractIdentity + ['candidateId' => $commitment['candidate']['candidate_id'], 'seller' => $commitment['seller'], 'assent' => $commitment['assent'],
             'amounts' => $commitment['amounts'], 'fundsMode' => $commitment['execution_context']['funds_mode'],
             'taxBehavior' => $commitment['execution_context']['tax']['behavior'],
             'licenses' => array_map(fn (array $line): array => ['position' => $line['position'], 'trackId' => $line['track_id'],
