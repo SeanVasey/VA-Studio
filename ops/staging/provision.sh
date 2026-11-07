@@ -189,7 +189,8 @@ swap_kib=$(awk '/^SwapTotal:/{print $2}' /proc/meminfo)
 
 # ---------------------------------------------------------------- 1. packages
 if [ "$SKIP_PACKAGES" = 0 ]; then
-  apt-cache policy "php$PHPV-fpm" | grep -q 'Candidate: [0-9]' \
+  # Not `grep -q`: it exits at the first match, apt-cache then dies of SIGPIPE and pipefail fails the check.
+  apt-cache policy "php$PHPV-fpm" | grep 'Candidate: [0-9]' >/dev/null \
     || die "php$PHPV packages unavailable: create the Forge server with PHP 8.4 (it adds the ondrej/php repository)"
   apt-get update -q
   apt-get install -y -q --no-install-recommends \
@@ -227,10 +228,10 @@ command -v python3 >/dev/null || die "python3 missing (restore schema comparison
 
 # Extensions vasey:doctor requires (php_runtime) plus what CI installs (final-verification.yml) and the workers need.
 for ext in pdo pdo_mysql pdo_sqlite mbstring intl bcmath gd fileinfo zip curl dom xml xmlwriter posix pcntl ctype iconv tokenizer openssl; do
-  "$PHP_BIN" -m | grep -qix "$ext" || die "PHP CLI extension missing: $ext"
+  "$PHP_BIN" -m | grep -ix "$ext" >/dev/null || die "PHP CLI extension missing: $ext"
 done
 for ext in pdo_mysql pdo_sqlite mbstring intl bcmath gd fileinfo zip curl dom xml posix ctype iconv; do
-  "$FPM_BIN" -m 2>/dev/null | grep -qix "$ext" || die "PHP-FPM extension missing: $ext"
+  "$FPM_BIN" -m 2>/dev/null | grep -ix "$ext" >/dev/null || die "PHP-FPM extension missing: $ext"
 done
 info "PHP $("$PHP_BIN" -r 'echo PHP_VERSION;') with required extensions; node $nv"
 
@@ -419,7 +420,7 @@ if [ "$(mysql_q 'SELECT @@log_bin')" = 1 ]; then
   mysql_q "SET PERSIST log_bin_trust_function_creators = ON" 2>/dev/null
   [ "$(mysql_q 'SELECT @@global.log_bin_trust_function_creators')" = 1 ] || die "could not set log_bin_trust_function_creators"
 fi
-mysql_q "SELECT @@bind_address" | grep -Eq '^(127\.0\.0\.1|localhost|::1)$' \
+mysql_q "SELECT @@bind_address" | grep -E '^(127\.0\.0\.1|localhost|::1)$' >/dev/null \
   || warn "MySQL bind_address is $(mysql_q 'SELECT @@bind_address'); keep port 3306 closed in the Forge firewall"
 info "MySQL $myver: schema $DB_NAME, accounts vasey_app and vasey_backup (127.0.0.1 only)"
 
