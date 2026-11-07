@@ -45,7 +45,7 @@ class ProductionCheckoutDataExportTest extends TestCase
         $this->assertSame([], $sections['productionCheckoutOrders']);
         $this->assertCount(1, $sections['productionTaxCheckoutOrders']);
         $order = $sections['productionTaxCheckoutOrders'][0];
-        $this->assertSame($fixture['order']['orderId'] ?? DB::table('production_tax_checkout_orders')->value('public_id'), $order['id']);
+        $this->assertSame($fixture['order']['orderId'], $order['id']);
         $this->assertEquals(['legal_name' => 'Declared synthetic buyer', 'identity_meaning' => 'buyer_declared_legal_name'], $order['buyerDeclarations']);
         $this->assertSame('USD', $order['currency']);
         $this->assertSame((int) DB::table('production_tax_checkout_orders')->value('subtotal_minor'), $order['subtotalMinor']);
@@ -84,8 +84,9 @@ class ProductionCheckoutDataExportTest extends TestCase
         $row = (array) DB::table('production_tax_checkout_orders')->first();
         $body = Evidence::open($row, 'production_tax_checkout_order');
 
-        // A sealed row filed under this buyer's origin whose own binding names someone else, then one whose seal is broken.
-        // The immutability triggers are dropped only inside this test's database, to plant rows the application never writes.
+        // Sealed rows filed under this buyer's origin whose own binding names another origin or another account, then one whose
+        // seal is broken. The immutability triggers are dropped only inside this test's database, to plant rows the application
+        // never writes.
         $triggers = DB::getDriverName() === 'mysql'
             ? array_column(DB::select("SHOW TRIGGERS WHERE `Table` = 'production_tax_checkout_orders'"), 'Trigger')
             : array_column(DB::select("SELECT name FROM sqlite_master WHERE type = 'trigger' AND tbl_name = 'production_tax_checkout_orders'"), 'name');
@@ -100,19 +101,77 @@ class ProductionCheckoutDataExportTest extends TestCase
         $this->refusesExport(self::account($fixture['buyer']));
 
         DB::table('production_tax_checkout_orders')->where('id', $row['id'] + 1)->delete();
+        $otherAccount = [...$body, 'public_id' => '00000000-0000-4000-8000-000000000002', 'buyer' => [...$body['buyer'], 'account_id' => $body['buyer']['account_id'] + 1]];
+        DB::table('production_tax_checkout_orders')->insert([...$row, 'id' => $row['id'] + 2, 'public_id' => $otherAccount['public_id'],
+            'request_key' => str_repeat('c', 64), ...Evidence::seal($otherAccount)]);
+        $this->refusesExport(self::account($fixture['buyer']));
+
+        DB::table('production_tax_checkout_orders')->where('id', $row['id'] + 2)->delete();
         DB::table('production_tax_checkout_orders')->where('id', $row['id'])->update(['payload_hash' => str_repeat('0', 64)]);
         $this->refusesExport(self::account($fixture['buyer']));
     }
 
-    private function refusesExport(int $account): void
+    private function refusesExport(int $account, int $status = 503, string $reason = 'production_record_unavailable'): void
     {
         try {
             app(ProductionCheckoutExportSection::class)->build($account);
             $this->fail('Expected the export to refuse');
         } catch (DataRightsException $e) {
-            $this->assertSame(503, $e->status);
-            $this->assertSame('production_record_unavailable', $e->reason);
+            $this->assertSame([$status, $reason], [$e->status, $e->reason]);
         }
+    }
+
+    public function test_more_records_than_the_cap_refuse_before_any_payload_is_opened(): void
+    {
+        $fixture = $this->taxOrder();
+        $row = (array) DB::table('production_tax_checkout_orders')->first();
+        foreach (DB::getDriverName() === 'mysql'
+            ? array_column(DB::select("SHOW TRIGGERS WHERE `Table` = 'production_tax_checkout_orders'"), 'Trigger')
+            : array_column(DB::select("SELECT name FROM sqlite_master WHERE type = 'trigger' AND tbl_name = 'production_tax_checkout_orders'"), 'name') as $trigger) {
+            DB::statement('DROP TRIGGER '.$trigger);
+        }
+        // Padding rows carry unreadable payloads: the cap must refuse on the count alone, before any of them is opened.
+        $padding = [];
+        for ($i = 1; $i <= ProductionCheckoutExportSection::MAX_RECORDS; $i++) {
+            $padding[] = [...$row, 'id' => $row['id'] + $i, 'public_id' => sprintf('00000000-0000-4000-8000-%012d', $i),
+                'request_key' => hash('sha256', 'pad'.$i), 'payload_ciphertext' => 'x', 'payload_hash' => str_repeat('0', 64)];
+        }
+        foreach (array_chunk($padding, 100) as $chunk) {
+            DB::table('production_tax_checkout_orders')->insert($chunk);
+        }
+        $this->refusesExport(self::account($fixture['buyer']), 413, 'export_too_large');
+    }
+
+    public function test_a_missing_production_table_refuses_instead_of_reporting_no_records(): void
+    {
+        $fixture = $this->taxOrder();
+        DB::getSchemaBuilder()->drop('production_tax_checkout_bindings');
+        DB::getSchemaBuilder()->drop('production_tax_checkout_reviewed_sessions');
+        DB::getSchemaBuilder()->drop('production_tax_checkout_requests');
+        DB::getSchemaBuilder()->drop('production_tax_checkout_orders');
+        $this->refusesExport(self::account($fixture['buyer']));
+        try {
+            ProductionCheckoutExportSection::counts(self::account($fixture['buyer']));
+            $this->fail('Expected the counts to refuse');
+        } catch (DataRightsException $e) {
+            $this->assertSame([503, 'production_record_unavailable'], [$e->status, $e->reason]);
+        }
+    }
+
+    public function test_the_export_document_carries_the_production_sections(): void
+    {
+        $fixture = $this->taxOrder();
+        $user = $fixture['buyer']['user']->fresh();
+        $account = \App\Domain\Customers\Models\CustomerAccount::findOrFail(self::account($fixture['buyer']));
+        // The data-rights entry point still admits only test-account sessions (D-30 step 3b), so the document is built directly.
+        config(['customer.test_accounts_enabled' => true]);
+        $principal = app(\App\Domain\Customers\CustomerAccess::class)->principal($user);
+        $document = app(\App\Domain\Customers\DataRights\CustomerDataExportDocument::class)
+            ->build($principal, $user, $account, '00000000-0000-4000-8000-0000000000aa', \Carbon\CarbonImmutable::now('UTC'));
+
+        $this->assertSame(2, $document['exportSchema']);
+        $this->assertSame([$fixture['order']['orderId']], array_column($document['productionTaxCheckoutOrders'], 'id'));
+        $this->assertSame([[], []], [$document['productionCheckoutReviews'], $document['productionCheckoutOrders']]);
     }
 
     public function test_deletion_keeps_every_production_checkout_record_that_holds_buyer_data(): void
