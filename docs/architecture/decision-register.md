@@ -267,3 +267,12 @@ Sean's words on 2026-10-24: "The merchant is Vasey Multimedia dba VASEY.AUDIO an
   - TERMS section 7 and the individual statement ("I confirm that this is my full legal name and that the license should be
     issued to me under it.") are approved.
   - D-30 records the shape.
+- **PRIVACY and TERMS approved** (Sean, 2026-11-07: "I approve privacy and terms").
+  - Approved as written, including every earlier proposal: the section 7 retention periods, the 120-minute session lifetime,
+    the refund policy, the 30-minute exclusive reservation, 12-month re-download availability and the buyer assent text.
+  - **U-13 retention periods are therefore approved** as PRIVACY section 7 states them. The configuration values derived
+    from them (`customer-data-rights.retention`: financial 7 years, consent 3 years, correspondence 2 years, security 1 year)
+    are this record's reading of that table and are set per host, never in Git. U-13's processors, consent notice texts and
+    the reviewed deletion workflow stay open.
+  - Still to fill before publication: postal address, hosting provider and region, storage, backup and email providers,
+    minimum age, Iowa venue county and the DMCA agent decision. The [For legal review] wording awaits counsel.
