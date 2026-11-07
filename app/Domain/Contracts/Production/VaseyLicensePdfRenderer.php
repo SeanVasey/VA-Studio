@@ -55,11 +55,12 @@ final class VaseyLicensePdfRenderer
         // The recorded profile identity binds the signature pin, so a different signature is a different profile.
         $effectiveHash = CanonicalJson::hash(['profile_sha256' => $profileHash, 'signature_sha256' => $signature->sha256]);
         $identity = hash('sha256', $document->inputHash.':'.$effectiveHash);
-        $fonts = VaseyLicenseProfile::assetPath('fonts/generated', $this->projectRoot);
+        $fonts = sys_get_temp_dir().'/vasey-license-fonts-'.bin2hex(random_bytes(16));
 
         $timezone = date_default_timezone_get();
         date_default_timezone_set('UTC');
         try {
+            $this->verifiedFonts($profile, $fonts);
             $pdf = new Tcpdf(unit: 'mm', isunicode: true, subsetfont: $profile['font_subset'], compress: $profile['compression'], mode: '', fileOptions: [
                 'allowedHosts' => [], 'allowedPaths' => [$fonts], 'markupAllowedPaths' => [],
             ]);
@@ -122,6 +123,31 @@ final class VaseyLicensePdfRenderer
             throw new ContractIssuanceException('render_failed');
         } finally {
             date_default_timezone_set($timezone);
+            if (is_dir($fonts) && ! is_link($fonts)) {
+                foreach (glob($fonts.'/*') ?: [] as $file) {
+                    @unlink($file);
+                }
+                @rmdir($fonts);
+            }
+        }
+    }
+
+    /**
+     * tc-lib reads font files itself, so it is given a private copy written from the bytes that were hashed against
+     * the manifest, never the asset directory, which could change between verification and use.
+     */
+    private function verifiedFonts(array $profile, string $directory): void
+    {
+        if (! mkdir($directory, 0700)) {
+            throw new ContractIssuanceException('render_failed');
+        }
+        foreach (array_keys($profile['assets']['assets']) as $asset) {
+            if (str_starts_with($asset, 'fonts/generated/')) {
+                $bytes = VaseyLicenseProfile::assetBytes($profile, $asset, $this->projectRoot);
+                if (file_put_contents($directory.'/'.basename($asset), $bytes, LOCK_EX) !== strlen($bytes)) {
+                    throw new ContractIssuanceException('render_failed');
+                }
+            }
         }
     }
 

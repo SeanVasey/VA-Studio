@@ -19,12 +19,29 @@ final class ContractTemplateCensus
     /**
      * Symbols and units each formatted placeholder already prints, and the template context that would double them.
      * `before`/`after` patterns are matched against the literal text directly around the placeholder.
+     *
+     * The price placeholders already carry their currency: `$1,500.00` and `… dollars and fifty cents`. Any currency
+     * symbol (`\p{Sc}`: `$`, `€`, `£` …), currency code or currency word written before either refuses, as does a dollar
+     * or cent word after either. A currency code after the figure (`{PRODUCT_PRICE} USD`) is accepted: it names the
+     * currency of the `$` figure instead of repeating a symbol or unit, and is a common unambiguous form.
+     * The publishing share already ends in `%`, so `%`, `percent`, `per cent`, `per-cent` or `pct` after it refuses.
      */
-    public const FORMATTED = [
-        'PRODUCT_PRICE' => ['before' => ['$' => '/\$\s*\z/u']],
-        'PRODUCT_PRICE_WORD' => ['after' => ['dollars' => '/\A\s*(?:US\s+)?(?:dollars?|cents?)\b/iu']],
-        'PUBLISHING_RIGHTS' => ['after' => ['%' => '/\A\s*(?:%|percent\b|per\s+cent\b)/iu']],
+    private const CURRENCY_BEFORE = [
+        'currency_symbol' => '/\p{Sc}\s*\z/u',
+        'currency_code' => '/\b(?:USD|US|EUR|GBP|CAD|AUD)\s*\z/u',
+        'currency_word' => '/\b(?:dollars?|cents?)\s*\z/iu',
     ];
+
+    private const CURRENCY_WORD_AFTER = ['currency_word' => '/\A\s*(?:US\s+)?(?:dollars?|cents?)\b/iu'];
+
+    public const FORMATTED = [
+        'PRODUCT_PRICE' => ['before' => self::CURRENCY_BEFORE, 'after' => self::CURRENCY_WORD_AFTER],
+        'PRODUCT_PRICE_WORD' => ['before' => self::CURRENCY_BEFORE, 'after' => self::CURRENCY_WORD_AFTER],
+        'PUBLISHING_RIGHTS' => ['after' => ['percent' => '/\A\s*(?:%|percent\b|per[\s-]*cent\b|pct\b)/iu']],
+    ];
+
+    /** A placeholder name the census may print. Anything else inside braces is reported only as a redacted line. */
+    public const NAME = '/\A[A-Z0-9_]{1,64}\z/';
 
     /** Symbols a bound value may begin or end with that the template must not repeat at that boundary. */
     private const BOUNDARY_SYMBOLS = ['$', '%'];
@@ -32,14 +49,20 @@ final class ContractTemplateCensus
     /**
      * The placeholders and stray braces in one template, using the binder's own tokenization.
      *
-     * @return array{placeholders: array<string, int>, malformed_lines: list<int>}
+     * Brace contents that are not a placeholder-shaped name are never returned, only their line: they may be
+     * template wording, which the census must not print.
+     *
+     * @return array{placeholders: array<string, int>, redacted_lines: list<int>, malformed_lines: list<int>}
      */
     public static function scan(string $template): array
     {
         $placeholders = [];
+        $redacted = [];
         $malformed = [];
         foreach (self::segments($template) as $segment) {
-            if ($segment['placeholder'] !== null) {
+            if ($segment['placeholder'] !== null && preg_match(self::NAME, $segment['placeholder']) !== 1) {
+                $redacted[] = $segment['line'];
+            } elseif ($segment['placeholder'] !== null) {
                 $placeholders[$segment['placeholder']] = ($placeholders[$segment['placeholder']] ?? 0) + 1;
             } elseif (($brace = strcspn($segment['text'], '{}')) < strlen($segment['text'])) {
                 $malformed[] = $segment['line'] + substr_count(substr($segment['text'], 0, $brace), "\n");
@@ -47,7 +70,8 @@ final class ContractTemplateCensus
         }
         ksort($placeholders, SORT_STRING);
 
-        return ['placeholders' => $placeholders, 'malformed_lines' => array_values(array_unique($malformed))];
+        return ['placeholders' => $placeholders, 'redacted_lines' => array_values(array_unique($redacted)),
+            'malformed_lines' => array_values(array_unique($malformed))];
     }
 
     /**
@@ -112,7 +136,7 @@ final class ContractTemplateCensus
      * Census of a template set against the binder's closed placeholder set.
      *
      * @param  array<string, string>  $templates  label => template text
-     * @return array{files: array<string, array{placeholders: array<string, int>, unknown: list<string>, doubled: list<array{placeholder: string, symbol: string, line: int}>, malformed_lines: list<int>}>, used: array<string, int>, unknown: list<string>, unused: list<string>, ok: bool}
+     * @return array{files: array<string, array{empty: bool, placeholders: array<string, int>, unknown: list<string>, redacted_lines: list<int>, doubled: list<array{placeholder: string, symbol: string, line: int}>, malformed_lines: list<int>}>, used: array<string, int>, unknown: list<string>, unused: list<string>, ok: bool}
      */
     public static function census(array $templates): array
     {
@@ -120,8 +144,11 @@ final class ContractTemplateCensus
         $used = [];
         $ok = $templates !== [];
         foreach ($templates as $label => $template) {
-            if (! is_string($template) || ! mb_check_encoding($template, 'UTF-8')) {
-                $files[(string) $label] = ['placeholders' => [], 'unknown' => [], 'doubled' => [], 'malformed_lines' => [0]];
+            // An empty or whitespace-only template is a finding, never a clean file.
+            $empty = ! is_string($template) || trim($template) === '';
+            if ($empty || ! mb_check_encoding($template, 'UTF-8')) {
+                $files[(string) $label] = ['empty' => $empty, 'placeholders' => [], 'unknown' => [], 'redacted_lines' => [], 'doubled' => [],
+                    'malformed_lines' => $empty ? [] : [0]];
                 $ok = false;
 
                 continue;
@@ -129,12 +156,12 @@ final class ContractTemplateCensus
             $scan = self::scan($template);
             $unknown = array_values(array_diff(array_keys($scan['placeholders']), ContractVariableBinder::PLACEHOLDERS));
             $doubled = self::doubledSymbols($template);
-            $files[(string) $label] = ['placeholders' => $scan['placeholders'], 'unknown' => $unknown, 'doubled' => $doubled,
-                'malformed_lines' => $scan['malformed_lines']];
+            $files[(string) $label] = ['empty' => false, 'placeholders' => $scan['placeholders'], 'unknown' => $unknown,
+                'redacted_lines' => $scan['redacted_lines'], 'doubled' => $doubled, 'malformed_lines' => $scan['malformed_lines']];
             foreach ($scan['placeholders'] as $name => $count) {
                 $used[$name] = ($used[$name] ?? 0) + $count;
             }
-            $ok = $ok && $unknown === [] && $doubled === [] && $scan['malformed_lines'] === [];
+            $ok = $ok && $unknown === [] && $doubled === [] && $scan['redacted_lines'] === [] && $scan['malformed_lines'] === [];
         }
         ksort($files, SORT_STRING);
         ksort($used, SORT_STRING);

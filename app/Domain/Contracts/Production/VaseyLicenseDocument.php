@@ -77,12 +77,13 @@ final readonly class VaseyLicenseDocument
         foreach ([...ContractTemplateCensus::doubledSymbols($template), ...ContractTemplateCensus::doubledAtBoundaries($template, $values)] as $doubled) {
             throw new ContractBindingException('doubled_symbol', $doubled['placeholder']);
         }
-        $body = ContractVariableBinder::substitute($template, $values);
+        // The whole template substitutes first, so every refusal of the binder applies to it as one text.
+        ContractVariableBinder::substitute($template, $values);
 
         $date = DateTimeImmutable::createFromFormat('!F j, Y', $values['CONTRACT_DATE'], new DateTimeZone('UTC'));
         ContractBindingException::require($date !== false && $date->format('F j, Y') === $values['CONTRACT_DATE'], 'unsupported_input', 'CONTRACT_DATE');
 
-        $blocks = self::blocks($body);
+        $blocks = self::blocks($template, $values);
         ContractBindingException::require($blocks !== [], 'malformed_template');
 
         $business = $declaration['licensee_type'] === 'business';
@@ -102,24 +103,33 @@ final readonly class VaseyLicenseDocument
             CanonicalJson::hash(['template_sha256' => hash('sha256', $template), 'values' => $values, 'declaration' => $declaration]), $text);
     }
 
-    /** @return list<array{type: string, text: string}> */
-    private static function blocks(string $body): array
+    /**
+     * Blocks are split and classified on the template, before substitution, so a buyer value (an all-caps legal
+     * name, say) can never turn a paragraph into a heading. Bound values hold no line breaks, so the template's blocks
+     * and lines are exactly the printed ones; each block is then substituted on its own.
+     *
+     * @param  array<string, string>  $values
+     * @return list<array{type: string, text: string}>
+     */
+    private static function blocks(string $template, array $values): array
     {
         $blocks = [];
-        foreach (preg_split('/\n[ ]*\n+/', trim($body, "\n ")) ?: [] as $raw) {
+        foreach (preg_split('/\n[ ]*\n+/', trim($template, "\n ")) ?: [] as $raw) {
             $lines = array_map(static fn (string $line): string => trim($line, ' '), explode("\n", trim($raw, "\n")));
             $lines = array_values(array_filter($lines, static fn (string $line): bool => $line !== ''));
             if ($lines === []) {
                 continue;
             }
-            $text = implode("\n", $lines);
+            $source = implode("\n", $lines);
+            // Only the template's own words decide: placeholders are removed before the uppercase test.
+            $literal = (string) preg_replace('/\{[^{}]*\}/u', '', $source);
             $type = match (true) {
                 $blocks === [] => 'title',
-                count($lines) === 1 && mb_strlen($text) <= self::HEADING_CHARACTERS
-                    && preg_match('/\p{L}/u', $text) === 1 && mb_strtoupper($text) === $text => 'heading',
+                count($lines) === 1 && mb_strlen($source) <= self::HEADING_CHARACTERS
+                    && preg_match('/\p{L}/u', $literal) === 1 && mb_strtoupper($literal) === $literal => 'heading',
                 default => 'paragraph',
             };
-            $blocks[] = ['type' => $type, 'text' => $text];
+            $blocks[] = ['type' => $type, 'text' => ContractVariableBinder::substitute($source, $values)];
         }
 
         return $blocks;

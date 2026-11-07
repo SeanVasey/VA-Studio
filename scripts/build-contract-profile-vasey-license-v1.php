@@ -17,6 +17,7 @@ declare(strict_types=1);
  * After a rebuild, set VaseyLicenseProfile::MANIFEST_SHA256 to the printed hash.
  */
 
+use App\Domain\Contracts\Production\VaseyLicenseImplementation;
 use Composer\InstalledVersions;
 use Symfony\Component\Process\Process;
 
@@ -108,18 +109,9 @@ foreach (InstalledVersions::getInstalledPackages() as $name) {
     }
 }
 ksort($packages);
+// The implementation pin is the mechanically derived closure of the renderer, binder, census and definition.
 $implementation = [];
-foreach ([
-    'app/Domain/Commerce/ContractIdentity/ContractGlyphCoverage.php',
-    'app/Domain/Commerce/ContractIdentity/ContractIdentityDeclarationV2.php',
-    'app/Domain/Contracts/Production/ContractBindingException.php',
-    'app/Domain/Contracts/Production/ContractTemplateCensus.php',
-    'app/Domain/Contracts/Production/ContractVariableBinder.php',
-    'app/Domain/Contracts/Production/VaseyLicenseDocument.php',
-    'app/Domain/Contracts/Production/VaseyLicenseLayout.php',
-    'app/Domain/Contracts/Production/VaseyLicensePdfRenderer.php',
-    'app/Domain/Contracts/Production/VaseyLicenseSignature.php',
-] as $path) {
+foreach (VaseyLicenseImplementation::closure($root) as $path) {
     if (! is_file($root.'/'.$path) || is_link($root.'/'.$path)) {
         $fail('The pinned renderer implementation is missing: '.$path);
     }

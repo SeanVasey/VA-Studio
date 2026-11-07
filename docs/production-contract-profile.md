@@ -220,8 +220,26 @@ reviewed substrate for the production free grant family (`ProductionFreeGrantFro
 accepted by `ContractRenderProfile::validate` on the test issuance path. No issuer, `VersionedContractRenderer`, policy or
 configuration selects the new profile, and a test checks that.
 
-**Manifest.** It pins the tc-lib package graph (unchanged), nine implementation files (the renderer, layout, document,
-signature, census, binder, binding exception, v2 declaration and glyph coverage) and 23 assets:
+**Manifest.** It pins the tc-lib package graph (unchanged), the implementation closure and 23 assets.
+
+The implementation pin is derived mechanically by `VaseyLicenseImplementation::closure()`. It covers every application class
+reachable from the renderer, the binder, the template census and the profile definition, through `use App\…` imports and
+same-namespace references. Today that is 25 files:
+
+- the renderer, layout, document and signature;
+- the census, binder, number speller, license constants and binding exception;
+- the v2 declaration, glyph coverage and `CheckoutException`;
+- `TypedLicenseTerms`, `ScopedLicenseTerms`, `EconomicLicenseTerms`, `TieredLicenseTerms` and `LicenseTerritories`;
+- `CanonicalJson`, `TestEnvironment`, the frozen `ContractRenderProfileRegistry` and `ContractIssuancePolicy`,
+  `ContractIssuanceException` and `RenderedContract`;
+- `VaseyLicenseProfileDefinition`, which holds the metadata, faces and logo path, and the closure class itself.
+
+A test fails when the pin and the derived closure differ. `VaseyLicenseProfile`, which holds `MANIFEST_SHA256`, is the anchor
+and cannot pin itself, so it carries no metadata, only the verification code, which is the same trust model as
+`ContractRenderProfileRegistry`. Vendor code is pinned by package identity only, for example the Laravel validator that
+`TieredLicenseTerms` calls.
+
+The 23 assets are:
 
 - the three brand woff2 faces and their OFL texts, byte-identical to `public/brand/fonts/`;
 - four static TrueType files decoded with fontTools 4.68.0 and brotli 1.2.1 (`scripts/vasey-license-fonts.py`): Bebas Neue,
@@ -237,7 +255,9 @@ directory and compares them byte for byte. Changing any pinned file therefore me
 relative to `storage/app/private`, never under `public/` and never in Git. `VASEY_LICENSE_SIGNATURE_SHA256` pins it. A
 missing file or link refuses with `signature_unavailable`, changed bytes with `signature_changed`, and a non-PNG or oversized
 image with `signature_invalid` (each a `ContractIssuanceException`). The PDF's recorded profile hash covers the signature pin,
-so a different signature is a different profile identity.
+so a different signature is a different profile identity. The constructor is private. Production code can only obtain a
+signature through `fromConfig()`, with its private-disk path rules. The stand-in factory `forTesting()` is refused outside the
+`testing` environment.
 
 **Document (`vasey-license-text-v1`).** The input is the license version's frozen template text, the binder's output for the
 line, and the line's frozen v2 declaration.
@@ -246,8 +266,11 @@ line, and the line's frozen v2 declaration.
   must equal the declaration's values.
 - The declaration re-verifies against the profile's own faces.
 - Substitution is the binder's one-pass `substitute`.
-- Layout: blocks are separated by blank lines. The first block is the title; a one-line all-uppercase block is a heading;
-  every other block is a paragraph that keeps its line breaks. Tabs and carriage returns refuse.
+- Layout: blocks are separated by blank lines. The first block is the title. A one-line block whose own literal words, with
+  placeholders removed, are all uppercase is a heading. Every other block is a paragraph that keeps its line breaks.
+- Blocks are classified on the template before substitution, so a buyer value such as an all-caps legal name can never turn a
+  paragraph into a heading.
+- Tabs and carriage returns refuse.
 
 **Layout.**
 
@@ -262,19 +285,38 @@ line, and the line's frozen v2 declaration.
 **Determinism.** The same document, profile and signature give byte-identical output, and a golden hash pins it. The creation
 and modification dates are the contract date at UTC midnight. The file and document IDs derive from the input, profile and
 signature hashes. Fonts are embedded whole and uncompressed (`font_subset: false`, `compression: false`), and the timezone is
-forced to UTC. Fonts load by explicit metric path, so another profile's `K_PATH_FONTS` in the same process cannot change them.
-The output does not depend on the project root.
+forced to UTC. The output does not depend on the project root.
+
+**Verified bytes.**
+
+- The manifest is read once, and the bytes that are hashed are the bytes that are decoded.
+- The logo and signature are drawn from the bytes that were hashed.
+- tc-lib reads font files itself, so the renderer gives it a private temporary copy written from the verified bytes, and
+  deletes it after rendering. Another profile's `K_PATH_FONTS` in the same process therefore cannot change the fonts.
+- Implementation files are hashed on disk, but PHP runs whatever code it has loaded. With opcache and
+  `opcache.validate_timestamps=0`, a server can keep serving code that differs from the pinned files until opcache is reset.
+  Deployment must reset opcache whenever these files change; this is an activation condition.
 
 One runtime dependency is outside the manifest: tc-lib separates a PNG's alpha channel with GD and re-encodes it, so the lockup
 and the signature pass through the host's libgd, libpng and zlib. The golden hash was produced with GD 2.3.3 and zlib 1.3.
-Another host is expected to match, but that is not yet proven; check it before activation.
+**Before activation, the golden render must be confirmed byte-identical on the Forge production host.** Otherwise the host's
+own hash must be pinned, with review.
 
 **Gates implemented** (each with a test):
 
 - the business representative line, present only for a business;
-- `doubled_symbol`, on the template (`${PRODUCT_PRICE}`, `{PUBLISHING_RIGHTS}%` or `percent`, `{PRODUCT_PRICE_WORD} dollars`)
-  and on every substitution boundary of the bound values;
-- the placeholder census tool, which refuses any file inside the repository and prints names, counts and line numbers only;
+- `doubled_symbol`, on the template and on every substitution boundary of the bound values. For `{PRODUCT_PRICE}` and
+  `{PRODUCT_PRICE_WORD}`, any of these refuses:
+  - a currency symbol (`\p{Sc}`: `$`, `€`, `£` …), a currency code (`USD`, `US`, `EUR`, `GBP`, `CAD`, `AUD`) or a dollar or
+    cent word before the placeholder;
+  - `dollars`, `cents` or `US Dollars` after it.
+
+  `{PUBLISHING_RIGHTS}` followed by `%`, `percent`, `per cent`, `per-cent` or `pct` refuses. A currency code after the
+  figure (`{PRODUCT_PRICE} USD`) is accepted on purpose: it names the currency of the `$` figure rather than repeating a
+  symbol or unit.
+- the placeholder census tool, which refuses any file inside the repository. It prints only placeholder names that match
+  `^[A-Z0-9_]{1,64}$`, counts and line numbers. Any other brace content is reported only as a redacted line number, and an
+  empty template is a finding (exit 1);
 - printability in the profile's own faces.
 
 **Glyph coverage, compared with DejaVu.** The brand files are Fontsource **Latin subsets**. The four faces share 214
@@ -291,7 +333,8 @@ example, "Łukasz", "Ștefan", "Nguyễn" or "Иван" would be refused at chec
   or upstream static TTFs) as a successor profile. Then rebind checkout (D-30 step 5) to the chosen faces.
 - Run the census and a golden render on the six real templates, locally, from private paths. Sean reviews the rendered layout,
   the block labels and the acceptance block wording.
-- Install the real signature on the private disk with its pin. Confirm cross-host byte determinism (above).
+- Install the real signature on the private disk with its pin. Confirm the golden hash on the Forge host (above), and reset
+  opcache on every deploy of pinned files.
 - Decide on the held tc-lib updates (#162/#164).
 - Wire the profile into the paid and paid-tax issuers for new issuance only, with independent review. This also needs the
   D-30 prerequisites: steps 2, 3a and 3b and the U-13 retention values.

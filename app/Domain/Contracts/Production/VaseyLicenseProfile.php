@@ -3,7 +3,6 @@
 namespace App\Domain\Contracts\Production;
 
 use App\Domain\Contracts\ContractIssuanceException;
-use App\Domain\Contracts\ContractRenderProfileRegistry;
 use App\Support\CanonicalJson;
 use Composer\InstalledVersions;
 use Throwable;
@@ -20,44 +19,28 @@ use Throwable;
  */
 final class VaseyLicenseProfile
 {
-    public const VERSION = 'vasey-license-pdf-v1';
+    public const VERSION = VaseyLicenseProfileDefinition::VERSION;
 
-    public const ASSETS_DIRECTORY = 'resources/contracts/vasey-license-v1';
+    public const ASSETS_DIRECTORY = VaseyLicenseProfileDefinition::ASSETS_DIRECTORY;
 
-    public const MANIFEST_SHA256 = 'ddb082a2d000bba81610bb01c3dba2c1d479fc2a6fc346367d1737656088e7db';
+    public const MANIFEST_SHA256 = 'e320bb0ab52600f9a32ebc9954c81fdc8c2984c7c8674f312c63db31e3766d03';
 
-    /** Face role to the tc-lib metric file the renderer loads it from. */
-    public const FACES = [
-        'heading' => 'fonts/generated/bebasneue.json',
-        'body' => 'fonts/generated/redditsans.json',
-        'body_bold' => 'fonts/generated/redditsansb.json',
-        'identifier' => 'fonts/generated/jetbrainsmono.json',
-    ];
+    public const FACES = VaseyLicenseProfileDefinition::FACES;
 
-    public const LOGO = 'images/vasey-audio-logo.png';
-
-    private const METADATA = ['schema_version' => 1, 'version' => self::VERSION, 'test_only' => false, 'issuance' => 'not_selected',
-        'purpose' => 'production-buyer-license', 'renderer' => 'tecnickcom/tc-lib-pdf', 'template' => 'vasey-license-text-v1',
-        'php_runtime' => '8.4', 'timezone' => 'UTC', 'pdf_conformance' => 'plain-pdf',
-        'page' => ['format' => 'A4', 'orientation' => 'P', 'margin_mm' => ['left' => 18, 'right' => 18, 'top' => 18, 'bottom' => 22]],
-        'faces' => ['heading' => 'bebasneue', 'body' => 'redditsans', 'body_bold' => 'redditsansb', 'identifier' => 'jetbrainsmono'],
-        'sizes_pt' => ['title' => 24, 'heading' => 15, 'body' => 10, 'label' => 9, 'identifier' => 8],
-        'colors' => ['band' => '#29363f', 'accent' => '#00b8d9', 'text' => '#1b2329', 'muted' => '#56656f'],
-        'font_subset' => false, 'compression' => false, 'allowed_scripts' => ['Latin', 'Common'], 'combining_marks' => false,
-        'remote_resources' => false, 'markup_resources' => false,
-        'signature' => ['source' => 'private_storage', 'media_type' => 'image/png', 'pin' => 'config:contracts.vasey_license_v1.signature_sha256'],
-        'limits' => ContractRenderProfileRegistry::V1_LIMITS];
+    public const LOGO = VaseyLicenseProfileDefinition::LOGO;
 
     /** The profile metadata with its verified asset manifest. Refuses `profile_changed` on any manifest drift. */
     public static function current(?string $projectRoot = null): array
     {
         $root = $projectRoot ?? self::defaultRoot();
         $path = $root.'/'.self::ASSETS_DIRECTORY.'/profile-assets.json';
-        if (! is_file($path) || is_link($path) || filesize($path) > 65536 || ! hash_equals(self::MANIFEST_SHA256, (string) hash_file('sha256', $path))) {
+        // Read once: the bytes that are hashed are the bytes that are decoded.
+        $bytes = is_file($path) && ! is_link($path) ? file_get_contents($path, false, null, 0, 65537) : false;
+        if (! is_string($bytes) || strlen($bytes) > 65536 || ! hash_equals(self::MANIFEST_SHA256, hash('sha256', $bytes))) {
             throw new ContractIssuanceException('profile_changed');
         }
         try {
-            $assets = json_decode((string) file_get_contents($path), true, 32, JSON_THROW_ON_ERROR);
+            $assets = json_decode($bytes, true, 32, JSON_THROW_ON_ERROR);
         } catch (Throwable) {
             throw new ContractIssuanceException('profile_changed');
         }
@@ -66,7 +49,7 @@ final class VaseyLicenseProfile
             throw new ContractIssuanceException('profile_changed');
         }
 
-        return self::METADATA + ['assets' => $assets];
+        return VaseyLicenseProfileDefinition::METADATA + ['assets' => $assets];
     }
 
     /** A retained profile must equal the trusted current one exactly. */

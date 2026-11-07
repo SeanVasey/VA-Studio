@@ -21,7 +21,7 @@ final readonly class VaseyLicenseSignature
 
     public const MAX_PIXELS = 4096;
 
-    public function __construct(public string $path, public string $sha256)
+    private function __construct(public string $path, public string $sha256)
     {
         if (preg_match('/\A[0-9a-f]{64}\z/', $sha256) !== 1 || $path === '' || ! str_starts_with($path, '/')) {
             throw new ContractIssuanceException('signature_unavailable');
@@ -53,6 +53,19 @@ final readonly class VaseyLicenseSignature
         $path = $disk.'/'.$relative;
         $resolved = realpath($path);
         if ($resolved === false || $resolved !== $path) {
+            throw new ContractIssuanceException('signature_unavailable');
+        }
+
+        return new self($path, $sha256);
+    }
+
+    /**
+     * Test-only: a stand-in image at any absolute path, without the private-disk rules. Refused outside the
+     * `testing` environment, so production code can only obtain a signature through {@see fromConfig()}.
+     */
+    public static function forTesting(string $path, string $sha256): self
+    {
+        if (! function_exists('app') || ! app()->environment('testing')) {
             throw new ContractIssuanceException('signature_unavailable');
         }
 

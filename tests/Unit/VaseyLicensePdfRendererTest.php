@@ -9,6 +9,7 @@ use App\Domain\Contracts\Production\ContractBindingException;
 use App\Domain\Contracts\Production\ContractTemplateCensus;
 use App\Domain\Contracts\Production\ContractVariableBinder;
 use App\Domain\Contracts\Production\VaseyLicenseDocument;
+use App\Domain\Contracts\Production\VaseyLicenseImplementation;
 use App\Domain\Contracts\Production\VaseyLicenseLayout;
 use App\Domain\Contracts\Production\VaseyLicensePdfRenderer;
 use App\Domain\Contracts\Production\VaseyLicenseProfile;
@@ -30,7 +31,7 @@ use Tests\TestCase;
 class VaseyLicensePdfRendererTest extends TestCase
 {
     /** sha256 of the golden business render below, under the pinned profile and the synthetic signature. */
-    private const GOLDEN_SHA256 = '52f8a5a239e2c9eda392bdf21c73928b4fce4f1ee35f10cc928297e6a6985735';
+    private const GOLDEN_SHA256 = '4491ac3bf697f3147c27be8ea2c55c3d8d02b99d5f131cc601974302c2b0d31b';
 
     private const TEMPLATE = "SYNTHETIC TEST TEMPLATE: {LICENSE_NAME}\n\nNONBINDING FIXTURE\n\n"
         .'This synthetic fixture is dated {CONTRACT_DATE}. It names {CUSTOMER_FULLNAME} of {CUSTOMER_ADDRESS} and {PRODUCER_ALIAS}, '
@@ -103,7 +104,7 @@ class VaseyLicensePdfRendererTest extends TestCase
         $path = $this->scratch.'/'.$name;
         file_put_contents($path, $png);
 
-        return new VaseyLicenseSignature($path, hash('sha256', $png));
+        return VaseyLicenseSignature::forTesting($path, hash('sha256', $png));
     }
 
     private function render(VaseyLicenseDocument $document, ?VaseyLicenseSignature $signature = null, ?string $root = null): RenderedContract
@@ -253,6 +254,14 @@ class VaseyLicensePdfRendererTest extends TestCase
             'percent after share' => ['Share {PUBLISHING_RIGHTS}%.', 'PUBLISHING_RIGHTS'],
             'percent word after share' => ['Share {PUBLISHING_RIGHTS} percent.', 'PUBLISHING_RIGHTS'],
             'unit word after price words' => ['Fee {PRODUCT_PRICE_WORD} dollars.', 'PRODUCT_PRICE_WORD'],
+            'dollar word after price' => ['Fee {PRODUCT_PRICE} dollars.', 'PRODUCT_PRICE'],
+            'US Dollars after price' => ['Fee {PRODUCT_PRICE} US Dollars.', 'PRODUCT_PRICE'],
+            'euro sign before price' => ['Fee €{PRODUCT_PRICE}.', 'PRODUCT_PRICE'],
+            'currency code before price' => ['Fee USD {PRODUCT_PRICE}.', 'PRODUCT_PRICE'],
+            'dollar before price words' => ['Fee ${PRODUCT_PRICE_WORD}.', 'PRODUCT_PRICE_WORD'],
+            'pct after share' => ['Share {PUBLISHING_RIGHTS} pct.', 'PUBLISHING_RIGHTS'],
+            'per-cent after share' => ['Share {PUBLISHING_RIGHTS} per-cent.', 'PUBLISHING_RIGHTS'],
+            'per cent after share' => ['Share {PUBLISHING_RIGHTS} per cent.', 'PUBLISHING_RIGHTS'],
         ];
     }
 
@@ -272,6 +281,41 @@ class VaseyLicensePdfRendererTest extends TestCase
         $this->assertSame([], ContractTemplateCensus::doubledAtBoundaries('Title: {PRODUCT_TITLE}!', $values));
         // Accepted forms: the symbol comes only from the value, and a currency code may follow the figure.
         $this->assertSame('SYNTHETIC', self::document('individual', 'non-exclusive', "SYNTHETIC\n\nFee {PRODUCT_PRICE} USD at {PUBLISHING_RIGHTS} share.")->blocks[0]['text']);
+    }
+
+    public function test_blocks_are_classified_on_the_template_so_buyer_text_cannot_make_a_heading(): void
+    {
+        $declaration = array_replace(self::fixture('individual'), ['legal_name' => 'ZOË EXAMPLE BUYER']);
+        $values = self::fixture('bind', self::fixture('taxInput', $declaration, self::fixture('license', self::fixture('terms'))));
+        $document = VaseyLicenseDocument::build("SYNTHETIC TITLE\n\n{CUSTOMER_FULLNAME}\n\nSECTION {PRODUCT_TITLE}\n\nBody text.",
+            $values, $declaration, ContractGlyphCoverage::vaseyLicenseFaces());
+
+        $this->assertSame([['type' => 'title', 'text' => 'SYNTHETIC TITLE'], ['type' => 'paragraph', 'text' => 'ZOË EXAMPLE BUYER'],
+            ['type' => 'heading', 'text' => 'SECTION Synthetic Track Title'], ['type' => 'paragraph', 'text' => 'Body text.']], $document->blocks);
+    }
+
+    public function test_the_stand_in_signature_factory_is_refused_outside_testing(): void
+    {
+        $path = $this->signature()->path;
+        $this->app['env'] = 'production';
+        try {
+            $this->refusesIssuance('signature_unavailable', fn () => VaseyLicenseSignature::forTesting($path, hash_file('sha256', $path)));
+        } finally {
+            $this->app['env'] = 'testing';
+        }
+        $this->assertFalse((new \ReflectionMethod(VaseyLicenseSignature::class, '__construct'))->isPublic());
+    }
+
+    public function test_the_implementation_pin_is_the_derived_closure_of_the_render_graph(): void
+    {
+        $pinned = array_keys(VaseyLicenseProfile::current()['assets']['implementation']);
+        $this->assertSame(VaseyLicenseImplementation::closure(base_path()), $pinned);
+        foreach (['ContractNumberWords', 'TypedLicenseTerms', 'TieredLicenseTerms', 'LicenseTerritories', 'CanonicalJson',
+            'VaseyLicenseProfileDefinition', 'ContractIdentityDeclarationV2', 'ContractGlyphCoverage', 'VaseyLicenseLayout'] as $class) {
+            $this->assertCount(1, array_filter($pinned, static fn (string $path): bool => str_ends_with($path, '/'.$class.'.php')), $class);
+        }
+        // The anchor holds the manifest hash and cannot pin itself; its definition is pinned instead.
+        $this->assertNotContains(VaseyLicenseImplementation::ANCHOR, $pinned);
     }
 
     public function test_the_binders_map_and_the_declaration_must_agree(): void
@@ -320,14 +364,14 @@ class VaseyLicensePdfRendererTest extends TestCase
         $this->refusesIssuance('signature_unavailable', fn () => $this->render($document, $signature));
 
         file_put_contents($this->scratch.'/not-a-png.png', 'GIF89a synthetic');
-        $notPng = new VaseyLicenseSignature($this->scratch.'/not-a-png.png', hash_file('sha256', $this->scratch.'/not-a-png.png'));
+        $notPng = VaseyLicenseSignature::forTesting($this->scratch.'/not-a-png.png', hash_file('sha256', $this->scratch.'/not-a-png.png'));
         $this->refusesIssuance('signature_invalid', fn () => $this->render($document, $notPng));
 
         $other = $this->signature('other.png');
         symlink($other->path, $this->scratch.'/linked.png');
-        $this->refusesIssuance('signature_unavailable', fn () => $this->render($document, new VaseyLicenseSignature($this->scratch.'/linked.png', $other->sha256)));
-        $this->refusesIssuance('signature_unavailable', fn () => new VaseyLicenseSignature('relative.png', $other->sha256));
-        $this->refusesIssuance('signature_unavailable', fn () => new VaseyLicenseSignature($other->path, 'not-a-hash'));
+        $this->refusesIssuance('signature_unavailable', fn () => $this->render($document, VaseyLicenseSignature::forTesting($this->scratch.'/linked.png', $other->sha256)));
+        $this->refusesIssuance('signature_unavailable', fn () => VaseyLicenseSignature::forTesting('relative.png', $other->sha256));
+        $this->refusesIssuance('signature_unavailable', fn () => VaseyLicenseSignature::forTesting($other->path, 'not-a-hash'));
     }
 
     public function test_a_different_signature_pin_is_a_different_recorded_profile_identity(): void

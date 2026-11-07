@@ -14,7 +14,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
   and pinned, but not selected for issuance and not wired into any issuer.
   - **Pinning:** its own registry class pins `resources/contracts/vasey-license-v1/profile-assets.json` by SHA-256. The manifest
     pins the Bebas Neue, Reddit Sans (400 and 700) and JetBrains Mono faces, converted from the brand woff2 files through static
-    TrueType to tc-lib metrics, plus the unmodified VASEY.AUDIO lockup, the tc-lib graph and nine implementation files.
+    TrueType to tc-lib metrics, plus the unmodified VASEY.AUDIO lockup, the tc-lib graph and the implementation closure (25 files, derived
+    mechanically and checked by a test).
     `scripts/build-contract-profile-vasey-license-v1.php --check` reproduces every asset byte for byte.
   - **Signature:** Sean's signature is read at render time from the private local disk (`VASEY_LICENSE_SIGNATURE_PATH`) and
     pinned by `VASEY_LICENSE_SIGNATURE_SHA256`. It is never in Git. A missing, changed or invalid file refuses issuance with a
@@ -23,9 +24,10 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
     fixed dates and IDs, whole uncompressed fonts, and a golden hash.
   - **Gates:**
     - the business representative line in the acceptance block, absent for individuals;
-    - `doubled_symbol` refusals;
+    - `doubled_symbol` refusals (currency symbols, codes and words around the price placeholders; `%`, `percent`, `pct`
+      after the publishing share);
     - a local placeholder census tool for the private templates (`scripts/contract-placeholder-census.php`), which refuses
-      files inside the repository;
+      files inside the repository, never prints template text and treats an empty template as a finding;
     - printability in the profile's own faces (`ContractGlyphCoverage::vaseyLicenseFaces()`). Checkout's DejaVu binding is
       unchanged.
   - **Finding:** the brand fonts are Latin subsets. The D-30 rule accepts 212 of their codepoints, against 3,799 for DejaVu,
