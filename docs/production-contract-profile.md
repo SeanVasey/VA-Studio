@@ -94,6 +94,9 @@ The six templates use 22 placeholders, and each one needs exactly one source. Tw
 | `FREE_DOWNLOADS` (5) | license | v5 usage `free_downloads` (G-1) |
 | `PERFORMANCES_FOR_PROFIT` (5), `PERFORMANCES_NOT_FOR_PROFIT` (5) | license | v5 usage `for_profit_performances`, `not_for_profit_performances` (G-1) |
 
+The license-level rows above assume schema 5 vocabulary. In schemas 2–4, `music_videos` means plain "Music videos", so the
+contract profile must accept **only schema 5 license sources**. A v4 limit must never fill a "monetized" placeholder.
+
 ### G-1: the usage schema cannot express Sean's tiers
 
 Sean's tiers distinguish four things the typed usage schema (`TypedLicenseTerms::USAGE`) has no slot for:

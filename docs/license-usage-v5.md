@@ -77,3 +77,20 @@ v4 one it uses its own in-memory SQLite connection.
   partition. `npm test`: 70 files, 1177 tests pass; `npm run typecheck` passes (no TypeScript changed).
 - `vendor/bin/pint --test` on the changed PHP files passes, except `LicenseVersion.php` and `PublicLicenseDisclosureTest.php`,
   which report the same fixers on the base commit and were not reformatted.
+
+## Operating notes (from the independent review, 2026-11-07)
+
+- **Rollback is forward-only once a v5 version is published.** `down()` restores the exact v4 guard. After that, v5 rows in
+  `legal_review` or `approved` can no longer advance; the trigger refuses them, so nothing is corrupted. Published v5 rows stay
+  readable and immutable. Rolling the code back as well would make published v5 rows fail validation and break their offers.
+  Do not roll back after the first v5 publication.
+- **The "Define tier usage limits" action copies `copies_downloads` from v4.** v5 adds a separate `free_downloads` slot, so the
+  author must confirm that the v4 copies limit did not include free downloads before submitting the successor for review.
+- **Native MySQL (private MySQL 8.4.11, PHP 8.4.27).** A full `migrate` installed `license_review_state_guard_v5`. A targeted
+  rollback restored `license_review_state_guard_v4`, and `migrate` reinstalled v5. The v5 trigger body admits the renderers
+  `vasey-license-review-html-v1` through `-v5`. `TieredLicenseMigrationTest`: OK (1 test, 25 assertions).
+  On the same server, `TieredLicenseTest::test_database_rejects_every_cross_version_v5_renderer_pair` and
+  `test_review_binds_every_tier_limit_to_the_v5_preview_and_publication_evidence`: OK (2 tests, 56 assertions).
+- **Independent review (2026-11-07): APPROVE WITH CONDITIONS, no P0 or P1.** Condition (P2, native MySQL evidence) met above;
+  the three P3s are recorded in these notes and in `production-contract-profile.md`.
+
