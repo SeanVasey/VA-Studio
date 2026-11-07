@@ -31,13 +31,29 @@ not use a separate record.
 
 | Field | Rule |
 | --- | --- |
-| Legal name | Current rules: ≤255 bytes, valid UTF-8, no C0/DEL, trimmed. Also refuses bidi overrides (U+202A–E, U+2066–9), and requires `legalNameConfirmed === true` against a versioned statement. |
+| Legal name | Current rules: ≤255 bytes, valid UTF-8, no C0/DEL, trimmed. Also refuses bidi overrides and isolates (U+202A–E, U+2066–9) under the character rule below, and requires `legalNameConfirmed === true` against a versioned statement. |
 | Postal address | Structured: `country` is a required ISO 3166-1 alpha-2 code from a pinned list; `lines` holds 1–3 lines (the first required) of ≤120 bytes each; `locality` and `region` are each ≤80 bytes; `postalCode` is ≤20 bytes of `[A-Za-z0-9 -]`; the whole canonical address is ≤512 bytes. Never inferred from Stripe billing or account data. |
 | Artist name | ≤120 bytes, same character rules. Required if and only if a line's license is `exclusive`. |
 
 `{CUSTOMER_ADDRESS}` is one deterministic string, joined with ", ": the lines, then the locality, region and postal code,
-then the country's English short name. **Characters the pinned contract fonts cannot print are refused at checkout** (Sean,
-2026-11-07). The buyer is asked to enter supported characters.
+then the country's English short name from the pinned `LicenseTerritories::COUNTRIES` list. **Characters the pinned contract
+fonts cannot print are refused at checkout** (Sean, 2026-11-07). The buyer is asked to enter supported characters.
+
+The character rule (implemented in `ContractIdentityDeclarationV2`) applies to the legal name, the artist name, the address
+lines, the locality and the region. A shape error (`invalid`) is always reported before a character problem
+(`unsupported_characters`). A value is printable only when both of the following hold:
+
+- It contains no format, private-use, unassigned or C1 codepoint (`\p{C}`: bidi overrides and isolates, zero-width
+  characters, soft hyphen, BOM), no combining mark (`\p{M}`), no space other than U+0020, and no right-to-left script
+  (Hebrew, Arabic, Syriac, Thaana, N'Ko, Samaritan, Mandaic). The pinned DejaVu faces draw some of these, but the printed
+  text could then differ from what a reader sees, or be reordered or left unshaped.
+- Every codepoint is in the width table of every pinned face (`ContractGlyphCoverage`). With the `test-v2` regular and bold
+  faces, that is 5,778 shared codepoints. They include Latin, Greek and Cyrillic, and every pinned country name. CJK is not
+  covered.
+
+Decomposed text is refused, not normalized, so the stored value is exactly what was sent; the checkout UI should send
+NFC. Before the gate opens, the `vasey-license-pdf-v1` profile must bind the coverage to its own pinned faces, and its
+render review must confirm the accepted repertoire.
 
 ## Corrections
 
