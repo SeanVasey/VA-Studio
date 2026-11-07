@@ -10,6 +10,26 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Added
 
+- Production license render profile `vasey-license-pdf-v1` (increment 4 of `docs/production-contract-profile.md`). It is built
+  and pinned, but not selected for issuance and not wired into any issuer.
+  - **Pinning:** its own registry class pins `resources/contracts/vasey-license-v1/profile-assets.json` by SHA-256. The manifest
+    pins the Bebas Neue, Reddit Sans (400 and 700) and JetBrains Mono faces, converted from the brand woff2 files through static
+    TrueType to tc-lib metrics, plus the unmodified VASEY.AUDIO lockup, the tc-lib graph and nine implementation files.
+    `scripts/build-contract-profile-vasey-license-v1.php --check` reproduces every asset byte for byte.
+  - **Signature:** Sean's signature is read at render time from the private local disk (`VASEY_LICENSE_SIGNATURE_PATH`) and
+    pinned by `VASEY_LICENSE_SIGNATURE_SHA256`. It is never in Git. A missing, changed or invalid file refuses issuance with a
+    typed reason.
+  - **Rendering:** the license template text is substituted in one pass from the increment 3 binder. Output is deterministic:
+    fixed dates and IDs, whole uncompressed fonts, and a golden hash.
+  - **Gates:**
+    - the business representative line in the acceptance block, absent for individuals;
+    - `doubled_symbol` refusals;
+    - a local placeholder census tool for the private templates (`scripts/contract-placeholder-census.php`), which refuses
+      files inside the repository;
+    - printability in the profile's own faces (`ContractGlyphCoverage::vaseyLicenseFaces()`). Checkout's DejaVu binding is
+      unchanged.
+  - **Finding:** the brand fonts are Latin subsets. The D-30 rule accepts 212 of their codepoints, against 3,799 for DejaVu,
+    so Latin Extended, Greek and Cyrillic names would be refused. This is a decision for activation.
 - Production contract variable binder (increment 3 of `docs/production-contract-profile.md`, D-30 step 7 as far as a pure binder goes). `ContractVariableBinder::bind` maps one frozen paid line (`PaidTaxRenderInput` or `PaidGrantRenderInput`) plus its schema 5 license terms to the closed set of 22 template placeholders, and `substitute` fills `{NAME}` placeholders in one pass.
   - **Refuses, never defaults:** unknown or unfilled placeholders, stray braces, legacy buyer declarations (`contract_identity_missing`), any non-v5 terms, terms that differ from the line's frozen terms, a stale hash or source commitment, a title, license name or constant that fails the D-30 printability rule or the 255-byte cap, a missing publishing share, non-USD or out-of-range prices.
   - **Sean's decisions (2026-11-07, with counsel):** the contract states the pre-tax license fee (tax-inclusive lines subtract the line's own tax exactly); prohibited uses print `0`; the publishing share uses the statement schedule's form (`12.50%`); the producer alias and governing place stay caller inputs.
