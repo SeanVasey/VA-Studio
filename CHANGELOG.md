@@ -158,6 +158,7 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Fixed
 
+- `ops/staging/provision.sh` (and the derived production kit) creates `/var/lib/nginx` root-owned 0755 when it is absent, before the no-follow runtime walk that makes `vasey-staging-fastcgi`. Forge installs nginx from nginx.org (1.31.8-1~noble on the staging Laravel VPS), whose package keeps its temp paths under `/var/cache/nginx` and ships no `/var/lib/nginx`, so provisioning stopped with "unsafe runtime directory". An existing `/var/lib/nginx` must be a root-owned directory, not a symlink. Guarded by `tests/ops/test_staging_nginx_libdir.py`.
 - Ops scripts that set `pipefail` no longer decide a check with a piped `grep -q` (`ops/staging/provision.sh`, `ops/clamav/install-clamd.sh`, `ops/monitoring/scheduler-liveness-check.sh`). `grep -q` exits at its first match, the writer then dies of SIGPIPE and `pipefail` fails the check although the text was there: the first staging provision on the Forge Laravel VPS (Ubuntu 24.04, PHP 8.4.27 installed) stopped with "php8.4 packages unavailable". The checks now read all input (`grep … >/dev/null`); `tests/ops/test_pipefail_grep.py` keeps the pattern out. The derived production kit's semantic delta snapshot is regenerated (line offsets only).
 
 - Staff reporting and customer communications follow-up batch (lane FUB-1, deferred findings from PRs #178 and #183):
