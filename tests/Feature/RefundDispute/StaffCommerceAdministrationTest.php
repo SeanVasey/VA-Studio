@@ -2,10 +2,13 @@
 
 namespace Tests\Feature\RefundDispute;
 
+use App\Domain\Commerce\Finalization\FinalizeTestPayment;
+use App\Domain\Commerce\Models\OrderFinalization;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeHold;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObject;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObservation;
 use App\Domain\Commerce\RefundDispute\Models\RefundLineAllocation;
+use App\Domain\Commerce\RefundDispute\RefundDisputeActions;
 use App\Domain\Commerce\RefundDispute\RefundDisputeException;
 use App\Domain\Commerce\RefundDispute\StaffCommerceDirectory;
 use App\Domain\Delivery\PrepareTestDeliveryStream;
@@ -17,10 +20,13 @@ use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Tests\Support\DeliveryFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\FinalizationFixtures;
 use Tests\Support\LicenseFixtures;
+use Tests\Support\PaymentFixtures;
 use Tests\Support\RefundDisputeFixtures as R;
 use Tests\TestCase;
 
@@ -101,6 +107,92 @@ class StaffCommerceAdministrationTest extends TestCase
             ->assertMountedActionModalSee('guest without an account')->assertMountedActionModalDontSee($f['order']->owner_key)
             ->assertMountedActionModalDontSee('re_PRIVATEREFUND');
         $this->assertSame($originals, R::originals());
+    }
+
+    public function test_staff_detail_excludes_a_failed_refund_but_retains_its_allocation_and_status_history(): void
+    {
+        $f = DeliveryFixtures::ready($this->payments, true);
+        $originals = R::originals();
+        $admin = LicenseFixtures::admin();
+        $this->actingAs($admin);
+        R::provider($this->financial, [['re_LATERFAILED', 101, 'succeeded']]);
+        R::observe($f['order']->public_id, $admin);
+        $refund = RefundDisputeObject::sole();
+        app(RefundDisputeActions::class)->allocate($f['order']->public_id, $admin, (string) Str::uuid(),
+            R::sequence($f['order']->public_id, $admin), $refund->public_id, [0 => 101]);
+        $allocations = RefundLineAllocation::orderBy('id')->get()->toArray();
+        $directory = app(StaffCommerceDirectory::class);
+        $this->assertSame([101, 0], array_column($directory->orderFor($f['finalization']->id, $admin)['lines'], 'allocatedMinor'));
+
+        R::provider($this->financial, [['re_LATERFAILED', 101, 'failed']]);
+        R::observe($f['order']->public_id, $admin);
+        $detail = $directory->orderFor($f['finalization']->id, $admin);
+        $this->assertSame([0, 0], array_column($detail['lines'], 'allocatedMinor'));
+        $this->assertSame(0, $detail['latestObservation']['succeededRefundMinor']);
+        $this->assertSame(['succeeded', 'failed'], $detail['providerObjects'][0]['statuses']);
+        $this->assertSame($allocations, RefundLineAllocation::orderBy('id')->get()->toArray());
+        Livewire::test(ListStaffOrders::class)->mountTableAction('orderDetail', $f['finalization'])
+            ->assertMountedActionModalSee('succeeded refunds by allocation 0')
+            ->assertMountedActionModalDontSee('succeeded refunds by allocation 101');
+        Livewire::test(ListStaffCustomers::class)->mountTableAction('customerDetail', $f['finalization'])
+            ->assertMountedActionModalSee('succeeded refunds by allocation 0')
+            ->assertMountedActionModalDontSee('succeeded refunds by allocation 101');
+        $this->assertSame($originals, R::originals());
+    }
+
+    public function test_staff_detail_aggregates_only_succeeded_allocations_with_failed_and_pending_refunds_present(): void
+    {
+        $f = DeliveryFixtures::ready($this->payments, true);
+        $originals = R::originals();
+        $admin = LicenseFixtures::admin();
+        $this->actingAs($admin);
+        R::provider($this->financial, [['re_KEEPONE', 101, 'succeeded'], ['re_KEEPTWO', 203, 'succeeded'],
+            ['re_FAIL', 307, 'succeeded'], ['re_PENDING', 409, 'pending']]);
+        R::observe($f['order']->public_id, $admin);
+        foreach ([101, 203, 307] as $amount) {
+            $refund = RefundDisputeObject::where('kind', 'refund')->where('amount_minor', $amount)->sole();
+            app(RefundDisputeActions::class)->allocate($f['order']->public_id, $admin, (string) Str::uuid(),
+                R::sequence($f['order']->public_id, $admin), $refund->public_id, [0 => $amount]);
+        }
+        $allocations = RefundLineAllocation::orderBy('id')->get()->toArray();
+        R::provider($this->financial, [['re_KEEPONE', 101, 'succeeded'], ['re_KEEPTWO', 203, 'succeeded'],
+            ['re_FAIL', 307, 'failed'], ['re_PENDING', 409, 'pending']]);
+        R::observe($f['order']->public_id, $admin);
+        $directory = app(StaffCommerceDirectory::class);
+        $detail = $directory->orderFor($f['finalization']->id, $admin);
+        // Independent arithmetic: 101 + 203 succeeded; the retained 307 failed allocation does not count.
+        $this->assertSame([304, 0], array_column($detail['lines'], 'allocatedMinor'));
+        $this->assertSame(304, $detail['latestObservation']['succeededRefundMinor']);
+        $this->assertSame(409, $detail['latestObservation']['pendingRefundMinor']);
+        $this->assertSame([304, 0], array_column($directory->customer($f['finalization']->id, $admin)['orders'][0]['lines'], 'allocatedMinor'));
+        $this->assertSame(611, (int) RefundLineAllocation::sum('amount_minor'));
+        $this->assertSame($allocations, RefundLineAllocation::orderBy('id')->get()->toArray());
+        Livewire::test(ListStaffOrders::class)->mountTableAction('orderDetail', $f['finalization'])
+            ->assertMountedActionModalSee('succeeded refunds by allocation 304')
+            ->assertMountedActionModalDontSee('succeeded refunds by allocation 611');
+        $this->assertSame($originals, R::originals());
+    }
+
+    public function test_paid_exception_detail_keeps_original_lines_and_shows_unknown_refunds_without_a_complete_case(): void
+    {
+        $f = PaymentFixtures::started($this->payments);
+        $this->travelTo($f['order']->attempt()->sole()->expires_at);
+        $f = FinalizationFixtures::confirm($f);
+        $this->assertSame('paid_exception', app(FinalizeTestPayment::class)->handle($f['payment']->id));
+        $finalization = OrderFinalization::sole();
+        $originals = R::originals();
+        $admin = LicenseFixtures::admin();
+        $this->actingAs($admin);
+        $detail = app(StaffCommerceDirectory::class)->orderFor($finalization->id, $admin);
+        $this->assertSame('paid_exception', $detail['outcome']);
+        $this->assertSame('attention', $detail['evidence']);
+        $this->assertSame($f['original']['lines'][0]['pricing']['total_minor'], $detail['lines'][0]['totalMinor']);
+        $this->assertNull($detail['lines'][0]['grant']);
+        $this->assertNull($detail['lines'][0]['allocatedMinor']);
+        Livewire::test(ListStaffOrders::class)->mountTableAction('orderDetail', $finalization)
+            ->assertMountedActionModalSee('succeeded refunds by allocation unknown');
+        $this->assertSame($originals, R::originals());
+        $this->assertSame(array_fill_keys(R::TABLES, 0), R::counts());
     }
 
     public function test_unset_policy_is_reported_and_writes_nothing(): void

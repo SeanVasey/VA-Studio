@@ -24,6 +24,7 @@
     "tests/Feature/LicenseEvidenceMigrationTest.php",
     "tests/Feature/MembershipCreditMigrationTest.php",
     "tests/Feature/Migration/LegacyHistoryArchiveMigrationTest.php",
+    "tests/Feature/Migration/LegacyHistoryDeclarationMigrationTest.php",
     "tests/Feature/MigrationRecompilationTest.php",
     "tests/Feature/OrderInquiryMigrationTest.php",
     "tests/Feature/OrderPreparationMigrationTest.php",
@@ -83,6 +84,7 @@
     "tests/Feature/ProductionFinancialRetrieval/FinancialReadPlanTest.php",
     "tests/Feature/ProductionIdentityAdapters/ProductionFeatureMetadataAdmissionTest.php",
     "tests/Feature/ProductionMemberActivation/MemberRetainedOriginalsTest.php",
+    "tests/Feature/ProductionMemberGrants/MemberActivationCommitWitnessTest.php",
     "tests/Feature/ProductionMemberGrants/MemberGrantActivationIntegrationTest.php",
     "tests/Feature/ProductionMemberGrants/MemberGrantActivationRetentionTest.php",
     "tests/Feature/ProductionMemberGrants/MemberGrantOrdinaryLifecycleTest.php",
@@ -151,6 +153,7 @@
     "tests/Feature/SupportAttachmentsTest.php",
     "tests/Feature/TestCommerceEvidenceCommandTest.php",
     "tests/Feature/TestContractSecondBoundaryTest.php",
+    "tests/Feature/TestIdentityLinkRelayCommandTest.php",
     "tests/Unit/SchemaQualifierDelimiterTest.php"
   ],
   "residual_files": [

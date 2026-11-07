@@ -11,7 +11,6 @@ use App\Domain\Commerce\RefundDispute\Models\RefundDisputeEffect;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeHold;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObject;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObservation;
-use App\Domain\Commerce\RefundDispute\Models\RefundLineAllocation;
 use App\Domain\Delivery\Models\TestDeliveryAuthorization;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -94,14 +93,22 @@ final class StaffCommerceDirectory
         }
         $grants = LicenseGrant::where('order_finalization_id', $finalization->id)->get()->keyBy('order_line_id');
         $exclusive = ExclusiveSale::where('order_finalization_id', $finalization->id)->pluck('order_line_id')->all();
-        $allocated = RefundLineAllocation::where('order_id', $order->id)->get()->groupBy('order_line_id');
+        $allocated = [];
+        if ($original !== null) {
+            try {
+                $allocated = RefundDisputeCase::load($order, $finalization, $original, forUpdate: false)->refundedByLine();
+            } catch (Throwable) {
+                // Retained allocations alone cannot establish a currently succeeded refund.
+                $evidence = 'attention';
+            }
+        }
         $holds = RefundDisputeHold::where('order_id', $order->id)->orderBy('id')->get();
         $lines = [];
         foreach ($order->lines()->orderBy('position')->get() as $line) {
             $grant = $grants->get($line->id);
             $lines[] = ['position' => $line->position, 'title' => $original['lines'][$line->position]['selection']['offer_snapshot']['product']['title'] ?? null,
                 'totalMinor' => $original['lines'][$line->position]['pricing']['total_minor'] ?? null, 'grant' => $grant?->public_id,
-                'exclusive' => in_array($line->id, $exclusive, true), 'allocatedMinor' => (int) ($allocated->get($line->id)?->sum('amount_minor') ?? 0),
+                'exclusive' => in_array($line->id, $exclusive, true), 'allocatedMinor' => $allocated[$line->id] ?? null,
                 'downloadsHeld' => $grant !== null && $holds->contains(fn ($h) => $h->released_at === null
                     && ($h->license_grant_id === null || $h->license_grant_id === $grant->id))];
         }

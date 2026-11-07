@@ -1,6 +1,11 @@
 <?php
 
 namespace Tests\Support {
+    use App\Domain\Memberships\Billing\BillingDatabaseClock;
+    use App\Domain\Memberships\Production\MembershipBillingEvidence;
+    use App\Domain\Memberships\Production\SealedMembershipPaidInvoice;
+    use Closure;
+
     /**
      * Synthetic monotonic time for membership production tests only. Load before any production
      * membership call site executes: PHP caches namespaced function resolution. No production
@@ -15,6 +20,26 @@ namespace Tests\Support {
         private static int $offsetNs = 0;
 
         private static int|float|null $anchorNs = null;
+
+        /** Narrow unexpected-failure probe; billing timestamps and budgets are never synthesized. */
+        public static ?Closure $onBillingReadSample = null;
+
+        public static function billingNow(bool $asNumber): array|int|float|false
+        {
+            if ($asNumber && self::$onBillingReadSample !== null) {
+                $sample = $read = $sealed = false;
+                foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 60) as $frame) {
+                    $sample = $sample || (($frame['class'] ?? null) === BillingDatabaseClock::class && ($frame['function'] ?? null) === 'sample');
+                    $read = $read || (($frame['class'] ?? null) === MembershipBillingEvidence::class && ($frame['function'] ?? null) === 'read');
+                    $sealed = $sealed || (($frame['class'] ?? null) === SealedMembershipPaidInvoice::class && ($frame['function'] ?? null) === 'lock');
+                }
+                if ($sample && $read && $sealed) {
+                    (self::$onBillingReadSample)();
+                }
+            }
+
+            return \hrtime($asNumber);
+        }
 
         /** Enable only after fixture setup; a future anchor isolates unchanged external frame clocks. */
         public static function freeze(): int|float
@@ -41,6 +66,18 @@ namespace Tests\Support {
         {
             self::$offsetNs = 0;
             self::$anchorNs = null;
+            self::$onBillingReadSample = null;
+        }
+    }
+}
+
+namespace App\Domain\Memberships\Billing {
+    use Tests\Support\MembershipAwardMonotonicClock;
+
+    if (! function_exists(__NAMESPACE__.'\\hrtime')) {
+        function hrtime(bool $as_number = false): array|int|float|false
+        {
+            return MembershipAwardMonotonicClock::billingNow($as_number);
         }
     }
 }

@@ -777,6 +777,51 @@ done""")
         self.assertNotEqual(again.returncode, 0, again.stdout + again.stderr)
         self.assertNotIn("already shipped", again.stdout)
 
+    def test_equal_malformed_record_and_remote_sizes_are_not_trusted(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        self.assertEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings).returncode, 0)
+        record = self.backups / f".offhost-shipped.{bk.name}"
+        digest = record.read_text().splitlines()[0]
+        shipped = self.remote_digests()
+        for malformed in ("not-a-size", "12x", "-1", " 12"):
+            with self.subTest(size=malformed):
+                record.write_text(digest + "\nsize=" + malformed + "\n")
+                blind = self.wrapped_rclone("malformed-size-rclone", """for a in "${args[@]}"; do
+  if [ "$a" = --format ]; then printf '%s;%s\\n' "$MALFORMED_SIZE" "$CIPHERTEXT_NAME"; exit 0; fi
+done""")
+                run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients,
+                                MALFORMED_SIZE=malformed, CIPHERTEXT_NAME=f"{bk.name}.tar.age", **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=blind))
+                self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+                self.assertNotIn("already shipped", run.stdout)
+                self.assertEqual(self.remote_digests(), shipped)
+
+    def test_failed_or_malformed_ciphertext_stat_never_leaves_a_shipped_record(self):
+        recipients = self.recipients()
+        for index, (value, status) in enumerate((("", 1), ("", 0), ("not-a-size", 0))):
+            with self.subTest(value=value, status=status):
+                bk = self.make_set(set_name(f"202610{index + 11}"))
+                record = self.backups / f".offhost-shipped.{bk.name}"
+                script = r'''eval "$(declare -f stat | sed '1s/stat/working_stat/')"
+stat() {
+  if [ "${1:-}" = -c ] && [ "${2:-}" = %s ] && [[ "${@: -1}" == *.tar.age ]]; then
+    echo "synthetic ciphertext stat result" >&2
+    printf '%s\n' "$STAT_VALUE"
+    return "$STAT_STATUS"
+  fi
+  working_stat "$@"
+}
+''' + f'ship "{bk}"'
+                run = self.bash(script, STAT_VALUE=value, STAT_STATUS=status,
+                                VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+                self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+                self.assertIn("synthetic ciphertext stat result", run.stderr)
+                self.assertIn(f"WARNING: could not record {bk.name} as shipped", run.stdout)
+                self.assertFalse(record.exists())
+                self.assertFalse(record.with_name(record.name + ".new").exists())
+                self.assertTrue((self.remote_dir / f"{bk.name}.tar.age").is_file())
+                self.assertFalse((self.backups / f".offhost-retry.{bk.name}").exists())
+
     def test_a_record_that_cannot_be_written_is_reported_and_leaves_no_partial_record(self):
         recipients = self.recipients()
         bk = self.make_set()

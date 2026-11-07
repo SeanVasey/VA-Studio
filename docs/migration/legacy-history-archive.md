@@ -199,13 +199,65 @@ handover evidence codes (`baseline_not_archived`, `later_not_archived`, `baselin
 transitions serialize on the ledger head (`SELECT … FOR UPDATE`) and the unique sequence number; the loser is refused
 (`authority_changed_concurrently` or the transition code it then sees), proven with two independent MySQL processes.
 
-`ExclusivityAuthority::storeMaySellExclusives()` is true only while `vasey_store` holds the authority. **The store's
-exclusive activation and checkout do not consult it yet**: wiring it in touches checkout and inventory files owned by
-the production-checkout/activation lanes. It is recorded as a launch gate in
-`docs/live-payment-and-production-preparation-queue.md` and in tasks T39/T40. Until then the ledger is the cutover record
-and rehearsal tool, not an enforced checkout gate.
+`ExclusivityAuthority::storeMaySellExclusives()` is true only while `vasey_store` holds the authority. Production
+checkout already consults it through `CurrentSelection` and `ExclusiveInventoryGate`: absent, unreadable, frozen or
+BeatStars authority is refused. Even with `vasey_store` authority, exclusive inventory remains refused as
+`unsupported_inventory`; there is no supported production exclusive consumer. Supporting exclusive activation and
+checkout remains a separate launch gate in `docs/live-payment-and-production-preparation-queue.md` and tasks T39/T40.
+This authority check does not activate historical verified grants or turn archive classifications into entitlements.
 
 ## Verification
 
 Focused development checks, not acceptance: `docs/verification/migration-tooling-20261024/README.md` records the
 exact commands, counts, the native MySQL run, mutation results and the untested conditions.
+
+### Mandatory review procedure for competing-record changes (V3)
+
+Before `review-grant --attest`, the reviewer must examine the exact delta whose
+baseline and later snapshot SHA-256 values identify the retained prior export and
+newest export being reviewed. Check its blocking items and dispositions, and inspect
+the retained history of every competing line/order, customer and contract that
+cleared a blocker, including versions moved to another track, address or line.
+A newer export copying or omitting that version does not waive this requirement.
+Record the exact snapshot hashes and checked delta reference in the review evidence
+reference. Do not attest while a change remains unexplained. This is an operator
+procedure: the review command does not persist or enforce a reconciled-delta approval.
+Historical `verified_grant` activation remains blocked pending all MIG gate repairs,
+including declaration-complete missing-original evidence and independent review.
+
+### V2 contract declarations and legacy history admission
+
+New normalization uses `vasey-legacy-history-v2` /
+`vasey-legacy-history-transform-v2`. Existing record identities retain the exact
+`vasey-legacy-history-v1` namespace, and original records retain their original
+bytes and hashes. V2 adds immutable `contract_declarations` after the original
+`contracts` cohort. Every valid declaration is retained, including declarations
+whose original is absent. A missing original produces no artifact row, size, hash
+or path. A genuinely supplied zero-byte original is distinct from absence.
+
+V1 snapshots remain readable, archivable, resumable and reconcilable. V1-to-v1
+and v2-to-v2 deltas are supported; mixed-version deltas refuse and require genuine
+re-normalization of both source packages before comparison. No in-memory upgrade
+or completeness backfill exists. Inspection/classification and writes refuse for
+a source system with **any retained v1 batch**, complete or incomplete, regardless
+of newest v2 evidence (`declaration_history_coverage_unproven`). No approved package
+coverage recovery mechanism exists in this batch. Renaming a source system,
+deleting batches or manufacturing new equivalent records is not recovery.
+
+For v2-only history, all five newest membership cohorts must be complete. Every
+retained declaration ever associated with a line remains a candidate. Any historical
+change of its line/order association is an unresolved
+`contract_declaration_relinked` blocker, including move-back, later copy and later
+omission. Delta dispositions and the V3 review procedure cannot authorize relinks.
+Exactly one declaration, present in the newest batch with its exact genuine verified
+original, is required. Historical reviews remain immutable; stronger evidence may
+withdraw classification. A preexisting review on the same immutable line version
+cannot be overwritten to escape `reviewed_evidence_changed`.
+
+Every retained same-source v2 batch must also have every advertised membership row
+physically archived, including superseded versions. An older interrupted export may
+advertise a new missing-original declaration or an intermediate relink that physical
+row discovery cannot yet associate. A newer complete export cannot prove that unknown
+evidence irrelevant. `retained_export_not_archived` therefore refuses review and
+classification until the genuine original package is resumed. Resume does not waive
+multiple declarations, historical relinks or any other substantive blocker.

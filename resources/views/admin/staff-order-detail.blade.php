@@ -3,7 +3,7 @@
     <h3 class="font-semibold">Lines</h3>
     <ul class="space-y-1">
         @foreach ($order['lines'] as $line)
-            <li>Line {{ $line['position'] }}: {{ $line['title'] ?? 'untitled' }} — {{ $line['totalMinor'] ?? 'unknown' }} minor units{{ $line['exclusive'] ? ', exclusive' : '' }}; refunded by allocation {{ $line['allocatedMinor'] }}; downloads {{ $line['downloadsHeld'] ? 'held' : 'not held' }}.@if ($line['grant']) Grant {{ $line['grant'] }}.@endif</li>
+            <li>Line {{ $line['position'] }}: {{ $line['title'] ?? 'untitled' }} — {{ $line['totalMinor'] ?? 'unknown' }} minor units{{ $line['exclusive'] ? ', exclusive' : '' }}; succeeded refunds by allocation {{ $line['allocatedMinor'] ?? 'unknown' }}; downloads {{ $line['downloadsHeld'] ? 'held' : 'not held' }}.@if ($line['grant']) Grant {{ $line['grant'] }}.@endif</li>
         @endforeach
     </ul>
     <h3 class="font-semibold">Refunds and disputes</h3>

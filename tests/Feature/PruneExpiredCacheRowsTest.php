@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
+use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -142,8 +143,25 @@ class PruneExpiredCacheRowsTest extends TestCase
         $this->assertSame(0, DB::table('cache')->where('key', 'like', '%expired-neighbour')->count());
     }
 
-    public function test_expired_locks_go_and_held_locks_stay_held(): void
+    /** @return array<string, array{?string}> */
+    public static function heldLockPrefixes(): array
     {
+        return [
+            'configured prefix' => [null],
+            'empty prefix' => [''],
+            'held key sorts first' => ['a-cache-'],
+            'held key sorts last' => ['vaseyaudio-cache-'],
+        ];
+    }
+
+    #[DataProvider('heldLockPrefixes')]
+    public function test_expired_locks_go_and_held_locks_stay_held(?string $prefix): void
+    {
+        if ($prefix !== null) {
+            config(['cache.prefix' => $prefix]);
+            Cache::purge('database');
+            $this->assertSame($prefix, Cache::getPrefix());
+        }
         $held = Cache::lock('held-synthetic', 600);
         $this->assertTrue($held->get());
         $this->row('expired-lock-1', $this->now - 1, 'cache_locks');
@@ -153,7 +171,11 @@ class PruneExpiredCacheRowsTest extends TestCase
         [$exit, $output] = $this->prune();
 
         $this->assertSame(0, $exit);
-        $this->assertSame(['held-synthetic', 'live-lock'], array_map(fn (string $key): string => str_replace(Cache::getPrefix(), '', $key), $this->keys('cache_locks')));
+        $expectedKeys = [Cache::getPrefix().'held-synthetic', 'live-lock'];
+        $remainingKeys = $this->keys('cache_locks');
+        sort($expectedKeys, SORT_STRING);
+        sort($remainingKeys, SORT_STRING);
+        $this->assertSame($expectedKeys, $remainingKeys);
         $this->assertStringContainsString('and 2 expired cache lock(s)', $output);
         $this->assertFalse(Cache::lock('held-synthetic', 5)->get(), 'another owner still cannot take the held lock');
         $this->assertTrue($held->release());
