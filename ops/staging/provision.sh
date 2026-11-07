@@ -274,6 +274,12 @@ runuser -u "$APP_USER" -- test -r /var/lib/clamav/daily.cvd -o -r /var/lib/clama
 install -d -m 0755 -o root -g root "$ROOT"
 install -d -m 0755 -o root -g root "$ROOT/releases"
 install -d -m 0700 -o root -g root "$ROOT/backups"
+# The nginx.org packages Forge installs keep their own temp paths under /var/cache/nginx and ship no
+# /var/lib/nginx (Ubuntu's package does). The site's fastcgi_temp_path lives below it, so create the
+# root-owned parent when absent; an existing one must already be a root-owned real directory.
+[ -e /var/lib/nginx ] || install -d -m 0755 -o root -g root /var/lib/nginx
+[ -d /var/lib/nginx ] && [ ! -L /var/lib/nginx ] && [ "$(stat -c %u /var/lib/nginx)" = 0 ] \
+  || die "/var/lib/nginx must be a root-owned directory, not a symlink"
 # App/nginx-owned paths can be replaced by those identities on a rerun. Never grant permissions
 # through a pathname below them: every child opens no-follow relative to a retained directory FD.
 initialize_runtime_directories
