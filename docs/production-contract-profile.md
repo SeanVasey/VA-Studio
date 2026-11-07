@@ -38,8 +38,8 @@ Existing originals stay byte-preserved, and v1 and v2 stay registered for retain
 
 | # | Decision | Why it blocks |
 | --- | --- | --- |
-| C-1 | **Buyer address.** The store does not collect or retain a buyer address, by design. The templates open with "{CUSTOMER_FULLNAME} residing at {CUSTOMER_ADDRESS}". The options are to collect a legal name and address at checkout (more personal data, which needs privacy policy and retention changes) or to remove "residing at {CUSTOMER_ADDRESS}" from the templates. | It decides the checkout fields and the template wording. |
-| C-2 | **Buyer legal name.** Is the account or checkout name accepted as `{CUSTOMER_FULLNAME}`, or must a separate legal-name field be confirmed at assent? | It decides the frozen input and the assent screen. |
+| C-1 | **Buyer address: decided 2026-11-07 by Sean, collect it.** The clause "{CUSTOMER_FULLNAME} residing at {CUSTOMER_ADDRESS}" stays as written. Checkout gains a postal address step, frozen into the grant input. Before collection starts, the privacy policy, retention schedule and customer data-rights export/deletion must cover it. | Checkout fields, privacy and retention work (new increment 2a). |
+| C-2 | **Buyer legal name: decided 2026-11-07 by Sean, confirmed at checkout.** The buyer types or confirms their legal name at the agreement step, and that exact name is frozen as `{CUSTOMER_FULLNAME}`. The account name is not substituted. | Assent screen and frozen input. |
 | C-3 | **Counsel review** of the drafted no-samples warranty and the removed law-firm notice sentence. | It is new legal wording. |
 | C-4 | **Per-track tier enablement.** The export enables Premium on 22 tracks, Unlimited on 7 and Exclusive (offer-only) on 1, on top of Basic and Premium Plus. These become individual offer approvals. | It decides the offer drafts after import. |
 
@@ -47,6 +47,9 @@ Existing originals stay byte-preserved, and v1 and v2 stay registered for retain
 
 1. **License sources.** Author the six templates as license versions (source text, plus v4 terms mapped from the tier
    variables), and get human review. This needs a live target, which means staging.
+2a. **Buyer identity capture (C-1, C-2).** Legal name and postal address at the agreement step. They are validated, stored
+    encrypted with the grant input, covered by retention and data-rights export/deletion, and disclosed in the privacy policy
+    first. Never inferred from payment or account data.
 2. **Variable binding.** A closed map from the frozen grant input to the template variables. Any unknown or unfilled placeholder
    refuses issuance, and nothing is substituted silently. This includes golden synthetic fixtures.
 3. **Profile `vasey-license-pdf-v1`.** Pin the fonts, logo and signature hash, the template layout and the renderer graph.
