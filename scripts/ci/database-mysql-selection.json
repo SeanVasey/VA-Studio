@@ -54,6 +54,7 @@
     "tests/Feature/TestPaymentEvidenceMigrationTest.php",
     "tests/Feature/TestRefundResolutionMigrationTest.php",
     "tests/Feature/TestUnpaidReleaseMigrationTest.php",
+    "tests/Feature/TieredLicenseMigrationTest.php",
     "tests/Feature/TrackMetadataMigrationTest.php",
     "tests/Feature/TrackMetadataPresetsMigrationTest.php",
     "tests/Feature/TrackPublicationGuardMigrationTest.php",

@@ -49,7 +49,7 @@ class ProductionTrackPreparationPacketGuardsTest extends TestCase
         // Explicit damaged-restore canaries only; the operational guards stay
         // strict in shipped migrations. Catalog active/current fields are editable.
         foreach (match ($scenario) {
-            'license' => ['license_review_state_guard_v4', 'license_review_content_guard'], 'packet' => ['ptp_packet_update'], 'line' => ['ptp_line_update'], default => []
+            'license' => ['license_review_state_guard_v5', 'license_review_content_guard'], 'packet' => ['ptp_packet_update'], 'line' => ['ptp_line_update'], default => []
         } as $trigger) {
             DB::unprepared('DROP TRIGGER '.$trigger);
         }
@@ -160,7 +160,7 @@ class ProductionTrackPreparationPacketGuardsTest extends TestCase
         $f = Fixture::prepared();
         if ($scenario === 'stale renderer') {
             DB::unprepared('DROP TRIGGER license_review_content_guard');
-            DB::unprepared('DROP TRIGGER license_review_state_guard_v4');
+            DB::unprepared('DROP TRIGGER license_review_state_guard_v5');
         }
         if (in_array($scenario, ['missing preview', 'missing run output', 'damaged asset hash'], true)) {
             DB::unprepared('DROP TRIGGER media_assets_immutable_update');

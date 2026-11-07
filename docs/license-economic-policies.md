@@ -4,7 +4,7 @@ This WP-04 increment adds retained ownership declarations, a precisely labeled p
 
 ## Deliberate authoring
 
-New admin drafts use schema 4. Choose every usage, scope and economic field explicitly. For a retained v3 version, **Define economic policies** creates a linked v4 successor with its source, usage, territory, duration and availability dates preserved. The new economic decisions start blank. Add the seven new source variables and complete the policy definitions before saving. **New revision** preserves its predecessor's schema. Existing v1-to-v2 and v2-to-v3 mapping actions remain available.
+New admin drafts used schema 4 until [schema 5](license-usage-v5.md), which keeps these declarations unchanged. Choose every usage, scope and economic field explicitly. For a retained v3 version, **Define economic policies** creates a linked v4 successor with its source, usage, territory, duration and availability dates preserved. The new economic decisions start blank. Add the seven new source variables and complete the policy definitions before saving. **New revision** preserves its predecessor's schema. Existing v1-to-v2 and v2-to-v3 mapping actions remain available.
 
 The editor captures integer basis points: 100 is 1.00%, 10,000 is 100.00%. Valid form strings become integers at the form boundary; domain calls reject strings, floats, booleans, ambiguous percentages and values outside the supported range. Changing a mode to `none` removes the stale rate/basis fields before validation. There is no default rate, income entitlement or ownership declaration.
 
