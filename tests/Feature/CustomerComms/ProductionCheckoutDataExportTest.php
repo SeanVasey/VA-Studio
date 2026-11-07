@@ -145,8 +145,10 @@ class ProductionCheckoutDataExportTest extends TestCase
     public function test_a_missing_production_table_refuses_instead_of_reporting_no_records(): void
     {
         $fixture = $this->taxOrder();
-        DB::getSchemaBuilder()->drop('production_tax_checkout_bindings');
+        // Children before parents: on MySQL the foreign keys refuse dropping a referenced table (reviewed sessions reference
+        // bindings, requests and orders; bindings reference requests; requests reference orders).
         DB::getSchemaBuilder()->drop('production_tax_checkout_reviewed_sessions');
+        DB::getSchemaBuilder()->drop('production_tax_checkout_bindings');
         DB::getSchemaBuilder()->drop('production_tax_checkout_requests');
         DB::getSchemaBuilder()->drop('production_tax_checkout_orders');
         $this->refusesExport(self::account($fixture['buyer']));
