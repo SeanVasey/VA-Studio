@@ -66,7 +66,13 @@ final class ContractIdentityDeclarationV2
         CheckoutException::require($input['legalNameConfirmed'] === true, 'invalid', 422);
         CheckoutException::require(in_array($input['licenseeType'], self::LICENSEE_TYPES, true), 'invalid', 422);
         CheckoutException::require(array_diff(array_keys($statements), self::LICENSEE_TYPES) === [], 'invalid', 422);
-        $hashes = array_column(array_filter($statements, 'is_array'), 'statement_hash');
+        // Every offered statement is checked, not only the selected one: a malformed or miskeyed entry is a configuration error.
+        foreach ($statements as $type => $offered) {
+            CheckoutException::require(is_array($offered), 'invalid', 422);
+            self::statement($offered);
+            CheckoutException::require(self::belongsTo($offered['statement_version'], $type), 'invalid', 422);
+        }
+        $hashes = array_column($statements, 'statement_hash');
         CheckoutException::require(count($hashes) === count(array_unique($hashes)), 'invalid', 422);
         $statement = $statements[$input['licenseeType']] ?? null;
         CheckoutException::require(is_array($statement), 'invalid', 422);
@@ -114,7 +120,7 @@ final class ContractIdentityDeclarationV2
         self::statement(['statement_version' => $confirmation['statement_version'], 'statement_hash' => $confirmation['statement_hash']]);
         // The frozen statement must be the one for this licensee type: its version names the type.
         CheckoutException::require(is_string($declaration['licensee_type'])
-            && str_starts_with($confirmation['statement_version'], $declaration['licensee_type'].'-'), 'invalid', 422);
+            && self::belongsTo($confirmation['statement_version'], $declaration['licensee_type']), 'invalid', 422);
 
         $printed = [];
         $printed[] = self::text($declaration['legal_name'], self::LEGAL_NAME_BYTES);
@@ -203,6 +209,12 @@ final class ContractIdentityDeclarationV2
         return preg_match(self::REFUSED, str_replace(' ', '', $value)) === 0
             && preg_match('/[\p{Lu}\p{Ll}\p{Lt}\p{Lo}\p{Nd}]/u', $value) === 1
             && $coverage->covers($value);
+    }
+
+    /** A statement version names its licensee type as a prefix and has something after it (`individual-…`, `business-…`). */
+    private static function belongsTo(string $version, string $type): bool
+    {
+        return str_starts_with($version, $type.'-') && strlen($version) > strlen($type) + 1;
     }
 
     private static function statement(array $statement): void

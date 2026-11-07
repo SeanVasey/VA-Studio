@@ -140,6 +140,33 @@ class ContractIdentityDeclarationV2Test extends TestCase
         $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(), false, $same, self::coverage()));
     }
 
+    public function test_every_offered_statement_is_validated_not_only_the_selected_one(): void
+    {
+        foreach ([
+            'malformed business entry' => [...self::STATEMENTS, 'business' => ['x' => 1]],
+            'business entry not an array' => [...self::STATEMENTS, 'business' => 'junk'],
+            'business hash is an array' => [...self::STATEMENTS, 'business' => ['statement_version' => 'business-v1', 'statement_hash' => ['a']]],
+            'business version names the other type' => [...self::STATEMENTS, 'business' => ['statement_version' => 'individual-other-v1', 'statement_hash' => self::BUSINESS_STATEMENT['statement_hash']]],
+            'bare type prefix' => ['individual' => ['statement_version' => 'individual-', 'statement_hash' => self::STATEMENT['statement_hash']]],
+        ] as $name => $statements) {
+            try {
+                ContractIdentityDeclarationV2::fromInput(self::input(), false, $statements, self::coverage());
+                $this->fail($name);
+            } catch (CheckoutException $e) {
+                $this->assertSame('invalid', $e->reason, $name);
+            }
+        }
+        $declaration = ContractIdentityDeclarationV2::fromInput(self::input(), false, self::STATEMENTS, self::coverage());
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::verify([...$declaration,
+            'legal_name_confirmation' => ['confirmed' => true, 'statement_version' => 'individual-', 'statement_hash' => self::STATEMENT['statement_hash']]], false, self::coverage()));
+    }
+
+    public function test_the_pinned_contract_faces_load_only_when_their_hashes_match_the_profile(): void
+    {
+        $this->assertTrue(\App\Domain\Commerce\ContractIdentity\ContractGlyphCoverage::pinnedContractFaces()->covers('Zoë Émile'));
+        $this->assertFalse(\App\Domain\Commerce\ContractIdentity\ContractGlyphCoverage::pinnedContractFaces()->covers('王'));
+    }
+
     public function test_artist_name_is_required_if_and_only_if_the_order_is_exclusive(): void
     {
         $exclusive = ContractIdentityDeclarationV2::fromInput(self::input(['artistName' => ' DJ Example ']), true, self::STATEMENTS, self::coverage());

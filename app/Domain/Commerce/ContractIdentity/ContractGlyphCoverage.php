@@ -30,6 +30,28 @@ final class ContractGlyphCoverage
     }
 
     /**
+     * The regular and bold DejaVu Sans faces the `test-v2` contract profile pins, which the paid and paid-tax renderers set
+     * buyer text in. Each metric file must match the SHA-256 the profile pins, so the coverage can never drift from the faces
+     * that actually print.
+     */
+    public static function pinnedContractFaces(): self
+    {
+        $root = base_path('resources/contracts/test-v2');
+        $profile = json_decode((string) file_get_contents($root.'/profile-assets.json'), true, 64, JSON_THROW_ON_ERROR);
+        $paths = [];
+        foreach (['fonts/generated/dejavusans.json', 'fonts/generated/dejavusansb.json'] as $asset) {
+            $pinned = $profile['assets'][$asset]['sha256'] ?? null;
+            $path = $root.'/'.$asset;
+            if (! is_string($pinned) || ! is_file($path) || ! hash_equals($pinned, (string) hash_file('sha256', $path))) {
+                throw new InvalidArgumentException('Pinned contract font metrics do not match the profile.');
+            }
+            $paths[] = $path;
+        }
+
+        return self::fromTcpdfMetrics($paths);
+    }
+
+    /**
      * Intersect the width tables (`cw`, keyed by codepoint) of tc-lib-pdf-font generated metric files, counting only
      * glyphs with a positive advance width.
      *

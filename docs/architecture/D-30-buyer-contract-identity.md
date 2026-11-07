@@ -38,6 +38,16 @@ not use a separate record.
   path until a production Exclusive consumer exists.
 - **Gate.** Capture sits behind a literal-false `contract_identity_v2` gate. The gate opens together with the
   `vasey-license-pdf-v1` profile, because the current paid renderers print every input field.
+  - **Implemented for the V2 tax checkout (step 5):** `production-tax-checkout.contract_identity_v2`, admitted only as an
+    exact `true` in `local` or `testing` (`TaxCheckoutPolicy::contractIdentityV2()`).
+  - **Gate on:**
+    - `ProductionTaxCheckout::order` requires the v2 declaration and refuses the legacy name-only shape;
+    - the statements come from `ContractIdentityStatements`, which holds the approved texts with versions
+      `individual-legal-name-confirmation-v1` and `business-legal-name-confirmation-v1`, hashed over the exact text;
+    - the printable set comes from the `test-v2` DejaVu metric files, whose SHA-256 must match that profile
+      (`ContractGlyphCoverage::pinnedContractFaces()`);
+    - the preview offers the licensee types and statement texts.
+  - **Gate off:** the order path and preview response are unchanged.
 
 ## Validation and rendering
 
@@ -107,7 +117,8 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
 2. Legal draft updates, for Sean's approval.
 3. Data-rights export and retained-table coverage. Needs independent review and native MySQL evidence.
 4. A pure `ContractIdentityDeclarationV2` validator and formatter.
-5. V2 tax checkout wiring behind the gate. Needs independent review and a native MySQL journey.
+5. V2 tax checkout wiring behind the gate. Needs independent review and a native MySQL journey. Before activation, the
+   statement texts and the printable set must be rebound to the `vasey-license-pdf-v1` profile's own faces.
 6. V1 checkout wiring.
 7. The binder requirement, inside contract increments 3 and 4.
 8. Activation, together with the profile, after steps 2–3 merge and U-13 retention values are approved.
