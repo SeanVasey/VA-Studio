@@ -354,7 +354,8 @@ class CustomerDataRightsTest extends TestCase
             array_diff_key($retained['orders'], ['record' => true]));
         $this->assertSame(1, $retained['customer_consent_events']['count']);
         foreach (['production_checkout_exemption_bases', 'production_checkout_reviews', 'production_checkout_orders', 'production_tax_checkout_orders',
-            'paid_order_origins', 'paid_grant_origins', 'paid_originals', 'paid_tax_order_origins', 'paid_tax_grant_origins', 'paid_tax_originals'] as $record) {
+            'paid_order_origins', 'paid_grant_origins', 'paid_originals', 'paid_tax_order_origins', 'paid_tax_grant_origins', 'paid_tax_originals',
+            'paid_authorizations', 'paid_redemptions', 'paid_tax_authorizations', 'paid_tax_redemptions'] as $record) {
             $this->assertEquals(['retention' => 'financial_records_years', 'reason' => 'immutable_record_retained', 'count' => 0],
                 array_diff_key($retained[$record], ['record' => true]), $record);
         }

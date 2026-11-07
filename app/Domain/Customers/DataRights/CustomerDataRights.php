@@ -56,6 +56,9 @@ class CustomerDataRights
         'paid_order_origins' => 'financial_records_years', 'paid_grant_origins' => 'financial_records_years',
         'paid_originals' => 'financial_records_years', 'paid_tax_order_origins' => 'financial_records_years',
         'paid_tax_grant_origins' => 'financial_records_years', 'paid_tax_originals' => 'financial_records_years',
+        // Their download history, kept by `_retain` triggers: delivery records, as `delivery_records` above.
+        'paid_authorizations' => 'financial_records_years', 'paid_redemptions' => 'financial_records_years',
+        'paid_tax_authorizations' => 'financial_records_years', 'paid_tax_redemptions' => 'financial_records_years',
     ];
 
     /** @return array{requestId: string, downloadToken: string, expiresAt: string, sizeBytes: int} */
