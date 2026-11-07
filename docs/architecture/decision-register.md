@@ -262,8 +262,8 @@ Sean's words on 2026-10-24: "The merchant is Vasey Multimedia dba VASEY.AUDIO an
 
 - **Business licensees allowed, and the individual statement and order-review wording approved** (Sean, 2026-11-07).
   - A business may be the licensee. Order review then records the business's legal name and the name of the person
-    accepting for it, under a separate business confirmation statement. That statement is still a proposal awaiting
-    Sean's approval (TERMS A.10), so until then checkout offers only the individual type.
+    accepting for it, under a separate business confirmation statement. Sean approved that statement and the
+    TERMS section 7 "Buying for a business" paragraph later the same day (TERMS A.10).
   - TERMS section 7 and the individual statement ("I confirm that this is my full legal name and that the license should be
     issued to me under it.") are approved.
   - D-30 records the shape.
