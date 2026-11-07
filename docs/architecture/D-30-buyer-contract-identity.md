@@ -44,8 +44,10 @@ not use a separate record.
     - `ProductionTaxCheckout::order` requires the v2 declaration and refuses the legacy name-only shape;
     - the statements come from `ContractIdentityStatements`, which holds the approved texts with versions
       `individual-legal-name-confirmation-v1` and `business-legal-name-confirmation-v1`, hashed over the exact text;
-    - the printable set comes from the `test-v2` DejaVu metric files, whose SHA-256 must match that profile
-      (`ContractGlyphCoverage::pinnedContractFaces()`);
+    - the printable set comes from the `test-v2` DejaVu metric files (`ContractGlyphCoverage::pinnedContractFaces()`).
+      The profile manifest must match the registry's pinned hash and each metric file the manifest's SHA-256, and the set is
+      restricted to the profile's `allowed_scripts`, so checkout refuses what the paid renderers would refuse after payment
+      (Armenian and Georgian, for example, which DejaVu draws);
     - the preview offers the licensee types and statement texts.
   - **Gate off:** the order path and preview response are unchanged.
 
@@ -137,8 +139,15 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
    - **Follow-up:** `production_checkout_exemption_bases`, which is the buyer's exemption attestation and not a declaration,
      should be exported and retained too.
 4. A pure `ContractIdentityDeclarationV2` validator and formatter.
-5. V2 tax checkout wiring behind the gate. Needs independent review and a native MySQL journey. Before activation, the
-   statement texts and the printable set must be rebound to the `vasey-license-pdf-v1` profile's own faces.
+5. V2 tax checkout wiring behind the gate. Needs independent review and a native MySQL journey. Before activation (step 8):
+   - the statement texts and the printable set must be rebound to the `vasey-license-pdf-v1` profile's own faces, and the
+     accepted set must stay a subset of that renderer's own input rule, with a test;
+   - the statement the buyer saw must be bound to the one frozen: the client sends back the displayed statement version,
+     checked with `hash_equals` against the server's, or the offered statements join the preview commitment. Today the order
+     freezes the server's current statement, which is safe only while each type has one version;
+   - gate-on tests must cover `initiate`, `reconcile` and the paid-tax grant render with a v2 declaration, a gate flip between
+     preview and order and on replay, and a business order without a representative;
+   - `TaxCheckoutEvidence::order` should check that the body's declarations equal the request's, as V1 `OrderEvidence` does.
 6. V1 checkout wiring.
 7. The binder requirement, inside contract increments 3 and 4.
 8. Activation, together with the profile, after steps 2, 3a and 3b merge and U-13 retention values are approved.

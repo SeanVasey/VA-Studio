@@ -9,7 +9,8 @@ use App\Domain\Rights\LicenseTerritories;
  * D-30 buyer contract identity: who the licensee is (an individual, or a business acting through a named
  * representative), the legal name the buyer confirms, a structured postal address and, for Exclusive, an
  * artist name. Pure: it validates checkout input into the frozen `buyer_declarations` shape, re-verifies a stored
- * declaration and formats `{CUSTOMER_ADDRESS}`. Nothing here is wired into a checkout yet.
+ * declaration and formats `{CUSTOMER_ADDRESS}`. The production tax checkout freezes it behind the default-off
+ * `contract_identity_v2` gate (local/testing only).
  *
  * Shape errors refuse with `invalid`; a well-formed value the pinned contract fonts cannot print refuses with
  * `unsupported_characters`, so the buyer can be asked to enter supported characters. Values are never rewritten
