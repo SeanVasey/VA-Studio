@@ -244,3 +244,18 @@ Sean's words on 2026-10-24: "The merchant is Vasey Multimedia dba VASEY.AUDIO an
 - **U-05 partially resolved.** Seller and licensor: **Sean Vasey**. Drafting of the privacy policy, the terms of sale and use and the license tiers was assigned to the development lead on 2026-10-24; the drafts are `docs/legal/PRIVACY.md`, `docs/legal/TERMS.md` and `docs/legal/LICENSE-TIERS.md`, each marked as a draft for Sean's approval. Still open: Sean's approval of the final text, caps and prices; qualified legal review; exclusive ownership semantics (the drafts default to an exclusive license with no copyright transfer); and per-track rights declarations. No license version, offer, production policy value or approved hash was created or recorded, and nothing is approved.
 - **Governing law: State of Iowa, USA** (Sean, 2026-10-24). The venue county, the postal address's city and ZIP, and the minimum age remain open in the drafts' open-items lists.
 - U-08 (exclusive reservation and late payment) and U-13 (retention, processors, consent notice text) are unchanged; the drafts only propose values for Sean to accept or change.
+
+## Register update — 2026-11-07: contracts, licensing and buyer identity
+
+- **Licensor: Sean Vasey personally** (Sean, 2026-11-07), consistent with U-05. Vasey Multimedia appears only as the brand
+  owner in the contract footer.
+- **License terms schema v5** (Sean, 2026-11-07; merged in #205). Each of Sean's tier limits has its own usage slot. See
+  [`license-usage-v5.md`](../license-usage-v5.md).
+- **[D-30](D-30-buyer-contract-identity.md) buyer contract identity** (Sean, 2026-11-07):
+  - checkout collects the postal address (C-1);
+  - the legal name is confirmed at the agreement step (C-2);
+  - Exclusive checkout asks for an artist name (D-1);
+  - characters the contract fonts cannot print are refused;
+  - issued contracts stand, and corrections are support notes.
+
+  U-13 retention values and the PRIVACY and TERMS text still need Sean's approval before any collection.

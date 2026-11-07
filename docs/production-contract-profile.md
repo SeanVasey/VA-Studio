@@ -49,7 +49,7 @@ Existing originals stay byte-preserved, and v1 and v2 stay registered for retain
 
 1. **License sources.** Author the six templates as license versions (source text, plus v4 terms mapped from the tier
    variables), and get human review. This needs a live target, which means staging.
-2. **Buyer identity capture (C-1, C-2).** Legal name and postal address at the agreement step. They are validated, stored
+2. **Buyer identity capture (C-1, C-2, D-1)**, designed in [D-30](architecture/D-30-buyer-contract-identity.md). Legal name and postal address at the agreement step. They are validated, stored
     encrypted with the grant input, covered by retention and data-rights export/deletion, and disclosed in the privacy policy
     first. Never inferred from payment or account data.
 3. **Variable binding.** A closed map from the frozen grant input to the template variables. Any unknown or unfilled placeholder
