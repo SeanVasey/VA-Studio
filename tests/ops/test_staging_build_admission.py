@@ -37,6 +37,11 @@ class BuildAdmissionTest(unittest.TestCase):
             release.parent.mkdir()
             evidence = root / "evidence"
             evidence.mkdir()
+            (root / "tmp").mkdir(mode=0o700)
+            # A home left by an earlier build (or planted by the application) must never be reused.
+            stale = root / "tmp" / "build-home"
+            (stale / "composer").mkdir(parents=True)
+            (stale / ".npmrc").write_text("registry=https://planted.invalid/\n")
             candidate = root / "candidate.env"
             candidate.write_text(profile)
             candidate.chmod(0o600)
@@ -54,6 +59,10 @@ if (!is_string($home) || !is_dir($home) || !is_string($composerHome) || !str_sta
     || str_starts_with(realpath($home), realpath(getcwd()))) {
     fwrite(STDERR, "Composer ran without a private build home outside the release\n");
     exit(24);
+}
+if ((fileperms($home) & 0777) !== 0700 || array_diff(scandir($home), ['.', '..', 'composer']) !== []) {
+    fwrite(STDERR, "Composer ran with a reused or shared build home\n");
+    exit(26);
 }
 file_put_contents('hook-profile.sha256', hash('sha256', $profile));
 mkdir('vendor/composer', 0755, true);
@@ -78,7 +87,7 @@ file_put_contents('vendor/composer/installed.json', '{}');
                                  env={"PATH": str(commands) + ":/usr/bin:/bin", "LC_ALL": "C"},
                                  capture_output=True, text=True)
             self.assertEqual(run.returncode, 0, run.stderr)
-            self.assertEqual(0o700, (root / "tmp/build-home").stat().st_mode & 0o777)
+            self.assertEqual([stale], list((root / "tmp").glob("build-home*")), "the per-build home must be removed")
             self.assertEqual((release / "hook-profile.sha256").read_text(), hashlib.sha256(profile.encode()).hexdigest())
             self.assertEqual(candidate.read_text(), profile, "build changed the captured profile")
             self.assertEqual((release / ".env").read_text(), profile)
@@ -106,6 +115,7 @@ file_put_contents('vendor/composer/installed.json', '{}');
             (root / "current").symlink_to(served)
             (root / "private").mkdir()
             (root / "evidence").mkdir()
+            (root / "tmp").mkdir(mode=0o700)
             env = root / "candidate.env"
             env.write_text("APP_DEBUG=false\n")
             (served / ".env").write_text(env.read_text())

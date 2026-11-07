@@ -30,9 +30,11 @@ case "$MODE" in
     # Composer's Laravel hooks boot the application; admit the captured profile first.
     install -m 0600 -- "$candidate" "$REL/.env"
     # ctl runs this step under `env -i`. Composer refuses to start without HOME or COMPOSER_HOME, and npm keeps its
-    # cache under HOME, so give both a private build home under the kit root, outside every release.
-    BUILD_HOME=$VASEY_ROOT/tmp/build-home
-    install -d -m 0700 -- "$BUILD_HOME"
+    # cache under HOME. Give both a fresh private home for this build only, outside every release, and remove it on
+    # exit: a reused home under the app-owned tmp could carry a planted .npmrc or Composer plugin into a sealed build.
+    BUILD_HOME=$(mktemp -d "$VASEY_ROOT/tmp/build-home.XXXXXXXXXX") || die "cannot create a private build home"
+    trap 'rm -rf -- "$BUILD_HOME"' EXIT
+    chmod 0700 -- "$BUILD_HOME"
     export HOME=$BUILD_HOME COMPOSER_HOME=$BUILD_HOME/composer npm_config_cache=$BUILD_HOME/npm
     composer_bin=$(command -v composer) || die "composer not found"
     (cd "$REL" && "$PHP" "$composer_bin" install --no-dev --no-interaction --no-progress --prefer-dist --classmap-authoritative)
