@@ -7,6 +7,7 @@ use App\Domain\Delivery\DeliveryAssetFiles;
 use App\Domain\Memberships\Production\MemberGrantIntent;
 use App\Domain\Rights\EconomicLicenseTerms;
 use App\Domain\Rights\LicenseTerritories;
+use App\Domain\Rights\TieredLicenseTerms;
 use App\Domain\Rights\TypedLicenseTerms;
 use App\Support\CanonicalJson;
 use DateTimeImmutable;
@@ -108,13 +109,13 @@ final class MemberGrantDocumentValues
     /** The retained license vocabularies, checked without their container-resolved authoring validators. */
     public static function terms(mixed $terms): void
     {
-        MemberGrantException::require(is_array($terms) && in_array($terms['schema_version'] ?? null, [1, 2, 3, 4], true), 'invalid_document');
+        MemberGrantException::require(is_array($terms) && in_array($terms['schema_version'] ?? null, [1, 2, 3, 4, 5], true), 'invalid_document');
         $version = $terms['schema_version'];
         $keys = $version === 1 ? ['schema_version', 'features', 'required_asset_roles'] : ['schema_version', 'required_asset_roles', 'usage', 'permissions', 'credit'];
         if ($version >= 3) {
             $keys = [...$keys, 'territory', 'duration'];
         }
-        if ($version === 4) {
+        if ($version >= 4) {
             $keys = [...$keys, 'ownership', 'publishing_income', 'recording_royalty', 'policies'];
         }
         self::keys($terms, $keys);
@@ -127,7 +128,7 @@ final class MemberGrantDocumentValues
 
             return;
         }
-        self::keys($terms['usage'], array_keys(TypedLicenseTerms::USAGE));
+        self::keys($terms['usage'], array_keys($version === 5 ? TieredLicenseTerms::USAGE : TypedLicenseTerms::USAGE));
         foreach ($terms['usage'] as $use) {
             MemberGrantException::require(is_array($use) && in_array($use['mode'] ?? null, ['prohibited', 'limited', 'unlimited'], true), 'invalid_document');
             self::keys($use, $use['mode'] === 'limited' ? ['mode', 'limit'] : ['mode']);
@@ -150,7 +151,7 @@ final class MemberGrantDocumentValues
         if ($version >= 3) {
             self::scope($terms);
         }
-        if ($version === 4) {
+        if ($version >= 4) {
             self::economics($terms);
         }
     }

@@ -93,6 +93,16 @@ class LicenseVersionResource extends OperatorResource
                 ], auth()->user(), $record);
                 Notification::make()->title('Draft version '.$draft->version.' created')->success()->send();
             }),
+            Action::make('tiered_successor')->label('Define tier usage limits')->visible(fn (LicenseVersion $record) => ($record->structured_terms['schema_version'] ?? null) === 4)
+                ->modalDescription('Create a successor with the separate tier usage limits. Unchanged declarations are copied. Choose audio streams, monetized and non-monetized video streams, monetized music videos, free downloads, and for-profit and not-for-profit performances explicitly, then replace the retired usage variables in the source. No limit is split or inferred from the earlier combined usage.')
+                ->fillForm(fn (LicenseVersion $record) => ['license_template_id' => $record->license_template_id, 'authored_source' => $record->authored_source,
+                    'structured_terms' => self::tieredSuccessorTerms($record->structured_terms),
+                    'effective_from' => $record->effective_from, 'effective_until' => $record->effective_until])
+                ->schema(fn () => self::fields())
+                ->action(function (LicenseVersion $record, array $data, $livewire) {
+                    $draft = self::withFormErrors(fn () => app(CreateLicenseDraft::class)->handle($record->template, Arr::only($data, ['authored_source', 'structured_terms', 'effective_from', 'effective_until']), auth()->user(), $record), $livewire);
+                    Notification::make()->title('Tier usage draft version '.$draft->version.' created')->body('Review every usage limit and the source before requesting approval.')->success()->send();
+                }),
             Action::make('economic_successor')->label('Define economic policies')->visible(fn (LicenseVersion $record) => ($record->structured_terms['schema_version'] ?? null) === 3)
                 ->modalDescription('Create a successor with explicit ownership declarations, income and royalty choices, and retained policy text. Preserve the existing terms and add the new source variables. No economic policy is inferred.')
                 ->fillForm(fn (LicenseVersion $record) => ['license_template_id' => $record->license_template_id, 'authored_source' => $record->authored_source,
@@ -133,6 +143,18 @@ class LicenseVersionResource extends OperatorResource
                 ->requiresConfirmation()->action(fn (LicenseVersion $record, array $data) => app(ReviewLicense::class)->approve($record, auth()->user(), $data)),
             Action::make('publish')->visible(fn (LicenseVersion $record) => $record->status === 'approved')->requiresConfirmation()->action(fn (LicenseVersion $record) => app(PublishLicense::class)->handle($record, auth()->user())),
         ]);
+    }
+
+    /**
+     * Copies only the v4 declarations whose meaning is unchanged in schema 5. Monetized/non-monetized
+     * streams, music videos (now monetized only) and live performances have no v5 equivalent, so their
+     * successors stay unset for an explicit choice.
+     */
+    private static function tieredSuccessorTerms(array $terms): array
+    {
+        $usage = array_intersect_key($terms['usage'] ?? [], array_flip(['audio_releases', 'copies_downloads', 'radio_stations']));
+
+        return array_replace($terms, ['schema_version' => 5, 'usage' => $usage]);
     }
 
     public static function getPages(): array

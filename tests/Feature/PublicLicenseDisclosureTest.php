@@ -16,6 +16,7 @@ use Tests\Support\EconomicLicenseFixtures;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\QuoteFixtures;
 use Tests\Support\ScopedLicenseFixtures;
+use Tests\Support\TieredLicenseFixtures;
 use Tests\Support\TypedLicenseFixtures;
 use Tests\TestCase;
 
@@ -38,7 +39,7 @@ class PublicLicenseDisclosureTest extends TestCase
 
     public static function schemas(): array
     {
-        return [['v1'], ['v2'], ['v3'], ['v4']];
+        return [['v1'], ['v2'], ['v3'], ['v4'], ['v5']];
     }
 
     #[DataProvider('schemas')]
@@ -49,6 +50,7 @@ class PublicLicenseDisclosureTest extends TestCase
             'v2' => TypedLicenseFixtures::class,
             'v3' => ScopedLicenseFixtures::class,
             'v4' => EconomicLicenseFixtures::class,
+            'v5' => TieredLicenseFixtures::class,
             default => null,
         };
         if ($fixture) {
@@ -76,7 +78,7 @@ class PublicLicenseDisclosureTest extends TestCase
         foreach ([$selection['media']['master_wav']->storage_path, $license['approval_reference'], $license['review_evidence_hash'], $revision->snapshot_hash] as $privateValue) {
             $response->assertDontSee($privateValue, false);
         }
-        if ($schema === 'v4') {
+        if (in_array($schema, ['v4', 'v5'], true)) {
             foreach ($license['structured_terms']['policies'] as $policy) {
                 $this->assertStringContainsString($policy['text'], $response->json('termsText'));
                 $this->assertStringContainsString(hash('sha256', $policy['text']), $response->json('termsText'));
