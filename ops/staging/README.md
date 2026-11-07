@@ -208,6 +208,8 @@ renaming that account breaks every guarded write.
 
 `forge-deploy.sh` runs as `forge` and follows `docs/ops/production-activation-packet.md` §4 (S1):
 
+Before anything else it compares the root-installed helpers (`vasey-staging-ctl`, `vasey-staging-backup`, `release-step.sh`, `seal-release.py`, `normalize-mysql-dump.py` and the nginx http file) with the kit at the deployed SHA, and refuses until `provision.sh` is re-run if any differ. A deploy never refreshes them itself.
+
 1. It freezes one private copy of the Forge `.env` and validates that candidate without printing values:
    - `APP_ENV` equals the configured value; `APP_DEBUG=false`; HTTPS `APP_URL`; secure cookies;
    - database cache, queue and sessions; `DB_HOST=127.0.0.1`; not `root`;
