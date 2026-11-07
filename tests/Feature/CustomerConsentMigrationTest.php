@@ -109,7 +109,9 @@ class CustomerConsentMigrationTest extends TestCase
             $this->assertSame(0, $queries);
         }
         try {
-            $this->artisan('migrate:rollback', ['--step' => 1])->run();
+            // Later migrations run after this one, so --step counts back to it; --path alone would skip the newest as "Migration not found".
+            $this->artisan('migrate:rollback', ['--path' => [database_path('migrations/'.self::MIGRATION.'.php')], '--realpath' => true,
+                '--step' => array_search(self::MIGRATION, array_column(app('migration.repository')->getMigrations(PHP_INT_MAX), 'migration'), true) + 1, '--force' => true])->run();
             $this->fail('Repository rollback accepted.');
         } catch (LogicException) {
             $this->assertSame($before, array_map(fn ($table) => DB::table($table)->orderBy('id')->get()->toJson(), [...self::TABLES, 'migrations']));
