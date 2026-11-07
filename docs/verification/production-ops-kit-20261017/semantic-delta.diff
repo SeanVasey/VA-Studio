@@ -37,26 +37,29 @@
 +[ "$APP_ENV_EXPECTED" = production ] || die "--app-env must be production"
  APP_GROUP=$(id -gn "$APP_USER")
  APP_HOME=$(getent passwd "$APP_USER" | cut -d: -f6)
-@@ -165,5 +163,5 @@
+@@ -165,8 +163,5 @@
  KIT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
  for f in nginx/vasey-production.conf php-fpm/vasey-production.conf php-fpm/vasey-paid-delivery.conf \
 -         workers/vasey-production-workers.conf bin/vasey-production-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh; do
+-  [ -f "$KIT/$f" ] || die "kit file missing: ops/production/$f"
+-done
+-for f in nginx/vasey-production-http.conf nginx/vasey-production-classic.conf; do  # the http-level helpers and the whole-file wrapper
 +         workers/vasey-production-workers.conf bin/vasey-production-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh forge-deploy.sh; do
    [ -f "$KIT/$f" ] || die "kit file missing: ops/production/$f"
  done
-@@ -461,5 +459,4 @@
+@@ -464,5 +459,4 @@
  VASEY_EXPECTED_APP_ENV=$APP_ENV_EXPECTED
  VASEY_DB_NAME=$DB_NAME
 -VASEY_PROBE_NETRC=/etc/vasey-production/probe.netrc
  VASEY_KEEP_RELEASES=3
  VASEY_BACKUP_KEEP=7
-@@ -477,4 +474,5 @@
+@@ -480,4 +474,5 @@
  install -m 0644 -o root -g root "$KIT/seal-release.py" /usr/local/libexec/vasey-production/seal-release.py
  install -m 0644 -o root -g root "$KIT/release-step.sh" /usr/local/libexec/vasey-production/release-step.sh
 +install -m 0755 -o root -g root "$KIT/forge-deploy.sh" /usr/local/libexec/vasey-production/forge-deploy.sh
  
  render "$KIT/php-fpm/vasey-production.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-production.conf" 0644
-@@ -523,24 +521,5 @@
+@@ -526,54 +521,6 @@
  EOF
  
 -# ---------------------------------------------------------------- 7. access credentials and nginx template
@@ -81,15 +84,48 @@
 -
 +# ---------------------------------------------------------------- 7. nginx template (no basic auth, no probe credentials)
  render "$KIT/nginx/vasey-production.conf" /etc/vasey-production/nginx-site.conf 0644
+-render "$KIT/nginx/vasey-production-classic.conf" /etc/vasey-production/nginx-classic.conf 0644
+-
+-# http-level helpers (limit_req_zone, map) the site body uses. Forge edits only the inside of the site's server block,
+-# where they are not allowed, so they live in conf.d, which nginx.conf includes at http level and Forge never writes.
+-# Each name may be defined once per nginx: refuse clearly if an older whole-file site still defines them.
+-NGINX_HTTP_CONF=/etc/nginx/conf.d/vasey-production.conf
+-command -v nginx >/dev/null 2>&1 || die "nginx not found (Forge installs it)"
+-[ -d /etc/nginx/conf.d ] && [ ! -L /etc/nginx/conf.d ] || die "/etc/nginx/conf.d must be a directory"
+-grep -Eq '^[[:space:]]*include[[:space:]]+(/etc/nginx/)?conf\.d/\*\.conf;' /etc/nginx/nginx.conf \
+-  || die "/etc/nginx/nginx.conf does not include conf.d/*.conf at http level; the site's rate-limit zones and header maps live there"
+-nginx_dupes=$(grep -rlE --exclude-dir=conf.d -e 'zone=vasey_production_(general|webhook):' \
+-  -e '^[[:space:]]*map[[:space:]]+[^[:space:]]+[[:space:]]+\$vasey_production_(referrer_policy|robots|frame_options)\b' /etc/nginx 2>/dev/null || true)
+-[ -z "$nginx_dupes" ] || die "these nginx files already define the staging zones or maps: $(echo $nginx_dupes); that is the older
+-  whole-file site template. Put the interim or Forge default site config back (README step 7), then re-run"
+-nginx_previous=""
+-if [ -e "$NGINX_HTTP_CONF" ]; then
+-  [ -f "$NGINX_HTTP_CONF" ] && [ ! -L "$NGINX_HTTP_CONF" ] || die "$NGINX_HTTP_CONF must be a regular file"
+-  nginx_previous=/etc/vasey-production/nginx-http.conf.previous
+-  cp -p "$NGINX_HTTP_CONF" "$nginx_previous"
+-fi
+-install -m 0644 -o root -g root "$KIT/nginx/vasey-production-http.conf" "$NGINX_HTTP_CONF.tmp"
+-mv -f "$NGINX_HTTP_CONF.tmp" "$NGINX_HTTP_CONF"
+-if ! nginx_test=$(nginx -t 2>&1); then
+-  if [ -n "$nginx_previous" ]; then mv -f "$nginx_previous" "$NGINX_HTTP_CONF"; else rm -f "$NGINX_HTTP_CONF"; fi
+-  printf '%s\n' "$nginx_test" >&2
+-  die "nginx -t failed with $NGINX_HTTP_CONF installed; it was put back as before"
+-fi
+-[ -z "$nginx_previous" ] || rm -f "$nginx_previous"
+-systemctl reload nginx || die "nginx reload failed after a passing nginx -t"
  
-@@ -555,7 +534,7 @@
+ # ---------------------------------------------------------------- summary
+@@ -587,8 +534,7 @@
    helpers             /usr/local/sbin/vasey-production-ctl (sudo for $APP_USER), /usr/local/sbin/vasey-production-backup (cron 03:17 UTC)
    MySQL               schema $DB_NAME; DB_HOST=127.0.0.1 DB_USERNAME=vasey_app
 -  secrets (root only) $SECRETS/db-app.env (paste DB_PASSWORD into Forge > Environment), $BACKUP_CNF, $HTPASSWD, /etc/vasey-production/probe.netrc
-+  secrets (root only) $SECRETS/db-app.env (paste DB_PASSWORD into Forge > Environment), $BACKUP_CNF
-   nginx site          /etc/vasey-production/nginx-site.conf: fill __SSL_CERT__, __SSL_KEY__, __FORGE_CONF__ from Forge's
-                       generated config, then paste it into Forge > Site > Edit Nginx Configuration
+-  nginx http helpers  $NGINX_HTTP_CONF (installed, nginx -t passed, reloaded)
+-  nginx site body     /etc/vasey-production/nginx-site.conf: install it as the site's nginx configuration (Forge > Site >
+-                      Edit Nginx Configuration, or the site API); README step 7. Whole-file hosts: nginx-classic.conf there
 -Next: ops/production/README.md step 8 onwards.
++  secrets (root only) $SECRETS/db-app.env (paste DB_PASSWORD into Forge > Environment), $BACKUP_CNF
++  nginx site          /etc/vasey-production/nginx-site.conf: fill __SSL_CERT__, __SSL_KEY__, __FORGE_CONF__ from Forge's
++                      generated config, then paste it into Forge > Site > Edit Nginx Configuration
 +Next: ops/production/README.md, "Provisioning, step by step", step 8 onwards.
  EOF
 --- staging/forge-deploy.sh (renamed)

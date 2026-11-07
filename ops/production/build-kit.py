@@ -170,6 +170,18 @@ PROVISION = [
             'install -m 0755 -o root -g root "$KIT/forge-deploy.sh" /usr/local/libexec/vasey-staging/forge-deploy.sh\n',
             "install the derived deploy script: Forge runs it from a root-owned path, not from the checkout"),
     Replace(", $HTPASSWD, /etc/vasey-staging/probe.netrc\n", "\n", "summary lists no basic-auth files"),
+    Replace("for f in nginx/vasey-staging-http.conf nginx/vasey-staging-classic.conf; do  # the http-level helpers and the whole-file wrapper\n"
+            '  [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"\ndone\n', "",
+            "production keeps its single whole-file nginx template (nginx/vasey-production.conf); no split site files"),
+    ReplaceBetween('render "$KIT/nginx/vasey-staging-classic.conf" /etc/vasey-staging/nginx-classic.conf 0644\n',
+                   "\n# ---------------------------------------------------------------- summary\n", "",
+                   "no classic wrapper and no conf.d helper file: the production template carries its own http-level helpers"),
+    Replace("  nginx http helpers  $NGINX_HTTP_CONF (installed, nginx -t passed, reloaded)\n"
+            "  nginx site body     /etc/vasey-staging/nginx-site.conf: install it as the site's nginx configuration (Forge > Site >\n"
+            "                      Edit Nginx Configuration, or the site API); README step 7. Whole-file hosts: nginx-classic.conf there\n",
+            "  nginx site          /etc/vasey-staging/nginx-site.conf: fill __SSL_CERT__, __SSL_KEY__, __FORGE_CONF__ from Forge's\n"
+            "                      generated config, then paste it into Forge > Site > Edit Nginx Configuration\n",
+            "summary: production still installs one whole-file site"),
     Replace("Next: ops/staging/README.md step 8 onwards.", 'Next: ops/production/README.md, "Provisioning, step by step", step 8 onwards.', "next-steps pointer"),
 ]
 

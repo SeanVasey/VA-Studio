@@ -454,7 +454,10 @@ class NginxTemplate(unittest.TestCase):
         for pattern in (r"paid-grants/authorizations", r"paid-grants/origins", r"livewire-"):
             ours, theirs = self.blocks(self.CONF, pattern), self.blocks(self.STAGING_CONF, pattern)
             self.assertEqual(len(ours), 1, pattern)
-            normalize = lambda block: [l.replace("vasey-staging", "vasey-X").replace("vasey-production", "vasey-X") for l in block]
+            # The staging site body sets `root` in every location (Forge's wrapper root is the checkout); the production whole-file
+            # template sets it once per server. That is layout, not the paid-delivery contract, so it is left out of the comparison.
+            normalize = lambda block: [l.replace("vasey-staging", "vasey-X").replace("vasey-production", "vasey-X") for l in block
+                                       if l != "root __VASEY_ROOT__/current/public;"]
             self.assertEqual(normalize(ours[0]), normalize(theirs[0]), pattern)
 
     def test_the_documented_timeouts_buffering_and_temp_cap(self):
