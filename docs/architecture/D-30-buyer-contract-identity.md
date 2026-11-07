@@ -2,7 +2,7 @@
 
 Status: decided design, 2026-11-07. Nothing is implemented or collected yet. It implements increment 2 of the
 [production contract profile](../production-contract-profile.md). It records Sean's decisions C-1, C-2 and D-1 from
-2026-11-07, plus his two follow-up decisions below.
+2026-11-07, plus his follow-up decisions below: corrections, unsupported characters, and business licensees.
 
 ## Decision
 
@@ -10,10 +10,19 @@ Production checkout freezes a versioned **contract identity declaration** inside
 not use a separate record.
 
 ```
-{schema: 'buyer-contract-identity-v2', legal_name, legal_name_confirmation: {confirmed: true, statement_version, statement_hash},
+{schema: 'buyer-contract-identity-v2', licensee_type: 'individual' | 'business', legal_name, representative_name | null,
+ legal_name_confirmation: {confirmed: true, statement_version, statement_hash},
  postal_address: {country, lines[1..3], locality?, region?, postalCode?}, artist_name | null,
  identity_meaning: 'buyer_declared_contract_identity'}
 ```
+
+- **Licensee.** A business may be the licensee (Sean, 2026-11-07). For a business, `legal_name` is the business's full
+  legal name and `representative_name` is the person accepting the license for it; for an individual it is `null`. Each
+  type has its own confirmation statement, and the buyer's type selects which one is frozen. A type whose statement is not
+  approved is not offered, so the validator refuses it.
+- **Statements.** The individual statement is approved (Sean, 2026-11-07): "I confirm that this is my full legal name and
+  that the license should be issued to me under it." The business statement is a proposal awaiting approval (TERMS
+  appendix A.10). Until it is approved, checkout offers only the individual type.
 
 - **Binding.** The declaration rides the existing hash chain: request → `request_hash` → sealed order `payload_hash` →
   paid source `order_hash`/`source_hash` → grant origin. No hash-pinned file changes. The frozen-V1 guard stays green:
@@ -33,14 +42,15 @@ not use a separate record.
 | --- | --- |
 | Legal name | Current rules: ≤255 bytes, valid UTF-8, no C0/DEL, trimmed. Also refuses bidi overrides and isolates (U+202A–E, U+2066–9) under the character rule below, and requires `legalNameConfirmed === true` against a versioned statement. |
 | Postal address | Structured: `country` is a required ISO 3166-1 alpha-2 code from a pinned list; `lines` holds 1–3 lines (the first required) of ≤120 bytes each; `locality` and `region` are each ≤80 bytes; `postalCode` is ≤20 bytes of `[A-Za-z0-9 -]`; the whole canonical address is ≤512 bytes. Never inferred from Stripe billing or account data. |
+| Representative name | ≤255 bytes, same character rules. Required if and only if `licensee_type` is `business`. |
 | Artist name | ≤120 bytes, same character rules. Required if and only if a line's license is `exclusive`. |
 
 `{CUSTOMER_ADDRESS}` is one deterministic string, joined with ", ": the lines, then the locality, region and postal code,
 then the country's English short name from the pinned `LicenseTerritories::COUNTRIES` list. **Characters the pinned contract
 fonts cannot print are refused at checkout** (Sean, 2026-11-07). The buyer is asked to enter supported characters.
 
-The character rule (implemented in `ContractIdentityDeclarationV2`) applies to the legal name, the artist name, the address
-lines, the locality and the region. A shape error (`invalid`) is always reported before a character problem
+The character rule (implemented in `ContractIdentityDeclarationV2`) applies to the legal name, the representative name,
+the artist name, the address lines, the locality and the region. A shape error (`invalid`) is always reported before a character problem
 (`unsupported_characters`). Byte caps apply to the trimmed value. A postal code must also start and end with a letter or
 digit. A value is printable only when all of the following hold:
 
@@ -56,7 +66,8 @@ digit. A value is printable only when all of the following hold:
 
   The pinned DejaVu faces draw some of these, but the printed text could then differ from what a reader sees or from the
   stored bytes, or be reordered or left unshaped.
-- It contains at least one letter or digit, so a field can't be only punctuation or symbols.
+- It contains at least one cased or other letter or decimal digit (`\p{Lu}\p{Ll}\p{Lt}\p{Lo}\p{Nd}`), so a field can't be
+  only punctuation, symbols, a modifier letter such as U+02BC, or a number such as ½.
 - Every codepoint has a positive-width glyph in every pinned face (`ContractGlyphCoverage`).
 
 With the `test-v2` regular and bold faces, 5,562 codepoints have a positive-width glyph in both faces, and the rule accepts

@@ -15,6 +15,10 @@ class ContractIdentityDeclarationV2Test extends TestCase
 {
     private const STATEMENT = ['statement_version' => 'legal-name-confirmation-v1', 'statement_hash' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'];
 
+    private const BUSINESS_STATEMENT = ['statement_version' => 'business-name-confirmation-v1', 'statement_hash' => 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'];
+
+    private const STATEMENTS = ['individual' => self::STATEMENT, 'business' => self::BUSINESS_STATEMENT];
+
     private static ?ContractGlyphCoverage $coverage = null;
 
     private static function coverage(): ContractGlyphCoverage
@@ -27,6 +31,7 @@ class ContractIdentityDeclarationV2Test extends TestCase
     private static function input(array $overrides = [], array $address = []): array
     {
         return array_replace([
+            'licenseeType' => 'individual',
             'legalName' => '  Zoë Émile Łukasz  ',
             'legalNameConfirmed' => true,
             'postalAddress' => array_replace(['country' => 'US', 'lines' => [' 1 Example Street ', 'Suite 2'], 'locality' => 'Springfield',
@@ -47,11 +52,13 @@ class ContractIdentityDeclarationV2Test extends TestCase
 
     public function test_input_becomes_the_trimmed_canonical_declaration_and_reverifies_unchanged(): void
     {
-        $declaration = ContractIdentityDeclarationV2::fromInput(self::input(), false, self::STATEMENT, self::coverage());
+        $declaration = ContractIdentityDeclarationV2::fromInput(self::input(), false, self::STATEMENTS, self::coverage());
 
         $this->assertSame([
             'schema' => 'buyer-contract-identity-v2',
+            'licensee_type' => 'individual',
             'legal_name' => 'Zoë Émile Łukasz',
+            'representative_name' => null,
             'legal_name_confirmation' => ['confirmed' => true, ...self::STATEMENT],
             'postal_address' => ['country' => 'US', 'lines' => ['1 Example Street', 'Suite 2'], 'locality' => 'Springfield', 'region' => 'IA', 'postalCode' => '50000-1234'],
             'artist_name' => null,
@@ -69,25 +76,64 @@ class ContractIdentityDeclarationV2Test extends TestCase
     public function test_optional_address_parts_are_omitted_when_absent_null_or_blank(): void
     {
         $declaration = ContractIdentityDeclarationV2::fromInput(self::input([], ['country' => 'AX', 'lines' => ['Torggatan 1'],
-            'locality' => '  ', 'region' => null, 'postalCode' => '']), false, self::STATEMENT, self::coverage());
+            'locality' => '  ', 'region' => null, 'postalCode' => '']), false, self::STATEMENTS, self::coverage());
 
         $this->assertSame(['country' => 'AX', 'lines' => ['Torggatan 1']], $declaration['postal_address']);
         $this->assertSame('Torggatan 1, Åland Islands', ContractIdentityDeclarationV2::customerAddress($declaration['postal_address']));
     }
 
+    public function test_a_business_licensee_records_the_representative_and_the_business_statement(): void
+    {
+        $input = self::input(['licenseeType' => 'business', 'legalName' => ' Example Records LLC ', 'representativeName' => ' Zoë Émile ']);
+        $declaration = ContractIdentityDeclarationV2::fromInput($input, false, self::STATEMENTS, self::coverage());
+
+        $this->assertSame('business', $declaration['licensee_type']);
+        $this->assertSame('Example Records LLC', $declaration['legal_name']);
+        $this->assertSame('Zoë Émile', $declaration['representative_name']);
+        $this->assertSame(['confirmed' => true, ...self::BUSINESS_STATEMENT], $declaration['legal_name_confirmation']);
+        $this->assertSame($declaration, ContractIdentityDeclarationV2::verify($declaration, false, self::coverage()));
+
+        // The representative is required for a business and refused for an individual.
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput([...$input, 'representativeName' => '  '], false, self::STATEMENTS, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(array_diff_key($input, ['representativeName' => true]), false, self::STATEMENTS, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(['representativeName' => 'Zoë Émile']), false, self::STATEMENTS, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::verify([...$declaration, 'representative_name' => null], false, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::verify([...$declaration, 'licensee_type' => 'individual'], false, self::coverage()));
+        foreach (['trust', 'Business', 1, null] as $type) {
+            $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::verify([...$declaration, 'licensee_type' => $type], false, self::coverage()));
+            $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::verify([...$declaration, 'licensee_type' => $type, 'representative_name' => null], false, self::coverage()));
+        }
+        $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput([...$input, 'representativeName' => "Zo\u{200B}e"], false, self::STATEMENTS, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput([...$input, 'representativeName' => str_repeat('a', 256)], false, self::STATEMENTS, self::coverage()));
+    }
+
+    public function test_the_licensee_type_selects_its_own_statement_and_needs_one_on_offer(): void
+    {
+        $individual = ContractIdentityDeclarationV2::fromInput(self::input(), false, self::STATEMENTS, self::coverage());
+        $this->assertSame(self::STATEMENT['statement_hash'], $individual['legal_name_confirmation']['statement_hash']);
+
+        $business = self::input(['licenseeType' => 'business', 'representativeName' => 'Zoë Émile']);
+        // A type whose statement is not offered (for example, not yet approved) cannot be chosen.
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput($business, false, ['individual' => self::STATEMENT], self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(['licenseeType' => 'trust']), false, self::STATEMENTS, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(array_diff_key(self::input(), ['licenseeType' => true]), false, self::STATEMENTS, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(), false, [...self::STATEMENTS, 'trust' => self::STATEMENT], self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(), false, [self::STATEMENT], self::coverage()));
+    }
+
     public function test_artist_name_is_required_if_and_only_if_the_order_is_exclusive(): void
     {
-        $exclusive = ContractIdentityDeclarationV2::fromInput(self::input(['artistName' => ' DJ Example ']), true, self::STATEMENT, self::coverage());
+        $exclusive = ContractIdentityDeclarationV2::fromInput(self::input(['artistName' => ' DJ Example ']), true, self::STATEMENTS, self::coverage());
         $this->assertSame('DJ Example', $exclusive['artist_name']);
         $this->assertSame($exclusive, ContractIdentityDeclarationV2::verify($exclusive, true, self::coverage()));
 
-        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(), true, self::STATEMENT, self::coverage()));
-        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(['artistName' => '  ']), true, self::STATEMENT, self::coverage()));
-        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(['artistName' => 'DJ Example']), false, self::STATEMENT, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(), true, self::STATEMENTS, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(['artistName' => '  ']), true, self::STATEMENTS, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(['artistName' => 'DJ Example']), false, self::STATEMENTS, self::coverage()));
         $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::verify($exclusive, false, self::coverage()));
         $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::verify([...$exclusive, 'artist_name' => null], true, self::coverage()));
         // An omitted artist name on a non-exclusive order is the same as a blank one.
-        $this->assertNull(ContractIdentityDeclarationV2::fromInput(self::input(['artistName' => '']), false, self::STATEMENT, self::coverage())['artist_name']);
+        $this->assertNull(ContractIdentityDeclarationV2::fromInput(self::input(['artistName' => '']), false, self::STATEMENTS, self::coverage())['artist_name']);
     }
 
     public static function invalidInputs(): array
@@ -133,18 +179,18 @@ class ContractIdentityDeclarationV2Test extends TestCase
         if (array_key_exists('legalNameConfirmed', $overrides) && $overrides['legalNameConfirmed'] === null) {
             unset($input['legalNameConfirmed']);
         }
-        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput($input, false, self::STATEMENT, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput($input, false, self::STATEMENTS, self::coverage()));
     }
 
     public function test_the_address_cap_is_inclusive_at_512_bytes(): void
     {
         // 3 * 120 + 80 + 49 + 13 ("United States") + 5 separators * 2 = 512 bytes after joining.
         $address = ['lines' => [str_repeat('a', 120), str_repeat('b', 120), str_repeat('c', 120)], 'locality' => str_repeat('d', 80), 'region' => str_repeat('e', 49), 'postalCode' => null];
-        $declaration = ContractIdentityDeclarationV2::fromInput(self::input([], $address), false, self::STATEMENT, self::coverage());
+        $declaration = ContractIdentityDeclarationV2::fromInput(self::input([], $address), false, self::STATEMENTS, self::coverage());
         $this->assertSame(512, strlen(ContractIdentityDeclarationV2::customerAddress($declaration['postal_address'])));
 
         $address['region'] .= 'e';
-        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input([], $address), false, self::STATEMENT, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input([], $address), false, self::STATEMENTS, self::coverage()));
     }
 
     public static function unprintable(): array
@@ -178,6 +224,9 @@ class ContractIdentityDeclarationV2Test extends TestCase
             'Greek question mark U+037E' => ["Name\u{37E}"],
             'Greek oxia U+1F71' => ["\u{1F71}lpha"],
             'punctuation only' => ['.'],
+            'modifier letter apostrophe U+02BC alone' => ["\u{2BC}"],
+            'superscript two alone' => ['²'],
+            'vulgar fraction one half alone' => ['½'],
             'symbols only' => ['-- ¶'],
         ];
     }
@@ -185,24 +234,24 @@ class ContractIdentityDeclarationV2Test extends TestCase
     #[DataProvider('unprintable')]
     public function test_characters_the_contract_cannot_print_refuse_as_unsupported_in_every_printed_field(string $value): void
     {
-        $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput(self::input(['legalName' => $value]), false, self::STATEMENT, self::coverage()));
-        $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput(self::input(['artistName' => $value]), true, self::STATEMENT, self::coverage()));
-        $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput(self::input([], ['lines' => ['1 Main St', $value]]), false, self::STATEMENT, self::coverage()));
-        $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput(self::input([], ['locality' => $value]), false, self::STATEMENT, self::coverage()));
-        $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput(self::input([], ['region' => $value]), false, self::STATEMENT, self::coverage()));
+        $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput(self::input(['legalName' => $value]), false, self::STATEMENTS, self::coverage()));
+        $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput(self::input(['artistName' => $value]), true, self::STATEMENTS, self::coverage()));
+        $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput(self::input([], ['lines' => ['1 Main St', $value]]), false, self::STATEMENTS, self::coverage()));
+        $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput(self::input([], ['locality' => $value]), false, self::STATEMENTS, self::coverage()));
+        $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput(self::input([], ['region' => $value]), false, self::STATEMENTS, self::coverage()));
     }
 
     public function test_a_shape_error_is_reported_before_a_character_problem(): void
     {
         // An unprintable name and an over-long line together report the shape error, never the character one.
         $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(
-            self::input(['legalName' => '王小明'], ['lines' => [str_repeat('a', 121)]]), false, self::STATEMENT, self::coverage()));
+            self::input(['legalName' => '王小明'], ['lines' => [str_repeat('a', 121)]]), false, self::STATEMENTS, self::coverage()));
     }
 
     public function test_supported_scripts_across_the_pinned_faces_are_accepted(): void
     {
         foreach (['Zoë Émile', 'Łukasz Żółć', 'Ἀλέξανδρος', 'Đorđe Đorđević', 'Иван Петров', "O'Brien-Smith Jr.", 'Søren Ærø'] as $name) {
-            $declaration = ContractIdentityDeclarationV2::fromInput(self::input(['legalName' => $name]), false, self::STATEMENT, self::coverage());
+            $declaration = ContractIdentityDeclarationV2::fromInput(self::input(['legalName' => $name]), false, self::STATEMENTS, self::coverage());
             $this->assertSame($name, $declaration['legal_name']);
         }
     }
@@ -218,7 +267,7 @@ class ContractIdentityDeclarationV2Test extends TestCase
         foreach (array_keys(array_intersect_key($regular, $bold)) as $codepoint) {
             $character = mb_chr($codepoint, 'UTF-8');
             try {
-                ContractIdentityDeclarationV2::fromInput(self::input(['legalName' => 'A'.$character]), false, self::STATEMENT, self::coverage());
+                ContractIdentityDeclarationV2::fromInput(self::input(['legalName' => 'A'.$character]), false, self::STATEMENTS, self::coverage());
             } catch (CheckoutException) {
                 continue;
             }
@@ -248,13 +297,13 @@ class ContractIdentityDeclarationV2Test extends TestCase
             ['statement_version' => 'v1'],
             [...self::STATEMENT, 'extra' => 1],
             [...self::STATEMENT, 'confirmed' => false]] as $statement) {
-            $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(), false, $statement, self::coverage()));
+            $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromInput(self::input(), false, ['individual' => $statement], self::coverage()));
         }
     }
 
     public function test_stored_declarations_reverify_exactly(): void
     {
-        $declaration = ContractIdentityDeclarationV2::fromInput(self::input(), false, self::STATEMENT, self::coverage());
+        $declaration = ContractIdentityDeclarationV2::fromInput(self::input(), false, self::STATEMENTS, self::coverage());
         $mutations = [
             'untrimmed name' => [...$declaration, 'legal_name' => ' '.$declaration['legal_name']],
             'unconfirmed' => [...$declaration, 'legal_name_confirmation' => [...$declaration['legal_name_confirmation'], 'confirmed' => false]],
