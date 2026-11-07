@@ -32,6 +32,9 @@ final class LegacyRedirectMap
         'unresolved' => ['required' => ['reason'], 'optional' => ['note']],
     ];
 
+    /** One in-process immutable parsed map; actual file guards and bytes are checked before every reuse. */
+    private static ?array $cachedFile = null;
+
     /** @param  list<array<string, mixed>>  $entries  @param  list<string>  $externalHosts */
     private function __construct(
         public readonly array $inventory,
@@ -41,16 +44,67 @@ final class LegacyRedirectMap
 
     public static function fromFile(string $path): self
     {
+        try {
+            [$json, $key] = self::guardedSource($path);
+        } catch (LegacyRedirectMapInvalid $invalid) {
+            self::$cachedFile = null;
+            throw $invalid;
+        }
+        if ((self::$cachedFile['key'] ?? null) === $key) {
+            return self::$cachedFile['map'];
+        }
+        // Evict before parsing: invalid replacement bytes cannot leave an earlier valid map available.
+        self::$cachedFile = null;
+        $map = self::fromJson($json);
+        self::$cachedFile = ['key' => $key, 'map' => $map];
+
+        return $map;
+    }
+
+    /** Fresh bounded descriptor read, bound to the same guarded pathname and file identity before and after. */
+    private static function guardedSource(string $path): array
+    {
+        clearstatcache(true, $path);
         if (is_link($path) || ! is_file($path) || ! is_readable($path)) {
             throw new LegacyRedirectMapInvalid(['The map file is missing or unreadable.']);
         }
-        $size = filesize($path);
-        if ($size === false || $size > self::MAX_BYTES) {
-            throw new LegacyRedirectMapInvalid(['The map file exceeds '.self::MAX_BYTES.' bytes.']);
+        $before = @lstat($path);
+        $resolved = realpath($path);
+        $size = @filesize($path);
+        if ($before === false || $resolved === false || $size === false || $size < 0 || $size > self::MAX_BYTES) {
+            throw new LegacyRedirectMapInvalid(['The map file exceeds '.self::MAX_BYTES.' bytes or cannot be inspected.']);
         }
-        $json = file_get_contents($path);
+        $stream = @fopen($path, 'rb');
+        if ($stream === false) {
+            throw new LegacyRedirectMapInvalid(['The map file is missing or unreadable.']);
+        }
+        try {
+            $opened = fstat($stream);
+            if ($opened === false || ($opened['mode'] & 0170000) !== 0100000 || self::identity($before) !== self::identity($opened)) {
+                throw new LegacyRedirectMapInvalid(['The map source changed while being read.']);
+            }
+            $json = @stream_get_contents($stream, self::MAX_BYTES + 1);
+            $after = fstat($stream);
+            clearstatcache(true, $path);
+            $named = @lstat($path);
+            if (! is_string($json) || strlen($json) > self::MAX_BYTES || strlen($json) !== $size
+                || $after === false || $named === false || self::identity($opened) !== self::identity($after)
+                || self::identity($opened) !== self::identity($named) || is_link($path) || ! is_file($path)
+                || ! is_readable($path) || realpath($path) !== $resolved) {
+                throw new LegacyRedirectMapInvalid(['The map source changed while being read.']);
+            }
+            // Binary-safe identity; no raw path or JSON is retained in the cache key or emitted to logs.
+            $key = hash('sha256', $path."\0".$resolved."\0".implode(':', self::identity($named))."\0".hash('sha256', $json));
 
-        return self::fromJson($json === false ? '' : $json);
+            return [$json, $key];
+        } finally {
+            fclose($stream);
+        }
+    }
+
+    private static function identity(array $stat): array
+    {
+        return array_map(static fn (string $key): int => $stat[$key], ['dev', 'ino', 'mode', 'nlink', 'uid', 'gid', 'size', 'mtime', 'ctime']);
     }
 
     public static function fromJson(string $json): self

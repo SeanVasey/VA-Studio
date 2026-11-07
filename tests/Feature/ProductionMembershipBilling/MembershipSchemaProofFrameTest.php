@@ -5,6 +5,7 @@ namespace Tests\Feature\ProductionMembershipBilling;
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Customers\ProductionIdentity\IdentityRows;
+use App\Domain\Customers\ProductionIdentity\SchemaProofFrame;
 use App\Domain\Memberships\Production\MembershipAwards;
 use App\Domain\Memberships\Production\MembershipAwardTransaction;
 use App\Domain\Memberships\Production\MembershipException;
@@ -25,8 +26,8 @@ use Throwable;
 /**
  * Frame-scoped schema proofs (SchemaProofFrame): a complete proof is reused only inside its owned frame, on its own
  * connection, while nothing a same-session statement can change has moved, and never in the terminal phase; every
- * reuse still sees new dependent objects. Every case runs on both drivers; the MySQL legs use a separate session where
- * SQLite has only one connection.
+ * reuse still sees new dependent objects. Shared cases run on both drivers; the native-only result-charset control
+ * requires MySQL. Cross-session MySQL legs use a separate session where SQLite has only one connection.
  */
 class MembershipSchemaProofFrameTest extends TestCase
 {
@@ -132,6 +133,74 @@ class MembershipSchemaProofFrameTest extends TestCase
         } finally {
             DB::rollBack();
         }
+    }
+
+    /**
+     * G1 N-1: a result-charset change alone must never be answered from a remembered proof. Inside an owned frame the
+     * catalog lease refuses first and closes the frame (the name predates that guard and is pinned by the skip census).
+     */
+    public function test_native_result_charset_alone_invalidates_a_remembered_complete_proof(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native MySQL session result-charset control.');
+        }
+        $pdo = DB::connection()->getPdo();
+        $results = $pdo->query('SELECT @@SESSION.character_set_results')->fetchColumn();
+        // A frame can only open on the canonical utf8mb4 session (CurrentCatalog::context requires it).
+        $this->assertSame('utf8mb4', $results);
+        $changed = 'latin1';
+        $frame = $this->ownedFrame();
+        $calls = 0;
+        $prove = function () use ($pdo, &$calls): void {
+            // Exercise the existing complete guards, not a fabricated schema or PDO double.
+            $this->guards($pdo);
+            $calls++;
+        };
+        $consult = static fn () => SchemaProofFrame::prove($pdo, self::class.'::result_charset', ['users'], $prove);
+        $otherLegs = static fn (): array => [
+            $pdo->query('SELECT CONNECTION_ID(), DATABASE(), @@SESSION.foreign_key_checks, @@SESSION.sql_mode, '
+                .'@@SESSION.sql_select_limit')->fetchAll(PDO::FETCH_NUM),
+            $pdo->query("SHOW SESSION STATUS WHERE Variable_name IN ('Com_create_table', 'Com_drop_table')")->fetchAll(PDO::FETCH_NUM),
+        ];
+        try {
+            $consult();
+            $this->assertSame(1, $calls);
+            $consult();
+            $this->assertSame(1, $calls, 'Unchanged session must actually reuse the completed proof.');
+            $before = $otherLegs();
+            $pdo->exec('SET SESSION character_set_results='.$pdo->quote($changed));
+            $this->assertSame($changed, $pdo->query('SELECT @@SESSION.character_set_results')->fetchColumn());
+            $this->assertSame($before, $otherLegs(), 'No other session-token leg or temporary-table counter changed.');
+            $frame->admit($pdo);
+            $this->assertTrue($pdo->inTransaction());
+            $this->assertSame(1, DB::connection()->transactionLevel());
+            // The frame's catalog lease re-reads the session context (character_set_results included) on every consult,
+            // so a changed result charset refuses and closes the frame before any remembered proof could answer.
+            try {
+                $consult();
+                $this->fail('A changed result charset must refuse the framed consult.');
+            } catch (LogicException $error) {
+                $this->assertSame('Current private catalog admission required.', $error->getMessage());
+            }
+            $this->assertSame(1, $calls, 'A changed result charset must never be answered from the remembered proof.');
+            $pdo->exec('SET SESSION character_set_results='.$pdo->quote($results));
+            $this->assertSame($results, $pdo->query('SELECT @@SESSION.character_set_results')->fetchColumn());
+            $this->assertSame($before, $otherLegs());
+            // Restoring the charset does not revive the closed frame: the next consult runs the real complete proof.
+            $consult();
+            $this->assertSame(2, $calls, 'A closed frame never answers from memory again.');
+            $consult();
+            $this->assertSame(3, $calls, 'The frame is closed, not merely cleared: it never remembers a proof again.');
+        } finally {
+            try {
+                $pdo->exec('SET SESSION character_set_results='.$pdo->quote($results));
+            } finally {
+                DB::rollBack();
+            }
+        }
+        $this->assertFalse($pdo->inTransaction());
+        $this->assertSame(0, DB::connection()->transactionLevel());
+        $this->guardsOutsideAFrame();
     }
 
     public function test_a_remembered_proof_is_never_used_by_another_connection(): void

@@ -63,6 +63,24 @@ final class TransactionalMailAdapter
         }, 3);
     }
 
+    /** Request the original wake-up only for an observed queued row; a racing claim makes a harmless duplicate job. */
+    public function wakeQueued(string $deliveryId): bool
+    {
+        $this->outside();
+        app(TransactionalMailPolicy::class)->configuration();
+        if (! OrderRequest::uuid($deliveryId)) {
+            throw new NotificationException;
+        }
+        $delivery = TransactionalMailDelivery::where('public_id', $deliveryId)->where('state', 'queued')->first();
+        if ($delivery === null || ! hash_equals($delivery->public_id, $deliveryId)) {
+            return false;
+        }
+        // No delivery mutation, recipient read or broker certainty. The unchanged job rechecks current authority.
+        DeliverTransactionalMail::dispatch($delivery->public_id);
+
+        return true;
+    }
+
     /** Queue handler. Sends only from "queued", after claiming "submitting" in a committed transaction. */
     public function deliver(string $deliveryId): array
     {

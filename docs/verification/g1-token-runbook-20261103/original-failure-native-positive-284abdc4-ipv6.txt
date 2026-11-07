@@ -1,0 +1,30 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.27
+Configuration: /home/user/wt/g1/phpunit.xml
+
+E                                                                   1 / 1 (100%)
+
+Time: 05:09.833, Memory: 85.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipSchemaProofFrameTest::test_native_result_charset_alone_invalidates_a_remembered_complete_proof
+LogicException: Current private catalog admission required.
+
+/home/user/wt/g1/app/Domain/Customers/ProductionIdentity/CurrentCatalog.php:738
+/home/user/wt/g1/app/Domain/Customers/ProductionIdentity/CurrentCatalog.php:635
+/home/user/wt/g1/app/Domain/Customers/ProductionIdentity/CurrentCatalog.php:166
+/home/user/wt/g1/app/Domain/Customers/ProductionIdentity/CatalogLease.php:43
+/home/user/wt/g1/app/Domain/Customers/ProductionIdentity/SchemaProofFrame.php:148
+/home/user/wt/g1/app/Domain/Customers/ProductionIdentity/SchemaProofFrame.php:104
+/home/user/wt/g1/tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php:154
+/home/user/wt/g1/tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php:172
+/home/user/wt/g1/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 7, Errors: 1.
+
+real	5m10.023s
+user	0m4.760s
+sys	0m1.629s
