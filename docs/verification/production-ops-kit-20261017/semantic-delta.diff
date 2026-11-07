@@ -144,14 +144,14 @@
 +#   bash /usr/local/libexec/vasey-production/forge-deploy.sh "$(git rev-parse HEAD)"
  #
  # The Forge site checkout ($FORGE_SITE_PATH) is only a git mirror and the home of the Forge-managed .env.
-@@ -108,5 +108,5 @@
+@@ -132,5 +132,5 @@
  freeze_runtime_environment
  envget() { grep -E "^$1=" "$RUNTIME_ENV" | tail -n 1 | cut -d= -f2- | sed -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'$/\1/"; }
 -need() { [ "$(envget "$1")" = "$2" ] || die ".env: $1 must be $2 for the staging profile"; }
 +need() { [ "$(envget "$1")" = "$2" ] || die ".env: $1 must be $2 for the production profile"; }
  need APP_ENV "$VASEY_EXPECTED_APP_ENV"
  need APP_DEBUG false
-@@ -120,6 +120,5 @@
+@@ -144,6 +144,5 @@
  need DB_DATABASE "$VASEY_DB_NAME"
  need FILESYSTEM_DISK local
 -need MAIL_MAILER log
@@ -159,7 +159,7 @@
 +need LOG_CHANNEL stderr            # the journal collects stderr; the reviewed preflight profile requires it
  need APP_MAINTENANCE_DRIVER file
  [[ "$(envget APP_KEY)" =~ ^base64:[A-Za-z0-9+/]{43}=$ ]] || die ".env: APP_KEY must be a base64 32-byte key (php artisan key:generate --show)"
-@@ -127,12 +126,6 @@
+@@ -151,12 +150,6 @@
  [ -n "$(envget DB_PASSWORD)" ] || die ".env: DB_PASSWORD is empty"
  [ "$(envget DB_QUEUE_RETRY_AFTER)" -ge 1200 ] 2>/dev/null || die ".env: DB_QUEUE_RETRY_AFTER must be at least 1200"
 -! grep -Eq '(sk|rk|pk)_live_' "$RUNTIME_ENV" || die ".env contains a live Stripe key; staging is test mode only"
