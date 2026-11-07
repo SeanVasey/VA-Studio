@@ -102,6 +102,30 @@ on_exit() {
 }
 trap on_exit EXIT
 
+# ---------------------------------------------------------------- 0. installed helpers match this kit
+# ctl, the backup helper and the fixed release steps run from root-installed copies that only provision.sh refreshes.
+# A deploy of newer kit code against older installed copies would run the old steps, so compare them with the kit this
+# script runs from (the checkout at this SHA) and refuse until provisioning is re-run.
+# A deploy script that itself runs from a root-installed copy (outside the checkout) is pinned the same way; skip there.
+KIT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+MIRROR_DIR=$(cd -- "$VASEY_MIRROR" && pwd -P)
+helper_drift=''
+if [ "${KIT_DIR#"$MIRROR_DIR"/}" != "$KIT_DIR" ]; then
+  while read -r required source installed; do
+    [ -e "$KIT_DIR/$source" ] || [ "$required" = required ] || continue
+    cmp -s -- "$KIT_DIR/$source" "$installed" || helper_drift="$helper_drift $installed"
+  done <<'HELPERS'
+required bin/vasey-staging-ctl /usr/local/sbin/vasey-staging-ctl
+required backup.sh /usr/local/sbin/vasey-staging-backup
+required release-step.sh /usr/local/libexec/vasey-staging/release-step.sh
+required seal-release.py /usr/local/libexec/vasey-staging/seal-release.py
+required normalize-mysql-dump.py /usr/local/libexec/vasey-staging/normalize-mysql-dump.py
+optional nginx/vasey-staging-http.conf /etc/nginx/conf.d/vasey-staging.conf
+HELPERS
+  [ -z "$helper_drift" ] || die "installed kit helpers differ from $KIT_DIR:$helper_drift; re-run provision.sh as root, then deploy again"
+  step "installed kit helpers match the kit at $SHA"
+fi
+
 # ---------------------------------------------------------------- 0. runtime .env checks (values never printed)
 [ -f "$RUNTIME_ENV" ] && [ ! -L "$RUNTIME_ENV" ] || die "Forge .env missing at $RUNTIME_ENV (Forge > Site > Environment)"
 chmod 0600 "$RUNTIME_ENV"
