@@ -15,10 +15,11 @@ The review surface is the delta (`--delta`): the staging file after renames vers
 
 What is derived, copied or written for production:
     derived  provision.sh, forge-deploy.sh, release-step.sh, backup.sh, bin/vasey-production-ctl,
-             php-fpm/vasey-production.conf, workers/vasey-production-workers.conf
+             php-fpm/vasey-production.conf, workers/vasey-production-workers.conf, and the three nginx files: the site body
+             nginx/vasey-production.conf, its http-level helpers nginx/vasey-production-http.conf and the whole-file wrapper
+             nginx/vasey-production-classic.conf
     copied   seal-release.py and normalize-mysql-dump.py (byte for byte), php-fpm/vasey-paid-delivery.conf (the paid-delivery
-             pool is generic and identical), validate-runtime.php and nginx/vasey-production.conf (production files in this
-             directory)
+             pool is generic and identical), validate-runtime.php (a production file in this directory)
     not shipped  anything under ops/staging/test-commerce/ and the basic-auth files: production has neither.
 Nothing here installs anything: the output is a directory of files, and provision.sh (run by an operator, as root, on a
 host) is what installs them.
@@ -170,18 +171,16 @@ PROVISION = [
             'install -m 0755 -o root -g root "$KIT/forge-deploy.sh" /usr/local/libexec/vasey-staging/forge-deploy.sh\n',
             "install the derived deploy script: Forge runs it from a root-owned path, not from the checkout"),
     Replace(", $HTPASSWD, /etc/vasey-staging/probe.netrc\n", "\n", "summary lists no basic-auth files"),
-    Replace("for f in nginx/vasey-staging-http.conf nginx/vasey-staging-classic.conf; do  # the http-level helpers and the whole-file wrapper\n"
-            '  [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"\ndone\n', "",
-            "production keeps its single whole-file nginx template (nginx/vasey-production.conf); no split site files"),
-    ReplaceBetween('render "$KIT/nginx/vasey-staging-classic.conf" /etc/vasey-staging/nginx-classic.conf 0644\n',
-                   "\n# ---------------------------------------------------------------- summary\n", "",
-                   "no classic wrapper and no conf.d helper file: the production template carries its own http-level helpers"),
-    Replace("  nginx http helpers  $NGINX_HTTP_CONF (installed, nginx -t passed, reloaded)\n"
-            "  nginx site body     /etc/vasey-staging/nginx-site.conf: install it as the site's nginx configuration (Forge > Site >\n"
-            "                      Edit Nginx Configuration, or the site API); README step 7. Whole-file hosts: nginx-classic.conf there\n",
-            "  nginx site          /etc/vasey-staging/nginx-site.conf: fill __SSL_CERT__, __SSL_KEY__, __FORGE_CONF__ from Forge's\n"
-            "                      generated config, then paste it into Forge > Site > Edit Nginx Configuration\n",
-            "summary: production still installs one whole-file site"),
+    Replace("nginx_dupes=$(grep -rlE --exclude-dir=conf.d -e 'zone=vasey_staging_(general|webhook):' \\\n"
+            "  -e '^[[:space:]]*map[[:space:]]+[^[:space:]]+[[:space:]]+\\$vasey_staging_(referrer_policy|robots|frame_options)\\b' /etc/nginx 2>/dev/null || true)\n"
+            '[ -z "$nginx_dupes" ] || die "these nginx files already define the staging zones or maps: $(echo $nginx_dupes); that is the older\n'
+            '  whole-file site template. Put the interim or Forge default site config back (README step 7), then re-run"\n',
+            "nginx_dupes=$(grep -rlE --exclude-dir=conf.d -e 'zone=vasey_staging_general:' \\\n"
+            "  -e '^[[:space:]]*map[[:space:]]+[^[:space:]]+[[:space:]]+\\$vasey_staging_(referrer_policy|frame_options|logged_uri)\\b' \\\n"
+            "  -e '^[[:space:]]*log_format[[:space:]]+vasey_staging\\b' /etc/nginx 2>/dev/null || true)\n"
+            '[ -z "$nginx_dupes" ] || die "these nginx files already define the production zone, maps or log format: $(echo $nginx_dupes); that\n'
+            '  is the older whole-file site template. Put Forge\'s default site config back (README step 7), then re-run"\n',
+            "production's http-level names: one zone (no webhook), no robots map, plus the access-log mask map and log format"),
     Replace("Next: ops/staging/README.md step 8 onwards.", 'Next: ops/production/README.md, "Provisioning, step by step", step 8 onwards.', "next-steps pointer"),
 ]
 
@@ -216,6 +215,109 @@ CTL = [
     Replace("--max-time 20 --netrc-file \"$VASEY_PROBE_NETRC\" \\\n", "--max-time 20 \\\n", "probe without basic-auth credentials"),
 ]
 
+# The site body. Everything the paid-delivery and upload contract and the root strategy rely on stays the staging text.
+NGINX_BODY = [
+    Replace("# VASEY.AUDIO private test-mode staging: nginx site body for a Forge-managed server (the inside of the site's server block).\n",
+            "# VASEY.AUDIO production: nginx site body for a Forge-managed server (the inside of the site's server block). A PREPARATION\n"
+            "# TEMPLATE: nothing is deployed, no DNS record exists for it and no production host has been chosen (U-02 in\n"
+            "# docs/architecture/decision-register.md).\n",
+            "title"),
+    Replace("(tests/ops/test_staging_nginx_site.py)", "(tests/ops/test_production_nginx_site.py)", "the production test guards it"),
+    Replace("# Access model: HTTP basic auth on everything. The one exception is exactly `POST /webhooks/stripe`,\n"
+            "# which the application authenticates by Stripe signature (VerifyStripeWebhook). Nothing else is\n"
+            "# reachable without the staging credentials.\n",
+            "# Access model: public. What differs from the staging body this file is derived from, and nothing else:\n"
+            "#   - no HTTP basic auth and no robots/noindex headers: the site is public and the application decides indexing;\n"
+            "#   - no unauthenticated /webhooks/stripe location: there is no production webhook receiver (VerifyStripeWebhook refuses\n"
+            "#     production), so a live one is a later reviewed change that must bring its own limits (1 MiB body, 60 s, POST only);\n"
+            "#   - the error log goes to stderr (the journal collects it); the access log is a file, rotated by provision.sh's\n"
+            "#     logrotate, in the `vasey_production` format, which masks the UUID in the two paid-delivery paths. nginx's error log\n"
+            "#     still quotes the request line when an upstream fails (observed), so treat the journal as sensitive: the identifiers\n"
+            "#     are short-lived authorizations, not secrets at rest.\n"
+            "# Everything that carries the paid-delivery and upload contract is identical to staging.\n"
+            "#\n"
+            "# Private storage is never reachable from here: every root is current/public, there is no alias or storage location,\n"
+            "# private files stream through controllers (public/ holds only the Vite build), dotfiles answer 404 and no PHP file but\n"
+            "# index.php executes.\n"
+            "#\n"
+            "# Behind a CDN or proxy: do NOT put the paid-delivery paths behind a proxy whose read timeout is shorter than 3,900 s (see\n"
+            "# docs/ops/monitoring-and-host-baseline.md, \"CDN and proxy\"). Trusting forwarded addresses also needs a reviewed\n"
+            "# TRUSTED_PROXIES address list (the application trusts no proxy by default); the illustration is commented out in\n"
+            "# nginx/vasey-staging-http.conf.\n",
+            "public site: the production access model, storage and proxy notes"),
+    Replace("#   - Stripe webhook: 1 MiB (VerifyStripeWebhook::MAX_BODY_BYTES).\n", "", "no webhook location"),
+    Replace("ssl_session_cache shared:VaseyStagingSSL:10m;", "ssl_session_cache shared:VaseyProductionSSL:10m;", "own TLS session cache name"),
+    Replace("# Private staging: every request needs the staging credentials unless a location below says otherwise.\n"
+            'auth_basic "VASEY.AUDIO staging";\n'
+            "auth_basic_user_file /etc/nginx/vasey-staging.htpasswd;\n\n", "", "no basic auth"),
+    Replace("(including test deliveries of private masters)", "(including paid deliveries of private masters)", "comment"),
+    Replace("add_header X-Robots-Tag $vasey_staging_robots always;\n", "", "no robots header: the application decides indexing"),
+    ReplaceBetween("# ---- Stripe test webhook: the only unauthenticated entry point ----\n",
+                   "# ---- Paid-delivery long routes", "", "no webhook location: production has no webhook receiver"),
+    Replace('    add_header X-Robots-Tag "noindex, nofollow, noarchive" always;\n', "", "no robots header on the build output either"),
+    Replace("access_log /var/log/nginx/vasey-staging-access.log;\n"
+            "error_log  /var/log/nginx/vasey-staging-error.log error;\n",
+            "access_log /var/log/nginx/vasey-staging-access.log vasey_staging;\n"
+            "error_log  stderr error;\n",
+            "masked access-log format; errors to the journal"),
+]
+
+# The http-level helpers: one zone, two header maps, plus the paid-path log mask and the commented trusted-proxy illustration.
+NGINX_HTTP = [
+    Replace("# VASEY.AUDIO private test-mode staging: http-level nginx helpers for the site in nginx/vasey-staging.conf.\n",
+            "# VASEY.AUDIO production: http-level nginx helpers for the site in nginx/vasey-staging.conf (a preparation template).\n",
+            "title"),
+    Replace("# Every name below is used by nginx/vasey-staging.conf and must be defined exactly once per nginx instance: a duplicate\n"
+            "# zone or map variable makes `nginx -t` fail. Do not paste these lines into the site as well. The production kit uses\n"
+            "# vasey_production_* names, so both kits can share one host.\n",
+            "# Every name below is used by nginx/vasey-staging.conf and must be defined exactly once per nginx instance: a second\n"
+            "# zone or log format of the same name makes `nginx -t` fail, and a second map of the same variable silently replaces\n"
+            "# the first. Do not paste these lines into the site as well. The staging kit uses its own names, so both kits can\n"
+            "# share one host.\n",
+            "the production names and what a duplicate does"),
+    Replace("# Requests per client address. The webhook zone is the only one an unauthenticated client can reach.\n"
+            "limit_req_zone $binary_remote_addr zone=vasey_staging_general:10m rate=30r/s;\n"
+            "limit_req_zone $binary_remote_addr zone=vasey_staging_webhook:1m rate=10r/s;\n",
+            "# Requests per client address.\n"
+            "limit_req_zone $binary_remote_addr zone=vasey_staging_general:10m rate=30r/s;\n",
+            "no webhook zone"),
+    Replace('map $upstream_http_x_robots_tag $vasey_staging_robots {\n'
+            '    ""      "noindex, nofollow, noarchive";\n'
+            '    default "";\n'
+            '}\n', "", "no robots map"),
+    Replace('    ~^/embed/ "";\n'
+            '    default   "SAMEORIGIN";\n'
+            '}\n',
+            '    ~^/embed/ "";\n'
+            '    default   "SAMEORIGIN";\n'
+            '}\n'
+            '\n'
+            '# The authorization and origin identifiers in the paid-delivery paths are capabilities: keep them out of the access log\n'
+            '# (query strings on those two routes are dropped too).\n'
+            'map $request_uri $vasey_staging_logged_uri {\n'
+            r'    "~^(?<head>/paid-grants/(?:authorizations|origins)/)[0-9a-f-]{36}(?<tail>/(?:redeem|document))(?:\?.*)?$" "${head}:uuid${tail}";' '\n'
+            '    default $request_uri;\n'
+            '}\n'
+            "log_format vasey_staging '$remote_addr [$time_iso8601] \"$request_method $vasey_staging_logged_uri\" $status $body_bytes_sent '\n"
+            "                            'rt=$request_time \"$http_user_agent\"';\n"
+            '\n'
+            '# Trusted-proxy handling is OFF. If, after the reviewed application change and a reviewed address list, the site sits\n'
+            '# behind a proxy that you control, nginx can restore the client address for rate limiting like this (illustration only):\n'
+            '#   set_real_ip_from <reviewed proxy address or range>;\n'
+            '#   real_ip_header CF-Connecting-IP;      # or X-Forwarded-For with real_ip_recursive on\n'
+            '# Do not enable it with an unreviewed or unbounded list: any client could then choose its own address.\n',
+            "the masked access-log format and the commented trusted-proxy illustration"),
+]
+
+# The whole-file wrapper: the same server block; only comments mention basic auth.
+NGINX_CLASSIC = [
+    Replace("# VASEY.AUDIO private test-mode staging: whole-file nginx site", "# VASEY.AUDIO production (preparation template): whole-file nginx site",
+            "title"),
+    Replace("# Encrypt HTTP-01 challenge handling, so renewals keep working without basic auth.\n",
+            "# Encrypt HTTP-01 challenge handling.\n", "no basic auth"),
+    Replace("# Everything else (basic auth, limits, headers, locations,", "# Everything else (limits, headers, locations,", "no basic auth"),
+]
+
 WORKERS = [
     Regex(r"^stdout_logfile=/var/log/vasey-staging/[a-z-]+\.log\nstdout_logfile_maxbytes=[0-9]+MB\nstdout_logfile_backups=[0-9]+\n",
           "stdout_logfile=NONE\nstdout_syslog=true\n",
@@ -230,6 +332,9 @@ DERIVED = [
     Derived("bin/vasey-production-ctl", "bin/vasey-staging-ctl", 0o755, "#", CTL),
     Derived("php-fpm/vasey-production.conf", "php-fpm/vasey-staging.conf", 0o644, ";", []),
     Derived("workers/vasey-production-workers.conf", "workers/vasey-staging-workers.conf", 0o644, ";", WORKERS),
+    Derived("nginx/vasey-production.conf", "nginx/vasey-staging.conf", 0o644, "#", NGINX_BODY),
+    Derived("nginx/vasey-production-http.conf", "nginx/vasey-staging-http.conf", 0o644, "#", NGINX_HTTP),
+    Derived("nginx/vasey-production-classic.conf", "nginx/vasey-staging-classic.conf", 0o644, "#", NGINX_CLASSIC),
 ]
 
 COPIED = [
@@ -237,7 +342,6 @@ COPIED = [
     Copied("normalize-mysql-dump.py", "normalize-mysql-dump.py", 0o644),
     Copied("php-fpm/vasey-paid-delivery.conf", "php-fpm/vasey-paid-delivery.conf", 0o644),
     Copied("validate-runtime.php", "production:validate-runtime.php", 0o644),
-    Copied("nginx/vasey-production.conf", "production:nginx/vasey-production.conf", 0o644),
 ]
 
 
