@@ -77,6 +77,8 @@ final readonly class CommittedReadContext
 
     public function prove(CurrentRows $reader, int $depth): void
     {
+        // Admit raw parents/classes before the retained closure or any metadata getter.
+        $selected = ResolvedConnection::current('committed_read_frame');
         CheckoutException::require(in_array($depth, [0, 1], true)
             && Container::getInstance() === $this->container && DB::getFacadeApplication() === $this->container
             && ($this->rawBindings)() === $this->originalBindings
@@ -84,7 +86,7 @@ final readonly class CommittedReadContext
         $name = self::configurationItems($this->configuration)['database']['default'];
         $connection = $this->manager->getConnections()[$name] ?? null;
         $classes = $this->driver === 'mysql' ? [PDO::class, Mysql::class] : [PDO::class, Sqlite::class];
-        CheckoutException::require($connection === $this->connection && $connection->getRawPdo() === $this->primary
+        CheckoutException::require($connection === $selected && $connection === $this->connection && $connection->getRawPdo() === $this->primary
             && $reader->identityPrimary() === $this->primary && $reader->identityDriver() === $this->driver
             && $connection->getDriverName() === $this->driver && $connection->getDatabaseName() === $this->database
             && $connection->getTablePrefix() === $this->prefix && $connection->transactionLevel() === $depth

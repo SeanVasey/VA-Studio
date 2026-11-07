@@ -3,6 +3,8 @@
 namespace App\Domain\Commerce\ProductionCheckout;
 
 use App\Domain\Commerce\ProductionPolicy\MachinePolicyV1;
+use App\Domain\Customers\ProductionIdentity\IdentityException;
+use App\Domain\Customers\ProductionIdentity\IdentityMetadataAdmission;
 use App\Support\Environment\TestEnvironment;
 
 /** Commercial target and execution funds are distinct. Rehearsal never establishes production facts. */
@@ -24,23 +26,31 @@ final readonly class ExecutionContextV1
 
     public static function current(array $machine): self
     {
-        $mode = config('production_checkout.funds_mode');
-        $account = config('production_checkout.account_id');
-        $origin = config('production_checkout.return_origin');
+        try {
+            [$policy, $environment] = IdentityMetadataAdmission::checkoutConfiguration();
+        } catch (IdentityException) {
+            throw new CheckoutException('unsupported');
+        }
 
-        return self::make($machine, $mode, $account, $origin, config('production_checkout.review_lifetime_seconds'));
+        return self::make($machine, $policy['funds_mode'] ?? null, $policy['account_id'] ?? null,
+            $policy['return_origin'] ?? null, $policy['review_lifetime_seconds'] ?? null, $environment);
     }
 
     /** Called only after authenticating a retained record; never accepts an HTTP execution context. */
     public static function retained(array $machine, array $binding): self
     {
-        $context = self::make($machine, $binding['funds_mode'] ?? null, $binding['account_id'] ?? null, $binding['return_origin'] ?? null, $binding['review_lifetime_seconds'] ?? null);
+        try {
+            $environment = IdentityMetadataAdmission::applicationEnvironment();
+        } catch (IdentityException) {
+            throw new CheckoutException('unsupported');
+        }
+        $context = self::make($machine, $binding['funds_mode'] ?? null, $binding['account_id'] ?? null, $binding['return_origin'] ?? null, $binding['review_lifetime_seconds'] ?? null, $environment);
         Evidence::same($context->binding(), $binding);
 
         return $context;
     }
 
-    private static function make(array $machine, mixed $mode, mixed $account, mixed $origin, mixed $reviewSeconds): self
+    private static function make(array $machine, mixed $mode, mixed $account, mixed $origin, mixed $reviewSeconds, string $environment): self
     {
         MachinePolicyV1::validate($machine);
         $c = $machine['choices'];
@@ -57,9 +67,9 @@ final readonly class ExecutionContextV1
             && $r['provider_lifetime_seconds'] >= 1800 + $r['retry_seconds'] && $r['reservation_seconds'] >= $r['provider_lifetime_seconds'] + $r['retry_seconds']
             && $r['late_time_basis'] === 'application_verified_observation_time', 'unsupported');
         CheckoutException::require(is_int($reviewSeconds) && $reviewSeconds >= 30 && $reviewSeconds <= 3600, 'unsupported');
-        CheckoutException::require($mode !== 'test' || app()->environment(['local', 'testing']), 'unsupported');
+        CheckoutException::require($mode !== 'test' || in_array($environment, ['local', 'testing'], true), 'unsupported');
         // Staging admits only Stripe-test commerce; live funds there are refused, never configured.
-        CheckoutException::require($mode !== 'live' || ! TestEnvironment::refusesProductionOnly(), 'unsupported');
+        CheckoutException::require($mode !== 'live' || ! TestEnvironment::isStaging($environment), 'unsupported');
 
         return new self($mode, $mode === 'test' ? 'synthetic_rehearsal' : 'verified_production',
             $account, $origin, $p['capture_method'], $r['reservation_seconds'], $r['provider_lifetime_seconds'], $r['retry_seconds'], $reviewSeconds);
