@@ -113,7 +113,7 @@ main() {
   fi
 
   info "6/7 group membership"
-  if id -nG "$worker" | tr ' ' '\n' | grep -qx clamav; then info "$worker is already in the group clamav"
+  if id -nG "$worker" | tr ' ' '\n' | grep -x clamav >/dev/null; then info "$worker is already in the group clamav"
   else run usermod -aG clamav "$worker"; fi
 
   info "7/7 restart the daemon and check it"

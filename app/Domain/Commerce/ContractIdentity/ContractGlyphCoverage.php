@@ -2,6 +2,8 @@
 
 namespace App\Domain\Commerce\ContractIdentity;
 
+use App\Domain\Contracts\ContractRenderProfileRegistry;
+use App\Domain\Contracts\Production\VaseyLicenseProfile;
 use InvalidArgumentException;
 
 /**
@@ -10,6 +12,8 @@ use InvalidArgumentException;
  */
 final class ContractGlyphCoverage
 {
+    private const PROFILE = 'test-buyer-pdf-v2';
+
     /** @var array<int, true> */
     private readonly array $codepoints;
 
@@ -27,6 +31,110 @@ final class ContractGlyphCoverage
             throw new InvalidArgumentException('Glyph coverage must not be empty.');
         }
         $this->codepoints = $set;
+    }
+
+    private static ?self $pinned = null;
+
+    /**
+     * The regular and bold DejaVu Sans faces the `test-buyer-pdf-v2` contract profile pins, which the paid and paid-tax
+     * renderers set buyer text in, restricted to the scripts that profile allows. The profile manifest is verified
+     * against the registry's pinned hash and each metric file against the SHA-256 the manifest pins, so the coverage can
+     * never drift from the faces that actually print, and it accepts nothing the renderer's script rule would refuse
+     * after payment. Loaded once per process.
+     */
+    public static function pinnedContractFaces(): self
+    {
+        if (self::$pinned !== null) {
+            return self::$pinned;
+        }
+        $profile = ContractRenderProfileRegistry::metadata(self::PROFILE, self::projectRoot());
+        $root = self::projectRoot().'/'.ContractRenderProfileRegistry::assetsDirectory(self::PROFILE);
+        $paths = [];
+        foreach (['fonts/generated/dejavusans.json', 'fonts/generated/dejavusansb.json'] as $asset) {
+            $pinned = $profile['assets']['assets'][$asset]['sha256'] ?? null;
+            $path = $root.'/'.$asset;
+            if (! is_string($pinned) || ! is_file($path) || is_link($path)
+                || ! hash_equals($pinned, (string) hash_file('sha256', $path))) {
+                throw new InvalidArgumentException('Pinned contract font metrics do not match the profile.');
+            }
+            $paths[] = $path;
+        }
+
+        return self::$pinned = self::fromTcpdfMetrics($paths)->restrictedToScripts($profile['allowed_scripts'] ?? []);
+    }
+
+    /**
+     * The four faces the `vasey-license-pdf-v1` profile pins (Bebas Neue, Reddit Sans regular and bold, JetBrains
+     * Mono), intersected and restricted to that profile's `allowed_scripts`. Every buyer field and substituted value
+     * of that profile must be drawable in each of them, whichever face sets it. The manifest is verified against the
+     * profile's pinned hash and each metric file against the manifest. The `test-v2` binding above, which checkout
+     * uses today, is unchanged. Loaded once per process for the default project root.
+     */
+    public static function vaseyLicenseFaces(?string $projectRoot = null): self
+    {
+        if ($projectRoot === null && self::$vaseyLicense !== null) {
+            return self::$vaseyLicense;
+        }
+        $profile = VaseyLicenseProfile::current($projectRoot);
+        $paths = [];
+        foreach (VaseyLicenseProfile::FACES as $asset) {
+            $pinned = $profile['assets']['assets'][$asset]['sha256'] ?? null;
+            $path = VaseyLicenseProfile::assetPath($asset, $projectRoot);
+            if (! is_string($pinned) || ! is_file($path) || is_link($path)
+                || ! hash_equals($pinned, (string) hash_file('sha256', $path))) {
+                throw new InvalidArgumentException('Pinned contract font metrics do not match the profile.');
+            }
+            $paths[] = $path;
+        }
+        $coverage = self::fromTcpdfMetrics($paths)->restrictedToScripts($profile['allowed_scripts']);
+        if ($projectRoot === null) {
+            self::$vaseyLicense = $coverage;
+        }
+
+        return $coverage;
+    }
+
+    private static ?self $vaseyLicense = null;
+
+    /** @return list<int> The covered codepoints, ascending. */
+    public function codepoints(): array
+    {
+        $codepoints = array_keys($this->codepoints);
+        sort($codepoints);
+
+        return $codepoints;
+    }
+
+    /**
+     * Keep only the codepoints whose Unicode script is one of `$scripts` (PCRE script names such as `Latin`).
+     *
+     * @param  list<string>  $scripts
+     */
+    public function restrictedToScripts(array $scripts): self
+    {
+        if ($scripts === []) {
+            throw new InvalidArgumentException('A script restriction needs at least one script.');
+        }
+        foreach ($scripts as $script) {
+            if (! is_string($script) || preg_match('/\A[A-Z][A-Za-z_]*\z/', $script) !== 1) {
+                throw new InvalidArgumentException('Script names must be plain PCRE script names.');
+            }
+        }
+        $pattern = '/\A[\p{'.implode('}\p{', $scripts).'}]\z/u';
+        $kept = [];
+        foreach (array_keys($this->codepoints) as $codepoint) {
+            $character = mb_chr($codepoint, 'UTF-8');
+            if ($character !== false && preg_match($pattern, $character) === 1) {
+                $kept[] = $codepoint;
+            }
+        }
+
+        return new self($kept);
+    }
+
+    private static function projectRoot(): string
+    {
+        return dirname(__DIR__, 4);
     }
 
     /**

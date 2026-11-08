@@ -460,6 +460,12 @@ followed by a later marker-cleanup/evidence failure needs inspection, rather tha
 Fresh quiesce is safe when the previous phase already stopped FPM/workers: it proves stopped state,
 retains the maintenance marker and closed gate, and does not require HTTP503 from an absent backend.
 
+A Forge "failed" after exactly ten minutes is Forge's deployment time limit, not necessarily a failed deploy: Forge
+stops reading the output but leaves the processes running, and a first install's migrations take longer than that.
+`forge-deploy.sh` keeps writing everything to `forge-deploy.log` in the deploy's evidence directory. Wait until no
+`vasey-staging-ctl` or `release-step.sh` process remains, then read that log's last lines and `ctl status`: a log that
+ends with `deployed <sha>` and a status without an operation marker is a completed deploy; anything else is a recovery case below.
+
 Decide which case applies by comparing `migrate-status-before.txt` and `migrate-status-after.txt` in the
 failed deploy's evidence directory.
 
@@ -471,6 +477,38 @@ separately; controlled service quiescence is not a builder attestation. Confirm 
 environment is unchanged. A failed quiesce or partial resume
 does not prove stopped writers. Inspect `ctl status` and establish quiesce before resuming. If any migration
 ran, use B; if same-SHA configuration replacement began, use D.
+
+An activation that stopped *before the switch* with nothing to migrate also belongs here: `current` still names the
+previous release, the evidence's `migrate.txt` says `Nothing to migrate.` and `migrate-status-before.txt` and
+`migrate-status-after.txt` are identical, so the schema is unchanged and there is nothing to restore. (Example: a
+`doctor failed checks: operator` refusal on a second deploy before step 11.) `doctor.json` must also be complete JSON
+and `/srv/vasey-staging/private/processing/` must hold no workspace the doctor left behind: its media-scanner check
+writes there and cleans up only when it exits normally. The candidate release is built, sealed and attached but never
+served; remove it, or a later deploy of the same SHA refuses "already exists but is not current".
+
+Run the recovery as one non-interactive root script, never by pasting lines into a root shell: there, a failed guard
+ends that shell and the remaining lines would run in your own shell with nothing set. The script stops at the first
+failure, refuses while any release-step, Artisan, Composer or npm process remains, and keeps this order (`ctl detach`
+refuses while the marker exists). It deletes the candidate only after the detach succeeded and its private directory is
+provably not the shared store: `rm --one-file-system` does not stop at a bind mount of the same filesystem.
+
+```sh
+sudo NEW=<40-hex SHA of the failed candidate> bash -euo pipefail <<'RECOVER'
+[[ "$NEW" =~ ^[0-9a-f]{40}$ ]] || { echo "NEW is not a SHA" >&2; exit 1; }
+! pgrep -f 'release-step|artisan (migrate|config:|route:|view:|event:|vasey:doctor)|composer|npm' >/dev/null || { echo "a build or Artisan process remains; stop" >&2; exit 1; }
+REL="/srv/vasey-staging/releases/$NEW"
+[ "$(readlink -f /srv/vasey-staging/current)" != "$REL" ] || { echo "$NEW is the served release; stop" >&2; exit 1; }
+/usr/local/sbin/vasey-staging-ctl quiesce                    # proves stopped writers; keeps the marker
+rm -- /etc/vasey-staging/operation-in-progress               # explicit root recovery, after the checks above
+/usr/local/sbin/vasey-staging-ctl detach "$NEW"
+! mountpoint -q "$REL/storage/app/private" || { echo "still mounted; stop" >&2; exit 1; }
+[ "$(stat -c %d:%i "$REL/storage/app/private" 2>/dev/null || echo none)" != "$(stat -c %d:%i /srv/vasey-staging/private)" ] \
+  || { echo "private storage still visible in $REL; stop" >&2; exit 1; }
+rm -rf --one-file-system -- "$REL"
+/usr/local/sbin/vasey-staging-ctl resume                     # previous release: 503 proof, workers, up, 200
+/usr/local/sbin/vasey-staging-ctl healthy "$(basename "$(readlink -f /srv/vasey-staging/current)")"
+RECOVER
+```
 
 An admitted test-commerce sweep can make quiesce refuse before stopping services. Its durable admission
 marker stays closed, so new scheduled sweeps skip. Wait for the existing sweep to finish, then retry
@@ -494,7 +532,7 @@ backup, which is the newest set taken before the deploy. Re-prove it successfull
 `RESTORE_CHECK` must say `RESTORE_VERIFIED` and its `env.backup` hash must match. Then
 return to the previous release. This follows `docs/ops/production-activation-packet.md` §4 "Rollback".
 
-Run this as root in a `sudo bash -euo pipefail` shell, so that any failed step stops the sequence. Use the MySQL admin account Forge created (root over the local socket, or the
+Run this as root in a `sudo bash -euo pipefail` script (a here-document or a saved file, not lines pasted into an interactive root shell, where a failed step ends the root shell and the rest runs in yours), so that any failed step stops the sequence. Use the MySQL admin account Forge created (root over the local socket, or the
 database password Forge showed at server creation).
 
 ```sh
@@ -540,7 +578,7 @@ Never check another SHA out inside an existing release directory: it would keep 
 `public/build` and serve the wrong Vite manifest.
 
 **D. Same-SHA environment refresh failed after replacement.** Its pre-change snapshot includes the served
-environment and key. As root in a `sudo bash -euo pipefail` shell, select that exact pre-refresh set and current
+environment and key. As root in a non-interactive `sudo bash -euo pipefail` script (as in B), select that exact pre-refresh set and current
 SHA; establish quiesce, re-prove the set and verify `env.backup.sha256` as in B. Use B's root-owned fresh-inode environment
 restore, compare, `artisan down` and `config:cache` commands, then `ctl resume`; `current` stays on the same SHA.
 Inspect application behavior before deciding whether a database/private-file restore is also needed. Do not

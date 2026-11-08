@@ -83,7 +83,7 @@ if [ -n "$LOGFILE" ]; then
   if [ -f "$LOGFILE" ]; then
     age=$(( now - $(stat -c %Y "$LOGFILE") ))
     if [ "$age" -gt "$SILENCE" ]; then report 2 "tick: $LOGFILE was last written ${age}s ago (limit ${SILENCE}s)"
-    elif tail -n 200 "$LOGFILE" 2>/dev/null | grep -q 'publish-scheduled-site-release'; then report 0 "tick: the scheduler log was written ${age}s ago and names the every-minute command"
+    elif tail -n 200 "$LOGFILE" 2>/dev/null | grep 'publish-scheduled-site-release' >/dev/null; then report 0 "tick: the scheduler log was written ${age}s ago and names the every-minute command"
     else report 1 "tick: the scheduler log is fresh but does not name vasey:publish-scheduled-site-release in its last 200 lines"; fi
   else report 2 "tick: $LOGFILE does not exist"; fi
 elif command -v "$JOURNALCTL" >/dev/null 2>&1; then

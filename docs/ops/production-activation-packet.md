@@ -233,9 +233,10 @@ php artisan migrate:status
 # backup-restore-proof.md steps 1-4 all passing, recorded as the line result=RESTORE_VERIFIED in
 # <BACKUP_DIR>/RESTORE_CHECK (ops/staging/backup.sh restore-check writes it; by hand, the operator writes it
 # only after step 4's last check passes). <BACKUP_DIR> is operator-only (0700), so the operator runs the
-# check. The preview is evidence only, never a gate: on a fresh schema migration 2026_10_01_000032 throws
-# under --pretend because its trigger self-checks return nothing, and --pretend also creates the migrations
-# table. <EVIDENCE_DIR> is this stage's evidence directory (§7).
+# check. There is no `migrate --pretend` preview: identity migrations (2026_10_07_247000 onwards) run DDL through
+# the raw PDO, which pretend mode cannot intercept, so a preview would really change the schema; on a fresh schema
+# 2026_10_01_000032 also throws under --pretend, and --pretend creates the migrations table. <EVIDENCE_DIR> is this
+# stage's evidence directory (§7).
 # Migrate only with every writer quiesced, as above, never beside live member operations. An owned membership frame
 # holds shared metadata locks on users, customer_accounts, quote_owners, audit_events and the production_identity_*
 # and membership tables until it commits or rolls back. The 60 s application deadline is sampled between work;
@@ -245,7 +246,6 @@ php artisan migrate:status
 # first, or run it with a short `SET SESSION lock_wait_timeout` so a queued statement gives up instead of stalling
 # the site (docs/verification/schema-guard-once-per-frame-20261019, "New metadata locks").
 grep -qx 'result=RESTORE_VERIFIED' <BACKUP_DIR>/RESTORE_CHECK || { echo 'no verified pre-migration backup: nothing applied; host stays in maintenance'; exit 1; }   # operator
-php artisan migrate --pretend > <EVIDENCE_DIR>/migrate-pretend.txt 2>&1 || echo 'migration preview failed: recorded as evidence, not a gate'   # review the SQL it did print
 php artisan migrate --force || { echo 'migration failed: host stays in maintenance; restore from the backup before retrying'; exit 1; }
 php artisan config:cache || exit 1
 php artisan vasey:doctor || exit 1

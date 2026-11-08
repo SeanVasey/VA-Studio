@@ -30,6 +30,7 @@ class OperationLeaseTest(unittest.TestCase):
         (self.release / "storage/framework").mkdir(parents=True)
         self.evidence = self.root / "evidence/owned-test"
         self.evidence.mkdir(parents=True)
+        (self.root / "tmp").mkdir(mode=0o700)
         self.entered = self.root / "entered"
         self.finish = self.root / "finish"
         self.trace = self.root / "trace"
