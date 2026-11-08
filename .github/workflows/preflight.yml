@@ -111,7 +111,11 @@ jobs:
       # A pinned render profile refuses at runtime once any file in its implementation closure changes (#216 broke
       # vasey-license-pdf-v1 this way unnoticed); rebuild it and compare byte for byte.
       - name: Verify pinned contract render profiles
-        run: php scripts/build-contract-profile-vasey-license-v1.php --check
+        # The font decoder refuses any fontTools/brotli other than the versions the manifest records.
+        run: |
+          python3 -m venv "$RUNNER_TEMP/contract-fonts"
+          "$RUNNER_TEMP/contract-fonts/bin/pip" install --quiet --disable-pip-version-check fonttools==4.68.0 brotli==1.2.1
+          PATH="$RUNNER_TEMP/contract-fonts/bin:$PATH" php scripts/build-contract-profile-vasey-license-v1.php --check
       - run: composer validate --strict
       - run: vendor/bin/pint --version
       - name: Verify private store foundations formatting
