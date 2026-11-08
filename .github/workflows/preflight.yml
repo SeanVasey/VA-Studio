@@ -116,6 +116,7 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/contract-fonts"
           "$RUNNER_TEMP/contract-fonts/bin/pip" install --quiet --disable-pip-version-check fonttools==4.68.0 brotli==1.2.1
           PATH="$RUNNER_TEMP/contract-fonts/bin:$PATH" php scripts/build-contract-profile-vasey-license-v1.php --check
+          PATH="$RUNNER_TEMP/contract-fonts/bin:$PATH" php scripts/build-contract-profile-vasey-license-v2.php --check
       - run: composer validate --strict
       - run: vendor/bin/pint --version
       - name: Verify private store foundations formatting

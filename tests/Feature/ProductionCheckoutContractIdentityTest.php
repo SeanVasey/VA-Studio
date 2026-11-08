@@ -316,6 +316,26 @@ class ProductionCheckoutContractIdentityTest extends TestCase
         $this->assertSame([0, 0], self::counts());
     }
 
+    public function test_with_the_gate_on_the_review_accepts_latin_extended_names_and_refuses_scripts_not_in_every_contract_face(): void
+    {
+        config(['production_checkout.contract_identity_v2' => true]);
+        $f = $this->prepared();
+        // The printable set is the vasey-license-pdf-v2 faces (decision register, 2026-11-08): Greek, Cyrillic and
+        // Vietnamese are refused at checkout rather than printed wrongly.
+        foreach (['Иван Петров', 'Ελένη Παπαδοπούλου', 'Nguyễn Văn An'] as $name) {
+            $this->refuses('unsupported_characters', fn () => $this->review($f, self::identity(['legalName' => $name])));
+        }
+        $this->refuses('unsupported_characters', fn () => $this->review($f, self::identity(['postalAddress' => ['country' => 'BG', 'lines' => ['ул. Витоша 1']]])));
+        $this->assertSame([0, 0], self::counts());
+
+        $review = $this->review($f, self::identity(['legalName' => 'Łukasz Żółć', 'postalAddress' => ['country' => 'RO', 'lines' => ['Strada Ștefan cel Mare 1'], 'locality' => 'Iași']]));
+        $frozen = Evidence::open(self::reviewRow(), 'production_checkout_review')['buyer_declarations'];
+        $this->assertSame(['Łukasz Żółć', ['Strada Ștefan cel Mare 1'], 'Iași'], [$frozen['legal_name'], $frozen['postal_address']['lines'], $frozen['postal_address']['locality']]);
+        $this->accept($f, $review);
+        $this->assertSame('Łukasz Żółć', self::orderBody()['buyer_declarations']['legal_name']);
+        $this->assertSame([1, 1], self::counts());
+    }
+
     public function test_a_gate_flip_between_review_and_assent_refuses_in_either_direction(): void
     {
         $f = $this->prepared();
@@ -361,18 +381,21 @@ class ProductionCheckoutContractIdentityTest extends TestCase
         $body = Evidence::open($row, 'production_checkout_review');
 
         // A well-sealed review whose request and body agree, so OrderEvidence accepts it, but whose name cannot be printed.
-        $declarations = [...$body['buyer_declarations'], 'legal_name' => '王小明'];
-        $digest = Evidence::key('synthetic-forged-review');
-        $request = [...$body['request'], 'buyer_declarations' => $declarations, 'key_digest' => $digest];
-        $public = (string) Str::uuid();
-        $forged = [...$body, 'public_id' => $public, 'request' => $request, 'request_hash' => CanonicalJson::hash($request), 'buyer_declarations' => $declarations];
-        $forged['review_hash'] = OrderEvidence::reviewHash($forged);
+        // Cyrillic prints in the test-v2 DejaVu faces but not in the vasey-license-pdf-v2 faces checkout is bound to.
         unset($row['id']);
-        DB::table(CheckoutSchema::TABLES['review'])->insert([...$row, 'public_id' => $public, ...Evidence::seal($forged),
-            'request_key' => $digest, 'request_hash' => $forged['request_hash']]);
+        foreach (['王小明', 'Иван Петров'] as $index => $name) {
+            $declarations = [...$body['buyer_declarations'], 'legal_name' => $name];
+            $digest = Evidence::key('synthetic-forged-review-'.$index);
+            $request = [...$body['request'], 'buyer_declarations' => $declarations, 'key_digest' => $digest];
+            $public = (string) Str::uuid();
+            $forged = [...$body, 'public_id' => $public, 'request' => $request, 'request_hash' => CanonicalJson::hash($request), 'buyer_declarations' => $declarations];
+            $forged['review_hash'] = OrderEvidence::reviewHash($forged);
+            DB::table(CheckoutSchema::TABLES['review'])->insert([...$row, 'public_id' => $public, ...Evidence::seal($forged),
+                'request_key' => $digest, 'request_hash' => $forged['request_hash']]);
 
-        $this->refuses('changed', fn () => $this->accept($f, ['reviewId' => $public, 'reviewHash' => $forged['review_hash']]));
-        $this->assertSame([2, 0], self::counts());
+            $this->refuses('changed', fn () => $this->accept($f, ['reviewId' => $public, 'reviewHash' => $forged['review_hash']]));
+        }
+        $this->assertSame([3, 0], self::counts());
     }
 
     /** The synthetic hosted checkout for a prepared buyer: a recording fake gateway, never a network call. */
