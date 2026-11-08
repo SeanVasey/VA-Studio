@@ -32,7 +32,7 @@ PINNED = {
     "d3c7e85c91707fc0a12abc5d88266747aa4fa8e7b162f633ffb3c9d989947620",  # CloudFlare Origin SSL Certificate Authority (RSA)
     "aa63697a22764b67b2134ce14cb5690ea336940b93986113f49545917832d80d",  # CloudFlare Origin SSL ECC Certificate Authority
 }
-TEE = 'exec > >(tee -p -a "$EVIDENCE/forge-deploy.log") 2>&1'
+TEE = 'exec > >(exec 9>&-; exec tee -p -a "$EVIDENCE/forge-deploy.log") 2>&1'
 
 
 def certificates(text):
@@ -45,6 +45,14 @@ class OriginCaBundle(unittest.TestCase):
         self.assertEqual(len(blocks), 2)
         found = {hashlib.sha256(ssl.PEM_cert_to_DER_cert(block)).hexdigest() for block in blocks}
         self.assertEqual(found, PINNED)
+
+    @unittest.skipUnless(shutil.which("openssl"), "needs openssl")
+    def test_neither_root_expires_within_180_days(self):
+        # An expired root makes every probe answer 000 and every resume refuse. Replace the bundle well before then.
+        for block in certificates(BUNDLE.read_text()):
+            run = subprocess.run(["openssl", "x509", "-noout", "-checkend", str(180 * 86400)], input=block,
+                                 capture_output=True, text=True)
+            self.assertEqual(run.returncode, 0, "a pinned Cloudflare Origin CA root expires within 180 days: " + run.stdout)
 
     def test_the_probe_trusts_the_installed_bundle_and_the_system_store(self):
         self.assertIn(f"ORIGIN_CA={INSTALLED}\n", CTL)
@@ -120,12 +128,29 @@ class ProbeTrustArguments(unittest.TestCase):
 
 
 class ForgeCutoff(unittest.TestCase):
-    def test_everything_from_prepare_on_goes_through_tee_into_the_evidence_log(self):
+    def test_every_controller_call_runs_after_the_log_redirect(self):
         self.assertEqual(DEPLOY.count(TEE), 1)
-        evidence_dir = DEPLOY.index('install -d -m 0750 "$ROOT/evidence/$STAMP-${SHA:0:12}"\n')
         self.assertTrue(DEPLOY.startswith('EVIDENCE=$ROOT/evidence/$STAMP-${SHA:0:12}', DEPLOY.index("EVIDENCE=")))
-        self.assertLess(evidence_dir, DEPLOY.index(TEE))
-        self.assertLess(DEPLOY.index(TEE), DEPLOY.index('"${CTL[@]}" prepare'))
+        redirect = DEPLOY.index(TEE)
+        self.assertLess(DEPLOY.index("trap on_exit EXIT"), redirect)
+        self.assertLess(DEPLOY.index('install -d -m 0750 "$EVIDENCE"\n'), redirect)
+        calls = [m.start() for m in re.finditer(r'"\$\{CTL\[@\]\}" (healthy|refresh|prepare|activate|prune)', DEPLOY)]
+        self.assertEqual(len(calls), 5)
+        self.assertTrue(all(redirect < call for call in calls))
+
+    def lock_free_after_exit(self, redirect):
+        with tempfile.TemporaryDirectory() as name:
+            lock = Path(name) / "lock"
+            # A surviving child that holds stdout but not the lock keeps the log writer alive after the deploy exits.
+            script = (f"exec 9>>{lock}\nflock -n 9\nEVIDENCE={name}\n{redirect}\n"
+                      "( exec 9>&-; sleep 3 ) &\nexit 0\n")
+            subprocess.run(["bash", "-c", script], timeout=30)
+            return subprocess.run(["flock", "-n", str(lock), "true"]).returncode == 0
+
+    def test_the_log_writer_does_not_hold_the_deploy_lock(self):
+        self.assertTrue(self.lock_free_after_exit(TEE))
+        # Sensitivity: a writer that keeps fd 9 holds the lock while it lives.
+        self.assertFalse(self.lock_free_after_exit('exec > >(exec tee -p -a "$EVIDENCE/forge-deploy.log") 2>&1'))
 
     def run_cutoff(self, redirect):
         """A writer that keeps writing after its reader has gone, as a deploy does after Forge's time limit."""

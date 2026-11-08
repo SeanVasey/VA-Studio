@@ -102,6 +102,17 @@ on_exit() {
 }
 trap on_exit EXIT
 
+# ---------------------------------------------------------------- deploy log that outlives Forge's output cutoff
+# Forge stops reading a deployment's output at its time limit (10 minutes) but leaves the processes running. A first
+# install's migrations take longer, and the next write to the closed pipe is SIGPIPE: that killed the first staging
+# activation between the release switch and the resume, and a configuration refresh whose snapshot waits on a busy
+# ship lock is exposed the same way. From here on every line goes through `tee -p`, which keeps writing the evidence
+# log after Forge stops reading, so a refresh, build, activation and resume always run to completion. The log writer
+# closes the deploy lock (fd 9) so it never holds the lock past the deploy. When Forge reports a time-out, read
+# $EVIDENCE/forge-deploy.log and `ctl status` before doing anything else.
+install -d -m 0750 "$EVIDENCE"
+exec > >(exec 9>&-; exec tee -p -a "$EVIDENCE/forge-deploy.log") 2>&1
+
 # ---------------------------------------------------------------- 0. installed helpers match this kit
 # ctl, the backup helper and the fixed release steps run from root-installed copies that only provision.sh refreshes.
 # A deploy of newer kit code against older installed copies would run the old steps, so compare them with the kit this
@@ -193,12 +204,6 @@ fi
 step "prepare under one root-held build lease (quiesce, allocate, build, attach and seal)"
 ACTIVATION_STARTED=1
 install -d -m 0750 "$ROOT/evidence/$STAMP-${SHA:0:12}"
-# Forge stops reading a deployment's output at its time limit (10 minutes) but leaves the processes running. A first
-# install's migrations take longer, and the next write to the closed pipe is SIGPIPE: that killed the first staging
-# activation between the release switch and the resume. From here on every line goes through `tee -p`, which keeps
-# writing the evidence log after Forge stops reading, so the build, activation and resume always run to completion.
-# When Forge reports a time-out, read $EVIDENCE/forge-deploy.log and `ctl status` before doing anything else.
-exec > >(tee -p -a "$EVIDENCE/forge-deploy.log") 2>&1
 "${CTL[@]}" prepare "$SHA" "$RUNTIME_ENV" "$EVIDENCE"
 [ "$(stat -c %d:%i "$REL/storage/app/private")" = "$(stat -c %d:%i "$ROOT/private")" ] && [ ! -L "$REL/storage/app/private" ] \
   || die "private storage not attached"
