@@ -276,3 +276,39 @@ Sean's words on 2026-10-24: "The merchant is Vasey Multimedia dba VASEY.AUDIO an
     the reviewed deletion workflow stay open.
   - Still to fill before publication: postal address, hosting provider and region, storage, backup and email providers,
     minimum age, Iowa venue county and the DMCA agent decision. The [For legal review] wording awaits counsel.
+
+## Register update — 2026-11-08: delegated D-30 activation decisions
+
+Sean delegated these on 2026-11-08 ("Make the appropriate decisions you'd recommend and continue development"). Each is
+the development lead's recommendation, recorded as decided; Sean can reverse any of them before activation.
+
+- **Contract glyph repertoire (D-30 step 5, contract increment 5).** Pin fuller builds of the same three families
+  (Bebas Neue, Reddit Sans, JetBrains Mono) that add Latin Extended (the Fontsource `latin-ext` subsets or the upstream
+  static fonts), as a successor to the `vasey-license-pdf-v1` profile, then rebind checkout to it. The printable set stays
+  the intersection of every pinned face, restricted to the profile's allowed scripts. Names such as "Łukasz" and
+  "Ștefan" then print; scripts not covered by every face (Greek, Cyrillic, and Vietnamese if any face lacks it) stay
+  refused at checkout rather than printing wrongly. Reason: a licensee must be able to use their real legal name, and
+  refusing at checkout is safer than a contract that misprints it.
+- **Reconcile with a declaration that no longer verifies (D-30 steps 6 and 8, both checkouts).** Reconcile always records
+  a captured payment: the money moved, and refusing to record it would lose financial evidence. The paid-grant
+  finalization re-verifies a v2 declaration and refuses to issue a contract or grant for one that fails, so the order
+  stays paid with fulfillment held for staff to resolve (normally a refund). The contract binder's own check (step 7)
+  remains a second line.
+- **Open provider sessions at activation (D-30 step 8).** Expire them. Before the contract identity gate opens, the
+  activation runbook expires every open provider session of a name-only order and reconciles each one, so no legacy order
+  can be paid after the flip. This needs a provider write and therefore Sean's separate live-activation authorization.
+- **v2 orders with the gate off (D-30 step 8).** Refuse at `initiate`, in both checkouts, matching `accept`, which already
+  refuses a gate mismatch in both directions. With the gate off the current paid renderers print every input field, so a
+  v2 order must not be paid under them.
+- **Already paid name-only orders with the gate on (D-30 step 8).** `initiate` answers the order's status, without any
+  provider call, when the order is already paid; it still refuses (`changed`) whenever it would open or resume a
+  provider session.
+- **Catalog identity proof: oversized TCP tables (identity follow-up C).** A refusal caused only by the TCP table
+  exceeding its read cap is transient: that attempt refuses, and the worker is not marked unusable. Malformed or
+  inconsistent tables keep the permanent refusal.
+- **Catalog identity proof: PHP version gate.** `CatalogSocketBinding` admits the PHP 8.4 series from 8.4.27 onward
+  instead of exactly 8.4.27, so a routine 8.4 patch update on Forge or CI does not stop identity migrations. A different
+  minor version (8.5) still refuses until it is proven.
+
+Still Sean's, not delegable: the staging step 11 inputs (two TOTP operators, the seller tag and the backup destination),
+and every live-payment, DNS, production and customer-import authorization.
