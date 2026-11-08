@@ -227,10 +227,14 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
      `TaxCheckoutEvidence::order`.
    - [x] For both checkouts, decide whether a re-verification failure at reconcile refuses, or records the paid order and
      escalates it (money captured but unreconciled). **Decided 2026-11-08:** record the payment, and refuse paid-grant
-     finalization so fulfillment is held for staff. Done: both `PaidGrants::finalize` and `PaidTaxGrants::finalize` hold such
-     an order (V1 reconcile records it). Still open: the tax checkout's `TaxCheckoutEvidence::order` re-verifies on every
-     open, so its reconcile refuses (`changed`) instead of recording the payment; aligning it with the decision is a change to
-     the order evidence and needs review.
+     finalization so fulfillment is held. Done: both `PaidGrants::finalize` and `PaidTaxGrants::finalize` refuse such an
+     order (V1 reconcile records it).
+   - [ ] **Activation blocker:** the tax checkout's `TaxCheckoutEvidence::order` re-verifies on every open, so its reconcile
+     refuses (`changed`) instead of recording the payment, and the `PaidTaxGrants` hold is unreachable. Align it (for
+     example a `reverify` flag that the reconcile, record, write-admission and status paths pass as false) with its own
+     independent review before either gate opens.
+   - [ ] **Activation blocker:** a held order has no durable marker, audit row or staff-visible signal yet; the reason
+     (`contract_identity_held`) exists only on the exception. Add a staff surface before activation.
    - [x] `initiate` refuses a v2 order while the gate is off, in both checkouts (decided 2026-11-08), before any row or
      provider call.
    - [x] An already paid name-only order with the gate on answers its status from `initiate` with no provider call
