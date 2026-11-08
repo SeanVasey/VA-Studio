@@ -23,7 +23,7 @@ use Tests\TestCase;
  */
 final class ProductionCheckoutMountTest extends TestCase
 {
-    private const ROUTES = ['reviews', 'orders', 'hosted', 'reconcile', 'status', 'return'];
+    private const ROUTES = ['contract-identity', 'reviews', 'orders', 'hosted', 'reconcile', 'status', 'return'];
 
     private const ORDER = '11111111-1111-4111-8111-111111111111';
 
@@ -80,6 +80,7 @@ final class ProductionCheckoutMountTest extends TestCase
         $queries = $this->queries();
         $this->notFound($this->postJson('/production/checkout/reviews', ['requestKey' => 'PRIVATE-REQUEST-KEY']))->assertDontSee('PRIVATE-REQUEST-KEY');
         $this->notFound($this->get('/production/checkout/orders/'.self::ORDER.'/status'));
+        $this->notFound($this->get('/production/checkout/contract-identity'));
         $this->assertSame([], $queries(), 'The refused request performed no query.');
         $this->assertFalse($this->app->resolved(ProductionCustomerAccess::class));
     }
@@ -106,7 +107,23 @@ final class ProductionCheckoutMountTest extends TestCase
         $queries = $this->queries();
         $this->privateJson($this->postJson('/production/checkout/reviews', ['candidateId' => 1]))->assertStatus(503);
         $this->privateJson($this->get('/production/checkout/orders/'.self::ORDER.'/status'))->assertStatus(503);
+        $this->privateJson($this->get('/production/checkout/contract-identity'))->assertStatus(503);
         $this->assertSame([], $queries());
+    }
+
+    public function test_every_checkout_route_keeps_its_throttle_and_block(): void
+    {
+        $expected = ['contract-identity' => 'throttle:30,1,production-checkout-read', 'reviews' => 'throttle:10,1,production-checkout-write',
+            'orders' => 'throttle:10,1,production-checkout-write', 'hosted' => 'throttle:5,1,production-checkout-provider',
+            'reconcile' => 'throttle:5,1,production-checkout-provider', 'status' => 'throttle:30,1,production-checkout-read',
+            'return' => 'throttle:30,1,production-checkout-read'];
+        $this->assertSame(self::ROUTES, array_keys($expected));
+        foreach ($expected as $name => $throttle) {
+            $route = Route::getRoutes()->getByName('production.checkout.'.$name);
+            $this->assertNotNull($route, $name);
+            $this->assertContains($throttle, $route->gatherMiddleware(), $name);
+            $this->assertSame([20, 5], [$route->locksFor(), $route->waitsFor()], $name);
+        }
     }
 
     /** @return array<string, array{0: mixed, 1: string}> */
@@ -125,6 +142,7 @@ final class ProductionCheckoutMountTest extends TestCase
         $queries = $this->queries();
         $this->notFound($this->postJson('/production/checkout/reviews', ['candidateId' => 1]))->assertCookieMissing(config('session.cookie'));
         $this->notFound($this->get('/production/checkout/orders/'.self::ORDER.'/return'))->assertCookieMissing(config('session.cookie'));
+        $this->notFound($this->get('/production/checkout/contract-identity'))->assertCookieMissing(config('session.cookie'));
         $this->assertSame([], $queries());
     }
 
