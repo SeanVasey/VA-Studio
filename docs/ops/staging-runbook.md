@@ -478,6 +478,24 @@ environment is unchanged. A failed quiesce or partial resume
 does not prove stopped writers. Inspect `ctl status` and establish quiesce before resuming. If any migration
 ran, use B; if same-SHA configuration replacement began, use D.
 
+An activation that stopped *before the switch* with nothing to migrate also belongs here: `current` still names the
+previous release, the evidence's `migrate.txt` says `Nothing to migrate.` and `migrate-status-before.txt` and
+`migrate-status-after.txt` are identical, so the schema is unchanged and there is nothing to restore. (Example: a
+`doctor failed checks: operator` refusal on a second deploy before step 11.) The candidate release is built, sealed
+and attached but never served; remove it, or a later deploy of the same SHA refuses "already exists but is not
+current". As root, with no release-step, Artisan, Composer or npm process left, and in this order (`ctl detach`
+refuses while the marker exists):
+
+```sh
+NEW=<40-hex SHA of the failed candidate>
+/usr/local/sbin/vasey-staging-ctl quiesce                    # proves stopped writers; keeps the marker
+rm -- /etc/vasey-staging/operation-in-progress               # explicit root recovery, after the checks above
+/usr/local/sbin/vasey-staging-ctl detach "$NEW"
+rm -rf --one-file-system -- "/srv/vasey-staging/releases/$NEW"
+/usr/local/sbin/vasey-staging-ctl resume                     # previous release: 503 proof, workers, up, 200
+/usr/local/sbin/vasey-staging-ctl healthy "$(basename "$(readlink -f /srv/vasey-staging/current)")"
+```
+
 An admitted test-commerce sweep can make quiesce refuse before stopping services. Its durable admission
 marker stays closed, so new scheduled sweeps skip. Wait for the existing sweep to finish, then retry
 quiesce and follow the applicable recovery below. Never edit the marker to bypass a failed operation.
