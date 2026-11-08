@@ -52,9 +52,8 @@ case "$MODE" in
     FIRST_INSTALL=$4
     art down >/dev/null
     art migrate:status > "$EVIDENCE/migrate-status-before.txt" 2>&1 || true
-    # Self-verifying trigger migrations cannot all run under --pretend; retain it as evidence only.
-    art migrate --pretend > "$EVIDENCE/migrate-pretend.sql.txt" 2>&1 \
-      || step "WARNING: migrate --pretend failed; retained as evidence"
+    # No `migrate --pretend`: identity migrations run DDL through the raw PDO, which pretend mode cannot intercept, so a
+    # "dry run" would really change the schema before the guarded migration. The verified snapshot is the safety net.
     art migrate --force > "$EVIDENCE/migrate.txt" 2>&1 || die "migration failed; restore verified snapshot before retry"
     art migrate:status > "$EVIDENCE/migrate-status-after.txt" 2>&1
     art config:cache >/dev/null

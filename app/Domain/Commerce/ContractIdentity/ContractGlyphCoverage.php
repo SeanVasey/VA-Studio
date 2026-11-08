@@ -3,6 +3,7 @@
 namespace App\Domain\Commerce\ContractIdentity;
 
 use App\Domain\Contracts\ContractRenderProfileRegistry;
+use App\Domain\Contracts\Production\VaseyLicenseProfile;
 use InvalidArgumentException;
 
 /**
@@ -60,6 +61,48 @@ final class ContractGlyphCoverage
         }
 
         return self::$pinned = self::fromTcpdfMetrics($paths)->restrictedToScripts($profile['allowed_scripts'] ?? []);
+    }
+
+    /**
+     * The four faces the `vasey-license-pdf-v1` profile pins (Bebas Neue, Reddit Sans regular and bold, JetBrains
+     * Mono), intersected and restricted to that profile's `allowed_scripts`. Every buyer field and substituted value
+     * of that profile must be drawable in each of them, whichever face sets it. The manifest is verified against the
+     * profile's pinned hash and each metric file against the manifest. The `test-v2` binding above, which checkout
+     * uses today, is unchanged. Loaded once per process for the default project root.
+     */
+    public static function vaseyLicenseFaces(?string $projectRoot = null): self
+    {
+        if ($projectRoot === null && self::$vaseyLicense !== null) {
+            return self::$vaseyLicense;
+        }
+        $profile = VaseyLicenseProfile::current($projectRoot);
+        $paths = [];
+        foreach (VaseyLicenseProfile::FACES as $asset) {
+            $pinned = $profile['assets']['assets'][$asset]['sha256'] ?? null;
+            $path = VaseyLicenseProfile::assetPath($asset, $projectRoot);
+            if (! is_string($pinned) || ! is_file($path) || is_link($path)
+                || ! hash_equals($pinned, (string) hash_file('sha256', $path))) {
+                throw new InvalidArgumentException('Pinned contract font metrics do not match the profile.');
+            }
+            $paths[] = $path;
+        }
+        $coverage = self::fromTcpdfMetrics($paths)->restrictedToScripts($profile['allowed_scripts']);
+        if ($projectRoot === null) {
+            self::$vaseyLicense = $coverage;
+        }
+
+        return $coverage;
+    }
+
+    private static ?self $vaseyLicense = null;
+
+    /** @return list<int> The covered codepoints, ascending. */
+    public function codepoints(): array
+    {
+        $codepoints = array_keys($this->codepoints);
+        sort($codepoints);
+
+        return $codepoints;
     }
 
     /**
