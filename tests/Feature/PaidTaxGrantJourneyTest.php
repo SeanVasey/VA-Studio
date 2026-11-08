@@ -175,8 +175,8 @@ class PaidTaxGrantJourneyTest extends TestCase
 
     /**
      * D-30 (decided 2026-11-08): reconciliation records the payment of an order whose sealed v2 declaration no longer verifies,
-     * and paid-tax finalization holds it: a distinct refusal, no grant row, and exactly one durable staff record however often
-     * finalization is retried. Initiate still refuses the order before any provider call.
+     * and paid-tax finalization holds it: a distinct refusal, no grant row, and exactly one durable staff record, written by
+     * reconcile and kept at one however often finalization is retried. Initiate still refuses the order before any provider call.
      */
     public function test_a_paid_v2_order_whose_declaration_no_longer_verifies_is_recorded_and_held_at_finalization(): void
     {
@@ -201,6 +201,8 @@ class PaidTaxGrantJourneyTest extends TestCase
         $reviewed = (array) DB::table(TaxCheckoutSchema::TABLES['reviewed'])->sole();
         $this->assertSame([RecordingTaxCheckoutTransport::SESSION, RecordingTaxCheckoutTransport::PAYMENT], [$reviewed['provider_session_id'], $reviewed['provider_payment_id']]);
         $this->assertSame(['retrieve', 'paymentIntent'], array_column($f['transport']->calls, 0));
+        // Reconcile alone has already left the one staff record (a buyer may never finalize).
+        $this->assertSame(1, DB::table('audit_events')->where('action', ContractIdentityHolds::ACTION)->count());
 
         $audits = DB::table('audit_events')->count();
         foreach ([1, 2] as $attempt) {
@@ -213,7 +215,7 @@ class PaidTaxGrantJourneyTest extends TestCase
             foreach (['paid_tax_order_origins', 'paid_tax_grant_origins', 'paid_tax_document_work', 'paid_tax_originals', 'paid_tax_fulfillments', 'license_grants'] as $table) {
                 $this->assertDatabaseCount($table, 0);
             }
-            $this->assertSame($audits + 1, DB::table('audit_events')->count(), 'attempt '.$attempt);
+            $this->assertSame($audits, DB::table('audit_events')->count(), 'attempt '.$attempt);
         }
         $hold = (array) DB::table('audit_events')->where('action', ContractIdentityHolds::ACTION)->sole();
         $orderRow = DB::table(TaxCheckoutSchema::TABLES['order'])->where('public_id', $forged)->sole();

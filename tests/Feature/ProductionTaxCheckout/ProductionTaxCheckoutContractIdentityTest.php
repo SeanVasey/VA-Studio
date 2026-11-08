@@ -14,10 +14,14 @@ use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutPolicy;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutRecords;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutSchema;
 use App\Domain\Customers\ProductionCustomerAccess;
+use App\Domain\Grants\ContractIdentityHolds;
+use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use RuntimeException;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ProductionTaxCheckoutContractIdentityForgery;
 use Tests\Support\ProductionTaxCheckoutFixtures;
@@ -352,6 +356,13 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
         return [DB::table(TaxCheckoutSchema::TABLES['request'])->count(), DB::table(TaxCheckoutSchema::TABLES['reviewed'])->count()];
     }
 
+    /** The D-30 staff hold records (ContractIdentityHolds), as [order public id] per row. */
+    private static function holds(): array
+    {
+        return DB::table('audit_events')->where('action', ContractIdentityHolds::ACTION)->orderBy('id')->pluck('context')
+            ->map(fn (string $context): string => json_decode($context, true, 4, JSON_THROW_ON_ERROR)['order_public_id'])->all();
+    }
+
     public function test_with_the_gate_on_initiate_and_reconcile_pay_a_valid_v2_order(): void
     {
         config(['production-tax-checkout.contract_identity_v2' => true]);
@@ -369,6 +380,9 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
         $this->assertSame(['complete', 'verified', 'pending_fulfillment'], [$paid['checkoutStatus'], $paid['paymentStatus'], $paid['fulfillmentStatus']]);
         $this->assertSame([1, 1], self::paymentCounts());
         $this->assertSame('buyer-contract-identity-v2', self::frozenDeclarations()['schema']);
+        // A declaration that still verifies leaves no staff hold record, however often it is reconciled.
+        $this->reconcile($f, $order['orderId']);
+        $this->assertSame([], self::holds());
     }
 
     public function test_initiate_refuses_a_v2_order_whose_declaration_no_longer_verifies_before_any_provider_call(): void
@@ -423,6 +437,9 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
         $this->assertSame($f['checkout']->status($f['buyer']['principal'], $f['buyer']['user'], $order['orderId']), $status);
         $this->assertSame(['create', 'retrieve', 'retrieve', 'paymentIntent'], array_column($f['transport']->calls, 0));
         $this->assertSame([1, 1], self::paymentCounts());
+        // A paid name-only (legacy) declaration is never held, also on a repeated reconcile.
+        $this->reconcile($f, $order['orderId']);
+        $this->assertSame([], self::holds());
     }
 
     public function test_with_the_gate_off_initiate_refuses_a_v2_order_before_any_request_or_transport_call(): void
@@ -474,14 +491,60 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
 
         $f['transport']->params = self::forgedTaxSession($forged, RecordingTaxCheckoutTransport::SESSION);
         $f['transport']->paid = true;
+        $this->assertSame([], self::holds());
         $paid = $this->reconcile($f, $forged);
         $this->assertSame(['complete', 'verified', 'pending_fulfillment'], [$paid['checkoutStatus'], $paid['paymentStatus'], $paid['fulfillmentStatus']]);
         $this->assertSame([1, 1], self::paymentCounts());
-        // A repeated reconcile writes nothing more; initiate still refuses rather than answering for the unverifiable order.
-        $this->assertSame($paid['paymentStatus'], $this->reconcile($f, $forged)['paymentStatus']);
+        // D-30: after the retained payment has committed, reconcile alone leaves the one staff hold record (no declaration field).
+        $this->assertSame([$forged], self::holds());
+        $hold = (array) DB::table('audit_events')->where('action', ContractIdentityHolds::ACTION)->sole();
+        $orderRow = DB::table(TaxCheckoutSchema::TABLES['order'])->where('public_id', $forged)->sole();
+        $this->assertSame(['production_tax_checkout_order', (int) $orderRow->id, null], [$hold['subject_type'], (int) $hold['subject_id'], $hold['actor_id']]);
+        $this->assertSame(['chain' => 'production_tax_checkout_v2', 'reason' => 'contract_identity_held', 'order_public_id' => $forged],
+            json_decode($hold['context'], true, 4, JSON_THROW_ON_ERROR));
+        $this->assertStringNotContainsString('王小明', $hold['context']);
+        // A repeated reconcile writes nothing more (still one hold); initiate still refuses rather than answering for the unverifiable order.
+        foreach ([1, 2] as $attempt) {
+            $this->assertSame($paid['paymentStatus'], $this->reconcile($f, $forged)['paymentStatus']);
+            $this->assertSame([$forged], self::holds(), 'attempt '.$attempt);
+        }
         $this->refuses('changed', fn () => $this->initiate($f, $forged));
         $this->assertSame(['retrieve', 'paymentIntent'], array_column($f['transport']->calls, 0));
         $this->assertSame([1, 1], self::paymentCounts());
+        $this->assertSame([$forged], self::holds());
+    }
+
+    /** A failed hold write is reported and swallowed: the payment and the answer are unchanged, and the next reconcile writes it. */
+    public function test_a_failed_hold_write_never_affects_the_retained_payment_or_the_reconcile_result(): void
+    {
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $f = $this->payable();
+        $this->order($f, self::identity());
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $forged = self::forgedUnprintableTaxOrder();
+        $f['transport']->params = self::forgedTaxSession($forged, RecordingTaxCheckoutTransport::SESSION);
+        $f['transport']->paid = true;
+        Exceptions::fake();
+        $failing = true;
+        AuditEvent::creating(function () use (&$failing): void {
+            if ($failing) {
+                throw new RuntimeException('synthetic audit write failure');
+            }
+        });
+
+        $paid = $this->reconcile($f, $forged);
+        $this->assertSame(['complete', 'verified', 'pending_fulfillment'], [$paid['checkoutStatus'], $paid['paymentStatus'], $paid['fulfillmentStatus']]);
+        $this->assertSame([1, 1], self::paymentCounts());
+        $reviewed = (array) DB::table(TaxCheckoutSchema::TABLES['reviewed'])->sole();
+        $this->assertSame([], self::holds());
+        Exceptions::assertReported(fn (RuntimeException $error): bool => $error->getMessage() === 'synthetic audit write failure');
+
+        // The already retained order: a repeated reconcile answers its status and retries the record.
+        $failing = false;
+        $this->assertSame($f['checkout']->status($f['buyer']['principal'], $f['buyer']['user'], $forged), $this->reconcile($f, $forged));
+        $this->assertSame([$forged], self::holds());
+        $this->assertSame($reviewed, (array) DB::table(TaxCheckoutSchema::TABLES['reviewed'])->sole());
+        $this->assertSame(['retrieve', 'paymentIntent'], array_column($f['transport']->calls, 0));
     }
 
     public function test_a_paid_name_only_order_answers_its_status_after_the_listing_changed(): void

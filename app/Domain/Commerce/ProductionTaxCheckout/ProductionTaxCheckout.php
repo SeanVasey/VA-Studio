@@ -15,6 +15,7 @@ use App\Domain\Commerce\ProductionCheckout\Records;
 use App\Domain\Commerce\ProductionPreparation\PreparationSelection;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionCustomerPrincipal;
+use App\Domain\Grants\ContractIdentityHolds;
 use App\Models\User;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
@@ -179,6 +180,9 @@ final class ProductionTaxCheckout
         TaxCheckoutPolicy::requireEnabled();
         $prepared = $this->prepare($principal, $buyer, $orderId, false);
         if ($prepared['intent']['reviewed'] !== null) {
+            // Already retained: a repeated reconcile retries the hold record a failed earlier write may have missed.
+            self::holdAfterPayment($prepared['order']['row']['public_id'], $prepared['order']['body']['buyer_declarations']);
+
             return $this->status($principal, $buyer, $orderId);
         }
         $sessionId = $prepared['intent']['binding']['provider_session_id'] ?? null;
@@ -199,7 +203,8 @@ final class ProductionTaxCheckout
             throw $error instanceof CheckoutException && in_array($error->reason, ['tax_ceiling', 'session_mismatch'], true) ? $error : new CheckoutException('provider_uncertain', 503);
         }
         if ($financial['outcome'] === 'confirmed') {
-            $this->retain($prepared['intent']['row']['public_id'], $financial, CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z'), $transportIdentity, $orderId);
+            $retained = $this->retain($prepared['intent']['row']['public_id'], $financial, CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z'), $transportIdentity, $orderId);
+            self::holdAfterPayment($orderId, $retained);
         }
         $status = $this->status($principal, $buyer, $orderId);
 
@@ -330,12 +335,27 @@ final class ProductionTaxCheckout
         });
     }
 
-    /** Retain the buyer-reviewed, provider-calculated paid session exactly once. */
-    private function retain(string $requestId, array $financial, string $observedAt, string $transport, string $orderId): void
+    /**
+     * D-30 (decided 2026-11-08): once the paid session is retained (committed), a verified payment of an order whose frozen
+     * v2 declaration no longer verifies leaves the staff hold record at once, not only when the buyer finalizes. Outside
+     * the retain transaction: a failure is reported and swallowed by ContractIdentityHolds and changes neither the
+     * retained payment nor the result.
+     */
+    private static function holdAfterPayment(string $orderId, array $declarations): void
+    {
+        ContractIdentityHolds::recordAfterPayment('production_tax_checkout_v2', $orderId, $declarations);
+    }
+
+    /**
+     * Retain the buyer-reviewed, provider-calculated paid session exactly once. Returns the frozen declarations of the order
+     * whose payment is retained.
+     */
+    private function retain(string $requestId, array $financial, string $observedAt, string $transport, string $orderId): array
     {
         $fresh = FreshTaxCheckoutPolicy::capture();
         $locator = ProductionTaxPaidOrderLocatorV2::locate($orderId);
-        CommandTransaction::run(function (Records $rows) use ($requestId, $financial, $observedAt, $transport, $fresh, $locator): void {
+
+        return CommandTransaction::run(function (Records $rows) use ($requestId, $financial, $observedAt, $transport, $fresh, $locator): array {
             $this->access->verifyHistoricalBinding($locator->historicalBuyerBinding(), $rows->current);
             $tax = TaxCheckoutRecords::writer($rows);
             $record = $tax->one('request', $requestId);
@@ -349,7 +369,7 @@ final class ProductionTaxCheckout
             if ($intent['reviewed'] !== null) {
                 CheckoutException::require($intent['reviewed']['provider_payment_id'] === $financial['payment']['id']);
 
-                return;
+                return $order['body']['buyer_declarations'];
             }
             $public = (string) Str::uuid();
             $created = CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z');
@@ -364,6 +384,8 @@ final class ProductionTaxCheckout
                 'amount_total_minor' => $amounts['total_minor'], 'observed_at' => $observedAt]);
             TaxCheckoutEvidence::intent($tax, $order, $record);
             TaxCheckoutWriteAdmission::retained($rows, $fresh, $locator, 'reviewed', $public);
+
+            return $order['body']['buyer_declarations'];
         });
     }
 

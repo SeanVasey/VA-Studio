@@ -20,17 +20,21 @@ use App\Domain\Commerce\ProductionPreparation\PreparationSelection;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
+use App\Domain\Grants\ContractIdentityHolds;
 use App\Http\Middleware\ProductionCheckoutPrivacy;
 use App\Models\User;
 use App\Providers\ProductionCheckoutServiceProvider;
+use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
+use RuntimeException;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ProductionCheckoutContractIdentityForgery;
 use Tests\Support\ProductionCheckoutFixtures as F;
@@ -474,6 +478,31 @@ class ProductionCheckoutContractIdentityTest extends TestCase
         return [DB::table(CheckoutSchema::TABLES['intent'])->count(), DB::table(CheckoutSchema::TABLES['payment'])->count()];
     }
 
+    /** The D-30 staff hold records (ContractIdentityHolds), as [order public id] per row. */
+    private static function holds(): array
+    {
+        return DB::table('audit_events')->where('action', ContractIdentityHolds::ACTION)->orderBy('id')->pluck('context')
+            ->map(fn (string $context): string => json_decode($context, true, 4, JSON_THROW_ON_ERROR)['order_public_id'])->all();
+    }
+
+    /** A paid forged order: an unprintable v2 declaration the frozen evidence accepts, an intent, and a paid synthetic session. */
+    private function paidForgedOrder(): array
+    {
+        config(['production_checkout.contract_identity_v2' => true]);
+        $f = $this->hosted($this->prepared());
+        $this->accept($f, $this->review($f, self::identity()));
+        $forged = self::forgedUnprintableOrder();
+        $f['gateway']->params = self::forgedIntent($forged);
+        $f['gateway']->paid = true;
+
+        return [$f, $forged];
+    }
+
+    private function reconcileForged(array $f, string $forged): array
+    {
+        return $f['hosted']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $forged, 'cs_test_SYNTHETIC');
+    }
+
     public function test_with_the_gate_on_initiate_and_reconcile_pay_a_valid_v2_order(): void
     {
         config(['production_checkout.contract_identity_v2' => true]);
@@ -494,6 +523,62 @@ class ProductionCheckoutContractIdentityTest extends TestCase
         $this->assertSame(['verified', 'pending_fulfillment'], [$paid['paymentStatus'], $paid['fulfillmentStatus']]);
         $this->assertSame([1, 1], self::paymentCounts());
         $this->assertSame('Example Records LLC', self::orderBody()['buyer_declarations']['legal_name']);
+        // A declaration that still verifies leaves no staff hold record, however often it is reconciled.
+        $this->reconcile($f, $order['orderId']);
+        $this->assertSame([], self::holds());
+    }
+
+    /**
+     * D-30: a buyer who pays and never finalizes still leaves the staff record. Reconciliation records the payment first and
+     * then, after that transaction has committed, the one hold record; repeated reconciliation and a later finalization keep
+     * it at one (finalization: PaidGrantDocumentJourneyTest). The buyer-facing answer is the unchanged status.
+     */
+    public function test_reconcile_records_the_payment_and_then_one_hold_for_a_declaration_that_no_longer_verifies(): void
+    {
+        [$f, $forged] = $this->paidForgedOrder();
+        $paid = $this->reconcileForged($f, $forged);
+        $this->assertSame(['verified', 'pending_fulfillment'], [$paid['paymentStatus'], $paid['fulfillmentStatus']]);
+        $this->assertSame($f['hosted']->status($f['buyer']['principal'], $f['buyer']['user'], $forged), $paid);
+        $this->assertSame([1, 1], self::paymentCounts());
+        $this->assertSame([$forged], self::holds());
+        $hold = (array) DB::table('audit_events')->where('action', ContractIdentityHolds::ACTION)->sole();
+        $orderRow = DB::table(CheckoutSchema::TABLES['order'])->where('public_id', $forged)->sole();
+        $this->assertSame(['production_checkout_order', (int) $orderRow->id, null], [$hold['subject_type'], (int) $hold['subject_id'], $hold['actor_id']]);
+        $this->assertSame(['chain' => 'production_checkout_v1', 'reason' => 'contract_identity_held', 'order_public_id' => $forged],
+            json_decode($hold['context'], true, 4, JSON_THROW_ON_ERROR));
+        $this->assertStringNotContainsString('王小明', $hold['context']);
+
+        foreach ([1, 2] as $attempt) {
+            $this->assertSame($paid, $this->reconcileForged($f, $forged), 'attempt '.$attempt);
+            $this->assertSame([$forged], self::holds(), 'attempt '.$attempt);
+            $this->assertSame([1, 1], self::paymentCounts());
+        }
+        $this->assertSame([], $f['gateway']->creates);
+    }
+
+    /** A failed hold write is reported and swallowed: the payment and the answer are unchanged, and the next reconcile writes it. */
+    public function test_a_failed_hold_write_never_affects_the_recorded_payment_or_the_reconcile_result(): void
+    {
+        [$f, $forged] = $this->paidForgedOrder();
+        Exceptions::fake();
+        $failing = true;
+        AuditEvent::creating(function () use (&$failing): void {
+            if ($failing) {
+                throw new RuntimeException('synthetic audit write failure');
+            }
+        });
+        $paid = $this->reconcileForged($f, $forged);
+        $this->assertSame(['verified', 'pending_fulfillment'], [$paid['paymentStatus'], $paid['fulfillmentStatus']]);
+        $this->assertSame($f['hosted']->status($f['buyer']['principal'], $f['buyer']['user'], $forged), $paid);
+        $this->assertSame([1, 1], self::paymentCounts());
+        $payment = (array) DB::table(CheckoutSchema::TABLES['payment'])->sole();
+        $this->assertSame([], self::holds());
+        Exceptions::assertReported(fn (RuntimeException $error): bool => $error->getMessage() === 'synthetic audit write failure');
+
+        $failing = false;
+        $this->assertSame($paid, $this->reconcileForged($f, $forged));
+        $this->assertSame([$forged], self::holds());
+        $this->assertSame($payment, (array) DB::table(CheckoutSchema::TABLES['payment'])->sole());
     }
 
     public function test_initiate_refuses_a_v2_order_whose_declaration_no_longer_verifies_before_any_provider_call(): void
@@ -544,6 +629,8 @@ class ProductionCheckoutContractIdentityTest extends TestCase
         $this->assertSame($f['hosted']->status($f['buyer']['principal'], $f['buyer']['user'], $order['orderId']), $status);
         $this->assertSame($calls, $f['calls']->calls);
         $this->assertSame([1, 1], self::paymentCounts());
+        // A paid name-only (legacy) declaration is never held.
+        $this->assertSame([], self::holds());
     }
 
     public function test_with_the_gate_off_initiate_refuses_a_v2_order_before_any_intent_or_provider_call(): void
