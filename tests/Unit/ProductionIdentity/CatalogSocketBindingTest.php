@@ -4,6 +4,8 @@ namespace Tests\Unit\ProductionIdentity;
 
 use App\Domain\Customers\ProductionIdentity\CatalogSocketBinding;
 use LogicException;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 
@@ -214,9 +216,115 @@ final class CatalogSocketBindingTest extends TestCase
         $lines = file($method->getFileName());
         $body = implode('', array_slice($lines, $method->getStartLine() - 1, $method->getEndLine() - $method->getStartLine() + 1));
         self::assertStringContainsString('return self::retrying(self::snapshot(...), self::prove(...), $writer, $context, $status);', $body);
+        self::assertStringContainsString('if (! self::supportedPhp(\\PHP_VERSION, \\PHP_MAJOR_VERSION, \\PHP_MINOR_VERSION) ||', $body);
         self::assertDoesNotMatchRegularExpression('/\bfn\s*\(|\bfunction\s*\(|\buse\s*\(/', $body);
         $retrying = new ReflectionMethod(CatalogSocketBinding::class, 'retrying');
         self::assertNotEmpty($retrying->getParameters()[2]->getAttributes(\SensitiveParameter::class));
+    }
+
+    public function test_php_gate_admits_the_8_4_series_from_8_4_27_and_refuses_other_series(): void
+    {
+        $gate = new ReflectionMethod(CatalogSocketBinding::class, 'supportedPhp');
+        $cases = ['8.4.26' => false, '8.4.27-dev' => false, '8.4.27' => true, '8.4.28' => true, '8.4.40' => true,
+            '8.3.99' => false, '8.5.0' => false, '8.5.27' => false, '9.0.0' => false];
+        foreach ($cases as $version => $admitted) {
+            [$major, $minor] = array_map('intval', explode('.', $version));
+            self::assertSame($admitted, $gate->invoke(null, $version, $major, $minor), $version);
+        }
+    }
+
+    public function test_only_a_read_past_the_cap_is_transient_and_any_other_read_anomaly_refuses(): void
+    {
+        $capped = new ReflectionMethod(CatalogSocketBinding::class, 'capped');
+        $full = str_repeat('x', 1048576);
+        self::assertSame($full, $capped->invoke(null, $full, true));
+        self::assertNull($capped->invoke(null, $full.'x', false));
+        self::assertNull($capped->invoke(null, $full.'x', true));
+        foreach ([[self::HEADER, false], [false, true], [null, true]] as [$text, $eof]) {
+            try {
+                $capped->invoke(null, $text, $eof);
+                self::fail('A failed or short read was admitted.');
+            } catch (LogicException $error) {
+                self::assertSame('Provable owned direct TCP metadata target required.', $error->getMessage());
+            }
+        }
+    }
+
+    /** A test table read in place of /proc/self/net/tcp{,6}, classified by the production cap. */
+    private function reader(string $tcp, bool $eof = true): \Closure
+    {
+        $capped = new ReflectionMethod(CatalogSocketBinding::class, 'capped');
+
+        return static fn (bool $ipv6): ?string => $capped->invoke(null, $ipv6 ? self::HEADER : $tcp, $eof);
+    }
+
+    private function oversized(): string
+    {
+        return self::HEADER.str_repeat($this->row(), intdiv(1048576, strlen($this->row())) + 1);
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function test_an_oversized_table_refuses_only_that_attempt_and_a_later_attempt_succeeds(): void
+    {
+        if (\PHP_OS_FAMILY !== 'Linux' || ! is_readable('/proc/self/net/tcp')) {
+            self::markTestSkipped('Linux procfs host control.');
+        }
+        $snapshot = new ReflectionMethod(CatalogSocketBinding::class, 'snapshot');
+        $retrying = new ReflectionMethod(CatalogSocketBinding::class, 'retrying');
+        $snapshots = 0;
+        $proofs = 0;
+        try {
+            // The real snapshot with only the table read replaced: no proof, and no second snapshot, in this attempt.
+            $retrying->invoke(null, function () use ($snapshot, &$snapshots): array {
+                $snapshots++;
+
+                return $snapshot->invoke(null, $this->reader($this->oversized()));
+            }, function () use (&$proofs): array {
+                $proofs++;
+
+                return [];
+            }, [], [], 'status');
+            self::fail('An oversized table was admitted.');
+        } catch (LogicException $error) {
+            self::assertSame('Provable owned direct TCP metadata target required.', $error->getMessage());
+            self::assertStringNotContainsString('0200000A', $error->getMessage());
+        }
+        self::assertSame([1, 0], [$snapshots, $proofs]);
+
+        // Not tainted: the next attempt reads a fresh table, both an injected normal one and the native procfs table.
+        CatalogSocketBinding::requireUntainted();
+        [$inodes, $tcp] = $snapshot->invoke(null, $this->reader(self::HEADER.$this->row()));
+        self::assertTrue(array_is_list($inodes));
+        self::assertSame(self::HEADER.$this->row(), $tcp);
+        [, $tcp] = $snapshot->invoke(null);
+        self::assertMatchesRegularExpression('/\A\s*sl\s+local_address\s/', $tcp);
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function test_a_short_or_failed_table_read_still_taints_the_worker_permanently(): void
+    {
+        if (\PHP_OS_FAMILY !== 'Linux' || ! is_readable('/proc/self/net/tcp')) {
+            self::markTestSkipped('Linux procfs host control.');
+        }
+        $snapshot = new ReflectionMethod(CatalogSocketBinding::class, 'snapshot');
+        try {
+            // A read that stopped before EOF under the cap is suspicious, unlike one that ran past the cap.
+            $snapshot->invoke(null, $this->reader(self::HEADER.$this->row(), false));
+            self::fail('A short table read was admitted.');
+        } catch (LogicException $error) {
+            self::assertSame('Provable owned direct TCP metadata target required.', $error->getMessage());
+        }
+        foreach ([fn () => CatalogSocketBinding::requireUntainted(), fn () => $snapshot->invoke(null, $this->reader(self::HEADER.$this->row())),
+            fn () => $snapshot->invoke(null)] as $later) {
+            try {
+                $later();
+                self::fail('A tainted worker admitted a later attempt.');
+            } catch (LogicException $error) {
+                self::assertSame('Provable owned direct TCP metadata target required.', $error->getMessage());
+            }
+        }
     }
 
     public function test_unowned_ambiguous_missing_nonestablished_and_malformed_snapshots_refuse(): void
