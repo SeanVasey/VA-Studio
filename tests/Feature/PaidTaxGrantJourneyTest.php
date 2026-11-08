@@ -4,10 +4,10 @@ namespace Tests\Feature;
 
 use App\Domain\Commerce\ContractIdentity\ContractIdentityStatements;
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
-use App\Domain\Commerce\ProductionCheckout\Evidence;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutSchema;
 use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
 use App\Domain\Delivery\DeliveryException;
+use App\Domain\Grants\ContractIdentityHolds;
 use App\Domain\Grants\PaidTax\PaidTaxActor;
 use App\Domain\Grants\PaidTax\PaidTaxCleanup;
 use App\Domain\Grants\PaidTax\PaidTaxCommands;
@@ -24,7 +24,6 @@ use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
 use App\Domain\Grants\PaidTax\PaidTaxRenderInput;
 use App\Domain\Grants\PaidTax\PaidTaxRuntime;
 use App\Domain\Grants\PaidTax\PaidTaxTransaction;
-use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
@@ -34,11 +33,12 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\PaidTaxGrantFixtures;
+use Tests\Support\ProductionTaxCheckoutContractIdentityForgery;
+use Tests\Support\RecordingTaxCheckoutTransport;
 use Tests\TestCase;
 
 /** Actual local SMTP enrollment and retained synthetic Tax payment; no host/provider acceptance claim. */
@@ -46,6 +46,7 @@ class PaidTaxGrantJourneyTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
     use PaidTaxGrantFixtures;
+    use ProductionTaxCheckoutContractIdentityForgery;
 
     protected function setUp(): void
     {
@@ -173,43 +174,57 @@ class PaidTaxGrantJourneyTest extends TestCase
     }
 
     /**
-     * D-30 (decided 2026-11-08): finalization never creates a grant origin for an order whose sealed v2 declaration no longer
-     * verifies. In this checkout the order evidence itself re-verifies the declaration whenever it is opened, so the frozen
-     * paid source (and reconciliation) already refuse such an order before PaidTaxGrants' own hold is reached; no row is written.
+     * D-30 (decided 2026-11-08): reconciliation records the payment of an order whose sealed v2 declaration no longer verifies,
+     * and paid-tax finalization holds it: a distinct refusal, no grant row, and exactly one durable staff record however often
+     * finalization is retried. Initiate still refuses the order before any provider call.
      */
-    public function test_a_v2_order_whose_declaration_no_longer_verifies_writes_no_paid_tax_grant_rows(): void
+    public function test_a_paid_v2_order_whose_declaration_no_longer_verifies_is_recorded_and_held_at_finalization(): void
     {
         config(['production-tax-checkout.contract_identity_v2' => true]);
         $f = $this->taxOrder('exclusive', 2500, ['licenseeType' => 'individual', 'legalName' => 'Zoë Émile', 'legalNameConfirmed' => true,
             'postalAddress' => ['country' => 'US', 'lines' => ['1 Example Street'], 'locality' => 'Springfield', 'region' => 'IA', 'postalCode' => '50000'],
             'statementVersion' => ContractIdentityStatements::offered()['individual']['statementVersion']]);
         self::configureTax(self::SYNTHETIC_PROVIDER);
-        // A sealed copy whose request and body agree, so only the re-verification can refuse it: the name cannot be printed.
-        $row = (array) DB::table(TaxCheckoutSchema::TABLES['order'])->sole();
-        $body = Evidence::open($row, 'production_tax_checkout_order');
-        $unprintable = [...$body['buyer_declarations'], 'legal_name' => '王小明'];
-        $request = [...$body['request'], 'buyer_declarations' => $unprintable, 'key_digest' => Evidence::key('synthetic-forged-order')];
-        $forged = [...$body, 'public_id' => (string) Str::uuid(), 'request' => $request, 'request_hash' => CanonicalJson::hash($request), 'buyer_declarations' => $unprintable];
-        unset($row['id']);
-        DB::table(TaxCheckoutSchema::TABLES['order'])->insert([...$row, 'public_id' => $forged['public_id'], ...Evidence::seal($forged),
-            'request_key' => $request['key_digest'], 'request_hash' => $forged['request_hash']]);
-
+        $forged = self::forgedUnprintableTaxOrder();
         try {
-            $f['checkout']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $forged['public_id']);
-            $this->fail('The tax order evidence re-verifies the declaration on every open.');
+            $f['checkout']->initiate($f['buyer']['principal'], $f['buyer']['user'], $forged);
+            $this->fail('Initiate re-verifies the declaration.');
         } catch (CheckoutException $error) {
             $this->assertSame('changed', $error->reason);
         }
-        try {
-            (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $forged['public_id']);
-            $this->fail('No grant origin may be created for a declaration that no longer verifies.');
-        } catch (PaidTaxException $error) {
-            $this->assertSame(409, $error->status);
-        }
-        foreach (['paid_tax_order_origins', 'paid_tax_grant_origins', 'paid_tax_document_work'] as $table) {
-            $this->assertDatabaseCount($table, 0);
-        }
         $this->assertSame([], $f['transport']->calls);
+        $f['transport']->params = self::forgedTaxSession($forged, RecordingTaxCheckoutTransport::SESSION);
+        $f['transport']->paid = true;
+
+        $paid = $f['checkout']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $forged);
+        $this->assertSame(['complete', 'verified', 'pending_fulfillment'], [$paid['checkoutStatus'], $paid['paymentStatus'], $paid['fulfillmentStatus']]);
+        $reviewed = (array) DB::table(TaxCheckoutSchema::TABLES['reviewed'])->sole();
+        $this->assertSame([RecordingTaxCheckoutTransport::SESSION, RecordingTaxCheckoutTransport::PAYMENT], [$reviewed['provider_session_id'], $reviewed['provider_payment_id']]);
+        $this->assertSame(['retrieve', 'paymentIntent'], array_column($f['transport']->calls, 0));
+
+        $audits = DB::table('audit_events')->count();
+        foreach ([1, 2] as $attempt) {
+            try {
+                (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $forged);
+                $this->fail('No grant origin may be created for a declaration that no longer verifies.');
+            } catch (PaidTaxException $error) {
+                $this->assertSame([409, ContractIdentityHolds::REASON, 'Paid grant request unavailable.'], [$error->status, $error->reason, $error->getMessage()]);
+            }
+            foreach (['paid_tax_order_origins', 'paid_tax_grant_origins', 'paid_tax_document_work', 'paid_tax_originals', 'paid_tax_fulfillments', 'license_grants'] as $table) {
+                $this->assertDatabaseCount($table, 0);
+            }
+            $this->assertSame($audits + 1, DB::table('audit_events')->count(), 'attempt '.$attempt);
+        }
+        $hold = (array) DB::table('audit_events')->where('action', ContractIdentityHolds::ACTION)->sole();
+        $orderRow = DB::table(TaxCheckoutSchema::TABLES['order'])->where('public_id', $forged)->sole();
+        $this->assertSame(['production_tax_checkout_order', (int) $orderRow->id, null], [$hold['subject_type'], (int) $hold['subject_id'], $hold['actor_id']]);
+        $this->assertSame(['chain' => 'production_tax_checkout_v2', 'reason' => 'contract_identity_held', 'order_public_id' => $forged],
+            json_decode($hold['context'], true, 4, JSON_THROW_ON_ERROR));
+        $this->assertStringNotContainsString('王小明', $hold['context']);
+        // The payment stays recorded and visible to the buyer; nothing was charged again.
+        $this->assertSame('verified', $f['checkout']->status($f['buyer']['principal'], $f['buyer']['user'], $forged)['paymentStatus']);
+        $this->assertSame(['retrieve', 'paymentIntent'], array_column($f['transport']->calls, 0));
+        $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['reviewed'], 1);
     }
 
     public function test_failed_second_tax_line_retains_first_original_until_exact_physical_retry(): void

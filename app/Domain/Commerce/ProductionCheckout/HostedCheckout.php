@@ -190,7 +190,9 @@ final class HostedCheckout
             $basis = null;
             $fresh = null;
             $inserted = false;
-            if ($create) {
+            // A status-only answer never reaches the provider, so it skips the create-only policy, selection, basis and
+            // fresh-checkout proofs that would otherwise refuse a paid order whose listing changed after payment (review P3-4).
+            if ($create && ! $statusOnly) {
                 CheckoutException::require(config('production_checkout.fresh_checkout_enabled') === true, 'disabled', 503);
                 $fresh = FreshCheckoutPolicy::capture();
                 $current = CurrentPolicy::load($rows->current, $order['review']['row']['candidate_id']);
@@ -228,7 +230,7 @@ final class HostedCheckout
                 CurrentSelection::proveCurrent($rows->current, $selection, CarbonImmutable::now('UTC'));
                 CurrentPolicy::proveCurrent($rows->current, $current);
                 CheckoutException::require(config('production_checkout.fresh_checkout_enabled') === true, 'disabled', 503);
-            } else {
+            } elseif (! $statusOnly) {
                 CheckoutException::require(config('production_checkout.reconciliation_enabled') === true, 'disabled', 503);
             }
             OrderEvidence::proveRetained($rows, $order['raw']);

@@ -11,6 +11,7 @@ use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderSourceV2;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
+use App\Domain\Grants\ContractIdentityHolds;
 use App\Domain\Grants\PaidTax\Models\PaidTaxOrderOrigin;
 use App\Domain\Rights\LicenseDisclosure;
 use App\Models\User;
@@ -25,6 +26,12 @@ final class PaidTaxGrants
     {
         try {
             return $this->finalizeOwned($principal, $actor, $orderId, $projectionRead);
+        } catch (PaidTaxException $error) {
+            if ($error->reason === ContractIdentityHolds::REASON) {
+                // D-30: the hold's transaction has rolled back; leave the durable staff record outside it.
+                ContractIdentityHolds::recordAfterHold('production_tax_checkout_v2', $orderId);
+            }
+            throw $error;
         } catch (IdentityException) {
             throw new PaidTaxException(403);
         } catch (CheckoutException $error) {
@@ -62,8 +69,9 @@ final class PaidTaxGrants
                 $this->sameOwner($current, $original);
                 $historical = $access->verifyHistoricalBinding($original, $rows->current());
                 $reader = $rows->admitSource();
-                // No callback gap between original consumer admission and the younger producer capture.
-                $source = ProductionTaxPaidOrderSourceV2::lockedRead($locator, $reader, $historical);
+                // No callback gap between original consumer admission and the younger producer capture. The source does not
+                // re-verify the contract identity declaration here: the hold below does, with its own reason (D-30).
+                $source = ProductionTaxPaidOrderSourceV2::lockedRead($locator, $reader, $historical, false);
                 $heldSource = $source;
                 $lines = [];
                 for ($position = 1; $position <= $source->lineCount(); $position++) {
@@ -75,7 +83,7 @@ final class PaidTaxGrants
                 // D-30 (decided 2026-11-08): a paid order whose frozen v2 declaration no longer verifies stays paid, but no grant
                 // origin is created; fulfillment is held for staff. Every line carries the order's one declaration.
                 foreach ($lines as $line) {
-                    PaidTaxException::require(! ProductionCheckout::contractIdentityHeld($line['buyer_declarations']), 409, 'contract_identity_held');
+                    PaidTaxException::require(! ProductionCheckout::contractIdentityHeld($line['buyer_declarations']), 409, ContractIdentityHolds::REASON);
                 }
                 $batch = $rows->one('paid_tax_order_origins', 'producer = ? AND order_public_id = ?', ['production_tax_checkout_v2', $orderId]);
                 if ($batch === []) {
