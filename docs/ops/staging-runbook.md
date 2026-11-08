@@ -460,6 +460,12 @@ followed by a later marker-cleanup/evidence failure needs inspection, rather tha
 Fresh quiesce is safe when the previous phase already stopped FPM/workers: it proves stopped state,
 retains the maintenance marker and closed gate, and does not require HTTP503 from an absent backend.
 
+A Forge "failed" after exactly ten minutes is Forge's deployment time limit, not necessarily a failed deploy: Forge
+stops reading the output but leaves the processes running, and a first install's migrations take longer than that.
+`forge-deploy.sh` keeps writing everything to `forge-deploy.log` in the deploy's evidence directory. Wait until no
+`vasey-staging-ctl` or `release-step.sh` process remains, then read that log's last lines and `ctl status`: a log that
+ends with `deployed <sha>` and a status without an operation marker is a completed deploy; anything else is a recovery case below.
+
 Decide which case applies by comparing `migrate-status-before.txt` and `migrate-status-after.txt` in the
 failed deploy's evidence directory.
 

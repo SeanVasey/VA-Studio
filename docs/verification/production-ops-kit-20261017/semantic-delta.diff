@@ -37,29 +37,32 @@
 +[ "$APP_ENV_EXPECTED" = production ] || die "--app-env must be production"
  APP_GROUP=$(id -gn "$APP_USER")
  APP_HOME=$(getent passwd "$APP_USER" | cut -d: -f6)
-@@ -165,8 +163,5 @@
+@@ -165,11 +163,8 @@
  KIT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
  for f in nginx/vasey-production.conf php-fpm/vasey-production.conf php-fpm/vasey-paid-delivery.conf \
 -         workers/vasey-production-workers.conf bin/vasey-production-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh; do
--  [ -f "$KIT/$f" ] || die "kit file missing: ops/production/$f"
--done
--for f in nginx/vasey-production-http.conf nginx/vasey-production-classic.conf; do  # the http-level helpers and the whole-file wrapper
 +         workers/vasey-production-workers.conf bin/vasey-production-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh forge-deploy.sh; do
    [ -f "$KIT/$f" ] || die "kit file missing: ops/production/$f"
  done
-@@ -478,5 +473,4 @@
+ [ -f "$KIT/tls/origin-ca.pem" ] || die "kit file missing: ops/production/tls/origin-ca.pem"  # the probe's pinned Origin CA roots
+-for f in nginx/vasey-production-http.conf nginx/vasey-production-classic.conf; do  # the http-level helpers and the whole-file wrapper
+-  [ -f "$KIT/$f" ] || die "kit file missing: ops/production/$f"
+-done
+ 
+ PHPV=8.4
+@@ -479,5 +474,4 @@
  VASEY_EXPECTED_APP_ENV=$APP_ENV_EXPECTED
  VASEY_DB_NAME=$DB_NAME
 -VASEY_PROBE_NETRC=/etc/vasey-production/probe.netrc
  VASEY_KEEP_RELEASES=3
  VASEY_BACKUP_KEEP=7
-@@ -494,4 +488,5 @@
+@@ -495,4 +489,5 @@
  install -m 0644 -o root -g root "$KIT/seal-release.py" /usr/local/libexec/vasey-production/seal-release.py
  install -m 0644 -o root -g root "$KIT/release-step.sh" /usr/local/libexec/vasey-production/release-step.sh
 +install -m 0755 -o root -g root "$KIT/forge-deploy.sh" /usr/local/libexec/vasey-production/forge-deploy.sh
+ install -m 0644 -o root -g root "$KIT/tls/origin-ca.pem" /usr/local/libexec/vasey-production/origin-ca.pem
  
- render "$KIT/php-fpm/vasey-production.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-production.conf" 0644
-@@ -540,54 +535,6 @@
+@@ -542,54 +537,6 @@
  EOF
  
 -# ---------------------------------------------------------------- 7. access credentials and nginx template
@@ -115,7 +118,7 @@
 -systemctl reload nginx || die "nginx reload failed after a passing nginx -t"
  
  # ---------------------------------------------------------------- summary
-@@ -601,8 +548,7 @@
+@@ -603,8 +550,7 @@
    helpers             /usr/local/sbin/vasey-production-ctl (sudo for $APP_USER), /usr/local/sbin/vasey-production-backup (cron 03:17 UTC)
    MySQL               schema $DB_NAME; DB_HOST=127.0.0.1 DB_USERNAME=vasey_app
 -  secrets (root only) $SECRETS/db-app.env (paste DB_PASSWORD into Forge > Environment), $BACKUP_CNF, $HTPASSWD, /etc/vasey-production/probe.netrc
@@ -144,14 +147,14 @@
 +#   bash /usr/local/libexec/vasey-production/forge-deploy.sh "$(git rev-parse HEAD)"
  #
  # The Forge site checkout ($FORGE_SITE_PATH) is only a git mirror and the home of the Forge-managed .env.
-@@ -132,5 +132,5 @@
+@@ -133,5 +133,5 @@
  freeze_runtime_environment
  envget() { grep -E "^$1=" "$RUNTIME_ENV" | tail -n 1 | cut -d= -f2- | sed -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'$/\1/"; }
 -need() { [ "$(envget "$1")" = "$2" ] || die ".env: $1 must be $2 for the staging profile"; }
 +need() { [ "$(envget "$1")" = "$2" ] || die ".env: $1 must be $2 for the production profile"; }
  need APP_ENV "$VASEY_EXPECTED_APP_ENV"
  need APP_DEBUG false
-@@ -144,6 +144,5 @@
+@@ -145,6 +145,5 @@
  need DB_DATABASE "$VASEY_DB_NAME"
  need FILESYSTEM_DISK local
 -need MAIL_MAILER log
@@ -159,7 +162,7 @@
 +need LOG_CHANNEL stderr            # the journal collects stderr; the reviewed preflight profile requires it
  need APP_MAINTENANCE_DRIVER file
  [[ "$(envget APP_KEY)" =~ ^base64:[A-Za-z0-9+/]{43}=$ ]] || die ".env: APP_KEY must be a base64 32-byte key (php artisan key:generate --show)"
-@@ -151,12 +150,6 @@
+@@ -152,12 +151,6 @@
  [ -n "$(envget DB_PASSWORD)" ] || die ".env: DB_PASSWORD is empty"
  [ "$(envget DB_QUEUE_RETRY_AFTER)" -ge 1200 ] 2>/dev/null || die ".env: DB_QUEUE_RETRY_AFTER must be at least 1200"
 -! grep -Eq '(sk|rk|pk)_live_' "$RUNTIME_ENV" || die ".env contains a live Stripe key; staging is test mode only"
@@ -183,18 +186,20 @@
 +  "${VASEY_PHP_FPM_SERVICE:?}" "${VASEY_KEEP_RELEASES:=3}"
  [ "$(id -u "$VASEY_APP_USER")" -gt 0 ] || die "application account must be nonroot"
  
-@@ -158,8 +158,8 @@
+@@ -159,10 +159,10 @@
  
  # HTTP status of GET / on this host, without depending on DNS or egress: the request goes to the local
 -# nginx with the staging hostname for SNI and the certificate check, and the staging basic-auth
 -# credentials from a 0600 netrc. Maintenance proof needs the exact code: a failed request is not a 503.
 +# nginx with the production hostname for SNI and the certificate check, and no credentials (the site has no basic
 +# auth). Maintenance proof needs the exact code: a failed request is not a 503.
+ # Certificates verify against the system store plus the pinned Cloudflare Origin CA roots: an on-forge.com site, or any
+ # origin behind Cloudflare in Full (strict) mode, serves an Origin CA certificate the system store does not hold.
  probe() {
 -  curl -sS --noproxy '*' -o /dev/null -w '%{http_code}' --max-time 20 --netrc-file "$VASEY_PROBE_NETRC" \
 +  curl -sS --noproxy '*' -o /dev/null -w '%{http_code}' --max-time 20 \
+     --cacert "$ORIGIN_CA" --capath /etc/ssl/certs \
      --resolve "$VASEY_PRODUCTION_HOST:443:127.0.0.1" "https://$VASEY_PRODUCTION_HOST/" 2>/dev/null || true
- }
 --- staging/workers/vasey-staging-workers.conf (renamed)
 +++ production/workers/vasey-production-workers.conf
 @@ -38,7 +38,6 @@

@@ -16,7 +16,7 @@ The review surface is the delta (`--delta`): the staging file after renames vers
 What is derived, copied or written for production:
     derived  provision.sh, forge-deploy.sh, release-step.sh, backup.sh, bin/vasey-production-ctl,
              php-fpm/vasey-production.conf, workers/vasey-production-workers.conf
-    copied   seal-release.py and normalize-mysql-dump.py (byte for byte), php-fpm/vasey-paid-delivery.conf (the paid-delivery
+    copied   seal-release.py, normalize-mysql-dump.py and tls/origin-ca.pem (byte for byte), php-fpm/vasey-paid-delivery.conf (the paid-delivery
              pool is generic and identical), validate-runtime.php and nginx/vasey-production.conf (production files in this
              directory)
     not shipped  anything under ops/staging/test-commerce/ and the basic-auth files: production has neither.
@@ -235,6 +235,7 @@ DERIVED = [
 COPIED = [
     Copied("seal-release.py", "seal-release.py", 0o644),
     Copied("normalize-mysql-dump.py", "normalize-mysql-dump.py", 0o644),
+    Copied("tls/origin-ca.pem", "tls/origin-ca.pem", 0o644),
     Copied("php-fpm/vasey-paid-delivery.conf", "php-fpm/vasey-paid-delivery.conf", 0o644),
     Copied("validate-runtime.php", "production:validate-runtime.php", 0o644),
     Copied("nginx/vasey-production.conf", "production:nginx/vasey-production.conf", 0o644),

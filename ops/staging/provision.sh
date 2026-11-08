@@ -167,6 +167,7 @@ for f in nginx/vasey-staging.conf php-fpm/vasey-staging.conf php-fpm/vasey-paid-
          workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh; do
   [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"
 done
+[ -f "$KIT/tls/origin-ca.pem" ] || die "kit file missing: ops/staging/tls/origin-ca.pem"  # the probe's pinned Origin CA roots
 for f in nginx/vasey-staging-http.conf nginx/vasey-staging-classic.conf; do  # the http-level helpers and the whole-file wrapper
   [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"
 done
@@ -493,6 +494,7 @@ install -d -m 0755 -o root -g root /usr/local/libexec/vasey-staging
 install -m 0644 -o root -g root "$KIT/normalize-mysql-dump.py" /usr/local/libexec/vasey-staging/normalize-mysql-dump.py
 install -m 0644 -o root -g root "$KIT/seal-release.py" /usr/local/libexec/vasey-staging/seal-release.py
 install -m 0644 -o root -g root "$KIT/release-step.sh" /usr/local/libexec/vasey-staging/release-step.sh
+install -m 0644 -o root -g root "$KIT/tls/origin-ca.pem" /usr/local/libexec/vasey-staging/origin-ca.pem
 
 render "$KIT/php-fpm/vasey-staging.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-staging.conf" 0644
 render "$KIT/php-fpm/vasey-paid-delivery.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-paid-delivery.conf" 0644
