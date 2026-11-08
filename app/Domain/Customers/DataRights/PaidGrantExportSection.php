@@ -57,10 +57,10 @@ final class PaidGrantExportSection
     /**
      * Stored payload bytes this chain may load (batches, lines, originals and redeemed authorizations), summed in the
      * database before anything is loaded. A chain's raw rows are held while each payload is decoded in turn, so peak memory
-     * tracks this sum: 64 MiB measured at about 84 MiB peak, well inside the 256M FPM pools. Stored payloads are much
-     * larger than what is exported (about 23 KiB per line against well under 1 KiB exported), so this budget is reached at
-     * roughly as many lines as a full 1 MiB export holds; a larger account refuses with 413 rather than running out of
-     * memory. Checked once, like the counts before it; rows committed after the sum can add to the load.
+     * tracks this sum: a PHP-only simulation of 64 MiB peaked at about 84 MiB, and buffered MySQL results can briefly hold
+     * a large read twice, which still fits inside the 256M FPM pools. Stored payloads are much larger than what is
+     * exported (about 23 KiB per line against well under 1 KiB exported), so this budget is reached at roughly as many
+     * lines as a full 1 MiB export holds; a larger account refuses with 413 rather than running out of memory. Checked once, like the counts before it; rows committed after the sum can add to the load.
      */
     public const MAX_PAYLOAD_BYTES = 64 * 1024 * 1024;
 
