@@ -140,6 +140,28 @@ jobs:
           python3 scripts/ci/test-php-test-runtime.py
           python3 scripts/dev/test-bootstrap-macos.py
           python3 scripts/test-publish-github.py
+      # The staging/production ops kits (tests/ops, build-kit) had no CI: PR #223 left three of their checks red on main.
+      # They need the Composer dependencies above. They run last: installing php8.4-fpm from the PPA can replace
+      # setup-php's CLI binary, so no later step may depend on it. The tests exercise real tools and root-only paths
+      # (installers, root-owned files) and skip without them, so the runner is provisioned like a host (service starts
+      # disabled while installing, needrestart suspended), they run as root, and a skipped test
+      # fails the step: no check passes by skipping.
+      - name: Verify the staging and production ops kits
+        run: |
+          printf '#!/bin/sh\nexit 101\n' | sudo tee /usr/sbin/policy-rc.d >/dev/null
+          sudo chmod 0755 /usr/sbin/policy-rc.d
+          sudo add-apt-repository -y -n ppa:ondrej/php  # php8.4-fpm for the production pool's `php-fpm8.4 -t` check
+          sudo apt-get update -qq
+          sudo NEEDRESTART_SUSPEND=1 apt-get install -y -qq --no-install-recommends nginx age rsync rclone supervisor clamav-daemon apparmor php8.4-fpm
+          sudo rm -f /usr/sbin/policy-rc.d
+          sudo env "PATH=$PATH" PYTHONDONTWRITEBYTECODE=1 python3 - <<'PY'
+          import sys, unittest
+          result = unittest.TextTestRunner(verbosity=1).run(unittest.defaultTestLoader.discover("tests/ops"))
+          for test, reason in result.skipped:
+              print(f"SKIPPED (not allowed in CI): {test.id()}: {reason}")
+          sys.exit(0 if result.wasSuccessful() and not result.skipped else 1)
+          PY
+          python3 ops/production/build-kit.py --check
 
   backend-mysql:
     # Do not start costly suites for a candidate that already fails preflight.
