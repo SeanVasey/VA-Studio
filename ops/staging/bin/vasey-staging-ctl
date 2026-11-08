@@ -55,6 +55,7 @@ PROGRAMS=(vasey-staging-media vasey-staging-payments vasey-staging-contracts vas
 BACKUP_BIN=/usr/local/sbin/vasey-staging-backup
 SEALER=/usr/local/libexec/vasey-staging/seal-release.py
 RELEASE_STEP=/usr/local/libexec/vasey-staging/release-step.sh
+ORIGIN_CA=/usr/local/libexec/vasey-staging/origin-ca.pem
 OPERATION_MARKER=/etc/vasey-staging/operation-in-progress
 
 valid_sha() { [[ "${1:-}" =~ ^[0-9a-f]{40}$ ]]; }
@@ -159,8 +160,11 @@ seal_release() {
 # HTTP status of GET / on this host, without depending on DNS or egress: the request goes to the local
 # nginx with the staging hostname for SNI and the certificate check, and the staging basic-auth
 # credentials from a 0600 netrc. Maintenance proof needs the exact code: a failed request is not a 503.
+# Certificates verify against the system store plus the pinned Cloudflare Origin CA roots: an on-forge.com site, or any
+# origin behind Cloudflare in Full (strict) mode, serves an Origin CA certificate the system store does not hold.
 probe() {
   curl -sS --noproxy '*' -o /dev/null -w '%{http_code}' --max-time 20 --netrc-file "$VASEY_PROBE_NETRC" \
+    --cacert "$ORIGIN_CA" --capath /etc/ssl/certs \
     --resolve "$VASEY_STAGING_HOST:443:127.0.0.1" "https://$VASEY_STAGING_HOST/" 2>/dev/null || true
 }
 

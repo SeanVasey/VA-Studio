@@ -35,7 +35,8 @@ EXPECTED_FILES = {
     "provision.sh", "forge-deploy.sh", "release-step.sh", "backup.sh", "bin/vasey-production-ctl", "seal-release.py",
     "normalize-mysql-dump.py", "validate-runtime.php", "nginx/vasey-production.conf", "nginx/vasey-production-http.conf",
     "nginx/vasey-production-classic.conf", "php-fpm/vasey-production.conf",
-    "php-fpm/vasey-paid-delivery.conf", "workers/vasey-production-workers.conf", "MANIFEST.sha256",
+    "php-fpm/vasey-paid-delivery.conf", "workers/vasey-production-workers.conf", "tls/origin-ca.pem",
+    "MANIFEST.sha256",
 }
 
 
@@ -161,7 +162,7 @@ class KitBuild(unittest.TestCase):
     def test_check_mode_builds_and_discards(self):
         run = subprocess.run([sys.executable, "-I", str(BUILDER), "--check"], capture_output=True, text=True)
         self.assertEqual(run.returncode, 0, run.stderr)
-        self.assertIn("build-kit: ok, 15 files", run.stdout)
+        self.assertIn("build-kit: ok, 16 files", run.stdout)
 
 
 class AnchorsFailClosed(unittest.TestCase):
@@ -264,9 +265,11 @@ class CrossFileConsistency(unittest.TestCase):
                                      "/usr/local/libexec/vasey-production/normalize-mysql-dump.py",
                                      "/usr/local/libexec/vasey-production/seal-release.py",
                                      "/usr/local/libexec/vasey-production/release-step.sh",
-                                     "/usr/local/libexec/vasey-production/forge-deploy.sh"})
+                                     "/usr/local/libexec/vasey-production/forge-deploy.sh",
+                                     "/usr/local/libexec/vasey-production/origin-ca.pem"})
         for path in ("BACKUP_BIN=/usr/local/sbin/vasey-production-backup", "SEALER=/usr/local/libexec/vasey-production/seal-release.py",
-                     "RELEASE_STEP=/usr/local/libexec/vasey-production/release-step.sh"):
+                     "RELEASE_STEP=/usr/local/libexec/vasey-production/release-step.sh",
+                     "ORIGIN_CA=/usr/local/libexec/vasey-production/origin-ca.pem"):
             self.assertIn(path, ctl)
         self.assertIn("CTL=/usr/local/sbin/vasey-production-ctl", backup)
         self.assertIn("NORMALIZER=/usr/local/libexec/vasey-production/normalize-mysql-dump.py", backup)
