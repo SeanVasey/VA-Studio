@@ -395,6 +395,15 @@ byte-identical.
 - Decide on the held tc-lib updates (#162/#164).
 - Wire the v2 renderer into the paid and paid-tax issuers for new issuance only, with independent review. This also needs the
   D-30 prerequisites: steps 2, 3a and 3b and the U-13 retention values.
+  Wiring conditions from the v2 renderer review (2026-11-08):
+  - `render()` must accept only documents built by `VaseyLicenseV2PdfRenderer::document()` (for example a `WeakMap` of the
+    documents it built, refusing anything else with `unsupported_input`). `VaseyLicenseDocument` does not record which
+    coverage built it, and the layout's per-face check has no script restriction, so a document built under a wider set
+    (such as `test-v2`) could otherwise print characters checkout refuses.
+  - Declarations frozen before #241 under the `test-v2` set stay on the `test-v2` renderers, or refuse before payment.
+  - Map `InvalidArgumentException` and `JsonException` from `ContractPrintableSet` (tampered metrics) to `profile_changed`.
+  - Add a test that a font file swapped after `verifyRuntime` refuses (the font copy must use the hashed bytes; v1 lacks it
+    too), and cover zero-width template glyphs in the six-template census.
 
 ### Wording item for Sean
 
