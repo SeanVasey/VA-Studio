@@ -19,6 +19,7 @@ template, a tool that writes to a new directory or to standard output, or a vali
 | Runtime validator | `ops/staging/validate-runtime.php`: test-mode requirements | `ops/production/validate-runtime.php`: the reviewed private-server preflight production profile, real configuration admission, production holds |
 | Logs | rotated files under `/var/log/vasey-staging/` | workers and scheduler through supervisor's syslog handler (the journal); nginx errors to stderr; nginx access, PHP-FPM and backup logs are files with logrotate |
 | Robots | `noindex` headers | none from nginx; the application decides |
+| nginx | three files for Forge's site wrapper: the server-block body, its http-level helpers in `conf.d`, a whole-file wrapper | the same three files, derived: no basic auth, no webhook location or zone, no robots map, an access-log format that masks the paid-path UUIDs |
 | Paid delivery | dedicated FPM pool (7,800 s), 480 s and 3,900 s read timeouts, 1 GiB temp cap in a private 0700 directory | identical |
 | Workers | `media`, `payments`, `contracts`, `default,inquiry-alerts` plus the scheduler | identical |
 | Names | `/srv/vasey-staging`, `/etc/vasey-staging`, `vasey-staging-ctl`, DB `vasey_staging` | `/srv/vasey-production`, `/etc/vasey-production`, `vasey-production-ctl`, DB `vasey_production` (the account stays `vasey_app@127.0.0.1`) |
@@ -38,14 +39,25 @@ mode and credentials blank, and the four pre-launch capability flags false).
 | `provision.sh` | Entry point. Assembles the kit (below), runs the assembled `provision.sh`, removes the assembly | `sudo bash ops/production/provision.sh --host <HOST>`; `--keep-build` keeps the assembly in `/root/vasey-production-kit.*` |
 | `build-kit.py` | Derives the kit from `ops/staging/`: renames plus counted patches. `--delta` prints the differences, `--check` builds and discards | no root needed |
 | `validate-runtime.php` | Production runtime admission | run by the deploy from each release; `--runtime` adds the preflight host checks for a served release |
-| `nginx/vasey-production.conf` | Site template: TLS, limits, headers, the long paid routes, masked access log | pasted into Forge |
 | `env.host-overlay.example` | The kit's own non-secret values (database host and name, tool paths) | layered by `compose-env.py` |
 | `compose-env.py` | Composes the environment template from `ops/private-server/env.example`, `env.production.example` and the overlay | `python3 -I ops/production/compose-env.py --host <HOST>` |
 | `env.production.example` | The reviewed feature-family switches, every one off (existing, unchanged) | never filled in place |
 
 Derived from `ops/staging/` at build time, not committed here: `provision.sh`, `forge-deploy.sh`, `release-step.sh`,
-`backup.sh`, `bin/vasey-production-ctl`, the default PHP-FPM pool and the worker programs. Copied byte for byte:
-`seal-release.py`, `normalize-mysql-dump.py` and the paid-delivery pool `php-fpm/vasey-paid-delivery.conf`.
+`backup.sh`, `bin/vasey-production-ctl`, the default PHP-FPM pool, the worker programs and the three nginx files. Copied byte
+for byte: `seal-release.py`, `normalize-mysql-dump.py` and the paid-delivery pool `php-fpm/vasey-paid-delivery.conf`.
+
+The nginx files follow staging's layout for Forge's current site wrapper (staging README, step 7):
+
+| Kit file | What it is | Installed to |
+| --- | --- | --- |
+| `nginx/vasey-production.conf` | Site body (the inside of Forge's server block): limits, headers, the long paid routes, the masked access log, `root <kit root>/current/public` in every location and a catch-all `location /` | rendered to `/etc/vasey-production/nginx-site.conf`, then installed as Forge's site configuration (step 7) |
+| `nginx/vasey-production-http.conf` | http-level helpers the body uses: the `vasey_production_general` rate-limit zone, the referrer-policy, frame-options and access-log mask `map`s, the `vasey_production` log format, and the commented trusted-proxy illustration | `/etc/nginx/conf.d/vasey-production.conf` (provision.sh, checked with `nginx -t`) |
+| `nginx/vasey-production-classic.conf` | Whole-file wrapper (listen, TLS, Forge includes) that includes the body, for a host whose site file is edited as a whole | rendered to `/etc/vasey-production/nginx-classic.conf`; not used on the current Forge layout |
+
+They replace the single whole-file template the kit carried until November 2026. Its directives are unchanged: the only
+differences are that `root` moved from the server block into every location and that Forge's `forge-conf/<id>/server/*` include
+is no longer pulled in (`tests/ops/test_production_nginx_site.py` diffs them directive by directive against a frozen copy).
 
 ### Why the kit is derived and how to review it
 
@@ -53,8 +65,8 @@ The staging scripts are about 1,900 lines of reviewed root-level code, tested by
 need a second line-by-line review and would drift. Instead each derived file is the staging file with mechanical renames and a
 short list of patches in `build-kit.py`, each with the number of times its anchor must match. Any other count stops the build,
 so a change to `ops/staging/` that touches an anchor forces a re-review here. **Review `python3 -I ops/production/build-kit.py
---delta`** (about 220 lines, mostly the removed basic-auth block): it is the staging file after renames against the production
-file, nothing else. `release-step.sh`, `backup.sh` and the default PHP-FPM pool have no delta at all beyond the renames. The
+--delta`** (about 420 lines, mostly the removed basic-auth and webhook blocks and the nginx comments): it is the staging file
+after renames against the production file, nothing else. `release-step.sh`, `backup.sh` and the default PHP-FPM pool have no delta at all beyond the renames. The
 control helper has two small hunks: it no longer requires probe credentials, and the readiness probe sends none.
 `build-kit.py` refuses to leave any staging-only name, basic-auth or netrc reference behind.
 
@@ -75,7 +87,7 @@ The **Who** column says whether Sean does the step in the Forge UI or a script d
 | 4 | **Sean, Forge** | **Install the repository** (`SeanVasey/VA-Studio`, the branch carrying the SHA). **Untick "Install Composer dependencies"** and leave **Quick Deploy off**. |
 | 5 | **Sean, Forge** | **Get the certificate** (Let's Encrypt) before step 7. The readiness probe checks the certificate against the host name, so use a publicly trusted one. |
 | 6 | **Script** (Sean over SSH) | `sudo bash /home/forge/<HOST>/ops/production/provision.sh --host <HOST>`. There is no password prompt. Safe to re-run. |
-| 7 | **Sean, Forge** | Fill `__SSL_CERT__`, `__SSL_KEY__` and `__FORGE_CONF__` in `/etc/vasey-production/nginx-site.conf` from Forge's config, check `grep -n '__[A-Z_]*__'` prints nothing, then paste it into Site → Edit Nginx Configuration. |
+| 7 | **Sean, Forge** | **Install the nginx site**, as on staging. Forge generates the site file as a wrapper (listen, `http2`, `server_name`, the certificate, a `root` that is the git checkout, and its `forge-conf/<site id>/` includes) and lets you edit only the inside of its server block. Provisioning (step 6) has already installed and loaded the http-level helpers in `/etc/nginx/conf.d/vasey-production.conf` and rendered the server-block body at `/etc/vasey-production/nginx-site.conf`, with no placeholders left (`grep -n '__[A-Z_]*__'` prints nothing). Replace the whole content of Site → Edit Nginx Configuration with that file, or send it as `config` to the site API (`PUT .../sites/<site>/nginx`). Forge writes it **without** `nginx -t`, so run `sudo nginx -t`, then load `https://<HOST>/` and confirm the site answers without credentials and sends no `X-Robots-Tag`. Every location in the body sets `root <kit root>/current/public`, so the wrapper's checkout root is never used; do not add a location without its own `root`. If provisioning refused because another nginx file already defines the `vasey_production_general` zone, a `vasey_production_*` map or the `vasey_production` log format (the older whole-file template), put Forge's default site configuration back first, then re-run step 6. On a host whose site file is edited as a whole, use `/etc/vasey-production/nginx-classic.conf` instead: fill `__SSL_CERT__`, `__SSL_KEY__` and `__FORGE_CONF__` from Forge's config and paste it as the whole file. |
 | 8 | **Sean, Forge** | **Environment.** On the host, `python3 -I ops/production/compose-env.py --host <HOST>` prints a template with no secrets. Paste it into Site → Environment and fill only `APP_KEY` (generate it once on the server: `php8.4 -r 'echo "base64:".base64_encode(random_bytes(32)), PHP_EOL;'`), `DB_PASSWORD` (`sudo cat /root/vasey-production-secrets/db-app.env`), `MEDIA_TAG_PATH` and `MEDIA_TAG_SHA256`, in Forge. The template is BLOCKED by the private-server preflight until those four are set. The first deploy checks the filled environment twice: the cheap frozen-environment check, then the validator on the built candidate. The mirror checkout has no `vendor/`, so the preflight itself cannot run there; to check earlier, run it from any built checkout as the application user. |
 | 9 | **Sean, Forge** | **Deployment script** (replace Forge's default with exactly this), then **Deploy Now**: `set -euo pipefail`, `cd "$FORGE_SITE_PATH"`, `git fetch --prune origin "$FORGE_SITE_BRANCH"`, `git checkout --detach --force FETCH_HEAD`, `bash /usr/local/libexec/vasey-production/forge-deploy.sh "$(git rev-parse HEAD)"`. |
 | 10 | **Script** (Forge runs it) | First deploy, the same sequence as staging: frozen environment check, quiesce, protected build, the production validator, snapshot and restore proof, migrate, caches, `vasey:doctor`, switch, healthy resume. |
@@ -176,6 +188,6 @@ These are application or review items this kit deliberately does not do:
 ## What was and was not verified
 
 See [`docs/verification/production-ops-kit-20261017/README.md`](../../docs/verification/production-ops-kit-20261017/README.md).
-In short: the derivation, patches, validator, nginx template (`nginx -t` and a live run of the log masking), supervisor and
-PHP-FPM syntax, the env composition and the backup and monitoring tools were exercised locally. Nothing was run on a host: no
+In short: the derivation, patches, validator, nginx files (`nginx -t` on a synthetic Forge tree and a live loopback run of the
+release root, headers, paid routing and log masking, `tests/ops/test_production_nginx_site.py`), supervisor and PHP-FPM syntax, the env composition and the backup and monitoring tools were exercised locally. Nothing was run on a host: no
 provisioning, no Forge, no systemd, no real deploy, backup, restore or off-host transfer.

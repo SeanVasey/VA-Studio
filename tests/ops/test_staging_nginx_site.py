@@ -13,6 +13,7 @@ provision.sh does, and prove:
 No host is touched: everything runs in a temporary directory on loopback."""
 import base64
 import http.client
+import importlib.util
 import os
 import re
 import shutil
@@ -36,6 +37,14 @@ ROOT = "/srv/vasey-staging"
 RELEASE_ROOT = f"{ROOT}/current/public"
 HOST = "vasey-staging.on-forge.com"
 NGINX = shutil.which("nginx")
+
+
+def production_nginx():
+    """The production kit's three nginx files, as ops/production/build-kit.py derives them from these."""
+    spec = importlib.util.spec_from_file_location("build_kit", REPO / "ops/production/build-kit.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return "".join(module.derive(entry, STAGING) for entry in module.DERIVED if entry.dst.startswith("nginx/"))
 
 
 def render(text, root=ROOT, host=HOST):
@@ -174,8 +183,9 @@ class Split(unittest.TestCase):
         defined_vars = {node.args[1] for node in HTTP.find("map")}
         used_vars = set(re.findall(r"\$vasey_staging_[a-z_]+", BODY_TEMPLATE))
         self.assertEqual(used_vars, defined_vars)
-        # The production kit uses its own names, so both kits can share an nginx instance.
-        production = (REPO / "ops/production/nginx/vasey-production.conf").read_text()
+        # The production kit uses its own names, so both kits can share an nginx instance. Its nginx files are derived from these
+        # by ops/production/build-kit.py (tests/ops/test_production_nginx_site.py covers them).
+        production = production_nginx()
         for name in defined_zones | {v.lstrip("$") for v in defined_vars}:
             self.assertNotIn(name, production)
 
