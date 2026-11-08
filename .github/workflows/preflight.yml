@@ -109,12 +109,17 @@ jobs:
           PERSISTENT_CATALOG_REQUIRE_PHP: '1'
         run: node --test scripts/migration/persistent-catalog.test.mjs
       # The staging/production ops kits (tests/ops, build-kit) had no CI: PR #223 left three of their checks red on main.
-      # They need the Composer dependencies above, so they run here; a skipped test fails the step, so a missing tool
-      # (nginx, openssl, curl) cannot turn the nginx, TLS or validator checks into a silent pass.
+      # They need the Composer dependencies above, so they run here. The tests exercise real tools and root-only paths
+      # (installers, root-owned files) and skip without them, so the runner is provisioned like a host (service starts
+      # disabled while installing), they run as root, and a skipped test fails the step: no check passes by skipping.
       - name: Verify the staging and production ops kits
         run: |
-          command -v nginx >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends nginx; }
-          python3 - <<'PY'
+          printf '#!/bin/sh\nexit 101\n' | sudo tee /usr/sbin/policy-rc.d >/dev/null
+          sudo chmod 0755 /usr/sbin/policy-rc.d
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends nginx age rsync rclone supervisor clamav-daemon apparmor php8.4-fpm
+          sudo rm -f /usr/sbin/policy-rc.d
+          sudo env "PATH=$PATH" PYTHONDONTWRITEBYTECODE=1 python3 - <<'PY'
           import sys, unittest
           result = unittest.TextTestRunner(verbosity=1).run(unittest.defaultTestLoader.discover("tests/ops"))
           for test, reason in result.skipped:
