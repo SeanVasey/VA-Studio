@@ -34,7 +34,8 @@ Inquiries sent from a browser session without an order are not linked to an acco
 - over `export_max_bytes` (default 1 MiB);
 - over 500 orders;
 - over 500 records in any one production checkout table, counted before any is opened;
-- over 500 paid orders, 5,000 paid lines or originals (ten lines per order), or 50,000 download authorizations or redemptions (ten per line), in either paid-grant chain, counted before any is opened.
+- over 500 paid orders, 5,000 paid lines or originals (ten lines per order), or 50,000 redeemed downloads, in either paid-grant chain, counted before any is opened (unused download authorizations are only counted, so they never refuse an export);
+- over 64 MiB of stored payloads (orders, lines, originals and redeemed downloads) in either paid-grant chain, summed in the database before any is loaded. Stored payloads are much larger than what is exported (about 23 KiB per paid line against well under 1 KiB exported), so this is reached at about as many lines as a full 1 MiB export holds; a larger account refuses instead of exhausting memory.
 
 Production-signed-in customers cannot reach these routes yet (D-30 step 3b).
 

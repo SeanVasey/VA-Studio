@@ -54,6 +54,16 @@ final class PaidGrantExportSection
      */
     public const MAX_DOWNLOADS = self::MAX_LINES * 10;
 
+    /**
+     * Stored payload bytes this chain may load (batches, lines, originals and redeemed authorizations), summed in the
+     * database before anything is loaded. A chain's raw rows are held while each payload is decoded in turn, so peak memory
+     * tracks this sum: a PHP-only simulation of 64 MiB peaked at about 84 MiB, and buffered MySQL results can briefly hold
+     * a large read twice, which still fits inside the 256M FPM pools. Stored payloads are much larger than what is
+     * exported (about 23 KiB per line against well under 1 KiB exported), so this budget is reached at roughly as many
+     * lines as a full 1 MiB export holds; a larger account refuses with 413 rather than running out of memory. Checked once, like the counts before it; rows committed after the sum can add to the load.
+     */
+    public const MAX_PAYLOAD_BYTES = 64 * 1024 * 1024;
+
     /** @return array{paidGrantOrders: list<array>, paidTaxGrantOrders: list<array>} */
     public function build(int $accountId): array
     {
@@ -83,6 +93,20 @@ final class PaidGrantExportSection
         }
 
         return $counts;
+    }
+
+    /** Stored payload bytes the export would load, summed in the database so nothing is loaded to measure it. */
+    private static function payloadBytes(array $chain, int $accountId): int
+    {
+        $length = DB::raw('COALESCE(SUM(LENGTH(payload)), 0) as bytes');
+        $batch = DB::table($chain['tables']['batch'])->where('account_id', $accountId)->value($length);
+        $lines = self::lines($chain, $accountId)->value(DB::raw('COALESCE(SUM(LENGTH(l.payload)), 0) as bytes'));
+        $originals = self::originals($chain, $accountId)->value(DB::raw('COALESCE(SUM(LENGTH(o.payload)), 0) as bytes'));
+        $redeemed = DB::table($chain['tables']['authorization'].' as a')
+            ->join($chain['tables']['redemption'].' as r', 'r.authorization_id', '=', 'a.id')
+            ->where('a.account_id', $accountId)->value(DB::raw('COALESCE(SUM(LENGTH(a.payload)), 0) as bytes'));
+
+        return (int) $batch + (int) $lines + (int) $originals + (int) $redeemed;
     }
 
     private static function installed(string $table): void
@@ -129,6 +153,9 @@ final class PaidGrantExportSection
             self::require($authorizationCount === 0);
 
             return [];
+        }
+        if (self::payloadBytes($chain, $accountId) > self::MAX_PAYLOAD_BYTES) {
+            throw new DataRightsException(413, 'export_too_large');
         }
         // A paid batch is created only for a production principal, so one without the account's origin is a broken record.
         if ($origin === null) {
