@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Commerce\ContractIdentity\ContractIdentityStatements;
 use App\Domain\Commerce\ProductionCheckout\ApproveExemptionAuthority;
 use App\Domain\Commerce\ProductionCheckout\HostedCheckout;
 use App\Domain\Commerce\ProductionCheckout\ProductionCheckout;
@@ -159,6 +160,46 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $this->assertCount(1, $after['paid_authorizations']);
         unset($before['paid_authorizations'], $after['paid_authorizations']);
         $this->assertSame($before, $after);
+        $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    /**
+     * D-30 step 8: with V1 contract identity capture on, a v2 order is initiated (re-verified), reconciled, carried by the
+     * frozen V1 paid source and rendered by the paid grant. The paid source and the renderer take the declaration as an
+     * opaque object; the contract binder (step 7) is what will place its fields.
+     */
+    public function test_a_v2_contract_identity_order_pays_through_the_v1_paid_source_and_renders(): void
+    {
+        config(['production_checkout.contract_identity_v2' => true]);
+        $catalog = ProductionCheckoutFixtures::catalog();
+        $buyer = $this->enrollThroughLocalSmtp();
+        $access = new ProductionCustomerAccess;
+        $authority = app(ApproveExemptionAuthority::class)->approve($catalog['candidate']->id, ProductionCheckoutFixtures::exemptionPolicy($catalog), 'synthetic-owner-policy', $catalog['actor']);
+        $basis = (new TaxExemptions($access))->qualify($buyer['principal'], $buyer['user'], $authority['public_id'], $catalog['items'],
+            ['qualified_exemption_confirmed' => true, 'reference' => 'synthetic:buyer-bound-qualification', 'source_sha256' => hash('sha256', 'NONBINDING SYNTHETIC BUYER EXEMPTION'),
+                'effective_from' => CarbonImmutable::now('UTC')->subDay()->format('Y-m-d\TH:i:s\Z'),
+                'effective_until' => CarbonImmutable::now('UTC')->addDays(30)->format('Y-m-d\TH:i:s\Z')], 'synthetic-qualified-buyer', $catalog['actor']);
+        $checkout = new ProductionCheckout($access);
+        $review = $checkout->review($buyer['principal'], $buyer['user'], $catalog['candidate']->id, $catalog['items'], $basis['public_id'],
+            ['licenseeType' => 'individual', 'legalName' => 'Zoë Émile', 'legalNameConfirmed' => true,
+                'postalAddress' => ['country' => 'US', 'lines' => ['1 Example Street'], 'locality' => 'Springfield', 'region' => 'IA', 'postalCode' => '50000'],
+                'statementVersion' => ContractIdentityStatements::offered()['individual']['statementVersion']], 'synthetic-v2-review');
+        $order = $checkout->accept($buyer['principal'], $buyer['user'], $review['reviewId'], $review['reviewHash'], true, 'synthetic-v2-accept');
+        $gateway = new ProductionCheckoutGatewayFixture;
+        $hosted = new HostedCheckout($access, $gateway);
+        $hosted->initiate($buyer['principal'], $buyer['user'], $order['orderId']);
+        $gateway->paid = true;
+        $this->assertSame('verified', $hosted->reconcile($buyer['principal'], $buyer['user'], $order['orderId'])['paymentStatus']);
+        $batch = (new PaidGrants)->finalize($buyer['principal'], $buyer['user'], $order['orderId']);
+
+        $origin = PaidGrantRecords::decode((array) DB::table('paid_grant_origins')->sole());
+        $declarations = $origin['source']['buyer_declarations'];
+        $this->assertSame(['buyer-contract-identity-v2', 'individual', 'Zoë Émile'], [$declarations['schema'], $declarations['licensee_type'], $declarations['legal_name']]);
+        $complete = (new PaidGrantDocuments)->prepare($batch['id'], $buyer['principal'], $buyer['user']);
+        $this->assertTrue($complete['fulfilled']);
+        $this->assertSame('complete', $complete['lines'][0]['documentStatus']);
+        $this->assertCount(2, $complete['lines'][0]['files']);
+        $this->assertDatabaseCount('paid_originals', 1);
         $this->assertDatabaseCount('license_grants', 0);
     }
 

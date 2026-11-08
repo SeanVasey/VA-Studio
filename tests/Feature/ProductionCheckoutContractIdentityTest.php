@@ -6,10 +6,13 @@ use App\Domain\Commerce\ContractIdentity\ContractIdentityStatements;
 use App\Domain\Commerce\ProductionCheckout\ApproveExemptionAuthority;
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionCheckout\CheckoutSchema;
+use App\Domain\Commerce\ProductionCheckout\CommandTransaction;
 use App\Domain\Commerce\ProductionCheckout\ContractIdentityPolicy;
 use App\Domain\Commerce\ProductionCheckout\Evidence;
+use App\Domain\Commerce\ProductionCheckout\HostedCheckout;
 use App\Domain\Commerce\ProductionCheckout\OrderEvidence;
 use App\Domain\Commerce\ProductionCheckout\ProductionCheckout;
+use App\Domain\Commerce\ProductionCheckout\Records;
 use App\Domain\Commerce\ProductionCheckout\TaxExemptions;
 use App\Domain\Commerce\ProductionPreparation\PreparationSelection;
 use App\Domain\Customers\ProductionCustomerAccess;
@@ -22,13 +25,15 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ProductionCheckoutFixtures as F;
+use Tests\Support\ProductionCheckoutGatewayFixture;
 use Tests\Support\ProductionIdentityFixture;
 use Tests\TestCase;
 
 /**
  * D-30 step 6: the V1 review freezes the v2 contract identity behind its own literal-false, local/testing-only gate. The
  * review request echoes the confirmation statement the buyer was shown; assent refuses a review taken under the other gate
- * state; with the gate off every byte is the original.
+ * state; with the gate off every byte is the original. Step 8: `HostedCheckout::initiate` re-verifies a v2 declaration and,
+ * with the gate on, refuses a name-only order before any provider call; reconciliation is unchanged.
  */
 class ProductionCheckoutContractIdentityTest extends TestCase
 {
@@ -293,5 +298,143 @@ class ProductionCheckoutContractIdentityTest extends TestCase
 
         $this->refuses('changed', fn () => $this->accept($f, ['reviewId' => $public, 'reviewHash' => $forged['review_hash']]));
         $this->assertSame([2, 0], self::counts());
+    }
+
+    /** The synthetic hosted checkout for a prepared buyer: a recording fake gateway, never a network call. */
+    private function hosted(array $f): array
+    {
+        config(['production_checkout.reconciliation_enabled' => true]);
+        $gateway = new ProductionCheckoutGatewayFixture;
+
+        return [...$f, 'gateway' => $gateway, 'hosted' => new HostedCheckout(new ProductionCustomerAccess, $gateway)];
+    }
+
+    private function initiate(array $f, string $orderId): array
+    {
+        return $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $orderId);
+    }
+
+    private function reconcile(array $f, string $orderId): array
+    {
+        return $f['hosted']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $orderId);
+    }
+
+    private static function paymentCounts(): array
+    {
+        return [DB::table(CheckoutSchema::TABLES['intent'])->count(), DB::table(CheckoutSchema::TABLES['payment'])->count()];
+    }
+
+    public function test_with_the_gate_on_initiate_and_reconcile_pay_a_valid_v2_order(): void
+    {
+        config(['production_checkout.contract_identity_v2' => true]);
+        $f = $this->hosted($this->prepared());
+        $order = $this->accept($f, $this->review($f, self::identity(['licenseeType' => 'business', 'legalName' => 'Example Records LLC',
+            'representativeName' => 'Zoë Émile'])));
+
+        $open = $this->initiate($f, $order['orderId']);
+        $this->assertSame(['open', 'unverified'], [$open['checkoutStatus'], $open['paymentStatus']]);
+        $this->assertCount(1, $f['gateway']->creates);
+        // A retry while the session is bound re-verifies again and reuses the one provider session.
+        $this->assertSame($open, $this->initiate($f, $order['orderId']));
+        $this->assertCount(1, $f['gateway']->creates);
+
+        // Reconciliation (unchanged by step 8) records the verified payment of a v2 order with the gate on.
+        $f['gateway']->paid = true;
+        $paid = $this->reconcile($f, $order['orderId']);
+        $this->assertSame(['verified', 'pending_fulfillment'], [$paid['paymentStatus'], $paid['fulfillmentStatus']]);
+        $this->assertSame([1, 1], self::paymentCounts());
+        $this->assertSame('Example Records LLC', self::orderBody()['buyer_declarations']['legal_name']);
+    }
+
+    public function test_initiate_refuses_a_v2_order_whose_declaration_no_longer_verifies_before_any_provider_call(): void
+    {
+        config(['production_checkout.contract_identity_v2' => true]);
+        $f = $this->hosted($this->prepared());
+        $this->accept($f, $this->review($f, self::identity()));
+        $forged = self::forgedUnprintableOrder();
+        // The frozen evidence opens: it checks only that the order, review and request declarations are equal.
+        $this->assertSame($forged, CommandTransaction::run(fn (Records $rows): string => OrderEvidence::order($rows, $rows->one('order', $forged))['row']['public_id']));
+
+        $this->refuses('changed', fn () => $this->initiate($f, $forged));
+        $this->assertSame([], $f['gateway']->creates);
+        $this->assertSame([0, 0], self::paymentCounts());
+        // The same refusal with the gate off: a v2 declaration is re-verified whatever the gate.
+        config(['production_checkout.contract_identity_v2' => false]);
+        $this->refuses('changed', fn () => $this->initiate($f, $forged));
+        $this->assertSame([], $f['gateway']->creates);
+        $this->assertSame([0, 0], self::paymentCounts());
+    }
+
+    public function test_with_the_gate_on_initiate_refuses_a_name_only_order_and_with_it_off_pays_it(): void
+    {
+        $f = $this->hosted($this->prepared());
+        $order = $this->accept($f, $this->review($f, ['legalName' => 'Declared synthetic buyer']));
+        config(['production_checkout.contract_identity_v2' => true]);
+        $this->refuses('changed', fn () => $this->initiate($f, $order['orderId']));
+        $this->assertSame([], $f['gateway']->creates);
+        $this->assertSame([0, 0], self::paymentCounts());
+
+        config(['production_checkout.contract_identity_v2' => false]);
+        $this->assertSame('open', $this->initiate($f, $order['orderId'])['checkoutStatus']);
+        $this->assertCount(1, $f['gateway']->creates);
+        // A session opened before the gate flip: initiate refuses again, but reconciliation still records the payment.
+        config(['production_checkout.contract_identity_v2' => true]);
+        $this->refuses('changed', fn () => $this->initiate($f, $order['orderId']));
+        $f['gateway']->paid = true;
+        $this->assertSame('verified', $this->reconcile($f, $order['orderId'])['paymentStatus']);
+        $this->assertCount(1, $f['gateway']->creates);
+        $this->assertSame([1, 1], self::paymentCounts());
+    }
+
+    /**
+     * A sealed review, order, lines and attempt that OrderEvidence accepts (each declaration equals its request's and the
+     * order's equals the review's), copied from the one retained order, but whose v2 name the pinned faces cannot print.
+     */
+    private static function forgedUnprintableOrder(): string
+    {
+        $tables = CheckoutSchema::TABLES;
+        $review = (array) DB::table($tables['review'])->sole();
+        $reviewBody = Evidence::open($review, 'production_checkout_review');
+        $declarations = [...$reviewBody['buyer_declarations'], 'legal_name' => '王小明'];
+        $reviewDigest = Evidence::key('synthetic-forged-review');
+        $reviewRequest = [...$reviewBody['request'], 'buyer_declarations' => $declarations, 'key_digest' => $reviewDigest];
+        $forgedReview = [...$reviewBody, 'public_id' => (string) Str::uuid(), 'request' => $reviewRequest,
+            'request_hash' => CanonicalJson::hash($reviewRequest), 'buyer_declarations' => $declarations];
+        $forgedReview['review_hash'] = OrderEvidence::reviewHash($forgedReview);
+        $reviewSeal = Evidence::seal($forgedReview);
+        unset($review['id']);
+        $reviewId = DB::table($tables['review'])->insertGetId([...$review, 'public_id' => $forgedReview['public_id'], ...$reviewSeal,
+            'request_key' => $reviewDigest, 'request_hash' => $forgedReview['request_hash']]);
+
+        $order = (array) DB::table($tables['order'])->sole();
+        $orderBody = Evidence::open($order, 'production_checkout_order');
+        $orderDigest = Evidence::key('synthetic-forged-accept');
+        $lines = array_map(fn (array $line): array => [...$line, 'public_id' => (string) Str::uuid()], $orderBody['lines']);
+        $orderRequest = [...$orderBody['request'], 'review_id' => $forgedReview['public_id'], 'review_hash' => $forgedReview['review_hash'], 'key_digest' => $orderDigest];
+        $forgedOrder = [...$orderBody, 'public_id' => (string) Str::uuid(), 'review_id' => $forgedReview['public_id'], 'review_hash' => $forgedReview['review_hash'],
+            'review_payload_hash' => $reviewSeal['payload_hash'], 'request' => $orderRequest, 'request_hash' => CanonicalJson::hash($orderRequest),
+            'buyer_declarations' => $declarations, 'assent' => [...$orderBody['assent'], 'review_hash' => $forgedReview['review_hash']],
+            'lines' => $lines, 'attempt_id' => (string) Str::uuid()];
+        $orderSeal = Evidence::seal($forgedOrder);
+        $orderRowId = $order['id'];
+        unset($order['id']);
+        $orderId = DB::table($tables['order'])->insertGetId([...$order, 'public_id' => $forgedOrder['public_id'], ...$orderSeal, 'review_id' => $reviewId,
+            'request_key' => $orderDigest, 'request_hash' => $forgedOrder['request_hash']]);
+
+        foreach (DB::table($tables['line'])->where('order_id', $orderRowId)->orderBy('position')->get() as $i => $row) {
+            $row = (array) $row;
+            $body = [...Evidence::open($row, 'production_checkout_order_line'), 'public_id' => $lines[$i]['public_id'],
+                'order_public_id' => $forgedOrder['public_id'], 'order_payload_hash' => $orderSeal['payload_hash'], 'line' => $lines[$i]];
+            unset($row['id']);
+            DB::table($tables['line'])->insert([...$row, 'public_id' => $lines[$i]['public_id'], ...Evidence::seal($body), 'order_id' => $orderId,
+                'line_hash' => CanonicalJson::hash($lines[$i])]);
+        }
+        $attempt = (array) DB::table($tables['attempt'])->where('order_id', $orderRowId)->sole();
+        $attemptBody = [...Evidence::open($attempt, 'production_checkout_attempt'), 'public_id' => $forgedOrder['attempt_id'],
+            'order_public_id' => $forgedOrder['public_id'], 'order_payload_hash' => $orderSeal['payload_hash']];
+        unset($attempt['id']);
+        DB::table($tables['attempt'])->insert([...$attempt, 'public_id' => $forgedOrder['attempt_id'], ...Evidence::seal($attemptBody), 'order_id' => $orderId]);
+
+        return $forgedOrder['public_id'];
     }
 }

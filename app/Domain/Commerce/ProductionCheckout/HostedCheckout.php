@@ -172,6 +172,10 @@ final class HostedCheckout
             $order = OrderEvidence::order($rows, $rows->one('order', $orderId));
             $binding = $this->access->durableBinding($principal);
             ProductionCheckout::requireOwner($binding, $order['body']['buyer']);
+            if ($create) {
+                // D-30 step 8: re-verify a v2 declaration, and refuse a name-only one while capture is on, before any intent or provider call.
+                ProductionCheckout::requirePayableIdentity($order['body']['buyer_declarations'], ContractIdentityPolicy::contractIdentityV2());
+            }
             $intents = $rows->selector('intent', 'order_id = ?', [$order['row']['id']]);
             CheckoutException::require(count($intents) <= 1);
             $current = null;
