@@ -208,9 +208,11 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
    (step 8):
    - [x] gate-on tests must cover `HostedCheckout::initiate` and `reconcile`, the V1 paid source and the paid grant render with a
      v2 declaration (step 8, part: `ProductionCheckoutContractIdentityTest`, `PaidGrantDocumentJourneyTest`);
-   - [ ] `HostedCheckout` and the V1 paid source open orders through the frozen `OrderEvidence` without re-verifying v2
-     declarations. `initiate` now re-verifies them (step 8); `reconcile` and the V1 paid source still do not. **Decided
-     2026-11-08:** reconcile keeps recording the payment; paid-grant finalization re-verifies and holds fulfillment;
+   - [x] `HostedCheckout` and the V1 paid source open orders through the frozen `OrderEvidence` without re-verifying v2
+     declarations. `initiate` re-verifies them (step 8); `reconcile` and the frozen V1 paid source still do not, by decision
+     (2026-11-08): reconcile keeps recording the payment, and `PaidGrants::finalize` re-verifies each line's declaration
+     (`ProductionCheckout::contractIdentityHeld`, through `ContractPrintableSet::verifyRetained()`) and refuses with `409 contract_identity_held` before any row is written, so
+     fulfillment is held (`PaidGrantDocumentJourneyTest::test_a_paid_v2_order_whose_declaration_no_longer_verifies_is_held_at_finalization`);
    - [x] the V1 HTTP review endpoint passes the `buyer` object through unchanged, and `GET production/checkout/contract-identity`
      (`production.checkout.contract-identity`, `ProductionCheckoutController::contractIdentity`) now serves
      `contractIdentityOffer()` through the same `run()` boundary as the other checkout routes: signed-in production customer,
@@ -223,14 +225,24 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
      intent row and any provider call, through `ProductionCheckout::requirePayableIdentity`, which uses `verifyRetained`;
      a failure refuses with `changed`). The V2 tax checkout's `initiate` already re-verified it through
      `TaxCheckoutEvidence::order`.
-   - [ ] For both checkouts, decide whether a re-verification failure at reconcile refuses, or records the paid order and
-     escalates it (money captured but unreconciled). Reconcile is unchanged; a test pins that it records a valid v2 order.
-     **Decided 2026-11-08:** record the payment, and refuse paid-grant finalization so fulfillment is held for staff.
-     Implementation pending. Also decided: `initiate` refuses a v2 order while the gate is off; an already paid name-only
-     order answers its status; open name-only sessions are expired before the gate opens (runbook).
+   - [x] For both checkouts, decide whether a re-verification failure at reconcile refuses, or records the paid order and
+     escalates it (money captured but unreconciled). **Decided 2026-11-08:** record the payment, and refuse paid-grant
+     finalization so fulfillment is held. Done: both `PaidGrants::finalize` and `PaidTaxGrants::finalize` refuse such an
+     order (V1 reconcile records it).
+   - [ ] **Activation blocker:** the tax checkout's `TaxCheckoutEvidence::order` re-verifies on every open, so its reconcile
+     refuses (`changed`) instead of recording the payment, and the `PaidTaxGrants` hold is unreachable. Align it (for
+     example a `reverify` flag that the reconcile, record, write-admission and status paths pass as false) with its own
+     independent review before either gate opens.
+   - [ ] **Activation blocker:** a held order has no durable marker, audit row or staff-visible signal yet; the reason
+     (`contract_identity_held`) exists only on the exception. Add a staff surface before activation.
+   - [x] `initiate` refuses a v2 order while the gate is off, in both checkouts (decided 2026-11-08), before any row or
+     provider call.
+   - [x] An already paid name-only order with the gate on answers its status from `initiate` with no provider call
+     (decided 2026-11-08); it still refuses (`changed`) whenever it would open or resume a session.
+   - [ ] Open name-only sessions are expired before the gate opens (decided 2026-11-08; activation runbook, needs Sean's
+     live-activation authorization).
    - [x] Name-only orders left unpaid: while the checkout's gate is on, `initiate` refuses an order frozen with the name-only
      declaration (`changed`), in both checkouts; with the gate off nothing changes. Still open: `reconcile` records a
      name-only order's payment with the gate on (a session opened before the flip can still be paid on the provider's
-     page), so the activation runbook must still decide whether to expire those open sessions or drain them first. With the
-     gate on, `initiate` on an already paid or bound name-only order now answers `changed` instead of its status; `status`
-     is unaffected, and the runbook should say so for buyer support.
+     page); decided 2026-11-08 that the activation runbook expires those open sessions. With the gate on, `initiate` on a
+     bound unpaid name-only order answers `changed`, and on an already paid one answers its status.

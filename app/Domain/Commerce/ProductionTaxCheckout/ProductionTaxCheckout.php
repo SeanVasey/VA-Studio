@@ -242,12 +242,15 @@ final class ProductionTaxCheckout
             $access = $this->access->lock($principal, $buyer, $tax->current);
             $order = TaxCheckoutEvidence::order($tax, $tax->one('order', $orderId));
             ProductionCheckout::requireOwner($this->access->durableBinding($principal), $order['body']['buyer']);
-            if ($create) {
-                // D-30 step 8: TaxCheckoutEvidence::order() has re-verified a v2 declaration; a name-only one refuses while capture is on.
-                ProductionCheckout::requirePayableIdentity($order['body']['buyer_declarations'], TaxCheckoutPolicy::contractIdentityV2());
-            }
             $requests = $tax->selector('request', 'order_id = ?', [$order['row']['id']]);
             CheckoutException::require(count($requests) <= 1);
+            if ($create) {
+                // D-30 step 8: TaxCheckoutEvidence::order() has re-verified a v2 declaration; a declaration that does not match the
+                // gate refuses before any request row or provider call. A name-only order already paid while the gate is on passes
+                // here, and initiate() answers it with its status (the existing `reviewed` early return), never a provider call.
+                $paid = $requests !== [] && TaxCheckoutEvidence::intent($tax, $order, $requests[0])['reviewed'] !== null;
+                ProductionCheckout::requirePayableIdentity($order['body']['buyer_declarations'], TaxCheckoutPolicy::contractIdentityV2(), $paid);
+            }
             $newRequest = $requests === [];
             CheckoutException::require($create || $requests !== [], 'request_required');
             $candidate = null;

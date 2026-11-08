@@ -33,6 +33,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\PaidGrantDependencyFixtures;
+use Tests\Support\ProductionCheckoutContractIdentityForgery;
 use Tests\Support\ProductionCheckoutFixtures;
 use Tests\Support\ProductionCheckoutGatewayFixture;
 use Tests\Support\ProductionCheckoutJourneyFixture;
@@ -44,6 +45,7 @@ final class PaidGrantDocumentJourneyTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
     use PaidGrantDependencyFixtures;
+    use ProductionCheckoutContractIdentityForgery;
     use ProductionCheckoutJourneyFixture;
 
     protected function beforeRefreshingDatabase(): void
@@ -201,6 +203,54 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $this->assertCount(2, $complete['lines'][0]['files']);
         $this->assertDatabaseCount('paid_originals', 1);
         $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    /**
+     * D-30 (decided 2026-11-08): reconciliation records the payment of an order whose sealed v2 declaration no longer
+     * verifies (the frozen evidence checks it only for equality), but paid-grant finalization holds it: a distinct refusal,
+     * and no origin, work or audit row. A valid v2 order still finalizes
+     * (test_a_v2_contract_identity_order_pays_through_the_v1_paid_source_and_renders); the synthetic gateway binds one
+     * provider session id, so one test pays one order.
+     */
+    public function test_a_paid_v2_order_whose_declaration_no_longer_verifies_is_held_at_finalization(): void
+    {
+        config(['production_checkout.contract_identity_v2' => true]);
+        $catalog = ProductionCheckoutFixtures::catalog();
+        $buyer = $this->enrollThroughLocalSmtp();
+        $access = new ProductionCustomerAccess;
+        $authority = app(ApproveExemptionAuthority::class)->approve($catalog['candidate']->id, ProductionCheckoutFixtures::exemptionPolicy($catalog), 'synthetic-owner-policy', $catalog['actor']);
+        $basis = (new TaxExemptions($access))->qualify($buyer['principal'], $buyer['user'], $authority['public_id'], $catalog['items'],
+            ['qualified_exemption_confirmed' => true, 'reference' => 'synthetic:buyer-bound-qualification', 'source_sha256' => hash('sha256', 'NONBINDING SYNTHETIC BUYER EXEMPTION'),
+                'effective_from' => CarbonImmutable::now('UTC')->subDay()->format('Y-m-d\TH:i:s\Z'),
+                'effective_until' => CarbonImmutable::now('UTC')->addDays(30)->format('Y-m-d\TH:i:s\Z')], 'synthetic-qualified-buyer', $catalog['actor']);
+        $checkout = new ProductionCheckout($access);
+        $review = $checkout->review($buyer['principal'], $buyer['user'], $catalog['candidate']->id, $catalog['items'], $basis['public_id'],
+            ['licenseeType' => 'individual', 'legalName' => 'Zoë Émile', 'legalNameConfirmed' => true,
+                'postalAddress' => ['country' => 'US', 'lines' => ['1 Example Street'], 'locality' => 'Springfield', 'region' => 'IA', 'postalCode' => '50000'],
+                'statementVersion' => ContractIdentityStatements::offered()['individual']['statementVersion']], 'synthetic-v2-review');
+        $checkout->accept($buyer['principal'], $buyer['user'], $review['reviewId'], $review['reviewHash'], true, 'synthetic-v2-accept');
+        $forged = self::forgedUnprintableOrder();
+        $gateway = new ProductionCheckoutGatewayFixture;
+        $gateway->params = self::forgedIntent($forged);
+        $gateway->paid = true;
+        $hosted = new HostedCheckout($access, $gateway);
+        $this->assertSame('verified', $hosted->reconcile($buyer['principal'], $buyer['user'], $forged, 'cs_test_SYNTHETIC')['paymentStatus']);
+        $this->assertSame([], $gateway->creates);
+
+        $before = $this->ownedRows();
+        $audits = DB::table('audit_events')->count();
+        try {
+            (new PaidGrants)->finalize($buyer['principal'], $buyer['user'], $forged);
+            $this->fail('A paid order whose v2 declaration no longer verifies must be held.');
+        } catch (PaidGrantException $error) {
+            $this->assertSame([409, 'contract_identity_held', 'Paid grant request unavailable.'], [$error->status, $error->reason, $error->getMessage()]);
+        }
+        $this->assertSame($before, $this->ownedRows());
+        $this->assertSame([], array_filter($before));
+        $this->assertSame($audits, DB::table('audit_events')->count());
+        // The payment stays recorded: the order is paid, with fulfillment held for staff.
+        $this->assertSame('verified', $hosted->status($buyer['principal'], $buyer['user'], $forged)['paymentStatus']);
+
     }
 
     public function test_failed_second_line_retains_first_original_without_any_activation_until_exact_fresh_retry(): void

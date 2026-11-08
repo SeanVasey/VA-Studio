@@ -3,6 +3,7 @@
 namespace App\Domain\Grants\PaidTax;
 
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
+use App\Domain\Commerce\ProductionCheckout\ProductionCheckout;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidLineAdapterV2;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderCommittedReadReceiptV2;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderLocatorV2;
@@ -71,6 +72,11 @@ final class PaidTaxGrants
                     $lines[] = $line;
                 }
                 PaidTaxException::require(count($lines) >= 1 && count($lines) <= 10, 409);
+                // D-30 (decided 2026-11-08): a paid order whose frozen v2 declaration no longer verifies stays paid, but no grant
+                // origin is created; fulfillment is held for staff. Every line carries the order's one declaration.
+                foreach ($lines as $line) {
+                    PaidTaxException::require(! ProductionCheckout::contractIdentityHeld($line['buyer_declarations']), 409, 'contract_identity_held');
+                }
                 $batch = $rows->one('paid_tax_order_origins', 'producer = ? AND order_public_id = ?', ['production_tax_checkout_v2', $orderId]);
                 if ($batch === []) {
                     $at = now()->utc()->startOfSecond();

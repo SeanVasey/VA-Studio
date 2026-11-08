@@ -25,8 +25,9 @@ use Tests\TestCase;
 /**
  * D-30 step 5: the tax checkout freezes the v2 contract identity behind a literal-false, local/testing-only gate. Step 6
  * binds the confirmation statement the buyer was shown (the echoed `statementVersion`) and the gate state (the preview
- * commitment) to the order. Step 8: `initiate` refuses a name-only order with the gate on, and a v2 declaration that no longer
- * verifies, before any transport call; reconciliation is unchanged.
+ * commitment) to the order. Step 8: `initiate` refuses a declaration that does not match the gate (decided 2026-11-08: in both
+ * directions), and a v2 declaration that no longer verifies, before any transport call, except that a name-only order already
+ * paid with the gate on answers its status; reconciliation is unchanged.
  */
 class ProductionTaxCheckoutContractIdentityTest extends TestCase
 {
@@ -403,6 +404,36 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
         $f['transport']->paid = true;
         $this->assertSame('verified', $this->reconcile($f, $order['orderId'])['paymentStatus']);
         // The refused initiate made no call; reconciliation only read the session it had opened.
+        $this->assertSame(['create', 'retrieve', 'retrieve', 'paymentIntent'], array_column($f['transport']->calls, 0));
+        $this->assertSame([1, 1], self::paymentCounts());
+
+        // Decided 2026-11-08: once paid, initiate answers the order's status with no transport call at all.
+        $status = $this->initiate($f, $order['orderId']);
+        $this->assertSame(['verified', 'pending_fulfillment'], [$status['paymentStatus'], $status['fulfillmentStatus']]);
+        $this->assertSame($f['checkout']->status($f['buyer']['principal'], $f['buyer']['user'], $order['orderId']), $status);
+        $this->assertSame(['create', 'retrieve', 'retrieve', 'paymentIntent'], array_column($f['transport']->calls, 0));
+        $this->assertSame([1, 1], self::paymentCounts());
+    }
+
+    public function test_with_the_gate_off_initiate_refuses_a_v2_order_before_any_request_or_transport_call(): void
+    {
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $f = $this->payable();
+        $order = $this->order($f, self::identity());
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+
+        config(['production-tax-checkout.contract_identity_v2' => false]);
+        $this->refuses('changed', fn () => $this->initiate($f, $order['orderId']));
+        $this->assertSame([], $f['transport']->calls);
+        $this->assertSame([0, 0], self::paymentCounts());
+
+        // The same order pays under the gate it was taken in; once paid, a gate-off initiate still refuses without a call.
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $this->assertSame('open', $this->initiate($f, $order['orderId'])['checkoutStatus']);
+        $f['transport']->paid = true;
+        $this->assertSame('verified', $this->reconcile($f, $order['orderId'])['paymentStatus']);
+        config(['production-tax-checkout.contract_identity_v2' => false]);
+        $this->refuses('changed', fn () => $this->initiate($f, $order['orderId']));
         $this->assertSame(['create', 'retrieve', 'retrieve', 'paymentIntent'], array_column($f['transport']->calls, 0));
         $this->assertSame([1, 1], self::paymentCounts());
     }

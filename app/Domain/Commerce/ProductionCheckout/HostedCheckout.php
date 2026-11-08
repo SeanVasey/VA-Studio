@@ -18,6 +18,10 @@ final class HostedCheckout
     public function initiate(ProductionCustomerPrincipal $principal, User $buyer, string $orderId): array
     {
         $prepared = $this->prepare($principal, $buyer, $orderId, true);
+        if ($prepared['statusOnly']) {
+            // D-30 step 8: a name-only order paid before the contract identity gate opened; no provider call.
+            return $this->status($principal, $buyer, $orderId);
+        }
         $this->access->current($principal, $buyer);
         CheckoutException::require(config('production_checkout.fresh_checkout_enabled') === true, 'disabled', 503);
         $context = $prepared['order']['context'];
@@ -172,12 +176,15 @@ final class HostedCheckout
             $order = OrderEvidence::order($rows, $rows->one('order', $orderId));
             $binding = $this->access->durableBinding($principal);
             ProductionCheckout::requireOwner($binding, $order['body']['buyer']);
-            if ($create) {
-                // D-30 step 8: re-verify a v2 declaration, and refuse a name-only one while capture is on, before any intent or provider call.
-                ProductionCheckout::requirePayableIdentity($order['body']['buyer_declarations'], ContractIdentityPolicy::contractIdentityV2());
-            }
             $intents = $rows->selector('intent', 'order_id = ?', [$order['row']['id']]);
             CheckoutException::require(count($intents) <= 1);
+            $statusOnly = false;
+            if ($create) {
+                // D-30 step 8: re-verify a v2 declaration and refuse a declaration that does not match the gate, before any intent
+                // or provider call; a name-only order already paid while the gate is on is answered by its status instead.
+                $paid = $intents !== [] && HostedEvidence::intent($rows, $order, $intents[0])['payment'] !== null;
+                $statusOnly = ProductionCheckout::requirePayableIdentity($order['body']['buyer_declarations'], ContractIdentityPolicy::contractIdentityV2(), $paid);
+            }
             $current = null;
             $selection = null;
             $basis = null;
@@ -233,7 +240,7 @@ final class HostedCheckout
                 CheckoutIntentAdmission::capture($rows, $access, $buyer, $fresh, $order, $intent, $current, $selection, $basis);
             }
 
-            return compact('order', 'intent', 'current', 'selection', 'basis');
+            return compact('order', 'intent', 'current', 'selection', 'basis', 'statusOnly');
         });
     }
 
