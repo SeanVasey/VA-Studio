@@ -2,9 +2,9 @@
 
 namespace App\Domain\Commerce\ProductionTaxCheckout;
 
-use App\Domain\Commerce\ContractIdentity\ContractGlyphCoverage;
 use App\Domain\Commerce\ContractIdentity\ContractIdentityDeclarationV2;
 use App\Domain\Commerce\ContractIdentity\ContractIdentityStatements;
+use App\Domain\Commerce\ContractIdentity\ContractPrintableSet;
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionCheckout\CommandTransaction;
 use App\Domain\Commerce\ProductionCheckout\CurrentSelection;
@@ -67,7 +67,7 @@ final class ProductionTaxCheckout
             // D-30: the licensee identity a production contract binds, confirmed against the statement version the preview
             // displayed. This checkout sells non-exclusive licenses only.
             ? ContractIdentityDeclarationV2::fromDisplayedInput($buyerDeclarations, false, ContractIdentityStatements::current(),
-                ContractGlyphCoverage::pinnedContractFaces())
+                ContractPrintableSet::checkout())
             : self::legacyDeclarations($buyerDeclarations);
         $items = PreparationSelection::items($items);
         $digest = Evidence::key($key);

@@ -12,6 +12,8 @@ React, Inertia, Vite and other JavaScript dependencies retain their upstream lic
 
 The storefront self-hosts the chosen Fontsource fonts. They retain their individual Open Font License notices. See `docs/brand/` for the font provenance and included notices; preserve those notices when redistributing the font binaries or generated site assets.
 
+The production license PDF profiles embed Bebas Neue, Reddit Sans and JetBrains Mono, each under the SIL Open Font License 1.1 (no Reserved Font Name declared), from the Fontsource 5.3.0 npm packages `@fontsource/bebas-neue`, `@fontsource-variable/reddit-sans` and `@fontsource-variable/jetbrains-mono`. `vasey-license-pdf-v1` uses their `latin` subsets (`resources/contracts/vasey-license-v1/`). `vasey-license-pdf-v2` also uses their `latin-ext` subsets from the same tarballs, merged into one face per style with fontTools (`resources/contracts/vasey-license-v2/`); the instanced, merged and converted faces are Modified Versions under the OFL, which declares no Reserved Font Name for these families. Each profile directory carries the three license texts, and `PROVENANCE.md` and `profile-assets.json` record the tarball SHA-256 values and file hashes.
+
 ## Existing brand imagery
 
 The six existing published brand image files are user-owned assets acquired from the current VASEY.AUDIO theme. `docs/brand/asset-manifest.json` records their source, byte dimensions and SHA-256. The geometric product identity has not been recreated. Do not infer a third-party trademark or equipment endorsement from atmospheric studio imagery.
