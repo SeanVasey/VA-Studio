@@ -96,6 +96,73 @@ final class CatalogSocketBindingTest extends TestCase
         $this->proof($this->writer(), $this->context(), ['23456'], self::HEADER.$other);
     }
 
+    public function test_a_torn_snapshot_is_retried_with_fresh_snapshots_and_never_more_than_three_times(): void
+    {
+        $retrying = new ReflectionMethod(CatalogSocketBinding::class, 'retrying');
+        $snapshots = 0;
+        $snapshot = function () use (&$snapshots): array {
+            $snapshots++;
+
+            return [['12345'], 'tcp '.$snapshots, ''];
+        };
+
+        // Every attempt refuses: exactly three fresh snapshots, then the last refusal propagates.
+        $seen = [];
+        try {
+            $retrying->invoke(null, $snapshot, function (array $inodes, string $tcp) use (&$seen): array {
+                $seen[] = $tcp;
+                throw new LogicException('refusal '.$tcp);
+            });
+            self::fail('a proof that always refuses must not be accepted');
+        } catch (LogicException $error) {
+            self::assertSame('refusal tcp 3', $error->getMessage());
+        }
+        self::assertSame(['tcp 1', 'tcp 2', 'tcp 3'], $seen);
+        self::assertSame(3, $snapshots);
+
+        // A torn first snapshot recovers on the second, and the proof of that fresh snapshot is what is returned.
+        $snapshots = 0;
+        $result = $retrying->invoke(null, $snapshot, function (array $inodes, string $tcp): array {
+            if ($tcp === 'tcp 1') {
+                throw new LogicException('torn');
+            }
+
+            return ['tcp' => $tcp];
+        });
+        self::assertSame(['tcp' => 'tcp 2'], $result);
+        self::assertSame(2, $snapshots);
+
+        // A snapshot failure (taint, provider) is never retried and never reaches the proof.
+        $calls = 0;
+        $proofs = 0;
+        try {
+            $retrying->invoke(null, function () use (&$calls): array {
+                $calls++;
+                throw new LogicException('snapshot refused');
+            }, function () use (&$proofs): array {
+                $proofs++;
+
+                return [];
+            });
+            self::fail('a snapshot failure must propagate');
+        } catch (LogicException $error) {
+            self::assertSame('snapshot refused', $error->getMessage());
+        }
+        self::assertSame(1, $calls);
+        self::assertSame(0, $proofs);
+
+        // Only the proof's refusal type is retried: an Error from the proof propagates on the first attempt.
+        $snapshots = 0;
+        try {
+            $retrying->invoke(null, $snapshot, function (): array {
+                throw new \TypeError('not a refusal');
+            });
+            self::fail('an Error must propagate');
+        } catch (\TypeError) {
+        }
+        self::assertSame(1, $snapshots);
+    }
+
     public function test_unowned_ambiguous_missing_nonestablished_and_malformed_snapshots_refuse(): void
     {
         $cases = [
