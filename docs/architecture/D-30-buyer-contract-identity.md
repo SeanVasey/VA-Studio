@@ -184,7 +184,8 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
 4. A pure `ContractIdentityDeclarationV2` validator and formatter.
 5. V2 tax checkout wiring behind the gate. Needs independent review and a native MySQL journey. Before activation (step 8):
    - the statement texts and the printable set must be rebound to the `vasey-license-pdf-v1` profile's own faces, and the
-     accepted set must stay a subset of that renderer's own input rule, with a test;
+     accepted set must stay a subset of that renderer's own input rule, with a test. **Decided 2026-11-08:** rebind to a
+     successor profile whose faces add Latin Extended (decision register, 2026-11-08);
    - [x] the statement the buyer saw must be bound to the one frozen (done in step 6: the client echoes the displayed
      statement version, checked with `hash_equals`);
    - [x] gate-on tests must cover `initiate`, `reconcile` and the paid-tax grant render with a v2 declaration. (Step 6 added
@@ -197,8 +198,8 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
    - [x] gate-on tests must cover `HostedCheckout::initiate` and `reconcile`, the V1 paid source and the paid grant render with a
      v2 declaration (step 8, part: `ProductionCheckoutContractIdentityTest`, `PaidGrantDocumentJourneyTest`);
    - [ ] `HostedCheckout` and the V1 paid source open orders through the frozen `OrderEvidence` without re-verifying v2
-     declarations. `initiate` now re-verifies them (step 8); `reconcile` and the V1 paid source still do not. Decide whether
-     they must, or whether the binder's own check (step 7) is enough;
+     declarations. `initiate` now re-verifies them (step 8); `reconcile` and the V1 paid source still do not. **Decided
+     2026-11-08:** reconcile keeps recording the payment; paid-grant finalization re-verifies and holds fulfillment;
    - [x] the V1 HTTP review endpoint passes the `buyer` object through unchanged, and `GET production/checkout/contract-identity`
      (`production.checkout.contract-identity`, `ProductionCheckoutController::contractIdentity`) now serves
      `contractIdentityOffer()` through the same `run()` boundary as the other checkout routes: signed-in production customer,
@@ -213,6 +214,9 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
      `TaxCheckoutEvidence::order`.
    - [ ] For both checkouts, decide whether a re-verification failure at reconcile refuses, or records the paid order and
      escalates it (money captured but unreconciled). Reconcile is unchanged; a test pins that it records a valid v2 order.
+     **Decided 2026-11-08:** record the payment, and refuse paid-grant finalization so fulfillment is held for staff.
+     Implementation pending. Also decided: `initiate` refuses a v2 order while the gate is off; an already paid name-only
+     order answers its status; open name-only sessions are expired before the gate opens (runbook).
    - [x] Name-only orders left unpaid: while the checkout's gate is on, `initiate` refuses an order frozen with the name-only
      declaration (`changed`), in both checkouts; with the gate off nothing changes. Still open: `reconcile` records a
      name-only order's payment with the gate on (a session opened before the flip can still be paid on the provider's
