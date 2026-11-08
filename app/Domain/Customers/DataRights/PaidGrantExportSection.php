@@ -55,11 +55,14 @@ final class PaidGrantExportSection
     public const MAX_DOWNLOADS = self::MAX_LINES * 10;
 
     /**
-     * Stored payload bytes this chain may load (batches, lines, originals and redeemed authorizations). The finished export
-     * is at most `export_max_bytes` (1 MiB by default), so a valid export needs far less; the budget makes an account near
-     * the row caps refuse with 413 before loading, instead of exhausting PHP memory (256M in the FPM pools) mid-build.
+     * Stored payload bytes this chain may load (batches, lines, originals and redeemed authorizations), summed in the
+     * database before anything is loaded. A chain's raw rows are held while each payload is decoded in turn, so peak memory
+     * tracks this sum: 64 MiB measured at about 84 MiB peak, well inside the 256M FPM pools. Stored payloads are much
+     * larger than what is exported (about 23 KiB per line against well under 1 KiB exported), so this budget is reached at
+     * roughly as many lines as a full 1 MiB export holds; a larger account refuses with 413 rather than running out of
+     * memory. Checked once, like the counts before it; rows committed after the sum can add to the load.
      */
-    public const MAX_PAYLOAD_BYTES = 16 * 1024 * 1024;
+    public const MAX_PAYLOAD_BYTES = 64 * 1024 * 1024;
 
     /** @return array{paidGrantOrders: list<array>, paidTaxGrantOrders: list<array>} */
     public function build(int $accountId): array
@@ -145,14 +148,14 @@ final class PaidGrantExportSection
             || self::redemptions($chain, $accountId)->count() > self::MAX_DOWNLOADS) {
             throw new DataRightsException(413, 'export_too_large');
         }
-        if (self::payloadBytes($chain, $accountId) > self::MAX_PAYLOAD_BYTES) {
-            throw new DataRightsException(413, 'export_too_large');
-        }
         if ($batchCount === 0) {
             // A download authorization exists only for a paid order of the same account.
             self::require($authorizationCount === 0);
 
             return [];
+        }
+        if (self::payloadBytes($chain, $accountId) > self::MAX_PAYLOAD_BYTES) {
+            throw new DataRightsException(413, 'export_too_large');
         }
         // A paid batch is created only for a production principal, so one without the account's origin is a broken record.
         if ($origin === null) {

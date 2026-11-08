@@ -438,13 +438,23 @@ class PaidGrantDataExportTest extends TestCase
     public function test_stored_payloads_past_the_byte_budget_refuse_before_any_payload_is_loaded(): void
     {
         $f = $this->paidV1();
+        $this->download($f, 'master_wav', true);
         $account = self::account($f['buyer']);
         $this->assertCount(1, app(PaidGrantExportSection::class)->build($account)['paidGrantOrders']);
-        $this->dropTriggers(['paid_grant_origins']);
+        $this->dropTriggers(['paid_grant_origins', 'paid_originals', 'paid_authorizations']);
         $line = (array) DB::table('paid_grant_origins')->sole();
-        // Unreadable bytes: a 413 here (not the 503 an opened payload gives) proves the budget is checked before loading.
-        DB::table('paid_grant_origins')->where('id', $line['id'])->update(['payload' => str_repeat('x', PaidGrantExportSection::MAX_PAYLOAD_BYTES + 1)]);
-        $this->refusesExport($account, 413, 'export_too_large');
+        $original = (array) DB::table('paid_originals')->sole();
+        $authorization = (array) DB::table('paid_authorizations')->sole();
+        // Each row stays under MySQL's default 64 MiB packet; only their sum passes the budget. Unreadable bytes: a 413
+        // here (not the 503 an opened payload gives) proves the budget is checked before anything is loaded.
+        $half = intdiv(PaidGrantExportSection::MAX_PAYLOAD_BYTES, 2) + 1;
+        DB::table('paid_grant_origins')->where('id', $line['id'])->update(['payload' => str_repeat('x', $half)]);
+        foreach ([['paid_originals', $original], ['paid_authorizations', $authorization]] as [$table, $row]) {
+            // The lines alone stay under the budget; each other sum (originals, redeemed downloads) must count to refuse.
+            DB::table($table)->where('id', $row['id'])->update(['payload' => str_repeat('y', $half)]);
+            $this->refusesExport($account, 413, 'export_too_large');
+            DB::table($table)->where('id', $row['id'])->update(['payload' => $row['payload']]);
+        }
         DB::table('paid_grant_origins')->where('id', $line['id'])->update(['payload' => $line['payload']]);
         $this->assertCount(1, app(PaidGrantExportSection::class)->build($account)['paidGrantOrders']);
     }
