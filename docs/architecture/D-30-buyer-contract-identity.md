@@ -193,8 +193,10 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
      successor profile whose faces add Latin Extended (decision register, 2026-11-08). **Printable set done (2026-11-08):**
      `vasey-license-pdf-v2` is built and pinned, and both checkouts accept and re-verify against its faces
      (`ContractPrintableSet`: 357 accepted codepoints, Latin and Common; Greek, Cyrillic and Vietnamese refused). Tests pin
-     the subset of the `test-v2` paid renderers' rule and of each v2 face. Open: the v2 renderer itself (whose input rule the
-     set must then also be tested against), and the statement texts' review in that render;
+     the subset of the `test-v2` paid renderers' rule and of each v2 face. **v2 renderer built (2026-11-08, not selected):**
+     `VaseyLicenseV2PdfRenderer`; a test pins that every codepoint checkout accepts is in the renderer's own input rule
+     (`coverage()`), passes its per-face check in all four roles and renders. Open: the statement texts' review in that
+     render, and wiring it into the issuers (separate review);
    - [x] the statement the buyer saw must be bound to the one frozen (done in step 6: the client echoes the displayed
      statement version, checked with `hash_equals`);
    - [x] gate-on tests must cover `initiate`, `reconcile` and the paid-tax grant render with a v2 declaration. (Step 6 added

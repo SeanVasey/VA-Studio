@@ -7,8 +7,8 @@ namespace App\Domain\Contracts\Production;
  * (that class is itself pinned by v1's manifest, so it is not parameterized here): every application class reachable
  * from the roots through `use App\…` imports and references to classes of the same namespace.
  *
- * The roots are the profile definition and the checkout printable set bound to its faces. The v2 renderer does not
- * exist yet; when it does, its entry points join the roots and the manifest is rebuilt before any issuance.
+ * The roots are the profile definition, the checkout printable set bound to its faces and the renderer
+ * ({@see VaseyLicenseV2PdfRenderer}), whose closure brings in the v1 document, layout and signature classes it reuses.
  * {@see VaseyLicenseV2Profile} is excluded: it holds the manifest's own SHA-256 and anchors the pin.
  */
 final class VaseyLicenseV2Implementation
@@ -17,6 +17,7 @@ final class VaseyLicenseV2Implementation
         'app/Domain/Contracts/Production/VaseyLicenseV2ProfileDefinition.php',
         'app/Domain/Contracts/Production/VaseyLicenseV2Implementation.php',
         'app/Domain/Commerce/ContractIdentity/ContractPrintableSet.php',
+        'app/Domain/Contracts/Production/VaseyLicenseV2PdfRenderer.php',
     ];
 
     public const ANCHOR = 'app/Domain/Contracts/Production/VaseyLicenseV2Profile.php';
