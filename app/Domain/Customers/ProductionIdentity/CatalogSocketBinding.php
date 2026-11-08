@@ -67,23 +67,22 @@ final class CatalogSocketBinding
         // Refuse unsupported descriptor/provider profiles before any filesystem access or constructor.
         self::requested($writer, $context, $status);
 
-        return self::retrying(
-            static fn (): array => self::snapshot(),
-            static fn (array $inodes, string $tcp, string $tcp6): array => self::prove($writer, $context, $status, $inodes, $tcp, $tcp6),
-        );
+        return self::retrying(self::snapshot(...), self::prove(...), $writer, $context, $status);
     }
 
     /**
      * procfs regenerates the TCP table per read() chunk and resumes by bucket offset, so concurrent socket churn can repeat
      * or skip a row. A torn read only ever refuses; a fresh complete snapshot must still prove the binding. Only a proof
      * refusal is retried, at most SNAPSHOT_ATTEMPTS times in all: a snapshot failure (taint, provider) propagates at once.
+     * The writer is passed as its own redacted parameter, never captured by a closure: SensitiveParameter redacts
+     * parameters in exception traces, not variables a closure holds.
      */
-    private static function retrying(\Closure $snapshot, \Closure $prove): array
+    private static function retrying(\Closure $snapshot, \Closure $prove, #[\SensitiveParameter] array $writer, array $context, string $status): array
     {
         for ($attempt = 1; ; $attempt++) {
             [$inodes, $tcp, $tcp6] = $snapshot();
             try {
-                return $prove($inodes, $tcp, $tcp6);
+                return $prove($writer, $context, $status, $inodes, $tcp, $tcp6);
             } catch (LogicException $error) {
                 if ($attempt >= self::SNAPSHOT_ATTEMPTS) {
                     throw $error;

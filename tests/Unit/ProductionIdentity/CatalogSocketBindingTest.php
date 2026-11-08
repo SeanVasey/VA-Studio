@@ -99,6 +99,7 @@ final class CatalogSocketBindingTest extends TestCase
     public function test_a_torn_snapshot_is_retried_with_fresh_snapshots_and_never_more_than_three_times(): void
     {
         $retrying = new ReflectionMethod(CatalogSocketBinding::class, 'retrying');
+        $args = [['writer'], ['context'], 'status'];
         $snapshots = 0;
         $snapshot = function () use (&$snapshots): array {
             $snapshots++;
@@ -109,10 +110,10 @@ final class CatalogSocketBindingTest extends TestCase
         // Every attempt refuses: exactly three fresh snapshots, then the last refusal propagates.
         $seen = [];
         try {
-            $retrying->invoke(null, $snapshot, function (array $inodes, string $tcp) use (&$seen): array {
+            $retrying->invoke(null, $snapshot, function (array $writer, array $context, string $status, array $inodes, string $tcp) use (&$seen): array {
                 $seen[] = $tcp;
                 throw new LogicException('refusal '.$tcp);
-            });
+            }, ...$args);
             self::fail('a proof that always refuses must not be accepted');
         } catch (LogicException $error) {
             self::assertSame('refusal tcp 3', $error->getMessage());
@@ -122,13 +123,13 @@ final class CatalogSocketBindingTest extends TestCase
 
         // A torn first snapshot recovers on the second, and the proof of that fresh snapshot is what is returned.
         $snapshots = 0;
-        $result = $retrying->invoke(null, $snapshot, function (array $inodes, string $tcp): array {
+        $result = $retrying->invoke(null, $snapshot, function (array $writer, array $context, string $status, array $inodes, string $tcp): array {
             if ($tcp === 'tcp 1') {
                 throw new LogicException('torn');
             }
 
             return ['tcp' => $tcp];
-        });
+        }, ...$args);
         self::assertSame(['tcp' => 'tcp 2'], $result);
         self::assertSame(2, $snapshots);
 
@@ -143,7 +144,7 @@ final class CatalogSocketBindingTest extends TestCase
                 $proofs++;
 
                 return [];
-            });
+            }, ...$args);
             self::fail('a snapshot failure must propagate');
         } catch (LogicException $error) {
             self::assertSame('snapshot refused', $error->getMessage());
@@ -156,11 +157,66 @@ final class CatalogSocketBindingTest extends TestCase
         try {
             $retrying->invoke(null, $snapshot, function (): array {
                 throw new \TypeError('not a refusal');
-            });
+            }, ...$args);
             self::fail('an Error must propagate');
         } catch (\TypeError) {
         }
         self::assertSame(1, $snapshots);
+
+        // Nor is any other Exception: only the refusal's LogicException is retried.
+        $snapshots = 0;
+        try {
+            $retrying->invoke(null, $snapshot, function (): array {
+                throw new \RuntimeException('not a refusal either');
+            }, ...$args);
+            self::fail('a RuntimeException must propagate');
+        } catch (\RuntimeException) {
+        }
+        self::assertSame(1, $snapshots);
+    }
+
+    public function test_a_refused_proof_never_exposes_the_writer_secret_in_its_trace(): void
+    {
+        $previous = ini_get('zend.exception_ignore_args');
+        ini_set('zend.exception_ignore_args', '0');
+        try {
+            $secret = 'SyntheticWriterSecret-'.bin2hex(random_bytes(8));
+            $retrying = new ReflectionMethod(CatalogSocketBinding::class, 'retrying');
+            // The real proof, as attest() wires it: an incomplete writer descriptor refuses on every attempt.
+            $snapshots = 0;
+            $snapshot = static function () use (&$snapshots): array {
+                $snapshots++;
+
+                return [['12345'], self::HEADER, self::HEADER];
+            };
+            try {
+                $retrying->invoke(null, $snapshot, CatalogSocketBinding::prove(...), ['password' => $secret], [], 'status');
+                self::fail('the proof refuses');
+            } catch (LogicException $error) {
+                // Every frame of the binding (retrying, prove, requested, refuse), including any closure it holds.
+                // The test's own ReflectionMethod::invoke frame is the caller here, not production code.
+                $frames = array_values(array_filter($error->getTrace(), static fn (array $frame): bool => ($frame['class'] ?? null) === CatalogSocketBinding::class));
+                self::assertContains('retrying', array_column($frames, 'function'));
+                self::assertStringNotContainsString($secret, print_r($frames, true));
+                self::assertStringNotContainsString($secret, var_export($frames, true));
+            }
+            self::assertSame(3, $snapshots);
+        } finally {
+            ini_set('zend.exception_ignore_args', (string) $previous);
+        }
+    }
+
+    public function test_attest_hands_the_writer_to_the_retry_loop_as_a_redacted_argument_never_inside_a_closure(): void
+    {
+        // attest() needs a native mysqlnd PDO, so pin its wiring at the source: SensitiveParameter redacts parameters in
+        // exception traces, not values captured by a closure, so attest must not wrap the writer in one.
+        $method = new ReflectionMethod(CatalogSocketBinding::class, 'attest');
+        $lines = file($method->getFileName());
+        $body = implode('', array_slice($lines, $method->getStartLine() - 1, $method->getEndLine() - $method->getStartLine() + 1));
+        self::assertStringContainsString('return self::retrying(self::snapshot(...), self::prove(...), $writer, $context, $status);', $body);
+        self::assertDoesNotMatchRegularExpression('/\bfn\s*\(|\bfunction\s*\(|\buse\s*\(/', $body);
+        $retrying = new ReflectionMethod(CatalogSocketBinding::class, 'retrying');
+        self::assertNotEmpty($retrying->getParameters()[2]->getAttributes(\SensitiveParameter::class));
     }
 
     public function test_unowned_ambiguous_missing_nonestablished_and_malformed_snapshots_refuse(): void
