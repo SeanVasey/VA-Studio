@@ -40,6 +40,7 @@ unchanged, so a present-but-unreadable `tcp6` still refuses. `file_exists` joins
 Main's binding also requires, and these are environment facts, not code changes:
 
 - PHP exactly 8.4.27 (`CatalogSocketBinding::attest`). The harness upgraded its PHP packages from 8.4.26 to 8.4.27.
+  Since the 2026-11-08 decision the gate admits 8.4.27 and every later 8.4 patch.
 - A literal-IP client endpoint: the private server runs with `--skip-name-resolve` and a `root@127.0.0.1` account.
 - Databases created `CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci` (the account guard checks the trigger
   `DATABASE_COLLATION`), as earlier private native setups did.
@@ -48,7 +49,8 @@ Main's binding also requires, and these are environment facts, not code changes:
 
 The exact `PHP_VERSION === '8.4.27'` pin refuses every later patch release. CI (`setup-php` '8.4') and Forge install the latest
 8.4 patch, so identity migrations will refuse on hosts and hosted MySQL shards as soon as 8.4.28 ships. Changing it needs a
-reviewed policy, not a silent edit. Hosted MySQL shards also use the `mysql:8.4` image's default collation
+reviewed policy, not a silent edit. (Decided 2026-11-08: the 8.4 series from 8.4.27 onward; see
+`docs/architecture/decision-register.md`.) Hosted MySQL shards also use the `mysql:8.4` image's default collation
 (`utf8mb4_0900_ai_ci`) for `vaseyaudio_test`; whether the account guard's collation check then refuses on CI has not been run.
 
 ## Untested
