@@ -111,6 +111,21 @@ final class ProductionCheckoutMountTest extends TestCase
         $this->assertSame([], $queries());
     }
 
+    public function test_every_checkout_route_keeps_its_throttle_and_block(): void
+    {
+        $expected = ['contract-identity' => 'throttle:30,1,production-checkout-read', 'reviews' => 'throttle:10,1,production-checkout-write',
+            'orders' => 'throttle:10,1,production-checkout-write', 'hosted' => 'throttle:5,1,production-checkout-provider',
+            'reconcile' => 'throttle:5,1,production-checkout-provider', 'status' => 'throttle:30,1,production-checkout-read',
+            'return' => 'throttle:30,1,production-checkout-read'];
+        $this->assertSame(self::ROUTES, array_keys($expected));
+        foreach ($expected as $name => $throttle) {
+            $route = Route::getRoutes()->getByName('production.checkout.'.$name);
+            $this->assertNotNull($route, $name);
+            $this->assertContains($throttle, $route->gatherMiddleware(), $name);
+            $this->assertSame([20, 5], [$route->locksFor(), $route->waitsFor()], $name);
+        }
+    }
+
     /** @return array<string, array{0: mixed, 1: string}> */
     public static function withdrawals(): array
     {
