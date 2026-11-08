@@ -47,9 +47,10 @@ final class PaidGrantExportSection
     public const MAX_LINES = self::MAX_RECORDS * 10;
 
     /**
-     * Download authorizations, and redemptions, per chain. A line is authorized once per kind and per attempt, and unused
-     * authorizations are retained, so this allows ten per line rather than one: an export of a long-lived account should
-     * not refuse permanently. Each entry is three small fields.
+     * Redeemed downloads per chain, each exported in full. Redemptions are bounded per line by the grant's `max_downloads`,
+     * so this cap is reached only by broken data. Unused authorizations are not capped by the download domain (a buyer
+     * may request more than they redeem), so they are exported as counts per line and kind, never row by row: their number
+     * cannot make an account's export refuse.
      */
     public const MAX_DOWNLOADS = self::MAX_LINES * 10;
 
@@ -120,7 +121,7 @@ final class PaidGrantExportSection
         $authorizationCount = DB::table($chain['tables']['authorization'])->where('account_id', $accountId)->count();
         if ($batchCount > self::MAX_RECORDS || self::lines($chain, $accountId)->count() > self::MAX_LINES
             || self::originals($chain, $accountId)->count() > self::MAX_LINES
-            || $authorizationCount > self::MAX_DOWNLOADS || self::redemptions($chain, $accountId)->count() > self::MAX_DOWNLOADS) {
+            || self::redemptions($chain, $accountId)->count() > self::MAX_DOWNLOADS) {
             throw new DataRightsException(413, 'export_too_large');
         }
         if ($batchCount === 0) {
@@ -180,52 +181,78 @@ final class PaidGrantExportSection
                         'title' => is_string($source['product']['title'] ?? null) ? $source['product']['title'] : null,
                         'buyerDeclarations' => $source['buyer_declarations'],
                         'contractOriginal' => $original === null ? null : self::original($chain, (array) $original, $line),
-                        'downloads' => $downloads[$line['id']] ?? []];
+                        'downloads' => $downloads['redeemed'][$line['id']] ?? [],
+                        'unusedAuthorizations' => $downloads['unused'][$line['id']] ?? []];
                 })->all()];
         })->all();
     }
 
     /**
-     * The account's download history, keyed by internal line id. Each authorization must name one of the account's exported
-     * lines (and, for the tax chain, its order and hash columns) and seal that line's hash; anything else refuses.
+     * The account's download history, keyed by internal line id. Redeemed authorizations are exported in full: each must
+     * name one of the account's exported lines (and, for the tax chain, its order and hash columns) and seal that line's
+     * hash; anything else refuses. Unused ones are counted per line and kind from their columns alone, and every count must
+     * also name one of the account's exported lines (with matching tax columns), or the export refuses.
      *
-     * @return array<int, list<array{kind: string, authorizedAt: string, redeemedAt: ?string}>>
+     * @return array{redeemed: array<int, list<array{kind: string, authorizedAt: string, redeemedAt: string}>>,
+     *     unused: array<int, array<string, int>>}
      */
     private function downloads(array $chain, int $accountId, Collection $batches, Collection $lines): array
     {
         $tax = $chain['tables']['authorization'] === 'paid_tax_authorizations';
-        $columns = ['id', 'account_id', 'target', 'payload', 'payload_hash', 'created_at', ...($tax ? ['batch_public_id', 'origin_public_id', 'origin_hash'] : ['origin_id'])];
-        $authorizations = DB::table($chain['tables']['authorization'])->where('account_id', $accountId)->orderBy('id')
-            ->limit(self::MAX_DOWNLOADS + 1)->get($columns);
+        $keys = $tax ? ['batch_public_id', 'origin_public_id', 'origin_hash'] : ['origin_id'];
+        $columns = array_map(static fn (string $column): string => 'a.'.$column, ['id', 'account_id', 'target', 'payload', 'payload_hash', 'created_at', ...$keys]);
+        $authorizations = DB::table($chain['tables']['authorization'].' as a')
+            ->join($chain['tables']['redemption'].' as r', 'r.authorization_id', '=', 'a.id')
+            ->where('a.account_id', $accountId)->orderBy('a.id')->limit(self::MAX_DOWNLOADS + 1)
+            ->get([...$columns, 'r.created_at as redeemed_at']);
         if ($authorizations->count() > self::MAX_DOWNLOADS) {
             throw new DataRightsException(413, 'export_too_large');
         }
-        $redemptions = DB::table($chain['tables']['redemption'])->whereIn('authorization_id', $authorizations->pluck('id'))->orderBy('id')
-            ->limit(self::MAX_DOWNLOADS + 1)->get(['authorization_id', 'created_at']);
-        if ($redemptions->count() > self::MAX_DOWNLOADS) {
-            throw new DataRightsException(413, 'export_too_large');
-        }
-        $redemptions = $redemptions->keyBy('authorization_id');
         $byId = $lines->keyBy('id');
         $byPublic = $lines->keyBy('public_id');
         $batchPublic = $batches->pluck('public_id', 'id');
-        $result = [];
+        $line = function (array $row) use ($tax, $byId, $byPublic, $batchPublic): array {
+            $line = $tax ? $byPublic->get($row['origin_public_id']) : $byId->get($row['origin_id']);
+            self::require($line !== null);
+            $line = (array) $line;
+            self::require(! $tax || ($row['origin_hash'] === $line['payload_hash'] && $row['batch_public_id'] === $batchPublic->get($line['batch_id'])));
+
+            return $line;
+        };
+        $redeemed = [];
         foreach ($authorizations as $authorization) {
             $authorization = (array) $authorization;
-            $line = $tax ? $byPublic->get($authorization['origin_public_id']) : $byId->get($authorization['origin_id']);
-            self::require($line !== null && (int) $authorization['account_id'] === $accountId);
-            $line = (array) $line;
+            self::require((int) $authorization['account_id'] === $accountId);
+            $owner = $line($authorization);
             $payload = self::open($chain, $authorization);
             self::require(($payload['schema_version'] ?? null) === $chain['schemas']['authorization']
-                && ($payload['origin_hash'] ?? null) === $line['payload_hash'] && ($payload['kind'] ?? null) === $authorization['target']
-                && (! $tax || ($authorization['origin_hash'] === $line['payload_hash']
-                    && $authorization['batch_public_id'] === $batchPublic->get($line['batch_id']))));
-            $redemption = $redemptions->get($authorization['id']);
-            $result[$line['id']][] = ['kind' => $authorization['target'], 'authorizedAt' => self::time($authorization['created_at']),
-                'redeemedAt' => $redemption === null ? null : self::time($redemption->created_at)];
+                && ($payload['origin_hash'] ?? null) === $owner['payload_hash'] && ($payload['kind'] ?? null) === $authorization['target']);
+            $redeemed[$owner['id']][] = ['kind' => $authorization['target'], 'authorizedAt' => self::time($authorization['created_at']),
+                'redeemedAt' => self::time($authorization['redeemed_at'])];
         }
+        // Bounded by the account's lines times the download kinds; the cap only stops broken data from growing the read.
+        $groups = DB::table($chain['tables']['authorization'].' as a')
+            ->leftJoin($chain['tables']['redemption'].' as r', 'r.authorization_id', '=', 'a.id')
+            ->whereNull('r.authorization_id')->where('a.account_id', $accountId)
+            ->groupBy(...array_map(static fn (string $key): string => 'a.'.$key, [...$keys, 'target']))
+            ->orderBy('a.target')->limit(self::MAX_DOWNLOADS + 1)
+            ->get([...array_map(static fn (string $key): string => 'a.'.$key, [...$keys, 'target']), DB::raw('COUNT(*) as unused')]);
+        if ($groups->count() > self::MAX_DOWNLOADS) {
+            throw new DataRightsException(413, 'export_too_large');
+        }
+        $unused = [];
+        foreach ($groups as $group) {
+            $group = (array) $group;
+            $owner = $line($group);
+            self::require(is_string($group['target']) && $group['target'] !== '' && ! isset($unused[$owner['id']][$group['target']]));
+            $unused[$owner['id']][$group['target']] = (int) $group['unused'];
+        }
+        foreach ($unused as &$kinds) {
+            ksort($kinds);
+        }
+        unset($kinds);
 
-        return $result;
+        return ['redeemed' => $redeemed, 'unused' => $unused];
     }
 
     private static function original(array $chain, array $row, array $line): array

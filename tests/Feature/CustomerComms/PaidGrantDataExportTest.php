@@ -121,13 +121,14 @@ class PaidGrantDataExportTest extends TestCase
         $sections = app(PaidGrantExportSection::class)->build($account);
         // Exact shapes: no storage path, claim, token, request key, provider or staff identifier can appear.
         $this->assertSame(['id', 'orderId', 'createdAt', 'lines'], array_keys($sections['paidGrantOrders'][0]));
-        $this->assertSame(['id', 'position', 'title', 'buyerDeclarations', 'contractOriginal', 'downloads'], array_keys($sections['paidGrantOrders'][0]['lines'][0]));
+        $this->assertSame(['id', 'position', 'title', 'buyerDeclarations', 'contractOriginal', 'downloads', 'unusedAuthorizations'], array_keys($sections['paidGrantOrders'][0]['lines'][0]));
         $this->assertSame(['createdAt', 'sha256', 'sizeBytes'], array_keys($sections['paidGrantOrders'][0]['lines'][0]['contractOriginal']));
+        // Redeemed downloads are exported in full; unused authorizations only as a count per kind.
         $downloads = $sections['paidGrantOrders'][0]['lines'][0]['downloads'];
-        $this->assertSame([['kind', 'authorizedAt', 'redeemedAt'], ['kind', 'authorizedAt', 'redeemedAt']], array_map('array_keys', $downloads));
-        $this->assertSame(['master_wav', 'contract'], array_column($downloads, 'kind'));
+        $this->assertSame([['kind', 'authorizedAt', 'redeemedAt']], array_map('array_keys', $downloads));
+        $this->assertSame(['master_wav'], array_column($downloads, 'kind'));
         $this->assertIsString($downloads[0]['redeemedAt']);
-        $this->assertNull($downloads[1]['redeemedAt']);
+        $this->assertSame(['contract' => 1], $sections['paidGrantOrders'][0]['lines'][0]['unusedAuthorizations']);
         $json = json_encode($sections, JSON_THROW_ON_ERROR);
         $authorization = (array) DB::table('paid_authorizations')->first();
         foreach (['storage_path', 'claim_id', 'contracts/paid/', (string) DB::table('paid_originals')->value('claim_id'),
@@ -181,7 +182,7 @@ class PaidGrantDataExportTest extends TestCase
         $this->assertSame($manifest['artifact']['pdf_hash'], $batch['lines'][0]['contractOriginal']['sha256']);
         $this->assertSame(self::counts([0, 0, 0, 0, 0], [1, 1, 1, 0, 0]), PaidGrantExportSection::counts($account));
         $this->assertSame(['id', 'orderId', 'createdAt', 'lines'], array_keys($batch));
-        $this->assertSame(['id', 'position', 'title', 'buyerDeclarations', 'contractOriginal', 'downloads'], array_keys($batch['lines'][0]));
+        $this->assertSame(['id', 'position', 'title', 'buyerDeclarations', 'contractOriginal', 'downloads', 'unusedAuthorizations'], array_keys($batch['lines'][0]));
         $this->assertSame(['createdAt', 'sha256', 'sizeBytes'], array_keys($batch['lines'][0]['contractOriginal']));
         $json = json_encode($sections, JSON_THROW_ON_ERROR);
         $row = (array) DB::table('paid_tax_order_origins')->sole();
@@ -205,13 +206,14 @@ class PaidGrantDataExportTest extends TestCase
         $authorize('master_wav');
         $account = self::account($f['buyer']);
         $exported = fn (): array => app(PaidGrantExportSection::class)->build($account)['paidTaxGrantOrders'][0]['lines'][0]['downloads'];
+        $unused = fn (): array => app(PaidGrantExportSection::class)->build($account)['paidTaxGrantOrders'][0]['lines'][0]['unusedAuthorizations'];
 
         $sections = app(PaidGrantExportSection::class)->build($account);
         $history = $sections['paidTaxGrantOrders'][0]['lines'][0]['downloads'];
-        $this->assertSame([['kind', 'authorizedAt', 'redeemedAt'], ['kind', 'authorizedAt', 'redeemedAt']], array_map('array_keys', $history));
-        $this->assertSame(['contract', 'master_wav'], array_column($history, 'kind'));
+        $this->assertSame([['kind', 'authorizedAt', 'redeemedAt']], array_map('array_keys', $history));
+        $this->assertSame(['contract'], array_column($history, 'kind'));
         $this->assertMatchesRegularExpression('/\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ\z/', $history[0]['redeemedAt']);
-        $this->assertNull($history[1]['redeemedAt']);
+        $this->assertSame(['master_wav' => 1], $unused());
         $this->assertSame(self::counts([0, 0, 0, 0, 0], [1, 1, 1, 2, 1]), PaidGrantExportSection::counts($account));
         $json = json_encode($sections, JSON_THROW_ON_ERROR);
         foreach (DB::table('paid_tax_authorizations')->get() as $authorization) {
@@ -228,20 +230,31 @@ class PaidGrantDataExportTest extends TestCase
             DB::table('paid_tax_authorizations')->where('id', $row['id'])->update($change);
             $this->refusesExport($account);
             DB::table('paid_tax_authorizations')->where('id', $row['id'])->update(array_intersect_key($row, $change));
-            $this->assertCount(2, $exported(), (string) array_key_first($change));
+            $this->assertCount(1, $exported(), (string) array_key_first($change));
         }
         $payload = PaidTaxRecords::decode($row);
         foreach ([['schema_version' => 'paid-authorization-v1'], ['origin_hash' => str_repeat('a', 64)], ['kind' => 'stems_zip']] as $change) {
             DB::table('paid_tax_authorizations')->where('id', $row['id'])->update(PaidTaxRecords::encode([...$payload, ...$change]));
             $this->refusesExport($account);
             DB::table('paid_tax_authorizations')->where('id', $row['id'])->update(PaidTaxRecords::encode($payload));
-            $this->assertCount(2, $exported(), (string) array_key_first($change));
+            $this->assertCount(1, $exported(), (string) array_key_first($change));
+        }
+
+        // An unused authorization is counted from its columns, which must still bind it to the exported line.
+        $unusedRow = (array) DB::table('paid_tax_authorizations')->where('target', 'master_wav')->sole();
+        foreach ([['origin_public_id' => '00000000-0000-4000-8000-0000000000ee'], ['batch_public_id' => '00000000-0000-4000-8000-0000000000ee'],
+            ['origin_hash' => str_repeat('b', 64)]] as $change) {
+            DB::table('paid_tax_authorizations')->where('id', $unusedRow['id'])->update($change);
+            $this->refusesExport($account);
+            DB::table('paid_tax_authorizations')->where('id', $unusedRow['id'])->update(array_intersect_key($unusedRow, $change));
+            $this->assertSame(['master_wav' => 1], $unused(), (string) array_key_first($change));
         }
 
         // Moved to another account: the requester's export no longer reads it, and the other account's export refuses it.
         $other = self::account($this->enrollThroughLocalSmtp('other.buyer@example.test'));
         DB::table('paid_tax_authorizations')->where('id', $row['id'])->update(['account_id' => $other]);
-        $this->assertSame(['master_wav'], array_column($exported(), 'kind'));
+        $this->assertSame([], $exported());
+        $this->assertSame(['master_wav' => 1], $unused());
         $this->assertSame([1, 0], [PaidGrantExportSection::counts($account)['paid_tax_authorizations'], PaidGrantExportSection::counts($account)['paid_tax_redemptions']]);
         $this->assertSame([1, 1], [PaidGrantExportSection::counts($other)['paid_tax_authorizations'], PaidGrantExportSection::counts($other)['paid_tax_redemptions']]);
         $this->refusesExport($other);
@@ -379,7 +392,7 @@ class PaidGrantDataExportTest extends TestCase
         $f = $this->paidV1();
         $this->download($f, 'contract', false);
         $account = self::account($f['buyer']);
-        $this->dropTriggers(['paid_grant_origins', 'paid_authorizations']);
+        $this->dropTriggers(['paid_grant_origins', 'paid_authorizations', 'paid_redemptions']);
         $authorization = (array) DB::table('paid_authorizations')->sole();
         $padding = [];
         for ($i = 1; $i <= PaidGrantExportSection::MAX_DOWNLOADS; $i++) {
@@ -390,7 +403,23 @@ class PaidGrantDataExportTest extends TestCase
         foreach (array_chunk($padding, 500) as $chunk) {
             DB::table('paid_authorizations')->insert($chunk);
         }
+        // Unused authorizations are not capped by the download domain, so they are only counted: however many a buyer
+        // requests, the export still succeeds (their payloads are never opened, so the unreadable padding passes).
+        $exportedLine = app(PaidGrantExportSection::class)->build($account)['paidGrantOrders'][0]['lines'][0];
+        $this->assertSame([], $exportedLine['downloads']);
+        $this->assertSame(['contract' => PaidGrantExportSection::MAX_DOWNLOADS + 1], $exportedLine['unusedAuthorizations']);
+
+        // Redeemed ones are exported in full and capped: past the cap the export refuses with 413 before opening a payload
+        // (the padding cannot be decoded, so a 503 here would mean a payload was opened first).
+        $redemptions = [];
+        for ($i = 0; $i <= PaidGrantExportSection::MAX_DOWNLOADS; $i++) {
+            $redemptions[] = ['authorization_id' => $authorization['id'] + $i, 'created_at' => '2026-11-08 00:00:00'];
+        }
+        foreach (array_chunk($redemptions, 500) as $chunk) {
+            DB::table('paid_redemptions')->insert($chunk);
+        }
         $this->refusesExport($account, 413, 'export_too_large');
+        DB::table('paid_redemptions')->delete();
         DB::table('paid_authorizations')->where('id', '>', $authorization['id'])->delete();
         $this->assertCount(1, app(PaidGrantExportSection::class)->build($account)['paidGrantOrders']);
 
