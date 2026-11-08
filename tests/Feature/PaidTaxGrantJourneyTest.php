@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Commerce\ContractIdentity\ContractIdentityStatements;
 use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Grants\PaidTax\PaidTaxActor;
@@ -130,6 +131,39 @@ class PaidTaxGrantJourneyTest extends TestCase
         $this->assertSame($bytes, (new PaidTaxFiles)->verify($manifest['artifact']));
         $this->assertDatabaseCount('paid_tax_fulfillments', 1);
         $this->assertDatabaseCount('paid_originals', 0);
+        $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    /**
+     * D-30 step 5 (before activation): with the V2 tax checkout's contract identity gate on, a v2 order is initiated
+     * (re-verified), reconciled, carried by the paid-tax grant origin and rendered. The renderer takes the declaration as an
+     * opaque object; the contract binder (step 7) is what will place its fields.
+     */
+    public function test_a_v2_contract_identity_order_pays_and_renders_through_the_paid_tax_grant(): void
+    {
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $f = $this->taxOrder('exclusive', 2500, ['licenseeType' => 'individual', 'legalName' => 'Zoë Émile', 'legalNameConfirmed' => true,
+            'postalAddress' => ['country' => 'US', 'lines' => ['1 Example Street'], 'locality' => 'Springfield', 'region' => 'IA', 'postalCode' => '50000'],
+            'statementVersion' => ContractIdentityStatements::offered()['individual']['statementVersion']]);
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $f['checkout']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['transport']->lineTax = 437;
+        $f['transport']->paid = true;
+        $this->assertSame('verified', $f['checkout']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
+        $retained = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+
+        $body = PaidTaxRecords::decode((array) DB::table('paid_tax_grant_origins')->sole());
+        $declarations = $body['source']['buyer_declarations'];
+        $this->assertSame(['buyer-contract-identity-v2', 'individual', 'Zoë Émile'], [$declarations['schema'], $declarations['licensee_type'], $declarations['legal_name']]);
+        $complete = (new PaidTaxDocuments)->prepare($retained['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertTrue($complete['fulfilled']);
+        $this->assertSame('complete', $complete['lines'][0]['documentStatus']);
+        $this->assertCount(2, $complete['lines'][0]['files']);
+        $manifest = PaidTaxRecords::decode((array) DB::table('paid_tax_originals')->sole());
+        $bytes = (new PaidTaxFiles)->verify($manifest['artifact']);
+        $rendered = app(PaidTaxRendererProcess::class)->render(PaidTaxRenderInput::fromOrigin($body), $body['profile']);
+        $this->assertSame($bytes, $rendered->pdfBytes, 'The genuine isolated renderer changed the same retained original.');
+        $this->assertDatabaseCount('paid_tax_originals', 1);
         $this->assertDatabaseCount('license_grants', 0);
     }
 

@@ -187,9 +187,10 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
      accepted set must stay a subset of that renderer's own input rule, with a test;
    - [x] the statement the buyer saw must be bound to the one frozen (done in step 6: the client echoes the displayed
      statement version, checked with `hash_equals`);
-   - [ ] gate-on tests must cover `initiate`, `reconcile` and the paid-tax grant render with a v2 declaration. (Step 6 added
+   - [x] gate-on tests must cover `initiate`, `reconcile` and the paid-tax grant render with a v2 declaration. (Step 6 added
      the other tests this item listed: a gate flip between preview and order and on replay, and a business order without a
-     representative.) `initiate` and `reconcile` are covered (step 8, part); the paid-tax grant render remains.
+     representative.) `initiate` and `reconcile` are covered (step 8, part); the paid-tax grant render is covered by
+     `PaidTaxGrantJourneyTest::test_a_v2_contract_identity_order_pays_and_renders_through_the_paid_tax_grant`.
    - [x] `TaxCheckoutEvidence::order` checks that the body's declarations equal the request's (done in step 6).
 6. V1 checkout wiring behind its own gate, with the statement binding and evidence checks above (done). Before activation
    (step 8):

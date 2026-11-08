@@ -55,7 +55,7 @@ trait ProductionTaxCheckoutFixtures
     }
 
     /** Enrolled buyer, previewed and accepted pre-tax order, and a recording transport that is NOT yet admitted. */
-    protected function taxOrder(string $behavior = 'exclusive', int $ceiling = 2500): array
+    protected function taxOrder(string $behavior = 'exclusive', int $ceiling = 2500, array $identity = ['legalName' => 'Declared synthetic buyer']): array
     {
         $catalog = $this->taxCatalog($behavior, $ceiling);
         $buyer = $this->enrollThroughLocalSmtp();
@@ -64,7 +64,7 @@ trait ProductionTaxCheckoutFixtures
         $checkout = new ProductionTaxCheckout($access, $transport);
         $preview = $checkout->preview($buyer['principal'], $buyer['user'], $catalog['candidate']->id, $catalog['items']);
         $order = $checkout->order($buyer['principal'], $buyer['user'], $catalog['candidate']->id, $catalog['items'], $preview['previewHash'], true,
-            ['legalName' => 'Declared synthetic buyer'], 'synthetic-tax-order');
+            $identity, 'synthetic-tax-order');
 
         return compact('catalog', 'buyer', 'access', 'transport', 'checkout', 'preview', 'order');
     }
