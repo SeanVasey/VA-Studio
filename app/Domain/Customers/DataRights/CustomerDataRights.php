@@ -50,6 +50,15 @@ class CustomerDataRights
         // D-30: production checkout records that carry buyer declarations (ProductionCheckoutExportSection::RECORDS).
         'production_checkout_reviews' => 'financial_records_years', 'production_checkout_orders' => 'financial_records_years',
         'production_tax_checkout_orders' => 'financial_records_years',
+        // The buyer's qualified exemption attestation (ProductionCheckoutExportSection::RECORDS).
+        'production_checkout_exemption_bases' => 'financial_records_years',
+        // Paid-grant copies of the declarations and the originals rendered from them (PaidGrantExportSection::CHAINS).
+        'paid_order_origins' => 'financial_records_years', 'paid_grant_origins' => 'financial_records_years',
+        'paid_originals' => 'financial_records_years', 'paid_tax_order_origins' => 'financial_records_years',
+        'paid_tax_grant_origins' => 'financial_records_years', 'paid_tax_originals' => 'financial_records_years',
+        // Their download history, kept by `_retain` triggers: delivery records, as `delivery_records` above.
+        'paid_authorizations' => 'financial_records_years', 'paid_redemptions' => 'financial_records_years',
+        'paid_tax_authorizations' => 'financial_records_years', 'paid_tax_redemptions' => 'financial_records_years',
     ];
 
     /** @return array{requestId: string, downloadToken: string, expiresAt: string, sizeBytes: int} */
@@ -84,7 +93,8 @@ class CustomerDataRights
             ]);
             $this->event($request, 'export_ready', null, ['size_bytes' => strlen($json), 'expires_at' => $expires->toIso8601ZuluString(),
                 'sections' => array_map('count', array_intersect_key($document, array_flip(['orders', 'licenseGrants', 'consent', 'inquiries',
-                'productionCheckoutReviews', 'productionCheckoutOrders', 'productionTaxCheckoutOrders'])))], $at);
+                'productionCheckoutReviews', 'productionCheckoutOrders', 'productionTaxCheckoutOrders', 'productionCheckoutExemptionBases',
+                'paidGrantOrders', 'paidTaxGrantOrders'])))], $at);
             AuditEvent::recordAttributed('customer.data_export.ready', $request, ['request_id' => $requestId, 'size_bytes' => strlen($json)], $user->id);
 
             return ['requestId' => $requestId, 'downloadToken' => $token, 'expiresAt' => $expires->toIso8601ZuluString(), 'sizeBytes' => strlen($json)];
@@ -432,7 +442,7 @@ class CustomerDataRights
                 ->where('n.account_id', $account->id)->count(),
             'customer_data_exports' => DB::table('customer_data_exports as x')->join('customer_data_requests as r', 'r.id', '=', 'x.request_id')
                 ->where('r.customer_account_id', $account->id)->count(),
-        ] + ProductionCheckoutExportSection::counts($account->id);
+        ] + ProductionCheckoutExportSection::counts($account->id) + PaidGrantExportSection::counts($account->id);
         $retained = [];
         foreach (self::RETAINED as $record => $class) {
             // Export rows stay as request evidence; their contents are purged before this record is written.

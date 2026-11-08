@@ -12,7 +12,10 @@ use Tests\Support\ProductionCheckoutJourneyFixture;
 use Tests\Support\ProductionTaxCheckoutFixtures;
 use Tests\TestCase;
 
-/** D-30 step 3: production checkout records and their buyer declarations enter the requester's export and retained list. */
+/**
+ * D-30 step 3: production checkout records and their buyer declarations enter the requester's export and retained list. The
+ * exemption basis and the paid-grant copies are covered in PaidGrantDataExportTest.
+ */
 class ProductionCheckoutDataExportTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
@@ -50,11 +53,12 @@ class ProductionCheckoutDataExportTest extends TestCase
         $this->assertSame('USD', $order['currency']);
         $this->assertSame((int) DB::table('production_tax_checkout_orders')->value('subtotal_minor'), $order['subtotalMinor']);
         $this->assertMatchesRegularExpression('/\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ\z/', $order['createdAt']);
-        $this->assertSame(['production_checkout_reviews' => 0, 'production_checkout_orders' => 0, 'production_tax_checkout_orders' => 1],
+        $this->assertSame(['production_checkout_exemption_bases' => 0, 'production_checkout_reviews' => 0, 'production_checkout_orders' => 0,
+            'production_tax_checkout_orders' => 1],
             ProductionCheckoutExportSection::counts($account));
 
         // Another enrolled buyer, and an account with no production identity origin, see nothing of it.
-        $empty = ['productionCheckoutReviews' => [], 'productionCheckoutOrders' => [], 'productionTaxCheckoutOrders' => []];
+        $empty = ['productionCheckoutExemptionBases' => [], 'productionCheckoutReviews' => [], 'productionCheckoutOrders' => [], 'productionTaxCheckoutOrders' => []];
         $this->assertSame($empty, app(ProductionCheckoutExportSection::class)->build(self::account($other)));
         $this->assertSame($empty, app(ProductionCheckoutExportSection::class)->build(PHP_INT_MAX));
         $this->assertSame(0, array_sum(ProductionCheckoutExportSection::counts(self::account($other))));
@@ -73,7 +77,8 @@ class ProductionCheckoutDataExportTest extends TestCase
         $this->assertEquals($declarations, $sections['productionCheckoutOrders'][0]['buyerDeclarations']);
         $this->assertSame((int) DB::table('production_checkout_orders')->value('total_minor'), $sections['productionCheckoutOrders'][0]['totalMinor']);
         $this->assertSame([], $sections['productionTaxCheckoutOrders']);
-        $this->assertSame(['production_checkout_reviews' => 1, 'production_checkout_orders' => 1, 'production_tax_checkout_orders' => 0],
+        $this->assertSame(['production_checkout_exemption_bases' => 1, 'production_checkout_reviews' => 1, 'production_checkout_orders' => 1,
+            'production_tax_checkout_orders' => 0],
             ProductionCheckoutExportSection::counts($account));
     }
 
@@ -171,9 +176,9 @@ class ProductionCheckoutDataExportTest extends TestCase
         $document = app(\App\Domain\Customers\DataRights\CustomerDataExportDocument::class)
             ->build($principal, $user, $account, '00000000-0000-4000-8000-0000000000aa', \Carbon\CarbonImmutable::now('UTC'));
 
-        $this->assertSame(2, $document['exportSchema']);
+        $this->assertSame(3, $document['exportSchema']);
         $this->assertSame([$fixture['order']['orderId']], array_column($document['productionTaxCheckoutOrders'], 'id'));
-        $this->assertSame([[], []], [$document['productionCheckoutReviews'], $document['productionCheckoutOrders']]);
+        $this->assertSame([[], [], []], [$document['productionCheckoutExemptionBases'], $document['productionCheckoutReviews'], $document['productionCheckoutOrders']]);
     }
 
     public function test_deletion_keeps_every_production_checkout_record_that_holds_buyer_data(): void

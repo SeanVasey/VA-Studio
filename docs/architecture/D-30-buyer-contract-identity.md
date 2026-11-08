@@ -139,6 +139,21 @@ linked to the order. No superseding contract version is issued.
   - Each record is opened with its hash checked, and its sealed buyer binding must name the same origin. Otherwise the export
     refuses with `production_record_unavailable`.
   - The three tables are on the deletion `RETAINED` list under `financial_records_years`.
+- Export schema 3 adds the exemption attestation and the paid-grant copies of the declarations:
+  - `production_checkout_exemption_bases` joins `ProductionCheckoutExportSection`. Its buyer binding is sealed inside the
+    qualification request. The qualifying staff member is not exported.
+  - `PaidGrantExportSection` covers the V1 paid and V2 paid-tax chains. For each chain it exports the order origins, the grant
+    origins that copy `buyer_declarations` verbatim, the manifests of the originals rendered from them, and the account's
+    download history (authorization kind and times, redemption times).
+  - Paid orders and authorizations are found through `account_id` only; lines, originals and redemptions only through them.
+  - Each payload is opened with its hash checked. The sealed original buyer must name the requester's origin and account, and
+    every line must repeat it. Originals and authorizations must seal one of the account's exported lines.
+  - Provider session, payment and account identifiers are deliberately not exported.
+  - The ten paid tables (order origins, grant origins, originals, authorizations, redemptions per chain) and the bases are on
+    the `RETAINED` list under `financial_records_years`. Authorizations hold `account_id`, the target and times (tax
+    authorizations also `actor_id`); redemptions hold their `authorization_id` and creation time. Their `_retain` triggers keep
+    both.
+  - Document work and fulfillments hold only states and hashes, so they are neither exported nor listed.
 
   Deletion approval stays refused until U-13 retention values are approved.
 - **Gap: production customers cannot reach data rights yet.** The export and deletion routes resolve only a test-account
@@ -159,10 +174,12 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
      evidence.
    - **3b:** a data-rights entry point for production-signed-in customers. It belongs with the production identity mount
      (U-07).
-   - **Before activation (step 8):** the paid-grant copies of the declarations (`paid_*` and `paid_tax_*` origins and originals,
-     local and testing only today) must also be exported and retained.
-   - **Follow-up:** `production_checkout_exemption_bases`, which is the buyer's exemption attestation and not a declaration,
-     should be exported and retained too.
+   - **Before activation (step 8), done:** the paid-grant copies of the declarations (`paid_*` and `paid_tax_*` origins and
+     originals, local and testing only today) are exported and retained (export schema 3, `PaidGrantExportSection`).
+   - **Follow-up, done:** `production_checkout_exemption_bases`, which is the buyer's exemption attestation and not a
+     declaration, is exported and retained (export schema 3).
+   - **Follow-up, out of scope:** test commerce's `RETAINED` entry `delivery_records` names no real table; the rows live in
+     `test_delivery_authorizations` and `test_delivery_redemptions`.
 4. A pure `ContractIdentityDeclarationV2` validator and formatter.
 5. V2 tax checkout wiring behind the gate. Needs independent review and a native MySQL journey. Before activation (step 8):
    - the statement texts and the printable set must be rebound to the `vasey-license-pdf-v1` profile's own faces, and the
