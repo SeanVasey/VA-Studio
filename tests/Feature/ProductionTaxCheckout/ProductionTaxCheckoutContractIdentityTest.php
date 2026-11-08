@@ -152,6 +152,24 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
         $this->assertSame(0, DB::table('production_tax_checkout_orders')->count());
     }
 
+    public function test_with_the_gate_on_latin_extended_names_order_and_scripts_not_in_every_contract_face_refuse(): void
+    {
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $f = $this->checkout();
+        // The printable set is the vasey-license-pdf-v2 faces (decision register, 2026-11-08): Greek, Cyrillic and
+        // Vietnamese are refused at checkout rather than printed wrongly.
+        foreach (['Иван Петров', 'Ελένη Παπαδοπούλου', 'Nguyễn Văn An'] as $name) {
+            $this->refuses('unsupported_characters', fn () => $this->order($f, self::identity(['legalName' => $name])));
+        }
+        $this->refuses('unsupported_characters', fn () => $this->order($f, self::identity(['licenseeType' => 'business',
+            'legalName' => 'Example Records LLC', 'representativeName' => 'Анна Иванова'])));
+        $this->assertSame(0, DB::table('production_tax_checkout_orders')->count());
+
+        $this->order($f, self::identity(['licenseeType' => 'business', 'legalName' => 'Wydawnictwo Łódź Sp. z o.o.', 'representativeName' => 'Ștefan Țepeș']));
+        $frozen = self::frozenDeclarations();
+        $this->assertSame(['Wydawnictwo Łódź Sp. z o.o.', 'Ștefan Țepeș'], [$frozen['legal_name'], $frozen['representative_name']]);
+    }
+
     public function test_with_the_gate_off_the_preview_commitment_request_and_order_bytes_are_the_original_ones(): void
     {
         $f = $this->checkout();
@@ -253,10 +271,13 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
         $this->assertSame($body['buyer_declarations'], self::openOrder($row)['body']['buyer_declarations']);
         $this->refusesEvidence(self::resealed($row, [...$body, 'buyer_declarations' => [...$body['buyer_declarations'], 'legal_name' => 'Someone Else']]));
         // Consistent in the request and the body, so only the re-verification can refuse it: the name cannot be printed.
-        $unprintable = [...$body['buyer_declarations'], 'legal_name' => '王小明'];
-        $request = [...$body['request'], 'buyer_declarations' => $unprintable];
-        $this->refusesEvidence([...self::resealed($row, [...$body, 'request' => $request, 'request_hash' => CanonicalJson::hash($request),
-            'buyer_declarations' => $unprintable]), 'request_hash' => CanonicalJson::hash($request)]);
+        // Cyrillic prints in the test-v2 DejaVu faces but not in the vasey-license-pdf-v2 faces checkout is bound to.
+        foreach (['王小明', 'Иван Петров'] as $name) {
+            $unprintable = [...$body['buyer_declarations'], 'legal_name' => $name];
+            $request = [...$body['request'], 'buyer_declarations' => $unprintable];
+            $this->refusesEvidence([...self::resealed($row, [...$body, 'request' => $request, 'request_hash' => CanonicalJson::hash($request),
+                'buyer_declarations' => $unprintable]), 'request_hash' => CanonicalJson::hash($request)]);
+        }
     }
 
     /** A second preview for the same buyer and catalog, under the gate as it is now. */

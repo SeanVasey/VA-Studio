@@ -319,18 +319,49 @@ own hash must be pinned, with review.
   empty template is a finding (exit 1);
 - printability in the profile's own faces.
 
-**Glyph coverage, compared with DejaVu.** The brand files are Fontsource **Latin subsets**. The four faces share 214
+**Glyph coverage, compared with DejaVu.** The v1 brand files are Fontsource **Latin subsets**. The four faces share 214
 positive-width codepoints, all Latin or Common, and the D-30 rule accepts 212 of them (U+000D and U+00A0 are refused). The
-`test-v2` DejaVu binding, which checkout still uses and which is unchanged, accepts 3,799 under its own script restriction. The
-brand set is a strict subset of it. Covered: Basic Latin, Latin-1 Supplement, ı, Œ, œ, the typographic quotes and dashes, €
-and ™. Not covered: Latin Extended-A and B (Ł, Ż, Ș, Ț, ğ, ş and others), Latin Extended Additional (Vietnamese), Greek,
-Cyrillic, and most other symbols. Every pinned country name prints. If checkout is rebound to these faces, buyers named, for
-example, "Łukasz", "Ștefan", "Nguyễn" or "Иван" would be refused at checkout.
+`test-v2` DejaVu set the paid renderers use accepts 3,799 under its own script restriction, and the v1 set is a strict subset
+of it. v1 covers Basic Latin, Latin-1 Supplement, ı, Œ, œ, the typographic quotes and dashes, € and ™, but not Latin
+Extended-A and B (Ł, Ż, Ș, Ț, ğ, ş and others), Latin Extended Additional (Vietnamese), Greek or Cyrillic. Every pinned
+country name prints.
+
+**Successor profile `vasey-license-pdf-v2` (increment 5, part 1, built 2026-11-08, not selected for issuance).** Decided
+2026-11-08 (decision register): the same three families with Latin Extended, as a successor; v1 stays byte-identical and pinned.
+
+- Sources: the Fontsource 5.3.0 tarballs the brand manifest already pins (same SHA-256 and npm integrity). Each face is its
+  `latin` subset (the brand file) merged with its `latin-ext` subset by `scripts/vasey-license-v2-fonts.py` (fontTools 4.68.0
+  `merge`, Latin first, instanced before the merge; `head` dates restored from the Latin source). The three `latin-ext` woff2
+  files are vendored in `resources/contracts/vasey-license-v2/fonts/source/` and pinned by SHA-256 in
+  `scripts/build-contract-profile-vasey-license-v2.php`. `--check` rebuilds byte for byte; `--archives=DIR` proves every source
+  face and license is the member of its pinned tarball. Bebas Neue has no Vietnamese subset; Reddit Sans and JetBrains Mono do,
+  but they are not merged because the intersection could not use them.
+- Pin: `VaseyLicenseV2Profile::MANIFEST_SHA256` over `profile-assets.json` (26 assets, the tc-lib graph and the implementation
+  closure of `VaseyLicenseV2ProfileDefinition`, `VaseyLicenseV2Implementation` and the checkout printable set).
+- Coverage: the four faces share **359** positive-width codepoints, all Latin or Common, and the D-30 rule accepts **357**
+  (U+000D and U+00A0 refused). That adds Latin Extended-A, the Latin Extended-B letters Fontsource's `latin-ext` subsets carry
+  (Ș, ș, Ț, ț among them; not Ǎ, Ǧ, Ơ or Ư), and ẞ, Ẁ–ẅ, Ỳ and ỳ. The v1 set is a subset; the accepted set is a subset of what the `test-v2` paid renderers accept.
+  "Łukasz Żółć", "Ștefan Țepeș", "Đorđe Đorđević" and "Gülşen Kılıç" print. Greek, Cyrillic, Vietnamese (ặ, ễ and the rest of
+  Latin Extended Additional), Ə/ə and the titlecase digraphs (ǅ, ǈ, ǋ) are refused.
+- **Checkout rebound (D-30 step 5).** Both production checkouts take the printable set from
+  `ContractPrintableSet::checkout()` (the v2 faces, verified against the manifest hash and each metric file's SHA-256,
+  restricted to `allowed_scripts`), and re-verify retained declarations with `ContractPrintableSet::verifyRetained()`.
+  `ContractGlyphCoverage` and `ContractIdentityDeclarationV2` are in v1's implementation pin, so their `test-v2` methods
+  (`pinnedContractFaces()`, `verifyRetained()`) are unchanged and no longer used by checkout.
+- Tests: `VaseyLicenseV2ProfileTest` (pin, sources, closure, tamper refusals, counts, the subset of the paid renderers' rule,
+  per-face drawability, names) and the Latin Extended cases in both checkout identity tests.
+
+**v1 pin (fixed in #240).** `ContractIdentityDeclarationV2.php` changed in #216 after #223 pinned it in v1's manifest;
+#240 rebuilt the v1 manifest and added both profiles' `--check` to CI. Because v2's implementation closure includes
+`VaseyLicenseProfile.php`, every v1 rebuild also requires a v2 rebuild.
 
 **Remaining for activation (increment 5).**
 
-- Decide the repertoire. Accept Latin-1 only, or pin fuller builds of the same families (the Fontsource `latin-ext` subsets,
-  or upstream static TTFs) as a successor profile. Then rebind checkout (D-30 step 5) to the chosen faces.
+- [x] Decide the repertoire: Latin Extended successor (2026-11-08). Built and checkout rebound (above).
+- A v2 renderer: v1's renderer, document and layout are pinned to v1 (`VaseyLicenseProfile`), so v2 needs its own render
+  entry points, added to `VaseyLicenseV2Implementation::ROOTS`, a manifest rebuild, a golden hash and the determinism and
+  mutation tests v1 has. Until then a buyer accepted at checkout with, say, "Ł" could not be rendered by v1; it is still
+  rendered by the `test-v2` paid renderers today.
 - Run the census and a golden render on the six real templates, locally, from private paths. Sean reviews the rendered layout,
   the block labels and the acceptance block wording.
 - Install the real signature on the private disk with its pin. Confirm the golden hash on the Forge host (above), and reset

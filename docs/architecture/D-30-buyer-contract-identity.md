@@ -45,10 +45,11 @@ not use a separate record.
     - `ProductionTaxCheckout::order` requires the v2 declaration and refuses the legacy name-only shape;
     - the statements come from `ContractIdentityStatements`, which holds the approved texts with versions
       `individual-legal-name-confirmation-v1` and `business-legal-name-confirmation-v1`, hashed over the exact text;
-    - the printable set comes from the `test-v2` DejaVu metric files (`ContractGlyphCoverage::pinnedContractFaces()`).
-      The profile manifest must match the registry's pinned hash and each metric file the manifest's SHA-256, and the set is
-      restricted to the profile's `allowed_scripts`, so checkout refuses what the paid renderers would refuse after payment
-      (Armenian and Georgian, for example, which DejaVu draws);
+    - the printable set comes from the `vasey-license-pdf-v2` faces (`ContractPrintableSet::checkout()`, since 2026-11-08;
+      before that, the `test-v2` DejaVu metric files through `ContractGlyphCoverage::pinnedContractFaces()`). The profile
+      manifest must match its pinned hash and each metric file the manifest's SHA-256, and the set is restricted to the
+      profile's `allowed_scripts`. A test pins that the accepted set is a subset of what the `test-v2` paid renderers accept,
+      so checkout refuses whatever they would refuse after payment;
     - the preview offers the licensee types and statement texts.
   - **Implemented for the V1 checkout (step 6):** `production_checkout.contract_identity_v2`, a separate literal `false`,
     admitted only as an exact `true` in `local` or `testing` (`ContractIdentityPolicy::contractIdentityV2()`). With it on,
@@ -113,6 +114,10 @@ digit. A value is printable only when all of the following hold:
 With the `test-v2` regular and bold faces, 5,562 codepoints have a positive-width glyph in both faces, and the rule accepts
 4,899 of them. That count is pinned by a test. The accepted set covers Latin, Greek and Cyrillic and every pinned country
 name; CJK is not covered.
+
+**Checkout's set since 2026-11-08** is the `vasey-license-pdf-v2` faces instead (`ContractPrintableSet`): 359 codepoints
+common to its four faces after the Latin and Common restriction, 357 accepted, pinned by a test. Latin Extended names such as
+"Łukasz" and "Ștefan" print; Greek, Cyrillic and Vietnamese are refused.
 
 Decomposed text is refused, not normalized, so the stored value is exactly what was sent; the checkout UI should send NFC.
 The refused list is pinned rather than computed from normalization data. The category and script classes still come from
@@ -185,7 +190,11 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
 5. V2 tax checkout wiring behind the gate. Needs independent review and a native MySQL journey. Before activation (step 8):
    - the statement texts and the printable set must be rebound to the `vasey-license-pdf-v1` profile's own faces, and the
      accepted set must stay a subset of that renderer's own input rule, with a test. **Decided 2026-11-08:** rebind to a
-     successor profile whose faces add Latin Extended (decision register, 2026-11-08);
+     successor profile whose faces add Latin Extended (decision register, 2026-11-08). **Printable set done (2026-11-08):**
+     `vasey-license-pdf-v2` is built and pinned, and both checkouts accept and re-verify against its faces
+     (`ContractPrintableSet`: 357 accepted codepoints, Latin and Common; Greek, Cyrillic and Vietnamese refused). Tests pin
+     the subset of the `test-v2` paid renderers' rule and of each v2 face. Open: the v2 renderer itself (whose input rule the
+     set must then also be tested against), and the statement texts' review in that render;
    - [x] the statement the buyer saw must be bound to the one frozen (done in step 6: the client echoes the displayed
      statement version, checked with `hash_equals`);
    - [x] gate-on tests must cover `initiate`, `reconcile` and the paid-tax grant render with a v2 declaration. (Step 6 added
@@ -200,7 +209,7 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
    - [x] `HostedCheckout` and the V1 paid source open orders through the frozen `OrderEvidence` without re-verifying v2
      declarations. `initiate` re-verifies them (step 8); `reconcile` and the frozen V1 paid source still do not, by decision
      (2026-11-08): reconcile keeps recording the payment, and `PaidGrants::finalize` re-verifies each line's declaration
-     (`ProductionCheckout::contractIdentityHeld`) and refuses with `409 contract_identity_held` before any row is written, so
+     (`ProductionCheckout::contractIdentityHeld`, through `ContractPrintableSet::verifyRetained()`) and refuses with `409 contract_identity_held` before any row is written, so
      fulfillment is held (`PaidGrantDocumentJourneyTest::test_a_paid_v2_order_whose_declaration_no_longer_verifies_is_held_at_finalization`);
    - [x] the V1 HTTP review endpoint passes the `buyer` object through unchanged, and `GET production/checkout/contract-identity`
      (`production.checkout.contract-identity`, `ProductionCheckoutController::contractIdentity`) now serves

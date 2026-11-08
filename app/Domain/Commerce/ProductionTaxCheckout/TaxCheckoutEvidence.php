@@ -3,6 +3,7 @@
 namespace App\Domain\Commerce\ProductionTaxCheckout;
 
 use App\Domain\Commerce\ContractIdentity\ContractIdentityDeclarationV2;
+use App\Domain\Commerce\ContractIdentity\ContractPrintableSet;
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionCheckout\Evidence;
 use App\Domain\Commerce\ProductionCheckout\OwnAccountStripeGateway;
@@ -66,7 +67,7 @@ final class TaxCheckoutEvidence
         Evidence::same([...$body['machine']['choices']['assent'], 'accepted' => true, 'preview_hash' => $body['preview_hash'], 'accepted_at' => $record['created_at']], $body['assent']);
         if ($identity) {
             // This checkout sells non-exclusive licenses only.
-            ContractIdentityDeclarationV2::verifyRetained($body['buyer_declarations'], false);
+            ContractPrintableSet::verifyRetained($body['buyer_declarations'], false);
         }
 
         return ['row' => $record, 'body' => $body, 'context' => $context];

@@ -43,7 +43,7 @@ final class CatalogSocketBinding
             'array_fill', 'array_fill_keys', 'array_merge', 'array_combine', 'array_diff', 'array_key_exists',
             'preg_match', 'preg_split', 'preg_replace_callback', 'inet_pton', 'inet_ntop', 'pack', 'hexdec',
             'explode', 'implode', 'rtrim', 'trim', 'str_split', 'strlen', 'substr', 'substr_count', 'str_replace',
-            'strpbrk', 'str_contains', 'str_starts_with', 'str_ends_with', 'filter_var', 'ksort', 'hrtime'] as $name) {
+            'strpbrk', 'str_contains', 'str_starts_with', 'str_ends_with', 'filter_var', 'ksort', 'hrtime', 'version_compare'] as $name) {
             try {
                 if (! (new ReflectionFunction($name))->isInternal()) {
                     self::$tainted = true;
@@ -59,7 +59,7 @@ final class CatalogSocketBinding
     public static function attest(PDO $primary, #[\SensitiveParameter] array $writer, array $context, string $status): array
     {
         self::requireUntainted();
-        if (\PHP_VERSION !== '8.4.27' || \PHP_OS_FAMILY !== 'Linux' || ! \in_array($primary::class, [PDO::class, 'Pdo\\Mysql'], true)
+        if (! self::supportedPhp(\PHP_VERSION, \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION) || \PHP_OS_FAMILY !== 'Linux' || ! \in_array($primary::class, [PDO::class, 'Pdo\\Mysql'], true)
             || ! (new ReflectionClass($primary))->isInternal()
             || ! \str_starts_with((string) $primary->getAttribute(PDO::ATTR_CLIENT_VERSION), 'mysqlnd ')) {
             self::refuse();
@@ -71,9 +71,19 @@ final class CatalogSocketBinding
     }
 
     /**
+     * The proven PHP 8.4 series from 8.4.27 onward: a routine 8.4 patch update (Forge, CI setup-php '8.4') keeps the proof
+     * running. Another minor or major version (8.5+, or anything older) refuses until its native behaviour is proven.
+     */
+    private static function supportedPhp(string $version, int $major, int $minor): bool
+    {
+        return \version_compare($version, '8.4.27', '>=') && $major === 8 && $minor === 4;
+    }
+
+    /**
      * procfs regenerates the TCP table per read() chunk and resumes by bucket offset, so concurrent socket churn can repeat
      * or skip a row. A torn read only ever refuses; a fresh complete snapshot must still prove the binding. Only a proof
-     * refusal is retried, at most SNAPSHOT_ATTEMPTS times in all: a snapshot failure (taint, provider) propagates at once.
+     * refusal is retried, at most SNAPSHOT_ATTEMPTS times in all: a snapshot failure (taint, provider, or a TCP table over
+     * its read cap) propagates at once, so an oversized table refuses this attempt without a retry.
      * The writer is passed as its own redacted parameter, never captured by a closure: SensitiveParameter redacts
      * parameters in exception traces, not variables a closure holds.
      */
@@ -278,9 +288,15 @@ final class CatalogSocketBinding
         return $context;
     }
 
-    private static function snapshot(): array
+    /**
+     * Any snapshot failure taints the worker, except a TCP table over its read cap: the table is the whole network
+     * namespace's, so a busy host can exceed the cap and shrink again. That refuses this attempt only, after the same
+     * cleanup, and a later attempt reads a fresh table. $read replaces the native table read in tests only.
+     */
+    private static function snapshot(?\Closure $read = null): array
     {
         self::requireUntainted();
+        $read ??= self::fixedFile(...);
         // Fixed own handler covers provider attestation AND every proc operation; caller handler is never invoked.
         \set_error_handler(static function (): never {
             self::$tainted = true;
@@ -312,7 +328,11 @@ final class CatalogSocketBinding
                 }
             }
 
-            return [\array_values(\array_unique($inodes)), self::fixedFile(false, $context), self::ipv6Table($context)];
+            $tcp = $read(false, $context);
+            $tcp6 = $tcp === null ? null : self::ipv6Table($context, $read);
+            if ($tcp !== null && $tcp6 !== null) {
+                return [\array_values(\array_unique($inodes)), $tcp, $tcp6];
+            }
         } catch (Throwable) {
             self::$tainted = true;
             self::refuse();
@@ -328,6 +348,8 @@ final class CatalogSocketBinding
                 }
             }
         }
+        // Reached only when a table exceeded its read cap: refuse this attempt, outside the catch, so it does not taint.
+        self::refuse();
     }
 
     /**
@@ -338,16 +360,17 @@ final class CatalogSocketBinding
      * primary finds no match and refuses. The IPv6 module cannot be unloaded, so absent now means absent when the primary
      * socket and the fd snapshot were made. This relies on a real Linux procfs (not WSL1, gVisor or a FUSE /proc).
      */
-    private static function ipv6Table(mixed $context): string
+    private static function ipv6Table(mixed $context, \Closure $read): ?string
     {
         if (! \file_exists('/proc/self/net/tcp6') && ! \file_exists('/proc/self/net/if_inet6') && \file_exists('/proc/self/net/tcp')) {
             return self::ABSENT_IPV6_TABLE;
         }
 
-        return self::fixedFile(true, $context);
+        return $read(true, $context);
     }
 
-    private static function fixedFile(bool $ipv6, mixed $context): string
+    /** The whole table, or null when it exceeds MAX_BYTES; any other read anomaly refuses (and taints, in snapshot). */
+    private static function fixedFile(bool $ipv6, mixed $context): ?string
     {
         $file = \fopen($ipv6 ? '/proc/self/net/tcp6' : '/proc/self/net/tcp', 'rb', false, $context);
         if (! \is_resource($file)) {
@@ -358,17 +381,30 @@ final class CatalogSocketBinding
                 self::refuse();
             }
             $text = \stream_get_contents($file, self::MAX_BYTES + 1);
-            if (! \is_string($text) || \strlen($text) > self::MAX_BYTES || ! \feof($file)) {
-                self::refuse();
-            }
 
-            return $text;
+            return self::capped($text, \is_string($text) && \feof($file));
         } finally {
             if (! \fclose($file)) {
                 self::$tainted = true;
                 self::refuse();
             }
         }
+    }
+
+    /** Only a read that ran past the cap is transient (null); a failed read, or a short one without EOF, is suspicious. */
+    private static function capped(mixed $text, bool $eof): ?string
+    {
+        if (! \is_string($text)) {
+            self::refuse();
+        }
+        if (\strlen($text) > self::MAX_BYTES) {
+            return null;
+        }
+        if (! $eof) {
+            self::refuse();
+        }
+
+        return $text;
     }
 
     private static function refuse(): never

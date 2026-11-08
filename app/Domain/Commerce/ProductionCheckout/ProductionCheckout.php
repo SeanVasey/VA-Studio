@@ -2,9 +2,9 @@
 
 namespace App\Domain\Commerce\ProductionCheckout;
 
-use App\Domain\Commerce\ContractIdentity\ContractGlyphCoverage;
 use App\Domain\Commerce\ContractIdentity\ContractIdentityDeclarationV2;
 use App\Domain\Commerce\ContractIdentity\ContractIdentityStatements;
+use App\Domain\Commerce\ContractIdentity\ContractPrintableSet;
 use App\Domain\Commerce\ProductionPreparation\PreparationSelection;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionCustomerPrincipal;
@@ -36,7 +36,7 @@ final class ProductionCheckout
             // D-30: the licensee identity a production contract binds, confirmed against the statement version the buyer was
             // shown. Exclusive has no production path (ExclusiveInventoryGate), so no artist name is admitted here.
             ? ContractIdentityDeclarationV2::fromDisplayedInput($buyerDeclarations, false, ContractIdentityStatements::current(),
-                ContractGlyphCoverage::pinnedContractFaces())
+                ContractPrintableSet::checkout())
             : self::legacyDeclarations($buyerDeclarations);
         $items = PreparationSelection::items($items);
         $digest = Evidence::key($key);
@@ -250,8 +250,8 @@ final class ProductionCheckout
     }
 
     /**
-     * D-30 (decided 2026-11-08): true when an order's frozen v2 declaration no longer verifies against the pinned contract
-     * faces, so paid-grant finalization must hold its fulfillment for staff (the payment stays recorded). A name-only
+     * D-30 (decided 2026-11-08): true when an order's frozen v2 declaration no longer verifies against checkout's printable set
+     * (`ContractPrintableSet::verifyRetained()`), so paid-grant finalization must hold its fulfillment for staff (the payment stays recorded). A name-only
      * declaration is never held here.
      */
     public static function contractIdentityHeld(array $declarations): bool
@@ -272,7 +272,7 @@ final class ProductionCheckout
     private static function retainedIdentity(array $declarations): void
     {
         if (ContractIdentityDeclarationV2::isV2($declarations)) {
-            ContractIdentityDeclarationV2::verifyRetained($declarations, false);
+            ContractPrintableSet::verifyRetained($declarations, false);
         }
     }
 

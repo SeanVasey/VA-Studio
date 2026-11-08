@@ -13,9 +13,9 @@ use Normalizer;
 use Tests\TestCase;
 
 /**
- * D-30 step 5 / increment 4: the printable set bound to the `vasey-license-pdf-v1` faces. The `test-v2` DejaVu binding
- * that checkout uses today is unchanged; this pins what the brand faces would accept instead, so activation is a
- * reviewed decision and not a silent repertoire change.
+ * D-30 step 5 / increment 4: the printable set bound to the `vasey-license-pdf-v1` faces, and the unchanged `test-v2`
+ * DejaVu set the paid renderers use. Checkout is bound to neither since 2026-11-08: it uses the Latin Extended successor
+ * faces (`ContractPrintableSet`, VaseyLicenseV2ProfileTest). These stay pinned, so v1's repertoire is still reviewable.
  */
 class VaseyLicenseGlyphCoverageTest extends TestCase
 {
@@ -40,7 +40,7 @@ class VaseyLicenseGlyphCoverageTest extends TestCase
         }
     }
 
-    public function test_the_checkout_binding_to_dejavu_is_unchanged_and_the_brand_set_is_a_strict_subset_of_it(): void
+    public function test_the_test_v2_dejavu_set_is_unchanged_and_the_v1_brand_set_is_a_strict_subset_of_it(): void
     {
         $brand = self::accepted(ContractGlyphCoverage::vaseyLicenseFaces());
         $dejavu = self::accepted(ContractGlyphCoverage::pinnedContractFaces());
