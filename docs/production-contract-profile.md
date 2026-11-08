@@ -1,6 +1,7 @@
 # Production buyer contracts from Sean's license templates (plan, 2026-11-07)
 
-Status: **plan; increment 3 (variable binding) is implemented as a pure binder, not wired into issuance.** It narrows the production part of
+Status: **plan; increment 3 (variable binding) is implemented as a pure binder, and increment 4 (the `vasey-license-pdf-v1`
+profile) is built and pinned. Neither is wired into issuance or selected by any issuer.** It narrows the production part of
 [U-06](architecture/decision-register.md) and follows from the real BeatStars contract evidence (SRC-027 to SRC-034,
 [dry-run record](verification/beatstars-catalog-dry-run-20261107/README.md)). Buyer contracts stay test-only until each gate
 below is met.
@@ -55,12 +56,16 @@ Existing originals stay byte-preserved, and v1 and v2 stay registered for retain
 3. **Variable binding. Implemented 2026-11-07** as a pure binder (see [Variable binding](#variable-binding-increment-3-implemented-2026-11-07)).
    A closed map from the frozen grant input to the template variables. Any unknown or unfilled placeholder refuses, and nothing
    is substituted silently. Golden synthetic fixtures included. Not yet wired into issuance; increment 4 consumes it.
-4. **Profile `vasey-license-pdf-v1`.** Pin the fonts, logo and signature hash, the template layout and the renderer graph.
-   Determinism tests and a mutation check prove that a changed signature or font refuses issuance.
+4. **Profile `vasey-license-pdf-v1`. Built 2026-11-07, not selected for issuance** (see
+   [Render profile](#render-profile-increment-4-built-2026-11-07)). Pin the fonts, logo and signature hash, the template
+   layout and the renderer graph. Determinism tests and a mutation check prove that a changed signature or font refuses
+   issuance.
 5. **Activation.** Select the profile for new issuance only, never rerendering old originals. Independent review is required.
 
 The current `tc-lib` pins and the held `tc-lib` updates (Dependabot #162/#164) are re-evaluated in increment 4. A new profile is
-the one place a renderer upgrade can land safely.
+the one place a renderer upgrade can land safely. **Increment 4 kept the current pins** (tc-lib-pdf 8.76.3, tc-lib-pdf-font
+4.4.1, the same graph as `test-buyer-pdf-v2`); #162/#164 stay held and must be decided before activation, because an upgrade
+after activation needs a successor profile.
 
 ## Variable map (increment 3 design, 2026-11-07)
 
@@ -194,10 +199,145 @@ Substituted values are never scanned again, so buyer text such as a legal name o
 ### Gates for increment 4
 
 - The golden render of each of the six templates must refuse doubled symbols such as `$$` or `%%` where a template already
-  writes a symbol next to its placeholder.
+  writes a symbol next to its placeholder. **Implemented** (`doubled_symbol`); running it on the six real templates is an
+  activation step, below.
 - It must diff the placeholders actually present in the six real templates against `ContractVariableBinder::PLACEHOLDERS`
-  (review P3-2), so a template placeholder the binder does not know is caught before activation.
-- It renders the business representative line above.
+  (review P3-2), so a template placeholder the binder does not know is caught before activation. **The tool is implemented**
+  (`scripts/contract-placeholder-census.php`); it has run only on synthetic fixtures.
+- It renders the business representative line above. **Implemented.**
+
+## Render profile (increment 4, built 2026-11-07)
+
+Code: `App\Domain\Contracts\Production\VaseyLicenseProfile`, `VaseyLicenseDocument`, `VaseyLicensePdfRenderer`,
+`VaseyLicenseLayout`, `VaseyLicenseSignature` and `ContractTemplateCensus`; `ContractGlyphCoverage::vaseyLicenseFaces()`.
+Assets: `resources/contracts/vasey-license-v1/` (see its `PROVENANCE.md`). Tests: `tests/Unit/VaseyLicensePdfRendererTest.php`,
+`VaseyLicenseGlyphCoverageTest.php` and `ContractTemplateCensusTest.php`, all on synthetic fixtures and a generated stand-in
+signature.
+
+**Registration.** The profile has its own registry class, pinned by the SHA-256 of its `profile-assets.json` exactly as
+`test-buyer-pdf-v2` is pinned. It is deliberately not an entry in `ContractRenderProfileRegistry`. That file is frozen-byte
+reviewed substrate for the production free grant family (`ProductionFreeGrantFrozenBytesTest`), and anything it lists is
+accepted by `ContractRenderProfile::validate` on the test issuance path. No issuer, `VersionedContractRenderer`, policy or
+configuration selects the new profile, and a test checks that.
+
+**Manifest.** It pins the tc-lib package graph (unchanged), the implementation closure and 23 assets.
+
+The implementation pin is derived mechanically by `VaseyLicenseImplementation::closure()`. It covers every application class
+reachable from the renderer, the binder, the template census and the profile definition, through `use App\…` imports and
+same-namespace references. Today that is 25 files:
+
+- the renderer, layout, document and signature;
+- the census, binder, number speller, license constants and binding exception;
+- the v2 declaration, glyph coverage and `CheckoutException`;
+- `TypedLicenseTerms`, `ScopedLicenseTerms`, `EconomicLicenseTerms`, `TieredLicenseTerms` and `LicenseTerritories`;
+- `CanonicalJson`, `TestEnvironment`, the frozen `ContractRenderProfileRegistry` and `ContractIssuancePolicy`,
+  `ContractIssuanceException` and `RenderedContract`;
+- `VaseyLicenseProfileDefinition`, which holds the metadata, faces and logo path, and the closure class itself.
+
+A test fails when the pin and the derived closure differ. `VaseyLicenseProfile`, which holds `MANIFEST_SHA256`, is the anchor
+and cannot pin itself, so it carries no metadata, only the verification code, which is the same trust model as
+`ContractRenderProfileRegistry`. Vendor code is pinned by package identity only, for example the Laravel validator that
+`TieredLicenseTerms` calls.
+
+The 23 assets are:
+
+- the three brand woff2 faces and their OFL texts, byte-identical to `public/brand/fonts/`;
+- four static TrueType files decoded with fontTools 4.68.0 and brotli 1.2.1 (`scripts/vasey-license-fonts.py`): Bebas Neue,
+  Reddit Sans at `wght` 400 and 700 (the 700 instance renamed `RedditSans-Bold`), and JetBrains Mono at 400;
+- tc-lib's twelve generated metric and program files;
+- the unmodified lockup, `public/brand/vasey-audio-logo.png` (SHA-256 `7b0ffd26…f07571`).
+
+`php scripts/build-contract-profile-vasey-license-v1.php --check` rebuilds every asset and the manifest in a temporary
+directory and compares them byte for byte. Changing any pinned file therefore means a rebuilt manifest and a new
+`MANIFEST_SHA256`, with review.
+
+**Signature.** Sean's signature PNG is read at render time from the private local disk: `VASEY_LICENSE_SIGNATURE_PATH`,
+relative to `storage/app/private`, never under `public/` and never in Git. `VASEY_LICENSE_SIGNATURE_SHA256` pins it. A
+missing file or link refuses with `signature_unavailable`, changed bytes with `signature_changed`, and a non-PNG or oversized
+image with `signature_invalid` (each a `ContractIssuanceException`). The PDF's recorded profile hash covers the signature pin,
+so a different signature is a different profile identity. The constructor is private. Production code can only obtain a
+signature through `fromConfig()`, with its private-disk path rules. The stand-in factory `forTesting()` is refused outside the
+`testing` environment.
+
+**Document (`vasey-license-text-v1`).** The input is the license version's frozen template text, the binder's output for the
+line, and the line's frozen v2 declaration.
+
+- The map must be exactly the binder's closed set in its order. `CUSTOMER_FULLNAME`, `CUSTOMER_ADDRESS` and `CUSTOMER_ALIAS`
+  must equal the declaration's values.
+- The declaration re-verifies against the profile's own faces.
+- Substitution is the binder's one-pass `substitute`.
+- Layout: blocks are separated by blank lines. The first block is the title. A one-line block whose own literal words, with
+  placeholders removed, are all uppercase is a heading. Every other block is a paragraph that keeps its line breaks.
+- Blocks are classified on the template before substitution, so a buyer value such as an all-caps legal name can never turn a
+  paragraph into a heading.
+- Tabs and carriage returns refuse.
+
+**Layout.**
+
+- A charcoal (`#29363f`) band with the lockup at its native aspect ratio and a turquoise rule.
+- Bebas Neue for the title, headings and the two block labels; Reddit Sans for the body, justified; Reddit Sans Bold for the
+  two names in the acceptance block; JetBrains Mono for the profile name and the document URN.
+- The acceptance block follows the template text. On the left, under the label "PRODUCER / LICENSOR", are the signature, a
+  rule, the producer alias and the date. On the right, under "LICENSEE", are the licensee's legal name, then for a business
+  "Accepted for {business legal name} by {representative name}, authorized representative.", then the date. The labels and
+  "Date:" are layout text for Sean's review, not template wording.
+
+**Determinism.** The same document, profile and signature give byte-identical output, and a golden hash pins it. The creation
+and modification dates are the contract date at UTC midnight. The file and document IDs derive from the input, profile and
+signature hashes. Fonts are embedded whole and uncompressed (`font_subset: false`, `compression: false`), and the timezone is
+forced to UTC. The output does not depend on the project root.
+
+**Verified bytes.**
+
+- The manifest is read once, and the bytes that are hashed are the bytes that are decoded.
+- The logo and signature are drawn from the bytes that were hashed.
+- tc-lib reads font files itself, so the renderer gives it a private temporary copy written from the verified bytes, and
+  deletes it after rendering. Another profile's `K_PATH_FONTS` in the same process therefore cannot change the fonts.
+- Implementation files are hashed on disk, but PHP runs whatever code it has loaded. With opcache and
+  `opcache.validate_timestamps=0`, a server can keep serving code that differs from the pinned files until opcache is reset.
+  Deployment must reset opcache whenever these files change; this is an activation condition.
+
+One runtime dependency is outside the manifest: tc-lib separates a PNG's alpha channel with GD and re-encodes it, so the lockup
+and the signature pass through the host's libgd, libpng and zlib. The golden hash was produced with GD 2.3.3 and zlib 1.3.
+**Before activation, the golden render must be confirmed byte-identical on the Forge production host.** Otherwise the host's
+own hash must be pinned, with review.
+
+**Gates implemented** (each with a test):
+
+- the business representative line, present only for a business;
+- `doubled_symbol`, on the template and on every substitution boundary of the bound values. For `{PRODUCT_PRICE}` and
+  `{PRODUCT_PRICE_WORD}`, any of these refuses:
+  - a currency symbol (`\p{Sc}`: `$`, `€`, `£` …), a currency code (`USD`, `US`, `EUR`, `GBP`, `CAD`, `AUD`) or a dollar or
+    cent word before the placeholder;
+  - `dollars`, `cents` or `US Dollars` after it.
+
+  `{PUBLISHING_RIGHTS}` followed by `%`, `percent`, `per cent`, `per-cent` or `pct` refuses. A currency code after the
+  figure (`{PRODUCT_PRICE} USD`) is accepted on purpose: it names the currency of the `$` figure rather than repeating a
+  symbol or unit.
+- the placeholder census tool, which refuses any file inside the repository. It prints only placeholder names that match
+  `^[A-Z0-9_]{1,64}$`, counts and line numbers. Any other brace content is reported only as a redacted line number, and an
+  empty template is a finding (exit 1);
+- printability in the profile's own faces.
+
+**Glyph coverage, compared with DejaVu.** The brand files are Fontsource **Latin subsets**. The four faces share 214
+positive-width codepoints, all Latin or Common, and the D-30 rule accepts 212 of them (U+000D and U+00A0 are refused). The
+`test-v2` DejaVu binding, which checkout still uses and which is unchanged, accepts 3,799 under its own script restriction. The
+brand set is a strict subset of it. Covered: Basic Latin, Latin-1 Supplement, ı, Œ, œ, the typographic quotes and dashes, €
+and ™. Not covered: Latin Extended-A and B (Ł, Ż, Ș, Ț, ğ, ş and others), Latin Extended Additional (Vietnamese), Greek,
+Cyrillic, and most other symbols. Every pinned country name prints. If checkout is rebound to these faces, buyers named, for
+example, "Łukasz", "Ștefan", "Nguyễn" or "Иван" would be refused at checkout.
+
+**Remaining for activation (increment 5).**
+
+- Decide the repertoire. Accept Latin-1 only, or pin fuller builds of the same families (the Fontsource `latin-ext` subsets,
+  or upstream static TTFs) as a successor profile. Then rebind checkout (D-30 step 5) to the chosen faces.
+- Run the census and a golden render on the six real templates, locally, from private paths. Sean reviews the rendered layout,
+  the block labels and the acceptance block wording.
+- Install the real signature on the private disk with its pin. Confirm the golden hash on the Forge host (above), and reset
+  opcache on every deploy of pinned files.
+- Decide on the held tc-lib updates (#162/#164).
+- Wire the profile into the paid and paid-tax issuers for new issuance only, with independent review. This also needs the
+  D-30 prerequisites: steps 2, 3a and 3b and the U-13 retention values.
 
 ### Wording item for Sean
 
