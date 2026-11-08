@@ -194,7 +194,7 @@
         "app/Domain/Contracts/ContractIssuanceException.php": "9df97742776ba51f031b088ade0fde06e2a73ad1d90284141b91ee6e3eb8a8be",
         "app/Domain/Contracts/ContractIssuancePolicy.php": "3aa15f4485ad5cdf8d71a59f2b244abdbfe0ab0d1c2b799264041986b086dac0",
         "app/Domain/Contracts/ContractRenderProfileRegistry.php": "d6718f8f0d962679da3b6429c0edcfba76db223df216c03c99d0710f03e272e7",
-        "app/Domain/Contracts/Production/VaseyLicenseProfile.php": "df342d2faeff684b35a29e05205205b047f8b08856c49441b9844b1abfa8b38d",
+        "app/Domain/Contracts/Production/VaseyLicenseProfile.php": "6f870d4c2e2c57c8be1ed2666cc93b656a21b63319c90563efe15ca94a6f7e8d",
         "app/Domain/Contracts/Production/VaseyLicenseProfileDefinition.php": "8afaf0ce8cefb1b728689d130f9f4c54fe725ec20a8d6ff3153e7db78329587f",
         "app/Domain/Contracts/Production/VaseyLicenseV2Implementation.php": "b4be6a29fd12269a86743aeba2f1ca76d13970622a1c27844c9b54a269e48436",
         "app/Domain/Contracts/Production/VaseyLicenseV2ProfileDefinition.php": "791e6f9656dcc0a28d649fd3f1e72684c0719270140ee53da75e995f5a53b379",
