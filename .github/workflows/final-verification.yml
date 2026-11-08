@@ -116,6 +116,10 @@ jobs:
         env:
           PERSISTENT_CATALOG_REQUIRE_PHP: '1'
         run: node --test scripts/migration/persistent-catalog.test.mjs
+      # A pinned render profile refuses at runtime once any file in its implementation closure changes (#216 broke
+      # vasey-license-pdf-v1 this way unnoticed); rebuild it and compare byte for byte.
+      - name: Verify pinned contract render profiles
+        run: php scripts/build-contract-profile-vasey-license-v1.php --check
       - run: composer validate --strict
       - run: vendor/bin/pint --version
       - name: Verify private store foundations formatting
