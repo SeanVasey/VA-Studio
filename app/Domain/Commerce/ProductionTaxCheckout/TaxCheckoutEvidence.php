@@ -2,6 +2,7 @@
 
 namespace App\Domain\Commerce\ProductionTaxCheckout;
 
+use App\Domain\Commerce\ContractIdentity\ContractIdentityDeclarationV2;
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionCheckout\Evidence;
 use App\Domain\Commerce\ProductionCheckout\OwnAccountStripeGateway;
@@ -15,10 +16,17 @@ use Carbon\CarbonImmutable;
  */
 final class TaxCheckoutEvidence
 {
-    /** What the buyer previews and then assents to before any provider exists: terms and pre-tax prices only. */
-    public static function commitment(array $buyer, array $candidate, TaxExecutionContext $context, array $selection, array $machine): array
+    /**
+     * What the buyer previews and then assents to before any provider exists: terms and pre-tax prices only. With D-30
+     * contract identity capture on, it also names the declaration schema the preview offered; with it off the commitment
+     * is byte-identical to the original.
+     */
+    public static function commitment(array $buyer, array $candidate, TaxExecutionContext $context, array $selection, array $machine,
+        bool $contractIdentity = false): array
     {
-        return ['schema_version' => 1, 'purpose' => 'production_tax_checkout_preview', 'buyer_origin_id' => $buyer['origin_id'],
+        $identity = $contractIdentity ? ['contract_identity' => ContractIdentityDeclarationV2::SCHEMA] : [];
+
+        return $identity + ['schema_version' => 1, 'purpose' => 'production_tax_checkout_preview', 'buyer_origin_id' => $buyer['origin_id'],
             'buyer_provenance' => $buyer['provenance'], 'candidate' => $candidate, 'execution_context' => $context->binding(),
             'selection_hash' => $selection['selection_hash'], 'seller' => $machine['choices']['seller_identity'],
             'assent' => $machine['choices']['assent'], 'amounts' => self::preTax($selection['selection']['advertised_subtotal_minor'])];
@@ -40,11 +48,13 @@ final class TaxCheckoutEvidence
                 && $line['amount_minor'] === $line['selection']['price_minor'] && $line['selection']['position'] === $line['position']);
             $subtotal += $line['amount_minor'];
         }
-        $commitment = self::commitment($body['buyer'], $body['candidate'], $context, $body['selection'], $body['machine']);
+        $identity = ContractIdentityDeclarationV2::isV2($body['buyer_declarations']);
+        $commitment = self::commitment($body['buyer'], $body['candidate'], $context, $body['selection'], $body['machine'], $identity);
         CheckoutException::require($record['buyer_origin_id'] === $body['buyer']['origin_id'] && $record['candidate_id'] === $body['candidate']['candidate_id']
             && $record['request_hash'] === $body['request_hash'] && $body['request_hash'] === CanonicalJson::hash($body['request'])
             && $record['request_key'] === $body['request']['key_digest'] && $body['request']['buyer_origin_id'] === $body['buyer']['origin_id']
             && $body['request']['preview_hash'] === $body['preview_hash'] && $body['preview_hash'] === CanonicalJson::hash($commitment)
+            && $body['buyer_declarations'] === $body['request']['buyer_declarations']
             && $body['selection_hash'] === $body['selection']['selection_hash'] && $record['currency'] === 'USD'
             && $record['subtotal_minor'] === $subtotal && $subtotal === $body['selection']['selection']['advertised_subtotal_minor']
             && $record['line_count'] === count($body['lines']) && count($body['lines']) === count($body['selection']['selection']['lines'])
@@ -54,6 +64,10 @@ final class TaxCheckoutEvidence
                 ->addSeconds($context->reservationSeconds)->format('Y-m-d\TH:i:s\Z'));
         Evidence::same(['kind' => 'unscoped_nonexclusive', 'selection_hash' => $body['selection_hash']], $body['inventory']);
         Evidence::same([...$body['machine']['choices']['assent'], 'accepted' => true, 'preview_hash' => $body['preview_hash'], 'accepted_at' => $record['created_at']], $body['assent']);
+        if ($identity) {
+            // This checkout sells non-exclusive licenses only.
+            ContractIdentityDeclarationV2::verifyRetained($body['buyer_declarations'], false);
+        }
 
         return ['row' => $record, 'body' => $body, 'context' => $context];
     }

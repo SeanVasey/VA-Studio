@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Domain\Commerce\ContractIdentity\ContractGlyphCoverage;
 use App\Domain\Commerce\ContractIdentity\ContractIdentityDeclarationV2;
+use App\Domain\Commerce\ContractIdentity\ContractIdentityStatements;
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Rights\LicenseTerritories;
 use App\Support\CanonicalJson;
@@ -194,6 +195,75 @@ class ContractIdentityDeclarationV2Test extends TestCase
                 $this->fail(json_encode($scripts));
             } catch (InvalidArgumentException) {
                 $this->addToAssertionCount(1);
+            }
+        }
+    }
+
+    /**
+     * The client echoes only the version, so a version must name exactly one text. Changing an approved statement's wording
+     * without a new version fails here; a new wording adds a new pinned entry.
+     */
+    public function test_each_approved_statement_version_is_pinned_to_the_hash_of_its_exact_text(): void
+    {
+        $pinned = [
+            'individual-legal-name-confirmation-v1' => '33c2396ddf79074ee3d3d119d8dba92aaac2b7f52f1d2f92bf2a30cf0c7c536d',
+            'business-legal-name-confirmation-v1' => 'd6c98ec7054aa591cb4bbe91e734b49c32ab500842a4b4f79a833a1d0fa98c81',
+        ];
+        $current = [];
+        foreach (ContractIdentityStatements::TEXTS as $statement) {
+            $current[$statement['statement_version']] = hash('sha256', $statement['text']);
+        }
+        $this->assertSame($pinned, $current);
+        $this->assertSame($pinned, array_column(ContractIdentityStatements::current(), 'statement_hash', 'statement_version'));
+        $this->assertSame($pinned, array_column(ContractIdentityStatements::offered(), 'statementHash', 'statementVersion'));
+    }
+
+    public function test_the_displayed_statement_version_must_be_the_one_offered_for_the_buyers_type(): void
+    {
+        $declaration = ContractIdentityDeclarationV2::fromDisplayedInput(self::input(['statementVersion' => self::STATEMENT['statement_version']]),
+            false, self::STATEMENTS, self::coverage());
+        $this->assertSame(ContractIdentityDeclarationV2::fromInput(self::input(), false, self::STATEMENTS, self::coverage()), $declaration);
+        $business = ContractIdentityDeclarationV2::fromDisplayedInput(self::input(['licenseeType' => 'business', 'legalName' => 'Example Records LLC',
+            'representativeName' => 'Zoë Émile', 'statementVersion' => self::BUSINESS_STATEMENT['statement_version']]), false, self::STATEMENTS, self::coverage());
+        $this->assertSame(self::BUSINESS_STATEMENT['statement_version'], $business['legal_name_confirmation']['statement_version']);
+
+        // The wording changed after the buyer saw it: the server now offers a new version, so the echoed one refuses.
+        $reworded = [...self::STATEMENTS, 'individual' => ['statement_version' => 'individual-legal-name-confirmation-v2', 'statement_hash' => str_repeat('c', 64)]];
+        foreach ([
+            'statement changed after display' => [self::input(['statementVersion' => self::STATEMENT['statement_version']]), $reworded],
+            'the other type\'s statement' => [self::input(['statementVersion' => self::BUSINESS_STATEMENT['statement_version']]), self::STATEMENTS],
+            'a prefix of the offered version' => [self::input(['statementVersion' => 'individual-legal-name-confirmation']), self::STATEMENTS],
+        ] as $name => [$input, $statements]) {
+            try {
+                ContractIdentityDeclarationV2::fromDisplayedInput($input, false, $statements, self::coverage());
+                $this->fail($name);
+            } catch (CheckoutException $e) {
+                $this->assertSame(['changed', 409], [$e->reason, $e->status], $name);
+            }
+        }
+        // A missing or non-string echo is a shape error, and other shape errors still report before a statement mismatch.
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromDisplayedInput(self::input(), false, self::STATEMENTS, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromDisplayedInput(self::input(['statementVersion' => null]), false, self::STATEMENTS, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromDisplayedInput(self::input(['statementVersion' => ['x']]), false, self::STATEMENTS, self::coverage()));
+        $this->refuses('invalid', fn () => ContractIdentityDeclarationV2::fromDisplayedInput(self::input(['statementVersion' => 'stale', 'legalNameConfirmed' => false]),
+            false, self::STATEMENTS, self::coverage()));
+    }
+
+    public function test_a_retained_declaration_that_no_longer_verifies_is_an_evidence_refusal(): void
+    {
+        $declaration = ContractIdentityDeclarationV2::fromInput(self::input(['legalName' => 'Zoë Émile']), false, self::STATEMENTS, self::coverage());
+        ContractIdentityDeclarationV2::verifyRetained($declaration, false);
+        foreach ([
+            'unprintable name' => [[...$declaration, 'legal_name' => '王小明'], false],
+            'artist name on a non-exclusive order' => [[...$declaration, 'artist_name' => 'DJ Example'], false],
+            'exclusive without an artist name' => [$declaration, true],
+            'legacy shape' => [['legal_name' => 'Zoë Émile', 'identity_meaning' => 'buyer_declared_legal_name'], false],
+        ] as $name => [$retained, $exclusive]) {
+            try {
+                ContractIdentityDeclarationV2::verifyRetained($retained, $exclusive);
+                $this->fail($name);
+            } catch (CheckoutException $e) {
+                $this->assertSame(['changed', 409], [$e->reason, $e->status], $name);
             }
         }
     }

@@ -4,17 +4,27 @@ namespace Tests\Feature\ProductionTaxCheckout;
 
 use App\Domain\Commerce\ContractIdentity\ContractIdentityStatements;
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
+use App\Domain\Commerce\ProductionCheckout\CommandTransaction;
 use App\Domain\Commerce\ProductionCheckout\Evidence;
+use App\Domain\Commerce\ProductionCheckout\Records;
+use App\Domain\Commerce\ProductionPreparation\PreparationSelection;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxCheckout;
+use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutEvidence;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutPolicy;
+use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutRecords;
 use App\Domain\Customers\ProductionCustomerAccess;
+use App\Support\CanonicalJson;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ProductionTaxCheckoutFixtures;
 use Tests\Support\RecordingTaxCheckoutTransport;
 use Tests\TestCase;
 
-/** D-30 step 5: the tax checkout freezes the v2 contract identity behind a literal-false, local/testing-only gate. */
+/**
+ * D-30 step 5: the tax checkout freezes the v2 contract identity behind a literal-false, local/testing-only gate. Step 6
+ * binds the confirmation statement the buyer was shown (the echoed `statementVersion`) and the gate state (the preview
+ * commitment) to the order.
+ */
 class ProductionTaxCheckoutContractIdentityTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
@@ -43,10 +53,13 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
             $f['preview']['previewHash'], true, $declarations, $key);
     }
 
+    /** Checkout input that echoes the statement the preview displayed for its licensee type, unless the override names one. */
     private static function identity(array $overrides = []): array
     {
-        return array_replace(['licenseeType' => 'individual', 'legalName' => ' Zoë Émile ', 'legalNameConfirmed' => true,
+        $identity = array_replace(['licenseeType' => 'individual', 'legalName' => ' Zoë Émile ', 'legalNameConfirmed' => true,
             'postalAddress' => ['country' => 'US', 'lines' => ['1 Example Street'], 'locality' => 'Springfield', 'region' => 'IA', 'postalCode' => '50000']], $overrides);
+
+        return $identity + ['statementVersion' => ContractIdentityStatements::offered()[$identity['licenseeType']]['statementVersion']];
     }
 
     private static function frozenDeclarations(): array
@@ -115,6 +128,7 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
     {
         config(['production-tax-checkout.contract_identity_v2' => true]);
         $f = $this->checkout();
+        $this->refuses('invalid', fn () => $this->order($f, self::identity(['licenseeType' => 'business', 'legalName' => 'Example Records LLC'])));
         $this->order($f, self::identity(['licenseeType' => 'business', 'legalName' => 'Example Records LLC', 'representativeName' => 'Zoë Émile']));
 
         $frozen = self::frozenDeclarations();
@@ -132,6 +146,139 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
         $this->refuses('invalid', fn () => $this->order($f, self::identity(['artistName' => 'DJ Example'])));
         $this->refuses('invalid', fn () => $this->order($f, self::identity(['legalNameConfirmed' => false])));
         $this->assertSame(0, DB::table('production_tax_checkout_orders')->count());
+    }
+
+    public function test_with_the_gate_off_the_preview_commitment_request_and_order_bytes_are_the_original_ones(): void
+    {
+        $f = $this->checkout();
+        $order = $this->order($f, ['legalName' => ' Declared synthetic buyer ']);
+        $row = (array) DB::table('production_tax_checkout_orders')->sole();
+        $body = Evidence::open($row, 'production_tax_checkout_order');
+
+        // The original ten-key commitment, spelled out here rather than through TaxCheckoutEvidence::commitment().
+        $commitment = ['schema_version' => 1, 'purpose' => 'production_tax_checkout_preview', 'buyer_origin_id' => $body['buyer']['origin_id'],
+            'buyer_provenance' => $body['buyer']['provenance'], 'candidate' => $body['candidate'], 'execution_context' => $body['execution_context'],
+            'selection_hash' => $body['selection_hash'], 'seller' => $body['machine']['choices']['seller_identity'], 'assent' => $body['machine']['choices']['assent'],
+            'amounts' => ['currency' => 'USD', 'subtotal_minor' => $body['amounts']['subtotal_minor'], 'tax' => 'calculated_by_provider_at_hosted_checkout',
+                'total' => 'reviewed_by_buyer_at_hosted_checkout']];
+        $this->assertSame(CanonicalJson::hash($commitment), $f['preview']['previewHash']);
+        // The original preview response, byte for byte.
+        $preview = ['candidateId' => $body['candidate']['candidate_id'], 'seller' => $commitment['seller'], 'assent' => $commitment['assent'],
+            'amounts' => $commitment['amounts'], 'fundsMode' => $body['execution_context']['funds_mode'], 'taxBehavior' => $body['execution_context']['tax']['behavior'],
+            'licenses' => array_map(fn (array $line): array => ['position' => $line['position'], 'trackId' => $line['track_id'],
+                'offerRevisionId' => $line['offer_revision_id'], 'trackTitle' => $line['offer_snapshot']['product']['title'],
+                'artist' => $line['offer_snapshot']['product']['artist'], 'licenseVersionId' => $line['license_version_id'],
+                'priceMinor' => $line['price_minor'], 'license' => array_intersect_key($line['offer_snapshot']['license'],
+                    array_flip(['name', 'version', 'authored_source', 'source_hash', 'structured_terms', 'features']))], $body['selection']['selection']['lines']),
+            'previewHash' => $f['preview']['previewHash']];
+        // Stored snapshots are canonical (sorted) while the live response keeps source order, so the top-level key order is
+        // compared exactly and the content as canonical bytes.
+        $this->assertSame(array_keys($preview), array_keys($f['preview']));
+        $this->assertSame(CanonicalJson::encode($preview), CanonicalJson::encode($f['preview']));
+        // The original request bytes and hash, and the original order body keys and declaration bytes.
+        $request = ['candidate_id' => $f['catalog']['candidate']->id, 'items' => PreparationSelection::items($f['catalog']['items']),
+            'preview_hash' => $f['preview']['previewHash'], 'accepted' => true, 'buyer_origin_id' => $body['buyer']['origin_id'],
+            'buyer_declarations' => ['legal_name' => 'Declared synthetic buyer', 'identity_meaning' => 'buyer_declared_legal_name'],
+            'key_digest' => Evidence::key('synthetic-identity-order')];
+        $this->assertSame(CanonicalJson::encode($request), CanonicalJson::encode($body['request']));
+        $this->assertSame(CanonicalJson::hash($request), $row['request_hash']);
+        $this->assertSame(CanonicalJson::encode($request['buyer_declarations']), CanonicalJson::encode($body['buyer_declarations']));
+        // The sealed body is canonical JSON, so its key set fixes its bytes' layout: exactly the original twenty keys.
+        $this->assertEqualsCanonicalizing(['schema_version', 'purpose', 'public_id', 'created_at', 'request', 'request_hash', 'preview_hash', 'buyer',
+            'buyer_declarations', 'candidate', 'machine', 'execution_context', 'selection', 'selection_hash', 'seller', 'assent', 'amounts', 'lines',
+            'inventory', 'expires_at'], array_keys($body));
+        $this->assertSame(['orderId', 'createdAt', 'amounts', 'assentAccepted', 'fundsMode', 'paymentStatus', 'fulfillmentStatus'], array_keys($order));
+    }
+
+    public function test_with_the_gate_on_the_order_must_echo_the_statement_the_preview_displayed(): void
+    {
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $f = $this->checkout();
+        // A different version than the one displayed is what a wording change between preview and order looks like here.
+        $this->refuses('changed', fn () => $this->order($f, self::identity(['statementVersion' => 'individual-legal-name-confirmation-v0'])));
+        $this->refuses('changed', fn () => $this->order($f, self::identity(['statementVersion' => ContractIdentityStatements::offered()['business']['statementVersion']])));
+        $this->refuses('invalid', fn () => $this->order($f, array_diff_key(self::identity(), ['statementVersion' => true])));
+        $this->refuses('invalid', fn () => $this->order($f, self::identity(['statementVersion' => null])));
+        $this->assertSame(0, DB::table('production_tax_checkout_orders')->count());
+    }
+
+    public function test_a_gate_flip_between_preview_and_order_refuses_in_either_direction(): void
+    {
+        $f = $this->checkout();
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $this->refuses('changed', fn () => $this->order($f, self::identity()));
+
+        $on = $this->checkout2($f);
+        config(['production-tax-checkout.contract_identity_v2' => false]);
+        $this->refuses('changed', fn () => $this->order($on, ['legalName' => 'Declared synthetic buyer']));
+        $this->refuses('invalid', fn () => $this->order($on, self::identity()));
+        $this->assertSame(0, DB::table('production_tax_checkout_orders')->count());
+        $this->assertNotSame($f['preview']['previewHash'], $on['preview']['previewHash']);
+    }
+
+    public function test_replay_after_a_gate_flip_refuses_and_writes_nothing_until_the_gate_is_restored(): void
+    {
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $f = $this->checkout();
+        $order = $this->order($f, self::identity());
+        config(['production-tax-checkout.contract_identity_v2' => false]);
+        $this->refuses('invalid', fn () => $this->order($f, self::identity()));
+        $this->refuses('changed', fn () => $this->order($f, ['legalName' => 'Zoë Émile']));
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $this->assertSame($order['orderId'], $this->order($f, self::identity())['orderId']);
+        $this->assertSame(1, DB::table('production_tax_checkout_orders')->count());
+    }
+
+    public function test_legacy_order_evidence_requires_the_body_declarations_to_equal_the_requests(): void
+    {
+        $legacy = $this->checkout();
+        $this->order($legacy, ['legalName' => 'Declared synthetic buyer']);
+        $row = (array) DB::table('production_tax_checkout_orders')->sole();
+        $this->assertSame($row['public_id'], self::openOrder($row)['row']['public_id']);
+        $body = Evidence::open($row, 'production_tax_checkout_order');
+        $this->refusesEvidence(self::resealed($row, [...$body, 'buyer_declarations' => ['legal_name' => 'Someone Else', 'identity_meaning' => 'buyer_declared_legal_name']]));
+    }
+
+    public function test_v2_order_evidence_requires_equal_declarations_and_reverifies_them_when_opened(): void
+    {
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $f = $this->checkout();
+        $this->order($f, self::identity());
+        $row = (array) DB::table('production_tax_checkout_orders')->sole();
+        $body = Evidence::open($row, 'production_tax_checkout_order');
+        $this->assertSame($body['buyer_declarations'], self::openOrder($row)['body']['buyer_declarations']);
+        $this->refusesEvidence(self::resealed($row, [...$body, 'buyer_declarations' => [...$body['buyer_declarations'], 'legal_name' => 'Someone Else']]));
+        // Consistent in the request and the body, so only the re-verification can refuse it: the name cannot be printed.
+        $unprintable = [...$body['buyer_declarations'], 'legal_name' => '王小明'];
+        $request = [...$body['request'], 'buyer_declarations' => $unprintable];
+        $this->refusesEvidence([...self::resealed($row, [...$body, 'request' => $request, 'request_hash' => CanonicalJson::hash($request),
+            'buyer_declarations' => $unprintable]), 'request_hash' => CanonicalJson::hash($request)]);
+    }
+
+    /** A second preview for the same buyer and catalog, under the gate as it is now. */
+    private function checkout2(array $f): array
+    {
+        return [...$f, 'preview' => $f['checkout']->preview($f['buyer']['principal'], $f['buyer']['user'], $f['catalog']['candidate']->id, $f['catalog']['items'])];
+    }
+
+    private static function openOrder(array $row): array
+    {
+        return CommandTransaction::run(fn (Records $rows): array => TaxCheckoutEvidence::order(TaxCheckoutRecords::writer($rows), $row));
+    }
+
+    private static function resealed(array $row, array $body): array
+    {
+        return [...$row, ...Evidence::seal($body)];
+    }
+
+    private function refusesEvidence(array $row): void
+    {
+        try {
+            self::openOrder($row);
+            $this->fail('Expected the tampered order evidence to refuse.');
+        } catch (CheckoutException $e) {
+            $this->assertSame(['changed', 409], [$e->reason, $e->status]);
+        }
     }
 
     public function test_the_approved_statements_match_the_terms_draft_verbatim(): void

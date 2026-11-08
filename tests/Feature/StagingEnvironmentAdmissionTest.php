@@ -149,6 +149,8 @@ class StagingEnvironmentAdmissionTest extends TestCase
         // #120-#125: Tax V2 checkout, paid-tax delivery and financial inspection rehearsals read the captured
         // environment without resolving it and admit only local/testing; the Tax HTTP mount also needs literal true.
         'app/Domain/Commerce/ProductionTaxCheckout/FreshTaxCheckoutPolicy.php',
+        // D-30 step 6: V1 contract identity capture has its own literal-false gate and admits only local/testing.
+        'app/Domain/Commerce/ProductionCheckout/ContractIdentityPolicy.php',
         'app/Domain/Grants/PaidTax/PaidTaxPolicy.php',
         'app/Domain/Grants/PaidTax/PaidTaxRuntime.php',
         'app/Domain/Grants/PaidTax/PaidTaxDeliveryPolicy.php',

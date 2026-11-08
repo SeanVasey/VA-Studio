@@ -13,6 +13,10 @@ return [
     // reconciliation command; ProductionCheckoutPrivacy re-checks it on every request. Turning it on is a reviewed code change,
     // and ops/production/validate-runtime.php holds it false. Mounting approves nothing: every switch below stays as configured.
     'mounted' => false,
+    // D-30 contract identity capture for the V1 review (confirmed legal name, postal address, licensee type and representative).
+    // A code literal, never an environment read: refused everywhere unless exactly true AND the environment is local or testing
+    // (ContractIdentityPolicy). It opens only with the vasey-license-pdf-v1 profile, because the paid renderers print every field.
+    'contract_identity_v2' => false,
     'http_enabled' => env('PRODUCTION_CHECKOUT_HTTP_ENABLED', false),
     'fresh_checkout_enabled' => env('PRODUCTION_CHECKOUT_ENABLED', false),
     'reconciliation_enabled' => env('PRODUCTION_CHECKOUT_RECONCILIATION_ENABLED', false),

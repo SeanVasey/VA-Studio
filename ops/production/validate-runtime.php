@@ -220,6 +220,9 @@ try {
         }
         // The composition gate is a code literal (lane PCC); lifting it is a reviewed change here too, with Sean's authorization.
         $check('holds.production_checkout_mounted', config('production_checkout.mounted') === false);
+        // D-30 contract identity capture is a code literal on each checkout; its policies also refuse outside local/testing.
+        $check('holds.production_checkout_contract_identity_v2', config('production_checkout.contract_identity_v2') === false);
+        $check('holds.production_tax_checkout_contract_identity_v2', config('production-tax-checkout.contract_identity_v2') === false);
         $check('holds.production_credentials', $liveStripe
             ? (in_array(config('production_checkout.secret_key'), [null, ''], true) || $liveSecret(config('production_checkout.secret_key')))
                 && in_array(config('production_checkout.funds_mode'), [null, '', 'live'], true)
