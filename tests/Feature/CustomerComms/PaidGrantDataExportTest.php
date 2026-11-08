@@ -435,6 +435,20 @@ class PaidGrantDataExportTest extends TestCase
         $this->refusesExport($account, 413, 'export_too_large');
     }
 
+    public function test_stored_payloads_past_the_byte_budget_refuse_before_any_payload_is_loaded(): void
+    {
+        $f = $this->paidV1();
+        $account = self::account($f['buyer']);
+        $this->assertCount(1, app(PaidGrantExportSection::class)->build($account)['paidGrantOrders']);
+        $this->dropTriggers(['paid_grant_origins']);
+        $line = (array) DB::table('paid_grant_origins')->sole();
+        // Unreadable bytes: a 413 here (not the 503 an opened payload gives) proves the budget is checked before loading.
+        DB::table('paid_grant_origins')->where('id', $line['id'])->update(['payload' => str_repeat('x', PaidGrantExportSection::MAX_PAYLOAD_BYTES + 1)]);
+        $this->refusesExport($account, 413, 'export_too_large');
+        DB::table('paid_grant_origins')->where('id', $line['id'])->update(['payload' => $line['payload']]);
+        $this->assertCount(1, app(PaidGrantExportSection::class)->build($account)['paidGrantOrders']);
+    }
+
     public function test_an_exemption_basis_whose_sealed_buyer_does_not_match_refuses_the_export(): void
     {
         $f = $this->payable(false);

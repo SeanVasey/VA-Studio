@@ -54,6 +54,13 @@ final class PaidGrantExportSection
      */
     public const MAX_DOWNLOADS = self::MAX_LINES * 10;
 
+    /**
+     * Stored payload bytes this chain may load (batches, lines, originals and redeemed authorizations). The finished export
+     * is at most `export_max_bytes` (1 MiB by default), so a valid export needs far less; the budget makes an account near
+     * the row caps refuse with 413 before loading, instead of exhausting PHP memory (256M in the FPM pools) mid-build.
+     */
+    public const MAX_PAYLOAD_BYTES = 16 * 1024 * 1024;
+
     /** @return array{paidGrantOrders: list<array>, paidTaxGrantOrders: list<array>} */
     public function build(int $accountId): array
     {
@@ -83,6 +90,20 @@ final class PaidGrantExportSection
         }
 
         return $counts;
+    }
+
+    /** Stored payload bytes the export would load, summed in the database so nothing is loaded to measure it. */
+    private static function payloadBytes(array $chain, int $accountId): int
+    {
+        $length = DB::raw('COALESCE(SUM(LENGTH(payload)), 0) as bytes');
+        $batch = DB::table($chain['tables']['batch'])->where('account_id', $accountId)->value($length);
+        $lines = self::lines($chain, $accountId)->value(DB::raw('COALESCE(SUM(LENGTH(l.payload)), 0) as bytes'));
+        $originals = self::originals($chain, $accountId)->value(DB::raw('COALESCE(SUM(LENGTH(o.payload)), 0) as bytes'));
+        $redeemed = DB::table($chain['tables']['authorization'].' as a')
+            ->join($chain['tables']['redemption'].' as r', 'r.authorization_id', '=', 'a.id')
+            ->where('a.account_id', $accountId)->value(DB::raw('COALESCE(SUM(LENGTH(a.payload)), 0) as bytes'));
+
+        return (int) $batch + (int) $lines + (int) $originals + (int) $redeemed;
     }
 
     private static function installed(string $table): void
@@ -122,6 +143,9 @@ final class PaidGrantExportSection
         if ($batchCount > self::MAX_RECORDS || self::lines($chain, $accountId)->count() > self::MAX_LINES
             || self::originals($chain, $accountId)->count() > self::MAX_LINES
             || self::redemptions($chain, $accountId)->count() > self::MAX_DOWNLOADS) {
+            throw new DataRightsException(413, 'export_too_large');
+        }
+        if (self::payloadBytes($chain, $accountId) > self::MAX_PAYLOAD_BYTES) {
             throw new DataRightsException(413, 'export_too_large');
         }
         if ($batchCount === 0) {
