@@ -39,9 +39,10 @@ trait ProductionTaxCheckoutContractIdentityForgery
     /**
      * The retained provider request and session binding `initiate` would have written for an order, written directly (the
      * forged order's initiate refuses), so reconciliation can record a synthetic payment for it. Returns the request params
-     * the synthetic transport must answer for.
+     * the synthetic transport must answer for. With $sessionId null only the request is written (no binding), and its
+     * public id is returned as `request_id` beside the params.
      */
-    private static function forgedTaxSession(string $orderId, string $sessionId): array
+    private static function forgedTaxSession(string $orderId, ?string $sessionId): array
     {
         $order = CommandTransaction::run(fn (Records $rows): array => TaxCheckoutEvidence::order(TaxCheckoutRecords::writer($rows),
             TaxCheckoutRecords::writer($rows)->one('order', $orderId), false));
@@ -53,6 +54,9 @@ trait ProductionTaxCheckoutContractIdentityForgery
             'order_id' => $order['row']['id'], 'account_id' => $context->accountId, 'funds_mode' => $context->fundsMode,
             'idempotency_key' => $body['idempotency_key'], 'currency' => 'USD', 'subtotal_minor' => $order['row']['subtotal_minor'],
             'tax_behavior' => $context->taxBehavior, 'maximum_rate_bps' => $context->maximumRateBps, 'provider_expires_at' => $body['provider_expires_at']]);
+        if ($sessionId === null) {
+            return ['request_id' => $public, 'params' => $body['params']];
+        }
         $request = ['row' => (array) DB::table(TaxCheckoutSchema::TABLES['request'])->where('id', $requestId)->sole(), 'body' => $body];
         $bindingId = (string) Str::uuid();
         $binding = TaxCheckoutEvidence::binding($request, $bindingId, $at, $sessionId);

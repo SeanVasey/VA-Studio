@@ -45,6 +45,10 @@ final class TaxCheckoutEvidence
      * the paths that retrieve or record an already created provider session pass false (reconcile, its retained write and
      * write admission, and status), so a captured payment is always recorded; initiate, bind, accept and the paid-tax source
      * re-verify, and paid-tax finalization holds fulfillment of an order whose declaration no longer verifies.
+     *
+     * @internal $reverify = false is allowed only on those record/status paths (ProductionTaxCheckout::prepare(create: false),
+     *           retain(), status(), TaxCheckoutWriteAdmission::retained) and, through ProductionTaxPaidOrderSourceV2::lockedRead,
+     *           in PaidTaxGrants::finalize, which must then run the contract identity hold itself. Every other caller keeps the default.
      */
     public static function order(TaxCheckoutRecords $tax, array $record, bool $reverify = true): array
     {

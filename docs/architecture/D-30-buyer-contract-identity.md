@@ -245,6 +245,9 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
      order row, and deduplicated per order. Staff read it in the admin panel's read-only "Held paid orders" list
      (`ContractIdentityHoldResource`, `administer-catalog` checked on the server, in the query and on every Livewire request,
      with required panel MFA). Not built: notification to staff, or a way to release a hold (staff act outside the system).
+     The record is written only when finalization runs, which the buyer starts: a buyer who pays and never finalizes leaves
+     no staff signal (no other write path is added). Known behaviour: a held order still shows the buyer
+     `fulfillmentStatus: pending_fulfillment` (checkout `status` reports the recorded payment, not the hold).
    - [x] `initiate` refuses a v2 order while the gate is off, in both checkouts (decided 2026-11-08), before any row or
      provider call.
    - [x] An already paid name-only order with the gate on answers its status from `initiate` with no provider call

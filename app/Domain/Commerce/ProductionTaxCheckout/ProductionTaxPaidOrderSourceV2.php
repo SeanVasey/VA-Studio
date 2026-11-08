@@ -37,6 +37,9 @@ final readonly class ProductionTaxPaidOrderSourceV2 implements \JsonSerializable
      * The consumer must prelock T23 historical identity before calling this under its captured transaction. The order's v2
      * contract identity declaration is re-verified unless $reverify is false; D-30 (decided 2026-11-08): only paid-tax
      * finalization passes false, because it holds fulfillment of such an order itself (`contract_identity_held`).
+     *
+     * @internal $reverify = false is allowed only in PaidTaxGrants::finalize, which must run the contract identity hold
+     *           (ProductionCheckout::contractIdentityHeld) on every line before any write. Every other consumer keeps the default.
      */
     public static function lockedRead(ProductionTaxPaidOrderLocatorV2 $locator, CurrentRows $reader, array $prelockedIdentityRaw, bool $reverify = true): self
     {

@@ -511,4 +511,23 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
         $this->assertSame($calls, $f['transport']->calls);
         $this->assertSame([1, 1], self::paymentCounts());
     }
+
+    /**
+     * Review P3-2: bind() (the internal write after initiate's provider create) re-verifies the declaration itself, so a
+     * declaration that stops verifying between initiate's checks and the binding write is never bound.
+     */
+    public function test_bind_refuses_a_v2_declaration_that_no_longer_verifies_and_writes_no_binding(): void
+    {
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $f = $this->payable();
+        $this->order($f, self::identity());
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $forged = self::forgedUnprintableTaxOrder();
+        $request = self::forgedTaxSession($forged, null)['request_id'];
+        $bind = new \ReflectionMethod(ProductionTaxCheckout::class, 'bind');
+
+        $this->refuses('changed', fn () => $bind->invoke($f['checkout'], $request, RecordingTaxCheckoutTransport::SESSION, $forged));
+        $this->assertDatabaseCount(TaxCheckoutSchema::TABLES['binding'], 0);
+        $this->assertSame([], $f['transport']->calls);
+    }
 }
