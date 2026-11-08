@@ -211,4 +211,6 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
    - [x] Name-only orders left unpaid: while the checkout's gate is on, `initiate` refuses an order frozen with the name-only
      declaration (`changed`), in both checkouts; with the gate off nothing changes. Still open: `reconcile` records a
      name-only order's payment with the gate on (a session opened before the flip can still be paid on the provider's
-     page), so the activation runbook must still decide whether to expire those open sessions or drain them first.
+     page), so the activation runbook must still decide whether to expire those open sessions or drain them first. With the
+     gate on, `initiate` on an already paid or bound name-only order now answers `changed` instead of its status; `status`
+     is unaffected, and the runbook should say so for buyer support.
