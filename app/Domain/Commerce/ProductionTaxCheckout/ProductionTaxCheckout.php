@@ -33,22 +33,23 @@ final class ProductionTaxCheckout
     public function preview(ProductionCustomerPrincipal $principal, User $buyer, int $candidateId, array $items): array
     {
         TaxCheckoutPolicy::requireEnabled();
+        $identity = TaxCheckoutPolicy::contractIdentityV2();
         $items = PreparationSelection::items($items);
-        $result = CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $candidateId, $items): array {
+        $result = CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $candidateId, $items, $identity): array {
             $tax = TaxCheckoutRecords::writer($rows);
             $access = $this->access->lock($principal, $buyer, $tax->current);
             $binding = $this->access->durableBinding($principal);
             $candidate = TaxCandidate::load($tax->current, $candidateId);
             $candidate['context']->requireBuyer($binding);
             $selection = CurrentSelection::load($tax->current, $items, CarbonImmutable::now('UTC'));
-            $commitment = TaxCheckoutEvidence::commitment($binding, $candidate['binding'], $candidate['context'], $selection, $candidate['machine']);
+            $commitment = TaxCheckoutEvidence::commitment($binding, $candidate['binding'], $candidate['context'], $selection, $candidate['machine'], $identity);
             CurrentSelection::proveBytes($selection);
             CurrentSelection::proveCurrent($tax->current, $selection, CarbonImmutable::now('UTC'));
             TaxCandidate::proveCurrent($tax->current, $candidate);
             $this->access->proveCurrent($principal, $buyer, $tax->current, $access);
             TaxCheckoutPolicy::requireEnabled();
 
-            return self::termsProjection($commitment, $selection) + ['previewHash' => CanonicalJson::hash($commitment)];
+            return self::termsProjection($commitment, $selection, $identity) + ['previewHash' => CanonicalJson::hash($commitment)];
         });
         $this->access->current($principal, $buyer);
 
@@ -61,15 +62,17 @@ final class ProductionTaxCheckout
         TaxCheckoutPolicy::requireEnabled();
         $fresh = FreshTaxCheckoutPolicy::capture();
         CheckoutException::require($accepted === true && Evidence::hash($previewHash), 'invalid', 422);
-        $declarations = TaxCheckoutPolicy::contractIdentityV2()
-            // D-30: the licensee identity a production contract binds. This checkout sells non-exclusive licenses only.
-            ? ContractIdentityDeclarationV2::fromInput($buyerDeclarations, false, ContractIdentityStatements::current(),
+        $identity = TaxCheckoutPolicy::contractIdentityV2();
+        $declarations = $identity
+            // D-30: the licensee identity a production contract binds, confirmed against the statement version the preview
+            // displayed. This checkout sells non-exclusive licenses only.
+            ? ContractIdentityDeclarationV2::fromDisplayedInput($buyerDeclarations, false, ContractIdentityStatements::current(),
                 ContractGlyphCoverage::pinnedContractFaces())
             : self::legacyDeclarations($buyerDeclarations);
         $items = PreparationSelection::items($items);
         $digest = Evidence::key($key);
 
-        $result = CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $candidateId, $items, $previewHash, $declarations, $digest, $fresh): array {
+        $result = CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $candidateId, $items, $previewHash, $declarations, $digest, $fresh, $identity): array {
             $tax = TaxCheckoutRecords::writer($rows);
             $access = $this->access->lock($principal, $buyer, $tax->current);
             $binding = $this->access->durableBinding($principal);
@@ -91,7 +94,8 @@ final class ProductionTaxCheckout
             $context->requireBuyer($binding);
             $at = CarbonImmutable::now('UTC');
             $selection = CurrentSelection::load($tax->current, $items, $at);
-            $commitment = TaxCheckoutEvidence::commitment($binding, $candidate['binding'], $context, $selection, $candidate['machine']);
+            // With the gate on, the commitment also names the contract identity schema, so a gate flip between preview and order refuses.
+            $commitment = TaxCheckoutEvidence::commitment($binding, $candidate['binding'], $context, $selection, $candidate['machine'], $identity);
             // The buyer assents only to the exact terms and pre-tax prices previewed; any change refuses.
             CheckoutException::require(hash_equals(CanonicalJson::hash($commitment), $previewHash), 'changed');
             $subtotal = $selection['selection']['advertised_subtotal_minor'];
@@ -361,9 +365,9 @@ final class ProductionTaxCheckout
         return ['legal_name' => trim($buyerDeclarations['legalName']), 'identity_meaning' => 'buyer_declared_legal_name'];
     }
 
-    private static function termsProjection(array $commitment, array $selection): array
+    private static function termsProjection(array $commitment, array $selection, bool $identity): array
     {
-        $contractIdentity = TaxCheckoutPolicy::contractIdentityV2()
+        $contractIdentity = $identity
             ? ['contractIdentity' => ['licenseeTypes' => ContractIdentityDeclarationV2::LICENSEE_TYPES,
                 'statements' => ContractIdentityStatements::offered()]]
             : [];

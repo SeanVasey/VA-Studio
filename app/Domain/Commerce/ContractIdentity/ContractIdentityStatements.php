@@ -32,12 +32,18 @@ final class ContractIdentityStatements
         return $statements;
     }
 
-    /** @return array<string, array{statementVersion: string, text: string}> what the order review shows next to the tick */
+    /**
+     * What the order review shows next to the tick. The client echoes `statementVersion` back; `statementHash` (SHA-256 of
+     * the exact text) is there for display only.
+     *
+     * @return array<string, array{statementVersion: string, statementHash: string, text: string}>
+     */
     public static function offered(): array
     {
         $offered = [];
         foreach (self::TEXTS as $type => $statement) {
-            $offered[$type] = ['statementVersion' => $statement['statement_version'], 'text' => $statement['text']];
+            $offered[$type] = ['statementVersion' => $statement['statement_version'], 'statementHash' => hash('sha256', $statement['text']),
+                'text' => $statement['text']];
         }
 
         return $offered;
