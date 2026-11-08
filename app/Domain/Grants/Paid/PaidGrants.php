@@ -3,6 +3,7 @@
 namespace App\Domain\Grants\Paid;
 
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
+use App\Domain\Commerce\ProductionCheckout\ProductionCheckout;
 use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderCommittedReadReceiptV1;
 use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderLocatorV1;
 use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderSourceV1;
@@ -64,6 +65,11 @@ final class PaidGrants
                     $lines[] = $line;
                 }
                 PaidGrantException::require(count($lines) >= 1 && count($lines) <= 10, 409);
+                // D-30 (decided 2026-11-08): a paid order whose frozen v2 declaration no longer verifies stays paid, but no grant
+                // origin is created; fulfillment is held for staff. Every line carries the order's one declaration.
+                foreach ($lines as $line) {
+                    PaidGrantException::require(! ProductionCheckout::contractIdentityHeld($line['buyer_declarations']), 409, 'contract_identity_held');
+                }
                 $batch = $rows->one('paid_order_origins', 'producer = ? AND order_public_id = ?', ['production_checkout_v1', $orderId]);
                 if ($batch === []) {
                     $at = now()->utc()->startOfSecond();

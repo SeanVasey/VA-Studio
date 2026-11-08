@@ -229,15 +229,40 @@ final class ProductionCheckout
 
     /**
      * D-30 step 8: what `initiate` requires of an order's frozen declarations before any provider call or payment intent.
-     * A v2 declaration is re-verified as everywhere this checkout opens the evidence; a name-only declaration refuses while
-     * the calling checkout's contract identity gate is on, so a legacy order left unpaid cannot be paid once the gate opens.
-     * Both refuse as evidence (`changed`). With the gate off a name-only order passes untouched. Reconciliation does not call
-     * this: money may already be captured there, and that policy is undecided.
+     * A v2 declaration is re-verified as everywhere this checkout opens the evidence, whatever the gate. The declaration's
+     * schema must then match the calling checkout's contract identity gate, in both directions (decided 2026-11-08): with the
+     * gate on a name-only order refuses, so a legacy order left unpaid cannot be paid once the gate opens; with the gate off a
+     * v2 order refuses, because the current paid renderers would print every input field. The one exception: a name-only
+     * order already paid while the gate is on is answered by its status (returns true) and never opens or resumes a provider
+     * session. Every refusal is the evidence refusal (`changed`). Reconciliation does not call this: money may already be
+     * captured there, and it always records it; paid-grant finalization holds the order instead (contractIdentityHeld()).
      */
-    public static function requirePayableIdentity(array $declarations, bool $contractIdentityV2): void
+    public static function requirePayableIdentity(array $declarations, bool $contractIdentityV2, bool $paid = false): bool
     {
         self::retainedIdentity($declarations);
-        CheckoutException::require(! $contractIdentityV2 || ContractIdentityDeclarationV2::isV2($declarations));
+        $v2 = ContractIdentityDeclarationV2::isV2($declarations);
+        if ($v2 === $contractIdentityV2) {
+            return false;
+        }
+        CheckoutException::require($paid && ! $v2);
+
+        return true;
+    }
+
+    /**
+     * D-30 (decided 2026-11-08): true when an order's frozen v2 declaration no longer verifies against the pinned contract
+     * faces, so paid-grant finalization must hold its fulfillment for staff (the payment stays recorded). A name-only
+     * declaration is never held here.
+     */
+    public static function contractIdentityHeld(array $declarations): bool
+    {
+        try {
+            self::retainedIdentity($declarations);
+        } catch (CheckoutException) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

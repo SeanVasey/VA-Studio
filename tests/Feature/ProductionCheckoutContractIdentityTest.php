@@ -9,9 +9,11 @@ use App\Domain\Commerce\ProductionCheckout\CheckoutSchema;
 use App\Domain\Commerce\ProductionCheckout\CommandTransaction;
 use App\Domain\Commerce\ProductionCheckout\ContractIdentityPolicy;
 use App\Domain\Commerce\ProductionCheckout\Evidence;
+use App\Domain\Commerce\ProductionCheckout\ExecutionContextV1;
 use App\Domain\Commerce\ProductionCheckout\HostedCheckout;
 use App\Domain\Commerce\ProductionCheckout\OrderEvidence;
 use App\Domain\Commerce\ProductionCheckout\ProductionCheckout;
+use App\Domain\Commerce\ProductionCheckout\ProviderGateway;
 use App\Domain\Commerce\ProductionCheckout\Records;
 use App\Domain\Commerce\ProductionCheckout\TaxExemptions;
 use App\Domain\Commerce\ProductionPreparation\PreparationSelection;
@@ -30,6 +32,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\ProductionCheckoutContractIdentityForgery;
 use Tests\Support\ProductionCheckoutFixtures as F;
 use Tests\Support\ProductionCheckoutGatewayFixture;
 use Tests\Support\ProductionIdentityFixture;
@@ -38,12 +41,14 @@ use Tests\TestCase;
 /**
  * D-30 step 6: the V1 review freezes the v2 contract identity behind its own literal-false, local/testing-only gate. The
  * review request echoes the confirmation statement the buyer was shown; assent refuses a review taken under the other gate
- * state; with the gate off every byte is the original. Step 8: `HostedCheckout::initiate` re-verifies a v2 declaration and,
- * with the gate on, refuses a name-only order before any provider call; reconciliation is unchanged.
+ * state; with the gate off every byte is the original. Step 8: `HostedCheckout::initiate` re-verifies a v2 declaration and
+ * refuses a declaration that does not match the gate (decided 2026-11-08: in both directions) before any provider call, except
+ * that a name-only order already paid with the gate on answers its status; reconciliation is unchanged.
  */
 class ProductionCheckoutContractIdentityTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
+    use ProductionCheckoutContractIdentityForgery;
     use ProductionIdentityFixture;
 
     protected function setUp(): void
@@ -380,8 +385,55 @@ class ProductionCheckoutContractIdentityTest extends TestCase
     {
         config(['production_checkout.reconciliation_enabled' => true]);
         $gateway = new ProductionCheckoutGatewayFixture;
+        $calls = self::counting($gateway);
 
-        return [...$f, 'gateway' => $gateway, 'hosted' => new HostedCheckout(new ProductionCustomerAccess, $gateway)];
+        return [...$f, 'gateway' => $gateway, 'calls' => $calls, 'hosted' => new HostedCheckout(new ProductionCustomerAccess, $calls)];
+    }
+
+    /** Records every provider method the checkout calls (provenance included), delegating to the synthetic fixture. */
+    private static function counting(ProviderGateway $inner): ProviderGateway
+    {
+        return new class($inner) implements ProviderGateway
+        {
+            public array $calls = [];
+
+            public function __construct(private readonly ProviderGateway $inner) {}
+
+            public function provenance(ExecutionContextV1 $context): string
+            {
+                $this->calls[] = 'provenance';
+
+                return $this->inner->provenance($context);
+            }
+
+            public function account(ExecutionContextV1 $context): array
+            {
+                $this->calls[] = 'account';
+
+                return $this->inner->account($context);
+            }
+
+            public function create(ExecutionContextV1 $context, array $params, string $key): array
+            {
+                $this->calls[] = 'create';
+
+                return $this->inner->create($context, $params, $key);
+            }
+
+            public function retrieve(ExecutionContextV1 $context, string $sessionId): array
+            {
+                $this->calls[] = 'retrieve';
+
+                return $this->inner->retrieve($context, $sessionId);
+            }
+
+            public function paymentIntent(ExecutionContextV1 $context, string $paymentId): array
+            {
+                $this->calls[] = 'paymentIntent';
+
+                return $this->inner->paymentIntent($context, $paymentId);
+            }
+        };
     }
 
     private function initiate(array $f, string $orderId): array
@@ -454,62 +506,43 @@ class ProductionCheckoutContractIdentityTest extends TestCase
         $this->assertCount(1, $f['gateway']->creates);
         // A session opened before the gate flip: initiate refuses again, but reconciliation still records the payment.
         config(['production_checkout.contract_identity_v2' => true]);
+        $calls = $f['calls']->calls;
         $this->refuses('changed', fn () => $this->initiate($f, $order['orderId']));
+        $this->assertSame($calls, $f['calls']->calls);
         $f['gateway']->paid = true;
         $this->assertSame('verified', $this->reconcile($f, $order['orderId'])['paymentStatus']);
         $this->assertCount(1, $f['gateway']->creates);
         $this->assertSame([1, 1], self::paymentCounts());
+
+        // Decided 2026-11-08: once paid, initiate answers the order's status with no provider call at all.
+        $calls = $f['calls']->calls;
+        $status = $this->initiate($f, $order['orderId']);
+        $this->assertSame(['verified', 'pending_fulfillment'], [$status['paymentStatus'], $status['fulfillmentStatus']]);
+        $this->assertSame($f['hosted']->status($f['buyer']['principal'], $f['buyer']['user'], $order['orderId']), $status);
+        $this->assertSame($calls, $f['calls']->calls);
+        $this->assertSame([1, 1], self::paymentCounts());
     }
 
-    /**
-     * A sealed review, order, lines and attempt that OrderEvidence accepts (each declaration equals its request's and the
-     * order's equals the review's), copied from the one retained order, but whose v2 name the pinned faces cannot print.
-     */
-    private static function forgedUnprintableOrder(): string
+    public function test_with_the_gate_off_initiate_refuses_a_v2_order_before_any_intent_or_provider_call(): void
     {
-        $tables = CheckoutSchema::TABLES;
-        $review = (array) DB::table($tables['review'])->sole();
-        $reviewBody = Evidence::open($review, 'production_checkout_review');
-        $declarations = [...$reviewBody['buyer_declarations'], 'legal_name' => '王小明'];
-        $reviewDigest = Evidence::key('synthetic-forged-review');
-        $reviewRequest = [...$reviewBody['request'], 'buyer_declarations' => $declarations, 'key_digest' => $reviewDigest];
-        $forgedReview = [...$reviewBody, 'public_id' => (string) Str::uuid(), 'request' => $reviewRequest,
-            'request_hash' => CanonicalJson::hash($reviewRequest), 'buyer_declarations' => $declarations];
-        $forgedReview['review_hash'] = OrderEvidence::reviewHash($forgedReview);
-        $reviewSeal = Evidence::seal($forgedReview);
-        unset($review['id']);
-        $reviewId = DB::table($tables['review'])->insertGetId([...$review, 'public_id' => $forgedReview['public_id'], ...$reviewSeal,
-            'request_key' => $reviewDigest, 'request_hash' => $forgedReview['request_hash']]);
+        config(['production_checkout.contract_identity_v2' => true]);
+        $f = $this->hosted($this->prepared());
+        $order = $this->accept($f, $this->review($f, self::identity()));
 
-        $order = (array) DB::table($tables['order'])->sole();
-        $orderBody = Evidence::open($order, 'production_checkout_order');
-        $orderDigest = Evidence::key('synthetic-forged-accept');
-        $lines = array_map(fn (array $line): array => [...$line, 'public_id' => (string) Str::uuid()], $orderBody['lines']);
-        $orderRequest = [...$orderBody['request'], 'review_id' => $forgedReview['public_id'], 'review_hash' => $forgedReview['review_hash'], 'key_digest' => $orderDigest];
-        $forgedOrder = [...$orderBody, 'public_id' => (string) Str::uuid(), 'review_id' => $forgedReview['public_id'], 'review_hash' => $forgedReview['review_hash'],
-            'review_payload_hash' => $reviewSeal['payload_hash'], 'request' => $orderRequest, 'request_hash' => CanonicalJson::hash($orderRequest),
-            'buyer_declarations' => $declarations, 'assent' => [...$orderBody['assent'], 'review_hash' => $forgedReview['review_hash']],
-            'lines' => $lines, 'attempt_id' => (string) Str::uuid()];
-        $orderSeal = Evidence::seal($forgedOrder);
-        $orderRowId = $order['id'];
-        unset($order['id']);
-        $orderId = DB::table($tables['order'])->insertGetId([...$order, 'public_id' => $forgedOrder['public_id'], ...$orderSeal, 'review_id' => $reviewId,
-            'request_key' => $orderDigest, 'request_hash' => $forgedOrder['request_hash']]);
+        config(['production_checkout.contract_identity_v2' => false]);
+        $this->refuses('changed', fn () => $this->initiate($f, $order['orderId']));
+        $this->assertSame([], $f['calls']->calls);
+        $this->assertSame([0, 0], self::paymentCounts());
 
-        foreach (DB::table($tables['line'])->where('order_id', $orderRowId)->orderBy('position')->get() as $i => $row) {
-            $row = (array) $row;
-            $body = [...Evidence::open($row, 'production_checkout_order_line'), 'public_id' => $lines[$i]['public_id'],
-                'order_public_id' => $forgedOrder['public_id'], 'order_payload_hash' => $orderSeal['payload_hash'], 'line' => $lines[$i]];
-            unset($row['id']);
-            DB::table($tables['line'])->insert([...$row, 'public_id' => $lines[$i]['public_id'], ...Evidence::seal($body), 'order_id' => $orderId,
-                'line_hash' => CanonicalJson::hash($lines[$i])]);
-        }
-        $attempt = (array) DB::table($tables['attempt'])->where('order_id', $orderRowId)->sole();
-        $attemptBody = [...Evidence::open($attempt, 'production_checkout_attempt'), 'public_id' => $forgedOrder['attempt_id'],
-            'order_public_id' => $forgedOrder['public_id'], 'order_payload_hash' => $orderSeal['payload_hash']];
-        unset($attempt['id']);
-        DB::table($tables['attempt'])->insert([...$attempt, 'public_id' => $forgedOrder['attempt_id'], ...Evidence::seal($attemptBody), 'order_id' => $orderId]);
-
-        return $forgedOrder['public_id'];
+        // The same order pays under the gate it was taken in; once paid, a gate-off initiate still refuses without a call.
+        config(['production_checkout.contract_identity_v2' => true]);
+        $this->assertSame('open', $this->initiate($f, $order['orderId'])['checkoutStatus']);
+        $f['gateway']->paid = true;
+        $this->assertSame('verified', $this->reconcile($f, $order['orderId'])['paymentStatus']);
+        config(['production_checkout.contract_identity_v2' => false]);
+        $calls = $f['calls']->calls;
+        $this->refuses('changed', fn () => $this->initiate($f, $order['orderId']));
+        $this->assertSame($calls, $f['calls']->calls);
+        $this->assertSame([1, 1], self::paymentCounts());
     }
 }
