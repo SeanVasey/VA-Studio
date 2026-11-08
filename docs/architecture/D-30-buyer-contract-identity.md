@@ -199,8 +199,11 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
    - [ ] `HostedCheckout` and the V1 paid source open orders through the frozen `OrderEvidence` without re-verifying v2
      declarations. `initiate` now re-verifies them (step 8); `reconcile` and the V1 paid source still do not. Decide whether
      they must, or whether the binder's own check (step 7) is enough;
-   - the V1 HTTP review endpoint already passes the `buyer` object through unchanged, but no route serves
-     `contractIdentityOffer()` yet; one must exist before the V1 mount admits buyers with the gate on.
+   - [x] the V1 HTTP review endpoint passes the `buyer` object through unchanged, and `GET production/checkout/contract-identity`
+     (`production.checkout.contract-identity`, `ProductionCheckoutController::contractIdentity`) now serves
+     `contractIdentityOffer()` through the same `run()` boundary as the other checkout routes: signed-in production customer,
+     private headers, read throttle, and the private 503 while `http_enabled` or the gate is off
+     (`ProductionCheckoutContractIdentityTest`, `ProductionCheckoutMountTest`).
 7. The binder requirement, inside contract increments 3 and 4.
 8. Activation, together with the profile, after steps 2, 3a and 3b merge and U-13 retention values are approved. Also
    required before activation (step 6 review, P3-2 and P3-3):

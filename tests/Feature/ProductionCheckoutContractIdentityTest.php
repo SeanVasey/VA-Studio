@@ -18,11 +18,17 @@ use App\Domain\Commerce\ProductionPreparation\PreparationSelection;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
+use App\Http\Middleware\ProductionCheckoutPrivacy;
+use App\Models\User;
+use App\Providers\ProductionCheckoutServiceProvider;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Illuminate\Testing\TestResponse;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ProductionCheckoutFixtures as F;
 use Tests\Support\ProductionCheckoutGatewayFixture;
@@ -139,6 +145,75 @@ class ProductionCheckoutContractIdentityTest extends TestCase
         config(['production_checkout.contract_identity_v2' => true]);
         $this->assertSame(['licenseeTypes' => ['individual', 'business'], 'statements' => ContractIdentityStatements::offered()],
             ProductionCheckout::contractIdentityOffer());
+    }
+
+    /** Mounts the checkout and customer identity routes by hand, as ProductionCheckoutJourneyTest does (lane PCC). */
+    private function mountHttp(): void
+    {
+        $this->withoutVite();
+        $this->app->register(ProductionCheckoutServiceProvider::class);
+        $this->app[Kernel::class]->prependMiddleware(ProductionCheckoutPrivacy::class);
+        Route::middleware('web')->group(base_path('routes/production-checkout.php'));
+        Route::middleware('web')->group(base_path('routes/production-customer-identity.php'));
+        config(['production_checkout.mounted' => true]);
+    }
+
+    private static function privateResponse(TestResponse $response, int $status): TestResponse
+    {
+        $response->assertStatus($status)->assertHeader('Content-Type', 'application/json')->assertHeader('Cache-Control', 'no-store, private')
+            ->assertHeader('Referrer-Policy', 'no-referrer')->assertHeader('X-Robots-Tag', 'noindex, nofollow')
+            ->assertHeader('X-Content-Type-Options', 'nosniff');
+        if ($status !== 200) {
+            $response->assertExactJson(['code' => 'PRODUCTION_CHECKOUT_UNAVAILABLE',
+                'message' => 'Checkout could not be confirmed. Retry the same request or check the saved order.']);
+        }
+
+        return $response;
+    }
+
+    public function test_the_http_offer_needs_the_http_switch_the_signed_in_buyer_and_the_gate(): void
+    {
+        $this->prepared();
+        $this->mountHttp();
+        $path = '/production/checkout/contract-identity';
+        config(['production_checkout.contract_identity_v2' => true]);
+        self::privateResponse($this->get($path), 503);
+        config(['production_checkout.http_enabled' => true]);
+        self::privateResponse($this->get($path), 403);
+        // A cached guard actor without the new authenticated credential marker has no checkout authority here either.
+        $this->actingAs(User::query()->where('email', 'buyer@example.test')->sole(), 'customer');
+        self::privateResponse($this->get($path), 403);
+        $this->postJson('/customer/sign-in', ['email' => 'buyer@example.test', 'password' => 'MailboxPassword123'])->assertOk();
+        self::privateResponse($this->get($path.'?licenseeType=business'), 422);
+        self::privateResponse($this->postJson($path, []), 405);
+        config(['production_checkout.contract_identity_v2' => false]);
+        self::privateResponse($this->get($path), 503);
+        config(['production_checkout.contract_identity_v2' => true]);
+        self::privateResponse($this->get($path), 200)->assertExactJson(['checkout' => ['licenseeTypes' => ['individual', 'business'],
+            'statements' => ContractIdentityStatements::offered()]]);
+        $this->assertSame([0, 0], self::counts());
+    }
+
+    public function test_a_review_echoing_the_statement_served_over_http_freezes_it(): void
+    {
+        config(['production_checkout.contract_identity_v2' => true]);
+        $f = $this->prepared();
+        $this->mountHttp();
+        config(['production_checkout.http_enabled' => true]);
+        $this->postJson('/customer/sign-in', ['email' => 'buyer@example.test', 'password' => 'MailboxPassword123'])->assertOk();
+        $offer = $this->get('/production/checkout/contract-identity')->assertOk()->json('checkout');
+        $this->assertSame(['individual', 'business'], $offer['licenseeTypes']);
+        $displayed = $offer['statements']['business']['statementVersion'];
+        $buyer = ['statementVersion' => $displayed] + self::identity(['licenseeType' => 'business', 'legalName' => 'Example Records LLC', 'representativeName' => 'Zoë Émile']);
+        $body = ['candidateId' => $f['catalog']['candidate']->id, 'items' => $f['catalog']['items'], 'basisId' => $f['basis']['public_id'],
+            'buyer' => $buyer, 'requestKey' => 'synthetic-http-identity-review'];
+        $this->postJson('/production/checkout/reviews', [...$body, 'buyer' => ['statementVersion' => $offer['statements']['individual']['statementVersion']] + $buyer,
+            'requestKey' => 'synthetic-http-identity-mismatch'])->assertStatus(409);
+        $this->assertSame([0, 0], self::counts());
+        $this->postJson('/production/checkout/reviews', $body)->assertOk()->assertHeader('Cache-Control', 'no-store, private');
+        $frozen = Evidence::open(self::reviewRow(), 'production_checkout_review')['buyer_declarations'];
+        $this->assertSame(['business', 'Example Records LLC', 'Zoë Émile', $displayed],
+            [$frozen['licensee_type'], $frozen['legal_name'], $frozen['representative_name'], $frozen['legal_name_confirmation']['statement_version']]);
     }
 
     public function test_with_the_gate_off_the_request_review_order_and_response_bytes_are_the_original_ones(): void

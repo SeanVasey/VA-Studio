@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 // Required from routes/web.php only when ProductionCheckoutMount admits (lane PCC); ProductionCheckoutPrivacy is prepended in
 // bootstrap/app.php and the provider is registered by AppServiceProvider behind the same gate.
 Route::withoutMiddleware(HandleInertiaRequests::class)->prefix('production/checkout')->name('production.checkout.')->group(function (): void {
+    // D-30: the licensee types and confirmation statements shown before a review; 503 while the contract identity gate is off.
+    Route::get('contract-identity', [ProductionCheckoutController::class, 'contractIdentity'])->middleware('throttle:30,1,production-checkout-read')->block(20, 5)->name('contract-identity');
     Route::post('reviews', [ProductionCheckoutController::class, 'review'])->middleware('throttle:10,1,production-checkout-write')->block(20, 5)->name('reviews');
     Route::post('orders', [ProductionCheckoutController::class, 'accept'])->middleware('throttle:10,1,production-checkout-write')->block(20, 5)->name('orders');
     Route::prefix('orders/{order}')->where(['order' => '[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}'])->group(function (): void {
