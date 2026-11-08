@@ -483,15 +483,21 @@ previous release, the evidence's `migrate.txt` says `Nothing to migrate.` and `m
 `migrate-status-after.txt` are identical, so the schema is unchanged and there is nothing to restore. (Example: a
 `doctor failed checks: operator` refusal on a second deploy before step 11.) The candidate release is built, sealed
 and attached but never served; remove it, or a later deploy of the same SHA refuses "already exists but is not
-current". As root, with no release-step, Artisan, Composer or npm process left, and in this order (`ctl detach`
-refuses while the marker exists):
+current". As root in a `sudo bash -euo pipefail` shell, so that any failed step stops the sequence, with no
+release-step, Artisan, Composer or npm process left, and in this order (`ctl detach` refuses while the marker exists).
+Never delete the candidate unless the detach succeeded and its private directory is provably not the shared store:
+`rm --one-file-system` does not stop at a bind mount of the same filesystem.
 
 ```sh
 NEW=<40-hex SHA of the failed candidate>
 /usr/local/sbin/vasey-staging-ctl quiesce                    # proves stopped writers; keeps the marker
 rm -- /etc/vasey-staging/operation-in-progress               # explicit root recovery, after the checks above
 /usr/local/sbin/vasey-staging-ctl detach "$NEW"
-rm -rf --one-file-system -- "/srv/vasey-staging/releases/$NEW"
+REL="/srv/vasey-staging/releases/$NEW"
+! mountpoint -q "$REL/storage/app/private" || { echo "still mounted; stop" >&2; exit 1; }
+[ "$(stat -c %d:%i "$REL/storage/app/private" 2>/dev/null || echo none)" != "$(stat -c %d:%i /srv/vasey-staging/private)" ] \
+  || { echo "private storage still visible in $REL; stop" >&2; exit 1; }
+rm -rf --one-file-system -- "$REL"
 /usr/local/sbin/vasey-staging-ctl resume                     # previous release: 503 proof, workers, up, 200
 /usr/local/sbin/vasey-staging-ctl healthy "$(basename "$(readlink -f /srv/vasey-staging/current)")"
 ```
