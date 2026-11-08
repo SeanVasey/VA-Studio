@@ -102,6 +102,7 @@ final class CatalogSocketBindingTest extends TestCase
             [[], self::HEADER.$this->row()],
             [['99999'], self::HEADER.$this->row()],
             [['12345', '23456'], self::HEADER.$this->row(remote: '020200C0:0CEA').$this->row(remote: '010200C0:8141', inode: '23456')],
+            [['12345', '23456'], self::HEADER.$this->row().$this->row(inode: '23456')],
             [['12345'], self::HEADER.$this->row(state: '02')],
             [['12345'], self::HEADER.$this->row().$this->row()],
             [['12345'], "malformed\n".$this->row()],

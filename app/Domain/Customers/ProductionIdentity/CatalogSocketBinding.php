@@ -104,7 +104,8 @@ final class CatalogSocketBinding
             // Never choose primary by whichever socket matches the request: the server-reported client endpoint must match.
             // That endpoint alone is not unique: Linux connect() reuses an ephemeral local port for sockets with DIFFERENT
             // peers (only the 4-tuple must be unique), so an owned SMTP/HTTP client socket can share it. The endpoint
-            // plus the literal requested peer is the TCP 4-tuple of the primary session, which is unique in the netns.
+            // plus the literal requested peer is the TCP 4-tuple of the primary session, unique among established sockets in this
+            // network namespace.
             if ($row['state'] === '01' && $row['local_port'] === $sourcePort && \inet_pton($row['local_ip']) === \inet_pton($client)
                 && $row['remote_port'] === $port && \inet_pton($row['remote_ip']) === \inet_pton($host)) {
                 $matches[$row['inode']] = $row;
