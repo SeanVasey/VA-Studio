@@ -188,21 +188,27 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
      statement version, checked with `hash_equals`);
    - [ ] gate-on tests must cover `initiate`, `reconcile` and the paid-tax grant render with a v2 declaration. (Step 6 added
      the other tests this item listed: a gate flip between preview and order and on replay, and a business order without a
-     representative.)
+     representative.) `initiate` and `reconcile` are covered (step 8, part); the paid-tax grant render remains.
    - [x] `TaxCheckoutEvidence::order` checks that the body's declarations equal the request's (done in step 6).
 6. V1 checkout wiring behind its own gate, with the statement binding and evidence checks above (done). Before activation
    (step 8):
-   - gate-on tests must cover `HostedCheckout::initiate` and `reconcile`, the V1 paid source and the paid grant render with a
-     v2 declaration;
-   - `HostedCheckout` and the V1 paid source open orders through the frozen `OrderEvidence` without re-verifying v2
-     declarations; decide whether they must, or whether the binder's own check (step 7) is enough;
+   - [x] gate-on tests must cover `HostedCheckout::initiate` and `reconcile`, the V1 paid source and the paid grant render with a
+     v2 declaration (step 8, part: `ProductionCheckoutContractIdentityTest`, `PaidGrantDocumentJourneyTest`);
+   - [ ] `HostedCheckout` and the V1 paid source open orders through the frozen `OrderEvidence` without re-verifying v2
+     declarations. `initiate` now re-verifies them (step 8); `reconcile` and the V1 paid source still do not. Decide whether
+     they must, or whether the binder's own check (step 7) is enough;
    - the V1 HTTP review endpoint already passes the `buyer` object through unchanged, but no route serves
      `contractIdentityOffer()` yet; one must exist before the V1 mount admits buyers with the gate on.
 7. The binder requirement, inside contract increments 3 and 4.
 8. Activation, together with the profile, after steps 2, 3a and 3b merge and U-13 retention values are approved. Also
    required before activation (step 6 review, P3-2 and P3-3):
-   - V1 `HostedCheckout::initiate` must re-verify a v2 declaration before any money moves. For both checkouts, decide
-     whether a re-verification failure at reconcile refuses, or records the paid order and escalates it (money captured but
-     unreconciled);
-   - name-only orders left unpaid stay payable after the gate opens. Either `initiate` refuses legacy declarations while the
-     gate is on, or the activation runbook drains or expires them first.
+   - [x] V1 `HostedCheckout::initiate` re-verifies a v2 declaration before any money moves (done: in `prepare`, before the
+     intent row and any provider call, through `ProductionCheckout::requirePayableIdentity`, which uses `verifyRetained`;
+     a failure refuses with `changed`). The V2 tax checkout's `initiate` already re-verified it through
+     `TaxCheckoutEvidence::order`.
+   - [ ] For both checkouts, decide whether a re-verification failure at reconcile refuses, or records the paid order and
+     escalates it (money captured but unreconciled). Reconcile is unchanged; a test pins that it records a valid v2 order.
+   - [x] Name-only orders left unpaid: while the checkout's gate is on, `initiate` refuses an order frozen with the name-only
+     declaration (`changed`), in both checkouts; with the gate off nothing changes. Still open: `reconcile` records a
+     name-only order's payment with the gate on (a session opened before the flip can still be paid on the provider's
+     page), so the activation runbook must still decide whether to expire those open sessions or drain them first.

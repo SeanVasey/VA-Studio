@@ -12,9 +12,11 @@ use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxCheckout;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutEvidence;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutPolicy;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutRecords;
+use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutSchema;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Support\CanonicalJson;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ProductionTaxCheckoutFixtures;
 use Tests\Support\RecordingTaxCheckoutTransport;
@@ -23,7 +25,8 @@ use Tests\TestCase;
 /**
  * D-30 step 5: the tax checkout freezes the v2 contract identity behind a literal-false, local/testing-only gate. Step 6
  * binds the confirmation statement the buyer was shown (the echoed `statementVersion`) and the gate state (the preview
- * commitment) to the order.
+ * commitment) to the order. Step 8: `initiate` refuses a name-only order with the gate on, and a v2 declaration that no longer
+ * verifies, before any transport call; reconciliation is unchanged.
  */
 class ProductionTaxCheckoutContractIdentityTest extends TestCase
 {
@@ -288,5 +291,98 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
             $this->assertStringContainsString('"'.$statement['text'].'"', $terms, $type);
             $this->assertStringStartsWith($type.'-', $statement['statement_version']);
         }
+    }
+
+    /** A checkout whose recording transport (synthetic, in-process) is kept, and admitted once a test binds the provider. */
+    private function payable(): array
+    {
+        $catalog = $this->taxCatalog();
+        $buyer = $this->enrollThroughLocalSmtp();
+        $transport = new RecordingTaxCheckoutTransport;
+        $checkout = new ProductionTaxCheckout(new ProductionCustomerAccess, $transport);
+        $preview = $checkout->preview($buyer['principal'], $buyer['user'], $catalog['candidate']->id, $catalog['items']);
+
+        return compact('catalog', 'buyer', 'checkout', 'preview', 'transport');
+    }
+
+    private function initiate(array $f, string $orderId): array
+    {
+        return $f['checkout']->initiate($f['buyer']['principal'], $f['buyer']['user'], $orderId);
+    }
+
+    private function reconcile(array $f, string $orderId): array
+    {
+        return $f['checkout']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $orderId);
+    }
+
+    private static function paymentCounts(): array
+    {
+        return [DB::table(TaxCheckoutSchema::TABLES['request'])->count(), DB::table(TaxCheckoutSchema::TABLES['reviewed'])->count()];
+    }
+
+    public function test_with_the_gate_on_initiate_and_reconcile_pay_a_valid_v2_order(): void
+    {
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $f = $this->payable();
+        $order = $this->order($f, self::identity());
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+
+        $open = $this->initiate($f, $order['orderId']);
+        $this->assertSame(['open', 'unverified'], [$open['checkoutStatus'], $open['paymentStatus']]);
+        $this->assertSame(['create', 'retrieve'], array_column($f['transport']->calls, 0));
+
+        // Reconciliation (unchanged by step 8) retains the paid session of a v2 order with the gate on.
+        $f['transport']->paid = true;
+        $paid = $this->reconcile($f, $order['orderId']);
+        $this->assertSame(['complete', 'verified', 'pending_fulfillment'], [$paid['checkoutStatus'], $paid['paymentStatus'], $paid['fulfillmentStatus']]);
+        $this->assertSame([1, 1], self::paymentCounts());
+        $this->assertSame('buyer-contract-identity-v2', self::frozenDeclarations()['schema']);
+    }
+
+    public function test_initiate_refuses_a_v2_order_whose_declaration_no_longer_verifies_before_any_provider_call(): void
+    {
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $f = $this->payable();
+        $this->order($f, self::identity());
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        // A sealed copy whose request and body agree, so only the re-verification can refuse it: the name cannot be printed.
+        $row = (array) DB::table(TaxCheckoutSchema::TABLES['order'])->sole();
+        $body = Evidence::open($row, 'production_tax_checkout_order');
+        $unprintable = [...$body['buyer_declarations'], 'legal_name' => '王小明'];
+        $request = [...$body['request'], 'buyer_declarations' => $unprintable, 'key_digest' => Evidence::key('synthetic-forged-order')];
+        $forged = [...$body, 'public_id' => (string) Str::uuid(), 'request' => $request, 'request_hash' => CanonicalJson::hash($request), 'buyer_declarations' => $unprintable];
+        unset($row['id']);
+        DB::table(TaxCheckoutSchema::TABLES['order'])->insert([...$row, 'public_id' => $forged['public_id'], ...Evidence::seal($forged),
+            'request_key' => $request['key_digest'], 'request_hash' => $forged['request_hash']]);
+
+        foreach ([true, false] as $gate) {
+            config(['production-tax-checkout.contract_identity_v2' => $gate]);
+            $this->refuses('changed', fn () => $this->initiate($f, $forged['public_id']));
+            $this->assertSame([], $f['transport']->calls);
+            $this->assertSame([0, 0], self::paymentCounts());
+        }
+    }
+
+    public function test_with_the_gate_on_initiate_refuses_a_name_only_order_and_with_it_off_pays_it(): void
+    {
+        $f = $this->payable();
+        $order = $this->order($f, ['legalName' => 'Declared synthetic buyer']);
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $this->refuses('changed', fn () => $this->initiate($f, $order['orderId']));
+        $this->assertSame([], $f['transport']->calls);
+        $this->assertSame([0, 0], self::paymentCounts());
+
+        config(['production-tax-checkout.contract_identity_v2' => false]);
+        $this->assertSame('open', $this->initiate($f, $order['orderId'])['checkoutStatus']);
+        $this->assertSame(['create', 'retrieve'], array_column($f['transport']->calls, 0));
+        // A session opened before the gate flip: initiate refuses again, but reconciliation still retains the payment.
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $this->refuses('changed', fn () => $this->initiate($f, $order['orderId']));
+        $f['transport']->paid = true;
+        $this->assertSame('verified', $this->reconcile($f, $order['orderId'])['paymentStatus']);
+        // The refused initiate made no call; reconciliation only read the session it had opened.
+        $this->assertSame(['create', 'retrieve', 'retrieve', 'paymentIntent'], array_column($f['transport']->calls, 0));
+        $this->assertSame([1, 1], self::paymentCounts());
     }
 }

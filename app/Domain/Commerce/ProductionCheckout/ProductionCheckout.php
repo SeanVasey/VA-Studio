@@ -228,6 +228,19 @@ final class ProductionCheckout
     }
 
     /**
+     * D-30 step 8: what `initiate` requires of an order's frozen declarations before any provider call or payment intent.
+     * A v2 declaration is re-verified as everywhere this checkout opens the evidence; a name-only declaration refuses while
+     * the calling checkout's contract identity gate is on, so a legacy order left unpaid cannot be paid once the gate opens.
+     * Both refuse as evidence (`changed`). With the gate off a name-only order passes untouched. Reconciliation does not call
+     * this: money may already be captured there, and that policy is undecided.
+     */
+    public static function requirePayableIdentity(array $declarations, bool $contractIdentityV2): void
+    {
+        self::retainedIdentity($declarations);
+        CheckoutException::require(! $contractIdentityV2 || ContractIdentityDeclarationV2::isV2($declarations));
+    }
+
+    /**
      * OrderEvidence (hash-frozen) proves the review's declarations equal its request's and the order's equal the review's;
      * a v2 declaration is also re-verified here, where this checkout opens the evidence. Legacy declarations pass untouched.
      */

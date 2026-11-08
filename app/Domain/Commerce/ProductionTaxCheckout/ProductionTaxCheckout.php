@@ -242,6 +242,10 @@ final class ProductionTaxCheckout
             $access = $this->access->lock($principal, $buyer, $tax->current);
             $order = TaxCheckoutEvidence::order($tax, $tax->one('order', $orderId));
             ProductionCheckout::requireOwner($this->access->durableBinding($principal), $order['body']['buyer']);
+            if ($create) {
+                // D-30 step 8: TaxCheckoutEvidence::order() has re-verified a v2 declaration; a name-only one refuses while capture is on.
+                ProductionCheckout::requirePayableIdentity($order['body']['buyer_declarations'], TaxCheckoutPolicy::contractIdentityV2());
+            }
             $requests = $tax->selector('request', 'order_id = ?', [$order['row']['id']]);
             CheckoutException::require(count($requests) <= 1);
             $newRequest = $requests === [];
