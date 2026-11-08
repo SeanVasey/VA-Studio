@@ -64,14 +64,15 @@ remain only in its bundle.
 
 - **Exact PHP pin (new).** `CatalogSocketBinding::attest` accepts only PHP 8.4.27. CI (`setup-php` '8.4') and Forge install the
   latest 8.4 patch, so identity migrations refuse everywhere once 8.4.28 ships. Choose a policy (an allowlist or a minimum
-  version). The code was deliberately not changed.
+  version). The code was deliberately not changed. *Decided 2026-11-08: the 8.4 series from 8.4.27 onward is admitted, 8.5+
+  still refuses (`docs/architecture/decision-register.md`).*
 - **CI collation (new, unverified).** Hosted MySQL shards use `mysql:8.4` with its default `utf8mb4_0900_ai_ci`. The account guard
   checks `utf8mb4_unicode_ci`. The first Foundation run will show whether the shards refuse.
 - The handoff's existing "Waiting on Sean" list (staging hostname, Stripe test keys, exports, prices and tax, legal inputs).
 
 ## Environment recipe for native runs in a cloud container (from this session)
 
-- PHP **exactly 8.4.27**. The Ondřej PPA offers it: `apt-get update`, then upgrade all `php8.4-*` packages.
+- PHP **8.4.27 or a later 8.4 patch** (exactly 8.4.27 before the 2026-11-08 decision). The Ondřej PPA offers it: `apt-get update`, then upgrade all `php8.4-*` packages.
 - A private Oracle MySQL 8.4.11 on its own datadir and port, started with `--skip-name-resolve`, plus a `root@'127.0.0.1'`
   account. Create the test database with `CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`.
 - If the kernel has no IPv6 (`/proc/self/net/tcp6` missing), cherry-pick `a2144d4a` onto the source under test until ACC-IPV6

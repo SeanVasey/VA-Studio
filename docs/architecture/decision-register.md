@@ -304,8 +304,10 @@ the development lead's recommendation, recorded as decided; Sean can reverse any
   provider call, when the order is already paid; it still refuses (`changed`) whenever it would open or resume a
   provider session.
 - **Catalog identity proof: oversized TCP tables (identity follow-up C).** A refusal caused only by the TCP table
-  exceeding its read cap is transient: that attempt refuses, and the worker is not marked unusable. Malformed or
-  inconsistent tables keep the permanent refusal.
+  exceeding its read cap is transient: that attempt refuses, and the worker is not marked unusable. A failed or short
+  read and every other snapshot anomaly (provider, descriptor, wrapper or error handler) keep the permanent worker taint.
+  Malformed or inconsistent table content refuses the proof as before: it is retried with fresh snapshots, at most three,
+  and never taints, so torn procfs reads stay recoverable (#231).
 - **Catalog identity proof: PHP version gate.** `CatalogSocketBinding` admits the PHP 8.4 series from 8.4.27 onward
   instead of exactly 8.4.27, so a routine 8.4 patch update on Forge or CI does not stop identity migrations. A different
   minor version (8.5) still refuses until it is proven.
