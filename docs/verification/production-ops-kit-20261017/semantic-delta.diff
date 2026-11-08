@@ -44,19 +44,19 @@
 +         workers/vasey-production-workers.conf bin/vasey-production-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh forge-deploy.sh; do
    [ -f "$KIT/$f" ] || die "kit file missing: ops/production/$f"
  done
-@@ -454,5 +452,4 @@
+@@ -479,5 +477,4 @@
  VASEY_EXPECTED_APP_ENV=$APP_ENV_EXPECTED
  VASEY_DB_NAME=$DB_NAME
 -VASEY_PROBE_NETRC=/etc/vasey-production/probe.netrc
  VASEY_KEEP_RELEASES=3
  VASEY_BACKUP_KEEP=7
-@@ -470,4 +467,5 @@
+@@ -495,4 +492,5 @@
  install -m 0644 -o root -g root "$KIT/seal-release.py" /usr/local/libexec/vasey-production/seal-release.py
  install -m 0644 -o root -g root "$KIT/release-step.sh" /usr/local/libexec/vasey-production/release-step.sh
 +install -m 0755 -o root -g root "$KIT/forge-deploy.sh" /usr/local/libexec/vasey-production/forge-deploy.sh
+ install -m 0644 -o root -g root "$KIT/tls/origin-ca.pem" /usr/local/libexec/vasey-production/origin-ca.pem
  
- render "$KIT/php-fpm/vasey-production.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-production.conf" 0644
-@@ -510,24 +508,5 @@
+@@ -542,24 +540,5 @@
  EOF
  
 -# ---------------------------------------------------------------- 7. access credentials and nginx template
@@ -81,14 +81,29 @@
 -
 +# ---------------------------------------------------------------- 7. nginx template (no basic auth, no probe credentials)
  render "$KIT/nginx/vasey-production.conf" /etc/vasey-production/nginx-site.conf 0644
- 
-@@ -542,7 +521,7 @@
+ render "$KIT/nginx/vasey-production-classic.conf" /etc/vasey-production/nginx-classic.conf 0644
+@@ -573,8 +552,9 @@
+ grep -Eq '^[[:space:]]*include[[:space:]]+(/etc/nginx/)?conf\.d/\*\.conf;' /etc/nginx/nginx.conf \
+   || die "/etc/nginx/nginx.conf does not include conf.d/*.conf at http level; the site's rate-limit zones and header maps live there"
+-nginx_dupes=$(grep -rlE --exclude-dir=conf.d -e 'zone=vasey_production_(general|webhook):' \
+-  -e '^[[:space:]]*map[[:space:]]+[^[:space:]]+[[:space:]]+\$vasey_production_(referrer_policy|robots|frame_options)\b' /etc/nginx 2>/dev/null || true)
+-[ -z "$nginx_dupes" ] || die "these nginx files already define the staging zones or maps: $(echo $nginx_dupes); that is the older
+-  whole-file site template. Put the interim or Forge default site config back (README step 7), then re-run"
++nginx_dupes=$(grep -rlE --exclude-dir=conf.d -e 'zone=vasey_production_general:' \
++  -e '^[[:space:]]*map[[:space:]]+[^[:space:]]+[[:space:]]+\$vasey_production_(referrer_policy|frame_options|logged_uri)\b' \
++  -e '^[[:space:]]*log_format[[:space:]]+vasey_production\b' /etc/nginx 2>/dev/null || true)
++[ -z "$nginx_dupes" ] || die "these nginx files already define the production zone, maps or log format: $(echo $nginx_dupes); that
++  is the older whole-file site template. Put Forge's default site config back (README step 7), then re-run"
+ nginx_previous=""
+ if [ -e "$NGINX_HTTP_CONF" ]; then
+@@ -603,8 +583,8 @@
    helpers             /usr/local/sbin/vasey-production-ctl (sudo for $APP_USER), /usr/local/sbin/vasey-production-backup (cron 03:17 UTC)
    MySQL               schema $DB_NAME; DB_HOST=127.0.0.1 DB_USERNAME=vasey_app
 -  secrets (root only) $SECRETS/db-app.env (paste DB_PASSWORD into Forge > Environment), $BACKUP_CNF, $HTPASSWD, /etc/vasey-production/probe.netrc
 +  secrets (root only) $SECRETS/db-app.env (paste DB_PASSWORD into Forge > Environment), $BACKUP_CNF
-   nginx site          /etc/vasey-production/nginx-site.conf: fill __SSL_CERT__, __SSL_KEY__, __FORGE_CONF__ from Forge's
-                       generated config, then paste it into Forge > Site > Edit Nginx Configuration
+   nginx http helpers  $NGINX_HTTP_CONF (installed, nginx -t passed, reloaded)
+   nginx site body     /etc/vasey-production/nginx-site.conf: install it as the site's nginx configuration (Forge > Site >
+                       Edit Nginx Configuration, or the site API); README step 7. Whole-file hosts: nginx-classic.conf there
 -Next: ops/production/README.md step 8 onwards.
 +Next: ops/production/README.md, "Provisioning, step by step", step 8 onwards.
  EOF
@@ -108,14 +123,14 @@
 +#   bash /usr/local/libexec/vasey-production/forge-deploy.sh "$(git rev-parse HEAD)"
  #
  # The Forge site checkout ($FORGE_SITE_PATH) is only a git mirror and the home of the Forge-managed .env.
-@@ -108,5 +108,5 @@
+@@ -144,5 +144,5 @@
  freeze_runtime_environment
  envget() { grep -E "^$1=" "$RUNTIME_ENV" | tail -n 1 | cut -d= -f2- | sed -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'$/\1/"; }
 -need() { [ "$(envget "$1")" = "$2" ] || die ".env: $1 must be $2 for the staging profile"; }
 +need() { [ "$(envget "$1")" = "$2" ] || die ".env: $1 must be $2 for the production profile"; }
  need APP_ENV "$VASEY_EXPECTED_APP_ENV"
  need APP_DEBUG false
-@@ -120,6 +120,5 @@
+@@ -156,6 +156,5 @@
  need DB_DATABASE "$VASEY_DB_NAME"
  need FILESYSTEM_DISK local
 -need MAIL_MAILER log
@@ -123,7 +138,7 @@
 +need LOG_CHANNEL stderr            # the journal collects stderr; the reviewed preflight profile requires it
  need APP_MAINTENANCE_DRIVER file
  [[ "$(envget APP_KEY)" =~ ^base64:[A-Za-z0-9+/]{43}=$ ]] || die ".env: APP_KEY must be a base64 32-byte key (php artisan key:generate --show)"
-@@ -127,12 +126,6 @@
+@@ -163,12 +162,6 @@
  [ -n "$(envget DB_PASSWORD)" ] || die ".env: DB_PASSWORD is empty"
  [ "$(envget DB_QUEUE_RETRY_AFTER)" -ge 1200 ] 2>/dev/null || die ".env: DB_QUEUE_RETRY_AFTER must be at least 1200"
 -! grep -Eq '(sk|rk|pk)_live_' "$RUNTIME_ENV" || die ".env contains a live Stripe key; staging is test mode only"
@@ -147,18 +162,20 @@
 +  "${VASEY_PHP_FPM_SERVICE:?}" "${VASEY_KEEP_RELEASES:=3}"
  [ "$(id -u "$VASEY_APP_USER")" -gt 0 ] || die "application account must be nonroot"
  
-@@ -158,8 +158,8 @@
+@@ -159,10 +159,10 @@
  
  # HTTP status of GET / on this host, without depending on DNS or egress: the request goes to the local
 -# nginx with the staging hostname for SNI and the certificate check, and the staging basic-auth
 -# credentials from a 0600 netrc. Maintenance proof needs the exact code: a failed request is not a 503.
 +# nginx with the production hostname for SNI and the certificate check, and no credentials (the site has no basic
 +# auth). Maintenance proof needs the exact code: a failed request is not a 503.
+ # Certificates verify against the system store plus the pinned Cloudflare Origin CA roots: an on-forge.com site, or any
+ # origin behind Cloudflare in Full (strict) mode, serves an Origin CA certificate the system store does not hold.
  probe() {
 -  curl -sS --noproxy '*' -o /dev/null -w '%{http_code}' --max-time 20 --netrc-file "$VASEY_PROBE_NETRC" \
 +  curl -sS --noproxy '*' -o /dev/null -w '%{http_code}' --max-time 20 \
+     --cacert "$ORIGIN_CA" --capath /etc/ssl/certs \
      --resolve "$VASEY_PRODUCTION_HOST:443:127.0.0.1" "https://$VASEY_PRODUCTION_HOST/" 2>/dev/null || true
- }
 --- staging/workers/vasey-staging-workers.conf (renamed)
 +++ production/workers/vasey-production-workers.conf
 @@ -38,7 +38,6 @@
@@ -211,3 +228,198 @@
 +stdout_syslog=true
  
  [group:vasey-production]
+--- staging/nginx/vasey-staging.conf (renamed)
++++ production/nginx/vasey-production.conf
+@@ -1,3 +1,5 @@
+-# VASEY.AUDIO private test-mode staging: nginx site body for a Forge-managed server (the inside of the site's server block).
++# VASEY.AUDIO production: nginx site body for a Forge-managed server (the inside of the site's server block). A PREPARATION
++# TEMPLATE: nothing is deployed, no DNS record exists for it and no production host has been chosen (U-02 in
++# docs/architecture/decision-register.md).
+ #
+ # Placeholder (provision.sh renders it; `grep -n '__[A-Z_]*__'` must print nothing in the rendered file):
+@@ -21,11 +23,26 @@
+ # served. `root` cannot be repeated at server level, so EVERY location below sets `root __VASEY_ROOT__/current/public;`
+ # and `location /` catches every URI no other location matches: no request, internal redirect or error page resolves a
+-# file against the wrapper's root. Keep both properties when adding a location (tests/ops/test_staging_nginx_site.py).
++# file against the wrapper's root. Keep both properties when adding a location (tests/ops/test_production_nginx_site.py).
+ # Forge's own `include forge-conf/<id>/server/*;` is deliberately not included: whatever Forge put there would inherit the
+ # checkout root and could repeat a directive set here.
+ #
+-# Access model: HTTP basic auth on everything. The one exception is exactly `POST /webhooks/stripe`,
+-# which the application authenticates by Stripe signature (VerifyStripeWebhook). Nothing else is
+-# reachable without the staging credentials.
++# Access model: public. What differs from the staging body this file is derived from, and nothing else:
++#   - no HTTP basic auth and no robots/noindex headers: the site is public and the application decides indexing;
++#   - no unauthenticated /webhooks/stripe location: there is no production webhook receiver (VerifyStripeWebhook refuses
++#     production), so a live one is a later reviewed change that must bring its own limits (1 MiB body, 60 s, POST only);
++#   - the error log goes to stderr (the journal collects it); the access log is a file, rotated by provision.sh's
++#     logrotate, in the `vasey_production` format, which masks the UUID in the two paid-delivery paths. nginx's error log
++#     still quotes the request line when an upstream fails (observed), so treat the journal as sensitive: the identifiers
++#     are short-lived authorizations, not secrets at rest.
++# Everything that carries the paid-delivery and upload contract is identical to staging.
++#
++# Private storage is never reachable from here: every root is current/public, there is no alias or storage location,
++# private files stream through controllers (public/ holds only the Vite build), dotfiles answer 404 and no PHP file but
++# index.php executes.
++#
++# Behind a CDN or proxy: do NOT put the paid-delivery paths behind a proxy whose read timeout is shorter than 3,900 s (see
++# docs/ops/monitoring-and-host-baseline.md, "CDN and proxy"). Trusting forwarded addresses also needs a reviewed
++# TRUSTED_PROXIES address list (the application trusts no proxy by default); the illustration is commented out in
++# nginx/vasey-production-http.conf.
+ #
+ # Sizes and timeouts come from the code:
+@@ -33,5 +50,4 @@
+ #     (config/livewire.php max:204800, IngestMediaUpload), so 210m with multipart overhead.
+ #   - Resumable media and sound-kit uploads: 8 MiB chunks (ResumableMediaUploads::CHUNK_BYTES), so 16m elsewhere.
+-#   - Stripe webhook: 1 MiB (VerifyStripeWebhook::MAX_BODY_BYTES).
+ #   - Paid-delivery long routes: docs/ops/paid-delivery-runtime.md (dedicated FPM pool, per-route timeouts,
+ #     buffering, private temp path). Those routes are not mounted on main yet; until they are, these
+@@ -44,10 +60,6 @@
+ ssl_prefer_server_ciphers off;
+ ssl_session_timeout 1d;
+-ssl_session_cache shared:VaseyStagingSSL:10m;
++ssl_session_cache shared:VaseyProductionSSL:10m;
+ ssl_session_tickets off;
+-
+-# Private staging: every request needs the staging credentials unless a location below says otherwise.
+-auth_basic "VASEY.AUDIO staging";
+-auth_basic_user_file /etc/nginx/vasey-production.htpasswd;
+ 
+ limit_req zone=vasey_production_general burst=200 nodelay;
+@@ -60,5 +72,5 @@
+ send_timeout 120s;
+ 
+-# Every buffered FastCGI response (including test deliveries of private masters) spools here, never in
++# Every buffered FastCGI response (including paid deliveries of private masters) spools here, never in
+ # the distribution default. provision.sh creates it 0700 for the nginx user. Never back it up or serve it.
+ fastcgi_temp_path /var/lib/nginx/vasey-production-fastcgi 1 2;
+@@ -71,46 +83,5 @@
+ add_header Referrer-Policy $vasey_production_referrer_policy always;
+ add_header X-Frame-Options $vasey_production_frame_options always;
+-add_header X-Robots-Tag $vasey_production_robots always;
+ add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), usb=(), interest-cohort=()" always;
+-
+-# ---- Stripe test webhook: the only unauthenticated entry point ----
+-# Exact path match only: `/webhooks/stripe/`, `/index.php/webhooks/stripe` and every other URI stay
+-# behind basic auth. Methods other than POST are refused here (403). The FastCGI parameters are
+-# spelled out instead of including fastcgi_params so PHP always sees exactly this route: the raw
+-# request URI is not forwarded (nginx normalizes `..`, `//` and %-escapes for the match, Laravel would
+-# route on the raw form) and the query string is dropped.
+-location = /webhooks/stripe {
+-    root __VASEY_ROOT__/current/public;
+-    auth_basic off;
+-    limit_except POST { deny all; }
+-    limit_req zone=vasey_production_webhook burst=40 nodelay;
+-    client_max_body_size 1m;
+-
+-    fastcgi_pass unix:/run/php/vasey-production.sock;
+-    fastcgi_param SCRIPT_FILENAME   $realpath_root/index.php;
+-    fastcgi_param SCRIPT_NAME       /index.php;
+-    fastcgi_param DOCUMENT_URI      /index.php;
+-    fastcgi_param DOCUMENT_ROOT     $realpath_root;
+-    fastcgi_param REQUEST_URI       /webhooks/stripe;
+-    fastcgi_param QUERY_STRING      "";
+-    fastcgi_param REQUEST_METHOD    $request_method;
+-    fastcgi_param CONTENT_TYPE      $content_type;
+-    fastcgi_param CONTENT_LENGTH    $content_length;
+-    fastcgi_param SERVER_PROTOCOL   $server_protocol;
+-    fastcgi_param REQUEST_SCHEME    $scheme;
+-    fastcgi_param HTTPS             $https if_not_empty;
+-    fastcgi_param GATEWAY_INTERFACE CGI/1.1;
+-    fastcgi_param SERVER_SOFTWARE   nginx;
+-    fastcgi_param REMOTE_ADDR       $remote_addr;
+-    fastcgi_param REMOTE_PORT       $remote_port;
+-    fastcgi_param SERVER_ADDR       $server_addr;
+-    fastcgi_param SERVER_PORT       $server_port;
+-    fastcgi_param SERVER_NAME       $server_name;
+-    fastcgi_param REDIRECT_STATUS   200;
+-    fastcgi_param HTTP_PROXY        "";
+-    # Keep signature admission explicit even if a Forge include disables request-header forwarding.
+-    fastcgi_param HTTP_STRIPE_SIGNATURE $http_stripe_signature;
+-    fastcgi_read_timeout 60s;
+-}
+ 
+ # ---- Paid-delivery long routes (docs/ops/paid-delivery-runtime.md, requirements 1-4 and 7) ----
+@@ -169,5 +140,4 @@
+     add_header Strict-Transport-Security "max-age=31536000" always;
+     add_header X-Content-Type-Options "nosniff" always;
+-    add_header X-Robots-Tag "noindex, nofollow, noarchive" always;
+     access_log off;
+ }
+@@ -196,6 +166,6 @@
+ }
+ 
+-access_log /var/log/nginx/vasey-production-access.log;
+-error_log  /var/log/nginx/vasey-production-error.log error;
++access_log /var/log/nginx/vasey-production-access.log vasey_production;
++error_log  stderr error;
+ 
+ error_page 404 /index.php;
+--- staging/nginx/vasey-staging-http.conf (renamed)
++++ production/nginx/vasey-production-http.conf
+@@ -1,3 +1,3 @@
+-# VASEY.AUDIO private test-mode staging: http-level nginx helpers for the site in nginx/vasey-production.conf.
++# VASEY.AUDIO production: http-level nginx helpers for the site in nginx/vasey-production.conf (a preparation template).
+ #
+ # provision.sh installs this file as /etc/nginx/conf.d/vasey-production.conf. nginx.conf includes conf.d/*.conf at http level
+@@ -6,11 +6,11 @@
+ # where `limit_req_zone` and `map` are not allowed. No placeholders.
+ #
+-# Every name below is used by nginx/vasey-production.conf and must be defined exactly once per nginx instance: a duplicate
+-# zone or map variable makes `nginx -t` fail. Do not paste these lines into the site as well. The production kit uses
+-# vasey_production_* names, so both kits can share one host.
++# Every name below is used by nginx/vasey-production.conf and must be defined exactly once per nginx instance: a second
++# zone or log format of the same name makes `nginx -t` fail, and a second map of the same variable silently replaces
++# the first. Do not paste these lines into the site as well. The staging kit uses its own names, so both kits can
++# share one host.
+ 
+-# Requests per client address. The webhook zone is the only one an unauthenticated client can reach.
++# Requests per client address.
+ limit_req_zone $binary_remote_addr zone=vasey_production_general:10m rate=30r/s;
+-limit_req_zone $binary_remote_addr zone=vasey_production_webhook:1m rate=10r/s;
+ 
+ # Add a header only when the application did not set its own. nginx appends after upstream headers,
+@@ -19,8 +19,4 @@
+ map $upstream_http_referrer_policy $vasey_production_referrer_policy {
+     ""      "strict-origin-when-cross-origin";
+-    default "";
+-}
+-map $upstream_http_x_robots_tag $vasey_production_robots {
+-    ""      "noindex, nofollow, noarchive";
+     default "";
+ }
+@@ -32,2 +28,17 @@
+     default   "SAMEORIGIN";
+ }
++
++# The authorization and origin identifiers in the paid-delivery paths are capabilities: keep them out of the access log
++# (query strings on those two routes are dropped too).
++map $request_uri $vasey_production_logged_uri {
++    "~^(?<head>/paid-grants/(?:authorizations|origins)/)[0-9a-f-]{36}(?<tail>/(?:redeem|document))(?:\?.*)?$" "${head}:uuid${tail}";
++    default $request_uri;
++}
++log_format vasey_production '$remote_addr [$time_iso8601] "$request_method $vasey_production_logged_uri" $status $body_bytes_sent '
++                            'rt=$request_time "$http_user_agent"';
++
++# Trusted-proxy handling is OFF. If, after the reviewed application change and a reviewed address list, the site sits
++# behind a proxy that you control, nginx can restore the client address for rate limiting like this (illustration only):
++#   set_real_ip_from <reviewed proxy address or range>;
++#   real_ip_header CF-Connecting-IP;      # or X-Forwarded-For with real_ip_recursive on
++# Do not enable it with an unreviewed or unbounded list: any client could then choose its own address.
+--- staging/nginx/vasey-staging-classic.conf (renamed)
++++ production/nginx/vasey-production-classic.conf
+@@ -1,3 +1,3 @@
+-# VASEY.AUDIO private test-mode staging: whole-file nginx site for a host whose site file is edited as a whole
++# VASEY.AUDIO production (preparation template): whole-file nginx site for a host whose site file is edited as a whole
+ # (the older Forge layout, or a plain nginx host). Not needed on the current Forge layout, where Forge generates this
+ # wrapper itself and only its inside (site.conf) is edited: there, install /etc/vasey-production/nginx-site.conf instead.
+@@ -9,7 +9,7 @@
+ #   __FORGE_CONF__     the forge-conf directory name Forge uses for this site (copy the include lines exactly)
+ # and paste it as the whole site file. Keep Forge's `before/` include: it carries the port-80 redirect and the Let's
+-# Encrypt HTTP-01 challenge handling, so renewals keep working without basic auth.
++# Encrypt HTTP-01 challenge handling.
+ #
+-# Everything else (basic auth, limits, headers, locations, each with its own root) is in the included site body, and its
++# Everything else (limits, headers, locations, each with its own root) is in the included site body, and its
+ # http-level helpers are in /etc/nginx/conf.d/vasey-production.conf; provision.sh installs both and checks them with
+ # `nginx -t`. Re-running provision.sh updates the body in place; it takes effect on the next nginx reload.

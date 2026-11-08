@@ -128,7 +128,8 @@ describe('original test-order items panel', () => {
     panel(); fireEvent.click(view()); await screen.findByText('Original recording');
     fireEvent.click(screen.getByRole('button', { name: 'Refresh original test-order items' }));
     expect(screen.queryByText('Original recording')).not.toBeInTheDocument();
-    expect(await screen.findByRole('alert')).toHaveFocus(); expect(screen.queryByText('PRIVATE')).not.toBeInTheDocument();
+    // Focus moves in an effect after the alert renders: wait for it rather than racing findByRole.
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveFocus()); expect(screen.queryByText('PRIVATE')).not.toBeInTheDocument();
   });
   it('bounds pending reads to twenty seconds with no retry and no retained result', async () => {
     vi.useFakeTimers();

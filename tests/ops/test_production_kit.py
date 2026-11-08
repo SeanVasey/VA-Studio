@@ -2,7 +2,7 @@
 
 Covers the builder (counted anchors, forbidden leftovers, byte-identical copies), cross-file path consistency, the
 supervisor and PHP-FPM templates (parsed by supervisor's and php-fpm's own parsers when installed), the nginx template
-(structure, equality of the paid-delivery contract with staging, `nginx -t` when installed), the env composer, and the
+(derived from staging's three-file Forge layout; tests/ops/test_production_nginx_site.py covers it in depth), the env composer, and the
 provisioning wrapper's refusals. Nothing is installed and no host is touched."""
 import difflib
 import hashlib
@@ -11,7 +11,6 @@ import json
 import os
 import re
 import shutil
-import socket
 import subprocess
 import sys
 import tempfile
@@ -31,10 +30,13 @@ sys.modules["build_kit"] = build_kit
 spec.loader.exec_module(build_kit)
 
 SCRIPTS = ["provision.sh", "forge-deploy.sh", "release-step.sh", "backup.sh", "bin/vasey-production-ctl"]
+NGINX_FILES = ["nginx/vasey-production.conf", "nginx/vasey-production-http.conf", "nginx/vasey-production-classic.conf"]
 EXPECTED_FILES = {
     "provision.sh", "forge-deploy.sh", "release-step.sh", "backup.sh", "bin/vasey-production-ctl", "seal-release.py",
-    "normalize-mysql-dump.py", "validate-runtime.php", "nginx/vasey-production.conf", "php-fpm/vasey-production.conf",
-    "php-fpm/vasey-paid-delivery.conf", "workers/vasey-production-workers.conf", "MANIFEST.sha256",
+    "normalize-mysql-dump.py", "validate-runtime.php", "nginx/vasey-production.conf", "nginx/vasey-production-http.conf",
+    "nginx/vasey-production-classic.conf", "php-fpm/vasey-production.conf",
+    "php-fpm/vasey-paid-delivery.conf", "workers/vasey-production-workers.conf", "tls/origin-ca.pem",
+    "MANIFEST.sha256",
 }
 
 
@@ -72,7 +74,7 @@ class KitBuild(unittest.TestCase):
                 self.assertNotIn("netrc", body.lower(), path.name)
 
     def test_nothing_staging_specific_is_left_in_the_derived_files(self):
-        for name in SCRIPTS + ["php-fpm/vasey-production.conf", "workers/vasey-production-workers.conf"]:
+        for name in SCRIPTS + NGINX_FILES + ["php-fpm/vasey-production.conf", "workers/vasey-production-workers.conf"]:
             body = "\n".join(l for l in self.text(name).splitlines() if "DERIVED by ops/production/build-kit.py" not in l)
             for token in build_kit.FORBIDDEN:
                 self.assertNotIn(token, body, f"{name}: {token}")
@@ -81,8 +83,7 @@ class KitBuild(unittest.TestCase):
         for name, source in (("seal-release.py", STAGING / "seal-release.py"),
                              ("normalize-mysql-dump.py", STAGING / "normalize-mysql-dump.py"),
                              ("php-fpm/vasey-paid-delivery.conf", STAGING / "php-fpm/vasey-paid-delivery.conf"),
-                             ("validate-runtime.php", PROD / "validate-runtime.php"),
-                             ("nginx/vasey-production.conf", PROD / "nginx/vasey-production.conf")):
+                             ("validate-runtime.php", PROD / "validate-runtime.php")):
             self.assertEqual((self.kit / name).read_bytes(), source.read_bytes(), name)
 
     def test_the_manifest_lists_every_file_with_its_hash(self):
@@ -114,7 +115,7 @@ class KitBuild(unittest.TestCase):
             compile(self.text(name), name, "exec")
 
     def test_every_derived_file_says_where_it_comes_from(self):
-        for name in SCRIPTS + ["php-fpm/vasey-production.conf", "workers/vasey-production-workers.conf"]:
+        for name in SCRIPTS + NGINX_FILES + ["php-fpm/vasey-production.conf", "workers/vasey-production-workers.conf"]:
             self.assertIn("DERIVED by ops/production/build-kit.py from ops/staging/", self.text(name), name)
         self.assertTrue(self.text("provision.sh").startswith("#!/usr/bin/env bash\n# DERIVED"))
 
@@ -138,7 +139,12 @@ class KitBuild(unittest.TestCase):
         self.assertEqual(sections["bin/vasey-staging-ctl"]["hunks"], 2)  # the required-variable list, and the probe with its comment
         self.assertLessEqual(sections["bin/vasey-staging-ctl"]["added"] + sections["bin/vasey-staging-ctl"]["removed"], 12)
         self.assertEqual(sections["workers/vasey-staging-workers.conf"]["hunks"], 5)
-        self.assertLess(len(delta.splitlines()), 400)
+        # The nginx body loses the basic auth, the robots header and the webhook location; the http file loses the webhook zone
+        # and robots map and gains the access-log mask; the classic wrapper only changes comments.
+        self.assertGreater(sections["nginx/vasey-staging.conf"]["removed"], sections["nginx/vasey-staging.conf"]["added"])
+        self.assertEqual(sections["nginx/vasey-staging-classic.conf"]["hunks"], 2)
+        self.assertLessEqual(sections["nginx/vasey-staging-classic.conf"]["added"], 3)
+        self.assertLess(len(delta.splitlines()), 500)
 
     def test_the_committed_semantic_delta_snapshot_is_current(self):
         # The review surface is the snapshot: it must be exactly what `--delta` prints now, or a kit change went unrecorded.
@@ -156,7 +162,7 @@ class KitBuild(unittest.TestCase):
     def test_check_mode_builds_and_discards(self):
         run = subprocess.run([sys.executable, "-I", str(BUILDER), "--check"], capture_output=True, text=True)
         self.assertEqual(run.returncode, 0, run.stderr)
-        self.assertIn("build-kit: ok, 13 files", run.stdout)
+        self.assertIn("build-kit: ok, 16 files", run.stdout)
 
 
 class AnchorsFailClosed(unittest.TestCase):
@@ -259,9 +265,11 @@ class CrossFileConsistency(unittest.TestCase):
                                      "/usr/local/libexec/vasey-production/normalize-mysql-dump.py",
                                      "/usr/local/libexec/vasey-production/seal-release.py",
                                      "/usr/local/libexec/vasey-production/release-step.sh",
-                                     "/usr/local/libexec/vasey-production/forge-deploy.sh"})
+                                     "/usr/local/libexec/vasey-production/forge-deploy.sh",
+                                     "/usr/local/libexec/vasey-production/origin-ca.pem"})
         for path in ("BACKUP_BIN=/usr/local/sbin/vasey-production-backup", "SEALER=/usr/local/libexec/vasey-production/seal-release.py",
-                     "RELEASE_STEP=/usr/local/libexec/vasey-production/release-step.sh"):
+                     "RELEASE_STEP=/usr/local/libexec/vasey-production/release-step.sh",
+                     "ORIGIN_CA=/usr/local/libexec/vasey-production/origin-ca.pem"):
             self.assertIn(path, ctl)
         self.assertIn("CTL=/usr/local/sbin/vasey-production-ctl", backup)
         self.assertIn("NORMALIZER=/usr/local/libexec/vasey-production/normalize-mysql-dump.py", backup)
@@ -423,8 +431,19 @@ class WorkerAndPoolContract(unittest.TestCase):
 
 
 class NginxTemplate(unittest.TestCase):
-    CONF = (PROD / "nginx/vasey-production.conf").read_text()
-    STAGING_CONF = (STAGING / "nginx/vasey-staging.conf").read_text()
+    """The derived nginx files as the kit ships them (the split, root strategy, old-template diff and live runs are in
+    tests/ops/test_production_nginx_site.py)."""
+
+    @classmethod
+    def setUpClass(cls):
+        tmp = tempfile.TemporaryDirectory(prefix="va-prod-kit-")
+        cls.addClassCleanup(tmp.cleanup)
+        kit = Path(tmp.name) / "kit"
+        build_kit.build(kit)
+        cls.CONF = (kit / "nginx/vasey-production.conf").read_text()
+        cls.HTTP = (kit / "nginx/vasey-production-http.conf").read_text()
+        cls.CLASSIC = (kit / "nginx/vasey-production-classic.conf").read_text()
+        cls.STAGING_CONF = (STAGING / "nginx/vasey-staging.conf").read_text()
 
     @staticmethod
     def blocks(text, pattern):
@@ -445,10 +464,13 @@ class NginxTemplate(unittest.TestCase):
             found.append([l.split("#")[0].strip() for l in body if l.split("#")[0].strip()])
         return found
 
+    def directives(self, text):
+        return "\n".join(l.split("#")[0] for l in text.splitlines())
+
     def test_no_basic_auth_no_noindex_and_no_webhook_exemption(self):
-        directives = "\n".join(l.split("#")[0] for l in self.CONF.splitlines())
-        for forbidden in ("auth_basic", "htpasswd", "X-Robots-Tag", "/webhooks/stripe", "limit_except", "auth_basic_user_file"):
-            self.assertNotIn(forbidden, directives)
+        for text in (self.CONF, self.HTTP, self.CLASSIC):
+            for forbidden in ("auth_basic", "htpasswd", "X-Robots-Tag", "/webhooks/stripe", "limit_except", "auth_basic_user_file"):
+                self.assertNotIn(forbidden, self.directives(text))
 
     def test_paid_delivery_contract_is_identical_to_staging(self):
         for pattern in (r"paid-grants/authorizations", r"paid-grants/origins", r"livewire-"):
@@ -466,55 +488,35 @@ class NginxTemplate(unittest.TestCase):
         for need in ("fastcgi_read_timeout 3900s;", "fastcgi_connect_timeout 5s;", "fastcgi_pass unix:/run/php/vasey-paid-delivery.sock;"):
             self.assertIn(need, document)
         self.assertIn("client_max_body_size 210m;", " ".join(self.blocks(self.CONF, r"livewire-")[0]))
-        self.assertRegex(self.CONF, r"(?m)^    client_max_body_size 16m;")
-        self.assertRegex(self.CONF, r"(?m)^    fastcgi_max_temp_file_size 1024m;")
-        self.assertRegex(self.CONF, r"(?m)^    fastcgi_temp_path /var/lib/nginx/vasey-production-fastcgi 1 2;")
+        self.assertRegex(self.CONF, r"(?m)^client_max_body_size 16m;")
+        self.assertRegex(self.CONF, r"(?m)^fastcgi_max_temp_file_size 1024m;")
+        self.assertRegex(self.CONF, r"(?m)^fastcgi_temp_path /var/lib/nginx/vasey-production-fastcgi 1 2;")
 
     def test_private_storage_is_never_public(self):
-        directives = "\n".join(l.split("#")[0] for l in self.CONF.splitlines())
-        self.assertRegex(directives, r"root __VASEY_ROOT__/current/public;")
+        directives = self.directives(self.CONF)
+        self.assertEqual(set(re.findall(r"\broot (\S+);", directives)), {"__VASEY_ROOT__/current/public"})
         for forbidden in ("alias ", "autoindex on", "/storage", "storage/app", "private"):
             self.assertNotIn(forbidden, directives)
-        self.assertIn("location ~ /\\.(?!well-known/) { return 404; }", self.CONF)
-        self.assertIn("location ~ \\.php$ { return 404; }", self.CONF)
+        self.assertIn("location ~ /\\.(?!well-known/) { root __VASEY_ROOT__/current/public; return 404; }", self.CONF)
+        self.assertIn("location ~ \\.php$ { root __VASEY_ROOT__/current/public; return 404; }", self.CONF)
 
-    def test_placeholders_are_exactly_the_documented_set(self):
-        self.assertEqual(set(re.findall(r"__[A-Z_]+__", self.CONF)),
-                         {"__PRODUCTION_HOST__", "__VASEY_ROOT__", "__SSL_CERT__", "__SSL_KEY__", "__FORGE_CONF__"})
+    def test_placeholders_are_exactly_the_documented_sets(self):
+        self.assertEqual(set(re.findall(r"__[A-Z_]+__", self.CONF)), {"__VASEY_ROOT__"})
+        self.assertEqual(set(re.findall(r"__[A-Z_]+__", self.HTTP)), set())
+        self.assertEqual(set(re.findall(r"__[A-Z_]+__", self.CLASSIC)),
+                         {"__PRODUCTION_HOST__", "__SSL_CERT__", "__SSL_KEY__", "__FORGE_CONF__"})
 
     def test_every_fastcgi_socket_is_a_pool_the_kit_installs(self):
         self.assertEqual(set(re.findall(r"fastcgi_pass unix:(\S+);", self.CONF)),
                          {"/run/php/vasey-production.sock", "/run/php/vasey-paid-delivery.sock"})
 
     def test_proxy_trust_is_off_and_only_illustrated(self):
-        live = [l for l in self.CONF.splitlines() if re.match(r"\s*(set_real_ip_from|real_ip_header|real_ip_recursive)\b", l)]
-        self.assertEqual(live, [])
+        for text in (self.CONF, self.HTTP, self.CLASSIC):
+            live = [l for l in text.splitlines() if re.match(r"\s*(set_real_ip_from|real_ip_header|real_ip_recursive)\b", l)]
+            self.assertEqual(live, [])
         # The application trusts no proxy by default (ExplicitTrustProxies, lane PCC); nginx's real-IP block stays commented.
         self.assertIn("the application trusts no proxy by default", self.CONF)
-
-    @unittest.skipUnless(shutil.which("nginx"), "nginx is not installed")
-    def test_nginx_accepts_the_rendered_template(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            for sub in ("before", "server", "after"):
-                (root / "forge-conf/site" / sub).mkdir(parents=True)
-            subprocess.run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-keyout", str(root / "k.pem"), "-out", str(root / "c.pem"),
-                            "-days", "1", "-subj", "/CN=shop.example.invalid"], check=True, capture_output=True)
-            shutil.copy("/etc/nginx/fastcgi_params", root / "fastcgi_params")
-            text = self.CONF
-            for old, new in (("__PRODUCTION_HOST__", "shop.example.invalid"), ("__VASEY_ROOT__", "/srv/vasey-production"),
-                             ("__SSL_CERT__", str(root / "c.pem")), ("__SSL_KEY__", str(root / "k.pem")), ("__FORGE_CONF__", "site")):
-                text = text.replace(old, new)
-            try:
-                socket.socket(socket.AF_INET6).close()
-            except OSError:  # this sandbox has no IPv6; the syntax check below still covers the whole file
-                text = "\n".join(l for l in text.splitlines() if "listen [::]" not in l)
-            (root / "site.conf").write_text(text)
-            (root / "nginx.conf").write_text(f"pid {root}/nginx.pid;\nerror_log {root}/error.log;\nevents {{}}\nhttp {{\n  access_log off;\n  include {root}/site.conf;\n}}\n")
-            run = subprocess.run(["nginx", "-t", "-p", str(root), "-c", str(root / "nginx.conf")], capture_output=True, text=True)
-            self.assertEqual(run.returncode, 0, run.stderr)
-            self.assertIn("syntax is ok", run.stderr)
-            self.assertIn("test is successful", run.stderr)
+        self.assertIn("#   set_real_ip_from <reviewed proxy address or range>;", self.HTTP)
 
 
 class EnvironmentComposition(unittest.TestCase):
@@ -669,9 +671,11 @@ class Docs(unittest.TestCase):
         readme = (PROD / "README.md").read_text()
         for target in re.findall(r"\]\((\.\./[^)#]+|[A-Za-z0-9_./-]+\.(?:md|sh|py|php|conf|example))(?:#[^)]*)?\)", readme):
             self.assertTrue((PROD / target).exists(), target)
-        for name in ("build-kit.py", "compose-env.py", "validate-runtime.php", "env.host-overlay.example", "provision.sh", "nginx/vasey-production.conf"):
+        for name in ("build-kit.py", "compose-env.py", "validate-runtime.php", "env.host-overlay.example", "provision.sh"):
             self.assertIn(name, readme)
             self.assertTrue((PROD / name).exists(), name)
+        for name in ("nginx/vasey-production.conf", "nginx/vasey-production-http.conf", "nginx/vasey-production-classic.conf"):
+            self.assertIn(name, readme)  # derived at build time, documented, not committed
 
 
 if __name__ == "__main__":

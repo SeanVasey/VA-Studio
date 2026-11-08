@@ -32,7 +32,9 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 | File | What it is | Installed to |
 | --- | --- | --- |
 | `provision.sh` | One-time root provisioning for everything Forge does not do | run in place |
-| `nginx/vasey-staging.conf` | Site template: TLS, basic auth with the webhook exemption, limits, headers, long paid routes | pasted into Forge |
+| `nginx/vasey-staging.conf` | Site body (the inside of Forge's server block): basic auth with the webhook exemption, limits, headers, long paid routes, the release root in every location | rendered to `/etc/vasey-staging/nginx-site.conf`, then installed as Forge's site configuration (step 7) |
+| `nginx/vasey-staging-http.conf` | http-level helpers the body uses: the two `limit_req_zone`s and three header `map`s | `/etc/nginx/conf.d/vasey-staging.conf` (provision.sh, checked with `nginx -t`) |
+| `nginx/vasey-staging-classic.conf` | Whole-file wrapper (listen, TLS, Forge includes) that includes the body, for a host whose site file is edited as a whole | rendered to `/etc/vasey-staging/nginx-classic.conf`; not used on the current Forge layout |
 | `php-fpm/vasey-staging.conf` | Default pool (300 s, 200 MiB uploads) | `/etc/php/8.4/fpm/pool.d/` |
 | `php-fpm/vasey-paid-delivery.conf` | Dedicated paid-delivery pool (7,800 s, no CPU cap), per `docs/ops/paid-delivery-runtime.md` | `/etc/php/8.4/fpm/pool.d/` |
 | `workers/vasey-staging-workers.conf` | Supervisor programs for the `media`, `payments`, `contracts` and `default`/`inquiry-alerts` workers, plus the scheduler | `/etc/supervisor/conf.d/vasey-staging.conf` |
@@ -58,7 +60,8 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
   backups/                           local backup sets (root 0700)
   evidence/<UTC>-<sha12>/            per-deploy evidence: build hashes, migrate output, doctor and readiness JSON
 /var/lib/nginx/vasey-staging-fastcgi nginx FastCGI temp (private, 0700; buffered downloads; never backed up)
-/etc/vasey-staging/                  staging.conf (no secrets), backup.my.cnf and probe.netrc (root 0600), nginx-site.conf
+/etc/vasey-staging/                  staging.conf (no secrets), backup.my.cnf and probe.netrc (root 0600), nginx-site.conf, nginx-classic.conf
+/etc/nginx/conf.d/vasey-staging.conf http-level rate-limit zones and header maps for the site (kit-owned; Forge never writes it)
 /root/vasey-staging-secrets/         generated MySQL app password (root 0600)
 ```
 
@@ -130,13 +133,13 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
 | 2 | **Sean, DNS** | **Add the staging record.** Create an `A` (and `AAAA`) record for `<STAGING_HOST>` pointing at the server. Never touch the apex or `www`. |
 | 3 | **Sean, Forge** | **Create the site.** Root domain `<STAGING_HOST>`; project type Laravel; PHP 8.4; no Forge-created database (provisioning creates it); no website isolation (otherwise pass `--app-user` in step 6). |
 | 4 | **Sean, Forge** | **Install the repository.** GitHub `SeanVasey/VA-Studio`, the branch carrying the SHA to stage. **Untick "Install Composer dependencies"**, and leave Quick Deploy **off**: deploys are deliberate. |
-| 5 | **Sean, Forge** | **Get the certificate.** Site → SSL → Let's Encrypt for `<STAGING_HOST>`, then activate it. Do this before step 7: the template keeps Forge's HTTP-01 challenge handling. |
+| 5 | **Sean, Forge** | **Get the certificate.** Site → SSL → Let's Encrypt for `<STAGING_HOST>`, then activate it. Do this before step 7: Forge's generated wrapper carries the certificate paths and the port-80 redirect with its HTTP-01 challenge handling. |
 | 6 | **Script** (Sean runs it over SSH) | **Run provisioning:** `sudo bash /home/forge/<STAGING_HOST>/ops/staging/provision.sh --host <STAGING_HOST>`. It asks for a basic-auth user and password (16+ characters, no spaces) and prints where the generated credentials are. It is safe to re-run. Details are under [What provision.sh does](#what-provisionsh-does). |
-| 7 | **Sean, Forge** | **Install the nginx site.** Open `/etc/vasey-staging/nginx-site.conf` (provisioning has filled in the host and root). Replace `__SSL_CERT__`, `__SSL_KEY__` and `__FORGE_CONF__` with the values from Forge's current config: copy its `ssl_certificate` lines and its `include forge-conf/...` lines. Check that `grep -n '__[A-Z_]*__'` prints nothing, then paste the file into Site → Edit Nginx Configuration. Forge validates it and reloads nginx. |
+| 7 | **Sean, Forge** | **Install the nginx site.** Forge generates the site file as a wrapper (listen, `http2`, `server_name`, the certificate, a `root` that is the git checkout, and its `forge-conf/<site id>/` includes) and lets you edit only the inside of its server block. Provisioning (step 6) has already installed and loaded the http-level helpers in `/etc/nginx/conf.d/vasey-staging.conf` and rendered the server-block body at `/etc/vasey-staging/nginx-site.conf`; it has no placeholders left (`grep -n '__[A-Z_]*__'` prints nothing). Replace the whole content of Site → Edit Nginx Configuration with that file, or send it as `config` to the site API (`PUT .../sites/<site>/nginx`). Forge writes it **without** `nginx -t`, so check before you consider it live: `sudo nginx -t`, then load `https://<STAGING_HOST>/` and confirm a 401 without credentials and the site with them. Every location in the body sets `root <kit root>/current/public`, so the wrapper's checkout root is never used; do not add a location without its own `root`. Forge's `forge-conf/<site id>/server/*` include is deliberately left out of the body. If provisioning refused because an older whole-file site still defines `vasey_staging_*` zones or maps, put Forge's default or the interim locked configuration back first, then re-run step 6. On a host whose site file is edited as a whole, use `/etc/vasey-staging/nginx-classic.conf` instead: fill `__SSL_CERT__`, `__SSL_KEY__` and `__FORGE_CONF__` from Forge's config and paste it as the whole file. |
 | 8 | **Sean, Forge** | **Set the environment.** Paste `ops/staging/env.staging.example` into Site → Environment and fill every `<...>`. For `APP_KEY`, run `php8.4 -r 'echo "base64:".base64_encode(random_bytes(32)), PHP_EOL;'` once on the server and keep the value. For `DB_PASSWORD`, run `sudo cat /root/vasey-staging-secrets/db-app.env`. Leave `MEDIA_TAG_*` until the runbook's seller-tag step. |
 | 9 | **Sean, Forge** | **Set the deployment script.** Replace Forge's default with the five lines at the top of `forge-deploy.sh`, then click **Deploy Now**. |
 | 10 | **Script** (Forge runs it) | **First deploy.** `forge-deploy.sh` runs the [deploy sequence](#deploy-sequence). On a first install, `vasey:doctor` may fail only on `operator`. The site then comes up empty, behind basic auth. |
-| 11 | **Sean, SSH** | **Finish first-run setup** with [`docs/ops/staging-runbook.md`](../../docs/ops/staging-runbook.md): two operators with TOTP, the seller tag, `vasey:doctor` until it passes, and the backup destination. |
+| 11 | **Sean, SSH** | **Finish first-run setup** with [`docs/ops/staging-runbook.md`](../../docs/ops/staging-runbook.md): two operators with TOTP, the seller tag, `vasey:doctor` until it passes, and the backup destination. Do this before any second deploy: only a first install may activate with `operator` failing, so every later deploy stops before the switch until the operators exist. |
 
 ### Packages and versions
 
@@ -145,8 +148,8 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
 | Component | Requirement | Why |
 | --- | --- | --- |
 | PHP 8.4.1 or newer, CLI + FPM | `pdo_mysql`, `pdo_sqlite`, `mbstring`, `intl`, `bcmath`, `gd`, `fileinfo`, `zip`, `curl`, `dom`, `xml`, `xmlwriter`, `posix`, `pcntl`, `ctype`, `iconv`, `tokenizer`, `openssl` | `vasey:doctor` `php_runtime` (it requires `pdo_sqlite` even on MySQL), CI's extension list, renderer children, `pcntl` for worker timeouts |
-| MySQL | 8.4, binary log on, `log_bin_trust_function_creators=ON` | 618 triggers (at `34562862`) created by a non-root account (see below) |
-| nginx | as Forge installs it (1.24+) | template uses `listen ... ssl http2` |
+| MySQL | 8.4, binary log on, `log_bin_trust_function_creators=ON`, `skip_name_resolve=ON` | 618 triggers (at `34562862`) created by a non-root account (see below) |
+| nginx | as Forge installs it (1.24+; nginx.org 1.31.8 on the current Forge Laravel VPS) | `nginx.conf` must include `conf.d/*.conf` at http level (provision.sh checks); the classic wrapper uses `listen ... ssl http2` |
 | Node.js | `>=24.15.0 <25` (`package.json` engines), installed from NodeSource if Forge's is older | `npm ci && npm run build` |
 | ffmpeg / ffprobe | encoders `libmp3lame`, `pcm_s16le`, `png`, `mjpeg`, `libwebp` | `vasey:doctor` `media_encoders`, previews and artwork |
 | util-linux `prlimit` | must apply 3 GiB/180 s scanner and 2 GiB/90 s media limits | `config/media.php` |
@@ -167,6 +170,7 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
    - `vasey_app@127.0.0.1`, the runtime and migration account, with schema-scoped `SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, INDEX, REFERENCES, TRIGGER, CREATE TEMPORARY TABLES, LOCK TABLES`;
    - `vasey_backup@127.0.0.1`, the backup account, with `SELECT, SHOW VIEW, TRIGGER, LOCK TABLES, EVENT` plus global `SHOW_ROUTINE`;
    - `SET PERSIST log_bin_trust_function_creators = ON`.
+   - `SET PERSIST_ONLY skip_name_resolve = ON` and one `mysqld` restart, when it is off. The identity layer admits its metadata companion connection only when PROCESSLIST names the client by a literal IP; with name resolution on, a 127.0.0.1 client is shown as `localhost`. It refuses first if any account is addressed by a host name.
    It never rotates an existing password.
    `/root/vasey-staging-secrets` must have canonical protected ancestry. An existing app account requires
    a regular root-owned 0600 single-link `db-app.env` containing exactly the generated username/password
@@ -181,7 +185,7 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
    exactly `vasey_backup@127.0.0.1`. Missing, truncated, unsafe or stale credentials require private
    restore or explicit account rotation; an orphan profile is never overwritten automatically.
 4. **Host files:** the two FPM pools (it runs `php-fpm8.4 -t` and reloads), the supervisor programs, the `vasey-staging-ctl` and `vasey-staging-backup` helpers, `/etc/sudoers.d/vasey-staging` (checked with `visudo -c`), the backup cron (03:17 UTC) and logrotate.
-5. **Access:** the basic-auth file (SHA-512 crypt) and a root-only netrc that the quiesce and resume probes use. It also renders the nginx site.
+5. **Access:** the basic-auth file (SHA-512 crypt) and a root-only netrc that the quiesce and resume probes use. It also renders the nginx site body (and the whole-file wrapper), and installs the http-level helpers as `/etc/nginx/conf.d/vasey-staging.conf`. It refuses first if another nginx file already defines the same `vasey_staging_*` zones or maps (an older whole-file site), then runs `nginx -t`, restores the previous conf.d file if the test fails, and reloads nginx when it passes.
 
 **Why one database account, and why `log_bin_trust_function_creators`.** On MySQL 8.4 with binary logging on,
 `CREATE TRIGGER` from an account without `SUPER` fails with error 1419. This was verified on a private 8.4.11
@@ -204,6 +208,8 @@ renaming that account breaks every guarded write.
 ### Deploy sequence
 
 `forge-deploy.sh` runs as `forge` and follows `docs/ops/production-activation-packet.md` §4 (S1):
+
+Before anything else it compares the root-installed helpers (`vasey-staging-ctl`, `vasey-staging-backup`, `release-step.sh`, `seal-release.py`, `normalize-mysql-dump.py` and the nginx http file) with the kit at the deployed SHA, and refuses until `provision.sh` is re-run if any differ. A deploy never refreshes them itself.
 
 1. It freezes one private copy of the Forge `.env` and validates that candidate without printing values:
    - `APP_ENV` equals the configured value; `APP_DEBUG=false`; HTTPS `APP_URL`; secure cookies;
@@ -229,7 +235,7 @@ renaming that account breaks every guarded write.
 6. Still inside that invocation, snapshot takes a backup and **restore proof** before anything is migrated,
    including a first-install retry. A no-current set explicitly has no historical environment/key.
 7. The fixed helper runs these steps as the application user in the new release while root retains both locks:
-   - `artisan down`, then `migrate --pretend` (evidence only; see the runbook), then `migrate --force`;
+   - `artisan down`, then `migrate --force` (no `--pretend` dry run: identity migrations run DDL through the raw PDO, which pretend mode cannot intercept);
    - `config:cache`, `route:cache`, `view:cache`, `event:cache` (all verified to work with this codebase);
    - `vasey:doctor`, plus redacted `commerce-readiness` and `stripe-preflight` JSON.
 8. The same root invocation verifies stopped web/workers, maintenance and attached private storage, then switches `current` atomically. Its internal resume then:

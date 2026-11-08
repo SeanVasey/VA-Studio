@@ -18,7 +18,7 @@
 #   4. the Forge .env validated for the staging profile and installed 0600;
 #   5. one root lease encloses build/sealing; activation freshly quiesces under its own retained lease;
 #   6. a backup of the database, private storage and .env, and an isolated restore proof, before migrating;
-#   7. maintenance in the new release, migrate --pretend, migrate --force, config/route/view/event caches,
+#   7. maintenance in the new release, migrate --force (no --pretend: raw-PDO DDL ignores it), config/route/view/event caches,
 #      vasey:doctor, redacted readiness reports;
 #   8. atomic switch of `current`, PHP-FPM and workers started on it and proven, maintenance lifted, GET / = 200.
 # No storage:link: nothing uses the public disk (previews, artwork and site images stream through controllers).
@@ -61,7 +61,7 @@ ENV_SNAPSHOT=''
 # application settings inherited from Forge's deployment shell. Preserve ordinary OS/tool state.
 while IFS= read -r name; do
   case "$name" in
-    APP_*|DB_*|STRIPE_*|PRODUCTION_*|VASEY_TEST_*|VASEY_OPERATIVE_*|SESSION_*|CACHE_*|QUEUE_*|MAIL_*|FILESYSTEM_DISK|MEDIA_*|CONTACT_*|REDIS_*|AWS_*|BROADCAST_*) unset "$name" ;;
+    APP_*|DB_*|STRIPE_*|PRODUCTION_*|VASEY_TEST_*|VASEY_OPERATIVE_*|VASEY_LICENSE_*|SESSION_*|CACHE_*|QUEUE_*|MAIL_*|FILESYSTEM_DISK|MEDIA_*|CONTACT_*|REDIS_*|AWS_*|BROADCAST_*) unset "$name" ;;
     # The remaining families config/*.php reads with env(); tests/ops/test_staging_code_drift.py fails when a new one is not covered here.
     LOG_*|AUTH_*|DISCOVERY_*|REPORTING_*|MYSQL_ATTR_*|MEMCACHED_*|SQS_*|DYNAMODB_*|BEANSTALKD_*|PAPERTRAIL_*|SLACK_*|POSTMARK_*|RESEND_*|VASEY_PHP_CLI_BINARY|VASEY_SUPPORT_*|VASEY_LISTENING_*|VASEY_CUSTOMER_DATA_*|VASEY_TRANSACTIONAL_MAIL_*|VASEY_*_SYNTHETIC_*|VASEY_PRODUCTION_*_ADMITTED|TRUSTED_PROXIES) unset "$name" ;;
   esac
@@ -101,6 +101,42 @@ on_exit() {
   fi
 }
 trap on_exit EXIT
+
+# ---------------------------------------------------------------- deploy log that outlives Forge's output cutoff
+# Forge stops reading a deployment's output at its time limit (10 minutes) but leaves the processes running. A first
+# install's migrations take longer, and the next write to the closed pipe is SIGPIPE: that killed the first staging
+# activation between the release switch and the resume, and a configuration refresh whose snapshot waits on a busy
+# ship lock is exposed the same way. From here on every line goes through `tee -p`, which keeps writing the evidence
+# log after Forge stops reading, so a refresh, build, activation and resume always run to completion. The log writer
+# closes the deploy lock (fd 9) so it never holds the lock past the deploy. When Forge reports a time-out, read
+# $EVIDENCE/forge-deploy.log and `ctl status` before doing anything else.
+install -d -m 0750 "$EVIDENCE"
+exec > >(exec 9>&-; exec tee -p -a "$EVIDENCE/forge-deploy.log") 2>&1
+
+# ---------------------------------------------------------------- 0. installed helpers match this kit
+# ctl, the backup helper and the fixed release steps run from root-installed copies that only provision.sh refreshes.
+# A deploy of newer kit code against older installed copies would run the old steps, so compare them with the kit this
+# script runs from (the checkout at this SHA) and refuse until provisioning is re-run.
+# A deploy script that itself runs from a root-installed copy (outside the checkout) is pinned the same way; skip there.
+KIT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+MIRROR_DIR=$(cd -- "$VASEY_MIRROR" && pwd -P)
+helper_drift=''
+if [ "${KIT_DIR#"$MIRROR_DIR"/}" != "$KIT_DIR" ]; then
+  while read -r required source installed; do
+    [ -e "$KIT_DIR/$source" ] || [ "$required" = required ] || continue
+    cmp -s -- "$KIT_DIR/$source" "$installed" || helper_drift="$helper_drift $installed"
+  done <<'HELPERS'
+required bin/vasey-staging-ctl /usr/local/sbin/vasey-staging-ctl
+required backup.sh /usr/local/sbin/vasey-staging-backup
+required release-step.sh /usr/local/libexec/vasey-staging/release-step.sh
+required seal-release.py /usr/local/libexec/vasey-staging/seal-release.py
+required normalize-mysql-dump.py /usr/local/libexec/vasey-staging/normalize-mysql-dump.py
+required tls/origin-ca.pem /usr/local/libexec/vasey-staging/origin-ca.pem
+optional nginx/vasey-staging-http.conf /etc/nginx/conf.d/vasey-staging.conf
+HELPERS
+  [ -z "$helper_drift" ] || die "installed kit helpers differ from $KIT_DIR:$helper_drift; re-run provision.sh as root, then deploy again"
+  step "installed kit helpers match the kit at $SHA"
+fi
 
 # ---------------------------------------------------------------- 0. runtime .env checks (values never printed)
 [ -f "$RUNTIME_ENV" ] && [ ! -L "$RUNTIME_ENV" ] || die "Forge .env missing at $RUNTIME_ENV (Forge > Site > Environment)"

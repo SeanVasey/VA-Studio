@@ -167,6 +167,10 @@ for f in nginx/vasey-staging.conf php-fpm/vasey-staging.conf php-fpm/vasey-paid-
          workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh; do
   [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"
 done
+[ -f "$KIT/tls/origin-ca.pem" ] || die "kit file missing: ops/staging/tls/origin-ca.pem"  # the probe's pinned Origin CA roots
+for f in nginx/vasey-staging-http.conf nginx/vasey-staging-classic.conf; do  # the http-level helpers and the whole-file wrapper
+  [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"
+done
 
 PHPV=8.4
 PHP_BIN=/usr/bin/php$PHPV
@@ -189,7 +193,8 @@ swap_kib=$(awk '/^SwapTotal:/{print $2}' /proc/meminfo)
 
 # ---------------------------------------------------------------- 1. packages
 if [ "$SKIP_PACKAGES" = 0 ]; then
-  apt-cache policy "php$PHPV-fpm" | grep -q 'Candidate: [0-9]' \
+  # Not `grep -q`: it exits at the first match, apt-cache then dies of SIGPIPE and pipefail fails the check.
+  apt-cache policy "php$PHPV-fpm" | grep 'Candidate: [0-9]' >/dev/null \
     || die "php$PHPV packages unavailable: create the Forge server with PHP 8.4 (it adds the ondrej/php repository)"
   apt-get update -q
   apt-get install -y -q --no-install-recommends \
@@ -227,10 +232,10 @@ command -v python3 >/dev/null || die "python3 missing (restore schema comparison
 
 # Extensions vasey:doctor requires (php_runtime) plus what CI installs (final-verification.yml) and the workers need.
 for ext in pdo pdo_mysql pdo_sqlite mbstring intl bcmath gd fileinfo zip curl dom xml xmlwriter posix pcntl ctype iconv tokenizer openssl; do
-  "$PHP_BIN" -m | grep -qix "$ext" || die "PHP CLI extension missing: $ext"
+  "$PHP_BIN" -m | grep -ix "$ext" >/dev/null || die "PHP CLI extension missing: $ext"
 done
 for ext in pdo_mysql pdo_sqlite mbstring intl bcmath gd fileinfo zip curl dom xml posix ctype iconv; do
-  "$FPM_BIN" -m 2>/dev/null | grep -qix "$ext" || die "PHP-FPM extension missing: $ext"
+  "$FPM_BIN" -m 2>/dev/null | grep -ix "$ext" >/dev/null || die "PHP-FPM extension missing: $ext"
 done
 info "PHP $("$PHP_BIN" -r 'echo PHP_VERSION;') with required extensions; node $nv"
 
@@ -273,6 +278,12 @@ runuser -u "$APP_USER" -- test -r /var/lib/clamav/daily.cvd -o -r /var/lib/clama
 install -d -m 0755 -o root -g root "$ROOT"
 install -d -m 0755 -o root -g root "$ROOT/releases"
 install -d -m 0700 -o root -g root "$ROOT/backups"
+# The nginx.org packages Forge installs keep their own temp paths under /var/cache/nginx and ship no
+# /var/lib/nginx (Ubuntu's package does). The site's fastcgi_temp_path lives below it, so create the
+# root-owned parent when absent; an existing one must already be a root-owned real directory.
+[ -e /var/lib/nginx ] || install -d -m 0755 -o root -g root /var/lib/nginx
+[ -d /var/lib/nginx ] && [ ! -L /var/lib/nginx ] && [ "$(stat -c %u /var/lib/nginx)" = 0 ] \
+  || die "/var/lib/nginx must be a root-owned directory, not a symlink"
 # App/nginx-owned paths can be replaced by those identities on a rerun. Never grant permissions
 # through a pathname below them: every child opens no-follow relative to a retained directory FD.
 initialize_runtime_directories
@@ -419,7 +430,21 @@ if [ "$(mysql_q 'SELECT @@log_bin')" = 1 ]; then
   mysql_q "SET PERSIST log_bin_trust_function_creators = ON" 2>/dev/null
   [ "$(mysql_q 'SELECT @@global.log_bin_trust_function_creators')" = 1 ] || die "could not set log_bin_trust_function_creators"
 fi
-mysql_q "SELECT @@bind_address" | grep -Eq '^(127\.0\.0\.1|localhost|::1)$' \
+# The identity layer admits its metadata companion connection only when PROCESSLIST names the client by a literal IP
+# (CatalogSocketBinding). With host-name resolution on (MySQL's default), a 127.0.0.1 client appears as localhost:<port>
+# and every identity migration and request refuses ("Current private catalog admission required"). Accounts here are
+# addressed by IP, % or localhost only, so resolving names is not needed. skip_name_resolve is read-only at runtime:
+# persist it and restart mysqld once; reruns find it already on and do nothing.
+if [ "$(mysql_q 'SELECT @@skip_name_resolve')" != 1 ]; then
+  named=$(mysql_q "SELECT COUNT(*) FROM mysql.user WHERE host NOT IN ('%','localhost') AND host NOT REGEXP '^[0-9.%]+$' AND host NOT LIKE '%:%'")
+  [ "$named" = 0 ] || die "MySQL accounts addressed by host name exist; resolve them before enabling skip_name_resolve"
+  mysql_q "SET PERSIST_ONLY skip_name_resolve = ON"
+  systemctl restart mysql
+  for _ in $(seq 1 60); do mysql_q 'SELECT 1' >/dev/null 2>&1 && break; sleep 1; done
+  [ "$(mysql_q 'SELECT @@skip_name_resolve')" = 1 ] || die "skip_name_resolve did not take effect after restarting MySQL"
+  info "MySQL skip_name_resolve enabled (persisted; mysqld restarted once)"
+fi
+mysql_q "SELECT @@bind_address" | grep -E '^(127\.0\.0\.1|localhost|::1)$' >/dev/null \
   || warn "MySQL bind_address is $(mysql_q 'SELECT @@bind_address'); keep port 3306 closed in the Forge firewall"
 info "MySQL $myver: schema $DB_NAME, accounts vasey_app and vasey_backup (127.0.0.1 only)"
 
@@ -469,12 +494,19 @@ install -d -m 0755 -o root -g root /usr/local/libexec/vasey-staging
 install -m 0644 -o root -g root "$KIT/normalize-mysql-dump.py" /usr/local/libexec/vasey-staging/normalize-mysql-dump.py
 install -m 0644 -o root -g root "$KIT/seal-release.py" /usr/local/libexec/vasey-staging/seal-release.py
 install -m 0644 -o root -g root "$KIT/release-step.sh" /usr/local/libexec/vasey-staging/release-step.sh
+install -m 0644 -o root -g root "$KIT/tls/origin-ca.pem" /usr/local/libexec/vasey-staging/origin-ca.pem
 
 render "$KIT/php-fpm/vasey-staging.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-staging.conf" 0644
 render "$KIT/php-fpm/vasey-paid-delivery.conf" "/etc/php/$PHPV/fpm/pool.d/vasey-paid-delivery.conf" 0644
 "$FPM_BIN" -t >/dev/null 2>&1 || { "$FPM_BIN" -t; die "PHP-FPM configuration test failed"; }
 systemctl reload "$FPM_SERVICE" || systemctl restart "$FPM_SERVICE"
-[ -S /run/php/vasey-staging.sock ] && [ -S /run/php/vasey-paid-delivery.sock ] || die "FPM pool sockets missing after reload"
+# The reload is a USR2 re-exec that systemctl does not wait for: the new pools' sockets appear about
+# two seconds later (seen on the staging host). Wait for them rather than test once.
+for _ in $(seq 1 30); do
+  [ -S /run/php/vasey-staging.sock ] && [ -S /run/php/vasey-paid-delivery.sock ] && break
+  sleep 1
+done
+[ -S /run/php/vasey-staging.sock ] && [ -S /run/php/vasey-paid-delivery.sock ] || die "FPM pool sockets missing 30 s after reload"
 
 render "$KIT/workers/vasey-staging-workers.conf" /etc/supervisor/conf.d/vasey-staging.conf 0644
 systemctl enable --now supervisor >/dev/null
@@ -530,6 +562,35 @@ fi
 chown root:root /etc/vasey-staging/probe.netrc; chmod 0600 /etc/vasey-staging/probe.netrc
 
 render "$KIT/nginx/vasey-staging.conf" /etc/vasey-staging/nginx-site.conf 0644
+render "$KIT/nginx/vasey-staging-classic.conf" /etc/vasey-staging/nginx-classic.conf 0644
+
+# http-level helpers (limit_req_zone, map) the site body uses. Forge edits only the inside of the site's server block,
+# where they are not allowed, so they live in conf.d, which nginx.conf includes at http level and Forge never writes.
+# Each name may be defined once per nginx: refuse clearly if an older whole-file site still defines them.
+NGINX_HTTP_CONF=/etc/nginx/conf.d/vasey-staging.conf
+command -v nginx >/dev/null 2>&1 || die "nginx not found (Forge installs it)"
+[ -d /etc/nginx/conf.d ] && [ ! -L /etc/nginx/conf.d ] || die "/etc/nginx/conf.d must be a directory"
+grep -Eq '^[[:space:]]*include[[:space:]]+(/etc/nginx/)?conf\.d/\*\.conf;' /etc/nginx/nginx.conf \
+  || die "/etc/nginx/nginx.conf does not include conf.d/*.conf at http level; the site's rate-limit zones and header maps live there"
+nginx_dupes=$(grep -rlE --exclude-dir=conf.d -e 'zone=vasey_staging_(general|webhook):' \
+  -e '^[[:space:]]*map[[:space:]]+[^[:space:]]+[[:space:]]+\$vasey_staging_(referrer_policy|robots|frame_options)\b' /etc/nginx 2>/dev/null || true)
+[ -z "$nginx_dupes" ] || die "these nginx files already define the staging zones or maps: $(echo $nginx_dupes); that is the older
+  whole-file site template. Put the interim or Forge default site config back (README step 7), then re-run"
+nginx_previous=""
+if [ -e "$NGINX_HTTP_CONF" ]; then
+  [ -f "$NGINX_HTTP_CONF" ] && [ ! -L "$NGINX_HTTP_CONF" ] || die "$NGINX_HTTP_CONF must be a regular file"
+  nginx_previous=/etc/vasey-staging/nginx-http.conf.previous
+  cp -p "$NGINX_HTTP_CONF" "$nginx_previous"
+fi
+install -m 0644 -o root -g root "$KIT/nginx/vasey-staging-http.conf" "$NGINX_HTTP_CONF.tmp"
+mv -f "$NGINX_HTTP_CONF.tmp" "$NGINX_HTTP_CONF"
+if ! nginx_test=$(nginx -t 2>&1); then
+  if [ -n "$nginx_previous" ]; then mv -f "$nginx_previous" "$NGINX_HTTP_CONF"; else rm -f "$NGINX_HTTP_CONF"; fi
+  printf '%s\n' "$nginx_test" >&2
+  die "nginx -t failed with $NGINX_HTTP_CONF installed; it was put back as before"
+fi
+[ -z "$nginx_previous" ] || rm -f "$nginx_previous"
+systemctl reload nginx || die "nginx reload failed after a passing nginx -t"
 
 # ---------------------------------------------------------------- summary
 cat <<EOF
@@ -542,7 +603,8 @@ provision: done for $HOST
   helpers             /usr/local/sbin/vasey-staging-ctl (sudo for $APP_USER), /usr/local/sbin/vasey-staging-backup (cron 03:17 UTC)
   MySQL               schema $DB_NAME; DB_HOST=127.0.0.1 DB_USERNAME=vasey_app
   secrets (root only) $SECRETS/db-app.env (paste DB_PASSWORD into Forge > Environment), $BACKUP_CNF, $HTPASSWD, /etc/vasey-staging/probe.netrc
-  nginx site          /etc/vasey-staging/nginx-site.conf: fill __SSL_CERT__, __SSL_KEY__, __FORGE_CONF__ from Forge's
-                      generated config, then paste it into Forge > Site > Edit Nginx Configuration
+  nginx http helpers  $NGINX_HTTP_CONF (installed, nginx -t passed, reloaded)
+  nginx site body     /etc/vasey-staging/nginx-site.conf: install it as the site's nginx configuration (Forge > Site >
+                      Edit Nginx Configuration, or the site API); README step 7. Whole-file hosts: nginx-classic.conf there
 Next: ops/staging/README.md step 8 onwards.
 EOF
