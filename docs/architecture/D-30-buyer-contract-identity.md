@@ -229,12 +229,22 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
      escalates it (money captured but unreconciled). **Decided 2026-11-08:** record the payment, and refuse paid-grant
      finalization so fulfillment is held. Done: both `PaidGrants::finalize` and `PaidTaxGrants::finalize` refuse such an
      order (V1 reconcile records it).
-   - [ ] **Activation blocker:** the tax checkout's `TaxCheckoutEvidence::order` re-verifies on every open, so its reconcile
-     refuses (`changed`) instead of recording the payment, and the `PaidTaxGrants` hold is unreachable. Align it (for
-     example a `reverify` flag that the reconcile, record, write-admission and status paths pass as false) with its own
-     independent review before either gate opens.
-   - [ ] **Activation blocker:** a held order has no durable marker, audit row or staff-visible signal yet; the reason
-     (`contract_identity_held`) exists only on the exception. Add a staff surface before activation.
+   - [x] **Activation blocker (done; needs its own independent review before either gate opens):** the tax checkout's
+     `TaxCheckoutEvidence::order` re-verified on every open, so its reconcile refused (`changed`) instead of recording the
+     payment, and the `PaidTaxGrants` hold was unreachable. `order()` now takes `reverify` (default true); only the paths
+     that retrieve or record an already created provider session pass false: `prepare(create: false)` (reconcile), `retain()`,
+     `TaxCheckoutWriteAdmission::retained` and `status`. Initiate, bind, accept and the paid-tax source (`lockedRead`, as
+     `PaidTaxCommands` uses it) still re-verify; `PaidTaxGrants::finalize` reads the source without it and holds the order
+     itself (`409 contract_identity_held`). Seal, hashes, buyer binding and body == request declarations stay enforced on
+     every path (`PaidTaxGrantJourneyTest::test_a_paid_v2_order_whose_declaration_no_longer_verifies_is_recorded_and_held_at_finalization`,
+     `ProductionTaxCheckoutContractIdentityTest`).
+   - [x] **Activation blocker (done; the staff list's MFA and access follow the existing read-only resources):** a held order
+     now leaves one durable, append-only `audit_events` row (`ContractIdentityHolds`, action
+     `paid_order.contract_identity_held`; subject the paid order row; context chain, reason and order public id only, no
+     declaration field), written after the finalizer's rolled-back transaction in its own transaction under a lock on the
+     order row, and deduplicated per order. Staff read it in the admin panel's read-only "Held paid orders" list
+     (`ContractIdentityHoldResource`, `administer-catalog` checked on the server, in the query and on every Livewire request,
+     with required panel MFA). Not built: notification to staff, or a way to release a hold (staff act outside the system).
    - [x] `initiate` refuses a v2 order while the gate is off, in both checkouts (decided 2026-11-08), before any row or
      provider call.
    - [x] An already paid name-only order with the gate on answers its status from `initiate` with no provider call
