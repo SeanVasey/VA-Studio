@@ -226,11 +226,27 @@ final class CatalogSocketBindingTest extends TestCase
     {
         $gate = new ReflectionMethod(CatalogSocketBinding::class, 'supportedPhp');
         $cases = ['8.4.26' => false, '8.4.27-dev' => false, '8.4.27' => true, '8.4.28' => true, '8.4.40' => true,
-            '8.3.99' => false, '8.5.0' => false, '8.5.27' => false, '9.0.0' => false];
+            '8.3.99' => false, '8.5.0' => false, '8.5.27' => false, '9.0.0' => false,
+            // Pre-releases of 8.4.27 refuse; distribution suffixes and pre-releases of later 8.4 patches are admitted.
+            '8.4.27RC1' => false, '8.4.27-1ubuntu1' => true, '8.4.28-dev' => true, '8.4.28RC1' => true];
         foreach ($cases as $version => $admitted) {
             [$major, $minor] = array_map('intval', explode('.', $version));
             self::assertSame($admitted, $gate->invoke(null, $version, $major, $minor), $version);
         }
+    }
+
+    public function test_every_qualified_function_the_binding_calls_is_proved_native(): void
+    {
+        $source = (string) file_get_contents((new \ReflectionClass(CatalogSocketBinding::class))->getFileName());
+        $start = strpos($source, 'private static function internalFunctions(): void');
+        self::assertIsInt($start);
+        preg_match('/foreach \(\[(.*?)\] as \$name\)/s', substr($source, $start), $list);
+        preg_match_all("/'([a-z_0-9]+)'/", $list[1] ?? '', $listed);
+        preg_match_all('/(?<![\w\\\\])\\\\([a-z_][a-z_0-9]*)\(/', $source, $called);
+        self::assertGreaterThan(20, count(array_unique($called[1])));
+        $missing = array_values(array_diff(array_unique($called[1]), $listed[1]));
+        self::assertSame([], $missing, 'Qualified native calls missing from internalFunctions().');
+        self::assertContains('version_compare', $listed[1]);
     }
 
     public function test_only_a_read_past_the_cap_is_transient_and_any_other_read_anomaly_refuses(): void
