@@ -144,7 +144,8 @@ linked to the order. No superseding contract version is issued.
     qualification request. The qualifying staff member is not exported.
   - `PaidGrantExportSection` covers the V1 paid and V2 paid-tax chains. For each chain it exports the order origins, the grant
     origins that copy `buyer_declarations` verbatim, the manifests of the originals rendered from them, and the account's
-    download history (authorization kind and times, redemption times).
+    download history (authorization kind and times, redemption times). A test pins that a V1 paid copy of a v2 declaration
+    (licensee type, legal name, postal address, statement) exports exactly as the grant origin froze it.
   - Paid orders and authorizations are found through `account_id` only; lines, originals and redemptions only through them.
   - Each payload is opened with its hash checked. The sealed original buyer must name the requester's origin and account, and
     every line must repeat it. Originals and authorizations must seal one of the account's exported lines.

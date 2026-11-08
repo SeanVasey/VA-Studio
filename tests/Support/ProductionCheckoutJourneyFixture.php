@@ -15,7 +15,7 @@ trait ProductionCheckoutJourneyFixture
 {
     use ProductionIdentityFixture;
 
-    protected function payable(bool $accept = true): array
+    protected function payable(bool $accept = true, array $identity = ['legalName' => 'Declared synthetic buyer']): array
     {
         $catalog = F::catalog();
         $buyer = $this->enrollThroughLocalSmtp();
@@ -26,7 +26,7 @@ trait ProductionCheckoutJourneyFixture
                 'effective_from' => CarbonImmutable::now('UTC')->subDay()->format('Y-m-d\TH:i:s\Z'),
                 'effective_until' => CarbonImmutable::now('UTC')->addDays(30)->format('Y-m-d\TH:i:s\Z')], 'synthetic-qualified-buyer', $catalog['actor']);
         $checkout = new ProductionCheckout($access);
-        $review = $checkout->review($buyer['principal'], $buyer['user'], $catalog['candidate']->id, $catalog['items'], $basis['public_id'], ['legalName' => 'Declared synthetic buyer'], 'synthetic-review');
+        $review = $checkout->review($buyer['principal'], $buyer['user'], $catalog['candidate']->id, $catalog['items'], $basis['public_id'], $identity, 'synthetic-review');
         $order = $accept ? $checkout->accept($buyer['principal'], $buyer['user'], $review['reviewId'], $review['reviewHash'], true, 'synthetic-accept') : null;
         $gateway = new ProductionCheckoutGatewayFixture;
         $hosted = new HostedCheckout($access, $gateway);
