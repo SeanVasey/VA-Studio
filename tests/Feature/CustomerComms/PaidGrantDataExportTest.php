@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\CustomerComms;
 
+use App\Domain\Commerce\ContractIdentity\ContractIdentityStatements;
 use App\Domain\Commerce\ProductionCheckout\Evidence;
 use App\Domain\Customers\CustomerAccess;
 use App\Domain\Customers\DataRights\CustomerDataExportDocument;
@@ -65,9 +66,9 @@ class PaidGrantDataExportTest extends TestCase
     }
 
     /** A V1 paid order with its grant origin and rendered original, through the genuine chain. */
-    private function paidV1(): array
+    private function paidV1(?array $identity = null): array
     {
-        $f = $this->payable();
+        $f = $identity === null ? $this->payable() : $this->payable(true, $identity);
         $f['hosted']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
         $f['gateway']->paid = true;
         $this->assertSame('verified', $f['hosted']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
@@ -165,6 +166,30 @@ class PaidGrantDataExportTest extends TestCase
         $this->assertSame(0, array_sum(PaidGrantExportSection::counts(self::account($other))));
         $this->assertSame([], app(ProductionCheckoutExportSection::class)->build(self::account($other))['productionCheckoutExemptionBases']);
         $this->assertSame(0, ProductionCheckoutExportSection::counts(self::account($other))['production_checkout_exemption_bases']);
+    }
+
+    /**
+     * D-30 before activation (P3-c): with V1 contract identity capture on, the paid copy of a v2 declaration (licensee type,
+     * legal name, postal address, statement) exports verbatim to its buyer, exactly as the grant origin froze it.
+     */
+    public function test_a_v1_paid_copy_of_a_v2_declaration_exports_verbatim(): void
+    {
+        config(['production_checkout.contract_identity_v2' => true]);
+        $f = $this->paidV1(['licenseeType' => 'individual', 'legalName' => 'Zoë Émile', 'legalNameConfirmed' => true,
+            'postalAddress' => ['country' => 'US', 'lines' => ['1 Example Street'], 'locality' => 'Springfield', 'region' => 'IA', 'postalCode' => '50000'],
+            'statementVersion' => ContractIdentityStatements::offered()['individual']['statementVersion']]);
+        $account = self::account($f['buyer']);
+
+        $frozen = PaidGrantRecords::decode((array) DB::table('paid_grant_origins')->sole())['source']['buyer_declarations'];
+        $this->assertSame(['buyer-contract-identity-v2', 'individual', 'Zoë Émile'], [$frozen['schema'], $frozen['licensee_type'], $frozen['legal_name']]);
+        $sections = app(PaidGrantExportSection::class)->build($account);
+        $this->assertCount(1, $sections['paidGrantOrders']);
+        $this->assertSame($frozen, $sections['paidGrantOrders'][0]['lines'][0]['buyerDeclarations']);
+        $this->assertSame(self::counts([1, 1, 1, 0, 0], [0, 0, 0, 0, 0]), PaidGrantExportSection::counts($account));
+        // The full export document carries it and stays valid UTF-8 JSON.
+        $json = json_encode(app(PaidGrantExportSection::class)->build($account), JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+        $this->assertStringContainsString('Zoë Émile', $json);
+        $this->assertStringContainsString('1 Example Street', $json);
     }
 
     public function test_paid_tax_copies_and_original_export_with_their_declarations(): void
