@@ -212,7 +212,8 @@ final class ProductionTaxCheckout
         $result = CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $orderId): array {
             $tax = TaxCheckoutRecords::writer($rows);
             $access = $this->access->lock($principal, $buyer, $tax->current);
-            $order = TaxCheckoutEvidence::order($tax, $tax->one('order', $orderId));
+            // D-30 (decided 2026-11-08): status reports a recorded payment whether or not the declaration still verifies.
+            $order = TaxCheckoutEvidence::order($tax, $tax->one('order', $orderId), false);
             ProductionCheckout::requireOwner($this->access->durableBinding($principal), $order['body']['buyer']);
             $result = self::orderProjection($order);
             $records = $tax->selector('request', 'order_id = ?', [$order['row']['id']]);
@@ -240,22 +241,26 @@ final class ProductionTaxCheckout
         $prepared = CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $orderId, $create, $fresh): array {
             $tax = TaxCheckoutRecords::writer($rows);
             $access = $this->access->lock($principal, $buyer, $tax->current);
-            $order = TaxCheckoutEvidence::order($tax, $tax->one('order', $orderId));
+            // D-30 (decided 2026-11-08): initiate re-verifies a v2 declaration; reconcile records a captured payment regardless.
+            $order = TaxCheckoutEvidence::order($tax, $tax->one('order', $orderId), $create);
             ProductionCheckout::requireOwner($this->access->durableBinding($principal), $order['body']['buyer']);
             $requests = $tax->selector('request', 'order_id = ?', [$order['row']['id']]);
             CheckoutException::require(count($requests) <= 1);
+            $statusOnly = false;
             if ($create) {
                 // D-30 step 8: TaxCheckoutEvidence::order() has re-verified a v2 declaration; a declaration that does not match the
                 // gate refuses before any request row or provider call. A name-only order already paid while the gate is on passes
                 // here, and initiate() answers it with its status (the existing `reviewed` early return), never a provider call.
                 $paid = $requests !== [] && TaxCheckoutEvidence::intent($tax, $order, $requests[0])['reviewed'] !== null;
-                ProductionCheckout::requirePayableIdentity($order['body']['buyer_declarations'], TaxCheckoutPolicy::contractIdentityV2(), $paid);
+                $statusOnly = ProductionCheckout::requirePayableIdentity($order['body']['buyer_declarations'], TaxCheckoutPolicy::contractIdentityV2(), $paid);
             }
             $newRequest = $requests === [];
             CheckoutException::require($create || $requests !== [], 'request_required');
             $candidate = null;
             $selection = null;
-            if ($create) {
+            // A status-only answer never reaches the provider, so it skips the create-only proofs (current candidate and
+            // selection) that would otherwise refuse a paid order whose listing changed after payment (review P3-4).
+            if ($create && ! $statusOnly) {
                 // Never send stale terms or prices to the provider: the approved candidate and the selection must be current.
                 $candidate = TaxCandidate::load($tax->current, $order['row']['candidate_id']);
                 Evidence::same($order['body']['candidate'], $candidate['binding']);
@@ -279,7 +284,7 @@ final class ProductionTaxCheckout
                 $record = $requests[0];
             }
             $intent = TaxCheckoutEvidence::intent($tax, $order, $record);
-            if ($create) {
+            if ($create && ! $statusOnly) {
                 CurrentSelection::proveBytes($selection);
                 CurrentSelection::proveCurrent($tax->current, $selection, CarbonImmutable::now('UTC'));
                 TaxCandidate::proveCurrent($tax->current, $candidate);
@@ -334,7 +339,8 @@ final class ProductionTaxCheckout
             $this->access->verifyHistoricalBinding($locator->historicalBuyerBinding(), $rows->current);
             $tax = TaxCheckoutRecords::writer($rows);
             $record = $tax->one('request', $requestId);
-            $order = TaxCheckoutEvidence::order($tax, $tax->byId('order', $record['order_id']));
+            // D-30 (decided 2026-11-08): a captured payment is always recorded; finalization holds an unverifiable declaration.
+            $order = TaxCheckoutEvidence::order($tax, $tax->byId('order', $record['order_id']), false);
             CheckoutException::require($order['row']['public_id'] === $locator->orderId && $order['row']['payload_hash'] === $locator->orderHash, 'write_source_changed');
             Evidence::same($locator->historicalBuyerBinding(), $order['body']['buyer']);
             $intent = TaxCheckoutEvidence::intent($tax, $order, $record);

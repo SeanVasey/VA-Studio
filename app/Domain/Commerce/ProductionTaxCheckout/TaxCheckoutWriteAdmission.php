@@ -94,7 +94,9 @@ final readonly class TaxCheckoutWriteAdmission implements CheckoutCommitAdmissio
         $fresh->prove();
         $historical = (new ProductionCustomerAccess)->verifyHistoricalBinding($locator->historicalBuyerBinding(), $rows->current);
         $tax = TaxCheckoutRecords::writer($rows);
-        $order = TaxCheckoutEvidence::order($tax, $tax->one('order', $locator->orderId));
+        // D-30 (decided 2026-11-08): retained provider evidence is admitted whether or not the declaration still verifies; bind()
+        // has re-verified it in the same transaction, and a recorded payment's fulfillment is held at finalization instead.
+        $order = TaxCheckoutEvidence::order($tax, $tax->one('order', $locator->orderId), false);
         CheckoutException::require($order['row']['payload_hash'] === $locator->orderHash, 'write_source_changed');
         Evidence::same($locator->historicalBuyerBinding(), $order['body']['buyer']);
         $requests = $tax->selector('request', 'order_id = ?', [$order['row']['id']]);

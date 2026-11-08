@@ -10,6 +10,7 @@ use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderSourceV1;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
+use App\Domain\Grants\ContractIdentityHolds;
 use App\Domain\Grants\Paid\Models\PaidOrderOrigin;
 use App\Domain\Rights\LicenseDisclosure;
 use App\Models\User;
@@ -25,6 +26,12 @@ final class PaidGrants
     {
         try {
             return $this->finalizeOwned($principal, $actor, $orderId, $projectionRead);
+        } catch (PaidGrantException $error) {
+            if ($error->reason === ContractIdentityHolds::REASON) {
+                // D-30: the hold's transaction has rolled back; leave the durable staff record outside it.
+                ContractIdentityHolds::recordAfterHold('production_checkout_v1', $orderId);
+            }
+            throw $error;
         } catch (IdentityException) {
             throw new PaidGrantException(403);
         } catch (CheckoutException $error) {
@@ -68,7 +75,7 @@ final class PaidGrants
                 // D-30 (decided 2026-11-08): a paid order whose frozen v2 declaration no longer verifies stays paid, but no grant
                 // origin is created; fulfillment is held for staff. Every line carries the order's one declaration.
                 foreach ($lines as $line) {
-                    PaidGrantException::require(! ProductionCheckout::contractIdentityHeld($line['buyer_declarations']), 409, 'contract_identity_held');
+                    PaidGrantException::require(! ProductionCheckout::contractIdentityHeld($line['buyer_declarations']), 409, ContractIdentityHolds::REASON);
                 }
                 $batch = $rows->one('paid_order_origins', 'producer = ? AND order_public_id = ?', ['production_checkout_v1', $orderId]);
                 if ($batch === []) {

@@ -17,7 +17,9 @@ use App\Domain\Customers\ProductionCustomerAccess;
 use App\Support\CanonicalJson;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\ProductionTaxCheckoutContractIdentityForgery;
 use Tests\Support\ProductionTaxCheckoutFixtures;
 use Tests\Support\RecordingTaxCheckoutTransport;
 use Tests\TestCase;
@@ -32,6 +34,7 @@ use Tests\TestCase;
 class ProductionTaxCheckoutContractIdentityTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
+    use ProductionTaxCheckoutContractIdentityForgery;
     use ProductionTaxCheckoutFixtures;
 
     protected function setUp(): void
@@ -275,9 +278,16 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
         foreach (['王小明', 'Иван Петров'] as $name) {
             $unprintable = [...$body['buyer_declarations'], 'legal_name' => $name];
             $request = [...$body['request'], 'buyer_declarations' => $unprintable];
-            $this->refusesEvidence([...self::resealed($row, [...$body, 'request' => $request, 'request_hash' => CanonicalJson::hash($request),
-                'buyer_declarations' => $unprintable]), 'request_hash' => CanonicalJson::hash($request)]);
+            $consistent = [...self::resealed($row, [...$body, 'request' => $request, 'request_hash' => CanonicalJson::hash($request),
+                'buyer_declarations' => $unprintable]), 'request_hash' => CanonicalJson::hash($request)];
+            $this->refusesEvidence($consistent);
+            // D-30 (decided 2026-11-08): the retrieve/record paths open it without re-verification, and only those.
+            $this->assertSame($name, self::openOrder($consistent, false)['body']['buyer_declarations']['legal_name']);
         }
+        // Without re-verification everything else is still enforced: the seal, the hashes and body == request declarations.
+        $this->refusesEvidence(self::resealed($row, [...$body, 'buyer_declarations' => [...$body['buyer_declarations'], 'legal_name' => 'Someone Else']]), false);
+        $this->refusesEvidence([...$row, 'payload_hash' => hash('sha256', 'tampered')], false, 'corrupt');
+        $this->refusesEvidence([...$row, 'request_hash' => hash('sha256', 'tampered')], false);
     }
 
     /** A second preview for the same buyer and catalog, under the gate as it is now. */
@@ -286,9 +296,9 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
         return [...$f, 'preview' => $f['checkout']->preview($f['buyer']['principal'], $f['buyer']['user'], $f['catalog']['candidate']->id, $f['catalog']['items'])];
     }
 
-    private static function openOrder(array $row): array
+    private static function openOrder(array $row, bool $reverify = true): array
     {
-        return CommandTransaction::run(fn (Records $rows): array => TaxCheckoutEvidence::order(TaxCheckoutRecords::writer($rows), $row));
+        return CommandTransaction::run(fn (Records $rows): array => TaxCheckoutEvidence::order(TaxCheckoutRecords::writer($rows), $row, $reverify));
     }
 
     private static function resealed(array $row, array $body): array
@@ -296,13 +306,13 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
         return [...$row, ...Evidence::seal($body)];
     }
 
-    private function refusesEvidence(array $row): void
+    private function refusesEvidence(array $row, bool $reverify = true, string $reason = 'changed'): void
     {
         try {
-            self::openOrder($row);
+            self::openOrder($row, $reverify);
             $this->fail('Expected the tampered order evidence to refuse.');
         } catch (CheckoutException $e) {
-            $this->assertSame(['changed', 409], [$e->reason, $e->status]);
+            $this->assertSame([$reason, 409], [$e->reason, $e->status]);
         }
     }
 
@@ -435,6 +445,70 @@ class ProductionTaxCheckoutContractIdentityTest extends TestCase
         config(['production-tax-checkout.contract_identity_v2' => false]);
         $this->refuses('changed', fn () => $this->initiate($f, $order['orderId']));
         $this->assertSame(['create', 'retrieve', 'retrieve', 'paymentIntent'], array_column($f['transport']->calls, 0));
+        $this->assertSame([1, 1], self::paymentCounts());
+    }
+
+    public function test_reconcile_records_an_unverifiable_v2_payment_but_still_refuses_tampered_evidence(): void
+    {
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $f = $this->payable();
+        $this->order($f, self::identity());
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $forged = self::forgedUnprintableTaxOrder();
+        // Body declarations that differ from the request's (resealed), and a stored row whose seal no longer matches.
+        $mismatched = self::forgedUnprintableTaxOrder('synthetic-forged-mismatch',
+            fn (array $body): array => [...$body, 'buyer_declarations' => [...$body['buyer_declarations'], 'legal_name' => '李小龙']]);
+        $unsealed = self::forgedUnprintableTaxOrder('synthetic-forged-unsealed', null,
+            fn (array $row): array => [...$row, 'payload_hash' => hash('sha256', 'tampered')]);
+        foreach ([[$mismatched, 'changed'], [$unsealed, 'corrupt']] as [$tampered, $reason]) {
+            // The evidence refuses before the missing request is even considered.
+            $this->refuses($reason, fn () => $this->reconcile($f, $tampered));
+            $this->refuses($reason, fn () => $f['checkout']->status($f['buyer']['principal'], $f['buyer']['user'], $tampered));
+        }
+        foreach ([true, false] as $gate) {
+            config(['production-tax-checkout.contract_identity_v2' => $gate]);
+            $this->refuses('changed', fn () => $this->initiate($f, $forged));
+        }
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $this->assertSame([], $f['transport']->calls);
+
+        $f['transport']->params = self::forgedTaxSession($forged, RecordingTaxCheckoutTransport::SESSION);
+        $f['transport']->paid = true;
+        $paid = $this->reconcile($f, $forged);
+        $this->assertSame(['complete', 'verified', 'pending_fulfillment'], [$paid['checkoutStatus'], $paid['paymentStatus'], $paid['fulfillmentStatus']]);
+        $this->assertSame([1, 1], self::paymentCounts());
+        // A repeated reconcile writes nothing more; initiate still refuses rather than answering for the unverifiable order.
+        $this->assertSame($paid['paymentStatus'], $this->reconcile($f, $forged)['paymentStatus']);
+        $this->refuses('changed', fn () => $this->initiate($f, $forged));
+        $this->assertSame(['retrieve', 'paymentIntent'], array_column($f['transport']->calls, 0));
+        $this->assertSame([1, 1], self::paymentCounts());
+    }
+
+    public function test_a_paid_name_only_order_answers_its_status_after_the_listing_changed(): void
+    {
+        $f = $this->payable();
+        $order = $this->order($f, ['legalName' => 'Declared synthetic buyer']);
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $this->assertSame('open', $this->initiate($f, $order['orderId'])['checkoutStatus']);
+        $f['transport']->paid = true;
+        $this->assertSame('verified', $this->reconcile($f, $order['orderId'])['paymentStatus']);
+        DB::table('offers')->where('track_id', $f['catalog']['items'][0]['trackId'])->update(['is_active' => false]);
+        $calls = $f['transport']->calls;
+
+        // Review P3-4: with the gate on, the status-only answer skips the create-only candidate and selection proofs.
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $status = $this->initiate($f, $order['orderId']);
+        $this->assertSame(['verified', 'pending_fulfillment'], [$status['paymentStatus'], $status['fulfillmentStatus']]);
+        $this->assertSame($f['checkout']->status($f['buyer']['principal'], $f['buyer']['user'], $order['orderId']), $status);
+        // With the gate off the same order still runs those proofs (unchanged), which the withdrawn listing refuses.
+        config(['production-tax-checkout.contract_identity_v2' => false]);
+        try {
+            $this->initiate($f, $order['orderId']);
+            $this->fail('The create-only proofs run when initiate is not answering a status-only order.');
+        } catch (CheckoutException|ValidationException) {
+            // The withdrawn listing no longer resolves to a current selection.
+        }
+        $this->assertSame($calls, $f['transport']->calls);
         $this->assertSame([1, 1], self::paymentCounts());
     }
 }

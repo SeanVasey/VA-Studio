@@ -39,7 +39,14 @@ final class TaxCheckoutEvidence
             'total' => 'reviewed_by_buyer_at_hosted_checkout'];
     }
 
-    public static function order(TaxCheckoutRecords $tax, array $record): array
+    /**
+     * Opens a sealed order and proves it against its own request, commitment, lines and assent. A v2 contract identity
+     * declaration is re-verified against checkout's printable set unless $reverify is false. D-30 (decided 2026-11-08): only
+     * the paths that retrieve or record an already created provider session pass false (reconcile, its retained write and
+     * write admission, and status), so a captured payment is always recorded; initiate, bind, accept and the paid-tax source
+     * re-verify, and paid-tax finalization holds fulfillment of an order whose declaration no longer verifies.
+     */
+    public static function order(TaxCheckoutRecords $tax, array $record, bool $reverify = true): array
     {
         $body = Evidence::open($record, 'production_tax_checkout_order');
         $context = TaxExecutionContext::retained($body['machine'], $body['execution_context']);
@@ -65,7 +72,7 @@ final class TaxCheckoutEvidence
                 ->addSeconds($context->reservationSeconds)->format('Y-m-d\TH:i:s\Z'));
         Evidence::same(['kind' => 'unscoped_nonexclusive', 'selection_hash' => $body['selection_hash']], $body['inventory']);
         Evidence::same([...$body['machine']['choices']['assent'], 'accepted' => true, 'preview_hash' => $body['preview_hash'], 'accepted_at' => $record['created_at']], $body['assent']);
-        if ($identity) {
+        if ($identity && $reverify) {
             // This checkout sells non-exclusive licenses only.
             ContractPrintableSet::verifyRetained($body['buyer_declarations'], false);
         }

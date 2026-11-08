@@ -568,4 +568,29 @@ class ProductionCheckoutContractIdentityTest extends TestCase
         $this->assertSame($calls, $f['calls']->calls);
         $this->assertSame([1, 1], self::paymentCounts());
     }
+
+    public function test_a_paid_name_only_order_answers_its_status_after_the_listing_and_switches_changed(): void
+    {
+        $f = $this->hosted($this->prepared());
+        $order = $this->accept($f, $this->review($f, ['legalName' => 'Declared synthetic buyer']));
+        $this->assertSame('open', $this->initiate($f, $order['orderId'])['checkoutStatus']);
+        $f['gateway']->paid = true;
+        $this->assertSame('verified', $this->reconcile($f, $order['orderId'])['paymentStatus']);
+        DB::table('offers')->where('track_id', $f['catalog']['items'][0]['trackId'])->update(['is_active' => false]);
+        config(['production_checkout.fresh_checkout_enabled' => false, 'production_checkout.reconciliation_enabled' => false]);
+        $calls = $f['calls']->calls;
+
+        // Review P3-4: with the gate on, the status-only answer skips the create-only policy, selection, basis and
+        // fresh-checkout proofs (and the reconciliation switch), keeping the owner, lock and evidence checks.
+        config(['production_checkout.contract_identity_v2' => true]);
+        $status = $this->initiate($f, $order['orderId']);
+        $this->assertSame(['verified', 'pending_fulfillment'], [$status['paymentStatus'], $status['fulfillmentStatus']]);
+        $this->assertSame($f['hosted']->status($f['buyer']['principal'], $f['buyer']['user'], $order['orderId']), $status);
+        $this->assertSame($calls, $f['calls']->calls);
+        // With the gate off the same order still runs those proofs (unchanged): the disabled fresh checkout refuses.
+        config(['production_checkout.contract_identity_v2' => false]);
+        $this->refuses('disabled', fn () => $this->initiate($f, $order['orderId']));
+        $this->assertSame($calls, $f['calls']->calls);
+        $this->assertSame([1, 1], self::paymentCounts());
+    }
 }
