@@ -351,11 +351,9 @@ country name prints.
 - Tests: `VaseyLicenseV2ProfileTest` (pin, sources, closure, tamper refusals, counts, the subset of the paid renderers' rule,
   per-face drawability, names) and the Latin Extended cases in both checkout identity tests.
 
-**Known issue on the base branch (not caused by v2).** `ContractIdentityDeclarationV2.php` changed in #216 after #223 pinned
-it in v1's manifest, so v1's implementation pin no longer matches: `VaseyLicenseProfile::verifyRuntime()` refuses with
-`profile_changed`, `build-contract-profile-vasey-license-v1.php --check` reports `profile-assets.json`, and
-`VaseyLicensePdfRendererTest` has 30 errors on the base commit. Fixing it needs a v1 manifest rebuild (a new
-`MANIFEST_SHA256`), which this increment did not do.
+**v1 pin (fixed in #240).** `ContractIdentityDeclarationV2.php` changed in #216 after #223 pinned it in v1's manifest;
+#240 rebuilt the v1 manifest and added both profiles' `--check` to CI. Because v2's implementation closure includes
+`VaseyLicenseProfile.php`, every v1 rebuild also requires a v2 rebuild.
 
 **Remaining for activation (increment 5).**
 
