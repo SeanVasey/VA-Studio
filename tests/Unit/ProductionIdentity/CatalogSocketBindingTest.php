@@ -80,12 +80,28 @@ final class CatalogSocketBindingTest extends TestCase
         $this->proof($this->writer(), $this->context(), ['12345', '23456'], $tcp);
     }
 
+    public function test_owned_socket_sharing_the_primary_source_port_with_another_peer_is_not_ambiguous(): void
+    {
+        // Linux connect() gives sockets with different peers the same ephemeral port (e.g. a loopback SMTP client).
+        $little = pack('S', 1) === "\x01\0";
+        $primary = $little ? $this->row() : $this->row('0A000002:C350', 'C0000201:0CEA');
+        $other = $little ? $this->row(remote: '0100007F:0019', inode: '23456') : $this->row('0A000002:C350', '7F000001:0019', '23456');
+        foreach ([$primary.$other, $other.$primary] as $rows) {
+            $actual = $this->proof($this->writer(), $this->context(), ['12345', '23456'], self::HEADER.$rows);
+            self::assertSame('12345', $actual['inode']);
+            self::assertSame(3306, $actual['remote_port']);
+        }
+        // Without the primary's own 4-tuple the shared source port proves nothing.
+        $this->expectException(LogicException::class);
+        $this->proof($this->writer(), $this->context(), ['23456'], self::HEADER.$other);
+    }
+
     public function test_unowned_ambiguous_missing_nonestablished_and_malformed_snapshots_refuse(): void
     {
         $cases = [
             [[], self::HEADER.$this->row()],
             [['99999'], self::HEADER.$this->row()],
-            [['12345', '23456'], self::HEADER.$this->row().$this->row(remote: '020200C0:0CEA', inode: '23456')],
+            [['12345', '23456'], self::HEADER.$this->row(remote: '020200C0:0CEA').$this->row(remote: '010200C0:8141', inode: '23456')],
             [['12345'], self::HEADER.$this->row(state: '02')],
             [['12345'], self::HEADER.$this->row().$this->row()],
             [['12345'], "malformed\n".$this->row()],

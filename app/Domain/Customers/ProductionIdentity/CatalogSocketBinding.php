@@ -19,6 +19,8 @@ final class CatalogSocketBinding
 
     private const MAX_FDS = 4096;
 
+    private const SNAPSHOT_ATTEMPTS = 3;
+
     /** The IPv6 table of a kernel built or booted without IPv6: it holds no socket, so it adds no row to the proof. */
     public const ABSENT_IPV6_TABLE = "  sl  local_address remote_address st tx_queue rx_queue tr tm->when retrnsmt uid timeout inode\n";
 
@@ -64,9 +66,18 @@ final class CatalogSocketBinding
         }
         // Refuse unsupported descriptor/provider profiles before any filesystem access or constructor.
         self::requested($writer, $context, $status);
-        [$inodes, $tcp, $tcp6] = self::snapshot();
-
-        return self::prove($writer, $context, $status, $inodes, $tcp, $tcp6);
+        // procfs regenerates the TCP table per read() chunk and resumes by bucket offset, so concurrent socket churn
+        // can repeat or skip a row. A torn read only ever refuses; a fresh complete snapshot must still prove the binding.
+        for ($attempt = 1; ; $attempt++) {
+            [$inodes, $tcp, $tcp6] = self::snapshot();
+            try {
+                return self::prove($writer, $context, $status, $inodes, $tcp, $tcp6);
+            } catch (LogicException $error) {
+                if ($attempt >= self::SNAPSHOT_ATTEMPTS) {
+                    throw $error;
+                }
+            }
+        }
     }
 
     /** Pure proof over bounded native snapshots. This method never constructs a PDO or accepts a provider/path. */
@@ -90,8 +101,12 @@ final class CatalogSocketBinding
                 self::refuse();
             }
             $seen[$row['inode']] = true;
-            // Choose primary by its OWN client endpoint FIRST, never by whichever socket matches the request.
-            if ($row['state'] === '01' && $row['local_port'] === $sourcePort && \inet_pton($row['local_ip']) === \inet_pton($client)) {
+            // Never choose primary by whichever socket matches the request: the server-reported client endpoint must match.
+            // That endpoint alone is not unique: Linux connect() reuses an ephemeral local port for sockets with DIFFERENT
+            // peers (only the 4-tuple must be unique), so an owned SMTP/HTTP client socket can share it. The endpoint
+            // plus the literal requested peer is the TCP 4-tuple of the primary session, which is unique in the netns.
+            if ($row['state'] === '01' && $row['local_port'] === $sourcePort && \inet_pton($row['local_ip']) === \inet_pton($client)
+                && $row['remote_port'] === $port && \inet_pton($row['remote_ip']) === \inet_pton($host)) {
                 $matches[$row['inode']] = $row;
             }
         }
