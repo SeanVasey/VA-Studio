@@ -11,8 +11,8 @@ use Throwable;
 /**
  * Contract increment 5, part 1: the `vasey-license-pdf-v2` render profile, successor of {@see VaseyLicenseProfile}.
  * Pinned the same way (the manifest's SHA-256 below) and verified the same way; v1 is unchanged. It is never selected
- * for issuance: no renderer, issuer, dispatch or policy names it yet. Checkout's printable set is bound to its faces
- * ({@see ContractPrintableSet}).
+ * for issuance: only its own renderer ({@see VaseyLicenseV2PdfRenderer}) names it, and no issuer, dispatch or policy
+ * does yet. Checkout's printable set is bound to its faces ({@see ContractPrintableSet}).
  *
  * The manifest pins the four merged Latin and Latin Extended brand faces, their Fontsource sources, the unmodified
  * VASEY.AUDIO lockup, the tc-lib package graph and the implementation closure ({@see VaseyLicenseV2Implementation}).
@@ -24,7 +24,7 @@ final class VaseyLicenseV2Profile
 
     public const ASSETS_DIRECTORY = VaseyLicenseV2ProfileDefinition::ASSETS_DIRECTORY;
 
-    public const MANIFEST_SHA256 = 'bbb4f04138edd3ef472e6c5c03827434489a709ac1c5a5f001780a0b1751320b';
+    public const MANIFEST_SHA256 = '1e02e7325b092754a4bc7bb1386e053b890226b2e915ef154338bda98c30af5e';
 
     public const FACES = VaseyLicenseV2ProfileDefinition::FACES;
 

@@ -337,7 +337,8 @@ country name prints.
   face and license is the member of its pinned tarball. Bebas Neue has no Vietnamese subset; Reddit Sans and JetBrains Mono do,
   but they are not merged because the intersection could not use them.
 - Pin: `VaseyLicenseV2Profile::MANIFEST_SHA256` over `profile-assets.json` (26 assets, the tc-lib graph and the implementation
-  closure of `VaseyLicenseV2ProfileDefinition`, `VaseyLicenseV2Implementation` and the checkout printable set).
+  closure of `VaseyLicenseV2ProfileDefinition`, `VaseyLicenseV2Implementation`, the checkout printable set and, since part 2,
+  the v2 renderer: 29 files).
 - Coverage: the four faces share **359** positive-width codepoints, all Latin or Common, and the D-30 rule accepts **357**
   (U+000D and U+00A0 refused). That adds Latin Extended-A, the Latin Extended-B letters Fontsource's `latin-ext` subsets carry
   (Ș, ș, Ț, ț among them; not Ǎ, Ǧ, Ơ or Ư), and ẞ, Ẁ–ẅ, Ỳ and ỳ. The v1 set is a subset; the accepted set is a subset of what the `test-v2` paid renderers accept.
@@ -351,6 +352,33 @@ country name prints.
 - Tests: `VaseyLicenseV2ProfileTest` (pin, sources, closure, tamper refusals, counts, the subset of the paid renderers' rule,
   per-face drawability, names) and the Latin Extended cases in both checkout identity tests.
 
+**v2 renderer (increment 5, part 2, built 2026-11-08, not selected for issuance).** `VaseyLicenseV2PdfRenderer` is the
+successor of `VaseyLicensePdfRenderer`, which v1's manifest pins to `VaseyLicenseProfile` and which therefore stays
+byte-identical.
+
+- Reused unchanged: `VaseyLicenseDocument` (its `build()` takes the coverage as a parameter), `VaseyLicenseLayout` (takes the
+  profile and the font directory; its page geometry is v1's `VaseyLicensePdfRenderer::geometry()`, identical for v2) and
+  `VaseyLicenseSignature` with the `contracts.vasey_license_v1` pin (decided). Same template grammar, layout, acceptance
+  block, determinism and verified-bytes handling as v1.
+- New in the successor: the binding to `VaseyLicenseV2Profile` (version check, `verifyRuntime`, asset reads, hash), the
+  creator string and keywords (`vasey-license-pdf-v2,<effective profile hash>`), the identifier line, and two entry points:
+  `coverage()`, the renderer's input rule (the v2 faces via `ContractPrintableSet::faces()`), and `document()`, which builds
+  the document under it.
+- Pin: the renderer is a root of `VaseyLicenseV2Implementation`; its closure adds the reused v1 classes, the binder and the
+  census, so a change to any of them refuses v2 (`profile_changed`) until the v2 manifest is rebuilt. Manifest SHA-256
+  `1e02e732…c30af5e`.
+- Golden: the synthetic business render is `ec2f685b…bb3dc157` (GD 2.3.3, zlib 1.3, as v1's). It changes with every v2
+  manifest rebuild, because the document ID and keywords carry the profile hash.
+- Tests (`VaseyLicenseV2PdfRendererTest`): determinism and golden hash, dates, embedded `/BaseFont` names, keywords;
+  "Łukasz Żółć", "Đorđe Kılıç SRL", "Ștefan Țepeș", "Dvořák Őrsi" and "MC Ęwa Mąkowska" render and extract with
+  `pdftotext`, while v1 refuses the same document; every codepoint checkout accepts (357) is in `coverage()`, passes the
+  layout's check in all four roles and renders; Cyrillic, Greek, Vietnamese, Ə and ǈ refuse at `document()`
+  (`unsupported_characters`), and text a face cannot draw refuses at render (`unsupported_input`) with the font copy
+  removed; one-byte changes to each of the 26 assets, the manifest, the renderer and each reused class refuse; v1, a
+  relabelled v1 and `test-v2` profiles refuse, and v1's renderer refuses v2's profile; changed, missing, linked and non-PNG
+  signatures refuse; root and `K_PATH_FONTS` independence; nothing outside the v2 profile files names the renderer.
+- `ContractPrintableSet::faces()` now reads each metric file once and decodes the bytes it hashed (#241 review P3).
+
 **v1 pin (fixed in #240).** `ContractIdentityDeclarationV2.php` changed in #216 after #223 pinned it in v1's manifest;
 #240 rebuilt the v1 manifest and added both profiles' `--check` to CI. Because v2's implementation closure includes
 `VaseyLicenseProfile.php`, every v1 rebuild also requires a v2 rebuild.
@@ -358,16 +386,14 @@ country name prints.
 **Remaining for activation (increment 5).**
 
 - [x] Decide the repertoire: Latin Extended successor (2026-11-08). Built and checkout rebound (above).
-- A v2 renderer: v1's renderer, document and layout are pinned to v1 (`VaseyLicenseProfile`), so v2 needs its own render
-  entry points, added to `VaseyLicenseV2Implementation::ROOTS`, a manifest rebuild, a golden hash and the determinism and
-  mutation tests v1 has. Until then a buyer accepted at checkout with, say, "Ł" could not be rendered by v1; it is still
-  rendered by the `test-v2` paid renderers today.
-- Run the census and a golden render on the six real templates, locally, from private paths. Sean reviews the rendered layout,
-  the block labels and the acceptance block wording.
+- [x] A v2 renderer (part 2, above). A buyer accepted at checkout with, say, "Ł" is rendered by the `test-v2` paid
+  renderers until the v2 renderer is wired in.
+- Run the census and a golden render with the v2 renderer on the six real templates, locally, from private paths. Sean
+  reviews the rendered layout, the block labels and the acceptance block wording.
 - Install the real signature on the private disk with its pin. Confirm the golden hash on the Forge host (above), and reset
   opcache on every deploy of pinned files.
 - Decide on the held tc-lib updates (#162/#164).
-- Wire the profile into the paid and paid-tax issuers for new issuance only, with independent review. This also needs the
+- Wire the v2 renderer into the paid and paid-tax issuers for new issuance only, with independent review. This also needs the
   D-30 prerequisites: steps 2, 3a and 3b and the U-13 retention values.
 
 ### Wording item for Sean

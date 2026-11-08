@@ -30,23 +30,49 @@ final class ContractPrintableSet
     /**
      * The four v2 faces, intersected and restricted to the profile's `allowed_scripts`. The manifest is verified against
      * the profile's pinned hash and each metric file against the SHA-256 the manifest pins, so the set cannot drift from
-     * the faces the profile prints with.
+     * the faces the profile prints with. Each metric file is read once: the bytes that are hashed are the bytes decoded.
      */
     public static function faces(?string $projectRoot = null): ContractGlyphCoverage
     {
         $profile = VaseyLicenseV2Profile::current($projectRoot);
-        $paths = [];
+        $common = null;
         foreach (VaseyLicenseV2Profile::FACES as $asset) {
             $pinned = $profile['assets']['assets'][$asset]['sha256'] ?? null;
             $path = VaseyLicenseV2Profile::assetPath($asset, $projectRoot);
-            if (! is_string($pinned) || ! is_file($path) || is_link($path)
-                || ! hash_equals($pinned, (string) hash_file('sha256', $path))) {
+            $bytes = is_file($path) && ! is_link($path) ? file_get_contents($path) : false;
+            if (! is_string($pinned) || ! is_string($bytes) || ! hash_equals($pinned, hash('sha256', $bytes))) {
                 throw new InvalidArgumentException('Pinned contract font metrics do not match the profile.');
             }
-            $paths[] = $path;
+            $face = self::positiveWidths($bytes);
+            $common = $common === null ? $face : array_intersect_key($common, $face);
         }
 
-        return ContractGlyphCoverage::fromTcpdfMetrics($paths)->restrictedToScripts($profile['allowed_scripts']);
+        return (new ContractGlyphCoverage(array_keys($common ?? [])))->restrictedToScripts($profile['allowed_scripts']);
+    }
+
+    /**
+     * The codepoints of one tc-lib metric file's width table (`cw`) with a positive advance width, decoded with the same
+     * rules as {@see ContractGlyphCoverage::fromTcpdfMetrics()}, which reads by path and so cannot take verified bytes.
+     *
+     * @return array<int, true>
+     */
+    private static function positiveWidths(string $bytes): array
+    {
+        $metrics = json_decode($bytes, true, 64, JSON_THROW_ON_ERROR);
+        if (! is_array($metrics) || ! is_array($metrics['cw'] ?? null) || $metrics['cw'] === []) {
+            throw new InvalidArgumentException('Font metrics lack a width table.');
+        }
+        $face = [];
+        foreach ($metrics['cw'] as $key => $width) {
+            if (! is_int($key) || ! is_int($width) && ! is_float($width)) {
+                throw new InvalidArgumentException('Font width table entries must map codepoints to widths.');
+            }
+            if ($width > 0) {
+                $face[$key] = true;
+            }
+        }
+
+        return $face;
     }
 
     /**
