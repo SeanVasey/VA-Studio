@@ -46,12 +46,13 @@ final class ContractRenderWorkspace
     /**
      * Removes the workspaces a killed parent left under `$parent` (as {@see ContractFiles::sweepRendererWorkspaces()} names it)
      * and nothing else: only direct children named as {@see create()} names them, that are private directories themselves
-     * (never a symbolic link, which is left alone and never followed) and last modified before `$cutoff`. Their contents
+     * (never a symbolic link, which is left alone and never followed), owned by `$owner` (the sweeping process's effective
+     * user; another user's entry is left alone) and last modified before `$cutoff`. Their contents
      * are removed as {@see close()} removes them: a link inside is unlinked, its target never touched.
      *
      * @return array{0: int, 1: int} the workspaces removed, and the entries left because they are not workspaces or could not be removed
      */
-    public static function sweep(string $parent, int $cutoff): array
+    public static function sweep(string $parent, int $cutoff, int $owner): array
     {
         ContractIo::outsideTransactions();
         clearstatcache(true, $parent);
@@ -64,7 +65,8 @@ final class ContractRenderWorkspace
             $path = $parent.'/'.$name;
             clearstatcache(true, $path);
             $entry = @lstat($path);
-            if (preg_match('/\A[0-9a-f]{32}\z/D', $name) !== 1 || ! is_array($entry) || ($entry['mode'] & 0177777) !== 0040700) {
+            if (preg_match('/\A[0-9a-f]{32}\z/D', $name) !== 1 || ! is_array($entry) || ($entry['mode'] & 0177777) !== 0040700
+                || $entry['uid'] !== $owner) {
                 $left++;
 
                 continue;

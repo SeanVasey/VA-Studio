@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Console\Commands\SweepContractRenderCache;
 use App\Domain\Contracts\ContractFiles;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel;
@@ -15,10 +16,25 @@ use Tests\TestCase;
  */
 final class ContractRenderCacheSweepTest extends TestCase
 {
+    /** The site user's uid the sweep runs as: this process's, or a stand-in when the suite runs as root. */
+    private int $uid;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->fakePrivateMediaStorage();
+        $this->uid = posix_geteuid() === 0 ? 4242 : posix_geteuid();
+        $this->app->instance(SweepContractRenderCache::EUID_BINDING, $this->uid);
+    }
+
+    /** Gives a directory to the stand-in site user (only needed, and only possible, when the suite runs as root). */
+    private function own(string $path): string
+    {
+        if (posix_geteuid() === 0) {
+            chown($path, $this->uid);
+        }
+
+        return $path;
     }
 
     /** @return array{0: int, 1: string} */
@@ -39,7 +55,7 @@ final class ContractRenderCacheSweepTest extends TestCase
         file_put_contents($outside.'/kept/target.txt', 'synthetic');
         $old = time() - 7200;
 
-        $stale = (new ContractFiles)->createRendererWorkspace()->path;
+        $stale = $this->own((new ContractFiles)->createRendererWorkspace()->path);
         mkdir($stale.'/nested', 0700);
         file_put_contents($stale.'/signature.png', 'synthetic');
         file_put_contents($stale.'/nested/cache.bin', 'synthetic');
@@ -47,6 +63,7 @@ final class ContractRenderCacheSweepTest extends TestCase
         symlink($outside.'/kept/target.txt', $stale.'/nested/link-to-file');
         touch($stale, $old);
         $fresh = (new ContractFiles)->createRendererWorkspace();
+        $this->own($fresh->path);
         file_put_contents($fresh->path.'/signature.png', 'synthetic');
         $cache = dirname($stale);
         // Entries that are not workspaces: a link under a workspace's name, a file, a directory under another name.
@@ -81,6 +98,7 @@ final class ContractRenderCacheSweepTest extends TestCase
     {
         $target = Storage::disk('local')->path('elsewhere');
         mkdir($target.'/'.str_repeat('d', 32), 0700, true);
+        $this->own($target.'/'.str_repeat('d', 32));
         touch($target.'/'.str_repeat('d', 32), time() - 7200);
         mkdir(Storage::disk('local')->path('contracts'), 0700);
         symlink($target, Storage::disk('local')->path('contracts/render-cache'));
@@ -90,6 +108,7 @@ final class ContractRenderCacheSweepTest extends TestCase
         // A cache directory that is not private is refused too.
         unlink(Storage::disk('local')->path('contracts/render-cache'));
         mkdir(Storage::disk('local')->path('contracts/render-cache/'.str_repeat('e', 32)), 0700, true);
+        $this->own(Storage::disk('local')->path('contracts/render-cache/'.str_repeat('e', 32)));
         touch(Storage::disk('local')->path('contracts/render-cache/'.str_repeat('e', 32)), time() - 7200);
         chmod(Storage::disk('local')->path('contracts/render-cache'), 0755);
         $this->assertSame(1, $this->sweep()[0]);
@@ -99,6 +118,31 @@ final class ContractRenderCacheSweepTest extends TestCase
             $this->assertSame(2, $this->sweep(['--older-than' => $age])[0], $age);
         }
         $this->assertDirectoryExists($target.'/'.str_repeat('d', 32));
+    }
+
+    /** Review of #251 (P3): never as root, only the sweeping user's own workspaces, and an absent root is not an error. */
+    public function test_it_refuses_root_leaves_other_users_workspaces_and_sweeps_nothing_without_a_root(): void
+    {
+        $stale = $this->own((new ContractFiles)->createRendererWorkspace()->path);
+        touch($stale, time() - 7200);
+
+        $this->app->instance(SweepContractRenderCache::EUID_BINDING, 0);
+        $this->assertSame([1, 'Refusing to sweep as root: run the scheduler as the site user that renders contracts.'], $this->sweep());
+        $this->assertDirectoryExists($stale);
+
+        $this->app->instance(SweepContractRenderCache::EUID_BINDING, $this->uid + 1);
+        $this->assertSame([1, 'Removed 0 stale render workspace(s); left 1 other entry in place.'], $this->sweep());
+        $this->assertDirectoryExists($stale);
+
+        $this->app->instance(SweepContractRenderCache::EUID_BINDING, $this->uid);
+        $this->assertSame([0, 'Removed 1 stale render workspace(s); left 0 other entries in place.'], $this->sweep());
+        $this->assertDirectoryDoesNotExist($stale);
+
+        // A fresh host without the private disk root: nothing to sweep, and nothing is created.
+        $absent = Storage::disk('local')->path('').'absent-root';
+        config(['filesystems.disks.local.root' => $absent]);
+        $this->assertSame([0, 'Removed 0 stale render workspace(s); left 0 other entries in place.'], $this->sweep());
+        $this->assertFileDoesNotExist($absent);
     }
 
     public function test_it_is_scheduled_hourly_with_a_short_overlap_lock(): void

@@ -29,14 +29,21 @@ final class ContractFiles
 
     /**
      * Removes renderer workspaces under `contracts/render-cache` last modified before `$cutoff` ({@see ContractRenderWorkspace::sweep()}),
-     * as a parent killed mid-render leaves them. Creates nothing; an absent cache sweeps nothing.
+     * as a parent killed mid-render leaves them, and only those owned by `$owner`. Creates nothing; an absent private
+     * disk root or cache sweeps nothing.
      *
      * @return array{0: int, 1: int} the workspaces removed, and the entries left in place
      */
-    public function sweepRendererWorkspaces(int $cutoff): array
+    public function sweepRendererWorkspaces(int $cutoff, int $owner): array
     {
         ContractIo::outsideTransactions();
         try {
+            // A fresh host may not have the private disk root yet; root(false) would refuse it rather than report it absent.
+            $configured = config('filesystems.disks.local.root');
+            if (is_string($configured) && $configured !== '') {
+                clearstatcache(true, rtrim($configured, '/'));
+                if (@lstat(rtrim($configured, '/')) === false) { return [0, 0]; }
+            }
             $directory = $this->root(false).'/contracts';
             foreach (['', '/render-cache'] as $component) {
                 $directory .= $component;
@@ -45,7 +52,7 @@ final class ContractFiles
                 $this->directory($directory, false, true);
             }
 
-            return ContractRenderWorkspace::sweep($directory, $cutoff);
+            return ContractRenderWorkspace::sweep($directory, $cutoff, $owner);
         } catch (Throwable) {
             throw new ContractIssuanceException('storage_failed');
         }

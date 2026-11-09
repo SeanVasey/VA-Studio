@@ -11,6 +11,7 @@ use App\Domain\Grants\VaseyLicenseIssuance;
 use App\Domain\Grants\VaseyLicensePreparedSelection;
 use App\Support\CanonicalJson;
 use Closure;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -221,14 +222,16 @@ class VaseyLicenseIssuanceTest extends TestCase
         $other = self::SYNTHETIC_TEMPLATE.' Edited.';
         $this->assertTrue(VaseyLicenseContractTexts::retain('template', $other));
         $this->refuses('profile_changed', fn () => $issuance->render($input, [...$profile, 'contract' => [...$profile['contract'], 'template_sha256' => hash('sha256', $other)]]));
-        // A stored text changed under its address (the immutability trigger bypassed) or no longer decrypting is an
-        // integrity failure no retry can fix: `profile_changed`, permanent. A text that is gone may come back on a retry.
+        // A stored text changed under its address (the immutability trigger bypassed) that still decrypts is an integrity
+        // failure no retry can fix: `profile_changed`, held at once on the first attempt. One that no longer decrypts cannot
+        // be told from a key this worker lacks, and a text that is gone may come back: both may resolve on a retry.
         $row = (array) DB::table(VaseyLicenseContractTexts::TABLE)->where('kind', 'template')->where('sha256', $profile['contract']['template_sha256'])->sole();
         $this->dropContractTextTriggers();
-        foreach (['changed' => Crypt::encryptString($other), 'undecryptable' => 'x'] as $case => $tampered) {
+        foreach (['changed' => [Crypt::encryptString($other), 'profile_changed', 'profile_changed'],
+            'undecryptable' => ['x', 'contract_text_unavailable', null],
+            'another key' => [(new Encrypter(random_bytes(32), 'aes-256-cbc'))->encryptString(self::SYNTHETIC_TEMPLATE), 'contract_text_unavailable', null]] as $case => [$tampered, $reason, $hold]) {
             DB::table(VaseyLicenseContractTexts::TABLE)->where('id', $row['id'])->update(['payload' => $tampered]);
-            // Held at once, on the first attempt.
-            $this->assertSame('profile_changed', ContractRenderHolds::reason($this->refuses('profile_changed', fn () => $issuance->render($input, $profile)), 1, 3), $case);
+            $this->assertSame($hold, ContractRenderHolds::reason($this->refuses($reason, fn () => $issuance->render($input, $profile)), 1, 3), $case);
         }
         DB::table(VaseyLicenseContractTexts::TABLE)->where('id', $row['id'])->delete();
         $this->assertNull(ContractRenderHolds::reason($this->refuses('contract_text_unavailable', fn () => $issuance->render($input, $profile)), 1, 3));

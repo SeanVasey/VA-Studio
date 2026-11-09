@@ -40,6 +40,7 @@ use App\Domain\Grants\VaseyLicenseIssuance;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Queue;
@@ -394,9 +395,10 @@ final class PaidGrantDocumentJourneyTest extends TestCase
     }
 
     /**
-     * Review P3-1 (#249): a stored contract text that is gone may come back, so its refusal (`contract_text_unavailable`)
-     * leaves no hold on the first attempt; one that exists but no longer decrypts, or decrypts to other bytes than its
-     * address, is an integrity failure (`profile_changed`) held at once.
+     * Review P3-1 (#249) and review of #251 (P2): a stored contract text that is gone, or no longer decrypts (tampering
+     * cannot be told from a key this worker lacks), may resolve on a retry, so its refusal (`contract_text_unavailable`)
+     * leaves no hold on the first attempt; one that decrypts to other bytes than its address is an integrity failure
+     * (`profile_changed`) held at once.
      */
     public function test_a_missing_stored_text_is_retryable_and_a_tampered_one_is_held_at_once(): void
     {
@@ -422,7 +424,13 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $this->assertSame(['failed', 1], [DB::table('paid_document_work')->sole()->state, (int) DB::table('paid_document_work')->sole()->attempts]);
         $this->assertSame(0, DB::table('audit_events')->where('action', ContractRenderHolds::ACTION)->count());
 
+        // One that no longer decrypts (tampered, or a key this worker lacks) is retryable too.
         DB::table('vasey_license_contract_texts')->insert([...$row, 'payload' => 'x']);
+        $prepare('contract_text_unavailable');
+        $this->assertSame(0, DB::table('audit_events')->where('action', ContractRenderHolds::ACTION)->count());
+
+        // One that decrypts to other bytes than its address is held at once.
+        DB::table('vasey_license_contract_texts')->where('id', $row['id'])->update(['payload' => Crypt::encryptString(self::SYNTHETIC_TEMPLATE.' Changed.')]);
         $prepare('profile_changed');
         $hold = (array) DB::table('audit_events')->where('action', ContractRenderHolds::ACTION)->sole();
         $this->assertSame(['chain' => 'production_checkout_v1', 'reason' => 'profile_changed', 'order_public_id' => $f['order']['orderId']],

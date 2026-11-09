@@ -91,13 +91,13 @@ class VaseyLicenseContractTextMigrationTest extends TestCase
         }
         $this->assertFalse(VaseyLicenseContractTexts::retain('template', self::TEXT));
 
-        // So does one that no longer decrypts: both are integrity failures (`profile_changed`, permanent).
+        // One that no longer decrypts may be a key this process lacks: a refusal a retry may fix, not an integrity failure.
         DB::table(VaseyLicenseContractTexts::TABLE)->where('id', $row['id'])->update(['payload' => 'x']);
         try {
             VaseyLicenseContractTexts::resolve('template', $row['sha256']);
             $this->fail('An undecryptable contract text resolved.');
         } catch (ContractIssuanceException $exception) {
-            $this->assertSame('profile_changed', $exception->reason);
+            $this->assertSame('contract_text_unavailable', $exception->reason);
         }
 
         // A malformed address is an integrity failure; a well-formed address with no row is an absence a retry may fix.
@@ -110,6 +110,27 @@ class VaseyLicenseContractTextMigrationTest extends TestCase
                 $this->assertSame($reason, $exception->reason, $kind.' '.$sha256);
             }
         }
+    }
+
+    /** Review of #251 (P2): a text stored under an older key refuses retryably, then resolves once that key is a previous key. */
+    public function test_a_text_under_a_rotated_key_resolves_once_the_old_key_is_a_previous_key(): void
+    {
+        $this->assertTrue(VaseyLicenseContractTexts::retain('template', self::TEXT));
+        $old = config('app.key');
+        $rotate = function (array $previous): void {
+            config(['app.key' => 'base64:'.base64_encode(str_repeat('r', 32)), 'app.previous_keys' => $previous]);
+            $this->app->forgetInstance('encrypter');
+            Crypt::clearResolvedInstance('encrypter');
+        };
+        $rotate([]);
+        try {
+            VaseyLicenseContractTexts::resolve('template', hash('sha256', self::TEXT));
+            $this->fail('A text under a key this process lacks resolved.');
+        } catch (ContractIssuanceException $exception) {
+            $this->assertSame('contract_text_unavailable', $exception->reason);
+        }
+        $rotate([$old]);
+        $this->assertSame(self::TEXT, VaseyLicenseContractTexts::resolve('template', hash('sha256', self::TEXT)));
     }
 
     public function test_rollback_refuses_once_a_text_is_stored_and_otherwise_drops_and_reinstalls_exactly(): void
