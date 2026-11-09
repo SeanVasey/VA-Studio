@@ -144,7 +144,8 @@ class OperationalHealthTest extends TestCase
         }
         $this->app['env'] = 'testing';
         $evidence = $this->metrics('evidence');
-        $this->assertSame(['scheduler_last_run', 'backup_restore', 'host_resources'], array_keys($evidence));
+        // Nothing recorded yet: the scheduler and backup signals are unavailable, never OK or zero.
+        $this->assertSame(['scheduler_last_run', 'scheduled_task_failures', 'backup_last_success', 'restore_drill_last_success', 'host_resources'], array_keys($evidence));
         foreach ($evidence as $metric) {
             $this->assertSame([null, 'unavailable'], [$metric['value'], $metric['state']]);
         }

@@ -1,7 +1,9 @@
 # Staff reporting and operations views
 
-Lane REP (FP-028, FP-089, FP-090). Read-only; the only writes are append-only `audit_events` rows for exports. Work package,
-commands and results: [docs/verification/reporting-rep-20261024](verification/reporting-rep-20261024/README.md).
+Lane REP (FP-028, FP-089, FP-090). Read-only; the only writes are append-only `audit_events` rows for exports. The scheduler
+heartbeat and backup evidence the dashboard reads are written by the scheduler and the host backup script, not by these views
+(see "Scheduler and backup signals" below). Work package, commands and results:
+[docs/verification/reporting-rep-20261024](verification/reporting-rep-20261024/README.md).
 
 ## Who can use it
 
@@ -20,9 +22,40 @@ never shown as zero.
 | Background work | database queue (ready, oldest age, running, stalled: reserved longer than the connection's `retry_after`), failed jobs, Stripe webhook receipt work | queue connection is not `database`, failed-job store is not a database store, table unreadable |
 | Commerce attention (test commerce) | payment exceptions awaiting review, A5 refund/dispute attention, open and lost disputes, active holds, unallocated succeeded refunds, recorded refund reversals | outside `local`/`testing`/`staging`, Stripe test account not configured |
 | Inquiries and media pipeline | inquiries in `new`, media runs failed, past their claim lease, queued, uploads in quarantine | table unreadable |
-| Not recorded by the application | scheduler last run, backup and restore evidence, host health | always: the application stores none of this |
+| Scheduler, backups and host | scheduler heartbeat age, scheduled commands whose latest run failed, last successful nightly backup, last successful restore drill (`scheduler_heartbeats`, `backup_evidence`) | nothing recorded yet, a threshold below 1, table unreadable; host health always |
 
 Thresholds are in `config/reporting.php` (`health`).
+
+### Scheduler and backup signals
+
+`App\Domain\Operations\OperationalSignals` writes them; `App\Domain\Reporting\OperationalHealth` reads them. They live in the
+application database, not the cache: the cache store differs per environment, `vasey:cache-prune-expired` and `cache:clear` remove
+entries, and an evicted key would read as "never recorded" rather than "stale".
+
+| Metric | Source | OK | Needs attention | Unavailable |
+| --- | --- | --- | --- | --- |
+| Scheduler last run (seconds ago) | `vasey:scheduler-heartbeat`, scheduled every minute, upserts one `scheduler_heartbeats` row | age at most `REPORTING_SCHEDULER_HEARTBEAT_STALE_SECONDS` (300) | older | no heartbeat ever recorded |
+| Scheduled commands whose latest run failed | the four other scheduled commands in `routes/console.php` record their exit outcome (`OperationalSignals::track`, `onSuccess`/`onFailure`) | 0 | 1 or more; the detail names them | no command has reported yet |
+| Last successful backup (hours ago) | `backup_evidence` rows of kind `daily` | latest run ok and at most `REPORTING_BACKUP_STALE_HOURS` (26) old | latest run failed, or the success is older | no run recorded |
+| Last successful restore drill (days ago) | `backup_evidence` rows of kind `restore-drill` | latest drill ok and at most `REPORTING_RESTORE_DRILL_STALE_DAYS` (35) old | latest drill failed (`never` when none succeeded), or older | no drill recorded |
+| Host disk, memory and process health | none | | | always: Forge server monitoring and `ops/monitoring/host-baseline.sh` cover the host (`docs/ops/monitoring-and-host-baseline.md`); the application does not read host state |
+
+`backup_evidence` is append-only: triggers on SQLite and MySQL refuse any UPDATE or DELETE and any INSERT with an unknown kind or
+status, a hash that is not 64 lowercase hex characters, a negative size, or a successful daily backup without its size and hash.
+Rollback refuses once a row exists. A scheduled command that throws before it starts is not recorded (the heartbeat still shows
+whether the scheduler runs); a failure to record never changes a scheduled command's result.
+
+**Recording a backup.** `php artisan vasey:backup-record --kind=daily|restore-drill --status=ok|failed [--bytes=N] [--sha256=HEX]`.
+It takes no path, host name or free text, so nothing secret can be stored, and a refusal names the option without echoing its
+value (exit 2). A successful `daily` run needs a nonzero `--bytes` and a lowercase `--sha256`. The nightly run of the host backup
+script (`ops/staging/backup.sh nightly`, and the production kit's copy derived from it) calls it after the resume as the application
+user on the served release, with the set's size and the dump's SHA-256 on success and neither on failure. The call is best effort:
+if it fails the script logs a WARNING and the backup's own result and exit status stand; the dashboard then turns stale after 26
+hours. A run that stops before the snapshot (lock held, quiesce refused) or whose resume fails records nothing and also turns
+stale. Deploy-time `predeploy` snapshots are not recorded (the nightly run calls `predeploy` itself through `ctl snapshot`).
+**Restore drills are recorded by hand** after the drill in `docs/ops/backup-restore-proof.md`:
+`php artisan vasey:backup-record --kind=restore-drill --status=ok` (or `failed`), as the application user in the served release.
+The nightly run's isolated restore proof is part of its `daily ok`, not a drill.
 
 ## Sales and conversion report (FP-089)
 
