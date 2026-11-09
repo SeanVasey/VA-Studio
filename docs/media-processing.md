@@ -238,6 +238,84 @@ An uncertain commit can therefore leave private orphan directories under `media/
 
 New stems jobs emit archive policy v2, including the duration ceiling in the profile fingerprint. A changed ceiling after queueing requires a new profile revision; validation consumes the accepted ceiling. Historical v1 and v2 evidence remains supported independently of the current builder version. Unknown versions fail verification.
 
+## Unattached uploads and abandoned upload sessions (FP-034)
+
+Nothing in this section deletes a media asset, quarantine original, kit revision or upload-session row. What exists is a read-only view, a cleanup of abandoned transport chunks, and a dry-run report.
+
+### Lifecycle
+
+| Stage | Where | How it ends |
+| --- | --- | --- |
+| Resumable upload session (`media_upload_sessions`, `sound_kit_upload_sessions`) | Row plus flat chunk directory `resumable/<session uuid>/` on the private disk (`part-<offset>.part`, `.pending`, `complete.assembled`, `assembly.pending`); 24-hour lifetime | `completed` (asset or kit revision created, chunks removed, `cleaned_at` set), `cancelled` (chunks removed, `cleaned_at` set) or still `uploading` past expiry: abandoned |
+| Source asset (`media_assets`, no parent) | `quarantine/...` original; `quarantined` until processed | Processing run (`media_processing_runs`) `completed` makes it `processed`; `failed` leaves it quarantined |
+| Derived assets (parent = source) | `media/revisions/<uuid>/...`; `ready`, immutable | Selected by offers (`offers.deliverable_asset_ids`, `offer_revisions.snapshot`), bound to stems (`stems_recordings`), entitled (`pending_entitlements`), frozen into grant manifests, contracts and evidence (often encrypted), or served publicly while the track is published |
+
+Every `media_assets` row belongs to a track (`track_id` is required), so "attached to a track" is not the question. A family (a source and its derived assets) is attached when anything other than its own lineage needs it. Sound-kit revisions, site images, merch drafts and support attachments keep their own files and rows; they never reference `media_assets` by id, but their rows are searched for a family's hashes and paths all the same.
+
+### What "unattached" means
+
+`App\Domain\Media\Lifecycle\MediaReferenceProof` classifies a family as unattached only when every check below finds zero referencing rows outside the family's own lineage (its derived assets, processing runs, upload session and the audit events whose subject is one of those rows) **and** coverage is complete. The checks come from the live schema, so a table or foreign key added later is included without a code change.
+
+- `fk:<table>.<column>`: every foreign key into `media_assets`, `media_processing_runs` or `media_upload_sessions`, and every integer column named `*asset_id` without one.
+- `json:<table>.<column>`: asset ids in every text column named `*asset_ids` and in offer revision snapshots (`assets`, `preview`, `files` and `*asset_id` keys).
+- `poly:<table>.<prefix>`: polymorphic `<prefix>_type`/`<prefix>_id` pairs naming a family row (audit events are handled by the content check).
+- `publication:track`: the track is published, scheduled or was ever published (`published_slug`).
+- `content:<table>`: any text value in any table containing a member's SHA-256 or private storage path, case-insensitively. Identical bytes in another family, a site image or a kit therefore count as a reference: conservative on purpose.
+
+Paths are also searched in their JSON-escaped form (`media\/revisions\/...`), and needles are matched literally (`LIKE ... ESCAPE '!'`).
+
+Coverage is incomplete, and every family without a found reference is **unknown**, never unattached, while any of these hold data: Laravel ciphertext (`eyJpdiI6`) in any text column outside the reviewed allowlist (`users.app_authentication_secret`, `users.app_authentication_recovery_codes`, `sessions.payload`, `cache.value`), because orders, grants, support attachments and evidence store encrypted payloads that may name an asset; a non-null `*asset_manifest_hash` column; a value of a type the checks cannot read; or more than 1,000 matching rows in one table. In a store with any sale, grant or support attachment, expect "unknown" everywhere: that is the intended answer until those payloads have a reviewed decryption-side check.
+
+### Staff view
+
+**Media lifecycle** in the admin panel (`App\Filament\Pages\MediaLifecyclePage`) is read-only and gated like the media pages: the `administer-catalog` gate and enrolled MFA on every Livewire request, re-checked under lock by `ReadStaffMediaInventory::lifecycle()`. It shows families and recorded bytes per state (in progress, failed processing, attached, unattached, unknown), upload sessions (active, expired, cleanup pending, with received bytes), and the existing asset-page inventory by role and status. Renders and paging run only the cheap structural checks. The full proof (up to 10 completed families older than the chosen age) runs only when staff choose **Run proof**: at most once a minute per user, cached per user for 10 minutes, and applied to the counts as of that run; until then no family is counted unattached. The staff fence (which locks the user row) commits before the read and is taken again after it, so the read-only proof never holds that lock. It shows ids, roles and sizes only: no file name, storage path, track title or customer value. Sizes are recorded metadata, not disk usage. Families beyond the first 5,000 are not classified.
+
+### Abandoned upload sessions
+
+```sh
+php artisan vasey:upload-sessions-sweep                  # dry run: counts only, changes nothing
+php artisan vasey:upload-sessions-sweep --execute        # mark, then remove chunks
+php artisan vasey:upload-sessions-sweep --older-than=86400   # minimum: the 24-hour upload lifetime
+```
+
+Eligible sessions, track media and sound kits alike: `uploading` past `expires_at` and idle (`updated_at`) and created at least `--older-than` seconds ago (default `media.upload_session_sweep.min_age_seconds`, 48 hours), and `cancelled` sessions created that long ago whose cleanup never finished. Completed sessions awaiting their own cleanup are counted and left alone.
+
+Order: one transaction marks an `uploading` row `cancelled` and records a system audit event (`media.upload.session_abandoned` or `sound_kit.upload.abandoned`, no actor); after it commits, a second transaction, holding the same track or kit-draft and session row locks the upload paths take, removes the directory and only then sets `cleaned_at`. Marking first means no append or completion can use the session while its files go, and a crash in between leaves `cancelled` with `cleaned_at` empty, which the next run finishes. The row is never deleted: upload sessions are retained evidence (the kit table refuses `DELETE` by trigger and the media migration refuses to roll back populated rows).
+
+Safety: the command refuses to run as root, refuses a private disk that is served or public, a disk root that is a link, writable by others, or inside the web root, the public disk, a served disk or a configured public link, and a temp root `resumable/` that is not a 0700 directory owned by the sweeping user. A session directory is removed only if `lstat` shows a 0700 directory owned by that user, reached without a link, holding only regular, singly linked, owned files with transport names. Anything else (links, foreign files, wrongly named or other users' directories, unexpected contents) is left in place and counted, and the command exits non-zero. It prints counts only.
+
+Before removing anything, the directory is re-checked (same device and inode as inspected, a 0700 directory owned by the sweeping user, no link) and each file is re-checked just before its unlink. A private disk root that is itself a link (a shared `storage/`) is resolved once and every check applies to the real path; the `resumable/` temp root itself must not be a link.
+
+The hourly scheduled `--execute` run (`:41`, its outcome recorded by `OperationalSignals::track()`) is registered but off until a reviewed change sets `media.upload_session_sweep.scheduled` to `true`. Run it as the site user that owns the private disk.
+
+### Unattached completed media report
+
+```sh
+php artisan vasey:media-unattached-report --older-than-days=30 --limit=50 --proof
+```
+
+A dry run with no execute mode: it lists completed families (processed source) created at least that many days ago with no structural reference, proves them in batches of 10, and prints each family's id, state, asset ids, roles, recorded bytes and, with `--proof`, every check that found zero references. It prints the coverage blockers when coverage is incomplete.
+
+### Deleting an unattached asset: not implemented
+
+An approved delete is the next step and needs all of these, none of which exists yet:
+
+1. A staff action gated by `administer-catalog` and enrolled MFA, naming one family by id, with a reason.
+2. Under one transaction that locks the track, the family's rows and every referencing table's relevant rows (or a global media-writer fence), re-run the complete proof and refuse unless it is unattached with complete coverage; re-check that the track is unpublished and no processing run is active.
+3. An append-only audit event with the actor, family, members, hashes, sizes and the proof's check list.
+4. A quarantine period: move the family's files into a private holding area (and mark the rows, which today's immutability triggers forbid for `ready`/`processed` assets: a reviewed migration must add a retire state) for a fixed period with a restore path, and only then hard-delete the files. Rows stay as evidence.
+5. The decryption-side checks for encrypted order, grant, contract and support-attachment payloads, so coverage can be complete in a store that has sold anything.
+
+Independent review of PR #257 recorded these as hard prerequisites: no delete may trust the proof until each is met.
+
+- **P2-1:** decrypt and parse every grant, contract, membership and legacy payload, column by column. An allowlist must never stand in for that.
+- **P2-2:** check track-level references: `catalog_import_mappings.track_id`, `legacy_history_lines.track_source_id`, `product_draft_members.track_id` and order lines.
+- **P2-3:** handle id-only references in plaintext JSON outside `MediaReferenceProof::JSON_COLUMNS`: `fulfillment_outbox.payload`, `exclusive_activations.snapshot`, `inventory_reservations.snapshot`, quote snapshots, `audit_events.context`, `site_releases.content` and `jobs.payload`.
+- **P2-4:** detect references through a schema-reviewed registry, not by column name (`source_manifest_hash`, for example, is missed today).
+- **P2-5:** re-prove under the asset, track and offer locks inside the delete transaction.
+
+Deferred follow-ups: (P3-2) check that a `resumable/` directory's `public_id` is not claimed by both upload-session tables before removing it; (P3-6) find and clean orphaned `quarantine/resumable/<uuid>/` copies left by interrupted completions; (P3-7) bound the cost of `vasey:media-unattached-report`, which runs the full proof per batch of 10 over every table.
+
 ## Verification and release boundary
 
 The PHP integration suite exercises real FFmpeg work on runtime-generated synthetic WAV/artwork fixtures. Its scanner double is accepted only in the testing environment. That proves application handling of scanner results; it does not prove real malware detection, signature freshness or a production ClamAV installation. There is no scanner bypass switch for local or production operation.

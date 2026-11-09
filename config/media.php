@@ -31,5 +31,9 @@ return [
     'scanner' => ['cpu_seconds' => 180, 'memory_bytes' => 3221225472, 'timeout_seconds' => 300],
     // Exceeds the job timeout; a crashed worker can be retried after this lease.
     'claim_lease_seconds' => 960,
+    // FP-034: `vasey:upload-sessions-sweep` cleans chunk files of resumable uploads that expired (or whose cancel cleanup was
+    // interrupted) and have been idle at least this long; never below the 24-hour upload lifetime. The hourly scheduled
+    // `--execute` run stays off until a reviewed change sets `scheduled` to true; the command can always be run by hand.
+    'upload_session_sweep' => ['min_age_seconds' => 172800, 'scheduled' => false],
     'queue' => 'media',
 ];
