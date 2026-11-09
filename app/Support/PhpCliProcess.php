@@ -7,8 +7,8 @@ use Symfony\Component\Process\Process;
 
 /**
  * Process factory for the pinned grant renderers when this process is not the CLI. The container passes it to
- * `FreeGrantRendererProcess` and `PaidGrantRendererProcess`; `ProductionFreeGrantRendererProcess` (family 256) ships
- * unbound and gets it when that family is composed.
+ * `FreeGrantRendererProcess`, `PaidGrantRendererProcess`, `PaidTaxRendererProcess`, `ProductionFreeGrantRendererProcess`
+ * (family 256) and the `vasey-license-pdf-v2` child (`VaseyLicenseV2RendererProcess`), which builds its command the same way.
  *
  * Those classes are frozen by their contract profiles (`resources/contracts/*-v1/profile-assets.json`) and build
  * `[PHP_BINARY, '-n', ...]`. Under PHP-FPM `PHP_BINARY` is the FPM daemon, which prints its usage text instead of

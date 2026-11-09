@@ -112,12 +112,15 @@ final class ContractIdentityHolds
         });
     }
 
-    /** Every recorded hold, for staff only: the current user's catalog administration authority is checked on the server. */
+    /**
+     * Every recorded hold, for staff only: the current user's catalog administration authority is checked on the server.
+     * Lists this class's identity holds and the v2 contract render holds ({@see ContractRenderHolds}), which share its shape.
+     */
     public static function staffQuery(): Builder
     {
         Gate::authorize('administer-catalog');
 
-        return AuditEvent::query()->where('action', self::ACTION)
+        return AuditEvent::query()->whereIn('action', [self::ACTION, ContractRenderHolds::ACTION])
             ->whereIn('subject_type', array_column(self::CHAINS, 1));
     }
 }

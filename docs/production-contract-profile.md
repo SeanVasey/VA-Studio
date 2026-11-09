@@ -367,10 +367,14 @@ byte-identical.
   `coverage()`, the renderer's input rule (the v2 faces via `ContractPrintableSet::faces()`), and `document()`, which builds
   the document under it.
 - Pin: the renderer is a root of `VaseyLicenseV2Implementation`; its closure adds the reused v1 classes, the binder and the
-  census, so a change to any of them refuses v2 (`profile_changed`) until the v2 manifest is rebuilt. Manifest SHA-256
-  `bcd40954…34c4dd82` since the wiring change below (was `1e02e732…c30af5e`).
-- Golden: the synthetic business render is `2b2a04e4…a2cc8403` (GD 2.3.3, zlib 1.3, as v1's; was `ec2f685b…bb3dc157`). It
-  changes with every v2 manifest rebuild, because the document ID and keywords carry the profile hash.
+  census, so a change to any of them refuses v2 (`profile_changed`) until the v2 manifest is rebuilt. Since the isolated
+  render (activation blockers below, 2026-11-09) the roots also include its application-free core (`VaseyLicenseV2Render`)
+  and the child script (`scripts/render-vasey-license-v2.php`); the parent-side `VaseyLicenseV2RendererProcess` is not a
+  root, because the child never loads it. Manifest SHA-256 `fe8c02e6…e94e854b` (was `bcd40954…34c4dd82` after the wiring
+  change, `1e02e732…c30af5e` before it).
+- Golden: the synthetic business render is `81f228d8…1aeb628d` (GD 2.3.3, zlib 1.3, as v1's; was `2b2a04e4…a2cc8403`, and
+  `ec2f685b…bb3dc157` before that), in process and from the isolated child alike. It changes with every v2 manifest rebuild,
+  because the document ID and keywords carry the profile hash.
 - Tests (`VaseyLicenseV2PdfRendererTest`): determinism and golden hash, dates, embedded `/BaseFont` names, keywords;
   "Łukasz Żółć", "Đorđe Kılıç SRL", "Ștefan Țepeș", "Dvořák Őrsi" and "MC Ęwa Mąkowska" render and extract with
   `pdftotext`, while v1 refuses the same document; every codepoint checkout accepts (357) is in `coverage()`, passes the
@@ -430,17 +434,32 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
   on any unexpected failure while selecting (a throwing source, a runtime error), the line keeps the family's existing
   profile, so **selection** never refuses a paid line. Each line's branch code (`selected`, `gate_off`,
   `name_only_declaration`, `identity_held`, `no_contract_source`, `template_too_large`, `signature_unavailable`,
-  `not_renderable`, `contract_text_unavailable`; never buyer data) is recorded as `contract_profile_selection` in the `paid_origin.retained` /
-  `paid_tax_origin.retained` audit context; while the gate is off the context is unchanged. Selection builds the document
-  but does not render it, so a refusal only rendering finds can still fail a selected line after payment (see the
-  activation blockers below). Nothing in the application
+  `not_renderable`, `contract_text_unavailable`; never buyer data) is recorded as `contract_profile_selection` in the
+  `paid_origin.retained` / `paid_tax_origin.retained` audit context; while the gate is off the context is unchanged. A line
+  whose render request (with the stored texts) would exceed the isolated child's 1 MiB input bound is `not_renderable`.
+  Selection builds the document but does not render it, so a refusal only rendering finds can still fail a selected line
+  after payment; that leaves a staff hold (below). Nothing in the application
   binds `VaseyLicenseContractSource` yet: contract increment 1 supplies the text, and tests bind a synthetic source.
+- **Selection file reads happen before the locked frame** (2026-11-09). `VaseyLicenseIssuance::prepare()` runs in each
+  issuer after its outside-transaction check and before the origin transaction: it reads and verifies the manifest, the
+  four metric files (the renderer's input rule, and checkout's cached printable set, so the in-frame identity check reads
+  nothing), and the configured signature against its pin. It reads nothing while the gate is off and never throws; a
+  failed read leaves its field empty and the line keeps the existing profile with the branch code it had before
+  (`signature_unavailable`, `not_renderable`). Inside the frame `decide($input, $prepared)` reads no file: it re-checks the
+  gate, that the configured pin is still the prepared signature's, and that the prepared profile is its recorded hash's,
+  then binds and builds the document under the prepared coverage, and stores the template and the prepared profile by
+  hash (`VaseyLicenseContractTexts::retain()`, a database write that stays in the frame, so no origin names a text that is
+  not stored). Called without a preparation inside a transaction it prepares nothing and keeps the existing profile
+  (`not_renderable`). A pinned file or the signature changed after preparing is found by the render, which re-verifies
+  everything, and leaves a staff hold. The contract source is still called inside the frame (it needs the line's license
+  snapshot); contract increment 1 must keep it free of file I/O.
 - **Recorded profile.** The origin's `profile` becomes a selection descriptor (`paid-vasey-license-v2-selection-v2`): the
   template's SHA-256 and the two constants, the signature pin, the v2 profile's hash, the effective hash (profile and
   signature), and the document's input hash and text digest. Every render, retry and replay uses it, whatever the gate says
   later. The template and the v2 profile themselves are stored once each by SHA-256 in `vasey_license_contract_texts`
   (see Payload growth below). At render both are resolved by their recorded hashes and verified (a missing, changed or
-  undecryptable row refuses `profile_changed`), the document is rebuilt from the frozen input and must match the frozen input hash; the PDF must carry the frozen effective
+  undecryptable row, or a database error, refuses `contract_text_unavailable`, which a retry may fix) and passed to the
+  isolated child, which verifies both hashes again; the document is rebuilt from the frozen input and must match the frozen input hash; the PDF must carry the frozen effective
   hash and text digest; a different signature refuses `signature_changed`; a changed profile refuses `profile_changed`.
   The stored original records the effective hash as its artifact profile hash and the descriptor's hash as the manifest's.
   A completed v2 original is checked against the frozen digests and never re-rendered or re-bound.
@@ -448,6 +467,42 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
   stored originals equal the existing isolated renderers' bytes (journey tests compare them).
 - **Render-time defence.** A recorded selection renders only in `local` or `testing`, and its recorded template and profile
   hashes must resolve to stored bytes with those hashes before the signature or anything else is read.
+- **Isolated render** (2026-11-09). Every v2 original renders in a bounded child, `scripts/render-vasey-license-v2.php`,
+  started by `VaseyLicenseV2RendererProcess` with the limits of the paid renderers' child: `php -n` with the same fixed
+  extensions, `memory_limit=128M`, `max_execution_time=60` and a 60 s wall clock, `allow_url_fopen=0`, the network and
+  process functions plus `mail`, `putenv` and `dl` disabled, `open_basedir` limited to what the child reads (`app/`, its
+  script, `resources/contracts/vasey-license-v2`, `vendor/composer` and the tc-lib package paths; never `.env`, `storage/`
+  or `public/`) and a private per-render workspace (also the child's temporary directory), every inherited environment name removed (only `LANG`, `LC_ALL`, `TZ`,
+  `TMPDIR` and a fixed `LD_LIBRARY_PATH` remain), at most 1 MiB of input, 24 MiB of output and no diagnostics. Under PHP-FPM
+  the container gives it `PhpCliProcess::factory()`, like the pinned renderers. The parent binds the line's values (the
+  binder needs the application's validator), checks the configured signature against the recorded pin and passes the line,
+  the descriptor, the resolved template and renderer-profile bytes (the child re-checks both against the descriptor's
+  hashes; payload keys in canonical sorted order) and the ordered values on standard input, and the checked signature bytes as `signature.png` in the
+  workspace, deleted as soon as the child exits and again before the workspace is removed. The child loads no Laravel, configuration or environment: Composer's tc-lib packages and `InstalledVersions`
+  only, and an application class only when the v2 manifest (checked against the anchor's hash) pins its file and the file's
+  bytes match the pin. It then re-verifies everything itself in `VaseyLicenseV2Render` (application-free, so the dispatch's
+  descriptor checks are the same code): the descriptor's shape and internal hashes, the recorded profile against the
+  manifest and every pinned file (`verifyRuntime`), the signature bytes against the recorded pin, the document rebuilt from
+  the frozen template and the values under its own input rule against the frozen input hash, and the PDF's effective hash
+  and text digest. The parent checks the answer again (size, page limit, hashes, PDF framing, effective hash, text digest);
+  that catches accidental drift, not a malicious child, which could echo the descriptor's values over other bytes.
+  The child's bytes equal the in-process renderer's (golden test).
+- **Post-payment render refusals leave a staff hold** (2026-11-09). When a v2 line's attempt fails with a refusal no retry
+  fixes (`profile_changed`, `signature_changed`, `signature_invalid`, `unsupported_input` (including text a face cannot
+  draw), `invalid_pdf`), or any failure spends its last attempt (`attempts_exhausted`; this is how a retryable
+  `render_failed` such as a timeout, failed fork or full disk, a `signature_unavailable` storage hiccup or a
+  `contract_text_unavailable` stored text, is held),
+  `PaidGrantDocuments`/`PaidTaxDocuments` record one `paid_order.contract_render_held` row (`ContractRenderHolds`), after the
+  attempt's own frames and outside any transaction: the order's row id as the subject and only the chain, the code and the
+  order's public id as context. It is idempotent under the order-row lock (one per order however often it is retried or how
+  many lines fail), reported and swallowed if the write fails, and listed in the existing read-only staff list
+  (`/admin/contract-identity-holds`, "Hold: Contract render", same Gate and staff MFA). The buyer's response is the render's
+  own failure, as before. Lines with an existing paid profile never reach it, so nothing changes while the gate is off.
+- **Runbook rule.** Do not rotate the signature (file or `VASEY_LICENSE_SIGNATURE_SHA256`) and do not deploy a change to any
+  file the v2 manifest pins (its implementation closure, assets or the manifest itself) while any v2 origin is unrendered
+  (a `paid_document_work`/`paid_tax_document_work` row that is not `complete` for an origin whose profile is a v2
+  selection). Such a line refuses `signature_changed` or `profile_changed` and is held for staff; its recorded descriptor is
+  never re-bound. The staging runbook repeats the rule for deploys.
 - **Payload growth (built 2026-11-09).** `App\Domain\Grants\VaseyLicenseContractTexts` and migration
   `2026_11_09_270200_vasey_license_contract_texts` (additive; `down()` refuses once a row exists): one row per kind
   (`template`, `renderer_profile`) and SHA-256, the bytes encrypted at rest with the application key as the origins are,
@@ -467,24 +522,24 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
   (which skips DELETE triggers) cannot replace a row; MySQL's `REPLACE` fires the DELETE trigger and refuses. `down()`
   also refuses unless the table's triggers are exactly the migration's own.
 - **Activation blockers for this wiring** (review of c5d0ce4c, 2026-11-09):
-  - [ ] **Post-payment render refusals.** Selection does not render, so drawability, page or byte limits, `invalid_pdf` and
+  - [x] **Post-payment render refusals** (2026-11-09: staff hold, above). Selection does not render, so drawability, page or byte limits, `invalid_pdf` and
     `render_failed`, and a signature rotation or pinned-file deploy between selection and render (`signature_changed`,
     `profile_changed`) fail a paid line's attempts up to `MAX_ATTEMPTS`, with no staff record. This matches the existing
     paid profiles' behaviour for a changed profile, but before activation either dry-render at selection (outside the
     origin transaction) or route v2 render refusals to a staff hold like `ContractIdentityHolds`.
-  - [ ] **Runbook rule.** No signature rotation and no change to a pinned v2 file while any v2 origin is unrendered.
-  - [ ] **Isolation.** The v2 render runs in the PHP worker, not in an isolated child process like the paid renderers (its
+  - [x] **Runbook rule.** No signature rotation and no change to a pinned v2 file while any v2 origin is unrendered (above,
+    and docs/ops/staging-runbook.md section 7).
+  - [x] **Isolation** (2026-11-09: isolated render, above). The v2 render ran in the PHP worker, not in an isolated child process like the paid renderers (its
     renderer needs the application's binder, validator and private-disk signature rules). Render it in a child with the same
     limits as `PaidGrantRendererProcess` (memory, time, input and output bytes, `open_basedir`, disabled functions, no
     inherited environment), or measure its bounds and record an accepted-risk entry.
-  - [ ] **Transaction I/O.** `decide()` reads the manifest, metric files and the signature inside the origin transaction
+  - [x] **Transaction I/O** (2026-11-09: file reads before the locked frame, above). `decide()` read the manifest, metric files and the signature inside the origin transaction
     that holds the order lock. Move the selection outside it (for example, prepare it before the frame and re-check
-    inside) before activation. `VaseyLicenseContractTexts::retain()` (or at least a check that the stored rows match the
-    prepared bytes) must stay inside the origin transaction when the file reads move out, so no origin ever names a text
-    that is not stored.
+    inside) before activation. `VaseyLicenseContractTexts::retain()` stays inside the origin transaction now that the file
+    reads moved out, so no origin ever names a text that is not stored.
   - [ ] **Key rotation.** v2 contract texts and grant origins are encrypted with the application key. Any `APP_KEY`
     rotation must keep the old key in `APP_PREVIOUS_KEYS` for as long as those rows are retained, or retained v2 lines
-    stop rendering (`profile_changed`) and origins stop opening. Record this in the rotation runbook before activation.
+    stop rendering (`contract_text_unavailable`, held for staff once the line's attempts are spent) and origins stop opening. Record this in the rotation runbook before activation.
   - [ ] **Staff alert on `contract_text_unavailable`.** That branch means a row at a template's or profile's address does
     not hold those bytes (planted or damaged). The line keeps the existing profile, but staff must be alerted from the
     `paid_origin.retained`/`paid_tax_origin.retained` audit context before activation.
@@ -495,11 +550,23 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
     descriptor holds hashes only and selections share one row of each (`VaseyLicenseIssuanceTest`); a template at the
     selection bound leaves the origin within 4 KiB of its gate-off size (`PaidGrantDocumentJourneyTest`); an account with
     enough v2 lines to pass the budget with inline descriptors exports, without a query on the texts table
-    (`PaidGrantDataExportTest`); render refuses a missing, changed, undecryptable or non-canonical stored text and another
+    (`PaidGrantDataExportTest`); render refuses a missing, changed or undecryptable stored text (`contract_text_unavailable`) or a non-canonical one (`profile_changed`) and another
     stored template whose hash verifies; triggers, idempotent storing and rollback (`VaseyLicenseContractTextMigrationTest`).
-- Tests: `VaseyLicenseIssuanceTest`, the wiring-condition tests in `VaseyLicenseV2PdfRendererTest`, gate-on and gate-off
-  journeys in `PaidGrantDocumentJourneyTest` and `PaidTaxGrantJourneyTest` (gate off stores no contract text),
-  `VaseyLicenseContractTextMigrationTest`, the v2 export case in `PaidGrantDataExportTest`, and the production hold in `tests/ops`.
+- Tests: `VaseyLicenseIssuanceTest` (including the stored texts, selection with its files removed after preparing, inside a transaction, and
+  the issuers preparing before their frames), the wiring-condition tests and the child's golden render in
+  `VaseyLicenseV2PdfRendererTest`, `VaseyLicenseContractTextMigrationTest`, the v2 export case in `PaidGrantDataExportTest`,
+  `VaseyLicenseV2RendererProcessTest` (child bytes equal the in-process renderer's; the
+  child refuses a tampered descriptor, template, value, signature pin or signature bytes, and a font program, the manifest,
+  an implementation file or the script changed after the parent's checks; probes of its environment, limits and functions;
+  oversized output, diagnostics, exit codes, memory and a wall clock; the input bound; the PHP-FPM factory), the render hold
+  in `ContractIdentityHoldsTest`, gate-on and gate-off journeys in `PaidGrantDocumentJourneyTest` (a signature rotated after
+  selection: one hold across retries, then a successful attempt) and `PaidTaxGrantJourneyTest` (spent attempts: a hold on
+  the last one only; none with the gate off), and the production hold in `tests/ops`. Review of ef327df7 added: a transient
+  `render_failed` then success leaves no hold; probes that `.env`, `composer.json` and `storage/` are unreadable and
+  `public/` unwritable from the child and that `mail`, `putenv` and `dl` are disabled; an unpinned change to a class the
+  child loads never runs (it would announce itself on stderr); an answer with the right bytes but another text digest refuses.
+- Remaining for the isolated render: a parent killed mid-render can leave a workspace (with the signature copy if the kill
+  lands before the child exits) under `contracts/render-cache`; a sweeper for stale workspaces is not built.
 
 ### Wording item for Sean
 

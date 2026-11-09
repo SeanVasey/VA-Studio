@@ -9,6 +9,7 @@ use App\Domain\Contracts\Production\VaseyLicenseV2Profile;
 use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Grants\ContractIdentityHolds;
+use App\Domain\Grants\ContractRenderHolds;
 use App\Domain\Grants\PaidTax\PaidTaxActor;
 use App\Domain\Grants\PaidTax\PaidTaxCleanup;
 use App\Domain\Grants\PaidTax\PaidTaxCommands;
@@ -249,6 +250,60 @@ class PaidTaxGrantJourneyTest extends TestCase
         $bytes = (new PaidTaxFiles)->verify($manifest['artifact']);
         $this->assertSame($bytes, app(PaidTaxRendererProcess::class)->render(PaidTaxRenderInput::fromOrigin($body), $body['profile'])->pdfBytes);
         $this->assertStringNotContainsString('vasey-license-pdf-v2', $bytes);
+    }
+
+    /** Prepares until the line's attempts are spent, with its master away; returns each failure's class and reason. */
+    private function exhaustAttempts(array $f): array
+    {
+        $master = Storage::disk('local')->path($f['catalog']['media']['master_wav']->storage_path);
+        rename($master, $master.'.away');
+        $failures = [];
+        try {
+            for ($attempt = 1; $attempt <= PaidTaxDocuments::MAX_ATTEMPTS + 1; $attempt++) {
+                try {
+                    (new PaidTaxDocuments)->prepare($f['retained']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+                    $this->fail('Preparation succeeded without its master.');
+                } catch (DeliveryException|PaidTaxException $error) {
+                    $failures[] = [$error::class, $error->reason ?? $error->status ?? null,
+                        DB::table('audit_events')->where('action', ContractRenderHolds::ACTION)->count()];
+                }
+            }
+        } finally {
+            rename($master.'.away', $master);
+        }
+
+        return $failures;
+    }
+
+    /**
+     * Activation blocker "Post-payment render refusals": a v2 tax line whose attempts are all spent on failures a retry could
+     * have fixed (here its master is away after each render) leaves one staff hold on the last attempt, not before; spent
+     * attempts then refuse as before, without another record. Gate off, the same failures leave no render hold.
+     */
+    public function test_a_v2_tax_line_that_spends_its_attempts_leaves_one_staff_hold_on_the_last(): void
+    {
+        $this->enableV2Issuance();
+        $f = $this->paidV2TaxOrder();
+        $this->assertTrue(VaseyLicenseIssuance::selected(PaidTaxRecords::decode((array) DB::table('paid_tax_grant_origins')->sole())['profile']));
+        $failures = $this->exhaustAttempts($f);
+        $this->assertSame([0, 0, 0, 0, 1, 1], array_column($failures, 2));
+        $this->assertSame(array_fill(0, PaidTaxDocuments::MAX_ATTEMPTS, DeliveryException::class), array_slice(array_column($failures, 0), 0, PaidTaxDocuments::MAX_ATTEMPTS));
+        $this->assertSame(PaidTaxException::class, $failures[PaidTaxDocuments::MAX_ATTEMPTS][0]);
+        $hold = (array) DB::table('audit_events')->where('action', ContractRenderHolds::ACTION)->sole();
+        $this->assertSame(['production_tax_checkout_order', ['chain' => 'production_tax_checkout_v2', 'reason' => ContractRenderHolds::ATTEMPTS_EXHAUSTED,
+            'order_public_id' => $f['order']['orderId']]], [$hold['subject_type'], json_decode($hold['context'], true)]);
+        $this->assertSame((int) DB::table(TaxCheckoutSchema::TABLES['order'])->where('public_id', $f['order']['orderId'])->value('id'), (int) $hold['subject_id']);
+    }
+
+    public function test_with_the_v2_issuance_gate_off_spent_tax_attempts_leave_no_render_hold(): void
+    {
+        $this->enableV2Issuance(false);
+        $f = $this->paidV2TaxOrder();
+        $this->assertFalse(VaseyLicenseIssuance::selected(PaidTaxRecords::decode((array) DB::table('paid_tax_grant_origins')->sole())['profile']));
+        $failures = $this->exhaustAttempts($f);
+        $this->assertSame([0, 0, 0, 0, 0, 0], array_column($failures, 2));
+        $this->assertSame(PaidTaxException::class, $failures[PaidTaxDocuments::MAX_ATTEMPTS][0]);
+        $this->assertSame(PaidTaxDocuments::MAX_ATTEMPTS, (int) DB::table('paid_tax_document_work')->sole()->attempts);
     }
 
     /**

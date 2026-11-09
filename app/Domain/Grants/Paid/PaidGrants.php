@@ -46,12 +46,15 @@ final class PaidGrants
         $deadline = PaidGrantDeadline::start();
         $this->outsideTransactions();
         $locator = ProductionPaidOrderLocatorV1::locate($orderId);
+        // Contract increment 5: the v2 selection's file reads (manifest, metrics, signature) happen here, before the locked
+        // origin transaction; inside it the selection only re-checks them without file I/O. Null, reading nothing, while the gate is off.
+        $v2Prepared = VaseyLicenseIssuance::prepare();
         $receipt = null;
         $heldRows = null;
         $producerRead = null;
         $producerSecond = null;
         try {
-            $projection = DB::transaction(function () use ($principal, $actor, $orderId, $locator, $deadline, $projectionRead,
+            $projection = DB::transaction(function () use ($v2Prepared, $principal, $actor, $orderId, $locator, $deadline, $projectionRead,
                 &$receipt, &$heldRows, &$producerRead, &$producerSecond): array {
                 $rows = new PaidGrantRows;
                 $heldRows = $rows;
@@ -103,7 +106,7 @@ final class PaidGrants
                             'profile' => null];
                         // Contract increment 5: the v2 license renderer for new originals only, behind its own gate; the
                         // choice is frozen here and every render, retry and replay uses it (VaseyLicenseIssuance).
-                        [$selected, $selections[]] = VaseyLicenseIssuance::decide(PaidGrantRenderInput::fromOrigin($payload));
+                        [$selected, $selections[]] = VaseyLicenseIssuance::decide(PaidGrantRenderInput::fromOrigin($payload), $v2Prepared);
                         $payload['profile'] = $selected ?? PaidGrantRenderProfile::current($line['provenance']);
                         (new PaidGrantText)->build(PaidGrantRenderInput::fromOrigin($payload));
                         $origin = PaidGrantRecords::insert('paid_grant_origins', ['public_id' => $originId, 'batch_id' => (int) $batch['id'], 'position' => $index + 1,
