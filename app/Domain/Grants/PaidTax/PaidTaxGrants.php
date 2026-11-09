@@ -46,6 +46,9 @@ final class PaidTaxGrants
         $deadline = PaidTaxDeadline::start();
         $runtime = PaidTaxRuntime::capture($deadline);
         $runtime->outsideTransactions();
+        // Contract increment 5: the v2 selection's file reads (manifest, metrics, signature) happen here, before the locked
+        // origin transaction; inside it the selection only re-checks them without file I/O. Null, reading nothing, while the gate is off.
+        $v2Prepared = VaseyLicenseIssuance::prepare();
         $actorOriginal = PaidTaxActor::capture($actor);
         $locator = ProductionTaxPaidOrderLocatorV2::locate($orderId);
         $receipt = null;
@@ -56,7 +59,7 @@ final class PaidTaxGrants
         $heldFrame = null;
         $runtime->prove(0);
         try {
-            $projection = PaidTaxTransaction::run($runtime, $actorOriginal, function (PaidTaxOwnedFrame $frame) use ($principal, $actor, $orderId, $locator, $deadline, $projectionRead, $runtime, $actorOriginal,
+            $projection = PaidTaxTransaction::run($runtime, $actorOriginal, function (PaidTaxOwnedFrame $frame) use ($v2Prepared, $principal, $actor, $orderId, $locator, $deadline, $projectionRead, $runtime, $actorOriginal,
                 &$heldSource, &$receipt, &$heldRows, &$producerRead, &$producerSecond): array {
                 $rows = new PaidTaxRows($runtime, $frame);
                 $heldRows = $rows;
@@ -114,7 +117,7 @@ final class PaidTaxGrants
                             'profile' => null];
                         // Contract increment 5: the v2 license renderer for new originals only, behind its own gate; the
                         // choice is frozen here and every render, retry and replay uses it (VaseyLicenseIssuance).
-                        [$selected, $selections[]] = VaseyLicenseIssuance::decide(PaidTaxRenderInput::fromOrigin($payload));
+                        [$selected, $selections[]] = VaseyLicenseIssuance::decide(PaidTaxRenderInput::fromOrigin($payload), $v2Prepared);
                         $payload['profile'] = $selected ?? PaidTaxRenderProfile::current($line['provenance']);
                         (new PaidTaxText)->build(PaidTaxRenderInput::fromOrigin($payload));
                         $origin = PaidTaxRecords::insert('paid_tax_grant_origins', ['public_id' => $originId, 'batch_id' => (int) $batch['id'], 'position' => $index + 1,

@@ -16,6 +16,8 @@ use App\Domain\Contracts\Production\VaseyLicenseSignature;
 use App\Domain\Contracts\Production\VaseyLicenseV2Implementation;
 use App\Domain\Contracts\Production\VaseyLicenseV2PdfRenderer;
 use App\Domain\Contracts\Production\VaseyLicenseV2Profile;
+use App\Domain\Contracts\Production\VaseyLicenseV2Render;
+use App\Domain\Contracts\Production\VaseyLicenseV2RendererProcess;
 use App\Domain\Contracts\RenderedContract;
 use App\Domain\Contracts\VersionedContractRenderer;
 use App\Support\CanonicalJson;
@@ -33,7 +35,7 @@ use Tests\TestCase;
 class VaseyLicenseV2PdfRendererTest extends TestCase
 {
     /** sha256 of the golden business render below, under the pinned v2 profile and the synthetic signature. */
-    private const GOLDEN_SHA256 = '2b2a04e462c487eb472d21da0e499dbb0d7728c438b953410848bf08a2cc8403';
+    private const GOLDEN_SHA256 = '81f228d82a58f8d5faafbe563587981cc92b772b11080572ccc792b71aeb628d';
 
     private const TEMPLATE = "SYNTHETIC TEST TEMPLATE: {LICENSE_NAME}\n\nNONBINDING FIXTURE\n\n"
         .'This synthetic fixture is dated {CONTRACT_DATE}. It names {CUSTOMER_FULLNAME} of {CUSTOMER_ADDRESS} and {PRODUCER_ALIAS}, '
@@ -211,6 +213,33 @@ class VaseyLicenseV2PdfRendererTest extends TestCase
         $this->assertStringContainsString('VASEY.AUDIO license profile vasey-license-pdf-v2', $first->pdfBytes);
         $this->assertStringNotContainsString('vasey-license-pdf-v1', $first->pdfBytes);
         $this->assertSame(self::GOLDEN_SHA256, $first->sha256);
+    }
+
+    /**
+     * Activation blocker "Isolation": the bounded child that renders issued v2 originals (VaseyLicenseV2RendererProcess)
+     * produces the golden bytes for the golden document, from a descriptor recorded the way the issuance dispatch records it.
+     */
+    public function test_the_isolated_child_renders_the_golden_bytes(): void
+    {
+        $this->fakePrivateMediaStorage();
+        $signature = $this->signature();
+        $declaration = self::fixture('business');
+        $input = self::fixture('taxInput', $declaration, self::fixture('license', self::fixture('terms'), 'non-exclusive'));
+        $values = self::fixture('bind', $input);
+        $document = (new VaseyLicenseV2PdfRenderer)->document(self::TEMPLATE, $values, $declaration);
+        $profile = VaseyLicenseV2Profile::current();
+        $profileSha256 = VaseyLicenseV2Profile::hash($profile);
+        $descriptor = ['schema_version' => VaseyLicenseV2Render::DESCRIPTOR_SCHEMA, 'version' => VaseyLicenseV2Profile::VERSION,
+            'purpose' => $input['purpose'], 'provenance' => $input['provenance'],
+            'contract' => ['template_sha256' => hash('sha256', self::TEMPLATE),
+                'producer_alias' => 'Synthetic Producer Alias', 'state_province_country' => 'Synthetic State, Synthetic Country'],
+            'signature_sha256' => $signature->sha256, 'renderer_profile_sha256' => $profileSha256,
+            'effective_hash' => CanonicalJson::hash(['profile_sha256' => $profileSha256, 'signature_sha256' => $signature->sha256]),
+            'expected' => ['input_hash' => $document->inputHash, 'text_digest' => hash('sha256', $document->text)]];
+
+        $child = (new VaseyLicenseV2RendererProcess)->render($input, $descriptor, $values, self::TEMPLATE, CanonicalJson::encode($profile), $signature->read()['bytes']);
+        $this->assertSame(self::GOLDEN_SHA256, $child->sha256);
+        $this->assertSame($this->render($document, $signature)->pdfBytes, $child->pdfBytes);
     }
 
     public function test_latin_extended_names_render_and_extract_with_their_own_glyphs(): void

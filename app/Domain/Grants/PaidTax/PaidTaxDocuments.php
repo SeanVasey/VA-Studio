@@ -4,6 +4,7 @@ namespace App\Domain\Grants\PaidTax;
 
 use App\Domain\Contracts\RenderedContract;
 use App\Domain\Customers\ProductionCustomerPrincipal;
+use App\Domain\Grants\ContractRenderHolds;
 use App\Domain\Grants\PaidTax\Models\PaidTaxOrderOrigin;
 use App\Domain\Grants\VaseyLicenseIssuance;
 use App\Models\User;
@@ -107,7 +108,7 @@ final class PaidTaxDocuments
                     [$claimId, $lease, $line['work']['id']]);
 
                 return ['origin' => $line['origin']['public_id'], 'origin_hash' => $line['origin']['payload_hash'], 'claim_id' => $claimId,
-                    'body' => $line['body'], 'expires_at' => $lease,
+                    'body' => $line['body'], 'expires_at' => $lease, 'attempt' => (int) $line['work']['attempts'] + 1,
                     // Monotonic end of the lease: the claim instant less the second's fraction the lease truncated away.
                     'lease_ends_ns' => $tick - $now->micro * 1000 + self::LEASE_SECONDS * 1_000_000_000];
             }
@@ -129,11 +130,11 @@ final class PaidTaxDocuments
         // The record frame still refuses once the lease itself has ended.
         $budget = PaidTaxDeadline::start(self::LEASE_SECONDS);
         $budget->shortenTo($claim['lease_ends_ns']);
+        // The profile recorded at the origin decides the renderer for every attempt, whatever the selection gate says now.
+        $v2 = is_array($claim['body']['profile'] ?? null) && VaseyLicenseIssuance::selected($claim['body']['profile']);
         try {
             $budget->proveCurrent();
             $input = PaidTaxRenderInput::fromOrigin($claim['body']);
-            // The profile recorded at the origin decides the renderer for every attempt, whatever the selection gate says now.
-            $v2 = VaseyLicenseIssuance::selected($claim['body']['profile']);
             $expected = $v2 ? VaseyLicenseIssuance::expected($claim['body']['profile']) : (new PaidTaxText)->build($input);
             $rendered = $v2 ? app(VaseyLicenseIssuance::class)->render($input, $claim['body']['profile'])
                 : app(PaidTaxRendererProcess::class)->render($input, $claim['body']['profile']);
@@ -174,6 +175,12 @@ final class PaidTaxDocuments
                 }, $budget);
             } catch (Throwable) {
                 // Retained lease/attempt remains truthful until a fresh authorized retry after expiry.
+            }
+            if ($v2) {
+                // Contract increment 5: a v2 render refusal no retry fixes, or a v2 line's last attempt, leaves one staff hold
+                // for the order, written after the frames above and outside any transaction. The response is unchanged.
+                ContractRenderHolds::recordAfterFailure('production_tax_checkout_v2', $claim['body']['source']['order_id'],
+                    ContractRenderHolds::reason($error, $claim['attempt'], self::MAX_ATTEMPTS));
             }
             throw $error;
         }
