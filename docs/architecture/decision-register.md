@@ -348,16 +348,34 @@ each table to an existing §7 row and add two rows where §7 had none.
   - test-commerce tables are `not_applicable` in production, where they must stay empty;
   - anything that still fits no row stays reported as unclassified.
 
-**Large-download resume (FP-077, PR #252).** No HTTP range support at launch:
+**Large-download resume (FP-077).** Sean decided on 2026-11-09 to replace the lead's first recommendation, which was no resume at launch:
 
-- the test-delivery policy stays v1 with `"ranges": "disabled"`;
-- downloads stay CSRF-protected POSTs (D-20 unchanged), so no token-bearing GET links;
-- authorization lifetimes are unchanged.
+1. Delivery moves to a v2 policy that allows resume.
+2. The buyer's download is resumable through a session-bound GET. Sean asked for a recommendation, and this is the lead's:
+   - The existing CSRF-protected POST still creates the authorization, then answers 303 to a GET URL.
+   - That URL carries only the opaque authorization id, never the secret.
+   - The GET works only with the same authenticated session and owner, and only after every existing check passes.
+   - Responses are `private, no-store`, `no-referrer` and `noindex`.
+   - Only single-range `Range` and strong `If-Range` are honored.
+   - This amends D-20, whose threat was a secret in a URL.
+3. A partial or interrupted transfer does not count toward `max_downloads`.
+   - A download counts once, when the distinct bytes served under one authorization cover the whole file.
+   - Authorizations that started but never completed are capped per grant per rolling 24 hours (operational setting, default 10).
+4. Large archives get longer resume windows once started:
+   - 1 hour below 512 MiB;
+   - 6 hours from 512 MiB;
+   - 24 hours from 4 GiB.
 
-A buyer whose transfer drops requests a new authorization, which counts as a download under the license's own
-`max_downloads`. That limit is a per-license term set by Sean and is not changed here. Reason: resume is only usable by
-browsers over GET, and that would reopen D-20's token-leakage analysis for every chain. Revisit with real failure data
-after launch. The prototype (#253) is closed as not planned and its branch kept for reference.
+   These are settings. The start window stays short, and whole-file verification still runs before every response.
+
+The test-delivery chain is phase 1. Paid, paid-tax, free and production-free follow in their own phases, each with native
+MySQL race evidence and independent review. #252 and #253 are closed as superseded.
+
+**Unpaid order snapshots (retention).** An order snapshot is created before payment. One with no verified payment,
+whose provider session has expired or been cancelled and reconciled, counts as "did not become an order": it falls under
+the 30-day abandoned-checkout row from that point. Any paid, refunded, disputed or held order stays with the orders row.
+The schedule implements this only after a separate change that proves no late webhook or reconcile can still attach
+payment to such a snapshot. Until then those snapshots stay with the orders row.
 
 Still Sean's, not delegable:
 
