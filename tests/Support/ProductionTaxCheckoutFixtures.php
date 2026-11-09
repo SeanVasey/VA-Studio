@@ -41,10 +41,10 @@ trait ProductionTaxCheckoutFixtures
     }
 
     /** Actual catalog/source lifecycle with a provider-calculated tax candidate. */
-    protected function taxCatalog(string $behavior = 'exclusive', int $ceiling = 2500): array
+    protected function taxCatalog(string $behavior = 'exclusive', int $ceiling = 2500, array $licenseTerms = [], array $licenseContent = []): array
     {
         self::configureTax();
-        $fixture = ProductionTrackPreparationFixtures::prepared();
+        $fixture = ProductionTrackPreparationFixtures::prepared(licenseTerms: $licenseTerms, licenseContent: $licenseContent);
         $machine = self::taxMachine($behavior, $ceiling);
         $candidate = app(SaveProductionTrackCapabilities::class)->applyReviewed(
             app(PrepareProductionTrackCapabilities::class)->review($fixture['candidate'], $fixture['source'], $machine, $fixture['actor']), $fixture['actor']);
@@ -55,9 +55,10 @@ trait ProductionTaxCheckoutFixtures
     }
 
     /** Enrolled buyer, previewed and accepted pre-tax order, and a recording transport that is NOT yet admitted. */
-    protected function taxOrder(string $behavior = 'exclusive', int $ceiling = 2500, array $identity = ['legalName' => 'Declared synthetic buyer']): array
+    protected function taxOrder(string $behavior = 'exclusive', int $ceiling = 2500, array $identity = ['legalName' => 'Declared synthetic buyer'],
+        array $licenseTerms = [], array $licenseContent = []): array
     {
-        $catalog = $this->taxCatalog($behavior, $ceiling);
+        $catalog = $this->taxCatalog($behavior, $ceiling, $licenseTerms, $licenseContent);
         $buyer = $this->enrollThroughLocalSmtp();
         $access = new ProductionCustomerAccess;
         $transport = new RecordingTaxCheckoutTransport;

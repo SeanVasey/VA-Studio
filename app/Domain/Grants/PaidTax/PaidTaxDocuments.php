@@ -5,6 +5,7 @@ namespace App\Domain\Grants\PaidTax;
 use App\Domain\Contracts\RenderedContract;
 use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Grants\PaidTax\Models\PaidTaxOrderOrigin;
+use App\Domain\Grants\VaseyLicenseIssuance;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -131,11 +132,14 @@ final class PaidTaxDocuments
         try {
             $budget->proveCurrent();
             $input = PaidTaxRenderInput::fromOrigin($claim['body']);
-            $expected = (new PaidTaxText)->build($input);
-            $rendered = app(PaidTaxRendererProcess::class)->render($input, $claim['body']['profile']);
+            // The profile recorded at the origin decides the renderer for every attempt, whatever the selection gate says now.
+            $v2 = VaseyLicenseIssuance::selected($claim['body']['profile']);
+            $expected = $v2 ? VaseyLicenseIssuance::expected($claim['body']['profile']) : (new PaidTaxText)->build($input);
+            $rendered = $v2 ? app(VaseyLicenseIssuance::class)->render($input, $claim['body']['profile'])
+                : app(PaidTaxRendererProcess::class)->render($input, $claim['body']['profile']);
             PaidTaxException::require($rendered instanceof RenderedContract
                 && hash_equals($expected['text_digest'], $rendered->textDigest)
-                && hash_equals(CanonicalJson::hash($claim['body']['profile']), $rendered->profileHash));
+                && hash_equals(VaseyLicenseIssuance::artifactProfileHash($claim['body']['profile']), $rendered->profileHash));
             $artifact = app(PaidTaxFiles::class)->store($claim['origin'], $claim['claim_id'], $claim['body']['source']['provenance'], $rendered);
             $budget->proveCurrent();
             (new PaidTaxAssets)->verify($claim['body']['assets'], $budget->value());

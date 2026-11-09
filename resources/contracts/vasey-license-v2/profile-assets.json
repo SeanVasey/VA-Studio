@@ -206,7 +206,7 @@
         "app/Domain/Contracts/Production/VaseyLicenseProfileDefinition.php": "8afaf0ce8cefb1b728689d130f9f4c54fe725ec20a8d6ff3153e7db78329587f",
         "app/Domain/Contracts/Production/VaseyLicenseSignature.php": "e8aae2e91522c273bc500b873cf8b762aadf9e0babe07d5a361f5377785b2376",
         "app/Domain/Contracts/Production/VaseyLicenseV2Implementation.php": "46f71f923ef40b26d54e0a34bfb1fbf09582a8ddcb06d003519dd6bf37332a1a",
-        "app/Domain/Contracts/Production/VaseyLicenseV2PdfRenderer.php": "60393da303231a91d0ac594e97463fe8fb8239bbd5614943afc4290d9453c923",
+        "app/Domain/Contracts/Production/VaseyLicenseV2PdfRenderer.php": "e83f7663f8830378cdce7590de4fa4c1cdabba35b80a78956e9ed7a97958624b",
         "app/Domain/Contracts/Production/VaseyLicenseV2ProfileDefinition.php": "791e6f9656dcc0a28d649fd3f1e72684c0719270140ee53da75e995f5a53b379",
         "app/Domain/Contracts/RenderedContract.php": "b3fa57b8c8cc8e354597a5fc5f12b7942aa734e9d1bab9f0d2014358dd1d249f",
         "app/Domain/Rights/EconomicLicenseTerms.php": "070a5b2e07887a713dd603803de5c330d34dc1d0b27b633dfe6c4eaaba87f0b4",

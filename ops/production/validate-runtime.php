@@ -223,6 +223,8 @@ try {
         // D-30 contract identity capture is a code literal on each checkout; its policies also refuse outside local/testing.
         $check('holds.production_checkout_contract_identity_v2', config('production_checkout.contract_identity_v2') === false);
         $check('holds.production_tax_checkout_contract_identity_v2', config('production-tax-checkout.contract_identity_v2') === false);
+        // Contract increment 5: selecting the vasey-license-pdf-v2 renderer for new paid originals is a code literal too.
+        $check('holds.vasey_license_v2_issuance', config('contracts.vasey_license_v2_issuance') === false);
         $check('holds.production_credentials', $liveStripe
             ? (in_array(config('production_checkout.secret_key'), [null, ''], true) || $liveSecret(config('production_checkout.secret_key')))
                 && in_array(config('production_checkout.funds_mode'), [null, '', 'live'], true)
