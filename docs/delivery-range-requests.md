@@ -1,6 +1,6 @@
 # FP-077 — HTTP range requests for private delivery: design and blockers
 
-Status: **design only, 2026-11-09. No delivery behaviour changed.** Every customer download path still refuses `Range` and `If-Range`. A working prototype for the test-delivery chain exists on the local, unpushed branch `claude/download-range-requests-20261109-prototype` (described under [Prototype](#prototype)). It was not merged because enabling it would contradict the approved test-delivery policy contract (blocker B1). The prototype also does not give buyers a resume they can use today (blockers B2 and B3).
+Status: **design only, 2026-11-09. No delivery behaviour changed.** Every customer download path still refuses `Range` and `If-Range`. A working prototype for the test-delivery chain is preserved on the pushed, unmerged branch `claude/download-range-requests-20261109-prototype` (draft PR, not for merge) (described under [Prototype](#prototype)). It was not merged because enabling it would contradict the approved test-delivery policy contract (blocker B1). The prototype also does not give buyers a resume they can use today (blockers B2 and B3).
 
 ## What exists today
 
