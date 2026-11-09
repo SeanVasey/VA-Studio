@@ -93,9 +93,20 @@ class TestDeliveryResumeMigrationTest extends TestCase
             'policy_version' => $version] + $row;
     }
 
-    private function coverage(array $s, array $changes = []): array
+    private function admission(array $s, array $changes = []): array
     {
         return $changes + ['test_delivery_authorization_id' => $s['authorization']->id, 'test_delivery_redemption_id' => $s['redemption']->id,
+            'sequence' => 2, 'first_byte' => 10, 'last_byte' => $s['size'] - 1, 'admitted_at' => now()->utc()->format('Y-m-d H:i:s')];
+    }
+
+    private function admissionId(int $sequence): int
+    {
+        return (int) DB::table('test_delivery_admissions')->where('sequence', $sequence)->value('id');
+    }
+
+    private function coverage(array $s, array $changes = []): array
+    {
+        return $changes + ['test_delivery_admission_id' => $this->admissionId(2), 'test_delivery_authorization_id' => $s['authorization']->id, 'test_delivery_redemption_id' => $s['redemption']->id,
             'sequence' => 2, 'first_byte' => 10, 'last_byte' => 19, 'intervals' => '[[0,19]]', 'covered_bytes' => 20,
             'completed_authorization_id' => null, 'recorded_at' => now()->utc()->format('Y-m-d H:i:s')];
     }
@@ -127,7 +138,21 @@ class TestDeliveryResumeMigrationTest extends TestCase
         $v1 = $this->copyAuthorization($s['authorization'], 'test-owner-delivery-v1');
         DB::table('test_delivery_authorizations')->insert($v1);
         $v1Id = DB::table('test_delivery_authorizations')->where('public_id', $v1['public_id'])->value('id');
+        // Admissions: contiguous, inside the file, after the start, only for v2, append-only.
         foreach ([
+            'duplicate sequence' => ['sequence' => 1], 'gap' => ['sequence' => 3], 'past the file' => ['last_byte' => $size],
+            'reversed bytes' => ['first_byte' => 19, 'last_byte' => 10], 'v1 authorization' => ['test_delivery_authorization_id' => $v1Id],
+            'before the start' => ['admitted_at' => $s['redemption']->redeemed_at->subSecond()->format('Y-m-d H:i:s')],
+        ] as $changes) {
+            $this->rejected(fn () => DB::table('test_delivery_admissions')->insert($this->admission($s, $changes)));
+        }
+        DB::table('test_delivery_admissions')->insert($this->admission($s));
+        DB::table('test_delivery_admissions')->insert($this->admission($s, ['sequence' => 3, 'first_byte' => 0]));
+        $this->rejected(fn () => DB::table('test_delivery_admissions')->where('sequence', 2)->update(['last_byte' => 11]));
+        $this->rejected(fn () => DB::table('test_delivery_admissions')->where('sequence', 3)->delete());
+        foreach ([
+            'outside its admission' => ['first_byte' => 5, 'intervals' => '[[0,19]]'],
+            'an admission that already has coverage' => ['test_delivery_admission_id' => $this->admissionId(1)],
             'duplicate sequence' => ['sequence' => 1], 'gap' => ['sequence' => 3], 'sequence zero' => ['sequence' => 0],
             'shrinking coverage' => ['covered_bytes' => 9, 'first_byte' => 0, 'last_byte' => 0, 'intervals' => '[[0,8]]'],
             'past the file' => ['last_byte' => $size, 'first_byte' => $size - 1],
@@ -146,8 +171,10 @@ class TestDeliveryResumeMigrationTest extends TestCase
         $complete = ['first_byte' => 10, 'last_byte' => $size - 1, 'covered_bytes' => $size, 'intervals' => '[[0,'.($size - 1).']]'];
         DB::table('test_delivery_coverage')->insert($this->coverage($s, $complete + ['completed_authorization_id' => $s['authorization']->id]));
         // After completion, re-served bytes append without a second completion, and a second completion is impossible.
-        $this->rejected(fn () => DB::table('test_delivery_coverage')->insert($this->coverage($s, $complete + ['sequence' => 3, 'completed_authorization_id' => $s['authorization']->id])));
-        DB::table('test_delivery_coverage')->insert($this->coverage($s, $complete + ['sequence' => 3]));
+        $third = ['sequence' => 3, 'test_delivery_admission_id' => $this->admissionId(3)];
+        $this->rejected(fn () => DB::table('test_delivery_coverage')->insert($this->coverage($s, $complete + $third + ['completed_authorization_id' => $s['authorization']->id])));
+        $this->rejected(fn () => DB::table('test_delivery_coverage')->insert($this->coverage($s, $complete + ['sequence' => 3])));
+        DB::table('test_delivery_coverage')->insert($this->coverage($s, $complete + $third));
         $this->assertSame(1, TestDeliveryCoverage::whereNotNull('completed_authorization_id')->count());
         $this->rejected(fn () => DB::table('test_delivery_coverage')->where('sequence', 1)->update(['covered_bytes' => $size]));
         $this->rejected(fn () => DB::table('test_delivery_coverage')->where('sequence', 3)->delete());

@@ -2,7 +2,6 @@
 
 namespace App\Http\Responses;
 
-use App\Domain\Delivery\DeliveryByteRange;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Delivery\PreparedDeliveryStream;
 use App\Domain\Delivery\TestDeliveryTransfer;
@@ -79,7 +78,7 @@ final class TestDeliveryResponse
      * v2 transfer, admitted and whole-file verified before this adapter is called. A partial selection is a 206 of exactly
      * its bytes, anything else the whole file; both carry Accept-Ranges and the derived strong ETag for If-Range.
      */
-    public static function transfer(TestDeliveryTransfer $transfer, string $filename, string $mime): TestDeliveryTransferResponse
+    public static function transfer(TestDeliveryTransfer $transfer, string $filename, string $mime, string $etag): TestDeliveryTransferResponse
     {
         try {
             $range = $transfer->range;
@@ -104,7 +103,7 @@ final class TestDeliveryResponse
                 'Content-Disposition' => HeaderUtils::makeDisposition('attachment', $filename),
                 'Content-Length' => (string) ($partial ? $range->length() : $transfer->sizeBytes()),
                 'Accept-Ranges' => 'bytes',
-                'ETag' => DeliveryByteRange::etag($transfer->sha256()),
+                'ETag' => $etag,
             ] + ($partial ? ['Content-Range' => 'bytes '.$range->start.'-'.$range->end.'/'.$transfer->sizeBytes()] : []));
         } catch (Throwable $error) {
             $transfer->close();

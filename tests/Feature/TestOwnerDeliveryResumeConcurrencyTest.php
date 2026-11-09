@@ -8,6 +8,8 @@ use App\Domain\Contracts\ContractRenderer;
 use App\Domain\Contracts\Models\GrantContract;
 use App\Domain\Delivery\DeliveryByteRange;
 use App\Domain\Delivery\IssueTestDelivery;
+use App\Domain\Delivery\Models\TestDeliveryAdmission;
+use App\Domain\Delivery\Models\TestDeliveryAuthorization;
 use App\Domain\Delivery\Models\TestDeliveryCoverage;
 use App\Domain\Delivery\Models\TestDeliveryRedemption;
 use App\Domain\Delivery\TransferTestDelivery;
@@ -16,6 +18,7 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Tests\Support\ContractFixtures;
+use Tests\Support\CustomerFixtures;
 use Tests\Support\DeliveryFixtures as F;
 use Tests\Support\DeliveryRace;
 use Tests\Support\FinalizationDatabaseMigrations;
@@ -54,6 +57,43 @@ class TestOwnerDeliveryResumeConcurrencyTest extends TestCase
         $this->assertSame([hash('sha256', substr($bytes, 10, $half - 10)), hash('sha256', substr($bytes, $half))], array_column($results, 'content_hash'));
         // Whichever recorded second saw the first's committed coverage and completed the file.
         $this->assertCoverage(strlen($bytes), [10, null, strlen($bytes)]);
+    }
+
+    /**
+     * #258 P2-2: a signed-in customer's admission fixes its REPEATABLE READ snapshot with plain reads (customer access) before
+     * it waits for the authorization lock that an independent record() holds. Once that coverage commits, the admission must
+     * read admissions and coverage with locking reads only, so it is admitted rather than refused as changed.
+     */
+    public function test_a_signed_in_admission_waiting_behind_a_coverage_write_reads_the_committed_state(): void
+    {
+        $this->fakePrivateMediaStorage();
+        $this->travelTo(now()->startOfSecond());
+        Queue::fake();
+        $account = CustomerFixtures::account();
+        $paid = CustomerFixtures::ready($account['user']);
+        F::configureV2();
+        $principal = $paid['principal'];
+        $issued = app(IssueTestDelivery::class)->handle($paid['order']->public_id, $principal->ownerKey, $paid['grant']->public_id, 'contract',
+            (string) Str::uuid(), $account['user'], $principal, F::SESSION_SECRET);
+        $original = GrantContract::where('license_grant_id', $paid['grant']->id)->sole();
+        $bytes = Storage::disk('local')->get($original->storage_path);
+        // A first response was admitted and its worker died: an admission without coverage, waiting to be recorded.
+        app(TransferTestDelivery::class)->handle($paid['order']->public_id, $principal->ownerKey, $issued->authorizationId, F::SESSION_SECRET,
+            DeliveryByteRange::evaluate('bytes=0-9', null, strlen($bytes), $original->pdf_hash), $account['user'], $principal)->close();
+        $this->assertSame(1, TestDeliveryAdmission::count());
+        $this->assertSame(0, TestDeliveryCoverage::count());
+
+        $results = DeliveryRace::run($this, ['mode' => 'admit_record', 'order_id' => $paid['order']->id, 'order_public_id' => $paid['order']->public_id,
+            'authorization_public_id' => $issued->authorizationId, 'authorization_id' => TestDeliveryAuthorization::sole()->id,
+            'admission_id' => TestDeliveryAdmission::sole()->id, 'user_id' => $account['user']->id, 'session_secret' => F::SESSION_SECRET,
+            'size_bytes' => strlen($bytes), 'sha256' => $original->pdf_hash, 'now' => now()->toIso8601ZuluString()]);
+        $this->assertSame(['recorded', 'transferred'], array_column($results, 'outcome'), json_encode($results));
+        $this->assertSame(hash('sha256', substr($bytes, 10)), $results[1]['content_hash']);
+        $rows = TestDeliveryCoverage::orderBy('sequence')->get();
+        $this->assertSame([[0, 9, 10, null], [10, strlen($bytes) - 1, strlen($bytes), TestDeliveryAuthorization::sole()->id]],
+            $rows->map(fn ($row) => [$row->first_byte, $row->last_byte, $row->covered_bytes, $row->completed_authorization_id])->all());
+        $this->assertSame(2, TestDeliveryAdmission::count());
+        $this->assertSame([$account['user']->id], DB::table('audit_events')->where('action', 'commerce.delivery.resumed')->pluck('actor_id')->all());
     }
 
     private function assertCoverage(int $size, array $covered): void

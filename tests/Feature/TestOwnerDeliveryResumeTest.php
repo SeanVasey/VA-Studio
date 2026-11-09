@@ -10,9 +10,9 @@ use App\Domain\Delivery\DeliveryByteRange;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Delivery\IssueTestDelivery;
 use App\Domain\Delivery\ManageTestDeliveryControl;
+use App\Domain\Delivery\Models\TestDeliveryAdmission;
 use App\Domain\Delivery\Models\TestDeliveryAuthorization;
 use App\Domain\Delivery\Models\TestDeliveryCoverage;
-use App\Domain\Delivery\Models\TestDeliveryRedemption;
 use App\Domain\Delivery\PrepareTestDeliveryStream;
 use App\Domain\Delivery\ReadTestDeliveryAuthorization;
 use App\Domain\Delivery\TestAccessPolicy;
@@ -29,6 +29,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Tests\Support\ActivationFixtures;
 use Tests\Support\ContractFixtures;
+use Tests\Support\CustomerFixtures;
 use Tests\Support\DeliveryFixtures as F;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\FinalizationFixtures;
@@ -54,6 +55,8 @@ class TestOwnerDeliveryResumeTest extends TestCase
     /** @var array<string, string> authorization ID => GET path, once its token was presented in this session */
     private array $locations = [];
 
+    private string $orderId = '';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -78,6 +81,7 @@ class TestOwnerDeliveryResumeTest extends TestCase
     {
         $fixture = F::activate(ActivationFixtures::issue(ContractFixtures::finalize(FinalizationFixtures::ownedHttp($this, $this->gateway))));
         Queue::fake();
+        $this->orderId = $fixture['order']->public_id;
 
         return $fixture;
     }
@@ -147,7 +151,7 @@ class TestOwnerDeliveryResumeTest extends TestCase
 
     private function etag(): string
     {
-        return DeliveryByteRange::etag(hash('sha256', $this->bytes()));
+        return DeliveryByteRange::etag(hash('sha256', $this->bytes()), $this->orderId, (string) config('app.key'));
     }
 
     private function assertPrivate(TestResponse $response): void
@@ -228,12 +232,63 @@ class TestOwnerDeliveryResumeTest extends TestCase
         $this->assertSame($prepares, $this->streams->transactionLevels);
         $this->assertSame(1, $this->completions());
         $this->get($this->url($f))->assertOk()->assertJsonPath('delivery.history.0.status', 'attempted');
-        // A response admitted before completion and recorded after it re-serves bytes without a second count.
-        $ledger = app(TestDeliveryCoverageLedger::class);
-        $this->assertFalse($ledger->record($row->id, TestDeliveryRedemption::sole()->id, 0, strlen($bytes) - 1));
+        // The ETag is scoped to this order: the same bytes in another order would carry another validator.
+        $this->assertNotSame($full->headers->get('ETag'), DeliveryByteRange::etag(hash('sha256', $bytes), (string) Str::uuid(), (string) config('app.key')));
+        $this->assertStringNotContainsString(hash('sha256', $bytes), (string) $full->headers->get('ETag'));
+    }
+
+    public function test_every_response_is_admitted_before_its_bytes_and_one_admitted_before_completion_never_counts_again(): void
+    {
+        $f = $this->ready();
+        $bytes = $this->bytes();
+        $authorization = $this->issue($f);
+        $this->present($f, $authorization)->assertStatus(303);
+        $transfer = fn (string $header) => app(TransferTestDelivery::class)->handle($f['order']->public_id, $f['order']->owner_key,
+            $authorization['authorizationId'], session('_test_delivery_session')['secret'],
+            DeliveryByteRange::evaluate($header, null, strlen($bytes), hash('sha256', $bytes)));
+        $early = $transfer('bytes=0-9');
+        $whole = $transfer('bytes=0-');
+        // Both are counted as admitted before any byte; neither has coverage yet.
+        $this->assertSame([[1, 0, 9], [2, 0, strlen($bytes) - 1]], TestDeliveryAdmission::orderBy('sequence')->get()
+            ->map(fn ($admission) => [$admission->sequence, $admission->first_byte, $admission->last_byte])->all());
+        $this->assertDatabaseCount('test_delivery_coverage', 0);
+        $whole->writeTo(fn () => null);
         $this->assertSame(1, $this->completions());
+        $early->writeTo(fn () => null);
         $this->assertDatabaseCount('test_delivery_coverage', 2);
+        $this->assertSame(1, $this->completions());
         $this->assertSame(1, $this->audits('commerce.delivery.completed'));
+        // A coverage row cannot exceed its admitted selection or be recorded twice for one admission.
+        $first = TestDeliveryAdmission::where('sequence', 1)->sole();
+        foreach ([[0, 10], [0, 9]] as [$from, $to]) {
+            try {
+                app(TestDeliveryCoverageLedger::class)->record(TestDeliveryAuthorization::sole()->id, $first->id, $from, $to);
+                $this->fail('Coverage outside or beyond its admission was recorded.');
+            } catch (DeliveryException $error) {
+                $this->assertSame('changed', $error->reason);
+            }
+        }
+        $this->assertDatabaseCount('test_delivery_coverage', 2);
+    }
+
+    public function test_a_response_whose_worker_dies_mid_stream_still_counts_toward_the_response_limit(): void
+    {
+        $f = $this->ready();
+        $bytes = $this->bytes();
+        $authorization = $this->issue($f);
+        $this->present($f, $authorization)->assertStatus(303);
+        $secret = session('_test_delivery_session')['secret'];
+        $this->fetch($f, $authorization, 'bytes=0-0')->assertStatus(206)->streamedContent();
+        // Simulate workers killed after admission: each admission is committed, no coverage is ever recorded.
+        for ($i = 1; $i < TestDeliveryCoverageLedger::MAX_RESPONSES; $i++) {
+            app(TransferTestDelivery::class)->handle($f['order']->public_id, $f['order']->owner_key, $authorization['authorizationId'], $secret,
+                DeliveryByteRange::evaluate('bytes=1-1', null, strlen($bytes), hash('sha256', $bytes)))->close();
+        }
+        $this->assertDatabaseCount('test_delivery_admissions', TestDeliveryCoverageLedger::MAX_RESPONSES);
+        $this->assertDatabaseCount('test_delivery_coverage', 1);
+        $this->assertError($this->fetch($f, $authorization, 'bytes=1-'), 429, 'DELIVERY_RESUME_LIMIT');
+        $this->assertDatabaseCount('test_delivery_admissions', TestDeliveryCoverageLedger::MAX_RESPONSES);
+        $this->assertSame(0, $this->completions());
     }
 
     public function test_overlapping_out_of_order_ranges_complete_coverage_exactly_once(): void
@@ -319,12 +374,9 @@ class TestOwnerDeliveryResumeTest extends TestCase
             }
             $this->assertError($this->present($f, $authorization), 404, 'DELIVERY_NOT_FOUND');
         }
-        // Another owner's session holding the copied binding, and a logged-out (invalidated, empty) session.
+        // Another owner's session holding the copied binding. (A real logout is covered with a signed-in customer below.)
         $this->flushSession();
         $this->withSession(['_token' => $this->csrf, '_test_delivery_session' => $binding]);
-        $this->assertError($this->transfer($location, 'bytes=10-'), 404, 'DELIVERY_NOT_FOUND');
-        $this->flushSession();
-        $this->withSession(['_token' => $this->csrf]);
         $this->assertError($this->transfer($location, 'bytes=10-'), 404, 'DELIVERY_NOT_FOUND');
 
         $this->assertSame($prepares, $this->streams->transactionLevels);
@@ -356,6 +408,43 @@ class TestOwnerDeliveryResumeTest extends TestCase
         $this->assertError($this->present($f, $authorization, ['HTTP_RANGE' => 'bytes=0-9']), 416, 'INVALID_DELIVERY_REQUEST');
         $this->assertError($this->call('GET', $this->url($f), [], [], [], ['HTTP_RANGE' => 'bytes=0-9', 'HTTP_ACCEPT' => 'application/json']), 416, 'INVALID_DELIVERY_REQUEST');
         $this->assertDatabaseCount('test_delivery_coverage', 1);
+    }
+
+    public function test_a_signed_in_customer_resumes_end_to_end_and_a_real_logout_ends_the_session_binding(): void
+    {
+        $account = CustomerFixtures::account();
+        $paid = CustomerFixtures::ready($account['user']);
+        F::configureV2();
+        $this->orderId = $paid['order']->public_id;
+        $f = ['order' => $paid['order'], 'grant' => $paid['grant']];
+        $signIn = fn () => $this->postJson('/account/sign-in', ['email' => $account['user']->email, 'password' => CustomerFixtures::PASSWORD])->assertOk();
+        $signIn();
+        $bytes = $this->bytes();
+        $authorization = $this->issue($f);
+        $this->assertStream($this->fetch($f, $authorization, 'bytes=0-9'), 206, substr($bytes, 0, 10));
+        $this->assertStream($this->fetch($f, $authorization, 'bytes=10-', $this->etag()), 206, substr($bytes, 10));
+        $this->assertSame(1, $this->completions());
+        $this->assertSame([$account['user']->id], AuditEvent::whereIn('action', ['commerce.delivery.authorized', 'commerce.delivery.redeemed',
+            'commerce.delivery.resumed', 'commerce.delivery.completed'])->distinct()->pluck('actor_id')->all());
+
+        // A started transfer, then a real logout through the route, then the same customer signs in again in that browser.
+        $next = $this->issue($f);
+        $this->fetch($f, $next, 'bytes=0-9')->assertStatus(206)->streamedContent();
+        $location = $this->location($f, $next);
+        $this->call('POST', '/account/sign-out', [], [], [], ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_CSRF_TOKEN' => session()->token()], '{}')->assertOk();
+        $this->assertNull(session('_test_delivery_session'));
+        $this->assertError($this->transfer($location, 'bytes=10-'), 404, 'DELIVERY_NOT_FOUND');
+        $signIn();
+        $prepares = $this->streams->transactionLevels;
+        $this->assertError($this->transfer($location, 'bytes=10-'), 404, 'DELIVERY_NOT_FOUND');
+        $this->assertError($this->present($f, $next), 404, 'DELIVERY_NOT_FOUND');
+        $this->assertSame($prepares, $this->streams->transactionLevels);
+        $this->assertDatabaseCount('test_delivery_admissions', 3);
+        // A new authorization in the new session works.
+        $fresh = $this->issue($f);
+        $this->assertStream($this->fetch($f, $fresh, 'bytes=0-'), 200, $bytes);
+        $this->assertSame(2, $this->completions());
     }
 
     public static function ignoredRanges(): array
@@ -451,7 +540,7 @@ class TestOwnerDeliveryResumeTest extends TestCase
         $this->assertError($this->issueResponse($f), 503, 'DELIVERY_UNAVAILABLE');
     }
 
-    public function test_started_but_incomplete_authorizations_are_capped_per_grant_per_rolling_day(): void
+    public function test_started_but_incomplete_and_issued_unstarted_authorizations_are_capped_per_grant_per_rolling_day(): void
     {
         config(['delivery.test_incomplete_authorizations_per_grant_24h' => 2]);
         $f = $this->ready();
@@ -459,12 +548,17 @@ class TestOwnerDeliveryResumeTest extends TestCase
         $start = now()->toImmutable();
         $first = $this->issue($f);
         $this->fetch($f, $first, 'bytes=0-0')->assertStatus(206)->streamedContent();
-        $this->issue($f); // Issued but never started: does not count.
+        // Issued, unexpired and not started: it could still start, so it counts. Concurrent issuance cannot overshoot.
+        $this->issue($f);
+        $this->assertError($this->issueResponse($f), 429, 'DELIVERY_INCOMPLETE_LIMIT');
+        $this->assertDatabaseCount('test_delivery_authorizations', 2);
+        // At its expiry the unstarted one stops counting.
+        $this->travelTo($start->addSeconds(59));
+        $this->assertError($this->issueResponse($f), 429, 'DELIVERY_INCOMPLETE_LIMIT');
+        $this->travelTo($start->addSeconds(61));
         $second = $this->issue($f);
         $this->fetch($f, $second, 'bytes=0-0')->assertStatus(206)->streamedContent();
-        $this->travelTo($start->addSeconds(61));
         $this->assertError($this->issueResponse($f), 429, 'DELIVERY_INCOMPLETE_LIMIT');
-        $this->assertDatabaseCount('test_delivery_authorizations', 3);
         // Completing one frees a slot: the cap is about abandoned transfers, not downloads.
         $this->assertStream($this->fetch($f, $second, 'bytes=1-'), 206, substr($bytes, 1));
         $third = $this->issue($f);

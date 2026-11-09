@@ -9,6 +9,7 @@ use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\IdentityRequests;
 use App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions;
 use App\Http\AccountFeatures\AccountFeatureMount;
+use App\Http\Controllers\TestOwnerDeliveryController;
 use App\Http\Middleware\ProductionIdentity\IdentityPrivacy;
 use App\Http\Requests\ProductionIdentity\IdentityBody;
 use Illuminate\Http\Request;
@@ -104,7 +105,8 @@ final class CustomerIdentityController
     {
         IdentityBody::body($request, []);
         Auth::guard('customer')->logoutCurrentDevice();
-        $request->session()->forget('_production_customer_identity');
+        // migrate(true) keeps session data: forget the v2 test delivery binding too, so a logged-out session cannot resume.
+        $request->session()->forget(['_production_customer_identity', TestOwnerDeliveryController::SESSION_KEY]);
         $request->session()->migrate(true);
         $request->session()->regenerateToken();
         Inertia::clearHistory();

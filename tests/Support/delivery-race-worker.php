@@ -10,7 +10,11 @@ use App\Domain\Delivery\ManageTestDeliveryControl;
 use App\Domain\Delivery\PrepareTestDeliveryStream;
 use App\Domain\Delivery\DeliveryByteRange;
 use App\Domain\Delivery\RedeemTestDelivery;
+use App\Domain\Delivery\TestDeliveryCoverageLedger;
 use App\Domain\Delivery\TransferTestDelivery;
+use App\Domain\Customers\CustomerAccess;
+use App\Models\User;
+use Tests\Support\CustomerFixtures;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -31,9 +35,10 @@ try {
     }
     // Raw test tokens travel only over stdin; never command arguments, environment variables, or worker output.
     $input = json_decode(stream_get_contents(STDIN, 32768), true, 32, JSON_THROW_ON_ERROR);
-    if (! in_array($input['mode'] ?? null, ['issue', 'redeem', 'block_redemption', 'transfer'], true)) { throw new LogicException('Unknown delivery race.'); }
+    if (! in_array($input['mode'] ?? null, ['issue', 'redeem', 'block_redemption', 'transfer', 'admit_record'], true)) { throw new LogicException('Unknown delivery race.'); }
     config(['filesystems.disks.local.root' => $mediaRoot, 'filesystems.disks.local.serve' => false, 'filesystems.disks.local.visibility' => 'private']);
-    Storage::forgetDisk('local'); $input['mode'] === 'transfer' ? DeliveryFixtures::configureV2() : DeliveryFixtures::configure();
+    Storage::forgetDisk('local'); in_array($input['mode'], ['transfer', 'admit_record'], true) ? DeliveryFixtures::configureV2() : DeliveryFixtures::configure();
+    if ($input['mode'] === 'admit_record') { CustomerFixtures::configure(); }
     \Illuminate\Support\Carbon::setTestNow($input['now']); \Carbon\CarbonImmutable::setTestNow($input['now']);
     DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
     $connectionId = DB::selectOne('SELECT CONNECTION_ID() AS connection_id')->connection_id;
@@ -58,6 +63,38 @@ try {
             $control = app(ManageTestDeliveryControl::class)->handle($input['order_public_id'], true, 1, 'SYNTHETIC-RACE-BLOCK');
             if (! $control->blocked || $control->control_version !== 2) { throw new LogicException('Block did not commit.'); }
             file_put_contents($directory.'/blocked-1', (string) $control->control_version); $outcome = 'blocked';
+        } elseif ($input['mode'] === 'admit_record' && $worker === '0') {
+            // FP-077 P2-2: record() takes the authorization lock, then holds it until the signed-in admitter (worker 1) is
+            // waiting for that lock, after its own plain reads fixed its REPEATABLE READ snapshot. Then this coverage commits.
+            $admitter = (int) file_get_contents($directory.'/ready-1');
+            app()->instance(TestDeliveryCoverageLedger::class, new class($directory, $admitter) extends TestDeliveryCoverageLedger {
+                public function __construct(private string $directory, private int $admitter) {}
+
+                protected function locked(): void
+                {
+                    touch($this->directory.'/locked-0');
+                    $deadline = microtime(true) + 35;
+                    do {
+                        $waiting = DB::connection('mysql_race_probe')->selectOne("SELECT COUNT(*) AS c FROM information_schema.INNODB_TRX WHERE trx_mysql_thread_id = ? AND trx_state = 'LOCK WAIT'", [$this->admitter]);
+                        if ((int) $waiting->c === 1) { touch($this->directory.'/admitter-waiting'); return; }
+                        usleep(10000);
+                    } while (microtime(true) < $deadline);
+                    throw new RuntimeException('The admitter never waited for the authorization lock.');
+                }
+            });
+            config(['database.connections.mysql_race_probe' => config('database.connections.mysql')]);
+            $waitFor($directory.'/verified-1');
+            app(TestDeliveryCoverageLedger::class)->record($input['authorization_id'], $input['admission_id'], 0, 9);
+            $outcome = 'recorded';
+        } elseif ($input['mode'] === 'admit_record') {
+            $user = User::findOrFail($input['user_id']); $principal = app(CustomerAccess::class)->principal($user);
+            $range = DeliveryByteRange::evaluate('bytes=10-', null, $input['size_bytes'], $input['sha256']);
+            $transfer = app(TransferTestDelivery::class)->handle($input['order_public_id'], $principal->ownerKey,
+                $input['authorization_public_id'], $input['session_secret'], $range, $user, $principal);
+            if (! is_file($directory.'/admitter-waiting')) { throw new LogicException('Admission did not wait for the coverage writer.'); }
+            $bytes = '';
+            $transfer->writeTo(function (string $chunk) use (&$bytes): void { $bytes .= $chunk; });
+            $contentHash = hash('sha256', $bytes); $sizeBytes = strlen($bytes); $outcome = 'transferred';
         } elseif ($input['mode'] === 'transfer') {
             // FP-077: both workers are admitted on one started v2 authorization, serve their range, then meet before either
             // records coverage, so the two coverage writers race on the authorization row lock.
@@ -94,5 +131,8 @@ try {
         'verification_transaction_levels' => $streams->transactionLevels,
         'open_prepared_resources' => count(array_filter($streams->resources, 'is_resource'))], JSON_THROW_ON_ERROR); exit(0);
 } catch (Throwable $error) {
-    echo json_encode(['outcome' => 'worker_failed', 'exception' => $error::class], JSON_THROW_ON_ERROR); exit(1);
+    // Only this harness's own barrier messages are echoed; domain and framework messages stay private.
+    $barrier = $error instanceof RuntimeException && str_contains($error->getMessage(), 'barrier') || str_contains($error->getMessage(), 'never waited');
+    echo json_encode(['outcome' => 'worker_failed', 'exception' => $error::class, 'barrier' => $barrier ? $error->getMessage() : null,
+        'at' => $error->getFile() === __FILE__ ? $error->getLine() : null], JSON_THROW_ON_ERROR); exit(1);
 }

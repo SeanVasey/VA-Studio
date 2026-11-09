@@ -116,9 +116,9 @@ class TestCommerceProfileValidatorTest extends TestCase
         [$exit, $output, $checks] = $this->validateFile(self::root().'/'.self::TEMPLATE, ['--template']);
 
         $this->assertSame(0, $exit, $output);
-        $this->assertCount(38, $checks);
+        $this->assertCount(39, $checks);
         $this->assertNotContains(false, $checks);
-        $this->assertStringContainsString('RESULT: PASS (0 of 38 checks failed; template mode', $output);
+        $this->assertStringContainsString('RESULT: PASS (0 of 39 checks failed; template mode', $output);
         $this->assertNoSecretPrinted($output);
     }
 
@@ -137,7 +137,7 @@ class TestCommerceProfileValidatorTest extends TestCase
         [$exit, $output, $checks] = $this->validate(self::filled());
 
         $this->assertSame(0, $exit, $output);
-        $this->assertCount(38, $checks);
+        $this->assertCount(39, $checks);
         $this->assertNotContains(false, $checks);
         $this->assertStringContainsString('no Stripe request made', $output);
         $this->assertNoSecretPrinted($output);
@@ -230,6 +230,8 @@ class TestCommerceProfileValidatorTest extends TestCase
             'resume window below the minimum' => [$set('VASEY_TEST_DELIVERY_RESUME_SECONDS_BELOW_512_MIB', '59'), 'delivery.access'],
             'larger files resume for less time' => [$set('VASEY_TEST_DELIVERY_RESUME_SECONDS_FROM_4_GIB', '3600'), 'delivery.access'],
             'blank incomplete cap' => [$set('VASEY_TEST_DELIVERY_INCOMPLETE_PER_GRANT_24H', ''), 'delivery.access'],
+            'v2 delivery with cookie sessions' => [$set('SESSION_DRIVER', 'cookie'), 'delivery.v2_session_database'],
+            'v2 delivery with file sessions' => [$set('SESSION_DRIVER', 'file'), 'delivery.v2_session_database'],
             'identity sends mail' => [$set('VASEY_TEST_CUSTOMER_IDENTITY_TRANSPORT', 'mail'), 'customer.identity_private_capture'],
             'production checkout flag' => [$set('PRODUCTION_CHECKOUT_PROVIDER_IO_ENABLED', 'true'), 'boundary.out_of_profile_families_off'],
             'free grants enabled' => [$set('VASEY_TEST_FREE_GRANTS_ENABLED', 'true'), 'boundary.out_of_profile_families_off'],

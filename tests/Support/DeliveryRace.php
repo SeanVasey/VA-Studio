@@ -32,6 +32,9 @@ final class DeliveryRace
                 $test->assertSame('2', file_get_contents($directory.'/blocked-1'));
                 $test->assertSame(0, DB::table('test_delivery_redemptions')->count());
                 $test->assertSame(1, (int) DB::table('test_delivery_controls')->where('order_id', $input['order_id'])->value('blocked'));
+            } elseif ($input['mode'] === 'admit_record') {
+                // Worker 1 holds a verified snapshot; worker 0 holds the authorization row lock inside record().
+                self::until($test, $processes, fn () => is_file($directory.'/verified-1') && is_file($directory.'/locked-0'), 'coverage writer holds the authorization lock');
             } else {
                 self::until($test, $processes, fn () => is_file($directory.'/verified-0') && is_file($directory.'/verified-1'), 'independent sealed-byte preflight');
             }
@@ -44,7 +47,8 @@ final class DeliveryRace
             foreach ($results as $index => $result) {
                 $test->assertSame(0, $result['transaction_level']); $test->assertSame([], $result['provider_calls']);
                 $test->assertSame([], $result['render_calls']);
-                $test->assertSame($input['mode'] === 'block_redemption' && $index === 1 ? [] : [0], $result['verification_transaction_levels']);
+                $test->assertSame(($input['mode'] === 'block_redemption' && $index === 1) || ($input['mode'] === 'admit_record' && $index === 0)
+                    ? [] : [0], $result['verification_transaction_levels']);
                 $test->assertSame(0, $result['open_prepared_resources']);
             }
             return $results;

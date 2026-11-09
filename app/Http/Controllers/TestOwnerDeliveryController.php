@@ -76,8 +76,9 @@ final class TestOwnerDeliveryController
             $ownerKey = app(PurchaseAccess::class)->owner($order, $owner->forRequest($request), $owner->principal($request));
             $context = $read->forSession($order, $ownerKey, $authorization, $secret);
             // Evaluated only after owner and session matched; the command re-checks size and hash against its own read.
+            $etag = DeliveryByteRange::etag($context['target']['file']['sha256'], $context['order']->public_id, (string) config('app.key'));
             $range = DeliveryByteRange::evaluate($request->headers->get('Range'), $request->headers->get('If-Range'),
-                $context['target']['file']['size_bytes'], $context['target']['file']['sha256']);
+                $context['target']['file']['size_bytes'], $context['target']['file']['sha256'], $etag);
             try {
                 $admitted = $transfer->handle($order, $ownerKey, $authorization, $secret, $range, $owner->actor($request), $owner->principal($request));
             } catch (DeliveryException $error) {
@@ -87,11 +88,12 @@ final class TestOwnerDeliveryController
                 throw $error;
             }
 
-            return TestDeliveryResponse::transfer($admitted, $context['target']['filename'], $context['target']['mime_type']);
+            return TestDeliveryResponse::transfer($admitted, $context['target']['filename'], $context['target']['mime_type'], $etag);
         });
     }
 
-    private const SESSION_KEY = '_test_delivery_session';
+    /** Server-side v2 session binding; every logout must forget it (CustomerSessionController, CustomerIdentityController). */
+    public const SESSION_KEY = '_test_delivery_session';
 
     private const PRESENTED_LIMIT = 32;
 

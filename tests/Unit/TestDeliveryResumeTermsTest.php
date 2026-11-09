@@ -43,7 +43,7 @@ class TestDeliveryResumeTermsTest extends TestCase
         $started = $issued->addSeconds(30);
         [$authorization, $control, $redemption] = $this->models($issued, $started);
         $terms = ['resume_window_seconds' => $window, 'session_binding_hash' => str_repeat('a', 64)];
-        $coverage = ['responses' => 1, 'intervals' => [[0, 0]], 'covered' => 1, 'completed' => false];
+        $coverage = ['admitted' => 1, 'responses' => 1, 'intervals' => [[0, 0]], 'covered' => 1, 'completed' => false];
         $transfer = app(TransferTestDelivery::class);
         $transfer->eligible($authorization, $control, $started->addSeconds($seconds - 1), $redemption, $terms, $coverage);
         $this->assertSame('expired', $this->reason(fn () => $transfer->eligible($authorization, $control, $started->addSeconds($seconds), $redemption, $terms, $coverage)));
@@ -60,11 +60,11 @@ class TestDeliveryResumeTermsTest extends TestCase
         $terms = ['resume_window_seconds' => 3600, 'session_binding_hash' => str_repeat('a', 64)];
         $transfer = app(TransferTestDelivery::class);
         $this->assertSame('redeemed', $this->reason(fn () => $transfer->eligible($authorization, $control, $issued->addSecond(), $redemption, $terms,
-            ['responses' => 1, 'intervals' => [[0, 9]], 'covered' => 10, 'completed' => true])));
+            ['admitted' => 1, 'responses' => 1, 'intervals' => [[0, 9]], 'covered' => 10, 'completed' => true])));
         $this->assertSame('resume_exhausted', $this->reason(fn () => $transfer->eligible($authorization, $control, $issued->addSecond(), $redemption, $terms,
-            ['responses' => TestDeliveryCoverageLedger::MAX_RESPONSES, 'intervals' => [[0, 0]], 'covered' => 1, 'completed' => false])));
+            ['admitted' => TestDeliveryCoverageLedger::MAX_RESPONSES, 'responses' => 1, 'intervals' => [[0, 0]], 'covered' => 1, 'completed' => false])));
         $transfer->eligible($authorization, $control, $issued->addSecond(), $redemption, $terms,
-            ['responses' => TestDeliveryCoverageLedger::MAX_RESPONSES - 1, 'intervals' => [[0, 0]], 'covered' => 1, 'completed' => false]);
+            ['admitted' => TestDeliveryCoverageLedger::MAX_RESPONSES - 1, 'responses' => 1, 'intervals' => [[0, 0]], 'covered' => 1, 'completed' => false]);
         $this->assertSame(TestDeliveryCoverageLedger::HARD_MAX_SEQUENCE, 2 * TestDeliveryCoverageLedger::MAX_RESPONSES);
     }
 

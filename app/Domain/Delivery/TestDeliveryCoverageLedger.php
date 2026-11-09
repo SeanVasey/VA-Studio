@@ -2,6 +2,7 @@
 
 namespace App\Domain\Delivery;
 
+use App\Domain\Delivery\Models\TestDeliveryAdmission;
 use App\Domain\Delivery\Models\TestDeliveryAuthorization;
 use App\Domain\Delivery\Models\TestDeliveryCoverage;
 use App\Domain\Delivery\Models\TestDeliveryRedemption;
@@ -16,72 +17,85 @@ use Throwable;
  * every byte served so far, so re-served bytes never add coverage. The authorization counts as one download exactly once,
  * on the row whose coverage first reaches the whole file. Writers serialize on the authorization row lock.
  *
- * Bounds: admission refuses a further response once MAX_RESPONSES rows exist, and at most PrepareTestDeliveryStream::SLOTS
- * verified streams exist at once, so rows (and therefore intervals, since each row adds at most one) stay far below the
- * schema's hard sequence cap of HARD_MAX_SEQUENCE.
+ * Bounds: every response is admitted (a `test_delivery_admissions` row, written under the authorization lock before its
+ * first byte) and admission stops at MAX_RESPONSES, so admissions, coverage rows (one per admission at most) and intervals
+ * (each row adds at most one) stay below the schema's hard sequence cap of HARD_MAX_SEQUENCE, even when a worker dies
+ * mid-stream and records no coverage.
  */
-final class TestDeliveryCoverageLedger
+class TestDeliveryCoverageLedger
 {
     public const MAX_RESPONSES = 64;
 
     public const HARD_MAX_SEQUENCE = 128;
 
     /**
-     * Verified current state of an authorization's coverage. Pass $lock inside a transaction that already holds the
-     * authorization row lock, so the read sees the latest committed row rather than an older snapshot.
+     * Verified current state of an authorization's admissions and coverage. With $lock (inside a transaction holding the
+     * authorization row lock) every value comes from locking reads, which read the latest committed rows even when an
+     * earlier plain read in the same REPEATABLE READ transaction fixed an older snapshot.
      *
-     * @return array{responses: int, intervals: list<array{0: int, 1: int}>, covered: int, completed: bool}
+     * @return array{admitted: int, responses: int, intervals: list<array{0: int, 1: int}>, covered: int, completed: bool}
      */
     public function state(TestDeliveryAuthorization $authorization, int $sizeBytes, bool $lock = false): array
     {
-        $rows = TestDeliveryCoverage::where('test_delivery_authorization_id', $authorization->id);
-        $latest = (clone $rows)->orderByDesc('sequence');
-        $latest = ($lock ? $latest->lockForUpdate() : $latest)->first();
-        $responses = (clone $rows)->count();
-        $completions = TestDeliveryCoverage::where('completed_authorization_id', $authorization->id)->get();
-        if (! $latest) {
-            if ($responses !== 0 || $completions->isNotEmpty()) {
-                throw new DeliveryException('changed');
-            }
-
-            return ['responses' => 0, 'intervals' => [], 'covered' => 0, 'completed' => false];
+        $locking = fn ($query) => $lock ? $query->lockForUpdate() : $query;
+        $admissions = $locking(TestDeliveryAdmission::where('test_delivery_authorization_id', $authorization->id)->orderBy('sequence'))
+            ->get(['id', 'sequence', 'first_byte', 'last_byte']);
+        $rows = $locking(TestDeliveryCoverage::where('test_delivery_authorization_id', $authorization->id)->orderBy('sequence'))->get();
+        $foreign = $locking(TestDeliveryCoverage::where('completed_authorization_id', $authorization->id)
+            ->where('test_delivery_authorization_id', '!=', $authorization->id))->exists();
+        $admitted = $admissions->count();
+        $responses = $rows->count();
+        $contiguous = fn ($sequences, int $count): bool => $sequences->all() === ($count === 0 ? [] : range(1, $count));
+        if ($foreign || $admitted > self::HARD_MAX_SEQUENCE || $responses > $admitted
+            || ! $contiguous($admissions->pluck('sequence'), $admitted) || ! $contiguous($rows->pluck('sequence'), $responses)) {
+            throw new DeliveryException('changed');
         }
+        if ($responses === 0) {
+            return ['admitted' => $admitted, 'responses' => 0, 'intervals' => [], 'covered' => 0, 'completed' => false];
+        }
+        $latest = $rows->last();
         $intervals = self::decode($latest->intervals, $sizeBytes);
         $covered = self::covered($intervals);
         $completed = $covered === $sizeBytes;
-        if ($latest->sequence !== $responses || $responses > self::HARD_MAX_SEQUENCE || $latest->covered_bytes !== $covered
-            || $latest->first_byte < 0 || $latest->last_byte < $latest->first_byte || $latest->last_byte >= $sizeBytes
-            || $completions->count() !== ($completed ? 1 : 0)
-            || ($completed && ($completions[0]->test_delivery_authorization_id !== $authorization->id || $completions[0]->covered_bytes !== $sizeBytes))) {
+        $completions = $rows->whereNotNull('completed_authorization_id');
+        if ($latest->covered_bytes !== $covered || $latest->first_byte < 0 || $latest->last_byte < $latest->first_byte
+            || $latest->last_byte >= $sizeBytes || $completions->count() !== ($completed ? 1 : 0)
+            || ($completed && ($completions->first()->completed_authorization_id !== $authorization->id
+                || $completions->first()->covered_bytes !== $sizeBytes))) {
             throw new DeliveryException('changed');
         }
 
-        return ['responses' => $responses, 'intervals' => $intervals, 'covered' => $covered, 'completed' => $completed];
+        return ['admitted' => $admitted, 'responses' => $responses, 'intervals' => $intervals, 'covered' => $covered, 'completed' => $completed];
     }
 
     /**
-     * Record bytes first..last (inclusive) that one response handed to the transport. Called after streaming, outside the
-     * admission transaction; a failure here loses only this response's coverage (it can never count a download that was not
-     * served). Returns true only for the single call that completed the file.
+     * Record bytes first..last (inclusive) that one admitted response handed to the transport. Called after streaming,
+     * outside the admission transaction; a failure here loses only this response's coverage (it can never count a download
+     * that was not served, and its admission still counts). Returns true only for the single call that completed the file.
      */
-    public function record(int $authorizationId, int $redemptionId, int $first, int $last, ?int $actorId = null): bool
+    public function record(int $authorizationId, int $admissionId, int $first, int $last, ?int $actorId = null): bool
     {
         ActivationPolicy::outsideTransactions();
 
-        return DB::transaction(function () use ($authorizationId, $redemptionId, $first, $last, $actorId): bool {
-            // Every coverage writer takes this row lock first; admission takes it after order and control.
+        return DB::transaction(function () use ($authorizationId, $admissionId, $first, $last, $actorId): bool {
+            // Every coverage writer takes this row lock first; admission takes it after order and control. All later reads
+            // are locking reads, so they see the latest commits however this transaction's snapshot was fixed.
             $authorization = TestDeliveryAuthorization::whereKey($authorizationId)->lockForUpdate()->first();
-            $redemption = TestDeliveryRedemption::where('test_delivery_authorization_id', $authorizationId)->first();
-            if (! $authorization || $authorization->policy_version !== TestAccessPolicy::V2 || ! $redemption || $redemption->id !== $redemptionId
-                || $first < 0 || $last < $first || $last >= $redemption->size_bytes) {
+            $this->locked();
+            $redemption = TestDeliveryRedemption::where('test_delivery_authorization_id', $authorizationId)->lockForUpdate()->first();
+            $admission = TestDeliveryAdmission::whereKey($admissionId)->lockForUpdate()->first();
+            if (! $authorization || $authorization->policy_version !== TestAccessPolicy::V2 || ! $redemption || ! $admission
+                || $admission->test_delivery_authorization_id !== $authorizationId || $admission->test_delivery_redemption_id !== $redemption->id
+                || $first < $admission->first_byte || $last < $first || $last > $admission->last_byte || $last >= $redemption->size_bytes
+                || TestDeliveryCoverage::where('test_delivery_admission_id', $admissionId)->lockForUpdate()->exists()) {
                 throw new DeliveryException('changed');
             }
             $state = $this->state($authorization, $redemption->size_bytes, true);
             $intervals = self::merge($state['intervals'], $first, $last);
             $covered = self::covered($intervals);
             $completes = ! $state['completed'] && $covered === $redemption->size_bytes;
-            $row = TestDeliveryCoverage::create(['test_delivery_authorization_id' => $authorizationId,
-                'test_delivery_redemption_id' => $redemptionId, 'sequence' => $state['responses'] + 1,
+            $row = TestDeliveryCoverage::create(['test_delivery_admission_id' => $admissionId, 'test_delivery_authorization_id' => $authorizationId,
+                'test_delivery_redemption_id' => $redemption->id, 'sequence' => $state['responses'] + 1,
                 'first_byte' => $first, 'last_byte' => $last, 'intervals' => self::encode($intervals), 'covered_bytes' => $covered,
                 'completed_authorization_id' => $completes ? $authorizationId : null,
                 'recorded_at' => now()->toImmutable()->utc()->startOfSecond()]);
@@ -95,17 +109,22 @@ final class TestDeliveryCoverageLedger
     }
 
     /** Never throws: the bytes have already left, so a bookkeeping failure is logged and the response finishes. */
-    public function recordServed(int $authorizationId, int $redemptionId, int $first, int $last, ?int $actorId = null): void
+    public function recordServed(int $authorizationId, int $admissionId, int $first, int $last, ?int $actorId = null): void
     {
         try {
-            $this->record($authorizationId, $redemptionId, $first, $last, $actorId);
+            $this->record($authorizationId, $admissionId, $first, $last, $actorId);
         } catch (Throwable $error) {
             try {
-                Log::warning('Test delivery coverage was not recorded.', ['exception_class' => $error::class]);
+                // Internal row IDs only: enough to reconcile the admission with no coverage, never buyer data or secrets.
+                Log::warning('Test delivery coverage was not recorded.', ['exception_class' => $error::class,
+                    'authorization_id' => $authorizationId, 'admission_id' => $admissionId, 'first_byte' => $first, 'last_byte' => $last]);
             } catch (Throwable) { /* A failed logger must not reach the private stream. */
             }
         }
     }
+
+    /** Test seam: runs while record() holds the authorization row lock. */
+    protected function locked(): void {}
 
     /** @return list<array{0: int, 1: int}> sorted, disjoint, non-adjacent */
     public static function merge(array $intervals, int $first, int $last): array

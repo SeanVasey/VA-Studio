@@ -10,6 +10,14 @@ use Illuminate\Support\Facades\Schema;
  * FP-077 phase 1 (Sean, 2026-11-09): admit test-owner-delivery-v2 authorizations alongside v1, and add the append-only
  * coverage log of v2 transfers. Everything else in the 000023 insert guard (expiry = issue + 60 s, bindings, shapes) is
  * kept byte for byte, and the supplemental 000029/000030 hash and UUID byte guards are separate triggers left untouched.
+ *
+ * Recovery after a partial MySQL run: MySQL DDL commits statement by statement, so a failure part-way leaves earlier
+ * steps applied and a rerun refuses (it never adopts an unexpected state). Inspect `information_schema.TRIGGERS` and the
+ * tables, then, with no v2 authorization, admission or coverage row present:
+ * - v2 guard created, original still present: `DROP TRIGGER test_delivery_authorizations_valid_insert_v2`, then rerun.
+ * - original dropped, v2 guard present: recreate the original from `statements()[0]` (exactly what down() does), drop
+ *   any `test_delivery_admission*`/`test_delivery_coverage*` triggers and both new tables, then rerun.
+ * Never drop a guard or table that holds v2 evidence; escalate instead. SQLite runs the migration in one transaction.
  */
 return new class extends Migration
 {
@@ -17,7 +25,9 @@ return new class extends Migration
 
     private const ADMITTED = 'test_delivery_authorizations_valid_insert_v2';
 
-    private const COVERAGE_TRIGGERS = ['test_delivery_coverage_valid_insert', 'test_delivery_coverage_immutable_update', 'test_delivery_coverage_immutable_delete'];
+    private const NEW_TRIGGERS = ['test_delivery_admissions_valid_insert', 'test_delivery_admissions_immutable_update',
+        'test_delivery_admissions_immutable_delete', 'test_delivery_coverage_valid_insert', 'test_delivery_coverage_immutable_update',
+        'test_delivery_coverage_immutable_delete'];
 
     public function up(): void
     {
@@ -34,8 +44,28 @@ return new class extends Migration
         DB::unprepared($this->create(self::ADMITTED, 'test_delivery_authorizations', 'insert', $admittedStatement));
         DB::unprepared('DROP TRIGGER '.self::ORIGINAL);
 
+        // One row per admitted v2 response, written under the authorization lock before any byte: the response limit and the
+        // incomplete cap count these, so a worker killed mid-stream (which records no coverage) still counts.
+        Schema::create('test_delivery_admissions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('test_delivery_authorization_id');
+            $table->foreign('test_delivery_authorization_id', 'delivery_admission_authorization_fk')->references('id')->on('test_delivery_authorizations')->restrictOnDelete();
+            $table->foreignId('test_delivery_redemption_id');
+            $table->foreign('test_delivery_redemption_id', 'delivery_admission_redemption_fk')->references('id')->on('test_delivery_redemptions')->restrictOnDelete();
+            $table->unsignedInteger('sequence');
+            $table->unique(['test_delivery_authorization_id', 'sequence'], 'delivery_admission_sequence_unique');
+            $table->unsignedBigInteger('first_byte');
+            $table->unsignedBigInteger('last_byte');
+            $table->dateTime('admitted_at');
+        });
+        $this->admissionGuards();
+
         Schema::create('test_delivery_coverage', function (Blueprint $table) {
             $table->id();
+            // Each coverage row records bytes served for exactly one admission, inside its admitted selection.
+            $table->foreignId('test_delivery_admission_id');
+            $table->foreign('test_delivery_admission_id', 'delivery_coverage_admission_fk')->references('id')->on('test_delivery_admissions')->restrictOnDelete();
+            $table->unique('test_delivery_admission_id', 'delivery_coverage_admission_unique');
             $table->foreignId('test_delivery_authorization_id');
             $table->foreign('test_delivery_authorization_id', 'delivery_coverage_authorization_fk')->references('id')->on('test_delivery_authorizations')->restrictOnDelete();
             $table->foreignId('test_delivery_redemption_id');
@@ -56,6 +86,29 @@ return new class extends Migration
             $table->dateTime('recorded_at');
         });
         $this->coverageGuards();
+    }
+
+    private function admissionGuards(): void
+    {
+        $sqlite = DB::getDriverName() === 'sqlite';
+        $same = 'c.test_delivery_authorization_id = NEW.test_delivery_authorization_id';
+        $timestamp = $sqlite
+            ? "TYPEOF(NEW.admitted_at) = 'text' AND LENGTH(NEW.admitted_at) = 19 AND SUBSTR(NEW.admitted_at, 1, 4) BETWEEN '1000' AND '9999' AND DATETIME(NEW.admitted_at, '+0 seconds') = NEW.admitted_at"
+            : 'YEAR(NEW.admitted_at) BETWEEN 1000 AND 9999 AND MICROSECOND(NEW.admitted_at) = 0';
+        $policy = $sqlite ? "x.policy_version = 'test-owner-delivery-v2'" : "CAST(x.policy_version AS BINARY) = CAST('test-owner-delivery-v2' AS BINARY)";
+        $shape = "NEW.first_byte >= 0 AND NEW.last_byte >= NEW.first_byte AND {$timestamp} AND NEW.sequence BETWEEN 1 AND 128"
+            ." AND NEW.sequence = 1 + (SELECT COUNT(*) FROM test_delivery_admissions c WHERE {$same})";
+        if ($sqlite) {
+            foreach (['sequence', 'first_byte', 'last_byte'] as $column) {
+                $shape .= " AND TYPEOF(NEW.{$column}) = 'integer'";
+            }
+        }
+        $binding = 'EXISTS (SELECT 1 FROM test_delivery_redemptions r JOIN test_delivery_authorizations x ON x.id = r.test_delivery_authorization_id'
+            .' WHERE r.id = NEW.test_delivery_redemption_id AND x.id = NEW.test_delivery_authorization_id AND '.$policy
+            .' AND NEW.last_byte < r.size_bytes AND NEW.admitted_at >= r.redeemed_at)';
+        DB::unprepared($this->create('test_delivery_admissions_valid_insert', 'test_delivery_admissions', 'insert', $this->body("{$shape} AND {$binding}")));
+        DB::unprepared($this->create('test_delivery_admissions_immutable_update', 'test_delivery_admissions', 'update', $this->body(null)));
+        DB::unprepared($this->create('test_delivery_admissions_immutable_delete', 'test_delivery_admissions', 'delete', $this->body(null)));
     }
 
     private function coverageGuards(): void
@@ -82,6 +135,10 @@ return new class extends Migration
         $binding = 'EXISTS (SELECT 1 FROM test_delivery_redemptions r JOIN test_delivery_authorizations x ON x.id = r.test_delivery_authorization_id'
             .' WHERE r.id = NEW.test_delivery_redemption_id AND x.id = NEW.test_delivery_authorization_id AND '.$policy
             .' AND NEW.last_byte < r.size_bytes AND NEW.covered_bytes <= r.size_bytes AND NEW.recorded_at >= r.redeemed_at'
+            .' AND EXISTS (SELECT 1 FROM test_delivery_admissions m WHERE m.id = NEW.test_delivery_admission_id'
+            .' AND m.test_delivery_authorization_id = NEW.test_delivery_authorization_id AND m.test_delivery_redemption_id = r.id'
+            .' AND NEW.first_byte >= m.first_byte AND NEW.last_byte <= m.last_byte AND NEW.recorded_at >= m.admitted_at'
+            .' AND NOT EXISTS (SELECT 1 FROM test_delivery_coverage u WHERE u.test_delivery_admission_id = m.id))'
             .' AND (CASE WHEN NEW.covered_bytes = r.size_bytes AND NOT EXISTS (SELECT 1 FROM test_delivery_coverage c'
             ." WHERE {$same} AND c.covered_bytes = r.size_bytes)"
             .' THEN NEW.completed_authorization_id IS NOT NULL AND NEW.completed_authorization_id = NEW.test_delivery_authorization_id'
@@ -193,7 +250,8 @@ return new class extends Migration
     {
         $this->driver();
         if (DB::table('test_delivery_authorizations')->where('policy_version', 'test-owner-delivery-v2')->exists()
-            || (Schema::hasTable('test_delivery_coverage') && DB::table('test_delivery_coverage')->exists())) {
+            || (Schema::hasTable('test_delivery_coverage') && DB::table('test_delivery_coverage')->exists())
+            || (Schema::hasTable('test_delivery_admissions') && DB::table('test_delivery_admissions')->exists())) {
             throw new LogicException('v2 test delivery evidence must be retained; rollback is refused.');
         }
         [$originalStatement, $admittedStatement] = $this->statements();
@@ -202,9 +260,10 @@ return new class extends Migration
         }
         DB::unprepared($this->create(self::ORIGINAL, 'test_delivery_authorizations', 'insert', $originalStatement));
         DB::unprepared('DROP TRIGGER '.self::ADMITTED);
-        foreach (self::COVERAGE_TRIGGERS as $trigger) {
+        foreach (self::NEW_TRIGGERS as $trigger) {
             DB::unprepared('DROP TRIGGER IF EXISTS '.$trigger);
         }
         Schema::dropIfExists('test_delivery_coverage');
+        Schema::dropIfExists('test_delivery_admissions');
     }
 };

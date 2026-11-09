@@ -1365,6 +1365,10 @@
     [
       "Tests\\Feature\\TestOwnerDeliveryResumeConcurrencyTest",
       "test_two_simultaneous_ranges_that_each_complete_the_file_count_it_once"
+    ],
+    [
+      "Tests\\Feature\\TestOwnerDeliveryResumeConcurrencyTest",
+      "test_a_signed_in_admission_waiting_behind_a_coverage_write_reads_the_committed_state"
     ]
   ]
 }

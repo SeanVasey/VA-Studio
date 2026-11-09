@@ -3,6 +3,7 @@
 namespace App\Domain\Delivery;
 
 use LogicException;
+use SensitiveParameter;
 
 /**
  * One evaluated RFC 9110 byte-range selection for a single private delivery representation.
@@ -40,22 +41,28 @@ final class DeliveryByteRange
     }
 
     /**
-     * Strong entity tag for the exact retained bytes, derived from the immutable content hash. It is a domain-separated
-     * digest rather than the hash itself, so delivery responses keep not exposing retained evidence hashes (D-20).
+     * Strong entity tag for the exact retained bytes within one scope (the order). It is an HMAC over the scope and content
+     * hash, keyed with a domain-separated derivation of the application key, so it neither exposes the retained evidence
+     * hash nor links identical files across orders or deployments.
      */
-    public static function etag(string $sha256): string
+    public static function etag(string $sha256, string $scope, #[SensitiveParameter] string $appKey): string
     {
-        return '"'.hash('sha256', 'vasey-test-delivery-etag-v1:'.$sha256).'"';
+        if (preg_match('/\A[a-f0-9]{64}\z/D', $sha256) !== 1 || $scope === '' || $appKey === '') {
+            throw new LogicException('Invalid delivery entity tag input.');
+        }
+        $key = hash_hmac('sha256', 'vasey-delivery-etag-key-v2', $appKey, true);
+
+        return '"'.hash_hmac('sha256', $scope."\0".$sha256, $key).'"';
     }
 
-    public static function evaluate(?string $range, ?string $ifRange, int $sizeBytes, string $sha256): self
+    public static function evaluate(?string $range, ?string $ifRange, int $sizeBytes, string $sha256, ?string $etag = null): self
     {
         $full = self::full($sizeBytes, $sha256);
         if ($range === null || strlen($range) > self::MAX_HEADER_BYTES) {
             return $full;
         }
-        // If-Range is evaluated first; a weak, date or different validator means "send the whole current representation".
-        if ($ifRange !== null && trim($ifRange, " \t") !== self::etag($sha256)) {
+        // If-Range is evaluated first against the caller's strong ETag; a missing, weak, date or different validator means "send the whole current representation".
+        if ($ifRange !== null && ($etag === null || trim($ifRange, " \t") !== $etag)) {
             return $full;
         }
         if (preg_match('/\A[ \t]*bytes=([0-9]*)-([0-9]*)[ \t]*\z/iD', $range, $match) !== 1

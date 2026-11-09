@@ -7,6 +7,7 @@ use App\Domain\Commerce\RefundDispute\RefundDisputeAccess;
 use App\Domain\Customers\CustomerAccess;
 use App\Domain\Customers\CustomerPrincipal;
 use App\Domain\Customers\PurchaseAccess;
+use App\Domain\Delivery\Models\TestDeliveryAdmission;
 use App\Domain\Delivery\Models\TestDeliveryAuthorization;
 use App\Domain\Delivery\Models\TestDeliveryControl;
 use App\Domain\Delivery\Models\TestDeliveryRedemption;
@@ -27,7 +28,7 @@ use Throwable;
  * - Not started: admitted only before `expires_at` (the 60-second start window). The first served response records the
  *   authorization's single redemption row, which marks the start of the transfer.
  * - Started: any satisfiable selection is admitted until `redeemed_at + resume_window_seconds` (frozen at issuance), never
- *   after, and never once coverage is complete or MAX_RESPONSES responses were recorded.
+ *   after, and never once coverage is complete or MAX_RESPONSES responses were admitted (admission rows, written here).
  * - Unsatisfiable: the same checks, no private file access, no start and no coverage; then `range_not_satisfiable`.
  * - Every admitted response copies and SHA-256-verifies the whole file before its first byte.
  *
@@ -77,8 +78,8 @@ final class TransferTestDelivery
             if ($through->lessThan($from)) {
                 throw new DeliveryException('retry');
             }
-            $redemption = DB::transaction(function () use ($order, $ownerKey, $source, $target, $authorization, $through, $read,
-                $policies, $policy, $account, $evidence, $actor, $principal, $probe): ?TestDeliveryRedemption {
+            $admission = DB::transaction(function () use ($order, $ownerKey, $source, $target, $authorization, $through, $read,
+                $policies, $policy, $account, $evidence, $actor, $principal, $probe, $range): ?TestDeliveryAdmission {
                 app(CustomerAccess::class)->lock($principal, $principal?->ownerKey ?? $ownerKey, $actor);
                 // Same order as every other writer: order -> control -> authorization. No private bytes are read under these locks.
                 $locked = Order::whereKey($order->id)->lockForUpdate()->first();
@@ -110,7 +111,7 @@ final class TransferTestDelivery
                 }
                 // Read under the authorization lock that every coverage writer takes first: the latest committed state.
                 $coverage = app(TestDeliveryCoverageLedger::class)->state($current, $freshTarget['file']['size_bytes'], true);
-                if ($coverage['responses'] > 0 && ! $redemption) {
+                if ($coverage['admitted'] > 0 && ! $redemption) {
                     throw new DeliveryException('changed');
                 }
                 $at = now()->toImmutable()->utc()->startOfSecond();
@@ -130,6 +131,14 @@ final class TransferTestDelivery
                     $action = 'commerce.delivery.redeemed'; // The transfer started; it counts only once coverage is complete.
                 } elseif ($redemption && ! $probe) {
                     $action = 'commerce.delivery.resumed';
+                }
+                $admission = null;
+                if (! $probe) {
+                    // Counted before any byte, under the authorization lock: the response limit and the incomplete cap
+                    // hold even if this worker dies mid-stream and never records coverage.
+                    $admission = TestDeliveryAdmission::create(['test_delivery_authorization_id' => $current->id,
+                        'test_delivery_redemption_id' => $redemption->id, 'sequence' => $coverage['admitted'] + 1,
+                        'first_byte' => $range->start, 'last_byte' => $range->end, 'admitted_at' => $at]);
                 }
                 if ($action !== null) {
                     $auditContext = ['order_public_id' => $locked->public_id, 'authorization_public_id' => $current->public_id,
@@ -156,13 +165,13 @@ final class TransferTestDelivery
                 app(CustomerAccess::class)->lock($principal, $principal?->ownerKey ?? $ownerKey, $actor);
                 app(PurchaseAccess::class)->assertOrder($locked, $ownerKey, $principal);
 
-                return $redemption;
+                return $admission;
             }, 5);
-            if ($prepared === null || $redemption === null) {
+            if ($prepared === null || $admission === null) {
                 throw new DeliveryException('range_not_satisfiable');
             }
 
-            return new TestDeliveryTransfer($prepared, $range, $authorization->id, $redemption->id, $principal?->userId ?? $actor?->id);
+            return new TestDeliveryTransfer($prepared, $range, $authorization->id, $admission->id, $principal?->userId ?? $actor?->id);
         } catch (Throwable $error) {
             $prepared?->close();
             throw $error;
@@ -189,7 +198,7 @@ final class TransferTestDelivery
         if ($coverage['completed']) {
             throw new DeliveryException('redeemed');
         }
-        if ($coverage['responses'] >= TestDeliveryCoverageLedger::MAX_RESPONSES) {
+        if ($coverage['admitted'] >= TestDeliveryCoverageLedger::MAX_RESPONSES) {
             throw new DeliveryException('resume_exhausted');
         }
     }

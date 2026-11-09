@@ -11,7 +11,7 @@ use LogicException;
 final class TestDeliveryTransfer
 {
     public function __construct(private readonly PreparedDeliveryStream $prepared, public readonly DeliveryByteRange $range,
-        private readonly int $authorizationId, private readonly int $redemptionId, private readonly ?int $actorId = null)
+        private readonly int $authorizationId, private readonly int $admissionId, private readonly ?int $actorId = null)
     {
         if (! $range->partial() && $range->outcome !== DeliveryByteRange::FULL
             || $range->sizeBytes !== $prepared->sizeBytes || ! hash_equals($range->sha256, $prepared->sha256)) {
@@ -45,7 +45,7 @@ final class TestDeliveryTransfer
         } finally {
             $this->prepared->close();
             if ($served > 0) {
-                app(TestDeliveryCoverageLedger::class)->recordServed($this->authorizationId, $this->redemptionId,
+                app(TestDeliveryCoverageLedger::class)->recordServed($this->authorizationId, $this->admissionId,
                     $this->range->start, $this->range->start + $served - 1, $this->actorId);
             }
         }

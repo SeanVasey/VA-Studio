@@ -82,6 +82,8 @@ final class RetentionSchedule
             'rationale' => self::WITH_ORDER.'download record of a perpetual license, kept while the order is kept.'],
         ['table' => 'test_delivery_redemptions', 'family' => 'delivery_records', 'class' => 'indefinite', 'clock' => null,
             'rationale' => self::WITH_ORDER.'redeemed download, kept with its authorization and order.'],
+        ['table' => 'test_delivery_admissions', 'family' => 'delivery_records', 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'each admitted v2 response (FP-077), kept with its authorization and order.'],
         ['table' => 'test_delivery_coverage', 'family' => 'delivery_records', 'class' => 'indefinite', 'clock' => null,
             'rationale' => self::WITH_ORDER.'bytes served per v2 response and the one counted completion (FP-077), kept with its authorization and order.'],
         // Production checkout records with frozen buyer declarations (RETAINED financial).

@@ -11,11 +11,15 @@ class DeliveryByteRangeTest extends TestCase
 {
     private const SHA = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
 
+    private const SCOPE = '0e8b1f3c-6b2a-4c9d-8f7e-1a2b3c4d5e6f';
+
+    private const KEY = 'base64:c3ludGhldGljLWtleS1mb3ItZXRhZy10ZXN0cy0wMQ==';
+
     private const OTHER = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
 
     public static function selections(): array
     {
-        $etag = DeliveryByteRange::etag(self::SHA);
+        $etag = DeliveryByteRange::etag(self::SHA, self::SCOPE, self::KEY);
 
         return [
             'closed' => ['bytes=10-19', null, ['partial', 10, 19]],
@@ -47,19 +51,19 @@ class DeliveryByteRangeTest extends TestCase
             'space inside' => ['bytes= 1-2', null, ['full', 0, 99]],
             'empty header' => ['', null, ['full', 0, 99]],
             'oversized header' => ['bytes=1-2'.str_repeat(' ', 200), null, ['full', 0, 99]],
-            'etag of other bytes' => ['bytes=5-', DeliveryByteRange::etag(self::OTHER), ['full', 0, 99]],
+            'etag of other bytes' => ['bytes=5-', DeliveryByteRange::etag(self::OTHER, self::SCOPE, self::KEY), ['full', 0, 99]],
             'raw content hash is not the etag' => ['bytes=5-', '"'.self::SHA.'"', ['full', 0, 99]],
             'weak etag never matches' => ['bytes=5-', 'W/'.$etag, ['full', 0, 99]],
             'unquoted hash never matches' => ['bytes=5-', self::SHA, ['full', 0, 99]],
             'http date never matches' => ['bytes=5-', 'Sun, 08 Nov 2026 10:00:00 GMT', ['full', 0, 99]],
-            'failed if-range ignores an unsatisfiable range' => ['bytes=500-', DeliveryByteRange::etag(self::OTHER), ['full', 0, 99]],
+            'failed if-range ignores an unsatisfiable range' => ['bytes=500-', DeliveryByteRange::etag(self::OTHER, self::SCOPE, self::KEY), ['full', 0, 99]],
         ];
     }
 
     #[DataProvider('selections')]
     public function test_single_range_selection_follows_rfc_9110(?string $range, ?string $ifRange, array $expected): void
     {
-        $selection = DeliveryByteRange::evaluate($range, $ifRange, 100, self::SHA);
+        $selection = DeliveryByteRange::evaluate($range, $ifRange, 100, self::SHA, DeliveryByteRange::etag(self::SHA, self::SCOPE, self::KEY));
         $this->assertSame($expected, [$selection->outcome, $selection->start, $selection->end]);
         $this->assertSame($expected[0] === 'partial', $selection->partial());
         $this->assertSame($expected[0] === 'unsatisfiable', $selection->unsatisfiable());
@@ -77,7 +81,14 @@ class DeliveryByteRangeTest extends TestCase
     public function test_length_and_strong_etag(): void
     {
         $this->assertSame(10, DeliveryByteRange::evaluate('bytes=10-19', null, 100, self::SHA)->length());
-        $this->assertSame('"'.hash('sha256', 'vasey-test-delivery-etag-v1:'.self::SHA).'"', DeliveryByteRange::etag(self::SHA));
-        $this->assertStringNotContainsString(self::SHA, DeliveryByteRange::etag(self::SHA));
+        $etag = DeliveryByteRange::etag(self::SHA, self::SCOPE, self::KEY);
+        $key = hash_hmac('sha256', 'vasey-delivery-etag-key-v2', self::KEY, true);
+        $this->assertSame('"'.hash_hmac('sha256', self::SCOPE."\0".self::SHA, $key).'"', $etag);
+        $this->assertStringNotContainsString(self::SHA, $etag);
+        // Identical files are not linkable across orders or deployments, and a missing validator never matches.
+        $this->assertNotSame($etag, DeliveryByteRange::etag(self::SHA, 'another-order', self::KEY));
+        $this->assertNotSame($etag, DeliveryByteRange::etag(self::SHA, self::SCOPE, 'another-key'));
+        $this->assertSame('full', DeliveryByteRange::evaluate('bytes=5-', $etag, 100, self::SHA)->outcome);
+        $this->assertSame('partial', DeliveryByteRange::evaluate('bytes=5-', $etag, 100, self::SHA, $etag)->outcome);
     }
 }

@@ -21,7 +21,7 @@ final class TestDeliveryCoverage extends Model
 
     protected function casts(): array
     {
-        return ['test_delivery_authorization_id' => 'integer', 'test_delivery_redemption_id' => 'integer', 'sequence' => 'integer',
+        return ['test_delivery_admission_id' => 'integer', 'test_delivery_authorization_id' => 'integer', 'test_delivery_redemption_id' => 'integer', 'sequence' => 'integer',
             'first_byte' => 'integer', 'last_byte' => 'integer', 'covered_bytes' => 'integer',
             'completed_authorization_id' => 'integer', 'recorded_at' => 'immutable_datetime'];
     }

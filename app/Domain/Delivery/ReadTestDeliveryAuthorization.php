@@ -50,7 +50,7 @@ final class ReadTestDeliveryAuthorization
         $redemption = TestDeliveryRedemption::where('test_delivery_authorization_id', $authorization->id)->first();
         if ($redemption) { $evidence->verifyRedemption($redemption, $authorization, $source, $target); }
         $coverage = app(TestDeliveryCoverageLedger::class)->state($authorization, $target['file']['size_bytes']);
-        if ($coverage['responses'] > 0 && ! $redemption) { throw new DeliveryException('changed'); }
+        if ($coverage['admitted'] > 0 && ! $redemption) { throw new DeliveryException('changed'); }
         return compact('order', 'source', 'target', 'authorization', 'redemption', 'transfer', 'coverage');
     }
 }

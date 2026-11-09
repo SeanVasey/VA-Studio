@@ -376,6 +376,12 @@ each table to an existing §7 row and add two rows where §7 had none.
 The test-delivery chain is phase 1. Paid, paid-tax, free and production-free follow in their own phases, each with native
 MySQL race evidence and independent review. #252 and #253 are closed as superseded.
 
+*Addendum, 2026-11-09 (delegated; from the independent review of #258, P2-1).* Count-on-complete per authorization can be
+split across authorizations (A serves `0..N-2`, B serves `-1`), so before Phase 2, where `max_downloads` applies: a
+download counts once when the grant's union coverage across its authorizations in a rolling 24 h window reaches 90% (which
+includes any single authorization reaching 90%). Each window counts at most once. Phase 1 test delivery has no
+`max_downloads`, so it keeps count-on-complete. Phase 2 implements this.
+
 **Unpaid order snapshots (retention).** An order snapshot is created before payment. One with no verified payment,
 whose provider session has expired or been cancelled and reconciled, counts as "did not become an order": it falls under
 the 30-day abandoned-checkout row from that point. Any paid, refunded, disputed or held order stays with the orders row.

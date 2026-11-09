@@ -7,7 +7,10 @@ use App\Domain\Commerce\RefundDispute\RefundDisputeAccess;
 use App\Domain\Customers\CustomerAccess;
 use App\Domain\Customers\CustomerPrincipal;
 use App\Domain\Customers\PurchaseAccess;
+use App\Domain\Delivery\Models\TestDeliveryAdmission;
 use App\Domain\Delivery\Models\TestDeliveryAuthorization;
+use App\Domain\Delivery\Models\TestDeliveryCoverage;
+use App\Domain\Delivery\Models\TestDeliveryRedemption;
 use App\Domain\Delivery\Models\TestDeliveryControl;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
@@ -148,18 +151,45 @@ final class IssueTestDelivery
         if ($query->where('issued_at', '>', $at->subSeconds(60))->count() >= 3) {
             throw new DeliveryException('budget_exhausted');
         }
-        if ($policy['version'] === TestAccessPolicy::V2) {
-            // Operational abuse bound, not a license term: v2 transfers started within the rolling 24 hours that never
-            // covered their file, across every kind of this grant. The order mutex serializes the last slot.
-            $incomplete = TestDeliveryAuthorization::where('order_id', $order->id)
-                ->where('license_grant_id', $target['license_grant_id'])->where('policy_version', TestAccessPolicy::V2)
-                ->whereHas('redemption', fn ($redemption) => $redemption->where('redeemed_at', '>', $at->subDay()))
-                ->whereNotExists(fn ($completion) => $completion->selectRaw('1')->from('test_delivery_coverage')
-                    ->whereColumn('test_delivery_coverage.completed_authorization_id', 'test_delivery_authorizations.id'))
-                ->count();
-            if ($incomplete >= app(TestAccessPolicy::class)->incompleteCap()) {
-                throw new DeliveryException('incomplete_limit');
+        if ($policy['version'] === TestAccessPolicy::V2 && $this->incomplete($order, (int) $target['license_grant_id'], $at)
+            >= app(TestAccessPolicy::class)->incompleteCap()) {
+            throw new DeliveryException('incomplete_limit');
+        }
+    }
+
+    /**
+     * Operational abuse bound, not a license term: this grant's v2 authorizations that started within the rolling 24 hours
+     * and never covered their file, plus those issued, unexpired and not yet started (which could still start, so
+     * concurrent issuance cannot overshoot the cap). Under the order lock every read is a locking read, so a snapshot fixed
+     * by an earlier plain read in this transaction cannot hide a start or completion committed meanwhile.
+     */
+    private function incomplete(Order $order, int $grantId, CarbonImmutable $at): int
+    {
+        $lock = fn ($query) => DB::transactionLevel() > 0 ? $query->lockForUpdate() : $query;
+        $authorizations = $lock(TestDeliveryAuthorization::where('order_id', $order->id)->where('license_grant_id', $grantId)
+            ->where('policy_version', TestAccessPolicy::V2)->where('issued_at', '>', $at->subDay()->subSeconds(60)))
+            ->get(['id', 'expires_at']);
+        if ($authorizations->isEmpty()) {
+            return 0;
+        }
+        $ids = $authorizations->pluck('id')->all();
+        $started = $lock(TestDeliveryAdmission::whereIn('test_delivery_authorization_id', $ids))
+            ->pluck('test_delivery_authorization_id')->unique()->all();
+        $startedAt = $lock(TestDeliveryRedemption::whereIn('test_delivery_authorization_id', $ids))
+            ->pluck('redeemed_at', 'test_delivery_authorization_id');
+        $completed = $lock(TestDeliveryCoverage::whereIn('completed_authorization_id', $ids))->pluck('completed_authorization_id')->all();
+        $count = 0;
+        foreach ($authorizations as $authorization) {
+            if (in_array($authorization->id, $completed, true)) {
+                continue;
+            }
+            $begun = in_array($authorization->id, $started, true) || $startedAt->has($authorization->id);
+            if ($begun ? CarbonImmutable::parse($startedAt[$authorization->id] ?? $at)->utc()->greaterThan($at->subDay())
+                : $authorization->expires_at->greaterThan($at)) {
+                $count++;
             }
         }
+
+        return $count;
     }
 }
