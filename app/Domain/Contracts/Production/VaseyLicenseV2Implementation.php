@@ -8,7 +8,9 @@ namespace App\Domain\Contracts\Production;
  * from the roots through `use App\…` imports and references to classes of the same namespace.
  *
  * The roots are the profile definition, the checkout printable set bound to its faces and the renderer
- * ({@see VaseyLicenseV2PdfRenderer}), whose closure brings in the v1 document, layout and signature classes it reuses.
+ * ({@see VaseyLicenseV2PdfRenderer}), whose closure brings in the v1 document, layout and signature classes it reuses, and
+ * the isolated render path of issued originals: the application-free core ({@see VaseyLicenseV2Render}), the bounded child
+ * script that runs it and the process that starts that child ({@see VaseyLicenseV2RendererProcess}).
  * {@see VaseyLicenseV2Profile} is excluded: it holds the manifest's own SHA-256 and anchors the pin.
  */
 final class VaseyLicenseV2Implementation
@@ -18,6 +20,9 @@ final class VaseyLicenseV2Implementation
         'app/Domain/Contracts/Production/VaseyLicenseV2Implementation.php',
         'app/Domain/Commerce/ContractIdentity/ContractPrintableSet.php',
         'app/Domain/Contracts/Production/VaseyLicenseV2PdfRenderer.php',
+        'app/Domain/Contracts/Production/VaseyLicenseV2Render.php',
+        'app/Domain/Contracts/Production/VaseyLicenseV2RendererProcess.php',
+        'scripts/render-vasey-license-v2.php',
     ];
 
     public const ANCHOR = 'app/Domain/Contracts/Production/VaseyLicenseV2Profile.php';

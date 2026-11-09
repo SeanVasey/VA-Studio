@@ -96,16 +96,19 @@ class VaseyLicenseV2ProfileTest extends TestCase
                 }
                 if (str_contains($file->getPathname(), '/app/Domain/Contracts/Production/VaseyLicenseV2')
                     || str_ends_with($file->getPathname(), '/app/Domain/Commerce/ContractIdentity/ContractPrintableSet.php')
-                    || str_ends_with($file->getPathname(), '/app/Domain/Grants/VaseyLicenseIssuance.php')) {
+                    || str_ends_with($file->getPathname(), '/app/Domain/Grants/VaseyLicenseIssuance.php')
+                    // The container gives the isolated v2 child process the PHP-FPM CLI-binary factory, as it does the pinned renderers.
+                    || str_ends_with($file->getPathname(), '/app/Providers/AppServiceProvider.php')) {
                     continue;
                 }
                 $this->assertStringNotContainsString('VaseyLicenseV2', $file->getContents(), $file->getPathname());
             }
         }
         sort($dispatchers);
-        $this->assertSame(['app/Domain/Contracts/Production/VaseyLicenseV2PdfRenderer.php', 'app/Domain/Grants/Paid/PaidGrantDocuments.php',
-            'app/Domain/Grants/Paid/PaidGrants.php', 'app/Domain/Grants/PaidTax/PaidTaxDocuments.php', 'app/Domain/Grants/PaidTax/PaidTaxGrants.php',
-            'app/Domain/Grants/VaseyLicenseContractSource.php', 'config/contracts.php'], $dispatchers);
+        $this->assertSame(['app/Domain/Contracts/Production/VaseyLicenseV2PdfRenderer.php', 'app/Domain/Contracts/Production/VaseyLicenseV2Render.php',
+            'app/Domain/Grants/Paid/PaidGrantDocuments.php', 'app/Domain/Grants/Paid/PaidGrants.php', 'app/Domain/Grants/PaidTax/PaidTaxDocuments.php',
+            'app/Domain/Grants/PaidTax/PaidTaxGrants.php', 'app/Domain/Grants/VaseyLicenseContractSource.php',
+            'app/Domain/Grants/VaseyLicensePreparedSelection.php', 'config/contracts.php'], $dispatchers);
     }
 
     public function test_the_implementation_pin_is_the_derived_closure_of_the_profile_and_the_printable_set(): void

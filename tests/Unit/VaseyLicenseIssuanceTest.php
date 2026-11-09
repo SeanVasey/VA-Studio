@@ -6,8 +6,11 @@ use App\Domain\Contracts\ContractIssuanceException;
 use App\Domain\Contracts\Production\VaseyLicenseV2Profile;
 use App\Domain\Grants\VaseyLicenseContractSource;
 use App\Domain\Grants\VaseyLicenseIssuance;
+use App\Domain\Grants\VaseyLicensePreparedSelection;
 use App\Support\CanonicalJson;
 use Closure;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\EconomicLicenseFixtures;
@@ -225,5 +228,71 @@ class VaseyLicenseIssuanceTest extends TestCase
         $this->refuses('signature_changed', fn () => $issuance->render($input, $profile));
         config(['contracts.vasey_license_v1.signature_sha256' => $pin]);
         $this->assertStringStartsWith('%PDF-', $issuance->render($input, $profile)->pdfBytes);
+    }
+
+    /**
+     * Activation blocker "Transaction I/O": the selection's file reads (manifest, metric files, signature) happen in prepare(),
+     * before the issuer's locked origin transaction; decide() inside it reads no file and only re-checks what it can see in
+     * memory. Proven by preparing from a copy of the profile files and removing that copy and the signature before deciding.
+     */
+    public function test_the_selection_reads_its_files_before_the_locked_transaction_and_none_inside_it(): void
+    {
+        $input = self::input('tax', ['legal_name' => 'Łukasz Żółć']);
+        // Gate off: nothing is prepared or read (the root does not even exist).
+        $this->assertNull(VaseyLicenseIssuance::prepare('/nonexistent-v2-root'));
+        $this->assertSame([null, 'gate_off'], VaseyLicenseIssuance::decide($input, null));
+
+        $this->enableV2Issuance();
+        $expected = VaseyLicenseIssuance::decide($input);
+        $this->assertSame('selected', $expected[1]);
+        $root = sys_get_temp_dir().'/vasey-license-v2-prepared-'.bin2hex(random_bytes(6));
+        foreach (['profile-assets.json', ...array_values(VaseyLicenseV2Profile::FACES)] as $file) {
+            $target = $root.'/'.VaseyLicenseV2Profile::ASSETS_DIRECTORY.'/'.$file;
+            is_dir(dirname($target)) || mkdir(dirname($target), 0700, true);
+            copy(base_path(VaseyLicenseV2Profile::ASSETS_DIRECTORY.'/'.$file), $target);
+        }
+        $prepared = VaseyLicenseIssuance::prepare($root);
+        $this->assertSame([VaseyLicenseV2Profile::current(), config('contracts.vasey_license_v1.signature_sha256')], [$prepared->profile, $prepared->signatureSha256]);
+        // Nothing the selection reads from files is there any more.
+        (new Filesystem)->deleteDirectory($root);
+        $signature = Storage::disk('local')->path(config('contracts.vasey_license_v1.signature_path'));
+        $bytes = file_get_contents($signature);
+        unlink($signature);
+        try {
+            $this->assertSame($expected, DB::transaction(fn (): array => VaseyLicenseIssuance::decide($input, $prepared)));
+            // Without a preparation, a selection inside a transaction reads nothing and keeps the existing profile.
+            file_put_contents($signature, $bytes);
+            $this->assertSame([null, 'not_renderable'], DB::transaction(fn (): array => VaseyLicenseIssuance::decide($input)));
+            $this->assertSame([null, 'not_renderable'], DB::transaction(fn (): array => VaseyLicenseIssuance::decide($input, VaseyLicenseIssuance::prepare())));
+            // In-memory re-checks: a signature pin configured since preparing, and a prepared profile that is not its hash's.
+            config(['contracts.vasey_license_v1.signature_sha256' => str_repeat('c', 64)]);
+            $this->assertSame([null, 'signature_unavailable'], DB::transaction(fn (): array => VaseyLicenseIssuance::decide($input, $prepared)));
+            config(['contracts.vasey_license_v1.signature_sha256' => $prepared->signatureSha256]);
+            $edited = new VaseyLicensePreparedSelection(['edited' => true] + $prepared->profile, $prepared->profileSha256, $prepared->coverage, $prepared->signatureSha256);
+            $this->assertSame([null, 'not_renderable'], DB::transaction(fn (): array => VaseyLicenseIssuance::decide($input, $edited)));
+            // Failed reads keep their branch codes: no signature, no profile.
+            $this->assertSame([null, 'signature_unavailable'], VaseyLicenseIssuance::decide($input, new VaseyLicensePreparedSelection($prepared->profile, $prepared->profileSha256, $prepared->coverage)));
+            $this->assertSame([null, 'not_renderable'], VaseyLicenseIssuance::decide($input, new VaseyLicensePreparedSelection(null, null, $prepared->coverage, $prepared->signatureSha256)));
+            $this->assertSame([null, 'not_renderable'], VaseyLicenseIssuance::decide($input, new VaseyLicensePreparedSelection));
+            // The gate is re-checked inside too.
+            config(['contracts.vasey_license_v2_issuance' => false]);
+            $this->assertSame([null, 'gate_off'], DB::transaction(fn (): array => VaseyLicenseIssuance::decide($input, $prepared)));
+        } finally {
+            file_put_contents($signature, $bytes);
+        }
+    }
+
+    /** Both issuers prepare before their locked origin transaction and hand that preparation to every line's selection. */
+    public function test_both_issuers_prepare_the_selection_before_their_origin_transaction(): void
+    {
+        foreach (['app/Domain/Grants/Paid/PaidGrants.php' => 'DB::transaction(', 'app/Domain/Grants/PaidTax/PaidTaxGrants.php' => 'PaidTaxTransaction::run('] as $path => $frame) {
+            $source = (string) file_get_contents(base_path($path));
+            $prepare = strpos($source, '$v2Prepared = VaseyLicenseIssuance::prepare();');
+            $this->assertIsInt($prepare, $path);
+            $this->assertLessThan(strpos($source, $frame), $prepare, $path);
+            $this->assertSame(1, substr_count($source, 'VaseyLicenseIssuance::decide('), $path);
+            $this->assertSame(1, preg_match('/VaseyLicenseIssuance::decide\(Paid(?:Grant|Tax)RenderInput::fromOrigin\(\$payload\), \$v2Prepared\)/', $source), $path);
+            $this->assertSame(1, preg_match('/function \([^)]*\) use \(\$v2Prepared,/', $source), $path);
+        }
     }
 }

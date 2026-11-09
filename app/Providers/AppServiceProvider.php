@@ -8,6 +8,7 @@ use App\Domain\Commerce\Payments\StripePaymentGateway;
 use App\Domain\Commerce\Payments\StripeSdkCheckoutGateway;
 use App\Domain\Contracts\ContractRenderer;
 use App\Domain\Contracts\IsolatedContractRenderer;
+use App\Domain\Contracts\Production\VaseyLicenseV2RendererProcess;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentitySmtpFactory;
 use App\Domain\Grants\Free\FreeGrantRendererProcess;
@@ -51,8 +52,10 @@ class AppServiceProvider extends ServiceProvider
         // The pinned grant renderers spawn PHP_BINARY, which is the FPM daemon outside the CLI; there they get a
         // factory that runs the validated CLI binary instead (PhpCliProcess). In the CLI they are built as before.
         // Family 256 is included now that its HTTP mount exists. The binding is inert while that mount and the family's
-        // policy stay off: nothing resolves the renderer unless an admitted render runs.
-        foreach ([FreeGrantRendererProcess::class, PaidGrantRendererProcess::class, PaidTaxRendererProcess::class, ProductionFreeGrantRendererProcess::class] as $renderer) {
+        // policy stay off: nothing resolves the renderer unless an admitted render runs. The v2 license child
+        // (VaseyLicenseV2RendererProcess) gets the same factory; it renders only recorded v2 selections.
+        foreach ([FreeGrantRendererProcess::class, PaidGrantRendererProcess::class, PaidTaxRendererProcess::class, ProductionFreeGrantRendererProcess::class,
+            VaseyLicenseV2RendererProcess::class] as $renderer) {
             $this->app->bind($renderer, function ($app) use ($renderer) {
                 $binary = $app->make(PhpCliBinary::class);
 

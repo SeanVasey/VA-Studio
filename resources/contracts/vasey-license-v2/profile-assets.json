@@ -191,9 +191,12 @@
         "app/Domain/Commerce/ContractIdentity/ContractIdentityDeclarationV2.php": "f5839782350513762734cef72ec786dc57057976557e377580bf778646ddba6f",
         "app/Domain/Commerce/ContractIdentity/ContractPrintableSet.php": "18df1fb1430463d56df4e791f36f645871567cfa2b04e7024112eae6d9648f3e",
         "app/Domain/Commerce/ProductionCheckout/CheckoutException.php": "271e6eaf728665edf521b64daadbdcf00b5c2f432c344138b648bc9f61140241",
+        "app/Domain/Contracts/ContractFiles.php": "3ab16f6dd6e71221de3925101329ec53807fe927fa3688188999a531e5763f1c",
+        "app/Domain/Contracts/ContractIo.php": "245cce48509e9df21a8cbc3d4cac625c1a446044d27d03bee5203a1b735138c8",
         "app/Domain/Contracts/ContractIssuanceException.php": "9df97742776ba51f031b088ade0fde06e2a73ad1d90284141b91ee6e3eb8a8be",
         "app/Domain/Contracts/ContractIssuancePolicy.php": "3aa15f4485ad5cdf8d71a59f2b244abdbfe0ab0d1c2b799264041986b086dac0",
         "app/Domain/Contracts/ContractRenderProfileRegistry.php": "d6718f8f0d962679da3b6429c0edcfba76db223df216c03c99d0710f03e272e7",
+        "app/Domain/Contracts/ContractRenderWorkspace.php": "61cd991e9389fcca6b04fc4d0e5ec2c2c0f75266979dfa64af5e305f754e61ad",
         "app/Domain/Contracts/Production/ContractBindingException.php": "a0746b6b67ab9ab75c8db28c8700bd523675fd8db6ff6207ada17a3552f747b8",
         "app/Domain/Contracts/Production/ContractLicenseConstants.php": "3b4e7a96638b0944e5eb2cdc88604013192dc32099b2219ee47d1c6a1c180ba7",
         "app/Domain/Contracts/Production/ContractNumberWords.php": "3c86e2b247fabcafeea88f740e50cb15fb35db88d712a3a2e776e2f141ce971f",
@@ -205,9 +208,11 @@
         "app/Domain/Contracts/Production/VaseyLicenseProfile.php": "6f870d4c2e2c57c8be1ed2666cc93b656a21b63319c90563efe15ca94a6f7e8d",
         "app/Domain/Contracts/Production/VaseyLicenseProfileDefinition.php": "8afaf0ce8cefb1b728689d130f9f4c54fe725ec20a8d6ff3153e7db78329587f",
         "app/Domain/Contracts/Production/VaseyLicenseSignature.php": "e8aae2e91522c273bc500b873cf8b762aadf9e0babe07d5a361f5377785b2376",
-        "app/Domain/Contracts/Production/VaseyLicenseV2Implementation.php": "46f71f923ef40b26d54e0a34bfb1fbf09582a8ddcb06d003519dd6bf37332a1a",
+        "app/Domain/Contracts/Production/VaseyLicenseV2Implementation.php": "5a027e3533110d6518d069db4486ea28ca246020d3e192f913c72c6bbd5ce73b",
         "app/Domain/Contracts/Production/VaseyLicenseV2PdfRenderer.php": "e83f7663f8830378cdce7590de4fa4c1cdabba35b80a78956e9ed7a97958624b",
         "app/Domain/Contracts/Production/VaseyLicenseV2ProfileDefinition.php": "791e6f9656dcc0a28d649fd3f1e72684c0719270140ee53da75e995f5a53b379",
+        "app/Domain/Contracts/Production/VaseyLicenseV2Render.php": "841e063724ea7c9244ba25711507facfa8ee662492a2729f3aae59190ec2ddee",
+        "app/Domain/Contracts/Production/VaseyLicenseV2RendererProcess.php": "1abbba57a0754f84201a073aaec152a92518a7bc7c1e0d578a9356ed8c205f5d",
         "app/Domain/Contracts/RenderedContract.php": "b3fa57b8c8cc8e354597a5fc5f12b7942aa734e9d1bab9f0d2014358dd1d249f",
         "app/Domain/Rights/EconomicLicenseTerms.php": "070a5b2e07887a713dd603803de5c330d34dc1d0b27b633dfe6c4eaaba87f0b4",
         "app/Domain/Rights/LicenseTerritories.php": "916ce751ecac29550e37546e134137284867d9850190cb554065771e357e9996",
@@ -215,7 +220,8 @@
         "app/Domain/Rights/TieredLicenseTerms.php": "c25f3670f00ca17274aa2120c8ad212f39c5ef1ced5fd7f57ebcfa695e97b3f3",
         "app/Domain/Rights/TypedLicenseTerms.php": "c227805735d5613b5ed04e805c3260831209812599d450855c477bbbb0ad2745",
         "app/Support/CanonicalJson.php": "6e8f14f950bbb7ed3c4a8162ecf7c2fd2752031d1679285cea8bb0a5f5f82d89",
-        "app/Support/Environment/TestEnvironment.php": "98566cea59214cb6d9ab1852eef7d9a6e2020048b46b02fbc1b882439ba2d948"
+        "app/Support/Environment/TestEnvironment.php": "98566cea59214cb6d9ab1852eef7d9a6e2020048b46b02fbc1b882439ba2d948",
+        "scripts/render-vasey-license-v2.php": "28966d9702c1b60d959ab6e17186c9a5fb8ac0b9a29823c419bb9828b72d5952"
     },
     "assets": {
         "fonts/generated/bebasneue.ctg.z": {

@@ -390,8 +390,20 @@ render failed closed with `render_failed` (`docs/verification/php-cli-resolver-2
   gained the binding with its default-off HTTP mount (`docs/ops/production-free-http-runtime.md`). The factory replaces just the
   executable and re-derives the fixed sibling library directory from the CLI binary. Flags, script, working directory, scrubbed environment, input and the 60 s
   limit are unchanged, and each renderer still verifies its pinned profile and bounds its output.
+- The `vasey-license-pdf-v2` child (`VaseyLicenseV2RendererProcess`, `scripts/render-vasey-license-v2.php`) gets the same
+  factory and limits. It renders only originals a gated selection recorded; the selection gate
+  (`contracts.vasey_license_v2_issuance`) is a code literal `false` that only `local` and `testing` admit, so staging renders
+  no v2 original today.
 - Do not point `VASEY_PHP_CLI_BINARY` at `/usr/bin/php`: it is an `update-alternatives` link that can move to another
   version. A move is caught by the probe, but then rendering stops until the setting is fixed.
+
+**Deploy rule for v2 license originals.** Do not rotate the license signature (the file or
+`VASEY_LICENSE_SIGNATURE_SHA256`) and do not deploy a change to any file the v2 manifest pins
+(`resources/contracts/vasey-license-v2/profile-assets.json`: its implementation closure, its assets or the manifest
+itself) while any v2 origin is unrendered, that is, while a paid or paid-tax document work row is not `complete` for an
+origin whose recorded profile is a v2 selection. Such a line refuses `signature_changed` or `profile_changed`, and the
+order appears under Fulfillment, Held paid orders ("Contract render"). Reset opcache on every deploy of pinned files
+(`docs/production-contract-profile.md`).
 
 **Host checks.**
 1. `ops/staging/validate-runtime.php` (run by every deploy and `ctl refresh`) fails `runtime.php_cli_binary` unless the

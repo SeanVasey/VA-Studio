@@ -11,6 +11,7 @@ use App\Domain\Commerce\ProductionCheckout\TaxExemptions;
 use App\Domain\Commerce\ProductionPolicy\PrepareProductionTrackCapabilities;
 use App\Domain\Commerce\ProductionPolicy\ReviewProductionTrackCapabilities;
 use App\Domain\Commerce\ProductionPolicy\SaveProductionTrackCapabilities;
+use App\Domain\Contracts\ContractIssuanceException;
 use App\Domain\Contracts\Production\VaseyLicenseV2Profile;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
@@ -19,6 +20,7 @@ use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use App\Domain\Customers\ProductionIdentity\Notifications\WorkIdentityNotice;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Grants\ContractIdentityHolds;
+use App\Domain\Grants\ContractRenderHolds;
 use App\Domain\Grants\Paid\PaidGrantCommands;
 use App\Domain\Grants\Paid\PaidGrantDocuments;
 use App\Domain\Grants\Paid\PaidGrantDownloads;
@@ -36,6 +38,7 @@ use App\Domain\Grants\VaseyLicenseContractSource;
 use App\Domain\Grants\VaseyLicenseIssuance;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Queue;
@@ -43,6 +46,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\LicenseFixtures;
 use Tests\Support\PaidGrantDependencyFixtures;
 use Tests\Support\ProductionCheckoutContractIdentityForgery;
 use Tests\Support\ProductionCheckoutFixtures;
@@ -308,6 +312,53 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         });
         $this->assertSame($bytes, $downloaded);
         $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    /**
+     * Activation blocker "Post-payment render refusals": a v2 line whose render refuses after payment (here a signature
+     * rotated between selection and render) fails its attempt exactly as before, and the order gets one staff-visible render
+     * hold, written outside the failed attempt and kept at one across retries. Restoring the pinned signature lets a later
+     * attempt issue the original; the append-only record stays.
+     */
+    public function test_a_v2_render_refused_after_payment_leaves_one_staff_hold_across_retries(): void
+    {
+        $this->enableV2Issuance();
+        $f = $this->paidV2Order();
+        $pinned = [config('contracts.vasey_license_v1.signature_path'), config('contracts.vasey_license_v1.signature_sha256')];
+        $this->installSyntheticSignature('contracts/signature/rotated-signature.png', 255);
+        foreach ([1, 2] as $attempt) {
+            try {
+                (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+                $this->fail('A v2 render under a rotated signature succeeded.');
+            } catch (ContractIssuanceException $error) {
+                $this->assertSame('signature_changed', $error->reason);
+            }
+            $this->assertSame(['failed', $attempt], [DB::table('paid_document_work')->sole()->state, (int) DB::table('paid_document_work')->sole()->attempts]);
+            $hold = (array) DB::table('audit_events')->where('action', ContractRenderHolds::ACTION)->sole();
+            $this->assertSame(['production_checkout_order', (int) DB::table(CheckoutSchema::TABLES['order'])->where('public_id', $f['order']['orderId'])->value('id'), null],
+                [$hold['subject_type'], (int) $hold['subject_id'], $hold['actor_id']]);
+            // Only the chain, the refusal code and the order's public id: no buyer data.
+            $this->assertSame(['chain' => 'production_checkout_v1', 'reason' => 'signature_changed', 'order_public_id' => $f['order']['orderId']],
+                json_decode($hold['context'], true));
+        }
+        $this->assertDatabaseCount('paid_originals', 0);
+        $this->assertSame(0, DB::table('audit_events')->where('action', ContractIdentityHolds::ACTION)->count());
+
+        // Staff see it in the existing hold list; the buyer cannot read it.
+        $this->actingAs($f['buyer']['user']);
+        try {
+            ContractIdentityHolds::staffQuery()->get();
+            $this->fail('A buyer read the staff hold list.');
+        } catch (AuthorizationException) {
+        }
+        $this->actingAs(LicenseFixtures::admin());
+        $this->assertSame([$f['order']['orderId']], ContractIdentityHolds::staffQuery()->get()->pluck('context.order_public_id')->all());
+
+        config(['contracts.vasey_license_v1.signature_path' => $pinned[0], 'contracts.vasey_license_v1.signature_sha256' => $pinned[1]]);
+        $complete = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertTrue($complete['fulfilled']);
+        $this->assertSame(3, (int) DB::table('paid_document_work')->sole()->attempts);
+        $this->assertSame(1, DB::table('audit_events')->where('action', ContractRenderHolds::ACTION)->count());
     }
 
     /**
