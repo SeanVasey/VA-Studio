@@ -32,8 +32,7 @@ final class CustomerDataRetentionReport extends Command
 
         $this->line('retention-report dry_run=true writes=none as_of='.$result['as_of'].' policy_reference='.json_encode($result['policy_reference'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
         foreach ($result['classes'] as $class) {
-            $this->line('class='.$class['class'].' years='.$class['years'].' cutoff='.$class['cutoff']
-                .($class['class'] === 'financial' ? ' note=minimum_period_license_lifetime_still_applies' : ''));
+            $this->line('class='.$class['class'].' '.$class['unit'].'='.$class['period'].' cutoff='.$class['cutoff']);
             foreach ($class['tables'] as $table) {
                 if (isset($table['held'])) {
                     $this->line('  '.$table['table'].' held='.$table['held']);

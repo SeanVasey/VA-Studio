@@ -12,7 +12,9 @@ use Illuminate\Support\Facades\Gate;
 /** Default-off admission, bounded export settings and the retention schedule that must be set before any deletion. */
 final class DataRightsPolicy
 {
-    public const RETENTION_KEYS = ['financial_records_years', 'consent_records_years', 'correspondence_records_years', 'security_records_years'];
+    /** Each period key; its suffix (`_years` or `_days`) is its unit. */
+    public const RETENTION_KEYS = ['financial_records_years', 'consent_records_years', 'correspondence_records_years', 'security_records_years',
+        'evidence_records_years', 'abandoned_checkout_days', 'operational_records_days'];
 
     public function enabled(): bool
     {
@@ -50,7 +52,8 @@ final class DataRightsPolicy
      * The approved retention schedule (U-13). Every value must be set: a missing, empty, non-integer or out-of-range value
      * refuses, so no deletion can run on an invented policy.
      *
-     * @return array{policy_reference: string, financial_records_years: int, consent_records_years: int, correspondence_records_years: int, security_records_years: int}
+     * @return array{policy_reference: string, financial_records_years: int, consent_records_years: int, correspondence_records_years: int,
+     *     security_records_years: int, evidence_records_years: int, abandoned_checkout_days: int, operational_records_days: int}
      */
     public function retention(): array
     {
