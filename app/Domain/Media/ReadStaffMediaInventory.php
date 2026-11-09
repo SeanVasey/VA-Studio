@@ -2,8 +2,11 @@
 
 namespace App\Domain\Media;
 
+use App\Domain\Media\Lifecycle\MediaLifecycleInventory;
+use App\Domain\Media\Lifecycle\MediaReferenceProof;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
+use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -24,6 +27,59 @@ final class ReadStaffMediaInventory
         'pending_entitlements' => ['media_asset_id'],
     ];
 
+    /**
+     * FP-034 lifecycle counts per state and upload sessions ({@see MediaLifecycleInventory::summary()}), cheap checks only.
+     * A cached result of {@see proveUnattached()} may be applied. Never deletes or decides deletion.
+     */
+    public function lifecycle(User $actor, int $olderThanDays = 30, ?array $proof = null): array
+    {
+        $this->days($olderThanDays);
+
+        return $this->outsideFence($actor, fn (): array => app(MediaLifecycleInventory::class)->summary($olderThanDays, CarbonImmutable::now(), $proof));
+    }
+
+    /** The bounded full proof of unattached completed families (at most one proof batch). Expensive: run on explicit request. */
+    public function proveUnattached(User $actor, int $olderThanDays = 30): array
+    {
+        $this->days($olderThanDays);
+
+        return $this->outsideFence($actor, fn (): array => app(MediaLifecycleInventory::class)
+            ->candidates($olderThanDays, CarbonImmutable::now(), MediaReferenceProof::MAX_PROOF_FAMILIES));
+    }
+
+    private function days(int $olderThanDays): void
+    {
+        if ($olderThanDays < 1 || $olderThanDays > 3650) {
+            throw ValidationException::withMessages(['inventory' => 'Use an age from 1 to 3650 days.']);
+        }
+    }
+
+    /**
+     * The staff fence (which locks the user row) commits before the read and is taken again after it. The read is
+     * metadata only and changes nothing, so it need not hold the user lock: a revocation during the read is caught by the
+     * second fence and the result is discarded. The read itself runs in its own transaction for one consistent snapshot.
+     */
+    private function outsideFence(User $actor, callable $read): array
+    {
+        if (DB::transactionLevel() !== 0) {
+            throw new LogicException('Media inventory requires a standalone transaction.');
+        }
+        DB::transaction(fn () => $this->fence($actor));
+        $result = DB::transaction($read);
+        DB::transaction(fn () => $this->fence($actor));
+
+        return $result;
+    }
+
+    private function fence(User $actor): void
+    {
+        // Reuse the current persisted staff fence; no media query precedes it.
+        $current = app(MediaWriterActor::class)->authorize($actor);
+        if (! AdminMultiFactor::satisfiedBy($current, lockForUpdate: true)) {
+            throw new AuthorizationException('Admin multi-factor authentication is required.');
+        }
+    }
+
     public function handle(User $actor, int $afterId = 0, int $limit = 50): array
     {
         if (DB::transactionLevel() !== 0) {
@@ -31,11 +87,7 @@ final class ReadStaffMediaInventory
         }
 
         return DB::transaction(function () use ($actor, $afterId, $limit): array {
-            // Reuse the current persisted staff fence; no media query precedes it.
-            $current = app(MediaWriterActor::class)->authorize($actor);
-            if (! AdminMultiFactor::satisfiedBy($current, lockForUpdate: true)) {
-                throw new AuthorizationException('Admin multi-factor authentication is required.');
-            }
+            $this->fence($actor);
             if ($afterId < 0 || $limit < 1 || $limit > self::MAX_ASSETS) {
                 throw ValidationException::withMessages(['inventory' => 'Use a nonnegative asset cursor and a page size from 1 to 100.']);
             }

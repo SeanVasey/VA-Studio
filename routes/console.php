@@ -32,6 +32,13 @@ OperationalSignals::track(Schedule::command('vasey:contract-render-cache-sweep')
 // most the command's default 100; the next run takes the rest. The overlap lock is hygiene only, as above.
 OperationalSignals::track(Schedule::command('vasey:customer-data-exports-prune')->cron('7,22,37,52 * * * *')->withoutOverlapping(10), 'vasey:customer-data-exports-prune');
 
+// FP-034: cleans the chunk files of resumable uploads (track media and sound kits) abandoned past expiry for at least the configured
+// age (48 h by default), marking each retained row cancelled first. Off until a reviewed change sets media.upload_session_sweep.scheduled;
+// never touches completed sessions, assets or originals. :41 keeps it clear of :07/:22/:37/:52, :23, :47 and the 03:17 backup. Its
+// outcome is tracked like the other commands. The overlap lock is hygiene only, as above.
+OperationalSignals::track(Schedule::command('vasey:upload-sessions-sweep --execute')->hourlyAt(41)->withoutOverlapping(10)
+    ->when(fn (): bool => config('media.upload_session_sweep.scheduled') === true), 'vasey:upload-sessions-sweep');
+
 // FP-028 dashboard: one upserted row a minute proves the scheduler itself runs (OperationalSignals; "Scheduler last run" turns
 // Needs attention after `reporting.health.scheduler_heartbeat_stale_seconds`). The tracked commands above record their latest
 // exit outcome the same way, so a failing scheduled command shows Needs attention. No overlap lock: a heartbeat is one upsert.
