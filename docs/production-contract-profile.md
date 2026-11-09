@@ -460,7 +460,12 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
   for the same origin with the gate-off profile. The rows hold license wording shared by every buyer of a version, not
   customer data: the data export never reads them and deletion neither erases nor lists them (`docs/customer-data-rights.md`).
   Descriptors of the #245 shape (`paid-vasey-license-v2-selection-v1`, only ever written in `local`/`testing` with the gate
-  overridden) are still recognized as v2 selections, so they never reach a paid renderer, but refuse `profile_changed`.
+  overridden) are still recognized as v2 selections, so they never reach a paid renderer. A completed original under one
+  still verifies by its frozen digests (`expected()`/`artifactProfileHash()` admit that shape when its inline template and
+  profile match their recorded hashes), so its order keeps finalizing and serving downloads, but it never renders
+  (`profile_changed`). On SQLite a second insert at a stored address is ignored by a trigger, so `INSERT OR REPLACE`
+  (which skips DELETE triggers) cannot replace a row; MySQL's `REPLACE` fires the DELETE trigger and refuses. `down()`
+  also refuses unless the table's triggers are exactly the migration's own.
 - **Activation blockers for this wiring** (review of c5d0ce4c, 2026-11-09):
   - [ ] **Post-payment render refusals.** Selection does not render, so drawability, page or byte limits, `invalid_pdf` and
     `render_failed`, and a signature rotation or pinned-file deploy between selection and render (`signature_changed`,
@@ -474,7 +479,15 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
     inherited environment), or measure its bounds and record an accepted-risk entry.
   - [ ] **Transaction I/O.** `decide()` reads the manifest, metric files and the signature inside the origin transaction
     that holds the order lock. Move the selection outside it (for example, prepare it before the frame and re-check
-    inside) before activation.
+    inside) before activation. `VaseyLicenseContractTexts::retain()` (or at least a check that the stored rows match the
+    prepared bytes) must stay inside the origin transaction when the file reads move out, so no origin ever names a text
+    that is not stored.
+  - [ ] **Key rotation.** v2 contract texts and grant origins are encrypted with the application key. Any `APP_KEY`
+    rotation must keep the old key in `APP_PREVIOUS_KEYS` for as long as those rows are retained, or retained v2 lines
+    stop rendering (`profile_changed`) and origins stop opening. Record this in the rotation runbook before activation.
+  - [ ] **Staff alert on `contract_text_unavailable`.** That branch means a row at a template's or profile's address does
+    not hold those bytes (planted or damaged). The line keeps the existing profile, but staff must be alerted from the
+    `paid_origin.retained`/`paid_tax_origin.retained` audit context before activation.
   - [x] **Payload growth.** A v2 origin carried the template and the v2 profile (about 125–600 KiB per line with a real
     template, against about 23 KiB today), so `PaidGrantExportSection::MAX_PAYLOAD_BYTES` (64 MiB) refused exports at a
     few hundred lines. Done (2026-11-09): the template and profile are stored once by hash (Payload growth above), a v2

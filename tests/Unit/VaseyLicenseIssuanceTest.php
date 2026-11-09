@@ -229,6 +229,22 @@ class VaseyLicenseIssuanceTest extends TestCase
         $retired = [...$profile, 'schema_version' => VaseyLicenseIssuance::RETIRED_DESCRIPTOR_SCHEMA];
         $this->assertTrue(VaseyLicenseIssuance::selected($retired));
         $this->refuses('profile_changed', fn () => $issuance->render($input, $retired));
+        // A #245 descriptor of its real shape (template and profile inline) still verifies its completed original by the
+        // frozen digests, but never renders; one whose inline template no longer matches its hash does neither.
+        $legacy = [...$retired, 'renderer_profile' => VaseyLicenseV2Profile::current(),
+            'contract' => [...$profile['contract'], 'template' => self::SYNTHETIC_TEMPLATE]];
+        $this->assertSame($profile['expected'], VaseyLicenseIssuance::expected($legacy));
+        $this->assertSame($profile['effective_hash'], VaseyLicenseIssuance::artifactProfileHash($legacy));
+        $this->refuses('profile_changed', fn () => $issuance->render($input, $legacy));
+        $this->refuses('profile_changed', fn () => VaseyLicenseIssuance::expected($retired));
+        foreach ([['contract', 'template', self::SYNTHETIC_TEMPLATE.' Edited.'], ['renderer_profile', 'version', 'another']] as [$key, $inner, $value]) {
+            $edited = $legacy;
+            $edited[$key][$inner] = $value;
+            $this->refuses('profile_changed', fn () => VaseyLicenseIssuance::expected($edited));
+            $this->refuses('profile_changed', fn () => VaseyLicenseIssuance::artifactProfileHash($edited));
+        }
+        // The current shape never carries its texts inline.
+        $this->refuses('profile_changed', fn () => VaseyLicenseIssuance::expected([...$profile, 'renderer_profile' => VaseyLicenseV2Profile::current()]));
         $this->refuses('profile_changed', fn () => $issuance->render($input, [...$profile, 'renderer_profile' => VaseyLicenseV2Profile::current()]));
         $mismatched = $profile;
         $mismatched['renderer_profile_sha256'] = str_repeat('d', 64);

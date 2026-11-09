@@ -52,7 +52,8 @@ final class VaseyLicenseIssuance
 
     /**
      * The #245 descriptor, which carried the template and the profile inline (local and testing only, never activated).
-     * Still recognized as a v2 selection, so it never routes to the paid renderers, but it no longer renders.
+     * Still recognized as a v2 selection, so it never routes to the paid renderers, and its frozen digests still verify a
+     * completed original ({@see expected()}, {@see artifactProfileHash()}), but it no longer renders.
      */
     public const RETIRED_DESCRIPTOR_SCHEMA = 'paid-vasey-license-v2-selection-v1';
 
@@ -160,7 +161,7 @@ final class VaseyLicenseIssuance
     /** The input hash and text digest frozen at selection; an issued original is checked against these, never re-rendered. */
     public static function expected(array $profile): array
     {
-        self::shape($profile);
+        self::shape($profile, true);
 
         return $profile['expected'];
     }
@@ -171,7 +172,7 @@ final class VaseyLicenseIssuance
         if (! self::selected($profile)) {
             return CanonicalJson::hash($profile);
         }
-        self::shape($profile);
+        self::shape($profile, true);
 
         return $profile['effective_hash'];
     }
@@ -252,11 +253,20 @@ final class VaseyLicenseIssuance
         }
     }
 
-    private static function shape(array $profile): void
+    /**
+     * The recorded descriptor's shape. Only the frozen-digest readers admit the retired #245 shape (`$retired`), and only
+     * with its inline template and profile matching their recorded hashes; render never does.
+     */
+    private static function shape(array $profile, bool $retired = false): void
     {
         try {
-            $valid = $profile['schema_version'] === self::DESCRIPTOR_SCHEMA && $profile['version'] === VaseyLicenseV2Profile::VERSION
-                && ! array_key_exists('template', $profile['contract']) && ! array_key_exists('renderer_profile', $profile)
+            $current = $profile['schema_version'] === self::DESCRIPTOR_SCHEMA
+                && ! array_key_exists('template', $profile['contract']) && ! array_key_exists('renderer_profile', $profile);
+            $legacy = $retired && $profile['schema_version'] === self::RETIRED_DESCRIPTOR_SCHEMA
+                && is_string($profile['contract']['template']) && is_array($profile['renderer_profile'])
+                && hash_equals((string) $profile['contract']['template_sha256'], hash('sha256', $profile['contract']['template']))
+                && hash_equals((string) $profile['renderer_profile_sha256'], CanonicalJson::hash($profile['renderer_profile']));
+            $valid = ($current || $legacy) && $profile['version'] === VaseyLicenseV2Profile::VERSION
                 && is_string($profile['contract']['producer_alias']) && is_string($profile['contract']['state_province_country'])
                 && preg_match('/\A[a-f0-9]{64}\z/D', (string) $profile['contract']['template_sha256']) === 1
                 && preg_match('/\A[a-f0-9]{64}\z/D', (string) $profile['signature_sha256']) === 1
