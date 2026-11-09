@@ -471,6 +471,8 @@ final class RetentionSchedule
         'production_track_preparation_packets' => 'Staff production preparation packets of catalog offers.',
         'production_track_preparation_packet_lines' => 'Offer lines of a preparation packet.',
         'transactional_mail_scan_progress' => 'Mail scanner cursor positions; no recipient data.',
+        'scheduler_heartbeats' => 'Operational health: scheduled command names and their last success and failure times.',
+        'backup_evidence' => 'Operational health: backup and restore-drill kind, status, size and dump hash; no path or customer data.',
     ];
 
     /** @return array<string, array{table: string, family: ?string, class: string, clock: ?array, rationale: string}> keyed by table */

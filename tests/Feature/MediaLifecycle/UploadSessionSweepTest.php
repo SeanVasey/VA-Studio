@@ -373,10 +373,15 @@ final class UploadSessionSweepTest extends TestCase
         $this->assertCount(1, $events);
         $event = $events->first();
         $this->assertStringContainsString('--execute', (string) $event->command);
-        $this->assertSame(['37 * * * *', true, 10], [$event->expression, $event->withoutOverlapping, $event->expiresAt]);
+        $this->assertSame(['41 * * * *', true, 10], [$event->expression, $event->withoutOverlapping, $event->expiresAt]);
         $this->assertFalse($event->filtersPass($this->app));
         config(['media.upload_session_sweep.scheduled' => true]);
         $this->assertTrue($event->filtersPass($this->app));
+        // Its outcome is tracked for the scheduler dashboard like the other scheduled commands (FP-028).
+        $event->finish($this->app, 1);
+        $row = DB::table('scheduler_heartbeats')->where('task', 'vasey:upload-sessions-sweep')->sole();
+        $this->assertNotNull($row->last_failure_at);
+        $this->assertNull($row->last_success_at);
     }
 
     public function test_a_session_touched_after_selection_is_rechecked_under_its_lock_and_kept(): void

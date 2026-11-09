@@ -286,7 +286,7 @@ Safety: the command refuses to run as root, refuses a private disk that is serve
 
 Before removing anything, the directory is re-checked (same device and inode as inspected, a 0700 directory owned by the sweeping user, no link) and each file is re-checked just before its unlink. A private disk root that is itself a link (a shared `storage/`) is resolved once and every check applies to the real path; the `resumable/` temp root itself must not be a link.
 
-The hourly scheduled `--execute` run (`:37`) is registered but off until a reviewed change sets `media.upload_session_sweep.scheduled` to `true`. Run it as the site user that owns the private disk.
+The hourly scheduled `--execute` run (`:41`, its outcome recorded by `OperationalSignals::track()`) is registered but off until a reviewed change sets `media.upload_session_sweep.scheduled` to `true`. Run it as the site user that owns the private disk.
 
 ### Unattached completed media report
 

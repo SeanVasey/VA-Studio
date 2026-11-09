@@ -3,14 +3,17 @@
 namespace App\Domain\Reporting;
 
 use App\Domain\Commerce\Operations\ReadTestCommerceOperations;
+use App\Domain\Operations\OperationalSignals;
 use App\Models\User;
 use App\Support\Environment\TestEnvironment;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
 /**
- * Read-only operational health from rows the application already stores. Every metric is `ok`, `attention` or
+ * Read-only operational health from rows the application already stores, including the scheduler heartbeat and backup
+ * evidence written by App\Domain\Operations\OperationalSignals. Every metric is `ok`, `attention` or
  * `unavailable`; a source the application cannot read, or evidence it does not record, is never shown as zero.
  * Each section issues a fixed small number of aggregate queries (no per-row work) and takes no locks.
  */
@@ -22,7 +25,7 @@ final class OperationalHealth
         'queue' => 'Background work',
         'commerce' => 'Commerce attention (test commerce)',
         'content' => 'Inquiries and media pipeline',
-        'evidence' => 'Not recorded by the application',
+        'evidence' => 'Scheduler, backups and host',
     ];
 
     /** Labels for metrics that can be marked unavailable when their source cannot be read. */
@@ -36,6 +39,8 @@ final class OperationalHealth
         'refund_reversals' => 'Orders with a recorded refund reversal', 'inquiries_new' => 'Inquiries not yet read',
         'media_failed' => 'Media processing runs failed', 'media_stuck' => 'Media processing runs past their claim lease',
         'media_queued' => 'Media processing runs queued', 'media_quarantined' => 'Uploads still in quarantine',
+        'scheduler_last_run' => 'Scheduler last run (seconds ago)', 'scheduled_task_failures' => 'Scheduled commands whose latest run failed',
+        'backup_last_success' => 'Last successful backup (hours ago)', 'restore_drill_last_success' => 'Last successful restore drill (days ago)',
     ];
 
     public function __construct(private readonly StaffReportingAuthority $authority) {}
@@ -230,14 +235,76 @@ final class OperationalHealth
         }));
     }
 
-    /** @return list<array<string, mixed>> */
+    /**
+     * Scheduler and backup signals recorded by App\Domain\Operations\OperationalSignals. Never recorded is Unavailable, not OK:
+     * a fresh install, a scheduler that never started and a backup script that never called back all look the same.
+     *
+     * @return list<array<string, mixed>>
+     */
     private function evidence(): array
     {
-        return [
-            self::unavailable('scheduler_last_run', 'Scheduler last run', 'The application does not record scheduler runs. Check the scheduler process supervisor on the host (`schedule:work` or the per-minute `schedule:run`).'),
-            self::unavailable('backup_restore', 'Backup and restore evidence', 'No backup or restore result is stored in the database. The backup kit writes its evidence on the host; a restore rehearsal is a manual drill.'),
-            self::unavailable('host_resources', 'Host disk, memory and process health', 'Outside the application; read from the host or the hosting provider.'),
-        ];
+        $limits = config('reporting.health');
+        $metrics = $this->guarded(['scheduler_last_run', 'scheduled_task_failures'], 'scheduler heartbeat', function () use ($limits): array {
+            $rows = DB::table('scheduler_heartbeats')->select(['task', 'last_outcome', 'last_success_at', 'last_failure_at'])->get()->keyBy('task');
+            $heartbeat = $rows->get(OperationalSignals::HEARTBEAT_TASK);
+            $limit = (int) $limits['scheduler_heartbeat_stale_seconds'];
+            if ($limit < 1) {
+                $scheduler = self::unavailable('scheduler_last_run', self::LABELS['scheduler_last_run'], 'The heartbeat threshold is not a positive number of seconds (REPORTING_SCHEDULER_HEARTBEAT_STALE_SECONDS).');
+            } elseif ($heartbeat === null || $heartbeat->last_success_at === null) {
+                $scheduler = self::unavailable('scheduler_last_run', self::LABELS['scheduler_last_run'], 'No scheduler heartbeat has ever been recorded: the scheduler has not run `vasey:scheduler-heartbeat` on this database.');
+            } else {
+                $age = self::ageSeconds($heartbeat->last_success_at);
+                $scheduler = self::metric('scheduler_last_run', self::LABELS['scheduler_last_run'], $age, $age > $limit ? 'attention' : 'ok',
+                    'Last heartbeat at '.$heartbeat->last_success_at.' UTC; attention after '.$limit.' seconds without one.');
+            }
+            $tasks = $rows->except(OperationalSignals::HEARTBEAT_TASK);
+            if ($tasks->isEmpty()) {
+                $failures = self::unavailable('scheduled_task_failures', self::LABELS['scheduled_task_failures'], 'No tracked scheduled command has recorded an outcome yet.');
+            } else {
+                $failed = $tasks->filter(fn (object $row): bool => $row->last_outcome === 'failure')->keys()->sort()->values()->all();
+                $failures = self::metric('scheduled_task_failures', self::LABELS['scheduled_task_failures'], count($failed), $failed === [] ? 'ok' : 'attention',
+                    $failed === [] ? 'The latest run of each of the '.$tasks->count().' commands that have reported succeeded.'
+                        : 'Latest run failed: '.implode(', ', $failed).'. The scheduler log on the host has the output.');
+            }
+
+            return [$scheduler, $failures];
+        });
+        $metrics = array_merge($metrics, $this->guarded(['backup_last_success', 'restore_drill_last_success'], 'backup evidence', fn (): array => [
+            $this->backupMetric('backup_last_success', 'daily', 3600, (int) $limits['backup_stale_hours'], 'hours', 'REPORTING_BACKUP_STALE_HOURS',
+                'No backup run has been recorded. The host backup script records each nightly run with `vasey:backup-record`.'),
+            $this->backupMetric('restore_drill_last_success', 'restore-drill', 86400, (int) $limits['restore_drill_stale_days'], 'days', 'REPORTING_RESTORE_DRILL_STALE_DAYS',
+                'No restore drill has been recorded. Record each drill with `vasey:backup-record --kind=restore-drill`.'),
+        ]));
+        $metrics[] = self::unavailable('host_resources', 'Host disk, memory and process health',
+            'Not read by the application: Forge server monitoring and ops/monitoring/host-baseline.sh cover the host (docs/ops/monitoring-and-host-baseline.md).');
+
+        return $metrics;
+    }
+
+    /** @return array<string, mixed> */
+    private function backupMetric(string $key, string $kind, int $unit, int $limit, string $unitName, string $envKey, string $never): array
+    {
+        if ($limit < 1) {
+            return self::unavailable($key, self::LABELS[$key], "The threshold is not a positive number of {$unitName} ({$envKey}).");
+        }
+        $latest = DB::table('backup_evidence')->where('kind', $kind)->orderByDesc('id')->first(['status', 'recorded_at']);
+        if ($latest === null) {
+            return self::unavailable($key, self::LABELS[$key], $never);
+        }
+        $success = DB::table('backup_evidence')->where('kind', $kind)->where('status', 'ok')->orderByDesc('id')->first(['recorded_at']);
+        $age = $success === null ? null : self::ageSeconds($success->recorded_at);
+        $value = $age === null ? 'never' : intdiv($age, $unit);
+        $since = $success === null ? 'No successful run has been recorded.' : 'Last success recorded '.$success->recorded_at.' UTC.';
+        if ($latest->status !== 'ok') {
+            return self::metric($key, self::LABELS[$key], $value, 'attention', 'The latest run, recorded '.$latest->recorded_at.' UTC, failed. '.$since);
+        }
+
+        return self::metric($key, self::LABELS[$key], $value, $age > $limit * $unit ? 'attention' : 'ok', $since.' Attention after '.$limit.' '.$unitName.'.');
+    }
+
+    private static function ageSeconds(string $at): int
+    {
+        return max(0, now()->utc()->timestamp - CarbonImmutable::parse($at, 'UTC')->timestamp);
     }
 
     /**

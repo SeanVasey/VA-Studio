@@ -4,9 +4,9 @@
 #
 #   scheduler-liveness-check.sh [--kit production|staging] [--conf FILE] [--workers] [--max-silence SECONDS] [--log-file FILE]
 #
-# The application has no scheduler heartbeat of its own: routes/console.php runs vasey:publish-scheduled-site-release every
-# minute, and nothing it does leaves a durable trace when no release is due. This check therefore combines three signals
-# that need no application change:
+# The application's own heartbeat (vasey:scheduler-heartbeat, a `scheduler_heartbeats` row a minute) is shown on the admin
+# dashboard only and alerts nobody, and reading it here would need database access. This check therefore combines three
+# signals from the host:
 #   1. supervisor reports <group>:<group>-scheduler RUNNING (not just recently restarted);
 #   2. an `artisan schedule:work` process of the application user runs from the served release (`current`), so a scheduler
 #      left on an old release after a deploy is caught;
@@ -15,8 +15,8 @@
 #      without it, the journal: the production workers log through supervisor's stdout_syslog, which tags the program name
 #      into each line.
 # --workers also requires the media, payments, contracts and default workers RUNNING on the served release.
-# A ready-made dead-man's switch for the scheduler would be a reviewed application change (a ping on schedule success);
-# this script is what can be done without one. Exit: 0 OK, 1 WARN, 2 CRIT, 3 UNKNOWN.
+# A dead-man's switch (an outbound ping on schedule success) is still not built; this script is the alerting path.
+# Exit: 0 OK, 1 WARN, 2 CRIT, 3 UNKNOWN.
 set -uo pipefail
 export LC_ALL=C PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
