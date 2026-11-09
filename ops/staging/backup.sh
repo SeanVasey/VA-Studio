@@ -663,6 +663,34 @@ prune_local() {
     | sort -r | tail -n +"$((keep + 1))" | while IFS= read -r d; do rm -rf --one-file-system -- "${VASEY_BACKUP_DIR:?}/$d"; done
 }
 
+# ---- dashboard evidence (FP-028, docs/staff-reporting.md) ----
+# Best effort: appends one row through `artisan vasey:backup-record` as the application user on the served release. It never
+# changes the backup's own outcome or exit status: a failure to record is a logged WARNING, and the dashboard then shows the
+# backup as stale once its age passes REPORTING_BACKUP_STALE_HOURS. Sends a kind, a status, the set's byte count and the dump's
+# SHA-256 only: never a path, host name, credential or row. Its output is discarded, so nothing the application prints reaches
+# this log.
+record_evidence() {  # record_evidence KIND ok|failed [SET_DIR]
+  local kind=$1 status=$2 bk=${3:-} cur='' bytes='' sha=''
+  local -a args=(--kind="$kind" --status="$status")
+  if [ -L "$VASEY_ROOT/current" ]; then cur=$(readlink -f -- "$VASEY_ROOT/current" 2>/dev/null) || cur=''; fi
+  if [ -z "$cur" ] || [ ! -f "$cur/artisan" ] || [ -z "${VASEY_PHP:-}" ]; then
+    log "WARNING: no served release or PHP binary; the $kind $status result was not recorded on the dashboard"
+    return 0
+  fi
+  if [ "$status" = ok ] && [ -n "$bk" ] && [ -d "$bk" ] && [ ! -L "$bk" ]; then
+    bytes=$(find "$bk" -maxdepth 1 -type f -printf '%s\n' 2>/dev/null | awk '{ s += $1 } END { printf "%.0f", s }') || bytes=''
+    sha=$(head -c 64 -- "$bk/database.sql.sha256" 2>/dev/null) || sha=''
+    [[ "$bytes" =~ ^[1-9][0-9]{0,15}$ ]] && args+=(--bytes="$bytes")
+    [[ "$sha" =~ ^[0-9a-f]{64}$ ]] && args+=(--sha256="$sha")
+  fi
+  if (cd -- "$cur" && timeout 120 runuser -u "$VASEY_APP_USER" -- env -i PATH=/usr/bin:/bin LC_ALL=C \
+      "$VASEY_PHP" "$cur/artisan" vasey:backup-record "${args[@]}" --no-interaction --no-ansi) </dev/null >/dev/null 2>&1 9>&-; then
+    log "recorded $kind $status on the dashboard"
+  else
+    log "WARNING: could not record $kind $status on the dashboard; the backup result stands"
+  fi
+}
+
 case "${1:-}" in
   nightly)
     install -d -m 0700 -o root -g root -- "$VASEY_BACKUP_DIR"
@@ -675,6 +703,10 @@ case "${1:-}" in
     "$CTL" snapshot || snapshot_status=$?
     # Resume even when the snapshot failed: a failed backup must not leave the site down overnight.
     if [ -L "$VASEY_ROOT/current" ]; then "$CTL" resume; fi
+    # After the resume, so the application can take the row. A run that stops before the snapshot (lock held, quiesce
+    # refused) or a failed resume records nothing; the dashboard then turns stale instead of showing a fresh success.
+    if [ "$snapshot_status" = 0 ]; then record_evidence daily ok "$(cat -- "$VASEY_BACKUP_DIR/.last" 2>/dev/null || true)"
+    else record_evidence daily failed; fi
     [ "$snapshot_status" = 0 ] || die "snapshot, restore proof or shipping failed; resume completed if a release was served"
     prune_local
     prune_remote || log "WARNING: remote retention did not complete; the remote keeps its sets until the next successful run"

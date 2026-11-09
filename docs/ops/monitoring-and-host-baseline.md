@@ -31,18 +31,23 @@ is Sean's choice; none is selected and none is configured.
 
 ### Scheduler: what can and cannot be known
 
-The application has **no scheduler heartbeat**. `routes/console.php` schedules three commands, each with a short overlap lock:
-`vasey:publish-scheduled-site-release` every minute, `vasey:cache-prune-expired` hourly at :23 (expired database-cache rows
-only) and `vasey:contract-render-cache-sweep` hourly at :47 (contract renderer workspaces left at least an hour in `contracts/render-cache`,
-`paid-render-cache`, `paid-tax-render-cache` and `member-render-cache`, one count line per cache). The
-scheduler must run as the site user that renders contracts: the sweep refuses to run as root and removes only its own
-user's workspaces. Nothing either does leaves a durable record when there is nothing to do. The check therefore combines
-three signals that need no application change: supervisor state, the process's working directory against `current`, and the line
+`routes/console.php` schedules five commands: `vasey:publish-scheduled-site-release` every minute, `vasey:cache-prune-expired`
+hourly at :23 (expired database-cache rows only) and `vasey:contract-render-cache-sweep` hourly at :47 (contract renderer workspaces
+left at least an hour in `contracts/render-cache`, `paid-render-cache`, `paid-tax-render-cache` and `member-render-cache`, one count
+line per cache) and `vasey:customer-data-exports-prune` at :07, :22, :37 and :52 (expired customer data export ciphertext only), each
+with a short overlap lock, and `vasey:scheduler-heartbeat` every minute. The scheduler must run as the site
+user that renders contracts: the sweep refuses to run as root and removes only its own user's workspaces.
+
+The heartbeat upserts one `scheduler_heartbeats` row, and the other four record their latest exit outcome the same way (FP-028,
+`docs/staff-reporting.md`, "Scheduler and backup signals"). The admin dashboard shows the heartbeat's age (Needs attention after
+`REPORTING_SCHEDULER_HEARTBEAT_STALE_SECONDS`, 300 s by default) and any command whose latest run failed. The dashboard is something
+staff look at, not an alert: nothing pages anyone when it turns stale, so this host check stays the alerting path. It combines
+three host signals and reads no database: supervisor state, the process's working directory against `current`, and the line
 `schedule:work` prints each minute (`Running ['artisan' vasey:publish-scheduled-site-release]`, observed locally; the hourly
 prune adds one line at :23 and is not what the check looks for). Production
 workers log through supervisor's `stdout_syslog`, which prefixes each line with the program name; staging writes
-`/var/log/vasey-staging/scheduler.log`, so use `--log-file` there. A real dead-man's-switch for the scheduler would be a reviewed
-application change (a ping on schedule success).
+`/var/log/vasey-staging/scheduler.log`, so use `--log-file` there. A real dead-man's-switch for the scheduler (an outbound ping on
+schedule success) is still not built: the heartbeat row is readable on the dashboard only.
 
 ### Installing and scheduling (example, not installed by the kit)
 
@@ -61,9 +66,20 @@ monitor should hold, create `vasey_monitor@127.0.0.1` with `SELECT` on `jobs` an
 
 ### Not covered here
 
-Web error rate and latency, paid-to-fulfilled delay, document and delivery failures, private-disk capacity and integrity,
-database health and backup freshness (the restore proof's `RESTORE_CHECK` age is the obvious signal). They are listed in the
-readiness guide and have no script yet.
+Web error rate and latency, paid-to-fulfilled delay, document and delivery failures, private-disk capacity and integrity, and
+database health. They are listed in the readiness guide and have no script yet.
+
+**Backup freshness** is on the admin dashboard, not in a script: the nightly run of `ops/staging/backup.sh` (and the production
+kit's derived copy) records its outcome with `php artisan vasey:backup-record` after the resume, best effort (a failure to record
+is a logged WARNING and never fails the backup). The dashboard shows Needs attention when the latest run failed or the last success
+is older than `REPORTING_BACKUP_STALE_HOURS` (26), and for restore drills, recorded by hand with `--kind=restore-drill`, after
+`REPORTING_RESTORE_DRILL_STALE_DAYS` (35). The change adds only that call to the backup helper; it changes no provisioning. The
+installed helper is a root copy that `provision.sh` installs, so `forge-deploy.sh` refuses (installed kit helpers differ) until the
+host is reprovisioned with the release that carries it.
+
+**Host health is not read by the application** and the dashboard shows it as Unavailable on purpose: disk, memory, load and process
+health come from Forge's server monitoring and `host-baseline.sh` below. Recording them in the application database would duplicate
+the host's own monitoring and still go silent exactly when the host is unhealthy.
 
 ## Host baseline
 

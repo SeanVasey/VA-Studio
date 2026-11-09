@@ -2,7 +2,8 @@
 
 /*
  * Staff reporting and operations views (lane REP: FP-028, FP-089, FP-090). Read-only; the only writes are append-only
- * audit rows for exports.
+ * audit rows for exports. The scheduler heartbeat and backup evidence the dashboard reads are written elsewhere
+ * (App\Domain\Operations\OperationalSignals).
  *
  * The operational dashboard and the sales report are on for staff with the admin panel's authority and MFA. The customer
  * segmentation mechanism is default-off: which customers may be segmented, for which purpose and with which processors
@@ -32,5 +33,10 @@ return [
         'queued_media_age_attention_seconds' => 900,
         'receipt_age_attention_seconds' => 900,
         'inquiry_age_attention_seconds' => 172800,
+        // Operational signals (OperationalSignals). Not secrets; an operator may tune them per host. A value below 1 makes the
+        // metric Unavailable (misconfigured) rather than permanently OK or permanently Needs attention.
+        'scheduler_heartbeat_stale_seconds' => (int) env('REPORTING_SCHEDULER_HEARTBEAT_STALE_SECONDS', 300),
+        'backup_stale_hours' => (int) env('REPORTING_BACKUP_STALE_HOURS', 26),
+        'restore_drill_stale_days' => (int) env('REPORTING_RESTORE_DRILL_STALE_DAYS', 35),
     ],
 ];
