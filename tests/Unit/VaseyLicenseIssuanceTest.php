@@ -120,6 +120,20 @@ class VaseyLicenseIssuanceTest extends TestCase
         $this->assertSame([null, 'no_contract_source'], VaseyLicenseIssuance::decide($input));
         $this->app->offsetUnset(VaseyLicenseContractSource::class);
         $this->assertSame([null, 'no_contract_source'], VaseyLicenseIssuance::decide($input));
+        // A source that throws, and an unexpected runtime error while building (terms that are not an array reach the
+        // binder's typed signature), keep the existing profile instead of escaping into the locked finalization.
+        $this->app->instance(VaseyLicenseContractSource::class, new class implements VaseyLicenseContractSource
+        {
+            public function contract(array $license): ?array
+            {
+                throw new \RuntimeException('synthetic contract source failure');
+            }
+        });
+        $this->assertSame([null, 'no_contract_source'], VaseyLicenseIssuance::decide($input));
+        $this->bindSyntheticContractSource();
+        $broken = $input;
+        $broken['source']['license']['structured_terms'] = 'not-an-array';
+        $this->assertSame([null, 'not_renderable'], VaseyLicenseIssuance::decide($broken));
         $this->bindSyntheticContractSource(self::SYNTHETIC_TEMPLATE.str_repeat("\n\nPadding paragraph.", 20000));
         $this->assertSame([null, 'template_too_large'], VaseyLicenseIssuance::decide($input));
         $this->bindSyntheticContractSource();
@@ -158,6 +172,42 @@ class VaseyLicenseIssuanceTest extends TestCase
         $retained = $profile;
         $retained['renderer_profile']['colors']['band'] = '#000000';
         $this->refuses('profile_changed', fn () => $issuance->render($input, $retained));
+        // The recorded profile hash must be the recorded profile's, checked before any render (review P3).
+        $rehashed = $retained;
+        $rehashed['renderer_profile_sha256'] = CanonicalJson::hash($retained['renderer_profile']);
+        $rehashed['effective_hash'] = CanonicalJson::hash(['profile_sha256' => $rehashed['renderer_profile_sha256'], 'signature_sha256' => $profile['signature_sha256']]);
+        $this->refuses('profile_changed', fn () => $issuance->render($input, $rehashed));
+        $mismatched = $profile;
+        $mismatched['renderer_profile_sha256'] = str_repeat('d', 64);
+        $mismatched['effective_hash'] = CanonicalJson::hash(['profile_sha256' => $mismatched['renderer_profile_sha256'], 'signature_sha256' => $profile['signature_sha256']]);
+        $this->refuses('profile_changed', fn () => $issuance->render($input, $mismatched));
+        // Checked before the signature or anything else is read: with the signature gone it still refuses as a changed profile.
+        $signaturePath = Storage::disk('local')->path(config('contracts.vasey_license_v1.signature_path'));
+        $signatureBytes = file_get_contents($signaturePath);
+        unlink($signaturePath);
+        try {
+            $this->refuses('profile_changed', fn () => $issuance->render($input, $mismatched));
+            $this->refuses('signature_unavailable', fn () => $issuance->render($input, $profile));
+        } finally {
+            file_put_contents($signaturePath, $signatureBytes);
+        }
+        // A template hash that does not match the frozen template refuses, even with the template itself unchanged.
+        $template = $profile;
+        $template['contract']['template_sha256'] = str_repeat('e', 64);
+        $this->refuses('profile_changed', fn () => $issuance->render($input, $template));
+        // The recorded purpose and provenance must be the input's.
+        foreach (['purpose' => 'paid-license-grant', 'provenance' => 'verified_production'] as $key => $value) {
+            $relabelled = $profile;
+            $relabelled[$key] = $value;
+            $this->refuses('profile_changed', fn () => $issuance->render($input, $relabelled));
+        }
+        // Defence in depth: outside local and testing a recorded selection never renders.
+        $this->app['env'] = 'production';
+        try {
+            $this->refuses('profile_changed', fn () => $issuance->render($input, $profile));
+        } finally {
+            $this->app['env'] = 'testing';
+        }
         $this->refuses('profile_changed', fn () => VaseyLicenseIssuance::expected(['schema_version' => 1]));
 
         // Another buyer, another family or another purpose is not the frozen document.

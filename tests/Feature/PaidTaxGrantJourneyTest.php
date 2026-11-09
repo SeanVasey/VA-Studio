@@ -208,6 +208,7 @@ class PaidTaxGrantJourneyTest extends TestCase
         $body = PaidTaxRecords::decode($originRow);
         $this->assertTrue(VaseyLicenseIssuance::selected($body['profile']));
         $this->assertSame([VaseyLicenseV2Profile::VERSION, 'paid-tax-license-grant'], [$body['profile']['version'], $body['profile']['purpose']]);
+        $this->assertSame(['selected'], json_decode(DB::table('audit_events')->where('action', 'paid_tax_origin.retained')->sole()->context, true)['contract_profile_selection']);
 
         config(['contracts.vasey_license_v2_issuance' => false]);
         $complete = (new PaidTaxDocuments)->prepare($f['retained']['id'], $f['buyer']['principal'], $f['buyer']['user']);
@@ -237,6 +238,7 @@ class PaidTaxGrantJourneyTest extends TestCase
         $f = $this->paidV2TaxOrder();
         $body = PaidTaxRecords::decode((array) DB::table('paid_tax_grant_origins')->sole());
         $this->assertSame(CanonicalJson::encode(PaidTaxRenderProfile::current('synthetic_rehearsal')), CanonicalJson::encode($body['profile']));
+        $this->assertSame(['origin_hash'], array_keys(json_decode(DB::table('audit_events')->where('action', 'paid_tax_origin.retained')->sole()->context, true)));
         config(['contracts.vasey_license_v2_issuance' => true]);
         $this->assertTrue((new PaidTaxDocuments)->prepare($f['retained']['id'], $f['buyer']['principal'], $f['buyer']['user'])['fulfilled']);
         $manifest = PaidTaxRecords::decode((array) DB::table('paid_tax_originals')->sole());

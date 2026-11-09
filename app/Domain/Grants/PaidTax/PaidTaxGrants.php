@@ -102,6 +102,7 @@ final class PaidTaxGrants
                         'provider_account' => $lines[0]['provider_account'], 'funds_mode' => $lines[0]['funds_mode'],
                         'provider_session_id' => $lines[0]['provider_session_id'], 'provider_payment_id' => $lines[0]['provider_payment_id'], 'line_count' => count($lines),
                         ...PaidTaxRecords::encode($batchPayload), 'created_at' => $at->format('Y-m-d H:i:s')], $rows);
+                    $selections = [];
                     foreach ($lines as $index => $line) {
                         $originId = (string) Str::uuid();
                         PaidTaxException::require($line['order_id'] === $orderId && $line['buyer'] === $original
@@ -113,7 +114,8 @@ final class PaidTaxGrants
                             'profile' => null];
                         // Contract increment 5: the v2 license renderer for new originals only, behind its own gate; the
                         // choice is frozen here and every render, retry and replay uses it (VaseyLicenseIssuance).
-                        $payload['profile'] = VaseyLicenseIssuance::decide(PaidTaxRenderInput::fromOrigin($payload))[0] ?? PaidTaxRenderProfile::current($line['provenance']);
+                        [$selected, $selections[]] = VaseyLicenseIssuance::decide(PaidTaxRenderInput::fromOrigin($payload));
+                        $payload['profile'] = $selected ?? PaidTaxRenderProfile::current($line['provenance']);
                         (new PaidTaxText)->build(PaidTaxRenderInput::fromOrigin($payload));
                         $origin = PaidTaxRecords::insert('paid_tax_grant_origins', ['public_id' => $originId, 'batch_id' => (int) $batch['id'], 'position' => $index + 1,
                             'line_public_id' => $line['line_id'], 'line_hash' => $line['line_hash'], 'source_hash' => $line['source_hash'],
@@ -124,7 +126,9 @@ final class PaidTaxGrants
                     $subject = new PaidTaxOrderOrigin;
                     $subject->setRawAttributes($batch, true);
                     $subject->exists = true;
-                    AuditEvent::recordAttributed('paid_tax_origin.retained', $subject, ['origin_hash' => $batch['payload_hash']], (int) $current['user_id']);
+                    AuditEvent::recordAttributed('paid_tax_origin.retained', $subject, ['origin_hash' => $batch['payload_hash'],
+                        // Contract increment 5: each line's profile selection branch (a code, never buyer data); absent while the gate is off.
+                        ...(array_unique($selections) === ['gate_off'] ? [] : ['contract_profile_selection' => $selections])], (int) $current['user_id']);
                 }
                 PaidTaxException::require((int) $batch['account_id'] === $current['account_id'] && (int) $batch['actor_id'] === $current['user_id'], 404);
                 $graph = $this->graph($batch['public_id'], $current['account_id'], $rows);

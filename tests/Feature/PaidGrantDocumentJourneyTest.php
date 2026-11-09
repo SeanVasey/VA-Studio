@@ -32,6 +32,7 @@ use App\Domain\Grants\Paid\PaidGrantRenderProfile;
 use App\Domain\Grants\Paid\PaidGrantRows;
 use App\Domain\Grants\Paid\PaidGrants;
 use App\Domain\Grants\Paid\PaidGrantSchema;
+use App\Domain\Grants\VaseyLicenseContractSource;
 use App\Domain\Grants\VaseyLicenseIssuance;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
@@ -272,6 +273,7 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $this->assertSame([VaseyLicenseV2Profile::VERSION, 'paid-license-grant', self::SYNTHETIC_TEMPLATE],
             [$origin['profile']['version'], $origin['profile']['purpose'], $origin['profile']['contract']['template']]);
         $originRow = (array) DB::table('paid_grant_origins')->sole();
+        $this->assertSame(['selected'], $this->retainedSelection('paid_origin.retained'));
 
         // The gate flips off before the render: the recorded profile still decides it.
         config(['contracts.vasey_license_v2_issuance' => false]);
@@ -318,6 +320,8 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $f = $this->paidV2Order();
         $origin = PaidGrantRecords::decode((array) DB::table('paid_grant_origins')->sole());
         $this->assertSame(CanonicalJson::encode(PaidGrantRenderProfile::current('synthetic_rehearsal')), CanonicalJson::encode($origin['profile']));
+        // Gate off: the audit context is exactly what it was before the wiring.
+        $this->assertSame(['origin_hash'], array_keys(json_decode(DB::table('audit_events')->where('action', 'paid_origin.retained')->sole()->context, true)));
 
         config(['contracts.vasey_license_v2_issuance' => true]);
         $complete = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
@@ -329,12 +333,40 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $this->assertStringNotContainsString('vasey-license-pdf-v2', $bytes);
     }
 
+    /** The selection branch recorded in the `paid_origin.retained` audit context, one code per line, or null when absent. */
+    private function retainedSelection(string $action): ?array
+    {
+        return json_decode(DB::table('audit_events')->where('action', $action)->sole()->context, true)['contract_profile_selection'] ?? null;
+    }
+
+    /**
+     * Review P2-b: selection runs inside the locked origin transaction after payment, so a contract source that throws
+     * never refuses the paid order: finalization succeeds with the existing profile and records why.
+     */
+    public function test_a_throwing_contract_source_keeps_the_existing_paid_profile_and_records_the_branch(): void
+    {
+        $this->enableV2Issuance();
+        app()->instance(VaseyLicenseContractSource::class, new class implements VaseyLicenseContractSource
+        {
+            public function contract(array $license): ?array
+            {
+                throw new \RuntimeException('synthetic contract source failure');
+            }
+        });
+        $f = $this->paidV2Order();
+        $origin = PaidGrantRecords::decode((array) DB::table('paid_grant_origins')->sole());
+        $this->assertSame(CanonicalJson::encode(PaidGrantRenderProfile::current('synthetic_rehearsal')), CanonicalJson::encode($origin['profile']));
+        $this->assertSame(['no_contract_source'], $this->retainedSelection('paid_origin.retained'));
+        $this->assertTrue((new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'])['fulfilled']);
+    }
+
     public function test_a_name_only_order_keeps_the_existing_paid_profile_with_the_v2_issuance_gate_on(): void
     {
         $this->enableV2Issuance();
         $f = $this->retained();
         $origin = PaidGrantRecords::decode((array) DB::table('paid_grant_origins')->sole());
         $this->assertSame(['identity_meaning', 'legal_name'], array_keys($origin['source']['buyer_declarations']));
+        $this->assertSame(['name_only_declaration'], $this->retainedSelection('paid_origin.retained'));
         $this->assertSame(CanonicalJson::encode(PaidGrantRenderProfile::current('synthetic_rehearsal')), CanonicalJson::encode($origin['profile']));
         $this->assertTrue((new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'])['fulfilled']);
     }

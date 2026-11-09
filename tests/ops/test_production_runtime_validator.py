@@ -277,6 +277,31 @@ class ProductionRuntimeValidator(unittest.TestCase):
         self.assertIn("$check('holds.vasey_license_v2_issuance', config('contracts.vasey_license_v2_issuance') === false);", text)
         self.assertEqual(self.validate(profile()).returncode, 0)
 
+    def test_the_v2_license_issuance_literal_flipped_to_true_fails_the_validator(self):
+        # A shadow project (symlinks to this checkout, a copied validator, bootstrap and config) whose only change is the
+        # literal: the validator run from it must refuse, so lifting the gate is a reviewed change to this hold.
+        shadow = self.dir / "shadow"
+        shadow.mkdir()
+        for name in ("app", "vendor", "scripts", "routes", "resources", "database", "public", "storage", "composer.json", "artisan"):
+            (shadow / name).symlink_to(REPO / name)
+        shutil.copytree(REPO / "bootstrap", shadow / "bootstrap")
+        shutil.copytree(REPO / "config", shadow / "config")
+        (shadow / "ops/production").mkdir(parents=True)
+        shutil.copy2(VALIDATOR, shadow / "ops/production/validate-runtime.php")
+        contracts = shadow / "config/contracts.php"
+        source = contracts.read_text()
+        self.assertEqual(source.count("'vasey_license_v2_issuance' => false,"), 1)
+
+        def run():
+            self.file.write_text(profile())
+            self.file.chmod(0o600)
+            return subprocess.run([PHP, str(shadow / "ops/production/validate-runtime.php"), str(self.file), "production", HOST, "vasey_production"],
+                                  cwd=shadow, env={"PATH": os.environ.get("PATH", "/usr/bin:/bin")}, capture_output=True, text=True, timeout=120)
+
+        self.assertEqual(run().returncode, 0)
+        contracts.write_text(source.replace("'vasey_license_v2_issuance' => false,", "'vasey_license_v2_issuance' => true,"))
+        self.failed(run(), "holds.vasey_license_v2_issuance")
+
     def test_the_documented_off_values_are_accepted_and_a_blank_assignment_is_not(self):
         for value in ("false", "(false)"):
             with self.subTest(value=value):

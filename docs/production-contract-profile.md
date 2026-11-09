@@ -426,8 +426,14 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
 - **Selection rule**, once per line at origin creation (paid-grant finalization, after the payment is recorded): the gate is
   on; the declaration is a v2 one; it re-verifies against checkout's printable set; a `VaseyLicenseContractSource` is bound
   and returns a template and the two license constants for the line's license version; the configured signature reads and
-  matches its pin; and the line binds (schema 5 terms) and its document builds under the v2 input rule. Otherwise the line
-  keeps the family's existing profile, so a paid line is never refused because of the switch. Nothing in the application
+  matches its pin; and the line binds (schema 5 terms) and its document builds under the v2 input rule. Otherwise, including
+  on any unexpected failure while selecting (a throwing source, a runtime error), the line keeps the family's existing
+  profile, so **selection** never refuses a paid line. Each line's branch code (`selected`, `gate_off`,
+  `name_only_declaration`, `identity_held`, `no_contract_source`, `template_too_large`, `signature_unavailable`,
+  `not_renderable`; never buyer data) is recorded as `contract_profile_selection` in the `paid_origin.retained` /
+  `paid_tax_origin.retained` audit context; while the gate is off the context is unchanged. Selection builds the document
+  but does not render it, so a refusal only rendering finds can still fail a selected line after payment (see the
+  activation blockers below). Nothing in the application
   binds `VaseyLicenseContractSource` yet: contract increment 1 supplies the text, and tests bind a synthetic source.
 - **Recorded profile.** The origin's `profile` becomes a selection descriptor (`paid-vasey-license-v2-selection-v1`): the
   template and constants, the signature pin, the v2 profile and its hash, the effective hash (profile and signature), and the
@@ -438,9 +444,26 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
   A completed v2 original is checked against the frozen digests and never re-rendered or re-bound.
 - **Gate off.** Origins record `PaidGrantRenderProfile::current()` / `PaidTaxRenderProfile::current()` as before, and the
   stored originals equal the existing isolated renderers' bytes (journey tests compare them).
-- **Not yet:** the v2 render runs in the PHP worker, not in an isolated child process like the paid renderers (its renderer
-  needs the application's binder, validator and private-disk signature rules). Decide before activation whether that is
-  acceptable or whether a child script is needed.
+- **Render-time defence.** A recorded selection renders only in `local` or `testing`, and its recorded profile hash must be
+  the hash of the recorded profile before anything is rendered.
+- **Activation blockers for this wiring** (review of c5d0ce4c, 2026-11-09):
+  - [ ] **Post-payment render refusals.** Selection does not render, so drawability, page or byte limits, `invalid_pdf` and
+    `render_failed`, and a signature rotation or pinned-file deploy between selection and render (`signature_changed`,
+    `profile_changed`) fail a paid line's attempts up to `MAX_ATTEMPTS`, with no staff record. This matches the existing
+    paid profiles' behaviour for a changed profile, but before activation either dry-render at selection (outside the
+    origin transaction) or route v2 render refusals to a staff hold like `ContractIdentityHolds`.
+  - [ ] **Runbook rule.** No signature rotation and no change to a pinned v2 file while any v2 origin is unrendered.
+  - [ ] **Isolation.** The v2 render runs in the PHP worker, not in an isolated child process like the paid renderers (its
+    renderer needs the application's binder, validator and private-disk signature rules). Render it in a child with the same
+    limits as `PaidGrantRendererProcess` (memory, time, input and output bytes, `open_basedir`, disabled functions, no
+    inherited environment), or measure its bounds and record an accepted-risk entry.
+  - [ ] **Transaction I/O.** `decide()` reads the manifest, metric files and the signature inside the origin transaction
+    that holds the order lock. Move the selection outside it (for example, prepare it before the frame and re-check
+    inside) before activation.
+  - [ ] **Payload growth.** A v2 origin carries the template and the v2 profile (about 125–600 KiB per line with a real
+    template, against about 23 KiB today). `PaidGrantExportSection::MAX_PAYLOAD_BYTES` (64 MiB, sized for today's lines)
+    must be re-estimated, or the template stored once by hash, before activation. Its comments are accurate for today's
+    gate-off payloads and are unchanged.
 - Tests: `VaseyLicenseIssuanceTest`, the wiring-condition tests in `VaseyLicenseV2PdfRendererTest`, gate-on and gate-off
   journeys in `PaidGrantDocumentJourneyTest` and `PaidTaxGrantJourneyTest`, and the production hold in `tests/ops`.
 

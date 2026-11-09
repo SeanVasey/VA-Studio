@@ -35,8 +35,11 @@ use Throwable;
  * 5. the line binds and its document builds under the v2 input rule now, and the configured signature reads and matches
  *    its pin.
  *
- * Anything else keeps the family's existing profile (its prior behaviour and bytes), so a paid line is never refused because
- * of this switch. Once an origin exists its recorded profile decides every render, retry and replay, whatever the gate says
+ * Anything else, including any unexpected failure while selecting, keeps the family's existing profile (its prior behaviour
+ * and bytes), so selection never refuses a paid line. Selection builds the document but does not render it: a refusal that
+ * only rendering finds (drawability, page or byte limits, `invalid_pdf`/`render_failed`, or a signature rotation or pinned-file
+ * change before the render) fails that line's attempts after payment, as a changed paid profile does today (an activation
+ * blocker in docs/production-contract-profile.md). Once an origin exists its recorded profile decides every render, retry and replay, whatever the gate says
  * later; nothing here ever re-renders a completed original.
  */
 final class VaseyLicenseIssuance
@@ -66,10 +69,24 @@ final class VaseyLicenseIssuance
      * `selected`, `gate_off`, `name_only_declaration`, `identity_held`, `no_contract_source`, `template_too_large`,
      * `signature_unavailable` or `not_renderable`.
      *
+     * Selection never throws: it runs inside the issuer's locked origin transaction after the payment is recorded, so any
+     * unexpected failure (a throwing contract source, a runtime error) keeps the existing profile instead of refusing the
+     * paid order. The issuers record the returned branch code in their `paid_origin.retained` audit context.
+     *
      * @param  array  $input  The line's frozen render input (`PaidGrantRenderInput` or `PaidTaxRenderInput`).
      * @return array{0: array|null, 1: string}
      */
     public static function decide(array $input): array
+    {
+        try {
+            return self::select($input);
+        } catch (Throwable) {
+            return [null, 'not_renderable'];
+        }
+    }
+
+    /** @return array{0: array|null, 1: string} */
+    private static function select(array $input): array
     {
         if (! self::enabled()) {
             return [null, 'gate_off'];
@@ -81,8 +98,12 @@ final class VaseyLicenseIssuance
         if (ProductionCheckout::contractIdentityHeld($declaration)) {
             return [null, 'identity_held'];
         }
-        $contract = app()->bound(VaseyLicenseContractSource::class)
-            ? app(VaseyLicenseContractSource::class)->contract($input['source']['license'] ?? []) : null;
+        try {
+            $contract = app()->bound(VaseyLicenseContractSource::class)
+                ? app(VaseyLicenseContractSource::class)->contract($input['source']['license'] ?? []) : null;
+        } catch (Throwable) {
+            $contract = null;
+        }
         if (! is_array($contract) || ! is_string($contract['template'] ?? null) || ! ($contract['constants'] ?? null) instanceof ContractLicenseConstants) {
             return [null, 'no_contract_source'];
         }
@@ -92,7 +113,7 @@ final class VaseyLicenseIssuance
         try {
             $signature = VaseyLicenseSignature::fromConfig();
             $signature->read();
-        } catch (ContractIssuanceException) {
+        } catch (Throwable) {
             return [null, 'signature_unavailable'];
         }
         $constants = $contract['constants'];
@@ -106,7 +127,7 @@ final class VaseyLicenseIssuance
             $profile = VaseyLicenseV2Profile::current();
             $profileSha256 = VaseyLicenseV2Profile::hash($profile);
             $document = self::document(new VaseyLicenseV2PdfRenderer, $input, $descriptor);
-        } catch (ContractBindingException|ContractIssuanceException) {
+        } catch (Throwable) {
             return [null, 'not_renderable'];
         }
 
@@ -141,6 +162,10 @@ final class VaseyLicenseIssuance
     public function render(array $input, array $profile): RenderedContract
     {
         ContractIo::outsideTransactions();
+        // Defence in depth: a recorded v2 selection renders only where the gate could have admitted it.
+        if (! app()->environment('local', 'testing')) {
+            throw new ContractIssuanceException('profile_changed');
+        }
         self::shape($profile);
         try {
             self::family($input);
@@ -195,6 +220,7 @@ final class VaseyLicenseIssuance
                 && preg_match('/\A[a-f0-9]{64}\z/D', (string) $profile['contract']['template_sha256']) === 1
                 && preg_match('/\A[a-f0-9]{64}\z/D', (string) $profile['signature_sha256']) === 1
                 && preg_match('/\A[a-f0-9]{64}\z/D', (string) $profile['renderer_profile_sha256']) === 1
+                && hash_equals($profile['renderer_profile_sha256'], CanonicalJson::hash($profile['renderer_profile']))
                 && hash_equals($profile['effective_hash'], CanonicalJson::hash(['profile_sha256' => $profile['renderer_profile_sha256'],
                     'signature_sha256' => $profile['signature_sha256']]))
                 && preg_match('/\A[a-f0-9]{64}\z/D', (string) $profile['expected']['input_hash']) === 1
