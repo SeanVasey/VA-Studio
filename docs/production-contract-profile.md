@@ -592,6 +592,10 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
   hour) can have its workspace swept under it: its `close()` then refuses `storage_failed`, which the contract work
   retries; nothing was stored yet, so nothing is lost. Tests: `ContractRenderCacheSweepTest` (each cache, a non-private
   workspace-named directory, and the swept-under-a-render race through `close()` and a real `IsolatedContractRenderer`).
+  **When changing `ContractFiles` or `ContractRenderWorkspace`, also run**
+  `tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php`: both files are frozen-byte pinned there for
+  the production free grant family, and no focused feedback suite (`scripts/ci/focused-tests.py`) selects contract tests
+  (review of #254, P3).
 - `open_basedir` separators (follow-up of #251, built 2026-11-09): the Isolated (`IsolatedContractRenderer`), Free
   (`FreeGrantRendererProcess`) and ProductionFree (`ProductionFreeGrantRendererProcess`) children now end every
   `open_basedir` directory entry with the separator, as the v2 child does. This is defence in depth: on the PHP 8.4.27
@@ -608,6 +612,11 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
   unreadable, the workspace lists, every entry ends with the separator, and the document still renders). The same holds
   for #251's v2 sibling probe: it would pass without the separator on this PHP, so its entry-format assertion is what
   pins the change.
+  **The Free family has no `RELEASED` registry** (review of #254, P3): `FreeGrantRenderProfile` validates a stored profile
+  only against the one current manifest, so the new `free-v1` `MANIFEST_HASH` made every Free origin recorded before it
+  unreadable (`profile_changed`). The family is test-only (test commerce behind the default-off `free-grants.test_enabled`),
+  so only synthetic origins on local, testing or a staging rehearsal that enabled it are affected; any later change to a
+  Free-pinned file does the same unless the family first gains a released-profile list like ProductionFree.
 
 ### Wording item for Sean
 

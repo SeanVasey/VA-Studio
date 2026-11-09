@@ -2,6 +2,7 @@
 
 namespace Tests\Support;
 
+use RuntimeException;
 use Symfony\Component\Process\Process;
 
 /**
@@ -16,20 +17,32 @@ final class OpenBasedirProbe
     public static function run(array $command, string $cwd, array $environment, string $payload): array
     {
         $sibling = base_path().'-sibling-'.bin2hex(random_bytes(4));
-        mkdir($sibling, 0700);
-        file_put_contents($sibling.'/secret.txt', 'synthetic');
+        $secret = $sibling.'/secret.txt';
         $probe = $command;
         $probe[count($probe) - 1] = '-r';
         $probe[] = 'stream_get_contents(STDIN); echo json_encode(["basedir" => ini_get("open_basedir"),'
-            .'"sibling_read" => @file_get_contents('.var_export($sibling.'/secret.txt', true).') !== false,'
+            .'"sibling_read" => @file_get_contents('.var_export($secret, true).') !== false,'
             .'"workspace_list" => @scandir(getenv("TMPDIR")) !== false,'
             .'"app_read" => @file_get_contents('.var_export(base_path('app/Support/CanonicalJson.php'), true).') !== false]);';
         $run = new Process($probe, $cwd, $environment, $payload, 60);
+        $created = false;
         try {
+            if (! mkdir($sibling, 0700)) {
+                throw new RuntimeException('The open_basedir probe could not create its sibling directory.');
+            }
+            $created = true;
+            if (file_put_contents($secret, 'synthetic') !== 9) {
+                throw new RuntimeException('The open_basedir probe could not write its sibling file.');
+            }
             $run->mustRun();
         } finally {
-            unlink($sibling.'/secret.txt');
-            rmdir($sibling);
+            // Remove only what this probe created, never a directory that was already there.
+            if ($created) {
+                if (is_file($secret) && ! is_link($secret)) {
+                    unlink($secret);
+                }
+                rmdir($sibling);
+            }
         }
 
         return json_decode($run->getOutput(), true, 4, JSON_THROW_ON_ERROR);
