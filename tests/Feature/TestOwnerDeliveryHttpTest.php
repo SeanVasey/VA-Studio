@@ -105,7 +105,14 @@ class TestOwnerDeliveryHttpTest extends TestCase
             ->assertHeader('X-Content-Type-Options', 'nosniff')->assertHeader('X-Robots-Tag', 'noindex, nofollow')
             ->assertHeader('Referrer-Policy', 'no-referrer');
         $this->assertContains('Cookie', $response->baseResponse->getVary());
-        $response->assertHeaderMissing('ETag')->assertHeaderMissing('Last-Modified');
+        $response->assertHeaderMissing('Last-Modified');
+        // FP-077: only the private attachment stream carries its content-hash ETag and advertises byte ranges.
+        if ($response->baseResponse instanceof StreamedResponse) {
+            $this->assertMatchesRegularExpression('/\A"[a-f0-9]{64}"\z/D', (string) $response->headers->get('ETag'));
+            $response->assertHeader('Accept-Ranges', 'bytes');
+        } else {
+            $response->assertHeaderMissing('ETag')->assertHeaderMissing('Accept-Ranges');
+        }
         $this->assertNotSame(304, $response->getStatusCode());
     }
 
@@ -337,9 +344,9 @@ class TestOwnerDeliveryHttpTest extends TestCase
                 if ($method !== 'HEAD') { $response->assertJsonPath('code', 'INVALID_DELIVERY_REQUEST'); }
             }
         }
+        // The redeeming download evaluates ranges since FP-077 (TestOwnerDeliveryRangeTest); the read route still refuses them.
         foreach (['Range' => 'bytes=0-9', 'If-Range' => 'private-etag'] as $header => $value) {
             $this->assertError($this->get($this->url($f), [$header => $value]), 416, 'INVALID_DELIVERY_REQUEST');
-            $this->assertError($this->download($f, $authorization, ['HTTP_'.strtoupper(str_replace('-', '_', $header)) => $value]), 416, 'INVALID_DELIVERY_REQUEST');
         }
         $this->assertError($this->get($this->url($f).'?token='.$authorization['token']), 422, 'INVALID_DELIVERY_REQUEST');
         $this->assertSame([0], $this->streams->transactionLevels); $this->assertDatabaseCount('test_delivery_authorizations', 1);

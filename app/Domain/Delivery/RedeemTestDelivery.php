@@ -21,9 +21,20 @@ use Throwable;
 
 final class RedeemTestDelivery
 {
-    /** One committed stream attempt; a later transport failure cannot restore or extend this authorization. */
+    /**
+     * One committed stream attempt; a later transport failure cannot restore or extend this authorization.
+     *
+     * `$range` (null means a full request) is the selection the caller evaluated against this authorization's retained
+     * target. A full selection needs an unredeemed authorization and records its one redemption. A partial selection is
+     * authorized exactly as strictly (owner, token, policy, control, refund/dispute, evidence and expiry, both before the
+     * snapshot and under the commit locks) and records the redemption only if none exists yet; a partial selection on an
+     * already redeemed, still unexpired authorization resumes that same redemption and is audited, never counted again.
+     * An unsatisfiable selection passes the same checks without private file access or consumption, then fails with
+     * `range_not_satisfiable`.
+     */
     public function handle(string $orderPublicId, #[SensitiveParameter] string $ownerKey, string $authorizationPublicId,
-        #[SensitiveParameter] string $token, ?User $actor = null, ?CustomerPrincipal $principal = null): PreparedDeliveryStream
+        #[SensitiveParameter] string $token, ?User $actor = null, ?CustomerPrincipal $principal = null,
+        ?DeliveryByteRange $range = null): PreparedDeliveryStream
     {
         ActivationPolicy::outsideTransactions();
         if ($principal) {
@@ -38,16 +49,23 @@ final class RedeemTestDelivery
         $source = $read['source'];
         $target = $read['target'];
         $authorization = $read['authorization'];
+        if ($range && ($range->sizeBytes !== $target['file']['size_bytes'] || ! hash_equals($target['file']['sha256'], $range->sha256))) {
+            throw new DeliveryException('changed');
+        }
+        // Only a partial or unsatisfiable selection may proceed past an existing redemption; it never records another one.
+        $resumable = $range !== null && $range->outcome !== DeliveryByteRange::FULL;
         $evidence = app(DeliveryAccessEvidence::class);
         $control = $evidence->control($source, TestDeliveryControl::where('order_id', $order->id)->first(), $authorization->control_version);
         $from = now()->toImmutable()->utc()->startOfSecond();
-        $this->eligible($authorization, $control, $from, $read['redemption'] !== null);
+        $this->eligible($authorization, $control, $from, $read['redemption'] !== null && ! $resumable);
         if ($principal) {
             app(CustomerAccess::class)->current($principal);
         }
-        $prepared = app(PrepareTestDeliveryStream::class)->handle($target['file']);
+        $probe = $range?->unsatisfiable() === true;
+        // The whole snapshot is copied and its SHA-256 read back before any byte, for full and partial selections alike.
+        $prepared = $probe ? null : app(PrepareTestDeliveryStream::class)->handle($target['file']);
         try {
-            if (! hash_equals($target['file']['sha256'], $prepared->sha256) || $target['file']['size_bytes'] !== $prepared->sizeBytes) {
+            if ($prepared && (! hash_equals($target['file']['sha256'], $prepared->sha256) || $target['file']['size_bytes'] !== $prepared->sizeBytes)) {
                 throw new DeliveryException('target_unavailable');
             }
             $through = now()->toImmutable()->utc()->startOfSecond();
@@ -55,7 +73,7 @@ final class RedeemTestDelivery
                 throw new DeliveryException('retry');
             }
             DB::transaction(function () use ($order, $ownerKey, $source, $target, $authorization, $through,
-                $policies, $policy, $account, $evidence, $actor, $principal): void {
+                $policies, $policy, $account, $evidence, $actor, $principal, $resumable, $probe): void {
                 app(CustomerAccess::class)->lock($principal, $principal?->ownerKey ?? $ownerKey, $actor);
                 // Every writer takes the same order -> control -> authorization order. No private bytes are read under these locks.
                 $locked = Order::whereKey($order->id)->lockForUpdate()->first();
@@ -88,21 +106,31 @@ final class RedeemTestDelivery
                 if ($at->lessThan($through)) {
                     throw new DeliveryException('retry');
                 }
-                $this->eligible($current, $control, $at, $redemption !== null);
-                $id = (string) Str::uuid();
-                [$ciphertext, $hash] = $evidence->encrypt($evidence->redemption($current, $fresh, $freshTarget, $id, $at));
-                $redemption = TestDeliveryRedemption::create(['public_id' => $id, 'test_delivery_authorization_id' => $current->id,
-                    'control_version' => $current->control_version, 'content_hash' => $freshTarget['file']['sha256'],
-                    'size_bytes' => $freshTarget['file']['size_bytes'], 'evidence_ciphertext' => $ciphertext,
-                    'evidence_hash' => $hash, 'canonicalization_version' => CanonicalJson::VERSION, 'redeemed_at' => $at]);
-                $auditContext = ['order_public_id' => $locked->public_id,
-                    'authorization_public_id' => $current->public_id, 'redemption_public_id' => $id, 'test_only' => true];
-                if ($principal) {
-                    AuditEvent::recordAttributed('commerce.delivery.redeemed', $redemption, $auditContext, $principal->userId);
-                } else {
-                    AuditEvent::record('commerce.delivery.redeemed', $redemption, $auditContext);
+                $this->eligible($current, $control, $at, $redemption !== null && ! $resumable);
+                $action = null;
+                if (! $redemption && ! $probe) {
+                    $id = (string) Str::uuid();
+                    [$ciphertext, $hash] = $evidence->encrypt($evidence->redemption($current, $fresh, $freshTarget, $id, $at));
+                    $redemption = TestDeliveryRedemption::create(['public_id' => $id, 'test_delivery_authorization_id' => $current->id,
+                        'control_version' => $current->control_version, 'content_hash' => $freshTarget['file']['sha256'],
+                        'size_bytes' => $freshTarget['file']['size_bytes'], 'evidence_ciphertext' => $ciphertext,
+                        'evidence_hash' => $hash, 'canonicalization_version' => CanonicalJson::VERSION, 'redeemed_at' => $at]);
+                    $action = 'commerce.delivery.redeemed';
+                } elseif ($redemption && ! $probe) {
+                    $action = 'commerce.delivery.resumed'; // Same redemption, same expiry: evidence of the partial re-stream only.
                 }
-                $evidence->verifyRedemption($redemption, $current, $fresh, $freshTarget);
+                if ($action !== null) {
+                    $auditContext = ['order_public_id' => $locked->public_id,
+                        'authorization_public_id' => $current->public_id, 'redemption_public_id' => $redemption->public_id, 'test_only' => true];
+                    if ($principal) {
+                        AuditEvent::recordAttributed($action, $redemption, $auditContext, $principal->userId);
+                    } else {
+                        AuditEvent::record($action, $redemption, $auditContext);
+                    }
+                }
+                if ($redemption) {
+                    $evidence->verifyRedemption($redemption, $current, $fresh, $freshTarget);
+                }
                 // Observers/auditing are part of the transaction too: expiry or withdrawal here must roll back consumption.
                 $commitAt = now()->toImmutable()->utc()->startOfSecond();
                 if ($commitAt->lessThan($at)) {
@@ -115,10 +143,13 @@ final class RedeemTestDelivery
                 app(CustomerAccess::class)->lock($principal, $principal?->ownerKey ?? $ownerKey, $actor);
                 app(PurchaseAccess::class)->assertOrder($locked, $ownerKey, $principal);
             }, 5);
+            if ($prepared === null) {
+                throw new DeliveryException('range_not_satisfiable');
+            }
 
             return $prepared;
         } catch (Throwable $error) {
-            $prepared->close();
+            $prepared?->close();
             throw $error;
         }
     }

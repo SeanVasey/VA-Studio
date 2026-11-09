@@ -2,6 +2,7 @@
 
 namespace App\Http\Responses;
 
+use App\Domain\Delivery\DeliveryByteRange;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Delivery\PreparedDeliveryStream;
 use Illuminate\Http\JsonResponse;
@@ -29,7 +30,9 @@ final class TestDeliveryResponse
     public static function protect(Response $response): Response
     {
         $response->headers->add(self::headers());
-        foreach (['ETag', 'Last-Modified', 'Accept-Ranges'] as $header) { $response->headers->remove($header); }
+        // Only the private attachment stream advertises byte ranges and its content-hash ETag (for If-Range); nothing else.
+        $validators = $response instanceof StreamedResponse ? ['Last-Modified'] : ['ETag', 'Last-Modified', 'Accept-Ranges'];
+        foreach ($validators as $header) { $response->headers->remove($header); }
         return $response;
     }
 
@@ -57,17 +60,30 @@ final class TestDeliveryResponse
         return self::error($status, $code);
     }
 
-    /** Ownership, immutable metadata and redemption are already verified before this adapter is called. */
-    public static function attachment(PreparedDeliveryStream $prepared, string $filename, string $mime): StreamedResponse
+    public static function rangeNotSatisfiable(int $sizeBytes): JsonResponse
+    {
+        return self::error(416, 'DELIVERY_RANGE_NOT_SATISFIABLE', ['Content-Range' => 'bytes */'.$sizeBytes]);
+    }
+
+    /**
+     * Ownership, immutable metadata and redemption are already verified before this adapter is called. A partial selection
+     * is a 206 of exactly its bytes; anything else is the whole file. Both carry the content-hash ETag for If-Range.
+     */
+    public static function attachment(PreparedDeliveryStream $prepared, string $filename, string $mime, ?DeliveryByteRange $range = null): StreamedResponse
     {
         try {
-            $response = new StreamedResponse(function () use ($prepared): void {
+            if ($range && ($range->sizeBytes !== $prepared->sizeBytes || ! hash_equals($range->sha256, $prepared->sha256))) {
+                throw new DeliveryException('changed');
+            }
+            $partial = $range?->partial() === true;
+            $response = new StreamedResponse(function () use ($prepared, $partial, $range): void {
                 $previous = ignore_user_abort(true);
                 try {
-                    $prepared->writeTo(function (string $chunk): void {
+                    $write = function (string $chunk): void {
                         if (connection_aborted()) { throw new \RuntimeException('Delivery transport interrupted.'); }
                         echo $chunk;
-                    });
+                    };
+                    $partial ? $prepared->writeRangeTo($write, $range->start, $range->end) : $prepared->writeTo($write);
                 } catch (Throwable $error) {
                     // Headers may already be sent. Never append exception/debug/JSON text to private file bytes.
                     try { Log::warning('Test delivery stream interrupted.', ['exception_class' => $error::class]); }
@@ -76,11 +92,13 @@ final class TestDeliveryResponse
                     $prepared->close();
                     ignore_user_abort((bool) $previous);
                 }
-            }, 200, self::headers() + [
+            }, $partial ? 206 : 200, self::headers() + [
                 'Content-Type' => $mime,
                 'Content-Disposition' => HeaderUtils::makeDisposition('attachment', $filename),
-                'Content-Length' => (string) $prepared->sizeBytes,
-            ]);
+                'Content-Length' => (string) ($partial ? $range->length() : $prepared->sizeBytes),
+                'Accept-Ranges' => 'bytes',
+                'ETag' => DeliveryByteRange::etag($prepared->sha256),
+            ] + ($partial ? ['Content-Range' => 'bytes '.$range->start.'-'.$range->end.'/'.$prepared->sizeBytes] : []));
             return $response;
         } catch (Throwable $error) {
             $prepared->close();

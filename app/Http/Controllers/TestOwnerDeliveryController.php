@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Customers\CustomerAccessException;
 use App\Domain\Customers\PurchaseAccess;
+use App\Domain\Delivery\DeliveryByteRange;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Delivery\IssueTestDelivery;
 use App\Domain\Delivery\ReadTestDeliveryAuthorization;
@@ -47,9 +48,19 @@ final class TestOwnerDeliveryController
             $ownerKey = app(PurchaseAccess::class)->owner($order, $owner->forRequest($request), $owner->principal($request));
             // The retained immutable target supplies attachment metadata; the command re-verifies it before consumption.
             $context = $read->forOwner($order, $ownerKey, $body['authorizationId'], $body['token']);
-            $prepared = $redeem->handle($order, $ownerKey, $body['authorizationId'], $body['token'], $owner->actor($request), $owner->principal($request));
+            // Evaluated only after the owner and token matched; the command re-checks size and hash against its own read.
+            $range = DeliveryByteRange::evaluate($request->headers->get('Range'), $request->headers->get('If-Range'),
+                $context['target']['file']['size_bytes'], $context['target']['file']['sha256']);
+            try {
+                $prepared = $redeem->handle($order, $ownerKey, $body['authorizationId'], $body['token'], $owner->actor($request), $owner->principal($request), $range);
+            } catch (DeliveryException $error) {
+                if ($error->reason === 'range_not_satisfiable') {
+                    return TestDeliveryResponse::rangeNotSatisfiable($range->sizeBytes);
+                }
+                throw $error;
+            }
 
-            return TestDeliveryResponse::attachment($prepared, $context['target']['filename'], $context['target']['mime_type']);
+            return TestDeliveryResponse::attachment($prepared, $context['target']['filename'], $context['target']['mime_type'], $range);
         });
     }
 

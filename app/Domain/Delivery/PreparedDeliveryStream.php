@@ -41,6 +41,27 @@ final class PreparedDeliveryStream
         } finally { $this->close(); }
     }
 
+    /**
+     * Streams bytes start..end (inclusive) of this already hash-verified snapshot. The preparer read back and verified the
+     * whole file's SHA-256 before this object existed, so a partial response never carries unverified bytes.
+     */
+    public function writeRangeTo(callable $consumer, int $start, int $end): void
+    {
+        try {
+            ActivationPolicy::outsideTransactions();
+            if ($start < 0 || $end < $start || $end >= $this->sizeBytes) { throw new DeliveryException('target_unavailable'); }
+            $input = $this->stream();
+            if (fseek($input, $start) !== 0) { throw new DeliveryException('target_unavailable'); }
+            $remaining = $end - $start + 1;
+            while ($remaining > 0) {
+                $chunk = @fread($input, min(1048576, $remaining));
+                if (! is_string($chunk) || $chunk === '' || strlen($chunk) > $remaining) { throw new DeliveryException('target_unavailable'); }
+                $remaining -= strlen($chunk);
+                $consumer($chunk);
+            }
+        } finally { $this->close(); }
+    }
+
     public function close(): void
     {
         if (is_resource($this->input)) { fclose($this->input); }

@@ -18,7 +18,8 @@ final class TestDeliveryPrivacy
         if ($allowed !== [] && ! in_array($request->getRealMethod(), $allowed, true)) {
             return TestDeliveryResponse::error(405, headers: ['Allow' => implode(', ', $allowed)]);
         }
-        if ($request->headers->has('Range') || $request->headers->has('If-Range')) {
+        // Only the redeeming download evaluates byte ranges (FP-077); every other delivery route still refuses them.
+        if (($request->headers->has('Range') || $request->headers->has('If-Range')) && ! $request->is('orders/*/delivery/download')) {
             return TestDeliveryResponse::error(416);
         }
         if ($request->query->count() !== 0 || $request->server->get('QUERY_STRING', '') !== '') {
