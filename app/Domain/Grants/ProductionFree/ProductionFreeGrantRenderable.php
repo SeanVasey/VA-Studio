@@ -23,9 +23,10 @@ final class ProductionFreeGrantRenderable
     /**
      * The renderer revision (`ProductionFreeGrantRenderProfile::RELEASED` key) whose glyph test this class was proved
      * identical to, over every Unicode scalar value (`hardening/codex-7/glyph-equivalence.txt`). A new revision must
-     * repeat that comparison before this constant moves; a test fails until it does.
+     * repeat that comparison before this constant moves; a test fails until it does. Repeated for r2 on 2026-11-09
+     * (`docs/verification/render-cache-hardening-20261109/glyph-equivalence-r2.txt`: 1,112,032 checked, 0 differences).
      */
-    public const VERIFIED_REVISION = 'r1';
+    public const VERIFIED_REVISION = 'r2';
 
     /**
      * Characters (newlines included) at or below which the preflight render is skipped. Wrapping never places fewer than

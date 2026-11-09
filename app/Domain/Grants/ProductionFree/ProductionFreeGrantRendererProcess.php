@@ -80,7 +80,10 @@ final class ProductionFreeGrantRendererProcess implements ContractRenderer
             }
             $command = [PHP_BINARY, '-n', ...$extensions, '-d', 'memory_limit=128M', '-d', 'max_execution_time=60',
                 '-d', 'display_errors=stderr', '-d', 'log_errors=0', '-d', 'allow_url_fopen=0', '-d', 'allow_url_include=0',
-                '-d', 'open_basedir='.implode(PATH_SEPARATOR, array_unique([$projectRoot, $workspace->path, ...$packages])),
+                // open_basedir matches entries as path prefixes: each directory ends with the separator so a sibling
+                // sharing its name as a prefix (`<root>2/`, `<workspace>-other/`) stays outside.
+                '-d', 'open_basedir='.implode(PATH_SEPARATOR, array_unique(array_map(static fn (string $directory): string => rtrim($directory, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR,
+                    [$projectRoot, $workspace->path, ...$packages]))),
                 '-d', 'upload_tmp_dir='.$workspace->path, '-d', 'sys_temp_dir='.$workspace->path,
                 '-d', 'disable_functions=curl_init,curl_exec,curl_multi_exec,fsockopen,pfsockopen,stream_socket_client,stream_socket_server,socket_create,exec,passthru,shell_exec,system,popen,proc_open',
                 $projectRoot.'/scripts/render-production-free-grant.php'];

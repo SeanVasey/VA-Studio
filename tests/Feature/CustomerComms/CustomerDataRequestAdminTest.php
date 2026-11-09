@@ -59,7 +59,8 @@ class CustomerDataRequestAdminTest extends TestCase
         $this->assertTrue(CustomerAccount::find($customer['account']->id)->active);
 
         config(['customer-data-rights.retention' => ['policy_reference' => 'Synthetic SR-1', 'financial_records_years' => 7,
-            'consent_records_years' => 3, 'correspondence_records_years' => 2, 'security_records_years' => 1]]);
+            'consent_records_years' => 3, 'correspondence_records_years' => 2, 'security_records_years' => 1, 'evidence_records_years' => 7,
+            'abandoned_checkout_days' => 30, 'operational_records_days' => 14]]);
         Livewire::test(ListCustomerDataRequests::class)->callTableAction('approveDeletion', $request)->assertNotified('Deletion completed');
         $this->assertSame('completed', $request->fresh()->state);
         $this->assertFalse(CustomerAccount::find($customer['account']->id)->active);
@@ -94,7 +95,8 @@ class CustomerDataRequestAdminTest extends TestCase
     {
         [$customer, $request] = $this->deletionRequest();
         config(['customer-data-rights.retention' => ['policy_reference' => 'Synthetic SR-1', 'financial_records_years' => 7,
-            'consent_records_years' => 3, 'correspondence_records_years' => 2, 'security_records_years' => 1]]);
+            'consent_records_years' => 3, 'correspondence_records_years' => 2, 'security_records_years' => 1, 'evidence_records_years' => 7,
+            'abandoned_checkout_days' => 30, 'operational_records_days' => 14]]);
         $this->actingAs($this->staff());
         // Every attempt of the service's transaction fails at its first read of the request with MySQL's lock-wait timeout (1205).
         $failure = null;

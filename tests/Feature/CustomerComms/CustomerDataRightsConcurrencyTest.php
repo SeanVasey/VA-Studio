@@ -26,7 +26,8 @@ class CustomerDataRightsConcurrencyTest extends TestCase
     use FinalizationDatabaseMigrations;
 
     private const RETENTION = ['policy_reference' => 'Synthetic SR-1', 'financial_records_years' => 7, 'consent_records_years' => 3,
-        'correspondence_records_years' => 2, 'security_records_years' => 1];
+        'correspondence_records_years' => 2, 'security_records_years' => 1, 'evidence_records_years' => 7, 'abandoned_checkout_days' => 30,
+        'operational_records_days' => 14];
 
     protected function beforeRefreshingDatabase(): void
     {
