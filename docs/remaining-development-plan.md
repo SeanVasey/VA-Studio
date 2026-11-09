@@ -6,7 +6,65 @@ This plan was written on October 2 and amended by dated blocks through October 7
 
 In the [task register](remaining-development-tasks.csv) only the six groups T03 to T08 are Accepted; 34 stay open, and six of forty is not a completion percentage. On October 17 the status cells of T18, T21, T22, T28, T30 and T38 were rewritten to cite the merged pull requests (SeanVasey/VA-Studio) and their remaining conditions. The other status cells are free text written between October 2 and 7 and were not re-audited in that refresh. Commerce, customer, membership and delivery capabilities remain default-off and test-only, and no live payment, production deployment, customer import or launch acceptance is claimed.
 
-## Parity status, source-read October 17, 2026
+## Parity status, source-read November 9, 2026
+
+The [parity coverage map](remaining-parity-coverage.csv) now carries two more columns, `development_status_20261109` and `status_evidence_20261109`, from a second read of the source on November 9, 2026 (main `49df0bcf`, after pull requests #132 to #247). The October 17 columns are unchanged and stay as history. **This is a reading of the code, not test acceptance, not release acceptance and not a completion percentage. No test or command was executed for it.** The same vocabulary applies, and commerce, customer, membership and delivery behavior is still default-off and test-only: every production-named checkout, identity, free-grant, membership and tax mount is a literal-false flag in `config/`, nothing is deployed, and no live payment, customer import or DNS change has occurred. Each evidence cell names the files that were read and the specific remaining gap, and cites the pull request that introduced the behavior where one is known. Every `acceptance_requirement` still has to be met on one exact, independently reviewed final candidate.
+
+Five rows changed status. All five moved up, none down:
+
+| Row | October 17 | November 9 | Reason |
+| --- | --- | --- | --- |
+| FP-028 dashboard | `not_implemented` | `implemented_partial` | Four dashboard widgets over `app/Domain/Reporting/OperationalHealth.php` (PR #178). Scheduler, backup and host health are always Unavailable, and the commerce card is test commerce only. |
+| FP-089 sales reporting | `not_implemented` | `implemented_partial` | `SalesReportPage` and `SalesReport` with audited CSV (PR #178). Test commerce only, no bot or replay filter, other product families not included. |
+| FP-090 segmentation | `not_implemented` | `implemented_partial` | `CustomerSegmentsPage` and audited pseudonymous export (PR #178), default-off until U-13. |
+| FP-100 redirects | `not_implemented` | `implemented_partial` | Default-off redirect map, validator and middleware (PR #170), with no active redirect. |
+| FP-097 source provenance | `blocked_on_sean` | `implemented_partial` | Sean supplied the catalog export, manifests and contract templates on 2026-11-07 (PR #199, `docs/migration/source_ledger.csv`). Order, customer, membership and payment exports are still missing. |
+
+Thirteen further rows keep their status but have a narrower stated gap: FP-005 (legal page type, PR #183; PRIVACY and TERMS approved by Sean 2026-11-07, PR #212, but unpublished with placeholders), FP-014 (JSON-LD, PR #170), FP-015 (axe spec added, PR #197, not run), FP-040 and FP-068 (A5 merged as PR #172, no longer branch-only), FP-055 (production free mount, PR #165), FP-075 (order-ready mail adapter, PR #183), FP-076 (retention periods approved 2026-11-07), FP-082 (data export and deletion requests, PR #183, #211, #214), FP-098, FP-099 and FP-101 (history archive PR #171 and #195, the real catalog dry run PR #199, checkout consults the exclusivity ledger PR #187), and FP-009 (member HTTP mount, PR #174, unmounted). The other 85 rows were re-read and keep both status and gap (some cells add later pull-request detail).
+
+| Status value | Meaning | Rows | October 17 |
+| --- | --- | --- | --- |
+| `implemented_evidenced` | The behavior exists and has tests or documented evidence, possibly default-off, test-only or awaiting device or host acceptance | 43 | 43 |
+| `implemented_partial` | Part of the behavior exists; `status_evidence_20261109` names the gap | 38 | 33 |
+| `not_implemented` | Nothing exists yet, including the conditional PayPal row (FP-062) | 7 | 11 |
+| `blocked_on_sean` | Needs a decision or private input that only Sean can give | 4 | 5 |
+| `postlaunch_by_design` | An explicit postlaunch enhancement that is not part of launch scope | 11 | 11 |
+
+The totals are 103 rows: 43 implemented and evidenced, 38 implemented in part, 18 not implemented (7 outright, including the conditional PayPal row, and 11 postlaunch by design) and 4 blocked on Sean. The October 17 column of the map itself totals 43, 33, 11, 5 and 11, because the lane MIG rows FP-099 and FP-101 were revised to partial on October 24. The October 17 table in the section below shows 31 partial and 13 not implemented for the same reason.
+
+| Area | Implemented and evidenced | Implemented in part | Not implemented | Blocked on Sean | Postlaunch by design |
+| --- | --- | --- | --- | --- | --- |
+| Storefront and content | FP-001 to FP-004, FP-011, FP-012, FP-016 (7) | FP-005, FP-013 to FP-015, FP-017 (5) | none | none | none |
+| Product families | FP-086 (1) | FP-006 to FP-008, FP-010, FP-087 (5) | FP-088 (1) | none | none |
+| Player and preview | FP-018 to FP-022, FP-024 (6) | FP-023, FP-025 (2) | none | none | none |
+| Admin, catalog and media | FP-027, FP-029 to FP-031, FP-033, FP-036, FP-038, FP-039, FP-042 to FP-047 (14) | FP-028, FP-032, FP-034, FP-035, FP-037, FP-040, FP-041 (7) | none | none | none |
+| Licensing and exclusives | FP-049 to FP-054 (6) | FP-055 (1) | FP-056, FP-058 (2) | none | none |
+| Checkout, payments and tax | FP-060, FP-064, FP-065 (3) | FP-061, FP-067, FP-068 (3) | FP-062, FP-066, FP-069 (3) | FP-063 (1) | none |
+| Delivery and customer | FP-073, FP-074, FP-078 to FP-080 (5) | FP-075 to FP-077, FP-081, FP-082 (5) | none | none | none |
+| Memberships | FP-084 (1) | FP-009 (1) | none | FP-083, FP-085 (2) | none |
+| Reporting and integrations | none | FP-089 to FP-091 (3) | none | FP-095 (1) | none |
+| Postlaunch | none | none | none | none | FP-026, FP-048, FP-057, FP-059, FP-070 to FP-072, FP-092 to FP-094, FP-096 (11) |
+| Migration and launch | none | FP-097 to FP-102 (6) | FP-103 (1) | none | none |
+
+The largest remaining gaps are:
+
+- **Product families without a customer path.** Collections, sound kits, services (payment side) and merchandise have private drafts only: no public storefront, purchase or delivery (FP-006 to FP-008, FP-010, FP-087, FP-088).
+- **Money in motion.** No row has live-provider evidence. Stripe test keys have not been supplied, so no real test-account run exists (FP-061); tax is default-off (FP-067); the refund and dispute lifecycle refuses until four policy values are set and writes nothing to the provider (FP-068); offers, bundles, collaborator accounting and e-signature are absent (FP-056, FP-066, FP-069, FP-058).
+- **Customer-facing membership.** The member HTTP mount and credit ledger are built but unmounted; no plan page, paid lifecycle, renewal or legacy continuity exists (FP-009, FP-083, FP-085).
+- **Outbound communication.** Order-ready mail and contact alerts are built or specified but nothing can send: no sender, SMTP provider or ESP is chosen (FP-013, FP-075, FP-081, FP-091).
+- **Publication of legal text and the contract chain.** PRIVACY and TERMS are approved but unpublished with open placeholders, and the `vasey-license-pdf-v2` contract and D-30 buyer identity chain is gated off (FP-005, FP-050, FP-051).
+- **Migration and launch.** Only the catalog has a real export, and nothing was imported; history archives, redirects and the exclusivity cutover are verified on synthetic data or default-off; no host, restore rehearsal or release-candidate evidence package exists (FP-097 to FP-103).
+- **Real-host and physical-device evidence** is missing across the board; the public axe spec and every browser spec still need a host with scanner signatures.
+
+Rows that wait on Sean, by input:
+
+- **Blocked outright (4):** FP-063 (U-04 remainder: currency, tax registrations and settings, capture, payouts, Managed Payments versus direct), FP-083 and FP-085 (membership continuity policy and the BeatStars membership inventory, U-09 and U-10), FP-095 (the authenticated Studio audit of Content ID, distribution and publishing).
+- **Partial rows gated on a Sean input:** FP-097 and FP-099 (order, customer, membership and buyer-contract exports; legal review of historical terms), FP-061 (Stripe test keys, S-4), FP-075 (sender and SMTP provider, U-07), FP-055 (approved free terms), FP-005 (postal address, providers, minimum age, venue county, DMCA decision, counsel review), FP-076, FP-081, FP-082 and FP-091 (processors and consent notice text, U-13), FP-068 (the four refund and dispute policy values), FP-006 to FP-008, FP-010, FP-087 and FP-088 (product-family scope, U-12), FP-100 (domain and DNS authorization), FP-102 (U-02: region, secrets, backup target, incident ownership; the two TOTP operators), FP-017 (the official SVG mark).
+- **Not implemented, scope Sean must confirm:** FP-058 and FP-069 (U-11), FP-062 (whether PayPal is active, U-008).
+
+## Parity status, source-read October 17, 2026 (historical)
+
+The table in this section is the October 17 reading and is superseded by the section above. It is kept unchanged as history; its counts differ from the map's October 17 column as noted above.
 
 The [parity coverage map](remaining-parity-coverage.csv) now carries two more columns, `development_status_20261017` and `status_evidence`, giving the result of reading the source on October 17, 2026 against each of the 103 requirements. **This is a reading of the code, not test acceptance, not release acceptance and not a completion percentage.** Nothing was executed for it. A row marked implemented and evidenced means the behavior exists in code with tests or documented evidence; where it involves commerce, customers, payments or delivery it exists only behind default-off, test-only policies. Every `acceptance_requirement` still has to be met on one exact, independently reviewed final candidate. A status goes stale as soon as a related pull request merges, so the pull request that changes the behavior also updates its row.
 
