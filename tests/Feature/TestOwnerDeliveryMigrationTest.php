@@ -45,10 +45,14 @@ class TestOwnerDeliveryMigrationTest extends TestCase
     {
         $fixture = $this->fixture(); $retained = $this->retained();
         $migration = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
+        // The later v2 migration references these tables and replaces the authorization guard: roll it back first, empty.
+        $resume = require database_path('migrations/2026_11_09_270300_test_delivery_resume_v2.php');
+        $resume->down();
         $migration->down();
         foreach ($this->tables() as $table) { $this->assertFalse(Schema::hasTable($table)); }
         $this->assertSame($retained, $this->retained());
         $migration->up();
+        $resume->up();
         foreach ($this->tables() as $table) { $this->assertDatabaseCount($table, 0); }
         $this->assertSame($retained, $this->retained());
         $this->assertSame('pending', PendingEntitlement::sole()->state);

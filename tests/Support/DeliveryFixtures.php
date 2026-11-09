@@ -38,6 +38,27 @@ final class DeliveryFixtures
         config(['delivery.test_access_enabled' => true, 'delivery.test_access_policy' => json_encode(self::policy(), JSON_THROW_ON_ERROR)]);
     }
 
+    /** Exactly TestAccessPolicy::CONTRACT_V2, spelled out so a drift in the contract fails the tests (FP-077). */
+    public static function policyV2(): array
+    {
+        return ['schema_version' => 1, 'purpose' => 'test_owner_delivery', 'version' => 'test-owner-delivery-v2',
+            'scope' => 'activated_order_owner', 'storage' => 'private_local', 'verification' => 'fresh_sha256',
+            'token_bytes' => 32, 'authorization_ttl_seconds' => 60, 'new_authorizations_per_order60_seconds' => 3,
+            'transport' => 'token_post_303_session_bound_get', 'ranges' => 'single_range_strong_if_range',
+            'counting' => 'distinct_bytes_cover_file_once', 'resume_window' => 'size_tiered_from_first_byte',
+            'incomplete_authorizations' => 'per_grant_rolling_24h_cap', 'pending_entitlements' => 'preserve',
+            'buyer_identity' => 'unverified_guest'];
+    }
+
+    public static function configureV2(): void
+    {
+        self::configure();
+        config(['delivery.test_access_policy' => json_encode(self::policyV2(), JSON_THROW_ON_ERROR)]);
+    }
+
+    /** A synthetic session secret for domain-level v2 calls (HTTP keeps its own in the server-side session). */
+    public const SESSION_SECRET = 'a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90';
+
     public static function ready(object $gateway, bool $mixed = false, bool $enable = true): array
     {
         return self::activate(ActivationFixtures::issued($gateway, $mixed), $enable);

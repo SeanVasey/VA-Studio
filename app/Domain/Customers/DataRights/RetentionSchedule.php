@@ -58,6 +58,8 @@ final class RetentionSchedule
             'rationale' => 'Download record. PRIVACY: at least the financial period and while the license can be used, so past-period rows are review candidates only.'],
         ['table' => 'test_delivery_redemptions', 'family' => 'delivery_records', 'class' => 'financial', 'clock' => ['columns' => ['redeemed_at']],
             'rationale' => 'Download record (redeemed). Same minimum period as its authorization.'],
+        ['table' => 'test_delivery_coverage', 'family' => 'delivery_records', 'class' => 'financial', 'clock' => ['columns' => ['recorded_at']],
+            'rationale' => 'Download record (bytes served per v2 response and the one counted completion, FP-077). Same minimum period as its authorization.'],
         // Production checkout records with frozen buyer declarations (RETAINED financial).
         ['table' => 'production_checkout_reviews', 'family' => 'production_checkout_reviews', 'class' => 'indefinite', 'clock' => null,
             'rationale' => 'Frozen buyer declarations an order snapshot is built from (D-30).'],

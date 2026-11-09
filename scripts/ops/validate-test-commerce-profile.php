@@ -290,7 +290,7 @@ if ($booted) {
         fn () => ContractRenderProfile::current()['version'] === 'test-buyer-pdf-v2');
     $attempt('delivery.activation', 'VASEY_TEST_FULFILLMENT_ACTIVATION_POLICY equals ActivationPolicy::CONTRACT and activation is enabled.',
         fn () => app(ActivationPolicy::class)->current());
-    $attempt('delivery.access', 'VASEY_TEST_DELIVERY_ACCESS_POLICY equals TestAccessPolicy::CONTRACT and owner delivery is enabled.',
+    $attempt('delivery.access', 'VASEY_TEST_DELIVERY_ACCESS_POLICY equals TestAccessPolicy::CONTRACT_V2 (or the retained v1 CONTRACT), v2 resume limits are valid, and owner delivery is enabled.',
         fn () => app(TestAccessPolicy::class)->current());
 
     // ---- Test customer accounts

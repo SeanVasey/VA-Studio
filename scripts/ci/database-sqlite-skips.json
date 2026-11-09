@@ -431,6 +431,14 @@
       "test_two_independent_redeemers_that_hold_verified_snapshots_commit_only_one_stream_attempt"
     ],
     [
+      "Tests\\Feature\\TestOwnerDeliveryResumeConcurrencyTest",
+      "test_two_simultaneous_complementary_ranges_lose_no_coverage_and_count_once"
+    ],
+    [
+      "Tests\\Feature\\TestOwnerDeliveryResumeConcurrencyTest",
+      "test_two_simultaneous_ranges_that_each_complete_the_file_count_it_once"
+    ],
+    [
       "Tests\\Feature\\TestPaymentConcurrencyTest",
       "test_distinct_receipts_racing_for_one_payment_cannot_duplicate_confirmation"
     ],

@@ -96,15 +96,50 @@ final class DeliveryAccessEvidence
         return CanonicalJson::hash(['purpose' => 'test_delivery_request', 'order_id' => $order->public_id, 'owner_key' => $owner, 'key' => $key]);
     }
 
-    public function capture(array $source, array $target, TestDeliveryControl $control, array $columns): array
+    /**
+     * Each authorization freezes the literal policy it was issued under. A v2 authorization also freezes its transfer terms:
+     * the resume window chosen for its file size and the hash binding it to the browser session that created it.
+     */
+    public function capture(array $source, array $target, TestDeliveryControl $control, array $columns, ?array $transfer = null): array
     {
-        return ['schema_version' => 1, 'purpose' => 'test_delivery_authorization', 'policy' => TestAccessPolicy::CONTRACT,
+        $version = $columns['policy_version'] ?? null;
+        if (($version === TestAccessPolicy::V2) !== ($transfer !== null)) { throw new DeliveryException('changed'); }
+        return ['schema_version' => 1, 'purpose' => 'test_delivery_authorization', 'policy' => TestAccessPolicy::contract($version),
             'authorization_id' => $columns['public_id'], 'owner_key' => $columns['owner_key'], 'token_hash' => $columns['token_hash'],
             'idempotency_key_hash' => $columns['idempotency_key_hash'], 'request_hash' => $columns['request_hash'],
             'order_id' => $source['order']->public_id, 'activation_id' => $source['activation']->public_id,
             'activation_evidence_hash' => $source['activation']->evidence_hash, 'snapshot_hash' => $source['snapshot_hash'],
             'control_id' => $control->public_id, 'control_version' => $columns['control_version'], 'target' => $target,
-            'issued_at' => $columns['issued_at']->toIso8601ZuluString(), 'expires_at' => $columns['expires_at']->toIso8601ZuluString()];
+            'issued_at' => $columns['issued_at']->toIso8601ZuluString(), 'expires_at' => $columns['expires_at']->toIso8601ZuluString()]
+            + ($transfer === null ? [] : ['transfer' => self::transferTerms($transfer)]);
+    }
+
+    /** Session binding: the authorization's own ID and a random secret that exists only in that server-side session. */
+    public static function sessionBinding(string $authorizationPublicId, #[SensitiveParameter] string $sessionSecret): string
+    {
+        if (! OrderRequest::uuid($authorizationPublicId) || preg_match('/\A[a-f0-9]{64}\z/D', $sessionSecret) !== 1) {
+            throw new DeliveryException('not_found');
+        }
+        return hash('sha256', "vasey-test-delivery-session-v1\0".$authorizationPublicId."\0".$sessionSecret);
+    }
+
+    /** v2 terms from verified evidence: call only after verify() accepted the same authorization. */
+    public function transfer(TestDeliveryAuthorization $authorization): array
+    {
+        if ($authorization->policy_version !== TestAccessPolicy::V2) { throw new DeliveryException('changed'); }
+        try { return self::transferTerms($this->decode($authorization)['transfer'] ?? null); }
+        catch (Throwable) { throw new DeliveryException('changed'); }
+    }
+
+    private static function transferTerms(mixed $terms): array
+    {
+        if (! is_array($terms) || array_keys($terms) !== ['resume_window_seconds', 'session_binding_hash']
+            || ! is_int($terms['resume_window_seconds']) || $terms['resume_window_seconds'] < TestAccessPolicy::MIN_RESUME_SECONDS
+            || $terms['resume_window_seconds'] > TestAccessPolicy::MAX_RESUME_SECONDS
+            || ! is_string($terms['session_binding_hash']) || preg_match('/\A[a-f0-9]{64}\z/D', $terms['session_binding_hash']) !== 1) {
+            throw new DeliveryException('changed');
+        }
+        return $terms;
     }
 
     public function verify(TestDeliveryAuthorization $authorization, array $source): array
@@ -121,7 +156,7 @@ final class DeliveryAccessEvidence
                 || $authorization->license_grant_id !== $target['license_grant_id']
                 || $authorization->grant_contract_id !== $target['grant_contract_id']
                 || $authorization->pending_entitlement_id !== $target['pending_entitlement_id']
-                || $authorization->policy_version !== TestAccessPolicy::CONTRACT['version']
+                || ! in_array($authorization->policy_version, [TestAccessPolicy::V1, TestAccessPolicy::V2], true)
                 || $authorization->control_version < 1 || $authorization->control_version > $control->control_version
                 || ! OrderRequest::uuid($authorization->public_id)
                 || ! $authorization->expires_at->equalTo($authorization->issued_at->addSeconds(60))
@@ -130,8 +165,9 @@ final class DeliveryAccessEvidence
                 || $authorization->request_hash !== $this->requestHash($source['order'], $authorization->owner_key, $target['grant_public_id'], $target['kind'])) {
                 throw new DeliveryException('changed');
             }
+            $transfer = $authorization->policy_version === TestAccessPolicy::V2 ? self::transferTerms($decoded['transfer'] ?? null) : null;
             $expected = $this->capture($source, $target, $control, $authorization->only(['public_id', 'owner_key', 'token_hash',
-                'idempotency_key_hash', 'request_hash', 'control_version', 'issued_at', 'expires_at']));
+                'idempotency_key_hash', 'request_hash', 'control_version', 'policy_version', 'issued_at', 'expires_at']), $transfer);
             if (CanonicalJson::encode($decoded) !== CanonicalJson::encode($expected)) { throw new DeliveryException('changed'); }
             return $target;
         } catch (QueryException $error) { throw $error; }

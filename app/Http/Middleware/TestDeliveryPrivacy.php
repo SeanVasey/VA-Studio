@@ -13,12 +13,15 @@ final class TestDeliveryPrivacy
     public function handle(Request $request, Closure $next): Response
     {
         if (! TestDeliveryResponse::matches($request)) { return $next($request); }
+        $transfer = $request->is('orders/*/delivery/downloads/*');
+        // HEAD is refused on the transfer: it would start a transfer whose bytes are never sent.
         $allowed = $request->is('orders/*/delivery') ? ['GET', 'HEAD']
-            : ($request->is('orders/*/delivery/authorizations', 'orders/*/delivery/download') ? ['POST'] : []);
+            : ($request->is('orders/*/delivery/authorizations', 'orders/*/delivery/download') ? ['POST'] : ($transfer ? ['GET'] : []));
         if ($allowed !== [] && ! in_array($request->getRealMethod(), $allowed, true)) {
             return TestDeliveryResponse::error(405, headers: ['Allow' => implode(', ', $allowed)]);
         }
-        if ($request->headers->has('Range') || $request->headers->has('If-Range')) {
+        // Only the v2 session-bound transfer evaluates byte ranges (FP-077); every other delivery route still refuses them.
+        if (($request->headers->has('Range') || $request->headers->has('If-Range')) && ! $transfer) {
             return TestDeliveryResponse::error(416);
         }
         if ($request->query->count() !== 0 || $request->server->get('QUERY_STRING', '') !== '') {

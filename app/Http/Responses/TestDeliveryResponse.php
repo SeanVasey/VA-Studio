@@ -2,8 +2,10 @@
 
 namespace App\Http\Responses;
 
+use App\Domain\Delivery\DeliveryByteRange;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Delivery\PreparedDeliveryStream;
+use App\Domain\Delivery\TestDeliveryTransfer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -29,7 +31,9 @@ final class TestDeliveryResponse
     public static function protect(Response $response): Response
     {
         $response->headers->add(self::headers());
-        foreach (['ETag', 'Last-Modified', 'Accept-Ranges'] as $header) { $response->headers->remove($header); }
+        // Only a v2 transfer stream advertises byte ranges and its derived ETag (for If-Range); nothing else does.
+        $validators = $response instanceof TestDeliveryTransferResponse ? ['Last-Modified'] : ['ETag', 'Last-Modified', 'Accept-Ranges'];
+        foreach ($validators as $header) { $response->headers->remove($header); }
         return $response;
     }
 
@@ -52,9 +56,60 @@ final class TestDeliveryResponse
             'expired' => [410, 'DELIVERY_EXPIRED'],
             'redeemed' => [409, 'DELIVERY_ATTEMPTED'],
             'budget_exhausted' => [429, 'DELIVERY_RATE_LIMITED'],
+            'incomplete_limit' => [429, 'DELIVERY_INCOMPLETE_LIMIT'],
+            'resume_exhausted' => [429, 'DELIVERY_RESUME_LIMIT'],
+            'session_required' => [403, 'DELIVERY_SESSION_REQUIRED'],
             default => [503, 'DELIVERY_UNAVAILABLE'],
         };
         return self::error($status, $code);
+    }
+
+    public static function rangeNotSatisfiable(int $sizeBytes): JsonResponse
+    {
+        return self::error(416, 'DELIVERY_RANGE_NOT_SATISFIABLE', ['Content-Range' => 'bytes */'.$sizeBytes]);
+    }
+
+    /** v2: the token POST hands over to the session-bound GET. The Location holds only the opaque authorization ID. */
+    public static function seeOther(string $location): Response
+    {
+        return new Response('', 303, self::headers() + ['Location' => $location]);
+    }
+
+    /**
+     * v2 transfer, admitted and whole-file verified before this adapter is called. A partial selection is a 206 of exactly
+     * its bytes, anything else the whole file; both carry Accept-Ranges and the derived strong ETag for If-Range.
+     */
+    public static function transfer(TestDeliveryTransfer $transfer, string $filename, string $mime): TestDeliveryTransferResponse
+    {
+        try {
+            $range = $transfer->range;
+            $partial = $range->partial();
+            return new TestDeliveryTransferResponse(function () use ($transfer): void {
+                $previous = ignore_user_abort(true);
+                try {
+                    $transfer->writeTo(function (string $chunk): void {
+                        if (connection_aborted()) { throw new \RuntimeException('Delivery transport interrupted.'); }
+                        echo $chunk;
+                    });
+                } catch (Throwable $error) {
+                    // Headers may already be sent. Never append exception/debug/JSON text to private file bytes.
+                    try { Log::warning('Test delivery stream interrupted.', ['exception_class' => $error::class]); }
+                    catch (Throwable) { /* Closing the descriptor must survive a failed logger. */ }
+                } finally {
+                    $transfer->close();
+                    ignore_user_abort((bool) $previous);
+                }
+            }, $partial ? 206 : 200, self::headers() + [
+                'Content-Type' => $mime,
+                'Content-Disposition' => HeaderUtils::makeDisposition('attachment', $filename),
+                'Content-Length' => (string) ($partial ? $range->length() : $transfer->sizeBytes()),
+                'Accept-Ranges' => 'bytes',
+                'ETag' => DeliveryByteRange::etag($transfer->sha256()),
+            ] + ($partial ? ['Content-Range' => 'bytes '.$range->start.'-'.$range->end.'/'.$transfer->sizeBytes()] : []));
+        } catch (Throwable $error) {
+            $transfer->close();
+            throw $error;
+        }
     }
 
     /** Ownership, immutable metadata and redemption are already verified before this adapter is called. */

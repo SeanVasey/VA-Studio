@@ -48,6 +48,7 @@
     "tests/Feature/SoundKitMigrationTest.php",
     "tests/Feature/SoundKitUploadMigrationTest.php",
     "tests/Feature/TestContractIssuanceMigrationTest.php",
+    "tests/Feature/TestDeliveryResumeMigrationTest.php",
     "tests/Feature/TestFulfillmentActivationMigrationTest.php",
     "tests/Feature/TestOrderFinalizationMigrationTest.php",
     "tests/Feature/TestOwnerDeliveryMigrationTest.php",

@@ -8,7 +8,9 @@ use App\Domain\Delivery\DeliveryException;
 use App\Domain\Delivery\IssueTestDelivery;
 use App\Domain\Delivery\ManageTestDeliveryControl;
 use App\Domain\Delivery\PrepareTestDeliveryStream;
+use App\Domain\Delivery\DeliveryByteRange;
 use App\Domain\Delivery\RedeemTestDelivery;
+use App\Domain\Delivery\TransferTestDelivery;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -29,9 +31,9 @@ try {
     }
     // Raw test tokens travel only over stdin; never command arguments, environment variables, or worker output.
     $input = json_decode(stream_get_contents(STDIN, 32768), true, 32, JSON_THROW_ON_ERROR);
-    if (! in_array($input['mode'] ?? null, ['issue', 'redeem', 'block_redemption'], true)) { throw new LogicException('Unknown delivery race.'); }
+    if (! in_array($input['mode'] ?? null, ['issue', 'redeem', 'block_redemption', 'transfer'], true)) { throw new LogicException('Unknown delivery race.'); }
     config(['filesystems.disks.local.root' => $mediaRoot, 'filesystems.disks.local.serve' => false, 'filesystems.disks.local.visibility' => 'private']);
-    Storage::forgetDisk('local'); DeliveryFixtures::configure();
+    Storage::forgetDisk('local'); $input['mode'] === 'transfer' ? DeliveryFixtures::configureV2() : DeliveryFixtures::configure();
     \Illuminate\Support\Carbon::setTestNow($input['now']); \Carbon\CarbonImmutable::setTestNow($input['now']);
     DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
     $connectionId = DB::selectOne('SELECT CONNECTION_ID() AS connection_id')->connection_id;
@@ -56,6 +58,21 @@ try {
             $control = app(ManageTestDeliveryControl::class)->handle($input['order_public_id'], true, 1, 'SYNTHETIC-RACE-BLOCK');
             if (! $control->blocked || $control->control_version !== 2) { throw new LogicException('Block did not commit.'); }
             file_put_contents($directory.'/blocked-1', (string) $control->control_version); $outcome = 'blocked';
+        } elseif ($input['mode'] === 'transfer') {
+            // FP-077: both workers are admitted on one started v2 authorization, serve their range, then meet before either
+            // records coverage, so the two coverage writers race on the authorization row lock.
+            $range = DeliveryByteRange::evaluate($input['ranges'][(int) $worker], null, $input['size_bytes'], $input['sha256']);
+            $transfer = app(TransferTestDelivery::class)->handle($input['order_public_id'], $input['owner_key'],
+                $input['authorization_public_id'], $input['session_secret'], $range);
+            $bytes = '';
+            $transfer->writeTo(function (string $chunk) use (&$bytes, $range, $directory, $worker, $waitFor): void {
+                $bytes .= $chunk;
+                if (strlen($bytes) === $range->length()) {
+                    touch($directory.'/served-'.$worker); $waitFor($directory.'/served-'.(1 - (int) $worker));
+                }
+            });
+            if (strlen($bytes) !== $range->length()) { throw new LogicException('Transfer served the wrong length.'); }
+            $contentHash = hash('sha256', $bytes); $sizeBytes = strlen($bytes); $outcome = 'transferred';
         } elseif ($input['mode'] === 'issue') {
             $issued = app(IssueTestDelivery::class)->handle($input['order_public_id'], $input['owner_key'],
                 $input['grant_public_id'], 'contract', (string) Str::uuid());

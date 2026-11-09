@@ -20,7 +20,8 @@ use SensitiveParameter;
 final class IssueTestDelivery
 {
     public function handle(string $orderPublicId, #[SensitiveParameter] string $ownerKey, string $grantPublicId,
-        string $kind, string $idempotencyKey, ?User $actor = null, ?CustomerPrincipal $principal = null): IssuedTestDelivery
+        string $kind, string $idempotencyKey, ?User $actor = null, ?CustomerPrincipal $principal = null,
+        #[SensitiveParameter] ?string $sessionSecret = null): IssuedTestDelivery
     {
         ActivationPolicy::outsideTransactions();
         if ($principal) {
@@ -30,6 +31,10 @@ final class IssueTestDelivery
         $policies = app(TestAccessPolicy::class);
         $policy = $policies->current();
         $account = $policies->account();
+        // A v2 authorization is bound to the server-side session that creates it; without one there is nothing to bind.
+        if ($policy['version'] === TestAccessPolicy::V2 && (! is_string($sessionSecret) || preg_match('/\A[a-f0-9]{64}\z/D', $sessionSecret) !== 1)) {
+            throw new DeliveryException('session_required');
+        }
         $evidence = app(DeliveryAccessEvidence::class);
         $order = $evidence->owned($orderPublicId, $ownerKey);
         $source = $evidence->source($order, $account);
@@ -39,7 +44,7 @@ final class IssueTestDelivery
         $requestHash = $evidence->requestHash($order, $ownerKey, $grantPublicId, $kind);
         $this->replay($order, $keyHash, $requestHash, $source);
         $from = now()->toImmutable()->utc()->startOfSecond();
-        $this->budget($order, $source, $control, $from);
+        $this->budget($order, $source, $control, $from, $policy, $target);
         if ($principal) {
             app(CustomerAccess::class)->current($principal);
         }
@@ -57,7 +62,7 @@ final class IssueTestDelivery
         }
 
         return DB::transaction(function () use ($order, $ownerKey, $source, $target, $control, $keyHash, $requestHash, $through,
-            $policies, $policy, $account, $evidence, $actor, $principal): IssuedTestDelivery {
+            $policies, $policy, $account, $evidence, $actor, $principal, $sessionSecret): IssuedTestDelivery {
             app(CustomerAccess::class)->lock($principal, $principal?->ownerKey ?? $ownerKey, $actor);
             // The order mutex serializes every target and every idempotency key, including the last rolling-budget slot.
             $locked = Order::whereKey($order->id)->lockForUpdate()->first();
@@ -82,7 +87,7 @@ final class IssueTestDelivery
             if ($at->lessThan($through)) {
                 throw new DeliveryException('retry');
             }
-            $this->budget($locked, $fresh, $currentControl, $at);
+            $this->budget($locked, $fresh, $currentControl, $at, $policy, $freshTarget);
             $token = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
             $columns = ['public_id' => (string) Str::uuid(), 'order_id' => $locked->id,
                 'test_fulfillment_activation_id' => $fresh['activation']->id, 'test_delivery_control_id' => $currentControl->id,
@@ -91,7 +96,11 @@ final class IssueTestDelivery
                 'license_grant_id' => $target['license_grant_id'], 'grant_contract_id' => $target['grant_contract_id'],
                 'pending_entitlement_id' => $target['pending_entitlement_id'], 'policy_version' => $policy['version'],
                 'issued_at' => $at, 'expires_at' => $at->addSeconds(60)];
-            [$ciphertext, $hash] = $evidence->encrypt($evidence->capture($fresh, $target, $currentControl, $columns));
+            $transfer = $policy['version'] === TestAccessPolicy::V2 ? [
+                'resume_window_seconds' => TestAccessPolicy::resumeWindowSeconds($target['file']['size_bytes'], $policies->resumeWindows()),
+                'session_binding_hash' => DeliveryAccessEvidence::sessionBinding($columns['public_id'], (string) $sessionSecret),
+            ] : null;
+            [$ciphertext, $hash] = $evidence->encrypt($evidence->capture($fresh, $target, $currentControl, $columns, $transfer));
             $authorization = TestDeliveryAuthorization::create($columns + ['evidence_ciphertext' => $ciphertext,
                 'evidence_hash' => $hash, 'canonicalization_version' => CanonicalJson::VERSION]);
             $auditContext = ['order_public_id' => $locked->public_id,
@@ -129,7 +138,7 @@ final class IssueTestDelivery
         throw new DeliveryException(hash_equals($existing->request_hash, $requestHash) ? 'already_issued' : 'conflict');
     }
 
-    private function budget(Order $order, array $source, TestDeliveryControl $control, CarbonImmutable $at): void
+    private function budget(Order $order, array $source, TestDeliveryControl $control, CarbonImmutable $at, array $policy, array $target): void
     {
         $query = TestDeliveryAuthorization::where('order_id', $order->id);
         if ($at->lessThan($source['activation']->activated_at) || $at->lessThan($control->updated_at)
@@ -138,6 +147,19 @@ final class IssueTestDelivery
         }
         if ($query->where('issued_at', '>', $at->subSeconds(60))->count() >= 3) {
             throw new DeliveryException('budget_exhausted');
+        }
+        if ($policy['version'] === TestAccessPolicy::V2) {
+            // Operational abuse bound, not a license term: v2 transfers started within the rolling 24 hours that never
+            // covered their file, across every kind of this grant. The order mutex serializes the last slot.
+            $incomplete = TestDeliveryAuthorization::where('order_id', $order->id)
+                ->where('license_grant_id', $target['license_grant_id'])->where('policy_version', TestAccessPolicy::V2)
+                ->whereHas('redemption', fn ($redemption) => $redemption->where('redeemed_at', '>', $at->subDay()))
+                ->whereNotExists(fn ($completion) => $completion->selectRaw('1')->from('test_delivery_coverage')
+                    ->whereColumn('test_delivery_coverage.completed_authorization_id', 'test_delivery_authorizations.id'))
+                ->count();
+            if ($incomplete >= app(TestAccessPolicy::class)->incompleteCap()) {
+                throw new DeliveryException('incomplete_limit');
+            }
         }
     }
 }
