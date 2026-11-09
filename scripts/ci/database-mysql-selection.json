@@ -60,7 +60,8 @@
     "tests/Feature/TrackPublicationGuardMigrationTest.php",
     "tests/Feature/TransactionalNotificationMigrationTest.php",
     "tests/Feature/TypedLicenseMigrationTest.php",
-    "tests/Feature/UuidByteGuardMigrationTest.php"
+    "tests/Feature/UuidByteGuardMigrationTest.php",
+    "tests/Feature/VaseyLicenseContractTextMigrationTest.php"
   ],
   "include_files": [
     "tests/Feature/BulkReplaceLicenseDraftSourceTest.php",
@@ -77,6 +78,7 @@
     "tests/Feature/Migration/ExclusivityAuthorityTest.php",
     "tests/Feature/Migration/LegacyHistoryArchiveTest.php",
     "tests/Feature/Migration/LegacyHistoryReviewConditionsTest.php",
+    "tests/Feature/PaidGrantDocumentJourneyTest.php",
     "tests/Feature/PaidTaxAdversarialJourneyTest.php",
     "tests/Feature/PaidTaxDeliverySchemaRecoveryTest.php",
     "tests/Feature/PaidTaxDownloadJourneyTest.php",

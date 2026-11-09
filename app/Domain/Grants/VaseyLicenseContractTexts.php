@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Domain\Grants;
+
+use App\Domain\Contracts\ContractIssuanceException;
+use App\Domain\Customers\DataRights\PaidGrantExportSection;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
+use Throwable;
+
+/**
+ * Contract increment 5, payload growth: the large immutable parts of a `vasey-license-pdf-v2` selection (the contract
+ * template and the renderer profile) are stored once each in `vasey_license_contract_texts`, addressed by kind and the
+ * SHA-256 of their bytes, and a grant origin keeps only the hashes ({@see VaseyLicenseIssuance}). Every v2 line of a
+ * license version shares one template row, so an origin stays about as large as a gate-off one and the data export's
+ * stored-payload budget ({@see PaidGrantExportSection}) is unaffected.
+ *
+ * Rows are encrypted at rest with the application key, as the origins are, and immutable (triggers refuse UPDATE and
+ * DELETE). They hold license text shared by every buyer of a version, never customer data, so the data export never
+ * reads them and deletion neither erases nor lists them. Every read is verified against the hash it is addressed by:
+ * a changed, planted or undecryptable row refuses `profile_changed` and nothing else is rendered.
+ */
+final class VaseyLicenseContractTexts
+{
+    public const TABLE = 'vasey_license_contract_texts';
+
+    /** Plaintext byte bounds per kind: the selection's template bound, and the v2 manifest (at most 64 KiB) with its metadata. */
+    public const KINDS = ['template' => VaseyLicenseIssuance::TEMPLATE_BYTES, 'renderer_profile' => 131072];
+
+    /** Stored ciphertext bound: the encrypted envelope of the largest plaintext (about 1.78 times its size), with margin. */
+    public const CIPHERTEXT_BYTES = 1048576;
+
+    /**
+     * Store the bytes under their hash unless that address is already stored, in the caller's transaction, and read back
+     * what is stored there. True only when the stored row decrypts to exactly these bytes; a row with other content under
+     * the address (planted or damaged) gives false, so the caller keeps its existing profile. Database errors propagate:
+     * inside the origin transaction they must abort it, never be swallowed.
+     */
+    public static function retain(string $kind, string $bytes): bool
+    {
+        if (! isset(self::KINDS[$kind]) || $bytes === '' || strlen($bytes) > self::KINDS[$kind]) {
+            return false;
+        }
+        $sha256 = hash('sha256', $bytes);
+        DB::table(self::TABLE)->insertOrIgnore(['kind' => $kind, 'sha256' => $sha256, 'payload' => Crypt::encryptString($bytes),
+            'created_at' => now()->utc()->format('Y-m-d H:i:s')]);
+        // A locking read also sees a row another transaction committed after this one's snapshot (MySQL REPEATABLE READ).
+        $payload = DB::table(self::TABLE)->where('kind', $kind)->where('sha256', $sha256)->sharedLock()->value('payload');
+        try {
+            return self::open($kind, $sha256, $payload) === $bytes;
+        } catch (ContractIssuanceException) {
+            return false;
+        }
+    }
+
+    /** The bytes stored under the address, verified against it; refuses `profile_changed` when missing or changed. */
+    public static function resolve(string $kind, string $sha256): string
+    {
+        if (! isset(self::KINDS[$kind]) || preg_match('/\A[a-f0-9]{64}\z/D', $sha256) !== 1) {
+            throw new ContractIssuanceException('profile_changed');
+        }
+
+        return self::open($kind, $sha256, DB::table(self::TABLE)->where('kind', $kind)->where('sha256', $sha256)->value('payload'));
+    }
+
+    private static function open(string $kind, string $sha256, mixed $payload): string
+    {
+        try {
+            $bytes = is_string($payload) && strlen($payload) <= self::CIPHERTEXT_BYTES ? Crypt::decryptString($payload) : null;
+        } catch (Throwable) {
+            $bytes = null;
+        }
+        if (! is_string($bytes) || $bytes === '' || strlen($bytes) > self::KINDS[$kind] || ! hash_equals($sha256, hash('sha256', $bytes))) {
+            throw new ContractIssuanceException('profile_changed');
+        }
+
+        return $bytes;
+    }
+}

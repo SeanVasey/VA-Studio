@@ -11,6 +11,7 @@ use App\Domain\Commerce\ProductionCheckout\TaxExemptions;
 use App\Domain\Commerce\ProductionPolicy\PrepareProductionTrackCapabilities;
 use App\Domain\Commerce\ProductionPolicy\ReviewProductionTrackCapabilities;
 use App\Domain\Commerce\ProductionPolicy\SaveProductionTrackCapabilities;
+use App\Domain\Contracts\ContractIssuanceException;
 use App\Domain\Contracts\Production\VaseyLicenseV2Profile;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
@@ -39,8 +40,10 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\PaidGrantDependencyFixtures;
@@ -53,6 +56,7 @@ use Tests\Support\ProductionTrackPreparationFixtures;
 use Tests\Support\QuoteFixtures;
 use Tests\Support\VaseyLicenseIssuanceFixtures;
 use Tests\TestCase;
+use Throwable;
 
 /** Actual SMTP-enrolled buyer + frozen synthetic paid source. No live payment/legal facts are certified. */
 final class PaidGrantDocumentJourneyTest extends TestCase
@@ -224,7 +228,7 @@ final class PaidGrantDocumentJourneyTest extends TestCase
      * The V1 catalog of ProductionCheckoutFixtures::catalog(), with a synthetic schema 5 license version (the binder binds
      * only schema 5 terms) and the V1 contract identity capture on, paid with a v2 declaration and finalized.
      */
-    private function paidV2Order(string $legalName = 'Łukasz Żółć'): array
+    private function paidV2Order(string $legalName = 'Łukasz Żółć', bool $finalize = true): array
     {
         config(['production_checkout.contract_identity_v2' => true]);
         ProductionCheckoutProviderFixtures::configure();
@@ -254,6 +258,9 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $hosted->initiate($buyer['principal'], $buyer['user'], $order['orderId']);
         $gateway->paid = true;
         $this->assertSame('verified', $hosted->reconcile($buyer['principal'], $buyer['user'], $order['orderId'])['paymentStatus']);
+        if (! $finalize) {
+            return compact('buyer', 'order');
+        }
         $batch = (new PaidGrants)->finalize($buyer['principal'], $buyer['user'], $order['orderId']);
 
         return compact('buyer', 'order', 'batch');
@@ -270,8 +277,8 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $f = $this->paidV2Order();
         $origin = PaidGrantRecords::decode((array) DB::table('paid_grant_origins')->sole());
         $this->assertTrue(VaseyLicenseIssuance::selected($origin['profile']));
-        $this->assertSame([VaseyLicenseV2Profile::VERSION, 'paid-license-grant', self::SYNTHETIC_TEMPLATE],
-            [$origin['profile']['version'], $origin['profile']['purpose'], $origin['profile']['contract']['template']]);
+        $this->assertSame([VaseyLicenseV2Profile::VERSION, 'paid-license-grant', hash('sha256', self::SYNTHETIC_TEMPLATE)],
+            [$origin['profile']['version'], $origin['profile']['purpose'], $origin['profile']['contract']['template_sha256']]);
         $originRow = (array) DB::table('paid_grant_origins')->sole();
         $this->assertSame(['selected'], $this->retainedSelection('paid_origin.retained'));
 
@@ -322,6 +329,8 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $this->assertSame(CanonicalJson::encode(PaidGrantRenderProfile::current('synthetic_rehearsal')), CanonicalJson::encode($origin['profile']));
         // Gate off: the audit context is exactly what it was before the wiring.
         $this->assertSame(['origin_hash'], array_keys(json_decode(DB::table('audit_events')->where('action', 'paid_origin.retained')->sole()->context, true)));
+        // Gate off: no contract text is stored.
+        $this->assertDatabaseCount('vasey_license_contract_texts', 0);
 
         config(['contracts.vasey_license_v2_issuance' => true]);
         $complete = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
@@ -331,6 +340,119 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $this->assertSame($bytes, app(PaidGrantRendererProcess::class)->render(PaidGrantRenderInput::fromOrigin($origin), $origin['profile'])->pdfBytes);
         $this->assertStringContainsString('VASEY.AUDIO paid grant profile v1', $bytes);
         $this->assertStringNotContainsString('vasey-license-pdf-v2', $bytes);
+    }
+
+    /**
+     * Payload growth (activation blocker): a v2 origin records its template and renderer profile by hash only, so even a
+     * template at the selection bound leaves the stored origin within a few KiB of the same origin with the gate-off
+     * profile, and the template is stored once, outside the origin, under its hash.
+     */
+    public function test_a_v2_origin_records_its_template_by_hash_and_stays_the_size_of_a_gate_off_origin(): void
+    {
+        $this->enableV2Issuance();
+        $paragraph = "\n\nSynthetic padding paragraph of a long nonbinding license.";
+        $template = self::SYNTHETIC_TEMPLATE.str_repeat($paragraph, intdiv(VaseyLicenseIssuance::TEMPLATE_BYTES - strlen(self::SYNTHETIC_TEMPLATE), strlen($paragraph)));
+        $this->assertGreaterThan(VaseyLicenseIssuance::TEMPLATE_BYTES - strlen($paragraph), strlen($template));
+        $this->bindSyntheticContractSource($template);
+        $this->paidV2Order();
+
+        $row = (array) DB::table('paid_grant_origins')->sole();
+        $origin = PaidGrantRecords::decode($row);
+        $this->assertTrue(VaseyLicenseIssuance::selected($origin['profile']));
+        $this->assertSame(['selected'], $this->retainedSelection('paid_origin.retained'));
+        $gateOff = PaidGrantRecords::encode([...$origin, 'profile' => PaidGrantRenderProfile::current('synthetic_rehearsal')]);
+        $this->assertLessThan(strlen($gateOff['payload']) + 4096, strlen($row['payload']));
+        $this->assertStringNotContainsString('Synthetic padding paragraph', CanonicalJson::encode($origin));
+        $stored = DB::table('vasey_license_contract_texts')->orderBy('kind')->get(['kind', 'sha256', 'payload']);
+        $this->assertSame([['renderer_profile', CanonicalJson::hash(VaseyLicenseV2Profile::current())], ['template', hash('sha256', $template)]],
+            $stored->map(fn (object $text): array => [$text->kind, $text->sha256])->all());
+        $this->assertGreaterThan(strlen($template), strlen($stored[1]->payload));
+    }
+
+    /**
+     * Storing a selected line's contract texts runs in the origin transaction and is not caught: a database error there
+     * aborts the whole finalization (no order origin, no grant origin) instead of continuing with another profile, and a
+     * later finalization selects normally.
+     */
+    public function test_a_database_error_storing_the_contract_texts_aborts_the_origin_transaction(): void
+    {
+        $this->enableV2Issuance();
+        $f = $this->paidV2Order(finalize: false);
+        Schema::rename('vasey_license_contract_texts', 'vasey_license_contract_texts_unavailable');
+        try {
+            (new PaidGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+            $this->fail('Finalization continued past a failed contract text write.');
+        } catch (Throwable $exception) {
+            $this->assertNotInstanceOf(AssertionFailedError::class, $exception);
+        } finally {
+            Schema::rename('vasey_license_contract_texts_unavailable', 'vasey_license_contract_texts');
+        }
+        foreach (['paid_order_origins', 'paid_grant_origins', 'paid_document_work', 'vasey_license_contract_texts'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
+        $this->assertSame(0, DB::table('audit_events')->where('action', 'paid_origin.retained')->count());
+
+        (new PaidGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $this->assertTrue(VaseyLicenseIssuance::selected(PaidGrantRecords::decode((array) DB::table('paid_grant_origins')->sole())['profile']));
+        $this->assertSame(['selected'], $this->retainedSelection('paid_origin.retained'));
+    }
+
+    /**
+     * A completed original whose origin recorded the retired #245 descriptor (template and profile inline; only ever written
+     * in local or testing) keeps its order whole: finalization replays, preparation reports it complete and its download
+     * serves the stored bytes, by the frozen digests alone. Its origin, original and completion record are re-sealed in
+     * that shape here, inside this test's database only.
+     */
+    public function test_an_order_with_a_completed_retired_shape_original_still_finalizes_and_downloads(): void
+    {
+        $this->enableV2Issuance();
+        $f = $this->paidV2Order();
+        $this->assertTrue((new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'])['fulfilled']);
+        $bytes = app(PaidGrantFiles::class)->verify(PaidGrantRecords::decode((array) DB::table('paid_originals')->sole())['artifact']);
+
+        foreach (['paid_grant_origins', 'paid_originals', 'paid_fulfillments'] as $table) {
+            $triggers = DB::getDriverName() === 'mysql'
+                ? array_column(DB::select("SHOW TRIGGERS WHERE `Table` = '".$table."'"), 'Trigger')
+                : array_column(DB::select("SELECT name FROM sqlite_master WHERE type = 'trigger' AND tbl_name = ?", [$table]), 'name');
+            foreach ($triggers as $trigger) {
+                DB::statement('DROP TRIGGER '.$trigger);
+            }
+        }
+        $originRow = (array) DB::table('paid_grant_origins')->sole();
+        $origin = PaidGrantRecords::decode($originRow);
+        $profile = $origin['profile'];
+        $retired = [...$profile, 'schema_version' => VaseyLicenseIssuance::RETIRED_DESCRIPTOR_SCHEMA, 'renderer_profile' => VaseyLicenseV2Profile::current(),
+            'contract' => [...$profile['contract'], 'template' => self::SYNTHETIC_TEMPLATE]];
+        $sealedOrigin = PaidGrantRecords::encode([...$origin, 'profile' => $retired]);
+        DB::table('paid_grant_origins')->where('id', $originRow['id'])->update($sealedOrigin);
+        $originalRow = (array) DB::table('paid_originals')->sole();
+        $sealedOriginal = PaidGrantRecords::encode([...PaidGrantRecords::decode($originalRow), 'origin_hash' => $sealedOrigin['payload_hash'],
+            'profile_hash' => CanonicalJson::hash($retired)]);
+        DB::table('paid_originals')->where('id', $originalRow['id'])->update($sealedOriginal);
+        $fulfillmentRow = (array) DB::table('paid_fulfillments')->sole();
+        DB::table('paid_fulfillments')->where('id', $fulfillmentRow['id'])->update(PaidGrantRecords::encode([...PaidGrantRecords::decode($fulfillmentRow),
+            'origin_hashes' => [$sealedOrigin['payload_hash']], 'original_hashes' => [$sealedOriginal['payload_hash']]]));
+
+        $this->assertSame($f['batch']['id'], (new PaidGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['id']);
+        $complete = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertTrue($complete['fulfilled']);
+        $this->assertSame($sealedOrigin['payload_hash'], $complete['lines'][0]['originHash']);
+        $auth = (new PaidGrantDownloads)->authorize($complete['id'], $complete['lines'][0]['id'],
+            ['requestKey' => (string) Str::uuid(), 'originHash' => $complete['lines'][0]['originHash'], 'kind' => 'contract', 'nonce' => bin2hex(random_bytes(32))],
+            $f['buyer']['principal'], $f['buyer']['user']);
+        $downloaded = '';
+        (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user'])->writeTo(static function (string $chunk) use (&$downloaded): void {
+            $downloaded .= $chunk;
+        });
+        $this->assertSame($bytes, $downloaded);
+        // It never renders again.
+        $this->assertDatabaseCount('paid_originals', 1);
+        try {
+            (new VaseyLicenseIssuance)->render(PaidGrantRenderInput::fromOrigin($origin), $retired);
+            $this->fail('A retired descriptor rendered.');
+        } catch (ContractIssuanceException $exception) {
+            $this->assertSame('profile_changed', $exception->reason);
+        }
     }
 
     /** The selection branch recorded in the `paid_origin.retained` audit context, one code per line, or null when absent. */
