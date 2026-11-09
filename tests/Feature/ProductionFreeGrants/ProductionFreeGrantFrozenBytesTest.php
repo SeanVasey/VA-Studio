@@ -16,8 +16,8 @@ final class ProductionFreeGrantFrozenBytesTest extends TestCase
         'app/Domain/Contracts/ContractRenderProfile.php' => '8b51ac91c35e9809a6040d32519a166d4652a759e265b97c32d205c865e95d40',
         'app/Domain/Contracts/ContractRenderer.php' => '4ef17678b4c8fd48b255e3a72eb26a32fe7f0d8da7d6ffe29ef5f4de8d141c4a',
         'app/Domain/Contracts/RenderedContract.php' => 'b3fa57b8c8cc8e354597a5fc5f12b7942aa734e9d1bab9f0d2014358dd1d249f',
-        'app/Domain/Contracts/ContractRenderWorkspace.php' => '61cd991e9389fcca6b04fc4d0e5ec2c2c0f75266979dfa64af5e305f754e61ad',
-        'app/Domain/Contracts/ContractFiles.php' => '3ab16f6dd6e71221de3925101329ec53807fe927fa3688188999a531e5763f1c',
+        'app/Domain/Contracts/ContractRenderWorkspace.php' => '44304d9f76a5972e03f3d6f29e1c3cd6d0c09fb0a20137af835adbdf93a788a0', // #251: adds sweep(); create()/close() unchanged but for removeContents becoming static
+        'app/Domain/Contracts/ContractFiles.php' => '5012bfd35819e0e83ada68eb8ae6856529cffa111ce8c6d065fb880481ec055a', // #251 and the 2026-11-09 follow-up: add RENDER_CACHES and sweepRendererWorkspaces(); createRendererWorkspace()/store()/verify() unchanged
         'app/Domain/Contracts/ContractIo.php' => '245cce48509e9df21a8cbc3d4cac625c1a446044d27d03bee5203a1b735138c8',
         'app/Domain/Contracts/ContractIssuanceException.php' => '9df97742776ba51f031b088ade0fde06e2a73ad1d90284141b91ee6e3eb8a8be',
         'scripts/contract-renderer-autoload.php' => '09a810e87b0f499bcf738dd35c1ebc60b27eeab2c5b6499be102c133bd72be01',
