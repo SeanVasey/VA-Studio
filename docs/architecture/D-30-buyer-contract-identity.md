@@ -258,7 +258,9 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
      buyer who pays and never finalizes still leaves the record. It runs only outside any transaction (inside one it writes
      nothing and reports), never in the provider `try` block, and any failure is reported and swallowed: the payment rows and
      the buyer's answer are unchanged, and the next reconcile or finalization writes it. The same order-row lock and dedup
-     keep one record per order across reconciles and finalization. Known behaviour: a held order still shows the buyer
+     keep one record per order across reconciles and finalization. A non-locking pre-check skips the lock once an order is held; a failing
+     reporter is itself swallowed. V1 `initiate` reaches `record()` only after re-verifying the declaration, so it writes the
+     record only if a declaration stopped verifying mid-call (not reproducible in a test: the faces are pinned). Known behaviour: a held order still shows the buyer
      `fulfillmentStatus: pending_fulfillment` (checkout `status` reports the recorded payment, not the hold).
    - [x] `initiate` refuses a v2 order while the gate is off, in both checkouts (decided 2026-11-08), before any row or
      provider call.

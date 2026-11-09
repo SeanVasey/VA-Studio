@@ -45,7 +45,7 @@ final class ContractIdentityHolds
         try {
             self::record($chain, $orderPublicId);
         } catch (\Throwable $error) {
-            report($error);
+            self::reportQuietly($error);
         }
     }
 
@@ -64,11 +64,34 @@ final class ContractIdentityHolds
             if (DB::transactionLevel() !== 0) {
                 throw new LogicException('A contract identity hold is recorded only after the payment transaction has committed.');
             }
-            if (ProductionCheckout::contractIdentityHeld($declarations)) {
+            // A non-locking pre-check skips the order-row lock on every later reconcile of an already held order; record()
+            // rechecks under the lock, which alone keeps the record unique.
+            if (ProductionCheckout::contractIdentityHeld($declarations) && ! self::alreadyRecorded($chain, $orderPublicId)) {
                 self::record($chain, $orderPublicId);
             }
         } catch (\Throwable $error) {
+            self::reportQuietly($error);
+        }
+    }
+
+    private static function alreadyRecorded(string $chain, string $orderPublicId): bool
+    {
+        [$table, $subject] = self::CHAINS[$chain] ?? throw new InvalidArgumentException('Unknown paid-order chain.');
+        $orderId = DB::table($table)->where('public_id', $orderPublicId)->value('id');
+
+        return $orderId !== null && AuditEvent::query()->where('action', self::ACTION)->where('subject_type', $subject)
+            ->where('subject_id', (int) $orderId)->exists();
+    }
+
+    /**
+     * report() can itself throw (for example when the logger cannot be built); that must never reach a buyer after the
+     * payment committed, nor replace a finalizer's hold refusal.
+     */
+    private static function reportQuietly(\Throwable $error): void
+    {
+        try {
             report($error);
+        } catch (\Throwable) {
         }
     }
 

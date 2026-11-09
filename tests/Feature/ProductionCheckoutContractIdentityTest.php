@@ -27,6 +27,7 @@ use App\Providers\ProductionCheckoutServiceProvider;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Exceptions;
@@ -34,6 +35,7 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
+use LogicException;
 use RuntimeException;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ProductionCheckoutContractIdentityForgery;
@@ -41,6 +43,7 @@ use Tests\Support\ProductionCheckoutFixtures as F;
 use Tests\Support\ProductionCheckoutGatewayFixture;
 use Tests\Support\ProductionIdentityFixture;
 use Tests\TestCase;
+use Throwable;
 
 /**
  * D-30 step 6: the V1 review freezes the v2 contract identity behind its own literal-false, local/testing-only gate. The
@@ -579,6 +582,77 @@ class ProductionCheckoutContractIdentityTest extends TestCase
         $this->assertSame($paid, $this->reconcileForged($f, $forged));
         $this->assertSame([$forged], self::holds());
         $this->assertSame($payment, (array) DB::table(CheckoutSchema::TABLES['payment'])->sole());
+    }
+
+    /** Review P3-1: a reporter that itself throws never reaches the buyer after the payment committed. */
+    public function test_a_failing_reporter_never_surfaces_after_the_payment_committed(): void
+    {
+        [$f, $forged] = $this->paidForgedOrder();
+        AuditEvent::creating(fn () => throw new RuntimeException('synthetic audit write failure'));
+        $this->app->instance(ExceptionHandler::class, new class implements ExceptionHandler
+        {
+            public function report(Throwable $e): void
+            {
+                throw new RuntimeException('synthetic reporter failure');
+            }
+
+            public function shouldReport(Throwable $e): bool
+            {
+                return true;
+            }
+
+            public function render($request, Throwable $e)
+            {
+                throw $e;
+            }
+
+            public function renderForConsole($output, Throwable $e): void {}
+        });
+        $paid = $this->reconcileForged($f, $forged);
+        $this->assertSame(['verified', 'pending_fulfillment'], [$paid['paymentStatus'], $paid['fulfillmentStatus']]);
+        $this->assertSame([1, 1], self::paymentCounts());
+        $this->assertSame([], self::holds());
+    }
+
+    /** Review P3-2(a): inside any open transaction the hold writes nothing and reports why. */
+    public function test_the_hold_is_never_written_inside_an_open_transaction(): void
+    {
+        [, $forged] = $this->paidForgedOrder();
+        $declarations = Evidence::open((array) DB::table(CheckoutSchema::TABLES['order'])->where('public_id', $forged)->sole(),
+            'production_checkout_order')['buyer_declarations'];
+        Exceptions::fake();
+        DB::transaction(fn () => ContractIdentityHolds::recordAfterPayment('production_checkout_v1', $forged, $declarations));
+        $this->assertSame([], self::holds());
+        Exceptions::assertReported(LogicException::class);
+        // The same call after commit records it: the declarations are held, so only the transaction guard refused above.
+        ContractIdentityHolds::recordAfterPayment('production_checkout_v1', $forged, $declarations);
+        $this->assertSame([$forged], self::holds());
+    }
+
+    /** Review P3-2(b): an open, unpaid session of an unverifiable order is no payment, so no hold; payment then records one. */
+    public function test_reconcile_of_an_unpaid_session_writes_no_hold(): void
+    {
+        [$f, $forged] = $this->paidForgedOrder();
+        $f['gateway']->paid = false;
+        $open = $this->reconcileForged($f, $forged);
+        $this->assertSame('unverified', $open['paymentStatus']);
+        $this->assertSame([1, 0], self::paymentCounts());
+        $this->assertSame([], self::holds());
+        $f['gateway']->paid = true;
+        $this->assertSame('verified', $this->reconcileForged($f, $forged)['paymentStatus']);
+        $this->assertSame([$forged], self::holds());
+    }
+
+    /** Review P3-2(c): operator reconciliation of a paid unverifiable order writes exactly one hold, also when repeated. */
+    public function test_operator_reconcile_of_a_paid_unverifiable_order_writes_one_hold(): void
+    {
+        [$f, $forged] = $this->paidForgedOrder();
+        config(['production_checkout.operator_reconciliation_enabled' => true]);
+        foreach ([1, 2] as $attempt) {
+            $this->assertSame('verified', $f['hosted']->operatorReconcile($forged, 'cs_test_SYNTHETIC')['paymentStatus'], 'attempt '.$attempt);
+            $this->assertSame([$forged], self::holds(), 'attempt '.$attempt);
+        }
+        $this->assertSame([1, 1], self::paymentCounts());
     }
 
     public function test_initiate_refuses_a_v2_order_whose_declaration_no_longer_verifies_before_any_provider_call(): void
