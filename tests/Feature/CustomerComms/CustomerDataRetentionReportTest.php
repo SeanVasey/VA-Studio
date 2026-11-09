@@ -454,7 +454,6 @@ class CustomerDataRetentionReportTest extends TestCase
         $this->assertSame(1, $report['customer_data_requests']['past_period']);
         $this->assertSame(DB::table('customer_data_request_events')->where('request_id', $closed)->count(), $report['customer_data_request_events']['past_period']);
         $this->assertSame(1, $report['customer_data_exports']['past_period']);
-        $this->assertGreaterThan(0, DB::table('audit_events')->where('created_at', '<=', $start->format('Y-m-d H:i:s'))->count());
         $this->assertArrayNotHasKey('audit_events', $report, 'Audit events are never counted.');
         // The open request is never past, however old; nor are its events.
         $this->travelTo($start->addYears(60));
@@ -462,6 +461,10 @@ class CustomerDataRetentionReportTest extends TestCase
         $this->assertSame(1, $report['customer_data_requests']['past_period'], 'An open request is never past its period.');
         $this->assertSame(DB::table('customer_data_request_events')->where('request_id', $closed)->count(), $report['customer_data_request_events']['past_period']);
         $this->assertSame(1, DB::table('customer_data_requests')->whereNull('resolved_at')->count());
+        // Audit rows take the database clock (useCurrent), so only here is every one of them unambiguously decades old; still never counted.
+        $this->assertSame(DB::table('audit_events')->count(), DB::table('audit_events')->where('created_at', '<=', $start->addYears(53)->format('Y-m-d H:i:s'))->count());
+        $this->assertGreaterThan(0, DB::table('audit_events')->count());
+        $this->assertArrayNotHasKey('audit_events', $report, 'Audit events are never counted, however old.');
         // Orders and download records are never counted.
         foreach (['orders', 'order_attempts', 'checkout_intents', ...self::DOWNLOAD_RECORDS] as $table) {
             $this->assertArrayNotHasKey($table, $report, $table);
