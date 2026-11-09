@@ -24,3 +24,9 @@ Schedule::command('vasey:cache-prune-expired')->hourlyAt(23)->withoutOverlapping
 // copy). Only workspaces unmodified for an hour go (a render's child has a 60 s wall clock); links are never followed. :47 keeps it
 // clear of :23 and the 03:17 backup. The overlap lock is hygiene only, as above.
 Schedule::command('vasey:contract-render-cache-sweep')->hourlyAt(47)->withoutOverlapping(10);
+
+// FP-034: cleans the chunk files of resumable uploads (track media and sound kits) abandoned past expiry for at least the configured
+// age (48 h by default), marking each retained row cancelled first. Off until a reviewed change sets media.upload_session_sweep.scheduled; never touches
+// completed sessions, assets or originals. :37 keeps it clear of :23, :47 and the 03:17 backup. The overlap lock is hygiene only, as above.
+Schedule::command('vasey:upload-sessions-sweep --execute')->hourlyAt(37)->withoutOverlapping(10)
+    ->when(fn (): bool => config('media.upload_session_sweep.scheduled') === true);
