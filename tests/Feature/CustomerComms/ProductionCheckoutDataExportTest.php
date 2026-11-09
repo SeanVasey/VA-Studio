@@ -183,8 +183,10 @@ class ProductionCheckoutDataExportTest extends TestCase
 
     public function test_deletion_keeps_every_production_checkout_record_that_holds_buyer_data(): void
     {
+        // A review that never became an order is an abandoned checkout (2026-11-09); every other record keeps the financial period.
         foreach (array_keys(ProductionCheckoutExportSection::RECORDS) as $table) {
-            $this->assertSame('financial_records_years', CustomerDataRights::RETAINED[$table] ?? null, $table);
+            $this->assertSame($table === 'production_checkout_reviews' ? 'abandoned_checkout_days' : 'financial_records_years',
+                CustomerDataRights::RETAINED[$table] ?? null, $table);
         }
     }
 }

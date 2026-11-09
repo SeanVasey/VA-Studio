@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\CustomerComms;
 
+use App\Domain\Commerce\PriceQuote;
 use App\Domain\Customers\DataRights\CustomerDataRights;
 use App\Domain\Customers\DataRights\PaidGrantExportSection;
 use App\Domain\Customers\DataRights\ProductionCheckoutExportSection;
@@ -10,6 +11,7 @@ use App\Domain\Customers\Preferences\CustomerConsentPreferences;
 use App\Domain\Delivery\IssueTestDelivery;
 use App\Domain\Inquiries\InquiryConversation;
 use App\Domain\Inquiries\OrderInquiry;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -23,54 +25,32 @@ use Tests\Support\InquiryConversationFixtures;
 use Tests\Support\InventoryFixtures;
 use Tests\Support\OrderFixtures;
 use Tests\Support\OrderInquiryFixtures;
+use Tests\Support\ProductionCheckoutJourneyFixture;
 use Tests\TestCase;
 
-/** FP-076 / U-13 first increment: the retention schedule and its read-only dry-run report. Nothing is deleted. */
+/** FP-076 / U-13: the retention schedule and its read-only dry-run report, with the 2026-11-09 decisions. Nothing is deleted. */
 class CustomerDataRetentionReportTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
+    use ProductionCheckoutJourneyFixture;
 
-    /** Audit and data-request evidence: PRIVACY section 7 gives it no period, so it is held until Sean decides. */
-    private const HELD_EVIDENCE = ['audit_events', 'customer_data_requests', 'customer_data_request_events', 'customer_data_exports'];
+    /** Rights and security evidence (2026-11-09): 7 years after the event, or after the request closes. */
+    private const EVIDENCE = ['audit_events', 'customer_data_requests', 'customer_data_request_events', 'customer_data_exports'];
+
+    /** Download and redemption records (2026-11-09): held with the order, never on their own authorization timestamps. */
+    private const DOWNLOAD_RECORDS = ['test_delivery_authorizations', 'test_delivery_redemptions', 'paid_authorizations', 'paid_redemptions',
+        'paid_tax_authorizations', 'paid_tax_redemptions'];
 
     /**
      * Every migrated table that is neither scheduled nor reviewed as not customer data, as the report prints it. A new migration
      * changes this list, which forces a deliberate classification (RetentionSchedule::ENTRIES or NOT_CUSTOMER_DATA) or an
-     * explicit addition here, documented in docs/customer-data-rights.md as awaiting Sean's retention decision.
+     * explicit addition here, documented in docs/customer-data-rights.md as fitting no PRIVACY section 7 row.
      */
-    private const UNCLASSIFIED = [
-        'cache', 'cache_locks', 'checkout_intents', 'checkout_observations', 'checkout_sessions', 'contract_render_requests',
-        'contract_render_work', 'customer_identity_addresses', 'exclusive_sales', 'failed_jobs', 'free_authorizations',
-        'free_document_work', 'free_originals', 'free_origins', 'free_redemptions', 'fulfillment_outbox', 'inventory_claims',
-        'inventory_reservations', 'job_batches', 'jobs', 'legacy_exclusivity_authority_events', 'legacy_history_batches',
-        'legacy_history_contract_declarations', 'legacy_history_contracts', 'legacy_history_customers', 'legacy_history_grant_reviews',
-        'legacy_history_lines', 'legacy_history_orders', 'membership_credit_buckets', 'membership_credit_events', 'order_attempts',
-        'paid_document_work', 'paid_fulfillments', 'paid_tax_document_work', 'paid_tax_fulfillments', 'password_reset_tokens',
-        'payment_observations', 'pending_entitlements', 'production_account_feature_bindings', 'production_buyer_assent_observations',
-        'production_checkout_attempts', 'production_checkout_exemption_authorities', 'production_checkout_observations',
-        'production_checkout_order_lines', 'production_checkout_payments', 'production_checkout_provider_intents',
-        'production_checkout_sessions', 'production_consent_events', 'production_consent_states', 'production_free_authorizations',
-        'production_free_document_work', 'production_free_originals', 'production_free_origins', 'production_free_redemptions',
-        'production_free_revocations', 'production_identity_addresses', 'production_identity_attempts', 'production_identity_challenges',
-        'production_identity_notices', 'production_identity_outcomes', 'production_identity_verifications',
-        'production_listening_libraries', 'production_member_activations', 'production_member_artifacts', 'production_member_definitions',
-        'production_member_origins', 'production_member_profiles', 'production_membership_billing_attempts',
-        'production_membership_billing_award_fence', 'production_membership_billing_events', 'production_membership_billing_invoices',
-        'production_membership_billing_observations', 'production_membership_billing_positions',
-        'production_membership_billing_subscriptions', 'production_membership_credit_events', 'production_membership_paid_periods',
-        'production_membership_redemptions', 'production_suppression_attempts', 'production_suppression_confirmations',
-        'production_suppression_intents', 'production_suppression_targets', 'production_tax_checkout_bindings',
-        'production_tax_checkout_requests', 'production_tax_checkout_reviewed_sessions', 'promotion_uses', 'quote_lines', 'quote_owners',
-        'quote_pricings', 'quotes', 'refund_dispute_effects', 'refund_dispute_holds', 'refund_dispute_objects',
-        'refund_dispute_observations', 'refund_dispute_statuses', 'refund_dispute_work', 'refund_line_allocations',
-        'service_project_events', 'service_projects', 'stripe_receipt_work', 'stripe_webhook_receipts', 'test_delivery_controls',
-        'test_fulfillment_activations', 'test_payment_exception_events', 'test_payment_exception_work',
-        'test_payment_financial_observations', 'test_refund_resolution_requests', 'test_refund_resolutions', 'test_unpaid_release_events',
-        'test_unpaid_release_work', 'test_unpaid_releases', 'transactional_notice_attempts',
-    ];
+    private const UNCLASSIFIED = ['production_account_feature_bindings', 'production_buyer_assent_observations', 'production_listening_libraries'];
 
     private const RETENTION = ['policy_reference' => 'Synthetic retention schedule SR-1 (test only)',
-        'financial_records_years' => '7', 'consent_records_years' => 3, 'correspondence_records_years' => '2', 'security_records_years' => 1];
+        'financial_records_years' => '7', 'consent_records_years' => 3, 'correspondence_records_years' => '2', 'security_records_years' => 1,
+        'evidence_records_years' => '7', 'abandoned_checkout_days' => 30, 'operational_records_days' => '14'];
 
     protected function setUp(): void
     {
@@ -88,7 +68,8 @@ class CustomerDataRetentionReportTest extends TestCase
         $tables = array_column(RetentionSchedule::ENTRIES, 'table');
         $this->assertSame(array_values(array_unique($tables)), $tables, 'A table is classified more than once.');
         $this->assertSame(['financial' => 'financial_records_years', 'consent' => 'consent_records_years', 'correspondence' => 'correspondence_records_years',
-            'security' => 'security_records_years', 'indefinite' => null, 'not_applicable' => null], RetentionSchedule::CLASSES);
+            'security' => 'security_records_years', 'evidence' => 'evidence_records_years', 'abandoned_checkout' => 'abandoned_checkout_days',
+            'operational' => 'operational_records_days', 'indefinite' => null, 'not_applicable' => null], RetentionSchedule::CLASSES);
         $byTable = RetentionSchedule::byTable();
 
         // Every RETAINED family resolves to at least one table, and no table loosens its family's class: it keeps the
@@ -139,43 +120,79 @@ class CustomerDataRetentionReportTest extends TestCase
                 continue;
             }
             if (isset($clock['via'])) {
-                $this->assertSame(['via'], array_keys($clock));
-                $this->assertTrue(Schema::hasColumn($entry['table'], $clock['via'][0]));
-                $parent = $byTable[$clock['via'][1]];
-                $this->assertSame($entry['class'], $parent['class']);
-                $this->assertArrayHasKey('columns', $parent['clock']);
+                $this->assertSame(isset($clock['when']) ? ['via', 'when'] : ['via'], array_keys($clock));
+                $this->assertTrue(Schema::hasColumns($entry['table'], [$clock['via'][0], 'id', ...(isset($clock['when']) ? [$clock['when'][0]] : [])]));
+                // The chain of parents ends at a `columns` clock of the same class, without a cycle.
+                $seen = [$entry['table']];
+                for ($link = $clock; isset($link['via']); $link = $parent['clock']) {
+                    $parent = $byTable[$link['via'][1]];
+                    $this->assertNotContains($parent['table'], $seen, $entry['table']);
+                    $seen[] = $parent['table'];
+                    $this->assertSame($entry['class'], $parent['class'], $entry['table']);
+                    $this->assertTrue(Schema::hasColumn($parent['table'], $link['via'][2] ?? 'id'), $entry['table']);
+                    $this->assertNotNull($parent['clock'], $entry['table']);
+                }
+                $this->assertNotEmpty($link['columns'], $entry['table']);
 
                 continue;
             }
             $this->assertNotEmpty($clock['columns']);
+            $this->assertContains($clock['format'] ?? 'datetime', ['datetime', 'iso8601', 'epoch']);
             $this->assertTrue(Schema::hasColumns($entry['table'], [...$clock['columns'], 'id']), $entry['table']);
             if (isset($clock['unless_later'])) {
                 $this->assertTrue(Schema::hasColumns($clock['unless_later'][0], array_slice($clock['unless_later'], 1)));
             }
-            foreach ($clock['unless_referenced'] ?? [] as [$holder, $column]) {
-                $this->assertTrue(Schema::hasColumn($holder, $column));
+            foreach ($clock['unless_referenced'] ?? [] as $hold) {
+                $this->assertTrue(Schema::hasColumn($hold[0], $hold[1]));
+                $this->assertTrue(Schema::hasColumn($entry['table'], $hold[2] ?? 'id'));
             }
         }
 
-        // PRIVACY section 7 gives the audit and data-request evidence no period: held until Sean decides, never counted.
-        foreach (self::HELD_EVIDENCE as $held) {
-            $this->assertSame('security', $byTable[$held]['class'], $held);
-            $this->assertNull($byTable[$held]['clock'], $held);
-            $this->assertStringContainsString('until Sean decides', $byTable[$held]['rationale'], $held);
+        // Rights and security evidence: 7 years after the event, or after the request closes (an open request is never past).
+        $this->assertSame(['columns' => ['created_at']], $byTable['audit_events']['clock']);
+        $this->assertSame(['columns' => ['resolved_at']], $byTable['customer_data_requests']['clock']);
+        $this->assertSame(['via' => ['request_id', 'customer_data_requests']], $byTable['customer_data_request_events']['clock']);
+        $this->assertSame(['via' => ['request_id', 'customer_data_requests']], $byTable['customer_data_exports']['clock']);
+        foreach (self::EVIDENCE as $table) {
+            $this->assertSame('evidence', $byTable[$table]['class'], $table);
+        }
+        // An abandoned checkout or quote is counted only when no order was built from it.
+        $this->assertSame([['orders', 'quote_id']], $byTable['quotes']['clock']['unless_referenced']);
+        $this->assertSame([['production_checkout_orders', 'review_id']], $byTable['production_checkout_reviews']['clock']['unless_referenced']);
+        // Consent has no "address no longer held" signal, so it stays held.
+        foreach (['customer_consent_events', 'customer_consent_states', 'production_consent_events', 'production_suppression_targets'] as $held) {
+            $this->assertSame(['consent', null], [$byTable[$held]['class'], $byTable[$held]['clock']], $held);
+        }
+        foreach (['jobs', 'failed_jobs', 'job_batches'] as $table) {
+            $this->assertSame('operational', $byTable[$table]['class'], $table);
+        }
+        $this->assertSame('security', $byTable['password_reset_tokens']['class']);
+        foreach (['cache', 'cache_locks', 'test_delivery_controls', 'test_unpaid_releases'] as $table) {
+            $this->assertSame('not_applicable', $byTable[$table]['class'], $table);
         }
 
         // The records AGENTS.md calls immutable, and every other record of a purchase, are never counted.
         foreach (['orders', 'order_lines', 'order_finalizations', 'license_grants', 'grant_contracts', 'verified_payments', 'customer_purchase_claims',
-            'production_checkout_orders', 'production_tax_checkout_orders', 'production_checkout_reviews', 'production_checkout_exemption_bases',
+            'production_checkout_orders', 'production_tax_checkout_orders', 'production_checkout_exemption_bases',
             'paid_order_origins', 'paid_grant_origins', 'paid_originals', 'paid_tax_order_origins', 'paid_tax_grant_origins', 'paid_tax_originals',
-            'inquiry_order_contexts'] as $immutable) {
+            'inquiry_order_contexts', ...self::DOWNLOAD_RECORDS, 'order_attempts', 'checkout_intents', 'payment_observations', 'stripe_webhook_receipts',
+            'refund_dispute_objects', 'fulfillment_outbox', 'exclusive_sales', 'free_authorizations', 'production_membership_billing_invoices',
+            'legacy_history_orders'] as $immutable) {
             $this->assertSame('indefinite', $byTable[$immutable]['class'], $immutable);
         }
     }
 
     public static function invalidRetention(): array
     {
-        return [
+        $each = [];
+        foreach (['evidence_records_years', 'abandoned_checkout_days', 'operational_records_days'] as $key) {
+            $each["{$key} unset"] = [array_diff_key(self::RETENTION, [$key => true])];
+            $each["{$key} empty"] = [array_replace(self::RETENTION, [$key => ''])];
+            $each["{$key} zero"] = [array_replace(self::RETENTION, [$key => 0])];
+            $each["{$key} over 100"] = [array_replace(self::RETENTION, [$key => '101'])];
+        }
+
+        return $each + [
             'unset (the shipped default)' => [null],
             'missing period' => [array_diff_key(self::RETENTION, ['security_records_years' => true])],
             'missing reference' => [array_replace(self::RETENTION, ['policy_reference' => ' '])],
@@ -211,9 +228,13 @@ class CustomerDataRetentionReportTest extends TestCase
         // example environment leaves every one empty.
         $config = file_get_contents(base_path('config/customer-data-rights.php'));
         $example = file_get_contents(base_path('.env.example'));
-        foreach (['POLICY_REFERENCE', 'FINANCIAL_YEARS', 'CONSENT_YEARS', 'CORRESPONDENCE_YEARS', 'SECURITY_YEARS'] as $suffix) {
+        foreach (['POLICY_REFERENCE', 'FINANCIAL_YEARS', 'CONSENT_YEARS', 'CORRESPONDENCE_YEARS', 'SECURITY_YEARS', 'EVIDENCE_YEARS',
+            'ABANDONED_CHECKOUT_DAYS', 'OPERATIONAL_DAYS'] as $suffix) {
             $this->assertStringContainsString("env('VASEY_CUSTOMER_DATA_RETENTION_{$suffix}')", $config);
             $this->assertMatchesRegularExpression("/^(?:# )?VASEY_CUSTOMER_DATA_RETENTION_{$suffix}=\\s*$/m", $example);
+            foreach (['ops/production/env.production.example', 'ops/staging/env.staging.example'] as $template) {
+                $this->assertMatchesRegularExpression("/^# VASEY_CUSTOMER_DATA_RETENTION_{$suffix}=$/m", file_get_contents(base_path($template)), $template);
+            }
         }
     }
 
@@ -245,6 +266,12 @@ class CustomerDataRetentionReportTest extends TestCase
         app(OrderInquiry::class)->submit(OrderInquiryFixtures::guest()->public_id, InventoryFixtures::OWNER, InquiryConversationFixtures::OWNER,
             OrderInquiryFixtures::body());
         $this->assertSame([2, 1], [DB::table('customer_inquiries')->count(), DB::table('inquiry_order_contexts')->count()]);
+        // Attachments: one on each conversation and one on a service project, which never follows a conversation.
+        $orderInquiry = DB::table('customer_inquiries')->where('id', DB::table('inquiry_order_contexts')->value('inquiry_id'))->value('public_id');
+        $this->assertNotSame($conversation['inquiry']->public_id, $orderInquiry);
+        foreach ([['inquiry', $conversation['inquiry']->public_id], ['inquiry', $orderInquiry], ['project', $conversation['inquiry']->public_id]] as [$kind, $source]) {
+            $this->attachment($kind, $source);
+        }
         $this->assertSame([1, 1, 1], [DB::table('test_delivery_authorizations')->count(), DB::table('customer_data_exports')->whereNotNull('purged_at')->count(),
             DB::table('customer_data_requests')->whereNotNull('resolved_at')->count()]);
         $this->assertSame(1, DB::table('customer_data_requests')->whereNull('resolved_at')->count());
@@ -258,16 +285,15 @@ class CustomerDataRetentionReportTest extends TestCase
             'synthetic-sender@example.test', 'Synthetic Sender', 'support-sender@example.test', 'Synthetic support sender',
             $ready['order']->public_id, $alice['account']->public_id, $export['requestId'], $conversation['inquiry']->public_id];
 
-        // One year and a day later only the security class (1 year) has run out.
+        // One year and a day later only the security class (1 year) and the day classes have run out.
         $this->travelTo($start->addYear()->addDay());
         [$report, $output] = $this->report();
-        // Audit and data-request evidence has rows past one year, but no approved period: held, never counted.
+        // Audit and data-request evidence is kept 7 years: nothing is past yet.
         $this->assertGreaterThan(0, $resolvedEvents);
-        foreach (self::HELD_EVIDENCE as $held) {
-            $this->assertSame(['held' => 'clock_not_modeled'], $report[$held], $held);
-            $this->assertStringNotContainsString("  {$held} past_period=", $output);
+        foreach (self::EVIDENCE as $table) {
+            $this->assertSame(0, $report[$table]['past_period'], $table);
         }
-        foreach (['test_delivery_authorizations', 'customer_inquiries', 'inquiry_messages', 'transactional_notices'] as $table) {
+        foreach (['customer_inquiries', 'inquiry_messages', 'support_attachments', 'transactional_notices'] as $table) {
             $this->assertSame(0, $report[$table]['past_period'], $table);
         }
         $this->assertStringContainsString('class=security years=1 cutoff='.$start->addDay()->toDateString(), $output);
@@ -293,17 +319,31 @@ class CustomerDataRetentionReportTest extends TestCase
         }
         $this->assertSame(0, DB::transactionLevel());
 
-        $this->assertSame(['past_period' => 1, 'oldest_due' => $start->addYears(7)->toDateString(), 'newest_due' => $start->addYears(7)->toDateString(),
-            'clock_index' => 'missing'], $report['test_delivery_authorizations']);
-        $this->assertSame(0, $report['test_delivery_redemptions']['past_period']);
-        $this->assertStringContainsString('class=financial years=7 cutoff='.$start->addYear()->toDateString().' note=minimum_period_license_lifetime_still_applies', $output);
+        // Download records follow the order: never counted, however old.
+        $this->assertSame(1, DB::table('test_delivery_authorizations')->count());
+        foreach (self::DOWNLOAD_RECORDS as $table) {
+            $this->assertArrayNotHasKey($table, $report, $table);
+        }
+        $this->assertMatchesRegularExpression('/^class=financial years=7 cutoff='.$start->addYear()->toDateString().'$/m', $output);
+        $this->assertStringNotContainsString('minimum_period_license_lifetime_still_applies', $output);
+        // Evidence: the closed export request, its events and its export metadata; never the open deletion request or its events.
+        $closed = DB::table('customer_data_requests')->whereNotNull('resolved_at')->value('resolved_at');
+        $due = CarbonImmutable::parse($closed, 'UTC')->addYears(7)->toDateString();
+        $this->assertSame(['past_period' => 1, 'oldest_due' => $due, 'newest_due' => $due, 'clock_index' => 'missing'], $report['customer_data_requests']);
+        $this->assertSame(['past_period' => $resolvedEvents, 'follows' => 'customer_data_requests'], $report['customer_data_request_events']);
+        $this->assertSame(['past_period' => 1, 'follows' => 'customer_data_requests'], $report['customer_data_exports']);
+        $this->assertSame(DB::table('audit_events')->where('created_at', '<=', $start->addYear()->format('Y-m-d H:i:s'))->count(), $report['audit_events']['past_period']);
+        $this->assertGreaterThan(0, $report['audit_events']['past_period']);
+        $this->assertStringContainsString('class=evidence years=7 cutoff='.$start->addYear()->toDateString(), $output);
+        // Only the attachment of the conversation without an order follows it; the order conversation and the project attachment never.
+        $this->assertSame(['past_period' => 1, 'follows' => 'customer_inquiries'], $report['support_attachments']);
         $this->assertSame(['past_period' => 1, 'oldest_due' => $replied->addYears(2)->toDateString(), 'newest_due' => $replied->addYears(2)->toDateString(),
             'clock_index' => 'missing'], $report['customer_inquiries'], 'Only the conversation without an order, dated by its last message.');
         $this->assertSame(DB::table('inquiry_messages')->where('inquiry_id', $conversation['inquiry']->id)->count(), $report['inquiry_messages']['past_period']);
         $this->assertSame($notices, $report['transactional_notices']['past_period']);
         $this->assertSame($finished, $report['transactional_mail_deliveries']['past_period']);
         $this->assertSame('customer_inquiries', $report['inquiry_messages']['follows']);
-        foreach (['customer_consent_events', 'customer_consent_states', 'customer_suppression_targets', 'support_attachments', ...self::HELD_EVIDENCE] as $held) {
+        foreach (['customer_consent_events', 'customer_consent_states', 'customer_suppression_targets', 'production_consent_events', 'password_reset_tokens'] as $held) {
             $this->assertSame(['held' => 'clock_not_modeled'], $report[$held], $held);
         }
         $this->assertGreaterThan(0, DB::table('audit_events')->count());
@@ -321,6 +361,142 @@ class CustomerDataRetentionReportTest extends TestCase
         foreach ($private as $value) {
             $this->assertStringNotContainsString($value, $output);
         }
+    }
+
+    public function test_day_and_evidence_clocks_count_exactly_at_their_boundaries_and_orders_and_open_requests_never(): void
+    {
+        config(['customer-data-rights.retention' => self::RETENTION]);
+        $start = now()->toImmutable();
+        // An abandoned quote (priced, never ordered) and a quote an order was built from.
+        $abandoned = InventoryFixtures::selection()['quote'];
+        app(PriceQuote::class)->create($abandoned->public_id, InventoryFixtures::OWNER);
+        $buyer = F::account(['email' => 'retention.boundary@example.test']);
+        $ready = F::ready($buyer['user'], 'BOUNDARY');
+        $this->assertTrue(DB::table('orders')->where('quote_id', $ready['order']->quote_id)->exists());
+        $this->assertFalse(DB::table('orders')->where('quote_id', $abandoned->id)->exists());
+        $ordered = DB::table('quotes')->where('id', $ready['order']->quote_id)->sole();
+        // The fixture's own unused selection quote is abandoned too; every quote here is created at the same instant.
+        $unordered = DB::table('quotes')->whereNotIn('id', DB::table('orders')->select('quote_id'))->pluck('id')->all();
+        $this->assertContains($abandoned->id, $unordered);
+        $this->assertSame(1, DB::table('quotes')->count() - count($unordered));
+        $this->assertSame(1, DB::table('quotes')->distinct()->count('expires_at'));
+        $expires = CarbonImmutable::parse(DB::table('quotes')->where('id', $abandoned->id)->value('expires_at'), 'UTC');
+        $this->assertTrue($expires->greaterThan($start));
+        // A closed export request and an open deletion request, both created now.
+        $export = app(CustomerDataRights::class)->requestExport($buyer['principal'], $buyer['user']);
+        app(CustomerDataRights::class)->download($buyer['principal'], $buyer['user'], $export['requestId'], $export['downloadToken']);
+        $other = F::account(['email' => 'retention.boundary.open@example.test']);
+        app(CustomerDataRights::class)->requestDeletion($other['principal'], $other['user']);
+        $this->assertSame([1, 1], [DB::table('customer_data_requests')->whereNotNull('resolved_at')->count(), DB::table('customer_data_requests')->whereNull('resolved_at')->count()]);
+        // Framework job stores: a queued job (Unix-second clock) and a failed job (datetime clock), both now.
+        DB::table('jobs')->insert(['queue' => 'retention', 'payload' => '{}', 'attempts' => 0, 'available_at' => $start->getTimestamp(), 'created_at' => $start->getTimestamp()]);
+        DB::table('failed_jobs')->insert(['uuid' => (string) Str::uuid(), 'connection' => 'sync', 'queue' => 'retention', 'payload' => '{}',
+            'exception' => 'synthetic', 'failed_at' => $start->format('Y-m-d H:i:s')]);
+
+        // Operational: one second before 14 days nothing, at exactly 14 days both.
+        $this->travelTo($start->addDays(14)->subSecond());
+        [$report] = $this->report();
+        $this->assertSame([0, 0], [$report['jobs']['past_period'], $report['failed_jobs']['past_period']]);
+        $this->travelTo($start->addDays(14));
+        [$report, $output] = $this->report();
+        $day = $start->addDays(14)->toDateString();
+        $this->assertSame(['past_period' => 1, 'oldest_due' => $day, 'newest_due' => $day, 'clock_index' => 'missing'], $report['jobs']);
+        $this->assertSame(['past_period' => 1, 'oldest_due' => $day, 'newest_due' => $day, 'clock_index' => 'missing'], $report['failed_jobs']);
+        $this->assertSame(['held' => 'clock_not_modeled'], $report['job_batches']);
+        $this->assertStringContainsString('class=operational days=14 cutoff='.$start->toDateString(), $output);
+
+        // Abandoned checkout: 30 days after the quote expires, never for the quote that became an order.
+        $this->travelTo($expires->addDays(30)->subSecond());
+        [$report] = $this->report();
+        $this->assertSame(0, $report['quotes']['past_period']);
+        $this->travelTo($expires->addDays(30));
+        [$report, $output] = $this->report();
+        $this->assertSame(['past_period' => count($unordered), 'oldest_due' => $expires->addDays(30)->toDateString(),
+            'newest_due' => $expires->addDays(30)->toDateString(), 'clock_index' => 'yes'], $report['quotes']);
+        $this->assertSame(DB::table('quote_lines')->whereIn('quote_id', $unordered)->count(), $report['quote_lines']['past_period']);
+        $this->assertSame(['past_period' => 1, 'follows' => 'quotes'], $report['quote_pricings']);
+        $this->assertSame(['held' => 'clock_not_modeled'], $report['quote_owners']);
+        $this->assertMatchesRegularExpression('/^class=abandoned_checkout days=30 cutoff='.$expires->toDateString().'$/m', $output);
+        // Long after, the ordered quote, its lines and pricing, and its reservation, claim and promotion still count nothing.
+        $this->travelTo(CarbonImmutable::parse($ordered->expires_at, 'UTC')->addYears(50));
+        [$report] = $this->report();
+        $this->assertSame(count($unordered), $report['quotes']['past_period'], 'A quote an order was built from is never counted.');
+        $this->assertSame(DB::table('quote_lines')->whereIn('quote_id', $unordered)->count(), $report['quote_lines']['past_period']);
+        $this->assertGreaterThan(0, DB::table('quote_lines')->where('quote_id', $ordered->id)->count());
+        $this->assertSame(1, $report['quote_pricings']['past_period']);
+        // The ordered quote's reservation follows it and is held by its order.
+        $this->assertSame(0, DB::table('inventory_reservations')->whereIn('quote_id', $unordered)->count());
+        $this->assertGreaterThan(0, DB::table('inventory_reservations')->where('quote_id', $ordered->id)->count());
+        foreach (['inventory_reservations', 'inventory_claims', 'promotion_uses'] as $table) {
+            $this->assertSame(0, $report[$table]['past_period'], $table);
+        }
+
+        // Evidence: one second before 7 years nothing, at exactly 7 years the closed request with its events and export metadata.
+        $this->travelTo($start->addYears(7)->subSecond());
+        [$report] = $this->report();
+        foreach (self::EVIDENCE as $table) {
+            $this->assertSame(0, $report[$table]['past_period'], $table);
+        }
+        $this->travelTo($start->addYears(7));
+        [$report] = $this->report();
+        $closed = DB::table('customer_data_requests')->whereNotNull('resolved_at')->value('id');
+        $this->assertSame(1, $report['customer_data_requests']['past_period']);
+        $this->assertSame(DB::table('customer_data_request_events')->where('request_id', $closed)->count(), $report['customer_data_request_events']['past_period']);
+        $this->assertSame(1, $report['customer_data_exports']['past_period']);
+        $this->assertSame(DB::table('audit_events')->where('created_at', '<=', $start->format('Y-m-d H:i:s'))->count(), $report['audit_events']['past_period']);
+        $this->assertGreaterThan(0, $report['audit_events']['past_period']);
+        // The open request is never past, however old; nor are its events.
+        $this->travelTo($start->addYears(60));
+        [$report] = $this->report();
+        $this->assertSame(1, $report['customer_data_requests']['past_period'], 'An open request is never past its period.');
+        $this->assertSame(DB::table('customer_data_request_events')->where('request_id', $closed)->count(), $report['customer_data_request_events']['past_period']);
+        $this->assertSame(1, DB::table('customer_data_requests')->whereNull('resolved_at')->count());
+        // Orders and download records are never counted.
+        foreach (['orders', 'order_attempts', 'checkout_intents', ...self::DOWNLOAD_RECORDS] as $table) {
+            $this->assertArrayNotHasKey($table, $report, $table);
+        }
+    }
+
+    public function test_production_checkout_reviews_without_an_order_and_identity_records_follow_their_clocks(): void
+    {
+        config(['app.key' => 'base64:'.base64_encode(str_repeat('h', 32))]);
+        $this->identitySetup();
+        config(['production_checkout.fresh_checkout_enabled' => true, 'customer-data-rights.retention' => self::RETENTION]);
+        $start = now()->toImmutable();
+        // One review an order was accepted from, and a second review of the same buyer that was never accepted.
+        $fixture = $this->payable();
+        $fixture['checkout']->review($fixture['buyer']['principal'], $fixture['buyer']['user'], $fixture['catalog']['candidate']->id, $fixture['catalog']['items'],
+            $fixture['basis']['public_id'], ['legalName' => 'Declared synthetic buyer'], 'synthetic-review-abandoned');
+        $this->assertSame([2, 1], [DB::table('production_checkout_reviews')->count(), DB::table('production_checkout_orders')->count()]);
+        $this->assertMatchesRegularExpression('/\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ\z/', DB::table('production_checkout_reviews')->value('created_at'));
+        $abandoned = CarbonImmutable::parse(DB::table('production_checkout_reviews')->whereNotIn('id', DB::table('production_checkout_orders')->select('review_id'))->value('created_at'), 'UTC');
+        $this->assertGreaterThan(0, DB::table('production_identity_notices')->count());
+        $this->assertSame(1, DB::table('production_identity_origins')->count());
+
+        // ISO-8601 text clock: one second before 30 days nothing (the same calendar day as the cutoff), at 30 days the abandoned review only.
+        $this->travelTo($abandoned->addDays(30)->subSecond());
+        [$report] = $this->report();
+        $this->assertSame(0, $report['production_checkout_reviews']['past_period']);
+        $this->travelTo($abandoned->addDays(30));
+        [$report] = $this->report();
+        $due = $abandoned->addDays(30)->toDateString();
+        $this->assertSame(['past_period' => 1, 'oldest_due' => $due, 'newest_due' => $due, 'clock_index' => 'missing'], $report['production_checkout_reviews']);
+        foreach (['production_checkout_orders', 'production_checkout_order_lines', 'production_checkout_provider_intents', 'production_identity_origins'] as $table) {
+            $this->assertArrayNotHasKey($table, $report, $table);
+        }
+
+        // Identity records: 12 months after their last clock column (a send attempt's 120-second lease included); the enrollment
+        // challenge the identity origin was created from is kept with that origin.
+        $this->travelTo($start->addYear()->addMinutes(5));
+        [$report] = $this->report();
+        $this->assertSame(1, $report['production_checkout_reviews']['past_period'], 'The review the order was accepted from is never counted.');
+        foreach (['production_identity_notices', 'production_identity_attempts', 'production_identity_outcomes', 'production_identity_verifications'] as $table) {
+            $this->assertSame(DB::table($table)->count(), $report[$table]['past_period'], $table);
+            $this->assertGreaterThan(0, $report[$table]['past_period'], $table);
+        }
+        $held = DB::table('production_identity_origins')->value('initial_challenge_id');
+        $this->assertSame(DB::table('production_identity_challenges')->where('id', '!=', $held)->count(), $report['production_identity_challenges']['past_period']);
+        $this->assertSame(['held' => 'clock_not_modeled'], $report['production_identity_addresses']);
     }
 
     public function test_every_migrated_table_is_scheduled_reviewed_or_reported_as_unclassified(): void
@@ -379,6 +555,17 @@ class CustomerDataRetentionReportTest extends TestCase
             $this->assertMatchesRegularExpression('/\A\s*select\b/i', $sql);
             $this->assertDoesNotMatchRegularExpression('/for update|lock in share mode|for share/i', $sql);
         }
+    }
+
+    /** A support attachment row for a source; its own timestamps are irrelevant, since it follows its source. */
+    private function attachment(string $kind, string $sourceId): void
+    {
+        DB::table('support_attachments')->insert(['public_id' => (string) Str::uuid(), 'source_kind' => $kind, 'source_id' => $sourceId,
+            'source_family' => $kind === 'inquiry' ? 'original_inquiry_session_v1' : 'test_service_project_v1', 'source_hash' => str_repeat('a', 64),
+            'origin_hash' => str_repeat('a', 64), 'actor_hash' => str_repeat('a', 64), 'request_key' => (string) Str::uuid(), 'policy_hash' => str_repeat('a', 64),
+            'manifest_hash' => str_repeat('a', 64), 'source_binding' => 'synthetic opaque evidence', 'policy_binding' => 'synthetic opaque evidence',
+            'manifest' => 'synthetic opaque evidence', 'source_version' => 0, 'bytes' => 12, 'expires_at' => 200, 'attempt' => 0, 'created_at' => 100,
+            'updated_at' => 100, 'state' => 'ready']);
     }
 
     /** @return array{0: array<string, array<string, int|string>>, 1: string} report lines keyed by table */

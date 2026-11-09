@@ -22,7 +22,7 @@ final class RetentionReport
     public function __construct(private readonly DataRightsPolicy $policy) {}
 
     /**
-     * @return array{policy_reference: string, as_of: string, classes: list<array{class: string, years: int, cutoff: string,
+     * @return array{policy_reference: string, as_of: string, classes: list<array{class: string, unit: string, period: int, cutoff: string,
      *     tables: list<array{table: string, held?: string, past_period?: int, oldest_due?: ?string, newest_due?: ?string,
      *     follows?: string, clock_index?: bool}>}>, indefinite: list<string>, not_applicable: list<string>, unclassified: list<string>}
      *
@@ -38,13 +38,15 @@ final class RetentionReport
             if ($key === null) {
                 continue;
             }
-            $years = $retention[$key];
-            $cutoff = $at->subYears($years);
+            $unit = str_ends_with($key, '_days') ? 'days' : 'years';
+            $period = $retention[$key];
+            $cutoff = $unit === 'days' ? $at->subDays($period) : $at->subYears($period);
+            $due = fn (CarbonImmutable $from): CarbonImmutable => $unit === 'days' ? $from->addDays($period) : $from->addYears($period);
             $tables = [];
             foreach (RetentionSchedule::forClass($class) as $entry) {
-                $tables[] = ['table' => $entry['table']] + $this->measure($entry, $cutoff, $years);
+                $tables[] = ['table' => $entry['table']] + $this->measure($entry, $cutoff, $due);
             }
-            $classes[] = ['class' => $class, 'years' => $years, 'cutoff' => $cutoff->toDateString(), 'tables' => $tables];
+            $classes[] = ['class' => $class, 'unit' => $unit, 'period' => $period, 'cutoff' => $cutoff->toDateString(), 'tables' => $tables];
         }
 
         return ['policy_reference' => $retention['policy_reference'], 'as_of' => $at->toIso8601ZuluString(), 'classes' => $classes,
@@ -74,61 +76,87 @@ final class RetentionReport
         return $tables;
     }
 
-    private function measure(array $entry, CarbonImmutable $cutoff, int $years): array
+    /** @param  \Closure(CarbonImmutable): CarbonImmutable  $due  the date a row dated at its argument falls due */
+    private function measure(array $entry, CarbonImmutable $cutoff, \Closure $due): array
     {
         $clock = $entry['clock'];
         if ($clock === null) {
             return ['held' => 'clock_not_modeled'];
         }
         $table = $entry['table'];
-        $bound = $cutoff->format('Y-m-d H:i:s');
         $dated = isset($clock['columns']) ? $this->dateExpression($clock) : null;
         $max = DB::table($table)->max('id');
         $count = 0;
         $oldest = $newest = null;
         for ($from = 0; $max !== null && $from < (int) $max; $from += self::CHUNK) {
             $query = DB::table($table.' as r')->where('r.id', '>', $from)->where('r.id', '<=', $from + self::CHUNK);
-            $this->past($query, $clock, $bound);
+            $this->past($query, $clock, $cutoff);
             $row = $query->selectRaw('count(*) as n'.($dated === null ? '' : ", min($dated) as lo, max($dated) as hi"))->first();
             $count += (int) $row->n;
             if ($dated !== null && $row->n > 0) {
-                $oldest = $oldest === null || $row->lo < $oldest ? $row->lo : $oldest;
-                $newest = $newest === null || $row->hi > $newest ? $row->hi : $newest;
+                $oldest = $oldest === null || $this->moment($clock, $row->lo)->lessThan($oldest) ? $this->moment($clock, $row->lo) : $oldest;
+                $newest = $newest === null || $this->moment($clock, $row->hi)->greaterThan($newest) ? $this->moment($clock, $row->hi) : $newest;
             }
         }
         if (isset($clock['via'])) {
             return ['past_period' => $count, 'follows' => $clock['via'][1]];
         }
-        $due = fn (?string $value): ?string => $value === null ? null : CarbonImmutable::parse($value, 'UTC')->addYears($years)->toDateString();
 
-        return ['past_period' => $count, 'oldest_due' => $due($oldest), 'newest_due' => $due($newest),
-            'clock_index' => $this->indexed($table, $clock['columns'][0])];
+        return ['past_period' => $count, 'oldest_due' => $oldest === null ? null : $due($oldest)->toDateString(),
+            'newest_due' => $newest === null ? null : $due($newest)->toDateString(), 'clock_index' => $this->indexed($table, $clock['columns'][0])];
     }
 
-    /** Rows whose clock has run out: every clock column set and at or before the cutoff, and nothing that holds them. */
-    private function past(Builder $query, array $clock, string $bound, string $alias = 'r'): void
+    /**
+     * Rows whose clock has run out: every clock column set and at or before the cutoff, and nothing that holds them. A `via` row
+     * follows its parent, joined under a fresh alias per level so a parent that itself follows a parent stays unambiguous.
+     */
+    private function past(Builder $query, array $clock, CarbonImmutable $cutoff, string $alias = 'r'): void
     {
         if (isset($clock['via'])) {
             [$foreign, $parent] = $clock['via'];
+            $key = $clock['via'][2] ?? 'id';
             $parentClock = RetentionSchedule::byTable()[$parent]['clock'];
-            $query->whereExists(function (Builder $sub) use ($parent, $foreign, $parentClock, $bound, $alias): void {
-                $sub->selectRaw('1')->from($parent.' as p')->whereColumn('p.id', $alias.'.'.$foreign);
-                $this->past($sub, $parentClock, $bound, 'p');
+            if (isset($clock['when'])) {
+                $query->where($alias.'.'.$clock['when'][0], '=', $clock['when'][1]);
+            }
+            $query->whereExists(function (Builder $sub) use ($parent, $foreign, $key, $parentClock, $cutoff, $alias): void {
+                $sub->selectRaw('1')->from($parent.' as '.$alias.'p')->whereColumn($alias.'p.'.$key, $alias.'.'.$foreign);
+                $this->past($sub, $parentClock, $cutoff, $alias.'p');
             });
 
             return;
         }
+        $bound = $this->bound($clock, $cutoff);
         foreach ($clock['columns'] as $column) {
             $query->whereNotNull($alias.'.'.$column)->where($alias.'.'.$column, '<=', $bound);
         }
         if (isset($clock['unless_later'])) {
             [$child, $foreign, $column] = $clock['unless_later'];
-            $query->whereNotExists(fn (Builder $sub) => $sub->selectRaw('1')->from($child.' as l')
-                ->whereColumn('l.'.$foreign, $alias.'.id')->where('l.'.$column, '>', $bound));
+            $query->whereNotExists(fn (Builder $sub) => $sub->selectRaw('1')->from($child.' as '.$alias.'l')
+                ->whereColumn($alias.'l.'.$foreign, $alias.'.id')->where($alias.'l.'.$column, '>', $bound));
         }
-        foreach ($clock['unless_referenced'] ?? [] as [$holder, $foreign]) {
-            $query->whereNotExists(fn (Builder $sub) => $sub->selectRaw('1')->from($holder.' as h')->whereColumn('h.'.$foreign, $alias.'.id'));
+        foreach ($clock['unless_referenced'] ?? [] as $hold) {
+            [$holder, $foreign] = $hold;
+            $own = $hold[2] ?? 'id';
+            $query->whereNotExists(fn (Builder $sub) => $sub->selectRaw('1')->from($holder.' as '.$alias.'h')
+                ->whereColumn($alias.'h.'.$foreign, $alias.'.'.$own));
         }
+    }
+
+    /** The cutoff in the clock columns' own storage format, so the comparison is exact on SQLite and MySQL alike. */
+    private function bound(array $clock, CarbonImmutable $cutoff): int|string
+    {
+        return match ($clock['format'] ?? 'datetime') {
+            'epoch' => $cutoff->getTimestamp(),
+            'iso8601' => $cutoff->format('Y-m-d\TH:i:s\Z'),
+            default => $cutoff->format('Y-m-d H:i:s'),
+        };
+    }
+
+    /** A stored clock value as a UTC moment. */
+    private function moment(array $clock, int|string $value): CarbonImmutable
+    {
+        return ($clock['format'] ?? 'datetime') === 'epoch' ? CarbonImmutable::createFromTimestampUTC((int) $value) : CarbonImmutable::parse($value, 'UTC');
     }
 
     /** The column that dates a past row: its last clock column, or its latest child row when a later child would hold it. */
@@ -162,7 +190,9 @@ final class RetentionReport
     {
         foreach (RetentionSchedule::ENTRIES as $entry) {
             $clock = $entry['clock'] ?? [];
-            $columns = array_merge($clock['columns'] ?? [], isset($clock['via']) ? [$clock['via'][0]] : [], $clock !== [] ? ['id'] : []);
+            $columns = array_merge($clock['columns'] ?? [], isset($clock['via']) ? [$clock['via'][0]] : [],
+                isset($clock['when']) ? [$clock['when'][0]] : [], array_map(fn (array $hold): string => $hold[2] ?? 'id', $clock['unless_referenced'] ?? []),
+                $clock !== [] ? ['id'] : []);
             if (! Schema::hasTable($entry['table']) || ($columns !== [] && ! Schema::hasColumns($entry['table'], $columns))) {
                 throw new DataRightsException(503, 'retention_schedule_table_missing');
             }

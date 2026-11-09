@@ -43,12 +43,13 @@ class CustomerDataRights
         'grant_contracts' => 'financial_records_years', 'verified_payments' => 'financial_records_years',
         'customer_purchase_claims' => 'financial_records_years', 'delivery_records' => 'financial_records_years',
         'customer_consent_events' => 'consent_records_years', 'customer_suppression_records' => 'consent_records_years',
-        'inquiries' => 'correspondence_records_years', 'audit_events' => 'security_records_years',
-        'identity_challenges' => 'security_records_years', 'customer_data_requests' => 'security_records_years',
+        'inquiries' => 'correspondence_records_years', 'audit_events' => 'evidence_records_years',
+        'identity_challenges' => 'security_records_years', 'customer_data_requests' => 'evidence_records_years',
         'transactional_notices' => 'correspondence_records_years', 'transactional_mail_deliveries' => 'correspondence_records_years',
-        'customer_data_exports' => 'security_records_years',
-        // D-30: production checkout records that carry buyer declarations (ProductionCheckoutExportSection::RECORDS).
-        'production_checkout_reviews' => 'financial_records_years', 'production_checkout_orders' => 'financial_records_years',
+        'customer_data_exports' => 'evidence_records_years',
+        // D-30: production checkout records that carry buyer declarations (ProductionCheckoutExportSection::RECORDS). A review
+        // that never became an order is an abandoned checkout (2026-11-09); one that did is kept with its order.
+        'production_checkout_reviews' => 'abandoned_checkout_days', 'production_checkout_orders' => 'financial_records_years',
         'production_tax_checkout_orders' => 'financial_records_years',
         // The buyer's qualified exemption attestation (ProductionCheckoutExportSection::RECORDS).
         'production_checkout_exemption_bases' => 'financial_records_years',
