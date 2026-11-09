@@ -3,12 +3,15 @@
 namespace Tests\Feature\MediaLifecycle;
 
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Media\MediaProcessor;
 use App\Domain\Media\Models\MediaAsset;
+use App\Domain\Media\QueueMediaProcessing;
 use App\Domain\Media\ReadStaffMediaInventory;
 use App\Filament\Pages\MediaLifecyclePage;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
@@ -86,5 +89,51 @@ final class MediaLifecyclePageTest extends TestCase
         } finally {
             $this->requireMfa($was);
         }
+    }
+
+    public function test_the_proof_runs_only_on_the_throttled_action_and_renders_and_paging_read_its_cache(): void
+    {
+        $admin = LicenseFixtures::admin();
+        $this->travelTo(now()->startOfSecond());
+        $track = Track::create(['title' => 'SYNTHETIC page proof', 'slug' => 'synthetic-page-proof']);
+        $source = MediaFixtures::source($track, 'artwork');
+        $run = app(QueueMediaProcessing::class)->handle($source, $admin);
+        $this->assertSame('completed', app(MediaProcessor::class)->handle($run->id)->status);
+        $this->travel(31)->days();
+        $this->actingAs($admin);
+        $proofQueries = 0;
+        DB::listen(function ($query) use (&$proofQueries): void {
+            $proofQueries += str_contains($query->sql, "ESCAPE '!'") ? 1 : 0;
+        });
+
+        $page = Livewire::test(MediaLifecyclePage::class)->assertSee('No proof has run for this age');
+        $page->call('nextPage', 0)->call('$refresh');
+        $this->assertSame(0, $proofQueries, 'Rendering and paging must not run the content proof.');
+        $this->assertMatchesRegularExpression('/data-state="unattached"><th scope="row">[^<]+<\/th><td>0<\/td>/', $page->html());
+
+        $page->call('runProof');
+        $this->assertGreaterThan(0, $proofQueries);
+        $this->assertMatchesRegularExpression('/data-state="unattached"><th scope="row">[^<]+<\/th><td>1<\/td>/', $page->html());
+        $this->assertStringContainsString('data-family="'.$source->id.'"', $page->html());
+
+        $after = $proofQueries;
+        $page->call('nextPage', 0)->call('$refresh');
+        $page->call('runProof')->assertNotified('Proof not run');
+        $this->assertSame($after, $proofQueries, 'Paging reads the cache and a second proof inside the cooldown is refused.');
+        $this->assertStringContainsString('data-family="'.$source->id.'"', $page->html());
+
+        $this->travel(MediaLifecyclePage::PROOF_COOLDOWN_SECONDS + 1)->seconds();
+        $page->call('runProof');
+        $this->assertGreaterThan($after, $proofQueries);
+    }
+
+    public function test_an_invalid_age_is_a_message_not_an_error(): void
+    {
+        $this->actingAs(LicenseFixtures::admin());
+        foreach (['abc', '0', '3651', '-1', '1e3', ''] as $age) {
+            Livewire::test(MediaLifecyclePage::class)->set('olderThanDays', $age)->assertOk()
+                ->assertSee('Enter a whole number of days from 1 to 3650.');
+        }
+        Livewire::test(MediaLifecyclePage::class)->set('olderThanDays', 'abc')->call('runProof')->assertNotified('Proof not run');
     }
 }

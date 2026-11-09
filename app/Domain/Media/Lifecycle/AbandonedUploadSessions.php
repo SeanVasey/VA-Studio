@@ -42,6 +42,9 @@ final class AbandonedUploadSessions
 
     public const TRANSPORT_FILE = '/\A(?:part-[0-9]+\.(?:part|pending)|complete\.assembled|assembly\.pending)\z/D';
 
+    /** @var array{0:int,1:int} device and inode of the directory {@see inspect()} last accepted */
+    private array $identity = [0, 0];
+
     private const KINDS = [
         'media' => [MediaUploadSession::class, 'track_id', Track::class, 'media.upload.session_abandoned'],
         'kit' => [SoundKitUploadSession::class, 'sound_kit_draft_id', SoundKitDraft::class, 'sound_kit.upload.abandoned'],
@@ -129,7 +132,7 @@ final class AbandonedUploadSessions
                 $counts['directories_absent']++;
             } else {
                 try {
-                    $this->remove($temp.'/'.$session->public_id, $plan, $euid);
+                    $this->remove($temp.'/'.$session->public_id, $plan, $euid, $this->identity);
                 } catch (UploadSweepRefused) {
                     // Whatever was removed was transport bytes of a terminal session; the rest stays for inspection.
                     $counts['directories_left']++;
@@ -189,6 +192,7 @@ final class AbandonedUploadSessions
         if (($stat['mode'] & 0177777) !== 0040700 || $stat['uid'] !== $euid || realpath($path) !== $path) {
             return false;
         }
+        $this->identity = [$stat['dev'], $stat['ino']];
         $entries = @scandir($path);
         if (! is_array($entries)) {
             return false;
@@ -210,11 +214,21 @@ final class AbandonedUploadSessions
         return $files;
     }
 
-    /** @param list<string> $files */
-    private function remove(string $path, array $files, int $euid): void
+    /**
+     * @param  list<string>  $files
+     * @param  array{0:int,1:int}  $identity  device and inode of the directory as inspected
+     */
+    private function remove(string $path, array $files, int $euid, array $identity): void
     {
         foreach ($files as $name) {
-            // Re-check immediately before unlinking: a link or replacement placed since inspection is never removed.
+            // The directory must still be the one inspected: a swapped-in directory (or a link to one) is never emptied.
+            clearstatcache(true, $path);
+            $directory = @lstat($path);
+            if (! is_array($directory) || ($directory['mode'] & 0177777) !== 0040700 || $directory['uid'] !== $euid
+                || [$directory['dev'], $directory['ino']] !== $identity || realpath($path) !== $path) {
+                throw new UploadSweepRefused('cleanup_incomplete');
+            }
+            // Re-check each file immediately before unlinking: a link or replacement placed since inspection is never removed.
             clearstatcache(true, $path.'/'.$name);
             $entry = @lstat($path.'/'.$name);
             if (! is_array($entry) || ($entry['mode'] & 0170000) !== 0100000 || $entry['uid'] !== $euid || ! @unlink($path.'/'.$name)) {

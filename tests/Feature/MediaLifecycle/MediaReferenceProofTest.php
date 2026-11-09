@@ -14,9 +14,11 @@ use App\Domain\Media\QueueMediaProcessing;
 use App\Domain\Rights\Models\RightsDeclaration;
 use App\Models\User;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Tests\Support\ContractFixtures;
@@ -197,7 +199,14 @@ final class MediaReferenceProofTest extends TestCase
             'profile_fingerprint' => str_repeat('c', 64), 'input_sha256' => $failed->sha256, 'profile' => '{}', 'status' => 'failed', 'created_at' => now(), 'updated_at' => now()]);
         $this->travel(31)->days();
 
-        $summary = app(MediaLifecycleInventory::class)->summary(30, CarbonImmutable::now());
+        $inventory = app(MediaLifecycleInventory::class);
+        // Without an explicit proof the cheap counts never call a family unattached.
+        $cheap = $inventory->summary(30, CarbonImmutable::now());
+        $this->assertSame(0, $cheap['states']['unattached']['families']);
+        $this->assertSame(2, $cheap['states']['unknown']['families']);
+        $this->assertNull($cheap['candidates']);
+        $proof = $inventory->candidates(30, CarbonImmutable::now(), MediaReferenceProof::MAX_PROOF_FAMILIES);
+        $summary = $inventory->summary(30, CarbonImmutable::now(), $proof);
 
         $this->assertSame(1, $summary['states']['in_progress']['families']);
         $this->assertSame(1, $summary['states']['failed_processing']['families']);
@@ -206,7 +215,7 @@ final class MediaReferenceProofTest extends TestCase
         $this->assertSame((int) $queued->size_bytes, $summary['states']['in_progress']['recorded_bytes']);
         $this->assertSame([$master, $artwork], array_column($summary['candidates']['families'], 'id'));
         // Younger than the age: not proven, so not unattached.
-        $younger = app(MediaLifecycleInventory::class)->summary(40, CarbonImmutable::now());
+        $younger = $inventory->summary(40, CarbonImmutable::now(), $inventory->candidates(40, CarbonImmutable::now(), 10));
         $this->assertSame(0, $younger['states']['unattached']['families']);
         $this->assertSame(2, $younger['states']['unknown']['families']);
         $this->assertSame(['active', 'expired', 'cleanup_pending'], array_keys($summary['sessions']['media']));
@@ -239,5 +248,60 @@ final class MediaReferenceProofTest extends TestCase
         $this->assertSame(0, $exit);
         $this->assertStringContainsString('Unattached: 0.', Artisan::output());
         $this->assertSame(2, Artisan::call('vasey:media-unattached-report', ['--limit' => 0]));
+    }
+
+    public function test_hash_only_manifests_unreadable_types_and_polymorphic_pairs_are_checked_and_one_proof_is_bounded(): void
+    {
+        [$master, , $outputs] = $this->family('synthetic-fences', 880, false);
+        Schema::create('fp034_probe', function (Blueprint $table): void {
+            $table->id();
+            $table->char('asset_manifest_hash', 64)->nullable();
+            $table->binary('payload')->nullable();
+            $table->string('subject_type')->nullable();
+            $table->unsignedBigInteger('subject_id')->nullable();
+        });
+        $this->assertSame(['complete', 'unattached'], [$this->prove([$master])['coverage'], $this->prove([$master])['families'][$master]['state']]);
+
+        DB::table('fp034_probe')->insert(['asset_manifest_hash' => str_repeat('d', 64)]);
+        $this->assertSame(['hash_only_manifest:fp034_probe.asset_manifest_hash'], $this->prove([$master])['blockers']);
+        $this->assertSame('unknown', $this->prove([$master])['families'][$master]['state']);
+        DB::table('fp034_probe')->delete();
+
+        DB::table('fp034_probe')->insert(['payload' => "\x00synthetic"]);
+        $this->assertSame(['uninspected_type:fp034_probe.payload'], $this->prove([$master])['blockers']);
+        DB::table('fp034_probe')->delete();
+
+        DB::table('fp034_probe')->insert(['subject_type' => MediaAsset::class, 'subject_id' => $outputs['download_mp3']->id]);
+        $result = $this->prove([$master]);
+        $this->assertSame('complete', $result['coverage']);
+        $this->assertSame('attached', $result['families'][$master]['state']);
+        $this->assertSame(1, $result['families'][$master]['checks']['poly:fp034_probe.subject']);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->prove(range(1, MediaReferenceProof::MAX_PROOF_FAMILIES + 1));
+    }
+
+    public function test_json_escaped_paths_count_and_too_many_matching_rows_make_coverage_incomplete(): void
+    {
+        [$master, , $outputs] = $this->family('synthetic-bounds', 990, false);
+        Schema::create('fp034_notes', function (Blueprint $table): void {
+            $table->id();
+            $table->text('note');
+        });
+        $note = json_encode(['file' => MediaAsset::findOrFail($outputs['master_wav']->id)->storage_path]);
+        $this->assertStringContainsString('\\/', $note);
+        DB::table('fp034_notes')->insert(['note' => $note]);
+        $result = $this->prove([$master]);
+        $this->assertSame('attached', $result['families'][$master]['state']);
+        $this->assertSame(1, $result['families'][$master]['checks']['content:fp034_notes']);
+
+        DB::table('fp034_notes')->delete();
+        $sha = MediaAsset::findOrFail($master)->sha256;
+        foreach (array_chunk(range(1, MediaReferenceProof::MAX_CONTENT_ROWS + 1), 200) as $chunk) {
+            DB::table('fp034_notes')->insert(array_map(fn (int $i): array => ['note' => 'synthetic '.$i.' '.$sha], $chunk));
+        }
+        $result = $this->prove([$master]);
+        $this->assertSame(['incomplete', ['content_bound:fp034_notes']], [$result['coverage'], $result['blockers']]);
+        $this->assertNotSame('unattached', $result['families'][$master]['state']);
     }
 }

@@ -9,9 +9,10 @@
     <form wire:submit="$refresh" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: end;">
         <div>
             <label for="lifecycle-age" style="display: block; font-weight: 600;">Unattached proof: minimum age (days)</label>
-            <input id="lifecycle-age" type="number" min="1" max="3650" wire:model="olderThanDays" required style="min-height: 44px;">
+            <input id="lifecycle-age" type="text" inputmode="numeric" maxlength="4" wire:model="olderThanDays" required style="min-height: 44px;">
         </div>
         <button type="submit" class="fi-btn fi-color fi-size-md fi-btn-color-primary" style="padding: .5rem 1rem; font-weight: 600; min-height: 44px;">Apply</button>
+        <button type="button" wire:click="runProof" class="fi-btn fi-color fi-size-md" style="padding: .5rem 1rem; font-weight: 600; min-height: 44px;">Run proof (at most once a minute)</button>
     </form>
 
     @if ($error)
@@ -53,7 +54,11 @@
 
         @php $candidates = $lifecycle['candidates']; @endphp
         <section aria-labelledby="lifecycle-unattached">
-            <h2 id="lifecycle-unattached" style="font-size: 1.25rem; font-weight: 700;">Unattached completed media older than {{ $candidates['older_than_days'] }} day(s): dry run</h2>
+            <h2 id="lifecycle-unattached" style="font-size: 1.25rem; font-weight: 700;">Unattached completed media: dry run</h2>
+            @if ($candidates === null)
+                <p data-proof="none">No proof has run for this age in the last 10 minutes. Choose Run proof; until then no family is counted as unattached.</p>
+            @else
+            <p data-proof="cached">Proof of families older than {{ $candidates['older_than_days'] }} day(s), run at {{ $proofAt }} (UTC); counts above apply it.</p>
             <p>Coverage: {{ $candidates['coverage'] }}.@if ($candidates['blockers'] !== []) Not provable while these hold data: {{ implode(', ', $candidates['blockers']) }}.@endif</p>
             @if ($candidates['families'] === [])
                 <p data-empty="unattached">No completed family without a structural reference was proven.</p>
@@ -69,6 +74,7 @@
                     @endforeach
                     </tbody>
                 </table>
+            @endif
             @endif
         </section>
 

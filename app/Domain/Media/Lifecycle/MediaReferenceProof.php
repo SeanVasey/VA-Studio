@@ -241,8 +241,8 @@ final class MediaReferenceProof
             foreach (array_chunk($terms, self::TERMS_PER_QUERY) as $chunk) {
                 $found = DB::table($table)->where(function ($query) use ($chunk): void {
                     foreach ($chunk as [$column, $needle]) {
-                        // Wildcards in a needle only widen the match, which is the conservative direction.
-                        $query->orWhere($column, 'like', '%'.$needle.'%');
+                        // An explicit escape character makes `\`, `%` and `_` literal on SQLite and MySQL alike.
+                        $query->orWhereRaw(DB::getQueryGrammar()->wrap($column)." LIKE ? ESCAPE '!'", ['%'.self::likeLiteral($needle).'%']);
                     }
                 })->limit(self::MAX_CONTENT_ROWS + 1)->get(array_values(array_unique([...$identity, ...$text])));
                 foreach ($found as $row) {
@@ -280,6 +280,11 @@ final class MediaReferenceProof
         sort($blockers);
 
         return $blockers;
+    }
+
+    private static function likeLiteral(string $value): string
+    {
+        return str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $value);
     }
 
     /** The family a row belongs to (its own lineage, or an audit event about a family row), or null. */
@@ -337,6 +342,10 @@ final class MediaReferenceProof
                 foreach ([$asset->sha256, $asset->storage_path] as $needle) {
                     if (is_string($needle) && strlen($needle) >= 16) {
                         $family['needles'][] = $needle;
+                        // JSON encoders escape slashes by default: `media\/revisions\/...` names the same file.
+                        if (str_contains($needle, '/')) {
+                            $family['needles'][] = str_replace('/', '\\/', $needle);
+                        }
                     }
                 }
                 unset($family);

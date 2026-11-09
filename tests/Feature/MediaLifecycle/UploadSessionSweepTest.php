@@ -4,6 +4,8 @@ namespace Tests\Feature\MediaLifecycle;
 
 use App\Console\Commands\SweepAbandonedUploadSessions;
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Media\Lifecycle\AbandonedUploadSessions;
+use App\Domain\Media\Lifecycle\UploadSweepRefused;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\Models\MediaUploadSession;
 use App\Domain\Media\ResumableMediaUploads;
@@ -20,6 +22,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\MediaFixtures;
@@ -374,5 +377,109 @@ final class UploadSessionSweepTest extends TestCase
         $this->assertFalse($event->filtersPass($this->app));
         config(['media.upload_session_sweep.scheduled' => true]);
         $this->assertTrue($event->filtersPass($this->app));
+    }
+
+    public function test_a_session_touched_after_selection_is_rechecked_under_its_lock_and_kept(): void
+    {
+        $id = $this->mediaSession();
+        $this->own();
+        $this->travel(49)->hours();
+        $touched = false;
+        DB::listen(function ($query) use (&$touched, $id): void {
+            // Right after the sweep selects its candidates, the row becomes recently active again.
+            if (! $touched && str_contains($query->sql, 'media_upload_sessions') && str_contains($query->sql, 'expires_at')) {
+                $touched = true;
+                DB::table('media_upload_sessions')->where('public_id', $id)->update(['updated_at' => now()]);
+            }
+        });
+
+        [$exit, $output] = $this->sweep(['--execute' => true]);
+
+        $this->assertTrue($touched);
+        $this->assertSame(0, $exit, $output);
+        $this->assertStringContainsString('1 expired and 0 interrupted-cancel session(s)', $output);
+        $this->assertStringContainsString('0 marked cancelled', $output);
+        $this->assertSame('uploading', MediaUploadSession::where('public_id', $id)->value('status'));
+        $this->assertFileExists($this->root().'/resumable/'.$id.'/part-0.part');
+    }
+
+    public function test_append_complete_and_cancel_cannot_use_a_session_the_sweep_marked(): void
+    {
+        $media = $this->mediaSession();
+        $kit = $this->kitSession();
+        $this->own();
+        $this->travel(49)->hours();
+        $this->sweep(['--execute' => true]);
+        $audits = AuditEvent::count();
+        foreach ([[app(ResumableMediaUploads::class), $media, MediaUploadSession::class], [app(SoundKitUploads::class), $kit, SoundKitUploadSession::class]] as [$uploads, $id, $model]) {
+            foreach (['append' => fn () => $uploads->append($id, 0, UploadedFile::fake()->createWithContent('chunk.bin', 'synthetic'), $this->actor),
+                'complete' => fn () => $uploads->complete($id, $this->actor)] as $operation => $call) {
+                try {
+                    $call();
+                    $this->fail($operation.' must be refused on a swept session.');
+                } catch (ValidationException $refused) {
+                    $this->assertArrayHasKey('upload', $refused->errors());
+                }
+            }
+            // Cancelling an already cancelled session is the existing idempotent replay: it reports the terminal state
+            // and changes nothing (no audit event, no revived row, no recreated directory).
+            $this->assertSame(['cancelled', false], array_values(array_intersect_key($uploads->cancel($id, $this->actor), ['status' => 1, 'cleanupPending' => 1])));
+            $this->assertSame('cancelled', $model::where('public_id', $id)->value('status'));
+            $this->assertDirectoryDoesNotExist($this->root().'/resumable/'.$id);
+        }
+        $this->assertSame($audits, AuditEvent::count());
+        $this->assertSame(0, MediaAsset::count());
+    }
+
+    public function test_a_directory_swapped_after_inspection_is_not_emptied(): void
+    {
+        $id = $this->mediaSession();
+        $this->own();
+        $directory = $this->root().'/resumable/'.$id;
+        $inspected = lstat($directory);
+        // An attacker swaps in a different directory with the same name and transport-looking contents.
+        rename($directory, $this->root().'/resumable-original');
+        mkdir($directory, 0700);
+        file_put_contents($directory.'/part-0.part', 'synthetic swapped-in file');
+        if (posix_geteuid() === 0) {
+            chown($directory, $this->uid);
+            chown($directory.'/part-0.part', $this->uid);
+        }
+        $remove = new \ReflectionMethod(AbandonedUploadSessions::class, 'remove');
+        try {
+            $remove->invoke(new AbandonedUploadSessions, $directory, ['part-0.part'], $this->uid, [$inspected['dev'], $inspected['ino']]);
+            $this->fail('A swapped directory must not be emptied.');
+        } catch (UploadSweepRefused $refused) {
+            $this->assertSame('cleanup_incomplete', $refused->reason);
+        }
+        $this->assertSame('synthetic swapped-in file', file_get_contents($directory.'/part-0.part'));
+        $this->assertFileExists($this->root().'/resumable-original/part-0.part');
+    }
+
+    public function test_a_linked_shared_storage_root_is_followed_once_but_a_linked_temp_root_is_refused(): void
+    {
+        $id = $this->mediaSession();
+        $this->own();
+        $this->travel(49)->hours();
+        $real = $this->root();
+        $link = dirname($real).'/linked-'.Str::uuid();
+        symlink($real, $link);
+        try {
+            config(['filesystems.disks.local.root' => $link]);
+            [$exit, $output] = $this->sweep(['--execute' => true]);
+            $this->assertSame(0, $exit, $output);
+            $this->assertStringContainsString('Directories removed: 1 (1 file(s))', $output);
+            $this->assertDirectoryDoesNotExist($real.'/resumable/'.$id);
+
+            // The temp root itself may not be a link, even to a private directory owned by the sweeping user.
+            rename($real.'/resumable', $real.'/resumable-real');
+            symlink($real.'/resumable-real', $real.'/resumable');
+            [$exit, $output] = $this->sweep(['--execute' => true]);
+            $this->assertSame(1, $exit);
+            $this->assertStringContainsString('upload temp root is not a private (0700) directory', $output);
+        } finally {
+            config(['filesystems.disks.local.root' => $real]);
+            unlink($link);
+        }
     }
 }

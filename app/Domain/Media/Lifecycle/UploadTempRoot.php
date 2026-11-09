@@ -17,16 +17,19 @@ final class UploadTempRoot
             || ($disk['visibility'] ?? 'private') !== 'private' || ! is_string($disk['root'] ?? null)) {
             throw new UploadSweepRefused('private_disk');
         }
-        $root = rtrim($disk['root'], '/');
-        if (! str_starts_with($root, '/') || str_contains($root, '//') || preg_match('~(?:\A|/)\.\.?(?:/|\z)~', $root) === 1) {
+        $configured = rtrim($disk['root'], '/');
+        if (! str_starts_with($configured, '/') || str_contains($configured, '//') || preg_match('~(?:\A|/)\.\.?(?:/|\z)~', $configured) === 1) {
             throw new UploadSweepRefused('root_unsafe');
         }
-        clearstatcache(true, $root);
-        $stat = @lstat($root);
-        if ($stat === false) {
+        clearstatcache(true, $configured);
+        if (@lstat($configured) === false) {
             return null;
         }
-        if (($stat['mode'] & 0170000) !== 0040000 || realpath($root) !== $root || ($stat['mode'] & 0022) !== 0) {
+        // A shared storage root may be a link (as PrivateMediaFiles::root() accepts); resolve it once and check the real path.
+        $root = realpath($configured);
+        clearstatcache(true, (string) $root);
+        $stat = $root === false ? false : @lstat($root);
+        if ($stat === false || ($stat['mode'] & 0170000) !== 0040000 || ($stat['mode'] & 0022) !== 0) {
             throw new UploadSweepRefused('root_unsafe');
         }
         foreach ($this->publicRoots() as $public) {
@@ -34,6 +37,7 @@ final class UploadTempRoot
                 throw new UploadSweepRefused('root_public');
             }
         }
+        // The temp root itself is never a link: it must be a real private directory directly under the resolved root.
         $temp = $root.'/'.self::DIRECTORY;
         clearstatcache(true, $temp);
         $stat = @lstat($temp);

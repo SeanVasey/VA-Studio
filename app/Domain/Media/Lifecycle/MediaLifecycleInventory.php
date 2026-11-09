@@ -23,7 +23,11 @@ final class MediaLifecycleInventory
 
     public function __construct(private readonly MediaReferenceProof $proof) {}
 
-    public function summary(int $olderThanDays, CarbonImmutable $now): array
+    /**
+     * Cheap counts: structural checks only. The full proof never runs here; a previously computed {@see candidates()}
+     * result may be passed in, and its family states (unattached, attached by content, unknown) are applied as of that proof.
+     */
+    public function summary(int $olderThanDays, CarbonImmutable $now, ?array $proof = null): array
     {
         $roots = DB::table('media_assets')->whereNull('parent_asset_id')->orderBy('id')->limit(self::MAX_FAMILIES + 1)
             ->get(['id', 'status', 'created_at']);
@@ -32,7 +36,6 @@ final class MediaLifecycleInventory
         $latest = $this->latestRuns($roots->pluck('id')->all());
         $states = array_fill_keys(self::STATES, ['families' => 0, 'recorded_bytes' => 0]);
         $classified = [];
-        $open = [];
         foreach ($roots->chunk(500) as $chunk) {
             $structural = $this->proof->structural($chunk->pluck('id')->map(fn ($id): int => (int) $id)->all());
             foreach ($chunk as $root) {
@@ -46,15 +49,13 @@ final class MediaLifecycleInventory
                     default => 'unknown',
                 };
                 $classified[$id] = [$state, $family['recorded_bytes']];
-                if ($state === 'unknown' && $root->status === 'processed') {
-                    $open[] = $id;
-                }
             }
         }
-        $candidates = $this->prove($open, $olderThanDays, $now, MediaReferenceProof::MAX_PROOF_FAMILIES);
-        foreach ($candidates['families'] as $family) {
-            // The full proof can only add references (content) or prove absence; unknown stays unknown.
-            $classified[$family['id']][0] = $family['state'];
+        foreach ($proof['families'] ?? [] as $family) {
+            // Only a family the cheap pass still leaves unknown takes the proof's answer; a newer reference always wins.
+            if (($classified[$family['id']][0] ?? null) === 'unknown') {
+                $classified[$family['id']][0] = $family['state'];
+            }
         }
         foreach ($classified as [$state, $bytes]) {
             $states[$state]['families']++;
@@ -65,9 +66,9 @@ final class MediaLifecycleInventory
             $states['unknown']['families_beyond_bound'] = true;
         }
 
-        return ['states' => $states, 'sessions' => $this->sessions($now), 'candidates' => $candidates,
+        return ['states' => $states, 'sessions' => $this->sessions($now), 'candidates' => $proof,
             'families_bounded' => $beyond, 'older_than_days' => $olderThanDays,
-            'observation' => 'Recorded metadata only: not physical disk usage and not a deletion decision. Unattached is reported only for the bounded proof set.'];
+            'observation' => 'Recorded metadata only: not physical disk usage and not a deletion decision. Unattached is reported only from an explicitly run, bounded proof.'];
     }
 
     /**

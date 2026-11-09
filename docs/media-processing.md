@@ -262,11 +262,13 @@ Every `media_assets` row belongs to a track (`track_id` is required), so "attach
 - `publication:track`: the track is published, scheduled or was ever published (`published_slug`).
 - `content:<table>`: any text value in any table containing a member's SHA-256 or private storage path, case-insensitively. Identical bytes in another family, a site image or a kit therefore count as a reference: conservative on purpose.
 
+Paths are also searched in their JSON-escaped form (`media\/revisions\/...`), and needles are matched literally (`LIKE ... ESCAPE '!'`).
+
 Coverage is incomplete, and every family without a found reference is **unknown**, never unattached, while any of these hold data: Laravel ciphertext (`eyJpdiI6`) in any text column outside the reviewed allowlist (`users.app_authentication_secret`, `users.app_authentication_recovery_codes`, `sessions.payload`, `cache.value`), because orders, grants, support attachments and evidence store encrypted payloads that may name an asset; a non-null `*asset_manifest_hash` column; a value of a type the checks cannot read; or more than 1,000 matching rows in one table. In a store with any sale, grant or support attachment, expect "unknown" everywhere: that is the intended answer until those payloads have a reviewed decryption-side check.
 
 ### Staff view
 
-**Media lifecycle** in the admin panel (`App\Filament\Pages\MediaLifecyclePage`) is read-only and gated like the media pages: the `administer-catalog` gate and enrolled MFA on every Livewire request, re-checked under lock by `ReadStaffMediaInventory::lifecycle()`. It shows families and recorded bytes per state (in progress, failed processing, attached, unattached, unknown), upload sessions (active, expired, cleanup pending, with received bytes), the bounded proof of up to 10 completed families older than the chosen age, and the existing asset-page inventory by role and status. It shows ids, roles and sizes only: no file name, storage path, track title or customer value. Sizes are recorded metadata, not disk usage. Families beyond the first 5,000 are not classified.
+**Media lifecycle** in the admin panel (`App\Filament\Pages\MediaLifecyclePage`) is read-only and gated like the media pages: the `administer-catalog` gate and enrolled MFA on every Livewire request, re-checked under lock by `ReadStaffMediaInventory::lifecycle()`. It shows families and recorded bytes per state (in progress, failed processing, attached, unattached, unknown), upload sessions (active, expired, cleanup pending, with received bytes), and the existing asset-page inventory by role and status. Renders and paging run only the cheap structural checks. The full proof (up to 10 completed families older than the chosen age) runs only when staff choose **Run proof**: at most once a minute per user, cached per user for 10 minutes, and applied to the counts as of that run; until then no family is counted unattached. The staff fence (which locks the user row) commits before the read and is taken again after it, so the read-only proof never holds that lock. It shows ids, roles and sizes only: no file name, storage path, track title or customer value. Sizes are recorded metadata, not disk usage. Families beyond the first 5,000 are not classified.
 
 ### Abandoned upload sessions
 
@@ -281,6 +283,8 @@ Eligible sessions, track media and sound kits alike: `uploading` past `expires_a
 Order: one transaction marks an `uploading` row `cancelled` and records a system audit event (`media.upload.session_abandoned` or `sound_kit.upload.abandoned`, no actor); after it commits, a second transaction, holding the same track or kit-draft and session row locks the upload paths take, removes the directory and only then sets `cleaned_at`. Marking first means no append or completion can use the session while its files go, and a crash in between leaves `cancelled` with `cleaned_at` empty, which the next run finishes. The row is never deleted: upload sessions are retained evidence (the kit table refuses `DELETE` by trigger and the media migration refuses to roll back populated rows).
 
 Safety: the command refuses to run as root, refuses a private disk that is served or public, a disk root that is a link, writable by others, or inside the web root, the public disk, a served disk or a configured public link, and a temp root `resumable/` that is not a 0700 directory owned by the sweeping user. A session directory is removed only if `lstat` shows a 0700 directory owned by that user, reached without a link, holding only regular, singly linked, owned files with transport names. Anything else (links, foreign files, wrongly named or other users' directories, unexpected contents) is left in place and counted, and the command exits non-zero. It prints counts only.
+
+Before removing anything, the directory is re-checked (same device and inode as inspected, a 0700 directory owned by the sweeping user, no link) and each file is re-checked just before its unlink. A private disk root that is itself a link (a shared `storage/`) is resolved once and every check applies to the real path; the `resumable/` temp root itself must not be a link.
 
 The hourly scheduled `--execute` run (`:37`) is registered but off until a reviewed change sets `media.upload_session_sweep.scheduled` to `true`. Run it as the site user that owns the private disk.
 
@@ -301,6 +305,16 @@ An approved delete is the next step and needs all of these, none of which exists
 3. An append-only audit event with the actor, family, members, hashes, sizes and the proof's check list.
 4. A quarantine period: move the family's files into a private holding area (and mark the rows, which today's immutability triggers forbid for `ready`/`processed` assets: a reviewed migration must add a retire state) for a fixed period with a restore path, and only then hard-delete the files. Rows stay as evidence.
 5. The decryption-side checks for encrypted order, grant, contract and support-attachment payloads, so coverage can be complete in a store that has sold anything.
+
+Independent review of PR #257 recorded these as hard prerequisites: no delete may trust the proof until each is met.
+
+- **P2-1:** decrypt and parse every grant, contract, membership and legacy payload, column by column. An allowlist must never stand in for that.
+- **P2-2:** check track-level references: `catalog_import_mappings.track_id`, `legacy_history_lines.track_source_id`, `product_draft_members.track_id` and order lines.
+- **P2-3:** handle id-only references in plaintext JSON outside `MediaReferenceProof::JSON_COLUMNS`: `fulfillment_outbox.payload`, `exclusive_activations.snapshot`, `inventory_reservations.snapshot`, quote snapshots, `audit_events.context`, `site_releases.content` and `jobs.payload`.
+- **P2-4:** detect references through a schema-reviewed registry, not by column name (`source_manifest_hash`, for example, is missed today).
+- **P2-5:** re-prove under the asset, track and offer locks inside the delete transaction.
+
+Deferred follow-ups: (P3-2) check that a `resumable/` directory's `public_id` is not claimed by both upload-session tables before removing it; (P3-6) find and clean orphaned `quarantine/resumable/<uuid>/` copies left by interrupted completions; (P3-7) bound the cost of `vasey:media-unattached-report`, which runs the full proof per batch of 10 over every table.
 
 ## Verification and release boundary
 
