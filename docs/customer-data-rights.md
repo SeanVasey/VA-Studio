@@ -77,7 +77,9 @@ Sean approved the periods on 2026-11-07 (PRIVACY section 7; decision register "R
 - the timestamp columns that start its clock;
 - a rationale.
 
-It covers every table of every `CustomerDataRights::RETAINED` record family, every table the export and deletion code reads, and the export sections' tables. `CustomerDataRetentionReportTest` fails when a table is unclassified or classified twice, or when a table would loosen its family's class (it may only keep the family's period or be held as `indefinite`).
+It covers every table of every `CustomerDataRights::RETAINED` record family, every table the export and deletion code reads, and the export sections' tables. `CustomerDataRetentionReportTest` fails when one of those tables is unclassified or classified twice, or when a table would loosen its family's class (it may only keep the family's period or be held as `indefinite`).
+
+Every other migrated table is either listed in `RetentionSchedule::NOT_CUSTOMER_DATA` (reviewed, by reading its migration or schema class, as holding no customer data) or reported by the dry run as **unclassified**. A second test pins the exact unclassified set and checks that every migrated table is scheduled, reviewed or reported, exactly once, so a new migration fails it until the table is classified deliberately.
 
 | Class | Tables | Clock |
 | --- | --- | --- |
@@ -86,7 +88,8 @@ It covers every table of every `CustomerDataRights::RETAINED` record family, eve
 | `consent`, held | consent events and states, the four `customer_suppression_*` tables | Not modeled. PRIVACY starts the clock when the email address is no longer held, and an opt-out must keep being honored. |
 | `correspondence` | `customer_inquiries`, with `inquiry_messages` and `inquiry_notification_intents` following their conversation | 2 years after the last message. A conversation linked to an order is never counted. |
 | `correspondence` | `transactional_notices` (`created_at`), `transactional_mail_deliveries` (`queued_at`, `finished_at`) | Never past while a delivery is unfinished. `support_attachments` is held: its source is polymorphic and no clock is modeled. |
-| `security` | `audit_events` (`created_at`), `customer_identity_challenges` (`created_at`, `expires_at`), `customer_data_requests` (`created_at`, `resolved_at`) with `customer_data_request_events` following, `customer_data_exports` (`created_at`, `purged_at`) | An open request or unpurged export is never past. `customer_purchase_challenges` (`created_at`, `expires_at`) is counted unless a purchase claim references it. |
+| `security` | `customer_identity_challenges` (`created_at`, `expires_at`), `customer_purchase_challenges` (`created_at`, `expires_at`) | PRIVACY: verification and recovery code records, 12 months. A purchase challenge that a purchase claim references is never counted. |
+| `security`, held until Sean decides | `audit_events`, `customer_data_requests`, `customer_data_request_events`, `customer_data_exports` | None. PRIVACY section 7 gives audit and data-request evidence no period, and these rows are the evidence that a deletion was honored, of role changes and of held orders. The report prints `held=clock_not_modeled` and never counts them. Deletion approval still keeps them (`CustomerDataRights::RETAINED` is unchanged). |
 | `not_applicable` | `users`, `customer_accounts`, `customer_saved_tracks`, `sessions`, `customer_consent_policies` | Account lifecycle, handled by deletion approval, or not customer data. |
 
 A row is past its period only when every clock column is set and at or before the cutoff (now minus the class's years).
@@ -95,6 +98,7 @@ A row is past its period only when every clock column is set and at or before th
 - It reads with plain selects only: no transaction, no locks and no writes. It scans each table in primary-key ranges of 10,000, so no single query is unbounded.
 - It prints, per class and table, `past_period` (a count) and the oldest and newest due dates (date only), or `held=clock_not_modeled`.
 - It lists the indefinite and not-applicable tables by name only. It never prints identifiers, names or addresses.
+- It prints `unclassified=<names> count=<n> note=each_needs_owner_retention_decision`: tables of the connection's own schema (SQLite `main`, the configured MySQL database; other schemas and tables without the connection's prefix are excluded) that are neither scheduled nor reviewed as not customer data. Names only. Unclassified tables never fail the command; each needs Sean's retention decision before any purge design covers it.
 - It refuses with a non-zero exit (`refused=retention_policy_unset`) while any retention value is unset or invalid, the same check deletion approval uses, so periods are never inferred.
 - It also refuses (`refused=retention_schedule_table_missing`) when a scheduled table or clock column is missing.
 
@@ -102,12 +106,40 @@ None of the counted clock columns has an index (the report prints `clock_index=m
 
 **Purge or anonymization is a later, separately authorized step.** It needs its own reviewed migration, because most of these tables refuse `DELETE` through database triggers. It also needs Sean's explicit authorization, and the open questions below need answers first. This increment has no delete or anonymize code path.
 
+### Reviewed as not customer data
+
+`RetentionSchedule::NOT_CUSTOMER_DATA` (62 tables) holds framework, catalog, storefront, license-template and staff-authored definition tables; each entry carries a one-line reason. Staff actor ids can appear in them; no customer, buyer, account or recipient column does. They are: `migrations`; catalog `tracks`, `track_metadata_presets`, `media_assets`, `media_processing_runs`, `media_upload_sessions`, `stems_recordings`, `rights_declarations`, `rights_scopes`, `rights_scope_offers`, `exclusive_activations`, `offers`, `offer_revisions`, `catalog_import_batches`, `catalog_import_mappings`, `catalog_discovery_epoch`, the three `discovery_sitemap_*` tables; license `license_templates`, `license_versions`, `license_review_evidence`, `vasey_license_contract_texts` (template and renderer profile by hash, shared by every buyer); storefront `site_images`, `site_image_variants`, `site_releases`, `site_release_images`, `site_publications`, `site_publication_revisions`, `site_publication_schedules`; drafts `sound_kit_drafts`, `sound_kit_revisions`, `sound_kit_upload_sessions`, `product_drafts`, `product_draft_versions`, `product_draft_members`, `merch_drafts`, `merch_draft_versions`, `service_drafts`, `service_draft_versions`; plans and definitions `membership_plans`, `membership_plan_versions`, `production_membership_plan_versions`, `promotion_campaigns`, `promotion_availabilities`, `promotion_availability_revisions`, `free_definitions`, `free_reviews`, `free_availability`, `production_free_definitions`, `production_free_reviews`, `production_free_availability`, `production_consent_policies`; production track policy `production_track_policy_drafts`, `production_track_policy_versions`, `production_track_policy_source_reviews`, `production_track_capability_candidates`, `production_track_capability_approvals`, `production_track_capability_closures`, `production_track_preparation_packets`, `production_track_preparation_packet_lines`; and `transactional_mail_scan_progress` (scanner cursors).
+
+### Unclassified: each needs Sean's retention decision
+
+The dry run reports these 111 tables by name. None is purged or counted. A table stays here when it holds or links to customer data, or when its payload could not be confirmed free of it. When Sean decides a family's retention, its tables move into `RetentionSchedule::ENTRIES` (with a class and clock) or, if reviewed as not customer data, into `NOT_CUSTOMER_DATA`, and the pinned list in the test changes in the same commit.
+
+| Tables | Why unclassified |
+| --- | --- |
+| `cache`, `cache_locks`, `jobs`, `job_batches`, `failed_jobs` | Framework stores whose keys and payloads can hold anything, including rate-limit keys derived from IP addresses and serialized job payloads with customer data. |
+| `password_reset_tokens` | Holds a customer email address with a reset token hash. |
+| `legacy_history_batches`, `legacy_history_customers`, `legacy_history_orders`, `legacy_history_lines`, `legacy_history_contracts`, `legacy_history_contract_declarations`, `legacy_history_grant_reviews`, `legacy_exclusivity_authority_events` | Imported BeatStars customer, order and contract history (and its batch membership); its retention is part of the cutover decision. |
+| `quotes`, `quote_lines`, `quote_owners`, `quote_pricings`, `inventory_reservations`, `inventory_claims`, `order_attempts`, `promotion_uses`, `exclusive_sales`, `checkout_intents`, `checkout_sessions`, `checkout_observations`, `pending_entitlements`, `fulfillment_outbox`, `contract_render_requests`, `contract_render_work` | Checkout and fulfillment state keyed to a buyer's owner key, order or grant. Some may be purchase evidence (exclusive sales); not decided. |
+| `stripe_webhook_receipts`, `stripe_receipt_work`, `payment_observations` | Payment provider events and observations: payment evidence that can carry customer details. |
+| `refund_dispute_objects`, `refund_dispute_observations`, `refund_dispute_statuses`, `refund_dispute_effects`, `refund_dispute_holds`, `refund_dispute_work`, `refund_line_allocations` | Refund and dispute evidence of an order. |
+| `test_delivery_controls`, `test_fulfillment_activations`, `test_payment_exception_events`, `test_payment_exception_work`, `test_payment_financial_observations`, `test_refund_resolution_requests`, `test_refund_resolutions`, `test_unpaid_releases`, `test_unpaid_release_events`, `test_unpaid_release_work` | Test-commerce controls and exception records linked to orders; default-off, but they reference customer orders. |
+| `free_origins`, `free_originals`, `free_document_work`, `free_authorizations`, `free_redemptions`, `paid_fulfillments`, `paid_document_work`, `paid_tax_fulfillments`, `paid_tax_document_work` | Free-grant records of a customer account, and paid-chain work rows linked to a buyer's grant. |
+| `membership_credit_buckets`, `membership_credit_events`, `service_projects`, `service_project_events` | A customer's membership credits and service projects. |
+| `customer_identity_addresses`, `transactional_notice_attempts` | Address keys derived from customer email addresses (identity challenge serialization); delivery attempts of a notice to a recipient. |
+| the 46 `production_*` tables not listed above (`production_account_feature_bindings`, `production_buyer_assent_observations`, the remaining `production_checkout_*`, `production_consent_*` states and events, `production_free_*` origins to redemptions and revocations, the `production_identity_*` tables other than `production_identity_origins`, `production_listening_libraries`, `production_member_*`, `production_membership_*` billing, periods, redemptions and credit events, `production_suppression_*`, `production_tax_checkout_bindings`, `production_tax_checkout_requests`, `production_tax_checkout_reviewed_sessions`) | Production customer identity (U-07), consent, membership, free-grant and checkout records, default-off and unconfigured. `production_member_profiles` and `production_member_definitions` are probably renderer profiles and definitions with no account column, but their encrypted payloads were not confirmed, so they stay unclassified. |
+
 Open questions for Sean:
-- `audit_events` and `customer_data_requests` also hold the evidence that a deletion was honored, role changes and held paid orders; a 1-year purge would erase that evidence.
+- Retention of the audit and data-request evidence (`audit_events`, `customer_data_requests`, `customer_data_request_events`, `customer_data_exports`). PRIVACY section 7 gives it no period, and it holds the evidence that a deletion was honored, role changes and held paid orders; the report holds it until this is decided.
+- Retention of each unclassified table family above.
 - What ends "while we hold your email address" for consent and suppression records: account erasure, or the end of the order records that keep the email?
 - Download records are bound to the license lifetime as well as the 7 years: is there a cutoff for perpetual licenses?
 - Do support attachments follow their conversation?
 - The production identity tables (U-07) beyond `production_identity_origins` are not scheduled yet.
+
+Deferred follow-ups (independent review P3s, 2026-11-09):
+- Download-record clock vs license lifetime: download records count from their own `issued_at`/`expires_at` or `created_at`, while PRIVACY counts 7 years from the last transaction on the order and keeps them while the license can be used. Align the clock with the order (or keep them indefinite) before any purge.
+- `transactional_notices` class: order-ready notices are classed `correspondence` (2 years); PRIVACY could read them as order records (7 years and the license lifetime). Decide the class.
+- `config/customer-data-rights.php` line 24 comment: it says the security period covers download authorizations, which are financial in the schedule, and the retention block's opening comment still says Sean has not approved a schedule. Correct both comments, and the `VASEY_CUSTOMER_DATA_RETENTION_SECURITY_YEARS` row in the configuration table above, which repeats them (the report applies that period only to identity and purchase challenges).
 
 ## Records
 

@@ -19,7 +19,10 @@ namespace App\Domain\Customers\DataRights;
  * - `columns` with `unless_later` [table, foreign key, column]: also no child row newer than the cutoff (a conversation's
  *   last message), and `unless_referenced` [[table, column]]: no row there references this one (kept with that record).
  * - `via` [foreign key, parent table]: the row follows its parent, whose clock must be `columns`.
- * - null: the clock the approved policy names is not modeled yet, so the table is reported as held.
+ * - null: the clock the approved policy names is not modeled yet, or the approved policy names no period for the record
+ *   (audit and data-request evidence, until Sean decides), so the table is reported as held and never counted.
+ *
+ * Tables in neither ENTRIES nor NOT_CUSTOMER_DATA are listed by the report as unclassified: names only, never a failure.
  */
 final class RetentionSchedule
 {
@@ -121,20 +124,22 @@ final class RetentionSchedule
         ['table' => 'transactional_mail_deliveries', 'family' => 'transactional_mail_deliveries', 'class' => 'correspondence',
             'clock' => ['columns' => ['queued_at', 'finished_at']],
             'rationale' => 'Delivery of a notice; never past while unfinished.'],
-        // Security records (RETAINED security).
-        ['table' => 'audit_events', 'family' => 'audit_events', 'class' => 'security', 'clock' => ['columns' => ['created_at']],
-            'rationale' => 'Minimized audit evidence. Also holds deletion-completion, role-change and held-order evidence: needs Sean before any purge.'],
+        // Security records (RETAINED security). PRIVACY section 7 sets 12 months only for verification and recovery code records.
         ['table' => 'customer_identity_challenges', 'family' => 'identity_challenges', 'class' => 'security', 'clock' => ['columns' => ['created_at', 'expires_at']],
             'rationale' => 'PRIVACY: verification and recovery code records are kept 12 months for security.'],
         ['table' => 'customer_purchase_challenges', 'family' => 'identity_challenges', 'class' => 'security',
             'clock' => ['columns' => ['created_at', 'expires_at'], 'unless_referenced' => [['customer_purchase_claims', 'challenge_id']]],
             'rationale' => 'Purchase claim challenge; one that proved a claim is kept with the claim.'],
-        ['table' => 'customer_data_requests', 'family' => 'customer_data_requests', 'class' => 'security', 'clock' => ['columns' => ['created_at', 'resolved_at']],
-            'rationale' => 'Data request record; never past while open. Also the evidence that a deletion was honored: needs Sean before any purge.'],
-        ['table' => 'customer_data_request_events', 'family' => 'customer_data_requests', 'class' => 'security', 'clock' => ['via' => ['request_id', 'customer_data_requests']],
-            'rationale' => 'Append-only history of its request; follows it.'],
-        ['table' => 'customer_data_exports', 'family' => 'customer_data_exports', 'class' => 'security', 'clock' => ['columns' => ['created_at', 'purged_at']],
-            'rationale' => 'Export row kept as request evidence; never past until its contents are purged.'],
+        // Audit and data-request evidence: PRIVACY section 7 gives these records no period, so they are held (never counted)
+        // until Sean decides their retention. They are the evidence that a deletion was honored, of role changes and of held orders.
+        ['table' => 'audit_events', 'family' => 'audit_events', 'class' => 'security', 'clock' => null,
+            'rationale' => 'Held until Sean decides: PRIVACY gives audit evidence no period; it also proves deletions, role changes and held orders.'],
+        ['table' => 'customer_data_requests', 'family' => 'customer_data_requests', 'class' => 'security', 'clock' => null,
+            'rationale' => 'Held until Sean decides: PRIVACY gives data request records no period; this is the evidence a deletion was honored.'],
+        ['table' => 'customer_data_request_events', 'family' => 'customer_data_requests', 'class' => 'security', 'clock' => null,
+            'rationale' => 'Held with its request until Sean decides: append-only history of the data request.'],
+        ['table' => 'customer_data_exports', 'family' => 'customer_data_exports', 'class' => 'security', 'clock' => null,
+            'rationale' => 'Held until Sean decides: export rows (contents purged) are kept as data request evidence, which PRIVACY gives no period.'],
         // Account lifecycle, handled by the deletion workflow rather than a retention purge.
         ['table' => 'users', 'family' => null, 'class' => 'not_applicable', 'clock' => null,
             'rationale' => 'Sign-in profile: pseudonymized when a deletion request is approved.'],
@@ -144,6 +149,76 @@ final class RetentionSchedule
             'rationale' => 'Listening library: erased on deletion approval.'],
         ['table' => 'sessions', 'family' => null, 'class' => 'not_applicable', 'clock' => null,
             'rationale' => 'Expire after inactivity and are ended on deletion approval.'],
+    ];
+
+    /**
+     * Tables reviewed (by reading their migration or schema class) as holding no customer data: framework, catalog, storefront,
+     * license-template and staff-authored definition tables. Staff actor ids may appear. Any other table that is neither here nor
+     * in ENTRIES is reported as unclassified and needs Sean's retention decision; when unsure, a table stays unclassified.
+     */
+    public const NOT_CUSTOMER_DATA = [
+        'migrations' => 'Framework migration log: migration names and batch numbers.',
+        'tracks' => 'Catalog: published track metadata.',
+        'track_metadata_presets' => 'Catalog: staff metadata presets.',
+        'media_assets' => 'Catalog media files (masters, previews, artwork) uploaded by staff.',
+        'media_processing_runs' => 'Processing runs of catalog media.',
+        'media_upload_sessions' => 'Resumable staff uploads of catalog media.',
+        'stems_recordings' => 'Catalog: verified stems and master links of a track.',
+        'rights_declarations' => 'Catalog: rights and sample declarations of a track.',
+        'rights_scopes' => 'Catalog: rights scopes that offers sell.',
+        'rights_scope_offers' => 'Catalog: links between rights scopes and offer revisions.',
+        'exclusive_activations' => 'Catalog: staff activation of an exclusive offer; no buyer reference.',
+        'license_templates' => 'License template names.',
+        'license_versions' => 'Published license text and terms, authored and approved by staff.',
+        'license_review_evidence' => 'Staff review evidence of a license version.',
+        'vasey_license_contract_texts' => 'Contract template and renderer profile shared by every buyer of a version, by hash; no buyer data.',
+        'offers' => 'Catalog: offers and prices.',
+        'offer_revisions' => 'Catalog: immutable published offer revisions.',
+        'catalog_import_batches' => 'Catalog import evidence (track source hashes and review); no customer records.',
+        'catalog_import_mappings' => 'Catalog import mapping of source records to tracks.',
+        'catalog_discovery_epoch' => 'Catalog discovery invalidation counter.',
+        'discovery_sitemap_current' => 'Public sitemap pointer.',
+        'discovery_sitemap_generations' => 'Public sitemap generations.',
+        'discovery_sitemap_windows' => 'Public sitemap pages.',
+        'site_images' => 'Storefront images uploaded by staff, with their credits.',
+        'site_image_variants' => 'Resized storefront image variants.',
+        'site_releases' => 'Storefront content releases.',
+        'site_release_images' => 'Images of a storefront release.',
+        'site_publications' => 'Active storefront release pointer.',
+        'site_publication_revisions' => 'Storefront publication history (staff actors).',
+        'site_publication_schedules' => 'Scheduled storefront publications.',
+        'sound_kit_drafts' => 'Catalog: sound kit drafts.',
+        'sound_kit_revisions' => 'Catalog: sound kit archives and manifests.',
+        'sound_kit_upload_sessions' => 'Resumable staff uploads of sound kits.',
+        'product_drafts' => 'Catalog: product drafts.',
+        'product_draft_versions' => 'Catalog: product draft versions.',
+        'product_draft_members' => 'Catalog: tracks of a product draft version.',
+        'merch_drafts' => 'Catalog: merch drafts.',
+        'merch_draft_versions' => 'Catalog: merch draft versions.',
+        'service_drafts' => 'Catalog: service drafts.',
+        'service_draft_versions' => 'Catalog: service draft versions.',
+        'membership_plans' => 'Membership plan definitions.',
+        'membership_plan_versions' => 'Membership plan versions.',
+        'production_membership_plan_versions' => 'Production membership plan policies and terms.',
+        'promotion_campaigns' => 'Promotion definitions and codes.',
+        'promotion_availabilities' => 'Current on/off state of a promotion.',
+        'promotion_availability_revisions' => 'Staff history of promotion availability.',
+        'free_definitions' => 'Free-download definitions authored by staff.',
+        'free_reviews' => 'Staff review of a free-download definition.',
+        'free_availability' => 'Staff availability changes of a free-download definition.',
+        'production_free_definitions' => 'Production free-grant definitions authored by staff.',
+        'production_free_reviews' => 'Staff review of a production free-grant definition.',
+        'production_free_availability' => 'Staff availability changes of a production free-grant definition.',
+        'production_consent_policies' => 'Production consent notice versions, as customer_consent_policies.',
+        'production_track_policy_drafts' => 'Staff production track policy drafts.',
+        'production_track_policy_versions' => 'Staff production track policy versions.',
+        'production_track_policy_source_reviews' => 'Staff review of a production track policy version.',
+        'production_track_capability_candidates' => 'Production track capability candidates (catalog policy).',
+        'production_track_capability_approvals' => 'Staff approval of a capability candidate.',
+        'production_track_capability_closures' => 'Staff closure of a capability candidate.',
+        'production_track_preparation_packets' => 'Staff production preparation packets of catalog offers.',
+        'production_track_preparation_packet_lines' => 'Offer lines of a preparation packet.',
+        'transactional_mail_scan_progress' => 'Mail scanner cursor positions; no recipient data.',
     ];
 
     /** @return array<string, array{table: string, family: ?string, class: string, clock: ?array, rationale: string}> keyed by table */

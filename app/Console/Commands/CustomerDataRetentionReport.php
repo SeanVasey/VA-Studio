@@ -48,6 +48,8 @@ final class CustomerDataRetentionReport extends Command
         }
         $this->line('class=indefinite never_purged_by_this_mechanism='.implode(',', $result['indefinite']));
         $this->line('class=not_applicable account_lifecycle_or_not_customer_data='.implode(',', $result['not_applicable']));
+        $this->line('unclassified='.implode(',', $result['unclassified']).' count='.count($result['unclassified'])
+            .' note=each_needs_owner_retention_decision');
         $this->line('Nothing was changed. Past-period counts are review candidates: any purge or anonymization is a later, separately authorized step.');
 
         return self::SUCCESS;

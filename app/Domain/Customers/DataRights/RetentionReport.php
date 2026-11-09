@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Schema;
  * Read-only dry run of the retention schedule (FP-076, U-13). For each class with a configured period it counts, per table,
  * the rows past their period and the earliest and latest date they fell due. It reads with plain selects only (no
  * transaction, no locks), scanning each table in primary-key ranges so no single query is unbounded. Counts and dates only:
- * no row identifiers, names or addresses leave the database. Nothing is deleted or anonymized.
+ * no row identifiers, names or addresses leave the database. Nothing is deleted or anonymized. Tables the schedule does not
+ * classify are listed by name as unclassified; they never fail the report.
  */
 final class RetentionReport
 {
@@ -23,7 +24,7 @@ final class RetentionReport
     /**
      * @return array{policy_reference: string, as_of: string, classes: list<array{class: string, years: int, cutoff: string,
      *     tables: list<array{table: string, held?: string, past_period?: int, oldest_due?: ?string, newest_due?: ?string,
-     *     follows?: string, clock_index?: bool}>}>, indefinite: list<string>, not_applicable: list<string>}
+     *     follows?: string, clock_index?: bool}>}>, indefinite: list<string>, not_applicable: list<string>, unclassified: list<string>}
      *
      * @throws DataRightsException when the retention configuration is unset or invalid, or a scheduled table or column is missing
      */
@@ -48,7 +49,29 @@ final class RetentionReport
 
         return ['policy_reference' => $retention['policy_reference'], 'as_of' => $at->toIso8601ZuluString(), 'classes' => $classes,
             'indefinite' => array_column(RetentionSchedule::forClass('indefinite'), 'table'),
-            'not_applicable' => array_column(RetentionSchedule::forClass('not_applicable'), 'table')];
+            'not_applicable' => array_column(RetentionSchedule::forClass('not_applicable'), 'table'),
+            'unclassified' => $this->unclassified()];
+    }
+
+    /**
+     * Tables of this connection's own schema (SQLite `main`, the MySQL database) that are neither scheduled nor reviewed as
+     * not customer data, by unprefixed name. Tables of other schemas, or without this connection's prefix, are not ours.
+     *
+     * @return list<string>
+     */
+    private function unclassified(): array
+    {
+        $prefix = DB::connection()->getTablePrefix();
+        $known = RetentionSchedule::byTable() + RetentionSchedule::NOT_CUSTOMER_DATA;
+        $tables = [];
+        foreach (Schema::getTableListing(Schema::getCurrentSchemaListing(), false) as $name) {
+            if (str_starts_with($name, $prefix) && ! array_key_exists($table = substr($name, strlen($prefix)), $known)) {
+                $tables[] = $table;
+            }
+        }
+        sort($tables, SORT_STRING);
+
+        return $tables;
     }
 
     private function measure(array $entry, CarbonImmutable $cutoff, int $years): array

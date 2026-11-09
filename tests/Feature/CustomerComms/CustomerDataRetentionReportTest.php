@@ -30,6 +30,45 @@ class CustomerDataRetentionReportTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
 
+    /** Audit and data-request evidence: PRIVACY section 7 gives it no period, so it is held until Sean decides. */
+    private const HELD_EVIDENCE = ['audit_events', 'customer_data_requests', 'customer_data_request_events', 'customer_data_exports'];
+
+    /**
+     * Every migrated table that is neither scheduled nor reviewed as not customer data, as the report prints it. A new migration
+     * changes this list, which forces a deliberate classification (RetentionSchedule::ENTRIES or NOT_CUSTOMER_DATA) or an
+     * explicit addition here, documented in docs/customer-data-rights.md as awaiting Sean's retention decision.
+     */
+    private const UNCLASSIFIED = [
+        'cache', 'cache_locks', 'checkout_intents', 'checkout_observations', 'checkout_sessions', 'contract_render_requests',
+        'contract_render_work', 'customer_identity_addresses', 'exclusive_sales', 'failed_jobs', 'free_authorizations',
+        'free_document_work', 'free_originals', 'free_origins', 'free_redemptions', 'fulfillment_outbox', 'inventory_claims',
+        'inventory_reservations', 'job_batches', 'jobs', 'legacy_exclusivity_authority_events', 'legacy_history_batches',
+        'legacy_history_contract_declarations', 'legacy_history_contracts', 'legacy_history_customers', 'legacy_history_grant_reviews',
+        'legacy_history_lines', 'legacy_history_orders', 'membership_credit_buckets', 'membership_credit_events', 'order_attempts',
+        'paid_document_work', 'paid_fulfillments', 'paid_tax_document_work', 'paid_tax_fulfillments', 'password_reset_tokens',
+        'payment_observations', 'pending_entitlements', 'production_account_feature_bindings', 'production_buyer_assent_observations',
+        'production_checkout_attempts', 'production_checkout_exemption_authorities', 'production_checkout_observations',
+        'production_checkout_order_lines', 'production_checkout_payments', 'production_checkout_provider_intents',
+        'production_checkout_sessions', 'production_consent_events', 'production_consent_states', 'production_free_authorizations',
+        'production_free_document_work', 'production_free_originals', 'production_free_origins', 'production_free_redemptions',
+        'production_free_revocations', 'production_identity_addresses', 'production_identity_attempts', 'production_identity_challenges',
+        'production_identity_notices', 'production_identity_outcomes', 'production_identity_verifications',
+        'production_listening_libraries', 'production_member_activations', 'production_member_artifacts', 'production_member_definitions',
+        'production_member_origins', 'production_member_profiles', 'production_membership_billing_attempts',
+        'production_membership_billing_award_fence', 'production_membership_billing_events', 'production_membership_billing_invoices',
+        'production_membership_billing_observations', 'production_membership_billing_positions',
+        'production_membership_billing_subscriptions', 'production_membership_credit_events', 'production_membership_paid_periods',
+        'production_membership_redemptions', 'production_suppression_attempts', 'production_suppression_confirmations',
+        'production_suppression_intents', 'production_suppression_targets', 'production_tax_checkout_bindings',
+        'production_tax_checkout_requests', 'production_tax_checkout_reviewed_sessions', 'promotion_uses', 'quote_lines', 'quote_owners',
+        'quote_pricings', 'quotes', 'refund_dispute_effects', 'refund_dispute_holds', 'refund_dispute_objects',
+        'refund_dispute_observations', 'refund_dispute_statuses', 'refund_dispute_work', 'refund_line_allocations',
+        'service_project_events', 'service_projects', 'stripe_receipt_work', 'stripe_webhook_receipts', 'test_delivery_controls',
+        'test_fulfillment_activations', 'test_payment_exception_events', 'test_payment_exception_work',
+        'test_payment_financial_observations', 'test_refund_resolution_requests', 'test_refund_resolutions', 'test_unpaid_release_events',
+        'test_unpaid_release_work', 'test_unpaid_releases', 'transactional_notice_attempts',
+    ];
+
     private const RETENTION = ['policy_reference' => 'Synthetic retention schedule SR-1 (test only)',
         'financial_records_years' => '7', 'consent_records_years' => 3, 'correspondence_records_years' => '2', 'security_records_years' => 1];
 
@@ -116,6 +155,13 @@ class CustomerDataRetentionReportTest extends TestCase
             foreach ($clock['unless_referenced'] ?? [] as [$holder, $column]) {
                 $this->assertTrue(Schema::hasColumn($holder, $column));
             }
+        }
+
+        // PRIVACY section 7 gives the audit and data-request evidence no period: held until Sean decides, never counted.
+        foreach (self::HELD_EVIDENCE as $held) {
+            $this->assertSame('security', $byTable[$held]['class'], $held);
+            $this->assertNull($byTable[$held]['clock'], $held);
+            $this->assertStringContainsString('until Sean decides', $byTable[$held]['rationale'], $held);
         }
 
         // The records AGENTS.md calls immutable, and every other record of a purchase, are never counted.
@@ -215,11 +261,12 @@ class CustomerDataRetentionReportTest extends TestCase
         // One year and a day later only the security class (1 year) has run out.
         $this->travelTo($start->addYear()->addDay());
         [$report, $output] = $this->report();
-        $this->assertSame(['past_period' => $audit, 'clock_index' => 'missing'], array_intersect_key($report['audit_events'], array_flip(['past_period', 'clock_index'])));
-        $this->assertSame($start->addYear()->toDateString(), $report['audit_events']['oldest_due']);
-        $this->assertSame(1, $report['customer_data_requests']['past_period'], 'The open deletion request is never past.');
-        $this->assertSame(1, $report['customer_data_exports']['past_period']);
-        $this->assertSame(['past_period' => $resolvedEvents, 'follows' => 'customer_data_requests'], $report['customer_data_request_events']);
+        // Audit and data-request evidence has rows past one year, but no approved period: held, never counted.
+        $this->assertGreaterThan(0, $resolvedEvents);
+        foreach (self::HELD_EVIDENCE as $held) {
+            $this->assertSame(['held' => 'clock_not_modeled'], $report[$held], $held);
+            $this->assertStringNotContainsString("  {$held} past_period=", $output);
+        }
         foreach (['test_delivery_authorizations', 'customer_inquiries', 'inquiry_messages', 'transactional_notices'] as $table) {
             $this->assertSame(0, $report[$table]['past_period'], $table);
         }
@@ -255,9 +302,11 @@ class CustomerDataRetentionReportTest extends TestCase
         $this->assertSame(DB::table('inquiry_messages')->where('inquiry_id', $conversation['inquiry']->id)->count(), $report['inquiry_messages']['past_period']);
         $this->assertSame($notices, $report['transactional_notices']['past_period']);
         $this->assertSame($finished, $report['transactional_mail_deliveries']['past_period']);
-        foreach (['customer_consent_events', 'customer_consent_states', 'customer_suppression_targets', 'support_attachments'] as $held) {
+        $this->assertSame('customer_inquiries', $report['inquiry_messages']['follows']);
+        foreach (['customer_consent_events', 'customer_consent_states', 'customer_suppression_targets', 'support_attachments', ...self::HELD_EVIDENCE] as $held) {
             $this->assertSame(['held' => 'clock_not_modeled'], $report[$held], $held);
         }
+        $this->assertGreaterThan(0, DB::table('audit_events')->count());
         $this->assertGreaterThan(0, DB::table('customer_consent_events')->count());
         foreach (RetentionSchedule::ENTRIES as $entry) {
             if (in_array($entry['class'], ['indefinite', 'not_applicable'], true)) {
@@ -271,6 +320,64 @@ class CustomerDataRetentionReportTest extends TestCase
         $this->assertStringContainsString('any purge or anonymization is a later, separately authorized step', $output);
         foreach ($private as $value) {
             $this->assertStringNotContainsString($value, $output);
+        }
+    }
+
+    public function test_every_migrated_table_is_scheduled_reviewed_or_reported_as_unclassified(): void
+    {
+        config(['customer-data-rights.retention' => self::RETENTION]);
+        $listing = Schema::getTableListing(Schema::getCurrentSchemaListing(), false);
+        $this->assertSame(array_values(array_unique($listing)), $listing, 'The listing must come from this connection\'s schema only.');
+        $scheduled = array_column(RetentionSchedule::ENTRIES, 'table');
+        $reviewed = array_keys(RetentionSchedule::NOT_CUSTOMER_DATA);
+        $this->assertSame([], array_values(array_intersect($scheduled, $reviewed)), 'A table is both scheduled and reviewed as not customer data.');
+        foreach (RetentionSchedule::NOT_CUSTOMER_DATA as $table => $reason) {
+            $this->assertTrue(Schema::hasTable($table), $table);
+            $this->assertGreaterThan(20, strlen($reason), $table);
+        }
+        // Sessions hold IP addresses and user agents; framework queues and caches can hold any payload: never reviewed as safe.
+        foreach (['sessions', 'cache', 'cache_locks', 'jobs', 'job_batches', 'failed_jobs', 'password_reset_tokens'] as $table) {
+            $this->assertArrayNotHasKey($table, RetentionSchedule::NOT_CUSTOMER_DATA, $table);
+        }
+
+        [, $output] = $this->report();
+        $this->assertSame(1, preg_match_all('/^unclassified=([a-z0-9_,]*) count=(\d+) note=each_needs_owner_retention_decision$/m', $output, $match));
+        $unclassified = $match[1][0] === '' ? [] : explode(',', $match[1][0]);
+        $this->assertSame(count($unclassified), (int) $match[2][0]);
+        $this->assertSame(self::UNCLASSIFIED, $unclassified, 'A migration added or removed a table: classify it deliberately.');
+
+        // Nothing migrated is silently omitted: every table is scheduled, reviewed or printed as unclassified, exactly once.
+        $accounted = [...$scheduled, ...$reviewed, ...$unclassified];
+        sort($accounted);
+        $tables = $listing;
+        sort($tables);
+        $this->assertSame($tables, $accounted);
+    }
+
+    public function test_a_new_unclassified_table_is_reported_by_name_without_failing(): void
+    {
+        config(['customer-data-rights.retention' => self::RETENTION]);
+        Schema::create('retention_probe_records', function ($table): void {
+            $table->id();
+            $table->string('email');
+        });
+        DB::table('retention_probe_records')->insert(['email' => 'retention.probe@example.test']);
+        // A temporary table lives outside the database's own schema (SQLite `temp`; MySQL never lists one) and is never listed.
+        Schema::create('retention_foreign_records', function ($table): void {
+            $table->temporary();
+            $table->id();
+        });
+        $queries = $this->recordQueries();
+        [, $output] = $this->report();
+        $reads = $queries->all;
+
+        $this->assertMatchesRegularExpression('/^unclassified=(?:[a-z0-9_]+,)*retention_probe_records(?:,[a-z0-9_]+)* count=\d+ /m', $output);
+        $this->assertStringNotContainsString('retention_foreign_records', $output);
+        $this->assertStringNotContainsString('retention.probe@example.test', $output);
+        $this->assertNotEmpty($reads);
+        foreach ($reads as $sql) {
+            $this->assertMatchesRegularExpression('/\A\s*select\b/i', $sql);
+            $this->assertDoesNotMatchRegularExpression('/for update|lock in share mode|for share/i', $sql);
         }
     }
 
