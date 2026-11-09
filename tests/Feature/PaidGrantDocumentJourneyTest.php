@@ -402,6 +402,8 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $hosted = new HostedCheckout($access, $gateway);
         $this->assertSame('verified', $hosted->reconcile($buyer['principal'], $buyer['user'], $forged, 'cs_test_SYNTHETIC')['paymentStatus']);
         $this->assertSame([], $gateway->creates);
+        // Reconcile alone has already left the one staff record (a buyer may never finalize).
+        $this->assertSame(1, DB::table('audit_events')->where('action', ContractIdentityHolds::ACTION)->count());
 
         $before = $this->ownedRows();
         $audits = DB::table('audit_events')->count();
@@ -413,8 +415,8 @@ final class PaidGrantDocumentJourneyTest extends TestCase
                 $this->assertSame([409, 'contract_identity_held', 'Paid grant request unavailable.'], [$error->status, $error->reason, $error->getMessage()]);
             }
             $this->assertSame($before, $this->ownedRows());
-            // Exactly one durable staff record, however often finalization is retried; no origin audit row.
-            $this->assertSame($audits + 1, DB::table('audit_events')->count(), 'attempt '.$attempt);
+            // Still exactly one durable staff record (written by reconcile), however often finalization is retried; no origin audit row.
+            $this->assertSame($audits, DB::table('audit_events')->count(), 'attempt '.$attempt);
         }
         $this->assertSame([], array_filter($before));
         $hold = (array) DB::table('audit_events')->where('action', ContractIdentityHolds::ACTION)->sole();

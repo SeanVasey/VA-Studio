@@ -251,8 +251,16 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
      order row, and deduplicated per order. Staff read it in the admin panel's read-only "Held paid orders" list
      (`ContractIdentityHoldResource`, `administer-catalog` checked on the server, in the query and on every Livewire request,
      with required panel MFA). Not built: notification to staff, or a way to release a hold (staff act outside the system).
-     The record is written only when finalization runs, which the buyer starts: a buyer who pays and never finalizes leaves
-     no staff signal (no other write path is added). Known behaviour: a held order still shows the buyer
+     The record is also written at payment time (follow-up, 2026-11-08): after the transaction that records or re-observes a
+     verified payment has committed (V1 `HostedCheckout::record` via `reconcile`, `operatorReconcile` and `initiate`; tax
+     `reconcile` after `retain()` and on its already-retained early return), the checkout calls
+     `ContractIdentityHolds::recordAfterPayment`, which applies the same `ProductionCheckout::contractIdentityHeld` check, so a
+     buyer who pays and never finalizes still leaves the record. It runs only outside any transaction (inside one it writes
+     nothing and reports), never in the provider `try` block, and any failure is reported and swallowed: the payment rows and
+     the buyer's answer are unchanged, and the next reconcile or finalization writes it. The same order-row lock and dedup
+     keep one record per order across reconciles and finalization. A non-locking pre-check skips the lock once an order is held; a failing
+     reporter is itself swallowed. V1 `initiate` reaches `record()` only after re-verifying the declaration, so it writes the
+     record only if a declaration stopped verifying mid-call (not reproducible in a test: the faces are pinned). Known behaviour: a held order still shows the buyer
      `fulfillmentStatus: pending_fulfillment` (checkout `status` reports the recorded payment, not the hold).
    - [x] `initiate` refuses a v2 order while the gate is off, in both checkouts (decided 2026-11-08), before any row or
      provider call.

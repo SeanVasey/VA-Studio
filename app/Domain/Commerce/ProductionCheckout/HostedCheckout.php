@@ -4,6 +4,7 @@ namespace App\Domain\Commerce\ProductionCheckout;
 
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionCustomerPrincipal;
+use App\Domain\Grants\ContractIdentityHolds;
 use App\Models\User;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
@@ -44,12 +45,13 @@ final class HostedCheckout
             $payment = $safe['payment_intent_id'] === null ? null : $this->gateway->paymentIntent($context, $safe['payment_intent_id']);
             HostedEvidence::financial($session, $payment, $prepared['intent']['body']);
             $observed = CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z');
-            $this->record($prepared['intent']['row']['public_id'], $session, $payment, $origin, $observed);
+            $paid = $this->record($prepared['intent']['row']['public_id'], $session, $payment, $origin, $observed);
         } catch (Throwable) {
             $this->uncertain($prepared['intent']['row']['public_id']);
             $this->access->current($principal, $buyer);
             throw new CheckoutException('provider_uncertain', 503);
         }
+        self::holdAfterPayment($paid);
         $this->access->current($principal, $buyer);
 
         return $this->status($principal, $buyer, $orderId);
@@ -73,12 +75,13 @@ final class HostedCheckout
             $payment = $safe['payment_intent_id'] === null ? null : $this->gateway->paymentIntent($context, $safe['payment_intent_id']);
             HostedEvidence::financial($session, $payment, $prepared['intent']['body']);
             $observed = CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z');
-            $this->record($prepared['intent']['row']['public_id'], $session, $payment, $origin, $observed);
+            $paid = $this->record($prepared['intent']['row']['public_id'], $session, $payment, $origin, $observed);
         } catch (Throwable) {
             $this->uncertain($prepared['intent']['row']['public_id']);
             $this->access->current($principal, $buyer);
             throw new CheckoutException('provider_uncertain', 503);
         }
+        self::holdAfterPayment($paid);
         // A lost access credential suppresses buyer projection, never deletes the money observation above.
         $this->access->current($principal, $buyer);
 
@@ -123,11 +126,12 @@ final class HostedCheckout
             $payment = $safe['payment_intent_id'] === null ? null : $this->gateway->paymentIntent($context, $safe['payment_intent_id']);
             HostedEvidence::financial($session, $payment, $prepared['intent']['body']);
             $observed = CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z');
-            $this->record($prepared['intent']['row']['public_id'], $session, $payment, $origin, $observed);
+            $paid = $this->record($prepared['intent']['row']['public_id'], $session, $payment, $origin, $observed);
         } catch (Throwable) {
             $this->uncertain($prepared['intent']['row']['public_id']);
             throw new CheckoutException('provider_uncertain', 503);
         }
+        self::holdAfterPayment($paid);
 
         return $this->operatorStatus($orderId);
     }
@@ -279,10 +283,30 @@ final class HostedCheckout
         });
     }
 
-    /** Internal system persistence after provider reads; current buyer credentials are deliberately checked afterward. */
-    private function record(string $intentId, array $session, ?array $payment, string $origin, string $observedAt): void
+    /**
+     * D-30 (decided 2026-11-08): once record() has committed, a verified payment of an order whose frozen v2 declaration no
+     * longer verifies leaves the staff hold record at once, not only when the buyer finalizes. Outside the payment
+     * transaction and the provider try block: a failure is reported and swallowed by ContractIdentityHolds and changes
+     * neither the recorded payment nor the result.
+     *
+     * @param  array{order: string, declarations: array}|null  $paid
+     */
+    private static function holdAfterPayment(?array $paid): void
     {
-        CommandTransaction::run(function (Records $rows) use ($intentId, $session, $payment, $origin, $observedAt): void {
+        if ($paid !== null) {
+            ContractIdentityHolds::recordAfterPayment('production_checkout_v1', $paid['order'], $paid['declarations']);
+        }
+    }
+
+    /**
+     * Internal system persistence after provider reads; current buyer credentials are deliberately checked afterward.
+     * Returns the order's public id and frozen declarations when the intent holds a verified payment after this write.
+     *
+     * @return array{order: string, declarations: array}|null
+     */
+    private function record(string $intentId, array $session, ?array $payment, string $origin, string $observedAt): ?array
+    {
+        return CommandTransaction::run(function (Records $rows) use ($intentId, $session, $payment, $origin, $observedAt): ?array {
             $record = $rows->one('intent', $intentId);
             $order = OrderEvidence::order($rows, $rows->current->one(CheckoutSchema::TABLES['order'], $record['order_id']));
             $intent = HostedEvidence::intent($rows, $order, $record);
@@ -331,6 +355,9 @@ final class HostedCheckout
             $after = HostedEvidence::intent($rows, $order, $record);
             OrderEvidence::proveRetained($rows, $order['raw']);
             HostedEvidence::proveRetained($rows, $after['raw']);
+
+            return $after['payment'] === null ? null
+                : ['order' => $order['row']['public_id'], 'declarations' => $order['body']['buyer_declarations']];
         });
     }
 
