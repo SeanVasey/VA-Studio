@@ -91,13 +91,23 @@ class VaseyLicenseContractTextMigrationTest extends TestCase
         }
         $this->assertFalse(VaseyLicenseContractTexts::retain('template', self::TEXT));
 
-        // A missing or malformed address refuses.
-        foreach ([['template', str_repeat('c', 64)], ['template', 'not-a-hash'], ['signature', $row['sha256']], ['renderer_profile', str_repeat('d', 64)]] as [$kind, $sha256]) {
+        // So does one that no longer decrypts: both are integrity failures (`profile_changed`, permanent).
+        DB::table(VaseyLicenseContractTexts::TABLE)->where('id', $row['id'])->update(['payload' => 'x']);
+        try {
+            VaseyLicenseContractTexts::resolve('template', $row['sha256']);
+            $this->fail('An undecryptable contract text resolved.');
+        } catch (ContractIssuanceException $exception) {
+            $this->assertSame('profile_changed', $exception->reason);
+        }
+
+        // A malformed address is an integrity failure; a well-formed address with no row is an absence a retry may fix.
+        foreach ([['template', 'not-a-hash', 'profile_changed'], ['signature', $row['sha256'], 'profile_changed'],
+            ['template', str_repeat('c', 64), 'contract_text_unavailable'], ['renderer_profile', str_repeat('d', 64), 'contract_text_unavailable']] as [$kind, $sha256, $reason]) {
             try {
                 VaseyLicenseContractTexts::resolve($kind, $sha256);
                 $this->fail('An absent contract text resolved.');
             } catch (ContractIssuanceException $exception) {
-                $this->assertSame('profile_changed', $exception->reason);
+                $this->assertSame($reason, $exception->reason, $kind.' '.$sha256);
             }
         }
     }

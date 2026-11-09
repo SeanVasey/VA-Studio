@@ -17,8 +17,11 @@ use Throwable;
  *
  * Rows are encrypted at rest with the application key, as the origins are, and immutable (triggers refuse UPDATE and
  * DELETE). They hold license text shared by every buyer of a version, never customer data, so the data export never
- * reads them and deletion neither erases nor lists them. Every read is verified against the hash it is addressed by:
- * a changed, planted or undecryptable row refuses `profile_changed` and nothing else is rendered.
+ * reads them and deletion neither erases nor lists them. Every read is verified against the hash it is addressed by, and
+ * {@see resolve()} tells a permanent integrity failure from an absence a retry may fix: a row that exists but does not
+ * decrypt, or decrypts to bytes other than its address (changed or planted), or a malformed address, refuses
+ * `profile_changed`; no row at the address refuses `contract_text_unavailable`; a database error propagates. Nothing else
+ * is rendered in any of these cases.
  */
 final class VaseyLicenseContractTexts
 {
@@ -53,14 +56,23 @@ final class VaseyLicenseContractTexts
         }
     }
 
-    /** The bytes stored under the address, verified against it; refuses `profile_changed` when missing or changed. */
+    /**
+     * The bytes stored under the address, verified against it. Refuses (a {@see ContractIssuanceException}) with
+     * `profile_changed` for an integrity failure no retry can fix (a malformed address, or a stored row that does not
+     * decrypt or whose bytes differ from the address), and with `contract_text_unavailable` when no row is stored there.
+     * A database error propagates unchanged; callers treat it like an absence.
+     */
     public static function resolve(string $kind, string $sha256): string
     {
         if (! isset(self::KINDS[$kind]) || preg_match('/\A[a-f0-9]{64}\z/D', $sha256) !== 1) {
             throw new ContractIssuanceException('profile_changed');
         }
+        $payload = DB::table(self::TABLE)->where('kind', $kind)->where('sha256', $sha256)->value('payload');
+        if ($payload === null) {
+            throw new ContractIssuanceException('contract_text_unavailable');
+        }
 
-        return self::open($kind, $sha256, DB::table(self::TABLE)->where('kind', $kind)->where('sha256', $sha256)->value('payload'));
+        return self::open($kind, $sha256, $payload);
     }
 
     private static function open(string $kind, string $sha256, mixed $payload): string

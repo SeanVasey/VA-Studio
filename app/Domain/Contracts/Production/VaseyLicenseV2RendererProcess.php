@@ -110,13 +110,15 @@ final class VaseyLicenseV2RendererProcess
                     array_push($readable, ...$paths);
                 }
             }
+            // open_basedir matches entries as path prefixes: a directory entry ends with the separator so a sibling that
+            // shares its name as a prefix (`app2/`, `<workspace>-other/`) stays outside; the script stays an exact file.
             $packages = [];
             foreach ($readable as $path) {
                 $resolved = realpath($path);
                 if ($resolved === false) {
                     throw new ContractIssuanceException('profile_changed');
                 }
-                $packages[] = $resolved;
+                $packages[] = is_dir($resolved) ? rtrim($resolved, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR : $resolved;
             }
             $workspace = (new ContractFiles)->createRendererWorkspace();
             $signaturePath = $workspace->path.'/'.self::SIGNATURE_FILE;
@@ -158,7 +160,7 @@ final class VaseyLicenseV2RendererProcess
             }
             $command = [PHP_BINARY, '-n', ...$extensions, '-d', 'memory_limit=128M', '-d', 'max_execution_time='.self::TIMEOUT_SECONDS,
                 '-d', 'display_errors=stderr', '-d', 'log_errors=0', '-d', 'allow_url_fopen=0', '-d', 'allow_url_include=0',
-                '-d', 'open_basedir='.implode(PATH_SEPARATOR, array_unique([...$packages, $workspace->path])),
+                '-d', 'open_basedir='.implode(PATH_SEPARATOR, array_unique([...$packages, $workspace->path.DIRECTORY_SEPARATOR])),
                 '-d', 'upload_tmp_dir='.$workspace->path, '-d', 'sys_temp_dir='.$workspace->path,
                 '-d', 'disable_functions=curl_init,curl_exec,curl_multi_exec,fsockopen,pfsockopen,stream_socket_client,stream_socket_server,socket_create,exec,passthru,shell_exec,system,popen,proc_open,mail,putenv,dl',
                 $projectRoot.'/scripts/'.self::SCRIPT];

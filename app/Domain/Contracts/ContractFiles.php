@@ -4,7 +4,7 @@ namespace App\Domain\Contracts;
 
 use Throwable;
 
-/** Private append-only originals. No record publication, overwrite, replacement or cleanup. */
+/** Private append-only originals. No record publication, overwrite, replacement or cleanup of originals. */
 final class ContractFiles
 {
     private const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}';
@@ -22,6 +22,30 @@ final class ContractFiles
             }
 
             return ContractRenderWorkspace::create($directory);
+        } catch (Throwable) {
+            throw new ContractIssuanceException('storage_failed');
+        }
+    }
+
+    /**
+     * Removes renderer workspaces under `contracts/render-cache` last modified before `$cutoff` ({@see ContractRenderWorkspace::sweep()}),
+     * as a parent killed mid-render leaves them. Creates nothing; an absent cache sweeps nothing.
+     *
+     * @return array{0: int, 1: int} the workspaces removed, and the entries left in place
+     */
+    public function sweepRendererWorkspaces(int $cutoff): array
+    {
+        ContractIo::outsideTransactions();
+        try {
+            $directory = $this->root(false).'/contracts';
+            foreach (['', '/render-cache'] as $component) {
+                $directory .= $component;
+                clearstatcache(true, $directory);
+                if (@lstat($directory) === false) { return [0, 0]; }
+                $this->directory($directory, false, true);
+            }
+
+            return ContractRenderWorkspace::sweep($directory, $cutoff);
         } catch (Throwable) {
             throw new ContractIssuanceException('storage_failed');
         }
