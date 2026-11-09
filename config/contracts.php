@@ -13,4 +13,9 @@ return [
         'signature_path' => env('VASEY_LICENSE_SIGNATURE_PATH'),
         'signature_sha256' => env('VASEY_LICENSE_SIGNATURE_SHA256'),
     ],
+
+    // Selection of `vasey-license-pdf-v2` for NEW paid and paid-tax originals (App\Domain\Grants\VaseyLicenseIssuance).
+    // A code literal, never an environment read: only an exact `true` set in `local` or `testing` admits, and
+    // ops/production/validate-runtime.php holds it false. Existing originals keep the profile recorded at their origin.
+    'vasey_license_v2_issuance' => false,
 ];

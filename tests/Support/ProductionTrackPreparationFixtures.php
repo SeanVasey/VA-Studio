@@ -18,12 +18,18 @@ use Illuminate\Support\Facades\DB;
 /** Actual local synthetic review/catalog lifecycle, never a merchant seed or legal/provider approval. */
 final class ProductionTrackPreparationFixtures
 {
-    public static function prepared(bool $save = false, string $key = 'synthetic-packet-request', ?string $licenseUntil = null): array
+    /**
+     * @param  array  $licenseTerms  Optional structured terms (with `$licenseContent`, e.g. its authored source) for the offer's
+     *                               license version instead of the default schema 1 one.
+     */
+    public static function prepared(bool $save = false, string $key = 'synthetic-packet-request', ?string $licenseUntil = null,
+        array $licenseTerms = [], array $licenseContent = []): array
     {
         $selection = QuoteFixtures::selection();
         $actor = $selection['actor'];
-        if ($licenseUntil !== null) {
-            $license = LicenseFixtures::published($actor, content: ['effective_until' => $licenseUntil]);
+        if ($licenseUntil !== null || $licenseTerms !== []) {
+            $license = LicenseFixtures::published($actor, terms: $licenseTerms,
+                content: $licenseContent + ($licenseUntil === null ? [] : ['effective_until' => $licenseUntil]));
             $selection['offer'] = app(SaveOfferDraft::class)->handle($selection['offer'], ['track_id' => $selection['track']->id,
                 'license_version_id' => $license->id, 'price_minor' => 4999, 'currency' => 'USD', 'deliverable_asset_ids' => [$selection['media']['master_wav']->id]], $actor);
             $selection['revision'] = app(PublishOffer::class)->handle($selection['offer'], $actor);

@@ -195,8 +195,12 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
      (`ContractPrintableSet`: 357 accepted codepoints, Latin and Common; Greek, Cyrillic and Vietnamese refused). Tests pin
      the subset of the `test-v2` paid renderers' rule and of each v2 face. **v2 renderer built (2026-11-08, not selected):**
      `VaseyLicenseV2PdfRenderer`; a test pins that every codepoint checkout accepts is in the renderer's own input rule
-     (`coverage()`), passes its per-face check in all four roles and renders. Open: the statement texts' review in that
-     render, and wiring it into the issuers (separate review);
+     (`coverage()`), passes its per-face check in all four roles and renders. **Wired behind a local/testing gate
+     (2026-11-08):** `VaseyLicenseIssuance` selects it for new paid and paid-tax originals when
+     `contracts.vasey_license_v2_issuance` (literal `false`) is on, the declaration is v2 and re-verifies, a contract source
+     exists for the license version and the line binds; otherwise the existing paid profiles stay
+     ([production contract profile](../production-contract-profile.md), "Issuer wiring"). Open: the statement texts' review
+     in that render, and independent review of the wiring before activation;
    - [x] the statement the buyer saw must be bound to the one frozen (done in step 6: the client echoes the displayed
      statement version, checked with `hash_equals`);
    - [x] gate-on tests must cover `initiate`, `reconcile` and the paid-tax grant render with a v2 declaration. (Step 6 added
@@ -218,7 +222,9 @@ Each step is a separately reviewed PR. The frozen-V1 guard stays green throughou
      `contractIdentityOffer()` through the same `run()` boundary as the other checkout routes: signed-in production customer,
      private headers, read throttle, and the private 503 while `http_enabled` or the gate is off
      (`ProductionCheckoutContractIdentityTest`, `ProductionCheckoutMountTest`).
-7. The binder requirement, inside contract increments 3 and 4.
+7. The binder requirement, inside contract increments 3 and 4. Since 2026-11-08 the gated v2 issuance binds every selected
+   line through `ContractVariableBinder::bind` when its origin is created and again at render, and a legacy declaration is
+   never selected (it keeps the existing paid profile instead of reaching the binder's `contract_identity_missing`).
 8. Activation, together with the profile, after steps 2, 3a and 3b merge and U-13 retention values are approved. Also
    required before activation (step 6 review, P3-2 and P3-3):
    - [x] V1 `HostedCheckout::initiate` re-verifies a v2 declaration before any money moves (done: in `prepare`, before the

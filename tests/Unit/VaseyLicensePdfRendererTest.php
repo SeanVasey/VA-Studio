@@ -463,6 +463,12 @@ class VaseyLicensePdfRendererTest extends TestCase
         $this->refusesIssuance('profile_changed', fn () => (new VersionedContractRenderer)->render([], $profile));
         foreach (['app/Domain/Grants', 'app/Domain/Commerce', 'app/Domain/Contracts', 'app/Http', 'app/Jobs', 'app/Console', 'app/Providers', 'routes', 'config'] as $directory) {
             foreach (File::allFiles(base_path($directory)) as $file) {
+                // The gated v2 issuance dispatch names the shared document and signature classes (never v1's renderer).
+                if (str_ends_with($file->getPathname(), '/app/Domain/Grants/VaseyLicenseIssuance.php')) {
+                    $this->assertStringNotContainsString('VaseyLicensePdfRenderer', str_replace('VaseyLicenseV2PdfRenderer', '', $file->getContents()));
+
+                    continue;
+                }
                 if (str_contains($file->getPathname(), '/app/Domain/Contracts/Production/')) {
                     continue;
                 }

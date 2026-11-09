@@ -7,11 +7,15 @@ use App\Domain\Commerce\ContractIdentity\ContractPrintableSet;
 use App\Domain\Contracts\ContractIssuanceException;
 use App\Domain\Contracts\RenderedContract;
 use App\Support\CanonicalJson;
+use Closure;
 use Com\Tecnick\Color\Pdf;
 use Com\Tecnick\Pdf\Encrypt\Encrypt;
 use Com\Tecnick\Pdf\Page\Page;
 use Com\Tecnick\Pdf\Tcpdf;
+use InvalidArgumentException;
+use JsonException;
 use Throwable;
+use WeakMap;
 
 /**
  * Contract increment 5, part 2: the `vasey-license-pdf-v2` renderer, successor of {@see VaseyLicensePdfRenderer}, which
@@ -27,7 +31,13 @@ use Throwable;
  * Deterministic exactly as v1: the contract date (UTC midnight) is every document date, the file and document IDs derive
  * from the input, profile and signature hashes, fonts are embedded whole and uncompressed, and nothing reads the clock.
  *
- * Built, not activated: no issuer, dispatch or policy selects this renderer; wiring it needs separate review.
+ * Wiring conditions (review of 2026-11-08): {@see render()} accepts only a document that {@see document()} built, because
+ * {@see VaseyLicenseDocument} does not record the coverage it was built under and the layout's per-face check has no script
+ * restriction; tampered metric files refuse `profile_changed`; and the fonts tc-lib reads are a private copy of the bytes
+ * that were hashed, so a font file swapped after {@see VaseyLicenseV2Profile::verifyRuntime()} refuses.
+ *
+ * Selected only by the grants' `VaseyLicenseIssuance` dispatch, for new paid and paid-tax originals, behind its literal-false,
+ * local/testing-only gate; the profile's own metadata still says `not_selected` for production.
  */
 final class VaseyLicenseV2PdfRenderer
 {
@@ -39,7 +49,19 @@ final class VaseyLicenseV2PdfRenderer
 
     private const SIGNATURE_BOX = ['width' => 60.0, 'height' => 20.0];
 
-    public function __construct(private readonly ?string $projectRoot = null) {}
+    /** @var WeakMap<VaseyLicenseDocument, true>|null Documents built by {@see document()} in this process. */
+    private static ?WeakMap $built = null;
+
+    /**
+     * @param  Closure|null  $afterRuntimeVerified  Test-only: runs right after the profile's runtime verification, so a test
+     *                                              can change a pinned file between verification and use. Refused outside `testing`.
+     */
+    public function __construct(private readonly ?string $projectRoot = null, private readonly ?Closure $afterRuntimeVerified = null)
+    {
+        if ($afterRuntimeVerified !== null && (! function_exists('app') || ! app()->environment('testing'))) {
+            throw new ContractIssuanceException('unsupported_input');
+        }
+    }
 
     /**
      * The renderer's own input rule: the v2 faces, verified against the manifest pin and each metric file's SHA-256,
@@ -47,7 +69,12 @@ final class VaseyLicenseV2PdfRenderer
      */
     public function coverage(): ContractGlyphCoverage
     {
-        return ContractPrintableSet::faces($this->projectRoot);
+        try {
+            return ContractPrintableSet::faces($this->projectRoot);
+        } catch (InvalidArgumentException|JsonException) {
+            // Metric files that differ from the manifest, or cannot be decoded, are a changed profile, not bad input.
+            throw new ContractIssuanceException('profile_changed');
+        }
     }
 
     /**
@@ -58,15 +85,26 @@ final class VaseyLicenseV2PdfRenderer
      */
     public function document(string $template, array $values, array $declaration): VaseyLicenseDocument
     {
-        return VaseyLicenseDocument::build($template, $values, $declaration, $this->coverage());
+        $document = VaseyLicenseDocument::build($template, $values, $declaration, $this->coverage());
+        self::$built ??= new WeakMap;
+        self::$built[$document] = true;
+
+        return $document;
     }
 
+    /** Renders only a document {@see document()} built under this renderer's input rule; any other refuses `unsupported_input`. */
     public function render(VaseyLicenseDocument $document, array $profile, VaseyLicenseSignature $signature): RenderedContract
     {
+        if (! isset(self::$built[$document])) {
+            throw new ContractIssuanceException('unsupported_input');
+        }
         if (($profile['version'] ?? null) !== VaseyLicenseV2Profile::VERSION) {
             throw new ContractIssuanceException('profile_changed');
         }
         VaseyLicenseV2Profile::verifyRuntime($profile, $this->projectRoot);
+        if ($this->afterRuntimeVerified !== null) {
+            ($this->afterRuntimeVerified)();
+        }
         $logo = VaseyLicenseV2Profile::assetBytes($profile, VaseyLicenseV2Profile::LOGO, $this->projectRoot);
         $signed = $signature->read();
         $profileHash = VaseyLicenseV2Profile::hash($profile, $this->projectRoot);
