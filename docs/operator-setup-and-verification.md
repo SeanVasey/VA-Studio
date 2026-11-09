@@ -51,6 +51,10 @@ Scheduled site publication ([D-24](architecture/D-24-scheduled-site-publication.
 
 The doctor's `site_images` check hashes every stored file of the active site release's images and warns when one no longer matches ([D-25](architecture/D-25-editable-site-images.md)). Back up `storage/app/private/site-images/` with the database and restore both from the same point.
 
+## Customer data retention dry run
+
+Once the host sets every `VASEY_CUSTOMER_DATA_RETENTION_*` value (the U-13 periods Sean approved on 2026-11-07; never committed), `php artisan vasey:retention-report` prints, per retention class and table, how many records are past their period and the oldest and newest due dates. It is read-only (plain selects, no locks, no writes) and prints no personal data. It exits non-zero with `refused=retention_policy_unset` while any value is unset or invalid. Indefinite records (orders, licenses, contracts, payments and other purchase evidence) are listed by name only and never counted. Nothing purges or anonymizes records: that is a later step with its own reviewed migration and Sean's separate authorization. Schedule, classes and open questions: [customer-data-rights.md](customer-data-rights.md#retention-schedule-and-dry-run-report-fp-076-first-increment).
+
 ## Browser verification
 
 After Composer and npm dependencies are installed:

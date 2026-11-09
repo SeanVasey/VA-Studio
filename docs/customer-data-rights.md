@@ -1,6 +1,6 @@
 # Customer data export and deletion requests
 
-Status: **built default-off (lane CX, FP-082); not acceptance.** Retention values are unset because Sean has not approved a retention schedule (U-13, FP-076), so staff approval of a deletion request refuses. Evidence: [lane CX packet](verification/customer-comms-cx-20261024/README.md).
+Status: **built default-off (lane CX, FP-082); not acceptance.** Sean approved the retention periods on 2026-11-07 (PRIVACY section 7, U-13), but the values are set per host and never in Git, so until a host sets them staff approval of a deletion request and the retention report both refuse. A read-only retention dry run exists (FP-076, first increment); nothing purges retained records yet. Evidence: [lane CX packet](verification/customer-comms-cx-20261024/README.md).
 
 ## What a signed-in customer can do
 
@@ -68,7 +68,46 @@ Name and email inside retained order snapshots and contracts stay there: they ar
 | `VASEY_CUSTOMER_DATA_RETENTION_CORRESPONDENCE_YEARS` | Inquiries, replies, attachments (1–100). |
 | `VASEY_CUSTOMER_DATA_RETENTION_SECURITY_YEARS` | Audit events, identity challenges, download authorizations (1–100). |
 
-These values are recorded with each approval; no code yet purges retained records when a period ends. Follow-up (independent CX review F4): schedule `vasey:customer-data-exports-prune` once a production host exists (U-02); until then the export lifetime is a download window, not a storage limit, except that deletion approval purges open exports. A purge of immutable records needs its own reviewed migration and Sean's schedule.
+These values are recorded with each approval and drive the read-only retention report below; no code purges retained records when a period ends. Follow-up (independent CX review F4): schedule `vasey:customer-data-exports-prune` once a production host exists (U-02); until then the export lifetime is a download window, not a storage limit, except that deletion approval purges open exports. A purge of immutable records needs its own reviewed migration and Sean's schedule.
+
+## Retention schedule and dry-run report (FP-076, first increment)
+
+Sean approved the periods on 2026-11-07 (PRIVACY section 7; decision register "Register update — 2026-11-07"). The configuration reading of them is financial 7 years, consent 3, correspondence 2 and security 1, set per host in the variables above and never committed. `App\Domain\Customers\DataRights\RetentionSchedule` is the single source of truth: one entry per table, with:
+- a retention class: `financial`, `consent`, `correspondence`, `security`, `indefinite` or `not_applicable`;
+- the timestamp columns that start its clock;
+- a rationale.
+
+It covers every table of every `CustomerDataRights::RETAINED` record family, every table the export and deletion code reads, and the export sections' tables. `CustomerDataRetentionReportTest` fails when a table is unclassified or classified twice, or when a table would loosen its family's class (it may only keep the family's period or be held as `indefinite`).
+
+| Class | Tables | Clock |
+| --- | --- | --- |
+| `indefinite`, never purged by this mechanism | `orders`, `order_lines`, `order_finalizations`, `license_grants`, `grant_contracts`, `verified_payments`, `customer_purchase_claims`, the four production checkout record tables, `production_identity_origins`, the six `paid_*`/`paid_tax_*` order origins, grant origins and originals, `inquiry_order_contexts` | none: order snapshots, published licenses, original contracts, verified payments and other purchase evidence (AGENTS.md invariants). PRIVACY keeps them while the license can be used and at least 7 years. |
+| `financial`, minimum period only | `test_delivery_authorizations` (`issued_at`, `expires_at`), `test_delivery_redemptions` (`redeemed_at`), `paid_authorizations`/`paid_tax_authorizations` (`created_at`, `expires_at`), `paid_redemptions`/`paid_tax_redemptions` (`created_at`) | Download records. Past-period rows are review candidates only, because the license lifetime still applies. |
+| `consent`, held | consent events and states, the four `customer_suppression_*` tables | Not modeled. PRIVACY starts the clock when the email address is no longer held, and an opt-out must keep being honored. |
+| `correspondence` | `customer_inquiries`, with `inquiry_messages` and `inquiry_notification_intents` following their conversation | 2 years after the last message. A conversation linked to an order is never counted. |
+| `correspondence` | `transactional_notices` (`created_at`), `transactional_mail_deliveries` (`queued_at`, `finished_at`) | Never past while a delivery is unfinished. `support_attachments` is held: its source is polymorphic and no clock is modeled. |
+| `security` | `audit_events` (`created_at`), `customer_identity_challenges` (`created_at`, `expires_at`), `customer_data_requests` (`created_at`, `resolved_at`) with `customer_data_request_events` following, `customer_data_exports` (`created_at`, `purged_at`) | An open request or unpurged export is never past. `customer_purchase_challenges` (`created_at`, `expires_at`) is counted unless a purchase claim references it. |
+| `not_applicable` | `users`, `customer_accounts`, `customer_saved_tracks`, `sessions`, `customer_consent_policies` | Account lifecycle, handled by deletion approval, or not customer data. |
+
+A row is past its period only when every clock column is set and at or before the cutoff (now minus the class's years).
+
+`php artisan vasey:retention-report` is a dry run:
+- It reads with plain selects only: no transaction, no locks and no writes. It scans each table in primary-key ranges of 10,000, so no single query is unbounded.
+- It prints, per class and table, `past_period` (a count) and the oldest and newest due dates (date only), or `held=clock_not_modeled`.
+- It lists the indefinite and not-applicable tables by name only. It never prints identifiers, names or addresses.
+- It refuses with a non-zero exit (`refused=retention_policy_unset`) while any retention value is unset or invalid, the same check deletion approval uses, so periods are never inferred.
+- It also refuses (`refused=retention_schedule_table_missing`) when a scheduled table or clock column is missing.
+
+None of the counted clock columns has an index (the report prints `clock_index=missing`). The primary-key chunks keep each query bounded, but each run still reads every row of the counted tables; an index belongs with the later purge migration.
+
+**Purge or anonymization is a later, separately authorized step.** It needs its own reviewed migration, because most of these tables refuse `DELETE` through database triggers. It also needs Sean's explicit authorization, and the open questions below need answers first. This increment has no delete or anonymize code path.
+
+Open questions for Sean:
+- `audit_events` and `customer_data_requests` also hold the evidence that a deletion was honored, role changes and held paid orders; a 1-year purge would erase that evidence.
+- What ends "while we hold your email address" for consent and suppression records: account erasure, or the end of the order records that keep the email?
+- Download records are bound to the license lifetime as well as the 7 years: is there a cutoff for perpetual licenses?
+- Do support attachments follow their conversation?
+- The production identity tables (U-07) beyond `production_identity_origins` are not scheduled yet.
 
 ## Records
 
