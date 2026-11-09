@@ -314,3 +314,79 @@ the development lead's recommendation, recorded as decided; Sean can reverse any
 
 Still Sean's, not delegable: the staging step 11 inputs (two TOTP operators, the seller tag and the backup destination),
 and every live-payment, DNS, production and customer-import authorization.
+
+## Register update — 2026-11-09: delegated retention and download-resume decisions
+
+Sean delegated these on 2026-11-09 ("Make decisions for me based on best recommendations"). Each is the development
+lead's recommendation, recorded as decided; Sean can reverse any of them. None authorizes deletion: the retention
+report (#250) stays read-only until a purge is separately built, reviewed and approved.
+
+**Retention (U-13 follow-up, open questions from #250).** PRIVACY §7 already answers most of these; the decisions map
+each table to an existing §7 row and add two rows where §7 had none.
+
+- **Privacy request records** (`customer_data_requests`, `customer_data_request_events`, `customer_data_exports`
+  metadata): **7 years** after the request closes. They prove that rights requests and deletions were honored, so they
+  must outlive the records they concern. Export *files* keep their existing short expiry; only the metadata is kept. New
+  §7 row. Amended after the independent review of #255: `audit_events` are not in this row. They also evidence license
+  approvals, exclusive activations, payments, finalizations and refunds of records kept indefinitely, so they are kept with
+  those records (indefinite).
+- **Consent clock:** §7's existing row decides it: kept while the email address is held, plus 3 years. The clock starts
+  when the address is no longer held (account closure or erasure), not at the consent event.
+- **Download and redemption records for perpetual licenses:** they follow the order (§7 orders row): retained while the
+  order is retained, never on their own authorization timestamps. The report treats them as held with the order.
+- **Support attachments:** §7's contact row: 2 years after the last message, or with the order when the conversation
+  concerns an order or a legal claim.
+- **Production identity tables:** notices, send attempts and their outcomes follow §7's verification row (12 months),
+  and so do challenges that no identity origin or verification references. Amended after the independent review of #255:
+  verifications, and every challenge an origin or a verification references, form the verified chain that every
+  production read re-verifies from sequence 1 and that sealed order, grant, invoice and checkout bindings name, so they are
+  kept with the origin (indefinite). Addresses have no timestamp and stay held.
+- **Quotes and checkout reviews that never became an order:** **30 days** after the quote or checkout ends. Checkout
+  intents, sessions and observations are always bound to an order snapshot, so they follow the unpaid-snapshot rule below. There is no contractual, tax or support need
+  to keep abandoned purchase details longer. New §7 row.
+- **The unclassified tables (111 in #250)** are classified by family:
+  - order, payment, refund/dispute, fulfillment, grant, membership-billing and legacy-imported order records follow the
+    orders row;
+  - framework job and failure stores follow the application error log row (14 days);
+  - password reset tokens follow the verification row;
+  - cache and lock stores follow the rate-limit row;
+  - test-commerce tables are `not_applicable` in production, where they must stay empty;
+  - anything that still fits no row stays reported as unclassified.
+
+**Large-download resume (FP-077).** Sean decided on 2026-11-09 to replace the lead's first recommendation, which was no resume at launch:
+
+1. Delivery moves to a v2 policy that allows resume.
+2. The buyer's download is resumable through a session-bound GET. Sean asked for a recommendation, and this is the lead's:
+   - The existing CSRF-protected POST still creates the authorization, then answers 303 to a GET URL.
+   - That URL carries only the opaque authorization id, never the secret.
+   - The GET works only with the same authenticated session and owner, and only after every existing check passes.
+   - Responses are `private, no-store`, `no-referrer` and `noindex`.
+   - Only single-range `Range` and strong `If-Range` are honored.
+   - This amends D-20, whose threat was a secret in a URL.
+3. A partial or interrupted transfer does not count toward `max_downloads`.
+   - A download counts once, when the distinct bytes served under one authorization cover the whole file.
+   - Authorizations that started but never completed are capped per grant per rolling 24 hours (operational setting, default 10).
+4. Large archives get longer resume windows once started:
+   - 1 hour below 512 MiB;
+   - 6 hours from 512 MiB;
+   - 24 hours from 4 GiB.
+
+   These are settings. The start window stays short, and whole-file verification still runs before every response.
+
+The test-delivery chain is phase 1. Paid, paid-tax, free and production-free follow in their own phases, each with native
+MySQL race evidence and independent review. #252 and #253 are closed as superseded.
+
+**Unpaid order snapshots (retention).** An order snapshot is created before payment. One with no verified payment,
+whose provider session has expired or been cancelled and reconciled, counts as "did not become an order": it falls under
+the 30-day abandoned-checkout row from that point. Any paid, refunded, disputed or held order stays with the orders row.
+The schedule implements this only after a separate change that proves no late webhook or reconcile can still attach
+payment to such a snapshot. Until then those snapshots, and the checkout intents, sessions and observations bound to
+them, stay with the orders row, and PRIVACY's 30-day row names only quotes and checkout reviews; that change widens the
+row when it lands.
+
+Still Sean's, not delegable:
+
+- dismissing the four Dependabot alerts, which come from frozen evidence lockfiles under
+  `docs/verification/member-source-currentness-20261013/` and not from the shipped `composer.lock`;
+- the staging step 11 inputs;
+- every live-payment, DNS, production and customer-import authorization.

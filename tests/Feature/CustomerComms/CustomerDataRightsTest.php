@@ -47,7 +47,8 @@ class CustomerDataRightsTest extends TestCase
     private function retention(): void
     {
         config(['customer-data-rights.retention' => ['policy_reference' => 'Synthetic retention schedule SR-1 (test only)',
-            'financial_records_years' => '7', 'consent_records_years' => 3, 'correspondence_records_years' => '2', 'security_records_years' => 1]]);
+            'financial_records_years' => '7', 'consent_records_years' => 3, 'correspondence_records_years' => '2', 'security_records_years' => 1,
+            'evidence_records_years' => 7, 'abandoned_checkout_days' => '30', 'operational_records_days' => 14]]);
     }
 
     private function login(array $fixture): void
@@ -252,7 +253,8 @@ class CustomerDataRightsTest extends TestCase
         $before = $this->snapshot();
         $user = DB::table('users')->where('id', $customer['user']->id)->first();
         $complete = ['policy_reference' => 'Synthetic SR-1', 'financial_records_years' => 7, 'consent_records_years' => 3,
-            'correspondence_records_years' => 2, 'security_records_years' => 1];
+            'correspondence_records_years' => 2, 'security_records_years' => 1, 'evidence_records_years' => 7, 'abandoned_checkout_days' => 30,
+            'operational_records_days' => 14];
         $cases = ['all unset' => null, 'empty reference' => ['policy_reference' => ''] + $complete, 'markup reference' => ['policy_reference' => '<b>x</b>'] + $complete];
         foreach (array_keys($complete) as $key) {
             if ($key !== 'policy_reference') {
@@ -353,7 +355,10 @@ class CustomerDataRightsTest extends TestCase
         $this->assertEquals(['retention' => 'financial_records_years', 'reason' => 'immutable_record_retained', 'count' => 1],
             array_diff_key($retained['orders'], ['record' => true]));
         $this->assertSame(1, $retained['customer_consent_events']['count']);
-        foreach (['production_checkout_exemption_bases', 'production_checkout_reviews', 'production_checkout_orders', 'production_tax_checkout_orders',
+        // A production checkout review is kept with its order, or as an abandoned checkout when it never became one (2026-11-09).
+        $this->assertEquals(['retention' => 'with_order_or_abandoned_checkout_days', 'reason' => 'immutable_record_retained', 'count' => 0],
+            array_diff_key($retained['production_checkout_reviews'], ['record' => true]));
+        foreach (['production_checkout_exemption_bases', 'production_checkout_orders', 'production_tax_checkout_orders',
             'paid_order_origins', 'paid_grant_origins', 'paid_originals', 'paid_tax_order_origins', 'paid_tax_grant_origins', 'paid_tax_originals',
             'paid_authorizations', 'paid_redemptions', 'paid_tax_authorizations', 'paid_tax_redemptions'] as $record) {
             $this->assertEquals(['retention' => 'financial_records_years', 'reason' => 'immutable_record_retained', 'count' => 0],
@@ -402,7 +407,7 @@ class CustomerDataRightsTest extends TestCase
         $this->assertNull($event->actor_user_id);
         $completed = DB::table('customer_data_request_events')->where('event', 'deletion_completed')->sole();
         $retained = array_column(json_decode($completed->detail, true)['retained'], null, 'record');
-        $this->assertEquals(['retention' => 'security_records_years', 'reason' => 'ledger_retained_contents_purged', 'count' => 2],
+        $this->assertEquals(['retention' => 'evidence_records_years', 'reason' => 'ledger_retained_contents_purged', 'count' => 2],
             array_diff_key($retained['customer_data_exports'], ['record' => true]));
         foreach (['transactional_notices', 'transactional_mail_deliveries'] as $record) {
             $this->assertSame(['correspondence_records_years', 0], [$retained[$record]['retention'], $retained[$record]['count']]);
