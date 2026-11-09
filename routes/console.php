@@ -19,3 +19,8 @@ Schedule::command('vasey:publish-scheduled-site-release')->everyMinute()->withou
 // supervisor on staging and in the production kit, runs it. Never replace it with `cache:clear`: that resets unexpired throttles,
 // TOTP replay records and held locks. The overlap lock is hygiene only, as above.
 Schedule::command('vasey:cache-prune-expired')->hourlyAt(23)->withoutOverlapping(10);
+
+// Removes contract renderer workspaces a parent killed mid-render left under `contracts/render-cache` (each may hold a signature
+// copy). Only workspaces unmodified for an hour go (a render's child has a 60 s wall clock); links are never followed. :47 keeps it
+// clear of :23 and the 03:17 backup. The overlap lock is hygiene only, as above.
+Schedule::command('vasey:contract-render-cache-sweep')->hourlyAt(47)->withoutOverlapping(10);

@@ -31,9 +31,11 @@ is Sean's choice; none is selected and none is configured.
 
 ### Scheduler: what can and cannot be known
 
-The application has **no scheduler heartbeat**. `routes/console.php` schedules two commands, each with a short overlap lock:
-`vasey:publish-scheduled-site-release` every minute and `vasey:cache-prune-expired` hourly at :23 (expired database-cache rows
-only). Nothing either does leaves a durable record when there is nothing to do. The check therefore combines
+The application has **no scheduler heartbeat**. `routes/console.php` schedules three commands, each with a short overlap lock:
+`vasey:publish-scheduled-site-release` every minute, `vasey:cache-prune-expired` hourly at :23 (expired database-cache rows
+only) and `vasey:contract-render-cache-sweep` hourly at :47 (contract renderer workspaces left at least an hour). The
+scheduler must run as the site user that renders contracts: the sweep refuses to run as root and removes only its own
+user's workspaces. Nothing either does leaves a durable record when there is nothing to do. The check therefore combines
 three signals that need no application change: supervisor state, the process's working directory against `current`, and the line
 `schedule:work` prints each minute (`Running ['artisan' vasey:publish-scheduled-site-release]`, observed locally; the hourly
 prune adds one line at :23 and is not what the check looks for). Production

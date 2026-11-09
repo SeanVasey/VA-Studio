@@ -294,6 +294,10 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
         $probe = null;
         try {
             $factory = static function (array $command, string $cwd, array $environment, string $payload) use (&$probe): Process {
+                // Siblings that share an allowed directory's name as a prefix: the workspace's and app/'s.
+                $sibling = $environment['TMPDIR'].'-sibling';
+                mkdir($sibling, 0700);
+                file_put_contents($sibling.'/secret.txt', 'synthetic');
                 $probeCommand = $command;
                 $probeCommand[count($probeCommand) - 1] = '-r';
                 $probeCommand[] = 'echo json_encode(["env" => array_keys(getenv()), "memory" => ini_get("memory_limit"), "time" => ini_get("max_execution_time"),'
@@ -305,9 +309,16 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
                     .'"project_file" => @file_get_contents('.var_export(base_path('composer.json'), true).') !== false,'
                     .'"public_write" => @file_put_contents('.var_export(public_path('v2-child-probe.txt'), true).', "x") !== false,'
                     .'"storage_read" => @scandir('.var_export(storage_path(), true).') !== false,'
+                    .'"sibling_read" => @file_get_contents('.var_export($sibling.'/secret.txt', true).') !== false,'
+                    .'"workspace_list" => @scandir(getenv("TMPDIR")) !== false,'
                     .'"app_read" => @file_get_contents('.var_export(base_path('app/Support/CanonicalJson.php'), true).') !== false]);';
                 $run = new Process($probeCommand, $cwd, $environment, $payload, 60);
-                $run->mustRun();
+                try {
+                    $run->mustRun();
+                } finally {
+                    unlink($sibling.'/secret.txt');
+                    rmdir($sibling);
+                }
                 $probe = json_decode($run->getOutput(), true, 8, JSON_THROW_ON_ERROR);
 
                 return new Process($command, $cwd, $environment, $payload, 60);
@@ -328,6 +339,12 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
             $probe['project_file'], $probe['public_write'], $probe['storage_read'], $probe['app_read']]);
         $this->assertFileDoesNotExist(public_path('v2-child-probe.txt'));
         $this->assertNotContains(base_path(), explode(PATH_SEPARATOR, $probe['basedir']));
+        // Review P3-2 (#249): a sibling directory sharing an allowed directory's name as a prefix is unreadable, the allowed
+        // directory itself still lists, and every entry but the script ends with the separator.
+        $this->assertSame([false, true], [$probe['sibling_read'], $probe['workspace_list']]);
+        foreach (explode(PATH_SEPARATOR, $probe['basedir']) as $entry) {
+            $this->assertTrue(str_ends_with($entry, '/') || $entry === base_path('scripts/'.VaseyLicenseV2RendererProcess::SCRIPT), $entry);
+        }
         $this->assertStringStartsWith(Storage::disk('local')->path('contracts/render-cache'), $probe['tmp']);
         $this->assertSame(strlen(VaseyLicenseV2RendererProcess::payload($input, $profile, $values, $template, $rendererProfile)), $probe['input']);
     }

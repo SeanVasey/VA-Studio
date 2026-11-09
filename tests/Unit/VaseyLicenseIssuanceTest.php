@@ -4,12 +4,14 @@ namespace Tests\Unit;
 
 use App\Domain\Contracts\ContractIssuanceException;
 use App\Domain\Contracts\Production\VaseyLicenseV2Profile;
+use App\Domain\Grants\ContractRenderHolds;
 use App\Domain\Grants\VaseyLicenseContractSource;
 use App\Domain\Grants\VaseyLicenseContractTexts;
 use App\Domain\Grants\VaseyLicenseIssuance;
 use App\Domain\Grants\VaseyLicensePreparedSelection;
 use App\Support\CanonicalJson;
 use Closure;
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -50,14 +52,16 @@ class VaseyLicenseIssuanceTest extends TestCase
         return $family === 'tax' ? self::fixture('taxInput', $declaration, $license) : self::fixture('v1Input', $declaration, $license);
     }
 
-    private function refuses(string $reason, callable $call): void
+    private function refuses(string $reason, callable $call): ContractIssuanceException
     {
         try {
             $call();
-            $this->fail('Expected refusal '.$reason);
         } catch (ContractIssuanceException $exception) {
             $this->assertSame($reason, $exception->reason);
+
+            return $exception;
         }
+        $this->fail('Expected refusal '.$reason);
     }
 
     public static function families(): array
@@ -218,15 +222,19 @@ class VaseyLicenseIssuanceTest extends TestCase
         $other = self::SYNTHETIC_TEMPLATE.' Edited.';
         $this->assertTrue(VaseyLicenseContractTexts::retain('template', $other));
         $this->refuses('profile_changed', fn () => $issuance->render($input, [...$profile, 'contract' => [...$profile['contract'], 'template_sha256' => hash('sha256', $other)]]));
-        // A stored text changed under its address (the immutability trigger bypassed) or gone cannot be resolved.
+        // A stored text changed under its address (the immutability trigger bypassed) that still decrypts is an integrity
+        // failure no retry can fix: `profile_changed`, held at once on the first attempt. One that no longer decrypts cannot
+        // be told from a key this worker lacks, and a text that is gone may come back: both may resolve on a retry.
         $row = (array) DB::table(VaseyLicenseContractTexts::TABLE)->where('kind', 'template')->where('sha256', $profile['contract']['template_sha256'])->sole();
         $this->dropContractTextTriggers();
-        foreach ([Crypt::encryptString($other), 'x'] as $tampered) {
+        foreach (['changed' => [Crypt::encryptString($other), 'profile_changed', 'profile_changed'],
+            'undecryptable' => ['x', 'contract_text_unavailable', null],
+            'another key' => [(new Encrypter(random_bytes(32), 'aes-256-cbc'))->encryptString(self::SYNTHETIC_TEMPLATE), 'contract_text_unavailable', null]] as $case => [$tampered, $reason, $hold]) {
             DB::table(VaseyLicenseContractTexts::TABLE)->where('id', $row['id'])->update(['payload' => $tampered]);
-            $this->refuses('contract_text_unavailable', fn () => $issuance->render($input, $profile));
+            $this->assertSame($hold, ContractRenderHolds::reason($this->refuses($reason, fn () => $issuance->render($input, $profile)), 1, 3), $case);
         }
         DB::table(VaseyLicenseContractTexts::TABLE)->where('id', $row['id'])->delete();
-        $this->refuses('contract_text_unavailable', fn () => $issuance->render($input, $profile));
+        $this->assertNull(ContractRenderHolds::reason($this->refuses('contract_text_unavailable', fn () => $issuance->render($input, $profile)), 1, 3));
         DB::table(VaseyLicenseContractTexts::TABLE)->insert($row);
         $this->assertStringStartsWith('%PDF-', $issuance->render($input, $profile)->pdfBytes);
         // The #245 descriptor that carried its texts inline is still a v2 selection but no longer renders.

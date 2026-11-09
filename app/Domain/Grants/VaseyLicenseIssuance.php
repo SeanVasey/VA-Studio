@@ -57,8 +57,9 @@ use Throwable;
  * Payload growth: the recorded profile carries only the SHA-256 of the template and of the renderer profile. Their bytes
  * are stored once each in {@see VaseyLicenseContractTexts} when a line is selected (inside the origin transaction: a
  * database write, never a file read), and every render resolves them by hash, verifies them and passes them to the child,
- * which verifies them again. A stored text that cannot be resolved refuses `contract_text_unavailable`, a refusal a retry
- * may fix (held for staff only once the line's attempts are spent).
+ * which verifies them again. A stored text that is missing or does not decrypt (or a database error reading it) refuses
+ * `contract_text_unavailable`, a refusal a retry may fix (held for staff only once the line's attempts are spent); a stored
+ * row that decrypts but does not match its hash refuses `profile_changed`, which is permanent and held at once.
  */
 final class VaseyLicenseIssuance
 {
@@ -252,11 +253,15 @@ final class VaseyLicenseIssuance
             throw new ContractIssuanceException('profile_changed');
         }
         VaseyLicenseV2Render::shape($profile);
-        // Resolved by hash and verified before the signature or anything else is read. A text that cannot be resolved (a
-        // missing, undecryptable or changed row, or a database error) may resolve on a retry: it is not a permanent refusal.
+        // Resolved by hash and verified before the signature or anything else is read. A stored row that decrypts to bytes
+        // other than its address is an integrity failure no retry can fix (`profile_changed`, held at once); a missing or
+        // undecryptable row (perhaps a key this worker lacks) or a database error may resolve on a retry
+        // (`contract_text_unavailable`, held only once attempts are spent).
         try {
             $template = VaseyLicenseContractTexts::resolve('template', $profile['contract']['template_sha256']);
             $rendererProfile = VaseyLicenseContractTexts::resolve('renderer_profile', $profile['renderer_profile_sha256']);
+        } catch (ContractIssuanceException $error) {
+            throw $error->reason === 'profile_changed' ? $error : new ContractIssuanceException('contract_text_unavailable');
         } catch (Throwable) {
             throw new ContractIssuanceException('contract_text_unavailable');
         }

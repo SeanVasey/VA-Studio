@@ -457,8 +457,11 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
   template's SHA-256 and the two constants, the signature pin, the v2 profile's hash, the effective hash (profile and
   signature), and the document's input hash and text digest. Every render, retry and replay uses it, whatever the gate says
   later. The template and the v2 profile themselves are stored once each by SHA-256 in `vasey_license_contract_texts`
-  (see Payload growth below). At render both are resolved by their recorded hashes and verified (a missing, changed or
-  undecryptable row, or a database error, refuses `contract_text_unavailable`, which a retry may fix) and passed to the
+  (see Payload growth below). At render both are resolved by their recorded hashes and verified (a missing row, a row that
+  does not decrypt or a database error refuses `contract_text_unavailable`, which a retry may fix: the ciphertext is
+  authenticated, so a failed decrypt cannot tell tampering from a key the worker lacks during an `APP_KEY` rotation or after
+  a restore paired with another key; a row that decrypts but whose bytes do not match its address, or a malformed address,
+  refuses `profile_changed`, permanent and held at once (review P3-1 of #249, P2 of the #251 review)) and passed to the
   isolated child, which verifies both hashes again; the document is rebuilt from the frozen input and must match the frozen input hash; the PDF must carry the frozen effective
   hash and text digest; a different signature refuses `signature_changed`; a changed profile refuses `profile_changed`.
   The stored original records the effective hash as its artifact profile hash and the descriptor's hash as the manifest's.
@@ -472,7 +475,9 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
   extensions, `memory_limit=128M`, `max_execution_time=60` and a 60 s wall clock, `allow_url_fopen=0`, the network and
   process functions plus `mail`, `putenv` and `dl` disabled, `open_basedir` limited to what the child reads (`app/`, its
   script, `resources/contracts/vasey-license-v2`, `vendor/composer` and the tc-lib package paths; never `.env`, `storage/`
-  or `public/`) and a private per-render workspace (also the child's temporary directory), every inherited environment name removed (only `LANG`, `LC_ALL`, `TZ`,
+  or `public/`) and a private per-render workspace (also the child's temporary directory); every directory entry ends with
+  the path separator, so a sibling sharing its name as a prefix (`app2/`, `<workspace>-other/`) is outside, and only the
+  script is an exact file entry (review P3-2 of #249). Every inherited environment name is removed (only `LANG`, `LC_ALL`, `TZ`,
   `TMPDIR` and a fixed `LD_LIBRARY_PATH` remain), at most 1 MiB of input, 24 MiB of output and no diagnostics. Under PHP-FPM
   the container gives it `PhpCliProcess::factory()`, like the pinned renderers. The parent binds the line's values (the
   binder needs the application's validator), checks the configured signature against the recorded pin and passes the line,
@@ -491,7 +496,8 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
   fixes (`profile_changed`, `signature_changed`, `signature_invalid`, `unsupported_input` (including text a face cannot
   draw), `invalid_pdf`), or any failure spends its last attempt (`attempts_exhausted`; this is how a retryable
   `render_failed` such as a timeout, failed fork or full disk, a `signature_unavailable` storage hiccup or a
-  `contract_text_unavailable` stored text, is held),
+  missing or undecryptable `contract_text_unavailable` stored text, is held; a stored text that decrypts but does not
+  match its hash refuses `profile_changed` and is held at once),
   `PaidGrantDocuments`/`PaidTaxDocuments` record one `paid_order.contract_render_held` row (`ContractRenderHolds`), after the
   attempt's own frames and outside any transaction: the order's row id as the subject and only the chain, the code and the
   order's public id as context. It is idempotent under the order-row lock (one per order however often it is retried or how
@@ -550,7 +556,7 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
     descriptor holds hashes only and selections share one row of each (`VaseyLicenseIssuanceTest`); a template at the
     selection bound leaves the origin within 4 KiB of its gate-off size (`PaidGrantDocumentJourneyTest`); an account with
     enough v2 lines to pass the budget with inline descriptors exports, without a query on the texts table
-    (`PaidGrantDataExportTest`); render refuses a missing, changed or undecryptable stored text (`contract_text_unavailable`) or a non-canonical one (`profile_changed`) and another
+    (`PaidGrantDataExportTest`); render refuses a missing or undecryptable stored text (`contract_text_unavailable`, retryable; one under a rotated key resolves once that key is in `APP_PREVIOUS_KEYS`), a changed one or a non-canonical one (`profile_changed`, held at once) and another
     stored template whose hash verifies; triggers, idempotent storing and rollback (`VaseyLicenseContractTextMigrationTest`).
 - Tests: `VaseyLicenseIssuanceTest` (including the stored texts, selection with its files removed after preparing, inside a transaction, and
   the issuers preparing before their frames), the wiring-condition tests and the child's golden render in
@@ -565,8 +571,25 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
   `render_failed` then success leaves no hold; probes that `.env`, `composer.json` and `storage/` are unreadable and
   `public/` unwritable from the child and that `mail`, `putenv` and `dl` are disabled; an unpinned change to a class the
   child loads never runs (it would announce itself on stderr); an answer with the right bytes but another text digest refuses.
-- Remaining for the isolated render: a parent killed mid-render can leave a workspace (with the signature copy if the kill
-  lands before the child exits) under `contracts/render-cache`; a sweeper for stale workspaces is not built.
+- Stale workspaces (built 2026-11-09, from #249's remaining list): a parent killed mid-render can leave a workspace (with
+  the signature copy if the kill lands before the child exits) under `contracts/render-cache`.
+  `vasey:contract-render-cache-sweep` (`SweepContractRenderCache`, `ContractRenderWorkspace::sweep()`), scheduled hourly at
+  :47 with `withoutOverlapping(10)`, removes direct children of that directory only when they are named as workspaces are
+  (32 hex characters), are private real directories (never a symbolic link) and were last modified at least an hour ago
+  (`--older-than`, never below 3600 s; a render's child has a 60 s wall clock). Contents go as `close()` removes them: a link
+  inside is unlinked, never followed. It creates nothing, sweeps nothing (and succeeds) when the private disk root or the
+  cache is absent, refuses a cache directory that is a link or not private, prints counts only and fails the run when it
+  leaves any other entry in place. It refuses to run as root (effective uid 0) and removes only workspaces owned by its own
+  effective user (another user's entry is left and counted), so **the scheduler must run as the site user that renders
+  contracts** (review of #251, P3). Tests: `ContractRenderCacheSweepTest`.
+- Tracked follow-ups from the #251 review (P3, not built):
+  - The paid, paid-tax and member render caches (`contracts/paid-render-cache`, `contracts/paid-tax-render-cache`,
+    `contracts/member-render-cache`) are not swept.
+  - The Isolated (`IsolatedContractRenderer`), Free (`FreeGrantRendererProcess`) and ProductionFree
+    (`ProductionFreeGrantRendererProcess`) children's `open_basedir` directory entries still lack the trailing separator
+    the v2 child now has (the paid and paid-tax children are pinned files; any change there rebuilds their manifests).
+  - Sweeper test gaps: a 32-hex directory that is not mode 0700 (left in place) and the race between a workspace's mtime
+    check and a render closing it are not exercised.
 
 ### Wording item for Sean
 
