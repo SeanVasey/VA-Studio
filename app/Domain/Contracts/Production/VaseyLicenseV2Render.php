@@ -25,7 +25,8 @@ use Throwable;
  */
 final class VaseyLicenseV2Render
 {
-    public const DESCRIPTOR_SCHEMA = 'paid-vasey-license-v2-selection-v1';
+    /** The recorded descriptor: hashes only; the template and renderer profile are stored once by hash and passed in. */
+    public const DESCRIPTOR_SCHEMA = 'paid-vasey-license-v2-selection-v2';
 
     /** The two frozen render-input families and their grant purposes. */
     public const FAMILIES = ['paid-grant-render-input-v1' => 'paid-license-grant', 'paid-tax-render-input-v2' => 'paid-tax-license-grant'];
@@ -41,12 +42,11 @@ final class VaseyLicenseV2Render
     {
         try {
             $valid = self::selected($profile) && $profile['version'] === VaseyLicenseV2ProfileDefinition::VERSION
-                && is_array($profile['renderer_profile']) && is_string($profile['contract']['template'])
+                && is_array($profile['contract']) && ! array_key_exists('template', $profile['contract']) && ! array_key_exists('renderer_profile', $profile)
                 && is_string($profile['contract']['producer_alias']) && is_string($profile['contract']['state_province_country'])
                 && preg_match('/\A[a-f0-9]{64}\z/D', (string) $profile['contract']['template_sha256']) === 1
                 && preg_match('/\A[a-f0-9]{64}\z/D', (string) $profile['signature_sha256']) === 1
                 && preg_match('/\A[a-f0-9]{64}\z/D', (string) $profile['renderer_profile_sha256']) === 1
-                && hash_equals($profile['renderer_profile_sha256'], CanonicalJson::hash($profile['renderer_profile']))
                 && hash_equals($profile['effective_hash'], CanonicalJson::hash(['profile_sha256' => $profile['renderer_profile_sha256'],
                     'signature_sha256' => $profile['signature_sha256']]))
                 && preg_match('/\A[a-f0-9]{64}\z/D', (string) $profile['expected']['input_hash']) === 1
@@ -68,15 +68,38 @@ final class VaseyLicenseV2Render
     }
 
     /**
-     * Render the recorded selection for its line. `$values` is the line's {@see ContractVariableBinder::bind()} output; it
-     * is not trusted either: the document built from it must have the input hash frozen at selection, which binds the
-     * template, every value and the declaration.
+     * The renderer profile from its stored bytes: they must hash to the recorded hash and be the canonical JSON of what they
+     * decode to; otherwise `profile_changed`.
+     */
+    public static function rendererProfile(array $profile, string $bytes): array
+    {
+        try {
+            $decoded = hash_equals((string) $profile['renderer_profile_sha256'], hash('sha256', $bytes))
+                ? json_decode($bytes, true, 32, JSON_THROW_ON_ERROR) : null;
+            $valid = is_array($decoded) && CanonicalJson::encode($decoded) === $bytes;
+        } catch (Throwable) {
+            $valid = false;
+        }
+        if (! $valid) {
+            throw new ContractIssuanceException('profile_changed');
+        }
+
+        return $decoded;
+    }
+
+    /**
+     * Render the recorded selection for its line. The template and the renderer profile's canonical JSON are the stored texts
+     * the descriptor addresses by hash; both are checked against those hashes here. `$values` is the line's
+     * {@see ContractVariableBinder::bind()} output; it is not trusted either: the document built from it must have the input
+     * hash frozen at selection, which binds the template, every value and the declaration.
      *
      * @param  array<string, string>  $values
      */
-    public static function render(array $input, array $profile, array $values, VaseyLicenseSignature $signature, ?string $projectRoot = null): RenderedContract
+    public static function render(array $input, array $profile, array $values, VaseyLicenseSignature $signature, string $template,
+        string $rendererProfile, ?string $projectRoot = null): RenderedContract
     {
         self::shape($profile);
+        $renderer = self::rendererProfile($profile, $rendererProfile);
         self::family($input);
         if (($input['purpose'] ?? null) !== $profile['purpose'] || ($input['provenance'] ?? null) !== $profile['provenance']) {
             throw new ContractIssuanceException('profile_changed');
@@ -84,24 +107,23 @@ final class VaseyLicenseV2Render
         if (! hash_equals($profile['signature_sha256'], $signature->sha256)) {
             throw new ContractIssuanceException('signature_changed');
         }
-        $contract = $profile['contract'];
-        if (! hash_equals($contract['template_sha256'], hash('sha256', $contract['template']))) {
+        if (! hash_equals($profile['contract']['template_sha256'], hash('sha256', $template))) {
             throw new ContractIssuanceException('profile_changed');
         }
         $declaration = $input['buyer']['declarations'] ?? null;
         if (! is_array($declaration)) {
             throw new ContractIssuanceException('unsupported_input');
         }
-        $renderer = new VaseyLicenseV2PdfRenderer($projectRoot);
+        $pdfRenderer = new VaseyLicenseV2PdfRenderer($projectRoot);
         try {
-            $document = $renderer->document($contract['template'], $values, $declaration);
+            $document = $pdfRenderer->document($template, $values, $declaration);
         } catch (ContractBindingException) {
             throw new ContractIssuanceException('unsupported_input');
         }
         if (! hash_equals($profile['expected']['input_hash'], $document->inputHash)) {
             throw new ContractIssuanceException('profile_changed');
         }
-        $rendered = $renderer->render($document, $profile['renderer_profile'], $signature);
+        $rendered = $pdfRenderer->render($document, $renderer, $signature);
         if (! hash_equals($profile['effective_hash'], $rendered->profileHash) || ! hash_equals($profile['expected']['text_digest'], $rendered->textDigest)) {
             throw new ContractIssuanceException('profile_changed');
         }

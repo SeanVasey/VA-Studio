@@ -53,10 +53,23 @@ use Throwable;
  * signature rotation or pinned v2 file change while any v2 origin is unrendered. Every render runs in the isolated child
  * ({@see VaseyLicenseV2RendererProcess}). Once an origin exists its recorded profile decides every render, retry and replay,
  * whatever the gate says later; nothing here ever re-renders a completed original.
+ *
+ * Payload growth: the recorded profile carries only the SHA-256 of the template and of the renderer profile. Their bytes
+ * are stored once each in {@see VaseyLicenseContractTexts} when a line is selected (inside the origin transaction: a
+ * database write, never a file read), and every render resolves them by hash, verifies them and passes them to the child,
+ * which verifies them again. A stored text that cannot be resolved refuses `contract_text_unavailable`, a refusal a retry
+ * may fix (held for staff only once the line's attempts are spent).
  */
 final class VaseyLicenseIssuance
 {
     public const DESCRIPTOR_SCHEMA = VaseyLicenseV2Render::DESCRIPTOR_SCHEMA;
+
+    /**
+     * The #245 descriptor, which carried the template and the profile inline (local and testing only, never activated).
+     * Still recognized as a v2 selection, so it never routes to the paid renderers, and its frozen digests still verify a
+     * completed original ({@see expected()}, {@see artifactProfileHash()}), but it no longer renders.
+     */
+    public const RETIRED_DESCRIPTOR_SCHEMA = 'paid-vasey-license-v2-selection-v1';
 
     /** Bounds the template frozen into each origin (origins are capped at 4 MiB for up to ten lines). */
     public const TEMPLATE_BYTES = 262144;
@@ -70,7 +83,7 @@ final class VaseyLicenseIssuance
     /** True for an origin profile this dispatch selected. */
     public static function selected(array $profile): bool
     {
-        return VaseyLicenseV2Render::selected($profile);
+        return VaseyLicenseV2Render::selected($profile) || ($profile['schema_version'] ?? null) === self::RETIRED_DESCRIPTOR_SCHEMA;
     }
 
     /**
@@ -113,11 +126,14 @@ final class VaseyLicenseIssuance
     /**
      * The profile to freeze into a new origin, or null to keep the family's existing profile, with the branch taken:
      * `selected`, `gate_off`, `name_only_declaration`, `identity_held`, `no_contract_source`, `template_too_large`,
-     * `signature_unavailable` or `not_renderable`.
+     * `signature_unavailable`, `not_renderable` or `contract_text_unavailable`.
      *
-     * Selection never throws: it runs inside the issuer's locked origin transaction after the payment is recorded, so any
+     * Selection never refuses: it runs inside the issuer's locked origin transaction after the payment is recorded, so any
      * unexpected failure (a throwing contract source, a runtime error) keeps the existing profile instead of refusing the
-     * paid order. The issuers record the returned branch code in their `paid_origin.retained` audit context.
+     * paid order. A selected line's template and renderer profile are then stored by hash in that same transaction
+     * ({@see VaseyLicenseContractTexts}); a stored text that differs keeps the existing profile, but a database error is
+     * not caught, as for the origin insert that follows it. The issuers record the returned branch code in their
+     * `paid_origin.retained` audit context.
      *
      * @param  array  $input  The line's frozen render input (`PaidGrantRenderInput` or `PaidTaxRenderInput`).
      * @param  VaseyLicensePreparedSelection|null  $prepared  From {@see prepare()} before the transaction. Without it the
@@ -127,28 +143,36 @@ final class VaseyLicenseIssuance
     public static function decide(array $input, ?VaseyLicensePreparedSelection $prepared = null): array
     {
         try {
-            return self::select($input, $prepared);
+            [$profile, $branch, $texts] = self::select($input, $prepared);
         } catch (Throwable) {
             return [null, 'not_renderable'];
         }
+        // Outside the catch: a database error here must abort the origin transaction, never be swallowed.
+        foreach ($texts as $kind => $bytes) {
+            if (! VaseyLicenseContractTexts::retain($kind, $bytes)) {
+                return [null, 'contract_text_unavailable'];
+            }
+        }
+
+        return [$profile, $branch];
     }
 
-    /** @return array{0: array|null, 1: string} */
+    /** @return array{0: array|null, 1: string, 2: array<string, string>} the profile, the branch and the texts to store by hash */
     private static function select(array $input, ?VaseyLicensePreparedSelection $prepared): array
     {
         if (! self::enabled()) {
-            return [null, 'gate_off'];
+            return [null, 'gate_off', []];
         }
         $declaration = $input['buyer']['declarations'] ?? null;
         if (! is_array($declaration) || ! ContractIdentityDeclarationV2::isV2($declaration)) {
-            return [null, 'name_only_declaration'];
+            return [null, 'name_only_declaration', []];
         }
         $prepared ??= self::prepare();
         if (! $prepared instanceof VaseyLicensePreparedSelection || $prepared->coverage === null) {
-            return [null, 'not_renderable'];
+            return [null, 'not_renderable', []];
         }
         if (ProductionCheckout::contractIdentityHeld($declaration)) {
-            return [null, 'identity_held'];
+            return [null, 'identity_held', []];
         }
         try {
             $contract = app()->bound(VaseyLicenseContractSource::class)
@@ -157,20 +181,20 @@ final class VaseyLicenseIssuance
             $contract = null;
         }
         if (! is_array($contract) || ! is_string($contract['template'] ?? null) || ! ($contract['constants'] ?? null) instanceof ContractLicenseConstants) {
-            return [null, 'no_contract_source'];
+            return [null, 'no_contract_source', []];
         }
         if (strlen($contract['template']) > self::TEMPLATE_BYTES) {
-            return [null, 'template_too_large'];
+            return [null, 'template_too_large', []];
         }
         // The prepared signature must still be the configured pin (configuration is in memory; no file is read here).
         $pin = config('contracts.vasey_license_v1.signature_sha256');
         if ($prepared->signatureSha256 === null || ! is_string($pin) || ! hash_equals($prepared->signatureSha256, $pin)) {
-            return [null, 'signature_unavailable'];
+            return [null, 'signature_unavailable', []];
         }
         $constants = $contract['constants'];
         $descriptor = ['schema_version' => self::DESCRIPTOR_SCHEMA, 'version' => VaseyLicenseV2Profile::VERSION,
             'purpose' => $input['purpose'] ?? null, 'provenance' => $input['provenance'] ?? null,
-            'contract' => ['template' => $contract['template'], 'template_sha256' => hash('sha256', $contract['template']),
+            'contract' => ['template_sha256' => hash('sha256', $contract['template']),
                 'producer_alias' => $constants->producerAlias, 'state_province_country' => $constants->stateProvinceCountry],
             'signature_sha256' => $prepared->signatureSha256];
         try {
@@ -179,25 +203,27 @@ final class VaseyLicenseIssuance
                 || ! hash_equals($prepared->profileSha256, CanonicalJson::hash($prepared->profile))) {
                 throw new ContractIssuanceException('profile_changed');
             }
-            [$values, $document] = self::document($input, $descriptor, $prepared->coverage);
-            $descriptor += ['renderer_profile' => $prepared->profile, 'renderer_profile_sha256' => $prepared->profileSha256,
+            [$values, $document] = self::document($input, $descriptor, $prepared->coverage, $contract['template']);
+            $texts = ['template' => $contract['template'], 'renderer_profile' => CanonicalJson::encode($prepared->profile)];
+            $descriptor += ['renderer_profile_sha256' => $prepared->profileSha256,
                 'effective_hash' => CanonicalJson::hash(['profile_sha256' => $prepared->profileSha256, 'signature_sha256' => $prepared->signatureSha256]),
                 'expected' => ['input_hash' => $document->inputHash, 'text_digest' => hash('sha256', $document->text)]];
-            // A line whose render request would exceed the isolated child's input bound is never selected.
-            if (strlen(VaseyLicenseV2RendererProcess::payload($input, $descriptor, $values)) > VaseyLicenseV2RendererProcess::MAX_INPUT) {
+            // A line whose render request (with the resolved texts) would exceed the isolated child's input bound is never selected.
+            if (strlen(VaseyLicenseV2RendererProcess::payload($input, $descriptor, $values, $texts['template'], $texts['renderer_profile']))
+                > VaseyLicenseV2RendererProcess::MAX_INPUT) {
                 throw new ContractIssuanceException('unsupported_input');
             }
         } catch (Throwable) {
-            return [null, 'not_renderable'];
+            return [null, 'not_renderable', []];
         }
 
-        return [$descriptor, 'selected'];
+        return [$descriptor, 'selected', $texts];
     }
 
     /** The input hash and text digest frozen at selection; an issued original is checked against these, never re-rendered. */
     public static function expected(array $profile): array
     {
-        VaseyLicenseV2Render::shape($profile);
+        self::shape($profile, true);
 
         return $profile['expected'];
     }
@@ -208,7 +234,7 @@ final class VaseyLicenseIssuance
         if (! self::selected($profile)) {
             return CanonicalJson::hash($profile);
         }
-        VaseyLicenseV2Render::shape($profile);
+        self::shape($profile, true);
 
         return $profile['effective_hash'];
     }
@@ -226,6 +252,14 @@ final class VaseyLicenseIssuance
             throw new ContractIssuanceException('profile_changed');
         }
         VaseyLicenseV2Render::shape($profile);
+        // Resolved by hash and verified before the signature or anything else is read. A text that cannot be resolved (a
+        // missing, undecryptable or changed row, or a database error) may resolve on a retry: it is not a permanent refusal.
+        try {
+            $template = VaseyLicenseContractTexts::resolve('template', $profile['contract']['template_sha256']);
+            $rendererProfile = VaseyLicenseContractTexts::resolve('renderer_profile', $profile['renderer_profile_sha256']);
+        } catch (Throwable) {
+            throw new ContractIssuanceException('contract_text_unavailable');
+        }
         try {
             VaseyLicenseV2Render::family($input);
             if (($input['purpose'] ?? null) !== $profile['purpose'] || ($input['provenance'] ?? null) !== $profile['provenance']) {
@@ -235,12 +269,12 @@ final class VaseyLicenseIssuance
             if (! hash_equals($profile['signature_sha256'], $signature->sha256)) {
                 throw new ContractIssuanceException('signature_changed');
             }
-            [$values, $document] = self::document($input, $profile, (new VaseyLicenseV2PdfRenderer)->coverage());
+            [$values, $document] = self::document($input, $profile, (new VaseyLicenseV2PdfRenderer)->coverage(), $template);
             if (! hash_equals($profile['expected']['input_hash'], $document->inputHash)) {
                 throw new ContractIssuanceException('profile_changed');
             }
             $signed = $signature->read();
-            $rendered = app(VaseyLicenseV2RendererProcess::class)->render($input, $profile, $values, $signed['bytes']);
+            $rendered = app(VaseyLicenseV2RendererProcess::class)->render($input, $profile, $values, $template, $rendererProfile, $signed['bytes']);
         } catch (ContractBindingException) {
             throw new ContractIssuanceException('unsupported_input');
         }
@@ -257,15 +291,47 @@ final class VaseyLicenseIssuance
      *
      * @return array{0: array<string, string>, 1: VaseyLicenseDocument}
      */
-    private static function document(array $input, array $descriptor, ContractGlyphCoverage $coverage): array
+    private static function document(array $input, array $descriptor, ContractGlyphCoverage $coverage, string $template): array
     {
         $contract = $descriptor['contract'];
-        if (! hash_equals($contract['template_sha256'], hash('sha256', $contract['template']))) {
+        if (! hash_equals($contract['template_sha256'], hash('sha256', $template))) {
             throw new ContractIssuanceException('profile_changed');
         }
         $values = ContractVariableBinder::bind($input, $input['source']['license']['structured_terms'] ?? [],
             new ContractLicenseConstants($contract['producer_alias'], $contract['state_province_country']), $coverage);
 
-        return [$values, VaseyLicenseDocument::build($contract['template'], $values, $input['buyer']['declarations'], $coverage)];
+        return [$values, VaseyLicenseDocument::build($template, $values, $input['buyer']['declarations'], $coverage)];
+    }
+
+    /**
+     * The recorded descriptor's shape ({@see VaseyLicenseV2Render::shape()}). Only the frozen-digest readers admit the retired
+     * #245 shape (`$retired`), and only with its inline template and profile matching their recorded hashes; render never does.
+     */
+    private static function shape(array $profile, bool $retired = false): void
+    {
+        if (! $retired || ($profile['schema_version'] ?? null) !== self::RETIRED_DESCRIPTOR_SCHEMA) {
+            VaseyLicenseV2Render::shape($profile);
+
+            return;
+        }
+        try {
+            $valid = $profile['version'] === VaseyLicenseV2Profile::VERSION
+                && is_string($profile['contract']['template']) && is_array($profile['renderer_profile'])
+                && is_string($profile['contract']['producer_alias']) && is_string($profile['contract']['state_province_country'])
+                && preg_match('/\A[a-f0-9]{64}\z/D', (string) $profile['contract']['template_sha256']) === 1
+                && hash_equals((string) $profile['contract']['template_sha256'], hash('sha256', $profile['contract']['template']))
+                && preg_match('/\A[a-f0-9]{64}\z/D', (string) $profile['signature_sha256']) === 1
+                && preg_match('/\A[a-f0-9]{64}\z/D', (string) $profile['renderer_profile_sha256']) === 1
+                && hash_equals((string) $profile['renderer_profile_sha256'], CanonicalJson::hash($profile['renderer_profile']))
+                && hash_equals($profile['effective_hash'], CanonicalJson::hash(['profile_sha256' => $profile['renderer_profile_sha256'],
+                    'signature_sha256' => $profile['signature_sha256']]))
+                && preg_match('/\A[a-f0-9]{64}\z/D', (string) $profile['expected']['input_hash']) === 1
+                && preg_match('/\A[a-f0-9]{64}\z/D', (string) $profile['expected']['text_digest']) === 1;
+        } catch (Throwable) {
+            $valid = false;
+        }
+        if (! $valid) {
+            throw new ContractIssuanceException('profile_changed');
+        }
     }
 }

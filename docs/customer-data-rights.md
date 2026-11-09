@@ -28,7 +28,7 @@ Schema 3 also adds the paid-grant copies of those declarations (`PaidGrantExport
 - Each payload is opened with its hash checked. The order's sealed original buyer must name the account's production origin and the account, and every line must repeat that binding. An original's manifest and every authorization must seal the hash of one of the account's exported lines, and the order's line count must match its retained lines. Otherwise, or if a paid table is missing, the export refuses with `503 production_record_unavailable`.
 - Paid-tax provider session, payment and account identifiers, storage paths, claim and request identifiers and token hashes are deliberately not exported.
 
-Document work and fulfillment records hold only states and hashes, so they are neither exported nor listed as retained.
+Document work and fulfillment records hold only states and hashes, so they are neither exported nor listed as retained. Nor is `vasey_license_contract_texts`: it holds the v2 license templates and renderer profiles, stored once each by SHA-256 and shared by every buyer of a license version, not customer data. A v2 grant origin names its template only by hash, so the export never reads that table and its stored payloads stay about the size of a gate-off origin's (the byte budget below is unchanged), and a deletion neither erases nor lists it.
 
 Inquiries sent from a browser session without an order are not linked to an account and are not included. These exports refuse with `413`, and the customer contacts support@vasey.audio:
 - over `export_max_bytes` (default 1 MiB);

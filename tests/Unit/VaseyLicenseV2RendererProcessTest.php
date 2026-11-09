@@ -11,11 +11,13 @@ use App\Domain\Contracts\Production\VaseyLicenseV2PdfRenderer;
 use App\Domain\Contracts\Production\VaseyLicenseV2Profile;
 use App\Domain\Contracts\Production\VaseyLicenseV2Render;
 use App\Domain\Contracts\Production\VaseyLicenseV2RendererProcess;
+use App\Domain\Grants\VaseyLicenseContractTexts;
 use App\Domain\Grants\VaseyLicenseIssuance;
 use App\Support\CanonicalJson;
 use Closure;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Process;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\PhpCliWrapperFixture;
 use Tests\Support\VaseyLicenseIssuanceFixtures;
 use Tests\TestCase;
@@ -27,6 +29,7 @@ use Tests\TestCase;
  */
 class VaseyLicenseV2RendererProcessTest extends TestCase
 {
+    use FinalizationDatabaseMigrations;
     use PhpCliWrapperFixture;
     use VaseyLicenseIssuanceFixtures;
 
@@ -53,7 +56,10 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
             (new VaseyLicenseV2PdfRenderer)->coverage());
         $signature = VaseyLicenseSignature::fromConfig();
 
-        return [$input, $profile, $values, $signature, $signature->read()['bytes']];
+        // The stored texts the descriptor addresses by hash, as the dispatch resolves them before starting the child.
+        return [$input, $profile, $values, $signature, $signature->read()['bytes'],
+            VaseyLicenseContractTexts::resolve('template', $profile['contract']['template_sha256']),
+            VaseyLicenseContractTexts::resolve('renderer_profile', $profile['renderer_profile_sha256'])];
     }
 
     private function refuses(string $reason, callable $call): void
@@ -71,9 +77,10 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
     {
         return static function (array $command, string $cwd, array $environment, string $payload) use ($edit): Process {
             $decoded = json_decode($payload, true, 128, JSON_THROW_ON_ERROR);
-            $decoded = $edit($decoded, $environment) ?? $decoded;
+            $edited = $edit($decoded, $environment) ?? $decoded;
 
-            return new Process($command, $cwd, $environment, CanonicalJson::encode($decoded), 60);
+            // An edit may return the raw standard input itself (to send what canonical JSON would reorder).
+            return new Process($command, $cwd, $environment, is_string($edited) ? $edited : CanonicalJson::encode($edited), 60);
         };
     }
 
@@ -103,17 +110,17 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
 
     public function test_the_child_renders_the_bytes_the_in_process_renderer_renders(): void
     {
-        [$input, $profile, $values, $signature, $bytes] = self::selected();
-        $child = (new VaseyLicenseV2RendererProcess)->render($input, $profile, $values, $bytes);
+        [$input, $profile, $values, $signature, $bytes, $template, $rendererProfile] = self::selected();
+        $child = (new VaseyLicenseV2RendererProcess)->render($input, $profile, $values, $template, $rendererProfile, $bytes);
         $renderer = new VaseyLicenseV2PdfRenderer;
-        $inProcess = $renderer->render($renderer->document($profile['contract']['template'], $values, $input['buyer']['declarations']),
-            $profile['renderer_profile'], $signature);
+        $inProcess = $renderer->render($renderer->document($template, $values, $input['buyer']['declarations']),
+            VaseyLicenseV2Profile::current(), $signature);
 
         $this->assertSame($inProcess->pdfBytes, $child->pdfBytes);
         $this->assertSame([$inProcess->sha256, $inProcess->sizeBytes, $inProcess->pageCount, $inProcess->textDigest, $inProcess->profileHash],
             [$child->sha256, $child->sizeBytes, $child->pageCount, $child->textDigest, $child->profileHash]);
         // The application-free core renders the same bytes too, and the dispatch renders through the child.
-        $this->assertSame($child->pdfBytes, VaseyLicenseV2Render::render($input, $profile, $values, $signature)->pdfBytes);
+        $this->assertSame($child->pdfBytes, VaseyLicenseV2Render::render($input, $profile, $values, $signature, $template, $rendererProfile)->pdfBytes);
         $this->assertSame($child->pdfBytes, (new VaseyLicenseIssuance)->render($input, $profile)->pdfBytes);
         $this->assertSame(2, substr_count($this->extractPdfText($child->pdfBytes), 'Łukasz Żółć'));
         // The workspace (with its copy of the signature) is gone.
@@ -136,25 +143,28 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
 
     public function test_the_child_refuses_a_tampered_descriptor_signature_or_values(): void
     {
-        [$input, $profile, $values, , $bytes] = self::selected();
+        [$input, $profile, $values, , $bytes, $template, $rendererProfile] = self::selected();
         $rehash = static function (array $profile): array {
-            $profile['renderer_profile_sha256'] = CanonicalJson::hash($profile['renderer_profile']);
             $profile['effective_hash'] = CanonicalJson::hash(['profile_sha256' => $profile['renderer_profile_sha256'], 'signature_sha256' => $profile['signature_sha256']]);
 
             return $profile;
         };
         $cases = [
             // A consistently rehashed profile that is not the manifest's.
-            'profile' => [function (array $payload) use ($rehash): array {
-                $payload['profile']['renderer_profile']['colors']['band'] = '#000000';
-                $payload['profile'] = $rehash($payload['profile']);
+            'profile' => [function (array $payload): array {
+                $changed = json_decode($payload['renderer_profile'], true);
+                $changed['colors']['band'] = '#000000';
+                $payload['renderer_profile'] = CanonicalJson::encode($changed);
+                $payload['profile']['renderer_profile_sha256'] = CanonicalJson::hash($changed);
+                $payload['profile']['effective_hash'] = CanonicalJson::hash(['profile_sha256' => $payload['profile']['renderer_profile_sha256'],
+                    'signature_sha256' => $payload['profile']['signature_sha256']]);
 
                 return $payload;
             }, 'profile_changed'],
             // Another template with its own hash: not the frozen document.
             'template' => [function (array $payload): array {
-                $payload['profile']['contract']['template'] .= ' Edited.';
-                $payload['profile']['contract']['template_sha256'] = hash('sha256', $payload['profile']['contract']['template']);
+                $payload['template'] .= ' Edited.';
+                $payload['profile']['contract']['template_sha256'] = hash('sha256', $payload['template']);
 
                 return $payload;
             }, 'profile_changed'],
@@ -168,6 +178,30 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
 
                 return $payload;
             }, 'profile_changed'],
+            // Template bytes that are not the ones the descriptor addresses.
+            'template bytes' => [function (array $payload): array {
+                $payload['template'] .= ' Edited.';
+
+                return $payload;
+            }, 'profile_changed'],
+            // Renderer-profile bytes that are not the addressed ones, or that do not decode to canonical JSON.
+            'profile bytes' => [function (array $payload): array {
+                $payload['renderer_profile'] = ' '.$payload['renderer_profile'];
+
+                return $payload;
+            }, 'profile_changed'],
+            'non-canonical profile' => [function (array $payload): array {
+                $payload['renderer_profile'] = ' '.$payload['renderer_profile'];
+                $payload['profile']['renderer_profile_sha256'] = hash('sha256', $payload['renderer_profile']);
+                $payload['profile']['effective_hash'] = CanonicalJson::hash(['profile_sha256' => $payload['profile']['renderer_profile_sha256'],
+                    'signature_sha256' => $payload['profile']['signature_sha256']]);
+
+                return $payload;
+            }, 'profile_changed'],
+            // Payload keys out of their canonical order are refused.
+            'key order' => [function (array $payload): string {
+                return json_encode(['values' => $payload['values']] + $payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            }, 'unsupported_input'],
             // An inconsistent descriptor.
             'shape' => [function (array $payload): array {
                 $payload['profile']['effective_hash'] = str_repeat('b', 64);
@@ -202,14 +236,14 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
             }, 'profile_changed'],
         ];
         foreach ($cases as [$edit, $reason]) {
-            $this->refuses($reason, fn () => (new VaseyLicenseV2RendererProcess(self::tampering($edit)))->render($input, $profile, $values, $bytes));
+            $this->refuses($reason, fn () => (new VaseyLicenseV2RendererProcess(self::tampering($edit)))->render($input, $profile, $values, $template, $rendererProfile, $bytes));
         }
-        $this->assertNotEmpty((new VaseyLicenseV2RendererProcess)->render($input, $profile, $values, $bytes)->pdfBytes);
+        $this->assertNotEmpty((new VaseyLicenseV2RendererProcess)->render($input, $profile, $values, $template, $rendererProfile, $bytes)->pdfBytes);
     }
 
     public function test_the_child_refuses_a_pinned_file_changed_after_the_parent_checked(): void
     {
-        [$input, $profile, $values, , $bytes] = self::selected();
+        [$input, $profile, $values, , $bytes, $template, $rendererProfile] = self::selected();
         // A font program, the manifest and an implementation file the child would load, each changed after the parent's checks.
         foreach (['resources/contracts/vasey-license-v2/fonts/generated/redditsans.json', 'resources/contracts/vasey-license-v2/profile-assets.json',
             'app/Domain/Contracts/Production/VaseyLicenseLayout.php', 'scripts/render-vasey-license-v2.php'] as $path) {
@@ -221,7 +255,7 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
 
                     return new Process($command, $cwd, $environment, $payload, 60);
                 };
-                $this->refuses('profile_changed', fn () => (new VaseyLicenseV2RendererProcess($factory))->render($input, $profile, $values, $bytes));
+                $this->refuses('profile_changed', fn () => (new VaseyLicenseV2RendererProcess($factory))->render($input, $profile, $values, $template, $rendererProfile, $bytes));
             } finally {
                 file_put_contents($file, $original);
             }
@@ -238,7 +272,7 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
 
                 return new Process($command, $cwd, $environment, $payload, 60);
             };
-            $this->refuses('profile_changed', fn () => (new VaseyLicenseV2RendererProcess($factory))->render($input, $profile, $values, $bytes));
+            $this->refuses('profile_changed', fn () => (new VaseyLicenseV2RendererProcess($factory))->render($input, $profile, $values, $template, $rendererProfile, $bytes));
         } finally {
             file_put_contents($file, $original);
         }
@@ -247,7 +281,7 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
 
     public function test_the_child_runs_without_the_parent_environment_and_under_the_paid_renderer_limits(): void
     {
-        [$input, $profile, $values, , $bytes] = self::selected();
+        [$input, $profile, $values, , $bytes, $template, $rendererProfile] = self::selected();
         // A child that could write public/ would leave this file; it is removed whatever the outcome.
         $this->beforeApplicationDestroyed(static function (): void {
             if (is_file(public_path('v2-child-probe.txt'))) {
@@ -278,7 +312,7 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
 
                 return new Process($command, $cwd, $environment, $payload, 60);
             };
-            $rendered = (new VaseyLicenseV2RendererProcess($factory))->render($input, $profile, $values, $bytes);
+            $rendered = (new VaseyLicenseV2RendererProcess($factory))->render($input, $profile, $values, $template, $rendererProfile, $bytes);
         } finally {
             putenv('VASEY_V2_CHILD_CANARY');
             unset($_ENV['VASEY_V2_CHILD_CANARY'], $_SERVER['VASEY_V2_CHILD_CANARY']);
@@ -295,41 +329,41 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
         $this->assertFileDoesNotExist(public_path('v2-child-probe.txt'));
         $this->assertNotContains(base_path(), explode(PATH_SEPARATOR, $probe['basedir']));
         $this->assertStringStartsWith(Storage::disk('local')->path('contracts/render-cache'), $probe['tmp']);
-        $this->assertSame(strlen(VaseyLicenseV2RendererProcess::payload($input, $profile, $values)), $probe['input']);
+        $this->assertSame(strlen(VaseyLicenseV2RendererProcess::payload($input, $profile, $values, $template, $rendererProfile)), $probe['input']);
     }
 
     public function test_bounded_input_output_diagnostics_memory_and_time(): void
     {
-        [$input, $profile, $values, , $bytes] = self::selected();
+        [$input, $profile, $values, , $bytes, $template, $rendererProfile] = self::selected();
         // Output past 24 MiB, any diagnostics, a non-zero exit and memory past 128M each fail the render.
         foreach (['echo str_repeat("a", '.(VaseyLicenseV2RendererProcess::MAX_OUTPUT + 1).');', 'fwrite(STDERR, "x");', 'exit(3);',
             '$a = str_repeat("a", 200 * 1024 * 1024); echo strlen($a);', 'echo "{\"error\":\"anything else\"}";'] as $code) {
-            $this->refuses('render_failed', fn () => (new VaseyLicenseV2RendererProcess(self::replacing($code)))->render($input, $profile, $values, $bytes));
+            $this->refuses('render_failed', fn () => (new VaseyLicenseV2RendererProcess(self::replacing($code)))->render($input, $profile, $values, $template, $rendererProfile, $bytes));
         }
         // Well-formed answers that are not the recorded render.
-        $result = (new VaseyLicenseV2RendererProcess)->render($input, $profile, $values, $bytes);
+        $result = (new VaseyLicenseV2RendererProcess)->render($input, $profile, $values, $template, $rendererProfile, $bytes);
         $answer = ['pdf_base64' => base64_encode($result->pdfBytes), 'sha256' => $result->sha256, 'size_bytes' => $result->sizeBytes,
             'page_count' => $result->pageCount, 'text_digest' => $result->textDigest, 'profile_hash' => str_repeat('c', 64)];
-        $this->refuses('profile_changed', fn () => (new VaseyLicenseV2RendererProcess(self::answering($answer)))->render($input, $profile, $values, $bytes));
+        $this->refuses('profile_changed', fn () => (new VaseyLicenseV2RendererProcess(self::answering($answer)))->render($input, $profile, $values, $template, $rendererProfile, $bytes));
         $answer['profile_hash'] = $result->profileHash;
-        $this->assertSame($result->pdfBytes, (new VaseyLicenseV2RendererProcess(self::answering($answer)))->render($input, $profile, $values, $bytes)->pdfBytes);
+        $this->assertSame($result->pdfBytes, (new VaseyLicenseV2RendererProcess(self::answering($answer)))->render($input, $profile, $values, $template, $rendererProfile, $bytes)->pdfBytes);
         // The same correct answer with a single byte of diagnostics fails.
         $this->refuses('render_failed', fn () => (new VaseyLicenseV2RendererProcess(self::answering($answer, 'fwrite(STDERR, "x");')))
-            ->render($input, $profile, $values, $bytes));
+            ->render($input, $profile, $values, $template, $rendererProfile, $bytes));
         foreach ([['text_digest', str_repeat('e', 64)]] as [$field, $value]) {
             $wrong = $answer;
             $wrong[$field] = $value;
-            $this->refuses('profile_changed', fn () => (new VaseyLicenseV2RendererProcess(self::answering($wrong)))->render($input, $profile, $values, $bytes));
+            $this->refuses('profile_changed', fn () => (new VaseyLicenseV2RendererProcess(self::answering($wrong)))->render($input, $profile, $values, $template, $rendererProfile, $bytes));
         }
         foreach ([['page_count', 101], ['size_bytes', $result->sizeBytes + 1], ['sha256', str_repeat('d', 64)], ['pdf_base64', base64_encode('%PDF-1.7 not it')]] as [$field, $value]) {
             $wrong = $answer;
             $wrong[$field] = $value;
-            $this->refuses('invalid_pdf', fn () => (new VaseyLicenseV2RendererProcess(self::answering($wrong)))->render($input, $profile, $values, $bytes));
+            $this->refuses('invalid_pdf', fn () => (new VaseyLicenseV2RendererProcess(self::answering($wrong)))->render($input, $profile, $values, $template, $rendererProfile, $bytes));
         }
 
         // A wall clock (test-only below 60 s) stops a child that does not finish.
         $started = hrtime(true);
-        $this->refuses('render_failed', fn () => (new VaseyLicenseV2RendererProcess(self::replacing('sleep(20);'), 1))->render($input, $profile, $values, $bytes));
+        $this->refuses('render_failed', fn () => (new VaseyLicenseV2RendererProcess(self::replacing('sleep(20);'), 1))->render($input, $profile, $values, $template, $rendererProfile, $bytes));
         $this->assertLessThan(10_000_000_000, hrtime(true) - $started);
         $this->app['env'] = 'production';
         try {
@@ -341,16 +375,16 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
 
         // More than 1 MiB of input is refused before any child starts.
         $large = $profile;
-        $large['contract']['template'] = str_repeat('x', VaseyLicenseV2RendererProcess::MAX_INPUT);
-        $large['contract']['template_sha256'] = hash('sha256', $large['contract']['template']);
+        $largeTemplate = str_repeat('x', VaseyLicenseV2RendererProcess::MAX_INPUT);
+        $large['contract']['template_sha256'] = hash('sha256', $largeTemplate);
         $spawned = false;
         $factory = static function () use (&$spawned): Process {
             $spawned = true;
 
             return new Process(['true']);
         };
-        $this->refuses('unsupported_input', fn () => (new VaseyLicenseV2RendererProcess($factory))->render($input, $large, $values, $bytes));
-        $this->refuses('signature_invalid', fn () => (new VaseyLicenseV2RendererProcess($factory))->render($input, $profile, $values, ''));
+        $this->refuses('unsupported_input', fn () => (new VaseyLicenseV2RendererProcess($factory))->render($input, $large, $values, $largeTemplate, $rendererProfile, $bytes));
+        $this->refuses('signature_invalid', fn () => (new VaseyLicenseV2RendererProcess($factory))->render($input, $profile, $values, $template, $rendererProfile, ''));
         $this->assertFalse($spawned);
     }
 

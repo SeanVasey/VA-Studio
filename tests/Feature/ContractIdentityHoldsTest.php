@@ -141,7 +141,7 @@ class ContractIdentityHoldsTest extends TestCase
         // render_failed (timeouts, failed forks, a full disk, a crashed child) and signature_unavailable (storage) may pass on a retry.
         $this->assertSame(['profile_changed', 'signature_changed', 'signature_invalid', 'unsupported_input', 'invalid_pdf'], ContractRenderHolds::PERMANENT);
         foreach ([new ContractIssuanceException('render_failed'), new ContractIssuanceException('signature_unavailable'),
-            new ContractIssuanceException('storage_failed'), new ContractIssuanceException('unavailable'), new \RuntimeException('synthetic')] as $error) {
+            new ContractIssuanceException('contract_text_unavailable'), new ContractIssuanceException('storage_failed'), new ContractIssuanceException('unavailable'), new \RuntimeException('synthetic')] as $error) {
             $this->assertNull(ContractRenderHolds::reason($error, 4, 5));
             $this->assertSame(ContractRenderHolds::ATTEMPTS_EXHAUSTED, ContractRenderHolds::reason($error, 5, 5));
         }

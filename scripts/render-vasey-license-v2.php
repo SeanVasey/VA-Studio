@@ -63,8 +63,9 @@ try {
         throw new ContractIssuanceException('unsupported_input');
     }
     $payload = json_decode($raw, true, 128, JSON_THROW_ON_ERROR);
-    if (! is_array($payload) || array_keys($payload) !== ['input', 'profile', 'values']
-        || ! is_array($payload['input']) || ! is_array($payload['profile']) || ! is_array($payload['values']) || ! array_is_list($payload['values'])) {
+    if (! is_array($payload) || array_keys($payload) !== ['input', 'profile', 'renderer_profile', 'template', 'values']
+        || ! is_array($payload['input']) || ! is_array($payload['profile']) || ! is_string($payload['renderer_profile'])
+        || ! is_string($payload['template']) || ! is_array($payload['values']) || ! array_is_list($payload['values'])) {
         throw new ContractIssuanceException('unsupported_input');
     }
     // The bound values arrive as ordered [name, value] pairs (canonical JSON would sort an object's keys).
@@ -81,8 +82,10 @@ try {
     VaseyLicenseV2Render::shape($payload['profile']);
     $signature = Closure::bind(static fn (string $path, string $sha256): VaseyLicenseSignature => new VaseyLicenseSignature($path, $sha256),
         null, VaseyLicenseSignature::class)(sys_get_temp_dir().'/signature.png', $payload['profile']['signature_sha256']);
-    $rendered = VaseyLicenseV2Render::render($payload['input'], $payload['profile'], $values, $signature, $root);
-    $limits = $payload['profile']['renderer_profile']['limits'];
+    // The template and renderer profile are checked against the descriptor's hashes inside render().
+    $rendered = VaseyLicenseV2Render::render($payload['input'], $payload['profile'], $values, $signature, $payload['template'],
+        $payload['renderer_profile'], $root);
+    $limits = VaseyLicenseV2Render::rendererProfile($payload['profile'], $payload['renderer_profile'])['limits'];
     if ($rendered->sizeBytes > 16777216 || $rendered->sizeBytes > $limits['output_bytes'] || $rendered->pageCount > $limits['pages']) {
         throw new ContractIssuanceException('invalid_pdf');
     }

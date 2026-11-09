@@ -19,6 +19,9 @@ use App\Domain\Grants\PaidTax\PaidTaxDocuments;
 use App\Domain\Grants\PaidTax\PaidTaxDownloads;
 use App\Domain\Grants\PaidTax\PaidTaxGrants;
 use App\Domain\Grants\PaidTax\PaidTaxRecords;
+use App\Domain\Grants\VaseyLicenseContractTexts;
+use App\Domain\Grants\VaseyLicenseIssuance;
+use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -26,6 +29,7 @@ use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\PaidGrantDependencyFixtures;
 use Tests\Support\PaidTaxGrantFixtures;
 use Tests\Support\ProductionCheckoutJourneyFixture;
+use Tests\Support\VaseyLicenseIssuanceFixtures;
 use Tests\TestCase;
 
 /**
@@ -40,6 +44,7 @@ class PaidGrantDataExportTest extends TestCase
         ProductionCheckoutJourneyFixture::identitySetup insteadof PaidTaxGrantFixtures;
         ProductionCheckoutJourneyFixture::enrollThroughLocalSmtp insteadof PaidTaxGrantFixtures;
     }
+    use VaseyLicenseIssuanceFixtures;
 
     private const DECLARATIONS = ['legal_name' => 'Declared synthetic buyer', 'identity_meaning' => 'buyer_declared_legal_name'];
 
@@ -484,6 +489,70 @@ class PaidGrantDataExportTest extends TestCase
         $this->assertCount(1, app(PaidGrantExportSection::class)->build($account)['paidGrantOrders']);
     }
 
+    /**
+     * Payload growth (activation blocker of the v2 license wiring): a v2 paid-tax line records its template and renderer
+     * profile by hash, so an account with many v2 lines exports under the unchanged stored-payload budget, and the export
+     * never reads a contract text. With the template inline (#245), each of these lines stored about 520 KiB and their sum
+     * passed the budget.
+     */
+    public function test_many_v2_license_lines_export_under_the_payload_budget_without_reading_contract_texts(): void
+    {
+        $this->enableV2Issuance();
+        $paragraph = "\n\nSynthetic padding paragraph of a long nonbinding license.";
+        $template = self::SYNTHETIC_TEMPLATE.str_repeat($paragraph, intdiv(VaseyLicenseIssuance::TEMPLATE_BYTES - strlen(self::SYNTHETIC_TEMPLATE), strlen($paragraph)));
+        $this->bindSyntheticContractSource($template);
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $f = $this->taxOrder('exclusive', 2500, ['licenseeType' => 'individual', 'legalName' => 'Zoë Émile', 'legalNameConfirmed' => true,
+            'postalAddress' => ['country' => 'US', 'lines' => ['1 Example Street'], 'locality' => 'Springfield', 'region' => 'IA', 'postalCode' => '50000'],
+            'statementVersion' => ContractIdentityStatements::offered()['individual']['statementVersion']], self::v2LicenseTerms(), self::v2LicenseContent());
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $f['checkout']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['transport']->lineTax = 437;
+        $f['transport']->paid = true;
+        $this->assertSame('verified', $f['checkout']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
+        (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $account = self::account($f['buyer']);
+        $batchRow = (array) DB::table('paid_tax_order_origins')->sole();
+        $lineRow = (array) DB::table('paid_tax_grant_origins')->sole();
+        $batch = PaidTaxRecords::decode($batchRow);
+        $line = PaidTaxRecords::decode($lineRow);
+        $this->assertTrue(VaseyLicenseIssuance::selected($line['profile']));
+
+        // The same line with the #245 inline descriptor: this many of them pass the budget on their own.
+        $inline = $line['profile'];
+        $inline['contract']['template'] = $template;
+        $inline['renderer_profile'] = json_decode(VaseyLicenseContractTexts::resolve('renderer_profile', $line['profile']['renderer_profile_sha256']), true);
+        $inlineBytes = strlen(PaidTaxRecords::encode([...$line, 'profile' => $inline])['payload']);
+        $orders = intdiv(PaidGrantExportSection::MAX_PAYLOAD_BYTES, $inlineBytes) + 1;
+        $this->assertLessThanOrEqual(PaidGrantExportSection::MAX_RECORDS, $orders);
+
+        // Re-sealed copies of the genuine order under their own ids: that many orders of one v2 line each.
+        $this->dropTriggers(['paid_tax_order_origins', 'paid_tax_grant_origins']);
+        for ($i = 1; $i < $orders; $i++) {
+            [$batchId, $orderId, $originId] = [(string) Str::uuid(), (string) Str::uuid(), (string) Str::uuid()];
+            $copy = DB::table('paid_tax_order_origins')->insertGetId([...array_diff_key($batchRow, ['id' => true]), 'public_id' => $batchId, 'order_public_id' => $orderId,
+                'provider_payment_id' => 'pad'.$i, ...PaidTaxRecords::encode([...$batch, 'origin_id' => $batchId, 'order_id' => $orderId])]);
+            DB::table('paid_tax_grant_origins')->insert([...array_diff_key($lineRow, ['id' => true]), 'public_id' => $originId, 'batch_id' => $copy,
+                'line_public_id' => (string) Str::uuid(), ...PaidTaxRecords::encode([...$line, 'origin_id' => $originId, 'batch_id' => $batchId])]);
+        }
+        $stored = (int) DB::table('paid_tax_grant_origins')->sum(DB::raw('LENGTH(payload)'));
+        $this->assertGreaterThan(PaidGrantExportSection::MAX_PAYLOAD_BYTES, $orders * $inlineBytes);
+        $this->assertLessThan(intdiv(PaidGrantExportSection::MAX_PAYLOAD_BYTES, 8), $stored);
+
+        $queries = [];
+        DB::listen(function ($query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
+        $sections = app(PaidGrantExportSection::class)->build($account);
+        $this->assertCount($orders, $sections['paidTaxGrantOrders']);
+        $this->assertSame(array_fill(0, $orders, $line['source']['buyer_declarations']),
+            array_map(fn (array $order): array => $order['lines'][0]['buyerDeclarations'], $sections['paidTaxGrantOrders']));
+        $this->assertSame([], array_values(array_filter($queries, fn (string $sql): bool => str_contains($sql, VaseyLicenseContractTexts::TABLE))));
+        $this->assertStringNotContainsString('Synthetic padding paragraph', json_encode($sections, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+        $this->assertSame(2, DB::table(VaseyLicenseContractTexts::TABLE)->count());
+        $this->assertSame(CanonicalJson::hash($sections), CanonicalJson::hash(app(PaidGrantExportSection::class)->build($account)));
+    }
+
     public function test_an_exemption_basis_whose_sealed_buyer_does_not_match_refuses_the_export(): void
     {
         $f = $this->payable(false);
@@ -560,6 +629,11 @@ class PaidGrantDataExportTest extends TestCase
         }
         $this->assertSame('financial_records_years', CustomerDataRights::RETAINED['production_checkout_exemption_bases'] ?? null);
         $this->assertArrayHasKey('production_checkout_exemption_bases', ProductionCheckoutExportSection::RECORDS);
+        // The v2 contract texts are license wording shared by every buyer of a version, not customer data: a deletion
+        // neither erases nor lists them, and the export never reads them.
+        $this->assertArrayNotHasKey(VaseyLicenseContractTexts::TABLE, CustomerDataRights::RETAINED);
+        $this->assertArrayNotHasKey(VaseyLicenseContractTexts::TABLE, PaidGrantExportSection::counts(PHP_INT_MAX));
+        $this->assertNotContains(VaseyLicenseContractTexts::TABLE, array_merge(...array_map(fn (array $chain): array => array_values($chain['tables']), array_values(PaidGrantExportSection::CHAINS))));
     }
 
     /** The immutability and insert guards are dropped only inside this test's database, to plant rows the application never writes. */

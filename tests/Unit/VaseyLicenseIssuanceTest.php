@@ -5,15 +5,18 @@ namespace Tests\Unit;
 use App\Domain\Contracts\ContractIssuanceException;
 use App\Domain\Contracts\Production\VaseyLicenseV2Profile;
 use App\Domain\Grants\VaseyLicenseContractSource;
+use App\Domain\Grants\VaseyLicenseContractTexts;
 use App\Domain\Grants\VaseyLicenseIssuance;
 use App\Domain\Grants\VaseyLicensePreparedSelection;
 use App\Support\CanonicalJson;
 use Closure;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\EconomicLicenseFixtures;
+use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\VaseyLicenseIssuanceFixtures;
 use Tests\TestCase;
 
@@ -23,6 +26,8 @@ use Tests\TestCase;
  */
 class VaseyLicenseIssuanceTest extends TestCase
 {
+    // Renders run outside any transaction (ContractIo), so the stored contract texts need a migrated, non-transactional database.
+    use FinalizationDatabaseMigrations;
     use VaseyLicenseIssuanceFixtures;
 
     protected function setUp(): void
@@ -71,8 +76,19 @@ class VaseyLicenseIssuanceTest extends TestCase
         $this->assertTrue(VaseyLicenseIssuance::selected($profile));
         $this->assertSame([VaseyLicenseIssuance::DESCRIPTOR_SCHEMA, VaseyLicenseV2Profile::VERSION, $purpose, 'synthetic_rehearsal'],
             [$profile['schema_version'], $profile['version'], $profile['purpose'], $profile['provenance']]);
-        $this->assertSame(VaseyLicenseV2Profile::current(), $profile['renderer_profile']);
-        $this->assertSame(self::SYNTHETIC_TEMPLATE, $profile['contract']['template']);
+        // Payload growth: the descriptor records the template and the renderer profile by hash only; their bytes are stored
+        // once each by that hash, so a v2 origin stays about as large as a gate-off one.
+        $this->assertEqualsCanonicalizing(['producer_alias', 'state_province_country', 'template_sha256'], array_keys($profile['contract']));
+        $this->assertArrayNotHasKey('renderer_profile', $profile);
+        $this->assertSame(hash('sha256', self::SYNTHETIC_TEMPLATE), $profile['contract']['template_sha256']);
+        $this->assertSame(VaseyLicenseV2Profile::hash(VaseyLicenseV2Profile::current()), $profile['renderer_profile_sha256']);
+        $this->assertSame(self::SYNTHETIC_TEMPLATE, VaseyLicenseContractTexts::resolve('template', $profile['contract']['template_sha256']));
+        $this->assertSame(CanonicalJson::encode(VaseyLicenseV2Profile::current()), VaseyLicenseContractTexts::resolve('renderer_profile', $profile['renderer_profile_sha256']));
+        $this->assertLessThan(2048, strlen(CanonicalJson::encode($profile)));
+        // Every selection of the same template and profile shares one stored row of each.
+        $this->assertSame('selected', VaseyLicenseIssuance::decide(self::input($family, ['legal_name' => 'Another Buyer']))[1]);
+        $this->assertSame(['renderer_profile' => 1, 'template' => 1],
+            DB::table(VaseyLicenseContractTexts::TABLE)->groupBy('kind')->orderBy('kind')->pluck(DB::raw('COUNT(*)'), 'kind')->map(fn ($n) => (int) $n)->all());
         $effective = CanonicalJson::hash(['profile_sha256' => VaseyLicenseV2Profile::hash(VaseyLicenseV2Profile::current()),
             'signature_sha256' => config('contracts.vasey_license_v1.signature_sha256')]);
         $this->assertSame($effective, VaseyLicenseIssuance::artifactProfileHash($profile));
@@ -155,6 +171,16 @@ class VaseyLicenseIssuanceTest extends TestCase
         $this->assertSame([null, 'not_renderable'], VaseyLicenseIssuance::decide(self::input('tax', [], EconomicLicenseFixtures::terms())));
         $this->bindSyntheticContractSource(self::SYNTHETIC_TEMPLATE.' {UNKNOWN_PLACEHOLDER}');
         $this->assertSame([null, 'not_renderable'], VaseyLicenseIssuance::decide($input));
+
+        // A row already stored under the template's address with other content (planted or damaged) keeps the existing
+        // profile instead of recording a template that would not resolve; nothing is overwritten.
+        foreach (['other bytes' => Crypt::encryptString(self::SYNTHETIC_TEMPLATE), 'undecryptable' => 'x'] as $case => $payload) {
+            $fresh = self::SYNTHETIC_TEMPLATE."\n\nFresh paragraph ({$case}).";
+            DB::table(VaseyLicenseContractTexts::TABLE)->insert(['kind' => 'template', 'sha256' => hash('sha256', $fresh), 'payload' => $payload, 'created_at' => '2026-11-09 00:00:00']);
+            $this->bindSyntheticContractSource($fresh);
+            $this->assertSame([null, 'contract_text_unavailable'], VaseyLicenseIssuance::decide($input), $case);
+            $this->assertSame($payload, DB::table(VaseyLicenseContractTexts::TABLE)->where('sha256', hash('sha256', $fresh))->value('payload'));
+        }
     }
 
     public function test_a_recorded_selection_refuses_rather_than_rendering_anything_else(): void
@@ -165,39 +191,79 @@ class VaseyLicenseIssuanceTest extends TestCase
         $issuance = new VaseyLicenseIssuance;
 
         // Any edit of the frozen descriptor refuses.
-        foreach ([['contract', 'template', self::SYNTHETIC_TEMPLATE.' Edited.'], ['contract', 'producer_alias', 'Another Alias'],
+        // A template hash with no stored text cannot be resolved: a refusal a retry may fix, not a changed profile.
+        $this->refuses('contract_text_unavailable', fn () => $issuance->render($input, [...$profile, 'contract' => [...$profile['contract'], 'template_sha256' => str_repeat('e', 64)]]));
+        foreach ([['contract', 'producer_alias', 'Another Alias'],
             ['expected', 'input_hash', str_repeat('0', 64)], ['expected', 'text_digest', str_repeat('0', 64)],
             ['signature_sha256', null, str_repeat('a', 64)], ['effective_hash', null, str_repeat('b', 64)]] as [$key, $inner, $value]) {
             $edited = $profile;
             $inner === null ? $edited[$key] = $value : $edited[$key][$inner] = $value;
             $this->refuses('profile_changed', fn () => $issuance->render($input, $edited));
         }
-        $retained = $profile;
-        $retained['renderer_profile']['colors']['band'] = '#000000';
-        $this->refuses('profile_changed', fn () => $issuance->render($input, $retained));
-        // The recorded profile hash must be the recorded profile's, checked before any render (review P3).
-        $rehashed = $retained;
-        $rehashed['renderer_profile_sha256'] = CanonicalJson::hash($retained['renderer_profile']);
+        // A stored renderer profile other than the pinned one refuses, even with every recorded hash consistent with it.
+        $changed = VaseyLicenseV2Profile::current();
+        $changed['colors']['band'] = '#000000';
+        $this->assertTrue(VaseyLicenseContractTexts::retain('renderer_profile', CanonicalJson::encode($changed)));
+        $rehashed = $profile;
+        $rehashed['renderer_profile_sha256'] = CanonicalJson::hash($changed);
         $rehashed['effective_hash'] = CanonicalJson::hash(['profile_sha256' => $rehashed['renderer_profile_sha256'], 'signature_sha256' => $profile['signature_sha256']]);
         $this->refuses('profile_changed', fn () => $issuance->render($input, $rehashed));
+        // So do stored profile bytes that are not canonical JSON, and another stored template whose hash verifies: it binds
+        // to a document other than the frozen one.
+        $padded = ' '.CanonicalJson::encode(VaseyLicenseV2Profile::current());
+        $this->assertTrue(VaseyLicenseContractTexts::retain('renderer_profile', $padded));
+        $nonCanonical = [...$profile, 'renderer_profile_sha256' => hash('sha256', $padded)];
+        $nonCanonical['effective_hash'] = CanonicalJson::hash(['profile_sha256' => $nonCanonical['renderer_profile_sha256'], 'signature_sha256' => $profile['signature_sha256']]);
+        $this->refuses('profile_changed', fn () => $issuance->render($input, $nonCanonical));
+        $other = self::SYNTHETIC_TEMPLATE.' Edited.';
+        $this->assertTrue(VaseyLicenseContractTexts::retain('template', $other));
+        $this->refuses('profile_changed', fn () => $issuance->render($input, [...$profile, 'contract' => [...$profile['contract'], 'template_sha256' => hash('sha256', $other)]]));
+        // A stored text changed under its address (the immutability trigger bypassed) or gone cannot be resolved.
+        $row = (array) DB::table(VaseyLicenseContractTexts::TABLE)->where('kind', 'template')->where('sha256', $profile['contract']['template_sha256'])->sole();
+        $this->dropContractTextTriggers();
+        foreach ([Crypt::encryptString($other), 'x'] as $tampered) {
+            DB::table(VaseyLicenseContractTexts::TABLE)->where('id', $row['id'])->update(['payload' => $tampered]);
+            $this->refuses('contract_text_unavailable', fn () => $issuance->render($input, $profile));
+        }
+        DB::table(VaseyLicenseContractTexts::TABLE)->where('id', $row['id'])->delete();
+        $this->refuses('contract_text_unavailable', fn () => $issuance->render($input, $profile));
+        DB::table(VaseyLicenseContractTexts::TABLE)->insert($row);
+        $this->assertStringStartsWith('%PDF-', $issuance->render($input, $profile)->pdfBytes);
+        // The #245 descriptor that carried its texts inline is still a v2 selection but no longer renders.
+        $retired = [...$profile, 'schema_version' => VaseyLicenseIssuance::RETIRED_DESCRIPTOR_SCHEMA];
+        $this->assertTrue(VaseyLicenseIssuance::selected($retired));
+        $this->refuses('profile_changed', fn () => $issuance->render($input, $retired));
+        // A #245 descriptor of its real shape (template and profile inline) still verifies its completed original by the
+        // frozen digests, but never renders; one whose inline template no longer matches its hash does neither.
+        $legacy = [...$retired, 'renderer_profile' => VaseyLicenseV2Profile::current(),
+            'contract' => [...$profile['contract'], 'template' => self::SYNTHETIC_TEMPLATE]];
+        $this->assertSame($profile['expected'], VaseyLicenseIssuance::expected($legacy));
+        $this->assertSame($profile['effective_hash'], VaseyLicenseIssuance::artifactProfileHash($legacy));
+        $this->refuses('profile_changed', fn () => $issuance->render($input, $legacy));
+        $this->refuses('profile_changed', fn () => VaseyLicenseIssuance::expected($retired));
+        foreach ([['contract', 'template', self::SYNTHETIC_TEMPLATE.' Edited.'], ['renderer_profile', 'version', 'another']] as [$key, $inner, $value]) {
+            $edited = $legacy;
+            $edited[$key][$inner] = $value;
+            $this->refuses('profile_changed', fn () => VaseyLicenseIssuance::expected($edited));
+            $this->refuses('profile_changed', fn () => VaseyLicenseIssuance::artifactProfileHash($edited));
+        }
+        // The current shape never carries its texts inline.
+        $this->refuses('profile_changed', fn () => VaseyLicenseIssuance::expected([...$profile, 'renderer_profile' => VaseyLicenseV2Profile::current()]));
+        $this->refuses('profile_changed', fn () => $issuance->render($input, [...$profile, 'renderer_profile' => VaseyLicenseV2Profile::current()]));
         $mismatched = $profile;
         $mismatched['renderer_profile_sha256'] = str_repeat('d', 64);
         $mismatched['effective_hash'] = CanonicalJson::hash(['profile_sha256' => $mismatched['renderer_profile_sha256'], 'signature_sha256' => $profile['signature_sha256']]);
-        $this->refuses('profile_changed', fn () => $issuance->render($input, $mismatched));
-        // Checked before the signature or anything else is read: with the signature gone it still refuses as a changed profile.
+        $this->refuses('contract_text_unavailable', fn () => $issuance->render($input, $mismatched));
+        // Checked before the signature or anything else is read: with the signature gone it still refuses for the text.
         $signaturePath = Storage::disk('local')->path(config('contracts.vasey_license_v1.signature_path'));
         $signatureBytes = file_get_contents($signaturePath);
         unlink($signaturePath);
         try {
-            $this->refuses('profile_changed', fn () => $issuance->render($input, $mismatched));
+            $this->refuses('contract_text_unavailable', fn () => $issuance->render($input, $mismatched));
             $this->refuses('signature_unavailable', fn () => $issuance->render($input, $profile));
         } finally {
             file_put_contents($signaturePath, $signatureBytes);
         }
-        // A template hash that does not match the frozen template refuses, even with the template itself unchanged.
-        $template = $profile;
-        $template['contract']['template_sha256'] = str_repeat('e', 64);
-        $this->refuses('profile_changed', fn () => $issuance->render($input, $template));
         // The recorded purpose and provenance must be the input's.
         foreach (['purpose' => 'paid-license-grant', 'provenance' => 'verified_production'] as $key => $value) {
             $relabelled = $profile;
@@ -293,6 +359,14 @@ class VaseyLicenseIssuanceTest extends TestCase
             $this->assertSame(1, substr_count($source, 'VaseyLicenseIssuance::decide('), $path);
             $this->assertSame(1, preg_match('/VaseyLicenseIssuance::decide\(Paid(?:Grant|Tax)RenderInput::fromOrigin\(\$payload\), \$v2Prepared\)/', $source), $path);
             $this->assertSame(1, preg_match('/function \([^)]*\) use \(\$v2Prepared,/', $source), $path);
+        }
+    }
+
+    /** The immutability triggers are dropped only inside this test's database, to plant a changed stored text. */
+    private function dropContractTextTriggers(): void
+    {
+        foreach (['vasey_license_contract_texts_insert', 'vasey_license_contract_texts_immutable', 'vasey_license_contract_texts_retain'] as $trigger) {
+            DB::unprepared('DROP TRIGGER '.$trigger);
         }
     }
 }

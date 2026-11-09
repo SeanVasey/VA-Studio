@@ -35,7 +35,7 @@ use Tests\TestCase;
 class VaseyLicenseV2PdfRendererTest extends TestCase
 {
     /** sha256 of the golden business render below, under the pinned v2 profile and the synthetic signature. */
-    private const GOLDEN_SHA256 = 'a720a0536ee40660cbf21269795cf0a03be2c4d18da518e29ff49f71d3d7aa17';
+    private const GOLDEN_SHA256 = '81f228d82a58f8d5faafbe563587981cc92b772b11080572ccc792b71aeb628d';
 
     private const TEMPLATE = "SYNTHETIC TEST TEMPLATE: {LICENSE_NAME}\n\nNONBINDING FIXTURE\n\n"
         .'This synthetic fixture is dated {CONTRACT_DATE}. It names {CUSTOMER_FULLNAME} of {CUSTOMER_ADDRESS} and {PRODUCER_ALIAS}, '
@@ -231,13 +231,13 @@ class VaseyLicenseV2PdfRendererTest extends TestCase
         $profileSha256 = VaseyLicenseV2Profile::hash($profile);
         $descriptor = ['schema_version' => VaseyLicenseV2Render::DESCRIPTOR_SCHEMA, 'version' => VaseyLicenseV2Profile::VERSION,
             'purpose' => $input['purpose'], 'provenance' => $input['provenance'],
-            'contract' => ['template' => self::TEMPLATE, 'template_sha256' => hash('sha256', self::TEMPLATE),
+            'contract' => ['template_sha256' => hash('sha256', self::TEMPLATE),
                 'producer_alias' => 'Synthetic Producer Alias', 'state_province_country' => 'Synthetic State, Synthetic Country'],
-            'signature_sha256' => $signature->sha256, 'renderer_profile' => $profile, 'renderer_profile_sha256' => $profileSha256,
+            'signature_sha256' => $signature->sha256, 'renderer_profile_sha256' => $profileSha256,
             'effective_hash' => CanonicalJson::hash(['profile_sha256' => $profileSha256, 'signature_sha256' => $signature->sha256]),
             'expected' => ['input_hash' => $document->inputHash, 'text_digest' => hash('sha256', $document->text)]];
 
-        $child = (new VaseyLicenseV2RendererProcess)->render($input, $descriptor, $values, $signature->read()['bytes']);
+        $child = (new VaseyLicenseV2RendererProcess)->render($input, $descriptor, $values, self::TEMPLATE, CanonicalJson::encode($profile), $signature->read()['bytes']);
         $this->assertSame(self::GOLDEN_SHA256, $child->sha256);
         $this->assertSame($this->render($document, $signature)->pdfBytes, $child->pdfBytes);
     }

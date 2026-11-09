@@ -61,20 +61,24 @@ final class VaseyLicenseV2RendererProcess
     }
 
     /**
-     * The exact standard input the child reads, so a selection can tell whether a line would fit. Canonical JSON sorts
-     * object keys, so the bound values travel as ordered `[name, value]` pairs: the document requires the binder's order.
+     * The exact standard input the child reads, so a selection can tell whether a line would fit: the line, its descriptor,
+     * the stored template and renderer-profile bytes the descriptor addresses by hash, and the bound values. Canonical JSON
+     * sorts object keys (the child expects `input`, `profile`, `renderer_profile`, `template`, `values` in that order), so
+     * the values travel as ordered `[name, value]` pairs: the document requires the binder's order.
      */
-    public static function payload(array $input, array $profile, array $values): string
+    public static function payload(array $input, array $profile, array $values, string $template, string $rendererProfile): string
     {
-        return CanonicalJson::encode(['input' => $input, 'profile' => $profile,
+        return CanonicalJson::encode(['input' => $input, 'profile' => $profile, 'renderer_profile' => $rendererProfile, 'template' => $template,
             'values' => array_map(static fn (string|int $name, mixed $value): array => [$name, $value], array_keys($values), array_values($values))]);
     }
 
     /**
      * @param  array<string, string>  $values  The line's bound values.
+     * @param  string  $template  The stored template the descriptor addresses (the child re-checks its hash).
+     * @param  string  $rendererProfile  The stored renderer profile's canonical JSON (the child re-checks its hash).
      * @param  string  $signaturePng  Signature bytes the caller read and checked against the configured pin.
      */
-    public function render(array $input, array $profile, array $values, string $signaturePng): RenderedContract
+    public function render(array $input, array $profile, array $values, string $template, string $rendererProfile, string $signaturePng): RenderedContract
     {
         ContractIo::outsideTransactions();
         $process = null;
@@ -82,7 +86,8 @@ final class VaseyLicenseV2RendererProcess
         $collectOutput = true;
         try {
             VaseyLicenseV2Render::shape($profile);
-            $payload = self::payload($input, $profile, $values);
+            $renderer = VaseyLicenseV2Render::rendererProfile($profile, $rendererProfile);
+            $payload = self::payload($input, $profile, $values, $template, $rendererProfile);
             if (strlen($payload) > self::MAX_INPUT) {
                 throw new ContractIssuanceException('unsupported_input');
             }
@@ -91,7 +96,7 @@ final class VaseyLicenseV2RendererProcess
             }
             $projectRoot = dirname(__DIR__, 4);
             // The package paths for open_basedir come from the recorded profile once it equals the current manifest's.
-            $renderer = VaseyLicenseV2Profile::validate($profile['renderer_profile'], $projectRoot);
+            $renderer = VaseyLicenseV2Profile::validate($renderer, $projectRoot);
             // What the child reads: the application classes, its own script, the v2 profile directory, Composer's loader
             // files and the tc-lib packages it autoloads (the profile's pinned packages and every Com\Tecnick PSR-4 path).
             // Not the project root: .env, storage and public/ stay outside it.
@@ -196,7 +201,7 @@ final class VaseyLicenseV2RendererProcess
                 throw new ContractIssuanceException('render_failed');
             }
 
-            return self::result($stdout, $profile);
+            return self::result($stdout, $profile, $renderer['limits']);
         } catch (ContractIssuanceException $error) {
             throw $error;
         } catch (Throwable) {
@@ -218,7 +223,7 @@ final class VaseyLicenseV2RendererProcess
     }
 
     /** The child's answer, checked field by field against its own bytes and the recorded descriptor. */
-    private static function result(string $stdout, array $profile): RenderedContract
+    private static function result(string $stdout, array $profile, array $limits): RenderedContract
     {
         $result = json_decode($stdout, true, 16, JSON_THROW_ON_ERROR);
         if (is_array($result) && array_keys($result) === ['error']) {
@@ -226,7 +231,6 @@ final class VaseyLicenseV2RendererProcess
         }
         $keys = is_array($result) ? array_keys($result) : [];
         sort($keys);
-        $limits = $profile['renderer_profile']['limits'];
         if ($keys !== ['page_count', 'pdf_base64', 'profile_hash', 'sha256', 'size_bytes', 'text_digest']
             || ! is_string($result['pdf_base64']) || ! is_int($result['size_bytes'])
             || $result['size_bytes'] < 32 || $result['size_bytes'] > $limits['output_bytes'] || $result['size_bytes'] > ContractFiles::MAX_BYTES

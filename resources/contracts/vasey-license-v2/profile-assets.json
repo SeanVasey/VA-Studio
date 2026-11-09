@@ -208,7 +208,7 @@
         "app/Domain/Contracts/Production/VaseyLicenseV2Implementation.php": "461ccfbcb6041dff1f2bd104d7c2a5ecec878a3024256cab3c4f7c4c817ba9bb",
         "app/Domain/Contracts/Production/VaseyLicenseV2PdfRenderer.php": "e83f7663f8830378cdce7590de4fa4c1cdabba35b80a78956e9ed7a97958624b",
         "app/Domain/Contracts/Production/VaseyLicenseV2ProfileDefinition.php": "791e6f9656dcc0a28d649fd3f1e72684c0719270140ee53da75e995f5a53b379",
-        "app/Domain/Contracts/Production/VaseyLicenseV2Render.php": "841e063724ea7c9244ba25711507facfa8ee662492a2729f3aae59190ec2ddee",
+        "app/Domain/Contracts/Production/VaseyLicenseV2Render.php": "a0e0f57f987d724a642cd47bf1341635f9025fe0aca8a3b139a86d7d37486ef8",
         "app/Domain/Contracts/RenderedContract.php": "b3fa57b8c8cc8e354597a5fc5f12b7942aa734e9d1bab9f0d2014358dd1d249f",
         "app/Domain/Rights/EconomicLicenseTerms.php": "070a5b2e07887a713dd603803de5c330d34dc1d0b27b633dfe6c4eaaba87f0b4",
         "app/Domain/Rights/LicenseTerritories.php": "916ce751ecac29550e37546e134137284867d9850190cb554065771e357e9996",
@@ -217,7 +217,7 @@
         "app/Domain/Rights/TypedLicenseTerms.php": "c227805735d5613b5ed04e805c3260831209812599d450855c477bbbb0ad2745",
         "app/Support/CanonicalJson.php": "6e8f14f950bbb7ed3c4a8162ecf7c2fd2752031d1679285cea8bb0a5f5f82d89",
         "app/Support/Environment/TestEnvironment.php": "98566cea59214cb6d9ab1852eef7d9a6e2020048b46b02fbc1b882439ba2d948",
-        "scripts/render-vasey-license-v2.php": "28966d9702c1b60d959ab6e17186c9a5fb8ac0b9a29823c419bb9828b72d5952"
+        "scripts/render-vasey-license-v2.php": "595c256ff6f265a218428825f41e917d1decb9eac706a3f2e7d3d0d487f462da"
     },
     "assets": {
         "fonts/generated/bebasneue.ctg.z": {
