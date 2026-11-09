@@ -274,6 +274,11 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
         $this->refuses('profile_changed', fn () => (new VaseyLicenseV2RendererProcess(self::answering($answer)))->render($input, $profile, $values, $bytes));
         $answer['profile_hash'] = $result->profileHash;
         $this->assertSame($result->pdfBytes, (new VaseyLicenseV2RendererProcess(self::answering($answer)))->render($input, $profile, $values, $bytes)->pdfBytes);
+        // The same correct answer with a single byte of diagnostics fails.
+        $path = Storage::disk('local')->path('v2-child-answer-diagnostics.json');
+        file_put_contents($path, json_encode($answer, JSON_THROW_ON_ERROR));
+        $this->refuses('render_failed', fn () => (new VaseyLicenseV2RendererProcess(self::replacing('readfile('.var_export($path, true).'); fwrite(STDERR, "x");')))
+            ->render($input, $profile, $values, $bytes));
         foreach ([['page_count', 101], ['size_bytes', $result->sizeBytes + 1], ['sha256', str_repeat('d', 64)], ['pdf_base64', base64_encode('%PDF-1.7 not it')]] as [$field, $value]) {
             $wrong = $answer;
             $wrong[$field] = $value;
