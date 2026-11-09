@@ -325,8 +325,10 @@ final class OperationalHealth
     }
 
     /**
-     * Artisan command names the scheduler registers (routes/console.php). A web request does not load the console routes,
-     * so the console kernel is bootstrapped first; it loads them once per process.
+     * Artisan command names the scheduler registers (routes/console.php) and whose `when` gates pass now, so a command gated
+     * off by configuration (such as `vasey:upload-sessions-sweep`) never flags from a row left before it was turned off. A
+     * web request does not load the console routes, so the console kernel is bootstrapped first; it loads them once per
+     * process. `skip` rejects are not evaluated: `withoutOverlapping` is one, and a running command must still be counted.
      *
      * @return list<string>
      */
@@ -334,11 +336,12 @@ final class OperationalHealth
     {
         app(ConsoleKernel::class)->bootstrap();
         $prefix = Artisan::formatCommandString('');
+        // Event::filtersPass() without its rejects, through the event's own callback invoker.
+        $gatesPass = fn (Event $event): bool => (fn (): bool => array_all($this->filters, fn ($gate): bool => (bool) $this->callEventCallback(app(), $gate)))->call($event);
 
         return collect(app(Schedule::class)->events())
-            ->map(fn (Event $event): string => (string) $event->command)
-            ->filter(fn (string $command): bool => str_starts_with($command, $prefix))
-            ->map(fn (string $command): string => explode(' ', substr($command, strlen($prefix)), 2)[0])
+            ->filter(fn (Event $event): bool => str_starts_with((string) $event->command, $prefix) && $gatesPass($event))
+            ->map(fn (Event $event): string => explode(' ', substr((string) $event->command, strlen($prefix)), 2)[0])
             ->unique()->values()->all();
     }
 

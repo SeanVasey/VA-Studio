@@ -114,6 +114,22 @@ class OperationalSignalsTest extends TestCase
         $this->assertSame('failure', DB::table('scheduler_heartbeats')->where('task', 'vasey:retired-command')->value('last_outcome'), 'The stale row is kept, only not counted.');
     }
 
+    public function test_a_command_gated_off_by_configuration_is_not_counted_until_enabled(): void
+    {
+        // vasey:upload-sessions-sweep is registered but off by default: a failure row left from before it was turned off is ignored.
+        $this->assertCount(1, $this->scheduled('vasey:upload-sessions-sweep'));
+        config(['media.upload_session_sweep.scheduled' => false]);
+        app(OperationalSignals::class)->recordTaskOutcome('vasey:upload-sessions-sweep', false);
+        $this->assertMetric('scheduled_task_failures', null, 'unavailable');
+        config(['media.upload_session_sweep.scheduled' => true]);
+        $this->assertMetric('scheduled_task_failures', 1, 'attention');
+        $this->assertStringContainsString('vasey:upload-sessions-sweep', $this->evidence()['scheduled_task_failures']['detail']);
+        config(['media.upload_session_sweep.scheduled' => false]);
+        [$sweep] = $this->scheduled('vasey:contract-render-cache-sweep');
+        $sweep->finish($this->app, 0);
+        $this->assertMetric('scheduled_task_failures', 0, 'ok');
+    }
+
     public function test_every_scheduled_command_is_registered_and_tracked_and_a_failed_latest_run_needs_attention(): void
     {
         $heartbeat = $this->scheduled('vasey:scheduler-heartbeat');
