@@ -4,23 +4,30 @@ namespace App\Domain\Customers\DataRights;
 
 /**
  * The retention schedule (U-13, FP-076): every table that holds a record family the deletion workflow keeps
- * (`CustomerDataRights::RETAINED`) or that the data-rights export and deletion read, with its retention class and the
- * timestamp columns that start its clock. It drives the read-only `vasey:retention-report`; nothing here deletes.
+ * (`CustomerDataRights::RETAINED`), that the data-rights export and deletion read, or whose family Sean's decisions of
+ * 2026-11-07 and 2026-11-09 classify, with its retention class and the timestamp columns that start its clock. It drives the
+ * read-only `vasey:retention-report`; nothing here deletes.
  *
  * Classes with a period take it from `customer-data-rights.retention` through `DataRightsPolicy::retention()`, which refuses
- * an unset or invalid value: periods are never inferred. `indefinite` records are immutable or evidence of a purchase
- * (AGENTS.md invariants: immutable published licenses, purchased asset revisions, order snapshots, original historical
- * contracts, durable verified payment state) and are never purged by this mechanism. `not_applicable` tables follow the
- * account's own lifecycle (the deletion workflow pseudonymizes or erases them) or hold no customer data.
+ * an unset or invalid value: periods are never inferred. The key's suffix is the unit (`_years` or `_days`). `indefinite`
+ * records are immutable, evidence of a purchase, or held with the order they belong to (AGENTS.md invariants: immutable
+ * published licenses, purchased asset revisions, order snapshots, original historical contracts, durable verified payment
+ * state; PRIVACY section 7 keeps download records with the order) and are never purged by this mechanism. `not_applicable`
+ * tables follow the account's own lifecycle (the deletion workflow pseudonymizes or erases them), are expiring stores, are
+ * test-commerce records that must stay empty in production, or hold no customer data.
  *
  * A clock is one of:
  * - `columns`: the row is past its period when every listed column is set and at or before the cutoff. A null column (an
- *   open request, an unfinished delivery, an unpurged export) is never past. The last column dates the row.
+ *   open request, an unfinished delivery, an unpurged export) is never past. The last column dates the row. `format` names
+ *   how the columns store time: `datetime` (the default), `iso8601` (`YYYY-MM-DDTHH:MM:SSZ` text) or `epoch` (Unix seconds).
  * - `columns` with `unless_later` [table, foreign key, column]: also no child row newer than the cutoff (a conversation's
- *   last message), and `unless_referenced` [[table, column]]: no row there references this one (kept with that record).
- * - `via` [foreign key, parent table]: the row follows its parent, whose clock must be `columns`.
- * - null: the clock the approved policy names is not modeled yet, or the approved policy names no period for the record
- *   (audit and data-request evidence, until Sean decides), so the table is reported as held and never counted.
+ *   last message), and `unless_referenced` [[table, column]] or [[table, column, own column]]: no row there whose column
+ *   equals this row's `id` (or own column), so the row is kept with that record (a quote that became an order).
+ * - `via` [foreign key, parent table] or [foreign key, parent table, parent key]: the row follows its parent, whose clock is
+ *   `columns` or itself `via`; the parent key defaults to `id`. `when` [column, value] limits it to rows of one source kind;
+ *   any other row is never past.
+ * - null: no clock can be modeled from the schema (no primary key or timestamp to scan, or no signal for when the clock
+ *   starts), so the table is reported as held and never counted. The rationale says why.
  *
  * Tables in neither ENTRIES nor NOT_CUSTOMER_DATA are listed by the report as unclassified: names only, never a failure.
  */
@@ -32,9 +39,26 @@ final class RetentionSchedule
         'consent' => 'consent_records_years',
         'correspondence' => 'correspondence_records_years',
         'security' => 'security_records_years',
+        'evidence' => 'evidence_records_years',
+        'abandoned_checkout' => 'abandoned_checkout_days',
+        'operational' => 'operational_records_days',
         'indefinite' => null,
         'not_applicable' => null,
     ];
+
+    /**
+     * `CustomerDataRights::RETAINED` labels that are not a single period key, with the classes their tables may take: a record
+     * kept indefinitely, and a production checkout review kept with its order or, with no order, for the abandoned-checkout period.
+     */
+    public const RETAINED_LABELS = [
+        'indefinite' => ['indefinite'],
+        'with_order_or_abandoned_checkout_days' => ['indefinite', 'abandoned_checkout'],
+    ];
+
+    /** Shared rationales of the families the 2026-11-09 decisions hold with the order (PRIVACY section 7 orders row). */
+    private const WITH_ORDER = 'Held with the order (PRIVACY section 7 orders row, decided 2026-11-09): ';
+
+    private const TEST_COMMERCE = 'Test-commerce record (default-off, local/testing/staging rehearsal only); not_applicable in production, where it must stay empty.';
 
     /** One entry per table; `family` is the `CustomerDataRights::RETAINED` record it belongs to, or null. */
     public const ENTRIES = [
@@ -53,14 +77,15 @@ final class RetentionSchedule
             'rationale' => 'Durable verified payment state and reconciliation evidence behind a grant.'],
         ['table' => 'customer_purchase_claims', 'family' => 'customer_purchase_claims', 'class' => 'indefinite', 'clock' => null,
             'rationale' => 'Links an account to the order it owns; evidence of the purchase for as long as the order is kept.'],
-        // Download records (RETAINED delivery_records): a minimum period only.
-        ['table' => 'test_delivery_authorizations', 'family' => 'delivery_records', 'class' => 'financial', 'clock' => ['columns' => ['issued_at', 'expires_at']],
-            'rationale' => 'Download record. PRIVACY: at least the financial period and while the license can be used, so past-period rows are review candidates only.'],
-        ['table' => 'test_delivery_redemptions', 'family' => 'delivery_records', 'class' => 'financial', 'clock' => ['columns' => ['redeemed_at']],
-            'rationale' => 'Download record (redeemed). Same minimum period as its authorization.'],
+        // Download records (RETAINED delivery_records): they follow the order, never their own authorization timestamps.
+        ['table' => 'test_delivery_authorizations', 'family' => 'delivery_records', 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'download record of a perpetual license, kept while the order is kept.'],
+        ['table' => 'test_delivery_redemptions', 'family' => 'delivery_records', 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'redeemed download, kept with its authorization and order.'],
         // Production checkout records with frozen buyer declarations (RETAINED financial).
-        ['table' => 'production_checkout_reviews', 'family' => 'production_checkout_reviews', 'class' => 'indefinite', 'clock' => null,
-            'rationale' => 'Frozen buyer declarations an order snapshot is built from (D-30).'],
+        ['table' => 'production_checkout_reviews', 'family' => 'production_checkout_reviews', 'class' => 'abandoned_checkout',
+            'clock' => ['columns' => ['created_at'], 'format' => 'iso8601', 'unless_referenced' => [['production_checkout_orders', 'review_id']]],
+            'rationale' => 'PRIVACY: a checkout that did not become an order, 30 days after it; a review an order was built from (D-30) is kept with that order.'],
         ['table' => 'production_checkout_orders', 'family' => 'production_checkout_orders', 'class' => 'indefinite', 'clock' => null,
             'rationale' => 'Production order snapshot (V1).'],
         ['table' => 'production_tax_checkout_orders', 'family' => 'production_tax_checkout_orders', 'class' => 'indefinite', 'clock' => null,
@@ -82,27 +107,41 @@ final class RetentionSchedule
             'rationale' => 'Paid-tax line origin; the license grant record.'],
         ['table' => 'paid_tax_originals', 'family' => 'paid_tax_originals', 'class' => 'indefinite', 'clock' => null,
             'rationale' => 'Original contract manifest of the paid-tax chain.'],
-        ['table' => 'paid_authorizations', 'family' => 'paid_authorizations', 'class' => 'financial', 'clock' => ['columns' => ['created_at', 'expires_at']],
-            'rationale' => 'Download record of the paid chain; minimum period only, as for test delivery records.'],
-        ['table' => 'paid_redemptions', 'family' => 'paid_redemptions', 'class' => 'financial', 'clock' => ['columns' => ['created_at']],
-            'rationale' => 'Redeemed download of the paid chain; minimum period only.'],
-        ['table' => 'paid_tax_authorizations', 'family' => 'paid_tax_authorizations', 'class' => 'financial', 'clock' => ['columns' => ['created_at', 'expires_at']],
-            'rationale' => 'Download record of the paid-tax chain; minimum period only.'],
-        ['table' => 'paid_tax_redemptions', 'family' => 'paid_tax_redemptions', 'class' => 'financial', 'clock' => ['columns' => ['created_at']],
-            'rationale' => 'Redeemed download of the paid-tax chain; minimum period only.'],
-        // Consent and suppression ledgers (RETAINED consent): the clock is "while we hold the email address, plus 3 years".
+        ['table' => 'paid_authorizations', 'family' => 'paid_authorizations', 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'download record of the paid chain, kept while the order is kept.'],
+        ['table' => 'paid_redemptions', 'family' => 'paid_redemptions', 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'redeemed download of the paid chain.'],
+        ['table' => 'paid_tax_authorizations', 'family' => 'paid_tax_authorizations', 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'download record of the paid-tax chain, kept while the order is kept.'],
+        ['table' => 'paid_tax_redemptions', 'family' => 'paid_tax_redemptions', 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'redeemed download of the paid-tax chain.'],
+        // Consent and suppression ledgers (RETAINED consent): "while we hold the email address, plus 3 years". No column records
+        // when an address stops being held: account closure has no timestamp, and an erased account's email stays inside its
+        // retained order snapshots and contracts, so erasure does not end the holding either. Held, never counted.
         ['table' => 'customer_consent_events', 'family' => 'customer_consent_events', 'class' => 'consent', 'clock' => null,
-            'rationale' => 'Clock starts when the email address is no longer held, which is not modeled; held so consent stays provable.'],
+            'rationale' => 'Clock starts when the email address is no longer held; no column records that (erasure keeps it in orders), so held.'],
         ['table' => 'customer_consent_states', 'family' => 'customer_consent_events', 'class' => 'consent', 'clock' => null,
             'rationale' => 'Current state derived from the consent ledger; held with it.'],
         ['table' => 'customer_suppression_targets', 'family' => 'customer_suppression_records', 'class' => 'consent', 'clock' => null,
-            'rationale' => 'An opt-out must keep being honored; clock not modeled, so held.'],
+            'rationale' => 'An opt-out must keep being honored; no signal that the address is no longer held, so held.'],
         ['table' => 'customer_suppression_intents', 'family' => 'customer_suppression_records', 'class' => 'consent', 'clock' => null,
             'rationale' => 'Suppression ledger; held with its target.'],
         ['table' => 'customer_suppression_attempts', 'family' => 'customer_suppression_records', 'class' => 'consent', 'clock' => null,
             'rationale' => 'Suppression ledger; held with its target.'],
         ['table' => 'customer_suppression_confirmations', 'family' => 'customer_suppression_records', 'class' => 'consent', 'clock' => null,
             'rationale' => 'Suppression ledger; held with its target.'],
+        ['table' => 'production_consent_events', 'family' => null, 'class' => 'consent', 'clock' => null,
+            'rationale' => 'Production consent ledger; same clock as customer_consent_events, which no column records, so held.'],
+        ['table' => 'production_consent_states', 'family' => null, 'class' => 'consent', 'clock' => null,
+            'rationale' => 'Current state derived from the production consent ledger; held with it.'],
+        ['table' => 'production_suppression_targets', 'family' => null, 'class' => 'consent', 'clock' => null,
+            'rationale' => 'Production opt-out that must keep being honored; no signal that the address is no longer held, so held.'],
+        ['table' => 'production_suppression_intents', 'family' => null, 'class' => 'consent', 'clock' => null,
+            'rationale' => 'Production suppression ledger; held with its target.'],
+        ['table' => 'production_suppression_attempts', 'family' => null, 'class' => 'consent', 'clock' => null,
+            'rationale' => 'Production suppression ledger; held with its target.'],
+        ['table' => 'production_suppression_confirmations', 'family' => null, 'class' => 'consent', 'clock' => null,
+            'rationale' => 'Production suppression ledger; held with its target.'],
         ['table' => 'customer_consent_policies', 'family' => null, 'class' => 'not_applicable', 'clock' => null,
             'rationale' => 'Read by the export: the notice versions consent was given to, not customer data.'],
         // Conversations (RETAINED inquiries): 2 years after the last message unless the conversation concerns an order.
@@ -116,30 +155,243 @@ final class RetentionSchedule
             'rationale' => 'Staff alert for a conversation; follows it.'],
         ['table' => 'inquiry_order_contexts', 'family' => 'inquiries', 'class' => 'indefinite', 'clock' => null,
             'rationale' => 'Marks a conversation as about an order, which PRIVACY keeps as long as the order records.'],
-        ['table' => 'support_attachments', 'family' => 'inquiries', 'class' => 'correspondence', 'clock' => null,
-            'rationale' => 'Polymorphic source and private files on disk; no per-source clock is modeled, so held.'],
+        ['table' => 'support_attachments', 'family' => 'inquiries', 'class' => 'correspondence',
+            'clock' => ['via' => ['source_id', 'customer_inquiries', 'public_id'], 'when' => ['source_kind', 'inquiry']],
+            'rationale' => 'An inquiry attachment follows its conversation (PRIVACY contact row); a service project attachment is never counted here.'],
         // Outgoing order notices (RETAINED correspondence).
         ['table' => 'transactional_notices', 'family' => 'transactional_notices', 'class' => 'correspondence', 'clock' => ['columns' => ['created_at']],
             'rationale' => 'Order-ready intent with the encrypted recipient email.'],
+        ['table' => 'transactional_notice_attempts', 'family' => 'transactional_notices', 'class' => 'correspondence',
+            'clock' => ['via' => ['notice_id', 'transactional_notices']],
+            'rationale' => 'Delivery attempt of an order-ready notice; follows its notice.'],
         ['table' => 'transactional_mail_deliveries', 'family' => 'transactional_mail_deliveries', 'class' => 'correspondence',
             'clock' => ['columns' => ['queued_at', 'finished_at']],
             'rationale' => 'Delivery of a notice; never past while unfinished.'],
-        // Security records (RETAINED security). PRIVACY section 7 sets 12 months only for verification and recovery code records.
+        // Security records (RETAINED security): PRIVACY section 7 keeps verification and recovery code records 12 months.
         ['table' => 'customer_identity_challenges', 'family' => 'identity_challenges', 'class' => 'security', 'clock' => ['columns' => ['created_at', 'expires_at']],
             'rationale' => 'PRIVACY: verification and recovery code records are kept 12 months for security.'],
         ['table' => 'customer_purchase_challenges', 'family' => 'identity_challenges', 'class' => 'security',
             'clock' => ['columns' => ['created_at', 'expires_at'], 'unless_referenced' => [['customer_purchase_claims', 'challenge_id']]],
             'rationale' => 'Purchase claim challenge; one that proved a claim is kept with the claim.'],
-        // Audit and data-request evidence: PRIVACY section 7 gives these records no period, so they are held (never counted)
-        // until Sean decides their retention. They are the evidence that a deletion was honored, of role changes and of held orders.
-        ['table' => 'audit_events', 'family' => 'audit_events', 'class' => 'security', 'clock' => null,
-            'rationale' => 'Held until Sean decides: PRIVACY gives audit evidence no period; it also proves deletions, role changes and held orders.'],
-        ['table' => 'customer_data_requests', 'family' => 'customer_data_requests', 'class' => 'security', 'clock' => null,
-            'rationale' => 'Held until Sean decides: PRIVACY gives data request records no period; this is the evidence a deletion was honored.'],
-        ['table' => 'customer_data_request_events', 'family' => 'customer_data_requests', 'class' => 'security', 'clock' => null,
-            'rationale' => 'Held with its request until Sean decides: append-only history of the data request.'],
-        ['table' => 'customer_data_exports', 'family' => 'customer_data_exports', 'class' => 'security', 'clock' => null,
-            'rationale' => 'Held until Sean decides: export rows (contents purged) are kept as data request evidence, which PRIVACY gives no period.'],
+        ['table' => 'customer_identity_addresses', 'family' => 'identity_challenges', 'class' => 'security', 'clock' => null,
+            'rationale' => 'Address key that serializes identity challenges; no primary key or timestamp to scan, so held.'],
+        ['table' => 'password_reset_tokens', 'family' => null, 'class' => 'security', 'clock' => null,
+            'rationale' => 'PRIVACY verification row (12 months); keyed by email with no primary key to scan in ranges, so held. Tokens expire within the hour.'],
+        ['table' => 'production_identity_challenges', 'family' => null, 'class' => 'security',
+            'clock' => ['columns' => ['created_at', 'expires_at'], 'unless_referenced' => [['production_identity_origins', 'initial_challenge_id'],
+                ['production_identity_verifications', 'challenge_id']]],
+            'rationale' => 'PRIVACY verification row, 12 months; a challenge an identity origin or a verification references is part of the verified chain and is kept with it.'],
+        ['table' => 'production_identity_notices', 'family' => null, 'class' => 'security', 'clock' => ['columns' => ['created_at']],
+            'rationale' => 'Verification code notice of a production identity challenge; PRIVACY verification row, 12 months.'],
+        ['table' => 'production_identity_attempts', 'family' => null, 'class' => 'security', 'clock' => ['columns' => ['started_at', 'lease_expires_at']],
+            'rationale' => 'Send attempt of a verification notice; PRIVACY verification row, 12 months.'],
+        ['table' => 'production_identity_outcomes', 'family' => null, 'class' => 'security', 'clock' => ['columns' => ['created_at']],
+            'rationale' => 'Result of a notice send attempt; bound to the attempt, not to an order, so PRIVACY verification row, 12 months.'],
+        ['table' => 'production_identity_verifications', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'verification chain of an identity origin; every production read re-verifies it from sequence 1, and sealed order, grant, invoice and checkout bindings name it.'],
+        ['table' => 'production_identity_addresses', 'family' => null, 'class' => 'security', 'clock' => null,
+            'rationale' => 'Address hash with no timestamp; one an identity origin binds is kept with the orders that origin is sealed into. Held.'],
+        // Audit events evidence license approvals, exclusive activations, payments, finalizations and refunds of records kept
+        // indefinitely, so they are kept with those records.
+        ['table' => 'audit_events', 'family' => 'audit_events', 'class' => 'indefinite', 'clock' => null,
+            'rationale' => 'Evidence of license approvals, exclusive activations, payments, finalizations, refunds, role changes and deletions; kept with the records it proves.'],
+        // Privacy request records (RETAINED evidence): 7 years after the request closes.
+        ['table' => 'customer_data_requests', 'family' => 'customer_data_requests', 'class' => 'evidence', 'clock' => ['columns' => ['resolved_at']],
+            'rationale' => 'PRIVACY: 7 years after the request closes; an open request has no resolved_at and is never past.'],
+        ['table' => 'customer_data_request_events', 'family' => 'customer_data_requests', 'class' => 'evidence',
+            'clock' => ['via' => ['request_id', 'customer_data_requests']],
+            'rationale' => 'Append-only history of a data request; follows the request.'],
+        ['table' => 'customer_data_exports', 'family' => 'customer_data_exports', 'class' => 'evidence',
+            'clock' => ['via' => ['request_id', 'customer_data_requests']],
+            'rationale' => 'Export metadata (contents purged on download, expiry or deletion approval); follows its request. File contents are out of scope.'],
+        // Abandoned checkouts and quotes: 30 days after the quote ends, unless it became an order (orders.quote_id).
+        ['table' => 'quotes', 'family' => null, 'class' => 'abandoned_checkout',
+            'clock' => ['columns' => ['created_at', 'expires_at'], 'unless_referenced' => [['orders', 'quote_id']]],
+            'rationale' => 'PRIVACY: a quote that did not become an order, 30 days after it expires; one an order was built from is kept with it.'],
+        ['table' => 'quote_lines', 'family' => null, 'class' => 'abandoned_checkout', 'clock' => ['via' => ['quote_id', 'quotes']],
+            'rationale' => 'Lines of a quote; follow the quote.'],
+        ['table' => 'quote_pricings', 'family' => null, 'class' => 'abandoned_checkout', 'clock' => ['via' => ['quote_id', 'quotes']],
+            'rationale' => 'Price snapshot of a quote; follows the quote.'],
+        ['table' => 'inventory_reservations', 'family' => null, 'class' => 'abandoned_checkout', 'clock' => ['via' => ['quote_id', 'quotes']],
+            'rationale' => 'Inventory reservation of a quote; follows the quote.'],
+        ['table' => 'inventory_claims', 'family' => null, 'class' => 'abandoned_checkout', 'clock' => ['via' => ['inventory_reservation_id', 'inventory_reservations']],
+            'rationale' => 'Exclusive inventory claim of a reservation; follows the reservation and its quote.'],
+        ['table' => 'promotion_uses', 'family' => null, 'class' => 'abandoned_checkout', 'clock' => ['via' => ['quote_pricing_id', 'quote_pricings']],
+            'rationale' => 'Promotion applied to a quote price; follows the quote.'],
+        ['table' => 'quote_owners', 'family' => null, 'class' => 'abandoned_checkout', 'clock' => null,
+            'rationale' => 'Buyer owner key shared by quotes and orders; no primary key or timestamp to scan, so held.'],
+        // Checkout state bound to an order snapshot: every intent, attempt and session row has a non-null order (or a parent that
+        // has one), so none is "a checkout that did not become an order"; it follows the order (open question: unpaid snapshots).
+        ['table' => 'order_attempts', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'checkout attempt bound to its order snapshot (order_id is required and unique).'],
+        ['table' => 'checkout_intents', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'payment intent created for an existing order snapshot (order_id is required).'],
+        ['table' => 'checkout_sessions', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'provider session of an intent that always has an order.'],
+        ['table' => 'checkout_observations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'provider session status observations of an order checkout.'],
+        ['table' => 'production_checkout_order_lines', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'lines of the production order snapshot.'],
+        ['table' => 'production_checkout_attempts', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'checkout attempt of a production order (order_id is required).'],
+        ['table' => 'production_checkout_provider_intents', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'payment intent of a production order (order_id is required).'],
+        ['table' => 'production_checkout_sessions', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'provider session of a production order intent.'],
+        ['table' => 'production_checkout_observations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'provider observations of a production order intent.'],
+        ['table' => 'production_checkout_exemption_authorities', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'qualification authority behind an exemption basis; tax evidence of the orders it approved.'],
+        ['table' => 'production_tax_checkout_requests', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'tax checkout request of a production tax order (order_id is required).'],
+        ['table' => 'production_tax_checkout_bindings', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'provider session binding of a tax checkout request.'],
+        // Payment records.
+        ['table' => 'payment_observations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'payment provider observation of an order checkout; payment evidence.'],
+        ['table' => 'stripe_webhook_receipts', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'deduplicated payment provider events and reconciliation evidence (AGENTS.md).'],
+        ['table' => 'stripe_receipt_work', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'processing state of a payment provider event.'],
+        ['table' => 'production_checkout_payments', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'observed payment of a production order.'],
+        ['table' => 'production_tax_checkout_reviewed_sessions', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'reviewed paid session of a production tax order, with its amounts.'],
+        // Refunds and disputes.
+        ['table' => 'refund_dispute_objects', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'refund or dispute of an order.'],
+        ['table' => 'refund_dispute_observations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'observed refund or dispute state of an order.'],
+        ['table' => 'refund_dispute_statuses', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'status history of a refund or dispute.'],
+        ['table' => 'refund_dispute_effects', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'effects a refund or dispute applied to an order or grant.'],
+        ['table' => 'refund_dispute_holds', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'hold a refund or dispute placed on an order or grant.'],
+        ['table' => 'refund_dispute_work', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'processing state of an order refund or dispute.'],
+        ['table' => 'refund_line_allocations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'refund amount allocated to an order line.'],
+        // Fulfillment.
+        ['table' => 'fulfillment_outbox', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'fulfillment effects of a finalized order.'],
+        ['table' => 'pending_entitlements', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'deliverable assets a license grant entitles.'],
+        ['table' => 'contract_render_requests', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'contract render request of a license grant.'],
+        ['table' => 'contract_render_work', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'processing state of a contract render request.'],
+        ['table' => 'paid_fulfillments', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'fulfillment batch of the paid chain.'],
+        ['table' => 'paid_document_work', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'contract document work of a paid grant origin.'],
+        ['table' => 'paid_tax_fulfillments', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'fulfillment batch of the paid-tax chain.'],
+        ['table' => 'paid_tax_document_work', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'contract document work of a paid-tax grant origin.'],
+        ['table' => 'service_projects', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'service project a customer bought, with its brief; fulfillment record.'],
+        ['table' => 'service_project_events', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'history of a purchased service project.'],
+        // Grants, including free licenses (PRIVACY orders row covers free licenses and their download records).
+        ['table' => 'exclusive_sales', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'exclusive sale of a rights scope; must never be silently revoked (AGENTS.md).'],
+        ['table' => 'free_origins', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'free license grant of an account.'],
+        ['table' => 'free_originals', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'original contract of a free license (AGENTS.md: preserved).'],
+        ['table' => 'free_document_work', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'contract document work of a free license.'],
+        ['table' => 'free_authorizations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'download record of a free license.'],
+        ['table' => 'free_redemptions', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'redeemed download of a free license.'],
+        ['table' => 'production_free_origins', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'production free license grant of an account.'],
+        ['table' => 'production_free_originals', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'original contract of a production free license.'],
+        ['table' => 'production_free_document_work', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'contract document work of a production free license.'],
+        ['table' => 'production_free_authorizations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'download record of a production free license.'],
+        ['table' => 'production_free_redemptions', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'redeemed download of a production free license.'],
+        ['table' => 'production_free_revocations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'staff revocation of a production free license; grant evidence.'],
+        ['table' => 'production_member_origins', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'member license grant of an account, from a membership redemption.'],
+        ['table' => 'production_member_activations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'activation of a member license grant.'],
+        ['table' => 'production_member_artifacts', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'deliverable artifacts of a member license grant.'],
+        ['table' => 'production_member_definitions', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'member grant definition and original terms sealed into every member grant made from it.'],
+        ['table' => 'production_member_profiles', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'member grant renderer profile sealed into every member grant made from it.'],
+        // Membership billing and credits.
+        ['table' => 'membership_credit_buckets', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'membership credit allowance of an account from a billing event.'],
+        ['table' => 'membership_credit_events', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'membership credit ledger of an account.'],
+        ['table' => 'production_membership_billing_subscriptions', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'membership billing subscription of an account.'],
+        ['table' => 'production_membership_billing_invoices', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'membership billing invoice; payment evidence.'],
+        ['table' => 'production_membership_billing_observations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'observed membership invoice state and amounts; payment evidence.'],
+        ['table' => 'production_membership_billing_events', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'membership billing provider events; payment evidence.'],
+        ['table' => 'production_membership_billing_attempts', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'membership invoice retrieval attempts; reconciliation evidence.'],
+        ['table' => 'production_membership_billing_positions', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'ordering positions of membership billing retrievals; reconciliation evidence.'],
+        ['table' => 'production_membership_billing_award_fence', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'serialization fence of membership credit awards; part of the billing ledger.'],
+        ['table' => 'production_membership_paid_periods', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'paid membership period of an account.'],
+        ['table' => 'production_membership_credit_events', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'membership credit ledger of a paid period.'],
+        ['table' => 'production_membership_redemptions', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'membership credit redemption that a member grant is made from.'],
+        // Imported BeatStars order history.
+        ['table' => 'legacy_history_batches', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'import batch of legacy order history (source hashes, dry-run evidence).'],
+        ['table' => 'legacy_history_customers', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'buyer of imported legacy orders; part of the legacy order record.'],
+        ['table' => 'legacy_history_orders', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'imported legacy order.'],
+        ['table' => 'legacy_history_lines', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'imported legacy order line.'],
+        ['table' => 'legacy_history_contracts', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'imported original contract (AGENTS.md: original historical contracts are preserved).'],
+        ['table' => 'legacy_history_contract_declarations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'declared legacy contract of an imported order line.'],
+        ['table' => 'legacy_history_grant_reviews', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'staff review of an imported legacy line.'],
+        ['table' => 'legacy_exclusivity_authority_events', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'exclusivity authority over legacy sales; protects prior exclusive grants.'],
+        // Framework job stores: PRIVACY application error log row, 14 days.
+        ['table' => 'jobs', 'family' => null, 'class' => 'operational', 'clock' => ['columns' => ['created_at'], 'format' => 'epoch'],
+            'rationale' => 'Queued job payloads can hold customer data; PRIVACY application error log row, 14 days after queueing.'],
+        ['table' => 'failed_jobs', 'family' => null, 'class' => 'operational', 'clock' => ['columns' => ['failed_at']],
+            'rationale' => 'Failed job payloads and exceptions can hold customer data; PRIVACY application error log row, 14 days after failing.'],
+        ['table' => 'job_batches', 'family' => null, 'class' => 'operational', 'clock' => null,
+            'rationale' => 'Job batch counters; its primary key is a string, which the primary-key range scan cannot read, so held.'],
+        // Expiring stores and test commerce.
+        ['table' => 'cache', 'family' => null, 'class' => 'not_applicable', 'clock' => null,
+            'rationale' => 'Expiring cache store (PRIVACY rate-limit row): each entry carries its own expiration and is removed by routine cleanup.'],
+        ['table' => 'cache_locks', 'family' => null, 'class' => 'not_applicable', 'clock' => null,
+            'rationale' => 'Expiring lock store (PRIVACY rate-limit row): each lock carries its own expiration.'],
+        ['table' => 'test_delivery_controls', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
+        ['table' => 'test_fulfillment_activations', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
+        ['table' => 'test_payment_exception_events', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
+        ['table' => 'test_payment_exception_work', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
+        ['table' => 'test_payment_financial_observations', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
+        ['table' => 'test_refund_resolution_requests', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
+        ['table' => 'test_refund_resolutions', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
+        ['table' => 'test_unpaid_releases', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
+        ['table' => 'test_unpaid_release_events', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
+        ['table' => 'test_unpaid_release_work', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
         // Account lifecycle, handled by the deletion workflow rather than a retention purge.
         ['table' => 'users', 'family' => null, 'class' => 'not_applicable', 'clock' => null,
             'rationale' => 'Sign-in profile: pseudonymized when a deletion request is approved.'],
