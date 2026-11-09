@@ -87,6 +87,33 @@ class OperationalSignalsTest extends TestCase
         $this->assertSame(2, DB::table('scheduler_heartbeats')->count());
     }
 
+    public function test_a_heartbeat_more_than_a_minute_in_the_future_is_clock_skew_and_needs_attention(): void
+    {
+        $this->artisan('vasey:scheduler-heartbeat')->assertExitCode(0);
+        $this->travel(-60)->seconds();
+        $this->assertMetric('scheduler_last_run', 0, 'ok');
+        $this->travel(-1)->seconds();
+        $this->assertMetric('scheduler_last_run', -61, 'attention');
+        $this->assertStringContainsString('61 seconds in the future', $this->evidence()['scheduler_last_run']['detail']);
+        $this->travel(61)->seconds();
+        $this->assertMetric('scheduler_last_run', 0, 'ok');
+    }
+
+    public function test_a_removed_or_renamed_command_row_is_not_counted_as_a_scheduled_failure(): void
+    {
+        $signals = app(OperationalSignals::class);
+        $signals->recordTaskOutcome('vasey:retired-command', false);
+        $this->assertMetric('scheduled_task_failures', null, 'unavailable');
+        [$sweep] = $this->scheduled('vasey:contract-render-cache-sweep');
+        $sweep->finish($this->app, 0);
+        $this->assertMetric('scheduled_task_failures', 0, 'ok');
+        $this->assertStringContainsString('each of the 1 commands', $this->evidence()['scheduled_task_failures']['detail']);
+        $sweep->finish($this->app, 1);
+        $this->assertMetric('scheduled_task_failures', 1, 'attention');
+        $this->assertStringNotContainsString('vasey:retired-command', $this->evidence()['scheduled_task_failures']['detail']);
+        $this->assertSame('failure', DB::table('scheduler_heartbeats')->where('task', 'vasey:retired-command')->value('last_outcome'), 'The stale row is kept, only not counted.');
+    }
+
     public function test_every_scheduled_command_is_registered_and_tracked_and_a_failed_latest_run_needs_attention(): void
     {
         $heartbeat = $this->scheduled('vasey:scheduler-heartbeat');
@@ -176,6 +203,10 @@ class OperationalSignalsTest extends TestCase
             'delete' => fn () => DB::table('backup_evidence')->where('id', $row['id'])->delete(),
             'unknown kind' => fn () => $insert(['kind' => 'weekly']),
             'unknown status' => fn () => $insert(['status' => 'success']),
+            'upper-case kind' => fn () => $insert(['kind' => 'DAILY']),
+            'upper-case status' => fn () => $insert(['status' => 'FAILED']),
+            'text bytes' => fn () => $insert(['bytes' => 'lots']),
+            'ok daily with zero bytes' => fn () => $insert(['status' => 'ok', 'bytes' => 0, 'sha256' => self::SHA]),
             'short sha' => fn () => $insert(['sha256' => 'abc']),
             'uppercase sha' => fn () => $insert(['sha256' => strtoupper(self::SHA)]),
             'non-hex sha' => fn () => $insert(['sha256' => str_repeat('z', 64)]),

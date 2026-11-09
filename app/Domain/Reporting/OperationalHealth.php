@@ -7,6 +7,10 @@ use App\Domain\Operations\OperationalSignals;
 use App\Models\User;
 use App\Support\Environment\TestEnvironment;
 use Carbon\CarbonImmutable;
+use Illuminate\Console\Application as Artisan;
+use Illuminate\Console\Scheduling\Event;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -42,6 +46,9 @@ final class OperationalHealth
         'scheduler_last_run' => 'Scheduler last run (seconds ago)', 'scheduled_task_failures' => 'Scheduled commands whose latest run failed',
         'backup_last_success' => 'Last successful backup (hours ago)', 'restore_drill_last_success' => 'Last successful restore drill (days ago)',
     ];
+
+    /** A heartbeat this far in the future is clock skew, not a fresh run. */
+    private const CLOCK_SKEW_SECONDS = 60;
 
     public function __construct(private readonly StaffReportingAuthority $authority) {}
 
@@ -118,7 +125,7 @@ final class OperationalHealth
             $rows = DB::table('stripe_receipt_work')->selectRaw('state, COUNT(*) AS total, MIN(created_at) AS oldest')->groupBy('state')->get()->keyBy('state');
             $waiting = (int) ($rows['pending']->total ?? 0) + (int) ($rows['retry']->total ?? 0) + (int) ($rows['processing']->total ?? 0);
             $oldest = collect([$rows['pending']->oldest ?? null, $rows['retry']->oldest ?? null, $rows['processing']->oldest ?? null])->filter()->min();
-            $age = $oldest === null ? 0 : max(0, now()->utc()->timestamp - \Carbon\CarbonImmutable::parse($oldest, 'UTC')->timestamp);
+            $age = $oldest === null ? 0 : max(0, now()->utc()->timestamp - CarbonImmutable::parse($oldest, 'UTC')->timestamp);
             $quarantined = (int) ($rows['quarantined']->total ?? 0);
             $limit = (int) config('reporting.health.receipt_age_attention_seconds');
 
@@ -207,7 +214,7 @@ final class OperationalHealth
         $limits = config('reporting.health');
         $metrics = $this->guarded(['inquiries_new'], 'customer inquiries', function () use ($limits): array {
             $row = DB::table('customer_inquiries')->where('state', 'new')->selectRaw('COUNT(*) AS total, MIN(created_at) AS oldest')->first();
-            $age = $row->oldest === null ? 0 : max(0, now()->utc()->timestamp - \Carbon\CarbonImmutable::parse($row->oldest, 'UTC')->timestamp);
+            $age = $row->oldest === null ? 0 : max(0, now()->utc()->timestamp - CarbonImmutable::parse($row->oldest, 'UTC')->timestamp);
 
             return [self::metric('inquiries_new', 'Inquiries not yet read', (int) $row->total, (int) $row->total > 0 && $age > (int) $limits['inquiry_age_attention_seconds'] ? 'attention' : 'ok',
                 (int) $row->total === 0 ? 'No new inquiry.' : 'Oldest received '.$row->oldest.' UTC; attention after '.intdiv((int) $limits['inquiry_age_attention_seconds'], 3600).' hours.')];
@@ -220,8 +227,8 @@ final class OperationalHealth
                 .' COUNT(CASE WHEN status = \'processing\' AND started_at < ? THEN 1 END) AS stuck,'
                 .' COUNT(CASE WHEN status = \'queued\' THEN 1 END) AS queued, MIN(CASE WHEN status = \'queued\' THEN created_at END) AS oldest_queued', [$stuckBefore])->first();
             $quarantine = DB::table('media_assets')->where('status', 'quarantined')->selectRaw('COUNT(*) AS total, MIN(created_at) AS oldest')->first();
-            $queuedAge = $runs->oldest_queued === null ? 0 : max(0, $now->timestamp - \Carbon\CarbonImmutable::parse($runs->oldest_queued, 'UTC')->timestamp);
-            $quarantineAge = $quarantine->oldest === null ? 0 : max(0, $now->timestamp - \Carbon\CarbonImmutable::parse($quarantine->oldest, 'UTC')->timestamp);
+            $queuedAge = $runs->oldest_queued === null ? 0 : max(0, $now->timestamp - CarbonImmutable::parse($runs->oldest_queued, 'UTC')->timestamp);
+            $quarantineAge = $quarantine->oldest === null ? 0 : max(0, $now->timestamp - CarbonImmutable::parse($quarantine->oldest, 'UTC')->timestamp);
 
             return [
                 self::metric('media_failed', 'Media processing runs failed', (int) $runs->failed, (int) $runs->failed > 0 ? 'attention' : 'ok', 'A failed run keeps its failure code until retried.'),
@@ -252,12 +259,17 @@ final class OperationalHealth
                 $scheduler = self::unavailable('scheduler_last_run', self::LABELS['scheduler_last_run'], 'The heartbeat threshold is not a positive number of seconds (REPORTING_SCHEDULER_HEARTBEAT_STALE_SECONDS).');
             } elseif ($heartbeat === null || $heartbeat->last_success_at === null) {
                 $scheduler = self::unavailable('scheduler_last_run', self::LABELS['scheduler_last_run'], 'No scheduler heartbeat has ever been recorded: the scheduler has not run `vasey:scheduler-heartbeat` on this database.');
+            } elseif (($ahead = -self::signedAgeSeconds($heartbeat->last_success_at)) > self::CLOCK_SKEW_SECONDS) {
+                // A heartbeat from the future is not proof the scheduler runs now: the clocks disagree, so it cannot be OK.
+                $scheduler = self::metric('scheduler_last_run', self::LABELS['scheduler_last_run'], -$ahead, 'attention',
+                    'Last heartbeat at '.$heartbeat->last_success_at.' UTC is '.$ahead.' seconds in the future: the scheduler host and this server disagree on the time.');
             } else {
                 $age = self::ageSeconds($heartbeat->last_success_at);
                 $scheduler = self::metric('scheduler_last_run', self::LABELS['scheduler_last_run'], $age, $age > $limit ? 'attention' : 'ok',
                     'Last heartbeat at '.$heartbeat->last_success_at.' UTC; attention after '.$limit.' seconds without one.');
             }
-            $tasks = $rows->except(OperationalSignals::HEARTBEAT_TASK);
+            // Only commands the scheduler still runs: a removed or renamed command's last row would otherwise flag forever.
+            $tasks = $rows->only(self::scheduledTasks())->except(OperationalSignals::HEARTBEAT_TASK);
             if ($tasks->isEmpty()) {
                 $failures = self::unavailable('scheduled_task_failures', self::LABELS['scheduled_task_failures'], 'No tracked scheduled command has recorded an outcome yet.');
             } else {
@@ -304,7 +316,30 @@ final class OperationalHealth
 
     private static function ageSeconds(string $at): int
     {
-        return max(0, now()->utc()->timestamp - CarbonImmutable::parse($at, 'UTC')->timestamp);
+        return max(0, self::signedAgeSeconds($at));
+    }
+
+    private static function signedAgeSeconds(string $at): int
+    {
+        return now()->utc()->timestamp - CarbonImmutable::parse($at, 'UTC')->timestamp;
+    }
+
+    /**
+     * Artisan command names the scheduler registers (routes/console.php). A web request does not load the console routes,
+     * so the console kernel is bootstrapped first; it loads them once per process.
+     *
+     * @return list<string>
+     */
+    private static function scheduledTasks(): array
+    {
+        app(ConsoleKernel::class)->bootstrap();
+        $prefix = Artisan::formatCommandString('');
+
+        return collect(app(Schedule::class)->events())
+            ->map(fn (Event $event): string => (string) $event->command)
+            ->filter(fn (string $command): bool => str_starts_with($command, $prefix))
+            ->map(fn (string $command): string => explode(' ', substr($command, strlen($prefix)), 2)[0])
+            ->unique()->values()->all();
     }
 
     /**
