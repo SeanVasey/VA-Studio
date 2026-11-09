@@ -33,7 +33,7 @@ use Tests\TestCase;
 class VaseyLicenseV2PdfRendererTest extends TestCase
 {
     /** sha256 of the golden business render below, under the pinned v2 profile and the synthetic signature. */
-    private const GOLDEN_SHA256 = 'ec2f685bb2e9f38c992dc2e7b9e76fabc5a590361818feb13ff25295bb3dc157';
+    private const GOLDEN_SHA256 = '2b2a04e462c487eb472d21da0e499dbb0d7728c438b953410848bf08a2cc8403';
 
     private const TEMPLATE = "SYNTHETIC TEST TEMPLATE: {LICENSE_NAME}\n\nNONBINDING FIXTURE\n\n"
         .'This synthetic fixture is dated {CONTRACT_DATE}. It names {CUSTOMER_FULLNAME} of {CUSTOMER_ADDRESS} and {PRODUCER_ALIAS}, '
@@ -371,7 +371,66 @@ class VaseyLicenseV2PdfRendererTest extends TestCase
         $this->refusesIssuance('profile_changed', fn () => (new VaseyLicensePdfRenderer)->render(self::document(), VaseyLicenseV2Profile::current(), $signature));
     }
 
-    public function test_the_renderer_is_in_the_v2_pin_and_selected_by_nothing(): void
+    /** Wiring condition 1: a document built anywhere but this renderer's document() refuses, even one with the same values. */
+    public function test_render_accepts_only_documents_its_own_document_method_built(): void
+    {
+        [$values, $declaration] = self::bound();
+        $signature = $this->signature();
+        $this->render(self::document(), $signature);
+        // Built directly under the same v2 coverage, under the wider test-v2 DejaVu set, or under v1's faces.
+        foreach ([ContractPrintableSet::faces(), ContractGlyphCoverage::pinnedContractFaces(), ContractGlyphCoverage::vaseyLicenseFaces()] as $coverage) {
+            $elsewhere = VaseyLicenseDocument::build(self::TEMPLATE, $values, $declaration, $coverage);
+            $this->refusesIssuance('unsupported_input', fn () => $this->render($elsewhere, $signature));
+        }
+        // A test-v2 document can carry what checkout refuses (Greek here); it never reaches the v2 renderer.
+        $wide = VaseyLicenseDocument::build(self::TEMPLATE.' Ελένη.', $values, $declaration, ContractGlyphCoverage::pinnedContractFaces());
+        $this->refusesIssuance('unsupported_input', fn () => $this->render($wide, $signature));
+        // Another instance (or project root) of this renderer is still this renderer's document() under the same pinned set.
+        $this->assertStringStartsWith('%PDF-', $this->render((new VaseyLicenseV2PdfRenderer($this->copiedRoot()))->document(self::TEMPLATE, $values, $declaration), $signature)->pdfBytes);
+    }
+
+    /** Wiring condition 3: tampered metric files refuse as a changed profile, not as an unexpected exception. */
+    public function test_tampered_metric_files_refuse_profile_changed(): void
+    {
+        [$values, $declaration] = self::bound();
+        foreach (VaseyLicenseV2Profile::FACES as $metrics) {
+            $root = $this->copiedRoot();
+            self::flipLastByte($root.'/'.VaseyLicenseV2Profile::ASSETS_DIRECTORY.'/'.$metrics);
+            $renderer = new VaseyLicenseV2PdfRenderer($root);
+            $this->refusesIssuance('profile_changed', fn () => $renderer->coverage());
+            $this->refusesIssuance('profile_changed', fn () => $renderer->document(self::TEMPLATE, $values, $declaration));
+            File::deleteDirectory($root);
+        }
+    }
+
+    /** Wiring condition 4: a font file swapped after runtime verification refuses; tc-lib only reads a copy of hashed bytes. */
+    public function test_a_font_swapped_after_runtime_verification_refuses(): void
+    {
+        $signature = $this->signature();
+        $document = self::document();
+        foreach (['fonts/generated/redditsans.json', 'fonts/generated/redditsans.z', 'fonts/generated/bebasneue.z'] as $asset) {
+            $root = $this->copiedRoot();
+            $path = $root.'/'.VaseyLicenseV2Profile::ASSETS_DIRECTORY.'/'.$asset;
+            $swapped = false;
+            $renderer = new VaseyLicenseV2PdfRenderer($root, function () use ($path, &$swapped): void {
+                // Same size, different bytes, after every pinned file was verified.
+                self::flipLastByte($path);
+                $swapped = true;
+            });
+            $this->refusesIssuance('profile_changed', fn () => $renderer->render($document, VaseyLicenseV2Profile::current(), $signature));
+            $this->assertTrue($swapped, $asset);
+            File::deleteDirectory($root);
+        }
+        // The hook is a test seam only.
+        $this->app['env'] = 'local';
+        try {
+            $this->refusesIssuance('unsupported_input', fn () => new VaseyLicenseV2PdfRenderer(null, static function (): void {}));
+        } finally {
+            $this->app['env'] = 'testing';
+        }
+    }
+
+    public function test_the_renderer_is_in_the_v2_pin_and_selected_only_by_the_gated_issuance_dispatch(): void
     {
         $pinned = array_keys(VaseyLicenseV2Profile::current()['assets']['implementation']);
         $this->assertSame(VaseyLicenseV2Implementation::closure(base_path()), $pinned);
@@ -382,15 +441,16 @@ class VaseyLicenseV2PdfRendererTest extends TestCase
         $this->assertContains('app/Domain/Contracts/Production/VaseyLicenseV2PdfRenderer.php', VaseyLicenseV2Implementation::ROOTS);
         $this->assertNotContains(VaseyLicenseV2Implementation::ANCHOR, $pinned);
 
-        // Not selected: the profile says so, the test registry and the versioned dispatcher refuse it, and no code
-        // outside the profile's own files names the renderer.
+        // Not selected outside the gated dispatch: the profile says so for production, the test registry and the versioned
+        // dispatcher refuse it, and no code outside the profile's own files and VaseyLicenseIssuance names the renderer.
         $profile = VaseyLicenseV2Profile::current();
         $this->assertSame([false, 'not_selected'], [$profile['test_only'], $profile['issuance']]);
         $this->refusesIssuance('profile_changed', fn () => ContractRenderProfileRegistry::metadata(VaseyLicenseV2Profile::VERSION));
         $this->refusesIssuance('profile_changed', fn () => (new VersionedContractRenderer)->render([], $profile));
         foreach (['app', 'routes', 'config', 'database', 'bootstrap'] as $directory) {
             foreach (File::allFiles(base_path($directory)) as $file) {
-                if (str_starts_with($file->getPathname(), base_path('app/Domain/Contracts/Production/VaseyLicenseV2'))) {
+                if (str_starts_with($file->getPathname(), base_path('app/Domain/Contracts/Production/VaseyLicenseV2'))
+                    || $file->getPathname() === base_path('app/Domain/Grants/VaseyLicenseIssuance.php')) {
                     continue;
                 }
                 $this->assertStringNotContainsString('VaseyLicenseV2PdfRenderer', $file->getContents(), $file->getPathname());

@@ -85,17 +85,27 @@ class VaseyLicenseV2ProfileTest extends TestCase
             array_diff_key($profile, ['version' => true, 'supersedes' => true, 'font_repertoire' => true, 'assets' => true]));
         $this->assertSame(['latin', 'latin-ext'], $profile['font_repertoire']);
 
-        // No issuance path knows it: the test registry refuses it, and only the printable set names it outside its own files.
+        // The test registry refuses it, and outside its own files only the printable set and the gated issuance dispatch
+        // name it; only the four paid and paid-tax issuer classes call that dispatch (the rest name it in comments).
         self::refusesIssuance(fn () => ContractRenderProfileRegistry::metadata('vasey-license-pdf-v2'));
+        $dispatchers = [];
         foreach (['app/Domain/Grants', 'app/Domain/Commerce', 'app/Domain/Contracts', 'app/Http', 'app/Jobs', 'app/Console', 'app/Providers', 'routes', 'config'] as $directory) {
             foreach (File::allFiles(base_path($directory)) as $file) {
+                if (str_contains($file->getContents(), 'VaseyLicenseIssuance') && ! str_ends_with($file->getPathname(), '/app/Domain/Grants/VaseyLicenseIssuance.php')) {
+                    $dispatchers[] = substr($file->getPathname(), strlen(base_path()) + 1);
+                }
                 if (str_contains($file->getPathname(), '/app/Domain/Contracts/Production/VaseyLicenseV2')
-                    || str_ends_with($file->getPathname(), '/app/Domain/Commerce/ContractIdentity/ContractPrintableSet.php')) {
+                    || str_ends_with($file->getPathname(), '/app/Domain/Commerce/ContractIdentity/ContractPrintableSet.php')
+                    || str_ends_with($file->getPathname(), '/app/Domain/Grants/VaseyLicenseIssuance.php')) {
                     continue;
                 }
                 $this->assertStringNotContainsString('VaseyLicenseV2', $file->getContents(), $file->getPathname());
             }
         }
+        sort($dispatchers);
+        $this->assertSame(['app/Domain/Contracts/Production/VaseyLicenseV2PdfRenderer.php', 'app/Domain/Grants/Paid/PaidGrantDocuments.php',
+            'app/Domain/Grants/Paid/PaidGrants.php', 'app/Domain/Grants/PaidTax/PaidTaxDocuments.php', 'app/Domain/Grants/PaidTax/PaidTaxGrants.php',
+            'app/Domain/Grants/VaseyLicenseContractSource.php', 'config/contracts.php'], $dispatchers);
     }
 
     public function test_the_implementation_pin_is_the_derived_closure_of_the_profile_and_the_printable_set(): void

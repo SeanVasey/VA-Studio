@@ -12,6 +12,7 @@ use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Grants\ContractIdentityHolds;
 use App\Domain\Grants\Paid\Models\PaidOrderOrigin;
+use App\Domain\Grants\VaseyLicenseIssuance;
 use App\Domain\Rights\LicenseDisclosure;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
@@ -98,7 +99,10 @@ final class PaidGrants
                         $payload = ['schema_version' => 'paid-grant-origin-v1', 'purpose' => 'paid-license-grant', 'origin_id' => $originId,
                             'batch_id' => $batchId, 'position' => $index + 1, 'source' => $line, 'assets' => $assets,
                             'disclosure' => app(LicenseDisclosure::class)->fromSnapshot($line['license']), 'delivery_policy' => $policy,
-                            'profile' => PaidGrantRenderProfile::current($line['provenance'])];
+                            'profile' => null];
+                        // Contract increment 5: the v2 license renderer for new originals only, behind its own gate; the
+                        // choice is frozen here and every render, retry and replay uses it (VaseyLicenseIssuance).
+                        $payload['profile'] = VaseyLicenseIssuance::decide(PaidGrantRenderInput::fromOrigin($payload))[0] ?? PaidGrantRenderProfile::current($line['provenance']);
                         (new PaidGrantText)->build(PaidGrantRenderInput::fromOrigin($payload));
                         $origin = PaidGrantRecords::insert('paid_grant_origins', ['public_id' => $originId, 'batch_id' => (int) $batch['id'], 'position' => $index + 1,
                             'line_public_id' => $line['line_id'], 'line_hash' => $line['line_hash'], 'source_hash' => $line['source_hash'],
@@ -173,13 +177,14 @@ final class PaidGrants
                 && ($work['state'] === 'complete') === ($original !== []));
             $manifest = $original === [] ? null : PaidGrantRecords::decode($original);
             if ($manifest !== null) {
-                $text = (new PaidGrantText)->build(PaidGrantRenderInput::fromOrigin($body));
+                $text = VaseyLicenseIssuance::selected($body['profile']) ? VaseyLicenseIssuance::expected($body['profile'])
+                    : (new PaidGrantText)->build(PaidGrantRenderInput::fromOrigin($body));
                 PaidGrantException::require($manifest['schema_version'] === 'paid-first-original-v1' && $manifest['origin_hash'] === $origin['payload_hash']
                     && $original['claim_id'] === $work['claim_id'] && $manifest['claim_id'] === $work['claim_id']
                     && $manifest['profile_hash'] === CanonicalJson::hash($body['profile'])
                     && $manifest['input_hash'] === $text['input_hash'] && $manifest['text_digest'] === $text['text_digest']
                     && $manifest['asset_manifest_hash'] === CanonicalJson::hash($body['assets'])
-                    && $manifest['artifact']['profile_hash'] === $manifest['profile_hash']
+                    && $manifest['artifact']['profile_hash'] === VaseyLicenseIssuance::artifactProfileHash($body['profile'])
                     && $manifest['artifact']['purpose'] === 'paid-license-grant' && $manifest['artifact']['provenance'] === $source['provenance']
                     && $manifest['artifact']['storage_path'] === 'contracts/paid/'.$source['provenance'].'/'.$origin['public_id'].'/'.$work['claim_id'].'/original.pdf');
             }

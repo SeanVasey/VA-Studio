@@ -271,6 +271,12 @@ class ProductionRuntimeValidator(unittest.TestCase):
                       "config('production-tax-checkout.contract_identity_v2') === false);", text)
         self.assertEqual(self.validate(profile()).returncode, 0)
 
+    def test_the_v2_license_issuance_literal_is_held(self):
+        # Contract increment 5: selecting the v2 license renderer for new paid originals is a code literal, held false here.
+        text = VALIDATOR.read_text()
+        self.assertIn("$check('holds.vasey_license_v2_issuance', config('contracts.vasey_license_v2_issuance') === false);", text)
+        self.assertEqual(self.validate(profile()).returncode, 0)
+
     def test_the_documented_off_values_are_accepted_and_a_blank_assignment_is_not(self):
         for value in ("false", "(false)"):
             with self.subTest(value=value):

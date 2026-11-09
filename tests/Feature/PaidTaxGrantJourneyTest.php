@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Domain\Commerce\ContractIdentity\ContractIdentityStatements;
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionTaxCheckout\TaxCheckoutSchema;
+use App\Domain\Contracts\Production\VaseyLicenseV2Profile;
 use App\Domain\Customers\ProductionIdentity\IdentityMigrationOwnership;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Grants\ContractIdentityHolds;
@@ -22,8 +23,11 @@ use App\Domain\Grants\PaidTax\PaidTaxReads;
 use App\Domain\Grants\PaidTax\PaidTaxRecords;
 use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
 use App\Domain\Grants\PaidTax\PaidTaxRenderInput;
+use App\Domain\Grants\PaidTax\PaidTaxRenderProfile;
 use App\Domain\Grants\PaidTax\PaidTaxRuntime;
 use App\Domain\Grants\PaidTax\PaidTaxTransaction;
+use App\Domain\Grants\VaseyLicenseIssuance;
+use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
@@ -39,6 +43,7 @@ use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\PaidTaxGrantFixtures;
 use Tests\Support\ProductionTaxCheckoutContractIdentityForgery;
 use Tests\Support\RecordingTaxCheckoutTransport;
+use Tests\Support\VaseyLicenseIssuanceFixtures;
 use Tests\TestCase;
 
 /** Actual local SMTP enrollment and retained synthetic Tax payment; no host/provider acceptance claim. */
@@ -47,6 +52,7 @@ class PaidTaxGrantJourneyTest extends TestCase
     use FinalizationDatabaseMigrations;
     use PaidTaxGrantFixtures;
     use ProductionTaxCheckoutContractIdentityForgery;
+    use VaseyLicenseIssuanceFixtures;
 
     protected function setUp(): void
     {
@@ -171,6 +177,72 @@ class PaidTaxGrantJourneyTest extends TestCase
         $this->assertSame($bytes, $rendered->pdfBytes, 'The genuine isolated renderer changed the same retained original.');
         $this->assertDatabaseCount('paid_tax_originals', 1);
         $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    /** A paid V2 tax order on a synthetic schema 5 license with a v2 declaration, finalized. */
+    private function paidV2TaxOrder(string $legalName = 'Ștefan Țepeș'): array
+    {
+        config(['production-tax-checkout.contract_identity_v2' => true]);
+        $f = $this->taxOrder('exclusive', 2500, ['licenseeType' => 'individual', 'legalName' => $legalName, 'legalNameConfirmed' => true,
+            'postalAddress' => ['country' => 'US', 'lines' => ['1 Example Street'], 'locality' => 'Springfield', 'region' => 'IA', 'postalCode' => '50000'],
+            'statementVersion' => ContractIdentityStatements::offered()['individual']['statementVersion']], self::v2LicenseTerms(), self::v2LicenseContent());
+        self::configureTax(self::SYNTHETIC_PROVIDER);
+        $f['checkout']->initiate($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+        $f['transport']->lineTax = 437;
+        $f['transport']->paid = true;
+        $this->assertSame('verified', $f['checkout']->reconcile($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['paymentStatus']);
+        $f['retained'] = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+
+        return $f;
+    }
+
+    /**
+     * Contract increment 5 wiring: with the selection gate on, a paid-tax v2 order issues a `vasey-license-pdf-v2` original
+     * (the pre-tax fee, the Latin Extended name), under the profile its origin recorded even after the gate flips off.
+     */
+    public function test_with_the_v2_issuance_gate_on_a_v2_tax_order_issues_a_v2_license_original_under_its_recorded_profile(): void
+    {
+        $this->enableV2Issuance();
+        $f = $this->paidV2TaxOrder();
+        $originRow = (array) DB::table('paid_tax_grant_origins')->sole();
+        $body = PaidTaxRecords::decode($originRow);
+        $this->assertTrue(VaseyLicenseIssuance::selected($body['profile']));
+        $this->assertSame([VaseyLicenseV2Profile::VERSION, 'paid-tax-license-grant'], [$body['profile']['version'], $body['profile']['purpose']]);
+
+        config(['contracts.vasey_license_v2_issuance' => false]);
+        $complete = (new PaidTaxDocuments)->prepare($f['retained']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertTrue($complete['fulfilled']);
+        $manifest = PaidTaxRecords::decode((array) DB::table('paid_tax_originals')->sole());
+        $bytes = (new PaidTaxFiles)->verify($manifest['artifact']);
+        $effective = VaseyLicenseIssuance::artifactProfileHash($body['profile']);
+        $this->assertSame([$effective, CanonicalJson::hash($body['profile'])], [$manifest['artifact']['profile_hash'], $manifest['profile_hash']]);
+        $this->assertStringContainsString('vasey-license-pdf-v2,'.$effective, $bytes);
+        $text = $this->extractPdfText($bytes);
+        $this->assertSame(2, substr_count($text, 'Ștefan Țepeș'), $text);
+        // The contract states the pre-tax fee (the line subtotal), not the taxed total.
+        $this->assertStringContainsString('fee $49.99 (forty-nine dollars and ninety-nine cents)', $text);
+
+        config(['contracts.vasey_license_v2_issuance' => true]);
+        $this->assertSame($complete, (new PaidTaxDocuments)->prepare($f['retained']['id'], $f['buyer']['principal'], $f['buyer']['user']));
+        $this->assertSame($f['retained']['id'], (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['id']);
+        $this->assertSame($originRow, (array) DB::table('paid_tax_grant_origins')->sole());
+        $this->assertDatabaseCount('paid_tax_originals', 1);
+        $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    /** Gate off: the same v2-capable tax order keeps the existing paid-tax profile and its exact bytes. */
+    public function test_with_the_v2_issuance_gate_off_the_existing_paid_tax_profile_and_bytes_are_unchanged(): void
+    {
+        $this->enableV2Issuance(false);
+        $f = $this->paidV2TaxOrder();
+        $body = PaidTaxRecords::decode((array) DB::table('paid_tax_grant_origins')->sole());
+        $this->assertSame(CanonicalJson::encode(PaidTaxRenderProfile::current('synthetic_rehearsal')), CanonicalJson::encode($body['profile']));
+        config(['contracts.vasey_license_v2_issuance' => true]);
+        $this->assertTrue((new PaidTaxDocuments)->prepare($f['retained']['id'], $f['buyer']['principal'], $f['buyer']['user'])['fulfilled']);
+        $manifest = PaidTaxRecords::decode((array) DB::table('paid_tax_originals')->sole());
+        $bytes = (new PaidTaxFiles)->verify($manifest['artifact']);
+        $this->assertSame($bytes, app(PaidTaxRendererProcess::class)->render(PaidTaxRenderInput::fromOrigin($body), $body['profile'])->pdfBytes);
+        $this->assertStringNotContainsString('vasey-license-pdf-v2', $bytes);
     }
 
     /**

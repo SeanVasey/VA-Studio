@@ -1,7 +1,9 @@
 # Production buyer contracts from Sean's license templates (plan, 2026-11-07)
 
 Status: **plan; increment 3 (variable binding) is implemented as a pure binder, and increment 4 (the `vasey-license-pdf-v1`
-profile) is built and pinned. Neither is wired into issuance or selected by any issuer.** It narrows the production part of
+profile) is built and pinned. Neither is wired into issuance or selected by any issuer. The `vasey-license-pdf-v2` successor
+is selectable for new paid originals only behind a literal-false, local/testing-only gate (2026-11-08, "Issuer wiring"
+below).** It narrows the production part of
 [U-06](architecture/decision-register.md) and follows from the real BeatStars contract evidence (SRC-027 to SRC-034,
 [dry-run record](verification/beatstars-catalog-dry-run-20261107/README.md)). Buyer contracts stay test-only until each gate
 below is met.
@@ -352,7 +354,7 @@ country name prints.
 - Tests: `VaseyLicenseV2ProfileTest` (pin, sources, closure, tamper refusals, counts, the subset of the paid renderers' rule,
   per-face drawability, names) and the Latin Extended cases in both checkout identity tests.
 
-**v2 renderer (increment 5, part 2, built 2026-11-08, not selected for issuance).** `VaseyLicenseV2PdfRenderer` is the
+**v2 renderer (increment 5, part 2, built 2026-11-08; selectable for new paid originals only behind a local/testing gate).** `VaseyLicenseV2PdfRenderer` is the
 successor of `VaseyLicensePdfRenderer`, which v1's manifest pins to `VaseyLicenseProfile` and which therefore stays
 byte-identical.
 
@@ -366,9 +368,9 @@ byte-identical.
   the document under it.
 - Pin: the renderer is a root of `VaseyLicenseV2Implementation`; its closure adds the reused v1 classes, the binder and the
   census, so a change to any of them refuses v2 (`profile_changed`) until the v2 manifest is rebuilt. Manifest SHA-256
-  `1e02e732…c30af5e`.
-- Golden: the synthetic business render is `ec2f685b…bb3dc157` (GD 2.3.3, zlib 1.3, as v1's). It changes with every v2
-  manifest rebuild, because the document ID and keywords carry the profile hash.
+  `bcd40954…34c4dd82` since the wiring change below (was `1e02e732…c30af5e`).
+- Golden: the synthetic business render is `2b2a04e4…a2cc8403` (GD 2.3.3, zlib 1.3, as v1's; was `ec2f685b…bb3dc157`). It
+  changes with every v2 manifest rebuild, because the document ID and keywords carry the profile hash.
 - Tests (`VaseyLicenseV2PdfRendererTest`): determinism and golden hash, dates, embedded `/BaseFont` names, keywords;
   "Łukasz Żółć", "Đorđe Kılıç SRL", "Ștefan Țepeș", "Dvořák Őrsi" and "MC Ęwa Mąkowska" render and extract with
   `pdftotext`, while v1 refuses the same document; every codepoint checkout accepts (357) is in `coverage()`, passes the
@@ -387,23 +389,60 @@ byte-identical.
 
 - [x] Decide the repertoire: Latin Extended successor (2026-11-08). Built and checkout rebound (above).
 - [x] A v2 renderer (part 2, above). A buyer accepted at checkout with, say, "Ł" is rendered by the `test-v2` paid
-  renderers until the v2 renderer is wired in.
+  renderers unless the gated v2 selection below picks the line.
 - Run the census and a golden render with the v2 renderer on the six real templates, locally, from private paths. Sean
   reviews the rendered layout, the block labels and the acceptance block wording.
 - Install the real signature on the private disk with its pin. Confirm the golden hash on the Forge host (above), and reset
   opcache on every deploy of pinned files.
 - Decide on the held tc-lib updates (#162/#164).
-- Wire the v2 renderer into the paid and paid-tax issuers for new issuance only, with independent review. This also needs the
-  D-30 prerequisites: steps 2, 3a and 3b and the U-13 retention values.
+- [x] Wire the v2 renderer into the paid and paid-tax issuers for new issuance only, **behind a local/testing gate**
+  (2026-11-08, below). Activation still needs independent review, the D-30 prerequisites (steps 2, 3a and 3b and the U-13
+  retention values), contract increment 1 (the license versions' v2 contract text) and the items below.
   Wiring conditions from the v2 renderer review (2026-11-08):
-  - `render()` must accept only documents built by `VaseyLicenseV2PdfRenderer::document()` (for example a `WeakMap` of the
-    documents it built, refusing anything else with `unsupported_input`). `VaseyLicenseDocument` does not record which
-    coverage built it, and the layout's per-face check has no script restriction, so a document built under a wider set
-    (such as `test-v2`) could otherwise print characters checkout refuses.
-  - Declarations frozen before #241 under the `test-v2` set stay on the `test-v2` renderers, or refuse before payment.
-  - Map `InvalidArgumentException` and `JsonException` from `ContractPrintableSet` (tampered metrics) to `profile_changed`.
-  - Add a test that a font file swapped after `verifyRuntime` refuses (the font copy must use the hashed bytes; v1 lacks it
-    too), and cover zero-width template glyphs in the six-template census.
+  - [x] `render()` accepts only documents built by `VaseyLicenseV2PdfRenderer::document()`: a process-wide `WeakMap` of the
+    documents it built; anything else refuses `unsupported_input`. `VaseyLicenseDocument` does not record which coverage
+    built it, and the layout's per-face check has no script restriction, so a document built under a wider set (such as
+    `test-v2`) could otherwise print characters checkout refuses. Test: documents built directly under the v2, `test-v2` and
+    v1 sets refuse, including one carrying Greek.
+  - [x] Declarations frozen before #241 under the `test-v2` set never reach v2: finalization already holds any v2
+    declaration that does not re-verify against checkout's set (`contract_identity_held`), and the selection rule repeats
+    the check (`identity_held`). Legacy name-only declarations keep the existing paid profiles. Neither refuses because of
+    the switch.
+  - [x] `InvalidArgumentException` and `JsonException` from `ContractPrintableSet` (tampered metrics) map to `profile_changed`
+    in `coverage()`, so `document()` refuses with it too. Test: a flipped byte in each of the four metric files.
+  - [x] A font file swapped after `verifyRuntime` refuses (`profile_changed`): the private font copy is written from the bytes
+    `assetBytes()` hashed. Test: a test-only hook on the renderer (refused outside `testing`) swaps a metric or font program
+    between verification and use.
+  - [ ] Cover zero-width template glyphs in the six-template census. Remaining: the census runs on the private templates,
+    which are not in Git; no template is fabricated for it.
+
+**Issuer wiring (built 2026-11-08, local and testing only).** `App\Domain\Grants\VaseyLicenseIssuance` is the dispatch. The
+pinned paid renderers, their child processes and profiles (`paid-v1`, `paid-tax-v2`) are unchanged; the dispatch sits in the
+unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's grant origin is created, `PaidGrantDocuments`/
+`PaidTaxDocuments` render by the recorded profile, and both graph checks verify a v2 original against frozen digests.
+
+- **Gate.** `contracts.vasey_license_v2_issuance`, a code literal `false` (no environment read), admitted only as an exact
+  `true` in `local` or `testing`. `ops/production/validate-runtime.php` holds it false (`holds.vasey_license_v2_issuance`).
+- **Selection rule**, once per line at origin creation (paid-grant finalization, after the payment is recorded): the gate is
+  on; the declaration is a v2 one; it re-verifies against checkout's printable set; a `VaseyLicenseContractSource` is bound
+  and returns a template and the two license constants for the line's license version; the configured signature reads and
+  matches its pin; and the line binds (schema 5 terms) and its document builds under the v2 input rule. Otherwise the line
+  keeps the family's existing profile, so a paid line is never refused because of the switch. Nothing in the application
+  binds `VaseyLicenseContractSource` yet: contract increment 1 supplies the text, and tests bind a synthetic source.
+- **Recorded profile.** The origin's `profile` becomes a selection descriptor (`paid-vasey-license-v2-selection-v1`): the
+  template and constants, the signature pin, the v2 profile and its hash, the effective hash (profile and signature), and the
+  document's input hash and text digest. Every render, retry and replay uses it, whatever the gate says later. At render the
+  document is rebuilt from the frozen input and must match the frozen input hash; the PDF must carry the frozen effective
+  hash and text digest; a different signature refuses `signature_changed`; a changed profile refuses `profile_changed`.
+  The stored original records the effective hash as its artifact profile hash and the descriptor's hash as the manifest's.
+  A completed v2 original is checked against the frozen digests and never re-rendered or re-bound.
+- **Gate off.** Origins record `PaidGrantRenderProfile::current()` / `PaidTaxRenderProfile::current()` as before, and the
+  stored originals equal the existing isolated renderers' bytes (journey tests compare them).
+- **Not yet:** the v2 render runs in the PHP worker, not in an isolated child process like the paid renderers (its renderer
+  needs the application's binder, validator and private-disk signature rules). Decide before activation whether that is
+  acceptable or whether a child script is needed.
+- Tests: `VaseyLicenseIssuanceTest`, the wiring-condition tests in `VaseyLicenseV2PdfRendererTest`, gate-on and gate-off
+  journeys in `PaidGrantDocumentJourneyTest` and `PaidTaxGrantJourneyTest`, and the production hold in `tests/ops`.
 
 ### Wording item for Sean
 

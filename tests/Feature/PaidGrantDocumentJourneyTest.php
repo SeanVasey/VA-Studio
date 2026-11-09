@@ -8,6 +8,10 @@ use App\Domain\Commerce\ProductionCheckout\CheckoutSchema;
 use App\Domain\Commerce\ProductionCheckout\HostedCheckout;
 use App\Domain\Commerce\ProductionCheckout\ProductionCheckout;
 use App\Domain\Commerce\ProductionCheckout\TaxExemptions;
+use App\Domain\Commerce\ProductionPolicy\PrepareProductionTrackCapabilities;
+use App\Domain\Commerce\ProductionPolicy\ReviewProductionTrackCapabilities;
+use App\Domain\Commerce\ProductionPolicy\SaveProductionTrackCapabilities;
+use App\Domain\Contracts\Production\VaseyLicenseV2Profile;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
@@ -23,9 +27,13 @@ use App\Domain\Grants\Paid\PaidGrantFiles;
 use App\Domain\Grants\Paid\PaidGrantProjectionRead;
 use App\Domain\Grants\Paid\PaidGrantRecords;
 use App\Domain\Grants\Paid\PaidGrantRendererProcess;
+use App\Domain\Grants\Paid\PaidGrantRenderInput;
+use App\Domain\Grants\Paid\PaidGrantRenderProfile;
 use App\Domain\Grants\Paid\PaidGrantRows;
 use App\Domain\Grants\Paid\PaidGrants;
 use App\Domain\Grants\Paid\PaidGrantSchema;
+use App\Domain\Grants\VaseyLicenseIssuance;
+use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -39,7 +47,10 @@ use Tests\Support\ProductionCheckoutContractIdentityForgery;
 use Tests\Support\ProductionCheckoutFixtures;
 use Tests\Support\ProductionCheckoutGatewayFixture;
 use Tests\Support\ProductionCheckoutJourneyFixture;
+use Tests\Support\ProductionCheckoutProviderFixtures;
+use Tests\Support\ProductionTrackPreparationFixtures;
 use Tests\Support\QuoteFixtures;
+use Tests\Support\VaseyLicenseIssuanceFixtures;
 use Tests\TestCase;
 
 /** Actual SMTP-enrolled buyer + frozen synthetic paid source. No live payment/legal facts are certified. */
@@ -49,6 +60,7 @@ final class PaidGrantDocumentJourneyTest extends TestCase
     use PaidGrantDependencyFixtures;
     use ProductionCheckoutContractIdentityForgery;
     use ProductionCheckoutJourneyFixture;
+    use VaseyLicenseIssuanceFixtures;
 
     protected function beforeRefreshingDatabase(): void
     {
@@ -205,6 +217,126 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $this->assertCount(2, $complete['lines'][0]['files']);
         $this->assertDatabaseCount('paid_originals', 1);
         $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    /**
+     * The V1 catalog of ProductionCheckoutFixtures::catalog(), with a synthetic schema 5 license version (the binder binds
+     * only schema 5 terms) and the V1 contract identity capture on, paid with a v2 declaration and finalized.
+     */
+    private function paidV2Order(string $legalName = 'Łukasz Żółć'): array
+    {
+        config(['production_checkout.contract_identity_v2' => true]);
+        ProductionCheckoutProviderFixtures::configure();
+        $fixture = ProductionTrackPreparationFixtures::prepared(licenseTerms: self::v2LicenseTerms(), licenseContent: self::v2LicenseContent());
+        $machine = ProductionCheckoutProviderFixtures::machine();
+        $candidate = app(SaveProductionTrackCapabilities::class)->applyReviewed(
+            app(PrepareProductionTrackCapabilities::class)->review($fixture['candidate'], $fixture['source'], $machine, $fixture['actor']), $fixture['actor']);
+        app(ReviewProductionTrackCapabilities::class)->applyReviewed(app(ReviewProductionTrackCapabilities::class)->review($candidate, $fixture['reviewer']),
+            ProductionTrackPreparationFixtures::reference('software_choices_reviewed'), $fixture['reviewer']);
+        config(['production_checkout.exemption_authoring_enabled' => true, 'production_checkout.exemption_policy_owner_ids' => [$fixture['actor']->id]]);
+        $catalog = array_replace($fixture, compact('machine', 'candidate'));
+        $buyer = $this->enrollThroughLocalSmtp();
+        $access = new ProductionCustomerAccess;
+        $authority = app(ApproveExemptionAuthority::class)->approve($catalog['candidate']->id, ProductionCheckoutFixtures::exemptionPolicy($catalog), 'synthetic-owner-policy', $catalog['actor']);
+        $basis = (new TaxExemptions($access))->qualify($buyer['principal'], $buyer['user'], $authority['public_id'], $catalog['items'],
+            ['qualified_exemption_confirmed' => true, 'reference' => 'synthetic:buyer-bound-qualification', 'source_sha256' => hash('sha256', 'NONBINDING SYNTHETIC BUYER EXEMPTION'),
+                'effective_from' => CarbonImmutable::now('UTC')->subDay()->format('Y-m-d\TH:i:s\Z'),
+                'effective_until' => CarbonImmutable::now('UTC')->addDays(30)->format('Y-m-d\TH:i:s\Z')], 'synthetic-qualified-buyer', $catalog['actor']);
+        $checkout = new ProductionCheckout($access);
+        $review = $checkout->review($buyer['principal'], $buyer['user'], $catalog['candidate']->id, $catalog['items'], $basis['public_id'],
+            ['licenseeType' => 'individual', 'legalName' => $legalName, 'legalNameConfirmed' => true,
+                'postalAddress' => ['country' => 'US', 'lines' => ['1 Example Street'], 'locality' => 'Springfield', 'region' => 'IA', 'postalCode' => '50000'],
+                'statementVersion' => ContractIdentityStatements::offered()['individual']['statementVersion']], 'synthetic-v2-review');
+        $order = $checkout->accept($buyer['principal'], $buyer['user'], $review['reviewId'], $review['reviewHash'], true, 'synthetic-v2-accept');
+        $gateway = new ProductionCheckoutGatewayFixture;
+        $hosted = new HostedCheckout($access, $gateway);
+        $hosted->initiate($buyer['principal'], $buyer['user'], $order['orderId']);
+        $gateway->paid = true;
+        $this->assertSame('verified', $hosted->reconcile($buyer['principal'], $buyer['user'], $order['orderId'])['paymentStatus']);
+        $batch = (new PaidGrants)->finalize($buyer['principal'], $buyer['user'], $order['orderId']);
+
+        return compact('buyer', 'order', 'batch');
+    }
+
+    /**
+     * Contract increment 5 wiring: with the selection gate on, a v2 declaration on a schema 5 license with a contract source
+     * issues a `vasey-license-pdf-v2` original. The origin records the selection; a later gate flip does not change the
+     * render, the retry or the replay, and the original downloads by its stored bytes.
+     */
+    public function test_with_the_v2_issuance_gate_on_a_v2_order_issues_a_v2_license_original_under_its_recorded_profile(): void
+    {
+        $this->enableV2Issuance();
+        $f = $this->paidV2Order();
+        $origin = PaidGrantRecords::decode((array) DB::table('paid_grant_origins')->sole());
+        $this->assertTrue(VaseyLicenseIssuance::selected($origin['profile']));
+        $this->assertSame([VaseyLicenseV2Profile::VERSION, 'paid-license-grant', self::SYNTHETIC_TEMPLATE],
+            [$origin['profile']['version'], $origin['profile']['purpose'], $origin['profile']['contract']['template']]);
+        $originRow = (array) DB::table('paid_grant_origins')->sole();
+
+        // The gate flips off before the render: the recorded profile still decides it.
+        config(['contracts.vasey_license_v2_issuance' => false]);
+        $complete = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertTrue($complete['fulfilled']);
+        $manifest = PaidGrantRecords::decode((array) DB::table('paid_originals')->sole());
+        $bytes = app(PaidGrantFiles::class)->verify($manifest['artifact']);
+        $effective = VaseyLicenseIssuance::artifactProfileHash($origin['profile']);
+        $this->assertSame([$effective, CanonicalJson::hash($origin['profile'])], [$manifest['artifact']['profile_hash'], $manifest['profile_hash']]);
+        $this->assertSame(VaseyLicenseIssuance::expected($origin['profile']), ['input_hash' => $manifest['input_hash'], 'text_digest' => $manifest['text_digest']]);
+        $this->assertStringContainsString('vasey-license-pdf-v2,'.$effective, $bytes);
+        $this->assertStringNotContainsString('VASEY.AUDIO paid grant profile v1', $bytes);
+        $text = $this->extractPdfText($bytes);
+        $this->assertSame(2, substr_count($text, 'Łukasz Żółć'), $text);
+        $this->assertStringContainsString('SYNTHETIC TEST TEMPLATE', $text);
+
+        // Replays: preparation, finalization and the origin are unchanged with the gate in either state.
+        $this->assertSame($complete, (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']));
+        config(['contracts.vasey_license_v2_issuance' => true]);
+        $this->assertSame($f['batch']['id'], (new PaidGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId'])['id']);
+        $this->assertSame($originRow, (array) DB::table('paid_grant_origins')->sole());
+        $this->assertDatabaseCount('paid_originals', 1);
+        $this->assertSame(1, (int) DB::table('paid_document_work')->sole()->attempts);
+
+        $auth = (new PaidGrantDownloads)->authorize($complete['id'], $complete['lines'][0]['id'],
+            ['requestKey' => (string) Str::uuid(), 'originHash' => $complete['lines'][0]['originHash'], 'kind' => 'contract', 'nonce' => bin2hex(random_bytes(32))],
+            $f['buyer']['principal'], $f['buyer']['user']);
+        $transfer = (new PaidGrantDownloads)->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user']);
+        $downloaded = '';
+        $transfer->writeTo(static function (string $chunk) use (&$downloaded): void {
+            $downloaded .= $chunk;
+        });
+        $this->assertSame($bytes, $downloaded);
+        $this->assertDatabaseCount('license_grants', 0);
+    }
+
+    /**
+     * Gate off (the shipped literal): the same v2-capable order keeps the existing paid profile and its exact bytes, and a
+     * gate flipped on after the origin exists does not move it to v2. Name-only orders keep it with the gate on.
+     */
+    public function test_with_the_v2_issuance_gate_off_the_existing_paid_profile_and_bytes_are_unchanged(): void
+    {
+        $this->enableV2Issuance(false);
+        $f = $this->paidV2Order();
+        $origin = PaidGrantRecords::decode((array) DB::table('paid_grant_origins')->sole());
+        $this->assertSame(CanonicalJson::encode(PaidGrantRenderProfile::current('synthetic_rehearsal')), CanonicalJson::encode($origin['profile']));
+
+        config(['contracts.vasey_license_v2_issuance' => true]);
+        $complete = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+        $this->assertTrue($complete['fulfilled']);
+        $manifest = PaidGrantRecords::decode((array) DB::table('paid_originals')->sole());
+        $bytes = app(PaidGrantFiles::class)->verify($manifest['artifact']);
+        $this->assertSame($bytes, app(PaidGrantRendererProcess::class)->render(PaidGrantRenderInput::fromOrigin($origin), $origin['profile'])->pdfBytes);
+        $this->assertStringContainsString('VASEY.AUDIO paid grant profile v1', $bytes);
+        $this->assertStringNotContainsString('vasey-license-pdf-v2', $bytes);
+    }
+
+    public function test_a_name_only_order_keeps_the_existing_paid_profile_with_the_v2_issuance_gate_on(): void
+    {
+        $this->enableV2Issuance();
+        $f = $this->retained();
+        $origin = PaidGrantRecords::decode((array) DB::table('paid_grant_origins')->sole());
+        $this->assertSame(['identity_meaning', 'legal_name'], array_keys($origin['source']['buyer_declarations']));
+        $this->assertSame(CanonicalJson::encode(PaidGrantRenderProfile::current('synthetic_rehearsal')), CanonicalJson::encode($origin['profile']));
+        $this->assertTrue((new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'])['fulfilled']);
     }
 
     /**
