@@ -46,6 +46,15 @@ final class RetentionSchedule
         'not_applicable' => null,
     ];
 
+    /**
+     * `CustomerDataRights::RETAINED` labels that are not a single period key, with the classes their tables may take: a record
+     * kept indefinitely, and a production checkout review kept with its order or, with no order, for the abandoned-checkout period.
+     */
+    public const RETAINED_LABELS = [
+        'indefinite' => ['indefinite'],
+        'with_order_or_abandoned_checkout_days' => ['indefinite', 'abandoned_checkout'],
+    ];
+
     /** Shared rationales of the families the 2026-11-09 decisions hold with the order (PRIVACY section 7 orders row). */
     private const WITH_ORDER = 'Held with the order (PRIVACY section 7 orders row, decided 2026-11-09): ';
 
@@ -169,21 +178,24 @@ final class RetentionSchedule
         ['table' => 'password_reset_tokens', 'family' => null, 'class' => 'security', 'clock' => null,
             'rationale' => 'PRIVACY verification row (12 months); keyed by email with no primary key to scan in ranges, so held. Tokens expire within the hour.'],
         ['table' => 'production_identity_challenges', 'family' => null, 'class' => 'security',
-            'clock' => ['columns' => ['created_at', 'expires_at'], 'unless_referenced' => [['production_identity_origins', 'initial_challenge_id']]],
-            'rationale' => 'PRIVACY verification row, 12 months; the enrollment challenge an identity origin was created from is kept with that origin.'],
+            'clock' => ['columns' => ['created_at', 'expires_at'], 'unless_referenced' => [['production_identity_origins', 'initial_challenge_id'],
+                ['production_identity_verifications', 'challenge_id']]],
+            'rationale' => 'PRIVACY verification row, 12 months; a challenge an identity origin or a verification references is part of the verified chain and is kept with it.'],
         ['table' => 'production_identity_notices', 'family' => null, 'class' => 'security', 'clock' => ['columns' => ['created_at']],
             'rationale' => 'Verification code notice of a production identity challenge; PRIVACY verification row, 12 months.'],
         ['table' => 'production_identity_attempts', 'family' => null, 'class' => 'security', 'clock' => ['columns' => ['started_at', 'lease_expires_at']],
             'rationale' => 'Send attempt of a verification notice; PRIVACY verification row, 12 months.'],
         ['table' => 'production_identity_outcomes', 'family' => null, 'class' => 'security', 'clock' => ['columns' => ['created_at']],
             'rationale' => 'Result of a notice send attempt; bound to the attempt, not to an order, so PRIVACY verification row, 12 months.'],
-        ['table' => 'production_identity_verifications', 'family' => null, 'class' => 'security', 'clock' => ['columns' => ['created_at']],
-            'rationale' => 'Completed verification of a production identity; PRIVACY verification row, 12 months.'],
+        ['table' => 'production_identity_verifications', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'verification chain of an identity origin; every production read re-verifies it from sequence 1, and sealed order, grant, invoice and checkout bindings name it.'],
         ['table' => 'production_identity_addresses', 'family' => null, 'class' => 'security', 'clock' => null,
             'rationale' => 'Address hash with no timestamp; one an identity origin binds is kept with the orders that origin is sealed into. Held.'],
-        // Rights and security evidence (RETAINED evidence): 7 years after the event, or after the request closes.
-        ['table' => 'audit_events', 'family' => 'audit_events', 'class' => 'evidence', 'clock' => ['columns' => ['created_at']],
-            'rationale' => 'PRIVACY: security and administration events, 7 years after the event; proves deletions, role changes and held orders.'],
+        // Audit events evidence license approvals, exclusive activations, payments, finalizations and refunds of records kept
+        // indefinitely, so they are kept with those records.
+        ['table' => 'audit_events', 'family' => 'audit_events', 'class' => 'indefinite', 'clock' => null,
+            'rationale' => 'Evidence of license approvals, exclusive activations, payments, finalizations, refunds, role changes and deletions; kept with the records it proves.'],
+        // Privacy request records (RETAINED evidence): 7 years after the request closes.
         ['table' => 'customer_data_requests', 'family' => 'customer_data_requests', 'class' => 'evidence', 'clock' => ['columns' => ['resolved_at']],
             'rationale' => 'PRIVACY: 7 years after the request closes; an open request has no resolved_at and is never past.'],
         ['table' => 'customer_data_request_events', 'family' => 'customer_data_requests', 'class' => 'evidence',

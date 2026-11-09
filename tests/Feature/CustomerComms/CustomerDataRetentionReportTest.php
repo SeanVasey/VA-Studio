@@ -8,6 +8,7 @@ use App\Domain\Customers\DataRights\PaidGrantExportSection;
 use App\Domain\Customers\DataRights\ProductionCheckoutExportSection;
 use App\Domain\Customers\DataRights\RetentionSchedule;
 use App\Domain\Customers\Preferences\CustomerConsentPreferences;
+use App\Domain\Customers\ProductionIdentity\CompleteIdentity;
 use App\Domain\Delivery\IssueTestDelivery;
 use App\Domain\Inquiries\InquiryConversation;
 use App\Domain\Inquiries\OrderInquiry;
@@ -34,8 +35,8 @@ class CustomerDataRetentionReportTest extends TestCase
     use FinalizationDatabaseMigrations;
     use ProductionCheckoutJourneyFixture;
 
-    /** Rights and security evidence (2026-11-09): 7 years after the event, or after the request closes. */
-    private const EVIDENCE = ['audit_events', 'customer_data_requests', 'customer_data_request_events', 'customer_data_exports'];
+    /** Privacy request records (2026-11-09, review of #255): 7 years after the request closes. */
+    private const EVIDENCE = ['customer_data_requests', 'customer_data_request_events', 'customer_data_exports'];
 
     /** Download and redemption records (2026-11-09): held with the order, never on their own authorization timestamps. */
     private const DOWNLOAD_RECORDS = ['test_delivery_authorizations', 'test_delivery_redemptions', 'paid_authorizations', 'paid_redemptions',
@@ -78,7 +79,8 @@ class CustomerDataRetentionReportTest extends TestCase
             $members = array_filter(RetentionSchedule::ENTRIES, fn (array $entry): bool => $entry['family'] === $family);
             $this->assertNotEmpty($members, "RETAINED record {$family} has no table in the retention schedule.");
             foreach ($members as $entry) {
-                $this->assertContains($entry['class'], [array_search($key, RetentionSchedule::CLASSES, true), 'indefinite'], $entry['table']);
+                $allowed = RetentionSchedule::RETAINED_LABELS[$key] ?? [array_search($key, RetentionSchedule::CLASSES, true), 'indefinite'];
+                $this->assertContains($entry['class'], $allowed, $entry['table']);
             }
         }
 
@@ -148,8 +150,16 @@ class CustomerDataRetentionReportTest extends TestCase
             }
         }
 
-        // Rights and security evidence: 7 years after the event, or after the request closes (an open request is never past).
-        $this->assertSame(['columns' => ['created_at']], $byTable['audit_events']['clock']);
+        // Privacy request records: 7 years after the request closes (an open request is never past). Audit events prove records
+        // kept indefinitely (license approvals, exclusive activations, payments, refunds), so they are kept with them.
+        $this->assertSame(['indefinite', null], [$byTable['audit_events']['class'], $byTable['audit_events']['clock']]);
+        $this->assertSame('indefinite', CustomerDataRights::RETAINED['audit_events']);
+        $this->assertSame(['indefinite'], RetentionSchedule::RETAINED_LABELS['indefinite']);
+        // The production identity chain every production read re-verifies is never counted: verifications are kept with the
+        // origin, and a challenge an origin or a verification references is held.
+        $this->assertSame(['indefinite', null], [$byTable['production_identity_verifications']['class'], $byTable['production_identity_verifications']['clock']]);
+        $this->assertSame([['production_identity_origins', 'initial_challenge_id'], ['production_identity_verifications', 'challenge_id']],
+            $byTable['production_identity_challenges']['clock']['unless_referenced']);
         $this->assertSame(['columns' => ['resolved_at']], $byTable['customer_data_requests']['clock']);
         $this->assertSame(['via' => ['request_id', 'customer_data_requests']], $byTable['customer_data_request_events']['clock']);
         $this->assertSame(['via' => ['request_id', 'customer_data_requests']], $byTable['customer_data_exports']['clock']);
@@ -332,8 +342,9 @@ class CustomerDataRetentionReportTest extends TestCase
         $this->assertSame(['past_period' => 1, 'oldest_due' => $due, 'newest_due' => $due, 'clock_index' => 'missing'], $report['customer_data_requests']);
         $this->assertSame(['past_period' => $resolvedEvents, 'follows' => 'customer_data_requests'], $report['customer_data_request_events']);
         $this->assertSame(['past_period' => 1, 'follows' => 'customer_data_requests'], $report['customer_data_exports']);
-        $this->assertSame(DB::table('audit_events')->where('created_at', '<=', $start->addYear()->format('Y-m-d H:i:s'))->count(), $report['audit_events']['past_period']);
-        $this->assertGreaterThan(0, $report['audit_events']['past_period']);
+        // Audit events, however old, are never counted: they prove records kept indefinitely.
+        $this->assertGreaterThan(0, DB::table('audit_events')->where('created_at', '<=', $start->addYear()->format('Y-m-d H:i:s'))->count());
+        $this->assertArrayNotHasKey('audit_events', $report);
         $this->assertStringContainsString('class=evidence years=7 cutoff='.$start->addYear()->toDateString(), $output);
         // Only the attachment of the conversation without an order follows it; the order conversation and the project attachment never.
         $this->assertSame(['past_period' => 1, 'follows' => 'customer_inquiries'], $report['support_attachments']);
@@ -443,8 +454,8 @@ class CustomerDataRetentionReportTest extends TestCase
         $this->assertSame(1, $report['customer_data_requests']['past_period']);
         $this->assertSame(DB::table('customer_data_request_events')->where('request_id', $closed)->count(), $report['customer_data_request_events']['past_period']);
         $this->assertSame(1, $report['customer_data_exports']['past_period']);
-        $this->assertSame(DB::table('audit_events')->where('created_at', '<=', $start->format('Y-m-d H:i:s'))->count(), $report['audit_events']['past_period']);
-        $this->assertGreaterThan(0, $report['audit_events']['past_period']);
+        $this->assertGreaterThan(0, DB::table('audit_events')->where('created_at', '<=', $start->format('Y-m-d H:i:s'))->count());
+        $this->assertArrayNotHasKey('audit_events', $report, 'Audit events are never counted.');
         // The open request is never past, however old; nor are its events.
         $this->travelTo($start->addYears(60));
         [$report] = $this->report();
@@ -469,6 +480,20 @@ class CustomerDataRetentionReportTest extends TestCase
             $fixture['basis']['public_id'], ['legalName' => 'Declared synthetic buyer'], 'synthetic-review-abandoned');
         $this->assertSame([2, 1], [DB::table('production_checkout_reviews')->count(), DB::table('production_checkout_orders')->count()]);
         $this->assertMatchesRegularExpression('/\A\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ\z/', DB::table('production_checkout_reviews')->value('created_at'));
+        // A completed recovery extends the verified chain (sequence 2, a recover challenge that only a verification references),
+        // and a second recovery is requested but never completed.
+        $email = $fixture['buyer']['user']->email;
+        $this->requestIdentity('recover', $email);
+        $received = $this->smtp('accept', (int) DB::table('production_identity_notices')->orderByDesc('id')->value('id'));
+        $this->assertSame(1, preg_match('~http://localhost/customer/access#recover\.([a-f0-9-]{36})\.([a-f0-9]{64})~', $received['data'], $match));
+        (new CompleteIdentity)->complete($match[1], $match[2], 'RecoveredRetentionPassword123', 'Recovered declared buyer', str_repeat('e', 64));
+        $this->requestIdentity('recover', $email);
+        $this->assertSame(2, DB::table('production_identity_verifications')->count());
+        $chain = DB::table('production_identity_verifications')->pluck('challenge_id')->all();
+        $initial = (int) DB::table('production_identity_origins')->value('initial_challenge_id');
+        $this->assertCount(1, array_diff($chain, [$initial]), 'One chain challenge is referenced only by a verification.');
+        $unchained = DB::table('production_identity_challenges')->whereNotIn('id', $chain)->count();
+        $this->assertGreaterThan(0, $unchained);
         $abandoned = CarbonImmutable::parse(DB::table('production_checkout_reviews')->whereNotIn('id', DB::table('production_checkout_orders')->select('review_id'))->value('created_at'), 'UTC');
         $this->assertGreaterThan(0, DB::table('production_identity_notices')->count());
         $this->assertSame(1, DB::table('production_identity_origins')->count());
@@ -485,17 +510,22 @@ class CustomerDataRetentionReportTest extends TestCase
             $this->assertArrayNotHasKey($table, $report, $table);
         }
 
-        // Identity records: 12 months after their last clock column (a send attempt's 120-second lease included); the enrollment
-        // challenge the identity origin was created from is kept with that origin.
-        $this->travelTo($start->addYear()->addMinutes(5));
+        // Identity records: 12 months after their last clock column (a send attempt's lease and a challenge's expiry included). The verified
+        // chain (every verification and every challenge an origin or a verification references) is never counted.
+        $this->travelTo($start->addYear()->addHour());
         [$report] = $this->report();
         $this->assertSame(1, $report['production_checkout_reviews']['past_period'], 'The review the order was accepted from is never counted.');
-        foreach (['production_identity_notices', 'production_identity_attempts', 'production_identity_outcomes', 'production_identity_verifications'] as $table) {
+        foreach (['production_identity_notices', 'production_identity_attempts', 'production_identity_outcomes'] as $table) {
             $this->assertSame(DB::table($table)->count(), $report[$table]['past_period'], $table);
             $this->assertGreaterThan(0, $report[$table]['past_period'], $table);
         }
-        $held = DB::table('production_identity_origins')->value('initial_challenge_id');
-        $this->assertSame(DB::table('production_identity_challenges')->where('id', '!=', $held)->count(), $report['production_identity_challenges']['past_period']);
+        $this->assertSame($unchained, $report['production_identity_challenges']['past_period'], 'Only challenges outside the verified chain count.');
+        $this->assertArrayNotHasKey('production_identity_verifications', $report);
+        // Long after, the chain still verifies from sequence 1 and is still never counted.
+        $this->travelTo($start->addYears(30));
+        [$report] = $this->report();
+        $this->assertSame($unchained, $report['production_identity_challenges']['past_period']);
+        $this->assertArrayNotHasKey('production_identity_verifications', $report);
         $this->assertSame(['held' => 'clock_not_modeled'], $report['production_identity_addresses']);
     }
 

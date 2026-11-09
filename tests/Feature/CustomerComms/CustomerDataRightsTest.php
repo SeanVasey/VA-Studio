@@ -355,8 +355,8 @@ class CustomerDataRightsTest extends TestCase
         $this->assertEquals(['retention' => 'financial_records_years', 'reason' => 'immutable_record_retained', 'count' => 1],
             array_diff_key($retained['orders'], ['record' => true]));
         $this->assertSame(1, $retained['customer_consent_events']['count']);
-        // A production checkout review that never became an order is an abandoned checkout (2026-11-09).
-        $this->assertEquals(['retention' => 'abandoned_checkout_days', 'reason' => 'immutable_record_retained', 'count' => 0],
+        // A production checkout review is kept with its order, or as an abandoned checkout when it never became one (2026-11-09).
+        $this->assertEquals(['retention' => 'with_order_or_abandoned_checkout_days', 'reason' => 'immutable_record_retained', 'count' => 0],
             array_diff_key($retained['production_checkout_reviews'], ['record' => true]));
         foreach (['production_checkout_exemption_bases', 'production_checkout_orders', 'production_tax_checkout_orders',
             'paid_order_origins', 'paid_grant_origins', 'paid_originals', 'paid_tax_order_origins', 'paid_tax_grant_origins', 'paid_tax_originals',

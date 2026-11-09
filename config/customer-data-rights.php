@@ -26,7 +26,7 @@ return [
         'correspondence_records_years' => env('VASEY_CUSTOMER_DATA_RETENTION_CORRESPONDENCE_YEARS'),
         // Identity and purchase challenges, verification records and password reset tokens (PRIVACY: 12 months).
         'security_records_years' => env('VASEY_CUSTOMER_DATA_RETENTION_SECURITY_YEARS'),
-        // Privacy request records, export metadata and audit events (PRIVACY: 7 years after the request closes or the event).
+        // Privacy request records, their events and export metadata (PRIVACY: 7 years after the request closes).
         'evidence_records_years' => env('VASEY_CUSTOMER_DATA_RETENTION_EVIDENCE_YEARS'),
         // Quotes and checkout reviews that did not become an order (PRIVACY: 30 days).
         'abandoned_checkout_days' => env('VASEY_CUSTOMER_DATA_RETENTION_ABANDONED_CHECKOUT_DAYS'),

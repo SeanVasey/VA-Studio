@@ -64,7 +64,8 @@ final class CustomerDataRequestResource extends ReadOnlyCommerceResource
                 return 'This withdraws the customer\'s access, ends their sessions, erases their listening library and replaces their name and sign-in email. Retained under "'
                     .$retention['policy_reference'].'": financial records '.$retention['financial_records_years'].' years, consent records '
                     .$retention['consent_records_years'].' years, correspondence '.$retention['correspondence_records_years'].' years, security records '
-                    .$retention['security_records_years'].' years, privacy request and audit evidence '.$retention['evidence_records_years'].' years. This cannot be undone.';
+                    .$retention['security_records_years'].' years, privacy request records '.$retention['evidence_records_years'].' years, abandoned checkouts '
+                    .$retention['abandoned_checkout_days'].' days, job records '.$retention['operational_records_days'].' days. Audit history is kept with the records it proves. This cannot be undone.';
             })
             ->visible(fn (CustomerDataRequest $record): bool => $record->kind === 'deletion' && $record->state === 'received')
             ->mountUsing(fn (CustomerDataRequest $record, ListCustomerDataRequests $livewire) => $livewire->expectedRequestVersion = $record->fresh()?->version)

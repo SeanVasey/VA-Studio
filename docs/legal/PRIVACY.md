@@ -142,8 +142,8 @@ The periods below are what we intend to apply (approved by Sean on 2026-11-07; t
 | Account details | While your account is open. If you close it, we end your access straight away and delete account details we are not required to keep within 30 days. Your name, email address, postal address and any artist name stay inside your order and license records for the period above. |
 | Listening library | Until you clear it or your account is closed. |
 | Marketing choice and suppression records | For as long as we hold your email address, plus 3 years, so we can prove consent or keep honoring an opt-out. |
-| Records of privacy requests, security and administration events | 7 years after the request closes or the event, so we can prove requests and deletions were honored. Copies of your data prepared for you expire much sooner; only the record that we provided them is kept. |
-| Checkouts and quotes that did not become an order | 30 days after the checkout or quote ends. |
+| Records of privacy requests and of what we did about them | 7 years after the request closes, so we can prove requests and deletions were honored. Copies of your data prepared for you expire much sooner; only the record that we provided them is kept. |
+| Quotes and checkout reviews that did not become an order | 30 days after the quote or checkout ends. |
 | Contact messages, replies and attachments | 2 years after the last message in the conversation, unless the conversation concerns an order or a legal claim, in which case as long as the order records. |
 | Backups | Backups rotate: up to 7 daily, 4 weekly and 6 monthly copies. Deleted information can remain in a backup for up to about 6 months until that backup is replaced. We do not restore deleted personal information from backups except to recover from a failure. |
 

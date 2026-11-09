@@ -324,20 +324,25 @@ report (#250) stays read-only until a purge is separately built, reviewed and ap
 **Retention (U-13 follow-up, open questions from #250).** PRIVACY §7 already answers most of these; the decisions map
 each table to an existing §7 row and add two rows where §7 had none.
 
-- **Rights and security evidence** (`audit_events`, `customer_data_requests`, `customer_data_request_events`,
-  `customer_data_exports` metadata): **7 years** after the event, or after the request closes. They prove that rights
-  requests, deletions and staff role changes were honored, so they must outlive the records they concern. Export *files*
-  keep their existing short expiry; only the metadata is kept. New §7 row.
+- **Privacy request records** (`customer_data_requests`, `customer_data_request_events`, `customer_data_exports`
+  metadata): **7 years** after the request closes. They prove that rights requests and deletions were honored, so they
+  must outlive the records they concern. Export *files* keep their existing short expiry; only the metadata is kept. New
+  §7 row. Amended after the independent review of #255: `audit_events` are not in this row. They also evidence license
+  approvals, exclusive activations, payments, finalizations and refunds of records kept indefinitely, so they are kept with
+  those records (indefinite).
 - **Consent clock:** §7's existing row decides it: kept while the email address is held, plus 3 years. The clock starts
   when the address is no longer held (account closure or erasure), not at the consent event.
 - **Download and redemption records for perpetual licenses:** they follow the order (§7 orders row): retained while the
   order is retained, never on their own authorization timestamps. The report treats them as held with the order.
 - **Support attachments:** §7's contact row: 2 years after the last message, or with the order when the conversation
   concerns an order or a legal claim.
-- **Production identity tables:** challenges, attempts, notices and verifications follow §7's verification row
-  (12 months); addresses and outcomes bound to a paid order follow the order.
-- **Checkouts and quotes that never became an order** (checkout reviews and sessions, quotes, intents and their
-  observations with no order): **30 days** after the checkout or quote ends. There is no contractual, tax or support need
+- **Production identity tables:** notices, send attempts and their outcomes follow §7's verification row (12 months),
+  and so do challenges that no identity origin or verification references. Amended after the independent review of #255:
+  verifications, and every challenge an origin or a verification references, form the verified chain that every
+  production read re-verifies from sequence 1 and that sealed order, grant, invoice and checkout bindings name, so they are
+  kept with the origin (indefinite). Addresses have no timestamp and stay held.
+- **Quotes and checkout reviews that never became an order:** **30 days** after the quote or checkout ends. Checkout
+  intents, sessions and observations are always bound to an order snapshot, so they follow the unpaid-snapshot rule below. There is no contractual, tax or support need
   to keep abandoned purchase details longer. New §7 row.
 - **The unclassified tables (111 in #250)** are classified by family:
   - order, payment, refund/dispute, fulfillment, grant, membership-billing and legacy-imported order records follow the
@@ -375,7 +380,9 @@ MySQL race evidence and independent review. #252 and #253 are closed as supersed
 whose provider session has expired or been cancelled and reconciled, counts as "did not become an order": it falls under
 the 30-day abandoned-checkout row from that point. Any paid, refunded, disputed or held order stays with the orders row.
 The schedule implements this only after a separate change that proves no late webhook or reconcile can still attach
-payment to such a snapshot. Until then those snapshots stay with the orders row.
+payment to such a snapshot. Until then those snapshots, and the checkout intents, sessions and observations bound to
+them, stay with the orders row, and PRIVACY's 30-day row names only quotes and checkout reviews; that change widens the
+row when it lands.
 
 Still Sean's, not delegable:
 
