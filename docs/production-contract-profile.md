@@ -430,22 +430,37 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
   on any unexpected failure while selecting (a throwing source, a runtime error), the line keeps the family's existing
   profile, so **selection** never refuses a paid line. Each line's branch code (`selected`, `gate_off`,
   `name_only_declaration`, `identity_held`, `no_contract_source`, `template_too_large`, `signature_unavailable`,
-  `not_renderable`; never buyer data) is recorded as `contract_profile_selection` in the `paid_origin.retained` /
+  `not_renderable`, `contract_text_unavailable`; never buyer data) is recorded as `contract_profile_selection` in the `paid_origin.retained` /
   `paid_tax_origin.retained` audit context; while the gate is off the context is unchanged. Selection builds the document
   but does not render it, so a refusal only rendering finds can still fail a selected line after payment (see the
   activation blockers below). Nothing in the application
   binds `VaseyLicenseContractSource` yet: contract increment 1 supplies the text, and tests bind a synthetic source.
-- **Recorded profile.** The origin's `profile` becomes a selection descriptor (`paid-vasey-license-v2-selection-v1`): the
-  template and constants, the signature pin, the v2 profile and its hash, the effective hash (profile and signature), and the
-  document's input hash and text digest. Every render, retry and replay uses it, whatever the gate says later. At render the
-  document is rebuilt from the frozen input and must match the frozen input hash; the PDF must carry the frozen effective
+- **Recorded profile.** The origin's `profile` becomes a selection descriptor (`paid-vasey-license-v2-selection-v2`): the
+  template's SHA-256 and the two constants, the signature pin, the v2 profile's hash, the effective hash (profile and
+  signature), and the document's input hash and text digest. Every render, retry and replay uses it, whatever the gate says
+  later. The template and the v2 profile themselves are stored once each by SHA-256 in `vasey_license_contract_texts`
+  (see Payload growth below). At render both are resolved by their recorded hashes and verified (a missing, changed or
+  undecryptable row refuses `profile_changed`), the document is rebuilt from the frozen input and must match the frozen input hash; the PDF must carry the frozen effective
   hash and text digest; a different signature refuses `signature_changed`; a changed profile refuses `profile_changed`.
   The stored original records the effective hash as its artifact profile hash and the descriptor's hash as the manifest's.
   A completed v2 original is checked against the frozen digests and never re-rendered or re-bound.
 - **Gate off.** Origins record `PaidGrantRenderProfile::current()` / `PaidTaxRenderProfile::current()` as before, and the
   stored originals equal the existing isolated renderers' bytes (journey tests compare them).
-- **Render-time defence.** A recorded selection renders only in `local` or `testing`, and its recorded profile hash must be
-  the hash of the recorded profile before anything is rendered.
+- **Render-time defence.** A recorded selection renders only in `local` or `testing`, and its recorded template and profile
+  hashes must resolve to stored bytes with those hashes before the signature or anything else is read.
+- **Payload growth (built 2026-11-09).** `App\Domain\Grants\VaseyLicenseContractTexts` and migration
+  `2026_11_09_270200_vasey_license_contract_texts` (additive; `down()` refuses once a row exists): one row per kind
+  (`template`, `renderer_profile`) and SHA-256, the bytes encrypted at rest with the application key as the origins are,
+  immutable (triggers refuse UPDATE and DELETE, and an INSERT of another kind or a malformed hash, on SQLite and MySQL).
+  Selection stores the line's template and the canonical v2 profile in the origin transaction with an idempotent
+  insert-or-ignore, then reads the address back with a locking read and requires the stored row to decrypt to exactly
+  those bytes; a row that differs keeps the existing profile (`contract_text_unavailable`). A database error there is not
+  caught, so it aborts the origin transaction as an origin insert failure would. Measured with a synthetic template at the
+  256 KiB selection bound: the stored V1 origin is 26,280 bytes against 532,880 with the #245 inline descriptor and 34,560
+  for the same origin with the gate-off profile. The rows hold license wording shared by every buyer of a version, not
+  customer data: the data export never reads them and deletion neither erases nor lists them (`docs/customer-data-rights.md`).
+  Descriptors of the #245 shape (`paid-vasey-license-v2-selection-v1`, only ever written in `local`/`testing` with the gate
+  overridden) are still recognized as v2 selections, so they never reach a paid renderer, but refuse `profile_changed`.
 - **Activation blockers for this wiring** (review of c5d0ce4c, 2026-11-09):
   - [ ] **Post-payment render refusals.** Selection does not render, so drawability, page or byte limits, `invalid_pdf` and
     `render_failed`, and a signature rotation or pinned-file deploy between selection and render (`signature_changed`,
@@ -460,12 +475,18 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
   - [ ] **Transaction I/O.** `decide()` reads the manifest, metric files and the signature inside the origin transaction
     that holds the order lock. Move the selection outside it (for example, prepare it before the frame and re-check
     inside) before activation.
-  - [ ] **Payload growth.** A v2 origin carries the template and the v2 profile (about 125–600 KiB per line with a real
-    template, against about 23 KiB today). `PaidGrantExportSection::MAX_PAYLOAD_BYTES` (64 MiB, sized for today's lines)
-    must be re-estimated, or the template stored once by hash, before activation. Its comments are accurate for today's
-    gate-off payloads and are unchanged.
+  - [x] **Payload growth.** A v2 origin carried the template and the v2 profile (about 125–600 KiB per line with a real
+    template, against about 23 KiB today), so `PaidGrantExportSection::MAX_PAYLOAD_BYTES` (64 MiB) refused exports at a
+    few hundred lines. Done (2026-11-09): the template and profile are stored once by hash (Payload growth above), a v2
+    origin is no larger than a gate-off one, and the budget, its comments and the export code are unchanged. Tests: the
+    descriptor holds hashes only and selections share one row of each (`VaseyLicenseIssuanceTest`); a template at the
+    selection bound leaves the origin within 4 KiB of its gate-off size (`PaidGrantDocumentJourneyTest`); an account with
+    enough v2 lines to pass the budget with inline descriptors exports, without a query on the texts table
+    (`PaidGrantDataExportTest`); render refuses a missing, changed, undecryptable or non-canonical stored text and another
+    stored template whose hash verifies; triggers, idempotent storing and rollback (`VaseyLicenseContractTextMigrationTest`).
 - Tests: `VaseyLicenseIssuanceTest`, the wiring-condition tests in `VaseyLicenseV2PdfRendererTest`, gate-on and gate-off
-  journeys in `PaidGrantDocumentJourneyTest` and `PaidTaxGrantJourneyTest`, and the production hold in `tests/ops`.
+  journeys in `PaidGrantDocumentJourneyTest` and `PaidTaxGrantJourneyTest` (gate off stores no contract text),
+  `VaseyLicenseContractTextMigrationTest`, the v2 export case in `PaidGrantDataExportTest`, and the production hold in `tests/ops`.
 
 ### Wording item for Sean
 

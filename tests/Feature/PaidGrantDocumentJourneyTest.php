@@ -270,8 +270,8 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $f = $this->paidV2Order();
         $origin = PaidGrantRecords::decode((array) DB::table('paid_grant_origins')->sole());
         $this->assertTrue(VaseyLicenseIssuance::selected($origin['profile']));
-        $this->assertSame([VaseyLicenseV2Profile::VERSION, 'paid-license-grant', self::SYNTHETIC_TEMPLATE],
-            [$origin['profile']['version'], $origin['profile']['purpose'], $origin['profile']['contract']['template']]);
+        $this->assertSame([VaseyLicenseV2Profile::VERSION, 'paid-license-grant', hash('sha256', self::SYNTHETIC_TEMPLATE)],
+            [$origin['profile']['version'], $origin['profile']['purpose'], $origin['profile']['contract']['template_sha256']]);
         $originRow = (array) DB::table('paid_grant_origins')->sole();
         $this->assertSame(['selected'], $this->retainedSelection('paid_origin.retained'));
 
@@ -322,6 +322,8 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $this->assertSame(CanonicalJson::encode(PaidGrantRenderProfile::current('synthetic_rehearsal')), CanonicalJson::encode($origin['profile']));
         // Gate off: the audit context is exactly what it was before the wiring.
         $this->assertSame(['origin_hash'], array_keys(json_decode(DB::table('audit_events')->where('action', 'paid_origin.retained')->sole()->context, true)));
+        // Gate off: no contract text is stored.
+        $this->assertDatabaseCount('vasey_license_contract_texts', 0);
 
         config(['contracts.vasey_license_v2_issuance' => true]);
         $complete = (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
@@ -331,6 +333,33 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $this->assertSame($bytes, app(PaidGrantRendererProcess::class)->render(PaidGrantRenderInput::fromOrigin($origin), $origin['profile'])->pdfBytes);
         $this->assertStringContainsString('VASEY.AUDIO paid grant profile v1', $bytes);
         $this->assertStringNotContainsString('vasey-license-pdf-v2', $bytes);
+    }
+
+    /**
+     * Payload growth (activation blocker): a v2 origin records its template and renderer profile by hash only, so even a
+     * template at the selection bound leaves the stored origin within a few KiB of the same origin with the gate-off
+     * profile, and the template is stored once, outside the origin, under its hash.
+     */
+    public function test_a_v2_origin_records_its_template_by_hash_and_stays_the_size_of_a_gate_off_origin(): void
+    {
+        $this->enableV2Issuance();
+        $paragraph = "\n\nSynthetic padding paragraph of a long nonbinding license.";
+        $template = self::SYNTHETIC_TEMPLATE.str_repeat($paragraph, intdiv(VaseyLicenseIssuance::TEMPLATE_BYTES - strlen(self::SYNTHETIC_TEMPLATE), strlen($paragraph)));
+        $this->assertGreaterThan(VaseyLicenseIssuance::TEMPLATE_BYTES - strlen($paragraph), strlen($template));
+        $this->bindSyntheticContractSource($template);
+        $this->paidV2Order();
+
+        $row = (array) DB::table('paid_grant_origins')->sole();
+        $origin = PaidGrantRecords::decode($row);
+        $this->assertTrue(VaseyLicenseIssuance::selected($origin['profile']));
+        $this->assertSame(['selected'], $this->retainedSelection('paid_origin.retained'));
+        $gateOff = PaidGrantRecords::encode([...$origin, 'profile' => PaidGrantRenderProfile::current('synthetic_rehearsal')]);
+        $this->assertLessThan(strlen($gateOff['payload']) + 4096, strlen($row['payload']));
+        $this->assertStringNotContainsString('Synthetic padding paragraph', CanonicalJson::encode($origin));
+        $stored = DB::table('vasey_license_contract_texts')->orderBy('kind')->get(['kind', 'sha256', 'payload']);
+        $this->assertSame([['renderer_profile', CanonicalJson::hash(VaseyLicenseV2Profile::current())], ['template', hash('sha256', $template)]],
+            $stored->map(fn (object $text): array => [$text->kind, $text->sha256])->all());
+        $this->assertGreaterThan(strlen($template), strlen($stored[1]->payload));
     }
 
     /** The selection branch recorded in the `paid_origin.retained` audit context, one code per line, or null when absent. */

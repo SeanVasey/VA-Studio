@@ -86,7 +86,8 @@ class VaseyLicenseV2ProfileTest extends TestCase
         $this->assertSame(['latin', 'latin-ext'], $profile['font_repertoire']);
 
         // The test registry refuses it, and outside its own files only the printable set and the gated issuance dispatch
-        // name it; only the four paid and paid-tax issuer classes call that dispatch (the rest name it in comments).
+        // name it; only the four paid and paid-tax issuer classes call that dispatch (the rest name it in comments, and the
+        // contract text store its template bound).
         self::refusesIssuance(fn () => ContractRenderProfileRegistry::metadata('vasey-license-pdf-v2'));
         $dispatchers = [];
         foreach (['app/Domain/Grants', 'app/Domain/Commerce', 'app/Domain/Contracts', 'app/Http', 'app/Jobs', 'app/Console', 'app/Providers', 'routes', 'config'] as $directory) {
@@ -105,7 +106,7 @@ class VaseyLicenseV2ProfileTest extends TestCase
         sort($dispatchers);
         $this->assertSame(['app/Domain/Contracts/Production/VaseyLicenseV2PdfRenderer.php', 'app/Domain/Grants/Paid/PaidGrantDocuments.php',
             'app/Domain/Grants/Paid/PaidGrants.php', 'app/Domain/Grants/PaidTax/PaidTaxDocuments.php', 'app/Domain/Grants/PaidTax/PaidTaxGrants.php',
-            'app/Domain/Grants/VaseyLicenseContractSource.php', 'config/contracts.php'], $dispatchers);
+            'app/Domain/Grants/VaseyLicenseContractSource.php', 'app/Domain/Grants/VaseyLicenseContractTexts.php', 'config/contracts.php'], $dispatchers);
     }
 
     public function test_the_implementation_pin_is_the_derived_closure_of_the_profile_and_the_printable_set(): void
