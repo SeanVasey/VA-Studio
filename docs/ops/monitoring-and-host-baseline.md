@@ -31,13 +31,14 @@ is Sean's choice; none is selected and none is configured.
 
 ### Scheduler: what can and cannot be known
 
-`routes/console.php` schedules four commands: `vasey:publish-scheduled-site-release` every minute, `vasey:cache-prune-expired`
+`routes/console.php` schedules five commands: `vasey:publish-scheduled-site-release` every minute, `vasey:cache-prune-expired`
 hourly at :23 (expired database-cache rows only) and `vasey:contract-render-cache-sweep` hourly at :47 (contract renderer workspaces
 left at least an hour in `contracts/render-cache`, `paid-render-cache`, `paid-tax-render-cache` and `member-render-cache`, one count
-line per cache), each with a short overlap lock, and `vasey:scheduler-heartbeat` every minute. The scheduler must run as the site
+line per cache) and `vasey:customer-data-exports-prune` at :07, :22, :37 and :52 (expired customer data export ciphertext only), each
+with a short overlap lock, and `vasey:scheduler-heartbeat` every minute. The scheduler must run as the site
 user that renders contracts: the sweep refuses to run as root and removes only its own user's workspaces.
 
-The heartbeat upserts one `scheduler_heartbeats` row, and the first three record their latest exit outcome the same way (FP-028,
+The heartbeat upserts one `scheduler_heartbeats` row, and the other four record their latest exit outcome the same way (FP-028,
 `docs/staff-reporting.md`, "Scheduler and backup signals"). The admin dashboard shows the heartbeat's age (Needs attention after
 `REPORTING_SCHEDULER_HEARTBEAT_STALE_SECONDS`, 300 s by default) and any command whose latest run failed. The dashboard is something
 staff look at, not an alert: nothing pages anyone when it turns stale, so this host check stays the alerting path. It combines

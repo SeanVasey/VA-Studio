@@ -8,8 +8,8 @@ use Illuminate\Console\Command;
 
 /**
  * Purges the encrypted bytes of customer data exports whose download window has passed (FP-082). The request and its
- * events stay as evidence; only the ciphertext is removed. Prints a count only. Not scheduled automatically: the operator
- * installs it once a production host exists (U-02).
+ * events stay as evidence; only the ciphertext is removed. Prints a count only. Scheduled every 15 minutes in
+ * routes/console.php (at :07, :22, :37 and :52).
  */
 final class PruneCustomerDataExports extends Command
 {

@@ -26,6 +26,12 @@ OperationalSignals::track(Schedule::command('vasey:cache-prune-expired')->hourly
 // clear of :23 and the 03:17 backup. The overlap lock is hygiene only, as above.
 OperationalSignals::track(Schedule::command('vasey:contract-render-cache-sweep')->hourlyAt(47)->withoutOverlapping(10), 'vasey:contract-render-cache-sweep');
 
+// Purges the encrypted bytes of customer data exports left unused past `customer-data-rights.export_ttl_minutes` (default 15);
+// requests and their events stay as evidence (FP-082, independent CX review F4). Every 15 minutes bounds an unused export's
+// lifetime to about twice its window; :07/:22/:37/:52 keeps it off minute zero and the :23/:47 hourly jobs. Each run purges at
+// most the command's default 100; the next run takes the rest. The overlap lock is hygiene only, as above.
+OperationalSignals::track(Schedule::command('vasey:customer-data-exports-prune')->cron('7,22,37,52 * * * *')->withoutOverlapping(10), 'vasey:customer-data-exports-prune');
+
 // FP-028 dashboard: one upserted row a minute proves the scheduler itself runs (OperationalSignals; "Scheduler last run" turns
 // Needs attention after `reporting.health.scheduler_heartbeat_stale_seconds`). The tracked commands above record their latest
 // exit outcome the same way, so a failing scheduled command shows Needs attention. No overlap lock: a heartbeat is one upsert.

@@ -39,7 +39,7 @@ Inquiries sent from a browser session without an order are not linked to an acco
 
 Production-signed-in customers cannot reach these routes yet (D-30 step 3b).
 
-The JSON is encrypted at rest with the application key (`customer_data_exports.ciphertext`) and its SHA-256 is kept. The token is shown once and stored only as a SHA-256 hash. Downloading purges the ciphertext in the same transaction; an export left unused past `export_ttl_minutes` (default 15, bounded 5 to 60) is purged on the next request or by `php artisan vasey:customer-data-exports-prune`, which is not scheduled automatically (U-02 host).
+The JSON is encrypted at rest with the application key (`customer_data_exports.ciphertext`) and its SHA-256 is kept. The token is shown once and stored only as a SHA-256 hash. Downloading purges the ciphertext in the same transaction; an export left unused past `export_ttl_minutes` (default 15, bounded 5 to 60) is purged on the next request or by `php artisan vasey:customer-data-exports-prune`, which the scheduler runs every 15 minutes (:07, :22, :37, :52; `routes/console.php`), so an unused export's ciphertext lives at most about one window plus 15 minutes while the scheduler runs.
 
 ## Staff review of deletion requests
 
@@ -71,7 +71,7 @@ Name and email inside retained order snapshots and contracts stay there: they ar
 | `VASEY_CUSTOMER_DATA_RETENTION_ABANDONED_CHECKOUT_DAYS` | Quotes and production checkout reviews that did not become an order (1–100 days). |
 | `VASEY_CUSTOMER_DATA_RETENTION_OPERATIONAL_DAYS` | Framework job queue and failed jobs (1–100 days). |
 
-These values are recorded with each approval and drive the read-only retention report below; no code purges retained records when a period ends. Follow-up (independent CX review F4): schedule `vasey:customer-data-exports-prune` once a production host exists (U-02); until then the export lifetime is a download window, not a storage limit, except that deletion approval purges open exports. A purge of immutable records needs its own reviewed migration and Sean's schedule.
+These values are recorded with each approval and drive the read-only retention report below; no code purges retained records when a period ends. Independent CX review F4 is addressed: `vasey:customer-data-exports-prune` is scheduled every 15 minutes, so the export lifetime is also a storage limit wherever the scheduler runs (its last outcome shows on the admin dashboard's scheduled-command metric); deletion approval still purges open exports at once. A purge of immutable records needs its own reviewed migration and Sean's schedule.
 
 ## Retention schedule and dry-run report (FP-076)
 

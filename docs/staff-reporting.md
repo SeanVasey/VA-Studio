@@ -35,7 +35,7 @@ entries, and an evicted key would read as "never recorded" rather than "stale".
 | Metric | Source | OK | Needs attention | Unavailable |
 | --- | --- | --- | --- | --- |
 | Scheduler last run (seconds ago) | `vasey:scheduler-heartbeat`, scheduled every minute, upserts one `scheduler_heartbeats` row | age at most `REPORTING_SCHEDULER_HEARTBEAT_STALE_SECONDS` (300) | older | no heartbeat ever recorded |
-| Scheduled commands whose latest run failed | the three scheduled commands in `routes/console.php` record their exit outcome (`OperationalSignals::track`, `onSuccess`/`onFailure`) | 0 | 1 or more; the detail names them | no command has reported yet |
+| Scheduled commands whose latest run failed | the four other scheduled commands in `routes/console.php` record their exit outcome (`OperationalSignals::track`, `onSuccess`/`onFailure`) | 0 | 1 or more; the detail names them | no command has reported yet |
 | Last successful backup (hours ago) | `backup_evidence` rows of kind `daily` | latest run ok and at most `REPORTING_BACKUP_STALE_HOURS` (26) old | latest run failed, or the success is older | no run recorded |
 | Last successful restore drill (days ago) | `backup_evidence` rows of kind `restore-drill` | latest drill ok and at most `REPORTING_RESTORE_DRILL_STALE_DAYS` (35) old | latest drill failed (`never` when none succeeded), or older | no drill recorded |
 | Host disk, memory and process health | none | | | always: Forge server monitoring and `ops/monitoring/host-baseline.sh` cover the host (`docs/ops/monitoring-and-host-baseline.md`); the application does not read host state |

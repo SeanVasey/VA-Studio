@@ -95,8 +95,13 @@ class OperationalSignalsTest extends TestCase
         $this->assertArrayHasKey('vasey:scheduler-heartbeat', Artisan::all());
         $this->assertArrayHasKey('vasey:backup-record', Artisan::all());
 
+        // Expired customer data exports are purged every 15 minutes off minute zero, with a short overlap lock (CX review F4).
+        $prune = $this->scheduled('vasey:customer-data-exports-prune');
+        $this->assertCount(1, $prune);
+        $this->assertSame(['7,22,37,52 * * * *', true, 10], [$prune[0]->expression, $prune[0]->withoutOverlapping, $prune[0]->expiresAt]);
+
         $this->assertMetric('scheduled_task_failures', null, 'unavailable');
-        $tracked = ['vasey:publish-scheduled-site-release', 'vasey:cache-prune-expired', 'vasey:contract-render-cache-sweep'];
+        $tracked = ['vasey:publish-scheduled-site-release', 'vasey:cache-prune-expired', 'vasey:contract-render-cache-sweep', 'vasey:customer-data-exports-prune'];
         foreach ($tracked as $command) {
             [$event] = $this->scheduled($command);
             $event->finish($this->app, 0);
@@ -115,7 +120,7 @@ class OperationalSignalsTest extends TestCase
         $this->artisan('vasey:scheduler-heartbeat')->assertExitCode(0);
         $sweep->finish($this->app, 0);
         $this->assertMetric('scheduled_task_failures', 0, 'ok');
-        $this->assertStringContainsString('3 commands', $this->evidence()['scheduled_task_failures']['detail']);
+        $this->assertStringContainsString('4 commands', $this->evidence()['scheduled_task_failures']['detail']);
     }
 
     public function test_backup_record_appends_valid_evidence_and_refuses_malformed_input_without_echoing_it(): void
