@@ -8,10 +8,13 @@ use Illuminate\Console\Command;
 use Throwable;
 
 /**
- * Removes contract renderer workspaces that a parent killed mid-render left under `contracts/render-cache` on the private
- * disk (each may still hold a copy of the signature). A render's child has a 60 s wall clock, so only workspaces unmodified
- * for at least an hour are removed; the root is never created, a symbolic link is never followed or removed, and anything
- * that is not a workspace is left in place and fails the run so it is noticed. Prints counts only, never a path.
+ * Removes contract renderer workspaces that a parent killed mid-render left in the renderer caches under `contracts/` on
+ * the private disk ({@see ContractFiles::RENDER_CACHES}: the v1 test and v2 license cache, whose workspaces may still hold
+ * a copy of the signature, and the paid, paid-tax and member caches). Every render's child has a 60 s wall clock, so only
+ * workspaces unmodified for at least an hour are removed; no cache is ever created, a symbolic link is never followed or
+ * removed, and anything that is not a workspace is left in place and fails the run so it is noticed. Each cache is swept
+ * on its own: one that is a link or not private is refused (and fails the run) without stopping the others. Prints
+ * counts per cache only, never a path.
  *
  * It refuses to run as root (effective uid 0) and removes only workspaces its own effective user owns, so it must run as
  * the site user that renders contracts (the scheduler's user). An absent private disk root or cache sweeps nothing.
@@ -25,7 +28,7 @@ final class SweepContractRenderCache extends Command
 
     protected $signature = 'vasey:contract-render-cache-sweep {--older-than=3600 : Minimum age in seconds of a workspace to remove, at least 3600}';
 
-    protected $description = 'Remove stale contract renderer workspaces (at least an hour old) under contracts/render-cache.';
+    protected $description = 'Remove stale contract renderer workspaces (at least an hour old) from the contract render caches.';
 
     public function handle(): int
     {
@@ -47,15 +50,21 @@ final class SweepContractRenderCache extends Command
 
             return self::FAILURE;
         }
-        try {
-            [$removed, $left] = (new ContractFiles)->sweepRendererWorkspaces(CarbonImmutable::now()->getTimestamp() - $age, $euid);
-        } catch (Throwable $error) {
-            $this->error(sprintf('The render cache could not be swept (%s).', $error::class));
+        $cutoff = CarbonImmutable::now()->getTimestamp() - $age;
+        $clean = true;
+        foreach (ContractFiles::RENDER_CACHES as $cache) {
+            try {
+                [$removed, $left] = (new ContractFiles)->sweepRendererWorkspaces($cutoff, $euid, $cache);
+            } catch (Throwable $error) {
+                $this->error(sprintf('%s: could not be swept (%s).', $cache, $error::class));
+                $clean = false;
 
-            return self::FAILURE;
+                continue;
+            }
+            $this->info(sprintf('%s: removed %d stale render workspace(s); left %d other entr%s in place.', $cache, $removed, $left, $left === 1 ? 'y' : 'ies'));
+            $clean = $clean && $left === 0;
         }
-        $this->info(sprintf('Removed %d stale render workspace(s); left %d other entr%s in place.', $removed, $left, $left === 1 ? 'y' : 'ies'));
 
-        return $left === 0 ? self::SUCCESS : self::FAILURE;
+        return $clean ? self::SUCCESS : self::FAILURE;
     }
 }

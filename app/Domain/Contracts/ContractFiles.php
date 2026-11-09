@@ -28,16 +28,26 @@ final class ContractFiles
     }
 
     /**
-     * Removes renderer workspaces under `contracts/render-cache` last modified before `$cutoff` ({@see ContractRenderWorkspace::sweep()}),
-     * as a parent killed mid-render leaves them, and only those owned by `$owner`. Creates nothing; an absent private
-     * disk root or cache sweeps nothing.
+     * The renderer caches under `contracts/` on the private disk. Each holds only ephemeral workspaces
+     * ({@see ContractRenderWorkspace} or `MemberOriginalWorkspace`: 32-hex names, private directories, removed by their
+     * render's close); originals live elsewhere (`contracts/test`, `contracts/paid`, `contracts/paid-tax-v2`,
+     * `contracts/production-member-v1`, ...) and are never swept.
+     */
+    public const RENDER_CACHES = ['render-cache', 'paid-render-cache', 'paid-tax-render-cache', 'member-render-cache'];
+
+    /**
+     * Removes renderer workspaces under `contracts/{$cache}` (one of {@see RENDER_CACHES}) last modified before `$cutoff`
+     * ({@see ContractRenderWorkspace::sweep()}), as a parent killed mid-render leaves them, and only those owned by
+     * `$owner`. Creates nothing; an absent private disk root or cache sweeps nothing. A cache that is a link or not a
+     * private directory is refused (`storage_failed`).
      *
      * @return array{0: int, 1: int} the workspaces removed, and the entries left in place
      */
-    public function sweepRendererWorkspaces(int $cutoff, int $owner): array
+    public function sweepRendererWorkspaces(int $cutoff, int $owner, string $cache = 'render-cache'): array
     {
         ContractIo::outsideTransactions();
         try {
+            if (! in_array($cache, self::RENDER_CACHES, true)) { throw new \UnexpectedValueException; }
             // A fresh host may not have the private disk root yet; root(false) would refuse it rather than report it absent.
             $configured = config('filesystems.disks.local.root');
             if (is_string($configured) && $configured !== '') {
@@ -45,7 +55,7 @@ final class ContractFiles
                 if (@lstat(rtrim($configured, '/')) === false) { return [0, 0]; }
             }
             $directory = $this->root(false).'/contracts';
-            foreach (['', '/render-cache'] as $component) {
+            foreach (['', '/'.$cache] as $component) {
                 $directory .= $component;
                 clearstatcache(true, $directory);
                 if (@lstat($directory) === false) { return [0, 0]; }

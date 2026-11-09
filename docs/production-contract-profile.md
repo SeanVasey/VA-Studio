@@ -571,25 +571,43 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
   `render_failed` then success leaves no hold; probes that `.env`, `composer.json` and `storage/` are unreadable and
   `public/` unwritable from the child and that `mail`, `putenv` and `dl` are disabled; an unpinned change to a class the
   child loads never runs (it would announce itself on stderr); an answer with the right bytes but another text digest refuses.
-- Stale workspaces (built 2026-11-09, from #249's remaining list): a parent killed mid-render can leave a workspace (with
-  the signature copy if the kill lands before the child exits) under `contracts/render-cache`.
-  `vasey:contract-render-cache-sweep` (`SweepContractRenderCache`, `ContractRenderWorkspace::sweep()`), scheduled hourly at
-  :47 with `withoutOverlapping(10)`, removes direct children of that directory only when they are named as workspaces are
-  (32 hex characters), are private real directories (never a symbolic link) and were last modified at least an hour ago
-  (`--older-than`, never below 3600 s; a render's child has a 60 s wall clock). Contents go as `close()` removes them: a link
-  inside is unlinked, never followed. It creates nothing, sweeps nothing (and succeeds) when the private disk root or the
-  cache is absent, refuses a cache directory that is a link or not private, prints counts only and fails the run when it
-  leaves any other entry in place. It refuses to run as root (effective uid 0) and removes only workspaces owned by its own
-  effective user (another user's entry is left and counted), so **the scheduler must run as the site user that renders
-  contracts** (review of #251, P3). Tests: `ContractRenderCacheSweepTest`.
-- Tracked follow-ups from the #251 review (P3, not built):
-  - The paid, paid-tax and member render caches (`contracts/paid-render-cache`, `contracts/paid-tax-render-cache`,
-    `contracts/member-render-cache`) are not swept.
-  - The Isolated (`IsolatedContractRenderer`), Free (`FreeGrantRendererProcess`) and ProductionFree
-    (`ProductionFreeGrantRendererProcess`) children's `open_basedir` directory entries still lack the trailing separator
-    the v2 child now has (the paid and paid-tax children are pinned files; any change there rebuilds their manifests).
-  - Sweeper test gaps: a 32-hex directory that is not mode 0700 (left in place) and the race between a workspace's mtime
-    check and a render closing it are not exercised.
+- Stale workspaces (built 2026-11-09, from #249's remaining list; extended the same day to every render cache): a parent
+  killed mid-render can leave a workspace (with the signature copy if the kill lands before the child exits) under
+  `contracts/render-cache`, and the paid, paid-tax and member renderers leave theirs under `contracts/paid-render-cache`,
+  `contracts/paid-tax-render-cache` and `contracts/member-render-cache` (`ContractFiles::RENDER_CACHES`). Those three hold
+  only ephemeral workspaces (`ContractRenderWorkspace` or `MemberOriginalWorkspace`: 32 hex characters, mode 0700, each
+  removed by its render's `close()`; no signature copy, since only the v2 child writes one; each child has a 60 s wall
+  clock). Their originals live elsewhere (`contracts/paid`, `contracts/paid-tax-v2`, `contracts/production-member-v1`)
+  and are never swept. `vasey:contract-render-cache-sweep` (`SweepContractRenderCache`,
+  `ContractFiles::sweepRendererWorkspaces()`, `ContractRenderWorkspace::sweep()`), scheduled hourly at :47 with
+  `withoutOverlapping(10)`, sweeps each cache on its own. It removes direct children of a cache only when they are named as
+  workspaces are (32 hex characters), are private (mode 0700) real directories (never a symbolic link) and were last
+  modified at least an hour ago (`--older-than`, never below 3600 s). Contents go as `close()` removes them: a link inside is
+  unlinked, never followed. It creates nothing, sweeps nothing (and succeeds) when the private disk root or a cache is
+  absent, refuses a cache directory that is a link or not private (that cache fails the run; the others are still swept),
+  prints counts only, one line per cache, and fails the run when it leaves any other entry in place (a workspace-named
+  directory that is not mode 0700 is left and counted). It refuses to run as root (effective uid 0) and removes only
+  workspaces owned by its own effective user (another user's entry is left and counted), so **the scheduler must run as
+  the site user that renders contracts** (review of #251, P3). A render stalled past the cutoff (a parent suspended for an
+  hour) can have its workspace swept under it: its `close()` then refuses `storage_failed`, which the contract work
+  retries; nothing was stored yet, so nothing is lost. Tests: `ContractRenderCacheSweepTest` (each cache, a non-private
+  workspace-named directory, and the swept-under-a-render race through `close()` and a real `IsolatedContractRenderer`).
+- `open_basedir` separators (follow-up of #251, built 2026-11-09): the Isolated (`IsolatedContractRenderer`), Free
+  (`FreeGrantRendererProcess`) and ProductionFree (`ProductionFreeGrantRendererProcess`) children now end every
+  `open_basedir` directory entry with the separator, as the v2 child does. This is defence in depth: on the PHP 8.4.27
+  CLI used for these tests, `open_basedir` already requires a path-component boundary, so a sibling sharing an allowed
+  directory's name as a prefix (`<root>-other/`) was unreadable with or without the separator (probed directly and in
+  the tests; reverting the separator fails only the entry-format assertions). The Free and ProductionFree process files are pinned: `free-v1` and
+  `production-free-v1` manifests and their `MANIFEST_HASH` constants were rebuilt, `ProductionFreeGrantRenderProfile::RELEASED`
+  gained `r2` (r1 stays readable; renders need the runtime profile, as before), and the glyph equivalence comparison was
+  repeated for r2 (`docs/verification/render-cache-hardening-20261109/glyph-equivalence-r2.txt`). These children may still
+  read the whole project root (unlike the v2 child), which this change does not narrow. The paid, paid-tax and member
+  children (pinned in `paid-v1`, `paid-tax-v2` and `production-member-v1`) keep entries without the separator; changing
+  them is a profile revision of its own. Tests: the real child's probe in `TestIsolatedContractRendererTest`,
+  `FreeGrantCliRendererTest` and `ProductionFreeGrantCliRendererTest` (a prefix-sharing sibling of the project root is
+  unreadable, the workspace lists, every entry ends with the separator, and the document still renders). The same holds
+  for #251's v2 sibling probe: it would pass without the separator on this PHP, so its entry-format assertion is what
+  pins the change.
 
 ### Wording item for Sean
 
