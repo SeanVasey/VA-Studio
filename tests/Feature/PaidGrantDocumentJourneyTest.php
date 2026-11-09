@@ -13,6 +13,7 @@ use App\Domain\Commerce\ProductionPolicy\ReviewProductionTrackCapabilities;
 use App\Domain\Commerce\ProductionPolicy\SaveProductionTrackCapabilities;
 use App\Domain\Contracts\ContractIssuanceException;
 use App\Domain\Contracts\Production\VaseyLicenseV2Profile;
+use App\Domain\Contracts\Production\VaseyLicenseV2RendererProcess;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\IdentityNoticeTransport;
@@ -359,6 +360,31 @@ final class PaidGrantDocumentJourneyTest extends TestCase
         $this->assertTrue($complete['fulfilled']);
         $this->assertSame(3, (int) DB::table('paid_document_work')->sole()->attempts);
         $this->assertSame(1, DB::table('audit_events')->where('action', ContractRenderHolds::ACTION)->count());
+    }
+
+    /**
+     * Review P2: a v2 render that fails in a way a retry can fix (here the child cannot be started once, `render_failed`)
+     * leaves no staff hold; the next attempt issues the original.
+     */
+    public function test_a_transient_v2_render_failure_then_success_leaves_no_staff_hold(): void
+    {
+        $this->enableV2Issuance();
+        $f = $this->paidV2Order();
+        $starts = 0;
+        $factory = static function (array $command, string $cwd, array $environment, string $payload) use (&$starts): ?Process {
+            return ++$starts === 1 ? null : new Process($command, $cwd, $environment, $payload, 60);
+        };
+        $this->app->bind(VaseyLicenseV2RendererProcess::class, static fn () => new VaseyLicenseV2RendererProcess($factory));
+        try {
+            (new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
+            $this->fail('The first attempt rendered.');
+        } catch (ContractIssuanceException $error) {
+            $this->assertSame('render_failed', $error->reason);
+        }
+        $this->assertSame(0, DB::table('audit_events')->where('action', ContractRenderHolds::ACTION)->count());
+        $this->assertTrue((new PaidGrantDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user'])['fulfilled']);
+        $this->assertSame([2, 2], [$starts, (int) DB::table('paid_document_work')->sole()->attempts]);
+        $this->assertSame(0, DB::table('audit_events')->where('action', ContractRenderHolds::ACTION)->count());
     }
 
     /**

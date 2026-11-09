@@ -138,15 +138,18 @@ class ContractIdentityHoldsTest extends TestCase
             $this->assertSame($reason, ContractRenderHolds::reason(new ContractIssuanceException($reason), 1, 5));
         }
         // Retryable failures are held only on the last attempt.
-        foreach ([new ContractIssuanceException('storage_failed'), new ContractIssuanceException('unavailable'), new \RuntimeException('synthetic')] as $error) {
+        // render_failed (timeouts, failed forks, a full disk, a crashed child) and signature_unavailable (storage) may pass on a retry.
+        $this->assertSame(['profile_changed', 'signature_changed', 'signature_invalid', 'unsupported_input', 'invalid_pdf'], ContractRenderHolds::PERMANENT);
+        foreach ([new ContractIssuanceException('render_failed'), new ContractIssuanceException('signature_unavailable'),
+            new ContractIssuanceException('storage_failed'), new ContractIssuanceException('unavailable'), new \RuntimeException('synthetic')] as $error) {
             $this->assertNull(ContractRenderHolds::reason($error, 4, 5));
             $this->assertSame(ContractRenderHolds::ATTEMPTS_EXHAUSTED, ContractRenderHolds::reason($error, 5, 5));
         }
 
         // Unknown chains and reasons are refused; a missing order writes nothing.
-        ContractRenderHolds::record('production_checkout_v1', (string) Str::uuid(), 'render_failed');
+        ContractRenderHolds::record('production_checkout_v1', (string) Str::uuid(), 'invalid_pdf');
         $this->assertSame(0, AuditEvent::query()->count());
-        foreach ([['unknown_chain', 'render_failed'], ['production_checkout_v1', 'buyer name']] as [$chain, $reason]) {
+        foreach ([['unknown_chain', 'invalid_pdf'], ['production_checkout_v1', 'buyer name'], ['production_checkout_v1', 'render_failed']] as [$chain, $reason]) {
             try {
                 ContractRenderHolds::record($chain, (string) Str::uuid(), $reason);
                 $this->fail('An unknown render hold was recorded.');
@@ -168,8 +171,8 @@ class ContractIdentityHoldsTest extends TestCase
             }
         });
         ContractRenderHolds::recordAfterFailure('unknown_chain', (string) Str::uuid(), null);
-        DB::transaction(fn () => ContractRenderHolds::recordAfterFailure('production_checkout_v1', (string) Str::uuid(), 'render_failed'));
-        ContractRenderHolds::recordAfterFailure('unknown_chain', (string) Str::uuid(), 'render_failed');
+        DB::transaction(fn () => ContractRenderHolds::recordAfterFailure('production_checkout_v1', (string) Str::uuid(), 'invalid_pdf'));
+        ContractRenderHolds::recordAfterFailure('unknown_chain', (string) Str::uuid(), 'invalid_pdf');
         $this->assertSame([\LogicException::class, InvalidArgumentException::class], array_map(get_class(...), $reported));
         $this->assertSame(0, AuditEvent::query()->count());
     }

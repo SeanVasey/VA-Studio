@@ -12,8 +12,9 @@ use Throwable;
 /**
  * Contract increment 5 activation blocker (review of c5d0ce4c): the durable, staff-visible record of a paid order whose
  * `vasey-license-pdf-v2` original cannot be rendered. Selection builds the document but does not render it, so a refusal
- * only rendering finds (a character a face cannot draw, page or byte limits, `invalid_pdf`/`render_failed`, a signature
- * rotation or pinned-file change since selection) fails the line after payment. No retry fixes those; the order needs staff.
+ * only rendering finds (a character a face cannot draw, page or byte limits, `invalid_pdf`, a signature rotation or
+ * pinned-file change since selection) fails the line after payment. No retry fixes those; the order needs staff. Failures a
+ * retry may fix (`render_failed`, `signature_unavailable`, storage) are held only when they spend the line's last attempt.
  *
  * Written exactly as {@see ContractIdentityHolds} writes its hold, with its own action: one append-only `audit_events` row per
  * order, the paid order's row id as the subject, and only the chain, the refusal code and the order's public id as context
@@ -31,11 +32,15 @@ final class ContractRenderHolds
     public const ATTEMPTS_EXHAUSTED = 'attempts_exhausted';
 
     /**
-     * Render refusals that no retry can fix. `unavailable` (an open transaction) and `storage_failed` (the private disk) are
-     * not here: they are held only once the line's attempts are spent.
+     * Render refusals that no retry can fix: the recorded profile, signature pin or document no longer matches, or the
+     * document cannot be drawn or framed within the profile. Refusals a retry may fix are not here and are held only once
+     * the line's attempts are spent: `render_failed` (a timeout under load, a failed fork, a full disk, a crashed child),
+     * `signature_unavailable` (a storage hiccup), `unavailable` (an open transaction) and `storage_failed` (the private disk).
      */
-    public const PERMANENT = ['profile_changed', 'signature_changed', 'signature_unavailable', 'signature_invalid',
-        'unsupported_input', 'invalid_pdf', 'render_failed'];
+    public const PERMANENT = ['profile_changed', 'signature_changed', 'signature_invalid', 'unsupported_input', 'invalid_pdf'];
+
+    /** Every reason a render hold can record. */
+    public const REASONS = [...self::PERMANENT, self::ATTEMPTS_EXHAUSTED];
 
     /**
      * The hold reason for a failed attempt of a v2 line, or null when the line may still succeed on a retry.
@@ -76,7 +81,7 @@ final class ContractRenderHolds
     public static function record(string $chain, string $orderPublicId, string $reason): void
     {
         [$table, $subject] = ContractIdentityHolds::CHAINS[$chain] ?? throw new InvalidArgumentException('Unknown paid-order chain.');
-        if (! in_array($reason, [...self::PERMANENT, self::ATTEMPTS_EXHAUSTED], true)) {
+        if (! in_array($reason, self::REASONS, true)) {
             throw new InvalidArgumentException('Unknown contract render hold reason.');
         }
         DB::transaction(function () use ($chain, $orderPublicId, $reason, $table, $subject): void {

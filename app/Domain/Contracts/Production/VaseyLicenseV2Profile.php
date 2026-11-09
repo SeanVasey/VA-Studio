@@ -24,7 +24,7 @@ final class VaseyLicenseV2Profile
 
     public const ASSETS_DIRECTORY = VaseyLicenseV2ProfileDefinition::ASSETS_DIRECTORY;
 
-    public const MANIFEST_SHA256 = '843759abf84d004808e993b9f49e9b6f701cef2cb859cfb77f60a885e3e359e1';
+    public const MANIFEST_SHA256 = '9834eaa6085e7012e2e7a7427e22c9f3ca88063e747b8f8d2aa5d62ae2f936ee';
 
     public const FACES = VaseyLicenseV2ProfileDefinition::FACES;
 

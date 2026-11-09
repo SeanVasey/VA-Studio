@@ -88,13 +88,17 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
         };
     }
 
-    /** A child that answers with the given JSON (read from a file in the project, inside its open_basedir). */
-    private static function answering(array $answer): Closure
+    /** A child that answers with the given JSON (placed in its workspace, inside its open_basedir), then runs `$after`. */
+    private static function answering(array $answer, string $after = ''): Closure
     {
-        $path = Storage::disk('local')->path('v2-child-answer-'.bin2hex(random_bytes(6)).'.json');
-        file_put_contents($path, json_encode($answer, JSON_THROW_ON_ERROR));
+        return static function (array $command, string $cwd, array $environment, string $payload) use ($answer, $after): Process {
+            $path = $environment['TMPDIR'].'/answer.json';
+            file_put_contents($path, json_encode($answer, JSON_THROW_ON_ERROR));
+            $command[count($command) - 1] = '-r';
+            $command[] = 'readfile('.var_export($path, true).');'.$after;
 
-        return self::replacing('readfile('.var_export($path, true).');');
+            return new Process($command, $cwd, $environment, $payload, 60);
+        };
     }
 
     public function test_the_child_renders_the_bytes_the_in_process_renderer_renders(): void
@@ -119,10 +123,14 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
     public function test_the_render_path_is_in_the_v2_implementation_pin(): void
     {
         $pinned = VaseyLicenseV2Profile::current()['assets']['implementation'];
-        foreach (['app/Domain/Contracts/Production/VaseyLicenseV2Render.php', 'app/Domain/Contracts/Production/VaseyLicenseV2RendererProcess.php',
-            'scripts/render-vasey-license-v2.php'] as $path) {
+        foreach (['app/Domain/Contracts/Production/VaseyLicenseV2Render.php', 'scripts/render-vasey-license-v2.php'] as $path) {
             $this->assertContains($path, VaseyLicenseV2Implementation::ROOTS);
             $this->assertSame(hash_file('sha256', base_path($path)), $pinned[$path] ?? null, $path);
+        }
+        // The parent-side process is not loaded by the child, so neither it nor its storage classes are pinned.
+        foreach (['app/Domain/Contracts/Production/VaseyLicenseV2RendererProcess.php', 'app/Domain/Contracts/ContractFiles.php',
+            'app/Domain/Contracts/ContractIo.php', 'app/Domain/Contracts/ContractRenderWorkspace.php'] as $path) {
+            $this->assertArrayNotHasKey($path, $pinned);
         }
     }
 
@@ -219,11 +227,33 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
             }
             $this->assertSame($original, file_get_contents($file));
         }
+
+        // Unpinned code never runs: a document class the child loads early, changed to announce itself on stderr (which
+        // would fail the render as render_failed), is refused before it is loaded.
+        $file = base_path('app/Domain/Contracts/Production/VaseyLicenseDocument.php');
+        $original = file_get_contents($file);
+        try {
+            $factory = static function (array $command, string $cwd, array $environment, string $payload) use ($file, $original): Process {
+                file_put_contents($file, $original."\nfwrite(STDERR, 'unpinned code ran');\n");
+
+                return new Process($command, $cwd, $environment, $payload, 60);
+            };
+            $this->refuses('profile_changed', fn () => (new VaseyLicenseV2RendererProcess($factory))->render($input, $profile, $values, $bytes));
+        } finally {
+            file_put_contents($file, $original);
+        }
+        $this->assertSame($original, file_get_contents($file));
     }
 
     public function test_the_child_runs_without_the_parent_environment_and_under_the_paid_renderer_limits(): void
     {
         [$input, $profile, $values, , $bytes] = self::selected();
+        // A child that could write public/ would leave this file; it is removed whatever the outcome.
+        $this->beforeApplicationDestroyed(static function (): void {
+            if (is_file(public_path('v2-child-probe.txt'))) {
+                unlink(public_path('v2-child-probe.txt'));
+            }
+        });
         putenv('VASEY_V2_CHILD_CANARY=synthetic-secret');
         $_ENV['VASEY_V2_CHILD_CANARY'] = 'synthetic-secret';
         $_SERVER['VASEY_V2_CHILD_CANARY'] = 'synthetic-secret';
@@ -235,7 +265,13 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
                 $probeCommand[] = 'echo json_encode(["env" => array_keys(getenv()), "memory" => ini_get("memory_limit"), "time" => ini_get("max_execution_time"),'
                     .'"basedir" => ini_get("open_basedir"), "url" => ini_get("allow_url_fopen"), "exec" => function_exists("exec"), "proc_open" => function_exists("proc_open"),'
                     .'"socket" => function_exists("stream_socket_client"), "curl" => function_exists("curl_init"), "outside" => @file_get_contents("/etc/hostname") !== false,'
-                    .'"tmp" => sys_get_temp_dir(), "ini" => php_ini_loaded_file(), "input" => strlen(stream_get_contents(STDIN))]);';
+                    .'"tmp" => sys_get_temp_dir(), "ini" => php_ini_loaded_file(), "input" => strlen(stream_get_contents(STDIN)),'
+                    .'"mail" => function_exists("mail"), "putenv" => function_exists("putenv"), "dl" => function_exists("dl"),'
+                    .'"env_file" => @file_get_contents('.var_export(base_path('.env'), true).') !== false || @is_file('.var_export(base_path('.env'), true).'),'
+                    .'"project_file" => @file_get_contents('.var_export(base_path('composer.json'), true).') !== false,'
+                    .'"public_write" => @file_put_contents('.var_export(public_path('v2-child-probe.txt'), true).', "x") !== false,'
+                    .'"storage_read" => @scandir('.var_export(storage_path(), true).') !== false,'
+                    .'"app_read" => @file_get_contents('.var_export(base_path('app/Support/CanonicalJson.php'), true).') !== false]);';
                 $run = new Process($probeCommand, $cwd, $environment, $payload, 60);
                 $run->mustRun();
                 $probe = json_decode($run->getOutput(), true, 8, JSON_THROW_ON_ERROR);
@@ -254,7 +290,10 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
         $this->assertNotContains('VASEY_V2_CHILD_CANARY', $environment);
         $this->assertSame(['128M', '60', '0', false, false, false, false, false, false], [$probe['memory'], $probe['time'], $probe['url'], $probe['exec'],
             $probe['proc_open'], $probe['socket'], $probe['curl'], $probe['outside'], $probe['ini']]);
-        $this->assertStringStartsWith(base_path(), $probe['basedir']);
+        $this->assertSame([false, false, false, false, false, false, false, true], [$probe['mail'], $probe['putenv'], $probe['dl'], $probe['env_file'],
+            $probe['project_file'], $probe['public_write'], $probe['storage_read'], $probe['app_read']]);
+        $this->assertFileDoesNotExist(public_path('v2-child-probe.txt'));
+        $this->assertNotContains(base_path(), explode(PATH_SEPARATOR, $probe['basedir']));
         $this->assertStringStartsWith(Storage::disk('local')->path('contracts/render-cache'), $probe['tmp']);
         $this->assertSame(strlen(VaseyLicenseV2RendererProcess::payload($input, $profile, $values)), $probe['input']);
     }
@@ -275,10 +314,13 @@ class VaseyLicenseV2RendererProcessTest extends TestCase
         $answer['profile_hash'] = $result->profileHash;
         $this->assertSame($result->pdfBytes, (new VaseyLicenseV2RendererProcess(self::answering($answer)))->render($input, $profile, $values, $bytes)->pdfBytes);
         // The same correct answer with a single byte of diagnostics fails.
-        $path = Storage::disk('local')->path('v2-child-answer-diagnostics.json');
-        file_put_contents($path, json_encode($answer, JSON_THROW_ON_ERROR));
-        $this->refuses('render_failed', fn () => (new VaseyLicenseV2RendererProcess(self::replacing('readfile('.var_export($path, true).'); fwrite(STDERR, "x");')))
+        $this->refuses('render_failed', fn () => (new VaseyLicenseV2RendererProcess(self::answering($answer, 'fwrite(STDERR, "x");')))
             ->render($input, $profile, $values, $bytes));
+        foreach ([['text_digest', str_repeat('e', 64)]] as [$field, $value]) {
+            $wrong = $answer;
+            $wrong[$field] = $value;
+            $this->refuses('profile_changed', fn () => (new VaseyLicenseV2RendererProcess(self::answering($wrong)))->render($input, $profile, $values, $bytes));
+        }
         foreach ([['page_count', 101], ['size_bytes', $result->sizeBytes + 1], ['sha256', str_repeat('d', 64)], ['pdf_base64', base64_encode('%PDF-1.7 not it')]] as [$field, $value]) {
             $wrong = $answer;
             $wrong[$field] = $value;

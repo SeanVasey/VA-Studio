@@ -368,11 +368,11 @@ byte-identical.
   the document under it.
 - Pin: the renderer is a root of `VaseyLicenseV2Implementation`; its closure adds the reused v1 classes, the binder and the
   census, so a change to any of them refuses v2 (`profile_changed`) until the v2 manifest is rebuilt. Since the isolated
-  render (activation blockers below, 2026-11-09) the roots also include its application-free core (`VaseyLicenseV2Render`),
-  the child script (`scripts/render-vasey-license-v2.php`) and the process that starts it (`VaseyLicenseV2RendererProcess`),
-  whose closure adds `ContractFiles`, `ContractIo` and `ContractRenderWorkspace`. Manifest SHA-256 `843759ab…e3e359e1`
-  (was `bcd40954…34c4dd82` after the wiring change, `1e02e732…c30af5e` before it).
-- Golden: the synthetic business render is `7c710300…acd33945` (GD 2.3.3, zlib 1.3, as v1's; was `2b2a04e4…a2cc8403`, and
+  render (activation blockers below, 2026-11-09) the roots also include its application-free core (`VaseyLicenseV2Render`)
+  and the child script (`scripts/render-vasey-license-v2.php`); the parent-side `VaseyLicenseV2RendererProcess` is not a
+  root, because the child never loads it. Manifest SHA-256 `9834eaa6…e2f936ee` (was `bcd40954…34c4dd82` after the wiring
+  change, `1e02e732…c30af5e` before it).
+- Golden: the synthetic business render is `a720a053…d3d7aa17` (GD 2.3.3, zlib 1.3, as v1's; was `2b2a04e4…a2cc8403`, and
   `ec2f685b…bb3dc157` before that), in process and from the isolated child alike. It changes with every v2 manifest rebuild,
   because the document ID and keywords carry the profile hash.
 - Tests (`VaseyLicenseV2PdfRendererTest`): determinism and golden hash, dates, embedded `/BaseFont` names, keywords;
@@ -465,23 +465,26 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
 - **Isolated render** (2026-11-09). Every v2 original renders in a bounded child, `scripts/render-vasey-license-v2.php`,
   started by `VaseyLicenseV2RendererProcess` with the limits of the paid renderers' child: `php -n` with the same fixed
   extensions, `memory_limit=128M`, `max_execution_time=60` and a 60 s wall clock, `allow_url_fopen=0`, the network and
-  process functions disabled, `open_basedir` limited to the project, the profile's packages and a private per-render
-  workspace (also the child's temporary directory), every inherited environment name removed (only `LANG`, `LC_ALL`, `TZ`,
+  process functions plus `mail`, `putenv` and `dl` disabled, `open_basedir` limited to what the child reads (`app/`, its
+  script, `resources/contracts/vasey-license-v2`, `vendor/composer` and the tc-lib package paths; never `.env`, `storage/`
+  or `public/`) and a private per-render workspace (also the child's temporary directory), every inherited environment name removed (only `LANG`, `LC_ALL`, `TZ`,
   `TMPDIR` and a fixed `LD_LIBRARY_PATH` remain), at most 1 MiB of input, 24 MiB of output and no diagnostics. Under PHP-FPM
   the container gives it `PhpCliProcess::factory()`, like the pinned renderers. The parent binds the line's values (the
   binder needs the application's validator), checks the configured signature against the recorded pin and passes the line,
   the descriptor and the ordered values on standard input, and the checked signature bytes as `signature.png` in the
-  workspace. The child loads no Laravel, configuration or environment: Composer's tc-lib packages and `InstalledVersions`
+  workspace, deleted as soon as the child exits and again before the workspace is removed. The child loads no Laravel, configuration or environment: Composer's tc-lib packages and `InstalledVersions`
   only, and an application class only when the v2 manifest (checked against the anchor's hash) pins its file and the file's
   bytes match the pin. It then re-verifies everything itself in `VaseyLicenseV2Render` (application-free, so the dispatch's
   descriptor checks are the same code): the descriptor's shape and internal hashes, the recorded profile against the
   manifest and every pinned file (`verifyRuntime`), the signature bytes against the recorded pin, the document rebuilt from
   the frozen template and the values under its own input rule against the frozen input hash, and the PDF's effective hash
-  and text digest. The parent checks the answer again (size, page limit, hashes, PDF framing, effective hash, text digest).
+  and text digest. The parent checks the answer again (size, page limit, hashes, PDF framing, effective hash, text digest);
+  that catches accidental drift, not a malicious child, which could echo the descriptor's values over other bytes.
   The child's bytes equal the in-process renderer's (golden test).
 - **Post-payment render refusals leave a staff hold** (2026-11-09). When a v2 line's attempt fails with a refusal no retry
-  fixes (`profile_changed`, `signature_changed`, `signature_unavailable`, `signature_invalid`, `unsupported_input` (including
-  text a face cannot draw), `invalid_pdf`, `render_failed`), or any failure spends its last attempt (`attempts_exhausted`),
+  fixes (`profile_changed`, `signature_changed`, `signature_invalid`, `unsupported_input` (including text a face cannot
+  draw), `invalid_pdf`), or any failure spends its last attempt (`attempts_exhausted`; this is how a retryable
+  `render_failed` such as a timeout, failed fork or full disk, or a `signature_unavailable` storage hiccup, is held),
   `PaidGrantDocuments`/`PaidTaxDocuments` record one `paid_order.contract_render_held` row (`ContractRenderHolds`), after the
   attempt's own frames and outside any transaction: the order's row id as the subject and only the chain, the code and the
   order's public id as context. It is idempotent under the order-row lock (one per order however often it is retried or how
@@ -520,7 +523,12 @@ unpinned issuers: `PaidGrants`/`PaidTaxGrants` choose the profile when a line's 
   oversized output, diagnostics, exit codes, memory and a wall clock; the input bound; the PHP-FPM factory), the render hold
   in `ContractIdentityHoldsTest`, gate-on and gate-off journeys in `PaidGrantDocumentJourneyTest` (a signature rotated after
   selection: one hold across retries, then a successful attempt) and `PaidTaxGrantJourneyTest` (spent attempts: a hold on
-  the last one only; none with the gate off), and the production hold in `tests/ops`.
+  the last one only; none with the gate off), and the production hold in `tests/ops`. Review of ef327df7 added: a transient
+  `render_failed` then success leaves no hold; probes that `.env`, `composer.json` and `storage/` are unreadable and
+  `public/` unwritable from the child and that `mail`, `putenv` and `dl` are disabled; an unpinned change to a class the
+  child loads never runs (it would announce itself on stderr); an answer with the right bytes but another text digest refuses.
+- Remaining for the isolated render: a parent killed mid-render can leave a workspace (with the signature copy if the kill
+  lands before the child exits) under `contracts/render-cache`; a sweeper for stale workspaces is not built.
 
 ### Wording item for Sean
 

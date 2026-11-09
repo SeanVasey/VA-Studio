@@ -9,8 +9,8 @@ namespace App\Domain\Contracts\Production;
  *
  * The roots are the profile definition, the checkout printable set bound to its faces and the renderer
  * ({@see VaseyLicenseV2PdfRenderer}), whose closure brings in the v1 document, layout and signature classes it reuses, and
- * the isolated render path of issued originals: the application-free core ({@see VaseyLicenseV2Render}), the bounded child
- * script that runs it and the process that starts that child ({@see VaseyLicenseV2RendererProcess}).
+ * the isolated render path of issued originals: the application-free core ({@see VaseyLicenseV2Render}) and the bounded
+ * child script that runs it. The parent-side process that starts the child is not a root: the child never loads it.
  * {@see VaseyLicenseV2Profile} is excluded: it holds the manifest's own SHA-256 and anchors the pin.
  */
 final class VaseyLicenseV2Implementation
@@ -21,7 +21,6 @@ final class VaseyLicenseV2Implementation
         'app/Domain/Commerce/ContractIdentity/ContractPrintableSet.php',
         'app/Domain/Contracts/Production/VaseyLicenseV2PdfRenderer.php',
         'app/Domain/Contracts/Production/VaseyLicenseV2Render.php',
-        'app/Domain/Contracts/Production/VaseyLicenseV2RendererProcess.php',
         'scripts/render-vasey-license-v2.php',
     ];
 
