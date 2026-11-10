@@ -27,15 +27,15 @@ function csrfHeaders(): Record<string, string> {
   return token ? { 'X-CSRF-TOKEN': token } : {};
 }
 
-type Props = { privacyNotice: string; noticeToken: string; orderId?: string; attachmentsEnabled?: boolean };
+type Props = { privacyNotice: string; noticeToken: string; orderId?: string; attachmentsEnabled?: boolean; initialSubject?: string; initialMessage?: string; serviceTitle?: string };
 /** Parent gates collection on a verified public or order-specific setup. Locator changes discard private state. */
 export function ContactInquiryForm(props: Props) {
   return <InquiryForm key={props.orderId ?? 'contact'} {...props} />;
 }
 
-function InquiryForm({ privacyNotice, noticeToken, orderId, attachmentsEnabled = false }: Props) {
+function InquiryForm({ privacyNotice, noticeToken, orderId, attachmentsEnabled = false, initialSubject, initialMessage, serviceTitle }: Props) {
   const prefix = useId();
-  const [fields, setFields] = useState<Fields>({ ...empty });
+  const [fields, setFields] = useState<Fields>({ ...empty, subject: initialSubject ?? '', message: initialMessage ?? '' });
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>({ kind: 'editing' });
   const [conversationReceipt, setConversationReceipt] = useState<string | null>(null);
@@ -182,7 +182,7 @@ function InquiryForm({ privacyNotice, noticeToken, orderId, attachmentsEnabled =
   </section>;
 
   return <><section className="contact-inquiry" aria-labelledby={`${prefix}-title`}>
-    <div className="contact-inquiry-heading"><h2 id={`${prefix}-title`}>Send an inquiry</h2><p>Your inquiry will be saved privately for VASEY.AUDIO.</p></div>
+    <div className="contact-inquiry-heading"><h2 id={`${prefix}-title`}>Send an inquiry</h2><p>Your inquiry will be saved privately for VASEY.AUDIO.</p>{serviceTitle && <p className="contact-inquiry-service">Requesting the service: <strong>{serviceTitle}</strong>. This sends a message only; it books nothing and takes no payment.</p>}</div>
     <p className="contact-inquiry-privacy" id={`${prefix}-privacy`}>{displayedNotice}</p>
     <form noValidate onSubmit={submit} aria-describedby={`${prefix}-privacy`}>
       {status.kind === 'error' && <div className="contact-inquiry-summary" role="alert" tabIndex={-1} ref={summary}>
