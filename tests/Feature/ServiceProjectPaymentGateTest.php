@@ -15,6 +15,10 @@ use Tests\TestCase;
  * no command that completes a project, collects or records a payment, or authorizes delivery, and the projection says so
  * on every read. This test pins that absence. A phase that adds a payment or completion path must replace it with the
  * real gate (a completion command refused until durable verified payment) and not simply delete it.
+ *
+ * BL-70 phase 1 adds default-off Stripe test-mode invoicing (docs/service-invoicing.md). It is deliberately not a project command:
+ * an invoice is issued by a separate staff service and a payment is recorded only by re-reading a paid invoice, so this pin still
+ * holds. With no verified service payment the projection still reads not_collected; ServiceInvoicingTest covers the paid states.
  */
 class ServiceProjectPaymentGateTest extends TestCase
 {
