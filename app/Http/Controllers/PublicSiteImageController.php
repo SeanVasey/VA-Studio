@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Albums\AlbumsPolicy;
 use App\Domain\SiteBuilder\Models\SiteImageVariant;
 use App\Domain\SiteBuilder\SiteImageFiles;
 use Illuminate\Database\Query\Builder;
@@ -18,10 +19,17 @@ final class PublicSiteImageController extends Controller
         if (preg_match('/\A([a-f0-9]{64})\.(jpg|webp)\z/D', $file, $match) === 1) {
             // Identical outputs can share a hash, so any live candidate with verified bytes will do. Every candidate is tried, in id
             // order and a chunk at a time: a damaged copy must not hide an intact one, and only staff can add candidates.
+            $albums = app(AlbumsPolicy::class)->enabled();
             $candidates = SiteImageVariant::query()->where('sha256', $match[1])->where('format', $match[2] === 'webp' ? 'webp' : 'jpeg')
-                ->whereExists(fn (Builder $live): Builder => $live->selectRaw('1')->from('site_release_images')
+                ->where(fn ($either) => $either->whereExists(fn (Builder $live): Builder => $live->selectRaw('1')->from('site_release_images')
                     ->join('site_publication_revisions', 'site_publication_revisions.release_id', '=', 'site_release_images.site_release_id')
                     ->whereColumn('site_release_images.site_image_id', 'site_image_variants.site_image_id'))
+                    // Cover art of a published release, while the albums page is on and the image is the version reviewed at publication (BL-67).
+                    ->when($albums, fn ($query) => $query->orWhereExists(fn (Builder $cover): Builder => $cover->selectRaw('1')->from('album_releases')
+                        ->join('site_images', 'site_images.id', '=', 'album_releases.artwork_image_id')
+                        ->where('album_releases.is_published', true)
+                        ->whereColumn('album_releases.artwork_image_id', 'site_image_variants.site_image_id')
+                        ->whereColumn('album_releases.artwork_manifest_sha256', 'site_images.manifest_sha256'))))
                 ->lazyById(20);
             foreach ($candidates as $variant) {
                 $bytes = app(SiteImageFiles::class)->verifiedBytes($variant);

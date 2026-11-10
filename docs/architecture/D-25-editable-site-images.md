@@ -39,10 +39,13 @@ The track media pipeline cannot hold these images: `media_assets.track_id` is re
 | `hero_mobile` | 960 × 890, about 1.08:1 | at least 960 px wide | JPEG and WebP, 480, 720 and 960 px wide |
 | `studio` | 1440 × 630, about 2.29:1 | at least 1440 px wide | JPEG and WebP, 720, 1080 and 1440 px wide |
 | `share` | 1200 × 630, about 1.90:1 | at least 1200 × 630 | one JPEG, trimmed from the centre to exactly 1200 × 630 |
+| `release_cover` | 1200 × 1200, 1:1 | at least 1200 × 1200 | JPEG and WebP, 400, 800 and 1200 px wide (six files) |
+
+`release_cover` was added by profile `site-image-v2` (BL-67, [docs/albums.md](../albums.md)) for the albums page. It is not a site release slot: a release of Sean's music references the image directly, and `/site-images/` serves it only while a published release pins it and the albums page is on. Images prepared under `site-image-v1` stay valid; the v2 profile changes the fingerprint recorded on new images only. Migration `2026_11_10_286700` replaces the intake trigger so the new slot is admitted; the ready trigger already requires six variants for every slot but `share`.
 
 Heights keep the upload's own shape: each height is the width times the upload's height divided by its width, rounded. Uploads are at most 6000 px on a side (`media.max_artwork_dimension`).
 
-Profile `site-image-v1` fixes the encoding. The upload is first re-encoded to a sanitized PNG by the track artwork step. Each output then drops all frame side data (which carries an ICC profile), scales with Lanczos and writes bitexact output with no encoder comment:
+Profile `site-image-v1` (unchanged encoding in `site-image-v2`) fixes the encoding. The upload is first re-encoded to a sanitized PNG by the track artwork step. Each output then drops all frame side data (which carries an ICC profile), scales with Lanczos and writes bitexact output with no encoder comment:
 
 - JPEG: `mjpeg`, `-q:v 3`, full-range 4:2:0 (`yuvj420p`);
 - WebP: `libwebp`, quality 80, compression level 4.
