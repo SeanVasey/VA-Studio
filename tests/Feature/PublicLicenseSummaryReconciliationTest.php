@@ -6,9 +6,11 @@ use App\Domain\Catalog\OfferSnapshot;
 use App\Domain\Catalog\PublishOffer;
 use App\Domain\Catalog\SaveOfferDraft;
 use App\Domain\Rights\LicenseDisclosure;
+use App\Domain\Rights\LicenseTerms;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\PublishLicense;
 use App\Domain\Rights\ReviewLicense;
+use App\Domain\Rights\TypedLicenseTerms;
 use App\Models\User;
 use Filament\Facades\Filament;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -56,6 +58,9 @@ class PublicLicenseSummaryReconciliationTest extends TestCase
     ];
 
     private const DELIVERABLES = ['MP3' => 'download_mp3', 'WAV master' => 'master_wav', 'Stems ZIP' => 'stems_zip'];
+
+    /** The storefront's one deliverable label map (DD-30); every client surface that names a file reads it. */
+    private const CLIENT_LABELS = 'resources/js/lib/deliverable-labels.json';
 
     protected function setUp(): void
     {
@@ -174,6 +179,31 @@ class PublicLicenseSummaryReconciliationTest extends TestCase
         }
     }
 
+    public function test_the_storefront_file_line_uses_the_generated_deliverable_wording(): void
+    {
+        // DD-30: the generated, typed-term wording is canonical. The client's map must be that wording, role for role and
+        // in the generated order, and no client source may carry another name for a file role.
+        $labels = $this->clientLabels();
+        $this->assertSame(array_flip(self::DELIVERABLES), $labels);
+        $this->assertSame(TypedLicenseTerms::DELIVERABLES, $labels);
+        $this->assertSame(LicenseTerms::ASSET_ROLES, array_keys($labels));
+        $sources = [];
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(base_path('resources/js'), \FilesystemIterator::SKIP_DOTS)) as $file) {
+            if (in_array($file->getExtension(), ['ts', 'tsx', 'json'], true)) {
+                $sources[] = $file->getPathname();
+                $this->assertSame(0, preg_match('/untagged|track stems|master wav/i', file_get_contents($file->getPathname())), $file->getPathname());
+            }
+        }
+        $this->assertContains(base_path(self::CLIENT_LABELS), $sources);
+        $this->assertStringContainsString("from './deliverable-labels.json'", file_get_contents(base_path('resources/js/lib/catalog.ts')));
+    }
+
+    /** @return array<string, string> */
+    private function clientLabels(): array
+    {
+        return json_decode(file_get_contents(base_path(self::CLIENT_LABELS)), true, 4, JSON_THROW_ON_ERROR);
+    }
+
     public function test_untyped_schema_one_summaries_are_the_reviewed_prose_exactly(): void
     {
         // Schema 1 has no typed usage terms: its summaries are free prose a reviewer attested against the source. They can
@@ -263,6 +293,12 @@ class PublicLicenseSummaryReconciliationTest extends TestCase
         // The card lists files in the fixed MP3, WAV, stems order whatever order the version stores.
         $this->assertSame(array_values(array_intersect(array_values(self::DELIVERABLES), $terms['required_asset_roles'])), $read['deliverables']);
         $this->assertEqualsCanonicalizing($terms['required_asset_roles'], $read['deliverables']);
+        // The card's file line (the client label of each required role, in map order) names the same files in the same
+        // words as the generated Deliverables line under it.
+        $labels = $this->clientLabels();
+        $fileLine = array_values(array_intersect_key($labels, array_flip($terms['required_asset_roles'])));
+        $this->assertCount(count($terms['required_asset_roles']), $fileLine);
+        $this->assertContains('Deliverables: '.implode(', ', $fileLine).'.', $features);
         if ($schema >= 3) {
             $territory = $terms['territory'];
             if ($territory['mode'] === 'countries') {

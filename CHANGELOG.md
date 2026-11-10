@@ -8,6 +8,10 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ## [Unreleased]
 
+### Fixed
+
+- `StagingEnvironmentAdmissionTest` is green again after #266: the synthetic STAGING seller tag is listed with the admitting gates, and its one use of the word "staging" (a placeholder-path check, not an environment gate) is a recorded exemption that fails if the file ever names staging anywhere else or beside an environment read.
+
 ### Added
 
 - BL-40, six-tier synthetic rehearsal catalog (DD-19, DD-20). `vasey:staging-synthetic-catalog` now creates six `[SYNTHETIC] TEST PRICE` licenses, one per tier shape of the six license templates, and offers each on every synthetic track, so staging has a contract and a delivery to rehearse for every non-exclusive tier without a real price or term. No migration, no new setting.
@@ -231,6 +235,7 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Changed
 
+- Deliverable wording (BL-37, DD-30): the storefront names a license's files in the words the server generates from typed license terms, "MP3", "WAV master" and "Stems ZIP". The "Untagged MP3" and "Track stems" labels are removed (no typed term states "untagged"), and purchased-file labels say "WAV master" instead of "Master WAV". One client map, `resources/js/lib/deliverable-labels.json`, feeds the license cards, track page offers, license chooser, quote review, order preparation and the test delivery panel, and files are listed in the generated order. `tests/Feature/PublicLicenseSummaryReconciliationTest.php` pins the map to `TypedLicenseTerms::DELIVERABLES` and requires each card's file line to agree with its Deliverables line; `tests/frontend/deliverable-wording.test.tsx` checks the rendered lines. No backend term, payload or stored text changed.
 - Catalog identity proof (`CatalogSocketBinding`), delegated decisions of 2026-11-08 (`docs/architecture/decision-register.md`): a TCP table over its 1 MiB read cap now refuses only that attempt, without retry and without marking the worker unusable, so a later attempt succeeds once the table shrinks; a failed or short read and every other snapshot anomaly still taint the worker. The PHP gate admits the 8.4 series from 8.4.27 onward instead of exactly 8.4.27; 8.5+ and older releases still refuse.
 - `docs/legal/PRIVACY.md` no longer claims encrypted backups (backup encryption is opt-in and off by default; production target open), after independent CX review F2.
 - `docs/legal/PRIVACY.md` section 8 no longer says files are encrypted at rest: only database records are; contract PDFs and support-attachment originals are stored privately in plain bytes. File encryption at rest is a reviewer-appendix prerequisite for stronger wording (deferred Codex P2 from PR #169). The staging capability boundary now holds thirteen flags (adds `VASEY_CUSTOMER_DATA_RIGHTS_ENABLED` and `VASEY_TRANSACTIONAL_MAIL_ENABLED`), and `forge-deploy.sh` scrubs their families.
