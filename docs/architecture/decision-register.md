@@ -388,8 +388,15 @@ row when it lands.
 `production_checkout_observations` row of kind `session_expired` and no `production_checkout_payments` row. After it,
 every later provider read that reports the session paid is refused (`provider_uncertain`, one retained `uncertain`
 observation, no payment row, no grant): the guard runs when a read is recorded and again on every read of the intent.
-The read-only schedule counts such an order under the 30-day row from the first expired-session observation, with its
-lines, attempt, intent and session. A paid, held, refunded, disputed or in-flight order is never counted.
+The read-only schedule counts such an order under the 30-day row from its latest expired-session observation, with its
+lines, attempt, intent and session, and only while that observation is the intent's latest. A paid, held, refunded,
+disputed or in-flight order is never counted.
+
+A refused or failed read leaves only an `uncertain` observation, which cannot be told from an outage, and it may be the
+one case where money moved at the provider with no local payment row. So any observation after the expiry holds the
+order (independent review of PR #267, P1). An outage clears on the next successful expired read, which restarts the 30
+days; a real contradiction stays with the order. Terminality rests on this store refusing contrary reads, not on the
+provider: any future purge must re-read the provider session first.
 
 Not applied, and why:
 - **Stripe-test chain (`orders`).** It has no terminal unpaid state. A late paid read after a recorded expiry is refused

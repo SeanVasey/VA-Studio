@@ -108,11 +108,11 @@ Every other migrated table is either listed in `RetentionSchedule::NOT_CUSTOMER_
 | `security`, held | `customer_identity_addresses`, `production_identity_addresses`, `password_reset_tokens` | None. No integer primary key or no timestamp to scan. A production address that an identity origin binds is kept with the orders that origin is sealed into. |
 | `evidence` | `customer_data_requests` (`resolved_at`); following their request: `customer_data_request_events` and `customer_data_exports` (metadata) | PRIVACY: records of privacy requests and of what we did about them, 7 years after the request closes. An open request has no `resolved_at` (the close transition sets it, and the database triggers enforce that), so it and its events are never counted. Export file contents are out of scope: they are purged on download, expiry or deletion approval. |
 | `abandoned_checkout` | `quotes` (`created_at`, `expires_at`), with `quote_lines`, `quote_pricings`, `inventory_reservations`, `inventory_claims` and `promotion_uses` following it; `production_checkout_reviews` (`created_at`, ISO-8601 text) | PRIVACY: quotes and checkout reviews that did not become an order, 30 days after they end. A quote that an order references (`orders.quote_id`), or a review that a production order references (`production_checkout_orders.review_id`), is never counted. `quote_owners` is held: it has no integer key, and orders share it. |
-| `abandoned_checkout`, unpaid production orders (2026-11-10) | `production_checkout_observations` (`created_at`, ISO-8601 text, only rows whose `kind` is `session_expired`); following it: `production_checkout_provider_intents`, then `production_checkout_sessions` and `production_checkout_orders`, then `production_checkout_order_lines` and `production_checkout_attempts` | An unpaid production order whose provider session was observed expired: 30 days after that observation was recorded. Never counted while the intent has a payment (`production_checkout_payments.intent_id`), so a paid, held, refunded or disputed order stays with the orders row; nor is an order with no observed expiry. See "Unpaid order snapshots" below. |
+| `abandoned_checkout`, unpaid production orders (2026-11-10) | `production_checkout_observations` (`created_at`, ISO-8601 text, only a row whose `kind` is `session_expired` and that is its intent's latest observation); following it: `production_checkout_provider_intents`, then `production_checkout_sessions` and `production_checkout_orders`, then `production_checkout_order_lines` and `production_checkout_attempts` | An unpaid production order whose provider session was observed expired: 30 days after that observation was recorded. Never counted once a later observation follows the expiry (a failed or refused read), or while the intent has a payment (`production_checkout_payments.intent_id`), so a paid, held, refunded or disputed order stays with the orders row; nor is an order with no observed expiry. See "Unpaid order snapshots" below. |
 | `operational` | `jobs` (`created_at`, Unix seconds), `failed_jobs` (`failed_at`) | PRIVACY application error log row: 14 days. `job_batches` is held because its primary key is a string. |
 | `not_applicable` | `users`, `customer_accounts`, `customer_saved_tracks`, `sessions`, `customer_consent_policies`; `cache`, `cache_locks` (expiring stores, the rate-limit row); the ten `test_*` test-commerce tables (they must stay empty in production) | Account lifecycle (handled by deletion approval), an expiring store, test commerce, or not customer data. |
 
-A row is past its period only when every clock column is set and at or before the cutoff: now minus the class's years or days. The cutoff is compared in the column's own storage format, so ISO-8601 text and Unix-second columns compare exactly on SQLite and MySQL. A `via` row is past only when its parent is past. A `when` condition limits a clock to rows whose column holds one value (one attachment source kind, one observation kind); any other row is never past. Parents can chain, as in an inventory claim that follows its reservation, which follows its quote.
+A row is past its period only when every clock column is set and at or before the cutoff: now minus the class's years or days. The cutoff is compared in the column's own storage format, so ISO-8601 text and Unix-second columns compare exactly on SQLite and MySQL. A `via` row is past only when its parent is past. A `when` condition limits a clock to rows whose column holds one value (one attachment source kind, one observation kind); any other row is never past. A `latest_in` condition (group column, order column) counts a row only while it is the last row of its group; the query is the same correlated `NOT EXISTS` on SQLite and MySQL. Parents can chain, as in an inventory claim that follows its reservation, which follows its quote.
 
 `php artisan vasey:retention-report` is a dry run:
 - It reads with plain selects only: no transaction, no locks and no writes. It scans each table in primary-key ranges of 10,000, so no single query is unbounded.
@@ -161,7 +161,7 @@ What was asked: prove, per checkout chain, that a webhook or reconcile arriving 
 
 ### Production checkout (V1): proven, applied
 
-**Terminal state.** The order's intent has a `production_checkout_observations` row with `kind = 'session_expired'`, and no `production_checkout_payments` row has that `intent_id`. The clock starts at that observation's `created_at` (the first one, if the expiry was read more than once).
+**Terminal state.** The order's intent has a `production_checkout_observations` row with `kind = 'session_expired'`, that row is the intent's latest observation (no row with the same `intent_id` and a higher `sequence`), and no `production_checkout_payments` row has that `intent_id`. The clock starts at that latest observation's `created_at`. If a later read failed or was refused and the expiry was then read again, the clock starts at the newer expired observation; the earlier one is never counted again.
 
 **Why no payment can attach afterwards.**
 - `HostedCheckout::record()` is the only code that inserts a payment row. It refuses a provider read whose session status differs from a retained `complete` or `expired` status (`terminal_regression`), and a confirmed payment needs a `complete` session.
@@ -169,18 +169,24 @@ What was asked: prove, per checkout chain, that a webhook or reconcile arriving 
 - `record()` reads the intent row first, which takes a row lock on MySQL, and observations are unique per intent and sequence. So an expiry and a paid read that race are applied one after the other, and the second is refused.
 - This chain has no webhook. Its late paths are the operator's `vasey:production-checkout-reconcile` (with or without `--session`), the buyer's reconcile and the buyer returning to the checkout.
 
-**What a late paid read does.** It is refused as `provider_uncertain`. No payment row and no grant are written. One `uncertain` observation is appended after the expired one, and every earlier row is unchanged. This is outcome (ii): refused, with evidence kept. The `uncertain` row records that a read failed, not what the provider said; the provider's own record of the session is the remaining evidence.
+**What a late paid read does.** It is refused as `provider_uncertain`. No payment row and no grant are written. One `uncertain` observation is appended after the expired one, and every earlier row is unchanged. This is outcome (ii): refused, with evidence kept. The same happens when the provider reports the session expired but its payment succeeded.
+
+**A refused read holds the order.** The `uncertain` row records only that a read failed. It does not record what the provider said, so a contradiction (money may have moved at the provider with no local payment row) cannot be told from an outage. From that row on, the expired observation is no longer the intent's latest, and the order, its lines, attempt, intent and session are not counted, however old. An outage clears itself: the next successful read that still shows the session expired appends a new expired observation, and the 30 days start again from it. A real contradiction never clears, and stays with the order for staff to reconcile.
+
+**What terminality rests on.** It rests on this store refusing contrary reads, not on the provider. Nothing here proves the provider took no money; the store only proves it recorded none. Any future purge must therefore re-read the provider session immediately before removing a snapshot, and keep the snapshot unless the session is still expired and unpaid.
 
 **Never counted.**
 - A paid order, however old. Held, refunded and disputed orders all have a payment row, so the same hold covers them.
 - An order in flight: an open session, a provider outage (`uncertain`), or a canceled payment attempt on an open session (`canceled`), which can still be paid.
+- An order whose expired observation was followed by any later observation (see above).
 - The review the order was built from, its exemption basis and `production_checkout_payments`.
 
 **Left with the order on purpose.**
 - *Expired session with a canceled payment attempt.* A late paid read is refused here too, but the observation kind is `canceled` whether the session is open or expired, so the column cannot tell this state from the non-terminal one. Missing: a column or kind that records the session status.
 - *Order that never reached the provider.* It has no intent, and none can be created once the attempt's `expires_at` has passed, but the decision's wording covers only a provider session that expired. Missing: Sean's decision to include it.
 - *Intent with no bound session* (the create response was lost). An operator reconcile with `--session` can still bind and pay it.
-- *Other observations of an abandoned intent* (`session_open`, `uncertain`). Only the expired-session row is the clock row, so the report undercounts that table. A purge design must take them with the intent.
+- *Other observations of an abandoned intent* (`session_open`, `uncertain`, an earlier expired observation). Only the latest expired-session row is the clock row, so the report undercounts that table. A purge design must take them with the intent.
+- *The review an abandoned order was built from.* `production_checkout_orders.review_id` holds it (`unless_referenced`), so it is not counted with the order. Note for the purge design: it would fall due the moment a purge removed the order, with no 30 days of its own left to run.
 
 ### Stripe-test chain: not applied, no terminal state
 
@@ -210,7 +216,7 @@ Notes for the review:
 
 ### Evidence
 
-`tests/Feature/CustomerComms/ProductionUnpaidSnapshotRetentionTest.php` and `StripeTestUnpaidSnapshotRetentionTest.php`, with synthetic provider evidence. SQLite, plus a small native MySQL 8.4 run of the proofs and the boundary report. Hosted Stripe behavior is not exercised.
+`tests/Feature/CustomerComms/ProductionUnpaidSnapshotRetentionTest.php` and `StripeTestUnpaidSnapshotRetentionTest.php`, with synthetic provider evidence, on SQLite. Native MySQL 8.4: not yet run on this commit (recorded separately when it completes). Hosted Stripe behavior is not exercised.
 
 ## Records
 

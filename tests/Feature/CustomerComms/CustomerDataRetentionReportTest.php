@@ -140,8 +140,8 @@ class CustomerDataRetentionReportTest extends TestCase
             }
             $this->assertNotEmpty($clock['columns']);
             $this->assertContains($clock['format'] ?? 'datetime', ['datetime', 'iso8601', 'epoch']);
-            $this->assertTrue(Schema::hasColumns($entry['table'], [...$clock['columns'], 'id', ...(isset($clock['when']) ? [$clock['when'][0]] : [])]), $entry['table']);
-            $this->assertSame([], array_diff(array_keys($clock), ['columns', 'format', 'when', 'unless_later', 'unless_referenced']), $entry['table']);
+            $this->assertTrue(Schema::hasColumns($entry['table'], [...$clock['columns'], 'id', ...(isset($clock['when']) ? [$clock['when'][0]] : []), ...($clock['latest_in'] ?? [])]), $entry['table']);
+            $this->assertSame([], array_diff(array_keys($clock), ['columns', 'format', 'when', 'latest_in', 'unless_later', 'unless_referenced']), $entry['table']);
             if (isset($clock['unless_later'])) {
                 $this->assertTrue(Schema::hasColumns($clock['unless_later'][0], array_slice($clock['unless_later'], 1)));
             }
@@ -190,6 +190,8 @@ class CustomerDataRetentionReportTest extends TestCase
             [$byTable['production_checkout_orders']['class'], $byTable['production_checkout_orders']['clock']]);
         $this->assertSame([['production_checkout_payments', 'intent_id', 'intent_id']], $byTable['production_checkout_observations']['clock']['unless_referenced']);
         $this->assertSame(['kind', 'session_expired'], $byTable['production_checkout_observations']['clock']['when']);
+        // Only while it is the intent's latest observation: a later failed or contradicting read holds the order.
+        $this->assertSame(['intent_id', 'sequence'], $byTable['production_checkout_observations']['clock']['latest_in']);
 
         // The records AGENTS.md calls immutable, and every other record of a purchase, are never counted.
         foreach (['orders', 'order_lines', 'order_finalizations', 'license_grants', 'grant_contracts', 'verified_payments', 'customer_purchase_claims',

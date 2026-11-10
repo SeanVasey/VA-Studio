@@ -28,6 +28,9 @@ namespace App\Domain\Customers\DataRights;
  *   checkout intent follows the terminal observation that names it (`['id', observations, 'intent_id']`).
  * - `when` [column, value], on a `columns` or a `via` clock, limits it to rows whose column holds that value (one source kind,
  *   one terminal observation kind); any other row is never past.
+ * - `latest_in` [group column, order column], on a `columns` clock: the row is past only while it is the last row of its group
+ *   in its own table (no row with the same group value and a higher order value). An observation that anything followed, a
+ *   failed or contradicting read included, is never past.
  * - null: no clock can be modeled from the schema (no primary key or timestamp to scan, or no signal for when the clock
  *   starts), so the table is reported as held and never counted. The rationale says why.
  *
@@ -66,7 +69,11 @@ final class RetentionSchedule
      * `production_checkout_payments` row. `HostedCheckout::record()` is the only writer of a payment row; it refuses any provider
      * read whose session status differs once a retained observation is `expired` (`terminal_regression`), and a confirmed payment
      * needs a `complete` session, so no later reconcile can attach payment. `HostedEvidence::intent()` repeats the check on every
-     * read. The clock starts at the first such observation's `created_at`. Proven by ProductionUnpaidSnapshotRetentionTest.
+     * read. That terminality rests on this store refusing contrary reads, not on the provider: a refused read leaves only an
+     * `uncertain` observation, which cannot be told from an outage. So the expired observation counts only while it is the
+     * intent's LATEST observation (`latest_in`); any later observation holds the order until a successful expired read is
+     * recorded again, and the clock then starts at that latest observation's `created_at`. Proven by
+     * ProductionUnpaidSnapshotRetentionTest. A purge must still re-read the provider session first.
      */
     public const PRODUCTION_ABANDONED_KIND = 'session_expired';
 
@@ -260,13 +267,14 @@ final class RetentionSchedule
             'rationale' => 'Payment intent of a production order; follows the expired-session observation that ends it, and is kept with the order while a payment exists or no expiry was observed.'],
         ['table' => 'production_checkout_sessions', 'family' => null, 'class' => 'abandoned_checkout', 'clock' => ['via' => ['intent_id', 'production_checkout_provider_intents']],
             'rationale' => 'Provider session of a production order intent; follows its intent.'],
-        // The clock row of an abandoned production order: only the `session_expired` observation, 30 days after it was recorded,
-        // and never while the intent has a payment. Other observations of the same intent (`session_open`, `uncertain`, a
-        // `canceled` payment attempt) are never counted on their own; a purge design must take them with the intent.
+        // The clock row of an abandoned production order: only a `session_expired` observation that is the intent's latest
+        // observation, 30 days after it was recorded, and never while the intent has a payment. Other observations of the same
+        // intent (`session_open`, `uncertain`, a `canceled` payment attempt, an earlier expiry) are never counted on their own; a
+        // purge design must take them with the intent.
         ['table' => 'production_checkout_observations', 'family' => null, 'class' => 'abandoned_checkout',
             'clock' => ['columns' => ['created_at'], 'format' => 'iso8601', 'when' => ['kind', self::PRODUCTION_ABANDONED_KIND],
-                'unless_referenced' => [['production_checkout_payments', 'intent_id', 'intent_id']]],
-            'rationale' => 'Provider observations of a production order intent. '.self::ABANDONED_ORDER.'the expired-session observation starts the 30 days, and one whose intent has a payment is kept with the order.'],
+                'latest_in' => ['intent_id', 'sequence'], 'unless_referenced' => [['production_checkout_payments', 'intent_id', 'intent_id']]],
+            'rationale' => 'Provider observations of a production order intent. '.self::ABANDONED_ORDER.'the expired-session observation starts the 30 days while it is the intent\'s latest observation; one that a later read followed (a failed or contradicting read), or whose intent has a payment, is kept with the order.'],
         ['table' => 'production_checkout_exemption_authorities', 'family' => null, 'class' => 'indefinite', 'clock' => null,
             'rationale' => self::WITH_ORDER.'qualification authority behind an exemption basis; tax evidence of the orders it approved.'],
         ['table' => 'production_tax_checkout_requests', 'family' => null, 'class' => 'indefinite', 'clock' => null,

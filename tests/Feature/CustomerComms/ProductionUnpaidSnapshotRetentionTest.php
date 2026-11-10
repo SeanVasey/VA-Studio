@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\ProductionCheckoutGatewayFixture;
 use Tests\Support\ProductionCheckoutJourneyFixture;
@@ -196,16 +197,85 @@ final class ProductionUnpaidSnapshotRetentionTest extends TestCase
             $this->assertArrayNotHasKey($held, $report, $held);
         }
 
-        // A late contradicting reconcile after the 30 days is still refused, and its `uncertain` observation, newer than the
-        // cutoff, is not itself counted: only the terminal observation is the clock row.
+        // A late contradicting reconcile after the 30 days is still refused. It may mean money moved at the provider with no
+        // local payment row, and its `uncertain` observation is all this store keeps of it, so from then on the order is held:
+        // the expired observation is no longer the intent's latest, and nothing of the chain is counted, however old.
         $gateway->state = 'paid';
         $this->assertSame([1, ['code' => 'refused', 'reason' => 'provider_uncertain']], $this->reconcile($order));
         $this->assertDatabaseCount(CheckoutSchema::TABLES['payment'], 0);
+        $this->assertSame(['session_open', 'session_expired', 'uncertain'], $this->kinds());
+        $this->assertNothingCounted($this->report());
         $this->travel(5)->years();
-        $late = $this->report();
-        $this->assertSame(1, $late['production_checkout_observations']['past_period']);
-        $this->assertSame(1, $late['production_checkout_orders']['past_period']);
-        $this->assertSame(3, DB::table('production_checkout_observations')->count());
+        $this->assertNothingCounted($this->report());
+    }
+
+    /** @return array<string, array{0: string}> */
+    public static function laterReads(): array
+    {
+        return ['session reported paid' => ['paid'], 'expired session with a succeeded payment' => ['expired_succeeded'], 'provider outage' => ['down']];
+    }
+
+    #[DataProvider('laterReads')]
+    public function test_a_contradicted_or_failed_read_after_the_expiry_holds_the_order_until_a_successful_expired_read_restarts_the_clock(string $state): void
+    {
+        [$f, $gateway] = $this->initiated();
+        $order = $f['order']['orderId'];
+        $this->travel(2)->hours();
+        $gateway->state = 'expired';
+        $this->assertSame(0, $this->reconcile($order)[0]);
+        $this->travel(31)->days();
+        $this->assertSame(1, $this->report()['production_checkout_orders']['past_period']);
+
+        // A later read contradicts the expiry or fails. All three leave the same `uncertain` observation, so none can be told
+        // from the others afterwards, and all three hold the order.
+        $gateway->state = $state;
+        $this->assertSame([1, ['code' => 'refused', 'reason' => 'provider_uncertain']], $this->reconcile($order));
+        $this->assertSame(['session_open', 'session_expired', 'uncertain'], $this->kinds());
+        $this->assertDatabaseCount(CheckoutSchema::TABLES['payment'], 0);
+        $this->assertNothingCounted($this->report());
+        $this->travel(5)->years();
+        $this->assertNothingCounted($this->report());
+
+        // The next successful read that still shows the session expired makes the order due again, 30 days after THAT
+        // observation: the latest expired observation is the clock row, and the earlier one is never counted again.
+        $gateway->state = 'expired';
+        $this->assertSame([0, 'expired'], [$this->reconcile($order)[0], $this->operatorStatus($order)['checkoutStatus']]);
+        $this->assertSame(['session_open', 'session_expired', 'uncertain', 'session_expired'], $this->kinds());
+        $again = CarbonImmutable::parse(DB::table('production_checkout_observations')->orderByDesc('sequence')->value('created_at'), 'UTC');
+        $this->assertTrue($again->equalTo(now()));
+        $this->assertNothingCounted($this->report());
+        $this->travelTo($again->addDays(30)->subSecond());
+        $this->assertNothingCounted($this->report());
+        $this->travelTo($again->addDays(30));
+        $report = $this->report();
+        $due = $again->addDays(30)->toDateString();
+        $this->assertSame(['past_period' => 1, 'oldest_due' => $due, 'newest_due' => $due, 'clock_index' => 'missing'], $report['production_checkout_observations']);
+        foreach (['production_checkout_orders', 'production_checkout_provider_intents', 'production_checkout_sessions', 'production_checkout_attempts'] as $table) {
+            $this->assertSame(1, $report[$table]['past_period'], $table);
+        }
+        $this->assertDatabaseCount(CheckoutSchema::TABLES['payment'], 0);
+    }
+
+    public function test_another_orders_later_observations_neither_hold_nor_release_this_order(): void
+    {
+        [$f, $gateway] = $this->initiated();
+        $this->travel(2)->hours();
+        $gateway->state = 'expired';
+        $this->assertSame(0, $this->reconcile($f['order']['orderId'])[0]);
+        // A second order's intent (raw rows shaped like the first; no application path reads them here) with more, and so
+        // higher-numbered, observations that end open. "Latest" is per intent: the first order still falls due, the second never.
+        $other = $this->forgeSecondIntent();
+        foreach (['session_open', 'uncertain', 'session_open', 'uncertain', 'session_open'] as $kind) {
+            $this->forgeObservation($kind, $other);
+        }
+        $this->assertSame([2, 5], [DB::table('production_checkout_observations')->where('intent_id', '!=', $other)->max('sequence'),
+            DB::table('production_checkout_observations')->where('intent_id', $other)->max('sequence')]);
+        $this->travel(31)->days();
+        $report = $this->report();
+        foreach (['production_checkout_observations', 'production_checkout_provider_intents', 'production_checkout_orders', 'production_checkout_attempts'] as $table) {
+            $this->assertSame(1, $report[$table]['past_period'], $table);
+        }
+        $this->assertSame([2, 2], [DB::table('production_checkout_orders')->count(), DB::table('production_checkout_provider_intents')->count()]);
     }
 
     public function test_states_that_are_not_provably_terminal_are_never_counted(): void
@@ -261,7 +331,7 @@ final class ProductionUnpaidSnapshotRetentionTest extends TestCase
         $byTable = RetentionSchedule::byTable();
         $this->assertSame('session_expired', RetentionSchedule::PRODUCTION_ABANDONED_KIND);
         $this->assertSame(['columns' => ['created_at'], 'format' => 'iso8601', 'when' => ['kind', 'session_expired'],
-            'unless_referenced' => [['production_checkout_payments', 'intent_id', 'intent_id']]], $byTable['production_checkout_observations']['clock']);
+            'latest_in' => ['intent_id', 'sequence'], 'unless_referenced' => [['production_checkout_payments', 'intent_id', 'intent_id']]], $byTable['production_checkout_observations']['clock']);
         $this->assertSame(['via' => ['id', 'production_checkout_observations', 'intent_id']], $byTable['production_checkout_provider_intents']['clock']);
         $this->assertSame(['via' => ['id', 'production_checkout_provider_intents', 'order_id']], $byTable['production_checkout_orders']['clock']);
         $this->assertSame(['via' => ['intent_id', 'production_checkout_provider_intents']], $byTable['production_checkout_sessions']['clock']);
@@ -339,14 +409,31 @@ final class ProductionUnpaidSnapshotRetentionTest extends TestCase
      * A raw observation row of the given kind on the one intent, as only a direct database write could make it: the insert
      * trigger checks its shape, and no application path would accept or produce it. Used to prove the schedule's own holds.
      */
-    private function forgeObservation(string $kind): void
+    private function forgeObservation(string $kind, ?int $intentId = null): void
     {
-        $intent = DB::table('production_checkout_provider_intents')->sole();
+        $intent = DB::table('production_checkout_provider_intents')->where('id', $intentId ?? DB::table('production_checkout_provider_intents')->min('id'))->sole();
         $sealed = Evidence::seal(['schema_version' => 1, 'purpose' => 'synthetic_forged_observation']);
         DB::table('production_checkout_observations')->insert(['public_id' => (string) Str::uuid(),
             'created_at' => CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z'), ...$sealed, 'intent_id' => $intent->id,
-            'sequence' => DB::table('production_checkout_observations')->max('sequence') + 1, 'kind' => $kind]);
+            'sequence' => DB::table('production_checkout_observations')->where('intent_id', $intent->id)->max('sequence') + 1, 'kind' => $kind]);
         $this->assertSame(CanonicalJson::VERSION, $sealed['canonicalization_version']);
+    }
+
+    /** Raw copies of the one review, order, attempt and intent under new identifiers; returns the second intent's id. */
+    private function forgeSecondIntent(): int
+    {
+        $copy = function (string $table, array $changes): int {
+            $row = (array) DB::table($table)->sole();
+            unset($row['id']);
+
+            return DB::table($table)->insertGetId(['public_id' => (string) Str::uuid(), ...$changes] + $row);
+        };
+        $key = hash('sha256', 'synthetic second order');
+        $review = $copy('production_checkout_reviews', ['request_key' => $key]);
+        $order = $copy('production_checkout_orders', ['review_id' => $review, 'request_key' => $key]);
+        $attempt = $copy('production_checkout_attempts', ['order_id' => $order]);
+
+        return $copy('production_checkout_provider_intents', ['order_id' => $order, 'attempt_id' => $attempt, 'idempotency_key' => 'synthetic-second-intent']);
     }
 
     /** @return array<string, array<string, int|string>> report lines keyed by table */
@@ -375,7 +462,7 @@ final class ProductionUnpaidSnapshotRetentionTest extends TestCase
 /** The synthetic provider with a session that can stay open, expire unpaid, lose a payment attempt, fail, or report payment. */
 final class ExpirableGateway implements ProviderGateway
 {
-    /** open | open_canceled | expired | expired_canceled | paid | down */
+    /** open | open_canceled | expired | expired_canceled | expired_succeeded | paid | down */
     public string $state = 'open';
 
     public function __construct(private readonly ProductionCheckoutGatewayFixture $inner) {}
@@ -406,7 +493,7 @@ final class ExpirableGateway implements ProviderGateway
             return ProductionCheckoutProviderFixtures::session($this->inner->params, 'complete', true);
         }
         $session = ProductionCheckoutProviderFixtures::session($this->inner->params, str_starts_with($this->state, 'expired') ? 'expired' : 'open');
-        if (str_ends_with($this->state, '_canceled')) {
+        if (str_ends_with($this->state, '_canceled') || $this->state === 'expired_succeeded') {
             $session['payment_intent'] = 'pi_SYNTHETIC';
         }
 
@@ -421,6 +508,10 @@ final class ExpirableGateway implements ProviderGateway
             return $this->inner->paymentIntent($context, $id);
         }
         $this->inner->provenance($context);
+        if ($this->state === 'expired_succeeded') {
+            // The contradiction HostedEvidence::financial() names `provider_inconsistent`: money taken on an expired session.
+            return ProductionCheckoutProviderFixtures::payment($this->inner->params);
+        }
         CheckoutException::require($id === 'pi_SYNTHETIC' && str_ends_with($this->state, '_canceled'));
 
         return ['status' => 'canceled', 'amount_received' => 0] + ProductionCheckoutProviderFixtures::payment($this->inner->params);
