@@ -255,21 +255,44 @@ Every `media_assets` row belongs to a track (`track_id` is required), so "attach
 
 ### What "unattached" means
 
-`App\Domain\Media\Lifecycle\MediaReferenceProof` classifies a family as unattached only when every check below finds zero referencing rows outside the family's own lineage (its derived assets, processing runs, upload session and the audit events whose subject is one of those rows) **and** coverage is complete. The checks come from the live schema, so a table or foreign key added later is included without a code change.
+`App\Domain\Media\Lifecycle\MediaReferenceProof` classifies a family as unattached only when every check below finds zero referencing rows outside the family's own lineage (its derived assets, processing runs, upload session and the audit events whose subject is one of those rows) **and** coverage is complete.
 
-- `fk:<table>.<column>`: every foreign key into `media_assets`, `media_processing_runs` or `media_upload_sessions`, and every integer column named `*asset_id` without one.
-- `json:<table>.<column>`: asset ids in every text column named `*asset_ids` and in offer revision snapshots (`assets`, `preview`, `files` and `*asset_id` keys).
-- `poly:<table>.<prefix>`: polymorphic `<prefix>_type`/`<prefix>_id` pairs naming a family row (audit events are handled by the content check).
+Which columns can hold a reference is decided by `MediaReferenceRegistry`, a schema-reviewed list. The proof no longer guesses from column names. Each check reads only registered columns:
+
+- `fk:<table>.<column>`: integer columns holding the id of an asset, a processing run or an upload session (`MEDIA_IDS`).
+- `track:<table>.<column>`: columns holding the family's track id on a sold or committed row (`TRACK_IDS`): `catalog_import_mappings`, `product_draft_members`, `production_checkout_order_lines`, `production_track_preparation_packet_lines`, `legacy_history_track_links`, `offer_revisions` and `free_definitions`. Every family of that track counts as attached. Test-chain order and quote lines name their track only through `offer_revision_id`, so the immutable offer revision row stands for them. `offers.track_id`, `rights_declarations.track_id` and `track_collaborator_splits.track_id` (report-only split metadata) are reviewed as mutable track set-up and do not count.
+- `json:<table>.<column>`: ids inside registered plaintext JSON. The structural pass reads `offers.deliverable_asset_ids`, `media_processing_runs.output_asset_ids` and offer revision snapshots (`JSON_STRUCTURAL`). The full proof also reads quote, pricing, reservation and exclusive-activation snapshots, `audit_events.context`, `site_releases.content`, product draft manifests, processing and recording evidence, `fulfillment_outbox.payload` and queued and failed jobs (`JSON_DEEP`).
+- `poly:<table>.<prefix>`: registered polymorphic `<prefix>_type`/`<prefix>_id` pairs naming a family row (`POLYMORPHIC`, empty today).
 - `publication:track`: the track is published, scheduled or was ever published (`published_slug`).
 - `content:<table>`: any text value in any table containing a member's SHA-256 or private storage path, case-insensitively. Identical bytes in another family, a site image or a kit therefore count as a reference: conservative on purpose.
 
 Paths are also searched in their JSON-escaped form (`media\/revisions\/...`), and needles are matched literally (`LIKE ... ESCAPE '!'`).
 
-Coverage is incomplete, and every family without a found reference is **unknown**, never unattached, while any of these hold data: Laravel ciphertext (`eyJpdiI6`) in any text column outside the reviewed allowlist (`users.app_authentication_secret`, `users.app_authentication_recovery_codes`, `sessions.payload`, `cache.value`), because orders, grants, support attachments and evidence store encrypted payloads that may name an asset; a non-null `*asset_manifest_hash` column; a value of a type the checks cannot read; or more than 1,000 matching rows in one table. In a store with any sale, grant or support attachment, expect "unknown" everywhere: that is the intended answer until those payloads have a reviewed decryption-side check.
+`MediaReferenceJson` reads JSON by a fixed key vocabulary: asset ids under any key ending in `asset_id` or `asset_ids` and under `assets`, `asset`, `preview` and `files`; run ids under keys ending in `processing_run_id`; track ids under keys that are or end in `track_id` or `track_ids` and under `track`, `tracks` and `product` (an offer snapshot's product is the track). Audit context is read for asset and run ids only: an event about a track is not a sold or committed item. The outbox parser accepts only the schema 1 payload, which holds public ids and a hash. The job parser accepts only the job classes listed in `MediaReferenceRegistry::JOBS`; a queued or failed `ProcessMedia` job counts as a reference to its run's family.
+
+Coverage is incomplete, and every family without a found reference is **unknown**, never unattached, while any of these holds. The report prints each as a blocker:
+
+| Blocker | Meaning |
+| --- | --- |
+| `unregistered:<table>.<column>` | The live schema has a candidate column the registry does not classify. |
+| `opaque:<table>.<column>` | A registered opaque payload holds a value: every `*_ciphertext` column, and plaintext whose shape is not reviewed (grant, order-origin, inquiry, membership, service, merch and support-attachment payloads). |
+| `ciphertext:<table>` | Laravel ciphertext (`eyJpdiI6`) in any other text column outside the allowlist (`users.app_authentication_secret`, `users.app_authentication_recovery_codes`, `sessions.payload`, `cache.value`). |
+| `hash_only_manifest:<table>.<column>` | A registered manifest digest is not null (`MANIFEST_DIGESTS`: every `asset_manifest_hash`, `source_manifest_hash`, `artifact_manifest_hash` and two more). |
+| `unresolved_track_source:legacy_history_lines.track_source_id` | A legacy history line names a track by its id in the old system and has no confirmed `legacy_history_track_links` row (BL-07, FP-099). A linked line counts through `track:legacy_history_track_links.track_id`; any unlinked line blocks. |
+| `unparsed:<table>.<column>` | A registered JSON column holds a row that is not the reviewed shape: invalid JSON, a newer outbox schema, an unreviewed job class or an encrypted job. |
+| `json_bound:<table>.<column>` | More than 20,000 candidate rows in one JSON column. |
+| `content_bound:<table>` | More than 1,000 rows of one table match the content search. |
+| `uninspected_type:<table>.<column>` | A value of a type the checks cannot read. |
+
+In a store with any sale, grant, legacy history or support attachment, expect "unknown" everywhere: that is the intended answer until those payloads have a reviewed decryption-side check (P2-1).
+
+#### Adding a column
+
+A migration that adds a column must classify it in `MediaReferenceRegistry` in the same change when the column is a candidate: foreign-keyed to `tracks` or a media table, named like media (`NAME_PATTERN`), part of a `<prefix>_type`/`<prefix>_id` pair, or any long-text or JSON column. `tests/Feature/MediaLifecycle/MediaReferenceRegistryTest.php` introspects the live schema and fails on an unclassified candidate, on a registered column that no longer exists and on a new job class that is not in `JOBS`. Use `OPAQUE` when unsure: it fails closed. A `REVIEWED` entry states that the column can never name a media family or its track, and carries the reason.
 
 ### Staff view
 
-**Media lifecycle** in the admin panel (`App\Filament\Pages\MediaLifecyclePage`) is read-only and gated like the media pages: the `administer-catalog` gate and enrolled MFA on every Livewire request, re-checked under lock by `ReadStaffMediaInventory::lifecycle()`. It shows families and recorded bytes per state (in progress, failed processing, attached, unattached, unknown), upload sessions (active, expired, cleanup pending, with received bytes), and the existing asset-page inventory by role and status. Renders and paging run only the cheap structural checks. The full proof (up to 10 completed families older than the chosen age) runs only when staff choose **Run proof**: at most once a minute per user, cached per user for 10 minutes, and applied to the counts as of that run; until then no family is counted unattached. The staff fence (which locks the user row) commits before the read and is taken again after it, so the read-only proof never holds that lock. It shows ids, roles and sizes only: no file name, storage path, track title or customer value. Sizes are recorded metadata, not disk usage. Families beyond the first 5,000 are not classified.
+**Media lifecycle** in the admin panel (`App\Filament\Pages\MediaLifecyclePage`) is read-only and gated like the media pages: the `administer-catalog` gate and enrolled MFA on every Livewire request, re-checked under lock by `ReadStaffMediaInventory::lifecycle()`. It shows families and recorded bytes per state (in progress, failed processing, attached, unattached, unknown), upload sessions (active, expired, cleanup pending, with received bytes), and the existing asset-page inventory by role and status. Renders and paging run only the cheap structural checks (registered id columns, track-level columns, the three small JSON columns and publication); the JSON checks over snapshots, audit context, site releases, the outbox and jobs belong to the full proof. The full proof (up to 10 completed families older than the chosen age) runs only when staff choose **Run proof**: at most once a minute per user, cached per user for 10 minutes, and applied to the counts as of that run; until then no family is counted unattached. The staff fence (which locks the user row) commits before the read and is taken again after it, so the read-only proof never holds that lock. It shows ids, roles and sizes only: no file name, storage path, track title or customer value. Sizes are recorded metadata, not disk usage. Families beyond the first 5,000 are not classified.
 
 ### Abandoned upload sessions
 
@@ -307,13 +330,15 @@ An approved delete is the next step and needs all of these, none of which exists
 4. A quarantine period: move the family's files into a private holding area (and mark the rows, which today's immutability triggers forbid for `ready`/`processed` assets: a reviewed migration must add a retire state) for a fixed period with a restore path, and only then hard-delete the files. Rows stay as evidence.
 5. The decryption-side checks for encrypted order, grant, contract and support-attachment payloads, so coverage can be complete in a store that has sold anything.
 
-Independent review of PR #257 recorded these as hard prerequisites: no delete may trust the proof until each is met.
+Independent review of PR #257 recorded these as hard prerequisites: no delete may trust the proof until each is met. Two remain open.
 
-- **P2-1:** decrypt and parse every grant, contract, membership and legacy payload, column by column. An allowlist must never stand in for that.
-- **P2-2:** check track-level references: `catalog_import_mappings.track_id`, `legacy_history_lines.track_source_id`, `product_draft_members.track_id` and order lines.
-- **P2-3:** handle id-only references in plaintext JSON outside `MediaReferenceProof::JSON_COLUMNS`: `fulfillment_outbox.payload`, `exclusive_activations.snapshot`, `inventory_reservations.snapshot`, quote snapshots, `audit_events.context`, `site_releases.content` and `jobs.payload`.
-- **P2-4:** detect references through a schema-reviewed registry, not by column name (`source_manifest_hash`, for example, is missed today).
-- **P2-5:** re-prove under the asset, track and offer locks inside the delete transaction.
+- **P2-1 (open):** decrypt and parse every grant, contract, membership and legacy payload, column by column. An allowlist must never stand in for that. Until then every registered `OPAQUE` column that holds a value makes coverage incomplete.
+- **P2-2 (done, 2026-11-10):** track-level references are checked (`track:` checks above). A legacy history line resolves only through its confirmed `legacy_history_track_links` row (one immutable link per line version, bound by trigger to the track its catalog mapping created); the linked track then counts as attached. A line with no link makes coverage incomplete.
+- **P2-3 (done, 2026-11-10):** id-only references in `fulfillment_outbox.payload`, `exclusive_activations.snapshot`, `inventory_reservations.snapshot`, quote and pricing snapshots, `audit_events.context`, `site_releases.content`, `jobs.payload` and `failed_jobs.payload` are parsed by the full proof; a row it cannot parse makes coverage incomplete.
+- **P2-4 (done, 2026-11-10):** references are detected through `MediaReferenceRegistry`, with a schema test that fails on an unclassified column. `source_manifest_hash` and `artifact_manifest_hash` are registered digests.
+- **P2-5 (open):** re-prove under the asset, track and offer locks inside the delete transaction. No delete exists.
+
+These three were closed without an independent review of this change; a delete must not rely on them until one has assessed the registry's `REVIEWED` entries and the JSON vocabulary.
 
 Deferred follow-ups: (P3-2) check that a `resumable/` directory's `public_id` is not claimed by both upload-session tables before removing it; (P3-6) find and clean orphaned `quarantine/resumable/<uuid>/` copies left by interrupted completions; (P3-7) bound the cost of `vasey:media-unattached-report`, which runs the full proof per batch of 10 over every table.
 

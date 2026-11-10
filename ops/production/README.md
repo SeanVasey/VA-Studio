@@ -192,6 +192,12 @@ These are application or review items this kit deliberately does not do:
    or `synthetic`, and a tag file in the attached private storage whose bytes carry the marker of the synthetic STAGING tag
    (`vasey:staging-seller-tag`, staging rehearsal only). The media pipeline and `vasey:doctor` refuse it too. Production needs
    Sean's approved seller tag; see `docs/ops/staging-placeholders.md` (P-1).
+8. **Off through launch (DD-44, DD-50).** `validate-runtime.php` also refuses `REPORTING_MARKETING_SEGMENT_ENABLED` unless it is
+   false, by the pre-launch hold's rule (`LAUNCH_OFF_HOLDS`, config key from `scripts/ops/capability-boundary.php`;
+   `holds.reporting_marketing_segment_enabled`), and the membership code literals `production-memberships.enabled`,
+   `production-memberships.http_mounted` and `member-grants.enabled` unless they read strictly false
+   (`holds.production_memberships_enabled`, `holds.production_memberships_http_mounted`, `holds.member_grants_enabled`). Lifting
+   one is a reviewed change to the validator with Sean's authorization (ledger PCL-23, PCL-25).
 
 ## What was and was not verified
 

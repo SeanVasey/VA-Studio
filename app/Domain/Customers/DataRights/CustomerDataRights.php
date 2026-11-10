@@ -39,7 +39,8 @@ class CustomerDataRights
 
     /**
      * Records a deletion keeps, with the retention that governs each: a `customer-data-rights.retention` period key, or a label
-     * from `RetentionSchedule::RETAINED_LABELS` (kept indefinitely; with the order, or the abandoned-checkout period without one).
+     * from `RetentionSchedule::RETAINED_LABELS` (kept indefinitely; with the order, or the abandoned-checkout period without one;
+     * the financial period, or the abandoned-checkout period for an unpaid order whose session was observed expired).
      */
     public const RETAINED = [
         'orders' => 'financial_records_years', 'license_grants' => 'financial_records_years',
@@ -51,8 +52,10 @@ class CustomerDataRights
         'transactional_notices' => 'correspondence_records_years', 'transactional_mail_deliveries' => 'correspondence_records_years',
         'customer_data_exports' => 'evidence_records_years',
         // D-30: production checkout records that carry buyer declarations (ProductionCheckoutExportSection::RECORDS). A review
-        // that became an order is kept with that order; one that never did is an abandoned checkout (2026-11-09).
-        'production_checkout_reviews' => 'with_order_or_abandoned_checkout_days', 'production_checkout_orders' => 'financial_records_years',
+        // that became an order is kept with that order; one that never did is an abandoned checkout (2026-11-09). An order
+        // snapshot is a financial record unless it was never paid and its provider session was observed expired (FP-076).
+        'production_checkout_reviews' => 'with_order_or_abandoned_checkout_days',
+        'production_checkout_orders' => 'financial_records_years_or_abandoned_checkout_days',
         'production_tax_checkout_orders' => 'financial_records_years',
         // The buyer's qualified exemption attestation (ProductionCheckoutExportSection::RECORDS).
         'production_checkout_exemption_bases' => 'financial_records_years',

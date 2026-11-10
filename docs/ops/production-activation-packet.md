@@ -84,6 +84,15 @@ and let the deploy refresh the environment. `PRE_LAUNCH_HOLDS` in `tests/ops/tes
 with the validator and the boundary. `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED` is not in this list because its command
 already refuses production by itself.
 
+**Off through launch (decision register, 2026-11-10).** The same validator refuses `REPORTING_MARKETING_SEGMENT_ENABLED`
+(DD-44) by the rule above: it is named in `LAUNCH_OFF_HOLDS`, its config key comes from
+`CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS` (not a staged flag, so the staging gates are unchanged) and a refusal is
+`holds.reporting_marketing_segment_enabled`. It also refuses the DD-50 membership code literals unless they read strictly
+`false`: `production-memberships.enabled` (`holds.production_memberships_enabled`), `production-memberships.http_mounted`
+(`holds.production_memberships_http_mounted`, the literal `MembershipHttpMount` reads) and `member-grants.enabled`
+(`holds.member_grants_enabled`). Lifting any of them is a reviewed change to the validator with Sean's authorization
+(`docs/production-cleanup-ledger.md`, PCL-23 and PCL-25).
+
 ## 2. Inputs only Sean can supply
 
 These come from the `docs/handoff/2026-10-07/CLAUDE-PLAN.md` §4 list. Placeholders in this packet look like `<...>`; none
