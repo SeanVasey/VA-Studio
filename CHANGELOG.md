@@ -8,6 +8,10 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ## [Unreleased]
 
+### Security
+
+- BL-45 (DD-14), one production checkout chain: new `ProductionChainExclusivity` guard. If `production_checkout.mounted` (tax-refusing chain) and `production-tax-checkout.http_mounted` (tax-calculating chain) are both the literal `true`, `ProductionCheckoutMount` and `TaxHttpMount` (for the checkout key only) both refuse in every environment, so neither chain registers or serves. Each mount alone behaves as before and both shipped literals stay `false`. The activation packet states that S2 and S3 rehearse the tax chain. Focused tests only, not full acceptance.
+
 ### Documentation
 
 - BL-51 follow-up, the live-site crawl is recorded: `docs/migration/legacy-redirects.md` (services fallback, crawl scope and findings, the 4 redirect, 6 retained, 10 unresolved reconciliation), `docs/production-cleanup-ledger.md` PCL-24 and the FP-100 row of the parity map (documentation only, not test acceptance).
