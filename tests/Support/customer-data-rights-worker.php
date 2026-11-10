@@ -4,6 +4,8 @@ use App\Domain\Customers\CustomerAccessException;
 use App\Domain\Customers\CustomerPrincipal;
 use App\Domain\Customers\DataRights\CustomerDataRights;
 use App\Domain\Customers\DataRights\DataRightsException;
+use App\Domain\Customers\ProductionCustomerPrincipal;
+use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Console\Kernel;
@@ -20,6 +22,16 @@ $input = json_decode(stream_get_contents(STDIN), true, 32, JSON_THROW_ON_ERROR);
 Carbon::setTestNow($input['at']);
 F::configure();
 config(['customer-data-rights.enabled' => true, 'customer-data-rights.retention' => $input['retention']]);
+// BL-44: `production` turns the production identity path on; a customer's principal (`mint` is the user id) is minted from server
+// authority (the production origin and credential on file), as the session does, BEFORE the worker announces itself, so the
+// command's own locks are the first thing it waits on. Staff approval passes `production` without `mint`.
+$production = ($input['production'] ?? false) === true;
+$minted = null;
+if ($production) {
+    config(['production-customer-identity.enabled' => true, 'production-customer-identity.provenance' => 'synthetic_rehearsal',
+        'production-customer-identity.public_origin' => 'http://localhost']);
+    $minted = isset($input['mint']) ? ProductionCustomerPrincipal::forUser(User::findOrFail($input['mint'])) : null;
+}
 $connection = (int) DB::selectOne('SELECT CONNECTION_ID() AS id')->id;
 DB::statement('SET SESSION innodb_lock_wait_timeout = 15');
 DB::statement('SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ');
@@ -61,17 +73,18 @@ if (isset($input['pause_sql'])) {
 $rights = app(CustomerDataRights::class);
 $reason = null;
 try {
-    $principal = isset($input['principal']) ? new CustomerPrincipal(...$input['principal']) : null;
+    $principal = $minted ?? (isset($input['principal']) ? new CustomerPrincipal(...$input['principal']) : null);
     $actor = User::findOrFail($input['actor_id']);
     $value = match ($input['operation']) {
-        'export' => $rights->requestExport($principal, $actor),
-        'download' => $rights->download($principal, $actor, $input['request_id'], $input['token']),
-        'deletion' => $rights->requestDeletion($principal, $actor),
+        'export' => $production ? $rights->requestProductionExport($principal, $actor) : $rights->requestExport($principal, $actor),
+        'download' => $production ? $rights->downloadProduction($principal, $actor, $input['request_id'], $input['token'])
+            : $rights->download($principal, $actor, $input['request_id'], $input['token']),
+        'deletion' => $production ? $rights->requestProductionDeletion($principal, $actor) : $rights->requestDeletion($principal, $actor),
         'approve' => $rights->approveDeletion($input['request_id'], $actor, $input['version']),
         default => throw new LogicException('Unknown customer data rights operation.'),
     };
     $result = 'saved';
-} catch (CustomerAccessException) {
+} catch (CustomerAccessException|IdentityException) {
     $result = 'denied';
 } catch (DataRightsException $error) {
     $result = 'refused';

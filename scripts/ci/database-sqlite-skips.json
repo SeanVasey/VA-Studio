@@ -1385,6 +1385,22 @@
     [
       "Tests\\Feature\\ServiceInvoiceConcurrencyTest",
       "test_two_independent_staff_issuing_the_same_deposit_serialize_to_one_invoice"
+    ],
+    [
+      "Tests\\Feature\\CustomerComms\\ProductionDataRightsConcurrencyTest",
+      "test_an_export_committed_while_a_production_approval_waits_is_purged_by_that_approval"
+    ],
+    [
+      "Tests\\Feature\\CustomerComms\\ProductionDataRightsConcurrencyTest",
+      "test_an_export_waiting_behind_a_production_account_withdrawal_is_denied_without_rows"
+    ],
+    [
+      "Tests\\Feature\\CustomerComms\\ProductionDataRightsConcurrencyTest",
+      "test_an_approval_committed_while_a_production_deletion_request_waits_denies_the_request"
+    ],
+    [
+      "Tests\\Feature\\CustomerComms\\ProductionDataRightsConcurrencyTest",
+      "test_two_simultaneous_production_deletion_requests_leave_one_request_and_one_replay"
     ]
   ]
 }

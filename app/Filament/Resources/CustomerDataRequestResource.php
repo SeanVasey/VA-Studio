@@ -99,6 +99,7 @@ final class CustomerDataRequestResource extends ReadOnlyCommerceResource
                 'retention_policy_unset' => 'The retention schedule is not configured. Configure the approved schedule before approving deletions.',
                 'request_changed' => 'This request changed after you opened the confirmation. Refresh the list.',
                 'staff_account' => 'Staff accounts are never erased through customer requests.',
+                'open_commerce' => 'This production customer has a checkout that may still complete, or a refund or dispute that is not settled. Nothing was changed. Approve again once it is resolved.',
                 default => 'The request could not be resolved.',
             })->persistent()->send();
             $action->cancel();
