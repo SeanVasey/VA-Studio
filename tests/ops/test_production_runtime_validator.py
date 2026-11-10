@@ -438,6 +438,34 @@ class ProductionRuntimeValidator(unittest.TestCase):
             self.assertEqual(run.returncode, 1)
             self.assertIn("runtime.unavailable", run.stderr)
 
+    # ---- the synthetic staging seller tag is a rehearsal placeholder, never a production tag ----
+
+    def test_a_staging_seller_tag_path_is_refused_before_the_preflight_child_runs(self):
+        for path in ("branding/STAGING-synthetic-seller-tag.wav", "branding/staging-tag.wav", "branding/Synthetic-tag.wav"):
+            with self.subTest(path=path):
+                run = self.validate(profile(MEDIA_TAG_PATH=path))
+                self.failed(run, "holds.staging_seller_tag")
+                self.assertEqual(run.stderr.split(), ["FAIL", "holds.staging_seller_tag"], run.stderr)
+
+    def test_a_staging_seller_tag_renamed_to_look_approved_is_refused_by_its_content(self):
+        # The validator reads the tag where the application would: the private local disk of this checkout.
+        private = REPO / "storage/app/private"
+        directory = Path(tempfile.mkdtemp(prefix="ops-validator-tag-", dir=private))
+        self.addCleanup(shutil.rmtree, directory, True)
+        relative = f"{directory.name}/approved-seller-tag.wav"
+        tag = directory / "approved-seller-tag.wav"
+        tag.write_bytes(b"RIFF" + b"x" * 70000 + b"VASEY-STAGING-SYNTHETIC-SELLER-TAG" + b"data")
+        self.failed(self.validate(profile(MEDIA_TAG_PATH=relative)), "holds.staging_seller_tag")
+        # The same path with unmarked content, or with no file at all, is not this hold's to refuse.
+        tag.write_bytes(b"RIFF" + b"x" * 70000 + b"data")
+        self.assertEqual(self.validate(profile(MEDIA_TAG_PATH=relative)).returncode, 0)
+        tag.unlink()
+        self.assertEqual(self.validate(profile(MEDIA_TAG_PATH=relative)).returncode, 0)
+
+    def test_the_staging_marker_is_the_applications_own(self):
+        marker = re.search(r"const MARKER = '([A-Z-]+)';", (REPO / "app/Domain/Media/StagingSellerTag.php").read_text())
+        self.assertEqual(marker and marker.group(1), "VASEY-STAGING-SYNTHETIC-SELLER-TAG")
+
     def test_php_syntax(self):
         lint = subprocess.run([PHP, "-l", str(VALIDATOR)], capture_output=True, text=True)
         self.assertEqual(lint.returncode, 0, lint.stderr)
