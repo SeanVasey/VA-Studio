@@ -14,7 +14,7 @@
 #      `TZ=UTC clamscan --version` prints (a daemon in another time zone, or one that has not reloaded yet, differs)
 #   2. a clean file reads OK and the EICAR test file is FOUND (exit 1)
 #   3. a ZIP over 25 MiB with an EICAR member is FOUND (catches the packaged limits and ScanArchive no)
-#   4. a sparse file over the 1280M limit is FOUND as Heuristics.Limits.Exceeded.MaxFileSize at once (AlertExceedsMax)
+#   4. a sparse file over the 2047M limit is FOUND as Heuristics.Limits.Exceeded.MaxFileSize at once (AlertExceedsMax)
 # Steps 5 to 8 (deflate bomb, largest stems end to end, stopped daemon, vasey:doctor) stay with the operator: they take
 # minutes, need the application, or stop the daemon. Exit 0 only when every automated check passed. Nothing is changed
 # on the host except a scratch directory that is removed at the end. The EICAR text is assembled here at run time.
@@ -103,12 +103,12 @@ if [ -s "$SCRATCH/big-eicar.zip" ]; then
 fi
 
 # 4. a file over the limit must be refused, not skipped.
-if truncate -s 1300M "$SCRATCH/big.bin" 2>/dev/null; then
+if truncate -s 2147000000 "$SCRATCH/big.bin" 2>/dev/null; then
   chmod 0644 "$SCRATCH/big.bin"
   out=$(scan "$SCRATCH/big.bin"); rc=$?
-  if [ "$rc" = 1 ] && grep -q 'Heuristics.Limits.Exceeded.MaxFileSize FOUND' <<<"$out"; then pass "4 a file over 1280M is refused as Heuristics.Limits.Exceeded.MaxFileSize"; else fail "4 a file over 1280M was not refused (exit $rc): MaxFileSize and MaxScanSize 1280M and AlertExceedsMax yes are required"; fi
+  if [ "$rc" = 1 ] && grep -q 'Heuristics.Limits.Exceeded.MaxFileSize FOUND' <<<"$out"; then pass "4 a file over 2047M is refused as Heuristics.Limits.Exceeded.MaxFileSize"; else fail "4 a file over 2047M was not refused (exit $rc): MaxFileSize and MaxScanSize 2047M and AlertExceedsMax yes are required"; fi
 else
-  echo "SKIP 4 the filesystem cannot make a 1300M sparse file here"
+  echo "SKIP 4 the filesystem cannot make a 2147000000-byte sparse file here"
 fi
 
 [ "$FAILED" = 0 ] || echo "verify-clamd: hint: a Permission denied or exit 2 usually means the user is not in the group clamav (restart the process after usermod -aG clamav) or AppArmor refused a path (dmesg | grep DENIED)"

@@ -11,9 +11,12 @@ return [
     'tag_path' => env('MEDIA_TAG_PATH'), // Relative to the private local disk; approved WAV only.
     'tag_sha256' => env('MEDIA_TAG_SHA256'),
     'tag_interval_seconds' => 30,
+    // WAV masters. Stems ZIPs have their own bound below; intake itself caps masters at 200 MiB (IngestMediaUpload::MAX_BYTES).
     'max_source_bytes' => 536870912,
+    // Stems ZIPs: 1 GiB, the intake cap (IngestMediaUpload::MAX_BYTES). A lower value narrows processing only.
+    'max_stems_bytes' => 1073741824,
     // Lower these for a smaller worker; StemsArchive enforces these hard ceilings.
-    'stems' => ['max_entries' => 128, 'max_member_bytes' => 134217728, 'max_total_bytes' => 536870912, 'max_ratio' => 100, 'max_seconds' => 360],
+    'stems' => ['max_entries' => 128, 'max_member_bytes' => 134217728, 'max_total_bytes' => 804257792, 'max_ratio' => 100, 'max_seconds' => 360],
     'max_artwork_bytes' => 20971520,
     'max_duration_seconds' => 1200,
     'max_tag_duration_seconds' => 15,

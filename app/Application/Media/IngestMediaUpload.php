@@ -25,6 +25,27 @@ final class IngestMediaUpload
 {
     public const ROLES = ['master_wav' => 'WAV master', 'artwork' => 'Artwork (PNG or JPEG)', 'stems_zip' => 'Stems (WAV-only ZIP)'];
 
+    /**
+     * The largest source each role may bring in, in bytes. Only stems ZIPs may reach 1 GiB (Sean, 2026-11-10: real BeatStars stems
+     * run to 823 MiB); WAV masters stay at 200 MiB and artwork at 20 MiB. Processing applies a further per-role bound from
+     * config/media.php, and the malware scanner's limits are derived from these (MalwareScanner::limitMebibytes()).
+     */
+    public const MAX_BYTES = ['master_wav' => 200 * 1024 * 1024, 'stems_zip' => 1024 * 1024 * 1024, 'artwork' => 20 * 1024 * 1024];
+
+    public static function maxBytes(string $role): int
+    {
+        return self::MAX_BYTES[$role] ?? 0;
+    }
+
+    private static function limitMessage(string $role): string
+    {
+        return match ($role) {
+            'artwork' => 'Artwork must be between 1 byte and 20 MiB.',
+            'stems_zip' => 'Stems ZIPs must be between 1 byte and 1 GiB.',
+            default => 'WAV masters must be between 1 byte and 200 MiB.',
+        };
+    }
+
     public function handle(Track $track, mixed $upload, string $role, User $actor): MediaAsset
     {
         return $this->ingest($track, $upload, $role, $actor);
@@ -60,9 +81,8 @@ final class IngestMediaUpload
             throw ValidationException::withMessages(['upload' => 'Choose a newly uploaded file. Existing storage paths cannot be submitted.']);
         }
         $size = $upload->getSize();
-        $limit = $role === 'artwork' ? 20 * 1024 * 1024 : 200 * 1024 * 1024;
-        if (! is_int($size) || $size < 1 || $size > $limit) {
-            throw ValidationException::withMessages(['upload' => $role === 'artwork' ? 'Artwork must be between 1 byte and 20 MiB.' : 'WAV masters and stems ZIPs must be between 1 byte and 200 MiB.']);
+        if (! is_int($size) || $size < 1 || $size > self::maxBytes($role)) {
+            throw ValidationException::withMessages(['upload' => self::limitMessage($role)]);
         }
         $source = $upload->getRealPath();
         if (! is_string($source) || ! is_file($source) || is_link($upload->getPathname())) {

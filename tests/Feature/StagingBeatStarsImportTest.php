@@ -474,6 +474,39 @@ class StagingBeatStarsImportTest extends TestCase
         $this->assertSame($before['media_assets'], DB::table('media_assets')->count());
     }
 
+    /** A sparse stems ZIP of the given size: the size is faked, no data blocks are written. */
+    private function sparseStems(int $bytes): void
+    {
+        $this->stage(['/SyntheticStudio/Stems/one.zip' => '']);
+        $handle = fopen($this->staged['files'].'/SyntheticStudio/Stems/one.zip', 'wb');
+        ftruncate($handle, $bytes);
+        fclose($handle);
+    }
+
+    public function test_check_mode_counts_a_stems_zip_of_exactly_one_gibibyte_as_in_the_cap(): void
+    {
+        $this->operators();
+        $this->sparseStems(1024 * 1024 * 1024);
+        $before = $this->census();
+        $this->command(['--check' => true])->expectsOutputToContain('files stems_zip: not_listed=1 ok=1 refused=1')->assertSuccessful();
+        $this->assertSame($before, $this->census());
+    }
+
+    public function test_a_stems_zip_one_byte_over_one_gibibyte_is_refused_too_large_and_the_run_continues(): void
+    {
+        $this->operators();
+        $this->sparseStems(1024 * 1024 * 1024 + 1);
+        $this->command(['--check' => true])->expectsOutputToContain('files stems_zip: not_listed=1 refused=2')->assertSuccessful();
+
+        $this->command()->assertSuccessful();
+        $first = $this->entry($this->report(), 'bs-import-0001');
+        $this->assertSame('refused:too_large', $first['media']['stems_zip']['files']['stems_zip']);
+        $this->assertSame('ready', $first['media']['master_wav']['state']);
+        $this->assertSame(['stems_zip'], $first['media_missing']);
+        // Nothing of the refused file was taken in: no stems source exists.
+        $this->assertSame(0, MediaAsset::where('role', 'stems_zip')->count());
+    }
+
     public function test_a_rejected_file_is_recorded_and_the_run_continues(): void
     {
         $this->operators();

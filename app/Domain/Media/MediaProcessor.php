@@ -19,6 +19,16 @@ class MediaProcessor
      */
     private const VERSION_CALL_SECONDS = 15;
 
+    /** The config key bounding a source of this role: artwork, stems ZIPs and WAV masters each have their own. */
+    public static function sourceLimitKey(string $role): string
+    {
+        return match ($role) {
+            'artwork' => 'media.max_artwork_bytes',
+            'stems_zip' => 'media.max_stems_bytes',
+            default => 'media.max_source_bytes',
+        };
+    }
+
     public function handle(int $runId): MediaProcessingRun
     {
         $token = (string) Str::uuid();
@@ -52,7 +62,7 @@ class MediaProcessor
             }
             $workspace = $files->workspace();
             $input = $workspace.'/source.bin';
-            $integrity = $files->snapshot($source->storage_path, $input, (int) config($source->role === 'artwork' ? 'media.max_artwork_bytes' : 'media.max_source_bytes'));
+            $integrity = $files->snapshot($source->storage_path, $input, (int) config(self::sourceLimitKey($source->role)));
             if (! hash_equals($run->input_sha256, $integrity['sha256']) || ! hash_equals($source->sha256 ?? '', $integrity['sha256']) || (int) $source->size_bytes !== $integrity['size_bytes'] || $source->mime_type !== $integrity['mime_type']) {
                 throw new MediaFailure('source_changed', 'Source hash, size, or MIME no longer matches its intake evidence.');
             }
