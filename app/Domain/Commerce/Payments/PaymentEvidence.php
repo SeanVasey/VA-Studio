@@ -18,7 +18,8 @@ final class PaymentEvidence
         unset($sessionEvidence['url']);
         $total = array_sum(array_column(array_column($request['params']['line_items'], 'price_data'), 'unit_amount'));
         $locator = $session['payment_intent'] ?? null;
-        $safe = null; $outcome = $session['status'] === 'expired' ? 'expired' : 'pending';
+        $safe = null;
+        $outcome = $session['status'] === 'expired' ? 'expired' : 'pending';
         if ($locator !== null) {
             if (! self::paymentId($locator) || $payment === null || ($payment['id'] ?? null) !== $locator
                 || ($payment['object'] ?? null) !== 'payment_intent' || ($payment['livemode'] ?? null) !== false
@@ -33,7 +34,9 @@ final class PaymentEvidence
                 throw new PaymentVerificationException('payment_changed');
             }
             foreach (['account', 'context', 'application', 'application_fee_amount', 'on_behalf_of', 'transfer_data', 'transfer_group', 'setup_future_usage'] as $key) {
-                if (($payment[$key] ?? null) !== null) { throw new PaymentVerificationException('payment_changed'); }
+                if (($payment[$key] ?? null) !== null) {
+                    throw new PaymentVerificationException('payment_changed');
+                }
             }
             if ($payment['status'] === 'succeeded') {
                 if ($payment['amount_received'] !== $total || $payment['amount_capturable'] !== 0) {
@@ -47,14 +50,19 @@ final class PaymentEvidence
             } elseif ($session['payment_status'] === 'paid') {
                 // Conflicting reads are never enough to confirm; a later retry can reconcile them.
                 throw new PaymentVerificationException('retry');
-            } elseif ($payment['status'] === 'requires_capture') { $outcome = 'authorized'; }
-            elseif ($payment['status'] === 'canceled') { $outcome = 'canceled'; }
+            } elseif ($payment['status'] === 'requires_capture') {
+                $outcome = 'authorized';
+            } elseif ($payment['status'] === 'canceled') {
+                $outcome = 'canceled';
+            }
             $safe = array_intersect_key($payment, array_flip(['id', 'object', 'livemode', 'currency', 'amount',
                 'amount_received', 'amount_capturable', 'metadata', 'status', 'capture_method', 'payment_method_types']));
         } elseif ($payment !== null || $session['payment_status'] === 'paid') {
             throw new PaymentVerificationException('retry');
         }
-        if ($session['payment_status'] === 'no_payment_required') { throw new PaymentVerificationException('payment_changed'); }
+        if ($session['payment_status'] === 'no_payment_required') {
+            throw new PaymentVerificationException('payment_changed');
+        }
 
         return ['schema_version' => 1, 'purpose' => 'verified_test_payment_observation', 'source' => $source,
             'receipt_id' => $receiptId, 'account_id' => $request['account_id'], 'mode' => 'test',
@@ -73,7 +81,8 @@ final class PaymentEvidence
     {
         $payload = app(CheckoutEvidence::class)->decrypt($payment->evidence_ciphertext, $payment->evidence_hash, $payment->canonicalization_version);
         $amounts = array_column(array_column($request['params']['line_items'], 'price_data'), 'unit_amount');
-        $total = array_sum($amounts); sort($amounts);
+        $total = array_sum($amounts);
+        sort($amounts);
         $expectedSession = ['schema_version' => 1, 'intent_id' => $request['intent_id'], 'account_id' => $request['account_id'],
             'mode' => 'test', 'session_id' => $session->provider_session_id, 'status' => 'complete', 'provider_payment_status' => 'paid',
             'payment_intent_id' => $payment->provider_payment_intent_id, 'amount_minor' => $total, 'currency' => 'USD',
