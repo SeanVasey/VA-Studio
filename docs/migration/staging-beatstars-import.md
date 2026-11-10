@@ -61,9 +61,11 @@ track and per role and without stopping the run, as:
 | `refused:path_not_absolute`, `path_traversal` (`.`, `..`, empty components), `path_invalid` (control characters, backslash, padding) | The cell is not a clean absolute path. |
 | `refused:wrong_extension` | The extension is not one the role allows. |
 | `refused:symlink` | Any component, including the file, is a symlink. |
-| `refused:not_regular_file`, `empty_file`, `unreadable`, `outside_root`, `hardlink` (more than one link), `too_large` (over the intake cap: 200 MiB WAV and ZIP, 20 MiB artwork) | Not a single-link, regular, non-empty, readable, in-cap file inside the root. |
-| `rejected` | The ordinary intake refused the file (content type, size limit: 200 MiB for WAV and ZIP, 20 MiB for artwork). |
+| `refused:not_regular_file`, `empty_file`, `unreadable`, `outside_root`, `hardlink` (more than one link), `too_large` (over the intake cap: 200 MiB for the WAV master and the MP3 preview, 1 GiB for the stems ZIP since 2026-11-10, 20 MiB artwork) | Not a single-link, regular, non-empty, readable, in-cap file inside the root. |
+| `rejected` | The ordinary intake refused the file (content type, size limit: 200 MiB for WAV, 1 GiB for the stems ZIP, 20 MiB for artwork). |
 | `failed:<code>` | Processing failed (for example `malware_detected`, `tag_not_configured`, a stems manifest problem, `queue_refused`). |
+
+**Gate before importing stems ZIPs over 200 MiB (2026-11-10).** Run acceptance step 6 of [media processing](../media-processing.md) on the staging host's own ClamAV first: one stems ZIP that expands to the 767 MiB ceiling must process end to end, and the 2047 MiB bomb check must alert. Until both pass, a large stems ZIP may end in `archive_timeout` or `scanner_unavailable` retries, which fail closed and never mark it clean. A stems run holds the quarantine copy, the workspace snapshot, the extracted members and the rebuilt ZIP at once, about 3.5 GiB of private storage per run, plus ClamAV temporary files.
 
 The media root must be a canonical absolute directory (no symlink), owned by the user running the command, and not writable by group
 or others. A file that changes while it is taken in is reported as `failed:source_changed_during_read`.

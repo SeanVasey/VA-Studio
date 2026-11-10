@@ -29,6 +29,8 @@ final class ResumableMediaUploads
     {
         $this->rootTransaction();
         if (! $track->exists || ! array_key_exists($role, IngestMediaUpload::ROLES)
+            // The browser uploader keeps 200 MiB for every role: it hashes the whole file in memory (JS crypto.subtle), unmeasured at 1 GiB.
+            // Only IngestMediaUpload::MAX_BYTES (the staging import command) admits a 1 GiB stems ZIP.
             || $sizeBytes < 1 || $sizeBytes > ($role === 'artwork' ? 20 : 200) * 1024 * 1024
             || ! preg_match('/\A[a-f0-9]{64}\z/D', $sha256)) {
             $this->invalid('Choose a supported file within the existing upload limits and its SHA-256 digest.');

@@ -100,6 +100,45 @@ class BeatStarsMediaFilesTest extends TestCase
         $this->assertSame($expected, BeatStarsMediaFiles::open($this->root)->resolve($role, $listed));
     }
 
+    /**
+     * Sparse files fake the sizes: no data blocks are written, so a 1 GiB file costs the filesystem nothing.
+     *
+     * @return array<string, array{0: string, 1: string, 2: int, 3: array<string, mixed>}>
+     */
+    public static function intakeCaps(): array
+    {
+        $mib = 1024 * 1024;
+
+        return [
+            'stems ZIP at exactly 1 GiB is in the cap' => ['stems_zip', 'stems.zip', 1024 * $mib, ['state' => 'ok']],
+            'stems ZIP one byte over 1 GiB is too large' => ['stems_zip', 'stems.zip', 1024 * $mib + 1, ['state' => 'refused', 'code' => 'too_large']],
+            'stems ZIP at the old 200 MiB cap is in the cap' => ['stems_zip', 'stems.zip', 200 * $mib, ['state' => 'ok']],
+            'master WAV at exactly 200 MiB is in the cap' => ['master_wav', 'master.wav', 200 * $mib, ['state' => 'ok']],
+            'master WAV one byte over 200 MiB is still too large' => ['master_wav', 'master.wav', 200 * $mib + 1, ['state' => 'refused', 'code' => 'too_large']],
+            'master WAV at 1 GiB is still too large' => ['master_wav', 'master.wav', 1024 * $mib, ['state' => 'refused', 'code' => 'too_large']],
+            'artwork at exactly 20 MiB is in the cap' => ['artwork', 'art.png', 20 * $mib, ['state' => 'ok']],
+            'artwork one byte over 20 MiB is still too large' => ['artwork', 'art.png', 20 * $mib + 1, ['state' => 'refused', 'code' => 'too_large']],
+            'high-resolution artwork one byte over 20 MiB is still too large' => ['artwork_high_res', 'art-hi.png', 20 * $mib + 1, ['state' => 'refused', 'code' => 'too_large']],
+            'preview MP3 one byte over 200 MiB is still too large' => ['preview_mp3', 'preview.mp3', 200 * $mib + 1, ['state' => 'refused', 'code' => 'too_large']],
+        ];
+    }
+
+    #[DataProvider('intakeCaps')]
+    public function test_the_intake_cap_is_per_role_and_only_the_stems_zip_reaches_one_gibibyte(string $role, string $file, int $bytes, array $expected): void
+    {
+        $handle = fopen($this->root.'/Studio/Masters/'.$file, 'wb');
+        ftruncate($handle, $bytes);
+        fclose($handle);
+
+        $resolved = BeatStarsMediaFiles::open($this->root)->resolve($role, '/Studio/Masters/'.$file);
+
+        $this->assertSame($expected['state'], $resolved['state']);
+        $this->assertSame($expected['code'] ?? null, $resolved['code'] ?? null);
+        if ($expected['state'] === 'ok') {
+            $this->assertSame($bytes, $resolved['bytes']);
+        }
+    }
+
     public function test_the_root_must_be_canonical_private_to_the_user_and_not_a_symlink(): void
     {
         foreach ([$this->root.'/', $this->root.'/../files', $this->base.'/missing', '/', 'relative/files', $this->root.'/Studio/Masters/a.wav'] as $bad) {
