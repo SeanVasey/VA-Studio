@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicCatalog;
+use App\Domain\SiteBuilder\LegalPublicationGuard;
 use App\Domain\SiteBuilder\Models\SiteImage;
 use App\Domain\SiteBuilder\Models\SitePublication;
 use App\Domain\SiteBuilder\Models\SitePublicationRevision;
@@ -17,6 +18,7 @@ use App\Domain\SiteBuilder\SiteRelatedTracks;
 use App\Filament\Forms\PreserveTrackIdState;
 use App\Filament\Resources\SiteReleaseResource\Pages\ListSiteReleases;
 use App\Models\User;
+use App\Support\Audit\AuditEvent;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -403,8 +405,14 @@ class SiteReleaseResource extends OperatorResource
             $content = ['schema_version' => $version] + $content
                 + (in_array($version, SiteContentSchema::IMAGE_VERSIONS, true) ? ['images' => $images] : [])
                 + ($version === SiteContentSchema::LEGAL_VERSION ? ['legal' => $legal] : []);
-            app(SiteContent::class)->create($content, $data['label'], static::actor());
+            $release = app(SiteContent::class)->create($content, $data['label'], static::actor());
             Notification::make()->success()->title('Private draft saved')->body('Preview the release before publishing.')->send();
+            // A draft may hold drafting marks for private review; say at once that the domain will refuse to publish it.
+            $markers = LegalPublicationGuard::findings($release->content);
+            if ($markers !== []) {
+                Notification::make()->warning()->title('This draft cannot be published yet')
+                    ->body(LegalPublicationGuard::describe($markers))->persistent()->send();
+            }
         } catch (ValidationException $exception) {
             $path = $livewire->getSchema($livewire->getMountedActionSchemaName())->getStatePath();
             $errors = [];
@@ -590,11 +598,19 @@ class SiteReleaseResource extends OperatorResource
                 $schedules = app(SiteContent::class)->recentSchedules(20);
                 $labels = SiteRelease::query()->whereIn('id', $schedules->pluck('release_id'))->pluck('label', 'id');
                 $users = User::query()->whereIn('id', $schedules->pluck('created_by')->merge($schedules->pluck('resolved_by'))->filter())->pluck('name', 'id');
+                // The schedule row stores one of its fixed outcomes; a legal-marker refusal names its reason in the audit event.
+                $legal = AuditEvent::query()->where('action', 'site.schedule.failed')->where('subject_type', SitePublicationSchedule::class)
+                    ->whereIn('subject_id', $schedules->where('outcome', 'integrity')->pluck('id'))->get()
+                    ->filter(fn (AuditEvent $event): bool => ($event->context['reason'] ?? null) === LegalPublicationGuard::REASON)
+                    ->pluck('subject_id')->flip();
 
                 return view('admin.site-schedule-history', ['rows' => $schedules->map(fn (SitePublicationSchedule $schedule): array => [
                     'id' => $schedule->id, 'release' => ($labels[$schedule->release_id] ?? 'Unavailable').' (#'.$schedule->release_id.')',
                     'publish_at' => static::utc($schedule->publish_at), 'state' => ucfirst($schedule->state),
-                    'reason' => static::scheduleOutcome($schedule->outcome), 'scheduled_by' => $users[$schedule->created_by] ?? 'Unavailable',
+                    'reason' => $legal->has($schedule->id)
+                        ? 'Not published: the legal pages still hold unresolved placeholders or review markers ('.LegalPublicationGuard::REASON.')'
+                        : static::scheduleOutcome($schedule->outcome),
+                    'scheduled_by' => $users[$schedule->created_by] ?? 'Unavailable',
                     'resolved' => $schedule->resolved_at === null ? '—' : static::utc($schedule->resolved_at)
                         .($schedule->resolved_by === null ? ' by the scheduler' : ' by '.($users[$schedule->resolved_by] ?? 'Unavailable')),
                     'revision' => $schedule->publication_revision,
