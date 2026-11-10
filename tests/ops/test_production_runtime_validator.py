@@ -302,6 +302,45 @@ class ProductionRuntimeValidator(unittest.TestCase):
         contracts.write_text(source.replace("'vasey_license_v2_issuance' => false,", "'vasey_license_v2_issuance' => true,"))
         self.failed(run(), "holds.vasey_license_v2_issuance")
 
+    def test_the_operator_alert_mail_production_literal_is_held(self):
+        # FP-013: the alert mail transport refuses production in code unless this literal is true; it sits beside the flag hold.
+        text = VALIDATOR.read_text()
+        self.assertIn("$check('holds.operator_alert_mail_production_admitted', "
+                      "config('inquiries.operator_alert_mail_production_admitted') === false);", text)
+        self.assertRegex(text, r"foreach \(\$holdKeys as \$name => \$key\) \{\s*\$check\('holds\.'\.strtolower\(\$name\), config\(\$key\) === false\);\s*\}"
+                               r"\s*(?://[^\n]*\n\s*)+\$check\('holds\.operator_alert_mail_production_admitted'")
+        self.assertEqual(self.validate(profile()).returncode, 0)
+
+    def test_the_operator_alert_mail_production_literal_flipped_fails_the_validator(self):
+        # A shadow project whose only change is the literal (true, or a truthy non-boolean): the validator run from it refuses.
+        shadow = self.dir / "shadow"
+        shadow.mkdir()
+        for name in ("app", "vendor", "scripts", "routes", "resources", "database", "public", "storage", "composer.json", "artisan"):
+            (shadow / name).symlink_to(REPO / name)
+        shutil.copytree(REPO / "bootstrap", shadow / "bootstrap")
+        shutil.copytree(REPO / "config", shadow / "config")
+        (shadow / "ops/production").mkdir(parents=True)
+        shutil.copy2(VALIDATOR, shadow / "ops/production/validate-runtime.php")
+        inquiries = shadow / "config/inquiries.php"
+        source = inquiries.read_text()
+        literal = "'operator_alert_mail_production_admitted' => false,"
+        self.assertEqual(source.count(literal), 1)
+
+        def run():
+            self.file.write_text(profile())
+            self.file.chmod(0o600)
+            return subprocess.run([PHP, str(shadow / "ops/production/validate-runtime.php"), str(self.file), "production", HOST, "vasey_production"],
+                                  cwd=shadow, env={"PATH": os.environ.get("PATH", "/usr/bin:/bin")}, capture_output=True, text=True, timeout=120)
+
+        self.assertEqual(run().returncode, 0)
+        for value in ("true", "1", "'false'", "null"):
+            with self.subTest(value=value):
+                inquiries.write_text(source.replace(literal, f"'operator_alert_mail_production_admitted' => {value},"))
+                result = run()
+                self.failed(result, "holds.operator_alert_mail_production_admitted")
+                self.assertEqual({line for line in result.stderr.splitlines() if line.startswith("FAIL ")},
+                                 {"FAIL holds.operator_alert_mail_production_admitted"}, result.stderr)
+
     def test_the_documented_off_values_are_accepted_and_a_blank_assignment_is_not(self):
         for value in ("false", "(false)"):
             with self.subTest(value=value):

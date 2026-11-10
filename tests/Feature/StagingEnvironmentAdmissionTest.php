@@ -116,6 +116,8 @@ class StagingEnvironmentAdmissionTest extends TestCase
         'app/Domain/Customers/Preferences/LocalConsentRuntime.php',
         'app/Domain/Notifications/TransactionalNotificationPolicy.php',
         'app/Domain/Inquiries/OrderInquiry.php',
+        // FP-013: the operator alert mail transport is admitted in local, testing and staging; production needs its code literal.
+        'app/Domain/Inquiries/Notifications/MailInquiryAlertTransport.php',
         'app/Domain/Services/Projects/ServiceProjectPolicy.php',
         'app/Domain/Memberships/MembershipPolicy.php',
         'app/Domain/Grants/Free/FreeGrantPolicy.php',
@@ -132,6 +134,8 @@ class StagingEnvironmentAdmissionTest extends TestCase
      */
     private const NAMES_STAGING_WITHOUT_GATING = [
         'app/Domain/Media/StagingSellerTag.php' => '/stripos\(\$path, \'staging\'\)/',
+        // BL-49: the cutover check's marker word for staging stand-in file names (seller tag, specimen signature), one constant.
+        'app/Support/Diagnostics/CutoverMarkers.php' => '/public const STAGING_PATH_WORD = \'staging\';/',
     ];
 
     /** Development-only conveniences and production-lane rehearsals: these stay explicitly local/testing. */

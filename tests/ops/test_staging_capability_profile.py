@@ -207,13 +207,75 @@ class AdmissionMatchesTheValues(unittest.TestCase):
         self.assertIn("app()->bound(FreeGrantIdentity::class)", arm.group(1))
         self.assertNotIn("admitsTestCommerce", arm.group(1), "the operative arm gained an environment gate: update the profile comment")
 
-    def test_operator_inquiry_notifications_are_ungated_and_inert_without_a_shipped_adapter(self):
+    def test_operator_inquiry_notifications_ship_one_mail_transport_bound_only_behind_the_flag_and_refused_in_production(self):
         self.assert_source("app/Domain/Inquiries/Notifications/InquiryNotificationWork.php",
                            r"config\('inquiries\.operator_notifications_enabled'\) === true\s*&& app\(\)->bound\(InquiryAlertTransport::class\)")
-        for path in sorted((REPO / "app").rglob("*.php")):
+        # FP-013 ships exactly one transport (mail) and exactly one binding of it. Another implementation or binding, or a
+        # changed admission rule below, sends the flag and the template comments back for review. A binding is any container
+        # registration call or array write naming the interface, by short name, fully qualified name or string.
+        transport = "app/Domain/Inquiries/Notifications/MailInquiryAlertTransport.php"
+        name = r"""(?:(?:\\?App\\Domain\\Inquiries\\Notifications\\)?InquiryAlertTransport::class|['"]\\?App\\{1,2}Domain\\{1,2}Inquiries\\{1,2}Notifications\\{1,2}InquiryAlertTransport['"])"""
+        binding = re.compile(r"(?:\b(?:bind|bindIf|singleton|singletonIf|scoped|scopedIf|instance|extend|alias|swap)\(\s*" + name + r"|\[\s*" + name + r"\s*\]\s*=[^=])")
+        implementing = re.compile(r"implements\s+[^{]*\bInquiryAlertTransport\b")
+        for sample in ("$this->app->bind(InquiryAlertTransport::class, X::class)", "$app->bindIf(InquiryAlertTransport::class, X::class)",
+                       "$app->singletonIf( \\App\\Domain\\Inquiries\\Notifications\\InquiryAlertTransport::class, X::class)",
+                       "$app->scoped('App\\\\Domain\\\\Inquiries\\\\Notifications\\\\InquiryAlertTransport', X::class)",
+                       "$app->instance(\"App\\Domain\\Inquiries\\Notifications\\InquiryAlertTransport\", $x)",
+                       "$app[InquiryAlertTransport::class] = fn () => new X;",
+                       "$this->app[ \\App\\Domain\\Inquiries\\Notifications\\InquiryAlertTransport::class ] = $x;"):
+            self.assertRegex(sample, binding)
+        for sample in ("app()->bound(InquiryAlertTransport::class)", "app(InquiryAlertTransport::class)",
+                       "$app[InquiryAlertTransport::class] === null"):
+            self.assertNotRegex(sample, binding)
+        self.assertRegex("final class X implements Other, \\App\\Domain\\Inquiries\\Notifications\\InquiryAlertTransport\n{", implementing)
+        implementers, binders = [], []
+        for path in sorted((REPO / "app").rglob("*.php")) + sorted((REPO / "routes").rglob("*.php")) + sorted((REPO / "bootstrap").glob("*.php")):
             text = path.read_text()
-            self.assertNotRegex(text, r"implements\s+InquiryAlertTransport", f"{path}: an alert transport now ships; re-review the flag")
-            self.assertNotRegex(text, r"(?:bind|singleton|instance)\(\s*(?:InquiryAlertTransport|FreeGrantIdentity)::class", f"{path}: a binding now exists")
+            relative = path.relative_to(REPO).as_posix()
+            if implementing.search(text):
+                implementers.append(relative)
+            if binding.search(text):
+                binders.append(relative)
+            self.assertNotRegex(text, r"(?:bind|bindIf|singleton|singletonIf|scoped|scopedIf|instance)\(\s*\\?(?:[A-Za-z\\]+\\)?FreeGrantIdentity::class",
+                                f"{path}: a binding now exists")
+        self.assertEqual(implementers, [transport], "another alert transport ships; re-review the flag")
+        self.assertEqual(binders, [transport], "the alert transport is bound somewhere else; re-review the flag")
+        self.assertEqual(len(re.findall(r"InquiryAlertTransport::class", source(transport))), 1)
+        # Bound only on the literal flag, in an admitted environment, with a configured operator; no other caller binds it.
+        self.assert_source(transport, r"function bindWhenConfigured\(Application \$app\): bool\s*\{.*?"
+                                      r"if \(\$config->get\('inquiries\.operator_notifications_enabled'\) !== true \|\| ! self::admitted\(\)\s*"
+                                      r"\|\| ! is_scalar\(\$operator\) \|\| preg_match\('/\\A\[1-9\]\[0-9\]\{0,15\}\\z/D', \(string\) \$operator\) !== 1\) \{\s*"
+                                      r"return false;\s*\}\s*\$app->bind\(InquiryAlertTransport::class, self::class\);")
+        callers = [path.relative_to(REPO).as_posix() for path in sorted((REPO / "app").rglob("*.php")) if "bindWhenConfigured(" in path.read_text()]
+        self.assertEqual(callers, [transport, "app/Providers/AppServiceProvider.php"])
+        # The environment gate: local, testing and staging through the shared helper; production only with a code literal that
+        # ships false and is never an environment read. Staging is therefore admitted, and the staging deploy gate keeps the
+        # flag false there; in production both this gate and the pre-launch hold refuse.
+        self.assert_source(transport, r"function admitted\(\): bool\s*\{\s*return TestEnvironment::admitsTestCommerce\(\)\s*"
+                                      r"\|\| \(app\(\)->environment\(\) === 'production' && config\('inquiries\.operator_alert_mail_production_admitted'\) === true\);")
+        self.assertRegex(source("config/inquiries.php"), r"(?m)^    'operator_alert_mail_production_admitted' => false,$")
+        self.assertEqual(source("config/inquiries.php").count("'operator_alert_mail_production_admitted'"), 1)
+        # It sends only when the flag and the gate still hold, under the order-ready mail policy (flag, SMTP mailer, sender and
+        # preflight facts; fake-only in local and testing), to the operator account's own address, never through a global override.
+        self.assert_source(transport, r"if \(config\('inquiries\.operator_notifications_enabled'\) !== true \|\| ! self::admitted\(\) \|\| ! \$receipt\) \{\s*throw")
+        self.assert_source(transport, r"\$configuration = app\(TransactionalMailPolicy::class\)->configuration\(\);")
+        self.assert_source(transport, r"DB::table\('users'\)->where\('id', \$operatorId\)->first\(\['email', 'email_verified_at'\]\)")
+        self.assert_source(transport, r"if \(config\('mail\.to'\) !== null \|\| \$this->redirected\(\$mailer\)\) \{\s*throw")
+        self.assertNotRegex(source(transport), r"mail\.from|MAIL_FROM|support@")
+        # No document may still say that no alert transport ships, or that the flag is inert.
+        stale = re.compile(r"ships none|none ships|no InquiryAlertTransport ships|bound alert transport, and none"
+                           r"|operator notification are bound only by an\s+(?:\*\s+)?adapter that other code would supply", re.S)
+        hold = "CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED"
+        for relative in ("ops/staging/env.staging.example", "ops/staging/test-commerce/env.test-commerce.example",
+                         "ops/production/validate-runtime.php", "ops/production/README.md", "docs/ops/production-activation-packet.md"):
+            text = source(relative)
+            self.assertIn(hold, text, relative)
+            self.assertNotRegex(text, stale, f"{relative}: stale wording about the alert transport")
+            for line in text.splitlines():
+                if hold in line or "operator notification" in line:
+                    self.assertNotRegex(line, r"none (?:ships|is bound)|inert", f"{relative}: stale wording about the alert transport")
+        for relative in ("ops/production/validate-runtime.php", "ops/production/README.md", "docs/ops/production-activation-packet.md"):
+            self.assertRegex(source(relative), re.compile(r"default-off[\s*]+mail[\s*]+(?:alert[\s*]+)?transport"), f"{relative}: must say that a mail transport ships")
 
     def test_order_ready_email_is_ungated_outside_local_and_testing_and_refuses_without_preflight_facts(self):
         policy = "app/Domain/Notifications/Mail/TransactionalMailPolicy.php"

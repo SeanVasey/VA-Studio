@@ -368,6 +368,8 @@ final class RetentionSchedule
             'rationale' => self::WITH_ORDER.'declared legacy contract of an imported order line.'],
         ['table' => 'legacy_history_grant_reviews', 'family' => null, 'class' => 'indefinite', 'clock' => null,
             'rationale' => self::WITH_ORDER.'staff review of an imported legacy line.'],
+        ['table' => 'legacy_history_track_links', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'link from an imported legacy order line to the store track it names; part of the legacy order record.'],
         ['table' => 'legacy_exclusivity_authority_events', 'family' => null, 'class' => 'indefinite', 'clock' => null,
             'rationale' => self::WITH_ORDER.'exclusivity authority over legacy sales; protects prior exclusive grants.'],
         // Framework job stores: PRIVACY application error log row, 14 days.

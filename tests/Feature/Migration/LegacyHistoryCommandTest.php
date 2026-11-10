@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Migration;
 
+use App\Domain\Catalog\Models\Track;
 use App\Domain\Migration\History\HistoryDelta;
 use App\Domain\Migration\History\LegacyHistoryArchive;
 use App\Domain\Staff\StaffWriteAuthority;
@@ -191,6 +192,91 @@ class LegacyHistoryCommandTest extends TestCase
     }
 
     /** @return array{0: int, 1: array, 2: string} */
+    public function test_track_links_are_dry_run_by_default_reported_by_reconcile_and_resolved_only_by_an_attested_choice(): void
+    {
+        $source = LegacyHistoryFixtures::privateCopy('families');
+        $exact = LegacyHistoryFixtures::catalogMapping('synthetic/beatstars-history', 'synthetic-track-01', $this->operator);
+        $first = LegacyHistoryFixtures::catalogMapping('synthetic/beatstars-history', 'synthetic-track-05', $this->operator);
+        $second = LegacyHistoryFixtures::catalogMapping('synthetic/other-catalog', 'synthetic-track-05', $this->operator);
+        LegacyHistoryFixtures::catalogMapping('synthetic/beatstars-history', 'synthetic-track-02', $this->operator);
+        $loaded = (new LegacyHistoryArchive)->load($source);
+        $sha = $loaded['result']['snapshot_sha256'];
+        LegacyHistoryFixtures::import($loaded['result']['snapshot'], $sha, $loaded['source']['contracts'], $this->operator, 1000);
+        $ambiguous = array_column($loaded['result']['snapshot']['lines'], 'record_key', 'track_source_id')['synthetic-track-05'];
+
+        $statements = $this->recordStatements();
+        [$exit, $summary, $output] = $this->invoke('link-tracks', ['--source' => $source]);
+        $this->assertSame([0, 'link_dry_run', 0], [$exit, $summary['code'], $summary['database_writes']]);
+        $this->assertEquals(['linked' => 0, 'unlinked' => 4, 'ambiguous' => 1], $summary['track_links']['states']);
+        $this->assertSame(2, $summary['track_links']['plan']['create']);
+        [$exit, $summary] = $this->invoke('resolve-track-link', ['--line' => $ambiguous]);
+        $this->assertSame([0, 'resolve_dry_run', 'ambiguous', 2], [$exit, $summary['code'], $summary['state'], count($summary['candidates'])]);
+        $this->assertSame([], array_filter($statements(), static fn (string $sql): bool => preg_match('/\A\s*select\b/i', $sql) !== 1));
+        foreach (['@', 'SYNTHETIC', 'synthetic-pay-', 'synthetic-track-', $source] as $private) {
+            $this->assertStringNotContainsString($private, $output);
+        }
+
+        $write = ['--source' => $source, '--write' => true, '--actor-id' => (string) $this->operator->id, '--snapshot' => $sha];
+        $this->assertSame('attestation_required', $this->invoke('link-tracks', $write)[1]['reason']);
+        $this->assertSame('snapshot_mismatch', $this->invoke('link-tracks', ['--snapshot' => str_repeat('b', 64), '--attest' => true] + $write)[1]['reason']);
+        $this->assertSame('usage', $this->invoke('link-tracks', ['--mapping' => '1'] + $write)[1]['reason']);
+        $this->assertSame('usage', $this->invoke('resolve-track-link', ['--line' => $ambiguous, '--write' => true, '--attest' => true,
+            '--actor-id' => (string) $this->operator->id, '--reference' => 'SYNTHETIC pointer'])[1]['reason']);
+        $this->assertSame(0, DB::table('legacy_history_track_links')->count());
+        $this->artisan('vasey:legacy-history', ['action' => 'link-tracks', '--attest' => true, '--limit' => '1'] + $write)
+            ->expectsQuestion('Staff password (hidden)', 'password')->expectsOutputToContain('"code":"link_partial"')->assertExitCode(2);
+        $this->artisan('vasey:legacy-history', ['action' => 'link-tracks', '--attest' => true] + $write)
+            ->expectsQuestion('Staff password (hidden)', 'password')->expectsOutputToContain('"code":"link_complete"')->assertExitCode(0);
+        $this->artisan('vasey:legacy-history', ['action' => 'link-tracks', '--attest' => true] + $write)
+            ->expectsQuestion('Staff password (hidden)', 'password')->expectsOutputToContain('"processed":0')->assertExitCode(0);
+        $this->assertSame(2, DB::table('legacy_history_track_links')->count());
+
+        [$exit, $summary] = $this->invoke('reconcile', ['--source' => $source]);
+        $this->assertSame([0, 'reconciled'], [$exit, $summary['code']]);
+        $this->assertEquals(['linked' => 2, 'unlinked' => 2, 'ambiguous' => 1], $summary['track_links']['states']);
+        $this->assertSame('ambiguous', $summary['track_links']['line_states'][$ambiguous]);
+
+        $resolve = ['action' => 'resolve-track-link', '--line' => $ambiguous, '--write' => true, '--attest' => true,
+            '--actor-id' => (string) $this->operator->id, '--reference' => 'SYNTHETIC pointer'];
+        $this->artisan('vasey:legacy-history', ['--mapping' => (string) $exact['mapping_id']] + $resolve)
+            ->expectsQuestion('Staff password (hidden)', 'password')->expectsOutputToContain('"reason":"candidate_refused"')->assertExitCode(1);
+        $this->artisan('vasey:legacy-history', ['--mapping' => (string) $second['mapping_id']] + $resolve)
+            ->expectsQuestion('Staff password (hidden)', 'password')->expectsOutputToContain('"code":"resolve_recorded"')->assertExitCode(0);
+        $this->artisan('vasey:legacy-history', ['--mapping' => (string) $first['mapping_id']] + $resolve)
+            ->expectsQuestion('Staff password (hidden)', 'password')->expectsOutputToContain('"reason":"already_linked"')->assertExitCode(1);
+        $this->assertSame($second['track_id'], (int) DB::table('legacy_history_track_links')->where('line_record_key', $ambiguous)->sole()->track_id);
+        [, $summary] = $this->invoke('reconcile', ['--source' => $source]);
+        $this->assertEquals(['linked' => 3, 'unlinked' => 2, 'ambiguous' => 0], $summary['track_links']['states']);
+    }
+
+    public function test_a_refused_track_link_report_never_changes_the_archive_reconciliation(): void
+    {
+        $source = LegacyHistoryFixtures::privateCopy('families');
+        $genuine = LegacyHistoryFixtures::catalogMapping('synthetic/beatstars-history', 'synthetic-track-01', $this->operator);
+        // A mapping row whose record key does not match its own evidence: the catalog side is corrupt, the archive is not.
+        $hash = hash('sha256', 'forged');
+        DB::table('catalog_import_mappings')->insert(['batch_id' => DB::table('catalog_import_batches')->value('id'), 'record_key' => $hash,
+            'source_record_sha256' => $hash, 'track_id' => Track::create(['title' => 'SYNTHETIC forged', 'slug' => 'synthetic-forged', 'artist' => 'Test only'])->id, 'track_sha256' => $hash, 'actor_id' => $this->operator->id,
+            'evidence_ciphertext' => DB::table('catalog_import_mappings')->where('id', $genuine['mapping_id'])->value('evidence_ciphertext'), 'created_at' => now()]);
+        $loaded = (new LegacyHistoryArchive)->load($source);
+        [$snapshot, $sha] = [$loaded['result']['snapshot'], $loaded['result']['snapshot_sha256']];
+
+        // The reconcile result and exit code are exactly the archive's own, before and after the import.
+        foreach ([[3, 'unreconciled'], [0, 'reconciled']] as $i => [$code, $result]) {
+            if ($i === 1) {
+                LegacyHistoryFixtures::import($snapshot, $sha, $loaded['source']['contracts'], $this->operator, 1000);
+            }
+            [$exit, $summary] = $this->invoke('reconcile', ['--source' => $source]);
+            $this->assertSame([$code, $result, 0], [$exit, $summary['code'], $summary['database_writes']]);
+            $this->assertEquals((new LegacyHistoryArchive)->reconcile($snapshot, $sha), $summary['report']);
+            $this->assertSame(['refused' => 'catalog_mapping_integrity'], $summary['track_links']);
+        }
+        // The link actions themselves still fail closed on the same evidence.
+        [$exit, $summary] = $this->invoke('link-tracks', ['--source' => $source]);
+        $this->assertSame([1, 'catalog_mapping_integrity'], [$exit, $summary['reason']]);
+        $this->assertSame(0, DB::table('legacy_history_track_links')->count());
+    }
+
     private function invoke(string $action, array $options): array
     {
         $exit = Artisan::call('vasey:legacy-history', ['action' => $action] + $options);
