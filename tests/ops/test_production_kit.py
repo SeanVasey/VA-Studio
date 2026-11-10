@@ -29,10 +29,10 @@ build_kit = importlib.util.module_from_spec(spec)
 sys.modules["build_kit"] = build_kit
 spec.loader.exec_module(build_kit)
 
-SCRIPTS = ["provision.sh", "forge-deploy.sh", "release-step.sh", "backup.sh", "bin/vasey-production-ctl"]
+SCRIPTS = ["provision.sh", "forge-deploy.sh", "release-step.sh", "backup.sh", "scheduler-watch.sh", "bin/vasey-production-ctl"]
 NGINX_FILES = ["nginx/vasey-production.conf", "nginx/vasey-production-http.conf", "nginx/vasey-production-classic.conf"]
 EXPECTED_FILES = {
-    "provision.sh", "forge-deploy.sh", "release-step.sh", "backup.sh", "bin/vasey-production-ctl", "seal-release.py",
+    "provision.sh", "forge-deploy.sh", "release-step.sh", "backup.sh", "scheduler-watch.sh", "bin/vasey-production-ctl", "seal-release.py",
     "normalize-mysql-dump.py", "validate-runtime.php", "nginx/vasey-production.conf", "nginx/vasey-production-http.conf",
     "nginx/vasey-production-classic.conf", "php-fpm/vasey-production.conf",
     "php-fpm/vasey-paid-delivery.conf", "workers/vasey-production-workers.conf", "tls/origin-ca.pem",
@@ -162,7 +162,7 @@ class KitBuild(unittest.TestCase):
     def test_check_mode_builds_and_discards(self):
         run = subprocess.run([sys.executable, "-I", str(BUILDER), "--check"], capture_output=True, text=True)
         self.assertEqual(run.returncode, 0, run.stderr)
-        self.assertIn("build-kit: ok, 16 files", run.stdout)
+        self.assertIn("build-kit: ok, 17 files", run.stdout)
 
 
 class AnchorsFailClosed(unittest.TestCase):
@@ -261,7 +261,7 @@ class CrossFileConsistency(unittest.TestCase):
     def test_helper_paths_in_ctl_and_backup_are_where_provision_installs_them(self):
         provision, ctl, backup = self.t["provision.sh"], self.t["bin/vasey-production-ctl"], self.t["backup.sh"]
         installed = set(re.findall(r'install -m 0[0-9]{3} -o root -g root "\$KIT/[^"]+" (/usr/local/[a-z/-]+[^ \n]*)', provision))
-        self.assertEqual(installed, {"/usr/local/sbin/vasey-production-ctl", "/usr/local/sbin/vasey-production-backup",
+        self.assertEqual(installed, {"/usr/local/sbin/vasey-production-ctl", "/usr/local/sbin/vasey-production-backup", "/usr/local/sbin/vasey-production-scheduler-watch",
                                      "/usr/local/libexec/vasey-production/normalize-mysql-dump.py",
                                      "/usr/local/libexec/vasey-production/seal-release.py",
                                      "/usr/local/libexec/vasey-production/release-step.sh",
