@@ -194,7 +194,8 @@ These are application or review items this kit deliberately does not do:
    Sean's approved seller tag; see `docs/ops/staging-placeholders.md` (P-1).
 8. **Off through launch (DD-44, DD-50).** `validate-runtime.php` also refuses `REPORTING_MARKETING_SEGMENT_ENABLED` unless it is
    false, by the pre-launch hold's rule (`LAUNCH_OFF_HOLDS`, config key from `scripts/ops/capability-boundary.php`;
-   `holds.reporting_marketing_segment_enabled`), and the membership code literals `production-memberships.enabled`,
+   `holds.reporting_marketing_segment_enabled`), `VASEY_STAGING_BEATSTARS_IMPORT_ENABLED` by the same rule
+   (`holds.vasey_staging_beatstars_import_enabled`; the staging-only catalog import refuses production in code as well), and the membership code literals `production-memberships.enabled`,
    `production-memberships.http_mounted` and `member-grants.enabled` unless they read strictly false
    (`holds.production_memberships_enabled`, `holds.production_memberships_http_mounted`, `holds.member_grants_enabled`). Lifting
    one is a reviewed change to the validator with Sean's authorization (ledger PCL-23, PCL-25).
