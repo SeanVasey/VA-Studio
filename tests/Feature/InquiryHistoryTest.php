@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Domain\Inquiries\InquiryAdministration;
 use App\Domain\Inquiries\InquiryConversation;
 use App\Domain\Inquiries\InquiryException;
+use App\Domain\Inquiries\InquirySubject;
 use App\Domain\Inquiries\Models\CustomerInquiry;
 use App\Domain\Inquiries\ReadOwnedInquiries;
 use App\Domain\Inquiries\SubmitInquiry;
@@ -112,8 +113,18 @@ class InquiryHistoryTest extends TestCase
 
     private function add(string $subject, string $owner = Fixture::OWNER): string
     {
-        $body = array_replace($this->fixture['body'], ['subject' => $subject, 'requestKey' => (string) Str::uuid()]);
-        return app(SubmitInquiry::class)->handle($body, $owner)['receipt'];
+        if (in_array($subject, InquirySubject::PUBLIC_CONTACT, true)) {
+            $body = array_replace($this->fixture['body'], ['subject' => $subject, 'requestKey' => (string) Str::uuid()]);
+            return app(SubmitInquiry::class)->handle($body, $owner)['receipt'];
+        }
+        // Rows retained from before the closed subject list (BL-50) keep any bounded free-text subject; history must
+        // still read them, so they are inserted as such rows rather than through today's public intake.
+        $row = $this->fixture['inquiry']->fresh()->replicate();
+        $row->forceFill(['public_id' => (string) Str::uuid(), 'request_key' => (string) Str::uuid(), 'owner_hash' => $owner,
+            'payload' => array_replace($row->payload, ['subject' => $subject]), 'state' => 'new', 'version' => 0,
+            'created_at' => now(), 'updated_at' => now()])->save();
+
+        return $row->public_id;
     }
 
     private function read(?string $before = null): array

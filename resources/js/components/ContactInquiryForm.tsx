@@ -27,13 +27,14 @@ function csrfHeaders(): Record<string, string> {
   return token ? { 'X-CSRF-TOKEN': token } : {};
 }
 
-type Props = { privacyNotice: string; noticeToken: string; orderId?: string; attachmentsEnabled?: boolean };
+/** `subjects` is the server's closed public contact list; without it the subject is free text (order inquiries). */
+type Props = { privacyNotice: string; noticeToken: string; orderId?: string; attachmentsEnabled?: boolean; subjects?: readonly string[] };
 /** Parent gates collection on a verified public or order-specific setup. Locator changes discard private state. */
 export function ContactInquiryForm(props: Props) {
   return <InquiryForm key={props.orderId ?? 'contact'} {...props} />;
 }
 
-function InquiryForm({ privacyNotice, noticeToken, orderId, attachmentsEnabled = false }: Props) {
+function InquiryForm({ privacyNotice, noticeToken, orderId, attachmentsEnabled = false, subjects }: Props) {
   const prefix = useId();
   const [fields, setFields] = useState<Fields>({ ...empty });
   const [errors, setErrors] = useState<Errors>({});
@@ -78,6 +79,7 @@ function InquiryForm({ privacyNotice, noticeToken, orderId, attachmentsEnabled =
       else if ([...fields[field]].length > limits[field]) invalid[field] = `${labels[field]} must be ${limits[field].toLocaleString('en-US')} characters or fewer.`;
     }
     if (!invalid.email && emailInput.current?.validity.typeMismatch) invalid.email = 'Enter a valid email address.';
+    if (subjects && !subjects.includes(fields.subject)) invalid.subject = 'Choose a subject.';
     return invalid;
   }
 
@@ -137,7 +139,7 @@ function InquiryForm({ privacyNotice, noticeToken, orderId, attachmentsEnabled =
         const invalid: Errors = {};
         const rejected = data.errors;
         for (const field of Object.keys(limits) as VisibleField[]) {
-          if (Object.hasOwn(rejected, field)) invalid[field] = field === 'email' ? 'Enter a valid email address of 254 characters or fewer.' : `Check your ${field}; use ${limits[field].toLocaleString('en-US')} characters or fewer.`;
+          if (Object.hasOwn(rejected, field)) invalid[field] = field === 'email' ? 'Enter a valid email address of 254 characters or fewer.' : field === 'subject' && subjects ? 'Choose one of the listed subjects.' : `Check your ${field}; use ${limits[field].toLocaleString('en-US')} characters or fewer.`;
         }
         attempt.current = null; setFields(value => ({ ...value, website: '' })); setErrors(invalid);
         if (Object.hasOwn(rejected, 'noticeToken')) {
@@ -199,7 +201,10 @@ function InquiryForm({ privacyNotice, noticeToken, orderId, attachmentsEnabled =
             onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => change(field, event.target.value) };
           return <div className={`contact-inquiry-field contact-inquiry-${field}`} key={field}>
             <label htmlFor={props.id}>{labels[field]} <span>(required)</span></label>
-            {field === 'message' ? <textarea {...props} rows={7} /> : <input {...props} type={field === 'email' ? 'email' : 'text'} autoComplete={field === 'name' ? 'name' : field === 'email' ? 'email' : 'off'} ref={field === 'name' ? nameInput : field === 'email' ? emailInput : undefined} />}
+            {field === 'subject' && subjects ? <select id={props.id} name={props.name} value={props.value} required aria-readonly={locked || undefined} aria-invalid={props['aria-invalid']} aria-describedby={props['aria-describedby']} onChange={event => change('subject', event.target.value)}>
+              <option value="">Choose a subject</option>
+              {subjects.map(subject => <option key={subject} value={subject}>{subject}</option>)}
+            </select> : field === 'message' ? <textarea {...props} rows={7} /> : <input {...props} type={field === 'email' ? 'email' : 'text'} autoComplete={field === 'name' ? 'name' : field === 'email' ? 'email' : 'off'} ref={field === 'name' ? nameInput : field === 'email' ? emailInput : undefined} />}
             {errors[field] && <p className="contact-inquiry-field-error" id={`${prefix}-${field}-error`}>{errors[field]}</p>}
           </div>;
         })}

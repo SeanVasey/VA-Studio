@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Domain\Inquiries\InquiryPolicy;
+use App\Domain\Inquiries\InquirySubject;
 use App\Domain\Inquiries\Models\CustomerInquiry;
 use App\Domain\SiteBuilder\Models\SitePublication;
 use App\Domain\SiteBuilder\Models\SiteRelease;
@@ -28,6 +29,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -92,7 +94,7 @@ class CustomerInquiryHttpTest extends TestCase
     {
         return array_replace([
             'name' => 'Synthetic Buyer', 'email' => 'synthetic-buyer@example.test',
-            'subject' => 'Synthetic recording inquiry', 'message' => "Synthetic private inquiry.\nSecond line.",
+            'subject' => 'Licensing question', 'message' => "Synthetic private inquiry.\nSecond line.",
             'website' => '', 'requestKey' => (string) Str::uuid(), 'noticeToken' => $this->noticeToken,
         ], $changes);
     }
@@ -427,6 +429,9 @@ class CustomerInquiryHttpTest extends TestCase
             'email object' => ['email', ['address' => 'private@example.test'], false],
             'missing subject' => ['subject', null, true], 'subject too long' => ['subject', str_repeat('界', 161), false],
             'subject boolean' => ['subject', true, false], 'empty subject' => ['subject', '', false],
+            // BL-50: the public contact subject is a closed list; free text, case and padding variants are refused.
+            'unlisted subject' => ['subject', 'Merchandise order', false], 'former free-text subject' => ['subject', 'Synthetic recording inquiry', false],
+            'subject case variant' => ['subject', 'service request', false], 'subject padded' => ['subject', ' Service request', false],
             'message missing' => ['message', null, true], 'message too long' => ['message', str_repeat('a', 8001), false],
             'empty message' => ['message', '', false], 'message array' => ['message', ['Private'], false],
             'message invalid control' => ['message', "Private\x01Message", false],
@@ -470,7 +475,7 @@ class CustomerInquiryHttpTest extends TestCase
     {
         $email = str_repeat('a', 64).'@'.str_repeat('b', 63).'.'.str_repeat('c', 63).'.'.str_repeat('d', 61);
         $this->assertSame(254, strlen($email));
-        $payload = $this->payload(['name' => str_repeat('é', 120), 'email' => $email, 'subject' => str_repeat('界', 160), 'message' => str_repeat('x', 8000)]);
+        $payload = $this->payload(['name' => str_repeat('é', 120), 'email' => $email, 'subject' => 'Order or download help', 'message' => str_repeat('x', 8000)]);
         $body = json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
         $this->assertLessThan(16384, strlen($body));
         $response = $this->raw(str_pad($body, 16384, ' '))->assertCreated();
@@ -482,12 +487,37 @@ class CustomerInquiryHttpTest extends TestCase
 
     public function test_message_bounds_count_unicode_characters_and_literal_markup_is_retained_as_text(): void
     {
-        $payload = $this->payload(['name' => '<Synthetic Buyer>', 'subject' => 'Literal <fixture>', 'message' => str_repeat('é', 8000)]);
+        $payload = $this->payload(['name' => '<Synthetic Buyer>', 'subject' => 'Service request', 'message' => str_repeat('é', 8000)]);
         $this->assertLessThanOrEqual(16384, strlen(json_encode($payload, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE)));
         $response = $this->submit($payload)->assertCreated();
         $this->assertSame($payload['message'], CustomerInquiry::sole()->payload['message']);
         $this->assertSame($payload['name'], CustomerInquiry::sole()->payload['name']);
         $response->assertDontSee($payload['name'], false)->assertDontSee($payload['subject'], false);
+    }
+
+    public function test_every_listed_subject_saves_an_ordinary_inquiry_and_a_service_request_takes_no_payment(): void
+    {
+        $this->assertSame(['General question', 'Licensing question', 'Order or download help', 'Service request'], InquirySubject::PUBLIC_CONTACT);
+        foreach (InquirySubject::PUBLIC_CONTACT as $subject) {
+            $this->submit($this->payload(['subject' => $subject]))->assertCreated();
+        }
+        $service = CustomerInquiry::query()->get()->firstWhere(fn (CustomerInquiry $row): bool => $row->payload['subject'] === InquirySubject::SERVICE_REQUEST);
+        $this->assertNotNull($service);
+        $this->assertSame('new', $service->state);
+        $this->assertSame(['name', 'email', 'subject', 'message', 'website'], array_keys($service->payload));
+        foreach (['quotes', 'orders', 'checkout_intents', 'payment_observations', 'service_projects'] as $table) {
+            if (Schema::hasTable($table)) {
+                $this->assertDatabaseCount($table, 0);
+            }
+        }
+    }
+
+    public function test_contact_page_offers_the_server_subject_list_only_while_intake_is_enabled(): void
+    {
+        $this->get('https://audio.example.test/contact', $this->editorialHeaders())->assertOk()
+            ->assertJsonPath('props.contactInquirySubjects', InquirySubject::PUBLIC_CONTACT);
+        config(['inquiries.enabled' => false]);
+        $this->get('https://audio.example.test/contact', $this->editorialHeaders())->assertOk()->assertJsonPath('props.contactInquirySubjects', null);
     }
 
     public function test_validation_errors_are_identical_for_different_private_invalid_values(): void
