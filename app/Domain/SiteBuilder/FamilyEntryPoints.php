@@ -11,8 +11,9 @@ use InvalidArgumentException;
  * (BL-50, FP-001: no link to a product that is not available). A family's public paths and its header link exist only
  * while that policy is enabled; turning the policy on makes the link appear. Nothing here enables a family, and no
  * family is hidden for good: a family joins this list when it has a policy to read. Families without one yet
- * (merchandise, sound kits, collections, offers, bundles) keep their current behaviour; today none of them has a
- * storefront entry point, and the site-content navigation allow-list cannot name one.
+ * (merchandise, sound kits, offers, bundles) keep their current behaviour; today none of them is listed here. Collections
+ * do have a storefront entry point (the `/collections` pages and navigation item, behind `collections.enabled`, BL-50 follow-up
+ * in #304), but they read their own flag rather than this list, so they are not part of it yet.
  */
 final class FamilyEntryPoints
 {
