@@ -36,7 +36,7 @@ class InquiryNotificationConcurrencyTest extends TestCase
         $site = app(SiteContent::class);
         $release = $site->create(SiteEditorialFixtures::content(), 'Synthetic notification race', $operator);
         $site->publish($release->id, 0, $operator);
-        app(SubmitInquiry::class)->handle(['name' => 'Synthetic sender', 'email' => 'sender@example.test', 'subject' => 'Synthetic subject',
+        app(SubmitInquiry::class)->handle(['name' => 'Synthetic sender', 'email' => 'sender@example.test', 'subject' => 'General question',
             'message' => 'Private synthetic race message', 'website' => '', 'requestKey' => (string) Str::uuid(),
             'noticeToken' => app(InquiryPolicy::class)->publicSetup($site->current())['noticeToken']], hash('sha256', 'synthetic-race-owner'));
         $intent = InquiryNotificationIntent::sole();
