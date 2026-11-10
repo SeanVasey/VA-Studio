@@ -54,7 +54,7 @@ final class HistoryMapping
      *     customers: array{columns: array<string, string>, ignored_columns: list<string>},
      *     orders: array{columns: array<string, string>, ignored_columns: list<string>, status_values: array<string, string>},
      *     contracts: array{columns: array<string, string>, ignored_columns: list<string>, media_types: array<string, string>},
-     *     licenses: array<string, array{label: string, exclusive: bool}>}
+     *     licenses: array<string, array{label: string, exclusive: bool}>, product_families: array<string, array>}
      */
     public function decode(string $bytes): array
     {
@@ -65,7 +65,7 @@ final class HistoryMapping
             throw new InvalidArgumentException('mapping_json');
         }
         $mapping = $this->object($decoded, ['schema_version', 'purpose', 'snapshot_id', 'source_system', 'operator_reference',
-            'acquisition_method', 'acquired_at', 'source_as_of', 'currency', 'customers', 'orders', 'contracts', 'licenses'], [], 'mapping_keys');
+            'acquisition_method', 'acquired_at', 'source_as_of', 'currency', 'customers', 'orders', 'contracts', 'licenses'], ['product_families'], 'mapping_keys');
         $this->require($mapping['schema_version'] === 1 && $mapping['purpose'] === self::PURPOSE, 'mapping_purpose');
         foreach (['snapshot_id', 'source_system', 'operator_reference'] as $field) {
             $this->require(CellText::identity($mapping[$field]), 'mapping_identity');
@@ -126,8 +126,50 @@ final class HistoryMapping
         }
         $this->require($licenses !== [] && count(array_unique(array_column($licenses, 'label'))) === count($licenses), 'mapping_licenses');
         $result['licenses'] = $licenses;
+        $result['product_families'] = $this->families($mapping['product_families'] ?? new stdClass);
 
         return $result;
+    }
+
+    /**
+     * Optional non-track families (ProductFamilyAdapter). Each declares its sheet's columns and its terms values;
+     * a family is never an exclusive, and that too is declared rather than assumed.
+     *
+     * @return array<string, array{columns: array<string, string>, ignored_columns: list<string>, terms: array<string, array{label: string, exclusive: bool}>}>
+     */
+    private function families(mixed $declared): array
+    {
+        $this->require($declared instanceof stdClass, 'mapping_product_families');
+        $families = [];
+        foreach (get_object_vars($declared) as $family => $value) {
+            $this->require(isset(ProductFamilyAdapter::FAMILIES[$family]), 'mapping_product_families');
+            $definition = $this->object($value, ['columns', 'terms'], ['ignored_columns'], 'mapping_product_families');
+            $columns = $this->object($definition['columns'], ProductFamilyAdapter::COLUMNS['required'], ProductFamilyAdapter::COLUMNS['optional'], 'mapping_columns');
+            foreach ($columns as $header) {
+                $this->require(CellText::line($header, 255), 'mapping_columns');
+            }
+            $ignored = $definition['ignored_columns'] ?? [];
+            $this->require(is_array($ignored) && array_is_list($ignored) && count($ignored) <= 200, 'mapping_ignored_columns');
+            foreach ($ignored as $header) {
+                $this->require(CellText::line($header, 255), 'mapping_ignored_columns');
+            }
+            $roles = [...array_values($columns), ...$ignored];
+            $this->require(count(array_unique($roles, SORT_STRING)) === count($roles), 'mapping_column_reuse');
+            $this->require($definition['terms'] instanceof stdClass, 'mapping_family_terms');
+            $terms = [];
+            foreach (get_object_vars($definition['terms']) as $name => $term) {
+                $term = $this->object($term, ['label', 'exclusive'], [], 'mapping_family_terms');
+                $this->require(CellText::line((string) $name, 120) && is_string($term['label'])
+                    && preg_match('/\A[a-z0-9][a-z0-9-]{0,79}\z/D', $term['label']) === 1, 'mapping_family_terms');
+                // The exclusivity ledger is about track licenses: an exclusive family sale has no supported meaning here.
+                $this->require($term['exclusive'] === false, 'mapping_family_exclusive');
+                $terms[(string) $name] = ['label' => $term['label'], 'exclusive' => false];
+            }
+            $this->require($terms !== [] && count(array_unique(array_column($terms, 'label'))) === count($terms), 'mapping_family_terms');
+            $families[(string) $family] = ['columns' => $columns, 'ignored_columns' => array_values($ignored), 'terms' => $terms];
+        }
+
+        return $families;
     }
 
     /** Explicit UTC second precision, as `YYYY-MM-DDTHH:MM:SSZ`. */

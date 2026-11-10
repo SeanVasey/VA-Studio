@@ -75,6 +75,21 @@ final class HistoryNormalizer
             $inputs['sheets'][$sheet] = ['name' => $name, 'sha256' => hash('sha256', $source['sheets'][$sheet]),
                 'bytes' => strlen($source['sheets'][$sheet]), 'records' => count($parsed['records'])];
         }
+        // Non-track families join the order lines through their adapter; an undeclared family changes nothing here.
+        foreach ($mapping['product_families'] as $family => $definition) {
+            $adapter = new ProductFamilyAdapter($family);
+            if (! isset($source['sheets'][$adapter->sheet])) {
+                throw new InvalidArgumentException($adapter->sheet.'_missing');
+            }
+            try {
+                $parsed = (new BeatStarsExportSheet)->read($source['sheets'][$adapter->sheet]);
+            } catch (InvalidArgumentException $error) {
+                throw new InvalidArgumentException($adapter->sheet.'_'.preg_replace('/\Aexport_/', '', $error->getMessage()));
+            }
+            $sheets['orders'] = [...$sheets['orders'], ...$adapter->orderRows($this->rows($adapter->sheet, $parsed, $definition))];
+            $inputs['sheets'][$adapter->sheet] = ['name' => $adapter->file, 'sha256' => hash('sha256', $source['sheets'][$adapter->sheet]),
+                'bytes' => strlen($source['sheets'][$adapter->sheet]), 'records' => count($parsed['records'])];
+        }
         $inputs['contract_files'] = ['count' => count($source['contracts']),
             'bytes' => array_sum(array_map('strlen', $source['contracts']))];
 
@@ -87,8 +102,9 @@ final class HistoryNormalizer
             'contracts' => count($contracts), 'contract_declarations' => count($this->declarations), 'contract_files' => count($source['contracts']),
             'findings' => count($this->findings), 'exceptions' => count($this->exceptions)];
         $findings = $this->findings;
-        usort($findings, static fn (array $a, array $b): int => [array_search($a['sheet'], array_keys(HistorySourceFiles::SHEETS), true), $a['row'] ?? 0, $a['code'], $a['column'] ?? '']
-            <=> [array_search($b['sheet'], array_keys(HistorySourceFiles::SHEETS), true), $b['row'] ?? 0, $b['code'], $b['column'] ?? '']);
+        $sheetOrder = [...array_keys(HistorySourceFiles::SHEETS), ...array_column(ProductFamilyAdapter::FAMILIES, 'sheet')];
+        usort($findings, static fn (array $a, array $b): int => [array_search($a['sheet'], $sheetOrder, true), $a['row'] ?? 0, $a['code'], $a['column'] ?? '']
+            <=> [array_search($b['sheet'], $sheetOrder, true), $b['row'] ?? 0, $b['code'], $b['column'] ?? '']);
         $snapshot = null;
         if ($findings === []) {
             $exceptions = $this->exceptions;
@@ -253,11 +269,27 @@ final class HistoryNormalizer
             $orderId = $c['source_order_id'];
             $lineId = $c['source_line_id'];
             $ok = true;
+            // A family row names its own sheet and columns in findings; a track row is the orders sheet.
+            $sheet = $row['sheet'] ?? 'orders';
+            $adapter = isset($row['family']) ? new ProductFamilyAdapter($row['family']) : null;
+            $column = static fn (string $field): string => $row['columns'][$field] ?? $field;
             // A line id only has to be unique within its order, so it carries no synthetic namespace of its own.
             foreach (['source_order_id' => [$orderId, $synthetic], 'source_line_id' => [$lineId, false],
                 'track_source_id' => [$c['track_source_id'], $synthetic]] as $field => [$value, $namespaced]) {
                 if (! $this->identifier($value, $namespaced)) {
-                    $this->finding('row', 'orders', $row['row'], is_string($orderId) ? $orderId : null, $this->identifierCode($value, $namespaced), $field);
+                    $this->finding('row', $sheet, $row['row'], is_string($orderId) ? $orderId : null, $this->identifierCode($value, $namespaced), $column($field));
+                    $ok = false;
+                }
+            }
+            $productId = $c['track_source_id'];
+            if ($ok && $adapter === null && ProductFamilyAdapter::familyOf($productId) !== null) {
+                // `kit:`, `service:` and `membership:` ids are family lines; a track inside them could be mistaken for one.
+                $this->finding('row', $sheet, $row['row'], $orderId, 'reserved_family_namespace', 'track_source_id');
+                $ok = false;
+            } elseif ($ok && $adapter !== null) {
+                $productId = $adapter->qualify($productId);
+                if (preg_match(self::IDENTIFIER, $productId) !== 1) {
+                    $this->finding('row', $sheet, $row['row'], $orderId, 'invalid_source_id', $column('track_source_id'));
                     $ok = false;
                 }
             }
@@ -265,49 +297,50 @@ final class HistoryNormalizer
                 continue;
             }
             $seen[$orderId."\n".$lineId][] = $row['row'];
-            $line = ['row' => $row, 'order' => $orderId, 'line' => $lineId];
+            $line = ['row' => $row, 'order' => $orderId, 'line' => $lineId, 'sheet' => $sheet, 'product' => $productId];
             if (! array_key_exists($c['source_customer_id'], $customerKeys)) {
-                $this->finding('row', 'orders', $row['row'], $orderId, 'unknown_customer_reference', 'source_customer_id');
+                $this->finding('row', $sheet, $row['row'], $orderId, 'unknown_customer_reference', 'source_customer_id');
                 $ok = false;
             }
             if (! HistoryMapping::timestamp($c['ordered_at'])) {
-                $this->finding('row', 'orders', $row['row'], $orderId, 'invalid_ordered_at', 'ordered_at');
+                $this->finding('row', $sheet, $row['row'], $orderId, 'invalid_ordered_at', 'ordered_at');
                 $ok = false;
             } elseif ($c['ordered_at'] > $mapping['source_as_of']) {
-                $this->finding('row', 'orders', $row['row'], $orderId, 'ordered_after_watermark', 'ordered_at');
+                $this->finding('row', $sheet, $row['row'], $orderId, 'ordered_after_watermark', 'ordered_at');
                 $ok = false;
             }
             $status = $mapping['orders']['status_values'][$c['status']] ?? null;
             if ($status === null) {
-                $this->finding('row', 'orders', $row['row'], $orderId, 'unknown_status_value', 'status');
+                $this->finding('row', $sheet, $row['row'], $orderId, 'unknown_status_value', 'status');
                 $ok = false;
             }
-            $license = $mapping['licenses'][$c['license']] ?? null;
+            $license = $adapter === null ? ($mapping['licenses'][$c['license']] ?? null)
+                : ($mapping['product_families'][$adapter->family]['terms'][$c['license']] ?? null);
             if ($license === null) {
-                $this->finding('row', 'orders', $row['row'], $orderId, 'unknown_license_name', 'license');
+                $this->finding('row', $sheet, $row['row'], $orderId, $adapter === null ? 'unknown_license_name' : 'unknown_terms_value', $column('license'));
                 $ok = false;
             }
             $amount = $this->money($c['amount']);
             $refunded = $this->money($c['refunded_amount']);
             if ($amount === null) {
-                $this->finding('row', 'orders', $row['row'], $orderId, 'invalid_amount', 'amount');
+                $this->finding('row', $sheet, $row['row'], $orderId, 'invalid_amount', 'amount');
                 $ok = false;
             }
             if ($refunded === null) {
-                $this->finding('row', 'orders', $row['row'], $orderId, 'invalid_refunded_amount', 'refunded_amount');
+                $this->finding('row', $sheet, $row['row'], $orderId, 'invalid_refunded_amount', 'refunded_amount');
                 $ok = false;
             }
             if ($amount !== null && $refunded !== null && $refunded > $amount) {
-                $this->finding('row', 'orders', $row['row'], $orderId, 'refund_exceeds_amount', 'refunded_amount');
+                $this->finding('row', $sheet, $row['row'], $orderId, 'refund_exceeds_amount', 'refunded_amount');
                 $ok = false;
             }
             if (array_key_exists('currency', $c) && $c['currency'] !== $mapping['currency']) {
-                $this->finding('row', 'orders', $row['row'], $orderId, 'currency_mismatch', 'currency');
+                $this->finding('row', $sheet, $row['row'], $orderId, 'currency_mismatch', 'currency');
                 $ok = false;
             }
             $reference = $c['payment_reference'] ?? '';
             if ($reference !== '' && ! (preg_match(self::IDENTIFIER, $reference) === 1)) {
-                $this->finding('row', 'orders', $row['row'], $orderId, 'invalid_payment_reference', 'payment_reference');
+                $this->finding('row', $sheet, $row['row'], $orderId, 'invalid_payment_reference', 'payment_reference');
                 $ok = false;
             }
             if ($ok) {
@@ -322,7 +355,7 @@ final class HistoryNormalizer
         $byOrder = [];
         foreach ($parsed as $line) {
             if (isset($duplicates[$line['order']."\n".$line['line']])) {
-                $this->finding('row', 'orders', $line['row']['row'], $line['order'], 'duplicate_source_id', 'source_line_id');
+                $this->finding('row', $line['sheet'], $line['row']['row'], $line['order'], 'duplicate_source_id', 'source_line_id');
 
                 continue;
             }
@@ -341,7 +374,7 @@ final class HistoryNormalizer
                 && $line['payment_reference'] === $first['payment_reference']);
             if (! $consistent) {
                 foreach ($group as $line) {
-                    $this->finding('row', 'orders', $line['row']['row'], $orderId, 'order_inconsistent', null);
+                    $this->finding('row', $line['sheet'], $line['row']['row'], $orderId, 'order_inconsistent', null);
                 }
 
                 continue;
@@ -356,7 +389,7 @@ final class HistoryNormalizer
             };
             if (! $statusFits) {
                 foreach ($group as $line) {
-                    $this->finding('row', 'orders', $line['row']['row'], $orderId, 'refund_status_mismatch', 'refunded_amount');
+                    $this->finding('row', $line['sheet'], $line['row']['row'], $orderId, 'refund_status_mismatch', 'refunded_amount');
                 }
 
                 continue;
@@ -368,7 +401,7 @@ final class HistoryNormalizer
                 $lineKeys[] = $lineKey;
                 $record = ['record_key' => $lineKey, 'source_order_id' => $orderId, 'source_line_id' => (string) $line['line'],
                     'order_record_key' => $orderKey, 'row' => $line['row']['row'], 'row_sha256' => $line['row']['row_sha256'],
-                    'track_source_id' => (string) $line['row']['cells']['track_source_id'], 'license_name' => $line['license_name'],
+                    'track_source_id' => (string) $line['product'], 'license_name' => $line['license_name'],
                     'license_label' => $line['license']['label'], 'exclusive' => $line['license']['exclusive'],
                     'amount_minor' => $line['amount'], 'refunded_minor' => $line['refunded'], 'currency' => $mapping['currency'],
                     'classification' => self::CLASSIFICATION];
@@ -533,6 +566,10 @@ final class HistoryNormalizer
         foreach ($lines as $key => $line) {
             $order = $orders[$line['order_record_key']];
             $blockers = [];
+            if (ProductFamilyAdapter::familyOf($line['track_source_id']) !== null) {
+                // A kit, service or membership line is history only; the grant review is about track licenses.
+                $blockers[] = 'product_family_not_reviewable';
+            }
             if ($order['status'] !== 'paid') {
                 $blockers[] = 'order_not_paid';
             }

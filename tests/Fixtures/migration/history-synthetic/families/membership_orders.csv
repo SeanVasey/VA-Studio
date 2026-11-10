@@ -1,0 +1,3 @@
+Invoice ID,Line ID,Customer ID,Charged At,Status,Plan ID,Plan,Amount,Refunded,Payment Ref,Period Start,Period End
+synthetic-ord-2006,1,synthetic-cust-101,2026-07-06T10:00:00Z,Completed,synthetic-plan-01,Pro Monthly,9.99,0,synthetic-pay-2006,2026-07-06,2026-08-05
+synthetic-ord-2007,1,synthetic-cust-101,2026-08-06T10:00:00Z,Completed,synthetic-plan-01,Pro Monthly,9.99,0,synthetic-pay-2007,2026-08-06,2026-09-05
