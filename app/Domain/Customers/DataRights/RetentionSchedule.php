@@ -31,6 +31,9 @@ namespace App\Domain\Customers\DataRights;
  * - `latest_in` [group column, order column], on a `columns` clock: the row is past only while it is the last row of its group
  *   in its own table (no row with the same group value and a higher order value). An observation that anything followed, a
  *   failed or contradicting read included, is never past.
+ * - `closure` ['account' => column]: the row's account (that column of its own table, a `customer_accounts.id`) had a deletion request
+ *   approved at or before the cutoff and no retained order still ties it to its address (`RetainedOrders`, DD-48). Rows without a
+ *   completed deletion are never past. Dated by the approval; the report prints only the count.
  * - null: no clock can be modeled from the schema (no primary key or timestamp to scan, or no signal for when the clock
  *   starts), so the table is reported as held and never counted. The rationale says why.
  *
@@ -166,18 +169,31 @@ final class RetentionSchedule
             'rationale' => 'Suppression ledger; held with its target.'],
         ['table' => 'customer_suppression_confirmations', 'family' => 'customer_suppression_records', 'class' => 'consent', 'clock' => null,
             'rationale' => 'Suppression ledger; held with its target.'],
-        ['table' => 'production_consent_events', 'family' => null, 'class' => 'consent', 'clock' => null,
-            'rationale' => 'Production consent ledger; same clock as customer_consent_events, which no column records, so held.'],
-        ['table' => 'production_consent_states', 'family' => null, 'class' => 'consent', 'clock' => null,
-            'rationale' => 'Current state derived from the production consent ledger; held with it.'],
-        ['table' => 'production_suppression_targets', 'family' => null, 'class' => 'consent', 'clock' => null,
-            'rationale' => 'Production opt-out that must keep being honored; no signal that the address is no longer held, so held.'],
-        ['table' => 'production_suppression_intents', 'family' => null, 'class' => 'consent', 'clock' => null,
-            'rationale' => 'Production suppression ledger; held with its target.'],
-        ['table' => 'production_suppression_attempts', 'family' => null, 'class' => 'consent', 'clock' => null,
-            'rationale' => 'Production suppression ledger; held with its target.'],
-        ['table' => 'production_suppression_confirmations', 'family' => null, 'class' => 'consent', 'clock' => null,
-            'rationale' => 'Production suppression ledger; held with its target.'],
+        // Production consent and suppression ledgers (DD-48, 2026-11-10): the clock starts at the staff approval of the account's
+        // deletion (`customer_data_requests` kind deletion, state completed, `resolved_at`), and only for an account that no retained
+        // order, order snapshot or contract still ties to the address (`RetainedOrders::HOLDERS`). While one does, the records stay
+        // held with it. Every other ledger row follows its binding or target. Test accounts' ledgers above keep no such signal.
+        ['table' => 'production_account_feature_bindings', 'family' => 'production_account_feature_bindings', 'class' => 'consent',
+            'clock' => ['closure' => ['account' => 'account_id']],
+            'rationale' => 'Key of the production consent ledger (DD-47, corrected by BL-44): the database refuses every update and delete of a binding and the retained consent rows reference it, so it is held with them. It holds ids, a hash and a sealed account binding, no listening content.'],
+        ['table' => 'production_consent_events', 'family' => 'production_consent_events', 'class' => 'consent',
+            'clock' => ['via' => ['binding_id', 'production_account_feature_bindings']],
+            'rationale' => 'Production consent ledger; past its period only once the deletion-approval clock of its binding has run (DD-48).'],
+        ['table' => 'production_consent_states', 'family' => 'production_consent_events', 'class' => 'consent',
+            'clock' => ['via' => ['binding_id', 'production_account_feature_bindings']],
+            'rationale' => 'Current state derived from the production consent ledger; follows its binding (DD-48).'],
+        ['table' => 'production_suppression_targets', 'family' => 'production_suppression_records', 'class' => 'consent',
+            'clock' => ['via' => ['binding_id', 'production_account_feature_bindings']],
+            'rationale' => 'Production opt-out that must keep being honored; past its period only once the deletion-approval clock of its binding has run (DD-48).'],
+        ['table' => 'production_suppression_intents', 'family' => 'production_suppression_records', 'class' => 'consent',
+            'clock' => ['via' => ['target_id', 'production_suppression_targets']],
+            'rationale' => 'Production suppression ledger; follows its target.'],
+        ['table' => 'production_suppression_attempts', 'family' => 'production_suppression_records', 'class' => 'consent',
+            'clock' => ['via' => ['target_id', 'production_suppression_targets']],
+            'rationale' => 'Production suppression ledger; follows its target.'],
+        ['table' => 'production_suppression_confirmations', 'family' => 'production_suppression_records', 'class' => 'consent',
+            'clock' => ['via' => ['attempt_id', 'production_suppression_attempts']],
+            'rationale' => 'Production suppression ledger; follows its attempt.'],
         ['table' => 'customer_consent_policies', 'family' => null, 'class' => 'not_applicable', 'clock' => null,
             'rationale' => 'Read by the export: the notice versions consent was given to, not customer data.'],
         // Conversations (RETAINED inquiries): 2 years after the last message unless the conversation concerns an order.
@@ -445,6 +461,9 @@ final class RetentionSchedule
         ['table' => 'test_unpaid_releases', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
         ['table' => 'test_unpaid_release_events', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
         ['table' => 'test_unpaid_release_work', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
+        // Review evidence held indefinitely (DD-47): staff-reported buyer assent observations. They are not keyed to an account.
+        ['table' => 'production_buyer_assent_observations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => 'Staff-reported production buyer assent, sealed and held indefinitely as review evidence (DD-47); no account key, so closure leaves it as it is.'],
         // Account lifecycle, handled by the deletion workflow rather than a retention purge.
         ['table' => 'users', 'family' => null, 'class' => 'not_applicable', 'clock' => null,
             'rationale' => 'Sign-in profile: pseudonymized when a deletion request is approved.'],
@@ -452,6 +471,8 @@ final class RetentionSchedule
             'rationale' => 'Account row: access withdrawn on deletion; immutable records reference it.'],
         ['table' => 'customer_saved_tracks', 'family' => null, 'class' => 'not_applicable', 'clock' => null,
             'rationale' => 'Listening library: erased on deletion approval.'],
+        ['table' => 'production_listening_libraries', 'family' => null, 'class' => 'not_applicable', 'clock' => null,
+            'rationale' => 'Production listening library (DD-47): its encrypted contents are overwritten with the empty library when a deletion request is approved; the row stays because the database refuses every delete of it.'],
         ['table' => 'sessions', 'family' => null, 'class' => 'not_applicable', 'clock' => null,
             'rationale' => 'Expire after inactivity and are ended on deletion approval.'],
     ];

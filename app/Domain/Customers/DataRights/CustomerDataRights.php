@@ -2,6 +2,7 @@
 
 namespace App\Domain\Customers\DataRights;
 
+use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\CustomerAccess;
 use App\Domain\Customers\CustomerPrincipal;
 use App\Domain\Customers\DataRights\Models\CustomerDataExport;
@@ -9,6 +10,9 @@ use App\Domain\Customers\DataRights\Models\CustomerDataRequest;
 use App\Domain\Customers\DataRights\Models\CustomerDataRequestEvent;
 use App\Domain\Customers\Models\CustomerAccount;
 use App\Domain\Customers\Models\CustomerPurchaseClaim;
+use App\Domain\Customers\ProductionCustomerAccess;
+use App\Domain\Customers\ProductionCustomerPrincipal;
+use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -66,13 +70,28 @@ class CustomerDataRights
         // Their download history, kept by `_retain` triggers: delivery records, as `delivery_records` above.
         'paid_authorizations' => 'financial_records_years', 'paid_redemptions' => 'financial_records_years',
         'paid_tax_authorizations' => 'financial_records_years', 'paid_tax_redemptions' => 'financial_records_years',
+        // BL-44 (DD-47, DD-48): the production consent ledger and its key. Held; the clock starts at deletion approval for an
+        // account with no retained order (RetentionSchedule, RetainedOrders).
+        'production_account_feature_bindings' => 'consent_records_years', 'production_consent_events' => 'consent_records_years',
+        'production_suppression_records' => 'consent_records_years',
     ];
 
     /** @return array{requestId: string, downloadToken: string, expiresAt: string, sizeBytes: int} */
     public function requestExport(CustomerPrincipal $principal, User $actor): array
     {
+        return $this->exportFor($principal, $actor);
+    }
+
+    /** @return array{requestId: string, downloadToken: string, expiresAt: string, sizeBytes: int} */
+    public function requestProductionExport(ProductionCustomerPrincipal $principal, User $actor): array
+    {
+        return $this->exportFor($principal, $actor);
+    }
+
+    private function exportFor(CustomerPrincipal|ProductionCustomerPrincipal $principal, User $actor): array
+    {
         $policy = app(DataRightsPolicy::class);
-        $policy->requireEnabled();
+        $this->admit($principal);
         $this->outside();
         [$ttl, $limit] = [$policy->exportTtlMinutes(), $policy->exportMaxBytes()];
 
@@ -100,8 +119,8 @@ class CustomerDataRights
             ]);
             $this->event($request, 'export_ready', null, ['size_bytes' => strlen($json), 'expires_at' => $expires->toIso8601ZuluString(),
                 'sections' => array_map('count', array_intersect_key($document, array_flip(['orders', 'licenseGrants', 'consent', 'inquiries',
-                'productionCheckoutReviews', 'productionCheckoutOrders', 'productionTaxCheckoutOrders', 'productionCheckoutExemptionBases',
-                'paidGrantOrders', 'paidTaxGrantOrders'])))], $at);
+                    'productionCheckoutReviews', 'productionCheckoutOrders', 'productionTaxCheckoutOrders', 'productionCheckoutExemptionBases',
+                    'paidGrantOrders', 'paidTaxGrantOrders'])))], $at);
             AuditEvent::recordAttributed('customer.data_export.ready', $request, ['request_id' => $requestId, 'size_bytes' => strlen($json)], $user->id);
 
             return ['requestId' => $requestId, 'downloadToken' => $token, 'expiresAt' => $expires->toIso8601ZuluString(), 'sizeBytes' => strlen($json)];
@@ -111,7 +130,17 @@ class CustomerDataRights
     /** Single use: the same signed-in customer and the one-time token; the ciphertext is purged in the same transaction. */
     public function download(CustomerPrincipal $principal, User $actor, string $requestId, #[SensitiveParameter] string $token): string
     {
-        app(DataRightsPolicy::class)->requireEnabled();
+        return $this->downloadFor($principal, $actor, $requestId, $token);
+    }
+
+    public function downloadProduction(ProductionCustomerPrincipal $principal, User $actor, string $requestId, #[SensitiveParameter] string $token): string
+    {
+        return $this->downloadFor($principal, $actor, $requestId, $token);
+    }
+
+    private function downloadFor(CustomerPrincipal|ProductionCustomerPrincipal $principal, User $actor, string $requestId, #[SensitiveParameter] string $token): string
+    {
+        $this->admit($principal);
         $this->outside();
         if (! $this->uuid($requestId) || preg_match('/\A[a-f0-9]{64}\z/D', $token) !== 1) {
             throw new DataRightsException(404, 'export_not_found');
@@ -161,18 +190,53 @@ class CustomerDataRights
     /** One open deletion request per account; a repeat returns the open request instead of creating another. */
     public function requestDeletion(CustomerPrincipal $principal, User $actor): array
     {
-        app(DataRightsPolicy::class)->requireEnabled();
+        return $this->deletionFor($principal, $actor);
+    }
+
+    /**
+     * A production closure request must carry the customer's acknowledgment that closing may end access to remaining downloads
+     * (Sean, 2026-11-10; `ProductionAccountClosure::ACKNOWLEDGMENT_VERSION`). It is sealed into the request's `requested` event.
+     */
+    public function requestProductionDeletion(ProductionCustomerPrincipal $principal, User $actor, bool $acknowledgedDownloadForfeiture): array
+    {
+        if (! $acknowledgedDownloadForfeiture) {
+            throw new DataRightsException(422, 'invalid_request');
+        }
+
+        return $this->deletionFor($principal, $actor, true);
+    }
+
+    /**
+     * The acknowledgment sealed into a request when it was made: its text version and the time, or null when none was given.
+     *
+     * @return array{version: string, at: string}|null
+     */
+    public static function closureAcknowledgment(CustomerDataRequest $request): ?array
+    {
+        $detail = CustomerDataRequestEvent::where('request_id', $request->id)->where('event', 'requested')->orderBy('sequence')->value('detail');
+        $decoded = is_string($detail) ? json_decode($detail, true) : null;
+        $ack = is_array($decoded) ? ($decoded['download_forfeiture_acknowledgment'] ?? null) : null;
+
+        return is_array($ack) && is_string($ack['version'] ?? null) && is_string($ack['at'] ?? null)
+            ? ['version' => $ack['version'], 'at' => $ack['at']] : null;
+    }
+
+    private function deletionFor(CustomerPrincipal|ProductionCustomerPrincipal $principal, User $actor, bool $acknowledged = false): array
+    {
+        $this->admit($principal);
         $this->outside();
 
-        return $this->transaction(function () use ($principal, $actor): array {
+        return $this->transaction(function () use ($principal, $actor, $acknowledged): array {
             [$user, $account] = $this->lockCustomer($principal, $actor);
             $open = CustomerDataRequest::where('customer_account_id', $account->id)->where('kind', 'deletion')->where('open_slot', 1)->first();
             if ($open !== null) {
                 return ['requestId' => $open->public_id, 'state' => $open->state, 'replayed' => true];
             }
             $at = $this->now();
-            $request = $this->open($account, 'deletion', (string) Str::uuid(), $at);
-            AuditEvent::recordAttributed('customer.data_deletion.requested', $request, ['request_id' => $request->public_id], $user->id);
+            $request = $this->open($account, 'deletion', (string) Str::uuid(), $at, $acknowledged ? ['download_forfeiture_acknowledgment' => [
+                'version' => ProductionAccountClosure::ACKNOWLEDGMENT_VERSION, 'at' => $at->toIso8601ZuluString()]] : []);
+            AuditEvent::recordAttributed('customer.data_deletion.requested', $request, ['request_id' => $request->public_id]
+                + ($acknowledged ? ['download_forfeiture_acknowledgment' => ProductionAccountClosure::ACKNOWLEDGMENT_VERSION] : []), $user->id);
 
             return ['requestId' => $request->public_id, 'state' => $request->state, 'replayed' => false];
         });
@@ -181,7 +245,17 @@ class CustomerDataRights
     /** The requester's own requests, newest first; an unexpired-looking export past its time reads as expired. */
     public function list(CustomerPrincipal $principal, User $actor): array
     {
-        app(DataRightsPolicy::class)->requireEnabled();
+        return $this->listFor($principal, $actor);
+    }
+
+    public function listProduction(ProductionCustomerPrincipal $principal, User $actor): array
+    {
+        return $this->listFor($principal, $actor);
+    }
+
+    private function listFor(CustomerPrincipal|ProductionCustomerPrincipal $principal, User $actor): array
+    {
+        $this->admit($principal);
         $this->outside();
 
         return $this->transaction(function () use ($principal, $actor): array {
@@ -209,7 +283,7 @@ class CustomerDataRights
     public function approveDeletion(string $requestId, User $actor, int $expectedVersion): array
     {
         $policy = app(DataRightsPolicy::class);
-        $policy->requireEnabled();
+        $policy->requireAnyEnabled();
         $retention = $policy->retention();
         $this->outside();
 
@@ -219,6 +293,18 @@ class CustomerDataRights
             if ($user->is_admin) {
                 // A staff account is never erased through the customer workflow.
                 throw new DataRightsException(409, 'staff_account');
+            }
+            // The account's own kind decides which path must be on: a production customer needs the production identity policy, a
+            // test account the test customer policy. Neither admits the other's accounts.
+            $closure = ProductionAccountClosure::isProduction($account) ? new ProductionAccountClosure : null;
+            $closure === null ? $policy->requireEnabled() : $policy->requireProductionEnabled();
+            if ($closure !== null && self::closureAcknowledgment($request) === null) {
+                // A production closure the customer never acknowledged cannot be approved (Sean, 2026-11-10); staff reject it instead.
+                throw new DataRightsException(409, 'acknowledgment_missing');
+            }
+            if ($closure?->holds($account)) {
+                // Commerce still in flight: nothing has changed, and staff can approve again once it settles.
+                throw new DataRightsException(409, 'open_commerce');
             }
             $at = $this->now();
             $actions = ['customer_access' => 'already_withdrawn', 'pending_exports' => 'none', 'listening_library' => 'none', 'sessions' => 'none', 'sign_in_profile' => 'pseudonymized'];
@@ -237,13 +323,21 @@ class CustomerDataRights
             if (Schema::hasColumn('sessions', 'user_id') && DB::table('sessions')->where('user_id', $user->id)->delete() > 0) {
                 $actions['sessions'] = 'ended';
             }
+            $production = [];
+            if ($closure !== null) {
+                // DD-47: the production library's contents are erased; its row and the account's feature bindings are retained by the
+                // database itself (see eraseLibrary), so they are reported as retained, never as erased.
+                $erasure = $closure->eraseLibrary($account, $at);
+                $actions += ['production_listening_library' => $erasure['library'], 'production_feature_bindings' => $erasure['bindings'] > 0 ? 'retained' : 'none'];
+                $production = ['consent_clock' => $closure->consentClock($account, $at), 'entitlements_retained' => $this->grants($account)];
+            }
             DB::table('users')->where('id', $user->id)->update([
                 'name' => 'Erased customer', 'email' => 'erased+'.$account->public_id.'@erased.invalid',
                 'password' => Hash::make(bin2hex(random_bytes(32))), 'remember_token' => null, 'email_verified_at' => null,
                 'updated_at' => $at,
             ]);
             $detail = ['schema' => 1, 'request_id' => $request->public_id, 'account_id' => $account->public_id,
-                'retention' => $retention, 'actions' => $actions, 'retained' => $this->retained($account)];
+                'retention' => $retention, 'actions' => $actions, 'retained' => $this->retained($account)] + $production;
             $hash = CanonicalJson::hash($detail);
             $this->resolve($request, 'completed', $at, $staff, $hash);
             $this->event($request, 'deletion_completed', $staff, $detail, $at);
@@ -258,7 +352,7 @@ class CustomerDataRights
     public function rejectDeletion(string $requestId, User $actor, int $expectedVersion, string $reason): array
     {
         $policy = app(DataRightsPolicy::class);
-        $policy->requireEnabled();
+        $policy->requireAnyEnabled();
         $reason = trim($reason);
         if ($reason === '' || mb_strlen($reason) > 500 || ! mb_check_encoding($reason, 'UTF-8') || preg_match('/[<>\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', $reason) === 1) {
             throw ValidationException::withMessages(['reason' => 'Give a plain-text reason of at most 500 characters.']);
@@ -267,7 +361,8 @@ class CustomerDataRights
 
         return $this->transaction(function () use ($policy, $requestId, $actor, $expectedVersion, $reason): array {
             $staff = $policy->staff($actor);
-            [$request] = $this->lockForStaff($requestId, $expectedVersion);
+            [$request, , $account] = $this->lockForStaff($requestId, $expectedVersion);
+            ProductionAccountClosure::isProduction($account) ? $policy->requireProductionEnabled() : $policy->requireEnabled();
             $at = $this->now();
             $detail = ['schema' => 1, 'request_id' => $request->public_id, 'reason' => $reason];
             $hash = CanonicalJson::hash($detail);
@@ -362,7 +457,7 @@ class CustomerDataRights
         $this->event($request, 'export_expired', null, ['expires_at' => $export->expires_at->toIso8601ZuluString(), 'reason' => $reason], $at);
     }
 
-    private function open(CustomerAccount $account, string $kind, string $publicId, CarbonImmutable $at): CustomerDataRequest
+    private function open(CustomerAccount $account, string $kind, string $publicId, CarbonImmutable $at, array $extra = []): CustomerDataRequest
     {
         try {
             $request = CustomerDataRequest::create(['public_id' => $publicId, 'customer_account_id' => $account->id, 'kind' => $kind,
@@ -376,7 +471,7 @@ class CustomerDataRights
             }
             throw $error;
         }
-        $this->event($request, 'requested', null, ['kind' => $kind], $at);
+        $this->event($request, 'requested', null, ['kind' => $kind] + $extra, $at);
 
         return $request;
     }
@@ -399,13 +494,64 @@ class CustomerDataRights
     }
 
     /** @return array{0: User, 1: CustomerAccount} user then account, the order every customer command uses */
-    private function lockCustomer(CustomerPrincipal $principal, User $actor): array
+    private function lockCustomer(CustomerPrincipal|ProductionCustomerPrincipal $principal, User $actor): array
     {
+        if ($principal instanceof ProductionCustomerPrincipal) {
+            return $this->lockProduction($principal, $actor);
+        }
         app(CustomerAccess::class)->lock($principal, $principal->ownerKey, $actor);
         $user = User::whereKey($principal->userId)->lockForUpdate()->firstOrFail();
         $account = CustomerAccount::whereKey($principal->accountId)->lockForUpdate()->firstOrFail();
 
         return [$user, $account];
+    }
+
+    /**
+     * The production customer: user then account (the order every command uses), then the identity evidence re-read under lock and
+     * compared with the principal the session minted. The owner is whatever the production origin proves for the locked account,
+     * never a value from the request. An account withdrawn by an approval fails this read, so a command queued behind one is denied.
+     *
+     * @return array{0: User, 1: CustomerAccount}
+     */
+    private function lockProduction(ProductionCustomerPrincipal $principal, User $actor): array
+    {
+        if (DB::transactionLevel() === 0) {
+            throw new \LogicException('Customer access requires the command transaction.');
+        }
+        app(DataRightsPolicy::class)->requireProductionEnabled();
+        if (! $actor->exists || $actor->getKey() !== $principal->userId) {
+            throw new IdentityException;
+        }
+        $user = User::whereKey($principal->userId)->lockForUpdate()->first();
+        $account = CustomerAccount::whereKey($principal->accountId)->lockForUpdate()->first();
+        if ($user === null || $account === null || $account->user_id !== $user->id) {
+            throw new IdentityException;
+        }
+        $connection = DB::connection();
+        (new ProductionCustomerAccess)->lock($principal, $actor, new CurrentRows($connection->getPdo(), $connection->getDriverName()));
+
+        return [$user, $account];
+    }
+
+    /** The path the principal came through must be on; the other path never admits it. */
+    private function admit(CustomerPrincipal|ProductionCustomerPrincipal $principal): void
+    {
+        $policy = app(DataRightsPolicy::class);
+        $principal instanceof ProductionCustomerPrincipal ? $policy->requireProductionEnabled() : $policy->requireEnabled();
+    }
+
+    /** License grants kept for the account's orders; closing the account ends its sign-in, not these records. */
+    private function grants(CustomerAccount $account): int
+    {
+        $orders = $this->orderIds($account);
+
+        return $orders === [] ? 0 : DB::table('license_grants as g')->join('order_finalizations as f', 'f.id', '=', 'g.order_finalization_id')->whereIn('f.order_id', $orders)->count();
+    }
+
+    private function orderIds(CustomerAccount $account): array
+    {
+        return DB::table('orders')->where('owner_key', $account->owner_key)
+            ->orWhereIn('id', CustomerPurchaseClaim::where('account_id', $account->id)->select('order_id'))->pluck('id')->all();
     }
 
     /** @return array{0: CustomerDataRequest, 1: User, 2: CustomerAccount} */
@@ -436,8 +582,7 @@ class CustomerDataRights
 
     private function retained(CustomerAccount $account): array
     {
-        $orders = DB::table('orders')->where('owner_key', $account->owner_key)
-            ->orWhereIn('id', CustomerPurchaseClaim::where('account_id', $account->id)->select('order_id'))->pluck('id')->all();
+        $orders = $this->orderIds($account);
         $counts = [
             'orders' => count($orders),
             'license_grants' => $orders === [] ? 0 : DB::table('license_grants as g')->join('order_finalizations as f', 'f.id', '=', 'g.order_finalization_id')->whereIn('f.order_id', $orders)->count(),
@@ -449,6 +594,11 @@ class CustomerDataRights
                 ->where('n.account_id', $account->id)->count(),
             'customer_data_exports' => DB::table('customer_data_exports as x')->join('customer_data_requests as r', 'r.id', '=', 'x.request_id')
                 ->where('r.customer_account_id', $account->id)->count(),
+            'production_account_feature_bindings' => DB::table('production_account_feature_bindings')->where('account_id', $account->id)->count(),
+            'production_consent_events' => DB::table('production_consent_events as e')->join('production_account_feature_bindings as b', 'b.id', '=', 'e.binding_id')
+                ->where('b.account_id', $account->id)->count(),
+            'production_suppression_records' => DB::table('production_suppression_targets as t')->join('production_account_feature_bindings as b', 'b.id', '=', 't.binding_id')
+                ->where('b.account_id', $account->id)->count(),
         ] + ProductionCheckoutExportSection::counts($account->id) + PaidGrantExportSection::counts($account->id);
         $retained = [];
         foreach (self::RETAINED as $record => $class) {

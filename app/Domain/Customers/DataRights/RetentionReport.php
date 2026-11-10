@@ -101,6 +101,9 @@ final class RetentionReport
         if (isset($clock['via'])) {
             return ['past_period' => $count, 'follows' => $clock['via'][1]];
         }
+        if (isset($clock['closure'])) {
+            return ['past_period' => $count, 'follows' => 'customer_data_requests'];
+        }
 
         return ['past_period' => $count, 'oldest_due' => $oldest === null ? null : $due($oldest)->toDateString(),
             'newest_due' => $newest === null ? null : $due($newest)->toDateString(), 'clock_index' => $this->indexed($table, $clock['columns'][0])];
@@ -129,6 +132,11 @@ final class RetentionReport
             return;
         }
         $bound = $this->bound($clock, $cutoff);
+        if (isset($clock['closure'])) {
+            $this->closed($query, $clock['closure']['account'], $bound, $alias);
+
+            return;
+        }
         foreach ($clock['columns'] as $column) {
             $query->whereNotNull($alias.'.'.$column)->where($alias.'.'.$column, '<=', $bound);
         }
@@ -148,6 +156,21 @@ final class RetentionReport
             $query->whereNotExists(fn (Builder $sub) => $sub->selectRaw('1')->from($holder.' as '.$alias.'h')
                 ->whereColumn($alias.'h.'.$foreign, $alias.'.'.$own));
         }
+    }
+
+    /**
+     * DD-48: the row's account had a deletion request completed at or before the cutoff, and no retained order, snapshot or contract
+     * still ties it to its address. Anything else, an open or rejected request included, is never past.
+     */
+    private function closed(Builder $query, string $column, string $bound, string $alias): void
+    {
+        $query->whereExists(fn (Builder $sub) => $sub->selectRaw('1')->from('customer_data_requests as '.$alias.'d')
+            ->whereColumn($alias.'d.customer_account_id', $alias.'.'.$column)->where($alias.'d.kind', 'deletion')
+            ->where($alias.'d.state', 'completed')->whereNotNull($alias.'d.resolved_at')->where($alias.'d.resolved_at', '<=', $bound));
+        $query->whereExists(function (Builder $sub) use ($column, $alias): void {
+            $sub->selectRaw('1')->from('customer_accounts as '.$alias.'a')->whereColumn($alias.'a.id', $alias.'.'.$column);
+            RetainedOrders::absent($sub, $alias.'a');
+        });
     }
 
     /** The cutoff in the clock columns' own storage format, so the comparison is exact on SQLite and MySQL alike. */
@@ -197,7 +220,7 @@ final class RetentionReport
     {
         foreach (RetentionSchedule::ENTRIES as $entry) {
             $clock = $entry['clock'] ?? [];
-            $columns = array_merge($clock['columns'] ?? [], isset($clock['via']) ? [$clock['via'][0]] : [],
+            $columns = array_merge($clock['columns'] ?? [], isset($clock['via']) ? [$clock['via'][0]] : [], isset($clock['closure']) ? [$clock['closure']['account']] : [],
                 isset($clock['when']) ? [$clock['when'][0]] : [], $clock['latest_in'] ?? [], array_map(fn (array $hold): string => $hold[2] ?? 'id', $clock['unless_referenced'] ?? []),
                 $clock !== [] ? ['id'] : []);
             if (! Schema::hasTable($entry['table']) || ($columns !== [] && ! Schema::hasColumns($entry['table'], $columns))) {
