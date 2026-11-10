@@ -13,6 +13,7 @@ use App\Support\Access\AdminMultiFactor;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -89,6 +90,7 @@ class AlbumReleaseResource extends OperatorResource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
+            Hidden::make('revision'),
             TextInput::make('title')->required()->maxLength(160),
             TextInput::make('artist_name')->label('Artist name')->required()->maxLength(120)->helperText('Shown as the artist and in search-engine data. Enter it exactly as it should appear.'),
             TextInput::make('slug')->label('Web address')->required()->maxLength(80)->regex('/\A[a-z0-9]+(?:-[a-z0-9]+)*\z/')
@@ -116,7 +118,7 @@ class AlbumReleaseResource extends OperatorResource
 
     public static function table(Table $table): Table
     {
-        return $table->description('Sean\'s own releases for the public albums page. Metadata only: nothing here prices, sells or delivers music. The page stays off until ALBUMS_PAGE_ENABLED is true.')
+        return $table->description('Sean\'s own releases for the public albums page. Metadata only: nothing here prices, sells or delivers music. The page stays off until a reviewed code change enables the albums page.')
             ->columns([
                 TextColumn::make('title')->searchable()->sortable(),
                 TextColumn::make('release_type')->label('Type')->badge()->formatStateUsing(fn (ReleaseType $state): string => $state->label()),
@@ -129,25 +131,29 @@ class AlbumReleaseResource extends OperatorResource
             ->recordActions([
                 EditAction::make()->modalHeading('Edit release')->modalWidth('4xl')->databaseTransaction(false)
                     ->fillForm(fn (AlbumRelease $record): array => static::formState($record))
-                    ->using(fn (AlbumRelease $record, array $data, ManageAlbumReleases $livewire): AlbumRelease => static::save($record, $data, $livewire)),
+                    ->using(fn (AlbumRelease $record, array $data, ManageAlbumReleases $livewire): AlbumRelease => static::save($record, $data, $livewire, isset($data['revision']) ? (int) $data['revision'] : -1)),
                 Action::make('publish')->label('Publish')->color('success')->requiresConfirmation()
+                    // The revision the staff member saw when the dialog opened, carried in the mounted state so a later change by someone
+                    // else makes the confirmation refuse instead of publishing text that was never reviewed.
+                    ->fillForm(fn (AlbumRelease $record): array => ['revision' => $record->revision])->schema([Hidden::make('revision')])
                     ->modalDescription(fn (AlbumRelease $record): string => ($blockers = app(AlbumReleases::class)->blockers($record)) === []
-                        ? 'The release becomes visible on the albums page once ALBUMS_PAGE_ENABLED is true.'
+                        ? 'The release becomes visible on the albums page once a reviewed code change enables the albums page.'
                         : 'Not ready: '.implode(' ', $blockers))
                     ->visible(fn (AlbumRelease $record): bool => ! $record->is_published)
-                    ->action(fn (AlbumRelease $record, ManageAlbumReleases $livewire) => static::transition($record, 'publish', $livewire)),
+                    ->action(fn (AlbumRelease $record, array $data, ManageAlbumReleases $livewire) => static::transition($record, 'publish', $livewire, (int) ($data['revision'] ?? -1))),
                 Action::make('unpublish')->label('Unpublish')->color('danger')->requiresConfirmation()
+                    ->fillForm(fn (AlbumRelease $record): array => ['revision' => $record->revision])->schema([Hidden::make('revision')])
                     ->modalDescription('The release disappears from the albums page, its sitemap entry and its cover art address.')
                     ->visible(fn (AlbumRelease $record): bool => $record->is_published)
-                    ->action(fn (AlbumRelease $record, ManageAlbumReleases $livewire) => static::transition($record, 'unpublish', $livewire)),
+                    ->action(fn (AlbumRelease $record, array $data, ManageAlbumReleases $livewire) => static::transition($record, 'unpublish', $livewire, (int) ($data['revision'] ?? -1))),
             ])->emptyStateHeading('No releases')
             ->emptyStateDescription('Add a release, upload its cover under Site images, then publish it. Nothing is pre-filled: enter every detail yourself.');
     }
 
     /** Create or edit: converts the form's m:ss lengths and hands the exact fields to the domain. */
-    public static function save(?AlbumRelease $record, array $data, ManageRecords $livewire): AlbumRelease
+    public static function save(?AlbumRelease $record, array $data, ManageRecords $livewire, ?int $expectedRevision = null): AlbumRelease
     {
-        return static::guarded($livewire, function (User $actor) use ($record, $data): AlbumRelease {
+        return static::guarded($livewire, function (User $actor) use ($record, $data, $expectedRevision): AlbumRelease {
             $tracks = [];
             foreach ($data['tracks'] ?? [] as $track) {
                 $seconds = static::seconds((string) ($track['duration'] ?? ''));
@@ -162,13 +168,13 @@ class AlbumReleaseResource extends OperatorResource
                 'release_type' => $data['release_type'] ?? null, 'release_date' => $data['release_date'] ?? null,
                 'description' => $data['description'] ?? null, 'artwork_image_id' => $data['artwork_image_id'] ?? null,
                 'artwork_alt' => $data['artwork_alt'] ?? null, 'listening_links' => array_values($data['listening_links'] ?? []), 'tracks' => $tracks,
-            ], $actor, $record?->revision);
+            ], $actor, $record === null ? null : $expectedRevision);
         });
     }
 
-    private static function transition(AlbumRelease $record, string $operation, ManageRecords $livewire): void
+    private static function transition(AlbumRelease $record, string $operation, ManageRecords $livewire, int $expectedRevision): void
     {
-        static::guarded($livewire, fn (User $actor) => app(AlbumReleases::class)->{$operation}($record, $record->revision, $actor));
+        static::guarded($livewire, fn (User $actor) => app(AlbumReleases::class)->{$operation}($record, $expectedRevision, $actor));
         Notification::make()->success()->title($operation === 'publish' ? 'Release published' : 'Release unpublished')->send();
     }
 
@@ -176,6 +182,7 @@ class AlbumReleaseResource extends OperatorResource
     private static function formState(AlbumRelease $record): array
     {
         return [
+            'revision' => $record->revision,
             'title' => $record->title, 'artist_name' => $record->artist_name, 'slug' => $record->slug, 'release_type' => $record->release_type->value,
             'release_date' => $record->release_date->format('Y-m-d'), 'description' => $record->description,
             'artwork_image_id' => $record->artwork_image_id, 'artwork_alt' => $record->artwork_alt,

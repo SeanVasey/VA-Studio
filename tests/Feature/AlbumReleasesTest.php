@@ -63,6 +63,18 @@ class AlbumReleasesTest extends TestCase
         ];
     }
 
+    private function draftReady(array $over = []): AlbumRelease
+    {
+        return app(AlbumReleases::class)->save(null, $this->data($over, $this->cover()), $this->actor);
+    }
+
+    /** Another staff member saves a new title, advancing the revision. */
+    private function bump(AlbumRelease $release, string $title): void
+    {
+        $release->refresh();
+        app(AlbumReleases::class)->save($release, $this->data(['title' => $title, 'slug' => $release->slug, 'artwork_image_id' => $release->artwork_image_id, 'artwork_alt' => $release->artwork_alt]), $this->actor, $release->revision);
+    }
+
     private function published(array $over = [], ?SiteImage $cover = null): AlbumRelease
     {
         $service = app(AlbumReleases::class);
@@ -378,6 +390,37 @@ class AlbumReleasesTest extends TestCase
         Livewire::test(ManageAlbumReleases::class)->callTableAction('unpublish', $release)->assertNotified('Release unpublished');
         $this->assertFalse($release->refresh()->is_published);
         $this->assertSame(0, DB::table('audit_events')->where('action', 'like', 'albums.%')->whereNull('actor_id')->count());
+    }
+
+    public function test_the_filament_editor_refuses_a_save_or_confirmation_made_against_a_revision_changed_since_it_was_opened(): void
+    {
+        $this->actingAs($this->actor);
+        $release = $this->draftReady();
+        $form = fn (AlbumRelease $r): array => ['title' => $r->title, 'artist_name' => $r->artist_name, 'slug' => $r->slug, 'release_type' => $r->release_type->value,
+            'release_date' => $r->release_date->format('Y-m-d'), 'description' => null, 'artwork_image_id' => $r->artwork_image_id, 'artwork_alt' => $r->artwork_alt,
+            'listening_links' => array_values($r->listening_links ?? []),
+            'tracks' => $r->tracks->map(fn ($t): array => ['title' => $t->title, 'duration' => intdiv($t->duration_seconds, 60).':'.str_pad((string) ($t->duration_seconds % 60), 2, '0', STR_PAD_LEFT)])->all()];
+
+        // Edit: A opens the dialog, B saves, A submits what it saw.
+        $a = Livewire::test(ManageAlbumReleases::class)->mountTableAction('edit', $release);
+        $this->bump($release, 'Synthetic title by B');
+        $a->setTableActionData(['title' => 'Synthetic title by A'] + $form($release->refresh()))->callMountedTableAction()->assertHasTableActionErrors();
+        $this->assertSame('Synthetic title by B', $release->refresh()->title);
+
+        // Publish: A opens the confirmation (ready), B edits the title, A confirms.
+        $a = Livewire::test(ManageAlbumReleases::class)->mountTableAction('publish', $release);
+        $this->bump($release, 'Synthetic title unreviewed');
+        $a->callMountedTableAction();
+        $this->assertFalse($release->refresh()->is_published);
+        $this->assertSame('Synthetic title unreviewed', $release->title);
+
+        // The same confirmation against the current revision succeeds, and unpublish is guarded the same way.
+        Livewire::test(ManageAlbumReleases::class)->callTableAction('publish', $release)->assertNotified('Release published');
+        $a = Livewire::test(ManageAlbumReleases::class)->mountTableAction('unpublish', $release);
+        app(AlbumReleases::class)->unpublish($release->refresh(), $release->revision, $this->actor);
+        app(AlbumReleases::class)->publish($release->refresh(), $release->revision, $this->actor);
+        $a->callMountedTableAction();
+        $this->assertTrue($release->refresh()->is_published);
     }
 
     public function test_cover_art_is_served_only_for_a_published_release_with_the_page_on_and_the_reviewed_bytes(): void
