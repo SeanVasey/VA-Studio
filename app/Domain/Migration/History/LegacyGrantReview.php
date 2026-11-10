@@ -183,6 +183,10 @@ final class LegacyGrantReview
         }
         $blockers = [];
         $consulted = [];
+        if (ProductFamilyAdapter::familyOf((string) $line->track_source_id) !== null) {
+            // Kit, service and membership lines are archive-only history; only a track license line is reviewable.
+            $blockers[] = 'product_family_not_reviewable';
+        }
         if ($orderRecord['status'] !== 'paid') {
             $blockers[] = 'order_not_paid';
         }

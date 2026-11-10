@@ -10,7 +10,8 @@ use Throwable;
 
 /**
  * Read-only admission of one history source package: `mapping.json`, `customers.csv`, `orders.csv`,
- * `contracts.csv` and the original contract files in `contracts/`. Nothing is written, moved or deleted.
+ * `contracts.csv`, the original contract files in `contracts/` and, only when the mapping declares the family,
+ * `kit_orders.csv`, `service_orders.csv` and `membership_orders.csv`. Nothing is written, moved or deleted.
  *
  * A real package is private source material (customer e-mail addresses, payment references, executed
  * contracts): every file must be a caller-owned 0600 single-link file in caller-owned 0700 directories outside
@@ -53,12 +54,24 @@ final class HistorySourceFiles
         }
         $read = fn (string $path, int $maximum): string => $inside ? $this->fixture($path, $maximum) : $this->private($path, $maximum);
         $mapping = $read($directory.'/'.self::MAPPING, HistoryMapping::MAX_BYTES);
+        $decoded = (new HistoryMapping)->decode($mapping);
         if ($inside) {
-            $this->require((new HistoryMapping)->decode($mapping)['acquisition_method'] === 'synthetic_fixture', 'source_inside_repository');
+            $this->require($decoded['acquisition_method'] === 'synthetic_fixture', 'source_inside_repository');
         }
         $sheets = [];
         foreach (self::SHEETS as $sheet => $name) {
             $sheets[$sheet] = $read($directory.'/'.$name, self::MAX_SHEET_BYTES);
+        }
+        foreach (ProductFamilyAdapter::FAMILIES as $family => $definition) {
+            $path = $directory.'/'.$definition['file'];
+            if (isset($decoded['product_families'][$family])) {
+                $sheets[$definition['sheet']] = $read($path, self::MAX_SHEET_BYTES);
+
+                continue;
+            }
+            // A family sheet the mapping does not declare would be history silently left out of the archive.
+            clearstatcache(true, $path);
+            $this->require(@lstat($path) === false, 'source_undeclared_family_sheet');
         }
         $contractDirectory = $directory.'/'.self::CONTRACT_DIRECTORY;
         $contracts = [];
