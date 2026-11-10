@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Domain\Albums\ReleaseType;
 use App\Domain\Catalog\SyntheticRehearsal\SyntheticRehearsalCatalog;
 use LogicException;
 
@@ -72,6 +73,46 @@ final class PublicStructuredData
                 'url' => $url, 'mainEntityOfPage' => $url, 'publisher' => $this->organization($origin)],
             $this->breadcrumbs([[self::BRAND, $origin.'/'], [$this->text($collection['title']), $origin.$collection['path']], [$headline, $url]]),
         ]);
+    }
+
+    /**
+     * A published release (BL-67). No Offer or price: releases have no purchase path. The artist is the staff-entered name, never
+     * inferred, and links are the already allow-listed https listening addresses.
+     *
+     * @param  array<string, mixed>  $album  the AlbumPresentation detail projection
+     */
+    public function forAlbum(array $album, array $metadata): ?string
+    {
+        if (! $this->admitted()) {
+            return null;
+        }
+        $origin = $this->origin();
+        $url = $metadata['canonicalUrl'];
+        $name = $this->text($album['title']);
+        $artist = ['@type' => 'MusicGroup', 'name' => $this->text($album['artist'])];
+        $tracks = array_map(fn (array $track): array => [
+            '@type' => 'MusicRecording', 'position' => $track['position'], 'name' => $this->text($track['title']),
+            'duration' => $this->duration($track['durationSeconds']), 'byArtist' => $artist,
+        ], $album['tracks']);
+
+        return $this->encode([
+            array_filter([
+                '@type' => 'MusicAlbum', '@id' => $url.'#album', 'name' => $name, 'url' => $url,
+                'albumReleaseType' => 'https://schema.org/'.ReleaseType::from($album['type'])->schema(),
+                'datePublished' => $album['releaseDate'], 'byArtist' => $artist, 'numTracks' => count($tracks), 'track' => $tracks,
+                'description' => is_string($album['description'] ?? null) ? $this->text($album['description']) : null,
+                'image' => $album['cover'] === null ? null : $metadata['imageUrl'],
+                'sameAs' => array_column($album['links'], 'url') ?: null,
+            ], fn ($value) => $value !== null),
+            $this->breadcrumbs([[self::BRAND, $origin.'/'], ['Albums', $origin.'/albums'], [$name, $url]]),
+        ]);
+    }
+
+    private function duration(int $seconds): string
+    {
+        [$hours, $minutes, $rest] = [intdiv($seconds, 3600), intdiv($seconds % 3600, 60), $seconds % 60];
+
+        return 'PT'.($hours > 0 ? $hours.'H' : '').($minutes > 0 || $hours > 0 ? $minutes.'M' : '').$rest.'S';
     }
 
     private function admitted(): bool

@@ -28,6 +28,9 @@ PRE_LAUNCH_HOLDS = {
 # Off through launch (decision register, 2026-11-10). DD-44: the marketing segment flag, its config key from the boundary.
 MARKETING_SEGMENT = "REPORTING_MARKETING_SEGMENT_ENABLED"
 MARKETING_SEGMENT_KEY = "reporting.customer_segments.marketing_segment_enabled"
+# BL-71: the staging-only BeatStars catalog import flag is held off in production by the same rule.
+BEATSTARS_IMPORT = "VASEY_STAGING_BEATSTARS_IMPORT_ENABLED"
+BEATSTARS_IMPORT_KEY = "staging-beatstars-import.enabled"
 # DD-50: code literals, refusal identifier => config key.
 MEMBERSHIP_LITERALS = {
     "holds.production_memberships_enabled": "production-memberships.enabled",
@@ -547,14 +550,14 @@ class ProductionRuntimeValidator(unittest.TestCase):
         block = re.search(r"const LAUNCH_OFF_HOLDS = \[(.*?)\n\];", text, re.S)
         self.assertIsNotNone(block, "LAUNCH_OFF_HOLDS constant block not found")
         self.assertNotIn("=>", block.group(1))
-        self.assertEqual(re.findall(r"'([A-Z0-9_]+)',", block.group(1)), [MARKETING_SEGMENT])
+        self.assertEqual(re.findall(r"'([A-Z0-9_]+)',", block.group(1)), [MARKETING_SEGMENT, BEATSTARS_IMPORT])
         self.assertNotIn(f"'{MARKETING_SEGMENT_KEY}'", text, "the config key must come from the boundary, not be restated")
         self.assertRegex(text, r"\$launchOffKeys = array_intersect_key\(CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS, array_flip\(LAUNCH_OFF_HOLDS\)\);"
                                r"\s*if \(count\(\$launchOffKeys\) !== count\(LAUNCH_OFF_HOLDS\)\) \{\s*throw new RuntimeException;")
         script = "require $argv[1]; echo json_encode(Vasey\\Ops\\CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS);"
         run = subprocess.run([PHP, "-r", script, str(REPO / "scripts/ops/capability-boundary.php")], capture_output=True, text=True, timeout=60)
         self.assertEqual(run.returncode, 0, run.stderr)
-        self.assertEqual(json.loads(run.stdout), {MARKETING_SEGMENT: MARKETING_SEGMENT_KEY})
+        self.assertEqual(json.loads(run.stdout), {MARKETING_SEGMENT: MARKETING_SEGMENT_KEY, BEATSTARS_IMPORT: BEATSTARS_IMPORT_KEY})
         # Not a staged flag: the staging gates keep their own list, and this hold is production's.
         script = "require $argv[1]; echo json_encode(array_key_exists($argv[2], Vasey\\Ops\\CapabilityBoundary::stagedFlags()));"
         run = subprocess.run([PHP, "-r", script, str(REPO / "scripts/ops/capability-boundary.php"), MARKETING_SEGMENT],
@@ -563,6 +566,36 @@ class ProductionRuntimeValidator(unittest.TestCase):
         self.assertRegex((REPO / "config/reporting.php").read_text(),
                          r"'marketing_segment_enabled'\s*=>\s*env\('" + MARKETING_SEGMENT + r"',\s*false\)")
         self.assertRegex((REPO / "ops/production/env.production.example").read_text(), rf"(?m)^{MARKETING_SEGMENT}=false$")
+
+    def test_the_beatstars_import_flag_is_held_off_in_production(self):
+        self.assertNotIn(BEATSTARS_IMPORT, profile())
+        for value in ("false", "(false)", "FALSE"):
+            with self.subTest(value=value):
+                self.assertEqual(self.validate(profile() + f"{BEATSTARS_IMPORT}={value}\n").returncode, 0)
+        for value in ("true", "1", "yes", "", "(true)", "TRUE", '"true"', "on", "0", "null"):
+            with self.subTest(value=value):
+                run = self.validate(profile() + f"{BEATSTARS_IMPORT}={value}\n")
+                self.failed(run, "holds.vasey_staging_beatstars_import_enabled")
+                self.assertEqual({line for line in run.stderr.splitlines() if line.startswith("FAIL ")},
+                                 {"FAIL holds.vasey_staging_beatstars_import_enabled"}, run.stderr)
+        self.failed(self.validate(profile() + f"{BEATSTARS_IMPORT}\n"), "holds.vasey_staging_beatstars_import_enabled")
+        # Not a staged flag: the staging deploy gate must let the import run set it true.
+        script = "require $argv[1]; echo json_encode(array_key_exists($argv[2], Vasey\\Ops\\CapabilityBoundary::stagedFlags()));"
+        run = subprocess.run([PHP, "-r", script, str(REPO / "scripts/ops/capability-boundary.php"), BEATSTARS_IMPORT],
+                             capture_output=True, text=True, timeout=60)
+        self.assertEqual(run.stdout, "false", run.stderr)
+        self.assertRegex((REPO / "config/staging-beatstars-import.php").read_text(),
+                         r"'enabled'\s*=>\s*env\('" + BEATSTARS_IMPORT + r"',\s*false\)")
+        self.assertRegex((REPO / "ops/production/env.production.example").read_text(), rf"(?m)^{BEATSTARS_IMPORT}=false$")
+
+    def test_a_boundary_without_the_beatstars_import_entry_fails_closed(self):
+        source = (REPO / "scripts/ops/capability-boundary.php").read_text()
+        entry = f"        '{BEATSTARS_IMPORT}' => '{BEATSTARS_IMPORT_KEY}',\n"
+        self.assertEqual(source.count(entry), 1)
+        _, run = self.shadow_project(boundary=source.replace(entry, ""))
+        result = run()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertEqual(result.stderr.split(), ["FAIL", "runtime.unavailable"], result.stderr)
 
     def test_a_boundary_without_the_marketing_segment_entry_fails_closed(self):
         source = (REPO / "scripts/ops/capability-boundary.php").read_text()

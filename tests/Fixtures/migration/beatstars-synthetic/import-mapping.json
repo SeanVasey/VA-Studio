@@ -1,0 +1,38 @@
+{
+    "schema_version": 1,
+    "purpose": "vasey-beatstars-export-mapping-v1",
+    "snapshot_id": "synthetic-beatstars-import-1",
+    "source_system": "synthetic/beatstars-import:fixture",
+    "operator_reference": "SYNTHETIC mapping for the staging import tests only: no real account, catalog, prices, licenses, rights or files",
+    "acquisition_method": "synthetic_fixture",
+    "acquired_at": "2026-11-10T00:00:00Z",
+    "source_as_of": "2026-11-09T00:00:00Z",
+    "currency": "USD",
+    "slug_policy": "derive_from_title",
+    "columns": {
+        "source_id": "Track ID",
+        "title": "Title",
+        "bpm": "BPM",
+        "musical_key": "Key",
+        "genre": "Genre",
+        "mood": "Mood",
+        "tags": "Tags",
+        "description": "Description",
+        "visibility": "Visibility",
+        "rights_reference": "Rights Reference"
+    },
+    "constants": {
+        "artist": "SYNTHETIC Producer"
+    },
+    "visibility_values": {
+        "Public": "public"
+    },
+    "tag_separator": ";",
+    "licenses": {
+        "SYNTHETIC Basic": "synthetic-basic"
+    },
+    "offers": [
+        {"license_column": "Lease Name", "price_column": "Lease Price"}
+    ],
+    "ignored_columns": ["Plays", "Master WAV Path", "Stems ZIP Path", "Preview MP3 Path", "Artwork Path", "High-Res Local Artwork Path"]
+}

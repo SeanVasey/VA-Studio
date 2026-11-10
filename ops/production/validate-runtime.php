@@ -77,6 +77,8 @@ const PRE_LAUNCH_HOLDS = [
  */
 const LAUNCH_OFF_HOLDS = [
     'REPORTING_MARKETING_SEGMENT_ENABLED',
+    // BL-71: the staging-only BeatStars catalog import (`vasey:staging-beatstars-import`) refuses production in code; this hold keeps its flag off the production host.
+    'VASEY_STAGING_BEATSTARS_IMPORT_ENABLED',
 ];
 
 ini_set('display_errors', '0');

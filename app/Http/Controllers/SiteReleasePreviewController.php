@@ -27,7 +27,7 @@ class SiteReleasePreviewController extends Controller
             $metadata['robots'] = 'noindex, nofollow';
 
             return SitePreviewPrivacy::protect(Inertia::render('Editorial', [
-                'siteContent' => app(EditorialContent::class)->chrome($content), 'editorial' => $page,
+                'siteContent' => app(EditorialContent::class)->chrome($content, families: false), 'editorial' => $page,
                 'sitePreview' => true, 'sitePreviewBase' => $base, 'metadata' => $metadata,
                 'commerceEnabled' => false, 'testOrderPreparationEnabled' => false, 'testCheckoutEnabled' => false,
             ])->withViewData(['metadata' => $metadata])->toResponse($request));
@@ -37,7 +37,7 @@ class SiteReleasePreviewController extends Controller
         $metadata['robots'] = 'noindex, nofollow';
 
         return SitePreviewPrivacy::protect(Inertia::render('Storefront', app(PublicCatalog::class)->page($request) + [
-            'siteContent' => app(EditorialContent::class)->chrome($content), 'siteImages' => $images->storefront($content, true),
+            'siteContent' => app(EditorialContent::class)->chrome($content, families: false), 'siteImages' => $images->storefront($content, true),
             'sitePreview' => true, 'sitePreviewBase' => $base, 'selectedTrack' => null,
             'commerceEnabled' => false, 'testOrderPreparationEnabled' => false, 'testCheckoutEnabled' => false,
             'metadata' => $metadata,
