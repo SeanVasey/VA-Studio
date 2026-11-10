@@ -10,7 +10,7 @@ final class SiteImageSlot
     /** How far an upload's shape may differ from its slot's, as a fraction of the slot's aspect ratio. */
     public const TOLERANCE = 0.03;
 
-    public const PROFILE_VERSION = 'site-image-v1';
+    public const PROFILE_VERSION = 'site-image-v2';
 
     /**
      * Each slot's reference size sets its shape. Uploads must be at least as wide as the largest output, so nothing is enlarged.
@@ -23,6 +23,8 @@ final class SiteImageSlot
         'studio' => ['label' => 'Studio image', 'width' => 1440, 'height' => 630, 'widths' => [720, 1080, 1440], 'formats' => ['jpeg', 'webp'], 'crop' => false],
         // Social platforms expect exactly 1200 x 630, so the share image is trimmed to it and kept as JPEG only.
         'share' => ['label' => 'Share image', 'width' => 1200, 'height' => 630, 'widths' => [1200], 'formats' => ['jpeg'], 'crop' => true],
+        // Square cover art for the albums page (BL-67). Profile v2 added it; images prepared under v1 stay valid (their manifest pins their own profile).
+        'release_cover' => ['label' => 'Release cover art', 'width' => 1200, 'height' => 1200, 'widths' => [400, 800, 1200], 'formats' => ['jpeg', 'webp'], 'crop' => false],
     ];
 
     /**

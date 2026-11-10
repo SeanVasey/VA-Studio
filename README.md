@@ -70,6 +70,7 @@ Recovery checkpoint, September 30: [PR #84](https://github.com/VASEYDEV/VASEYAUD
 - [Shared rights inventory](docs/shared-rights-inventory.md): internal scope/revision linkage, guarded test reservations and the boundary before exclusive sales.
 - [Promotion pricing](docs/promotion-pricing.md): versioned discount allocations, shared test campaign limits and guarded usage holds.
 - [Collaborator splits](docs/collaborator-splits.md): credited collaborators and per-track shares in basis points as staff metadata; database-held totals, audited edits, reported to publication readiness without blocking; no payouts.
+- [Albums page](docs/albums.md): default-off public page for Sean's own releases with staff-entered tracklists, allow-listed https listening links and cover art through the site image pipeline; no purchase path.
 - [Catalog administration](docs/catalog-administration.md): audited metadata saves, edit conflicts and stable published track URLs.
 - [Reusable metadata presets](docs/verification/track-metadata-presets.md): named descriptive defaults, stale-edit protection and explicit copied-value review before private draft creation.
 - [Reviewed bulk metadata edits](docs/verification/bulk-track-metadata.md): current-page Keep/Set/Clear choices, exact before/after review and atomic optimistic saves.
