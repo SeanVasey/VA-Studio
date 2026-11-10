@@ -34,16 +34,23 @@ entries, and an evicted key would read as "never recorded" rather than "stale".
 
 | Metric | Source | OK | Needs attention | Unavailable |
 | --- | --- | --- | --- | --- |
-| Scheduler last run (seconds ago) | `vasey:scheduler-heartbeat`, scheduled every minute, upserts one `scheduler_heartbeats` row | age at most `REPORTING_SCHEDULER_HEARTBEAT_STALE_SECONDS` (300) | older | no heartbeat ever recorded |
-| Scheduled commands whose latest run failed | the four other scheduled commands in `routes/console.php` record their exit outcome (`OperationalSignals::track`, `onSuccess`/`onFailure`) | 0 | 1 or more; the detail names them | no command has reported yet |
+| Scheduler last run (seconds ago) | `vasey:scheduler-heartbeat`, scheduled every minute, upserts one `scheduler_heartbeats` row | age at most `REPORTING_SCHEDULER_HEARTBEAT_STALE_SECONDS` (300) | older, or more than 60 seconds in the future (clock skew; shown as a negative age) | no heartbeat ever recorded |
+| Scheduled commands whose latest run failed | the four other scheduled commands in `routes/console.php` record their exit outcome (`OperationalSignals::track`, `onSuccess`/`onFailure`); only commands the schedule still registers and whose `when` gate passes now are counted, so a removed or renamed command's kept row, or one gated off by configuration (`vasey:upload-sessions-sweep` while `media.upload_session_sweep.scheduled` is off), never flags | 0 | 1 or more; the detail names them | no registered command has reported yet |
 | Last successful backup (hours ago) | `backup_evidence` rows of kind `daily` | latest run ok and at most `REPORTING_BACKUP_STALE_HOURS` (26) old | latest run failed, or the success is older | no run recorded |
 | Last successful restore drill (days ago) | `backup_evidence` rows of kind `restore-drill` | latest drill ok and at most `REPORTING_RESTORE_DRILL_STALE_DAYS` (35) old | latest drill failed (`never` when none succeeded), or older | no drill recorded |
 | Host disk, memory and process health | none | | | always: Forge server monitoring and `ops/monitoring/host-baseline.sh` cover the host (`docs/ops/monitoring-and-host-baseline.md`); the application does not read host state |
 
 `backup_evidence` is append-only: triggers on SQLite and MySQL refuse any UPDATE or DELETE and any INSERT with an unknown kind or
-status, a hash that is not 64 lowercase hex characters, a negative size, or a successful daily backup without its size and hash.
+status, a hash that is not 64 lowercase hex characters, a negative size, or a successful daily backup without its hash or a
+positive size. Kind and status compare byte for byte on MySQL too (BINARY, so `DAILY`, `dâily` or `ok ` are refused despite the
+column collation), and SQLite refuses a size that is not an integer (migration `2026_11_09_270360`).
 Rollback refuses once a row exists. A scheduled command that throws before it starts is not recorded (the heartbeat still shows
 whether the scheduler runs); a failure to record never changes a scheduled command's result.
+
+**Expected brief heartbeat flags.** The nightly backup's quiesce (`ops/staging/backup.sh nightly`, 03:17 UTC) and every deploy stop
+the scheduler with the other workers until the resume. "Scheduler last run" can therefore show Needs attention for a few minutes
+during those windows when they outlast `REPORTING_SCHEDULER_HEARTBEAT_STALE_SECONDS`; it clears with the first heartbeat after the
+resume. A flag that persists after the window, or outside it, is a real scheduler outage.
 
 **Recording a backup.** `php artisan vasey:backup-record --kind=daily|restore-drill --status=ok|failed [--bytes=N] [--sha256=HEX]`.
 It takes no path, host name or free text, so nothing secret can be stored, and a refusal names the option without echoing its
@@ -56,6 +63,33 @@ stale. Deploy-time `predeploy` snapshots are not recorded (the nightly run calls
 **Restore drills are recorded by hand** after the drill in `docs/ops/backup-restore-proof.md`:
 `php artisan vasey:backup-record --kind=restore-drill --status=ok` (or `failed`), as the application user in the served release.
 The nightly run's isolated restore proof is part of its `daily ok`, not a drill.
+
+### Scheduler dead-man's switch
+
+The dashboard is something staff look at; it alerts nobody. The switch alerts when the scheduler stops, and it cannot depend on the
+scheduler, so it runs from **host cron** (`/etc/cron.d/vasey-<kit>-scheduler-watch`, every five minutes, installed by
+`provision.sh` from `ops/staging/scheduler-watch.sh` and the production kit's derived copy). The job runs
+`php artisan vasey:scheduler-heartbeat-check --notify` as the application user on the served release.
+
+- **The check.** `vasey:scheduler-heartbeat-check [--max-age=900] [--notify]` is read-only without `--notify`: it reads the
+  `vasey:scheduler-heartbeat` row's last success and exits 0 (fresh), 1 (stale: older than `--max-age`, never recorded, or more
+  than 60 seconds in the future) or 3 (unreadable: database or episode state; nothing is sent). Exactly `--max-age` old is still
+  fresh. `--max-age` is 60 to 86,400 seconds; 900 is three missed cron checks.
+- **Once per episode.** With `--notify`, the first stale run of an episode sends one email; later stale runs send nothing; the first
+  fresh run after an announced episode sends one recovery note. An episode that was never announced (alerting off, or all
+  attempts failed) gets no recovery note. A failed handoff is retried on later runs, at most 3 attempts per episode. The episode
+  state is a small file, `storage/app/private/ops-state/scheduler-watch.json`, under an exclusive lock: it is not in the
+  database, so dedupe still works when the database is what is down, and overlapping runs cannot send twice.
+- **Default-off.** `REPORTING_SCHEDULER_ALERT_TO` is empty by default and then nothing is sent (the command prints
+  `alert: disabled`). Sean's chosen value (SQ-09, 2026-11-10) is `support@vasey.audio`; it is set in the host `.env`, never in code.
+  Sending also goes through the reviewed transactional mail configuration (`VASEY_TRANSACTIONAL_MAIL_*`,
+  `TransactionalMailPolicy`), so it stays off until PCL-10 is done, local and testing never send real mail, and staging (which holds
+  `VASEY_TRANSACTIONAL_MAIL_ENABLED` false) stays silent. The message holds the site host, UTC times and ages only: no data and no link.
+- **What it does not cover.** A host that is down, or a cron job that stopped, sends nothing (pair with the queue-age check's
+  outbound heartbeat ping, `docs/ops/monitoring-and-host-baseline.md`, for an external service). An unreadable database exits 3 and
+  alerts nobody. The 03:17 UTC nightly backup stops the scheduler for its quiesce and each deploy for its duration; an outage past
+  15 minutes in those windows is reported as stale, then as recovered. Installing it needs a reprovision of the host, because the
+  helper and the cron file are installed by `provision.sh` (the deploy gate refuses until then).
 
 ## Sales and conversion report (FP-089)
 
