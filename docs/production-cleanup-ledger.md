@@ -21,6 +21,58 @@ Rules that hold for every entry:
 "Supplier" is who provides the production value or decision. "Verified at cutover" is the check that proves the
 placeholder is gone or the switch is in its intended state.
 
+## Checking the ledger from the command line
+
+`vasey:cutover-check` reads what configuration, the database and the filesystem can show about each entry and prints one
+line per ledger id. It is read-only: plain selects, no transaction and no lock, no row, file, cache entry or log line
+written, and no provider or network call. It prints ids, states and counts only, never a configured value, a path, a key,
+a name or any text read from a record.
+
+```bash
+# On the production host, as the user that owns private storage, with the served release's configuration:
+php artisan vasey:cutover-check --expect=production
+php artisan vasey:cutover-check --expect=production --json   # the same rows, for the evidence record
+
+# On staging, local or testing, where placeholders are the expected state:
+php artisan vasey:cutover-check --expect=staging
+```
+
+Without `--expect` the profile is `production` when `APP_ENV` is `production` and `staging` otherwise. The command exits
+0 when no checkable item fails, 1 when at least one fails, and 2 for an unknown profile.
+
+| Status | Meaning |
+| --- | --- |
+| `PASS` | Under `production`: the placeholder is gone, or the value is in the state this ledger requires. Under `staging`: the state is one a staging, local or testing installation may be in, placeholder or not. |
+| `FAIL` | Under `production`: a staging placeholder, synthetic value or test-only state is still there, a value the ledger requires is missing, or the check could not run (it fails closed and names only the exception class). Under `staging`: something that must never be true off production: a live Stripe key, mode or admission (PCL-12), admitted real mail (PCL-10), an open production lane (PCL-18, PCL-19, PCL-22), or the staging host without its basic-auth file (PCL-14). |
+| `INFO` | The state of a default-off switch whose activation is a separate authorized step (section 3, and the tax facts of PCL-08). The line says what the switch reads and judges nothing. |
+| `NOT_CHECKABLE` | Nothing about the entry can be read by code (PCL-04, PCL-15, PCL-17, PCL-27, PCL-28, PCL-29). The line carries this ledger's verification for a person to perform. |
+
+Two production results are expected until a later step and are not placeholders to remove: PCL-09 fails under
+`production` until Sean's official SVG mark is committed under `assets/`, and PCL-12 judges Stripe key prefixes only, so
+no key, or `STRIPE_MODE=test` with no key, passes until the S3 live-key step.
+
+Three switches are judged in both profiles because this ledger fixes their state: memberships stay off at v1 (PCL-23), the
+three contract v2 gates never disagree (PCL-20), and the contract profiles' package pins match the installed packages
+(PCL-30). The marketing segment (PCL-25) must read false under `production`.
+
+What a `PASS` does not mean:
+
+- It closes no entry. Most entries also have a part only a person can verify; the command prints it on the "by hand"
+  line under the entry. An entry is closed as the opening of this file says, with the evidence the activation packet asks
+  for. The command's output can be part of that evidence.
+- It authorizes nothing. Flipping any switch of section 3 still needs Sean's own authorization.
+- It is not `ops/production/validate-runtime.php`, which reads the candidate environment file before a deploy and refuses
+  it. This command reads the effective configuration of a running installation and its data. Run both.
+- A marker is detected by its convention (`[SYNTHETIC]`, `TEST PRICE`, the `synthetic-rehearsal` slug prefix, a
+  `Synthetic ` staff name, `STAGING` and "set at production" in legal and free-license text, a `STAGING-synthetic-*` file
+  name, the seller tag's `VASEY-STAGING-SYNTHETIC-SELLER-TAG` content marker, `STAGING SPECIMEN` in the signature file). A
+  placeholder someone renamed and stripped of its marker is not found. The conventions are constants in
+  `App\Support\Diagnostics\CutoverMarkers`.
+
+Each id maps to its check, or to its not-checkable note, in `App\Support\Diagnostics\CutoverLedgerChecks::LEDGER`.
+`tests/Unit/CutoverCheckLedgerCoverageTest.php` reads this file and fails when an id here has no mapping there, or the
+reverse, so a new entry must be added to both in the same change.
+
 ## 1. Staging placeholders and synthetic values to replace
 
 | ID | What it is and where it lives | Production value or decision, and supplier | Verified at cutover |
@@ -58,7 +110,7 @@ it off through launch, and cutover verifies that it is still off.
 | PCL-18 | **Production checkout.** `config/production_checkout.php`: `mounted` literal `false`, and the `PRODUCTION_CHECKOUT_*` switches (`HTTP_ENABLED`, `ENABLED`, `RECONCILIATION_ENABLED`, `OPERATOR_RECONCILIATION_ENABLED`, `PROVIDER_IO_ENABLED`, `EXEMPTION_AUTHORING_ENABLED`, `COMMITTED_READ_RECEIPTS_ENABLED`). | Flipped at S2 (test funds) and S3 (live), one at a time, each a reviewed change with Sean's authorization. | The S2 rehearsal evidence exists for the exact SHA; `validate-runtime.php` passes for the stage; each flip has its own record. |
 | PCL-19 | **Tax checkout.** `config/production-tax-checkout.php`: `enabled`, `http_mounted`, `committed_read_receipts_enabled` literal `false`. This is the chain v1 sells through (DD-14). | Flipped after PCL-08, by a reviewed change and Sean's authorization. | As PCL-18, plus the tax evidence of PCL-08. |
 | PCL-20 | **Contract v2 gates.** `contracts.vasey_license_v2_issuance`, `production_checkout.contract_identity_v2` and `production-tax-checkout.contract_identity_v2`, all literal `false` and held false by `validate-runtime.php`. | Flipped together at D-30 activation (step 8), after the six license versions are authored and reviewed, the host golden passes and every open provider session of a name-only order is expired and reconciled. The provider write needs Sean's authorization. | The activation runbook's record shows zero open name-only provider sessions; a golden contract of each of the six templates renders on the production host and matches the pinned profile; the first paid order issues a v2 contract. |
-| PCL-21 | **Pre-launch capability holds** in `ops/production/validate-runtime.php` (`PRE_LAUNCH_HOLDS`, approved 2026-10-18): `VASEY_OPERATIVE_FREE_GRANTS_ENABLED`, `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED`, `DISCOVERY_SITEMAP_ENABLED`, `VASEY_LISTENING_V2_PROMOTION_ENABLED`. | Each lifted by a reviewed change to that file with Sean's authorization: free grants once PCL-05 closes; operator notifications once mail works (PCL-10); the sitemap at public launch; listening promotion only if wanted (it is a one-way data change). | The validator passes with exactly the intended holds lifted; the sitemap lists only published tracks; a free grant issues under the approved text. |
+| PCL-21 | **Pre-launch capability holds** in `ops/production/validate-runtime.php` (`PRE_LAUNCH_HOLDS`, approved 2026-10-18): `VASEY_OPERATIVE_FREE_GRANTS_ENABLED`, `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED`, `DISCOVERY_SITEMAP_ENABLED`, `VASEY_LISTENING_V2_PROMOTION_ENABLED`. | Each lifted by a reviewed change to that file with Sean's authorization: free grants once PCL-05 closes; operator notifications once mail works (PCL-10), together with the code literal `inquiries.operator_alert_mail_production_admitted` in `config/inquiries.php`, which ships `false` and makes the alert mail transport refuse production (FP-013; open items in `docs/contact-inquiries.md`); the sitemap at public launch; listening promotion only if wanted (it is a one-way data change). | The validator passes with exactly the intended holds lifted; the sitemap lists only published tracks; a free grant issues under the approved text. |
 | PCL-22 | **Production free grants.** `config/production-free-grants.php`: `enabled`, `http_mounted` literal `false`, `provenance` and `storage_root` `null`. | Flipped with the free-grant hold of PCL-21. | As PCL-21. |
 | PCL-23 | **Memberships.** `MembershipHttpMount` (admits only a literal `true` at `production-memberships.http_mounted`, in `local` or `testing`); `config/production-memberships.php` and `config/member-grants.php`: `enabled`, `authoring_enabled` `false`, every `approved_*_hash` `null`. | **Stays off at v1** (DD-50). A later membership launch needs Sean's plans, prices and wording and its own review. | All of these still read `false` or `null` on the production SHA; the `/production-memberships/…` routes answer 404; BeatStars retirement is blocked while the membership inventory shows an active member. |
 | PCL-24 | **Legacy redirects.** `config/legacy-redirects.php` `enabled` literal `false`; `resources/legacy-redirects/map.json` has 5 retained and 15 unresolved rows. | Flipped at the DNS switch, after the map is reviewed against a crawl and Sean's URL export. Sean authorizes with the DNS change. | Every reviewed legacy URL answers its mapped target on the production host; no unresolved row remains unreviewed. |

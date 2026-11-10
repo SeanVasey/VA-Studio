@@ -66,6 +66,7 @@
   ],
   "include_files": [
     "tests/Feature/BulkReplaceLicenseDraftSourceTest.php",
+    "tests/Feature/CollaboratorSplitsTest.php",
     "tests/Feature/CustomerComms/CustomerDataRightsTest.php",
     "tests/Feature/CustomerComms/PaidGrantDataExportTest.php",
     "tests/Feature/CustomerComms/ProductionCheckoutDataExportTest.php",
