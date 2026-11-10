@@ -9,11 +9,16 @@ use App\Domain\Catalog\Models\OfferRevision;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicationReadiness;
 use App\Domain\Catalog\PublishTrack;
+use App\Domain\Catalog\SaveOfferDraft;
 use App\Domain\Catalog\SaveTrackMetadata;
 use App\Domain\Catalog\SyntheticRehearsal\SyntheticRehearsalCatalog;
+use App\Domain\Catalog\SyntheticRehearsal\SyntheticRehearsalMedia;
 use App\Domain\Commerce\CreateQuote;
 use App\Domain\Media\MalwareScanner;
 use App\Domain\Media\Models\MediaAsset;
+use App\Domain\Media\PrivateMediaFiles;
+use App\Domain\Media\RecordingAssociation;
+use App\Domain\Rights\LicenseTerms;
 use App\Domain\Rights\Models\LicenseTemplate;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\Models\RightsDeclaration;
@@ -282,7 +287,10 @@ class StagingSyntheticCatalogTest extends TestCase
             $this->assertStringContainsString(SyntheticRehearsalCatalog::LABEL, $rights->sample_disclosure);
 
             $ready = $track->assets()->where('status', 'ready')->pluck('role')->sort()->values()->all();
-            $this->assertSame(['artwork', 'download_mp3', 'master_wav', 'preview_tagged'], $ready);
+            $this->assertSame(['artwork', 'download_mp3', 'master_wav', 'preview_tagged', 'stems_zip'], $ready);
+            $stems = $track->assets()->where('role', 'stems_zip')->where('status', 'ready')->sole();
+            $this->assertTrue(app(RecordingAssociation::class)->matches($stems, $track->assets()->where('role', 'preview_tagged')->sole()));
+            $this->assertCount(count($definition['sources']), $stems->technical_metadata['manifest']);
             foreach ($track->assets()->whereNull('parent_asset_id')->get() as $source) {
                 $this->assertSame('processed', $source->status);
                 $this->assertStringStartsWith($definition['slug'].'-', $source->original_name);
@@ -293,33 +301,50 @@ class StagingSyntheticCatalogTest extends TestCase
             $this->assertNotEmpty($preview->technical_metadata['waveform']);
 
             $offers = Offer::where('track_id', $track->id)->orderBy('id')->get();
-            $this->assertCount(2, $offers);
-            foreach ($offers as $offer) {
+            $this->assertCount(6, $offers);
+            $exclusive = $offers->filter(fn (Offer $offer): bool => $offer->licenseVersion->template->type === 'exclusive');
+            $this->assertCount(1, $exclusive);
+            $draft = $exclusive->sole();
+            $this->assertSame([false, null, 666, 'USD'], [$draft->is_active, $draft->current_revision_id, $draft->price_minor, $draft->currency]);
+            $this->assertSame(['download_mp3', 'master_wav', 'stems_zip'], MediaAsset::whereIn('id', $draft->deliverable_asset_ids)->orderBy('role')->pluck('role')->all());
+            // The test chain could prepare it against a rights scope: nothing in its own evidence blocks that.
+            $this->assertSame([], app(PublicationReadiness::class)->exclusiveDraftBlockers($draft));
+            foreach ($offers->diff($exclusive) as $offer) {
                 $this->assertTrue($offer->is_active);
                 $revision = $offer->currentRevision;
                 $this->assertSame('USD', $revision->currency);
                 $this->assertIsInt($revision->price_minor);
-                $this->assertContains($revision->price_minor, [111, 222]);
+                $this->assertContains($revision->price_minor, [111, 222, 333, 444, 555]);
+                $this->assertSame('non-exclusive', $revision->snapshot['license']['type']);
+                $roles = $offer->licenseVersion->requiredAssetRoles();
+                sort($roles);
+                $this->assertSame($roles, collect($revision->snapshot['assets'])->pluck('role')->sort()->values()->all());
                 $this->assertStringContainsString('TEST PRICE', $revision->snapshot['license']['name']);
                 $this->assertStringContainsString(SyntheticRehearsalCatalog::LABEL, $revision->snapshot['license']['name']);
                 $this->assertSame(SyntheticRehearsalCatalog::LABEL, $revision->snapshot['license']['features'][0]);
                 $this->assertSame($operator->id, $revision->published_by);
             }
         }
-        $this->assertSame(2, LicenseTemplate::count());
+        $this->assertSame(6, LicenseTemplate::count());
+        $this->assertSame([['non-exclusive', 111, ['download_mp3']], ['non-exclusive', 222, ['download_mp3']],
+            ['non-exclusive', 333, ['download_mp3', 'master_wav']], ['non-exclusive', 444, ['download_mp3', 'master_wav', 'stems_zip']],
+            ['non-exclusive', 555, ['download_mp3', 'master_wav', 'stems_zip']], ['exclusive', 666, ['download_mp3', 'master_wav', 'stems_zip']]],
+            array_values(array_map(fn (array $license): array => [$license['type'], $license['price_minor'], $license['roles']], SyntheticRehearsalCatalog::licenses())));
         foreach (LicenseVersion::with('template')->get() as $license) {
             $this->assertStringStartsWith(SyntheticRehearsalCatalog::MARKER.'-', $license->template->slug);
             $this->assertStringContainsString(SyntheticRehearsalCatalog::LABEL, $license->template->name);
             $this->assertStringContainsString('TEST PRICE', $license->template->name);
             $this->assertStringContainsString(SyntheticRehearsalCatalog::LABEL, $license->authored_source);
             $this->assertContains(SyntheticRehearsalCatalog::LABEL, $license->structured_terms['features']);
+            // Features and deliverables only: no typed usage, territory, duration or economic value exists to read as a term.
+            $this->assertSame(['features', 'required_asset_roles', 'schema_version'], collect($license->structured_terms)->keys()->sort()->values()->all());
             $this->assertSame('published', $license->status);
             $this->assertSame($operator->id, $license->author_id);
             $this->assertSame($reviewer->id, $license->approved_by);
             $this->assertSame(SyntheticRehearsalCatalog::APPROVAL_REFERENCE, $license->approval_reference);
         }
-        $this->assertSame(12, OfferRevision::count());
-        $this->assertSame([111, 222], OfferRevision::distinct()->orderBy('price_minor')->pluck('price_minor')->all());
+        $this->assertSame(30, OfferRevision::count());
+        $this->assertSame([111, 222, 333, 444, 555], OfferRevision::distinct()->orderBy('price_minor')->pluck('price_minor')->all());
         foreach (self::COMMERCE_TABLES as $table) {
             $this->assertSame(0, DB::table($table)->count(), $table);
         }
@@ -331,11 +356,11 @@ class StagingSyntheticCatalogTest extends TestCase
         $counts = $audits->countBy('action')->all();
         ksort($counts);
         $this->assertSame([
-            'catalog.offer.draft_saved' => 12, 'catalog.offer.revision_published' => 12, 'catalog.track.created' => 6,
-            'catalog.track.published' => 6, 'media.processing.completed' => 12, 'media.processing.queued' => 12,
-            'media.upload.quarantined' => 12, 'rights.declaration.created' => 6, 'rights.declaration.verified' => 6,
-            'rights.license.approved' => 2, 'rights.license.draft_created' => 2, 'rights.license.published' => 2,
-            'rights.license.review_requested' => 2, 'rights.license_template.created' => 2,
+            'catalog.offer.draft_saved' => 36, 'catalog.offer.revision_published' => 30, 'catalog.track.created' => 6,
+            'catalog.track.published' => 6, 'media.processing.completed' => 18, 'media.processing.queued' => 18,
+            'media.stems.recording_associated' => 6, 'media.upload.quarantined' => 18, 'rights.declaration.created' => 6,
+            'rights.declaration.verified' => 6, 'rights.license.approved' => 6, 'rights.license.draft_created' => 6,
+            'rights.license.published' => 6, 'rights.license.review_requested' => 6, 'rights.license_template.created' => 6,
         ], $counts);
         $this->assertSame(6, $audits->where('action', 'catalog.track.published')->filter(fn (AuditEvent $audit): bool => is_string($audit->context['manifest_hash'] ?? null))->count());
         $this->assertSame([], glob(rtrim(config('filesystems.disks.local.root'), '/').'/processing/*') ?: []);
@@ -373,14 +398,24 @@ class StagingSyntheticCatalogTest extends TestCase
         $this->assertSame($edited, $this->census());
         $this->assertSame(['published', 'Edited published row'], [$second->fresh()->status, $second->fresh()->title]);
 
-        // A published synthetic track whose offers no longer match the two TEST PRICE offers is reported, not repaired.
+        // A published synthetic track whose offers no longer match the six TEST PRICE offers is reported, not repaired.
         $third = Track::where('slug', SyntheticRehearsalCatalog::tracks()[2]['slug'])->sole();
         app(DeactivateOffer::class)->handle(Offer::where('track_id', $third->id)->orderBy('id')->firstOrFail(), $operator);
         $deactivated = $this->census();
         $this->catalog()->expectsOutputToContain('track   '.$third->slug.'  present, offers differ from the definition; left unchanged')
             ->assertExitCode(1);
         $this->assertSame($deactivated, $this->census());
-        $this->assertSame(['published', 1], [$third->fresh()->status, Offer::where('track_id', $third->id)->where('is_active', true)->count()]);
+        $this->assertSame(['published', 4], [$third->fresh()->status, Offer::where('track_id', $third->id)->where('is_active', true)->count()]);
+
+        // So is one whose exclusive-shape draft no longer carries its TEST PRICE.
+        $fourth = Track::where('slug', SyntheticRehearsalCatalog::tracks()[3]['slug'])->sole();
+        $draft = Offer::where('track_id', $fourth->id)->whereNull('current_revision_id')->sole();
+        app(SaveOfferDraft::class)->handle($draft, ['price_minor' => 667], $operator);
+        $repriced = $this->census();
+        $this->catalog()->expectsOutputToContain('track   '.$fourth->slug.'  present, offers differ from the definition; left unchanged')
+            ->assertExitCode(1);
+        $this->assertSame($repriced, $this->census());
+        $this->assertSame([667, false], [$draft->fresh()->price_minor, $draft->fresh()->is_active]);
     }
 
     public function test_an_interrupted_run_resumes_and_a_marked_row_that_differs_is_refused_unchanged(): void
@@ -397,7 +432,7 @@ class StagingSyntheticCatalogTest extends TestCase
         $this->assertSame(['draft', 1, 'Edited synthetic row'], [$edited->fresh()->status, $edited->fresh()->metadata_version, $edited->fresh()->title]);
         $this->assertSame(0, $edited->rightsDeclarations()->count() + $edited->assets()->count() + Offer::where('track_id', $edited->id)->count());
         $this->assertSame(1, Track::where('status', 'published')->count());
-        $this->assertSame(2, LicenseVersion::where('status', 'published')->count());
+        $this->assertSame(6, LicenseVersion::where('status', 'published')->count());
     }
 
     public function test_an_unexpected_failure_in_the_write_phase_reports_an_unconfirmed_result_and_how_to_resume(): void
@@ -521,7 +556,8 @@ class StagingSyntheticCatalogTest extends TestCase
             $this->assertStringStartsWith('[SYNTHETIC] ', $track['title']);
             $this->assertSame('Synthetic Test Content', $track['artist']);
             $this->assertContains(SyntheticRehearsalCatalog::MARKER, $track['tags']);
-            $this->assertCount(2, $track['offers']);
+            // The five published non-exclusive shapes; the exclusive-shape draft is not public.
+            $this->assertSame([111, 222, 333, 444, 555], collect($track['offers'])->pluck('priceMinor')->sort()->values()->all());
             foreach ($track['offers'] as $offer) {
                 $this->assertStringContainsString(SyntheticRehearsalCatalog::LABEL, $offer['licenseName']);
                 $this->assertStringContainsString('TEST PRICE', $offer['licenseName']);
@@ -545,7 +581,7 @@ class StagingSyntheticCatalogTest extends TestCase
             'trackId' => (int) $first['id'], 'offerId' => $offer->id, 'licenseVersionId' => $offer->license_version_id,
             'offerRevisionId' => $offer->current_revision_id]]);
         $this->assertSame($offer->currentRevision->price_minor, $quote->subtotal_minor);
-        $this->assertContains($quote->subtotal_minor, [111, 222]);
+        $this->assertContains($quote->subtotal_minor, [111, 222, 333, 444, 555]);
         $this->assertSame('USD', $quote->currency);
         $this->assertStringContainsString(SyntheticRehearsalCatalog::LABEL, $quote->snapshot['lines'][0]['offer_snapshot']['license']['name']);
         $this->assertSame(0, DB::table('orders')->count());
@@ -565,6 +601,18 @@ class StagingSyntheticCatalogTest extends TestCase
             $this->assertSame(['width' => 600, 'height' => 600, 'sanitized' => true], $artwork->technical_metadata);
         }
         $this->assertSame([$operator->id], RightsDeclaration::distinct()->pluck('verified_by')->all());
+
+        // The stems archive is bit-exact, so a resumed run can prove an interrupted source is the generated one.
+        $definition = SyntheticRehearsalCatalog::tracks()[5];
+        $stems = MediaAsset::whereNull('parent_asset_id')->where('role', 'stems_zip')->where('original_name', $definition['slug'].'-stems.zip')->sole();
+        $this->assertSame(['application/zip', 'processed'], [$stems->mime_type, $stems->status]);
+        $files = app(PrivateMediaFiles::class);
+        $workspace = $files->workspace();
+        try {
+            $this->assertSame($stems->sha256, hash_file('sha256', app(SyntheticRehearsalMedia::class)->stems($definition, $workspace)));
+        } finally {
+            $files->cleanup($workspace);
+        }
 
         // No generated file, source or derivative, is byte-identical to any brand or public file in the repository.
         $generated = MediaAsset::whereNotNull('sha256')->pluck('sha256')->unique()->all();
@@ -692,5 +740,70 @@ class StagingSyntheticCatalogTest extends TestCase
         $this->catalog(['--check' => true])->expectsOutputToContain('Admission passed')->assertSuccessful();
         LicenseFixtures::approved($operator, $reviewer);
         $this->assertRefusedWithoutWrites([], 'runs only on an empty or synthetic-only catalog');
+    }
+
+    public function test_no_license_text_or_cap_from_the_legal_drafts_is_copied_in(): void
+    {
+        $synthetic = collect(SyntheticRehearsalCatalog::licenses())
+            ->map(fn (array $license): string => implode("\n", [$license['name'], ...$license['features'], $license['source']]))->implode("\n");
+        // The deliverable role identifiers are the typed schema's vocabulary, not license text, so they are left out of the comparison.
+        $words = fn (string $text): array => preg_split('/[^a-z0-9%]+/', mb_strtolower(str_replace(LicenseTerms::ASSET_ROLES, ' ', $text)), -1, PREG_SPLIT_NO_EMPTY);
+        $shingles = function (array $words): array {
+            $set = [];
+            for ($index = 0; $index + 7 <= count($words); $index++) {
+                $set[implode(' ', array_slice($words, $index, 7))] = true;
+            }
+
+            return $set;
+        };
+        $ours = $shingles($words($synthetic));
+        $this->assertNotEmpty($ours);
+        $legal = glob(base_path('docs/legal/*.md'));
+        $this->assertContains(base_path('docs/legal/LICENSE-TIERS.md'), $legal);
+        foreach ($legal as $file) {
+            // No run of seven words of any legal draft (license text, terms, privacy) appears in a synthetic license.
+            $this->assertSame([], array_keys(array_intersect_key($ours, $shingles($words(file_get_contents($file))))), $file);
+        }
+
+        // No cap, duration, percentage or price: the only digits are the tier ordinals and the "mp3" role name.
+        preg_match_all('/\b\d{1,3}(?:,\d{3})+\b|\b\d+(?:\.\d+)?\s*(?:%|years?\b)/i', file_get_contents(base_path('docs/legal/LICENSE-TIERS.md')), $caps);
+        $this->assertContains('5,000', $caps[0]);
+        foreach (array_unique($caps[0]) as $cap) {
+            $this->assertStringNotContainsString($cap, $synthetic);
+        }
+        $this->assertSame(0, preg_match('/\d/', preg_replace(['/mp3/i', '/\btier [1-6]\b/'], '', $synthetic)));
+        // No template variable of the private license templates (production contract profile) is carried in.
+        $this->assertStringNotContainsString('{{', $synthetic);
+        $this->assertStringNotContainsString('Sean', $synthetic);
+    }
+
+    public function test_the_cleanup_ledger_verification_queries_run_and_find_every_synthetic_record(): void
+    {
+        $section = Str::between(file_get_contents(base_path('docs/production-cleanup-ledger.md')), '### PCL-02 and PCL-03 verification commands', "\n## ");
+        preg_match_all("/art db <<'SQL'\n(.*?)\nSQL\n/s", $section, $matches);
+        $this->assertCount(3, $matches[1]);
+        [$synthetic, $prices, $catalog] = $matches[1];
+        $rows = fn (string $sql): array => array_map(fn (object $row): array => (array) $row, DB::select(rtrim(trim($sql), ';')));
+        $found = fn (string $sql): array => array_map('intval', array_column($rows($sql), 'found', 'check_name'));
+
+        $this->assertSame(['license templates' => 0, 'license versions' => 0, 'offers on synthetic licenses' => 0, 'offer revisions' => 0,
+            'synthetic tracks' => 0], $found($synthetic));
+        $this->assertSame(['synthetic tracks' => 0, 'synthetic rights declarations' => 0, 'synthetic media' => 0,
+            'synthetic stems associations' => 0], $found($catalog));
+        $this->assertSame([], $rows($prices));
+
+        $this->operators();
+        $this->catalog()->assertSuccessful();
+        $this->assertSame(['license templates' => 6, 'license versions' => 6, 'offers on synthetic licenses' => 36, 'offer revisions' => 30,
+            'synthetic tracks' => 6], $found($synthetic));
+        $this->assertSame(['synthetic tracks' => 6, 'synthetic rights declarations' => 6, 'synthetic media' => 18,
+            'synthetic stems associations' => 6], $found($catalog));
+        $list = $rows($prices);
+        $this->assertCount(30, $list);
+        $this->assertSame([111, 222, 333, 444, 555], collect($list)->pluck('price_minor')->map(fn ($price): int => (int) $price)->unique()->sort()->values()->all());
+        foreach ($list as $row) {
+            $this->assertStringContainsString('TEST PRICE', $row['license']);
+            $this->assertSame(['non-exclusive', 'USD'], [$row['license_type'], $row['currency']]);
+        }
     }
 }
