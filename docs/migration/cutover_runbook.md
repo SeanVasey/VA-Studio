@@ -6,7 +6,7 @@ Status: **planned; no live cutover authorized or performed**. Prepared 2026-09-0
 
 The launch operator, incident decision maker, finance/rights reviewers and support owner must be named in the launch record. Sean is the product owner; do not fabricate other role assignments. Pin the exact repository commit, schema version, source batch IDs, transformation version and parity-matrix revision proposed for launch.
 
-Use `source_ledger.csv`, `migration_field_map.csv`, `authenticated_studio_audit_checklist.csv`, `known_unknowns_and_validation.csv` and the repository decision register as the working control records. Keep their IDs stable. Every changed source class must have a mapped destination or an explicit preservation/disposition decision.
+Use `source_ledger.csv`, `migration_field_map.csv`, `authenticated_studio_audit_checklist.csv`, `known_unknowns_and_validation.csv` and the repository decision register as the working control records. The [production cleanup ledger](../production-cleanup-ledger.md) lists every staging placeholder, synthetic value and default-off switch that must be replaced, decided or flipped before production; no entry may be open at the launch approval record (section 8) unless that record names it and why it may stay open. Keep their IDs stable. Every changed source class must have a mapped destination or an explicit preservation/disposition decision.
 
 Prefer seller-owned originals, official exports, authorized read-only screens, owner-controlled payment/fulfillment records and public routes, in that order. No undocumented private endpoints, token extraction, guessed account settings or destructive source operations. Retain confidential source data only in approved private storage, encrypted and access controlled, with hashes and opaque pointers in the project evidence.
 
@@ -109,9 +109,18 @@ Required gates:
 | Commerce | Actual merchant/provider configured; paid confirmation, contract, grant, delivery and recovery proven |
 | Rights | Active and historic agreements preserved; applicable legal decisions recorded |
 | Reliability | Restore, retries, monitoring and rollback rehearsed |
+| Cleanup ledger | `vasey:cutover-check --expect=production` exits 0 on the production host at the packet's commit; every "by hand" and `NOT_CHECKABLE` entry has its recorded evidence |
 | Domain | Verified zone/control; certificates; apex/www; redirects; mail/integrations preserved |
 | Authority | One checkout/exclusive source of truth and reconciled final delta |
 | Approval | Named owner approval for the precise production operation |
+
+Before the approval record is signed, run the cleanup ledger check on the production host at the exact commit of the packet, as the user that owns private storage:
+
+```bash
+php artisan vasey:cutover-check --expect=production --json
+```
+
+It is read-only and contacts no provider. PCL-09 fails until Sean's official SVG mark is committed under `assets/`; that is expected, not a placeholder to remove. Exit code 0 is required: any `FAIL` line names a staging placeholder, synthetic value or test-only state still present, and the launch is not approved while one remains. Attach the output to the launch packet with the command, exit code, UTC time, commit and operator. Exit code 0 is necessary and not sufficient: each "by hand" line and each `NOT_CHECKABLE` entry is verified by a person as the [production cleanup ledger](../production-cleanup-ledger.md) describes, each `INFO` line is compared with the switches the packet intends to have on, and `ops/production/validate-runtime.php` is run separately on the environment file. The command changes nothing and authorizes nothing. Run it again after the domain switch (section 9) and before retiring the source platform, since a later deploy or configuration change can bring a placeholder back.
 
 Keep BeatStars available while these gates are prepared. Avoid cancelling the source subscription or removing source originals as part of a first switch.
 

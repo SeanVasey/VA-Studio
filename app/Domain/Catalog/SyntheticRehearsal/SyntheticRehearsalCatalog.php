@@ -29,12 +29,29 @@ final class SyntheticRehearsalCatalog
 
     public const APPROVAL_REFERENCE = 'SYNTHETIC-REHEARSAL-NOT-FOR-SALE';
 
-    /** @return array<string, array{slug: string, name: string, type: string, price_minor: int, roles: list<string>, features: list<string>, source: string}> */
+    /**
+     * One TEST PRICE license per tier shape of the six license templates (DD-19, DD-20). A shape is only what the
+     * repository states about a tier without its terms: the deliverable roles and whether the template is exclusive
+     * (`docs/legal/LICENSE-TIERS.md`, "Deliverables" and "Template type"). No tier name, cap, duration, territory, royalty
+     * or price is carried over, and the terms stay schema 1 (features and deliverables only), so no typed usage value
+     * exists to be mistaken for a term. Two pairs share a shape (tiers 1 and 2, tiers 4 and 5); they differ only in the
+     * caps this definition deliberately leaves out.
+     *
+     * @return array<string, array{slug: string, name: string, type: string, price_minor: int, roles: list<string>, features: list<string>, source: string}>
+     */
     public static function licenses(): array
     {
+        $mp3 = ['download_mp3'];
+        $wav = ['download_mp3', 'master_wav'];
+        $stems = ['download_mp3', 'master_wav', 'stems_zip'];
+
         return [
-            'mp3' => self::license('mp3', 'MP3', 111, ['download_mp3'], 'a generated MP3 (download_mp3)'),
-            'wav' => self::license('wav', 'WAV', 222, ['download_mp3', 'master_wav'], 'a generated MP3 and WAV (download_mp3, master_wav)'),
+            'tier-1' => self::license(1, 'non-exclusive', 111, $mp3),
+            'tier-2' => self::license(2, 'non-exclusive', 222, $mp3),
+            'tier-3' => self::license(3, 'non-exclusive', 333, $wav),
+            'tier-4' => self::license(4, 'non-exclusive', 444, $stems),
+            'tier-5' => self::license(5, 'non-exclusive', 555, $stems),
+            'tier-6' => self::license(6, 'exclusive', 666, $stems),
         ];
     }
 
@@ -80,19 +97,34 @@ final class SyntheticRehearsalCatalog
         ];
     }
 
-    private static function license(string $key, string $format, int $price, array $roles, string $deliverable): array
+    /** The recording evidence `BindStemsToRecording` receives: the stems are the generated sources of the same master. */
+    public static function stemsReference(array $track): string
     {
+        return self::PROVENANCE_PREFIX.$track['number'].'-STEMS: generated per test source by vasey:staging-synthetic-catalog';
+    }
+
+    private static function license(int $tier, string $type, int $price, array $roles): array
+    {
+        $labels = ['download_mp3' => 'MP3', 'master_wav' => 'WAV master', 'stems_zip' => 'Stems ZIP'];
+        $files = implode(', ', array_map(fn (string $role): string => $labels[$role], $roles));
+        $deliverable = $files.' ('.implode(', ', $roles).')';
+        $shape = 'tier '.$tier.' shape: '.$files.'; '.$type;
+        $features = [
+            self::LABEL,
+            'TEST PRICE: a staging rehearsal value, not a product price',
+            'Grants no rights; delivers '.$deliverable.' for download testing only',
+        ];
+        if ($type === 'exclusive') {
+            $features[] = 'Exclusive template type for rehearsing the exclusive preparation path only; grants no exclusivity in anything';
+        }
+
         return [
-            'slug' => self::MARKER.'-'.$key.'-license',
-            'name' => self::TITLE_PREFIX.' TEST PRICE '.$format.' license — '.self::LABEL,
-            'type' => 'non-exclusive',
+            'slug' => self::MARKER.'-tier-'.$tier.'-license',
+            'name' => self::TITLE_PREFIX.' TEST PRICE '.$shape.' license — '.self::LABEL,
+            'type' => $type,
             'price_minor' => $price,
             'roles' => $roles,
-            'features' => [
-                self::LABEL,
-                'TEST PRICE: a staging rehearsal value, not a product price',
-                'Grants no rights; delivers '.$deliverable.' for download testing only',
-            ],
+            'features' => $features,
             'source' => implode("\n\n", [
                 'SYNTHETIC REHEARSAL LICENSE — NOT A REAL LICENSE',
                 self::LABEL.'.',
@@ -100,6 +132,7 @@ final class SyntheticRehearsalCatalog
                     .'copyright, master, publishing, performance, distribution or other right in anything. The audio is a generated '
                     .'test tone or noise with no artist, composition or recording behind it. Any price shown with it is a TEST PRICE, '
                     .'not a product price, and Stripe test mode collects no real payment.',
+                'Rehearsal shape: '.$shape.'. It copies no term, limit or text of a real license.',
                 'Rehearsal deliverable: '.$deliverable.'.',
                 'Created by vasey:staging-synthetic-catalog. The staging database and private storage are reset before real content is loaded.',
             ]),

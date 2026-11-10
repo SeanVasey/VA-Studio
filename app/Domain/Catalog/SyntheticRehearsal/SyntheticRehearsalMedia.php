@@ -4,12 +4,14 @@ namespace App\Domain\Catalog\SyntheticRehearsal;
 
 use App\Domain\Media\BoundedMediaProcess;
 use RuntimeException;
+use ZipArchive;
 
 /**
  * Generates one definition's source files at run time inside a private processing workspace: a PCM WAV master from
- * ffmpeg's built-in test sources (tones, chords, noise) and a plain PNG with "SYNTHETIC TEST" drawn by GD. Nothing is
- * read from the repository or the network, nothing is committed, and no brand mark is drawn. The files then enter
- * through the ordinary intake service, which copies them to quarantine; the caller removes the workspace.
+ * ffmpeg's built-in test sources (tones, chords, noise), a WAV-only stems ZIP with one mono stem per test source, and a
+ * plain PNG with "SYNTHETIC TEST" drawn by GD. Nothing is read from the repository or the network, nothing is
+ * committed, and no brand mark is drawn. The files then enter through the ordinary intake service, which copies them
+ * to quarantine; the caller removes the workspace.
  */
 final class SyntheticRehearsalMedia
 {
@@ -32,6 +34,46 @@ final class SyntheticRehearsalMedia
         app(BoundedMediaProcess::class)->run($arguments, $workspace, self::SECONDS);
         if (! is_file($path) || filesize($path) < 44) {
             throw new RuntimeException('Synthetic master generation produced no WAV.');
+        }
+
+        return $path;
+    }
+
+    /**
+     * One bit-exact mono WAV per test source, packed as the media pipeline packs verified stems (stored members, fixed
+     * time and attributes, sorted names), so the same definition always yields the same archive bytes.
+     */
+    public function stems(array $track, string $workspace): string
+    {
+        $members = [];
+        foreach (array_values($track['sources']) as $index => $source) {
+            $name = sprintf('stem-%02d.wav', $index + 1);
+            $path = $workspace.'/'.$track['slug'].'-'.$name;
+            app(BoundedMediaProcess::class)->run([config('media.ffmpeg'), '-nostdin', '-hide_banner', '-loglevel', 'error', '-n',
+                '-f', 'lavfi', '-i', $source, '-map_metadata', '-1', '-fflags', '+bitexact', '-flags:a', '+bitexact', '-threads', '1',
+                '-ac', '1', '-ar', '44100', '-c:a', 'pcm_s16le', '-t', (string) $track['duration'], '-f', 'wav', $path], $workspace, self::SECONDS);
+            if (! is_file($path) || filesize($path) < 44) {
+                throw new RuntimeException('Synthetic stem generation produced no WAV.');
+            }
+            $members[$name] = $path;
+        }
+        $path = $workspace.'/'.$track['slug'].'-stems.zip';
+        $zip = new ZipArchive;
+        if ($zip->open($path, ZipArchive::CREATE | ZipArchive::EXCL) !== true) {
+            throw new RuntimeException('Synthetic stems archive could not be created.');
+        }
+        try {
+            ksort($members, SORT_STRING);
+            foreach ($members as $name => $file) {
+                if (! $zip->addFile($file, $name) || ! $zip->setCompressionName($name, ZipArchive::CM_STORE)
+                    || ! $zip->setMtimeName($name, 315532800) || ! $zip->setExternalAttributesName($name, ZipArchive::OPSYS_UNIX, 0100600 << 16)) {
+                    throw new RuntimeException('Synthetic stem could not be packaged.');
+                }
+            }
+        } finally {
+            if (! $zip->close()) {
+                throw new RuntimeException('Synthetic stems archive could not be finished.');
+            }
         }
 
         return $path;

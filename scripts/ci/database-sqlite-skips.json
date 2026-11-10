@@ -1359,6 +1359,14 @@
       "test_native_duplicate_jobs_have_one_committed_claim_and_one_fake_transport_without_terminal_reopen"
     ],
     [
+      "Tests\\Feature\\CollaboratorSplitsConcurrencyTest",
+      "test_the_database_guard_alone_serializes_two_raw_writers_whose_snapshots_hide_each_other"
+    ],
+    [
+      "Tests\\Feature\\CollaboratorSplitsConcurrencyTest",
+      "test_two_editors_adding_shares_to_one_track_wait_on_its_row_and_cannot_exceed_10000_basis_points"
+    ],
+    [
       "Tests\\Feature\\TestOwnerDeliveryResumeConcurrencyTest",
       "test_two_simultaneous_complementary_ranges_lose_no_coverage_and_count_once"
     ],

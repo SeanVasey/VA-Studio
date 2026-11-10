@@ -90,7 +90,7 @@ final class RetentionReport
         $oldest = $newest = null;
         for ($from = 0; $max !== null && $from < (int) $max; $from += self::CHUNK) {
             $query = DB::table($table.' as r')->where('r.id', '>', $from)->where('r.id', '<=', $from + self::CHUNK);
-            $this->past($query, $clock, $cutoff);
+            $this->past($query, $table, $clock, $cutoff);
             $row = $query->selectRaw('count(*) as n'.($dated === null ? '' : ", min($dated) as lo, max($dated) as hi"))->first();
             $count += (int) $row->n;
             if ($dated !== null && $row->n > 0) {
@@ -109,19 +109,21 @@ final class RetentionReport
     /**
      * Rows whose clock has run out: every clock column set and at or before the cutoff, and nothing that holds them. A `via` row
      * follows its parent, joined under a fresh alias per level so a parent that itself follows a parent stays unambiguous.
+     * `when` limits either kind of clock to rows whose column holds one value; any other row is never past. `latest_in` holds a
+     * row that a later row of its own group has followed, whatever that later row is.
      */
-    private function past(Builder $query, array $clock, CarbonImmutable $cutoff, string $alias = 'r'): void
+    private function past(Builder $query, string $table, array $clock, CarbonImmutable $cutoff, string $alias = 'r'): void
     {
+        if (isset($clock['when'])) {
+            $query->where($alias.'.'.$clock['when'][0], '=', $clock['when'][1]);
+        }
         if (isset($clock['via'])) {
             [$foreign, $parent] = $clock['via'];
             $key = $clock['via'][2] ?? 'id';
             $parentClock = RetentionSchedule::byTable()[$parent]['clock'];
-            if (isset($clock['when'])) {
-                $query->where($alias.'.'.$clock['when'][0], '=', $clock['when'][1]);
-            }
             $query->whereExists(function (Builder $sub) use ($parent, $foreign, $key, $parentClock, $cutoff, $alias): void {
                 $sub->selectRaw('1')->from($parent.' as '.$alias.'p')->whereColumn($alias.'p.'.$key, $alias.'.'.$foreign);
-                $this->past($sub, $parentClock, $cutoff, $alias.'p');
+                $this->past($sub, $parent, $parentClock, $cutoff, $alias.'p');
             });
 
             return;
@@ -134,6 +136,11 @@ final class RetentionReport
             [$child, $foreign, $column] = $clock['unless_later'];
             $query->whereNotExists(fn (Builder $sub) => $sub->selectRaw('1')->from($child.' as '.$alias.'l')
                 ->whereColumn($alias.'l.'.$foreign, $alias.'.id')->where($alias.'l.'.$column, '>', $bound));
+        }
+        if (isset($clock['latest_in'])) {
+            [$group, $order] = $clock['latest_in'];
+            $query->whereNotExists(fn (Builder $sub) => $sub->selectRaw('1')->from($table.' as '.$alias.'n')
+                ->whereColumn($alias.'n.'.$group, $alias.'.'.$group)->whereColumn($alias.'n.'.$order, '>', $alias.'.'.$order));
         }
         foreach ($clock['unless_referenced'] ?? [] as $hold) {
             [$holder, $foreign] = $hold;
@@ -191,7 +198,7 @@ final class RetentionReport
         foreach (RetentionSchedule::ENTRIES as $entry) {
             $clock = $entry['clock'] ?? [];
             $columns = array_merge($clock['columns'] ?? [], isset($clock['via']) ? [$clock['via'][0]] : [],
-                isset($clock['when']) ? [$clock['when'][0]] : [], array_map(fn (array $hold): string => $hold[2] ?? 'id', $clock['unless_referenced'] ?? []),
+                isset($clock['when']) ? [$clock['when'][0]] : [], $clock['latest_in'] ?? [], array_map(fn (array $hold): string => $hold[2] ?? 'id', $clock['unless_referenced'] ?? []),
                 $clock !== [] ? ['id'] : []);
             if (! Schema::hasTable($entry['table']) || ($columns !== [] && ! Schema::hasColumns($entry['table'], $columns))) {
                 throw new DataRightsException(503, 'retention_schedule_table_missing');

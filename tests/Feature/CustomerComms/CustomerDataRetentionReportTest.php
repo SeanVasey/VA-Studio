@@ -140,7 +140,8 @@ class CustomerDataRetentionReportTest extends TestCase
             }
             $this->assertNotEmpty($clock['columns']);
             $this->assertContains($clock['format'] ?? 'datetime', ['datetime', 'iso8601', 'epoch']);
-            $this->assertTrue(Schema::hasColumns($entry['table'], [...$clock['columns'], 'id']), $entry['table']);
+            $this->assertTrue(Schema::hasColumns($entry['table'], [...$clock['columns'], 'id', ...(isset($clock['when']) ? [$clock['when'][0]] : []), ...($clock['latest_in'] ?? [])]), $entry['table']);
+            $this->assertSame([], array_diff(array_keys($clock), ['columns', 'format', 'when', 'latest_in', 'unless_later', 'unless_referenced']), $entry['table']);
             if (isset($clock['unless_later'])) {
                 $this->assertTrue(Schema::hasColumns($clock['unless_later'][0], array_slice($clock['unless_later'], 1)));
             }
@@ -181,9 +182,20 @@ class CustomerDataRetentionReportTest extends TestCase
             $this->assertSame('not_applicable', $byTable[$table]['class'], $table);
         }
 
+        // An unpaid production order follows the expired-session observation of its intent, which a payment holds (FP-076); the
+        // RETAINED label names both periods. ProductionUnpaidSnapshotRetentionTest pins the clocks and proves the terminal state.
+        $this->assertSame('financial_records_years_or_abandoned_checkout_days', CustomerDataRights::RETAINED['production_checkout_orders']);
+        $this->assertSame(['indefinite', 'abandoned_checkout'], RetentionSchedule::RETAINED_LABELS['financial_records_years_or_abandoned_checkout_days']);
+        $this->assertSame(['abandoned_checkout', ['via' => ['id', 'production_checkout_provider_intents', 'order_id']]],
+            [$byTable['production_checkout_orders']['class'], $byTable['production_checkout_orders']['clock']]);
+        $this->assertSame([['production_checkout_payments', 'intent_id', 'intent_id']], $byTable['production_checkout_observations']['clock']['unless_referenced']);
+        $this->assertSame(['kind', 'session_expired'], $byTable['production_checkout_observations']['clock']['when']);
+        // Only while it is the intent's latest observation: a later failed or contradicting read holds the order.
+        $this->assertSame(['intent_id', 'sequence'], $byTable['production_checkout_observations']['clock']['latest_in']);
+
         // The records AGENTS.md calls immutable, and every other record of a purchase, are never counted.
         foreach (['orders', 'order_lines', 'order_finalizations', 'license_grants', 'grant_contracts', 'verified_payments', 'customer_purchase_claims',
-            'production_checkout_orders', 'production_tax_checkout_orders', 'production_checkout_exemption_bases',
+            'production_checkout_payments', 'production_tax_checkout_orders', 'production_checkout_exemption_bases',
             'paid_order_origins', 'paid_grant_origins', 'paid_originals', 'paid_tax_order_origins', 'paid_tax_grant_origins', 'paid_tax_originals',
             'inquiry_order_contexts', ...self::DOWNLOAD_RECORDS, 'order_attempts', 'checkout_intents', 'payment_observations', 'stripe_webhook_receipts',
             'refund_dispute_objects', 'fulfillment_outbox', 'exclusive_sales', 'free_authorizations', 'production_membership_billing_invoices',
@@ -509,9 +521,12 @@ class CustomerDataRetentionReportTest extends TestCase
         [$report] = $this->report();
         $due = $abandoned->addDays(30)->toDateString();
         $this->assertSame(['past_period' => 1, 'oldest_due' => $due, 'newest_due' => $due, 'clock_index' => 'missing'], $report['production_checkout_reviews']);
-        foreach (['production_checkout_orders', 'production_checkout_order_lines', 'production_checkout_provider_intents', 'production_identity_origins'] as $table) {
-            $this->assertArrayNotHasKey($table, $report, $table);
+        // The accepted order never reached the provider: no expiry was observed, so it and its dependent rows count nothing.
+        foreach (['production_checkout_orders', 'production_checkout_order_lines', 'production_checkout_attempts', 'production_checkout_provider_intents',
+            'production_checkout_sessions', 'production_checkout_observations'] as $table) {
+            $this->assertSame(0, $report[$table]['past_period'], $table);
         }
+        $this->assertArrayNotHasKey('production_identity_origins', $report);
 
         // Identity records: 12 months after their last clock column (a send attempt's lease and a challenge's expiry included). The verified
         // chain (every verification and every challenge an origin or a verification references) is never counted.
