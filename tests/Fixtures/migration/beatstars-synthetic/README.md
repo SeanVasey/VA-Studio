@@ -15,3 +15,13 @@ acquisitions, so this data can never be admitted as a real source.
 The prices (`1.00`, `2.50`, `$3`, `4.99`, `10.00`–`40.00` USD) are placeholders to
 exercise minor-unit parsing. They are not approved prices and the dry run never
 turns them into offers. See `docs/migration/beatstars-export-normalization.md`.
+
+## Staging import fixtures (BL-71)
+
+| File | Purpose |
+| --- | --- |
+| `import-export.csv` | Three-row sheet with the BeatStars media path columns (`Master WAV Path`, `Stems ZIP Path`, `Preview MP3 Path`, `Artwork Path`, `High-Res Local Artwork Path`) pointing at invented `/SyntheticStudio/...` paths. Row 1 lists every file, row 2 lists no stems and files that will be missing, row 3 lists a `..` path, a wrong extension and a symlinked artwork. |
+| `import-mapping.json` | The mapping for that sheet: `synthetic_fixture`, all path columns ignored (the importer reads them from the hashed raw export, not from the snapshot). |
+
+The tests generate the media files themselves (a tiny sine WAV, a one-pixel PNG, a WAV-only stems ZIP) under a private temporary directory;
+no media file is committed.

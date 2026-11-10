@@ -126,6 +126,8 @@ class StagingEnvironmentAdmissionTest extends TestCase
         'app/Http/Controllers/FreeGrantController.php',
         // #266: the synthetic STAGING seller tag is admitted through the helper; production refuses it.
         'app/Domain/Media/StagingSellerTag.php',
+        // BL-71: the BeatStars catalog import (drafts and media only) is admitted through the helper; production refuses it.
+        'app/Domain/Migration/BeatStarsImport/BeatStarsImportPolicy.php',
     ];
 
     /**
