@@ -24,7 +24,9 @@ return new class extends Migration
             throw new LogicException('Track visibility requires SQLite or MySQL.');
         }
         // Fail closed before any DDL: a row outside the closed set would make every later update of that track refuse.
-        $unexpected = DB::table('tracks')->whereNotIn('status', TrackVisibility::STATES)->distinct()->pluck('status')->all();
+        $unexpected = DB::table('tracks')->when(DB::getDriverName() === 'mysql',
+            fn ($query) => $query->whereRaw('CAST(status AS BINARY) NOT IN ('.implode(',', array_fill(0, count(TrackVisibility::STATES), 'CAST(? AS BINARY)')).')', TrackVisibility::STATES),
+            fn ($query) => $query->whereNotIn('status', TrackVisibility::STATES))->distinct()->pluck('status')->all();
         if ($unexpected !== []) {
             throw new LogicException('Unexpected track statuses exist ('.implode(', ', array_map('strval', $unexpected)).'); existing data is unchanged. Investigate before retrying.');
         }
@@ -93,7 +95,8 @@ return new class extends Migration
         $activated = 'EXISTS (SELECT 1 FROM track_publication_schedules s WHERE s.track_id = NEW.id'
             ." AND s.state = 'published' AND s.target_status = NEW.status AND s.publication_version = NEW.publication_version)";
         // Never `scheduled` at birth: no schedule row can exist before its track.
-        $this->guard('tracks', 'visibility_insert', 'INSERT', "NEW.status IN ({$states}) AND NEW.status <> 'scheduled'");
+        $this->guard('tracks', 'visibility_insert', 'INSERT', "NEW.status IN ({$states}) AND NEW.status <> 'scheduled'"
+            ." AND (NEW.status <> 'unlisted' OR NEW.published_slug IS NOT NULL)");
         $this->guard('tracks', 'visibility_update', 'UPDATE',
             "NEW.status IN ({$states}) AND (NEW.status = OLD.status OR ".implode(' OR ', $pairs).')'
             ." AND (NEW.status <> 'scheduled' OR {$pending})"
@@ -105,6 +108,11 @@ return new class extends Migration
     private function guard(string $table, string $name, string $operation, ?string $valid = null): void
     {
         $name = $table === 'tracks' ? 'tracks_'.$name : $table.'_'.$name;
+        if ($valid !== null && DB::getDriverName() === 'mysql') {
+            // utf8mb4_unicode_ci compares case- and trailing-space-insensitively, so a raw 'Published' or 'published ' would
+            // pass an `IN ('published')` test while every exact-match reader treats it as an unknown state. Compare bytes.
+            $valid = preg_replace('/\b((?:NEW|OLD|s|t)\.(?:status|state|target_status|outcome|entry_zone))\b/', 'CAST($1 AS BINARY)', $valid);
+        }
         if (DB::getDriverName() === 'sqlite') {
             $when = $valid === null ? '' : ' WHEN NOT COALESCE(('.$valid.'), 0)';
             DB::unprepared("CREATE TRIGGER {$name} BEFORE {$operation} ON {$table}{$when} BEGIN SELECT RAISE(ABORT, '".self::MESSAGE."'); END");

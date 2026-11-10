@@ -1401,6 +1401,10 @@
     [
       "Tests\\Feature\\TrackSchedulingConcurrencyTest",
       "test_native_an_activation_that_loses_the_race_to_a_cancel_publishes_nothing"
+    ],
+    [
+      "Tests\\Feature\\TrackSchedulingConcurrencyTest",
+      "test_native_status_comparisons_are_byte_exact_under_the_case_and_space_insensitive_collation"
     ]
   ]
 }

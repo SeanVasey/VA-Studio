@@ -171,6 +171,7 @@
     "tests/Feature/TestCommerceEvidenceCommandTest.php",
     "tests/Feature/TestContractSecondBoundaryTest.php",
     "tests/Feature/TestIdentityLinkRelayCommandTest.php",
+    "tests/Feature/TrackVisibilityProductionSelectionTest.php",
     "tests/Unit/SchemaQualifierDelimiterTest.php"
   ],
   "residual_files": [

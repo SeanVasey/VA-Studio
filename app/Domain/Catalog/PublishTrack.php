@@ -146,6 +146,8 @@ class PublishTrack
         if (DB::transactionLevel() < 1) {
             throw new LogicException('Scheduled track publication requires its caller transaction.');
         }
+        // Public, so it re-asserts the role and MFA itself instead of trusting the caller; re-locking is free inside the caller's transaction.
+        $actor = $this->lockActor($actor);
         if ($locked->status !== TrackVisibility::SCHEDULED || ! in_array($target, TrackVisibility::TARGETS, true)) {
             $this->reject('This track is no longer scheduled.');
         }

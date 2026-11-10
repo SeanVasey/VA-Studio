@@ -97,6 +97,35 @@ class TrackSchedulingConcurrencyTest extends TestCase
         $this->assertSame(1, AuditEvent::where('action', 'catalog.track.published')->where('context->trigger', 'schedule')->count());
     }
 
+    public function test_native_status_comparisons_are_byte_exact_under_the_case_and_space_insensitive_collation(): void
+    {
+        $fixture = QuoteFixtures::selection();
+        $id = $fixture['track']->id;
+        $this->assertSame('published', $fixture['track']->fresh()->status);
+        // utf8mb4_unicode_ci treats these as equal to 'published'/'draft'; the triggers must not.
+        foreach (['Published', 'published ', 'PUBLISHED', 'Unlisted', 'unlisted ', 'Draft', 'draft '] as $spelling) {
+            try {
+                DB::table('tracks')->where('id', $id)->update(['status' => $spelling]);
+                $this->fail('MySQL accepted the status spelling '.json_encode($spelling).'.');
+            } catch (QueryException $exception) {
+                $this->assertStringContainsString('Track visibility or publication schedule evidence is invalid or immutable', $exception->getMessage(), $spelling);
+            }
+        }
+        foreach (['Draft', 'draft ', 'Published'] as $spelling) {
+            try {
+                DB::table('tracks')->insert(['title' => 'Spelling', 'slug' => 'spelling-'.Str::slug($spelling).'-'.strlen($spelling), 'status' => $spelling]);
+                $this->fail('MySQL accepted an inserted status spelling '.json_encode($spelling).'.');
+            } catch (QueryException) {
+                // 'Published' is also refused by the earlier published-URL guard, which answers first with its own message.
+                $this->assertSame(0, DB::table('tracks')->where('title', 'Spelling')->count(), $spelling);
+            }
+        }
+        $this->assertSame('published', $fixture['track']->fresh()->status);
+        // The exact spellings still move: published to unlisted keeps its reserved URL.
+        DB::table('tracks')->where('id', $id)->update(['status' => 'unlisted']);
+        $this->assertSame('unlisted', $fixture['track']->fresh()->status);
+    }
+
     public function test_native_two_runners_that_selected_the_same_due_schedule_publish_it_exactly_once(): void
     {
         [$schedule, $fixture, $now] = $this->due();

@@ -383,6 +383,14 @@ class TrackVisibilityStatesTest extends TestCase
         }
     }
 
+    public function test_the_database_refuses_to_insert_an_unlisted_track_without_its_reserved_url(): void
+    {
+        $this->fixture();
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('Track visibility or publication schedule evidence is invalid or immutable');
+        DB::table('tracks')->insert(['title' => 'Unlisted at birth', 'slug' => 'unlisted-at-birth', 'status' => 'unlisted']);
+    }
+
     public function test_an_unlisted_track_must_have_its_reserved_url_in_the_database(): void
     {
         $this->fixture();

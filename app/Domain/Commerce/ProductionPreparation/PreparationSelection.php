@@ -4,6 +4,7 @@ namespace App\Domain\Commerce\ProductionPreparation;
 
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Catalog\TrackVisibility;
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Commerce\ProductionPolicy\MachinePolicyV1 as Check;
 use App\Domain\Media\MediaProfile;
@@ -84,7 +85,7 @@ final class PreparationSelection
         $lines = [];
         foreach ($items as $item) {
             $track = self::one($graph['tracks'], $item['trackId']);
-            Check::require($track['status'] === 'published' && $track['published_at'] !== null && $track['publication_version'] >= 1
+            Check::require(TrackVisibility::isLive($track['status']) && $track['published_at'] !== null && $track['publication_version'] >= 1
                 && is_int($track['metadata_version']) && $track['metadata_version'] >= 0 && $track['metadata_version'] <= 2147483647
                 && $track['published_slug'] === $track['slug'] && $track['bpm'] >= 20 && $track['bpm'] <= 400);
             foreach (['title', 'slug', 'artist', 'genre', 'musical_key'] as $field) {

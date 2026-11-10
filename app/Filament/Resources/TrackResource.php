@@ -130,7 +130,7 @@ class TrackResource extends OperatorResource
                 })
                 ->action(fn (Track $record, Action $action, ManageTracks $livewire) => $livewire->applyReviewedPublication($record, $action, 'publish')),
             Action::make('publish_unlisted')->label('Publish unlisted')->visible(fn (Track $record) => $record->status === TrackVisibility::DRAFT)->requiresConfirmation()->databaseTransaction(false)
-                ->modalDescription('Serve the reviewed track at its own link without listing it in the catalog, search or sitemaps. It can be bought by anyone with the link, under the same checks as a published track.')
+                ->modalDescription('Serve the reviewed track at its own link without listing it in the catalog, search or sitemaps. Unlisted is not secret: anyone who has or is given the link can open the page, hear the preview and buy it, under the same checks as a published track. Use Private to keep a track staff-only.')
                 ->mountUsing(function (Track $record, ManageTracks $livewire, ?Schema $schema = null): void {
                     $livewire->reviewPublication($record, 'publish_unlisted');
                     $schema?->fill();

@@ -517,6 +517,36 @@ class TrackSchedulingTest extends TestCase
         }
     }
 
+    public function test_the_public_activation_entry_point_rechecks_the_operator_role_and_mfa_itself(): void
+    {
+        foreach (['role', 'mfa'] as $loss) {
+            [$schedule, $fixture] = $this->scheduled();
+            if ($loss === 'role') {
+                DB::table('users')->where('id', $fixture['actor']->id)->update(['is_admin' => false]);
+            } else {
+                $panel = Filament::getPanel('admin');
+                $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: true);
+                $fixture['actor']->forceFill(['app_authentication_secret' => null])->save();
+            }
+            $resolved = false;
+            try {
+                DB::transaction(function () use ($fixture, &$resolved): void {
+                    $track = Track::query()->lockForUpdate()->findOrFail($fixture['track']->id);
+                    app(PublishTrack::class)->publishScheduled($track, $fixture['actor'], 'published', function () use (&$resolved): void {
+                        $resolved = true;
+                    });
+                });
+                $this->fail('A scheduled publication ran for an operator who lost '.$loss.'.');
+            } catch (AuthorizationException) {
+                $this->assertFalse($resolved, $loss);
+            }
+            $this->assertSame('scheduled', $fixture['track']->fresh()->status, $loss);
+            $this->assertSame('pending', $schedule->fresh()->state, $loss);
+
+            return;
+        }
+    }
+
     public function test_the_runner_refuses_an_outer_transaction_or_a_signed_in_user(): void
     {
         $this->scheduled();
