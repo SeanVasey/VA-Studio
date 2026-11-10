@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
 use App\Support\Environment\TestEnvironment;
+use Closure;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Gate;
 
@@ -30,6 +31,13 @@ final class SoundKitCliImport
 
     /** The only other directory a kit may be staged in. Files must be direct children of an allowed directory. */
     public const TEMP_DIRECTORY = '/tmp';
+
+    /**
+     * @param  (Closure(): ?int)|null  $effectiveUid  Resolves the effective uid of the running process, or null when it
+     *                                                cannot be established. Defaults to `posix_geteuid()`; tests bind a
+     *                                                fixed answer because a non-root runner cannot chown a fixture.
+     */
+    public function __construct(private readonly ?Closure $effectiveUid = null) {}
 
     /**
      * Local, testing or staging only. Production is refused first, whether it is the configured environment
@@ -112,10 +120,11 @@ final class SoundKitCliImport
             $this->refuse('The kit ZIP is not a regular file.');
         }
         // Fail closed: without POSIX the owner cannot be established, so the file is not admitted.
-        if (! function_exists('posix_geteuid')) {
+        $euid = $this->effectiveUid();
+        if ($euid === null) {
             $this->refuse('The file owner cannot be verified on this host (the PHP posix extension is unavailable), so the kit CLI import refuses every file.');
         }
-        if ($stat['uid'] !== 0 && $stat['uid'] !== posix_geteuid()) {
+        if ($stat['uid'] !== 0 && $stat['uid'] !== $euid) {
             $this->refuse('The kit ZIP must be owned by root or by the user running this command.');
         }
         if ($stat['nlink'] > 1) {
@@ -228,6 +237,15 @@ final class SoundKitCliImport
         }
 
         return $allowed;
+    }
+
+    private function effectiveUid(): ?int
+    {
+        if ($this->effectiveUid !== null) {
+            return ($this->effectiveUid)();
+        }
+
+        return function_exists('posix_geteuid') ? posix_geteuid() : null;
     }
 
     private function refuse(string $message): never

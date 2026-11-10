@@ -392,13 +392,30 @@ class SoundKitCliImportTest extends TestCase
     public function test_a_file_owned_by_another_user_is_refused(): void
     {
         $path = $this->tmp();
-        $this->assertSame(0, posix_geteuid(), 'This test needs a process that may chown.');
-        chown($path, 65534);
-        clearstatcache();
+        if (posix_geteuid() === 0) {
+            // Root can hand the fixture to another account and exercise the real effective uid.
+            chown($path, 65534);
+            clearstatcache();
+        } else {
+            // A non-root runner owns its fixture and cannot chown it, so the process is told it runs as someone else.
+            $this->app->instance(SoundKitCliImport::class, new SoundKitCliImport(fn (): int => 4242));
+        }
         $this->assertRefused($path, 'owned by root or by the user running this command');
         $this->assertRefused($path, 'owned by root or by the user running this command', ['--check' => true]);
-        chown($path, 0);
+    }
+
+    public function test_a_file_owned_by_the_running_user_is_admitted_for_a_check(): void
+    {
+        $path = $this->tmp();
         $this->kit($path, ['--check' => true])->expectsOutputToContain('Checked only')->assertSuccessful();
+    }
+
+    public function test_every_file_is_refused_when_the_owner_cannot_be_verified(): void
+    {
+        $this->app->instance(SoundKitCliImport::class, new SoundKitCliImport(fn (): ?int => null));
+        $path = $this->tmp();
+        $this->assertRefused($path, 'The file owner cannot be verified on this host');
+        $this->assertRefused($path, 'The file owner cannot be verified on this host', ['--check' => true]);
     }
 
     public function test_a_symlinked_private_kit_imports_directory_is_not_an_allowed_directory(): void
