@@ -148,14 +148,13 @@ class StagingLegalReleaseTest extends TestCase
         $this->assertStringContainsString('Email delivery provider: set at production', $privacy);
         $terms = $this->text($pages['terms']);
         $this->assertStringNotContainsString('Cloudflare R2', $privacy.$terms);
-        $this->assertStringContainsString('Iowa (county: set at production)', $terms);
+        $this->assertStringContainsString('courts located in Polk County, Iowa', $terms);
         $this->assertStringContainsString('Privacy Policy', $terms);
         $this->assertStringContainsString('15. Disclaimers', $terms);
         // A street address, ZIP code or legal name is never written (the drafts hold none; DD-33).
         foreach ([$privacy, $terms] as $text) {
             $this->assertDoesNotMatchRegularExpression('/\b\d{1,5}\s+[A-Z][a-z]+\s+(Street|St|Avenue|Ave|Road|Rd|Drive|Dr|Boulevard|Blvd|Lane|Ln)\b/', $text);
             $this->assertDoesNotMatchRegularExpression('/\b(?:IA|Iowa)\s+\d{5}\b/', $text);
-            $this->assertStringNotContainsString('Polk', $text);
         }
         $this->assertSame($before, $this->draftHashes(), 'docs/legal changed');
     }

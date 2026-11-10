@@ -5,6 +5,8 @@ import CheckoutReturn from './Pages/CheckoutReturn';
 import Editorial from './Pages/Editorial';
 import Albums from './Pages/Albums';
 import Album from './Pages/Album';
+import Collections from './Pages/Collections';
+import Collection from './Pages/Collection';
 import CustomerSignIn from './Pages/CustomerSignIn';
 import CustomerLibrary from './Pages/CustomerLibrary';
 import FreeGrants from './Pages/FreeGrants';
@@ -28,6 +30,8 @@ createInertiaApp({
     if (name === 'Editorial') return Editorial;
     if (name === 'Albums') return Albums;
     if (name === 'Album') return Album;
+    if (name === 'Collections') return Collections;
+    if (name === 'Collection') return Collection;
     if (name === 'CustomerSignIn') return CustomerSignIn;
     if (name === 'CustomerLibrary') return CustomerLibrary;
     if (name === 'FreeGrants') return FreeGrants;
