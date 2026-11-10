@@ -21,8 +21,29 @@ final class LegalPageFixtures
         ];
     }
 
-    /** Version 5: version 4 editorial content, no images, empty related tracks and the requested legal slots. */
+    /** The schema 6 license comparison frame: a title and an introduction; the comparison is generated (DD-31). */
+    public static function comparison(string $marker = 'SYNTHETIC LEGAL'): array
+    {
+        return ['title' => $marker.' License comparison', 'description' => $marker.' DESCRIPTION'];
+    }
+
+    /**
+     * Version 4 editorial content, no images, empty related tracks and the requested legal slots: version 6 when the license
+     * comparison is requested (its generated frame), otherwise version 5.
+     */
     public static function content(string $marker = 'SYNTHETIC LEGAL', array $documents = ['privacy']): array
+    {
+        $content = self::handTyped($marker, array_values(array_diff($documents, ['licenses'])));
+        if (! in_array('licenses', $documents, true)) {
+            return $content;
+        }
+        $content['legal']['licenses'] = self::comparison($marker);
+
+        return ['schema_version' => SiteContentSchema::GENERATED_LICENSES_VERSION] + $content;
+    }
+
+    /** Version 5 exactly as it was authored before DD-31, a hand-typed license comparison included when requested. */
+    public static function handTyped(string $marker = 'SYNTHETIC LEGAL', array $documents = ['privacy']): array
     {
         $content = SiteEditorialFixtures::content($marker);
         foreach (['blog', 'videos'] as $section) {

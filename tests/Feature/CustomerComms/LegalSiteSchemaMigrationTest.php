@@ -26,6 +26,8 @@ class LegalSiteSchemaMigrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // The later schema-v6 successor (2026_11_10_283800) replaces this guard; these cases exercise 268100 in its own context.
+        (require database_path('migrations/2026_11_10_283800_site_release_images_schema_v6.php'))->down();
         $this->actor = User::factory()->create();
     }
 
