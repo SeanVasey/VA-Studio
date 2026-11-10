@@ -8,6 +8,10 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ## [Unreleased]
 
+### Documentation
+
+- Decision register: Sean's 2026-11-10 waiting-on-Sean queue decisions (SQ-01 to SQ-19) recorded verbatim, with a reconciliation table naming the delegated DD rows they supersede (sound kits and collections now launch; guest checkout, R2 storage, B2 backups, Plausible analytics, tc-lib updates now, Pint `laravel` preset, RTO 4 h and cutover rules) plus Sean's SQ-04 amendment (no family is deferred from development; merchandise fulfills through Printful; every family is built default-off), and four open questions (Q-1 guest checkout vs TERMS §3, Q-2 kit terms, Q-3 tier names, Q-4 R2 scope). Sean's remaining actions and held authorizations are in `docs/handoff/2026-11-10/SEAN-QUEUE.md`; follow-on tasks BL-53 to BL-62 are in `UNBLOCKED-WORK.md`.
+
 ### Fixed
 
 - `StagingEnvironmentAdmissionTest` is green again after #266: the synthetic STAGING seller tag is listed with the admitting gates, and its one use of the word "staging" (a placeholder-path check, not an environment gate) is a recorded exemption that fails if the file ever names staging anywhere else or beside an environment read.
