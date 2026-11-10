@@ -290,8 +290,12 @@ if ($booted) {
         fn () => ContractRenderProfile::current()['version'] === 'test-buyer-pdf-v2');
     $attempt('delivery.activation', 'VASEY_TEST_FULFILLMENT_ACTIVATION_POLICY equals ActivationPolicy::CONTRACT and activation is enabled.',
         fn () => app(ActivationPolicy::class)->current());
-    $attempt('delivery.access', 'VASEY_TEST_DELIVERY_ACCESS_POLICY equals TestAccessPolicy::CONTRACT and owner delivery is enabled.',
+    $attempt('delivery.access', 'VASEY_TEST_DELIVERY_ACCESS_POLICY equals TestAccessPolicy::CONTRACT_V2 (or the retained v1 CONTRACT), v2 resume limits are valid, and owner delivery is enabled.',
         fn () => app(TestAccessPolicy::class)->current());
+    // v2 binds downloads to a secret in the server-side session; a cookie (or any client-held) session would let a copied
+    // pre-logout cookie replay it, so v2 is refused unless sessions are stored in the database.
+    $attempt('delivery.v2_session_database', 'A test-owner-delivery-v2 policy runs only with SESSION_DRIVER=database.',
+        fn () => app(TestAccessPolicy::class)->current()['version'] !== TestAccessPolicy::V2 || config('session.driver') === 'database');
 
     // ---- Test customer accounts
     $attempt('customer.accounts', 'Test customer accounts are enabled (CustomerAccessPolicy).', fn () => app(CustomerAccessPolicy::class)->enabled());
