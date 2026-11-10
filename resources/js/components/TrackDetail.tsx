@@ -1,6 +1,6 @@
 import { type MouseEvent } from 'react';
 import { player, useAudio } from '../lib/audio';
-import { availableOffer, fileRoleLabels, formatMoney, formatTime, safeMediaUrl, type LicenseTier, type Offer, type Track } from '../lib/catalog';
+import { availableOffer, deliverableNames, formatMoney, formatTime, safeMediaUrl, type LicenseTier, type Offer, type Track } from '../lib/catalog';
 import { Icon } from './Icon';
 
 export function TrackDetail({ track, tiers, catalogUrl, onNavigate, onLicense, onShare }: {
@@ -30,7 +30,7 @@ export function TrackDetail({ track, tiers, catalogUrl, onNavigate, onLicense, o
     <section id="licenses" className="detail-licenses" aria-labelledby="detail-licenses-title"><div className="section-heading"><div><p className="eyebrow">MAKE IT YOURS</p><h2 id="detail-licenses-title">THE RIGHT LICENSE.</h2></div><p>Compare the included files and published rights.<br />Read the full terms for your selected license.</p></div>
       <div className="detail-offers">{track.offers.filter(availableOffer).map(offer => {
         const tier = tiers.find(item => item.id === offer.licenseVersionId);
-        return <article className="detail-offer" key={offer.offerRevisionId}><div><p className="eyebrow">{tier?.type.replaceAll('_', ' ') || 'LICENSE'}</p><h3>{offer.licenseName}</h3><p className="license-files">{offer.deliverableRoles.map(role => fileRoleLabels[role] ?? role).join(' + ')}</p></div><div className="detail-offer-price"><strong>{formatMoney(offer.priceMinor, offer.currency)}</strong><span>{offer.currency}</span></div>{tier && <details><summary>Compare usage rights · version {tier.version}</summary><ul>{tier.features.map(feature => <li key={feature}>{feature}</li>)}</ul></details>}<button className="button button-outline" onClick={() => onLicense(track, offer)}>Read terms & choose <Icon name="arrow" size={16} /></button></article>;
+        return <article className="detail-offer" key={offer.offerRevisionId}><div><p className="eyebrow">{tier?.type.replaceAll('_', ' ') || 'LICENSE'}</p><h3>{offer.licenseName}</h3><p className="license-files">{deliverableNames(offer.deliverableRoles).join(' + ')}</p></div><div className="detail-offer-price"><strong>{formatMoney(offer.priceMinor, offer.currency)}</strong><span>{offer.currency}</span></div>{tier && <details><summary>Compare usage rights · version {tier.version}</summary><ul>{tier.features.map(feature => <li key={feature}>{feature}</li>)}</ul></details>}<button className="button button-outline" onClick={() => onLicense(track, offer)}>Read terms & choose <Icon name="arrow" size={16} /></button></article>;
       })}</div>
     </section>
   </article>;
