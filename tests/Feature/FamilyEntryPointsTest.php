@@ -48,9 +48,10 @@ class FamilyEntryPointsTest extends TestCase
         $this->assertFalse($families->admits($path));
         config(['services-projects.test_enabled' => true, 'services-projects.catalog_enabled' => true, 'memberships.test_mode_enabled' => true]);
         $this->assertTrue($families->admits($path));
-        // The policies, not this registry, decide: production refuses both test journeys.
+        // The policies, not this registry, decide: production refuses the test journeys. The public service pages follow
+        // their own code-literal switch (BL-64), which is not environment-bound, so they stay admitted while it is on.
         $this->app->instance('env', 'production');
-        $this->assertFalse($families->admits($path));
+        $this->assertSame($family === 'services', $families->admits($path));
     }
 
     public function test_the_catalog_and_the_test_journey_follow_their_own_switches_and_the_projects_slug_stays_reserved(): void
