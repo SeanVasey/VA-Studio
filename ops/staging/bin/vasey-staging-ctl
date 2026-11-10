@@ -18,6 +18,8 @@
 #   vasey-staging-ctl resume                  start PHP-FPM and workers on `current`, prove it, leave maintenance
 #   vasey-staging-ctl switch <40-hex SHA>     atomically select a sealed, attached release while quiesced
 #   vasey-staging-ctl snapshot                pre-deploy backup + isolated restore proof (requires quiesce first)
+#   vasey-staging-ctl space-check            refuse unless the disk has room for a pre-deploy snapshot (run before any quiesce)
+#   vasey-staging-ctl backup-prune            apply local backup retention (VASEY_BACKUP_KEEP; tiered if configured); never the newest set
 #   vasey-staging-ctl prepare <SHA> <env> <evidence>   root lease across quiesce, checkout/build and sealing
 #   vasey-staging-ctl activate <SHA> <evidence>        root lease across quiesce, snapshot, migration, switch/resume
 #   vasey-staging-ctl refresh <SHA> <env>             root lease across snapshot, protected config and resume
@@ -367,6 +369,16 @@ cmd_snapshot() {
   "$BACKUP_BIN" predeploy
 }
 
+cmd_space_check() {
+  [ -x "$BACKUP_BIN" ] || die "missing $BACKUP_BIN"
+  "$BACKUP_BIN" space-check
+}
+
+cmd_backup_prune() {
+  [ -x "$BACKUP_BIN" ] || die "missing $BACKUP_BIN"
+  "$BACKUP_BIN" prune
+}
+
 cmd_configure() {
   local sha=${1:-} candidate=${2:-} cur
   valid_sha "$sha" || die "configure needs a 40-hex SHA"
@@ -425,6 +437,7 @@ cmd_prepare() {
   protected_dir "$ROOT"
   release_step_file
   operation_evidence "$evidence"
+  cmd_space_check   # before any quiesce: a full disk must refuse here, not mid-snapshot with the site stopped
   operation_begin prepare "$sha"
   cmd_quiesce
   OPERATION_ENV=$(mktemp "$ROOT/.build-env.XXXXXXXX") || die "cannot stage protected build environment"
@@ -450,6 +463,7 @@ cmd_activate() {
     served_release >/dev/null || die "served release is invalid"
     first_install=0
   fi
+  cmd_space_check   # prepare already stopped the site; refuse before the snapshot starts rather than die inside it
   operation_begin activate "$sha"
   cmd_quiesce
   cmd_snapshot
@@ -463,6 +477,7 @@ cmd_activate() {
 cmd_refresh() {
   local sha=$1 candidate=$2
   valid_sha "$sha" || die "refresh needs a 40-hex SHA"
+  cmd_space_check   # before any quiesce, as in prepare
   operation_begin refresh "$sha"
   cmd_quiesce
   cmd_snapshot
@@ -544,7 +559,7 @@ case "${1:-}" in
   allocate|attach|detach|switch|healthy) [ "$#" = 2 ] || die "release action requires exactly one SHA" ;;
   prepare) [ "$#" = 4 ] || die "prepare requires SHA, private environment and evidence directory" ;;
   activate|refresh) [ "$#" = 3 ] || die "activation action requires SHA and evidence/environment" ;;
-  quiesce|resume|snapshot|prune|status) [ "$#" = 1 ] || die "action does not accept extra arguments" ;;
+  quiesce|resume|snapshot|prune|status|space-check|backup-prune) [ "$#" = 1 ] || die "action does not accept extra arguments" ;;
 esac
 case "${1:-}" in
   allocate) cmd_allocate "${2:-}" ;;
@@ -559,6 +574,8 @@ case "${1:-}" in
   activate) cmd_activate "$2" "$3" ;;
   refresh) cmd_refresh "$2" "$3" ;;
   prune)    cmd_prune ;;
+  space-check) cmd_space_check ;;
+  backup-prune) cmd_backup_prune ;;
   status)   cmd_status ;;
-  *) die "usage: vasey-staging-ctl allocate|attach|detach|switch|healthy <sha> | prepare <sha> <evidence-env> <evidence-dir> | activate <sha> <evidence-dir> | refresh <sha> <evidence-env> | quiesce | resume | snapshot | prune | status" ;;
+  *) die "usage: vasey-staging-ctl allocate|attach|detach|switch|healthy <sha> | prepare <sha> <evidence-env> <evidence-dir> | activate <sha> <evidence-dir> | refresh <sha> <evidence-env> | quiesce | resume | snapshot | space-check | backup-prune | prune | status" ;;
 esac

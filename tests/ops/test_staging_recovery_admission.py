@@ -32,6 +32,7 @@ release_step_file() { :; }
 operation_evidence() { :; }
 sealed_release() { :; }
 operation_begin() { :; }
+cmd_space_check() { :; }   # covered by test_staging_backup_offhost.SpaceCheck
 cmd_quiesce() { :; }
 cmd_snapshot() { echo snapshot; [ "$SNAPSHOT_OK" = 1 ]; }
 as_app() { echo migration; }

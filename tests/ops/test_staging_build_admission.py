@@ -142,6 +142,7 @@ protected_dir() { :; }
 release_step_file() { :; }
 operation_evidence() { :; }
 operation_begin() { :; }
+cmd_space_check() { :; }   # covered by test_staging_backup_offhost.SpaceCheck
 operation_finish() { :; }
 seal_tool() { cp -- "$3" "$4"; }
 chown() { :; }

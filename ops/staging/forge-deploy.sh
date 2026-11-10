@@ -17,7 +17,8 @@
 #   3. persistent private storage attached by bind mount (never a symlink), proven by inode;
 #   4. the Forge .env validated for the staging profile and installed 0600;
 #   5. one root lease encloses build/sealing; activation freshly quiesces under its own retained lease;
-#   6. a backup of the database, private storage and .env, and an isolated restore proof, before migrating;
+#   6. a free-space check before any quiesce, then a backup of the database, private storage and .env, and an isolated
+#      restore proof, before migrating; local backup retention is applied after the snapshot and after a successful deploy;
 #   7. maintenance in the new release, migrate --force (no --pretend: raw-PDO DDL ignores it), config/route/view/event caches,
 #      vasey:doctor, redacted readiness reports;
 #   8. atomic switch of `current`, PHP-FPM and workers started on it and proven, maintenance lifted, GET / = 200.
@@ -185,6 +186,7 @@ if [ -e "$REL" ]; then
     runtime_gate "$REL" "$RUNTIME_ENV"
     [ "$(envget APP_KEY)" = "$(grep '^APP_KEY=' "$REL/.env" | cut -d= -f2- | sed -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'$/\1/")" ] \
       || die "APP_KEY changes require a separately reviewed key-custody/rotation procedure"
+    "${CTL[@]}" space-check || die "not enough free disk space for the pre-deploy snapshot; nothing was stopped (docs/ops/staging-runbook.md section 9, out of disk during snapshot)"
     ACTIVATION_STARTED=1
     "${CTL[@]}" refresh "$SHA" "$RUNTIME_ENV"
     cmp -s "$RUNTIME_ENV" "$REL/.env" || die ".env not installed"
@@ -202,6 +204,9 @@ if [ -L "$CURRENT" ]; then
   runtime_gate "$previous_release" "$RUNTIME_ENV"
   FIRST_INSTALL=0
 fi
+# Prepare quiesces, and activation then takes a full snapshot (database + private store + env). Refuse now, with the served
+# release untouched, when the disk cannot hold it (2026-11-10: a full disk killed tar after the site was stopped).
+"${CTL[@]}" space-check || die "not enough free disk space for the pre-deploy snapshot; nothing was stopped (docs/ops/staging-runbook.md section 9, out of disk during snapshot)"
 step "prepare under one root-held build lease (quiesce, allocate, build, attach and seal)"
 ACTIVATION_STARTED=1
 install -d -m 0750 "$ROOT/evidence/$STAMP-${SHA:0:12}"
@@ -226,4 +231,6 @@ step "activate under one root-held lease (fresh quiesce, snapshot/proof, migrate
 } > "$EVIDENCE/DEPLOY"
 step "pruning old releases"
 "${CTL[@]}" prune || echo "forge-deploy: WARNING: prune failed; old releases kept" >&2
+step "applying local backup retention"
+"${CTL[@]}" backup-prune || echo "forge-deploy: WARNING: backup retention failed; old deploy snapshots kept (run: sudo vasey-staging-ctl backup-prune)" >&2
 step "deployed $SHA; evidence in $EVIDENCE"

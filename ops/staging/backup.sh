@@ -6,6 +6,8 @@
 # Installed by provision.sh as /usr/local/sbin/vasey-staging-backup (root:root 0755) and run as root:
 #   vasey-staging-backup nightly            quiesce, serialized snapshot/proof/ship, resume, prune (cron, 03:17 UTC)
 #   vasey-staging-backup predeploy          snapshot + restore-check on an already-quiesced host (deploy, via ctl)
+#   vasey-staging-backup space-check        refuse (exit 1) unless the disk has room for a pre-deploy snapshot; run before any quiesce
+#   vasey-staging-backup prune              apply local retention now (newest VASEY_BACKUP_KEEP, or tiered); never the newest set
 #   vasey-staging-backup restore-check DIR  re-prove an existing backup directory
 #   vasey-staging-backup ship DIR           copy one backup directory to VASEY_BACKUP_DEST
 #   vasey-staging-backup check-offhost      validate the opt-in age/rclone/retention settings (no network, ships nothing)
@@ -618,15 +620,19 @@ retention_plan() {  # retention_plan KEEP DAILY WEEKLY MONTHLY [PROTECT]
   done
 }
 
-prune_local_tiered() {
+prune_local_tiered() {  # prune_local_tiered [EXTRA_PROTECT...]: names never removed besides the newest verified set
   offhost_config_ok || die "retention configuration refused; nothing was pruned"
+  local -a extra=("$@")
   local protect='' d
   while IFS= read -r d; do
     if grep -qx 'result=RESTORE_VERIFIED' "$VASEY_BACKUP_DIR/$d/RESTORE_CHECK" 2>/dev/null; then protect=$d; break; fi
   done < <(find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -name '20*Z-*' ! -name '*.FAILED' -printf '%f\n' | LC_ALL=C sort -r)
   find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -name '20*Z-*' ! -name '*.FAILED' -printf '%f\n' \
     | retention_plan "$VASEY_BACKUP_KEEP" "$VASEY_BACKUP_KEEP_DAILY" "$VASEY_BACKUP_KEEP_WEEKLY" "$VASEY_BACKUP_KEEP_MONTHLY" "$protect" \
-    | while IFS= read -r d; do rm -rf --one-file-system -- "${VASEY_BACKUP_DIR:?}/$d"; done
+    | while IFS= read -r d; do
+      case " ${extra[*]} " in *" $d "*) continue ;; esac
+      rm -rf --one-file-system -- "${VASEY_BACKUP_DIR:?}/$d"
+    done
 }
 
 # rclone remotes only, and only when asked (VASEY_BACKUP_REMOTE_PRUNE=1). A host that can delete its own off-host
@@ -656,11 +662,84 @@ prune_remote() {
   log "remote retention: pruned $count set(s) beyond the tiered policy"
 }
 
+# prune_local [PROTECT]: local retention (flat newest-N, or tiered). PROTECT names one set that is never removed (the
+# deploy's own snapshot); the newest set `.last` points at is always protected too. Only well-formed set directories of
+# VASEY_BACKUP_DIR are ever considered: .FAILED sets, staging directories, kept copies and anything outside it (such as a
+# separately retained copy) are never touched. VASEY_BACKUP_KEEP below 1 is refused: it would remove every set.
 prune_local() {
-  if [ "$VASEY_BACKUP_RETENTION" = tiered ]; then prune_local_tiered; return; fi
+  local protect=${1:-} last='' d
+  [ -z "$protect" ] || [[ "$protect" =~ $SET_NAME_RE ]] || die "prune: not a backup set name: $protect"
+  if [ -f "$VASEY_BACKUP_DIR/.last" ] && [ ! -L "$VASEY_BACKUP_DIR/.last" ]; then
+    last=$(basename -- "$(cat -- "$VASEY_BACKUP_DIR/.last" 2>/dev/null || true)")
+    [[ "$last" =~ $SET_NAME_RE ]] || last=''
+  fi
+  if [ "$VASEY_BACKUP_RETENTION" = tiered ]; then prune_local_tiered "$protect" "$last"; return; fi
   local keep=$VASEY_BACKUP_KEEP
+  [[ "$keep" =~ ^[0-9]{1,3}$ ]] && [ "$keep" -ge 1 ] || die "prune: VASEY_BACKUP_KEEP must be a whole number of at least 1; nothing was pruned"
   find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -name '20*Z-*' ! -name '*.FAILED' -printf '%f\n' \
-    | sort -r | tail -n +"$((keep + 1))" | while IFS= read -r d; do rm -rf --one-file-system -- "${VASEY_BACKUP_DIR:?}/$d"; done
+    | sort -r | tail -n +"$((keep + 1))" | while IFS= read -r d; do
+      [ "$d" != "$protect" ] && [ "$d" != "$last" ] || continue
+      rm -rf --one-file-system -- "${VASEY_BACKUP_DIR:?}/$d"
+    done
+}
+
+# ---- free-space pre-check (the deploy runs it BEFORE any quiesce) ----
+# A snapshot needs room for the dump and the private archive in the backup directory, a second copy of the set when an
+# encrypted off-host copy is staged there, and the restore proof's extracted store and disposable datadir under
+# VASEY_RESTORE_CHECK_DIR (often the same filesystem). 2026-11-10: five deploys left five 14 GB sets, the disk reached 96%
+# and tar died mid-snapshot with the site already stopped. Refusing here leaves the served release untouched.
+SPACE_MARGIN_PCT=20
+SPACE_MARGIN_BYTES=268435456
+
+# Database size estimate: the schema's data plus index bytes (an upper bound of the dump), else the newest set's dump.
+snapshot_db_bytes() {
+  local bytes='' newest=''
+  if [[ "$VASEY_DB_NAME" =~ ^[A-Za-z0-9_]+$ ]]; then
+    bytes=$(mysql --defaults-extra-file="$VASEY_BACKUP_MYCNF" --batch --skip-column-names \
+      -e "SELECT COALESCE(SUM(data_length + index_length), 0) FROM information_schema.tables WHERE table_schema = '$VASEY_DB_NAME'" 2>/dev/null) || bytes=''
+    bytes=${bytes%%.*}
+  fi
+  if [[ "$bytes" =~ ^[0-9]{1,15}$ ]]; then printf '%s' "$bytes"; return 0; fi
+  newest=$(find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -name '20*Z-*' ! -name '*.FAILED' -printf '%f\n' 2>/dev/null | LC_ALL=C sort -r | head -n 1)
+  if [ -n "$newest" ] && [ -f "$VASEY_BACKUP_DIR/$newest/database.sql" ]; then
+    stat -c %s -- "$VASEY_BACKUP_DIR/$newest/database.sql"; return 0
+  fi
+  return 1
+}
+
+nearest_existing() {  # nearest_existing PATH -> PATH or its closest existing ancestor
+  local p=$1
+  while [ ! -e "$p" ] && [ "$p" != / ] && [ "$p" != . ]; do p=$(dirname -- "$p"); done
+  printf '%s' "$p"
+}
+
+space_check() {
+  local priv db set_need need restore_need avail restore_avail backup_at restore_at margin
+  [ -d "$PRIVATE" ] && [ ! -L "$PRIVATE" ] || die "private root missing"
+  priv=$(du -sb -- "$PRIVATE" | cut -f1)
+  db=$(snapshot_db_bytes) || die "cannot estimate the database size (query and newest set both unavailable); no snapshot attempted, nothing stopped"
+  [[ "$priv" =~ ^[0-9]+$ && "$db" =~ ^[0-9]+$ ]] || die "cannot size the snapshot; nothing stopped"
+  set_need=$((priv + db))
+  need=$set_need
+  # An age/rclone shipment stages one more encrypted copy of the set inside the backup directory.
+  if hardening_requested; then need=$((need + set_need)); fi
+  restore_need=$set_need   # restore proof: extracted private store + disposable datadir
+  backup_at=$(nearest_existing "$VASEY_BACKUP_DIR"); restore_at=$(nearest_existing "$VASEY_RESTORE_CHECK_DIR")
+  if [ "$(stat -c %d -- "$backup_at")" = "$(stat -c %d -- "$restore_at")" ]; then
+    need=$((need + restore_need)); restore_need=0
+  fi
+  margin=$((need * SPACE_MARGIN_PCT / 100 + SPACE_MARGIN_BYTES))
+  need=$((need + margin))
+  avail=$(df --output=avail -B1 -- "$backup_at" | tail -n 1 | tr -d ' ')
+  [[ "$avail" =~ ^[0-9]+$ ]] && [ "$avail" -ge "$need" ] \
+    || die "not enough free disk space for the pre-deploy snapshot: $avail bytes free, about $need bytes needed (private store $priv, database $db, margin included) in $VASEY_BACKUP_DIR; nothing was stopped. Free space with 'sudo vasey-staging-ctl backup-prune' (docs/ops/staging-runbook.md section 9, out of disk during snapshot)"
+  if [ "$restore_need" -gt 0 ]; then
+    restore_need=$((restore_need + restore_need * SPACE_MARGIN_PCT / 100 + SPACE_MARGIN_BYTES))
+    restore_avail=$(df --output=avail -B1 -- "$restore_at" | tail -n 1 | tr -d ' ')
+    [[ "$restore_avail" =~ ^[0-9]+$ ]] && [ "$restore_avail" -ge "$restore_need" ] \
+      || die "not enough free disk space for the restore proof: $restore_avail bytes free, about $restore_need bytes needed in $VASEY_RESTORE_CHECK_DIR; nothing was stopped (docs/ops/staging-runbook.md section 9, out of disk during snapshot)"
+  fi
+  log "free space ok for the pre-deploy snapshot: $avail bytes free, about $need needed"
 }
 
 # ---- dashboard evidence (FP-028, docs/staff-reporting.md) ----
@@ -718,6 +797,15 @@ case "${1:-}" in
     # A deploy runs this with the site quiesced: wait a bounded time for a manual hardened ship rather than fail the deploy at once.
     SHIP_LOCK_WAIT=600
     ship "$(cat "$VASEY_BACKUP_DIR/.last")"
+    # Retention for deploy snapshots: five deploys in a day once kept five full sets. The set just taken (the deploy's rollback
+    # point) is protected, and a prune failure never fails a deploy whose snapshot and proof succeeded.
+    ( prune_local "$(basename -- "$(cat "$VASEY_BACKUP_DIR/.last")")" ) || log "WARNING: local retention after the pre-deploy snapshot did not complete; run 'vasey-staging-ctl backup-prune'"
+    ;;
+  space-check) space_check ;;
+  prune)
+    [ -d "$VASEY_BACKUP_DIR" ] || die "no backup directory"
+    prune_local
+    log "local retention applied (keep ${VASEY_BACKUP_KEEP}, ${VASEY_BACKUP_RETENTION:-flat})"
     ;;
   restore-check) restore_check "${2:?backup directory}" ;;
   ship) ship "${2:?backup directory}" ;;
@@ -725,5 +813,5 @@ case "${1:-}" in
     offhost_config_ok || die "off-host configuration refused"
     log "off-host configuration ok (encryption: $([ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] && echo age || { [ -n "$VASEY_BACKUP_REMOTE" ] && echo 'none by this script, explicitly allowed' || echo none; }); transport: $([ -n "$VASEY_BACKUP_REMOTE" ] && echo rclone || { [ -n "$VASEY_BACKUP_DEST" ] && echo rsync || echo none; }); retention: ${VASEY_BACKUP_RETENTION:-flat}; $(retry_copies_summary))"
     ;;
-  *) die "usage: vasey-staging-backup nightly | predeploy | restore-check DIR | ship DIR | check-offhost" ;;
+  *) die "usage: vasey-staging-backup nightly | predeploy | space-check | prune | restore-check DIR | ship DIR | check-offhost" ;;
 esac
