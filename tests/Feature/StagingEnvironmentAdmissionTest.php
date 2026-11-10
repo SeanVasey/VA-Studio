@@ -151,6 +151,9 @@ class StagingEnvironmentAdmissionTest extends TestCase
         'app/Domain/Commerce/ProductionTaxCheckout/FreshTaxCheckoutPolicy.php',
         // D-30 step 6: V1 contract identity capture has its own literal-false gate and admits only local/testing.
         'app/Domain/Commerce/ProductionCheckout/ContractIdentityPolicy.php',
+        // D-30 (#245): v2 license issuance has its own literal-false gate (contracts.vasey_license_v2_issuance)
+        // and admits only local/testing; ops/production/validate-runtime.php holds it in production.
+        'app/Domain/Grants/VaseyLicenseIssuance.php',
         'app/Domain/Grants/PaidTax/PaidTaxPolicy.php',
         'app/Domain/Grants/PaidTax/PaidTaxRuntime.php',
         'app/Domain/Grants/PaidTax/PaidTaxDeliveryPolicy.php',

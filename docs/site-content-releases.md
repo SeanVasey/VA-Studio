@@ -78,6 +78,29 @@ Lane CX (FP-005) adds three optional legal pages to a release: **Privacy policy*
 
 Until a release with legal pages is published, every legal route answers `404`. Restoring an older release withdraws them.
 
+### Publication guard: placeholders and review markers
+
+A release may be saved and previewed with unfinished legal text, but the domain refuses to make it public while a legal page still shows drafting material (`App\Domain\SiteBuilder\LegalPublicationGuard`, reason code `legal_unresolved_markers`). The rule runs in `SiteContent` itself, on **Publish release**, **Restore previous release**, **Schedule publication** and the scheduler's own activation, so no screen or command can skip it. It reads only the public text of the three legal pages: title, description, section headings and paragraphs. It does not read the approval reference, which is never public, and it never fills, removes or rewrites anything.
+
+| Class | What is refused | Where the convention comes from |
+| --- | --- | --- |
+| `legal_review_marker` | "for legal review", with or without brackets | `[For legal review]` on TERMS sections 15 to 17 and LICENSE-TIERS 4.14 |
+| `owner_decision` | "Sean to confirm", "Sean to choose", "Sean to decide", "Sean to set" | `[county — Sean to confirm]`, the provider rows of PRIVACY section 5, the price cells of LICENSE-TIERS |
+| `publication_value` | "set on publication", "inserted at publication", "entered at publication" | `[set on publication]`, `[registered postal address — inserted at publication]` |
+| `draft_notice` | "not yet published", "DRAFT for … approval" or "… review", "Reviewer appendix", "remove before publication", "Draft version label" | the status banner and reviewer appendix of each draft |
+| `template_variable` | an unsubstituted license source variable such as `{{deliverables}}` | LICENSE-TIERS 6.3 |
+| `bracketed_placeholder` | any other text in square brackets, and any unpaired `[` or `]` | "Text still in square brackets is a placeholder or a choice that must be filled before publication" (PRIVACY and TERMS banners) |
+
+Because every square bracket counts, approved legal text must not use square brackets; use parentheses. Matching is on these exact conventions only, so the guard cannot tell whether a filled-in value is correct or whether counsel has in fact reviewed the wording: removing a marker is a statement by the operator, recorded in the approval reference.
+
+What staff see:
+
+- Saving a draft that holds markers succeeds and adds a warning, **This draft cannot be published yet**, listing the first eight markers by page, section and class.
+- **Publish release**, **Restore previous release** and **Schedule publication** answer **Publication blocked** or **Scheduling blocked** with the same list; the live site and the schedule are unchanged.
+- A pending schedule made before this rule existed is resolved `failed` when it comes due. The schedule table's transition trigger admits only its existing outcomes, so the row stores `integrity`; the reason travels in the `site.schedule.failed` audit event (`reason`, and `legal_markers` as counts per page and class, never page text), in the command output (`FAILED integrity schedule=… reason=legal_unresolved_markers`) and in **Schedule history** ("Not published: the legal pages still hold unresolved placeholders or review markers").
+
+To publish, save a new draft with the approved final text. A release that was refused is immutable like any other and stays available as a private draft.
+
 ## Original schema-v1 fields
 
 All values are bounded plain text, with no markup or unsupported keys. Label length is at most 120 characters. These are the original integer schema-version `1` fields; new editor copies use schema version `2` and its additional bounded fields, or version `3`, which adds site image references ([D-25](architecture/D-25-editable-site-images.md)), when they use an image.
