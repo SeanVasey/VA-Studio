@@ -3,6 +3,7 @@
 namespace App\Http\Tax;
 
 use App\Domain\Grants\PaidTax\PaidTaxConfiguration;
+use App\Http\ProductionCheckout\ProductionChainExclusivity;
 use Closure;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
@@ -29,6 +30,7 @@ final class TaxHttpMount
             $config = $instances['config'] ?? null;
 
             return $config instanceof Repository && $config::class === Repository::class
+                && ($key !== 'production-tax-checkout.http_mounted' || ! ProductionChainExclusivity::conflict($config)) // DD-14
                 && self::environment($app, $instances)
                 && PaidTaxConfiguration::read($config, $key) === true;
         } catch (Throwable) {

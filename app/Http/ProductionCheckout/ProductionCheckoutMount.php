@@ -52,6 +52,7 @@ final class ProductionCheckoutMount
             $remaining = 128;
 
             return self::plain($parent, $remaining) && ($parent['mounted'] ?? null) === true
+                && ! ProductionChainExclusivity::conflict($repository) // DD-14: never beside the tax chain
                 && self::environment($app, $instances);
         } catch (Throwable) {
             return false;
