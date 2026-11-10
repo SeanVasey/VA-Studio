@@ -8,6 +8,10 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ## [Unreleased]
 
+### Fixed
+
+- `StagingEnvironmentAdmissionTest` is green again after #266: the synthetic STAGING seller tag is listed with the admitting gates, and its one use of the word "staging" (a placeholder-path check, not an environment gate) is a recorded exemption that fails if the file ever names staging anywhere else or beside an environment read.
+
 ### Added
 
 - Staging step 11 preparation: a synthetic STAGING seller tag and a short owner checklist. `vasey:staging-seller-tag` (`app/Domain/Media/StagingSellerTag.php`) generates a one-second three-tone chime with ffmpeg on the host, checks it against the pipeline's tag rules, installs it owner-only in private storage as `branding/STAGING-synthetic-seller-tag.wav` and prints the two `MEDIA_TAG_*` lines. Local, testing and staging only; it never replaces an installed tag, and no audio is committed.
