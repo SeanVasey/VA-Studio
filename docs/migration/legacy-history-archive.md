@@ -108,7 +108,11 @@ declares no family normalizes to exactly the same bytes and snapshot hash as bef
   fills `license_name`/`license_label`. Status values are the orders sheet's `status_values`; amounts, currency,
   customer, time and payment reference follow the same rules and findings. A family line may share an order with
   track lines; order-level cells must agree across sheets (`order_inconsistent`) and a line id is unique within its
-  order across sheets (`duplicate_source_id`).
+  order across sheets (`duplicate_source_id`). Line identity is order id plus line id across every sheet, so a real
+  export whose family sheets number lines independently inside a shared order (kit line 1 beside track line 1) is
+  refused as `duplicate_source_id`. That refusal is fail-closed and has no mapping-level remedy yet.
+- **Consumers must check the family.** `legacy_history_lines.track_source_id` holds family ids too. Any reader must
+  call `ProductFamilyAdapter::familyOf()` on it and treat it as a track id only when that returns `null`.
 - **Never a track.** A kit whose raw id equals a track's id is stored as `kit:<id>`, and a track id inside `kit:`,
   `service:` or `membership:` on the orders sheet is a finding (`reserved_family_namespace`), so the two cannot be
   confused. Track linking skips family lines.
@@ -207,7 +211,9 @@ unexplained, and the result is `reconciled` only with zero unexplained differenc
 mapping and the store track for the line's `track_source_id`. `reconcile` prints a `track_links` report beside the
 archive report (it never changes `reconciled`/`unreconciled`), and `link-tracks` without `--write` prints the same
 report: counts per state, every track line's state by record key, and, for lines that need a person, the candidate
-mapping and track ids.
+mapping and track ids. If the link report itself is refused (`catalog_mapping_integrity`, `track_link_integrity` or
+`archive_integrity`), `reconcile` still prints the unchanged archive result and exit code with
+`track_links: {"refused": "<reason>"}`; `link-tracks` and `resolve-track-link` refuse outright.
 
 A **candidate** is every `catalog_import_mappings` row whose retained source record carries the line's
 `track_source_id` as its source id, in any catalog source system. A mapping whose encrypted evidence cannot be read

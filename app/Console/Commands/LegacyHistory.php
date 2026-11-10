@@ -225,10 +225,15 @@ final class LegacyHistory extends Command
             return self::UNRECONCILED;
         }
         $report = (new LegacyHistoryArchive)->reconcile($result['snapshot'], $result['snapshot_sha256']);
-        // Track links are reported beside the archive reconciliation and never change its result: an unlinked or
-        // ambiguous line is still a fully archived record.
-        $this->emit(['code' => $report['result'], 'report' => $report,
-            'track_links' => (new LegacyTrackLinks)->report($result['snapshot'], $result['snapshot_sha256']), 'database_writes' => 0]);
+        // Track links are reported beside the archive reconciliation and never change its result or exit code: an
+        // unlinked or ambiguous line is still a fully archived record, and a link report refused on catalog or link
+        // evidence the archive never depended on is reported here instead of refusing the reconciliation.
+        try {
+            $trackLinks = (new LegacyTrackLinks)->report($result['snapshot'], $result['snapshot_sha256']);
+        } catch (LegacyArchiveRefusal $refusal) {
+            $trackLinks = ['refused' => $refusal->reason];
+        }
+        $this->emit(['code' => $report['result'], 'report' => $report, 'track_links' => $trackLinks, 'database_writes' => 0]);
 
         return $report['result'] === 'reconciled' ? self::SUCCESS : self::UNRECONCILED;
     }

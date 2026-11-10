@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Migration;
 
+use App\Domain\Catalog\Models\Track;
 use App\Domain\Migration\History\HistoryDelta;
 use App\Domain\Migration\History\LegacyHistoryArchive;
 use App\Domain\Staff\StaffWriteAuthority;
@@ -246,6 +247,34 @@ class LegacyHistoryCommandTest extends TestCase
         $this->assertSame($second['track_id'], (int) DB::table('legacy_history_track_links')->where('line_record_key', $ambiguous)->sole()->track_id);
         [, $summary] = $this->invoke('reconcile', ['--source' => $source]);
         $this->assertEquals(['linked' => 3, 'unlinked' => 2, 'ambiguous' => 0], $summary['track_links']['states']);
+    }
+
+    public function test_a_refused_track_link_report_never_changes_the_archive_reconciliation(): void
+    {
+        $source = LegacyHistoryFixtures::privateCopy('families');
+        $genuine = LegacyHistoryFixtures::catalogMapping('synthetic/beatstars-history', 'synthetic-track-01', $this->operator);
+        // A mapping row whose record key does not match its own evidence: the catalog side is corrupt, the archive is not.
+        $hash = hash('sha256', 'forged');
+        DB::table('catalog_import_mappings')->insert(['batch_id' => DB::table('catalog_import_batches')->value('id'), 'record_key' => $hash,
+            'source_record_sha256' => $hash, 'track_id' => Track::create(['title' => 'SYNTHETIC forged', 'slug' => 'synthetic-forged', 'artist' => 'Test only'])->id, 'track_sha256' => $hash, 'actor_id' => $this->operator->id,
+            'evidence_ciphertext' => DB::table('catalog_import_mappings')->where('id', $genuine['mapping_id'])->value('evidence_ciphertext'), 'created_at' => now()]);
+        $loaded = (new LegacyHistoryArchive)->load($source);
+        [$snapshot, $sha] = [$loaded['result']['snapshot'], $loaded['result']['snapshot_sha256']];
+
+        // The reconcile result and exit code are exactly the archive's own, before and after the import.
+        foreach ([[3, 'unreconciled'], [0, 'reconciled']] as $i => [$code, $result]) {
+            if ($i === 1) {
+                LegacyHistoryFixtures::import($snapshot, $sha, $loaded['source']['contracts'], $this->operator, 1000);
+            }
+            [$exit, $summary] = $this->invoke('reconcile', ['--source' => $source]);
+            $this->assertSame([$code, $result, 0], [$exit, $summary['code'], $summary['database_writes']]);
+            $this->assertEquals((new LegacyHistoryArchive)->reconcile($snapshot, $sha), $summary['report']);
+            $this->assertSame(['refused' => 'catalog_mapping_integrity'], $summary['track_links']);
+        }
+        // The link actions themselves still fail closed on the same evidence.
+        [$exit, $summary] = $this->invoke('link-tracks', ['--source' => $source]);
+        $this->assertSame([1, 'catalog_mapping_integrity'], [$exit, $summary['reason']]);
+        $this->assertSame(0, DB::table('legacy_history_track_links')->count());
     }
 
     private function invoke(string $action, array $options): array
