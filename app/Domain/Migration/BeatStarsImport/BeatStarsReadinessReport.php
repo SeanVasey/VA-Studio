@@ -1,0 +1,251 @@
+<?php
+
+namespace App\Domain\Migration\BeatStarsImport;
+
+use App\Domain\Catalog\Models\Track;
+use App\Domain\Catalog\PublicationReadiness;
+use App\Domain\Media\Models\MediaAsset;
+use App\Domain\Media\RecordingAssociation;
+use App\Domain\Media\VerifiedMedia;
+use App\Domain\Migration\CatalogOnboarding\PrivateSourceFiles;
+use Illuminate\Support\Carbon;
+use InvalidArgumentException;
+use Throwable;
+
+/**
+ * The per-track readiness report of the import: what is attached, what is missing and what still blocks publication. It
+ * names titles and slugs, so it is written only to a caller-owned 0600 file in a 0700 directory (never the repository,
+ * never stdout). The state of each track is read from the database and the files on every run, so a resumed run and a
+ * first run produce the same truth; only the last attempt's outcome is carried forward from the previous report.
+ */
+final class BeatStarsReadinessReport
+{
+    public const SCHEMA = 'vasey-beatstars-import-readiness-v1';
+
+    /** The import never confirms that the stems are the master's recording; staff do, in the admin, before publishing. */
+    public const STEMS_UNCONFIRMED = 'stems_association_unconfirmed';
+
+    private const ROLES = ['master_wav' => 'preview_tagged', 'artwork' => 'artwork', 'stems_zip' => 'stems_zip'];
+
+    /** Refuses a report path that is not a plain file name in a private directory, before anything is written. */
+    public function admit(string $path, array $protected = []): void
+    {
+        try {
+            $this->require(str_starts_with($path, '/') && preg_match('/\A[A-Za-z0-9._-]{1,120}\.json\z/D', basename($path)) === 1);
+            (new PrivateSourceFiles)->privateDirectory(dirname($path));
+            // Never inside, or in place of, the hashed snapshot directory or the media root: a report there could replace the manifest.
+            $directory = realpath(dirname($path));
+            $this->require($directory !== false);
+            foreach ($protected as $root) {
+                $real = realpath($root);
+                $this->require($real !== false && $directory !== $real && ! str_starts_with($directory.'/', $real.'/') && ! str_starts_with($real.'/', $directory.'/'));
+            }
+            if (@lstat($path) !== false) {
+                $this->require(is_file($path) && ! is_link($path) && fileowner($path) === posix_geteuid() && (fileperms($path) & 07777) === 0600);
+                // Only a previous report of this schema may be replaced.
+                $existing = json_decode((string) file_get_contents($path), true, 32);
+                $this->require(is_array($existing) && ($existing['schema'] ?? null) === self::SCHEMA);
+            }
+        } catch (Throwable) {
+            throw new BeatStarsImportRefusal('The report path must be a .json file name inside a caller-owned 0700 directory outside every Git working tree, the snapshot directory and the media root; an existing file there must be a caller-owned 0600 earlier report of this import.');
+        }
+    }
+
+    /** The last attempt of each source id in an earlier report at this path, or nothing when there is none or it is unreadable. */
+    public function previous(string $path): array
+    {
+        try {
+            $decoded = json_decode((string) file_get_contents($path), true, 32, JSON_THROW_ON_ERROR);
+            $this->require(is_array($decoded) && ($decoded['schema'] ?? null) === self::SCHEMA);
+            $attempts = [];
+            foreach ($decoded['tracks'] as $entry) {
+                if (is_array($entry['last_attempt'] ?? null)) {
+                    $attempts[(string) $entry['source_id']] = $entry['last_attempt'];
+                }
+            }
+
+            return $attempts;
+        } catch (Throwable) {
+            return [];
+        }
+    }
+
+    /**
+     * @param  list<array>  $rows  BeatStarsCatalogImport::rows()
+     * @param  array<string, array<string, string>>  $listings
+     * @param  array<string, array>  $outcomes  this run's outcome per source id
+     * @param  array<string, array>  $previous
+     */
+    public function build(array $source, array $rows, array $listings, BeatStarsMediaFiles $files, array $outcomes, array $previous, array $run): array
+    {
+        $tracks = [];
+        foreach ($rows as $row) {
+            $track = $row['track_id'] === null ? null : Track::query()->find($row['track_id']);
+            $attempt = isset($outcomes[$row['source_id']]) ? $this->attempt($outcomes[$row['source_id']], $previous[$row['source_id']] ?? null) : ($previous[$row['source_id']] ?? null);
+            $tracks[] = $track === null
+                ? ['source_id' => $row['source_id'], 'track_id' => null, 'title' => $row['title'], 'status' => 'not_imported', 'last_attempt' => $attempt]
+                : $this->track($row, $track, $listings[$row['source_id']] ?? [], $files, $attempt);
+        }
+
+        $report = ['schema' => self::SCHEMA, 'generated_at' => Carbon::now()->utc()->format('Y-m-d\TH:i:s\Z'),
+            'snapshot_id' => $source['snapshot']['snapshot_id'], 'source_sha256' => $source['source_sha256'], 'run' => $run, 'summary' => null,
+            'statements' => ['publication' => 'the import publishes nothing; tracks stay unpublished drafts until Sean reviews and publishes them',
+                'offers_and_licenses' => 'none created', 'rights' => 'no rights declaration created or verified',
+                'prices' => 'export prices not applied in this phase',
+                'preview' => 'the tagged preview is generated by the media pipeline from the master; the listed BeatStars preview MP3 is not used'],
+            'tracks' => $tracks];
+        $report['summary'] = $this->counts($report);
+
+        return $report;
+    }
+
+    /** Writes the report atomically as a 0600 file. */
+    public function write(string $path, array $report, array $protected = []): void
+    {
+        $this->admit($path, $protected);
+        $pending = $path.'.pending';
+        $previous = umask(0077);
+        try {
+            if (@lstat($pending) !== false) {
+                $this->require(is_file($pending) && ! is_link($pending));
+                unlink($pending);
+            }
+            $bytes = json_encode($report, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)."\n";
+            $handle = fopen($pending, 'xb');
+            $this->require($handle !== false);
+            try {
+                $this->require(fwrite($handle, $bytes) === strlen($bytes));
+            } finally {
+                fclose($handle);
+            }
+            chmod($pending, 0600);
+            $this->require(rename($pending, $path));
+        } catch (Throwable) {
+            @unlink($pending);
+
+            throw new BeatStarsImportRefusal('The readiness report could not be written. The import itself is recorded; re-run the command to write the report again.');
+        } finally {
+            umask($previous);
+        }
+    }
+
+    /** Counts that are safe for stdout: no path, title, identifier or personal value. */
+    private function counts(array $report): array
+    {
+        $counts = ['tracks' => count($report['tracks']), 'imported_drafts' => 0, 'published' => 0, 'media_complete' => 0,
+            'master_ready' => 0, 'artwork_ready' => 0, 'stems_ready' => 0, 'stems_associated' => 0, 'stems_unconfirmed' => 0,
+            'master_missing' => 0, 'artwork_missing' => 0, 'stems_missing' => 0, 'files_refused' => 0, 'last_attempt_failed' => 0];
+        $blockers = [];
+        foreach ($report['tracks'] as $track) {
+            if ($track['status'] === 'not_imported') {
+                continue;
+            }
+            $counts['imported_drafts']++;
+            $counts['published'] += $track['status'] === 'published' ? 1 : 0;
+            $counts['master_ready'] += $track['media']['master_wav']['state'] === 'ready' ? 1 : 0;
+            $counts['artwork_ready'] += $track['media']['artwork']['state'] === 'ready' ? 1 : 0;
+            $counts['stems_ready'] += $track['media']['stems_zip']['state'] === 'ready' ? 1 : 0;
+            $counts['stems_associated'] += $track['stems_association'] === 'associated' ? 1 : 0;
+            $counts['stems_unconfirmed'] += $track['stems_association'] === 'unconfirmed' ? 1 : 0;
+            foreach (['master_wav' => 'master_missing', 'artwork' => 'artwork_missing', 'stems_zip' => 'stems_missing'] as $role => $counter) {
+                $counts[$counter] += in_array($role, $track['media_missing'], true) ? 1 : 0;
+            }
+            $counts['files_refused'] += $track['files_refused'] > 0 ? 1 : 0;
+            $counts['last_attempt_failed'] += ($track['last_attempt']['failed'] ?? false) ? 1 : 0;
+            $counts['media_complete'] += $track['media_missing'] === [] && $track['media']['master_wav']['state'] === 'ready'
+                && $track['media']['artwork']['state'] === 'ready' ? 1 : 0;
+            foreach ($track['publication_blockers'] as $blocker) {
+                $blockers[$blocker] = ($blockers[$blocker] ?? 0) + 1;
+            }
+        }
+        ksort($blockers);
+
+        return ['counts' => $counts, 'publication_blockers' => $blockers];
+    }
+
+    private function track(array $row, Track $track, array $listing, BeatStarsMediaFiles $files, ?array $attempt): array
+    {
+        $media = [];
+        $missing = [];
+        $refused = 0;
+        foreach (self::ROLES as $role => $output) {
+            $keys = $role === 'artwork' ? ['artwork_high_res', 'artwork'] : [$role];
+            $listed = [];
+            foreach ($keys as $key) {
+                $resolved = $files->resolve($key, $listing[$key] ?? '');
+                $listed[$key] = $resolved['state'] === 'refused' ? 'refused:'.$resolved['code'] : $resolved['state'];
+                $refused += $resolved['state'] === 'refused' ? 1 : 0;
+            }
+            $state = $this->state($track, $role, $output);
+            $media[$role] = ['state' => $state, 'files' => $listed];
+            // Stems are optional: a track the export lists none for (28 of 99 in Sean's export) is not missing a file. A master or
+            // artwork nobody listed is a gap, because publication needs both.
+            $optionalAndUnlisted = $role === 'stems_zip' && array_unique(array_values($listed)) === ['not_listed'];
+            if ($state !== 'ready' && ! in_array('ok', $listed, true) && ! $optionalAndUnlisted) {
+                $missing[] = $role;
+            }
+        }
+        $preview = $files->resolve('preview_mp3', $listing['preview_mp3'] ?? '');
+        $stems = $this->ready($track, 'stems_zip');
+        $previewAsset = $this->ready($track, 'preview_tagged');
+        $association = $stems === null || $previewAsset === null ? 'n/a'
+            : (app(RecordingAssociation::class)->matches($stems, $previewAsset) ? 'associated' : 'unconfirmed');
+
+        return ['source_id' => $row['source_id'], 'track_id' => $track->id, 'slug' => $track->slug, 'title' => $track->title, 'status' => $track->status,
+            'media' => $media, 'preview' => ['state' => $previewAsset !== null ? 'generated_by_pipeline' : 'pending_master',
+                'listed_source_mp3' => $preview['state'] === 'refused' ? 'refused:'.$preview['code'] : $preview['state'], 'listed_source_mp3_used' => false],
+            'stems_association' => $association, 'media_missing' => $missing, 'files_refused' => $refused, 'last_attempt' => $attempt,
+            'publication_blockers' => array_values(array_unique([...app(PublicationReadiness::class)->blockers($track),
+                ...($association === 'unconfirmed' ? [self::STEMS_UNCONFIRMED] : [])]))];
+    }
+
+    /** ready, quarantined (taken in, not yet processed) or absent. */
+    private function state(Track $track, string $role, string $output): string
+    {
+        if ($this->ready($track, $output) !== null) {
+            return 'ready';
+        }
+
+        return MediaAsset::query()->where('track_id', $track->id)->whereNull('parent_asset_id')->where('role', $role)
+            ->where('status', 'quarantined')->exists() ? 'quarantined' : 'absent';
+    }
+
+    private function ready(Track $track, string $output): ?MediaAsset
+    {
+        $asset = $track->assets()->where('role', $output)->where('status', 'ready')->latest('id')->first();
+
+        return $asset !== null && app(VerifiedMedia::class)->available($asset) ? $asset : null;
+    }
+
+    /**
+     * The attempt as the report keeps it: each role's outcome and code, no detail beyond the intake service's own generic wording.
+     * A role this run found already attached keeps the earlier run's `attached` record instead of overwriting the evidence of
+     * when and how it arrived with "already attached".
+     */
+    private function attempt(array $outcome, ?array $previous): array
+    {
+        $roles = [];
+        $failed = false;
+        foreach ($outcome['roles'] as $role => $result) {
+            if (($result['outcome'] ?? '') === 'already_attached' && ($previous['roles'][$role]['outcome'] ?? '') === 'attached') {
+                $roles[$role] = $previous['roles'][$role];
+
+                continue;
+            }
+            $roles[$role] = array_intersect_key($result, array_flip(['outcome', 'code', 'detail', 'source', 'candidates', 'source_mp3', 'source_mp3_used']));
+            $failed = $failed || in_array($result['outcome'] ?? '', ['failed', 'rejected'], true);
+        }
+        $attempted = $outcome['attempted'] || ($previous['attempted'] ?? false);
+
+        return ['at' => $outcome['attempted'] || $previous === null ? Carbon::now()->utc()->format('Y-m-d\TH:i:s\Z') : ($previous['at'] ?? Carbon::now()->utc()->format('Y-m-d\TH:i:s\Z')),
+            'attempted' => $attempted, 'roles' => $roles, 'stems_association' => $outcome['stems_association'],
+            'failed' => $failed || str_starts_with($outcome['stems_association'], 'failed:')];
+    }
+
+    private function require(bool $condition): void
+    {
+        if (! $condition) {
+            throw new InvalidArgumentException('report_invalid');
+        }
+    }
+}

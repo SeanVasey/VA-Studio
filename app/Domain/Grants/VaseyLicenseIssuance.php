@@ -18,6 +18,8 @@ use App\Domain\Contracts\Production\VaseyLicenseV2Profile;
 use App\Domain\Contracts\Production\VaseyLicenseV2Render;
 use App\Domain\Contracts\Production\VaseyLicenseV2RendererProcess;
 use App\Domain\Contracts\RenderedContract;
+use App\Domain\Contracts\RenderFit\LicensePdfCheck;
+use App\Domain\Contracts\RenderFit\RenderFitException;
 use App\Support\CanonicalJson;
 use Throwable;
 
@@ -285,6 +287,15 @@ final class VaseyLicenseIssuance
         }
         if (! hash_equals($profile['effective_hash'], $rendered->profileHash) || ! hash_equals($profile['expected']['text_digest'], $rendered->textDigest)) {
             throw new ContractIssuanceException('profile_changed');
+        }
+        // BL-72: the finished original must draw every character of the document, inside the page and the right margin.
+        // Read from the PDF itself, so it holds whichever way the pinned layout treats an over-long unbroken token.
+        try {
+            $v2 = VaseyLicenseV2Profile::current();
+            (new LicensePdfCheck($v2, static fn (string $asset): string => VaseyLicenseV2Profile::assetBytes($v2, $asset)))
+                ->assertContained($rendered->pdfBytes, $document, VaseyLicenseV2Profile::VERSION);
+        } catch (RenderFitException) {
+            throw new ContractIssuanceException('invalid_pdf');
         }
 
         return $rendered;

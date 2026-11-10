@@ -183,13 +183,14 @@ class SiteImageLibraryTest extends TestCase
         }
     }
 
-    public function test_the_encoder_arguments_and_fingerprint_are_those_of_profile_v1(): void
+    public function test_the_encoder_arguments_and_fingerprint_are_those_of_profile_v2(): void
     {
-        // Built from the recorded settings, in the order profile site-image-v1 has always used. A different list or fingerprint
-        // means a new profile, which needs a new version and migration (D-25).
+        // Built from the recorded settings, in the order profiles site-image-v1 and v2 have used. A different list or fingerprint
+        // means a new profile, which needs a new version and migration (D-25). v2 only added the release_cover slot (BL-67), so the
+        // encoder arguments are unchanged; the fingerprint covers the slot definitions and moved with it.
         $this->assertSame(['-c:v', 'mjpeg', '-q:v', '3', '-pix_fmt', 'yuvj420p'], SiteImageSlot::encoderArguments('jpeg'));
         $this->assertSame(['-c:v', 'libwebp', '-quality', '80', '-compression_level', '4'], SiteImageSlot::encoderArguments('webp'));
-        $this->assertSame('d93be6e82f8dbe45919b7d8c07726e83a33ccc361ce7101612e775a0207dfc6a', SiteImageSlot::fingerprint());
+        $this->assertSame('bf1ec091fe2d52344921564216c4e722bffbb27a8fb8c0b79a51ee422c36c062', SiteImageSlot::fingerprint());
     }
 
     /** @return array<string, array{string}> */

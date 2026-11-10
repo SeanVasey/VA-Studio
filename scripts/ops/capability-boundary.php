@@ -64,6 +64,9 @@ final class CapabilityBoundary
      */
     public const PRODUCTION_LAUNCH_OFF_FLAGS = [
         'REPORTING_MARKETING_SEGMENT_ENABLED' => 'reporting.customer_segments.marketing_segment_enabled',
+        // BL-71: the BeatStars catalog import is a staging console command that refuses production in code; the hold keeps the flag
+        // from ever being set on the production host, as the staging deploy gate cannot (it must be true for the import run).
+        'VASEY_STAGING_BEATSTARS_IMPORT_ENABLED' => 'staging-beatstars-import.enabled',
     ];
 
     /**
