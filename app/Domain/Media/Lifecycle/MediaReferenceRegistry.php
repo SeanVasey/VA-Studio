@@ -171,7 +171,7 @@ final class MediaReferenceRegistry
         'customer_suppression_targets.recipient_ciphertext', 'legacy_history_contract_declarations.record_ciphertext',
         'legacy_history_contracts.record_ciphertext', 'legacy_history_customers.record_ciphertext',
         'legacy_history_lines.record_ciphertext', 'legacy_history_orders.record_ciphertext',
-        'license_grants.render_input_ciphertext', 'order_finalizations.evidence_ciphertext', 'orders.payload_ciphertext',
+        'license_grants.render_input_ciphertext', 'merch_fulfillments.request_ciphertext', 'order_finalizations.evidence_ciphertext', 'orders.payload_ciphertext',
         'payment_observations.evidence_ciphertext', 'production_account_feature_bindings.binding_ciphertext',
         'production_buyer_assent_observations.payload_ciphertext', 'production_checkout_attempts.payload_ciphertext',
         'production_checkout_exemption_authorities.payload_ciphertext',
@@ -232,8 +232,17 @@ final class MediaReferenceRegistry
 
     private const PROSE = 'Staff-authored text or settings with no ids.';
 
+    private const SITE_IMAGE = 'Names or pins a site image (D-25), which keeps its own files and never names media_assets by id; shared bytes are found by the content check.';
+
+    private const COLLECTION = 'Mutable staff-ordered browse grouping (BL-54): it has no price, offer, license or entitlement, and every track in it is still sold through its own page.';
+
     /** Reviewed candidates that are not a reference: column => why. */
     public const REVIEWED = [
+        'album_releases.artwork_alt' => self::PROSE,
+        'album_releases.artwork_image_id' => self::SITE_IMAGE,
+        'album_releases.artwork_manifest_sha256' => self::SITE_IMAGE.' It copies site_images.manifest_sha256, a digest over the image variants, not the hash of a media file.',
+        'album_releases.description' => self::PROSE,
+        'album_releases.listening_links' => 'Staff-entered https links to external listening services (BL-67); no ids, and no private file.',
         'audit_events.subject' => 'An event about a track or about a family row is not a reference; ids in its context are read by json:audit_events.context.',
         'cache.value' => 'Framework cache: never authoritative.',
         'catalog_import_mappings.track_sha256' => 'Digest of the imported track attributes; the row counts through track_id.',
@@ -264,6 +273,8 @@ final class MediaReferenceRegistry
         'media_upload_sessions.track_id' => self::OWN,
         'membership_credit_events.after_balance' => 'A credit balance.', 'membership_credit_events.before_balance' => 'A credit balance.',
         'merch_draft_versions.manifest_sha256' => 'Digest of the manifest column of the same row, which is classified itself.',
+        'merch_fulfillments.tracking_number' => 'A carrier tracking number returned by the fulfillment provider.',
+        'merch_fulfillments.tracking_url' => 'A carrier tracking link returned by the fulfillment provider.',
         'offers.track_id' => self::TRACK_SETUP,
         'pending_entitlements.asset_hash' => 'The asset\'s SHA-256, found by the content check; the row counts through media_asset_id.',
         'product_draft_versions.manifest_sha256' => 'Digest of the manifest column of the same row, which is classified itself.',
@@ -301,15 +312,23 @@ final class MediaReferenceRegistry
         'rights_declarations.provenance_reference' => self::PROSE, 'rights_declarations.sample_disclosure' => self::PROSE,
         'rights_declarations.track_id' => self::TRACK_SETUP,
         'service_draft_versions.manifest_sha256' => 'Digest of the manifest column of the same row, which is classified itself.',
+        'service_publications.manifest_sha256' => 'Copy of the pinned service_draft_versions.manifest_sha256, whose manifest column is classified itself (opaque).',
         'sessions.payload' => 'Encrypted browser session: never authoritative.', 'sessions.user_agent' => 'A user agent string.',
         'site_images.evidence' => self::OWN_FILES, 'site_images.manifest_sha256' => self::OWN_FILES,
         'sound_kit_drafts.description' => self::PROSE, 'sound_kit_revisions.description_snapshot' => self::PROSE,
         'sound_kit_revisions.evidence' => self::OWN_FILES, 'sound_kit_revisions.manifest' => self::OWN_FILES,
         'sound_kit_revisions.manifest_sha256' => self::OWN_FILES, 'sound_kit_revisions.profile' => self::OWN_FILES,
+        'sound_kit_products.manifest_sha256' => self::OWN_FILES.' It copies sound_kit_revisions.manifest_sha256 of the pinned archive revision.',
+        'sound_kit_products.summary' => self::PROSE,
         'sound_kit_upload_sessions.parts' => self::OWN_FILES,
         'stems_recordings.track_id' => 'The binding row counts through its asset columns.',
         'stripe_webhook_receipts.event' => 'Stripe event id and type strings, not a model reference.',
         'stripe_webhook_receipts.object' => 'Stripe object id and type strings, not a model reference.',
+        'test_delivery_coverage.intervals' => 'Byte ranges served for one download admission; numbers only.',
+        'track_collection_items.track_collection_id' => 'A collection id, not a track or media id.',
+        'track_collection_items.track_id' => self::COLLECTION,
+        'track_collections.description' => self::PROSE,
+        'track_publication_schedules.track_id' => 'A staff request to publish the track at a later time (BL-41): mutable set-up that sells and commits nothing. Activation re-runs every publication guard, so a family deleted in the meantime fails the activation and leaves the schedule pending, never publishing without media.',
         'track_metadata_presets.metadata' => self::PROSE,
         'track_collaborator_splits.track_id' => 'Editable collaborator split metadata (BL-05): report-only, feeds no sale, grant or delivery.',
         'tracks.description' => self::PROSE, 'tracks.tags' => self::PROSE, 'tracks.waveform' => 'Display peaks of the track.',
