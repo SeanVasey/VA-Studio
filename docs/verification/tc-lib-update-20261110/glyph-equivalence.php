@@ -1,4 +1,5 @@
 <?php
+
 // Glyph equivalence for ProductionFree renderer revision r3 (tc-lib-pdf 8.81.1 / tc-lib-pdf-font 4.6.2).
 // Compares ProductionFreeGrantRenderable::glyph with the Tcpdf font API the renderer uses (ProductionFreeGrantPdfRenderer:
 // insert dejavusans 'B' and '', isCharDefined and a non-zero getGidForOrd) over U+0020..U+10FFFF excluding surrogates.
