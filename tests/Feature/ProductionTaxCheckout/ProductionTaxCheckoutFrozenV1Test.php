@@ -33,8 +33,14 @@ class ProductionTaxCheckoutFrozenV1Test extends TestCase
      * The change adds two nonunique single-column indexes plus a migration-only upgrade preflight
      * (assertReportingUpgrade); strict installer admission is unchanged apart from now requiring the two indexes.
      * No column, uniqueness, foreign key, trigger or payment path changed.
+     *
+     * HostedEvidence.php (BL-68): the request now offers payment_method_types ['card','link'] and the session and
+     * PaymentIntent checks call CheckoutPaymentMethods::matchesRequest (exact unordered set equal to the stored request,
+     * which must itself be {card, link} or the pre-BL-68 ['card']) instead of requiring ['card']. No other line changed.
+     * Pending independent review of the BL-68 PR; the hash pins the exact reviewed bytes.
      */
     public const REVIEWED_SUCCESSORS = [
+        'app/Domain/Commerce/ProductionCheckout/HostedEvidence.php' => '479c6631998e34e2d8999e44047b67d4777842222861ccdcdabfca5a09619e43',
         'app/Domain/Commerce/ProductionCheckout/CheckoutSchema.php' => 'ecbb168a283213666380d21a4d89430c289fb95e4be9fd77e6cf78de6e3f2357',
         'app/Domain/Commerce/ProductionCheckout/CheckoutSchemaInstaller.php' => '6d770ecb9b2b9ff2d38c3bf04a8f1f81221e2fed9ea54ec6a9ad5af071b52ef8',
     ];
