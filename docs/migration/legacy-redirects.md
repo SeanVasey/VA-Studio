@@ -51,8 +51,20 @@ Two cautions for future map entries (independent review, 2026-10-24):
 
 `vasey:redirects-validate` fails (exit 1) when the inventory hash or row count differs from the pin, an inventory row has no entry, an entry is not an inventory row or its host/path differs, a `retained` path is not served, a `redirect` or `gone` path is served by a route (dead configuration), or a target is invalid: a missing or non-GET route, a route needing parameters, a non-https or non-allowlisted external URL, an external URL back to a legacy host, or a target that is another entry's source (chain) or its own source (loop). A content target that is not public right now is a warning, because the request path answers 404 until it is published. `--require-resolved` also fails while any row is unresolved; that is the cutover gate.
 
-## Current reconciliation (2026-10-24, base 786fb7c7)
+## Current reconciliation (2026-11-10, BL-51; first reviewed 2026-10-24 at base 786fb7c7)
 
-20 inventory rows, 20 entries: 0 redirect, 0 gone, 5 retained (URL-001 `/`, URL-009 `/videos`, URL-010 `/blog`, URL-011 `/about`, URL-012 `/contact`) and 15 unresolved (URL-002 to URL-008 and URL-013 to URL-020). Every unresolved row's proposed target has no current route, and every inventory row is still a `Recommendation` that needs live browser and catalog verification and verified owner control. No target was guessed. URL-010 keeps `/blog` because the current implementation serves it; the older `/updates` proposal is not implemented.
+20 inventory rows, 20 entries: 3 redirect, 0 gone, 5 retained (URL-001 `/`, URL-009 `/videos`, URL-010 `/blog`, URL-011 `/about`, URL-012 `/contact`) and 12 unresolved. The inventory CSV is unchanged, so its pinned hash and row count are unchanged.
+
+BL-51 gave a reviewed disposition to the unresolved rows that point into a family with no live public page, each to a page that exists and never to one that does not:
+
+| Row | Legacy path | Target | Why |
+| --- | --- | --- | --- |
+| URL-005 | `/sound-kits` | catalog (`home`) | No kit storefront page exists (FP-007). |
+| URL-007 | `/merch` | catalog (`home`) | No merchandise page exists and none is sold. |
+| URL-008 | `/memberships` | contact (`editorial` section `contact`) | No membership is sold at launch (DD-50); the contact page reaches the owner. |
+
+All are 301 and every entry is revisited when the family's own page is enabled; the validator then fails the entry as dead configuration, because a served path may not be redirected. Nothing here activates a redirect: `config/legacy-redirects.php` `enabled` stays a literal `false`, and no DNS, customer data or BeatStars state is touched. The contact target resolves only while the active site release has a contact page; otherwise the request answers 404 and the validator warns.
+
+Rows left unresolved on purpose: URL-006 `/services` (a `/services` route now exists, BL-64, and answers 404 while its flag is off; a real route wins over a redirect, so this needs a route-level fallback decision), URL-018 `/account/membership` (an `/account/*` source is changed by the customer-privacy middleware, see the cautions above, and needs the identity decision), URL-003 and URL-004 (collections, built by a later task), and the rows that need the crawl or Sean's URL export (URL-002, URL-013 to URL-017, URL-019, URL-020). Every inventory row is still a `Recommendation` that needs live browser and catalog verification and verified owner control.
 
 To resolve a row: verify the legacy URL against the live site, build or choose the target route, change the entry, run the validator, and record the evidence in the PR. After any inventory change, review every row and update the pinned hash and row count.
