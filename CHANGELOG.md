@@ -8,6 +8,10 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ## [Unreleased]
 
+### Fixed
+
+- `StagingEnvironmentAdmissionTest` is green again after #266: the synthetic STAGING seller tag is listed with the admitting gates, and its one use of the word "staging" (a placeholder-path check, not an environment gate) is a recorded exemption that fails if the file ever names staging anywhere else or beside an environment read.
+
 ### Added
 
 - Read-only cutover check for the production cleanup ledger (BL-49). No migration, no new setting, nothing activated.
