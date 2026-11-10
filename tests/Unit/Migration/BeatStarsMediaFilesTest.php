@@ -24,8 +24,13 @@ class BeatStarsMediaFilesTest extends TestCase
         mkdir($this->root.'/Studio/Masters', 0755, true);
         file_put_contents($this->root.'/Studio/Masters/a.wav', 'RIFF');
         file_put_contents($this->root.'/Studio/Masters/empty.wav', '');
+        file_put_contents($this->root.'/Studio/Masters/solo.wav', 'RIFF');
         file_put_contents($this->base.'/outside.wav', 'RIFF');
         mkdir($this->root.'/Studio/Dir.wav');
+        link($this->root.'/Studio/Masters/a.wav', $this->root.'/Studio/Masters/hard.wav');
+        $big = fopen($this->root.'/Studio/Masters/big.png', 'wb');
+        ftruncate($big, 20 * 1024 * 1024 + 1);
+        fclose($big);
         symlink($this->base.'/outside.wav', $this->root.'/Studio/Masters/link.wav');
         symlink($this->root.'/Studio/Masters/a.wav', $this->root.'/Studio/Masters/inside-link.wav');
         symlink($this->base, $this->root.'/Studio/Escape');
@@ -41,15 +46,15 @@ class BeatStarsMediaFilesTest extends TestCase
     public function test_an_exact_regular_file_under_the_root_resolves_with_its_identity(): void
     {
         $files = BeatStarsMediaFiles::open($this->root);
-        $resolved = $files->resolve('master_wav', '/Studio/Masters/a.wav');
+        $resolved = $files->resolve('master_wav', '/Studio/Masters/solo.wav');
         $this->assertSame('ok', $resolved['state']);
-        $this->assertSame($this->root.'/Studio/Masters/a.wav', $resolved['path']);
+        $this->assertSame($this->root.'/Studio/Masters/solo.wav', $resolved['path']);
         $this->assertSame(4, $resolved['bytes']);
         $this->assertTrue($files->unchanged($resolved));
         file_put_contents($resolved['path'], 'RIFFmore');
         $this->assertFalse($files->unchanged($resolved));
         // The extension check is case-insensitive but a role's own extensions only.
-        copy($this->root.'/Studio/Masters/a.wav', $this->root.'/Studio/Masters/UP.WAV');
+        copy($this->root.'/Studio/Masters/solo.wav', $this->root.'/Studio/Masters/UP.WAV');
         $this->assertSame('ok', $files->resolve('master_wav', '/Studio/Masters/UP.WAV')['state']);
     }
 
@@ -81,6 +86,9 @@ class BeatStarsMediaFilesTest extends TestCase
             'symlinked directory to outside the root' => ['master_wav', '/Studio/Escape/outside.wav', ['state' => 'refused', 'code' => 'symlink']],
             'symlinked directory inside the root' => ['master_wav', '/Studio/Alias/a.wav', ['state' => 'refused', 'code' => 'symlink']],
             'directory named like a file' => ['master_wav', '/Studio/Dir.wav', ['state' => 'refused', 'code' => 'not_regular_file']],
+            'hard link to another name' => ['master_wav', '/Studio/Masters/hard.wav', ['state' => 'refused', 'code' => 'hardlink']],
+            'original of a hard link' => ['master_wav', '/Studio/Masters/a.wav', ['state' => 'refused', 'code' => 'hardlink']],
+            'artwork over the intake cap' => ['artwork', '/Studio/Masters/big.png', ['state' => 'refused', 'code' => 'too_large']],
             'empty file' => ['master_wav', '/Studio/Masters/empty.wav', ['state' => 'refused', 'code' => 'empty_file']],
             'unknown role' => ['preview_wav', '/Studio/Masters/a.wav', ['state' => 'refused', 'code' => 'unknown_role']],
         ];

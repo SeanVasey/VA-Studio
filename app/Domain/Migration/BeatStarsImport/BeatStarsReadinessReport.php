@@ -22,19 +22,32 @@ final class BeatStarsReadinessReport
 {
     public const SCHEMA = 'vasey-beatstars-import-readiness-v1';
 
+    /** The import never confirms that the stems are the master's recording; staff do, in the admin, before publishing. */
+    public const STEMS_UNCONFIRMED = 'stems_association_unconfirmed';
+
     private const ROLES = ['master_wav' => 'preview_tagged', 'artwork' => 'artwork', 'stems_zip' => 'stems_zip'];
 
     /** Refuses a report path that is not a plain file name in a private directory, before anything is written. */
-    public function admit(string $path): void
+    public function admit(string $path, array $protected = []): void
     {
         try {
             $this->require(str_starts_with($path, '/') && preg_match('/\A[A-Za-z0-9._-]{1,120}\.json\z/D', basename($path)) === 1);
             (new PrivateSourceFiles)->privateDirectory(dirname($path));
+            // Never inside, or in place of, the hashed snapshot directory or the media root: a report there could replace the manifest.
+            $directory = realpath(dirname($path));
+            $this->require($directory !== false);
+            foreach ($protected as $root) {
+                $real = realpath($root);
+                $this->require($real !== false && $directory !== $real && ! str_starts_with($directory.'/', $real.'/') && ! str_starts_with($real.'/', $directory.'/'));
+            }
             if (@lstat($path) !== false) {
                 $this->require(is_file($path) && ! is_link($path) && fileowner($path) === posix_geteuid() && (fileperms($path) & 07777) === 0600);
+                // Only a previous report of this schema may be replaced.
+                $existing = json_decode((string) file_get_contents($path), true, 32);
+                $this->require(is_array($existing) && ($existing['schema'] ?? null) === self::SCHEMA);
             }
         } catch (Throwable) {
-            throw new BeatStarsImportRefusal('The report path must be a .json file name inside a caller-owned 0700 directory outside every Git working tree; an existing file there must be a caller-owned 0600 file.');
+            throw new BeatStarsImportRefusal('The report path must be a .json file name inside a caller-owned 0700 directory outside every Git working tree, the snapshot directory and the media root; an existing file there must be a caller-owned 0600 earlier report of this import.');
         }
     }
 
@@ -87,9 +100,9 @@ final class BeatStarsReadinessReport
     }
 
     /** Writes the report atomically as a 0600 file. */
-    public function write(string $path, array $report): void
+    public function write(string $path, array $report, array $protected = []): void
     {
-        $this->admit($path);
+        $this->admit($path, $protected);
         $pending = $path.'.pending';
         $previous = umask(0077);
         try {
@@ -120,7 +133,7 @@ final class BeatStarsReadinessReport
     private function counts(array $report): array
     {
         $counts = ['tracks' => count($report['tracks']), 'imported_drafts' => 0, 'published' => 0, 'media_complete' => 0,
-            'master_ready' => 0, 'artwork_ready' => 0, 'stems_ready' => 0, 'stems_associated' => 0,
+            'master_ready' => 0, 'artwork_ready' => 0, 'stems_ready' => 0, 'stems_associated' => 0, 'stems_unconfirmed' => 0,
             'master_missing' => 0, 'artwork_missing' => 0, 'stems_missing' => 0, 'files_refused' => 0, 'last_attempt_failed' => 0];
         $blockers = [];
         foreach ($report['tracks'] as $track) {
@@ -133,6 +146,7 @@ final class BeatStarsReadinessReport
             $counts['artwork_ready'] += $track['media']['artwork']['state'] === 'ready' ? 1 : 0;
             $counts['stems_ready'] += $track['media']['stems_zip']['state'] === 'ready' ? 1 : 0;
             $counts['stems_associated'] += $track['stems_association'] === 'associated' ? 1 : 0;
+            $counts['stems_unconfirmed'] += $track['stems_association'] === 'unconfirmed' ? 1 : 0;
             foreach (['master_wav' => 'master_missing', 'artwork' => 'artwork_missing', 'stems_zip' => 'stems_missing'] as $role => $counter) {
                 $counts[$counter] += in_array($role, $track['media_missing'], true) ? 1 : 0;
             }
@@ -175,13 +189,14 @@ final class BeatStarsReadinessReport
         $stems = $this->ready($track, 'stems_zip');
         $previewAsset = $this->ready($track, 'preview_tagged');
         $association = $stems === null || $previewAsset === null ? 'n/a'
-            : (app(RecordingAssociation::class)->matches($stems, $previewAsset) ? 'associated' : 'pending');
+            : (app(RecordingAssociation::class)->matches($stems, $previewAsset) ? 'associated' : 'unconfirmed');
 
         return ['source_id' => $row['source_id'], 'track_id' => $track->id, 'slug' => $track->slug, 'title' => $track->title, 'status' => $track->status,
             'media' => $media, 'preview' => ['state' => $previewAsset !== null ? 'generated_by_pipeline' : 'pending_master',
                 'listed_source_mp3' => $preview['state'] === 'refused' ? 'refused:'.$preview['code'] : $preview['state'], 'listed_source_mp3_used' => false],
             'stems_association' => $association, 'media_missing' => $missing, 'files_refused' => $refused, 'last_attempt' => $attempt,
-            'publication_blockers' => app(PublicationReadiness::class)->blockers($track)];
+            'publication_blockers' => array_values(array_unique([...app(PublicationReadiness::class)->blockers($track),
+                ...($association === 'unconfirmed' ? [self::STEMS_UNCONFIRMED] : [])]))];
     }
 
     /** ready, quarantined (taken in, not yet processed) or absent. */

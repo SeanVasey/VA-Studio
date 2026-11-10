@@ -8,6 +8,7 @@ use App\Domain\Catalog\PublicationReadiness;
 use App\Domain\Catalog\SaveTrackMetadata;
 use App\Domain\Catalog\SyntheticRehearsal\SyntheticRehearsalMedia;
 use App\Domain\Media\Models\MediaAsset;
+use App\Domain\Media\Models\StemsRecording;
 use App\Domain\Media\RecordingAssociation;
 use App\Domain\Migration\BeatStars\BeatStarsExportNormalizer;
 use App\Domain\Migration\CatalogOnboarding\NormalizedSourceSnapshot;
@@ -284,6 +285,19 @@ class StagingBeatStarsImportTest extends TestCase
         // Raw export bytes that no longer match the hash the snapshot binds.
         file_put_contents($staged['source'].'/raw/import-export.csv', "tampered\n");
         $this->assertRefusedWithoutWrites([], 'not a valid private snapshot');
+        // The report can never replace the hashed snapshot manifest or sit in the snapshot directory or the media root.
+        $guard = $this->stage(media: false);
+        $manifest = file_get_contents($guard['source'].'/catalog.json');
+        $this->assertRefusedWithoutWrites(['--report' => $guard['source'].'/catalog.json'], 'report path must be a .json file name');
+        $this->assertRefusedWithoutWrites(['--report' => $guard['source'].'/raw/report.json'], 'report path must be a .json file name');
+        $this->assertSame($manifest, file_get_contents($guard['source'].'/catalog.json'));
+        mkdir($guard['files'].'/inner', 0700);
+        $this->assertRefusedWithoutWrites(['--report' => $guard['files'].'/inner/report.json'], 'report path must be a .json file name');
+        // An existing file that is not an earlier report of this import is never overwritten.
+        file_put_contents($guard['base'].'/reports/readiness.json', '{"something":"else"}');
+        chmod($guard['base'].'/reports/readiness.json', 0600);
+        $this->assertRefusedWithoutWrites([], 'report path must be a .json file name');
+        $this->assertSame('{"something":"else"}', file_get_contents($guard['base'].'/reports/readiness.json'));
         // The report must be a plain .json name in a private directory.
         $fresh = $this->stage(media: false);
         $this->assertRefusedWithoutWrites(['--report' => $fresh['base'].'/reports/readiness.txt'], 'report path must be a .json file name');
@@ -347,8 +361,10 @@ class StagingBeatStarsImportTest extends TestCase
         $this->assertSame(95, $one->bpm);
         $ready = $one->assets()->where('status', 'ready')->pluck('role')->sort()->values()->all();
         $this->assertSame(['artwork', 'download_mp3', 'master_wav', 'preview_tagged', 'stems_zip'], $ready);
+        // The import never confirms that the stems are the master's recording: no association exists and the track says so.
         $stems = $one->assets()->where('role', 'stems_zip')->where('status', 'ready')->sole();
-        $this->assertTrue(app(RecordingAssociation::class)->matches($stems, $one->assets()->where('role', 'preview_tagged')->sole()));
+        $this->assertFalse(app(RecordingAssociation::class)->matches($stems, $one->assets()->where('role', 'preview_tagged')->sole()));
+        $this->assertSame(0, StemsRecording::count());
         foreach ($one->assets()->whereNull('parent_asset_id')->get() as $source) {
             $this->assertSame('processed', $source->status);
             $this->assertSame($operator->id, $source->technical_metadata['acquired_by']);
@@ -372,7 +388,7 @@ class StagingBeatStarsImportTest extends TestCase
         $audits = AuditEvent::where('id', '>', $auditStart)->get()->countBy('action')->all();
         ksort($audits);
         $this->assertSame(['catalog.track.created' => 3, 'media.processing.completed' => 4, 'media.processing.queued' => 4,
-            'media.stems.recording_associated' => 1, 'media.upload.quarantined' => 4, 'migration.catalog_batch.accepted' => 1,
+            'media.upload.quarantined' => 4, 'migration.catalog_batch.accepted' => 1,
             'migration.catalog_draft.mapped' => 3], $audits);
 
         $report = $this->report();
@@ -381,14 +397,16 @@ class StagingBeatStarsImportTest extends TestCase
         $this->assertSame(0, $report['summary']['counts']['published']);
         $this->assertSame(2, $report['summary']['counts']['master_ready']);
         $this->assertSame(1, $report['summary']['counts']['artwork_ready']);
-        $this->assertSame(1, $report['summary']['counts']['stems_associated']);
+        $this->assertSame([0, 1], [$report['summary']['counts']['stems_associated'], $report['summary']['counts']['stems_unconfirmed']]);
         $first = $this->entry($report, 'bs-import-0001');
         $this->assertSame(['ready', 'ready', 'ready'], [$first['media']['master_wav']['state'], $first['media']['artwork']['state'], $first['media']['stems_zip']['state']]);
-        $this->assertSame('associated', $first['stems_association']);
+        $this->assertSame('unconfirmed', $first['stems_association']);
+        $this->assertContains('stems_association_unconfirmed', $first['publication_blockers']);
+        $this->assertArrayHasKey('stems_association_unconfirmed', $report['summary']['publication_blockers']);
         $this->assertEquals(['listed_source_mp3' => 'ok', 'listed_source_mp3_used' => false, 'state' => 'generated_by_pipeline'], $first['preview']);
         $this->assertContains('The latest rights declaration must be verified.', $first['publication_blockers']);
         $this->assertContains('At least one active license offer is required.', $first['publication_blockers']);
-        $this->assertSame($first['publication_blockers'], app(PublicationReadiness::class)->blockers($one));
+        $this->assertSame($first['publication_blockers'], [...app(PublicationReadiness::class)->blockers($one), 'stems_association_unconfirmed']);
         $second = $this->entry($report, 'bs-import-0002');
         $this->assertSame(['artwork'], $second['media_missing']);
         $this->assertSame(['artwork_high_res' => 'missing', 'artwork' => 'missing'], $second['media']['artwork']['files']);

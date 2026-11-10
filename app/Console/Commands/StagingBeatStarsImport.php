@@ -94,7 +94,7 @@ final class StagingBeatStarsImport extends Command
             $files = BeatStarsMediaFiles::open($this->path('files-root'));
             $report = new BeatStarsReadinessReport;
             if (! $check) {
-                $report->admit($this->path('report'));
+                $report->admit($this->path('report'), [$this->path('source'), $this->path('files-root')]);
             }
             $release = $this->release();
         } catch (BeatStarsImportRefusal $refusal) {
@@ -149,7 +149,7 @@ final class StagingBeatStarsImport extends Command
             // Whatever happened, the report shows the truth as the database now holds it; a failure to write it never hides the stop.
             try {
                 $built = $report->build($source, $import->rows($source), $listings, $files, $outcomes, $report->previous($reportPath), $run);
-                $report->write($reportPath, $built);
+                $report->write($reportPath, $built, [$this->path('source'), $this->path('files-root')]);
             } catch (Throwable $error) {
                 Log::warning('BeatStars import readiness report was not written.', ['exception_class' => $error::class]);
                 $built = null;

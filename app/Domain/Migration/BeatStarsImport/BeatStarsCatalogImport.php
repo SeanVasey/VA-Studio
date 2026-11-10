@@ -137,7 +137,7 @@ final class BeatStarsCatalogImport
 
                 continue;
             }
-            $outcome = $media->attach($track, $listings[$row['source_id']] ?? [], $this->reference($source, $row), $operator);
+            $outcome = $media->attach($track, $listings[$row['source_id']] ?? [], $operator);
             $outcomes[$row['source_id']] = $outcome;
             $worked += $outcome['attempted'] ? 1 : 0;
             $progress?->__invoke((string) $row['track_id'], $outcome);
@@ -148,11 +148,6 @@ final class BeatStarsCatalogImport
     public function release(string $commit, string $tree): array
     {
         return ['commit' => $commit, 'tree' => $tree, 'schema_hash' => (new CatalogDatabaseEvidence)->schema()];
-    }
-
-    private function reference(array $source, array $row): string
-    {
-        return 'beatstars-export:'.substr($source['source_sha256'], 0, 16).':record:'.substr($row['record_sha256'], 0, 16);
     }
 
     private function reasons(array $reasons): string

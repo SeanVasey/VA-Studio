@@ -32,20 +32,21 @@ readiness report stay under `/srv/vasey-staging/private/import/beatstars-2026110
    evidence) stop the run before anything is applied. A record is imported **once**: on a re-run, mapped records are skipped.
    BeatStars visibility (`PUBLIC` and so on) is evidence only; every track is created as a draft.
 3. **Media**, per draft in export-id order, through `IngestMediaUpload`, the same `MediaProcessor` the media worker runs (ClamAV, the
-   approved seller tag, derivatives) and `BindStemsToRecording`:
+   approved seller tag, derivatives):
 
    | Export column | Becomes | Rule |
    | --- | --- | --- |
    | `Master WAV Path` | `master_wav` source, then the tagged preview, the MP3 and the WAV master derivatives | `.wav` |
    | `High-Res Local Artwork Path`, else `Artwork Path` | `artwork` source and its derivative | `.png`, `.jpg`, `.jpeg`; the high-resolution file is tried first and the standard file is the fallback when it is missing, refused, rejected or fails |
-   | `Stems ZIP Path` | `stems_zip` source, then the ordinary stems association with the master and generated preview | `.zip`, WAV-only archive |
+   | `Stems ZIP Path` | `stems_zip` source and derivative; **the stems association is not created** | `.zip`, WAV-only archive |
    | `Preview MP3 Path` | **not ingested** | The pipeline generates the tagged preview from the master. The listed BeatStars MP3 is only checked for presence and reported; an untagged preview must not become a public file. |
 
-   The stems association records the export row itself as its verification reference
-   (`beatstars-export:<snapshot hash>:record:<record hash>`): the export lists one master and one stems file under one track id, and
-   that is the claim recorded, visible in the audit log (`media.stems.recording_associated`). Sean confirms it when he reviews the
-   track.
-4. **Report.** A per-track readiness report goes to a private file (`--report`), and a count-only summary to stdout.
+   **The import never confirms the stems association.** Associating stems with the master and preview is a staff verification that
+   they are the same recording, and it satisfies publication readiness, so Sean makes it in the admin (the ordinary stems
+   association action) before publishing. The export listing one master and one stems file under one track id is evidence for him,
+   not a confirmation. Every imported track with stems shows `stems_association: unconfirmed` and the blocker
+   `stems_association_unconfirmed` in the report until he does.
+4. **Report.** A per-track readiness report goes to a private file (`--report`), and a count-only summary to stdout. The report path must be a `.json` name in a private directory outside the snapshot directory and the media root, and an existing file there is replaced only if it is an earlier report of this import.
 
 ### How files are found
 
@@ -60,9 +61,9 @@ track and per role and without stopping the run, as:
 | `refused:path_not_absolute`, `path_traversal` (`.`, `..`, empty components), `path_invalid` (control characters, backslash, padding) | The cell is not a clean absolute path. |
 | `refused:wrong_extension` | The extension is not one the role allows. |
 | `refused:symlink` | Any component, including the file, is a symlink. |
-| `refused:not_regular_file`, `empty_file`, `unreadable`, `outside_root` | Not a regular, non-empty, readable file inside the root. |
+| `refused:not_regular_file`, `empty_file`, `unreadable`, `outside_root`, `hardlink` (more than one link), `too_large` (over the intake cap: 200 MiB WAV and ZIP, 20 MiB artwork) | Not a single-link, regular, non-empty, readable, in-cap file inside the root. |
 | `rejected` | The ordinary intake refused the file (content type, size limit: 200 MiB for WAV and ZIP, 20 MiB for artwork). |
-| `failed:<code>` | Processing failed (for example `malware_detected`, `tag_not_configured`, a stems manifest problem). |
+| `failed:<code>` | Processing failed (for example `malware_detected`, `tag_not_configured`, a stems manifest problem, `queue_refused`). |
 
 The media root must be a canonical absolute directory (no symlink), owned by the user running the command, and not writable by group
 or others. A file that changes while it is taken in is reported as `failed:source_changed_during_read`.
@@ -178,7 +179,7 @@ exists. Add them through a new snapshot before any media is attached, or create 
 
 `<IMPORT>/reports/readiness.json` (mode `0600`, rewritten atomically on every run, including after a stop) holds, per track: the draft
 id, slug and title; each of master, artwork and stems as `ready`, `quarantined` or `absent` with what the export listed
-(`ok`, `missing`, `not_listed`, `refused:<code>`); the stems association; the last attempt's outcomes; `media_missing`; and
+(`ok`, `missing`, `not_listed`, `refused:<code>`); the stems association (`associated` or `unconfirmed`); the last attempt's outcomes; `media_missing`; and
 `publication_blockers` straight from `PublicationReadiness`. It holds no file path. Stdout carries a count summary and the blocker
 histogram only: no path, title, identifier or personal value.
 
@@ -190,7 +191,7 @@ Set `VASEY_STAGING_BEATSTARS_IMPORT_ENABLED` back to `false` and reload configur
   Reference` stays in the snapshot as an operator reference only, not clearance.
 - **Offers and prices.** None are created and the export prices are not applied. Licenses, offers and prices are Sean's, in the admin.
 - **Publication.** Sean publishes through the ordinary reviewed manifest flow once the blockers clear.
-- **Stems association.** Sean confirms the recorded `beatstars-export:...` reference matches the real recording.
+- **Stems association.** Sean confirms, in the admin, that each stems ZIP is the master's recording. The import leaves it unconfirmed.
 - **Missing and rejected files.** The report lists each; copy the file, or upload through the admin, and re-run.
 
 ## Verification

@@ -4,7 +4,6 @@ namespace App\Domain\Migration\BeatStarsImport;
 
 use App\Application\Media\IngestMediaUpload;
 use App\Domain\Catalog\Models\Track;
-use App\Domain\Media\BindStemsToRecording;
 use App\Domain\Media\MediaFailure;
 use App\Domain\Media\MediaProcessor;
 use App\Domain\Media\Models\MediaAsset;
@@ -20,15 +19,15 @@ use Illuminate\Validation\ValidationException;
 /**
  * Brings one draft track's listed files in through the ordinary media services: WAV master, artwork (high-resolution
  * first, then the standard file) and the stems ZIP enter as quarantined sources through `IngestMediaUpload`, are processed
- * by the same `MediaProcessor` the media worker runs (ClamAV, the approved seller tag, derivatives), and the stems are
- * associated with the master and generated preview through `BindStemsToRecording`.
+ * by the same `MediaProcessor` the media worker runs (ClamAV, the approved seller tag, derivatives). The stems association is
+ * left for staff to confirm.
  *
  * The listed preview MP3 is never ingested: the pipeline generates the tagged preview from the master, and an untagged
  * BeatStars preview must not become a public file. Nothing here creates a rights declaration, offer, license or
  * publication, and a missing or refused file is an outcome, never a substitute.
  *
  * Every step first looks at what an earlier run left: a ready derivative is kept, a quarantined source with the file's
- * exact SHA-256 is processed again instead of uploaded again, and an association already in place is kept.
+ * exact SHA-256 is processed again instead of uploaded again.
  */
 final class BeatStarsTrackMedia
 {
@@ -41,7 +40,7 @@ final class BeatStarsTrackMedia
      * @param  array<string, string>  $listing  role => the export cell
      * @return array{attempted: bool, roles: array<string, array<string, mixed>>, stems_association: string}
      */
-    public function attach(Track $track, array $listing, string $reference, User $operator): array
+    public function attach(Track $track, array $listing, User $operator): array
     {
         $roles = [];
         $attempted = false;
@@ -56,7 +55,7 @@ final class BeatStarsTrackMedia
         }
         $roles['preview'] = $this->preview($track, $listing);
 
-        return ['attempted' => $attempted, 'roles' => $roles, 'stems_association' => $this->associate($track, $reference, $operator, $roles)];
+        return ['attempted' => $attempted, 'roles' => $roles, 'stems_association' => $this->association($track, $roles)];
     }
 
     /** What the pipeline and the files say about the preview, for the report. */
@@ -127,7 +126,12 @@ final class BeatStarsTrackMedia
                 return ['outcome' => 'failed', 'code' => 'source_changed_during_read'];
             }
         }
-        $code = $this->process(app(QueueMediaProcessing::class)->handle($source, $operator));
+        try {
+            $run = app(QueueMediaProcessing::class)->handle($source, $operator);
+        } catch (ValidationException) {
+            return ['outcome' => 'failed', 'code' => 'queue_refused'];
+        }
+        $code = $this->process($run);
 
         return $code === null ? ['outcome' => 'attached'] : ['outcome' => 'failed', 'code' => $code];
     }
@@ -157,36 +161,22 @@ final class BeatStarsTrackMedia
     }
 
     /**
-     * Associates the current stems revision with the master and preview of the same processing run, through the same
-     * service and evidence as the admin action. The reference is the export row's own hashes: the export lists one master and
-     * one stems file under one track identifier, which is the claim being recorded, and it is reviewable in the audit log.
+     * Whether the stems are associated with the master and preview. The import never creates that association: it is a staff
+     * verification that the stems are the same recording as the master, and it satisfies publication readiness, so Sean makes it
+     * in the admin. The export row listing both files is evidence for him, not a confirmation.
      */
-    private function associate(Track $track, string $reference, User $operator, array $roles): string
+    private function association(Track $track, array $roles): string
     {
         $stems = $this->ready($track, 'stems_zip');
-        $preview = $this->ready($track, 'preview_tagged');
         if ($stems === null) {
             return ($roles['stems_zip']['outcome'] ?? '') === 'not_listed' ? 'not_applicable' : 'waiting_for_stems';
         }
+        $preview = $this->ready($track, 'preview_tagged');
         if ($preview === null) {
             return 'waiting_for_master';
         }
-        if (app(RecordingAssociation::class)->matches($stems, $preview)) {
-            return 'already_associated';
-        }
-        $master = $track->assets()->where('role', 'master_wav')->where('status', 'ready')
-            ->where('processing_run_id', $preview->processing_run_id)->latest('id')->first();
-        if ($master === null) {
-            return 'failed:master_not_found';
-        }
-        try {
-            app(BindStemsToRecording::class)->handle($stems, ['master_asset_id' => $master->id, 'preview_asset_id' => $preview->id,
-                'verification_reference' => $reference, 'same_recording_confirmed' => true], $operator);
-        } catch (ValidationException) {
-            return 'failed:association_refused';
-        }
 
-        return 'associated';
+        return app(RecordingAssociation::class)->matches($stems, $preview) ? 'associated' : 'unconfirmed';
     }
 
     private function ready(Track $track, string $output): ?MediaAsset

@@ -19,6 +19,9 @@ final class BeatStarsMediaFiles
         'artwork_high_res' => ['png', 'jpg', 'jpeg'],
     ];
 
+    /** Intake caps (IngestMediaUpload): WAV and ZIP sources 200 MiB, artwork 20 MiB. */
+    private const MAX_BYTES = ['master_wav' => 209715200, 'stems_zip' => 209715200, 'artwork' => 20971520, 'artwork_high_res' => 20971520, 'preview_mp3' => 209715200];
+
     private function __construct(private readonly string $root) {}
 
     /** The root must be a canonical absolute directory owned by the running user and writable by nobody else. */
@@ -86,6 +89,12 @@ final class BeatStarsMediaFiles
         }
         if ($stat['size'] < 1) {
             return ['state' => 'refused', 'code' => 'empty_file'];
+        }
+        if ($stat['nlink'] !== 1) {
+            return ['state' => 'refused', 'code' => 'hardlink'];
+        }
+        if ($stat['size'] > self::MAX_BYTES[$role]) {
+            return ['state' => 'refused', 'code' => 'too_large'];
         }
         if (! is_readable($cursor)) {
             return ['state' => 'refused', 'code' => 'unreadable'];
