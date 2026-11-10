@@ -172,4 +172,4 @@ it off through launch, and cutover verifies that it is still off.
 | --- | --- | --- | --- |
 | PCL-28 | The BeatStars Studio audit and the remaining exports (DD-66): until they exist, active obligations in deferred families (memberships, merchandise, services, kits) are unknown. | Sean | The audit checklist has no unperformed item; each deferred family shows no active obligation, or a recorded way it is honored before retirement. |
 | PCL-29 | The four Dependabot alerts from archived evidence lockfiles (DD-63). | Sean | The alert list shows only alerts from the shipped lockfiles; `composer audit` and `npm audit --audit-level=high` pass on the candidate SHA. |
-| PCL-30 | The held tc-lib updates (DD-26) stay unmerged until after activation. | Development lead | `resources/contracts/*/profile-assets.json` pins match the installed packages on the candidate SHA. |
+| PCL-30 | The tc-lib updates (DD-26, superseded by SQ-14 on 2026-11-10) are taken before activation; after activation a renderer change needs a successor profile. | Development lead | `resources/contracts/*/profile-assets.json` pins match the installed packages on the candidate SHA. |

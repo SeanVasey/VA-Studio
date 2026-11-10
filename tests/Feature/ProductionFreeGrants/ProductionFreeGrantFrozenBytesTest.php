@@ -12,7 +12,7 @@ use Tests\TestCase;
 final class ProductionFreeGrantFrozenBytesTest extends TestCase
 {
     private const MAIN = [
-        'app/Domain/Contracts/ContractRenderProfileRegistry.php' => 'd6718f8f0d962679da3b6429c0edcfba76db223df216c03c99d0710f03e272e7',
+        'app/Domain/Contracts/ContractRenderProfileRegistry.php' => '51d879e904b3b8352c578c10a582b621d76f48c149189ede1ed0c2bcd970bbac', // 2026-11-10 (SQ-14): only the test-buyer-pdf-v2 manifest_sha256 constant, for the tc-lib re-pin
         'app/Domain/Contracts/ContractRenderProfile.php' => '8b51ac91c35e9809a6040d32519a166d4652a759e265b97c32d205c865e95d40',
         'app/Domain/Contracts/ContractRenderer.php' => '4ef17678b4c8fd48b255e3a72eb26a32fe7f0d8da7d6ffe29ef5f4de8d141c4a',
         'app/Domain/Contracts/RenderedContract.php' => 'b3fa57b8c8cc8e354597a5fc5f12b7942aa734e9d1bab9f0d2014358dd1d249f',
