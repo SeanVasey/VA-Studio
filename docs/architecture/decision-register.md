@@ -815,8 +815,10 @@ and the visual appearance more in line with other generated legal documents such
 - **Albums page.** A public albums page for Sean's own released music (for example *Cancel the Sky* and *Wide Awake*):
   release title, artwork, release date, tracklist and listening links, staff-entered, default-off until Sean enables
   it. Selling releases as digital downloads is a later decision; this page does not create a purchase path.
-- Noted for Sean's confirmation: the supplied kit license names the Fifth Judicial District of Polk County, Iowa as
-  venue. If that is the venue for all VASEY.AUDIO terms, it answers the SQ-07 venue-county placeholder.
+- **SQ-07 venue county answered:** Polk County, Iowa is Sean's county. Sean: the Fifth Judicial District is the court
+  there, which matters only for a legal dispute or the possibility of one. So legal pages fill the venue-county
+  placeholder with "Polk County, Iowa", and a court is named only in a governing-law or dispute clause (as the kit
+  license does), never elsewhere. Postal city and ZIP stay Sean's and out of the repository.
 
 ### Reconciliation with the delegated decisions (DD-xx)
 
