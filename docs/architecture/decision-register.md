@@ -384,6 +384,27 @@ payment to such a snapshot. Until then those snapshots, and the checkout intents
 them, stay with the orders row, and PRIVACY's 30-day row names only quotes and checkout reviews; that change widens the
 row when it lands.
 
+*Implemented and proven 2026-11-10 (BL-08), production checkout (V1) only.* The terminal state is an intent with a
+`production_checkout_observations` row of kind `session_expired` and no `production_checkout_payments` row. After it,
+every later provider read that reports the session paid is refused (`provider_uncertain`, one retained `uncertain`
+observation, no payment row, no grant): the guard runs when a read is recorded and again on every read of the intent.
+The read-only schedule counts such an order under the 30-day row from the first expired-session observation, with its
+lines, attempt, intent and session. A paid, held, refunded, disputed or in-flight order is never counted.
+
+Not applied, and why:
+- **Stripe-test chain (`orders`).** It has no terminal unpaid state. A late paid read after a recorded expiry is refused
+  and its receipt kept, but after a staff release a late confirmed payment is recorded against the order as a paid
+  exception by contract, and a release can follow any expiry. It stays with the orders row. Applying the rule there
+  needs a decision that a released order may refuse late money, or a purge that re-checks the provider first.
+- **Expired session with a canceled payment attempt (V1).** Terminal in code, but stored under the same observation kind
+  as a canceled attempt on an open session, which can still be paid. It stays with the orders row until the two are
+  stored distinguishably.
+- **Order that never reached the provider (V1)** and the **tax checkout (V2) chain**: outside this decision's wording
+  (no provider session, or no stored expiry observation). They stay with the orders row.
+
+PRIVACY's 30-day row is unchanged: the widened wording is proposed in `docs/customer-data-rights.md` for Sean. No purge
+exists.
+
 Still Sean's, not delegable:
 
 - dismissing the four Dependabot alerts, which come from frozen evidence lockfiles under

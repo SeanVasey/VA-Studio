@@ -109,16 +109,17 @@ final class RetentionReport
     /**
      * Rows whose clock has run out: every clock column set and at or before the cutoff, and nothing that holds them. A `via` row
      * follows its parent, joined under a fresh alias per level so a parent that itself follows a parent stays unambiguous.
+     * `when` limits either kind of clock to rows whose column holds one value; any other row is never past.
      */
     private function past(Builder $query, array $clock, CarbonImmutable $cutoff, string $alias = 'r'): void
     {
+        if (isset($clock['when'])) {
+            $query->where($alias.'.'.$clock['when'][0], '=', $clock['when'][1]);
+        }
         if (isset($clock['via'])) {
             [$foreign, $parent] = $clock['via'];
             $key = $clock['via'][2] ?? 'id';
             $parentClock = RetentionSchedule::byTable()[$parent]['clock'];
-            if (isset($clock['when'])) {
-                $query->where($alias.'.'.$clock['when'][0], '=', $clock['when'][1]);
-            }
             $query->whereExists(function (Builder $sub) use ($parent, $foreign, $key, $parentClock, $cutoff, $alias): void {
                 $sub->selectRaw('1')->from($parent.' as '.$alias.'p')->whereColumn($alias.'p.'.$key, $alias.'.'.$foreign);
                 $this->past($sub, $parentClock, $cutoff, $alias.'p');
