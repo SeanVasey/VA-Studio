@@ -605,7 +605,7 @@ class ProductionTaxRefundDisputeTest extends TestCase
 
     public function test_a_test_chain_row_with_the_same_order_number_never_leaks_into_a_production_order(): void
     {
-        $f = $this->order();
+        $f = $this->order(prepare: true);
         $batchId = (int) $this->batchRow($f)->id;
         $originId = (int) DB::table('paid_tax_grant_origins')->value('id');
         // A disposable fixture removes the test chain's existence guards so rows for a test order numbered like this batch can be planted.
@@ -623,6 +623,8 @@ class ProductionTaxRefundDisputeTest extends TestCase
         $this->assertSame([null, null], $this->blocked($batchId, $originId, RefundDisputeSource::PRODUCTION_TAX));
         $this->assertSame(['blocked', null], $this->blocked($batchId, $originId, RefundDisputeSource::TEST));
         $this->assertSame([false], $this->heldLines($f));
+        // The buyer's real download frame ignores the planted hold too.
+        $this->assertGreaterThan(0, $this->redeem($f, $this->authorize($f)));
         $this->financial->refunds = [['re_ONE', 500, 'succeeded']];
         $this->assertSame('partial', $this->observe($f)['refundState']);
         $this->assertSame(1, $this->sequence($f));
