@@ -32,7 +32,8 @@ use Illuminate\Validation\ValidationException;
  * - staff recorded rights clearance for exactly that revision (a provenance note alone approves nothing);
  * - it carries a currently published, effective, reviewed license version of the sound-kit kind (never a beat license);
  * - it has a positive integer USD price;
- * - staff approved the offer for exactly those terms (revision, license, price): changing any of them voids the approval.
+ * - staff approved the offer for exactly those terms (revision, license, price): changing any of them voids the approval;
+ * - it has an approved cover and an approved, processed demo audio ({@see SoundKitProductMedia}).
  */
 final class SoundKitProducts
 {
@@ -269,7 +270,8 @@ final class SoundKitProducts
             $problems['offer'] = 'Approve the offer for the current archive revision, license and price.';
         }
 
-        return $problems;
+        // Cover art and demo audio: staff-approved public assets, separate from the private archive (SoundKitProductMedia).
+        return $problems + app(SoundKitProductMedia::class)->problems($product, $verifyArchive);
     }
 
     private function lockProduct(SoundKitProduct $product, int $expectedRevision): SoundKitProduct

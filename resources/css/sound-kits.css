@@ -18,3 +18,10 @@
 .sound-kit-facts dt { font-family: var(--va-font-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--va-text-muted); }
 .sound-kit-facts dd { margin: 0; font-variant-numeric: tabular-nums; }
 .sound-kit-notice { max-width: 68ch; padding: 20px 24px; border: 1px solid var(--va-rule); background: var(--va-canvas); font-size: 15px; }
+
+.sound-kit-art { aspect-ratio: 1 / 1; max-width: 480px; background: var(--va-surface); border: 1px solid var(--va-rule); border-radius: var(--va-radius-panel); overflow: hidden; }
+.sound-kit-card .sound-kit-art { max-width: none; }
+.sound-kit-art .album-cover { display: block; width: 100%; height: 100%; object-fit: cover; }
+.sound-kit-demo { padding: 28px; background: var(--va-canvas); border: 1px solid var(--va-rule); display: grid; gap: 14px; max-width: 68ch; }
+.sound-kit-demo h2 { font-family: var(--va-font-section); font-size: 32px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
+.sound-kit-demo-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
