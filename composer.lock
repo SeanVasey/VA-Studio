@@ -8400,16 +8400,16 @@
         },
         {
             "name": "tecnickcom/tc-lib-file",
-            "version": "3.9.4",
+            "version": "3.9.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/tc-lib-file.git",
-                "reference": "02089faaaed42cb5137d23ba2236e6809124999e"
+                "reference": "a26615b711c7fa76672a0391bc9af863e5558ee5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/tc-lib-file/zipball/02089faaaed42cb5137d23ba2236e6809124999e",
-                "reference": "02089faaaed42cb5137d23ba2236e6809124999e",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-file/zipball/a26615b711c7fa76672a0391bc9af863e5558ee5",
+                "reference": "a26615b711c7fa76672a0391bc9af863e5558ee5",
                 "shasum": ""
             },
             "require": {
@@ -8418,9 +8418,9 @@
                 "php": "^8.2"
             },
             "require-dev": {
-                "carthage-software/mago": "1.50.0",
-                "pdepend/pdepend": "^2.16",
-                "phpunit/phpunit": "^11.5 || ^12.5 || ^13.3"
+                "carthage-software/mago": "1.59.0",
+                "pdepend/pdepend": "^3.0",
+                "phpunit/phpunit": "^11.5 || ^12.5 || ^13.4"
             },
             "suggest": {
                 "ext-intl": "Enables Unicode NFC normalization when matching paths against the allowlist"
@@ -8464,7 +8464,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-09-26T10:57:54+00:00"
+            "time": "2026-11-02T14:54:47+00:00"
         },
         {
             "name": "tecnickcom/tc-lib-pdf",
@@ -8685,16 +8685,16 @@
         },
         {
             "name": "tecnickcom/tc-lib-pdf-font",
-            "version": "4.6.2",
+            "version": "4.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/tc-lib-pdf-font.git",
-                "reference": "668d73e853c6027afd9cdaae8ea042957ba11e08"
+                "reference": "30804d3d493ddcf13dbb0a78c76c95b788c8948a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf-font/zipball/668d73e853c6027afd9cdaae8ea042957ba11e08",
-                "reference": "668d73e853c6027afd9cdaae8ea042957ba11e08",
+                "url": "https://api.github.com/repos/tecnickcom/tc-lib-pdf-font/zipball/30804d3d493ddcf13dbb0a78c76c95b788c8948a",
+                "reference": "30804d3d493ddcf13dbb0a78c76c95b788c8948a",
                 "shasum": ""
             },
             "require": {
@@ -8708,7 +8708,7 @@
                 "tecnickcom/tc-lib-unicode-data": "^3.1"
             },
             "require-dev": {
-                "carthage-software/mago": "1.57.0",
+                "carthage-software/mago": "1.59.0",
                 "pdepend/pdepend": "^3.0",
                 "phpunit/phpunit": "^11.5 || ^12.5 || ^13.4"
             },
@@ -8754,7 +8754,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-17T10:53:55+00:00"
+            "time": "2026-11-02T16:16:50+00:00"
         },
         {
             "name": "tecnickcom/tc-lib-pdf-graph",
@@ -11823,5 +11823,5 @@
     "platform-overrides": {
         "php": "8.4.1"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
