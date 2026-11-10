@@ -21,9 +21,11 @@ interface EditorialProps {
   contactInquiryPrivacyNotice?: string | null;
   contactInquiryNoticeToken?: string | null;
   supportAttachmentsEnabled?: boolean;
+  /** Server-validated service named by the service page's request button; prefills the contact form only. */
+  contactServiceRequest?: { title: string; subject: string; message: string } | null;
 }
 
-export default function Editorial({ siteContent, editorial, sitePreview = false, sitePreviewBase = null, metadata, contactInquiryEnabled = false, contactInquiryPrivacyNotice = null, contactInquiryNoticeToken = null, supportAttachmentsEnabled = false }: EditorialProps) {
+export default function Editorial({ siteContent, editorial, sitePreview = false, sitePreviewBase = null, metadata, contactInquiryEnabled = false, contactInquiryPrivacyNotice = null, contactInquiryNoticeToken = null, supportAttachmentsEnabled = false, contactServiceRequest = null }: EditorialProps) {
   const href = (path: string) => siteContentHref(path, sitePreviewBase);
   function navigate(event: MouseEvent<HTMLAnchorElement>) {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
@@ -52,7 +54,7 @@ export default function Editorial({ siteContent, editorial, sitePreview = false,
       {editorial.kind === 'collection' && <div className="editorial-list">{editorial.entries.map((entry, index) => <article className="editorial-entry" key={entry.slug}>
         <span className="editorial-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><div><h2><a href={href(entry.path)} onClick={navigate}>{entry.title}</a></h2><p>{entry.description}</p><a className="text-link" href={href(entry.path)} onClick={navigate} aria-label={`${editorial.section === 'blog' ? 'Read' : 'View'} ${entry.title}`}>{editorial.section === 'blog' ? 'Read article' : 'View video'} <Icon name="arrow" size={16} /></a></div>
       </article>)}</div>}
-      {!sitePreview && editorial.section === 'contact' && contactInquiryEnabled && contactInquiryPrivacyNotice && contactInquiryNoticeToken && <ContactInquiryForm privacyNotice={contactInquiryPrivacyNotice} noticeToken={contactInquiryNoticeToken} attachmentsEnabled={supportAttachmentsEnabled} />}
+      {!sitePreview && editorial.section === 'contact' && contactInquiryEnabled && contactInquiryPrivacyNotice && contactInquiryNoticeToken && <ContactInquiryForm privacyNotice={contactInquiryPrivacyNotice} noticeToken={contactInquiryNoticeToken} attachmentsEnabled={supportAttachmentsEnabled} initialSubject={contactServiceRequest?.subject} initialMessage={contactServiceRequest?.message} serviceTitle={contactServiceRequest?.title} />}
       {!sitePreview && editorial.section === 'contact' && !(contactInquiryEnabled && contactInquiryPrivacyNotice && contactInquiryNoticeToken) && <InquiryConversationEntry attachmentsEnabled={supportAttachmentsEnabled} />}
       {editorial.email && <div className="editorial-contact"><p className="eyebrow">Email</p><p>{editorial.email}</p>{!sitePreview && editorial.contactHref ? <a className="button" href={editorial.contactHref}>Open email <Icon name="northeast" size={18} /></a> : <span className="fine-print">Email action disabled in private preview.</span>}</div>}
       {editorial.video && <EditorialVideo key={`${editorial.path}:${editorial.video.provider}:${editorial.video.videoId}:${sitePreview}`} video={editorial.video} title={editorial.title} privatePreview={sitePreview} />}

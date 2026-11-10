@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Inquiries\InquiryPolicy;
+use App\Domain\Services\Catalog\ServiceCatalog;
 use App\Domain\SiteBuilder\EditorialContent;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteImagePresentation;
@@ -26,10 +27,13 @@ final class EditorialController extends Controller
 
         $inquiry = $section === 'contact' ? app(InquiryPolicy::class)->publicSetup($content) : null;
 
+        // A service page's request button opens the contact form with that service named; unknown or withdrawn names add nothing.
+        $service = $section === 'contact' && $slug === null ? app(ServiceCatalog::class)->inquiryPrefill(request()->query('service')) : null;
+
         return Inertia::render('Editorial', [
             'siteContent' => app(EditorialContent::class)->chrome($content), 'editorial' => $page,
             'contactInquiryEnabled' => $inquiry !== null, 'contactInquiryPrivacyNotice' => $inquiry['privacyNotice'] ?? null,
-            'contactInquiryNoticeToken' => $inquiry['noticeToken'] ?? null,
+            'contactInquiryNoticeToken' => $inquiry['noticeToken'] ?? null, 'contactServiceRequest' => $service,
             'supportAttachmentsEnabled' => $section === 'contact' && SupportAttachmentUi::enabled(),
             'sitePreview' => false, 'sitePreviewBase' => null, 'metadata' => $metadata,
             'commerceEnabled' => false, 'testOrderPreparationEnabled' => false, 'testCheckoutEnabled' => false,

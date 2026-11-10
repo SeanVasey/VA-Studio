@@ -39,6 +39,7 @@ createInertiaApp({
     // Default-off private pages load as separate lazy chunks: their code is fetched only when one of them is opened.
     if (name === 'PaidTaxLicenses') return import('./Pages/PaidTaxLicenses').then(page => page.default);
     if (name === 'PaidGrants') return import('./Pages/PaidGrants').then(page => page.default);
+    if (name === 'ServiceCatalog') return import('./Pages/ServiceCatalog').then(page => page.default);
     if (name === 'ProductionCustomerFeatures') return import('./Pages/ProductionCustomerFeatures').then(page => page.default);
     throw new Error(`Unknown page: ${name}`);
   },
