@@ -122,6 +122,8 @@ final class RefundDisputeActions
                 $dispute = $case->disputeState();
                 RefundDisputeException::require($line['exclusive'] && $dispute !== 'open'
                     && ($case->lineFullyRefunded($line['id']) || $dispute === 'lost') && $case->grantHeld($line['grant_id']), 'not_qualified');
+                // Rights scopes exist only on the test chain; a production tax line is never exclusive, so it never reaches here.
+                RefundDisputeException::require($case->source() === RefundDisputeSource::TEST, 'not_qualified');
                 $retained = LicenseGrant::where('rights_scope_id', $line['rights_scope_id'])->where('id', '<>', $line['grant_id'])
                     ->orderBy('id')->lockForUpdate()->pluck('public_id')->all();
                 $effect = app(RefundDisputeEffects::class)->effect($case, $sequence, 'exclusive_qualified:'.$line['id'], 'exclusive_reopening_qualified',
@@ -145,7 +147,7 @@ final class RefundDisputeActions
         try {
             return DB::transaction(function () use ($orderPublicId, $actor, $requestId, $expectedSequence, $requestHash, $apply): array {
                 [$current, $order, $finalization, $original, $work, $policy] = app(RefundDisputeAuthority::class)->lock($orderPublicId, $actor);
-                $existing = RefundDisputeEffect::where('order_id', $order->id)->where('request_id', $requestId)->orderBy('id')->lockForUpdate()->get();
+                $existing = RefundDisputeEffect::forOrder($order)->where('request_id', $requestId)->orderBy('id')->lockForUpdate()->get();
                 if ($existing->isNotEmpty()) {
                     foreach ($existing as $effect) {
                         RefundDisputeException::require($effect->actor_id === $current->id && hash_equals($effect->request_hash, $requestHash), 'conflict');
@@ -156,7 +158,8 @@ final class RefundDisputeActions
                 RefundDisputeException::require($work->sequence === $expectedSequence, 'stale');
                 $now = CarbonImmutable::now();
                 RefundDisputeException::require(! $work->lease_expires_at?->greaterThan($now), 'busy');
-                $case = RefundDisputeCase::load($order, $finalization, $original);
+                $case = $finalization === null ? RefundDisputeCase::loadProductionTax($order, $original)
+                    : RefundDisputeCase::load($order, $finalization, $original);
                 RefundDisputeException::require($case->latest !== null && $case->latest->outcome === 'observed'
                     && $case->latestObserved?->id === $case->latest->id, 'not_observed');
                 $sequence = $work->sequence + 1;

@@ -8,6 +8,8 @@ use LogicException;
 /** Append-only, reviewable record of every automatic effect and staff decision. */
 final class RefundDisputeEffect extends Model
 {
+    use ScopesToOrder;
+
     public $timestamps = false;
 
     protected $table = 'refund_dispute_effects';

@@ -304,6 +304,7 @@
     "tests/Support/promotion-race-worker.php",
     "tests/Support/public-embed-route-cache-worker.php",
     "tests/Support/quote-race-worker.php",
+    "tests/Support/refund-dispute-production-race-worker.php",
     "tests/Support/refund-dispute-race-worker.php",
     "tests/Support/refund-resolution-worker.php",
     "tests/Support/resumable-media-upload-worker.php",

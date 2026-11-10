@@ -8,6 +8,8 @@ use LogicException;
 /** Per-order coordination: the ledger sequence and at most one provider-read claim. Not evidence. */
 final class RefundDisputeWork extends Model
 {
+    use ScopesToOrder;
+
     public $timestamps = false;
 
     protected $table = 'refund_dispute_work';
@@ -23,7 +25,7 @@ final class RefundDisputeWork extends Model
     protected static function booted(): void
     {
         self::updating(function (self $work): void {
-            if ($work->isDirty(['id', 'order_id', 'created_at']) || $work->sequence < $work->getOriginal('sequence')) {
+            if ($work->isDirty(['id', 'order_id', 'order_source', 'created_at']) || $work->sequence < $work->getOriginal('sequence')) {
                 throw new LogicException('Refund and dispute coordination is monotonic.');
             }
         });

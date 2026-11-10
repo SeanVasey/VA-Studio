@@ -26,6 +26,9 @@ class RefundDisputeMigrationTest extends TestCase
 
     private const MIGRATION = 'migrations/2026_10_24_264100_refund_dispute_lifecycle.php';
 
+    /** BL-42: adds `order_source` and replaces the insert guards; a disposable rebuild needs both. */
+    private const PRODUCTION_MIGRATION = 'migrations/2026_11_10_288200_refund_dispute_production_tax_chain.php';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -142,6 +145,7 @@ class RefundDisputeMigrationTest extends TestCase
             $this->assertFalse(Schema::hasTable($table));
         }
         $migration->up();
+        (require database_path(self::PRODUCTION_MIGRATION))->up();
         $f = $this->populated();
         $before = $this->rows();
         try {

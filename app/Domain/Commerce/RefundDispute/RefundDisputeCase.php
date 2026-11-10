@@ -13,13 +13,18 @@ use App\Domain\Commerce\RefundDispute\Models\RefundDisputeHold;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObject;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObservation;
 use App\Domain\Commerce\RefundDispute\Models\RefundLineAllocation;
+use App\Domain\Grants\PaidTax\Models\PaidTaxOrderOrigin;
 use App\Support\CanonicalJson;
 use Throwable;
 
 /**
- * The current refund/dispute case for one paid test order, read with current locking reads after the caller
- * holds the Order row. Line amounts come only from the verified original order payload; their sum must equal
+ * The current refund/dispute case for one paid order, read with current locking reads after the caller
+ * holds the order row. Line amounts come only from the verified original order payload; their sum must equal
  * the verified payment in the same currency, or the case is unavailable.
+ *
+ * Two chains share it: a paid Stripe-test order (`load`) and a finalized production tax batch (`loadProductionTax`). The
+ * production chain has no Order, finalization or VerifiedPayment row; its line and grant are one `paid_tax_grant_origins` row,
+ * and `order` is the `PaidTaxOrderOrigin`. Both expose `id` and `public_id`, and `source()` says which ledger partition applies.
  */
 final class RefundDisputeCase
 {
@@ -31,9 +36,9 @@ final class RefundDisputeCase
      * @param  list<RefundDisputeHold>  $holds  active holds
      */
     private function __construct(
-        public readonly Order $order,
-        public readonly OrderFinalization $finalization,
-        public readonly VerifiedPayment $payment,
+        public readonly Order|PaidTaxOrderOrigin $order,
+        public readonly ?OrderFinalization $finalization,
+        public readonly ?VerifiedPayment $payment,
         public readonly int $paidMinor,
         public readonly string $currency,
         public readonly array $lines,
@@ -75,27 +80,66 @@ final class RefundDisputeCase
         RefundDisputeException::require($lines !== [] && count($lines) === count($original['lines'] ?? []) && $sum === $payment->amount_minor
             && $grants->count() === count($lines), 'unavailable');
 
+        return self::assemble($order, $finalization, $payment, $payment->amount_minor, $lines, $original, $lock);
+    }
+
+    /**
+     * The same case for a finalized production tax batch, from `ProductionTaxOrders::verify`'s proven facts. Lines are keyed by their
+     * `paid_tax_grant_origins` id, which is both the line and the grant.
+     */
+    public static function loadProductionTax(PaidTaxOrderOrigin $batch, array $original, bool $forUpdate = true): self
+    {
+        $lock = static fn ($query) => $forUpdate ? $query->lockForUpdate() : $query;
+        RefundDisputeException::require($original['source'] === RefundDisputeSource::PRODUCTION_TAX && $original['batch_id'] === $batch->id
+            && $original['currency'] === 'USD' && $original['paid_minor'] > 0 && $original['lines'] !== [], 'unavailable');
+        $lines = [];
+        $sum = 0;
+        foreach ($original['lines'] as $position => $line) {
+            RefundDisputeException::require(is_int($line['total_minor']) && $line['total_minor'] >= 0 && $line['exclusive'] === false, 'unavailable');
+            $sum += $line['total_minor'];
+            $lines[$line['id']] = ['id' => $line['id'], 'position' => $position, 'total_minor' => $line['total_minor'], 'grant_id' => $line['id'],
+                'grant_public_id' => $line['public_id'], 'rights_scope_id' => 0, 'exclusive' => false];
+        }
+        RefundDisputeException::require($sum === $original['paid_minor'], 'unavailable');
+
+        return self::assemble($batch, null, null, $original['paid_minor'], $lines, $original, $lock);
+    }
+
+    private static function assemble(Order|PaidTaxOrderOrigin $order, ?OrderFinalization $finalization, ?VerifiedPayment $payment,
+        int $paidMinor, array $lines, array $original, \Closure $lock): self
+    {
         $objects = [];
-        foreach ($lock(RefundDisputeObject::where('order_id', $order->id)->orderBy('id'))->get() as $object) {
+        foreach ($lock(RefundDisputeObject::forOrder($order)->orderBy('id'))->get() as $object) {
             $objects[$object->kind.':'.$object->object_hash] = $object;
         }
-        $latest = $lock(RefundDisputeObservation::where('order_id', $order->id)->orderByDesc('sequence'))->first();
-        $observed = $lock(RefundDisputeObservation::where('order_id', $order->id)->where('outcome', 'observed')
+        $latest = $lock(RefundDisputeObservation::forOrder($order)->orderByDesc('sequence'))->first();
+        $observed = $lock(RefundDisputeObservation::forOrder($order)->where('outcome', 'observed')
             ->orderByDesc('sequence'))->first();
         $snapshot = $observed === null ? [] : self::snapshot($observed, $order, $objects);
         $allocations = [];
-        foreach ($lock(RefundLineAllocation::where('order_id', $order->id)->orderBy('id'))->get() as $allocation) {
+        foreach ($lock(RefundLineAllocation::forOrder($order)->orderBy('id'))->get() as $allocation) {
             RefundDisputeException::require(isset($lines[$allocation->order_line_id]) && $allocation->currency === 'USD', 'unavailable');
             $allocations[$allocation->refund_dispute_object_id][$allocation->order_line_id] = $allocation->amount_minor;
         }
-        $holds = $lock(RefundDisputeHold::where('order_id', $order->id)->whereNull('released_at')->orderBy('id'))->get()->all();
+        $holds = $lock(RefundDisputeHold::forOrder($order)->whereNull('released_at')->orderBy('id'))->get()->all();
 
-        return new self($order, $finalization, $payment, $payment->amount_minor, 'USD', $lines, $objects, $snapshot,
+        return new self($order, $finalization, $payment, $paidMinor, 'USD', $lines, $objects, $snapshot,
             $latest, $observed, $allocations, $holds, $original);
     }
 
+    public function source(): string
+    {
+        return RefundDisputeSource::of($this->order);
+    }
+
+    /** The sealed observation's purpose names its chain, so one chain's evidence can never be read as the other's. */
+    public static function observationPurpose(object $order): string
+    {
+        return RefundDisputeSource::of($order) === RefundDisputeSource::TEST ? 'test_refund_dispute_observation' : 'production_tax_refund_dispute_observation';
+    }
+
     /** Decrypts and cross-checks the latest accepted snapshot against the deduplicated object registry. */
-    public static function snapshot(RefundDisputeObservation $observation, Order $order, array $objects): array
+    public static function snapshot(RefundDisputeObservation $observation, Order|PaidTaxOrderOrigin $order, array $objects): array
     {
         try {
             $payload = app(CheckoutEvidence::class)->decrypt($observation->evidence_ciphertext, $observation->evidence_hash,
@@ -103,7 +147,7 @@ final class RefundDisputeCase
         } catch (Throwable) {
             throw new RefundDisputeException('unavailable');
         }
-        RefundDisputeException::require(($payload['schema_version'] ?? null) === 1 && ($payload['purpose'] ?? null) === 'test_refund_dispute_observation'
+        RefundDisputeException::require(($payload['schema_version'] ?? null) === 1 && ($payload['purpose'] ?? null) === self::observationPurpose($order)
             && ($payload['order_id'] ?? null) === $order->public_id && ($payload['observation_id'] ?? null) === $observation->public_id
             && ($payload['request_id'] ?? null) === $observation->request_id && ($payload['sequence'] ?? null) === $observation->sequence
             && ($payload['outcome'] ?? null) === $observation->outcome && ($payload['policy_hash'] ?? null) === $observation->policy_hash
@@ -124,7 +168,9 @@ final class RefundDisputeCase
     /** A fresh current read of the same case, for use after this transaction wrote allocations or holds. */
     public function reload(): self
     {
-        return self::load($this->order, $this->finalization, $this->original);
+        return $this->order instanceof PaidTaxOrderOrigin
+            ? self::loadProductionTax($this->order, $this->original)
+            : self::load($this->order, $this->finalization, $this->original);
     }
 
     public function statuses(): array

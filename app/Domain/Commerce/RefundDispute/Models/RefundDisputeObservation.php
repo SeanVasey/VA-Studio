@@ -8,6 +8,8 @@ use LogicException;
 /** Append-only staff-requested provider observation. Encrypted evidence retains the reconciliation facts. */
 final class RefundDisputeObservation extends Model
 {
+    use ScopesToOrder;
+
     public $timestamps = false;
 
     protected $table = 'refund_dispute_observations';
