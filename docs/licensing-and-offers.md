@@ -99,3 +99,27 @@ New drafts use [schema v5](license-usage-v5.md). It keeps every v4 declaration a
 slots, so audio streams, monetized and non-monetized video streams, free downloads and the two kinds of performance are
 separate limits. **Define tier usage limits** maps a v4 predecessor and copies only the declarations whose meaning is unchanged.
 Versions on schemas 1 to 4 keep their validation, statements, previews and review evidence byte for byte.
+
+## Summary reconciliation
+
+`tests/Feature/PublicLicenseSummaryReconciliationTest.php` (FP-005) checks that what a buyer reads on a license card is the
+typed term of the published version. It does not reuse the generator: each public line is read back into a typed value with
+the wording pinned in the test, and the result must equal `structured_terms` field for field, with exactly one line per typed
+field. It covers schemas 2 to 5, both sides of every mode, the `licenseTiers` cards of `/api/catalog` and the disclosure at
+`/tracks/{slug}/offers/{revision}/license`, where every line must also stand once in the license text shown with it.
+Fixtures are synthetic and nonbinding.
+
+Not covered, and why:
+
+- **The License comparison page (`/legal/licenses`).** It is staff-pasted plain text in a site release, with no link to a
+  license version. Nothing compares its wording with any published license, so agreement depends on the person who pastes it.
+- **Schema 1 licenses.** Their summaries are free prose a reviewer attested (`summary_consistency_confirmed`). The test only
+  proves they are shown unchanged.
+- **Two labels for one file role on the same card.** The card's file line uses the storefront labels
+  (`resources/js/lib/catalog.ts`: "Untagged MP3", "WAV master", "Track stems"); the generated line below it uses the license
+  vocabulary ("Deliverables: MP3, WAV master, Stems ZIP."). The roles are the same; the words differ, and "Untagged" is stated
+  by the storefront, not by a typed term. Unresolved: the generated wording is frozen into published license sources.
+- **`docs/legal/LICENSE-TIERS.md`.** The unapproved tier draft maps its limits to the schema 2 to 4 usage slots
+  (`monetized_streams`, `live_performances`). New drafts use schema 5, which has no such slots and has slots the draft gives
+  no value for (`audio_streams`, `free_downloads`, the two performance kinds). The draft's comparison copy therefore cannot
+  be generated from a schema 5 license as written.
