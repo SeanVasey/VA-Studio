@@ -75,6 +75,7 @@
     "tests/Feature/CustomerListeningFreshnessTest.php",
     "tests/Feature/FreeGrantSchemaRecoveryTest.php",
     "tests/Feature/LicenseTemplateAuthoringTest.php",
+    "tests/Feature/MediaLifecycle/MediaReferenceRegistryTest.php",
     "tests/Feature/Migration/ExclusivityAuthorityTest.php",
     "tests/Feature/Migration/LegacyHistoryArchiveTest.php",
     "tests/Feature/Migration/LegacyHistoryReviewConditionsTest.php",
