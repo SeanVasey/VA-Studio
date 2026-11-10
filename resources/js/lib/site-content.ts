@@ -1,23 +1,43 @@
 export interface SiteContent {
-  schema_version: 1 | 2 | 3 | 4 | 5;
+  schema_version: 1 | 2 | 3 | 4 | 5 | 6;
   hero: { eyebrow: string; title: string; line_two: string; description: string };
   studio: { eyebrow: string; title: string; line_two: string; lead: string; paragraphs: string[] };
   footer: { description: string };
   navigation: { label: string; href: '/' | '/#catalog' | '/#licenses' | '/#studio' | '/about' | '/contact' | '/blog' | '/videos' | LegalPath }[];
   seo: { title: string; description: string };
-  /** Published legal pages (schema 5), listed in the footer by title. */
+  /** Published legal pages (schema 5 and 6), listed in the footer by title. */
   legal_links?: { title: string; path: LegalPath }[];
 }
 
 export type LegalPath = '/legal/privacy' | '/legal/terms' | '/legal/licenses';
 
 /** One published legal document. The approval reference stays with the staff record and is never sent to the browser. */
-export interface LegalDocument {
-  document: 'privacy' | 'terms' | 'licenses';
+export interface LegalTextDocument {
+  document: 'privacy' | 'terms';
+  generated?: false;
   version: string;
   effectiveDate: string;
   sections: { heading: string; paragraphs: string[] }[];
 }
+
+/** One published license version as the comparison lists it: the storefront's license tier, generated from typed terms. */
+export interface ComparedLicense {
+  id: string;
+  name: string;
+  version: number | string;
+  type: string;
+  features: string[];
+  requiredAssetRoles: string[];
+}
+
+/** The license comparison (schema 6, DD-31): generated from the published license versions, never typed into a release. */
+export interface GeneratedLicenseComparison {
+  document: 'licenses';
+  generated: true;
+  licenses: ComparedLicense[];
+}
+
+export type LegalDocument = LegalTextDocument | GeneratedLicenseComparison;
 
 /** One prepared size of a site image (D-25). */
 export interface SiteImageSource { url: string; width: number; height: number }

@@ -21,7 +21,7 @@ class SiteReleasePreviewController extends Controller
         $content = app(SiteContent::class)->preview($release->id, $request->user());
         $base = route('filament.admin.site-releases.preview', $release, false);
         if ($section !== null) {
-            $page = app(EditorialContent::class)->page($content, $section, $slug, false);
+            $page = app(EditorialContent::class)->page($content, $section, $slug, false, true);
             abort_if($page === null, 404);
             $metadata = app(StorefrontMetadata::class)->forEditorial($page, app(SiteImagePresentation::class)->share($content, true));
             $metadata['robots'] = 'noindex, nofollow';
