@@ -40,6 +40,11 @@ MEMBERSHIP_LITERALS = {
     "holds.production_memberships_http_mounted": "production-memberships.http_mounted",
     "holds.member_grants_enabled": "member-grants.enabled",
 }
+# DD-14: both production checkout chain mounts are code literals held false; refusal identifier => config key.
+CHECKOUT_MOUNT_LITERALS = {
+    "holds.production_checkout_mounted": "production_checkout.mounted",
+    "holds.production_tax_checkout_http_mounted": "production-tax-checkout.http_mounted",
+}
 
 
 def profile(**overrides):
@@ -277,6 +282,7 @@ class ProductionRuntimeValidator(unittest.TestCase):
         text = VALIDATOR.read_text()
         self.assertIn("'committed_read_receipts_enabled', 'operator_reconciliation_enabled'] as $flag", text)
         self.assertIn("$check('holds.production_checkout_mounted', config('production_checkout.mounted') === false);", text)
+        self.assertIn("$check('holds.production_tax_checkout_http_mounted', config('production-tax-checkout.http_mounted') === false);", text)
 
     def test_both_contract_identity_literals_are_held(self):
         # D-30: each checkout's contract identity capture is a code literal; lifting either is a reviewed change to this file.
@@ -649,6 +655,26 @@ class ProductionRuntimeValidator(unittest.TestCase):
         shadow, run = self.shadow_project()
         self.assertEqual(run().returncode, 0)
         for identifier, key in MEMBERSHIP_LITERALS.items():
+            name, item = key.split(".")
+            path = shadow / "config" / f"{name}.php"
+            source = path.read_text()
+            literal = f"    '{item}' => false,\n"
+            self.assertEqual(source.count(literal), 1, key)
+            for value in ("true", "1", "'false'", "null"):
+                with self.subTest(key=key, value=value):
+                    path.write_text(source.replace(literal, f"    '{item}' => {value},\n"))
+                    result = run()
+                    self.failed(result, identifier)
+                    self.assertEqual({line for line in result.stderr.splitlines() if line.startswith("FAIL ")},
+                                     {"FAIL " + identifier}, result.stderr)
+            path.write_text(source)
+        self.assertEqual(run().returncode, 0)
+
+    def test_each_checkout_chain_mount_literal_flipped_fails_the_validator(self):
+        # DD-14: the tax chain's mount is held beside the tax-refusing chain's, each refused with its own identifier alone.
+        shadow, run = self.shadow_project()
+        self.assertEqual(run().returncode, 0)
+        for identifier, key in CHECKOUT_MOUNT_LITERALS.items():
             name, item = key.split(".")
             path = shadow / "config" / f"{name}.php"
             source = path.read_text()

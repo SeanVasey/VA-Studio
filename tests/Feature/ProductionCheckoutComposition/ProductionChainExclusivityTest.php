@@ -2,16 +2,19 @@
 
 namespace Tests\Feature\ProductionCheckoutComposition;
 
+use App\Domain\Grants\PaidTax\PaidTaxConfiguration;
 use App\Http\ProductionCheckout\ProductionChainExclusivity;
 use App\Http\ProductionCheckout\ProductionCheckoutMount;
 use App\Http\Tax\TaxHttpMount;
 use App\Providers\ProductionCheckoutServiceProvider;
 use App\Providers\ProductionTaxCheckoutServiceProvider;
+use Illuminate\Config\Repository;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Support\Facades\Route;
 use PHPUnit\Framework\Attributes\DataProvider;
+use ReflectionProperty;
 use Tests\TestCase;
 
 /**
@@ -102,6 +105,36 @@ final class ProductionChainExclusivityTest extends TestCase
         $this->assertFalse(ProductionCheckoutMount::admitted());
         $this->assertFalse(TaxHttpMount::admitted('production-tax-checkout.http_mounted'));
         $this->postJson('/production/checkout/reviews', ['candidateId' => 1])->assertNotFound();
+    }
+
+    public function test_a_runtime_conflict_withdraws_the_tax_chain_from_stale_routes_through_the_private_404(): void
+    {
+        $this->tax = true;
+        $this->refreshApplication();
+        $this->assertTrue(Route::has('production.tax-checkout.previews'));
+        $this->assertTrue(TaxHttpMount::admitted('production-tax-checkout.http_mounted'));
+        $this->assertNotSame(404, $this->postJson('/production/tax-checkout/previews', ['candidateId' => 1])->getStatusCode());
+        config(['production_checkout.mounted' => true]);
+        $this->assertFalse(TaxHttpMount::admitted('production-tax-checkout.http_mounted'));
+        $this->assertTrue(Route::has('production.tax-checkout.previews'), 'The route table is stale; only runtime admission withdraws it.');
+        $this->postJson('/production/tax-checkout/previews', ['candidateId' => 1])->assertNotFound();
+    }
+
+    public function test_the_guard_reads_the_tax_mount_exactly_as_the_mount_does_including_a_flat_dotted_key(): void
+    {
+        config(['production_checkout.mounted' => true, 'production-tax-checkout' => null]);
+        $reflection = new ReflectionProperty(Repository::class, 'items');
+        $items = $reflection->getValue(config());
+        unset($items['production-tax-checkout']);
+        $items['production-tax-checkout.http_mounted'] = true;
+        $reflection->setValue(config(), $items);
+        $this->assertTrue(PaidTaxConfiguration::read(config(), 'production-tax-checkout.http_mounted') === true);
+        $this->assertTrue(ProductionChainExclusivity::conflict(config()));
+        $this->assertFalse(ProductionCheckoutMount::admitted());
+        $this->assertFalse(TaxHttpMount::admitted('production-tax-checkout.http_mounted'));
+        $items['production-tax-checkout.http_mounted'] = 'true';
+        $reflection->setValue(config(), $items);
+        $this->assertFalse(ProductionChainExclusivity::conflict(config()));
     }
 
     public function test_the_conflict_needs_both_literal_true_and_the_guard_leaves_other_tax_mounts_alone(): void

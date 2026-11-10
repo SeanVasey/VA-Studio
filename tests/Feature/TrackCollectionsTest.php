@@ -7,6 +7,7 @@ use App\Domain\Catalog\DeactivateOffer;
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublishTrack;
+use App\Domain\Catalog\TrackPublicationSchedules;
 use App\Domain\Collections\CollectionsPolicy;
 use App\Domain\Collections\Models\TrackCollection;
 use App\Domain\Collections\TrackCollections;
@@ -17,6 +18,7 @@ use App\Domain\SiteBuilder\SiteContentSchema;
 use App\Filament\Resources\TrackCollectionResource\Pages\ManageTrackCollections;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -195,6 +197,33 @@ class TrackCollectionsTest extends TestCase
         $this->assertSame(['Synthetic Listed'], array_column($detail['tracks'], 'title'));
         $this->assertStringNotContainsString('Synthetic Unlisted', $this->get('/collections', $this->inertia())->getContent());
         $this->assertStringNotContainsString('Synthetic No Offer', $this->get('/collections', $this->inertia())->getContent());
+    }
+
+    public function test_scheduled_and_private_tracks_are_excluded_from_a_collection_and_its_index(): void
+    {
+        $listed = $this->publishedTrack('Synthetic Listed');
+        $private = $this->publishedTrack('Synthetic Private');
+        $scheduled = $this->publishedTrack('Synthetic Scheduled');
+        $this->collection([$listed, $private, $scheduled]);
+        config(['collections.enabled' => true]);
+        $private = $private->refresh();
+        app(ChangeTrackVisibility::class)->handle($private, $this->actor, 'private', $private->metadata_version, $private->publication_version);
+        // The services schedule only a draft: withdraw the track, then schedule it for later through the real service.
+        $scheduled = app(PublishTrack::class)->unpublish($scheduled->refresh(), $this->actor)->refresh();
+        app(TrackPublicationSchedules::class)->schedule($scheduled, $this->actor, CarbonImmutable::now('UTC')->addMinutes(30)->setTimezone('America/Chicago')->format('Y-m-d H:i'),
+            'published', $scheduled->metadata_version, $scheduled->publication_version);
+
+        $this->assertSame(['private', 'scheduled'], [$private->refresh()->status, $scheduled->refresh()->status]);
+        $detail = $this->get('/collections/synthetic-collection', $this->inertia())->assertOk()->json('props.collection');
+        $this->assertSame(['Synthetic Listed'], array_column($detail['tracks'], 'title'));
+        $this->assertSame(1, $detail['trackCount']);
+        $index = $this->get('/collections', $this->inertia())->assertOk();
+        $this->assertSame(['Synthetic Listed'], $index->json('props.collections.0.preview'));
+        $this->assertSame(1, $index->json('props.collections.0.trackCount'));
+        foreach (['Synthetic Private', 'Synthetic Scheduled'] as $hidden) {
+            $this->assertStringNotContainsString($hidden, $this->get('/collections/synthetic-collection')->getContent());
+            $this->assertStringNotContainsString($hidden, $index->getContent());
+        }
     }
 
     public function test_unpublished_unknown_and_empty_collections_are_404_and_absent_from_the_index(): void
