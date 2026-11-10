@@ -184,9 +184,10 @@ class ProductionCheckoutDataExportTest extends TestCase
     public function test_deletion_keeps_every_production_checkout_record_that_holds_buyer_data(): void
     {
         // Every record is kept with the financial period; a review is kept with the order built from it, or for the
-        // abandoned-checkout period when no order was (2026-11-09).
+        // abandoned-checkout period when no order was (2026-11-09); a V1 order is kept for the financial period, or for the
+        // abandoned-checkout period when it was never paid and its provider session was observed expired (FP-076, 2026-11-10).
         $this->assertSame(['production_checkout_exemption_bases' => 'financial_records_years', 'production_checkout_reviews' => 'with_order_or_abandoned_checkout_days',
-            'production_checkout_orders' => 'financial_records_years', 'production_tax_checkout_orders' => 'financial_records_years'],
+            'production_checkout_orders' => 'financial_records_years_or_abandoned_checkout_days', 'production_tax_checkout_orders' => 'financial_records_years'],
             array_map(fn (string $table): ?string => CustomerDataRights::RETAINED[$table] ?? null, array_combine(array_keys(ProductionCheckoutExportSection::RECORDS),
                 array_keys(ProductionCheckoutExportSection::RECORDS))));
     }

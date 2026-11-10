@@ -41,6 +41,7 @@
     "tests/Feature/PromotionMigrationTest.php",
     "tests/Feature/QuotePricingMigrationTest.php",
     "tests/Feature/RefundDispute/RefundDisputeMigrationTest.php",
+    "tests/Feature/Reporting/BackupEvidenceGuardMigrationTest.php",
     "tests/Feature/RightsEvidenceGuardMigrationTest.php",
     "tests/Feature/ScopedLicenseMigrationTest.php",
     "tests/Feature/SharedInventoryMigrationTest.php",

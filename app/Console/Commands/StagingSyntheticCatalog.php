@@ -81,7 +81,7 @@ final class StagingSyntheticCatalog extends Command
         if ($this->option('check')) {
             $this->line('Admission passed. Operator #'.$operator->id.', reviewer #'.$reviewer->id.'. Nothing was written.');
             foreach (SyntheticRehearsalCatalog::licenses() as $license) {
-                $this->line('license '.$license['slug'].'  '.$license['name'].'  '.number_format($license['price_minor'] / 100, 2).' '.SyntheticRehearsalCatalog::CURRENCY);
+                $this->line('license '.$license['slug'].'  '.$license['type'].'  '.$license['name'].'  '.number_format($license['price_minor'] / 100, 2).' '.SyntheticRehearsalCatalog::CURRENCY);
             }
             foreach (SyntheticRehearsalCatalog::tracks() as $track) {
                 $this->line('track   '.$track['slug'].'  '.$track['title'].'  '.$track['duration'].' s');
@@ -122,6 +122,9 @@ final class StagingSyntheticCatalog extends Command
                 foreach ($result['revisions'] as $key => $revision) {
                     $offers[] = strtoupper($key).' revision #'.$revision->id.' at '.number_format($revision->price_minor / 100, 2).' '.$revision->currency;
                 }
+                foreach ($result['drafts'] as $key => $draft) {
+                    $offers[] = strtoupper($key).' inactive exclusive draft offer #'.$draft->id.' at '.number_format($draft->price_minor / 100, 2).' '.$draft->currency;
+                }
                 $rows[] = [$definition['slug'], $result['state'], implode('; ', $offers) ?: '-'];
                 $this->line('track   '.$definition['slug'].'  '.$result['state']);
             }
@@ -138,7 +141,8 @@ final class StagingSyntheticCatalog extends Command
         }
         $this->table(['Track', 'State', 'Offers (TEST PRICE)'], $rows);
         $this->line('Before \'Prepare order\', link each offer revision to a synthetic rights scope with `php artisan vasey:rights-scope` '
-            .'(docs/ops/staging-test-purchase.md, setup step 5). Reset staging before loading real content (docs/ops/staging-runbook.md).');
+            .'(docs/ops/staging-test-purchase.md, setup step 5). The exclusive-shape offers stay inactive drafts: the test chain prepares one only '
+            .'against a rights scope an operator links (docs/ops/staging-runbook.md, section 5a). Reset staging before loading real content (docs/ops/staging-runbook.md).');
 
         return $ready ? self::SUCCESS : self::FAILURE;
     }

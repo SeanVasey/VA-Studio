@@ -100,6 +100,9 @@ final class SyntheticRehearsalPolicy
         if (! function_exists('imagecreatetruecolor') || ! function_exists('imagepng')) {
             $this->refuse('The PHP GD extension is required to draw the synthetic artwork.');
         }
+        if (! class_exists(\ZipArchive::class)) {
+            $this->refuse('The PHP ZIP extension is required to package the synthetic stems.');
+        }
         $path = config('media.tag_path');
         $sha256 = config('media.tag_sha256');
         if (! is_string($path) || $path === '' || ! is_string($sha256) || preg_match('/\A[a-f0-9]{64}\z/D', $sha256) !== 1) {

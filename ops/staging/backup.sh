@@ -683,7 +683,7 @@ record_evidence() {  # record_evidence KIND ok|failed [SET_DIR]
     [[ "$bytes" =~ ^[1-9][0-9]{0,15}$ ]] && args+=(--bytes="$bytes")
     [[ "$sha" =~ ^[0-9a-f]{64}$ ]] && args+=(--sha256="$sha")
   fi
-  if (cd -- "$cur" && timeout 120 runuser -u "$VASEY_APP_USER" -- env -i PATH=/usr/bin:/bin LC_ALL=C \
+  if (cd -- "$cur" && timeout -k 10 120 runuser -u "$VASEY_APP_USER" -- env -i PATH=/usr/bin:/bin LC_ALL=C \
       "$VASEY_PHP" "$cur/artisan" vasey:backup-record "${args[@]}" --no-interaction --no-ansi) </dev/null >/dev/null 2>&1 9>&-; then
     log "recorded $kind $status on the dashboard"
   else
