@@ -191,6 +191,63 @@ class LegacyHistoryCommandTest extends TestCase
     }
 
     /** @return array{0: int, 1: array, 2: string} */
+    public function test_track_links_are_dry_run_by_default_reported_by_reconcile_and_resolved_only_by_an_attested_choice(): void
+    {
+        $source = LegacyHistoryFixtures::privateCopy('families');
+        $exact = LegacyHistoryFixtures::catalogMapping('synthetic/beatstars-history', 'synthetic-track-01', $this->operator);
+        $first = LegacyHistoryFixtures::catalogMapping('synthetic/beatstars-history', 'synthetic-track-05', $this->operator);
+        $second = LegacyHistoryFixtures::catalogMapping('synthetic/other-catalog', 'synthetic-track-05', $this->operator);
+        LegacyHistoryFixtures::catalogMapping('synthetic/beatstars-history', 'synthetic-track-02', $this->operator);
+        $loaded = (new LegacyHistoryArchive)->load($source);
+        $sha = $loaded['result']['snapshot_sha256'];
+        LegacyHistoryFixtures::import($loaded['result']['snapshot'], $sha, $loaded['source']['contracts'], $this->operator, 1000);
+        $ambiguous = array_column($loaded['result']['snapshot']['lines'], 'record_key', 'track_source_id')['synthetic-track-05'];
+
+        $statements = $this->recordStatements();
+        [$exit, $summary, $output] = $this->invoke('link-tracks', ['--source' => $source]);
+        $this->assertSame([0, 'link_dry_run', 0], [$exit, $summary['code'], $summary['database_writes']]);
+        $this->assertEquals(['linked' => 0, 'unlinked' => 4, 'ambiguous' => 1], $summary['track_links']['states']);
+        $this->assertSame(2, $summary['track_links']['plan']['create']);
+        [$exit, $summary] = $this->invoke('resolve-track-link', ['--line' => $ambiguous]);
+        $this->assertSame([0, 'resolve_dry_run', 'ambiguous', 2], [$exit, $summary['code'], $summary['state'], count($summary['candidates'])]);
+        $this->assertSame([], array_filter($statements(), static fn (string $sql): bool => preg_match('/\A\s*select\b/i', $sql) !== 1));
+        foreach (['@', 'SYNTHETIC', 'synthetic-pay-', 'synthetic-track-', $source] as $private) {
+            $this->assertStringNotContainsString($private, $output);
+        }
+
+        $write = ['--source' => $source, '--write' => true, '--actor-id' => (string) $this->operator->id, '--snapshot' => $sha];
+        $this->assertSame('attestation_required', $this->invoke('link-tracks', $write)[1]['reason']);
+        $this->assertSame('snapshot_mismatch', $this->invoke('link-tracks', ['--snapshot' => str_repeat('b', 64), '--attest' => true] + $write)[1]['reason']);
+        $this->assertSame('usage', $this->invoke('link-tracks', ['--mapping' => '1'] + $write)[1]['reason']);
+        $this->assertSame('usage', $this->invoke('resolve-track-link', ['--line' => $ambiguous, '--write' => true, '--attest' => true,
+            '--actor-id' => (string) $this->operator->id, '--reference' => 'SYNTHETIC pointer'])[1]['reason']);
+        $this->assertSame(0, DB::table('legacy_history_track_links')->count());
+        $this->artisan('vasey:legacy-history', ['action' => 'link-tracks', '--attest' => true, '--limit' => '1'] + $write)
+            ->expectsQuestion('Staff password (hidden)', 'password')->expectsOutputToContain('"code":"link_partial"')->assertExitCode(2);
+        $this->artisan('vasey:legacy-history', ['action' => 'link-tracks', '--attest' => true] + $write)
+            ->expectsQuestion('Staff password (hidden)', 'password')->expectsOutputToContain('"code":"link_complete"')->assertExitCode(0);
+        $this->artisan('vasey:legacy-history', ['action' => 'link-tracks', '--attest' => true] + $write)
+            ->expectsQuestion('Staff password (hidden)', 'password')->expectsOutputToContain('"processed":0')->assertExitCode(0);
+        $this->assertSame(2, DB::table('legacy_history_track_links')->count());
+
+        [$exit, $summary] = $this->invoke('reconcile', ['--source' => $source]);
+        $this->assertSame([0, 'reconciled'], [$exit, $summary['code']]);
+        $this->assertEquals(['linked' => 2, 'unlinked' => 2, 'ambiguous' => 1], $summary['track_links']['states']);
+        $this->assertSame('ambiguous', $summary['track_links']['line_states'][$ambiguous]);
+
+        $resolve = ['action' => 'resolve-track-link', '--line' => $ambiguous, '--write' => true, '--attest' => true,
+            '--actor-id' => (string) $this->operator->id, '--reference' => 'SYNTHETIC pointer'];
+        $this->artisan('vasey:legacy-history', ['--mapping' => (string) $exact['mapping_id']] + $resolve)
+            ->expectsQuestion('Staff password (hidden)', 'password')->expectsOutputToContain('"reason":"candidate_refused"')->assertExitCode(1);
+        $this->artisan('vasey:legacy-history', ['--mapping' => (string) $second['mapping_id']] + $resolve)
+            ->expectsQuestion('Staff password (hidden)', 'password')->expectsOutputToContain('"code":"resolve_recorded"')->assertExitCode(0);
+        $this->artisan('vasey:legacy-history', ['--mapping' => (string) $first['mapping_id']] + $resolve)
+            ->expectsQuestion('Staff password (hidden)', 'password')->expectsOutputToContain('"reason":"already_linked"')->assertExitCode(1);
+        $this->assertSame($second['track_id'], (int) DB::table('legacy_history_track_links')->where('line_record_key', $ambiguous)->sole()->track_id);
+        [, $summary] = $this->invoke('reconcile', ['--source' => $source]);
+        $this->assertEquals(['linked' => 3, 'unlinked' => 2, 'ambiguous' => 0], $summary['track_links']['states']);
+    }
+
     private function invoke(string $action, array $options): array
     {
         $exit = Artisan::call('vasey:legacy-history', ['action' => $action] + $options);

@@ -2,13 +2,19 @@
 
 namespace Tests\Support;
 
+use App\Domain\Catalog\Models\Track;
 use App\Domain\Migration\History\ExclusivityAuthority;
 use App\Domain\Migration\History\LegacyGrantReview;
 use App\Domain\Migration\History\LegacyHistoryArchive;
+use App\Domain\Migration\History\LegacyTrackLinks;
+use App\Domain\Migration\History\ProductFamilyAdapter;
 use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
+use App\Support\CanonicalJson;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 /**
  * Private copies of the synthetic history packages (tests/Fixtures/migration/history-synthetic) laid out exactly as
@@ -31,6 +37,13 @@ final class LegacyHistoryFixtures
         foreach (glob($fixture.'/contracts/*') as $file) {
             $parts['files'][basename($file)] = file_get_contents($file);
         }
+        // Optional product-family sheets (ProductFamilyAdapter), copied under their file names.
+        $parts['families'] = [];
+        foreach (array_column(ProductFamilyAdapter::FAMILIES, 'file') as $name) {
+            if (is_file($fixture.'/'.$name)) {
+                $parts['families'][$name] = file_get_contents($fixture.'/'.$name);
+            }
+        }
         if ($change !== null) {
             $parts = $change($parts);
         }
@@ -44,6 +57,10 @@ final class LegacyHistoryFixtures
             mkdir($source.'/contracts', 0700);
             foreach (['mapping' => 'mapping.json', 'customers' => 'customers.csv', 'orders' => 'orders.csv', 'contracts' => 'contracts.csv'] as $key => $name) {
                 file_put_contents($source.'/'.$name, $parts[$key]);
+                chmod($source.'/'.$name, 0600);
+            }
+            foreach ($parts['families'] as $name => $bytes) {
+                file_put_contents($source.'/'.$name, $bytes);
                 chmod($source.'/'.$name, 0600);
             }
             foreach ($parts['files'] as $name => $bytes) {
@@ -96,6 +113,40 @@ final class LegacyHistoryFixtures
         return $authority->transition($transition, $actor, $reference, $write
             ? self::attestation($actor, ExclusivityAuthority::attestationAction($transition), ExclusivityAuthority::ATTESTATION_SCOPE, $reference) : null,
             $write, $handover);
+    }
+
+    public static function linkTracks(array $snapshot, string $sha, User $actor, int $limit, ?callable $afterLink = null): array
+    {
+        return (new LegacyTrackLinks)->link($snapshot, $sha, $actor,
+            self::attestation($actor, LegacyTrackLinks::ATTESTATION_ACTION, LegacyTrackLinks::attestationScope($sha), $sha), $limit, $afterLink);
+    }
+
+    public static function resolveTrackLink(string $line, int $mapping, User $actor, string $reference): array
+    {
+        return (new LegacyTrackLinks)->resolve($line, $mapping, $actor, $reference,
+            self::attestation($actor, LegacyTrackLinks::RESOLVE_ATTESTATION_ACTION, LegacyTrackLinks::resolveScope($line, $mapping), $reference));
+    }
+
+    /**
+     * One synthetic draft track with the catalog import mapping the catalog importer would retain for it: the same
+     * record key derivation and the evidence fields the link reader proves (source system and source record id).
+     *
+     * @return array{mapping_id: int, track_id: int}
+     */
+    public static function catalogMapping(string $sourceSystem, string $sourceId, User $actor): array
+    {
+        $track = Track::create(['title' => 'SYNTHETIC '.$sourceId, 'slug' => 'synthetic-link-'.Str::uuid(), 'artist' => 'Test only']);
+        $hash = static fn (string $value): string => hash('sha256', $value);
+        $key = CanonicalJson::hash([$sourceSystem, $sourceId]);
+        $batch = DB::table('catalog_import_batches')->insertGetId(['review_sha256' => $hash('review|'.$key), 'source_sha256' => $hash('source|'.$key),
+            'source_identity_sha256' => $hash('identity|'.$key), 'target_commit' => str_repeat('1', 40), 'target_schema_sha256' => $hash('schema'),
+            'transform_version' => 'synthetic', 'actor_id' => $actor->id, 'review_ciphertext' => Crypt::encryptString('{}'), 'created_at' => now()]);
+        $mapping = DB::table('catalog_import_mappings')->insertGetId(['batch_id' => $batch, 'record_key' => $key, 'source_record_sha256' => $hash('record|'.$key),
+            'track_id' => $track->id, 'track_sha256' => $hash('track|'.$key), 'actor_id' => $actor->id,
+            'evidence_ciphertext' => Crypt::encryptString(CanonicalJson::encode(['schema_version' => 1, 'source_system' => $sourceSystem,
+                'record' => ['source_id' => $sourceId]])), 'created_at' => now()]);
+
+        return ['mapping_id' => (int) $mapping, 'track_id' => (int) $track->id];
     }
 
     public static function cleanup(): void

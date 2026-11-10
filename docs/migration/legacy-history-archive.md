@@ -7,6 +7,14 @@ It was built and tested only against the hand-made synthetic packages in
 `tests/Fixtures/migration/history-synthetic/`. No real export (input S-9) has been inspected, so the shape of the
 real files, the mapping Sean writes for them and the tool's behaviour on them are unproven.
 
+**BL-07 (FP-098, FP-099; 2026-11-10), focused synthetic checks, not acceptance:** two additions, also built and
+tested only on synthetic fixtures (`tests/Fixtures/migration/history-synthetic/families/`). Adapters archive kit,
+service and membership order lines in the same line record as track lines ("Product-family adapters"), and an
+append-only table links archived track lines to store tracks through `catalog_import_mappings` ("Track links").
+Both are archive-only: no entitlement, grant, active order, subscription, credit or customer account is created,
+and nothing reads a link or a family line to grant anything. The real export's family sheets and ids are unknown
+(S-9), and a link names a store track, not an asset revision.
+
 What it never does: create or change a customer account, order, grant, entitlement, consent, offer, download or
 inventory row; regenerate, render or substitute contract text; infer marketing consent; merge customers; revoke a
 prior grant; run outside `local`/`testing` (unless a reviewed code change names another environment); or write
@@ -26,6 +34,10 @@ caller-owned `0700` directory inside another `0700` directory, outside any Git w
 | `orders.csv` | One row per order line: order id, line id, customer id, UTC order time, status, track id, license name, amount, refunded amount, optional payment reference and currency. |
 | `contracts.csv` | One row per original contract: contract id, order id, line id, file name, optional declared SHA-256. |
 | `contracts/` | The original contract files, byte for byte as BeatStars generated them. |
+
+Optional, and read only when `mapping.json` declares the family under `product_families`: `kit_orders.csv`,
+`service_orders.csv` and `membership_orders.csv`. A declared sheet must be present; a family sheet the mapping does
+not declare refuses the package (`source_undeclared_family_sheet`), so history is never left out silently.
 
 CSV rules are the catalog normalizer's (`BeatStarsExportSheet`): UTF-8, strict RFC 4180 quoting, one header line,
 at most 1,000 data rows and 200 columns per sheet (split a larger export into several packages), 8 MiB per sheet.
@@ -65,6 +77,50 @@ every customer record says `marketing_consent: unknown`. Statuses map to `paid`,
 `unpaid` or an explicitly declared `unknown`. Whether a license is exclusive is the operator's declaration. Amounts are
 USD only and become integer cents (`12`, `12.5`, `$12.50`); `1,299.00`, negatives and words are not numbers.
 
+### Product-family adapters (kits, services, memberships)
+
+The history schema itself names no product family: its line record is a track license line. `ProductFamilyAdapter`
+adds the three non-track families the cutover runbook inventories, without changing that record. A package that
+declares no family normalizes to exactly the same bytes and snapshot hash as before (pinned in
+`ProductFamilyAdapterTest`).
+
+```json
+"product_families": {
+    "kits": {"columns": {"source_order_id": "Order ID", "source_line_id": "Line ID", "source_customer_id": "Customer ID",
+                         "ordered_at": "Ordered At", "status": "Status", "product_source_id": "Kit ID", "terms": "Kit License",
+                         "amount": "Amount", "refunded_amount": "Refunded", "payment_reference": "Payment Ref", "currency": "Currency"},
+             "ignored_columns": [],
+             "terms": {"Sound Kit License": {"label": "sound-kit-license", "exclusive": false}}},
+    "services": {"columns": {"…": "…"}, "terms": {"Mixing Package": {"label": "mixing-package", "exclusive": false}}},
+    "memberships": {"columns": {"…": "…"}, "ignored_columns": ["Period Start", "Period End"],
+                    "terms": {"Pro Monthly": {"label": "pro-monthly", "exclusive": false}}}
+}
+```
+
+| Family | Sheet (findings name it) | Stored `track_source_id` | `terms` column means |
+| --- | --- | --- | --- |
+| `kits` | `kit_orders` | `kit:<Kit ID>` | the kit's license name |
+| `services` | `service_orders` | `service:<Service ID>` | the service package |
+| `memberships` | `membership_orders` | `membership:<Plan ID>` | the plan; one row per charge |
+
+- **Same line shape.** A family row becomes an ordinary order line: same fields, record key, hash, table and
+  `archive_only` classification. `product_source_id` fills `track_source_id` under the family's namespace and `terms`
+  fills `license_name`/`license_label`. Status values are the orders sheet's `status_values`; amounts, currency,
+  customer, time and payment reference follow the same rules and findings. A family line may share an order with
+  track lines; order-level cells must agree across sheets (`order_inconsistent`) and a line id is unique within its
+  order across sheets (`duplicate_source_id`).
+- **Never a track.** A kit whose raw id equals a track's id is stored as `kit:<id>`, and a track id inside `kit:`,
+  `service:` or `membership:` on the orders sheet is a finding (`reserved_family_namespace`), so the two cannot be
+  confused. Track linking skips family lines.
+- **Nothing is defaulted.** Every terms value must be declared (`unknown_terms_value` otherwise). `exclusive` must be
+  declared `false`: the exclusivity ledger is about track licenses, and an exclusive family sale is not supported
+  (`mapping_family_exclusive`). Other mapping refusals: `mapping_product_families`, `mapping_family_terms`.
+- **History only.** A membership line records one past charge, not a subscription, paid period or credit; a service
+  line records one past payment, not an open job, deposit or milestone. Those obligations (M-030, M-032, U-012,
+  U-013) are not modelled here. Ignored columns such as notes or billing periods are not retained (only the raw row
+  hash covers them). No family line is reviewable: the dry run and `review-grant` report
+  `product_family_not_reviewable`, so it can never become a `verified_grant`.
+
 ## Commands
 
 All output is one canonical JSON line of counts, codes, record keys and hashes: no e-mail address, name, payment
@@ -83,6 +139,12 @@ php artisan vasey:legacy-history delta     --source /private/history/2026-11-01 
     [--dispositions /private/history/dispositions.json]
 php artisan vasey:legacy-history review-grant --line <line record key>                    # eligibility only
 php artisan vasey:legacy-history review-grant --line <key> --write --attest --actor-id 9 --reference "<private evidence pointer>"
+php artisan vasey:legacy-history link-tracks --source /private/history/2026-11-01                             # dry run
+php artisan vasey:legacy-history link-tracks --source /private/history/2026-11-01 --write --attest \
+    --actor-id 7 --snapshot <snapshot_sha256> --limit 100                                 # repeat until exit 0
+php artisan vasey:legacy-history resolve-track-link --line <line record key>              # state and candidates only
+php artisan vasey:legacy-history resolve-track-link --line <key> --mapping <catalog import mapping id> \
+    --write --attest --actor-id 9 --reference "<private evidence pointer>"
 php artisan vasey:exclusivity-authority status
 php artisan vasey:exclusivity-authority freeze --actor-id 7 [--write --attest --reference "<where the freeze is documented>"]
 php artisan vasey:exclusivity-authority handover --actor-id 7 --baseline <previous package> --later <post-freeze package> \
@@ -138,6 +200,48 @@ other than `archive_only` are refused by insert guards.
 every stored original re-hashed; money totals per currency from the stored columns; and every stored record's
 encrypted copy decrypted and proved against its hash. Recorded exceptions are listed as explained. Anything else is
 unexplained, and the result is `reconciled` only with zero unexplained differences.
+
+### Track links: linked, unlinked, ambiguous
+
+`legacy_history_track_links` holds at most one immutable row per archived line version, naming the catalog import
+mapping and the store track for the line's `track_source_id`. `reconcile` prints a `track_links` report beside the
+archive report (it never changes `reconciled`/`unreconciled`), and `link-tracks` without `--write` prints the same
+report: counts per state, every track line's state by record key, and, for lines that need a person, the candidate
+mapping and track ids.
+
+A **candidate** is every `catalog_import_mappings` row whose retained source record carries the line's
+`track_source_id` as its source id, in any catalog source system. A mapping whose encrypted evidence cannot be read
+and proved against its record key refuses the whole read (`catalog_mapping_integrity`), because it could hide a
+candidate.
+
+| State | Meaning |
+| --- | --- |
+| `linked` | A link row exists (`linked_by`: `exact_source_identity` or `staff_resolution`). |
+| `ambiguous` | More than one candidate. It stays ambiguous until staff resolve it. |
+| `unlinked` | No link and at most one candidate: `no_candidate`, `exact_candidate_pending` (one candidate in the line's own source system, not linked yet) or `other_source_system_candidate` (one candidate, but from another source system). |
+
+- **Never a guess.** `link-tracks --write` records only `exact_candidate_pending` lines: same source system and same
+  source id is the identity the catalog importer itself used. Matching by title, slug or a different source system
+  is never done. A single candidate from another source system proves no identity and waits for staff, like an
+  ambiguous line.
+- **Restartable and idempotent.** Links follow a completely archived snapshot (`import_incomplete` otherwise). Each
+  segment is one transaction under the batch row lock, at most `--limit` links, with a
+  `legacy_history.track_link_segment` audit event; an interrupted segment rolls back, and re-running the import
+  batch or the link segment creates no second row (unique `line_id`).
+- **Staff resolution.** `resolve-track-link --write` records one staff choice for the line's current version: the
+  mapping must be one of that line's candidates (`candidate_refused`), the line must need a choice
+  (`resolution_not_required`, `no_candidate`, `not_a_track_line`), and the write needs the same staff authority, MFA
+  rule and spent console attestation as every other write here, bound to the line, the mapping and the reference.
+  It stores the reference only as a keyed hash and writes a `legacy_history.track_link_resolved` audit event. The
+  same choice again is a no-op; a different one is refused (`already_linked`).
+- **Append-only.** UPDATE, DELETE and REPLACE are refused by triggers on SQLite and MySQL; an insert guard admits only
+  the two methods byte-exactly, requires a reference hash exactly for a staff resolution, and requires the link to
+  name the exact archived line version and the exact track of its mapping. A changed line in a later export is a
+  new line version and is linked afresh.
+- **Not supported yet:** correcting or withdrawing a recorded link (it would need a superseding-row design and
+  Sean's decision), separation of duties between the importer and the resolver, a Filament screen for resolution,
+  links to asset revisions, and any use of a link by checkout, grants or delivery.
+- **Retention:** indefinite, with the legacy order record (`RetentionSchedule`, "with the order").
 
 ### Historical grants: `archive_only` and `verified_grant`
 
@@ -210,6 +314,14 @@ This authority check does not activate historical verified grants or turn archiv
 
 Focused development checks, not acceptance: `docs/verification/migration-tooling-20261024/README.md` records the
 exact commands, counts, the native MySQL run, mutation results and the untested conditions.
+
+BL-07 (2026-11-10), focused checks, not acceptance: `tests/Unit/Migration/ProductFamilyAdapterTest.php`,
+`tests/Feature/Migration/LegacyTrackLinksTest.php`, `tests/Feature/Migration/LegacyHistoryTrackLinkMigrationTest.php`
+and the track-link case in `LegacyHistoryCommandTest.php` on SQLite; the migration test and two link tests ran
+natively on MySQL 8.4.11. Untested: any real export, concurrent link or resolve processes on MySQL (the unique
+`line_id` and the batch row lock are the guard; no two-process race was run), more than a handful of catalog
+mappings (every mapping's evidence is decrypted per read), and the real catalog importer's rows (tests insert
+mappings in the importer's evidence shape rather than running it).
 
 ### Mandatory review procedure for competing-record changes (V3)
 

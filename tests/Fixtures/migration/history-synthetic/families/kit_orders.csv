@@ -1,0 +1,2 @@
+Order ID,Line ID,Customer ID,Ordered At,Status,Kit ID,Kit License,Amount,Refunded,Payment Ref,Currency
+synthetic-ord-2001,2,synthetic-cust-101,2026-08-01T10:00:00Z,Completed,synthetic-track-01,Sound Kit License,19.99,0,synthetic-pay-2001,USD
