@@ -4,6 +4,7 @@ namespace App\Domain\SiteBuilder;
 
 use App\Domain\Albums\AlbumsPolicy;
 use App\Domain\Catalog\PublicCatalog;
+use App\Domain\Rights\PublishedLicenseComparison;
 
 /** Route projections accept one already verified release, never a second pointer read. */
 final class EditorialContent
@@ -32,11 +33,11 @@ final class EditorialContent
         $chrome = array_intersect_key($verifiedContent, array_flip([
             'schema_version', 'hero', 'studio', 'footer', 'navigation', 'seo',
         ]));
-        if ($verifiedContent['schema_version'] === SiteContentSchema::LEGAL_VERSION) {
+        if (in_array($verifiedContent['schema_version'], SiteContentSchema::LEGAL_VERSIONS, true)) {
             // The footer lists published legal pages by title and path only; their text belongs to their own route.
             $chrome['legal_links'] = [];
             foreach (SiteContentSchema::LEGAL_DOCUMENTS as $document) {
-                if (is_array($verifiedContent['legal'][$document] ?? null)) {
+                if ($this->listed($verifiedContent, $document)) {
                     $chrome['legal_links'][] = ['title' => $verifiedContent['legal'][$document]['title'], 'path' => '/legal/'.$document];
                 }
             }
@@ -48,15 +49,37 @@ final class EditorialContent
     /**
      * One published legal document, or null when the release predates legal pages or leaves the slot empty. The approval
      * reference is staff evidence and is deliberately not projected.
+     *
+     * The license comparison exists only in schema 6, generated from the published license versions (DD-31); with no such
+     * version it is absent. A schema 5 comparison is hand-typed text that may differ from what is sold, so it is never
+     * shown, and publication refuses it (LegalPublicationGuard). A staff preview shows the generated page even when it
+     * is empty, so the release can be reviewed before any version is published.
      */
-    public function legal(array $verifiedContent, string $document): ?array
+    public function legal(array $verifiedContent, string $document, bool $preview = false): ?array
     {
-        if (($verifiedContent['schema_version'] ?? null) !== SiteContentSchema::LEGAL_VERSION
+        $version = $verifiedContent['schema_version'] ?? null;
+        if (! in_array($version, SiteContentSchema::LEGAL_VERSIONS, true)
             || ! in_array($document, SiteContentSchema::LEGAL_DOCUMENTS, true)
             || ! is_array($verifiedContent['legal'][$document] ?? null)) {
             return null;
         }
         $selected = $verifiedContent['legal'][$document];
+        if ($document === 'licenses') {
+            if ($version !== SiteContentSchema::GENERATED_LICENSES_VERSION) {
+                return null;
+            }
+            $licenses = app(PublishedLicenseComparison::class)->versions();
+            if ($licenses === [] && ! $preview) {
+                return null;
+            }
+
+            return [
+                'section' => 'legal', 'kind' => 'legal', 'path' => '/legal/licenses',
+                'title' => $selected['title'], 'description' => $selected['description'],
+                'paragraphs' => [], 'entries' => [], 'email' => null, 'contactHref' => null, 'video' => null,
+                'legal' => ['document' => 'licenses', 'generated' => true, 'licenses' => $licenses],
+            ];
+        }
 
         return [
             'section' => 'legal', 'kind' => 'legal', 'path' => '/legal/'.$document,
@@ -71,10 +94,10 @@ final class EditorialContent
         ];
     }
 
-    public function page(array $verifiedContent, string $section, ?string $slug = null, bool $includeRelatedHref = true): ?array
+    public function page(array $verifiedContent, string $section, ?string $slug = null, bool $includeRelatedHref = true, bool $preview = false): ?array
     {
         if ($section === 'legal') {
-            return $slug === null ? null : $this->legal($verifiedContent, $slug);
+            return $slug === null ? null : $this->legal($verifiedContent, $slug, $preview);
         }
         if (! in_array($verifiedContent['schema_version'] ?? null, SiteContentSchema::EDITORIAL_VERSIONS, true)
             || ! in_array($section, ['about', 'contact', 'blog', 'videos'], true)
@@ -132,5 +155,16 @@ final class EditorialContent
         }
 
         return $page;
+    }
+
+    /** Whether the footer links a legal page: the comparison only while its generated page would not be empty. */
+    private function listed(array $verifiedContent, string $document): bool
+    {
+        if (! is_array($verifiedContent['legal'][$document] ?? null)) {
+            return false;
+        }
+
+        return $document !== 'licenses' || ($verifiedContent['schema_version'] === SiteContentSchema::GENERATED_LICENSES_VERSION
+            && app(PublishedLicenseComparison::class)->offered());
     }
 }

@@ -60,12 +60,12 @@ class LegalPublicationGuardTest extends TestCase
 
         return [
             'legal review marker on a heading (TERMS 15)' => $case(LegalPublicationGuard::LEGAL_REVIEW, '15. Disclaimers [For legal review]', '[For legal review]', 'terms', 'sections.0.heading'),
-            'legal review marker with a full stop (LICENSE-TIERS 4.14)' => $case(LegalPublicationGuard::LEGAL_REVIEW, 'Neither party is liable for indirect losses. [For legal review.]', '[For legal review.]', 'licenses'),
+            'legal review marker with a full stop (LICENSE-TIERS 4.14)' => $case(LegalPublicationGuard::LEGAL_REVIEW, 'Neither party is liable for indirect losses. [For legal review.]', '[For legal review.]', 'licenses', 'description'),
             'legal review marker without brackets' => $case(LegalPublicationGuard::LEGAL_REVIEW, 'Limitation of liability, for legal review', 'for legal review'),
             'owner decision: venue county (TERMS 18)' => $case(LegalPublicationGuard::OWNER_DECISION, 'courts located in Iowa [county — Sean to confirm], and you agree', '[county — Sean to confirm]'),
             'owner decision: provider choice (PRIVACY 5)' => $case(LegalPublicationGuard::OWNER_DECISION, 'Email delivery provider: [name of email/SMTP provider — Sean to choose]', '[name of email/SMTP provider — Sean to choose]', 'privacy'),
             'owner decision: DMCA agent (TERMS 13)' => $case(LegalPublicationGuard::OWNER_DECISION, '[Sean to decide whether to register a DMCA designated agent with the U.S. Copyright Office.]', '[Sean to decide whether to register a DMCA designated agent with the U.S. Copyr…'),
-            'owner decision without brackets: price cell (LICENSE-TIERS 1)' => $case(LegalPublicationGuard::OWNER_DECISION, 'Price: Sean to set', 'Sean to set', 'licenses'),
+            'owner decision without brackets: price cell (LICENSE-TIERS 1)' => $case(LegalPublicationGuard::OWNER_DECISION, 'Price: Sean to set', 'Sean to set', 'licenses', 'title'),
             'owner decision without brackets: proposed figure (LICENSE-TIERS)' => $case(LegalPublicationGuard::OWNER_DECISION, 'All caps above are proposed — Sean to confirm.', 'Sean to confirm', 'licenses', 'description'),
             'publication value: effective date (PRIVACY header)' => $case(LegalPublicationGuard::PUBLICATION_VALUE, 'Effective date: [set on publication]', '[set on publication]', 'privacy'),
             'publication value: postal address (PRIVACY 1, TERMS 21)' => $case(LegalPublicationGuard::PUBLICATION_VALUE, 'Postal address: [registered postal address — inserted at publication]', '[registered postal address — inserted at publication]', 'privacy', 'sections.0.paragraphs.1'),
@@ -75,8 +75,8 @@ class LegalPublicationGuardTest extends TestCase
             'draft notice: reviewer appendix heading' => $case(LegalPublicationGuard::DRAFT_NOTICE, 'Reviewer appendix', 'Reviewer appendix', 'terms', 'sections.1.heading'),
             'draft notice: removal instruction' => $case(LegalPublicationGuard::DRAFT_NOTICE, 'This section is removed before publication.', 'removed before publication', 'privacy'),
             'draft notice: version label' => $case(LegalPublicationGuard::DRAFT_NOTICE, 'Draft version label: terms-draft-2026-10-24', 'Draft version label'),
-            'template variable (LICENSE-TIERS 6.3)' => $case(LegalPublicationGuard::TEMPLATE_VARIABLE, 'Files and scope {{deliverables}}', '{{deliverables}}', 'licenses'),
-            'template variable with a dotted name' => $case(LegalPublicationGuard::TEMPLATE_VARIABLE, '{{usage.audio_streams}}', '{{usage.audio_streams}}', 'licenses'),
+            'template variable (LICENSE-TIERS 6.3)' => $case(LegalPublicationGuard::TEMPLATE_VARIABLE, 'Files and scope {{deliverables}}', '{{deliverables}}', 'licenses', 'description'),
+            'template variable with a dotted name' => $case(LegalPublicationGuard::TEMPLATE_VARIABLE, '{{usage.audio_streams}}', '{{usage.audio_streams}}', 'licenses', 'title'),
             'bracketed placeholder: template slot (LICENSE-TIERS 6.3)' => $case(LegalPublicationGuard::BRACKETED_PLACEHOLDER, '[Tier name] — VASEY.AUDIO license', '[Tier name]', 'licenses', 'title'),
             'bracketed placeholder: any other bracketed text' => $case(LegalPublicationGuard::BRACKETED_PLACEHOLDER, 'You must be at least [18] to buy a license.', '[18]'),
             'bracketed placeholder: empty brackets' => $case(LegalPublicationGuard::BRACKETED_PLACEHOLDER, 'Our address is [].', '[]', 'privacy'),
@@ -171,9 +171,11 @@ class LegalPublicationGuardTest extends TestCase
 
         $site->publish($release->id, 0, $actor);
         $this->assertSame([1, $release->id], [SitePublication::findOrFail(1)->revision, SitePublication::findOrFail(1)->active_release_id]);
-        foreach (array_keys(self::TITLES) as $path) {
+        foreach (['privacy', 'terms'] as $path) {
             $this->get('/legal/'.$path)->assertOk()->assertSee('CLEAN LEGAL FIRST HEADING', false);
         }
+        // The comparison carries only its frame and is generated; with no published license version it is absent (DD-31).
+        $this->get('/legal/licenses')->assertNotFound()->assertDontSee('CLEAN LEGAL License comparison', false);
         // A release without legal pages is never held back by the legal rule, and the clean one can be scheduled and restored.
         $older = $this->release(SiteEditorialFixtures::content('NO LEGAL'), $actor, 'No legal pages');
         $this->assertSame([], LegalPublicationGuard::findings($older->content));

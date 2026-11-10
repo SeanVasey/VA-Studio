@@ -40,6 +40,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use UnitEnum;
@@ -199,6 +200,20 @@ class SiteReleaseResource extends OperatorResource
     {
         $sections = [];
         foreach (self::LEGAL_LABELS as $key => $label) {
+            if ($key === 'licenses') {
+                // DD-31: the comparison itself is generated from the published license versions; staff write only its frame.
+                $sections[] = Section::make("{$label} page")->collapsible()->collapsed()
+                    ->description('The comparison lists every published license version in its availability window, with the terms generated from that version, as the track cards show them. Write only the page title and introduction; the page is absent while no version is published.')
+                    ->schema([
+                        Checkbox::make("enabled_legal.{$key}")->label("Include {$label} page")->live(),
+                        Group::make([
+                            TextInput::make("content.legal.{$key}.title")->label("{$label} page title")->required()->maxLength(120),
+                            Textarea::make("content.legal.{$key}.description")->label("{$label} introduction")->required()->maxLength(300)->rows(2),
+                        ])->visible(fn (Get $get): bool => (bool) $get("enabled_legal.{$key}")),
+                    ]);
+
+                continue;
+            }
             $sections[] = Section::make("{$label} page")->collapsible()->collapsed()
                 ->description('Paste only text that has been approved for publication. Plain text: headings and paragraphs, without markup or links.')
                 ->schema([
@@ -320,6 +335,8 @@ class SiteReleaseResource extends OperatorResource
             $content['legal'][$key] = $legal[$key] ?? ['title' => '', 'description' => '', 'version' => '', 'effective_date' => '',
                 'approval_reference' => '', 'sections' => [['heading' => '', 'paragraphs' => ['']]]];
         }
+        // A copy of a schema 5 comparison keeps its title and introduction; its typed sections are not carried forward.
+        $content['legal']['licenses'] = Arr::only($content['legal']['licenses'], ['title', 'description']);
         $enabled = [];
         foreach (['about', 'contact', 'blog', 'videos'] as $key) {
             $enabled[$key] = $content[$key] !== null;
@@ -389,11 +406,15 @@ class SiteReleaseResource extends OperatorResource
                     $legal[$key] = $content['legal'][$key] ?? null;
                 }
             }
-            // Only included legal pages need v5, and only enabled associations need v4. Clearing them restores the existing
-            // image-based v2/v3 choice without changing retained releases or losing an image. Empty new keys do not enter
-            // older schemas.
-            $version = array_filter($legal, 'is_array') !== [] ? SiteContentSchema::LEGAL_VERSION
-                : (SiteRelatedTracks::used($content) ? 4 : (array_filter($images) === [] ? 2 : 3));
+            if (is_array($legal['licenses'])) {
+                $legal['licenses'] = Arr::only($legal['licenses'], ['title', 'description']);
+            }
+            // Only the generated comparison needs v6, only included legal pages need v5, and only enabled associations need
+            // v4. Clearing them restores the existing image-based v2/v3 choice without changing retained releases or losing
+            // an image. Empty new keys do not enter older schemas.
+            $version = is_array($legal['licenses']) ? SiteContentSchema::GENERATED_LICENSES_VERSION
+                : (array_filter($legal, 'is_array') !== [] ? SiteContentSchema::LEGAL_VERSION
+                : (SiteRelatedTracks::used($content) ? 4 : (array_filter($images) === [] ? 2 : 3)));
             if (! in_array($version, SiteContentSchema::RELATED_TRACK_VERSIONS, true)) {
                 foreach (['blog', 'videos'] as $section) {
                     foreach ($content[$section]['entries'] ?? [] as $index => $entry) {
@@ -404,7 +425,7 @@ class SiteReleaseResource extends OperatorResource
             unset($content['schema_version'], $content['images'], $content['legal']);
             $content = ['schema_version' => $version] + $content
                 + (in_array($version, SiteContentSchema::IMAGE_VERSIONS, true) ? ['images' => $images] : [])
-                + ($version === SiteContentSchema::LEGAL_VERSION ? ['legal' => $legal] : []);
+                + (in_array($version, SiteContentSchema::LEGAL_VERSIONS, true) ? ['legal' => $legal] : []);
             $release = app(SiteContent::class)->create($content, $data['label'], static::actor());
             Notification::make()->success()->title('Private draft saved')->body('Preview the release before publishing.')->send();
             // A draft may hold drafting marks for private review; say at once that the domain will refuse to publish it.
