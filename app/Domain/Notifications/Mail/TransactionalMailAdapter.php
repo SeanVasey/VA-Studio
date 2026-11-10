@@ -13,11 +13,15 @@ use App\Domain\Notifications\NotificationException;
 use App\Domain\Notifications\TestTransactionalNotifications;
 use App\Domain\Notifications\TransactionalNotificationPolicy;
 use App\Jobs\DeliverTransactionalMail;
+use App\Models\User;
+use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -46,7 +50,7 @@ final class TransactionalMailAdapter
             if ($notice === null || ! hash_equals($notice->public_id, $noticeId) || $notice->notification_type !== 'test_order_ready') {
                 throw new NotificationException;
             }
-            $existing = TransactionalMailDelivery::where('notice_id', $notice->id)->lockForUpdate()->first();
+            $existing = TransactionalMailDelivery::where('notice_id', $notice->id)->orderByDesc('id')->lockForUpdate()->first();
             if ($existing !== null) {
                 return ['deliveryId' => $existing->public_id, 'state' => $existing->state, 'replayed' => true];
             }
@@ -61,6 +65,81 @@ final class TransactionalMailAdapter
 
             return ['deliveryId' => $delivery->public_id, 'state' => 'queued', 'replayed' => false];
         }, 3);
+    }
+
+    /**
+     * Staff recovery for an order whose confirmation email did not go out (BL-47). A requeue is a NEW delivery attempt, never a
+     * revival of the old row (the delivery guards keep rows forward-only). It is idempotent and cannot duplicate a send:
+     *  - any earlier attempt "accepted" refuses (`already_delivered`); the message was handed to the provider;
+     *  - a latest attempt still "queued" or "submitting" returns it as `replayed` and creates nothing;
+     *  - only a latest "failed" attempt (it failed before any transport call) is requeued;
+     *  - an "uncertain" attempt may have been accepted by the provider, so it is requeued only when the operator states that
+     *    the provider's logs show it was not delivered ($uncertainChecked), and the audit event records that statement.
+     * Needs a staff user with the admin panel's MFA enrollment (re-read under lock), the same admitted mail configuration as the
+     * first send, and an intent that still verifies against current customer and purchase authority.
+     *
+     * @return array{deliveryId: string, state: string, replayed: bool, attempt: int}
+     */
+    public function requeueOrderReady(string $noticeId, User $actor, bool $uncertainChecked = false): array
+    {
+        $this->outside();
+        $this->authorizeStaff($actor);
+        $configuration = app(TransactionalMailPolicy::class)->configuration();
+        if (! OrderRequest::uuid($noticeId)) {
+            throw new NotificationException;
+        }
+        $this->verifyAuthority($noticeId);
+
+        return DB::transaction(function () use ($noticeId, $actor, $configuration, $uncertainChecked): array {
+            $staff = User::query()->lockForUpdate()->find($actor->getKey());
+            if ($staff === null) {
+                throw new AuthorizationException;
+            }
+            $this->authorizeStaff($staff, true);
+            $notice = TransactionalNotice::where('public_id', $noticeId)->lockForUpdate()->first();
+            if ($notice === null || ! hash_equals($notice->public_id, $noticeId) || $notice->notification_type !== 'test_order_ready') {
+                throw new NotificationException;
+            }
+            $attempts = TransactionalMailDelivery::where('notice_id', $notice->id)->orderByDesc('id')->lockForUpdate()->get();
+            $latest = $attempts->first();
+            if ($latest === null) {
+                // Nothing was ever queued for this intent: the normal first send applies, not a requeue.
+                throw new NotificationException('no_delivery');
+            }
+            if ($attempts->contains(fn (TransactionalMailDelivery $row): bool => $row->state === 'accepted')) {
+                throw new NotificationException('already_delivered');
+            }
+            if (in_array($latest->state, ['queued', 'submitting'], true)) {
+                return ['deliveryId' => $latest->public_id, 'state' => $latest->state, 'replayed' => true, 'attempt' => $latest->attempt];
+            }
+            if ($latest->state === 'uncertain' && ! $uncertainChecked) {
+                throw new NotificationException('uncertain_unchecked');
+            }
+            $delivery = TransactionalMailDelivery::create([
+                'public_id' => (string) Str::uuid(), 'notice_id' => $notice->id, 'notice_public_id' => $notice->public_id,
+                'template_version' => TransactionalMailPolicy::TEMPLATE, 'capability' => $configuration['capability'],
+                'state' => 'queued', 'version' => 0, 'queued_at' => $this->now(), 'attempt' => $latest->attempt + 1,
+            ]);
+            AuditEvent::recordAttributed('notification.mail.requeued', $delivery, ['delivery_id' => $delivery->public_id,
+                'notice_id' => $notice->public_id, 'previous_delivery_id' => $latest->public_id, 'previous_state' => $latest->state,
+                'previous_reason' => $latest->reason, 'attempt' => $delivery->attempt, 'provider_log_checked' => $latest->state === 'uncertain',
+            ], $staff->getKey());
+            DeliverTransactionalMail::dispatch($delivery->public_id);
+
+            return ['deliveryId' => $delivery->public_id, 'state' => 'queued', 'replayed' => false, 'attempt' => $delivery->attempt];
+        }, 3);
+    }
+
+    private function authorizeStaff(User $user, bool $locked = false): void
+    {
+        $current = $locked ? $user : ($user->exists ? User::find($user->getKey()) : null);
+        if ($current === null) {
+            throw new AuthorizationException;
+        }
+        Gate::forUser($current)->authorize('administer-catalog', [$locked]);
+        if (! AdminMultiFactor::satisfiedBy($current, lockForUpdate: $locked)) {
+            throw new AuthorizationException('Admin multi-factor authentication is required.');
+        }
     }
 
     /** Request the original wake-up only for an observed queued row; a racing claim makes a harmless duplicate job. */
