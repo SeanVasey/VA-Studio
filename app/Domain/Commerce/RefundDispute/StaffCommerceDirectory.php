@@ -7,6 +7,7 @@ use App\Domain\Commerce\Models\LicenseGrant;
 use App\Domain\Commerce\Models\Order;
 use App\Domain\Commerce\Models\OrderFinalization;
 use App\Domain\Commerce\Orders\ReadOrder;
+use App\Domain\Commerce\RefundDispute\Models\ProductionTaxPaidOrder;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeEffect;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeHold;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObject;
@@ -39,6 +40,28 @@ final class StaffCommerceDirectory
             ->selectRaw('('.sprintf($latest, 'r.refund_state').') AS refund_state')
             ->selectRaw('('.sprintf($latest, 'r.dispute_state').') AS dispute_state')
             ->selectRaw('(SELECT COUNT(*) FROM refund_dispute_holds h WHERE h.order_id = o.id AND h.order_source = \'test\' AND h.released_at IS NULL) AS active_holds');
+    }
+
+    /**
+     * Paid production tax orders that have no finalized batch (so no ledger row), with the staff resolution if one exists. Scoped to the
+     * own test account; empty while the production lifecycle is not admitted. Hashes, ciphertexts and provider ids are never projected.
+     */
+    public function unfinalizedProductionOrders(): Builder
+    {
+        $query = ProductionTaxPaidOrder::query()
+            ->join('production_tax_checkout_reviewed_sessions as r', 'r.order_id', '=', 'production_tax_checkout_orders.id')
+            ->leftJoin('production_tax_refused_order_resolutions as x', 'x.order_public_id', '=', 'production_tax_checkout_orders.public_id')
+            ->whereNotExists(fn ($batch) => $batch->selectRaw('1')->from('paid_tax_order_origins as p')
+                ->whereColumn('p.order_public_id', 'production_tax_checkout_orders.public_id'))
+            ->select(['production_tax_checkout_orders.id', 'production_tax_checkout_orders.public_id as order_public_id',
+                'r.amount_total_minor as amount_minor', 'r.currency', 'r.observed_at as paid_at', 'x.reason as resolution_reason', 'x.resolved_at']);
+        try {
+            $account = app(RefundDisputePolicy::class)->productionAccount();
+        } catch (RefundDisputeException) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query->where('r.funds_mode', 'test')->where('r.account_id', $account);
     }
 
     /** One row per test customer (quote owner) with at least one paid or paid-exception order. */

@@ -39,6 +39,21 @@ final class RefundDisputeAuthority
     }
 
     /**
+     * Inside the caller's transaction: the actor's row locked, then staff authority and MFA re-read from it. The first lock of every
+     * staff writer, shared by the refused-order resolution (which has no batch or order row to lock after it).
+     */
+    public function lockStaff(?User $actor): User
+    {
+        RefundDisputeException::require(DB::transactionLevel() > 0, 'unavailable');
+        $current = $actor?->exists ? User::whereKey($actor->getKey())->lockForUpdate()->first() : null;
+        if (! $current || ! Gate::forUser($current)->allows('administer-catalog') || ! AdminMultiFactor::satisfiedBy($current, lockForUpdate: true)) {
+            throw new AuthorizationException;
+        }
+
+        return $current;
+    }
+
+    /**
      * Inside the caller's transaction: lock the actor and order, verify the original evidence and return the
      * locked context. The policy is required for every write.
      *
