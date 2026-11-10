@@ -313,6 +313,7 @@
     "tests/Support/rights-declaration-writer-worker.php",
     "tests/Support/rights-evidence-guard-race-worker.php",
     "tests/Support/rights-scope-writer-worker.php",
+    "tests/Support/service-invoice-worker.php",
     "tests/Support/service-project-worker.php",
     "tests/Support/site-content-race-worker.php",
     "tests/Support/sound-kit-upload-worker.php",

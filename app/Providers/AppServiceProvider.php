@@ -19,6 +19,8 @@ use App\Domain\Inquiries\Notifications\MailInquiryAlertTransport;
 use App\Domain\Media\MediaWorkflowBudget;
 use App\Domain\Merch\Fulfillment\Printful\HttpPrintfulClient;
 use App\Domain\Merch\Fulfillment\Printful\PrintfulClient;
+use App\Domain\Services\Invoicing\StripeInvoiceGateway;
+use App\Domain\Services\Invoicing\StripeSdkInvoiceGateway;
 use App\Http\ProductionCheckout\ProductionCheckoutMount;
 use App\Http\Tax\TaxHttpMount;
 use App\Models\User;
@@ -73,6 +75,7 @@ class AppServiceProvider extends ServiceProvider
             StripeSdkCheckoutGateway::class);
         $this->app->bind(StripeFinancialInspectionGateway::class,
             StripeSdkCheckoutGateway::class);
+        $this->app->bind(StripeInvoiceGateway::class, StripeSdkInvoiceGateway::class);
         // BL-63: the only Printful transport. Tests bind a fake over it; it refuses without a configured token.
         $this->app->bind(PrintfulClient::class, fn () => new HttpPrintfulClient(
             config('merch.printful.api_key'), config('merch.printful.store_id')));

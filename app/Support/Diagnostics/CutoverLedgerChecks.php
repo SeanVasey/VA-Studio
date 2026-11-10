@@ -130,6 +130,7 @@ final class CutoverLedgerChecks
         'STRIPE_TEST_FINALIZATION_ENABLED' => 'payments.stripe.finalization_enabled',
         'VASEY_TEST_CONTRACT_ISSUANCE_ENABLED' => 'contracts.test_issuance_enabled',
         'VASEY_TEST_SERVICE_PROJECTS_ENABLED' => 'services-projects.test_enabled',
+        'VASEY_TEST_SERVICE_INVOICING_ENABLED' => 'services-invoicing.test_enabled',
         'VASEY_TEST_FREE_GRANTS_ENABLED' => 'free-grants.test_enabled',
         'VASEY_TEST_CUSTOMER_CONSENT_ENABLED' => 'customer-preferences.test_grants_enabled',
         'VASEY_TEST_UNPAID_RELEASE_ENABLED' => 'unpaid-release.enabled',

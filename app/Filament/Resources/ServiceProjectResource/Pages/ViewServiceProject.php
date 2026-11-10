@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\ServiceProjectResource\Pages;
 
+use App\Domain\Services\Invoicing\ServiceInvoiceException;
+use App\Domain\Services\Invoicing\ServiceInvoicePolicy;
+use App\Domain\Services\Invoicing\ServiceInvoices;
 use App\Domain\Services\Projects\ServiceProjectInput;
 use App\Domain\Services\Projects\ServiceProjects;
 use App\Filament\Resources\ServiceProjectResource;
@@ -70,9 +73,27 @@ final class ViewServiceProject extends ViewRecord
             ->modalDescription('Record cancellation in this scope journey. Payment, refunds, existing rights and delivered files require their separate approved workflows.')
             ->schema([Textarea::make('reason')->required()->maxLength(2000)]);
 
-        return [$quote, $begin, $ready, $cancel, Action::make('attachments')->label('Private attachments')
-            ->visible(fn (): bool => SupportAttachmentUi::enabled())
-            ->url(fn (): string => '/private-support/operator/projects/'.$this->getRecord()->public_id.'/attachments/view')];
+        return [$quote, $begin, $ready, $cancel, $this->invoice('deposit', 'Issue test deposit invoice'), $this->invoice('balance', 'Issue test balance invoice'),
+            Action::make('attachments')->label('Private attachments')
+                ->visible(fn (): bool => SupportAttachmentUi::enabled())
+                ->url(fn (): string => '/private-support/operator/projects/'.$this->getRecord()->public_id.'/attachments/view')];
+    }
+
+    /** BL-70: Stripe test-mode invoice for the accepted quote's authored amount. The amount is never entered here. */
+    private function invoice(string $kind, string $label): Action
+    {
+        return Action::make('issue_'.$kind.'_invoice')->label($label)
+            ->visible(fn (): bool => app(ServiceInvoicePolicy::class)->enabled() && in_array($this->snapshot()['status'], ServiceInvoices::ELIGIBLE[$kind], true))
+            ->modalDescription('Creates a Stripe test-mode invoice for the authored '.$kind.' amount of the accepted quote. No live funds. Share the hosted invoice page with the buyer; payment is recorded only after Stripe confirms it. Repeating this does not create a second invoice.')
+            ->schema([TextInput::make('daysUntilDue')->label('Days until due (1 to 90)')->integer()->required()->minValue(1)->maxValue(90)])
+            ->action(function (array $data) use ($kind): void {
+                try {
+                    app(ServiceInvoices::class)->issue($this->getRecord()->public_id, $kind, (int) $data['daysUntilDue'], Filament::auth()->user());
+                } catch (ServiceInvoiceException $error) {
+                    throw ValidationException::withMessages(['mountedActions.0.data.daysUntilDue' => $error->getMessage()]);
+                }
+                Notification::make()->success()->title('Test invoice ready')->body('Share the hosted invoice page with the buyer. Nothing is paid until Stripe confirms it.')->send();
+            });
     }
 
     private function milestone(string $action, string $label, string $state): Action

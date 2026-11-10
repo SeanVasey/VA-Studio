@@ -1381,6 +1381,10 @@
     [
       "Tests\\Feature\\TestOwnerDeliveryResumeConcurrencyTest",
       "test_a_signed_in_admission_waiting_behind_a_completing_coverage_write_is_refused_as_counted"
+    ],
+    [
+      "Tests\\Feature\\ServiceInvoiceConcurrencyTest",
+      "test_two_independent_staff_issuing_the_same_deposit_serialize_to_one_invoice"
     ]
   ]
 }

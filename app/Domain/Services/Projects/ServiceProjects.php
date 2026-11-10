@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
+use Closure;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Crypt;
@@ -117,6 +118,25 @@ final class ServiceProjects
         });
     }
 
+    /**
+     * One staff transaction over a project for a sibling command (BL-70 invoicing). The same operator fence and raw locking reads as
+     * staffShow(); the callback receives the verified projection, the retained project row and a raw reader, and may write only its
+     * own tables. The project's events and row are re-proved unchanged before the transaction returns.
+     *
+     * @param  Closure(array, array, Closure(string, array): array): mixed  $callback
+     */
+    public function withStaffProject(string $id, User $actor, Closure $callback): mixed
+    {
+        return $this->transaction(function () use ($id, $actor, $callback): mixed {
+            $authority = $this->operator($actor);
+            $context = $this->project($id);
+            $result = $callback($context['projection'], $context['row'], fn (string $table, array $where): array => $this->rows($table, $where));
+            $this->finalAuthority($authority, $context['row'], ['project' => $context['row'], 'events' => $context['events']]);
+
+            return $result;
+        });
+    }
+
     public function staffActor(?User $actor): User
     {
         app(ServiceProjectPolicy::class)->requireEnabled();
@@ -185,14 +205,14 @@ final class ServiceProjects
             $expected = $this->rawEvidence($project);
             $this->audit($project, $body['action'], $number, CanonicalJson::hash($payload), $actor->id);
             $finalEvents = $expected['events'];
-            $result = $this->projection($project, $finalEvents);
+            $result = $this->projection($project, $finalEvents, $context['payments']);
             $this->finalAuthority($authority, $project, $expected);
 
             return ['project' => $result, 'replayed' => false];
         });
     }
 
-    /** The only transition table. No action sets a paid, delivered or completed state. */
+    /** The only transition table. No action sets a paid, delivered or completed state; payment state comes from verified invoices. */
     private function advance(array $state, array $body, string $kind, string $eventId, ?string $quoteHash, array $quotes): array
     {
         $action = $body['action'];
@@ -274,7 +294,9 @@ final class ServiceProjects
             throw new ServiceProjectException(404);
         }
         $events = $this->rows('service_project_events', ['project_id' => (int) $row['id']], 'number');
-        $projection = $this->projection($row, $events);
+        // Verified service payments (BL-70) are the only input to the payment state; a missing table is a refusal, never "not collected".
+        $payments = $this->rows('service_invoice_payments', ['project_id' => (int) $row['id']]);
+        $projection = $this->projection($row, $events, $payments);
         $quotes = [];
         foreach ($events as $event) {
             $payload = $this->decode($event['payload'], $event['payload_hash']);
@@ -283,10 +305,10 @@ final class ServiceProjects
             }
         }
 
-        return ['row' => $row, 'events' => $events, 'quotes' => $quotes, 'projection' => $projection];
+        return ['row' => $row, 'events' => $events, 'quotes' => $quotes, 'payments' => $payments, 'projection' => $projection];
     }
 
-    private function projection(array $row, array $events): array
+    private function projection(array $row, array $events, array $payments = []): array
     {
         $manifest = $this->decode($row['service_manifest'], $row['service_hash']);
         (new ServiceDraftManifest)->verified($manifest);
@@ -332,11 +354,20 @@ final class ServiceProjects
             $quoteHistory[] = ['id' => $id, 'hash' => CanonicalJson::hash($quote), ...$quote['terms']];
         }
         $accepted = ! in_array($state['status'], ['submitted', 'quoted', 'declined', 'withdrawn'], true) && $state['milestones'] !== [];
+        // Derived only from verified service payments against the current quote's authored total; never stored, never set by a command.
+        $paid = 0;
+        foreach ($payments as $payment) {
+            if ($state['quoteId'] !== null && $payment['quote_id'] === $state['quoteId']) {
+                $paid += (int) $payment['amount_minor'];
+            }
+        }
+        $paymentState = $paid === 0 || $state['quoteId'] === null ? 'not_collected'
+            : ($paid >= $quotes[$state['quoteId']]['terms']['totalMinor'] ? 'paid_in_full' : 'partially_paid');
 
         return ['id' => $row['public_id'], 'version' => count($events), 'testOnly' => true, 'title' => $manifest['title'],
             'submittedAt' => $row['created_at'], 'summary' => $brief['request']['summary'],
             'answers' => array_map(fn ($question, $answer): array => ['question' => $question, 'answer' => $answer], $manifest['brief_questions'], $brief['request']['answers']),
-            ...$state, 'quotes' => array_slice($quoteHistory, -10), 'quotesRetained' => count($quoteHistory), 'history' => array_slice($history, -100), 'eventsRetained' => count($history), 'scopeFrozen' => $accepted, 'paymentState' => 'not_collected', 'deliveryAuthorized' => false];
+            ...$state, 'quotes' => array_slice($quoteHistory, -10), 'quotesRetained' => count($quoteHistory), 'history' => array_slice($history, -100), 'eventsRetained' => count($history), 'scopeFrozen' => $accepted, 'paymentState' => $paymentState, 'deliveryAuthorized' => false];
     }
 
     private function state(array $events): array

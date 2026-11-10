@@ -5,6 +5,7 @@ namespace App\Domain\Commerce\Payments;
 use App\Domain\Commerce\Models\StripeReceiptWork;
 use App\Domain\Commerce\Models\StripeWebhookReceipt;
 use App\Domain\Commerce\QuoteException;
+use App\Domain\Services\Invoicing\ServiceInvoiceSettlement;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Throwable;
 
@@ -25,6 +26,10 @@ final class ProcessStripeReceipt
             }
             $receipt = StripeWebhookReceipt::findOrFail($receiptId);
             $locator = app(ReadStripeReceipt::class)->read($receipt);
+            // BL-70: service invoice events re-read the invoice and settle on that, in their own default-off lane.
+            if (in_array($locator['event_type'], ServiceInvoiceSettlement::EVENTS, true)) {
+                return app(ServiceInvoiceSettlement::class)->process($locator, $claim);
+            }
             if (! in_array($locator['event_type'], self::EVENTS, true)) {
                 return app(PaymentWork::class)->outcome($claim, 'unsupported', 'unsupported');
             }
@@ -37,11 +42,16 @@ final class ProcessStripeReceipt
         } catch (Throwable $error) {
             $outcome = $error instanceof PaymentVerificationException ? $error->reason :
                 ($error instanceof QuoteException || $error instanceof UniqueConstraintViolationException ? 'payment_changed' : 'retry');
-            if (! $claim) { return $outcome; }
+            if (! $claim) {
+                return $outcome;
+            }
             $state = in_array($outcome, ['receipt_changed', 'payment_changed'], true) ? 'quarantined' : 'retry';
             // Error bookkeeping is fenced too: an old failure cannot overwrite a new success.
-            try { return app(PaymentWork::class)->outcome($claim, $state, $outcome); }
-            catch (Throwable) { return 'retry'; } // Leave durable lease for recovery; no SQL/SDK exception escapes.
+            try {
+                return app(PaymentWork::class)->outcome($claim, $state, $outcome);
+            } catch (Throwable) {
+                return 'retry';
+            } // Leave durable lease for recovery; no SQL/SDK exception escapes.
         }
     }
 }
