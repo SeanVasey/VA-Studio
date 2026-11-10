@@ -44,7 +44,7 @@ Order-ready mail uses its own mailer, `transactional` in `config/mail.php`, kept
 | `VASEY_TRANSACTIONAL_MAIL_SMTP_EHLO_DOMAIN` | the `APP_URL` host | |
 | `VASEY_TRANSACTIONAL_MAIL_SENDER` | unset | the From address; must equal the declared planned sender in the preflight facts |
 
-Owner inputs (Sean, PCL-10): the provider account and credentials, the sender domain and its SPF, DKIM and DMARC records. DD-43 says the sender sits on a dedicated subdomain; Sean's later SQ-08 decision names a transactional provider stream on `mail.vasey.audio` with From `orders@vasey.audio`. The code enforces neither domain (it checks only that the sender is a plain address on a real domain that matches the declared facts), so the host value is whichever Sean confirms. In `production` the policy additionally refuses unless the mailer scheme is `smtps` and the port is 465; staging mail stays `log` and other environments are bound only by the declared facts.
+Owner inputs (Sean, PCL-10): the provider account and credentials, the sender domain and its SPF, DKIM and DMARC records. The sender is `orders@vasey.audio` (Sean confirmed 2026-11-10, SQ-08 over DD-43's dedicated-subdomain sender), sent through a transactional provider stream on `mail.vasey.audio`, with Reply-To `support@vasey.audio`. The code does not hard-code the address (it checks only that the sender is a plain address on a real domain that matches the declared facts); each host sets it. In `production` the policy additionally refuses unless the mailer scheme is `smtps` and the port is 465; staging mail stays `log` and other environments are bound only by the declared facts.
 
 ## Paid but the email failed: recovery (BL-47)
 
