@@ -47,7 +47,7 @@ class CustomerDataRetentionReportTest extends TestCase
      * changes this list, which forces a deliberate classification (RetentionSchedule::ENTRIES or NOT_CUSTOMER_DATA) or an
      * explicit addition here, documented in docs/customer-data-rights.md as fitting no PRIVACY section 7 row.
      */
-    private const UNCLASSIFIED = ['production_account_feature_bindings', 'production_buyer_assent_observations', 'production_listening_libraries'];
+    private const UNCLASSIFIED = [];
 
     private const RETENTION = ['policy_reference' => 'Synthetic retention schedule SR-1 (test only)',
         'financial_records_years' => '7', 'consent_records_years' => 3, 'correspondence_records_years' => '2', 'security_records_years' => 1,
@@ -134,7 +134,21 @@ class CustomerDataRetentionReportTest extends TestCase
                     $this->assertTrue(Schema::hasColumn($parent['table'], $link['via'][2] ?? 'id'), $entry['table']);
                     $this->assertNotNull($parent['clock'], $entry['table']);
                 }
-                $this->assertNotEmpty($link['columns'], $entry['table']);
+                // The chain ends at a `columns` clock or at the DD-48 `closure` clock, which names the account column it reads.
+                $this->assertTrue(! empty($link['columns']) || ! empty($link['closure']['account']), $entry['table']);
+                if (isset($link['closure'])) {
+                    $this->assertSame('consent', $entry['class'], $entry['table']);
+                    $this->assertTrue(Schema::hasColumns($parent['table'], [$link['closure']['account'], 'id']), $entry['table']);
+                }
+
+                continue;
+            }
+            if (isset($clock['closure'])) {
+                // DD-48: only the consent class carries it, it names an account column of its own table, and it has no other part.
+                $this->assertSame(['closure'], array_keys($clock), $entry['table']);
+                $this->assertSame('consent', $entry['class'], $entry['table']);
+                $this->assertSame(['account'], array_keys($clock['closure']), $entry['table']);
+                $this->assertTrue(Schema::hasColumns($entry['table'], [$clock['closure']['account'], 'id']), $entry['table']);
 
                 continue;
             }
@@ -170,10 +184,18 @@ class CustomerDataRetentionReportTest extends TestCase
         // An abandoned checkout or quote is counted only when no order was built from it.
         $this->assertSame([['orders', 'quote_id']], $byTable['quotes']['clock']['unless_referenced']);
         $this->assertSame([['production_checkout_orders', 'review_id']], $byTable['production_checkout_reviews']['clock']['unless_referenced']);
-        // Consent has no "address no longer held" signal, so it stays held.
-        foreach (['customer_consent_events', 'customer_consent_states', 'production_consent_events', 'production_suppression_targets'] as $held) {
+        // A test account's consent has no "address no longer held" signal, so it stays held.
+        foreach (['customer_consent_events', 'customer_consent_states', 'customer_suppression_targets'] as $held) {
             $this->assertSame(['consent', null], [$byTable[$held]['class'], $byTable[$held]['clock']], $held);
         }
+        // DD-48: a production account's consent clock starts at deletion approval (never inferred), through its binding.
+        $this->assertSame(['closure' => ['account' => 'account_id']], $byTable['production_account_feature_bindings']['clock']);
+        foreach (['production_consent_events', 'production_consent_states', 'production_suppression_targets'] as $follows) {
+            $this->assertSame(['via' => ['binding_id', 'production_account_feature_bindings']], $byTable[$follows]['clock'], $follows);
+        }
+        // DD-47: the library follows the account lifecycle; the assent observations are review evidence held indefinitely.
+        $this->assertSame(['not_applicable', null], [$byTable['production_listening_libraries']['class'], $byTable['production_listening_libraries']['clock']]);
+        $this->assertSame(['indefinite', null], [$byTable['production_buyer_assent_observations']['class'], $byTable['production_buyer_assent_observations']['clock']]);
         foreach (['jobs', 'failed_jobs', 'job_batches'] as $table) {
             $this->assertSame('operational', $byTable[$table]['class'], $table);
         }
@@ -366,7 +388,7 @@ class CustomerDataRetentionReportTest extends TestCase
         $this->assertSame($notices, $report['transactional_notices']['past_period']);
         $this->assertSame($finished, $report['transactional_mail_deliveries']['past_period']);
         $this->assertSame('customer_inquiries', $report['inquiry_messages']['follows']);
-        foreach (['customer_consent_events', 'customer_consent_states', 'customer_suppression_targets', 'production_consent_events', 'password_reset_tokens'] as $held) {
+        foreach (['customer_consent_events', 'customer_consent_states', 'customer_suppression_targets', 'password_reset_tokens'] as $held) {
             $this->assertSame(['held' => 'clock_not_modeled'], $report[$held], $held);
         }
         $this->assertGreaterThan(0, DB::table('audit_events')->count());
