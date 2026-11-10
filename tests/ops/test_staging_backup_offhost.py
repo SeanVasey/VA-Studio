@@ -1097,6 +1097,157 @@ class LocalPruning(OffhostBase):
         self.assertEqual(len(list(self.backups.iterdir())), 5)
 
 
+class DeployRetention(OffhostBase):
+    """Deploy snapshots are pruned to VASEY_BACKUP_KEEP right after the snapshot, protecting the set just taken."""
+
+    def sets(self, count):
+        names = [set_name(f"202611{day:02d}") for day in range(1, count + 1)]
+        for name in names:
+            self.make_set(name)
+        return names
+
+    def names(self):
+        return sorted(p.name for p in self.backups.iterdir() if p.is_dir())
+
+    def test_flat_prune_keeps_the_newest_keep_sets(self):
+        names = self.sets(8)
+        run = self.bash("prune_local", VASEY_BACKUP_KEEP=3)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(self.names(), names[-3:])
+
+    def test_the_named_set_and_the_last_pointer_are_never_pruned(self):
+        names = self.sets(8)
+        (self.backups / ".last").write_text(str(self.backups / names[1]) + "\n")
+        run = self.bash(f'prune_local "{names[0]}"', VASEY_BACKUP_KEEP=3)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(self.names(), sorted([names[0], names[1]] + names[-3:]))
+
+    def test_tiered_prune_also_protects_the_named_set_and_keeps_the_newest_proven_set(self):
+        names = self.sets(8)
+        env = dict(VASEY_BACKUP_RETENTION="tiered", VASEY_BACKUP_KEEP=2, VASEY_BACKUP_KEEP_DAILY=0,
+                   VASEY_BACKUP_KEEP_WEEKLY=0, VASEY_BACKUP_KEEP_MONTHLY=0)
+        run = self.bash(f'prune_local "{names[2]}"', **env)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        # newest two, the protected deploy set, and the newest set carrying a verified proof (the newest one here)
+        self.assertEqual(self.names(), sorted([names[2], names[-2], names[-1]]))
+
+    def test_a_keep_below_one_is_refused_and_removes_nothing(self):
+        self.sets(4)
+        for keep in ("0", "many"):
+            with self.subTest(keep=keep):
+                run = self.bash("prune_local", VASEY_BACKUP_KEEP=keep)
+                self.assertNotEqual(run.returncode, 0)
+                self.assertEqual(len(self.names()), 4)
+
+    def test_a_malformed_protect_name_is_refused(self):
+        self.sets(4)
+        self.assertNotEqual(self.bash('prune_local "../x"', VASEY_BACKUP_KEEP=1).returncode, 0)
+        self.assertEqual(len(self.names()), 4)
+
+    def test_failed_sets_staging_directories_and_files_outside_the_backup_directory_are_untouched(self):
+        self.sets(6)
+        failed = self.backups / "20261001T000000Z-ffffffffffff.FAILED"
+        staging = self.backups / ".ship.abc123"
+        failed.mkdir()
+        staging.mkdir()
+        retained = self.root / "retained-backups" / set_name("20260101")
+        retained.mkdir(parents=True)
+        (retained / "database.sql").write_text("x")
+        run = self.bash("prune_local", VASEY_BACKUP_KEEP=1)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertTrue(failed.is_dir() and staging.is_dir() and (retained / "database.sql").exists())
+
+    def test_predeploy_prunes_after_the_ship_and_never_fails_the_deploy_for_it(self):
+        predeploy = SOURCE[SOURCE.index("  predeploy)"):SOURCE.index("  space-check)")]
+        self.assertLess(predeploy.index('ship "$(cat'), predeploy.index("prune_local"))
+        self.assertIn('prune_local "$(basename -- "$(cat "$VASEY_BACKUP_DIR/.last")")" )', predeploy)
+        self.assertIn("|| log \"WARNING", predeploy)
+
+    def test_the_prune_subcommand_runs_the_same_function(self):
+        branch = SOURCE[SOURCE.index("  prune)"):SOURCE.index("  restore-check)")]
+        self.assertIn("prune_local", branch)
+
+
+class SpaceCheck(OffhostBase):
+    """The pre-deploy free-space check: runs before any quiesce and refuses when the snapshot would not fit."""
+
+    def setUp(self):
+        super().setUp()
+        self.private = self.root / "private"
+        self.private.mkdir()
+        (self.private / "media.bin").write_bytes(b"m" * 100_000)
+        self.restore = self.root / "restore-check"
+
+    def check(self, free, db=50_000, **extra):
+        """Runs space_check with df reporting FREE bytes and the database query answering DB (or failing when None)."""
+        mysql = 'mysql() { return 1; }' if db is None else f'mysql() {{ echo {db}; }}'
+        script = f'''PRIVATE="{self.private}"; VASEY_DB_NAME=vasey_staging; VASEY_BACKUP_MYCNF=/nonexistent
+VASEY_RESTORE_CHECK_DIR="{self.restore}"
+{mysql}
+df() {{ printf 'Avail\\n%s\\n' "{free}"; }}
+space_check'''
+        return self.bash(script, **extra)
+
+    def test_enough_space_proceeds(self):
+        run = self.check(free=1_000_000_000)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertIn("free space ok", run.stdout)
+
+    def test_insufficient_space_refuses_naming_free_and_needed_bytes_and_the_runbook(self):
+        run = self.check(free=1_000_000)
+        self.assertNotEqual(run.returncode, 0)
+        message = run.stdout + run.stderr
+        self.assertIn("1000000 bytes free", message)
+        self.assertRegex(message, r"about \d+ bytes needed")
+        self.assertIn("nothing was stopped", message)
+        self.assertIn("out of disk during snapshot", message)
+        self.assertIn("backup-prune", message)
+
+    def test_the_need_covers_private_store_database_and_margin(self):
+        # private 100000 + database 50000, the same filesystem for the restore proof (x2), then 20% and 256 MiB of margin
+        need = (150_000 * 2) + (150_000 * 2) * 20 // 100 + 268_435_456
+        self.assertEqual(self.check(free=need).returncode, 0)
+        self.assertNotEqual(self.check(free=need - 1).returncode, 0)
+
+    def test_hardened_shipping_adds_the_staged_encrypted_copy(self):
+        base = (150_000 * 2) + (150_000 * 2) * 20 // 100 + 268_435_456
+        self.assertNotEqual(self.check(free=base, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+
+    def test_the_database_size_falls_back_to_the_newest_set_and_unknown_size_refuses(self):
+        self.make_set(set_name("20261101"))
+        (self.backups / set_name("20261101") / "database.sql").write_bytes(b"d" * 70_000)
+        self.assertEqual(self.check(free=1_000_000_000, db=None).returncode, 0)
+        shutil.rmtree(self.backups / set_name("20261101"))
+        run = self.check(free=1_000_000_000, db=None)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("cannot estimate the database size", run.stdout + run.stderr)
+
+    def test_it_changes_nothing(self):
+        before = sorted(p.name for p in self.root.rglob("*"))
+        self.check(free=1)
+        self.check(free=1_000_000_000)
+        self.assertEqual(sorted(p.name for p in self.root.rglob("*")), before)
+
+    def test_the_deploy_checks_before_it_stops_anything(self):
+        deploy = (REPO / "ops/staging/forge-deploy.sh").read_text()
+        prepare = deploy.index('step "prepare under one root-held build lease')
+        started = deploy.index("ACTIVATION_STARTED=1", prepare)
+        self.assertLess(deploy.index('"${CTL[@]}" space-check', prepare - 700), prepare)
+        self.assertLess(prepare, started)
+        refresh = deploy.index('"${CTL[@]}" refresh')
+        self.assertLess(deploy.rindex('"${CTL[@]}" space-check', 0, refresh), deploy.rindex("ACTIVATION_STARTED=1", 0, refresh))
+        self.assertLess(deploy.index('"${CTL[@]}" prune'), deploy.index('"${CTL[@]}" backup-prune'))
+
+    def test_the_root_helper_checks_before_its_operation_marker_and_quiesce(self):
+        ctl = (REPO / "ops/staging/bin/vasey-staging-ctl").read_text()
+        for action in ("prepare", "activate", "refresh"):
+            body = ctl[ctl.index(f"cmd_{action}() {{"):]
+            body = body[:body.index("\n}\n")]
+            self.assertLess(body.index("cmd_space_check"), body.index(f"operation_begin {action}"), action)
+        self.assertIn("space-check) cmd_space_check", ctl)
+        self.assertIn("backup-prune) cmd_backup_prune", ctl)
+
+
 @unittest.skipUnless(os.geteuid() == 0, "the script's own preamble refuses to run as another user")
 class ConfigFileCustody(OffhostBase):
     """The optional backup.conf is sourced as root, so it must be as trusted as staging.conf."""
