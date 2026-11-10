@@ -1,0 +1,6 @@
+Order ID,Line ID,Customer ID,Ordered At,Status,Track ID,License,Amount,Refunded,Payment Ref,Currency
+synthetic-ord-2001,1,synthetic-cust-101,2026-08-01T10:00:00Z,Completed,synthetic-track-01,Basic Lease,29.99,0,synthetic-pay-2001,USD
+synthetic-ord-2002,1,synthetic-cust-102,2026-08-02T10:00:00Z,Completed,synthetic-track-02,Premium Lease,49.99,0,synthetic-pay-2002,USD
+synthetic-ord-2003,1,synthetic-cust-102,2026-08-03T10:00:00Z,Completed,synthetic-track-09,Basic Lease,29.99,0,synthetic-pay-2003,USD
+synthetic-ord-2004,1,synthetic-cust-101,2026-08-04T10:00:00Z,Completed,synthetic-track-05,Basic Lease,29.99,0,synthetic-pay-2004,USD
+synthetic-ord-2008,1,synthetic-cust-101,2026-08-08T10:00:00Z,Completed,synthetic-track-06,Basic Lease,29.99,0,synthetic-pay-2008,USD
