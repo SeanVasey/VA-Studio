@@ -2,12 +2,27 @@
 
 namespace App\Domain\SiteBuilder;
 
+use App\Domain\Albums\AlbumsPolicy;
 use App\Domain\Catalog\PublicCatalog;
 
 /** Route projections accept one already verified release, never a second pointer read. */
 final class EditorialContent
 {
-    public function chrome(array $verifiedContent): array
+    /**
+     * @param  bool  $families  add the navigation items of default-off public families that are switched on (the albums page).
+     *                          Staff previews pass false: a family page is not part of a saved site release.
+     */
+    public function chrome(array $verifiedContent, bool $families = true): array
+    {
+        $chrome = $this->baseChrome($verifiedContent);
+        if ($families && app(AlbumsPolicy::class)->enabled() && ! in_array('/albums', array_column($chrome['navigation'], 'href'), true)) {
+            $chrome['navigation'][] = ['label' => 'Albums', 'href' => '/albums'];
+        }
+
+        return $chrome;
+    }
+
+    private function baseChrome(array $verifiedContent): array
     {
         // Existing v1 props remain exact. Editorial bodies belong only to their selected route.
         if ($verifiedContent['schema_version'] === 1) {
