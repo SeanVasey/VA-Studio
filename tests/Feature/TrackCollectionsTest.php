@@ -312,6 +312,23 @@ class TrackCollectionsTest extends TestCase
     {
         $service = app(TrackCollections::class);
         $data = ['title' => 'Synthetic', 'slug' => 'synthetic', 'description' => null, 'track_ids' => []];
+        // With MFA required (staging and production), an admin without an enrolled secret passes the gate but is refused
+        // before any write, and the enrolled actor is admitted.
+        $panel = Filament::getPanel('admin');
+        $wasRequired = $panel->isMultiFactorAuthenticationRequired();
+        $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: true);
+        try {
+            try {
+                $service->save(null, $data, LicenseFixtures::admin());
+                $this->fail('An admin without MFA wrote a collection.');
+            } catch (AuthorizationException $exception) {
+                $this->assertSame('Admin multi-factor authentication is required.', $exception->getMessage());
+            }
+            $this->assertSame(0, TrackCollection::query()->count());
+            $this->assertSame('synthetic', $service->save(null, $data, $this->actor)->slug);
+        } finally {
+            $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: $wasRequired);
+        }
         $this->expectException(AuthorizationException::class);
         $service->save(null, $data, User::factory()->create());
     }
