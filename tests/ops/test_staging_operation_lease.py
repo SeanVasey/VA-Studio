@@ -83,6 +83,7 @@ stat() {
   elif [ "$2" = '%u %a' ]; then printf '0 %s\\n' "$(command stat -c %a "$path")";
   else command stat "$@"; fi
 }
+cmd_space_check() { :; }   # covered by test_staging_backup_offhost.SpaceCheck
 cmd_quiesce() { writer_gate_write closed; writer_barrier; echo quiesce >> "$TRACE"; }
 cmd_switch() { echo switch >> "$TRACE"; ln -s "$RELEASES/$1" "$CURRENT"; }
 cmd_resume() { echo resume >> "$TRACE"; writer_gate_write open; }
