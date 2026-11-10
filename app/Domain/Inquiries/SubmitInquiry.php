@@ -16,9 +16,17 @@ use Illuminate\Support\Str;
 
 final class SubmitInquiry
 {
-    public function handle(array $body, string $ownerHash): array
+    /**
+     * @param  bool  $listedSubject  true for the public contact form, whose subject must be one of InquirySubject::PUBLIC_CONTACT;
+     *                               only OrderInquiry, which keeps a free-text subject, passes false
+     */
+    public function handle(array $body, string $ownerHash, bool $listedSubject = true): array
     {
         $body = InquiryInput::validate($body);
+        // The public contact form offers a closed subject list; anything else is refused before any record exists.
+        if ($listedSubject) {
+            InquirySubject::requirePublicContact($body['subject']);
+        }
         if (preg_match('/\A[a-f0-9]{64}\z/D', $ownerHash) !== 1) {
             throw new InquiryException(422);
         }

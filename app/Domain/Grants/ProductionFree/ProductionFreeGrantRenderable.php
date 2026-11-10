@@ -3,6 +3,10 @@
 namespace App\Domain\Grants\ProductionFree;
 
 use App\Domain\Contracts\ContractIssuanceException;
+use App\Domain\Contracts\RenderFit\FaceMetrics;
+use App\Domain\Contracts\RenderFit\LineFit;
+use App\Domain\Contracts\RenderFit\PdfTextGlyphs;
+use App\Domain\Contracts\RenderFit\RenderFitException;
 use Throwable;
 
 /**
@@ -15,6 +19,11 @@ use Throwable;
  * - the font glyph check is the renderer's test on the finished text (a character the repertoire admits can still
  *   have no glyph in the retained font), over the same retained font files.
  *
+ * - the renderer's HTML cell breaks a token wider than its 180 mm column at the column but does not paginate the lines that
+ *   makes, so a long enough token is drawn below the page (the PDF holds the glyphs; no reader shows them: BL-72). The
+ *   preflight therefore always renders text holding such a token, and every preflight render is checked against the
+ *   finished PDF's own text runs: every inked character drawn in order, no run below the page or past the column.
+ *
  * No normalization is applied: a value that is not renderable exactly as typed is refused, so what is sealed is always
  * what the person entered (decomposed accents are combining marks, which the repertoire excludes).
  */
@@ -25,8 +34,10 @@ final class ProductionFreeGrantRenderable
      * identical to, over every Unicode scalar value (`hardening/codex-7/glyph-equivalence.txt`). A new revision must
      * repeat that comparison before this constant moves; a test fails until it does. Repeated for r2 on 2026-11-09
      * (`docs/verification/render-cache-hardening-20261109/glyph-equivalence-r2.txt`: 1,112,032 checked, 0 differences).
+     * Repeated for r3 on 2026-11-10 (`docs/verification/tc-lib-update-20261110/glyph-equivalence-r3.txt`, committed script beside it:
+     * 1,112,032 checked, 0 differences).
      */
-    public const VERIFIED_REVISION = 'r2';
+    public const VERIFIED_REVISION = 'r3';
 
     /**
      * Characters (newlines included) at or below which the preflight render is skipped. Wrapping never places fewer than
@@ -36,8 +47,21 @@ final class ProductionFreeGrantRenderable
      */
     private const PREFLIGHT_SKIP_CHARACTERS = 2000;
 
-    /** @var array<string, array{cw:array<int,mixed>,ctgu:array<int,int>,table:string}> */
+    /** The renderer's HTML cell: `addHTMLCell(posx: 15, width: 180)` at 10 pt (`ProductionFreeGrantPdfRenderer`). */
+    private const COLUMN_LEFT_MM = 15.0;
+
+    private const COLUMN_WIDTH_MM = 180.0;
+
+    private const FONT_SIZE_PT = 10.0;
+
+    /** The renderer sets labels in resource `F1` (bold) and values in `F2` (regular): it inserts `['B', '']` in that order. */
+    private const RESOURCE_FONTS = ['F1' => 'dejavusansb', 'F2' => 'dejavusans'];
+
+    /** @var array<string, array{cw:array<int,mixed>,dw:float,ctgu:array<int,int>,table:string}> */
     private static array $fonts = [];
+
+    /** @var array<string, array<int, int|float>> glyph id => advance (1/1000 em), by font */
+    private static array $advances = [];
 
     /** @var array<int, bool> codepoint => has a glyph in both retained font styles */
     private static array $glyphs = [];
@@ -77,7 +101,7 @@ final class ProductionFreeGrantRenderable
     public static function preflight(array $definition, array $profile): void
     {
         $text = $definition['title']."\n".$definition['terms_reference']."\n".$definition['terms_text']."\n".$definition['assent_text'];
-        if (mb_strlen($text) <= self::PREFLIGHT_SKIP_CHARACTERS) {
+        if (mb_strlen($text) <= self::PREFLIGHT_SKIP_CHARACTERS && ! self::hasOverwideToken($text)) {
             return;
         }
         $origin = ['provenance' => $profile['provenance'], 'origin_id' => '00000000-0000-4000-8000-000000000000', 'accepted_at' => '2000-01-01T00:00:00Z',
@@ -87,9 +111,66 @@ final class ProductionFreeGrantRenderable
                 'terms_reference' => $definition['terms_reference'], 'terms_text' => $definition['terms_text'], 'terms_hash' => hash('sha256', $definition['terms_text']),
                 'assent_text' => $definition['assent_text'], 'assets' => $definition['assets']]];
         try {
-            app(ProductionFreeGrantRendererProcess::class)->render(ProductionFreeGrantRenderInput::fromOrigin($origin), $profile);
+            $input = ProductionFreeGrantRenderInput::fromOrigin($origin);
+            $rendered = app(ProductionFreeGrantRendererProcess::class)->render($input, $profile);
+            self::requireDrawn($rendered->pdfBytes, (new ProductionFreeGrantText)->build($input)['text']);
         } catch (Throwable) {
             throw new ProductionFreeGrantException('unrenderable_definition');
+        }
+    }
+
+    /**
+     * True when a token (text between spaces and line breaks) is wider than the renderer's column. The HTML cell breaks such
+     * a token at the column, and the lines it makes are not paginated: a long enough token is drawn below the page, where
+     * nothing shows it (BL-72). Short text is skipped by the render bound above only because wrapping puts at least one
+     * character on a line; a token it must break does not honor that bound, so it is always rendered and checked.
+     */
+    private static function hasOverwideToken(string $text): bool
+    {
+        $text = str_replace(["\r\n", "\r", "\t"], ["\n", "\n", '    '], $text);
+        $limit = self::COLUMN_WIDTH_MM - LineFit::TOLERANCE_MM;
+
+        return LineFit::widest(self::metrics('dejavusans'), self::FONT_SIZE_PT, $text) > $limit;
+    }
+
+    /**
+     * Checks a finished original against the text it was rendered from: every non-blank character of `$text` is drawn,
+     * in order, in the face that sets it, and no text run ends past the column. The check behind the preflight render.
+     *
+     * @throws RenderFitException
+     */
+    public static function requireDrawn(string $pdf, string $text): void
+    {
+        $right = (self::COLUMN_LEFT_MM + self::COLUMN_WIDTH_MM) * 72 / 25.4 + 0.05;
+        $space = ['dejavusans' => self::gid('dejavusans', 32), 'dejavusansb' => self::gid('dejavusansb', 32)];
+        $expected = array_values(array_filter(mb_str_split($text), static fn (string $character): bool => ! in_array($character, [' ', "\n", "\t"], true)));
+        $next = 0;
+        foreach (PdfTextGlyphs::runs($pdf) as $run) {
+            $font = self::RESOURCE_FONTS[$run['font']] ?? throw new RenderFitException('text run', 'a font the renderer does not set');
+            $advance = 0.0;
+            $inked = 0.0;
+            foreach ($run['glyphs'] as $index => $glyph) {
+                $advance += ($run['shifts'][$index] ?? 0.0) + self::advance($font, $glyph);
+                if ($glyph === $space[$font]) {
+                    continue;
+                }
+                // A space that ends a line hangs past the column without printing anything.
+                $inked = $advance;
+                $character = $expected[$next++] ?? null;
+                if ($character === null || self::gid($font, mb_ord($character)) !== $glyph) {
+                    throw new RenderFitException('text run', 'a drawn glyph is not the next character of the text');
+                }
+            }
+            // The HTML cell does not paginate a token it had to break: the lines fall below the page, drawn but never shown.
+            if ($run['y'] < 0) {
+                throw new RenderFitException('text run', 'a run is drawn below the page');
+            }
+            if ($right < $run['x'] + $inked * $run['size'] / 1000) {
+                throw new RenderFitException('text run', 'a run ends past the column');
+            }
+        }
+        if ($next !== count($expected)) {
+            throw new RenderFitException('text', 'characters of the text are not drawn');
         }
     }
 
@@ -124,7 +205,39 @@ final class ProductionFreeGrantRenderable
         return ((ord($metric['table'][$codepoint * 2]) << 8) | ord($metric['table'][$codepoint * 2 + 1])) !== 0;
     }
 
-    /** @return array{cw:array<int,mixed>,ctgu:array<int,int>,table:string} */
+    private static function metrics(string $name): FaceMetrics
+    {
+        $font = self::font($name);
+
+        return FaceMetrics::fromTable($font['cw'], $font['dw']);
+    }
+
+    /** The glyph id the retained font gives a codepoint (0 when it has none). */
+    private static function gid(string $font, int $codepoint): int
+    {
+        $metric = self::font($font);
+        if ($codepoint > 0xFFFF) {
+            return (int) ($metric['ctgu'][$codepoint] ?? 0);
+        }
+
+        return (ord($metric['table'][$codepoint * 2]) << 8) | ord($metric['table'][$codepoint * 2 + 1]);
+    }
+
+    /** The advance of a glyph id in 1/1000 em, the first codepoint in the width table that maps to it. */
+    private static function advance(string $font, int $glyph): int|float
+    {
+        if (! isset(self::$advances[$font])) {
+            $advances = [];
+            foreach (self::font($font)['cw'] as $codepoint => $width) {
+                $advances += [self::gid($font, (int) $codepoint) => $width];
+            }
+            self::$advances[$font] = $advances;
+        }
+
+        return self::$advances[$font][$glyph] ?? self::font($font)['dw'];
+    }
+
+    /** @return array{cw:array<int,mixed>,dw:float,ctgu:array<int,int>,table:string} */
     private static function font(string $name): array
     {
         if (! isset(self::$fonts[$name])) {
@@ -138,7 +251,7 @@ final class ProductionFreeGrantRenderable
             } catch (Throwable) {
                 throw new ProductionFreeGrantException('renderer_unavailable');
             }
-            self::$fonts[$name] = ['cw' => $definition['cw'], 'ctgu' => is_array($definition['ctgu'] ?? null) ? $definition['ctgu'] : [], 'table' => $table];
+            self::$fonts[$name] = ['cw' => $definition['cw'], 'dw' => (float) ($definition['dw'] ?? 0), 'ctgu' => is_array($definition['ctgu'] ?? null) ? $definition['ctgu'] : [], 'table' => $table];
         }
 
         return self::$fonts[$name];

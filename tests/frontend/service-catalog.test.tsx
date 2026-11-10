@@ -47,9 +47,11 @@ describe('public service pages', () => {
 describe('contact form service prefill', () => {
   const about: EditorialDescriptor = { section: 'contact', kind: 'page', path: '/contact', title: 'Contact', description: 'Reach out.', paragraphs: [], entries: [], email: null, contactHref: null, video: null };
   const token = 'a'.repeat(64);
+  // The server's closed contact list (BL-50); it includes "Service request", which the service page's button prefills.
+  const subjects = ['General question', 'Licensing question', 'Order or download help', 'Service request'];
 
   it('starts the subject and message from the server-validated service and names it', () => {
-    render(<Editorial siteContent={chrome} editorial={about} metadata={metadata} contactInquiryEnabled contactInquiryPrivacyNotice="Notice." contactInquiryNoticeToken={token}
+    render(<Editorial siteContent={chrome} editorial={about} metadata={metadata} contactInquiryEnabled contactInquiryPrivacyNotice="Notice." contactInquiryNoticeToken={token} contactInquirySubjects={subjects}
       contactServiceRequest={{ title: 'Synthetic mix review', subject: 'Service request', message: 'I would like to request this service: Synthetic mix review\n\n' }} />);
     expect(screen.getByLabelText(/^Subject/)).toHaveValue('Service request');
     expect((screen.getByLabelText(/^Message/) as HTMLTextAreaElement).value).toContain('Synthetic mix review');
@@ -57,7 +59,7 @@ describe('contact form service prefill', () => {
   });
 
   it('leaves the form empty without a service', () => {
-    render(<Editorial siteContent={chrome} editorial={about} metadata={metadata} contactInquiryEnabled contactInquiryPrivacyNotice="Notice." contactInquiryNoticeToken={token} />);
+    render(<Editorial siteContent={chrome} editorial={about} metadata={metadata} contactInquiryEnabled contactInquiryPrivacyNotice="Notice." contactInquiryNoticeToken={token} contactInquirySubjects={subjects} />);
     expect(screen.getByLabelText(/^Subject/)).toHaveValue('');
     expect(screen.getByLabelText(/^Message/)).toHaveValue('');
     expect(screen.queryByText(/books nothing/)).not.toBeInTheDocument();

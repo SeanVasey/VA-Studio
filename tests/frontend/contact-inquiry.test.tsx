@@ -307,3 +307,41 @@ describe('private contact inquiry', () => {
     expect(fetcher.mock.calls[0][1]?.signal?.aborted).toBe(true); expect(write).not.toHaveBeenCalled();
   });
 });
+
+describe('public contact subject list (BL-50)', () => {
+  const subjects = ['General question', 'Licensing question', 'Order or download help', 'Service request'];
+  function listed() { return render(<ContactInquiryForm privacyNotice={privacy} noticeToken={noticeToken} subjects={subjects} />); }
+
+  it('offers exactly the supplied subjects in a labelled required select, not a free-text field', () => {
+    listed();
+    const select = screen.getByRole('combobox', { name: /^Subject/ });
+    expect(select).toBeRequired(); expect(select).toHaveValue('');
+    expect([...select.querySelectorAll('option')].map(option => option.textContent)).toEqual(['Choose a subject', ...subjects]);
+    expect(screen.queryByRole('textbox', { name: /^Subject/ })).not.toBeInTheDocument();
+  });
+
+  it('refuses to send without a listed subject and focuses the summary', () => {
+    const fetcher = vi.spyOn(globalThis, 'fetch'); listed(); fill({ subject: '' }); send();
+    expect(screen.getByRole('alert')).toHaveFocus();
+    expect(screen.getByRole('link', { name: 'Choose a subject.' })).toBeVisible();
+    expect(screen.getByRole('combobox', { name: /^Subject/ })).toHaveAttribute('aria-invalid', 'true');
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it('sends a service request as an ordinary inquiry body and keeps the choice locked while unconfirmed', async () => {
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(() => new Promise(() => {}));
+    listed(); fill({ subject: 'Service request' }); send();
+    expect(JSON.parse(fetcher.mock.calls[0][1]?.body as string)).toEqual({ ...draft, subject: 'Service request', noticeToken, requestKey: firstKey });
+    const select = screen.getByRole('combobox', { name: /^Subject/ });
+    expect(select).toHaveAttribute('aria-readonly', 'true');
+    fireEvent.change(select, { target: { value: 'General question' } });
+    expect(select).toHaveValue('Service request');
+  });
+
+  it('names a server subject refusal without echoing server detail', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValueOnce(response(422, { code: 'INQUIRY_VALIDATION_FAILED', errors: { subject: ['PRIVATE SERVER DETAIL'] } }));
+    listed(); fill({ subject: 'General question' }); send();
+    await waitFor(() => expect(screen.getByRole('link', { name: 'Choose one of the listed subjects.' })).toBeVisible());
+    expect(document.body.textContent).not.toContain('PRIVATE SERVER DETAIL');
+  });
+});

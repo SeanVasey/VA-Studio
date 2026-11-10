@@ -43,7 +43,7 @@ class CustomerInquiryAdminTest extends TestCase
             'inquiries.retention_policy_reference' => 'SYNTHETIC-TEST-REFERENCE', 'inquiries.operator_user_id' => $this->operator->id]);
         $release = app(SiteContent::class)->create(SiteEditorialFixtures::content(), 'Synthetic test contact', $this->operator);
         app(SiteContent::class)->publish($release->id, 0, $this->operator);
-        app(SubmitInquiry::class)->handle(['name' => 'Private synthetic buyer', 'email' => 'private@example.test', 'subject' => 'Private test subject',
+        app(SubmitInquiry::class)->handle(['name' => 'Private synthetic buyer', 'email' => 'private@example.test', 'subject' => 'Service request',
             'message' => '<script>synthetic body only</script>', 'website' => '', 'requestKey' => (string) Str::uuid(),
             'noticeToken' => app(InquiryPolicy::class)->publicSetup(app(SiteContent::class)->current())['noticeToken']], str_repeat('a', 64));
         $this->inquiry = CustomerInquiry::sole();
@@ -77,7 +77,7 @@ class CustomerInquiryAdminTest extends TestCase
         $this->actingAs($this->operator);
         $expectedUrl = url('/admin/customer-inquiries/'.$this->inquiry->public_id);
         Livewire::test(ListCustomerInquiries::class)->assertCanSeeTableRecords([$this->inquiry])
-            ->assertSee('Private test subject')->assertTableActionHasUrl('view', $expectedUrl, $this->inquiry);
+            ->assertSee('Service request')->assertTableActionHasUrl('view', $expectedUrl, $this->inquiry);
         $response = $this->get(CustomerInquiryResource::getUrl('view', ['record' => $this->inquiry]))->assertOk();
         $response->assertHeader('Cache-Control', 'no-store, private')->assertSee('private@example.test', false)
             ->assertDontSee('<script>synthetic body only</script>', false)->assertSee('&lt;script&gt;synthetic body only&lt;/script&gt;', false);

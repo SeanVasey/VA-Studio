@@ -6,7 +6,7 @@ import { PersistentPlayer } from '../components/PersistentPlayer';
 import { EditorialVideo } from '../components/EditorialVideo';
 import { ContactInquiryForm } from '../components/ContactInquiryForm';
 import { InquiryConversationEntry } from '../components/InquiryConversation';
-import { SiteFooter, SiteHeader } from '../components/SiteChrome';
+import { SiteFooter, SiteHeader, type FamilyLink } from '../components/SiteChrome';
 import { InstallApp } from '../components/InstallApp';
 import { siteContentHref, type EditorialDescriptor, type SiteContent } from '../lib/site-content';
 import { deliverableNames, type PageMetadata } from '../lib/catalog';
@@ -20,19 +20,21 @@ interface EditorialProps {
   contactInquiryEnabled?: boolean;
   contactInquiryPrivacyNotice?: string | null;
   contactInquiryNoticeToken?: string | null;
+  contactInquirySubjects?: string[] | null;
   supportAttachmentsEnabled?: boolean;
+  familyLinks?: FamilyLink[];
   /** Server-validated service named by the service page's request button; prefills the contact form only. */
   contactServiceRequest?: { title: string; subject: string; message: string } | null;
 }
 
-export default function Editorial({ siteContent, editorial, sitePreview = false, sitePreviewBase = null, metadata, contactInquiryEnabled = false, contactInquiryPrivacyNotice = null, contactInquiryNoticeToken = null, supportAttachmentsEnabled = false, contactServiceRequest = null }: EditorialProps) {
+export default function Editorial({ siteContent, editorial, sitePreview = false, sitePreviewBase = null, metadata, contactInquiryEnabled = false, contactInquiryPrivacyNotice = null, contactInquiryNoticeToken = null, contactInquirySubjects = null, supportAttachmentsEnabled = false, familyLinks = [], contactServiceRequest = null }: EditorialProps) {
   const href = (path: string) => siteContentHref(path, sitePreviewBase);
   function navigate(event: MouseEvent<HTMLAnchorElement>) {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
     event.preventDefault();
     router.visit(event.currentTarget.href, { preserveScroll: false, onSuccess: () => (document.getElementById('editorial-title') ?? document.getElementById('detail-title') ?? document.getElementById('catalog-title'))?.focus({ preventScroll: true }) });
   }
-  const chrome = { content: siteContent, homeHref: href('/'), href, onNavigate: navigate };
+  const chrome = { content: siteContent, homeHref: href('/'), href, onNavigate: navigate, familyLinks: sitePreview ? [] : familyLinks };
   return <>
     <MetadataHead metadata={metadata} publicInstallation={!sitePreview} />
     <a className="skip-link" href="#main">Skip to content</a>
@@ -64,8 +66,9 @@ export default function Editorial({ siteContent, editorial, sitePreview = false,
       {editorial.kind === 'collection' && <div className="editorial-list">{editorial.entries.map((entry, index) => <article className="editorial-entry" key={entry.slug}>
         <span className="editorial-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><div><h2><a href={href(entry.path)} onClick={navigate}>{entry.title}</a></h2><p>{entry.description}</p><a className="text-link" href={href(entry.path)} onClick={navigate} aria-label={`${editorial.section === 'blog' ? 'Read' : 'View'} ${entry.title}`}>{editorial.section === 'blog' ? 'Read article' : 'View video'} <Icon name="arrow" size={16} /></a></div>
       </article>)}</div>}
-      {!sitePreview && editorial.section === 'contact' && contactInquiryEnabled && contactInquiryPrivacyNotice && contactInquiryNoticeToken && <ContactInquiryForm privacyNotice={contactInquiryPrivacyNotice} noticeToken={contactInquiryNoticeToken} attachmentsEnabled={supportAttachmentsEnabled} initialSubject={contactServiceRequest?.subject} initialMessage={contactServiceRequest?.message} serviceTitle={contactServiceRequest?.title} />}
-      {!sitePreview && editorial.section === 'contact' && !(contactInquiryEnabled && contactInquiryPrivacyNotice && contactInquiryNoticeToken) && <InquiryConversationEntry attachmentsEnabled={supportAttachmentsEnabled} />}
+      {!sitePreview && editorial.section === 'contact' && (contactInquiryEnabled && contactInquiryPrivacyNotice && contactInquiryNoticeToken && Array.isArray(contactInquirySubjects) && contactInquirySubjects.length > 0
+        ? <ContactInquiryForm privacyNotice={contactInquiryPrivacyNotice} noticeToken={contactInquiryNoticeToken} subjects={contactInquirySubjects} attachmentsEnabled={supportAttachmentsEnabled} initialSubject={contactServiceRequest?.subject} initialMessage={contactServiceRequest?.message} serviceTitle={contactServiceRequest?.title} />
+        : <InquiryConversationEntry attachmentsEnabled={supportAttachmentsEnabled} />)}
       {editorial.email && <div className="editorial-contact"><p className="eyebrow">Email</p><p>{editorial.email}</p>{!sitePreview && editorial.contactHref ? <a className="button" href={editorial.contactHref}>Open email <Icon name="northeast" size={18} /></a> : <span className="fine-print">Email action disabled in private preview.</span>}</div>}
       {editorial.video && <EditorialVideo key={`${editorial.path}:${editorial.video.provider}:${editorial.video.videoId}:${sitePreview}`} video={editorial.video} title={editorial.title} privatePreview={sitePreview} />}
       {editorial.kind === 'entry' && editorial.relatedTracks && editorial.relatedTracks.length > 0 && <section aria-labelledby="related-tracks-title">
