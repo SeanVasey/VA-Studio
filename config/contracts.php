@@ -14,6 +14,13 @@ return [
         'signature_sha256' => env('VASEY_LICENSE_SIGNATURE_SHA256'),
     ],
 
+    // Sound-kit license (BL-66, `vasey-kit-license-pdf-v1`): the licensor display name printed in the kit license and on its
+    // signature line. Blank refuses rendering. Sean's signature is the same private PNG as `vasey_license_v1` above. Built, not
+    // selected for any issuance.
+    'vasey_kit_license' => [
+        'licensor_name' => env('VASEY_KIT_LICENSE_LICENSOR_NAME'),
+    ],
+
     // Selection of `vasey-license-pdf-v2` for NEW paid and paid-tax originals (App\Domain\Grants\VaseyLicenseIssuance).
     // A code literal, never an environment read: only an exact `true` set in `local` or `testing` admits, and
     // ops/production/validate-runtime.php holds it false. Existing originals keep the profile recorded at their origin.
