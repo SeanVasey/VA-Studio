@@ -128,6 +128,7 @@ if [ "${KIT_DIR#"$MIRROR_DIR"/}" != "$KIT_DIR" ]; then
   done <<'HELPERS'
 required bin/vasey-staging-ctl /usr/local/sbin/vasey-staging-ctl
 required backup.sh /usr/local/sbin/vasey-staging-backup
+required scheduler-watch.sh /usr/local/sbin/vasey-staging-scheduler-watch
 required release-step.sh /usr/local/libexec/vasey-staging/release-step.sh
 required seal-release.py /usr/local/libexec/vasey-staging/seal-release.py
 required normalize-mysql-dump.py /usr/local/libexec/vasey-staging/normalize-mysql-dump.py

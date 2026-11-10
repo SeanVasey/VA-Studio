@@ -39,4 +39,11 @@ return [
         'backup_stale_hours' => (int) env('REPORTING_BACKUP_STALE_HOURS', 26),
         'restore_drill_stale_days' => (int) env('REPORTING_RESTORE_DRILL_STALE_DAYS', 35),
     ],
+    // Scheduler dead-man's switch (FP-028; App\Domain\Operations\SchedulerWatch). Default-off: no recipient, nothing is sent.
+    // The recipient is a plain lowercase address; sending also needs the transactional-mail configuration to admit it.
+    'scheduler_alert' => [
+        'recipient' => env('REPORTING_SCHEDULER_ALERT_TO'),
+        // Null: storage/app/private/ops-state/scheduler-watch.json. Not an env read; tests set an absolute path.
+        'state_path' => null,
+    ],
 ];
