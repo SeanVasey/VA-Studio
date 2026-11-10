@@ -230,10 +230,13 @@ final class SiteImageFixtures
     /** The size each slot's fixtures use: the slot's own reference size, so every check passes. */
     public const SIZES = ['hero_desktop' => [2400, 890], 'hero_mobile' => [960, 890], 'studio' => [1440, 630], 'share' => [1200, 630]];
 
+    /** Slots that no site release uses, so suites looping over the site release slots leave them out (BL-67 cover art). */
+    public const OTHER_SIZES = ['release_cover' => [1200, 1200]];
+
     /** A processed, ready image for a slot. The caller has bound the testing-only scanner (MediaFixtures::configure()). */
     public static function ready(string $slot, User $uploader, ?string $bytes = null, string $name = 'synthetic-fixture'): SiteImage
     {
-        [$width, $height] = self::SIZES[$slot];
+        [$width, $height] = self::SIZES[$slot] ?? self::OTHER_SIZES[$slot];
         $image = app(SiteImageProcessor::class)->handle(self::quarantined($slot, $bytes ?? self::jpeg($width, $height), $width, $height, $uploader, name: $name)->id);
         if ($image->status !== 'ready') {
             throw new \LogicException('The synthetic site image did not become ready: '.$image->failure_code);
