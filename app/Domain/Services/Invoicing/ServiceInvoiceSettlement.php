@@ -46,7 +46,13 @@ final class ServiceInvoiceSettlement
             // A crash between Stripe's finalize and the local record leaves a `creating` row with no provider id: adopt it by the
             // metadata this server set, but only when the provider facts then match that row. Anything else is not ours.
             $ref = is_array($provider['metadata'] ?? null) ? ($provider['metadata']['va_service_invoice'] ?? null) : null;
-            $local = is_string($ref) ? ServiceInvoice::where('public_id', $ref)->where('state', 'creating')->whereNull('stripe_invoice_id')->first() : null;
+            $named = is_string($ref) ? ServiceInvoice::where('public_id', $ref)->first() : null;
+            if ($named && ! ($named->state === 'creating' && $named->stripe_invoice_id === null)) {
+                // A second Stripe invoice for a local row that already has (or had) its own: money may have moved on an invoice this
+                // server does not track. Never "unsupported": quarantine it for an operator.
+                throw new PaymentVerificationException('payment_changed');
+            }
+            $local = $named;
             if (! $local) {
                 return app(PaymentWork::class)->outcome($claim, 'unsupported', 'not_a_service_invoice');
             }
@@ -132,6 +138,10 @@ final class ServiceInvoiceSettlement
         if ($invoice->state !== 'open') {
             // Open at Stripe but void, paid or uncollectible here (a stale or out-of-order event): leave the stronger local fact alone.
             return 'stale_open';
+        }
+        if ($eventType === 'invoice.paid') {
+            // The event says paid, the provider says open: a lagging read or a forged event. Never final; bounded by the work attempts.
+            throw new PaymentVerificationException('retry');
         }
         if ($eventType === 'invoice.payment_failed') {
             $invoice->fill(['payment_failures' => $invoice->payment_failures + 1, 'last_payment_failed_at' => now(), 'updated_at' => now()])->save();

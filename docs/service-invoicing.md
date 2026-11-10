@@ -70,6 +70,24 @@ event id. `ProcessStripeReceipt` routes the four invoice events to `ServiceInvoi
 current quote, `partially_paid` below the quote's `totalMinor`, `paid_in_full` at or above it. `deliveryAuthorized` stays `false`.
 The project commands are unchanged: none of them can invoice, mark paid, complete or deliver, and a test pins that.
 
+## Known limitations and operator runbook (test mode)
+
+- **Refunds, credit notes and disputes after payment never change `paymentState`.** `charge.refunded`, `credit_note.*` and
+  `charge.dispute.*` are not routed. A project stays `paid_in_full` after a refund. `deliveryAuthorized` is always `false`, so
+  nothing is granted on the strength of it, but phase 2 must not treat `paymentState` as current money without refund handling.
+- **A second provider invoice for a local row is quarantined.** Before creating, the gateway searches Stripe by the
+  `va_service_invoice` metadata and adopts an invoice it finds (so a retry after the idempotency window cannot create a duplicate;
+  Stripe search is eventually consistent, so a retry within about a minute of the first attempt may not see it, and the
+  deterministic idempotency keys cover that case). If a paid invoice still names a local row that already has another invoice id,
+  settlement quarantines it (`payment_changed`) instead of ignoring it, and an operator reconciles in the Stripe Dashboard.
+- **Stuck `creating` row** after Stripe returned an invoice that did not match the quote: nothing was recorded. Void the invoice in
+  the Stripe Dashboard, then issue again; the row is re-resolved by its reference. (Test mode only; there is no void command.)
+- **Cancelling a project does not void its invoices.** Staff must void any open invoice in Stripe when cancelling; the lane follows
+  the provider and records the void from the webhook.
+- **Flag toggled off while invoices are open:** invoice events received meanwhile end `unsupported` (`service_invoicing_off`) and are
+  not retried. After re-enabling, replay those receipts (`php artisan vasey:process-stripe-receipts <receipt> --replay`) so a payment is not missed.
+- **A `paid` event over an invoice Stripe still reports `open`** retries, bounded by the receipt work attempts, then quarantines.
+
 ## Data
 
 | Table | Meaning | Retention class |

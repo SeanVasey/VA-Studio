@@ -40,6 +40,12 @@ final class FakeStripeInvoiceGateway implements StripeInvoiceGateway
             $this->failIssue = null;
             throw new RuntimeException('STRIPE_INVOICE_UNAVAILABLE');
         }
+        // Provider-side search by the reference the server set, as the real gateway does before creating.
+        foreach ($this->invoices as $existing) {
+            if (($existing['metadata']['va_service_invoice'] ?? null) === $spec['invoice_ref']) {
+                return ['customer_id' => $existing['customer'], 'invoice' => $existing];
+            }
+        }
         $id = $this->byKey[$spec['key']] ??= 'in_Fake'.substr($spec['key'], 0, 20);
         $customer = $spec['customer_id'] ?? 'cus_Fake'.substr($spec['key'], 0, 12);
         $this->invoices[$id] ??= [

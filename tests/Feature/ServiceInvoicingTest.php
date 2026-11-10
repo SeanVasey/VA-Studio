@@ -388,9 +388,15 @@ class ServiceInvoicingTest extends TestCase
         [$fixture, $project] = $this->accepted();
         $this->issue($fixture, $project);
         $id = $this->stripe->onlyInvoiceId();
-        $this->assertSame('still_open', $this->settle($this->event('invoice.paid', $id, null, ['status' => 'paid', 'amount_paid' => 3500])));
+        // A "paid" event over an open invoice is never terminal: it retries (bounded by the work attempts) and records nothing.
+        $this->assertSame('retry', $this->settle($this->event('invoice.paid', $id, null, ['status' => 'paid', 'amount_paid' => 3500])));
         $this->assertSame(0, ServiceInvoicePayment::count());
+        $this->assertSame('retry', StripeReceiptWork::sole()->state);
         $this->assertSame('open', ServiceInvoice::sole()->state);
+        // Once the provider really reports it paid, the same receipt settles.
+        $this->stripe->pay($id);
+        $this->travelTo(now()->addHour());
+        $this->assertSame('payment_verified', app(ProcessStripeReceipt::class)->handle(StripeWebhookReceipt::sole()->id));
         $this->assertSame('not_collected', $this->state($fixture, $project)['paymentState']);
     }
 
@@ -519,6 +525,32 @@ class ServiceInvoicingTest extends TestCase
         $row = ServiceInvoice::sole();
         $this->assertSame([$id, 'paid'], [$row->stripe_invoice_id, $row->state]);
         $this->assertSame(1, ServiceInvoicePayment::count());
+    }
+
+    public function test_retrying_after_the_idempotency_window_adopts_the_provider_invoice_instead_of_creating_a_second(): void
+    {
+        [$fixture, $project] = $this->accepted();
+        $this->stripe->failIssue = 'after';
+        $this->assertSame(503, $this->refusal(fn () => $this->issue($fixture, $project)));
+        $first = $this->stripe->onlyInvoiceId();
+        $this->stripe->byKey = [];
+        $again = $this->issue($fixture, $project);
+        $this->assertSame('open', $again['invoice']['state']);
+        $this->assertCount(1, $this->stripe->invoices);
+        $this->assertSame($first, ServiceInvoice::sole()->stripe_invoice_id);
+    }
+
+    public function test_a_second_provider_invoice_naming_a_tracked_row_is_quarantined_not_unsupported(): void
+    {
+        [$fixture, $project] = $this->accepted();
+        $this->issue($fixture, $project);
+        $tracked = $this->stripe->onlyInvoiceId();
+        $this->stripe->invoices['in_FakeDuplicate'] = [...$this->stripe->invoices[$tracked], 'id' => 'in_FakeDuplicate'];
+        $this->stripe->pay('in_FakeDuplicate');
+        $this->assertSame('payment_changed', $this->settle($this->event('invoice.paid', 'in_FakeDuplicate')));
+        $this->assertSame('quarantined', StripeReceiptWork::sole()->state);
+        $this->assertSame(0, ServiceInvoicePayment::count());
+        $this->assertSame('open', ServiceInvoice::sole()->state);
     }
 
     public function test_a_provider_invoice_naming_a_row_with_other_facts_is_not_adopted(): void

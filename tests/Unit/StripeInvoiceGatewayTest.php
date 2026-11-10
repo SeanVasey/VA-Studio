@@ -59,6 +59,11 @@ class StripeInvoiceGatewayTest extends TestCase
             'currency' => 'usd', 'total' => 0, 'amount_due' => 0, 'lines' => ['object' => 'list', 'data' => [], 'has_more' => false]], $changes);
     }
 
+    private function none(): array
+    {
+        return ['object' => 'search_result', 'data' => [], 'has_more' => false];
+    }
+
     private function line(): array
     {
         return ['id' => 'il_Synthetic', 'object' => 'line_item', 'amount' => 3500];
@@ -73,12 +78,12 @@ class StripeInvoiceGatewayTest extends TestCase
     {
         Stripe::$apiVersion = '2000-01-01';
         Stripe::$maxNetworkRetries = 9;
-        $http = new InvoiceHttpFixture([$this->account(), ['id' => 'cus_SyntheticOne', 'object' => 'customer', 'livemode' => false], $this->invoice(), $this->invoice(), $this->open(), $this->open()]);
+        $http = new InvoiceHttpFixture([$this->account(), $this->none(), ['id' => 'cus_SyntheticOne', 'object' => 'customer', 'livemode' => false], $this->invoice(), $this->invoice(), $this->open(), $this->open()]);
         $result = (new StripeSdkInvoiceGateway($http))->issue($this->spec());
 
         $this->assertSame('cus_SyntheticOne', $result['customer_id']);
         $this->assertSame('open', $result['invoice']['status']);
-        $expected = [['get', 'account'], ['post', 'customers'], ['post', 'invoices'], ['get', 'invoices/in_SyntheticOne'],
+        $expected = [['get', 'account'], ['get', 'invoices/search'], ['post', 'customers'], ['post', 'invoices'], ['get', 'invoices/in_SyntheticOne'],
             ['post', 'invoices/in_SyntheticOne/add_lines'], ['post', 'invoices/in_SyntheticOne/finalize']];
         $this->assertSame($expected, array_map(fn (array $request): array => [$request['method'], substr($request['url'], strlen('https://api.stripe.com/v1/'))], $http->requests));
         foreach ($http->requests as $request) {
@@ -87,29 +92,49 @@ class StripeInvoiceGatewayTest extends TestCase
             $this->assertContains('Stripe-Version: 2026-08-26.dahlia', $request['headers']);
             $this->assertSame([], array_values(array_filter($request['headers'], fn (string $header): bool => str_starts_with($header, 'Stripe-Account:') || str_starts_with($header, 'Stripe-Context:'))));
         }
-        $this->assertContains('Idempotency-Key: svcinv-cus-'.self::KEY, $http->requests[1]['headers']);
-        $this->assertContains('Idempotency-Key: svcinv-inv-'.self::KEY, $http->requests[2]['headers']);
-        $this->assertContains('Idempotency-Key: svcinv-line-'.self::KEY, $http->requests[4]['headers']);
-        $this->assertContains('Idempotency-Key: svcinv-fin-'.self::KEY, $http->requests[5]['headers']);
-        $this->assertSame(['email' => 'buyer@example.invalid', 'metadata' => ['va_project' => '6e1d7f0a-0c53-4b43-a0c0-6e6c4f3b9a11']], $http->requests[1]['params']);
+        $this->assertContains('Idempotency-Key: svcinv-cus-'.self::KEY, $http->requests[2]['headers']);
+        $this->assertContains('Idempotency-Key: svcinv-inv-'.self::KEY, $http->requests[3]['headers']);
+        $this->assertContains('Idempotency-Key: svcinv-line-'.self::KEY, $http->requests[5]['headers']);
+        $this->assertContains('Idempotency-Key: svcinv-fin-'.self::KEY, $http->requests[6]['headers']);
+        $this->assertSame(['email' => 'buyer@example.invalid', 'metadata' => ['va_project' => '6e1d7f0a-0c53-4b43-a0c0-6e6c4f3b9a11']], $http->requests[2]['params']);
         $this->assertSame(['customer' => 'cus_SyntheticOne', 'collection_method' => 'send_invoice', 'days_until_due' => 14, 'currency' => 'usd', 'auto_advance' => 'false',
             'pending_invoice_items_behavior' => 'exclude', 'description' => 'Deposit: Synthetic scope',
-            'metadata' => ['va_service_invoice' => '2f9d2e0e-3d0e-4c5a-9a3e-1b2c3d4e5f60', 'va_project' => '6e1d7f0a-0c53-4b43-a0c0-6e6c4f3b9a11']], $http->requests[2]['params']);
-        $this->assertSame(['lines' => [['description' => 'Deposit: Synthetic scope', 'amount' => 3500]]], $http->requests[4]['params']);
+            'metadata' => ['va_service_invoice' => '2f9d2e0e-3d0e-4c5a-9a3e-1b2c3d4e5f60', 'va_project' => '6e1d7f0a-0c53-4b43-a0c0-6e6c4f3b9a11']], $http->requests[3]['params']);
+        $this->assertSame(['lines' => [['description' => 'Deposit: Synthetic scope', 'amount' => 3500]]], $http->requests[5]['params']);
+        $this->assertStringContainsString('va_service_invoice', (string) json_encode($http->requests[1]['params']));
     }
 
     public function test_a_resumed_issue_reuses_the_customer_and_skips_steps_the_provider_already_completed(): void
     {
-        $http = new InvoiceHttpFixture([$this->account(), $this->open(), $this->open()]);
+        $http = new InvoiceHttpFixture([$this->account(), $this->none(), $this->open(), $this->open()]);
         $result = (new StripeSdkInvoiceGateway($http))->issue($this->spec(['customer_id' => 'cus_SyntheticOne']));
         $this->assertSame('open', $result['invoice']['status']);
-        $this->assertSame(['account', 'invoices', 'invoices/in_SyntheticOne'], array_map(fn (array $request): string => substr($request['url'], strlen('https://api.stripe.com/v1/')), $http->requests));
+        $this->assertSame(['account', 'invoices/search', 'invoices', 'invoices/in_SyntheticOne'], array_map(fn (array $request): string => substr($request['url'], strlen('https://api.stripe.com/v1/')), $http->requests));
 
         $withLine = $this->invoice(['lines' => ['object' => 'list', 'data' => [$this->line()], 'has_more' => false]]);
-        $http = new InvoiceHttpFixture([$this->account(), $withLine, $withLine, $this->open()]);
+        $http = new InvoiceHttpFixture([$this->account(), $this->none(), $withLine, $withLine, $this->open()]);
         (new StripeSdkInvoiceGateway($http))->issue($this->spec(['customer_id' => 'cus_SyntheticOne']));
-        $this->assertSame(['account', 'invoices', 'invoices/in_SyntheticOne', 'invoices/in_SyntheticOne/finalize'],
+        $this->assertSame(['account', 'invoices/search', 'invoices', 'invoices/in_SyntheticOne', 'invoices/in_SyntheticOne/finalize'],
             array_map(fn (array $request): string => substr($request['url'], strlen('https://api.stripe.com/v1/')), $http->requests));
+    }
+
+    public function test_an_invoice_that_already_carries_the_local_reference_is_adopted_not_duplicated(): void
+    {
+        $ref = '2f9d2e0e-3d0e-4c5a-9a3e-1b2c3d4e5f60';
+        $existing = $this->open() + [];
+        $existing['metadata'] = ['va_service_invoice' => $ref];
+        $http = new InvoiceHttpFixture([$this->account(), ['object' => 'search_result', 'data' => [$existing], 'has_more' => false], $existing]);
+        $result = (new StripeSdkInvoiceGateway($http))->issue($this->spec());
+        $this->assertSame(['in_SyntheticOne', 'cus_SyntheticOne'], [$result['invoice']['id'], $result['customer_id']]);
+        $this->assertSame(['account', 'invoices/search', 'invoices/in_SyntheticOne'],
+            array_map(fn (array $request): string => substr($request['url'], strlen('https://api.stripe.com/v1/')), $http->requests));
+        $this->assertSame([], array_filter($http->requests, fn (array $request): bool => $request['method'] === 'post'));
+        // Two invoices naming one local row is ambiguous: refuse rather than choose.
+        $http = new InvoiceHttpFixture([$this->account(), ['object' => 'search_result', 'data' => [$existing, [...$existing, 'id' => 'in_Second']], 'has_more' => false]]);
+        $this->refused(fn () => (new StripeSdkInvoiceGateway($http))->issue($this->spec()));
+        // A reference that is not a UUID is never interpolated into a search query.
+        $http = new InvoiceHttpFixture([$this->account()]);
+        $this->refused(fn () => (new StripeSdkInvoiceGateway($http))->issue($this->spec(['invoice_ref' => "x' OR metadata['a']:'b"])));
     }
 
     public static function refusedSpecs(): array

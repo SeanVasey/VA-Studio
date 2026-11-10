@@ -45,6 +45,21 @@ final class StripeSdkInvoiceGateway implements StripeInvoiceGateway
             $this->verifyAccount($client, $account);
             $key = $spec['key'];
             $customerId = $spec['customer_id'];
+            // An earlier attempt may have created the invoice and outlived the provider's idempotency-key window: find it by the
+            // reference this server set and adopt it, never create a second invoice for the same local row.
+            $found = $client->invoices->search(['query' => "metadata['va_service_invoice']:'".$spec['invoice_ref']."'", 'limit' => 3])->toArray();
+            $matches = array_values(array_filter($found['data'] ?? [], fn ($candidate): bool => is_array($candidate) && ($candidate['metadata']['va_service_invoice'] ?? null) === $spec['invoice_ref']));
+            if (count($matches) > 1 || preg_match('/\A[0-9a-f-]{36}\z/D', $spec['invoice_ref']) !== 1) {
+                throw new RuntimeException(self::UNAVAILABLE);
+            }
+            if (count($matches) === 1) {
+                $existing = $this->invoice($matches[0], $matches[0]['id'] ?? null);
+                if (! self::customerId($existing['customer'] ?? null)) {
+                    throw new RuntimeException(self::UNAVAILABLE);
+                }
+
+                return ['customer_id' => $existing['customer'], 'invoice' => $this->invoice($client->invoices->retrieve($existing['id'], [])->toArray(), $existing['id'])];
+            }
             if ($customerId === null) {
                 $customer = $client->customers->create(['email' => $spec['email'], 'metadata' => ['va_project' => $spec['project_ref']]],
                     ['idempotency_key' => 'svcinv-cus-'.$key])->toArray();
