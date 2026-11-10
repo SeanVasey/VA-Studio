@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Services\Catalog\ServicePublications;
 use App\Domain\SiteBuilder\FamilyEntryPoints;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteContentSchema;
@@ -28,14 +29,14 @@ class FamilyEntryPointsTest extends TestCase
     {
         parent::setUp();
         $this->withoutVite();
-        config(['app.debug' => false, 'app.url' => 'https://audio.example.test',
-            'services-projects.test_enabled' => false, 'memberships.test_mode_enabled' => false]);
+        config(['app.debug' => false, 'app.url' => 'https://audio.example.test', 'services-projects.test_enabled' => false,
+            'services-projects.catalog_enabled' => false, 'memberships.test_mode_enabled' => false]);
     }
 
     public static function familyPaths(): array
     {
-        return ['service projects' => ['/services/projects', 'services'], 'encoded service' => ['/%73ervices//projects?x=1', 'services'],
-            'service root' => ['/SERVICES#top', 'services'], 'membership' => ['/memberships', 'memberships'],
+        return ['service projects' => ['/services/projects', 'service-projects'], 'encoded service' => ['/%73ervices//projects?x=1', 'service-projects'],
+            'service root' => ['/SERVICES#top', 'services'], 'service page' => ['/services/web-design', 'services'], 'membership' => ['/memberships', 'memberships'],
             'member credits' => ['/account/membership-credits/1', 'memberships'], 'member periods' => ['/production-memberships/periods', 'memberships']];
     }
 
@@ -45,11 +46,30 @@ class FamilyEntryPointsTest extends TestCase
         $families = app(FamilyEntryPoints::class);
         $this->assertSame($family, $families->familyOf($path));
         $this->assertFalse($families->admits($path));
-        config(['services-projects.test_enabled' => true, 'memberships.test_mode_enabled' => true]);
+        config(['services-projects.test_enabled' => true, 'services-projects.catalog_enabled' => true, 'memberships.test_mode_enabled' => true]);
         $this->assertTrue($families->admits($path));
         // The policies, not this registry, decide: production refuses both test journeys.
         $this->app->instance('env', 'production');
         $this->assertFalse($families->admits($path));
+    }
+
+    public function test_the_catalog_and_the_test_journey_follow_their_own_switches_and_the_projects_slug_stays_reserved(): void
+    {
+        $families = app(FamilyEntryPoints::class);
+        $this->assertContains('projects', ServicePublications::RESERVED_SLUGS);
+        // Catalog on, journey off: public service pages are admitted, the private journey path is not.
+        config(['services-projects.catalog_enabled' => true]);
+        $this->assertTrue($families->admits('/services'));
+        $this->assertTrue($families->admits('/services/web-design'));
+        $this->assertFalse($families->admits('/services/projects'));
+        $this->assertFalse($families->admits('/services/projects/12'));
+        $this->assertSame([], $families->links());
+        // Journey on, catalog off: the reverse.
+        config(['services-projects.catalog_enabled' => false, 'services-projects.test_enabled' => true]);
+        $this->assertFalse($families->admits('/services'));
+        $this->assertFalse($families->admits('/services/web-design'));
+        $this->assertTrue($families->admits('/services/projects'));
+        $this->assertSame([['label' => 'Service projects', 'href' => '/services/projects']], $families->links());
     }
 
     public function test_paths_of_families_without_a_policy_and_ordinary_pages_are_left_to_their_own_checks(): void

@@ -17,19 +17,24 @@ use InvalidArgumentException;
 final class FamilyEntryPoints
 {
     /**
-     * Path prefixes, matched whole-segment ("/services" covers "/services/projects" but not "/servicesx"), and the one
-     * header link a family shows while enabled. Memberships have no public page; their entry point is the customer
+     * Path prefixes, matched whole-segment ("/services" covers "/services/web-design" but not "/servicesx"), and the one
+     * header link a family shows while enabled. The first matching family wins, so "service-projects" (the test
+     * journey, read through `enabled()`) is listed before "services" (the public catalog pages, read through
+     * `catalogEnabled()`); the slug "projects" is reserved for the former (ServicePublications::RESERVED_SLUGS).
+     * The catalog has no header link of its own. Memberships have no public page; their entry point is the customer
      * library, which reads the same policy.
      */
     public const FAMILIES = [
-        'services' => ['paths' => ['/services'], 'link' => ['label' => 'Service projects', 'href' => '/services/projects']],
+        'service-projects' => ['paths' => ['/services/projects'], 'link' => ['label' => 'Service projects', 'href' => '/services/projects']],
+        'services' => ['paths' => ['/services'], 'link' => null],
         'memberships' => ['paths' => ['/memberships', '/membership', '/production-memberships', '/account/membership-credits'], 'link' => null],
     ];
 
     public function enabled(string $family): bool
     {
         return match ($family) {
-            'services' => app(ServiceProjectPolicy::class)->enabled(),
+            'service-projects' => app(ServiceProjectPolicy::class)->enabled(),
+            'services' => app(ServiceProjectPolicy::class)->catalogEnabled(),
             'memberships' => app(MembershipPolicy::class)->enabled(),
             default => throw new InvalidArgumentException('Unknown product family.'),
         };
