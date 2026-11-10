@@ -52,6 +52,21 @@ class ProductionIdentityHttpTest extends TestCase
         $this->assertSame($staff->id, Auth::guard('web')->id());
     }
 
+    /** #258 P3-1: migrate(true) keeps session data, so the production sign-out must forget the v2 test delivery binding itself. */
+    public function test_sign_out_through_the_route_forgets_the_v2_test_delivery_session_binding(): void
+    {
+        $this->completeIdentity($this->requestIdentity());
+        $this->postJson('/customer/sign-in', ['email' => 'buyer@example.test', 'password' => 'MailboxPassword123'])->assertOk();
+        $binding = ['secret' => str_repeat('a', 64), 'presented' => []];
+        $this->withSession(['_test_delivery_session' => $binding]);
+        $this->get('/customer')->assertOk();
+        $this->assertSame($binding, session('_test_delivery_session'));
+        $this->call('POST', '/customer/sign-out', [], [], [], ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json'], '{}')->assertOk();
+        $this->assertFalse(Auth::guard('customer')->check());
+        $this->assertFalse(session()->has('_test_delivery_session'));
+        $this->assertFalse(session()->has('_production_customer_identity'));
+    }
+
     public function test_login_event_credential_change_cannot_stamp_later_password_as_authenticated(): void
     {
         $this->completeIdentity($this->requestIdentity());

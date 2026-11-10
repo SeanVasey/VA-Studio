@@ -377,10 +377,10 @@ The test-delivery chain is phase 1. Paid, paid-tax, free and production-free fol
 MySQL race evidence and independent review. #252 and #253 are closed as superseded.
 
 *Addendum, 2026-11-09 (delegated; from the independent review of #258, P2-1).* Count-on-complete per authorization can be
-split across authorizations (A serves `0..N-2`, B serves `-1`), so before Phase 2, where `max_downloads` applies: a
-download counts once when the grant's union coverage across its authorizations in a rolling 24 h window reaches 90% (which
-includes any single authorization reaching 90%). Each window counts at most once. Phase 1 test delivery has no
-`max_downloads`, so it keeps count-on-complete. Phase 2 implements this.
+split across authorizations (A serves `0..N-2`, B serves `-1`). Decided 2026-11-09, delegated by Sean: from Phase 2
+(where `max_downloads` applies), a download counts once when the grant's union coverage across its authorizations in a
+rolling 24 h window reaches 90% of the file (which includes any single authorization reaching 90%); each window counts at
+most once. Phase 1 test delivery has no `max_downloads` and keeps count-on-complete. Phase 2 implements this.
 
 **Unpaid order snapshots (retention).** An order snapshot is created before payment. One with no verified payment,
 whose provider session has expired or been cancelled and reconciled, counts as "did not become an order": it falls under

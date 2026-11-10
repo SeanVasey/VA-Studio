@@ -21,6 +21,7 @@ use App\Domain\Delivery\TransferTestDelivery;
 use App\Domain\Media\Models\MediaAsset;
 use App\Support\Audit\AuditEvent;
 use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -289,6 +290,23 @@ class TestOwnerDeliveryResumeTest extends TestCase
         $this->assertError($this->fetch($f, $authorization, 'bytes=1-'), 429, 'DELIVERY_RESUME_LIMIT');
         $this->assertDatabaseCount('test_delivery_admissions', TestDeliveryCoverageLedger::MAX_RESPONSES);
         $this->assertSame(0, $this->completions());
+    }
+
+    /** #258 P2-3: a lost coverage write never reaches the stream, and its warning names the authorization and admission. */
+    public function test_a_lost_coverage_write_is_logged_with_the_authorization_and_admission_ids(): void
+    {
+        $f = $this->ready();
+        $bytes = $this->bytes();
+        $authorization = $this->issue($f);
+        $this->assertStream($this->fetch($f, $authorization, 'bytes=0-9'), 206, substr($bytes, 0, 10));
+        $admission = TestDeliveryAdmission::sole();
+        Log::spy();
+        // The admission already has its coverage row, so this second write is refused as changed and only logged.
+        app(TestDeliveryCoverageLedger::class)->recordServed($admission->test_delivery_authorization_id, $admission->id, 0, 9);
+        Log::shouldHaveReceived('warning')->once()->with('Test delivery coverage was not recorded.', ['exception_class' => DeliveryException::class,
+            'authorization_id' => TestDeliveryAuthorization::sole()->id, 'admission_id' => $admission->id, 'first_byte' => 0, 'last_byte' => 9]);
+        $this->assertDatabaseCount('test_delivery_coverage', 1);
+        $this->assertDatabaseCount('test_delivery_admissions', 1);
     }
 
     public function test_overlapping_out_of_order_ranges_complete_coverage_exactly_once(): void

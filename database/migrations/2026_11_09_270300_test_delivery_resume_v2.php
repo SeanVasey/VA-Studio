@@ -15,8 +15,10 @@ use Illuminate\Support\Facades\Schema;
  * steps applied and a rerun refuses (it never adopts an unexpected state). Inspect `information_schema.TRIGGERS` and the
  * tables, then, with no v2 authorization, admission or coverage row present:
  * - v2 guard created, original still present: `DROP TRIGGER test_delivery_authorizations_valid_insert_v2`, then rerun.
- * - original dropped, v2 guard present: recreate the original from `statements()[0]` (exactly what down() does), drop
- *   any `test_delivery_admission*`/`test_delivery_coverage*` triggers and both new tables, then rerun.
+ * - original dropped, v2 guard present: in down()'s order, recreate the original from `statements()[0]`, then
+ *   `DROP TRIGGER test_delivery_authorizations_valid_insert_v2` (create before drop, so no instant is unguarded), drop
+ *   any `test_delivery_admissions*`/`test_delivery_coverage*` triggers, then `test_delivery_coverage` and
+ *   `test_delivery_admissions` (coverage first: it references admissions), then rerun.
  * Never drop a guard or table that holds v2 evidence; escalate instead. SQLite runs the migration in one transaction.
  */
 return new class extends Migration

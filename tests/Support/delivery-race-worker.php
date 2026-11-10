@@ -79,13 +79,14 @@ try {
                         if ((int) $waiting->c === 1) { touch($this->directory.'/admitter-waiting'); return; }
                         usleep(10000);
                     } while (microtime(true) < $deadline);
-                    throw new RuntimeException('The admitter never waited for the authorization lock.');
+                    // Report instead of failing here, so the test sees the admitter's own outcome and reason.
+                    touch($this->directory.'/admitter-never-waited');
                 }
             });
             config(['database.connections.mysql_race_probe' => config('database.connections.mysql')]);
             $waitFor($directory.'/verified-1');
             app(TestDeliveryCoverageLedger::class)->record($input['authorization_id'], $input['admission_id'], 0, 9);
-            $outcome = 'recorded';
+            $outcome = is_file($directory.'/admitter-waiting') ? 'recorded' : 'recorded_without_admitter_wait';
         } elseif ($input['mode'] === 'admit_record') {
             $user = User::findOrFail($input['user_id']); $principal = app(CustomerAccess::class)->principal($user);
             $range = DeliveryByteRange::evaluate('bytes=10-', null, $input['size_bytes'], $input['sha256']);

@@ -74,7 +74,7 @@ At issuance (preflight and again under the order lock, with locking reads), the 
 - Creates `test_delivery_admissions` (append-only, contiguous `sequence` 1..128, bound to a started v2 authorization, selection inside the file, admitted after the start).
 - Creates `test_delivery_coverage` (each row bound to one admission and inside its selection) with `_valid_insert` (bound to a started v2 authorization, contiguous `sequence` from 1 to 128, monotonic coverage, last byte inside the file, completion exactly on the first full row), `_immutable_update` and `_immutable_delete` guards, plus unique `(authorization, sequence)` and unique `completed_authorization_id`.
 - Rollback refuses while any v2 authorization, admission or coverage row exists, and otherwise restores the exact 000023 guard.
-- **Recovery after a partial MySQL run.** MySQL DDL commits statement by statement. A rerun refuses rather than adopting an unexpected state. With no v2 evidence present: if the v2 guard exists beside the original, drop `test_delivery_authorizations_valid_insert_v2` and rerun; if the original was already dropped, recreate it exactly as `down()` does, drop any `test_delivery_admissions*`/`test_delivery_coverage*` triggers and both new tables, and rerun. Never drop a guard or table that holds v2 evidence; escalate instead. The migration's docblock carries the same steps.
+- **Recovery after a partial MySQL run.** MySQL DDL commits statement by statement. A rerun refuses rather than adopting an unexpected state. With no v2 evidence present: if the v2 guard exists beside the original, drop `test_delivery_authorizations_valid_insert_v2` and rerun; if the original was already dropped, follow `down()`'s order: recreate the original guard first, then drop `test_delivery_authorizations_valid_insert_v2`, any `test_delivery_admissions*`/`test_delivery_coverage*` triggers, `test_delivery_coverage` and then `test_delivery_admissions` (coverage references admissions), and rerun. Never drop a guard or table that holds v2 evidence; escalate instead. The migration's docblock carries the same steps.
 
 The retention schedule (`RetentionSchedule`) classifies `test_delivery_admissions` and `test_delivery_coverage` as `indefinite`, held with the order (no clock of their own), like the other download records under the 2026-11-09 retention decisions. The customer data export does not include them yet.
 
@@ -86,7 +86,9 @@ The Phase 1 commit message records the exact commands and results: focused SQLit
 
 Review #258 (P2-1) showed that count-on-complete per authorization can be split: authorization A serves `0..N-2` and authorization B serves `-1`, so a buyer gets a whole copy with zero counted downloads (worst case about 640–790 × N uncounted bytes per grant per day within the caps). Under Sean's delegation this is decided, not built in Phase 1:
 
-> Before Phase 2 (where `max_downloads` applies), a download counts once when the grant's union coverage across its authorizations in a rolling 24 h window reaches 90% (which includes any single authorization reaching 90%). Both apply together; the grant-level union is mandatory, because a per-authorization 90% alone can be bypassed by splitting a file across two authorizations at about 89% each. Each window counts at most once. Phase 1 test delivery has no `max_downloads`, so it keeps count-on-complete.
+> From Phase 2 (where `max_downloads` applies), a download counts once when the grant's union coverage across its authorizations in a rolling 24 h window reaches 90% of the file (which includes any single authorization reaching 90%); each window counts at most once. Phase 1 test delivery has no `max_downloads` and keeps count-on-complete.
+
+The grant-level union is the rule, not an option: a per-authorization 90% alone can be bypassed by splitting a file across two authorizations at about 89% each. Decided 2026-11-09, delegated by Sean.
 
 Phase 2 implements it.
 
