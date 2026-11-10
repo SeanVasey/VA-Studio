@@ -882,7 +882,7 @@ and the visual appearance more in line with other generated legal documents such
 | DD-35 DMCA agent | Superseded | SQ-07: Sean registers VASEY.AUDIO as DMCA designated agent. |
 | DD-39 scheduling, unlisted | Refined | SQ-15: adds a `private` state; scheduled instants entered in America/Chicago and stored UTC; a failed check leaves the track **scheduled** with a staff alert (DD-39 said draft). |
 | DD-42 customer identity | Superseded, conditional | SQ-08: email-verified guest checkout, account optional. See open question Q-1. |
-| DD-43 mail | Refined | SQ-08: Postmark transactional stream on `mail.vasey.audio`; From `orders@vasey.audio`, Reply-To `support@vasey.audio`. |
+| DD-43 mail | Refined | SQ-08: Postmark transactional stream on `mail.vasey.audio`; From `orders@vasey.audio`, Reply-To `support@vasey.audio`. Sean confirmed the From address `orders@vasey.audio` on 2026-11-10 (BL-47), superseding DD-43's dedicated-subdomain sender. |
 | DD-44 analytics | Superseded | SQ-12: cookieless Plausible; still no marketing ESP. PRIVACY must name the processor before it runs. |
 | DD-46 order-ready notices | Unchanged | SQ-12 "class `transactional`" is read as the mail class (not marketing); the retention class stays `correspondence`, 2 years. |
 | DD-53 off-host backup | Superseded | SQ-01/SQ-09: Backblaze B2 via rclone, no-delete key, age-encrypted, tiered retention. |

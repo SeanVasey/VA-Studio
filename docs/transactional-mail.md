@@ -1,6 +1,6 @@
 # Order-ready email (transactional mail adapter)
 
-Status: **built default-off (lane CX, FP-075); nothing is sent.** No sender or provider is chosen (U-07; completion plan owner input #9). Evidence: [lane CX packet](verification/customer-comms-cx-20261024/README.md).
+Status: **built default-off (lane CX, FP-075; transport shape and staff requeue added by BL-47); nothing is sent.** Sean decided the sender shape on 2026-11-10 (From `orders@vasey.audio` through the provider stream on `mail.vasey.audio`, Reply-To `support@vasey.audio`), but the provider account, credentials and DNS are not set up (U-07; completion plan owner input #9), so no provider is configured. Evidence: [lane CX packet](verification/customer-comms-cx-20261024/README.md).
 
 ## What it does
 
@@ -30,9 +30,38 @@ Logs carry the delivery id and exception class only; audit events carry ids, sta
 
 A configuration change after a delivery was queued fails that delivery (`configuration_changed`) instead of sending under different settings. The binding is declared facts, not observation: it proves no DNS, SPF/DKIM/DMARC, TLS, credential, provider account scope or delivery. Those, and the choice of sender and provider, remain Sean's (`docs/ops/email-operations-runtime.md`).
 
+## Transport shape (BL-47, DD-43)
+
+Order-ready mail uses its own mailer, `transactional` in `config/mail.php`, kept apart from `MAIL_MAILER` (which stays `log`). It is SMTP over implicit TLS on port 465 by default. Every value is per host and none is committed (empty or commented in `.env.example`, `ops/staging/env.staging.example` and `ops/production/env.production.example`):
+
+| Key | Default | Notes |
+| --- | --- | --- |
+| `VASEY_TRANSACTIONAL_MAIL_MAILER` | unset | set to `transactional` to use this mailer |
+| `VASEY_TRANSACTIONAL_MAIL_SMTP_HOST` | unset | provider SMTP host; with none set the policy refuses |
+| `VASEY_TRANSACTIONAL_MAIL_SMTP_PORT` | `465` | production refuses any other port |
+| `VASEY_TRANSACTIONAL_MAIL_SMTP_SCHEME` | `smtps` | implicit TLS; production refuses any other scheme |
+| `VASEY_TRANSACTIONAL_MAIL_SMTP_USERNAME`, `…_PASSWORD` | unset | provider credentials; the password is a secret and lives only in the host environment |
+| `VASEY_TRANSACTIONAL_MAIL_SMTP_EHLO_DOMAIN` | the `APP_URL` host | |
+| `VASEY_TRANSACTIONAL_MAIL_SENDER` | unset | the From address; must equal the declared planned sender in the preflight facts |
+| `VASEY_TRANSACTIONAL_MAIL_REPLY_TO` | unset | the Reply-To address (`support@vasey.audio`); `OrderReadyMail` sets the header only when this is a plain address, otherwise none |
+
+Owner inputs (Sean, PCL-10): the provider account and credentials, the sender domain and its SPF, DKIM and DMARC records. The sender is `orders@vasey.audio` (Sean confirmed 2026-11-10, SQ-08 over DD-43's dedicated-subdomain sender), sent through a transactional provider stream on `mail.vasey.audio`, with Reply-To `support@vasey.audio` (set from `VASEY_TRANSACTIONAL_MAIL_REPLY_TO`). The code does not hard-code either address (it checks only that the sender is a plain address on a real domain that matches the declared facts); each host sets it. In `production` the policy additionally refuses unless the mailer scheme is `smtps` and the port is 465; staging mail stays `log` and other environments are bound only by the declared facts.
+
+## Paid but the email failed: recovery (BL-47)
+
+The email is a convenience, not the record. An order that is paid whose message failed, or never arrived, stays fully reachable:
+
+- **Customer.** Signing in to the account shows the order in `/orders/history` and opens its status, items and delivery (`/orders/{order}/status`, `/items`, `/delivery`). Nothing depends on the email or on a link in it (the message carries none).
+- **Staff.** The admin page "Order-ready emails" (`StaffMailDeliveryResource`) lists delivery attempts and offers **Requeue email** on the newest attempt of a notice when it is `failed` or `uncertain`. The action calls `TransactionalMailAdapter::requeueOrderReady`, which requires a staff user with the admin panel's MFA enrollment (re-read under lock), the same admitted mail configuration as the first send (so nothing is queued while the mail is off), and an intent that still verifies against current customer and purchase authority. The page hides the button for other states; the server rechecks everything.
+- **Idempotent, no duplicate send.** A requeue creates a new attempt row (migration `2026_11_11_000400`; the earlier row is evidence and stays unchanged). A requeue while the newest attempt is `queued` or `submitting` returns that attempt and queues nothing. If any attempt for the notice was `accepted` the requeue refuses (`already_delivered`). A `failed` attempt failed before any transport call, so it is requeued directly. An `uncertain` attempt may have been delivered, so staff must tick that the provider's logs for its delivery id show it was not; the audit event `notification.mail.requeued` (staff user, previous delivery id and state, attempt number, `provider_log_checked`) records the statement. Each attempt still sends at most once through the existing `queued → submitting` claim.
+
+Two staff requeues that race on a driver without row locks collide on the unique `(notice_id, attempt)` key; the loser returns the winner's attempt as a replay instead of raising.
+
+Not done: automatic retry, bounce handling, and a customer-facing "resend my email" button. Two review items of PR #310 are deferred: the database update/insert guards do not yet cover the `attempt` column (P3-2), and a delivery stuck in `submitting` cannot be requeued; `ListStuckTransactionalMail` surfaces it for an operator instead (P3-4).
+
 ## Records
 
-Migration `2026_10_24_268300_transactional_mail_deliveries` (additive, forward-only, `down()` refuses): one row per intent (unique notice id; the intent is proven by the insert trigger rather than a foreign key so the notification family's own migrations keep their rollback shape), forward-only states, no deletes.
+Migration `2026_10_24_268300_transactional_mail_deliveries` (additive, forward-only, `down()` refuses): one row per delivery attempt (BL-47: unique `(notice_id, attempt)`, attempt 1 unless staff requeued, migration `2026_11_11_000400`; originally unique per notice id; the intent is proven by the insert trigger rather than a foreign key so the notification family's own migrations keep their rollback shape), forward-only states, no deletes.
 
 ## Not built
 
