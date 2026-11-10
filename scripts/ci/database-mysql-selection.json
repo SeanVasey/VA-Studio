@@ -171,6 +171,7 @@
     "tests/Feature/TestCommerceEvidenceCommandTest.php",
     "tests/Feature/TestContractSecondBoundaryTest.php",
     "tests/Feature/TestIdentityLinkRelayCommandTest.php",
+    "tests/Feature/TrackVisibilityProductionSelectionTest.php",
     "tests/Unit/SchemaQualifierDelimiterTest.php"
   ],
   "residual_files": [
@@ -325,6 +326,7 @@
     "tests/Support/track-publication-apply-race-worker.php",
     "tests/Support/track-publication-guard-race-worker.php",
     "tests/Support/track-publication-manifest-race-worker.php",
+    "tests/Support/track-schedule-race-worker.php",
     "tests/Support/transactional-mail-recovery-worker.php",
     "tests/Support/transactional-notification-worker.php",
     "tests/Support/unpaid-release-worker.php",

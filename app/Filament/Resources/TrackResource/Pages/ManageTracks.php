@@ -4,9 +4,11 @@ namespace App\Filament\Resources\TrackResource\Pages;
 
 use App\Domain\Catalog\BulkAddTrackTags;
 use App\Domain\Catalog\BulkUpdateTrackMetadata;
+use App\Domain\Catalog\ChangeTrackVisibility;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublishTrack;
 use App\Domain\Catalog\TrackMetadataPresets;
+use App\Domain\Catalog\TrackPublicationSchedules;
 use App\Filament\Resources\TrackResource;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
@@ -80,16 +82,16 @@ class ManageTracks extends ManageRecords
         $this->publicationReview = null;
         $this->publicationTableContext = null;
         $action = $this->getMountedAction();
-        if (! in_array($intent, ['publish', 'unpublish'], true) || $action?->getName() !== $intent
+        if (! in_array($intent, ['publish', 'publish_unlisted', 'unpublish'], true) || $action?->getName() !== $intent
             || ! ($action->getRecord() instanceof Track) || (int) $action->getRecord()->id !== (int) $record->id) {
             throw ValidationException::withMessages(['publication' => 'Open the current track confirmation again.']);
         }
         // Filament invokes this mount callback before opening the confirmation. Never recreate it during submit.
         try {
             $actor = $this->actor();
-            $this->publicationReview = $intent === 'publish'
-                ? app(PublishTrack::class)->reviewManifest($record, $actor)
-                : app(PublishTrack::class)->review($record, $actor, $intent);
+            $this->publicationReview = $intent === 'unpublish'
+                ? app(PublishTrack::class)->review($record, $actor, $intent)
+                : app(PublishTrack::class)->reviewManifest($record, $actor, $intent);
             $this->publicationTableContext = $this->metadataTableContext();
         } catch (ValidationException $exception) {
             Notification::make()->danger()->title('Publication blocked')
@@ -107,17 +109,17 @@ class ManageTracks extends ManageRecords
         try {
             $actor = $this->actor();
             if ($review === null || $context !== $this->metadataTableContext()
-                || ! in_array($intent, ['publish', 'unpublish'], true) || $this->getMountedAction() !== $action
+                || ! in_array($intent, ['publish', 'publish_unlisted', 'unpublish'], true) || $this->getMountedAction() !== $action
                 || $action->getName() !== $intent || ! ($action->getRecord() instanceof Track)
                 || (int) $action->getRecord()->id !== (int) $record->id
                 || ($review['actor_id'] ?? null) !== (int) $actor->id
                 || ($review['track_id'] ?? null) !== (int) $record->id || ($review['intent'] ?? null) !== $intent) {
                 throw ValidationException::withMessages(['publication' => 'The confirmation changed. Open the current track confirmation again.']);
             }
-            if ($intent === 'publish') {
-                app(PublishTrack::class)->publishManifestReviewed($review, $actor);
-            } else {
+            if ($intent === 'unpublish') {
                 app(PublishTrack::class)->unpublishReviewed($review, $actor);
+            } else {
+                app(PublishTrack::class)->publishManifestReviewed($review, $actor);
             }
         } catch (AuthorizationException|ModelNotFoundException|HttpExceptionInterface $exception) {
             // Keep explicit access and missing-resource responses outside uncertain-result recovery.
@@ -133,6 +135,56 @@ class ManageTracks extends ManageRecords
                 ->body('Reload tracks to check the current publication state, then open a new confirmation before trying again.')
                 ->persistent()->send();
             // The command may already have committed. Never retry with this consumed review.
+            $action->cancel();
+        }
+    }
+
+    /** Schedule or reschedule from the modal. Field errors stay in the open form; the versions come from when it opened. */
+    public function scheduleTrack(Track $record, array $data): void
+    {
+        $actor = $this->actor();
+        try {
+            $schedule = app(TrackPublicationSchedules::class)->schedule(
+                $record, $actor, (string) ($data['local_time'] ?? ''), (string) ($data['target'] ?? ''),
+                (int) ($data['metadata_version'] ?? -1), (int) ($data['publication_version'] ?? -1),
+            );
+        } catch (ValidationException $exception) {
+            $path = $this->getSchema($this->getMountedActionSchemaName())->getStatePath();
+            $errors = [];
+            foreach ($exception->errors() as $field => $messages) {
+                // Domain keys are relative; version and state conflicts have no field of their own, so show them by the time.
+                $errors[$path.'.'.(in_array($field, ['target'], true) ? 'target' : 'local_time')] = $messages;
+            }
+            throw ValidationException::withMessages($errors);
+        }
+        $advisories = app(TrackPublicationSchedules::class)->advisories($record->refresh());
+        Notification::make()->success()->title('Scheduled for '.TrackPublicationSchedules::describe($schedule->publish_at))
+            ->body($advisories === []
+                ? 'Every publication check passes now. They run again at that time.'
+                : "These checks fail now and must pass at that time, or the track stays scheduled and an alert is raised:\n".implode("\n", $advisories))
+            ->persistent($advisories !== [])->send();
+    }
+
+    public function cancelTrackSchedule(Track $record, array $data, Action $action): void
+    {
+        $actor = $this->actor();
+        try {
+            app(TrackPublicationSchedules::class)->cancel($record, $actor, (int) ($data['metadata_version'] ?? -1), (int) ($data['publication_version'] ?? -1));
+        } catch (ValidationException $exception) {
+            Notification::make()->danger()->title('Schedule not cancelled')
+                ->body(implode(' ', array_merge(...array_values($exception->errors()))))->persistent()->send();
+            $action->cancel();
+        }
+    }
+
+    public function changeTrackVisibility(Track $record, array $data, Action $action): void
+    {
+        $actor = $this->actor();
+        try {
+            app(ChangeTrackVisibility::class)->handle($record, $actor, (string) ($data['target'] ?? ''), (int) ($data['metadata_version'] ?? -1), (int) ($data['publication_version'] ?? -1));
+        } catch (ValidationException $exception) {
+            Notification::make()->danger()->title('Visibility not changed')
+                ->body(implode(' ', array_merge(...array_values($exception->errors()))))->persistent()->send();
             $action->cancel();
         }
     }

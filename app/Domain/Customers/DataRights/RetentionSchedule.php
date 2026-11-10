@@ -485,6 +485,7 @@ final class RetentionSchedule
     public const NOT_CUSTOMER_DATA = [
         'migrations' => 'Framework migration log: migration names and batch numbers.',
         'tracks' => 'Catalog: published track metadata.',
+        'track_publication_schedules' => 'Catalog: scheduled track publications (staff actors, track state, alert evidence).',
         'track_metadata_presets' => 'Catalog: staff metadata presets.',
         'collaborators' => 'Catalog: staff-entered collaborator credits (display name, role, source reference); no customer, payment, tax or contact data.',
         'album_releases' => 'Catalog: staff-entered releases of Sean\'s own music (title, artist, date, cover art reference, listening links); no customer, payment or contact data.',

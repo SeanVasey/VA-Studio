@@ -42,6 +42,10 @@ class RightsEvidenceGuardMigrationTest extends TestCase
                 DB::unprepared('DROP TRIGGER '.$name);
             }
         }
+        // The BL-41 visibility guards (2026_11_10_289410) also postdate 035 and sit on `tracks`.
+        foreach (['tracks_visibility_insert', 'tracks_visibility_update'] as $name) {
+            DB::unprepared('DROP TRIGGER IF EXISTS '.$name);
+        }
         // Baseline proof: the reduced fixture is an exact, admitted 035 installation, so every
         // refusal case below is caused by its own drift rather than by an unrelated later trigger.
         $this->assertSame([], $this->ddlDuring(fn () => $this->migration()->up()));

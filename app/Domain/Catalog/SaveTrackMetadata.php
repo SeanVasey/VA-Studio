@@ -59,7 +59,7 @@ class SaveTrackMetadata
                 if (! $locked->exists) {
                     $locked->status = 'draft';
                 }
-                if ($locked->status === 'published') {
+                if (TrackVisibility::isLive($locked->status)) {
                     $blockers = app(PublicationReadiness::class)->blockers($locked);
                     if ($blockers !== []) {
                         // A visible form field keeps command failures actionable in the edit modal.
