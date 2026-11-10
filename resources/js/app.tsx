@@ -7,6 +7,8 @@ import Albums from './Pages/Albums';
 import Album from './Pages/Album';
 import Collections from './Pages/Collections';
 import Collection from './Pages/Collection';
+import SoundKits from './Pages/SoundKits';
+import SoundKit from './Pages/SoundKit';
 import CustomerSignIn from './Pages/CustomerSignIn';
 import CustomerLibrary from './Pages/CustomerLibrary';
 import FreeGrants from './Pages/FreeGrants';
@@ -32,6 +34,8 @@ createInertiaApp({
     if (name === 'Album') return Album;
     if (name === 'Collections') return Collections;
     if (name === 'Collection') return Collection;
+    if (name === 'SoundKits') return SoundKits;
+    if (name === 'SoundKit') return SoundKit;
     if (name === 'CustomerSignIn') return CustomerSignIn;
     if (name === 'CustomerLibrary') return CustomerLibrary;
     if (name === 'FreeGrants') return FreeGrants;

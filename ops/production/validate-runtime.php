@@ -262,6 +262,9 @@ try {
         }
         // The composition gate is a code literal (lane PCC); lifting it is a reviewed change here too, with Sean's authorization.
         $check('holds.production_checkout_mounted', config('production_checkout.mounted') === false);
+        // DD-14: the tax-calculating chain's customer HTTP mount is the same kind of code literal (TaxHttpMount admits only a literal true),
+        // and v1's one production chain, so lifting it is a reviewed change here with Sean's authorization.
+        $check('holds.production_tax_checkout_http_mounted', config('production-tax-checkout.http_mounted') === false);
         // D-30 contract identity capture is a code literal on each checkout; its policies also refuse outside local/testing.
         $check('holds.production_checkout_contract_identity_v2', config('production_checkout.contract_identity_v2') === false);
         $check('holds.production_tax_checkout_contract_identity_v2', config('production-tax-checkout.contract_identity_v2') === false);

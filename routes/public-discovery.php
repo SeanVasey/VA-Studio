@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Route;
 require __DIR__.'/albums.php';
 // The public collections routes (BL-54) are mounted here for the same reason.
 require __DIR__.'/collections.php';
+// The public sound-kit storefront routes (BL-53) are mounted here for the same reason; they answer 404 while the flag is off.
+require __DIR__.'/sound-kits.php';
 
 // No session, Inertia or cookies are needed for public URL discovery.
 Route::get('/site-pages-sitemap.xml', PublicPagesSitemapController::class)
