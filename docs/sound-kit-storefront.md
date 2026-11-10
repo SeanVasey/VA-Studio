@@ -107,8 +107,13 @@ quote refusal unchanged, no order, grant or entitlement rows after publishing an
 ## Needs Sean
 
 - Go-ahead to enable `sound-kits.storefront_enabled`, only after the payment lane above exists.
-- Whether a kit needs a rights approver separate from the staff member who set it up (today one MFA staff user may do both).
-- The kit demo and artwork approval policy.
+
+## Owner decisions (Sean, 2026-11-10)
+
+- One MFA-enrolled catalog staff member may set up a kit, clear its rights and approve its offer; no separate approver is required.
+- Kits get public demo audio and artwork. They are a follow-up lane (asset roles for a kit demo and cover, scanned and staff-approved,
+  never served from the private archive); IMPERIAL DRVMZ is the first real kit.
+- The flag stays a literal `false` until kit checkout exists: enabling it before then would list prices with "not available to buy yet".
 
 ## Tests
 

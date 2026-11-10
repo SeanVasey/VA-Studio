@@ -351,6 +351,22 @@ class SoundKitStorefrontTest extends TestCase
         $this->assertTrue($service->publish($product, $product->revision, $this->actor)->is_published);
     }
 
+    public function test_a_published_kit_pointed_at_a_beat_license_behind_the_writer_is_no_longer_listed(): void
+    {
+        // Defence in depth for the read-time kit-type check: if a row is ever repointed at a published beat license outside the
+        // writer, every public read drops the kit, even though it stays marked published.
+        $this->enable();
+        $product = $this->product();
+        $this->assertSame([$product->slug], $this->listedSlugs());
+        $beat = $this->license('non-exclusive');
+        DB::table('sound_kit_products')->where('id', $product->id)->update(['license_version_id' => $beat->id]);
+        $product->refresh();
+        $this->assertTrue((bool) $product->is_published);
+        $this->assertArrayHasKey('license_version_id', app(SoundKitProducts::class)->blockers($product));
+        $this->assertSame([], $this->listedSlugs());
+        $this->get('/sound-kits/'.$product->slug)->assertNotFound();
+    }
+
     public function test_the_license_kind_of_a_published_kit_license_cannot_be_changed_behind_the_writer(): void
     {
         $product = $this->product();
