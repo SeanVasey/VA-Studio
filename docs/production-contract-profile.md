@@ -8,6 +8,9 @@ below).** It narrows the production part of
 [dry-run record](verification/beatstars-catalog-dry-run-20261107/README.md)). Buyer contracts stay test-only until each gate
 below is met.
 
+The sound-kit license (a generic license for kits and sample packs, rendered by the new `vasey-kit-license-pdf-v1` profile
+in this same visual system) is described in [sound-kit-license.md](sound-kit-license.md).
+
 ## Current state
 
 - Every issued test contract is rendered from frozen grant sections by a pinned, test-only TCPDF profile

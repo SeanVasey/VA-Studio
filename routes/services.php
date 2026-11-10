@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ServiceCatalogController;
 use App\Http\Controllers\ServiceProjectController;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\ServiceProjectPrivacy;
@@ -14,3 +15,9 @@ Route::middleware([ServiceProjectPrivacy::class, 'throttle:60,1,service-project-
         Route::post('/services/projects/{project}/commands', [ServiceProjectController::class, 'command'])->middleware('throttle:10,1,service-project-writes')->block(20, 5)->name('service-projects.command');
     });
 });
+
+// Public service pages (BL-64): 404 while the policy's catalog flag is off. The slug pattern excludes "projects" so the
+// private project routes above keep their path.
+Route::get('/services', [ServiceCatalogController::class, 'index'])->middleware('throttle:120,1')->name('services.index');
+Route::get('/services/{slug}', [ServiceCatalogController::class, 'show'])->where('slug', '(?!projects$)[a-z0-9]+(?:-[a-z0-9]+)*')
+    ->middleware('throttle:120,1')->name('services.show');
