@@ -275,6 +275,23 @@ final class PaidTaxRows
         return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Whether an active refund/dispute hold (BL-42) covers one line of this batch: an order-wide hold or the line's own. A locking
+     * read on MySQL, made inside a frame that already holds the batch row, which every hold writer also locks first. The batch
+     * and line ids are this frame's own retained rows; the ledger is partitioned by source so a test order's hold never applies.
+     */
+    public function downloadsHeld(int $batchId, int $originId): bool
+    {
+        return $this->held(function () use ($batchId, $originId): bool {
+            $statement = $this->primary->prepare('SELECT 1 FROM '.$this->qualifiedTable('refund_dispute_holds')
+                ." WHERE order_source = 'production_tax' AND order_id = ? AND released_at IS NULL AND (license_grant_id IS NULL OR license_grant_id = ?) LIMIT 1"
+                .($this->driver === 'mysql' ? ' FOR UPDATE' : ''));
+            $statement->execute([$batchId, $originId]);
+
+            return $statement->fetchColumn() !== false;
+        });
+    }
+
     public function one(string $logical, string $where, array $bindings, bool $closed = false): array
     {
         $rows = $this->rows($logical, $where, $bindings, 2, $closed);

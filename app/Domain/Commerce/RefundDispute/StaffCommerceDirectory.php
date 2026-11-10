@@ -30,7 +30,7 @@ final class StaffCommerceDirectory
     public function orders(): Builder
     {
         $account = $this->account();
-        $latest = 'SELECT %s FROM refund_dispute_observations r WHERE r.order_id = o.id AND r.outcome = \'observed\' ORDER BY r.sequence DESC LIMIT 1';
+        $latest = 'SELECT %s FROM refund_dispute_observations r WHERE r.order_id = o.id AND r.order_source = \'test\' AND r.outcome = \'observed\' ORDER BY r.sequence DESC LIMIT 1';
 
         return $this->scoped($account)
             ->leftJoin('customer_accounts as ca', 'ca.owner_key', '=', 'o.owner_key')
@@ -38,7 +38,7 @@ final class StaffCommerceDirectory
                 'p.amount_minor', 'p.currency', 'order_finalizations.finalized_at', 'ca.public_id as customer_public_id'])
             ->selectRaw('('.sprintf($latest, 'r.refund_state').') AS refund_state')
             ->selectRaw('('.sprintf($latest, 'r.dispute_state').') AS dispute_state')
-            ->selectRaw('(SELECT COUNT(*) FROM refund_dispute_holds h WHERE h.order_id = o.id AND h.released_at IS NULL) AS active_holds');
+            ->selectRaw('(SELECT COUNT(*) FROM refund_dispute_holds h WHERE h.order_id = o.id AND h.order_source = \'test\' AND h.released_at IS NULL) AS active_holds');
     }
 
     /** One row per test customer (quote owner) with at least one paid or paid-exception order. */
@@ -49,7 +49,7 @@ final class StaffCommerceDirectory
             ->groupBy('o.owner_key', 'ca.public_id')
             ->selectRaw('MIN(order_finalizations.id) AS id, ca.public_id AS customer_public_id, COUNT(*) AS order_count,'
                 .' SUM(p.amount_minor) AS paid_minor, MAX(order_finalizations.finalized_at) AS last_finalized_at,'
-                .' (SELECT COUNT(*) FROM refund_dispute_holds h JOIN orders ho ON ho.id = h.order_id WHERE ho.owner_key = o.owner_key AND h.released_at IS NULL) AS active_holds');
+                .' (SELECT COUNT(*) FROM refund_dispute_holds h JOIN orders ho ON ho.id = h.order_id WHERE h.order_source = \'test\' AND ho.owner_key = o.owner_key AND h.released_at IS NULL) AS active_holds');
     }
 
     /** Detail for the customer who owns the given finalization: every scoped order with its evidence. */
@@ -102,7 +102,7 @@ final class StaffCommerceDirectory
                 $evidence = 'attention';
             }
         }
-        $holds = RefundDisputeHold::where('order_id', $order->id)->orderBy('id')->get();
+        $holds = RefundDisputeHold::forOrder($order)->orderBy('id')->get();
         $lines = [];
         foreach ($order->lines()->orderBy('position')->get() as $line) {
             $grant = $grants->get($line->id);
@@ -112,7 +112,7 @@ final class StaffCommerceDirectory
                 'downloadsHeld' => $grant !== null && $holds->contains(fn ($h) => $h->released_at === null
                     && ($h->license_grant_id === null || $h->license_grant_id === $grant->id))];
         }
-        $observation = RefundDisputeObservation::where('order_id', $order->id)->orderByDesc('sequence')->first();
+        $observation = RefundDisputeObservation::forOrder($order)->orderByDesc('sequence')->first();
         $authorizations = TestDeliveryAuthorization::where('order_id', $order->id);
 
         return ['order' => $order->public_id, 'finalization' => $finalization->public_id, 'outcome' => $finalization->outcome,
@@ -122,13 +122,13 @@ final class StaffCommerceDirectory
                 'refundState' => $observation->refund_state, 'disputeState' => $observation->dispute_state,
                 'succeededRefundMinor' => $observation->succeeded_refund_minor, 'pendingRefundMinor' => $observation->pending_refund_minor,
                 'observedAt' => $observation->observed_at->toIso8601ZuluString()],
-            'providerObjects' => RefundDisputeObject::where('order_id', $order->id)->orderBy('id')->get()->map(fn ($o) => ['reference' => $o->public_id,
+            'providerObjects' => RefundDisputeObject::forOrder($order)->orderBy('id')->get()->map(fn ($o) => ['reference' => $o->public_id,
                 'kind' => $o->kind, 'amountMinor' => $o->amount_minor, 'currency' => $o->currency,
                 'statuses' => DB::table('refund_dispute_statuses')->where('refund_dispute_object_id', $o->id)->orderBy('id')->pluck('status')->all()])->all(),
             'holds' => $holds->map(fn ($h) => ['reference' => $h->public_id, 'reason' => $h->reason,
                 'grant' => $h->license_grant_id === null ? null : LicenseGrant::find($h->license_grant_id)?->public_id,
                 'createdAt' => $h->created_at->toIso8601ZuluString(), 'releasedAt' => $h->released_at?->toIso8601ZuluString()])->all(),
-            'effects' => RefundDisputeEffect::where('order_id', $order->id)->orderByDesc('id')->limit(30)->get()->map(fn ($e) => ['kind' => $e->kind,
+            'effects' => RefundDisputeEffect::forOrder($order)->orderByDesc('id')->limit(30)->get()->map(fn ($e) => ['kind' => $e->kind,
                 'sequence' => $e->sequence, 'staff' => $e->actor_id !== null, 'createdAt' => $e->created_at->toIso8601ZuluString()])->all(),
             'downloads' => ['authorizations' => (clone $authorizations)->count(),
                 'redemptions' => DB::table('test_delivery_redemptions as d')->join('test_delivery_authorizations as a', 'a.id', '=', 'd.test_delivery_authorization_id')

@@ -181,18 +181,18 @@ final class OperationalHealth
                 ->where($alias.'.mode', 'test')->where($alias.'.outcome', 'paid')->where('p.mode', 'test')->where('p.account_id', $account)
                 ->whereColumn('p.order_id', $alias.'.order_id');
             $latestObserved = static fn (Builder $query): Builder => $query->join('refund_dispute_observations as r', 'r.order_id', '=', 'f.order_id')
-                ->where('r.outcome', 'observed')
-                ->whereRaw('r.sequence = (SELECT MAX(r2.sequence) FROM refund_dispute_observations r2 WHERE r2.order_id = r.order_id AND r2.outcome = \'observed\')');
-            $attention = $scope()->join('refund_dispute_observations as r', 'r.order_id', '=', 'f.order_id')->where('r.outcome', 'attention')
-                ->whereRaw('r.sequence = (SELECT MAX(r2.sequence) FROM refund_dispute_observations r2 WHERE r2.order_id = r.order_id)')->count();
+                ->where('r.order_source', 'test')->where('r.outcome', 'observed')
+                ->whereRaw('r.sequence = (SELECT MAX(r2.sequence) FROM refund_dispute_observations r2 WHERE r2.order_id = r.order_id AND r2.order_source = \'test\' AND r2.outcome = \'observed\')');
+            $attention = $scope()->join('refund_dispute_observations as r', 'r.order_id', '=', 'f.order_id')->where('r.order_source', 'test')->where('r.outcome', 'attention')
+                ->whereRaw('r.sequence = (SELECT MAX(r2.sequence) FROM refund_dispute_observations r2 WHERE r2.order_id = r.order_id AND r2.order_source = \'test\')')->count();
             $open = $latestObserved($scope())->where('r.dispute_state', 'open')->count();
             $lost = $latestObserved($scope())->where('r.dispute_state', 'lost')->count();
             $holds = $scope()->whereExists(fn (Builder $query) => $query->selectRaw('1')->from('refund_dispute_holds as h')
-                ->whereColumn('h.order_id', 'f.order_id')->whereNull('h.released_at'))->count();
+                ->whereColumn('h.order_id', 'f.order_id')->where('h.order_source', 'test')->whereNull('h.released_at'))->count();
             $unallocated = $latestObserved($scope())->where('r.succeeded_refund_minor', '>', 0)
-                ->whereRaw('r.succeeded_refund_minor > COALESCE((SELECT SUM(a.amount_minor) FROM refund_line_allocations a WHERE a.order_id = f.order_id), 0)')->count();
+                ->whereRaw('r.succeeded_refund_minor > COALESCE((SELECT SUM(a.amount_minor) FROM refund_line_allocations a WHERE a.order_id = f.order_id AND a.order_source = \'test\'), 0)')->count();
             $reversals = $scope()->whereExists(fn (Builder $query) => $query->selectRaw('1')->from('refund_dispute_effects as x')
-                ->whereColumn('x.order_id', 'f.order_id')->where('x.kind', 'refund_reversed_review_required'))->count();
+                ->whereColumn('x.order_id', 'f.order_id')->where('x.order_source', 'test')->where('x.kind', 'refund_reversed_review_required'))->count();
 
             return [
                 self::metric('refund_attention', 'Refund or dispute evidence needing attention', $attention, $attention > 0 ? 'attention' : 'ok',

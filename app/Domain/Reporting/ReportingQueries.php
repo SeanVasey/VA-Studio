@@ -22,7 +22,8 @@ final class ReportingQueries
      */
     public static function latestObserved(JoinClause $join): void
     {
-        $join->on('r.order_id', '=', 'f.order_id')->where('r.outcome', 'observed')
-            ->whereRaw('r.sequence = (SELECT MAX(r2.sequence) FROM refund_dispute_observations r2 WHERE r2.order_id = f.order_id AND r2.outcome = \'observed\')');
+        // Test-chain reports only: the ledger also holds production tax orders, whose ids are a separate number space.
+        $join->on('r.order_id', '=', 'f.order_id')->where('r.order_source', 'test')->where('r.outcome', 'observed')
+            ->whereRaw('r.sequence = (SELECT MAX(r2.sequence) FROM refund_dispute_observations r2 WHERE r2.order_id = f.order_id AND r2.order_source = \'test\' AND r2.outcome = \'observed\')');
     }
 }

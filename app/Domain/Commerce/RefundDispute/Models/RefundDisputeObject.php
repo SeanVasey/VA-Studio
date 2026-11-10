@@ -8,6 +8,8 @@ use LogicException;
 /** One deduplicated provider refund or dispute, identified by a hash of its provider identifier. */
 final class RefundDisputeObject extends Model
 {
+    use ScopesToOrder;
+
     public $timestamps = false;
 
     protected $table = 'refund_dispute_objects';

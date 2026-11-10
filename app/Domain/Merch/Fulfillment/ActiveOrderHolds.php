@@ -13,7 +13,8 @@ class ActiveOrderHolds
 {
     public function exist(int $orderId): bool
     {
-        return DB::table('refund_dispute_holds')->where('order_id', $orderId)->whereNull('released_at')->exists()
-            || DB::table('refund_dispute_objects')->where('order_id', $orderId)->exists();
+        // Merch orders are test-chain orders; the ledger's production tax rows use a separate order number space (`order_source`).
+        return DB::table('refund_dispute_holds')->where('order_id', $orderId)->where('order_source', 'test')->whereNull('released_at')->exists()
+            || DB::table('refund_dispute_objects')->where('order_id', $orderId)->where('order_source', 'test')->exists();
     }
 }

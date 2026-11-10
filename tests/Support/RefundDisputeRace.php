@@ -16,7 +16,7 @@ use Tests\TestCase;
  */
 final class RefundDisputeRace
 {
-    public static function run(TestCase $test, array $input, ?string $expectWait, ?int $lockedId): array
+    public static function run(TestCase $test, array $input, ?string $expectWait, ?int $lockedId, string $worker = 'refund-dispute-race-worker.php'): array
     {
         $test->assertSame('mysql', DB::getDriverName());
         $test->assertSame(0, DB::transactionLevel());
@@ -26,7 +26,7 @@ final class RefundDisputeRace
         $processes = [];
         try {
             foreach ([0, 1] as $index) {
-                $process = new Process([PHP_BINARY, base_path('tests/Support/refund-dispute-race-worker.php')], base_path(),
+                $process = new Process([PHP_BINARY, base_path('tests/Support/'.$worker)], base_path(),
                     self::environment($directory, $index), json_encode($input, JSON_THROW_ON_ERROR), 90);
                 $process->start();
                 $processes[] = $process;
@@ -99,7 +99,12 @@ SQL;
             }
             usleep(5000);
         } while (microtime(true) < $deadline);
-        $test->fail('Refund/dispute workers missed the '.$stage.' barrier.');
+        $detail = '';
+        foreach ($processes as $index => $process) {
+            $detail .= ' worker '.$index.': '.($process->isRunning() ? 'running' : 'exited '.$process->getExitCode()).' '
+                .substr($process->getOutput().$process->getErrorOutput(), 0, 700);
+        }
+        $test->fail('Refund/dispute workers missed the '.$stage.' barrier.'.$detail);
     }
 
     private static function environment(string $directory, int $worker): array
