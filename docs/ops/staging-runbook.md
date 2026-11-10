@@ -137,6 +137,31 @@ art vasey:staging-seller-tag          # add --check to verify without installing
   [`staging-placeholders.md`](staging-placeholders.md). Sean still approves the audible mix of the real tag before anything
   real is published.
 
+### Specimen licensor signature (DD-27, PCL-06)
+
+The licence profile reads a signature PNG from private storage (`VASEY_LICENSE_SIGNATURE_PATH`, pinned by
+`VASEY_LICENSE_SIGNATURE_SHA256`). Staging uses a labelled specimen until Sean installs his own PNG on the production host:
+
+```sh
+art vasey:staging-specimen-signature          # add --check to verify without installing
+```
+
+- **What it makes.** A 1200 x 160 opaque PNG that reads `STAGING SPECIMEN — NOT A SIGNATURE` in the bold face the
+  contract documents already bundle (DejaVu Sans Bold, `resources/contracts/test-v2/fonts/source/`), drawn with PHP GD.
+  Text only: no stroke, flourish or mark of the brand. The bytes are deterministic (one fixed canvas and one fixed
+  `tEXt` comment; no timestamp or random value), and the command reads the SHA-256 from the file it made.
+- **Where.** `private/contracts/STAGING-specimen-signature.png`, mode 0600, never under `public/`, never committed.
+- **What it prints.** `VASEY_LICENSE_SIGNATURE_PATH=…` and `VASEY_LICENSE_SIGNATURE_SHA256=…` for Forge → Environment,
+  then **Deploy Now**. Neither is a secret. Do this before any v2 original is rendered: the signature must not change while
+  one is unrendered (section 7, deploy rule).
+- **What it refuses.** Any environment other than `local`, `testing` or `staging`, or a configured `APP_ENV` that differs
+  from the running one; another signature image installed and configured; a different file already at its own path. It
+  never replaces a file and never edits the environment.
+- **How it is named a specimen.** `vasey:doctor` does not inspect the signature. `art vasey:cutover-check` row PCL-06 does,
+  by the path word (`STAGING`, `specimen`) and by the marker `STAGING SPECIMEN` inside the PNG's `tEXt` chunk (the words
+  in the picture are pixels, which cannot be searched). On the staging profile it passes and says the specimen is
+  configured; on the production profile it fails. The marker is a convention: a copy with it stripped is not detected.
+
 ## 4. `vasey:doctor` until it passes
 
 Run it as the user that owns private storage. Its scanner-limits check creates a 4 GiB sparse file in
