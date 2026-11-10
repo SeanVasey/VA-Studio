@@ -61,6 +61,7 @@ final class MediaReferenceRegistry
     public const TRACK_IDS = [
         'catalog_import_mappings.track_id',
         'free_definitions.track_id',
+        'legacy_history_track_links.track_id',
         'offer_revisions.track_id',
         'product_draft_members.track_id',
         'production_checkout_order_lines.track_id',
@@ -68,11 +69,13 @@ final class MediaReferenceRegistry
     ];
 
     /**
-     * Text columns holding a track identifier from another system. No reviewed link from these to store tracks exists yet
-     * (FP-098/FP-099), so none is resolvable: any value makes coverage incomplete
+     * Text columns holding a track identifier from another system: column => [link table, link column naming the row].
+     * A row resolves only through a confirmed link (BL-07: one immutable `legacy_history_track_links` row per line version,
+     * trigger-bound to that exact line and to the track its catalog mapping created), whose `track_id` is then counted by
+     * `track:legacy_history_track_links.track_id`. Any row with a value and no link makes coverage incomplete
      * (`unresolved_track_source:<table>.<column>`).
      */
-    public const TRACK_SOURCE_IDS = ['legacy_history_lines.track_source_id'];
+    public const TRACK_SOURCE_IDS = ['legacy_history_lines.track_source_id' => ['legacy_history_track_links', 'line_id']];
 
     /** Polymorphic `<prefix>_type`/`<prefix>_id` pairs that can name a media row: `<table>.<prefix>`. Checks `poly:...`. */
     public const POLYMORPHIC = [];
@@ -308,6 +311,7 @@ final class MediaReferenceRegistry
         'stripe_webhook_receipts.event' => 'Stripe event id and type strings, not a model reference.',
         'stripe_webhook_receipts.object' => 'Stripe object id and type strings, not a model reference.',
         'track_metadata_presets.metadata' => self::PROSE,
+        'track_collaborator_splits.track_id' => 'Editable collaborator split metadata (BL-05): report-only, feeds no sale, grant or delivery.',
         'tracks.description' => self::PROSE, 'tracks.tags' => self::PROSE, 'tracks.waveform' => 'Display peaks of the track.',
         'users.app_authentication_recovery_codes' => 'Encrypted TOTP recovery codes.',
         'users.app_authentication_secret' => 'Encrypted TOTP secret.',
@@ -325,7 +329,7 @@ final class MediaReferenceRegistry
         $base = match ($list) {
             'media_ids' => self::MEDIA_IDS,
             'track_ids' => array_fill_keys(self::TRACK_IDS, 'tracks'),
-            'track_source_ids' => array_fill_keys(self::TRACK_SOURCE_IDS, 'tracks'),
+            'track_source_ids' => self::TRACK_SOURCE_IDS,
             'polymorphic' => array_fill_keys(self::POLYMORPHIC, 'poly'),
             'json_structural' => self::JSON_STRUCTURAL,
             'json_deep' => self::JSON_DEEP,

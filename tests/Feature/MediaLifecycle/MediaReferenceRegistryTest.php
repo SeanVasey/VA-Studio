@@ -172,7 +172,9 @@ final class MediaReferenceRegistryTest extends TestCase
         foreach (['catalog_import_mappings.track_id', 'product_draft_members.track_id', 'production_checkout_order_lines.track_id', 'offer_revisions.track_id'] as $column) {
             $this->assertContains($column, MediaReferenceRegistry::TRACK_IDS);
         }
-        $this->assertSame(['legacy_history_lines.track_source_id'], MediaReferenceRegistry::TRACK_SOURCE_IDS);
+        $this->assertSame(['legacy_history_lines.track_source_id' => ['legacy_history_track_links', 'line_id']], MediaReferenceRegistry::TRACK_SOURCE_IDS);
+        $this->assertContains('legacy_history_track_links.track_id', MediaReferenceRegistry::TRACK_IDS);
+        $this->assertArrayHasKey('track_collaborator_splits.track_id', MediaReferenceRegistry::REVIEWED);
     }
 
     public function test_an_unregistered_reference_column_fails_the_registry_and_blocks_the_proof_until_it_is_classified(): void
@@ -233,7 +235,8 @@ final class MediaReferenceRegistryTest extends TestCase
     {
         $families = [];
         foreach (['catalog_import_mappings', 'product_draft_members', 'production_checkout_order_lines',
-            'production_track_preparation_packet_lines', 'free_definitions', 'offer_revisions', 'offers', 'rights_declarations', 'none'] as $index => $table) {
+            'production_track_preparation_packet_lines', 'free_definitions', 'offer_revisions', 'offers', 'rights_declarations',
+            'legacy_history_track_links', 'none'] as $index => $table) {
             $families[$table] = $this->family('synthetic-track-'.$index, 300 + 40 * $index);
         }
         $roots = array_column($families, 0);
@@ -259,16 +262,29 @@ final class MediaReferenceRegistryTest extends TestCase
             $this->assertSame(['attached', ['track:'.$table.'.track_id']], [$result['families'][$root]['state'], $this->attached($result, $root)], $table);
         }
         // Mutable track set-up (an offer without deliverables, a rights declaration) is reviewed as not a reference.
-        foreach (['offers', 'rights_declarations', 'none', 'catalog_import_mappings', 'production_checkout_order_lines', 'free_definitions'] as $table) {
+        foreach (['offers', 'rights_declarations', 'none', 'catalog_import_mappings', 'production_checkout_order_lines', 'free_definitions',
+            'legacy_history_track_links'] as $table) {
             $this->assertSame('unattached', $result['families'][$families[$table][0]]['state'], $table);
         }
 
-        // A legacy line names a track by an id from another system. Nothing links it to a store track, so nothing is proven.
-        $this->raw('legacy_history_lines', ['track_source_id' => 'TK-SYNTHETIC-1', 'exclusive' => false, 'record_ciphertext' => '']);
+        // A legacy line names a track by an id from another system. Until a confirmed link names its store track, nothing is proven.
+        $line = $this->raw('legacy_history_lines', ['track_source_id' => 'TK-SYNTHETIC-1', 'exclusive' => false, 'record_ciphertext' => '']);
         $result = $this->prove($roots);
         $this->assertSame(['incomplete', ['unresolved_track_source:legacy_history_lines.track_source_id']], [$result['coverage'], $result['blockers']]);
         $this->assertSame('unknown', $result['families'][$families['none'][0]]['state']);
         $this->assertSame('attached', $result['families'][$families['offer_revisions'][0]]['state']);
+        // A confirmed link (BL-07) resolves that line: the linked track's families are attached and coverage is complete.
+        $this->raw('legacy_history_track_links', ['line_id' => $line, 'track_id' => $families['legacy_history_track_links'][1], 'reference_hmac' => null]);
+        $result = $this->prove($roots);
+        $this->assertSame(['complete', []], [$result['coverage'], $result['blockers']]);
+        $this->assertSame(['attached', ['track:legacy_history_track_links.track_id']],
+            [$result['families'][$families['legacy_history_track_links'][0]]['state'], $this->attached($result, $families['legacy_history_track_links'][0])]);
+        $this->assertSame('unattached', $result['families'][$families['none'][0]]['state']);
+        // Another line without a link still blocks.
+        $this->raw('legacy_history_lines', ['track_source_id' => 'TK-SYNTHETIC-2', 'exclusive' => false, 'record_ciphertext' => '']);
+        $result = $this->prove($roots);
+        $this->assertSame(['incomplete', ['unresolved_track_source:legacy_history_lines.track_source_id']], [$result['coverage'], $result['blockers']]);
+        $this->assertSame('unknown', $result['families'][$families['none'][0]]['state']);
 
         // Import mappings, production order lines and free definitions also carry payloads the proof cannot read (P2-1 is
         // open), so coverage is incomplete; their track-level reference still keeps the family attached, not merely unknown.

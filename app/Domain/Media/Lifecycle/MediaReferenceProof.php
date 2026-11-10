@@ -218,10 +218,18 @@ final class MediaReferenceProof
         $blockers = array_map(fn (string $column): string => 'unregistered:'.$column, $schema['unregistered']);
         $digests = $this->registry->entries('manifest_digests');
         $opaque = $this->registry->entries('opaque');
-        foreach ($this->registry->entries('track_source_ids') as $qualified => $_) {
+        foreach ($this->registry->entries('track_source_ids') as $qualified => [$links, $linkColumn]) {
             [$table, $column] = explode('.', $qualified, 2);
-            // No reviewed link from a legacy track id to a store track exists, so no value can be resolved.
-            if ($this->hasColumn($table, $column) && $this->nonEmpty($table, $column)->exists()) {
+            if (! $this->hasColumn($table, $column)) {
+                continue;
+            }
+            $unresolved = $this->nonEmpty($table, $column);
+            // A linked row is counted through the link's track_id; only a row without a confirmed link stays unresolved.
+            if ($this->hasColumn($links, $linkColumn)) {
+                $unresolved->whereNotExists(fn ($query) => $query->selectRaw('1')->from($links)
+                    ->whereColumn($links.'.'.$linkColumn, $table.'.id'));
+            }
+            if ($unresolved->exists()) {
                 $blockers[] = 'unresolved_track_source:'.$qualified;
             }
         }
