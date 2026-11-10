@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { fixtureOperation, type InquiryFixture } from './contact-inquiry-fixture';
+import { fillInquiryField, fixtureOperation, type InquiryFixture } from './contact-inquiry-fixture';
 
 test.use({ serviceWorkers: 'block' });
 
@@ -13,7 +13,7 @@ test('visitor attachment uses real quarantine, exact upload replay, scanner refu
   let foreign: Awaited<ReturnType<typeof browser.newContext>> | undefined;
   try {
     await page.goto('/contact');
-    for (const label of ['Name', 'Email', 'Subject', 'Message'] as const) await page.getByLabel(new RegExp(`^${label}`)).fill(fixture.values[label.toLowerCase() as keyof InquiryFixture['values']]);
+    for (const label of ['Name', 'Email', 'Subject', 'Message'] as const) await fillInquiryField(page.getByLabel(new RegExp(`^${label}`)), fixture.values[label.toLowerCase() as keyof InquiryFixture['values']]);
     const submitted = page.waitForResponse(response => response.url().endsWith('/contact/inquiries') && response.request().method() === 'POST');
     await page.getByRole('button', { name: 'Send inquiry', exact: true }).click(); const accepted = await submitted; expect(accepted.status()).toBe(201);
     const { receipt } = await accepted.json();
