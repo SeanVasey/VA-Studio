@@ -90,7 +90,7 @@ try {
             });
             config(['database.connections.mysql_race_probe' => config('database.connections.mysql')]);
             $waitFor($directory.'/verified-1');
-            app(TestDeliveryCoverageLedger::class)->record($input['authorization_id'], $input['admission_id'], 0, 9);
+            app(TestDeliveryCoverageLedger::class)->record($input['authorization_id'], $input['admission_id'], 0, $input['record_last']);
             $outcome = is_file($directory.'/admitter-waiting') ? 'recorded' : 'recorded_without_admitter_wait';
         } elseif ($input['mode'] === 'admit_record') {
             $user = User::findOrFail($input['user_id']); $principal = app(CustomerAccess::class)->principal($user);

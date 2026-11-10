@@ -66,6 +66,42 @@ class TestOwnerDeliveryResumeConcurrencyTest extends TestCase
      */
     public function test_a_signed_in_admission_waiting_behind_a_coverage_write_reads_the_committed_state(): void
     {
+        [$results, $bytes, $userId] = $this->admissionBehindCoverage('bytes=0-9', 9);
+        $this->assertSame(['recorded', 'transferred'], array_column($results, 'outcome'), json_encode($results));
+        $this->assertSame(hash('sha256', substr($bytes, 10)), $results[1]['content_hash']);
+        $rows = TestDeliveryCoverage::orderBy('sequence')->get();
+        $this->assertSame([[0, 9, 10, null], [10, strlen($bytes) - 1, strlen($bytes), TestDeliveryAuthorization::sole()->id]],
+            $rows->map(fn ($row) => [$row->first_byte, $row->last_byte, $row->covered_bytes, $row->completed_authorization_id])->all());
+        $this->assertSame(2, TestDeliveryAdmission::count());
+        $this->assertSame([$userId], DB::table('audit_events')->where('action', 'commerce.delivery.resumed')->pluck('actor_id')->all());
+    }
+
+    /**
+     * The discriminating half of P2-2: the coverage that commits while the signed-in admission waits completes the file. Only
+     * a locking read sees that completion (the admission's older snapshot shows one admission and no coverage), so the
+     * admission must be refused as already counted, with no second admission, no bytes and no second completion.
+     */
+    public function test_a_signed_in_admission_waiting_behind_a_completing_coverage_write_is_refused_as_counted(): void
+    {
+        [$results, $bytes] = $this->admissionBehindCoverage('bytes=0-', null);
+        $this->assertSame(['recorded', 'denied'], array_column($results, 'outcome'), json_encode($results));
+        $this->assertSame('redeemed', $results[1]['reason']);
+        $this->assertNull($results[1]['content_hash']);
+        $this->assertSame([[0, strlen($bytes) - 1, strlen($bytes), TestDeliveryAuthorization::sole()->id]], TestDeliveryCoverage::get()
+            ->map(fn ($row) => [$row->first_byte, $row->last_byte, $row->covered_bytes, $row->completed_authorization_id])->all());
+        $this->assertSame(1, TestDeliveryAdmission::count());
+        $this->assertSame(1, DB::table('audit_events')->where('action', 'commerce.delivery.completed')->count());
+        $this->assertSame(0, DB::table('audit_events')->where('action', 'commerce.delivery.resumed')->count());
+    }
+
+    /**
+     * A signed-in customer's first admitted response ($first) whose worker died before recording coverage; then worker 0
+     * records bytes 0..$recordLast for it (null: the whole file) while worker 1, signed in, asks to resume from byte 10.
+     *
+     * @return array{0: array, 1: string, 2: int}
+     */
+    private function admissionBehindCoverage(string $first, ?int $recordLast): array
+    {
         $this->fakePrivateMediaStorage();
         $this->travelTo(now()->startOfSecond());
         Queue::fake();
@@ -79,21 +115,17 @@ class TestOwnerDeliveryResumeConcurrencyTest extends TestCase
         $bytes = Storage::disk('local')->get($original->storage_path);
         // A first response was admitted and its worker died: an admission without coverage, waiting to be recorded.
         app(TransferTestDelivery::class)->handle($paid['order']->public_id, $principal->ownerKey, $issued->authorizationId, F::SESSION_SECRET,
-            DeliveryByteRange::evaluate('bytes=0-9', null, strlen($bytes), $original->pdf_hash), $account['user'], $principal)->close();
+            DeliveryByteRange::evaluate($first, null, strlen($bytes), $original->pdf_hash), $account['user'], $principal)->close();
         $this->assertSame(1, TestDeliveryAdmission::count());
         $this->assertSame(0, TestDeliveryCoverage::count());
 
         $results = DeliveryRace::run($this, ['mode' => 'admit_record', 'order_id' => $paid['order']->id, 'order_public_id' => $paid['order']->public_id,
             'authorization_public_id' => $issued->authorizationId, 'authorization_id' => TestDeliveryAuthorization::sole()->id,
-            'admission_id' => TestDeliveryAdmission::sole()->id, 'user_id' => $account['user']->id, 'session_secret' => F::SESSION_SECRET,
+            'admission_id' => TestDeliveryAdmission::sole()->id, 'record_last' => $recordLast ?? strlen($bytes) - 1,
+            'user_id' => $account['user']->id, 'session_secret' => F::SESSION_SECRET,
             'size_bytes' => strlen($bytes), 'sha256' => $original->pdf_hash, 'now' => now()->toIso8601ZuluString()]);
-        $this->assertSame(['recorded', 'transferred'], array_column($results, 'outcome'), json_encode($results));
-        $this->assertSame(hash('sha256', substr($bytes, 10)), $results[1]['content_hash']);
-        $rows = TestDeliveryCoverage::orderBy('sequence')->get();
-        $this->assertSame([[0, 9, 10, null], [10, strlen($bytes) - 1, strlen($bytes), TestDeliveryAuthorization::sole()->id]],
-            $rows->map(fn ($row) => [$row->first_byte, $row->last_byte, $row->covered_bytes, $row->completed_authorization_id])->all());
-        $this->assertSame(2, TestDeliveryAdmission::count());
-        $this->assertSame([$account['user']->id], DB::table('audit_events')->where('action', 'commerce.delivery.resumed')->pluck('actor_id')->all());
+
+        return [$results, $bytes, $account['user']->id];
     }
 
     private function assertCoverage(int $size, array $covered): void
