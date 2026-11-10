@@ -214,6 +214,25 @@ class MerchPrintfulFulfillmentTest extends TestCase
         $this->assertSame($this->printful->orders[$fulfillment->external_id]->id, $retried->printful_order_id);
     }
 
+    public function test_a_recovered_order_already_confirmed_in_printful_is_settled_and_never_confirmed_again(): void
+    {
+        config(['merch.confirm_orders' => true]);
+        $fulfillment = $this->recorded();
+        $this->printful->createFailures[] = ['created' => true, 'exception' => new PrintfulException('PRINTFUL_UNAVAILABLE', true)];
+        $this->refusal(fn () => app(SubmitMerchFulfillment::class)->handle($fulfillment));
+
+        // Sean confirmed the draft in the Printful dashboard before the retry ran.
+        $external = $fulfillment->refresh()->external_id;
+        $draft = $this->printful->orders[$external];
+        $this->printful->orders[$external] = new PrintfulOrder($draft->id, $external, 'inprocess');
+        $settled = app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        $this->assertSame([MerchFulfillment::CONFIRMED, 'inprocess', $draft->id], [$settled->state, $settled->printful_status, $settled->printful_order_id]);
+        $this->assertSame([1, 0], [$this->printful->count('create'), $this->printful->count('confirm')]);
+
+        app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        $this->assertSame(0, $this->printful->count('confirm'));
+    }
+
     public function test_a_create_that_never_arrived_is_created_on_the_retry(): void
     {
         $fulfillment = $this->recorded();

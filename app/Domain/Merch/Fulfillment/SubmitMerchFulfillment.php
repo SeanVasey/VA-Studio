@@ -60,11 +60,18 @@ final class SubmitMerchFulfillment
 
             return $current->refresh();
         }
+        if (in_array($order->status, self::CONFIRMED_STATUSES, true)) {
+            // A recovered order that was already confirmed (for example in the Printful dashboard) is settled, never re-sent.
+            $this->settle($current, MerchFulfillment::CONFIRMED, ['printful_order_id' => $order->id, 'printful_status' => $order->status,
+                'failure_code' => null, 'submitted_at' => now()]);
+
+            return $current->refresh();
+        }
         $this->settle($current, MerchFulfillment::SUBMITTED, ['printful_order_id' => $order->id, 'printful_status' => $order->status,
             'failure_code' => null, 'submitted_at' => now()]);
         $current->refresh();
 
-        return $this->policy->confirmsOrders() ? $this->confirm($current, $order) : $current;
+        return $this->policy->confirmsOrders() && $order->status === 'draft' ? $this->confirm($current, $order) : $current;
     }
 
     /**
@@ -192,7 +199,8 @@ final class SubmitMerchFulfillment
             // The earlier confirmation's outcome is unknown. Never silently return it as if it were settled.
             return $this->reconcileConfirmation($current);
         }
-        if ($current->state === MerchFulfillment::SUBMITTED && $this->policy->confirmsOrders() && is_string($current->printful_order_id)) {
+        if ($current->state === MerchFulfillment::SUBMITTED && $this->policy->confirmsOrders() && is_string($current->printful_order_id)
+            && $current->printful_status === 'draft') {
             return $this->confirm($current, new PrintfulOrder($current->printful_order_id, $current->external_id, (string) $current->printful_status));
         }
 
