@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Domain\Inquiries\Notifications\InquiryNotificationWork;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -9,7 +10,8 @@ use Illuminate\Support\Facades\DB;
  * Read-only listing of inquiry alert intents an operator must check by hand (FP-013): a claim left in "processing" longer
  * than a threshold (a worker stopped before or after the transport call) and every "unknown" outcome (the transport raised
  * an error or the lease expired). Neither is ever resent, so check the mail provider's logs for the inquiry reference (the
- * `X-Vasey-Inquiry-Alert` header) before acting. Prints identifiers, states and times only, never a recipient or content.
+ * `X-Vasey-Inquiry-Alert` header) before acting. It also counts, as `stale`, the unsent intents older than the alert window,
+ * which are skipped for good. Prints identifiers, states and times only, never a recipient or content.
  */
 final class ListStuckInquiryAlerts extends Command
 {
@@ -20,7 +22,7 @@ final class ListStuckInquiryAlerts extends Command
 
     protected $description = 'List inquiry alert intents stuck in processing or left unknown (read-only).';
 
-    public function handle(): int
+    public function handle(InquiryNotificationWork $work): int
     {
         $minutes = filter_var($this->option('minutes'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 10080]]);
         if ($minutes === false) {
@@ -39,7 +41,11 @@ final class ListStuckInquiryAlerts extends Command
         $stuck = fn () => DB::table('inquiry_notification_intents')->where('state', 'processing')->where('updated_at', '<', $before);
         $unknown = fn () => DB::table('inquiry_notification_intents')->where('state', 'unknown');
         [$stuckTotal, $unknownTotal] = [$stuck()->count(), $unknown()->count()];
-        $this->line('stuck='.$stuckTotal.' unknown='.$unknownTotal.' minutes='.$minutes);
+        // Pending and retry intents older than the alert window (or all of them while the window is invalid) are never sent.
+        $oldest = $work->oldestSendable();
+        $stale = DB::table('inquiry_notification_intents')->whereIn('state', ['pending', 'retry'])
+            ->when($oldest !== null, fn ($query) => $query->where('created_at', '<', $oldest->format('Y-m-d H:i:s')))->count();
+        $this->line('stuck='.$stuckTotal.' unknown='.$unknownTotal.' stale='.$stale.' minutes='.$minutes);
         $rows = DB::table('inquiry_notification_intents as n')->join('customer_inquiries as i', 'i.id', '=', 'n.customer_inquiry_id')
             ->where(fn ($query) => $query->where('n.state', 'unknown')
                 ->orWhere(fn ($claimed) => $claimed->where('n.state', 'processing')->where('n.updated_at', '<', $before)))

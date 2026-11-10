@@ -40,9 +40,13 @@ use Vasey\Ops\CapabilityBoundary;
 
 /**
  * Pre-launch capability hold, approved by Sean on 2026-10-18: the environment keys of the four flags, each refused unless false.
- * Three have no environment gate in the application: an operative free grant and an operator notification are bound only by an
- * adapter that other code would supply, and the public track sitemap build chain is not environment-gated while the public index
- * serves it in production. In production this validator is their only guard. The fourth, V2 listening promotion, is reached
+ * Two have no environment gate in the application: an operative free grant is bound only by an adapter that other code would
+ * supply, and the public track sitemap build chain is not environment-gated while the public index serves it in production. In
+ * production this validator is their only guard. The operator notification flag now has a shipped adapter (FP-013): a default-off
+ * mail alert transport that the flag binds once an inquiry operator is configured, and that sends an operator a plain-text alert
+ * carrying an inquiry reference when the order-ready mail configuration is admitted too. That transport refuses production in code
+ * unless the literal `inquiries.operator_alert_mail_production_admitted` is true (it ships false), so this hold and that literal
+ * are lifted together, in one reviewed change. The fourth, V2 listening promotion, is reached
  * today only through a customer session, which the test customer access path creates in local, testing and staging only, and
  * the production listening lane does not read it; it is held as defence in depth because promotion is a one-way data change.
  * Lifting one is a reviewed change to this file together with Sean's authorization for that activation. The config key of each
