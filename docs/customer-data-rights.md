@@ -216,7 +216,7 @@ Notes for the review:
 
 ### Evidence
 
-`tests/Feature/CustomerComms/ProductionUnpaidSnapshotRetentionTest.php` and `StripeTestUnpaidSnapshotRetentionTest.php`, with synthetic provider evidence, on SQLite. Native MySQL 8.4: not yet run on this commit (recorded separately when it completes). Hosted Stripe behavior is not exercised.
+`tests/Feature/CustomerComms/ProductionUnpaidSnapshotRetentionTest.php` and `StripeTestUnpaidSnapshotRetentionTest.php`, with synthetic provider evidence, on SQLite. Native MySQL 8.4.11 on commit 75688c70, five tests (the expiry recorded between a paid read and its commit, the 30-day boundary report, the contradicted-read hold for a paid session and for an expired session with a succeeded payment, and the two-intent grouping): OK, 180 assertions. The other tests in these files ran on SQLite only. Hosted Stripe behavior is not exercised.
 
 ## Records
 
