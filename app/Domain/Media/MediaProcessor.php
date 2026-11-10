@@ -71,6 +71,10 @@ class MediaProcessor
                 if (! hash_equals($profile['tag_sha256'], $tagIntegrity['sha256'])) {
                     throw new MediaFailure('tag_hash_mismatch', 'The seller tag does not match its approved SHA-256.');
                 }
+                // The synthetic staging tag stands in for the approved one on rehearsal hosts only (docs/ops/staging-placeholders.md).
+                if (StagingSellerTag::refused($profile['tag_path'], $tag)) {
+                    throw new MediaFailure('staging_tag_refused', 'The configured seller tag is the synthetic staging placeholder. Install the approved seller tag and its SHA-256.');
+                }
                 $evidence['tag_scan'] = $this->scan($tag);
                 $outputs = app(AudioDerivatives::class)->build($input, $tag, $profile, $workspace);
             } elseif ($source->role === 'stems_zip') {

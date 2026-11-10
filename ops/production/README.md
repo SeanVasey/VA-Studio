@@ -188,6 +188,10 @@ These are application or review items this kit deliberately does not do:
    validator together with Sean's authorization for that activation; see `docs/ops/production-activation-packet.md` (section 1). The
    `VASEY_TEST_*` flags, the support fixture and the synthetic rehearsal catalog flag (`VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED`) are
    refused by their own environment gates or by the preflight, not by this hold.
+7. **No staging seller tag.** `validate-runtime.php` refuses (`holds.staging_seller_tag`) a `MEDIA_TAG_PATH` that contains `staging`
+   or `synthetic`, and a tag file in the attached private storage whose bytes carry the marker of the synthetic STAGING tag
+   (`vasey:staging-seller-tag`, staging rehearsal only). The media pipeline and `vasey:doctor` refuse it too. Production needs
+   Sean's approved seller tag; see `docs/ops/staging-placeholders.md` (P-1).
 
 ## What was and was not verified
 
