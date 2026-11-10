@@ -371,7 +371,7 @@ SH;
         $check = collect(app(InstallationReport::class)->collect()['checks'])->firstWhere('id', 'media_scanner_limits');
 
         $this->assertSame('warn', $check['status']);
-        $this->assertStringContainsString('MaxFileSize and MaxScanSize to 1280M and AlertExceedsMax yes', $check['message']);
+        $this->assertStringContainsString('MaxFileSize and MaxScanSize to 2047M and AlertExceedsMax yes', $check['message']);
         $this->assertCount(1, $this->asked());
         $this->assertFileDoesNotExist($this->asked()[0]);
         $this->assertDirectoryDoesNotExist($this->directory.'/private/processing');
