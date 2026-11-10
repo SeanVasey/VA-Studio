@@ -157,10 +157,12 @@ art vasey:staging-specimen-signature          # add --check to verify without in
 - **What it refuses.** Any environment other than `local`, `testing` or `staging`, or a configured `APP_ENV` that differs
   from the running one; another signature image installed and configured; a different file already at its own path. It
   never replaces a file and never edits the environment.
-- **How it is named a specimen.** `vasey:doctor` does not inspect the signature. `art vasey:cutover-check` row PCL-06 does,
-  by the path word (`STAGING`, `specimen`) and by the marker `STAGING SPECIMEN` inside the PNG's `tEXt` chunk (the words
-  in the picture are pixels, which cannot be searched). On the staging profile it passes and says the specimen is
-  configured; on the production profile it fails. The marker is a convention: a copy with it stripped is not detected.
+- **How it is named a specimen.** `vasey:doctor` adds a `license_signature_specimen` row only when the configured signature
+  file is readable and its bytes hold the marker `STAGING SPECIMEN` (in the PNG's `tEXt` chunk; the words in the picture are
+  pixels, which cannot be searched). It passes on staging and says the file is the staging specimen; on production it is a
+  required check and fails. With no signature configured, or a file that is absent, unreadable or a link, the report is
+  unchanged. `art vasey:cutover-check` row PCL-06 reports the same by path word and marker. The marker is a convention: a
+  copy with it stripped is not detected.
 
 ## 4. `vasey:doctor` until it passes
 
