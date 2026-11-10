@@ -115,11 +115,19 @@ Not covered, and why:
   license version. Nothing compares its wording with any published license, so agreement depends on the person who pastes it.
 - **Schema 1 licenses.** Their summaries are free prose a reviewer attested (`summary_consistency_confirmed`). The test only
   proves they are shown unchanged.
-- **Two labels for one file role on the same card.** The card's file line uses the storefront labels
-  (`resources/js/lib/catalog.ts`: "Untagged MP3", "WAV master", "Track stems"); the generated line below it uses the license
-  vocabulary ("Deliverables: MP3, WAV master, Stems ZIP."). The roles are the same; the words differ, and "Untagged" is stated
-  by the storefront, not by a typed term. Unresolved: the generated wording is frozen into published license sources.
 - **`docs/legal/LICENSE-TIERS.md`.** The unapproved tier draft maps its limits to the schema 2 to 4 usage slots
   (`monetized_streams`, `live_performances`). New drafts use schema 5, which has no such slots and has slots the draft gives
   no value for (`audio_streams`, `free_downloads`, the two performance kinds). The draft's comparison copy therefore cannot
   be generated from a schema 5 license as written.
+
+**Resolved 2026-11-10 (DD-30): one wording for a file role.** The card's file line used storefront labels ("Untagged MP3",
+"WAV master", "Track stems") while the generated line under it used the license vocabulary. The generated, typed-term wording
+is now the only one: "MP3", "WAV master", "Stems ZIP". "Untagged" is gone because no typed term states it. The server still
+sends role keys, not labels, so the client keeps one map, `resources/js/lib/deliverable-labels.json`, which the reconciliation
+test pins to `TypedLicenseTerms::DELIVERABLES`, role for role and in order. `deliverableNames()` in `resources/js/lib/catalog.ts`
+is the only reader for the license cards, the track page offers, the license chooser, quote review and order preparation, and
+it lists files in the generated order; the purchased-file labels in `resources/js/lib/test-delivery.ts` read the same map (they
+said "Master WAV" before). The test also requires each card's file line to stand inside its generated Deliverables line and
+refuses the old words anywhere under `resources/js`; `tests/frontend/deliverable-wording.test.tsx` checks the two rendered
+lines against each other. No term, payload or stored license text changed.
+

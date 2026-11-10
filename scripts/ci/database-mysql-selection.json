@@ -25,6 +25,7 @@
     "tests/Feature/MembershipCreditMigrationTest.php",
     "tests/Feature/Migration/LegacyHistoryArchiveMigrationTest.php",
     "tests/Feature/Migration/LegacyHistoryDeclarationMigrationTest.php",
+    "tests/Feature/Migration/LegacyHistoryTrackLinkMigrationTest.php",
     "tests/Feature/MigrationRecompilationTest.php",
     "tests/Feature/OrderInquiryMigrationTest.php",
     "tests/Feature/OrderPreparationMigrationTest.php",
@@ -65,6 +66,7 @@
   ],
   "include_files": [
     "tests/Feature/BulkReplaceLicenseDraftSourceTest.php",
+    "tests/Feature/CollaboratorSplitsTest.php",
     "tests/Feature/CustomerComms/CustomerDataRightsTest.php",
     "tests/Feature/CustomerComms/PaidGrantDataExportTest.php",
     "tests/Feature/CustomerComms/ProductionCheckoutDataExportTest.php",

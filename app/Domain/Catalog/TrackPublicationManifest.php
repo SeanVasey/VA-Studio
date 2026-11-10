@@ -17,7 +17,13 @@ final readonly class TrackPublicationManifest
 
     private string $captureTimestamp;
 
-    public function __construct(array $payload, private int $actor, CarbonImmutable $capturedAt)
+    private array $reported;
+
+    /**
+     * Advisories are reported beside the identity and are never part of the payload or its hash: they cannot block,
+     * change or invalidate a reviewed publication.
+     */
+    public function __construct(array $payload, private int $actor, CarbonImmutable $capturedAt, array $advisories = [])
     {
         if ($actor < 1 || ($payload['schema_version'] ?? null) !== self::SCHEMA_VERSION ||
             ($payload['canonicalization_version'] ?? null) !== CanonicalJson::VERSION) {
@@ -28,6 +34,13 @@ final readonly class TrackPublicationManifest
         $this->content = self::copy($payload);
         $this->contentHash = CanonicalJson::hash($this->content);
         $this->captureTimestamp = $capturedAt->utc()->toISOString();
+        $this->reported = self::copy($advisories);
+    }
+
+    /** Report-only findings, such as incomplete collaborator splits. Not publication authority. */
+    public function advisories(): array
+    {
+        return $this->reported;
     }
 
     public function payload(): array

@@ -302,6 +302,45 @@ class ProductionRuntimeValidator(unittest.TestCase):
         contracts.write_text(source.replace("'vasey_license_v2_issuance' => false,", "'vasey_license_v2_issuance' => true,"))
         self.failed(run(), "holds.vasey_license_v2_issuance")
 
+    def test_the_operator_alert_mail_production_literal_is_held(self):
+        # FP-013: the alert mail transport refuses production in code unless this literal is true; it sits beside the flag hold.
+        text = VALIDATOR.read_text()
+        self.assertIn("$check('holds.operator_alert_mail_production_admitted', "
+                      "config('inquiries.operator_alert_mail_production_admitted') === false);", text)
+        self.assertRegex(text, r"foreach \(\$holdKeys as \$name => \$key\) \{\s*\$check\('holds\.'\.strtolower\(\$name\), config\(\$key\) === false\);\s*\}"
+                               r"\s*(?://[^\n]*\n\s*)+\$check\('holds\.operator_alert_mail_production_admitted'")
+        self.assertEqual(self.validate(profile()).returncode, 0)
+
+    def test_the_operator_alert_mail_production_literal_flipped_fails_the_validator(self):
+        # A shadow project whose only change is the literal (true, or a truthy non-boolean): the validator run from it refuses.
+        shadow = self.dir / "shadow"
+        shadow.mkdir()
+        for name in ("app", "vendor", "scripts", "routes", "resources", "database", "public", "storage", "composer.json", "artisan"):
+            (shadow / name).symlink_to(REPO / name)
+        shutil.copytree(REPO / "bootstrap", shadow / "bootstrap")
+        shutil.copytree(REPO / "config", shadow / "config")
+        (shadow / "ops/production").mkdir(parents=True)
+        shutil.copy2(VALIDATOR, shadow / "ops/production/validate-runtime.php")
+        inquiries = shadow / "config/inquiries.php"
+        source = inquiries.read_text()
+        literal = "'operator_alert_mail_production_admitted' => false,"
+        self.assertEqual(source.count(literal), 1)
+
+        def run():
+            self.file.write_text(profile())
+            self.file.chmod(0o600)
+            return subprocess.run([PHP, str(shadow / "ops/production/validate-runtime.php"), str(self.file), "production", HOST, "vasey_production"],
+                                  cwd=shadow, env={"PATH": os.environ.get("PATH", "/usr/bin:/bin")}, capture_output=True, text=True, timeout=120)
+
+        self.assertEqual(run().returncode, 0)
+        for value in ("true", "1", "'false'", "null"):
+            with self.subTest(value=value):
+                inquiries.write_text(source.replace(literal, f"'operator_alert_mail_production_admitted' => {value},"))
+                result = run()
+                self.failed(result, "holds.operator_alert_mail_production_admitted")
+                self.assertEqual({line for line in result.stderr.splitlines() if line.startswith("FAIL ")},
+                                 {"FAIL holds.operator_alert_mail_production_admitted"}, result.stderr)
+
     def test_the_documented_off_values_are_accepted_and_a_blank_assignment_is_not(self):
         for value in ("false", "(false)"):
             with self.subTest(value=value):
@@ -437,6 +476,34 @@ class ProductionRuntimeValidator(unittest.TestCase):
                                  env={"PATH": os.environ.get("PATH", "/usr/bin:/bin")}, capture_output=True, text=True)
             self.assertEqual(run.returncode, 1)
             self.assertIn("runtime.unavailable", run.stderr)
+
+    # ---- the synthetic staging seller tag is a rehearsal placeholder, never a production tag ----
+
+    def test_a_staging_seller_tag_path_is_refused_before_the_preflight_child_runs(self):
+        for path in ("branding/STAGING-synthetic-seller-tag.wav", "branding/staging-tag.wav", "branding/Synthetic-tag.wav"):
+            with self.subTest(path=path):
+                run = self.validate(profile(MEDIA_TAG_PATH=path))
+                self.failed(run, "holds.staging_seller_tag")
+                self.assertEqual(run.stderr.split(), ["FAIL", "holds.staging_seller_tag"], run.stderr)
+
+    def test_a_staging_seller_tag_renamed_to_look_approved_is_refused_by_its_content(self):
+        # The validator reads the tag where the application would: the private local disk of this checkout.
+        private = REPO / "storage/app/private"
+        directory = Path(tempfile.mkdtemp(prefix="ops-validator-tag-", dir=private))
+        self.addCleanup(shutil.rmtree, directory, True)
+        relative = f"{directory.name}/approved-seller-tag.wav"
+        tag = directory / "approved-seller-tag.wav"
+        tag.write_bytes(b"RIFF" + b"x" * 70000 + b"VASEY-STAGING-SYNTHETIC-SELLER-TAG" + b"data")
+        self.failed(self.validate(profile(MEDIA_TAG_PATH=relative)), "holds.staging_seller_tag")
+        # The same path with unmarked content, or with no file at all, is not this hold's to refuse.
+        tag.write_bytes(b"RIFF" + b"x" * 70000 + b"data")
+        self.assertEqual(self.validate(profile(MEDIA_TAG_PATH=relative)).returncode, 0)
+        tag.unlink()
+        self.assertEqual(self.validate(profile(MEDIA_TAG_PATH=relative)).returncode, 0)
+
+    def test_the_staging_marker_is_the_applications_own(self):
+        marker = re.search(r"const MARKER = '([A-Z-]+)';", (REPO / "app/Domain/Media/StagingSellerTag.php").read_text())
+        self.assertEqual(marker and marker.group(1), "VASEY-STAGING-SYNTHETIC-SELLER-TAG")
 
     def test_php_syntax(self):
         lint = subprocess.run([PHP, "-l", str(VALIDATOR)], capture_output=True, text=True)

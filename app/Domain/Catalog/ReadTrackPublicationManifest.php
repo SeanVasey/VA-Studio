@@ -11,6 +11,7 @@ use App\Domain\Commerce\Models\RightsScopeOffer;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Delivery\MediaEvidenceValues;
 use App\Domain\Media\VerifiedMedia;
+use App\Domain\Rights\CollaboratorSplitReport;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\VerifiedLicense;
 use App\Models\User;
@@ -78,7 +79,9 @@ final class ReadTrackPublicationManifest
             'artwork' => $this->derivative($track, 'artwork'),
             'preview_tagged' => $this->derivative($track, 'preview_tagged'),
             'offers' => $offers,
-        ], $this->integer($actor->id), $capturedAt);
+        ], $this->integer($actor->id), $capturedAt,
+            // Reported, never enforced: whether incomplete splits should block publication is Sean's open decision.
+            ['collaborator_splits' => app(CollaboratorSplitReport::class)->forTrack($this->integer($track->id))]);
     }
 
     private function track(Track $track): array

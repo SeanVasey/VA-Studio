@@ -116,12 +116,26 @@ class StagingEnvironmentAdmissionTest extends TestCase
         'app/Domain/Customers/Preferences/LocalConsentRuntime.php',
         'app/Domain/Notifications/TransactionalNotificationPolicy.php',
         'app/Domain/Inquiries/OrderInquiry.php',
+        // FP-013: the operator alert mail transport is admitted in local, testing and staging; production needs its code literal.
+        'app/Domain/Inquiries/Notifications/MailInquiryAlertTransport.php',
         'app/Domain/Services/Projects/ServiceProjectPolicy.php',
         'app/Domain/Memberships/MembershipPolicy.php',
         'app/Domain/Grants/Free/FreeGrantPolicy.php',
         'app/Domain/Grants/Free/TestFreeGrantIdentity.php',
         'app/Domain/Grants/Free/FreeGrantDefinitions.php',
         'app/Http/Controllers/FreeGrantController.php',
+        // #266: the synthetic STAGING seller tag is admitted through the helper; production refuses it.
+        'app/Domain/Media/StagingSellerTag.php',
+    ];
+
+    /**
+     * Files that may spell 'staging' without being an environment gate. StagingSellerTag matches the word inside a
+     * configured tag path (a placeholder-file marker); its environment gate is TestEnvironment::admitsTestCommerce().
+     */
+    private const NAMES_STAGING_WITHOUT_GATING = [
+        'app/Domain/Media/StagingSellerTag.php' => '/stripos\(\$path, \'staging\'\)/',
+        // BL-49: the cutover check's marker word for staging stand-in file names (seller tag, specimen signature), one constant.
+        'app/Support/Diagnostics/CutoverMarkers.php' => '/public const STAGING_PATH_WORD = \'staging\';/',
     ];
 
     /** Development-only conveniences and production-lane rehearsals: these stay explicitly local/testing. */
@@ -578,7 +592,15 @@ class StagingEnvironmentAdmissionTest extends TestCase
                 $named[] = Str::after($path->getPathname(), base_path().'/');
             }
         }
-        $this->assertSame(['app/Support/Environment/TestEnvironment.php'], $named);
+        // A file allowed to spell the word must use it only in its recorded non-gate expression, never beside an
+        // environment read, so the exemption cannot hide a gate.
+        foreach (self::NAMES_STAGING_WITHOUT_GATING as $file => $use) {
+            $source = file_get_contents(base_path($file));
+            $this->assertMatchesRegularExpression($use, $source, $file);
+            $this->assertSame(1, preg_match_all('/[\'"]staging[\'"]/', $source), $file.' names staging outside its recorded use');
+            $this->assertDoesNotMatchRegularExpression('/environment\([^)]*[\'"]staging[\'"]|[\'"]staging[\'"]\s*===|===\s*[\'"]staging[\'"]/', $source, $file);
+        }
+        $this->assertSame(['app/Support/Environment/TestEnvironment.php'], array_values(array_diff($named, array_keys(self::NAMES_STAGING_WITHOUT_GATING))));
     }
 }
 

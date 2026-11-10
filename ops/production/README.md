@@ -175,8 +175,12 @@ These are application or review items this kit deliberately does not do:
    mounting, membership billing) still needs a reviewed change and Sean's separate authorization.
 5. **Scheduler heartbeat.** The application leaves no trace when no release is due; a ping on schedule success is a reviewed change.
 6. **Pre-launch capability hold (approved by Sean, 2026-10-18).** `ops/production/validate-runtime.php` refuses four flags unless they
-   are false: `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` and `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED` (no environment gate; each
-   admits once an adapter is bound by other code, and none ships today), `DISCOVERY_SITEMAP_ENABLED` (the public index serves track
+   are false: `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` (no environment gate; it admits once an identity adapter is bound by other
+   code, and no such adapter is bound today), `CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED` (a default-off mail alert transport
+   now ships, FP-013: `true` binds it once an inquiry operator is configured, and it then emails that operator a plain-text alert
+   with an inquiry reference whenever the order-ready mail configuration is admitted too; the transport also refuses production in
+   code until the literal `inquiries.operator_alert_mail_production_admitted` is set to `true` in the same reviewed change that
+   lifts this hold), `DISCOVERY_SITEMAP_ENABLED` (the public index serves track
    sitemaps in production once it is true) and `VASEY_LISTENING_V2_PROMOTION_ENABLED` (a one-way data promotion; its only consumer
    needs a customer session, which only the test customer access path creates, so this one is defence in depth). The validator
    names them in `PRE_LAUNCH_HOLDS` and reads their config keys from `scripts/ops/capability-boundary.php`; a refusal is
@@ -184,6 +188,10 @@ These are application or review items this kit deliberately does not do:
    validator together with Sean's authorization for that activation; see `docs/ops/production-activation-packet.md` (section 1). The
    `VASEY_TEST_*` flags, the support fixture and the synthetic rehearsal catalog flag (`VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED`) are
    refused by their own environment gates or by the preflight, not by this hold.
+7. **No staging seller tag.** `validate-runtime.php` refuses (`holds.staging_seller_tag`) a `MEDIA_TAG_PATH` that contains `staging`
+   or `synthetic`, and a tag file in the attached private storage whose bytes carry the marker of the synthetic STAGING tag
+   (`vasey:staging-seller-tag`, staging rehearsal only). The media pipeline and `vasey:doctor` refuse it too. Production needs
+   Sean's approved seller tag; see `docs/ops/staging-placeholders.md` (P-1).
 
 ## What was and was not verified
 

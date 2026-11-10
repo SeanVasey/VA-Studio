@@ -6,6 +6,7 @@ use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicationReadiness;
 use App\Domain\Catalog\ReadPrivateTrackReview;
 use App\Domain\Catalog\SaveTrackMetadata;
+use App\Domain\Rights\CollaboratorSplitReport;
 use App\Filament\Resources\TrackResource\Pages\ManageTracks;
 use App\Models\User;
 use Filament\Actions\Action;
@@ -107,7 +108,9 @@ class TrackResource extends OperatorResource
                 ->using(fn (Track $record, array $data, ManageTracks $livewire) => static::saveMetadata($record, $data, $livewire)),
             Action::make('readiness')->label('Check readiness')->action(function (Track $record) {
                 $blockers = app(PublicationReadiness::class)->blockers($record);
-                Notification::make()->title($blockers === [] ? 'Ready to publish' : 'Publication blocked')->body(implode("\n", $blockers))->persistent()->send();
+                // Incomplete collaborator splits are reported here and never change the verdict.
+                $advisories = app(CollaboratorSplitReport::class)->advisories((int) $record->id);
+                Notification::make()->title($blockers === [] ? 'Ready to publish' : 'Publication blocked')->body(implode("\n", [...$blockers, ...$advisories]))->persistent()->send();
             }),
             Action::make('publish')->visible(fn (Track $record) => $record->status !== 'published')->requiresConfirmation()->databaseTransaction(false)
                 ->modalDescription('Publish the reviewed track, files and offers. If anything changes after this review, reopen the confirmation to review it again.')

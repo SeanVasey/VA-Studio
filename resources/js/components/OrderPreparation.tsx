@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { fileRoleLabels, formatMoney, type LicenseDisclosure } from '../lib/catalog';
+import { deliverableNames, formatMoney, type LicenseDisclosure } from '../lib/catalog';
 import { TestCheckout, validPaymentProgress, type PaymentProgress } from './TestCheckout';
 import { OwnedTestOrderHistory } from './OwnedTestOrderHistory';
 import { OrderItems } from './OrderItems';
@@ -308,7 +308,7 @@ function Preparation({ quoteId, expiresAt, offerRevisionIds, testCheckoutEnabled
             const line = review.pricing.items.find(line => line.offerRevisionId === item.offerRevisionId)!;
             return <section className="quote-review-item" key={item.offerRevisionId} aria-label={`${item.title} order terms`}>
               <h3>{item.title}</h3><p>{item.licenseName} · version {item.disclosure.version} · {item.disclosure.type}</p>
-              <p>{item.disclosure.deliverableRoles.map(role => fileRoleLabels[role] ?? role).join(' + ')}</p>
+              <p>{deliverableNames(item.disclosure.deliverableRoles).join(' + ')}</p>
               <ul>{item.disclosure.features.map((feature, index) => <li key={index}>{feature}</li>)}</ul>
               <p>Quantity: {line.quantity} · Price: {formatMoney(line.baseMinor)} · Discount: {formatMoney(line.discountMinor)} · Tax basis: {formatMoney(line.taxBasisMinor)} · Test tax: {formatMoney(line.taxMinor)} · Line total: {formatMoney(line.totalMinor)}</p>
               <div className="license-source" role="region" aria-label={`${item.title} full license text`} tabIndex={0}>{item.disclosure.termsText}</div>

@@ -418,3 +418,199 @@ Still Sean's, not delegable:
   `docs/verification/member-source-currentness-20261013/` and not from the shipped `composer.lock`;
 - the staging step 11 inputs;
 - every live-payment, DNS, production and customer-import authorization.
+
+## Register update — 2026-11-10: delegated decisions and staging placeholders
+
+Sean delegated the decisions that were waiting on him on 2026-11-10: "For things waiting for my decision - do what is
+recommended by you or if requiring a wav tag audio item like in item 1 needing my input, use a staging tag and make note
+of these for the final cleanup of production. We need to get these things going as well."
+
+Read as a rule, every waiting item falls into one of three classes:
+
+- **A, decided.** A pure decision. The development lead's recommendation is recorded as decided. Sean can reverse any of
+  them before the activation it affects.
+- **B, staging placeholder.** The item needs a real asset or value from Sean. Work proceeds on a clearly labelled
+  STAGING or synthetic placeholder, and the item is entered in the
+  [production cleanup ledger](../production-cleanup-ledger.md) (`PCL-xx`) to be replaced before production.
+- **C, Sean only.** Not delegated: entering credentials or secrets on a host, enrolling authenticator devices, supplying
+  BeatStars exports, dismissing GitHub alerts, counsel's legal review, and every live-payment, DNS, production-deploy,
+  customer-import and BeatStars-retirement authorization.
+
+The items are the 20 entries of the 2026-11-09 status audit's queue for Sean (`SQ-xx`), the 28 parity rows whose blocker
+was Sean's decision, the open `U-xx` rows above and the open questions of `docs/legal/` and
+`docs/customer-data-rights.md`, deduplicated. Nothing here is test acceptance, nothing changes a flag, and nothing
+authorizes a live payment, a deploy, a DNS change, an import or a deletion. No price, license term, tax registration,
+address or secret is invented or recorded.
+
+**Placeholder convention (class B).** A staging placeholder is recognizable without context: text carries the literal
+words `STAGING PLACEHOLDER`, catalog and license records carry the existing `[SYNTHETIC]` / `synthetic-rehearsal`
+markers (`docs/ops/staging-runbook.md`, section 5a), and files are named `STAGING-synthetic-…`. Placeholders exist only
+on `local`, `testing` and the private `staging` host, never in a production environment file, fixture or release.
+Where a value is Sean's alone (above all the postal address), the placeholder is the words "set at production", never a
+guess.
+
+### Launch (v1) scope — SQ-04, U-11, U-12
+
+Each deferral keeps launch small and is reversible: the built drafts and test journeys stay in the repository,
+default-off. A deferral changes what is built before launch. It does not remove a cutover gate: BeatStars is not retired
+while the Studio audit (DD-66) shows an active obligation in a deferred family.
+
+| ID | Item | Class | Decision and reason | Parity rows moved to `postlaunch_by_design` |
+| --- | --- | --- | --- | --- |
+| DD-01 | What v1 sells | A | Track licensing on every tier of Sean's six templates, exclusive sales, free downloads, customer accounts, contracts and delivery. One reason: this is the BeatStars core, and it is the part already built behind flags. | none |
+| DD-02 | Merchandise | A | Deferred. It needs a fulfillment provider, shipping and returns terms (U-12), none of which exists. | FP-010, FP-088 |
+| DD-03 | Services | A | Public service catalog, deposits and service payments deferred (U-12). Service requests arrive through the contact form at launch. The built test journey (FP-086) stays as it is, default-off, and collects no money. | FP-008, FP-087 |
+| DD-04 | Collections, albums and automatic bundles | A | Deferred. Bundle pricing rules would be invented, and a multi-track line multiplies the rights and exclusive cases. | FP-006, FP-066 |
+| DD-05 | Sound kits | A | Deferred. Kit intake is built, but no storefront or entitlement delivery exists and none of the six templates is a kit license, so a kit could only be sold on invented terms. With all four families deferred, their publish and archive editors follow. | FP-007, FP-037 |
+| DD-06 | PayPal | A | Stripe only at v1. One provider means one verified-payment path to prove. One-time payments leave nothing to carry over. | FP-062 |
+| DD-07 | E-signature provider | A | Click-assent contracts: the recorded declaration, the frozen assent text and the original PDF are the evidence (D-30). No provider, no extra customer data processor. | FP-058 |
+| DD-08 | Collaborator accounting and payouts | A | Deferred. Collaborator splits are metadata only (DD-38); no accounting, statement or payout. D-07 already excludes payout infrastructure. | FP-069 |
+| DD-09 | Offers and negotiation | A | Deferred. Fixed published prices only; a buyer-specific price is handled by Sean outside the store until built. | FP-056 |
+| DD-10 | Rest of U-11 (affiliate rewards, crypto, license upgrades, distribution and publishing hand-offs) | A | Stay post-launch, as their rows already say. | none (already post-launch) |
+
+Twelve rows move: FP-006, FP-007, FP-008, FP-010, FP-037, FP-056, FP-058, FP-062, FP-066, FP-069, FP-087, FP-088. The
+parity count becomes 43 `implemented_evidenced`, 32 `implemented_partial`, 1 `not_implemented`, 4 `blocked_on_sean` and
+23 `postlaunch_by_design`. No row changed to an implemented status. FP-009, FP-083 and FP-085 (memberships, DD-50) and
+FP-091 (marketing email, DD-44) are decided but not moved: the delegated scope list names neither family, and the
+membership inventory is still a cutover gate. Sean can move them with one word. The `scope_stage` column is left as the baseline
+recorded it, so the move is visibly a 2026-11-10 decision and is undone by restoring one cell.
+
+### Money: merchant, tax, prices and policy values — SQ-02, SQ-05, SQ-06, SQ-13, U-04, U-08
+
+| ID | Item | Class | Decision, placeholder or why it stays Sean's |
+| --- | --- | --- | --- |
+| DD-11 | Store currency | A | One currency: USD, stored as integer cents. The approved TERMS section 6 already says so. No presentment currencies at v1. |
+| DD-12 | Capture model | A | Immediate capture in Stripe Checkout payment mode. No authorize-then-capture and no manual capture: a grant already requires durable verified payment, so a hold would add a state with no benefit. |
+| DD-13 | Managed Payments or direct | A | Direct Stripe payments on Vasey Multimedia's own account. Managed Payments would make Stripe the merchant of record, against the 2026-10-24 decision. No Connect (D-07). |
+| DD-14 | Tax approach | A + C | **A:** production sells through the tax-calculating chain (Tax V2 over Stripe automatic tax), not the tax-refusing chain; prices are tax-exclusive, as TERMS section 6 states; tax is collected only where a registration exists. **C:** the registrations themselves, the Stripe Tax settings and the product tax category are Sean's with his accountant; none is assumed here. PCL-08. |
+| DD-15 | Payouts and reconciliation | A + C | **A:** Stripe's standard automatic payouts; once a month the Stripe payout report is reconciled against the store's sales report and the production reconcile command. **C:** the bank account and payout schedule are entered by Sean in Stripe. |
+| DD-16 | Refund and dispute policy values (FP-068) | A | Confirmed as TERMS appendix A.4 reads the approved section 10: `refund_authority = authoritative_provider_operator_review`, `partial_refunds = exact_line_allocation`, `dispute_access = temporarily_block_while_reconciling`, `exclusive_reopening = qualified_operator_review`. They are entered per host, never committed. |
+| DD-17 | Exclusive reservation and late payment (U-08) | A | From the approved TERMS section 9: `reservation_seconds = 1800`; `provider_lifetime_seconds = 1800`, so a provider session cannot outlive the reservation; `pending_cutoff = block_new_nonexclusive_on_pending_exclusive`; `late_action = paid_exception_operator_reconciliation`; `late_time_basis = authoritative_provider_payment_time`, because the provider's payment time is the fact a buyer and a bank can both see. After a refund an exclusive is offered again only after operator review (DD-16). U-08 is closed for development; exclusive live checkout still needs its own authorization. |
+| DD-18 | Stripe TEST credentials on the staging host (S-4, FP-061) | C | Secrets entered on a host. Steps under "What only Sean can do". |
+| DD-19 | Prices for every tier and offer (S-8, C-4) | B | Staging uses the existing synthetic convention: licenses named `[SYNTHETIC] TEST PRICE …` with repeated-digit amounts (1.11, 2.22, … 6.66 USD, one per tier), on synthetic tracks only. No production price exists in the repository. Sean supplies real prices. PCL-02. |
+| DD-20 | Per-track tier enablement (C-4) | B | Staging: every tier is offered on every synthetic track, so each contract can be rehearsed. Production: Sean's list of tiers per track. PCL-03. |
+
+### Licensing and contracts — SQ-05, SQ-11, SQ-14, U-05, U-06
+
+| ID | Item | Class | Decision, placeholder or why it stays Sean's |
+| --- | --- | --- | --- |
+| DD-21 | Canonical tiers and license text | A | Sean's six private templates (Basic, Premium, Premium Plus, Unlimited, Custom Beat, Exclusive) are canonical for names, caps, credit, royalty and sync wording (`docs/production-contract-profile.md`, increment 1). `docs/legal/LICENSE-TIERS.md` is a superseded draft wherever it differs; only its free-license section is still used (DD-24). Custom Beat is authored with the other five but offered only where Sean assigns it. |
+| DD-22 | Does an exclusive transfer ownership | A | No. An exclusive is an exclusive license with no copyright assignment, as the drafts default. It is the reversible choice: an assignment can be added later, and cannot be taken back. |
+| DD-23 | Publishing details (PRO, IPI, designee) and per-track exclusive disclosures | C | Sean's own facts, given to a licensee on request and entered per track by him. Never committed. PCL-04. |
+| DD-24 | Free downloads (FP-055) | A + B + C | **A:** free downloads are in v1, delivered untagged as built. **B:** no template of the six is a free license, so staging uses the LICENSE-TIERS section 5.1 draft marked `STAGING PLACEHOLDER`; the production text needs Sean's approval. PCL-05. **C:** lifting `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` is a live activation. |
+| DD-25 | Contract renderer and archival standard (U-06) | A | Closed as built: the pinned offline TCPDF profile `vasey-license-pdf-v2`, the original PDF kept byte-exact with its SHA-256. PDF/A is not claimed at v1. |
+| DD-26 | Held tc-lib updates (#162, #164) | A | Not merged before launch. The contract profiles pin those bytes; `composer audit` remains the security gate. An update after activation ships as a successor profile with its own golden. |
+| DD-27 | Licensor signature image | B + C | **B:** staging renders with a specimen image that reads `STAGING SPECIMEN — NOT A SIGNATURE`; nothing resembling a signature is drawn. **C:** Sean installs his real signature PNG on the production host. PCL-06. |
+
+### Legal pages — SQ-07, U-05 (open questions from PR #261)
+
+| ID | Item | Class | Decision, placeholder or why it stays Sean's |
+| --- | --- | --- | --- |
+| DD-28 | Should restoring a previous release skip the legal guard | A | No. Rollback stays guarded. A rollback that would republish unfinished legal text is refused; the operator rolls back to a clean release or removes the legal pages. |
+| DD-29 | Square brackets in approved legal text | A | Not allowed. Brackets are the drafts' placeholder convention, so any bracket refuses publication. Approved text uses parentheses. |
+| DD-30 | Deliverable wording | A | The generated, typed-term wording is canonical: "MP3", "WAV master", "Stems ZIP". The storefront's "Untagged" label is removed unless a typed term backs it. No typed term does today. |
+| DD-31 | `/legal/licenses` | A | Generated from the published license versions, not typed as free text, so the comparison cannot drift from what is sold. Until that is built the page is not published. |
+| DD-32 | A distinct schedule outcome for a legal refusal | A | No. The schedule keeps the existing `integrity` outcome with the reason in the audit event. A new outcome would need a trigger migration for no operator benefit. |
+| DD-33 | Legal placeholders: effective date, postal address, venue county, hosting, storage, backup and email providers, server region | B | Staging-only values, each harmless and marked: the pages open with "STAGING PLACEHOLDER — not in effect"; effective date, postal address, venue county, backup provider and email provider each read "set at production"; hosting is Laravel Forge on a DigitalOcean server, storage is the server's private disk and the region is the United States (DD-55, DD-58), which are facts of the staging host. **No street address is ever written.** Sean supplies the production values. PCL-07. |
+| DD-34 | Minimum age | A | "18, or the age of majority where you live", as drafted. A license is a contract, so the buyer must be able to make one. |
+| DD-35 | DMCA designated agent | A | Not registered for launch. The store publishes only Sean's own content, and the TERMS section 13 complaint procedure stands. The bracketed sentence is removed. Revisit if the store ever shows customer content publicly. Counsel may overrule in DD-36. |
+| DD-36 | Counsel's review of the "For legal review" sections and the no-samples warranty (C-3) | C | Only a qualified reviewer can give it. The guard refuses publication while a marker remains, so production publication waits for it. PCL-07. |
+| DD-37 | Contact-form privacy notice and retention reference | A + B | **A:** the notice is one sentence that points to the published privacy policy, and the retention reference is the PRIVACY section 7 contact row. **B:** on staging the notice text carries `STAGING PLACEHOLDER` until the policy is published. PCL-07. |
+
+### Media and catalog — SQ-01, SQ-15, SQ-16
+
+| ID | Item | Class | Decision, placeholder or why it stays Sean's |
+| --- | --- | --- | --- |
+| DD-38 | Do incomplete collaborator splits block publication | A | No. The publication manifest reports them and does not block. The export shows 19 featured-artist titles with 2 recorded splits, so blocking would stop most of the catalog on metadata that feeds no price or payout. |
+| DD-39 | Track scheduling and unlisted tracks (FP-032) | A | Scheduled: a track publishes at a UTC instant only if every publication guard passes at that instant, and otherwise stays a draft with the failure recorded, as site releases do. Private is the existing draft; no new state. Unlisted: reachable by its direct link and share link, absent from catalog, search, sitemaps and feeds, served `noindex`, and purchasable only under the same guards as a published track. |
+| DD-40 | Seller tag (S-6) | B | A synthetic STAGING seller tag is approved: audio generated by tooling on the host, named `STAGING-synthetic-seller-tag.wav` and marked inside the file, with its SHA-256 pinned in the staging environment only. It tags only staging previews and is never installed in production. Sean supplies the approved tag WAV. PCL-01. |
+| DD-41 | Official logo SVG and icon suite (S-11, FP-017) | B | No mark is recreated. The placeholder is what the repository already holds: the official PNG icons under `public/brand/`. Sean supplies the SVG source. PCL-09. |
+
+### Customers, mail and data — SQ-08, SQ-10, SQ-12, U-07, U-10, U-13
+
+| ID | Item | Class | Decision, placeholder or why it stays Sean's |
+| --- | --- | --- | --- |
+| DD-42 | Production customer identity (U-07) | A | Account-first: `buyer_identity.mode = verified_account` with `verified_account_recovery`. The approved TERMS section 3 already requires an account. No guest checkout, no social sign-in and no customer MFA at v1; recovery is by emailed code. Staff MFA stays required. |
+| DD-43 | Sender domain and SMTP provider (FP-075) | A + C | **A:** transactional mail only, from a dedicated subdomain of vasey.audio so the apex mail records stay untouched until cutover; SMTP over implicit TLS on port 465, which is what the production validator admits; SPF and DKIM aligned, DMARC starting at `p=none`. Staging mail stays `log`. **C:** choosing and paying for the provider, entering its credentials and adding DNS records. PCL-10. |
+| DD-44 | Marketing email, ESP and analytics processors (FP-081, FP-090, FP-091) | A | None at v1. No ESP, no suppression sync and no third-party analytics; reporting is first-party. PRIVACY then names fewer processors. The built consent ledger stays, and unknown consent stays unknown. |
+| DD-45 | Marketing consent notice text | A | Stays `null`. With no marketing mail there is nothing to consent to, and a null notice keeps the preference page from collecting consent. |
+| DD-46 | Retention class of order-ready notices (`transactional_notices`) | A | `correspondence`, 2 years, as scheduled. The order itself keeps the purchase evidence; two years covers the dispute window for "I never received it". |
+| DD-47 | The three unclassified tables | A | `production_account_feature_bindings` and `production_listening_libraries` follow the account lifecycle and are erased by a deletion approval once production accounts can be closed (D-30 step 3b). `production_buyer_assent_observations` is held indefinitely as review evidence. Each moves into the schedule, with its pinned test, in the change that builds step 3b; until then the report keeps listing all three. |
+| DD-48 | Consent clock signal | A | The 3-year clock starts at deletion approval for an account with no retained order. While an order snapshot or contract still holds the address, consent and suppression records stay held with it. |
+| DD-49 | Reviewed deletion workflow (U-13) | A | The built workflow is the workflow: customer request, staff approval under MFA, erasure of the profile and library, retention of the financial and license record. U-13 is closed except for the purge, which is DD-67. |
+| DD-50 | Membership policy (U-10, FP-009, FP-083, FP-085) | A + C | **A:** no membership is sold at v1 and no recurring billing runs; `MembershipHttpMount`, both `enabled` flags and every approved hash stay as shipped. No legacy member is imported into an active entitlement automatically. BeatStars is not retired while any legacy member is active: each is honored there until it lapses, or by a reviewed manual grant. Plans, prices and allowances are not invented; none is needed while nothing is sold. **C:** the BeatStars membership inventory (DD-66). The three rows keep their status. |
+
+### Operations, staging and cutover — SQ-01, SQ-09, SQ-14, SQ-16 to SQ-20, U-02, U-03
+
+| ID | Item | Class | Decision, placeholder or why it stays Sean's |
+| --- | --- | --- | --- |
+| DD-51 | Two staging operators with TOTP (step 11) | C | Enrolling an authenticator device. Steps under "What only Sean can do". |
+| DD-52 | Who the second operator is | A | On staging Sean may hold both accounts (author and reviewer); the two-account rule then separates actions, not people, as the runbook already states. For production Sean names a second reviewer or accepts the same arrangement. PCL-11. |
+| DD-53 | Off-host backup destination (S-10) | A + C | **A:** an SSH-reachable store that Sean controls, encrypted at rest, at a different provider or account from the host; staging keeps 30 days there. **C:** creating it and installing its key on the host. |
+| DD-54 | Reprovisioning the staging host | C | Root on the host. The installed helpers are stale after #259, so deploys refuse until `provision.sh` is rerun. |
+| DD-55 | Production region, sizing and topology (U-02) | A + C | **A:** a second Forge-managed server at the same provider as staging, in a United States region (as PRIVACY section 9 proposes), never the staging machine; at least the staging specification of 4 vCPU, 8 GB RAM and 160 GB disk; one server running the web tier, workers, MySQL and private files, as the production kit builds. **C:** creating the server and every deploy. |
+| DD-56 | Secrets custody (U-02) | A + C | **A:** secrets exist only in the Forge environment and in Sean's password manager; never in Git, chat, a ticket or an agent session. **C:** entering them. |
+| DD-57 | Incident ownership (U-02) | A | Sean is the incident decision maker and the launch operator; support@vasey.audio is the contact. An agent prepares diagnosis and a proposed fix and takes no production action. |
+| DD-58 | Private file storage (U-03) | A | The server's private disk at launch, as built and tested, with the encrypted off-host backup. R2 or an S3-compatible store is deferred until measured size or egress calls for it; the storage interface keeps that move open. |
+| DD-59 | Recovery objectives and rollback thresholds (SQ-17) | A | RPO 24 hours (nightly backup plus a snapshot before every deploy; payments are also recoverable from Stripe). RTO 8 hours. During the cutover observation window, roll back on any of: a paid order with no delivery that staff cannot resolve within 30 minutes; any sign of a double exclusive sale; a failed reconciliation or integrity check; checkout unavailable for 30 minutes. |
+| DD-60 | Does BeatStars keep selling during cutover (SQ-17) | A | No. BeatStars sales are frozen before the final delta, so one system holds exclusive authority at any moment (`ExclusivityAuthority`). The freeze and the switch are Sean's actions (DD-61, DD-67). |
+| DD-61 | DNS control and records | C | DNS is not delegated. Sean holds the registrar and makes every change. |
+| DD-62 | Device tester and deployment operator (SQ-16) | A + C | **A:** Sean is both unless he names someone. **C:** the physical-device run needs his devices. |
+| DD-63 | Dependabot alerts from the evidence lockfiles | C + A | **C:** dismissing the four alerts is a click in GitHub. **A, alternative rejected:** the two archived `composer.lock` files are not renamed or moved. `archive-index.json`, `artifact-digests.json` and `catalog/component-release-artifacts.json` bind each by path and SHA-256, and `rebuild-manifests.py` asserts those bindings, so a rename would force the manifests to be rewritten and the packet would no longer be the evidence that was reviewed. No follow-up task. |
+| DD-64 | CLAUDE.md adaptations and the lint preset (SQ-18) | A | The five adaptations stand as recorded (gate, auth, audit level, license and layout, deploy). Lint: Pint with a preset matched to the existing style and a TypeScript linter, changed files only at first. Sections 1 to 12 of CLAUDE.md are not edited. |
+| DD-65 | The Foundation CI run at freeze (SQ-19) | A | No new approval is needed: Sean's CI cost policy of 2026-10-06 (AGENTS.md) already orders one complete run on the final candidate at an exact SHA. Further runs only for actual failures or new source. |
+| DD-66 | BeatStars Studio audit and the order, customer, membership, payment and contract exports (SQ-03, U-09, FP-095, FP-097, FP-099) | C | Only Sean can sign in and export. Until then PayPal use, Content ID enrollment and active memberships stay unknown, which blocks cutover and retirement, not development. |
+| DD-67 | Authorizations (SQ-20) | C | Each separate and each Sean's: the media delete path, the retention purge, live Stripe keys and the first charge, expiring open provider sessions at D-30 activation, lifting any pre-launch hold, production deploy, import into active entitlements, DNS cutover and BeatStars retirement. |
+
+### Status of the open U-xx rows after this update
+
+| Key | Status |
+| --- | --- |
+| U-02 | Decided: platform (2026-10-18), region, sizing, topology, custody rule, backup shape, incident owner (DD-53, DD-55 to DD-57). Sean's: creating the server, entering secrets, the backup credentials, every deploy. |
+| U-03 | Decided for launch: private server disk (DD-58). |
+| U-04 | Decided: merchant (2026-10-24), currency, capture, direct Stripe, tax approach, payout approach (DD-11 to DD-15). Sean's: tax registrations and Stripe Tax settings, bank account, live keys. |
+| U-05 | Decided: seller (2026-10-24), PRIVACY and TERMS (2026-11-07), canonical tiers, exclusive ownership (DD-21, DD-22). Sean's: prices, counsel review, the production legal values, free-license text. |
+| U-06 | Closed (DD-25). |
+| U-07 | Decided: account-first (DD-42). Activation is a separate authorization. |
+| U-08 | Decided for development (DD-16, DD-17). Exclusive live checkout is a separate authorization. |
+| U-09 | Sean's (DD-66). |
+| U-10 | Decided: nothing sold at v1 and the legacy rule (DD-50). Sean's: the inventory. |
+| U-11 | Decided: all deferred (DD-06 to DD-10). |
+| U-12 | Decided: merchandise and services deferred (DD-02, DD-03). |
+| U-13 | Decided: periods (2026-11-07), classes (2026-11-09), processors, notice, clock and workflow (DD-44 to DD-49). Sean's: authorizing any purge. |
+
+### What only Sean can do
+
+In the order that unblocks the most work. Times are estimates for someone following the linked steps.
+
+1. **Reprovision the staging host and create the two operators** (DD-54, DD-51), about 30 minutes. Over SSH, rerun
+   `provision.sh` as `ops/staging/README.md` describes for the release that carries #259, then deploy. Then, in
+   `/srv/vasey-staging/current`, run `php8.4 artisan vasey:create-admin` twice (name, email, a password of 16 or more
+   characters). For each account: sign in at `https://<HOST>/admin`, open **Profile**, scan the QR code with an
+   authenticator app, confirm a code, store the recovery codes offline, sign out and back in. Runbook section 2.
+2. **Off-host backup destination** (DD-53), about 20 minutes. Create the storage account, then run the four commands of
+   runbook section 8: generate the key on the host, add the public key at the destination, set `VASEY_BACKUP_DEST` in
+   `/etc/vasey-staging/staging.conf`, and run one supervised `vasey-staging-backup nightly` that ends in "shipped".
+3. **Stripe test credentials** (DD-18), about 15 minutes. In the Stripe dashboard in test mode: copy the account id,
+   reveal a standard `sk_test_` key (restricted keys are refused), add the webhook endpoint for
+   `https://<HOST>/webhooks/stripe` and copy its `whsec_` secret. Paste the three values into Forge → Environment and
+   deploy. `docs/ops/staging-test-purchase.md` has the exact fields. Never send them by chat or commit them.
+4. **BeatStars Studio audit and exports** (DD-66), one to two hours. Walk items A-001 to A-014 of
+   `docs/migration/authenticated_studio_audit_checklist.csv`; export orders, customers, memberships, payment-provider
+   records and buyer contracts into the private store used for the catalog export on 2026-11-07, and note each file's
+   SHA-256.
+5. **Production values** (the cleanup ledger), about an hour in total and not needed for staging: prices and tiers per
+   track, the seller tag WAV, the signature PNG, the postal address and venue county, the logo SVG, the free-license
+   text, publishing details.
+6. **Counsel's review** of TERMS sections 15 to 17 and the no-samples warranty (DD-36). Elapsed time is counsel's.
+7. **Tax registrations and Stripe Tax settings** with his accountant (DD-14), and the payout bank account (DD-15).
+8. **Mail provider account, credentials and DNS records** (DD-43), about 30 minutes plus DNS propagation.
+9. **Dismiss the four Dependabot alerts** (DD-63), about two minutes: GitHub → Security → Dependabot, filter by the
+   manifest path `docs/verification/member-source-currentness-20261013/`, select the four, **Dismiss** with the reason
+   that the vulnerable code is not used (archived evidence, not an installed lockfile).
+10. **Physical-device run** (DD-62), about 30 minutes with an iPhone and an Android phone, once staging serves the
+    synthetic catalog.
+11. **Each authorization of DD-67**, one at a time, when its evidence is in front of him.
+
+The work these decisions unblock is listed in
+[`docs/handoff/2026-11-10/UNBLOCKED-WORK.md`](../handoff/2026-11-10/UNBLOCKED-WORK.md).
