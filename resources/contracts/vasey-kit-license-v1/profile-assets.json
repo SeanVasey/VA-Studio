@@ -1,0 +1,214 @@
+{
+    "schema_version": 1,
+    "profile_version": "vasey-kit-license-pdf-v1",
+    "shared_assets": {
+        "profile_version": "vasey-license-pdf-v2",
+        "directory": "resources/contracts/vasey-license-v2",
+        "note": "The font and logo files are the v2 profile's own, pinned here by SHA-256 and size; none is copied."
+    },
+    "signature": {
+        "in_manifest": false,
+        "source": "private_storage",
+        "pin": "config:contracts.vasey_license_v1.signature_sha256"
+    },
+    "packages": {
+        "tecnickcom/tc-lib-barcode": {
+            "version": "2.17.3",
+            "reference": "2fd80f8b4d2cb5f31ac20b784e2516f20c71fd61"
+        },
+        "tecnickcom/tc-lib-color": {
+            "version": "3.0.7",
+            "reference": "8455d371882d2e3eb2742d4d6fb82ca5aebb95db"
+        },
+        "tecnickcom/tc-lib-file": {
+            "version": "3.9.4",
+            "reference": "02089faaaed42cb5137d23ba2236e6809124999e"
+        },
+        "tecnickcom/tc-lib-pdf": {
+            "version": "8.81.1",
+            "reference": "a0626686715391dd4210c5622aee849d033b8baf"
+        },
+        "tecnickcom/tc-lib-pdf-encrypt": {
+            "version": "2.12.2",
+            "reference": "887921e1fef98dc9885b33b85cbcd1b222b4b7dc"
+        },
+        "tecnickcom/tc-lib-pdf-filter": {
+            "version": "2.11.4",
+            "reference": "2b0e0f9f56ae8e8baeda9a7aebd8e8321b493e30"
+        },
+        "tecnickcom/tc-lib-pdf-font": {
+            "version": "4.6.2",
+            "reference": "668d73e853c6027afd9cdaae8ea042957ba11e08"
+        },
+        "tecnickcom/tc-lib-pdf-graph": {
+            "version": "2.18.2",
+            "reference": "bb87e68d21792e5722e8395a3ef471c74b81d70d"
+        },
+        "tecnickcom/tc-lib-pdf-image": {
+            "version": "3.15.3",
+            "reference": "c162371c7cb705f3cae0bd9e284ed023886e4180"
+        },
+        "tecnickcom/tc-lib-pdf-page": {
+            "version": "4.18.1",
+            "reference": "86f854489301a79533454d3ca8d9d918cec95cb9"
+        },
+        "tecnickcom/tc-lib-pdf-parser": {
+            "version": "3.16.2",
+            "reference": "074599a52f1ef8cbac67dcb9b10dd2a730760c70"
+        },
+        "tecnickcom/tc-lib-pdf-sign": {
+            "version": "2.0.5",
+            "reference": "cc3d9afc536a5878326a5d34d08492c1d475960a"
+        },
+        "tecnickcom/tc-lib-unicode": {
+            "version": "3.2.3",
+            "reference": "1b400c9aeee482a153b9ec0c8b5d86c166cc92ba"
+        },
+        "tecnickcom/tc-lib-unicode-data": {
+            "version": "3.1.3",
+            "reference": "597a62c86c96a655d1d35e3d585ebec1232ad152"
+        }
+    },
+    "implementation": {
+        "app/Domain/Commerce/ContractIdentity/ContractGlyphCoverage.php": "fae4b3c5fa2a7841a5a09440ca42ddac545553fa32524770b91e156b42cbd4c9",
+        "app/Domain/Commerce/ContractIdentity/ContractIdentityDeclarationV2.php": "f5839782350513762734cef72ec786dc57057976557e377580bf778646ddba6f",
+        "app/Domain/Commerce/ContractIdentity/ContractPrintableSet.php": "18df1fb1430463d56df4e791f36f645871567cfa2b04e7024112eae6d9648f3e",
+        "app/Domain/Commerce/ProductionCheckout/CheckoutException.php": "271e6eaf728665edf521b64daadbdcf00b5c2f432c344138b648bc9f61140241",
+        "app/Domain/Contracts/ContractIssuanceException.php": "9df97742776ba51f031b088ade0fde06e2a73ad1d90284141b91ee6e3eb8a8be",
+        "app/Domain/Contracts/ContractIssuancePolicy.php": "3aa15f4485ad5cdf8d71a59f2b244abdbfe0ab0d1c2b799264041986b086dac0",
+        "app/Domain/Contracts/ContractRenderProfileRegistry.php": "51d879e904b3b8352c578c10a582b621d76f48c149189ede1ed0c2bcd970bbac",
+        "app/Domain/Contracts/Production/ContractBindingException.php": "a0746b6b67ab9ab75c8db28c8700bd523675fd8db6ff6207ada17a3552f747b8",
+        "app/Domain/Contracts/Production/ContractLicenseConstants.php": "3b4e7a96638b0944e5eb2cdc88604013192dc32099b2219ee47d1c6a1c180ba7",
+        "app/Domain/Contracts/Production/ContractNumberWords.php": "3c86e2b247fabcafeea88f740e50cb15fb35db88d712a3a2e776e2f141ce971f",
+        "app/Domain/Contracts/Production/ContractTemplateCensus.php": "86b3b9b5d967c2ca8dcfe01107ebac4e334cec3431df57ea7420e013465bc8db",
+        "app/Domain/Contracts/Production/ContractVariableBinder.php": "32b9d30070b6113ad8177e6d99269ef8a70fed1bdef971c31268a9040cc29abc",
+        "app/Domain/Contracts/Production/SoundKitLicenseBinder.php": "8046e0eaffd2cb8b7c118a74360ae7025f315a85e012980696680de302599dfe",
+        "app/Domain/Contracts/Production/SoundKitLicenseDocument.php": "d7a6c9e65e12f49d86dc5fe589d2a638fc26eda64eed59024859ac7d357f6475",
+        "app/Domain/Contracts/Production/VaseyKitLicenseImplementation.php": "3839765a6afb173af0904275c92d8d207426eddbb7cd586e7ec6b12bea6e4c76",
+        "app/Domain/Contracts/Production/VaseyKitLicensePdfRenderer.php": "27278da30df3a3a1375e78e8671e504fd982272796168dc2e661f9406af37696",
+        "app/Domain/Contracts/Production/VaseyKitLicenseProfileDefinition.php": "c58700be1978af58633109b32cbe040fb09978c3c2cb738da7eca745c42a63b5",
+        "app/Domain/Contracts/Production/VaseyLicenseDocument.php": "57a2b080a3f0ba445261f2e36c7569352cd5bbe2a81a697672b3e2faed2f3a2d",
+        "app/Domain/Contracts/Production/VaseyLicenseLayout.php": "9999d2fa2a9df75d5724b2a5807c5fe8e4b9b1ebcdc2bdfd5310455f446412a1",
+        "app/Domain/Contracts/Production/VaseyLicensePdfRenderer.php": "f81ae57e04616d77cb9e0dd25b894d00e336ec5db1718f5b6272df59fbd4d0bc",
+        "app/Domain/Contracts/Production/VaseyLicenseProfile.php": "b7863c34cba02dccf19d803d0ad166d40360dd8a6e373646a994522051a01fa8",
+        "app/Domain/Contracts/Production/VaseyLicenseProfileDefinition.php": "8afaf0ce8cefb1b728689d130f9f4c54fe725ec20a8d6ff3153e7db78329587f",
+        "app/Domain/Contracts/Production/VaseyLicenseSignature.php": "e8aae2e91522c273bc500b873cf8b762aadf9e0babe07d5a361f5377785b2376",
+        "app/Domain/Contracts/Production/VaseyLicenseV2Profile.php": "75b4ef0cd57abbcf22071d4d6a34216aa53163c573c5b8365fedc6a201f9e7ba",
+        "app/Domain/Contracts/Production/VaseyLicenseV2ProfileDefinition.php": "791e6f9656dcc0a28d649fd3f1e72684c0719270140ee53da75e995f5a53b379",
+        "app/Domain/Contracts/RenderedContract.php": "b3fa57b8c8cc8e354597a5fc5f12b7942aa734e9d1bab9f0d2014358dd1d249f",
+        "app/Domain/Rights/EconomicLicenseTerms.php": "070a5b2e07887a713dd603803de5c330d34dc1d0b27b633dfe6c4eaaba87f0b4",
+        "app/Domain/Rights/LicenseTerritories.php": "916ce751ecac29550e37546e134137284867d9850190cb554065771e357e9996",
+        "app/Domain/Rights/ScopedLicenseTerms.php": "6d9942fbce17293679957e1bed0dc92dfc11d27b6c320c432b9f351563072dc7",
+        "app/Domain/Rights/SoundKitLicenseKind.php": "4a390df79cad6e2e57205c220de830d87d2d8dbc639f9ff302bc55d5501d9eba",
+        "app/Domain/Rights/TieredLicenseTerms.php": "c25f3670f00ca17274aa2120c8ad212f39c5ef1ced5fd7f57ebcfa695e97b3f3",
+        "app/Domain/Rights/TypedLicenseTerms.php": "c227805735d5613b5ed04e805c3260831209812599d450855c477bbbb0ad2745",
+        "app/Support/CanonicalJson.php": "6e8f14f950bbb7ed3c4a8162ecf7c2fd2752031d1679285cea8bb0a5f5f82d89",
+        "app/Support/Environment/TestEnvironment.php": "98566cea59214cb6d9ab1852eef7d9a6e2020048b46b02fbc1b882439ba2d948"
+    },
+    "assets": {
+        "fonts/generated/bebasneue.ctg.z": {
+            "sha256": "839067126abfede7b970cf9e3a06b5f521e97499795824c54a177fcdf49b1ec3",
+            "size_bytes": 958
+        },
+        "fonts/generated/bebasneue.json": {
+            "sha256": "5cf67a037d2f044339f37832ed8342f505aaa130cd5a8e17fb689e8b9d7b6ad4",
+            "size_bytes": 12716
+        },
+        "fonts/generated/bebasneue.z": {
+            "sha256": "85079f56af3596708074cbb1c59799555445ad9e1bd792521ca63d7192333df9",
+            "size_bytes": 23107
+        },
+        "fonts/generated/jetbrainsmono.ctg.z": {
+            "sha256": "475e96f9a2fbb845908832941eca11e4c1e97c7456138612eb94d1cb351ea762",
+            "size_bytes": 1030
+        },
+        "fonts/generated/jetbrainsmono.json": {
+            "sha256": "b852527608bc1c337f9ad0a768ee0a7e5071154091e7198a51872c5f3c604eca",
+            "size_bytes": 13522
+        },
+        "fonts/generated/jetbrainsmono.z": {
+            "sha256": "3fb492c0f2c55720f6ae68d49b83f7f2770ac517a6bd6d54ef57a8ed14e6a2f9",
+            "size_bytes": 34116
+        },
+        "fonts/generated/redditsans.ctg.z": {
+            "sha256": "869c3fa4be3dc1bcc63b436e494759e954e353f22d050a6e7118c9465d1006a8",
+            "size_bytes": 1264
+        },
+        "fonts/generated/redditsans.json": {
+            "sha256": "eb124ada197422a59763bca8bdee589440e4adc4b74e826d780635088b0f88a7",
+            "size_bytes": 17535
+        },
+        "fonts/generated/redditsans.z": {
+            "sha256": "88c30fbf01fa45e062afda6e5036bdaa1c062502e0942a26d4fa5380feae72ff",
+            "size_bytes": 35647
+        },
+        "fonts/generated/redditsansb.ctg.z": {
+            "sha256": "869c3fa4be3dc1bcc63b436e494759e954e353f22d050a6e7118c9465d1006a8",
+            "size_bytes": 1264
+        },
+        "fonts/generated/redditsansb.json": {
+            "sha256": "59305fc9cffa5cae6efed1fc4f941ed2ec9bdb45bd72888cc04058139d67f73d",
+            "size_bytes": 17554
+        },
+        "fonts/generated/redditsansb.z": {
+            "sha256": "c304c7d008100148b2a442c4a987a18b51d63eb690d808085bfc983aaecd13c0",
+            "size_bytes": 38278
+        },
+        "fonts/source/bebas-neue-latin-400-normal.woff2": {
+            "sha256": "a7c90c89240c134f7fdd33d40c000ec90b79d675ea53e8cc5a6d423c073de412",
+            "size_bytes": 13768
+        },
+        "fonts/source/bebas-neue-latin-ext-400-normal.woff2": {
+            "sha256": "16c95ce45a2922f52551d38d565d14c92cf257b8f219c89613407d81fdd21a39",
+            "size_bytes": 8928
+        },
+        "fonts/source/bebas-neue.LICENSE.txt": {
+            "sha256": "66c436339f7490c1a99e4f6a7b8aef5c176676edfd071a31638e7d54c1b0aeda",
+            "size_bytes": 4391
+        },
+        "fonts/source/jetbrains-mono-latin-ext-wght-normal.woff2": {
+            "sha256": "79bfdab9ba467e26eea4122e6f2567e188dd8a09a8c730d501fc487c4ab99c6e",
+            "size_bytes": 15196
+        },
+        "fonts/source/jetbrains-mono-latin-wght-normal.woff2": {
+            "sha256": "18be452724bfdc236c074ca94a249a7f41a86752c7d04ab258ce9ed5651f6a7e",
+            "size_bytes": 40404
+        },
+        "fonts/source/jetbrains-mono.LICENSE.txt": {
+            "sha256": "403581b69dac5cff4079205e01c6b467e56af449ecbd7247693ddb1baafa005b",
+            "size_bytes": 4524
+        },
+        "fonts/source/reddit-sans-latin-ext-wght-normal.woff2": {
+            "sha256": "1f4049cb63a3088a505d98719f509f3fadcf5dde4424c9d675b1826ec28d262b",
+            "size_bytes": 34092
+        },
+        "fonts/source/reddit-sans-latin-wght-normal.woff2": {
+            "sha256": "3e3b66d208b63e175830ee0dedb631c5df11bd93d01e890e3692ecffab612262",
+            "size_bytes": 41844
+        },
+        "fonts/source/reddit-sans.LICENSE.txt": {
+            "sha256": "4d23a85506d013f1599d4aa29aa4ed60f75d3842c7aaa1bb83d3a3dace9032fc",
+            "size_bytes": 4485
+        },
+        "fonts/ttf/bebasneue.ttf": {
+            "sha256": "25e23f2cba3bf1d2f3687bcccb3db0748c10af4eedf876acc6ed99862f015d67",
+            "size_bytes": 47680
+        },
+        "fonts/ttf/jetbrainsmono.ttf": {
+            "sha256": "437c34fdb36a175a32ff216a866efbae1bf5caa12a97d93f2fc8d3016f460d03",
+            "size_bytes": 75696
+        },
+        "fonts/ttf/redditsans.ttf": {
+            "sha256": "a0e44a802df8c99ffa2d41185be5714c3228ee71a4998769cf2e2261efb99f7a",
+            "size_bytes": 80516
+        },
+        "fonts/ttf/redditsansb.ttf": {
+            "sha256": "2c8411858f02039d587a34f4137d3b8b1dbb884eaa22c2e1a9489641df182473",
+            "size_bytes": 80876
+        },
+        "images/vasey-audio-logo.png": {
+            "sha256": "7b0ffd26d5ddffab9695fdd3e0a4bb306d50642dc6a51e25233fd1626ff07571",
+            "size_bytes": 27673
+        }
+    }
+}

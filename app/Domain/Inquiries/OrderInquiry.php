@@ -63,7 +63,7 @@ final class OrderInquiry
                 $result = ['state' => 'saved', 'receipt' => $existing->public_id, 'replayed' => true];
             } else {
                 // Reuse the exact existing notice admission, encrypted payload, hash and request-key contract.
-                $result = app(SubmitInquiry::class)->handle($body, $inquiryOwner);
+                $result = app(SubmitInquiry::class)->handle($body, $inquiryOwner, listedSubject: false);
                 $inquiry = CustomerInquiry::where('public_id', $result['receipt'])->lockForUpdate()->sole();
                 $context = InquiryOrderContext::create([
                     'inquiry_id' => $inquiry->id, 'order_id' => $order->id, 'schema_version' => 1,

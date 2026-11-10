@@ -108,7 +108,7 @@ final class MemberOriginalRendererTest extends TestCase
             $this->assertSame($hash, hash_file('sha256', base_path($path)));
             $this->assertTrue(str_starts_with($path, 'app/Domain/Grants/Member/') || str_starts_with($path, 'scripts/'));
         }
-        $this->assertSame(MemberGrantRenderProfileRegistry::RELEASED['r1']['synthetic_rehearsal'], CanonicalJson::hash($this->profile));
+        $this->assertSame(MemberGrantRenderProfileRegistry::RELEASED['r2']['synthetic_rehearsal'], CanonicalJson::hash($this->profile));
         $this->assertNotSame(CanonicalJson::hash($this->profile), CanonicalJson::hash(MemberGrantRenderProfile::released('verified_production')));
     }
 

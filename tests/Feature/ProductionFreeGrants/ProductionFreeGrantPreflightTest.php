@@ -81,16 +81,45 @@ final class ProductionFreeGrantPreflightTest extends TestCase
         $this->assertSame(1, $this->renders);
     }
 
-    public function test_long_unbreakable_tokens_under_the_old_estimate_are_rendered_and_refused_at_propose(): void
+    /**
+     * tc-lib-pdf 8.81.1 (BL-55): this input was refused under 8.76.3, whose page count grew non-linearly with long
+     * unbreakable tokens (250 tokens of 40 characters already passed the 100-page limit). The updated renderer lays it out
+     * linearly: every token on its own line inside the column, 6 pages against the limit of 100. The retired estimate still
+     * would have skipped the render, so the render is counted once and propose() accepts the text. Refusal of text that
+     * truly exceeds the limits stays pinned by the short-lines test above.
+     */
+    public function test_long_unbreakable_tokens_under_the_old_estimate_are_rendered_within_the_column_and_accepted(): void
     {
         $definitions = new ProductionFreeGrantDefinitions;
         $terms = implode(' ', array_fill(0, 300, str_repeat('@', 51)));
         $this->assertLessThan(1500, substr_count($terms, "\n") + 1 + intdiv(strlen($terms), 60), 'The retired estimate skipped this text.');
 
-        $this->refuses(fn () => $definitions->propose($this->definitionInput(['termsText' => $terms]), $this->staff()));
-
-        $this->assertSame(0, DB::table('production_free_definitions')->count());
+        $this->assertNotEmpty($definitions->propose($this->definitionInput(['termsText' => $terms]), $this->staff())['id']);
         $this->assertSame(1, $this->renders);
+        $this->assertSame(1, DB::table('production_free_definitions')->count());
+
+        $payload = $this->inputs[0];
+        $rendered = app(ProductionFreeGrantRendererProcess::class)->render($payload['input'], $payload['profile']);
+        $this->assertLessThanOrEqual(10, $rendered->pageCount, 'Linear layout: well under the profile limit of 100 pages.');
+
+        $path = tempnam(sys_get_temp_dir(), 'pfg');
+        try {
+            file_put_contents($path, $rendered->pdfBytes);
+            $extract = new Process(['pdftotext', '-enc', 'UTF-8', '-bbox', $path, '-'], timeout: 30);
+            $extract->mustRun();
+            $boxes = $extract->getOutput();
+        } finally {
+            @unlink($path);
+        }
+        preg_match('/<page width="([\d.]+)"/', $boxes, $page);
+        preg_match_all('/xMin="([\d.]+)"[^>]*xMax="([\d.]+)"[^>]*>(@+)</', $boxes, $words, PREG_SET_ORDER);
+        $this->assertCount(300, $words, 'Every token is on the page, each as one word.');
+        $this->assertSame(300 * 51, array_sum(array_map(fn (array $word): int => strlen($word[3]), $words)), 'No character is lost.');
+        $margin = 42.52;
+        foreach ($words as $word) {
+            $this->assertGreaterThanOrEqual($margin - 0.01, (float) $word[1]);
+            $this->assertLessThanOrEqual((float) $page[1] - $margin + 0.01, (float) $word[2], 'No glyph passes the right margin.');
+        }
     }
 
     public function test_the_skip_bound_counts_every_character_of_the_rendered_definition_text(): void

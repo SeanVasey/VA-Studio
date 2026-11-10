@@ -12,7 +12,7 @@ T15a adds a private database inbox and truthful saved receipt. It sends no email
 - `CONTACT_INQUIRIES_OPERATOR_ID` must identify an existing verified staff member satisfying the panel's required MFA enrollment rule.
 - The currently published verified site release must contain a contact page. Draft/private previews cannot enable public submission. Withdrawal of any required condition stops new submissions and receipt replay with the same generic unavailable response.
 
-The public contact controller calls `InquiryPolicy::publicSetup($verifiedCurrentContent)` on its verified snapshot. Expose only `contactInquiryEnabled`, `contactInquiryPrivacyNotice` and the opaque `contactInquiryNoticeToken`; internal operator, retention reference and hashes stay private. Private preview pages keep the form disabled and receive no token. The frontend consumes the same `/contact/inquiries` endpoint and existing CSRF cookie/token.
+The public contact controller calls `InquiryPolicy::publicSetup($verifiedCurrentContent)` on its verified snapshot. Expose only `contactInquiryEnabled`, `contactInquiryPrivacyNotice`, the opaque `contactInquiryNoticeToken` and the subject list `contactInquirySubjects` (null while intake is off); internal operator, retention reference and hashes stay private. Private preview pages keep the form disabled and receive no token. The frontend consumes the same `/contact/inquiries` endpoint and existing CSRF cookie/token.
 
 The token is a purpose-separated HMAC using the application key. It binds the displayed notice hash, selected release/hash/publication revision, private retention-reference hash and configured operator identity. Issuance fails closed if the verified content does not match the selected release or the key is unavailable. This binds the displayed context; it is not a consent record, delivery receipt or new policy. During admission, current publication and persisted operator authority are locked in that order. A caller's old repeatable-read content snapshot cannot issue a token for different current content.
 
@@ -24,11 +24,13 @@ The token is a purpose-separated HMAC using the application key. It binds the di
 | --- | --- |
 | `name` | Required, 120 Unicode characters; no control characters |
 | `email` | Required valid email, 254 characters; no control characters |
-| `subject` | Required, 160 Unicode characters; no control characters |
+| `subject` | Required; on the public contact form exactly one of the listed subjects (below). Order inquiries keep a free-text subject of 160 Unicode characters without control characters |
 | `message` | Required, 8,000 Unicode characters; ordinary line breaks allowed |
 | `website` | Honeypot; must be exactly empty |
 | `requestKey` | Fresh canonical lowercase UUIDv4 |
 | `noticeToken` | Exact 64 lowercase hexadecimal characters issued with the displayed notice |
+
+**Subjects (BL-50).** The public contact form offers a closed list, held on the server in `App\Domain\Inquiries\InquirySubject::PUBLIC_CONTACT`: "General question", "Licensing question", "Order or download help" and "Service request". `SubmitInquiry` refuses any other value, including case or whitespace variants and the old free-text subjects, with 422 and `errors.subject` "Choose one of the listed subjects." before any record, audit event or alert exists. The React form renders the list it is given as a required select and decides nothing. The chosen label is stored as the payload's `subject`, so the payload, retention classification, staff views and customer history keep their shape, and rows saved before the list keep their free-text subjects and still display. "Service request" is how service enquiries reach Sean while the service catalog, deposits and service payments stay default-off (DD-03): it creates an ordinary inquiry with the same rate limits, notice token, consent handling (unknown consent stays unknown) and operator alert as any other, books nothing and takes no payment. The labels are the development lead's wording and Sean can rename them; a renamed label refuses the old one from then on.
 
 The complete raw body is capped at 16,384 bytes, including JSON escaping/envelope. Duplicate keys, extra/nested fields, query parameters, method overrides, range/encoding tricks and other media types fail before admission. Same-origin checks supplement the framework's CSRF/fetch-metadata protection. IP budgets are five requests per minute and twenty per hour; cache keys hash the IP and no IP is stored in the inquiry.
 
