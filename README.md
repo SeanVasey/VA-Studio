@@ -141,6 +141,14 @@ composer audit
 npm audit --audit-level=high
 ```
 
+Check PHP formatting locally the way preflight does, on the files your branch changes
+(Laravel Pint, `laravel` preset in `pint.json`; the whole-repository format sweep is a
+separate later PR, so untouched files may still fail):
+
+```sh
+vendor/bin/pint --test --diff=origin/main
+```
+
 Routine PRs run **Development preflight**: frontend tests/build, client secret
 scans, dependency audits and PHP/tooling quality checks. Pushes and merges do not
 start full database/browser matrices. Sean's October 6 policy in [AGENTS.md](AGENTS.md)
