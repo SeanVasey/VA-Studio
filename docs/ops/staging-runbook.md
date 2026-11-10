@@ -73,6 +73,9 @@ art route:list --path=admin/tracks --json -v | grep -c EnsureMultiFactorAuthenti
 
 Rerun `art vasey:doctor`; the `operator` check now passes.
 
+The shortest path through sections 2, 3, 4 and 8 on a host whose first deploy has finished is
+[`staging-step11-checklist.md`](staging-step11-checklist.md).
+
 ## 3. Seller tag
 
 Without the approved tag no `preview_tagged` asset is produced and nothing can be published
@@ -108,6 +111,32 @@ configuration. It quiesces, installs `.env`, runs `config:cache` and `route:cach
 Then process one real master, listen to the tagged preview and confirm the mix with Sean before publishing
 anything.
 
+### Synthetic STAGING tag (until S-6 exists)
+
+Sean decided on 2026-11-10 that staging uses a clearly marked staging tag until his approved tag is ready. The command
+below generates one on the host and installs it; nothing is copied to the server and nothing is committed:
+
+```sh
+art vasey:staging-seller-tag          # add --check to verify without installing
+```
+
+- **What it makes.** A one-second chime of three sine tones (880, 1320, 1760 Hz), 16-bit mono PCM, from ffmpeg's `sine`
+  source. No recording, sample, speech or brand mark. One ffmpeg build always produces the same bytes; the command reads
+  the SHA-256 from the file it made and never assumes it.
+- **Where.** `/srv/vasey-staging/private/branding/STAGING-synthetic-seller-tag.wav`, mode 0600. The file name, the RIFF
+  `INFO` title and the marker `VASEY-STAGING-SYNTHETIC-SELLER-TAG` in the RIFF `INFO` comment mark it.
+- **What it prints.** The two lines `MEDIA_TAG_PATH=…` and `MEDIA_TAG_SHA256=…` to set in Forge → Environment, then
+  **Deploy Now** as above. Neither is a secret.
+- **What it refuses.** Any environment other than `local`, `testing` or `staging`, or a configured `APP_ENV` that differs
+  from the running one; a host where another seller tag is installed and configured; a different file already at its
+  own path. It never replaces a tag and never edits the environment.
+- **Production.** A tag whose path contains `staging` or `synthetic`, or whose bytes contain the marker, is refused outside
+  `local`, `testing` and `staging`: masters fail with `staging_tag_refused`, production `vasey:doctor` fails the required
+  check `production_seller_tag`, and `ops/production/validate-runtime.php` refuses the deploy with `holds.staging_seller_tag`.
+- **Cleanup.** Previews made with it are rehearsal output. The replacement and its verification are entry P-1 of
+  [`staging-placeholders.md`](staging-placeholders.md). Sean still approves the audible mix of the real tag before anything
+  real is published.
+
 ## 4. `vasey:doctor` until it passes
 
 Run it as the user that owns private storage. Its scanner-limits check creates a 4 GiB sparse file in
@@ -132,7 +161,7 @@ art vasey:doctor --json     # redacted; keep it as evidence
 | `media_tools`, `media_encoders` | pass | `provision.sh` checks the same encoders. |
 | `media_scanner` | pass | `clamscan` installed. |
 | `media_scanner_limits` | pass | Run as `forge`. The private filesystem must keep sparse files (ext4 does). |
-| `seller_tag` | pass after section 3 | |
+| `seller_tag` | pass after section 3 | It checks that the two settings are present and well formed, not the file. `art vasey:staging-seller-tag` reports whether the staging tag on disk matches them. |
 | `media_queue` | pass | `QUEUE_CONNECTION=database`. |
 | `mail_transport` | **warn (intended)** | `MAIL_MAILER=log`: staging sends no email. |
 | `scheduled_publication`, `site_images` | pass | Scheduler program running (`vasey-staging-ctl status`). |
@@ -155,8 +184,8 @@ If a job fails, open **Processing details**. `docs/media-processing.md` maps eac
 
 ## 5a. Synthetic rehearsal catalog (optional, before real tracks)
 
-**Blocked until the S-6 seller tag is installed (section 3), or until Sean decides about a synthetic tag.** Without
-a configured tag, the command refuses before writing anything.
+**Needs a configured seller tag (section 3): the approved S-6 tag, or the synthetic STAGING tag Sean accepted for
+staging on 2026-11-10.** Without a configured tag, the command refuses before writing anything.
 
 `vasey:staging-synthetic-catalog` creates six labelled synthetic tracks, so testers can rehearse the whole journey
 (catalog, player, quote, Stripe test checkout, verified payment, contract PDF, download) before Sean's real tracks
@@ -196,7 +225,8 @@ domain service as the admin, under the same staff authority, MFA, rights, media 
    does not require standard input to be a terminal, so the confirmed passwords, not the terminal, are the gate). On staging it also needs
    `--attest`: it records one `staff.console_attestation` audit row per account before the first write.
 6. The approved seller tag is configured and matches its SHA-256 (section 3). Without it the pipeline cannot make a
-   tagged preview (`tag_not_configured`). The command never generates, replaces or overrides a tag.
+   tagged preview (`tag_not_configured`). The command never generates, replaces or overrides a tag; the staging tag is
+   made by its own command (section 3).
 7. ffmpeg, ffprobe, prlimit and PHP GD are available.
 
 **Run.**
