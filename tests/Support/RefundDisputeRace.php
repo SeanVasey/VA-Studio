@@ -99,7 +99,12 @@ SQL;
             }
             usleep(5000);
         } while (microtime(true) < $deadline);
-        $test->fail('Refund/dispute workers missed the '.$stage.' barrier.');
+        $detail = '';
+        foreach ($processes as $index => $process) {
+            $detail .= ' worker '.$index.': '.($process->isRunning() ? 'running' : 'exited '.$process->getExitCode()).' '
+                .substr($process->getOutput().$process->getErrorOutput(), 0, 700);
+        }
+        $test->fail('Refund/dispute workers missed the '.$stage.' barrier.'.$detail);
     }
 
     private static function environment(string $directory, int $worker): array

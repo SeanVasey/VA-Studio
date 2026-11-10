@@ -5,6 +5,7 @@ namespace Tests\Feature\RefundDispute;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeHold;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObject;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObservation;
+use App\Domain\Commerce\RefundDispute\RefundDisputePolicy;
 use App\Domain\Grants\PaidTax\PaidTaxDocuments;
 use App\Domain\Grants\PaidTax\PaidTaxDownloads;
 use App\Domain\Grants\PaidTax\PaidTaxGrants;
@@ -13,6 +14,7 @@ use Illuminate\Support\Str;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\PaidTaxGrantFixtures;
+use Tests\Support\ProductionTrackCapabilitiesFixtures;
 use Tests\Support\RefundDisputeRace;
 use Tests\TestCase;
 
@@ -45,6 +47,20 @@ class RefundDisputeProductionNativeTest extends TestCase
         $this->preparePaidTaxFixture();
         config(['paid-tax-grants.downloads_enabled' => true, 'refund-dispute.enabled' => true, 'payments.stripe.mode' => 'test',
             'payments.stripe.account_id' => 'acct_SYNTHETIC']);
+    }
+
+    /** The shared synthetic machine, retaining the DD-16 refund choices this lifecycle accepts. */
+    protected static function taxMachine(string $behavior = 'exclusive', int $ceiling = 2500): array
+    {
+        $machine = ProductionTrackCapabilitiesFixtures::machine();
+        $machine['version'] = 'synthetic-tax-checkout-machine-v1';
+        $machine['choices']['tax_calculation'] = ['strategy' => 'provider_calculated', 'behavior' => $behavior, 'maximum_rate_bps' => $ceiling, 'rounding' => 'provider_exact'];
+        $machine['choices']['reservation_and_exclusives']['late_time_basis'] = 'application_verified_observation_time';
+        $machine['choices']['reservation_and_exclusives']['reservation_seconds'] = 7200;
+        $machine['choices']['reservation_and_exclusives']['provider_lifetime_seconds'] = 3600;
+        $machine['choices']['refunds_and_disputes'] = RefundDisputePolicy::PRODUCTION_CONFIRMED;
+
+        return $machine;
     }
 
     /** A finalized synthetic production tax order; documents are prepared only when a download is part of the race. */
@@ -123,8 +139,6 @@ class RefundDisputeProductionNativeTest extends TestCase
         $this->assertSame(1, DB::table('paid_tax_authorizations')->count());
         $this->assertSame(0, DB::table('paid_tax_redemptions')->count());
         $this->assertSame($before, $this->originals());
-        // Once the hold is released by a later won observation the same authorization redeems.
-        config(['refund-dispute.enabled' => true]);
         $this->assertSame(1, RefundDisputeHold::whereNull('released_at')->count());
     }
 
