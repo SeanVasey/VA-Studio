@@ -27,6 +27,7 @@ The drill numbers match.
 
 1. Staging is deployed and the test-commerce profile validates: `php scripts/ops/validate-test-commerce-profile.php .env`
    prints 38 `PASS` lines and `RESULT: PASS` ([setup step 3](staging-test-purchase.md#3-apply-the-profile-on-the-host)).
+   Also check that Link is enabled on the Stripe account (the checkout request names `card` and `link`); if it is disabled, session creation or the check that the returned session echoes exactly the requested methods fails closed. The staging sandbox account's default payment method configuration showed Link available and on when read through the Stripe API in test mode on 2026-11-10; no Link payment has been exercised.
 2. The pipeline runner is installed and logging ([setup step 4](staging-test-purchase.md#4-start-the-pipeline-runner)).
 3. A **dedicated drill offer** is published and linked to its rights scope. Drill 2, and drill 1 if abandoned, leave
    that offer revision reserved for good, because the staging profile has no unpaid release

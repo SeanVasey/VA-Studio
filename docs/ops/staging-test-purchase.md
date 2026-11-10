@@ -27,6 +27,7 @@ Do these once, before the first purchase. Steps 1–3 need Sean.
 ### 1. Stripe Dashboard, in test mode
 
 1. Switch the Dashboard to **Test mode**.
+   - Prerequisite: confirm **Link** is enabled for the account (Settings → Payment methods; the checkout request names `card` and `link`). If Link is disabled, creating the session, or the check that the returned session echoes exactly the requested methods, fails closed and no checkout opens. The staging sandbox account's default payment method configuration was read through the Stripe API in test mode on 2026-11-10 and showed Link available and on, card on, and bank debit off; that was a configuration read, no Link payment has been exercised.
 2. Note the account ID (`acct_…`) of the account you will use. It must be the account that owns the key in step 3. Do not use a connected account.
 3. Create or reveal a **standard secret key** (`sk_test_…`). Restricted keys (`rk_test_…`) are refused by the application.
 4. Add a webhook endpoint (Developers → Webhooks, or Workbench → Event destinations):
@@ -207,7 +208,7 @@ All from Stripe's documented test set; use any future expiry, any CVC and any po
 | `4000 0025 0000 3155` | 3D Secure required | Stripe opens an authentication window. **Complete** → succeeds. **Fail** → declined, session stays open. |
 | `4000 0000 0000 3220` | 3D Secure 2 required | As above. |
 
-Checkout is card-only, so the `async_payment_*` events should not occur; they are subscribed only so an unexpected one is processed rather than ignored.
+Checkout offers card and Link. Confirmation is not assumed synchronous (Link can be bank-funded and land at `processing`), so `async_payment_succeeded` and `async_payment_failed` can occur. They are locators only: the event triggers a retrieval, a `processing` PaymentIntent is retried and never granted, and a grant happens only after a paid session and a `succeeded` PaymentIntent with the exact amount are verified from Stripe.
 
 ## Drills
 

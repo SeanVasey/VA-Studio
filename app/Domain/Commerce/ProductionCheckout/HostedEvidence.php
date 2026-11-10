@@ -18,7 +18,7 @@ final class HostedEvidence
         return $provenance;
     }
 
-    public static function request(array $order, string $intentId, string $createdAt): array
+    public static function request(array $order, string $intentId, string $createdAt, ?array $paymentMethodTypes = null): array
     {
         $context = $order['context'];
         $at = CarbonImmutable::parse($createdAt);
@@ -35,7 +35,7 @@ final class HostedEvidence
                     'metadata' => ['line_id' => $line['public_id'], 'line_hash' => CanonicalJson::hash($line)]]]];
         }
         $return = $context->returnOrigin.'/production/checkout/orders/'.$order['row']['public_id'].'/return';
-        $params = ['mode' => 'payment', 'payment_method_types' => CheckoutPaymentMethods::offered(), 'client_reference_id' => $order['row']['public_id'], 'metadata' => $metadata,
+        $params = ['mode' => 'payment', 'payment_method_types' => $paymentMethodTypes ?? CheckoutPaymentMethods::offered(), 'client_reference_id' => $order['row']['public_id'], 'metadata' => $metadata,
             'payment_intent_data' => ['metadata' => $metadata, 'capture_method' => $context->captureMethod], 'line_items' => $items,
             'automatic_tax' => ['enabled' => false], 'adaptive_pricing' => ['enabled' => false], 'allow_promotion_codes' => false,
             'customer_creation' => 'if_required', 'success_url' => $return, 'cancel_url' => $return,
@@ -50,7 +50,8 @@ final class HostedEvidence
     public static function intent(Records $rows, array $order, array $record): array
     {
         $body = Evidence::open($record, 'production_checkout_provider_intent');
-        Evidence::same(self::request($order, $record['public_id'], $record['created_at']), $body);
+        Evidence::same(self::request($order, $record['public_id'], $record['created_at'],
+            CheckoutPaymentMethods::forStored($body['params']['payment_method_types'] ?? null)), $body);
         $context = $order['context'];
         $created = CarbonImmutable::parse($record['created_at']);
         CheckoutException::require($record['order_id'] === $order['row']['id'] && $record['attempt_id'] === $order['attempt']['id']
