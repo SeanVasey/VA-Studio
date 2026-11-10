@@ -46,18 +46,27 @@ class LegacyRedirectMapTest extends TestCase
         $this->assertNotEmpty(array_filter($report['errors'], fn (string $error) => str_contains($error, $needle)), $needle.' not in: '.implode(' | ', $report['errors']));
     }
 
-    public function test_the_shipped_map_reconciles_every_inventory_row_without_inventing_or_activating_redirects(): void
+    public function test_the_shipped_map_reconciles_every_inventory_row_and_does_not_activate_its_redirects(): void
     {
         $report = app(LegacyRedirectValidator::class)->validate(
             LegacyRedirectMap::fromFile(config('legacy-redirects.map_path')),
             LegacyRouteInventory::read(config('legacy-redirects.inventory_path')),
         );
         $this->assertSame([], $report['errors']);
-        $this->assertSame(['inventory' => 20, 'entries' => 20, 'redirect' => 0, 'gone' => 0, 'retained' => 5, 'unresolved' => 15], $report['counts']);
+        $this->assertSame(['inventory' => 20, 'entries' => 20, 'redirect' => 3, 'gone' => 0, 'retained' => 5, 'unresolved' => 12], $report['counts']);
         $this->assertSame(['URL-001', 'URL-009', 'URL-010', 'URL-011', 'URL-012'], array_column($report['retained'], 'route_id'));
+        // BL-51: only deferred-family rows that no route serves were decided, each to the catalog or the contact page.
+        $this->assertSame([
+            ['route_id' => 'URL-005', 'source' => '/sound-kits', 'status' => 301, 'target' => '/'],
+            ['route_id' => 'URL-007', 'source' => '/merch', 'status' => 301, 'target' => '/'],
+            ['route_id' => 'URL-008', 'source' => '/memberships', 'status' => 301, 'target' => '/contact'],
+        ], array_map(fn (array $row) => array_intersect_key($row, array_flip(['route_id', 'source', 'target', 'status'])), $report['redirects']));
+        $this->assertSame([], $report['gone']);
         $this->assertSame(['home', 'editorial.show', 'editorial.show', 'editorial.show', 'editorial.show'], array_column($report['retained'], 'route'));
         foreach ($report['unresolved'] as $row) {
-            $this->assertNull($row['served_by'], $row['route_id']);
+            // URL-006 stays unresolved on purpose: BL-64's flag-gated /services route now serves the path (404 while off),
+            // a route always wins over a redirect, and the cutover gate must keep listing it.
+            $row['route_id'] === 'URL-006' ? $this->assertSame('services.index', $row['served_by']) : $this->assertNull($row['served_by'], $row['route_id']);
             $this->assertNotSame('', trim($row['reason']));
         }
         $this->assertFalse(config('legacy-redirects.enabled'));

@@ -29,14 +29,14 @@ class LegacyRedirectCommandTest extends TestCase
     {
         $this->artisan('vasey:redirects-validate')
             ->expectsOutputToContain('activation flag legacy-redirects.enabled is off')
-            ->expectsOutputToContain('Inventory rows: 20 · map entries: 20 · redirect: 0 · gone: 0 · retained: 5 · unresolved: 15')
+            ->expectsOutputToContain('Inventory rows: 20 · map entries: 20 · redirect: 3 · gone: 0 · retained: 5 · unresolved: 12')
             ->expectsOutputToContain('Query strings: dropped on redirect. Matching: exact path only.')
             ->expectsOutputToContain('RETAINED URL-010 /blog served by editorial.show')
             ->expectsOutputToContain('UNRESOLVED URL-002 /music/tracks: Proposed target /beats has no route.')
             ->expectsOutputToContain('Map valid: no errors.')
             ->assertSuccessful();
         $this->artisan('vasey:redirects-validate', ['--require-resolved' => true])
-            ->expectsOutputToContain('15 inventory row(s) are unresolved; the cutover gate requires none.')
+            ->expectsOutputToContain('12 inventory row(s) are unresolved; the cutover gate requires none.')
             ->assertFailed();
     }
 
