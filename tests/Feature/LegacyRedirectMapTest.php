@@ -53,7 +53,7 @@ class LegacyRedirectMapTest extends TestCase
             LegacyRouteInventory::read(config('legacy-redirects.inventory_path')),
         );
         $this->assertSame([], $report['errors']);
-        $this->assertSame(['inventory' => 20, 'entries' => 20, 'redirect' => 4, 'gone' => 0, 'retained' => 6, 'unresolved' => 10], $report['counts']);
+        $this->assertSame(['inventory' => 20, 'entries' => 20, 'redirect' => 7, 'gone' => 0, 'retained' => 6, 'unresolved' => 7], $report['counts']);
         $this->assertSame(['URL-001', 'URL-006', 'URL-009', 'URL-010', 'URL-011', 'URL-012'], array_column($report['retained'], 'route_id'));
         // BL-51 and the 2026-11-10 crawl: only rows that no route serves were decided, each to the catalog or the contact page.
         $this->assertSame([
@@ -61,11 +61,15 @@ class LegacyRedirectMapTest extends TestCase
             ['route_id' => 'URL-005', 'source' => '/sound-kits', 'status' => 301, 'target' => '/'],
             ['route_id' => 'URL-007', 'source' => '/merch', 'status' => 301, 'target' => '/'],
             ['route_id' => 'URL-008', 'source' => '/memberships', 'status' => 301, 'target' => '/contact'],
+            // The legal footer links resolve through the `legal` target type to the store's own legal pages.
+            ['route_id' => 'URL-013', 'source' => '/licensing-info', 'status' => 301, 'target' => '/legal/licenses'],
+            ['route_id' => 'URL-014', 'source' => '/terms-of-use', 'status' => 301, 'target' => '/legal/terms'],
+            ['route_id' => 'URL-015', 'source' => '/privacy-policy', 'status' => 301, 'target' => '/legal/privacy'],
         ], array_map(fn (array $row) => array_intersect_key($row, array_flip(['route_id', 'source', 'target', 'status'])), $report['redirects']));
         $this->assertSame([], $report['gone']);
         $this->assertSame(['home', 'services.index', 'editorial.show', 'editorial.show', 'editorial.show', 'editorial.show'], array_column($report['retained'], 'route'));
         // URL-006 is retained: BL-64's /services route serves the path and answers the contact fallback while the catalog is off.
-        $this->assertSame(['URL-003', 'URL-004', 'URL-013', 'URL-014', 'URL-015', 'URL-016', 'URL-017', 'URL-018', 'URL-019', 'URL-020'], array_column($report['unresolved'], 'route_id'));
+        $this->assertSame(['URL-003', 'URL-004', 'URL-016', 'URL-017', 'URL-018', 'URL-019', 'URL-020'], array_column($report['unresolved'], 'route_id'));
         foreach ($report['unresolved'] as $row) {
             $this->assertNull($row['served_by'], $row['route_id']);
             $this->assertNotSame('', trim($row['reason']));

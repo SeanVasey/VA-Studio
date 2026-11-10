@@ -71,6 +71,13 @@ final class LegacyRedirectTargets
                     }
                     $path = route('tracks.show', ['slug' => $target['slug']], false);
                     break;
+                case 'legal':
+                    if (! Route::has('legal.show')) {
+                        return $this->problem('the legal page route does not exist');
+                    }
+                    // The route's own document constraint is the final word: a page it does not accept cannot generate.
+                    $path = route('legal.show', ['document' => $target['page']], false);
+                    break;
                 case 'external':
                     $url = $target['url'];
                     $parts = parse_url($url);
@@ -117,6 +124,8 @@ final class LegacyRedirectTargets
         try {
             return match ($target['type']) {
                 'editorial' => app(EditorialContent::class)->page(app(SiteContent::class)->current(), $target['section'], $target['slug'], false) !== null,
+                // The same verified snapshot and rule the legal page controller uses; a staff preview never counts.
+                'legal' => app(EditorialContent::class)->legal(app(SiteContent::class)->current(), $target['page']) !== null,
                 'track' => app(PublicCatalog::class)->track($target['slug'])['tracks'] !== [],
                 default => true,
             };

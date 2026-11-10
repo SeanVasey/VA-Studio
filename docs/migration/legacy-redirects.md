@@ -22,9 +22,11 @@ Operator and reviewer guide for the default-off legacy redirect layer added on 2
 Each entry has `route_id`, `source_host` and `source_path` copied exactly from its inventory row, and one `disposition`:
 
 - `retained`: the legacy path is served unchanged by a current route. The validator fails if no route serves it.
-- `redirect`: `status` 301 and a `target`. Allowed targets are `{"type": "route", "name": "<GET route without parameters>"}`, `{"type": "editorial", "section": "about|contact|blog|videos", "slug": null|"<entry>"}` (an entry slug only for blog or videos), `{"type": "track", "slug": "<published slug>"}` and `{"type": "external", "url": "https://..."}`. External hosts must be listed in the map's own `external_hosts`; the shipped list is empty.
+- `redirect`: `status` 301 and a `target`. Allowed targets are `{"type": "route", "name": "<GET route without parameters>"}`, `{"type": "editorial", "section": "about|contact|blog|videos", "slug": null|"<entry>"}` (an entry slug only for blog or videos), `{"type": "track", "slug": "<published slug>"}`, `{"type": "legal", "page": "licenses|terms|privacy"}` and `{"type": "external", "url": "https://..."}`. External hosts must be listed in the map's own `external_hosts`; the shipped list is empty.
 - `gone`: `status` 410 for retired content with no successor.
 - `unresolved`: a `reason`. No runtime effect; listed by the validator until someone decides it.
+
+A `legal` target names one of the application's own legal pages (`SiteContentSchema::LEGAL_DOCUMENTS`, the same keys the `legal.show` route constrains `{document}` to; a test pins the two together) and resolves to `/legal/<page>` with no other key allowed. It is public only while `EditorialContent::legal()` returns the page for the active site release, the rule the legal page controller applies: a release without that page, or `/legal/licenses` with no published license version listed (DD-31), is not public, so the validator warns and the request answers 404. A staff preview never counts.
 
 There is no wildcard or pattern syntax, because no inventory row needs one. Source paths are exact lowercase paths without a trailing slash, query or fragment; a request with a trailing slash matches the same entry, and any other case or longer path does not.
 
@@ -35,7 +37,7 @@ There is no wildcard or pattern syntax, because no inventory row needs one. Sour
 3. `gone` answers 410. `redirect` answers 301 with `Cache-Control: public, max-age=3600` so a corrected map takes effect within the hour.
 4. The `Location` uses the canonical `APP_URL` origin, never the request Host, so the redirect is a single hop to the canonical host.
 5. Query strings are dropped. Legacy tracking or paging parameters are not forwarded into the new pages, matching the canonical-URL rule in [track sharing](../track-sharing.md).
-6. Track and editorial targets are re-checked against current public content on every request. A draft, unpublished, withdrawn or otherwise ineligible track, or an editorial page that is not in the active published site release, gets the ordinary 404 instead of a redirect, so a redirect never confirms or exposes private content.
+6. Track, editorial and legal targets are re-checked against current public content on every request. A draft, unpublished, withdrawn or otherwise ineligible track, an editorial or legal page that is not in the active published site release (or a license comparison with nothing listed), gets the ordinary 404 instead of a redirect, so a redirect never confirms or exposes private content.
 7. An unreadable or invalid map, a refused target (not allowlisted, a chain, a loop, a missing route) or anything uncertain falls through to the ordinary 404 and logs a warning. The map is never partially applied.
 
 Redirects run before the web middleware group, so they start no session and set no cookie.
@@ -72,7 +74,7 @@ A read-only crawl of `https://www.vasey.audio` (the BeatStars-hosted store) fed 
 
 ## Current reconciliation (2026-11-10, BL-51 and the crawl; first reviewed 2026-10-24 at base 786fb7c7)
 
-20 inventory rows, 20 entries: 4 redirect, 0 gone, 6 retained (URL-001 `/`, URL-006 `/services`, URL-009 `/videos`, URL-010 `/blog`, URL-011 `/about`, URL-012 `/contact`) and 10 unresolved. The inventory CSV is unchanged, so its pinned hash and row count are unchanged.
+20 inventory rows, 20 entries: 7 redirect, 0 gone, 6 retained (URL-001 `/`, URL-006 `/services`, URL-009 `/videos`, URL-010 `/blog`, URL-011 `/about`, URL-012 `/contact`) and 7 unresolved. The inventory CSV is unchanged, so its pinned hash and row count are unchanged.
 
 Reviewed dispositions for rows that point into a family with no live public page, each to a page that exists and never to one that does not:
 
@@ -82,13 +84,15 @@ Reviewed dispositions for rows that point into a family with no live public page
 | URL-005 | `/sound-kits` | catalog (`home`) | No kit storefront page exists (FP-007). |
 | URL-007 | `/merch` | catalog (`home`) | No merchandise page exists and none is sold. |
 | URL-008 | `/memberships` | contact (`editorial` section `contact`) | No membership is sold at launch (DD-50); the contact page reaches the owner. |
+| URL-013 | `/licensing-info` | `/legal/licenses` (`legal` page `licenses`) | The live footer link "Licensing Info"; the store's generated license comparison. |
+| URL-014 | `/terms-of-use` | `/legal/terms` (`legal` page `terms`) | The live footer link "Terms of Use". |
+| URL-015 | `/privacy-policy` | `/legal/privacy` (`legal` page `privacy`) | The live footer link "Privacy Policy". |
 
-URL-006 `/services` is `retained`: the route serves it, with the contact fallback above while the catalog is off. All redirects are 301 and every entry is revisited when the family's own page is enabled; the validator then fails the entry as dead configuration, because a served path may not be redirected. Nothing here activates a redirect: `config/legacy-redirects.php` `enabled` stays a literal `false`, and no DNS, customer data or BeatStars state is touched. The contact target resolves only while the active site release has a contact page; otherwise the request answers 404 and the validator warns.
+URL-006 `/services` is `retained`: the route serves it, with the contact fallback above while the catalog is off. All redirects are 301 and every entry is revisited when the family's own page is enabled; the validator then fails the entry as dead configuration, because a served path may not be redirected. Nothing here activates a redirect: `config/legacy-redirects.php` `enabled` stays a literal `false`, and no DNS, customer data or BeatStars state is touched. The contact target resolves only while the active site release has a contact page; otherwise the request answers 404 and the validator warns. The three legal targets behave the same way: each resolves only once the active site release carries that legal page (and, for licenses, a published license version is listed). On the shipped default release none is public, so the validator prints four warnings today (URL-008 and the three legal rows) and the redirects answer 404 until owner-reviewed legal text is published.
 
-Rows left unresolved on purpose, with the crawl evidence for each:
+Rows left unresolved on purpose, with the crawl evidence for each (URL-013, URL-014 and URL-015 were resolved by the `legal` target type and are in the table above):
 
 - URL-003 `/music/albums` and URL-004 `/music/collections`: the live navigation links COLLECTIONS but nothing links `/music/albums`, and the content could not be read. `/collections` has no route (Q-2) and `/albums` is default-off (BL-67).
-- URL-013 `/licensing-info`, URL-014 `/terms-of-use`, URL-015 `/privacy-policy`: the live footer links. The equivalents are `/legal/licenses`, `/legal/terms` and `/legal/privacy`, parameterized routes that the target grammar cannot express (the editorial target covers only about, contact, blog and videos), and each answers 404 until owner-reviewed text is in the active site release. Resolving them needs a small `legal` target type (reviewed validator change) or a decision to serve the legacy paths directly; this branch does not extend the grammar.
 - URL-016 `/account/purchases`, URL-017 `/account/offers`, URL-018 `/account/membership`, URL-019 `/account/faves`, URL-020 `/account/lyrics`: signed-in buyer pages that the crawl could see only as menu links. Each is an `/account/*` source, so the customer-privacy middleware would change its behaviour (see the cautions above), and the targets depend on the production identity decision (U-07, open question Q-1). URL-019 and URL-020 would map to the private listening library (FP-079), which is not a public page; URL-017 has no equivalent feature.
 
 Every inventory row is still a `Recommendation`; the crawl is evidence for the dispositions above, not verified owner control of the legacy host.
