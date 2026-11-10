@@ -30,6 +30,12 @@ final class LegalPublicationGuard
     /** Any other square-bracketed text, such as "[Tier name]", and any unpaired square bracket. */
     public const BRACKETED_PLACEHOLDER = 'bracketed_placeholder';
 
+    /**
+     * A license comparison typed as sections (schema 5). DD-31: the comparison is generated from the published license
+     * versions (schema 6), so typed comparison text, which can drift from what is sold, is never made public.
+     */
+    public const HAND_TYPED_COMPARISON = 'hand_typed_license_comparison';
+
     public const LABELS = [
         self::LEGAL_REVIEW => 'legal-review marker',
         self::OWNER_DECISION => 'undecided owner choice',
@@ -37,6 +43,7 @@ final class LegalPublicationGuard
         self::DRAFT_NOTICE => 'draft notice',
         self::TEMPLATE_VARIABLE => 'unsubstituted template variable',
         self::BRACKETED_PLACEHOLDER => 'square-bracket placeholder',
+        self::HAND_TYPED_COMPARISON => 'hand-typed license comparison; the comparison is now generated from the published license versions',
     ];
 
     /** Phrase classes in precedence order; they apply inside and outside square brackets. */
@@ -52,7 +59,8 @@ final class LegalPublicationGuard
 
     /**
      * Every unresolved marker in the public text of the legal pages: title, description, headings and paragraphs. The
-     * version and effective date cannot hold one (SiteContentSchema), and the approval reference is never public.
+     * version and effective date cannot hold one (SiteContentSchema), and the approval reference is never public. A license
+     * comparison that still holds typed sections is one finding of its own, reported before the markers in its text.
      *
      * @return list<array{document: string, field: string, class: string, excerpt: string}>
      */
@@ -64,6 +72,11 @@ final class LegalPublicationGuard
             $page = $legal[$document] ?? null;
             if (! is_array($page)) {
                 continue;
+            }
+            if ($document === 'licenses' && array_key_exists('sections', $page)) {
+                $count = is_array($page['sections']) ? count($page['sections']) : 0;
+                $findings[] = ['document' => $document, 'field' => 'sections', 'class' => self::HAND_TYPED_COMPARISON,
+                    'excerpt' => $count.' typed '.($count === 1 ? 'section' : 'sections')];
             }
             $fields = ['title' => $page['title'] ?? null, 'description' => $page['description'] ?? null];
             foreach (is_array($page['sections'] ?? null) ? $page['sections'] : [] as $index => $section) {
@@ -169,6 +182,9 @@ final class LegalPublicationGuard
         $page = ['privacy' => 'Privacy policy', 'terms' => 'Terms', 'licenses' => 'License comparison'][$finding['document']];
         if (preg_match('/\Asections\.(\d+)\.(heading|paragraphs\.(\d+))\z/', $finding['field'], $match) === 1) {
             return $page.', section '.((int) $match[1] + 1).(isset($match[3]) ? ' paragraph '.((int) $match[3] + 1) : ' heading');
+        }
+        if ($finding['field'] === 'sections') {
+            return $page.' sections';
         }
 
         return $page.' '.$finding['field'];

@@ -111,8 +111,11 @@ Fixtures are synthetic and nonbinding.
 
 Not covered, and why:
 
-- **The License comparison page (`/legal/licenses`).** It is staff-pasted plain text in a site release, with no link to a
-  license version. Nothing compares its wording with any published license, so agreement depends on the person who pastes it.
+- **The License comparison page (`/legal/licenses`)** is no longer a gap (BL-38, DD-31, 2026-11-10): it is generated from
+  the published, in-window license versions with typed terms, one section per version identical to that version's
+  `licenseTiers` card (`tests/Feature/CustomerComms/GeneratedLicenseComparisonTest.php` asserts the equality), and a release
+  that still holds a hand-typed comparison is refused at publication (`docs/site-content-releases.md`, "License comparison").
+  Schema 1 versions are not listed there, for the reason below.
 - **Schema 1 licenses.** Their summaries are free prose a reviewer attested (`summary_consistency_confirmed`). The test only
   proves they are shown unchanged.
 - **`docs/legal/LICENSE-TIERS.md`.** The unapproved tier draft maps its limits to the schema 2 to 4 usage slots
