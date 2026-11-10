@@ -46,8 +46,10 @@ three host signals and reads no database: supervisor state, the process's workin
 `schedule:work` prints each minute (`Running ['artisan' vasey:publish-scheduled-site-release]`, observed locally; the hourly
 prune adds one line at :23 and is not what the check looks for). Production
 workers log through supervisor's `stdout_syslog`, which prefixes each line with the program name; staging writes
-`/var/log/vasey-staging/scheduler.log`, so use `--log-file` there. A real dead-man's-switch for the scheduler (an outbound ping on
-schedule success) is still not built: the heartbeat row is readable on the dashboard only.
+`/var/log/vasey-staging/scheduler.log`, so use `--log-file` there. The scheduler dead-man's switch (FP-028) is separate and *is*
+installed by the kits: a host cron job runs `vasey:scheduler-heartbeat-check --notify`, which emails one alert per stale episode when
+`REPORTING_SCHEDULER_ALERT_TO` is set and mail is admitted (default off; `docs/staff-reporting.md`, "Scheduler dead-man's switch").
+This script remains the supervisor, release and tick view; an outbound ping on schedule success to an external service is still not built.
 
 ### Installing and scheduling (example, not installed by the kit)
 

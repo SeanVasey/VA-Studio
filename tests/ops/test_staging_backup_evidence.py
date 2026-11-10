@@ -3,7 +3,9 @@
 The function is sliced out of the shipped script and run in bash against a throwaway release directory. `runuser` is a
 stand-in on PATH that records its arguments, so nothing here needs root, PHP, a database or a real host."""
 import os
+import re
 import subprocess
+import time
 import tempfile
 import unittest
 from pathlib import Path
@@ -42,11 +44,11 @@ class RecordEvidenceTest(unittest.TestCase):
         (self.set / "database.sql.sha256").write_text(f"{SHA}  database.sql\n")
         (self.set / "private.tar").write_bytes(b"y" * 2345)
 
-    def run_function(self, call, **extra):
+    def run_function(self, call, function=FUNCTION, **extra):
         env = {"PATH": f"{self.bin}:/usr/bin:/bin", "LC_ALL": "C", "CALLS": str(self.calls),
                "VASEY_ROOT": str(self.root / "app"), "VASEY_APP_USER": "vaseyapp", "VASEY_PHP": "/usr/bin/php8.4"}
         env.update({k: str(v) for k, v in extra.items()})
-        return subprocess.run(["bash", "-c", PRELUDE + FUNCTION + "\n" + call + "\necho AFTER $?"],
+        return subprocess.run(["bash", "-c", PRELUDE + function + "\n" + call + "\necho AFTER $?"],
                               env=env, capture_output=True, text=True, timeout=60)
 
     def recorded(self):
@@ -95,6 +97,24 @@ class RecordEvidenceTest(unittest.TestCase):
         run = self.run_function("record_evidence daily ok", VASEY_PHP="")
         self.assertIn("AFTER 0", run.stdout)
         self.assertEqual(self.recorded(), [])
+
+    def test_a_recorder_that_hangs_or_ignores_term_is_killed_and_never_changes_the_outcome(self):
+        # The shipped bound is `timeout -k 10 120`: TERM after 120 s, KILL 10 s later. The same function with the bounds
+        # scaled to 2 s and 1 s proves the shape without a two-minute test; a bound without -k would wait for the stub.
+        self.assertIn("timeout -k 10 120 runuser", FUNCTION)
+        scaled = re.sub(r"timeout (-k [0-9]+ )?120 ", lambda m: "timeout " + ("-k 1 " if m.group(1) else "") + "2 ", FUNCTION)
+        self.assertNotEqual(scaled, FUNCTION)
+        stub = self.bin / "runuser"
+        for name, body in (("ignores TERM", "trap '' TERM\nsleep 60 & wait\nsleep 60\n"), ("sleeps", "sleep 60\n")):
+            with self.subTest(name):
+                stub.write_text("#!/bin/bash\n" + body)
+                started = time.monotonic()
+                run = self.run_function(f'record_evidence daily ok "{self.set}"', scaled)
+                elapsed = time.monotonic() - started
+                self.assertEqual(run.returncode, 0, run.stderr)
+                self.assertIn("WARNING: could not record daily ok on the dashboard; the backup result stands", run.stdout)
+                self.assertIn("AFTER 0", run.stdout)
+                self.assertLess(elapsed, 10, f"{name}: the recorder held the backup for {elapsed:.1f} s")
 
     def test_the_nightly_run_records_after_the_resume_and_before_it_reports_a_failure(self):
         resume = NIGHTLY.index('"$CTL" resume')

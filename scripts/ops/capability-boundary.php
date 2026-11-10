@@ -58,6 +58,15 @@ final class CapabilityBoundary
     ];
 
     /**
+     * Held false in production through launch by ops/production/validate-runtime.php (`LAUNCH_OFF_HOLDS`), which names only the
+     * environment keys and reads the config key from here. Not part of stagedFlags(): the staging gates do not hold them, so the
+     * rehearsal keeps its template value. DD-44 (2026-11-10): no marketing email at v1, so the marketing customer segment stays off.
+     */
+    public const PRODUCTION_LAUNCH_OFF_FLAGS = [
+        'REPORTING_MARKETING_SEGMENT_ENABLED' => 'reporting.customer_segments.marketing_segment_enabled',
+    ];
+
+    /**
      * Configuration files of the production lanes: every `production-*` or `production_*` file, paid-grants (Paid252),
      * paid-tax-grants (Tax255) and member-grants. An `enabled` or `mounted` flag in any of them must not be strictly true on staging.
      * Today they hold literal values with no environment switch; this keeps a future switch or default change from opening one.
