@@ -25,6 +25,13 @@ final class BillingWebhookIntake
     private const INVOICE_TYPES = ['invoice.created', 'invoice.finalized', 'invoice.paid', 'invoice.payment_succeeded', 'invoice.payment_failed',
         'invoice.payment_action_required', 'invoice.updated', 'invoice.voided', 'invoice.marked_uncollectible', 'invoice_payment.paid'];
 
+    /**
+     * Subscription lifecycle events (BL-69). They name no invoice, are retained as `no_invoice_hint` for operator reconciliation and
+     * never settle, observe, award or schedule a retrieval: a period is settled only by `invoice.paid` re-read from Stripe. Because
+     * nothing is derived from their content, updated/deleted may arrive in any order, twice, or after the invoice, with the same effect.
+     */
+    private const SUBSCRIPTION_TYPES = ['customer.subscription.updated', 'customer.subscription.deleted'];
+
     /** These name no invoice in this API version; they are retained as hints for operator reconciliation. */
     private const CHARGE_TYPES = ['charge.refunded', 'charge.dispute.created', 'charge.dispute.closed', 'charge.dispute.funds_withdrawn'];
 
@@ -57,6 +64,11 @@ final class BillingWebhookIntake
             $invoiceRef = $type === 'invoice_payment.paid' ? BillingValues::ref($object['invoice'] ?? null) : BillingValues::ref($object['id'] ?? null);
             $subscriptionRef = BillingValues::ref($object['parent']['subscription_details']['subscription'] ?? null);
             $disposition = BillingValues::is('invoice', $invoiceRef) ? 'retrieval_hint' : 'no_invoice_hint';
+        } elseif (in_array($type, self::SUBSCRIPTION_TYPES, true)) {
+            // The embedded object must be a subscription in the event's own mode; a mismatch is a scope error, not a hint.
+            BillingException::require(($object['object'] ?? null) === 'subscription' && ($object['livemode'] ?? null) === ($mode === 'live'), 'event_scope');
+            $subscriptionRef = BillingValues::ref($object['id'] ?? null);
+            $disposition = 'no_invoice_hint';
         } else {
             $disposition = in_array($type, self::CHARGE_TYPES, true) ? 'no_invoice_hint' : 'ignored_type';
         }

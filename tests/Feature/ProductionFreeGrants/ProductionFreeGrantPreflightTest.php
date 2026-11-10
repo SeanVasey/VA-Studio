@@ -128,10 +128,13 @@ final class ProductionFreeGrantPreflightTest extends TestCase
         $input = $this->definitionInput();
         $fixed = mb_strlen($input['title']."\n".$input['termsReference']."\n\n".$input['assentText']);
 
-        $definitions->propose($this->definitionInput(['termsText' => str_repeat('é', 2000 - $fixed)]), $this->staff());
+        // Words, not one token: a token wider than the column is refused by the fit check (BL-72) before any render.
+        $text = static fn (int $length): string => mb_substr(mb_substr(str_repeat('ééé ', intdiv($length, 4) + 1), 0, $length), 0, $length - 1).'é';
+
+        $definitions->propose($this->definitionInput(['termsText' => $text(2000 - $fixed)]), $this->staff());
         $this->assertSame(0, $this->renders, 'Exactly 2,000 characters cannot reach the page limit and skip the render.');
 
-        $definitions->propose($this->definitionInput(['termsText' => str_repeat('é', 2001 - $fixed)]), $this->staff());
+        $definitions->propose($this->definitionInput(['termsText' => $text(2001 - $fixed)]), $this->staff());
         $this->assertSame(1, $this->renders, 'One character more is rendered.');
     }
 
