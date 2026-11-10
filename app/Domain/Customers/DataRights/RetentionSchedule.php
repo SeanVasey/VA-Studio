@@ -412,6 +412,8 @@ final class RetentionSchedule
         'migrations' => 'Framework migration log: migration names and batch numbers.',
         'tracks' => 'Catalog: published track metadata.',
         'track_metadata_presets' => 'Catalog: staff metadata presets.',
+        'collaborators' => 'Catalog: staff-entered collaborator credits (display name, role, source reference); no customer, payment, tax or contact data.',
+        'track_collaborator_splits' => 'Catalog: staff-entered per-track collaborator shares in basis points; metadata only.',
         'media_assets' => 'Catalog media files (masters, previews, artwork) uploaded by staff.',
         'media_processing_runs' => 'Processing runs of catalog media.',
         'media_upload_sessions' => 'Resumable staff uploads of catalog media.',
