@@ -101,6 +101,13 @@ final class RetentionSchedule
             'rationale' => 'Durable verified payment state and reconciliation evidence behind a grant.'],
         ['table' => 'customer_purchase_claims', 'family' => 'customer_purchase_claims', 'class' => 'indefinite', 'clock' => null,
             'rationale' => 'Links an account to the order it owns; evidence of the purchase for as long as the order is kept.'],
+        // Physical-goods fulfillment (BL-63, default-off): the hand-off of a paid order to Printful. Held with the order. Phase 1 gap:
+        // the data-rights export and deletion workflow do not read these tables yet (the encrypted shipping address is customer data),
+        // so `family` stays null here and the export/deletion coverage is a gate for lifting the merch flag, not a claim.
+        ['table' => 'merch_fulfillments', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'fulfillment of a paid order (encrypted shipping address, Printful order id, tracking); the retention of a shipping address after delivery is a U-13 decision.'],
+        ['table' => 'merch_fulfillment_events', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'Printful webhook receipts of a fulfillment (identifiers, type and a body hash only; no address); kept with it.'],
         // Download records (RETAINED delivery_records): they follow the order, never their own authorization timestamps.
         ['table' => 'test_delivery_authorizations', 'family' => 'delivery_records', 'class' => 'indefinite', 'clock' => null,
             'rationale' => self::WITH_ORDER.'download record of a perpetual license, kept while the order is kept.'],
