@@ -257,6 +257,9 @@ try {
         foreach ($holdKeys as $name => $key) {
             $check('holds.'.strtolower($name), config($key) === false);
         }
+        // FP-013: the operator alert mail transport refuses production in code unless this literal is true. It is lifted only
+        // together with the CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED hold above, in one reviewed change.
+        $check('holds.operator_alert_mail_production_admitted', config('inquiries.operator_alert_mail_production_admitted') === false);
         // Renderer children started inside FPM requests need a genuine CLI PHP of this exact version and build (M-16).
         // Validate the configured binary as the FPM pool will, with a real probe; the path itself is never printed.
         try {

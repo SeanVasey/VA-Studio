@@ -492,35 +492,54 @@ class InquiryAlertMailTransportTest extends TestCase
         Mail::assertNothingOutgoing();
     }
 
-    public function test_the_real_mailer_path_sends_to_the_operator_only_with_a_bounded_timeout_and_refuses_a_global_recipient(): void
+    public function test_the_alert_uses_its_own_mailer_with_a_bounded_timeout_and_never_touches_the_shared_mailer(): void
     {
         // The policy admits a real mailer only outside local and testing, so this runs as production with the literal gate set.
-        // The SMTP transport is replaced by one that records the message instead of opening a connection.
-        $recorder = new class('smtp.example.com', 587) extends EsmtpTransport
-        {
-            public array $sent = [];
-
-            protected function doSend(SentMessage $message): void
+        // Each SMTP transport the manager creates records its sends instead of opening a connection, with the timeout its
+        // configuration asked for, which is what Laravel's own SMTP factory applies to the stream.
+        $log = new \ArrayObject;
+        $factory = function (array $config) use ($log): EsmtpTransport {
+            $transport = new class($config['host'], (int) $config['port']) extends EsmtpTransport
             {
-                $this->sent[] = ['timeout' => $this->getStream()->getTimeout(), 'message' => $message->getOriginalMessage(), 'envelope' => $message->getEnvelope()];
-            }
+                public ?\ArrayObject $log = null;
+
+                protected function doSend(SentMessage $message): void
+                {
+                    $this->log[] = ['transport' => spl_object_id($this), 'timeout' => $this->getStream()->getTimeout(),
+                        'message' => $message->getOriginalMessage(), 'envelope' => $message->getEnvelope()];
+                }
+            };
+            $transport->log = $log;
+            $transport->getStream()->setTimeout((float) ($config['timeout'] ?? 60));
+
+            return $transport;
         };
-        $recorder->getStream()->setTimeout(60.0);
         $receipt = (string) Str::uuid();
         $this->enable();
+        M::configure([], ['timeout' => 60]);
         config(['inquiries.operator_alert_mail_production_admitted' => true]);
         $this->in('production');
         $manager = new MailManager($this->app);
-        $manager->extend('smtp', fn () => $recorder);
+        $manager->extend('smtp', $factory);
         Mail::swap($manager);
         $transport = app(InquiryAlertTransport::class);
 
+        // Order-ready mail already holds the shared mailer and its transport (scenario 1); an alert sends; order-ready mail
+        // sends again on the same worker (scenario 2). The shared transport is the same object throughout, at its own timeout.
+        $shared = $manager->mailer(M::MAILER);
+        $sharedTransport = $shared->getSymfonyTransport();
+        $shared->raw('synthetic order-ready', fn ($message) => $message->to('buyer@example.com')->from(M::SENDER));
         $transport->submit(new OperatorInquiryAlert($this->operator->id, $receipt));
-        $this->assertCount(1, $recorder->sent);
-        $sent = $recorder->sent[0];
+        $shared->raw('synthetic order-ready', fn ($message) => $message->to('buyer@example.com')->from(M::SENDER));
+        $this->assertSame($sharedTransport, $manager->mailer(M::MAILER)->getSymfonyTransport());
+        $this->assertSame(60.0, $sharedTransport->getStream()->getTimeout());
+        $this->assertCount(3, $log);
+        [$before, $sent, $after] = $log->getArrayCopy();
+        $this->assertSame([spl_object_id($sharedTransport), 60.0], [$before['transport'], $before['timeout']]);
+        $this->assertSame([spl_object_id($sharedTransport), 60.0], [$after['transport'], $after['timeout']]);
+        $this->assertNotSame(spl_object_id($sharedTransport), $sent['transport'], 'The alert never uses the shared transport.');
         $this->assertSame((float) MailInquiryAlertTransport::TRANSPORT_TIMEOUT_SECONDS, $sent['timeout']);
         $this->assertLessThan((new NotifyInquiryOperatorJob(1))->timeout, MailInquiryAlertTransport::TRANSPORT_TIMEOUT_SECONDS);
-        $this->assertSame(60.0, $recorder->getStream()->getTimeout(), 'The shared mailer keeps its own timeout afterwards.');
         $this->assertSame([$this->operator->email], array_map(fn ($address) => $address->getAddress(), $sent['envelope']->getRecipients()));
         $this->assertSame([$this->operator->email], array_map(fn ($address) => $address->getAddress(), $sent['message']->getTo()));
         $this->assertSame([[], [], []], [$sent['message']->getCc(), $sent['message']->getBcc(), $sent['message']->getReplyTo()]);
@@ -531,22 +550,58 @@ class InquiryAlertMailTransportTest extends TestCase
         $this->assertSame($receipt, $sent['message']->getHeaders()->get('X-Vasey-Inquiry-Alert')->getBodyAsString());
         $this->assertNoPrivateData($sent['message']->getTextBody());
 
-        // A global recipient set on the mailer at runtime, or through mail.to before the mailer is built, refuses before any send.
-        $manager->mailer(M::MAILER)->alwaysTo('redirect@example.com');
-        foreach (['runtime alwaysTo', 'configured mail.to'] as $case) {
-            if ($case === 'configured mail.to') {
-                config(['mail.to' => ['address' => 'redirect@example.com', 'name' => 'Redirect']]);
-                $manager->purge(M::MAILER);
+        // A shorter configured timeout is kept, never raised to the cap.
+        config(['mail.mailers.'.M::MAILER.'.timeout' => 5]);
+        $transport->submit(new OperatorInquiryAlert($this->operator->id, (string) Str::uuid()));
+        $this->assertSame(5.0, $log[3]['timeout']);
+        $this->assertSame(60.0, $sharedTransport->getStream()->getTimeout());
+
+        // With Laravel's real SMTP factory (no connection is opened by building), the alert's mailer is a separate SMTP
+        // transport whose socket stream carries the cap, while the shared mailer's stream keeps its configured timeout.
+        config(['mail.mailers.'.M::MAILER.'.timeout' => 60]);
+        $real = new MailManager($this->app);
+        Mail::swap($real);
+        $alertMailer = (new \ReflectionMethod(MailInquiryAlertTransport::class, 'alertMailer'))->invoke($transport, M::MAILER);
+        $sharedReal = $real->mailer(M::MAILER)->getSymfonyTransport();
+        $this->assertInstanceOf(EsmtpTransport::class, $alertMailer->getSymfonyTransport());
+        $this->assertNotSame($sharedReal, $alertMailer->getSymfonyTransport());
+        $this->assertSame((float) MailInquiryAlertTransport::TRANSPORT_TIMEOUT_SECONDS, $alertMailer->getSymfonyTransport()->getStream()->getTimeout());
+        $this->assertSame(60.0, $sharedReal->getStream()->getTimeout());
+        $this->assertSame(M::HOST, $alertMailer->getSymfonyTransport()->getStream()->getHost());
+        Mail::swap($manager);
+
+        // A global recipient refuses before any send: configured through mail.to, or carried by the alert's own mailer.
+        config(['mail.to' => ['address' => 'redirect@example.com', 'name' => 'Redirect']]);
+        $this->assertRefusedWithoutSend($transport, $log, 'configured mail.to');
+        config(['mail.to' => null]);
+        $redirecting = new class($this->app) extends MailManager
+        {
+            public function build($config)
+            {
+                return tap(parent::build($config), fn ($mailer) => $mailer->alwaysTo('redirect@example.com'));
             }
-            try {
-                $transport->submit(new OperatorInquiryAlert($this->operator->id, (string) Str::uuid()));
-                $this->fail('An alert was sent through a mailer with a global recipient: '.$case);
-            } catch (InquiryAlertNotSubmitted) {
-                $this->assertCount(1, $recorder->sent, $case);
-            }
-        }
+        };
+        $redirecting->extend('smtp', $factory);
+        Mail::swap($redirecting);
+        $this->assertRefusedWithoutSend($transport, $log, 'alwaysTo on the alert mailer');
         $this->assertStringContainsString('recipient_override_configured', implode("\n", $this->logs));
         $this->assertStringNotContainsString('redirect@example.com', implode("\n", $this->logs));
+        // An alwaysTo on the shared mailer does not reach the alert, which still goes to the operator only.
+        Mail::swap($manager);
+        $manager->mailer(M::MAILER)->alwaysTo('redirect@example.com');
+        $transport->submit(new OperatorInquiryAlert($this->operator->id, (string) Str::uuid()));
+        $this->assertSame([$this->operator->email], array_map(fn ($address) => $address->getAddress(), $log[count($log) - 1]['envelope']->getRecipients()));
+    }
+
+    private function assertRefusedWithoutSend(InquiryAlertTransport $transport, \ArrayObject $log, string $case): void
+    {
+        $count = count($log);
+        try {
+            $transport->submit(new OperatorInquiryAlert($this->operator->id, (string) Str::uuid()));
+            $this->fail('An alert was sent with a global recipient: '.$case);
+        } catch (InquiryAlertNotSubmitted) {
+            $this->assertCount($count, $log, $case);
+        }
     }
 
     public function test_enabling_alerts_never_releases_a_backlog_older_than_the_window(): void

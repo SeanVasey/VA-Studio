@@ -10,9 +10,8 @@ use Illuminate\Mail\Mailer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Testing\Fakes\MailFake;
 use ReflectionProperty;
-use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
-use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 use Throwable;
 
 /**
@@ -27,7 +26,7 @@ use Throwable;
  */
 final class MailInquiryAlertTransport implements InquiryAlertTransport
 {
-    /** Per network operation, kept well below NotifyInquiryOperatorJob's 30-second timeout and the 120-second claim lease. */
+    /** Per network operation on the alert's own connection, kept well below NotifyInquiryOperatorJob's 30-second timeout and the 120-second claim lease. */
     public const TRANSPORT_TIMEOUT_SECONDS = 10;
 
     /**
@@ -66,7 +65,7 @@ final class MailInquiryAlertTransport implements InquiryAlertTransport
             }
             $configuration = app(TransactionalMailPolicy::class)->configuration();
             $recipient = $this->recipient($alert->operatorId);
-            $mailer = Mail::mailer($configuration['mailer']);
+            $mailer = $this->alertMailer($configuration['mailer']);
             // A global recipient override would send the alert, and its inquiry reference, somewhere else: refuse instead.
             if (config('mail.to') !== null || $this->redirected($mailer)) {
                 throw new NotificationException('recipient_override_configured');
@@ -79,25 +78,37 @@ final class MailInquiryAlertTransport implements InquiryAlertTransport
 
             throw new InquiryAlertNotSubmitted;
         }
-        $stream = $mailer instanceof Mailer && $mailer->getSymfonyTransport() instanceof SmtpTransport
-            ? $mailer->getSymfonyTransport()->getStream() : null;
-        $timeout = $stream instanceof SocketStream ? $stream->getTimeout() : null;
         try {
-            // The mailer is shared with order-ready mail, so the shorter timeout applies to this send only.
-            if ($timeout !== null) {
-                $stream->setTimeout(min($timeout, (float) self::TRANSPORT_TIMEOUT_SECONDS));
-            }
             $mailer->to($recipient)->send($message);
         } catch (Throwable $error) {
             // A transport error after the attempt began cannot prove the provider did not accept the message.
             Log::warning('Inquiry alert outcome is uncertain.', ['inquiry' => $alert->receipt, 'exception_class' => $error::class]);
 
             throw $error;
-        } finally {
-            if ($timeout !== null) {
-                $stream->setTimeout($timeout);
-            }
         }
+    }
+
+    /**
+     * A mailer built for this alert alone from the configured mailer's settings, with the per-operation timeout capped at
+     * TRANSPORT_TIMEOUT_SECONDS. Symfony applies a stream timeout only when a connection opens and keeps that connection across
+     * sends, so the shared mailer (order-ready mail) is never resolved, reused or changed here. In local and testing the
+     * policy admits only the framework fake, which records the message on the named mailer and never connects.
+     */
+    private function alertMailer(string $name): object
+    {
+        $mail = Mail::getFacadeRoot();
+        if ($mail instanceof MailFake) {
+            return $mail->mailer($name);
+        }
+        $settings = config('mail.mailers.'.$name);
+        if (! is_array($settings)) {
+            throw new NotificationException('mail_not_configured');
+        }
+        $configured = $settings['timeout'] ?? null;
+        $timeout = is_numeric($configured) && $configured > 0
+            ? min((float) $configured, (float) self::TRANSPORT_TIMEOUT_SECONDS) : (float) self::TRANSPORT_TIMEOUT_SECONDS;
+
+        return $mail->build(array_merge($settings, ['name' => $name.'-inquiry-alert', 'timeout' => $timeout]));
     }
 
     /** The verified email of the staff account the outbox proved authority for; there is no other recipient. */
