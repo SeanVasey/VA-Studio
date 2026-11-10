@@ -20,7 +20,7 @@ final class InquiryConversationFixtures
         $site = app(SiteContent::class);
         $release = $site->create(SiteEditorialFixtures::content(), 'Synthetic conversation fixture', $actor);
         $site->publish($release->id, 0, $actor);
-        $body = ['name' => 'Synthetic Sender', 'email' => 'synthetic-sender@example.test', 'subject' => 'Synthetic private conversation',
+        $body = ['name' => 'Synthetic Sender', 'email' => 'synthetic-sender@example.test', 'subject' => 'General question',
             'message' => "Synthetic initial message.\nOriginal text.", 'website' => '', 'requestKey' => (string) Str::uuid(),
             'noticeToken' => app(InquiryPolicy::class)->publicSetup($site->current())['noticeToken']];
         app(SubmitInquiry::class)->handle($body, $owner ?? self::OWNER);

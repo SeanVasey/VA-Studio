@@ -24,7 +24,7 @@ final class ReceivePrintfulWebhook
 {
     public const MAX_BODY_BYTES = 65536;
 
-    private const SHIPPED_FROM = [MerchFulfillment::SUBMITTED, MerchFulfillment::CONFIRMED, MerchFulfillment::SHIPPED];
+    private const SHIPPED_FROM = [MerchFulfillment::SUBMITTED, MerchFulfillment::CONFIRMING, MerchFulfillment::CONFIRMED, MerchFulfillment::SHIPPED];
 
     public function __construct(private readonly MerchFulfillmentPolicy $policy) {}
 

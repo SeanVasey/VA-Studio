@@ -25,7 +25,9 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Tests\Support\FakePrintfulClient;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\LicenseFixtures;
 use Tests\Support\PaymentFixtures as F;
+use Tests\Support\RefundDisputeFixtures as R;
 use Tests\TestCase;
 
 /** BL-63 phase 1: the Printful hand-off. A fake client only; any real request would fail Http::preventStrayRequests(). */
@@ -269,6 +271,83 @@ class MerchPrintfulFulfillmentTest extends TestCase
         $this->assertSame('MERCH_ORDER_HELD', $this->refusal(fn () => app(SubmitMerchFulfillment::class)->handle($fulfillment)));
         $this->assertSame([], $this->printful->calls);
         $this->assertSame(MerchFulfillment::RECORDED, $fulfillment->refresh()->state);
+    }
+
+    /** Real refund/dispute ledger rows for a paid order: observed from synthetic provider facts through the production ledger. */
+    private function observeProviderFacts(Order $order, array $refunds, array $disputes): void
+    {
+        R::configure();
+        [, $financial] = R::bind($this->app);
+        $this->app->instance(StripeCheckoutGateway::class, $this->gateway);
+        $this->app->instance(StripePaymentGateway::class, $this->gateway);
+        R::provider($financial, $refunds, $disputes);
+        R::observe($order->public_id, LicenseFixtures::admin());
+    }
+
+    public function test_a_really_refunded_order_is_not_submitted_even_though_a_refund_creates_no_hold(): void
+    {
+        $order = $this->paidOrder();
+        $fulfillment = $this->recorded($order);
+        $this->observeProviderFacts($order, [['re_MERCH', $order->lines()->sum('total_minor') ?: 1, 'succeeded']], []);
+        $this->assertSame(0, DB::table('refund_dispute_holds')->where('order_id', $order->id)->count());
+        $this->assertGreaterThan(0, DB::table('refund_dispute_objects')->where('order_id', $order->id)->count());
+
+        $this->assertSame('MERCH_ORDER_HELD', $this->refusal(fn () => app(SubmitMerchFulfillment::class)->handle($fulfillment)));
+        $this->assertSame([], $this->printful->calls);
+        $this->assertSame(MerchFulfillment::RECORDED, $fulfillment->refresh()->state);
+    }
+
+    public function test_a_really_disputed_order_is_not_submitted(): void
+    {
+        $order = $this->paidOrder();
+        $fulfillment = $this->recorded($order);
+        $this->observeProviderFacts($order, [], [['du_MERCH', 1000, 'needs_response']]);
+        $this->assertSame(1, DB::table('refund_dispute_objects')->where('order_id', $order->id)->where('kind', 'dispute')->count());
+
+        $this->assertSame('MERCH_ORDER_HELD', $this->refusal(fn () => app(SubmitMerchFulfillment::class)->handle($fulfillment)));
+        $this->assertSame([], $this->printful->calls);
+    }
+
+    public function test_a_real_unreleased_hold_row_blocks_and_a_clean_order_does_not(): void
+    {
+        $order = $this->paidOrder();
+        $this->assertFalse(app(ActiveOrderHolds::class)->exist($order->id));
+        $this->observeProviderFacts($order, [], [['du_HOLD', 1000, 'needs_response']]);
+        // The dispute policy places a reconciling hold with the observation; both signals are real rows.
+        $this->assertSame(1, DB::table('refund_dispute_holds')->where('order_id', $order->id)->whereNull('released_at')->count());
+        $this->assertTrue(app(ActiveOrderHolds::class)->exist($order->id));
+        $this->assertFalse(app(ActiveOrderHolds::class)->exist($order->id + 9999));
+    }
+
+    public function test_a_refund_that_arrives_after_the_draft_stops_the_confirmation(): void
+    {
+        $order = $this->paidOrder();
+        $fulfillment = $this->recorded($order);
+        $submitted = app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        $this->assertSame(MerchFulfillment::SUBMITTED, $submitted->state);
+        $this->observeProviderFacts($order, [['re_LATE', 1000, 'succeeded']], []);
+
+        config(['merch.confirm_orders' => true]);
+        $after = app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        $this->assertSame(MerchFulfillment::SUBMITTED, $after->state);
+        $this->assertSame(0, $this->printful->count('confirm'));
+    }
+
+    public function test_two_callers_cannot_both_send_the_confirmation(): void
+    {
+        $fulfillment = $this->recorded();
+        app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        config(['merch.confirm_orders' => true]);
+        $inner = null;
+        $this->printful->duringConfirm = function () use ($fulfillment, &$inner): void {
+            $this->printful->duringConfirm = null;
+            $inner = app(SubmitMerchFulfillment::class)->handle(MerchFulfillment::query()->findOrFail($fulfillment->id));
+        };
+        $outer = app(SubmitMerchFulfillment::class)->handle($fulfillment);
+
+        $this->assertSame(MerchFulfillment::CONFIRMING, $inner->state);
+        $this->assertSame(MerchFulfillment::CONFIRMED, $outer->state);
+        $this->assertSame(1, $this->printful->count('confirm'));
     }
 
     public function test_confirmation_needs_its_own_switch_and_runs_at_most_once(): void

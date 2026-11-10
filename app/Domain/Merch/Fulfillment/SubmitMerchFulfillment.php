@@ -64,19 +64,34 @@ final class SubmitMerchFulfillment
         return $this->policy->confirmsOrders() ? $this->confirm($current, $order) : $current;
     }
 
-    /** Confirms a submitted draft (charges the Printful account). Only reachable with the separate confirm switch on. */
+    /**
+     * Confirms a submitted draft (charges the Printful account). Only reachable with the separate confirm switch on.
+     *
+     * The refund/dispute check runs again here, and the confirmation is claimed with one conditional UPDATE (submitted to
+     * confirming), so two callers cannot both send it and a hold placed after the draft was created stops the charge. A claim
+     * left in `confirming` is never taken over automatically: the outcome of its request is unknown, so an operator decides.
+     */
     private function confirm(MerchFulfillment $fulfillment, PrintfulOrder $draft): MerchFulfillment
     {
+        if ($this->holds->exist($fulfillment->order_id)) {
+            return $fulfillment->refresh();
+        }
+        $claimed = MerchFulfillment::query()->whereKey($fulfillment->id)->where('state', MerchFulfillment::SUBMITTED)
+            ->update(['state' => MerchFulfillment::CONFIRMING, 'lease_expires_at' => now()->addMinutes(self::LEASE_MINUTES), 'updated_at' => now()]);
+        if ($claimed !== 1) {
+            return $fulfillment->refresh();
+        }
         try {
             $confirmed = $this->printful->confirmOrder($draft->id);
         } catch (PrintfulException $exception) {
             // The draft exists and holds the same external id: leave it submitted so an operator (or the next run) can confirm it.
-            $fulfillment->forceFill(['failure_code' => $exception->errorCode(), 'updated_at' => now()])->save();
+            MerchFulfillment::query()->whereKey($fulfillment->id)->where('state', MerchFulfillment::CONFIRMING)
+                ->update(['state' => MerchFulfillment::SUBMITTED, 'lease_expires_at' => null, 'failure_code' => $exception->errorCode(), 'updated_at' => now()]);
 
             return $fulfillment->refresh();
         }
-        MerchFulfillment::query()->whereKey($fulfillment->id)->where('state', MerchFulfillment::SUBMITTED)
-            ->update(['state' => MerchFulfillment::CONFIRMED, 'printful_status' => $confirmed->status, 'failure_code' => null, 'updated_at' => now()]);
+        MerchFulfillment::query()->whereKey($fulfillment->id)->where('state', MerchFulfillment::CONFIRMING)
+            ->update(['state' => MerchFulfillment::CONFIRMED, 'printful_status' => $confirmed->status, 'failure_code' => null, 'lease_expires_at' => null, 'updated_at' => now()]);
 
         return $fulfillment->refresh();
     }

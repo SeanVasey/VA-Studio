@@ -1,12 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
-import { fixtureOperation } from './contact-inquiry-fixture';
+import { expectInquiryFieldLocked, fillInquiryField, fixtureOperation } from './contact-inquiry-fixture';
 
 // This file owns synthetic request transport; keep it authoritative across navigation/reload.
 test.use({ serviceWorkers: 'block' });
 
 const receipt = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
 const privacyNotice = 'Synthetic browser privacy notice. Inquiries are saved privately for verification.';
-const values = { name: 'Synthetic inquiry visitor', email: 'inquiry-visitor@example.test', subject: 'Synthetic inquiry subject', message: 'Synthetic private message.\nKeep this exact draft.' };
+const values = { name: 'Synthetic inquiry visitor', email: 'inquiry-visitor@example.test', subject: 'Service request', message: 'Synthetic private message.\nKeep this exact draft.' };
 const requestKeyPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 let prepared = false;
 let expectedRotations = 0;
@@ -73,7 +73,7 @@ async function inquiryFixture(page: Page, options: { enabled?: boolean; preview?
 }
 
 async function fill(page: Page) {
-  for (const [name, value] of Object.entries(values)) await page.getByLabel(new RegExp(`^${name}`, 'i')).fill(value);
+  for (const [name, value] of Object.entries(values)) await fillInquiryField(page.getByLabel(new RegExp(`^${name}`, 'i')), value);
 }
 
 for (const [description, options] of [
@@ -180,10 +180,10 @@ for (const hidden of ['website', 'requestKey'] as const) {
     await expect(page.locator('input[name="website"]')).toHaveValue('');
     for (const [field, value] of Object.entries(values)) {
       const input = page.getByLabel(new RegExp(`^${field}`, 'i'));
-      await expect(input).toHaveValue(value); await expect(input).not.toHaveAttribute('readonly', '');
+      await expect(input).toHaveValue(value); await expectInquiryFieldLocked(input, false);
     }
-    const subject = `${values.subject} corrected`;
-    await page.getByLabel(/^Subject/).fill(subject);
+    const subject = 'General question';
+    await fillInquiryField(page.getByLabel(/^Subject/), subject);
     await page.getByRole('button', { name: 'Send inquiry', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Inquiry saved', exact: true })).toBeVisible();
     expect(attempts).toHaveLength(2);
@@ -215,7 +215,7 @@ test('hidden rejections after uncertainty retain the exact original body, key an
     await expect(page.getByText(privacyNotice, { exact: true })).toBeVisible();
     for (const [field, value] of Object.entries(values)) {
       await expect(page.getByLabel(new RegExp(`^${field}`, 'i'))).toHaveValue(value);
-      await expect(page.getByLabel(new RegExp(`^${field}`, 'i'))).toHaveAttribute('readonly', '');
+      await expectInquiryFieldLocked(page.getByLabel(new RegExp(`^${field}`, 'i')), true);
     }
     const response = page.waitForResponse(result => new URL(result.url()).pathname === '/contact/inquiries' && result.request().method() === 'POST');
     await page.getByRole('button', { name: 'Retry same inquiry', exact: true }).click();
@@ -244,13 +244,13 @@ test('stale notice keeps the editable draft until an explicit refresh and a new 
   await expect(page.getByRole('alert')).toContainText('Your inquiry was not saved. Copy your draft before refreshing contact to review the current privacy notice.');
   for (const [field, value] of Object.entries(values)) {
     await expect(page.getByLabel(new RegExp(`^${field}`, 'i'))).toHaveValue(value);
-    await expect(page.getByLabel(new RegExp(`^${field}`, 'i'))).not.toHaveAttribute('readonly', '');
+    await expectInquiryFieldLocked(page.getByLabel(new RegExp(`^${field}`, 'i')), false);
   }
   const revisedMessage = `${values.message}\nSynthetic copied correction before refreshing.`;
   await page.getByLabel(/^Message/).fill(revisedMessage);
   await expect(page.getByLabel(/^Message/)).toHaveValue(revisedMessage);
   await expect(page.getByRole('button', { name: 'Send inquiry', exact: true })).toBeDisabled();
-  await page.getByLabel(/^Subject/).press('Enter');
+  await page.getByLabel(/^Name/).press('Enter');
   expect(attempts).toHaveLength(1);
   const refresh = page.getByRole('link', { name: 'Refresh contact to review the current privacy notice', exact: true });
   await expect(refresh).toHaveAttribute('href', '/contact');

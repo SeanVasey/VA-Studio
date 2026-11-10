@@ -18,6 +18,9 @@ final class MerchFulfillment extends Model
 
     public const SUBMITTED = 'submitted';
 
+    /** A confirmation request is in flight (it charges the Printful account); only the caller holding the claim may send it. */
+    public const CONFIRMING = 'confirming';
+
     public const CONFIRMED = 'confirmed';
 
     public const SHIPPED = 'shipped';

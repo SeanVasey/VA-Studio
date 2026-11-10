@@ -40,8 +40,9 @@ the tracking number and URL, and a failure code.
 1. `RecordMerchFulfillment`: refuses unless the flag admits it and a `VerifiedPayment` exists for the order; validates the
    recipient and items; creates one row per order. The same request again returns the row; a different request for the same
    order is `MERCH_REQUEST_CONFLICT`.
-2. `SubmitMerchFulfillment`: re-checks the flag, the verified payment bound to this very row and that no refund/dispute hold
-   is active (`refund_dispute_holds`). It claims the row with a single conditional `UPDATE` (`recorded` to `submitting`, with a
+2. `SubmitMerchFulfillment`: re-checks the flag, the verified payment bound to this very row and that the order has no refund or
+   dispute at all: an unreleased `refund_dispute_holds` row **or any `refund_dispute_objects` row** for it (a full refund records
+   no hold, so the object is the signal; fail closed). It claims the row with a single conditional `UPDATE` (`recorded` to `submitting`, with a
    five-minute lease), so two workers cannot both submit. On the first attempt it creates a **draft** order carrying our
    `external_id` (`vasey-<public_id>`). On every later attempt it looks the order up by external id **first** and creates only
    if Printful says it does not exist. This is how a lost reply, a crashed worker or a replayed job never makes a second order.
@@ -49,6 +50,9 @@ the tracking number and URL, and a failure code.
    returns the row to `recorded` (outcome unknown) and reports `MERCH_PRINTFUL_UNAVAILABLE`. A missing or refused credential
    also returns it to `recorded`; it never strands an order as failed.
 4. **Confirmation charges the Printful account**, so it needs its own literal-true switch, `MERCH_PRINTFUL_CONFIRM_ENABLED`.
+   The check above runs again immediately before confirming, and the confirmation is claimed with one conditional `UPDATE`
+   (`submitted` to `confirming`), so two callers cannot both send it; a claim left in `confirming` is never taken over
+   automatically (its outcome is unknown) and needs an operator.
    With it off (the default) a submission leaves a Printful draft that Sean can inspect and confirm in the Printful dashboard.
 5. Nothing submits before verified payment: record and submit each check it, in code and by the unique key to the payment.
 

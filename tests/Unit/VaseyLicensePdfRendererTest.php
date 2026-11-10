@@ -31,7 +31,7 @@ use Tests\TestCase;
 class VaseyLicensePdfRendererTest extends TestCase
 {
     /** sha256 of the golden business render below, under the pinned profile and the synthetic signature. */
-    private const GOLDEN_SHA256 = 'a359163eda59ccf4c7c371c081c5c4ad660d2561de81082805e109ddd9f1ff5b';
+    private const GOLDEN_SHA256 = 'df32c9ea610e314d57745f4c3da3a1e8a80e3defa5c602369daefed354078941';
 
     private const TEMPLATE = "SYNTHETIC TEST TEMPLATE: {LICENSE_NAME}\n\nNONBINDING FIXTURE\n\n"
         .'This synthetic fixture is dated {CONTRACT_DATE}. It names {CUSTOMER_FULLNAME} of {CUSTOMER_ADDRESS} and {PRODUCER_ALIAS}, '

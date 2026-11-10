@@ -58,7 +58,7 @@ class CustomerInquiryConcurrencyTest extends TestCase
 
     private function payload(): array
     {
-        return ['name' => 'Synthetic Race Buyer', 'email' => 'race-buyer@example.test', 'subject' => 'Synthetic concurrency inquiry',
+        return ['name' => 'Synthetic Race Buyer', 'email' => 'race-buyer@example.test', 'subject' => 'General question',
             'message' => "Synthetic private message.\nRetain exact input.", 'website' => '', 'requestKey' => (string) Str::uuid(),
             'noticeToken' => $this->noticeToken];
     }

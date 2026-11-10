@@ -21,6 +21,9 @@ final class FakePrintfulClient implements PrintfulClient
 
     public ?PrintfulException $confirmFailure = null;
 
+    /** Runs inside confirmOrder, before it answers: lets a test interleave a second caller or a late hold. */
+    public ?\Closure $duringConfirm = null;
+
     private int $sequence = 9000;
 
     public function createDraftOrder(string $externalId, array $recipient, array $items, string $shipping): PrintfulOrder
@@ -44,6 +47,9 @@ final class FakePrintfulClient implements PrintfulClient
     public function confirmOrder(string $printfulOrderId): PrintfulOrder
     {
         $this->calls[] = ['confirm', ['id' => $printfulOrderId]];
+        if ($this->duringConfirm) {
+            ($this->duringConfirm)();
+        }
         if ($this->confirmFailure) {
             throw $this->confirmFailure;
         }

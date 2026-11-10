@@ -93,6 +93,8 @@ export interface StorefrontProps {
   testOrderPreparationEnabled?: boolean;
   testCheckoutEnabled?: boolean;
   customerAccountEnabled?: boolean;
+  /** Links of default-off product families whose own server policy is on (BL-50). */
+  familyLinks?: { label: string; href: string }[];
   metadata?: PageMetadata;
 }
 

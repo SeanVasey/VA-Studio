@@ -42,7 +42,7 @@ class InquiryAlertMailTransportTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
 
-    private const PRIVATE = ['Private sender', 'private-sender@example.test', 'Private subject', 'Private message',
+    private const PRIVATE = ['Private sender', 'private-sender@example.test', 'Service request', 'Private message',
         'SYNTHETIC NOTIFICATION NOTICE', 'SYNTHETIC-TEST-POLICY'];
 
     private User $operator;
@@ -70,7 +70,7 @@ class InquiryAlertMailTransportTest extends TestCase
             'inquiries.retention_policy_reference' => 'SYNTHETIC-TEST-POLICY', 'inquiries.operator_user_id' => $this->operator->id]);
         $release = app(SiteContent::class)->create(SiteEditorialFixtures::content(), 'Synthetic alert fixture', $this->operator);
         app(SiteContent::class)->publish($release->id, 0, $this->operator);
-        $this->body = ['name' => 'Private sender', 'email' => 'private-sender@example.test', 'subject' => 'Private subject',
+        $this->body = ['name' => 'Private sender', 'email' => 'private-sender@example.test', 'subject' => 'Service request',
             'message' => 'Private message', 'website' => '', 'requestKey' => (string) Str::uuid(),
             'noticeToken' => app(InquiryPolicy::class)->publicSetup(app(SiteContent::class)->current())['noticeToken']];
     }
