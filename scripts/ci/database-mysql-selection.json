@@ -7,6 +7,7 @@
   "pattern_files": [
     "tests/Feature/CustomerAccountMigrationTest.php",
     "tests/Feature/CustomerComms/CustomerDataRequestMigrationTest.php",
+    "tests/Feature/CustomerComms/GeneratedLicenseSiteSchemaMigrationTest.php",
     "tests/Feature/CustomerComms/LegalSiteSchemaMigrationTest.php",
     "tests/Feature/CustomerConsentMigrationTest.php",
     "tests/Feature/CustomerIdentityMigrationTest.php",

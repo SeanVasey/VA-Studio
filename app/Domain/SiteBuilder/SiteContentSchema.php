@@ -43,16 +43,26 @@ final class SiteContentSchema
     public const NO_IMAGES = ['hero' => null, 'studio' => null, 'share' => null];
 
     /** Schema versions carrying the optional editorial pages (D-23). */
-    public const EDITORIAL_VERSIONS = [2, 3, 4, 5];
+    public const EDITORIAL_VERSIONS = [2, 3, 4, 5, 6];
 
     /** Schema versions carrying site image references (D-25). */
-    public const IMAGE_VERSIONS = [3, 4, 5];
+    public const IMAGE_VERSIONS = [3, 4, 5, 6];
 
     /** Schema versions carrying related-track identities on blog and video entries. */
-    public const RELATED_TRACK_VERSIONS = [4, 5];
+    public const RELATED_TRACK_VERSIONS = [4, 5, 6];
 
     /** Version 5 adds the legal pages; a release without legal text keeps an older version. */
     public const LEGAL_VERSION = 5;
+
+    /**
+     * Version 6 (DD-31) keeps version 5 and changes only the license comparison slot: it carries a title and introduction,
+     * and the comparison itself is generated from the published license versions (PublishedLicenseComparison). A release
+     * without that page keeps version 5, so older application code can still read it.
+     */
+    public const GENERATED_LICENSES_VERSION = 6;
+
+    /** Schema versions carrying legal pages. */
+    public const LEGAL_VERSIONS = [self::LEGAL_VERSION, self::GENERATED_LICENSES_VERSION];
 
     /** Legal page slots and their public paths under /legal/. */
     public const LEGAL_DOCUMENTS = ['privacy', 'terms', 'licenses'];
@@ -125,7 +135,8 @@ final class SiteContentSchema
             }
         }
         $version = $content['schema_version'];
-        if ($version === self::LEGAL_VERSION) {
+        $legalVersion = in_array($version, self::LEGAL_VERSIONS, true);
+        if ($legalVersion) {
             foreach (self::LEGAL_DOCUMENTS as $document) {
                 if (is_array($content['legal'][$document] ?? null)) {
                     $destinations[] = '/legal/'.$document;
@@ -134,7 +145,7 @@ final class SiteContentSchema
         }
         $rules = [
             'content' => ['required', 'array:schema_version,hero,studio,footer,navigation,seo,about,contact,blog,videos'
-                .(in_array($version, self::IMAGE_VERSIONS, true) ? ',images' : '').($version === self::LEGAL_VERSION ? ',legal' : '')],
+                .(in_array($version, self::IMAGE_VERSIONS, true) ? ',images' : '').($legalVersion ? ',legal' : '')],
             'content.schema_version' => ['required', 'integer', Rule::in(self::EDITORIAL_VERSIONS)],
             'content.hero' => ['required', 'array:eyebrow,title,line_two,description'],
             'content.hero.eyebrow' => $text(120), 'content.hero.title' => $text(80),
@@ -206,8 +217,8 @@ final class SiteContentSchema
         if (in_array($version, self::IMAGE_VERSIONS, true)) {
             $rules += self::imageRules($content, $text);
         }
-        if ($version === self::LEGAL_VERSION) {
-            $rules += self::legalRules($content, $text);
+        if ($legalVersion) {
+            $rules += self::legalRules($content, $text, $version);
         }
         if (($content['contact'] ?? null) !== null) {
             $rules['content.contact.email'] = ['required', 'string', 'max:254', function (string $attribute, mixed $value, \Closure $fail): void {
@@ -217,9 +228,13 @@ final class SiteContentSchema
             }];
         }
         Validator::make(['content' => $content], $rules)->validate();
-        if ($version === self::LEGAL_VERSION && array_filter($content['legal'], 'is_array') === []) {
+        if ($legalVersion && array_filter($content['legal'], 'is_array') === []) {
             // A release without legal text keeps the older schema, so older application code can still read it.
             throw ValidationException::withMessages(['content.legal' => 'Include at least one legal page, or save the release without legal pages.']);
+        }
+        if ($version === self::GENERATED_LICENSES_VERSION && ! is_array($content['legal']['licenses'])) {
+            // Version 6 exists only for the generated comparison; without it the release keeps version 5.
+            throw ValidationException::withMessages(['content.legal.licenses' => 'Include the license comparison page, or save the release as schema version 5.']);
         }
 
         return $content;
@@ -228,13 +243,23 @@ final class SiteContentSchema
     /**
      * Legal pages carry staff-pasted approved text as bounded plain text: headings and paragraphs only, no markup or links.
      * The approval reference is retained staff evidence and is never part of the public projection (EditorialContent).
+     * From version 6 the license comparison holds only its title and introduction; its sections are generated from the
+     * published license versions and can no longer be typed (DD-31).
      */
-    private static function legalRules(array $content, \Closure $text): array
+    private static function legalRules(array $content, \Closure $text, int $version): array
     {
         $rules = ['content.legal' => ['required', 'array:'.implode(',', self::LEGAL_DOCUMENTS)]];
         $legal = is_array($content['legal'] ?? null) ? $content['legal'] : [];
         foreach (self::LEGAL_DOCUMENTS as $document) {
             $prefix = 'content.legal.'.$document;
+            if ($document === 'licenses' && $version === self::GENERATED_LICENSES_VERSION) {
+                $rules[$prefix] = ['present', 'nullable', 'array:title,description'];
+                if (is_array($legal[$document] ?? null)) {
+                    $rules += [$prefix.'.title' => $text(120), $prefix.'.description' => $text(300)];
+                }
+
+                continue;
+            }
             $rules[$prefix] = ['present', 'nullable', 'array:title,description,version,effective_date,approval_reference,sections'];
             if (! is_array($legal[$document] ?? null)) {
                 continue;
