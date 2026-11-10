@@ -1365,6 +1365,10 @@
     [
       "Tests\\Feature\\CollaboratorSplitsConcurrencyTest",
       "test_two_editors_adding_shares_to_one_track_wait_on_its_row_and_cannot_exceed_10000_basis_points"
+    ],
+    [
+      "Tests\\Feature\\ServiceInvoiceConcurrencyTest",
+      "test_two_independent_staff_issuing_the_same_deposit_serialize_to_one_invoice"
     ]
   ]
 }

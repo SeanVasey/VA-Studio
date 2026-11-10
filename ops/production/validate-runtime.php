@@ -77,6 +77,8 @@ const PRE_LAUNCH_HOLDS = [
  */
 const LAUNCH_OFF_HOLDS = [
     'REPORTING_MARKETING_SEGMENT_ENABLED',
+    // BL-70: Stripe test-mode service invoicing has no production path; the flag is refused unless false (file value and effective config).
+    'VASEY_TEST_SERVICE_INVOICING_ENABLED',
 ];
 
 ini_set('display_errors', '0');

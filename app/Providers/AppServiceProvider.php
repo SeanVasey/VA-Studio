@@ -17,6 +17,8 @@ use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantRendererProcess;
 use App\Domain\Inquiries\Notifications\MailInquiryAlertTransport;
 use App\Domain\Media\MediaWorkflowBudget;
+use App\Domain\Services\Invoicing\StripeInvoiceGateway;
+use App\Domain\Services\Invoicing\StripeSdkInvoiceGateway;
 use App\Http\ProductionCheckout\ProductionCheckoutMount;
 use App\Http\Tax\TaxHttpMount;
 use App\Models\User;
@@ -71,6 +73,7 @@ class AppServiceProvider extends ServiceProvider
             StripeSdkCheckoutGateway::class);
         $this->app->bind(StripeFinancialInspectionGateway::class,
             StripeSdkCheckoutGateway::class);
+        $this->app->bind(StripeInvoiceGateway::class, StripeSdkInvoiceGateway::class);
     }
 
     public function boot(): void

@@ -328,6 +328,11 @@ final class RetentionSchedule
             'rationale' => self::WITH_ORDER.'service project a customer bought, with its brief; fulfillment record.'],
         ['table' => 'service_project_events', 'family' => null, 'class' => 'indefinite', 'clock' => null,
             'rationale' => self::WITH_ORDER.'history of a purchased service project.'],
+        ['table' => 'service_invoices', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'Stripe test-mode invoice for a purchased service project (BL-70); a settled invoice is purchase evidence and is never deleted. '
+                .'Test-commerce record, default-off; in production the lane is held off.'],
+        ['table' => 'service_invoice_payments', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'verified service payment (BL-70): durable verified payment state behind a service project, immutable (AGENTS.md invariant).'],
         // Grants, including free licenses (PRIVACY orders row covers free licenses and their download records).
         ['table' => 'exclusive_sales', 'family' => null, 'class' => 'indefinite', 'clock' => null,
             'rationale' => self::WITH_ORDER.'exclusive sale of a rights scope; must never be silently revoked (AGENTS.md).'],

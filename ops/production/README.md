@@ -198,6 +198,8 @@ These are application or review items this kit deliberately does not do:
    `production-memberships.http_mounted` and `member-grants.enabled` unless they read strictly false
    (`holds.production_memberships_enabled`, `holds.production_memberships_http_mounted`, `holds.member_grants_enabled`). Lifting
    one is a reviewed change to the validator with Sean's authorization (ledger PCL-23, PCL-25).
+   BL-70 adds `VASEY_TEST_SERVICE_INVOICING_ENABLED` (Stripe test-mode service invoicing) to the same list
+   (`holds.vasey_test_service_invoicing_enabled`); it has no production path at all.
 
 ## What was and was not verified
 

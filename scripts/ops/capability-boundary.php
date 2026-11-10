@@ -64,6 +64,8 @@ final class CapabilityBoundary
      */
     public const PRODUCTION_LAUNCH_OFF_FLAGS = [
         'REPORTING_MARKETING_SEGMENT_ENABLED' => 'reporting.customer_segments.marketing_segment_enabled',
+        // BL-70: Stripe test-mode service invoicing. Admitted on staging by the test-commerce gate, never in production.
+        'VASEY_TEST_SERVICE_INVOICING_ENABLED' => 'services-invoicing.test_enabled',
     ];
 
     /**

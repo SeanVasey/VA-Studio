@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Domain\Services\Invoicing\ServiceInvoicePolicy;
+use App\Domain\Services\Invoicing\ServiceInvoices;
 use App\Domain\Services\Projects\Models\ServiceProject;
 use App\Domain\Services\Projects\ServiceProjects;
 use App\Filament\Resources\ServiceProjectResource\Pages\ListServiceProjects;
@@ -92,6 +94,14 @@ final class ServiceProjectResource extends OperatorResource
                     ."\nRevision allowance: ".$quote['revisionAllowance']."\nCancellation text: ".$quote['cancellation']."\n"
                     .implode("\n", array_map(fn ($milestone): string => $milestone['label'].': '.$milestone['scope'].' — '.($project['milestones'][$milestone['id']] ?? 'not accepted'), $quote['milestones'])), $project['quotes'])) ?: 'No authored quote yet.';
             })->columnSpanFull()->extraAttributes(['class' => 'whitespace-pre-wrap']),
+            TextEntry::make('invoices')->label('Test-mode invoices (Stripe test mode, no live funds)')->visible(fn (): bool => app(ServiceInvoicePolicy::class)->enabled())
+                ->state(function (ServiceProject $record): string {
+                    $lines = array_map(fn (array $invoice): string => $invoice['kind'].' #'.$invoice['revision'].' · '.$invoice['state'].' · '.$invoice['currency'].' '.$invoice['amountMinor']
+                        .' minor units · due in '.$invoice['daysUntilDue'].' days'.($invoice['hostedInvoiceUrl'] ? ' · '.$invoice['hostedInvoiceUrl'] : ''),
+                        app(ServiceInvoices::class)->forProject($record->public_id, Filament::auth()->user()));
+
+                    return 'Payment state: '.str_replace('_', ' ', self::snapshot($record)['paymentState'])."\n".($lines === [] ? 'No invoice issued.' : implode("\n", $lines));
+                })->columnSpanFull()->extraAttributes(['class' => 'whitespace-pre-wrap']),
             TextEntry::make('history')->state(fn (ServiceProject $record): string => implode("\n", array_map(fn ($event): string => $event['at'].' · '.$event['actor'].' · '.str_replace('_', ' ', $event['action']).($event['reason'] ? ' · '.$event['reason'] : ''), self::snapshot($record)['history'])) ?: 'Brief submitted; awaiting authored quote.')
                 ->columnSpanFull()->extraAttributes(['class' => 'whitespace-pre-wrap']),
         ]);

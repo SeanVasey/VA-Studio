@@ -28,6 +28,9 @@ PRE_LAUNCH_HOLDS = {
 # Off through launch (decision register, 2026-11-10). DD-44: the marketing segment flag, its config key from the boundary.
 MARKETING_SEGMENT = "REPORTING_MARKETING_SEGMENT_ENABLED"
 MARKETING_SEGMENT_KEY = "reporting.customer_segments.marketing_segment_enabled"
+# BL-70: Stripe test-mode service invoicing has no production path, so the validator holds its flag false like the marketing segment.
+SERVICE_INVOICING = "VASEY_TEST_SERVICE_INVOICING_ENABLED"
+SERVICE_INVOICING_KEY = "services-invoicing.test_enabled"
 # DD-50: code literals, refusal identifier => config key.
 MEMBERSHIP_LITERALS = {
     "holds.production_memberships_enabled": "production-memberships.enabled",
@@ -547,14 +550,14 @@ class ProductionRuntimeValidator(unittest.TestCase):
         block = re.search(r"const LAUNCH_OFF_HOLDS = \[(.*?)\n\];", text, re.S)
         self.assertIsNotNone(block, "LAUNCH_OFF_HOLDS constant block not found")
         self.assertNotIn("=>", block.group(1))
-        self.assertEqual(re.findall(r"'([A-Z0-9_]+)',", block.group(1)), [MARKETING_SEGMENT])
+        self.assertEqual(re.findall(r"'([A-Z0-9_]+)',", block.group(1)), [MARKETING_SEGMENT, SERVICE_INVOICING])
         self.assertNotIn(f"'{MARKETING_SEGMENT_KEY}'", text, "the config key must come from the boundary, not be restated")
         self.assertRegex(text, r"\$launchOffKeys = array_intersect_key\(CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS, array_flip\(LAUNCH_OFF_HOLDS\)\);"
                                r"\s*if \(count\(\$launchOffKeys\) !== count\(LAUNCH_OFF_HOLDS\)\) \{\s*throw new RuntimeException;")
         script = "require $argv[1]; echo json_encode(Vasey\\Ops\\CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS);"
         run = subprocess.run([PHP, "-r", script, str(REPO / "scripts/ops/capability-boundary.php")], capture_output=True, text=True, timeout=60)
         self.assertEqual(run.returncode, 0, run.stderr)
-        self.assertEqual(json.loads(run.stdout), {MARKETING_SEGMENT: MARKETING_SEGMENT_KEY})
+        self.assertEqual(json.loads(run.stdout), {MARKETING_SEGMENT: MARKETING_SEGMENT_KEY, SERVICE_INVOICING: SERVICE_INVOICING_KEY})
         # Not a staged flag: the staging gates keep their own list, and this hold is production's.
         script = "require $argv[1]; echo json_encode(array_key_exists($argv[2], Vasey\\Ops\\CapabilityBoundary::stagedFlags()));"
         run = subprocess.run([PHP, "-r", script, str(REPO / "scripts/ops/capability-boundary.php"), MARKETING_SEGMENT],
@@ -563,6 +566,31 @@ class ProductionRuntimeValidator(unittest.TestCase):
         self.assertRegex((REPO / "config/reporting.php").read_text(),
                          r"'marketing_segment_enabled'\s*=>\s*env\('" + MARKETING_SEGMENT + r"',\s*false\)")
         self.assertRegex((REPO / "ops/production/env.production.example").read_text(), rf"(?m)^{MARKETING_SEGMENT}=false$")
+
+    def test_the_service_invoicing_flag_passes_only_as_false_or_unset(self):
+        self.assertEqual(self.validate(profile() + f"{SERVICE_INVOICING}=false\n").returncode, 0)
+        for value in ("true", "1", "yes", "", "(true)", "TRUE", "on", "0", "null"):
+            with self.subTest(value=value):
+                run = self.validate(profile() + f"{SERVICE_INVOICING}={value}\n")
+                self.failed(run, "holds.vasey_test_service_invoicing_enabled")
+                self.assertEqual({line for line in run.stderr.splitlines() if line.startswith("FAIL ")},
+                                 {"FAIL holds.vasey_test_service_invoicing_enabled"}, run.stderr)
+        self.assertRegex((REPO / "config/services-invoicing.php").read_text(), r"'test_enabled'\s*=>\s*env\('" + SERVICE_INVOICING + r"',\s*false\)")
+        self.assertRegex((REPO / "ops/production/env.production.example").read_text(), rf"(?m)^{SERVICE_INVOICING}=false$")
+
+    def test_the_service_invoicing_effective_configuration_is_strictly_false(self):
+        run = self.validate(profile(**{"PATH": "false", SERVICE_INVOICING: "${PATH}"}))
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertEqual(run.stderr.split(), ["FAIL", "holds.vasey_test_service_invoicing_enabled"], run.stderr)
+
+    def test_a_boundary_without_the_service_invoicing_entry_fails_closed(self):
+        source = (REPO / "scripts/ops/capability-boundary.php").read_text()
+        entry = f"        '{SERVICE_INVOICING}' => '{SERVICE_INVOICING_KEY}',\n"
+        self.assertEqual(source.count(entry), 1)
+        _, run = self.shadow_project(boundary=source.replace(entry, ""))
+        result = run()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertEqual(result.stderr.split(), ["FAIL", "runtime.unavailable"], result.stderr)
 
     def test_a_boundary_without_the_marketing_segment_entry_fails_closed(self):
         source = (REPO / "scripts/ops/capability-boundary.php").read_text()
