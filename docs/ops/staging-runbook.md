@@ -176,8 +176,9 @@ art vasey:staging-legal-release --actor=<staff-account-email>    # asks the staf
 
 - **What it builds.** The active site content with the privacy and terms pages replaced from `docs/legal/PRIVACY.md` and
   `TERMS.md` (read, never written). The pages open with `STAGING PLACEHOLDER — not in effect`; the effective date, last
-  updated date, postal address, venue county, backup provider and email provider read `set at production`; hosting reads
-  Laravel Forge on DigitalOcean, storage the server's private disk and the region the United States. The reviewer
+  updated date, postal address, backup provider and email provider read `set at production`; the venue reads Polk County,
+  Iowa (SQ-07); hosting reads Laravel Forge on DigitalOcean, storage the server's private disk and the region the United
+  States. The reviewer
   appendices, the change log, square brackets, the legal-review tags and the DMCA sentence (DD-35) are removed. It writes no
   street address, legal name or other value DD-33 did not fix; a bracket it has no value for stops the build. The page's
   schema date field holds the build date (the schema needs a real date), not an effective date.
