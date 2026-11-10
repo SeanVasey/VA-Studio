@@ -19,8 +19,15 @@ final class CutoverMarkers
      */
     public const STAGING_SELLER_TAG_MARKER = StagingSellerTag::MARKER;
 
+    /**
+     * The word a staging stand-in's file name carries, matched in any letter case against configured paths. A marker
+     * word, not an environment name: environment checks go through TestEnvironment. This is the file's one use of it
+     * (recorded in StagingEnvironmentAdmissionTest::NAMES_STAGING_WITHOUT_GATING).
+     */
+    public const STAGING_PATH_WORD = 'staging';
+
     /** A tag path that names a staging or synthetic file, in any letter case (the same rule the tag guard applies). */
-    public const STAGING_SELLER_TAG_PATH_WORDS = ['staging', 'synthetic'];
+    public const STAGING_SELLER_TAG_PATH_WORDS = [self::STAGING_PATH_WORD, 'synthetic'];
 
     /** File-name stem of every staging stand-in on the private disk: `STAGING-synthetic-…` (ledger rules). */
     public const STAGING_FILE_STEM = 'STAGING-synthetic';
@@ -28,7 +35,7 @@ final class CutoverMarkers
     /** The specimen signature reads "STAGING SPECIMEN — NOT A SIGNATURE" (ledger PCL-06). */
     public const SPECIMEN_SIGNATURE_MARKER = 'STAGING SPECIMEN';
 
-    public const SPECIMEN_SIGNATURE_PATH_WORDS = ['staging', 'specimen'];
+    public const SPECIMEN_SIGNATURE_PATH_WORDS = [self::STAGING_PATH_WORD, 'specimen'];
 
     public const SYNTHETIC_TITLE = SyntheticRehearsalCatalog::TITLE_PREFIX;
 

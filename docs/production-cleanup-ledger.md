@@ -47,6 +47,10 @@ Without `--expect` the profile is `production` when `APP_ENV` is `production` an
 | `INFO` | The state of a default-off switch whose activation is a separate authorized step (section 3, and the tax facts of PCL-08). The line says what the switch reads and judges nothing. |
 | `NOT_CHECKABLE` | Nothing about the entry can be read by code (PCL-04, PCL-15, PCL-17, PCL-27, PCL-28, PCL-29). The line carries this ledger's verification for a person to perform. |
 
+Two production results are expected until a later step and are not placeholders to remove: PCL-09 fails under
+`production` until Sean's official SVG mark is committed under `assets/`, and PCL-12 judges Stripe key prefixes only, so
+no key, or `STRIPE_MODE=test` with no key, passes until the S3 live-key step.
+
 Three switches are judged in both profiles because this ledger fixes their state: memberships stay off at v1 (PCL-23), the
 three contract v2 gates never disagree (PCL-20), and the contract profiles' package pins match the installed packages
 (PCL-30). The marketing segment (PCL-25) must read false under `production`.

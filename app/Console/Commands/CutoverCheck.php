@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Support\Diagnostics\CutoverLedgerChecks;
+use App\Support\Environment\TestEnvironment;
 use Illuminate\Console\Command;
 
 final class CutoverCheck extends Command
@@ -26,7 +27,7 @@ final class CutoverCheck extends Command
         $counts = array_count_values(array_column($rows, 'status')) + [CutoverLedgerChecks::FAIL => 0, CutoverLedgerChecks::PASS => 0,
             CutoverLedgerChecks::INFO => 0, CutoverLedgerChecks::NOT_CHECKABLE => 0];
         // The environment is printed only when it is one of the known names; anything else is a host-chosen string.
-        $environment = in_array($environment, ['production', 'staging', 'local', 'testing'], true) ? $environment : 'other';
+        $environment = in_array($environment, ['production', ...TestEnvironment::TEST_COMMERCE], true) ? $environment : 'other';
         if ($this->option('json')) {
             $this->line(json_encode(['ledger' => 'docs/production-cleanup-ledger.md', 'profile' => $profile, 'environment' => $environment,
                 'counts' => $counts, 'rows' => $rows], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));

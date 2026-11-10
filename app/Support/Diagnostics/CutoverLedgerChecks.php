@@ -8,6 +8,7 @@ use App\Domain\Media\MediaFailure;
 use App\Domain\Media\PrivateMediaFiles;
 use App\Domain\SiteBuilder\LegalPublicationGuard;
 use App\Domain\SiteBuilder\SiteContentSchema;
+use App\Support\Environment\TestEnvironment;
 use Composer\InstalledVersions;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Arr;
@@ -35,7 +36,8 @@ final class CutoverLedgerChecks
 {
     public const PRODUCTION = 'production';
 
-    public const STAGING = 'staging';
+    /** The profile is named after the staging environment and spelled by TestEnvironment, the one place that names it. */
+    public const STAGING = TestEnvironment::STAGING;
 
     public const PROFILES = [self::PRODUCTION, self::STAGING];
 
@@ -51,7 +53,7 @@ final class CutoverLedgerChecks
      * Every ledger id, in ledger order. `check` is the method that inspects it, or null when nothing about the entry can
      * be read from configuration, the database or the filesystem. `manual` is the part of the ledger's "Verified at
      * cutover" column that stays with a person, shortened; the ledger is the authority. A ledger id missing here, or an
-     * id here that the ledger no longer has, fails tests/Feature/CutoverCheckLedgerCoverageTest.php.
+     * id here that the ledger no longer has, fails tests/Unit/CutoverCheckLedgerCoverageTest.php.
      *
      * @var array<string, array{subject: string, check: ?string, manual: ?string}>
      */
@@ -496,7 +498,7 @@ final class CutoverLedgerChecks
             return [[$clean ? self::PASS : self::FAIL, count($live).' configured value(s) with a live Stripe key prefix; mode '.$modeText
                 .'; live admission '.self::state($admitted)], $info];
         }
-        $findings = [[$test === [] ? self::PASS : self::FAIL, count($test).' configured value(s) with a Stripe test key prefix']];
+        $findings = [[$test === [] ? self::PASS : self::FAIL, count($test).' configured value(s) with a Stripe test key prefix (key prefixes only: no key, or STRIPE_MODE=test with no key, passes until the S3 live-key step)']];
         $misplaced = array_values(array_diff($live, ['production_checkout.secret_key']));
         if ($misplaced !== []) {
             $findings[] = [self::FAIL, count($misplaced).' live-prefixed value(s) outside the one admitted slot (PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY)'];
@@ -536,7 +538,7 @@ final class CutoverLedgerChecks
         }
 
         // Off the staging host (local, testing) there is no web server to protect, so absence is only reported.
-        return [[$present ? self::PASS : (config('app.env') === self::STAGING ? self::FAIL : self::INFO), $text]];
+        return [[$present ? self::PASS : (TestEnvironment::isStaging(config('app.env')) ? self::FAIL : self::INFO), $text]];
     }
 
     private function policyValues(bool $production): array

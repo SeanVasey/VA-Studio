@@ -132,6 +132,8 @@ class StagingEnvironmentAdmissionTest extends TestCase
      */
     private const NAMES_STAGING_WITHOUT_GATING = [
         'app/Domain/Media/StagingSellerTag.php' => '/stripos\(\$path, \'staging\'\)/',
+        // BL-49: the cutover check's marker word for staging stand-in file names (seller tag, specimen signature), one constant.
+        'app/Support/Diagnostics/CutoverMarkers.php' => '/public const STAGING_PATH_WORD = \'staging\';/',
     ];
 
     /** Development-only conveniences and production-lane rehearsals: these stay explicitly local/testing. */
