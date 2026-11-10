@@ -368,6 +368,8 @@ final class RetentionSchedule
             'rationale' => self::WITH_ORDER.'declared legacy contract of an imported order line.'],
         ['table' => 'legacy_history_grant_reviews', 'family' => null, 'class' => 'indefinite', 'clock' => null,
             'rationale' => self::WITH_ORDER.'staff review of an imported legacy line.'],
+        ['table' => 'legacy_history_track_links', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'link from an imported legacy order line to the store track it names; part of the legacy order record.'],
         ['table' => 'legacy_exclusivity_authority_events', 'family' => null, 'class' => 'indefinite', 'clock' => null,
             'rationale' => self::WITH_ORDER.'exclusivity authority over legacy sales; protects prior exclusive grants.'],
         // Framework job stores: PRIVACY application error log row, 14 days.
@@ -412,6 +414,8 @@ final class RetentionSchedule
         'migrations' => 'Framework migration log: migration names and batch numbers.',
         'tracks' => 'Catalog: published track metadata.',
         'track_metadata_presets' => 'Catalog: staff metadata presets.',
+        'collaborators' => 'Catalog: staff-entered collaborator credits (display name, role, source reference); no customer, payment, tax or contact data.',
+        'track_collaborator_splits' => 'Catalog: staff-entered per-track collaborator shares in basis points; metadata only.',
         'media_assets' => 'Catalog media files (masters, previews, artwork) uploaded by staff.',
         'media_processing_runs' => 'Processing runs of catalog media.',
         'media_upload_sessions' => 'Resumable staff uploads of catalog media.',

@@ -24,12 +24,16 @@ declare(strict_types=1);
 //      four flags, is a reviewed change to this file together with Sean's explicit authorization.
 //   4. APP_KEY equals the key of the previous (served) environment, when one is given.
 //
+//   5. the seller tag is not the synthetic staging placeholder: neither MEDIA_TAG_PATH nor, when the file is present in the
+//      attached private storage, its content carries the staging marker (holds.staging_seller_tag).
+//
 // Admissions (lane PCC). MAIL_MAILER and STRIPE_MODE are the preflight's: `log` and `test` unless the candidate file sets
 // VASEY_PRODUCTION_REAL_MAIL_ADMITTED or VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED to exactly `true` (then `smtp` with implicit TLS,
 // and `live`). This file adds only what the live flag changes in its holds: an `sk_live_` value is admitted as
 // PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY and nowhere else, and PRODUCTION_CHECKOUT_FUNDS_MODE may be blank or `live`. Every
 // PRODUCTION_CHECKOUT_*_ENABLED switch stays held false whatever the flags say: admitting live credentials is not activation.
 // The effective admissions (config/production-runtime.php) must agree with the file.
+use App\Domain\Media\StagingSellerTag;
 use App\Support\Http\TrustedProxyList;
 use App\Support\PhpCliBinary;
 use App\Support\PhpCliBinaryUnavailable;
@@ -40,9 +44,13 @@ use Vasey\Ops\CapabilityBoundary;
 
 /**
  * Pre-launch capability hold, approved by Sean on 2026-10-18: the environment keys of the four flags, each refused unless false.
- * Three have no environment gate in the application: an operative free grant and an operator notification are bound only by an
- * adapter that other code would supply, and the public track sitemap build chain is not environment-gated while the public index
- * serves it in production. In production this validator is their only guard. The fourth, V2 listening promotion, is reached
+ * Two have no environment gate in the application: an operative free grant is bound only by an adapter that other code would
+ * supply, and the public track sitemap build chain is not environment-gated while the public index serves it in production. In
+ * production this validator is their only guard. The operator notification flag now has a shipped adapter (FP-013): a default-off
+ * mail alert transport that the flag binds once an inquiry operator is configured, and that sends an operator a plain-text alert
+ * carrying an inquiry reference when the order-ready mail configuration is admitted too. That transport refuses production in code
+ * unless the literal `inquiries.operator_alert_mail_production_admitted` is true (it ships false), so this hold and that literal
+ * are lifted together, in one reviewed change. The fourth, V2 listening promotion, is reached
  * today only through a customer session, which the test customer access path creates in local, testing and staging only, and
  * the production listening lane does not read it; it is held as defence in depth because promotion is a one-way data change.
  * Lifting one is a reviewed change to this file together with Sean's authorization for that activation. The config key of each
@@ -116,6 +124,9 @@ try {
         unset($scanned['PRODUCTION_CHECKOUT_STRIPE_SECRET_KEY']);
     }
     $check('holds.no_live_provider_credential', ! preg_match('/(?:sk|rk|pk)_live_/', implode("\n", array_filter($scanned, 'is_string'))));
+    // The synthetic staging seller tag is a rehearsal placeholder (docs/ops/staging-placeholders.md): its path is refused here,
+    // from the file alone, and its content below once the configuration is loaded.
+    $check('holds.staging_seller_tag', ! StagingSellerTag::pathCarriesMarker($values['MEDIA_TAG_PATH'] ?? null));
     $check('runtime.no_cache_override', array_filter($names, static fn ($name) => preg_match('/\AAPP_[A-Z_]*CACHE\z/', $name)) === []);
     // A production-checkout switch is accepted only as the literal false the template ships, or unset. A blank assignment is
     // not the same as unset (the application's env() default does not apply to it), and the configuration check below refuses it.
@@ -230,6 +241,13 @@ try {
                 && in_array(config('production_checkout.funds_mode'), [null, '', 'live'], true)
             : in_array(config('production_checkout.secret_key'), [null, ''], true)
                 && in_array(config('production_checkout.funds_mode'), [null, ''], true));
+        // The effective tag path, and the tag itself when private storage is attached and holds it: neither may be the staging
+        // placeholder. An absent file is the preflight's and the media pipeline's to refuse, not this hold's.
+        $tagPath = config('media.tag_path');
+        $tagFile = is_string($tagPath) && preg_match('~\A[a-zA-Z0-9][a-zA-Z0-9_./-]*\z~D', $tagPath) === 1 && ! str_contains($tagPath, '..')
+            ? rtrim((string) config('filesystems.disks.local.root'), '/').'/'.$tagPath : null;
+        $check('holds.staging_seller_tag', ! StagingSellerTag::pathCarriesMarker($tagPath)
+            && ($tagFile === null || ! is_file($tagFile) || ! StagingSellerTag::fileCarriesMarker($tagFile)));
         // Production identity SMTP composes settings only from its reviewed code literal, and only with real mail admitted.
         $check('holds.production_identity_smtp', $realMail || config('production-identity-smtp.settings') === null);
         // The admissions as the application reads them must be the file's. MAIL_MAILER and STRIPE_MODE stay the preflight's.
@@ -239,6 +257,9 @@ try {
         foreach ($holdKeys as $name => $key) {
             $check('holds.'.strtolower($name), config($key) === false);
         }
+        // FP-013: the operator alert mail transport refuses production in code unless this literal is true. It is lifted only
+        // together with the CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED hold above, in one reviewed change.
+        $check('holds.operator_alert_mail_production_admitted', config('inquiries.operator_alert_mail_production_admitted') === false);
         // Renderer children started inside FPM requests need a genuine CLI PHP of this exact version and build (M-16).
         // Validate the configured binary as the FPM pool will, with a real probe; the path itself is never printed.
         try {

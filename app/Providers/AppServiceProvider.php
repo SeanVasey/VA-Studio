@@ -15,6 +15,7 @@ use App\Domain\Grants\Free\FreeGrantRendererProcess;
 use App\Domain\Grants\Paid\PaidGrantRendererProcess;
 use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantRendererProcess;
+use App\Domain\Inquiries\Notifications\MailInquiryAlertTransport;
 use App\Domain\Media\MediaWorkflowBudget;
 use App\Http\ProductionCheckout\ProductionCheckoutMount;
 use App\Http\Tax\TaxHttpMount;
@@ -42,6 +43,8 @@ class AppServiceProvider extends ServiceProvider
         if (ProductionCheckoutMount::admitted()) {
             $this->app->register(ProductionCheckoutServiceProvider::class);
         }
+        // FP-013: the inquiry operator alert transport exists only behind its default-off flag and a configured operator.
+        MailInquiryAlertTransport::bindWhenConfigured($this->app);
         $this->app->bind(IdentityNoticeTransport::class,
             fn ($app) => IdentitySmtpFactory::make($app, $app['config']));
         $this->app->scoped(MediaWorkflowBudget::class);
