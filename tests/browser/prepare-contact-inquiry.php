@@ -103,7 +103,7 @@ try {
             $inquiryGraphHash = $transport ? $inquiryGraph() : null;
             $retainedRowsHash = $transport ? $retainedRows($auditStartId) : null;
             $values = ['name' => 'Synthetic inquiry visitor '.$project, 'email' => 'inquiry-'.$project.'@example.test',
-                'subject' => 'Synthetic inquiry subject '.$project, 'message' => "Synthetic private message.\nKeep exact Unicode: é 🎧.\n<script>synthetic escaped text</script>", 'website' => ''];
+                'subject' => 'Service request', 'message' => "Synthetic private message.\nKeep exact Unicode: é 🎧.\n<script>synthetic escaped text</script>", 'website' => ''];
             $release = $site->create(SiteEditorialFixtures::content('SYNTHETIC INQUIRY '.$project), 'Synthetic inquiry '.$project, $operator);
             $preview = $site->create(SiteEditorialFixtures::content('PRIVATE SYNTHETIC INQUIRY '.$project), 'Private synthetic inquiry '.$project, $operator);
             $site->publish($release->id, $before->revision, $operator);

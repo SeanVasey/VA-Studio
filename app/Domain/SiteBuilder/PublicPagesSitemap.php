@@ -33,7 +33,10 @@ final class PublicPagesSitemap
                 $albums = app(AlbumPresentation::class)->paths();
                 $paths = [...$paths, ...($albums === [] ? [] : ['/albums', ...$albums])];
             }
-            $urls = array_map(fn (string $path): string => rtrim($origin, '/').$path, array_unique($paths));
+            // Fail closed on a path into a product family whose own policy is off (FP-001, BL-50).
+            $families = app(FamilyEntryPoints::class);
+            $paths = array_filter(array_unique($paths), fn (string $path): bool => $families->admits($path));
+            $urls = array_map(fn (string $path): string => rtrim($origin, '/').$path, array_values($paths));
         }
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
         foreach ($urls as $url) {
