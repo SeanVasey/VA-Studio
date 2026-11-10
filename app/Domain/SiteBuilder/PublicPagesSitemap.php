@@ -6,6 +6,8 @@ use App\Domain\Albums\AlbumPresentation;
 use App\Domain\Albums\AlbumsPolicy;
 use App\Domain\Collections\CollectionPresentation;
 use App\Domain\Collections\CollectionsPolicy;
+use App\Domain\SoundKits\Products\SoundKitPresentation;
+use App\Domain\SoundKits\Products\SoundKitStorefrontPolicy;
 
 /** Public URL discovery from one verified current release; never private preview content. */
 final class PublicPagesSitemap
@@ -39,6 +41,11 @@ final class PublicPagesSitemap
             if (app(CollectionsPolicy::class)->enabled()) {
                 $collections = app(CollectionPresentation::class)->paths();
                 $paths = [...$paths, ...($collections === [] ? [] : ['/collections', ...$collections])];
+            }
+            // Listed sound kits, only while the sound-kit pages are on (BL-53).
+            if (app(SoundKitStorefrontPolicy::class)->enabled()) {
+                $kits = app(SoundKitPresentation::class)->paths();
+                $paths = [...$paths, ...($kits === [] ? [] : ['/sound-kits', ...$kits])];
             }
             // Fail closed on a path into a product family whose own policy is off (FP-001, BL-50).
             $families = app(FamilyEntryPoints::class);

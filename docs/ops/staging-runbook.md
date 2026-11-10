@@ -548,6 +548,20 @@ Each run produces `/srv/vasey-staging/backups/<UTC>-<sha12>/` containing:
 The log is `/var/log/vasey-staging/backup.log`. A set without `RESTORE_CHECK` is unproven. A `*.FAILED`
 directory is kept for inspection and never pruned.
 
+**Disk space and retention.** Every deploy takes a full snapshot (database dump + `private.tar` + `.env`, about
+14 GB on 2026-11-10), and the restore proof needs about the same again under `/var/lib/mysql-restore-check`. Before it
+stops anything, `forge-deploy.sh` runs `vasey-staging-ctl space-check` (the backup helper's `space-check`): it
+estimates the need from the private store (`du`), the schema's data and index bytes (else the newest set's
+`database.sql`), a second set copy when age/rclone shipping stages an encrypted file in the backup directory, the
+restore proof (added when it shares the filesystem) and a 20% + 256 MiB margin. When the free bytes are below that,
+the deploy ends with `FAILED ... before the quiesce: the served release was not touched`, naming the bytes free and
+needed. Free space with `sudo /usr/local/sbin/vasey-staging-ctl backup-prune`, which applies the configured local
+retention (`VASEY_BACKUP_KEEP` newest sets, or the tiered policy) and never removes the newest set, a `*.FAILED`
+directory or anything outside `VASEY_BACKUP_DIR` (such as `/srv/vasey-staging-retained-backups`); if that is not
+enough, lower `VASEY_BACKUP_KEEP` in `/etc/vasey-staging/backup.conf` or enlarge the volume, then deploy again.
+The same retention runs automatically right after each successful deploy snapshot (protecting the set just
+taken, which is the rollback point) and after each successful deploy; a prune failure is only a warning.
+
 **Off-host destination (Sean).** The step is optional, but until it is done the backups sit on the same disk
 as the data.
 
@@ -613,6 +627,18 @@ previous release, the evidence's `migrate.txt` says `Nothing to migrate.` and `m
 and `/srv/vasey-staging/private/processing/` must hold no workspace the doctor left behind: its media-scanner check
 writes there and cleans up only when it exits normally. The candidate release is built, sealed and attached but never
 served; remove it, or a later deploy of the same SHA refuses "already exists but is not current".
+
+**Out of disk during the snapshot** (`tar` or `mysqldump` reporting "Wrote only ..." or "No space left on device"). This
+is case A: the snapshot runs before any migration, `current` still names the previous release and the schema is
+unchanged, so there is nothing to restore. The failed set is renamed `*.FAILED` (or the snapshot pointer is left
+invalid) and kept for inspection; the site is down until you resume it. Recover in this order: (1) `ctl status`
+and the recovery script below, which establishes quiesce and resumes the previous release; (2) free space without
+touching data you may need: `sudo /usr/local/sbin/vasey-staging-ctl backup-prune` (never delete the newest complete
+set, the `RESTORE_VERIFIED` set a rollback would use, or `/srv/vasey-staging-retained-backups` by hand); delete a
+`*.FAILED` directory only after reading it, and only with `rm -rf --one-file-system`; (3) run
+`sudo /usr/local/sbin/vasey-staging-backup space-check` and deploy again. Deploys made with the helpers from the
+2026-11-10 fix check this before they stop anything (see "Disk space and retention" in section 8); an older installed
+helper must be refreshed first by re-running `ops/staging/provision.sh` as root.
 
 Run the recovery as one non-interactive root script, never by pasting lines into a root shell: there, a failed guard
 ends that shell and the remaining lines would run in your own shell with nothing set. The script stops at the first

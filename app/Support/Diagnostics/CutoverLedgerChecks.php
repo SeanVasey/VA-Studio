@@ -118,6 +118,8 @@ final class CutoverLedgerChecks
             'manual' => 'The alert list shows only alerts from the shipped lockfiles; composer audit and npm audit --audit-level=high pass on the candidate SHA.'],
         'PCL-30' => ['subject' => 'Held tc-lib updates', 'check' => 'contractPackagePins',
             'manual' => 'The held tc-lib update pull requests stay unmerged until after activation.'],
+        'PCL-31' => ['subject' => 'Cutover window and rollback terms (SQ-17)', 'check' => null,
+            'manual' => 'Sean switched off every exclusive offer on BeatStars at or before 72 hours before cutover and the dated record is in the launch packet (an owner action on BeatStars; nothing in this repository touches it); the recovery time objective is 4 hours (recovery point 24 hours); roll back in the first 48 hours on any of: checkout error rate above 5% over 30 minutes, a paid order undelivered for more than 1 hour without a known cause, webhook signature failures sustained for 15 minutes, HTTP 5xx above 2% over 15 minutes, any data-integrity alarm.'],
     ];
 
     /**

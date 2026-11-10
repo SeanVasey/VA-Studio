@@ -38,7 +38,7 @@ The existing `Offer`, `OfferSnapshot` and `DeliveryAssets` are explicitly track-
 
 The next coherent commerce child needs a versioned product-target/asset adapter for the existing quote → prepared order → verified payment → grant/contract → authorized delivery pipeline. It must bind a selected, technically verified kit revision and manifest to staff-entered integer prices/currency and explicitly authored, reviewed, versioned sample-use terms. Sample redistribution, permitted uses and source rights require actual decisions; a provenance note or existing track license cannot supply them implicitly. Purchased snapshots must retain the exact kit archive version, old track snapshots/contracts must remain byte-compatible, and existing customer ownership and short-lived authorized download controls should serve the purchased archive. Reuse the existing payment/finalization engine; do not introduce another charge or entitlement engine.
 
-Public kit listings, approved demo/artwork, product-specific rights approval, those commerce adapters, actual preset/MIDI profiles and native browser acceptance remain open. This private technical intake neither changes launch gates nor drops the broader T27 requirement.
+BL-53 (2026-11-11) built the kit product record, publication gate and default-off public pages and stopped at the payment boundary: see [sound-kit-storefront.md](sound-kit-storefront.md) for what exists and the precise payment work that remains. Public kit listings, approved demo/artwork, product-specific rights approval, those commerce adapters, actual preset/MIDI profiles and native browser acceptance remain open. This private technical intake neither changes launch gates nor drops the broader T27 requirement.
 
 ## Verification
 

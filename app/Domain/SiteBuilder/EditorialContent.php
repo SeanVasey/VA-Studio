@@ -6,6 +6,7 @@ use App\Domain\Albums\AlbumsPolicy;
 use App\Domain\Catalog\PublicCatalog;
 use App\Domain\Collections\CollectionsPolicy;
 use App\Domain\Rights\PublishedLicenseComparison;
+use App\Domain\SoundKits\Products\SoundKitStorefrontPolicy;
 
 /** Route projections accept one already verified release, never a second pointer read. */
 final class EditorialContent
@@ -22,6 +23,9 @@ final class EditorialContent
         }
         if ($families && app(CollectionsPolicy::class)->enabled() && ! in_array('/collections', array_column($chrome['navigation'], 'href'), true)) {
             $chrome['navigation'][] = ['label' => 'Collections', 'href' => '/collections'];
+        }
+        if ($families && app(SoundKitStorefrontPolicy::class)->enabled() && ! in_array('/sound-kits', array_column($chrome['navigation'], 'href'), true)) {
+            $chrome['navigation'][] = ['label' => 'Sound kits', 'href' => '/sound-kits'];
         }
 
         return $chrome;
