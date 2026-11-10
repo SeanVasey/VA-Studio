@@ -3,7 +3,7 @@ export interface SiteContent {
   hero: { eyebrow: string; title: string; line_two: string; description: string };
   studio: { eyebrow: string; title: string; line_two: string; lead: string; paragraphs: string[] };
   footer: { description: string };
-  navigation: { label: string; href: '/' | '/#catalog' | '/#licenses' | '/#studio' | '/about' | '/contact' | '/blog' | '/videos' | '/albums' | LegalPath }[];
+  navigation: { label: string; href: '/' | '/#catalog' | '/#licenses' | '/#studio' | '/about' | '/contact' | '/blog' | '/videos' | '/albums' | '/collections' | LegalPath }[];
   seo: { title: string; description: string };
   /** Published legal pages (schema 5 and 6), listed in the footer by title. */
   legal_links?: { title: string; path: LegalPath }[];
