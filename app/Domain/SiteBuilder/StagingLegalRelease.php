@@ -31,9 +31,10 @@ final class StagingLegalRelease
 
     /**
      * The draft's exact bracketed spans and what staging shows instead, applied in this order. Values: DD-33 for the effective
-     * date, postal address, venue county, backup and email providers ("set at production"), hosting (Laravel Forge on a
+     * date, postal address, backup and email providers ("set at production"), hosting (Laravel Forge on a
      * DigitalOcean server), storage (the server's private disk) and region (the United States); DD-34 for the minimum age
-     * ("18, or the age of majority where you live", as drafted); DD-35 for the DMCA agent sentence (removed); the legal-review
+     * ("18, or the age of majority where you live", as drafted); SQ-07 for the venue county (Polk County, Iowa, Sean 2026-11-10);
+     * DD-35 for the DMCA agent sentence (removed); the legal-review
      * tags are dropped from the headings because DD-36 keeps production publication behind counsel anyway.
      *
      * @var array<string, string>
@@ -50,7 +51,8 @@ final class StagingLegalRelease
         '[18, or the age of majority where you live — Proposed, Sean to confirm]' => '18, or the age of majority where you live',
         '[18, or the age of majority where you live — Sean to confirm]' => '18, or the age of majority where you live',
         ' [Sean to decide whether to register a DMCA designated agent with the U.S. Copyright Office.]' => '',
-        '[county — Sean to confirm]' => '(county: '.self::UNSET.')',
+        'Iowa [county — Sean to confirm]' => 'Polk County, Iowa',
+        '[county — Sean to confirm]' => '(Polk County, Iowa)',
         ' [For legal review]' => '',
     ];
 
@@ -102,7 +104,7 @@ final class StagingLegalRelease
 
         $title = null;
         $sections = [['heading' => self::BANNER, 'paragraphs' => [
-            self::BANNER.'. This page is a staging rehearsal. The effective date, postal address, venue county, backup provider and email provider read "'.self::UNSET.'".',
+            self::BANNER.'. This page is a staging rehearsal. The effective date, postal address, backup provider and email provider read "'.self::UNSET.'".',
         ]]];
         $pending = null;
         $paragraph = [];
