@@ -24,8 +24,13 @@ namespace App\Domain\Customers\DataRights;
  *   last message), and `unless_referenced` [[table, column]] or [[table, column, own column]]: no row there whose column
  *   equals this row's `id` (or own column), so the row is kept with that record (a quote that became an order).
  * - `via` [foreign key, parent table] or [foreign key, parent table, parent key]: the row follows its parent, whose clock is
- *   `columns` or itself `via`; the parent key defaults to `id`. `when` [column, value] limits it to rows of one source kind;
- *   any other row is never past.
+ *   `columns` or itself `via`; the parent key defaults to `id`. The "parent" is whichever row carries the clock: a production
+ *   checkout intent follows the terminal observation that names it (`['id', observations, 'intent_id']`).
+ * - `when` [column, value], on a `columns` or a `via` clock, limits it to rows whose column holds that value (one source kind,
+ *   one terminal observation kind); any other row is never past.
+ * - `latest_in` [group column, order column], on a `columns` clock: the row is past only while it is the last row of its group
+ *   in its own table (no row with the same group value and a higher order value). An observation that anything followed, a
+ *   failed or contradicting read included, is never past.
  * - null: no clock can be modeled from the schema (no primary key or timestamp to scan, or no signal for when the clock
  *   starts), so the table is reported as held and never counted. The rationale says why.
  *
@@ -48,12 +53,31 @@ final class RetentionSchedule
 
     /**
      * `CustomerDataRights::RETAINED` labels that are not a single period key, with the classes their tables may take: a record
-     * kept indefinitely, and a production checkout review kept with its order or, with no order, for the abandoned-checkout period.
+     * kept indefinitely; a production checkout review kept with its order or, with no order, for the abandoned-checkout period;
+     * and a production order snapshot kept as a financial record or, when it was never paid and its provider session was observed
+     * expired, for the abandoned-checkout period.
      */
     public const RETAINED_LABELS = [
         'indefinite' => ['indefinite'],
         'with_order_or_abandoned_checkout_days' => ['indefinite', 'abandoned_checkout'],
+        'financial_records_years_or_abandoned_checkout_days' => ['indefinite', 'abandoned_checkout'],
     ];
+
+    /**
+     * The proven terminal state of an unpaid production (V1) order snapshot (FP-076, decision register "Unpaid order snapshots
+     * (retention)"): its intent has a `production_checkout_observations` row of kind `session_expired`, and no
+     * `production_checkout_payments` row. `HostedCheckout::record()` is the only writer of a payment row; it refuses any provider
+     * read whose session status differs once a retained observation is `expired` (`terminal_regression`), and a confirmed payment
+     * needs a `complete` session, so no later reconcile can attach payment. `HostedEvidence::intent()` repeats the check on every
+     * read. That terminality rests on this store refusing contrary reads, not on the provider: a refused read leaves only an
+     * `uncertain` observation, which cannot be told from an outage. So the expired observation counts only while it is the
+     * intent's LATEST observation (`latest_in`); any later observation holds the order until a successful expired read is
+     * recorded again, and the clock then starts at that latest observation's `created_at`. Proven by
+     * ProductionUnpaidSnapshotRetentionTest. A purge must still re-read the provider session first.
+     */
+    public const PRODUCTION_ABANDONED_KIND = 'session_expired';
+
+    private const ABANDONED_ORDER = 'PRIVACY 30-day row (decided 2026-11-09, proven 2026-11-10): an unpaid production order whose provider session was observed expired did not become an order; ';
 
     /** Shared rationales of the families the 2026-11-09 decisions hold with the order (PRIVACY section 7 orders row). */
     private const WITH_ORDER = 'Held with the order (PRIVACY section 7 orders row, decided 2026-11-09): ';
@@ -86,8 +110,9 @@ final class RetentionSchedule
         ['table' => 'production_checkout_reviews', 'family' => 'production_checkout_reviews', 'class' => 'abandoned_checkout',
             'clock' => ['columns' => ['created_at'], 'format' => 'iso8601', 'unless_referenced' => [['production_checkout_orders', 'review_id']]],
             'rationale' => 'PRIVACY: a checkout that did not become an order, 30 days after it; a review an order was built from (D-30) is kept with that order.'],
-        ['table' => 'production_checkout_orders', 'family' => 'production_checkout_orders', 'class' => 'indefinite', 'clock' => null,
-            'rationale' => 'Production order snapshot (V1).'],
+        ['table' => 'production_checkout_orders', 'family' => 'production_checkout_orders', 'class' => 'abandoned_checkout',
+            'clock' => ['via' => ['id', 'production_checkout_provider_intents', 'order_id']],
+            'rationale' => 'Production order snapshot (V1). '.self::ABANDONED_ORDER.'a paid order, an order still in flight and an order with no observed expiry are never counted.'],
         ['table' => 'production_tax_checkout_orders', 'family' => 'production_tax_checkout_orders', 'class' => 'indefinite', 'clock' => null,
             'rationale' => 'Production tax order snapshot (V2).'],
         ['table' => 'production_checkout_exemption_bases', 'family' => 'production_checkout_exemption_bases', 'class' => 'indefinite', 'clock' => null,
@@ -221,7 +246,10 @@ final class RetentionSchedule
         ['table' => 'quote_owners', 'family' => null, 'class' => 'abandoned_checkout', 'clock' => null,
             'rationale' => 'Buyer owner key shared by quotes and orders; no primary key or timestamp to scan, so held.'],
         // Checkout state bound to an order snapshot: every intent, attempt and session row has a non-null order (or a parent that
-        // has one), so none is "a checkout that did not become an order"; it follows the order (open question: unpaid snapshots).
+        // has one), so it follows the order. The Stripe-test chain (`orders` and the four tables below) stays with the order even
+        // when unpaid: it has no terminal unpaid state, because a staff release keeps accepting a late confirmed payment
+        // (`UnpaidReleasePolicy::CONTRACT` late_confirmation, VerifyTestPayment::commit). The production V1 chain follows its order
+        // into the abandoned-checkout class only through the proven terminal state (PRODUCTION_ABANDONED_KIND).
         ['table' => 'order_attempts', 'family' => null, 'class' => 'indefinite', 'clock' => null,
             'rationale' => self::WITH_ORDER.'checkout attempt bound to its order snapshot (order_id is required and unique).'],
         ['table' => 'checkout_intents', 'family' => null, 'class' => 'indefinite', 'clock' => null,
@@ -230,16 +258,23 @@ final class RetentionSchedule
             'rationale' => self::WITH_ORDER.'provider session of an intent that always has an order.'],
         ['table' => 'checkout_observations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
             'rationale' => self::WITH_ORDER.'provider session status observations of an order checkout.'],
-        ['table' => 'production_checkout_order_lines', 'family' => null, 'class' => 'indefinite', 'clock' => null,
-            'rationale' => self::WITH_ORDER.'lines of the production order snapshot.'],
-        ['table' => 'production_checkout_attempts', 'family' => null, 'class' => 'indefinite', 'clock' => null,
-            'rationale' => self::WITH_ORDER.'checkout attempt of a production order (order_id is required).'],
-        ['table' => 'production_checkout_provider_intents', 'family' => null, 'class' => 'indefinite', 'clock' => null,
-            'rationale' => self::WITH_ORDER.'payment intent of a production order (order_id is required).'],
-        ['table' => 'production_checkout_sessions', 'family' => null, 'class' => 'indefinite', 'clock' => null,
-            'rationale' => self::WITH_ORDER.'provider session of a production order intent.'],
-        ['table' => 'production_checkout_observations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
-            'rationale' => self::WITH_ORDER.'provider observations of a production order intent.'],
+        ['table' => 'production_checkout_order_lines', 'family' => null, 'class' => 'abandoned_checkout', 'clock' => ['via' => ['order_id', 'production_checkout_orders']],
+            'rationale' => 'Lines of the production order snapshot; follow their order ('.self::ABANDONED_ORDER.'otherwise kept with the order).'],
+        ['table' => 'production_checkout_attempts', 'family' => null, 'class' => 'abandoned_checkout', 'clock' => ['via' => ['order_id', 'production_checkout_orders']],
+            'rationale' => 'Checkout attempt of a production order (order_id is required); follows its order, so it is kept with a paid or in-flight order.'],
+        ['table' => 'production_checkout_provider_intents', 'family' => null, 'class' => 'abandoned_checkout',
+            'clock' => ['via' => ['id', 'production_checkout_observations', 'intent_id']],
+            'rationale' => 'Payment intent of a production order; follows the expired-session observation that ends it, and is kept with the order while a payment exists or no expiry was observed.'],
+        ['table' => 'production_checkout_sessions', 'family' => null, 'class' => 'abandoned_checkout', 'clock' => ['via' => ['intent_id', 'production_checkout_provider_intents']],
+            'rationale' => 'Provider session of a production order intent; follows its intent.'],
+        // The clock row of an abandoned production order: only a `session_expired` observation that is the intent's latest
+        // observation, 30 days after it was recorded, and never while the intent has a payment. Other observations of the same
+        // intent (`session_open`, `uncertain`, a `canceled` payment attempt, an earlier expiry) are never counted on their own; a
+        // purge design must take them with the intent.
+        ['table' => 'production_checkout_observations', 'family' => null, 'class' => 'abandoned_checkout',
+            'clock' => ['columns' => ['created_at'], 'format' => 'iso8601', 'when' => ['kind', self::PRODUCTION_ABANDONED_KIND],
+                'latest_in' => ['intent_id', 'sequence'], 'unless_referenced' => [['production_checkout_payments', 'intent_id', 'intent_id']]],
+            'rationale' => 'Provider observations of a production order intent. '.self::ABANDONED_ORDER.'the expired-session observation starts the 30 days while it is the intent\'s latest observation; one that a later read followed (a failed or contradicting read), or whose intent has a payment, is kept with the order.'],
         ['table' => 'production_checkout_exemption_authorities', 'family' => null, 'class' => 'indefinite', 'clock' => null,
             'rationale' => self::WITH_ORDER.'qualification authority behind an exemption basis; tax evidence of the orders it approved.'],
         ['table' => 'production_tax_checkout_requests', 'family' => null, 'class' => 'indefinite', 'clock' => null,
