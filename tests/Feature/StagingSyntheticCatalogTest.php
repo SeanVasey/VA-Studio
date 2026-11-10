@@ -780,7 +780,7 @@ class StagingSyntheticCatalogTest extends TestCase
     public function test_the_cleanup_ledger_verification_queries_run_and_find_every_synthetic_record(): void
     {
         $section = Str::between(file_get_contents(base_path('docs/production-cleanup-ledger.md')), '### PCL-02 and PCL-03 verification commands', "\n## ");
-        preg_match_all("/art db <<'SQL'\n(.*?)\nSQL\n/s", $section, $matches);
+        preg_match_all("/mysql --defaults-extra-file=<OPTION_FILE> <DATABASE> <<'SQL'\n(.*?)\nSQL\n/s", $section, $matches);
         $this->assertCount(3, $matches[1]);
         [$synthetic, $prices, $catalog] = $matches[1];
         $rows = fn (string $sql): array => array_map(fn (object $row): array => (array) $row, DB::select(rtrim(trim($sql), ';')));

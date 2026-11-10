@@ -41,14 +41,16 @@ placeholder is gone or the switch is in its intended state.
 ### PCL-02 and PCL-03 verification commands
 
 Run these on the production host as the application user, from the release directory (`art` is `php artisan`, as in the
-runbooks). `art db` opens the configured database client; each heredoc is one read-only query. The queries use only
+runbooks). Each heredoc is one read-only query, piped to the `mysql` client with the same root-only option file the
+backup restore proof uses (`docs/ops/backup-restore-proof.md`; it holds the database credentials and never enters Git).
+`art db` is not used: it opens an interactive TTY session and ignores standard input. The queries use only
 portable SQL, and `tests/Feature/StagingSyntheticCatalogTest.php` runs this exact text against a database before and after a
 synthetic run. Record each command, its output, the UTC time and the release SHA as the entry's "Closed" evidence.
 
 PCL-02, synthetic licenses and prices. Every `found` must be 0:
 
 ```sh
-art db <<'SQL'
+mysql --defaults-extra-file=<OPTION_FILE> <DATABASE> <<'SQL'
 SELECT 'license templates' AS check_name, COUNT(*) AS found FROM license_templates WHERE name LIKE '%[SYNTHETIC]%' OR name LIKE '%TEST PRICE%' OR slug LIKE 'synthetic-rehearsal-%'
 UNION ALL SELECT 'license versions', COUNT(*) FROM license_versions WHERE approval_reference = 'SYNTHETIC-REHEARSAL-NOT-FOR-SALE' OR authored_source LIKE '%SYNTHETIC REHEARSAL LICENSE%'
 UNION ALL SELECT 'offers on synthetic licenses', COUNT(*) FROM offers JOIN license_versions ON license_versions.id = offers.license_version_id JOIN license_templates ON license_templates.id = license_versions.license_template_id WHERE license_templates.name LIKE '%[SYNTHETIC]%' OR license_templates.name LIKE '%TEST PRICE%'
@@ -60,7 +62,7 @@ SQL
 PCL-02, the price list Sean reads back and signs (one row per active offer):
 
 ```sh
-art db <<'SQL'
+mysql --defaults-extra-file=<OPTION_FILE> <DATABASE> <<'SQL'
 SELECT tracks.slug AS track, license_templates.name AS license, license_templates.type AS license_type, offer_revisions.price_minor, offer_revisions.currency FROM offers JOIN offer_revisions ON offer_revisions.id = offers.current_revision_id JOIN tracks ON tracks.id = offers.track_id JOIN license_versions ON license_versions.id = offers.license_version_id JOIN license_templates ON license_templates.id = license_versions.license_template_id WHERE offers.is_active = 1 ORDER BY tracks.slug, offer_revisions.price_minor;
 SQL
 ```
@@ -75,7 +77,7 @@ grep -c '^VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED=true' .env
 PCL-03, the synthetic catalog. Every `found` must be 0:
 
 ```sh
-art db <<'SQL'
+mysql --defaults-extra-file=<OPTION_FILE> <DATABASE> <<'SQL'
 SELECT 'synthetic tracks' AS check_name, COUNT(*) AS found FROM tracks WHERE slug LIKE 'synthetic-rehearsal-%' OR artist = 'Synthetic Test Content'
 UNION ALL SELECT 'synthetic rights declarations', COUNT(*) FROM rights_declarations WHERE provenance_reference LIKE 'SYNTHETIC-REHEARSAL-%'
 UNION ALL SELECT 'synthetic media', COUNT(*) FROM media_assets WHERE original_name LIKE 'synthetic-rehearsal-%'
