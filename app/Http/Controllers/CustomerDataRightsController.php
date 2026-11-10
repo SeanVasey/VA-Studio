@@ -65,21 +65,29 @@ final class CustomerDataRightsController
             if ($body['confirm'] !== true) {
                 throw new DataRightsException(422, 'invalid_request');
             }
-            $result = $principal instanceof ProductionCustomerPrincipal ? $rights->requestProductionDeletion($principal, $actor) : $rights->requestDeletion($principal, $actor);
+            if ($principal instanceof ProductionCustomerPrincipal) {
+                // The customer must acknowledge that closing may end access to remaining downloads (Sean, 2026-11-10).
+                if (($body['acknowledge_download_forfeiture'] ?? null) !== true) {
+                    throw new DataRightsException(422, 'invalid_request');
+                }
+                $result = $rights->requestProductionDeletion($principal, $actor, true);
+            } else {
+                $result = $rights->requestDeletion($principal, $actor);
+            }
 
             return response()->json(['deletion' => $result], $result['replayed'] ? 200 : 201);
-        }, ['confirm']);
+        }, fn (Request $request): array => $request->session()->has('_production_customer_identity') ? ['confirm', 'acknowledge_download_forfeiture'] : ['confirm']);
     }
 
-    /** @param list<string>|null $keys exact JSON object keys for POST bodies; null for reads */
-    private function handle(Request $request, callable $operation, ?array $keys): Response
+    /** @param list<string>|callable(Request): list<string>|null $keys exact JSON object keys for POST bodies (a callable decides from the session); null for reads */
+    private function handle(Request $request, callable $operation, array|callable|null $keys): Response
     {
         try {
             $policy = app(DataRightsPolicy::class);
             if (! $policy->anyEnabled()) {
                 return $this->error(404, 'not_enabled');
             }
-            $body = $keys === null ? [] : $this->body($request, $keys);
+            $body = $keys === null ? [] : $this->body($request, is_array($keys) ? $keys : $keys($request));
             [$principal, $actor] = $this->identity($request, $policy);
             if ($principal === null || $actor === null) {
                 return $this->error(403, 'sign_in_required');

@@ -6,12 +6,16 @@ use App\Domain\Customers\DataRights\CustomerDataRights;
 use App\Domain\Customers\DataRights\DataRightsException;
 use App\Domain\Customers\DataRights\Models\CustomerDataRequest;
 use App\Domain\Customers\DataRights\Models\CustomerDataRequestEvent;
+use App\Domain\Customers\DataRights\ProductionAccountClosure;
 use App\Domain\Customers\DataRights\RetentionReport;
 use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeaturePolicy;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions;
+use App\Filament\Resources\CustomerDataRequestResource\Pages\ListCustomerDataRequests;
 use App\Models\User;
+use App\Support\CanonicalJson;
+use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -19,6 +23,9 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Str;
+use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\ProductionCheckoutJourneyFixture;
 use Tests\Support\ProductionDataRightsFixtures;
 use Tests\TestCase;
@@ -66,7 +73,7 @@ class ProductionDataRightsTest extends TestCase
     {
         $this->signIn($customer);
 
-        return $this->postJson('/account/data-requests/deletion', ['confirm' => true])->assertCreated()->json('deletion.requestId');
+        return $this->postJson('/account/data-requests/deletion', ['confirm' => true, 'acknowledge_download_forfeiture' => true])->assertCreated()->json('deletion.requestId');
     }
 
     private function snapshot(): array
@@ -87,7 +94,7 @@ class ProductionDataRightsTest extends TestCase
             $this->getJson('/account/data-requests'),
             $this->postJson('/account/data-requests/export', ['confirm' => true]),
             $this->postJson('/account/data-requests/export/download', ['requestId' => '00000000-0000-4000-8000-000000000000', 'token' => str_repeat('a', 64)]),
-            $this->postJson('/account/data-requests/deletion', ['confirm' => true]),
+            $this->postJson('/account/data-requests/deletion', ['confirm' => true, 'acknowledge_download_forfeiture' => true]),
         ];
         foreach ([[false, true, true], [true, false, true], ['true', true, true], [1, true, true]] as [$flag, $identity, $unused]) {
             config(['customer-data-rights.enabled' => $flag, 'production-customer-identity.enabled' => $identity]);
@@ -128,7 +135,7 @@ class ProductionDataRightsTest extends TestCase
         $this->withSession(['_customer_access' => ['account_id' => 1, 'access_version' => 1, 'credential_stamp' => 'x'],
             '_production_customer_identity' => ['binding_digest' => $alice['principal']->sessionBindingDigest()]])->actingAs($alice['user'], 'customer');
         $this->getJson('/account/data-requests')->assertForbidden()->assertJsonPath('reason', 'sign_in_required');
-        $this->postJson('/account/data-requests/deletion', ['confirm' => true])->assertForbidden();
+        $this->postJson('/account/data-requests/deletion', ['confirm' => true, 'acknowledge_download_forfeiture' => true])->assertForbidden();
         $this->assertDatabaseCount('customer_data_requests', 0);
     }
 
@@ -141,7 +148,7 @@ class ProductionDataRightsTest extends TestCase
         $staff = $this->staff();
         $this->resetLimits();
         $this->withSession(['_production_customer_identity' => ['binding_digest' => $alice['principal']->sessionBindingDigest()]])->actingAs($staff, 'customer');
-        $this->postJson('/account/data-requests/deletion', ['confirm' => true])->assertForbidden();
+        $this->postJson('/account/data-requests/deletion', ['confirm' => true, 'acknowledge_download_forfeiture' => true])->assertForbidden();
 
         // Another customer's marker on this customer's session; a malformed marker; no marker at all.
         $bob = $this->customer('bob-auth@example.test');
@@ -215,8 +222,8 @@ class ProductionDataRightsTest extends TestCase
     {
         $alice = $this->customer('alice-replay@example.test');
         $this->signIn($alice);
-        $first = $this->postJson('/account/data-requests/deletion', ['confirm' => true])->assertCreated()->json('deletion');
-        $replay = $this->postJson('/account/data-requests/deletion', ['confirm' => true])->assertOk()->json('deletion');
+        $first = $this->postJson('/account/data-requests/deletion', ['confirm' => true, 'acknowledge_download_forfeiture' => true])->assertCreated()->json('deletion');
+        $replay = $this->postJson('/account/data-requests/deletion', ['confirm' => true, 'acknowledge_download_forfeiture' => true])->assertOk()->json('deletion');
         $this->assertSame([$first['requestId'], 'received', false, true], [$replay['requestId'], $replay['state'], $first['replayed'], $replay['replayed']]);
         $this->assertSame(1, CustomerDataRequest::where('kind', 'deletion')->count());
         $this->assertSame(1, CustomerDataRequestEvent::count());
@@ -224,7 +231,7 @@ class ProductionDataRightsTest extends TestCase
         $this->assertTrue($this->accountOf($alice)->active);
 
         app(CustomerDataRights::class)->approveDeletion($first['requestId'], $this->staff(), 0);
-        $this->postJson('/account/data-requests/deletion', ['confirm' => true])->assertForbidden();
+        $this->postJson('/account/data-requests/deletion', ['confirm' => true, 'acknowledge_download_forfeiture' => true])->assertForbidden();
         $this->assertSame(1, CustomerDataRequest::where('kind', 'deletion')->count());
     }
 
@@ -239,7 +246,7 @@ class ProductionDataRightsTest extends TestCase
         $this->assertSame([201, 409, 409, 429], $statuses);
         $statuses = [];
         for ($i = 0; $i < 4; $i++) {
-            $statuses[] = $this->postJson('/account/data-requests/deletion', ['confirm' => true])->getStatusCode();
+            $statuses[] = $this->postJson('/account/data-requests/deletion', ['confirm' => true, 'acknowledge_download_forfeiture' => true])->getStatusCode();
         }
         $this->assertSame([201, 200, 200, 429], $statuses);
         $this->assertSame(1, CustomerDataRequest::where('kind', 'deletion')->count());
@@ -311,7 +318,7 @@ class ProductionDataRightsTest extends TestCase
 
         $this->assertSame('completed', $result['state']);
         $this->assertEquals(['customer_access' => 'withdrawn', 'pending_exports' => 'purged', 'listening_library' => 'none', 'sessions' => 'ended',
-            'sign_in_profile' => 'pseudonymized', 'production_listening_library' => 'erased', 'production_feature_bindings' => 'retained'], $result['actions']);
+            'sign_in_profile' => 'pseudonymized', 'production_listening_library' => 'contents_erased', 'production_feature_bindings' => 'retained'], $result['actions']);
 
         // Erased: the library's contents, as the next version of the same row (the database admits nothing else), and the sign-in.
         $after = DB::table('production_listening_libraries')->orderBy('id')->get()->map(fn ($r) => (array) $r)->all();
@@ -479,7 +486,7 @@ class ProductionDataRightsTest extends TestCase
         $before = [DB::table('customer_data_requests')->count(), DB::table('customer_data_exports')->count(), DB::table('audit_events')->count()];
         // The principal and actor objects still exist (a command that was queued behind the approval holds exactly these). The locked
         // re-read of the identity evidence is what refuses them; the objects themselves prove nothing.
-        foreach ([fn () => $rights->requestProductionExport($alice['principal'], $alice['user']), fn () => $rights->requestProductionDeletion($alice['principal'], $alice['user']),
+        foreach ([fn () => $rights->requestProductionExport($alice['principal'], $alice['user']), fn () => $rights->requestProductionDeletion($alice['principal'], $alice['user'], true),
             fn () => $rights->listProduction($alice['principal'], $alice['user']),
             fn () => $rights->downloadProduction($alice['principal'], $alice['user'], '00000000-0000-4000-8000-000000000000', str_repeat('a', 64))] as $call) {
             try {
@@ -507,7 +514,130 @@ class ProductionDataRightsTest extends TestCase
         $this->signIn($alice);
         $this->getJson('/account/data-requests?accountId='.$bob['principal']->accountId)->assertStatus(422);
         $this->withHeaders(['X-Account-Id' => (string) $bob['principal']->accountId, 'X-Owner-Key' => str_repeat('b', 64)])
-            ->postJson('/account/data-requests/deletion', ['confirm' => true])->assertCreated();
+            ->postJson('/account/data-requests/deletion', ['confirm' => true, 'acknowledge_download_forfeiture' => true])->assertCreated();
         $this->assertSame([$alice['principal']->accountId], CustomerDataRequest::pluck('customer_account_id')->all());
+    }
+
+    public static function badClosureBodies(): array
+    {
+        return [
+            'confirm only' => ['{"confirm":true}'],
+            'acknowledgment missing' => ['{"confirm":true,"acknowledge_download_forfeiture":null}'],
+            'acknowledgment false' => ['{"confirm":true,"acknowledge_download_forfeiture":false}'],
+            'acknowledgment string' => ['{"confirm":true,"acknowledge_download_forfeiture":"true"}'],
+            'acknowledgment only' => ['{"acknowledge_download_forfeiture":true}'],
+            'confirm false' => ['{"confirm":false,"acknowledge_download_forfeiture":true}'],
+            'extra key' => ['{"confirm":true,"acknowledge_download_forfeiture":true,"note":"x"}'],
+            'duplicate key' => ['{"confirm":true,"acknowledge_download_forfeiture":true,"acknowledge_download_forfeiture":true}'],
+        ];
+    }
+
+    #[DataProvider('badClosureBodies')]
+    public function test_a_production_closure_request_needs_exactly_confirm_and_the_download_forfeiture_acknowledgment(string $body): void
+    {
+        $alice = $this->customer('alice-ack-bad@example.test');
+        $this->signIn($alice);
+        $this->call('POST', '/account/data-requests/deletion', [], [], [], ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json'], $body)
+            ->assertStatus(422)->assertJsonPath('reason', 'invalid_request');
+        $this->assertDatabaseCount('customer_data_requests', 0);
+        $this->assertDatabaseCount('customer_data_request_events', 0);
+    }
+
+    public function test_the_acknowledgment_is_sealed_into_the_request_and_shown_to_staff_and_the_service_refuses_a_false_one(): void
+    {
+        $alice = $this->customer('alice-ack@example.test');
+        $request = $this->requestDeletion($alice);
+        $row = CustomerDataRequest::where('public_id', $request)->sole();
+        $event = json_decode(CustomerDataRequestEvent::where('request_id', $row->id)->where('event', 'requested')->sole()->detail, true, 64, JSON_THROW_ON_ERROR);
+        $this->assertEquals(['version' => 'closure-download-forfeiture-v1', 'at' => now()->utc()->toIso8601ZuluString()], $event['download_forfeiture_acknowledgment']);
+        $this->assertEquals($event['download_forfeiture_acknowledgment'], CustomerDataRights::closureAcknowledgment($row));
+        $this->assertSame('closure-download-forfeiture-v1', json_decode((string) DB::table('audit_events')->where('action', 'customer.data_deletion.requested')->value('context'), true)['download_forfeiture_acknowledgment']);
+
+        Livewire::actingAs($this->staff())->test(ListCustomerDataRequests::class)
+            ->assertTableColumnStateSet('closure_acknowledgment', 'closure-download-forfeiture-v1 at '.now()->utc()->toIso8601ZuluString(), $row);
+
+        $bob = $this->customer('bob-ack@example.test');
+        try {
+            app(CustomerDataRights::class)->requestProductionDeletion($bob['principal'], $bob['user'], false);
+            $this->fail('The service refuses a closure request without the acknowledgment.');
+        } catch (DataRightsException $error) {
+            $this->assertSame([422, 'invalid_request'], [$error->status, $error->reason]);
+        }
+        $this->assertSame(1, CustomerDataRequest::count());
+    }
+
+    public function test_approval_refuses_a_production_closure_request_that_lacks_the_acknowledgment(): void
+    {
+        $alice = $this->customer('alice-noack@example.test');
+        $this->populate($alice, 'SYNTHETIC noack playlist');
+        $at = now()->utc();
+        // A request opened before the acknowledgment existed: its sealed `requested` event carries only the kind.
+        $row = CustomerDataRequest::create(['public_id' => (string) Str::uuid(), 'customer_account_id' => $alice['principal']->accountId, 'kind' => 'deletion',
+            'state' => 'received', 'open_slot' => 1, 'version' => 0, 'last_event_sequence' => 0, 'created_at' => $at, 'updated_at' => $at]);
+        $detail = CanonicalJson::encode(['kind' => 'deletion']);
+        CustomerDataRequestEvent::create(['request_id' => $row->id, 'sequence' => 1, 'event' => 'requested', 'actor_user_id' => null,
+            'detail' => $detail, 'detail_hash' => hash('sha256', $detail), 'created_at' => $at]);
+        $row->forceFill(['last_event_sequence' => 1])->save();
+        $this->assertNull(CustomerDataRights::closureAcknowledgment($row->fresh()));
+        $before = [$this->snapshot(), DB::table('production_listening_libraries')->get()->all()];
+
+        try {
+            app(CustomerDataRights::class)->approveDeletion($row->public_id, $this->staff(), 0);
+            $this->fail('An unacknowledged production closure cannot be approved.');
+        } catch (DataRightsException $error) {
+            $this->assertSame([409, 'acknowledgment_missing'], [$error->status, $error->reason]);
+        }
+        $this->assertEquals($before, [$this->snapshot(), DB::table('production_listening_libraries')->get()->all()]);
+        $this->assertTrue($this->accountOf($alice)->active);
+        $this->assertSame('received', $row->fresh()->state);
+    }
+
+    /** @return array{0: int, 1: int, 2: int} order, request and binding ids of a synthetic V2 session row set for an origin */
+    private function taxRows(string $origin, string $tag, string $created, string $expires): array
+    {
+        $common = fn (string $public): array => ['public_id' => $public, 'created_at' => $created, 'payload_ciphertext' => 'synthetic', 'payload_hash' => str_repeat('a', 64),
+            'canonicalization_version' => CanonicalJson::VERSION];
+        $order = DB::table('production_tax_checkout_orders')->insertGetId($common((string) Str::uuid()) + ['buyer_origin_id' => $origin, 'candidate_id' => 1,
+            'request_key' => hash('sha256', 'k'.$tag), 'request_hash' => hash('sha256', 'h'.$tag), 'currency' => 'USD', 'subtotal_minor' => 1000, 'line_count' => 1]);
+        $public = (string) Str::uuid();
+        $request = DB::table('production_tax_checkout_requests')->insertGetId($common($public) + ['order_id' => $order, 'account_id' => 'acct_SYNTHETIC', 'funds_mode' => 'test',
+            'idempotency_key' => 'va-production-tax-checkout-v2-'.$public, 'currency' => 'USD', 'subtotal_minor' => 1000, 'tax_behavior' => 'exclusive',
+            'maximum_rate_bps' => 2500, 'provider_expires_at' => $expires]);
+        $binding = DB::table('production_tax_checkout_bindings')->insertGetId($common((string) Str::uuid()) + ['request_id' => $request, 'account_id' => 'acct_SYNTHETIC',
+            'funds_mode' => 'test', 'provider_session_id' => 'cs_test_SYNTHETIC'.$tag]);
+
+        return [$order, $request, $binding];
+    }
+
+    public function test_an_unpaid_v2_tax_checkout_session_holds_the_closure_until_it_expired_or_was_paid(): void
+    {
+        $iso = fn (CarbonImmutable $t): string => $t->utc()->format('Y-m-d\TH:i:s\Z');
+        $now = CarbonImmutable::now('UTC');
+        $closure = new ProductionAccountClosure;
+
+        $open = $this->customer('alice-tax-open@example.test');
+        $this->assertSame([], $closure->holds($this->accountOf($open)), 'No V2 order at all.');
+        $this->taxRows($open['binding']['origin_id'], 'o', $iso($now->subMinutes(10)), $iso($now->addMinutes(20)));
+        $this->assertSame(['unpaid_tax_checkout_session'], $closure->holds($this->accountOf($open)), 'The provider session is still open.');
+
+        // Expired a minute ago: still inside the reconcile grace, so a late payment event can still be recorded.
+        $grace = $this->customer('alice-tax-grace@example.test');
+        $this->taxRows($grace['binding']['origin_id'], 'g', $iso($now->subHour()), $iso($now->subMinute()));
+        $this->assertSame(['unpaid_tax_checkout_session'], $closure->holds($this->accountOf($grace)));
+
+        // Expired past the grace and never paid: abandoned, no hold.
+        $expired = $this->customer('alice-tax-expired@example.test');
+        $this->taxRows($expired['binding']['origin_id'], 'e', $iso($now->subHours(3)), $iso($now->subSeconds(ProductionAccountClosure::TAX_SESSION_RECONCILE_GRACE_SECONDS + 60)));
+        $this->assertSame([], $closure->holds($this->accountOf($expired)));
+
+        // A reviewed (paid) session never holds, even though its provider expiry has not passed.
+        $paid = $this->customer('alice-tax-paid@example.test');
+        [$order, $request, $binding] = $this->taxRows($paid['binding']['origin_id'], 'p', $iso($now->subMinutes(10)), $iso($now->addMinutes(20)));
+        $this->assertSame(['unpaid_tax_checkout_session'], $closure->holds($this->accountOf($paid)), 'Unpaid until reviewed.');
+        DB::table('production_tax_checkout_reviewed_sessions')->insert(['public_id' => (string) Str::uuid(), 'created_at' => $iso($now->subMinutes(5)), 'payload_ciphertext' => 'synthetic',
+            'payload_hash' => str_repeat('a', 64), 'canonicalization_version' => CanonicalJson::VERSION, 'binding_id' => $binding, 'request_id' => $request, 'order_id' => $order,
+            'account_id' => 'acct_SYNTHETIC', 'funds_mode' => 'test', 'provider_session_id' => 'cs_test_SYNTHETICp', 'provider_payment_id' => 'pi_SYNTHETIC', 'currency' => 'USD',
+            'tax_behavior' => 'exclusive', 'amount_subtotal_minor' => 1000, 'amount_tax_minor' => 100, 'amount_total_minor' => 1100, 'observed_at' => $iso($now->subMinutes(6))]);
+        $this->assertSame([], $closure->holds($this->accountOf($paid)));
     }
 }

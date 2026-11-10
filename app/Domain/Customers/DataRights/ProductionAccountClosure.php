@@ -24,6 +24,15 @@ final class ProductionAccountClosure
     /** Observation kind that proves a V1 provider session ended unpaid (RetentionSchedule::PRODUCTION_ABANDONED_KIND). */
     private const EXPIRED = RetentionSchedule::PRODUCTION_ABANDONED_KIND;
 
+    /** Version of the closure acknowledgment text a customer agrees to (Sean, 2026-11-10); sealed into the request's `requested` event. */
+    public const ACKNOWLEDGMENT_VERSION = 'closure-download-forfeiture-v1';
+
+    /**
+     * Seconds past a V2 (tax chain) session's `provider_expires_at` during which closure still holds: a payment event delivered at
+     * the very end of the session lifetime may be recorded a little later. An operational margin chosen here, not a provider value.
+     */
+    public const TAX_SESSION_RECONCILE_GRACE_SECONDS = 3600;
+
     /** Whether the account is a production customer account: it has its one production identity origin. */
     public static function isProduction(CustomerAccount $account): bool
     {
@@ -35,8 +44,10 @@ final class ProductionAccountClosure
      * order history depend on, so an unpaid session that may still complete, or a refund or dispute that is not settled, makes
      * approval refuse until staff can retry. Nothing here reads a provider; it fails closed on what the store has recorded.
      *
-     * Known gap: the V2 tax checkout chain keeps no payment table of its own that this reads, so an in-flight V2 session is not
-     * detected here (the chain is gated off and takes no live payment; BL-42 wires it to the refund and dispute ledger).
+     * The V2 tax checkout chain is covered by timing: its paid record is `production_tax_checkout_reviewed_sessions`, so an order with
+     * a request, no reviewed session, and a `provider_expires_at` (plus `TAX_SESSION_RECONCILE_GRACE_SECONDS`) not yet passed may
+     * still be paid and holds as `unpaid_tax_checkout_session`. Known gap: after that window an unpaid V2 session is treated as
+     * abandoned without a provider read (nothing here reads a provider); a late payment would surface through the refund ledger.
      *
      * @return list<string>
      */
@@ -46,6 +57,9 @@ final class ProductionAccountClosure
         $origin = ProductionCheckoutExportSection::origin($account->id);
         if ($origin !== null && $this->unpaidSession($origin)) {
             $holds[] = 'unpaid_checkout_session';
+        }
+        if ($origin !== null && $this->unpaidTaxSession($origin)) {
+            $holds[] = 'unpaid_tax_checkout_session';
         }
         $orders = $this->orderIds($account);
         if ($orders !== [] && $this->openRefundOrDispute($orders)) {
@@ -68,6 +82,17 @@ final class ProductionAccountClosure
                         ->whereNotExists(fn ($n) => $n->selectRaw('1')->from('production_checkout_observations as y')
                             ->whereColumn('y.intent_id', 'x.intent_id')->whereColumn('y.sequence', '>', 'x.sequence')));
             })->exists();
+    }
+
+    /** A V2 order of the origin with a session request, no reviewed (paid) session, whose provider session may still complete. */
+    private function unpaidTaxSession(string $origin): bool
+    {
+        $cutoff = CarbonImmutable::now('UTC')->subSeconds(self::TAX_SESSION_RECONCILE_GRACE_SECONDS)->format('Y-m-d\TH:i:s\Z');
+
+        return DB::table('production_tax_checkout_orders as o')->join('production_tax_checkout_requests as r', 'r.order_id', '=', 'o.id')
+            ->where('o.buyer_origin_id', $origin)
+            ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('production_tax_checkout_reviewed_sessions as s')->whereColumn('s.order_id', 'o.id'))
+            ->where('r.provider_expires_at', '>', $cutoff)->exists();
     }
 
     /** @return list<int> the account's orders: by owner key, or by a saved purchase claim */
@@ -112,7 +137,7 @@ final class ProductionAccountClosure
      * binding refuses every UPDATE, and the binding is the key of the retained consent ledger (`production_consent_events`, which
      * references it with ON DELETE RESTRICT). They hold no listening content: ids, a hash and a sealed account binding.
      *
-     * @return array{library: string, bindings: int} `erased` or `none`, and how many feature bindings remain
+     * @return array{library: string, bindings: int} `contents_erased` or `none`, and how many feature bindings remain
      */
     public function eraseLibrary(CustomerAccount $account, CarbonImmutable $at): array
     {
@@ -135,7 +160,7 @@ final class ProductionAccountClosure
                     ->update(['payload' => $payload, 'version' => (int) $row->version + 1, 'updated_at' => $updated]) !== 1) {
                     throw new DataRightsException(503, 'library_erasure_failed');
                 }
-                $erased = 'erased';
+                $erased = 'contents_erased';
             }
         }
 

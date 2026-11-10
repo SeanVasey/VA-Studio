@@ -193,25 +193,50 @@ class CustomerDataRights
         return $this->deletionFor($principal, $actor);
     }
 
-    public function requestProductionDeletion(ProductionCustomerPrincipal $principal, User $actor): array
+    /**
+     * A production closure request must carry the customer's acknowledgment that closing may end access to remaining downloads
+     * (Sean, 2026-11-10; `ProductionAccountClosure::ACKNOWLEDGMENT_VERSION`). It is sealed into the request's `requested` event.
+     */
+    public function requestProductionDeletion(ProductionCustomerPrincipal $principal, User $actor, bool $acknowledgedDownloadForfeiture): array
     {
-        return $this->deletionFor($principal, $actor);
+        if (! $acknowledgedDownloadForfeiture) {
+            throw new DataRightsException(422, 'invalid_request');
+        }
+
+        return $this->deletionFor($principal, $actor, true);
     }
 
-    private function deletionFor(CustomerPrincipal|ProductionCustomerPrincipal $principal, User $actor): array
+    /**
+     * The acknowledgment sealed into a request when it was made: its text version and the time, or null when none was given.
+     *
+     * @return array{version: string, at: string}|null
+     */
+    public static function closureAcknowledgment(CustomerDataRequest $request): ?array
+    {
+        $detail = CustomerDataRequestEvent::where('request_id', $request->id)->where('event', 'requested')->orderBy('sequence')->value('detail');
+        $decoded = is_string($detail) ? json_decode($detail, true) : null;
+        $ack = is_array($decoded) ? ($decoded['download_forfeiture_acknowledgment'] ?? null) : null;
+
+        return is_array($ack) && is_string($ack['version'] ?? null) && is_string($ack['at'] ?? null)
+            ? ['version' => $ack['version'], 'at' => $ack['at']] : null;
+    }
+
+    private function deletionFor(CustomerPrincipal|ProductionCustomerPrincipal $principal, User $actor, bool $acknowledged = false): array
     {
         $this->admit($principal);
         $this->outside();
 
-        return $this->transaction(function () use ($principal, $actor): array {
+        return $this->transaction(function () use ($principal, $actor, $acknowledged): array {
             [$user, $account] = $this->lockCustomer($principal, $actor);
             $open = CustomerDataRequest::where('customer_account_id', $account->id)->where('kind', 'deletion')->where('open_slot', 1)->first();
             if ($open !== null) {
                 return ['requestId' => $open->public_id, 'state' => $open->state, 'replayed' => true];
             }
             $at = $this->now();
-            $request = $this->open($account, 'deletion', (string) Str::uuid(), $at);
-            AuditEvent::recordAttributed('customer.data_deletion.requested', $request, ['request_id' => $request->public_id], $user->id);
+            $request = $this->open($account, 'deletion', (string) Str::uuid(), $at, $acknowledged ? ['download_forfeiture_acknowledgment' => [
+                'version' => ProductionAccountClosure::ACKNOWLEDGMENT_VERSION, 'at' => $at->toIso8601ZuluString()]] : []);
+            AuditEvent::recordAttributed('customer.data_deletion.requested', $request, ['request_id' => $request->public_id]
+                + ($acknowledged ? ['download_forfeiture_acknowledgment' => ProductionAccountClosure::ACKNOWLEDGMENT_VERSION] : []), $user->id);
 
             return ['requestId' => $request->public_id, 'state' => $request->state, 'replayed' => false];
         });
@@ -273,6 +298,10 @@ class CustomerDataRights
             // test account the test customer policy. Neither admits the other's accounts.
             $closure = ProductionAccountClosure::isProduction($account) ? new ProductionAccountClosure : null;
             $closure === null ? $policy->requireEnabled() : $policy->requireProductionEnabled();
+            if ($closure !== null && self::closureAcknowledgment($request) === null) {
+                // A production closure the customer never acknowledged cannot be approved (Sean, 2026-11-10); staff reject it instead.
+                throw new DataRightsException(409, 'acknowledgment_missing');
+            }
             if ($closure?->holds($account)) {
                 // Commerce still in flight: nothing has changed, and staff can approve again once it settles.
                 throw new DataRightsException(409, 'open_commerce');
@@ -428,7 +457,7 @@ class CustomerDataRights
         $this->event($request, 'export_expired', null, ['expires_at' => $export->expires_at->toIso8601ZuluString(), 'reason' => $reason], $at);
     }
 
-    private function open(CustomerAccount $account, string $kind, string $publicId, CarbonImmutable $at): CustomerDataRequest
+    private function open(CustomerAccount $account, string $kind, string $publicId, CarbonImmutable $at, array $extra = []): CustomerDataRequest
     {
         try {
             $request = CustomerDataRequest::create(['public_id' => $publicId, 'customer_account_id' => $account->id, 'kind' => $kind,
@@ -442,7 +471,7 @@ class CustomerDataRights
             }
             throw $error;
         }
-        $this->event($request, 'requested', null, ['kind' => $kind], $at);
+        $this->event($request, 'requested', null, ['kind' => $kind] + $extra, $at);
 
         return $request;
     }

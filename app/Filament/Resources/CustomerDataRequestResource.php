@@ -42,6 +42,15 @@ final class CustomerDataRequestResource extends ReadOnlyCommerceResource
                 TextColumn::make('kind')->label('Kind')->badge(),
                 TextColumn::make('state')->label('State')->badge(),
                 TextColumn::make('customer_account_id')->label('Account')->formatStateUsing(fn (int $state): string => '#'.$state),
+                TextColumn::make('closure_acknowledgment')->label('Download-forfeiture acknowledgment')
+                    ->state(function (CustomerDataRequest $record): ?string {
+                        if ($record->kind !== 'deletion') {
+                            return null;
+                        }
+                        $ack = CustomerDataRights::closureAcknowledgment($record);
+
+                        return $ack === null ? 'Not given' : $ack['version'].' at '.$ack['at'];
+                    })->placeholder('Not applicable'),
                 TextColumn::make('created_at')->label('Requested (UTC)')->dateTime('Y-m-d H:i', 'UTC')->sortable(),
                 TextColumn::make('resolved_at')->label('Resolved (UTC)')->dateTime('Y-m-d H:i', 'UTC')->placeholder('Open'),
             ])
@@ -98,6 +107,7 @@ final class CustomerDataRequestResource extends ReadOnlyCommerceResource
             Notification::make()->danger()->title('Request not changed')->body(match ($error->reason) {
                 'retention_policy_unset' => 'The retention schedule is not configured. Configure the approved schedule before approving deletions.',
                 'request_changed' => 'This request changed after you opened the confirmation. Refresh the list.',
+                'acknowledgment_missing' => 'This production closure request does not carry the customer\'s acknowledgment that closing may end access to remaining downloads, so it cannot be approved. Nothing was changed. Reject it and ask the customer to make a new request.',
                 'staff_account' => 'Staff accounts are never erased through customer requests.',
                 'open_commerce' => 'This production customer has a checkout that may still complete, or a refund or dispute that is not settled. Nothing was changed. Approve again once it is resolved.',
                 default => 'The request could not be resolved.',

@@ -79,7 +79,7 @@ try {
         'export' => $production ? $rights->requestProductionExport($principal, $actor) : $rights->requestExport($principal, $actor),
         'download' => $production ? $rights->downloadProduction($principal, $actor, $input['request_id'], $input['token'])
             : $rights->download($principal, $actor, $input['request_id'], $input['token']),
-        'deletion' => $production ? $rights->requestProductionDeletion($principal, $actor) : $rights->requestDeletion($principal, $actor),
+        'deletion' => $production ? $rights->requestProductionDeletion($principal, $actor, true) : $rights->requestDeletion($principal, $actor),
         'approve' => $rights->approveDeletion($input['request_id'], $actor, $input['version']),
         default => throw new LogicException('Unknown customer data rights operation.'),
     };

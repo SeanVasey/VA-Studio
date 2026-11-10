@@ -70,7 +70,7 @@ class ProductionDataRightsConcurrencyTest extends TestCase
     {
         $alice = $this->populated('alice-native@example.test');
         $this->signIn($alice);
-        $request = app(CustomerDataRights::class)->requestProductionDeletion($alice['principal'], $alice['user'])['requestId'];
+        $request = app(CustomerDataRights::class)->requestProductionDeletion($alice['principal'], $alice['user'], true)['requestId'];
         $staff = $this->staff();
         $result = $this->race(['operation' => 'approve', 'production' => true, 'actor_id' => $staff->id, 'request_id' => $request, 'version' => 0], $alice['user']->id,
             function () use ($alice): void {
@@ -88,7 +88,7 @@ class ProductionDataRightsConcurrencyTest extends TestCase
                     'expires_at' => $now->copy()->addMinutes(15), 'created_at' => $now]);
             });
         $this->assertSame('saved', $result['result'], json_encode($result));
-        $this->assertSame(['purged', 'erased', 'retained'], [$result['value']['actions']['pending_exports'], $result['value']['actions']['production_listening_library'],
+        $this->assertSame(['purged', 'contents_erased', 'retained'], [$result['value']['actions']['pending_exports'], $result['value']['actions']['production_listening_library'],
             $result['value']['actions']['production_feature_bindings']]);
         $export = DB::table('customer_data_requests')->where('public_id', '77777777-7777-4777-8777-777777777777')->sole();
         $this->assertSame(['expired', null], [$export->state, $export->open_slot]);
@@ -116,7 +116,7 @@ class ProductionDataRightsConcurrencyTest extends TestCase
     {
         $alice = $this->populated('alice-late@example.test');
         $this->signIn($alice);
-        $first = app(CustomerDataRights::class)->requestProductionDeletion($alice['principal'], $alice['user'])['requestId'];
+        $first = app(CustomerDataRights::class)->requestProductionDeletion($alice['principal'], $alice['user'], true)['requestId'];
         $staff = $this->staff();
         $result = $this->race(['operation' => 'deletion', 'production' => true, 'mint' => $alice['user']->id, 'actor_id' => $alice['user']->id], $alice['user']->id,
             function () use ($first, $staff): void {
