@@ -29,7 +29,7 @@ An existing prepared order must still have verified pending resource bindings. I
 
 `CheckoutEvidence` accepts USD fixed test tax at exactly zero, tied to the same Stripe account. The retained total must be 50–99,999,999 minor units. Every line has quantity one, zero tax and a total equal to its post-discount tax basis. That basis becomes Stripe `unit_amount`; existing local discounts are already reflected in the line amounts. Stripe promotion codes, automatic tax and adaptive pricing are disabled. No second provider discount is applied.
 
-The request uses payment mode, card only, generic numbered test-license product names and opaque order/attempt/intent metadata on both session and PaymentIntent creation data. It does not send retained buyer identity or full license terms. API version is pinned to `2026-08-26.dahlia`. This narrow mapping does not implement production tax, refunds, invoicing, customer verification or additional payment methods.
+The request uses payment mode, `card` and `link` only (Apple Pay and Google Pay appear under `card`; no delayed-settlement method is ever requested or accepted, and the session and PaymentIntent must report exactly the requested set), generic numbered test-license product names and opaque order/attempt/intent metadata on both session and PaymentIntent creation data. It does not send retained buyer identity or full license terms. API version is pinned to `2026-08-26.dahlia`. This narrow mapping does not implement production tax, refunds, invoicing, customer verification or payment methods beyond `card` and `link`.
 
 ## Durable intent and provider boundary
 

@@ -3,6 +3,7 @@
 namespace App\Domain\Commerce\Payments;
 
 use App\Domain\Commerce\Checkout\CheckoutEvidence;
+use App\Domain\Commerce\Checkout\CheckoutPaymentMethods;
 use App\Domain\Commerce\Models\CheckoutSession;
 use App\Domain\Commerce\Models\VerifiedPayment;
 use App\Support\CanonicalJson;
@@ -25,7 +26,7 @@ final class PaymentEvidence
                 || ! is_int($payment['amount_received'] ?? null) || $payment['amount_received'] < 0 || $payment['amount_received'] > $total
                 || ! is_int($payment['amount_capturable'] ?? null) || $payment['amount_capturable'] < 0 || $payment['amount_capturable'] > $total
                 || CanonicalJson::encode($payment['metadata'] ?? null) !== CanonicalJson::encode($request['params']['payment_intent_data']['metadata'])
-                || ($payment['payment_method_types'] ?? null) !== ['card']
+                || ! CheckoutPaymentMethods::matchesRequest($payment['payment_method_types'] ?? null, $request)
                 || ! in_array($payment['status'] ?? null, ['requires_payment_method', 'requires_confirmation', 'requires_action', 'processing', 'requires_capture', 'canceled', 'succeeded'], true)
                 || ! in_array($payment['capture_method'] ?? null, ['automatic', 'automatic_async', 'manual'], true)
                 || (isset($payment['confirmation_method']) && $payment['confirmation_method'] !== 'automatic')) {
@@ -93,7 +94,7 @@ final class PaymentEvidence
             || ($payload['payment']['object'] ?? null) !== 'payment_intent' || ($payload['payment']['livemode'] ?? null) !== false
             || ($payload['payment']['currency'] ?? null) !== 'usd' || ($payload['payment']['amount'] ?? null) !== $total
             || ($payload['payment']['amount_received'] ?? null) !== $total || ($payload['payment']['amount_capturable'] ?? null) !== 0
-            || ($payload['payment']['payment_method_types'] ?? null) !== ['card']
+            || ! CheckoutPaymentMethods::matchesRequest($payload['payment']['payment_method_types'] ?? null, $request)
             || ! in_array($payload['payment']['capture_method'] ?? null, ['automatic', 'automatic_async', 'manual'], true)
             || CanonicalJson::encode($payload['payment']['metadata'] ?? null) !== CanonicalJson::encode($request['params']['metadata'])
             || ($payload['payment']['status'] ?? null) !== 'succeeded' || ($payload['amount_minor'] ?? null) !== $payment->amount_minor

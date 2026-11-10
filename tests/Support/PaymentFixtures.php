@@ -2,6 +2,7 @@
 
 namespace Tests\Support;
 
+use App\Domain\Commerce\Checkout\CheckoutPaymentMethods;
 use App\Domain\Commerce\Checkout\HostedCheckout;
 use App\Domain\Commerce\Models\CheckoutIntent;
 use App\Domain\Commerce\Models\StripeWebhookReceipt;
@@ -38,7 +39,7 @@ final class PaymentFixtures
         return ['object' => 'payment_intent', 'id' => self::PAYMENT, 'livemode' => false, 'currency' => 'usd',
             'amount' => $session['amount_total'], 'amount_received' => $session['amount_total'], 'amount_capturable' => 0,
             'status' => 'succeeded', 'capture_method' => 'automatic', 'confirmation_method' => 'automatic',
-            'payment_method_types' => ['card'], 'metadata' => $session['metadata'],
+            'payment_method_types' => $session['payment_method_types'] ?? CheckoutPaymentMethods::offered(), 'metadata' => $session['metadata'],
             'latest_charge' => 'ch_SYNTHETICCHARGE'];
     }
 

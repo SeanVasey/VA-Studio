@@ -91,7 +91,7 @@ class HostedCheckoutTest extends TestCase
         $calls = $this->creates(); $this->assertCount(1, $calls); $params = $calls[0]['params'];
         $this->assertSame(1, $calls[0]['intent_count']);
         foreach ($this->gateway->calls as $call) { $this->assertSame(0, $call['transaction_level']); }
-        $this->assertSame('payment', $params['mode']); $this->assertSame(['card'], $params['payment_method_types']);
+        $this->assertSame('payment', $params['mode']); $this->assertSame(['card', 'link'], $params['payment_method_types']);
         $this->assertSame($result['totalMinor'], array_sum(array_map(fn ($line) => $line['price_data']['unit_amount'] * $line['quantity'], $params['line_items'])));
         $this->assertSame(1, $params['line_items'][0]['quantity']); $this->assertSame('usd', $params['line_items'][0]['price_data']['currency']);
         $this->assertSame($f['order']->public_id, $params['client_reference_id']);

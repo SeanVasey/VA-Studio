@@ -34,7 +34,7 @@ final class CheckoutEvidence
         }
         $metadata = ['order_id' => $order->public_id, 'attempt_id' => $orderEvidence['attempt_id'], 'intent_id' => $intentId, 'schema_version' => '1'];
         $return = $policy['return_origin'].'/orders/'.$order->public_id.'/checkout/return';
-        $params = ['mode' => 'payment', 'payment_method_types' => ['card'], 'client_reference_id' => $order->public_id,
+        $params = ['mode' => 'payment', 'payment_method_types' => CheckoutPaymentMethods::offered(), 'client_reference_id' => $order->public_id,
             'metadata' => $metadata, 'payment_intent_data' => ['metadata' => $metadata], 'line_items' => $items,
             'automatic_tax' => ['enabled' => false], 'adaptive_pricing' => ['enabled' => false], 'allow_promotion_codes' => false,
             'customer_creation' => 'if_required', 'success_url' => $return, 'cancel_url' => $return,
@@ -101,7 +101,7 @@ final class CheckoutEvidence
             ($session['expires_at'] ?? null) !== $params['expires_at'] ||
             ($session['total_details']['amount_discount'] ?? null) !== 0 || ($session['total_details']['amount_tax'] ?? null) !== 0 ||
             ($session['total_details']['amount_shipping'] ?? null) !== 0 || ($session['automatic_tax']['enabled'] ?? null) !== false ||
-            ($session['payment_method_types'] ?? null) !== ['card'] ||
+            ! CheckoutPaymentMethods::matchesRequest($session['payment_method_types'] ?? null, $request) ||
             ! in_array($status, ['open', 'complete', 'expired'], true) ||
             ! in_array($session['payment_status'] ?? null, ['paid', 'unpaid', 'no_payment_required'], true) ||
             ($session['line_items']['has_more'] ?? null) !== false || ! is_array($session['line_items']['data'] ?? null) ||

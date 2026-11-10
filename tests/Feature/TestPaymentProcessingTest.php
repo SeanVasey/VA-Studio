@@ -141,7 +141,7 @@ class TestPaymentProcessingTest extends TestCase
             'payment_partial' => $this->gateway->payment['amount_received']--,
             'payment_capturable' => $this->gateway->payment['amount_capturable'] = 1,
             'payment_metadata' => $this->gateway->payment['metadata']['order_id'] = (string) Str::uuid(),
-            'payment_method' => $this->gateway->payment['payment_method_types'] = ['card', 'link'],
+            'payment_method' => $this->gateway->payment['payment_method_types'] = ['card', 'klarna'],
             'payment_account' => $this->gateway->payment['on_behalf_of'] = 'acct_DIFFERENT',
             'payment_context' => $this->gateway->payment['transfer_data'] = ['destination' => 'acct_DIFFERENT'],
             'future_usage' => $this->gateway->payment['setup_future_usage'] = 'off_session',

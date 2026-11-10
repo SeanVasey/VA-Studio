@@ -2,6 +2,7 @@
 
 namespace App\Domain\Commerce\ProductionCheckout;
 
+use App\Domain\Commerce\Checkout\CheckoutPaymentMethods;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 
@@ -34,7 +35,7 @@ final class HostedEvidence
                     'metadata' => ['line_id' => $line['public_id'], 'line_hash' => CanonicalJson::hash($line)]]]];
         }
         $return = $context->returnOrigin.'/production/checkout/orders/'.$order['row']['public_id'].'/return';
-        $params = ['mode' => 'payment', 'payment_method_types' => ['card'], 'client_reference_id' => $order['row']['public_id'], 'metadata' => $metadata,
+        $params = ['mode' => 'payment', 'payment_method_types' => CheckoutPaymentMethods::offered(), 'client_reference_id' => $order['row']['public_id'], 'metadata' => $metadata,
             'payment_intent_data' => ['metadata' => $metadata, 'capture_method' => $context->captureMethod], 'line_items' => $items,
             'automatic_tax' => ['enabled' => false], 'adaptive_pricing' => ['enabled' => false], 'allow_promotion_codes' => false,
             'customer_creation' => 'if_required', 'success_url' => $return, 'cancel_url' => $return,
@@ -126,7 +127,7 @@ final class HostedEvidence
             && ($session['amount_subtotal'] ?? null) === $total && ($session['amount_total'] ?? null) === $total
             && ($session['expires_at'] ?? null) === $params['expires_at'] && ($session['total_details']['amount_discount'] ?? null) === 0
             && ($session['total_details']['amount_tax'] ?? null) === 0 && ($session['total_details']['amount_shipping'] ?? null) === 0
-            && ($session['automatic_tax']['enabled'] ?? null) === false && ($session['payment_method_types'] ?? null) === ['card']
+            && ($session['automatic_tax']['enabled'] ?? null) === false && CheckoutPaymentMethods::matchesRequest($session['payment_method_types'] ?? null, $request)
             && in_array($session['status'] ?? null, ['open', 'complete', 'expired'], true)
             && in_array($session['payment_status'] ?? null, ['paid', 'unpaid'], true)
             && ($session['line_items']['object'] ?? null) === 'list' && ($session['line_items']['has_more'] ?? null) === false
@@ -176,7 +177,7 @@ final class HostedEvidence
                 && ($payment['livemode'] ?? null) === ($request['execution_context']['funds_mode'] === 'live') && ($payment['currency'] ?? null) === 'usd'
                 && ($payment['amount'] ?? null) === $total && is_int($payment['amount_received'] ?? null) && $payment['amount_received'] >= 0 && $payment['amount_received'] <= $total
                 && is_int($payment['amount_capturable'] ?? null) && $payment['amount_capturable'] >= 0 && $payment['amount_capturable'] <= $total
-                && ($payment['capture_method'] ?? null) === $request['execution_context']['capture_method'] && ($payment['payment_method_types'] ?? null) === ['card']
+                && ($payment['capture_method'] ?? null) === $request['execution_context']['capture_method'] && CheckoutPaymentMethods::matchesRequest($payment['payment_method_types'] ?? null, $request)
                 && in_array($payment['status'] ?? null, ['requires_payment_method', 'requires_confirmation', 'requires_action', 'processing', 'requires_capture', 'canceled', 'succeeded'], true));
             Evidence::same($request['params']['payment_intent_data']['metadata'], $payment['metadata'] ?? null);
             foreach (['account', 'context', 'application', 'application_fee_amount', 'on_behalf_of', 'transfer_data', 'transfer_group', 'setup_future_usage'] as $field) {

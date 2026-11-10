@@ -70,7 +70,7 @@ final class CheckoutFixtures
             'status' => 'open', 'payment_status' => 'unpaid', 'expires_at' => $params['expires_at'],
             'amount_subtotal' => $total, 'amount_total' => $total,
             'total_details' => ['amount_discount' => 0, 'amount_shipping' => 0, 'amount_tax' => 0],
-            'automatic_tax' => ['enabled' => false], 'payment_method_types' => ['card'],
+            'automatic_tax' => ['enabled' => false], 'payment_method_types' => $params['payment_method_types'],
             'line_items' => ['object' => 'list', 'has_more' => false, 'data' => $lines],
             'url' => 'https://checkout.stripe.com/c/pay/'.$id, 'payment_intent' => null];
     }
