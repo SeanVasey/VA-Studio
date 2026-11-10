@@ -23,7 +23,7 @@ final class StripeInboxStatus extends Command
         }
         $receipts = StripeWebhookReceipt::query()->where('account_id', $account)->where('livemode', false);
         $this->line('Test receipts retained: '.$receipts->count());
-        $this->line('Receipt storage only. Payment reconciliation and order finalization are not implemented yet.');
+        $this->line('Receipts are locators only: payment is verified by Stripe API reads, and finalization runs through the queue workers or the test-commerce pipeline.');
         $this->table(['Event', 'Type', 'Object', 'Received UTC'], $receipts->orderByDesc('id')->limit((int) $limit)
             ->get(['event_id', 'event_type', 'object_id', 'received_at'])
             ->map(fn (StripeWebhookReceipt $receipt) => [$receipt->event_id, $receipt->event_type, $receipt->object_id ?? '(none)', $receipt->received_at->utc()->toIso8601String()])->all());

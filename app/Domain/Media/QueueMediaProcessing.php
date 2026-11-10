@@ -32,7 +32,7 @@ class QueueMediaProcessing
             } catch (MediaFailure $failure) {
                 throw ValidationException::withMessages(['media' => $failure->getMessage()]);
             }
-            $maxBytes = (int) config($source->role === 'artwork' ? 'media.max_artwork_bytes' : 'media.max_source_bytes');
+            $maxBytes = (int) config(MediaProcessor::sourceLimitKey($source->role));
             if (filesize($path) < 12 || filesize($path) > $maxBytes) {
                 throw ValidationException::withMessages(['media' => 'The upload is empty or exceeds the role size limit.']);
             }

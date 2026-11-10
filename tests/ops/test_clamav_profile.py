@@ -37,8 +37,8 @@ class Configuration(unittest.TestCase):
 
     def test_documented_limits_and_socket(self):
         s = {key: values[0] for key, values in settings(CONF).items()}
-        self.assertEqual(s["MaxFileSize"], "1280M")
-        self.assertEqual(s["MaxScanSize"], "1280M")
+        self.assertEqual(s["MaxFileSize"], "2047M")
+        self.assertEqual(s["MaxScanSize"], "2047M")
         self.assertEqual(s["MaxFileSize"], s["MaxScanSize"])
         self.assertEqual(s["AlertExceedsMax"], "yes")
         self.assertEqual(s["MaxScanTime"], "240000")
@@ -50,7 +50,7 @@ class Configuration(unittest.TestCase):
         self.assertEqual(s["User"], "clamav")
 
     def test_values_match_the_guide_the_application_documents(self):
-        for needle in ("`1280M` and `1280M`", "`AlertExceedsMax` | `yes`", "`MaxScanTime` | `240000`",
+        for needle in ("`2047M` and `2047M`", "`AlertExceedsMax` | `yes`", "`MaxScanTime` | `240000`",
                        "`LocalSocket` | `/run/clamav/clamd.ctl`", "`clamav`, the daemon's own group, and `660`",
                        "`EnableVersionCommand` | `yes`", "`TemporaryDirectory` | a disk-backed directory"):
             self.assertIn(needle, GUIDE)
@@ -75,7 +75,7 @@ class Configuration(unittest.TestCase):
             shutil.copy(CLAMAV / "clamd.conf", Path(directory) / "clamd.conf")
             result = subprocess.run(["clamconf", "-c", directory, "-n"], capture_output=True, text=True)
             self.assertNotIn("ERROR", result.stdout + result.stderr)
-            self.assertIn('MaxScanSize = "1342177280"', result.stdout)  # 1280 MiB
+            self.assertIn('MaxScanSize = "2146435072"', result.stdout)  # 2047 MiB
             self.assertIn('AlertExceedsMax = "yes"', result.stdout)
             (Path(directory) / "clamd.conf").write_text(CONF + "NotAnOption yes\n")
             rejected = subprocess.run(["clamconf", "-c", directory, "-n"], capture_output=True, text=True)

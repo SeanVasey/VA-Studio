@@ -2,6 +2,7 @@
 
 use App\Http\AccountFeatures\AccountFeatureHttpKernel;
 use App\Http\AccountFeatures\AccountFeaturePrivacy;
+use App\Http\Membership\MembershipPrivacy;
 use App\Http\Middleware\CustomerPrivacy;
 use App\Http\Middleware\ExplicitTrustProxies;
 use App\Http\Middleware\FreeGrantPrivacy;
@@ -10,6 +11,7 @@ use App\Http\Middleware\InquiryPrivacy;
 use App\Http\Middleware\LegacyRedirects;
 use App\Http\Middleware\PaidGrantPrivacy;
 use App\Http\Middleware\PaidTaxPrivacy;
+use App\Http\Middleware\PrintfulWebhookBodyLimit;
 use App\Http\Middleware\PrivateTrackReviewPrivacy;
 use App\Http\Middleware\ProductionCheckoutPrivacy;
 use App\Http\Middleware\ProductionIdentity\IdentityPrivacy;
@@ -21,7 +23,6 @@ use App\Http\Middleware\SupportAttachmentPrivacy;
 use App\Http\Middleware\TaxRootPrivacy;
 use App\Http\Middleware\TestDeliveryPrivacy;
 use App\Http\Middleware\TestExceptionResolutionPrivacy;
-use App\Http\Membership\MembershipPrivacy;
 use App\Http\ProductionFree\ProductionFreePrivacy;
 use App\Http\Responses\InquiryResponse;
 use App\Http\Responses\ProductionCheckoutResponse;
@@ -54,6 +55,7 @@ $application = Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(StripeWebhookBodyLimit::class);
+        $middleware->prepend(PrintfulWebhookBodyLimit::class);
         $middleware->prepend(TestDeliveryPrivacy::class);
         $middleware->prepend(TestExceptionResolutionPrivacy::class);
         $middleware->prepend(SitePreviewPrivacy::class);

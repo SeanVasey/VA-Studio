@@ -235,6 +235,8 @@ class ResumableMediaUploadsTest extends TestCase
     public function test_existing_size_role_digest_and_concurrent_session_limits_remain_bounded(): void
     {
         foreach ([['artwork', 20 * 1024 * 1024 + 1, str_repeat('a', 64)], ['master_wav', 200 * 1024 * 1024 + 1, str_repeat('a', 64)],
+            // The browser uploader did not follow the stems ZIP intake cap to 1 GiB: it hashes the whole file in memory.
+            ['stems_zip', 200 * 1024 * 1024 + 1, str_repeat('a', 64)], ['stems_zip', 1024 * 1024 * 1024, str_repeat('a', 64)],
             ['preview_tagged', 100, str_repeat('a', 64)], ['stems_zip', 0, str_repeat('a', 64)], ['artwork', 10, '../not-a-hash']] as [$role, $size, $hash]) {
             $this->rejected(fn () => $this->uploads->start($this->track, $role, $size, $hash, 'synthetic', $this->actor));
         }
