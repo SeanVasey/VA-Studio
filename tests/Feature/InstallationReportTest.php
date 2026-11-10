@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Domain\Media\BoundedMediaProcess;
 use App\Domain\Media\MediaFailure;
+use App\Domain\Media\StagingSellerTag;
 use App\Support\Diagnostics\InstallationReport;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -423,6 +424,24 @@ SH;
             DB::purge('doctor_unavailable');
             DB::setDefaultConnection($original);
         }
+    }
+
+    public function test_production_refuses_the_synthetic_staging_seller_tag_by_path_and_by_content(): void
+    {
+        $this->assertArrayNotHasKey('production_seller_tag', $this->statuses());
+        $this->app->instance('env', 'production');
+        config(['app.env' => 'production', 'app.debug' => false, 'app.url' => 'https://example.test', 'session.secure' => true]);
+        $this->assertSame('pass', $this->statuses()['production_seller_tag']);
+        config(['media.tag_path' => StagingSellerTag::PATH, 'media.tag_sha256' => str_repeat('a', 64)]);
+        $this->assertSame('fail', $this->statuses()['production_seller_tag']);
+        $this->assertFalse(app(InstallationReport::class)->collect()['foundation_ready']);
+        // Renamed to look approved, the marker inside the file still fails the check; an unmarked file passes.
+        mkdir($this->directory.'/private/branding', 0700, true);
+        file_put_contents($this->directory.'/private/branding/approved.wav', 'RIFF'.StagingSellerTag::MARKER);
+        config(['media.tag_path' => 'branding/approved.wav']);
+        $this->assertSame('fail', $this->statuses()['production_seller_tag']);
+        file_put_contents($this->directory.'/private/branding/approved.wav', 'RIFF approved');
+        $this->assertSame('pass', $this->statuses()['production_seller_tag']);
     }
 
     public function test_production_settings_require_https_secure_cookies_and_debug_off(): void
