@@ -27,7 +27,7 @@ return [
     'memory_bytes' => 2147483648,
     'max_output_bytes' => 1073741824,
     'max_process_log_bytes' => 262144,
-    // clamscan loads its whole signature database on every call and scans an archive against a budget of up to 1280 MiB
+    // clamscan loads its whole signature database on every call and scans an archive against a budget of up to 2047 MiB
     // (MalwareScanner::limitMebibytes(), derived from the stems policy above), so clamscan, and only clamscan, has the CPU and
     // address-space limits below, and a file-size limit of that budget. ffmpeg, every other tool and clamdscan, which only relays
     // the file to its daemon, keep the ones above. Every scan, clamdscan too, has the wall-clock limit.
