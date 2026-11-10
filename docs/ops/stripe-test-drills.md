@@ -27,6 +27,7 @@ The drill numbers match.
 
 1. Staging is deployed and the test-commerce profile validates: `php scripts/ops/validate-test-commerce-profile.php .env`
    prints 38 `PASS` lines and `RESULT: PASS` ([setup step 3](staging-test-purchase.md#3-apply-the-profile-on-the-host)).
+   Also check that Link is enabled on the Stripe account (the checkout request names `card` and `link`); if it is disabled, session creation or the check that the returned session echoes exactly the requested methods fails closed. The staging sandbox account's default payment method configuration showed Link available and on when read through the Stripe API in test mode on 2026-11-10; no Link payment has been exercised.
 2. The pipeline runner is installed and logging ([setup step 4](staging-test-purchase.md#4-start-the-pipeline-runner)).
 3. A **dedicated drill offer** is published and linked to its rights scope. Drill 2, and drill 1 if abandoned, leave
    that offer revision reserved for good, because the staging profile has no unpaid release
@@ -93,7 +94,7 @@ Locally proven: [matrix row (a)](../verification/stripe-test-drills-20261018/REA
 
 | Step | Do | Expect | Record |
 | --- | --- | --- | --- |
-| 1.1 | Prepare an order for the drill offer and open Stripe test checkout. Copy the `cs_test_…` ID from the address bar. | Stripe's page shows the order amount, card only. | Order UUID, `cs_test_…`, UTC time. Snapshot `01-open.json`: `checkout.latest_status=open`, `payment.verified=false`, `reservation.state=pending`. |
+| 1.1 | Prepare an order for the drill offer and open Stripe test checkout. Copy the `cs_test_…` ID from the address bar. | Stripe's page shows the order amount and card payment (Link, and Apple Pay or Google Pay where the browser offers them, may also appear; no bank debit, Klarna or similar). | Order UUID, `cs_test_…`, UTC time. Snapshot `01-open.json`: `checkout.latest_status=open`, `payment.verified=false`, `reservation.state=pending`. |
 | 1.2 | Pay with `4000 0000 0000 0002`, any future expiry, any CVC, any postcode. | "Your card was declined." Stripe stays on its page. Dashboard → Payments lists a failed test PaymentIntent. Dashboard → Webhooks shows **no** `checkout.session.*` delivery for it. | Dashboard screenshot of the PaymentIntent (`pi_…`) and its decline code. |
 | 1.3 | Force a sweep, or wait one minute. | Runner: `reconcile <intent> pending`; no `finalize` line for the order. | Runner log lines. Snapshot `02-after-decline.json`: `payment.verified=false`, `observation_outcomes` has `pending`, `payment.observations[].source=reconciliation`, `checkout.latest_status=open`, `grants.count=0`, `finalization=null`, `reservation.state=pending`. |
 | 1.4 | On the store's return page press **Check Stripe test checkout status**. | Payment not verified; the checkout link still opens the same Stripe session. | Screenshot. |

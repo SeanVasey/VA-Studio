@@ -2,6 +2,7 @@
 
 namespace Tests\Support;
 
+use App\Domain\Commerce\Checkout\CheckoutPaymentMethods;
 use App\Domain\Commerce\Checkout\HostedCheckout;
 use App\Domain\Commerce\Models\CheckoutIntent;
 use App\Domain\Commerce\Models\StripeWebhookReceipt;
@@ -26,8 +27,10 @@ final class PaymentFixtures
     {
         $fixture = CheckoutFixtures::prepared($exclusive, $promoted);
         app(HostedCheckout::class)->start($fixture['order']->public_id, InventoryFixtures::OWNER);
-        $gateway->session['status'] = 'complete'; $gateway->session['payment_status'] = 'paid';
-        $gateway->session['url'] = null; $gateway->session['payment_intent'] = self::PAYMENT;
+        $gateway->session['status'] = 'complete';
+        $gateway->session['payment_status'] = 'paid';
+        $gateway->session['url'] = null;
+        $gateway->session['payment_intent'] = self::PAYMENT;
         $gateway->payment = self::payment($gateway->session);
 
         return $fixture + ['intent' => CheckoutIntent::where('order_id', $fixture['order']->id)->sole()];
@@ -38,14 +41,16 @@ final class PaymentFixtures
         return ['object' => 'payment_intent', 'id' => self::PAYMENT, 'livemode' => false, 'currency' => 'usd',
             'amount' => $session['amount_total'], 'amount_received' => $session['amount_total'], 'amount_capturable' => 0,
             'status' => 'succeeded', 'capture_method' => 'automatic', 'confirmation_method' => 'automatic',
-            'payment_method_types' => ['card'], 'metadata' => $session['metadata'],
+            'payment_method_types' => $session['payment_method_types'] ?? CheckoutPaymentMethods::offered(), 'metadata' => $session['metadata'],
             'latest_charge' => 'ch_SYNTHETICCHARGE'];
     }
 
     public static function event(array $session, string $id = 'evt_SYNTHETICPAYMENT', string $type = 'checkout.session.completed'): array
     {
         $event = StripeWebhookFixtures::event();
-        $event['id'] = $id; $event['type'] = $type; $event['api_version'] = '2026-08-26.dahlia';
+        $event['id'] = $id;
+        $event['type'] = $type;
+        $event['api_version'] = '2026-08-26.dahlia';
         $event['data']['object'] = $session;
 
         return $event;
@@ -79,11 +84,17 @@ final class PaymentFixtures
         return new class implements StripeCheckoutGateway, StripePaymentGateway
         {
             public array $calls = [];
+
             public array $accountResponse = ['id' => CheckoutFixtures::ACCOUNT, 'object' => 'account'];
+
             public ?array $session = null;
+
             public ?array $payment = null;
+
             public mixed $onCreate = null;
+
             public mixed $onRetrieve = null;
+
             public mixed $onPayment = null;
 
             public function account(): array
