@@ -164,7 +164,7 @@ APP_HOME=$(getent passwd "$APP_USER" | cut -d: -f6)
 MIRROR=${MIRROR:-$APP_HOME/$HOST}
 KIT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
 for f in nginx/vasey-staging.conf php-fpm/vasey-staging.conf php-fpm/vasey-paid-delivery.conf \
-         workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh; do
+         workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh scheduler-watch.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh; do
   [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"
 done
 [ -f "$KIT/tls/origin-ca.pem" ] || die "kit file missing: ops/staging/tls/origin-ca.pem"  # the probe's pinned Origin CA roots
@@ -490,6 +490,7 @@ chmod 0644 /etc/vasey-staging/staging.conf.tmp; mv -f /etc/vasey-staging/staging
 
 install -m 0755 -o root -g root "$KIT/bin/vasey-staging-ctl" /usr/local/sbin/vasey-staging-ctl
 install -m 0755 -o root -g root "$KIT/backup.sh" /usr/local/sbin/vasey-staging-backup
+install -m 0755 -o root -g root "$KIT/scheduler-watch.sh" /usr/local/sbin/vasey-staging-scheduler-watch
 install -d -m 0755 -o root -g root /usr/local/libexec/vasey-staging
 install -m 0644 -o root -g root "$KIT/normalize-mysql-dump.py" /usr/local/libexec/vasey-staging/normalize-mysql-dump.py
 install -m 0644 -o root -g root "$KIT/seal-release.py" /usr/local/libexec/vasey-staging/seal-release.py
@@ -529,8 +530,18 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 EOF
 chmod 0644 /etc/cron.d/vasey-staging-backup
 
+# Scheduler dead-man's switch (FP-028). Runs from cron, not from the scheduler it watches. Sends nothing unless
+# REPORTING_SCHEDULER_ALERT_TO is set in the application .env and the transactional mail configuration is admitted.
+cat > /etc/cron.d/vasey-staging-scheduler-watch <<'EOF'
+# Scheduler dead-man's switch (ops/staging/scheduler-watch.sh): one alert per stale episode, one note on recovery.
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+*/5 * * * * root /usr/local/sbin/vasey-staging-scheduler-watch >> /var/log/vasey-staging/scheduler-watch.log 2>&1
+EOF
+chmod 0644 /etc/cron.d/vasey-staging-scheduler-watch
+
 cat > /etc/logrotate.d/vasey-staging <<'EOF'
-/var/log/php8.4-fpm-vasey-*.log /var/log/vasey-staging/backup.log /var/log/nginx/vasey-staging-*.log {
+/var/log/php8.4-fpm-vasey-*.log /var/log/vasey-staging/backup.log /var/log/vasey-staging/scheduler-watch.log /var/log/nginx/vasey-staging-*.log {
     weekly
     rotate 8
     missingok
