@@ -393,11 +393,12 @@ class ServiceInvoicingTest extends TestCase
         $this->assertSame(0, ServiceInvoicePayment::count());
         $this->assertSame('retry', StripeReceiptWork::sole()->state);
         $this->assertSame('open', ServiceInvoice::sole()->state);
+        $this->assertSame('not_collected', $this->state($fixture, $project)['paymentState']);
         // Once the provider really reports it paid, the same receipt settles.
         $this->stripe->pay($id);
         $this->travelTo(now()->addHour());
         $this->assertSame('payment_verified', app(ProcessStripeReceipt::class)->handle(StripeWebhookReceipt::sole()->id));
-        $this->assertSame('not_collected', $this->state($fixture, $project)['paymentState']);
+        $this->assertSame('partially_paid', $this->state($fixture, $project)['paymentState']);
     }
 
     public static function contradictions(): array
