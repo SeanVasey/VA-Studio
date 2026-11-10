@@ -490,6 +490,8 @@ final class RetentionSchedule
         'collaborators' => 'Catalog: staff-entered collaborator credits (display name, role, source reference); no customer, payment, tax or contact data.',
         'album_releases' => 'Catalog: staff-entered releases of Sean\'s own music (title, artist, date, cover art reference, listening links); no customer, payment or contact data.',
         'album_release_tracks' => 'Catalog: staff-entered tracklist rows (title, duration) of a release.',
+        'track_collections' => 'Catalog: staff-entered browse collections of tracks (title, slug, description, publication state); no price, customer, payment or contact data.',
+        'track_collection_items' => 'Catalog: ordered references from a collection to existing tracks; no customer data.',
         'track_collaborator_splits' => 'Catalog: staff-entered per-track collaborator shares in basis points; metadata only.',
         'media_assets' => 'Catalog media files (masters, previews, artwork) uploaded by staff.',
         'media_processing_runs' => 'Processing runs of catalog media.',

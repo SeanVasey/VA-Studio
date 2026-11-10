@@ -4,6 +4,8 @@ namespace App\Domain\SiteBuilder;
 
 use App\Domain\Albums\AlbumPresentation;
 use App\Domain\Albums\AlbumsPolicy;
+use App\Domain\Collections\CollectionPresentation;
+use App\Domain\Collections\CollectionsPolicy;
 
 /** Public URL discovery from one verified current release; never private preview content. */
 final class PublicPagesSitemap
@@ -32,6 +34,11 @@ final class PublicPagesSitemap
             if (app(AlbumsPolicy::class)->enabled()) {
                 $albums = app(AlbumPresentation::class)->paths();
                 $paths = [...$paths, ...($albums === [] ? [] : ['/albums', ...$albums])];
+            }
+            // Published collections that still have a listed track, only while the collections pages are on (BL-54).
+            if (app(CollectionsPolicy::class)->enabled()) {
+                $collections = app(CollectionPresentation::class)->paths();
+                $paths = [...$paths, ...($collections === [] ? [] : ['/collections', ...$collections])];
             }
             // Fail closed on a path into a product family whose own policy is off (FP-001, BL-50).
             $families = app(FamilyEntryPoints::class);

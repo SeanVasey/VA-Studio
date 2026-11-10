@@ -169,6 +169,40 @@ final class PublicCatalog
         return $this->project($this->query()->whereIn('id', $ids)->limit(10)->get()->filter(fn (Track $track) => $this->eligible($track)));
     }
 
+    /**
+     * Browse cards for the given track IDs, in the order given, for grouping pages such as collections (BL-54). Only listed
+     * (published) tracks that pass the same eligibility check as the catalog are returned; a draft, scheduled, private, unlisted
+     * or withdrawn track is dropped silently. The card names the track and links to its own page: it carries no offer, price or
+     * license, because every track is licensed individually there.
+     *
+     * @param  list<int>  $ids  at most 100
+     * @return list<array<string, mixed>>
+     */
+    public function browseCards(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+        $tracks = $this->query()->whereIn('id', array_slice($ids, 0, 100))->get()->filter(fn (Track $track) => $this->eligible($track))->keyBy('id');
+        $cards = [];
+        foreach ($ids as $id) {
+            $track = $tracks->get($id);
+            if ($track === null) {
+                continue;
+            }
+            $assets = $track->assets->where('status', 'ready')->sortByDesc('id');
+            $preview = $assets->firstWhere('role', 'preview_tagged');
+            $cards[] = [
+                'id' => (string) $track->id, 'slug' => $track->slug, 'path' => route('tracks.show', $track->slug, false),
+                'title' => $track->title, 'artist' => $track->artist, 'bpm' => $track->bpm, 'musicalKey' => $track->musical_key,
+                'genre' => $track->genre, 'durationSeconds' => $preview->technical_metadata['duration_seconds'],
+                'artworkUrl' => route('media.public', $assets->firstWhere('role', 'artwork')->id),
+            ];
+        }
+
+        return $cards;
+    }
+
     /** Ordered editorial summaries only; private previews omit destinations at the server boundary. */
     public function relatedLinks(array $ids, bool $includeHref = true): array
     {

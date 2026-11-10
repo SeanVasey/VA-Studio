@@ -4,6 +4,7 @@ namespace App\Domain\SiteBuilder;
 
 use App\Domain\Albums\AlbumsPolicy;
 use App\Domain\Catalog\PublicCatalog;
+use App\Domain\Collections\CollectionsPolicy;
 use App\Domain\Rights\PublishedLicenseComparison;
 
 /** Route projections accept one already verified release, never a second pointer read. */
@@ -18,6 +19,9 @@ final class EditorialContent
         $chrome = $this->baseChrome($verifiedContent);
         if ($families && app(AlbumsPolicy::class)->enabled() && ! in_array('/albums', array_column($chrome['navigation'], 'href'), true)) {
             $chrome['navigation'][] = ['label' => 'Albums', 'href' => '/albums'];
+        }
+        if ($families && app(CollectionsPolicy::class)->enabled() && ! in_array('/collections', array_column($chrome['navigation'], 'href'), true)) {
+            $chrome['navigation'][] = ['label' => 'Collections', 'href' => '/collections'];
         }
 
         return $chrome;
