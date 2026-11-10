@@ -664,6 +664,30 @@ class ProductionRuntimeValidator(unittest.TestCase):
         marker = re.search(r"const MARKER = '([A-Z-]+)';", (REPO / "app/Domain/Media/StagingSellerTag.php").read_text())
         self.assertEqual(marker and marker.group(1), "VASEY-STAGING-SYNTHETIC-SELLER-TAG")
 
+    # ---- BEGIN BL-63 merch/Printful hold tests (own block) ----
+
+    MERCH_HOLDS = ("MERCH_PRINTFUL_ENABLED", "MERCH_PRINTFUL_CONFIRM_ENABLED")
+
+    def test_the_merch_flags_pass_as_false_or_unset(self):
+        self.assertEqual(self.validate(profile()).returncode, 0)
+        run = self.validate(profile() + "".join(f"{key}=false\n" for key in self.MERCH_HOLDS))
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(run.stderr, "")
+
+    def test_each_merch_flag_is_refused_unless_false(self):
+        for key in self.MERCH_HOLDS:
+            for value in ("true", "1", "", "TRUE", '"true"', "on"):
+                with self.subTest(key=key, value=value):
+                    run = self.validate(profile() + f"{key}={value}\n")
+                    self.failed(run, "holds." + key.lower())
+
+    def test_the_merch_configuration_keys_are_held_strictly_false(self):
+        text = VALIDATOR.read_text()
+        self.assertIn("$check('holds.merch_printful_enabled', config('merch.printful_enabled') === false);", text)
+        self.assertIn("$check('holds.merch_printful_confirm_enabled', config('merch.confirm_orders') === false);", text)
+
+    # ---- END BL-63 merch/Printful hold tests ----
+
     def test_php_syntax(self):
         lint = subprocess.run([PHP, "-l", str(VALIDATOR)], capture_output=True, text=True)
         self.assertEqual(lint.returncode, 0, lint.stderr)
