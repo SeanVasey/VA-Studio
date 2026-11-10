@@ -8,6 +8,7 @@ use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
 use App\Domain\Media\Lifecycle\MediaLifecycleInventory;
 use App\Domain\Media\Lifecycle\MediaReferenceProof;
+use App\Domain\Media\Lifecycle\MediaReferenceRegistry;
 use App\Domain\Media\MediaProcessor;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\QueueMediaProcessing;
@@ -66,9 +67,10 @@ final class MediaReferenceProofTest extends TestCase
         return [$roots[0], $roots[1] ?? null, $outputs, $track];
     }
 
-    private function prove(array $roots): array
+    /** $extra registers the columns of a probe table, as a migration adding such a table would have to. */
+    private function prove(array $roots, array $extra = []): array
     {
-        return app(MediaReferenceProof::class)->prove($roots);
+        return (new MediaReferenceProof(new MediaReferenceRegistry($extra)))->prove($roots);
     }
 
     private function snapshot(): array
@@ -142,7 +144,8 @@ final class MediaReferenceProofTest extends TestCase
         $this->assertSame('attached', $result['families'][$offered]['state']);
         $this->assertContains('json:offers.deliverable_asset_ids', $attached($offered));
         $this->assertSame('attached', $result['families'][$revised]['state']);
-        $this->assertSame(['json:offer_revisions.snapshot'], $attached($revised));
+        // The frozen revision names the preview by id and, as a published commercial row, its track.
+        $this->assertSame(['json:offer_revisions.snapshot', 'track:offer_revisions.track_id'], $attached($revised));
         $this->assertSame(['publication:track'], $attached($published));
         $this->assertSame(['content:site_images'], $attached($shared));
         $this->assertSame('unattached', $result['families'][$free]['state']);
@@ -260,19 +263,20 @@ final class MediaReferenceProofTest extends TestCase
             $table->string('subject_type')->nullable();
             $table->unsignedBigInteger('subject_id')->nullable();
         });
-        $this->assertSame(['complete', 'unattached'], [$this->prove([$master])['coverage'], $this->prove([$master])['families'][$master]['state']]);
+        $extra = ['manifest_digests' => ['fp034_probe.asset_manifest_hash' => 'digest'], 'polymorphic' => ['fp034_probe.subject' => 'poly']];
+        $this->assertSame(['complete', 'unattached'], [$this->prove([$master], $extra)['coverage'], $this->prove([$master], $extra)['families'][$master]['state']]);
 
         DB::table('fp034_probe')->insert(['asset_manifest_hash' => str_repeat('d', 64)]);
-        $this->assertSame(['hash_only_manifest:fp034_probe.asset_manifest_hash'], $this->prove([$master])['blockers']);
-        $this->assertSame('unknown', $this->prove([$master])['families'][$master]['state']);
+        $this->assertSame(['hash_only_manifest:fp034_probe.asset_manifest_hash'], $this->prove([$master], $extra)['blockers']);
+        $this->assertSame('unknown', $this->prove([$master], $extra)['families'][$master]['state']);
         DB::table('fp034_probe')->delete();
 
         DB::table('fp034_probe')->insert(['payload' => "\x00synthetic"]);
-        $this->assertSame(['uninspected_type:fp034_probe.payload'], $this->prove([$master])['blockers']);
+        $this->assertSame(['uninspected_type:fp034_probe.payload'], $this->prove([$master], $extra)['blockers']);
         DB::table('fp034_probe')->delete();
 
         DB::table('fp034_probe')->insert(['subject_type' => MediaAsset::class, 'subject_id' => $outputs['download_mp3']->id]);
-        $result = $this->prove([$master]);
+        $result = $this->prove([$master], $extra);
         $this->assertSame('complete', $result['coverage']);
         $this->assertSame('attached', $result['families'][$master]['state']);
         $this->assertSame(1, $result['families'][$master]['checks']['poly:fp034_probe.subject']);
@@ -291,7 +295,8 @@ final class MediaReferenceProofTest extends TestCase
         $note = json_encode(['file' => MediaAsset::findOrFail($outputs['master_wav']->id)->storage_path]);
         $this->assertStringContainsString('\\/', $note);
         DB::table('fp034_notes')->insert(['note' => $note]);
-        $result = $this->prove([$master]);
+        $extra = ['reviewed' => ['fp034_notes.note' => 'A synthetic note: only the content check reads it.']];
+        $result = $this->prove([$master], $extra);
         $this->assertSame('attached', $result['families'][$master]['state']);
         $this->assertSame(1, $result['families'][$master]['checks']['content:fp034_notes']);
 
@@ -300,7 +305,7 @@ final class MediaReferenceProofTest extends TestCase
         foreach (array_chunk(range(1, MediaReferenceProof::MAX_CONTENT_ROWS + 1), 200) as $chunk) {
             DB::table('fp034_notes')->insert(array_map(fn (int $i): array => ['note' => 'synthetic '.$i.' '.$sha], $chunk));
         }
-        $result = $this->prove([$master]);
+        $result = $this->prove([$master], $extra);
         $this->assertSame(['incomplete', ['content_bound:fp034_notes']], [$result['coverage'], $result['blockers']]);
         $this->assertNotSame('unattached', $result['families'][$master]['state']);
     }

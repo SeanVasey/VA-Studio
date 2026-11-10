@@ -64,6 +64,33 @@ stale. Deploy-time `predeploy` snapshots are not recorded (the nightly run calls
 `php artisan vasey:backup-record --kind=restore-drill --status=ok` (or `failed`), as the application user in the served release.
 The nightly run's isolated restore proof is part of its `daily ok`, not a drill.
 
+### Scheduler dead-man's switch
+
+The dashboard is something staff look at; it alerts nobody. The switch alerts when the scheduler stops, and it cannot depend on the
+scheduler, so it runs from **host cron** (`/etc/cron.d/vasey-<kit>-scheduler-watch`, every five minutes, installed by
+`provision.sh` from `ops/staging/scheduler-watch.sh` and the production kit's derived copy). The job runs
+`php artisan vasey:scheduler-heartbeat-check --notify` as the application user on the served release.
+
+- **The check.** `vasey:scheduler-heartbeat-check [--max-age=900] [--notify]` is read-only without `--notify`: it reads the
+  `vasey:scheduler-heartbeat` row's last success and exits 0 (fresh), 1 (stale: older than `--max-age`, never recorded, or more
+  than 60 seconds in the future) or 3 (unreadable: database or episode state; nothing is sent). Exactly `--max-age` old is still
+  fresh. `--max-age` is 60 to 86,400 seconds; 900 is three missed cron checks.
+- **Once per episode.** With `--notify`, the first stale run of an episode sends one email; later stale runs send nothing; the first
+  fresh run after an announced episode sends one recovery note. An episode that was never announced (alerting off, or all
+  attempts failed) gets no recovery note. A failed handoff is retried on later runs, at most 3 attempts per episode. The episode
+  state is a small file, `storage/app/private/ops-state/scheduler-watch.json`, under an exclusive lock: it is not in the
+  database, so dedupe still works when the database is what is down, and overlapping runs cannot send twice.
+- **Default-off.** `REPORTING_SCHEDULER_ALERT_TO` is empty by default and then nothing is sent (the command prints
+  `alert: disabled`). Sean's chosen value (SQ-09, 2026-11-10) is `support@vasey.audio`; it is set in the host `.env`, never in code.
+  Sending also goes through the reviewed transactional mail configuration (`VASEY_TRANSACTIONAL_MAIL_*`,
+  `TransactionalMailPolicy`), so it stays off until PCL-10 is done, local and testing never send real mail, and staging (which holds
+  `VASEY_TRANSACTIONAL_MAIL_ENABLED` false) stays silent. The message holds the site host, UTC times and ages only: no data and no link.
+- **What it does not cover.** A host that is down, or a cron job that stopped, sends nothing (pair with the queue-age check's
+  outbound heartbeat ping, `docs/ops/monitoring-and-host-baseline.md`, for an external service). An unreadable database exits 3 and
+  alerts nobody. The 03:17 UTC nightly backup stops the scheduler for its quiesce and each deploy for its duration; an outage past
+  15 minutes in those windows is reported as stale, then as recovered. Installing it needs a reprovision of the host, because the
+  helper and the cron file are installed by `provision.sh` (the deploy gate refuses until then).
+
 ## Sales and conversion report (FP-089)
 
 Admin panel, Reporting, Sales report. UTC periods (day or month buckets), at most 400 days (day buckets at most 92).
