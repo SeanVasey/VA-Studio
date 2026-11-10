@@ -6,6 +6,7 @@ use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
 use App\Domain\Commerce\Payments\VerifyTestPayment;
 use App\Domain\Merch\Fulfillment\Printful\PrintfulClient;
+use App\Domain\Merch\Fulfillment\ReceivePrintfulWebhook;
 use App\Domain\Merch\Fulfillment\RecordMerchFulfillment;
 use App\Domain\Merch\Fulfillment\SubmitMerchFulfillment;
 use App\Domain\Merch\Models\MerchFulfillment;
@@ -193,6 +194,27 @@ class PrintfulWebhookTest extends TestCase
         $body = $this->event('order_updated', $this->order());
         $this->deliver($body, $this->sign($body))->assertStatus(404);
         $this->assertSame(0, MerchFulfillmentEvent::query()->count());
+    }
+
+    public function test_the_real_body_is_capped_whatever_content_length_claims_and_whatever_the_flag_says(): void
+    {
+        $oversize = str_repeat('x', ReceivePrintfulWebhook::MAX_BODY_BYTES + 1);
+        $server = ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json'];
+        foreach ([true, false] as $enabled) {
+            config(['merch.printful_enabled' => $enabled]);
+            // Understated and omitted lengths: the bytes actually received decide, before anything parses or verifies them.
+            foreach (['understated' => $server + ['CONTENT_LENGTH' => '10'], 'omitted' => $server, 'overstated' => $server + ['CONTENT_LENGTH' => (string) strlen($oversize)]] as $name => $headers) {
+                $response = $this->call('POST', '/webhooks/printful', [], [], [], $headers, $oversize);
+                $response->assertStatus(413)->assertExactJson(['code' => 'PRINTFUL_WEBHOOK_TOO_LARGE']);
+                $this->assertStringContainsString('no-store', (string) $response->headers->get('Cache-Control'), $name);
+            }
+        }
+        $this->assertSame(0, MerchFulfillmentEvent::query()->count());
+
+        // Exactly at the limit is still read; a normal body works.
+        config(['merch.printful_enabled' => true]);
+        $body = $this->event('order_updated', $this->order('inprocess'));
+        $this->deliver($body, $this->sign($body), [])->assertOk()->assertJson(['outcome' => 'applied']);
     }
 
     public function test_the_endpoint_is_rate_limited(): void

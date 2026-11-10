@@ -24,6 +24,9 @@ final class SubmitMerchFulfillment
 {
     private const LEASE_MINUTES = 5;
 
+    /** Printful statuses that prove a confirmation took effect. */
+    private const CONFIRMED_STATUSES = ['pending', 'inprocess', 'partial', 'fulfilled'];
+
     public function __construct(
         private readonly MerchFulfillmentPolicy $policy,
         private readonly PrintfulClient $printful,
@@ -68,8 +71,7 @@ final class SubmitMerchFulfillment
      * Confirms a submitted draft (charges the Printful account). Only reachable with the separate confirm switch on.
      *
      * The refund/dispute check runs again here, and the confirmation is claimed with one conditional UPDATE (submitted to
-     * confirming), so two callers cannot both send it and a hold placed after the draft was created stops the charge. A claim
-     * left in `confirming` is never taken over automatically: the outcome of its request is unknown, so an operator decides.
+     * confirming), so two callers cannot both send it and a hold placed after the draft was created stops the charge.
      */
     private function confirm(MerchFulfillment $fulfillment, PrintfulOrder $draft): MerchFulfillment
     {
@@ -81,12 +83,27 @@ final class SubmitMerchFulfillment
         if ($claimed !== 1) {
             return $fulfillment->refresh();
         }
+
+        return $this->sendConfirmation($fulfillment, $draft->id);
+    }
+
+    /**
+     * Sends the confirmation for a row this caller has just claimed into `confirming`.
+     *
+     * A definite rejection (the request did not take effect) goes back to `submitted`. Anything whose outcome is unknown
+     * (timeout, 5xx, 429, or a success whose body cannot be read) stays `confirming` with the lease cleared: the charge may
+     * have landed, so the next run reconciles by looking the order up and never re-sends blindly.
+     */
+    private function sendConfirmation(MerchFulfillment $fulfillment, string $printfulOrderId): MerchFulfillment
+    {
         try {
-            $confirmed = $this->printful->confirmOrder($draft->id);
+            $confirmed = $this->printful->confirmOrder($printfulOrderId);
         } catch (PrintfulException $exception) {
-            // The draft exists and holds the same external id: leave it submitted so an operator (or the next run) can confirm it.
-            MerchFulfillment::query()->whereKey($fulfillment->id)->where('state', MerchFulfillment::CONFIRMING)
-                ->update(['state' => MerchFulfillment::SUBMITTED, 'lease_expires_at' => null, 'failure_code' => $exception->errorCode(), 'updated_at' => now()]);
+            $update = ['failure_code' => $exception->errorCode(), 'lease_expires_at' => null, 'updated_at' => now()];
+            if (! $exception->outcomeUnknown) {
+                $update['state'] = MerchFulfillment::SUBMITTED;
+            }
+            MerchFulfillment::query()->whereKey($fulfillment->id)->where('state', MerchFulfillment::CONFIRMING)->update($update);
 
             return $fulfillment->refresh();
         }
@@ -94,6 +111,47 @@ final class SubmitMerchFulfillment
             ->update(['state' => MerchFulfillment::CONFIRMED, 'printful_status' => $confirmed->status, 'failure_code' => null, 'lease_expires_at' => null, 'updated_at' => now()]);
 
         return $fulfillment->refresh();
+    }
+
+    /**
+     * A `confirming` row whose lease has lapsed or was cleared by an unknown outcome. Looks the order up by external id:
+     * confirmed or in production settles it without a second charge; still a draft means the first request never took
+     * effect, so it is re-confirmed once (claimed with one conditional UPDATE); anything else needs an operator.
+     */
+    private function reconcileConfirmation(MerchFulfillment $current): MerchFulfillment
+    {
+        try {
+            $order = $this->printful->findOrderByExternalId($current->external_id);
+        } catch (PrintfulException) {
+            throw new MerchFulfillmentException('MERCH_CONFIRMATION_UNRESOLVED');
+        }
+        if ($order === null || $order->id !== (string) $current->printful_order_id) {
+            throw new MerchFulfillmentException('MERCH_CONFIRMATION_UNRESOLVED');
+        }
+        if (in_array($order->status, self::CONFIRMED_STATUSES, true)) {
+            MerchFulfillment::query()->whereKey($current->id)->where('state', MerchFulfillment::CONFIRMING)
+                ->update(['state' => MerchFulfillment::CONFIRMED, 'printful_status' => $order->status, 'failure_code' => null, 'lease_expires_at' => null, 'updated_at' => now()]);
+
+            return $current->refresh();
+        }
+        if ($order->status !== 'draft') {
+            throw new MerchFulfillmentException('MERCH_CONFIRMATION_UNRESOLVED');
+        }
+        if ($this->holds->exist($current->order_id)) {
+            return $current->refresh();
+        }
+        $claimed = MerchFulfillment::query()->whereKey($current->id)->where('state', MerchFulfillment::CONFIRMING)
+            ->where(fn ($unowned) => $unowned->whereNull('lease_expires_at')->orWhere('lease_expires_at', '<=', now()))
+            ->update(['lease_expires_at' => now()->addMinutes(self::LEASE_MINUTES), 'updated_at' => now()]);
+        if ($claimed !== 1) {
+            return $current->refresh();
+        }
+        $result = $this->sendConfirmation($current, $order->id);
+        if ($result->state === MerchFulfillment::CONFIRMING) {
+            throw new MerchFulfillmentException('MERCH_CONFIRMATION_UNRESOLVED');
+        }
+
+        return $result;
     }
 
     private function requireVerifiedPayment(MerchFulfillment $fulfillment): void
@@ -111,6 +169,10 @@ final class SubmitMerchFulfillment
     {
         if ($current->state === MerchFulfillment::SUBMITTING) {
             throw new MerchFulfillmentException('MERCH_SUBMISSION_IN_PROGRESS');
+        }
+        if ($current->state === MerchFulfillment::CONFIRMING && ($current->lease_expires_at === null || $current->lease_expires_at->isPast())) {
+            // The earlier confirmation's outcome is unknown. Never silently return it as if it were settled.
+            return $this->reconcileConfirmation($current);
         }
         if ($current->state === MerchFulfillment::SUBMITTED && $this->policy->confirmsOrders() && is_string($current->printful_order_id)) {
             return $this->confirm($current, new PrintfulOrder($current->printful_order_id, $current->external_id, (string) $current->printful_status));

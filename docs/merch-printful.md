@@ -51,16 +51,30 @@ the tracking number and URL, and a failure code.
    also returns it to `recorded`; it never strands an order as failed.
 4. **Confirmation charges the Printful account**, so it needs its own literal-true switch, `MERCH_PRINTFUL_CONFIRM_ENABLED`.
    The check above runs again immediately before confirming, and the confirmation is claimed with one conditional `UPDATE`
-   (`submitted` to `confirming`), so two callers cannot both send it; a claim left in `confirming` is never taken over
-   automatically (its outcome is unknown) and needs an operator.
+   (`submitted` to `confirming`), so two callers cannot both send it. A definite rejection (4xx: the request did not take
+   effect) returns the row to `submitted` with the failure code. An unknown outcome (timeout, 429, 5xx, or a 2xx whose body
+   cannot be read) **stays `confirming`** with the lease cleared and the failure code recorded, because the charge may have
+   landed. The next `handle()` on that row (or one whose confirming lease has lapsed) looks the order up by external id
+   before anything is re-sent: Printful `pending`, `inprocess`, `partial` or `fulfilled` marks it `confirmed`; `draft`
+   re-confirms once (claimed by a conditional update, hold check first); any other answer, a missing order, or a failed
+   lookup raises `MERCH_CONFIRMATION_UNRESOLVED` (409) and leaves the row in `confirming` for an operator.
    With it off (the default) a submission leaves a Printful draft that Sean can inspect and confirm in the Printful dashboard.
 5. Nothing submits before verified payment: record and submit each check it, in code and by the unique key to the payment.
 
-States: `recorded`, `submitting`, `submitted`, `confirmed`, `shipped`, `failed`, `canceled`.
+States: `recorded`, `submitting`, `submitted`, `confirming`, `confirmed`, `shipped`, `failed`, `canceled`.
+
+### Resolving an unresolved `confirming` row (operator)
+
+Find them: `select public_id, external_id, printful_order_id, failure_code, updated_at from merch_fulfillments where state = 'confirming' and (lease_expires_at is null or lease_expires_at <= now());`
+Open the order in the Printful dashboard by `printful_order_id`. If it is confirmed or in production, set `state = 'confirmed'`
+and `printful_status` to what Printful shows. If it is still a draft, confirm it in the dashboard (or leave it: the next run
+re-confirms a draft once) and then mark it `confirmed`. If it is canceled or failed, set `state = 'canceled'` or `'failed'`
+with the matching `failure_code`. Never re-send a confirmation by hand without looking at the Printful order first: a second
+confirmation can charge the account twice. `MERCH_CONFIRMATION_UNRESOLVED` is the error `handle()` raises for these rows.
 
 ## Webhook
 
-`POST /webhooks/printful`, throttled to 60 requests a minute per client address, 404 while the flag is off, body limit 64 KiB.
+`POST /webhooks/printful`, throttled to 60 requests a minute per client address, 404 while the flag is off, body limit 64 KiB, enforced on the bytes actually received (`PrintfulWebhookBodyLimit`, a bounded stream read before any parse or the flag check; `Content-Length` is not trusted) with 413 `PRINTFUL_WEBHOOK_TOO_LARGE`.
 
 - **Signature** (Printful v2, "Event signing"): `x-pf-webhook-signature` is the hex HMAC-SHA256 of the raw body keyed with the
   hex-decoded secret key of the webhook configuration. An invalid or missing signature is refused with 401 before anything is

@@ -394,13 +394,93 @@ class MerchPrintfulFulfillmentTest extends TestCase
         $this->assertSame(1, $this->printful->count('create'));
     }
 
-    public function test_a_confirmation_failure_leaves_the_draft_submitted(): void
+    public function test_a_definite_rejection_of_the_confirmation_leaves_the_draft_submitted_and_retryable(): void
+    {
+        config(['merch.confirm_orders' => true]);
+        $this->printful->confirmFailure = new PrintfulException('PRINTFUL_REJECTED', false, 422);
+        $kept = app(SubmitMerchFulfillment::class)->handle($this->recorded());
+        $this->assertSame([MerchFulfillment::SUBMITTED, 'PRINTFUL_REJECTED', null], [$kept->state, $kept->failure_code, $kept->lease_expires_at]);
+        $this->assertSame(1, $this->printful->count('create'));
+
+        // The rejection is known not to have taken effect, so the next run confirms the same draft again.
+        $this->printful->confirmFailure = null;
+        $again = app(SubmitMerchFulfillment::class)->handle($kept);
+        $this->assertSame(MerchFulfillment::CONFIRMED, $again->state);
+        $this->assertSame([1, 2], [$this->printful->count('create'), $this->printful->count('confirm')]);
+    }
+
+    public function test_a_timed_out_confirmation_stays_confirming_and_a_later_run_does_not_confirm_again_when_printful_confirmed(): void
     {
         config(['merch.confirm_orders' => true]);
         $this->printful->confirmFailure = new PrintfulException('PRINTFUL_UNAVAILABLE', true);
-        $kept = app(SubmitMerchFulfillment::class)->handle($this->recorded());
-        $this->assertSame([MerchFulfillment::SUBMITTED, 'PRINTFUL_UNAVAILABLE'], [$kept->state, $kept->failure_code]);
-        $this->assertSame(1, $this->printful->count('create'));
+        $fulfillment = $this->recorded();
+        $held = app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        $this->assertSame([MerchFulfillment::CONFIRMING, 'PRINTFUL_UNAVAILABLE', null], [$held->state, $held->failure_code, $held->lease_expires_at]);
+
+        // The request in fact landed: Printful reports the order as in production.
+        $this->printful->confirmFailure = null;
+        $order = $this->printful->orders[$held->external_id];
+        $this->printful->orders[$held->external_id] = new PrintfulOrder($order->id, $order->externalId, 'inprocess');
+        $settled = app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        $this->assertSame([MerchFulfillment::CONFIRMED, 'inprocess', null], [$settled->state, $settled->printful_status, $settled->failure_code]);
+        $this->assertSame([1, 1, 1], [$this->printful->count('create'), $this->printful->count('confirm'), $this->printful->count('find')]);
+
+        app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        $this->assertSame(1, $this->printful->count('confirm'));
+    }
+
+    public function test_a_later_run_reconfirms_exactly_once_when_printful_still_reports_a_draft(): void
+    {
+        config(['merch.confirm_orders' => true]);
+        $this->printful->confirmFailure = new PrintfulException('PRINTFUL_UNAVAILABLE', true);
+        $fulfillment = $this->recorded();
+        $this->assertSame(MerchFulfillment::CONFIRMING, app(SubmitMerchFulfillment::class)->handle($fulfillment)->state);
+
+        // Printful never received it: still a draft. A lookup precedes the second confirmation.
+        $this->printful->confirmFailure = null;
+        $settled = app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        $this->assertSame(MerchFulfillment::CONFIRMED, $settled->state);
+        $this->assertSame([1, 2, 1], [$this->printful->count('create'), $this->printful->count('confirm'), $this->printful->count('find')]);
+
+        app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        $this->assertSame(2, $this->printful->count('confirm'));
+    }
+
+    public function test_an_unresolved_confirmation_is_refused_loudly_never_returned_silently(): void
+    {
+        config(['merch.confirm_orders' => true]);
+        $this->printful->confirmFailure = new PrintfulException('PRINTFUL_UNAVAILABLE', true);
+        $fulfillment = $this->recorded();
+        app(SubmitMerchFulfillment::class)->handle($fulfillment);
+
+        // Printful cannot be asked, reports the order missing, or reports a state that is neither draft nor confirmed.
+        $external = $fulfillment->refresh()->external_id;
+        $order = $this->printful->orders[$external];
+        foreach (['canceled', 'failed', 'onhold'] as $status) {
+            $this->printful->orders[$external] = new PrintfulOrder($order->id, $external, $status);
+            $this->assertSame('MERCH_CONFIRMATION_UNRESOLVED', $this->refusal(fn () => app(SubmitMerchFulfillment::class)->handle($fulfillment)));
+        }
+        unset($this->printful->orders[$external]);
+        $this->assertSame('MERCH_CONFIRMATION_UNRESOLVED', $this->refusal(fn () => app(SubmitMerchFulfillment::class)->handle($fulfillment)));
+
+        // A re-confirmation of a draft that times out again stays unresolved too.
+        $this->printful->orders[$external] = $order;
+        $this->assertSame('MERCH_CONFIRMATION_UNRESOLVED', $this->refusal(fn () => app(SubmitMerchFulfillment::class)->handle($fulfillment)));
+        $this->assertSame(MerchFulfillment::CONFIRMING, $fulfillment->refresh()->state);
+        $this->assertSame(2, $this->printful->count('confirm'));
+    }
+
+    public function test_a_success_with_an_unreadable_body_is_an_unknown_outcome_not_a_reset(): void
+    {
+        config(['merch.confirm_orders' => true, 'merch.printful.api_key' => 'pf-'.str_repeat('t', 12)]);
+        Http::fake([
+            'api.printful.com/v2/orders/55/confirmation' => Http::response(['data' => 'unexpected'], 200),
+            'api.printful.com/v2/orders' => Http::response(['data' => ['id' => 55, 'external_id' => 'vasey-shape', 'status' => 'draft']], 201),
+        ]);
+        $this->app->instance(PrintfulClient::class, new HttpPrintfulClient('pf-'.str_repeat('t', 12)));
+        $held = app(SubmitMerchFulfillment::class)->handle($this->recorded());
+        $this->assertSame([MerchFulfillment::CONFIRMING, 'PRINTFUL_RESPONSE_INVALID'], [$held->state, $held->failure_code]);
+        Http::assertSentCount(2);
     }
 
     public function test_the_database_keeps_one_fulfillment_per_order_and_only_one_claim_wins(): void
