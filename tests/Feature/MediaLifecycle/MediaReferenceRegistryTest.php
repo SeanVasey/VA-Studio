@@ -70,7 +70,8 @@ final class MediaReferenceRegistryTest extends TestCase
                 continue;
             }
             $type = strtolower($column['type_name']);
-            $row[$column['name']] = match (true) {
+            $length = preg_match('/\((\d+)\)/', (string) $column['type'], $match) === 1 ? (int) $match[1] : 255;
+            $value = match (true) {
                 str_ends_with($column['name'], '_at') => now()->format('Y-m-d H:i:s'),
                 str_contains($type, 'int') => 1,
                 str_ends_with($column['name'], 'public_id') || $column['name'] === 'uuid' => (string) Str::uuid(),
@@ -79,6 +80,7 @@ final class MediaReferenceRegistryTest extends TestCase
                 $column['name'] === 'currency' => 'USD',
                 default => 'synthetic-'.Str::random(8),
             };
+            $row[$column['name']] = is_string($value) && $type !== 'json' ? substr($value, 0, $length) : $value;
         }
         Schema::disableForeignKeyConstraints();
         try {
@@ -107,7 +109,7 @@ final class MediaReferenceRegistryTest extends TestCase
         $classified = $registry->classified();
         $tables = [];
         $candidates = [];
-        foreach (Schema::getTables() as $table) {
+        foreach (Schema::getTables(Schema::getCurrentSchemaListing()) as $table) {
             $name = $table['name'];
             if (str_starts_with($name, 'sqlite_')) {
                 continue;

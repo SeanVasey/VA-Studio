@@ -528,7 +528,8 @@ final class MediaReferenceProof
             return $this->schema;
         }
         $tables = $foreign = $references = $tracks = $json = $deep = $poly = [];
-        foreach (Schema::getTables() as $table) {
+        // This connection's own schema only: a server shared with other databases lists their tables too.
+        foreach (Schema::getTables(Schema::getCurrentSchemaListing()) as $table) {
             $name = $table['name'];
             if (str_starts_with($name, 'sqlite_')) {
                 continue;
