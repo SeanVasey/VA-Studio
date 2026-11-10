@@ -83,8 +83,8 @@ final class SoundKitCliImport
 
     /**
      * Validates the operator's file without opening its contents: an absolute, canonical path (no `..`, `//` or symlinked
-     * directory), a direct child of an allowed directory, a regular non-symlink file owned by this process's user or root,
-     * a `.zip` name the web upload would also accept, and a size within the profile ceiling. Nothing is copied here.
+     * directory), a direct child of an allowed directory, a regular, single-link, non-group/world-writable file owned by this
+     * process's user or root, a `.zip` name the web upload would also accept, and a size within the profile ceiling. Nothing is copied here.
      *
      * @return array{path: string, name: string, size: int, device: int, inode: int}
      */
@@ -111,8 +111,18 @@ final class SoundKitCliImport
         if (($stat['mode'] & 0170000) !== 0100000) {
             $this->refuse('The kit ZIP is not a regular file.');
         }
-        if (function_exists('posix_geteuid') && $stat['uid'] !== 0 && $stat['uid'] !== posix_geteuid()) {
+        // Fail closed: without POSIX the owner cannot be established, so the file is not admitted.
+        if (! function_exists('posix_geteuid')) {
+            $this->refuse('The file owner cannot be verified on this host (the PHP posix extension is unavailable), so the kit CLI import refuses every file.');
+        }
+        if ($stat['uid'] !== 0 && $stat['uid'] !== posix_geteuid()) {
             $this->refuse('The kit ZIP must be owned by root or by the user running this command.');
+        }
+        if ($stat['nlink'] > 1) {
+            $this->refuse('The kit ZIP has more than one hard link. Copy the real file to a fresh name instead.');
+        }
+        if (($stat['mode'] & 0022) !== 0) {
+            $this->refuse('The kit ZIP must not be group- or world-writable (chmod 600 or 644).');
         }
         if (! mb_check_encoding($name, 'UTF-8') || mb_strlen($name) > 180 || ! preg_match('/\.zip\z/iD', $name)
             || preg_match('~[\\\\/\x00-\x1f\x7f]~', $name)) {
@@ -143,6 +153,8 @@ final class SoundKitCliImport
      */
     public function import(User $actor, array $source, ?SoundKitDraft $draft, array $metadata): array
     {
+        // Defense in depth: the command admits first, but this entry must not rely on its caller.
+        $this->admit();
         $created = false;
         if ($draft === null) {
             $draft = app(SoundKitDrafts::class)->save(null, $metadata, $actor);
@@ -205,6 +217,10 @@ final class SoundKitCliImport
     {
         $allowed = [];
         foreach ([self::TEMP_DIRECTORY, app(PrivateMediaFiles::class)->root().'/'.self::PRIVATE_DIRECTORY] as $directory) {
+            // A symlinked staging directory is never admitted, as the private workspace refuses one.
+            if ($directory !== self::TEMP_DIRECTORY && is_link($directory)) {
+                continue;
+            }
             $real = realpath($directory);
             if ($real !== false && is_dir($real)) {
                 $allowed[] = $real;

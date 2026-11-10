@@ -96,9 +96,14 @@ final class SoundKitImport extends Command
 
             return self::SUCCESS;
         }
-        $this->error($revision->status === 'failed'
-            ? 'The archive failed verification ('.$revision->failure_code.'). Upload a corrected ZIP with --draft='.$result['draft']->public_id.'.'
-            : 'Verification is waiting and retryable ('.($revision->failure_code ?? 'queued').'). Retry it under Admin → Sound kit drafts → Inspect revision.');
+        if ($revision->status === 'failed') {
+            $this->error('The archive failed verification ('.$revision->failure_code.'). Upload a corrected ZIP with --draft='.$result['draft']->public_id.'.');
+        } elseif ($revision->status === 'processing') {
+            $this->error('Verification is running in the queue worker, which claimed this revision first. Check the revision state under Admin → Sound kit drafts, or re-run later with --draft='
+                .$result['draft']->public_id.' --check.');
+        } else {
+            $this->error('Verification is waiting and retryable ('.($revision->failure_code ?? 'queued').'). Retry it under Admin → Sound kit drafts → Inspect revision.');
+        }
 
         return self::FAILURE;
     }

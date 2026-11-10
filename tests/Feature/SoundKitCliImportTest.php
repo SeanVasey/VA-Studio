@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Console\Commands\SoundKitImport;
 use App\Domain\SoundKits\Models\SoundKitDraft;
 use App\Domain\SoundKits\Models\SoundKitRevision;
+use App\Domain\SoundKits\SoundKitCliImport;
+use App\Domain\SoundKits\SoundKitCliImportRefusal;
 use App\Domain\SoundKits\SoundKitDrafts;
 use App\Domain\SoundKits\SoundKitIntake;
 use App\Domain\SoundKits\SoundKitProcessor;
@@ -76,6 +78,7 @@ class SoundKitCliImportTest extends TestCase
     {
         $path = '/tmp/kit-cli-import-'.Str::uuid().$suffix;
         file_put_contents($path, $bytes ?? $this->bytes());
+        chmod($path, 0600); // The command refuses group- or world-writable files whatever the umask.
         $this->cleanup[] = $path;
 
         return $path;
@@ -202,12 +205,14 @@ class SoundKitCliImportTest extends TestCase
         $outside = Storage::disk('local')->path('elsewhere');
         mkdir($outside, 0700, true);
         file_put_contents($outside.'/kit.zip', $this->bytes());
+        chmod($outside.'/kit.zip', 0600);
         $this->assertRefused($outside.'/kit.zip', 'direct child of /tmp or of the private kit-imports directory');
         $nested = '/tmp/kit-cli-import-nested-'.Str::uuid();
         mkdir($nested);
         $this->cleanup[] = $nested.'/kit.zip';
         $this->cleanup[] = $nested;
         file_put_contents($nested.'/kit.zip', $this->bytes());
+        chmod($nested.'/kit.zip', 0600);
         $this->assertRefused($nested.'/kit.zip', 'direct child of /tmp');
         $this->assertRefused('/etc/passwd', 'direct child of /tmp');
 
@@ -230,6 +235,7 @@ class SoundKitCliImportTest extends TestCase
         $directory = Storage::disk('local')->path('kit-imports');
         mkdir($directory, 0700, true);
         file_put_contents($directory.'/kit.zip', $this->bytes());
+        chmod($directory.'/kit.zip', 0600);
         $this->kit(realpath($directory).'/kit.zip', ['--check' => true])->expectsOutputToContain('Checked only')->assertSuccessful();
     }
 
@@ -350,5 +356,120 @@ class SoundKitCliImportTest extends TestCase
         $this->kit($path)->expectsOutputToContain('state=failed failure_code=scan_not_clean')->expectsOutputToContain('failed verification')->assertExitCode(1);
         $this->assertSame('failed', SoundKitRevision::sole()->status);
         $this->assertFileExists($path);
+    }
+
+    public function test_a_file_swapped_after_validation_is_refused_without_a_revision_workspace_or_source_change(): void
+    {
+        $import = app(SoundKitCliImport::class);
+        $draft = app(SoundKitDrafts::class)->save(null, ['title' => 'Swap', 'description' => '', 'provenance' => 'P'], $this->actor);
+        foreach (['rename' => false, 'symlink' => true] as $kind => $viaSymlink) {
+            $path = $this->tmp();
+            $source = $import->source($path);
+            // Same size and a regular file, so only the device/inode identity can tell the swap.
+            $replacement = $this->tmp(str_repeat('x', $source['size']));
+            if ($viaSymlink) {
+                unlink($path);
+                symlink($replacement, $path);
+                $this->cleanup[] = $path;
+                $expected = hash_file('sha256', $replacement);
+            } else {
+                rename($replacement, $path);
+                $expected = hash_file('sha256', $path);
+            }
+            $before = $this->census();
+            $result = $import->import($this->actor, $source, $draft->fresh(), []);
+
+            $this->assertInstanceOf(SoundKitCliImportRefusal::class, $result['error'], $kind);
+            $this->assertStringContainsString('changed after it was checked', $result['error']->getMessage(), $kind);
+            $this->assertNull($result['revision'], $kind);
+            $this->assertSame(0, SoundKitRevision::count(), $kind);
+            $this->assertSame($before, $this->census(), $kind);
+            $this->assertSame([], Storage::disk('local')->allDirectories('processing'), $kind);
+            $this->assertSame($expected, hash_file('sha256', $path), $kind);
+        }
+    }
+
+    public function test_a_file_owned_by_another_user_is_refused(): void
+    {
+        $path = $this->tmp();
+        $this->assertSame(0, posix_geteuid(), 'This test needs a process that may chown.');
+        chown($path, 65534);
+        clearstatcache();
+        $this->assertRefused($path, 'owned by root or by the user running this command');
+        $this->assertRefused($path, 'owned by root or by the user running this command', ['--check' => true]);
+        chown($path, 0);
+        $this->kit($path, ['--check' => true])->expectsOutputToContain('Checked only')->assertSuccessful();
+    }
+
+    public function test_a_symlinked_private_kit_imports_directory_is_not_an_allowed_directory(): void
+    {
+        $real = Storage::disk('local')->path('kit-real');
+        mkdir($real, 0700, true);
+        chmod($real.'/..', 0700);
+        file_put_contents($real.'/kit.zip', $this->bytes());
+        chmod($real.'/kit.zip', 0600);
+        $link = Storage::disk('local')->path('kit-imports');
+        symlink($real, $link);
+        $this->assertRefused(realpath($real).'/kit.zip', 'direct child of /tmp or of the private kit-imports directory');
+        $this->assertRefused(realpath($real).'/kit.zip', 'direct child of /tmp or of the private kit-imports directory', ['--check' => true]);
+    }
+
+    public function test_a_hard_linked_file_is_refused(): void
+    {
+        $path = $this->tmp();
+        $second = '/tmp/kit-cli-import-hardlink-'.Str::uuid().'.zip';
+        link($path, $second);
+        $this->cleanup[] = $second;
+        $this->assertRefused($path, 'more than one hard link');
+        $this->assertRefused($second, 'more than one hard link', ['--check' => true]);
+        unlink($second);
+        clearstatcache();
+        $this->kit($path, ['--check' => true])->expectsOutputToContain('Checked only')->assertSuccessful();
+    }
+
+    public function test_a_group_or_world_writable_file_is_refused(): void
+    {
+        $path = $this->tmp();
+        foreach ([0620, 0602, 0666, 0664] as $mode) {
+            chmod($path, $mode);
+            clearstatcache();
+            $this->assertRefused($path, 'group- or world-writable', [], false);
+            $this->assertRefused($path, 'group- or world-writable', ['--check' => true]);
+        }
+        chmod($path, 0644);
+        clearstatcache();
+        $this->kit($path, ['--check' => true])->expectsOutputToContain('Checked only')->assertSuccessful();
+    }
+
+    public function test_import_refuses_production_itself_without_the_command_and_creates_nothing(): void
+    {
+        $import = app(SoundKitCliImport::class);
+        $source = $import->source($this->tmp());
+        $this->enroll($this->actor); // So only the environment guard, not the panel MFA rule, can stop it.
+        $before = $this->census();
+        $this->inEnvironment('production', function () use ($import, $source): void {
+            try {
+                $import->import($this->actor, $source, null, ['title' => 'T', 'provenance' => 'P']);
+                $this->fail('import() must refuse production on its own.');
+            } catch (SoundKitCliImportRefusal $refusal) {
+                $this->assertStringContainsString('refused in production', $refusal->getMessage());
+            }
+        });
+        $this->assertSame($before, $this->census());
+        $this->assertSame(0, SoundKitRevision::count());
+        $this->assertSame(0, SoundKitDraft::count());
+    }
+
+    public function test_a_revision_claimed_first_by_a_queue_worker_is_reported_as_running_there(): void
+    {
+        // A worker takes the claim between the intake's commit and the CLI's own processor call.
+        AuditEvent::creating(function (AuditEvent $event): void {
+            if ($event->action === 'sound_kit.cli_import') {
+                DB::table('sound_kit_revisions')->update(['status' => 'processing', 'claim_token' => (string) Str::uuid(), 'claimed_until' => now()->addMinutes(10)]);
+            }
+        });
+        $this->kit($this->tmp())->expectsOutputToContain('state=processing')->expectsOutputToContain('Verification is running in the queue worker, which claimed this revision first. Check the revision state under Admin → Sound kit drafts, or re-run later with --draft=')
+            ->doesntExpectOutputToContain('waiting and retryable')->assertExitCode(1);
+        $this->assertSame('processing', SoundKitRevision::sole()->status);
     }
 }
