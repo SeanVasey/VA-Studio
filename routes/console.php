@@ -13,6 +13,10 @@ Artisan::command('inspire', function () {
 // overlap lock is hygiene only (the 1,440-minute default could stall scheduled releases after a crashed run).
 OperationalSignals::track(Schedule::command('vasey:publish-scheduled-site-release')->everyMinute()->withoutOverlapping(5), 'vasey:publish-scheduled-site-release');
 
+// Track schedules (FP-032). A due schedule whose publication guards fail stays scheduled and exits non-zero, which the tracked
+// signal records as a failure on the operational dashboard. The database locks serialize activation; the overlap lock is hygiene.
+OperationalSignals::track(Schedule::command('vasey:publish-scheduled-tracks')->everyMinute()->withoutOverlapping(5), 'vasey:publish-scheduled-tracks');
+
 // Deletes expired `cache` and `cache_locks` rows only. Laravel removes an expired row when that exact key is read and ships no bulk
 // command, so an unread Filament flash notification (plain text, `session.lifetime` TTL) and stale throttle counters would stay
 // forever. Hourly bounds that retention to the TTL plus one hour, the delete is a short indexed range delete in batches, and

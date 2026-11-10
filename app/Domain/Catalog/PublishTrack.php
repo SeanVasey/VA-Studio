@@ -22,6 +22,9 @@ class PublishTrack
 
     private const REVIEW_KEYS = ['schema_version', 'actor_id', 'track_id', 'intent', 'metadata_version', 'publication_version', 'status'];
 
+    /** Intents that expose a track and therefore run every publication guard. */
+    private const PUBLISH_INTENTS = ['publish', 'publish_unlisted'];
+
     private const MANIFEST_REVIEW_KEYS = [...self::REVIEW_KEYS, 'manifest_hash'];
 
     /** Immediate trusted server command; the supplied Track is an identity, not an expected revision. */
@@ -71,20 +74,23 @@ class PublishTrack
     }
 
     /** A server-held confirmation of the ready evidence the operator is about to publish. */
-    public function reviewManifest(Track $track, User $actor): array
+    public function reviewManifest(Track $track, User $actor, string $intent = 'publish'): array
     {
         $this->requireStandalone();
+        if (! in_array($intent, self::PUBLISH_INTENTS, true)) {
+            $this->reject('Choose how to publish the track before reviewing it.');
+        }
 
-        return DB::transaction(function () use ($track, $actor): array {
+        return DB::transaction(function () use ($track, $actor, $intent): array {
             $current = $this->lockActor($actor);
             $locked = Track::query()->lockForUpdate()->findOrFail($track->getKey());
-            $this->requireState($locked, 'publish');
+            $this->requireState($locked, $intent);
             $this->requireVersion($locked->metadata_version);
             $this->requireCapacity($locked->publication_version);
             $manifest = $this->publicationManifest($locked, $current);
 
             return ['schema_version' => 2, 'actor_id' => (int) $current->id, 'track_id' => (int) $locked->id,
-                'intent' => 'publish', 'metadata_version' => $locked->metadata_version,
+                'intent' => $intent, 'metadata_version' => $locked->metadata_version,
                 'publication_version' => $locked->publication_version, 'status' => $locked->status,
                 'manifest_hash' => $manifest->hash()];
         });
@@ -105,21 +111,49 @@ class PublishTrack
             // Validate the shared identity shape without permitting schema 1 as a fallback.
             $identity = array_intersect_key($review, array_flip(self::REVIEW_KEYS));
             $identity['schema_version'] = 1;
-            $this->validateReview($identity, $current, 'publish');
+            $intent = $identity['intent'];
+            if (! in_array($intent, self::PUBLISH_INTENTS, true)) {
+                $this->reject('Review the current publication evidence before publishing this track.');
+            }
+            $this->validateReview($identity, $current, $intent);
             $locked = Track::query()->lockForUpdate()->findOrFail($review['track_id']);
             if ($locked->metadata_version !== $review['metadata_version']
                 || $locked->publication_version !== $review['publication_version'] || $locked->status !== $review['status']) {
                 $this->reject('This track changed after publication review. Close and reopen the confirmation before trying again.');
             }
-            $this->requireState($locked, 'publish');
+            $this->requireState($locked, $intent);
             $this->requireCapacity($locked->publication_version);
             $manifest = $this->publicationManifest($locked, $current);
             if (! hash_equals($review['manifest_hash'], $manifest->hash())) {
                 $this->reject('Publication evidence changed after review. Close and reopen the confirmation before trying again.');
             }
 
-            return $this->write($locked, $current, 'publish', $manifest);
+            return $this->write($locked, $current, $intent, $manifest);
         });
+    }
+
+    /**
+     * Scheduled activation. The caller (TrackPublicationSchedules) owns the transaction and has already locked, in this
+     * order, the signed-in-equivalent actor, this track and its schedule row. Every guard of a manual publication runs now,
+     * at the activation instant, against current evidence including the private files; a failure throws a
+     * ValidationException and writes nothing. `$resolve` receives the publication revision the track is about to take and
+     * must record the schedule outcome before the track moves (the track guard requires that row).
+     *
+     * @param  callable(int): void  $resolve
+     */
+    public function publishScheduled(Track $locked, User $actor, string $target, callable $resolve): Track
+    {
+        if (DB::transactionLevel() < 1) {
+            throw new LogicException('Scheduled track publication requires its caller transaction.');
+        }
+        if ($locked->status !== TrackVisibility::SCHEDULED || ! in_array($target, TrackVisibility::TARGETS, true)) {
+            $this->reject('This track is no longer scheduled.');
+        }
+        $this->requireCapacity($locked->publication_version);
+        $manifest = $this->publicationManifest($locked, $actor);
+        $resolve($locked->publication_version + 1);
+
+        return $this->write($locked, $actor, $target === TrackVisibility::UNLISTED ? 'publish_unlisted' : 'publish', $manifest, ['trigger' => 'schedule']);
     }
 
     private function publicationManifest(Track $track, User $actor): TrackPublicationManifest
@@ -177,28 +211,48 @@ class PublishTrack
         });
     }
 
-    private function write(Track $locked, User $actor, string $intent, ?TrackPublicationManifest $manifest = null): Track
+    private function write(Track $locked, User $actor, string $intent, ?TrackPublicationManifest $manifest = null, array $context = []): Track
     {
         $this->requireCapacity($locked->publication_version);
-        if ($intent === 'publish' && $manifest === null) {
+        $publishing = in_array($intent, self::PUBLISH_INTENTS, true);
+        $target = match ($intent) {
+            'publish' => TrackVisibility::PUBLISHED,
+            'publish_unlisted' => TrackVisibility::UNLISTED,
+            default => TrackVisibility::DRAFT,
+        };
+        if ($locked->status === TrackVisibility::SCHEDULED && ($context['trigger'] ?? null) !== 'schedule') {
+            $this->reject('Cancel the schedule before changing this track.');
+        }
+        if ($locked->status !== $target && ! TrackVisibility::allows($locked->status, $target)) {
+            $this->reject('A '.$locked->status.' track cannot become '.$target.' directly.');
+        }
+        if ($publishing && $manifest === null) {
             $blockers = app(PublicationReadiness::class)->blockers($locked);
             if ($blockers !== []) {
                 $this->reject(implode(' ', $blockers));
             }
         }
         $previous = $locked->publication_version;
-        $changes = ['status' => $intent === 'publish' ? 'published' : 'draft', 'publication_version' => $previous + 1];
-        if ($intent === 'publish') {
+        $changes = ['status' => $target, 'publication_version' => $previous + 1];
+        if ($publishing) {
             $changes['published_at'] = $manifest?->capturedAt() ?? now();
         }
+        $from = $locked->status;
         $locked->update($changes);
-        AuditEvent::record($intent === 'publish' ? 'catalog.track.published' : 'catalog.track.unpublished', $locked, [
+        AuditEvent::record(match ($intent) {
+            'publish' => 'catalog.track.published',
+            'publish_unlisted' => 'catalog.track.published_unlisted',
+            default => 'catalog.track.unpublished',
+        }, $locked, [
             'schema_version' => 1,
             'metadata_version' => $locked->metadata_version,
             'previous_publication_version' => $previous,
             'publication_version' => $locked->publication_version,
         ] + ($manifest === null ? [] : ['manifest_schema_version' => TrackPublicationManifest::SCHEMA_VERSION,
-            'manifest_hash' => $manifest->hash()]), $actor->id);
+            'manifest_hash' => $manifest->hash()])
+            // The ordinary draft -> published and published -> draft moves, and same-state repeats, keep their original audit shape.
+            + (in_array($from, [$intent === 'unpublish' ? TrackVisibility::PUBLISHED : TrackVisibility::DRAFT, $target], true) ? [] : ['from_status' => $from])
+            + $context, $actor->id);
 
         return $locked;
     }
@@ -230,7 +284,7 @@ class PublishTrack
         }
         $this->requireVersion($review['metadata_version']);
         $this->requireVersion($review['publication_version']);
-        if ($review['status'] !== ($intent === 'publish' ? 'draft' : 'published')) {
+        if (! in_array($review['status'], $this->sourceStates($intent), true)) {
             $this->reject('Review the current track before changing publication.');
         }
     }
@@ -244,9 +298,19 @@ class PublishTrack
 
     private function requireState(Track $track, string $intent): void
     {
-        if ($track->status !== ($intent === 'publish' ? 'draft' : 'published')) {
+        if (! in_array($track->status, $this->sourceStates($intent), true)) {
             $this->reject('This track no longer has the publication state required by this confirmation. Close and reopen it.');
         }
+    }
+
+    /** States a confirmation of this intent may start from. Unlisted tracks go to the catalog by publish, and out by unpublish. */
+    private function sourceStates(string $intent): array
+    {
+        return match ($intent) {
+            'publish' => [TrackVisibility::DRAFT, TrackVisibility::UNLISTED],
+            'publish_unlisted' => [TrackVisibility::DRAFT],
+            default => TrackVisibility::LIVE,
+        };
     }
 
     private function requireVersion(mixed $version): void
