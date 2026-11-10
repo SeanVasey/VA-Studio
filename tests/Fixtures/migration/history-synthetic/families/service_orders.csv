@@ -1,0 +1,2 @@
+Order ID,Line ID,Customer ID,Ordered At,Status,Service ID,Package,Amount,Refunded,Payment Ref,Buyer Notes
+synthetic-ord-2005,1,synthetic-cust-102,2026-08-05T10:00:00Z,Refunded,synthetic-service-01,Mixing Package,150,150,synthetic-pay-2005,SYNTHETIC note that is never retained

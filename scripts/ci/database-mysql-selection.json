@@ -25,6 +25,7 @@
     "tests/Feature/MembershipCreditMigrationTest.php",
     "tests/Feature/Migration/LegacyHistoryArchiveMigrationTest.php",
     "tests/Feature/Migration/LegacyHistoryDeclarationMigrationTest.php",
+    "tests/Feature/Migration/LegacyHistoryTrackLinkMigrationTest.php",
     "tests/Feature/MigrationRecompilationTest.php",
     "tests/Feature/OrderInquiryMigrationTest.php",
     "tests/Feature/OrderPreparationMigrationTest.php",

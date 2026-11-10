@@ -8,6 +8,7 @@ use App\Domain\Migration\History\LegacyArchivePolicy;
 use App\Domain\Migration\History\LegacyArchiveRefusal;
 use App\Domain\Migration\History\LegacyGrantReview;
 use App\Domain\Migration\History\LegacyHistoryArchive;
+use App\Domain\Migration\History\LegacyTrackLinks;
 use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\CanonicalJson;
@@ -25,10 +26,10 @@ use Throwable;
  * reference or contract text).
  *
  * Every action is read-only unless `--write` is given. A write also needs the snapshot hash from the dry run
- * (import) or an evidence reference (review-grant), a staff account whose password is confirmed at a hidden prompt
+ * (import, link-tracks) or an evidence reference (review-grant, resolve-track-link), a staff account whose password is confirmed at a hidden prompt
  * in an interactive console, and `--attest`, which records a console attestation in the audit log first.
  *
- * Exit codes: 0 clean, complete or reconciled; 1 refused or failed; 2 import segment committed, more pending;
+ * Exit codes: 0 clean, complete or reconciled; 1 refused or failed; 2 import or link segment committed, more pending;
  * 3 findings or unexplained differences.
  */
 final class LegacyHistory extends Command
@@ -40,15 +41,16 @@ final class LegacyHistory extends Command
     public const UNRECONCILED = 3;
 
     protected $signature = 'vasey:legacy-history
-        {action : dry-run, import, reconcile, delta or review-grant}
+        {action : dry-run, import, reconcile, delta, review-grant, link-tracks or resolve-track-link}
         {--source= : Absolute path of the private history source package (the baseline for delta)}
         {--later= : Absolute path of the later source package (delta only)}
         {--dispositions= : Absolute path of a private delta dispositions file (delta only)}
-        {--snapshot= : Snapshot SHA-256 printed by the dry run; required with import --write}
-        {--line= : Line record key to review (review-grant only)}
-        {--limit=100 : Records per import segment (1-1000)}
+        {--snapshot= : Snapshot SHA-256 printed by the dry run; required with import --write and link-tracks --write}
+        {--line= : Line record key (review-grant and resolve-track-link)}
+        {--mapping= : Catalog import mapping ID chosen for the line (resolve-track-link only)}
+        {--limit=100 : Records per import or link segment (1-1000)}
         {--actor-id= : Staff user ID performing a write; the password is confirmed at a hidden prompt}
-        {--reference= : Private evidence reference for a grant review (kept only as a keyed hash)}
+        {--reference= : Private evidence reference for a grant review or a track link resolution (kept only as a keyed hash)}
         {--write : Perform the write; without it every action is a dry run}
         {--attest : Record a console attestation in the audit log before writing (required for every write)}';
 
@@ -60,9 +62,11 @@ final class LegacyHistory extends Command
         'reconcile' => ['source'],
         'delta' => ['source', 'later', 'dispositions'],
         'review-grant' => ['line', 'actor-id', 'reference'],
+        'link-tracks' => ['source', 'snapshot', 'limit', 'actor-id'],
+        'resolve-track-link' => ['line', 'mapping', 'actor-id', 'reference'],
     ];
 
-    private const WRITES = ['import', 'review-grant'];
+    private const WRITES = ['import', 'review-grant', 'link-tracks', 'resolve-track-link'];
 
     /** The attestation this invocation recorded, so a later refusal does not claim that nothing was written. */
     private ?int $attestationAuditId = null;
@@ -83,6 +87,8 @@ final class LegacyHistory extends Command
                 'reconcile' => $this->reconcile(),
                 'delta' => $this->delta(),
                 'review-grant' => $this->reviewGrant(),
+                'link-tracks' => $this->linkTracks(),
+                'resolve-track-link' => $this->resolveTrackLink(),
             };
         } catch (LegacyArchiveRefusal $refusal) {
             return $this->refuse($refusal->reason);
@@ -102,16 +108,16 @@ final class LegacyHistory extends Command
     private function invalid(mixed $action): ?string
     {
         if (! is_string($action) || ! isset(self::OPTIONS[$action])) {
-            return 'The action must be dry-run, import, reconcile, delta or review-grant.';
+            return 'The action must be dry-run, import, reconcile, delta, review-grant, link-tracks or resolve-track-link.';
         }
         $write = (bool) $this->option('write');
         if (! in_array($action, self::WRITES, true) && ($write || $this->option('attest'))) {
-            return '--write and --attest apply only to import and review-grant.';
+            return '--write and --attest apply only to import, review-grant, link-tracks and resolve-track-link.';
         }
         if (! $write && $this->option('attest')) {
             return '--attest applies only with --write.';
         }
-        foreach (['source', 'later', 'dispositions', 'snapshot', 'line', 'actor-id', 'reference'] as $name) {
+        foreach (['source', 'later', 'dispositions', 'snapshot', 'line', 'mapping', 'actor-id', 'reference'] as $name) {
             $value = $this->option($name);
             if ($value !== null && ! in_array($name, self::OPTIONS[$action], true)) {
                 return '--'.$name.' does not apply to '.$action.'.';
@@ -121,12 +127,16 @@ final class LegacyHistory extends Command
             }
         }
         $required = match ($action) {
-            'dry-run', 'reconcile', 'import' => ['source'],
+            'dry-run', 'reconcile', 'import', 'link-tracks' => ['source'],
             'delta' => ['source', 'later'],
-            'review-grant' => ['line'],
+            'review-grant', 'resolve-track-link' => ['line'],
         };
         if ($write) {
-            $required = [...$required, 'actor-id', ...($action === 'import' ? ['snapshot'] : ['reference'])];
+            $required = [...$required, 'actor-id', ...match ($action) {
+                'import', 'link-tracks' => ['snapshot'],
+                'resolve-track-link' => ['mapping', 'reference'],
+                default => ['reference'],
+            }];
         }
         foreach ($required as $name) {
             if ($this->option($name) === null) {
@@ -135,6 +145,9 @@ final class LegacyHistory extends Command
         }
         if ($this->option('actor-id') !== null && preg_match('/\A[1-9][0-9]{0,17}\z/D', $this->option('actor-id')) !== 1) {
             return '--actor-id must be a positive whole-number ID.';
+        }
+        if ($this->option('mapping') !== null && preg_match('/\A[1-9][0-9]{0,17}\z/D', $this->option('mapping')) !== 1) {
+            return '--mapping must be a positive whole-number ID.';
         }
         if ($this->option('actor-id') !== null && ! $write) {
             return '--actor-id applies only with --write.';
@@ -212,7 +225,15 @@ final class LegacyHistory extends Command
             return self::UNRECONCILED;
         }
         $report = (new LegacyHistoryArchive)->reconcile($result['snapshot'], $result['snapshot_sha256']);
-        $this->emit(['code' => $report['result'], 'report' => $report, 'database_writes' => 0]);
+        // Track links are reported beside the archive reconciliation and never change its result or exit code: an
+        // unlinked or ambiguous line is still a fully archived record, and a link report refused on catalog or link
+        // evidence the archive never depended on is reported here instead of refusing the reconciliation.
+        try {
+            $trackLinks = (new LegacyTrackLinks)->report($result['snapshot'], $result['snapshot_sha256']);
+        } catch (LegacyArchiveRefusal $refusal) {
+            $trackLinks = ['refused' => $refusal->reason];
+        }
+        $this->emit(['code' => $report['result'], 'report' => $report, 'track_links' => $trackLinks, 'database_writes' => 0]);
 
         return $report['result'] === 'reconciled' ? self::SUCCESS : self::UNRECONCILED;
     }
@@ -254,6 +275,56 @@ final class LegacyHistory extends Command
         $result = $review->review($line, $reviewer, (string) $this->option('reference'), $attestation, true);
         $this->emit(['code' => 'review_'.$result['outcome'], 'line_record_key' => $line, 'classification' => LegacyGrantReview::CLASSIFICATION,
             'evidence_sha256' => $result['evidence_sha256'], 'attestation_audit_id' => $attestation->auditEventId, 'entitlements_created' => 0]);
+
+        return self::SUCCESS;
+    }
+
+    private function linkTracks(): int
+    {
+        $result = (new LegacyHistoryArchive)->load((string) $this->option('source'))['result'];
+        if ($result['snapshot'] === null) {
+            $this->emit(['code' => 'link_refused_findings', 'counts' => $result['counts'], 'findings' => $result['findings'], 'database_writes' => 0]);
+
+            return self::UNRECONCILED;
+        }
+        $links = new LegacyTrackLinks;
+        if (! $this->option('write')) {
+            $this->emit(['code' => 'link_dry_run', 'track_links' => $links->report($result['snapshot'], $result['snapshot_sha256']), 'database_writes' => 0]);
+
+            return self::SUCCESS;
+        }
+        if (! hash_equals((string) $this->option('snapshot'), $result['snapshot_sha256'])) {
+            return $this->refuse('snapshot_mismatch');
+        }
+        $actor = $this->authorized();
+        $attestation = StaffWriteAuthority::attest($actor, 'vasey:legacy-history', LegacyTrackLinks::ATTESTATION_ACTION,
+            LegacyTrackLinks::attestationScope($result['snapshot_sha256']), null, $result['snapshot_sha256']);
+        $this->attestationAuditId = $attestation->auditEventId;
+        $outcome = $links->link($result['snapshot'], $result['snapshot_sha256'], $actor, $attestation, (int) $this->option('limit'));
+        $this->emit(['code' => $outcome['complete'] ? 'link_complete' : 'link_partial', 'snapshot_sha256' => $result['snapshot_sha256'],
+            'processed' => $outcome['processed'], 'pending' => $outcome['pending'], 'states' => $outcome['states'],
+            'attestation_audit_id' => $attestation->auditEventId, 'entitlements_created' => 0]);
+
+        return $outcome['complete'] ? self::SUCCESS : self::PARTIAL;
+    }
+
+    private function resolveTrackLink(): int
+    {
+        $links = new LegacyTrackLinks;
+        $line = (string) $this->option('line');
+        if (! $this->option('write')) {
+            $this->emit(['code' => 'resolve_dry_run', 'database_writes' => 0] + $links->inspect($line));
+
+            return self::SUCCESS;
+        }
+        $mapping = (int) $this->option('mapping');
+        $actor = $this->authorized();
+        $attestation = StaffWriteAuthority::attest($actor, 'vasey:legacy-history', LegacyTrackLinks::RESOLVE_ATTESTATION_ACTION,
+            LegacyTrackLinks::resolveScope($line, $mapping), null, (string) $this->option('reference'));
+        $this->attestationAuditId = $attestation->auditEventId;
+        $result = $links->resolve($line, $mapping, $actor, (string) $this->option('reference'), $attestation);
+        $this->emit(['code' => 'resolve_'.$result['outcome'], 'line_record_key' => $line, 'mapping_id' => $result['mapping_id'],
+            'track_id' => $result['track_id'], 'attestation_audit_id' => $attestation->auditEventId, 'entitlements_created' => 0]);
 
         return self::SUCCESS;
     }
