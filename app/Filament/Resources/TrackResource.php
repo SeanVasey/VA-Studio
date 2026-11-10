@@ -2,10 +2,13 @@
 
 namespace App\Filament\Resources;
 
+use App\Domain\Catalog\ChangeTrackVisibility;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicationReadiness;
 use App\Domain\Catalog\ReadPrivateTrackReview;
 use App\Domain\Catalog\SaveTrackMetadata;
+use App\Domain\Catalog\TrackPublicationSchedules;
+use App\Domain\Catalog\TrackVisibility;
 use App\Domain\Rights\CollaboratorSplitReport;
 use App\Filament\Resources\TrackResource\Pages\ManageTracks;
 use App\Models\User;
@@ -71,7 +74,14 @@ class TrackResource extends OperatorResource
         return $table->columns([
             TextColumn::make('title')->searchable()->sortable(),
             TextColumn::make('bpm'), TextColumn::make('musical_key'), TextColumn::make('genre'),
-            TextColumn::make('status')->badge(),
+            TextColumn::make('status')->badge()
+                ->color(fn (string $state): string => match ($state) {
+                    TrackVisibility::PUBLISHED => 'success', TrackVisibility::UNLISTED => 'info', TrackVisibility::SCHEDULED => 'warning',
+                    default => 'gray',
+                }),
+            // Scheduled tracks show their Central time, and an overdue one shows why it has not gone live: that is the staff alert.
+            TextColumn::make('schedule')->label('Schedule')->state(fn (Track $record): ?string => static::scheduleSummary($record))
+                ->wrap()->color(fn (Track $record): ?string => $record->pendingSchedule?->last_failure_reason !== null ? 'danger' : null),
         ])->selectCurrentPageOnly()->maxSelectableRecords(25)->toolbarActions([
             // Keep Filament's Alpine selection transport; the domain loads and locks the exact bounded IDs itself.
             BulkAction::make('addTags')->label('Add tags')->fetchSelectedRecords(false)
@@ -112,21 +122,78 @@ class TrackResource extends OperatorResource
                 $advisories = app(CollaboratorSplitReport::class)->advisories((int) $record->id);
                 Notification::make()->title($blockers === [] ? 'Ready to publish' : 'Publication blocked')->body(implode("\n", [...$blockers, ...$advisories]))->persistent()->send();
             }),
-            Action::make('publish')->visible(fn (Track $record) => $record->status !== 'published')->requiresConfirmation()->databaseTransaction(false)
-                ->modalDescription('Publish the reviewed track, files and offers. If anything changes after this review, reopen the confirmation to review it again.')
+            Action::make('publish')->label('Publish')->visible(fn (Track $record) => in_array($record->status, [TrackVisibility::DRAFT, TrackVisibility::UNLISTED], true))->requiresConfirmation()->databaseTransaction(false)
+                ->modalDescription('Publish the reviewed track, files and offers to the catalog. If anything changes after this review, reopen the confirmation to review it again.')
                 ->mountUsing(function (Track $record, ManageTracks $livewire, ?Schema $schema = null): void {
                     $livewire->reviewPublication($record, 'publish');
                     $schema?->fill();
                 })
                 ->action(fn (Track $record, Action $action, ManageTracks $livewire) => $livewire->applyReviewedPublication($record, $action, 'publish')),
-            Action::make('share')->visible(fn (Track $record) => $record->status === 'published')->url(fn (Track $record) => route('tracks.show', $record->slug))->openUrlInNewTab(),
-            Action::make('unpublish')->visible(fn (Track $record) => $record->status === 'published')->requiresConfirmation()->databaseTransaction(false)
+            Action::make('publish_unlisted')->label('Publish unlisted')->visible(fn (Track $record) => $record->status === TrackVisibility::DRAFT)->requiresConfirmation()->databaseTransaction(false)
+                ->modalDescription('Serve the reviewed track at its own link without listing it in the catalog, search or sitemaps. Unlisted is not secret: anyone who has or is given the link can open the page, hear the preview and buy it, under the same checks as a published track. Use Private to keep a track staff-only.')
+                ->mountUsing(function (Track $record, ManageTracks $livewire, ?Schema $schema = null): void {
+                    $livewire->reviewPublication($record, 'publish_unlisted');
+                    $schema?->fill();
+                })
+                ->action(fn (Track $record, Action $action, ManageTracks $livewire) => $livewire->applyReviewedPublication($record, $action, 'publish_unlisted')),
+            Action::make('schedule')->label(fn (Track $record) => $record->status === TrackVisibility::SCHEDULED ? 'Reschedule' : 'Schedule')
+                ->visible(fn (Track $record) => in_array($record->status, [TrackVisibility::DRAFT, TrackVisibility::SCHEDULED], true))
+                ->modalHeading('Schedule publication')
+                ->modalDescription('Enter Central time (America/Chicago). Every publication check runs again at that moment; if one fails the track stays scheduled and an alert is raised.')
+                ->extraModalWindowAttributes(static::metadataModalAttributes())
+                ->fillForm(fn (Track $record): array => [
+                    'metadata_version' => $record->metadata_version, 'publication_version' => $record->publication_version,
+                    'target' => $record->pendingSchedule?->target_status ?? TrackVisibility::PUBLISHED,
+                    'local_time' => $record->pendingSchedule?->entry_local ? str_replace(' ', 'T', $record->pendingSchedule->entry_local) : null,
+                ])
+                ->schema([
+                    Hidden::make('metadata_version'), Hidden::make('publication_version'),
+                    Select::make('target')->label('Publish as')->native()->required()->selectablePlaceholder(false)
+                        ->options([TrackVisibility::PUBLISHED => 'Published (listed in the catalog)', TrackVisibility::UNLISTED => 'Unlisted (link only)']),
+                    TextInput::make('local_time')->label('Central time')->type('datetime-local')->required()
+                        ->helperText('The instant is stored in UTC. Times that do not exist or happen twice on a clock-change night are refused.'),
+                ])
+                ->action(fn (Track $record, array $data, ManageTracks $livewire) => $livewire->scheduleTrack($record, $data)),
+            Action::make('cancel_schedule')->label('Cancel schedule')->color('gray')->visible(fn (Track $record) => $record->status === TrackVisibility::SCHEDULED)
+                ->requiresConfirmation()->databaseTransaction(false)
+                ->modalDescription('The track returns to draft and will not go live at the scheduled time.')
+                ->fillForm(fn (Track $record): array => ['metadata_version' => $record->metadata_version, 'publication_version' => $record->publication_version])
+                ->schema([Hidden::make('metadata_version'), Hidden::make('publication_version')])
+                ->action(fn (Track $record, array $data, Action $action, ManageTracks $livewire) => $livewire->cancelTrackSchedule($record, $data, $action)),
+            Action::make('visibility')->label('Change visibility')->color('gray')
+                ->visible(fn (Track $record) => ChangeTrackVisibility::targets((string) $record->status) !== [])
+                ->modalHeading('Change visibility')
+                ->modalDescription('Unlisted keeps the track at its link but out of the catalog, search and sitemaps. Private is staff only: never served and never purchasable.')
+                ->fillForm(fn (Track $record): array => ['metadata_version' => $record->metadata_version, 'publication_version' => $record->publication_version])
+                ->schema(fn (Track $record): array => [
+                    Hidden::make('metadata_version'), Hidden::make('publication_version'),
+                    Select::make('target')->label('Make this track')->native()->required()
+                        ->options(array_combine(ChangeTrackVisibility::targets((string) $record->status), array_map('ucfirst', ChangeTrackVisibility::targets((string) $record->status)))),
+                ])
+                ->action(fn (Track $record, array $data, Action $action, ManageTracks $livewire) => $livewire->changeTrackVisibility($record, $data, $action)),
+            Action::make('share')->visible(fn (Track $record) => TrackVisibility::isLive($record->status))->url(fn (Track $record) => route('tracks.show', $record->slug))->openUrlInNewTab(),
+            Action::make('unpublish')->label('Return to draft')->visible(fn (Track $record) => TrackVisibility::isLive($record->status))->requiresConfirmation()->databaseTransaction(false)
                 ->mountUsing(function (Track $record, ManageTracks $livewire, ?Schema $schema = null): void {
                     $livewire->reviewPublication($record, 'unpublish');
                     $schema?->fill();
                 })
                 ->action(fn (Track $record, Action $action, ManageTracks $livewire) => $livewire->applyReviewedPublication($record, $action, 'unpublish')),
         ]);
+    }
+
+    /** Central wall time of the pending schedule, with the stored failure reason when a due schedule could not publish. */
+    public static function scheduleSummary(Track $record): ?string
+    {
+        $schedule = $record->status === TrackVisibility::SCHEDULED ? $record->pendingSchedule : null;
+        if ($schedule === null) {
+            return null;
+        }
+        $line = ucfirst($schedule->target_status).' at '.TrackPublicationSchedules::describe($schedule->publish_at);
+        if ($schedule->last_failure_reason !== null) {
+            $line .= ' — NOT PUBLISHED: '.$schedule->last_failure_reason.' (checked '.$schedule->attempts.'x)';
+        }
+
+        return $line;
     }
 
     public static function bulkMetadataLabels(): array

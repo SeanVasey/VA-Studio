@@ -2,6 +2,7 @@
 
 namespace App\Domain\Media;
 
+use App\Domain\Catalog\TrackVisibility;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\Models\MediaProcessingRun;
 use App\Jobs\ProcessMedia;
@@ -18,7 +19,7 @@ class QueueMediaProcessing
             $actor = app(MediaWriterActor::class)->authorize($actor);
             $source = MediaAsset::query()->lockForUpdate()->findOrFail($source->id);
             $track = $source->track()->lockForUpdate()->firstOrFail();
-            if ($track->status === 'published') {
+            if (TrackVisibility::isLive($track->status)) {
                 throw ValidationException::withMessages(['media' => 'Unpublish the track before processing a replacement media revision.']);
             }
             if ($source->disk !== 'local' || ! str_starts_with($source->storage_path, 'quarantine/') || $source->processing_run_id || ! in_array($source->role, ['master_wav', 'artwork', 'stems_zip'], true)) {

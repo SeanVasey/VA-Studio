@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\OfferRevision;
+use App\Domain\Catalog\TrackVisibility;
 use App\Domain\Commerce\Inventory\InventoryPolicy;
 use App\Domain\Commerce\Inventory\ManageRightsScope;
 use App\Domain\Commerce\Models\RightsScope;
@@ -204,7 +205,7 @@ final class ManageRightsScopes extends Command
             ->whereNotIn('current_revision_id', RightsScopeOffer::query()->select('offer_revision_id'))
             ->orderBy('id')->get();
         foreach ($offers as $offer) {
-            if ($offer->track?->status !== 'published') {
+            if (! TrackVisibility::isLive($offer->track?->status)) {
                 continue;
             }
             $revision = OfferRevision::find($offer->current_revision_id);

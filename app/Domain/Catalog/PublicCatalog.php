@@ -112,9 +112,23 @@ final class PublicCatalog
         ];
     }
 
+    /** Listed (published) tracks only. Callers that point at a track for others, such as legacy redirects, use this. */
     public function track(string $slug): array
     {
-        return $this->project(collect([$this->publishedTrack($slug)]));
+        return $this->project(collect([$this->publishedTrack($slug, false)]));
+    }
+
+    /**
+     * A track page by its own URL: the projection plus whether the track is unlisted, so the page can be served `noindex`
+     * and without structured data. Draft, scheduled and private tracks are not found here.
+     *
+     * @return array{projection: array, unlisted: bool}
+     */
+    public function direct(string $slug): array
+    {
+        $track = $this->publishedTrack($slug, true);
+
+        return ['projection' => $this->project(collect([$track])), 'unlisted' => $track->status === TrackVisibility::UNLISTED];
     }
 
     /** Internal model only. HTTP embeds must explicitly project public text and route IDs. */
@@ -128,9 +142,13 @@ final class PublicCatalog
         return $preview;
     }
 
-    private function publishedTrack(string $slug): Track
+    /**
+     * By its own URL, preview or license link. With `$direct`, unlisted tracks are found too; either way the same
+     * eligibility checks apply.
+     */
+    private function publishedTrack(string $slug, bool $direct = true): Track
     {
-        $track = $this->query()->where('slug', $slug)->first();
+        $track = ($direct ? $this->directQuery() : $this->query())->where('slug', $slug)->first();
         abort_unless($track && $this->eligible($track), 404);
 
         return $track;
@@ -197,9 +215,15 @@ final class PublicCatalog
             ->mapWithKeys(fn (Track $track): array => [$track->id => $track->title.' · '.$track->artist])->all();
     }
 
+    /** Every listing, search, filter, related-track and ID lookup is published only: an unlisted track is never discoverable. */
     private function query(): Builder
     {
-        return Track::query()->where('status', 'published')->with('assets');
+        return Track::query()->where('status', TrackVisibility::PUBLISHED)->with('assets');
+    }
+
+    private function directQuery(): Builder
+    {
+        return Track::query()->whereIn('status', TrackVisibility::LIVE)->with('assets');
     }
 
     private function eligible(Track $track): bool

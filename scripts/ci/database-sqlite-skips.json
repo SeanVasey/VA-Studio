@@ -1397,6 +1397,26 @@
     [
       "Tests\\Feature\\RefundDispute\\RefundDisputeProductionNativeTest",
       "test_two_staff_observing_one_order_serialize_and_the_second_finds_the_sequence_moved"
+    ],
+    [
+      "Tests\\Feature\\TrackSchedulingConcurrencyTest",
+      "test_native_lifecycle_blocked_attempt_and_forged_rows_hold_under_the_mysql_triggers"
+    ],
+    [
+      "Tests\\Feature\\TrackSchedulingConcurrencyTest",
+      "test_native_two_runners_that_selected_the_same_due_schedule_publish_it_exactly_once"
+    ],
+    [
+      "Tests\\Feature\\TrackSchedulingConcurrencyTest",
+      "test_native_a_cancel_that_loses_the_race_to_an_activation_changes_nothing"
+    ],
+    [
+      "Tests\\Feature\\TrackSchedulingConcurrencyTest",
+      "test_native_an_activation_that_loses_the_race_to_a_cancel_publishes_nothing"
+    ],
+    [
+      "Tests\\Feature\\TrackSchedulingConcurrencyTest",
+      "test_native_status_comparisons_are_byte_exact_under_the_case_and_space_insensitive_collation"
     ]
   ]
 }

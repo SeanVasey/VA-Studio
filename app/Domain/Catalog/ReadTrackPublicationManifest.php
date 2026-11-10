@@ -90,7 +90,8 @@ final class ReadTrackPublicationManifest
         if ($tags !== null && (! is_array($tags) || ! array_is_list($tags) || array_filter($tags, fn ($tag) => ! is_string($tag)))) {
             $this->invalid();
         }
-        if (! in_array($track->status, ['draft', 'published'], true)) {
+        // The scheduler captures a scheduled track, and an unlisted track may be reviewed for the catalog.
+        if (! in_array($track->status, ['draft', 'published', 'scheduled', 'unlisted'], true)) {
             $this->invalid();
         }
 

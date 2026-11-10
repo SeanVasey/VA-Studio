@@ -4,6 +4,7 @@ namespace App\Domain\Media;
 
 use App\Application\Media\MediaIntegrity;
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Catalog\TrackVisibility;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\Models\MediaProcessingRun;
 use App\Support\Audit\AuditEvent;
@@ -109,7 +110,7 @@ class MediaProcessor
                 app(MediaWriterActor::class)->requester((int) $run->requested_by);
                 $lockedSource = MediaAsset::query()->lockForUpdate()->findOrFail($source->id);
                 $track = Track::query()->lockForUpdate()->findOrFail($source->track_id);
-                if ($track->status === 'published') {
+                if (TrackVisibility::isLive($track->status)) {
                     throw new MediaFailure('track_published', 'Unpublish the track before processing a replacement media revision.');
                 }
                 $locked = MediaProcessingRun::query()->lockForUpdate()->findOrFail($run->id);

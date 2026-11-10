@@ -6,6 +6,7 @@ use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\OfferRevision;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicationReadiness;
+use App\Domain\Catalog\TrackVisibility;
 use App\Domain\Commerce\Models\RightsScope;
 use App\Domain\Commerce\Models\RightsScopeOffer;
 use App\Domain\Commerce\QuoteException;
@@ -70,7 +71,7 @@ final class ManageRightsScope
             $revision = OfferRevision::findOrFail($revisionId);
             $track = Track::whereKey($revision->track_id)->lockForUpdate()->firstOrFail();
             $offer = Offer::whereKey($revision->offer_id)->lockForUpdate()->firstOrFail();
-            if ($track->status !== 'published' || ! $offer->is_active || $offer->current_revision_id !== $revision->id ||
+            if (! TrackVisibility::isLive($track->status) || ! $offer->is_active || $offer->current_revision_id !== $revision->id ||
                 app(PublicationReadiness::class)->blockers($track) !== [] ||
                 app(PublicationReadiness::class)->revisionBlockers($offer, $revision) !== []) {
                 throw new QuoteException('SELECTION_CHANGED', 409);

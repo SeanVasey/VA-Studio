@@ -12,7 +12,7 @@ final class StorefrontMetadata
         'alt' => 'VASEY.AUDIO studio and audio production artwork', 'type' => 'image/jpeg'];
 
     /** @param  array{path: string, width: int, height: int, alt: string, type: string}|null  $share  the release's share image, if it sets one */
-    public function forPage(?array $track, ?array $siteContent = null, ?array $share = null): array
+    public function forPage(?array $track, ?array $siteContent = null, ?array $share = null, bool $unlisted = false): array
     {
         $siteContent ??= SiteContentSchema::defaults();
         $title = $this->text($siteContent['seo']['title'], 120);
@@ -49,7 +49,8 @@ final class StorefrontMetadata
             'imageAlt' => $imageAlt,
             'imageWidth' => $imageSize[0], 'imageHeight' => $imageSize[1], 'imageType' => $imageSize[2],
             'type' => $track === null ? 'website' : 'music.song',
-            'robots' => app()->environment('production') ? 'index, follow' : 'noindex, nofollow',
+            // An unlisted track is reachable by its link everywhere, including production, and is never indexed.
+            'robots' => ! $unlisted && app()->environment('production') ? 'index, follow' : 'noindex, nofollow',
         ];
     }
 
