@@ -34,8 +34,16 @@ destination, every backup set is on the staging host's own disk and the backup l
 | **What replaces it** | A destination Sean controls, entered on the host only ([checklist](staging-step11-checklist.md), step 7). Production needs its own destination, encryption and retention decision (U-02); the staging destination is not it. |
 | **How it is verified** | `sudo /usr/local/sbin/vasey-staging-backup nightly` ends with `shipped` in `/var/log/vasey-staging/backup.log`, the set is present at the destination, and one restore drill from the off-host copy is done and recorded (`backup-offhost-hardening.md`, "Restore drill"). |
 
-## P-3. Synthetic staff accounts and the synthetic rehearsal catalog (existing; listed for completeness)
+## P-3. Synthetic staff accounts and the synthetic rehearsal catalog (six tier shapes since BL-40)
 
-Not introduced by this change. `vasey:staging-synthetic-catalog` and its two `Synthetic …` staff accounts are described in
-[runbook section 5a](staging-runbook.md#5a-synthetic-rehearsal-catalog-optional-before-real-tracks). Their replacement is the
-reset under "Removing it before real content" there; their verification is an empty catalog before Sean's real tracks load.
+`vasey:staging-synthetic-catalog` and its two `Synthetic …` staff accounts are described in
+[runbook section 5a](staging-runbook.md#5a-synthetic-rehearsal-catalog-optional-before-real-tracks). Since BL-40 it creates
+six `[SYNTHETIC] TEST PRICE` licenses, one per tier shape, on every synthetic track (ledger PCL-02 and PCL-03).
+
+| | |
+| --- | --- |
+| **What it is** | Six tracks (`synthetic-rehearsal-01` to `-06`) with generated masters, previews, artwork and stems; six license templates `synthetic-rehearsal-tier-1-license` to `-tier-6-license`; on each track five published non-exclusive offers at 1.11, 2.22, 3.33, 4.44 and 5.55 USD and one inactive exclusive-shape draft offer at 6.66 USD. Every license name, feature list and text says "Synthetic rehearsal content — not for sale; staging test only". |
+| **Assumption: how the six shapes were derived** | Sean's private templates were not read. The shapes come from the repository only: the six tiers of `docs/legal/LICENSE-TIERS.md` (DD-01, v1 sells every tier of the six templates), taking just the "Deliverables (`required_asset_roles`)" and "Template type" columns, in that file's order. Shape 1 and 2: `download_mp3`, non-exclusive. Shape 3: `download_mp3`, `master_wav`, non-exclusive. Shape 4 and 5: `download_mp3`, `master_wav`, `stems_zip`, non-exclusive. Shape 6: the same three roles, exclusive. Prices follow DD-19's repeated-digit convention in tier order. No tier name, cap, term, territory, royalty, policy text or price is copied; the terms are schema 1 (features and deliverables), so typed usage, territory and duration fields are absent rather than filled with invented values. If Sean's templates differ in deliverables or type, change the definition in `SyntheticRehearsalCatalog::licenses()` and reset staging. |
+| **What is not rehearsable yet** | The exclusive purchase: the exclusive-shape offer stays a draft because public publication admits only non-exclusive licenses, and the test chain's exclusive preparation and activation (`PrepareExclusiveOffer`, `ActivateExclusiveOffer`) have no operator entry point. The free-claim flow: shape 1 is sold as a paid TEST PRICE offer. |
+| **What replaces it** | Nothing in production. Sean's real tracks, licenses (authored from his approved templates) and prices (S-8, C-4) are entered on a reset staging and in production; the synthetic catalog is removed by the reset under "Removing it before real content" in runbook section 5a. A staging that holds the earlier two-license catalog is reset before the six-tier run (the command refuses it). |
+| **How the replacement is verified** | Before Sean's real tracks load on staging, and on the production host: every `found` of the PCL-02 and PCL-03 queries in [`production-cleanup-ledger.md`](../production-cleanup-ledger.md#pcl-02-and-pcl-03-verification-commands) is 0, `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED` is off, and no user name starts with `Synthetic ` (PCL-11). |
