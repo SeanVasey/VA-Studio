@@ -55,7 +55,8 @@ class LegalPagesTest extends TestCase
     {
         $actor = LicenseFixtures::admin();
         $draft = $this->create(LegalPageFixtures::content('UNPUBLISHED LEGAL', ['privacy', 'terms', 'licenses']), $actor);
-        $this->assertSame(5, $draft->schema_version);
+        // The license comparison is the generated frame (DD-31), so the release is schema 6.
+        $this->assertSame(SiteContentSchema::GENERATED_LICENSES_VERSION, $draft->schema_version);
         foreach (self::PATHS as $path) {
             foreach (['', '?release='.$draft->id.'&preview=1'] as $query) {
                 $this->assertAbsent($path.$query, 'UNPUBLISHED LEGAL');
@@ -95,16 +96,17 @@ class LegalPagesTest extends TestCase
             ])
             ->assertJsonPath('props.metadata.canonicalUrl', 'https://audio.example.test/legal/privacy')
             ->assertJsonPath('props.sitePreview', false)
+            // The generated comparison is neither linked nor public while no license version is published (DD-31).
             ->assertJsonPath('props.siteContent.legal_links', [
                 ['title' => 'PUBLIC LEGAL Privacy policy', 'path' => '/legal/privacy'],
-                ['title' => 'PUBLIC LEGAL License comparison', 'path' => '/legal/licenses'],
             ]);
         $this->assertArrayNotHasKey('legal', $response->json('props.siteContent'));
         $this->assertArrayNotHasKey('images', $response->json('props.siteContent'));
-        foreach ([$response, $this->get('/legal/privacy')->assertOk(), $this->get('/legal/licenses')->assertOk(), $this->get('/')->assertOk()] as $page) {
+        foreach ([$response, $this->get('/legal/privacy')->assertOk(), $this->get('/')->assertOk()] as $page) {
             $page->assertDontSee(LegalPageFixtures::APPROVAL, false)->assertDontSee('approval_reference', false)
                 ->assertDontSee($release->content_hash, false);
         }
+        $this->assertAbsent('/legal/licenses', 'PUBLIC LEGAL License comparison');
         $this->assertAbsent('/legal/terms', 'PUBLIC LEGAL Terms');
         // Other pages carry the footer links, never the legal text.
         $home = $this->get('/', $this->headers())->assertOk();
