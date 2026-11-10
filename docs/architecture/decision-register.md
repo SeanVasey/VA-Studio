@@ -778,13 +778,31 @@ while there is any sign of use (§10). **U-08 resolved.**
 **Approved.** The repository is public, so GitHub-hosted standard runners carry no Actions charge; the cost is wall
 time only. Run once on the exact freeze candidate.
 
+### SQ-04 amendment (Sean, 2026-11-10, later the same day) — no family is deferred from development
+
+Sean: "We shouldn't be deferring development of those service pages like merch or others. Merch will use Printful."
+
+- **Development continues now** for every family SQ-04 listed as deferred: merchandise, services (catalog pages,
+  deposits/milestones), memberships, offers/negotiation and automatic bundles, alongside sound kits and collections.
+  Each is built default-off behind its own server-side flag, so building it never exposes an unfinished purchase path
+  (FP-001 "no unavailable product purchase links" is met by the flag, not by removing the family).
+- **Merchandise fulfillment: Printful** (print-on-demand). Printful produces, ships and handles returns per its policy;
+  the store sells, takes payment through the same verified Stripe path, and submits the order to Printful only after
+  durable verified payment. No Printful order is placed by a test or without Sean's API credentials on the host.
+- **Which families are switched on at launch** stays a per-family launch decision (Sean), taken when each family's
+  evidence is complete; building a family does not authorize enabling it.
+- Still Sean's for merch: the Printful account and API key (entered on the host only), product and variant choices and
+  retail prices, shipping and returns wording for TERMS (counsel), and tax treatment of physical goods (accountant).
+
 ### Reconciliation with the delegated decisions (DD-xx)
 
 | DD row | Status | Governing decision |
 | --- | --- | --- |
-| DD-04 collections, albums | Superseded | SQ-04: collections/albums **launch** (FP-006). Automatic bundles stay deferred (FP-066). |
+| DD-02 merchandise | Superseded | SQ-04 amendment: developed now, fulfillment through Printful, default-off until Sean enables it. |
+| DD-04 collections, albums | Superseded | SQ-04: collections/albums **launch** (FP-006). Automatic bundles are developed now, default-off (SQ-04 amendment). |
 | DD-05 sound kits | Superseded | SQ-04: sound kits **launch** (FP-007). See open question Q-2. |
-| DD-03 services | Refined | SQ-04: inquiry-only at launch; deposits/milestones deferred to v1.1 (FP-087). |
+| DD-03 services | Superseded | SQ-04 amendment: service pages, deposits and milestones are developed now, default-off; inquiry stays the live path until Sean enables more. |
+| DD-08, DD-09, DD-50 | Refined | SQ-04 amendment: offers, collaborator accounting and memberships are developed, not deferred; each stays default-off (MembershipHttpMount stays literal `false` until Sean authorizes a mount). |
 | DD-20 per-track tiers | Superseded for production | SQ-05: four tiers on by default, Exclusive per track (default on), stems-dependent tiers off without stems. Staging (DD-19/DD-20 B) unchanged. |
 | DD-24 free downloads | Superseded | SQ-11: Free Promotional terms approved; the free-grant hold is **not lifted at launch**. |
 | DD-26 tc-lib #162/#164 | Superseded | SQ-14: take them now, before contract activation, with profile re-pins through review. |
