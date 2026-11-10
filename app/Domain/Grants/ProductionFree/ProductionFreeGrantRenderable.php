@@ -3,6 +3,10 @@
 namespace App\Domain\Grants\ProductionFree;
 
 use App\Domain\Contracts\ContractIssuanceException;
+use App\Domain\Contracts\RenderFit\FaceMetrics;
+use App\Domain\Contracts\RenderFit\LineFit;
+use App\Domain\Contracts\RenderFit\PdfTextGlyphs;
+use App\Domain\Contracts\RenderFit\RenderFitException;
 use Throwable;
 
 /**
@@ -14,6 +18,11 @@ use Throwable;
  * - `ProductionFreeGrantText::build` applies the script/mark/control repertoire (`supportedText`) to every label and value,
  * - the font glyph check is the renderer's test on the finished text (a character the repertoire admits can still
  *   have no glyph in the retained font), over the same retained font files.
+ *
+ * - the fit check measures every free-text field with the retained font's own advance widths: the renderer's HTML cell
+ *   never splits a token at anything but a space, so a token wider than its 180 mm column runs past the right margin and
+ *   off the page (the PDF holds the glyphs; no reader shows them). Such a field is refused before it is sealed, and a
+ *   preflight render is checked against the finished PDF's own text runs (every glyph present, no run past the column).
  *
  * No normalization is applied: a value that is not renderable exactly as typed is refused, so what is sealed is always
  * what the person entered (decomposed accents are combining marks, which the repertoire excludes).
@@ -36,8 +45,21 @@ final class ProductionFreeGrantRenderable
      */
     private const PREFLIGHT_SKIP_CHARACTERS = 2000;
 
-    /** @var array<string, array{cw:array<int,mixed>,ctgu:array<int,int>,table:string}> */
+    /** The renderer's HTML cell: `addHTMLCell(posx: 15, width: 180)` at 10 pt (`ProductionFreeGrantPdfRenderer`). */
+    private const COLUMN_LEFT_MM = 15.0;
+
+    private const COLUMN_WIDTH_MM = 180.0;
+
+    private const FONT_SIZE_PT = 10.0;
+
+    /** The renderer sets labels in resource `F1` (bold) and values in `F2` (regular): it inserts `['B', '']` in that order. */
+    private const RESOURCE_FONTS = ['F1' => 'dejavusansb', 'F2' => 'dejavusans'];
+
+    /** @var array<string, array{cw:array<int,mixed>,dw:float,ctgu:array<int,int>,table:string}> */
     private static array $fonts = [];
+
+    /** @var array<string, array<int, int|float>> glyph id => advance (1/1000 em), by font */
+    private static array $advances = [];
 
     /** @var array<int, bool> codepoint => has a glyph in both retained font styles */
     private static array $glyphs = [];
@@ -63,6 +85,24 @@ final class ProductionFreeGrantRenderable
                 ProductionFreeGrantException::require(self::glyph(mb_ord($character)), 'unsupported_text');
             }
         }
+        foreach ([$title, $termsReference, $termsText, $assentText] as $value) {
+            self::requireFit($value, 'unrenderable_definition');
+        }
+        self::requireFit($declaredName, 'unsupported_text');
+    }
+
+    /**
+     * Refuses a value whose widest unbreakable run is wider than the renderer's column. Measured in the regular face (a
+     * value is never set in the bold one) after the renderer's own whitespace normalization.
+     */
+    private static function requireFit(string $value, string $reason): void
+    {
+        $value = str_replace(["\r\n", "\r", "\t"], ["\n", "\n", '    '], $value);
+        try {
+            LineFit::require('value', self::metrics('dejavusans'), self::FONT_SIZE_PT, $value, self::COLUMN_WIDTH_MM);
+        } catch (RenderFitException) {
+            throw new ProductionFreeGrantException($reason);
+        }
     }
 
     /**
@@ -81,15 +121,51 @@ final class ProductionFreeGrantRenderable
             return;
         }
         $origin = ['provenance' => $profile['provenance'], 'origin_id' => '00000000-0000-4000-8000-000000000000', 'accepted_at' => '2000-01-01T00:00:00Z',
-            'declared_name' => str_repeat('W', 120), 'definition_id' => '00000000-0000-4000-8000-000000000001', 'definition_hash' => str_repeat('a', 64),
+            'declared_name' => substr(str_repeat('WWW ', 30), 0, 119).'W', 'definition_id' => '00000000-0000-4000-8000-000000000001', 'definition_hash' => str_repeat('a', 64),
             'review_id' => '00000000-0000-4000-8000-000000000002', 'display_hash' => str_repeat('b', 64),
             'buyer_binding' => ['account_public_id' => str_repeat('p', 36)], 'definition' => ['title' => $definition['title'],
                 'terms_reference' => $definition['terms_reference'], 'terms_text' => $definition['terms_text'], 'terms_hash' => hash('sha256', $definition['terms_text']),
                 'assent_text' => $definition['assent_text'], 'assets' => $definition['assets']]];
         try {
-            app(ProductionFreeGrantRendererProcess::class)->render(ProductionFreeGrantRenderInput::fromOrigin($origin), $profile);
+            $input = ProductionFreeGrantRenderInput::fromOrigin($origin);
+            $rendered = app(ProductionFreeGrantRendererProcess::class)->render($input, $profile);
+            self::requireDrawn($rendered->pdfBytes, (new ProductionFreeGrantText)->build($input)['text']);
         } catch (Throwable) {
             throw new ProductionFreeGrantException('unrenderable_definition');
+        }
+    }
+
+    /**
+     * Checks a finished original against the text it was rendered from: every non-blank character of `$text` is drawn,
+     * in order, in the face that sets it, and no text run ends past the column. The second guard behind {@see requireFit()}.
+     *
+     * @throws RenderFitException
+     */
+    public static function requireDrawn(string $pdf, string $text): void
+    {
+        $right = (self::COLUMN_LEFT_MM + self::COLUMN_WIDTH_MM) * 72 / 25.4 + 0.05;
+        $space = ['dejavusans' => self::gid('dejavusans', 32), 'dejavusansb' => self::gid('dejavusansb', 32)];
+        $expected = array_values(array_filter(mb_str_split($text), static fn (string $character): bool => ! in_array($character, [' ', "\n", "\t"], true)));
+        $next = 0;
+        foreach (PdfTextGlyphs::runs($pdf) as $run) {
+            $font = self::RESOURCE_FONTS[$run['font']] ?? throw new RenderFitException('text run', 'a font the renderer does not set');
+            $advance = $run['adjust'];
+            foreach ($run['glyphs'] as $glyph) {
+                $advance += self::advance($font, $glyph);
+                if ($glyph === $space[$font]) {
+                    continue;
+                }
+                $character = $expected[$next++] ?? null;
+                if ($character === null || self::gid($font, mb_ord($character)) !== $glyph) {
+                    throw new RenderFitException('text run', 'a drawn glyph is not the next character of the text');
+                }
+            }
+            if ($run['x'] + $advance * $run['size'] / 1000 > $right) {
+                throw new RenderFitException('text run', 'a run ends past the column');
+            }
+        }
+        if ($next !== count($expected)) {
+            throw new RenderFitException('text', 'characters of the text are not drawn');
         }
     }
 
@@ -124,7 +200,39 @@ final class ProductionFreeGrantRenderable
         return ((ord($metric['table'][$codepoint * 2]) << 8) | ord($metric['table'][$codepoint * 2 + 1])) !== 0;
     }
 
-    /** @return array{cw:array<int,mixed>,ctgu:array<int,int>,table:string} */
+    private static function metrics(string $name): FaceMetrics
+    {
+        $font = self::font($name);
+
+        return FaceMetrics::fromTable($font['cw'], $font['dw']);
+    }
+
+    /** The glyph id the retained font gives a codepoint (0 when it has none). */
+    private static function gid(string $font, int $codepoint): int
+    {
+        $metric = self::font($font);
+        if ($codepoint > 0xFFFF) {
+            return (int) ($metric['ctgu'][$codepoint] ?? 0);
+        }
+
+        return (ord($metric['table'][$codepoint * 2]) << 8) | ord($metric['table'][$codepoint * 2 + 1]);
+    }
+
+    /** The advance of a glyph id in 1/1000 em, the first codepoint in the width table that maps to it. */
+    private static function advance(string $font, int $glyph): int|float
+    {
+        if (! isset(self::$advances[$font])) {
+            $advances = [];
+            foreach (self::font($font)['cw'] as $codepoint => $width) {
+                $advances += [self::gid($font, (int) $codepoint) => $width];
+            }
+            self::$advances[$font] = $advances;
+        }
+
+        return self::$advances[$font][$glyph] ?? self::font($font)['dw'];
+    }
+
+    /** @return array{cw:array<int,mixed>,dw:float,ctgu:array<int,int>,table:string} */
     private static function font(string $name): array
     {
         if (! isset(self::$fonts[$name])) {
@@ -138,7 +246,7 @@ final class ProductionFreeGrantRenderable
             } catch (Throwable) {
                 throw new ProductionFreeGrantException('renderer_unavailable');
             }
-            self::$fonts[$name] = ['cw' => $definition['cw'], 'ctgu' => is_array($definition['ctgu'] ?? null) ? $definition['ctgu'] : [], 'table' => $table];
+            self::$fonts[$name] = ['cw' => $definition['cw'], 'dw' => (float) ($definition['dw'] ?? 0), 'ctgu' => is_array($definition['ctgu'] ?? null) ? $definition['ctgu'] : [], 'table' => $table];
         }
 
         return self::$fonts[$name];

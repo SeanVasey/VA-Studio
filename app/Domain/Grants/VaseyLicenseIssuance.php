@@ -18,6 +18,8 @@ use App\Domain\Contracts\Production\VaseyLicenseV2Profile;
 use App\Domain\Contracts\Production\VaseyLicenseV2Render;
 use App\Domain\Contracts\Production\VaseyLicenseV2RendererProcess;
 use App\Domain\Contracts\RenderedContract;
+use App\Domain\Contracts\RenderFit\LicenseTextFit;
+use App\Domain\Contracts\RenderFit\RenderFitException;
 use App\Support\CanonicalJson;
 use Throwable;
 
@@ -110,8 +112,9 @@ final class VaseyLicenseIssuance
             $profile = VaseyLicenseV2Profile::current($projectRoot);
             $profileSha256 = VaseyLicenseV2Profile::hash($profile, $projectRoot);
             $coverage = (new VaseyLicenseV2PdfRenderer($projectRoot))->coverage();
+            $fit = self::fit($profile, $projectRoot)->warm();
         } catch (Throwable) {
-            [$profile, $profileSha256, $coverage] = [null, null, null];
+            [$profile, $profileSha256, $coverage, $fit] = [null, null, null, null];
         }
         try {
             $signature = VaseyLicenseSignature::fromConfig();
@@ -121,7 +124,7 @@ final class VaseyLicenseIssuance
             $signatureSha256 = null;
         }
 
-        return new VaseyLicensePreparedSelection($profile, $profileSha256, $coverage, $signatureSha256);
+        return new VaseyLicensePreparedSelection($profile, $profileSha256, $coverage, $signatureSha256, $fit);
     }
 
     /**
@@ -169,7 +172,7 @@ final class VaseyLicenseIssuance
             return [null, 'name_only_declaration', []];
         }
         $prepared ??= self::prepare();
-        if (! $prepared instanceof VaseyLicensePreparedSelection || $prepared->coverage === null) {
+        if (! $prepared instanceof VaseyLicensePreparedSelection || $prepared->coverage === null || $prepared->fit === null) {
             return [null, 'not_renderable', []];
         }
         if (ProductionCheckout::contractIdentityHeld($declaration)) {
@@ -204,7 +207,7 @@ final class VaseyLicenseIssuance
                 || ! hash_equals($prepared->profileSha256, CanonicalJson::hash($prepared->profile))) {
                 throw new ContractIssuanceException('profile_changed');
             }
-            [$values, $document] = self::document($input, $descriptor, $prepared->coverage, $contract['template']);
+            [$values, $document] = self::document($input, $descriptor, $prepared->coverage, $contract['template'], $prepared->fit);
             $texts = ['template' => $contract['template'], 'renderer_profile' => CanonicalJson::encode($prepared->profile)];
             $descriptor += ['renderer_profile_sha256' => $prepared->profileSha256,
                 'effective_hash' => CanonicalJson::hash(['profile_sha256' => $prepared->profileSha256, 'signature_sha256' => $prepared->signatureSha256]),
@@ -274,13 +277,13 @@ final class VaseyLicenseIssuance
             if (! hash_equals($profile['signature_sha256'], $signature->sha256)) {
                 throw new ContractIssuanceException('signature_changed');
             }
-            [$values, $document] = self::document($input, $profile, (new VaseyLicenseV2PdfRenderer)->coverage(), $template);
+            [$values, $document] = self::document($input, $profile, (new VaseyLicenseV2PdfRenderer)->coverage(), $template, self::fit(VaseyLicenseV2Profile::current()));
             if (! hash_equals($profile['expected']['input_hash'], $document->inputHash)) {
                 throw new ContractIssuanceException('profile_changed');
             }
             $signed = $signature->read();
             $rendered = app(VaseyLicenseV2RendererProcess::class)->render($input, $profile, $values, $template, $rendererProfile, $signed['bytes']);
-        } catch (ContractBindingException) {
+        } catch (ContractBindingException|RenderFitException) {
             throw new ContractIssuanceException('unsupported_input');
         }
         if (! hash_equals($profile['effective_hash'], $rendered->profileHash) || ! hash_equals($profile['expected']['text_digest'], $rendered->textDigest)) {
@@ -292,11 +295,16 @@ final class VaseyLicenseIssuance
 
     /**
      * The line's bound values and document under the given coverage (the v2 renderer's input rule). Reads no file: the
-     * coverage is passed in, and the document is built directly rather than through the renderer, which would re-read it.
+     * coverage and the width check are passed in, and the document is built directly rather than through the renderer,
+     * which would re-read it. A document the shared page layout would set past its column (an unbroken value wider than
+     * the column or its half, which the layout never splits and the page edge cuts off) is refused here, at selection and
+     * again before every render, instead of printing clipped: {@see LicenseTextFit}.
      *
      * @return array{0: array<string, string>, 1: VaseyLicenseDocument}
+     *
+     * @throws RenderFitException
      */
-    private static function document(array $input, array $descriptor, ContractGlyphCoverage $coverage, string $template): array
+    private static function document(array $input, array $descriptor, ContractGlyphCoverage $coverage, string $template, LicenseTextFit $fit): array
     {
         $contract = $descriptor['contract'];
         if (! hash_equals($contract['template_sha256'], hash('sha256', $template))) {
@@ -305,7 +313,16 @@ final class VaseyLicenseIssuance
         $values = ContractVariableBinder::bind($input, $input['source']['license']['structured_terms'] ?? [],
             new ContractLicenseConstants($contract['producer_alias'], $contract['state_province_country']), $coverage);
 
-        return [$values, VaseyLicenseDocument::build($template, $values, $input['buyer']['declarations'], $coverage)];
+        $document = VaseyLicenseDocument::build($template, $values, $input['buyer']['declarations'], $coverage);
+        $fit->assertFits($document, VaseyLicenseV2Profile::VERSION);
+
+        return [$values, $document];
+    }
+
+    /** The width check over the profile's own pinned metric files, each verified against the manifest as it is read. */
+    private static function fit(array $profile, ?string $projectRoot = null): LicenseTextFit
+    {
+        return new LicenseTextFit($profile, static fn (string $asset): string => VaseyLicenseV2Profile::assetBytes($profile, $asset, $projectRoot));
     }
 
     /**
