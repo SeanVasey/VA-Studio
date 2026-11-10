@@ -67,16 +67,21 @@ try {
             // FP-077 P2-2: record() takes the authorization lock, then holds it until the signed-in admitter (worker 1) is
             // waiting for that lock, after its own plain reads fixed its REPEATABLE READ snapshot. Then this coverage commits.
             $admitter = (int) file_get_contents($directory.'/ready-1');
-            app()->instance(TestDeliveryCoverageLedger::class, new class($directory, $admitter) extends TestDeliveryCoverageLedger {
-                public function __construct(private string $directory, private int $admitter) {}
+            app()->instance(TestDeliveryCoverageLedger::class, new class($directory, $admitter, (int) $connectionId) extends TestDeliveryCoverageLedger {
+                public function __construct(private string $directory, private int $admitter, private int $writer) {}
 
                 protected function locked(): void
                 {
                     touch($this->directory.'/locked-0');
                     $deadline = microtime(true) + 35;
                     do {
-                        $waiting = DB::connection('mysql_race_probe')->selectOne("SELECT COUNT(*) AS c FROM information_schema.INNODB_TRX WHERE trx_mysql_thread_id = ? AND trx_state = 'LOCK WAIT'", [$this->admitter]);
-                        if ((int) $waiting->c === 1) { touch($this->directory.'/admitter-waiting'); return; }
+                        // The admitter's connection requests an InnoDB lock that this connection holds. INNODB_TRX alone
+                        // did not list the waiting transaction on MySQL 8.4.11, while data_lock_waits did.
+                        $waiting = DB::connection('mysql_race_probe')->selectOne('SELECT COUNT(*) AS c FROM performance_schema.data_lock_waits w'
+                            .' JOIN performance_schema.threads r ON r.THREAD_ID = w.REQUESTING_THREAD_ID'
+                            .' JOIN performance_schema.threads b ON b.THREAD_ID = w.BLOCKING_THREAD_ID'
+                            .' WHERE r.PROCESSLIST_ID = ? AND b.PROCESSLIST_ID = ?', [$this->admitter, $this->writer]);
+                        if ((int) $waiting->c >= 1) { touch($this->directory.'/admitter-waiting'); return; }
                         usleep(10000);
                     } while (microtime(true) < $deadline);
                     // Report instead of failing here, so the test sees the admitter's own outcome and reason.
