@@ -137,6 +137,7 @@ class ServiceCatalogTest extends TestCase
         $this->assertSame('Quoted on request', ServiceCatalog::price(null, null));
         $this->assertSame('Quoted on request', ServiceCatalog::price(500, null));
         $this->assertSame('Quoted on request', ServiceCatalog::price(500, 'JPY'));
+        $this->assertSame('Quoted on request', ServiceCatalog::price(500, 'EUR'));
         $this->assertSame('USD 1,234.05', ServiceCatalog::price(123405, 'USD'));
     }
 
@@ -213,7 +214,7 @@ class ServiceCatalogTest extends TestCase
         }
         $bad = [['slug' => 'Bad Slug'], ['slug' => 'projects'], ['slug' => str_repeat('a', 81)], ['slug' => 'ok', 'price_minor' => 500],
             ['slug' => 'ok', 'currency' => 'USD'], ['slug' => 'ok', 'price_minor' => 0, 'currency' => 'USD'], ['slug' => 'ok', 'price_minor' => -5, 'currency' => 'USD'],
-            ['slug' => 'ok', 'price_minor' => '500', 'currency' => 'USD'], ['slug' => 'ok', 'price_minor' => 500, 'currency' => 'JPY'], ['slug' => 'ok', 'service_draft_id' => 9999]];
+            ['slug' => 'ok', 'price_minor' => '500', 'currency' => 'USD'], ['slug' => 'ok', 'price_minor' => 500, 'currency' => 'JPY'], ['slug' => 'ok', 'price_minor' => 500, 'currency' => 'EUR'], ['slug' => 'ok', 'price_minor' => 500, 'currency' => 'usd'], ['slug' => 'ok', 'service_draft_id' => 9999]];
         foreach ($bad as $changes) {
             try {
                 $service->approve($changes + ['service_draft_id' => $draft->id, 'price_minor' => null, 'currency' => null], $this->operator);

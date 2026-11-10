@@ -26,8 +26,8 @@ final class ServicePublications
     /** Slugs that would collide with the static /services/projects route. */
     public const RESERVED_SLUGS = ['projects'];
 
-    /** Currencies with two minor-unit digits, so the displayed amount is exact. */
-    public const CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'AUD'];
+    /** USD only (Sean, SQ-06): the store prices in US dollars, whose two minor-unit digits keep the displayed amount exact. */
+    public const CURRENCIES = ['USD'];
 
     public function approve(array $data, User $actor): ServicePublication
     {

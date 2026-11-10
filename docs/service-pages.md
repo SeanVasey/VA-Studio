@@ -21,7 +21,7 @@ Sean). BL-50's `FamilyEntryPoints` should read `catalogEnabled()` for the public
 
 The existing service draft (`ServiceDrafts`, private evidence only) has no approval state and no price. Phase 1 adds
 `service_publications` (one row per draft): an approval pins the draft's **latest immutable version** (id and content
-hash), a unique slug, and an **optional staff-entered price** (integer minor units plus one of USD, EUR, GBP, CAD, AUD;
+hash), a unique slug, and an **optional staff-entered price** (integer minor units in USD only, per Sean's SQ-06 decision; any other currency is refused server-side;
 both or neither). Approval needs `administer-catalog` and admin MFA, writes one audit event
 (`services.publication.approved` / `.withdrawn`, subject = the publication row) and is idempotent. Saving a newer draft
 version changes nothing public until staff approve again. Rows are never deleted; Withdraw hides the page at once and
