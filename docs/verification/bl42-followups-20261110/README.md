@@ -8,10 +8,10 @@ Branch `claude/bl42-followups-20261110`, from main `b5c980a9`. This is the defer
 | P2-2 | Fixed here | The `order_source` filters in `ReportingQueries`, `OperationalHealth` and `StaffCommerceDirectory` had no test. `SourceFilteredReadersTest` plants production rows under a test order's number; 13 single-filter mutations were each killed. |
 | P3-3 | Checked, no change | `ProductionTaxRefundDisputeTest` and `SourceFilteredReadersTest` do not branch on the database driver (no `getDriverName`, no SQLite or MySQL condition), so by the census rule (`scripts/ci/phpunit-shards.py`, driver-branching files only) they do not belong in `scripts/ci/database-mysql-selection.json`. The native-only coverage stays in `RefundDisputeProductionNativeTest` and `refund-dispute-production-race-worker.php`, both already listed. Both CI self-tests pass. |
 | P3-4 | Fixed here | The comment in `RefundDisputeAuthority::lock` said policy refused "before any row is locked or read"; `resolve()` makes plain reads first. It now says so. |
-| P3-1 | Deferred, unchanged | Recorded deferral from the review. The text of this finding was not in the brief for this batch, so it is neither fixed nor re-assessed here. |
-| P3-2 | Deferred, cannot be done here | Needs a schema change, and migration `2026_11_10_288200_refund_dispute_production_tax_chain` is already on main and must not be edited. If it is ever wanted it is a new forward-only migration. |
-| P3-5 | Deferred, unchanged | As P3-1. |
-| P3-6 | Deferred, unchanged | As P3-1. |
+| P3-1 | Deferred, unchanged | Production rows are not bound to the parent batch or line in the database (the PaidTax schema forbids external references); the binding is enforced by the locked verify instead. |
+| P3-2 | Deferred, cannot be done here | Migration `2026_11_10_288200_refund_dispute_production_tax_chain` drops guards and unique keys before creating the new ones, leaving a non-transactional MySQL window during deploy (create-first, drop-last would close it). It is already on main and must not be edited; any change would be a new forward-only migration. |
+| P3-5 | Deferred, unchanged | No test runs the migration over populated pre-migration data. |
+| P3-6 | Deferred, unchanged | Production `attention` states and holds are not surfaced to staff. Together with the new finalize guard, a refused finalization also leaves no staff-visible row (see Remaining). |
 
 ## Owner decisions recorded
 
