@@ -75,7 +75,7 @@ class CheckoutPaymentMethodsTest extends TestCase
     {
         $this->assertSame(['card'], Methods::forStored(['card']));
         $this->assertSame(Methods::OFFERED, Methods::forStored(['card', 'link']));
-        foreach ([['link'], ['card', 'klarna'], ['card', 'card'], ['Card'], [], null, 'card', ['a' => 'card'], [1 => 'card']] as $stored) {
+        foreach ([['link'], ['link', 'card'], ['card', 'klarna'], ['card', 'card'], ['Card'], [], null, 'card', ['a' => 'card'], [1 => 'card']] as $stored) {
             $this->assertSame(Methods::OFFERED, Methods::forStored($stored));
         }
     }
