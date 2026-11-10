@@ -343,6 +343,29 @@ class MerchPrintfulFulfillmentTest extends TestCase
         $this->assertSame(0, $this->printful->count('confirm'));
     }
 
+    public function test_a_hold_does_not_block_reconciling_a_confirmation_that_may_have_charged(): void
+    {
+        [$order] = $this->finalizedOrder();
+        config(['merch.confirm_orders' => true]);
+        $this->printful->confirmFailure = new PrintfulException('PRINTFUL_UNAVAILABLE', true);
+        $fulfillment = $this->recorded($order);
+        $this->assertSame(MerchFulfillment::CONFIRMING, app(SubmitMerchFulfillment::class)->handle($fulfillment)->state);
+        $this->printful->confirmFailure = null;
+        $this->observeProviderFacts($order, [['re_AFTER', 1000, 'succeeded']], []);
+
+        // Still a draft: the refund hold stops the re-send, and the row stays for an operator.
+        $kept = app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        $this->assertSame([MerchFulfillment::CONFIRMING, null], [$kept->state, $kept->lease_expires_at]);
+        $this->assertSame(1, $this->printful->count('confirm'));
+
+        // The first confirmation had in fact landed: the read-only lookup still settles it so staff can see the charge.
+        $draft = $this->printful->orders[$kept->external_id];
+        $this->printful->orders[$kept->external_id] = new PrintfulOrder($draft->id, $draft->externalId, 'inprocess');
+        $settled = app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        $this->assertSame([MerchFulfillment::CONFIRMED, 'inprocess'], [$settled->state, $settled->printful_status]);
+        $this->assertSame(1, $this->printful->count('confirm'));
+    }
+
     public function test_a_hold_that_appears_between_the_draft_and_the_confirmation_stops_the_charge(): void
     {
         config(['merch.confirm_orders' => true]);

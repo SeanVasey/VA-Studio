@@ -175,7 +175,10 @@ final class SubmitMerchFulfillment
         if (! $verified) {
             throw new MerchFulfillmentException('MERCH_PAYMENT_NOT_VERIFIED');
         }
-        if ($this->holds->exist($fulfillment->order_id)) {
+        // A row already in `confirming` may have been charged at Printful. It still reaches reconciliation under a hold,
+        // because that only reads Printful and settles local state; the re-send of a draft checks holds itself.
+        $state = MerchFulfillment::query()->whereKey($fulfillment->id)->value('state');
+        if ($state !== MerchFulfillment::CONFIRMING && $this->holds->exist($fulfillment->order_id)) {
             throw new MerchFulfillmentException('MERCH_ORDER_HELD');
         }
     }
