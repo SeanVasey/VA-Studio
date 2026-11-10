@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client';
 import Storefront from './Pages/Storefront';
 import CheckoutReturn from './Pages/CheckoutReturn';
 import Editorial from './Pages/Editorial';
+import Albums from './Pages/Albums';
+import Album from './Pages/Album';
 import CustomerSignIn from './Pages/CustomerSignIn';
 import CustomerLibrary from './Pages/CustomerLibrary';
 import FreeGrants from './Pages/FreeGrants';
@@ -24,6 +26,8 @@ createInertiaApp({
     if (name === 'Storefront') return Storefront;
     if (name === 'CheckoutReturn') return CheckoutReturn;
     if (name === 'Editorial') return Editorial;
+    if (name === 'Albums') return Albums;
+    if (name === 'Album') return Album;
     if (name === 'CustomerSignIn') return CustomerSignIn;
     if (name === 'CustomerLibrary') return CustomerLibrary;
     if (name === 'FreeGrants') return FreeGrants;
