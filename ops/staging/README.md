@@ -38,7 +38,7 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 | `php-fpm/vasey-staging.conf` | Default pool (300 s, 200 MiB uploads) | `/etc/php/8.4/fpm/pool.d/` |
 | `php-fpm/vasey-paid-delivery.conf` | Dedicated paid-delivery pool (7,800 s, no CPU cap), per `docs/ops/paid-delivery-runtime.md` | `/etc/php/8.4/fpm/pool.d/` |
 | `workers/vasey-staging-workers.conf` | Supervisor programs for the `media`, `payments`, `contracts` and `default`/`inquiry-alerts` workers, plus the scheduler | `/etc/supervisor/conf.d/vasey-staging.conf` |
-| `bin/vasey-staging-ctl` | Root helper: allocate/seal release ancestry, attach/detach storage, switch, quiesce, resume, snapshot, prune. It is the only sudo grant. | `/usr/local/sbin/` |
+| `bin/vasey-staging-ctl` | Root helper: allocate/seal release ancestry, attach/detach storage, switch, quiesce, resume, snapshot, space-check, backup-prune, prune. It is the only sudo grant. | `/usr/local/sbin/` |
 | `backup.sh` | Nightly backup: dump, private archive, `.env`, an isolated restore proof, then an off-host copy | `/usr/local/sbin/vasey-staging-backup` |
 | `seal-release.py` | Parent-first protected code sealing and safe private environment capture | `/usr/local/libexec/vasey-staging/` |
 | `release-step.sh` | Fixed unprivileged build and migration/cache steps under the enclosing root lease | `/usr/local/libexec/vasey-staging/` |
@@ -226,6 +226,12 @@ Before anything else it compares the root-installed helpers (`vasey-staging-ctl`
 4. The frozen `.env` starts as 0600. The built candidate repeats real Laravel admission before
    `vasey-staging-ctl attach` seals code and environment onto protected inodes, verifies the explicit runtime
    exceptions and bind-mounts private storage.
+0. Before anything is stopped, `ctl space-check` (the backup helper's `space-check`) estimates the snapshot (private store +
+   database + restore proof + margin, plus an encrypted copy when off-host hardening is on) against the free bytes and refuses
+   with the served release untouched ("FAILED before the quiesce"). `ctl prepare`, `activate` and `refresh` repeat it before
+   their own operation marker. After the snapshot (predeploy) and after a successful deploy, `ctl backup-prune` /
+   `vasey-staging-backup prune` apply `VASEY_BACKUP_KEEP` (or the tiered policy), never the set just taken; see
+   `docs/ops/staging-runbook.md` sections 8 and 9.
 5. `ctl activate` obtains one root lease and repeats fresh quiesce/stopped proof immediately before snapshot. It establishes:
    - `artisan down` in that release, proven by an exact 503;
    - workers and scheduler stopped;
@@ -346,7 +352,7 @@ There is no global CSP: the application sets CSP on the responses that need one.
    refuses normalization rather than guessing literal boundaries; retain the failed proof for review.
 4. Copies the set off-host with `rsync` over SSH if `VASEY_BACKUP_DEST` is set in `/etc/vasey-staging/staging.conf`.
 5. Resumes the site, including after a failed snapshot/proof/transfer, then reports any failure. Successful
-   runs prune old local sets. A failed resume remains an explicit recovery condition.
+   runs prune old local sets (a deploy's pre-deploy snapshot is pruned too, protecting the set just taken). A failed resume remains an explicit recovery condition.
 
 `docs/ops/staging-runbook.md` covers setting the destination, retention, and restoring.
 

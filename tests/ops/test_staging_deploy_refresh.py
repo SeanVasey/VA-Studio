@@ -73,7 +73,8 @@ CTL=(ctl_stub)
             self.assertEqual(run.returncode, 0, run.stderr)
             self.assertEqual((release / ".env").read_text(), candidate,
                              "refresh installed a later Forge edit instead of the profile it validated")
-            self.assertEqual((root / "trace").read_text().splitlines(), ["refresh"])
+            # The free-space check runs first, before the refresh quiesces anything.
+            self.assertEqual((root / "trace").read_text().splitlines(), ["space-check", "refresh"])
 
 
 if __name__ == "__main__":
