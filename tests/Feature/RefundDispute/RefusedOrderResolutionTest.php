@@ -239,6 +239,56 @@ class RefusedOrderResolutionTest extends TestCase
         $this->assertFalse($guard->resolved((string) Str::uuid()));
     }
 
+    public function test_the_locked_finalization_frame_refuses_a_resolved_order_that_the_pre_lock_read_missed(): void
+    {
+        $f = $this->pending();
+        $this->financial->refunds = [['re_FULL', $f['gross'], 'succeeded']];
+        $this->resolve($f);
+        // The provider state reverses to clean, and the unlocked pre-lock read is made blind to the resolution (as if it committed after
+        // that read). Only the locking check inside the frame can still refuse; without it this finalization would grant.
+        $this->financial->refunds = [];
+        $this->app->bind(ProductionTaxFinalizeGuard::class, fn () => new class extends ProductionTaxFinalizeGuard
+        {
+            public function resolved(string $orderPublicId, bool $locking = false): bool
+            {
+                return $locking && parent::resolved($orderPublicId, true);
+            }
+        });
+        $before = $this->snapshot();
+        try {
+            $this->finalizeOrder($f);
+            $this->fail('A resolved order was finalized past the pre-lock read');
+        } catch (PaidTaxException $error) {
+            $this->assertSame([409, ProductionTaxFinalizeGuard::RESOLVED], [$error->status, $error->reason]);
+        }
+        $this->assertSame($before, $this->snapshot());
+        $this->assertSame(0, DB::table('paid_tax_order_origins')->count());
+        $this->assertSame(0, DB::table('paid_tax_grant_origins')->count());
+    }
+
+    public function test_a_non_owner_gets_the_same_404_for_a_resolved_order_as_for_an_unresolved_one_with_no_provider_call(): void
+    {
+        $f = $this->pending();
+        $other = $this->enrollThroughLocalSmtp('other-resolved-buyer@example.test');
+        $attempt = function () use ($f, $other): array {
+            try {
+                (new PaidTaxGrants)->finalize($other['principal'], $other['user'], $f['order']['orderId']);
+                $this->fail('A non-owner finalized');
+            } catch (PaidTaxException $error) {
+                return [$error->status, $error->reason, $error->getMessage()];
+            }
+        };
+        $unresolved = $attempt();
+        $this->assertSame([404, null], [$unresolved[0], $unresolved[1]]);
+        $this->financial->refunds = [['re_FULL', $f['gross'], 'succeeded']];
+        $this->resolve($f);
+        $calls = count($this->financial->calls);
+        $this->assertSame($unresolved, $attempt(), 'a resolved order must not be distinguishable to another buyer');
+        $this->assertCount($calls, $this->financial->calls, 'a non-owner causes no new provider call');
+        $this->assertSame(0, DB::table('paid_tax_order_origins')->count());
+        $this->assertSame(0, DB::table('paid_tax_grant_origins')->count());
+    }
+
     public function test_clear_partial_failed_and_unresolved_provider_states_are_refused_and_write_nothing(): void
     {
         $f = $this->pending();
