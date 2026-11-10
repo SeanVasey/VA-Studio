@@ -50,6 +50,7 @@ use App\Domain\Memberships\Production\MembershipPaidInvoiceAuthority;
 use App\Domain\Memberships\Production\MembershipPolicy as ProductionMembershipPolicy;
 use App\Domain\Memberships\Production\MembershipPolicyFactsAuthority;
 use App\Domain\Memberships\Production\MembershipReservationAuthority;
+use App\Domain\Merch\Fulfillment\MerchFulfillmentPolicy;
 use App\Domain\Notifications\TransactionalNotificationPolicy;
 use App\Domain\Services\Invoicing\ServiceInvoicePolicy;
 use App\Domain\Services\Invoicing\StripeSdkInvoiceGateway;
@@ -124,6 +125,8 @@ class StagingEnvironmentAdmissionTest extends TestCase
         // BL-70: Stripe test-mode service invoicing (policy and gateway) is admitted wherever test commerce is; production holds its flag false.
         'app/Domain/Services/Invoicing/ServiceInvoicePolicy.php',
         'app/Domain/Services/Invoicing/StripeSdkInvoiceGateway.php',
+        // BL-63: Printful merch fulfillment is admitted in local, testing and staging behind its own default-off flag.
+        'app/Domain/Merch/Fulfillment/MerchFulfillmentPolicy.php',
         'app/Domain/Memberships/MembershipPolicy.php',
         'app/Domain/Grants/Free/FreeGrantPolicy.php',
         'app/Domain/Grants/Free/TestFreeGrantIdentity.php',
@@ -203,6 +206,7 @@ class StagingEnvironmentAdmissionTest extends TestCase
             'transactional-notifications.test_enabled' => true, 'transactional-notifications.transport' => 'private_capture',
             'transactional-notifications.policy_version' => TransactionalNotificationPolicy::VERSION,
             'support-attachments.fixture_enabled' => true, 'commerce.test_promotions' => '[]',
+            'merch.printful_enabled' => true,
             // The real SDK gateway admits only an exact sk_test_ credential shape.
             'payments.stripe.secret_key' => 'sk_test_SYNTHETICONLY12345',
         ]);
@@ -325,6 +329,7 @@ class StagingEnvironmentAdmissionTest extends TestCase
                 // after sending at least the account request; a refused one sends nothing at all.
                 return $transport->requests !== [];
             },
+            'merch printful fulfillment' => fn () => app(MerchFulfillmentPolicy::class)->enabled(),
             'synthetic memberships' => fn () => app(MembershipPolicy::class)->enabled(),
             'test free grants' => fn () => app(FreeGrantPolicy::class)->enabled(),
             'test free grant definitions' => fn () => self::completes(fn () => app(FreeGrantPolicy::class)

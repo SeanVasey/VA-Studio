@@ -26,7 +26,9 @@ The foundation selects the exact original contract or purchased media revision f
 }
 ```
 
-`TestAccessPolicy::CONTRACT` is authoritative. The JSON envelope is at most 4 KiB, and extra or changed values are refused. Older preparation, checkout, payment, finalization, issuance and activation flags are not required. Blocking a control and reading retained authorization evidence do not require the current access flag/policy, but they still require the supported local/testing environment and configured test account. These limits are separate from licensed exploitation terms and do not establish a lifetime website download cap or production policy.
+> **D-19 note, amended 2026-11-09 (FP-077).** The literal above is the retained `test-owner-delivery-v1`: one committed POST stream attempt and no ranges, and v1 authorizations and history still verify under it. Sean approved a second literal, `TestAccessPolicy::CONTRACT_V2` (`test-owner-delivery-v2`), for resumable transfers: the token POST answers 303 to a session-bound GET, single ranges resume within a size-tiered window after the first byte, and a download counts once, when the distinct bytes served cover the file. Exactly one of the two literals may be configured. The v2 design, its config values and the remaining paid/free phases are in [delivery-range-requests.md](delivery-range-requests.md).
+
+`TestAccessPolicy::CONTRACT` (v1) and `TestAccessPolicy::CONTRACT_V2` are authoritative. The JSON envelope is at most 4 KiB, and extra or changed values are refused. Older preparation, checkout, payment, finalization, issuance and activation flags are not required. Blocking a control and reading retained authorization evidence do not require the current access flag/policy, but they still require the supported local/testing environment and configured test account. These limits are separate from licensed exploitation terms and do not establish a lifetime website download cap or production policy.
 
 ## Provisioning and restriction
 
@@ -68,6 +70,8 @@ A new secret contains 32 random bytes transported as 43 base64url characters. On
 `expires_at = issued_at + 60 seconds`, in UTC whole seconds. Redemption requires `now < expires_at`; exact equality is expired. Fresh target verification happens again, and the authorization's original expiry still applies after file preparation, lock waits, evidence verification and auditing. Under order → control → authorization locks, the service verifies the graph and captured control version, then inserts one immutable redemption/audit. Time and policy are checked again after transactional observers before the callback returns. Unique authorization membership prevents a second committed redemption.
 
 Pre-commit failure closes the prepared snapshot and leaves no redemption. After commit, the attempt is consumed even if a transport disconnect or process failure delivers zero bytes. Expiry or a later block does not recall an already committed stream. This is **one committed stream attempt, not confirmed receipt**. No range, resume, reset, secret recovery or lifetime download-count mechanism is included.
+
+> **D-19 note, amended 2026-11-09 (FP-077).** The paragraph above describes v1. Under v2 the redemption row marks the start of a transfer, not a consumed attempt: further responses (full or single-range) resume the same authorization until `redeemed_at` plus its frozen resume window, and the download counts once, on the `test_delivery_coverage` row whose served bytes first cover the file. Partial and interrupted transfers never count; started-but-incomplete transfers are capped per grant per rolling 24 hours. Secret recovery and resets are still not offered. See [delivery-range-requests.md](delivery-range-requests.md).
 
 | Bounded domain reason | Meaning / recovery |
 | --- | --- |

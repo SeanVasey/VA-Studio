@@ -25,7 +25,7 @@ Every value comes from the guide; the figures were measured with ClamAV 1.5.4 on
 
 | Setting | Value | Reason |
 | --- | --- | --- |
-| `MaxFileSize`, `MaxScanSize` | `1280M`, `1280M` (kept equal) | The worker rebuilds every stems ZIP and scans it too, so the largest admitted archive needs its expanded size twice. The application derives the figure in `MalwareScanner::limitMebibytes()`. |
+| `MaxFileSize`, `MaxScanSize` | `2047M`, `2047M` (kept equal) | The worker rebuilds every stems ZIP and scans it too, so the largest admitted archive needs its expanded size twice. The application derives the figure in `MalwareScanner::limitMebibytes()`. 2047M is also the most ClamAV can be given: it cannot scan a file of 2 GiB or more. |
 | `AlertExceedsMax` | `yes` | A file over a limit, or a scan that outlasts `MaxScanTime`, is an error (`Heuristics.Limits.Exceeded`, exit 1) and not an `OK`. The application's canary refuses a daemon that does not do this. |
 | `MaxScanTime` | `240000` ms | Keeps the daemon's give-up time under the client's 300-second wall limit. |
 | `MaxThreads` | `4` | At least twice the media workers (the kit runs one): `clamd` keeps scanning for a client the application killed, and a retry would queue behind it. `install-clamd.sh --media-workers N` raises it to `2N` when larger. |
@@ -33,7 +33,7 @@ Every value comes from the guide; the figures were measured with ClamAV 1.5.4 on
 | `EnableVersionCommand` | `yes` | The application reads the signature date from the daemon's answer (packaged: `false`, which makes every scan `scanner_signatures_stale`). |
 | `ScanArchive` and the other `Scan*` | `yes` | `ScanArchive no` passes the canary and reads `OK` for an EICAR member in a ZIP. |
 | `ConcurrentDatabaseReload`, `SelfCheck` | `yes`, `600` | Scans continue through a reload; a changed database is noticed within 10 minutes. |
-| `TemporaryDirectory` | `/var/tmp/clamd` | Disk-backed and owned by the daemon; up to `MaxThreads` x 1280 MiB of extraction. |
+| `TemporaryDirectory` | `/var/tmp/clamd` | Disk-backed and owned by the daemon; up to `MaxThreads` x 2047 MiB of extraction. |
 | Logging | syslog, no `LogFile` | The journal collects it; nothing to rotate. |
 
 `clamconf -c <dir containing clamd.conf> -n` parses the file with the installed ClamAV and rejects an unknown option.

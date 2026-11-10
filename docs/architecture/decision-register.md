@@ -376,6 +376,12 @@ each table to an existing §7 row and add two rows where §7 had none.
 The test-delivery chain is phase 1. Paid, paid-tax, free and production-free follow in their own phases, each with native
 MySQL race evidence and independent review. #252 and #253 are closed as superseded.
 
+*Addendum, 2026-11-09 (delegated; from the independent review of #258, P2-1).* Count-on-complete per authorization can be
+split across authorizations (A serves `0..N-2`, B serves `-1`). Decided 2026-11-09, delegated by Sean: from Phase 2
+(where `max_downloads` applies), a download counts once when the grant's union coverage across its authorizations in a
+rolling 24 h window reaches 90% of the file (which includes any single authorization reaching 90%); each window counts at
+most once. Phase 1 test delivery has no `max_downloads` and keeps count-on-complete. Phase 2 implements this.
+
 **Unpaid order snapshots (retention).** An order snapshot is created before payment. One with no verified payment,
 whose provider session has expired or been cancelled and reconciled, counts as "did not become an order": it falls under
 the 30-day abandoned-checkout row from that point. Any paid, refunded, disputed or held order stays with the orders row.
@@ -418,6 +424,10 @@ Still Sean's, not delegable:
   `docs/verification/member-source-currentness-20261013/` and not from the shipped `composer.lock`;
 - the staging step 11 inputs;
 - every live-payment, DNS, production and customer-import authorization.
+
+## D-20 amendment — 2026-11-09: resumable test delivery (FP-077)
+
+The decision is the "Large-download resume (FP-077)" item of the register update above; this entry records only how it amends D-20 and D-19. D-20 rejected token-bearing GET links because a secret in a URL leaks through history, logs and referrers. That rule stands: under `test-owner-delivery-v2` the token is still presented once in the CSRF-protected POST body, which answers 303 to a GET whose URL holds only the opaque authorization ID and which works only in the server-side session that created the authorization (a random session secret hash-bound into its evidence). JavaScript blob downloads stay excluded. D-19's "one committed stream attempt" holds for v1 only; a v2 authorization counts one download when served bytes cover the file. Phase 1 (test-delivery chain) and the remaining phases: [delivery-range-requests.md](../delivery-range-requests.md).
 
 ## Register update — 2026-11-10: delegated decisions and staging placeholders
 

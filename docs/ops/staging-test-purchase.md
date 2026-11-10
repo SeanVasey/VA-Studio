@@ -1,6 +1,6 @@
 # Staging guest test purchase (Stripe test mode)
 
-Status: **prepared, not yet run against Stripe.** Every step below was exercised with synthetic provider fixtures (see [Evidence](#evidence)). No real Stripe test transaction has run through this application yet, so expect to find interoperability issues on the first run and record them.
+Status: **run once end to end on 2026-11-10 on staging, in Stripe test mode** (see [First real run](#first-real-run-2026-11-10)). Before that, every step was exercised only with synthetic provider fixtures (see [Evidence](#evidence)). One run is not a soak: the four failure drills below have not been run against real Stripe, and the runbook fixes and [known follow-ups](#known-follow-ups) from that run are recorded here.
 
 This guide is for Sean and the staging operator. It covers one guest purchase on the private staging host, from the storefront to downloading the purchased files, plus four failure drills. Everything here is **test mode only**. No real card is charged, no live key is used and no production path is turned on.
 
@@ -27,6 +27,7 @@ Do these once, before the first purchase. Steps 1–3 need Sean.
 ### 1. Stripe Dashboard, in test mode
 
 1. Switch the Dashboard to **Test mode**.
+   - Prerequisite: confirm **Link** is enabled for the account (Settings → Payment methods; the checkout request names `card` and `link`). If Link is disabled, creating the session, or the check that the returned session echoes exactly the requested methods, fails closed and no checkout opens. The staging sandbox account's default payment method configuration was read through the Stripe API in test mode on 2026-11-10 and showed Link available and on, card on, and bank debit off; that was a configuration read, no Link payment has been exercised.
 2. Note the account ID (`acct_…`) of the account you will use. It must be the account that owns the key in step 3. Do not use a connected account.
 3. Create or reveal a **standard secret key** (`sk_test_…`). Restricted keys (`rk_test_…`) are refused by the application.
 4. Add a webhook endpoint (Developers → Webhooks, or Workbench → Event destinations):
@@ -103,7 +104,7 @@ leaves admission closed: wait for it to finish, inspect `ctl status`, then retry
 gate or resume after a failed backup/migration. For this kit, choose the current-based oneshot service/timer
 or scheduler; avoid a daemon that retains old script code across release switches.
 
-- **systemd:** install `ops/staging/test-commerce/vasey-test-commerce-pipeline.service` and `.timer` after replacing `<APP_USER>` and `<APP_ROOT>` (for the kit, `forge` and `/srv/vasey-staging/current`; instructions inside the unit). Logs: `journalctl -u vasey-test-commerce-pipeline.service -f`.
+- **systemd:** install `ops/staging/test-commerce/vasey-test-commerce-pipeline.service` and `.timer` after replacing `<APP_USER>` and `<APP_ROOT>` (for the kit, `forge` and `/srv/vasey-staging/current`; instructions inside the unit). Logs: `journalctl -u vasey-test-commerce-pipeline.service -f`. If that prints "No journal files were found", see [Reading the journal on the Forge host](#reading-the-journal-on-the-forge-host).
 - **Forge scheduler:** add a job that runs every minute as the site user:
 
   ```sh
@@ -161,14 +162,16 @@ Use one browser, signed in to nothing. The guest's order ownership lives in that
 
 | # | Do | Expect | Verify on the host |
 | --- | --- | --- | --- |
-| 1 | Open `https://<STAGING_HOST>`, pass basic auth, open a track, choose a license, **Add license**. | The cart shows the license and price. | — |
-| 2 | Open the cart and start the test order review. | The price with zero test tax, the full license terms, the seller name and the assent text. | — |
-| 3 | Enter a name and a test email you control, tick the assent, **Prepare order**. | An order reference appears; "Open Stripe test checkout". | If it fails with `INVENTORY_SCOPE_UNAVAILABLE`, do setup step 5. |
-| 4 | **Open Stripe test checkout** → **Continue to Stripe test checkout**. | Stripe's hosted page shows "VASEY.AUDIO test license 1", the same amount, card only. | The Stripe page address contains the `cs_test_…` session ID; Dashboard → Developers → Logs shows the `POST /v1/checkout/sessions` request. |
+| 1 | Open `https://<STAGING_HOST>`, pass basic auth, open a track, choose a license, press **Add license**. | The cart shows the license and price. | — |
+| 2 | Open the cart and press **Review selection**. The cart then offers **Review test order**; press it. | The price with zero test tax, the full license terms, the seller name and the assent text. | — |
+| 3 | Enter a name and a test email you control, tick the assent, press **Prepare test order**. | An order reference appears, with an **Open Stripe test checkout** button. | If it fails with `INVENTORY_SCOPE_UNAVAILABLE`, do setup step 5. |
+| 4 | Press **Open Stripe test checkout**, then **Continue to Stripe test checkout**. | Stripe's hosted page shows "VASEY.AUDIO test license 1", the same amount and card payment (Link, and Apple Pay or Google Pay where the browser offers them, may also appear; no bank debit, Klarna or similar). | The Stripe page address contains the `cs_test_…` session ID; Dashboard → Developers → Logs shows the `POST /v1/checkout/sessions` request. |
 | 5 | Pay with card `4242 4242 4242 4242`, any future expiry, any CVC, any postcode. | Stripe redirects back to the store's return page. It says the result is not verified yet. | `php artisan vasey:stripe-inbox --limit=5` lists a `checkout.session.completed` receipt. Dashboard → Webhooks shows a `200` delivery. |
-| 6 | Wait up to two minutes, then press **Check Stripe test checkout status** or reload. | Payment `verified`; contract and fulfillment progress. | Runner log: `receipts <id> awaiting_finalization`, `finalize <order> paid`, `contracts <grant> ready`, `activate <order> activated`. Studio → Test commerce → Test contract issuance shows "Original recorded". |
+| 6 | Wait up to two minutes, then press **Check Stripe test checkout status** or reload. | Payment `verified`; contract and fulfillment progress. | Runner log, only for the work the runner itself does: `receipts <id> awaiting_finalization`, `finalize <order> paid`, `contracts <grant> ready`. The queue workers usually get there first, as on the 2026-11-10 run, and then the runner log shows only `activate <order> activated`. In that case the evidence is `php artisan vasey:stripe-inbox`, Studio → Test commerce → Test contract issuance ("Original recorded") and the order status on the return page. |
 | 7 | Operator enables delivery for this order (below). | — | Output `<control id> enabled version=1`. |
 | 8 | On the return page (or the cart's order status), press **Check Stripe test checkout status**. The downloads section appears once payment is verified, the order is paid and the contract is issued. Download the contract and each file. | `<grant>-contract.pdf` and the purchased files (`master_wav`, `download_mp3`, `stems_zip` as the license requires). Each click gives one 60-second, single-use authorization; at most three per minute per order. | The server re-hashes every file before streaming. Optional check below. |
+
+**The return page can lag the server.** After payment the page can show "finalization pending" for up to about a minute while the order is already finalized, because the page catches up only once activation has run. Reload, or press **Check Stripe test checkout status**, to refresh it.
 
 ### Enable delivery for one order (operator)
 
@@ -195,6 +198,17 @@ php artisan tinker --execute='echo App\Domain\Media\Models\MediaAsset::where("tr
 
 The profile enables test customer accounts. The buyer can create a test account and claim the guest order into it, so downloads survive a new browser session. No email is sent: the one-time link is written to `storage/app/private/customer-identity-capture/<uuid>.json` on the host. The buyer signs up with a reserved test address such as `name@example.test`, and the operator relays the link with `vasey:test-identity-links` ([runbook section 6a](staging-runbook.md#6a-test-customer-sign-in-links)). See [Test customer enrollment and recovery](../customer-test-self-service.md).
 
+### Reading the journal on the Forge host
+
+On the Forge staging host `journalctl -u vasey-test-commerce-pipeline.service` printed "No journal files were found", because the host's `/etc/machine-id` differs from the directory name under `/var/log/journal/`, and journalctl looks for a directory named after the machine id. Point it at the directory that exists (there is one):
+
+```sh
+ls /var/log/journal/
+journalctl -D /var/log/journal/<dir> -u vasey-test-commerce-pipeline.service
+```
+
+Or read `/var/log/syslog`. Do not change `/etc/machine-id` to match.
+
 ## Test cards
 
 All from Stripe's documented test set; use any future expiry, any CVC and any postcode.
@@ -207,7 +221,7 @@ All from Stripe's documented test set; use any future expiry, any CVC and any po
 | `4000 0025 0000 3155` | 3D Secure required | Stripe opens an authentication window. **Complete** → succeeds. **Fail** → declined, session stays open. |
 | `4000 0000 0000 3220` | 3D Secure 2 required | As above. |
 
-Checkout is card-only, so the `async_payment_*` events should not occur; they are subscribed only so an unexpected one is processed rather than ignored.
+Checkout offers card and Link. Confirmation is not assumed synchronous (Link can be bank-funded and land at `processing`), so `async_payment_succeeded` and `async_payment_failed` can occur. They are locators only: the event triggers a retrieval, a `processing` PaymentIntent is retried and never granted, and a grant happens only after a paid session and a `succeeded` PaymentIntent with the exact amount are verified from Stripe.
 
 ## Drills
 
@@ -292,13 +306,32 @@ Set `STRIPE_TEST_CHECKOUT_ENABLED=false` to stop new checkouts. Leave processing
 
 Use only if the Dashboard endpoint cannot reach the host. `ops/staging/test-commerce/stripe-listen.service` runs `stripe listen --forward-to https://<STAGING_HOST>/webhooks/stripe` for the four events, using the test key from a root-only environment file. The CLI signs forwarded events with its own `whsec_…` (shown by `stripe listen --print-secret`), which must replace `STRIPE_WEBHOOK_SECRET`. Disable the Dashboard endpoint while the fallback runs, because the application accepts one signing secret. Instructions are inside the unit file.
 
+## First real run (2026-11-10)
+
+One guest purchase was run end to end on the staging host in Stripe test mode with card `4242 4242 4242 4242`. Outcomes, without order, session or customer identifiers:
+
+- Payment was verified about 3 seconds after the webhook arrived.
+- The test contract was issued.
+- Fulfillment activation followed after about 40 seconds.
+- Delivery was enabled by an operator for that one order.
+- The downloaded contract and MP3 matched the stored hashes.
+
+Only a card payment was exercised: no Link payment, no declined-card, expired-session, duplicate-webhook or late-payment drill has run against real Stripe. The queue workers finalized and issued the contract before the runner did, so the runner log showed only the activation line (see step 6).
+
+## Known follow-ups
+
+Found on that run and not yet fixed. Docs only for now; neither changes payment evidence.
+
+- The buyer's email is not passed to Stripe Checkout (`customer_email`), so the buyer types it again on the Stripe page.
+- Each **Check Stripe test checkout status** click on an already-verified order makes another reconcile read of Stripe.
+
 ## Evidence
 
 Recorded 2026-10-08–09 on PHP 8.4.26 with synthetic fixtures only. Current and historical selections, including SQLite and native MySQL 8.4.11 journeys, are distinguished in the [verification record](../verification/staging-test-commerce-20261009/README.md):
 
-- `tests/Unit/TestCommerceProfileValidatorTest.php`: the committed template passes all 38 checks in template mode; a filled synthetic profile passes against the real policy classes; broken variants each fail on the responsible check, including script-readable cookies; safe exports cannot mask unsafe files or permit the optional account probe; no value is printed.
+- `tests/Unit/TestCommerceProfileValidatorTest.php`: the committed template passes all 39 checks (38 before the FP-077 `delivery.v2_session_database` check) in template mode; a filled synthetic profile passes against the real policy classes; broken variants each fail on the responsible check, including script-readable cookies; safe exports cannot mask unsafe files or permit the optional account probe; no value is printed.
 - `tests/Unit/TestCommercePipelineRunnerTest.php`: cursor following, full-page repetition, page bounds with a saved reconcile cursor, reconcile cadence, failure handling, lock, bounded loop and log redaction, against a scripted stand-in for artisan.
 - `tests/Feature/StagingTestCommerceProfileJourneyTest.php`: configured only from the profile, a guest purchase runs quote → order → checkout → signed webhook (sent twice) → the runner's five commands → operator enable → download of the contract and master WAV with matching SHA-256. Also: reconcile without webhook, declined card, expired session, late payment, the missing scope link, and an abandoned order blocking its offer revision while a paid order releases it.
 - A real-process run of `run-test-commerce-pipeline.sh` with real artisan on a disposable SQLite database finalized, rendered a real `test-buyer-pdf-v2` contract and activated a seeded synthetic order.
 
-None of this establishes real Stripe interoperability. The first real run on staging is that evidence; record its order UUIDs, runner log and any defects.
+The synthetic fixtures above do not establish real Stripe interoperability; the one real staging run is recorded under [First real run](#first-real-run-2026-11-10). Record further runs, their runner logs and any defects.

@@ -19,8 +19,8 @@ final class BeatStarsMediaFiles
         'artwork_high_res' => ['png', 'jpg', 'jpeg'],
     ];
 
-    /** Intake caps (IngestMediaUpload): WAV and ZIP sources 200 MiB, artwork 20 MiB. */
-    private const MAX_BYTES = ['master_wav' => 209715200, 'stems_zip' => 209715200, 'artwork' => 20971520, 'artwork_high_res' => 20971520, 'preview_mp3' => 209715200];
+    /** Intake caps (IngestMediaUpload::MAX_BYTES): WAV 200 MiB, stems ZIP 1 GiB, artwork 20 MiB; the MP3 preview keeps 200 MiB. */
+    private const MAX_BYTES = ['master_wav' => 209715200, 'stems_zip' => 1073741824, 'artwork' => 20971520, 'artwork_high_res' => 20971520, 'preview_mp3' => 209715200];
 
     private function __construct(private readonly string $root) {}
 

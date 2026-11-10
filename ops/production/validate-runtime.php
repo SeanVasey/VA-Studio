@@ -164,6 +164,15 @@ try {
             $check('holds.'.strtolower($name), in_array(strtolower((string) $values[$name]), ['false', '(false)'], true));
         }
     }
+    // ---- BEGIN BL-63 merch/Printful hold (own block; lifting it is a reviewed change with Sean's authorization, U-12) ----
+    // Merchandise fulfillment ships default-off and is admitted only in local, testing and staging. In production both switches
+    // may only be the literal false, or unset. A blank or any other value fails here, before the configuration check below.
+    foreach (['MERCH_PRINTFUL_ENABLED', 'MERCH_PRINTFUL_CONFIRM_ENABLED'] as $name) {
+        if (array_key_exists($name, $values)) {
+            $check('holds.'.strtolower($name), in_array(strtolower((string) $values[$name]), ['false', '(false)'], true));
+        }
+    }
+    // ---- END BL-63 merch/Printful hold ----
     if (isset($arguments[4])) {
         $previous = $arguments[4];
         if (! is_file($previous) || is_link($previous) || filesize($previous) > 262144) {
@@ -282,6 +291,10 @@ try {
         // FP-013: the operator alert mail transport refuses production in code unless this literal is true. It is lifted only
         // together with the CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED hold above, in one reviewed change.
         $check('holds.operator_alert_mail_production_admitted', config('inquiries.operator_alert_mail_production_admitted') === false);
+        // ---- BEGIN BL-63 merch/Printful hold (config as the application reads it; strictly false, so a renamed key fails closed) ----
+        $check('holds.merch_printful_enabled', config('merch.printful_enabled') === false);
+        $check('holds.merch_printful_confirm_enabled', config('merch.confirm_orders') === false);
+        // ---- END BL-63 merch/Printful hold ----
         // DD-44: the marketing segment stays off through launch. Strictly false, so a renamed or removed key fails closed.
         foreach ($launchOffKeys as $name => $key) {
             $check('holds.'.strtolower($name), config($key) === false);

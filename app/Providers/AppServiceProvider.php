@@ -17,6 +17,8 @@ use App\Domain\Grants\PaidTax\PaidTaxRendererProcess;
 use App\Domain\Grants\ProductionFree\ProductionFreeGrantRendererProcess;
 use App\Domain\Inquiries\Notifications\MailInquiryAlertTransport;
 use App\Domain\Media\MediaWorkflowBudget;
+use App\Domain\Merch\Fulfillment\Printful\HttpPrintfulClient;
+use App\Domain\Merch\Fulfillment\Printful\PrintfulClient;
 use App\Domain\Services\Invoicing\StripeInvoiceGateway;
 use App\Domain\Services\Invoicing\StripeSdkInvoiceGateway;
 use App\Http\ProductionCheckout\ProductionCheckoutMount;
@@ -74,6 +76,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(StripeFinancialInspectionGateway::class,
             StripeSdkCheckoutGateway::class);
         $this->app->bind(StripeInvoiceGateway::class, StripeSdkInvoiceGateway::class);
+        // BL-63: the only Printful transport. Tests bind a fake over it; it refuses without a configured token.
+        $this->app->bind(PrintfulClient::class, fn () => new HttpPrintfulClient(
+            config('merch.printful.api_key'), config('merch.printful.store_id')));
     }
 
     public function boot(): void
@@ -82,6 +87,8 @@ class AppServiceProvider extends ServiceProvider
         // Keep these IP-only named budgets available on every application boot.
         RateLimiter::for('public-track-embed', fn (Request $request) => Limit::perMinute(120)->by($request->ip()));
         RateLimiter::for('public-track-embed-audio', fn (Request $request) => Limit::perMinute(240)->by($request->ip()));
+        // Printful's sender addresses are not published, so the budget is per client address and generous for its retry schedule.
+        RateLimiter::for('printful-webhook', fn (Request $request) => Limit::perMinute(60)->by($request->ip()));
         RateLimiter::for('customer-inquiries', function (Request $request): array {
             $key = hash_hmac('sha256', (string) $request->ip(), (string) config('app.key'));
 

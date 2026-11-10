@@ -12,11 +12,14 @@ use App\Domain\Commerce\RefundDispute\Models\RefundLineAllocation;
 use App\Domain\Commerce\RefundDispute\RefundDisputeActions;
 use App\Domain\Commerce\RefundDispute\RefundDisputeException;
 use App\Domain\Commerce\RefundDispute\RefundDisputeLedger;
+use App\Domain\Delivery\DeliveryByteRange;
 use App\Domain\Delivery\DeliveryException;
 use App\Domain\Delivery\IssueTestDelivery;
 use App\Domain\Delivery\PrepareTestDeliveryStream;
+use App\Domain\Delivery\ReadTestDeliveryAuthorization;
 use App\Domain\Delivery\ReadTestOwnerDelivery;
 use App\Domain\Delivery\RedeemTestDelivery;
+use App\Domain\Delivery\TransferTestDelivery;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use Filament\Facades\Filament;
@@ -407,6 +410,36 @@ class RefundDisputeLifecycleTest extends TestCase
         $this->deliveryRefused(fn () => $this->issue($f, $this->grant($f, 0)));
         $this->assertNotEmpty($this->issue($f, $this->grant($f, 1))->authorizationId);
         $this->assertSame($originals, R::originals());
+    }
+
+    public function test_a_hold_placed_while_a_v2_resume_holds_its_verified_snapshot_is_refused_under_the_locks(): void
+    {
+        DeliveryFixtures::configureV2();
+        $f = $this->order();
+        $issued = app(IssueTestDelivery::class)->handle($f['order']->public_id, InventoryFixtures::OWNER, $f['grant']->public_id, 'contract',
+            (string) Str::uuid(), sessionSecret: DeliveryFixtures::SESSION_SECRET);
+        $file = app(ReadTestDeliveryAuthorization::class)->forSession($f['order']->public_id, InventoryFixtures::OWNER, $issued->authorizationId,
+            DeliveryFixtures::SESSION_SECRET)['target']['file'];
+        $transfer = fn (string $header) => app(TransferTestDelivery::class)->handle($f['order']->public_id, InventoryFixtures::OWNER,
+            $issued->authorizationId, DeliveryFixtures::SESSION_SECRET, DeliveryByteRange::evaluate($header, null, $file['size_bytes'], $file['sha256']));
+        $transfer('bytes=0-9')->writeTo(fn () => null);
+        R::provider($this->financial, [['re_FULL', $f['paid'], 'succeeded']]);
+        R::observe($f['order']->public_id, $this->staff);
+        // The hold commits after this resume passed its preflight and verified its snapshot, before its locked commit.
+        $streams = DeliveryFixtures::observingStreams();
+        $streams->afterPrepare = function () use ($f, $streams): void {
+            $streams->afterPrepare = null;
+            $this->act('suspendLine', $f, $f['grant']->public_id);
+        };
+        $this->app->instance(PrepareTestDeliveryStream::class, $streams);
+        $this->deliveryRefused(fn () => $transfer('bytes=10-'));
+        $this->assertSame(1, RefundDisputeHold::whereNull('released_at')->count());
+        $this->assertSame([0], $streams->transactionLevels);
+        $this->assertFalse(is_resource($streams->resources[0]));
+        $this->assertSame(1, DB::table('test_delivery_admissions')->count());
+        $this->assertSame(1, DB::table('test_delivery_coverage')->count());
+        $this->assertSame(0, DB::table('test_delivery_coverage')->whereNotNull('completed_authorization_id')->count());
+        $this->assertSame(0, AuditEvent::where('action', 'commerce.delivery.resumed')->count());
     }
 
     public function test_a_hold_refuses_redemption_of_an_authorization_issued_before_it(): void

@@ -298,6 +298,7 @@ class StripeWebhookTest extends TestCase
         $this->deliver(Fixtures::body())->assertOk();
         $this->artisan('vasey:stripe-inbox', ['--limit' => 1])
             ->expectsOutput('Test receipts retained: 1')
+            ->expectsOutput('Receipts are locators only: payment is verified by Stripe API reads, and finalization runs through the queue workers or the test-commerce pipeline.')
             ->doesntExpectOutputToContain('synthetic@example.invalid')
             ->doesntExpectOutputToContain(Fixtures::SECRET)->assertSuccessful();
         $this->artisan('vasey:stripe-inbox', ['--limit' => 101])->assertFailed();

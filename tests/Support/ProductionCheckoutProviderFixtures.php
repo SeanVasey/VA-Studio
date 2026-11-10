@@ -59,7 +59,7 @@ final class ProductionCheckoutProviderFixtures
         return ['id' => $id, 'object' => 'checkout.session', 'livemode' => false, 'mode' => 'payment', 'currency' => 'usd',
             'client_reference_id' => $params['client_reference_id'], 'metadata' => $params['metadata'], 'amount_subtotal' => $total, 'amount_total' => $total,
             'expires_at' => $params['expires_at'], 'total_details' => ['amount_discount' => 0, 'amount_tax' => 0, 'amount_shipping' => 0],
-            'automatic_tax' => ['enabled' => false], 'payment_method_types' => ['card'], 'status' => $status, 'payment_status' => $paid ? 'paid' : 'unpaid',
+            'automatic_tax' => ['enabled' => false], 'payment_method_types' => $params['payment_method_types'], 'status' => $status, 'payment_status' => $paid ? 'paid' : 'unpaid',
             'payment_intent' => $paid ? 'pi_SYNTHETIC' : null, 'url' => $status === 'open' ? 'https://checkout.stripe.com/c/pay/'.$id : null,
             'line_items' => ['object' => 'list', 'has_more' => false, 'data' => $lines]];
     }
@@ -69,7 +69,7 @@ final class ProductionCheckoutProviderFixtures
         $amount = array_sum(array_column(array_column($params['line_items'], 'price_data'), 'unit_amount'));
 
         return ['id' => 'pi_SYNTHETIC', 'object' => 'payment_intent', 'livemode' => false, 'currency' => 'usd', 'amount' => $amount, 'amount_received' => $amount,
-            'amount_capturable' => 0, 'capture_method' => $params['payment_intent_data']['capture_method'], 'payment_method_types' => ['card'],
+            'amount_capturable' => 0, 'capture_method' => $params['payment_intent_data']['capture_method'], 'payment_method_types' => $params['payment_method_types'],
             'status' => 'succeeded', 'metadata' => $params['payment_intent_data']['metadata']];
     }
 }

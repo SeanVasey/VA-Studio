@@ -248,7 +248,7 @@ for e in libmp3lame pcm_s16le png mjpeg libwebp; do
   grep -Eq "^ [AVS][F.][S.][X.][B.][D.] +$e( |$)" <<<"$encoders" || die "ffmpeg lacks the $e encoder (vasey:doctor media_encoders)"
 done
 # The app runs clamscan under a 3 GiB address-space cap and media tools under 2 GiB (config/media.php).
-/usr/bin/prlimit --as=3221225472 --cpu=180 --fsize=1342177280 -- /bin/true || die "prlimit cannot apply the scanner limits"
+/usr/bin/prlimit --as=3221225472 --cpu=180 --fsize=2146435072 -- /bin/true || die "prlimit cannot apply the scanner limits"
 /usr/bin/prlimit --as=2147483648 --cpu=90 -- /usr/bin/ffprobe -version >/dev/null || die "ffprobe does not run under the media limits"
 info "ffmpeg/ffprobe encoders, prlimit limits, qpdf and poppler present"
 
