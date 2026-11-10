@@ -772,6 +772,13 @@ review, full refund if the exclusive is no longer available (§9); pending non-e
 blocks new non-exclusive sales on that track (§9); availability after refund → reviewed individually, never reopened
 while there is any sign of use (§10). **U-08 resolved.**
 
+### FP-068 follow-up — C1 and C4 (Sean, 2026-11-10)
+
+Owner decisions on the review of PR #297 (BL-42, refund and dispute lifecycle on the production tax chain). They amend DD-16; they do not change its four values.
+
+- **C1.** A dispute ends download access while the license itself is kept, with the dispute noted on the record. A lost dispute keeps the hold. Staff suspension ends access with the license record retained. Nothing revokes a license, order, contract or authorization. (Checked against the code on 2026-11-10; see `docs/refund-dispute-lifecycle.md`, "Owner decisions".)
+- **C4.** The exclusive acceptance items for FP-068 are not applicable on the production tax chain, because no production line is exclusive. Recorded as N/A with that reason; DD-17 and U-08 are unchanged.
+
 ### SQ-14 — Dependencies
 
 - **tc-lib #162/#164: take them now**, before contract activation, through normal CI and review. After activation a

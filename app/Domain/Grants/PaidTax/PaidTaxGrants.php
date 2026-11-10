@@ -8,6 +8,7 @@ use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidLineAdapterV2;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderCommittedReadReceiptV2;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderLocatorV2;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderSourceV2;
+use App\Domain\Commerce\RefundDispute\ProductionTaxFinalizeGuard;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
@@ -18,6 +19,7 @@ use App\Domain\Rights\LicenseDisclosure;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /** New typed paid consumer; current original-session buyer authority precedes immutable historical proof. */
@@ -43,6 +45,9 @@ final class PaidTaxGrants
     private function finalizeOwned(ProductionCustomerPrincipal $principal, User $actor, string $orderId, ?PaidTaxProjectionRead $projectionRead): array
     {
         PaidTaxInput::uuid($orderId);
+        // BL-42 follow-up: an unfinalized order refunded or disputed at the provider is not granted. The authenticated provider
+        // read runs here, outside every transaction; the locked frame below proves the lines carry the facts it read.
+        $financial = $this->financialGuard($orderId);
         $deadline = PaidTaxDeadline::start();
         $runtime = PaidTaxRuntime::capture($deadline);
         $runtime->outsideTransactions();
@@ -59,7 +64,7 @@ final class PaidTaxGrants
         $heldFrame = null;
         $runtime->prove(0);
         try {
-            $projection = PaidTaxTransaction::run($runtime, $actorOriginal, function (PaidTaxOwnedFrame $frame) use ($v2Prepared, $principal, $actor, $orderId, $locator, $deadline, $projectionRead, $runtime, $actorOriginal,
+            $projection = PaidTaxTransaction::run($runtime, $actorOriginal, function (PaidTaxOwnedFrame $frame) use ($financial, $v2Prepared, $principal, $actor, $orderId, $locator, $deadline, $projectionRead, $runtime, $actorOriginal,
                 &$heldSource, &$receipt, &$heldRows, &$producerRead, &$producerSecond): array {
                 $rows = new PaidTaxRows($runtime, $frame);
                 $heldRows = $rows;
@@ -91,6 +96,7 @@ final class PaidTaxGrants
                 }
                 $batch = $rows->one('paid_tax_order_origins', 'producer = ? AND order_public_id = ?', ['production_tax_checkout_v2', $orderId]);
                 if ($batch === []) {
+                    app(ProductionTaxFinalizeGuard::class)->assertBound($financial, $lines);
                     $at = now()->utc()->startOfSecond();
                     $batchId = (string) Str::uuid();
                     $commitments = array_map(fn (array $line): array => array_intersect_key($line, array_flip(['line_id', 'line_hash', 'source_hash'])), $lines);
@@ -161,6 +167,18 @@ final class PaidTaxGrants
             PaidTaxCleanup::abort($heldSource, $heldRows, $heldFrame);
             throw $error;
         }
+    }
+
+    /** Null while the refund/dispute lifecycle is not admitted (default) or the order is not yet paid; otherwise the facts the provider read was bound to. */
+    private function financialGuard(string $orderId): ?array
+    {
+        $guard = app(ProductionTaxFinalizeGuard::class);
+        // A finalized order replays its retained batch without a provider call: holds and the ledger govern it from then on.
+        if (! $guard->admitted() || DB::table('paid_tax_order_origins')->where('producer', 'production_tax_checkout_v2')->where('order_public_id', $orderId)->exists()) {
+            return null;
+        }
+
+        return $guard->read($orderId);
     }
 
     public function graph(string $id, int $accountId, PaidTaxRows $rows): array

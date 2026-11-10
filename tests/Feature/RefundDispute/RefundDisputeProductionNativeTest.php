@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\RefundDispute;
 
+use App\Domain\Commerce\Payments\StripeFinancialInspectionGateway;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeHold;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObject;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObservation;
@@ -14,6 +15,7 @@ use Illuminate\Support\Str;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\Support\PaidTaxGrantFixtures;
+use Tests\Support\ProductionTaxFinancialFixtures;
 use Tests\Support\ProductionTrackCapabilitiesFixtures;
 use Tests\Support\RefundDisputeRace;
 use Tests\TestCase;
@@ -67,6 +69,10 @@ class RefundDisputeProductionNativeTest extends TestCase
     private function order(bool $prepare): array
     {
         $f = $this->paidTaxOrder();
+        // The finalize guard reads the provider while the lifecycle is admitted; this clean synthetic provider reports no refund or dispute.
+        $reviewed = DB::table('production_tax_checkout_reviewed_sessions')->first();
+        $this->app->instance(StripeFinancialInspectionGateway::class,
+            ProductionTaxFinancialFixtures::gateway('acct_SYNTHETIC', (string) $reviewed->provider_payment_id, (int) $reviewed->amount_total_minor));
         $f['batch'] = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
         if ($prepare) {
             $f['batch'] = (new PaidTaxDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
