@@ -19,6 +19,7 @@ const about: EditorialDescriptor = { section: 'about', kind: 'page', path: '/abo
 const blog: EditorialDescriptor = { ...about, section: 'blog', kind: 'collection', path: '/blog', title: 'Synthetic blog', paragraphs: [], entries: [{ slug: 'first-article', title: 'First article', description: 'Article summary.', path: '/blog/first-article' }] };
 const video: EditorialDescriptor = { ...about, section: 'videos', kind: 'entry', path: '/videos/first-video', paragraphs: [], video: { provider: 'youtube', videoId: 'abcdefghijk', watchUrl: 'https://www.youtube.com/watch?v=abcdefghijk' } };
 const previewBase = '/admin/site-releases/42/preview';
+const subjects = ['General question', 'Licensing question', 'Order or download help', 'Service request'];
 
 describe('editorial content and shared navigation', () => {
   it('renders supplied plain text and fixed identity without injecting markup', () => {
@@ -62,13 +63,22 @@ describe('editorial content and shared navigation', () => {
   it('passes the displayed notice token into the enabled public contact form without changing the email fallback', async () => {
     const token = 'a'.repeat(64);
     const fetcher = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify({ state: 'saved', receipt: 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee' }), { status: 201, headers: { 'Content-Type': 'application/json' } }));
-    render(<Editorial siteContent={chrome} editorial={{ ...about, section: 'contact', email: 'synthetic@example.test', contactHref: 'mailto:synthetic%40example.test' }} metadata={metadata} contactInquiryEnabled contactInquiryPrivacyNotice="Displayed synthetic notice." contactInquiryNoticeToken={token} />);
+    render(<Editorial siteContent={chrome} editorial={{ ...about, section: 'contact', email: 'synthetic@example.test', contactHref: 'mailto:synthetic%40example.test' }} metadata={metadata} contactInquiryEnabled contactInquiryPrivacyNotice="Displayed synthetic notice." contactInquiryNoticeToken={token} contactInquirySubjects={subjects} />);
     expect(screen.getByText('Displayed synthetic notice.')).toBeVisible();
     expect(screen.getByRole('link', { name: /Open email/ })).toHaveAttribute('href', 'mailto:synthetic%40example.test');
-    for (const [name, value] of Object.entries({ name: 'Synthetic visitor', email: 'visitor@example.test', subject: 'Synthetic subject', message: 'Synthetic inquiry.' })) fireEvent.change(screen.getByLabelText(new RegExp(`^${name}`, 'i')), { target: { value } });
+    for (const [name, value] of Object.entries({ name: 'Synthetic visitor', email: 'visitor@example.test', subject: 'Service request', message: 'Synthetic inquiry.' })) fireEvent.change(screen.getByLabelText(new RegExp(`^${name}`, 'i')), { target: { value } });
     await userEvent.click(screen.getByRole('button', { name: 'Send inquiry' }));
     expect(fetcher).toHaveBeenCalledTimes(1);
-    expect(JSON.parse(fetcher.mock.calls[0][1]?.body as string)).toEqual(expect.objectContaining({ noticeToken: token, website: '', name: 'Synthetic visitor' }));
+    expect(JSON.parse(fetcher.mock.calls[0][1]?.body as string)).toEqual(expect.objectContaining({ noticeToken: token, website: '', name: 'Synthetic visitor', subject: 'Service request' }));
+  });
+
+  it('offers the public contact subject as the server list, with service requests among them and no payment field', () => {
+    render(<Editorial siteContent={chrome} editorial={{ ...about, section: 'contact' }} metadata={metadata} contactInquiryEnabled contactInquiryPrivacyNotice="Displayed synthetic notice." contactInquiryNoticeToken={'a'.repeat(64)} contactInquirySubjects={subjects} />);
+    const select = screen.getByRole('combobox', { name: /^Subject/ });
+    expect(select).toBeRequired();
+    expect([...select.querySelectorAll('option')].map(option => option.value)).toEqual(['', ...subjects]);
+    expect(screen.queryByRole('textbox', { name: /^Subject/ })).not.toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/deposit|payment|price|checkout/i);
   });
 
   it.each([
@@ -77,9 +87,11 @@ describe('editorial content and shared navigation', () => {
     { label: 'missing notice', props: { contactInquiryPrivacyNotice: null } },
     { label: 'missing token', props: { contactInquiryNoticeToken: null } },
     { label: 'malformed token', props: { contactInquiryNoticeToken: 'malformed' } },
+    { label: 'missing subjects', props: { contactInquirySubjects: null } },
+    { label: 'empty subjects', props: { contactInquirySubjects: [] } },
   ])('does not collect on $label even when other public inquiry props are supplied', ({ props }) => {
     const fetcher = vi.spyOn(globalThis, 'fetch');
-    render(<Editorial siteContent={chrome} editorial={{ ...about, section: 'contact' }} metadata={metadata} contactInquiryEnabled contactInquiryPrivacyNotice="Displayed synthetic notice." contactInquiryNoticeToken={'a'.repeat(64)} {...props} />);
+    render(<Editorial siteContent={chrome} editorial={{ ...about, section: 'contact' }} metadata={metadata} contactInquiryEnabled contactInquiryPrivacyNotice="Displayed synthetic notice." contactInquiryNoticeToken={'a'.repeat(64)} contactInquirySubjects={subjects} {...props} />);
     if (props.sitePreview || props.contactInquiryNoticeToken === 'malformed') expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     else expect(screen.getAllByRole('textbox')).toEqual([screen.getByLabelText('Inquiry receipt')]);
     for (const label of ['Name', 'Email', 'Subject', 'Message']) expect(screen.queryByLabelText(new RegExp(`^${label}`))).not.toBeInTheDocument();
