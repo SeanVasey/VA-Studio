@@ -3,6 +3,7 @@
 namespace App\Domain\Customers\DataRights;
 
 use App\Domain\Customers\CustomerAccessPolicy;
+use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -24,6 +25,36 @@ final class DataRightsPolicy
     public function requireEnabled(): void
     {
         if (! $this->enabled()) {
+            throw new DataRightsException(404, 'not_enabled');
+        }
+    }
+
+    /**
+     * The production-customer entry point (D-30 step 3b, BL-44): the same data-rights flag AND the production identity policy,
+     * which is on only where `production-customer-identity` is enabled for the environment's provenance (never in staging).
+     * It admits no test account and `enabled()` admits no production customer: the two paths never widen each other.
+     */
+    public function productionEnabled(): bool
+    {
+        return config('customer-data-rights.enabled') === true && (new IdentityPolicy)->enabled();
+    }
+
+    public function requireProductionEnabled(): void
+    {
+        if (! $this->productionEnabled()) {
+            throw new DataRightsException(404, 'not_enabled');
+        }
+    }
+
+    /** Either path is on; the controller answers 404 only when neither is. */
+    public function anyEnabled(): bool
+    {
+        return $this->enabled() || $this->productionEnabled();
+    }
+
+    public function requireAnyEnabled(): void
+    {
+        if (! $this->anyEnabled()) {
             throw new DataRightsException(404, 'not_enabled');
         }
     }
