@@ -19,6 +19,7 @@ use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -115,11 +116,21 @@ final class TransactionalMailAdapter
             if ($latest->state === 'uncertain' && ! $uncertainChecked) {
                 throw new NotificationException('uncertain_unchecked');
             }
-            $delivery = TransactionalMailDelivery::create([
-                'public_id' => (string) Str::uuid(), 'notice_id' => $notice->id, 'notice_public_id' => $notice->public_id,
-                'template_version' => TransactionalMailPolicy::TEMPLATE, 'capability' => $configuration['capability'],
-                'state' => 'queued', 'version' => 0, 'queued_at' => $this->now(), 'attempt' => $latest->attempt + 1,
-            ]);
+            try {
+                $delivery = TransactionalMailDelivery::create([
+                    'public_id' => (string) Str::uuid(), 'notice_id' => $notice->id, 'notice_public_id' => $notice->public_id,
+                    'template_version' => TransactionalMailPolicy::TEMPLATE, 'capability' => $configuration['capability'],
+                    'state' => 'queued', 'version' => 0, 'queued_at' => $this->now(), 'attempt' => $latest->attempt + 1,
+                ]);
+            } catch (UniqueConstraintViolationException) {
+                // Lost a race on a driver without row locks: (notice_id, attempt) is unique, so a peer already queued this attempt.
+                $winner = TransactionalMailDelivery::where('notice_id', $notice->id)->orderByDesc('id')->first();
+                if ($winner === null) {
+                    throw new NotificationException('requeue_conflict');
+                }
+
+                return ['deliveryId' => $winner->public_id, 'state' => $winner->state, 'replayed' => true, 'attempt' => $winner->attempt];
+            }
             AuditEvent::recordAttributed('notification.mail.requeued', $delivery, ['delivery_id' => $delivery->public_id,
                 'notice_id' => $notice->public_id, 'previous_delivery_id' => $latest->public_id, 'previous_state' => $latest->state,
                 'previous_reason' => $latest->reason, 'attempt' => $delivery->attempt, 'provider_log_checked' => $latest->state === 'uncertain',
@@ -128,6 +139,14 @@ final class TransactionalMailAdapter
 
             return ['deliveryId' => $delivery->public_id, 'state' => 'queued', 'replayed' => false, 'attempt' => $delivery->attempt];
         }, 3);
+    }
+
+    /** Reply-To from per-host config; a value that is not a plain address is ignored rather than sent. */
+    private function replyTo(): ?string
+    {
+        $value = config('transactional-mail.reply_to');
+
+        return is_string($value) && filter_var($value, FILTER_VALIDATE_EMAIL) !== false ? $value : null;
     }
 
     private function authorizeStaff(User $user, bool $locked = false): void
@@ -198,7 +217,7 @@ final class TransactionalMailAdapter
         }
         try {
             Mail::mailer($configuration['mailer'])->to($intent['email'])
-                ->send(new OrderReadyMail($intent['order'], $configuration['sender'], $deliveryId));
+                ->send(new OrderReadyMail($intent['order'], $configuration['sender'], $deliveryId, $this->replyTo()));
         } catch (Throwable $error) {
             // A transport error after the attempt began cannot prove the provider did not accept the message.
             Log::warning('Transactional mail outcome is uncertain.', ['delivery_id' => $deliveryId, 'exception_class' => $error::class]);

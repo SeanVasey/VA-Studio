@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\CustomerComms;
 
+use App\Domain\Notifications\Mail\OrderReadyMail;
 use App\Domain\Notifications\Mail\TransactionalMailAdapter;
 use App\Domain\Notifications\Mail\TransactionalMailPolicy;
 use App\Domain\Notifications\Models\TransactionalMailDelivery;
@@ -12,11 +13,13 @@ use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Mail\MailManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use Livewire\Livewire;
 use RuntimeException;
@@ -316,5 +319,110 @@ class TransactionalMailRequeueTest extends TestCase
         Livewire::test(ListStaffMailDeliveries::class)->assertTableActionHidden('requeue', $accepted)->assertTableActionHidden('requeue', $failed);
         $this->assertSame(1, AuditEvent::where('action', 'notification.mail.requeued')->count());
         $this->assertSame(2, DB::table('transactional_mail_deliveries')->count());
+    }
+
+    /** Revoke the staff user's authority once, after the pre-lock check passed and before the locked re-read (the pre-lock phase reads the notice outside any transaction). */
+    private function revokeBetweenChecks(callable $revoke): void
+    {
+        $fired = false;
+        DB::listen(function (QueryExecuted $query) use (&$fired, $revoke): void {
+            if (! $fired && DB::transactionLevel() === 0 && str_contains($query->sql, 'transactional_notices')) {
+                $fired = true;
+                $revoke();
+            }
+        });
+    }
+
+    public function test_staff_demoted_between_the_pre_lock_check_and_the_locked_reread_is_refused_with_nothing_written(): void
+    {
+        Mail::fake();
+        $f = N::ready();
+        M::configure();
+        $staff = $this->staff();
+        $failed = $this->failedDelivery($f['notice']['notificationId']);
+        $this->revokeBetweenChecks(fn () => DB::table('users')->where('id', $staff->id)->update(['is_admin' => false]));
+
+        try {
+            app(TransactionalMailAdapter::class)->requeueOrderReady($f['notice']['notificationId'], $staff);
+            $this->fail('A staff user demoted before the locked re-read requeued an email.');
+        } catch (AuthorizationException) {
+            $this->addToAssertionCount(1);
+        }
+        $this->assertSame([$failed->public_id], TransactionalMailDelivery::pluck('public_id')->all());
+        $this->assertSame(0, AuditEvent::where('action', 'notification.mail.requeued')->count());
+        Queue::assertNotPushed(DeliverTransactionalMail::class);
+        Mail::assertNothingOutgoing();
+    }
+
+    public function test_staff_who_lose_mfa_between_the_pre_lock_check_and_the_locked_reread_are_refused_with_nothing_written(): void
+    {
+        Mail::fake();
+        $f = N::ready();
+        M::configure();
+        $staff = $this->staff();
+        $failed = $this->failedDelivery($f['notice']['notificationId']);
+        $panel = Filament::getPanel('admin');
+        $wasRequired = $panel->isMultiFactorAuthenticationRequired();
+        $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: true);
+        try {
+            $staff->saveAppAuthenticationSecret('JBSWY3DPEHPK3PXP');
+            $this->revokeBetweenChecks(fn () => $staff->saveAppAuthenticationSecret(null));
+
+            try {
+                app(TransactionalMailAdapter::class)->requeueOrderReady($f['notice']['notificationId'], $staff);
+                $this->fail('Staff who lost MFA before the locked re-read requeued an email.');
+            } catch (AuthorizationException $exception) {
+                $this->assertSame('Admin multi-factor authentication is required.', $exception->getMessage());
+            }
+        } finally {
+            $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: $wasRequired);
+        }
+        $this->assertSame([$failed->public_id], TransactionalMailDelivery::pluck('public_id')->all());
+        $this->assertSame(0, AuditEvent::where('action', 'notification.mail.requeued')->count());
+        Queue::assertNotPushed(DeliverTransactionalMail::class);
+    }
+
+    public function test_a_lost_unique_key_race_returns_the_winning_attempt_as_a_replay(): void
+    {
+        Mail::fake();
+        $f = N::ready();
+        M::configure();
+        $staff = $this->staff();
+        $failed = $this->failedDelivery($f['notice']['notificationId']);
+        $winner = null;
+        // A peer on a driver without row locks inserts attempt 2 between the locked read and this insert.
+        TransactionalMailDelivery::creating(function (TransactionalMailDelivery $row) use ($failed, &$winner): void {
+            if ($winner !== null) {
+                return;
+            }
+            $winner = (string) Str::uuid();
+            DB::table('transactional_mail_deliveries')->insert([
+                'public_id' => $winner, 'notice_id' => $failed->notice_id, 'notice_public_id' => $failed->notice_public_id,
+                'template_version' => $failed->template_version, 'capability' => $failed->capability, 'state' => 'queued',
+                'version' => 0, 'queued_at' => $row->queued_at, 'attempt' => 2,
+            ]);
+        });
+
+        $result = app(TransactionalMailAdapter::class)->requeueOrderReady($f['notice']['notificationId'], $staff);
+
+        $this->assertSame([$winner, 'queued', true, 2], [$result['deliveryId'], $result['state'], $result['replayed'], $result['attempt']]);
+        $this->assertSame(2, TransactionalMailDelivery::count());
+        $this->assertSame(0, AuditEvent::where('action', 'notification.mail.requeued')->count());
+        Queue::assertNotPushed(DeliverTransactionalMail::class);
+    }
+
+    public function test_the_message_carries_the_configured_reply_to_and_none_when_unset(): void
+    {
+        Mail::fake();
+        $f = N::ready();
+        M::configure();
+        config(['transactional-mail.reply_to' => 'support@vasey.audio']);
+        $adapter = app(TransactionalMailAdapter::class);
+        $id = $adapter->queueOrderReady($f['notice']['notificationId'])['deliveryId'];
+        $this->assertSame('accepted', $adapter->deliver($id)['state']);
+        Mail::assertSent(OrderReadyMail::class, fn (OrderReadyMail $mail): bool => $mail->hasReplyTo('support@vasey.audio'));
+
+        $this->assertSame([], (new OrderReadyMail('ORD-1', 'orders@example.com', 'd'))->envelope()->replyTo);
+        $this->assertSame('support@vasey.audio', (new OrderReadyMail('ORD-1', 'orders@example.com', 'd', 'support@vasey.audio'))->envelope()->replyTo[0]->address);
     }
 }
