@@ -776,7 +776,7 @@ while there is any sign of use (§10). **U-08 resolved.**
 
 Owner decisions on the review of PR #297 (BL-42, refund and dispute lifecycle on the production tax chain). They amend DD-16; they do not change its four values.
 
-- **C1.** A dispute ends download access while the license itself is kept, with the dispute noted on the record. A lost dispute keeps the hold. Staff suspension ends access with the license record retained. Nothing revokes a license, order, contract or authorization. (Checked against the code on 2026-11-10; see `docs/refund-dispute-lifecycle.md`, "Owner decisions".)
+- **C1.** A dispute ends download access while the license itself is kept, with the dispute noted on the record. A lost dispute keeps the hold. Staff suspension ends access with the license record retained. Nothing revokes a license, order, contract or authorization. (Checked against the code on 2026-11-10; see `docs/refund-dispute-lifecycle.md`, "Owner decisions".) Staff can lift a dispute hold, including after a lost dispute, with the existing explicit audited `hold_released_by_staff` command (Sean, 2026-11-10; amends DD-16). Nothing restores access automatically; a lost dispute on an unfinalized order has no batch and no release path.
 - **C4.** The exclusive acceptance items for FP-068 are not applicable on the production tax chain, because no production line is exclusive. Recorded as N/A with that reason; DD-17 and U-08 are unchanged.
 
 ### SQ-14 — Dependencies

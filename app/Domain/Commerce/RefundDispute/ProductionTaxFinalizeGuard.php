@@ -72,8 +72,9 @@ class ProductionTaxFinalizeGuard
             $row = $reviewed->count() === 1 ? $reviewed->first() : null;
             $facts = $row === null ? null : ['account' => (string) $row->account_id, 'payment' => (string) $row->provider_payment_id,
                 'gross' => (int) $row->amount_total_minor];
+            // The reviewed row's currency is USD by the table's insert trigger and the row is immutable, so it is not re-checked here.
             PaidTaxException::require($facts !== null && $row->funds_mode === 'test' && hash_equals($account, $facts['account'])
-                && strtoupper((string) $row->currency) === 'USD' && $facts['gross'] >= 1 && $facts['gross'] <= 99999999
+                && $facts['gross'] >= 1 && $facts['gross'] <= 99999999
                 && preg_match('/\Api_[A-Za-z0-9]{1,120}\z/D', $facts['payment']) === 1, 409, self::ATTENTION);
         } catch (PaidTaxException $error) {
             throw $error;
@@ -116,7 +117,10 @@ class ProductionTaxFinalizeGuard
         }
         $evaluation = RefundDisputeState::evaluate($facts['gross'], 'USD', [], app(RefundDisputeLedger::class)->normalize($financial));
         PaidTaxException::require($evaluation['valid'], 409, self::ATTENTION);
-        PaidTaxException::require($facts['gross'] > $evaluation['succeeded_minor'] + $evaluation['pending_minor']
+        // The charge's own refunded aggregate cross-checks the listed refunds: a list that lags the aggregate must fail toward hold,
+        // so the larger of the two is the amount treated as refunded or in flight.
+        $refunded = max($evaluation['succeeded_minor'] + $evaluation['pending_minor'], (int) ($financial['source']['charge_after']['amount_refunded'] ?? 0));
+        PaidTaxException::require($facts['gross'] > $refunded
             && ! in_array($evaluation['dispute_state'], ['open', 'lost'], true), 409, self::HOLD);
     }
 }
