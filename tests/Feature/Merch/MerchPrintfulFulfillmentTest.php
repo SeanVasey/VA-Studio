@@ -233,6 +233,23 @@ class MerchPrintfulFulfillmentTest extends TestCase
         $this->assertSame(0, $this->printful->count('confirm'));
     }
 
+    public function test_a_recovered_order_canceled_in_printful_is_recorded_and_refused_loudly(): void
+    {
+        config(['merch.confirm_orders' => true]);
+        $fulfillment = $this->recorded();
+        $this->printful->createFailures[] = ['created' => true, 'exception' => new PrintfulException('PRINTFUL_UNAVAILABLE', true)];
+        $this->refusal(fn () => app(SubmitMerchFulfillment::class)->handle($fulfillment));
+
+        $external = $fulfillment->refresh()->external_id;
+        $draft = $this->printful->orders[$external];
+        $this->printful->orders[$external] = new PrintfulOrder($draft->id, $external, 'canceled');
+        $this->assertSame('MERCH_PRINTFUL_STATUS_UNEXPECTED', $this->refusal(fn () => app(SubmitMerchFulfillment::class)->handle($fulfillment)));
+        $kept = $fulfillment->refresh();
+        $this->assertSame([MerchFulfillment::SUBMITTED, 'canceled', 'PRINTFUL_STATUS_UNEXPECTED', $draft->id],
+            [$kept->state, $kept->printful_status, $kept->failure_code, $kept->printful_order_id]);
+        $this->assertSame([1, 0], [$this->printful->count('create'), $this->printful->count('confirm')]);
+    }
+
     public function test_a_create_that_never_arrived_is_created_on_the_retry(): void
     {
         $fulfillment = $this->recorded();

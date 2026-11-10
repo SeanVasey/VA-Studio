@@ -71,7 +71,7 @@ Open the order in the Printful dashboard by `printful_order_id`. If it is confir
 and `printful_status` to what Printful shows. If it is still a draft, confirm it in the dashboard (or leave it: the next run
 re-confirms a draft once) and then mark it `confirmed`. If it is canceled or failed, set `state = 'canceled'` or `'failed'`
 with the matching `failure_code`. Never re-send a confirmation by hand without looking at the Printful order first: a second
-confirmation can charge the account twice. `MERCH_CONFIRMATION_UNRESOLVED` is the error `handle()` raises for these rows. While another caller holds a confirmation or its reconciliation, `handle()` raises `MERCH_CONFIRMATION_IN_PROGRESS` instead of returning the row as if it were settled; an unexpected error during reconciliation releases the lease so the next run reconciles again.
+confirmation can charge the account twice. `MERCH_CONFIRMATION_UNRESOLVED` is the error `handle()` raises for these rows. A recovered order that Printful reports as neither a draft nor confirmed (canceled, failed, on hold, or unknown) is recorded as `submitted` with failure code `PRINTFUL_STATUS_UNEXPECTED`, and `handle()` raises `MERCH_PRINTFUL_STATUS_UNEXPECTED` for an operator. While another caller holds a confirmation or its reconciliation, `handle()` raises `MERCH_CONFIRMATION_IN_PROGRESS` instead of returning the row as if it were settled; an unexpected error during reconciliation releases the lease so the next run reconciles again.
 
 ## Webhook
 

@@ -25,7 +25,7 @@ final class SubmitMerchFulfillment
     private const LEASE_MINUTES = 5;
 
     /** Printful statuses that prove a confirmation took effect. */
-    private const CONFIRMED_STATUSES = ['pending', 'inprocess', 'partial', 'fulfilled'];
+    private const CONFIRMED_STATUSES = ['pending', 'inreview', 'inprocess', 'partial', 'fulfilled'];
 
     public function __construct(
         private readonly MerchFulfillmentPolicy $policy,
@@ -67,11 +67,18 @@ final class SubmitMerchFulfillment
 
             return $current->refresh();
         }
+        if ($order->status !== 'draft') {
+            // Neither a draft nor confirmed (canceled, failed, on hold, or a status this code does not know): record the
+            // order and stop loudly for an operator instead of leaving a row that looks healthy.
+            $this->settle($current, MerchFulfillment::SUBMITTED, ['printful_order_id' => $order->id, 'printful_status' => $order->status,
+                'failure_code' => 'PRINTFUL_STATUS_UNEXPECTED', 'submitted_at' => now()]);
+            throw new MerchFulfillmentException('MERCH_PRINTFUL_STATUS_UNEXPECTED');
+        }
         $this->settle($current, MerchFulfillment::SUBMITTED, ['printful_order_id' => $order->id, 'printful_status' => $order->status,
             'failure_code' => null, 'submitted_at' => now()]);
         $current->refresh();
 
-        return $this->policy->confirmsOrders() && $order->status === 'draft' ? $this->confirm($current, $order) : $current;
+        return $this->policy->confirmsOrders() ? $this->confirm($current, $order) : $current;
     }
 
     /**
