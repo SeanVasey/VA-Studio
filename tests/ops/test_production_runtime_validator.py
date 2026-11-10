@@ -25,6 +25,15 @@ PRE_LAUNCH_HOLDS = {
     "DISCOVERY_SITEMAP_ENABLED": "discovery-sitemap.enabled",
     "VASEY_LISTENING_V2_PROMOTION_ENABLED": "customer-listening.v2_promotion_enabled",
 }
+# Off through launch (decision register, 2026-11-10). DD-44: the marketing segment flag, its config key from the boundary.
+MARKETING_SEGMENT = "REPORTING_MARKETING_SEGMENT_ENABLED"
+MARKETING_SEGMENT_KEY = "reporting.customer_segments.marketing_segment_enabled"
+# DD-50: code literals, refusal identifier => config key.
+MEMBERSHIP_LITERALS = {
+    "holds.production_memberships_enabled": "production-memberships.enabled",
+    "holds.production_memberships_http_mounted": "production-memberships.http_mounted",
+    "holds.member_grants_enabled": "member-grants.enabled",
+}
 
 
 def profile(**overrides):
@@ -476,6 +485,123 @@ class ProductionRuntimeValidator(unittest.TestCase):
                                  env={"PATH": os.environ.get("PATH", "/usr/bin:/bin")}, capture_output=True, text=True)
             self.assertEqual(run.returncode, 1)
             self.assertIn("runtime.unavailable", run.stderr)
+
+    # ---- off through launch: DD-44 (marketing segment) and DD-50 (memberships), decision register 2026-11-10 ----
+
+    def shadow_project(self, boundary=None):
+        # A shadow project (symlinks to this checkout, a copied validator, bootstrap and config, and optionally a copied
+        # capability boundary) so one literal or boundary entry can be changed without touching the checkout.
+        shadow = self.dir / "shadow"
+        shadow.mkdir()
+        linked = ["app", "vendor", "routes", "resources", "database", "public", "storage", "composer.json", "artisan"]
+        if boundary is None:
+            linked.append("scripts")
+        else:
+            (shadow / "scripts/ops").mkdir(parents=True)
+            (shadow / "scripts/ops/capability-boundary.php").write_text(boundary)
+        for name in linked:
+            (shadow / name).symlink_to(REPO / name)
+        shutil.copytree(REPO / "bootstrap", shadow / "bootstrap")
+        shutil.copytree(REPO / "config", shadow / "config")
+        (shadow / "ops/production").mkdir(parents=True)
+        shutil.copy2(VALIDATOR, shadow / "ops/production/validate-runtime.php")
+
+        def run(text=None):
+            self.file.write_text(profile() if text is None else text)
+            self.file.chmod(0o600)
+            return subprocess.run([PHP, str(shadow / "ops/production/validate-runtime.php"), str(self.file), "production", HOST, "vasey_production"],
+                                  cwd=shadow, env={"PATH": os.environ.get("PATH", "/usr/bin:/bin")}, capture_output=True, text=True, timeout=120)
+
+        return shadow, run
+
+    def test_the_marketing_segment_flag_passes_only_as_false_or_unset(self):
+        self.assertNotIn(MARKETING_SEGMENT, profile())
+        for value in ("false", "(false)", "FALSE", '"false"', "'false'"):
+            with self.subTest(value=value):
+                run = self.validate(profile() + f"{MARKETING_SEGMENT}={value}\n")
+                self.assertEqual(run.returncode, 0, run.stderr)
+        for value in ("true", "1", "yes", "", "(true)", "TRUE", '"true"', "on", "0", "null", "${BAD}"):
+            with self.subTest(value=value):
+                run = self.validate(profile() + ("BAD=true\n" if "BAD" in value else "") + f"{MARKETING_SEGMENT}={value}\n")
+                self.failed(run, "holds.reporting_marketing_segment_enabled")
+                self.assertEqual({line for line in run.stderr.splitlines() if line.startswith("FAIL ")},
+                                 {"FAIL holds.reporting_marketing_segment_enabled"}, run.stderr)
+        self.failed(self.validate(profile() + f"{MARKETING_SEGMENT}\n"), "holds.reporting_marketing_segment_enabled")
+
+    def test_the_marketing_segment_hold_is_checked_before_the_preflight_child_runs(self):
+        run = self.validate(profile(APP_DEBUG="true", **{MARKETING_SEGMENT: "true"}))
+        self.failed(run, "holds.reporting_marketing_segment_enabled")
+        self.assertNotIn("preflight.", run.stderr)
+
+    def test_the_marketing_segment_effective_configuration_is_strictly_false(self):
+        # `${PATH}` reads `false` in the file but the process PATH in the real bootstrap: only the configuration check refuses it.
+        run = self.validate(profile(**{"PATH": "false", MARKETING_SEGMENT: "${PATH}"}))
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertEqual(run.stderr.split(), ["FAIL", "holds.reporting_marketing_segment_enabled"], run.stderr)
+        text = VALIDATOR.read_text()
+        self.assertRegex(text, r"foreach \(\$launchOffKeys as \$name => \$key\) \{\s*\$check\('holds\.'\.strtolower\(\$name\), config\(\$key\) === false\);")
+        self.assertRegex(text, r"foreach \(\[\.\.\.PRE_LAUNCH_HOLDS, \.\.\.LAUNCH_OFF_HOLDS\] as \$name\)")
+
+    def test_the_marketing_segment_key_comes_from_the_capability_boundary(self):
+        text = VALIDATOR.read_text()
+        block = re.search(r"const LAUNCH_OFF_HOLDS = \[(.*?)\n\];", text, re.S)
+        self.assertIsNotNone(block, "LAUNCH_OFF_HOLDS constant block not found")
+        self.assertNotIn("=>", block.group(1))
+        self.assertEqual(re.findall(r"'([A-Z0-9_]+)',", block.group(1)), [MARKETING_SEGMENT])
+        self.assertNotIn(f"'{MARKETING_SEGMENT_KEY}'", text, "the config key must come from the boundary, not be restated")
+        self.assertRegex(text, r"\$launchOffKeys = array_intersect_key\(CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS, array_flip\(LAUNCH_OFF_HOLDS\)\);"
+                               r"\s*if \(count\(\$launchOffKeys\) !== count\(LAUNCH_OFF_HOLDS\)\) \{\s*throw new RuntimeException;")
+        script = "require $argv[1]; echo json_encode(Vasey\\Ops\\CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS);"
+        run = subprocess.run([PHP, "-r", script, str(REPO / "scripts/ops/capability-boundary.php")], capture_output=True, text=True, timeout=60)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(json.loads(run.stdout), {MARKETING_SEGMENT: MARKETING_SEGMENT_KEY})
+        # Not a staged flag: the staging gates keep their own list, and this hold is production's.
+        script = "require $argv[1]; echo json_encode(array_key_exists($argv[2], Vasey\\Ops\\CapabilityBoundary::stagedFlags()));"
+        run = subprocess.run([PHP, "-r", script, str(REPO / "scripts/ops/capability-boundary.php"), MARKETING_SEGMENT],
+                             capture_output=True, text=True, timeout=60)
+        self.assertEqual(run.stdout, "false", run.stderr)
+        self.assertRegex((REPO / "config/reporting.php").read_text(),
+                         r"'marketing_segment_enabled'\s*=>\s*env\('" + MARKETING_SEGMENT + r"',\s*false\)")
+        self.assertRegex((REPO / "ops/production/env.production.example").read_text(), rf"(?m)^{MARKETING_SEGMENT}=false$")
+
+    def test_a_boundary_without_the_marketing_segment_entry_fails_closed(self):
+        source = (REPO / "scripts/ops/capability-boundary.php").read_text()
+        entry = f"        '{MARKETING_SEGMENT}' => '{MARKETING_SEGMENT_KEY}',\n"
+        self.assertEqual(source.count(entry), 1)
+        _, run = self.shadow_project(boundary=source.replace(entry, ""))
+        result = run()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertEqual(result.stderr.split(), ["FAIL", "runtime.unavailable"], result.stderr)
+
+    def test_the_membership_literals_are_held(self):
+        text = VALIDATOR.read_text()
+        for identifier, key in MEMBERSHIP_LITERALS.items():
+            with self.subTest(key=key):
+                self.assertIn(f"$check('{identifier}', config('{key}') === false);", text)
+                name, item = key.split(".")
+                self.assertRegex((REPO / "config" / f"{name}.php").read_text(), rf"(?m)^    '{item}' => false,$")
+        self.assertEqual(self.validate(profile()).returncode, 0)
+
+    def test_each_membership_literal_flipped_fails_the_validator(self):
+        # MembershipHttpMount and both lanes ship literal false; the validator run from a shadow whose only change is one literal
+        # (true, or a truthy or non-boolean value) refuses with that literal's identifier alone.
+        shadow, run = self.shadow_project()
+        self.assertEqual(run().returncode, 0)
+        for identifier, key in MEMBERSHIP_LITERALS.items():
+            name, item = key.split(".")
+            path = shadow / "config" / f"{name}.php"
+            source = path.read_text()
+            literal = f"    '{item}' => false,\n"
+            self.assertEqual(source.count(literal), 1, key)
+            for value in ("true", "1", "'false'", "null"):
+                with self.subTest(key=key, value=value):
+                    path.write_text(source.replace(literal, f"    '{item}' => {value},\n"))
+                    result = run()
+                    self.failed(result, identifier)
+                    self.assertEqual({line for line in result.stderr.splitlines() if line.startswith("FAIL ")},
+                                     {"FAIL " + identifier}, result.stderr)
+            path.write_text(source)
+        self.assertEqual(run().returncode, 0)
 
     # ---- the synthetic staging seller tag is a rehearsal placeholder, never a production tag ----
 
