@@ -14,8 +14,8 @@ and sends no notification beyond the existing inquiry intake.
 `VASEY_TEST_SERVICE_PROJECTS_ENABLED` / `ServiceProjectPolicy::enabled()`, which keeps its test-commerce admission and
 staging boundary unchanged. There is no client flag and no environment variable, so no staging or production capability
 census changes. Turning it on is a reviewed one-line change, taken as the per-family launch decision (SQ-04 amendment,
-Sean). BL-50's `FamilyEntryPoints` should read `catalogEnabled()` for the public `/services` path (the private
-`/services/projects` path keeps `enabled()`).
+Sean). BL-50's `FamilyEntryPoints` reads `catalogEnabled()` for the public `/services` and `/services/{slug}` paths (the
+private `/services/projects` path keeps `enabled()`, and the slug `projects` stays reserved).
 
 ## What is published
 

@@ -75,7 +75,7 @@ try {
         $release = $site->create(SiteEditorialFixtures::content(), 'Synthetic inquiry regression', $operator);
         $site->publish($release->id, 0, $operator);
         $restore = SitePublicationRevision::where('revision', 0)->sole()->release_id;
-        $values = ['name' => 'Synthetic fixture visitor', 'email' => 'synthetic-fixture@example.test', 'subject' => 'Synthetic private inquiry',
+        $values = ['name' => 'Synthetic fixture visitor', 'email' => 'synthetic-fixture@example.test', 'subject' => 'General question',
             'message' => 'Retained private conversation fixture.', 'website' => ''];
         $body = $values + ['requestKey' => (string) Str::uuid(),
             'noticeToken' => app(InquiryPolicy::class)->publicSetup($site->current())['noticeToken']];
