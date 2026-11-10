@@ -446,6 +446,47 @@ class MerchPrintfulFulfillmentTest extends TestCase
         $this->assertSame(2, $this->printful->count('confirm'));
     }
 
+    public function test_a_second_worker_cannot_reconcile_while_the_first_holds_the_lookup(): void
+    {
+        config(['merch.confirm_orders' => true]);
+        $this->printful->confirmFailure = new PrintfulException('PRINTFUL_UNAVAILABLE', true);
+        $fulfillment = $this->recorded();
+        app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        $this->printful->confirmFailure = null;
+
+        // While the first worker waits on Printful's answer, a second one runs: it must neither look up nor confirm.
+        $inner = null;
+        $this->printful->onFind = function () use ($fulfillment, &$inner): void {
+            $inner = app(SubmitMerchFulfillment::class)->handle(MerchFulfillment::query()->findOrFail($fulfillment->id));
+        };
+        $settled = app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        $this->assertSame(MerchFulfillment::CONFIRMING, $inner?->state);
+        $this->assertSame(MerchFulfillment::CONFIRMED, $settled->state);
+        $this->assertSame([1, 2], [$this->printful->count('find'), $this->printful->count('confirm')]);
+    }
+
+    public function test_a_draft_is_not_reconfirmed_once_the_confirm_switch_is_off(): void
+    {
+        config(['merch.confirm_orders' => true]);
+        $this->printful->confirmFailure = new PrintfulException('PRINTFUL_UNAVAILABLE', true);
+        $fulfillment = $this->recorded();
+        app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        $this->printful->confirmFailure = null;
+
+        // The operator turns confirmation off after the timeout; Printful still reports a draft. Nothing is charged.
+        config(['merch.confirm_orders' => false]);
+        $this->assertSame('MERCH_CONFIRMATION_UNRESOLVED', $this->refusal(fn () => app(SubmitMerchFulfillment::class)->handle($fulfillment)));
+        $kept = $fulfillment->refresh();
+        $this->assertSame([MerchFulfillment::CONFIRMING, null], [$kept->state, $kept->lease_expires_at]);
+        $this->assertSame(1, $this->printful->count('confirm'));
+
+        // Read-only reconciliation still works: once Printful reports it confirmed, the row settles without a charge.
+        $order = $this->printful->orders[$kept->external_id];
+        $this->printful->orders[$kept->external_id] = new PrintfulOrder($order->id, $order->externalId, 'pending');
+        $this->assertSame(MerchFulfillment::CONFIRMED, app(SubmitMerchFulfillment::class)->handle($fulfillment)->state);
+        $this->assertSame(1, $this->printful->count('confirm'));
+    }
+
     public function test_an_unresolved_confirmation_is_refused_loudly_never_returned_silently(): void
     {
         config(['merch.confirm_orders' => true]);

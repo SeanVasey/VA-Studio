@@ -55,9 +55,10 @@ the tracking number and URL, and a failure code.
    effect) returns the row to `submitted` with the failure code. An unknown outcome (timeout, 429, 5xx, or a 2xx whose body
    cannot be read) **stays `confirming`** with the lease cleared and the failure code recorded, because the charge may have
    landed. The next `handle()` on that row (or one whose confirming lease has lapsed) looks the order up by external id
-   before anything is re-sent: Printful `pending`, `inprocess`, `partial` or `fulfilled` marks it `confirmed`; `draft`
-   re-confirms once (claimed by a conditional update, hold check first); any other answer, a missing order, or a failed
-   lookup raises `MERCH_CONFIRMATION_UNRESOLVED` (409) and leaves the row in `confirming` for an operator.
+   before anything is re-sent. That run first takes the row's reconciliation lease with a conditional update and holds it
+   through the lookup and the decision, so a second worker never acts on the same or an older lookup. Printful `pending`,
+   `inprocess`, `partial` or `fulfilled` marks it `confirmed`; `draft` re-confirms once, and only while the confirm switch
+   is still on (hold check first); any other answer, a draft with the switch off, a missing order, or a failed lookup raises `MERCH_CONFIRMATION_UNRESOLVED` (409) and leaves the row in `confirming` for an operator.
    With it off (the default) a submission leaves a Printful draft that Sean can inspect and confirm in the Printful dashboard.
 5. Nothing submits before verified payment: record and submit each check it, in code and by the unique key to the payment.
 

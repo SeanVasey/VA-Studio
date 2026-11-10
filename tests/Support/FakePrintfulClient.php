@@ -61,9 +61,17 @@ final class FakePrintfulClient implements PrintfulClient
         throw new PrintfulException('PRINTFUL_REJECTED', false, 404);
     }
 
+    /** Runs once inside the next lookup, to simulate a second worker acting while the first waits on Printful. */
+    public ?\Closure $onFind = null;
+
     public function findOrderByExternalId(string $externalId): ?PrintfulOrder
     {
         $this->calls[] = ['find', ['externalId' => $externalId]];
+        if ($this->onFind !== null) {
+            $hook = $this->onFind;
+            $this->onFind = null;
+            $hook();
+        }
 
         return $this->orders[$externalId] ?? null;
     }

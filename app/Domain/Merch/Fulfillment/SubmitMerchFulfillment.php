@@ -114,18 +114,28 @@ final class SubmitMerchFulfillment
     }
 
     /**
-     * A `confirming` row whose lease has lapsed or was cleared by an unknown outcome. Looks the order up by external id:
-     * confirmed or in production settles it without a second charge; still a draft means the first request never took
-     * effect, so it is re-confirmed once (claimed with one conditional UPDATE); anything else needs an operator.
+     * A `confirming` row whose lease has lapsed or was cleared by an unknown outcome. The caller first takes the
+     * reconciliation lease with one conditional UPDATE and holds it through the provider lookup and the decision, so two
+     * workers can never act on the same (possibly stale) lookup. Then it looks the order up by external id: confirmed or
+     * in production settles it without a second charge; still a draft means the first request never took effect, so it is
+     * re-confirmed once, and only while the confirm switch is on; anything else needs an operator.
      */
     private function reconcileConfirmation(MerchFulfillment $current): MerchFulfillment
     {
+        $claimed = MerchFulfillment::query()->whereKey($current->id)->where('state', MerchFulfillment::CONFIRMING)
+            ->where(fn ($unowned) => $unowned->whereNull('lease_expires_at')->orWhere('lease_expires_at', '<=', now()))
+            ->update(['lease_expires_at' => now()->addMinutes(self::LEASE_MINUTES), 'updated_at' => now()]);
+        if ($claimed !== 1) {
+            return $current->refresh();
+        }
         try {
             $order = $this->printful->findOrderByExternalId($current->external_id);
         } catch (PrintfulException) {
+            $this->releaseReconciliation($current);
             throw new MerchFulfillmentException('MERCH_CONFIRMATION_UNRESOLVED');
         }
         if ($order === null || $order->id !== (string) $current->printful_order_id) {
+            $this->releaseReconciliation($current);
             throw new MerchFulfillmentException('MERCH_CONFIRMATION_UNRESOLVED');
         }
         if (in_array($order->status, self::CONFIRMED_STATUSES, true)) {
@@ -134,16 +144,14 @@ final class SubmitMerchFulfillment
 
             return $current->refresh();
         }
-        if ($order->status !== 'draft') {
+        if ($order->status !== 'draft' || ! $this->policy->confirmsOrders()) {
+            // A draft is only re-sent while the confirm switch is on; with it off the row waits for an operator.
+            $this->releaseReconciliation($current);
             throw new MerchFulfillmentException('MERCH_CONFIRMATION_UNRESOLVED');
         }
         if ($this->holds->exist($current->order_id)) {
-            return $current->refresh();
-        }
-        $claimed = MerchFulfillment::query()->whereKey($current->id)->where('state', MerchFulfillment::CONFIRMING)
-            ->where(fn ($unowned) => $unowned->whereNull('lease_expires_at')->orWhere('lease_expires_at', '<=', now()))
-            ->update(['lease_expires_at' => now()->addMinutes(self::LEASE_MINUTES), 'updated_at' => now()]);
-        if ($claimed !== 1) {
+            $this->releaseReconciliation($current);
+
             return $current->refresh();
         }
         $result = $this->sendConfirmation($current, $order->id);
@@ -152,6 +160,13 @@ final class SubmitMerchFulfillment
         }
 
         return $result;
+    }
+
+    /** Gives the reconciliation lease back without changing state, so the next run (or an operator) can reconcile again. */
+    private function releaseReconciliation(MerchFulfillment $current): void
+    {
+        MerchFulfillment::query()->whereKey($current->id)->where('state', MerchFulfillment::CONFIRMING)
+            ->update(['lease_expires_at' => null, 'updated_at' => now()]);
     }
 
     private function requireVerifiedPayment(MerchFulfillment $fulfillment): void
