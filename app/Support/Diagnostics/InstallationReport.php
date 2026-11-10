@@ -6,6 +6,7 @@ use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Media\BoundedMediaProcess;
 use App\Domain\Media\MalwareScanner;
 use App\Domain\Media\PrivateMediaFiles;
+use App\Domain\Media\StagingSellerTag;
 use App\Domain\SiteBuilder\Models\SiteRelease;
 use App\Domain\SiteBuilder\SiteContentSchema;
 use App\Domain\SiteBuilder\SiteImageReferences;
@@ -135,6 +136,12 @@ final class InstallationReport
             && ! str_contains(config('media.tag_path'), '..') && ! str_contains(config('media.tag_path'), '//')
             && is_string(config('media.tag_sha256')) && preg_match('/\A[a-f0-9]{64}\z/D', config('media.tag_sha256')),
             'Seller tag settings are present; file content and audible approval are unverified.', 'Configure the approved private seller tag and its SHA-256 using Media operations.');
+        if (app()->isProduction()) {
+            // Path and, when the file is there, content: the staging placeholder is refused wherever the approved tag is required.
+            $check('production_seller_tag', true, fn () => ! StagingSellerTag::refused(config('media.tag_path'), $this->sellerTagFile()),
+                'The configured seller tag is not the synthetic staging placeholder.',
+                'Production is configured with the synthetic staging seller tag. Install the approved seller tag and set MEDIA_TAG_PATH and MEDIA_TAG_SHA256 to it.');
+        }
         $check('media_queue', false, fn () => in_array(config('queue.default'), ['database', 'redis', 'sqs', 'beanstalkd'], true),
             'An asynchronous queue is selected; worker liveness and recovery are unverified.', 'Select and run the documented asynchronous media queue before processing real uploads.');
         $check('mail_transport', false, fn () => in_array(config('mail.default'), ['smtp', 'ses', 'postmark', 'resend', 'mailgun'], true),
@@ -185,6 +192,16 @@ final class InstallationReport
         }
 
         return function_exists('posix_geteuid') ? posix_geteuid() : null;
+    }
+
+    /** The configured seller tag as a file in private storage, or null when it is not there to read. */
+    private function sellerTagFile(): ?string
+    {
+        try {
+            return is_string(config('media.tag_path')) ? app(PrivateMediaFiles::class)->resolve(config('media.tag_path')) : null;
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     private function executable(string $key): bool
