@@ -36,4 +36,6 @@ Migration `2026_10_24_268300_transactional_mail_deliveries` (additive, forward-o
 
 ## Not built
 
-Receipts for production orders (the production checkout lane PCC has no order-ready producer yet), contact-form operator notification by email, ESP or marketing email, bounce or complaint processing, suppression synchronization (FP-081/FP-091, U-13).
+Receipts for production orders (the production checkout lane PCC has no order-ready producer yet), ESP or marketing email, bounce or complaint processing, suppression synchronization (FP-081/FP-091, U-13).
+
+The contact-form operator alert is a separate default-off transport that reuses this configuration; see [contact inquiries](contact-inquiries.md#operator-alert-email-fp-013-default-off).
