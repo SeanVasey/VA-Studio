@@ -8,7 +8,8 @@ use RuntimeException;
 final class RefundDisputeException extends RuntimeException
 {
     public const REASONS = ['disabled', 'policy_unset', 'policy_unknown', 'not_found', 'invalid', 'stale', 'busy',
-        'conflict', 'not_observed', 'not_qualified', 'already_applied', 'reconciling', 'policy_forbids', 'unavailable'];
+        'conflict', 'not_observed', 'not_qualified', 'already_applied', 'reconciling', 'policy_forbids', 'unavailable',
+        'finalized', 'not_paid', 'not_refused', 'in_flight'];
 
     public function __construct(public readonly string $reason)
     {

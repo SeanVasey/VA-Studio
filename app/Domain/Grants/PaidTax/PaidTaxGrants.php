@@ -99,6 +99,9 @@ final class PaidTaxGrants
                 }
                 $batch = $rows->one('paid_tax_order_origins', 'producer = ? AND order_public_id = ?', ['production_tax_checkout_v2', $orderId]);
                 if ($batch === []) {
+                    // A staff-resolved refused order (fully refunded or dispute lost; FP-068) is closed to finalization for good. A locking
+                    // read, so a resolution committed since the pre-lock check is seen; the resolver holds the checkout order row too.
+                    PaidTaxException::require(! app(ProductionTaxFinalizeGuard::class)->resolved($orderId, true), 409, ProductionTaxFinalizeGuard::RESOLVED);
                     // Deferred refusal: raised only here, after the lock, the buyer binding and the authenticated lines.
                     if (($financial['refusal'] ?? null) instanceof PaidTaxException) {
                         throw $financial['refusal'];
@@ -187,7 +190,8 @@ final class PaidTaxGrants
     {
         $guard = app(ProductionTaxFinalizeGuard::class);
         // A finalized order replays its retained batch without a provider call: holds and the ledger govern it from then on.
-        if (! $guard->admitted() || DB::table('paid_tax_order_origins')->where('producer', 'production_tax_checkout_v2')->where('order_public_id', $orderId)->exists()) {
+        $resolved = $guard->resolved($orderId);
+        if ((! $resolved && ! $guard->admitted()) || DB::table('paid_tax_order_origins')->where('producer', 'production_tax_checkout_v2')->where('order_public_id', $orderId)->exists()) {
             return null;
         }
         try {
@@ -195,6 +199,10 @@ final class PaidTaxGrants
         } catch (\Throwable) {
             // Not (provably) the original buyer: no provider IO. The locked frame refuses this caller exactly as it always did.
             return null;
+        }
+        if ($resolved) {
+            // Staff resolved this refused order: no provider IO either; the refusal is deferred like the guard's own.
+            return ['facts' => null, 'refusal' => new PaidTaxException(409, ProductionTaxFinalizeGuard::RESOLVED)];
         }
         try {
             return ['facts' => $guard->read($orderId), 'refusal' => null];
