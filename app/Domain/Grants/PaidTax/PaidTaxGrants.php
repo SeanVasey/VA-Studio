@@ -8,6 +8,7 @@ use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidLineAdapterV2;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderCommittedReadReceiptV2;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderLocatorV2;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderSourceV2;
+use App\Domain\Commerce\RefundDispute\ProductionTaxFinalizeGuard;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
@@ -18,6 +19,7 @@ use App\Domain\Rights\LicenseDisclosure;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /** New typed paid consumer; current original-session buyer authority precedes immutable historical proof. */
@@ -43,6 +45,13 @@ final class PaidTaxGrants
     private function finalizeOwned(ProductionCustomerPrincipal $principal, User $actor, string $orderId, ?PaidTaxProjectionRead $projectionRead): array
     {
         PaidTaxInput::uuid($orderId);
+        // The unlocked order read carries the original buyer binding; it makes no provider call and takes no lock.
+        $locator = ProductionTaxPaidOrderLocatorV2::locate($orderId);
+        // BL-42 follow-up: an unfinalized order refunded or disputed at the provider is not granted. The authenticated provider
+        // read runs here, outside every transaction, and only for the order's own buyer (an unlocked pre-check with the locked
+        // frame's own binding comparison); the locked frame proves the lines carry the facts it read and is the only place the
+        // read's refusal takes effect, after the lock and the buyer binding, so a non-owner can never observe it.
+        $financial = $this->financialGuard($orderId, $principal, $locator);
         $deadline = PaidTaxDeadline::start();
         $runtime = PaidTaxRuntime::capture($deadline);
         $runtime->outsideTransactions();
@@ -50,7 +59,6 @@ final class PaidTaxGrants
         // origin transaction; inside it the selection only re-checks them without file I/O. Null, reading nothing, while the gate is off.
         $v2Prepared = VaseyLicenseIssuance::prepare();
         $actorOriginal = PaidTaxActor::capture($actor);
-        $locator = ProductionTaxPaidOrderLocatorV2::locate($orderId);
         $receipt = null;
         $heldRows = null;
         $producerRead = null;
@@ -59,7 +67,7 @@ final class PaidTaxGrants
         $heldFrame = null;
         $runtime->prove(0);
         try {
-            $projection = PaidTaxTransaction::run($runtime, $actorOriginal, function (PaidTaxOwnedFrame $frame) use ($v2Prepared, $principal, $actor, $orderId, $locator, $deadline, $projectionRead, $runtime, $actorOriginal,
+            $projection = PaidTaxTransaction::run($runtime, $actorOriginal, function (PaidTaxOwnedFrame $frame) use ($financial, $v2Prepared, $principal, $actor, $orderId, $locator, $deadline, $projectionRead, $runtime, $actorOriginal,
                 &$heldSource, &$receipt, &$heldRows, &$producerRead, &$producerSecond): array {
                 $rows = new PaidTaxRows($runtime, $frame);
                 $heldRows = $rows;
@@ -91,6 +99,11 @@ final class PaidTaxGrants
                 }
                 $batch = $rows->one('paid_tax_order_origins', 'producer = ? AND order_public_id = ?', ['production_tax_checkout_v2', $orderId]);
                 if ($batch === []) {
+                    // Deferred refusal: raised only here, after the lock, the buyer binding and the authenticated lines.
+                    if (($financial['refusal'] ?? null) instanceof PaidTaxException) {
+                        throw $financial['refusal'];
+                    }
+                    app(ProductionTaxFinalizeGuard::class)->assertBound($financial['facts'] ?? null, $lines);
                     $at = now()->utc()->startOfSecond();
                     $batchId = (string) Str::uuid();
                     $commitments = array_map(fn (array $line): array => array_intersect_key($line, array_flip(['line_id', 'line_hash', 'source_hash'])), $lines);
@@ -160,6 +173,33 @@ final class PaidTaxGrants
         } catch (\Throwable $error) {
             PaidTaxCleanup::abort($heldSource, $heldRows, $heldFrame);
             throw $error;
+        }
+    }
+
+    /**
+     * Null while the refund/dispute lifecycle is not admitted (default), the order is already finalized, or the caller is not the
+     * order's original buyer (no provider call is made for a non-owner). Otherwise the facts the provider read was bound to, or
+     * the refusal that read produced, carried unraised into the locked frame.
+     *
+     * @return ?array{facts: ?array, refusal: ?PaidTaxException}
+     */
+    private function financialGuard(string $orderId, ProductionCustomerPrincipal $principal, ProductionTaxPaidOrderLocatorV2 $locator): ?array
+    {
+        $guard = app(ProductionTaxFinalizeGuard::class);
+        // A finalized order replays its retained batch without a provider call: holds and the ledger govern it from then on.
+        if (! $guard->admitted() || DB::table('paid_tax_order_origins')->where('producer', 'production_tax_checkout_v2')->where('order_public_id', $orderId)->exists()) {
+            return null;
+        }
+        try {
+            $this->sameOwner(app(ProductionCustomerAccess::class)->durableBinding($principal), $locator->historicalBuyerBinding());
+        } catch (\Throwable) {
+            // Not (provably) the original buyer: no provider IO. The locked frame refuses this caller exactly as it always did.
+            return null;
+        }
+        try {
+            return ['facts' => $guard->read($orderId), 'refusal' => null];
+        } catch (PaidTaxException $refusal) {
+            return ['facts' => null, 'refusal' => $refusal];
         }
     }
 

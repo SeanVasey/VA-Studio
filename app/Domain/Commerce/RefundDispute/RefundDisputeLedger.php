@@ -212,7 +212,7 @@ final class RefundDisputeLedger
     }
 
     /** Provider identifiers become hashes; only kind, amount, currency and status take part in the state machine. */
-    private function normalize(array $financial): array
+    public function normalize(array $financial): array
     {
         $objects = [];
         foreach (['refund' => 'refunds', 'dispute' => 'disputes'] as $kind => $list) {

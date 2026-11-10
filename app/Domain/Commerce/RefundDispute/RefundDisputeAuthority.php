@@ -51,7 +51,7 @@ final class RefundDisputeAuthority
         if ($source === RefundDisputeSource::PRODUCTION_TAX) {
             return $this->lockProductionTax($batch, $actor);
         }
-        // Environment, flag and policy refuse before any row is locked or read.
+        // resolve() above already made plain, unlocked reads to pick the chain; environment, flag and policy refuse before the first lock is taken.
         $policy = app(RefundDisputePolicy::class)->current();
         $current = $actor?->exists ? User::whereKey($actor->getKey())->lockForUpdate()->first() : null;
         if (! $current || ! Gate::forUser($current)->allows('administer-catalog') || ! AdminMultiFactor::satisfiedBy($current, lockForUpdate: true)) {

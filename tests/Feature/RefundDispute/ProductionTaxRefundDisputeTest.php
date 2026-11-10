@@ -8,6 +8,7 @@ use App\Domain\Commerce\RefundDispute\Models\RefundDisputeHold;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObject;
 use App\Domain\Commerce\RefundDispute\Models\RefundDisputeObservation;
 use App\Domain\Commerce\RefundDispute\Models\RefundLineAllocation;
+use App\Domain\Commerce\RefundDispute\ProductionTaxFinalizeGuard;
 use App\Domain\Commerce\RefundDispute\RefundDisputeAccess;
 use App\Domain\Commerce\RefundDispute\RefundDisputeActions;
 use App\Domain\Commerce\RefundDispute\RefundDisputeException;
@@ -81,9 +82,16 @@ class ProductionTaxRefundDisputeTest extends TestCase
         return $machine;
     }
 
+    /**
+     * The programmable provider is bound before finalization: the finalize guard reads the provider while the lifecycle is
+     * admitted, using the reviewed row's payment and gross, exactly the facts the batch later retains.
+     */
     private function order(bool $two = false, bool $prepare = false): array
     {
         $f = $this->paidTaxOrder(twoLines: $two);
+        $reviewed = DB::table('production_tax_checkout_reviewed_sessions')->first();
+        $this->financial = ProductionTaxFinancialFixtures::gateway('acct_SYNTHETIC', (string) $reviewed->provider_payment_id, (int) $reviewed->amount_total_minor);
+        $this->app->instance(StripeFinancialInspectionGateway::class, $this->financial);
         $f['batch'] = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
         if ($prepare) {
             $f['batch'] = (new PaidTaxDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
@@ -92,8 +100,7 @@ class ProductionTaxRefundDisputeTest extends TestCase
         $f['gross'] = $f['batch']['lines'][0]['tax']['order_total_minor'];
         $f['totals'] = array_column(array_column($f['batch']['lines'], 'tax'), 'line_total_minor');
         $f['payment'] = (string) DB::table('paid_tax_order_origins')->where('public_id', $f['id'])->value('provider_payment_id');
-        $this->financial = ProductionTaxFinancialFixtures::gateway('acct_SYNTHETIC', $f['payment'], $f['gross']);
-        $this->app->instance(StripeFinancialInspectionGateway::class, $this->financial);
+        $this->financial->calls = [];
 
         return $f;
     }
@@ -636,6 +643,280 @@ class ProductionTaxRefundDisputeTest extends TestCase
         $this->assertSame(0, RefundDisputeHold::where('order_source', 'production_tax')->count());
     }
 
+    /** A paid but not yet finalized synthetic order, with the programmable provider already bound for the finalize guard. */
+    private function pending(bool $two = false): array
+    {
+        $f = $this->paidTaxOrder(twoLines: $two);
+        $reviewed = DB::table('production_tax_checkout_reviewed_sessions')->first();
+        $f['payment'] = (string) $reviewed->provider_payment_id;
+        $f['gross'] = (int) $reviewed->amount_total_minor;
+        $this->financial = ProductionTaxFinancialFixtures::gateway('acct_SYNTHETIC', $f['payment'], $f['gross']);
+        $this->app->instance(StripeFinancialInspectionGateway::class, $this->financial);
+
+        return $f;
+    }
+
+    private function finalizeOrder(array $f): array
+    {
+        return (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
+    }
+
+    /** Finalization is refused with this internal reason, the order stays paid and not one grant row or ledger row is written. */
+    private function refusedFinalize(string $reason, array $f): void
+    {
+        $originals = $this->originals();
+        try {
+            $this->finalizeOrder($f);
+            $this->fail('A finalization that must be refused created a grant.');
+        } catch (PaidTaxException $error) {
+            $this->assertSame([409, $reason], [$error->status, $error->reason]);
+        }
+        $this->assertSame($originals, $this->originals());
+        $this->assertSame(0, DB::table('paid_tax_order_origins')->count());
+        $this->assertSame(0, DB::table('paid_tax_grant_origins')->count());
+        $this->assertSame(array_fill_keys(self::LEDGER, 0), $this->counts());
+        $this->assertSame(0, DB::transactionLevel());
+        $this->assertFalse(DB::getPdo()->inTransaction());
+    }
+
+    public function test_an_order_refunded_or_disputed_before_finalization_is_held_and_never_granted(): void
+    {
+        $f = $this->pending();
+        $cases = [
+            'fully refunded' => [[['re_FULL', $f['gross'], 'succeeded']], []],
+            'refunds in flight cover the gross' => [[['re_A', 100, 'succeeded'], ['re_B', $f['gross'] - 100, 'pending']], []],
+            'dispute open' => [[], [['du_OPEN', $f['gross'], 'needs_response']]],
+            'warning open' => [[], [['du_WARN', $f['gross'], 'warning_under_review']]],
+            'dispute lost' => [[], [['du_LOST', $f['gross'], 'lost']]],
+            'refunded and disputed' => [[['re_FULL', $f['gross'], 'succeeded']], [['du_OPEN', $f['gross'], 'under_review']]],
+        ];
+        foreach ($cases as $name => [$refunds, $disputes]) {
+            $this->financial->refunds = $refunds;
+            $this->financial->disputes = $disputes;
+            $before = count($this->financial->calls);
+            $this->refusedFinalize(ProductionTaxFinalizeGuard::HOLD, $f);
+            $this->assertCount($before + 1, $this->financial->calls, $name);
+        }
+        // The provider read ran outside every transaction, for the retained PaymentIntent only.
+        $this->assertSame(0, collect($this->financial->calls)->max('transaction_level'));
+        $this->assertSame([$f['payment']], array_values(array_unique(array_column($this->financial->calls, 'id'))));
+        // Once the provider no longer reports a blocking state the same order finalizes normally.
+        $this->financial->refunds = [];
+        $this->financial->disputes = [];
+        $batch = $this->finalizeOrder($f);
+        $this->assertSame($f['gross'], $batch['lines'][0]['tax']['order_total_minor']);
+        $this->assertSame(1, DB::table('paid_tax_order_origins')->count());
+    }
+
+    public function test_a_clean_partially_refunded_or_resolved_order_finalizes(): void
+    {
+        $f = $this->pending();
+        $guard = app(ProductionTaxFinalizeGuard::class);
+        $orderId = $f['order']['orderId'];
+        $expected = ['account' => 'acct_SYNTHETIC', 'payment' => $f['payment'], 'gross' => $f['gross']];
+        $cases = ['untouched' => [[], []], 'partial refund' => [[['re_PART', 100, 'succeeded']], []], 'failed refund' => [[['re_FAILED', $f['gross'], 'failed']], []],
+            'canceled refund' => [[['re_CANCELED', $f['gross'], 'canceled']], []], 'dispute won' => [[], [['du_WON', 5, 'won']]],
+            'warning closed' => [[], [['du_CLOSED', 5, 'warning_closed']]]];
+        foreach ($cases as $name => [$refunds, $disputes]) {
+            $this->financial->refunds = $refunds;
+            $this->financial->disputes = $disputes;
+            $this->assertSame($expected, $guard->read($orderId), $name);
+        }
+        $this->assertCount(count($cases), $this->financial->calls);
+        $this->assertSame(0, DB::table('paid_tax_order_origins')->count());
+        $this->assertSame($f['gross'], $this->finalizeOrder($f)['lines'][0]['tax']['order_total_minor']);
+    }
+
+    public function test_a_failed_foreign_or_incomplete_provider_read_fails_closed_at_finalization(): void
+    {
+        $f = $this->pending();
+        $failures = [
+            'provider error' => fn (array $source) => throw new \RuntimeException('Stripe is unreachable'),
+            'another account' => fn (array $source): array => ['account_id' => 'acct_ANOTHER'] + $source,
+            'another payment' => fn (array $source): array => ['payment' => ['id' => 'pi_FOREIGN'] + $source['payment']] + $source,
+            'another amount' => fn (array $source): array => ['payment' => ['amount' => $source['payment']['amount'] + 1] + $source['payment']] + $source,
+            'live mode' => fn (array $source): array => ['payment' => ['livemode' => true] + $source['payment']] + $source,
+            'refunds above the gross' => null,
+            'incomplete refund list' => fn (array $source): array => ['refunds' => ['has_more' => true] + $source['refunds']] + $source,
+            'incomplete dispute list' => fn (array $source): array => ['disputes' => ['has_more' => true] + $source['disputes']] + $source,
+            'a dispute the charge does not admit' => fn (array $source): array => ['charge_before' => ['disputed' => true] + $source['charge_before'],
+                'charge_after' => ['disputed' => true] + $source['charge_after']] + $source,
+        ];
+        foreach ($failures as $name => $failure) {
+            if ($failure === null) {
+                // Each refund fits the payment, but together they exceed it: the state machine, not the provider read, rejects this.
+                $this->financial->onInspect = null;
+                $this->financial->refunds = [['re_ONE', $f['gross'], 'pending'], ['re_TWO', $f['gross'], 'pending']];
+                $this->refusedFinalize(ProductionTaxFinalizeGuard::ATTENTION, $f);
+                $this->financial->refunds = [];
+
+                continue;
+            }
+            $this->financial->onInspect = $failure;
+            $this->refusedFinalize(ProductionTaxFinalizeGuard::ATTENTION, $f);
+        }
+        // A refund in another currency is not a comparable fact: attention, not a pass.
+        $this->financial->onInspect = null;
+        $this->financial->refunds = [['re_EUR', 100, 'succeeded', 'eur']];
+        $this->refusedFinalize(ProductionTaxFinalizeGuard::ATTENTION, $f);
+        $this->financial->refunds = [];
+        // The retained reviewed row must belong to the own account; the read fails closed before any provider call otherwise.
+        // (Its currency is USD by the table's insert trigger and the row is immutable, so the guard keeps no separate currency check.)
+        $calls = count($this->financial->calls);
+        $guard = app(ProductionTaxFinalizeGuard::class);
+        $refusedRead = function (string $label) use ($guard, $f): void {
+            try {
+                $guard->read($f['order']['orderId']);
+                $this->fail($label.' was read');
+            } catch (PaidTaxException $error) {
+                $this->assertSame([409, ProductionTaxFinalizeGuard::ATTENTION], [$error->status, $error->reason], $label);
+            }
+        };
+        config(['payments.stripe.account_id' => 'acct_ANOTHEROWN']);
+        $refusedRead('reviewed account is not the own account');
+        config(['payments.stripe.account_id' => 'acct_SYNTHETIC']);
+        $this->assertCount($calls, $this->financial->calls, 'neither refusal reached the provider');
+        $this->assertSame($f['gross'], $this->finalizeOrder($f)['lines'][0]['tax']['order_total_minor']);
+    }
+
+    public function test_finalization_replays_without_a_provider_read_and_after_a_dispute_is_recorded(): void
+    {
+        $f = $this->pending();
+        $first = $this->finalizeOrder($f);
+        $this->assertCount(1, $this->financial->calls);
+        $this->assertSame($first, $this->finalizeOrder($f));
+        $this->assertCount(1, $this->financial->calls, 'a replay of a finalized order makes no provider call');
+        $this->assertSame(1, DB::table('paid_tax_order_origins')->count());
+        // A dispute that arrives after finalization is the ledger's job: the replay still returns the retained batch, read only.
+        $this->financial->disputes = [['du_LATE', $f['gross'], 'needs_response']];
+        $f['id'] = $first['id'];
+        $this->observe($f);
+        $this->assertSame([true], $this->heldLines($f));
+        $this->assertSame($first, $this->finalizeOrder($f));
+        $this->assertCount(2, $this->financial->calls);
+    }
+
+    public function test_a_charge_refund_aggregate_the_list_does_not_show_still_holds(): void
+    {
+        $f = $this->pending();
+        // The listed refunds cover only part of the gross while the charge's own aggregate says it is fully refunded: list lag
+        // must fail toward hold, never toward a grant.
+        $this->financial->refunds = [['re_LAG', 100, 'succeeded']];
+        $this->financial->chargeOverrides = ['amount_refunded' => $f['gross'], 'refunded' => true];
+        $this->refusedFinalize(ProductionTaxFinalizeGuard::HOLD, $f);
+        // An aggregate that agrees with a partial refund is clean.
+        $this->financial->chargeOverrides = [];
+        $this->assertSame($f['gross'], $this->finalizeOrder($f)['lines'][0]['tax']['order_total_minor']);
+    }
+
+    public function test_another_enrolled_buyer_cannot_tell_a_refunded_order_from_a_clean_one_and_causes_no_provider_call(): void
+    {
+        $f = $this->pending();
+        $other = $this->enrollThroughLocalSmtp('other-refund-buyer@example.test');
+        $outcomes = [];
+        foreach (['clean' => [[], []], 'refunded' => [[['re_FULL', $f['gross'], 'succeeded']], []], 'disputed' => [[], [['du_OPEN', $f['gross'], 'needs_response']]]] as $name => [$refunds, $disputes]) {
+            $this->financial->refunds = $refunds;
+            $this->financial->disputes = $disputes;
+            try {
+                (new PaidTaxGrants)->finalize($other['principal'], $other['user'], $f['order']['orderId']);
+                $this->fail('A non-owner finalized '.$name);
+            } catch (PaidTaxException $error) {
+                $outcomes[$name] = [$error->status, $error->reason, $error->getMessage()];
+            }
+        }
+        $this->assertSame([404, null, $outcomes['clean'][2]], $outcomes['clean']);
+        $this->assertSame($outcomes['clean'], $outcomes['refunded']);
+        $this->assertSame($outcomes['clean'], $outcomes['disputed']);
+        $this->assertSame([], $this->financial->calls, 'a non-owner causes no provider call');
+        $this->assertSame(0, DB::table('paid_tax_order_origins')->count());
+        $this->assertSame(0, DB::table('paid_tax_grant_origins')->count());
+        // The owner still gets the hold, so the refusal exists and only the owner sees it.
+        $this->financial->refunds = [['re_FULL', $f['gross'], 'succeeded']];
+        $this->financial->disputes = [];
+        $this->refusedFinalize(ProductionTaxFinalizeGuard::HOLD, $f);
+    }
+
+    public function test_a_non_owner_is_refused_normally_even_when_the_guard_would_refuse(): void
+    {
+        $f = $this->pending();
+        $other = $this->enrollThroughLocalSmtp('other-race-buyer@example.test');
+        // Even a guard whose read would refuse is never reached for a non-owner: the ordinary refusal comes back and the owner is unaffected.
+        $this->app->bind(ProductionTaxFinalizeGuard::class, fn () => new class extends ProductionTaxFinalizeGuard
+        {
+            public function read(string $orderPublicId): ?array
+            {
+                throw new PaidTaxException(409, ProductionTaxFinalizeGuard::HOLD);
+            }
+        });
+        try {
+            (new PaidTaxGrants)->finalize($other['principal'], $other['user'], $f['order']['orderId']);
+            $this->fail('A non-owner finalized');
+        } catch (PaidTaxException $error) {
+            $this->assertSame([404, null], [$error->status, $error->reason]);
+        }
+        $this->refusedFinalize(ProductionTaxFinalizeGuard::HOLD, $f);
+    }
+
+    public function test_the_guard_does_nothing_while_the_lifecycle_is_not_admitted(): void
+    {
+        $f = $this->pending();
+        $this->financial->refunds = [['re_FULL', $f['gross'], 'succeeded']];
+        config(['refund-dispute.enabled' => false]);
+        $this->assertFalse(app(ProductionTaxFinalizeGuard::class)->admitted());
+        // Default-off: finalization is exactly what it was before the guard, with no provider call.
+        $this->assertSame($f['gross'], $this->finalizeOrder($f)['lines'][0]['tax']['order_total_minor']);
+        $this->assertSame([], $this->financial->calls);
+        foreach (['staging', 'production'] as $environment) {
+            $this->app['env'] = $environment;
+            $this->assertFalse(app(ProductionTaxFinalizeGuard::class)->admitted(), $environment);
+        }
+        $this->app['env'] = 'testing';
+    }
+
+    public function test_finalization_refuses_when_the_facts_read_before_the_lock_are_not_the_locked_orders(): void
+    {
+        $f = $this->pending();
+        $reads = ['another payment' => ['account' => 'acct_SYNTHETIC', 'payment' => 'pi_OTHERORDER', 'gross' => $f['gross']],
+            'another gross' => ['account' => 'acct_SYNTHETIC', 'payment' => $f['payment'], 'gross' => $f['gross'] + 1], 'nothing read' => null];
+        foreach ($reads as $name => $read) {
+            $this->app->bind(ProductionTaxFinalizeGuard::class, fn () => new class($read) extends ProductionTaxFinalizeGuard
+            {
+                public function __construct(private ?array $fake) {}
+
+                public function read(string $orderPublicId): ?array
+                {
+                    return $this->fake;
+                }
+            });
+            $this->refusedFinalize(ProductionTaxFinalizeGuard::ATTENTION, $f);
+        }
+        $this->app->forgetInstance(ProductionTaxFinalizeGuard::class);
+        $this->app->bind(ProductionTaxFinalizeGuard::class);
+        $this->assertSame($f['gross'], $this->finalizeOrder($f)['lines'][0]['tax']['order_total_minor']);
+    }
+
+    public function test_the_locked_frame_refuses_paid_lines_that_are_not_the_facts_the_provider_read_cleared(): void
+    {
+        $guard = app(ProductionTaxFinalizeGuard::class);
+        $read = ['account' => 'acct_SYNTHETIC', 'payment' => 'pi_READ', 'gross' => 1200];
+        $line = ['provider_account' => 'acct_SYNTHETIC', 'provider_payment_id' => 'pi_READ', 'funds_mode' => 'test',
+            'producer' => 'production_tax_checkout_v2', 'tax' => ['order_total_minor' => 1200]];
+        $guard->assertBound($read, [$line, $line]);
+        $mismatches = ['another producer' => [$read, [['producer' => 'production_track_checkout_v1'] + $line]], 'nothing read' => [null, [$line]], 'no lines' => [$read, []], 'another payment' => [$read, [['provider_payment_id' => 'pi_OTHER'] + $line]],
+            'another account' => [$read, [['provider_account' => 'acct_ANOTHER'] + $line]], 'another gross' => [$read, [['tax' => ['order_total_minor' => 1201]] + $line]],
+            'second line differs' => [$read, [$line, ['provider_payment_id' => 'pi_OTHER'] + $line]], 'live funds' => [$read, [['funds_mode' => 'live'] + $line]]];
+        foreach ($mismatches as $name => [$facts, $lines]) {
+            try {
+                $guard->assertBound($facts, $lines);
+                $this->fail($name.' was accepted');
+            } catch (PaidTaxException $error) {
+                $this->assertSame([409, ProductionTaxFinalizeGuard::ATTENTION], [$error->status, $error->reason], $name);
+            }
+        }
+        config(['refund-dispute.enabled' => false]);
+        $guard->assertBound(null, []);
+    }
+
     private function blocked(int $order, int $grant, string $source): array
     {
         try {
@@ -695,7 +976,11 @@ class ProductionTaxRefundDisputeTest extends TestCase
     {
         $f = $this->order(two: true);
         $second = $this->secondPaidTaxOrder($f, 'cs_test_refundsecond', 'pi_refundsecond');
+        // The finalize guard reads the second order's own PaymentIntent, so it gets its own programmable provider.
+        $reviewed = DB::table('production_tax_checkout_reviewed_sessions')->where('provider_payment_id', 'pi_refundsecond')->first();
+        $this->app->instance(StripeFinancialInspectionGateway::class, ProductionTaxFinancialFixtures::gateway('acct_SYNTHETIC', 'pi_refundsecond', (int) $reviewed->amount_total_minor));
         $second['batch'] = (new PaidTaxGrants)->finalize($second['buyer']['principal'], $second['buyer']['user'], $second['order']['orderId']);
+        $this->app->instance(StripeFinancialInspectionGateway::class, $this->financial);
         $second['id'] = $second['batch']['id'];
         $this->financial->disputes = [['du_ONE', $f['gross'], 'needs_response']];
         $this->observe($f);
