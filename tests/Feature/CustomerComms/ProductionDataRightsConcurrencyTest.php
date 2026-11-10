@@ -7,6 +7,7 @@ use App\Domain\Customers\DataRights\Models\CustomerDataRequest;
 use App\Domain\Customers\Models\CustomerAccount;
 use App\Domain\Customers\ProductionIdentity\Features\ProductionAccountFeaturePolicy;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
+use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use App\Models\User;
 use App\Support\CanonicalJson;
 use Illuminate\Filesystem\Filesystem;
@@ -47,7 +48,8 @@ class ProductionDataRightsConcurrencyTest extends TestCase
         parent::setUp();
         config(['app.key' => 'base64:'.base64_encode(str_repeat('n', 32))]);
         config(['production-customer-identity.enabled' => true, 'production-customer-identity.provenance' => IdentityPolicy::REHEARSAL,
-            'production-customer-identity.public_origin' => 'http://localhost', 'customer.test_accounts_enabled' => false,
+            'production-customer-identity.public_origin' => 'http://localhost', 'production-customer-identity.notifications_enabled' => true,
+            'production-customer-identity.transport_capability' => LoopbackSmtp::CAPABILITY, 'customer.test_accounts_enabled' => false,
             'customer-data-rights.enabled' => true, 'customer-data-rights.retention' => self::RETENTION,
             'production-account-features.enabled' => true, 'production-account-features.provenance' => IdentityPolicy::REHEARSAL,
             'production-account-features.versions' => ProductionAccountFeaturePolicy::VERSIONS]);
@@ -140,6 +142,7 @@ class ProductionDataRightsConcurrencyTest extends TestCase
             foreach (['one', 'two'] as $name) {
                 $workers[$name] = $this->worker($directory, ['name' => $name, 'barrier' => 'start', 'operation' => 'deletion', 'production' => true,
                     'mint' => $alice['user']->id, 'actor_id' => $alice['user']->id]);
+                $workers[$name]->start();
             }
             $deadline = microtime(true) + 30;
             while (! (is_file($directory.'/one') && is_file($directory.'/two')) && microtime(true) < $deadline) {
