@@ -794,6 +794,30 @@ Sean: "We shouldn't be deferring development of those service pages like merch o
 - Still Sean's for merch: the Printful account and API key (entered on the host only), product and variant choices and
   retail prices, shipping and returns wording for TERMS (counsel), and tax treatment of physical goods (accountant).
 
+### Sean's answers, 2026-11-10 (later the same day): tiers, kit license, albums
+
+Sean: "Your private templates are Basic / Premium / Premium Plus / Unlimited / Custom Beat / Exclusive … Sound kit
+license. There should also be an albums page for my digital music such as Cancel the Sky and Wide Awake etc. This is
+the license from one of the drum kits. It obviously needs to be tailored to each drum kit or sound kit or made generic
+and the visual appearance more in line with other generated legal documents such as the contracts."
+
+- **Q-3 answered: the six private templates are canonical for v1**: Basic, Premium, Premium Plus, Unlimited, Custom
+  Beat, Exclusive (DD-21 stands). SQ-05's per-track defaults are read against these names: Basic, Premium, Premium Plus
+  and Unlimited are on by default; Exclusive is per track (default on). Working assumption until Sean corrects it: the
+  draft's "Trackout" is the private set's Premium Plus (the stems tier), and Custom Beat is not a per-track catalog
+  tier. Staging keeps its synthetic shapes (DD-19, BL-40).
+- **Q-2 answered: sound-kit license.** Sean supplied his current "Sample Pack License Agreement" (revision 2026-09-18,
+  attached to a drum kit). It becomes **one generic sound-kit license** whose kit name, purchase date, license fee and
+  licensee are filled per purchase, rendered by the store's contract pipeline in the same visual system as the
+  generated license contracts (header, typography, acceptance and signature block, footer). Its text is authored as a
+  private license version like the six templates and never enters Git; the repository holds only the template kind,
+  its placeholders, the renderer and profile pins. Sean's signature image stays private, as for every contract.
+- **Albums page.** A public albums page for Sean's own released music (for example *Cancel the Sky* and *Wide Awake*):
+  release title, artwork, release date, tracklist and listening links, staff-entered, default-off until Sean enables
+  it. Selling releases as digital downloads is a later decision; this page does not create a purchase path.
+- Noted for Sean's confirmation: the supplied kit license names the Fifth Judicial District of Polk County, Iowa as
+  venue. If that is the venue for all VASEY.AUDIO terms, it answers the SQ-07 venue-county placeholder.
+
 ### Reconciliation with the delegated decisions (DD-xx)
 
 | DD row | Status | Governing decision |
@@ -830,10 +854,10 @@ All other DD rows stand.
   account-first). Email-verified guest checkout needs a TERMS §3 amendment, counsel's review of it, and new
   production identity code (`buyer_identity.mode`). Until Sean confirms the amendment, production identity stays
   default-off and nothing ships either way.
-- **Q-2 Kit and collection terms.** None of Sean's six private license templates is a sound-kit license, and SQ-04
+- **Q-2 Kit and collection terms (answered below).** None of Sean's six private license templates is a sound-kit license, and SQ-04
   defers automatic bundles. Kits need kit license terms from Sean before a kit can be sold; collections can launch as
   browse groupings of individually licensed tracks (no bundle price) unless Sean says otherwise.
-- **Q-3 Tier names.** SQ-05 names Basic, Premium, Trackout, Unlimited, Exclusive (as in the LICENSE-TIERS draft);
+- **Q-3 Tier names (answered below: the six private templates).** SQ-05 names Basic, Premium, Trackout, Unlimited, Exclusive (as in the LICENSE-TIERS draft);
   DD-21 records Sean's six private templates as Basic, Premium, Premium Plus, Unlimited, Custom Beat, Exclusive. Which
   set is canonical for v1?
 - **Q-4 R2 scope.** Private storage on R2 is a new storage adapter, signed-delivery path and backup change; it is not

@@ -265,7 +265,7 @@ those flags.
 
 | Task | Size | Source | Notes |
 | --- | --- | --- | --- |
-| BL-53 Sound kit storefront and entitlement delivery (FP-007) | L | SQ-04 | Needs kit license terms from Sean before a kit can be sold (open question Q-2). Build to default-off. |
+| BL-53 Sound kit storefront and entitlement delivery (FP-007) | L | SQ-04 | Kit license terms come from BL-66 (Sean supplied his sample pack license). Build default-off. |
 | BL-54 Collections/albums as browse groupings (FP-006) | M | SQ-04 | Individually licensed tracks, no bundle price (FP-066 stays deferred) unless Sean says otherwise. |
 | BL-55 tc-lib #162/#164 updates with contract profile re-pins | M | SQ-14 | Before contract activation; frozen-bytes and profile `--check` tests re-pinned through review. |
 | BL-56 Pint `laravel` preset on changed files in CI | S | SQ-18 | `pint --test --diff=main`; the whole-repo sweep is one PR after the freeze. |
@@ -278,6 +278,8 @@ those flags.
 | BL-63 Merchandise with Printful fulfillment (FP-010, FP-088) | L | SQ-04 amendment | Catalog, cart line, verified-payment hand-off to Printful, webhook-verified status, default-off; tests use a fake Printful client only. |
 | BL-64 Service pages, deposits and milestones (FP-086, FP-087) | L | SQ-04 amendment | Public service catalog and deposit/milestone payments over the verified Stripe path, default-off; inquiry remains the live path. |
 | BL-65 Memberships, offers and automatic bundles (FP-009, FP-083, FP-056, FP-066) | L | SQ-04 amendment | Continue the built membership work and add offers and bundles, each default-off; no recurring charge without Sean's authorization. |
+| BL-66 Generic sound-kit license kind and renderer | M | Sean 2026-11-10 (Q-2) | Per-kit placeholders (kit name, purchase date, fee, licensee); same visual system as the license contracts; text authored privately as a license version, never in Git. Precedes BL-53 sales. |
+| BL-67 Albums page for Sean's releases | M | Sean 2026-11-10 | Release title, artwork, date, tracklist, listening links; staff-entered; default-off; no purchase path. |
 
 BL-41 (track scheduling) adds the `private` state, America/Chicago entry with UTC storage, and "stays scheduled with a
 staff alert" on a failed check (SQ-15).
