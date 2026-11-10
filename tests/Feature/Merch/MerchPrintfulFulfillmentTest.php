@@ -411,11 +411,12 @@ class MerchPrintfulFulfillmentTest extends TestCase
         $inner = null;
         $this->printful->duringConfirm = function () use ($fulfillment, &$inner): void {
             $this->printful->duringConfirm = null;
-            $inner = app(SubmitMerchFulfillment::class)->handle(MerchFulfillment::query()->findOrFail($fulfillment->id));
+            $inner = $this->refusal(fn () => app(SubmitMerchFulfillment::class)->handle(MerchFulfillment::query()->findOrFail($fulfillment->id)));
         };
         $outer = app(SubmitMerchFulfillment::class)->handle($fulfillment);
 
-        $this->assertSame(MerchFulfillment::CONFIRMING, $inner->state);
+        // The second caller is told the confirmation is in progress; it never sends one of its own.
+        $this->assertSame('MERCH_CONFIRMATION_IN_PROGRESS', $inner);
         $this->assertSame(MerchFulfillment::CONFIRMED, $outer->state);
         $this->assertSame(1, $this->printful->count('confirm'));
     }
@@ -499,12 +500,54 @@ class MerchPrintfulFulfillmentTest extends TestCase
         // While the first worker waits on Printful's answer, a second one runs: it must neither look up nor confirm.
         $inner = null;
         $this->printful->onFind = function () use ($fulfillment, &$inner): void {
-            $inner = app(SubmitMerchFulfillment::class)->handle(MerchFulfillment::query()->findOrFail($fulfillment->id));
+            $inner = $this->refusal(fn () => app(SubmitMerchFulfillment::class)->handle(MerchFulfillment::query()->findOrFail($fulfillment->id)));
         };
         $settled = app(SubmitMerchFulfillment::class)->handle($fulfillment);
-        $this->assertSame(MerchFulfillment::CONFIRMING, $inner?->state);
+        $this->assertSame('MERCH_CONFIRMATION_IN_PROGRESS', $inner);
         $this->assertSame(MerchFulfillment::CONFIRMED, $settled->state);
         $this->assertSame([1, 2], [$this->printful->count('find'), $this->printful->count('confirm')]);
+    }
+
+    public function test_an_unexpected_failure_while_reconciling_gives_the_lease_back(): void
+    {
+        config(['merch.confirm_orders' => true]);
+        $this->printful->confirmFailure = new PrintfulException('PRINTFUL_UNAVAILABLE', true);
+        $fulfillment = $this->recorded();
+        app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        $this->printful->confirmFailure = null;
+
+        // The hold ledger cannot be read during reconciliation: the error surfaces and the lease is released, so the next
+        // run reconciles again instead of seeing a live lease and returning as if settled.
+        $this->app->instance(ActiveOrderHolds::class, new class extends ActiveOrderHolds
+        {
+            public function exist(int $orderId): bool
+            {
+                throw new \RuntimeException('ledger unavailable');
+            }
+        });
+        try {
+            app(SubmitMerchFulfillment::class)->handle($fulfillment);
+            $this->fail('The ledger failure was swallowed.');
+        } catch (\RuntimeException $exception) {
+            $this->assertSame('ledger unavailable', $exception->getMessage());
+        }
+        $this->assertSame([MerchFulfillment::CONFIRMING, null], [$fulfillment->refresh()->state, $fulfillment->lease_expires_at]);
+
+        $this->app->forgetInstance(ActiveOrderHolds::class);
+        $this->assertSame(MerchFulfillment::CONFIRMED, app(SubmitMerchFulfillment::class)->handle($fulfillment)->state);
+        $this->assertSame(2, $this->printful->count('confirm'));
+    }
+
+    public function test_a_confirmation_in_progress_is_reported_not_returned_as_settled(): void
+    {
+        config(['merch.confirm_orders' => true]);
+        $this->printful->confirmFailure = new PrintfulException('PRINTFUL_UNAVAILABLE', true);
+        $fulfillment = $this->recorded();
+        app(SubmitMerchFulfillment::class)->handle($fulfillment);
+        MerchFulfillment::query()->whereKey($fulfillment->id)->update(['lease_expires_at' => now()->addMinutes(5)]);
+
+        $this->assertSame('MERCH_CONFIRMATION_IN_PROGRESS', $this->refusal(fn () => app(SubmitMerchFulfillment::class)->handle($fulfillment)));
+        $this->assertSame([1, 0], [$this->printful->count('confirm'), $this->printful->count('find')]);
     }
 
     public function test_a_draft_is_not_reconfirmed_once_the_confirm_switch_is_off(): void

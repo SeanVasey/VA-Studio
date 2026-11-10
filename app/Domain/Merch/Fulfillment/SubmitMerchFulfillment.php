@@ -133,8 +133,23 @@ final class SubmitMerchFulfillment
             ->where(fn ($unowned) => $unowned->whereNull('lease_expires_at')->orWhere('lease_expires_at', '<=', now()))
             ->update(['lease_expires_at' => now()->addMinutes(self::LEASE_MINUTES), 'updated_at' => now()]);
         if ($claimed !== 1) {
-            return $current->refresh();
+            throw new MerchFulfillmentException('MERCH_CONFIRMATION_IN_PROGRESS');
         }
+        try {
+            return $this->reconcileClaimed($current);
+        } catch (MerchFulfillmentException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            // Anything unexpected after the claim (a ledger read, a client error) must not leave the lease held, or the next
+            // run would see a live lease and return as if the work were settled.
+            $this->releaseReconciliation($current);
+            throw $exception;
+        }
+    }
+
+    /** The body of reconciliation, run while this caller holds the reconciliation lease. */
+    private function reconcileClaimed(MerchFulfillment $current): MerchFulfillment
+    {
         try {
             $order = $this->printful->findOrderByExternalId($current->external_id);
         } catch (PrintfulException) {
@@ -195,9 +210,13 @@ final class SubmitMerchFulfillment
         if ($current->state === MerchFulfillment::SUBMITTING) {
             throw new MerchFulfillmentException('MERCH_SUBMISSION_IN_PROGRESS');
         }
-        if ($current->state === MerchFulfillment::CONFIRMING && ($current->lease_expires_at === null || $current->lease_expires_at->isPast())) {
-            // The earlier confirmation's outcome is unknown. Never silently return it as if it were settled.
-            return $this->reconcileConfirmation($current);
+        if ($current->state === MerchFulfillment::CONFIRMING) {
+            if ($current->lease_expires_at === null || $current->lease_expires_at->isPast()) {
+                // The earlier confirmation's outcome is unknown. Never silently return it as if it were settled.
+                return $this->reconcileConfirmation($current);
+            }
+            // Another caller holds the confirmation or its reconciliation right now.
+            throw new MerchFulfillmentException('MERCH_CONFIRMATION_IN_PROGRESS');
         }
         if ($current->state === MerchFulfillment::SUBMITTED && $this->policy->confirmsOrders() && is_string($current->printful_order_id)
             && $current->printful_status === 'draft') {
