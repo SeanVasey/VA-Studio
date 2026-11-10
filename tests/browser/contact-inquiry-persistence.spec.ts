@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
-import { fixtureOperation, type InquiryFixture as Fixture } from './contact-inquiry-fixture';
+import { fillInquiryField, fixtureOperation, type InquiryFixture as Fixture } from './contact-inquiry-fixture';
 
 async function confirm(page: Page, label: 'Mark read' | 'Archive') {
   await page.getByRole('button', { name: label, exact: true }).click();
@@ -39,7 +39,7 @@ test('real customer inquiry persists encrypted and ordinary staff can read and a
     await expect(page.getByRole('link', { name: /Open email/ })).toHaveAttribute('href', 'mailto:editorial%2Bsynthetic%40example.test');
     await expect(page.getByText(fixture.privacyNotice, { exact: true })).toBeVisible();
     for (const label of ['Name', 'Email', 'Subject', 'Message'] as const) {
-      await page.getByLabel(new RegExp(`^${label}`)).fill(fixture.values[label.toLowerCase() as keyof Fixture['values']]);
+      await fillInquiryField(page.getByLabel(new RegExp(`^${label}`)), fixture.values[label.toLowerCase() as keyof Fixture['values']]);
     }
     const csrf = await page.locator('meta[name="csrf-token"]').getAttribute('content');
     expect(csrf).toBeTruthy();

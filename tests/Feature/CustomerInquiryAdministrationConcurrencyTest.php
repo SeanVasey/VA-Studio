@@ -73,7 +73,7 @@ class CustomerInquiryAdministrationConcurrencyTest extends TestCase
         $release = $site->create(SiteEditorialFixtures::content(), 'Synthetic administration contact', $this->operator);
         $site->publish($release->id, 0, $this->operator);
         app(SubmitInquiry::class)->handle(['name' => 'Synthetic Authority Buyer', 'email' => 'authority-buyer@example.test',
-            'subject' => 'Synthetic retained private subject', 'message' => "Synthetic retained private body.\nExact second line.",
+            'subject' => 'Order or download help', 'message' => "Synthetic retained private body.\nExact second line.",
             'website' => '', 'requestKey' => (string) Str::uuid(),
             'noticeToken' => app(InquiryPolicy::class)->publicSetup($site->current())['noticeToken']], hash('sha256', 'synthetic-administration-owner'));
         $this->inquiry = CustomerInquiry::sole();

@@ -52,7 +52,7 @@ class InquiryNotificationWorkTest extends TestCase
             'inquiries.operator_notifications_enabled' => false]);
         $release = app(SiteContent::class)->create(SiteEditorialFixtures::content(), 'Synthetic alert fixture', $this->operator);
         app(SiteContent::class)->publish($release->id, 0, $this->operator);
-        $this->body = ['name' => 'Private sender', 'email' => 'private-sender@example.test', 'subject' => 'Private subject',
+        $this->body = ['name' => 'Private sender', 'email' => 'private-sender@example.test', 'subject' => 'Service request',
             'message' => 'Private message', 'website' => '', 'requestKey' => (string) Str::uuid(),
             'noticeToken' => app(InquiryPolicy::class)->publicSetup(app(SiteContent::class)->current())['noticeToken']];
     }
@@ -105,7 +105,7 @@ class InquiryNotificationWorkTest extends TestCase
         $this->assertSame(CanonicalJson::hash(array_diff_key($this->body, ['requestKey' => true])), $inquiry->payload_hash);
         $this->assertArrayNotHasKey('noticeToken', $inquiry->payload);
         $raw = json_encode(DB::table('inquiry_notification_intents')->sole());
-        foreach (['Private sender', 'private-sender@example.test', 'Private subject', 'Private message', 'SYNTHETIC NOTIFICATION NOTICE', 'SYNTHETIC-TEST-POLICY', $this->body['noticeToken']] as $private) {
+        foreach (['Private sender', 'private-sender@example.test', 'Service request', 'Private message', 'SYNTHETIC NOTIFICATION NOTICE', 'SYNTHETIC-TEST-POLICY', $this->body['noticeToken']] as $private) {
             $this->assertStringNotContainsString($private, $raw);
         }
         $this->assertSame('disabled', app(InquiryNotificationWork::class)->process($intent->id));
@@ -119,7 +119,7 @@ class InquiryNotificationWorkTest extends TestCase
         Queue::assertPushed(NotifyInquiryOperatorJob::class, 1);
         Queue::assertPushed(NotifyInquiryOperatorJob::class, function (NotifyInquiryOperatorJob $job): bool {
             $this->assertSame(InquiryNotificationIntent::latest('id')->firstOrFail()->id, $job->intentId);
-            foreach (['Private sender', 'private-sender@example.test', 'Private subject', 'Private message', 'SYNTHETIC NOTIFICATION NOTICE', 'SYNTHETIC-TEST-POLICY', $this->body['noticeToken']] as $private) {
+            foreach (['Private sender', 'private-sender@example.test', 'Service request', 'Private message', 'SYNTHETIC NOTIFICATION NOTICE', 'SYNTHETIC-TEST-POLICY', $this->body['noticeToken']] as $private) {
                 $this->assertStringNotContainsString($private, serialize($job));
             }
 

@@ -2,6 +2,8 @@
 
 namespace App\Domain\Catalog;
 
+use App\Domain\Rights\Models\LicenseVersion;
+use App\Domain\Rights\SoundKitLicenseAttachment;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -22,6 +24,7 @@ final class OfferDraftInput
             'deliverable_asset_ids' => ['present', 'array', 'max:3'],
             'deliverable_asset_ids.*' => ['integer', 'distinct', 'exists:media_assets,id'],
         ])->validate();
+        SoundKitLicenseAttachment::assertBeatOfferable(LicenseVersion::query()->with('template')->find($validated['license_version_id']));
         $validated['price_minor'] = (int) $validated['price_minor'];
         $validated['deliverable_asset_ids'] = array_map('intval', $validated['deliverable_asset_ids']);
 

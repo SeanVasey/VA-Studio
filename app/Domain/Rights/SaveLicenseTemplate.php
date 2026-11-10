@@ -150,7 +150,7 @@ final class SaveLicenseTemplate
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', 'regex:/\A[a-z0-9]+(?:-[a-z0-9]+)*\z/D', Rule::unique('license_templates', 'slug')->ignore($template)],
-            'type' => ['required', 'string', Rule::in(['non-exclusive', 'exclusive', 'free'])],
+            'type' => ['required', 'string', Rule::in(['non-exclusive', 'exclusive', 'free', SoundKitLicenseKind::TYPE])],
         ])->validate();
     }
 

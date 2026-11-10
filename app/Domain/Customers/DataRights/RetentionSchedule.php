@@ -493,6 +493,7 @@ final class RetentionSchedule
         'merch_draft_versions' => 'Catalog: merch draft versions.',
         'service_drafts' => 'Catalog: service drafts.',
         'service_draft_versions' => 'Catalog: service draft versions.',
+        'service_publications' => 'Catalog: staff approvals of service draft versions for the public service pages; staff-authored, no customer data.',
         'membership_plans' => 'Membership plan definitions.',
         'membership_plan_versions' => 'Membership plan versions.',
         'production_membership_plan_versions' => 'Production membership plan policies and terms.',

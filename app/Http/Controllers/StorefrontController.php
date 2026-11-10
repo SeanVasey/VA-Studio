@@ -7,6 +7,7 @@ use App\Domain\Commerce\Checkout\CheckoutPolicy;
 use App\Domain\Commerce\Orders\OrderPolicy;
 use App\Domain\Customers\CustomerAccessPolicy;
 use App\Domain\SiteBuilder\EditorialContent;
+use App\Domain\SiteBuilder\FamilyEntryPoints;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteImagePresentation;
 use App\Support\PublicStructuredData;
@@ -35,7 +36,9 @@ class StorefrontController extends Controller
             'selectedTrack' => $selectedTrack, 'selectedTrackSlug' => $slug, 'commerceEnabled' => false,
             'testOrderPreparationEnabled' => app(OrderPolicy::class)->enabled(),
             'customerAccountEnabled' => app(CustomerAccessPolicy::class)->enabled(),
-            'testCheckoutEnabled' => app(CheckoutPolicy::class)->enabled(), 'metadata' => $metadata])
+            'testCheckoutEnabled' => app(CheckoutPolicy::class)->enabled(), 'metadata' => $metadata,
+            // Entry points of default-off families appear only while their own policy is on (BL-50).
+            'familyLinks' => app(FamilyEntryPoints::class)->links()])
             ->withViewData(['metadata' => $metadata]);
     }
 
