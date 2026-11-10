@@ -1387,6 +1387,18 @@
       "test_two_independent_staff_issuing_the_same_deposit_serialize_to_one_invoice"
     ],
     [
+      "Tests\\Feature\\RefundDispute\\RefundDisputeProductionNativeTest",
+      "test_a_committed_dispute_hold_wins_the_batch_row_and_refuses_a_waiting_download_authorization"
+    ],
+    [
+      "Tests\\Feature\\RefundDispute\\RefundDisputeProductionNativeTest",
+      "test_a_committed_dispute_hold_refuses_the_waiting_redemption_of_an_authorization_issued_before_it"
+    ],
+    [
+      "Tests\\Feature\\RefundDispute\\RefundDisputeProductionNativeTest",
+      "test_two_staff_observing_one_order_serialize_and_the_second_finds_the_sequence_moved"
+    ],
+    [
       "Tests\\Feature\\TrackSchedulingConcurrencyTest",
       "test_native_lifecycle_blocked_attempt_and_forged_rows_hold_under_the_mysql_triggers"
     ],

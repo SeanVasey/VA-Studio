@@ -8,6 +8,8 @@ use LogicException;
 /** Exact allocation of a succeeded provider refund to an original order line. */
 final class RefundLineAllocation extends Model
 {
+    use ScopesToOrder;
+
     public $timestamps = false;
 
     protected $table = 'refund_line_allocations';

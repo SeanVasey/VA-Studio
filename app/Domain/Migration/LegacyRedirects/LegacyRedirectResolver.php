@@ -18,6 +18,9 @@ final class LegacyRedirectResolver
     /** Bounded browser and shared-cache lifetime, so a corrected map takes effect within the hour. */
     public const CACHE_CONTROL = 'public, max-age=3600';
 
+    /** The route-level fallback sets session cookies, so a shared cache must not store it. */
+    public const FALLBACK_CACHE_CONTROL = 'private, max-age=3600';
+
     public function __construct(private readonly LegacyRedirectTargets $targets) {}
 
     public function respond(Request $request): ?RedirectResponse
@@ -61,5 +64,29 @@ final class LegacyRedirectResolver
         $location = $target['url'] ?? app(PublicPagesSitemap::class)->canonicalOrigin().$target['path'];
 
         return new RedirectResponse($location, 301, ['Cache-Control' => self::CACHE_CONTROL]);
+    }
+
+    /**
+     * Route-level fallback for the legacy /services path while the service catalog is switched off (URL-006). A real
+     * route always wins over a map redirect, so the services controller asks for this instead. It follows the layer's own
+     * switch (the literal `legacy-redirects.enabled`), uses the same canonical origin and query-free single hop as a map
+     * redirect, and answers null (the ordinary 404) unless the contact page is public right now. It runs inside the web
+     * group, so the response carries session cookies: it is cacheable by the browser only (`private`), never by a shared cache.
+     */
+    public function contactFallback(): ?RedirectResponse
+    {
+        if (config('legacy-redirects.enabled') !== true) {
+            return null;
+        }
+        $target = ['type' => 'editorial', 'section' => 'contact', 'slug' => null];
+        if (! $this->targets->currentlyPublic($target)) {
+            return null;
+        }
+
+        return new RedirectResponse(
+            app(PublicPagesSitemap::class)->canonicalOrigin().route('editorial.show', ['section' => 'contact'], false),
+            301,
+            ['Cache-Control' => self::FALLBACK_CACHE_CONTROL],
+        );
     }
 }

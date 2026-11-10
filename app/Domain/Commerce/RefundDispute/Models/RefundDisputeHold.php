@@ -8,6 +8,8 @@ use LogicException;
 /** A technical download hold. It never changes a license, grant or contract; release is a single guarded change. */
 final class RefundDisputeHold extends Model
 {
+    use ScopesToOrder;
+
     public $timestamps = false;
 
     protected $table = 'refund_dispute_holds';
@@ -23,7 +25,7 @@ final class RefundDisputeHold extends Model
     protected static function booted(): void
     {
         self::updating(function (self $hold): void {
-            if ($hold->isDirty(['id', 'public_id', 'order_id', 'license_grant_id', 'reason', 'applied_effect_id', 'created_at'])
+            if ($hold->isDirty(['id', 'public_id', 'order_id', 'order_source', 'license_grant_id', 'reason', 'applied_effect_id', 'created_at'])
                 || $hold->getOriginal('released_at') !== null || ! $hold->isDirty(['released_at', 'released_effect_id'])
                 || $hold->released_at === null || $hold->released_effect_id === null) {
                 throw new LogicException('A refund or dispute hold changes only once, when it is released.');

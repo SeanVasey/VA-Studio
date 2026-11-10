@@ -101,6 +101,7 @@ final class PaidTaxDownloads
             $inputs = $rows->deliveryInputs();
             $line = $this->line($graph, $lineId);
             PaidTaxException::require($graph['complete'] !== null && hash_equals($line['origin']['payload_hash'], $input['originHash']), 409);
+            $this->requireNotHeld($graph, $line, $rows);
             $auth = $rows->one('paid_tax_authorizations', 'account_id = ? AND request_key = ?', [$graph['batch']['account_id'], $input['requestKey']]);
             if ($auth !== []) {
                 PaidTaxException::require($auth['origin_public_id'] === $line['origin']['public_id'] && $auth['batch_public_id'] === $graph['batch']['public_id']
@@ -159,6 +160,7 @@ final class PaidTaxDownloads
                 && (int) $auth['actor_id'] === (int) $graph['batch']['actor_id'], 404);
             $line = $this->line($graph, $auth['origin_public_id']);
             PaidTaxException::require($graph['complete'] !== null, 409);
+            $this->requireNotHeld($graph, $line, $rows);
             PaidTaxException::require(hash_equals($auth['token_hash'], hash('sha256', $token)), 403);
             $this->live($auth, $rows, $admitted);
             $this->deadline($auth, $admitted);
@@ -216,6 +218,17 @@ final class PaidTaxDownloads
             $prepared->close();
             throw $error;
         }
+    }
+
+    /**
+     * BL-42: an active refund or dispute hold on the order, or on this line, refuses a new authorization, the replay of a live one and
+     * the redemption of one issued before the hold. It runs after the frame has read the batch row under lock, the row every hold
+     * writer locks first, and in both redeem frames, so a hold committed between them refuses the redemption. Holds are technical:
+     * no authorization, redemption, grant, original or contract row is changed, and a released hold restores access.
+     */
+    private function requireNotHeld(array $graph, array $line, PaidTaxRows $rows): void
+    {
+        PaidTaxException::require(! $rows->downloadsHeld((int) $graph['batch']['id'], (int) $line['origin']['id']), 409, 'refund_dispute_hold');
     }
 
     private function line(array $graph, string $id): array
