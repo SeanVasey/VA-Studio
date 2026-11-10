@@ -160,7 +160,7 @@ Sean's current `AGENTS.md` CI cost policy supersedes earlier gate adaptations he
 
 Synthetic membership test setup is explicitly approved. Live credentials/payments, real money, purchased services, production deployment and DNS/cutover still require separate authorization. The production preparation queue records developed versus queued work. Direct PHPUnit with worktree-specific Composer autoload avoids the restored Artisan Collision issue; see the handoff for exact source-bound commands and engine limitations.
 
-### Adaptations of §1–§12 (pending Sean's confirmation)
+### Adaptations of §1–§12 (decided 2026-11-10: DD-64 under Sean's delegation; lint preset set by Sean's SQ-18)
 
 - **§3 gate:** Pint (`laravel` preset) is enforced on changed PHP files in preflight (SQ-18); no TypeScript linter yet. SQLite runs skip MySQL-only race tests by design (reviewed census `scripts/ci/database-sqlite-skips.json`); the twenty-four MySQL CI shards run the reviewed native selection and skip only the reviewed SQLite-only census (`scripts/ci/database-mysql-skips.json`), each engine's skips exactly matching its census.
 - **§5 auth:** staff sign in through Filament's built-in auth with TOTP MFA (required in staging and production); the production customer account path (`routes/production-customer-identity.php`, `CompleteIdentity`) is implemented but default-off and unconfigured, and its production policy is U-07; synthetic test accounts run behind default-off flags in `local`, `testing` and `staging`. MySQL has no row-level security, so authorization lives in server-side domain policies and owner checks.

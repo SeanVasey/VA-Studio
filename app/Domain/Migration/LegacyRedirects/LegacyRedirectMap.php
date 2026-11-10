@@ -2,6 +2,7 @@
 
 namespace App\Domain\Migration\LegacyRedirects;
 
+use App\Domain\SiteBuilder\SiteContentSchema;
 use JsonException;
 
 /**
@@ -270,9 +271,12 @@ final class LegacyRedirectMap
                 ? [] : [$label.' editorial target needs a section and, for blog or videos only, an optional entry slug.'],
             'track' => $keys === ['slug', 'type'] && is_string($target['slug']) && preg_match(self::SLUG_PATTERN, $target['slug']) === 1
                 ? [] : [$label.' track target needs exactly a published slug.'],
+            // The page keys are the application's own legal documents (SiteContentSchema), which the legal.show route constrains too.
+            'legal' => $keys === ['page', 'type'] && is_string($target['page']) && in_array($target['page'], SiteContentSchema::LEGAL_DOCUMENTS, true)
+                ? [] : [$label.' legal target needs exactly one of the published legal pages: '.implode(', ', SiteContentSchema::LEGAL_DOCUMENTS).'.'],
             'external' => $keys === ['type', 'url'] && is_string($target['url']) && strlen($target['url']) <= 2048
                 ? [] : [$label.' external target needs exactly a url.'],
-            default => [$label.' target type must be route, editorial, track or external.'],
+            default => [$label.' target type must be route, editorial, track, legal or external.'],
         };
     }
 

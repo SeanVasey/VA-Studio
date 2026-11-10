@@ -110,6 +110,8 @@ of them has a value here.
 | Legal pages (privacy, terms) | S3 | `docs/legal/` (open adoption gap) |
 | Production host, region, topology, backups, incident owner (U-02) and storage choice (U-03) | S1 | `ops/private-server/env.example` inputs; this packet's S1 commands |
 | Storefront origin and DNS plan | S1 staging subdomain, S3 cutover | `APP_URL`, `PRODUCTION_CHECKOUT_RETURN_ORIGIN`; cutover runbook DNS section |
+
+The decided values for the machine-policy rows above (currency DD-11, refund and dispute DD-16, exclusive reservation and late payment DD-17, account-first identity DD-42, and the approved assent text and seller name in `docs/legal/TERMS.md` appendix A.8) are pinned by `tests/Unit/DecidedMachinePolicyConformanceTest.php` against `MachinePolicyV1` and the decision register, using synthetic account, origin and hash values. The test commits no production value and approves nothing; the account id, return origin, tax strategy and ceiling, storage, delivery and retention choices still come from the host. DD-42 is conditionally superseded by SQ-08 (open question Q-1): the policy accepts both `verified_account` and `verified_guest_claim`, and the test pins only the decided `verified_account`.
 | Sender domain, DNS (SPF/DKIM/DMARC) and SMTP provider | Customer identity and notices | `PRODUCTION_IDENTITY_SMTP_*` and `MAIL_*` (host secret store), `VASEY_PRODUCTION_REAL_MAIL_ADMITTED=true`, and flipping the `$enabled` literal in `config/production-identity-smtp.php` (a reviewed code change) |
 | BeatStars exports | Migration (D2) | Content onboarding packet |
 | Review lifetime (30–3600 s) | S2b production-checkout test funds, S3 | `PRODUCTION_CHECKOUT_REVIEW_LIFETIME_SECONDS` |

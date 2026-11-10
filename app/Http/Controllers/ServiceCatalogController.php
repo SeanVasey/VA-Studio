@@ -2,26 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Migration\LegacyRedirects\LegacyRedirectResolver;
 use App\Domain\Services\Catalog\ServiceCatalog;
 use App\Domain\SiteBuilder\EditorialContent;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteImagePresentation;
 use App\Support\StorefrontMetadata;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
 /**
  * Public service pages (BL-64), default off. While the catalog flag is off every path answers the ordinary 404 before
- * any content is read. When on, only staff-approved, unwithdrawn services appear; no price is invented and nothing here
- * takes payment: the request button opens the ordinary contact inquiry.
+ * any service content is read. When on, only staff-approved, unwithdrawn services appear; no price is invented and nothing
+ * here takes payment: the request button opens the ordinary contact inquiry.
+ *
+ * The one exception is the legacy /services path (URL-006, Sean's fallback): while the catalog is off and the legacy
+ * redirect layer is on, it answers a 301 to the canonical contact page instead of a 404, and keeps the 404 when no
+ * contact page is public. Service detail paths never redirect.
  */
 final class ServiceCatalogController extends Controller
 {
     private const INTRO = 'Custom work from VASEY.AUDIO. Request a service and Sean will reply with a written quote; nothing is charged by sending a request.';
 
-    public function index(ServiceCatalog $catalog): Response
+    public function index(ServiceCatalog $catalog, LegacyRedirectResolver $legacy): Response|RedirectResponse
     {
-        abort_unless($catalog->enabled(), 404);
+        if (! $catalog->enabled()) {
+            $fallback = $legacy->contactFallback();
+            abort_if($fallback === null, 404);
+
+            return $fallback;
+        }
 
         return $this->render('Services', self::INTRO, '/services', $catalog->all(), null);
     }
