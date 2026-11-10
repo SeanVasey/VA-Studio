@@ -586,3 +586,238 @@ In the order that unblocks the most work. Times are estimates for someone follow
 
 The work these decisions unblock is listed in
 [`docs/handoff/2026-11-10/UNBLOCKED-WORK.md`](../handoff/2026-11-10/UNBLOCKED-WORK.md).
+
+## Register update — 2026-11-10 (Sean): waiting-on-Sean queue decisions
+
+Sean issued these decisions himself on 2026-11-10 ("Waiting-on-Sean queue: decisions and remaining actions", prepared
+against main `25bfdc9` and the Store Progress dashboard queue SQ-01..SQ-20). They are recorded verbatim below. **Where
+they differ from the delegated decisions of the 2026-11-10 update above (DD-xx), Sean's decision governs**; the
+reconciliation table at the end of this section names every DD row that is superseded or refined, and the questions that
+still need his word. None of these grants a live payment, a provider write, DNS, production deploy, customer import or
+deletion.
+
+### SQ-01 — Staging step 11 (staging recommendations adopted)
+
+- **Second operator: a second staff account Sean controls**, not a second person. Created with `vasey:create-admin`
+  under a distinct mailbox and its own TOTP entry. The two-person rule for license approval and free-definition review
+  then holds between accounts, not between people (as `staging-runbook.md` §5a already states). Production keeps
+  this as an open item: a real second reviewer is preferred before live contracts.
+- **Seller tag: a staging-only synthetic tag is approved for rehearsal.** It must be a generated WAV meeting
+  `docs/media-processing.md` limits (PCM, ≤15 s, ≤16 MiB, above −50 dBFS), installed under
+  `private/branding/`, with its SHA-256 in Forge Environment. Rules: it is used only with
+  `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED=true` and the six `[SYNTHETIC]` tracks; no real master is processed while
+  it is configured; before real tracks the documented reset (runbook "before Sean's real tracks") removes it and
+  installs the real S-6 tag.
+- **Off-host backup destination: Backblaze B2 through the kit's rclone remote, age-encrypted.**
+  - Private bucket per host: `vasey-staging-backups` now, `vasey-production-backups` later. Never shared.
+  - Application key scoped to that bucket with list/read/write and **no delete** capability; retention enforced by a
+    B2 lifecycle rule, `VASEY_BACKUP_REMOTE_PRUNE=0`.
+  - `VASEY_BACKUP_REQUIRE_ENCRYPTION=1`, two age recipients (primary + offline recovery key), public keys only on
+    the host.
+  - `VASEY_BACKUP_RETENTION=tiered`, KEEP 7 / DAILY 7 / WEEKLY 4 / MONTHLY 6 (the guide's starting values, adopted).
+  - Reason: object storage with a no-delete key gives the "host cannot destroy its own off-host backups" property the
+    hardening guide asks for, without running a second server. rclone/B2 is unverified in the kit; staging is where it
+    gets verified.
+- **Reprovisioning approved:** rerun `provision.sh` so the installed root helpers match the kit after #259, then
+  `forge-deploy.sh`, then step 11.
+
+### SQ-04 — v1 scope (U-11, U-12)
+
+Launch is the beat store: tracks, licenses, exclusives, coupons, contracts, downloads, accounts, blog/video/content.
+
+| Item | Decision | Rows |
+| --- | --- | --- |
+| Sound kits, collections/albums | **Launch** (finish FP-006/007; already partially built, no policy blocker) | FP-006, 007 |
+| Services: inquiry/quote/booking | **Launch** as inquiry-only (already evidenced) | FP-086 |
+| Service deposits/milestones | **Defer** to v1.1; quotes settle by invoice outside the store | FP-087 |
+| Offers / negotiations | **Defer**; use inquiry + a one-off coupon instead | FP-056 |
+| Automatic bundles / bulk deals | **Defer**; coupons cover launch promotions | FP-066 |
+| PayPal | **Defer**, pending the BeatStars audit; reopen only if the audit shows PayPal is a material share of sales | FP-062 |
+| E-signature provider | **Retire** for v1; recorded click-through assent (D-30) is the contract mechanism | FP-058 |
+| Collaborator revenue accounting | **Defer**; the split *model* (BL-05) continues, accounting does not launch | FP-069 |
+| Merch storefront and fulfillment | **Defer** to a later phase (or a hosted print-on-demand link-out) | FP-010, 088 |
+| Memberships | **Defer**, see SQ-10 | FP-009, 083 |
+
+### SQ-05 — Prices (partial)
+
+- **Exclusives do not transfer ownership.** Exclusive Rights is an exclusive *license*: Sean keeps copyright in the
+  beat and 50% publishing, as LICENSE-TIERS already states. No assignment clause.
+- **Per-track tier enablement (C-4):** every published track offers Basic, Premium, Trackout and Unlimited by
+  default; Exclusive is enabled per track (default on, Sean switches it off for tracks he wants to keep);
+  Free Promotional follows SQ-11. Trackout/Unlimited/Exclusive are automatically unavailable on tracks with no stems.
+- **Prices themselves stay Sean's** (AGENTS.md forbids invented prices).
+
+### SQ-06 — U-04 remainder
+
+- **Currency:** USD only at launch.
+- **Integration:** **direct Stripe**, not Managed Payments (merchant of record stays Vasey Multimedia dba
+  VASEY.AUDIO, as decided 2026-10-24).
+- **Tax:** Stripe Tax (`automatic_tax`) on for production; collect only where Vasey Multimedia is registered;
+  registrations are added when a jurisdiction's threshold is crossed (Stripe Tax monitoring). Home-state (Iowa)
+  registration and the digital-goods treatment are confirmed with Sean's accountant before the first live charge.
+- **Capture:** automatic capture at payment (digital goods delivered immediately; no authorize-then-capture).
+- **Payout reconciliation:** Stripe automatic payouts on the default schedule, reconciled monthly against Stripe's
+  payout reconciliation report and the store's order ledger.
+- **Live webhook receipt (risk 10):** a separate live receiver path, not retrieval-only, built behind the live
+  activation gate.
+
+### SQ-07 — Legal placeholders (partial)
+
+- Hosting provider and region: DigitalOcean via Laravel Forge, NYC3 (see SQ-09).
+- Storage: Cloudflare R2 (SQ-09). Backups: Backblaze B2 (SQ-01). Email: Postmark (SQ-08).
+- **Minimum age: 18** for purchases and accounts (licenses are contracts).
+- **DMCA agent:** designate VASEY.AUDIO (Sean Vasey) through the U.S. Copyright Office DMCA designated-agent directory,
+  contact support@vasey.audio. Registration is Sean's action.
+- Postal city/ZIP and venue county are Sean's. Counsel review of the marked wording and the no-samples warranty is an
+  external review, scheduled before publication.
+
+### SQ-08 — Mail and identity
+
+- **Sender domain:** `mail.vasey.audio` subdomain; From `orders@vasey.audio`, Reply-To `support@vasey.audio`.
+- **Provider:** Postmark, transactional stream only (no marketing on the same stream).
+- **DNS:** Postmark DKIM and return-path records on `mail.vasey.audio`; SPF include on the sending subdomain;
+  DMARC `p=none` with reporting for the first 30 days, then `p=quarantine`. Existing `vasey.audio` mailbox records
+  are preserved unchanged.
+- **Identity (U-07): email-verified guest checkout, account optional.** The buyer verifies email at checkout; an
+  account can be claimed later with the existing guest-claim flow (FP-078). Staff stay TOTP-only.
+
+### SQ-09 — U-02 remainder and U-03
+
+- **Production:** Forge-managed DigitalOcean droplet, **NYC3**, **4 vCPU / 8 GB / 160 GB** (the staging spec,
+  already justified by ClamAV + MySQL + ffmpeg), single host, scale vertically when measured load warrants.
+- **Secrets custody:** Forge Environment on the host; master copies (APP_KEY, DB, Stripe, Postmark, R2, B2) in Sean's
+  password manager; age private keys offline. Nothing in Git.
+- **Backup target:** B2 `vasey-production-backups`, same rules as SQ-01.
+- **Incident owner:** Sean (primary), alerts to support@vasey.audio; the dead-man's switch for FP-028 is added before
+  launch.
+- **U-03 storage: Cloudflare R2** for masters, stems, previews and contracts (zero egress suits a download store;
+  private bucket, entitlement-checked signed delivery).
+
+### SQ-10 — Membership policy (U-10)
+
+**No new memberships at launch.** Membership pages stay off (FP-009, FP-083 deferred). Legacy continuity (FP-085) is
+decided from the BeatStars audit: if active members exist, they keep their BeatStars membership until their paid
+period ends and are offered a launch coupon; nothing is migrated as a recurring charge.
+
+### SQ-11 — Free grants
+
+- **Terms text:** the Free Promotional tier in `docs/legal/LICENSE-TIERS.md` is approved as the free terms.
+- **Hold:** **not lifted at launch.** Lift after the first two weeks of stable paid sales and once order mail is proven
+  (free claims need verified email).
+
+### SQ-12 — U-13 remainder
+
+- **Email processor:** Postmark (transactional). **Marketing ESP: none at launch** (FP-081 consent capture stays,
+  FP-090/091 deferred).
+- **Analytics:** a cookieless processor (Plausible), so no consent banner is needed for analytics.
+- **Consent notice text:** drafted by the development lead for Sean's approval with the ESP decision; not needed at
+  launch because marketing mail is off.
+- **Deletion workflow:** the reviewed export/deletion flow is approved for production customers once U-07 identity
+  is live (D-30 step 3b).
+- **Order-ready notices:** class `transactional`.
+- **The three unclassified tables:** classified by the 2026-11-09 family rule; any table that still fits no row
+  stays reported, not purged.
+
+### SQ-13 — Refund/dispute values and U-08
+
+The four values (these match the approved TERMS §§9–10):
+
+| Key | Value |
+| --- | --- |
+| `refund_authority` | `authoritative_provider_operator_review` |
+| `partial_refunds` | `exact_line_allocation` |
+| `dispute_access` | `temporarily_block_while_reconciling` |
+| `exclusive_reopening` | `qualified_operator_review` |
+
+U-08 is settled by the approved TERMS and needs no new decision: reservation 30 minutes (§9); late payment → manual
+review, full refund if the exclusive is no longer available (§9); pending non-exclusive cutoff → the reservation
+blocks new non-exclusive sales on that track (§9); availability after refund → reviewed individually, never reopened
+while there is any sign of use (§10). **U-08 resolved.**
+
+### SQ-14 — Dependencies
+
+- **tc-lib #162/#164: take them now**, before contract activation, through normal CI and review. After activation a
+  renderer change needs a successor profile (risk 11), so pre-activation is the cheap window.
+- **The four Dependabot alerts from frozen evidence lockfiles:** dismiss as "vulnerable code is not actually used"
+  (they are not the shipped `composer.lock`). Clicking dismiss is Sean's.
+
+### SQ-15 — Track scheduling and unlisted semantics
+
+- **States:** draft, scheduled, published, unlisted, private.
+- **Scheduled:** goes live at a stored UTC instant entered in America/Chicago; same publication checks as a manual
+  publish run at that instant; if a check fails it stays scheduled and staff are alerted.
+- **Unlisted:** playable and purchasable by direct link only; excluded from catalog, search, filters, sitemap, feeds
+  and related tracks; `noindex`.
+- **Private:** staff only; never public, never purchasable.
+
+### SQ-16 — People (partial)
+
+- **Physical-device tester:** Sean, on his iPhone (iOS Safari, PWA install) and Samsung Galaxy (Chrome).
+- **Deployment operator:** Sean, with the development session preparing each step.
+- Official logo SVG and icon source: Sean supplies.
+
+### SQ-17 — Cutover (partial)
+
+- **Single exclusive authority:** BeatStars keeps selling non-exclusive licenses until the DNS switch; **exclusive
+  sales on BeatStars are switched off 72 hours before cutover**, so only VA Studio can sell an exclusive afterwards.
+  The post-snapshot delta (FP-101) captures BeatStars non-exclusive sales in that window.
+- **RTO 4 hours, RPO 24 hours** at launch (nightly backup plus pre-deploy backups; binlog shipping not built).
+- **Rollback thresholds (first 48 hours):** roll back if any of: checkout error rate above 5% over 30 minutes;
+  any paid order undelivered for more than 1 hour without a known cause; webhook signature failures sustained for
+  15 minutes; HTTP 5xx above 2% over 15 minutes; any data-integrity alarm.
+- DNS location is Sean's input.
+
+### SQ-18 — CLAUDE.md adaptations and lint
+
+- §3 gate, §5 auth, §6 audit, §7 license/layout, §9 deploy adaptations are **confirmed as written**.
+- **Lint:** Laravel Pint with the `laravel` preset, enforced in CI on changed files only (`pint --test --diff=main`);
+  the one-time whole-repo format sweep is a single dedicated PR after the freeze, not before.
+
+### SQ-19 — Foundation CI run
+
+**Approved.** The repository is public, so GitHub-hosted standard runners carry no Actions charge; the cost is wall
+time only. Run once on the exact freeze candidate.
+
+### Reconciliation with the delegated decisions (DD-xx)
+
+| DD row | Status | Governing decision |
+| --- | --- | --- |
+| DD-04 collections, albums | Superseded | SQ-04: collections/albums **launch** (FP-006). Automatic bundles stay deferred (FP-066). |
+| DD-05 sound kits | Superseded | SQ-04: sound kits **launch** (FP-007). See open question Q-2. |
+| DD-03 services | Refined | SQ-04: inquiry-only at launch; deposits/milestones deferred to v1.1 (FP-087). |
+| DD-20 per-track tiers | Superseded for production | SQ-05: four tiers on by default, Exclusive per track (default on), stems-dependent tiers off without stems. Staging (DD-19/DD-20 B) unchanged. |
+| DD-24 free downloads | Superseded | SQ-11: Free Promotional terms approved; the free-grant hold is **not lifted at launch**. |
+| DD-26 tc-lib #162/#164 | Superseded | SQ-14: take them now, before contract activation, with profile re-pins through review. |
+| DD-34 minimum age | Superseded | SQ-07: 18. |
+| DD-35 DMCA agent | Superseded | SQ-07: Sean registers VASEY.AUDIO as DMCA designated agent. |
+| DD-39 scheduling, unlisted | Refined | SQ-15: adds a `private` state; scheduled instants entered in America/Chicago and stored UTC; a failed check leaves the track **scheduled** with a staff alert (DD-39 said draft). |
+| DD-42 customer identity | Superseded, conditional | SQ-08: email-verified guest checkout, account optional. See open question Q-1. |
+| DD-43 mail | Refined | SQ-08: Postmark transactional stream on `mail.vasey.audio`; From `orders@vasey.audio`, Reply-To `support@vasey.audio`. |
+| DD-44 analytics | Superseded | SQ-12: cookieless Plausible; still no marketing ESP. PRIVACY must name the processor before it runs. |
+| DD-46 order-ready notices | Unchanged | SQ-12 "class `transactional`" is read as the mail class (not marketing); the retention class stays `correspondence`, 2 years. |
+| DD-53 off-host backup | Superseded | SQ-01/SQ-09: Backblaze B2 via rclone, no-delete key, age-encrypted, tiered retention. |
+| DD-55 production host | Refined | SQ-09: DigitalOcean NYC3 via Forge, 4 vCPU / 8 GB / 160 GB, single host. |
+| DD-58 private storage | Superseded | SQ-09: Cloudflare R2 for masters, stems, previews and contracts. Not built; see open question Q-3. |
+| DD-59 recovery objectives | Superseded | SQ-17: RTO 4 hours, RPO 24 hours, and the five rollback thresholds. |
+| DD-60 BeatStars during cutover | Superseded | SQ-17: non-exclusive sales continue until the DNS switch; BeatStars exclusives off 72 hours before cutover; FP-101 delta covers the window. |
+| DD-61 DNS | Refined | SQ-17 / Part B item 9: Sean names the DNS host; the session may prepare record changes for Sean to apply. |
+| DD-64 lint | Superseded | SQ-18: Pint `laravel` preset on changed files in CI; whole-repo sweep after the freeze. |
+| DD-65 Foundation CI | Confirmed | SQ-19. |
+
+All other DD rows stand.
+
+### Open questions for Sean raised by this update
+
+- **Q-1 Guest checkout vs approved TERMS §3.** The approved TERMS §3 requires an account to buy (the reason DD-42 chose
+  account-first). Email-verified guest checkout needs a TERMS §3 amendment, counsel's review of it, and new
+  production identity code (`buyer_identity.mode`). Until Sean confirms the amendment, production identity stays
+  default-off and nothing ships either way.
+- **Q-2 Kit and collection terms.** None of Sean's six private license templates is a sound-kit license, and SQ-04
+  defers automatic bundles. Kits need kit license terms from Sean before a kit can be sold; collections can launch as
+  browse groupings of individually licensed tracks (no bundle price) unless Sean says otherwise.
+- **Q-3 Tier names.** SQ-05 names Basic, Premium, Trackout, Unlimited, Exclusive (as in the LICENSE-TIERS draft);
+  DD-21 records Sean's six private templates as Basic, Premium, Premium Plus, Unlimited, Custom Beat, Exclusive. Which
+  set is canonical for v1?
+- **Q-4 R2 scope.** Private storage on R2 is a new storage adapter, signed-delivery path and backup change; it is not
+  built. It becomes development work before production; the server's private disk remains the tested path until it
+  lands.

@@ -256,6 +256,28 @@ rows and list the deferred families' tasks as launch work; CLAUDE.md's Project N
 to 12 of CLAUDE.md are not touched.
 **Acceptance.** Counts agree with the parity CSV (checked by a script, not by eye). **Touches.** documentation only.
 
+## Added by Sean's queue decisions (2026-11-10, SQ-xx)
+
+Sean's own decisions supersede several delegated rows (see the reconciliation table in the decision register). These
+tasks follow from them. BL-50's deferred families are now merchandise, memberships, service payments, offers and
+automatic bundles only; sound kits and collections launch.
+
+| Task | Size | Source | Notes |
+| --- | --- | --- | --- |
+| BL-53 Sound kit storefront and entitlement delivery (FP-007) | L | SQ-04 | Needs kit license terms from Sean before a kit can be sold (open question Q-2). Build to default-off. |
+| BL-54 Collections/albums as browse groupings (FP-006) | M | SQ-04 | Individually licensed tracks, no bundle price (FP-066 stays deferred) unless Sean says otherwise. |
+| BL-55 tc-lib #162/#164 updates with contract profile re-pins | M | SQ-14 | Before contract activation; frozen-bytes and profile `--check` tests re-pinned through review. |
+| BL-56 Pint `laravel` preset on changed files in CI | S | SQ-18 | `pint --test --diff=main`; the whole-repo sweep is one PR after the freeze. |
+| BL-57 B2/rclone off-host backups, tiered retention, no-delete key | M | SQ-01, SQ-09 | Kit support plus a staging verification run once Sean creates the bucket and age keys. |
+| BL-58 Cloudflare R2 private storage adapter and signed delivery | L | SQ-09 (U-03) | New adapter, delivery path and backup change; the private disk stays the tested path until it lands. |
+| BL-59 Cookieless analytics (Plausible) | S | SQ-12 | Default-off; PRIVACY must name the processor before it runs. |
+| BL-60 Email-verified guest checkout (U-07) | L | SQ-08 | Blocked on the TERMS §3 amendment (open question Q-1). |
+| BL-61 Scheduler dead-man's switch (FP-028) | S | SQ-09 | Alert to support@vasey.audio when the heartbeat goes stale. |
+| BL-62 Cutover runbook: BeatStars exclusives off 72 h before, RTO 4 h, rollback thresholds | S | SQ-17 | Docs and `vasey:cutover-check` wording. |
+
+BL-41 (track scheduling) adds the `private` state, America/Chicago entry with UTC storage, and "stays scheduled with a
+staff alert" on a failed check (SQ-15).
+
 ## Still blocked, and on what
 
 | Work | Waits for |
