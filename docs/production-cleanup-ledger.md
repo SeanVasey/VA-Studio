@@ -21,6 +21,54 @@ Rules that hold for every entry:
 "Supplier" is who provides the production value or decision. "Verified at cutover" is the check that proves the
 placeholder is gone or the switch is in its intended state.
 
+## Checking the ledger from the command line
+
+`vasey:cutover-check` reads what configuration, the database and the filesystem can show about each entry and prints one
+line per ledger id. It is read-only: plain selects, no transaction and no lock, no row, file, cache entry or log line
+written, and no provider or network call. It prints ids, states and counts only, never a configured value, a path, a key,
+a name or any text read from a record.
+
+```bash
+# On the production host, as the user that owns private storage, with the served release's configuration:
+php artisan vasey:cutover-check --expect=production
+php artisan vasey:cutover-check --expect=production --json   # the same rows, for the evidence record
+
+# On staging, local or testing, where placeholders are the expected state:
+php artisan vasey:cutover-check --expect=staging
+```
+
+Without `--expect` the profile is `production` when `APP_ENV` is `production` and `staging` otherwise. The command exits
+0 when no checkable item fails, 1 when at least one fails, and 2 for an unknown profile.
+
+| Status | Meaning |
+| --- | --- |
+| `PASS` | Under `production`: the placeholder is gone, or the value is in the state this ledger requires. Under `staging`: the state is one a staging, local or testing installation may be in, placeholder or not. |
+| `FAIL` | Under `production`: a staging placeholder, synthetic value or test-only state is still there, a value the ledger requires is missing, or the check could not run (it fails closed and names only the exception class). Under `staging`: something that must never be true off production: a live Stripe key, mode or admission (PCL-12), admitted real mail (PCL-10), an open production lane (PCL-18, PCL-19, PCL-22), or the staging host without its basic-auth file (PCL-14). |
+| `INFO` | The state of a default-off switch whose activation is a separate authorized step (section 3, and the tax facts of PCL-08). The line says what the switch reads and judges nothing. |
+| `NOT_CHECKABLE` | Nothing about the entry can be read by code (PCL-04, PCL-15, PCL-17, PCL-27, PCL-28, PCL-29). The line carries this ledger's verification for a person to perform. |
+
+Three switches are judged in both profiles because this ledger fixes their state: memberships stay off at v1 (PCL-23), the
+three contract v2 gates never disagree (PCL-20), and the contract profiles' package pins match the installed packages
+(PCL-30). The marketing segment (PCL-25) must read false under `production`.
+
+What a `PASS` does not mean:
+
+- It closes no entry. Most entries also have a part only a person can verify; the command prints it on the "by hand"
+  line under the entry. An entry is closed as the opening of this file says, with the evidence the activation packet asks
+  for. The command's output can be part of that evidence.
+- It authorizes nothing. Flipping any switch of section 3 still needs Sean's own authorization.
+- It is not `ops/production/validate-runtime.php`, which reads the candidate environment file before a deploy and refuses
+  it. This command reads the effective configuration of a running installation and its data. Run both.
+- A marker is detected by its convention (`[SYNTHETIC]`, `TEST PRICE`, the `synthetic-rehearsal` slug prefix, a
+  `Synthetic ` staff name, `STAGING` and "set at production" in legal and free-license text, a `STAGING-synthetic-*` file
+  name, the seller tag's `VASEY-STAGING-SYNTHETIC-SELLER-TAG` content marker, `STAGING SPECIMEN` in the signature file). A
+  placeholder someone renamed and stripped of its marker is not found. The conventions are constants in
+  `App\Support\Diagnostics\CutoverMarkers`.
+
+Each id maps to its check, or to its not-checkable note, in `App\Support\Diagnostics\CutoverLedgerChecks::LEDGER`.
+`tests/Unit/CutoverCheckLedgerCoverageTest.php` reads this file and fails when an id here has no mapping there, or the
+reverse, so a new entry must be added to both in the same change.
+
 ## 1. Staging placeholders and synthetic values to replace
 
 | ID | What it is and where it lives | Production value or decision, and supplier | Verified at cutover |
