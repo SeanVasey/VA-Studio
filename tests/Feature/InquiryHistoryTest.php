@@ -56,8 +56,12 @@ class InquiryHistoryTest extends TestCase
             $this->add('Foreign subject '.$i, str_repeat('b', 64));
             $owned[] = $this->add('Owned subject '.$i);
         }
-        $first = $this->read(); $second = $this->read($first['nextCursor']); $third = $this->read($second['nextCursor']);
-        $this->assertCount(20, $first['inquiries']); $this->assertCount(20, $second['inquiries']); $this->assertCount(1, $third['inquiries']);
+        $first = $this->read();
+        $second = $this->read($first['nextCursor']);
+        $third = $this->read($second['nextCursor']);
+        $this->assertCount(20, $first['inquiries']);
+        $this->assertCount(20, $second['inquiries']);
+        $this->assertCount(1, $third['inquiries']);
         $this->assertSame(array_reverse($owned), array_column([...$first['inquiries'], ...$second['inquiries'], ...$third['inquiries']], 'receipt'));
         $this->assertNull($third['nextCursor']);
         $newest = $this->add('New inquiry after first read');
@@ -69,8 +73,13 @@ class InquiryHistoryTest extends TestCase
     {
         $foreign = $this->add('Foreign subject', str_repeat('b', 64));
         foreach ([$foreign, (string) Str::uuid(), 'invalid', strtoupper($foreign)] as $cursor) {
-            try { $this->read($cursor); $this->fail('The cursor must be refused.'); }
-            catch (InquiryException $error) { $this->assertSame(422, $error->status); $this->assertSame([], $error->errors); }
+            try {
+                $this->read($cursor);
+                $this->fail('The cursor must be refused.');
+            } catch (InquiryException $error) {
+                $this->assertSame(422, $error->status);
+                $this->assertSame([], $error->errors);
+            }
         }
         $this->assertSame([], app(ReadOwnedInquiries::class)->handle(str_repeat('c', 64))['inquiries']);
     }
@@ -79,7 +88,9 @@ class InquiryHistoryTest extends TestCase
     {
         app(InquiryAdministration::class)->transition($this->fixture['inquiry']->id, 'archived', 0, $this->fixture['actor']);
         config(['inquiries.enabled' => false, 'inquiries.operator_user_id' => null, 'inquiries.privacy_notice' => null]);
-        $site = app(SiteContent::class); $content = $site->current(); $content['contact'] = null;
+        $site = app(SiteContent::class);
+        $content = $site->current();
+        $content['contact'] = null;
         $content['navigation'] = array_values(array_filter($content['navigation'], fn ($entry) => $entry['href'] !== '/contact'));
         $release = $site->create($content, 'Synthetic withdrawn contact', $this->fixture['actor']);
         $site->publish($release->id, 1, $this->fixture['actor']);
@@ -90,23 +101,35 @@ class InquiryHistoryTest extends TestCase
 
     public function test_one_bounded_query_does_not_load_messages_or_decrypt_the_twenty_first_payload(): void
     {
-        for ($i = 0; $i < 20; $i++) { $this->add(str_repeat('🎛', 160)); }
+        for ($i = 0; $i < 20; $i++) {
+            $this->add(str_repeat('🎛', 160));
+        }
         $sentinel = $this->fixture['inquiry']->id;
         CustomerInquiry::retrieved(function (CustomerInquiry $row) use ($sentinel): void {
-            if ($row->id === $sentinel) { $row->setRawAttributes(array_replace($row->getAttributes(), ['payload' => 'NOT-A-CIPHERTEXT'])); }
+            if ($row->id === $sentinel) {
+                $row->setRawAttributes(array_replace($row->getAttributes(), ['payload' => 'NOT-A-CIPHERTEXT']));
+            }
         });
-        $queries = []; DB::listen(function (QueryExecuted $query) use (&$queries): void { $queries[] = $query->sql; });
+        $queries = [];
+        DB::listen(function (QueryExecuted $query) use (&$queries): void {
+            $queries[] = $query->sql;
+        });
         $history = $this->read();
-        $this->assertCount(1, $queries); $this->assertStringContainsString('limit 21', strtolower($queries[0]));
-        $this->assertStringContainsString('owner_hash', $queries[0]); $this->assertStringNotContainsString('inquiry_messages', $queries[0]);
-        $this->assertCount(20, $history['inquiries']); $this->assertNotNull($history['nextCursor']);
+        $this->assertCount(1, $queries);
+        $this->assertStringContainsString('limit 21', strtolower($queries[0]));
+        $this->assertStringContainsString('owner_hash', $queries[0]);
+        $this->assertStringNotContainsString('inquiry_messages', $queries[0]);
+        $this->assertCount(20, $history['inquiries']);
+        $this->assertNotNull($history['nextCursor']);
         $this->assertLessThan(65536, strlen(json_encode(['history' => $history], JSON_THROW_ON_ERROR)));
         $this->assertSame(str_repeat('🎛', 160), $history['inquiries'][0]['subject']);
     }
 
     public function test_unverifiable_displayed_subject_fails_closed(): void
     {
-        CustomerInquiry::retrieved(function (CustomerInquiry $row): void { $row->payload = ['subject' => str_repeat('x', 161)]; });
+        CustomerInquiry::retrieved(function (CustomerInquiry $row): void {
+            $row->payload = ['subject' => str_repeat('x', 161)];
+        });
         $this->expectException(InquiryException::class);
         $this->read();
     }
@@ -115,6 +138,7 @@ class InquiryHistoryTest extends TestCase
     {
         if (in_array($subject, InquirySubject::PUBLIC_CONTACT, true)) {
             $body = array_replace($this->fixture['body'], ['subject' => $subject, 'requestKey' => (string) Str::uuid()]);
+
             return app(SubmitInquiry::class)->handle($body, $owner)['receipt'];
         }
         // Rows retained from before the closed subject list (BL-50) keep any bounded free-text subject; history must
