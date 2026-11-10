@@ -180,4 +180,4 @@ Synthetic membership test setup is explicitly approved. Live credentials/payment
 
 ### Standard adoption gaps (open)
 
-Lint gate (Pint's default preset flags 243 of 477 PHP files; there's no TypeScript linter) · README §8 layout · official SVG mark and icon suite (AGENTS.md forbids recreating the logo) · `docs/legal/` PRIVACY and TERMS for owner review · deploy target.
+Lint gate (changed-files Laravel Pint gate in preflight since SQ-18, 2026-11-10; the whole-repo format sweep is a post-freeze PR; Pint's default preset flags 243 of 477 PHP files; there's no TypeScript linter) · README §8 layout · official SVG mark and icon suite (AGENTS.md forbids recreating the logo) · `docs/legal/` PRIVACY and TERMS for owner review · deploy target.

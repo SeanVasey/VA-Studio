@@ -91,6 +91,15 @@ class CadenceTests(unittest.TestCase):
         job = gitlab.split('backend-quality:\n', 1)[1].split('\n.database:', 1)[0]
         self.assertEqual(1, job.count(target))
 
+    def test_changed_php_files_are_pint_checked_against_the_base_branch(self):
+        self.assertEqual('{\n    "preset": "laravel"\n}\n', (ROOT / 'pint.json').read_text())
+        for source in (CI, (ROOT / '.github/workflows/preflight.yml').read_text()):
+            job = block(source, 'backend-quality')
+            self.assertIn('fetch-depth: 0', job[:job.index('setup-node')])
+            self.assertIn("BASE_REF: ${{ github.base_ref || 'main' }}", job)
+            self.assertIn('run: php vendor/bin/pint --test --diff="origin/$BASE_REF"', job)
+            self.assertNotIn('continue-on-error', job)
+
     def test_optional_feedback_has_no_automatic_push_or_pr_trigger(self):
         events = FOCUSED.split('on:\n', 1)[1].split('\npermissions:', 1)[0]
         self.assertEqual(['workflow_dispatch'], re.findall(r'^  ([a-z_]+):', events, re.M))
