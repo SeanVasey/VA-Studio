@@ -4,6 +4,9 @@ namespace Tests\Unit;
 
 use App\Domain\Contracts\ContractIssuanceException;
 use App\Domain\Contracts\Production\VaseyLicenseV2Profile;
+use App\Domain\Contracts\Production\VaseyLicenseV2RendererProcess;
+use App\Domain\Contracts\RenderedContract;
+use App\Domain\Contracts\RenderFit\PdfTextGlyphs;
 use App\Domain\Grants\ContractRenderHolds;
 use App\Domain\Grants\VaseyLicenseContractSource;
 use App\Domain\Grants\VaseyLicenseContractTexts;
@@ -108,6 +111,30 @@ class VaseyLicenseIssuanceTest extends TestCase
         // A paid-grant descriptor JSON round trip (as stored in the encrypted origin) keeps it renderable.
         $stored = json_decode(CanonicalJson::encode($profile), true, 64, JSON_THROW_ON_ERROR);
         $this->assertSame($rendered->pdfBytes, (new VaseyLicenseIssuance)->render($input, $stored)->pdfBytes);
+    }
+
+    /** BL-72: an original that lost or displaced text is never returned, whatever the isolated child produced. */
+    public function test_a_rendered_original_that_draws_text_below_the_page_is_refused_invalid_pdf(): void
+    {
+        $this->enableV2Issuance();
+        $input = self::input('tax', ['legal_name' => str_repeat('Wonderful', 20)]);
+        [$profile] = VaseyLicenseIssuance::decide($input);
+        $good = (new VaseyLicenseIssuance)->render($input, $profile);
+
+        $first = PdfTextGlyphs::runs($good->pdfBytes)[0];
+        $td = sprintf('%.6F %.6F Td', $first['x'], $first['y']);
+        $broken = str_replace($td, sprintf('%.6F %.6F Td', $first['x'], -40), $good->pdfBytes);
+        $this->assertNotSame($good->pdfBytes, $broken);
+        $this->app->instance(VaseyLicenseV2RendererProcess::class, new class($good, $broken)
+        {
+            public function __construct(private readonly RenderedContract $good, private readonly string $broken) {}
+
+            public function render(): RenderedContract
+            {
+                return new RenderedContract($this->broken, hash('sha256', $this->broken), strlen($this->broken), $this->good->pageCount, $this->good->textDigest, $this->good->profileHash);
+            }
+        });
+        $this->refuses('invalid_pdf', fn () => (new VaseyLicenseIssuance)->render($input, $profile));
     }
 
     public function test_each_branch_that_keeps_the_existing_paid_profile(): void

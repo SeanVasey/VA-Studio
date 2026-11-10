@@ -17,7 +17,7 @@ final class PdfTextGlyphs
 
     private const MAX_RUNS = 400000;
 
-    /** @return list<array{font: string, size: float, x: float, y: float, glyphs: list<int>, adjust: float}> `adjust` is the TJ kerning total, in thousandths of an em */
+    /** @return list<array{font: string, size: float, x: float, y: float, glyphs: list<int>, shifts: array<int, float>}> `shifts` maps a glyph index to the advance (thousandths of an em) a TJ number adds just before it; a number after the last glyph keys the glyph count */
     public static function runs(string $pdf): array
     {
         $runs = [];
@@ -76,7 +76,7 @@ final class PdfTextGlyphs
         return $glyphs;
     }
 
-    /** @return list<array{font: string, size: float, x: float, y: float, glyphs: list<int>, adjust: float}> */
+    /** @return list<array{font: string, size: float, x: float, y: float, glyphs: list<int>, shifts: array<int, float>}> */
     private static function scan(string $content): array
     {
         $runs = [];
@@ -136,18 +136,18 @@ final class PdfTextGlyphs
                     $x = (float) $operands[count($operands) - 2][1];
                     $y = (float) $operands[count($operands) - 1][1];
                 } elseif ($text && $word === 'Tj' && $operands !== [] && $operands[count($operands) - 1][0] === 's') {
-                    $runs[] = ['font' => $font, 'size' => $size, 'x' => $x, 'y' => $y, 'glyphs' => self::glyphIds($operands[count($operands) - 1][1]), 'adjust' => 0.0];
+                    $runs[] = ['font' => $font, 'size' => $size, 'x' => $x, 'y' => $y, 'glyphs' => self::glyphIds($operands[count($operands) - 1][1]), 'shifts' => []];
                 } elseif ($text && $word === 'TJ' && $operands !== [] && $operands[count($operands) - 1][0] === 'a') {
                     $glyphs = [];
-                    $adjust = 0.0;
+                    $shifts = [];
                     foreach ($operands[count($operands) - 1][1] as [$kind, $value]) {
                         if ($kind === 's') {
                             array_push($glyphs, ...self::glyphIds($value));
                         } elseif ($kind === 'd') {
-                            $adjust -= $value;
+                            $shifts[count($glyphs)] = ($shifts[count($glyphs)] ?? 0.0) - $value;
                         }
                     }
-                    $runs[] = ['font' => $font, 'size' => $size, 'x' => $x, 'y' => $y, 'glyphs' => $glyphs, 'adjust' => $adjust];
+                    $runs[] = ['font' => $font, 'size' => $size, 'x' => $x, 'y' => $y, 'glyphs' => $glyphs, 'shifts' => $shifts];
                 }
                 $operands = [];
             } else {

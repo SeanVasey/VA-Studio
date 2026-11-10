@@ -19,10 +19,10 @@ use Throwable;
  * - the font glyph check is the renderer's test on the finished text (a character the repertoire admits can still
  *   have no glyph in the retained font), over the same retained font files.
  *
- * - the fit check measures every free-text field with the retained font's own advance widths: the renderer's HTML cell
- *   never splits a token at anything but a space, so a token wider than its 180 mm column runs past the right margin and
- *   off the page (the PDF holds the glyphs; no reader shows them). Such a field is refused before it is sealed, and a
- *   preflight render is checked against the finished PDF's own text runs (every glyph present, no run past the column).
+ * - the renderer's HTML cell breaks a token wider than its 180 mm column at the column but does not paginate the lines that
+ *   makes, so a long enough token is drawn below the page (the PDF holds the glyphs; no reader shows them: BL-72). The
+ *   preflight therefore always renders text holding such a token, and every preflight render is checked against the
+ *   finished PDF's own text runs: every inked character drawn in order, no run below the page or past the column.
  *
  * No normalization is applied: a value that is not renderable exactly as typed is refused, so what is sealed is always
  * what the person entered (decomposed accents are combining marks, which the repertoire excludes).
@@ -87,24 +87,6 @@ final class ProductionFreeGrantRenderable
                 ProductionFreeGrantException::require(self::glyph(mb_ord($character)), 'unsupported_text');
             }
         }
-        foreach ([$title, $termsReference, $termsText, $assentText] as $value) {
-            self::requireFit($value, 'unrenderable_definition');
-        }
-        self::requireFit($declaredName, 'unsupported_text');
-    }
-
-    /**
-     * Refuses a value whose widest unbreakable run is wider than the renderer's column. Measured in the regular face (a
-     * value is never set in the bold one) after the renderer's own whitespace normalization.
-     */
-    private static function requireFit(string $value, string $reason): void
-    {
-        $value = str_replace(["\r\n", "\r", "\t"], ["\n", "\n", '    '], $value);
-        try {
-            LineFit::require('value', self::metrics('dejavusans'), self::FONT_SIZE_PT, $value, self::COLUMN_WIDTH_MM);
-        } catch (RenderFitException) {
-            throw new ProductionFreeGrantException($reason);
-        }
     }
 
     /**
@@ -119,11 +101,11 @@ final class ProductionFreeGrantRenderable
     public static function preflight(array $definition, array $profile): void
     {
         $text = $definition['title']."\n".$definition['terms_reference']."\n".$definition['terms_text']."\n".$definition['assent_text'];
-        if (mb_strlen($text) <= self::PREFLIGHT_SKIP_CHARACTERS) {
+        if (mb_strlen($text) <= self::PREFLIGHT_SKIP_CHARACTERS && ! self::hasOverwideToken($text)) {
             return;
         }
         $origin = ['provenance' => $profile['provenance'], 'origin_id' => '00000000-0000-4000-8000-000000000000', 'accepted_at' => '2000-01-01T00:00:00Z',
-            'declared_name' => substr(str_repeat('WWW ', 30), 0, 119).'W', 'definition_id' => '00000000-0000-4000-8000-000000000001', 'definition_hash' => str_repeat('a', 64),
+            'declared_name' => str_repeat('W', 120), 'definition_id' => '00000000-0000-4000-8000-000000000001', 'definition_hash' => str_repeat('a', 64),
             'review_id' => '00000000-0000-4000-8000-000000000002', 'display_hash' => str_repeat('b', 64),
             'buyer_binding' => ['account_public_id' => str_repeat('p', 36)], 'definition' => ['title' => $definition['title'],
                 'terms_reference' => $definition['terms_reference'], 'terms_text' => $definition['terms_text'], 'terms_hash' => hash('sha256', $definition['terms_text']),
@@ -138,8 +120,22 @@ final class ProductionFreeGrantRenderable
     }
 
     /**
+     * True when a token (text between spaces and line breaks) is wider than the renderer's column. The HTML cell breaks such
+     * a token at the column, and the lines it makes are not paginated: a long enough token is drawn below the page, where
+     * nothing shows it (BL-72). Short text is skipped by the render bound above only because wrapping puts at least one
+     * character on a line; a token it must break does not honor that bound, so it is always rendered and checked.
+     */
+    private static function hasOverwideToken(string $text): bool
+    {
+        $text = str_replace(["\r\n", "\r", "\t"], ["\n", "\n", '    '], $text);
+        $limit = self::COLUMN_WIDTH_MM - LineFit::TOLERANCE_MM;
+
+        return LineFit::widest(self::metrics('dejavusans'), self::FONT_SIZE_PT, $text) > $limit;
+    }
+
+    /**
      * Checks a finished original against the text it was rendered from: every non-blank character of `$text` is drawn,
-     * in order, in the face that sets it, and no text run ends past the column. The second guard behind {@see requireFit()}.
+     * in order, in the face that sets it, and no text run ends past the column. The check behind the preflight render.
      *
      * @throws RenderFitException
      */
@@ -151,18 +147,25 @@ final class ProductionFreeGrantRenderable
         $next = 0;
         foreach (PdfTextGlyphs::runs($pdf) as $run) {
             $font = self::RESOURCE_FONTS[$run['font']] ?? throw new RenderFitException('text run', 'a font the renderer does not set');
-            $advance = $run['adjust'];
-            foreach ($run['glyphs'] as $glyph) {
-                $advance += self::advance($font, $glyph);
+            $advance = 0.0;
+            $inked = 0.0;
+            foreach ($run['glyphs'] as $index => $glyph) {
+                $advance += ($run['shifts'][$index] ?? 0.0) + self::advance($font, $glyph);
                 if ($glyph === $space[$font]) {
                     continue;
                 }
+                // A space that ends a line hangs past the column without printing anything.
+                $inked = $advance;
                 $character = $expected[$next++] ?? null;
                 if ($character === null || self::gid($font, mb_ord($character)) !== $glyph) {
                     throw new RenderFitException('text run', 'a drawn glyph is not the next character of the text');
                 }
             }
-            if ($run['x'] + $advance * $run['size'] / 1000 > $right) {
+            // The HTML cell does not paginate a token it had to break: the lines fall below the page, drawn but never shown.
+            if ($run['y'] < 0) {
+                throw new RenderFitException('text run', 'a run is drawn below the page');
+            }
+            if ($right < $run['x'] + $inked * $run['size'] / 1000) {
                 throw new RenderFitException('text run', 'a run ends past the column');
             }
         }
