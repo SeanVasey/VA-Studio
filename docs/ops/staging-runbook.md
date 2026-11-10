@@ -193,15 +193,36 @@ staging on 2026-11-10.** Without a configured tag, the command refuses before wr
 
 - Track titles start with `[SYNTHETIC]` and the artist is "Synthetic Test Content".
 - Every description, license name and license text says "Synthetic rehearsal content — not for sale; staging test only".
-- There are two non-exclusive licenses, each offered on every track:
-  - "[SYNTHETIC] TEST PRICE MP3 license" delivers `download_mp3` at 1.11 USD (stored as 111 cents);
-  - "[SYNTHETIC] TEST PRICE WAV license" delivers `download_mp3` and `master_wav` at 2.22 USD (222 cents).
+- There are six licenses, one per tier shape of the six license templates (DD-19, DD-20), each offered on every track.
+  A shape is only the deliverables and whether the template is exclusive, as `docs/legal/LICENSE-TIERS.md` lists them;
+  no tier name, cap, duration, territory, royalty or price is carried over, and the terms hold features and deliverables
+  only (schema 1). Each is named `[SYNTHETIC] TEST PRICE tier N shape: … license — …`, with slug
+  `synthetic-rehearsal-tier-N-license`:
+
+  | Tier shape | Template type | Deliverables | TEST PRICE (cents) | Offer on each track |
+  | --- | --- | --- | --- | --- |
+  | 1 | non-exclusive | `download_mp3` | 1.11 USD (111) | published |
+  | 2 | non-exclusive | `download_mp3` | 2.22 USD (222) | published |
+  | 3 | non-exclusive | `download_mp3`, `master_wav` | 3.33 USD (333) | published |
+  | 4 | non-exclusive | `download_mp3`, `master_wav`, `stems_zip` | 4.44 USD (444) | published |
+  | 5 | non-exclusive | `download_mp3`, `master_wav`, `stems_zip` | 5.55 USD (555) | published |
+  | 6 | exclusive | `download_mp3`, `master_wav`, `stems_zip` | 6.66 USD (666) | inactive draft |
+
+  Shapes 1 and 2, and 4 and 5, are the same here: the real tiers differ only in caps, which are left out. Shape 1 is
+  the free tier's shape, sold here as a paid TEST PRICE offer; the free-claim flow is not part of this command.
+- The exclusive-shape offer is a draft with its exact deliverables and no revision. Public offer publication admits
+  only non-exclusive licenses; the test chain prepares an exclusive revision (`PrepareExclusiveOffer`) only against a
+  rights scope an operator links, and activates it (`ActivateExclusiveOffer`) only under the configured test exclusive
+  selection policy. Neither has an admin action or console command yet, so the exclusive contract cannot be rehearsed
+  from the storefront on staging until one exists. The draft is ready for it: its own evidence has no preparation
+  blocker.
 - The marker `synthetic-rehearsal` is the slug prefix of the tracks and license templates, a track tag, and (as
   `SYNTHETIC-REHEARSAL-NN:`) the prefix of each rights declaration's provenance. Offers, revisions and media inherit
   it through their track or license.
 
-The command generates the audio (30–60 s tones, chords and noise, as WAV masters) with ffmpeg and the artwork (plain
-colours with "SYNTHETIC TEST", no brand mark) with PHP GD, on the host, at run time. The files enter through the
+The command generates the audio (30–60 s tones, chords and noise, as WAV masters), a stems ZIP per track (one mono WAV
+per test source, associated with the master through the ordinary stems association) with ffmpeg and PHP ZIP, and the
+artwork (plain colours with "SYNTHETIC TEST", no brand mark) with PHP GD, on the host, at run time. The files enter through the
 ordinary intake service and the ordinary media pipeline. Nothing generated is committed. Every step uses the same
 domain service as the admin, under the same staff authority, MFA, rights, media and readiness checks.
 
@@ -227,7 +248,7 @@ domain service as the admin, under the same staff authority, MFA, rights, media 
 6. The approved seller tag is configured and matches its SHA-256 (section 3). Without it the pipeline cannot make a
    tagged preview (`tag_not_configured`). The command never generates, replaces or overrides a tag; the staging tag is
    made by its own command (section 3).
-7. ffmpeg, ffprobe, prlimit and PHP GD are available.
+7. ffmpeg, ffprobe, prlimit, PHP GD and PHP ZIP are available.
 
 **Run.**
 
@@ -240,10 +261,11 @@ art vasey:staging-synthetic-catalog --operator=OPERATOR_EMAIL --reviewer=REVIEWE
 art vasey:staging-synthetic-catalog --operator=OPERATOR_EMAIL --reviewer=REVIEWER_EMAIL --attest           # asks both passwords
 ```
 
-Expect several minutes. ClamAV scans each master, the tag and each artwork, at 15–25 s per scan (section 5). The
+Expect several minutes. ClamAV scans each master, the tag, each artwork and each stems ZIP (once as uploaded, once per
+member and once rebuilt), at 15–25 s per scan (section 5). The
 command processes each media run in its own process with the service the media worker uses. A claim token makes
 the two exclusive: whichever claims a run first processes it, and the command waits for the result. It prints one
-line per license and per track, then a table of offer revisions and prices. Exit 0 means every synthetic track is
+line per license and per track, then a table of offer revisions and prices, with each exclusive-shape draft offer. Exit 0 means every synthetic track is
 published and passes publication readiness. Then set the flag back to `false` in Forge → Environment and click
 Deploy Now, which refreshes the cached configuration as in section 3, so the running value is off too.
 
@@ -252,8 +274,9 @@ concurrent run. If a run is killed, its lock expires after an hour.
 
 **Verify.**
 
-- The storefront lists six `[SYNTHETIC]` tracks. Each plays its tagged preview and shows the two TEST PRICE licenses.
-- `art vasey:rights-scope list` shows the twelve new revisions. "Prepare order" needs each revision you buy linked to
+- The storefront lists six `[SYNTHETIC]` tracks. Each plays its tagged preview and shows the five non-exclusive TEST
+  PRICE licenses (1.11 to 5.55 USD).
+- `art vasey:rights-scope list` shows the thirty new revisions. "Prepare order" needs each revision you buy linked to
   a rights scope first (purchase walkthrough, setup step 5). Use one scope per synthetic track, with a key starting
   `synthetic-rehearsal-`. The command does not link scopes. Each link is its own `vasey:rights-scope` write, with
   its own password confirmation and single-use attestation, and an operator decides which scope each revision
@@ -268,20 +291,29 @@ concurrent run. If a run is killed, its lock expires after an hour.
   cause and run the command again.
 - A row that carries the marker but differs from its definition is refused and left unchanged. A published
   synthetic track whose metadata or offers staff changed is reported `present, metadata differs …` or
-  `present, offers differ …` (exit 1). Nothing is reverted.
+  `present, offers differ …` (exit 1). Nothing is reverted. This includes an exclusive-shape draft whose price was
+  changed; an operator who prepared or activated it at its TEST PRICE keeps a matching catalog.
 - When a run resumes an interrupted draft, two more things must be exactly what the definition generates, or it refuses
   (exit 1, nothing changed): the rights declaration (both its provenance and its sample disclosure) and the media. A source
   an earlier run took in, or a ready preview or artwork, is accepted only when its source file has the SHA-256 of the file the
   definition generates now. Staff who replaced a draft's upload, or whose draft declaration was edited, get
-  `… has a rights declaration that differs …` or `… has master_wav media that differs …`. The master is bit-exact; the
+  `… has a rights declaration that differs …` or `… has master_wav media that differs …` (or `stems_zip`). The master
+  and the stems ZIP are bit-exact; the
   artwork PNG comes from GD, so a changed PHP GD or zlib build can trigger the same refusal for an interrupted draft. Nothing
   is edited back; the remedy is the reset described under "Removing it before real content" below.
 - A track withdrawn with the ordinary unpublish action is reported `withdrawn by staff; left unpublished`. The
   command never republishes it, and exits 1.
-- The command never creates quotes, orders, payments, grants or contracts.
+- The command never creates quotes, orders, payments, grants, contracts, rights scopes or exclusive preparations.
+- **A staging that holds the earlier two-license catalog** (`synthetic-rehearsal-mp3-license`,
+  `synthetic-rehearsal-wav-license`) is refused at admission: those approved licenses are outside the six-tier
+  definition. Reset it as below first; published licenses and revisions are never edited into the new shapes.
 
 **Removing it before real content.** There is no purge command: published licenses, offer revisions, order
-snapshots and contracts are immutable evidence. To hide the catalog, unpublish the synthetic tracks with the
+snapshots and contracts are immutable evidence. The reset below removes every record the command creates: six tracks,
+their rights declarations, masters, previews, artwork and stems with their recording associations, the six license
+templates and versions, thirty published offer revisions, six draft exclusive-shape offers, and anything a rehearsal
+built on them (rights scopes, quotes, orders, grants, contracts). The production cleanup ledger's PCL-02 and PCL-03
+queries (`docs/production-cleanup-ledger.md`) confirm none remains. To hide the catalog, unpublish the synthetic tracks with the
 ordinary staff action. Before Sean's real tracks are loaded, reset staging to an empty database and fresh private
 storage, with Sean's go-ahead:
 
