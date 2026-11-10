@@ -2,6 +2,7 @@
 
 namespace App\Http\ProductionCheckout;
 
+use App\Domain\Grants\PaidTax\PaidTaxConfiguration;
 use Illuminate\Config\Repository;
 use ReflectionProperty;
 use Throwable;
@@ -13,6 +14,9 @@ use Throwable;
  * loaded configuration, neither chain is admitted (no provider, no routes, private 404 on stale routes, reconcile command
  * refused). It deliberately ignores the environment, so the conflict is refused wherever either flag would otherwise admit.
  * Unreadable configuration is a conflict too. Reads plain loaded storage only, never a resolver, like the mounts themselves.
+ * The tax mount is read through PaidTaxConfiguration::read, exactly as TaxHttpMount reads it (nested or flat dotted key), so the
+ * guard and the mount can never disagree about whether that flag is true. Scope: this is the mount/composition layer only; the
+ * policy and runtime flags of the two chains are not made exclusive here.
  */
 final class ProductionChainExclusivity
 {
@@ -24,7 +28,7 @@ final class ProductionChainExclusivity
             $items = (new ReflectionProperty(Repository::class, 'items'))->getRawValue($repository);
 
             return ! is_array($items) || (($items['production_checkout']['mounted'] ?? null) === true
-                && ($items['production-tax-checkout']['http_mounted'] ?? null) === true);
+                && PaidTaxConfiguration::read($repository, 'production-tax-checkout.http_mounted') === true);
         } catch (Throwable) {
             return true;
         }

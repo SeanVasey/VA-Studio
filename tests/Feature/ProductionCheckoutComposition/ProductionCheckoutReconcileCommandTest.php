@@ -108,6 +108,21 @@ final class ProductionCheckoutReconcileCommandTest extends TestCase
         $this->assertSame($before, self::evidence());
     }
 
+    public function test_it_refuses_before_any_query_when_the_tax_chain_mount_is_also_true(): void
+    {
+        // DD-14 covers the mount/composition layer only: the policy flags stay as set, yet the command is not admitted.
+        [$f, $gateway] = $this->order();
+        $retrieves = $gateway->retrieves;
+        config(['production-tax-checkout.http_mounted' => true]);
+        $queries = [];
+        DB::listen(function ($event) use (&$queries): void {
+            $queries[] = $event->sql;
+        });
+        $this->assertSame([1, ['code' => 'refused', 'reason' => 'not_mounted']], $this->reconcile($f['order']['orderId']));
+        $this->assertSame([], $queries, 'Refused before any query.');
+        $this->assertSame($retrieves, $gateway->retrieves);
+    }
+
     public function test_it_refuses_in_staging_even_with_every_switch_on(): void
     {
         [$f] = $this->order();
