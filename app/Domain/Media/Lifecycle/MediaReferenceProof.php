@@ -5,6 +5,7 @@ namespace App\Domain\Media\Lifecycle;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\Models\MediaProcessingRun;
 use App\Domain\Media\Models\MediaUploadSession;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
@@ -16,16 +17,22 @@ use InvalidArgumentException;
  * source it is and the upload session that created it. Rows of the family itself (its lineage and its own upload and
  * processing audit events) are not references; every other row that names a family member is, and so is publication of
  * its track. "Unattached" is returned only when every check found zero references AND coverage is complete: no row
- * anywhere holds Laravel ciphertext (outside the reviewed {@see self::OPAQUE_ALLOWLIST}), a hash-only asset manifest, a value
- * of a type the checks cannot read, or more matches than the bounded content check reads. Otherwise a family with no
- * reference found is "unknown", never "unattached". Any table or foreign key added later is included automatically.
+ * anywhere holds Laravel ciphertext (outside the reviewed {@see self::OPAQUE_ALLOWLIST}), a registered opaque payload, a
+ * hash-only manifest, an unresolved legacy track id, JSON the proof cannot parse, a value of a type the checks cannot
+ * read, or more rows than a bounded check reads. Otherwise a family with no reference found is "unknown", never
+ * "unattached".
+ *
+ * Which columns can hold a reference is decided by {@see MediaReferenceRegistry}, a schema-reviewed list, not by column
+ * names. A candidate column of the live schema that the registry does not classify makes coverage incomplete.
  *
  * Checks (each counts referencing rows; their names form the per-family proof):
- *  - fk:<table>.<column>: every foreign key in the schema into media_assets, media_processing_runs or
- *    media_upload_sessions, and every integer column named *asset_id without one;
- *  - json:<table>.<column>: asset ids inside the reviewed plaintext JSON id columns (every text column named *asset_ids,
- *    and offer revision snapshots), in any key naming assets, a preview or files;
- *  - poly:<table>.<prefix>: polymorphic `<prefix>_type`/`<prefix>_id` pairs naming a member (audit_events excepted, below);
+ *  - fk:<table>.<column>: registered integer columns holding the id of an asset, a processing run or an upload session;
+ *  - track:<table>.<column>: registered columns holding the family's track id on a sold or committed row (an import
+ *    mapping, a product draft member, an order or preparation line, a published offer revision, a free definition);
+ *  - json:<table>.<column>: ids inside registered plaintext JSON. The small id lists and offer revision snapshots are read
+ *    by the structural pass; snapshots, audit context, site releases, the fulfillment outbox and queued jobs only by the
+ *    full proof, which treats a row it cannot parse, or more rows than {@see self::MAX_JSON_ROWS}, as incomplete coverage;
+ *  - poly:<table>.<prefix>: registered polymorphic `<prefix>_type`/`<prefix>_id` pairs naming a member;
  *  - publication:track: the family's track is published, scheduled or was ever published;
  *  - content:<table>: any text value containing a member's SHA-256 or private storage path (case-insensitive), except in
  *    the family's own rows and in audit events whose subject is a family row.
@@ -45,8 +52,12 @@ final class MediaReferenceProof
     public const OPAQUE_ALLOWLIST = ['users.app_authentication_secret', 'users.app_authentication_recovery_codes',
         'sessions.payload', 'cache.value'];
 
-    /** Reviewed plaintext JSON whose asset ids are read besides every text column named *asset_ids. */
-    public const JSON_COLUMNS = ['offer_revisions.snapshot'];
+    /** Candidate rows read per column by a full-proof JSON check; more makes coverage incomplete. */
+    public const MAX_JSON_ROWS = 20000;
+
+    /** Substrings one of which every key of {@see MediaReferenceJson}'s vocabulary contains, per parser. */
+    private const JSON_KEY_HINTS = ['assets' => ['asset', 'preview', 'files', 'run_id'],
+        'ids' => ['asset', 'preview', 'files', 'run_id', 'track', 'product']];
 
     private const TARGETS = ['media_assets' => MediaAsset::class, 'media_processing_runs' => MediaProcessingRun::class,
         'media_upload_sessions' => MediaUploadSession::class];
@@ -60,6 +71,11 @@ final class MediaReferenceProof
     private const TERMS_PER_QUERY = 200;
 
     private ?array $schema = null;
+
+    /** @var array<string, true> structural JSON columns holding a value the parser could not read */
+    private array $unparsed = [];
+
+    public function __construct(private readonly MediaReferenceRegistry $registry = new MediaReferenceRegistry) {}
 
     /**
      * @param  list<int>  $rootIds  source assets (no parent)
@@ -83,9 +99,13 @@ final class MediaReferenceProof
             foreach ($schema['poly'] as $name => $_) {
                 $family['checks'][$name] = 0;
             }
+            foreach ($schema['tracks'] as $name => $_) {
+                $family['checks'][$name] = 0;
+            }
             $family['checks']['publication:track'] = 0;
         }
         unset($family);
+        $this->unparsed = [];
 
         $owners = $this->owners($families);
         foreach ($schema['references'] as $name => [$table, $column, $target]) {
@@ -102,23 +122,19 @@ final class MediaReferenceProof
                 }
             }
         }
-        foreach ($schema['json'] as $name => [$table, $column]) {
-            $runFamily = $table === 'media_processing_runs';
+        foreach ($schema['json'] as $name => [$table, $column, $parser]) {
             $hasId = $this->hasColumn($table, 'id');
             DB::table($table)->whereNotNull($column)->orderBy($hasId ? 'id' : $column)
                 ->select(array_values(array_unique([...($hasId ? ['id'] : []), $column])))
-                ->chunk(500, function ($rows) use (&$families, $owners, $name, $column, $runFamily): void {
+                ->chunk(500, function ($rows) use (&$families, $owners, $name, $table, $column, $parser): void {
                     foreach ($rows as $row) {
-                        $ids = $this->jsonAssetIds($row->{$column}, str_ends_with($column, 'asset_ids'));
-                        $seen = [];
-                        foreach ($ids as $id) {
-                            $root = $owners['media_assets'][$id] ?? null;
-                            if ($root === null || isset($seen[$root]) || ($runFamily && isset($row->id) && ($owners['media_processing_runs'][(int) $row->id] ?? null) === $root)) {
-                                continue;
-                            }
-                            $seen[$root] = true;
-                            $families[$root]['checks'][$name]++;
+                        $ids = MediaReferenceJson::read($parser, $row->{$column});
+                        if ($ids === null) {
+                            $this->unparsed[$table.'.'.$column] = true;
+
+                            continue;
                         }
+                        $this->count($families, $owners, $name, $table, $row, $ids);
                     }
                 });
         }
@@ -132,6 +148,19 @@ final class MediaReferenceProof
             }
         }
         $tracks = array_values(array_unique(array_column($families, 'track_id')));
+        $byTrack = [];
+        foreach ($families as $root => $family) {
+            $byTrack[$family['track_id']][] = $root;
+        }
+        foreach ($schema['tracks'] as $name => [$table, $column]) {
+            foreach (array_chunk($tracks, 500) as $chunk) {
+                foreach (DB::table($table)->whereIn($column, $chunk)->groupBy($column)->selectRaw(DB::getQueryGrammar()->wrap($column).' AS track_id, COUNT(*) AS aggregate')->get() as $row) {
+                    foreach ($byTrack[(int) $row->track_id] ?? [] as $root) {
+                        $families[$root]['checks'][$name] += (int) $row->aggregate;
+                    }
+                }
+            }
+        }
         $published = [];
         foreach (array_chunk($tracks, 500) as $chunk) {
             foreach (DB::table('tracks')->whereIn('id', $chunk)->where(fn ($query) => $query->where('status', 'published')
@@ -160,9 +189,14 @@ final class MediaReferenceProof
             throw new InvalidArgumentException('Too many families for one proof.');
         }
         $families = $this->structural($rootIds);
-        $blockers = $this->blockers();
+        $blockers = array_values(array_unique([...$this->blockers(), ...array_map(fn (string $column): string => 'unparsed:'.$column, array_keys($this->unparsed))]));
+        sort($blockers);
         if ($blockers === [] && $families !== []) {
-            $blockers = $this->content($families);
+            // The cheap id checks run first; the content search over every text column only when they leave nothing open.
+            $blockers = $this->deep($families);
+            if ($blockers === []) {
+                $blockers = $this->content($families);
+            }
         }
         foreach ($families as &$family) {
             $family['state'] = array_sum($family['checks']) > 0 ? 'attached' : ($blockers === [] ? 'unattached' : 'unknown');
@@ -180,25 +214,47 @@ final class MediaReferenceProof
      */
     public function blockers(): array
     {
-        $blockers = [];
-        foreach ($this->schema()['tables'] as $table => $columns) {
-            $opaque = [];
+        $schema = $this->schema();
+        $blockers = array_map(fn (string $column): string => 'unregistered:'.$column, $schema['unregistered']);
+        $digests = $this->registry->entries('manifest_digests');
+        $opaque = $this->registry->entries('opaque');
+        foreach ($this->registry->entries('track_source_ids') as $qualified => [$links, $linkColumn]) {
+            [$table, $column] = explode('.', $qualified, 2);
+            if (! $this->hasColumn($table, $column)) {
+                continue;
+            }
+            $unresolved = $this->nonEmpty($table, $column);
+            // A linked row is counted through the link's track_id; only a row without a confirmed link stays unresolved.
+            if ($this->hasColumn($links, $linkColumn)) {
+                $unresolved->whereNotExists(fn ($query) => $query->selectRaw('1')->from($links)
+                    ->whereColumn($links.'.'.$linkColumn, $table.'.id'));
+            }
+            if ($unresolved->exists()) {
+                $blockers[] = 'unresolved_track_source:'.$qualified;
+            }
+        }
+        foreach ($schema['tables'] as $table => $columns) {
+            $scanned = [];
             foreach ($columns as $column => $type) {
                 $qualified = $table.'.'.$column;
-                if (preg_match('/asset_manifest_(?:hash|sha256)\z/', $column) === 1) {
+                if (isset($digests[$qualified])) {
                     if (DB::table($table)->whereNotNull($column)->exists()) {
                         $blockers[] = 'hash_only_manifest:'.$qualified;
                     }
+                } elseif (isset($opaque[$qualified])) {
+                    if ($this->nonEmpty($table, $column)->exists()) {
+                        $blockers[] = 'opaque:'.$qualified;
+                    }
                 } elseif (in_array($type, self::TEXT_TYPES, true)) {
                     if (! in_array($qualified, self::OPAQUE_ALLOWLIST, true)) {
-                        $opaque[] = $column;
+                        $scanned[] = $column;
                     }
                 } elseif (! in_array($type, self::PLAIN_TYPES, true) && DB::table($table)->whereNotNull($column)->exists()) {
                     $blockers[] = 'uninspected_type:'.$qualified;
                 }
             }
-            if ($opaque !== [] && DB::table($table)->where(function ($query) use ($opaque): void {
-                foreach ($opaque as $column) {
+            if ($scanned !== [] && DB::table($table)->where(function ($query) use ($scanned): void {
+                foreach ($scanned as $column) {
                     $query->orWhere($column, 'like', '%'.self::CIPHERTEXT_MARK.'%');
                 }
             })->exists()) {
@@ -208,6 +264,87 @@ final class MediaReferenceProof
         sort($blockers);
 
         return $blockers;
+    }
+
+    /** Candidate columns of the live schema that {@see MediaReferenceRegistry} does not classify. */
+    public function unregistered(): array
+    {
+        return $this->schema()['unregistered'];
+    }
+
+    /**
+     * Ids in the registered plaintext JSON that only the full proof reads (P2-3).
+     *
+     * @return list<string> blockers found while reading; counts are added to each family's checks
+     */
+    private function deep(array &$families): array
+    {
+        $owners = $this->owners($families);
+        $jobs = $this->registry->entries('jobs');
+        $blockers = [];
+        foreach ($this->schema()['deep'] as $name => [$table, $column, $parser]) {
+            foreach ($families as &$family) {
+                $family['checks'][$name] = 0;
+            }
+            unset($family);
+            $wrapped = DB::getQueryGrammar()->wrap($column);
+            $identity = array_values(array_intersect(['id', 'parent_asset_id', 'source_asset_id', 'asset_id', 'subject_type', 'subject_id'],
+                array_keys($this->schema()['tables'][$table])));
+            $query = $this->nonEmpty($table, $column);
+            if (isset(self::JSON_KEY_HINTS[$parser])) {
+                // Rows without any vocabulary key cannot name an id; rows that are not JSON at all are caught below.
+                $query->where(function ($query) use ($wrapped, $parser): void {
+                    foreach (self::JSON_KEY_HINTS[$parser] as $hint) {
+                        $query->orWhereRaw('LOWER(CAST('.$wrapped.' AS CHAR)) LIKE ?', ['%'.$hint.'%']);
+                    }
+                    $query->orWhereRaw('CAST('.$wrapped.' AS CHAR) NOT LIKE ?', ['{%']);
+                });
+            }
+            $rows = $query->orderBy(in_array('id', $identity, true) ? 'id' : $column)->limit(self::MAX_JSON_ROWS + 1)
+                ->get(array_values(array_unique([...$identity, $column])));
+            if ($rows->count() > self::MAX_JSON_ROWS) {
+                $blockers[] = 'json_bound:'.$table.'.'.$column;
+
+                continue;
+            }
+            foreach ($rows as $row) {
+                $ids = MediaReferenceJson::read($parser, $row->{$column}, $jobs);
+                if ($ids === null) {
+                    $blockers[] = 'unparsed:'.$table.'.'.$column;
+
+                    continue 2;
+                }
+                $this->count($families, $owners, $name, $table, $row, $ids);
+            }
+        }
+        sort($blockers);
+
+        return $blockers;
+    }
+
+    /** Adds one to the named check of every family the ids of one row name, except the row's own family. */
+    private function count(array &$families, array $owners, string $name, string $table, object $row, array $ids): void
+    {
+        $roots = [];
+        foreach (['media_assets', 'media_processing_runs'] as $target) {
+            foreach ($ids[$target] as $id) {
+                if (isset($owners[$target][$id])) {
+                    $roots[$owners[$target][$id]] = true;
+                }
+            }
+        }
+        if ($ids['tracks'] !== []) {
+            $tracks = array_flip($ids['tracks']);
+            foreach ($families as $root => $family) {
+                if (isset($tracks[$family['track_id']])) {
+                    $roots[$root] = true;
+                }
+            }
+        }
+        unset($roots[$this->rowFamily($table, $row, $owners) ?? 0]);
+        foreach (array_keys($roots) as $root) {
+            $families[$root]['checks'][$name]++;
+        }
     }
 
     /** @return list<string> blockers found while reading; counts are added to each family's checks */
@@ -372,54 +509,13 @@ final class MediaReferenceProof
         return $families;
     }
 
-    /**
-     * Asset ids in plaintext JSON: scalars in a list held by an asset key, `id` of an object held by one, and any value under
-     * a key ending in asset_id(s). Asset keys are assets, asset, preview, files and *asset_ids. Nested objects inside an asset
-     * entry (a recording binding, say) contribute only their *asset_id keys, so their own ids are not mistaken for assets.
-     *
-     * @return list<int>
-     */
-    private function jsonAssetIds(mixed $value, bool $idList): array
+    /** Rows holding a value in the column; an empty string is no value for a character column. */
+    private function nonEmpty(string $table, string $column): Builder
     {
-        $decoded = is_string($value) ? json_decode($value, true) : $value;
-        $ids = [];
-        $add = function (mixed $scalar) use (&$ids): void {
-            if (is_int($scalar) && $scalar > 0) {
-                $ids[] = $scalar;
-            } elseif (is_string($scalar) && preg_match('/\A[1-9][0-9]{0,17}\z/D', $scalar) === 1) {
-                $ids[] = (int) $scalar;
-            }
-        };
-        $walk = function (mixed $node, bool $assets) use (&$walk, $add): void {
-            if (! is_array($node)) {
-                return;
-            }
-            if (array_is_list($node)) {
-                foreach ($node as $child) {
-                    is_array($child) ? $walk($child, $assets) : ($assets ? $add($child) : null);
-                }
+        $type = $this->schema()['tables'][$table][$column];
+        $query = DB::table($table)->whereNotNull($column);
 
-                return;
-            }
-            foreach ($node as $key => $child) {
-                $name = strtolower((string) $key);
-                if (preg_match('/asset_ids?\z/', $name) === 1) {
-                    is_array($child) ? $walk($child, true) : $add($child);
-                } elseif (preg_match('/\A(?:assets?|preview|files)\z/', $name) === 1) {
-                    $walk($child, true);
-                } elseif ($assets && $name === 'id') {
-                    $add($child);
-                } else {
-                    $walk($child, false);
-                }
-            }
-        };
-        $walk($decoded, false);
-        if ($idList && is_array($decoded)) {
-            $walk($decoded, true);
-        }
-
-        return array_values(array_unique($ids));
+        return in_array($type, self::TEXT_TYPES, true) && ! in_array($type, ['json', 'jsonb'], true) ? $query->where($column, '<>', '') : $query;
     }
 
     private function hasColumn(string $table, string $column): bool
@@ -427,14 +523,21 @@ final class MediaReferenceProof
         return array_key_exists($column, $this->schema()['tables'][$table] ?? []);
     }
 
-    /** @return array{tables:array<string,array<string,string>>, references:array<string,array{0:string,1:string,2:string}>, json:array<string,array{0:string,1:string}>, poly:array<string,array{0:string,1:string}>} */
+    /**
+     * The live schema, and the registered columns that exist in it.
+     *
+     * @return array{tables:array<string,array<string,string>>, references:array<string,array{0:string,1:string,2:string}>,
+     *     tracks:array<string,array{0:string,1:string}>, json:array<string,array{0:string,1:string,2:string}>,
+     *     deep:array<string,array{0:string,1:string,2:string}>, poly:array<string,array{0:string,1:string}>, unregistered:list<string>}
+     */
     private function schema(): array
     {
         if ($this->schema !== null) {
             return $this->schema;
         }
-        $tables = $references = $json = $poly = [];
-        foreach (Schema::getTables() as $table) {
+        $tables = $foreign = $references = $tracks = $json = $deep = $poly = [];
+        // This connection's own schema only: a server shared with other databases lists their tables too.
+        foreach (Schema::getTables(Schema::getCurrentSchemaListing()) as $table) {
             $name = $table['name'];
             if (str_starts_with($name, 'sqlite_')) {
                 continue;
@@ -444,29 +547,48 @@ final class MediaReferenceProof
             }
         }
         ksort($tables);
-        foreach ($tables as $name => $columns) {
+        foreach (array_keys($tables) as $name) {
             foreach (Schema::getForeignKeys($name) as $key) {
-                if (isset(self::TARGETS[$key['foreign_table']]) && count($key['columns']) === 1) {
-                    $references['fk:'.$name.'.'.$key['columns'][0]] = [$name, $key['columns'][0], $key['foreign_table']];
-                }
-            }
-            foreach ($columns as $column => $type) {
-                $qualified = $name.'.'.$column;
-                if (in_array($type, self::PLAIN_TYPES, true) && preg_match('/(?:\A|_)asset_id\z/', $column) === 1) {
-                    $references['fk:'.$qualified] ??= [$name, $column, 'media_assets'];
-                }
-                if (in_array($type, self::TEXT_TYPES, true) && (str_ends_with($column, 'asset_ids') || in_array($qualified, self::JSON_COLUMNS, true))) {
-                    $json['json:'.$qualified] = [$name, $column];
-                }
-                if ($name !== 'audit_events' && str_ends_with($column, '_type') && isset($columns[substr($column, 0, -5).'_id'])) {
-                    $poly['poly:'.$name.'.'.substr($column, 0, -5)] = [$name, substr($column, 0, -5)];
+                if ($key['foreign_table'] === 'tracks' || in_array($key['foreign_table'], MediaReferenceRegistry::TARGET_TABLES, true)) {
+                    $foreign[$name] = [...($foreign[$name] ?? []), ...$key['columns']];
                 }
             }
         }
+        $present = fn (string $qualified): ?array => isset($tables[explode('.', $qualified, 2)[0]][explode('.', $qualified, 2)[1]])
+            ? explode('.', $qualified, 2) : null;
+        foreach ($this->registry->entries('media_ids') as $qualified => $target) {
+            if ($found = $present($qualified)) {
+                $references['fk:'.$qualified] = [...$found, $target];
+            }
+        }
+        foreach ($this->registry->entries('track_ids') as $qualified => $_) {
+            if ($found = $present($qualified)) {
+                $tracks['track:'.$qualified] = $found;
+            }
+        }
+        foreach ($this->registry->entries('json_structural') as $qualified => $parser) {
+            if ($found = $present($qualified)) {
+                $json['json:'.$qualified] = [...$found, $parser];
+            }
+        }
+        foreach ($this->registry->entries('json_deep') as $qualified => $parser) {
+            if ($found = $present($qualified)) {
+                $deep['json:'.$qualified] = [...$found, $parser];
+            }
+        }
+        foreach ($this->registry->entries('polymorphic') as $qualified => $_) {
+            [$name, $prefix] = explode('.', $qualified, 2);
+            if (isset($tables[$name][$prefix.'_type'], $tables[$name][$prefix.'_id'])) {
+                $poly['poly:'.$qualified] = [$name, $prefix];
+            }
+        }
         ksort($references);
+        ksort($tracks);
         ksort($json);
+        ksort($deep);
         ksort($poly);
 
-        return $this->schema = ['tables' => $tables, 'references' => $references, 'json' => $json, 'poly' => $poly];
+        return $this->schema = ['tables' => $tables, 'references' => $references, 'tracks' => $tracks, 'json' => $json, 'deep' => $deep,
+            'poly' => $poly, 'unregistered' => $this->registry->unregistered($tables, $foreign)];
     }
 }
