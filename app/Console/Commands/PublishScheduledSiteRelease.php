@@ -41,7 +41,8 @@ final class PublishScheduledSiteRelease extends Command
 
             return self::SUCCESS;
         }
-        $this->error(($result['outcome'] === 'grace_expired' ? 'EXPIRED' : 'FAILED '.$result['outcome']).' schedule='.$result['schedule_id']);
+        $this->error(($result['outcome'] === 'grace_expired' ? 'EXPIRED' : 'FAILED '.$result['outcome']).' schedule='.$result['schedule_id']
+            .(isset($result['reason']) ? ' reason='.$result['reason'] : ''));
 
         return self::FAILURE;
     }
