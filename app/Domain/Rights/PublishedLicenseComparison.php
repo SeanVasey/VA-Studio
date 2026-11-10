@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
  * A version is listed while it is published and inside its offer availability window [effective_from, effective_until),
  * exactly as VerifiedLicense decides availability, and only when its terms are typed (schema 2 and later): each section's
  * lines are LicenseVersion::features(), the generator whose output the storefront cards and the offer snapshot carry.
- * Schema 1 versions hold reviewed free prose with no typed meaning, so they are not listed here. Nothing is authored,
+ * Sound-kit licenses are not track licenses and are left out. Schema 1 versions hold reviewed free prose with no typed meaning, so they are not listed here. Nothing is authored,
  * stored or changed by this read; a successor version appears when it is published, with no site release edit.
  */
 final class PublishedLicenseComparison
@@ -60,6 +60,8 @@ final class PublishedLicenseComparison
     {
         return LicenseVersion::query()
             ->where('status', 'published')->whereNotNull('published_at')
+            // A sound-kit license (BL-66) prints only on a kit and never on a track card; kits are deferred at v1 (DD-05).
+            ->whereHas('template', fn (Builder $template) => $template->where('type', '!=', SoundKitLicenseKind::TYPE))
             ->whereIn('terms_schema_version', self::TYPED_SCHEMAS)
             ->where(fn (Builder $query) => $query->whereNull('effective_from')->orWhere('effective_from', '<=', $at))
             ->where(fn (Builder $query) => $query->whereNull('effective_until')->orWhere('effective_until', '>', $at))

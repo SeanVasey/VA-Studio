@@ -88,7 +88,8 @@ version 6, which is version 5 with one change: `legal.licenses` holds only a `ti
 - **Which versions.** Every license version that is `published` and inside its offer availability window
   (`effective_from` to `effective_until`, end exclusive; `VerifiedLicense::available()` decides, including the reviewed-evidence
   chain), with typed terms (license schemas 2 to 5). Schema 1 versions hold reviewer-attested prose with no typed meaning,
-  so they are left out even when an offer sells one. Drafts, approved-but-unpublished, not-yet-available and expired versions
+  so they are left out even when an offer sells one. Sound-kit licenses (template type `sound-kit`, BL-66) print only on a
+  kit and never on a track card, so they are left out too. Drafts, approved-but-unpublished, not-yet-available and expired versions
   are never listed.
 - **Order.** By license template identity, then by version identity. Names and publication times do not change the order.
 - **Wording.** One section per version, carrying exactly the storefront's license tier for that version (`id`, `name`,

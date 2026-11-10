@@ -10,6 +10,7 @@ use App\Domain\Rights\Models\LicenseVersion;
 use App\Domain\Rights\PublishedLicenseComparison;
 use App\Domain\Rights\PublishLicense;
 use App\Domain\Rights\ReviewLicense;
+use App\Domain\Rights\SoundKitLicenseKind;
 use App\Domain\SiteBuilder\EditorialContent;
 use App\Domain\SiteBuilder\LegalPublicationGuard;
 use App\Domain\SiteBuilder\LegalPublicationRefused;
@@ -120,13 +121,14 @@ class GeneratedLicenseComparisonTest extends TestCase
         $this->get('/legal/privacy', $this->headers())->assertOk()
             ->assertJsonPath('props.siteContent.legal_links', [['title' => 'GENERATED Privacy policy', 'path' => '/legal/privacy']]);
 
-        // Versions that must never be listed: unpublished, untyped (schema 1), not yet available and no longer available.
+        // Versions that must never be listed: unpublished, untyped (schema 1), a sound-kit license, not yet available and no longer available.
         $later = $this->template('SYNTHETIC LATER TIER');
         $earlier = $this->template('SYNTHETIC EARLIER TIER', 'exclusive');
         $this->publishVersion($this->template('SYNTHETIC APPROVED ONLY'), $actor, publish: false);
         LicenseFixtures::draft($actor, TieredLicenseFixtures::terms(), ['authored_source' => TieredLicenseFixtures::source()]);
         $untyped = LicenseFixtures::published($actor);
         $this->assertSame(1, $untyped->terms_schema_version);
+        $this->publishVersion($this->template('SYNTHETIC KIT LICENSE', SoundKitLicenseKind::TYPE), $actor);
         $future = $this->publishVersion($this->template('SYNTHETIC FUTURE TIER'), $actor, content: ['effective_from' => '2026-11-12T00:00:00Z']);
         $expiring = $this->publishVersion($this->template('SYNTHETIC EXPIRING TIER'), $actor, content: ['effective_from' => '2026-11-01T00:00:00Z', 'effective_until' => '2026-11-11T00:00:00Z']);
         // Listed: created in an order that differs from the expected order, which is template identity, then version identity.
@@ -151,7 +153,7 @@ class GeneratedLicenseComparisonTest extends TestCase
         $this->assertContains('Deliverables: MP3, Stems ZIP.', collect($expected)->firstWhere('id', (string) $second->id)['features']);
         $html = $this->get('/legal/licenses')->assertOk();
         $html->assertDontSee('SYNTHETIC COMPARISON REVIEW', false)->assertDontSee('SYNTHETIC NONBINDING REVIEW FIXTURE', false);
-        foreach (['SYNTHETIC APPROVED ONLY', 'SYNTHETIC FUTURE TIER', 'NONBINDING TEST FIXTURE'] as $absent) {
+        foreach (['SYNTHETIC APPROVED ONLY', 'SYNTHETIC FUTURE TIER', 'NONBINDING TEST FIXTURE', 'SYNTHETIC KIT LICENSE'] as $absent) {
             $html->assertDontSee($absent, false);
         }
 
