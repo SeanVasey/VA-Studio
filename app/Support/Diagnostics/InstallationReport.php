@@ -2,6 +2,8 @@
 
 namespace App\Support\Diagnostics;
 
+use App\Domain\Contracts\Production\StagingSpecimenSignature;
+use App\Domain\Contracts\Production\VaseyLicenseSignature;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Media\BoundedMediaProcess;
 use App\Domain\Media\MalwareScanner;
@@ -14,6 +16,7 @@ use App\Models\User;
 use App\Support\Environment\TestEnvironment;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 /**
@@ -142,6 +145,14 @@ final class InstallationReport
                 'The configured seller tag is not the synthetic staging placeholder.',
                 'Production is configured with the synthetic staging seller tag. Install the approved seller tag and set MEDIA_TAG_PATH and MEDIA_TAG_SHA256 to it.');
         }
+        // Only when a configured signature file is readable and carries the specimen marker; no row otherwise, so a real,
+        // absent or unreadable signature leaves the report exactly as it was. Production requires the real signature.
+        if ($this->signatureIsSpecimen()) {
+            $production = app()->isProduction();
+            $check('license_signature_specimen', $production, fn () => ! $production,
+                'The configured license signature is the staging specimen (STAGING SPECIMEN — NOT A SIGNATURE), not a signature. Sean installs his own on the production host.',
+                'Production is configured with the staging specimen signature. Install Sean\'s signature PNG and set VASEY_LICENSE_SIGNATURE_PATH and VASEY_LICENSE_SIGNATURE_SHA256 to it.');
+        }
         $check('media_queue', false, fn () => in_array(config('queue.default'), ['database', 'redis', 'sqs', 'beanstalkd'], true),
             'An asynchronous queue is selected; worker liveness and recovery are unverified.', 'Select and run the documented asynchronous media queue before processing real uploads.');
         $check('mail_transport', false, fn () => in_array(config('mail.default'), ['smtp', 'ses', 'postmark', 'resend', 'mailgun'], true),
@@ -195,6 +206,26 @@ final class InstallationReport
     }
 
     /** The configured seller tag as a file in private storage, or null when it is not there to read. */
+    /** True when the configured signature file is a regular private file whose bytes hold the specimen marker. Unreadable reads as false. */
+    private function signatureIsSpecimen(): bool
+    {
+        try {
+            $relative = config('contracts.vasey_license_v1.signature_path');
+            if (! is_string($relative) || preg_match('#\A(?:[A-Za-z0-9_-][A-Za-z0-9._-]*/)*[A-Za-z0-9_-][A-Za-z0-9._-]*\z#', $relative) !== 1) {
+                return false;
+            }
+            $file = rtrim(Storage::disk('local')->path(''), '/').'/'.$relative;
+            if (! is_file($file) || is_link($file)) {
+                return false;
+            }
+            $bytes = file_get_contents($file, false, null, 0, VaseyLicenseSignature::MAX_BYTES);
+
+            return is_string($bytes) && str_contains($bytes, StagingSpecimenSignature::MARKER);
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
     private function sellerTagFile(): ?string
     {
         try {

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Contracts\Production\StagingSpecimenSignature;
 use App\Domain\Media\BoundedMediaProcess;
 use App\Domain\Media\MediaFailure;
 use App\Domain\Media\StagingSellerTag;
@@ -442,6 +443,54 @@ SH;
         $this->assertSame('fail', $this->statuses()['production_seller_tag']);
         file_put_contents($this->directory.'/private/branding/approved.wav', 'RIFF approved');
         $this->assertSame('pass', $this->statuses()['production_seller_tag']);
+    }
+
+    private function specimenSignature(string $relative = StagingSpecimenSignature::PATH): void
+    {
+        $path = $this->directory.'/private/'.$relative;
+        is_dir(dirname($path)) || mkdir(dirname($path), 0700, true);
+        file_put_contents($path, StagingSpecimenSignature::png());
+        config(['contracts.vasey_license_v1.signature_path' => $relative, 'contracts.vasey_license_v1.signature_sha256' => hash('sha256', (string) file_get_contents($path))]);
+    }
+
+    public function test_doctor_names_a_configured_specimen_signature_on_staging_and_fails_it_in_production(): void
+    {
+        $this->assertArrayNotHasKey('license_signature_specimen', $this->statuses());
+        // Renamed to look approved: the marker inside the file names it.
+        $this->specimenSignature('contracts/signature.png');
+        $this->app->instance('env', 'staging');
+        config(['app.env' => 'staging']);
+        $checks = array_column(app(InstallationReport::class)->collect()['checks'], null, 'id');
+        $this->assertSame('pass', $checks['license_signature_specimen']['status']);
+        $this->assertStringContainsString('staging specimen', $checks['license_signature_specimen']['message']);
+
+        $this->app->instance('env', 'production');
+        config(['app.env' => 'production', 'app.debug' => false, 'app.url' => 'https://example.test', 'session.secure' => true]);
+        $checks = array_column(app(InstallationReport::class)->collect()['checks'], null, 'id');
+        $this->assertSame('fail', $checks['license_signature_specimen']['status']);
+        $this->assertStringContainsString('staging specimen signature', $checks['license_signature_specimen']['message']);
+        $this->assertStringNotContainsString($this->directory, json_encode($checks));
+    }
+
+    public function test_doctor_is_unchanged_for_a_real_absent_or_unreadable_signature(): void
+    {
+        $before = app(InstallationReport::class)->collect();
+        $path = $this->directory.'/private/contracts/signature.png';
+        mkdir(dirname($path), 0700, true);
+        file_put_contents($path, "\x89PNG\r\n\x1a\n synthetic approved signature fixture");
+        foreach ([null, 'contracts/missing.png', 'contracts/signature.png', '../outside.png'] as $configured) {
+            config(['contracts.vasey_license_v1.signature_path' => $configured]);
+            $this->assertSame($before, app(InstallationReport::class)->collect(), (string) $configured);
+        }
+        $this->app->instance('env', 'production');
+        config(['app.env' => 'production', 'contracts.vasey_license_v1.signature_path' => 'contracts/signature.png']);
+        $this->assertArrayNotHasKey('license_signature_specimen', $this->statuses());
+        // A symbolic link to a specimen is not read.
+        $this->specimenSignature();
+        $link = $this->directory.'/private/contracts/linked.png';
+        symlink($this->directory.'/private/'.StagingSpecimenSignature::PATH, $link);
+        config(['contracts.vasey_license_v1.signature_path' => 'contracts/linked.png']);
+        $this->assertArrayNotHasKey('license_signature_specimen', $this->statuses());
     }
 
     public function test_production_settings_require_https_secure_cookies_and_debug_off(): void
