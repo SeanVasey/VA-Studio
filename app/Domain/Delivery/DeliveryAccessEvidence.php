@@ -20,25 +20,34 @@ final class DeliveryAccessEvidence
 {
     public function owned(string $publicId, #[SensitiveParameter] string $ownerKey): Order
     {
-        if (! OrderRequest::uuid($publicId) || preg_match('/\A[a-f0-9]{64}\z/D', $ownerKey) !== 1) { throw new DeliveryException('not_found'); }
+        if (! OrderRequest::uuid($publicId) || preg_match('/\A[a-f0-9]{64}\z/D', $ownerKey) !== 1) {
+            throw new DeliveryException('not_found');
+        }
         $order = Order::where('public_id', $publicId)->where('owner_key', $ownerKey)->first();
-        if (! $order || ! hash_equals($order->owner_key, $ownerKey)) { throw new DeliveryException('not_found'); }
+        if (! $order || ! hash_equals($order->owner_key, $ownerKey)) {
+            throw new DeliveryException('not_found');
+        }
+
         return $order;
     }
 
     public function source(Order $order, string $account): array
     {
         $activation = TestFulfillmentActivation::where('order_id', $order->id)->first();
-        if (! $activation) { throw new DeliveryException('blocked'); }
+        if (! $activation) {
+            throw new DeliveryException('blocked');
+        }
         try {
             $evidence = app(ActivationEvidence::class);
             $source = $evidence->source($order, $account);
             $evidence->verify($activation, $source);
             $source['activation'] = $activation;
             $source['snapshot_hash'] = CanonicalJson::hash($source['snapshot']);
+
             return $source;
-        } catch (QueryException $error) { throw $error; }
-        catch (DeliveryException $error) {
+        } catch (QueryException $error) {
+            throw $error;
+        } catch (DeliveryException $error) {
             throw new DeliveryException($error->reason === 'unavailable' ? 'unavailable' : 'changed');
         }
     }
@@ -50,26 +59,40 @@ final class DeliveryAccessEvidence
             throw new DeliveryException('not_found');
         }
         $matches = array_values(array_filter($source['snapshot']['members'], fn ($member) => $member['grant_public_id'] === $grantPublicId));
-        if (count($matches) !== 1) { throw new DeliveryException('not_found'); }
-        $member = $matches[0]; $contract = null; $entitlement = null;
+        if (count($matches) !== 1) {
+            throw new DeliveryException('not_found');
+        }
+        $member = $matches[0];
+        $contract = null;
+        $entitlement = null;
         if ($kind === 'contract') {
-            $original = $member['original']; $contract = $original['id'];
+            $original = $member['original'];
+            $contract = $original['id'];
             $file = ['kind' => 'contract', 'disk' => $original['disk'], 'storage_path' => $original['storage_path'],
                 'sha256' => $original['pdf_hash'], 'size_bytes' => $original['size_bytes'],
                 'page_count' => $original['page_count'], 'profile_hash' => $original['profile_hash']];
-            $extension = 'pdf'; $mime = 'application/pdf';
+            $extension = 'pdf';
+            $mime = 'application/pdf';
         } else {
             $matches = array_values(array_filter($member['entitlements'], fn ($entry) => $entry['role'] === $kind));
-            if (count($matches) !== 1) { throw new DeliveryException('not_found'); }
-            $entry = $matches[0]; $entitlement = $entry['id'];
+            if (count($matches) !== 1) {
+                throw new DeliveryException('not_found');
+            }
+            $entry = $matches[0];
+            $entitlement = $entry['id'];
             $assets = array_values(array_filter($source['assets'], fn ($asset) => $asset['id'] === $entry['media_asset_id'] && $asset['role'] === $kind));
-            if (count($assets) !== 1) { throw new DeliveryException('changed'); }
+            if (count($assets) !== 1) {
+                throw new DeliveryException('changed');
+            }
             $file = $assets[0] + ['kind' => $kind];
-            if ($file['sha256'] !== $entry['asset_hash'] || $file['size_bytes'] !== $entry['size_bytes']) { throw new DeliveryException('changed'); }
+            if ($file['sha256'] !== $entry['asset_hash'] || $file['size_bytes'] !== $entry['size_bytes']) {
+                throw new DeliveryException('changed');
+            }
             [$extension, $mime] = match ($kind) {
                 'master_wav' => ['wav', 'audio/wav'], 'download_mp3' => ['mp3', 'audio/mpeg'], 'stems_zip' => ['zip', 'application/zip'],
             };
         }
+
         return ['kind' => $kind, 'license_grant_id' => $member['grant_id'], 'grant_public_id' => $grantPublicId,
             'grant_contract_id' => $contract, 'pending_entitlement_id' => $entitlement, 'file' => $file,
             'filename' => $grantPublicId.'-'.$kind.'.'.$extension, 'mime_type' => $mime];
@@ -77,10 +100,17 @@ final class DeliveryAccessEvidence
 
     public function control(array $source, ?TestDeliveryControl $control, ?int $version = null): TestDeliveryControl
     {
-        if (! $control) { throw new DeliveryException('blocked'); }
+        if (! $control) {
+            throw new DeliveryException('blocked');
+        }
         if ($control->order_id !== $source['order']->id || $control->test_fulfillment_activation_id !== $source['activation']->id
-            || ! OrderRequest::uuid($control->public_id) || $control->control_version < 0) { throw new DeliveryException('changed'); }
-        if ($control->blocked || ($version !== null && $control->control_version !== $version)) { throw new DeliveryException('blocked'); }
+            || ! OrderRequest::uuid($control->public_id) || $control->control_version < 0) {
+            throw new DeliveryException('changed');
+        }
+        if ($control->blocked || ($version !== null && $control->control_version !== $version)) {
+            throw new DeliveryException('blocked');
+        }
+
         return $control;
     }
 
@@ -92,7 +122,10 @@ final class DeliveryAccessEvidence
 
     public function idempotencyHash(Order $order, #[SensitiveParameter] string $owner, string $key): string
     {
-        if (! OrderRequest::uuid($key)) { throw new DeliveryException('not_found'); }
+        if (! OrderRequest::uuid($key)) {
+            throw new DeliveryException('not_found');
+        }
+
         return CanonicalJson::hash(['purpose' => 'test_delivery_request', 'order_id' => $order->public_id, 'owner_key' => $owner, 'key' => $key]);
     }
 
@@ -103,7 +136,10 @@ final class DeliveryAccessEvidence
     public function capture(array $source, array $target, TestDeliveryControl $control, array $columns, ?array $transfer = null): array
     {
         $version = $columns['policy_version'] ?? null;
-        if (($version === TestAccessPolicy::V2) !== ($transfer !== null)) { throw new DeliveryException('changed'); }
+        if (($version === TestAccessPolicy::V2) !== ($transfer !== null)) {
+            throw new DeliveryException('changed');
+        }
+
         return ['schema_version' => 1, 'purpose' => 'test_delivery_authorization', 'policy' => TestAccessPolicy::contract($version),
             'authorization_id' => $columns['public_id'], 'owner_key' => $columns['owner_key'], 'token_hash' => $columns['token_hash'],
             'idempotency_key_hash' => $columns['idempotency_key_hash'], 'request_hash' => $columns['request_hash'],
@@ -120,15 +156,21 @@ final class DeliveryAccessEvidence
         if (! OrderRequest::uuid($authorizationPublicId) || preg_match('/\A[a-f0-9]{64}\z/D', $sessionSecret) !== 1) {
             throw new DeliveryException('not_found');
         }
+
         return hash('sha256', "vasey-test-delivery-session-v1\0".$authorizationPublicId."\0".$sessionSecret);
     }
 
     /** v2 terms from verified evidence: call only after verify() accepted the same authorization. */
     public function transfer(TestDeliveryAuthorization $authorization): array
     {
-        if ($authorization->policy_version !== TestAccessPolicy::V2) { throw new DeliveryException('changed'); }
-        try { return self::transferTerms($this->decode($authorization)['transfer'] ?? null); }
-        catch (Throwable) { throw new DeliveryException('changed'); }
+        if ($authorization->policy_version !== TestAccessPolicy::V2) {
+            throw new DeliveryException('changed');
+        }
+        try {
+            return self::transferTerms($this->decode($authorization)['transfer'] ?? null);
+        } catch (Throwable) {
+            throw new DeliveryException('changed');
+        }
     }
 
     private static function transferTerms(mixed $terms): array
@@ -139,6 +181,7 @@ final class DeliveryAccessEvidence
             || ! is_string($terms['session_binding_hash']) || preg_match('/\A[a-f0-9]{64}\z/D', $terms['session_binding_hash']) !== 1) {
             throw new DeliveryException('changed');
         }
+
         return $terms;
     }
 
@@ -168,10 +211,16 @@ final class DeliveryAccessEvidence
             $transfer = $authorization->policy_version === TestAccessPolicy::V2 ? self::transferTerms($decoded['transfer'] ?? null) : null;
             $expected = $this->capture($source, $target, $control, $authorization->only(['public_id', 'owner_key', 'token_hash',
                 'idempotency_key_hash', 'request_hash', 'control_version', 'policy_version', 'issued_at', 'expires_at']), $transfer);
-            if (CanonicalJson::encode($decoded) !== CanonicalJson::encode($expected)) { throw new DeliveryException('changed'); }
+            if (CanonicalJson::encode($decoded) !== CanonicalJson::encode($expected)) {
+                throw new DeliveryException('changed');
+            }
+
             return $target;
-        } catch (QueryException $error) { throw $error; }
-        catch (Throwable) { throw new DeliveryException('changed'); }
+        } catch (QueryException $error) {
+            throw $error;
+        } catch (Throwable) {
+            throw new DeliveryException('changed');
+        }
     }
 
     public function redemption(TestDeliveryAuthorization $authorization, array $source, array $target, string $publicId, CarbonImmutable $at): array
@@ -196,19 +245,31 @@ final class DeliveryAccessEvidence
         }
     }
 
-    public function encrypt(array $payload): array { return app(ActivationEvidence::class)->encrypt($payload); }
+    public function encrypt(array $payload): array
+    {
+        return app(ActivationEvidence::class)->encrypt($payload);
+    }
 
     private function decode(TestDeliveryAuthorization|TestDeliveryRedemption $record): array
     {
         try {
             if ($record->canonicalization_version !== CanonicalJson::VERSION
                 || strlen($record->evidence_ciphertext) > ActivationEvidence::MAX_CIPHERTEXT_BYTES
-                || ! hash_equals($record->evidence_hash, hash('sha256', $record->evidence_ciphertext))) { throw new DeliveryException('changed'); }
+                || ! hash_equals($record->evidence_hash, hash('sha256', $record->evidence_ciphertext))) {
+                throw new DeliveryException('changed');
+            }
             $canonical = Crypt::decryptString($record->evidence_ciphertext);
-            if (strlen($canonical) > ActivationEvidence::MAX_BYTES) { throw new DeliveryException('changed'); }
+            if (strlen($canonical) > ActivationEvidence::MAX_BYTES) {
+                throw new DeliveryException('changed');
+            }
             $decoded = json_decode($canonical, true, 128, JSON_THROW_ON_ERROR);
-            if (! is_array($decoded) || CanonicalJson::encode($decoded) !== $canonical) { throw new DeliveryException('changed'); }
+            if (! is_array($decoded) || CanonicalJson::encode($decoded) !== $canonical) {
+                throw new DeliveryException('changed');
+            }
+
             return $decoded;
-        } catch (Throwable) { throw new DeliveryException('changed'); }
+        } catch (Throwable) {
+            throw new DeliveryException('changed');
+        }
     }
 }

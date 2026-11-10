@@ -56,25 +56,37 @@ final class TestAccessPolicy
             || ! is_string($account) || preg_match('/\Aacct_[A-Za-z0-9]{1,64}\z/D', $account) !== 1) {
             throw new DeliveryException('unavailable');
         }
+
         return $account;
     }
 
     public function account(): string
     {
-        if (config('delivery.test_access_enabled') !== true) { throw new DeliveryException('unavailable'); }
+        if (config('delivery.test_access_enabled') !== true) {
+            throw new DeliveryException('unavailable');
+        }
+
         return $this->environmentAccount();
     }
 
     public function current(): array
     {
-        $this->account(); $raw = config('delivery.test_access_policy');
-        if (! is_string($raw) || strlen($raw) > 4096) { throw new DeliveryException('unavailable'); }
-        try { $policy = self::validate(json_decode($raw, true, 8, JSON_THROW_ON_ERROR)); }
-        catch (Throwable) { throw new DeliveryException('unavailable'); }
+        $this->account();
+        $raw = config('delivery.test_access_policy');
+        if (! is_string($raw) || strlen($raw) > 4096) {
+            throw new DeliveryException('unavailable');
+        }
+        try {
+            $policy = self::validate(json_decode($raw, true, 8, JSON_THROW_ON_ERROR));
+        } catch (Throwable) {
+            throw new DeliveryException('unavailable');
+        }
         if ($policy['version'] === self::V2) {
             // A v2 policy with unusable operational numbers is unavailable, never silently defaulted.
-            $this->resumeWindows(); $this->incompleteCap();
+            $this->resumeWindows();
+            $this->incompleteCap();
         }
+
         return $policy;
     }
 
@@ -82,7 +94,9 @@ final class TestAccessPolicy
     public static function validate(array $policy): array
     {
         foreach ([self::CONTRACT, self::CONTRACT_V2] as $contract) {
-            if (CanonicalJson::encode($policy) === CanonicalJson::encode($contract)) { return $policy; }
+            if (CanonicalJson::encode($policy) === CanonicalJson::encode($contract)) {
+                return $policy;
+            }
         }
         throw new DeliveryException('changed');
     }
@@ -112,6 +126,7 @@ final class TestAccessPolicy
         if ($windows['from_512_mib'] < $windows['below_512_mib'] || $windows['from_4_gib'] < $windows['from_512_mib']) {
             throw new DeliveryException('unavailable');
         }
+
         return $windows;
     }
 
@@ -123,7 +138,10 @@ final class TestAccessPolicy
     /** Pure tier selection: below 512 MiB, from 512 MiB, from 4 GiB. */
     public static function resumeWindowSeconds(int $sizeBytes, array $windows): int
     {
-        if ($sizeBytes < 1) { throw new DeliveryException('changed'); }
+        if ($sizeBytes < 1) {
+            throw new DeliveryException('changed');
+        }
+
         return match (true) {
             $sizeBytes >= 4096 * self::MIB => $windows['from_4_gib'],
             $sizeBytes >= 512 * self::MIB => $windows['from_512_mib'],
@@ -133,8 +151,13 @@ final class TestAccessPolicy
 
     private static function integer(mixed $value, int $minimum, int $maximum): int
     {
-        if (is_string($value) && preg_match('/\A[1-9][0-9]{0,9}\z/D', $value) === 1) { $value = (int) $value; }
-        if (! is_int($value) || $value < $minimum || $value > $maximum) { throw new DeliveryException('unavailable'); }
+        if (is_string($value) && preg_match('/\A[1-9][0-9]{0,9}\z/D', $value) === 1) {
+            $value = (int) $value;
+        }
+        if (! is_int($value) || $value < $minimum || $value > $maximum) {
+            throw new DeliveryException('unavailable');
+        }
+
         return $value;
     }
 }

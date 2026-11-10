@@ -32,7 +32,10 @@ final class TestDeliveryResponse
         $response->headers->add(self::headers());
         // Only a v2 transfer stream advertises byte ranges and its derived ETag (for If-Range); nothing else does.
         $validators = $response instanceof TestDeliveryTransferResponse ? ['Last-Modified'] : ['ETag', 'Last-Modified', 'Accept-Ranges'];
-        foreach ($validators as $header) { $response->headers->remove($header); }
+        foreach ($validators as $header) {
+            $response->headers->remove($header);
+        }
+
         return $response;
     }
 
@@ -43,6 +46,7 @@ final class TestDeliveryResponse
             404 => 'DELIVERY_NOT_FOUND', 419 => 'SESSION_EXPIRED', 429 => 'DELIVERY_RATE_LIMITED',
             400, 405, 413, 415, 416, 422 => 'INVALID_DELIVERY_REQUEST', default => 'DELIVERY_UNAVAILABLE',
         };
+
         return response()->json(['code' => $code], $status, self::headers() + $headers);
     }
 
@@ -60,6 +64,7 @@ final class TestDeliveryResponse
             'session_required' => [403, 'DELIVERY_SESSION_REQUIRED'],
             default => [503, 'DELIVERY_UNAVAILABLE'],
         };
+
         return self::error($status, $code);
     }
 
@@ -83,17 +88,22 @@ final class TestDeliveryResponse
         try {
             $range = $transfer->range;
             $partial = $range->partial();
+
             return new TestDeliveryTransferResponse(function () use ($transfer): void {
                 $previous = ignore_user_abort(true);
                 try {
                     $transfer->writeTo(function (string $chunk): void {
-                        if (connection_aborted()) { throw new \RuntimeException('Delivery transport interrupted.'); }
+                        if (connection_aborted()) {
+                            throw new \RuntimeException('Delivery transport interrupted.');
+                        }
                         echo $chunk;
                     });
                 } catch (Throwable $error) {
                     // Headers may already be sent. Never append exception/debug/JSON text to private file bytes.
-                    try { Log::warning('Test delivery stream interrupted.', ['exception_class' => $error::class]); }
-                    catch (Throwable) { /* Closing the descriptor must survive a failed logger. */ }
+                    try {
+                        Log::warning('Test delivery stream interrupted.', ['exception_class' => $error::class]);
+                    } catch (Throwable) { /* Closing the descriptor must survive a failed logger. */
+                    }
                 } finally {
                     $transfer->close();
                     ignore_user_abort((bool) $previous);
@@ -119,13 +129,17 @@ final class TestDeliveryResponse
                 $previous = ignore_user_abort(true);
                 try {
                     $prepared->writeTo(function (string $chunk): void {
-                        if (connection_aborted()) { throw new \RuntimeException('Delivery transport interrupted.'); }
+                        if (connection_aborted()) {
+                            throw new \RuntimeException('Delivery transport interrupted.');
+                        }
                         echo $chunk;
                     });
                 } catch (Throwable $error) {
                     // Headers may already be sent. Never append exception/debug/JSON text to private file bytes.
-                    try { Log::warning('Test delivery stream interrupted.', ['exception_class' => $error::class]); }
-                    catch (Throwable) { /* Closing the descriptor must survive a failed logger. */ }
+                    try {
+                        Log::warning('Test delivery stream interrupted.', ['exception_class' => $error::class]);
+                    } catch (Throwable) { /* Closing the descriptor must survive a failed logger. */
+                    }
                 } finally {
                     $prepared->close();
                     ignore_user_abort((bool) $previous);
@@ -135,6 +149,7 @@ final class TestDeliveryResponse
                 'Content-Disposition' => HeaderUtils::makeDisposition('attachment', $filename),
                 'Content-Length' => (string) $prepared->sizeBytes,
             ]);
+
             return $response;
         } catch (Throwable $error) {
             $prepared->close();

@@ -12,7 +12,9 @@ final class TestDeliveryPrivacy
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! TestDeliveryResponse::matches($request)) { return $next($request); }
+        if (! TestDeliveryResponse::matches($request)) {
+            return $next($request);
+        }
         $transfer = $request->is('orders/*/delivery/downloads/*');
         // HEAD is refused on the transfer: it would start a transfer whose bytes are never sent.
         $allowed = $request->is('orders/*/delivery') ? ['GET', 'HEAD']
@@ -37,13 +39,20 @@ final class TestDeliveryPrivacy
         // Content-Length is untrusted and may be absent for chunked requests. Inspect at most MAX + 1 bytes.
         $input = $request->getContent(true);
         $body = is_resource($input) ? stream_get_contents($input, 4097) : false;
-        if ($body === false) { return TestDeliveryResponse::error(503); }
-        if (strlen($body) > 4096) { return TestDeliveryResponse::error(413); }
+        if ($body === false) {
+            return TestDeliveryResponse::error(503);
+        }
+        if (strlen($body) > 4096) {
+            return TestDeliveryResponse::error(413);
+        }
         $request->attributes->set('_test_delivery_body', $body);
         if (in_array($request->getRealMethod(), ['GET', 'HEAD'], true) && $body !== '') {
             return TestDeliveryResponse::error(422);
         }
-        if ($request->getRealMethod() !== $request->method()) { return TestDeliveryResponse::error(405); }
+        if ($request->getRealMethod() !== $request->method()) {
+            return TestDeliveryResponse::error(405);
+        }
+
         return TestDeliveryResponse::protect($next($request));
     }
 }

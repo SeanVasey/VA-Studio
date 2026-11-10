@@ -16,14 +16,21 @@ final class ReadTestDeliveryAuthorization
         $evidence = app(DeliveryAccessEvidence::class);
         $order = $evidence->owned($orderPublicId, $ownerKey);
         if (! OrderRequest::uuid($authorizationPublicId) || preg_match('/\A[A-Za-z0-9_-]{43}\z/D', $token) !== 1
-            || strlen((string) base64_decode(strtr($token, '-_', '+/').'=', true)) !== 32) { throw new DeliveryException('not_found'); }
+            || strlen((string) base64_decode(strtr($token, '-_', '+/').'=', true)) !== 32) {
+            throw new DeliveryException('not_found');
+        }
         $authorization = TestDeliveryAuthorization::where('order_id', $order->id)->where('public_id', $authorizationPublicId)->first();
         if (! $authorization || ! hash_equals($authorization->owner_key, $ownerKey)
-            || ! hash_equals($authorization->token_hash, hash('sha256', $token))) { throw new DeliveryException('not_found'); }
+            || ! hash_equals($authorization->token_hash, hash('sha256', $token))) {
+            throw new DeliveryException('not_found');
+        }
         $source = $evidence->source($order, app(TestAccessPolicy::class)->environmentAccount());
         $target = $evidence->verify($authorization, $source);
         $redemption = TestDeliveryRedemption::where('test_delivery_authorization_id', $authorization->id)->first();
-        if ($redemption) { $evidence->verifyRedemption($redemption, $authorization, $source, $target); }
+        if ($redemption) {
+            $evidence->verifyRedemption($redemption, $authorization, $source, $target);
+        }
+
         return compact('order', 'source', 'target', 'authorization', 'redemption');
     }
 
@@ -36,7 +43,9 @@ final class ReadTestDeliveryAuthorization
     {
         $evidence = app(DeliveryAccessEvidence::class);
         $order = $evidence->owned($orderPublicId, $ownerKey);
-        if (! OrderRequest::uuid($authorizationPublicId) || ! is_string($sessionSecret)) { throw new DeliveryException('not_found'); }
+        if (! OrderRequest::uuid($authorizationPublicId) || ! is_string($sessionSecret)) {
+            throw new DeliveryException('not_found');
+        }
         $authorization = TestDeliveryAuthorization::where('order_id', $order->id)->where('public_id', $authorizationPublicId)->first();
         if (! $authorization || ! hash_equals($authorization->owner_key, $ownerKey) || $authorization->policy_version !== TestAccessPolicy::V2) {
             throw new DeliveryException('not_found');
@@ -48,9 +57,14 @@ final class ReadTestDeliveryAuthorization
             throw new DeliveryException('not_found');
         }
         $redemption = TestDeliveryRedemption::where('test_delivery_authorization_id', $authorization->id)->first();
-        if ($redemption) { $evidence->verifyRedemption($redemption, $authorization, $source, $target); }
+        if ($redemption) {
+            $evidence->verifyRedemption($redemption, $authorization, $source, $target);
+        }
         $coverage = app(TestDeliveryCoverageLedger::class)->state($authorization, $target['file']['size_bytes']);
-        if ($coverage['admitted'] > 0 && ! $redemption) { throw new DeliveryException('changed'); }
+        if ($coverage['admitted'] > 0 && ! $redemption) {
+            throw new DeliveryException('changed');
+        }
+
         return compact('order', 'source', 'target', 'authorization', 'redemption', 'transfer', 'coverage');
     }
 }
