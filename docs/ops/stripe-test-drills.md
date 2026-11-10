@@ -60,7 +60,7 @@ Append; never overwrite. Keep failed and refused runs and label them. Label ever
 | `art vasey:stripe-inbox --limit=10` | Recent receipts: event ID, type, session ID, received time | No |
 | `art vasey:doctor --json` | Redacted installation report | No |
 | `php scripts/ops/validate-test-commerce-profile.php .env` | Profile checks; no values printed | No (reads the file you pass) |
-| Runner log (`journalctl -u vasey-test-commerce-pipeline.service`, or the Forge log file) | `<stage> <opaque id> <outcome>` lines | — |
+| Runner log (`journalctl -u vasey-test-commerce-pipeline.service`, or the Forge log file; if journalctl reports "No journal files were found", use `journalctl -D /var/log/journal/<dir> -u vasey-test-commerce-pipeline.service` with the one directory under `/var/log/journal/`, or read `/var/log/syslog`) | `<stage> <opaque id> <outcome>` lines | — |
 
 `<REF>` for the evidence helper is any of: the order UUID shown to the buyer, the checkout intent UUID (runner
 `reconcile` lines), the Stripe session ID (`cs_test_…`, from the Stripe page address) or a Stripe event ID (`evt_…`,
