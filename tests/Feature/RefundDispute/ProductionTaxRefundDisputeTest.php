@@ -603,6 +603,37 @@ class ProductionTaxRefundDisputeTest extends TestCase
         $this->assertSame(0, DB::table('refund_dispute_objects')->where('order_id', $batchId)->where('order_source', 'test')->count());
     }
 
+    public function test_a_test_chain_row_with_the_same_order_number_never_leaks_into_a_production_order(): void
+    {
+        $f = $this->order();
+        $batchId = (int) $this->batchRow($f)->id;
+        $originId = (int) DB::table('paid_tax_grant_origins')->value('id');
+        // A disposable fixture removes the test chain's existence guards so rows for a test order numbered like this batch can be planted.
+        foreach (['refund_dispute_work_insert', 'refund_dispute_effects_insert', 'refund_dispute_holds_insert'] as $guard) {
+            DB::unprepared('DROP TRIGGER '.$guard);
+        }
+        $now = now();
+        DB::table('refund_dispute_work')->insert(['order_id' => $batchId, 'order_source' => 'test', 'sequence' => 7, 'created_at' => $now, 'updated_at' => $now]);
+        DB::table('refund_dispute_effects')->insert(['public_id' => (string) Str::uuid(), 'order_id' => $batchId, 'order_source' => 'test', 'sequence' => 1,
+            'effect_key' => 'planted', 'kind' => 'dispute_hold_applied', 'policy_hash' => str_repeat('a', 64), 'context' => '{}', 'created_at' => $now]);
+        DB::table('refund_dispute_holds')->insert(['public_id' => (string) Str::uuid(), 'order_id' => $batchId, 'order_source' => 'test', 'license_grant_id' => null,
+            'reason' => 'dispute_reconciling', 'applied_effect_id' => DB::table('refund_dispute_effects')->value('id'), 'created_at' => $now]);
+        // The planted test-chain hold and sequence are invisible to the production order that shares their number.
+        $this->assertSame(0, $this->sequence($f));
+        $this->assertSame([null, null], $this->blocked($batchId, $originId, RefundDisputeSource::PRODUCTION_TAX));
+        $this->assertSame(['blocked', null], $this->blocked($batchId, $originId, RefundDisputeSource::TEST));
+        $this->assertSame([false], $this->heldLines($f));
+        $this->financial->refunds = [['re_ONE', 500, 'succeeded']];
+        $this->assertSame('partial', $this->observe($f)['refundState']);
+        $this->assertSame(1, $this->sequence($f));
+        $this->assertSame([7, 1], DB::table('refund_dispute_work')->orderBy('order_source', 'desc')->pluck('sequence')->map(fn ($v): int => (int) $v)->all());
+        // The production ledger counted only its own rows, and the planted ones were left exactly as written.
+        $this->assertSame(1, RefundDisputeObject::where('order_source', 'production_tax')->count());
+        $this->assertSame(0, RefundDisputeObject::where('order_source', 'test')->count());
+        $this->assertSame(1, DB::table('refund_dispute_holds')->where('order_source', 'test')->whereNull('released_at')->count());
+        $this->assertSame(0, RefundDisputeHold::where('order_source', 'production_tax')->count());
+    }
+
     private function blocked(int $order, int $grant, string $source): array
     {
         try {
