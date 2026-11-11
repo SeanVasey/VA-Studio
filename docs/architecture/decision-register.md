@@ -866,6 +866,64 @@ and the visual appearance more in line with other generated legal documents such
   placeholder with "Polk County, Iowa", and a court is named only in a governing-law or dispute clause (as the kit
   license does), never elsewhere. Postal city and ZIP stay Sean's and out of the repository.
 
+### Sean's answers, 2026-11-11: seller tag, preview-tag control, kit price and license
+
+- **Seller tag (S-6) answered.** The approved preview tag is a **4-second** cut of Sean's vocoded anti-theft vocal tag
+  (the first phrase and its delay tail, faded out from 3.5 s). The 34.5 s source exceeds the 15 s tag limit and the 30 s
+  repeat interval; Sean chose 4 s over 7 s and 11 s cuts. The file stays private (staging `branding/VASEY.AUDIO-seller-tag.wav`,
+  SHA-256 828e0b7b…); every preview mixes it every 30 seconds.
+- **Preview tag control.** Sean: a per-track on/off with a store-wide default, the default **on**. Both the tagged and
+  an untagged preview are kept per processing run so switching is immediate; a track set to off without an untagged
+  variant keeps serving the tagged one. Staff with MFA only, audited, and never changes sold licenses or deliverables.
+- **Kit price.** IMPERIAL DRVMZ: $14.99.
+- **Kit license.** The licensor line reads **VASEY.AUDIO** (`VASEY_KIT_LICENSE_LICENSOR_NAME`). The only change to
+  Sean's Sample Pack License text is a purchase-details block under the title carrying the six placeholders; the
+  wording is otherwise unchanged and stays out of Git. On staging it is published as the sound-kit license
+  (authored by Sean's account, approved and published by the review account).
+
+### Sean's answers, 2026-11-11 (later): SQ-05 prices and license-tier terms
+
+- **SQ-05 prices answered (USD).** Basic $40, Premium $75, Premium Plus $100, Unlimited $500, Custom Beat $1,000,
+  Exclusive $1,500 (Sean's BeatStars prices, confirmed for the new store). Files: Basic MP3; Premium MP3 + WAV;
+  Premium Plus, Unlimited, Custom Beat and Exclusive MP3 + WAV + stems.
+- **Tier terms: Sean accepted the recommended defaults** for every conflict and missing value found between the
+  BeatStars export settings and his private templates:
+  - monetized video streams on leases equal the audio-stream cap (250,000 Basic; 500,000 Premium, Premium Plus,
+    Unlimited), as BeatStars showed buyers, not the stored value of 1;
+  - lease publishing follows the contract text: the producer keeps a 50% writer share and 100% of the publisher
+    share; the single publishing-rate field stores the beat-only rate and the contract text keeps all three rates;
+  - free downloads unlimited on every tier (Premium Plus included); no separate audio-release cap (the copies cap
+    governs); credit "Produced by Sean Vasey" on every tier;
+  - leases: no paid advertising; Content ID, sublicensing and resale prohibited; worldwide; 10 years; no royalty on
+    the licensee's receipts;
+  - Exclusive: perpetual; a license, not an assignment (SQ-05: Sean keeps the copyright and 50% publishing);
+    for-profit performances and broadcasting allowed; Content ID and paid advertising allowed; sublicensing and
+    standalone resale not allowed; the contract's video-program and mechanical royalty share is kept;
+  - Custom Beat: unlimited music videos; authored with the others but not offered per track.
+- **Per-track enablement stays as SQ-05**, not the BeatStars per-track settings: every published track offers the four
+  leases, Exclusive is on by default per track, and stem tiers are unavailable on tracks without stems.
+- `docs/legal/LICENSE-TIERS.md` remains a superseded draft wherever it differs (DD-21). Contract text stays private.
+
+### Sean's answers, 2026-11-11 (later): what an Exclusive grants, and catalog rights
+
+- **Exclusive is an exclusive license, never a sale of the instrumental master** (refines SQ-05). Sean always owns the
+  instrumental: its sound recording (the instrumental master) and its composition. The buyer may use, adapt and
+  commercially exploit the instrumental in new works that add the buyer's own significant, substantial and original
+  contribution, and owns that contribution. The buyer may not exploit the instrumental as Sean made it, or with only
+  minor changes, and may register their works, not the bare instrumental, with content-identification systems.
+  "Produced by Sean Vasey" is a condition of the license on every work, release, video, listing and metadata entry.
+- After an exclusive sale Sean grants no new licenses on that beat. Licenses sold before the sale stay valid for their
+  terms. Sean always keeps the right to play and share the instrumental in his portfolio, showreels, website and social
+  media, but not to sell or license new use.
+- Selling the instrumental master or composition outright is a separate, directly negotiated written agreement; the
+  store never sells it.
+- Publishing on an exclusive is 50% Sean and 50% the buyer, with the matching writer and publisher shares, replacing
+  the template's 45/35/25 split by use.
+- Sean's Exclusive template clauses 1, 2 and 5 are rewritten to match (private; the contract text stays out of Git).
+  The rewrite is a draft for his attorney's review before any live exclusive sale.
+- **Catalog rights attestation:** Sean states that all 99 imported tracks are his original productions. Staging
+  records this as each track's rights declaration (no third-party samples, Sean 100%).
+
 ### Reconciliation with the delegated decisions (DD-xx)
 
 | DD row | Status | Governing decision |
