@@ -124,7 +124,8 @@ transport and retention, or the reason it refuses. It never prints a value.
 
   ```sh
   mkdir restore && age -d -i key.txt <set>.tar.age | tar -x -C restore
-  ( cd restore/<set> && sha256sum --check --strict database.sql.sha256 private.tar.sha256 env.backup.sha256 )
+  ( cd restore/<set> && sha256sum --check --strict database.sql.sha256 env.backup.sha256 )
+  ( cd restore/<set> && if [ -d private ]; then (cd private && sha256sum --check --strict ../private.sha256); else sha256sum --check --strict private.tar.sha256; fi )
   sudo /usr/local/sbin/vasey-production-backup restore-check <path to the extracted set>   # on a host with MySQL
   ```
 

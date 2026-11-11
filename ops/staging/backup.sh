@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2015  # `test && test || die` is intended: die whenever any test fails.
-# VASEY.AUDIO staging backup: MySQL dump + private storage archive + runtime .env (APP_KEY), with an
+# VASEY.AUDIO staging backup: MySQL dump + private storage tree + runtime .env (APP_KEY), with an
 # isolated restore proof, then an optional off-host copy (rsync, or age + rclone) that runs AFTER the site is back up.
 #
 # Installed by provision.sh as /usr/local/sbin/vasey-staging-backup (root:root 0755) and run as root:
 #   vasey-staging-backup nightly            quiesce, serialized snapshot/proof, resume, start the detached off-host ship, prune (cron, 03:17 UTC)
 #   vasey-staging-backup predeploy          snapshot + restore-check + "pending ship" marker on an already-quiesced host (deploy, via ctl); never ships
-#   vasey-staging-backup space-check        refuse (exit 1) unless the disk has room for a pre-deploy snapshot; run before any quiesce
+#   vasey-staging-backup space-check [--preverify]  refuse (exit 1) unless the disk has room for a pre-deploy snapshot; run before
+#                                           any quiesce. --preverify first re-proves the files the next snapshot will share (site up)
 #   vasey-staging-backup prune              apply local retention now (newest VASEY_BACKUP_KEEP, or tiered); never the newest set
-#   vasey-staging-backup restore-check DIR  re-prove an existing backup directory
+#   vasey-staging-backup restore-check DIR  re-prove an existing backup directory (re-hashes every private file)
 #   vasey-staging-backup ship DIR           copy one backup directory off-host now (manual; clears its pending marker on success)
 #   vasey-staging-backup ship-pending       ship every pending set, newest first, with the site up (foreground; own lock; records dashboard evidence)
 #   vasey-staging-backup ship-pending-start start ship-pending detached from the caller's locks (systemd-run, else setsid) and return at once
@@ -16,8 +17,10 @@
 #   vasey-staging-backup pending-clear SET  abandon one pending set (it is then pruned by ordinary retention)
 #   vasey-staging-backup check-offhost      validate the opt-in age/rclone/retention settings (no network, ships nothing)
 #
-# The dump, archive and verification follow docs/ops/backup-restore-proof.md ("Equivalent MySQL 8.4
-# procedure") step for step. The restore target is a disposable mysqld started here on a private socket
+# The dump and its verification follow docs/ops/backup-restore-proof.md ("Equivalent MySQL 8.4 procedure") step for step.
+# Since 2026-11-11 the private store is a directory tree in the set (private/) that shares unchanged files with the previous
+# verified set by hard link, never with the live store (private-snapshot.py says why that is safe); sets taken before that
+# hold private.tar and are still restore-checked, shipped and pruned as they always were. The restore target is a disposable mysqld started here on a private socket
 # with its own datadir (never the staging server) and a fresh private directory; both are removed after
 # the proof. Encrypted columns are readable only with the same APP_KEY, so the .env is backed up with them.
 #
@@ -58,11 +61,16 @@ fi
 : "${VASEY_BACKUP_REMOTE:=}" "${VASEY_BACKUP_RCLONE_BIN:=/usr/bin/rclone}" "${VASEY_BACKUP_RCLONE_CONFIG:=/root/.config/rclone/rclone.conf}"
 : "${VASEY_BACKUP_RETENTION:=}" "${VASEY_BACKUP_KEEP_DAILY:=7}" "${VASEY_BACKUP_KEEP_WEEKLY:=4}" "${VASEY_BACKUP_KEEP_MONTHLY:=6}"
 : "${VASEY_BACKUP_REMOTE_PRUNE:=0}" "${VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE:=0}"
+# Sharing unchanged private files with the previous verified set (1, the default) or copying the whole store every time (0);
+# and how old a file's last full re-hash may be before the pre-quiesce re-verification hashes it again (0, the default: every
+# shared file is re-hashed before every quiesce, with the site up). docs/ops/staging-runbook.md section 8.
+: "${VASEY_BACKUP_LINK:=1}" "${VASEY_BACKUP_REVERIFY_HOURS:=0}"
 [ "$(id -u "$VASEY_APP_USER")" -gt 0 ] || die "application account must be nonroot"
 
 PRIVATE=$VASEY_ROOT/private
 CTL=/usr/local/sbin/vasey-staging-ctl
 NORMALIZER=/usr/local/libexec/vasey-staging/normalize-mysql-dump.py
+PRIVATE_SNAPSHOT=/usr/local/libexec/vasey-staging/private-snapshot.py
 DUMP_FLAGS=(--single-transaction --quick --routines --triggers --events --hex-blob --no-tablespaces
             --set-gtid-purged=OFF --skip-dump-date --skip-comments --databases "$VASEY_DB_NAME")
 
@@ -133,15 +141,18 @@ snapshot() {
   fi
   (cd "$out" && sha256sum database.sql > database.sql.sha256)
 
-  # 2. Private files with a manifest. Refuse anything the manifest would not cover.
-  local unmanifested dirs
-  unmanifested=$(cd "$PRIVATE" && find . \( ! -type f ! -type d \) -o \( -type f -links +1 \)) || die "find failed"
-  [ -z "$unmanifested" ] || { mv -- "$out" "$out.FAILED"; die "unmanifested entry (symlink, hard link or special file) in private storage"; }
-  (cd "$PRIVATE" && find . -type f -print0 | sort -z | xargs -0 -r sha256sum) > "$out/private.sha256"
-  dirs=$(cd "$PRIVATE" && find . -type d) || die "find failed"
-  printf '%s\n' "$dirs" | LC_ALL=C sort > "$out/private.dirs"
-  tar --create --file="$out/private.tar" --directory="$PRIVATE" --numeric-owner . || { mv -- "$out" "$out.FAILED"; die "tar failed"; }
-  (cd "$out" && sha256sum private.tar > private.tar.sha256)
+  # 2. Private files: a root-only tree with manifests (private.sha256, private.dirs, private.index). Files unchanged since the
+  #    newest verified set are hard links to THAT SET's verified copies; everything else is copied from the live store, which is
+  #    never linked. Symlinks, hard links and special files in the live store are refused, as before.
+  [ -f "$PRIVATE_SNAPSHOT" ] && [ ! -L "$PRIVATE_SNAPSHOT" ] \
+    || { mv -- "$out" "$out.FAILED"; die "missing $PRIVATE_SNAPSHOT; re-run provision.sh"; }
+  local src private_summary
+  local -a sharing=()
+  src=$(link_source "$(basename -- "$out")") || src=''
+  [ -z "$src" ] || sharing=(--link-from "$src" --link-max-age-hours "$(link_max_age_hours)")
+  if ! private_summary=$(python3 -I "$PRIVATE_SNAPSHOT" snapshot --live "$PRIVATE" --set "$out" "${sharing[@]}"); then
+    mv -- "$out" "$out.FAILED"; die "private snapshot failed (reason above); kept as $out.FAILED for inspection"
+  fi
 
   # 3. Key custody: the served release's .env carries APP_KEY. Without it encrypted columns are unreadable.
   if [ "$sha" != none ]; then
@@ -156,8 +167,10 @@ snapshot() {
     echo "database=$VASEY_DB_NAME"
     echo "private_files=$(wc -l < "$out/private.sha256")"
     echo "private_dirs=$(wc -l < "$out/private.dirs")"
+    echo "private_format=tree"
+    printf '%s\n' "$private_summary" | grep -E '^(copied_files|copied_bytes|linked_files|linked_bytes|link_source)=' | sed 's/^/private_/'
   } > "$out/MANIFEST"
-  log "snapshot written: $(basename "$out")"
+  log "snapshot written: $(basename "$out") (private: $(printf '%s' "$private_summary" | grep -E '^(copied|linked)_(files|bytes)=|^link_source=|^link_refused=' | tr '\n' ' '))"
   printf '%s\n' "$out" > "$VASEY_BACKUP_DIR/.last"
 }
 
@@ -173,12 +186,22 @@ cleanup_restore() {
 }
 
 # ---- restore-check: docs/ops/backup-restore-proof.md steps 3-4 against isolated targets ----
-restore_check() {
-  local bk=${1:?backup directory}
+# The private part is either private.tar (sets taken before 2026-11-11: extracted as the application user and verified) or the
+# private/ tree (verified in place by private-snapshot.py: exact names, directories, modes and owner, and the SHA-256 of every
+# file it copied, plus every shared file whose last full re-hash is older than REHASH_HOURS; 0, the default and what a manual
+# `restore-check DIR` uses, re-hashes every file). The predeploy proof passes the link age, because the files it shared were
+# re-hashed before the quiesce.
+restore_check() {  # restore_check DIR [REHASH_HOURS]
+  local bk=${1:?backup directory} rehash_hours=${2:-0} format
   [ -d "$bk" ] && [ ! -L "$bk" ] || die "not a backup directory"
+  [[ "$rehash_hours" =~ ^[0-9]{1,4}$ ]] || die "restore-check: re-hash age must be whole hours"
   # A success marker describes this proof attempt, never an earlier attempt that now fails.
   rm -f -- "$bk/RESTORE_CHECK" || die "cannot invalidate previous restore proof"
-  [ -d "$bk" ] && [ -f "$bk/database.sql" ] && [ -f "$bk/private.tar" ] || die "not a backup directory"
+  rm -f -- "$bk/private.verified" || die "cannot invalidate previous private verification"
+  if [ -f "$bk/private.tar" ] && [ ! -L "$bk/private.tar" ] && [ ! -e "$bk/private" ] && [ ! -L "$bk/private" ]; then format=tar
+  elif [ -d "$bk/private" ] && [ ! -L "$bk/private" ] && [ -f "$bk/private.index" ] && [ ! -e "$bk/private.tar" ] && [ ! -L "$bk/private.tar" ]; then format=tree
+  else die "not a backup directory"; fi
+  [ -d "$bk" ] && [ -f "$bk/database.sql" ] || die "not a backup directory"
   [ -f "$bk/MANIFEST" ] && [ ! -L "$bk/MANIFEST" ] \
     && [ "$(grep -c '^release_sha=' "$bk/MANIFEST")" = 1 ] || die "backup has no unambiguous release manifest"
   local release_sha
@@ -195,7 +218,11 @@ restore_check() {
     # Check the exact recorded file, never another pathname supplied by the hash manifest.
     (cd "$bk" && sha256sum env.backup | cmp -s - env.backup.sha256) || die "env.backup hash mismatch"
   fi
-  (cd "$bk" && sha256sum --check --quiet database.sql.sha256 private.tar.sha256) || die "backup files do not match their recorded hashes"
+  if [ "$format" = tar ]; then
+    (cd "$bk" && sha256sum --check --quiet database.sql.sha256 private.tar.sha256) || die "backup files do not match their recorded hashes"
+  else
+    (cd "$bk" && sha256sum --check --quiet database.sql.sha256) || die "backup files do not match their recorded hashes"
+  fi
 
   install -d -m 0711 -o root -g root -- "$VASEY_RESTORE_CHECK_DIR"
   # Globals, so the EXIT trap still sees them when die() exits from inside this function.
@@ -203,7 +230,14 @@ restore_check() {
   RC_SOCK=$RC_WORK/run/mysqld.sock
   RC_PID=""
   trap cleanup_restore EXIT
-  local data=$RC_WORK/data run=$RC_WORK/run sock=$RC_SOCK rpriv=$RC_WORK/private
+  local data=$RC_WORK/data run=$RC_WORK/run sock=$RC_SOCK rpriv=$RC_WORK/private private_proof=''
+  # A tree set is verified in place first: it is the cheaper failure, and nothing of it is extracted.
+  if [ "$format" = tree ]; then
+    [ -f "$PRIVATE_SNAPSHOT" ] && [ ! -L "$PRIVATE_SNAPSHOT" ] || die "missing $PRIVATE_SNAPSHOT; re-run provision.sh"
+    private_proof=$(python3 -I "$PRIVATE_SNAPSHOT" verify "$bk" --rehash-older-than-hours "$rehash_hours" \
+      --strict-modes "$([ "$VASEY_RESTORE_STRICT_MODES" = 1 ] && echo 1 || echo 0)") \
+      || { rm -f -- "$bk/private.verified"; die "private tree verification failed (reason above); no restore proof published"; }
+  fi
 
   # Disposable server: its own datadir and socket, no TCP, no binlog, never the staging server.
   install -d -m 0700 -o mysql -g mysql -- "$data" "$run"
@@ -220,27 +254,33 @@ restore_check() {
   [ "$up" = 1 ] || { tail -n 5 "$run/error.log" >&2 2>/dev/null || true; die "disposable mysqld did not start"; }
   local R=(--no-defaults --socket="$sock" -uroot)
 
-  # 3. Load the dump unchanged; restore private files as the application user into a fresh directory.
+  # 3. Load the dump unchanged; restore private files as the application user into a fresh directory (archive sets only).
   mysql "${R[@]}" < "$bk/database.sql" || die "loading the dump into the disposable server failed"
-  install -d -m 0700 -o "$VASEY_APP_USER" -g "$VASEY_APP_GROUP" -- "$rpriv"
-  runuser -u "$VASEY_APP_USER" -- tar --extract --file=- --directory="$rpriv" --no-same-owner --preserve-permissions \
-    8>&- 7<&- < "$bk/private.tar" || die "private archive extraction failed"
-
-  # 4. Verify: exact file set and hashes, exact directory set, owner-only modes and ownership, re-dump diff.
-  if [ -s "$bk/private.sha256" ]; then
-    (cd "$rpriv" && sha256sum --check --strict --quiet "$bk/private.sha256") || die "restored file hash mismatch"
-  fi
-  diff <(cd "$rpriv" && find . ! -type d | LC_ALL=C sort) <(cut -c67- "$bk/private.sha256" | LC_ALL=C sort) >/dev/null \
-    || die "restored file names differ from the manifest"
-  local restored_dirs; restored_dirs=$(cd "$rpriv" && find . -type d) || die "find failed"
-  diff <(printf '%s\n' "$restored_dirs" | LC_ALL=C sort) "$bk/private.dirs" >/dev/null || die "restored directories differ"
   local widened foreign mode_result=pass
-  widened=$(cd "$rpriv" && find . \( -type f ! -path ./.gitignore ! -perm 0600 ! -perm 0400 \) -o \( -type d ! -perm 0700 \)) || die "find failed"
-  foreign=$(cd "$rpriv" && find . \( ! -user "$VASEY_APP_USER" -o ! -group "$VASEY_APP_GROUP" \)) || die "find failed"
-  if [ -n "$widened" ] || [ -n "$foreign" ] \
-     || ! (cd "$rpriv" && { [ ! -e .gitignore ] || [ "$(stat -c %a .gitignore)" = 644 ]; }); then
-    mode_result="fail ($(printf '%s\n' "$widened" "$foreign" | grep -c . || true) entries outside 0600/0400 files, 0700 dirs or $VASEY_APP_USER ownership)"
-    [ "$VASEY_RESTORE_STRICT_MODES" = 1 ] && die "restored tree $mode_result; inspect with: cd $PRIVATE && find . \\( -type f ! -path ./.gitignore ! -perm 0600 ! -perm 0400 \\) -o \\( -type d ! -perm 0700 \\)"
+  if [ "$format" = tar ]; then
+    install -d -m 0700 -o "$VASEY_APP_USER" -g "$VASEY_APP_GROUP" -- "$rpriv"
+    runuser -u "$VASEY_APP_USER" -- tar --extract --file=- --directory="$rpriv" --no-same-owner --preserve-permissions \
+      8>&- 7<&- < "$bk/private.tar" || die "private archive extraction failed"
+
+    # 4. Verify: exact file set and hashes, exact directory set, owner-only modes and ownership, re-dump diff.
+    if [ -s "$bk/private.sha256" ]; then
+      (cd "$rpriv" && sha256sum --check --strict --quiet "$bk/private.sha256") || die "restored file hash mismatch"
+    fi
+    diff <(cd "$rpriv" && find . ! -type d | LC_ALL=C sort) <(cut -c67- "$bk/private.sha256" | LC_ALL=C sort) >/dev/null \
+      || die "restored file names differ from the manifest"
+    local restored_dirs; restored_dirs=$(cd "$rpriv" && find . -type d) || die "find failed"
+    diff <(printf '%s\n' "$restored_dirs" | LC_ALL=C sort) "$bk/private.dirs" >/dev/null || die "restored directories differ"
+    widened=$(cd "$rpriv" && find . \( -type f ! -path ./.gitignore ! -perm 0600 ! -perm 0400 \) -o \( -type d ! -perm 0700 \)) || die "find failed"
+    foreign=$(cd "$rpriv" && find . \( ! -user "$VASEY_APP_USER" -o ! -group "$VASEY_APP_GROUP" \)) || die "find failed"
+    if [ -n "$widened" ] || [ -n "$foreign" ] \
+       || ! (cd "$rpriv" && { [ ! -e .gitignore ] || [ "$(stat -c %a .gitignore)" = 644 ]; }); then
+      mode_result="fail ($(printf '%s\n' "$widened" "$foreign" | grep -c . || true) entries outside 0600/0400 files, 0700 dirs or $VASEY_APP_USER ownership)"
+      [ "$VASEY_RESTORE_STRICT_MODES" = 1 ] && die "restored tree $mode_result; inspect with: cd $PRIVATE && find . \\( -type f ! -path ./.gitignore ! -perm 0600 ! -perm 0400 \\) -o \\( -type d ! -perm 0700 \\)"
+    fi
+  else
+    # 4. (tree) The in-place verification above proved names, directories, modes and owner and the hashes it reports; a restore
+    #    streams the tree to the application user (runbook section 9, case B), which gives it that user's ownership.
+    mode_result=$(printf '%s\n' "$private_proof" | sed -n 's/^modes_and_ownership=//p')
   fi
   ( umask 077; : > "$bk/redump.sql" )
   mysqldump "${R[@]}" "${DUMP_FLAGS[@]}" > "$bk/redump.sql" || die "re-dump from the disposable server failed"
@@ -275,6 +315,8 @@ restore_check() {
   cleanup_restore || die "disposable restore cleanup failed; no restore proof published"
   trap - EXIT
   local marker
+  local -a proof_fields=()
+  mapfile -t proof_fields < <(printf '%s\n' "$private_proof" | grep -E '^(rehashed_files|rehashed_bytes|trusted_linked_files|oldest_hash_utc)=' | sed 's/^/private_/' || true)
   marker=$(mktemp "$bk/.RESTORE_CHECK.XXXXXXXX")
   if ! printf '%s\n' \
     "restore_checked_utc=$(date -u +%FT%TZ)" \
@@ -286,6 +328,8 @@ restore_check() {
     "private_dirs_verified=$(grep -c . "$bk/private.dirs" || true)" \
     "modes_and_ownership=$mode_result" \
     "app_key_present=$([ -f "$bk/env.backup" ] && echo yes || echo no)" \
+    "private_format=$format" \
+    "${proof_fields[@]}" \
     > "$marker" || ! mv -T -- "$marker" "$bk/RESTORE_CHECK"; then
     rm -f -- "$marker"
     die "cannot publish restore proof"
@@ -318,6 +362,59 @@ SHIP_PENDING_UNIT=vasey-staging-ship-pending
 SHIP_PENDING_LOCK_WAIT=3600
 # More pending sets than this means the remote has been failing for days; each one is about a set of disk (ship_pending logs a warning).
 PENDING_WARN=3
+
+# ---- the private tree: which earlier set a snapshot may share unchanged files with ----
+# Hours a shared file's last full re-hash may be old at snapshot time: the re-verification threshold plus the time a build may
+# take between the pre-quiesce re-verification and the snapshot. An older one is copied again, never trusted.
+LINK_SLACK_HOURS=6
+reverify_hours() {
+  local h=${VASEY_BACKUP_REVERIFY_HOURS:-0}
+  [[ "$h" =~ ^[0-9]{1,3}$ ]] || { log "WARNING: VASEY_BACKUP_REVERIFY_HOURS must be a whole number of hours; using 0 (re-hash everything)"; h=0; }
+  printf '%s' "$((10#$h))"
+}
+link_max_age_hours() { printf '%s' "$(( $(reverify_hours) + LINK_SLACK_HOURS ))"; }
+
+# The newest set a snapshot may share files with: a tree set whose restore proof passed and whose files carry a verification
+# record. Prints nothing when sharing is off or no set qualifies (the snapshot then copies the whole store).
+link_source() {  # link_source [EXCLUDE_SET_NAME]
+  case "${VASEY_BACKUP_LINK:-1}" in
+    1) ;;
+    0) return 0 ;;
+    *) log "WARNING: VASEY_BACKUP_LINK must be 0 or 1; copying the whole private store"; return 0 ;;
+  esac
+  local d bk
+  while IFS= read -r d; do
+    [ "$d" != "${1:-}" ] && [[ "$d" =~ $SET_NAME_RE ]] || continue
+    bk=$VASEY_BACKUP_DIR/$d
+    grep -qx 'result=RESTORE_VERIFIED' "$bk/RESTORE_CHECK" 2>/dev/null || continue
+    [ -d "$bk/private" ] && [ ! -L "$bk/private" ] && [ -f "$bk/private.index" ] && [ -f "$bk/private.verified" ] || continue
+    printf '%s\n' "$bk"
+    return 0
+  done < <(find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -name '20*Z-*' ! -name '*.FAILED' -printf '%f\n' 2>/dev/null | LC_ALL=C sort -r)
+  return 0
+}
+
+# Re-proves the files of the set the next snapshot will share, with the site still up, so that the proof inside the maintenance
+# window only has to hash what is new. A failure means that set's files no longer match its manifest: its restore proof and
+# verification are withdrawn (a failed reproof never keeps an earlier success claim) and the next snapshot copies everything.
+# Never fails its caller.
+preverify_link_source() {
+  [ -n "${PRIVATE_SNAPSHOT:-}" ] && [ -f "$PRIVATE_SNAPSHOT" ] || return 0
+  local src out
+  src=$(link_source) || src=''
+  if [ -z "$src" ]; then
+    log "no verified tree set to share files with: the next snapshot copies the whole private store"
+    return 0
+  fi
+  if out=$(python3 -I "$PRIVATE_SNAPSHOT" verify "$src" --rehash-older-than-hours "$(reverify_hours)" \
+             --strict-modes "$([ "${VASEY_RESTORE_STRICT_MODES:-1}" = 0 ] && echo 0 || echo 1)" 2>&1); then
+    log "re-verified the private files of $(basename -- "$src") before the quiesce: $(printf '%s' "$out" | tr '\n' ' ')"
+  else
+    rm -f -- "$src/private.verified" "$src/RESTORE_CHECK"
+    log "WARNING: $(basename -- "$src") failed its private file re-verification ($(printf '%s' "$out" | tr '\n' ' ' | cut -c1-300)); its restore proof was withdrawn and the next snapshot copies the whole private store. Inspect it with: vasey-staging-backup restore-check $src"
+  fi
+  return 0
+}
 
 hardening_requested() {
   [ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] || [ -n "$VASEY_BACKUP_REMOTE" ] || [ "$VASEY_BACKUP_REQUIRE_ENCRYPTION" = 1 ]
@@ -916,12 +1013,15 @@ prune_local() {
 }
 
 # ---- free-space pre-check (the deploy runs it BEFORE any quiesce) ----
-# A snapshot needs room for the dump and the private archive in the backup directory and the restore proof's extracted store and
-# disposable datadir under VASEY_RESTORE_CHECK_DIR (often the same filesystem). An age/rclone shipment stages one more
-# set-sized encrypted copy in the backup directory, but only AFTER the deploy (ship-pending), when the restore proof's scratch
-# is already gone; so on a shared filesystem the peak is the set plus the larger of the two (proof scratch, encrypted copy), not
-# both. The encrypted copy is still counted: a deploy the disk could not ship afterwards would leave the new set pending. 2026-11-10: five deploys left five 14 GB sets, the disk reached 96%
-# and tar died mid-snapshot with the site already stopped. Refusing here leaves the served release untouched.
+# A snapshot needs room in the backup directory for the dump and for the private files it COPIES (files it shares with the
+# previous verified set take no space; private-snapshot.py estimate counts them exactly as the snapshot would decide, and without
+# it the whole store is counted), and the restore proof's disposable datadir under VASEY_RESTORE_CHECK_DIR (often the same
+# filesystem; a tree set is verified in place, nothing is extracted). An age/rclone shipment stages one more encrypted copy of
+# the WHOLE set (shared files included) in the backup directory, but only AFTER the deploy (ship-pending), when the restore proof's
+# scratch is already gone; so on a shared filesystem the peak is the new bytes plus the larger of the two (proof scratch, encrypted
+# copy), not both. The encrypted copy is still counted: a deploy the disk could not ship afterwards would leave the new set
+# pending. 2026-11-10: five deploys left five 14 GB sets, the disk reached 96% and tar died mid-snapshot with the site already
+# stopped. Refusing here leaves the served release untouched.
 SPACE_MARGIN_PCT=20
 SPACE_MARGIN_BYTES=268435456
 
@@ -947,19 +1047,31 @@ nearest_existing() {  # nearest_existing PATH -> PATH or its closest existing an
   printf '%s' "$p"
 }
 
-space_check() {
-  local priv db set_need need restore_need ship_need avail restore_avail backup_at restore_at margin
+space_check() {  # space_check [--preverify]
+  local priv db copy full set_need need restore_need ship_need avail restore_avail backup_at restore_at margin src estimate
+  # Re-proving the shared set first (site still up) decides what the snapshot may share, and so what it must copy.
+  [ "${1:-}" != --preverify ] || preverify_link_source
   [ -d "$PRIVATE" ] && [ ! -L "$PRIVATE" ] || die "private root missing"
   priv=$(du -sb -- "$PRIVATE" | cut -f1)
   db=$(snapshot_db_bytes) || die "cannot estimate the database size (query and newest set both unavailable); no snapshot attempted, nothing stopped"
   [[ "$priv" =~ ^[0-9]+$ && "$db" =~ ^[0-9]+$ ]] || die "cannot size the snapshot; nothing stopped"
-  set_need=$((priv + db))
+  copy=$priv
+  if [ -n "${PRIVATE_SNAPSHOT:-}" ] && [ -f "$PRIVATE_SNAPSHOT" ]; then
+    src=$(link_source) || src=''
+    if [ -n "$src" ] && estimate=$(python3 -I "$PRIVATE_SNAPSHOT" estimate --live "$PRIVATE" --link-from "$src" \
+         --link-max-age-hours "$(link_max_age_hours)" 2>/dev/null); then
+      estimate=$(printf '%s\n' "$estimate" | sed -n 's/^copy_bytes=//p')
+      if [[ "$estimate" =~ ^[0-9]+$ ]]; then copy=$estimate; fi
+    fi
+  fi
+  full=$((priv + db))      # the whole set: what an encrypted copy of it holds
+  set_need=$((copy + db))  # what the snapshot writes
   need=$set_need
   ship_need=0
-  # The shipment of an earlier set may still be encrypting (its staging copy grows to one set while this snapshot runs).
-  if hardening_requested; then ship_need=$set_need; fi
-  if hardening_requested && { offhost_ship_running || ship_pending_running; }; then need=$((need + set_need)); fi
-  restore_need=$set_need   # restore proof: extracted private store + disposable datadir
+  # The shipment of an earlier set may still be encrypting (its staging copy grows to one whole set while this snapshot runs).
+  if hardening_requested; then ship_need=$full; fi
+  if hardening_requested && { offhost_ship_running || ship_pending_running; }; then need=$((need + full)); fi
+  restore_need=$db   # restore proof: the disposable datadir (a tree set is verified in place; nothing is extracted)
   backup_at=$(nearest_existing "$VASEY_BACKUP_DIR"); restore_at=$(nearest_existing "$VASEY_RESTORE_CHECK_DIR")
   if [ "$(stat -c %d -- "$backup_at")" = "$(stat -c %d -- "$restore_at")" ]; then
     # Sequential on one filesystem: proof scratch during the quiesce, encrypted copy after the resume.
@@ -978,7 +1090,7 @@ space_check() {
     [[ "$restore_avail" =~ ^[0-9]+$ ]] && [ "$restore_avail" -ge "$restore_need" ] \
       || die "not enough free disk space for the restore proof: $restore_avail bytes free, about $restore_need bytes needed in $VASEY_RESTORE_CHECK_DIR; nothing was stopped (docs/ops/staging-runbook.md section 9, out of disk during snapshot)"
   fi
-  log "free space ok for the pre-deploy snapshot: $avail bytes free, about $need needed"
+  log "free space ok for the pre-deploy snapshot: $avail bytes free, about $need needed ($copy of $priv private bytes to copy)"
 }
 
 # ---- dashboard evidence (FP-028, docs/staff-reporting.md) ----
@@ -996,7 +1108,8 @@ record_evidence() {  # record_evidence KIND ok|failed [SET_DIR]
     return 0
   fi
   if [ "$status" = ok ] && [ -n "$bk" ] && [ -d "$bk" ] && [ ! -L "$bk" ]; then
-    bytes=$(find "$bk" -maxdepth 1 -type f -printf '%s\n' 2>/dev/null | awk '{ s += $1 } END { printf "%.0f", s }') || bytes=''
+    # Every file of the set, the private tree included (shared files count in full: this is the set's own size).
+    bytes=$(find "$bk" -type f -printf '%s\n' 2>/dev/null | awk '{ s += $1 } END { printf "%.0f", s }') || bytes=''
     sha=$(head -c 64 -- "$bk/database.sql.sha256" 2>/dev/null) || sha=''
     [[ "$bytes" =~ ^[1-9][0-9]{0,15}$ ]] && args+=(--bytes="$bytes")
     [[ "$sha" =~ ^[0-9a-f]{64}$ ]] && args+=(--sha256="$sha")
@@ -1016,7 +1129,7 @@ case "${1:-}" in
     flock -n 9 || die "a deploy or another backup holds the lock; skipping this run"
     # No space-check, no snapshot: pending sets are never pruned, so a long remote outage fills the disk. Refuse before the
     # quiesce (the site was never stopped), record the failure, and still drain the backlog.
-    if ! ( space_check ); then
+    if ! ( space_check --preverify ); then
       note_snapshot_failed
       record_evidence daily failed
       ship_pending_start
@@ -1047,7 +1160,9 @@ case "${1:-}" in
   predeploy)
     install -d -m 0700 -o root -g root -- "$VASEY_BACKUP_DIR"
     snapshot
-    restore_check "$(cat "$VASEY_BACKUP_DIR/.last")"
+    # The files this snapshot shared were re-hashed before the quiesce (space-check --preverify); the proof re-hashes what it
+    # copied and any shared file whose last full re-hash is older than the link age.
+    restore_check "$(cat "$VASEY_BACKUP_DIR/.last")" "$(link_max_age_hours)"
     # Runs with the site quiesced, so nothing here may touch the network or take time proportional to the set: no age, no rclone,
     # no rsync. The off-host copy is queued and sent after the release is resumed and healthy (ctl activate/refresh and the
     # nightly run start ship-pending). Queuing never fails the deploy.
@@ -1057,7 +1172,10 @@ case "${1:-}" in
     # and proof succeeded.
     ( prune_local "$(basename -- "$(cat "$VASEY_BACKUP_DIR/.last")")" ) || log "WARNING: local retention after the pre-deploy snapshot did not complete; run 'vasey-staging-ctl backup-prune'"
     ;;
-  space-check) space_check ;;
+  space-check)
+    case "${2:-}" in ''|--preverify) ;; *) die "usage: vasey-staging-backup space-check [--preverify]" ;; esac
+    space_check "${2:-}"
+    ;;
   prune)
     [ -d "$VASEY_BACKUP_DIR" ] || die "no backup directory"
     prune_local
@@ -1081,5 +1199,5 @@ case "${1:-}" in
     offhost_config_ok || die "off-host configuration refused"
     log "off-host configuration ok (encryption: $([ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] && echo age || { [ -n "$VASEY_BACKUP_REMOTE" ] && echo 'none by this script, explicitly allowed' || echo none; }); transport: $([ -n "$VASEY_BACKUP_REMOTE" ] && echo rclone || { [ -n "$VASEY_BACKUP_DEST" ] && echo rsync || echo none; }); retention: ${VASEY_BACKUP_RETENTION:-flat}; $(retry_copies_summary))"
     ;;
-  *) die "usage: vasey-staging-backup nightly | predeploy | space-check | prune | restore-check DIR | ship DIR | ship-pending | ship-pending-start | pending | pending-clear SET | check-offhost" ;;
+  *) die "usage: vasey-staging-backup nightly | predeploy | space-check [--preverify] | prune | restore-check DIR | ship DIR | ship-pending | ship-pending-start | pending | pending-clear SET | check-offhost" ;;
 esac

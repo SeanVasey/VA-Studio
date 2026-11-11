@@ -19,7 +19,8 @@
 #   vasey-staging-ctl switch <40-hex SHA>     atomically select a sealed, attached release while quiesced
 #   vasey-staging-ctl snapshot                pre-deploy backup + isolated restore proof + "pending ship" marker (requires quiesce first); never ships
 #   vasey-staging-ctl ship-pending            start the detached off-host shipment of pending backup sets (site up); returns at once
-#   vasey-staging-ctl space-check            refuse unless the disk has room for a pre-deploy snapshot (run before any quiesce)
+#   vasey-staging-ctl space-check            refuse unless the disk has room for a pre-deploy snapshot (run before any quiesce;
+#                                             prepare and refresh also re-verify the backup files the snapshot will share)
 #   vasey-staging-ctl backup-prune            apply local backup retention (VASEY_BACKUP_KEEP; tiered if configured); never the newest set
 #   vasey-staging-ctl prepare <SHA> <env> <evidence>   root lease across quiesce, checkout/build and sealing
 #   vasey-staging-ctl activate <SHA> <evidence>        root lease across quiesce, snapshot, migration, switch/resume
@@ -370,9 +371,11 @@ cmd_snapshot() {
   "$BACKUP_BIN" predeploy
 }
 
-cmd_space_check() {
+# --preverify (prepare and refresh, before their quiesce): first re-hash the backup files the next snapshot will share with the
+# previous set, while the site is still up, so the snapshot and its proof inside the maintenance window only handle new files.
+cmd_space_check() {  # cmd_space_check [--preverify]
   [ -x "$BACKUP_BIN" ] || die "missing $BACKUP_BIN"
-  "$BACKUP_BIN" space-check
+  "$BACKUP_BIN" space-check ${1:+"$1"}
 }
 
 # Off-host shipping runs after the release is resumed and healthy, detached from this lease and from the deploy lock (a transient
@@ -453,7 +456,7 @@ cmd_prepare() {
   protected_dir "$ROOT"
   release_step_file
   operation_evidence "$evidence"
-  cmd_space_check   # before any quiesce: a full disk must refuse here, not mid-snapshot with the site stopped
+  cmd_space_check --preverify   # before any quiesce: a full disk must refuse here, not mid-snapshot with the site stopped
   operation_begin prepare "$sha"
   cmd_quiesce
   OPERATION_ENV=$(mktemp "$ROOT/.build-env.XXXXXXXX") || die "cannot stage protected build environment"
@@ -494,7 +497,7 @@ cmd_activate() {
 cmd_refresh() {
   local sha=$1 candidate=$2
   valid_sha "$sha" || die "refresh needs a 40-hex SHA"
-  cmd_space_check   # before any quiesce, as in prepare
+  cmd_space_check --preverify   # before any quiesce, as in prepare
   operation_begin refresh "$sha"
   cmd_quiesce
   cmd_snapshot

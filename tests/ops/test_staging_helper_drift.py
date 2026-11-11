@@ -14,7 +14,7 @@ DEPLOY = (REPO / "ops/staging/forge-deploy.sh").read_text()
 START = "# ---------------------------------------------------------------- 0. installed helpers match this kit"
 END = "# ---------------------------------------------------------------- 0. runtime .env checks"
 SOURCES = ["bin/vasey-staging-ctl", "backup.sh", "scheduler-watch.sh", "release-step.sh", "seal-release.py", "normalize-mysql-dump.py",
-           "tls/origin-ca.pem", "nginx/vasey-staging-http.conf"]
+           "private-snapshot.py", "tls/origin-ca.pem", "nginx/vasey-staging-http.conf"]
 
 
 class HelperDriftTest(unittest.TestCase):

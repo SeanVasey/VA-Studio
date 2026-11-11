@@ -39,7 +39,8 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 | `php-fpm/vasey-paid-delivery.conf` | Dedicated paid-delivery pool (7,800 s, no CPU cap), per `docs/ops/paid-delivery-runtime.md` | `/etc/php/8.4/fpm/pool.d/` |
 | `workers/vasey-staging-workers.conf` | Supervisor programs for the `media`, `payments`, `contracts` and `default`/`inquiry-alerts` workers, plus the scheduler | `/etc/supervisor/conf.d/vasey-staging.conf` |
 | `bin/vasey-staging-ctl` | Root helper: allocate/seal release ancestry, attach/detach storage, switch, quiesce, resume, snapshot, space-check, backup-prune, prune. It is the only sudo grant. | `/usr/local/sbin/` |
-| `backup.sh` | Nightly backup: dump, private archive, `.env`, an isolated restore proof, then an off-host copy | `/usr/local/sbin/vasey-staging-backup` |
+| `backup.sh` | Nightly and pre-deploy backup: dump, private tree, `.env`, an isolated restore proof; the off-host copy ships after the resume | `/usr/local/sbin/vasey-staging-backup` |
+| `private-snapshot.py` | The private tree of a backup set: copies new or changed files, hard-links unchanged ones to the previous verified set (never to the live store), verifies and estimates | `/usr/local/libexec/vasey-staging/` |
 | `seal-release.py` | Parent-first protected code sealing and safe private environment capture | `/usr/local/libexec/vasey-staging/` |
 | `release-step.sh` | Fixed unprivileged build and migration/cache steps under the enclosing root lease | `/usr/local/libexec/vasey-staging/` |
 | `normalize-mysql-dump.py` | Schema-only charset rendering comparison; preserves retained data bytes | `/usr/local/libexec/vasey-staging/` |
@@ -209,7 +210,7 @@ renaming that account breaks every guarded write.
 
 `forge-deploy.sh` runs as `forge` and follows `docs/ops/production-activation-packet.md` §4 (S1):
 
-Before anything else it compares the root-installed helpers (`vasey-staging-ctl`, `vasey-staging-backup`, `release-step.sh`, `seal-release.py`, `normalize-mysql-dump.py` and the nginx http file) with the kit at the deployed SHA, and refuses until `provision.sh` is re-run if any differ. A deploy never refreshes them itself.
+Before anything else it compares the root-installed helpers (`vasey-staging-ctl`, `vasey-staging-backup`, `release-step.sh`, `seal-release.py`, `normalize-mysql-dump.py`, `private-snapshot.py` and the nginx http file) with the kit at the deployed SHA, and refuses until `provision.sh` is re-run if any differ. A deploy never refreshes them itself.
 
 1. It freezes one private copy of the Forge `.env` and validates that candidate without printing values:
    - `APP_ENV` equals the configured value; `APP_DEBUG=false`; HTTPS `APP_URL`; secure cookies;
@@ -226,10 +227,11 @@ Before anything else it compares the root-installed helpers (`vasey-staging-ctl`
 4. The frozen `.env` starts as 0600. The built candidate repeats real Laravel admission before
    `vasey-staging-ctl attach` seals code and environment onto protected inodes, verifies the explicit runtime
    exceptions and bind-mounts private storage.
-0. Before anything is stopped, `ctl space-check` (the backup helper's `space-check`) estimates the snapshot (private store +
-   database + restore proof + margin, plus an encrypted copy when off-host hardening is on) against the free bytes and refuses
-   with the served release untouched ("FAILED before the quiesce"). `ctl prepare`, `activate` and `refresh` repeat it before
-   their own operation marker. After the snapshot (predeploy) and after a successful deploy, `ctl backup-prune` /
+0. Before anything is stopped, `ctl space-check` (the backup helper's `space-check`) estimates the snapshot (the private bytes it
+   will copy + database + restore proof + margin, plus an encrypted copy of the whole set when off-host hardening is on) against
+   the free bytes and refuses with the served release untouched ("FAILED before the quiesce"). `ctl prepare`, `activate` and
+   `refresh` repeat it before their own operation marker; `prepare` and `refresh` first re-hash the private files of the backup
+   set the snapshot will share (`space-check --preverify`, site still up; runbook section 8). After the snapshot (predeploy) and after a successful deploy, `ctl backup-prune` /
    `vasey-staging-backup prune` apply `VASEY_BACKUP_KEEP` (or the tiered policy), never the set just taken; see
    `docs/ops/staging-runbook.md` sections 8 and 9.
 5. `ctl activate` obtains one root lease and repeats fresh quiesce/stopped proof immediately before snapshot. It establishes:
@@ -339,18 +341,21 @@ There is no global CSP: the application sets CSP on the responses that need one.
 
 `vasey-staging-backup nightly` (cron, 03:17 UTC) runs these steps:
 
-1. Quiesces the host. Maintenance lasts through the snapshot, restore proof and optional off-host transfer;
-   duration depends on retained media and database size.
-2. Writes a `mysqldump --single-transaction` of the schema, the private-storage archive with file and
-   directory manifests, and the served `.env` (it holds `APP_KEY`).
-3. Proves the restore inside the serialized `ctl snapshot` action. A disposable `mysqld` on a private socket loads the dump and re-dumps it, the archive is
-   extracted as `forge` into a fresh directory, and hashes, names, directories, modes and ownership are checked.
+1. Re-hashes, with the site still up, the private files of the newest verified set (the one the snapshot will share), then
+   quiesces the host. Maintenance lasts through the snapshot and restore proof; its length depends on the database size and on
+   how many private bytes changed since the previous set (the off-host copy ships after the resume).
+2. Writes a `mysqldump --single-transaction` of the schema, the private tree with file and directory manifests (new or changed
+   files copied, unchanged ones hard-linked to the previous verified set, never to the live store; runbook section 8), and the
+   served `.env` (it holds `APP_KEY`).
+3. Proves the restore inside the serialized `ctl snapshot` action. A disposable `mysqld` on a private socket loads the dump and re-dumps it, and the
+   private tree is verified in place: names, directories, modes and ownership, the SHA-256 of every copied file and the inode identity of every shared one
+   (a set from before 2026-11-11 is still extracted as `forge` and checked).
    Only the immediate charset attribute of a string column in the dump's matching table-definition block
    may be normalized. All row/default/comment/routine bytes remain exact. Reproof invalidates an old success
    marker before checking hashes; a new marker is published atomically after verification and cleanup.
    Delimiter directives count only outside SQL strings/comments. An explicit `NO_BACKSLASH_ESCAPES` mode
    refuses normalization rather than guessing literal boundaries; retain the failed proof for review.
-4. Copies the set off-host with `rsync` over SSH if `VASEY_BACKUP_DEST` is set in `/etc/vasey-staging/staging.conf`.
+4. Off-host copy: only after the resume in step 5, a detached shipment sends the set (`rsync` over SSH if `VASEY_BACKUP_DEST` is set, or age + rclone).
 5. Resumes the site, including after a failed snapshot/proof/transfer, then reports any failure. Successful
    runs prune old local sets (a deploy's pre-deploy snapshot is pruned too, protecting the set just taken). A failed resume remains an explicit recovery condition.
 

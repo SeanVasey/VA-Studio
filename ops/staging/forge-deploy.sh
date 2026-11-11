@@ -17,8 +17,10 @@
 #   3. persistent private storage attached by bind mount (never a symlink), proven by inode;
 #   4. the Forge .env validated for the staging profile and installed 0600;
 #   5. one root lease encloses build/sealing; activation freshly quiesces under its own retained lease;
-#   6. a free-space check before any quiesce, then a backup of the database, private storage and .env, and an isolated
-#      restore proof, before migrating; local backup retention is applied after the snapshot and after a successful deploy.
+#   6. a free-space check before any quiesce (prepare and refresh first re-hash the backup files the snapshot will share with
+#      the previous set, site still up), then a backup of the database, private storage (new or changed files copied, unchanged
+#      ones shared with the previous verified set) and .env, and an isolated restore proof, before migrating; local backup
+#      retention is applied after the snapshot and after a successful deploy.
 #      The snapshot never ships off-host: it only queues a "pending ship" marker. After the healthy resume ctl starts the
 #      off-host shipment detached (site up, own lock, /var/log/vasey-staging/ship-pending.log); its failure never fails a deploy;
 #   7. maintenance in the new release, migrate --force (no --pretend: raw-PDO DDL ignores it), config/route/view/event caches,
@@ -135,6 +137,7 @@ required scheduler-watch.sh /usr/local/sbin/vasey-staging-scheduler-watch
 required release-step.sh /usr/local/libexec/vasey-staging/release-step.sh
 required seal-release.py /usr/local/libexec/vasey-staging/seal-release.py
 required normalize-mysql-dump.py /usr/local/libexec/vasey-staging/normalize-mysql-dump.py
+required private-snapshot.py /usr/local/libexec/vasey-staging/private-snapshot.py
 required tls/origin-ca.pem /usr/local/libexec/vasey-staging/origin-ca.pem
 optional nginx/vasey-staging-http.conf /etc/nginx/conf.d/vasey-staging.conf
 HELPERS

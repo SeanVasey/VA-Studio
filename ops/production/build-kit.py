@@ -18,7 +18,7 @@ What is derived, copied or written for production:
              php-fpm/vasey-production.conf, workers/vasey-production-workers.conf, and the three nginx files: the site body
              nginx/vasey-production.conf, its http-level helpers nginx/vasey-production-http.conf and the whole-file wrapper
              nginx/vasey-production-classic.conf
-    copied   seal-release.py, normalize-mysql-dump.py and tls/origin-ca.pem (byte for byte), php-fpm/vasey-paid-delivery.conf (the paid-delivery
+    copied   seal-release.py, normalize-mysql-dump.py, private-snapshot.py and tls/origin-ca.pem (byte for byte), php-fpm/vasey-paid-delivery.conf (the paid-delivery
              pool is generic and identical), validate-runtime.php (a production file in this directory)
     not shipped  anything under ops/staging/test-commerce/ and the basic-auth files: production has neither.
 Nothing here installs anything: the output is a directory of files, and provision.sh (run by an operator, as root, on a
@@ -350,6 +350,7 @@ DERIVED = [
 COPIED = [
     Copied("seal-release.py", "seal-release.py", 0o644),
     Copied("normalize-mysql-dump.py", "normalize-mysql-dump.py", 0o644),
+    Copied("private-snapshot.py", "private-snapshot.py", 0o644),
     Copied("tls/origin-ca.pem", "tls/origin-ca.pem", 0o644),
     Copied("php-fpm/vasey-paid-delivery.conf", "php-fpm/vasey-paid-delivery.conf", 0o644),
     Copied("validate-runtime.php", "production:validate-runtime.php", 0o644),
