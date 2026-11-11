@@ -589,15 +589,18 @@ that are new or changed since the newest verified set and hard-links the unchang
   changed within two seconds of the earlier snapshot's start is never trusted, and a file that changes while it is copied
   refuses the snapshot.
 - **A file is shared only with the set this operation re-hashed in full, and only while it is still that inode.** Before every
-  quiesce (`ctl prepare`, `ctl refresh`, the nightly run), with the site still up, the helper re-hashes every file of the newest
-  tree set that holds a restore proof (about 2.5 minutes for 38 GB, estimated at about 250 MB/s; not measured on the host). Success
+  quiesce (the deploy's own early `ctl space-check --preverify`, which `ctl prepare` and `ctl refresh` reuse; the nightly run),
+  with the site still up, the helper re-hashes every file of the newest tree set that holds a restore proof (3m17s for 37.9 GB
+  measured on staging on 2026-11-11). Success
   writes a token, `backups/.link-token`, outside every set: the identity of each verified inode, ctime included. The next snapshot
   consumes it (one use; refused after 6 hours or when it names another set) and shares only files whose inode still has exactly
   that identity. Any write to it since, by anyone, moves the ctime, so it is copied instead. Without a token nothing is shared.
 - **Two kinds of refusal before the quiesce.** The deploy log tells them apart; neither stops anything.
   - **Corruption refusal** ("a backup set's private files failed re-verification ... corruption refusal"; the backup log says
     "failed its private file re-verification" and "withdrew the restore proof of ..."). A file's bytes, identity, mode or owner,
-    or the set's names or directories, no longer match the manifest. The `RESTORE_CHECK` of that set and of every tree set that
+    or the set's names or directories, no longer match the manifest; or the set's own manifests (`private.index`,
+    `private.sha256`, `private.dirs`) are truncated or unreadable; or reading one of its files failed with an I/O error (EIO).
+    The `RESTORE_CHECK` of that set and of every tree set that
     holds a failed file is removed (a mode or owner change withdraws only the sets that hold that file). What to do: check `dmesg`
     and the disk; run `sudo /usr/local/sbin/vasey-staging-backup restore-check <set>` on the sets that still hold a proof; keep
     the withdrawn sets for inspection (do not delete them by hand); then deploy again. The next deploy re-verifies the newest set
@@ -605,9 +608,11 @@ that are new or changed since the newest verified set and hard-links the unchang
     still has it.
   - **Operational refusal** ("the re-verification of the backup set could not run (an operational error ... not corruption) ...
     operational refusal", exit status 3; the backup log says "an operational error, not a corruption finding" and "No restore
-    proof was withdrawn"). The re-hash could not run or its token could not be written: no space (the host has been at 96%), an
-    I/O error, an unreadable file. **Every proof is kept.** What to do: fix the cause (free space with
-    `sudo /usr/local/sbin/vasey-staging-ctl backup-prune`; read `dmesg` for I/O errors), then deploy again; nothing else.
+    proof was withdrawn"). The re-hash could not run or its token could not be written: no space (the host has been at 96%),
+    out of memory, a crash of the helper. **Every proof is kept.** What to do: fix the cause (free space with
+    `sudo /usr/local/sbin/vasey-staging-ctl backup-prune`; read `dmesg`), then deploy again. If the same operational refusal
+    repeats for the same set, prove that set by hand: `sudo /usr/local/sbin/vasey-staging-backup restore-check <set>` (named in
+    the log line); a set that fails it loses its proof as a corruption finding.
   - The nightly run refuses neither: it logs the WARNING (with the same two wordings) and its snapshot copies everything.
   - The re-hash runs before the free-space arithmetic on purpose: it decides what may be shared and so what must be copied;
     checking space first would count a full copy and refuse deploys that fit. It writes only the token (a few MB).
@@ -627,14 +632,21 @@ that are new or changed since the newest verified set and hard-links the unchang
   kernel refuses a link, the file is copied. `VASEY_BACKUP_LINK=0` in `backup.conf` turns sharing off (a full copy every time).
 
 What changed for an operator:
-- The deploy (and the nightly run) spends about 2.5 minutes re-hashing the previous set **before** it stops the site, then the
-  maintenance window holds only the dump, the copy of new files, their re-hash and the database proof. The re-hash runs inside
-  `ctl prepare` (or `ctl refresh`), so it holds the helper's action lock: other `vasey-staging-ctl` calls, `status` included,
-  wait for it, as they already wait for the build that `prepare` runs under the same lock. Expected quiesce for
-  staging's sizes: about 2 to 4 minutes instead of 22 (see the PR evidence; not yet measured on the host).
-- The **first** snapshot after re-provisioning has nothing to share and copies the whole store inside the window (a few minutes
-  longer than before the tar was dropped, about 5 to 9 minutes for 38 GB). Let the 03:17 nightly run take it, or deploy at a quiet
-  time; every later snapshot shares.
+- The deploy (and the nightly run) re-hashes the previous set **before** it stops the site, then the maintenance window holds
+  only the dump, the copy of new files, their re-hash and the database proof. The re-hash runs in the deploy's early
+  `ctl space-check --preverify`, so it holds the helper's action lock: other `vasey-staging-ctl` calls, `status` included, wait
+  for it. Measured on staging, 2026-11-11 (the second deploy after re-provisioning): re-hash with the site up 3m17s; snapshot 4 s
+  (copied 10 bytes / 1 file, linked 37,902,871,534 bytes / 1,048 files); restore proof 47 s; backup part of the window about 58 s;
+  the whole maintenance window about 5.5 minutes, of which about 4m07s is the build that `ctl prepare` runs inside its quiesce;
+  the whole deploy 8m54s. The new set used 25 MB on disk. Before the change the window was about 22 minutes.
+- The **first** snapshot after re-provisioning has nothing to share and copies the whole store inside the window. Measured on
+  staging, 2026-11-11: 37.9 GB / 1,049 files copied in 4m52s, proof 4m33s, maintenance about 9.8 minutes. Let the 03:17 nightly
+  run take it, or deploy at a quiet time; every later snapshot shares.
+- The early free-space gate is the authoritative one: `forge-deploy.sh` runs `ctl space-check --preverify` before anything is
+  stopped, so the estimate counts only what the snapshot will really copy. (Until 2026-11-11 it ran a plain check that counted a
+  full copy: it asked for 91,344,719,852 bytes with 88,657,883,136 free and refused a deploy that needed 45,861,274,012.) Its
+  refusal names the estimate it used ("estimate: sharing with the re-verified set ..." or "no re-verified set to share with: the
+  whole private store is counted") and ends with `FAILED ... before the quiesce: the served release was not touched`.
 - `space-check` counts only the bytes the snapshot will copy, plus the database twice (dump and the proof's datadir); with age +
   rclone it still counts one encrypted copy of the whole set. A tree set's `du` is its full logical size; the disk use of the
   backup directory as a whole grows by the changed files only.
@@ -687,7 +699,7 @@ once and watch `ship-pending.log`; the failed row on the dashboard is replaced b
 **Disk space and retention.** Every deploy takes a snapshot (database dump + the private files that changed since the newest
 verified set + `.env`; the first one after re-provisioning copies the whole store, about 14 GB on 2026-11-10 and 38 GB on
 2026-11-11), and the restore proof needs a disposable datadir (about the database's size) under `/var/lib/mysql-restore-check`.
-Before it stops anything, `forge-deploy.sh` runs `vasey-staging-ctl space-check` (the backup helper's `space-check`): it
+Before it stops anything, `forge-deploy.sh` runs `vasey-staging-ctl space-check --preverify` (the backup helper's `space-check`): it
 estimates the need from the bytes the snapshot will copy (`private-snapshot.py estimate`; the whole store when no set can be
 shared), the schema's data and index bytes (else the newest set's `database.sql`), the encrypted copy of the whole set that age/rclone shipping stages in the backup directory after the deploy (counted as the larger
 of that copy and the restore proof's scratch when they share a filesystem, because they never coexist; plus one more set while an

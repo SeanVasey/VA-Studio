@@ -463,11 +463,12 @@ preverify_link_source() {
     return 0
   fi
   rm -f -- "${VASEY_BACKUP_DIR:?}/.link-token"
-  if [ "$rc" != 1 ]; then
-    log "WARNING: the re-verification of $(basename -- "$src") could not run: an operational error, not a corruption finding ($(printf '%s\n' "$out" | grep -v '^withdraw=' | tr '\n' ' ' | cut -c1-300)). No restore proof was withdrawn; nothing is shared until a re-verification succeeds"
+  mapfile -t withdrawn < <(printf '%s\n' "$out" | sed -n 's/^withdraw=//p')
+  # A finding is exit 1 WITH the sets it affects; anything else (exit 3, a crash, exit 1 without them) says nothing about content.
+  if [ "$rc" != 1 ] || [ "${#withdrawn[@]}" = 0 ]; then
+    log "WARNING: the re-verification of $(basename -- "$src") could not run: an operational error, not a corruption finding ($(printf '%s\n' "$out" | grep -v '^withdraw=' | tr '\n' ' ' | cut -c1-300)). No restore proof was withdrawn; nothing is shared until a re-verification succeeds. If it repeats, run: vasey-staging-backup restore-check $src"
     return 2
   fi
-  mapfile -t withdrawn < <(printf '%s\n' "$out" | sed -n 's/^withdraw=//p')
   withdraw_proofs "${withdrawn[@]}"
   log "WARNING: $(basename -- "$src") failed its private file re-verification ($(printf '%s\n' "$out" | grep -v '^withdraw=' | tr '\n' ' ' | cut -c1-300)); withdrew the proof of: ${withdrawn[*]:-none}. Nothing is shared: the next snapshot copies the whole private store. Inspect with: vasey-staging-backup restore-check $src"
   return 1
@@ -1112,8 +1113,14 @@ nearest_existing() {  # nearest_existing PATH -> PATH or its closest existing an
   printf '%s' "$p"
 }
 
-space_check() {  # space_check [--preverify]
-  local priv db copy full set_need need restore_need ship_need avail restore_avail backup_at restore_at margin src estimate
+# --preverify re-hashes the newest proven tree set first (always); --preverify-if-needed does so only when no usable token exists
+# yet (ctl prepare and refresh: the deploy's own `ctl space-check --preverify` has normally just made one, and a second 3-minute
+# re-hash would only lengthen the deploy).
+space_check() {  # space_check [--preverify|--preverify-if-needed]
+  local priv db copy full set_need need restore_need ship_need avail restore_avail backup_at restore_at margin src estimate basis
+  if [ "${1:-}" = --preverify-if-needed ]; then
+    if [ -n "$(link_token_set)" ]; then set --; else set -- --preverify; fi
+  fi
   # Re-proving the shared set first (site still up) decides what the snapshot may share, and so what it must copy. A deploy
   # refuses on a failed re-proof, before anything is stopped: a backup set's files changed on disk, which needs a person.
   # The re-hash runs before the free-space arithmetic on purpose: what the snapshot may share (and so must not copy) is decided by
@@ -1132,13 +1139,14 @@ space_check() {  # space_check [--preverify]
   db=$(snapshot_db_bytes) || die "cannot estimate the database size (query and newest set both unavailable); no snapshot attempted, nothing stopped"
   [[ "$priv" =~ ^[0-9]+$ && "$db" =~ ^[0-9]+$ ]] || die "cannot size the snapshot; nothing stopped"
   copy=$priv
+  basis="no re-verified set to share with: the whole private store is counted"
   if [ -n "${PRIVATE_SNAPSHOT:-}" ] && [ -f "$PRIVATE_SNAPSHOT" ]; then
     src=''
     [ "${VASEY_BACKUP_LINK:-1}" != 1 ] || src=$(link_token_set) || src=''
     if [ -n "$src" ] && estimate=$(python3 -I "$PRIVATE_SNAPSHOT" estimate --live "$PRIVATE" --link-from "$src" \
          --link-token "$VASEY_BACKUP_DIR/.link-token" --link-max-age-hours "$LINK_MAX_AGE_HOURS" 2>/dev/null); then
       estimate=$(printf '%s\n' "$estimate" | sed -n 's/^copy_bytes=//p')
-      if [[ "$estimate" =~ ^[0-9]+$ ]]; then copy=$estimate; fi
+      if [[ "$estimate" =~ ^[0-9]+$ ]]; then copy=$estimate; basis="sharing with the re-verified set $(basename -- "$src")"; fi
     fi
   fi
   full=$((priv + db))      # the whole set: what an encrypted copy of it holds
@@ -1160,14 +1168,14 @@ space_check() {  # space_check [--preverify]
   need=$((need + margin))
   avail=$(df --output=avail -B1 -- "$backup_at" | tail -n 1 | tr -d ' ')
   [[ "$avail" =~ ^[0-9]+$ ]] && [ "$avail" -ge "$need" ] \
-    || die "not enough free disk space for the pre-deploy snapshot: $avail bytes free, about $need bytes needed (private store $priv, database $db, margin included) in $VASEY_BACKUP_DIR; nothing was stopped. Free space with 'sudo vasey-staging-ctl backup-prune' (docs/ops/staging-runbook.md section 9, out of disk during snapshot)"
+    || die "not enough free disk space for the pre-deploy snapshot: $avail bytes free, about $need bytes needed (estimate: $basis; $copy of $priv private bytes to copy, database $db$(hardening_requested && echo ", one encrypted copy of the whole set $full"), margin included) in $VASEY_BACKUP_DIR; nothing was stopped. Free space with 'sudo vasey-staging-ctl backup-prune' (docs/ops/staging-runbook.md section 9, out of disk during snapshot)"
   if [ "$restore_need" -gt 0 ]; then
     restore_need=$((restore_need + restore_need * SPACE_MARGIN_PCT / 100 + SPACE_MARGIN_BYTES))
     restore_avail=$(df --output=avail -B1 -- "$restore_at" | tail -n 1 | tr -d ' ')
     [[ "$restore_avail" =~ ^[0-9]+$ ]] && [ "$restore_avail" -ge "$restore_need" ] \
       || die "not enough free disk space for the restore proof: $restore_avail bytes free, about $restore_need bytes needed in $VASEY_RESTORE_CHECK_DIR; nothing was stopped (docs/ops/staging-runbook.md section 9, out of disk during snapshot)"
   fi
-  log "free space ok for the pre-deploy snapshot: $avail bytes free, about $need needed ($copy of $priv private bytes to copy)"
+  log "free space ok for the pre-deploy snapshot: $avail bytes free, about $need needed ($copy of $priv private bytes to copy; estimate: $basis)"
 }
 
 # ---- dashboard evidence (FP-028, docs/staff-reporting.md) ----
@@ -1253,7 +1261,7 @@ case "${1:-}" in
     ( prune_local "$(basename -- "$(cat "$VASEY_BACKUP_DIR/.last")")" ) || log "WARNING: local retention after the pre-deploy snapshot did not complete; run 'vasey-staging-ctl backup-prune'"
     ;;
   space-check)
-    case "${2:-}" in ''|--preverify) ;; *) die "usage: vasey-staging-backup space-check [--preverify]" ;; esac
+    case "${2:-}" in ''|--preverify|--preverify-if-needed) ;; *) die "usage: vasey-staging-backup space-check [--preverify|--preverify-if-needed]" ;; esac
     space_check "${2:-}"
     ;;
   prune)
