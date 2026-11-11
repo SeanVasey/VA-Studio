@@ -9,6 +9,7 @@ use App\Domain\Catalog\ReadPrivateTrackReview;
 use App\Domain\Catalog\SaveTrackMetadata;
 use App\Domain\Catalog\TrackPublicationSchedules;
 use App\Domain\Catalog\TrackVisibility;
+use App\Domain\Media\PreviewTag\PreviewTagResolver;
 use App\Domain\Rights\CollaboratorSplitReport;
 use App\Filament\Resources\TrackResource\Pages\ManageTracks;
 use App\Models\User;
@@ -79,6 +80,7 @@ class TrackResource extends OperatorResource
                     TrackVisibility::PUBLISHED => 'success', TrackVisibility::UNLISTED => 'info', TrackVisibility::SCHEDULED => 'warning',
                     default => 'gray',
                 }),
+            TextColumn::make('preview_tag')->label('Public preview')->state(fn (Track $record): string => app(PreviewTagResolver::class)->describe($record)['summary'])->wrap()->toggleable(),
             // Scheduled tracks show their Central time, and an overdue one shows why it has not gone live: that is the staff alert.
             TextColumn::make('schedule')->label('Schedule')->state(fn (Track $record): ?string => static::scheduleSummary($record))
                 ->wrap()->color(fn (Track $record): ?string => $record->pendingSchedule?->last_failure_reason !== null ? 'danger' : null),
@@ -171,6 +173,22 @@ class TrackResource extends OperatorResource
                         ->options(array_combine(ChangeTrackVisibility::targets((string) $record->status), array_map('ucfirst', ChangeTrackVisibility::targets((string) $record->status)))),
                 ])
                 ->action(fn (Track $record, array $data, Action $action, ManageTracks $livewire) => $livewire->changeTrackVisibility($record, $data, $action)),
+            Action::make('previewTag')->label('Preview tag')->color('gray')
+                ->modalHeading('Preview tag')
+                ->modalDescription(fn (Track $record): string => app(PreviewTagResolver::class)->describe($record)['summary'].'. This changes only which preview visitors hear, at once, on draft and live tracks alike. Licenses, files and offers are not touched.')
+                ->fillForm(fn (Track $record): array => ['revision' => app(PreviewTagResolver::class)->revision((int) $record->id),
+                    'choice' => match (app(PreviewTagResolver::class)->override((int) $record->id)) {
+                        true => 'on', false => 'off', null => 'default'
+                    }])
+                ->schema(fn (Track $record): array => [
+                    Hidden::make('revision'),
+                    Select::make('choice')->label('Preview tag')->native()->required()->selectablePlaceholder(false)->options([
+                        'default' => 'Default (store default is '.(app(PreviewTagResolver::class)->defaultTagged() ? 'tagged' : 'untagged').')',
+                        'on' => 'On (always tagged)',
+                        'off' => 'Off (untagged'.(app(PreviewTagResolver::class)->describe($record)['untagged_recorded'] ? ')' : '; no untagged variant exists yet, so this will be refused)'),
+                    ]),
+                ])
+                ->action(fn (Track $record, array $data, Action $action, ManageTracks $livewire) => $livewire->setPreviewTag($record, $data, $action)),
             Action::make('share')->visible(fn (Track $record) => TrackVisibility::isLive($record->status))->url(fn (Track $record) => route('tracks.show', $record->slug))->openUrlInNewTab(),
             Action::make('unpublish')->label('Return to draft')->visible(fn (Track $record) => TrackVisibility::isLive($record->status))->requiresConfirmation()->databaseTransaction(false)
                 ->mountUsing(function (Track $record, ManageTracks $livewire, ?Schema $schema = null): void {

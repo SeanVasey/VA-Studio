@@ -911,3 +911,16 @@ All other DD rows stand.
 - **Q-4 R2 scope.** Private storage on R2 is a new storage adapter, signed-delivery path and backup change; it is not
   built. It becomes development work before production; the server's private disk remains the tested path until it
   lands.
+
+## Register update — 2026-11-11: seller tag on public previews is a setting
+
+**Decision (Sean, 2026-11-11).** Whether a track's public preview carries the seller tag is a per-track setting with a store-wide default. The default is **on** (tagged). Both variants are kept, so the switch is instant and reprocesses nothing.
+
+**Implemented as** (`App\Domain\Media\PreviewTag\PreviewTagPolicy`, `PreviewTagResolver`; `docs/media-processing.md`, "Preview tag"):
+
+- Processing makes `preview_untagged` beside `preview_tagged` in the same run, from the same master, with the tagged preview's duration and waveform. The tagged preview is the preview identity: offer snapshots, publication readiness and recording bindings still pin it, so a switch cannot void an offer or block publication.
+- `preview_tag_settings` holds the store default and per-track overrides (null follows the default) with a revision, beside `tracks` so a change never bumps publication versions. Writes need catalog authority and enrolled admin MFA re-read under lock, an expected revision, and are audited with actor and old/new values.
+- The public route reads the setting per request. If the untagged preview is effective but missing or unverified, the tagged preview is served; the delivery MP3 and master are never public. A track cannot be switched off until a verified untagged preview exists.
+- Existing drafts gain the untagged variant by processing the master again (`vasey:media-retag-previews --add-untagged`); live tracks need the usual unpublish-reprocess-republish. Sound-kit demos are not covered (follow-up).
+
+Not decided here and left open: how loud the untagged preview should be relative to the tagged mix (it uses the same gain stage), and whether a full-length untagged 192 kbps preview should be public at all for tracks still on sale; Sean chose both variants and the default, so this register records the choice and the exposure, not a reversal.

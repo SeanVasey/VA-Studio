@@ -17,7 +17,7 @@ class VerifiedMedia
     public function evidence(MediaAsset $asset, bool $historical = false): ?array
     {
         try {
-            if ($asset->status !== 'ready' || $asset->disk !== 'local' || ! $asset->verified_at || ! $asset->verified_by || ! $asset->parent_asset_id || ! $asset->processing_run_id || ! preg_match('~\Amedia/revisions/[a-f0-9-]{36}/(?:master\.wav|delivery\.mp3|preview\.mp3|artwork\.png|stems\.zip)\z~D', $asset->storage_path)) {
+            if ($asset->status !== 'ready' || $asset->disk !== 'local' || ! $asset->verified_at || ! $asset->verified_by || ! $asset->parent_asset_id || ! $asset->processing_run_id || ! preg_match('~\Amedia/revisions/[a-f0-9-]{36}/(?:master\.wav|delivery\.mp3|preview\.mp3|preview-untagged\.mp3|artwork\.png|stems\.zip)\z~D', $asset->storage_path)) {
                 return null;
             }
             $run = $asset->processingRun()->first();
@@ -29,14 +29,16 @@ class VerifiedMedia
             if (($scan['status'] ?? null) !== 'clean' || ! hash_equals($run->input_sha256, $scan['sha256'] ?? '') || ! ScanEngines::accepted($scan['engine'] ?? null, $historical)) {
                 return null;
             }
-            $expectedRoles = match ($source->role) {
-                'master_wav' => ['download_mp3', 'master_wav', 'preview_tagged'],
-                'artwork' => ['artwork'],
-                'stems_zip' => ['stems_zip'],
+            // A master run made before the untagged preview existed has the first three roles and stays valid as it was judged;
+            // a run under the current profile has all four. Nothing else is accepted, so removing or adding a row fails here.
+            $expectedRoleSets = match ($source->role) {
+                'master_wav' => [['download_mp3', 'master_wav', 'preview_tagged'], ['download_mp3', 'master_wav', 'preview_tagged', 'preview_untagged']],
+                'artwork' => [['artwork']],
+                'stems_zip' => [['stems_zip']],
                 default => [],
             };
             $outputs = $run->outputs()->get();
-            if ($expectedRoles === [] || $outputs->pluck('role')->sort()->values()->all() !== $expectedRoles || $outputs->pluck('id')->sort()->values()->all() !== collect($run->output_asset_ids)->sort()->values()->all()) {
+            if ($expectedRoleSets === [] || ! in_array($outputs->pluck('role')->sort()->values()->all(), $expectedRoleSets, true) || $outputs->pluck('id')->sort()->values()->all() !== collect($run->output_asset_ids)->sort()->values()->all()) {
                 return null;
             }
             foreach ($outputs as $output) {
@@ -62,6 +64,16 @@ class VerifiedMedia
                     return null;
                 }
             }
+            if ($asset->role === 'preview_untagged') {
+                // The untagged variant shares the tagged preview's waveform and length, and must carry no tag evidence at all.
+                $metadata = $asset->technical_metadata ?? [];
+                $tagged = $outputs->firstWhere('role', 'preview_tagged');
+                if (empty($metadata['waveform']) || ! hash_equals($metadata['waveform_sha256'] ?? '', hash('sha256', json_encode($metadata['waveform'], JSON_THROW_ON_ERROR)))
+                    || ($metadata['tagged'] ?? null) !== false || ($metadata['full_length'] ?? false) !== true || array_key_exists('tag_sha256', $metadata) || array_key_exists('tag_interval_seconds', $metadata)
+                    || $tagged === null || ! hash_equals($metadata['waveform_sha256'], $tagged->technical_metadata['waveform_sha256'] ?? '')) {
+                    return null;
+                }
+            }
             $identity = fn (MediaAsset $item) => $item->only(['id', 'track_id', 'role', 'disk', 'storage_path', 'original_name',
                 'mime_type', 'size_bytes', 'sha256', 'status', 'parent_asset_id', 'processing_run_id', 'verified_by', 'technical_metadata'])
                 + ['verified_at' => $item->verified_at?->toISOString()];
@@ -78,7 +90,9 @@ class VerifiedMedia
     public function path(MediaAsset $asset): ?string
     {
         try {
-            if ($this->evidence($asset) === null) { return null; }
+            if ($this->evidence($asset) === null) {
+                return null;
+            }
             $path = app(PrivateMediaFiles::class)->resolve($asset->storage_path);
             if (! app(MediaIntegrity::class)->matches($asset, $path)) {
                 return null;

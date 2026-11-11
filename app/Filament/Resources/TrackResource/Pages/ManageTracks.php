@@ -9,6 +9,7 @@ use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublishTrack;
 use App\Domain\Catalog\TrackMetadataPresets;
 use App\Domain\Catalog\TrackPublicationSchedules;
+use App\Domain\Media\PreviewTag\PreviewTagPolicy;
 use App\Filament\Resources\TrackResource;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
@@ -187,6 +188,27 @@ class ManageTracks extends ManageRecords
                 ->body(implode(' ', array_merge(...array_values($exception->errors()))))->persistent()->send();
             $action->cancel();
         }
+    }
+
+    /** @param  array{revision?: mixed, choice?: mixed}  $data */
+    public function setPreviewTag(Track $record, array $data, Action $action): void
+    {
+        $tagged = match ($data['choice'] ?? null) {
+            'on' => true, 'off' => false, 'default' => null, default => 'invalid'
+        };
+        try {
+            if ($tagged === 'invalid') {
+                throw ValidationException::withMessages(['tagged' => 'Choose Default, On or Off.']);
+            }
+            app(PreviewTagPolicy::class)->setTrack($record, $tagged, (int) ($data['revision'] ?? -1), $this->actor());
+        } catch (ValidationException $exception) {
+            Notification::make()->danger()->title('Preview tag not changed')
+                ->body(implode(' ', array_merge(...array_values($exception->errors()))))->persistent()->send();
+            $action->cancel();
+
+            return;
+        }
+        Notification::make()->success()->title('Preview tag saved')->send();
     }
 
     public function reviewTagAdditions(array $data): void

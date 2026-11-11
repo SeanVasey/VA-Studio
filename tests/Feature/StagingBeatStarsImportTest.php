@@ -360,7 +360,7 @@ class StagingBeatStarsImportTest extends TestCase
         $one = Track::where('slug', 'synthetic-import-one')->sole();
         $this->assertSame(95, $one->bpm);
         $ready = $one->assets()->where('status', 'ready')->pluck('role')->sort()->values()->all();
-        $this->assertSame(['artwork', 'download_mp3', 'master_wav', 'preview_tagged', 'stems_zip'], $ready);
+        $this->assertSame(['artwork', 'download_mp3', 'master_wav', 'preview_tagged', 'preview_untagged', 'stems_zip'], $ready);
         // The import never confirms that the stems are the master's recording: no association exists and the track says so.
         $stems = $one->assets()->where('role', 'stems_zip')->where('status', 'ready')->sole();
         $this->assertFalse(app(RecordingAssociation::class)->matches($stems, $one->assets()->where('role', 'preview_tagged')->sole()));
@@ -376,7 +376,7 @@ class StagingBeatStarsImportTest extends TestCase
         $this->assertSame('one-hires.png', $one->assets()->where('role', 'artwork')->whereNull('parent_asset_id')->sole()->original_name);
 
         $two = Track::where('slug', 'synthetic-import-two')->sole();
-        $this->assertSame(['download_mp3', 'master_wav', 'preview_tagged'], $two->assets()->where('status', 'ready')->pluck('role')->sort()->values()->all());
+        $this->assertSame(['download_mp3', 'master_wav', 'preview_tagged', 'preview_untagged'], $two->assets()->where('status', 'ready')->pluck('role')->sort()->values()->all());
         $three = Track::where('slug', 'synthetic-import-three')->sole();
         $this->assertSame(0, $three->assets()->count());
 
@@ -451,7 +451,7 @@ class StagingBeatStarsImportTest extends TestCase
         $this->assertSame(0, $two->assets()->count());
         $auditCount = AuditEvent::count();
         $this->command(['--limit' => '1', '--from' => 'bs-import-0002'])->expectsOutputToContain('drafts created=0 already_mapped=3')->assertSuccessful();
-        $this->assertSame(['download_mp3', 'master_wav', 'preview_tagged'], $two->assets()->where('status', 'ready')->pluck('role')->sort()->values()->all());
+        $this->assertSame(['download_mp3', 'master_wav', 'preview_tagged', 'preview_untagged'], $two->assets()->where('status', 'ready')->pluck('role')->sort()->values()->all());
         $this->assertSame(3, $one->assets()->whereNull('parent_asset_id')->count());
         $this->assertSame(1, MediaAsset::where('track_id', $two->id)->whereNull('parent_asset_id')->count());
         $this->assertGreaterThan($auditCount, AuditEvent::count());
