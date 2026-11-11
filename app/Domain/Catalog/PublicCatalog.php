@@ -264,7 +264,8 @@ final class PublicCatalog
 
     private function eligible(Track $track): bool
     {
-        if (app(PublicationReadiness::class)->blockers($track) !== []) {
+        // Listing evidence: a private deliverable is not hashed per public request; checkout and delivery hash it again.
+        if (app(PublicationReadiness::class)->listingBlockers($track) !== []) {
             return false;
         }
         $track->setRelation('offers', $track->offers->filter(fn ($offer) => app(SelectionInventory::class)->available($offer->current_revision_id)));

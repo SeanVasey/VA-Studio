@@ -197,6 +197,15 @@ class PublicationReadiness
         return array_values(array_unique($blockers));
     }
 
+    /**
+     * The same checks as blockers(), for public listing and rendering only: private deliverables are checked without hashing their bytes
+     * (VerifiedMedia::forListing). Publication, checkout, activation and delivery keep calling blockers() and the full checks.
+     */
+    public function listingBlockers(Track $track, ?CarbonInterface $at = null): array
+    {
+        return VerifiedMedia::forListing(fn (): array => $this->blockers($track, $at));
+    }
+
     private function available(MediaAsset $asset): bool
     {
         return app(VerifiedMedia::class)->available($asset);

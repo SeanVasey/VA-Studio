@@ -8,9 +8,49 @@ use Throwable;
 
 class VerifiedMedia
 {
+    private static int $listing = 0;
+
+    /**
+     * Runs a public listing decision (catalog, track page, sitemap, the readiness gate in front of a served public file). Inside it,
+     * available() does not hash private deliverables (masters, delivery MP3s, stems): see listable(). path() and every caller outside
+     * the callback still hash in full, so checkout, publication, delivery and any served bytes are unchanged.
+     *
+     * @template T
+     *
+     * @param  callable(): T  $callback
+     * @return T
+     */
+    public static function forListing(callable $callback): mixed
+    {
+        self::$listing++;
+        try {
+            return $callback();
+        } finally {
+            self::$listing--;
+        }
+    }
+
     public function available(MediaAsset $asset): bool
     {
-        return $this->path($asset) !== null;
+        return self::$listing > 0 ? $this->listable($asset) : $this->path($asset) !== null;
+    }
+
+    /**
+     * Listing availability. Public derivatives (artwork, previews) are small and are what a visitor actually receives, so they keep the full
+     * check. A private deliverable needs the same provenance and path safety, a regular file of the recorded size, and no recorded full-hash
+     * mismatch for its current file identity; its bytes are not read here, because they are hashed again before anything is sold or delivered.
+     */
+    public function listable(MediaAsset $asset): bool
+    {
+        if ($asset->isPublicDerivative()) {
+            return $this->path($asset) !== null;
+        }
+        try {
+            return $this->evidence($asset) !== null
+                && app(MediaIntegrity::class)->plausible($asset, app(PrivateMediaFiles::class)->resolve($asset->storage_path));
+        } catch (Throwable) {
+            return false;
+        }
     }
 
     /** Historical database evidence only: no private paths are opened and no integrity cache is consulted. */
