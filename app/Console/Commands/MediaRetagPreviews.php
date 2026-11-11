@@ -77,11 +77,21 @@ final class MediaRetagPreviews extends Command
             return $this->refuse('Staff authority was refused: the password was not confirmed or the account may not administer the catalog.');
         }
         try {
-            $result = $retag->queue($actor, $plan);
+            // The prompt can take minutes: decide again from the database as it is now, not as it was when the list was printed.
+            $fresh = $retag->plan($retag->configuredTag());
+            if ($fresh['stale'] !== $plan['stale']) {
+                $this->line('The plan changed while the password was being confirmed; using current state: stale_draft='.count($fresh['stale']));
+            }
+            $result = $retag->queue($actor, $fresh);
+        } catch (RetagPreviewsRefusal $refusal) {
+            return $this->refuse($refusal->getMessage());
         } catch (AuthorizationException) {
-            return $this->refuse('Staff authorization was refused while queueing.');
+            return $this->refuse('Staff authorization was refused while queueing. Runs queued before this point stay queued; run --check to see what is pending.');
         }
-        $this->line('queued='.count($result['queued']).' in_flight='.count($result['in_flight']).' refused='.count($result['refused']));
+        $this->line('queued='.count($result['queued']).' in_flight='.count($result['in_flight']).' refused='.count($result['refused']).' skipped='.count($result['skipped']));
+        foreach ($result['skipped'] as $trackId => $reason) {
+            $this->line('  track #'.$trackId.' skipped: '.$reason);
+        }
         $this->line('Reprocessing runs in the media queue worker; run --check again to follow it. Nothing was published or altered on a live track.');
 
         return $result['refused'] === [] ? self::SUCCESS : self::FAILURE;

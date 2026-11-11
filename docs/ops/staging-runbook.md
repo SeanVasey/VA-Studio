@@ -136,15 +136,20 @@ art vasey:staging-seller-tag          # add --check to verify without installing
 - **After the tag changes.** Tracks processed under the chime keep chime previews until their masters are processed again
   (`MEDIA_TAG_SHA256` is part of the processing fingerprint, but an existing preview stays "valid" against its own run).
   After the approved tag is deployed and `art vasey:doctor` passes `seller_tag`, list and then queue the draft tracks to
-  reprocess (the media queue worker must be running; no path is printed):
+  reprocess (no path is printed). The media queue worker must be running **on the new configuration**: the Deploy Now
+  above restarts the workers, but if `MEDIA_TAG_PATH` / `MEDIA_TAG_SHA256` were changed any other way, run
+  `art config:cache` and `art queue:restart` first, or a worker that still holds the old configuration can fail the new
+  runs. Then:
 
   ```sh
   art vasey:media-retag-previews --check
   art vasey:media-retag-previews --actor=<staff email>    # asks for that staff password; queues fresh runs, never publishes
   ```
 
-  Published or unlisted tracks are reported (`skipped_live`) and left alone; unpublish one, then run it again. Repeat
-  `--check` until `stale_draft=0`. Details: [`media-processing.md`](../media-processing.md#regenerate-previews-after-the-seller-tag-changes).
+  Published or unlisted tracks are reported (`skipped_live`) and left alone; unpublish one, then run it again. A track
+  whose master was replaced since its current preview was made is reported `skipped_superseded`: process the newer master
+  instead. Repeat `--check` until `stale_draft=0`. **Offers:** a retagged draft gets a new current preview, so its active
+  offer revisions (which snapshot the old preview) are publication-blocked until the offers are republished. Details: [`media-processing.md`](../media-processing.md#regenerate-previews-after-the-seller-tag-changes).
   The command refuses on production.
 - **Cleanup.** Previews made with it are rehearsal output. The replacement and its verification are entry P-1 of
   [`staging-placeholders.md`](staging-placeholders.md). Sean still approves the audible mix of the real tag before anything

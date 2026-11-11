@@ -11,6 +11,7 @@ use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
 use App\Support\Environment\TestEnvironment;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
@@ -113,11 +114,11 @@ final class RetagPreviews
     /**
      * Read-only classification of every track's current tagged preview against the configured tag.
      *
-     * @return array{tag_sha256: string, current: int, stale: list<array{track_id: int, slug: string, source_id: int, state: string}>, skipped: array<string, list<int>>}
+     * @return array{tag_sha256: string, current: int, stale: list<array{track_id: int, slug: string, source_id: int, preview_id: int, state: string}>, skipped: array<string, list<int>>}
      */
     public function plan(string $tagSha256): array
     {
-        $plan = ['tag_sha256' => $tagSha256, 'current' => 0, 'stale' => [], 'skipped' => ['live' => [], 'not_draft' => [], 'unverified' => [], 'unresolved' => []]];
+        $plan = ['tag_sha256' => $tagSha256, 'current' => 0, 'stale' => [], 'skipped' => ['live' => [], 'not_draft' => [], 'unverified' => [], 'unresolved' => [], 'superseded' => []]];
         $fingerprint = app(MediaProfile::class)->fingerprint(app(MediaProfile::class)->current('master_wav'));
         $latest = MediaAsset::query()->selectRaw('max(id)')->where('role', 'preview_tagged')->where('status', 'ready')->groupBy('track_id');
         MediaAsset::query()->whereIn('id', $latest)->orderBy('id')->each(function (MediaAsset $preview) use (&$plan, $tagSha256, $fingerprint): void {
@@ -152,6 +153,12 @@ final class RetagPreviews
 
                 return;
             }
+            // A newer master upload means the staff already replaced this recording: reprocessing the old one would make it the newest preview again.
+            if ($this->newerMasterSourceExists($track->id, $source->id)) {
+                $plan['skipped']['superseded'][] = $track->id;
+
+                return;
+            }
             $run = MediaProcessingRun::query()->where('source_asset_id', $source->id)->where('profile_fingerprint', $fingerprint)->first();
             $state = self::NEW;
             if ($run !== null) {
@@ -167,7 +174,7 @@ final class RetagPreviews
                     $state = $run->status === 'failed' ? self::RETRY : self::NEW;
                 }
             }
-            $plan['stale'][] = ['track_id' => $track->id, 'slug' => (string) $track->slug, 'source_id' => $source->id, 'state' => $state];
+            $plan['stale'][] = ['track_id' => $track->id, 'slug' => (string) $track->slug, 'source_id' => $source->id, 'preview_id' => $preview->id, 'state' => $state];
         });
 
         return $plan;
@@ -178,31 +185,83 @@ final class RetagPreviews
      * `QueueMediaProcessing` (staff authority re-read under lock, live-track refusal, one run per source and profile).
      * Repeating it queues nothing twice: a finished track is no longer stale and an in-flight run is left alone.
      *
-     * @return array{queued: list<int>, in_flight: list<int>, refused: list<int>}
+     * Each entry is decided again inside its own transaction, under the locks `QueueMediaProcessing` takes (staff user,
+     * source, track), because the plan was read earlier: a track that left draft, whose newest preview changed or that
+     * received a newer master upload since is skipped with a reason, never reprocessed. A summary audit event is written
+     * even when the run stops early (`stopped`), so what was already queued stays on record.
+     *
+     * @return array{queued: list<int>, in_flight: list<int>, refused: list<int>, skipped: array<int, string>}
      */
     public function queue(User $actor, array $plan): array
     {
-        $result = ['queued' => [], 'in_flight' => [], 'refused' => []];
-        foreach ($plan['stale'] as $entry) {
-            if ($entry['state'] === self::IN_FLIGHT) {
-                $result['in_flight'][] = $entry['track_id'];
+        $result = ['queued' => [], 'in_flight' => [], 'refused' => [], 'skipped' => []];
+        $finished = false;
+        try {
+            foreach ($plan['stale'] as $entry) {
+                if ($entry['state'] === self::IN_FLIGHT) {
+                    $result['in_flight'][] = $entry['track_id'];
 
-                continue;
+                    continue;
+                }
+                try {
+                    $outcome = $this->queueEntry($actor, $entry);
+                } catch (AuthorizationException $denied) {
+                    throw $denied; // Staff authority lost mid-run: stop, never continue under another identity.
+                } catch (ValidationException|MediaFailure) {
+                    $result['refused'][] = $entry['track_id'];
+
+                    continue;
+                }
+                if (isset($outcome['run'])) {
+                    $result['queued'][] = $outcome['run'];
+                } else {
+                    $result['skipped'][$entry['track_id']] = $outcome['skip'];
+                }
             }
-            try {
-                $run = app(QueueMediaProcessing::class)->handle(MediaAsset::query()->findOrFail($entry['source_id']), $actor);
-                $result['queued'][] = $run->id;
-            } catch (AuthorizationException $denied) {
-                throw $denied; // Staff authority lost mid-run: stop, never continue under another identity.
-            } catch (ValidationException|MediaFailure) {
-                $result['refused'][] = $entry['track_id'];
-            }
+            $finished = true;
+        } finally {
+            AuditEvent::record('media.retag_previews.requested', $actor, [
+                'tag_sha256' => $plan['tag_sha256'], 'queued_run_ids' => $result['queued'], 'in_flight_track_ids' => $result['in_flight'],
+                'refused_track_ids' => $result['refused'], 'skipped_live_track_ids' => $plan['skipped']['live'],
+                'skipped_superseded_track_ids' => $plan['skipped']['superseded'], 'skipped_after_plan' => $result['skipped'],
+                'stopped' => ! $finished,
+            ], $actor->id);
         }
-        AuditEvent::record('media.retag_previews.requested', $actor, [
-            'tag_sha256' => $plan['tag_sha256'], 'queued_run_ids' => $result['queued'], 'in_flight_track_ids' => $result['in_flight'],
-            'refused_track_ids' => $result['refused'], 'skipped_live_track_ids' => $plan['skipped']['live'],
-        ], $actor->id);
 
         return $result;
+    }
+
+    /** @return array{run: int}|array{skip: string} */
+    private function queueEntry(User $actor, array $entry): array
+    {
+        return DB::transaction(function () use ($actor, $entry): array {
+            // Same order as QueueMediaProcessing (staff user, source, track), so concurrent staff actions cannot deadlock against this.
+            if (! AdminMultiFactor::satisfiedBy($actor, lockForUpdate: true)) {
+                throw new AuthorizationException;
+            }
+            $source = MediaAsset::query()->lockForUpdate()->find($entry['source_id']);
+            $track = Track::query()->lockForUpdate()->find($entry['track_id']);
+            if ($source === null || $track === null || $source->track_id !== $track->id) {
+                return ['skip' => 'source_missing'];
+            }
+            if ($track->status !== TrackVisibility::DRAFT) {
+                return ['skip' => 'no_longer_draft'];
+            }
+            $newest = MediaAsset::query()->where('track_id', $track->id)->where('role', 'preview_tagged')->where('status', 'ready')->max('id');
+            if ((int) $newest !== $entry['preview_id']) {
+                return ['skip' => 'preview_changed'];
+            }
+            if ($this->newerMasterSourceExists($track->id, $source->id)) {
+                return ['skip' => 'superseded'];
+            }
+
+            return ['run' => app(QueueMediaProcessing::class)->handle($source, $actor)->id];
+        });
+    }
+
+    /** Master uploads (not derived masters) are the only rows without a parent. */
+    private function newerMasterSourceExists(int $trackId, int $sourceId): bool
+    {
+        return MediaAsset::query()->where('track_id', $trackId)->where('role', 'master_wav')->whereNull('parent_asset_id')->where('id', '>', $sourceId)->exists();
     }
 }

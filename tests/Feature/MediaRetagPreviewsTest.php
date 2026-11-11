@@ -17,6 +17,7 @@ use App\Support\Audit\AuditEvent;
 use Closure;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Facades\Filament;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -271,8 +272,9 @@ class MediaRetagPreviewsTest extends TestCase
 
         $result = $retag->queue($this->actor, $plan);
 
-        $this->assertSame([$track->id], $result['refused']);
-        $this->assertSame([], $result['queued']);
+        // The per-entry re-check stops it before the queue is even asked; QueueMediaProcessing's own live-track refusal is covered in MediaProcessingTest.
+        $this->assertSame([$track->id => 'no_longer_draft'], $result['skipped']);
+        $this->assertSame([], $result['queued'] + $result['refused']);
         Queue::assertNotPushed(ProcessMedia::class, fn () => true);
     }
 
@@ -380,5 +382,251 @@ class MediaRetagPreviewsTest extends TestCase
         });
         Queue::assertNotPushed(ProcessMedia::class, fn () => true);
         $this->assertSame(1, AuditEvent::query()->where('action', 'media.retag_previews.requested')->count());
+    }
+
+    /** Runs `$during` at the moment the staff password is checked, i.e. between the printed plan and the queueing. */
+    private function duringPasswordCheck(Closure $during): void
+    {
+        Hash::partialMock()->shouldReceive('check')->andReturnUsing(function (string $value, string $hashed) use ($during): bool {
+            $during();
+
+            return password_verify($value, $hashed);
+        });
+    }
+
+    private function sourceIdOf(Track $track): int
+    {
+        return (int) $this->preview($track)->parent_asset_id;
+    }
+
+    public function test_a_track_with_a_newer_master_upload_is_reported_superseded_not_retagged(): void
+    {
+        $this->useTag('approved-tags/old-tag.wav', 700);
+        $track = $this->track('superseded');
+        $this->processed($track);
+        $this->useTag('approved-tags/new-tag.wav', 900);
+        // Staff replaced the master; its run is queued or waiting. The old recording must not become the newest preview again.
+        MediaFixtures::source($track, bytes: MediaFixtures::wav(1.2, 990));
+        $before = $this->census();
+
+        $this->retag(['--check' => true])->expectsOutputToContain('current=0 stale_draft=0')->expectsOutputToContain('skipped_superseded=1 tracks #'.$track->id)->assertSuccessful();
+        $this->retag()->expectsOutputToContain('queued=0 in_flight=0 refused=0 skipped=0')->assertSuccessful();
+
+        $this->assertSame($before['media_processing_runs'], MediaProcessingRun::count());
+        Queue::assertNotPushed(ProcessMedia::class, fn () => true);
+    }
+
+    public function test_a_master_uploaded_after_planning_is_skipped_and_the_old_recording_never_becomes_current_again(): void
+    {
+        $this->useTag('approved-tags/old-tag.wav', 700);
+        $track = $this->track('late-master');
+        $this->processed($track);
+        $oldSource = $this->sourceIdOf($track);
+        $this->useTag('approved-tags/new-tag.wav', 900);
+        $retag = app(RetagPreviews::class);
+        $plan = $retag->plan($retag->configuredTag());
+        $this->assertSame($oldSource, $plan['stale'][0]['source_id']);
+        $replacement = MediaFixtures::source($track, bytes: MediaFixtures::wav(1.2, 990));
+        $replacementRun = app(QueueMediaProcessing::class)->handle($replacement, $this->actor);
+        Queue::fake();
+
+        $result = $retag->queue($this->actor, $plan);
+
+        $this->assertSame([$track->id => 'superseded'], $result['skipped']);
+        $this->assertSame([], $result['queued']);
+        Queue::assertNotPushed(ProcessMedia::class, fn () => true);
+        app(MediaProcessor::class)->handle($replacementRun->id);
+        $this->assertSame($replacement->id, $this->sourceIdOf($track));
+    }
+
+    public function test_a_preview_that_changed_after_planning_is_skipped(): void
+    {
+        $this->useTag('approved-tags/old-tag.wav', 700);
+        $track = $this->track('already-done');
+        $this->processed($track);
+        $this->useTag('approved-tags/new-tag.wav', 900);
+        $retag = app(RetagPreviews::class);
+        $plan = $retag->plan($retag->configuredTag());
+        // A staff Process / retry finishes the same master under the new tag before this run queues anything.
+        $staff = app(QueueMediaProcessing::class)->handle(MediaAsset::findOrFail($plan['stale'][0]['source_id']), $this->actor);
+        app(MediaProcessor::class)->handle($staff->id);
+        Queue::fake();
+
+        $result = $retag->queue($this->actor, $plan);
+
+        $this->assertSame([$track->id => 'preview_changed'], $result['skipped']);
+        $this->assertSame([], $result['queued']);
+        Queue::assertNotPushed(ProcessMedia::class, fn () => true);
+    }
+
+    public function test_a_track_made_private_after_planning_is_not_reprocessed(): void
+    {
+        $this->useTag('approved-tags/old-tag.wav', 700);
+        $private = $this->track('went-private');
+        $this->processed($private);
+        $this->useTag('approved-tags/new-tag.wav', 900);
+        $retag = app(RetagPreviews::class);
+        $plan = $retag->plan($retag->configuredTag());
+        $this->assertCount(1, $plan['stale']);
+        DB::table('tracks')->where('id', $private->id)->update(['status' => 'private']);
+        $runs = MediaProcessingRun::count();
+
+        $result = $retag->queue($this->actor, $plan);
+
+        $this->assertSame([$private->id => 'no_longer_draft'], $result['skipped']);
+        $this->assertSame($runs, MediaProcessingRun::count());
+        Queue::assertNotPushed(ProcessMedia::class, fn () => true);
+    }
+
+    public function test_the_plan_is_rebuilt_after_the_password_prompt(): void
+    {
+        $this->useTag('approved-tags/old-tag.wav', 700);
+        $track = $this->track('prompt-window');
+        $this->processed($track);
+        $this->useTag('approved-tags/new-tag.wav', 900);
+        $this->duringPasswordCheck(fn () => DB::table('tracks')->where('id', $track->id)->update(['status' => 'private']));
+
+        $this->retag()
+            ->expectsOutputToContain('track #'.$track->id.' (prompt-window) new')
+            ->expectsOutputToContain('The plan changed while the password was being confirmed')
+            ->expectsOutputToContain('queued=0 in_flight=0 refused=0 skipped=0')
+            ->assertSuccessful();
+
+        $this->assertSame('private', $track->fresh()->status);
+        Queue::assertNotPushed(ProcessMedia::class, fn () => true);
+        $this->assertSame(1, MediaProcessingRun::count());
+    }
+
+    public function test_authority_lost_while_the_password_is_confirmed_writes_nothing(): void
+    {
+        $this->useTag('approved-tags/old-tag.wav', 700);
+        $track = $this->track('demoted-at-prompt');
+        $this->processed($track);
+        $this->useTag('approved-tags/new-tag.wav', 900);
+        $this->duringPasswordCheck(fn () => DB::table('users')->where('id', $this->actor->id)->update(['is_admin' => false]));
+        $before = $this->census();
+
+        $this->retag()->expectsOutputToContain('password was not confirmed or the account may not administer the catalog')->assertExitCode(1);
+
+        $this->assertSame($before, $this->census());
+        Queue::assertNotPushed(ProcessMedia::class, fn () => true);
+    }
+
+    public function test_two_invocations_dispatch_a_lost_queued_run_only_once_inside_the_lease(): void
+    {
+        $this->useTag('approved-tags/old-tag.wav', 700);
+        $track = $this->track('lost-queue');
+        $this->processed($track);
+        $this->useTag('approved-tags/new-tag.wav', 900);
+        $retag = app(RetagPreviews::class);
+        $retag->queue($this->actor, $retag->plan($retag->configuredTag()));
+        $run = MediaProcessingRun::query()->latest('id')->firstOrFail();
+        Queue::assertPushed(ProcessMedia::class, 1);
+        MediaProcessingRun::query()->whereKey($run->id)->update(['updated_at' => now()->subSeconds(config('media.claim_lease_seconds') + 5)]);
+
+        $second = $retag->queue($this->actor, $retag->plan($retag->configuredTag()));
+        $third = $retag->queue($this->actor, $retag->plan($retag->configuredTag()));
+
+        $this->assertSame([$run->id], $second['queued']);
+        $this->assertSame([], $third['queued']);
+        $this->assertSame([$track->id], $third['in_flight']);
+        Queue::assertPushed(ProcessMedia::class, 2);
+        $this->assertTrue($run->fresh()->updated_at->gt(now()->subSeconds(60)));
+    }
+
+    public function test_a_run_that_stops_midway_still_audits_what_it_queued(): void
+    {
+        $this->useTag('approved-tags/old-tag.wav', 700);
+        $first = $this->track('stop-a');
+        $second = $this->track('stop-b');
+        $this->processed($first);
+        $this->processed($second);
+        $this->useTag('approved-tags/new-tag.wav', 900);
+        $retag = app(RetagPreviews::class);
+        $plan = $retag->plan($retag->configuredTag());
+        $this->assertCount(2, $plan['stale']);
+        $armed = true;
+        MediaProcessingRun::created(function () use (&$armed): void {
+            if ($armed) {
+                $armed = false;
+                DB::table('users')->where('id', $this->actor->id)->update(['is_admin' => false]);
+            }
+        });
+
+        try {
+            $retag->queue($this->actor, $plan);
+            $this->fail('A staff account demoted mid-run must stop the run, not count as a refusal.');
+        } catch (AuthorizationException) {
+        }
+
+        Queue::assertPushed(ProcessMedia::class, 1);
+        $event = AuditEvent::query()->where('action', 'media.retag_previews.requested')->sole();
+        $this->assertTrue($event->context['stopped']);
+        $this->assertCount(1, $event->context['queued_run_ids']);
+        $this->assertSame([], $event->context['refused_track_ids']);
+        // A completed run is recorded as not stopped.
+        DB::table('users')->where('id', $this->actor->id)->update(['is_admin' => true]);
+        $retag->queue($this->actor, ['tag_sha256' => $plan['tag_sha256'], 'current' => 0, 'stale' => [], 'skipped' => ['live' => [], 'superseded' => []]]);
+        $this->assertFalse(AuditEvent::query()->where('action', 'media.retag_previews.requested')->latest('id')->firstOrFail()->context['stopped']);
+    }
+
+    public function test_multi_factor_is_re_read_under_lock_before_queueing(): void
+    {
+        $this->useTag('approved-tags/old-tag.wav', 700);
+        $track = $this->track('mfa-lost');
+        $this->processed($track);
+        $this->useTag('approved-tags/new-tag.wav', 900);
+        $retag = app(RetagPreviews::class);
+        $plan = $retag->plan($retag->configuredTag());
+        $runs = MediaProcessingRun::count();
+
+        // The environment that requires staff MFA is reached after the plan; the actor has no authenticator enrolled.
+        $this->inEnvironment('staging', function () use ($retag, $plan): void {
+            $this->expectException(AuthorizationException::class);
+            try {
+                $retag->queue($this->actor, $plan);
+            } finally {
+                $this->assertTrue(AuditEvent::query()->where('action', 'media.retag_previews.requested')->sole()->context['stopped']);
+            }
+        });
+        $this->assertSame($runs, MediaProcessingRun::count());
+    }
+
+    public function test_a_processing_run_inside_its_lease_is_in_flight_and_one_past_it_is_not(): void
+    {
+        $this->useTag('approved-tags/old-tag.wav', 700);
+        $track = $this->track('leased');
+        $this->processed($track);
+        $this->useTag('approved-tags/new-tag.wav', 900);
+        $this->retag()->assertSuccessful();
+        $run = MediaProcessingRun::query()->latest('id')->firstOrFail();
+
+        MediaProcessingRun::query()->whereKey($run->id)->update(['status' => 'processing', 'started_at' => now()->subSeconds(30)]);
+        $this->retag(['--check' => true])->expectsOutputToContain('track #'.$track->id.' (leased) in_flight')->assertSuccessful();
+        $pushed = Queue::pushed(ProcessMedia::class)->count();
+        $this->retag()->expectsOutputToContain('queued=0 in_flight=1')->assertSuccessful();
+        $this->assertSame($pushed, Queue::pushed(ProcessMedia::class)->count());
+
+        MediaProcessingRun::query()->whereKey($run->id)->update(['started_at' => now()->subSeconds(config('media.claim_lease_seconds') + 5)]);
+        $this->retag(['--check' => true])->expectsOutputToContain('track #'.$track->id.' (leased) new')->assertSuccessful();
+    }
+
+    public function test_a_completed_run_whose_preview_is_still_stale_is_reported_unresolved(): void
+    {
+        $old = $this->useTag('approved-tags/old-tag.wav', 700);
+        $track = $this->track('unresolved');
+        $this->processed($track);
+        $this->useTag('approved-tags/new-tag.wav', 900);
+        $this->retag()->assertSuccessful();
+        app(MediaProcessor::class)->handle((int) MediaProcessingRun::query()->latest('id')->value('id'));
+        // The configuration goes back to the first tag: this master already has a completed run under it, yet its newest preview carries the second tag.
+        $this->assertSame($old, $this->useTag('approved-tags/old-tag.wav', 700));
+        $before = $this->census();
+
+        $this->retag(['--check' => true])->expectsOutputToContain('stale_draft=0')->expectsOutputToContain('skipped_unresolved=1 tracks #'.$track->id)->assertSuccessful();
+        $this->retag()->expectsOutputToContain('queued=0 in_flight=0 refused=0')->assertSuccessful();
+
+        $this->assertSame($before['media_processing_runs'], MediaProcessingRun::count());
+        Queue::assertPushed(ProcessMedia::class, 1);
     }
 }
