@@ -41,6 +41,7 @@ class SoundKitRecoveryTest extends TestCase
 
     public function test_the_private_kit_lock_is_owner_only_whatever_the_callers_umask(): void
     {
+        $this->fakePrivateMediaStorage();
         $previous = umask(0002); // a console run under sudo, not the queue worker's umask
         try {
             $source = tempnam(sys_get_temp_dir(), 'kit-lock-');
