@@ -53,7 +53,8 @@ class QueueMediaProcessing
             if (! $run) {
                 $run = MediaProcessingRun::create(['source_asset_id' => $source->id, 'requested_by' => $actor->id, 'profile_version' => $profile['version'], 'profile_fingerprint' => $fingerprint, 'input_sha256' => $hash, 'profile' => $profile]);
             } else {
-                $run->update(['status' => 'queued', 'claim_token' => null, 'failure_code' => null, 'failure_message' => null, 'failed_at' => null]);
+                // updated_at is forced: re-queuing an already queued run changes nothing else, and callers read it as the dispatch time.
+                $run->forceFill(['status' => 'queued', 'claim_token' => null, 'failure_code' => null, 'failure_message' => null, 'failed_at' => null, 'updated_at' => now()])->save();
             }
             AuditEvent::record('media.processing.queued', $run, ['source_asset_id' => $source->id, 'profile_version' => $profile['version']], $actor->id);
             ProcessMedia::dispatch($run->id)->onQueue(config('media.queue'))->afterCommit();
