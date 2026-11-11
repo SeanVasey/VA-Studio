@@ -206,6 +206,13 @@ first; uploading a different image or demo voids its approval.
   archive); IMPERIAL DRVMZ is the first real kit.
 - The flag stays a literal `false` until kit checkout exists: enabling it before then would list prices with "not available to buy yet".
 
+## Owner decisions (Sean, 2026-11-11)
+
+- IMPERIAL DRVMZ sells for **$14.99** (USD, `price_minor` 1499), under the generic sound-kit license.
+- The kit's demo is built from the kit's own samples (74 BPM, C minor, the kit's bonus melody loop, rap backbeat); Sean
+  approved the third revision. The cover is Sean's 1320 x 1320 artwork. On staging the product, rights, offer, cover and
+  demo are approved and it has no publication blockers; it stays unpublished while the storefront flag is off.
+
 ## Tests
 
 `tests/Feature/SoundKitStorefrontTest.php` (SQLite): flag off and exact-true gating, listing facts and the absence of private
