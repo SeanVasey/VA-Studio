@@ -251,6 +251,17 @@ class SelectionTests(unittest.TestCase):
         with self.assertRaises(focused.FocusedError):
             focused.selection({"FOCUSED_SUITE": "bulk-license-browser", "FOCUSED_ENGINE": "mysql"})
 
+    def test_public_accessibility_spec_has_its_own_browser_suite_outside_the_full_ceiling(self):
+        selected = focused.selection({"FOCUSED_SUITE": "accessibility-browser", "FOCUSED_ENGINE": "sqlite"})
+        self.assertEqual(("tests/browser/accessibility-public.spec.ts",), selected.files)
+        self.assertEqual("browser", selected.kind)
+        focused.validate_files(ROOT, selected)
+        self.assertEqual(["npm", "run", "test:browser", "--", *selected.files, "--reporter=line,junit"], focused.commands(selected)[0])
+        self.assertNotIn(selected.files[0], focused.BROWSER_TARGETS)
+        self.assertIn("accessibility-browser", (ROOT / ".github/workflows/focused-feedback.yml").read_text())
+        with self.assertRaises(focused.FocusedError):
+            focused.selection({"FOCUSED_SUITE": "accessibility-browser", "FOCUSED_ENGINE": "mysql"})
+
     def test_every_enum_maps_to_nonempty_bounded_unique_fixed_files(self):
         for suite in focused.SUITES:
             selected = focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "sqlite"})

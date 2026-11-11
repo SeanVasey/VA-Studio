@@ -310,6 +310,8 @@ BROWSER_TARGETS = (
 BROWSER_SUBSETS = {
     "browser": BROWSER_TARGETS,
     "bulk-license-browser": ("tests/browser/bulk-license-draft-source.spec.ts",),
+    # Kept apart from "browser", which sits at the 32-file ceiling.
+    "accessibility-browser": ("tests/browser/accessibility-public.spec.ts",),
 }
 SUITES = (*PHP_TARGETS, *FRONTEND_SUBSETS, *BROWSER_SUBSETS)
 ENGINES = ("sqlite", "mysql")
