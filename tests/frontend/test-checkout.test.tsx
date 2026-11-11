@@ -138,6 +138,40 @@ describe('hosted Stripe test checkout', () => {
       expect(screen.getByRole('button', { name: 'Refresh test order status' })).toBeInTheDocument();
     });
 
+    it('keeps the payment-regression guard once a poll that started unverified has seen a verified payment', async () => {
+      vi.useFakeTimers();
+      const unverified = fixture('complete');
+      const fetcher = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(json(unverified)).mockResolvedValueOnce(json(awaiting)).mockResolvedValueOnce(json(unverified));
+      render(<TestCheckout orderId={orderId} enabled />);
+      await flush(0);
+      expect(screen.getByTestId('checkout-auto-refresh')).toHaveTextContent('Checking for updates automatically');
+      await flush(5_000);
+      expect(screen.getByRole('status')).toHaveTextContent('Test payment verified');
+      await flush(5_000);
+      expect(fetcher).toHaveBeenCalledTimes(3);
+      // The stale unverified read is refused: verified progress stays and nothing reopens payment.
+      expect(screen.getByRole('status')).toHaveTextContent('Test payment verified');
+      expect(screen.getByText(/previously verified test payment remains recorded/)).toBeInTheDocument();
+      expect(screen.queryByText(/No payment or fulfillment is confirmed/)).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: 'Continue to Stripe test checkout' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe/ })).not.toBeInTheDocument();
+      expect(screen.getByTestId('checkout-auto-refresh')).toHaveTextContent('Automatic checking has stopped because the status could not be loaded');
+    });
+
+    it('reports a failed poll after verification as a status problem, never as an unconfirmed payment', async () => {
+      vi.useFakeTimers();
+      vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(json(fixture('complete'))).mockResolvedValueOnce(json(awaiting)).mockRejectedValueOnce(new Error('offline'));
+      render(<TestCheckout orderId={orderId} enabled />);
+      await flush(0);
+      await flush(5_000);
+      await flush(5_000);
+      expect(screen.getByRole('status')).toHaveTextContent('Test payment verified');
+      expect(screen.getByText(/previously verified test payment remains recorded/)).toBeInTheDocument();
+      expect(screen.queryByText(/No payment or fulfillment is confirmed/)).not.toBeInTheDocument();
+    });
+
     it('stops after about three minutes and keeps the manual button', async () => {
       vi.useFakeTimers();
       const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => json(awaiting));

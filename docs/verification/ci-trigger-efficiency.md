@@ -71,6 +71,21 @@ focused selection, routing and database receipts. Hosted event execution is
 recorded in the integrating PR; local checks alone do not prove an Actions pass.
 
 
+### Ops-kit step and the Launchpad API (2026-11-11)
+
+From about 13:27 UTC on 2026-11-11 every `backend-quality` job failed in "Verify the staging and production ops kits"
+at `add-apt-repository ppa:ondrej/php`, which calls `api.launchpad.net` (unreachable). The runner has no `php-fpm8.4`:
+setup-php installs its own prebuilt PHP 8.4 (run 43012360621: `Installed PHP 8.4.27`, then `php8.4-cli` and `php8.4-fpm`
+were "previously unselected" when the step installed them), so the tests' real `php-fpm8.4 -t` needs the apt package.
+If setup-php's prebuilt PHP already put a `php-fpm8.4` reporting 8.4 on PATH, the step uses that binary and installs
+no PHP apt package. Otherwise:
+
+`preflight.yml` and `final-verification.yml` now take it from `https://packages.sury.org/php/` (noble, the same
+maintainer and builds, no Launchpad service) as a plain apt source whose key is fetched from that host and accepted only
+when its full fingerprint equals the pin `15058500A0235D97F5D10063B188E2B695BD4743`; a fetch or fingerprint failure
+prints a `::warning::` and falls back to the old PPA line. The step then asserts `php-fpm8.4 -v` reports 8.4. Tests,
+skips and the unchanged "no skip" rule are untouched. Only a real Actions run proves the apt install on a runner.
+
 ## T01/T02 candidate — September 30, 2026
 
 The new [documentation routing](ci-scope.md) and [focused feedback](focused-ci.md) guides describe the current candidate. Runtime PR/main/manual events retain complete Foundation CI, while an explicit allowlist can select documentation validation. Feature pushes run a separate informative unit workflow. The `backend` aggregate requires every selected-mode result, including frontend/browser in full mode. The dated PR #68 record below describes the earlier unconditional policy; it remains provenance, not the new docs exception. Actual integration and event execution results belong to the integrating PR. No runtime post-merge deduplication, draft suppression or scheduled run is introduced.

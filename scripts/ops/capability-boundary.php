@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Vasey\Ops;
 
+use App\Domain\Commerce\UnpaidRelease\UnpaidReleasePolicy;
 use Illuminate\Support\Arr;
 
 /**
@@ -18,8 +19,8 @@ use Illuminate\Support\Arr;
 final class CapabilityBoundary
 {
     /**
-     * The thirteen capability flags, environment key => config key. Each defaults to false in config/ and both staging templates state
-     * each as `false`. Nine are admitted on staging by TestEnvironment::admitsTestCommerce() and are off because the rehearsal does not
+     * The twelve capability flags, environment key => config key. Each defaults to false in config/ and both staging templates state
+     * each as `false`. Eight are admitted on staging by TestEnvironment::admitsTestCommerce() and are off because the rehearsal does not
      * use them; the support-attachment fixture is local and testing only; and VASEY_OPERATIVE_FREE_GRANTS_ENABLED,
      * CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED and VASEY_TRANSACTIONAL_MAIL_ENABLED are not gated by environment outside local
      * and testing (an adapter or operator configuration is the only other condition), so on staging the template line and the deploy
@@ -29,7 +30,6 @@ final class CapabilityBoundary
         'VASEY_TEST_SERVICE_PROJECTS_ENABLED' => 'services-projects.test_enabled',
         'VASEY_TEST_FREE_GRANTS_ENABLED' => 'free-grants.test_enabled',
         'VASEY_TEST_CUSTOMER_CONSENT_ENABLED' => 'customer-preferences.test_grants_enabled',
-        'VASEY_TEST_UNPAID_RELEASE_ENABLED' => 'unpaid-release.enabled',
         'VASEY_TEST_REFUND_RESOLUTION_ENABLED' => 'refund-resolution.enabled',
         'VASEY_TEST_REFUND_DISPUTE_ENABLED' => 'refund-dispute.enabled',
         'VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED' => 'transactional-notifications.test_enabled',
@@ -42,7 +42,20 @@ final class CapabilityBoundary
     ];
 
     /**
-     * Stated false in the base staging template beside the thirteen: production-lane, production-only or one-way, so never left to a default.
+     * Optional on staging (Sean's authorization for the staging alpha, 2026-11-11): environment key => the config key of the switch
+     * and the policy class that admits it. Default off: config/ defaults it to false and both staging templates state it `false`.
+     * Not part of stagedFlags(), so the staging gates do not hold it false; they accept it only as exactly false, or as exactly true
+     * when the policy's current() accepts the effective configuration. For unpaid release that means TestEnvironment admits test
+     * commerce (never production), Stripe test mode, an `acct_` account and VASEY_TEST_UNPAID_RELEASE_POLICY equal to the exact
+     * UnpaidReleasePolicy::CONTRACT. Production holds it false (PRODUCTION_LAUNCH_OFF_FLAGS). Review: docs/test-unpaid-release.md.
+     */
+    public const STAGING_OPTIONAL_FLAGS = [
+        'VASEY_TEST_UNPAID_RELEASE_ENABLED' => ['config' => 'unpaid-release.enabled',
+            'policy' => UnpaidReleasePolicy::class],
+    ];
+
+    /**
+     * Stated false in the base staging template beside the twelve: production-lane, production-only or one-way, so never left to a default.
      * The public track sitemap build chain is not environment-gated; promoting customer listening data to V2 cannot be undone by
      * turning it off again. VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED is deliberately not held: it admits only the
      * `vasey:staging-synthetic-catalog` console command, which refuses production whatever the flag says, and
@@ -66,6 +79,8 @@ final class CapabilityBoundary
         'REPORTING_MARKETING_SEGMENT_ENABLED' => 'reporting.customer_segments.marketing_segment_enabled',
         // BL-70: Stripe test-mode service invoicing. Admitted on staging by the test-commerce gate, never in production.
         'VASEY_TEST_SERVICE_INVOICING_ENABLED' => 'services-invoicing.test_enabled',
+        // Unpaid release is optional on staging (STAGING_OPTIONAL_FLAGS) and has no production path; production holds it false.
+        'VASEY_TEST_UNPAID_RELEASE_ENABLED' => 'unpaid-release.enabled',
         // BL-71: the BeatStars catalog import is a staging console command that refuses production in code; the hold keeps the flag
         // from ever being set on the production host, as the staging deploy gate cannot (it must be true for the import run).
         'VASEY_STAGING_BEATSTARS_IMPORT_ENABLED' => 'staging-beatstars-import.enabled',
@@ -81,7 +96,7 @@ final class CapabilityBoundary
     /** Lanes the brief names (Paid252, Tax255, production customer identity, production free grants): a rename must update this. */
     public const NAMED_PRODUCTION_LANES = ['paid-grants', 'paid-tax-grants', 'production-tax-checkout', 'production-customer-identity', 'production-free-grants'];
 
-    /** @return array<string, string> environment key => config key, the thirteen and the four */
+    /** @return array<string, string> environment key => config key, the twelve and the four */
     public static function stagedFlags(): array
     {
         return [...self::CAPABILITY_FLAGS, ...self::ADDITIONAL_FLAGS];
@@ -105,6 +120,28 @@ final class CapabilityBoundary
         }
 
         return $notOff;
+    }
+
+    /**
+     * The optional staging flags the effective configuration does not admit: a value other than exactly false, unless it is
+     * exactly true and the flag's policy accepts the configuration. Strict for the same reasons as flagsNotOff(); a missing
+     * config key reads as null and is refused.
+     *
+     * @param  callable(string): mixed  $read  reads one config key, normally `config(...)`
+     * @param  callable(string): bool  $admits  given a policy class, true only when its current() accepts the configuration
+     * @return list<string> environment keys
+     */
+    public static function optionalFlagsRefused(callable $read, callable $admits): array
+    {
+        $refused = [];
+        foreach (self::STAGING_OPTIONAL_FLAGS as $environmentKey => $flag) {
+            $value = $read($flag['config']);
+            if ($value !== false && ($value !== true || $admits($flag['policy']) !== true)) {
+                $refused[] = $environmentKey;
+            }
+        }
+
+        return $refused;
     }
 
     /**

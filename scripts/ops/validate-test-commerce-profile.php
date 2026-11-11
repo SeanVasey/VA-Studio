@@ -15,9 +15,11 @@ declare(strict_types=1);
  * --template replaces each documented placeholder with a synthetic value first, so the committed
  * template can be checked for shape. --probe additionally makes one read-only GET /v1/account with
  * the configured test key, and only after every other check passed.
- * Boundary checks: the profile must state thirteen capability flags explicitly as false (scripts/ops/capability-boundary.php), none of them or of the
+ * Boundary checks: the profile must state twelve capability flags explicitly as false (scripts/ops/capability-boundary.php), none of them or of the
  * other out-of-profile families may be enabled in the booted configuration, and no enabled or mounted flag may be true in any
  * production-lane configuration file (Paid252, Tax255, production customer identity, production free grants and the rest).
+ * The optional staging capabilities (unpaid release) must be stated explicitly as false or true, and true only with the
+ * policy class accepting the booted configuration.
  * Exit codes: 0 every check passed, 1 at least one check failed, 2 usage or unreadable file.
  */
 
@@ -62,7 +64,7 @@ const OUT_OF_PROFILE_FLAGS = [
     'production_checkout.reconciliation_enabled', 'production_checkout.provider_io_enabled',
     'production_checkout.exemption_authoring_enabled', 'production_checkout.committed_read_receipts_enabled',
     'production-tax-checkout.enabled', 'free-grants.test_enabled', 'free-grants.operative_enabled',
-    'memberships.test_mode_enabled', 'refund-resolution.enabled', 'unpaid-release.enabled',
+    'memberships.test_mode_enabled', 'refund-resolution.enabled',
     'transactional-notifications.test_enabled', 'services-projects.test_enabled',
     'customer-preferences.test_grants_enabled',
 ];
@@ -101,7 +103,7 @@ if (! is_file($file) || is_link($file) || ! is_readable($file) || filesize($file
 
 $root = dirname(__DIR__, 2);
 require $root.'/vendor/autoload.php';
-// The thirteen capability flags and the production-lane rule, shared with the staging deploy gate (ops/staging/validate-runtime.php).
+// The twelve capability flags, the optional staging capabilities and the production-lane rule, shared with the staging deploy gate (ops/staging/validate-runtime.php).
 require_once __DIR__.'/capability-boundary.php';
 $raw = (string) file_get_contents($file);
 if ($template) {
@@ -156,6 +158,11 @@ if ($entries !== null) {
     $record('profile.capability_flags_explicit', $notFalse === [], $notFalse === []
         ? 'All '.count(CapabilityBoundary::CAPABILITY_FLAGS).' capability flags are stated explicitly as false.'
         : 'Capability flags missing or not exactly false: '.implode(', ', $notFalse).'. State each as KEY=false (template section 6).');
+    $unstated = array_values(array_filter(array_keys(CapabilityBoundary::STAGING_OPTIONAL_FLAGS), static fn (string $name): bool => ! array_key_exists($name, $values)
+        || ! in_array($values[$name], ['false', '(false)', 'true', '(true)'], true)));
+    $record('profile.optional_flags_explicit', $unstated === [], $unstated === []
+        ? 'Every optional staging capability is stated explicitly as true or false.'
+        : 'Optional capability flags missing or not exactly true or false: '.implode(', ', $unstated).'. State each (template section 6).');
 }
 
 // ---- Boot the real application with this file as its only dotenv source.
@@ -310,6 +317,18 @@ if ($booted) {
     $record('boundary.out_of_profile_families_off', $enabled === [], $enabled === []
         ? 'Production checkout, production tax checkout and the other test families are off.'
         : 'Enabled outside this profile: '.implode(', ', $enabled).'.');
+    $refused = CapabilityBoundary::optionalFlagsRefused(static fn (string $key): mixed => config($key), static function (string $policy): bool {
+        try {
+            app($policy)->current();
+
+            return true;
+        } catch (Throwable) {
+            return false;
+        }
+    });
+    $record('boundary.optional_capabilities_admitted', $refused === [], $refused === []
+        ? 'Each optional staging capability is off, or on with its exact policy accepted.'
+        : 'Optional capability on without an accepted policy (or not a boolean): '.implode(', ', $refused).'.');
     $lanes = CapabilityBoundary::productionLanes($root.'/config', static fn (string $stem): array => (array) config($stem));
     $record('boundary.production_lanes_closed', $lanes['open'] === [] && $lanes['missing'] === [], match (true) {
         $lanes['missing'] !== [] => 'Production lane configuration not found (renamed? update CapabilityBoundary): '.implode(', ', $lanes['missing']).'.',

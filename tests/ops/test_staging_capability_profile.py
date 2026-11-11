@@ -4,6 +4,7 @@ The staging templates (ops/staging/env.staging.example, ops/staging/test-commerc
 application capability flag explicitly. This reads the real config files and policy classes (no copies of the facts), so a new
 config key, a flipped default or a changed admission rule fails here and sends the profile back for review. It reads files only:
 no application boot, database, network or host."""
+import json
 import re
 import unittest
 from pathlib import Path
@@ -17,12 +18,11 @@ ENV_CALL = re.compile(r"""env\(\s*['"]([A-Za-z0-9_]+)['"]""")
 ASSIGNMENT = re.compile(r"^(#?)\s*([A-Z][A-Z0-9_]*)=(.*)$")
 
 # Environment key -> (config file, config key). The ten flags of batch K2 plus A5's refund/dispute flag and lane CX's data rights and
-# order-ready email flags, in the validator's CAPABILITY_FLAGS.
+# order-ready email flags, in the validator's CAPABILITY_FLAGS, less unpaid release, which moved to OPTIONAL on 2026-11-11.
 FLAGS = {
     "VASEY_TEST_SERVICE_PROJECTS_ENABLED": ("services-projects", "test_enabled"),
     "VASEY_TEST_FREE_GRANTS_ENABLED": ("free-grants", "test_enabled"),
     "VASEY_TEST_CUSTOMER_CONSENT_ENABLED": ("customer-preferences", "test_grants_enabled"),
-    "VASEY_TEST_UNPAID_RELEASE_ENABLED": ("unpaid-release", "enabled"),
     "VASEY_TEST_REFUND_RESOLUTION_ENABLED": ("refund-resolution", "enabled"),
     "VASEY_TEST_REFUND_DISPUTE_ENABLED": ("refund-dispute", "enabled"),
     "VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED": ("transactional-notifications", "test_enabled"),
@@ -33,7 +33,14 @@ FLAGS = {
     "VASEY_OPERATIVE_FREE_GRANTS_ENABLED": ("free-grants", "operative_enabled"),
     "VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED": ("support-attachments", "fixture_enabled"),
 }
-# Stated explicitly but outside the thirteen: production-lane or one-way, so never left to a default on staging.
+# Optional on staging (Sean's authorization for the staging alpha, 2026-11-11): CapabilityBoundary::STAGING_OPTIONAL_FLAGS,
+# environment key -> (config file, config key, policy class). Both templates still state each as `false`: turning one on is a
+# per-host decision with its exact policy line, never a template default. The deploy gate accepts exactly false, or exactly true
+# with the policy class accepting the effective configuration.
+OPTIONAL = {
+    "VASEY_TEST_UNPAID_RELEASE_ENABLED": ("unpaid-release", "enabled", "App\\Domain\\Commerce\\UnpaidRelease\\UnpaidReleasePolicy"),
+}
+# Stated explicitly but outside the twelve: production-lane or one-way, so never left to a default on staging.
 EXTRA_FALSE = ("DISCOVERY_SITEMAP_ENABLED", "VASEY_LISTENING_V2_PROMOTION_ENABLED", "VASEY_PRODUCTION_REAL_MAIL_ADMITTED",
                "VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED")
 
@@ -119,7 +126,7 @@ class TheTenFlagsAreExplicit(unittest.TestCase):
     def test_both_templates_state_each_flag_once_as_an_uncommented_false(self):
         for template in (BASE, OVERLAY):
             found = assignments(template)
-            for flag in FLAGS:
+            for flag in (*FLAGS, *OPTIONAL):
                 self.assertEqual(found.get(flag), [(False, "false")], f"{template.name}: {flag}")
         base = assignments(BASE)
         for flag in EXTRA_FALSE:
@@ -128,7 +135,7 @@ class TheTenFlagsAreExplicit(unittest.TestCase):
         self.assertTrue(all(commented for commented, _ in base["VASEY_LISTENING_V2_ROLLOUT_REVIEW_REFERENCE"]))
 
     def test_every_flag_reads_its_environment_key_and_defaults_to_false(self):
-        for flag, (config, key) in FLAGS.items():
+        for flag, (config, key) in {**FLAGS, **{name: entry[:2] for name, entry in OPTIONAL.items()}}.items():
             text = source(f"config/{config}.php")
             self.assertRegex(text, rf"'{re.escape(key)}'\s*=>\s*env\('{flag}',\s*false\)", f"config/{config}.php {key}")
         for flag, (config, key) in {"DISCOVERY_SITEMAP_ENABLED": ("discovery-sitemap", "enabled"),
@@ -163,13 +170,60 @@ class TheTenFlagsAreExplicit(unittest.TestCase):
         # Fail closed when the shared file is absent: a thrown exception becomes the refusal runtime.unavailable.
         self.assertRegex(gate, r"if \(! is_file\(\$boundary\) \|\| is_link\(\$boundary\)\) \{\s*throw new RuntimeException;")
 
+    def test_the_boundary_declares_exactly_the_optional_flags_and_keeps_them_out_of_the_held_set(self):
+        text = source("scripts/ops/capability-boundary.php")
+        block = re.search(r"const STAGING_OPTIONAL_FLAGS = \[(.*?)\n    \];", text, re.S)
+        self.assertIsNotNone(block)
+        found = re.findall(r"'([A-Z0-9_]+)' => \['config' => '([a-z-]+)\.([a-z0-9_]+)',\s*'policy' => \\?([A-Za-z\\]+)::class\]", block.group(1))
+        uses = dict((name.rsplit("\\", 1)[-1], name) for name in re.findall(r"(?m)^use ([A-Za-z\\]+);$", text))
+        self.assertEqual({flag: (config, key, uses.get(policy, policy.lstrip("\\"))) for flag, config, key, policy in found}, OPTIONAL)
+        for flag in OPTIONAL:
+            self.assertNotIn(f"'{flag}' =>", re.search(r"const CAPABILITY_FLAGS = \[(.*?)\n    \];", text, re.S).group(1))
+            self.assertNotIn(f"'{flag}' =>", re.search(r"const ADDITIONAL_FLAGS = \[(.*?)\n    \];", text, re.S).group(1))
+            # Production holds every optional staging flag false.
+            self.assertIn(f"'{flag}' => '{OPTIONAL[flag][0]}.{OPTIONAL[flag][1]}'",
+                          re.search(r"const PRODUCTION_LAUNCH_OFF_FLAGS = \[(.*?)\n    \];", text, re.S).group(1))
+            self.assertRegex(source("ops/production/validate-runtime.php"), rf"const LAUNCH_OFF_HOLDS = \[[^\]]*'{flag}',")
+        # An optional flag passes only as exactly false, or exactly true with the policy accepting.
+        self.assertRegex(text, r"if \(\$value !== false && \(\$value !== true \|\| \$admits\(\$flag\['policy'\]\) !== true\)\) \{\s*\$refused\[\] = \$environmentKey;")
+
+    def test_the_deploy_gate_and_the_profile_validator_admit_an_optional_flag_only_through_its_policy(self):
+        admits = (r"static function \(string \$policy\): bool \{\s*try \{\s*app\(\$policy\)->current\(\);\s*return true;"
+                  r"\s*\} catch \(Throwable\) \{\s*return false;\s*\}\s*\}")
+        gate = source("ops/staging/validate-runtime.php")
+        self.assertRegex(gate, r"CapabilityBoundary::optionalFlagsRefused\(static fn \(string \$key\): mixed => config\(\$key\), " + admits)
+        self.assertIn("$check('runtime.optional_'.strtolower($flag), ! in_array($flag, $refused, true));", gate)
+        self.assertLess(gate.index("CapabilityBoundary::optionalFlagsRefused("), gate.index('echo "PASS runtime.profile'))
+        validator = source("scripts/ops/validate-test-commerce-profile.php")
+        self.assertRegex(validator, r"CapabilityBoundary::optionalFlagsRefused\(static fn \(string \$key\): mixed => config\(\$key\), " + admits)
+        self.assertIn("'boundary.optional_capabilities_admitted'", validator)
+        self.assertIn("'profile.optional_flags_explicit'", validator)
+        out_of_profile = re.search(r"const OUT_OF_PROFILE_FLAGS = \[(.*?)\];", validator, re.S).group(1)
+        for flag, (config, key, _) in OPTIONAL.items():
+            self.assertNotIn(f"'{config}.{key}'", out_of_profile, f"{flag} is optional, not out of profile")
+
+    def test_the_overlay_shows_the_exact_unpaid_release_policy_commented(self):
+        # The one line the operator uncomments to turn the capability on must be the contract the policy class accepts.
+        policy = source("app/Domain/Commerce/UnpaidRelease/UnpaidReleasePolicy.php")
+        contract = re.search(r"public const CONTRACT = \[(.*?)\];", policy, re.S).group(1)
+        expected = dict(re.findall(r"'([a-z_]+)' => '([a-z0-9_-]+)'", contract))
+        expected["schema_version"] = int(re.search(r"'schema_version' => (\d+)", contract).group(1))
+        lines = [value for commented, value in assignments(OVERLAY).get("VASEY_TEST_UNPAID_RELEASE_POLICY", []) if commented]
+        self.assertEqual(len(lines), 1, "the overlay must show the policy once, commented")
+        self.assertEqual(assignments(OVERLAY)["VASEY_TEST_UNPAID_RELEASE_POLICY"], [(True, lines[0])])
+        self.assertTrue(lines[0].startswith("'") and lines[0].endswith("'"))
+        self.assertEqual(json.loads(lines[0][1:-1]), expected)
+        self.assertEqual(len(expected), 10)
+        self.assertNotIn("VASEY_TEST_UNPAID_RELEASE_POLICY", {name for name, entries in assignments(BASE).items()
+                                                             if any(not commented for commented, _ in entries)})
+
     def test_the_deploy_gate_checks_every_staged_flag_before_it_passes(self):
         gate = source("ops/staging/validate-runtime.php")
         self.assertLess(gate.index("CapabilityBoundary::flagsNotOff("), gate.index('echo "PASS runtime.profile'))
         self.assertLess(gate.index("CapabilityBoundary::productionLanes("), gate.index('echo "PASS runtime.profile'))
 
     def test_the_two_templates_agree_on_every_flag(self):
-        for flag in (*FLAGS, *EXTRA_FALSE):
+        for flag in (*FLAGS, *OPTIONAL, *EXTRA_FALSE):
             if flag in assignments(OVERLAY):
                 self.assertEqual(assignments(OVERLAY)[flag], assignments(BASE)[flag], flag)
 
@@ -297,6 +351,8 @@ class NothingEnablesAProductionPath(unittest.TestCase):
                     self.assertEqual(value, "false", f"{BASE.name}: {name}")
 
     def test_the_overlay_enables_exactly_the_guest_purchase_chain(self):
+        # Unpaid release is optional on staging (2026-11-11) but deliberately not enabled here: the operator turns it on per host
+        # with its exact policy line. Adding it to this pinned set would make it a template default; that needs a new decision.
         enabled = sorted(name for name, entries in assignments(OVERLAY).items()
                          if name.endswith("_ENABLED") and any(not c and v == "true" for c, v in entries))
         self.assertEqual(enabled, sorted([
