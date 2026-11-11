@@ -50,6 +50,14 @@ OperationalSignals::track(Schedule::command('vasey:upload-sessions-sweep --execu
 OperationalSignals::track(Schedule::command('vasey:finalize-test-kit-grants')->cron('4-59/10 * * * *')->withoutOverlapping(10)
     ->when(fn (): bool => app(SoundKitPurchasePolicy::class)->admitted()), 'vasey:finalize-test-kit-grants');
 
+// BL-13: records the license contract original of every paid kit grant that has none, so a paid kit order reaches "contract issued"
+// without an operator (the staff view and `vasey:issue-test-kit-contracts` do the same step on demand). The track contract command
+// has no schedule to mirror; this uses the grant sweep's 10-minute cadence offset to :06/:16/…/:56, clear of the other jobs' minutes.
+// Runs only while SoundKitPurchasePolicy admits the kit lane (never in production); a refused grant (for example the licensor line
+// is unset) exits non-zero, which the tracked signal shows as Needs attention. Idempotent: a recorded original is never re-rendered.
+OperationalSignals::track(Schedule::command('vasey:issue-test-kit-contracts')->cron('6-59/10 * * * *')->withoutOverlapping(10)
+    ->when(fn (): bool => app(SoundKitPurchasePolicy::class)->admitted()), 'vasey:issue-test-kit-contracts');
+
 // FP-028 dashboard: one upserted row a minute proves the scheduler itself runs (OperationalSignals; "Scheduler last run" turns
 // Needs attention after `reporting.health.scheduler_heartbeat_stale_seconds`). The tracked commands above record their latest
 // exit outcome the same way, so a failing scheduled command shows Needs attention. No overlap lock: a heartbeat is one upsert.
