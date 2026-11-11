@@ -3,9 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Domain\SoundKits\Purchases\Models\SoundKitOrder;
+use App\Domain\SoundKits\Purchases\Models\SoundKitPayment;
 use App\Domain\SoundKits\Purchases\SoundKitPayments;
 use App\Domain\SoundKits\Purchases\SoundKitPurchasePolicy;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Throwable;
 
 /**
@@ -33,6 +35,7 @@ final class FinalizeTestKitGrants extends Command
                     ->whereColumn('sound_kit_payments.sound_kit_order_id', 'sound_kit_orders.id'))
                 ->whereNotExists(fn ($grants) => $grants->selectRaw('1')->from('sound_kit_grants')
                     ->whereColumn('sound_kit_grants.sound_kit_order_id', 'sound_kit_orders.id'))
+                ->orderByRaw($this->priority(), [SoundKitPayment::class, 'payment_changed', SoundKitPayment::class])
                 ->orderBy('id')->limit((int) $limit)->get();
         } catch (Throwable) {
             $this->error('Kit grant finalization is unavailable or the request is invalid.');
@@ -47,5 +50,20 @@ final class FinalizeTestKitGrants extends Command
         }
 
         return $failed ? self::FAILURE : self::SUCCESS;
+    }
+
+    /**
+     * Fair selection without a new column: orders never refused first, then orders whose only recorded refusal is transient, and
+     * orders audited as `payment_changed` (they need an operator, and each is retried only when nothing newer is waiting) last. 25 or
+     * more permanently refused orders therefore cannot starve a newer retryable one. The refusal is audited once per reason on the
+     * order's payment ({@see SoundKitPayments::settle()}).
+     */
+    private function priority(): string
+    {
+        $refused = "from audit_events a where a.action = 'sound_kit.test_grant.refused' and a.subject_type = ?"
+            .' and a.subject_id = (select p.id from sound_kit_payments p where p.sound_kit_order_id = sound_kit_orders.id)';
+        $changed = $refused.(DB::getDriverName() === 'sqlite' ? " and json_extract(a.context, '$.reason') = ?" : " and json_unquote(json_extract(a.context, '$.reason')) = ?");
+
+        return "case when exists (select 1 {$changed}) then 2 when exists (select 1 {$refused}) then 1 else 0 end";
     }
 }
