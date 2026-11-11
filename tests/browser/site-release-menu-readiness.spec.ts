@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
-import { openReleaseMenu, releaseMenuTrigger } from './site-release-row';
+import { openReleaseMenu, releaseMenuItem, releaseMenuTrigger } from './site-release-row';
 
 const dropdownView = readFileSync(new URL('../../resources/views/filament/admin/dropdown-focus.blade.php', import.meta.url), 'utf8');
 const dropdownScript = dropdownView.match(/<script>([\s\S]*?)<\/script>/)?.[1];
@@ -13,7 +13,7 @@ test('release menu opening waits for replaced-panel identity and visibility to a
   const label = 'Synthetic replaced panel';
   await page.setContent(`<table><tbody><tr><td>${label}</td><td><div class="fi-dropdown">
     <div class="fi-dropdown-trigger"><button aria-label="More actions for “${label}”" aria-controls="old-panel" aria-expanded="true">More</button></div>
-    <div class="fi-dropdown-panel" style="display: none"><button>Edit as new draft</button></div>
+    <div class="fi-dropdown-panel" style="display: none"><button role="menuitem">Edit as new draft</button></div>
     </div></td></tr></tbody></table>`);
   await page.evaluate(() => {
     const trigger = document.querySelector<HTMLButtonElement>('.fi-dropdown-trigger button')!;
@@ -32,7 +32,7 @@ test('release menu opening waits for replaced-panel identity and visibility to a
     setTimeout(() => { trigger.setAttribute('aria-expanded', 'false'); }, 300);
   });
   const row = await openReleaseMenu(page, label);
-  await expect(row.getByRole('button', { name: 'Edit as new draft', exact: true })).toBeVisible();
+  await expect(releaseMenuItem(row, 'Edit as new draft')).toBeVisible();
   await expect(releaseMenuTrigger(page, label)).toHaveAttribute('aria-controls', 'replacement-panel');
   await expect(page.locator('body')).toHaveAttribute('data-early-clicks', '0');
   await expect(page.locator('body')).toHaveAttribute('data-clicks', '1');
