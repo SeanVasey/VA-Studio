@@ -18,7 +18,9 @@
 #   4. the Forge .env validated for the staging profile and installed 0600;
 #   5. one root lease encloses build/sealing; activation freshly quiesces under its own retained lease;
 #   6. a free-space check before any quiesce, then a backup of the database, private storage and .env, and an isolated
-#      restore proof, before migrating; local backup retention is applied after the snapshot and after a successful deploy;
+#      restore proof, before migrating; local backup retention is applied after the snapshot and after a successful deploy.
+#      The snapshot never ships off-host: it only queues a "pending ship" marker. After the healthy resume ctl starts the
+#      off-host shipment detached (site up, own lock, /var/log/vasey-staging/ship-pending.log); its failure never fails a deploy;
 #   7. maintenance in the new release, migrate --force (no --pretend: raw-PDO DDL ignores it), config/route/view/event caches,
 #      vasey:doctor, redacted readiness reports;
 #   8. atomic switch of `current`, PHP-FPM and workers started on it and proven, maintenance lifted, GET / = 200.
@@ -233,4 +235,5 @@ step "pruning old releases"
 "${CTL[@]}" prune || echo "forge-deploy: WARNING: prune failed; old releases kept" >&2
 step "applying local backup retention"
 "${CTL[@]}" backup-prune || echo "forge-deploy: WARNING: backup retention failed; old deploy snapshots kept (run: sudo vasey-staging-ctl backup-prune)" >&2
+step "off-host backup shipment (when configured) was started detached after the resume; it never holds this deploy: tail /var/log/vasey-staging/ship-pending.log, list with: sudo vasey-staging-backup pending"
 step "deployed $SHA; evidence in $EVIDENCE"

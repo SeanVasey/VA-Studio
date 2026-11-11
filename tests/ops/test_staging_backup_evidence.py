@@ -15,6 +15,7 @@ SOURCE = (REPO / "ops/staging/backup.sh").read_text()
 START = SOURCE.index("record_evidence() {")
 FUNCTION = SOURCE[START:SOURCE.index("\n}\n", START) + 3]
 NIGHTLY = SOURCE[SOURCE.index("  nightly)"):SOURCE.index("  predeploy)")]
+FUNCTIONS_SHIP_PENDING = SOURCE[SOURCE.index("ship_pending() {"):SOURCE.index("ship_pending_start() {")]
 SHA = "0123456789abcdef" * 4
 
 PRELUDE = """set -euo pipefail
@@ -124,9 +125,17 @@ class RecordEvidenceTest(unittest.TestCase):
         self.assertLess(resume, ok)
         self.assertLess(ok, failed)
         self.assertLess(failed, die)
-        # Only the nightly run records: predeploy also runs inside it (ctl snapshot) and would double-count.
-        self.assertEqual(SOURCE.count("record_evidence daily"), 2)
-        self.assertNotIn("record_evidence", SOURCE[SOURCE.index("  predeploy)"):])
+        # The nightly run records the local result (and defers "ok" while an off-host copy is still owed); ship-pending records the
+        # off-host result. predeploy also runs inside the nightly (ctl snapshot) and inside every deploy: it must record nothing.
+        self.assertEqual(SOURCE.count("record_evidence daily"), 4)
+        self.assertEqual(NIGHTLY.count("record_evidence daily"), 2)
+        self.assertIn("record_evidence daily failed", FUNCTIONS_SHIP_PENDING)
+        self.assertIn('record_evidence daily ok "$VASEY_BACKUP_DIR/$newest_ok"', FUNCTIONS_SHIP_PENDING)
+        predeploy = SOURCE[SOURCE.index("  predeploy)"):SOURCE.index("  space-check)")]
+        self.assertNotIn("record_evidence", predeploy)
+        # Starting the shipment is after the resume and before the nightly run reports a local failure.
+        self.assertLess(resume, NIGHTLY.index("ship_pending_start"))
+        self.assertLess(NIGHTLY.index("ship_pending_start"), die)
 
 
 if __name__ == "__main__":

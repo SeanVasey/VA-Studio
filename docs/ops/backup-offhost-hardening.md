@@ -2,9 +2,13 @@
 
 `ops/staging/backup.sh` (and the production kit's derived copy) takes a nightly or pre-deploy backup, proves it restores on a
 disposable MySQL, and optionally copies the set off the host with rsync over SSH. This guide covers four **opt-in** additions.
-Every one is off unless `backup.conf` (below) turns it on. With no `backup.conf` the script behaves exactly as before: the same
-restore proof, and a plain `rsync` of the whole set to `VASEY_BACKUP_DEST` when that is set. The existing tests in
-`tests/ops/test_staging_backup_*.py` still pass unchanged.
+Every one is off unless `backup.conf` (below) turns it on. With no `backup.conf` the script behaves as before: the same
+restore proof, and a plain `rsync` of the whole set to `VASEY_BACKUP_DEST` when that is set.
+
+**Shipping happens after the site is back up (2026-11-11).** `predeploy` (every deploy) and the nightly snapshot no longer copy
+anything off the host. They take the snapshot and the restore proof, queue the set as *pending* and return; the shipment then runs
+detached with the site serving. See "Deferred shipping" below. This replaces the older behaviour in which `nightly` and `predeploy`
+called `ship` inside the maintenance window.
 
 | Addition | Setting | What it does |
 | --- | --- | --- |
@@ -56,21 +60,64 @@ transport and retention, or the reason it refuses. It never prints a value.
   except after a failed rclone transfer, where it is kept for the retry ("Retrying a failed rclone transfer", below).
 - **One ship at a time.** Each hardened ship holds a lock on `backups/.offhost.lock` (a symlinked lock file is refused) while it
   cleans up, encrypts and transfers. A manual `ship` that finds it held refuses at once with "another off-host ship is running",
-  before it removes or sends anything. `predeploy` (the nightly run and every deploy go through it, with the site quiesced) waits up
-  to 600 seconds instead, so a manual ship that overlaps a deploy delays it rather than failing it mid-operation; if the lock is still
-  held after that, the deploy's backup step fails and the control helper leaves the site quiesced with its operation marker for root
-  recovery (`ops/staging/README.md`, operation markers and root recovery). Any time limit of the deploy runner (Forge's, if it has
-  one; not verified here) must cover that 600-second wait plus the snapshot, the restore proof and the ship, or the runner itself can
-  strand the operation marker. Do not start a long manual ship while a deploy may run. The nightly run and deploys never
-  compete with each other: `.deploy.lock` already serializes them. Pruning (`nightly`, after the resume) runs outside this lock: it
-  never touches staging directories or kept copies, and a manual ship of a set that pruning removes at that moment fails rather than
-  ship anything else. The default path takes no such lock.
+  before it removes or sends anything. `ship-pending` (below) runs with the site up, so it waits up to 600 seconds for a manual ship
+  instead of failing, and the nightly run and deploys never wait for any ship at all: they only queue and start it. The nightly run
+  and deploys never compete with each other: `.deploy.lock` already serializes them. Pruning (`nightly`, after the resume) runs outside
+  this lock: it never touches staging directories or kept copies, and a manual ship of a set that pruning removes at that moment fails
+  rather than ship anything else. The default path takes no such lock.
 - **Cost.** Encryption streams `tar | age` into a temporary file under `backups/.ship.*` (0700), so it needs free space of about
   one more copy of the set; the script checks that first. A run killed mid-transfer can leave its `.ship.*` directory behind; the next
   hardened ship (under the lock, so no transfer is running) removes any that has been untouched for more than a day, and only real
-  directories named exactly `.ship.` plus six characters (never a link). Shipping runs inside the same maintenance window as the snapshot
-  (`nightly` and `predeploy` call `ship` before the site resumes), so encryption lengthens that window by the time to encrypt and
-  upload. Moving the transfer after the resume is a possible later change.
+  directories named exactly `.ship.` plus six characters (never a link). Encryption and upload no longer lengthen the maintenance
+  window: they run after the resume (below). On staging (2026-11-11) the window had grown from the snapshot (8 minutes) and the
+  restore proof (9) by a 14-minute ship, about 32 minutes of downtime, and a B2 `403 storage_cap_exceeded` failed the deploy before
+  the switch and left the site down.
+
+## Deferred shipping: pending sets, `ship-pending`, and what never fails
+
+| Step | Where | What it does |
+| --- | --- | --- |
+| Snapshot, restore proof, queue | `predeploy` (every deploy, and the nightly run through `ctl snapshot`), site quiesced | After the proof it writes `backups/.offhost-pending.<set>` (0600, a few lines of text) and returns. **No age, no rclone, no rsync, no network.** A bad off-host configuration is only a logged warning here; a marker that cannot be written is a warning too |
+| Start | after the healthy resume: `ctl activate` and `ctl refresh` (after the recovery marker is cleared), and the nightly run after `ctl resume` | `ship-pending-start` starts `ship-pending` as a transient systemd unit (`vasey-staging-ship-pending.service`, `systemd-run --collect`, nice 10), or without systemd-run as a `setsid` child with every inherited lock descriptor (`.deploy.lock`, the ctl and writer locks) closed. It returns at once and **never fails the deploy or the nightly run**: a start that fails is a warning, and the set simply stays pending |
+| Ship | `ship-pending`, site up | Takes its own run lock (`backups/.ship-pending.lock`; a second start exits quietly and the running one also picks up sets queued meanwhile), then ships pending sets **newest first** through the same `ship`, so every guarantee below is the one that already held: the off-host lock, `RESTORE_VERIFIED` required in the hardened path, `REQUIRE_ENCRYPTION`, no plaintext to a remote, the retry copies, the already-shipped check. The first failure stops the run. Output goes to `/var/log/vasey-staging/ship-pending.log` (rotated weekly) |
+| Evidence | end of `ship-pending` | `vasey:backup-record --kind=daily` as the application user: **ok** with the newest shipped set's size and dump hash, or **failed** when a shipment failed. The dashboard's accepted kinds are fixed (no free text), so the reason is **not** on the dashboard: it is in the log and in the marker (`pending` below) |
+| Retry | the next nightly run (and any later deploy) | Every start picks up whatever is still pending, including sets an earlier failure left. A failed snapshot in the nightly run still starts the retry |
+
+- **Dashboard semantics.** With an off-host destination configured, "last successful backup" now means *the set has its off-host copy*:
+  the nightly run records `daily failed` right away if its own snapshot or proof failed, but it **does not** record `daily ok` itself;
+  `ship-pending` does, when the transfer is verified. Until then the dashboard ages towards stale (`REPORTING_BACKUP_STALE_HOURS`, 26),
+  and a failed shipment turns it red (latest daily run failed) until a later shipment succeeds. A deploy's shipment records the same
+  way, so a failed deploy-set shipment is visible at once rather than at the next nightly run. Without a destination (the host
+  keeps its sets locally only) the nightly run records `daily ok` immediately, as before.
+- **A ship failure never fails an operation whose local proof succeeded.** The unit's failure, a 403 from the remote, a refused
+  configuration and a full disk during encryption are logged, kept in the marker and recorded as failed evidence, and nothing else
+  changes: the deploy has already finished, the nightly run has already resumed the site and returned.
+- **Pruning never removes a pending set.** `prune_local` (flat and tiered; the nightly run, every deploy's retention and
+  `backup-prune`) protects every set that still has a pending marker, as it protects the newest set and the newest
+  `RESTORE_VERIFIED` set. Disk consequence: while the remote keeps failing, one set per deploy and per night stays beyond the
+  retention count (each is about a set of disk; `ship-pending` warns when more than three wait). Fix the remote, or abandon a set
+  deliberately with `pending-clear SET`, after which ordinary retention applies to it again.
+- **Free-space accounting.** `space-check` (before any quiesce) no longer adds the encrypted-copy term on top of the restore proof.
+  The two are sequential: the proof's scratch exists during the maintenance window and is removed before the resume, and the
+  encrypted copy is created afterwards, so on one filesystem the peak is the set plus the larger of the two (two sets in all, where it
+  used to be three). The term is kept, as a *later* need: on a separate
+  filesystem for the restore scratch, the backup filesystem still needs room for the set and its encrypted copy, and a deploy the
+  disk could not ship afterwards is refused before it stops anything. When a ship is still running (the off-host lock is held, so an
+  earlier set's encrypted copy is still growing in `backups/.ship.*`), the check adds one more set, because that copy would otherwise
+  be filling the disk while the next snapshot runs with the site down.
+- **The rsync path** is deferred in exactly the same way (the marker, the start, the evidence). `rsync -a` of the plain set runs
+  after the resume instead of inside the window. Hardened rsync (age to `VASEY_BACKUP_DEST`) is the same.
+- **Operator commands** (as root; the deploy user may start a shipment with `sudo vasey-staging-ctl ship-pending`):
+
+  ```sh
+  sudo /usr/local/sbin/vasey-staging-backup pending                    # sets still waiting: queued, attempts, last result and reason
+  sudo /usr/local/sbin/vasey-staging-backup ship-pending               # ship them now, in the foreground, site up (own run lock; waits for a manual ship)
+  sudo /usr/local/sbin/vasey-staging-backup ship-pending-start         # the same, detached (what deploys and the nightly run use)
+  sudo /usr/local/sbin/vasey-staging-backup ship /srv/vasey-staging/backups/<set>   # one set, as before; clears its pending marker when it succeeds
+  sudo /usr/local/sbin/vasey-staging-backup pending-clear <set>        # give up on one set (it is not deleted; retention applies to it again)
+  systemctl status vasey-staging-ship-pending; tail -n 50 /var/log/vasey-staging/ship-pending.log
+  ```
+
 - **Restore drill (on a machine that has the private key):**
 
   ```sh
@@ -122,8 +169,8 @@ transport and retention, or the reason it refuses. It never prints a value.
   recipients file in `backups/.offhost-retry.<set>` (0700, ciphertext and digests only). The copy is dropped only when the remote is
   listed afterwards and holds no `<set>.tar.age`; then a retry encrypts the set again. If the remote cannot be listed (an outage that
   interrupted the transfer, say), the ciphertext may have landed, so the copy is kept and the retry after the outage re-sends it.
-  `vasey-<kit>-backup ship <set directory>` re-sends the kept bytes and removes the copy once the transfer is verified. Nothing
-  retries on its own: the nightly run ships its own new set. A kept copy encrypted to other recipients (after a rotation), one that
+  `vasey-<kit>-backup ship <set directory>` re-sends the kept bytes and removes the copy once the transfer is verified. A pending
+  set is retried by every `ship-pending` run (the next nightly run, the next deploy, or by hand), which goes through the same `ship`. A kept copy encrypted to other recipients (after a rotation), one that
   no longer matches its digest, one that is not age ciphertext and one that is or contains a link are never sent. If the remote then
   holds either name the ship stops before encrypting, leaves the objects untouched and says to remove them first; the unusable copy
   stays, so reverting the recipients can still complete the set.
@@ -132,8 +179,8 @@ transport and retention, or the reason it refuses. It never prints a value.
   with a log line naming the set (that set then needs its partial remote object removed before it can ship again). The next hardened
   ship also removes the copy of a pruned set. Every rclone ship logs, and `check-offhost` prints, "N kept retry copies, B bytes".
   Size the backup filesystem for the retained sets plus two kept copies plus one more set-sized copy for the next encryption (the
-  free-space check covers only that last one). `snapshot` itself has no free-space check, and the backups may share a filesystem with
-  MySQL, so watch it.
+  pre-deploy free-space check covers that last one, as described under "Deferred shipping"). The nightly `snapshot` has no free-space
+  check, and the backups may share a filesystem with MySQL, so watch it.
 - **A remote without age recipients is refused.** The set holds the masters, stems, contracts, customer data and `env.backup` (which
   holds `APP_KEY`), so the script will not send it as stored: `check-offhost` and every ship stop with "would leave this host
   unencrypted" before anything is transferred, and the local set is untouched. The one exception is an explicit
@@ -173,10 +220,17 @@ directories, the shipping lock, the real rclone 1.60.1 refusing a differing remo
 retry after an interrupted checksum upload (only the interruption is simulated; the retry re-sends the first attempt's exact bytes,
 which then decrypt), the presence check and digest read-back on a real `chunker` remote with `hash_type = none`, "already shipped",
 the kept-copy rule and cap, the bounded lock wait, a retry after an outage that also stopped listing, and the size check behind
-"already shipped". `tests/ops/test_staging_backup_offhost.py` holds them (72 tests).
+"already shipped". `tests/ops/test_staging_backup_offhost.py` holds them (94 tests). `tests/ops/test_staging_deferred_ship.py` (38 tests) covers the deferral: the
+shipped dispatcher with the snapshot and proof stubbed, real `age` and `rclone` against a local-directory remote, a recording
+`rclone` that fails like B2 (`403 storage_cap_exceeded`) or with exit 1, and a recording `systemd-run`. It shows that `predeploy`
+never calls `age`, `rclone` or `rsync` and queues a marker, that the nightly run resumes before anything reaches the remote, that a
+failing remote fails neither `predeploy` nor the nightly run nor `ctl activate`/`refresh` (`test_staging_operation_lease.py`),
+that a failed shipment stays pending, is recorded as failed and is completed and cleared by the next run, that pruning never removes
+a pending set, and that the detached start leaks no lock descriptor and returns without waiting.
 **Not verified:** any real remote (S3-compatible, B2, SFTP, another server), rsync over SSH to a real host, the host's cron
-and maintenance-window behaviour with encryption, a restore of a decrypted production-sized set, and the time encryption adds
-to the window.
+behaviour, a real `systemd-run` transient unit on the staging host (the tests use a recording stand-in; the `setsid` fallback is
+exercised for real), a restore of a decrypted production-sized set, and the wall-clock time of a 38 GB shipment (it no longer
+affects the maintenance window).
 
 ## Binary-log retention and shipping for point-in-time restore (later step, not built)
 

@@ -541,7 +541,7 @@ EOF
 chmod 0644 /etc/cron.d/vasey-staging-scheduler-watch
 
 cat > /etc/logrotate.d/vasey-staging <<'EOF'
-/var/log/php8.4-fpm-vasey-*.log /var/log/vasey-staging/backup.log /var/log/vasey-staging/scheduler-watch.log /var/log/nginx/vasey-staging-*.log {
+/var/log/php8.4-fpm-vasey-*.log /var/log/vasey-staging/backup.log /var/log/vasey-staging/ship-pending.log /var/log/vasey-staging/scheduler-watch.log /var/log/nginx/vasey-staging-*.log {
     weekly
     rotate 8
     missingok

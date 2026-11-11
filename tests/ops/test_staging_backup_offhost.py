@@ -961,11 +961,14 @@ fi""")
                 self.assertNotIn("kept from an earlier attempt", run.stdout)
                 self.assertTrue(any(outside.iterdir()), "a link is removed, never what it points to")
 
-    def test_a_ship_from_predeploy_waits_a_bounded_time_for_the_lock(self):
+    def test_a_ship_from_ship_pending_waits_a_bounded_time_for_the_lock(self):
         recipients = self.recipients()
         bk = self.make_set()
-        predeploy = SOURCE[SOURCE.index("  predeploy)"):SOURCE.index("  restore-check)")]
-        self.assertLess(predeploy.index("SHIP_LOCK_WAIT=600"), predeploy.index('ship "$(cat'))
+        # The site is up when pending sets ship, so waiting for a manual ship is harmless. predeploy (quiesced) never ships at all.
+        self.assertIn("SHIP_PENDING_LOCK_WAIT=600", SOURCE)
+        self.assertIn("SHIP_LOCK_WAIT=$SHIP_PENDING_LOCK_WAIT; ship", SOURCE)
+        predeploy = SOURCE[SOURCE.index("  predeploy)"):SOURCE.index("  space-check)")]
+        self.assertNotIn("SHIP_LOCK_WAIT", predeploy)
         held = open(self.backups / ".offhost.lock", "a")
         fcntl.flock(held, fcntl.LOCK_EX)
         threading.Timer(2, held.close).start()  # the other ship finishes after two seconds
@@ -1157,9 +1160,9 @@ class DeployRetention(OffhostBase):
         self.assertEqual(run.returncode, 0, run.stderr)
         self.assertTrue(failed.is_dir() and staging.is_dir() and (retained / "database.sql").exists())
 
-    def test_predeploy_prunes_after_the_ship_and_never_fails_the_deploy_for_it(self):
+    def test_predeploy_prunes_after_queuing_the_ship_and_never_fails_the_deploy_for_it(self):
         predeploy = SOURCE[SOURCE.index("  predeploy)"):SOURCE.index("  space-check)")]
-        self.assertLess(predeploy.index('ship "$(cat'), predeploy.index("prune_local"))
+        self.assertLess(predeploy.index('mark_pending "$(cat'), predeploy.index("prune_local"))
         self.assertIn('prune_local "$(basename -- "$(cat "$VASEY_BACKUP_DIR/.last")")" )', predeploy)
         self.assertIn("|| log \"WARNING", predeploy)
 
@@ -1178,10 +1181,10 @@ class SpaceCheck(OffhostBase):
         (self.private / "media.bin").write_bytes(b"m" * 100_000)
         self.restore = self.root / "restore-check"
 
-    def check(self, free, db=50_000, **extra):
+    def check(self, free, db=50_000, preamble="", **extra):
         """Runs space_check with df reporting FREE bytes and the database query answering DB (or failing when None)."""
         mysql = 'mysql() { return 1; }' if db is None else f'mysql() {{ echo {db}; }}'
-        script = f'''PRIVATE="{self.private}"; VASEY_DB_NAME=vasey_staging; VASEY_BACKUP_MYCNF=/nonexistent
+        script = f'''{preamble}PRIVATE="{self.private}"; VASEY_DB_NAME=vasey_staging; VASEY_BACKUP_MYCNF=/nonexistent
 VASEY_RESTORE_CHECK_DIR="{self.restore}"
 {mysql}
 df() {{ printf 'Avail\\n%s\\n' "{free}"; }}
@@ -1209,9 +1212,32 @@ space_check'''
         self.assertEqual(self.check(free=need).returncode, 0)
         self.assertNotEqual(self.check(free=need - 1).returncode, 0)
 
-    def test_hardened_shipping_adds_the_staged_encrypted_copy(self):
+    def test_hardened_shipping_is_counted_after_the_deploy_not_on_top_of_the_restore_proof(self):
+        # The encrypted copy is staged after the resume (ship-pending), when the restore proof's scratch is already gone, so on a
+        # shared filesystem the peak is the set plus the larger of the two, which here are equal: the plain need, not a third set.
         base = (150_000 * 2) + (150_000 * 2) * 20 // 100 + 268_435_456
+        self.assertEqual(self.check(free=base, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        self.assertNotEqual(self.check(free=base - 1, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+
+    def test_hardened_shipping_on_its_own_filesystem_still_needs_the_encrypted_copy_there(self):
+        # Backups and restore scratch on different filesystems: the backup filesystem holds the set and, later, its encrypted copy.
+        shim = 'stat() { if [ "${1:-}" = -c ] && [ "${2:-}" = %d ]; then case "${@: -1}" in */backups) echo 1 ;; *) echo 2 ;; esac; else command stat "$@"; fi; }\n'
+        need_backup_fs = (150_000 * 2) + (150_000 * 2) * 20 // 100 + 268_435_456
+        run = lambda free, **extra: self.check(free=free, preamble=shim, **extra)
+        self.assertEqual(run(need_backup_fs, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        self.assertNotEqual(run(need_backup_fs - 1, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        # Without hardening the backup filesystem needs only the set (150000), so the same free space is plenty.
+        self.assertEqual(run(150_000 + 150_000 * 20 // 100 + 268_435_456).returncode, 0)
+
+    def test_an_earlier_shipment_still_staging_its_encrypted_copy_is_counted(self):
+        base = (150_000 * 2) + (150_000 * 2) * 20 // 100 + 268_435_456
+        held = open(self.backups / ".offhost.lock", "a")
+        self.addCleanup(held.close)
+        fcntl.flock(held, fcntl.LOCK_EX)  # ship-pending of the previous deploy is still encrypting
         self.assertNotEqual(self.check(free=base, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        extra = base + 150_000 + 150_000 * 20 // 100
+        self.assertEqual(self.check(free=extra, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        self.assertEqual(self.check(free=base).returncode, 0, "an unhardened host has no staging copy to wait for")
 
     def test_the_database_size_falls_back_to_the_newest_set_and_unknown_size_refuses(self):
         self.make_set(set_name("20261101"))
