@@ -29,6 +29,9 @@ final class SoundKitDemoProcessor
 {
     public const LEASE_SECONDS = 960;
 
+    /** An upper bound for the probe only; the demo's own cap is {@see SoundKitProductMedia::DEMO_MAX_SECONDS}. A 100 MiB WAV is under two hours of 8 kHz mono. */
+    private const PROBE_CEILING_SECONDS = 86400;
+
     /** Failures an operator can fix without a new upload. */
     public const TRANSIENT = ['scanner_unavailable', 'scanner_signatures_stale', 'tool_unavailable', 'processor_timeout', 'storage_failed', 'unsafe_storage',
         'missing_source', 'processing_interrupted', 'tag_not_configured', 'tag_hash_mismatch', 'staging_tag_refused'];
@@ -52,9 +55,8 @@ final class SoundKitDemoProcessor
             if (! hash_equals($demo->source_sha256, $snapshot['sha256']) || $snapshot['size_bytes'] !== $demo->size_bytes || $snapshot['mime_type'] !== $demo->mime_type) {
                 throw new MediaFailure('source_changed', 'The quarantined upload changed after it was received.');
             }
-            $audio = app(AudioDerivatives::class);
-            // Refuse a long recording before any encoding: a demo is a short taster, not the kit.
-            $audio->validateWav($input, $snapshot['mime_type'], SoundKitProductMedia::DEMO_MAX_SECONDS);
+            // Same order as a track (MediaProcessor): snapshot, scan the source, check and scan the tag, and only then run any tool on
+            // the bytes. ffprobe and ffmpeg never see an unscanned file.
             $scan = $this->scan($input);
             $evidence = ['source_scan' => $scan];
             $profile = app(MediaProfile::class)->current('master_wav');
@@ -71,6 +73,13 @@ final class SoundKitDemoProcessor
                 throw new MediaFailure('staging_tag_refused', 'The configured seller tag is the synthetic staging placeholder. Install the approved seller tag and its SHA-256.');
             }
             $evidence['tag_scan'] = $this->scan($tag);
+            $audio = app(AudioDerivatives::class);
+            // Full validation of the scanned copy, then the duration cap: a demo is a short taster, not the kit. The probe ceiling is
+            // far above the cap so that a long demo gets its own failure code rather than a generic audio one.
+            $wav = $audio->validateWav($input, $snapshot['mime_type'], self::PROBE_CEILING_SECONDS);
+            if ($wav['duration_seconds'] > SoundKitProductMedia::DEMO_MAX_SECONDS) {
+                throw new MediaFailure('demo_too_long', 'A demo may be at most '.(SoundKitProductMedia::DEMO_MAX_SECONDS / 60).' minutes long.');
+            }
             $evidence['profile_fingerprint'] = app(MediaProfile::class)->fingerprint($profile);
             $outputs = $audio->build($input, $tag, $profile, $workspace);
             $preview = collect($outputs)->firstWhere('role', 'preview_tagged');

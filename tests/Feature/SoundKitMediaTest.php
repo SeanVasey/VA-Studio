@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Domain\Customers\DataRights\RetentionSchedule;
+use App\Domain\Media\AudioDerivatives;
 use App\Domain\Media\MalwareScanner;
 use App\Domain\Media\MediaFailure;
 use App\Domain\Media\PrivateMediaFiles;
@@ -14,6 +15,7 @@ use App\Domain\SoundKits\Products\SoundKitProductMedia;
 use App\Domain\SoundKits\Products\SoundKitProducts;
 use App\Filament\Resources\SoundKitProductResource\Pages\ManageSoundKitProducts;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Jobs\ProcessSoundKitDemo;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -21,6 +23,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -222,7 +225,6 @@ class SoundKitMediaTest extends TestCase
             'png named wav' => $this->upload('demo.wav', $png),
             'text named wav' => $this->upload('demo.wav', str_repeat('not audio at all. ', 50)),
             'truncated wav' => $this->upload('demo.wav', substr(MediaFixtures::wav(1.2, 330), 0, 400)),
-            'too long' => $this->upload('long.wav', $this->longWav(SoundKitProductMedia::DEMO_MAX_SECONDS + 1)),
             'too small' => $this->upload('tiny.wav', 'RIFF'),
         ];
         foreach ($cases as $label => $file) {
@@ -284,7 +286,7 @@ class SoundKitMediaTest extends TestCase
         $this->assertSame(['failed', 'scan_not_clean', null], [$failed->status, $failed->failure_code, $failed->preview_path]);
         $this->assertStringContainsString('Upload a new demo', app(SoundKitProducts::class)->blockers($product->refresh())['demo']);
         $this->assertArrayHasKey('demo', $this->messages(fn () => $this->media()->approveDemo($product, $product->revision, $this->actor)));
-        $this->assertArrayHasKey('demo', $this->messages(fn () => $this->media()->retryDemo($failed, $this->actor)), 'a final failure is not retried');
+        $this->assertArrayHasKey('demo', $this->messages(fn () => $this->media()->retryDemo($product->refresh(), $product->revision, $this->actor)), 'a final failure is not retried');
         $this->assertSame([], array_filter(Storage::disk('local')->allFiles(), fn (string $file): bool => str_starts_with($file, 'sound-kit-demos/revisions/')));
         $this->scanner->reject = false;
 
@@ -302,14 +304,14 @@ class SoundKitMediaTest extends TestCase
         app()->instance(MalwareScanner::class, $this->scanner);
         $tag = config('media.tag_path');
         config(['media.tag_path' => null]);
-        $this->media()->retryDemo($waiting, $this->actor);
+        $this->media()->retryDemo($product->refresh(), $product->revision, $this->actor);
         $waiting = app(SoundKitDemoProcessor::class)->handle($demo->id);
         $this->assertSame(['quarantined', 'tag_not_configured'], [$waiting->status, $waiting->failure_code]);
         config(['media.tag_path' => $tag, 'media.tag_sha256' => str_repeat('0', 64)]);
         $waiting = app(SoundKitDemoProcessor::class)->handle($demo->id);
         $this->assertSame('tag_hash_mismatch', $waiting->failure_code, 'a tag that is not the approved one is refused');
         config(['media.tag_sha256' => hash('sha256', MediaFixtures::wav(0.2, 1800))]);
-        $this->media()->retryDemo($waiting, $this->actor);
+        $this->media()->retryDemo($product->refresh(), $product->revision, $this->actor);
         $done = app(SoundKitDemoProcessor::class)->handle($demo->id);
         $this->assertSame(['ready', null], [$done->status, $done->failure_code]);
         $this->assertSame(1, DB::table('audit_events')->where('action', 'sound_kit_demo.processed')->count());
@@ -510,7 +512,7 @@ class SoundKitMediaTest extends TestCase
             fn () => $this->media()->approveCover($product, $product->revision, $who),
             fn () => $this->media()->uploadDemo($product, $product->revision, $this->upload(), $who),
             fn () => $this->media()->approveDemo($product, $product->revision, $who),
-            fn () => $this->media()->retryDemo($demo, $who),
+            fn () => $this->media()->retryDemo($product, $product->revision, $who),
         ];
         $before = [SoundKitDemo::count(), DB::table('audit_events')->where('action', 'like', 'sound_kit_products.product.%')->count()];
         $panel = Filament::getPanel('admin');
@@ -591,5 +593,300 @@ class SoundKitMediaTest extends TestCase
             }
         }
         $this->assertSame('ready', $demo->refresh()->status);
+    }
+
+    /** A scanner that records what it was asked to scan and can flag the seller tag as infected. */
+    private function spyScanner(bool $infectTag = false): TestOnlyMediaScanner
+    {
+        $spy = new class extends TestOnlyMediaScanner
+        {
+            /** @var list<string> */
+            public array $seen = [];
+
+            public bool $infectTag = false;
+
+            public function scan(string $path): array
+            {
+                $this->seen[] = basename($path);
+                if ($this->infectTag && basename($path) === 'tag.wav') {
+                    return ['engine' => 'test-only', 'version' => 'synthetic-test-fixture-v1', 'status' => 'infected', 'sha256' => hash_file('sha256', $path)];
+                }
+
+                return parent::scan($path);
+            }
+        };
+        $spy->infectTag = $infectTag;
+        app()->instance(MalwareScanner::class, $spy);
+
+        return $spy;
+    }
+
+    /** Wraps ffprobe so that every call is recorded; returns the file that gains a line per call. */
+    private function countFfprobe(): string
+    {
+        $dir = sys_get_temp_dir().'/vasey-ffprobe-'.bin2hex(random_bytes(5));
+        mkdir($dir, 0700);
+        $log = $dir.'/calls';
+        file_put_contents($dir.'/ffprobe', "#!/bin/sh\necho call >> '{$log}'\nexec '".config('media.ffprobe')."' \"$@\"\n");
+        chmod($dir.'/ffprobe', 0700);
+        config(['media.ffprobe' => $dir.'/ffprobe']);
+        $this->beforeApplicationDestroyed(function () use ($dir): void {
+            @unlink($dir.'/ffprobe');
+            @unlink($dir.'/calls');
+            @rmdir($dir);
+        });
+
+        return $log;
+    }
+
+    private function revisionFiles(): array
+    {
+        return array_values(array_filter(Storage::disk('local')->allFiles(), fn (string $file): bool => str_starts_with($file, 'sound-kit-demos/revisions/')));
+    }
+
+    public function test_a_demo_whose_quarantined_bytes_changed_after_upload_fails_and_promotes_nothing(): void
+    {
+        $product = $this->bare();
+        $demo = $this->media()->uploadDemo($product, $product->revision, $this->upload(), $this->actor);
+        // Same size and a valid, clean WAV, so only the stored hash can notice the swap.
+        $swapped = MediaFixtures::wav(1.2, 331);
+        $this->assertSame(strlen(MediaFixtures::wav(1.2, 330)), strlen($swapped));
+        Storage::disk('local')->put($demo->source_path, $swapped);
+
+        $failed = app(SoundKitDemoProcessor::class)->handle($demo->id);
+        $this->assertSame(['failed', 'source_changed', null], [$failed->status, $failed->failure_code, $failed->preview_path]);
+        $this->assertSame([], $this->revisionFiles(), 'nothing is promoted');
+        $this->assertSame(0, DB::table('audit_events')->where('action', 'sound_kit_demo.processed')->count());
+        $this->assertArrayHasKey('demo', $this->messages(fn () => $this->media()->approveDemo($product->refresh(), $product->revision, $this->actor)));
+        $this->assertNull($product->refresh()->demo_approved_by);
+        $this->assertArrayHasKey('demo', app(SoundKitProducts::class)->blockers($product));
+    }
+
+    public function test_a_demo_is_refused_when_the_seller_tag_is_the_synthetic_staging_placeholder_outside_admitted_environments(): void
+    {
+        $product = $this->bare();
+        $demo = $this->media()->uploadDemo($product, $product->revision, $this->upload(), $this->actor);
+        // An unmarked file under a staging name is refused by its path once the configured and running environments disagree
+        // (the same set-up the track test uses); in `testing` the same tag would be admitted.
+        $plain = MediaFixtures::wav(0.2, 1800);
+        Storage::disk('local')->put('branding/Staging-copy.wav', $plain);
+        config(['media.tag_path' => 'branding/Staging-copy.wav', 'media.tag_sha256' => hash('sha256', $plain), 'app.env' => 'production']);
+
+        $waiting = app(SoundKitDemoProcessor::class)->handle($demo->id);
+        $this->assertSame(['quarantined', 'staging_tag_refused', null], [$waiting->status, $waiting->failure_code, $waiting->preview_path]);
+        $this->assertSame([], $this->revisionFiles());
+        config(['app.env' => 'testing']);
+        $this->assertArrayHasKey('demo', app(SoundKitProducts::class)->blockers($product->refresh()));
+        $this->assertArrayHasKey('demo', $this->messages(fn () => $this->media()->approveDemo($product, $product->revision, $this->actor)));
+
+        // The approved tag completes the same demo once it is installed.
+        config(['media.tag_path' => 'approved-tags/test-only.wav', 'media.tag_sha256' => hash('sha256', $plain)]);
+        $this->media()->retryDemo($product->refresh(), $product->revision, $this->actor);
+        $this->assertSame('ready', app(SoundKitDemoProcessor::class)->handle($demo->id)->status);
+    }
+
+    public function test_a_demo_whose_seller_tag_is_flagged_by_the_scanner_fails_and_promotes_nothing(): void
+    {
+        $product = $this->bare();
+        $demo = $this->media()->uploadDemo($product, $product->revision, $this->upload(), $this->actor);
+        $spy = $this->spyScanner(infectTag: true);
+
+        $failed = app(SoundKitDemoProcessor::class)->handle($demo->id);
+        $this->assertSame(['failed', 'scan_not_clean', null], [$failed->status, $failed->failure_code, $failed->preview_path]);
+        $this->assertSame(['source.bin', 'tag.wav'], $spy->seen, 'the source is scanned first, then the tag');
+        $this->assertSame([], $this->revisionFiles());
+        $this->assertSame(0, DB::table('audit_events')->where('action', 'sound_kit_demo.processed')->count());
+        $this->assertArrayHasKey('demo', $this->messages(fn () => $this->media()->approveDemo($product->refresh(), $product->revision, $this->actor)));
+    }
+
+    public function test_no_media_tool_runs_on_an_upload_or_on_bytes_the_scanner_has_not_cleared(): void
+    {
+        $product = $this->bare();
+        $calls = $this->countFfprobe();
+        $demo = $this->media()->uploadDemo($product, $product->revision, $this->upload(), $this->actor);
+        $this->assertFileDoesNotExist($calls, 'the upload is checked without ffprobe');
+
+        // A source the scanner refuses is never probed or encoded.
+        $this->scanner->reject = true;
+        $failed = app(SoundKitDemoProcessor::class)->handle($demo->id);
+        $this->assertSame('scan_not_clean', $failed->failure_code);
+        $this->assertFileDoesNotExist($calls, 'ffprobe never saw the unscanned source');
+        $this->scanner->reject = false;
+
+        // A tag that is not cleared holds the source back too.
+        $second = $this->media()->uploadDemo($product->refresh(), $product->revision, $this->upload(), $this->actor);
+        $this->spyScanner(infectTag: true);
+        $this->assertSame('scan_not_clean', app(SoundKitDemoProcessor::class)->handle($second->id)->failure_code);
+        $this->assertFileDoesNotExist($calls, 'ffprobe waits for both scans');
+
+        // Once both are clean the tools run.
+        app()->instance(MalwareScanner::class, $this->scanner);
+        $third = $this->media()->uploadDemo($product->refresh(), $product->revision, $this->upload(), $this->actor);
+        $this->assertSame('ready', app(SoundKitDemoProcessor::class)->handle($third->id)->status);
+        $this->assertFileExists($calls);
+    }
+
+    public function test_a_demo_longer_than_five_minutes_is_accepted_at_upload_and_fails_in_the_processor_with_its_own_code(): void
+    {
+        $product = $this->bare();
+        $demo = $this->media()->uploadDemo($product, $product->revision, $this->upload('long.wav', $this->longWav(SoundKitProductMedia::DEMO_MAX_SECONDS + 1)), $this->actor);
+        $this->assertSame('quarantined', $demo->status);
+
+        $failed = app(SoundKitDemoProcessor::class)->handle($demo->id);
+        $this->assertSame(['failed', 'demo_too_long', null], [$failed->status, $failed->failure_code, $failed->preview_path]);
+        $this->assertSame([], $this->revisionFiles());
+        $this->assertStringContainsString('longer than 5 minutes', app(SoundKitProducts::class)->blockers($product->refresh())['demo']);
+        $this->assertArrayHasKey('demo', $this->messages(fn () => $this->media()->retryDemo($product, $product->revision, $this->actor)), 'a final failure is not retried');
+    }
+
+    public function test_a_wav_that_is_well_formed_but_not_audio_fails_in_the_processor_not_at_upload(): void
+    {
+        $product = $this->bare();
+        // A RIFF/WAVE container with a correct size but no usable stream: the cheap upload checks pass, the probe refuses it.
+        $bytes = "RIFF\x24\x00\x00\x00WAVE".str_repeat("\x00", 32);
+        $demo = $this->media()->uploadDemo($product, $product->revision, $this->upload('empty.wav', $bytes), $this->actor);
+        $failed = app(SoundKitDemoProcessor::class)->handle($demo->id);
+        $this->assertSame('failed', $failed->status);
+        $this->assertContains($failed->failure_code, ['invalid_audio', 'invalid_wav', 'unsupported_wav', 'processor_failed']);
+        $this->assertSame([], $this->revisionFiles());
+    }
+
+    public function test_the_upload_accepts_exactly_the_mime_types_the_wav_validator_accepts(): void
+    {
+        $this->assertSame(['audio/x-wav', 'audio/wav', 'audio/vnd.wave'], SoundKitProductMedia::WAV_MIME_TYPES);
+        $this->assertNotContains('audio/wave', SoundKitProductMedia::WAV_MIME_TYPES);
+        $path = sys_get_temp_dir().'/vasey-mime-'.bin2hex(random_bytes(5)).'.wav';
+        file_put_contents($path, MediaFixtures::wav(0.5, 440));
+        try {
+            foreach (SoundKitProductMedia::WAV_MIME_TYPES as $mime) {
+                $this->assertGreaterThan(0, app(AudioDerivatives::class)->validateWav($path, $mime)['duration_seconds'], $mime);
+            }
+            foreach (['audio/wave', 'audio/mpeg', 'application/octet-stream'] as $mime) {
+                try {
+                    app(AudioDerivatives::class)->validateWav($path, $mime);
+                    $this->fail('The validator accepted '.$mime);
+                } catch (MediaFailure $failure) {
+                    $this->assertSame('invalid_wav', $failure->failureCode);
+                }
+            }
+        } finally {
+            @unlink($path);
+        }
+    }
+
+    public function test_missing_media_tools_leave_the_demo_waiting_with_an_honest_message_and_a_retry_completes_it(): void
+    {
+        $product = $this->bare();
+        $real = config('media.ffprobe');
+        config(['media.ffprobe' => '/nonexistent/ffprobe']);
+        // The upload needs no tool, so it is accepted even while the tools are down.
+        $demo = $this->media()->uploadDemo($product, $product->revision, $this->upload(), $this->actor);
+        $waiting = app(SoundKitDemoProcessor::class)->handle($demo->id);
+        $this->assertSame(['quarantined', 'tool_unavailable'], [$waiting->status, $waiting->failure_code]);
+        $message = app(SoundKitProducts::class)->blockers($product->refresh())['demo'];
+        $this->assertStringContainsString('media tools are unavailable', $message);
+        $this->assertStringNotContainsString('complete WAV', $message);
+        $this->assertTrue(SoundKitProductMedia::retryable($waiting));
+
+        config(['media.ffprobe' => $real]);
+        $this->media()->retryDemo($product, $product->revision, $this->actor);
+        $this->assertSame('ready', app(SoundKitDemoProcessor::class)->handle($demo->id)->status);
+    }
+
+    public function test_a_demo_stuck_in_processing_can_be_retried_only_after_its_lease_expires(): void
+    {
+        Queue::fake();
+        $product = $this->bare();
+        $demo = $this->media()->uploadDemo($product, $product->revision, $this->upload(), $this->actor);
+        $audits = fn () => DB::table('audit_events')->where('action', 'sound_kit_products.product.demo_retry_queued')->count();
+        $stuck = fn (?\DateTimeInterface $until) => DB::table('sound_kit_demos')->where('id', $demo->id)->update(['status' => 'processing', 'claim_token' => 'dead-worker', 'claimed_until' => $until, 'attempts' => 1]);
+
+        // A worker may still be finishing it: refused, with no audit event and nothing queued.
+        $stuck(now()->addMinutes(10));
+        $pushed = Queue::pushed(ProcessSoundKitDemo::class)->count();
+        $this->assertFalse(SoundKitProductMedia::retryable($demo->refresh()));
+        $this->assertArrayHasKey('demo', $this->messages(fn () => $this->media()->retryDemo($product->refresh(), $product->revision, $this->actor)));
+        $this->assertSame([0, $pushed], [$audits(), Queue::pushed(ProcessSoundKitDemo::class)->count()]);
+
+        // The lease has run out: the same command re-dispatches it, audited, and the processor reclaims and completes it.
+        $stuck(now()->subMinute());
+        $this->assertTrue(SoundKitProductMedia::retryable($demo->refresh()));
+        $this->media()->retryDemo($product->refresh(), $product->revision, $this->actor);
+        $this->assertSame([1, $pushed + 1], [$audits(), Queue::pushed(ProcessSoundKitDemo::class)->count()]);
+        $event = DB::table('audit_events')->where('action', 'sound_kit_products.product.demo_retry_queued')->first();
+        $this->assertSame($this->actor->id, (int) $event->actor_id);
+        $context = json_decode($event->context, true);
+        $this->assertSame(['processing', 'processing_interrupted'], [$context['from_status'], $context['failure_code']]);
+        $this->assertSame('ready', app(SoundKitDemoProcessor::class)->handle($demo->id)->status);
+    }
+
+    public function test_retrying_a_demo_needs_the_current_product_revision_and_a_demo(): void
+    {
+        Queue::fake();
+        $product = $this->bare();
+        $this->assertArrayHasKey('demo', $this->messages(fn () => $this->media()->retryDemo($product, $product->revision, $this->actor)), 'no demo yet');
+        $demo = $this->media()->uploadDemo($product, $product->revision, $this->upload(), $this->actor);
+        DB::table('sound_kit_demos')->where('id', $demo->id)->update(['failure_code' => 'scanner_unavailable']);
+        $product->refresh();
+        $pushed = Queue::pushed(ProcessSoundKitDemo::class)->count();
+        $this->assertArrayHasKey('title', $this->messages(fn () => $this->media()->retryDemo($product, $product->revision - 1, $this->actor)));
+        $this->assertSame($pushed, Queue::pushed(ProcessSoundKitDemo::class)->count());
+        $this->assertSame(0, DB::table('audit_events')->where('action', 'sound_kit_products.product.demo_retry_queued')->count());
+        $this->media()->retryDemo($product, $product->revision, $this->actor);
+        $this->assertSame($pushed + 1, Queue::pushed(ProcessSoundKitDemo::class)->count());
+        $this->assertSame($product->revision, $product->refresh()->revision, 'a retry does not change the product');
+    }
+
+    private function damage(string $path): void
+    {
+        $this->assertFileExists($path);
+        file_put_contents($path, str_repeat('x', max(1, (int) filesize($path))));
+    }
+
+    public function test_choosing_a_cover_whose_files_are_missing_or_damaged_is_refused(): void
+    {
+        $product = $this->bare();
+        $image = SoundKitMediaFixtures::cover($this->actor);
+        $variant = $image->variants()->firstOrFail();
+        $this->damage(app(PrivateMediaFiles::class)->resolve($variant->storage_path));
+        $this->assertArrayHasKey('cover', $this->messages(fn () => $this->media()->chooseCover($product, $product->revision, $image->id, 'A synthetic cover', $this->actor)));
+        $this->assertNull($product->refresh()->cover_image_id);
+        $this->assertSame(0, DB::table('audit_events')->where('action', 'sound_kit_products.product.cover_chosen')->count());
+    }
+
+    public function test_approving_a_cover_or_a_demo_whose_stored_file_no_longer_verifies_is_refused(): void
+    {
+        $product = $this->bare();
+        $image = SoundKitMediaFixtures::cover($this->actor);
+        $product = $this->media()->chooseCover($product, $product->revision, $image->id, 'A synthetic cover', $this->actor);
+        $this->damage(app(PrivateMediaFiles::class)->resolve($image->variants()->firstOrFail()->storage_path));
+        $this->assertArrayHasKey('cover', $this->messages(fn () => $this->media()->approveCover($product, $product->revision, $this->actor)));
+        $this->assertNull($product->refresh()->cover_approved_by);
+
+        $demo = SoundKitMediaFixtures::demo($product, $this->actor);
+        $this->assertSame('ready', $demo->status);
+        $this->damage($this->previewFile($demo));
+        $this->assertArrayHasKey('demo', $this->messages(fn () => $this->media()->approveDemo($product->refresh(), $product->revision, $this->actor)));
+        $this->assertNull($product->refresh()->demo_approved_by);
+        $this->assertSame(0, DB::table('audit_events')->whereIn('action', ['sound_kit_products.product.cover_approved', 'sound_kit_products.product.demo_approved'])->count());
+    }
+
+    public function test_publishing_re_verifies_the_stored_preview_and_cover_files(): void
+    {
+        $service = app(SoundKitProducts::class);
+        $product = SoundKitMediaFixtures::approved($this->bare(), $this->actor);
+        $this->assertSame([], $service->blockers($product), 'approved and intact');
+        $demo = SoundKitDemo::findOrFail($product->demo_id);
+        $original = file_get_contents($this->previewFile($demo));
+        $this->damage($this->previewFile($demo));
+        // Public reads trust the immutable rows (no hashing per page view); publication reads the file.
+        $this->assertArrayNotHasKey('demo', $service->blockers($product));
+        $this->assertArrayHasKey('demo', $this->messages(fn () => $service->publish($product, $product->revision, $this->actor)));
+        $this->assertFalse($product->refresh()->is_published);
+        file_put_contents($this->previewFile($demo), $original);
+
+        $this->damage(app(PrivateMediaFiles::class)->resolve(SiteImageVariant::where('site_image_id', $product->cover_image_id)->firstOrFail()->storage_path));
+        $this->assertArrayHasKey('cover', $this->messages(fn () => $service->publish($product->refresh(), $product->revision, $this->actor)));
+        $this->assertFalse($product->refresh()->is_published);
     }
 }

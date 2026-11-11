@@ -115,14 +115,27 @@ Both reuse the pipelines tracks and releases already use; nothing parallel was a
 | Piece | How it is made | Public address |
 | --- | --- | --- |
 | Cover art | The existing site image pipeline (D-25) with the square `release_cover` slot also used by albums: JPEG or PNG, at least 1200 x 1200 px, scanned, metadata stripped, re-encoded to 400, 800 and 1200 px in JPEG and WebP, manifest-hashed. Staff upload it under **Site images** with the use "Release cover art" and choose it on the kit product. | `/site-images/{sha256}.jpg` or `.webp` (content-hashed, the albums pattern), served only while a **listed** kit pins that exact approved image and the kit pages are on |
-| Demo audio | `SoundKitDemoProcessor`: the track path's own parts, in the same order. A staff WAV is validated (`AudioDerivatives::validateWav`), scanned (`MalwareScanner`), mixed with the approved seller tag at the configured interval and encoded to the same 192k MP3 and 200-point waveform (`AudioDerivatives::build`), and stored under `sound-kit-demos/revisions/` (private, `PrivateMediaFiles::promoteUnder`). | `/sound-kits/{slug}/demo/{demo uuid}`, the tagged preview only, hashed against its retained evidence before it is sent |
+| Demo audio | `SoundKitDemoProcessor`: the track path's own parts, in the same order. The quarantined copy is snapshotted and checked against its stored hash, size and type, then scanned (`MalwareScanner`) together with the seller tag (hash, staging-placeholder and tag checks first), and only then validated (`AudioDerivatives::validateWav`, the first ffprobe call) and mixed with the tag at the configured interval and encoded to the same 192k MP3 and 200-point waveform (`AudioDerivatives::build`), and stored under `sound-kit-demos/revisions/` (private, `PrivateMediaFiles::promoteUnder`). | `/sound-kits/{slug}/demo/{demo uuid}`, the tagged preview only, hashed against its retained evidence before it is sent |
 
 **Seller tag.** The track policy applies to demos unchanged: the public demo is the tagged preview, never the full-quality
 source (which stays in private quarantine). A missing, mismatched or synthetic-staging tag leaves the demo waiting for an
 operator fix, exactly as for a track master; production refuses the staging placeholder.
 
-**Limits (kit-specific).** A demo is a taster, not the kit: WAV only, up to 100 MiB and 5 minutes (a track master may be 200 MiB
+**Order of work.** The same as a track (`MediaProcessor`): snapshot, hash check, scan of the source, tag checks and scan of the tag,
+then WAV validation and build. No media tool (ffprobe or ffmpeg) runs on bytes the scanner has not cleared, and none runs at upload:
+`uploadDemo` checks only size, the WAV types `validateWav` itself accepts (`audio/x-wav`, `audio/wav`, `audio/vnd.wave`), the RIFF/WAVE
+header with its size field, and emptiness. Codec, channels and duration are judged by the processor on the scanned copy.
+
+**Limits (kit-specific).** A demo is a taster, not the kit: WAV only, up to 100 MiB (checked at upload) and 5 minutes (checked by the
+processor after the scan; a longer demo fails for good with `demo_too_long`, a track master may be 200 MiB
 and 20 minutes). Cover art keeps the 20 MiB, 6000 px and slot-shape limits of the site image pipeline.
+
+**Waiting and retry.** A missing scanner, media tool (`tool_unavailable`, shown as "the media tools are unavailable on the server",
+never as a bad file), storage fault or tag setting leaves the demo waiting; **Retry demo** re-queues it once the cause is fixed.
+A demo still `processing` after its claim lease (16 minutes) has expired, because a worker died holding it, can be retried the same
+way; while the lease is live the retry is refused. Retry runs under the same authority, MFA, expected product revision and audit event
+(`demo_retry_queued`, with the prior status) as every other command. It takes the product and its expected revision like the others;
+it does not change the product, so it does not advance the revision, and it can only retry the product's current demo.
 
 **Approval.** One MFA-enrolled catalog staff member chooses and approves each asset (Sean's rule; no second approver).
 `SoundKitProductMedia` is the writer: administer-catalog plus enrolled MFA re-read under the lock, expected revision, one audit
@@ -131,6 +144,22 @@ hash over the exact asset (product, image id and manifest hash; or demo id, sour
 public read. So a replacement voids it in the writer, and an asset swapped behind the writer is simply not shown. As for tracks,
 media cannot be replaced while the kit is published (unpublish first). Scan-engine acceptance and every stored file's bytes are
 verified when an asset is approved and when the kit is published; page views rely on the immutable rows.
+
+**Caches.** Covers are served with `Cache-Control: public, max-age=31536000, immutable`, so after a kit is unlisted its cover can
+stay in browser and CDN caches: "gone at once" holds at the origin only. The demo is read and hashed against its retained evidence
+on every request (per-IP rate limiting applies) and is cached for five minutes (`max-age=300`).
+
+**Defence in depth.** Some guards have a second layer behind them, so a test removing only the first still finds the second. Pinned
+by a test of their own: the three processor integrity guards (stored hash, staging placeholder, tag scan), the file verification at
+both approvals and at publication, `chooseCover` refusing a problem image, the processor's ordering, the lease-expiry retry and the
+expected revision. Left documented rather than pinned singly, with the layer that covers each:
+
+- full-length check of the tagged preview (processor): `AudioDerivatives::build` already refuses a duration mismatch over 0.15 s;
+- claim-token check when completing (processor): the row lock and lease in `claim()`, and the immutable-once-ready model guard and trigger;
+- the demo belongs to the product (`demoProblem`): the approval hash binds the product's and the demo's public ids, so a foreign demo cannot match it;
+- cover scan evidence equals the source hash (`imageProblem`): the site image pipeline writes that evidence and `SiteImageManifest::matches` pins it;
+- the cheap authority check before the upload copy (`authorise`): `lockActor` re-checks authority and MFA under the lock, and a failed upload removes its copy;
+- the preview path pattern (`previewPathValid`): `PrivateMediaFiles::resolve` refuses any path outside the private root, and the file is then hashed.
 
 **Required to list.** Both. A track needs a ready tagged preview and artwork to be published; a kit is an audio product bought by
 ear, so it needs the same two public assets. (This is one rule in `SoundKitProductMedia::problems()` if Sean prefers an optional demo.)
@@ -158,7 +187,7 @@ No file content goes into Git: the ZIP, cover and demo are uploaded in the admin
 4. **Cover on the product.** Row action **Cover art**: choose the ready image and write its description, then **Approve cover**.
 5. **Demo.** Row action **Upload demo**: a WAV of up to 5 minutes (the original stays private). Processing runs on the media queue
    worker; the **Demo audio** column changes from "still being prepared" to "Approve the demo audio". If it shows a waiting reason
-   (scanner, tools, storage or the seller tag setting), fix that and use **Retry demo**. A demo that fails the scan or cannot be
+   (scanner, tools, storage or the seller tag setting), fix that and use **Retry demo** (it also appears for a demo stuck in processing after its time allowance ended). A demo that fails the scan or cannot be
    read is final: upload another. **Approve demo** once it is ready.
 6. **Publish.** Row action **Publish** (it re-verifies the archive, cover and demo bytes). The public pages stay 404 until
    `sound-kits.storefront_enabled` is turned on by a reviewed change, which waits for kit checkout (see above).
@@ -187,8 +216,8 @@ quote, order, grant, entitlement, download or checkout route. `tests/frontend/so
 
 `tests/Feature/SoundKitMediaTest.php` (SQLite, real media tools with the testing-only scanner): a kit is not listed without an approved
 cover and an approved demo; wrong-slot, unready and unknown covers and bad descriptions refused; the approval bound to the exact
-image and demo, and replaced or swapped assets not shown; oversize, wrong-type, truncated and over-long uploads refused with nothing
-left behind; the demo scanned, tagged and turned into a preview; an infected demo failing for good, and scanner, tag-missing and
+image and demo, and replaced or swapped assets not shown; oversize, wrong-type and truncated uploads refused with nothing
+left behind, no ffprobe call at upload or before both scans, a demo over 5 minutes failing in the processor, a stored-bytes swap, the staging placeholder and a flagged tag refused, missing tools waiting with an honest message, a stuck `processing` demo retried only after its lease, retry needing the current revision, and approval, publication and cover choice refusing damaged files; the demo scanned, tagged and turned into a preview; an infected demo failing for good, and scanner, tag-missing and
 tag-mismatch problems waiting for a retry; published kits refusing media replacement; flag off serving nothing; the exact approved
 bytes served and a damaged file not; the private archive unreachable through either address; staff-only, MFA and one audit event per
 command; the Filament actions. `tests/Feature/SoundKitMediaMigrationTest.php` (both engines) covers the two migrations and triggers.

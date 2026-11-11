@@ -161,10 +161,11 @@ class SoundKitProductResource extends OperatorResource
                     ->action(fn (SoundKitProduct $record, array $data, ManageSoundKitProducts $livewire) => static::run('Demo uploaded; it is being prepared', $livewire,
                         fn (User $actor) => app(SoundKitProductMedia::class)->uploadDemo($record, (int) ($data['revision'] ?? -1), $data['upload'] ?? null, $actor))),
                 Action::make('retryDemo')->label('Retry demo')->color('gray')->requiresConfirmation()
-                    ->modalDescription('Queues processing again after the cause (scanner, media tools, storage or the seller tag setting) is fixed.')
-                    ->visible(fn (SoundKitProduct $record): bool => $record->demo?->status === 'quarantined' && $record->demo?->failure_code !== null)
-                    ->action(fn (SoundKitProduct $record, ManageSoundKitProducts $livewire) => static::run('Demo processing queued', $livewire,
-                        fn (User $actor) => app(SoundKitProductMedia::class)->retryDemo($record->demo, $actor))),
+                    ->fillForm(fn (SoundKitProduct $record): array => ['revision' => $record->revision])->schema([Hidden::make('revision')])
+                    ->modalDescription('Queues processing again after the cause (scanner, media tools, storage or the seller tag setting) is fixed, or when processing is stuck after its time allowance ended.')
+                    ->visible(fn (SoundKitProduct $record): bool => $record->demo !== null && SoundKitProductMedia::retryable($record->demo))
+                    ->action(fn (SoundKitProduct $record, array $data, ManageSoundKitProducts $livewire) => static::run('Demo processing queued', $livewire,
+                        fn (User $actor) => app(SoundKitProductMedia::class)->retryDemo($record, (int) ($data['revision'] ?? -1), $actor))),
                 Action::make('approveDemo')->label('Approve demo')->color('warning')->requiresConfirmation()
                     ->fillForm(fn (SoundKitProduct $record): array => ['revision' => $record->revision])->schema([Hidden::make('revision')])
                     ->modalDescription('Approves exactly this prepared, tagged preview for the public kit page. Uploading a different demo voids the approval.')

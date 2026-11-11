@@ -3,7 +3,6 @@
 namespace App\Domain\SoundKits\Products;
 
 use App\Domain\Media\AudioDerivatives;
-use App\Domain\Media\MediaFailure;
 use App\Domain\Media\PrivateMediaFiles;
 use App\Domain\Media\ScanEngines;
 use App\Domain\SiteBuilder\Models\SiteImage;
@@ -49,6 +48,18 @@ final class SoundKitProductMedia
     public const DEMO_MAX_BYTES = 100 * 1024 * 1024;
 
     public const DEMO_MAX_SECONDS = 300;
+
+    /** Kept equal to the list in AudioDerivatives::validateWav(). */
+    public const WAV_MIME_TYPES = ['audio/x-wav', 'audio/wav', 'audio/vnd.wave'];
+
+    /** What staff are told about a demo that failed for good, by failure code; any other code gets the generic text. */
+    private const FAILED_MESSAGES = [
+        'demo_too_long' => 'The demo is longer than 5 minutes (demo_too_long). Upload a shorter demo.',
+        'invalid_wav' => 'The demo is not a complete WAV file (invalid_wav). Upload a new demo.',
+        'unsupported_wav' => 'The demo is not 16/24/32-bit PCM or float audio (unsupported_wav). Upload a new demo.',
+        'invalid_audio' => 'The demo is not one or two channels of valid, supported audio (invalid_audio). Upload a new demo.',
+        'source_changed' => 'The stored upload changed after it was received (source_changed). Upload a new demo.',
+    ];
 
     /** Chooses (or replaces) the cover art. Replacing voids the cover approval. Alt text is required for people who cannot see it. */
     public function chooseCover(SoundKitProduct $product, int $expectedRevision, mixed $imageId, mixed $alt, User $actor): SoundKitProduct
@@ -132,14 +143,15 @@ final class SoundKitProductMedia
             $this->reject('demo', 'The temporary upload is no longer available. Upload it again.');
         }
         $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($source);
-        if (! in_array($mime, ['audio/wav', 'audio/x-wav', 'audio/vnd.wave', 'audio/wave'], true)) {
+        // The same types AudioDerivatives::validateWav accepts, so nothing passes here only to fail there.
+        if (! in_array($mime, self::WAV_MIME_TYPES, true)) {
             $this->reject('demo', 'Upload a WAV file. File contents do not match.');
         }
-        try {
-            // Early feedback only; processing validates the scanned copy again.
-            app(AudioDerivatives::class)->validateWav($source, $mime, self::DEMO_MAX_SECONDS);
-        } catch (MediaFailure) {
-            $this->reject('demo', 'The upload is not a complete 16/24/32-bit PCM or float WAV of one or two channels, up to 5 minutes.');
+        // Cheap checks only: no media tool ever runs on an unscanned upload. Full validation (codec, channels, duration) is done by
+        // the processor on the scanned copy.
+        $header = (string) file_get_contents($source, false, null, 0, 12);
+        if (strlen($header) < 12 || ! str_starts_with($header, 'RIFF') || substr($header, 8, 4) !== 'WAVE' || unpack('Vsize', substr($header, 4, 4))['size'] + 8 !== $size) {
+            $this->reject('demo', 'The upload is not a complete RIFF/WAVE file.');
         }
         app(PrivateMediaFiles::class)->root();
         $hash = hash_file('sha256', $source);
@@ -190,22 +202,43 @@ final class SoundKitProductMedia
         return $demo;
     }
 
-    /** Queues processing again for a demo that stopped for a temporary reason (scanner, tools, storage or tag configuration). */
-    public function retryDemo(SoundKitDemo $demo, User $actor): SoundKitDemo
+    /**
+     * Queues processing again for the product's current demo when it stopped for a temporary reason (scanner, tools, storage or tag
+     * configuration), or when a worker died holding it: a demo still `processing` once its claim lease has expired. A live lease is
+     * refused, since a worker may still be finishing it. Same authority, MFA, expected product revision and audit as every command.
+     * The product itself does not change, so the revision is not advanced.
+     */
+    public function retryDemo(SoundKitProduct $product, int $expectedRevision, User $actor): SoundKitDemo
     {
-        $queued = DB::transaction(function () use ($demo, $actor): SoundKitDemo {
+        $queued = DB::transaction(function () use ($product, $expectedRevision, $actor): SoundKitDemo {
             $current = $this->lockActor($actor);
-            $locked = SoundKitDemo::query()->lockForUpdate()->find($demo->getKey());
-            if ($locked === null || $locked->status !== 'quarantined' || $locked->failure_code === null) {
-                $this->reject('demo', 'This demo does not need a retry.');
+            $locked = $this->lockProduct($product, $expectedRevision);
+            $demo = $locked->demo_id === null ? null : SoundKitDemo::query()->lockForUpdate()->find($locked->demo_id);
+            if ($demo === null || $demo->sound_kit_product_id !== $locked->id) {
+                $this->reject('demo', 'This kit has no demo to retry.');
             }
-            AuditEvent::record('sound_kit_products.product.demo_retry_queued', $locked, ['schema_version' => 1, 'failure_code' => $locked->failure_code], $current->id);
+            if (! self::retryable($demo)) {
+                $this->reject('demo', $demo->status === 'processing' ? 'This demo is still being processed. Retry it if it is still stuck after its time allowance ends.' : 'This demo does not need a retry.');
+            }
+            AuditEvent::record('sound_kit_products.product.demo_retry_queued', $demo, [
+                'schema_version' => 1, 'revision' => $locked->revision, 'failure_code' => $demo->failure_code ?? 'processing_interrupted', 'from_status' => $demo->status,
+            ], $current->id);
 
-            return $locked;
+            return $demo;
         });
         $this->dispatch($queued);
 
         return $queued;
+    }
+
+    /** True for a demo waiting on a fixable cause, or stuck in `processing` after its claim lease ran out (the processor reclaims it). */
+    public static function retryable(SoundKitDemo $demo): bool
+    {
+        if ($demo->status === 'quarantined') {
+            return $demo->failure_code !== null;
+        }
+
+        return $demo->status === 'processing' && ($demo->claimed_until === null || $demo->claimed_until->isPast());
     }
 
     /** Approves the product's current demo: binds the approval to its exact source and prepared preview. */
@@ -331,9 +364,13 @@ final class SoundKitProductMedia
             return 'The demo audio is not available. Upload it again.';
         }
         if ($demo->status === 'failed') {
-            return 'The demo could not be prepared ('.($demo->failure_code ?? 'unknown').'). Upload a new demo.';
+            return self::FAILED_MESSAGES[$demo->failure_code] ?? 'The demo could not be prepared ('.($demo->failure_code ?? 'unknown').'). Upload a new demo.';
         }
         if ($demo->status !== 'ready') {
+            if ($demo->failure_code === 'tool_unavailable') {
+                return 'The demo is waiting: the media tools are unavailable on the server (tool_unavailable). Retry it once an operator has restored them; the upload is not at fault.';
+            }
+
             return 'The demo is still being prepared'.($demo->failure_code !== null ? ' ('.$demo->failure_code.'); retry it once the cause is fixed' : '').'.';
         }
         $scan = $demo->evidence['source_scan'] ?? [];
