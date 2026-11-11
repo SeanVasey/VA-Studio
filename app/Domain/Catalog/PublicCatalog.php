@@ -6,6 +6,7 @@ use App\Domain\Catalog\Models\Track;
 use App\Domain\Commerce\Inventory\SelectionInventory;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\PreviewTag\PreviewTagResolver;
+use App\Support\PublicReadMemo;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Cursor;
@@ -21,7 +22,16 @@ final class PublicCatalog
 
     public const SCAN_LIMIT = 48;
 
+    /**
+     * Every public entry point below runs as one PublicReadMemo scope: its eligibility checks share repeated reads (assets, runs,
+     * licenses, rights) instead of re-reading them per offer and per track. The memo ends with the call and never spans a write.
+     */
     public function page(Request $request): array
+    {
+        return PublicReadMemo::scope(fn (): array => $this->catalogPage($request));
+    }
+
+    private function catalogPage(Request $request): array
     {
         $input = validator($request->query(), [
             'q' => ['nullable', 'string', 'max:100'],
@@ -69,7 +79,7 @@ final class PublicCatalog
             });
         }
         // Bound hydrated candidates and current-evidence checks. No offset or total query.
-        $candidates = $query->limit(self::SCAN_LIMIT + 1)->get();
+        $candidates = $this->candidates($query->limit(self::SCAN_LIMIT + 1));
         $hasMore = $candidates->count() > self::SCAN_LIMIT;
         $candidates = $candidates->take(self::SCAN_LIMIT);
         $eligible = collect();
@@ -116,7 +126,7 @@ final class PublicCatalog
     /** Listed (published) tracks only. Callers that point at a track for others, such as legacy redirects, use this. */
     public function track(string $slug): array
     {
-        return $this->project(collect([$this->publishedTrack($slug, false)]));
+        return PublicReadMemo::scope(fn (): array => $this->project(collect([$this->publishedTrack($slug, false)])));
     }
 
     /**
@@ -127,21 +137,25 @@ final class PublicCatalog
      */
     public function direct(string $slug): array
     {
-        $track = $this->publishedTrack($slug, true);
+        return PublicReadMemo::scope(function () use ($slug): array {
+            $track = $this->publishedTrack($slug, true);
 
-        return ['projection' => $this->project(collect([$track])), 'unlisted' => $track->status === TrackVisibility::UNLISTED];
+            return ['projection' => $this->project(collect([$track])), 'unlisted' => $track->status === TrackVisibility::UNLISTED];
+        });
     }
 
     /** Internal model only. HTTP embeds must explicitly project public text and route IDs. */
     public function preview(string $slug): MediaAsset
     {
-        $track = $this->publishedTrack($slug);
-        // The preview the setting selects (tagged or its verified untagged sibling); eligibility above already proved the tagged identity.
-        $preview = app(PreviewTagResolver::class)->publicPreview($track, $track->assets);
-        abort_unless($preview, 404);
-        $preview->setRelation('track', $track);
+        return PublicReadMemo::scope(function () use ($slug): MediaAsset {
+            $track = $this->publishedTrack($slug);
+            // The preview the setting selects (tagged or its verified untagged sibling); eligibility above already proved the tagged identity.
+            $preview = app(PreviewTagResolver::class)->publicPreview($track, $track->assets);
+            abort_unless($preview, 404);
+            $preview->setRelation('track', $track);
 
-        return $preview;
+            return $preview;
+        });
     }
 
     /**
@@ -150,7 +164,7 @@ final class PublicCatalog
      */
     private function publishedTrack(string $slug, bool $direct = true): Track
     {
-        $track = ($direct ? $this->directQuery() : $this->query())->where('slug', $slug)->first();
+        $track = $this->candidates(($direct ? $this->directQuery() : $this->query())->where('slug', $slug)->limit(1))->first();
         abort_unless($track && $this->eligible($track), 404);
 
         return $track;
@@ -158,17 +172,19 @@ final class PublicCatalog
 
     public function license(string $slug, string $revisionId): array
     {
-        $track = $this->publishedTrack($slug);
-        $offer = $track->offers->first(fn ($offer) => $offer->is_active && (string) $offer->currentRevision?->id === $revisionId);
-        abort_unless($offer, 404);
+        return PublicReadMemo::scope(function () use ($slug, $revisionId): array {
+            $track = $this->publishedTrack($slug);
+            $offer = $track->offers->first(fn ($offer) => $offer->is_active && (string) $offer->currentRevision?->id === $revisionId);
+            abort_unless($offer, 404);
 
-        return app(PublicLicenseDisclosure::class)->fromRevision($offer->currentRevision);
+            return app(PublicLicenseDisclosure::class)->fromRevision($offer->currentRevision);
+        });
     }
 
     public function selections(array $ids): array
     {
         // At most ten public records; never treat absence from a catalog page as withdrawal.
-        return $this->project($this->query()->whereIn('id', $ids)->limit(10)->get()->filter(fn (Track $track) => $this->eligible($track)));
+        return PublicReadMemo::scope(fn (): array => $this->project($this->candidates($this->query()->whereIn('id', $ids)->limit(10))->filter(fn (Track $track) => $this->eligible($track))));
     }
 
     /**
@@ -185,7 +201,7 @@ final class PublicCatalog
         if ($ids === []) {
             return [];
         }
-        $tracks = $this->query()->whereIn('id', array_slice($ids, 0, 100))->get()->filter(fn (Track $track) => $this->eligible($track))->keyBy('id');
+        $tracks = PublicReadMemo::scope(fn () => $this->candidates($this->query()->whereIn('id', array_slice($ids, 0, 100)))->filter(fn (Track $track) => $this->eligible($track))->keyBy('id'));
         $cards = [];
         foreach ($ids as $id) {
             $track = $tracks->get($id);
@@ -222,7 +238,7 @@ final class PublicCatalog
         if ($ids === []) {
             return [];
         }
-        $tracks = $this->query()->whereIn('id', $ids)->get()->filter(fn (Track $track) => $this->eligible($track))->keyBy('id');
+        $tracks = PublicReadMemo::scope(fn () => $this->candidates($this->query()->whereIn('id', $ids))->filter(fn (Track $track) => $this->eligible($track))->keyBy('id'));
         $links = [];
         foreach ($ids as $id) {
             if (($track = $tracks->get($id)) !== null) {
@@ -246,8 +262,8 @@ final class PublicCatalog
                 ->orWhereRaw("LOWER(artist) LIKE ? ESCAPE '!'", [$pattern]));
         }
 
-        return $query->orderBy('title')->orderBy('artist')->orderBy('id')->limit(self::SCAN_LIMIT)->get()
-            ->filter(fn (Track $track) => $this->eligible($track))
+        return PublicReadMemo::scope(fn () => $this->candidates($query->orderBy('title')->orderBy('artist')->orderBy('id')->limit(self::SCAN_LIMIT))
+            ->filter(fn (Track $track) => $this->eligible($track)))
             ->mapWithKeys(fn (Track $track): array => [$track->id => $track->title.' · '.$track->artist])->all();
     }
 
@@ -260,6 +276,16 @@ final class PublicCatalog
     private function directQuery(): Builder
     {
         return Track::query()->whereIn('status', TrackVisibility::LIVE)->with('assets');
+    }
+
+    /** Hydrates candidates and reads the rows their eligibility checks need in a few batched reads (ListingPrefetch). */
+    private function candidates(Builder $query): Collection
+    {
+        $since = PublicReadMemo::generation();
+        $tracks = $query->get();
+        app(ListingPrefetch::class)->prime($tracks, $since);
+
+        return $tracks;
     }
 
     private function eligible(Track $track): bool
