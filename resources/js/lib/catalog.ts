@@ -1,4 +1,4 @@
-import deliverableLabelMap from './deliverable-labels.json';
+import deliverableLabelMap from './deliverable-labels.json' with { type: 'json' };
 import type { SiteContent, SiteImages } from './site-content';
 
 export interface Offer {
