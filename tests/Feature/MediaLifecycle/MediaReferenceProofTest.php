@@ -3,6 +3,7 @@
 namespace Tests\Feature\MediaLifecycle;
 
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Catalog\TrackPublicationSchedules;
 use App\Domain\Commerce\Models\PendingEntitlement;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
@@ -149,6 +150,49 @@ final class MediaReferenceProofTest extends TestCase
         $this->assertSame(['publication:track'], $attached($published));
         $this->assertSame(['content:site_images'], $attached($shared));
         $this->assertSame('unattached', $result['families'][$free]['state']);
+    }
+
+    public function test_a_pending_publication_schedule_keeps_a_never_published_tracks_families_attached_until_it_is_cancelled(): void
+    {
+        [$scheduled, , , $scheduledTrack] = $this->family('synthetic-scheduled', 240, false);
+        [$cancelled, , , $cancelledTrack] = $this->family('synthetic-cancelled', 350, false);
+        [$pending, , , $pendingTrack] = $this->family('synthetic-pending-draft', 460, false);
+        [$none] = $this->family('synthetic-no-schedule', 570, false);
+        $at = CarbonImmutable::now('UTC')->startOfMinute()->addMinutes(10)->setTimezone('America/Chicago')->format('Y-m-d\TH:i');
+        $service = app(TrackPublicationSchedules::class);
+        $schedule = function (Track $track) use ($service, $at): Track {
+            $track->refresh();
+            $service->schedule($track, $this->actor, $at, 'published', $track->metadata_version, $track->publication_version);
+
+            return $track->refresh();
+        };
+
+        // Through the real service: the track is `scheduled`, was never published and holds a pending row.
+        $scheduledTrack = $schedule($scheduledTrack);
+        $this->assertSame(['scheduled', null, null], [$scheduledTrack->status, $scheduledTrack->published_at, $scheduledTrack->published_slug]);
+        $cancelledTrack = $schedule($cancelledTrack);
+        // A pending row on a track that is still `draft` (the trigger allows it): the schedule alone must count.
+        DB::table('track_publication_schedules')->insert(['track_id' => $pendingTrack->id, 'target_status' => 'published',
+            'publish_at' => now()->addHour()->startOfMinute(), 'entry_zone' => 'America/Chicago', 'entry_local' => '2030-01-01 00:00',
+            'created_by' => $this->actor->id, 'created_at' => now(), 'state' => 'pending', 'pending_slot' => 1]);
+        $this->assertSame('draft', $pendingTrack->refresh()->status);
+
+        $result = $this->prove([$scheduled, $cancelled, $pending, $none]);
+        $this->assertSame('complete', $result['coverage']);
+        foreach ([$scheduled, $cancelled, $pending] as $root) {
+            $this->assertSame(['attached', ['publication:track']], [$result['families'][$root]['state'],
+                array_keys(array_filter($result['families'][$root]['checks']))], (string) $root);
+        }
+        $this->assertSame('unattached', $result['families'][$none]['state']);
+        $this->assertSame(1, app(MediaReferenceProof::class)->structural([$scheduled])[$scheduled]['checks']['publication:track']);
+
+        // Cancelling releases the track to draft and resolves the row: nothing was ever published, so nothing keeps the family.
+        $service->cancel($cancelledTrack, $this->actor, $cancelledTrack->metadata_version, $cancelledTrack->publication_version);
+        $this->assertSame(['draft', 'cancelled'], [$cancelledTrack->refresh()->status,
+            DB::table('track_publication_schedules')->where('track_id', $cancelledTrack->id)->value('state')]);
+        $result = $this->prove([$scheduled, $cancelled]);
+        $this->assertSame(['attached', 'unattached'], [$result['families'][$scheduled]['state'], $result['families'][$cancelled]['state']]);
+        $this->assertSame(0, array_sum($result['families'][$cancelled]['checks']));
     }
 
     public function test_a_purchased_and_contracted_asset_is_never_unattached_and_its_payload_is_not_changed(): void
