@@ -32,6 +32,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Fixed
 
+- Sound-kit storage creates its private `.write-lock` files owner-only (0600) whatever the caller's umask, and tightens a lock an earlier run left group-writable. A staging CLI kit import under `sudo` had left two 0664 locks, which made the next deploy's snapshot proof refuse the private tree and stop the site until recovery.
+
 - Media reference proof: `publication:track` now counts a track with a pending publication schedule (`track_publication_schedules.state = 'pending'`) and a track whose status is `scheduled`, as `docs/media-processing.md` already promised. Before, only `status = 'published'`, `published_at` and `published_slug` counted, so a never-published scheduled track's media families could be judged unattached. A cancelled, superseded or published schedule adds nothing by itself. `MediaReferenceRegistry` keeps `track_publication_schedules.track_id` as REVIEWED, with a reason that now names the pending-schedule check (the proof reads the table directly; it is not a `TRACK_IDS` column because that check has no state filter and would count history). Tests in `tests/Feature/MediaLifecycle/MediaReferenceProofTest.php` drive the real `TrackPublicationSchedules` service (SQLite).
 - Media reference registry classifies `production_tax_refused_order_resolutions.evidence_ciphertext` (added by the refused-order resolution, #308) as opaque, like every other `*_ciphertext` column, so the media-lifecycle proof is complete again.
 
