@@ -2,15 +2,19 @@
 
 namespace App\Domain\Commerce\Orders;
 
+use App\Domain\Commerce\Finalization\FinalizationEvidence;
 use App\Domain\Commerce\Models\InventoryReservation;
+use App\Domain\Commerce\Models\Order;
+use App\Domain\Commerce\Models\OrderFinalization;
 use App\Domain\Commerce\Models\PromotionCampaign;
 use App\Domain\Commerce\Models\PromotionUse;
 use App\Domain\Commerce\Models\Quote;
 use App\Domain\Commerce\Models\QuotePricing;
-use App\Domain\Commerce\Models\Order;
-use App\Domain\Commerce\Models\OrderFinalization;
-use App\Domain\Commerce\Finalization\FinalizationEvidence;
+use App\Domain\Commerce\Models\TestRefundResolution;
+use App\Domain\Commerce\Models\TestUnpaidRelease;
 use App\Domain\Commerce\QuoteException;
+use App\Domain\Commerce\UnpaidRelease\ReadUnpaidRelease;
+use App\Domain\Commerce\UnpaidRelease\ReadUnsentRelease;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -32,9 +36,13 @@ final class OrderEvidence
         InventoryReservation $reservation, ?PromotionUse $use, array $policy,
         #[SensitiveParameter] array $request): array
     {
-        $release = \App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $order->id)->first();
+        $release = TestUnpaidRelease::where('order_id', $order->id)->first();
         if ($release) {
-            app(\App\Domain\Commerce\UnpaidRelease\ReadUnpaidRelease::class)->resourceDisposition($release, $order, $attempt, $reservation, $use);
+            app(ReadUnpaidRelease::class)->resourceDisposition($release, $order, $attempt, $reservation, $use);
+        }
+        $unsent = ReadUnsentRelease::for($order);
+        if ($unsent) {
+            app(ReadUnsentRelease::class)->resourceDisposition($unsent, $order, $attempt, $reservation, $use);
         }
         $finalization = OrderFinalization::where('order_id', $order->id)->first();
         if ($finalization) {
@@ -45,10 +53,12 @@ final class OrderEvidence
         // Only this historical path can reconstruct a proved consumed or released resource as its original pending state.
         $originalReservation = clone $reservation;
         $originalUse = $use === null ? null : clone $use;
-        if ($release || $finalization?->outcome === 'paid'
-            || ($finalization && \App\Domain\Commerce\Models\TestRefundResolution::where('order_finalization_id', $finalization->id)->exists())) {
+        if ($release || $unsent || $finalization?->outcome === 'paid'
+            || ($finalization && TestRefundResolution::where('order_finalization_id', $finalization->id)->exists())) {
             $originalReservation->state = 'pending';
-            if ($originalUse) { $originalUse->state = 'pending'; }
+            if ($originalUse) {
+                $originalUse->state = 'pending';
+            }
         }
 
         return $this->reconstruct($order->public_id, $attempt->public_id, $quote, $pricing,
@@ -78,13 +88,15 @@ final class OrderEvidence
             throw new QuoteException('ORDER_CHANGED', 409);
         }
         $references = $quote->lines()->orderBy('position')->get();
-        $quoteLines = $quote->snapshot['lines']; $priceLines = $pricing->snapshot['lines'];
+        $quoteLines = $quote->snapshot['lines'];
+        $priceLines = $pricing->snapshot['lines'];
         if ($references->count() !== count($quoteLines) || count($priceLines) !== count($quoteLines)) {
             throw new QuoteException('ORDER_CHANGED', 409);
         }
         $lines = [];
         foreach ($quoteLines as $position => $line) {
-            $reference = $references[$position]; $priceLine = $priceLines[$position];
+            $reference = $references[$position];
+            $priceLine = $priceLines[$position];
             if ($reference->position !== $position || $reference->offer_revision_id !== $line['offer_revision_id'] ||
                 $priceLine['offer_revision_id'] !== $line['offer_revision_id'] ||
                 $reference->line_hash !== CanonicalJson::hash($line) ||
@@ -96,8 +108,11 @@ final class OrderEvidence
                 'selection' => $line, 'pricing' => $priceLine, 'disclosure' => $review['items'][$position]['disclosure']];
         }
         $bindings = $reservation->snapshot['bindings'];
-        $scopeIds = array_column($bindings, 'scope_id'); $revisionIds = array_column($bindings, 'offer_revision_id');
-        $expectedRevisions = array_column($quoteLines, 'offer_revision_id'); sort($revisionIds); sort($expectedRevisions);
+        $scopeIds = array_column($bindings, 'scope_id');
+        $revisionIds = array_column($bindings, 'offer_revision_id');
+        $expectedRevisions = array_column($quoteLines, 'offer_revision_id');
+        sort($revisionIds);
+        sort($expectedRevisions);
         $claims = DB::table('inventory_claims')->where('inventory_reservation_id', $reservation->id)
             ->orderBy('rights_scope_id')->pluck('rights_scope_id')->map(fn ($id) => (int) $id)->all();
         if ($claims !== $scopeIds || $revisionIds !== $expectedRevisions || count(array_unique($scopeIds)) !== count($scopeIds)) {
@@ -123,7 +138,9 @@ final class OrderEvidence
         }
         $expires = $quote->expires_at->min($pricing->expires_at)->min($reservation->expires_at);
         if ($at->lessThan($quote->created_at) || $at->lessThan($pricing->created_at) || $at->lessThan($reservation->created_at) ||
-            $expires->lessThanOrEqualTo($at)) { throw new QuoteException('ORDER_CHANGED', 409); }
+            $expires->lessThanOrEqualTo($at)) {
+            throw new QuoteException('ORDER_CHANGED', 409);
+        }
         $attempt = ['schema_version' => 1, 'purpose' => 'test_order_attempt', 'public_id' => $attemptId,
             'order_public_id' => $orderId, 'quote_public_id' => $quote->public_id, 'quote_snapshot_hash' => $quote->snapshot_hash,
             'pricing_public_id' => $pricing->public_id, 'pricing_snapshot_hash' => $pricing->snapshot_hash,

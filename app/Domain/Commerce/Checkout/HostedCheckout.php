@@ -8,11 +8,13 @@ use App\Domain\Commerce\Models\CheckoutIntent;
 use App\Domain\Commerce\Models\CheckoutObservation;
 use App\Domain\Commerce\Models\CheckoutSession;
 use App\Domain\Commerce\Models\Order;
+use App\Domain\Commerce\Models\TestUnpaidRelease;
 use App\Domain\Commerce\Orders\OrderRequest;
 use App\Domain\Commerce\Orders\ReadOrder;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\QuoteRequest;
+use App\Domain\Commerce\UnpaidRelease\ReadUnsentRelease;
 use App\Domain\Customers\CustomerAccess;
 use App\Domain\Customers\CustomerPrincipal;
 use App\Models\User;
@@ -37,7 +39,8 @@ final class HostedCheckout
             $actorId = app(CommerceAuditActor::class)->lock($actor);
             // A short order lock serializes one durable provider intent; never includes provider I/O.
             $locked = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();
-            if (\App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $locked->id)->lockForUpdate()->exists()) {
+            if (TestUnpaidRelease::where('order_id', $locked->id)->lockForUpdate()->exists()
+                || ReadUnsentRelease::for($locked, lock: true)) {
                 throw new QuoteException('CHECKOUT_EXPIRED', 410);
             }
             $existing = CheckoutIntent::where('order_id', $locked->id)->first();
@@ -136,7 +139,9 @@ final class HostedCheckout
             throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);
         }
         $request = $this->evidence->verifyIntent($intent, Order::findOrFail($intent->order_id));
-        if (\App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $intent->order_id)->exists()) { return; }
+        if (TestUnpaidRelease::where('order_id', $intent->order_id)->exists()) {
+            return;
+        }
         $session = CheckoutSession::where('checkout_intent_id', $intent->id)->first();
         if ($candidate !== null && (! preg_match('/\Acs_test_[A-Za-z0-9]{1,120}\z/', $candidate) ||
             ($session && $session->provider_session_id !== $candidate))) {
@@ -237,8 +242,10 @@ final class HostedCheckout
         $data['finalizationStatus'] = $paymentState['finalizationStatus'];
         $data['contractStatus'] = $paymentState['contractStatus'];
         $data['fulfillmentStatus'] = $paymentState['fulfillmentStatus'];
-        if (\App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $order->id)->exists()) {
+        if (TestUnpaidRelease::where('order_id', $order->id)->exists()
+            || ReadUnsentRelease::for($order)) {
             $data['status'] = 'expired';
+
             return $data;
         }
         if (! $intent) {

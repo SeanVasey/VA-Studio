@@ -148,7 +148,7 @@ php artisan vasey:rights-scope list
 - The service rechecks current staff authority and track/offer/license/rights/media readiness. A link is an audited operator assertion, not proof of ownership. See [shared-rights command and uncertainty recovery](../shared-rights-inventory.md#operator-command-for-test-purchases).
 - If a write reports an unconfirmed result, inspect and retry the **exact original request**, preserving scope, revision and reference. A nonzero exit does not prove rollback.
 
-**An unpaid order keeps its offer reserved.** Preparing an order moves the offer revision's reservation to `pending`, and it stays `pending` until the order is finalized or a staff member releases it. A paid order releases it. An abandoned, declined-then-abandoned or expired order does not release it by itself: staff release it with the optional unpaid-release capability once Stripe shows its checkout session expired unpaid (see [Releasing an abandoned test order](#releasing-an-abandoned-test-order)). A late-paid order (a paid exception) and an order whose Stripe checkout was never opened cannot be released this way. While a reservation is held or pending, nobody else can prepare an order for that offer revision: "Prepare order" fails with `INVENTORY_UNAVAILABLE`. So:
+**An unpaid order keeps its offer reserved.** Preparing an order moves the offer revision's reservation to `pending`, and it stays `pending` until the order is finalized or a staff member releases it. A paid order releases it. An abandoned, declined-then-abandoned or expired order does not release it by itself: staff release it with the optional unpaid-release capability once Stripe shows its checkout session expired unpaid (see [Releasing an abandoned test order](#releasing-an-abandoned-test-order)). An order that was prepared but never sent to Stripe is released the same way, with its own proof, once its payment window has closed. A late-paid order (a paid exception) cannot be released. While a reservation is held or pending, nobody else can prepare an order for that offer revision: "Prepare order" fails with `INVENTORY_UNAVAILABLE`. So:
 
 - Two buyers cannot prepare orders against the same rights scope at the same time, including other linked variants.
 - Run the failure drills on a dedicated drill offer, not on an offer you want to keep buying.
@@ -291,7 +291,7 @@ Optional, off by default (Sean authorized it for the staging alpha on 2026-11-11
 
 All of these must hold, and the application checks each one itself; staff cannot override any of them:
 
-- The order belongs to the configured Stripe test account and has a recorded Stripe Checkout Session, that is, the buyer pressed **Open Stripe test checkout**. An order that was prepared but never sent to Stripe has no session and cannot be released (result `unavailable`).
+- The order belongs to the configured Stripe test account and has a recorded Stripe Checkout Session, that is, the buyer pressed **Open Stripe test checkout**. An order whose checkout started but has no recorded session (the request to Stripe failed or timed out) cannot be released (result `unavailable`): Stripe may hold a session for it. An order that was never sent to Stripe at all follows [Never sent to Stripe](#never-sent-to-stripe) instead.
 - No verified payment and no finalization is recorded for the order (otherwise `payment_recorded`). A late-paid order (paid exception) keeps its reservation; this path refuses it.
 - Two reads of the session from Stripe both show `status: expired` and `payment_status: unpaid`, with `after_expiration` and `recovered_from` both null, and the same order, attempt, amount, currency, payment methods and line items as the retained request. Its PaymentIntent is absent, or `canceled` with nothing received or capturable.
 
@@ -319,7 +319,7 @@ Then **Deploy Now**. The deploy gate (`ops/staging/validate-runtime.php`) accept
    php artisan tinker --execute='foreach (DB::table("inventory_reservations as r")->join("order_attempts as a", "a.inventory_reservation_id", "=", "r.id")->join("orders as o", "o.id", "=", "a.order_id")->leftJoin("checkout_intents as i", "i.order_id", "=", "o.id")->leftJoin("checkout_sessions as s", "s.checkout_intent_id", "=", "i.id")->where("r.state", "pending")->orderBy("r.id")->get(["o.public_id", "r.pending_at", "s.id as session"]) as $x) echo $x->public_id, " pending_since=", $x->pending_at, " stripe_session=", $x->session ? "yes" : "none", PHP_EOL;'
    ```
 
-   `stripe_session=none` means the order cannot be released with this path. A paid order is never `pending` here, but a paid exception is: the release reports `payment_recorded` for it.
+   `stripe_session=none` means the order cannot be released with the Stripe proof. If the order also has no checkout intent it was never sent to Stripe; see [Never sent to Stripe](#never-sent-to-stripe). A paid order is never `pending` here, but a paid exception is: the release reports `payment_recorded` for it.
 3. Studio → **Test commerce** → **Test unpaid release**. Search for the order reference. Listing an order does not mean it is unpaid.
 4. **Release history** shows the current state: "Eligible unpaid status has not been established" (no release yet), "A release is recorded" (done) or "Payment is recorded".
 5. **Verify unpaid status and release**, then confirm. The dialog makes the Stripe reads (GET only) and, only if every condition above holds, records the release and frees the reservation in one database transaction.
@@ -337,6 +337,16 @@ Then **Deploy Now**. The deploy gate (`ops/staging/validate-runtime.php`) accept
 
 7. **"Release was not confirmed. The outcome is uncertain."** means the request failed part-way (a lost connection, a timeout, a changed record) and the application cannot say whether the release committed. Nothing is assumed either way. Press confirm again in the **same** dialog: it carries the same request identifier, so a release that already committed is reported as released and is never applied twice. If the dialog was closed, open **Release history**: "A release is recorded" means it committed; otherwise start a new check.
 
+### Never sent to Stripe
+
+An order prepared in the store whose buyer never pressed **Open Stripe test checkout** has no checkout request. The page's **Checkout** column shows it as "Never sent to Stripe", and it offers **Release never-sent order** instead of the Stripe check. Same switch, same staff and MFA requirement.
+
+1. Wait until the order's payment window has closed: it ends with the quote, 15 minutes after the cart review. Before that the result is "Checkout window is still open" (`checkout_open`) and nothing is recorded; the buyer could still open checkout.
+2. **Release never-sent order**, then confirm. The dialog states what the application proves before it changes anything: no checkout request exists for the order, so it was never sent to Stripe and no payment can exist for it, and its checkout window has closed. Nothing is sent to Stripe.
+3. "Test resources released" means the reservation (and any promotion use) is free and the order is terminal: its checkout status reads `expired`, and the database refuses a checkout request for it, so it can never be paid. "Release review is out of date" (`stale`) means checkout started since the dialog opened: close it and use the Stripe check once that session has expired. Uncertain results behave as in step 7 above.
+
+The audit event is `commerce.unpaid_release.unsent_released`, with the staff member, order, release ID, proof and request ID.
+
 Every review and check writes an audit event (`commerce.unpaid_release.reviewed`, `.requested`, `.observed`) naming the staff member. A released order cannot be checked out again (its status reads `expired`). If a payment for it were ever verified later, it would be kept as money and finalized as a paid exception with reason `released_attempt`, with no license, contract or download, and the reservation stays released.
 
 ## Troubleshooting
@@ -345,7 +355,7 @@ Every review and check writes an audit event (`commerce.unpaid_release.reviewed`
 | --- | --- | --- |
 | Cart says checkout is not available | A profile flag or policy is off or invalid | `php scripts/ops/validate-test-commerce-profile.php .env` |
 | `INVENTORY_SCOPE_UNAVAILABLE` on Prepare order | Offer revision not linked | Setup step 5 |
-| `INVENTORY_UNAVAILABLE` on Prepare order | A held or pending reservation occupies the actual rights scope, including linked variants | List the pending orders ([Releasing an abandoned test order](#releasing-an-abandoned-test-order), step 2). An unused hold expires by itself; a pending abandoned order is released by staff once its Stripe session has expired unpaid. A paid exception or an order without a Stripe session cannot be released: use dedicated drill content and preserve the original evidence (setup step 5). |
+| `INVENTORY_UNAVAILABLE` on Prepare order | A held or pending reservation occupies the actual rights scope, including linked variants | List the pending orders ([Releasing an abandoned test order](#releasing-an-abandoned-test-order), step 2). An unused hold expires by itself; a pending abandoned order is released by staff once its Stripe session has expired unpaid. An order never sent to Stripe is released once its payment window closes ([Never sent to Stripe](#never-sent-to-stripe)). A paid exception, or an order whose checkout started without a recorded session, cannot be released: use dedicated drill content and preserve the original evidence (setup step 5). |
 | `PRICING_UNAVAILABLE` | Pricing policy invalid or outside its window | `commerce.pricing` check |
 | `PRICING_CHANGED` on an open cart | The pricing policy changed after the cart was priced | Start a new cart |
 | Webhook delivery `400 STRIPE_WEBHOOK_INVALID` | Wrong `STRIPE_WEBHOOK_SECRET`, host clock more than 5 minutes off, or both the Dashboard endpoint and `stripe listen` in use | Re-copy the secret; check `timedatectl` |

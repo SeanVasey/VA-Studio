@@ -208,6 +208,7 @@ final class MediaReferenceRegistry
         'test_delivery_authorizations.evidence_ciphertext', 'test_delivery_redemptions.evidence_ciphertext',
         'test_fulfillment_activations.evidence_ciphertext', 'test_payment_financial_observations.evidence_ciphertext',
         'test_refund_resolutions.evidence_ciphertext', 'test_unpaid_releases.evidence_ciphertext',
+        'test_unsent_order_releases.evidence_ciphertext',
         'transactional_notices.capture_ciphertext', 'verified_payments.evidence_ciphertext',
         // Plaintext or mixed payloads without a reviewed shape.
         'contract_render_requests.profile', 'customer_data_request_events.detail', 'customer_inquiries.payload',

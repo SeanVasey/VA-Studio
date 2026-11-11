@@ -63,6 +63,8 @@ class TestOrderFinalizationMigrationTest extends TestCase
         TransactionalMailFixtures::dropEmptyDeliveries();
         $notices->down();
         $purchaseClaims->down();
+        // The empty never-sent release child replaces the refund migration's resource guards; restore them first.
+        (require database_path('migrations/2026_11_11_001000_test_unsent_order_releases.php'))->down();
         $refundResolution->down();
         $unpaidRelease->down();
         $financialObservations->down();
@@ -93,6 +95,7 @@ class TestOrderFinalizationMigrationTest extends TestCase
         $financialObservations->up();
         $unpaidRelease->up();
         $refundResolution->up();
+        (require database_path('migrations/2026_11_11_001000_test_unsent_order_releases.php'))->up();
         $purchaseClaims->up();
         $notices->up();
         TransactionalMailFixtures::restoreDeliveries();

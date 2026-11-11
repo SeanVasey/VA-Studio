@@ -25,7 +25,7 @@ Three tracks were held by abandoned checkouts on 2026-11-11: Wide Awake, Words I
 
 ## Limits to know before you start
 
-1. **An unpaid order keeps its offer reserved.** If you abandon, decline-and-leave, or let a checkout expire, nobody can prepare an order for that same offer again until staff release it (`docs/ops/staging-test-purchase.md`, "An unpaid order keeps its offer reserved"). Treat the whole track as held after any order you do not complete. Staff can release it from the admin: **Test commerce > Test unpaid release**, "Verify unpaid status and release" (Script 5). Two conditions apply. The order must have reached Stripe (you pressed "Open Stripe test checkout"); an order that was prepared but never sent to Stripe cannot be released this way. And Stripe must show the checkout session expired and unpaid, which happens 60 minutes after checkout was opened; before that the result is "Unpaid status was not established". The switch for this page is set per host (`VASEY_TEST_UNPAID_RELEASE_ENABLED`); if the action says it is unavailable, tell the operator.
+1. **An unpaid order keeps its offer reserved.** If you abandon, decline-and-leave, or let a checkout expire, nobody can prepare an order for that same offer again until staff release it (`docs/ops/staging-test-purchase.md`, "An unpaid order keeps its offer reserved"). Treat the whole track as held after any order you do not complete. Staff can release it from the admin: **Test commerce > Test unpaid release**, "Verify unpaid status and release" (Script 5). If you opened Stripe's page, Stripe must show the checkout session expired and unpaid, which happens 60 minutes after checkout was opened; before that the result is "Unpaid status was not established". If you prepared the order but never pressed "Open Stripe test checkout", the page lists it as "Never sent to Stripe" and staff use "Release never-sent order" instead, once the order's 15-minute payment window has closed (before that: "Checkout window is still open"). After that release the order can never be paid. The switch for this page is set per host (`VASEY_TEST_UNPAID_RELEASE_ENABLED`); if the action says it is unavailable, tell the operator.
 2. **Do not buy Exclusive unless you mean to.** It is $1,500 and it locks that track's other licenses (the exclusive docs say exclusive and linked non-exclusive offers compete for the same rights scope). You cannot undo it from the browser.
 3. **Order access is the browser session.** Guest orders belong to the browser session that placed them (120 minutes idle by default), and downloads work in that same browser only. Do not clear cookies or close a private window mid-test.
 4. **Your cart lives in the browser tab.** A new tab starts with an empty cart.
@@ -176,6 +176,8 @@ Use a fresh track. This deliberately burns that track.
    Expect: "Test resources released". If you are early, the result is "Unpaid status was not established": close the dialog, wait, and start a new check. "Release evidence needs attention" means Stripe's answer did not match the order; do not retry, write it down.
 6. Buy a license on that track again.
    Expect: the order can now be prepared.
+7. Optional, on another fresh track: prepare an order (Script 2 up to "Prepare test order") and do not press "Open Stripe test checkout". Wait 15 minutes, then in the admin find the order: its "Checkout" column reads "Never sent to Stripe". Press "Release never-sent order".
+   Expect: "Test resources released". Earlier, "Checkout window is still open". The order's page then says the checkout has expired, and the track can be bought again.
 
 ### Script 6: buy the sound kit
 
@@ -228,7 +230,7 @@ Labels below are the navigation labels the code generates. Which entries you see
    - **Test Contract Issuance**: your grant shows a recorded status and "Original recorded (UTC)".
    - **Test Payment Exceptions**: empty unless a payment arrived after the window.
    - **Test Customers**: your guest order appears as "Guest (no account)".
-   - **Test Unpaid Release**: lists orders; "Verify unpaid status and release" frees the track held by an abandoned order once Stripe shows its session expired and unpaid (Limit 1, Script 5). "Release history" shows what was recorded. It refuses a paid order.
+   - **Test Unpaid Release**: lists orders, with a "Checkout" column ("Checkout started" or "Never sent to Stripe"); "Verify unpaid status and release" frees the track held by an abandoned order once Stripe shows its session expired and unpaid (Limit 1, Script 5), and "Release never-sent order" frees one that never reached Stripe once its payment window has closed (Script 5, step 7). "Release history" shows what was recorded. It refuses a paid order.
    - **Test kit orders**: one row per kit order with its status ("Order started", "Awaiting payment", "Paid, grant pending", "Granted, contract pending", "Contract issued, delivery not enabled", "Delivery enabled", "Delivery blocked"). Row actions: "Re-check payment", "Issue license contract", "Enable delivery", "Block delivery" (Script 6).
    - **Order-ready Emails** and **Test promotions** exist; no mail is sent.
 10. **Reporting**: **Sales report** and **Customer segments**.

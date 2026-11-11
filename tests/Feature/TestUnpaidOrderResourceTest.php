@@ -114,8 +114,8 @@ class TestUnpaidOrderResourceTest extends TestCase
         $this->get('/admin/test-unpaid-orders/create')->assertNotFound();
         $this->get('/admin/test-unpaid-orders/'.$order->id.'/edit')->assertNotFound();
         $component = Livewire::test(ListTestUnpaidOrders::class)
-            ->assertTableActionExists('releaseHistory')->assertTableActionExists('releaseUnpaid');
-        $this->assertSame(['releaseHistory', 'releaseUnpaid'], array_keys($component->instance()->getTable()->getFlatActions()));
+            ->assertTableActionExists('releaseHistory')->assertTableActionExists('releaseUnpaid')->assertTableActionExists('releaseUnsent');
+        $this->assertSame(['releaseHistory', 'releaseUnpaid', 'releaseUnsent'], array_keys($component->instance()->getTable()->getFlatActions()));
         $this->assertSame([], $component->instance()->getTable()->getFlatBulkActions());
         $this->assertSame([], $component->instance()->getCachedHeaderActions());
         $this->assertNull($component->instance()->getTable()->getRecordUrl($order));
