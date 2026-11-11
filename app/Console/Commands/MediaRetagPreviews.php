@@ -25,6 +25,7 @@ final class MediaRetagPreviews extends Command
 
     protected $signature = 'vasey:media-retag-previews
         {--actor= : Email of the staff account that requests the reprocessing}
+        {--add-untagged : Select draft tracks that have no untagged public preview yet (processed before it existed) instead of tracks with a stale tag}
         {--check : List what would be reprocessed and write nothing}';
 
     protected $description = 'Queue reprocessing of draft tracks whose tagged preview does not carry the configured seller tag (local, testing or staging only).';
@@ -51,7 +52,8 @@ final class MediaRetagPreviews extends Command
         } catch (RetagPreviewsRefusal $refusal) {
             return $this->refuse($refusal->getMessage());
         }
-        $plan = $retag->plan($tag);
+        $addUntagged = (bool) $this->option('add-untagged');
+        $plan = $retag->plan($tag, $addUntagged);
         $this->line('configured_tag_sha256='.$tag);
         $this->line('current='.$plan['current'].' stale_draft='.count($plan['stale']));
         foreach ($plan['stale'] as $entry) {
@@ -78,7 +80,7 @@ final class MediaRetagPreviews extends Command
         }
         try {
             // The prompt can take minutes: decide again from the database as it is now, not as it was when the list was printed.
-            $fresh = $retag->plan($retag->configuredTag());
+            $fresh = $retag->plan($retag->configuredTag(), $addUntagged);
             if ($fresh['stale'] !== $plan['stale']) {
                 $this->line('The plan changed while the password was being confirmed; using current state: stale_draft='.count($fresh['stale']));
             }

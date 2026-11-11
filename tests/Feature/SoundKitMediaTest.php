@@ -240,6 +240,30 @@ class SoundKitMediaTest extends TestCase
         $this->assertSame(0, DB::table('audit_events')->where('action', 'sound_kit_products.product.demo_uploaded')->count());
     }
 
+    public function test_the_demo_processor_builds_no_untagged_preview(): void
+    {
+        // Track runs also make an untagged public preview; a kit demo is a single tagged taster, so the real processor must
+        // ask for none (PR #322 review P2-1). The spy records what the processor actually asked AudioDerivatives for.
+        $spy = new class extends AudioDerivatives
+        {
+            public array $calls = [];
+
+            public function build(string $master, string $tag, array $profile, string $workspace, bool $untaggedPreview = true): array
+            {
+                $outputs = parent::build($master, $tag, $profile, $workspace, $untaggedPreview);
+                $this->calls[] = ['untagged' => $untaggedPreview, 'roles' => array_column($outputs, 'role')];
+
+                return $outputs;
+            }
+        };
+        $this->app->instance(AudioDerivatives::class, $spy);
+        $product = $this->bare();
+        $demo = $this->media()->uploadDemo($product, $product->revision, $this->upload(), $this->actor);
+        $ready = app(SoundKitDemoProcessor::class)->handle($demo->id);
+        $this->assertSame('ready', $ready->status, (string) $ready->failure_code);
+        $this->assertSame([['untagged' => false, 'roles' => ['master_wav', 'download_mp3', 'preview_tagged']]], $spy->calls);
+    }
+
     public function test_a_demo_is_scanned_and_becomes_the_same_tagged_preview_a_track_gets(): void
     {
         $product = $this->bare();

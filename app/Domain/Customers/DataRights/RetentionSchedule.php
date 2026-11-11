@@ -495,6 +495,7 @@ final class RetentionSchedule
         'track_collections' => 'Catalog: staff-entered browse collections of tracks (title, slug, description, publication state); no price, customer, payment or contact data.',
         'sound_kit_demos' => 'Catalog: staff-uploaded demo audio of sound-kit products (private source, retained scan evidence, prepared tagged preview and waveform); no customer, payment, order, entitlement or contact data.',
         'sound_kit_products' => 'Catalog: staff-entered sound-kit products (title, slug, public summary, pinned archive revision, license version, integer price, rights-clearance and offer-approval records, chosen cover art and demo with their approvals, publication state); no customer, payment, order, entitlement or contact data.',
+        'preview_tag_settings' => 'Catalog: staff setting of whether a track\'s public preview carries the seller tag (the store default and per-track overrides, with a revision and the staff actor); no customer, payment or contact data.',
         'track_collection_items' => 'Catalog: ordered references from a collection to existing tracks; no customer data.',
         'track_collaborator_splits' => 'Catalog: staff-entered per-track collaborator shares in basis points; metadata only.',
         'media_assets' => 'Catalog media files (masters, previews, artwork) uploaded by staff.',

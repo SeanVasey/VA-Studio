@@ -331,6 +331,7 @@ final class MediaReferenceRegistry
         'stripe_webhook_receipts.event' => 'Stripe event id and type strings, not a model reference.',
         'stripe_webhook_receipts.object' => 'Stripe object id and type strings, not a model reference.',
         'test_delivery_coverage.intervals' => 'Byte ranges served for one download admission; numbers only.',
+        'preview_tag_settings.track_id' => 'A staff choice of which already-verified preview (tagged or untagged) the public hears (2026-11-11): it sells and commits nothing and names no media row. Both previews stay attached through the track\'s own families.',
         'track_collection_items.track_collection_id' => 'A collection id, not a track or media id.',
         'track_collection_items.track_id' => self::COLLECTION,
         'track_collections.description' => self::PROSE,

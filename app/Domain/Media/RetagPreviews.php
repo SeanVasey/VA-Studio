@@ -6,6 +6,7 @@ use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\TrackVisibility;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\Models\MediaProcessingRun;
+use App\Domain\Media\PreviewTag\PreviewTagResolver;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
@@ -114,14 +115,19 @@ final class RetagPreviews
     /**
      * Read-only classification of every track's current tagged preview against the configured tag.
      *
-     * @return array{tag_sha256: string, current: int, stale: list<array{track_id: int, slug: string, source_id: int, preview_id: int, state: string}>, skipped: array<string, list<int>>}
+     * With `$addUntagged` the question is different: which draft tracks were processed before the untagged public preview existed
+     * (their newest run recorded no untagged sibling), so that processing the same master again under today's profile gives them one.
+     * Everything else (draft only, superseded masters, in-flight runs, the unchanged queue) is the same. Processing makes a NEW tagged
+     * preview as well, so a draft's offers are prepared again afterwards, exactly as after any reprocess.
+     *
+     * @return array{tag_sha256: string, mode: string, current: int, stale: list<array{track_id: int, slug: string, source_id: int, preview_id: int, state: string}>, skipped: array<string, list<int>>}
      */
-    public function plan(string $tagSha256): array
+    public function plan(string $tagSha256, bool $addUntagged = false): array
     {
-        $plan = ['tag_sha256' => $tagSha256, 'current' => 0, 'stale' => [], 'skipped' => ['live' => [], 'not_draft' => [], 'unverified' => [], 'unresolved' => [], 'superseded' => []]];
+        $plan = ['tag_sha256' => $tagSha256, 'mode' => $addUntagged ? 'add_untagged' : 'retag', 'current' => 0, 'stale' => [], 'skipped' => ['live' => [], 'not_draft' => [], 'unverified' => [], 'unresolved' => [], 'superseded' => []]];
         $fingerprint = app(MediaProfile::class)->fingerprint(app(MediaProfile::class)->current('master_wav'));
         $latest = MediaAsset::query()->selectRaw('max(id)')->where('role', 'preview_tagged')->where('status', 'ready')->groupBy('track_id');
-        MediaAsset::query()->whereIn('id', $latest)->orderBy('id')->each(function (MediaAsset $preview) use (&$plan, $tagSha256, $fingerprint): void {
+        MediaAsset::query()->whereIn('id', $latest)->orderBy('id')->each(function (MediaAsset $preview) use (&$plan, $tagSha256, $fingerprint, $addUntagged): void {
             $track = Track::query()->find($preview->track_id);
             if ($track === null) {
                 return;
@@ -132,7 +138,7 @@ final class RetagPreviews
 
                 return;
             }
-            if (hash_equals((string) ($preview->technical_metadata['tag_sha256'] ?? ''), $tagSha256)) {
+            if ($addUntagged ? app(PreviewTagResolver::class)->sibling($preview) !== null : hash_equals((string) ($preview->technical_metadata['tag_sha256'] ?? ''), $tagSha256)) {
                 $plan['current']++;
 
                 return;
@@ -221,7 +227,7 @@ final class RetagPreviews
             $finished = true;
         } finally {
             AuditEvent::record('media.retag_previews.requested', $actor, [
-                'tag_sha256' => $plan['tag_sha256'], 'queued_run_ids' => $result['queued'], 'in_flight_track_ids' => $result['in_flight'],
+                'mode' => $plan['mode'] ?? 'retag', 'tag_sha256' => $plan['tag_sha256'], 'queued_run_ids' => $result['queued'], 'in_flight_track_ids' => $result['in_flight'],
                 'refused_track_ids' => $result['refused'], 'skipped_live_track_ids' => $plan['skipped']['live'],
                 'skipped_superseded_track_ids' => $plan['skipped']['superseded'], 'skipped_after_plan' => $result['skipped'],
                 'stopped' => ! $finished,

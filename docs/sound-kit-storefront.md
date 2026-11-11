@@ -120,6 +120,7 @@ Both reuse the pipelines tracks and releases already use; nothing parallel was a
 **Seller tag.** The track policy applies to demos unchanged: the public demo is the tagged preview, never the full-quality
 source (which stays in private quarantine). A missing, mismatched or synthetic-staging tag leaves the demo waiting for an
 operator fix, exactly as for a track master; production refuses the staging placeholder.
+The track-level preview-tag setting (2026-11-11, [media processing](media-processing.md#preview-tag-tagged-or-untagged-public-preview)) does not apply to demos: they keep a single tagged preview and no untagged variant is made for them (a follow-up that needs new `sound_kit_demos` columns and a decision on the pinned demo approval).
 
 **Order of work.** The same as a track (`MediaProcessor`): snapshot, hash check, scan of the source, tag checks and scan of the tag,
 then WAV validation and build. No media tool (ffprobe or ffmpeg) runs on bytes the scanner has not cleared, and none runs at upload:

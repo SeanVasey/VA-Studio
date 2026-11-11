@@ -3,6 +3,7 @@
 namespace App\Domain\Media\Models;
 
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Media\PreviewTag\PreviewTagResolver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +11,14 @@ use Illuminate\Validation\ValidationException;
 
 class MediaAsset extends Model
 {
-    public const ROLES = ['artwork', 'preview_tagged', 'download_mp3', 'master_wav', 'stems_zip'];
+    public const ROLES = ['artwork', 'preview_tagged', 'preview_untagged', 'download_mp3', 'master_wav', 'stems_zip'];
+
+    /**
+     * The two public previews one processing run makes from the same master: with the seller tag mixed in, and without it.
+     * `preview_tagged` is the preview identity (offer snapshots, readiness and recording bindings pin it); `preview_untagged`
+     * is its sibling, served instead only when {@see PreviewTagResolver} says the untagged one is effective.
+     */
+    public const PREVIEW_ROLES = ['preview_tagged', 'preview_untagged'];
 
     protected $guarded = ['id'];
 
@@ -41,7 +49,7 @@ class MediaAsset extends Model
 
     public function isPublicDerivative(): bool
     {
-        return in_array($this->role, ['artwork', 'preview_tagged'], true);
+        return in_array($this->role, ['artwork', ...self::PREVIEW_ROLES], true);
     }
 
     protected static function booted(): void

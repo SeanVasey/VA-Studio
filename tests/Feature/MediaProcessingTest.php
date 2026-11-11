@@ -83,7 +83,7 @@ class MediaProcessingTest extends TestCase
         $run = $this->process($source);
         $this->assertSame('completed', $run->status);
         $outputs = $run->outputs()->get()->keyBy('role');
-        $this->assertCount(3, $outputs);
+        $this->assertCount(4, $outputs);
         $this->assertSame($source->sha256, $outputs['master_wav']->sha256);
         foreach ($outputs as $asset) {
             $this->assertSame($source->id, $asset->parent_asset_id);
@@ -139,7 +139,7 @@ class MediaProcessingTest extends TestCase
         $this->assertSame($completed->id, $queuedAgain->id);
         $this->assertSame(2, $again->attempts);
         $this->assertDatabaseCount('media_processing_runs', 1);
-        $this->assertSame(3, MediaAsset::where('status', 'ready')->count());
+        $this->assertSame(4, MediaAsset::where('status', 'ready')->count());
         Queue::assertPushed(ProcessMedia::class, 2);
     }
 
@@ -151,7 +151,7 @@ class MediaProcessingTest extends TestCase
         config(['media.profile_version' => 'wav-preview-v2']);
         $second = $this->process($source);
         $this->assertNotSame($first->id, $second->id);
-        $this->assertSame(6, MediaAsset::where('status', 'ready')->count());
+        $this->assertSame(8, MediaAsset::where('status', 'ready')->count());
         foreach ($original as $path => $hash) {
             $this->assertSame($hash, hash_file('sha256', Storage::disk('local')->path($path)));
         }
@@ -473,7 +473,7 @@ class MediaProcessingTest extends TestCase
         $this->assertSame('processed', $source->fresh()->status);
         $this->assertFileExists(Storage::disk('local')->path($source->storage_path));
         $outputs = $completed->outputs()->get();
-        $this->assertCount(3, $outputs);
+        $this->assertCount(4, $outputs);
         foreach ($outputs as $asset) {
             $this->assertFileExists(Storage::disk('local')->path($asset->storage_path));
             $this->assertSame($asset->sha256, hash_file('sha256', Storage::disk('local')->path($asset->storage_path)));
@@ -483,8 +483,8 @@ class MediaProcessingTest extends TestCase
         $again = app(MediaProcessor::class)->handle($run->id);
         $this->assertSame($completed->output_asset_ids, $again->output_asset_ids);
         $this->assertSame(1, $again->attempts);
-        $this->assertSame(3, MediaAsset::query()->where('status', 'ready')->count());
-        $this->assertCount(3, Storage::disk('local')->allFiles('media/revisions'));
+        $this->assertSame(4, MediaAsset::query()->where('status', 'ready')->count());
+        $this->assertCount(4, Storage::disk('local')->allFiles('media/revisions'));
     }
 
     /** Simulates a commit whose rows are not visible by undoing its savepoint inside RefreshDatabase's outer transaction. */
@@ -517,11 +517,11 @@ class MediaProcessingTest extends TestCase
         }
 
         $this->assertTrue($raised);
-        $this->assertCount(3, $retained);
+        $this->assertCount(4, $retained);
         $this->assertSame(['failed', 'processing_failed', null], [$run->fresh()->status, $run->fresh()->failure_code, $run->fresh()->claim_token]);
         $this->assertSame('quarantined', $source->fresh()->status);
         $this->assertSame(0, $run->outputs()->count());
-        $this->assertCount(3, Storage::disk('local')->allFiles('media/revisions'), 'Files were deleted while the completion commit was in doubt.');
+        $this->assertCount(4, Storage::disk('local')->allFiles('media/revisions'), 'Files were deleted while the completion commit was in doubt.');
         foreach ($retained as $path => $hash) {
             $this->assertFileExists(Storage::disk('local')->path($path));
             $this->assertSame($hash, hash_file('sha256', Storage::disk('local')->path($path)));
@@ -535,7 +535,7 @@ class MediaProcessingTest extends TestCase
         $this->assertSame(['completed', 2], [$completed->status, $completed->attempts]);
         $this->assertSame('processed', $source->fresh()->status);
         $outputs = $completed->outputs()->get();
-        $this->assertCount(3, $outputs);
+        $this->assertCount(4, $outputs);
         $this->assertSame([], array_values(array_intersect(array_keys($retained), $outputs->pluck('storage_path')->all())));
         foreach ($outputs as $asset) {
             $this->assertSame($asset->sha256, hash_file('sha256', Storage::disk('local')->path($asset->storage_path)));
@@ -544,8 +544,8 @@ class MediaProcessingTest extends TestCase
         foreach ($retained as $path => $hash) {
             $this->assertSame($hash, hash_file('sha256', Storage::disk('local')->path($path)));
         }
-        $this->assertSame(3, MediaAsset::query()->where('status', 'ready')->count());
-        $this->assertCount(6, Storage::disk('local')->allFiles('media/revisions'));
+        $this->assertSame(4, MediaAsset::query()->where('status', 'ready')->count());
+        $this->assertCount(8, Storage::disk('local')->allFiles('media/revisions'));
         $this->assertSame([], glob(Storage::disk('local')->path('processing').'/*'));
     }
 

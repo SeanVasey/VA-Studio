@@ -5,6 +5,7 @@ namespace App\Domain\Catalog;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Commerce\Inventory\SelectionInventory;
 use App\Domain\Media\Models\MediaAsset;
+use App\Domain\Media\PreviewTag\PreviewTagResolver;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Cursor;
@@ -135,7 +136,8 @@ final class PublicCatalog
     public function preview(string $slug): MediaAsset
     {
         $track = $this->publishedTrack($slug);
-        $preview = $track->assets->where('status', 'ready')->where('role', 'preview_tagged')->sortByDesc('id')->first();
+        // The preview the setting selects (tagged or its verified untagged sibling); eligibility above already proved the tagged identity.
+        $preview = app(PreviewTagResolver::class)->publicPreview($track, $track->assets);
         abort_unless($preview, 404);
         $preview->setRelation('track', $track);
 
@@ -296,14 +298,16 @@ final class PublicCatalog
         return [
             'tracks' => $tracks->map(function (Track $track) {
                 $assets = $track->assets->where('status', 'ready')->sortByDesc('id');
+                // Duration and waveform are the tagged identity's (the untagged variant carries identical ones); only the URL follows the setting.
                 $preview = $assets->firstWhere('role', 'preview_tagged');
+                $served = app(PreviewTagResolver::class)->publicPreview($track, $track->assets) ?? $preview;
 
                 return [
                     'id' => (string) $track->id, 'slug' => $track->slug, 'title' => $track->title, 'artist' => $track->artist,
                     'bpm' => $track->bpm, 'musicalKey' => $track->musical_key, 'genre' => $track->genre, 'mood' => $track->mood,
                     'durationSeconds' => $preview->technical_metadata['duration_seconds'], 'tags' => $track->tags ?? [], 'waveform' => $preview->technical_metadata['waveform'],
                     'artworkUrl' => route('media.public', $assets->firstWhere('role', 'artwork')->id),
-                    'previewUrl' => route('media.public', $preview->id),
+                    'previewUrl' => route('media.public', $served->id),
                     'shareUrl' => route('tracks.show', $track->slug),
                     'offers' => $track->offers->where('is_active', true)->map(function ($offer) use ($track) {
                         $revision = $offer->currentRevision;
