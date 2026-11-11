@@ -557,7 +557,7 @@ class SpaceCheck(PrivateTreeBase):
         total += 30_004
         run = self.check(self.need(30_004))
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
-        self.assertIn(f"(30004 of {total} private bytes to copy)", run.stdout)
+        self.assertIn(f"(30004 of {total} private bytes to copy;", run.stdout)
         self.assertNotEqual(self.check(self.need(30_004) - 1).returncode, 0)
         # Sharing turned off, or no token (this operation did not re-verify): the whole store again.
         self.assertNotEqual(self.check(self.need(30_004), VASEY_BACKUP_LINK=0).returncode, 0)
@@ -832,11 +832,12 @@ class OperationalErrors(PrivateTreeBase):
     """Review round 3, R1: an error about the host or the run is not evidence about a backup and withdraws nothing."""
 
     def eio_engine(self):
-        wrapper = self.root / "engine-with-eio.py"
+        # ENOMEM: an error about the host. (EIO reading a set file is a finding about that file since 2026-11-11, Q1.)
+        wrapper = self.root / "engine-with-enomem.py"
         wrapper.write_text(
             "import errno, os, runpy, sys\n"
             "def failing(fd, buffers):\n"
-            "    raise OSError(errno.EIO, 'synthetic I/O error')\n"
+            "    raise OSError(errno.ENOMEM, 'synthetic out of memory')\n"
             "os.readv = failing\n"
             f"sys.argv = [{str(ENGINE)!r}] + sys.argv[1:]\n"
             f"runpy.run_path({str(ENGINE)!r}, run_name='__main__')\n")
@@ -866,12 +867,12 @@ class OperationalErrors(PrivateTreeBase):
         third = self.predeploy()
         self.assertEqual(fields(third / "MANIFEST")["private_link_source"], second.name)
 
-    def test_an_io_error_during_the_re_hash_refuses_the_deploy_and_withdraws_nothing(self):
+    def test_an_operational_os_error_during_the_re_hash_refuses_the_deploy_and_withdraws_nothing(self):
         first = self.predeploy()
         second = self.predeploy()
         run = self.run_helper("space-check", "--preverify", T_FREE=10**15, PRIVATE_SNAPSHOT=self.eio_engine())
         self.assert_operational_refusal(run, first, second)
-        self.assertIn("EIO", run.stdout)
+        self.assertIn("ENOMEM", run.stdout)
         self.assertIn("the proof could not run", run.stdout)
 
     def test_a_real_mismatch_still_withdraws_and_is_reported_as_corruption(self):
@@ -1013,6 +1014,198 @@ class EngineRound3(unittest.TestCase):
         finally:
             engine.os.link = original
         self.assertIn("not the verified inode", err.getvalue())
+
+def wrapped_engine(root, body, name="engine-wrapper.py"):
+    """An engine run through a wrapper that first applies `body` (a failure injection), then runs the real file."""
+    wrapper = Path(root) / name
+    wrapper.write_text("import errno, os, runpy, sys\n" + body + "\n"
+                       f"sys.argv = [{str(ENGINE)!r}] + sys.argv[1:]\n"
+                       f"runpy.run_path({str(ENGINE)!r}, run_name='__main__')\n")
+    return wrapper
+
+
+class FollowUps(PrivateTreeBase):
+    """2026-11-11 follow-ups after PR #335 went live: G1 (early space gate), Q1-Q3."""
+
+    def check(self, *arguments, **extra):
+        return self.run_helper("space-check", *arguments, T_DB_BYTES=40_000, **extra)
+
+    def need(self, copy, ship=0, db=40_000):
+        base = copy + db + max(db, ship)
+        return base + base * 20 // 100 + 268_435_456
+
+    def test_g1_a_deploy_that_fits_only_with_sharing_is_not_refused_by_the_early_gate(self):
+        total = sum((self.live / f).stat().st_size for f in self.live_files())
+        self.predeploy()
+        self.write("masters/new/master.wav", b"RIFF" + b"z" * 20_000)
+        total += 20_004
+        free = self.need(20_004)  # enough with sharing, far too little for a full copy
+        self.assertLess(free, self.need(total))
+        run = self.check("--preverify", T_FREE=free)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("estimate: sharing with the re-verified set", run.stdout)
+        # Without the re-hash (what the early gate used to run) the same deploy is refused: it counts the whole store.
+        (self.token()).unlink()
+        run = self.check(T_FREE=free)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("estimate: no re-verified set to share with: the whole private store is counted", run.stderr)
+
+    def test_g1_a_deploy_that_does_not_fit_even_with_sharing_is_refused_naming_the_estimate(self):
+        self.predeploy()
+        self.write("masters/new/master.wav", b"RIFF" + b"z" * 20_000)
+        run = self.check("--preverify", T_FREE=self.need(20_004) - 1)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("not enough free disk space for the pre-deploy snapshot", run.stderr)
+        self.assertIn("estimate: sharing with the re-verified set", run.stderr)
+        self.assertIn("20004 of", run.stderr)
+        self.assertIn("nothing was stopped", run.stderr)
+        hardened = self.check("--preverify", T_FREE=self.need(20_004) - 1, VASEY_BACKUP_REMOTE="vasey-backup:bucket")
+        self.assertIn("one encrypted copy of the whole set", hardened.stderr)
+
+    def test_g1_prepare_reuses_the_deploys_token_and_re_hashes_only_without_one(self):
+        self.predeploy()
+        run = self.check("--preverify", T_FREE=10**15)
+        self.assertIn("re-verified the private files of", run.stdout)
+        run = self.check("--preverify-if-needed", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertNotIn("re-verified the private files of", run.stdout, "the deploy's token is reused, not re-hashed again")
+        self.assertIn("estimate: sharing with the re-verified set", run.stdout)
+        self.token().unlink()
+        run = self.check("--preverify-if-needed", T_FREE=10**15)
+        self.assertIn("re-verified the private files of", run.stdout, "without a token, prepare re-hashes itself")
+
+    def test_q1_a_truncated_index_is_a_finding_about_that_set_only(self):
+        first = self.predeploy()
+        second = self.predeploy()
+        (second / "private.index").write_text('{"format": "vasey-private-index-v2", "started_ns": ')
+        run = self.check("--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertIn("cannot be parsed", run.stdout)
+        self.assertFalse((second / "RESTORE_CHECK").exists())
+        self.assertTrue((first / "RESTORE_CHECK").exists(), "no inode of another set is implicated")
+
+    def test_q1_an_io_error_reading_a_shared_file_withdraws_every_set_holding_it(self):
+        independent = self.predeploy(preverify=False, VASEY_BACKUP_LINK=0)
+        first = self.predeploy(VASEY_BACKUP_LINK=0)
+        second = self.predeploy()
+        eio = wrapped_engine(self.root, "def failing(fd, buffers):\n    raise OSError(errno.EIO, 'synthetic EIO')\nos.readv = failing\n")
+        run = self.check("--preverify", T_FREE=10**15, PRIVATE_SNAPSHOT=eio)
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertIn("I/O error reading a set file", run.stdout)
+        self.assertFalse((second / "RESTORE_CHECK").exists())
+        self.assertFalse((first / "RESTORE_CHECK").exists(), "it holds the same inode")
+        self.assertTrue((independent / "RESTORE_CHECK").exists())
+
+    def test_q2_a_crash_of_the_engine_is_operational_and_withdraws_nothing(self):
+        first = self.predeploy()
+        crash = wrapped_engine(self.root, "import os as _os\n_real = _os.scandir\n"
+                               "def deep(*a, **k):\n    raise RecursionError('maximum recursion depth exceeded')\n_os.scandir = deep\n")
+        run = self.check("--preverify", T_FREE=10**15, PRIVATE_SNAPSHOT=crash)
+        self.assertEqual(run.returncode, 3, run.stdout + run.stderr)
+        self.assertIn("stopped unexpectedly (RecursionError)", run.stdout)
+        self.assertIn("an operational error, not a corruption finding", run.stdout)
+        self.assertTrue((first / "RESTORE_CHECK").exists())
+
+    def test_q2_exit_1_without_named_sets_is_not_taken_as_corruption(self):
+        first = self.predeploy()
+        bare = wrapped_engine(self.root, "sys.stderr.write('private-snapshot: something odd\\n'); sys.exit(1)\n")
+        run = self.check("--preverify", T_FREE=10**15, PRIVATE_SNAPSHOT=bare)
+        self.assertEqual(run.returncode, 3, run.stdout + run.stderr)
+        self.assertNotIn("withdrew the proof of: none", run.stdout)
+        self.assertTrue((first / "RESTORE_CHECK").exists())
+
+    def test_q3_a_widened_mode_on_a_shared_file_withdraws_its_holders_and_spares_the_rest(self):
+        # S0 shares the ordinary files with S1/S2 but not the widened one; S1 and S2 hold it. The strict re-proof refuses the mode
+        # (not an identity change: the mode was recorded that way), and only the sets holding that inode lose their proof.
+        s0 = self.predeploy()
+        self.write("kits/k2/.write-lock", b"").chmod(0o660)
+        time.sleep(2.1)
+        loose = dict(VASEY_RESTORE_STRICT_MODES=0)
+        s1 = self.predeploy(**loose)
+        s2 = self.predeploy(**loose)
+        held = "kits/k2/.write-lock"
+        self.assertEqual(inodes(s1 / "private")[held], inodes(s2 / "private")[held])
+        self.assertTrue(set(inodes(s0 / "private").values()) & set(inodes(s2 / "private").values()), "S0 shares other files")
+        run = self.check("--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertIn("set tree fail", run.stdout)
+        self.assertFalse((s2 / "RESTORE_CHECK").exists())
+        self.assertFalse((s1 / "RESTORE_CHECK").exists())
+        self.assertTrue((s0 / "RESTORE_CHECK").exists(), "S0 does not hold the widened file")
+
+    def test_q3_a_chmod_of_one_shared_file_in_s2_withdraws_s1_too(self):
+        s0 = self.predeploy(VASEY_BACKUP_LINK=0)
+        self.write("masters/only-later.wav", b"RIFF" + b"q" * 50)
+        time.sleep(2.1)
+        s1 = self.predeploy(VASEY_BACKUP_LINK=0)
+        s2 = self.predeploy()
+        os.chmod(s2 / "private/masters/track-one/stems.zip", 0o640)  # the same inode is in S1
+        run = self.check("--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertFalse((s2 / "RESTORE_CHECK").exists())
+        self.assertFalse((s1 / "RESTORE_CHECK").exists())
+        self.assertTrue((s0 / "RESTORE_CHECK").exists())
+
+
+class DeployGate(unittest.TestCase):
+    """G1 and Q4 in ops/staging/forge-deploy.sh: one authoritative space gate, before anything is stopped, reported truthfully."""
+
+    DEPLOY = (REPO / "ops/staging/forge-deploy.sh").read_text()
+    CTL = (REPO / "ops/staging/bin/vasey-staging-ctl").read_text()
+
+    def test_the_early_gate_is_the_authoritative_one_and_runs_before_anything_is_stopped(self):
+        self.assertNotIn('"${CTL[@]}" space-check ||', self.DEPLOY, "a plain early check counts a full copy")
+        for anchor in ('"${CTL[@]}" prepare', '"${CTL[@]}" refresh'):
+            action = self.DEPLOY.index(anchor)
+            gate = self.DEPLOY.rindex('"${CTL[@]}" space-check --preverify', 0, action)
+            started = self.DEPLOY.rindex("ACTIVATION_STARTED=1", 0, action)
+            self.assertLess(gate, started, anchor)
+            self.assertNotIn("ACTIVATION_STARTED=1", self.DEPLOY[self.DEPLOY.rindex("\n", 0, gate):gate])
+        for action in ("prepare", "refresh"):
+            body = self.CTL[self.CTL.index(f"cmd_{action}() {{"):]
+            body = body[:body.index("\n}\n")]
+            check = body.index("cmd_space_check --preverify-if-needed")
+            for later in (f"operation_begin {action}", "cmd_quiesce"):
+                self.assertLess(check, body.index(later), (action, later))
+            if action == "prepare":
+                self.assertLess(check, body.index("cmd_allocate"))
+        self.assertIn('[ "$#" = 2 ] && [ "$2" = --preverify ]', self.CTL)
+        self.assertIn('space-check) cmd_space_check "${2:-}" ;;', self.CTL)
+
+    def run_deploy_tail(self, fail_at):
+        """Runs the real new-release branch of forge-deploy.sh from the early gate through `ctl prepare`, with its real on_exit,
+        against a stub ctl that fails at FAIL_AT."""
+        source = self.DEPLOY
+        on_exit = source[source.index("on_exit() {"):source.index("trap on_exit EXIT")]
+        start = source.index("# Prepare quiesces, and activation then takes a snapshot")
+        tail = source[start:source.index('[ "$(stat -c %d:%i "$REL/storage/app/private")"', start)]
+        with tempfile.TemporaryDirectory() as directory:
+            script = ("set -Eeuo pipefail\nACTIVATION_STARTED=0\nENV_SNAPSHOT=''\n"
+                      "die() { echo \"forge-deploy: ERROR: $*\" >&2; exit 1; }\nstep() { :; }\n"
+                      "ctl_stub() { echo \"$1\" >> \"$TRACE\"; [ \"$1\" != \"$FAIL_AT\" ]; }\nCTL=(ctl_stub)\n"
+                      + on_exit + "trap on_exit EXIT\n" + tail + "\necho REACHED-AFTER-PREPARE\n")
+            trace = Path(directory) / "trace"
+            run = subprocess.run(["bash", "-c", script], capture_output=True, text=True,
+                                 env={"PATH": "/usr/bin:/bin", "TRACE": str(trace), "FAIL_AT": fail_at, "ROOT": directory,
+                                      "STAMP": "20261111T000000Z", "SHA": "a" * 40, "RUNTIME_ENV": "/dev/null",
+                                      "EVIDENCE": str(Path(directory) / "evidence")})
+            return run, (trace.read_text().split() if trace.exists() else [])
+
+    def test_a_refusal_by_the_gate_says_nothing_was_touched(self):
+        run, calls = self.run_deploy_tail("space-check")
+        self.assertNotEqual(run.returncode, 0)
+        self.assertEqual(calls, ["space-check"])
+        self.assertIn("refused before the quiesce by the backup space/re-verification gate", run.stderr)
+        self.assertIn("before the quiesce: the served release was not touched", run.stderr)
+        self.assertNotIn("unconfirmed", run.stderr)
+
+    def test_a_failure_once_prepare_started_still_says_state_is_unconfirmed(self):
+        run, calls = self.run_deploy_tail("prepare")
+        self.assertNotEqual(run.returncode, 0)
+        self.assertEqual(calls, ["space-check", "prepare"])
+        self.assertIn("service and writer state is unconfirmed", run.stderr)
+        self.assertIn("establish quiesce before recovery", run.stderr)
+        self.assertNotIn("the served release was not touched", run.stderr)
 
 if __name__ == "__main__":
     unittest.main()
