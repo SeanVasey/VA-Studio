@@ -157,9 +157,10 @@ jobs:
       # paths (installers, root-owned files) and skip without them, so the runner is provisioned like a host (service
       # starts disabled while installing, needrestart suspended), they run as root, and a skipped test
       # fails the step: no check passes by skipping.
-      # php8.4-fpm is not on the runner: setup-php installs its own prebuilt PHP (php8.4-cli and php8.4-fpm were
-      # "previously unselected" in run 43012360621), so the test's real `php-fpm8.4 -t` needs the apt package. The old
-      # line `add-apt-repository ppa:ondrej/php` asks api.launchpad.net for the PPA's metadata, and that API was down on
+      # The test's real `php-fpm8.4 -t` needs PHP 8.4 FPM. setup-php's prebuilt PHP may already provide php-fpm8.4 outside
+      # apt (run 43067147563 found it on PATH, while dpkg had listed php8.4-fpm as "previously unselected" in run
+      # 43012360621); when it reports 8.4 it is used as is. Otherwise the apt package is installed. The old line
+      # `add-apt-repository ppa:ondrej/php` asks api.launchpad.net for the PPA's metadata, and that API was down on
       # 2026-11-11 (every PR's backend-quality failed here). The same packages are published at packages.sury.org, which
       # needs no Launchpad service: the signing key is fetched from there and accepted only when its full fingerprint
       # matches the pin below (a mismatch or fetch failure is a loud warning, never a silent skip). The Launchpad PPA
@@ -171,7 +172,14 @@ jobs:
           # php8.4-fpm for the production pool's `php-fpm8.4 -t` check: noble's own archive only has PHP 8.3.
           SURY_FPR=15058500A0235D97F5D10063B188E2B695BD4743  # DEB.SURY.ORG Automatic Signing Key <deb@sury.org>
           sury_ok=0
-          if ! command -v php-fpm8.4 >/dev/null 2>&1 && ! [ -e /etc/apt/sources.list.d/sury-php.sources ]; then
+          # setup-php's prebuilt PHP can already provide php-fpm8.4 (it is not an apt package, so dpkg does not list it).
+          # Use it when it really is 8.4; only otherwise install the apt package, which needs the extra source.
+          fpm_packages=php8.4-fpm
+          if command -v php-fpm8.4 >/dev/null 2>&1 && php-fpm8.4 -v | head -n 1 | grep -Eq '^PHP 8\.4\.'; then
+            echo "php-fpm8.4 already present at $(command -v php-fpm8.4): $(php-fpm8.4 -v | head -n 1)"
+            fpm_packages=
+          fi
+          if [ -n "$fpm_packages" ] && ! [ -e /etc/apt/sources.list.d/sury-php.sources ]; then
             keydir="$(mktemp -d)"
             if curl -fsSL --retry 5 --retry-delay 3 --retry-all-errors --max-time 60 -o "$keydir/sury.key" https://packages.sury.org/php/apt.gpg; then
               export GNUPGHOME="$keydir/gnupg"; mkdir -m 0700 "$GNUPGHOME"
@@ -195,7 +203,9 @@ jobs:
             fi
           fi
           sudo apt-get update -qq
-          sudo NEEDRESTART_SUSPEND=1 apt-get install -y -qq --no-install-recommends nginx age rsync rclone supervisor clamav-daemon apparmor php8.4-fpm
+          if [ -n "$fpm_packages" ]; then apt-cache policy php8.4-fpm | head -n 3; fi
+          # $fpm_packages is deliberately unquoted: it is empty when php-fpm8.4 is already present.
+          sudo NEEDRESTART_SUSPEND=1 apt-get install -y -qq --no-install-recommends nginx age rsync rclone supervisor clamav-daemon apparmor $fpm_packages
           sudo rm -f /usr/sbin/policy-rc.d
           # The tests must run the real PHP 8.4 FPM, never another version and never a skip.
           php-fpm8.4 -v | head -n 1 | tee /dev/stderr | grep -Eq '^PHP 8\.4\.'

@@ -77,6 +77,9 @@ From about 13:27 UTC on 2026-11-11 every `backend-quality` job failed in "Verify
 at `add-apt-repository ppa:ondrej/php`, which calls `api.launchpad.net` (unreachable). The runner has no `php-fpm8.4`:
 setup-php installs its own prebuilt PHP 8.4 (run 43012360621: `Installed PHP 8.4.27`, then `php8.4-cli` and `php8.4-fpm`
 were "previously unselected" when the step installed them), so the tests' real `php-fpm8.4 -t` needs the apt package.
+If setup-php's prebuilt PHP already put a `php-fpm8.4` reporting 8.4 on PATH, the step uses that binary and installs
+no PHP apt package. Otherwise:
+
 `preflight.yml` and `final-verification.yml` now take it from `https://packages.sury.org/php/` (noble, the same
 maintainer and builds, no Launchpad service) as a plain apt source whose key is fetched from that host and accepted only
 when its full fingerprint equals the pin `15058500A0235D97F5D10063B188E2B695BD4743`; a fetch or fingerprint failure
