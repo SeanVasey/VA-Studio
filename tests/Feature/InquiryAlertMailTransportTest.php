@@ -516,7 +516,8 @@ class InquiryAlertMailTransportTest extends TestCase
         };
         $receipt = (string) Str::uuid();
         $this->enable();
-        M::configure([], ['timeout' => 60]);
+        // Production transactional mail must be implicit TLS on 465 (BL-47, DD-43), so the synthetic facts declare exactly that.
+        M::configure(['port' => 465, 'security' => 'implicit_tls'], ['timeout' => 60, 'port' => 465, 'scheme' => 'smtps']);
         config(['inquiries.operator_alert_mail_production_admitted' => true]);
         $this->in('production');
         $manager = new MailManager($this->app);

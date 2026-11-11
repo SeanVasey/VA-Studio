@@ -19,6 +19,9 @@ final class TransactionalMailPolicy
 
     public const MAX_FILE_BYTES = 32768;
 
+    /** DD-43: the only SMTP port production transactional mail may use (implicit TLS). */
+    public const PRODUCTION_PORT = 465;
+
     /** The operator-mode checks the existing preflight reports, in its own order. */
     public const PREFLIGHT_CHECKS = ['closed_versioned_schema', 'candidate_shape', 'planned_https_origin', 'literal_disabled_unbound_baseline',
         'planned_identity_smtp_scope', 'planned_suppression_separate_scope', 'queued_wakeup_configuration', 'bounded_identity_recovery',
@@ -43,6 +46,10 @@ final class TransactionalMailPolicy
             || ! is_int($port = filter_var($mailer['port'] ?? null, FILTER_VALIDATE_INT)) || $port < 1 || $port > 65535
             || ! in_array($mailer['scheme'] ?? null, [null, '', 'smtp', 'smtps'], true)
             || ! is_string($sender) || ! self::address($sender) || preg_match('/\.(?:test|invalid|localhost)\z/D', $sender) === 1) {
+            $refuse();
+        }
+        // DD-43: production transactional mail is SMTP over implicit TLS on 465 (what the production validator admits).
+        if (app()->environment('production') && (($mailer['scheme'] ?? null) !== 'smtps' || $port !== self::PRODUCTION_PORT)) {
             $refuse();
         }
         $preflight = config('transactional-mail.preflight');

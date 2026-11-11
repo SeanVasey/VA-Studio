@@ -332,6 +332,8 @@ final class RetentionSchedule
             'rationale' => self::WITH_ORDER.'hold a refund or dispute placed on an order or grant.'],
         ['table' => 'refund_dispute_work', 'family' => null, 'class' => 'indefinite', 'clock' => null,
             'rationale' => self::WITH_ORDER.'processing state of an order refund or dispute.'],
+        ['table' => 'production_tax_refused_order_resolutions', 'family' => null, 'class' => 'indefinite', 'clock' => null,
+            'rationale' => self::WITH_ORDER.'staff resolution of a paid order refused at finalization because it was fully refunded or its dispute was lost.'],
         ['table' => 'refund_line_allocations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
             'rationale' => self::WITH_ORDER.'refund amount allocated to an order line.'],
         // Fulfillment.
