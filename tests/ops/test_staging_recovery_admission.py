@@ -39,6 +39,7 @@ as_app() { echo migration; }
 cmd_switch() { :; }
 cmd_resume() { :; }
 operation_finish() { :; }
+start_ship_pending() { :; }   # the detached off-host shipment: covered by test_staging_operation_lease and test_staging_deferred_ship
 '''
         with tempfile.TemporaryDirectory() as directory:
             for snapshot_ok in ('0', '1'):

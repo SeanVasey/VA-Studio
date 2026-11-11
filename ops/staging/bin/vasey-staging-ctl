@@ -17,7 +17,8 @@
 #   vasey-staging-ctl quiesce                 maintenance in the served release, stop every writer, prove it
 #   vasey-staging-ctl resume                  start PHP-FPM and workers on `current`, prove it, leave maintenance
 #   vasey-staging-ctl switch <40-hex SHA>     atomically select a sealed, attached release while quiesced
-#   vasey-staging-ctl snapshot                pre-deploy backup + isolated restore proof (requires quiesce first)
+#   vasey-staging-ctl snapshot                pre-deploy backup + isolated restore proof + "pending ship" marker (requires quiesce first); never ships
+#   vasey-staging-ctl ship-pending            start the detached off-host shipment of pending backup sets (site up); returns at once
 #   vasey-staging-ctl space-check            refuse unless the disk has room for a pre-deploy snapshot (run before any quiesce)
 #   vasey-staging-ctl backup-prune            apply local backup retention (VASEY_BACKUP_KEEP; tiered if configured); never the newest set
 #   vasey-staging-ctl prepare <SHA> <env> <evidence>   root lease across quiesce, checkout/build and sealing
@@ -374,6 +375,21 @@ cmd_space_check() {
   "$BACKUP_BIN" space-check
 }
 
+# Off-host shipping runs after the release is resumed and healthy, detached from this lease and from the deploy lock (a transient
+# systemd unit, else a setsid'd child with every lock descriptor closed). It records its own result, retries on the next
+# nightly run, and must never fail the operation that started it: a missing helper or a failed start is only a warning.
+start_ship_pending() {
+  [ -x "$BACKUP_BIN" ] || { echo "vasey-staging-ctl: WARNING: missing $BACKUP_BIN; pending off-host shipments were not started" >&2; return 0; }
+  timeout -k 10 90 "$BACKUP_BIN" ship-pending-start 8>&- 7<&- </dev/null \
+    || echo "vasey-staging-ctl: WARNING: could not start the off-host shipment; the set stays pending and the next nightly run retries it" >&2
+  return 0
+}
+
+cmd_ship_pending() {
+  [ -x "$BACKUP_BIN" ] || die "missing $BACKUP_BIN"
+  "$BACKUP_BIN" ship-pending-start 8>&- 7<&-
+}
+
 cmd_backup_prune() {
   [ -x "$BACKUP_BIN" ] || die "missing $BACKUP_BIN"
   "$BACKUP_BIN" prune
@@ -472,6 +488,7 @@ cmd_activate() {
   cmd_switch "$sha"
   cmd_resume
   operation_finish
+  start_ship_pending   # site healthy and the recovery marker cleared; the off-host copy of the snapshot just taken ships now
 }
 
 cmd_refresh() {
@@ -484,6 +501,7 @@ cmd_refresh() {
   cmd_configure "$sha" "$candidate"
   cmd_resume
   operation_finish
+  start_ship_pending   # as in activate: after the resume, never part of the downtime, never fatal
 }
 
 public_quiesce() {
@@ -559,7 +577,7 @@ case "${1:-}" in
   allocate|attach|detach|switch|healthy) [ "$#" = 2 ] || die "release action requires exactly one SHA" ;;
   prepare) [ "$#" = 4 ] || die "prepare requires SHA, private environment and evidence directory" ;;
   activate|refresh) [ "$#" = 3 ] || die "activation action requires SHA and evidence/environment" ;;
-  quiesce|resume|snapshot|prune|status|space-check|backup-prune) [ "$#" = 1 ] || die "action does not accept extra arguments" ;;
+  quiesce|resume|snapshot|prune|status|space-check|backup-prune|ship-pending) [ "$#" = 1 ] || die "action does not accept extra arguments" ;;
 esac
 case "${1:-}" in
   allocate) cmd_allocate "${2:-}" ;;
@@ -576,6 +594,7 @@ case "${1:-}" in
   prune)    cmd_prune ;;
   space-check) cmd_space_check ;;
   backup-prune) cmd_backup_prune ;;
+  ship-pending) cmd_ship_pending ;;
   status)   cmd_status ;;
-  *) die "usage: vasey-staging-ctl allocate|attach|detach|switch|healthy <sha> | prepare <sha> <evidence-env> <evidence-dir> | activate <sha> <evidence-dir> | refresh <sha> <evidence-env> | quiesce | resume | snapshot | space-check | backup-prune | prune | status" ;;
+  *) die "usage: vasey-staging-ctl allocate|attach|detach|switch|healthy <sha> | prepare <sha> <evidence-env> <evidence-dir> | activate <sha> <evidence-dir> | refresh <sha> <evidence-env> | quiesce | resume | snapshot | space-check | backup-prune | ship-pending | prune | status" ;;
 esac

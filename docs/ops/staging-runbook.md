@@ -559,6 +559,8 @@ order appears under Fulfillment, Held paid orders ("Contract render"). Reset opc
 What runs:
 - **Nightly, 03:17 UTC** (`/etc/cron.d/vasey-staging-backup`).
 - **Before every deploy that replaces a served release** (`vasey-staging-ctl snapshot`).
+- **After the site is back up, when an off-host destination is configured:** the detached off-host shipment of every set still
+  *pending* (below). It is not part of the nightly run or of a deploy, and never holds the site down.
 
 Each run produces `/srv/vasey-staging/backups/<UTC>-<sha12>/` containing:
 - `database.sql` and `.sha256`;
@@ -572,12 +574,46 @@ Each run produces `/srv/vasey-staging/backups/<UTC>-<sha12>/` containing:
 The log is `/var/log/vasey-staging/backup.log`. A set without `RESTORE_CHECK` is unproven. A `*.FAILED`
 directory is kept for inspection and never pruned.
 
+**Off-host shipping is deferred (2026-11-11).** The snapshot and the restore proof are the only backup work inside the
+maintenance window. `predeploy` (every deploy, and the nightly run) leaves a marker `backups/.offhost-pending.<set>` and
+returns; with age + rclone configured it no longer encrypts or uploads ~38 GB while the site is down (that had added ~15 minutes
+to every deploy, and a B2 `403 storage_cap_exceeded` once failed the deploy before the switch). After `ctl activate` / `ctl refresh`
+has resumed the site, and after the nightly run's `ctl resume`, a detached `vasey-staging-ship-pending` unit ships the pending
+sets, newest first, with the site up.
+
+What the operator sees:
+- A deploy's `forge-deploy.log` ends with `deployed <sha>` as before; the line before it says the shipment was started detached.
+  The deploy's exit status never depends on the remote.
+- Progress and failures: `/var/log/vasey-staging/ship-pending.log` (and `systemctl status vasey-staging-ship-pending` while it runs).
+- The dashboard's "last successful backup" turns green when a shipment is verified (`daily ok`), red when one fails (`daily failed`),
+  and goes stale (26 h) if none completes. A nightly run with an off-host destination does not mark itself ok: the shipment does.
+  Without an off-host destination nothing changes (ok is recorded by the nightly run).
+- Pending sets: `sudo /usr/local/sbin/vasey-staging-backup pending` prints each set with when it was queued, how many attempts were
+  made, the last attempt's time, result and a one-line reason (for example `403 storage_cap_exceeded`). Empty output
+  ("no sets are waiting for an off-host copy") means every set has shipped.
+- A set stays on disk while it is pending: local retention (`backup-prune`, the nightly prune, the post-deploy prune) never removes
+  it. If the remote stays broken for days the disk fills with sets (the pre-deploy `space-check` refuses before it stops anything).
+
+Re-running a shipment:
+
+```sh
+sudo /usr/local/sbin/vasey-staging-backup pending                              # what is waiting, and why the last attempt failed
+sudo /usr/local/sbin/vasey-staging-backup ship-pending                         # retry all of them now (foreground; site up; safe to interrupt and re-run)
+sudo /usr/local/sbin/vasey-staging-ctl ship-pending                            # the same, detached, as the deploy user via sudo
+sudo /usr/local/sbin/vasey-staging-backup ship /srv/vasey-staging/backups/<set>   # one set; clears its marker on success
+sudo /usr/local/sbin/vasey-staging-backup pending-clear <set>                  # abandon one set (never deletes it; retention applies again)
+```
+
+The next nightly run retries on its own. After fixing a remote problem (a bucket cap, expired credentials) run `ship-pending`
+once and watch `ship-pending.log`; the failed row on the dashboard is replaced by the success.
+
 **Disk space and retention.** Every deploy takes a full snapshot (database dump + `private.tar` + `.env`, about
 14 GB on 2026-11-10), and the restore proof needs about the same again under `/var/lib/mysql-restore-check`. Before it
 stops anything, `forge-deploy.sh` runs `vasey-staging-ctl space-check` (the backup helper's `space-check`): it
 estimates the need from the private store (`du`), the schema's data and index bytes (else the newest set's
-`database.sql`), a second set copy when age/rclone shipping stages an encrypted file in the backup directory, the
-restore proof (added when it shares the filesystem) and a 20% + 256 MiB margin. When the free bytes are below that,
+`database.sql`), the encrypted copy that age/rclone shipping stages in the backup directory after the deploy (counted as the larger
+of that copy and the restore proof's scratch when they share a filesystem, because they never coexist; plus one more set while an
+earlier shipment is still encrypting) and a 20% + 256 MiB margin. When the free bytes are below that,
 the deploy ends with `FAILED ... before the quiesce: the served release was not touched`, naming the bytes free and
 needed. Free space with `sudo /usr/local/sbin/vasey-staging-ctl backup-prune`, which applies the configured local
 retention (`VASEY_BACKUP_KEEP` newest sets, or the tiered policy) and never removes the newest set, a `*.FAILED`

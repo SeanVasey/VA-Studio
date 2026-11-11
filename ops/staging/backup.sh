@@ -1,15 +1,19 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2015  # `test && test || die` is intended: die whenever any test fails.
 # VASEY.AUDIO staging backup: MySQL dump + private storage archive + runtime .env (APP_KEY), with an
-# isolated restore proof, then an optional rsync to an off-host destination.
+# isolated restore proof, then an optional off-host copy (rsync, or age + rclone) that runs AFTER the site is back up.
 #
 # Installed by provision.sh as /usr/local/sbin/vasey-staging-backup (root:root 0755) and run as root:
-#   vasey-staging-backup nightly            quiesce, serialized snapshot/proof/ship, resume, prune (cron, 03:17 UTC)
-#   vasey-staging-backup predeploy          snapshot + restore-check on an already-quiesced host (deploy, via ctl)
+#   vasey-staging-backup nightly            quiesce, serialized snapshot/proof, resume, start the detached off-host ship, prune (cron, 03:17 UTC)
+#   vasey-staging-backup predeploy          snapshot + restore-check + "pending ship" marker on an already-quiesced host (deploy, via ctl); never ships
 #   vasey-staging-backup space-check        refuse (exit 1) unless the disk has room for a pre-deploy snapshot; run before any quiesce
 #   vasey-staging-backup prune              apply local retention now (newest VASEY_BACKUP_KEEP, or tiered); never the newest set
 #   vasey-staging-backup restore-check DIR  re-prove an existing backup directory
-#   vasey-staging-backup ship DIR           copy one backup directory to VASEY_BACKUP_DEST
+#   vasey-staging-backup ship DIR           copy one backup directory off-host now (manual; clears its pending marker on success)
+#   vasey-staging-backup ship-pending       ship every pending set, newest first, with the site up (foreground; own lock; records dashboard evidence)
+#   vasey-staging-backup ship-pending-start start ship-pending detached from the caller's locks (systemd-run, else setsid) and return at once
+#   vasey-staging-backup pending            list the sets still waiting for an off-host copy, with their last result
+#   vasey-staging-backup pending-clear SET  abandon one pending set (it is then pruned by ordinary retention)
 #   vasey-staging-backup check-offhost      validate the opt-in age/rclone/retention settings (no network, ships nothing)
 #
 # The dump, archive and verification follow docs/ops/backup-restore-proof.md ("Equivalent MySQL 8.4
@@ -301,9 +305,19 @@ restore_check() {
 SET_NAME_RE='^20[0-9]{6}T[0-9]{6}Z-([0-9a-f]{12}|none)$'
 # At most this many kept retry copies (backups/.offhost-retry.<set>, each about one set's size): the oldest go first.
 RETRY_COPIES_MAX=2
-# Seconds a hardened ship waits for another one to finish; 0 refuses at once. predeploy waits (see the case below).
+# Seconds a hardened ship waits for another one to finish; 0 refuses at once. ship-pending waits (SHIP_PENDING_LOCK_WAIT); predeploy never ships.
 SHIP_LOCK_WAIT=0
 ALREADY_SHIPPED=0
+# Off-host shipping never runs while the site is quiesced. predeploy and the nightly snapshot only queue a "pending ship"
+# marker (backups/.offhost-pending.<set>); ship-pending sends the queued sets later, detached from the deploy and ctl locks.
+BACKUP_SELF=/usr/local/sbin/vasey-staging-backup
+SHIP_PENDING_LOG=/var/log/vasey-staging/ship-pending.log
+SHIP_PENDING_UNIT=vasey-staging-ship-pending
+# Seconds ship-pending waits for a manual `ship` (a 38 GB one takes ~15 minutes) to release the off-host lock; the site is up,
+# so waiting delays nothing. A timeout is "busy, retry later", never a recorded failure.
+SHIP_PENDING_LOCK_WAIT=3600
+# More pending sets than this means the remote has been failing for days; each one is about a set of disk (ship_pending logs a warning).
+PENDING_WARN=3
 
 hardening_requested() {
   [ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] || [ -n "$VASEY_BACKUP_REMOTE" ] || [ "$VASEY_BACKUP_REQUIRE_ENCRYPTION" = 1 ]
@@ -587,6 +601,219 @@ ship() {
   log "shipped $(basename "$bk")"
 }
 
+# ---- deferred off-host shipping: queue while quiesced, ship after the site is back up ----
+# 2026-11-11: shipping the ~38 GB encrypted set inside the maintenance window added ~15 minutes to every deploy, and a remote
+# failure (a B2 403 storage_cap_exceeded) failed the deploy before the switch and left the site down. A set that has its local
+# snapshot and restore proof is already a usable rollback point; the off-host copy is a second line of defence and must never
+# hold the site down or fail an operation whose local proof succeeded.
+offhost_destination_configured() { [ -n "$VASEY_BACKUP_DEST" ] || [ -n "$VASEY_BACKUP_REMOTE" ]; }
+
+pending_marker() { printf '%s/.offhost-pending.%s' "$VASEY_BACKUP_DIR" "$1"; }
+
+is_pending() {  # is_pending SET_NAME
+  local marker; marker=$(pending_marker "$1")
+  [[ "$1" =~ $SET_NAME_RE ]] && [ -f "$marker" ] && [ ! -L "$marker" ]
+}
+
+# Names of the pending sets, newest first. Only well-formed regular marker files count, so a stray or linked file is ignored.
+pending_names() {
+  local f n
+  while IFS= read -r f; do
+    n=${f#.offhost-pending.}
+    [[ "$n" =~ $SET_NAME_RE ]] && printf '%s\n' "$n"
+  done < <(find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type f -name '.offhost-pending.20*' -printf '%f\n' 2>/dev/null | LC_ALL=C sort -r)
+  return 0
+}
+
+pending_field() {  # pending_field SET_NAME KEY -> value (empty when absent)
+  sed -n "s/^$2=//p" "$(pending_marker "$1")" 2>/dev/null | head -n 1
+}
+
+# Writes the whole marker atomically: pending_write SET_NAME QUEUED ATTEMPTS LAST_ATTEMPT LAST_RESULT LAST_REASON.
+# The reason is sanitized to a short printable line: no newline, no value that could be parsed as another key.
+pending_write() {
+  local name=$1 marker tmp reason=${6:-}
+  marker=$(pending_marker "$name")
+  reason=$(printf '%s' "$reason" | tr '\n\r' '  ' | tr -c 'A-Za-z0-9 _.,:;()/=-' '?' | cut -c1-240)
+  tmp=$(mktemp "$VASEY_BACKUP_DIR/.offhost-pending-new.XXXXXX") || return 1
+  if printf '%s\n' "set=$name" "queued_utc=$2" "attempts=$3" "last_attempt_utc=${4:-}" "last_result=${5:-}" "last_reason=$reason" > "$tmp" \
+     && mv -T -- "$tmp" "$marker"; then return 0; fi
+  rm -f -- "$tmp"; return 1
+}
+
+# Queues one set for a later off-host copy. Never fails the caller's operation: the local set and its proof already stand.
+mark_pending() {  # mark_pending SET_DIR
+  local name; name=$(basename -- "${1:-}")
+  if ! offhost_destination_configured; then
+    log "no off-host destination (VASEY_BACKUP_DEST or VASEY_BACKUP_REMOTE); $name exists on this host only (NOT an off-host backup)"
+    return 0
+  fi
+  [[ "$name" =~ $SET_NAME_RE ]] || { log "WARNING: not a backup set name, so it was not queued for the off-host copy: $name"; return 0; }
+  # A bad configuration is reported now, while someone may be watching; the set is queued anyway and ship-pending records the failure.
+  offhost_config_ok || log "WARNING: the off-host configuration is refused (reason above); $name is queued and its shipment will be recorded as failed until that is fixed"
+  if pending_write "$name" "$(date -u +%FT%TZ)" 0 '' '' ''; then
+    log "queued $name for the off-host copy; it ships after the site is back up (vasey-staging-backup pending)"
+  else
+    log "WARNING: could not queue $name for the off-host copy; run 'vasey-staging-backup ship $VASEY_BACKUP_DIR/$name' once the site is up"
+  fi
+  return 0
+}
+
+clear_pending() {  # clear_pending SET_NAME: forget a set that now has its off-host copy (or was abandoned)
+  local marker; marker=$(pending_marker "$1")
+  if [[ "$1" =~ $SET_NAME_RE ]] && [ -f "$marker" ] && [ ! -L "$marker" ]; then rm -f -- "$marker"; fi
+  return 0
+}
+
+# True while a hardened ship holds the off-host lock (read-only probe: it never takes the lock and never creates the file).
+offhost_ship_running() {
+  local lock=$VASEY_BACKUP_DIR/.offhost.lock
+  [ -f "$lock" ] && [ ! -L "$lock" ] || return 1
+  ! ( flock -n 4 ) 4<"$lock" 2>/dev/null
+}
+
+# True while a ship-pending run is alive, including the moments between two sets when .offhost.lock is free.
+ship_pending_running() {
+  local lock=$VASEY_BACKUP_DIR/.ship-pending.lock
+  [ -f "$lock" ] && [ ! -L "$lock" ] || return 1
+  ! ( flock -n 4 ) 4<"$lock" 2>/dev/null
+}
+
+# A failed snapshot (or a refused space check) leaves a stamp; a later "daily ok" for an older set must not hide it.
+note_snapshot_failed() {
+  printf '%s\n' "$(date -u +%Y%m%dT%H%M%SZ)" > "$VASEY_BACKUP_DIR/.snapshot-failed" 2>/dev/null \
+    || log "WARNING: could not record the snapshot failure stamp"
+  return 0
+}
+
+# "daily ok" from a shipment is honest only for the newest proven set, with no snapshot failure after that set was taken.
+# Otherwise an older set draining from the backlog would turn a failed nightly green.
+evidence_ok_allowed() {  # evidence_ok_allowed SET_NAME
+  local name=$1 newest='' d stamp
+  while IFS= read -r d; do
+    if grep -qx 'result=RESTORE_VERIFIED' "$VASEY_BACKUP_DIR/$d/RESTORE_CHECK" 2>/dev/null; then newest=$d; break; fi
+  done < <(find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -name '20*Z-*' ! -name '*.FAILED' -printf '%f\n' | LC_ALL=C sort -r)
+  if [ "$newest" != "$name" ]; then
+    log "shipped $name, but it is not the newest proven set (${newest:-none}); no dashboard success recorded for it"; return 1
+  fi
+  stamp=$(head -c 16 -- "$VASEY_BACKUP_DIR/.snapshot-failed" 2>/dev/null || true)
+  if [[ "$stamp" =~ ^20[0-9]{6}T[0-9]{6}Z$ ]] && [[ "$stamp" > "${name:0:16}" ]]; then
+    log "shipped $name, but a snapshot failed after it was taken ($stamp); no dashboard success recorded"; return 1
+  fi
+  return 0
+}
+
+# Ships every pending set, newest first, with the site up. It holds its own run lock (a second start exits quietly), and each
+# set goes through `ship`, which takes the existing off-host lock. Sets queued while it runs are picked up before it exits. The
+# first failure stops the run (a remote problem fails every set, and a retry would only repeat it); that set and the rest stay
+# pending for the next nightly or deploy. Returns nonzero after a failure, but its callers only start it detached.
+ship_pending() {
+  local lock=$VASEY_BACKUP_DIR/.ship-pending.lock name n bk out reason rc attempted=' ' ok=0 failed=0 busy=0 newest_ok='' count queued attempts
+  [ -d "$VASEY_BACKUP_DIR" ] || die "no backup directory"
+  [ ! -L "$lock" ] || die "refusing a symlinked $lock"
+  exec 5>>"$lock" || die "cannot open the ship-pending lock"
+  if ! flock -n 5; then log "another ship-pending run is active; it also picks up sets queued while it runs"; exec 5>&-; return 0; fi
+  count=$(pending_names | grep -c . || true)
+  if [ "$count" -gt "$PENDING_WARN" ]; then
+    log "WARNING: $count sets wait for an off-host copy (each is about a set of disk on this host and none is pruned); fix the remote, or abandon one with 'pending-clear SET'"
+  fi
+  while :; do
+    name=''
+    while IFS= read -r n; do
+      case "$attempted" in *" $n "*) continue ;; esac
+      name=$n; break
+    done < <(pending_names)
+    [ -n "$name" ] || break
+    attempted="$attempted$name "
+    bk=$VASEY_BACKUP_DIR/$name
+    if [ ! -d "$bk" ] || [ -L "$bk" ]; then
+      log "WARNING: pending set $name is no longer on this host; its marker is dropped"
+      clear_pending "$name"; continue
+    fi
+    queued=$(pending_field "$name" queued_utc || true); attempts=$(pending_field "$name" attempts || true)
+    is_pending "$name" || { log "pending marker of $name vanished; skipping it"; continue; }
+    [[ "$attempts" =~ ^[0-9]{1,6}$ ]] || attempts=0
+    pending_write "$name" "${queued:-$(date -u +%FT%TZ)}" "$((attempts + 1))" "$(date -u +%FT%TZ)" started '' || true
+    log "shipping pending set $name off-host (attempt $((attempts + 1)); the site stays up)"
+    out=$(mktemp "$VASEY_BACKUP_DIR/.ship-pending-out.XXXXXX") || die "cannot create a scratch file in $VASEY_BACKUP_DIR"
+    rc=0
+    if ! offhost_destination_configured; then
+      # ship would only warn and succeed, which must not clear a set that was never sent.
+      echo "no off-host destination is configured any more (VASEY_BACKUP_DEST or VASEY_BACKUP_REMOTE)" | tee -- "$out" || true
+      rc=1
+    else
+      ( SHIP_LOCK_WAIT=$SHIP_PENDING_LOCK_WAIT; ship "$bk" ) 2>&1 | tee -- "$out" || rc=$?
+    fi
+    if [ "$rc" = 0 ]; then
+      clear_pending "$name"
+      ok=$((ok + 1)); [ -n "$newest_ok" ] || newest_ok=$name
+      rm -f -- "$out"
+    elif grep -q 'another off-host ship is running' "$out"; then
+      # A manual ship held the lock past the wait: busy, not broken. Nothing was removed or sent; the next run retries.
+      pending_write "$name" "${queued:-$(date -u +%FT%TZ)}" "$((attempts + 1))" "$(date -u +%FT%TZ)" busy "another off-host ship held the lock" || true
+      rm -f -- "$out"; busy=1
+      log "the off-host lock stayed busy; $name stays pending and the next run retries (no failure recorded)"
+      break
+    else
+      # The first lines that name an error carry the cause (an rclone 403, a refused configuration); the closing summary follows.
+      reason=$(grep -v '^$' "$out" | grep -iE 'error|fail|denied|refus|forbidden|exceed|unable|cannot|no space|[45][0-9]{2}' | head -n 3 | tr '\n' ' ' || true)
+      [ -n "$reason" ] || reason=$(grep -v '^$' "$out" | tail -n 2 | tr '\n' ' ' || true)
+      pending_write "$name" "${queued:-$(date -u +%FT%TZ)}" "$((attempts + 1))" "$(date -u +%FT%TZ)" failed "$reason" || true
+      rm -f -- "$out"
+      failed=1
+      log "WARNING: the off-host shipment of $name failed (exit $rc); it stays pending and the local set is intact. This never fails a deploy or the nightly run; the next nightly run retries."
+      break
+    fi
+  done
+  # Remote retention runs here, after the uploads and under the run lock, never beside a detached upload; a manual ship holding
+  # .offhost.lock defers it to the next run.
+  if [ "$failed" = 0 ] && [ "$busy" = 0 ]; then
+    if offhost_ship_running; then log "remote retention deferred: a manual ship holds the off-host lock"
+    else prune_remote || log "WARNING: remote retention did not complete; the remote keeps its sets until the next successful run"; fi
+  fi
+  exec 5>&-
+  # Recorded last and outside the run lock. Never changes the outcome: a failure to record is a logged warning.
+  if [ "$failed" = 1 ]; then record_evidence daily failed
+  elif [ "$ok" -gt 0 ]; then
+    if evidence_ok_allowed "$newest_ok"; then record_evidence daily ok "$VASEY_BACKUP_DIR/$newest_ok"; fi
+  elif [ "$busy" = 1 ]; then :
+  else log "no off-host shipments pending"; fi
+  [ "$failed" = 0 ]
+}
+
+# Starts ship-pending detached from the caller (a deploy under Forge, the ctl lease, the nightly run): it must not hold the
+# deploy lock or the helper lock, and it must outlive a runner that stops reading. A transient systemd unit has no inherited
+# file descriptors; without systemd-run a setsid'd child gets every lock descriptor closed explicitly. Never fails the caller.
+ship_pending_start() {
+  offhost_destination_configured || return 0
+  if [ -z "$(pending_names)" ]; then log "no off-host shipments pending"; return 0; fi
+  if command -v systemd-run >/dev/null 2>&1 \
+     && timeout 30 systemd-run --quiet --collect --unit="$SHIP_PENDING_UNIT" --property=Nice=10 \
+          --description="VASEY.AUDIO off-host backup shipment (pending sets)" \
+          /bin/bash -c 'exec "$0" ship-pending >>"$1" 2>&1' "$BACKUP_SELF" "$SHIP_PENDING_LOG" </dev/null >/dev/null 2>&1; then
+    log "off-host shipment started as ${SHIP_PENDING_UNIT}.service; progress: $SHIP_PENDING_LOG"
+    return 0
+  fi
+  if [ -x "$BACKUP_SELF" ] && command -v setsid >/dev/null 2>&1 \
+     && ( setsid "$BACKUP_SELF" ship-pending >>"$SHIP_PENDING_LOG" 2>&1 </dev/null 5>&- 6>&- 7>&- 8>&- 9>&- & ) 2>/dev/null; then
+    log "off-host shipment started detached (no systemd unit); progress: $SHIP_PENDING_LOG"
+    return 0
+  fi
+  log "WARNING: could not start the off-host shipment; the set stays pending and the next nightly run retries (or run: vasey-staging-backup ship-pending)"
+  return 0
+}
+
+pending_report() {
+  local n any=0
+  while IFS= read -r n; do
+    any=1
+    printf '%s queued=%s attempts=%s last_attempt=%s last_result=%s%s\n' "$n" "$(pending_field "$n" queued_utc)" "$(pending_field "$n" attempts)" \
+      "$(pending_field "$n" last_attempt_utc)" "$(pending_field "$n" last_result)" \
+      "$([ -z "$(pending_field "$n" last_reason)" ] || printf ' reason="%s"' "$(pending_field "$n" last_reason)")"
+  done < <(pending_names)
+  [ "$any" = 1 ] || echo "no sets are waiting for an off-host copy"
+}
+
 # Tiered retention planner. stdin: set names (any order, anything malformed is ignored and so never pruned).
 # stdout: the names to prune. Keeps the union of the newest KEEP sets, the newest set of each of the last DAILY
 # days / WEEKLY ISO weeks / MONTHLY months, and PROTECT (the newest set that carries a restore proof).
@@ -663,7 +890,9 @@ prune_remote() {
 }
 
 # prune_local [PROTECT]: local retention (flat newest-N, or tiered). PROTECT names one set that is never removed (the
-# deploy's own snapshot); the newest set `.last` points at is always protected too. Only well-formed set directories of
+# deploy's own snapshot); the newest set `.last` points at and every set still pending an off-host copy are always protected too
+# (a pending set is the only copy that has not left this host; ship-pending clears the marker, or `pending-clear SET` abandons
+# it, and only then does ordinary retention apply). Only well-formed set directories of
 # VASEY_BACKUP_DIR are ever considered: .FAILED sets, staging directories, kept copies and anything outside it (such as a
 # separately retained copy) are never touched. VASEY_BACKUP_KEEP below 1 is refused: it would remove every set.
 prune_local() {
@@ -673,20 +902,25 @@ prune_local() {
     last=$(basename -- "$(cat -- "$VASEY_BACKUP_DIR/.last" 2>/dev/null || true)")
     [[ "$last" =~ $SET_NAME_RE ]] || last=''
   fi
-  if [ "$VASEY_BACKUP_RETENTION" = tiered ]; then prune_local_tiered "$protect" "$last"; return; fi
+  local -a pending=()
+  mapfile -t pending < <(pending_names)
+  if [ "$VASEY_BACKUP_RETENTION" = tiered ]; then prune_local_tiered "$protect" "$last" "${pending[@]}"; return; fi
   local keep=$VASEY_BACKUP_KEEP
   [[ "$keep" =~ ^[0-9]{1,3}$ ]] && [ "$keep" -ge 1 ] || die "prune: VASEY_BACKUP_KEEP must be a whole number of at least 1; nothing was pruned"
   find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -name '20*Z-*' ! -name '*.FAILED' -printf '%f\n' \
     | sort -r | tail -n +"$((keep + 1))" | while IFS= read -r d; do
       [ "$d" != "$protect" ] && [ "$d" != "$last" ] || continue
+      ! is_pending "$d" || continue
       rm -rf --one-file-system -- "${VASEY_BACKUP_DIR:?}/$d"
     done
 }
 
 # ---- free-space pre-check (the deploy runs it BEFORE any quiesce) ----
-# A snapshot needs room for the dump and the private archive in the backup directory, a second copy of the set when an
-# encrypted off-host copy is staged there, and the restore proof's extracted store and disposable datadir under
-# VASEY_RESTORE_CHECK_DIR (often the same filesystem). 2026-11-10: five deploys left five 14 GB sets, the disk reached 96%
+# A snapshot needs room for the dump and the private archive in the backup directory and the restore proof's extracted store and
+# disposable datadir under VASEY_RESTORE_CHECK_DIR (often the same filesystem). An age/rclone shipment stages one more
+# set-sized encrypted copy in the backup directory, but only AFTER the deploy (ship-pending), when the restore proof's scratch
+# is already gone; so on a shared filesystem the peak is the set plus the larger of the two (proof scratch, encrypted copy), not
+# both. The encrypted copy is still counted: a deploy the disk could not ship afterwards would leave the new set pending. 2026-11-10: five deploys left five 14 GB sets, the disk reached 96%
 # and tar died mid-snapshot with the site already stopped. Refusing here leaves the served release untouched.
 SPACE_MARGIN_PCT=20
 SPACE_MARGIN_BYTES=268435456
@@ -714,19 +948,24 @@ nearest_existing() {  # nearest_existing PATH -> PATH or its closest existing an
 }
 
 space_check() {
-  local priv db set_need need restore_need avail restore_avail backup_at restore_at margin
+  local priv db set_need need restore_need ship_need avail restore_avail backup_at restore_at margin
   [ -d "$PRIVATE" ] && [ ! -L "$PRIVATE" ] || die "private root missing"
   priv=$(du -sb -- "$PRIVATE" | cut -f1)
   db=$(snapshot_db_bytes) || die "cannot estimate the database size (query and newest set both unavailable); no snapshot attempted, nothing stopped"
   [[ "$priv" =~ ^[0-9]+$ && "$db" =~ ^[0-9]+$ ]] || die "cannot size the snapshot; nothing stopped"
   set_need=$((priv + db))
   need=$set_need
-  # An age/rclone shipment stages one more encrypted copy of the set inside the backup directory.
-  if hardening_requested; then need=$((need + set_need)); fi
+  ship_need=0
+  # The shipment of an earlier set may still be encrypting (its staging copy grows to one set while this snapshot runs).
+  if hardening_requested; then ship_need=$set_need; fi
+  if hardening_requested && { offhost_ship_running || ship_pending_running; }; then need=$((need + set_need)); fi
   restore_need=$set_need   # restore proof: extracted private store + disposable datadir
   backup_at=$(nearest_existing "$VASEY_BACKUP_DIR"); restore_at=$(nearest_existing "$VASEY_RESTORE_CHECK_DIR")
   if [ "$(stat -c %d -- "$backup_at")" = "$(stat -c %d -- "$restore_at")" ]; then
-    need=$((need + restore_need)); restore_need=0
+    # Sequential on one filesystem: proof scratch during the quiesce, encrypted copy after the resume.
+    need=$((need + (restore_need > ship_need ? restore_need : ship_need))); restore_need=0
+  else
+    need=$((need + ship_need))
   fi
   margin=$((need * SPACE_MARGIN_PCT / 100 + SPACE_MARGIN_BYTES))
   need=$((need + margin))
@@ -775,30 +1014,47 @@ case "${1:-}" in
     install -d -m 0700 -o root -g root -- "$VASEY_BACKUP_DIR"
     exec 9>>"$VASEY_ROOT/.deploy.lock"
     flock -n 9 || die "a deploy or another backup holds the lock; skipping this run"
+    # No space-check, no snapshot: pending sets are never pruned, so a long remote outage fills the disk. Refuse before the
+    # quiesce (the site was never stopped), record the failure, and still drain the backlog.
+    if ! ( space_check ); then
+      note_snapshot_failed
+      record_evidence daily failed
+      ship_pending_start
+      die "no room for tonight's snapshot (reason above); nothing was stopped, the off-host backlog is shipping"
+    fi
     "$CTL" quiesce
     snapshot_status=0
-    # The serialized root helper re-proves stopped writers and holds its action lock through
-    # snapshot, restore verification and shipping. A direct ctl resume cannot race the copy.
+    # The serialized root helper re-proves stopped writers and holds its action lock through the
+    # snapshot and the restore verification. A direct ctl resume cannot race the copy. It does NOT ship:
+    # the off-host copy is queued as a pending marker and sent after the resume, with the site up.
     "$CTL" snapshot || snapshot_status=$?
     # Resume even when the snapshot failed: a failed backup must not leave the site down overnight.
     if [ -L "$VASEY_ROOT/current" ]; then "$CTL" resume; fi
     # After the resume, so the application can take the row. A run that stops before the snapshot (lock held, quiesce
     # refused) or a failed resume records nothing; the dashboard then turns stale instead of showing a fresh success.
-    if [ "$snapshot_status" = 0 ]; then record_evidence daily ok "$(cat -- "$VASEY_BACKUP_DIR/.last" 2>/dev/null || true)"
-    else record_evidence daily failed; fi
-    [ "$snapshot_status" = 0 ] || die "snapshot, restore proof or shipping failed; resume completed if a release was served"
+    # With an off-host destination configured the "daily ok" row means the off-host copy exists too, so ship-pending records
+    # it (ok, or failed) once the shipment finishes; until then the dashboard ages towards stale. Without one it is recorded now.
+    if [ "$snapshot_status" = 0 ]; then
+      offhost_destination_configured || record_evidence daily ok "$(cat -- "$VASEY_BACKUP_DIR/.last" 2>/dev/null || true)"
+    else note_snapshot_failed; record_evidence daily failed; fi
+    # Site is up: start the detached shipment of every pending set (tonight's, and any an earlier failure left). Even after a
+    # failed snapshot, so earlier sets are retried. It never fails this run, whatever the remote does.
+    ship_pending_start
+    [ "$snapshot_status" = 0 ] || die "snapshot or restore proof failed; resume completed if a release was served"
+    # Local retention protects every pending set. Remote retention (VASEY_BACKUP_REMOTE_PRUNE) runs at the end of ship-pending.
     prune_local
-    prune_remote || log "WARNING: remote retention did not complete; the remote keeps its sets until the next successful run"
     ;;
   predeploy)
     install -d -m 0700 -o root -g root -- "$VASEY_BACKUP_DIR"
     snapshot
     restore_check "$(cat "$VASEY_BACKUP_DIR/.last")"
-    # A deploy runs this with the site quiesced: wait a bounded time for a manual hardened ship rather than fail the deploy at once.
-    SHIP_LOCK_WAIT=600
-    ship "$(cat "$VASEY_BACKUP_DIR/.last")"
+    # Runs with the site quiesced, so nothing here may touch the network or take time proportional to the set: no age, no rclone,
+    # no rsync. The off-host copy is queued and sent after the release is resumed and healthy (ctl activate/refresh and the
+    # nightly run start ship-pending). Queuing never fails the deploy.
+    mark_pending "$(cat "$VASEY_BACKUP_DIR/.last")"
     # Retention for deploy snapshots: five deploys in a day once kept five full sets. The set just taken (the deploy's rollback
-    # point) is protected, and a prune failure never fails a deploy whose snapshot and proof succeeded.
+    # point) and every set still pending an off-host copy are protected, and a prune failure never fails a deploy whose snapshot
+    # and proof succeeded.
     ( prune_local "$(basename -- "$(cat "$VASEY_BACKUP_DIR/.last")")" ) || log "WARNING: local retention after the pre-deploy snapshot did not complete; run 'vasey-staging-ctl backup-prune'"
     ;;
   space-check) space_check ;;
@@ -808,10 +1064,22 @@ case "${1:-}" in
     log "local retention applied (keep ${VASEY_BACKUP_KEEP}, ${VASEY_BACKUP_RETENTION:-flat})"
     ;;
   restore-check) restore_check "${2:?backup directory}" ;;
-  ship) ship "${2:?backup directory}" ;;
+  ship)
+    ship "${2:?backup directory}"
+    # A manual ship that succeeded satisfies the pending marker of that set (ship refuses a set that is not proven or not shipped).
+    if offhost_destination_configured; then clear_pending "$(basename -- "$2")"; fi
+    ;;
+  ship-pending) ship_pending ;;
+  ship-pending-start) ship_pending_start ;;
+  pending) pending_report ;;
+  pending-clear)
+    is_pending "$(basename -- "${2:?set name}")" || die "not a pending set: $2"
+    clear_pending "$(basename -- "$2")"
+    log "abandoned the pending off-host copy of $(basename -- "$2"); ordinary retention applies to it again"
+    ;;
   check-offhost)
     offhost_config_ok || die "off-host configuration refused"
     log "off-host configuration ok (encryption: $([ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] && echo age || { [ -n "$VASEY_BACKUP_REMOTE" ] && echo 'none by this script, explicitly allowed' || echo none; }); transport: $([ -n "$VASEY_BACKUP_REMOTE" ] && echo rclone || { [ -n "$VASEY_BACKUP_DEST" ] && echo rsync || echo none; }); retention: ${VASEY_BACKUP_RETENTION:-flat}; $(retry_copies_summary))"
     ;;
-  *) die "usage: vasey-staging-backup nightly | predeploy | space-check | prune | restore-check DIR | ship DIR | check-offhost" ;;
+  *) die "usage: vasey-staging-backup nightly | predeploy | space-check | prune | restore-check DIR | ship DIR | ship-pending | ship-pending-start | pending | pending-clear SET | check-offhost" ;;
 esac
