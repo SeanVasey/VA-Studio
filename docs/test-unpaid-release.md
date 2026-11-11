@@ -1,12 +1,18 @@
 # Test unpaid resource release
 
-This is the bounded T20 local/testing workflow for releasing a prepared test order’s pending inventory and promotion resources. It requires the configured Stripe test account, an enabled release flag and the exact versioned `UnpaidReleasePolicy::CONTRACT`. It does not enable production checkout or establish production acceptance of the late-payment policy.
+This is the bounded T20 workflow, admitted in `local`, `testing` and (as an optional, default-off capability since PR #333; operator steps in [Releasing an abandoned test order](ops/staging-test-purchase.md#releasing-an-abandoned-test-order)) the hosted `staging` rehearsal, for releasing a prepared test order’s pending inventory and promotion resources. It requires the configured Stripe test account, an enabled release flag and the exact versioned `UnpaidReleasePolicy::CONTRACT`. It does not enable production checkout or establish production acceptance of the late-payment policy.
 
 ## Isolated configuration
 
 The feature is off unless `VASEY_TEST_UNPAID_RELEASE_ENABLED=true` and `VASEY_TEST_UNPAID_RELEASE_POLICY` contains the exact JSON object declared by `UnpaidReleasePolicy::CONTRACT`. The environment must be one that `TestEnvironment::admitsTestCommerce()` admits (`local`, `testing` or the hosted `staging` rehearsal), with the configured Stripe account in test mode. Production is refused even if those values are supplied. This change does not enable the existing checkout, payment-processing, finalization or webhook switches.
 
 **Staging (2026-11-11).** Sean authorized the capability for the staging alpha, so abandoned test checkouts stop locking offers. It is an optional staging capability (`CapabilityBoundary::STAGING_OPTIONAL_FLAGS`), off in both staging templates: the staging deploy gate and the profile validator accept the flag only as exactly `false`, or as exactly `true` when this policy class accepts the effective configuration (staging or local, Stripe test mode, an `acct_` account, the exact contract). The production validator holds it false (`LAUNCH_OFF_HOLDS`). Before this the K2/K3 capability profile held it false with the reason "not part of this profile", not for a safety finding. Operator steps: [Releasing an abandoned test order](ops/staging-test-purchase.md#releasing-an-abandoned-test-order). The staging review of the release path found no change needed in it; two orders it cannot release by design (no Stripe session; paid exception) are listed there.
+
+**Known limits.** Each is enforced in `ReleaseTestOrderResources::release()` and checked against the code on 2026-11-11.
+
+- It cannot release an order that was prepared but never sent to Stripe. With no recorded Checkout Session the result is `unavailable`, because there is nothing to prove unpaid. Such an order keeps its reservation.
+- It cannot release a late-paid order. Any recorded verified payment or finalization, including a paid exception, gives `payment_recorded` and the reservation is left as it is.
+- A held order blocks the whole rights scope of its track, which means every linked tier of that track, not only the offer in the cart (inventory claims are per rights scope, `ReserveQuoteInventory`). Releasing the one order frees them all.
 
 Only an already-bound CheckoutIntent and Checkout Session can qualify. An order with an unbound or ambiguous creation request remains unresolved; a timeout or the end of an idempotency window does not establish unpaid status. The dedicated browser proof uses disposable fixtures and a private GET-only synthetic transport, with no provider credentials or external network calls. That override exists only in `tests/browser/server.php`, never an application provider or the public entry point.
 
@@ -75,4 +81,4 @@ The retained browser case is `tests/browser/test-unpaid-release.spec.ts`. After 
 npm run test:browser -- test-unpaid-release.spec.ts
 ```
 
-Rendered Chromium/WebKit execution remains a final CI gate because the local browser binaries were unavailable. The production unpaid-release policy, live provider behavior and production purchase readiness remain separate acceptance decisions; this bounded local/testing implementation does not resolve them.
+Rendered Chromium/WebKit execution remains a final CI gate because the local browser binaries were unavailable. The production unpaid-release policy, live provider behavior and production purchase readiness remain separate acceptance decisions; this bounded implementation does not resolve them.

@@ -241,6 +241,7 @@ class PreviewTagTest extends TestCase
         $track = $fixture['track'];
         $this->assertTrue(app(PreviewTagResolver::class)->effectiveTagged($track->id));
         $this->assertSame((string) $fixture['tagged']->id, $this->catalogPreviewId($track));
+        $this->assertTrue(app(PublicCatalog::class)->track($track->slug)['tracks'][0]['previewTagged']);
         $this->assertSame($this->bytes($fixture['tagged']), $this->served($fixture['tagged']));
         // The untagged id is asked for while the tag is on: it is sent to the tagged preview, never served.
         $redirect = $this->get(route('media.public', $fixture['untagged']->id, false));
@@ -256,6 +257,7 @@ class PreviewTagTest extends TestCase
         $this->assertSame(['tagged' => false, 'revision' => 1, 'effective_tagged' => false], $result);
         $projection = app(PublicCatalog::class)->track($track->slug)['tracks'][0];
         $this->assertSame((string) $fixture['untagged']->id, $this->catalogPreviewId($track));
+        $this->assertFalse($projection['previewTagged'], 'The page must not call an untagged preview tagged.');
         $this->assertSame($fixture['tagged']->technical_metadata['waveform'], $projection['waveform']);
         $this->assertSame((int) ceil($fixture['tagged']->technical_metadata['duration_seconds']), (int) ceil($projection['durationSeconds']));
         $this->assertSame($this->bytes($fixture['untagged']), $this->served($fixture['untagged']));
