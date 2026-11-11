@@ -26,9 +26,11 @@ use App\Http\Tax\TaxHttpMount;
 use App\Models\User;
 use App\Support\PhpCliBinary;
 use App\Support\PhpCliProcess;
+use App\Support\PublicReadMemo;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
@@ -106,6 +108,8 @@ class AppServiceProvider extends ServiceProvider
 
             return $current !== null && $current->is_admin && $current->email_verified_at !== null;
         });
+        // A write in the same request empties the public read memo, so a read after it always reaches the database.
+        Event::listen(QueryExecuted::class, [PublicReadMemo::class, 'observe']);
         Event::listen([Login::class, Logout::class], function (): void {
             // Invalidate old quote ownership even if no quote route was visited
             // between signing in and signing out.

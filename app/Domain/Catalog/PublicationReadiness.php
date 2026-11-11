@@ -9,8 +9,10 @@ use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\RecordingAssociation;
 use App\Domain\Media\VerifiedMedia;
 use App\Domain\Rights\Models\LicenseVersion;
+use App\Domain\Rights\Models\RightsDeclaration;
 use App\Domain\Rights\VerifiedLicense;
 use App\Support\CanonicalJson;
+use App\Support\PublicReadMemo;
 use Carbon\CarbonInterface;
 use Illuminate\Database\QueryException;
 use Throwable;
@@ -90,7 +92,7 @@ class PublicationReadiness
 
     public function offerBlockers(Offer $offer, ?CarbonInterface $at = null): array
     {
-        $current = $offer->currentRevision()->first();
+        $current = PublicReadMemo::remember('offer-revision:'.$offer->current_revision_id, fn () => $offer->currentRevision()->first());
         if (! $offer->is_active || ! $current) {
             return ['An active published commercial revision is required.'];
         }
@@ -133,17 +135,18 @@ class PublicationReadiness
                 return ['The published commercial snapshot is invalid.'];
             }
             $blockers = [];
-            $license = LicenseVersion::find($revision->license_version_id);
+            $license = PublicReadMemo::remember('license-version:'.$revision->license_version_id, fn () => LicenseVersion::find($revision->license_version_id));
             $snapshots = app(OfferSnapshot::class);
-            if (! $license || ! app(VerifiedLicense::class)->available($license, $at) || ! hash_equals(CanonicalJson::hash($snapshot['license']), CanonicalJson::hash($snapshots->license($license)))) {
+            if (! $license || ! app(VerifiedLicense::class)->available($license, $at)
+                || ! hash_equals(CanonicalJson::hash($snapshot['license']), PublicReadMemo::remember('license-evidence:'.$license->id, fn (): string => CanonicalJson::hash($snapshots->license($license))))) {
                 $blockers[] = 'The published offer license or review evidence is no longer valid or effective.';
             }
-            $track = Track::find($revision->track_id);
-            $rights = $track?->rightsDeclarations()->latest('id')->first();
+            $track = PublicReadMemo::remember('track:'.$revision->track_id, fn () => Track::find($revision->track_id));
+            $rights = $track ? $this->latestRights($track) : null;
             if (! $rights || $rights->id !== $revision->rights_declaration_id || ($snapshot['rights']['id'] ?? null) !== $rights->id || $rights->status !== 'verified' || ! $rights->verified_by || ! $rights->verified_at || ! hash_equals($snapshot['rights']['identity_hash'] ?? '', $snapshots->rightsHash($rights))) {
                 $blockers[] = 'The current rights declaration differs from the published offer evidence.';
             }
-            $preview = $track?->assets()->where('role', 'preview_tagged')->where('status', 'ready')->latest('id')->first();
+            $preview = $track ? $this->latestReady($track, 'preview_tagged') : null;
             if (! $preview || ! $this->available($preview) || ($snapshot['preview']['id'] ?? null) !== $preview->id || ($snapshot['preview']['parent_asset_id'] ?? null) !== $preview->parent_asset_id || ! hash_equals($snapshot['preview']['sha256'] ?? '', $preview->sha256)) {
                 $blockers[] = 'Deliverables must come from the same verified recording revision as the current preview.';
             }
@@ -153,7 +156,8 @@ class PublicationReadiness
                 $blockers[] = 'The published deliverable manifest does not match the licensed roles.';
             }
             foreach ($manifest as $entry) {
-                $asset = MediaAsset::find($entry['id'] ?? null);
+                $id = $entry['id'] ?? null;
+                $asset = is_int($id) ? PublicReadMemo::remember('media-asset:'.$id, fn () => MediaAsset::find($id)) : MediaAsset::find($id);
                 if (! $asset || $asset->track_id !== $revision->track_id || ! $this->available($asset) || ! $preview || ! app(RecordingAssociation::class)->matches($asset, $preview) || ! hash_equals(CanonicalJson::hash($entry), CanonicalJson::hash($snapshots->asset($asset)))) {
                     $blockers[] = 'A published deliverable revision is unavailable or differs from its frozen manifest.';
                 }
@@ -171,21 +175,21 @@ class PublicationReadiness
         if (! $track->title || ! $track->slug || ! $track->artist || ! $track->genre || ! $track->musical_key || $track->bpm < 20 || $track->bpm > 400) {
             $blockers[] = 'Complete title, slug, artist, genre, musical key, BPM (20–400).';
         }
-        $rights = $track->exists ? $track->rightsDeclarations()->latest('id')->first() : null;
+        $rights = $track->exists ? $this->latestRights($track) : null;
         if (! $rights || $rights->status !== 'verified' || ! $rights->verified_by || ! $rights->verified_at) {
             $blockers[] = 'The latest rights declaration must be verified.';
         }
         foreach (['artwork', 'preview_tagged'] as $role) {
-            $asset = $track->exists ? $track->assets()->where('role', $role)->where('status', 'ready')->latest('id')->first() : null;
+            $asset = $track->exists ? $this->latestReady($track, $role) : null;
             if (! $asset || ! $this->available($asset)) {
                 $blockers[] = 'A verified '.$role.' asset is required.';
             }
         }
-        $preview = $track->exists ? $track->assets()->where('role', 'preview_tagged')->where('status', 'ready')->latest('id')->first() : null;
+        $preview = $track->exists ? $this->latestReady($track, 'preview_tagged') : null;
         if (empty($preview?->technical_metadata['waveform']) || ($preview?->technical_metadata['duration_seconds'] ?? 0) < 1) {
             $blockers[] = 'Measured preview duration and waveform peaks are required.';
         }
-        $offers = $track->exists ? $track->offers()->where('is_active', true)->get() : collect();
+        $offers = $track->exists ? PublicReadMemo::remember('track-active-offers:'.$track->id, fn () => $track->offers()->where('is_active', true)->get()) : collect();
         $track->setRelation('offers', $offers);
         if ($offers->isEmpty()) {
             $blockers[] = 'At least one active license offer is required.';
@@ -203,7 +207,19 @@ class PublicationReadiness
      */
     public function listingBlockers(Track $track, ?CarbonInterface $at = null): array
     {
-        return VerifiedMedia::forListing(fn (): array => $this->blockers($track, $at));
+        return VerifiedMedia::forListing(fn (): array => PublicReadMemo::scope(fn (): array => $this->blockers($track, $at)));
+    }
+
+    /** The track's latest rights declaration; read once per PublicReadMemo scope, a plain read outside one. */
+    private function latestRights(Track $track): ?RightsDeclaration
+    {
+        return PublicReadMemo::remember('track-rights:'.$track->id, fn () => $track->rightsDeclarations()->latest('id')->first());
+    }
+
+    /** The track's latest ready asset in this role; read once per PublicReadMemo scope, a plain read outside one. */
+    private function latestReady(Track $track, string $role): ?MediaAsset
+    {
+        return PublicReadMemo::remember('track-ready:'.$track->id.':'.$role, fn () => $track->assets()->where('role', $role)->where('status', 'ready')->latest('id')->first());
     }
 
     private function available(MediaAsset $asset): bool
