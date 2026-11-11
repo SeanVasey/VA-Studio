@@ -371,9 +371,10 @@ cmd_snapshot() {
   "$BACKUP_BIN" predeploy
 }
 
-# --preverify (prepare and refresh, before their quiesce): first re-hash the backup files the next snapshot will share with the
-# previous set, while the site is still up, so the snapshot and its proof inside the maintenance window only handle new files.
-cmd_space_check() {  # cmd_space_check [--preverify]
+# --preverify (the deploy's own early check, before anything is stopped): first re-hash the backup files the next snapshot will
+# share with the previous set, while the site is still up, so the snapshot and its proof inside the window only handle new files.
+# --preverify-if-needed (prepare and refresh, before their quiesce): the same, unless that re-hash already left a usable token.
+cmd_space_check() {  # cmd_space_check [--preverify|--preverify-if-needed]
   [ -x "$BACKUP_BIN" ] || die "missing $BACKUP_BIN"
   "$BACKUP_BIN" space-check ${1:+"$1"}
 }
@@ -456,7 +457,7 @@ cmd_prepare() {
   protected_dir "$ROOT"
   release_step_file
   operation_evidence "$evidence"
-  cmd_space_check --preverify   # before any quiesce: a full disk must refuse here, not mid-snapshot with the site stopped
+  cmd_space_check --preverify-if-needed   # before any quiesce: a full disk must refuse here, not mid-snapshot with the site stopped
   operation_begin prepare "$sha"
   cmd_quiesce
   OPERATION_ENV=$(mktemp "$ROOT/.build-env.XXXXXXXX") || die "cannot stage protected build environment"
@@ -497,7 +498,7 @@ cmd_activate() {
 cmd_refresh() {
   local sha=$1 candidate=$2
   valid_sha "$sha" || die "refresh needs a 40-hex SHA"
-  cmd_space_check --preverify   # before any quiesce, as in prepare
+  cmd_space_check --preverify-if-needed   # before any quiesce, as in prepare
   operation_begin refresh "$sha"
   cmd_quiesce
   cmd_snapshot
@@ -580,7 +581,8 @@ case "${1:-}" in
   allocate|attach|detach|switch|healthy) [ "$#" = 2 ] || die "release action requires exactly one SHA" ;;
   prepare) [ "$#" = 4 ] || die "prepare requires SHA, private environment and evidence directory" ;;
   activate|refresh) [ "$#" = 3 ] || die "activation action requires SHA and evidence/environment" ;;
-  quiesce|resume|snapshot|prune|status|space-check|backup-prune|ship-pending) [ "$#" = 1 ] || die "action does not accept extra arguments" ;;
+  quiesce|resume|snapshot|prune|status|backup-prune|ship-pending) [ "$#" = 1 ] || die "action does not accept extra arguments" ;;
+  space-check) [ "$#" = 1 ] || { [ "$#" = 2 ] && [ "$2" = --preverify ]; } || die "space-check accepts only --preverify" ;;
 esac
 case "${1:-}" in
   allocate) cmd_allocate "${2:-}" ;;
@@ -595,7 +597,7 @@ case "${1:-}" in
   activate) cmd_activate "$2" "$3" ;;
   refresh) cmd_refresh "$2" "$3" ;;
   prune)    cmd_prune ;;
-  space-check) cmd_space_check ;;
+  space-check) cmd_space_check "${2:-}" ;;
   backup-prune) cmd_backup_prune ;;
   ship-pending) cmd_ship_pending ;;
   status)   cmd_status ;;

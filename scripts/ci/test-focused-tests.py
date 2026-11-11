@@ -246,10 +246,50 @@ class SelectionTests(unittest.TestCase):
         self.assertEqual("sqlite", browser.engine)
         focused.validate_files(ROOT, browser)
         self.assertEqual(["npm", "run", "test:browser", "--", *browser.files, "--reporter=line,junit"], focused.commands(browser)[0])
-        self.assertEqual(focused.BROWSER_SUBSETS["browser"], focused.BROWSER_TARGETS)
         self.assertEqual(len(focused.BROWSER_TARGETS), 32)
         with self.assertRaises(focused.FocusedError):
             focused.selection({"FOCUSED_SUITE": "bulk-license-browser", "FOCUSED_ENGINE": "mysql"})
+
+    def test_browser_selection_is_split_into_suites_that_each_fit_the_runner_cap(self):
+        # The former single "browser" suite (32 specs, 118 tests, both projects) needed 25-30 minutes against a
+        # 720 s cap, so it could never finish. Its files must stay covered exactly once, by domain suites.
+        former = {"tests/browser/" + name + ".spec.ts" for name in (
+            "license-template-authoring", "customer-library-browsing", "customer-purchase-claim",
+            "test-refunded-exception-resolution", "customer-identity", "resumable-kit-upload", "test-unpaid-release",
+            "inquiry-conversation", "customer-account", "customer-order-reference", "product-member-refresh",
+            "customer-order-items", "storefront", "operator", "test-checkout", "test-owner-delivery", "player-controls",
+            "owned-order-history", "editorial-video-consent", "site-release-menu-readiness", "contact-inquiry",
+            "contact-inquiry-persistence", "public-track-embed", "track-bulk-tags", "track-metadata-presets",
+            "bulk-track-metadata", "private-track-review", "track-publication-guard", "editorial-content", "site-content",
+            "site-schedule", "resumable-media-upload")}
+        self.assertNotIn("browser", focused.SUITES)
+        union = [name for files in focused.BROWSER_SUITES.values() for name in files]
+        self.assertEqual(len(union), len(set(union)), "a spec is in two browser suites")
+        self.assertEqual(former, set(union), "the split must cover exactly the former selection")
+        self.assertEqual(set(union), set(focused.BROWSER_TARGETS))
+        for suite, files in focused.BROWSER_SUITES.items():
+            self.assertLessEqual(len(files), 8, suite)
+            self.assertLessEqual(len(files), focused.MAX_FILES)
+            selected = focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "sqlite"})
+            self.assertEqual(files, selected.files)
+            focused.validate_files(ROOT, selected)
+            self.assertEqual(["npm", "run", "test:browser", "--", *files, "--reporter=line,junit"], focused.commands(selected)[0])
+            self.assertIn(suite, (ROOT / ".github/workflows/focused-feedback.yml").read_text())
+            self.assertIn("`" + suite + "`", (ROOT / "docs/verification/focused-ci.md").read_text())
+        self.assertEqual(focused.BROWSER_TIMEOUT_SECONDS, 720)
+
+    def test_a_capped_browser_run_is_reported_as_incomplete_failure(self):
+        saved = {}
+        env = {"FOCUSED_SUITE": "browser-storefront", "FOCUSED_ENGINE": "sqlite"}
+        with patch.dict(os.environ, env), \
+             patch.object(focused, "source_identity", return_value={"checked_out_commit": "0" * 40, "tracked_worktree_clean": True}), \
+             patch.object(focused, "save_evidence", side_effect=lambda root, evidence: saved.update(evidence)), \
+             patch.object(focused, "report"), \
+             patch.object(focused.subprocess, "run", side_effect=subprocess.TimeoutExpired(["npm"], focused.BROWSER_TIMEOUT_SECONDS)):
+            self.assertEqual(1, focused.main([]))
+        self.assertEqual("failed", saved["status"])
+        self.assertIn("720 s", saved["error"])
+        self.assertIn("incomplete", saved["error"])
 
     def test_public_accessibility_spec_has_its_own_browser_suite_outside_the_full_ceiling(self):
         selected = focused.selection({"FOCUSED_SUITE": "accessibility-browser", "FOCUSED_ENGINE": "sqlite"})
@@ -311,7 +351,7 @@ class SelectionTests(unittest.TestCase):
     def test_mysql_only_reaches_php_modes_and_browser_reports_isolated_sqlite(self):
         for suite in focused.PHP_TARGETS:
             self.assertEqual(focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "mysql"}).engine, "mysql")
-        for suite in ("frontend", "browser"):
+        for suite in ("frontend", "browser-storefront"):
             with self.assertRaises(focused.FocusedError):
                 focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "mysql"})
         self.assertEqual(focused.selection({"FOCUSED_SUITE": "frontend", "FOCUSED_ENGINE": "sqlite"}).engine, "none")
@@ -386,7 +426,7 @@ class SelectionTests(unittest.TestCase):
             focused.validate_files(ROOT, selected)
         for suite, target in {
             "frontend": "tests/frontend/customer-order-reference.test.tsx",
-            "browser": "tests/browser/customer-order-reference.spec.ts",
+            "browser-customer": "tests/browser/customer-order-reference.spec.ts",
         }.items():
             selected = focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "sqlite"})
             self.assertIn(target, selected.files)
@@ -401,7 +441,7 @@ class SelectionTests(unittest.TestCase):
             for name in ("ProductMemberRefreshTest", "ProductMemberRefreshEditorTest", "ProductMemberRefreshConcurrencyTest"):
                 self.assertIn("tests/Feature/" + name + ".php", selected.files)
             focused.validate_files(ROOT, selected)
-        selected = focused.selection({"FOCUSED_SUITE": "browser", "FOCUSED_ENGINE": "sqlite"})
+        selected = focused.selection({"FOCUSED_SUITE": "browser-customer", "FOCUSED_ENGINE": "sqlite"})
         self.assertIn("tests/browser/product-member-refresh.spec.ts", selected.files)
         focused.validate_files(ROOT, selected)
         policy = json.loads((ROOT / "scripts/ci/database-sqlite-skips.json").read_text())
@@ -420,7 +460,7 @@ class SelectionTests(unittest.TestCase):
             focused.validate_files(ROOT, selected)
         for suite, target in {
             "frontend": "tests/frontend/order-items.test.tsx",
-            "browser": "tests/browser/customer-order-items.spec.ts",
+            "browser-customer": "tests/browser/customer-order-items.spec.ts",
         }.items():
             selected = focused.selection({"FOCUSED_SUITE": suite, "FOCUSED_ENGINE": "sqlite"})
             self.assertEqual(selected.files.count(target), 1)
@@ -586,9 +626,9 @@ class SelectionTests(unittest.TestCase):
         self.assertIn("--fail-on-phpunit-warning", php)
         self.assertIn("--fail-on-empty-test-suite", php)
         self.assertNotIn("--filter", " ".join(php))
-        browser = focused.commands(focused.selection({"FOCUSED_SUITE": "browser", "FOCUSED_ENGINE": "sqlite"}))[0]
+        browser = focused.commands(focused.selection({"FOCUSED_SUITE": "browser-storefront", "FOCUSED_ENGINE": "sqlite"}))[0]
         self.assertEqual(browser[:4], ["npm", "run", "test:browser", "--"])
-        self.assertEqual(browser[4:-1], list(focused.BROWSER_TARGETS))
+        self.assertEqual(browser[4:-1], list(focused.BROWSER_SUITES["browser-storefront"]))
         frontend = focused.commands(focused.selection({"FOCUSED_SUITE": "frontend", "FOCUSED_ENGINE": "sqlite"}))
         self.assertEqual(frontend[0][3:-3], list(focused.FRONTEND_TARGETS))
         self.assertIn(["npm", "run", "build"], frontend)

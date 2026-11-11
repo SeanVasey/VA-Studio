@@ -281,36 +281,55 @@ FRONTEND_SUBSETS = {
         "tests/frontend/owned-order-history.test.tsx",
     ),
 }
-BROWSER_TARGETS = (
-    "tests/browser/license-template-authoring.spec.ts",
-    "tests/browser/customer-library-browsing.spec.ts",
-    "tests/browser/customer-purchase-claim.spec.ts", "tests/browser/test-refunded-exception-resolution.spec.ts",
-    "tests/browser/customer-identity.spec.ts", "tests/browser/resumable-kit-upload.spec.ts",
-    "tests/browser/test-unpaid-release.spec.ts",
-    "tests/browser/inquiry-conversation.spec.ts",
-    "tests/browser/customer-account.spec.ts",
-    "tests/browser/customer-order-reference.spec.ts",
-    "tests/browser/product-member-refresh.spec.ts",
-
-    "tests/browser/customer-order-items.spec.ts",
-    "tests/browser/storefront.spec.ts", "tests/browser/operator.spec.ts",
-    "tests/browser/test-checkout.spec.ts", "tests/browser/test-owner-delivery.spec.ts",
-    "tests/browser/player-controls.spec.ts", "tests/browser/owned-order-history.spec.ts",
-    "tests/browser/editorial-video-consent.spec.ts", "tests/browser/site-release-menu-readiness.spec.ts",
-    "tests/browser/contact-inquiry.spec.ts", "tests/browser/contact-inquiry-persistence.spec.ts",
-    "tests/browser/public-track-embed.spec.ts",
-    "tests/browser/track-bulk-tags.spec.ts",
-    "tests/browser/track-metadata-presets.spec.ts",
-    "tests/browser/bulk-track-metadata.spec.ts",
-    "tests/browser/private-track-review.spec.ts",
-    "tests/browser/track-publication-guard.spec.ts",
-    "tests/browser/editorial-content.spec.ts", "tests/browser/site-content.spec.ts", "tests/browser/site-schedule.spec.ts",
-    "tests/browser/resumable-media-upload.spec.ts",
-)
+# The runner caps a browser command at BROWSER_TIMEOUT_SECONDS and each spec runs in both the chromium-desktop and
+# webkit-mobile projects (one worker), so one suite per domain keeps the selection finishing with room to spare.
+# Estimated minutes assume 3 s per fast journey and 50 s per heavy journey/test with measured values from run
+# 43115861337 where one existed (docs/verification/focused-ci.md); every suite runs BOTH projects for its files.
+BROWSER_TIMEOUT_SECONDS = 720
+BROWSER_SUITES = {
+    "browser-storefront": (  # about 7 minutes
+        "tests/browser/storefront.spec.ts", "tests/browser/player-controls.spec.ts",
+        "tests/browser/public-track-embed.spec.ts",
+    ),
+    "browser-customer": (  # about 8 minutes
+        "tests/browser/customer-account.spec.ts", "tests/browser/customer-identity.spec.ts",
+        "tests/browser/customer-library-browsing.spec.ts", "tests/browser/customer-order-items.spec.ts",
+        "tests/browser/customer-order-reference.spec.ts", "tests/browser/customer-purchase-claim.spec.ts",
+        "tests/browser/owned-order-history.spec.ts", "tests/browser/product-member-refresh.spec.ts",
+    ),
+    "browser-site": (  # about 8 minutes
+        "tests/browser/editorial-content.spec.ts", "tests/browser/editorial-video-consent.spec.ts",
+        "tests/browser/site-content.spec.ts", "tests/browser/site-schedule.spec.ts",
+        "tests/browser/site-release-menu-readiness.spec.ts", "tests/browser/contact-inquiry.spec.ts",
+        "tests/browser/contact-inquiry-persistence.spec.ts", "tests/browser/inquiry-conversation.spec.ts",
+    ),
+    "browser-checkout": (  # about 6 minutes
+        "tests/browser/test-checkout.spec.ts",
+    ),
+    "browser-delivery": (  # about 7 minutes
+        "tests/browser/test-owner-delivery.spec.ts",
+    ),
+    "browser-payment-exceptions": (  # about 4 minutes
+        "tests/browser/test-refunded-exception-resolution.spec.ts", "tests/browser/test-unpaid-release.spec.ts",
+    ),
+    "browser-operator-tracks": (  # about 7 minutes
+        "tests/browser/track-bulk-tags.spec.ts", "tests/browser/track-metadata-presets.spec.ts",
+        "tests/browser/bulk-track-metadata.spec.ts",
+    ),
+    "browser-operator-uploads": (  # about 7 minutes
+        "tests/browser/operator.spec.ts", "tests/browser/resumable-kit-upload.spec.ts",
+        "tests/browser/resumable-media-upload.spec.ts",
+    ),
+    "browser-operator-publication": (  # about 6 minutes
+        "tests/browser/license-template-authoring.spec.ts", "tests/browser/private-track-review.spec.ts",
+        "tests/browser/track-publication-guard.spec.ts",
+    ),
+}
+# The files the former single "browser" suite selected: it could not finish inside the cap, so it was split above.
+BROWSER_TARGETS = tuple(name for files in BROWSER_SUITES.values() for name in files)
 BROWSER_SUBSETS = {
-    "browser": BROWSER_TARGETS,
+    **BROWSER_SUITES,
     "bulk-license-browser": ("tests/browser/bulk-license-draft-source.spec.ts",),
-    # Kept apart from "browser", which sits at the 32-file ceiling.
     "accessibility-browser": ("tests/browser/accessibility-public.spec.ts",),
 }
 SUITES = (*PHP_TARGETS, *FRONTEND_SUBSETS, *BROWSER_SUBSETS)
@@ -493,7 +512,7 @@ def main(argv: list[str] | None = None) -> int:
             environment["PLAYWRIGHT_JUNIT_OUTPUT_FILE"] = str(results)
         for index, command in enumerate(evidence["commands"]):
             result = subprocess.run(command, cwd=root, env=environment, shell=False, check=False,
-                                    timeout=900 if selected.kind == "php" else 720 if selected.kind == "browser" else 300)
+                                    timeout=900 if selected.kind == "php" else BROWSER_TIMEOUT_SECONDS if selected.kind == "browser" else 300)
             evidence["command_results"].append({"argv": command, "exit_code": result.returncode})
             if index == 0 and results.is_file():
                 evidence["test_counts"] = junit_counts(results)
@@ -506,7 +525,12 @@ def main(argv: list[str] | None = None) -> int:
                     raise FocusedError("Successful process did not prove a nonempty passing focused test run")
         evidence["status"] = "passed"
         return 0
-    except (OSError, subprocess.TimeoutExpired, ET.ParseError, FocusedError) as error:
+    except subprocess.TimeoutExpired as error:
+        # A capped run proves nothing about the tests it never reached; say so rather than leave a bare timeout.
+        evidence.update(status="failed", error=f"Runner cap of {int(error.timeout)} s reached before the run finished: "
+                        "the result is incomplete, not a pass or a verdict on the unexecuted tests")
+        return 1
+    except (OSError, ET.ParseError, FocusedError) as error:
         evidence.update(status="failed", error=str(error))
         return 1
     finally:

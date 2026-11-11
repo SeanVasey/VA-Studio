@@ -52,6 +52,7 @@ button, a, input, select { outline-offset: 5px; }
 .cart-toggle { background: transparent; border: 1px solid var(--va-border); min-height: 44px; padding: 0 14px; display: flex; align-items: center; gap: 10px; font-size: 12px; }
 .cart-text { font-size: 22px; }
 .cart-toggle:hover { background: var(--va-surface); }
+.cart-count[data-pad]::before { content: attr(data-pad); }
 .cart-count { margin-left: 4px; padding-left: 12px; border-left: 1px solid var(--va-rule); font-family: var(--va-font-mono); }
 .hero { min-height: 625px; position: relative; overflow: hidden; background: var(--va-canvas); }
 .hero-copy { position: relative; z-index: 1; padding: 64px var(--page-margin) 52px; width: 100%; pointer-events: none; }

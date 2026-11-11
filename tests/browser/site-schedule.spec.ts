@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { test, expect, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
-import { expectReleaseTableFits, openReleaseMenu, releaseMenuAction, releaseRow as row } from './site-release-row';
+import { expectReleaseTableFits, openReleaseMenu, releaseMenuAction, releaseMenuItem, releaseRow as row } from './site-release-row';
 import { syncSuccessNotification } from './notification-sync';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
@@ -80,7 +80,7 @@ test('a scheduled release waits, the scheduler publishes it, and a pending sched
     // The schedule badge is the widest cell; the desktop admin must still fit without scrolling sideways.
     if (testInfo.project.name === 'chromium-desktop') await expectReleaseTableFits(page);
     // Opened, so a missing action is really absent rather than hidden inside a closed menu.
-    await expect((await openReleaseMenu(page, label)).getByRole('button', { name: 'Schedule publication', exact: true })).toHaveCount(0);
+    await expect(releaseMenuItem(await openReleaseMenu(page, label), 'Schedule publication')).toHaveCount(0);
     await page.keyboard.press('Escape');
     expect(await (await visitor.get('/')).text()).not.toContain(heading);
     await history(page, label, 'Waiting for its time');
