@@ -1,6 +1,6 @@
 import { test, expect, type Page, type Route } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
-import { expectReleaseTableFits, releaseMenuAction, releaseMenuTrigger, releaseRow as row } from './site-release-row';
+import { expectReleaseTableFits, releaseMenuAction, releaseMenuItem, releaseMenuTrigger, releaseRow as row } from './site-release-row';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
@@ -116,7 +116,7 @@ test('the row menu shows keyboard focus and returns it to More when a dialog is 
   await create.getByRole('button', { name: 'Save private draft', exact: true }).click();
   await expect(row(page, label).getByText('Private draft', { exact: true })).toBeVisible();
   const trigger = releaseMenuTrigger(page, label);
-  const edit = row(page, label).getByRole('button', { name: 'Edit as new draft', exact: true });
+  const edit = releaseMenuItem(row(page, label), 'Edit as new draft');
   const openMenuFromKeyboard = async () => {
     await page.keyboard.press('Enter');
     await expect(edit).toBeVisible();
