@@ -134,8 +134,25 @@ Every route and command answers 404 or refuses while it is closed. Code: `app/Do
 `POST …/checkout/reconcile`, `POST …/delivery/authorizations` (`kind`), `POST …/delivery/download` (`authorizationId`, `token`).
 
 **Commands:** `vasey:reconcile-test-kit-order {order}` (a webhook that never arrived), `vasey:finalize-test-kit-grants --limit=` (paid orders
-without a grant; also scheduled), `vasey:issue-test-kit-contracts {grant?} --limit=`,
+without a grant; also scheduled), `vasey:issue-test-kit-contracts {grant?} --limit=` (also scheduled, below),
 `vasey:control-test-kit-delivery {order} enable|block --expected-version=N --reference=REF` (first use `--expected-version=0`).
+
+**Staff view (admin, no shell needed).** **Test commerce > Test kit orders** (`/admin/test-kit-orders`, `TestKitOrderResource`) lists kit test orders
+newest first: order id, kit title, price, a plain status (Order started, Awaiting payment, Paid / grant pending, Granted / contract pending, Contract
+issued / delivery not enabled, Delivery enabled, Delivery blocked), and the paid, granted, contract and delivery state. It never shows the licensee,
+provider ids or file paths, and has no create, edit or delete. It exists and answers only while `SoundKitPurchasePolicy` admits the lane (a closed
+lane or production is a 404, rechecked on every Livewire request) and only to staff holding `administer-catalog`. Its row actions call
+`SoundKitStaffOperations`, which calls the services the commands call: **Re-check payment** (`SoundKitPayments::reconcile`, shown while there is no
+grant), **Issue license contract** (`SoundKitContracts::issue`, shown for a granted order without one) and **Enable delivery** / **Block delivery**
+(`SoundKitDelivery::control`; a required reference, and the control version is carried in a hidden field read when the dialog opens, so a change
+made meanwhile is refused with "Another change was recorded first"). The services keep their own audit events (no actor, as from the console);
+each attempt, accepted or refused, also records `sound_kit.staff_action.<step>` against the pressing staff member. A refusal shows its reason in the
+notification. `vasey:issue-test-kit-contracts` is also scheduled (every 10 minutes at :06/:16/…, tracked, only while the lane is admitted), so a
+paid kit order gets its contract without an operator; the **Issue license contract** action is for an immediate or retried issue.
+
+`vasey:finalize-test-kit-grants` selects fairly: orders never refused first, then those with a transient refusal, then those audited as
+`payment_changed` (they need an operator), each oldest first, so 25 or more permanently refused orders cannot starve a newer retryable one. The
+refused orders are still retried in whatever capacity is left.
 
 ### Staging: enable and test-buy IMPERIAL DRVMZ
 
@@ -150,17 +167,20 @@ The track Stripe-test chain must already be configured on the host (ops/staging/
    stays `false`: the pages open on staging because the test lane is admitted.
 3. As a buyer, open `/sound-kits/<slug>`, enter the licensee name, **Buy with Stripe test checkout**, pay with a Stripe test card
    (`4242 4242 4242 4242`). Stripe returns to `/sound-kit-orders/<order>`.
-4. The webhook grants the kit (or press **Check payment status**, or run `php artisan vasey:reconcile-test-kit-order <order>`).
-5. `php artisan vasey:issue-test-kit-contracts` (prints `<grant> issued <sha256>`).
-6. `php artisan vasey:control-test-kit-delivery <order> enable --expected-version=0 --reference=STAGING-KIT-1`.
+4. The webhook grants the kit (or press **Check payment status**, or admin **Test kit orders > Re-check payment**, or run
+   `php artisan vasey:reconcile-test-kit-order <order>`).
+5. The contract is issued by the 10-minute schedule (or admin **Issue license contract**, or `php artisan vasey:issue-test-kit-contracts`, which
+   prints `<grant> issued <sha256>`).
+6. Admin **Test kit orders > Enable delivery** with a reference such as `STAGING-KIT-1` (or `php artisan vasey:control-test-kit-delivery <order>
+   enable --expected-version=0 --reference=STAGING-KIT-1`).
 7. Reload the order page: **Download the kit (ZIP)** and **Download the license (PDF)**. Each click mints a fresh 60-second single-use link.
 
-If the order page stays at "Test payment verified. The kit is being granted.", run `php artisan vasey:finalize-test-kit-grants`: it prints
+If the order page stays at "Test payment verified. The kit is being granted.", press **Re-check payment** on the order in admin or run `php artisan vasey:finalize-test-kit-grants`: it prints
 `<order> granted`, or `<order> payment_changed` when the purchased archive row no longer matches the order (investigate before anything else;
 the audit log holds `sound_kit.test_grant.refused`).
 
 **Refunds and disputes are not handled by the kit lane.** A refund or dispute on a kit order's Stripe test payment changes nothing here: the
-payment and grant stay and delivery stays as it was. When one happens, block delivery by hand with the next control version (read the current
+payment and grant stay and delivery stays as it was. When one happens, block delivery by hand (admin **Block delivery**, which carries the current version for you; or by command with the next control version, read the current
 `version` from the last command output or `sound_kit_delivery_controls`; `0` if delivery was never enabled):
 `php artisan vasey:control-test-kit-delivery <order> block --expected-version=<current version> --reference=<refund or dispute id>`. That closes
 new and outstanding download authorizations; nothing is revoked or deleted.
