@@ -18,6 +18,8 @@ use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\CheckoutFixtures as F;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\RefundDisputeFixtures;
+use Tests\Support\TransactionalMailFixtures;
 use Tests\TestCase;
 
 /** Synthetic storage fixtures prove database guards, not successful provider payment. */
@@ -48,6 +50,7 @@ class TestPaymentEvidenceMigrationTest extends TestCase
         $contracts = require database_path('migrations/2026_09_26_000021_test_contract_issuance.php');
         $fulfillmentActivations = require database_path('migrations/2026_09_26_000022_test_fulfillment_activation.php');
         $delivery = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
+        $deliveryResume = require database_path('migrations/2026_11_09_270300_test_delivery_resume_v2.php');
         $financialObservations = require database_path('migrations/2026_10_06_000039_test_payment_financial_observations.php');
         $unpaidRelease = require database_path('migrations/2026_10_06_000042_test_unpaid_releases.php');
         $purchaseClaims = require database_path('migrations/2026_10_06_000048_customer_purchase_claims.php');
@@ -58,32 +61,53 @@ class TestPaymentEvidenceMigrationTest extends TestCase
         $refundDispute = require database_path('migrations/2026_10_24_264100_refund_dispute_lifecycle.php');
         $this->assertDatabaseCount('transactional_notices', 0);
         $this->assertDatabaseCount('transactional_notice_attempts', 0);
-        \Tests\Support\RefundDisputeFixtures::dropEmptyTables();
+        RefundDisputeFixtures::dropEmptyTables();
         // The empty lane CX mail-delivery child names transactional_notices in its insert guard; dispose of it first.
-        \Tests\Support\TransactionalMailFixtures::dropEmptyDeliveries();
+        TransactionalMailFixtures::dropEmptyDeliveries();
         $notices->down();
         $purchaseClaims->down();
         $refundResolution->down();
         $unpaidRelease->down();
         $financialObservations->down();
         $exceptionOperations = require database_path('migrations/2026_10_02_000036_test_payment_exception_operations.php');
-        foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
+        foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
         foreach (['stripe_receipt_work', 'payment_observations', 'verified_payments'] as $table) {
             $this->assertDatabaseCount($table, 0);
         }
-        $exceptionOperations->down(); $delivery->down(); $fulfillmentActivations->down(); $contracts->down(); $finalizations->down(); $migration->down();
+        // The empty v2 resume child (admissions and coverage, plus the v2 authorization guard) names test_delivery_redemptions
+        // in its triggers; SQLite revalidates them when a parent table is rebuilt, so it is removed before 000023 is.
+        $deliveryResume->down();
+        $exceptionOperations->down();
+        $delivery->down();
+        $fulfillmentActivations->down();
+        $contracts->down();
+        $finalizations->down();
+        $migration->down();
         foreach (['stripe_receipt_work', 'payment_observations', 'verified_payments'] as $table) {
             $this->assertFalse(Schema::hasTable($table));
         }
-        $migration->up(); $finalizations->up(); $contracts->up(); $fulfillmentActivations->up(); $delivery->up(); $exceptionOperations->up();
+        $migration->up();
+        $finalizations->up();
+        $contracts->up();
+        $fulfillmentActivations->up();
+        $delivery->up();
+        $deliveryResume->up();
+        $exceptionOperations->up();
         $financialObservations->up();
         $unpaidRelease->up();
         $refundResolution->up();
         $purchaseClaims->up();
         $notices->up();
-        \Tests\Support\TransactionalMailFixtures::restoreDeliveries();
+        TransactionalMailFixtures::restoreDeliveries();
         $refundDispute->up();
-        foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
+        foreach (['test_delivery_admissions', 'test_delivery_coverage'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
+        foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
         foreach ($tables as $table) {
             $this->assertSame($before[$table], DB::table($table)->orderBy('id')->get()->map(fn ($row) => (array) $row)->all());
         }
