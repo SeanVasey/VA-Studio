@@ -17,7 +17,7 @@ The staging site is `https://<staging host>`. It is Stripe **test mode** only. N
   - `4000 0025 0000 3155`: asks for 3D Secure; "Complete" succeeds, "Fail" declines.
 - A name and an email address you control for the order forms. The site sends no email from staging (see [Limits](#limits-to-know-before-you-start)), so the address is only stored.
 - A place to take notes and screenshots as you go.
-- The operator on call for one step you cannot do from the browser: turning on downloads for a **track** order. Give them the order id (see below). Kit orders are operated from the admin ("Test kit orders").
+- Turning on downloads is a step you do yourself in the admin, per order: **Test commerce > Test track orders** for a track order and **Test kit orders** for a kit order (Limit 6). The operator console command (`vasey:control-test-delivery`) still works as an alternative, for example if the admin is unreachable.
 
 ### Do not use these tracks for purchase tests
 
@@ -30,7 +30,7 @@ Three tracks were held by abandoned checkouts on 2026-11-11: Wide Awake, Words I
 3. **Order access is the browser session.** Guest orders belong to the browser session that placed them (120 minutes idle by default), and downloads work in that same browser only. Do not clear cookies or close a private window mid-test.
 4. **Your cart lives in the browser tab.** A new tab starts with an empty cart.
 5. **Each deploy takes the site down for about 20 minutes.** If pages stop answering, wait before reporting. Work to shorten this is in progress.
-6. **Downloads need a deliberate step per order.** Payment, grant and the contract happen by themselves (a kit contract is issued by a schedule within about 10 minutes of the grant). Enabling downloads is separate. For a **track** order it is a command run by the operator (`vasey:control-test-delivery`); there is no admin button for it. For a **kit** order you do it yourself in the admin: **Test commerce > Test kit orders**, "Enable delivery".
+6. **Downloads need a deliberate step per order.** Payment, grant and the contract happen by themselves (a kit contract is issued by a schedule within about 10 minutes of the grant). Enabling downloads is separate. For a **track** order you do it yourself in the admin: **Test commerce > Test track orders**, "Enable delivery" on the order's row. The button appears once the order's status reads "Ready, delivery not enabled", which is after the contract is issued and the test commerce pipeline has activated the order (usually within a minute or two). Until then the status names the step still pending. The operator command `vasey:control-test-delivery` remains the alternative. For a **kit** order: **Test commerce > Test kit orders**, "Enable delivery".
 7. **Email.** The store sends none from staging: `MAIL_MAILER=log` and `VASEY_TRANSACTIONAL_MAIL_ENABLED=false` in the staging settings file. The buyer email is also not passed to Stripe Checkout (known follow-up in `docs/ops/staging-test-purchase.md`), so the Stripe page asks for it again. If an email arrives, write it down: it should not.
 8. **Quote and payment windows.** The selection review expires about 15 minutes after you press "Review selection", and the order's payment window ends with it. Finish a purchase within about 10 minutes of opening the review.
 9. **Rate limits.** At most three download authorizations per minute per track order. A track-order download link lasts 60 seconds and works once.
@@ -127,8 +127,11 @@ Use a track that is not in the held list above.
 8. Watch the page without clicking.
    Expect, in order: "Stripe reports that its test checkout session is complete. Payment has not been verified and fulfillment has not started." (it may be skipped), then "Test payment verified. Order finalization is pending. Contracts and download access are not available yet.", then "Test payment verified and order finalized. Contracts are pending; download access is not available yet.", then "Test payment verified and order finalized. Test contracts have been issued. Check the separate test downloads panel for current availability." While it waits the page says "Checking for updates automatically. This page refreshes about every 5 seconds for up to 3 minutes." If it stops ("Automatic checking has stopped..."), press "Check Stripe test checkout status" (before payment is verified) or "Refresh test order status" (after).
 9. Look for the downloads panel, "TEST ORDER DOWNLOADS". It appears once the contract is issued.
-   Expect: "Downloads are not available for this test order currently." until the operator enables delivery.
-10. Send the operator the order id and ask them to enable delivery. Then press "Refresh downloads and recent attempts".
+   Expect: "Downloads are not available for this test order currently." until delivery is enabled for the order.
+10. In the admin open **Test commerce > Test track orders** and find the row with your order id (search by the id; "Awaiting delivery" in the filter shows only orders waiting for this step).
+    Expect: status "Ready, delivery not enabled" and an "Enable delivery" button. If the status is "Contract issued, activation pending", wait a minute and reload. Press "Enable delivery", enter a reference (for example `ALPHA-TRACK-1`) and confirm.
+    Expect: a "Done" notice "Delivery is now enabled (version 1)." and the row's status "Delivery enabled". If another staff member enabled it first, nothing changes and the row already shows "Delivery enabled". If the admin is unavailable, send the operator the order id and ask them to run `vasey:control-test-delivery` instead.
+    Back on the order page press "Refresh downloads and recent attempts".
     Expect: one row per file: "Original contract" plus the files the license dialog listed for Basic (they are named "MP3", "WAV master" or "Stems ZIP"; compare), each with a "Download <name>" button and a size in bytes.
 11. Press "Download Original contract", then each file button.
     Expect: the browser saves each file. The button then reads "Request another <name>" and a notice says a download attempt was submitted. "RECENT DOWNLOAD ATTEMPTS" lists each as "Stream attempted". Open the PDF and check it names the licensed track, your legal name and the license; play the MP3.
@@ -229,13 +232,14 @@ Labels below are the navigation labels the code generates. Which entries you see
    - **Test Payment Exceptions**: empty unless a payment arrived after the window.
    - **Test Customers**: your guest order appears as "Guest (no account)".
    - **Test Unpaid Release**: lists orders; "Verify unpaid status and release" frees the track held by an abandoned order once Stripe shows its session expired and unpaid (Limit 1, Script 5). "Release history" shows what was recorded. It refuses a paid order.
+   - **Test track orders**: one row per track order that reached Stripe test checkout, with Customer ("Guest" or a test customer id, never a name or email), Track and license, Status ("Awaiting payment", "Paid, grant pending", "Paid exception, no grant", "Granted, contract pending", "Contract issued, activation pending", "Ready, delivery not enabled", "Delivery enabled", "Delivery blocked"), Paid, Grants, Contracts issued and Delivery (state and version). Row actions: "Enable delivery" and "Block delivery" (Script 2, step 10). The filter "Awaiting delivery" lists activated orders whose downloads are not enabled.
    - **Test kit orders**: one row per kit order with its status ("Order started", "Awaiting payment", "Paid, grant pending", "Granted, contract pending", "Contract issued, delivery not enabled", "Delivery enabled", "Delivery blocked"). Row actions: "Re-check payment", "Issue license contract", "Enable delivery", "Block delivery" (Script 6).
    - **Order-ready Emails** and **Test promotions** exist; no mail is sent.
 10. **Reporting**: **Sales report** and **Customer segments**.
     Expect: figures that include your test orders. Treat them as test data.
 11. **Held Paid Orders** (Fulfillment) and **Customer Inquiries**: look only.
 
-Not available in the admin today: enabling **track** downloads, linking rights scopes and issuing refunds. Each is an operator command or a Stripe dashboard action.
+Not available in the admin today: linking rights scopes and issuing refunds. Each is an operator command or a Stripe dashboard action.
 
 ### Script 8: phone and web-app checks
 
@@ -300,7 +304,7 @@ Short list, from `docs/remaining-parity-coverage.csv` and `docs/sound-kit-storef
 - No live payments. Tax is a fixed test value of zero. Cards through Stripe only (no PayPal or cryptocurrency).
 - Refunds are issued in the Stripe test dashboard. For track orders the admin only observes and records them; kit orders ignore refunds and disputes, so block delivery by hand ("Block delivery" on the kit order's row).
 - No email: no receipt, no "order ready" message, no marketing email.
-- No self-service release of an abandoned checkout, and no admin button for enabling downloads or issuing the kit contract.
+- No self-service release of an abandoned checkout by the buyer. Downloads are enabled per order by staff in the admin, never automatically (see Limit 6).
 - Memberships and subscriptions are not sold. Merchandise and services storefronts, license upgrades, negotiated offers, bundles and deals, affiliate and abandoned-cart tools, and collaborator payouts are post-launch.
 - Kit orders do not appear in a customer library, order history or data export, and kit downloads cannot resume if interrupted.
 - The production customer account path, final privacy and terms text, and the official icon set are open items. Staging legal pages, if published, are stand-ins that the runbook says open with "STAGING PLACEHOLDER — not in effect"; I could not confirm they are published.
