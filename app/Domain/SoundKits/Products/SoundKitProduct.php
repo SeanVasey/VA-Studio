@@ -17,13 +17,20 @@ class SoundKitProduct extends Model
     {
         return ['sound_kit_draft_id' => 'integer', 'sound_kit_revision_id' => 'integer', 'rights_cleared_revision_id' => 'integer', 'license_version_id' => 'integer',
             'is_published' => 'boolean', 'revision' => 'integer', 'price_minor' => 'integer', 'published_at' => 'immutable_datetime',
-            'rights_cleared_at' => 'immutable_datetime', 'offer_approved_at' => 'immutable_datetime'];
+            'rights_cleared_at' => 'immutable_datetime', 'offer_approved_at' => 'immutable_datetime',
+            'cover_image_id' => 'integer', 'demo_id' => 'integer', 'cover_approved_at' => 'immutable_datetime', 'demo_approved_at' => 'immutable_datetime'];
     }
 
     /** @return BelongsTo<SoundKitDraft, $this> */
     public function draft(): BelongsTo
     {
         return $this->belongsTo(SoundKitDraft::class, 'sound_kit_draft_id');
+    }
+
+    /** @return BelongsTo<SoundKitDemo, $this> */
+    public function demo(): BelongsTo
+    {
+        return $this->belongsTo(SoundKitDemo::class, 'demo_id');
     }
 
     /** @return BelongsTo<SoundKitRevision, $this> */
