@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { router } from '@inertiajs/react';
 import { SiteFooter, SiteHeader } from '../components/SiteChrome';
-import { POLL_INTERVAL_MS, POLL_MAX_MS } from '../components/TestCheckout';
 import { formatMoney } from '../lib/catalog';
 import { siteContentHref, type SiteContent } from '../lib/site-content';
 import { soundKitGet, soundKitPost, SoundKitRequestError, stripeTestCheckoutUrl, type SoundKitOrderState } from '../lib/sound-kits';
@@ -23,6 +22,13 @@ const descriptions: Record<SoundKitOrderState['status'], string> = {
 const progress: Record<SoundKitOrderState['status'], number> = { expired: 0, not_started: 0, checkout_started: 1, paid: 2, awaiting_contract: 3, awaiting_delivery: 4, downloadable: 5 };
 /** The server grants, issues and enables delivery by itself, or on staff action, while the order is in one of these states. */
 const pending = new Set<SoundKitOrderState['status']>(['paid', 'awaiting_contract', 'awaiting_delivery']);
+/**
+ * The kit lane is advanced by schedules, not by the buyer's request: grants by `vasey:finalize-test-kit-grants` (cron 4-59/10) and contracts
+ * by `vasey:issue-test-kit-contracts` (cron 6-59/10), see routes/console.php. A pending order can wait about 10 minutes, so the cap is 15
+ * minutes (that cadence plus margin). One read per 10 seconds is at most 90 reads, under the status route's 60 a minute throttle.
+ */
+const POLL_INTERVAL_MS = 10_000;
+const POLL_MAX_MS = 900_000;
 type PollState = 'active' | 'timed_out' | 'error';
 
 /** The owner's Stripe-test kit order (BL-13). Shows retained state only; a redirect from Stripe proves nothing. */
@@ -119,8 +125,8 @@ export default function SoundKitOrder({ siteContent, order: initial, navigate = 
         <h1 id="sound-kit-order-title">{order.kit.title}</h1>
         <p>{formatMoney(order.priceMinor, order.currency)}</p>
         <p role="status">{descriptions[order.status]}</p>
-        {watching && <p className="fine-print" aria-live="polite" data-testid="order-auto-refresh">{polling ? 'Checking for updates automatically. This page refreshes about every 5 seconds for up to 3 minutes.'
-          : pollState === 'timed_out' ? 'Automatic checking has stopped after 3 minutes. Reload the page to check again.'
+        {watching && <p className="fine-print" aria-live="polite" data-testid="order-auto-refresh">{polling ? 'Checking for updates automatically. This page refreshes about every 10 seconds for up to 15 minutes.'
+          : pollState === 'timed_out' ? 'Automatic checking has stopped after 15 minutes. Reload the page to check again.'
             : 'Automatic checking has stopped because the status could not be loaded. Reload the page to check again.'}</p>}
         <div className="sound-kit-order-actions">
           {order.status === 'not_started' && <button type="button" className="button" disabled={busy} onClick={checkout}>Continue to Stripe test checkout</button>}
