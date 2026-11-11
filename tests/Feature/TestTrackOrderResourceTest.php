@@ -15,6 +15,7 @@ use App\Domain\Delivery\TestDeliveryStaffOperations;
 use App\Filament\Resources\TestTrackOrderResource;
 use App\Filament\Resources\TestTrackOrderResource\Pages\ListTestTrackOrders;
 use App\Models\User;
+use App\Support\Audit\AuditEvent;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Artisan;
@@ -393,5 +394,67 @@ class TestTrackOrderResourceTest extends TestCase
         // The console's change stays unattributed, as before; the page's change is attributed.
         $this->assertSame([null, $this->actor->id], array_slice(array_column($this->audit('commerce.delivery.control_changed'), 0), 0, 2));
         $this->issue($f);
+    }
+
+    public function test_orders_of_another_stripe_account_or_live_mode_are_neither_listed_nor_operable(): void
+    {
+        $own = $this->order('ready');
+        $foreign = $this->order('unpaid');
+        $live = $this->order('unpaid');
+        // Synthetic stand-ins for checkout evidence recorded under another account and in live mode (the evidence is otherwise immutable).
+        DB::unprepared('DROP TRIGGER IF EXISTS checkout_intents_immutable_update');
+        DB::table('checkout_intents')->where('order_id', $foreign['order']->id)->update(['account_id' => 'acct_FOREIGNTRACK']);
+        DB::table('checkout_intents')->where('order_id', $live['order']->id)->update(['mode' => 'live']);
+
+        $this->trackList()->assertCanSeeTableRecords([$own['order']])->assertCanNotSeeTableRecords([$foreign['order'], $live['order']]);
+        $service = app(TestDeliveryStaffOperations::class);
+        $this->assertSame([$own['order']->public_id], $service->orders()->pluck('public_id')->all());
+        foreach ([$foreign, $live] as $f) {
+            foreach (['enable', 'block'] as $action) {
+                $this->assertSame(['ok' => false, 'message' => 'This order was not found.'],
+                    $service->controlDelivery($this->actor, $f['order']->public_id, $action, 0, 'ALPHA-OUTSIDE'));
+            }
+        }
+        $this->assertSame(0, TestDeliveryControl::query()->count());
+    }
+
+    public function test_a_change_committed_between_the_state_check_and_the_control_call_is_reported_as_the_state_found(): void
+    {
+        $f = $this->order('ready');
+        $id = $f['order']->public_id;
+        // Another operator enables the order right after this call provisioned it, before this call's own enable runs.
+        $raced = false;
+        AuditEvent::created(function (AuditEvent $event) use (&$raced, $id): void {
+            if ($event->action === 'commerce.delivery.control_provisioned' && ! $raced) {
+                $raced = true;
+                DB::afterCommit(fn () => app(ManageTestDeliveryControl::class)->handle($id, false, 0, 'OTHER-OPERATOR'));
+            }
+        });
+        $this->assertSame(['ok' => true, 'message' => 'Delivery is already enabled (version 1). Nothing changed.'],
+            app(TestDeliveryStaffOperations::class)->controlDelivery($this->actor, $id, 'enable', 0, 'ALPHA-RACE'));
+        $this->assertTrue($raced);
+        $this->assertSame([false, 1], [TestDeliveryControl::query()->sole()->blocked, TestDeliveryControl::query()->sole()->control_version]);
+        $this->assertCount(1, $this->audit('commerce.delivery.control_changed'));
+        $this->assertSame(hash('sha256', 'OTHER-OPERATOR'), $this->audit('commerce.delivery.control_changed')[0][1]['reference_hash']);
+        $this->assertSame([$this->staffAudit($id, 'unchanged', 1, 'ALPHA-RACE')], $this->audit('commerce.delivery.staff_action.delivery_enable'));
+    }
+
+    public function test_a_refused_second_step_says_the_control_was_recorded_as_blocked(): void
+    {
+        $f = $this->order('ready');
+        $id = $f['order']->public_id;
+        // Owner delivery is switched off after this call provisioned the control and before it enables it.
+        AuditEvent::created(function (AuditEvent $event): void {
+            if ($event->action === 'commerce.delivery.control_provisioned') {
+                config(['delivery.test_access_enabled' => false]);
+            }
+        });
+        $this->assertSame(['ok' => false, 'message' => 'The delivery control was recorded as blocked (version 0); delivery was not enabled: '
+            .'Test delivery access is switched off or not configured on this host.'],
+            app(TestDeliveryStaffOperations::class)->controlDelivery($this->actor, $id, 'enable', 0, 'ALPHA-STEP2'));
+        $this->assertSame([true, 0], [TestDeliveryControl::query()->sole()->blocked, TestDeliveryControl::query()->sole()->control_version]);
+        $this->assertSame([$this->staffAudit($id, 'refused', 0, 'ALPHA-STEP2')], $this->audit('commerce.delivery.staff_action.delivery_enable'));
+        $this->deliveryRefused($f, 'unavailable');
+        $this->trackList()->assertSee('Blocked (version 0)')->assertSee('Delivery blocked');
     }
 }

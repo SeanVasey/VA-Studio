@@ -155,9 +155,13 @@ final class TestDeliveryStaffOperations
     {
         $manage = app(ManageTestDeliveryControl::class);
         $current = TestDeliveryControl::query()->where('order_id', $order->id)->first();
+        // Deliberate difference from the command: an order already in the requested state answers with that state without calling the
+        // control service, so the expected version, owner-delivery policy and evidence checks are not run (nothing changes either way),
+        // whereas `vasey:control-test-delivery ... enable --expected-version=<stale>` exits 1.
         if ($current !== null && $current->blocked === $blocked) {
             return ['unchanged', $this->already($current), $current->control_version];
         }
+        $provisioned = false;
         try {
             if ($current === null && $expectedVersion === 0) {
                 if (! $blocked) {
@@ -165,6 +169,7 @@ final class TestDeliveryStaffOperations
                     app(TestAccessPolicy::class)->current();
                 }
                 $current = $manage->handle($order->public_id, true, 0, $reference);
+                $provisioned = true;
                 if ($blocked) {
                     return ['accepted', 'Delivery control recorded as blocked (version '.$current->control_version.').', $current->control_version];
                 }
@@ -176,8 +181,14 @@ final class TestDeliveryStaffOperations
                 return ['unchanged', $this->already($now), $now->control_version];
             }
 
-            return ['refused', $this->reason($error->reason, $order), $now?->control_version];
+            return ['refused', $this->refusal($error->reason, $order, $provisioned ? $now : null), $now?->control_version];
         } catch (Throwable) {
+            if ($provisioned) {
+                $now = TestDeliveryControl::query()->where('order_id', $order->id)->first();
+
+                return ['refused', $this->refusal('other', $order, $now), $now?->control_version];
+            }
+
             return ['refused', 'The change was not recorded.', null];
         }
 
@@ -187,6 +198,18 @@ final class TestDeliveryStaffOperations
     private function already(TestDeliveryControl $control): string
     {
         return 'Delivery is already '.($control->blocked ? 'blocked' : 'enabled').' (version '.$control->control_version.'). Nothing changed.';
+    }
+
+    /** When this call already provisioned the control, the refusal says so instead of claiming nothing changed. */
+    private function refusal(string $reason, Order $order, ?TestDeliveryControl $provisioned): string
+    {
+        $message = $this->reason($reason, $order);
+        if ($provisioned !== null) {
+            return 'The delivery control was recorded as '.($provisioned->blocked ? 'blocked' : 'enabled').' (version '.$provisioned->control_version
+                .'); delivery was not enabled: '.$message;
+        }
+
+        return in_array($reason, ['unavailable', 'changed'], true) ? $message.' Nothing changed.' : $message;
     }
 
     private function reason(string $reason, Order $order): string
@@ -201,8 +224,8 @@ final class TestDeliveryStaffOperations
                 default => 'Delivery cannot be enabled for this order.',
             },
             'conflict' => 'Another change was recorded first. Close this dialog, reopen it and review the current state.',
-            'unavailable' => 'Test delivery access is switched off or not configured on this host. Nothing changed.',
-            'changed' => 'The order no longer matches its recorded activation evidence. Nothing changed; an operator must inspect it.',
+            'unavailable' => 'Test delivery access is switched off or not configured on this host.',
+            'changed' => 'The order no longer matches its recorded activation evidence; an operator must inspect it.',
             'retry' => 'The change could not be recorded yet; try again shortly.',
             default => 'The change was not recorded.',
         };
