@@ -1,4 +1,4 @@
-import deliverableLabels from './deliverable-labels.json';
+import deliverableLabels from './deliverable-labels.json' with { type: 'json' };
 
 // Delivery labels come from the one deliverable label map (DD-30); the contract is not a license deliverable role.
 export const deliveryRoles = {
