@@ -15,7 +15,8 @@ class PublicMediaController extends Controller
     public function __invoke(MediaAsset $asset): Response
     {
         abort_unless($asset->isPublicDerivative() && $asset->status === 'ready' && $asset->disk === 'local' && TrackVisibility::isLive($asset->track->status), 404);
-        abort_unless(app(PublicationReadiness::class)->blockers($asset->track) === [], 404);
+        // Listing evidence for the track's private deliverables; the served public file itself is hashed by VerifiedMedia::path() below.
+        abort_unless(app(PublicationReadiness::class)->listingBlockers($asset->track) === [], 404);
         abort_unless($asset->track->assets()->where('role', $asset->role)->where('status', 'ready')->latest('id')->value('id') === $asset->id, 404);
         if (in_array($asset->role, MediaAsset::PREVIEW_ROLES, true)) {
             // The preview setting is read on every request, so a switch is effective at once. A page that was loaded before the switch
