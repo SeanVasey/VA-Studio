@@ -91,7 +91,7 @@ final class SoundKitPresentation
             'slug' => $product->slug, 'path' => '/sound-kits/'.$product->slug, 'title' => $product->title,
             'memberCount' => count($members), 'totalDurationSeconds' => intdiv($microseconds, 1000000),
             'priceMinor' => $product->price_minor, 'currency' => $product->currency,
-            // Always false until a kit checkout exists: the page shows a notice, never a purchase control.
+            // True only where the Stripe-test kit purchase lane is admitted (never production); otherwise the page shows a notice.
             'purchasable' => app(SoundKitStorefrontPolicy::class)->purchasable(),
             'cover' => $this->cover($product),
         ];

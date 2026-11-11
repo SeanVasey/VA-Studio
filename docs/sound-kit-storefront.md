@@ -1,8 +1,8 @@
 # Sound-kit storefront and entitlement delivery (BL-53, FP-007)
 
-Status, 2026-11-11: the **catalog, publication gate, cover art and demo audio, public pages and a purchase pin are built, default-off. Purchase,
-entitlement and delivery of a kit are NOT built.** This work stopped at the payment boundary on purpose (see "Where it
-stopped"). Nothing here is test acceptance of FP-007; the parity row keeps its status. No kit, price, license wording or demo
+Status, 2026-11-11: the **catalog, publication gate, cover art and demo audio and public pages are built, default-off, and a Stripe
+TEST-mode purchase lane (BL-13) now sells, grants, contracts and delivers a kit in local, testing and staging only** (see "Kit checkout
+(BL-13)"). There is no production kit checkout. Nothing here is test acceptance of FP-007; the parity row keeps its status. No kit, price, license wording or demo
 audio is invented: tests use synthetic fixtures, and the kit license text stays private (BL-66, `docs/sound-kit-license.md`).
 
 ## Audit: what existed, what was a gap
@@ -17,17 +17,19 @@ audio is invented: tests use synthetic fixtures, and the kit license text stays 
 | Publication gate for a kit | missing | `SoundKitProducts` (below) |
 | Staff editor | missing | `SoundKitProductResource` (Publishing group) |
 | Public kit pages, sitemap, navigation | missing | `/sound-kits`, `/sound-kits/{slug}`, literal-false flag |
-| Kit line in quote, order, payment, grant, contract, delivery | missing | **still missing** (payment-domain change; below) |
-| Entitlement of a kit and an authorized download of the purchased archive | missing | **still missing** (depends on the line above) |
+| Kit order, payment, grant, contract, delivery | missing | Stripe TEST lane only (BL-13, "Kit checkout"): its own immutable tables beside the track chain, reusing its gateway, receipt inbox and verification |
+| Entitlement of a kit and an authorized download of the purchased archive | missing | Stripe TEST lane only: grant per verified payment, per-order control, 60 s single-use authorization, re-hash before streaming |
 | Approved demo audio or artwork for a kit | missing | `sound_kit_demos`, cover reference and per-asset approvals on the product (below) |
 
 ## Off by default
 
 `config/sound-kits.php` holds `storefront_enabled` as a code literal `false`, not an environment key (so no `.env.example`
-entry). Everything public goes through `SoundKitStorefrontPolicy::enabled()`, true only for the exact boolean `true`. While it
+entry). Everything public goes through `SoundKitStorefrontPolicy::enabled()`, true only for the exact boolean `true`, **or** where the
+Stripe-test kit purchase lane is admitted (`SoundKitPurchasePolicy`: local, testing or staging with `VASEY_SOUND_KIT_TEST_CHECKOUT_ENABLED=true`;
+production never). While it
 is false, `/sound-kits` and `/sound-kits/{slug}` answer 404 and the navigation item and sitemap entries do not exist. Staff
-editing is not gated by the flag. `SoundKitStorefrontPolicy::purchasable()` is a separate constant `false`: **do not set the
-flag to `true` before a kit checkout exists**, or the pages list kits that say "This kit is not available to buy yet".
+editing is not gated by the flag. `SoundKitStorefrontPolicy::purchasable()` is true only where the test lane is admitted: **do not set
+the production literal to `true`**, there is no production kit checkout and the pages would list kits that say "This kit is not available to buy yet".
 
 ## Data model
 
@@ -76,35 +78,83 @@ of a purchase control. The sitemap lists listed kits in production only, while t
 
 `SoundKitPurchaseBinding::capture()` returns a canonical, hashed description of what a future purchase must bind: product,
 `offer_terms_hash`, kit and archive revision, manifest hash, archive hash and size, member count, license version and its
-review submission hash, price and currency. It re-verifies the archive bytes, refuses a kit that is not listed, writes nothing,
-and always reports `payable: false` with `commercial_blockers: ["kit_checkout_unbuilt"]`. It is the exact input the payment
-lane needs; it is not a checkout.
+review submission hash, price and currency. It re-verifies the archive bytes, refuses a kit that is not listed and writes nothing.
+`payable` is true only where the test lane is admitted (otherwise `commercial_blockers: ["kit_test_checkout_off"]`). A kit order freezes it
+into its immutable snapshot.
 
-## Where it stopped: what payment integration remains
+## Kit checkout (BL-13): Stripe TEST purchase, grant, contract and delivery
 
-The existing quote, order, verified-payment, grant, contract and delivery chain is track-bound end to end:
-`quote_lines.offer_revision_id` and `order_lines.offer_revision_id` reference `offer_revisions` of a track offer, the tables are
-immutable by trigger, `QuoteSelection::resolve` locks tracks and offers, `PricingSnapshot` and the paid-grant and contract
-issuance read track assets and the six beat license kinds, and `DeliveryAssets` and the short-lived delivery authorization are
-keyed to track media assets. A kit line cannot be added without a **payment-domain redesign**, which this task is forbidden to
-improvise. Remaining, in dependency order:
+Default-off, admitted only where `TestEnvironment::admitsTestCommerce()` admits the track chain (local, testing, staging) **and**
+`VASEY_SOUND_KIT_TEST_CHECKOUT_ENABLED=true` (`config('sound-kits.test_checkout_enabled')`, exact `true`). Production can never admit it.
+Every route and command answers 404 or refuses while it is closed. Code: `app/Domain/SoundKits/Purchases/`, migration
+`2026_11_11_000800_sound_kit_test_purchases.php`, `SoundKitPurchaseController`, `routes/sound-kits.php`.
 
-1. A versioned product-target on `quote_lines` and `order_lines` (a kit product revision instead of an `offer_revision_id`),
-   with new immutable evidence tables, MySQL triggers and a data-rights classification, keeping every old track row byte-compatible.
-2. `QuoteSelection::resolveFamily` returning a kit line from `SoundKitPurchaseBinding` (it refuses today), pricing from the
-   pinned integer price, and Stripe-test checkout admission through `TestEnvironment::admitsTestCommerce()` only.
-3. Durable verified payment before any grant, with deduplicated webhook and finalization replay (the existing engine; no new
-   charge engine).
-4. A kit grant, the generic kit license issued as a contract through the `vasey-kit-license-pdf-v1` profile (still unwired:
-   no issuer, dispatch or policy names it), and the purchased snapshot retaining the exact archive revision.
-5. A delivery asset adapter so the existing owner-checked, short-lived delivery authorization serves the purchased archive
-   (never a public path), with entitlement required for every download.
-6. Kit support in the customer library, refund and dispute handling for a kit, and native browser acceptance. (Approved demo
-   audio and cover art are built: see "Cover art and demo audio".)
+**Design decisions.**
 
-Until those land, none of these properties apply and none is claimed: grant only on verified payment, replay safety of a kit
-grant, entitlement-gated download. The tests pin the absence instead (no kit route other than the two read-only pages, the
-quote refusal unchanged, no order, grant or entitlement rows after publishing and capturing).
+- **Own tables, shared machinery.** The track quote/order/grant tables are bound to track offer revisions and their immutable triggers; widening
+  them for a kit would touch every track reader. The kit lane has its own seven tables (orders, checkout sessions, payments, grants,
+  contracts, delivery controls, delivery authorizations) and reuses, unchanged, the track chain's Stripe gateway (`StripeCheckoutGateway`,
+  `StripePaymentGateway`), `CheckoutPolicy`, the webhook endpoint and receipt inbox with its fenced work rows (`PaymentWork`), and the
+  field-by-field session and PaymentIntent verification (`CheckoutEvidence::session`, `PaymentEvidence::capture`). `ProcessStripeReceipt`
+  routes a receipt whose session is bound to a kit order to `SoundKitPayments`; every other receipt is processed exactly as before. This
+  follows the service-invoice precedent (BL-70).
+- **No inventory reservation.** A kit is non-exclusive and unlimited: nothing can be oversold and there is no exclusive sale to serialize, so a
+  rights-scope reservation would add a lock with nothing to protect. The terms are still re-checked under a product lock at order time and the
+  kit must still be listed on the exact frozen terms (`termsHash`) before a Stripe session is created.
+- **No mixed carts.** A kit is bought on its own from its page. The track quote accepts only track items (`QuoteRequest`), and
+  `QuoteSelection::resolveFamily` still refuses a kit, so a kit can never enter a track order. One kit, one order, one license.
+- **Server-side everything.** The browser sends only the kit's address, the licensee's name and an idempotency key. Price (integer minor units),
+  currency, archive revision, archive SHA-256 and size, license version, its review hash and the SHA-256 of its text come from the listed product
+  through `SoundKitPurchaseBinding` (which re-hashes the private archive) into an immutable snapshot. A client-supplied price, revision or
+  license is never read. The exact Stripe request (one line named `VASEY.AUDIO sound kit (test): <title>`, the server price, no tax,
+  promotion codes or adaptive pricing) is frozen in the order and replayed with idempotency key `vasey-kit-checkout-v1-<order>`.
+- **Refuse before money moves.** Order creation refuses a license text that does not declare exactly the six placeholders, a missing licensor name
+  and a licensee name the kit profile cannot print, so a paid order can always get its contract.
+- **Verified payment before grant, once.** The payment row is written only from GET-only provider reads (session complete and paid, PaymentIntent
+  succeeded with exactly the order price) inside a fenced commit; a trigger also requires the order's exact price, currency and bound session.
+  The grant is written afterwards in its own transaction from that committed row. `UNIQUE(order)` on both, so a replayed or duplicated webhook,
+  an `async_payment_succeeded` and a reconcile converge on one payment and one grant.
+- **Contract.** `SoundKitContracts` renders the published license version's frozen text through `vasey-kit-license-pdf-v1`
+  (`VaseyKitLicensePdfRenderer`, Sean's pinned signature). Only the six purchase-details placeholders are filled: `{KIT_NAME}` (order snapshot
+  title), `{LICENSEE_NAME}` (the encrypted name from the order), `{LICENSOR_NAME}` (`VASEY_KIT_LICENSE_LICENSOR_NAME`), `{PURCHASE_DATE}` (the
+  verified payment time, UTC), `{LICENSE_FEE}` (the verified amount) and `{ORDER_REFERENCE}` (the order id). The original is written once to the
+  private disk (`sound-kit-contracts/<grant>/<sha256>.pdf`) and recorded immutably (SHA-256, size, pages, drawn-text hash, effective profile hash,
+  input hash); every read re-hashes it. Rendering is in-process (the track v2 originals use an isolated child; a follow-up).
+- **Delivery.** The track test-delivery model: an operator control per order (absent means not enabled), a 60-second single-use authorization
+  bound to the owner, order, grant and one deliverable (`archive` or `contract`), its secret stored only as a SHA-256. On redemption the private
+  archive is copied into an unlinked temporary file while being hashed and compared with the snapshot; only that checked copy is streamed. A
+  tampered archive is refused and audited; nothing is served from a public path. No ranges or resume for kits yet.
+
+**Routes** (all 404 while the lane is closed): `POST /sound-kits/{slug}/orders` (`licenseeName`, `idempotencyKey`),
+`GET /sound-kit-orders/{order}` (owner page, also Stripe's return address; arrival proves nothing), `GET …/status`, `POST …/checkout`,
+`POST …/checkout/reconcile`, `POST …/delivery/authorizations` (`kind`), `POST …/delivery/download` (`authorizationId`, `token`).
+
+**Commands:** `vasey:reconcile-test-kit-order {order}` (a webhook that never arrived), `vasey:issue-test-kit-contracts {grant?} --limit=`,
+`vasey:control-test-kit-delivery {order} enable|block --expected-version=N --reference=REF` (first use `--expected-version=0`).
+
+### Staging: enable and test-buy IMPERIAL DRVMZ
+
+The track Stripe-test chain must already be configured on the host (ops/staging/test-commerce profile: `STRIPE_ACCOUNT_ID`, `STRIPE_TEST_SECRET_KEY`,
+`STRIPE_WEBHOOK_ENABLED=true` with its secret, `STRIPE_TEST_CHECKOUT_ENABLED=true`, `STRIPE_TEST_PAYMENT_PROCESSING_ENABLED=true`,
+`VASEY_TEST_CHECKOUT_POLICY` with `return_origin` equal to `APP_URL`, and the queue worker processing receipts). Then:
+
+1. In the staging `.env`: `VASEY_SOUND_KIT_TEST_CHECKOUT_ENABLED=true`, `VASEY_KIT_LICENSE_LICENSOR_NAME=VASEY.AUDIO` (the decided licensor line),
+   and the signature pin `VASEY_LICENSE_SIGNATURE_PATH` / `VASEY_LICENSE_SIGNATURE_SHA256` (a PNG on the private disk; without it the contract
+   refuses `signature_unavailable`). Run `php artisan config:cache` (or redeploy).
+2. Admin: the IMPERIAL DRVMZ product must be **published** (row action Publish; it re-verifies archive, cover and demo). The storefront literal
+   stays `false`: the pages open on staging because the test lane is admitted.
+3. As a buyer, open `/sound-kits/<slug>`, enter the licensee name, **Buy with Stripe test checkout**, pay with a Stripe test card
+   (`4242 4242 4242 4242`). Stripe returns to `/sound-kit-orders/<order>`.
+4. The webhook grants the kit (or press **Check payment status**, or run `php artisan vasey:reconcile-test-kit-order <order>`).
+5. `php artisan vasey:issue-test-kit-contracts` (prints `<grant> issued <sha256>`).
+6. `php artisan vasey:control-test-kit-delivery <order> enable --expected-version=0 --reference=STAGING-KIT-1`.
+7. Reload the order page: **Download the kit (ZIP)** and **Download the license (PDF)**. Each click mints a fresh 60-second single-use link.
+
+To close it again set `VASEY_SOUND_KIT_TEST_CHECKOUT_ENABLED=false` and re-cache config: every kit purchase route answers 404 and the pages close.
+
+**Not built** (follow-ups): production kit checkout and tax; refunds and disputes for a kit; kit orders in the customer library, order history and
+the data-rights export (the tables are classified `not_applicable`, test-only); staff views of kit orders (inspect them with the commands above and
+the audit log); resumable kit downloads; isolated-child contract rendering; native browser acceptance.
 
 ## Cover art and demo audio
 
@@ -190,15 +240,15 @@ No file content goes into Git: the ZIP, cover and demo are uploaded in the admin
    worker; the **Demo audio** column changes from "still being prepared" to "Approve the demo audio". If it shows a waiting reason
    (scanner, tools, storage or the seller tag setting), fix that and use **Retry demo** (it also appears for a demo stuck in processing after its time allowance ended). A demo that fails the scan or cannot be
    read is final: upload another. **Approve demo** once it is ready.
-6. **Publish.** Row action **Publish** (it re-verifies the archive, cover and demo bytes). The public pages stay 404 until
-   `sound-kits.storefront_enabled` is turned on by a reviewed change, which waits for kit checkout (see above).
+6. **Publish.** Row action **Publish** (it re-verifies the archive, cover and demo bytes). In production the public pages stay 404 while
+   `sound-kits.storefront_enabled` is `false`; on staging they open with the Stripe-test kit lane (see "Kit checkout").
 
 Check before publishing: the **Cover art** and **Demo audio** columns both read "Approved". To change either later, **Unpublish**
 first; uploading a different image or demo voids its approval.
 
 ## Needs Sean
 
-- Go-ahead to enable `sound-kits.storefront_enabled`, only after the payment lane above exists.
+- A production kit checkout (tax, refunds, customer library) before `sound-kits.storefront_enabled` is turned on; the test lane is staging-only.
 
 ## Owner decisions (Sean, 2026-11-10)
 
@@ -216,11 +266,21 @@ first; uploading a different image or demo voids its approval.
 
 ## Tests
 
+`tests/Feature/SoundKitCheckoutTest.php` (SQLite; three tests also run on native MySQL 8.4 locally): every route and command closed with the
+flag off, a non-boolean flag or in production; the HTTP journey ignoring client price, revision and license and naming the kit at Stripe;
+idempotency; one payment and one grant across webhook replay, a duplicate event, `async_payment_succeeded` and reconcile; reconcile recovering a
+missing webhook while unpaid, short-paid, mis-totalled or foreign-metadata provider evidence never grants; unpublished, uncleared, unapproved,
+blocked, tampered-archive, expired and unprintable-name purchases refused before any Stripe call; the contract filling exactly the six
+placeholders with the licensor from configuration, recorded once and re-hashed on read; delivery needing grant, contract and control, owner-bound,
+single-use, 60-second authorizations; a tampered archive never streamed; the HTTP download; immutable evidence and the payment-amount trigger;
+retention classification.
+
 `tests/Feature/SoundKitStorefrontTest.php` (SQLite): flag off and exact-true gating, listing facts and the absence of private
 or actionable fields, sitemap and navigation, unpublished/unknown/withdrawn 404, every publication blocker, unready and foreign
 revisions, replaced and deleted archives, beat licenses and drafts refused, rights and approval bound to exact terms, field
-rules and audit, MFA and role on every command, the Filament lifecycle, retention classification, and the absence of any
-quote, order, grant, entitlement, download or checkout route. `tests/frontend/sound-kits.test.tsx` covers both pages, the cover and the demo player.
+rules and audit, MFA and role on every command, the Filament lifecycle, retention classification, a kit never entering the track
+quote, and the exact route list (the only purchase routes are the BL-13 test lane's). `tests/frontend/sound-kits.test.tsx` covers both pages,
+the cover and the demo player; `tests/frontend/sound-kit-checkout.test.tsx` the buy form and the order page.
 
 `tests/Feature/SoundKitMediaTest.php` (SQLite, real media tools with the testing-only scanner): a kit is not listed without an approved
 cover and an approved demo; wrong-slot, unready and unknown covers and bad descriptions refused; the approval bound to the exact
