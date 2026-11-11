@@ -1,6 +1,6 @@
 # Sound-kit storefront and entitlement delivery (BL-53, FP-007)
 
-Status, 2026-11-11: the **catalog, publication gate, public pages and a purchase pin are built, default-off. Purchase,
+Status, 2026-11-11: the **catalog, publication gate, cover art and demo audio, public pages and a purchase pin are built, default-off. Purchase,
 entitlement and delivery of a kit are NOT built.** This work stopped at the payment boundary on purpose (see "Where it
 stopped"). Nothing here is test acceptance of FP-007; the parity row keeps its status. No kit, price, license wording or demo
 audio is invented: tests use synthetic fixtures, and the kit license text stays private (BL-66, `docs/sound-kit-license.md`).
@@ -19,7 +19,7 @@ audio is invented: tests use synthetic fixtures, and the kit license text stays 
 | Public kit pages, sitemap, navigation | missing | `/sound-kits`, `/sound-kits/{slug}`, literal-false flag |
 | Kit line in quote, order, payment, grant, contract, delivery | missing | **still missing** (payment-domain change; below) |
 | Entitlement of a kit and an authorized download of the purchased archive | missing | **still missing** (depends on the line above) |
-| Approved demo audio or artwork for a kit | missing | still missing (no asset role or approval exists for kits) |
+| Approved demo audio or artwork for a kit | missing | `sound_kit_demos`, cover reference and per-asset approvals on the product (below) |
 
 ## Off by default
 
@@ -45,7 +45,8 @@ deleted (unpublish). A populated table refuses `down()`.
 (`administer-catalog` plus enrolled MFA, re-read under the lock), then the product, then the private kit and archive revision,
 checks the expected revision, and records one audit event (the clearance note is hashed in the audit, not copied).
 
-A kit is **listed** (`SoundKitProducts::listed()`, the only public predicate, re-evaluated on every public read) only when all hold:
+A kit is **listed** (`SoundKitProducts::listed()`, the only public predicate, re-evaluated on every public read) only when all hold
+(the seven rules below; 7 is the cover and demo, see "Cover art and demo audio"):
 
 1. a title and a public summary;
 2. the chosen archive revision is `ready`, belongs to this kit and still matches the pinned manifest hash;
@@ -54,7 +55,8 @@ A kit is **listed** (`SoundKitProducts::listed()`, the only public predicate, re
    not yet published refuses;
 5. a positive integer USD price entered by staff;
 6. staff **approved the offer** for the exact terms. The approval stores `termsHash` over (product, archive revision, manifest,
-   license version, price, currency) and is compared at every read, so a price edit voids it even if the voiding were skipped.
+   license version, price, currency) and is compared at every read, so a price edit voids it even if the voiding were skipped;
+7. it has a **staff-approved cover** and a **staff-approved, processed demo** (below).
 
 At publication only, the archive is **re-verified against its retained scan evidence and the private bytes**
 (`SoundKitManifest::verified`): a replaced or deleted archive refuses. Public reads do not hash a 200 MiB file; the revision
@@ -97,12 +99,101 @@ improvise. Remaining, in dependency order:
    no issuer, dispatch or policy names it), and the purchased snapshot retaining the exact archive revision.
 5. A delivery asset adapter so the existing owner-checked, short-lived delivery authorization serves the purchased archive
    (never a public path), with entitlement required for every download.
-6. Approved kit demo audio and artwork (asset roles and an approval step), kit support in the customer library, refund and
-   dispute handling for a kit, and native browser acceptance.
+6. Kit support in the customer library, refund and dispute handling for a kit, and native browser acceptance. (Approved demo
+   audio and cover art are built: see "Cover art and demo audio".)
 
 Until those land, none of these properties apply and none is claimed: grant only on verified payment, replay safety of a kit
 grant, entitlement-gated download. The tests pin the absence instead (no kit route other than the two read-only pages, the
 quote refusal unchanged, no order, grant or entitlement rows after publishing and capturing).
+
+## Cover art and demo audio
+
+Sean's 2026-11-10 decision: kits get public demo audio and cover art. They are two public assets of their own, entirely separate
+from the private kit archive: neither can name the archive, its members, hashes or paths, and no asset address can reach it.
+Both reuse the pipelines tracks and releases already use; nothing parallel was added.
+
+| Piece | How it is made | Public address |
+| --- | --- | --- |
+| Cover art | The existing site image pipeline (D-25) with the square `release_cover` slot also used by albums: JPEG or PNG, at least 1200 x 1200 px, scanned, metadata stripped, re-encoded to 400, 800 and 1200 px in JPEG and WebP, manifest-hashed. Staff upload it under **Site images** with the use "Release cover art" and choose it on the kit product. | `/site-images/{sha256}.jpg` or `.webp` (content-hashed, the albums pattern), served only while a **listed** kit pins that exact approved image and the kit pages are on |
+| Demo audio | `SoundKitDemoProcessor`: the track path's own parts, in the same order. The quarantined copy is snapshotted and checked against its stored hash, size and type, then scanned (`MalwareScanner`) together with the seller tag (hash, staging-placeholder and tag checks first), and only then validated (`AudioDerivatives::validateWav`, the first ffprobe call) and mixed with the tag at the configured interval and encoded to the same 192k MP3 and 200-point waveform (`AudioDerivatives::build`), and stored under `sound-kit-demos/revisions/` (private, `PrivateMediaFiles::promoteUnder`). | `/sound-kits/{slug}/demo/{demo uuid}`, the tagged preview only, hashed against its retained evidence before it is sent |
+
+**Seller tag.** The track policy applies to demos unchanged: the public demo is the tagged preview, never the full-quality
+source (which stays in private quarantine). A missing, mismatched or synthetic-staging tag leaves the demo waiting for an
+operator fix, exactly as for a track master; production refuses the staging placeholder.
+
+**Order of work.** The same as a track (`MediaProcessor`): snapshot, hash check, scan of the source, tag checks and scan of the tag,
+then WAV validation and build. No media tool (ffprobe or ffmpeg) runs on bytes the scanner has not cleared, and none runs at upload:
+`uploadDemo` checks only size, the WAV types `validateWav` itself accepts (`audio/x-wav`, `audio/wav`, `audio/vnd.wave`), the RIFF/WAVE
+header with its size field, and emptiness. Codec, channels and duration are judged by the processor on the scanned copy.
+
+**Limits (kit-specific).** A demo is a taster, not the kit: WAV only, up to 100 MiB (checked at upload) and 5 minutes (checked by the
+processor after the scan; a longer demo fails for good with `demo_too_long`, a track master may be 200 MiB
+and 20 minutes). Cover art keeps the 20 MiB, 6000 px and slot-shape limits of the site image pipeline.
+
+**Waiting and retry.** A missing scanner, media tool (`tool_unavailable`, shown as "the media tools are unavailable on the server",
+never as a bad file), storage fault or tag setting leaves the demo waiting; **Retry demo** re-queues it once the cause is fixed.
+A demo still `processing` after its claim lease (16 minutes) has expired, because a worker died holding it, can be retried the same
+way; while the lease is live the retry is refused. Retry runs under the same authority, MFA, expected product revision and audit event
+(`demo_retry_queued`, with the prior status) as every other command. It takes the product and its expected revision like the others;
+it does not change the product, so it does not advance the revision, and it can only retry the product's current demo.
+
+**Approval.** One MFA-enrolled catalog staff member chooses and approves each asset (Sean's rule; no second approver).
+`SoundKitProductMedia` is the writer: administer-catalog plus enrolled MFA re-read under the lock, expected revision, one audit
+event per command (`cover_chosen`, `cover_approved`, `demo_uploaded`, `demo_retry_queued`, `demo_approved`). An approval stores a
+hash over the exact asset (product, image id and manifest hash; or demo id, source and preview hash) that is recomputed at every
+public read. So a replacement voids it in the writer, and an asset swapped behind the writer is simply not shown. As for tracks,
+media cannot be replaced while the kit is published (unpublish first). Scan-engine acceptance and every stored file's bytes are
+verified when an asset is approved and when the kit is published; page views rely on the immutable rows.
+
+**Caches.** Covers are served with `Cache-Control: public, max-age=31536000, immutable`, so after a kit is unlisted its cover can
+stay in browser and CDN caches: "gone at once" holds at the origin only. The demo is read and hashed against its retained evidence
+on every request (per-IP rate limiting applies) and is cached for five minutes (`max-age=300`).
+
+**Defence in depth.** Some guards have a second layer behind them, so a test removing only the first still finds the second. Pinned
+by a test of their own: the three processor integrity guards (stored hash, staging placeholder, tag scan), the file verification at
+both approvals and at publication, `chooseCover` refusing a problem image, the processor's ordering, the lease-expiry retry and the
+expected revision. Left documented rather than pinned singly, with the layer that covers each:
+
+- full-length check of the tagged preview (processor): `AudioDerivatives::build` already refuses a duration mismatch over 0.15 s;
+- claim-token check when completing (processor): the row lock and lease in `claim()`, and the immutable-once-ready model guard and trigger;
+- the demo belongs to the product (`demoProblem`): the approval hash binds the product's and the demo's public ids, so a foreign demo cannot match it;
+- cover scan evidence equals the source hash (`imageProblem`): the site image pipeline writes that evidence and `SiteImageManifest::matches` pins it;
+- the cheap authority check before the upload copy (`authorise`): `lockActor` re-checks authority and MFA under the lock, and a failed upload removes its copy;
+- the preview path pattern (`previewPathValid`): `PrivateMediaFiles::resolve` refuses any path outside the private root, and the file is then hashed.
+
+**Required to list.** Both. A track needs a ready tagged preview and artwork to be published; a kit is an audio product bought by
+ear, so it needs the same two public assets. (This is one rule in `SoundKitProductMedia::problems()` if Sean prefers an optional demo.)
+
+**Data.** Migration `2026_11_11_000600_sound_kit_demos.php`: `sound_kit_demos` (private source path and hash, retained scan
+evidence, prepared preview path, hash, duration and waveform; never deleted, immutable once `ready` or `failed` by model guard and
+database trigger; `NOT_CUSTOMER_DATA` in `RetentionSchedule`). Migration `000601`: cover and demo references and their approval hashes
+on `sound_kit_products`. Neither holds customer, payment or entitlement data. A populated table refuses `down()`.
+
+**What the public sees.** Cover: staff-written description and the prepared sizes only. Demo: the opaque address, length and
+waveform. The detail page plays the demo through the same `PersistentPlayer` the catalog uses, with no offers, so it never
+offers a license; the index shows each cover. Never a member name, path, hash, source file name or archive address.
+
+## Staff how-to: adding IMPERIAL DRVMZ (or any kit) on staging
+
+No file content goes into Git: the ZIP, cover and demo are uploaded in the admin only.
+
+1. **ZIP.** Admin, Publishing, **Sound kit drafts**: create the draft (title, description, provenance), upload the ZIP, wait for the
+   revision to become **ready** (see `docs/sound-kit-intake.md`).
+2. **Cover.** Admin, **Site images**, Upload site image: use = "Release cover art", the square cover (at least 1200 x 1200 px, no
+   transparency, no text or prices), source or credit, rights confirmation. Wait until its status is **ready**.
+3. **Product.** Admin, Publishing, **Sound kit products**, Add kit product: choose the private kit, title, web address, summary,
+   the ready archive revision, a published sound-kit license version and the price you decided. **Clear rights** for that revision,
+   then **Approve offer**.
+4. **Cover on the product.** Row action **Cover art**: choose the ready image and write its description, then **Approve cover**.
+5. **Demo.** Row action **Upload demo**: a WAV of up to 5 minutes (the original stays private). Processing runs on the media queue
+   worker; the **Demo audio** column changes from "still being prepared" to "Approve the demo audio". If it shows a waiting reason
+   (scanner, tools, storage or the seller tag setting), fix that and use **Retry demo** (it also appears for a demo stuck in processing after its time allowance ended). A demo that fails the scan or cannot be
+   read is final: upload another. **Approve demo** once it is ready.
+6. **Publish.** Row action **Publish** (it re-verifies the archive, cover and demo bytes). The public pages stay 404 until
+   `sound-kits.storefront_enabled` is turned on by a reviewed change, which waits for kit checkout (see above).
+
+Check before publishing: the **Cover art** and **Demo audio** columns both read "Approved". To change either later, **Unpublish**
+first; uploading a different image or demo voids its approval.
 
 ## Needs Sean
 
@@ -111,8 +202,8 @@ quote refusal unchanged, no order, grant or entitlement rows after publishing an
 ## Owner decisions (Sean, 2026-11-10)
 
 - One MFA-enrolled catalog staff member may set up a kit, clear its rights and approve its offer; no separate approver is required.
-- Kits get public demo audio and artwork. They are a follow-up lane (asset roles for a kit demo and cover, scanned and staff-approved,
-  never served from the private archive); IMPERIAL DRVMZ is the first real kit.
+- Kits get public demo audio and artwork (built: "Cover art and demo audio"; scanned, staff-approved, never served from the private
+  archive); IMPERIAL DRVMZ is the first real kit.
 - The flag stays a literal `false` until kit checkout exists: enabling it before then would list prices with "not available to buy yet".
 
 ## Tests
@@ -121,4 +212,12 @@ quote refusal unchanged, no order, grant or entitlement rows after publishing an
 or actionable fields, sitemap and navigation, unpublished/unknown/withdrawn 404, every publication blocker, unready and foreign
 revisions, replaced and deleted archives, beat licenses and drafts refused, rights and approval bound to exact terms, field
 rules and audit, MFA and role on every command, the Filament lifecycle, retention classification, and the absence of any
-quote, order, grant, entitlement, download or checkout route. `tests/frontend/sound-kits.test.tsx` covers both pages.
+quote, order, grant, entitlement, download or checkout route. `tests/frontend/sound-kits.test.tsx` covers both pages, the cover and the demo player.
+
+`tests/Feature/SoundKitMediaTest.php` (SQLite, real media tools with the testing-only scanner): a kit is not listed without an approved
+cover and an approved demo; wrong-slot, unready and unknown covers and bad descriptions refused; the approval bound to the exact
+image and demo, and replaced or swapped assets not shown; oversize, wrong-type and truncated uploads refused with nothing
+left behind, no ffprobe call at upload or before both scans, a demo over 5 minutes failing in the processor, a stored-bytes swap, the staging placeholder and a flagged tag refused, missing tools waiting with an honest message, a stuck `processing` demo retried only after its lease, retry needing the current revision, and approval, publication and cover choice refusing damaged files; the demo scanned, tagged and turned into a preview; an infected demo failing for good, and scanner, tag-missing and
+tag-mismatch problems waiting for a retry; published kits refusing media replacement; flag off serving nothing; the exact approved
+bytes served and a damaged file not; the private archive unreachable through either address; staff-only, MFA and one audit event per
+command; the Filament actions. `tests/Feature/SoundKitMediaMigrationTest.php` (both engines) covers the two migrations and triggers.
