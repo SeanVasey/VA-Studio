@@ -15,9 +15,11 @@ use App\Domain\Media\MediaProcessor;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\QueueMediaProcessing;
 use App\Domain\Media\VerifiedMedia;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
@@ -43,6 +45,10 @@ class PublicCatalogIntegrityCostTest extends TestCase
         parent::setUp();
         $this->withoutVite();
         $this->fakePrivateMediaStorage();
+        // Each test owns the mismatch store's directory, so no record outlives it or leaks into another test.
+        $mismatches = sys_get_temp_dir().'/media-integrity-'.Str::uuid();
+        config(['cache.stores.'.MediaIntegrity::MISMATCH_STORE.'.path' => $mismatches, 'cache.stores.'.MediaIntegrity::MISMATCH_STORE.'.lock_path' => $mismatches]);
+        $this->beforeApplicationDestroyed(fn () => (new Filesystem)->deleteDirectory($mismatches));
     }
 
     /** Counts every full integrity check (the only caller of hash_file for catalog media) while delegating to the real service. */
@@ -144,23 +150,41 @@ class PublicCatalogIntegrityCostTest extends TestCase
 
     public function test_a_same_size_tamper_is_refused_by_checkout_activation_and_serving_and_then_hidden_from_listing(): void
     {
+        // As on staging and production: the default store is the database, so it shares the checkout transaction below.
+        config(['cache.default' => 'database']);
+        Cache::setDefaultDriver('database');
         $fixture = QuoteFixtures::selection();
         $master = $fixture['media']['master_wav'];
         $this->tamper($master);
         Cache::flush();
+        Cache::store(MediaIntegrity::MISMATCH_STORE)->flush();
         $this->countHashing();
 
         // Unproven but stat-identical: listing shows it, without reading it. Nothing below sells or hands it over.
         $this->assertSame([$fixture['track']->slug], $this->catalogSlugs());
         $this->assertSame([], $this->privateHashes());
 
-        foreach ([false, true] as $fresh) {
-            try {
-                DB::transaction(fn () => app(QuoteSelection::class)->resolve($fixture['items'], $fresh));
-                $this->fail('Checkout accepted a tampered deliverable.');
-            } catch (QuoteException $error) {
-                $this->assertSame('SELECTION_CHANGED', $error->errorCode);
-            }
+        // Checkout resolves the selection inside a transaction, which its refusal rolls back. The mismatch the full hash found must
+        // survive that rollback: the listing hides the track at once, before anything else hashes the file.
+        try {
+            DB::transaction(fn () => app(QuoteSelection::class)->resolve($fixture['items'], false));
+            $this->fail('Checkout accepted a tampered deliverable.');
+        } catch (QuoteException $error) {
+            $this->assertSame('SELECTION_CHANGED', $error->errorCode);
+        }
+        $this->assertSame(0, DB::transactionLevel());
+        $hashed = count($this->privateHashes());
+        $this->assertGreaterThan(0, $hashed, 'Checkout hashes the deliverable in full.');
+        $this->assertSame([], $this->catalogSlugs());
+        $this->get('/tracks/'.$fixture['track']->slug)->assertNotFound();
+        $this->assertCount($hashed, $this->privateHashes(), 'The listing hid the track without hashing it again.');
+
+        // Every other path that sells or hands over the bytes still refuses it.
+        try {
+            DB::transaction(fn () => app(QuoteSelection::class)->resolve($fixture['items'], true));
+            $this->fail('Checkout with fresh digests accepted a tampered deliverable.');
+        } catch (QuoteException $error) {
+            $this->assertSame('SELECTION_CHANGED', $error->errorCode);
         }
         try {
             app(VerifyOfferFiles::class)->revision($fixture['revision']);
@@ -170,12 +194,6 @@ class PublicCatalogIntegrityCostTest extends TestCase
         }
         $this->assertNull(app(VerifiedMedia::class)->path($master), 'Bytes of a tampered file must never be handed over.');
         $this->assertNotEmpty(app(PublicationReadiness::class)->blockers($fixture['track']->fresh()));
-
-        // The failed full hash is recorded for this file identity, so listing and the track page now hide the track without hashing it.
-        $hashed = count($this->privateHashes());
-        $this->assertSame([], $this->catalogSlugs());
-        $this->get('/tracks/'.$fixture['track']->slug)->assertNotFound();
-        $this->assertCount($hashed, $this->privateHashes());
     }
 
     public function test_publication_still_refuses_a_same_size_tamper(): void

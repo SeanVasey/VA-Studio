@@ -13,6 +13,9 @@ final class MediaIntegrity
     // A full hash that disagreed with the record is remembered for that exact file identity, so a listing can hide the file without reading it.
     public const MISMATCH_SECONDS = 30 * 86400;
 
+    // Mismatch records live in their own non-transactional store (config/cache.php): a rollback of the caller's transaction must not erase one.
+    public const MISMATCH_STORE = 'media-integrity';
+
     public function matches(MediaAsset $asset, string $path): bool
     {
         $identity = $this->identity($asset, $path);
@@ -31,11 +34,11 @@ final class MediaIntegrity
             return false;
         }
         if (! hash_equals($asset->sha256, $hash)) {
-            Cache::put('media-integrity-mismatch:'.$digest, true, self::MISMATCH_SECONDS);
+            Cache::store(self::MISMATCH_STORE)->put('media-integrity-mismatch:'.$digest, true, self::MISMATCH_SECONDS);
 
             return false;
         }
-        Cache::forget('media-integrity-mismatch:'.$digest);
+        Cache::store(self::MISMATCH_STORE)->forget('media-integrity-mismatch:'.$digest);
         Cache::put('media-integrity:'.$digest, true, self::CACHE_SECONDS);
 
         return true;
@@ -49,7 +52,7 @@ final class MediaIntegrity
     {
         $identity = $this->identity($asset, $path);
 
-        return $identity !== null && Cache::get('media-integrity-mismatch:'.$this->digest($asset, $path, $identity)) !== true;
+        return $identity !== null && Cache::store(self::MISMATCH_STORE)->get('media-integrity-mismatch:'.$this->digest($asset, $path, $identity)) !== true;
     }
 
     /** @return ?array<string, int> device, inode, size, modification and change times */
