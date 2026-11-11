@@ -52,5 +52,5 @@ Open, not changed: the forced-colors contrast report. The foreground values are 
 ## Confirming dispatches
 
 1. `accessibility-browser` (engine sqlite): expect the cart, play-name and focus-containment cases to pass; the forced-colors case may still fail (open above).
-2. `browser` (engine sqlite): the 118-test selection may still exceed the 720 s focused budget (the run did 26 tests in 12 minutes, three of them waiting 120-150 s on the notification helper). If the evidence stops short again, split the dispatch by spec files, or use the per-project `operator-browser` jobs of `final-verification.yml` (35 min). The webkit-mobile project has produced no browser result at all yet.
-3. Do not read a green `browser` run as complete until its evidence JSON shows 118 executed cases and an exit code of 0.
+2. The old `browser` suite was split by the follow-up commit into nine suites that each fit the 720 s cap and run both projects: `browser-storefront`, `browser-customer`, `browser-site`, `browser-checkout`, `browser-delivery`, `browser-payment-exceptions`, `browser-operator-tracks`, `browser-operator-uploads`, `browser-operator-publication` (engine sqlite). Dispatch all nine; webkit-mobile has produced no browser result yet.
+3. A run that hits the cap is now recorded as an incomplete failure. Across the nine suites the evidence should total 118 executed cases.

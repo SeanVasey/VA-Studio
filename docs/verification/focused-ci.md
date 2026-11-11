@@ -27,8 +27,18 @@ receive the distinct [development preflight](ci-trigger-efficiency.md).
 | `track-concurrency` | Five metadata, stems recording/preview and media-writer authority files. | `sqlite` or `mysql` |
 | `seller` | 32 inquiry, preview embed, editorial/related content, disclosure and private collection/album draft authoring/version/migration/concurrency files. | `sqlite` or `mysql` |
 | `frontend` | 32 reviewed frontend files including customer sign-in/library, TypeScript/Vite production build and client-bundle secret scan. | Select `sqlite`; recorded engine is `none`. |
-| `browser` | 32 reviewed specs including the fresh-session customer library and exact original downloads, plus existing storefront, operator, checkout/delivery/history, player, inquiry, metadata, publication, editorial and resumable-upload journeys. Both configured engines use the isolated fixture/server wrapper. | `sqlite` only |
-| `accessibility-browser` | The single public-surface axe/keyboard spec `tests/browser/accessibility-public.spec.ts` (catalog, track detail, license dialog; chromium desktop and WebKit mobile), through the same isolated wrapper. A separate suite because `browser` is at the 32-file ceiling. Needs `@axe-core/playwright` from the lockfile (`npm ci`). | `sqlite` only |
+| `browser-storefront` | `storefront`, `player-controls`, `public-track-embed`: public catalog, detail, native player and embed journeys. Estimated 7 minutes; runs BOTH chromium-desktop and webkit-mobile for these files. | Select `sqlite`; the wrapper isolates its own SQLite. |
+| `browser-customer` | Eight customer account, identity, library, order items/reference, purchase claim, order history and product-member specs. Estimated 8 minutes; runs BOTH chromium-desktop and webkit-mobile for these files. | Select `sqlite`; the wrapper isolates its own SQLite. |
+| `browser-site` | Eight editorial, site content/schedule/release-menu, contact inquiry and inquiry-conversation specs. Estimated 8 minutes; runs BOTH chromium-desktop and webkit-mobile for these files. | Select `sqlite`; the wrapper isolates its own SQLite. |
+| `browser-checkout` | `test-checkout`: the Stripe-test checkout journey. Estimated 6 minutes; runs BOTH chromium-desktop and webkit-mobile for these files. | Select `sqlite`; the wrapper isolates its own SQLite. |
+| `browser-delivery` | `test-owner-delivery`: owner delivery journeys. Estimated 7 minutes; runs BOTH chromium-desktop and webkit-mobile for these files. | Select `sqlite`; the wrapper isolates its own SQLite. |
+| `browser-payment-exceptions` | `test-refunded-exception-resolution` and `test-unpaid-release`. Estimated 4 minutes; runs BOTH chromium-desktop and webkit-mobile for these files. | Select `sqlite`; the wrapper isolates its own SQLite. |
+| `browser-operator-tracks` | `track-bulk-tags`, `track-metadata-presets`, `bulk-track-metadata`. Estimated 7 minutes; runs BOTH chromium-desktop and webkit-mobile for these files. | Select `sqlite`; the wrapper isolates its own SQLite. |
+| `browser-operator-uploads` | `operator`, `resumable-kit-upload`, `resumable-media-upload`. Estimated 7 minutes; runs BOTH chromium-desktop and webkit-mobile for these files. | Select `sqlite`; the wrapper isolates its own SQLite. |
+| `browser-operator-publication` | `license-template-authoring`, `private-track-review`, `track-publication-guard`. Estimated 6 minutes; runs BOTH chromium-desktop and webkit-mobile for these files. | Select `sqlite`; the wrapper isolates its own SQLite. |
+| `accessibility-browser` | The single public-surface axe/keyboard spec `tests/browser/accessibility-public.spec.ts` (catalog, track detail, license dialog; chromium desktop and WebKit mobile), through the same isolated wrapper. A separate suite from the domain `browser-*` suites. Needs `@axe-core/playwright` from the lockfile (`npm ci`). | `sqlite` only |
+
+The former single `browser` suite (the 32 specs above, 118 tests across both projects, one worker) could never finish inside the runner's 720 s cap: run 43115861337 completed 26 tests in 12 minutes, three of them waiting 120-150 s on a stale helper, and full-suite time is roughly 25-30 minutes. It was split by domain into the nine `browser-*` suites, each spec in exactly one of them, each running both projects, so no coverage was dropped. Estimates assume measured per-test times from that run where a test ran (fast journeys 1-10 s, `customer-library-browsing` about 95 s, `inquiry-conversation` about 40 s) and, for the rest, 30 s per ordinary journey and 50 s per heavy journey (checkout, delivery, operator, uploads, publication, bulk metadata) per project, plus about 40 s of start-up. Revisit them from the next real durations. A run that reaches the cap is recorded as an incomplete failure, never a pass.
 
 The exact paths live in `scripts/ci/focused-tests.py`, are printed before execution and retained in JSON evidence. Files are a bounded reviewed allowlist, not a changing-files heuristic or arbitrary user filter. Unknown/empty enums, invalid combinations, missing files, repository escapes and empty/duplicate/oversized lists fail closed. Add a new relevant test to that allowlist in a reviewed change, or run the necessary test separately and the full candidate gate; do not infer coverage for unselected features.
 
@@ -48,7 +58,7 @@ FOCUSED_SUITE=customer FOCUSED_ENGINE=mysql python3 scripts/ci/focused-tests.py
 FOCUSED_SUITE=operator FOCUSED_ENGINE=sqlite python3 scripts/ci/focused-tests.py
 FOCUSED_SUITE=seller FOCUSED_ENGINE=sqlite python3 scripts/ci/focused-tests.py
 FOCUSED_SUITE=frontend FOCUSED_ENGINE=sqlite python3 scripts/ci/focused-tests.py
-FOCUSED_SUITE=browser FOCUSED_ENGINE=sqlite python3 scripts/ci/focused-tests.py
+FOCUSED_SUITE=browser-customer FOCUSED_ENGINE=sqlite python3 scripts/ci/focused-tests.py
 python3 scripts/ci/test-focused-tests.py
 ```
 
