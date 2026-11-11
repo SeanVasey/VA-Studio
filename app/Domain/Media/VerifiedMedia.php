@@ -4,6 +4,8 @@ namespace App\Domain\Media;
 
 use App\Application\Media\MediaIntegrity;
 use App\Domain\Media\Models\MediaAsset;
+use App\Support\PublicReadMemo;
+use Closure;
 use Throwable;
 
 class VerifiedMedia
@@ -32,7 +34,29 @@ class VerifiedMedia
 
     public function available(MediaAsset $asset): bool
     {
-        return self::$listing > 0 ? $this->listable($asset) : $this->path($asset) !== null;
+        $listing = self::$listing > 0;
+
+        // Within one public read decision (PublicReadMemo) an asset is judged once per mode; path() itself, which serves bytes, never is.
+        return $this->memo('media-available:'.($listing ? 'listing' : 'full'), $asset,
+            fn (): bool => $listing ? $this->listable($asset) : $this->path($asset) !== null);
+    }
+
+    /**
+     * Shares a decision about this exact asset state within a PublicReadMemo scope; outside one it simply computes.
+     *
+     * @template T
+     *
+     * @param  Closure(): T  $compute
+     * @return T
+     */
+    private function memo(string $kind, MediaAsset $asset, Closure $compute): mixed
+    {
+        if (! $asset->exists || $asset->getKey() === null || ! PublicReadMemo::active()) {
+            return $compute();
+        }
+
+        // Keyed by every attribute too, so an in-memory change to the model is never answered with an earlier decision.
+        return PublicReadMemo::remember($kind.':'.$asset->getKey().':'.hash('sha256', serialize($asset->getAttributes())), $compute);
     }
 
     /**
@@ -56,12 +80,18 @@ class VerifiedMedia
     /** Historical database evidence only: no private paths are opened and no integrity cache is consulted. */
     public function evidence(MediaAsset $asset, bool $historical = false): ?array
     {
+        return $this->memo('media-evidence:'.($historical ? 'historical' : 'current'), $asset, fn (): ?array => $this->currentEvidence($asset, $historical));
+    }
+
+    private function currentEvidence(MediaAsset $asset, bool $historical): ?array
+    {
         try {
             if ($asset->status !== 'ready' || $asset->disk !== 'local' || ! $asset->verified_at || ! $asset->verified_by || ! $asset->parent_asset_id || ! $asset->processing_run_id || ! preg_match('~\Amedia/revisions/[a-f0-9-]{36}/(?:master\.wav|delivery\.mp3|preview\.mp3|preview-untagged\.mp3|artwork\.png|stems\.zip)\z~D', $asset->storage_path)) {
                 return null;
             }
-            $run = $asset->processingRun()->first();
-            $source = $asset->parent()->first();
+            // Sibling outputs share one run and source: read each once per PublicReadMemo scope (a plain read outside one).
+            $run = PublicReadMemo::remember('media-run:'.$asset->processing_run_id, fn () => $asset->processingRun()->first());
+            $source = PublicReadMemo::remember('media-asset:'.$asset->parent_asset_id, fn () => $asset->parent()->first());
             if (! $run || ! $source || $run->status !== 'completed' || ! $run->completed_at || $source->status !== 'processed' || $run->source_asset_id !== $source->id || $source->track_id !== $asset->track_id || ! in_array($asset->id, $run->output_asset_ids ?? [], true) || ! hash_equals($source->sha256 ?? '', $run->input_sha256) || ! hash_equals($run->profile_fingerprint, app(MediaProfile::class)->fingerprint($run->profile))) {
                 return null;
             }
@@ -77,7 +107,7 @@ class VerifiedMedia
                 'stems_zip' => [['stems_zip']],
                 default => [],
             };
-            $outputs = $run->outputs()->get();
+            $outputs = PublicReadMemo::remember('media-run-outputs:'.$run->id, fn () => $run->outputs()->get());
             if ($expectedRoleSets === [] || ! in_array($outputs->pluck('role')->sort()->values()->all(), $expectedRoleSets, true) || $outputs->pluck('id')->sort()->values()->all() !== collect($run->output_asset_ids)->sort()->values()->all()) {
                 return null;
             }

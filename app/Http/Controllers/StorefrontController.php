@@ -10,6 +10,7 @@ use App\Domain\SiteBuilder\EditorialContent;
 use App\Domain\SiteBuilder\FamilyEntryPoints;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteImagePresentation;
+use App\Support\PublicReadMemo;
 use App\Support\PublicStructuredData;
 use App\Support\StorefrontMetadata;
 use Illuminate\Http\JsonResponse;
@@ -23,10 +24,10 @@ class StorefrontController extends Controller
     public function index(Request $request, ?string $slug = null): Response|SymfonyResponse
     {
         $service = app(PublicCatalog::class);
-        $direct = $slug === null ? null : $service->direct($slug);
+        // One read scope for the selected track and the catalog page, so a track judged for both is read once (PublicReadMemo).
+        [$direct, $catalog] = PublicReadMemo::scope(fn (): array => [$slug === null ? null : $service->direct($slug), $service->page($request)]);
         $selected = $direct['projection'] ?? null;
         $unlisted = $direct['unlisted'] ?? false;
-        $catalog = $service->page($request);
         $selectedTrack = $selected['tracks'][0] ?? null;
         $catalog['licenseTiers'] = collect(array_merge($catalog['licenseTiers'], $selected['licenseTiers'] ?? []))->unique('id')->values()->all();
         $siteContent = app(SiteContent::class)->current();
