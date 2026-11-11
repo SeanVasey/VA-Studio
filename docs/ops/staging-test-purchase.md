@@ -306,6 +306,8 @@ VASEY_TEST_UNPAID_RELEASE_ENABLED=true
 VASEY_TEST_UNPAID_RELEASE_POLICY='{"schema_version":1,"purpose":"test_unpaid_resource_release","version":"test-unpaid-release-v1","provider":"stripe","mode":"test","proof":"bound_expired_unpaid_session_and_absent_or_canceled_zero_payment","recovery":"disabled","resources":"pending_to_released","late_confirmation":"paid_exception_preserve_released","provider_writes":"forbidden"}'
 ```
 
+**The release that knows this rule must already be live.** The first gate of a deploy runs before the candidate is built, so it uses the validator of the release being served. If the served release predates this capability (before 2026-11-11, PR #333), a deploy with the flag `true` is refused with `FAIL runtime.flag_off_vasey_test_unpaid_release_enabled` before the quiesce, and nothing changes on the host (seen on staging, 2026-11-11). In that case deploy once with the two lines absent, then add them and deploy again.
+
 Then **Deploy Now**. The deploy gate (`ops/staging/validate-runtime.php`) accepts the flag only as exactly `false`, or as exactly `true` with Stripe test mode, an `acct_` account and this exact policy; anything else fails the deploy with `FAIL runtime.optional_vasey_test_unpaid_release_enabled` and nothing changes on the host. As the application user, `php scripts/ops/validate-test-commerce-profile.php .env` then reports `PASS boundary.optional_capabilities_admitted`. The production validator refuses the flag in any value but `false` (`holds.vasey_test_unpaid_release_enabled`), and the policy class refuses production in code as well. To switch it off, set the flag back to `false` and deploy; releases already recorded stay recorded.
 
 ### Release one order (staff, signed in with MFA)

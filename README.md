@@ -51,6 +51,7 @@ Recovery checkpoint, September 30: [PR #84](https://github.com/VASEYDEV/VASEYAUD
 - [Brand evidence](docs/brand/): current published theme, exact identity assets, and source provenance.
 - [Verification](docs/verification/): actual local checks and remaining gates.
 - [Media operations](docs/media-processing.md): worker prerequisites, approved preview tag, processing and recovery.
+- [Staging alpha test guide](docs/alpha/staging-alpha-test-guide.md): browser test scripts for the owner on the staging store (Stripe test mode), with expected results and known limits.
 - [Licensing and offers](docs/licensing-and-offers.md): review submission, successor versions, published prices/files and legacy upgrade steps.
 - [Provisional selection reviews](docs/provisional-quotes.md): server snapshots, session ownership, retries, expiry and the boundary before payable checkout.
 - [Quote license disclosure](docs/quote-license-disclosure.md): full frozen terms tied to the owning selection review, disclosure identity and recovery.
