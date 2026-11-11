@@ -178,6 +178,19 @@ class PublicCatalogIntegrityCostTest extends TestCase
         $this->assertSame([], $this->catalogSlugs());
         $this->get('/tracks/'.$fixture['track']->slug)->assertNotFound();
         $this->assertCount($hashed, $this->privateHashes(), 'The listing hid the track without hashing it again.');
+        // The record must be writable by a non-root PHP user: every directory of the store keeps its owner's execute bit. CI runs
+        // as root, which ignores directory modes, so this guards against store options that would lock php-fpm out (PR #324 review).
+        $root = config('cache.stores.'.MediaIntegrity::MISMATCH_STORE.'.path');
+        $dirs = [$root];
+        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST) as $entry) {
+            if ($entry->isDir()) {
+                $dirs[] = $entry->getPathname();
+            }
+        }
+        $this->assertGreaterThan(1, count($dirs), 'The mismatch was recorded in the dedicated store.');
+        foreach ($dirs as $dir) {
+            $this->assertNotSame(0, fileperms($dir) & 0100, 'Store directory '.$dir.' must be enterable by its owner.');
+        }
 
         // Every other path that sells or hands over the bytes still refuses it.
         try {

@@ -59,7 +59,8 @@ return [
             'driver' => 'file',
             'path' => storage_path('framework/cache/media-integrity'),
             'lock_path' => storage_path('framework/cache/media-integrity'),
-            'permission' => 0600,
+            // No 'permission' here: Laravel's file store applies it to the hash subdirectories too, and a directory without
+            // its execute bit cannot be entered by a non-root PHP user (php-fpm as forge), so no record could ever be written.
         ],
 
         'storage' => [
