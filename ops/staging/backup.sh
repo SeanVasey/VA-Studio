@@ -61,10 +61,9 @@ fi
 : "${VASEY_BACKUP_REMOTE:=}" "${VASEY_BACKUP_RCLONE_BIN:=/usr/bin/rclone}" "${VASEY_BACKUP_RCLONE_CONFIG:=/root/.config/rclone/rclone.conf}"
 : "${VASEY_BACKUP_RETENTION:=}" "${VASEY_BACKUP_KEEP_DAILY:=7}" "${VASEY_BACKUP_KEEP_WEEKLY:=4}" "${VASEY_BACKUP_KEEP_MONTHLY:=6}"
 : "${VASEY_BACKUP_REMOTE_PRUNE:=0}" "${VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE:=0}"
-# Sharing unchanged private files with the previous verified set (1, the default) or copying the whole store every time (0);
-# and how old a file's last full re-hash may be before the pre-quiesce re-verification hashes it again (0, the default: every
-# shared file is re-hashed before every quiesce, with the site up). docs/ops/staging-runbook.md section 8.
-: "${VASEY_BACKUP_LINK:=1}" "${VASEY_BACKUP_REVERIFY_HOURS:=0}"
+# Sharing unchanged private files with the set re-hashed before the quiesce (1, the default) or copying the whole store every
+# time (0). docs/ops/staging-runbook.md section 8.
+: "${VASEY_BACKUP_LINK:=1}"
 [ "$(id -u "$VASEY_APP_USER")" -gt 0 ] || die "application account must be nonroot"
 
 PRIVATE=$VASEY_ROOT/private
@@ -146,12 +145,28 @@ snapshot() {
   #    never linked. Symlinks, hard links and special files in the live store are refused, as before.
   [ -f "$PRIVATE_SNAPSHOT" ] && [ ! -L "$PRIVATE_SNAPSHOT" ] \
     || { mv -- "$out" "$out.FAILED"; die "missing $PRIVATE_SNAPSHOT; re-run provision.sh"; }
-  local src private_summary
+  #    Only the set this operation re-hashed before its quiesce may be shared (its token, consumed here: one use).
+  local src private_summary in_use
   local -a sharing=()
-  src=$(link_source "$(basename -- "$out")") || src=''
-  [ -z "$src" ] || sharing=(--link-from "$src" --link-max-age-hours "$(link_max_age_hours)")
+  in_use=${VASEY_BACKUP_DIR:?}/.link-token.in-use.$$
+  src=''
+  if [ "${VASEY_BACKUP_LINK:-1}" = 1 ] && src=$(link_token_set) && [ -n "$src" ] \
+     && mv -T -- "${VASEY_BACKUP_DIR:?}/.link-token" "$in_use" 2>/dev/null; then
+    sharing=(--link-from "$src" --link-token "$in_use" --link-max-age-hours "$LINK_MAX_AGE_HOURS")
+  else
+    src=''
+    rm -f -- "${VASEY_BACKUP_DIR:?}/.link-token"
+  fi
   if ! private_summary=$(python3 -I "$PRIVATE_SNAPSHOT" snapshot --live "$PRIVATE" --set "$out" "${sharing[@]}"); then
+    rm -f -- "${in_use:?}"
     mv -- "$out" "$out.FAILED"; die "private snapshot failed (reason above); kept as $out.FAILED for inspection"
+  fi
+  rm -f -- "${in_use:?}"
+  # A re-verified source that shares nothing (every file copied) usually means the live store's device number changed (a reboot or
+  # a remount): still correct, but a full copy. Say so.
+  if [ -n "$src" ] && [ "$(printf '%s\n' "$private_summary" | sed -n 's/^linked_files=//p')" = 0 ] \
+     && [ "$(printf '%s\n' "$private_summary" | sed -n 's/^files=//p')" != 0 ]; then
+    log "WARNING: nothing was shared with $(basename -- "$src") although it was re-verified: every private file was copied ($(printf '%s\n' "$private_summary" | grep '^link_refused=' || echo 'every live file changed identity; a remount or reboot renumbers devices'))"
   fi
 
   # 3. Key custody: the served release's .env carries APP_KEY. Without it encrypted columns are unreadable.
@@ -187,17 +202,19 @@ cleanup_restore() {
 
 # ---- restore-check: docs/ops/backup-restore-proof.md steps 3-4 against isolated targets ----
 # The private part is either private.tar (sets taken before 2026-11-11: extracted as the application user and verified) or the
-# private/ tree (verified in place by private-snapshot.py: exact names, directories, modes and owner, and the SHA-256 of every
-# file it copied, plus every shared file whose last full re-hash is older than REHASH_HOURS; 0, the default and what a manual
-# `restore-check DIR` uses, re-hashes every file). The predeploy proof passes the link age, because the files it shared were
-# re-hashed before the quiesce.
-restore_check() {  # restore_check DIR [REHASH_HOURS]
-  local bk=${1:?backup directory} rehash_hours=${2:-0} format
+# private/ tree, verified in place by private-snapshot.py: exact names, directories, modes and owner, and the SHA-256 of every
+# file. `incremental` (the predeploy proof, right after its snapshot) re-hashes every file the snapshot copied and requires every
+# shared file to be the exact inode it linked from the set re-hashed before the quiesce; without it (a manual `restore-check
+# DIR`, rollback case B, a set moved or extracted from an off-host copy) every file is re-hashed.
+restore_check() {  # restore_check DIR [incremental]
+  local bk=${1:?backup directory} depth=--full format
   [ -d "$bk" ] && [ ! -L "$bk" ] || die "not a backup directory"
-  [[ "$rehash_hours" =~ ^[0-9]{1,4}$ ]] || die "restore-check: re-hash age must be whole hours"
-  # A success marker describes this proof attempt, never an earlier attempt that now fails.
+  case "${2:-}" in '') ;; incremental) depth='' ;; *) die "restore-check: unknown proof depth" ;; esac
+  # A success marker describes this proof attempt, never an earlier attempt that now fails; nor may a token keep naming it.
   rm -f -- "$bk/RESTORE_CHECK" || die "cannot invalidate previous restore proof"
-  rm -f -- "$bk/private.verified" || die "cannot invalidate previous private verification"
+  if [ "$(link_token_name)" = "$(basename -- "$bk")" ]; then
+    rm -f -- "${VASEY_BACKUP_DIR:?}/.link-token" || die "cannot invalidate the link token"
+  fi
   if [ -f "$bk/private.tar" ] && [ ! -L "$bk/private.tar" ] && [ ! -e "$bk/private" ] && [ ! -L "$bk/private" ]; then format=tar
   elif [ -d "$bk/private" ] && [ ! -L "$bk/private" ] && [ -f "$bk/private.index" ] && [ ! -e "$bk/private.tar" ] && [ ! -L "$bk/private.tar" ]; then format=tree
   else die "not a backup directory"; fi
@@ -234,9 +251,13 @@ restore_check() {  # restore_check DIR [REHASH_HOURS]
   # A tree set is verified in place first: it is the cheaper failure, and nothing of it is extracted.
   if [ "$format" = tree ]; then
     [ -f "$PRIVATE_SNAPSHOT" ] && [ ! -L "$PRIVATE_SNAPSHOT" ] || die "missing $PRIVATE_SNAPSHOT; re-run provision.sh"
-    private_proof=$(python3 -I "$PRIVATE_SNAPSHOT" verify "$bk" --rehash-older-than-hours "$rehash_hours" \
-      --strict-modes "$([ "$VASEY_RESTORE_STRICT_MODES" = 1 ] && echo 1 || echo 0)") \
-      || { rm -f -- "$bk/private.verified"; die "private tree verification failed (reason above); no restore proof published"; }
+    if ! private_proof=$(python3 -I "$PRIVATE_SNAPSHOT" verify "$bk" ${depth:+"$depth"} --backups "$VASEY_BACKUP_DIR" \
+           --strict-modes "$([ "$VASEY_RESTORE_STRICT_MODES" = 1 ] && echo 1 || echo 0)"); then
+      local -a withdrawn=()
+      mapfile -t withdrawn < <(printf '%s\n' "$private_proof" | sed -n 's/^withdraw=//p')
+      [ "${#withdrawn[@]}" = 0 ] || withdraw_proofs "${withdrawn[@]}"
+      die "private tree verification failed (reason above); no restore proof published"
+    fi
   fi
 
   # Disposable server: its own datadir and socket, no TCP, no binlog, never the staging server.
@@ -316,7 +337,7 @@ restore_check() {  # restore_check DIR [REHASH_HOURS]
   trap - EXIT
   local marker
   local -a proof_fields=()
-  mapfile -t proof_fields < <(printf '%s\n' "$private_proof" | grep -E '^(rehashed_files|rehashed_bytes|trusted_linked_files|oldest_hash_utc)=' | sed 's/^/private_/' || true)
+  mapfile -t proof_fields < <(printf '%s\n' "$private_proof" | grep -E '^(proof|rehashed_files|rehashed_bytes|trusted_linked_files)=' | sed 's/^/private_/' || true)
   marker=$(mktemp "$bk/.RESTORE_CHECK.XXXXXXXX")
   if ! printf '%s\n' \
     "restore_checked_utc=$(date -u +%FT%TZ)" \
@@ -364,19 +385,13 @@ SHIP_PENDING_LOCK_WAIT=3600
 PENDING_WARN=3
 
 # ---- the private tree: which earlier set a snapshot may share unchanged files with ----
-# Hours a shared file's last full re-hash may be old at snapshot time: the re-verification threshold plus the time a build may
-# take between the pre-quiesce re-verification and the snapshot. An older one is copied again, never trusted.
-LINK_SLACK_HOURS=6
-reverify_hours() {
-  local h=${VASEY_BACKUP_REVERIFY_HOURS:-0}
-  [[ "$h" =~ ^[0-9]{1,3}$ ]] || { log "WARNING: VASEY_BACKUP_REVERIFY_HOURS must be a whole number of hours; using 0 (re-hash everything)"; h=0; }
-  printf '%s' "$((10#$h))"
-}
-link_max_age_hours() { printf '%s' "$(( $(reverify_hours) + LINK_SLACK_HOURS ))"; }
+# A snapshot shares files only with the set that this operation's pre-quiesce re-verification hashed in full: preverify writes
+# its token (backups/.link-token, outside every set: the identity of each verified inode) and the next snapshot consumes it. The
+# token is refused after this many hours (a build between prepare's re-verification and activate's snapshot fits well inside).
+LINK_MAX_AGE_HOURS=6
 
-# The newest set a snapshot may share files with: a tree set whose restore proof passed and whose files carry a verification
-# record. Prints nothing when sharing is off or no set qualifies (the snapshot then copies the whole store).
-link_source() {  # link_source [EXCLUDE_SET_NAME]
+# The newest tree set with a restore proof: the one preverify re-hashes. Prints nothing when sharing is off or none qualifies.
+link_source() {
   case "${VASEY_BACKUP_LINK:-1}" in
     1) ;;
     0) return 0 ;;
@@ -384,36 +399,72 @@ link_source() {  # link_source [EXCLUDE_SET_NAME]
   esac
   local d bk
   while IFS= read -r d; do
-    [ "$d" != "${1:-}" ] && [[ "$d" =~ $SET_NAME_RE ]] || continue
+    [[ "$d" =~ $SET_NAME_RE ]] || continue
     bk=$VASEY_BACKUP_DIR/$d
     grep -qx 'result=RESTORE_VERIFIED' "$bk/RESTORE_CHECK" 2>/dev/null || continue
-    [ -d "$bk/private" ] && [ ! -L "$bk/private" ] && [ -f "$bk/private.index" ] && [ -f "$bk/private.verified" ] || continue
+    [ -d "$bk/private" ] && [ ! -L "$bk/private" ] && [ -f "$bk/private.index" ] || continue
     printf '%s\n' "$bk"
     return 0
   done < <(find "$VASEY_BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -name '20*Z-*' ! -name '*.FAILED' -printf '%f\n' 2>/dev/null | LC_ALL=C sort -r)
   return 0
 }
 
-# Re-proves the files of the set the next snapshot will share, with the site still up, so that the proof inside the maintenance
-# window only has to hash what is new. A failure means that set's files no longer match its manifest: its restore proof and
-# verification are withdrawn (a failed reproof never keeps an earlier success claim) and the next snapshot copies everything.
-# Never fails its caller.
+# The set name the current token's header records (nothing when there is no token).
+link_token_name() {
+  local token=$VASEY_BACKUP_DIR/.link-token
+  [ -f "$token" ] && [ ! -L "$token" ] || return 0
+  sed -n '1s/.*"set": "\([^"]*\)".*/\1/p' -- "$token"
+}
+
+# The set the current token names, while that set still holds its restore proof; else nothing.
+link_token_set() {
+  local name
+  name=$(link_token_name)
+  [[ "$name" =~ $SET_NAME_RE ]] && grep -qx 'result=RESTORE_VERIFIED' "$VASEY_BACKUP_DIR/$name/RESTORE_CHECK" 2>/dev/null \
+    && [ -d "$VASEY_BACKUP_DIR/$name/private" ] && [ ! -L "$VASEY_BACKUP_DIR/$name/private" ] || return 0
+  printf '%s\n' "$VASEY_BACKUP_DIR/$name"
+}
+
+# Withdraws the restore proof of each named set (a failed re-proof, or a set sharing an inode with what failed), and the link
+# token when it names one of them. A withdrawn set is never shared, is skipped by ship-pending and is proven again only by an
+# explicit `restore-check`.
+withdraw_proofs() {  # withdraw_proofs NAME...
+  local name
+  for name in "$@"; do
+    [[ "$name" =~ $SET_NAME_RE ]] || continue
+    if [ "$(link_token_name)" = "$name" ]; then rm -f -- "${VASEY_BACKUP_DIR:?}/.link-token"; fi
+    if [ -e "$VASEY_BACKUP_DIR/$name/RESTORE_CHECK" ]; then
+      rm -f -- "${VASEY_BACKUP_DIR:?}/${name:?}/RESTORE_CHECK"
+      log "WARNING: withdrew the restore proof of $name: it holds or shares a private file that failed verification"
+    fi
+  done
+  return 0
+}
+
+# Re-proves, with the site still up, every file of the set the next snapshot will share, and writes the token that lets the
+# snapshot share it. Returns 1 after a failed re-proof: that set and every set sharing an inode with what failed lose their
+# restore proof, no token exists, and the caller decides (a deploy refuses before its quiesce; the nightly run copies everything).
 preverify_link_source() {
   [ -n "${PRIVATE_SNAPSHOT:-}" ] && [ -f "$PRIVATE_SNAPSHOT" ] || return 0
-  local src out
+  local src out rc=0
+  local -a withdrawn=()
+  rm -f -- "${VASEY_BACKUP_DIR:?}/.link-token"
   src=$(link_source) || src=''
   if [ -z "$src" ]; then
     log "no verified tree set to share files with: the next snapshot copies the whole private store"
     return 0
   fi
-  if out=$(python3 -I "$PRIVATE_SNAPSHOT" verify "$src" --rehash-older-than-hours "$(reverify_hours)" \
-             --strict-modes "$([ "${VASEY_RESTORE_STRICT_MODES:-1}" = 0 ] && echo 0 || echo 1)" 2>&1); then
+  out=$(python3 -I "$PRIVATE_SNAPSHOT" preverify "$src" --token "$VASEY_BACKUP_DIR/.link-token" --backups "$VASEY_BACKUP_DIR" \
+          --strict-modes "$([ "${VASEY_RESTORE_STRICT_MODES:-1}" = 0 ] && echo 0 || echo 1)" 2>&1) || rc=$?
+  if [ "$rc" = 0 ]; then
     log "re-verified the private files of $(basename -- "$src") before the quiesce: $(printf '%s' "$out" | tr '\n' ' ')"
-  else
-    rm -f -- "$src/private.verified" "$src/RESTORE_CHECK"
-    log "WARNING: $(basename -- "$src") failed its private file re-verification ($(printf '%s' "$out" | tr '\n' ' ' | cut -c1-300)); its restore proof was withdrawn and the next snapshot copies the whole private store. Inspect it with: vasey-staging-backup restore-check $src"
+    return 0
   fi
-  return 0
+  rm -f -- "${VASEY_BACKUP_DIR:?}/.link-token"
+  mapfile -t withdrawn < <(printf '%s\n' "$out" | sed -n 's/^withdraw=//p')
+  withdraw_proofs "$(basename -- "$src")" "${withdrawn[@]}"
+  log "WARNING: $(basename -- "$src") failed its private file re-verification ($(printf '%s\n' "$out" | grep -v '^withdraw=' | tr '\n' ' ' | cut -c1-300)); withdrew the proof of: ${withdrawn[*]:-$(basename -- "$src")}. Nothing is shared: the next snapshot copies the whole private store. Inspect with: vasey-staging-backup restore-check $src"
+  return 1
 }
 
 hardening_requested() {
@@ -830,6 +881,14 @@ ship_pending() {
     queued=$(pending_field "$name" queued_utc || true); attempts=$(pending_field "$name" attempts || true)
     is_pending "$name" || { log "pending marker of $name vanished; skipping it"; continue; }
     [[ "$attempts" =~ ^[0-9]{1,6}$ ]] || attempts=0
+    # A set whose restore proof was withdrawn (a failed re-verification) is never shipped as good. Skip it with its own reason and
+    # go on with the others: it is not a remote failure. It stays pending until it is proven again or abandoned (pending-clear).
+    if ! grep -qx 'result=RESTORE_VERIFIED' "$bk/RESTORE_CHECK" 2>/dev/null; then
+      pending_write "$name" "${queued:-$(date -u +%FT%TZ)}" "$attempts" "$(date -u +%FT%TZ)" skipped \
+        "no verified restore proof (withdrawn or never published); prove it with restore-check or abandon it with pending-clear" || true
+      log "WARNING: pending set $name has no verified restore proof; skipped (restore-check it, or pending-clear it)"
+      continue
+    fi
     pending_write "$name" "${queued:-$(date -u +%FT%TZ)}" "$((attempts + 1))" "$(date -u +%FT%TZ)" started '' || true
     log "shipping pending set $name off-host (attempt $((attempts + 1)); the site stays up)"
     out=$(mktemp "$VASEY_BACKUP_DIR/.ship-pending-out.XXXXXX") || die "cannot create a scratch file in $VASEY_BACKUP_DIR"
@@ -1049,17 +1108,21 @@ nearest_existing() {  # nearest_existing PATH -> PATH or its closest existing an
 
 space_check() {  # space_check [--preverify]
   local priv db copy full set_need need restore_need ship_need avail restore_avail backup_at restore_at margin src estimate
-  # Re-proving the shared set first (site still up) decides what the snapshot may share, and so what it must copy.
-  [ "${1:-}" != --preverify ] || preverify_link_source
+  # Re-proving the shared set first (site still up) decides what the snapshot may share, and so what it must copy. A deploy
+  # refuses on a failed re-proof, before anything is stopped: a backup set's files changed on disk, which needs a person.
+  if [ "${1:-}" = --preverify ] && ! preverify_link_source; then
+    die "refused: a backup set's private files failed re-verification (reason above; its proof and those of the sets sharing the file were withdrawn); nothing was stopped. Check the disk and the sets (docs/ops/staging-runbook.md section 8), then deploy again: the next snapshot copies the whole private store"
+  fi
   [ -d "$PRIVATE" ] && [ ! -L "$PRIVATE" ] || die "private root missing"
   priv=$(du -sb -- "$PRIVATE" | cut -f1)
   db=$(snapshot_db_bytes) || die "cannot estimate the database size (query and newest set both unavailable); no snapshot attempted, nothing stopped"
   [[ "$priv" =~ ^[0-9]+$ && "$db" =~ ^[0-9]+$ ]] || die "cannot size the snapshot; nothing stopped"
   copy=$priv
   if [ -n "${PRIVATE_SNAPSHOT:-}" ] && [ -f "$PRIVATE_SNAPSHOT" ]; then
-    src=$(link_source) || src=''
+    src=''
+    [ "${VASEY_BACKUP_LINK:-1}" != 1 ] || src=$(link_token_set) || src=''
     if [ -n "$src" ] && estimate=$(python3 -I "$PRIVATE_SNAPSHOT" estimate --live "$PRIVATE" --link-from "$src" \
-         --link-max-age-hours "$(link_max_age_hours)" 2>/dev/null); then
+         --link-token "$VASEY_BACKUP_DIR/.link-token" --link-max-age-hours "$LINK_MAX_AGE_HOURS" 2>/dev/null); then
       estimate=$(printf '%s\n' "$estimate" | sed -n 's/^copy_bytes=//p')
       if [[ "$estimate" =~ ^[0-9]+$ ]]; then copy=$estimate; fi
     fi
@@ -1129,7 +1192,10 @@ case "${1:-}" in
     flock -n 9 || die "a deploy or another backup holds the lock; skipping this run"
     # No space-check, no snapshot: pending sets are never pruned, so a long remote outage fills the disk. Refuse before the
     # quiesce (the site was never stopped), record the failure, and still drain the backlog.
-    if ! ( space_check --preverify ); then
+    # Re-prove the set the snapshot will share, with the site up. A failure withdraws the affected proofs and leaves no token, so
+    # tonight's snapshot copies everything; the backup itself still runs.
+    preverify_link_source || log "WARNING: re-verification failed (reason above); tonight's snapshot copies the whole private store"
+    if ! ( space_check ); then
       note_snapshot_failed
       record_evidence daily failed
       ship_pending_start
@@ -1160,9 +1226,9 @@ case "${1:-}" in
   predeploy)
     install -d -m 0700 -o root -g root -- "$VASEY_BACKUP_DIR"
     snapshot
-    # The files this snapshot shared were re-hashed before the quiesce (space-check --preverify); the proof re-hashes what it
-    # copied and any shared file whose last full re-hash is older than the link age.
-    restore_check "$(cat "$VASEY_BACKUP_DIR/.last")" "$(link_max_age_hours)"
+    # The files this snapshot shared were re-hashed before the quiesce (space-check --preverify) and are checked to be those very
+    # inodes; the proof re-hashes everything the snapshot copied.
+    restore_check "$(cat "$VASEY_BACKUP_DIR/.last")" incremental
     # Runs with the site quiesced, so nothing here may touch the network or take time proportional to the set: no age, no rclone,
     # no rsync. The off-host copy is queued and sent after the release is resumed and healthy (ctl activate/refresh and the
     # nightly run start ship-pending). Queuing never fails the deploy.

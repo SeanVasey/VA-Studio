@@ -571,8 +571,7 @@ What runs:
 Each run produces `/srv/vasey-staging/backups/<UTC>-<sha12>/` containing:
 - `database.sql` and `.sha256`;
 - `private/`, a root-only copy of the private store (sets taken before 2026-11-11 hold `private.tar` and `.sha256` instead);
-- `private.sha256` and `private.dirs` (manifests), and for a `private/` tree `private.index` (per-file identity and hash) and
-  `private.verified` (when each file was last fully re-hashed);
+- `private.sha256` and `private.dirs` (manifests), and for a `private/` tree `private.index` (per-file identity and hash);
 - `env.backup` (APP_KEY) and `.sha256`;
 - `MANIFEST` (for a tree also `private_format=tree`, `private_link_source`, `private_copied_files/bytes`, `private_linked_files/bytes`);
 - `RESTORE_CHECK`, the proof: a disposable `mysqld` loaded the dump and re-dumped it, and the private files were verified
@@ -589,13 +588,26 @@ that are new or changed since the newest verified set and hard-links the unchang
   Any write, truncate, chmod, utime or replacement changes the ctime, which an unprivileged process cannot set back. A file
   changed within two seconds of the earlier snapshot's start is never trusted, and a file that changes while it is copied
   refuses the snapshot.
-- **A file is shared only after its earlier copy was fully re-hashed.** Before every quiesce (`ctl prepare`, `ctl refresh`, the
-  nightly run: `space-check --preverify`), with the site still up, the helper re-hashes every file of the set it will share
-  with against its manifest (about 2.5 minutes for 38 GB; `VASEY_BACKUP_REVERIFY_HOURS` in `backup.conf` skips files re-hashed
-  within that many hours, default 0 = all). A mismatch withdraws that set's `RESTORE_CHECK`, logs a WARNING and the snapshot then
-  copies everything. A copy whose last full re-hash is older than `VASEY_BACKUP_REVERIFY_HOURS` + 6 hours is copied again, never
-  trusted. Inside the window the proof re-hashes every file it copied and checks that every shared file is still the
-  verified inode (same size, mtime and mode). `restore-check DIR` (manual, and case B below) re-hashes every file.
+- **A file is shared only with the set this operation re-hashed in full, and only while it is still that inode.** Before every
+  quiesce (`ctl prepare`, `ctl refresh`, the nightly run), with the site still up, the helper re-hashes every file of the newest
+  tree set that holds a restore proof (about 2.5 minutes for 38 GB, estimated at about 250 MB/s; not measured on the host). Success
+  writes a token, `backups/.link-token`, outside every set: the identity of each verified inode, ctime included. The next snapshot
+  consumes it (one use; refused after 6 hours or when it names another set) and shares only files whose inode still has exactly
+  that identity. Any write to it since, by anyone, moves the ctime, so it is copied instead. Without a token nothing is shared.
+- **A failed re-hash withdraws every proof it affects.** The `RESTORE_CHECK` of that set and of every other tree set that shares an
+  inode with a failed file is removed, no token is written, and a **deploy refuses before it stops anything** ("a backup set's
+  private files failed re-verification ... nothing was stopped"): the disk changed a backup behind its manifest, which needs a
+  person. Check `dmesg` and the disk, run `vasey-staging-backup restore-check <set>` on what remains, then deploy again (it
+  re-verifies the newest set that still holds a proof, or copies everything). The nightly run does not refuse: it logs the
+  WARNING and its snapshot copies everything. A withdrawn set that was still waiting for its off-host copy is skipped by
+  `ship-pending` (`pending` shows `last_result=skipped` and why) until it is proven again or abandoned with `pending-clear`.
+- **Inside the window** the proof re-hashes every file the snapshot copied and checks that every shared file is still the exact
+  inode it linked (device, inode, size, mtime, mode, owner, ctime). `restore-check DIR` (manual, case B below, a set moved to
+  another disk or extracted from an off-host copy) re-hashes every file and compares size, mode and the mtime in whole seconds,
+  because a copy has new inodes and tar keeps whole seconds.
+- **Symlinks and FIFOs swapped in during a snapshot are refused**: every directory and file is opened relative to its parent's
+  descriptor without following links and must be the inode the listing reported; a file is opened non-blocking and must be a
+  regular file. An application process that kept running through the quiesce cannot point the snapshot outside the store.
 - **Pruning a set never changes another.** Removing a set unlinks its own names; an inode shared with a newer set keeps its data.
 - **Off-host copies are whole.** The shipment tars one set at a time, so the archive holds every file in full (no hard-link
   entries) and `du` sizes it fully; an rsync destination receives whole files.
@@ -604,7 +616,9 @@ that are new or changed since the newest verified set and hard-links the unchang
 
 What changed for an operator:
 - The deploy (and the nightly run) spends about 2.5 minutes re-hashing the previous set **before** it stops the site, then the
-  maintenance window holds only the dump, the copy of new files, their re-hash and the database proof. Expected quiesce for
+  maintenance window holds only the dump, the copy of new files, their re-hash and the database proof. The re-hash runs inside
+  `ctl prepare` (or `ctl refresh`), so it holds the helper's action lock: other `vasey-staging-ctl` calls, `status` included,
+  wait for it, as they already wait for the build that `prepare` runs under the same lock. Expected quiesce for
   staging's sizes: about 2 to 4 minutes instead of 22 (see the PR evidence; not yet measured on the host).
 - The **first** snapshot after re-provisioning has nothing to share and copies the whole store inside the window (a few minutes
   longer than before the tar was dropped, about 5 to 9 minutes for 38 GB). Let the 03:17 nightly run take it, or deploy at a quiet
@@ -615,6 +629,12 @@ What changed for an operator:
 - Restoring private files from a tree set streams the tree instead of extracting `private.tar` (section 9, case B shows both).
 - Re-provisioning is required: `provision.sh` installs the new `/usr/local/libexec/vasey-staging/private-snapshot.py` and the
   changed `vasey-staging-backup` and `vasey-staging-ctl`; until then every deploy refuses on helper drift.
+- Directory mtimes are not kept in a tree set (the tar sets kept them); file mtimes, modes and contents are.
+- Going back to a kit from before this change (re-provisioning from an older SHA) leaves tree sets that the older helper can
+  neither prove, ship nor restore: it knows only `private.tar`. Restore such a set with this runbook's case B commands, or
+  re-provision with a kit from this change or later first.
+- A reboot or remount can renumber the store's device, which makes every live file look changed: that snapshot copies everything
+  and logs "nothing was shared with <set> although it was re-verified". The next one shares again.
 
 The log is `/var/log/vasey-staging/backup.log`. A set without `RESTORE_CHECK` is unproven. A `*.FAILED`
 directory is kept for inspection and never pruned.

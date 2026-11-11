@@ -231,7 +231,8 @@ Before anything else it compares the root-installed helpers (`vasey-staging-ctl`
    will copy + database + restore proof + margin, plus an encrypted copy of the whole set when off-host hardening is on) against
    the free bytes and refuses with the served release untouched ("FAILED before the quiesce"). `ctl prepare`, `activate` and
    `refresh` repeat it before their own operation marker; `prepare` and `refresh` first re-hash the private files of the backup
-   set the snapshot will share (`space-check --preverify`, site still up; runbook section 8). After the snapshot (predeploy) and after a successful deploy, `ctl backup-prune` /
+   set the snapshot will share (`space-check --preverify`, site still up; runbook section 8) and refuse, with nothing stopped,
+   when that re-hash finds a changed backup file. After the snapshot (predeploy) and after a successful deploy, `ctl backup-prune` /
    `vasey-staging-backup prune` apply `VASEY_BACKUP_KEEP` (or the tiered policy), never the set just taken; see
    `docs/ops/staging-runbook.md` sections 8 and 9.
 5. `ctl activate` obtains one root lease and repeats fresh quiesce/stopped proof immediately before snapshot. It establishes:
