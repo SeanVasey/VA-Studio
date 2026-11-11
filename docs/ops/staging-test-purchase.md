@@ -51,7 +51,7 @@ Both are captured into each immutable test order. Changing them later affects ne
 
 ### 3. Apply the profile on the host
 
-1. Open `ops/staging/test-commerce/env.test-commerce.example`. Copy every key into the host's private `.env`, keeping exactly one copy of each key. Section 1 (runtime) and section 6 (the thirteen capability flags, each stated `false`) normally already exist in the base staging `.env` (`ops/staging/env.staging.example` states them the same way); make sure the values match and keep one copy. The validator refuses a profile that omits any of the thirteen, naming the missing keys, so a `.env` copied before section 6 existed needs those lines added.
+1. Open `ops/staging/test-commerce/env.test-commerce.example`. Copy every key into the host's private `.env`, keeping exactly one copy of each key. Section 1 (runtime) and section 6 (the twelve capability flags, each stated `false`, and the optional unpaid-release flag, also `false` until you [switch it on](#switching-it-on-once-by-the-lead)) normally already exist in the base staging `.env` (`ops/staging/env.staging.example` states them the same way); make sure the values match and keep one copy. The validator refuses a profile that omits any of the thirteen lines, naming the missing keys, so a `.env` copied before section 6 existed needs those lines added.
 2. Replace every placeholder: `<STAGING_HOST>` (host name only), `<acct_ID>` (twice: `STRIPE_ACCOUNT_ID` and inside `VASEY_TEST_PRICING_POLICY`), `<sk_test_KEY>`, `<whsec_SECRET>`, `<SELLER_LEGAL_NAME>`, `<ASSENT_TEXT>`.
 3. Validate, as the application user, from the application root:
 
@@ -148,11 +148,11 @@ php artisan vasey:rights-scope list
 - The service rechecks current staff authority and track/offer/license/rights/media readiness. A link is an audited operator assertion, not proof of ownership. See [shared-rights command and uncertainty recovery](../shared-rights-inventory.md#operator-command-for-test-purchases).
 - If a write reports an unconfirmed result, inspect and retry the **exact original request**, preserving scope, revision and reference. A nonzero exit does not prove rollback.
 
-**An unpaid order keeps its offer reserved.** Preparing an order moves the offer revision's reservation to `pending`, and it stays `pending` until the order is finalized. A paid order releases it. An abandoned, declined-then-abandoned, expired or late-paid order never does (unpaid release is outside this profile). While a reservation is held or pending, nobody else can prepare an order for that offer revision: "Prepare order" fails with `INVENTORY_UNAVAILABLE`. So:
+**An unpaid order keeps its offer reserved.** Preparing an order moves the offer revision's reservation to `pending`, and it stays `pending` until the order is finalized or a staff member releases it. A paid order releases it. An abandoned, declined-then-abandoned or expired order does not release it by itself: staff release it with the optional unpaid-release capability once Stripe shows its checkout session expired unpaid (see [Releasing an abandoned test order](#releasing-an-abandoned-test-order)). A late-paid order (a paid exception) and an order whose Stripe checkout was never opened cannot be released this way. While a reservation is held or pending, nobody else can prepare an order for that offer revision: "Prepare order" fails with `INVENTORY_UNAVAILABLE`. So:
 
 - Two buyers cannot prepare orders against the same rights scope at the same time, including other linked variants.
 - Run the failure drills on a dedicated drill offer, not on an offer you want to keep buying.
-- An abandoned reservation needs a separately reviewed resolution/release path, outside this profile. Publishing a successor or inventing a replacement scope does not establish that the original reservation is resolved. Preserve it as evidence and use dedicated drill content; never change a rights identity to bypass occupancy.
+- An abandoned reservation is resolved only through [Releasing an abandoned test order](#releasing-an-abandoned-test-order), which keeps the original order and its evidence. Publishing a successor or inventing a replacement scope does not establish that the original reservation is resolved. Never change a rights identity to bypass occupancy.
 
 ## The purchase
 
@@ -249,7 +249,7 @@ Run each drill on a fresh order, using a dedicated drill offer: drills 1 (if aba
 
    Or wait for the 60-minute session expiry.
 3. Expect a `checkout.session.expired` delivery, then `receipts <id> expired` in the runner log. The store's checkout status becomes `expired`. No payment, grant, contract or download exists.
-4. The offer revision now stays reserved: a new order for it fails with `INVENTORY_UNAVAILABLE` (setup step 5).
+4. The offer revision now stays reserved: a new order for it fails with `INVENTORY_UNAVAILABLE` (setup step 5) until staff release it ([Releasing an abandoned test order](#releasing-an-abandoned-test-order)). With unpaid release on, release it and confirm that a new order for the offer can be prepared.
 5. Note: the expired intent stays in the reconcile selection. Every eligible reconcile sweep (one-minute minimum by default) reads it from Stripe again and stores one more observation row. This is expected for now (see the findings in the handoff); keep drill orders few.
 
 ### 3. Duplicate webhook
@@ -283,13 +283,67 @@ Run each drill on a fresh order, using a dedicated drill offer: drills 1 (if aba
 2. Expect `finalize <order> paid_exception`. No grant, contract or download. Studio → Test commerce → Test payment exceptions lists it.
 3. The test payment stays captured in Stripe. The application has no refund workflow yet; refunding in the Stripe Dashboard changes nothing in the store.
 
+## Releasing an abandoned test order
+
+Optional, off by default (Sean authorized it for the staging alpha on 2026-11-11). It releases the `pending` reservation (and a pending promotion use) of one test order whose Stripe test checkout ended without payment, so the offer can be bought again. The order, its attempt, its checkout evidence and the release itself are kept; nothing is deleted. It never writes to Stripe: it does not expire a session, cancel a PaymentIntent, capture or refund. Full contract: [test unpaid release](../test-unpaid-release.md).
+
+### When a release is possible
+
+All of these must hold, and the application checks each one itself; staff cannot override any of them:
+
+- The order belongs to the configured Stripe test account and has a recorded Stripe Checkout Session, that is, the buyer pressed **Open Stripe test checkout**. An order that was prepared but never sent to Stripe has no session and cannot be released (result `unavailable`).
+- No verified payment and no finalization is recorded for the order (otherwise `payment_recorded`). A late-paid order (paid exception) keeps its reservation; this path refuses it.
+- Two reads of the session from Stripe both show `status: expired` and `payment_status: unpaid`, with `after_expiration` and `recovered_from` both null, and the same order, attempt, amount, currency, payment methods and line items as the retained request. Its PaymentIntent is absent, or `canceled` with nothing received or capturable.
+
+A session expires 60 minutes after checkout was opened. Until then the result is `not_unpaid`. To release sooner, expire the session first, from a machine with the Stripe CLI logged in to the test account (a test-mode provider write, as in [drill 2](#2-expired-session)): `stripe post /v1/checkout/sessions/cs_test_…/expire`. Expiry is final at Stripe: an expired session cannot be paid, so nothing can be charged for that order afterwards.
+
+### Switching it on (once, by the lead)
+
+In Forge → Environment, keep `STRIPE_MODE=test`, `STRIPE_ACCOUNT_ID` and `STRIPE_TEST_SECRET_KEY` as the profile sets them, replace the `VASEY_TEST_UNPAID_RELEASE_ENABLED=false` line and add the policy line exactly as shown in `ops/staging/test-commerce/env.test-commerce.example` section 6 (single quotes around the JSON, one line):
+
+```dotenv
+VASEY_TEST_UNPAID_RELEASE_ENABLED=true
+VASEY_TEST_UNPAID_RELEASE_POLICY='{"schema_version":1,"purpose":"test_unpaid_resource_release","version":"test-unpaid-release-v1","provider":"stripe","mode":"test","proof":"bound_expired_unpaid_session_and_absent_or_canceled_zero_payment","recovery":"disabled","resources":"pending_to_released","late_confirmation":"paid_exception_preserve_released","provider_writes":"forbidden"}'
+```
+
+Then **Deploy Now**. The deploy gate (`ops/staging/validate-runtime.php`) accepts the flag only as exactly `false`, or as exactly `true` with Stripe test mode, an `acct_` account and this exact policy; anything else fails the deploy with `FAIL runtime.optional_vasey_test_unpaid_release_enabled` and nothing changes on the host. As the application user, `php scripts/ops/validate-test-commerce-profile.php .env` then reports `PASS boundary.optional_capabilities_admitted`. The production validator refuses the flag in any value but `false` (`holds.vasey_test_unpaid_release_enabled`), and the policy class refuses production in code as well. To switch it off, set the flag back to `false` and deploy; releases already recorded stay recorded.
+
+### Release one order (staff, signed in with MFA)
+
+1. Note the order reference: the buyer's order page, the cart's order status, or step 2.
+2. Optional, to see every order that still holds a reservation, as the application user (read only):
+
+   ```sh
+   php artisan tinker --execute='foreach (DB::table("inventory_reservations as r")->join("order_attempts as a", "a.inventory_reservation_id", "=", "r.id")->join("orders as o", "o.id", "=", "a.order_id")->leftJoin("checkout_intents as i", "i.order_id", "=", "o.id")->leftJoin("checkout_sessions as s", "s.checkout_intent_id", "=", "i.id")->where("r.state", "pending")->orderBy("r.id")->get(["o.public_id", "r.pending_at", "s.id as session"]) as $x) echo $x->public_id, " pending_since=", $x->pending_at, " stripe_session=", $x->session ? "yes" : "none", PHP_EOL;'
+   ```
+
+   `stripe_session=none` means the order cannot be released with this path. A paid order is never `pending` here, but a paid exception is: the release reports `payment_recorded` for it.
+3. Studio → **Test commerce** → **Test unpaid release**. Search for the order reference. Listing an order does not mean it is unpaid.
+4. **Release history** shows the current state: "Eligible unpaid status has not been established" (no release yet), "A release is recorded" (done) or "Payment is recorded".
+5. **Verify unpaid status and release**, then confirm. The dialog makes the Stripe reads (GET only) and, only if every condition above holds, records the release and frees the reservation in one database transaction.
+6. Read the notification:
+
+   | Result | Meaning | Next |
+   | --- | --- | --- |
+   | Test resources released | Released now, or a release was already recorded for this order | Prepare a new order for the offer to confirm |
+   | Unpaid status was not established (`not_unpaid`) | Stripe shows the session still open, complete, or with a payment in progress | Wait for the 60-minute expiry or expire the session, then close the dialog and start a new check |
+   | Release evidence needs attention (`attention`) | Stripe's answer is incomplete or contradicts the retained order | Do not retry blindly; keep the order as evidence and report it |
+   | Unpaid verification is unavailable (`unavailable`) | No Stripe session for the order, Stripe could not be read (key, network, account), or the reads did not match each other or the order | Check `php scripts/ops/validate-test-commerce-profile.php --probe --i-understand-this-calls-stripe .env`; an order without a session cannot be released |
+   | Payment is already recorded (`payment_recorded`) | A verified payment or finalization exists | Not an abandoned order; nothing to release |
+   | Release check is in progress (`busy`) | Another check of this order holds its 2-minute lease | Wait, then retry the same dialog |
+   | Release review is out of date (`stale`) | The history moved since the dialog opened | Close the dialog and start again |
+
+7. **"Release was not confirmed. The outcome is uncertain."** means the request failed part-way (a lost connection, a timeout, a changed record) and the application cannot say whether the release committed. Nothing is assumed either way. Press confirm again in the **same** dialog: it carries the same request identifier, so a release that already committed is reported as released and is never applied twice. If the dialog was closed, open **Release history**: "A release is recorded" means it committed; otherwise start a new check.
+
+Every review and check writes an audit event (`commerce.unpaid_release.reviewed`, `.requested`, `.observed`) naming the staff member. A released order cannot be checked out again (its status reads `expired`). If a payment for it were ever verified later, it would be kept as money and finalized as a paid exception with reason `released_attempt`, with no license, contract or download, and the reservation stays released.
+
 ## Troubleshooting
 
 | Symptom | Likely cause | Check |
 | --- | --- | --- |
 | Cart says checkout is not available | A profile flag or policy is off or invalid | `php scripts/ops/validate-test-commerce-profile.php .env` |
 | `INVENTORY_SCOPE_UNAVAILABLE` on Prepare order | Offer revision not linked | Setup step 5 |
-| `INVENTORY_UNAVAILABLE` on Prepare order | A held or pending reservation occupies the actual rights scope, including linked variants | Identify the occupied scope/reservation. An unused hold can expire; a pending abandoned order needs the separately reviewed resolution path. Use dedicated drill content and preserve the original evidence (setup step 5). |
+| `INVENTORY_UNAVAILABLE` on Prepare order | A held or pending reservation occupies the actual rights scope, including linked variants | List the pending orders ([Releasing an abandoned test order](#releasing-an-abandoned-test-order), step 2). An unused hold expires by itself; a pending abandoned order is released by staff once its Stripe session has expired unpaid. A paid exception or an order without a Stripe session cannot be released: use dedicated drill content and preserve the original evidence (setup step 5). |
 | `PRICING_UNAVAILABLE` | Pricing policy invalid or outside its window | `commerce.pricing` check |
 | `PRICING_CHANGED` on an open cart | The pricing policy changed after the cart was priced | Start a new cart |
 | Webhook delivery `400 STRIPE_WEBHOOK_INVALID` | Wrong `STRIPE_WEBHOOK_SECRET`, host clock more than 5 minutes off, or both the Dashboard endpoint and `stripe listen` in use | Re-copy the secret; check `timedatectl` |
