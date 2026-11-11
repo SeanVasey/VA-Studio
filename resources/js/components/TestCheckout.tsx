@@ -166,6 +166,10 @@ function Checkout({ orderId, enabled = false, expectedTotalMinor, retainedProgre
     }
   }
 
+  // Timers outlive the render that started them; they call the latest request so its payment-regression guard sees current progress.
+  const latestRequest = useRef(request);
+  latestRequest.current = request;
+
   useEffect(() => {
     active.current = true;
     void request('read');
@@ -189,10 +193,10 @@ function Checkout({ orderId, enabled = false, expectedTotalMinor, retainedProgre
     pollStartedAt.current ??= Date.now();
     const timer = window.setInterval(() => {
       if (Date.now() - (pollStartedAt.current ?? Date.now()) >= POLL_MAX_MS) { setPollState('timed_out'); return; }
-      void request('read').then(ok => { if (ok === false && active.current) setPollState('error'); });
+      void latestRequest.current('read').then(ok => { if (ok === false && active.current) setPollState('error'); });
     }, POLL_INTERVAL_MS);
     return () => window.clearInterval(timer);
-  // request only touches refs and state setters; the keyed component fixes the order identity.
+  // The interval reads the request through latestRequest, so it never holds a stale closure; the keyed component fixes the order identity.
   }, [polling]);
 
   // URLs stay only in this component's memory and disappear while an observation is uncertain or expired.
