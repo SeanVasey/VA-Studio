@@ -16,6 +16,7 @@ use Illuminate\Database\Events\TransactionCommitted;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
@@ -36,6 +37,32 @@ class SoundKitRecoveryTest extends TestCase
         $revision = app(SoundKitIntake::class)->handle($draft->id, UploadedFile::fake()->createWithContent('kit.zip', $bytes ?? StemsFixtures::zip([['name' => 'Kick.wav']])), 1, $actor);
 
         return [$actor, $draft, $revision];
+    }
+
+    public function test_the_private_kit_lock_is_owner_only_whatever_the_callers_umask(): void
+    {
+        $previous = umask(0002); // a console run under sudo, not the queue worker's umask
+        try {
+            $source = tempnam(sys_get_temp_dir(), 'kit-lock-');
+            file_put_contents($source, 'Kit bytes');
+            $root = Storage::disk('local')->path('');
+            $fresh = (string) Str::uuid();
+            app(SoundKitFiles::class)->preserve($source, $fresh, 'source.zip', hash_file('sha256', $source), filesize($source));
+            clearstatcache();
+            $this->assertSame('0600', sprintf('%04o', fileperms($root.'sound-kits/revisions/'.$fresh.'/.write-lock') & 0777));
+
+            // A lock an older run left group-writable is tightened before it is used.
+            $stale = (string) Str::uuid();
+            mkdir($root.'sound-kits/revisions/'.$stale, 0700, true);
+            touch($root.'sound-kits/revisions/'.$stale.'/.write-lock');
+            chmod($root.'sound-kits/revisions/'.$stale.'/.write-lock', 0664);
+            app(SoundKitFiles::class)->preserve($source, $stale, 'source.zip', hash_file('sha256', $source), filesize($source));
+            clearstatcache();
+            $this->assertSame('0600', sprintf('%04o', fileperms($root.'sound-kits/revisions/'.$stale.'/.write-lock') & 0777));
+            @unlink($source);
+        } finally {
+            umask($previous);
+        }
     }
 
     public function test_repeated_ready_rollback_reuses_one_archive_then_commits_exactly_one_verified_outcome(): void

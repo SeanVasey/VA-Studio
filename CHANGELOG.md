@@ -32,6 +32,8 @@ Work merged before this file existed is recorded PR by PR in [docs/development-o
 
 ### Fixed
 
+- Sound-kit storage creates its private `.write-lock` files owner-only (0600) whatever the caller's umask, and tightens a lock an earlier run left group-writable. A staging CLI kit import under `sudo` had left two 0664 locks, which made the next deploy's snapshot proof refuse the private tree and stop the site until recovery.
+
 - Media reference registry classifies `production_tax_refused_order_resolutions.evidence_ciphertext` (added by the refused-order resolution, #308) as opaque, like every other `*_ciphertext` column, so the media-lifecycle proof is complete again.
 
 - Media reference registry: classified the 16 columns added by recent PRs without a registry entry, which turned `tests/Feature/MediaLifecycle/MediaReferenceRegistryTest.php` red on main (5 of 6 tests). `merch_fulfillments.request_ciphertext` is `OPAQUE` (encrypted postal address and Printful items). `album_releases.artwork_image_id` and `artwork_manifest_sha256`, and `sound_kit_products.manifest_sha256`, are `REVIEWED` as site-image and kit-file references that never name `media_assets` (same treatment as `site_images.manifest_sha256` and `sound_kit_revisions.manifest_sha256`), so they do not raise a false `hash_only_manifest` blocker. `service_publications.manifest_sha256` is `REVIEWED` as a copy of the draft version digest. The other columns are prose, links, tracking identifiers, byte ranges or collection and schedule set-up with no sale or commitment (`docs/media-processing.md` lists the two track-level ones).

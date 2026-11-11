@@ -27,10 +27,18 @@ final class SoundKitFiles
         if (is_link($lockPath) || ($before !== false && ($before['mode'] & 0170000) !== 0100000)) {
             throw new MediaFailure('unsafe_storage', 'The private kit lock is unsafe.');
         }
-        $lock = @fopen($lockPath, 'c+b');
+        // The lock lives in the private tree, whose files must be 0600 or 0400 whatever the caller's umask: a console run
+        // (for example the staging CLI import under sudo) inherits a looser umask than the queue worker.
+        $mask = umask(0077);
+        try {
+            $lock = @fopen($lockPath, 'c+b');
+        } finally {
+            umask($mask);
+        }
         $opened = $lock ? fstat($lock) : false;
         if (! $opened || ($opened['mode'] & 0170000) !== 0100000
-            || ($before !== false && ($before['ino'] !== $opened['ino'] || $before['dev'] !== $opened['dev']))) {
+            || ($before !== false && ($before['ino'] !== $opened['ino'] || $before['dev'] !== $opened['dev']))
+            || (($opened['mode'] & 0777) !== 0600 && ! @chmod($lockPath, 0600))) {
             if (is_resource($lock)) {
                 fclose($lock);
             }
