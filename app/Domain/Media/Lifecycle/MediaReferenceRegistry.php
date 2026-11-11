@@ -197,6 +197,7 @@ final class MediaReferenceRegistry
         'production_suppression_confirmations.receipt_ciphertext', 'production_suppression_targets.recipient_ciphertext',
         'production_tax_checkout_bindings.payload_ciphertext', 'production_tax_checkout_orders.payload_ciphertext',
         'production_tax_checkout_requests.payload_ciphertext', 'production_tax_checkout_reviewed_sessions.payload_ciphertext',
+        'production_tax_refused_order_resolutions.evidence_ciphertext',
         'production_track_capability_approvals.approval_ciphertext',
         'production_track_capability_candidates.payload_ciphertext',
         'production_track_capability_closures.closure_ciphertext', 'production_track_policy_source_reviews.review_ciphertext',
