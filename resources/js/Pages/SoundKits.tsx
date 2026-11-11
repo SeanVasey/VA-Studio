@@ -1,5 +1,6 @@
 import type { MouseEvent } from 'react';
 import { router } from '@inertiajs/react';
+import { AlbumCover } from '../components/AlbumCover';
 import { Icon } from '../components/Icon';
 import { MetadataHead } from '../components/MetadataHead';
 import { SiteFooter, SiteHeader } from '../components/SiteChrome';
@@ -31,6 +32,7 @@ export default function SoundKits({ siteContent, kits, metadata }: SoundKitsProp
       {kits.length === 0
         ? <p className="sound-kits-empty">No sound kits are published yet.</p>
         : <ul className="sound-kit-list" aria-label="Sound kits">{kits.map(kit => <li className="sound-kit-card" key={kit.slug}>
+          {kit.cover && <div className="sound-kit-art"><AlbumCover cover={kit.cover} sizes="(min-width: 900px) 320px, 100vw" /></div>}
           <h2><a href={href(kit.path)} onClick={navigate}>{kit.title}</a></h2>
           <p className="sound-kit-meta">{kit.memberCount} {kit.memberCount === 1 ? 'sample' : 'samples'}</p>
           <p className="sound-kit-price">{formatMoney(kit.priceMinor, kit.currency)}</p>

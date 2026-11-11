@@ -15,6 +15,7 @@ use App\Jobs\NotifyInquiryOperatorJob;
 use App\Jobs\ProcessMedia;
 use App\Jobs\ProcessSiteImage;
 use App\Jobs\ProcessSoundKit;
+use App\Jobs\ProcessSoundKitDemo;
 use App\Jobs\ProcessStripeReceiptJob;
 use App\Jobs\RetrieveMembershipInvoice;
 
@@ -136,6 +137,7 @@ final class MediaReferenceRegistry
         ProcessMedia::class => ['runId', 'media_processing_runs'],
         ProcessSiteImage::class => null,
         ProcessSoundKit::class => null,
+        ProcessSoundKitDemo::class => null,
         ProcessStripeReceiptJob::class => null,
         RetrieveMembershipInvoice::class => null,
     ];
@@ -315,6 +317,9 @@ final class MediaReferenceRegistry
         'service_publications.manifest_sha256' => 'Copy of the pinned service_draft_versions.manifest_sha256, whose manifest column is classified itself (opaque).',
         'sessions.payload' => 'Encrypted browser session: never authoritative.', 'sessions.user_agent' => 'A user agent string.',
         'site_images.evidence' => self::OWN_FILES, 'site_images.manifest_sha256' => self::OWN_FILES,
+        'sound_kit_demos.evidence' => self::OWN_FILES, 'sound_kit_demos.preview_path' => self::OWN_FILES, 'sound_kit_demos.preview_sha256' => self::OWN_FILES,
+        'sound_kit_demos.preview_size_bytes' => self::OWN_FILES, 'sound_kit_demos.waveform' => 'Display peaks of the demo preview.',
+        'sound_kit_products.cover_manifest_sha256' => self::OWN_FILES,
         'sound_kit_drafts.description' => self::PROSE, 'sound_kit_revisions.description_snapshot' => self::PROSE,
         'sound_kit_revisions.evidence' => self::OWN_FILES, 'sound_kit_revisions.manifest' => self::OWN_FILES,
         'sound_kit_revisions.manifest_sha256' => self::OWN_FILES, 'sound_kit_revisions.profile' => self::OWN_FILES,

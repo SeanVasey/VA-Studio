@@ -48,6 +48,7 @@
     "tests/Feature/SharedInventoryMigrationTest.php",
     "tests/Feature/SiteImageMigrationTest.php",
     "tests/Feature/SiteRelatedTrackImageMigrationTest.php",
+    "tests/Feature/SoundKitMediaMigrationTest.php",
     "tests/Feature/SoundKitMigrationTest.php",
     "tests/Feature/SoundKitUploadMigrationTest.php",
     "tests/Feature/TestContractIssuanceMigrationTest.php",
