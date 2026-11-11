@@ -335,6 +335,8 @@ final class PublicCatalog
                     'durationSeconds' => $preview->technical_metadata['duration_seconds'], 'tags' => $track->tags ?? [], 'waveform' => $preview->technical_metadata['waveform'],
                     'artworkUrl' => route('media.public', $assets->firstWhere('role', 'artwork')->id),
                     'previewUrl' => route('media.public', $served->id),
+                    // True when the served preview carries the spoken tag; false when the track's setting serves its verified untagged sibling.
+                    'previewTagged' => $served->role !== 'preview_untagged',
                     'shareUrl' => route('tracks.show', $track->slug),
                     'offers' => $track->offers->where('is_active', true)->map(function ($offer) use ($track) {
                         $revision = $offer->currentRevision;

@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SoundKitBuy } from '../../resources/js/components/SoundKitBuy';
@@ -132,5 +132,128 @@ describe('kit order page', () => {
     expect(JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body))).toEqual({ kind: 'archive' });
     expect(submitted).toEqual([{ action: `/sound-kit-orders/${orderId}/delivery/download`, method: 'post', authorizationId: 'a-1', token: 'f'.repeat(64), _token: '' }]);
     expect(document.querySelector('form[hidden]')).toBeNull();
+  });
+});
+
+describe('kit order page automatic refresh', () => {
+  const flush = async (ms: number) => { await act(async () => { await vi.advanceTimersByTimeAsync(ms); }); };
+  const statusUrl = `/sound-kit-orders/${orderId}/status`;
+  const at = (status: SoundKitOrderState['status']) => ({ ...order, status });
+  const page = (status: SoundKitOrderState['status']) => render(<SoundKitOrder siteContent={defaultSiteContent} order={at(status)} />);
+  afterEach(() => vi.useRealTimers());
+
+  it('polls the owner-authorized status read every 10 seconds until the kit is downloadable, announcing it politely', async () => {
+    vi.useFakeTimers();
+    const fetcher = vi.spyOn(globalThis, 'fetch')
+      .mockImplementationOnce(() => json(at('awaiting_contract'))).mockImplementationOnce(() => json(at('awaiting_delivery')))
+      .mockImplementationOnce(() => json({ ...at('downloadable'), deliverables: ['archive', 'contract'] }));
+    page('paid');
+    const note = screen.getByTestId('order-auto-refresh');
+    expect(note).toHaveTextContent('Checking for updates automatically');
+    expect(note).toHaveAttribute('aria-live', 'polite');
+    await flush(9_999);
+    expect(fetcher).not.toHaveBeenCalled();
+    await flush(1);
+    expect(screen.getByRole('status')).toHaveTextContent('license contract is being prepared');
+    await flush(10_000);
+    expect(screen.getByRole('status')).toHaveTextContent('Test downloads open once delivery is enabled');
+    await flush(10_000);
+    expect(screen.getByRole('status')).toHaveTextContent('Each download link is single-use');
+    expect(screen.getByRole('button', { name: 'Download the kit (ZIP)' })).toBeInTheDocument();
+    expect(screen.queryByTestId('order-auto-refresh')).toBeNull();
+    await flush(60_000);
+    expect(fetcher).toHaveBeenCalledTimes(3);
+    expect(fetcher.mock.calls.every(([url, init]) => url === statusUrl && init?.method === 'GET')).toBe(true);
+  });
+
+  it.each(['not_started', 'checkout_started', 'expired', 'downloadable'] as const)('does not poll a %s order', async status => {
+    vi.useFakeTimers();
+    const fetcher = vi.spyOn(globalThis, 'fetch');
+    page(status);
+    await flush(60_000);
+    expect(fetcher).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('order-auto-refresh')).toBeNull();
+  });
+
+  it('refuses a read that would move the order backwards, shows the error treatment and stops', async () => {
+    vi.useFakeTimers();
+    const fetcher = vi.spyOn(globalThis, 'fetch')
+      .mockImplementationOnce(() => json(at('awaiting_contract'))).mockImplementation(() => json(at('paid')));
+    page('paid');
+    await flush(10_000);
+    expect(screen.getByRole('status')).toHaveTextContent('license contract is being prepared');
+    await flush(10_000);
+    // The older `paid` read is not applied; the newer state stays and polling stops with the alert.
+    expect(screen.getByRole('status')).toHaveTextContent('license contract is being prepared');
+    expect(screen.getByRole('alert')).toHaveTextContent('could not be loaded');
+    expect(screen.getByTestId('order-auto-refresh')).toHaveTextContent('Automatic checking has stopped because the status could not be loaded');
+    await flush(60_000);
+    expect(fetcher).toHaveBeenCalledTimes(2);
+  });
+
+  it('stops on the first failed read', async () => {
+    vi.useFakeTimers();
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(() => json({ code: 'UNAVAILABLE', message: 'Nope.' }, 500));
+    page('awaiting_contract');
+    await flush(10_000);
+    expect(screen.getByRole('alert')).toHaveTextContent('could not be loaded');
+    await flush(60_000);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+
+  it('stops after about fifteen minutes', async () => {
+    vi.useFakeTimers();
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(() => json(at('awaiting_delivery')));
+    page('awaiting_delivery');
+    await flush(900_000);
+    const calls = fetcher.mock.calls.length;
+    expect(calls).toBeGreaterThanOrEqual(89);
+    expect(calls).toBeLessThanOrEqual(91);
+    await flush(60_000);
+    expect(fetcher).toHaveBeenCalledTimes(calls);
+    expect(screen.getByTestId('order-auto-refresh')).toHaveTextContent('Automatic checking has stopped after 15 minutes');
+  });
+
+  it('stops polling on unmount', async () => {
+    vi.useFakeTimers();
+    const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(() => json(at('paid')));
+    const { unmount } = page('paid');
+    await flush(10_000);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    unmount();
+    await flush(60_000);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not start a poll while an owner action is running, using the current render rather than the one that started the timer', async () => {
+    vi.useFakeTimers();
+    let finish: (value: Response) => void = () => undefined;
+    const fetcher = vi.spyOn(globalThis, 'fetch')
+      .mockImplementationOnce(() => new Promise<Response>(resolve => { finish = resolve; }))
+      .mockImplementation(() => json(at('paid')));
+    render(<SoundKitOrder siteContent={defaultSiteContent} order={at('paid')} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Check payment status' }));
+    await flush(110_000);
+    // Only the reconcile POST is in flight: the interval saw busy=true through the latest-request ref.
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect((fetcher.mock.calls[0][1] as RequestInit).method).toBe('POST');
+    await act(async () => { finish(new Response(JSON.stringify(at('awaiting_contract')), { status: 200, headers: { 'Content-Type': 'application/json' } })); await vi.advanceTimersByTimeAsync(0); });
+    expect(screen.getByRole('status')).toHaveTextContent('license contract is being prepared');
+  });
+
+  it('discards a poll that was in flight when a newer owner write landed', async () => {
+    vi.useFakeTimers();
+    let release: (value: Response) => void = () => undefined;
+    vi.spyOn(globalThis, 'fetch')
+      .mockImplementationOnce(() => new Promise<Response>(resolve => { release = resolve; }))
+      .mockImplementationOnce(() => json(at('awaiting_delivery')));
+    render(<SoundKitOrder siteContent={defaultSiteContent} order={at('paid')} />);
+    await flush(10_000);
+    fireEvent.click(screen.getByRole('button', { name: 'Check payment status' }));
+    await flush(0);
+    expect(screen.getByRole('status')).toHaveTextContent('Test downloads open once delivery is enabled');
+    await act(async () => { release(new Response(JSON.stringify(at('awaiting_contract')), { status: 200, headers: { 'Content-Type': 'application/json' } })); await vi.advanceTimersByTimeAsync(0); });
+    expect(screen.getByRole('status')).toHaveTextContent('Test downloads open once delivery is enabled');
+    expect(screen.queryByRole('alert')).toBeNull();
   });
 });

@@ -40,6 +40,8 @@ export interface Track {
   durationSeconds: number;
   artworkUrl: string | null;
   previewUrl: string | null;
+  /** Whether the served preview carries the tag. Absent when the source does not say, which renders neutral wording. */
+  previewTagged?: boolean;
   waveform: number[];
   tags: string[];
   offers: Offer[];

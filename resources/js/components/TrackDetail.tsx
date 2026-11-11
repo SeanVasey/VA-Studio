@@ -23,7 +23,7 @@ export function TrackDetail({ track, tiers, catalogUrl, onNavigate, onLicense, o
         <div className="detail-waveform" aria-hidden="true">{peaks.map((peak, index) => <span key={index} className={current && index / peaks.length < audio.currentTime / (audio.duration || track.durationSeconds || 1) ? 'played' : ''} style={{ height: `${Math.max(4, peak / peakMaximum * 100)}%` }} />)}</div>
         <div className="detail-actions"><button className="button" disabled={!safeMediaUrl(track.previewUrl)} onClick={() => player.toggle(track)} aria-label={playing ? `Pause ${track.title}` : `Play ${track.title}`}><Icon name={playing ? 'pause' : 'play'} />{playing ? 'Pause preview' : 'Play preview'}</button><a className="button button-outline" href="#licenses">View licenses <Icon name="arrow" /></a><button className="icon-button" onClick={() => onShare(track)} aria-label={`Share ${track.title}`}><Icon name="share" /></button></div>
         {!safeMediaUrl(track.previewUrl) && <p className="fine-print">This preview is unavailable.</p>}
-        <p className="fine-print">Listen to the tagged preview. Your license determines the delivered files.</p>
+        <p className="fine-print">{track.previewTagged ? 'Listen to the tagged preview.' : 'Listen to the preview.'} Your license determines the delivered files.</p>
         {!!track.tags.length && <ul className="detail-tags" aria-label="Track tags">{track.tags.map(tag => <li key={tag}>{tag}</li>)}</ul>}
       </div>
     </div>
