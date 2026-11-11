@@ -62,6 +62,17 @@ export async function soundKitPost<T>(url: string, body: Record<string, unknown>
   return data;
 }
 
+/** GET JSON from a same-origin kit endpoint. Read-only: the server answers from retained state and sends nothing to a provider. */
+export async function soundKitGet<T>(url: string): Promise<T> {
+  const response = await fetch(url, { method: 'GET', credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json' } });
+  const data = await response.json().catch(() => null) as (T & { code?: string; message?: string }) | null;
+  if (!response.ok || data === null) {
+    throw new SoundKitRequestError(typeof data?.code === 'string' ? data.code : 'UNAVAILABLE',
+      typeof data?.message === 'string' ? data.message : 'This request could not be completed.');
+  }
+  return data;
+}
+
 /** Only a Stripe test Checkout address is ever followed. */
 export function stripeTestCheckoutUrl(value: unknown): value is string {
   if (typeof value !== 'string' || value.length > 4096 || /[\u0000-\u0020\u007f\\]/.test(value)) return false;
