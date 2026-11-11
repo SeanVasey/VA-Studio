@@ -15,7 +15,7 @@ This guide is for Sean and the staging operator. It covers one guest purchase on
 | Finalization (grant + pending entitlements) | Queue worker, or the runner | Runner log `finalize <order> paid` |
 | Test contract PDF (`test-buyer-pdf-v2`) | `contracts` queue worker, or the runner | Runner log `contracts <grant> ready`; Studio → Test commerce → Test contract issuance |
 | Fulfillment activation | The runner only | Runner log `activate <order> activated` |
-| Download enable | **The operator, per order** | `vasey:control-test-delivery` output `enabled version=1` |
+| Download enable | **Staff, per order**: Studio → Test commerce → Test track orders, "Enable delivery" (or the operator command) | Notice "Delivery is now enabled (version 1)."; or `vasey:control-test-delivery` output `enabled version=1` |
 | Download of the exact files | Buyer's browser, same session | Browser download; server re-hashes each file before streaming |
 
 A return to the store from Stripe proves nothing about payment. Only the signed event or an explicit reconcile, followed by Stripe API reads, records a verified payment.
@@ -168,7 +168,7 @@ Use one browser, signed in to nothing. The guest's order ownership lives in that
 | 4 | Press **Open Stripe test checkout**, then **Continue to Stripe test checkout**. | Stripe's hosted page shows "VASEY.AUDIO test license 1", the same amount and card payment (Link, and Apple Pay or Google Pay where the browser offers them, may also appear; bank debit, Klarna and similar are not requested. See "Payment methods seen on 2026-11-11" below). | The Stripe page address contains the `cs_test_…` session ID; Dashboard → Developers → Logs shows the `POST /v1/checkout/sessions` request. |
 | 5 | Pay with card `4242 4242 4242 4242`, any future expiry, any CVC, any postcode. | Stripe redirects back to the store's return page. It says the result is not verified yet. | `php artisan vasey:stripe-inbox --limit=5` lists a `checkout.session.completed` receipt. Dashboard → Webhooks shows a `200` delivery. |
 | 6 | Wait up to two minutes, then press **Check Stripe test checkout status** or reload. | Payment `verified`; contract and fulfillment progress. | Runner log, only for the work the runner itself does: `receipts <id> awaiting_finalization`, `finalize <order> paid`, `contracts <grant> ready`. The queue workers usually get there first, as on the 2026-11-10 run, and then the runner log shows only `activate <order> activated`. In that case the evidence is `php artisan vasey:stripe-inbox`, Studio → Test commerce → Test contract issuance ("Original recorded") and the order status on the return page. |
-| 7 | Operator enables delivery for this order (below). | — | Output `<control id> enabled version=1`. |
+| 7 | Staff enable delivery for this order in Studio → Test commerce → Test track orders, or the operator runs the command (below). | The row reads "Delivery enabled". | Notice "Delivery is now enabled (version 1).", or command output `<control id> enabled version=1`. |
 | 8 | On the return page (or the cart's order status), press **Check Stripe test checkout status**. The downloads section appears once payment is verified, the order is paid and the contract is issued. Download the contract and each file. | `<grant>-contract.pdf` and the purchased files (`master_wav`, `download_mp3`, `stems_zip` as the license requires). Each click gives one 60-second, single-use authorization; at most three per minute per order. | The server re-hashes every file before streaming. Optional check below. |
 
 **The return page refreshes itself.** After payment the order can stay at "finalization pending" for up to about a minute while the server finishes, because the page catches up only once activation has run. While the order is waiting on the server, the page re-reads its status about every 5 seconds for up to 3 minutes and announces the change; it stops when the order settles, when a read fails or after 3 minutes. The **Refresh test order status** and **Check Stripe test checkout status** buttons still work at any time, and after an automatic stop you press one of them to check again.
@@ -177,9 +177,13 @@ Use one browser, signed in to nothing. The guest's order ownership lives in that
 
 **Payment methods seen on 2026-11-11.** The run on that date showed Bank and Klarna as well as card on Stripe's page. The store's checkout request names only `card` and `link` (`CheckoutPaymentMethods::OFFERED`; unit and wire-level tests assert it), and a returned session that does not echo exactly that set is refused, so those two extra options are not explained by this repository. Before the next run, compare the `POST /v1/checkout/sessions` request body in Dashboard → Developers → Logs (it must contain `payment_method_types[0]=card` and `[1]=link`) and note which build was deployed. If the body is right, the extra options come from Stripe's side (for example Link's own funding choices) and are not a store defect.
 
-### Enable delivery for one order (operator)
+### Enable delivery for one order
 
-Enabling downloads is a deliberate per-order decision and is never automatic. The order must already be activated (runner log `activate <order> activated`). Provision the control blocked, then enable it:
+Enabling downloads is a deliberate per-order decision and is never automatic (D-19: an explicitly provisioned blocked control, then an explicit enable). The order must already be activated (runner log `activate <order> activated`).
+
+**From the admin (staff).** Studio → Test commerce → **Test track orders** lists every track order that reached Stripe test checkout for the configured account, with its payment, grant, contract, activation and delivery state; the "Awaiting delivery" filter shows activated orders whose downloads are not enabled. On the order's row press **Enable delivery**, enter a reference (1–192 letters, digits or `._:/-`) and confirm. For an order that was never enabled this records the same two transitions as the commands below (blocked version 0, then enabled version 1), through the same control service (`ManageTestDeliveryControl`), so the same environment, Stripe test mode, account, owner-delivery policy, complete-activation and expected-version checks apply. **Block delivery** withdraws access. The page exists only where the command can act (local, testing or staging with Stripe test mode and an `acct_` account; never production), and the service itself requires `administer-catalog` and enrolled admin MFA wherever the panel requires it. Every attempt on a listed order by an authorized staff member adds a `commerce.delivery.staff_action.delivery_enable` or `..._block` audit event (a caller refused as not authorized, or naming an order outside the list, is refused without one) with the staff member, the result (`accepted`, `unchanged` or `refused`), the resulting version and the reference hash; the control service's own `commerce.delivery.control_provisioned` / `control_changed` events are recorded as for the command. Asking for the state an order already has changes nothing and says so; unlike the command, that answer does not check the expected version or the owner-delivery switch. If enabling fails after the page provisioned the control, the notice says the control was recorded as blocked (version 0). With `VASEY_TEST_DELIVERY_ACCESS_ENABLED=false` the page still opens and can block, but enabling is refused before anything is recorded.
+
+**From the console (operator).** Provision the control blocked, then enable it:
 
 ```sh
 php artisan vasey:control-test-delivery <ORDER_UUID> block  --expected-version=0 --reference=staging-YYYYMMDD-01
@@ -356,7 +360,7 @@ Every review and check writes an audit event (`commerce.unpaid_release.reviewed`
 | `contracts <grant> retry` or `quarantined` | Renderer runtime or private storage problem | Validator `contracts.renderer_runtime`; ownership and mode `0700` of `storage/app/private` |
 | `activate <order> pending_contracts` | Contracts not issued yet | Wait for the next sweep |
 | `activate <order> asset_unavailable` | A purchased file is missing or changed on disk | Restore the exact file; never re-upload over it |
-| Download shows unavailable | Delivery not enabled, or a different browser session | "Enable delivery for one order"; use the same browser |
+| Download shows unavailable | Delivery not enabled, or a different browser session | "Enable delivery for one order" (Test track orders row, or the command); use the same browser |
 
 ## Stopping test commerce
 
