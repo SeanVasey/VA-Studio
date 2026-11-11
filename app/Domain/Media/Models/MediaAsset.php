@@ -3,7 +3,7 @@
 namespace App\Domain\Media\Models;
 
 use App\Domain\Catalog\Models\Track;
-use App\Domain\Media\PreviewTagResolver;
+use App\Domain\Media\PreviewTag\PreviewTagResolver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;

@@ -81,7 +81,8 @@ final class SoundKitDemoProcessor
                 throw new MediaFailure('demo_too_long', 'A demo may be at most '.(SoundKitProductMedia::DEMO_MAX_SECONDS / 60).' minutes long.');
             }
             $evidence['profile_fingerprint'] = app(MediaProfile::class)->fingerprint($profile);
-            $outputs = $audio->build($input, $tag, $profile, $workspace);
+            // A demo keeps a single tagged preview: the untagged variant is a track-only feature (docs/media-processing.md).
+            $outputs = $audio->build($input, $tag, $profile, $workspace, untaggedPreview: false);
             $preview = collect($outputs)->firstWhere('role', 'preview_tagged');
             if ($preview === null || ($preview['technical_metadata']['full_length'] ?? false) !== true) {
                 throw new MediaFailure('processor_failed', 'The tagged preview could not be produced.');
