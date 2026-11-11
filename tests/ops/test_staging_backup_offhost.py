@@ -965,7 +965,7 @@ fi""")
         recipients = self.recipients()
         bk = self.make_set()
         # The site is up when pending sets ship, so waiting for a manual ship is harmless. predeploy (quiesced) never ships at all.
-        self.assertIn("SHIP_PENDING_LOCK_WAIT=600", SOURCE)
+        self.assertIn("SHIP_PENDING_LOCK_WAIT=3600", SOURCE)
         self.assertIn("SHIP_LOCK_WAIT=$SHIP_PENDING_LOCK_WAIT; ship", SOURCE)
         predeploy = SOURCE[SOURCE.index("  predeploy)"):SOURCE.index("  space-check)")]
         self.assertNotIn("SHIP_LOCK_WAIT", predeploy)
@@ -1238,6 +1238,14 @@ space_check'''
         extra = base + 150_000 + 150_000 * 20 // 100
         self.assertEqual(self.check(free=extra, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
         self.assertEqual(self.check(free=base).returncode, 0, "an unhardened host has no staging copy to wait for")
+
+    def test_a_ship_pending_run_between_two_sets_is_counted_like_a_running_ship(self):
+        base = (150_000 * 2) + (150_000 * 2) * 20 // 100 + 268_435_456
+        held = open(self.backups / ".ship-pending.lock", "a")  # only the run lock is held: .offhost.lock is free between sets
+        self.addCleanup(held.close)
+        fcntl.flock(held, fcntl.LOCK_EX)
+        self.assertNotEqual(self.check(free=base, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        self.assertEqual(self.check(free=base + 150_000 + 150_000 * 20 // 100, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
 
     def test_the_database_size_falls_back_to_the_newest_set_and_unknown_size_refuses(self):
         self.make_set(set_name("20261101"))

@@ -9,6 +9,8 @@ Everything below runs the shipped script's own dispatcher and functions in bash.
 (covered by test_staging_backup_*), `age` and `rsync` are the real tools where a transfer is wanted and recording fakes where the
 assertion is that they are never called, and `rclone` is a recording wrapper that either passes through to the real binary against
 a local-directory remote or fails like B2 did. Nothing touches a network, a database or a real host."""
+import os
+import shutil
 import subprocess
 import sys
 import time
@@ -78,8 +80,19 @@ while [ "$#" -gt 0 ]; do case "$1" in --*) shift ;; *) break ;; esac; done
 setsid "$@" </dev/null >/dev/null 2>&1 &
 exit 0
 ''')
+        self.addCleanup(self.drain)  # registered after the temp-dir cleanup, so it runs first
         self.remote_settings = {"VASEY_BACKUP_REMOTE": f"vasey-backup:{self.remote}", "VASEY_BACKUP_RCLONE_BIN": self.bin / "rclone",
                                 "VASEY_BACKUP_RCLONE_CONFIG": self.config}
+
+    def drain(self):
+        """Detached shipments outlive the call that started them: wait until nothing runs from this test's directory."""
+        deadline = time.monotonic() + 90
+        while time.monotonic() < deadline:
+            found = subprocess.run(["pgrep", "-f", str(self.root)], capture_output=True, text=True).stdout.split()
+            if not [pid for pid in found if int(pid) != os.getpid()]:
+                return
+            time.sleep(0.1)
+        subprocess.run(["pkill", "-9", "-f", str(self.root)])
 
     # ---- fixtures ----------------------------------------------------------------------------------------------
     def hardened(self, **extra):
@@ -118,6 +131,9 @@ snapshot() {{
   printf '%s\\n' "$VASEY_BACKUP_DIR/$T_SET" > "$VASEY_BACKUP_DIR/.last"
 }}
 restore_check() {{ echo "restore-check $1" >> "$T_TRACE"; }}
+space_check() {{ [ -z "${{T_SPACE_FAILS:-}}" ] || die "synthetic: not enough free disk space for the pre-deploy snapshot"; }}
+prune_remote() {{ echo prune-remote >> "$T_TRACE"; }}
+[ -z "${{T_LOCK_WAIT:-}}" ] || SHIP_PENDING_LOCK_WAIT=$T_LOCK_WAIT
 record_evidence() {{ echo "$1 $2 $(basename -- "${{3:-}}")" >> "{self.evidence}"; }}
 ''' + DISPATCH)
         executable(self.root / "fake-ctl", f'''#!/bin/bash
@@ -492,8 +508,8 @@ class TheDetachedStart(DeferredShipBase):
             self.assertIn(part, call)
         self.assertIn("started as vasey-staging-ship-pending.service", run.stdout)
         # The unit really does the work, with the settings it was given, and logs to the ship-pending log.
-        self.assertTrue(self.wait_for(lambda: not self.marker(FIRST).exists()), self.log.read_text() if self.log.exists() else "no log")
-        self.assertTrue(self.wait_for(lambda: self.evidence_lines() == [f"daily ok {FIRST}"]))
+        self.assertTrue(self.wait_for(lambda: self.evidence_lines() == [f"daily ok {FIRST}"]), self.log.read_text() if self.log.exists() else "no log")
+        self.assertFalse(self.marker(FIRST).exists())
         self.assertIn("shipping pending set", self.log.read_text())
 
     def test_without_systemd_a_setsid_child_gets_no_lock_descriptor_and_the_caller_does_not_wait(self):
@@ -570,9 +586,8 @@ class TheNightlyRun(DeferredShipBase):
         self.mode.write_text("real")
         run = self.nightly(T_SET=SECOND, **self.hardened())
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
-        self.assertTrue(self.wait_for(lambda: not self.marker(FIRST).exists() and not self.marker(SECOND).exists()),
-                        self.log.read_text())
-        self.assertEqual(self.evidence_lines(), ["daily failed ", f"daily ok {SECOND}"])
+        self.assertTrue(self.wait_for(lambda: self.evidence_lines() == ["daily failed ", f"daily ok {SECOND}"]), self.log.read_text())
+        self.assertFalse(self.marker(FIRST).exists() or self.marker(SECOND).exists())
         self.assertEqual(len(list(self.remote.glob("*.tar.age"))), 2)
 
     def test_with_an_off_host_destination_the_ok_row_waits_for_the_shipment(self):
@@ -600,16 +615,105 @@ class TheNightlyRun(DeferredShipBase):
         self.assertIn("ctl resume", self.trace.read_text())
         self.assertIn("snapshot or restore proof failed", run.stderr)
         self.assertIn("daily failed ", self.evidence_lines())
-        self.assertTrue(self.wait_for(lambda: not self.marker(set_name("20261109")).exists()), "the earlier set is retried")
+        self.assertTrue(self.wait_for(lambda: "daily failed " in self.evidence_lines() and not self.marker(set_name("20261109")).exists()),
+                        "the earlier set is retried")
 
     def test_the_branch_orders_resume_then_evidence_then_the_detached_start_and_never_ships_in_the_foreground(self):
         nightly = SOURCE[SOURCE.index("  nightly)"):SOURCE.index("  predeploy)")]
         code = "\n".join(line for line in nightly.splitlines() if not line.lstrip().startswith("#"))
-        self.assertLess(code.index('"$CTL" resume'), code.index("ship_pending_start"))
-        self.assertLess(code.index("ship_pending_start"), code.index('[ "$snapshot_status" = 0 ] || die'))
+        self.assertLess(code.index("space_check"), code.index('"$CTL" quiesce'))
+        self.assertLess(code.index('"$CTL" resume'), code.rindex("ship_pending_start"))
+        self.assertLess(code.rindex("ship_pending_start"), code.index('[ "$snapshot_status" = 0 ] || die'))
         self.assertLess(code.index('[ "$snapshot_status" = 0 ] || die'), code.index("prune_local"))
         for forbidden in ("ship ", "ship_pending\n", "ship_pending;", "rclone", "rsync", "age "):
             self.assertNotIn(forbidden, code)
+
+
+@NEEDS_TOOLS
+class EvidenceHonesty(DeferredShipBase):
+    def test_a_failed_nightly_is_not_masked_by_an_older_pending_set_draining(self):
+        older = set_name("20261108")
+        self.make_set(older)
+        self.queue(older)
+        self.make_set(FIRST)
+        run = self.run_helper("nightly", T_SNAPSHOT_FAILS=1, **self.hardened())
+        self.assertNotEqual(run.returncode, 0)
+        self.assertTrue(self.wait_for(lambda: not self.marker(older).exists() and not list(self.backups.glob(".ship.*"))), self.log.read_text())
+        self.drain()
+        self.assertEqual(self.evidence_lines(), ["daily failed "], "the older set's success must not become the latest daily result")
+        self.assertIn("not the newest proven set", self.log.read_text())
+        self.assertTrue((self.remote / f"{older}.tar.age").is_file(), "the backlog still drained")
+
+    def test_a_snapshot_failure_after_the_set_blocks_its_success_row(self):
+        self.make_set(FIRST)
+        self.queue(FIRST)
+        (self.backups / ".snapshot-failed").write_text("20261112T031700Z\n")
+        run = self.run_helper("ship-pending", **self.hardened())
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertEqual(self.evidence_lines(), [])
+        self.assertIn("a snapshot failed after it was taken", run.stdout)
+        self.assertFalse(self.marker(FIRST).exists())
+        (self.backups / ".snapshot-failed").write_text("20261109T031700Z\n")  # older than the set: it is a newer snapshot's success
+        self.queue(FIRST)
+        shutil.rmtree(self.remote); self.remote.mkdir()
+        (self.backups / f".offhost-shipped.{FIRST}").unlink(missing_ok=True)
+        self.assertEqual(self.run_helper("ship-pending", **self.hardened()).returncode, 0)
+        self.assertEqual(self.evidence_lines(), [f"daily ok {FIRST}"])
+
+    def test_a_refused_space_check_skips_the_snapshot_records_failed_and_still_drains_the_backlog(self):
+        self.make_set(FIRST)
+        self.queue(FIRST)
+        self.trace.write_text("")
+        run = self.run_helper("nightly", T_SPACE_FAILS=1, **self.hardened())
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("not enough free disk space", run.stderr)
+        self.assertNotIn("ctl quiesce", self.trace.read_text(), "nothing was stopped")
+        self.assertTrue((self.backups / ".snapshot-failed").is_file())
+        self.assertTrue(self.wait_for(lambda: (self.remote / f"{FIRST}.tar.age").is_file()), "the backlog drains")
+        self.drain()
+        self.assertEqual(self.evidence_lines()[0], "daily failed ")
+        self.assertNotIn("daily ok", " ".join(self.evidence_lines()), "FIRST is not newer than the failure")
+
+    def test_a_ship_pending_run_between_two_sets_counts_as_a_running_ship(self):
+        import fcntl
+        with open(self.backups / ".ship-pending.lock", "a") as held:
+            fcntl.flock(held, fcntl.LOCK_EX)
+            run = self.bash("ship_pending_running && echo RUNNING || echo IDLE; offhost_ship_running && echo OFFHOST || echo NOOFFHOST")
+        self.assertIn("RUNNING", run.stdout)
+        self.assertIn("NOOFFHOST", run.stdout)
+        self.assertIn("IDLE", self.bash("ship_pending_running && echo RUNNING || echo IDLE").stdout)
+
+    def test_remote_retention_runs_at_the_end_of_ship_pending_only_after_success_and_never_in_the_nightly_branch(self):
+        nightly = SOURCE[SOURCE.index("  nightly)"):SOURCE.index("  predeploy)")]
+        self.assertNotIn("prune_remote", nightly)
+        self.make_set(FIRST)
+        self.queue(FIRST)
+        self.mode.write_text("403")
+        self.assertNotEqual(self.run_helper("ship-pending", **self.hardened()).returncode, 0)
+        self.assertNotIn("prune-remote", self.trace.read_text())
+        self.mode.write_text("real")
+        self.assertEqual(self.run_helper("ship-pending", **self.hardened()).returncode, 0)
+        self.assertIn("prune-remote", self.trace.read_text().splitlines())
+
+    def test_a_marker_that_vanishes_is_skipped_not_fatal(self):
+        self.make_set(FIRST)
+        script = f'pending_names() {{ echo {FIRST}; }}; ship_pending; echo "rc=$?"'
+        run = self.bash(script, **self.hardened())
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("vanished", run.stdout)
+
+    def test_a_manual_ship_holding_the_lock_is_busy_not_a_recorded_failure(self):
+        import fcntl
+        self.make_set(FIRST)
+        self.queue(FIRST)
+        with open(self.backups / ".offhost.lock", "a") as held:
+            fcntl.flock(held, fcntl.LOCK_EX)
+            run = self.run_helper("ship-pending", T_LOCK_WAIT=1, **self.hardened())
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertEqual(self.evidence_lines(), [])
+        self.assertEqual(self.fields(FIRST)["last_result"], "busy")
+        self.assertEqual(list(self.remote.iterdir()), [])
+        self.assertNotIn("prune-remote", self.trace.read_text() if self.trace.exists() else "")
 
 
 class TheDeployNeverShips(unittest.TestCase):
