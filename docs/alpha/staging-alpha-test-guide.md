@@ -2,7 +2,7 @@
 
 For Sean. Written 2026-11-11 for an alpha test by 2026-11-14, done by you alone, from a browser, on a desktop and a phone.
 
-Everything here was checked against the source on `main` (commit `089ccdcf`), not against a running site. Button names, headings and messages are quoted from the code, so match them exactly. Where the code cannot tell me something, the step says so. If the site disagrees with this guide, the site is the finding: write it down (see [What to write down](#what-to-write-down-when-something-is-wrong)).
+Everything here was checked against the source on `main` (commit `089ccdcf`, plus the unpaid-release and kit-admin changes of #333 and #334), not against a running site. Button names, headings and messages are quoted from the code, so match them exactly. Where the code cannot tell me something, the step says so. If the site disagrees with this guide, the site is the finding: write it down (see [What to write down](#what-to-write-down-when-something-is-wrong)).
 
 The staging site is `https://<staging host>`. It is Stripe **test mode** only. No real money can move.
 
@@ -17,20 +17,20 @@ The staging site is `https://<staging host>`. It is Stripe **test mode** only. N
   - `4000 0025 0000 3155`: asks for 3D Secure; "Complete" succeeds, "Fail" declines.
 - A name and an email address you control for the order forms. The site sends no email from staging (see [Limits](#limits-to-know-before-you-start)), so the address is only stored.
 - A place to take notes and screenshots as you go.
-- The operator on call for two steps you cannot do from the browser: turning on downloads for an order, and issuing the sound-kit license contract. Give them the order id (see below).
+- The operator on call for one step you cannot do from the browser: turning on downloads for a **track** order. Give them the order id (see below). Kit orders are operated from the admin ("Test kit orders").
 
 ### Do not use these tracks for purchase tests
 
-Three offers are held by earlier abandoned checkouts: Wide Awake Basic, Words I Said Basic, Lion's Den Basic. Per the brief for this guide; I could not read the staging database. Use other tracks.
+Three tracks were held by abandoned checkouts on 2026-11-11: Wide Awake, Words I Said and Lion's Den (each from a Basic order). A held order blocks every license of its track, not only the one that was in the cart. They are due to be released once the release path below is switched on; if one of them still refuses an order, release it yourself with Script 5 or use another track.
 
 ## Limits to know before you start
 
-1. **An unpaid order keeps its offer reserved.** If you abandon, decline-and-leave, or let a checkout expire, nobody can prepare an order for that same offer again until staff release it (`docs/ops/staging-test-purchase.md`, "An unpaid order keeps its offer reserved"). Treat the whole track as used up after any order you do not complete, and use a different track for each experiment. The admin has a "Test unpaid release" page, but the staging settings file ships with its switch off (`VASEY_TEST_UNPAID_RELEASE_ENABLED=false` in `ops/staging/env.staging.example`), so do not count on it. A staging release path is under review.
+1. **An unpaid order keeps its offer reserved.** If you abandon, decline-and-leave, or let a checkout expire, nobody can prepare an order for that same offer again until staff release it (`docs/ops/staging-test-purchase.md`, "An unpaid order keeps its offer reserved"). Treat the whole track as held after any order you do not complete. Staff can release it from the admin: **Test commerce > Test unpaid release**, "Verify unpaid status and release" (Script 5). Two conditions apply. The order must have reached Stripe (you pressed "Open Stripe test checkout"); an order that was prepared but never sent to Stripe cannot be released this way. And Stripe must show the checkout session expired and unpaid, which happens 60 minutes after checkout was opened; before that the result is "Unpaid status was not established". The switch for this page is set per host (`VASEY_TEST_UNPAID_RELEASE_ENABLED`); if the action says it is unavailable, tell the operator.
 2. **Do not buy Exclusive unless you mean to.** It is $1,500 and it locks that track's other licenses (the exclusive docs say exclusive and linked non-exclusive offers compete for the same rights scope). You cannot undo it from the browser.
 3. **Order access is the browser session.** Guest orders belong to the browser session that placed them (120 minutes idle by default), and downloads work in that same browser only. Do not clear cookies or close a private window mid-test.
 4. **Your cart lives in the browser tab.** A new tab starts with an empty cart.
 5. **Each deploy takes the site down for about 20 minutes.** If pages stop answering, wait before reporting. Work to shorten this is in progress.
-6. **Downloads need an operator step per order.** Payment, grant and (for tracks) the contract happen by themselves. Enabling downloads is a deliberate command run by the operator for each order (`vasey:control-test-delivery`). There is no admin button for it.
+6. **Downloads need a deliberate step per order.** Payment, grant and the contract happen by themselves (a kit contract is issued by a schedule within about 10 minutes of the grant). Enabling downloads is separate. For a **track** order it is a command run by the operator (`vasey:control-test-delivery`); there is no admin button for it. For a **kit** order you do it yourself in the admin: **Test commerce > Test kit orders**, "Enable delivery".
 7. **Email.** The store sends none from staging: `MAIL_MAILER=log` and `VASEY_TRANSACTIONAL_MAIL_ENABLED=false` in the staging settings file. The buyer email is also not passed to Stripe Checkout (known follow-up in `docs/ops/staging-test-purchase.md`), so the Stripe page asks for it again. If an email arrives, write it down: it should not.
 8. **Quote and payment windows.** The selection review expires about 15 minutes after you press "Review selection", and the order's payment window ends with it. Finish a purchase within about 10 minutes of opening the review.
 9. **Rate limits.** At most three download authorizations per minute per track order. A track-order download link lasts 60 seconds and works once.
@@ -170,8 +170,12 @@ Use a fresh track. This deliberately burns that track.
    Expect: the "STRIPE TEST CHECKOUT" panel says "Stripe test checkout is available. Opening it does not verify payment or issue rights." with a "Continue to Stripe test checkout" link. After the quote window it says "This checkout link has expired. Check the current Stripe test checkout status."
 3. Press "Check Stripe test checkout status".
    Expect: no payment is shown as verified. After Stripe expires the session (60 minutes) it reads "The Stripe test checkout session has expired. No payment or fulfillment is confirmed here."
-4. Try to buy the same offer on that track again.
-   Expect: it fails. The message you will see in the order step is "The reviewed terms or availability changed. Load a current review and explicitly accept its terms before preparing an order." (the review step may instead say "Your selection changed or is no longer available. Refresh the catalog and choose its licenses again."). Other offers or tracks still work. Write down which message you got.
+4. Try to buy any license on that track again.
+   Expect: it fails. The message you will see in the order step is "The reviewed terms or availability changed. Load a current review and explicitly accept its terms before preparing an order." (the review step may instead say "Your selection changed or is no longer available. Refresh the catalog and choose its licenses again."). Other tracks still work. Write down which message you got.
+5. Release it. Wait until 60 minutes after you opened Stripe's page, then in the admin open **Test commerce > Test unpaid release**, find the order, and press "Verify unpaid status and release".
+   Expect: "Test resources released". If you are early, the result is "Unpaid status was not established": close the dialog, wait, and start a new check. "Release evidence needs attention" means Stripe's answer did not match the order; do not retry, write it down.
+6. Buy a license on that track again.
+   Expect: the order can now be prepared.
 
 ### Script 6: buy the sound kit
 
@@ -189,9 +193,10 @@ The kit page and its order page do not use the track cart. A kit is bought alone
    Expect: Stripe returns you to `/sound-kit-orders/<order id>` (copy the id from the address bar). The page shows "Test order · Stripe test mode", the kit title and $14.99. This page does not refresh itself.
 6. If it says "A Stripe test checkout was started. Returning here does not confirm payment: check the payment status below.", press "Check payment status" or reload.
    Expect, in order: "Test payment verified. The kit is being granted.", then "Test payment verified and the kit granted. Your license contract is being prepared; downloads open after it is issued." Reload the page to see later states; the "Check payment status" button is only shown up to the granting step.
-7. Ask the operator to issue the kit license contract for the order (`vasey:issue-test-kit-contracts`). Today this is a command, not an admin button; a button and a schedule are being built.
-   Expect after a reload: "Test payment verified, kit granted and license issued. Test downloads open once delivery is enabled for this order."
-8. Ask the operator to enable delivery for the order (`vasey:control-test-kit-delivery ... enable`). Reload.
+7. In the admin open **Test commerce > Test kit orders** and find the order by its id. Its status reads "Granted, contract pending". Either wait (a schedule issues the contract within about 10 minutes) or press "Issue license contract" on the row; it takes a few seconds.
+   Expect: the row's status becomes "Contract issued, delivery not enabled". On the order page, after a reload: "Test payment verified, kit granted and license issued. Test downloads open once delivery is enabled for this order."
+8. On the same row press "Enable delivery", enter a reference (for example `ALPHA-KIT-1`) and confirm. Reload the order page.
+   If the dialog says "Another change was recorded first", close it and open it again.
    Expect: "Test payment verified. Your kit and license are ready. Each download link is single-use and lasts one minute." and two buttons: "Download the kit (ZIP)" and "Download the license (PDF)".
 9. Press both buttons.
    Expect: a ZIP and a PDF save. Open the ZIP: it holds the kit's samples. Compare the number of samples to the "N samples" on the kit page and write down any difference. Open the PDF: the code fills in the kit name, your licensee name, the licensor name, the purchase date, the fee and the order reference; check each one.
@@ -223,13 +228,14 @@ Labels below are the navigation labels the code generates. Which entries you see
    - **Test Contract Issuance**: your grant shows a recorded status and "Original recorded (UTC)".
    - **Test Payment Exceptions**: empty unless a payment arrived after the window.
    - **Test Customers**: your guest order appears as "Guest (no account)".
-   - **Test Unpaid Release**: lists orders; "Verify unpaid status and release" may refuse on staging, because the staging settings file ships its switch off (Limit 1). Do not press it on an order you want to keep. If it ever releases a held offer, write that down.
+   - **Test Unpaid Release**: lists orders; "Verify unpaid status and release" frees the track held by an abandoned order once Stripe shows its session expired and unpaid (Limit 1, Script 5). "Release history" shows what was recorded. It refuses a paid order.
+   - **Test kit orders**: one row per kit order with its status ("Order started", "Awaiting payment", "Paid, grant pending", "Granted, contract pending", "Contract issued, delivery not enabled", "Delivery enabled", "Delivery blocked"). Row actions: "Re-check payment", "Issue license contract", "Enable delivery", "Block delivery" (Script 6).
    - **Order-ready Emails** and **Test promotions** exist; no mail is sent.
 10. **Reporting**: **Sales report** and **Customer segments**.
     Expect: figures that include your test orders. Treat them as test data.
 11. **Held Paid Orders** (Fulfillment) and **Customer Inquiries**: look only.
 
-Not available in the admin today: enabling track or kit downloads, issuing the kit contract, linking rights scopes, releasing an abandoned reservation (see Limit 1) and issuing refunds. Each is an operator command or a Stripe dashboard action.
+Not available in the admin today: enabling **track** downloads, linking rights scopes and issuing refunds. Each is an operator command or a Stripe dashboard action.
 
 ### Script 8: phone and web-app checks
 
@@ -292,7 +298,7 @@ Do not try to fix a stuck order by buying again. Report it and move to a differe
 Short list, from `docs/remaining-parity-coverage.csv` and `docs/sound-kit-storefront.md`. Each of these is expected to be missing on staging.
 
 - No live payments. Tax is a fixed test value of zero. Cards through Stripe only (no PayPal or cryptocurrency).
-- Refunds are issued in the Stripe test dashboard. For track orders the admin only observes and records them; kit orders ignore refunds and disputes, and an operator must block delivery by hand.
+- Refunds are issued in the Stripe test dashboard. For track orders the admin only observes and records them; kit orders ignore refunds and disputes, so block delivery by hand ("Block delivery" on the kit order's row).
 - No email: no receipt, no "order ready" message, no marketing email.
 - No self-service release of an abandoned checkout, and no admin button for enabling downloads or issuing the kit contract.
 - Memberships and subscriptions are not sold. Merchandise and services storefronts, license upgrades, negotiated offers, bundles and deals, affiliate and abandoned-cart tools, and collaborator payouts are post-launch.
