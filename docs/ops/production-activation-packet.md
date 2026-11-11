@@ -350,7 +350,8 @@ fi
    archive with it: the backup captured database and private storage as one moment, and an
    upload, contract or media job that wrote the bind-mounted private root after the snapshot
    would otherwise leave the earlier database with a later tree (orphaned files, missing
-   references). With writers still stopped, extract `private.tar` into a fresh directory as
+   references). With writers still stopped, extract `private.tar` (or, for a set whose private store is a
+   `private/` tree, the 2026-11-11 kit format, stream that tree with `tar` as in the staging runbook's case B) into a fresh directory as
    the application user and verify it exactly as the backup procedure's step 4 does (digest,
    manifest, names, modes, ownership); then replace the *contents* of
    `<PERSISTENT_ROOT>/private` while keeping that directory object in place: every release's

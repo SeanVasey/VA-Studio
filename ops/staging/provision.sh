@@ -168,6 +168,7 @@ for f in nginx/vasey-staging.conf php-fpm/vasey-staging.conf php-fpm/vasey-paid-
   [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"
 done
 [ -f "$KIT/tls/origin-ca.pem" ] || die "kit file missing: ops/staging/tls/origin-ca.pem"  # the probe's pinned Origin CA roots
+[ -f "$KIT/private-snapshot.py" ] || die "kit file missing: ops/staging/private-snapshot.py"  # the backup's private-store tree
 for f in nginx/vasey-staging-http.conf nginx/vasey-staging-classic.conf; do  # the http-level helpers and the whole-file wrapper
   [ -f "$KIT/$f" ] || die "kit file missing: ops/staging/$f"
 done
@@ -493,6 +494,7 @@ install -m 0755 -o root -g root "$KIT/backup.sh" /usr/local/sbin/vasey-staging-b
 install -m 0755 -o root -g root "$KIT/scheduler-watch.sh" /usr/local/sbin/vasey-staging-scheduler-watch
 install -d -m 0755 -o root -g root /usr/local/libexec/vasey-staging
 install -m 0644 -o root -g root "$KIT/normalize-mysql-dump.py" /usr/local/libexec/vasey-staging/normalize-mysql-dump.py
+install -m 0644 -o root -g root "$KIT/private-snapshot.py" /usr/local/libexec/vasey-staging/private-snapshot.py
 install -m 0644 -o root -g root "$KIT/seal-release.py" /usr/local/libexec/vasey-staging/seal-release.py
 install -m 0644 -o root -g root "$KIT/release-step.sh" /usr/local/libexec/vasey-staging/release-step.sh
 install -m 0644 -o root -g root "$KIT/tls/origin-ca.pem" /usr/local/libexec/vasey-staging/origin-ca.pem

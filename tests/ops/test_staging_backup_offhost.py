@@ -1207,8 +1207,10 @@ space_check'''
         self.assertIn("backup-prune", message)
 
     def test_the_need_covers_private_store_database_and_margin(self):
-        # private 100000 + database 50000, the same filesystem for the restore proof (x2), then 20% and 256 MiB of margin
-        need = (150_000 * 2) + (150_000 * 2) * 20 // 100 + 268_435_456
+        # private 100000 (no set to share files with, and no estimator here: the whole store is counted) + database 50000, plus
+        # the restore proof's disposable datadir (50000) on the same filesystem: since 2026-11-11 a tree set is verified in place
+        # and nothing is extracted, so the private store is not counted twice; then 20% and 256 MiB of margin
+        need = (150_000 + 50_000) + (150_000 + 50_000) * 20 // 100 + 268_435_456
         self.assertEqual(self.check(free=need).returncode, 0)
         self.assertNotEqual(self.check(free=need - 1).returncode, 0)
 

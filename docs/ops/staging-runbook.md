@@ -570,12 +570,83 @@ What runs:
 
 Each run produces `/srv/vasey-staging/backups/<UTC>-<sha12>/` containing:
 - `database.sql` and `.sha256`;
-- `private.tar` and `.sha256`;
-- `private.sha256` and `private.dirs` (manifests);
+- `private/`, a root-only copy of the private store (sets taken before 2026-11-11 hold `private.tar` and `.sha256` instead);
+- `private.sha256` and `private.dirs` (manifests), and for a `private/` tree `private.index` (per-file identity and hash);
 - `env.backup` (APP_KEY) and `.sha256`;
-- `MANIFEST`;
-- `RESTORE_CHECK`, the proof: a disposable `mysqld` loaded the dump and re-dumped it, and the archive was
-  restored as `forge` and verified.
+- `MANIFEST` (for a tree also `private_format=tree`, `private_link_source`, `private_copied_files/bytes`, `private_linked_files/bytes`);
+- `RESTORE_CHECK`, the proof: a disposable `mysqld` loaded the dump and re-dumped it, and the private files were verified
+  (a tree in place, see below; an older archive restored as `forge` and verified).
+
+**The private store is a shared tree (2026-11-11).** Every deploy used to tar the whole ~38 GB private store and the proof
+extracted and re-hashed all of it: about 21 of the 22 minutes the site was down. Now the snapshot copies only the private files
+that are new or changed since the newest verified set and hard-links the unchanged ones to **that set's** copies
+(`ops/staging/private-snapshot.py`). What makes it safe:
+- **Nothing in a set is ever linked to the live store.** Every changed file is copied to a new root-owned inode in a root-only
+  tree, so an in-place write to a live file (reservation counters, lock files and Flysystem `put` do rewrite private files in
+  place) can never reach a snapshot. A live file with a second hard link is refused, as before.
+- **"Unchanged" means the exact identity the previous set recorded**: same device, inode, size, mtime and ctime (nanoseconds).
+  Any write, truncate, chmod, utime or replacement changes the ctime, which an unprivileged process cannot set back. A file
+  changed within two seconds of the earlier snapshot's start is never trusted, and a file that changes while it is copied
+  refuses the snapshot.
+- **A file is shared only with the set this operation re-hashed in full, and only while it is still that inode.** Before every
+  quiesce (`ctl prepare`, `ctl refresh`, the nightly run), with the site still up, the helper re-hashes every file of the newest
+  tree set that holds a restore proof (about 2.5 minutes for 38 GB, estimated at about 250 MB/s; not measured on the host). Success
+  writes a token, `backups/.link-token`, outside every set: the identity of each verified inode, ctime included. The next snapshot
+  consumes it (one use; refused after 6 hours or when it names another set) and shares only files whose inode still has exactly
+  that identity. Any write to it since, by anyone, moves the ctime, so it is copied instead. Without a token nothing is shared.
+- **Two kinds of refusal before the quiesce.** The deploy log tells them apart; neither stops anything.
+  - **Corruption refusal** ("a backup set's private files failed re-verification ... corruption refusal"; the backup log says
+    "failed its private file re-verification" and "withdrew the restore proof of ..."). A file's bytes, identity, mode or owner,
+    or the set's names or directories, no longer match the manifest. The `RESTORE_CHECK` of that set and of every tree set that
+    holds a failed file is removed (a mode or owner change withdraws only the sets that hold that file). What to do: check `dmesg`
+    and the disk; run `sudo /usr/local/sbin/vasey-staging-backup restore-check <set>` on the sets that still hold a proof; keep
+    the withdrawn sets for inspection (do not delete them by hand); then deploy again. The next deploy re-verifies the newest set
+    that still holds a proof, or copies everything. Rollback case B needs a set with `RESTORE_VERIFIED`: use the newest one that
+    still has it.
+  - **Operational refusal** ("the re-verification of the backup set could not run (an operational error ... not corruption) ...
+    operational refusal", exit status 3; the backup log says "an operational error, not a corruption finding" and "No restore
+    proof was withdrawn"). The re-hash could not run or its token could not be written: no space (the host has been at 96%), an
+    I/O error, an unreadable file. **Every proof is kept.** What to do: fix the cause (free space with
+    `sudo /usr/local/sbin/vasey-staging-ctl backup-prune`; read `dmesg` for I/O errors), then deploy again; nothing else.
+  - The nightly run refuses neither: it logs the WARNING (with the same two wordings) and its snapshot copies everything.
+  - The re-hash runs before the free-space arithmetic on purpose: it decides what may be shared and so what must be copied;
+    checking space first would count a full copy and refuse deploys that fit. It writes only the token (a few MB).
+  - A withdrawn set that was still waiting for its off-host copy is skipped by `ship-pending` (`pending` shows
+    `last_result=skipped` and why) until it is proven again or abandoned with `pending-clear`.
+- **Inside the window** the proof re-hashes every file the snapshot copied and checks that every shared file is still the exact
+  inode it linked (device, inode, size, mtime, mode, owner, ctime). `restore-check DIR` (manual, case B below, a set moved to
+  another disk or extracted from an off-host copy) re-hashes every file and compares size, mode and the mtime in whole seconds,
+  because a copy has new inodes and tar keeps whole seconds.
+- **Symlinks and FIFOs swapped in during a snapshot are refused**: every directory and file is opened relative to its parent's
+  descriptor without following links and must be the inode the listing reported; a file is opened non-blocking and must be a
+  regular file. An application process that kept running through the quiesce cannot point the snapshot outside the store.
+- **Pruning a set never changes another.** Removing a set unlinks its own names; an inode shared with a newer set keeps its data.
+- **Off-host copies are whole.** The shipment tars one set at a time, so the archive holds every file in full (no hard-link
+  entries) and `du` sizes it fully; an rsync destination receives whole files.
+- Sharing needs the sets on one filesystem (they always are: one backup directory). If the previous set is elsewhere, or the
+  kernel refuses a link, the file is copied. `VASEY_BACKUP_LINK=0` in `backup.conf` turns sharing off (a full copy every time).
+
+What changed for an operator:
+- The deploy (and the nightly run) spends about 2.5 minutes re-hashing the previous set **before** it stops the site, then the
+  maintenance window holds only the dump, the copy of new files, their re-hash and the database proof. The re-hash runs inside
+  `ctl prepare` (or `ctl refresh`), so it holds the helper's action lock: other `vasey-staging-ctl` calls, `status` included,
+  wait for it, as they already wait for the build that `prepare` runs under the same lock. Expected quiesce for
+  staging's sizes: about 2 to 4 minutes instead of 22 (see the PR evidence; not yet measured on the host).
+- The **first** snapshot after re-provisioning has nothing to share and copies the whole store inside the window (a few minutes
+  longer than before the tar was dropped, about 5 to 9 minutes for 38 GB). Let the 03:17 nightly run take it, or deploy at a quiet
+  time; every later snapshot shares.
+- `space-check` counts only the bytes the snapshot will copy, plus the database twice (dump and the proof's datadir); with age +
+  rclone it still counts one encrypted copy of the whole set. A tree set's `du` is its full logical size; the disk use of the
+  backup directory as a whole grows by the changed files only.
+- Restoring private files from a tree set streams the tree instead of extracting `private.tar` (section 9, case B shows both).
+- Re-provisioning is required: `provision.sh` installs the new `/usr/local/libexec/vasey-staging/private-snapshot.py` and the
+  changed `vasey-staging-backup` and `vasey-staging-ctl`; until then every deploy refuses on helper drift.
+- Directory mtimes are not kept in a tree set (the tar sets kept them); file mtimes, modes and contents are.
+- Going back to a kit from before this change (re-provisioning from an older SHA) leaves tree sets that the older helper can
+  neither prove, ship nor restore: it knows only `private.tar`. Restore such a set with this runbook's case B commands, or
+  re-provision with a kit from this change or later first.
+- A reboot or remount can renumber the store's device, which makes every live file look changed: that snapshot copies everything
+  and logs "nothing was shared with <set> although it was re-verified". The next one shares again.
 
 The log is `/var/log/vasey-staging/backup.log`. A set without `RESTORE_CHECK` is unproven. A `*.FAILED`
 directory is kept for inspection and never pruned.
@@ -613,11 +684,12 @@ sudo /usr/local/sbin/vasey-staging-backup pending-clear <set>                  #
 The next nightly run retries on its own. After fixing a remote problem (a bucket cap, expired credentials) run `ship-pending`
 once and watch `ship-pending.log`; the failed row on the dashboard is replaced by the success.
 
-**Disk space and retention.** Every deploy takes a full snapshot (database dump + `private.tar` + `.env`, about
-14 GB on 2026-11-10), and the restore proof needs about the same again under `/var/lib/mysql-restore-check`. Before it
-stops anything, `forge-deploy.sh` runs `vasey-staging-ctl space-check` (the backup helper's `space-check`): it
-estimates the need from the private store (`du`), the schema's data and index bytes (else the newest set's
-`database.sql`), the encrypted copy that age/rclone shipping stages in the backup directory after the deploy (counted as the larger
+**Disk space and retention.** Every deploy takes a snapshot (database dump + the private files that changed since the newest
+verified set + `.env`; the first one after re-provisioning copies the whole store, about 14 GB on 2026-11-10 and 38 GB on
+2026-11-11), and the restore proof needs a disposable datadir (about the database's size) under `/var/lib/mysql-restore-check`.
+Before it stops anything, `forge-deploy.sh` runs `vasey-staging-ctl space-check` (the backup helper's `space-check`): it
+estimates the need from the bytes the snapshot will copy (`private-snapshot.py estimate`; the whole store when no set can be
+shared), the schema's data and index bytes (else the newest set's `database.sql`), the encrypted copy of the whole set that age/rclone shipping stages in the backup directory after the deploy (counted as the larger
 of that copy and the restore proof's scratch when they share a filesystem, because they never coexist; plus one more set while an
 earlier shipment is still encrypting) and a 20% + 256 MiB margin. When the free bytes are below that,
 the deploy ends with `FAILED ... before the quiesce: the served release was not touched`, naming the bytes free and
@@ -642,7 +714,8 @@ The destination receives the dump, the private files and the `.env`, which holds
 secrets. Use storage that Sean controls and that is encrypted at rest. Retention there is Sean's decision;
 the host keeps 7 sets.
 
-**Re-prove any set:** `sudo /usr/local/sbin/vasey-staging-backup restore-check /srv/vasey-staging/backups/<set>`.
+**Re-prove any set:** `sudo /usr/local/sbin/vasey-staging-backup restore-check /srv/vasey-staging/backups/<set>`. For a tree set
+it re-hashes every private file; `RESTORE_CHECK` then reports `private_rehashed_files` equal to `private_files_verified`.
 
 Two observations from the proof run on MySQL 8.4.11:
 - **Collation rendering.** A first-generation dump and its re-dump differ only in collation rendering: 328
@@ -669,7 +742,10 @@ Fresh quiesce is safe when the previous phase already stopped FPM/workers: it pr
 retains the maintenance marker and closed gate, and does not require HTTP503 from an absent backend.
 
 A Forge "failed" after exactly ten minutes is Forge's deployment time limit, not necessarily a failed deploy: Forge
-stops reading the output but leaves the processes running, and a first install's migrations take longer than that.
+stops reading the output but leaves the processes running, and a first install's migrations take longer than that. Forge
+documents the limit as fixed ("Deployments are limited to 10 minutes"; there is no site setting for it, only Envoyer's own
+limits replace it). Since the 2026-11-11 shared-tree snapshot a normal deploy should finish well inside it; the first snapshot
+after re-provisioning (a full copy) and a long build can still pass it.
 `forge-deploy.sh` keeps writing everything to `forge-deploy.log` in the deploy's evidence directory. Wait until no
 `vasey-staging-ctl` or `release-step.sh` process remains, then read that log's last lines and `ctl status`: a log that
 ends with `deployed <sha>` and a status without an operation marker is a completed deploy; anything else is a recovery case below.
@@ -766,15 +842,22 @@ grep -qx 'result=RESTORE_VERIFIED' "$SET/RESTORE_CHECK" || exit 1
 (cd "$SET" && sha256sum --check --quiet --strict env.backup.sha256) || exit 1
 # 2. Database: drop and recreate the staging schema (a plain load would leave tables the failed migration made),
 #    then load the verified dump.
-(cd "$SET" && sha256sum --check --quiet --strict database.sql.sha256 private.tar.sha256) || exit 1
+(cd "$SET" && sha256sum --check --quiet --strict database.sql.sha256) || exit 1
+[ ! -e "$SET/private.tar" ] || (cd "$SET" && sha256sum --check --quiet --strict private.tar.sha256) || exit 1
 mysql -uroot -e 'DROP DATABASE vasey_staging; CREATE DATABASE vasey_staging CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
 mysql -uroot < "$SET/database.sql" || exit 1
 # 3. Private files: keep the directory object (every release bind-mounts that inode); move its entries aside, then
-#    extract the verified archive into it as forge and check it against the manifest.
+#    restore the verified tree (or, for a set from before 2026-11-11, extract its archive) into it as forge and check it
+#    against the manifest. Root reads the root-only set; forge writes, so every restored file belongs to forge.
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
 install -d -m 0700 -o forge -g forge "/srv/vasey-staging/private.pre-rollback-$STAMP"
 APP bash -c 'shopt -s dotglob nullglob; for e in /srv/vasey-staging/private/*; do mv -- "$e" "$1/"; done' _ "/srv/vasey-staging/private.pre-rollback-$STAMP"
-APP tar --extract --file=- --directory=/srv/vasey-staging/private --no-same-owner --preserve-permissions < "$SET/private.tar" || exit 1
+if [ -d "$SET/private" ]; then
+  tar --create --file=- --directory="$SET/private" --numeric-owner . \
+    | APP tar --extract --file=- --directory=/srv/vasey-staging/private --no-same-owner --preserve-permissions || exit 1
+else
+  APP tar --extract --file=- --directory=/srv/vasey-staging/private --no-same-owner --preserve-permissions < "$SET/private.tar" || exit 1
+fi
 (cd /srv/vasey-staging/private && sha256sum --check --strict --quiet "$SET/private.sha256") || exit 1
 # 4. Recheck/seal its attachment. As root, restore the hash-verified key/env on a fresh protected inode.
 /usr/local/sbin/vasey-staging-ctl attach "$PREV"
