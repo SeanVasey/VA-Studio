@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Domain\Commerce\UnpaidRelease\UnpaidReleasePolicy;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -13,12 +14,14 @@ require_once dirname(__DIR__, 2).'/scripts/ops/capability-boundary.php';
 class StagingRuntimeValidatorTest extends TestCase
 {
     /**
-     * The thirteen capability flags and the four stated beside them (batches K2 and K3, lane PCC). Written out here on purpose: removing one from
-     * scripts/ops/capability-boundary.php must fail a test, not silently shrink what the test checks.
+     * The twelve capability flags and the four stated beside them (batches K2 and K3, lane PCC). Written out here on purpose: removing one from
+     * scripts/ops/capability-boundary.php must fail a test, not silently shrink what the test checks. Unpaid release left this list on
+     * 2026-11-11 for STAGING_OPTIONAL_FLAGS (Sean's authorization for the staging alpha); tests/ops/test_staging_unpaid_release_admission.py
+     * runs the gate for it.
      */
     private const STAGED_FLAGS = [
         'VASEY_TEST_SERVICE_PROJECTS_ENABLED', 'VASEY_TEST_FREE_GRANTS_ENABLED', 'VASEY_TEST_CUSTOMER_CONSENT_ENABLED',
-        'VASEY_TEST_UNPAID_RELEASE_ENABLED', 'VASEY_TEST_REFUND_RESOLUTION_ENABLED', 'VASEY_TEST_REFUND_DISPUTE_ENABLED',
+        'VASEY_TEST_REFUND_RESOLUTION_ENABLED', 'VASEY_TEST_REFUND_DISPUTE_ENABLED',
         'VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED', 'VASEY_CUSTOMER_DATA_RIGHTS_ENABLED', 'VASEY_TRANSACTIONAL_MAIL_ENABLED',
         'CONTACT_TEST_ORDER_INQUIRIES_ENABLED', 'CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED',
         'VASEY_OPERATIVE_FREE_GRANTS_ENABLED', 'VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED',
@@ -123,10 +126,11 @@ class StagingRuntimeValidatorTest extends TestCase
         return array_combine(self::STAGED_FLAGS, array_map(static fn (string $flag): array => [$flag], self::STAGED_FLAGS));
     }
 
-    public function test_the_shared_boundary_lists_exactly_the_seventeen_flags(): void
+    public function test_the_shared_boundary_lists_exactly_the_sixteen_flags(): void
     {
         $this->assertSame(self::STAGED_FLAGS, array_keys(CapabilityBoundary::stagedFlags()));
-        $this->assertSame(13, count(CapabilityBoundary::CAPABILITY_FLAGS));
+        $this->assertSame(12, count(CapabilityBoundary::CAPABILITY_FLAGS));
+        $this->assertSame(['VASEY_TEST_UNPAID_RELEASE_ENABLED'], array_keys(CapabilityBoundary::STAGING_OPTIONAL_FLAGS));
         foreach (self::UNGATED_FLAGS as $flag) {
             $this->assertArrayHasKey($flag, CapabilityBoundary::CAPABILITY_FLAGS);
         }
@@ -319,6 +323,20 @@ class StagingRuntimeValidatorTest extends TestCase
             $this->assertSame([$environmentKey], CapabilityBoundary::flagsNotOff($reader), $environmentKey);
         }
         $this->assertSame([], CapabilityBoundary::flagsNotOff(static fn (string $key): bool => false));
+    }
+
+    #[DataProvider('notOff')]
+    public function test_an_optional_flag_passes_only_as_false_or_as_true_with_its_policy_admitting(mixed $value): void
+    {
+        $admits = static fn (string $policy): bool => true;
+        $refuses = static fn (string $policy): bool => false;
+        foreach (CapabilityBoundary::STAGING_OPTIONAL_FLAGS as $environmentKey => $flag) {
+            $reader = static fn (string $key): mixed => $key === $flag['config'] ? $value : false;
+            $this->assertSame($value === true ? [] : [$environmentKey], CapabilityBoundary::optionalFlagsRefused($reader, $admits), $environmentKey);
+            $this->assertSame([$environmentKey], CapabilityBoundary::optionalFlagsRefused($reader, $refuses), $environmentKey);
+            $this->assertSame(UnpaidReleasePolicy::class, $flag['policy']);
+        }
+        $this->assertSame([], CapabilityBoundary::optionalFlagsRefused(static fn (string $key): bool => false, $refuses));
     }
 
     public function test_a_byte_order_mark_is_refused_with_its_own_clear_check(): void
