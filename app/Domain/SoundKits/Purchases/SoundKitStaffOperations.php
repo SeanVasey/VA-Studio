@@ -8,6 +8,7 @@ use App\Domain\SoundKits\Purchases\Models\SoundKitDeliveryControl;
 use App\Domain\SoundKits\Purchases\Models\SoundKitGrant;
 use App\Domain\SoundKits\Purchases\Models\SoundKitOrder;
 use App\Models\User;
+use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Gate;
@@ -18,17 +19,22 @@ use Throwable;
  * `vasey:reconcile-test-kit-order`, callable from the admin panel. It owns no business rule: every step calls the service the
  * command calls ({@see SoundKitContracts}, {@see SoundKitDelivery}, {@see SoundKitPayments}), which keep their own audit events (those
  * record no actor, as from the console). This class adds one actor-attributed `sound_kit.staff_action.*` event per attempt, success or
- * refusal, so the Filament user who pressed the button is recorded. The lane gate and the catalog permission are enforced here, not
+ * refusal, so the Filament user who pressed the button is recorded. The lane gate, the catalog permission and admin MFA are enforced here, not
  * only in navigation. A refusal never carries private detail: only a stable, staff-readable reason.
  */
 final class SoundKitStaffOperations
 {
     public const PERMISSION = 'administer-catalog';
 
-    /** Whether the kit lane is open and this user may operate it; a closed lane is indistinguishable from absence. */
+    /**
+     * Whether the kit lane is open and this user may operate it; a closed lane is indistinguishable from absence. Like the sibling
+     * staff services, it re-reads the actor and requires admin multi-factor authentication where the panel requires it, so a caller
+     * other than the Filament page (whose boot() also checks it) cannot skip MFA.
+     */
     public function allows(?User $actor): bool
     {
-        return $actor !== null && app(SoundKitPurchasePolicy::class)->admitted() && Gate::forUser($actor)->allows(self::PERMISSION);
+        return $actor !== null && app(SoundKitPurchasePolicy::class)->admitted() && Gate::forUser($actor)->allows(self::PERMISSION)
+            && AdminMultiFactor::satisfiedBy($actor);
     }
 
     /**

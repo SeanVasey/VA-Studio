@@ -326,6 +326,30 @@ class TestKitOrderResourceTest extends TestCase
         $this->assertSame([], $this->audit('sound_kit.staff_action.contract_issue'));
     }
 
+    public function test_an_admin_without_mfa_is_refused_by_the_page_and_by_the_service_when_the_panel_requires_it(): void
+    {
+        $order = $this->granted();
+        $panel = Filament::getPanel('admin');
+        $wasRequired = $panel->isMultiFactorAuthenticationRequired();
+        $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: true);
+        try {
+            $noMfa = LicenseFixtures::admin();
+            Livewire::actingAs($noMfa)->test(ListTestKitOrders::class)->assertForbidden();
+            $service = app(SoundKitStaffOperations::class);
+            $this->assertFalse($service->allows($noMfa));
+            $this->assertSame(['ok' => false, 'message' => 'Not available.'], $service->issueContract($noMfa, $order->public_id));
+            $this->assertSame(['ok' => false, 'message' => 'Not available.'], $service->controlDelivery($noMfa, $order->public_id, 'enable', 0, 'REF-1234'));
+            $this->assertSame(['ok' => false, 'message' => 'Not available.'], $service->recheckPayment($noMfa, $order->public_id));
+            $this->assertSame([0, 0], [SoundKitContract::query()->count(), SoundKitDeliveryControl::query()->count()]);
+            $this->assertSame([], $this->audit('sound_kit.staff_action.contract_issue'));
+            // The enrolled admin is still admitted under the same requirement.
+            $this->assertTrue($service->allows($this->actor));
+            $this->assertTrue($service->issueContract($this->actor, $order->public_id)['ok']);
+        } finally {
+            $panel->multiFactorAuthentication($panel->getMultiFactorAuthenticationProviders(), isRequired: $wasRequired);
+        }
+    }
+
     public function test_contract_issuance_is_scheduled_tracked_and_closed_with_the_lane(): void
     {
         $this->app->make(ConsoleKernel::class)->bootstrap();
