@@ -133,6 +133,19 @@ art vasey:staging-seller-tag          # add --check to verify without installing
 - **Production.** A tag whose path contains `staging` or `synthetic`, or whose bytes contain the marker, is refused outside
   `local`, `testing` and `staging`: masters fail with `staging_tag_refused`, production `vasey:doctor` fails the required
   check `production_seller_tag`, and `ops/production/validate-runtime.php` refuses the deploy with `holds.staging_seller_tag`.
+- **After the tag changes.** Tracks processed under the chime keep chime previews until their masters are processed again
+  (`MEDIA_TAG_SHA256` is part of the processing fingerprint, but an existing preview stays "valid" against its own run).
+  After the approved tag is deployed and `art vasey:doctor` passes `seller_tag`, list and then queue the draft tracks to
+  reprocess (the media queue worker must be running; no path is printed):
+
+  ```sh
+  art vasey:media-retag-previews --check
+  art vasey:media-retag-previews --actor=<staff email>    # asks for that staff password; queues fresh runs, never publishes
+  ```
+
+  Published or unlisted tracks are reported (`skipped_live`) and left alone; unpublish one, then run it again. Repeat
+  `--check` until `stale_draft=0`. Details: [`media-processing.md`](../media-processing.md#regenerate-previews-after-the-seller-tag-changes).
+  The command refuses on production.
 - **Cleanup.** Previews made with it are rehearsal output. The replacement and its verification are entry P-1 of
   [`staging-placeholders.md`](staging-placeholders.md). Sean still approves the audible mix of the real tag before anything
   real is published.
