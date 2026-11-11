@@ -866,6 +866,21 @@ and the visual appearance more in line with other generated legal documents such
   placeholder with "Polk County, Iowa", and a court is named only in a governing-law or dispute clause (as the kit
   license does), never elsewhere. Postal city and ZIP stay Sean's and out of the repository.
 
+### Sean's answers, 2026-11-11: seller tag, preview-tag control, kit price and license
+
+- **Seller tag (S-6) answered.** The approved preview tag is a **4-second** cut of Sean's vocoded anti-theft vocal tag
+  (the first phrase and its delay tail, faded out from 3.5 s). The 34.5 s source exceeds the 15 s tag limit and the 30 s
+  repeat interval; Sean chose 4 s over 7 s and 11 s cuts. The file stays private (staging `branding/VASEY.AUDIO-seller-tag.wav`,
+  SHA-256 828e0b7b…); every preview mixes it every 30 seconds.
+- **Preview tag control.** Sean: a per-track on/off with a store-wide default, the default **on**. Both the tagged and
+  an untagged preview are kept per processing run so switching is immediate; a track set to off without an untagged
+  variant keeps serving the tagged one. Staff with MFA only, audited, and never changes sold licenses or deliverables.
+- **Kit price.** IMPERIAL DRVMZ: $14.99.
+- **Kit license.** The licensor line reads **VASEY.AUDIO** (`VASEY_KIT_LICENSE_LICENSOR_NAME`). The only change to
+  Sean's Sample Pack License text is a purchase-details block under the title carrying the six placeholders; the
+  wording is otherwise unchanged and stays out of Git. On staging it is published as the sound-kit license
+  (authored by Sean's account, approved and published by the review account).
+
 ### Reconciliation with the delegated decisions (DD-xx)
 
 | DD row | Status | Governing decision |

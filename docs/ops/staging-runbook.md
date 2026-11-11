@@ -21,6 +21,12 @@ Conventions:
 alias art='sudo -u forge php8.4 /srv/vasey-staging/current/artisan'
 ```
 
+  Run any command that writes private files (kit import, retag, legal release) with an owner-only umask, for example
+  `sudo -u forge bash -c 'umask 077; php8.4 /srv/vasey-staging/current/artisan …'`. The queue worker already writes
+  0600/0700, but a `sudo` shell inherits a looser umask; on 2026-11-11 two group-writable kit `.write-lock` files from a
+  CLI kit import made the next deploy's snapshot proof refuse the private tree and left the site in maintenance until
+  case-A recovery. The kit lock is now created 0600 whatever the umask (#317); the umask habit covers anything else.
+
 ## 1. First deploy
 
 Do steps 1 to 10 of [`ops/staging/README.md`](../../ops/staging/README.md#provisioning-step-by-step) in order.

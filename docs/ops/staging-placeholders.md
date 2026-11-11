@@ -11,6 +11,7 @@ Add an entry in the same change that introduces a placeholder. Remove an entry o
 
 | | |
 | --- | --- |
+| **Status (2026-11-11)** | **Replaced.** Sean's approved tag is installed on staging as `branding/VASEY.AUDIO-seller-tag.wav` (`MEDIA_TAG_SHA256` 828e0b7b…; a 4-second cut chosen by Sean, decision register 2026-11-11). All 98 draft-track previews were regenerated with `vasey:media-retag-previews`; the newest preview of every track records the new `tag_sha256`. The chime file is still on the host and is deleted after Sean's listening check. |
 | **What it is** | A one-second, three-tone chime (880, 1320 and 1760 Hz sine tones; 16-bit mono PCM WAV, about 88 kB) that stands in for Sean's approved seller preview tag (S-6). It is made on the host by ffmpeg's built-in `sine` source. It is no recording, sample or speech and carries no brand mark. It is not committed to Git. |
 | **Why** | Without a configured tag the media pipeline produces no tagged preview (`tag_not_configured`), so nothing can be published and the synthetic rehearsal catalog refuses to run. |
 | **How it is made** | `php8.4 artisan vasey:staging-seller-tag` in the served release, as the user that owns private storage (`forge`). It refuses unless `APP_ENV` is `local`, `testing` or `staging` and matches the running environment. It never replaces an installed tag and never edits the environment. |
