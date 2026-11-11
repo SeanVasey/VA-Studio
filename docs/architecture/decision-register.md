@@ -904,6 +904,26 @@ and the visual appearance more in line with other generated legal documents such
   leases, Exclusive is on by default per track, and stem tiers are unavailable on tracks without stems.
 - `docs/legal/LICENSE-TIERS.md` remains a superseded draft wherever it differs (DD-21). Contract text stays private.
 
+### Sean's answers, 2026-11-11 (later): what an Exclusive grants, and catalog rights
+
+- **Exclusive is an exclusive license, never a sale of the instrumental master** (refines SQ-05). Sean always owns the
+  instrumental: its sound recording (the instrumental master) and its composition. The buyer may use, adapt and
+  commercially exploit the instrumental in new works that add the buyer's own significant, substantial and original
+  contribution, and owns that contribution. The buyer may not exploit the instrumental as Sean made it, or with only
+  minor changes, and may register their works, not the bare instrumental, with content-identification systems.
+  "Produced by Sean Vasey" is a condition of the license on every work, release, video, listing and metadata entry.
+- After an exclusive sale Sean grants no new licenses on that beat. Licenses sold before the sale stay valid for their
+  terms. Sean always keeps the right to play and share the instrumental in his portfolio, showreels, website and social
+  media, but not to sell or license new use.
+- Selling the instrumental master or composition outright is a separate, directly negotiated written agreement; the
+  store never sells it.
+- Publishing on an exclusive is 50% Sean and 50% the buyer, with the matching writer and publisher shares, replacing
+  the template's 45/35/25 split by use.
+- Sean's Exclusive template clauses 1, 2 and 5 are rewritten to match (private; the contract text stays out of Git).
+  The rewrite is a draft for his attorney's review before any live exclusive sale.
+- **Catalog rights attestation:** Sean states that all 99 imported tracks are his original productions. Staging
+  records this as each track's rights declaration (no third-party samples, Sean 100%).
+
 ### Reconciliation with the delegated decisions (DD-xx)
 
 | DD row | Status | Governing decision |
