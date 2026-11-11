@@ -468,6 +468,8 @@ class CollaboratorSplitsTest extends TestCase
             'app/Domain/Catalog/ReadTrackPublicationManifest.php', 'app/Filament/Resources/TrackResource.php',
             // Classification of the two tables as staff catalog data.
             'app/Domain/Customers/DataRights/RetentionSchedule.php',
+            // Media-reference classification only: names the split table's track_id column as metadata that holds no media.
+            'app/Domain/Media/Lifecycle/MediaReferenceRegistry.php',
         ];
         $found = [];
         foreach ((new Finder)->files()->in([app_path(), base_path('routes'), base_path('config'), resource_path()])->name(['*.php', '*.ts', '*.tsx']) as $file) {
