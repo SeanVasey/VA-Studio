@@ -442,8 +442,10 @@ withdraw_proofs() {  # withdraw_proofs NAME...
 }
 
 # Re-proves, with the site still up, every file of the set the next snapshot will share, and writes the token that lets the
-# snapshot share it. Returns 1 after a failed re-proof: that set and every set sharing an inode with what failed lose their
-# restore proof, no token exists, and the caller decides (a deploy refuses before its quiesce; the nightly run copies everything).
+# snapshot share it. Returns 1 after a failed re-proof (the engine exits 1 and names the sets): those sets lose their restore
+# proof. Returns 2 after an operational error (the engine exits 3, or anything else: no space, I/O, a token it cannot write):
+# nothing is withdrawn, because it says nothing about a backup's content. Either way no token exists and the caller decides (a
+# deploy refuses before its quiesce; the nightly run copies everything).
 preverify_link_source() {
   [ -n "${PRIVATE_SNAPSHOT:-}" ] && [ -f "$PRIVATE_SNAPSHOT" ] || return 0
   local src out rc=0
@@ -461,9 +463,13 @@ preverify_link_source() {
     return 0
   fi
   rm -f -- "${VASEY_BACKUP_DIR:?}/.link-token"
+  if [ "$rc" != 1 ]; then
+    log "WARNING: the re-verification of $(basename -- "$src") could not run: an operational error, not a corruption finding ($(printf '%s\n' "$out" | grep -v '^withdraw=' | tr '\n' ' ' | cut -c1-300)). No restore proof was withdrawn; nothing is shared until a re-verification succeeds"
+    return 2
+  fi
   mapfile -t withdrawn < <(printf '%s\n' "$out" | sed -n 's/^withdraw=//p')
-  withdraw_proofs "$(basename -- "$src")" "${withdrawn[@]}"
-  log "WARNING: $(basename -- "$src") failed its private file re-verification ($(printf '%s\n' "$out" | grep -v '^withdraw=' | tr '\n' ' ' | cut -c1-300)); withdrew the proof of: ${withdrawn[*]:-$(basename -- "$src")}. Nothing is shared: the next snapshot copies the whole private store. Inspect with: vasey-staging-backup restore-check $src"
+  withdraw_proofs "${withdrawn[@]}"
+  log "WARNING: $(basename -- "$src") failed its private file re-verification ($(printf '%s\n' "$out" | grep -v '^withdraw=' | tr '\n' ' ' | cut -c1-300)); withdrew the proof of: ${withdrawn[*]:-none}. Nothing is shared: the next snapshot copies the whole private store. Inspect with: vasey-staging-backup restore-check $src"
   return 1
 }
 
@@ -1110,8 +1116,16 @@ space_check() {  # space_check [--preverify]
   local priv db copy full set_need need restore_need ship_need avail restore_avail backup_at restore_at margin src estimate
   # Re-proving the shared set first (site still up) decides what the snapshot may share, and so what it must copy. A deploy
   # refuses on a failed re-proof, before anything is stopped: a backup set's files changed on disk, which needs a person.
-  if [ "${1:-}" = --preverify ] && ! preverify_link_source; then
-    die "refused: a backup set's private files failed re-verification (reason above; its proof and those of the sets sharing the file were withdrawn); nothing was stopped. Check the disk and the sets (docs/ops/staging-runbook.md section 8), then deploy again: the next snapshot copies the whole private store"
+  # The re-hash runs before the free-space arithmetic on purpose: what the snapshot may share (and so must not copy) is decided by
+  # it. Checking space first would count a full copy and refuse deploys that fit; the re-hash itself writes only the token.
+  if [ "${1:-}" = --preverify ]; then
+    local preverified=0
+    preverify_link_source || preverified=$?
+    case "$preverified" in
+      0) ;;
+      1) die "refused: a backup set's private files failed re-verification (reason above; its proof and those of the sets holding the failed file were withdrawn); nothing was stopped. Check the disk and the sets (docs/ops/staging-runbook.md section 8, corruption refusal), then deploy again: the next snapshot copies the whole private store" ;;
+      *) echo "vasey-staging-backup: refused: the re-verification of the backup set could not run (an operational error such as no space or an I/O error, not corruption; reason above). No restore proof was withdrawn and nothing was stopped. Fix the cause (docs/ops/staging-runbook.md section 8, operational refusal), then deploy again" >&2; exit 3 ;;
+    esac
   fi
   [ -d "$PRIVATE" ] && [ ! -L "$PRIVATE" ] || die "private root missing"
   priv=$(du -sb -- "$PRIVATE" | cut -f1)

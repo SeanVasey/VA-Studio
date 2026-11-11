@@ -827,5 +827,192 @@ class Wiring(unittest.TestCase):
         self.assertIn("PRIVATE_SNAPSHOT=/usr/local/libexec/vasey-staging/private-snapshot.py", SOURCE)
 
 
+
+class OperationalErrors(PrivateTreeBase):
+    """Review round 3, R1: an error about the host or the run is not evidence about a backup and withdraws nothing."""
+
+    def eio_engine(self):
+        wrapper = self.root / "engine-with-eio.py"
+        wrapper.write_text(
+            "import errno, os, runpy, sys\n"
+            "def failing(fd, buffers):\n"
+            "    raise OSError(errno.EIO, 'synthetic I/O error')\n"
+            "os.readv = failing\n"
+            f"sys.argv = [{str(ENGINE)!r}] + sys.argv[1:]\n"
+            f"runpy.run_path({str(ENGINE)!r}, run_name='__main__')\n")
+        return wrapper
+
+    def assert_operational_refusal(self, run, *sets):
+        self.assertEqual(run.returncode, 3, run.stdout + run.stderr)
+        self.assertIn("an operational error, not a corruption finding", run.stdout)
+        self.assertIn("No restore proof was withdrawn", run.stdout)
+        self.assertIn("operational refusal", run.stderr)
+        self.assertNotIn("failed its private file re-verification", run.stdout)
+        self.assertNotIn("withdrew the restore proof", run.stdout)
+        for bk in sets:
+            self.assertEqual(fields(bk / "RESTORE_CHECK")["result"], "RESTORE_VERIFIED", bk.name)
+        self.assertFalse(self.token().is_file())
+
+    def test_a_token_that_cannot_be_written_refuses_the_deploy_and_withdraws_nothing(self):
+        first = self.predeploy()
+        second = self.predeploy()
+        self.token().mkdir()  # stands in for ENOSPC or EIO while writing the token
+        run = self.run_helper("space-check", "--preverify", T_FREE=10**15)
+        self.assert_operational_refusal(run, first, second)
+        self.assertIn("token could not be written", run.stdout)
+        self.token().rmdir()
+        self.assertEqual(list(self.backups.glob(".link-token.new.*")), [], "no temporary token is left behind")
+        # Once the cause is gone the next deploy re-verifies and shares as usual.
+        third = self.predeploy()
+        self.assertEqual(fields(third / "MANIFEST")["private_link_source"], second.name)
+
+    def test_an_io_error_during_the_re_hash_refuses_the_deploy_and_withdraws_nothing(self):
+        first = self.predeploy()
+        second = self.predeploy()
+        run = self.run_helper("space-check", "--preverify", T_FREE=10**15, PRIVATE_SNAPSHOT=self.eio_engine())
+        self.assert_operational_refusal(run, first, second)
+        self.assertIn("EIO", run.stdout)
+        self.assertIn("the proof could not run", run.stdout)
+
+    def test_a_real_mismatch_still_withdraws_and_is_reported_as_corruption(self):
+        first = self.predeploy()
+        self.corrupt(first / "private/masters/track-one/master.wav")
+        run = self.run_helper("space-check", "--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertIn("failed its private file re-verification", run.stdout)
+        self.assertIn("corruption refusal", run.stderr)
+        self.assertNotIn("operational error", run.stdout)
+        self.assertFalse((first / "RESTORE_CHECK").exists())
+
+    def test_the_engine_exit_codes_tell_the_two_apart(self):
+        first = self.predeploy()
+        token = self.root / "token-dir"
+        token.mkdir()
+        run = subprocess.run([sys.executable, "-I", str(ENGINE), "preverify", str(first), "--token", str(token),
+                              "--backups", str(self.backups)], capture_output=True, text=True)
+        self.assertEqual(run.returncode, 3, run.stderr)
+        self.assertNotIn("withdraw=", run.stdout)
+        self.corrupt(first / "private/contracts/c1.pdf", b"X")
+        run = subprocess.run([sys.executable, "-I", str(ENGINE), "preverify", str(first), "--token", str(self.root / "token"),
+                              "--backups", str(self.backups)], capture_output=True, text=True)
+        self.assertEqual(run.returncode, 1, run.stderr)
+        self.assertIn(f"withdraw={first.name}", run.stdout)
+
+
+class NarrowWithdrawals(PrivateTreeBase):
+    """Review round 3, R2: a mode or owner change withdraws only the sets that hold the changed file."""
+
+    def test_a_widened_file_in_one_set_only_withdraws_that_set(self):
+        first = self.predeploy()
+        self.write("new.bin", b"n" * 10)
+        time.sleep(2.1)
+        second = self.predeploy()
+        os.chmod(second / "private/new.bin", 0o640)  # only in the second set
+        run = self.run_helper("space-check", "--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertFalse((second / "RESTORE_CHECK").exists())
+        self.assertTrue((first / "RESTORE_CHECK").exists(), "the older set does not hold that file")
+
+    def test_a_widened_mode_recorded_in_one_set_only_withdraws_that_set(self):
+        # The mode was already wide when the snapshot copied it (strict modes off then): the strict re-proof refuses it as a
+        # mode finding, and only the set holding that file loses its proof.
+        first = self.predeploy()
+        self.write("new.bin", b"n" * 10).chmod(0o640)
+        time.sleep(2.1)
+        second = self.predeploy(VASEY_RESTORE_STRICT_MODES=0)
+        self.assertEqual(fields(second / "MANIFEST")["private_link_source"], first.name)
+        run = self.run_helper("space-check", "--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertIn("set tree fail", run.stdout)
+        self.assertFalse((second / "RESTORE_CHECK").exists())
+        self.assertTrue((first / "RESTORE_CHECK").exists(), "the older set does not hold that file")
+
+    def test_a_widened_shared_file_withdraws_every_set_that_holds_it(self):
+        first = self.predeploy()
+        second = self.predeploy()
+        os.chmod(second / "private/masters/track-one/stems.zip", 0o640)  # the same inode is in the first set
+        run = self.run_helper("space-check", "--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertFalse((second / "RESTORE_CHECK").exists())
+        self.assertFalse((first / "RESTORE_CHECK").exists())
+
+
+class TokenAndWalkerChecks(PrivateTreeBase):
+    """Review round 3, R3 and R4."""
+
+    def test_a_token_whose_set_lost_its_proof_shares_nothing(self):
+        first = self.predeploy()
+        run = self.run_helper("space-check", "--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertTrue(self.token().is_file())
+        (first / "RESTORE_CHECK").unlink()
+        second = self.predeploy(preverify=False)
+        manifest = fields(second / "MANIFEST")
+        self.assertEqual((manifest["private_link_source"], manifest["private_linked_files"]), ("none", "0"))
+
+
+@unittest.skipUnless(IS_ROOT, "set files are checked for this user's ownership")
+class EngineRound3(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(prefix="va-private-engine3-")
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.live = self.root / "live"
+        for sub in ("a", "b"):
+            (self.live / sub).mkdir(parents=True, mode=0o700)
+            (self.live / sub / "file").write_bytes(sub.encode() * 100)
+            (self.live / sub / "file").chmod(0o600)
+        self.live.chmod(0o700)
+        time.sleep(2.1)
+
+    def test_a_directory_swapped_for_another_real_directory_after_the_listing_is_refused(self):
+        # O_NOFOLLOW does not catch this one: only the inode comparison with the listing does.
+        target = self.root / "set"
+        target.mkdir(mode=0o700)
+        original = engine._open_dir
+
+        def swap(parent_fd, name):
+            if name == "a" and not (self.root / "moved-a").exists():
+                os.rename(self.live / "a", self.root / "moved-a")
+                os.rename(self.live / "b", self.live / "a")
+            return original(parent_fd, name)
+
+        engine._open_dir = swap
+        try:
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
+                self.assertEqual(engine.main(["snapshot", "--live", str(self.live), "--set", str(target)]), 1)
+        finally:
+            engine._open_dir = original
+        self.assertIn("changed during the walk", err.getvalue())
+
+    def test_a_linked_inode_whose_size_or_mtime_moved_since_the_decision_refuses_the_snapshot(self):
+        backups = self.root / "backups"
+        backups.mkdir(mode=0o700)
+        source = backups / "20261110T000000Z-none"
+        source.mkdir(mode=0o700)
+        run = subprocess.run([sys.executable, "-I", str(ENGINE), "snapshot", "--live", str(self.live), "--set", str(source)],
+                             capture_output=True, text=True)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        token = backups / ".link-token"
+        run = subprocess.run([sys.executable, "-I", str(ENGINE), "preverify", str(source), "--token", str(token),
+                              "--backups", str(backups)], capture_output=True, text=True)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        target = backups / "20261111T000000Z-none"
+        target.mkdir(mode=0o700)
+        original = engine.os.link
+
+        def touch_then_link(src, dst, *args, **kwargs):
+            os.utime(src, ns=(0, 10**9), dir_fd=kwargs["src_dir_fd"], follow_symlinks=False)  # same inode, another mtime
+            return original(src, dst, *args, **kwargs)
+
+        engine.os.link = touch_then_link
+        try:
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
+                self.assertEqual(engine.main(["snapshot", "--live", str(self.live), "--set", str(target), "--link-from", str(source),
+                                              "--link-token", str(token)]), 1)
+        finally:
+            engine.os.link = original
+        self.assertIn("not the verified inode", err.getvalue())
+
 if __name__ == "__main__":
     unittest.main()

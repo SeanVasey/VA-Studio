@@ -594,13 +594,25 @@ that are new or changed since the newest verified set and hard-links the unchang
   writes a token, `backups/.link-token`, outside every set: the identity of each verified inode, ctime included. The next snapshot
   consumes it (one use; refused after 6 hours or when it names another set) and shares only files whose inode still has exactly
   that identity. Any write to it since, by anyone, moves the ctime, so it is copied instead. Without a token nothing is shared.
-- **A failed re-hash withdraws every proof it affects.** The `RESTORE_CHECK` of that set and of every other tree set that shares an
-  inode with a failed file is removed, no token is written, and a **deploy refuses before it stops anything** ("a backup set's
-  private files failed re-verification ... nothing was stopped"): the disk changed a backup behind its manifest, which needs a
-  person. Check `dmesg` and the disk, run `vasey-staging-backup restore-check <set>` on what remains, then deploy again (it
-  re-verifies the newest set that still holds a proof, or copies everything). The nightly run does not refuse: it logs the
-  WARNING and its snapshot copies everything. A withdrawn set that was still waiting for its off-host copy is skipped by
-  `ship-pending` (`pending` shows `last_result=skipped` and why) until it is proven again or abandoned with `pending-clear`.
+- **Two kinds of refusal before the quiesce.** The deploy log tells them apart; neither stops anything.
+  - **Corruption refusal** ("a backup set's private files failed re-verification ... corruption refusal"; the backup log says
+    "failed its private file re-verification" and "withdrew the restore proof of ..."). A file's bytes, identity, mode or owner,
+    or the set's names or directories, no longer match the manifest. The `RESTORE_CHECK` of that set and of every tree set that
+    holds a failed file is removed (a mode or owner change withdraws only the sets that hold that file). What to do: check `dmesg`
+    and the disk; run `sudo /usr/local/sbin/vasey-staging-backup restore-check <set>` on the sets that still hold a proof; keep
+    the withdrawn sets for inspection (do not delete them by hand); then deploy again. The next deploy re-verifies the newest set
+    that still holds a proof, or copies everything. Rollback case B needs a set with `RESTORE_VERIFIED`: use the newest one that
+    still has it.
+  - **Operational refusal** ("the re-verification of the backup set could not run (an operational error ... not corruption) ...
+    operational refusal", exit status 3; the backup log says "an operational error, not a corruption finding" and "No restore
+    proof was withdrawn"). The re-hash could not run or its token could not be written: no space (the host has been at 96%), an
+    I/O error, an unreadable file. **Every proof is kept.** What to do: fix the cause (free space with
+    `sudo /usr/local/sbin/vasey-staging-ctl backup-prune`; read `dmesg` for I/O errors), then deploy again; nothing else.
+  - The nightly run refuses neither: it logs the WARNING (with the same two wordings) and its snapshot copies everything.
+  - The re-hash runs before the free-space arithmetic on purpose: it decides what may be shared and so what must be copied;
+    checking space first would count a full copy and refuse deploys that fit. It writes only the token (a few MB).
+  - A withdrawn set that was still waiting for its off-host copy is skipped by `ship-pending` (`pending` shows
+    `last_result=skipped` and why) until it is proven again or abandoned with `pending-clear`.
 - **Inside the window** the proof re-hashes every file the snapshot copied and checks that every shared file is still the exact
   inode it linked (device, inode, size, mtime, mode, owner, ctime). `restore-check DIR` (manual, case B below, a set moved to
   another disk or extracted from an off-host copy) re-hashes every file and compares size, mode and the mtime in whole seconds,

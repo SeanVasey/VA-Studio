@@ -6,8 +6,12 @@ only by the backup helper, as root, with `python3 -I`:
 
     preverify SET --token TOKEN --backups DIR [--strict-modes 0|1]
         Re-hashes every file of SET (the site is still up). Success writes TOKEN, outside every set: the identity of each
-        verified inode, which is what a snapshot may then share. Failure prints `withdraw=NAME` for SET and for every set in DIR
-        that shares an inode with what failed, and exits 1.
+        verified inode, which is what a snapshot may then share. A proof failure (content, identity, names, directories, modes)
+        prints `withdraw=NAME` for SET and for every set in DIR that holds an inode that failed, and exits 1. An operational
+        error (I/O, no space, an unreadable or unparseable file, a token that cannot be written) withdraws nothing and exits 3.
+
+Exit status of every command: 0 success, 1 the set or the store failed a check (Refused), 3 operational error (OSError,
+ValueError): the helper must not treat 3 as evidence about a backup's content.
     snapshot --live PRIVATE --set SET [--link-from SOURCE_SET --link-token TOKEN] [--link-max-age-hours H]
         Writes SET/private/ (a copy of PRIVATE), SET/private.sha256, SET/private.dirs and SET/private.index.
     verify SET [--full] [--backups DIR] [--strict-modes 0|1]
@@ -69,6 +73,14 @@ FILE_FLAGS = os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC
 
 class Refused(Exception):
     pass
+
+
+EXIT_REFUSED = 1
+EXIT_OPERATIONAL = 3
+
+
+class Operational(Exception):
+    """An error about the host or the run, not about a backup's content: it never withdraws a proof."""
 
 
 class Mismatch(Refused):
@@ -180,13 +192,20 @@ def write_atomic(path, data):
     temporary = f"{path}.new.{os.getpid()}"
     fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600)
     try:
-        view = memoryview(data)
-        while view:
-            view = view[os.write(fd, view):]
-        os.fsync(fd)
-    finally:
-        os.close(fd)
-    os.replace(temporary, path)
+        try:
+            view = memoryview(data)
+            while view:
+                view = view[os.write(fd, view):]
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+        os.replace(temporary, path)
+    except BaseException:
+        try:
+            os.unlink(temporary)
+        except OSError:
+            pass
+        raise
 
 
 def report(fields):
@@ -369,7 +388,8 @@ def snapshot(args):
                     shared = None
                 if shared is not None:
                     linked = os.stat(name, dir_fd=destination, follow_symlinks=False)
-                    if (linked.st_dev, linked.st_ino) != (source_st.st_dev, source_st.st_ino):
+                    if [linked.st_dev, linked.st_ino, linked.st_size, linked.st_mtime_ns] \
+                            != [source_st.st_dev, source_st.st_ino, source_st.st_size, source_st.st_mtime_ns]:
                         raise Refused("a linked set file is not the verified inode")
                     record = {"h": digest, "how": "link"}
                     counts["linked_files"] += 1
@@ -458,7 +478,7 @@ def prove(setdir, full, strict_modes):
     with os.fdopen(fd, "rb") as handle:
         listed_dirs = [os.fsdecode(line) for line in handle.read().splitlines()]
     uid, gid = os.geteuid(), os.getegid()
-    files, dirs, widened, bad, identities = {}, [], [], {}, {}
+    files, dirs, widened, bad, identities, widened_inodes = {}, [], [], {}, {}, set()
     counts = {"rehashed_files": 0, "rehashed_bytes": 0, "trusted_linked_files": 0}
 
     def on_dir(rel, st, fd):
@@ -474,6 +494,7 @@ def prove(setdir, full, strict_modes):
         if stat.S_IMODE(st.st_mode) not in ((0o644,) if rel == "./.gitignore" else (0o600, 0o400)) \
                 or (st.st_uid, st.st_gid) != (uid, gid):
             widened.append(rel)
+            widened_inodes.add((st.st_dev, st.st_ino))
         try:
             if manifest[rel] != entry["h"]:
                 raise Refused("the set's private.sha256 and private.index disagree")
@@ -515,7 +536,8 @@ def prove(setdir, full, strict_modes):
     if widened:
         mode_result = f"fail ({len(widened)} entries outside 0600/0400 files, 0700 dirs or this user's ownership)"
         if strict_modes:
-            raise Refused(f"set tree {mode_result}")
+            # Only the sets holding a widened file are affected (a directory is never shared between sets).
+            raise Mismatch(f"set tree {mode_result}", widened_inodes)
     return dict(counts, files=len(files), dirs=len(dirs), modes_and_ownership=mode_result,
                 proof="full" if full else "incremental"), identities
 
@@ -552,33 +574,44 @@ def withdrawals(setdir, backups, error):
             if set_inodes(other) & suspect:
                 names.add(name)
         except (OSError, Refused):
-            names.add(name)  # a tree that cannot be walked cannot keep a proof either
+            # Not evidence about that set's content: it keeps its proof, and its own re-proof decides.
+            continue
     return names
 
 
-def verify(args):
-    setdir = os.path.abspath(args.set)
+def proved(setdir, full, strict_modes, backups):
+    """prove() for verify and preverify: a proof failure prints the withdrawals; anything else is operational."""
     try:
-        summary, _ = prove(setdir, args.full, args.strict_modes)
+        return prove(setdir, full, strict_modes)
     except Refused as error:
-        for name in sorted(withdrawals(setdir, args.backups, error)):
+        for name in sorted(withdrawals(setdir, backups, error)):
             print(f"withdraw={name}")
         raise
+    except (OSError, ValueError) as error:
+        raise Operational(f"the proof could not run ({describe(error)}); this says nothing about the set's content") from error
+
+
+def verify(args):
+    summary, _ = proved(os.path.abspath(args.set), args.full, args.strict_modes, args.backups)
     report(summary)
 
 
 def preverify(args):
     setdir = os.path.abspath(args.set)
-    try:
-        summary, identities = prove(setdir, True, args.strict_modes)
-    except Refused as error:
-        for name in sorted(withdrawals(setdir, args.backups, error)):
-            print(f"withdraw={name}")
-        raise
+    summary, identities = proved(setdir, True, args.strict_modes, args.backups)
     header = {"format": TOKEN_FORMAT, "set": os.path.basename(setdir.rstrip("/")), "verified_ns": time.time_ns()}
-    write_atomic(args.token, jsonl(header, [{"p": rel, "id": ident}
-                                            for rel, ident in sorted(identities.items(), key=lambda item: key(item[0]))]))
+    try:
+        write_atomic(args.token, jsonl(header, [{"p": rel, "id": ident}
+                                                for rel, ident in sorted(identities.items(), key=lambda item: key(item[0]))]))
+    except OSError as error:
+        raise Operational(f"the set verified, but its re-verification token could not be written ({describe(error)})") from error
     report(summary)
+
+
+def describe(error):
+    # A path can name private content: report the kind of failure and its errno only.
+    code = errno.errorcode.get(error.errno, "") if isinstance(error, OSError) and error.errno else ""
+    return type(error).__name__ + (f", {code}" if code else "")
 
 
 def hours(value):
@@ -614,12 +647,13 @@ def main(argv):
         {"snapshot": snapshot, "estimate": estimate, "verify": verify, "preverify": preverify}[args.command](args)
     except Refused as error:
         print(f"private-snapshot: {error}", file=sys.stderr)
-        return 1
+        return EXIT_REFUSED
+    except Operational as error:
+        print(f"private-snapshot: operational error: {error}", file=sys.stderr)
+        return EXIT_OPERATIONAL
     except (OSError, ValueError) as error:
-        # A path can name private content: report the kind of failure and its errno only.
-        print(f"private-snapshot: {args.command} failed ({type(error).__name__}"
-              f"{', ' + errno.errorcode.get(error.errno, '') if isinstance(error, OSError) and error.errno else ''})", file=sys.stderr)
-        return 1
+        print(f"private-snapshot: operational error: {args.command} failed ({describe(error)})", file=sys.stderr)
+        return EXIT_OPERATIONAL
     return 0
 
 
