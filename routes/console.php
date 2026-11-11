@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\Operations\OperationalSignals;
+use App\Domain\SoundKits\Purchases\SoundKitPurchasePolicy;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -42,6 +43,12 @@ OperationalSignals::track(Schedule::command('vasey:customer-data-exports-prune')
 // outcome is tracked like the other commands. The overlap lock is hygiene only, as above.
 OperationalSignals::track(Schedule::command('vasey:upload-sessions-sweep --execute')->hourlyAt(41)->withoutOverlapping(10)
     ->when(fn (): bool => config('media.upload_session_sweep.scheduled') === true), 'vasey:upload-sessions-sweep');
+
+// BL-13: grants paid Stripe-test kit orders whose grant failed after the payment committed (SoundKitPayments::settle). Runs only
+// while SoundKitPurchasePolicy admits the kit lane (never in production). Every 10 minutes at :04/:14/…/:54 keeps it off minute zero
+// and the other jobs' minutes; a still-refused order exits non-zero, which the tracked signal shows as Needs attention.
+OperationalSignals::track(Schedule::command('vasey:finalize-test-kit-grants')->cron('4-59/10 * * * *')->withoutOverlapping(10)
+    ->when(fn (): bool => app(SoundKitPurchasePolicy::class)->admitted()), 'vasey:finalize-test-kit-grants');
 
 // FP-028 dashboard: one upserted row a minute proves the scheduler itself runs (OperationalSignals; "Scheduler last run" turns
 // Needs attention after `reporting.health.scheduler_heartbeat_stale_seconds`). The tracked commands above record their latest

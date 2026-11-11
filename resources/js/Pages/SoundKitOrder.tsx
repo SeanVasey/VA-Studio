@@ -38,10 +38,12 @@ export default function SoundKitOrder({ siteContent, order: initial, navigate = 
       setMessage(caught instanceof SoundKitRequestError ? caught.message : 'This request could not be completed.');
     } finally { setBusy(false); }
   }
+  // Starting and continuing both ask the server: it creates the session once, then re-reads it and returns its URL only while open.
   const checkout = () => run(async () => {
     const state = await soundKitPost<SoundKitOrderState>(`${base}/checkout`);
     setOrder(state);
     if (stripeTestCheckoutUrl(state.checkoutUrl)) navigate(state.checkoutUrl);
+    else if (state.status === 'checkout_started') setMessage('This Stripe test checkout is no longer open. Check the payment status instead.');
   });
   const reconcile = () => run(async () => { setOrder(await soundKitPost<SoundKitOrderState>(`${base}/checkout/reconcile`)); });
   const download = (kind: 'archive' | 'contract') => run(async () => {
@@ -56,7 +58,8 @@ export default function SoundKitOrder({ siteContent, order: initial, navigate = 
     document.body.appendChild(form);
     try { submitForm(form); } finally { form.remove(); }
   });
-  const unpaid = order.status === 'not_started' || order.status === 'checkout_started';
+  // `paid` without a grant is retried by the server; the owner may also ask it to try again now.
+  const checkable = order.status === 'not_started' || order.status === 'checkout_started' || order.status === 'paid';
   return <>
     <a className="skip-link" href="#main">Skip to content</a>
     <SiteHeader {...chrome} currentPath="/sound-kits" />
@@ -68,7 +71,8 @@ export default function SoundKitOrder({ siteContent, order: initial, navigate = 
         <p role="status">{descriptions[order.status]}</p>
         <div className="sound-kit-order-actions">
           {order.status === 'not_started' && <button type="button" className="button" disabled={busy} onClick={checkout}>Continue to Stripe test checkout</button>}
-          {unpaid && <button type="button" className="button" disabled={busy} onClick={reconcile}>Check payment status</button>}
+          {order.status === 'checkout_started' && <button type="button" className="button" disabled={busy} onClick={checkout}>Continue to checkout</button>}
+          {checkable && <button type="button" className="button" disabled={busy} onClick={reconcile}>Check payment status</button>}
           {order.deliverables.includes('archive') && <button type="button" className="button" disabled={busy} onClick={() => download('archive')}>Download the kit (ZIP)</button>}
           {order.deliverables.includes('contract') && <button type="button" className="button" disabled={busy} onClick={() => download('contract')}>Download the license (PDF)</button>}
         </div>

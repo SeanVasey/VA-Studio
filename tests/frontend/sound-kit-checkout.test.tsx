@@ -47,6 +47,30 @@ describe('kit purchase', () => {
     expect(navigate).not.toHaveBeenCalled();
   });
 
+  it('keeps one idempotency key while the licensee name is unchanged and starts a new one when it changes', async () => {
+    const refusal = () => json({ code: 'CHECKOUT_UNAVAILABLE', message: 'Test checkout is unavailable.' }, 503);
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(refusal);
+    const user = userEvent.setup();
+    render(<SoundKitBuy slug="synthetic-kit" title="Synthetic Kit" priceLabel="$14.99" navigate={vi.fn()} />);
+    const input = screen.getByLabelText('Licensee legal name');
+    const button = screen.getByRole('button', { name: 'Buy with Stripe test checkout' });
+    const sent = (call: number) => JSON.parse(String((fetchMock.mock.calls[call][1] as RequestInit).body));
+    await user.type(input, 'Ada Synthetic');
+    await user.click(button);
+    await screen.findByRole('alert');
+    await user.click(button);
+    await screen.findByRole('alert');
+    expect(sent(1)).toEqual(sent(0));
+    await user.clear(input);
+    await user.type(input, 'Grace Synthetic');
+    await user.click(button);
+    await screen.findByRole('alert');
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(sent(2).licenseeName).toBe('Grace Synthetic');
+    expect(sent(2).idempotencyKey).toMatch(/^kit-[0-9a-f]{32}$/);
+    expect(sent(2).idempotencyKey).not.toBe(sent(0).idempotencyKey);
+  });
+
   it('accepts only Stripe test checkout addresses', () => {
     expect(stripeTestCheckoutUrl('https://checkout.stripe.com/c/pay/cs_test_X')).toBe(true);
     for (const bad of ['https://checkout.stripe.com/c/pay/cs_live_X', 'http://checkout.stripe.com/c/pay/cs_test_X', 'https://evil.example/c/pay/cs_test_X', null]) {
@@ -63,6 +87,36 @@ describe('kit order page', () => {
     expect(screen.getByRole('button', { name: 'Continue to Stripe test checkout' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Check payment status' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Download/ })).toBeNull();
+  });
+
+  it('continues a started checkout through the server, following only the open session URL it returns', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch')
+      .mockImplementationOnce(() => json({ ...order, status: 'checkout_started', checkoutUrl: 'https://checkout.stripe.com/c/pay/cs_test_SYNTHETIC' }))
+      .mockImplementationOnce(() => json({ ...order, status: 'checkout_started', checkoutUrl: null }));
+    const navigate = vi.fn();
+    const user = userEvent.setup();
+    render(<SoundKitOrder siteContent={defaultSiteContent} order={{ ...order, status: 'checkout_started' }} navigate={navigate} />);
+    expect(screen.queryByRole('button', { name: 'Continue to Stripe test checkout' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Check payment status' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Continue to checkout' }));
+    expect(fetchMock.mock.calls[0][0]).toBe(`/sound-kit-orders/${orderId}/checkout`);
+    expect((fetchMock.mock.calls[0][1] as RequestInit).method).toBe('POST');
+    expect(navigate).toHaveBeenCalledExactlyOnceWith('https://checkout.stripe.com/c/pay/cs_test_SYNTHETIC');
+    // A session that is no longer open returns no URL: nothing is followed and the buyer is told to check the payment.
+    await user.click(screen.getByRole('button', { name: 'Continue to checkout' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('no longer open');
+    expect(navigate).toHaveBeenCalledTimes(1);
+  });
+
+  it('lets the owner ask for the grant again while the order is paid but not yet granted', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementationOnce(() => json({ ...order, status: 'awaiting_contract' }));
+    const user = userEvent.setup();
+    render(<SoundKitOrder siteContent={defaultSiteContent} order={{ ...order, status: 'paid' }} />);
+    expect(screen.queryByRole('button', { name: /checkout/i })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Check payment status' }));
+    expect(fetchMock.mock.calls[0][0]).toBe(`/sound-kit-orders/${orderId}/checkout/reconcile`);
+    expect(await screen.findByRole('status')).toHaveTextContent('license contract is being prepared');
+    expect(screen.queryByRole('button', { name: 'Check payment status' })).toBeNull();
   });
 
   it('downloads through a fresh authorization posted as a form, never a stored link', async () => {

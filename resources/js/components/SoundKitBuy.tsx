@@ -17,6 +17,7 @@ export function SoundKitBuy({ slug, title, priceLabel, navigate = url => window.
   const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // One key per licensee name: a retry of the same name replays the same order, a changed name is a new request.
   const key = useRef<string | null>(null);
   const inputId = useId();
   async function submit(event: FormEvent) {
@@ -40,7 +41,7 @@ export function SoundKitBuy({ slug, title, priceLabel, navigate = url => window.
     <p className="fine-print">Stripe test mode only: no real payment is taken. You pay {priceLabel} for {title} under the sound-kit license, issued in the licensee's name.</p>
     <form onSubmit={submit} noValidate>
       <label htmlFor={inputId}>Licensee legal name</label>
-      <input id={inputId} name="licenseeName" autoComplete="name" maxLength={255} value={name} onChange={event => setName(event.target.value)} aria-describedby={error ? inputId + '-error' : undefined} />
+      <input id={inputId} name="licenseeName" autoComplete="name" maxLength={255} value={name} onChange={event => { setName(event.target.value); key.current = null; }} aria-describedby={error ? inputId + '-error' : undefined} />
       <button type="submit" className="button" disabled={busy}>{busy ? 'Starting test checkout…' : 'Buy with Stripe test checkout'}</button>
     </form>
     {error && <p id={inputId + '-error'} className="sound-kit-notice" role="alert">{error}</p>}

@@ -113,7 +113,11 @@ Every route and command answers 404 or refuses while it is closed. Code: `app/Do
 - **Verified payment before grant, once.** The payment row is written only from GET-only provider reads (session complete and paid, PaymentIntent
   succeeded with exactly the order price) inside a fenced commit; a trigger also requires the order's exact price, currency and bound session.
   The grant is written afterwards in its own transaction from that committed row. `UNIQUE(order)` on both, so a replayed or duplicated webhook,
-  an `async_payment_succeeded` and a reconcile converge on one payment and one grant.
+  an `async_payment_succeeded` and a reconcile converge on one payment and one grant. A grant refused after its payment committed (a transient
+  error, or a purchased archive row that no longer matches the snapshot) leaves the order `paid`: the refusal is audited once per reason
+  (`sound_kit.test_grant.refused`), `vasey:finalize-test-kit-grants` (scheduled every 10 minutes at :04/:14/…, tracked on the operational
+  dashboard, run only while the lane is admitted) retries every paid order without a grant and exits non-zero while one is still refused, and the
+  owner's **Check payment status** retries it too. A `requires_capture`, `processing` or `canceled` PaymentIntent records no payment.
 - **Contract.** `SoundKitContracts` renders the published license version's frozen text through `vasey-kit-license-pdf-v1`
   (`VaseyKitLicensePdfRenderer`, Sean's pinned signature). Only the six purchase-details placeholders are filled: `{KIT_NAME}` (order snapshot
   title), `{LICENSEE_NAME}` (the encrypted name from the order), `{LICENSOR_NAME}` (`VASEY_KIT_LICENSE_LICENSOR_NAME`), `{PURCHASE_DATE}` (the
@@ -129,7 +133,8 @@ Every route and command answers 404 or refuses while it is closed. Code: `app/Do
 `GET /sound-kit-orders/{order}` (owner page, also Stripe's return address; arrival proves nothing), `GET …/status`, `POST …/checkout`,
 `POST …/checkout/reconcile`, `POST …/delivery/authorizations` (`kind`), `POST …/delivery/download` (`authorizationId`, `token`).
 
-**Commands:** `vasey:reconcile-test-kit-order {order}` (a webhook that never arrived), `vasey:issue-test-kit-contracts {grant?} --limit=`,
+**Commands:** `vasey:reconcile-test-kit-order {order}` (a webhook that never arrived), `vasey:finalize-test-kit-grants --limit=` (paid orders
+without a grant; also scheduled), `vasey:issue-test-kit-contracts {grant?} --limit=`,
 `vasey:control-test-kit-delivery {order} enable|block --expected-version=N --reference=REF` (first use `--expected-version=0`).
 
 ### Staging: enable and test-buy IMPERIAL DRVMZ
@@ -150,9 +155,20 @@ The track Stripe-test chain must already be configured on the host (ops/staging/
 6. `php artisan vasey:control-test-kit-delivery <order> enable --expected-version=0 --reference=STAGING-KIT-1`.
 7. Reload the order page: **Download the kit (ZIP)** and **Download the license (PDF)**. Each click mints a fresh 60-second single-use link.
 
+If the order page stays at "Test payment verified. The kit is being granted.", run `php artisan vasey:finalize-test-kit-grants`: it prints
+`<order> granted`, or `<order> payment_changed` when the purchased archive row no longer matches the order (investigate before anything else;
+the audit log holds `sound_kit.test_grant.refused`).
+
+**Refunds and disputes are not handled by the kit lane.** A refund or dispute on a kit order's Stripe test payment changes nothing here: the
+payment and grant stay and delivery stays as it was. When one happens, block delivery by hand with the next control version (read the current
+`version` from the last command output or `sound_kit_delivery_controls`; `0` if delivery was never enabled):
+`php artisan vasey:control-test-kit-delivery <order> block --expected-version=<current version> --reference=<refund or dispute id>`. That closes
+new and outstanding download authorizations; nothing is revoked or deleted.
+
 To close it again set `VASEY_SOUND_KIT_TEST_CHECKOUT_ENABLED=false` and re-cache config: every kit purchase route answers 404 and the pages close.
 
-**Not built** (follow-ups): production kit checkout and tax; refunds and disputes for a kit; kit orders in the customer library, order history and
+**Not built** (follow-ups): production kit checkout and tax; refund and dispute integration for a kit (refunds and disputes neither block
+delivery nor mark the order; this is a blocker for any production kit lane, and until then an operator blocks delivery by hand as above); kit orders in the customer library, order history and
 the data-rights export (the tables are classified `not_applicable`, test-only); staff views of kit orders (inspect them with the commands above and
 the audit log); resumable kit downloads; isolated-child contract rendering; native browser acceptance.
 
@@ -269,10 +285,14 @@ first; uploading a different image or demo voids its approval.
 `tests/Feature/SoundKitCheckoutTest.php` (SQLite; three tests also run on native MySQL 8.4 locally): every route and command closed with the
 flag off, a non-boolean flag or in production; the HTTP journey ignoring client price, revision and license and naming the kit at Stripe;
 idempotency; one payment and one grant across webhook replay, a duplicate event, `async_payment_succeeded` and reconcile; reconcile recovering a
-missing webhook while unpaid, short-paid, mis-totalled or foreign-metadata provider evidence never grants; unpublished, uncleared, unapproved,
+missing webhook while unpaid, short-paid, mis-totalled or foreign-metadata provider evidence never grants; a `requires_capture`, `processing` or
+`canceled` PaymentIntent recording nothing; a session bound to one real order whose metadata (or every term) names another paying neither; a grant
+refused after payment (archive size, then hash, changed on the revision row) audited once and later swept into exactly one grant; the owner's
+reconcile at `paid` granting once; unpublished, uncleared, unapproved,
 blocked, tampered-archive, expired and unprintable-name purchases refused before any Stripe call; the contract filling exactly the six
 placeholders with the licensor from configuration, recorded once and re-hashed on read; delivery needing grant, contract and control, owner-bound,
-single-use, 60-second authorizations; a tampered archive never streamed; the HTTP download; immutable evidence and the payment-amount trigger;
+single-use, 60-second authorizations; a tampered archive never streamed; the HTTP download; immutable evidence and the payment trigger (the honest bound row accepted; only the amount, currency, session or
+account wrong refused);
 retention classification.
 
 `tests/Feature/SoundKitStorefrontTest.php` (SQLite): flag off and exact-true gating, listing facts and the absence of private

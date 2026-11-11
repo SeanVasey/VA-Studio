@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Domain\Commerce\Models\StripeWebhookReceipt;
+use App\Domain\Commerce\Payments\PaymentVerificationException;
 use App\Domain\Commerce\Payments\ProcessStripeReceipt;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
@@ -31,6 +32,9 @@ use App\Domain\SoundKits\Purchases\SoundKitPurchaseException;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Models\User;
 use Carbon\CarbonImmutable;
+use Illuminate\Console\Scheduling\Event;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -469,10 +473,169 @@ class SoundKitCheckoutTest extends TestCase
         $second = $this->order(SoundKitProduct::query()->find($order->sound_kit_product_id));
         $this->gateway->onCreate = fn (array $params): array => CheckoutFixtures::session($params, 'cs_test_SECOND');
         app(SoundKitCheckout::class)->start($second->public_id, InventoryFixtures::OWNER);
-        $this->expectException(QueryException::class);
-        DB::table('sound_kit_payments')->insert(['public_id' => (string) Str::uuid(), 'sound_kit_order_id' => $second->id, 'account_id' => $second->account_id,
-            'provider_session_id' => 'cs_test_OTHER', 'provider_payment_intent_id' => 'pi_OTHER', 'source' => 'reconciliation', 'amount_minor' => 1,
-            'currency' => 'USD', 'evidence' => '{}', 'evidence_hash' => str_repeat('a', 64), 'verified_at' => CarbonImmutable::now()]);
+        // Each row below is the honest payment of the second order (its bound session, a fresh PaymentIntent, its account) with
+        // exactly one field wrong; the trigger refuses each, and the honest row itself is accepted.
+        $honest = ['public_id' => (string) Str::uuid(), 'sound_kit_order_id' => $second->id, 'account_id' => $second->account_id,
+            'provider_session_id' => 'cs_test_SECOND', 'provider_payment_intent_id' => 'pi_SYNTHETICSECOND', 'source' => 'reconciliation',
+            'amount_minor' => $second->price_minor, 'currency' => 'USD', 'evidence' => '{}', 'evidence_hash' => str_repeat('a', 64),
+            'verified_at' => CarbonImmutable::now()];
+        foreach (['amount' => ['amount_minor' => $second->price_minor - 1], 'more' => ['amount_minor' => $second->price_minor + 1],
+            'currency' => ['currency' => 'EUR'], 'unbound session' => ['provider_session_id' => 'cs_test_OTHER'],
+            'foreign account' => ['account_id' => 'acct_SYNTHETICOTHER']] as $case => $wrong) {
+            try {
+                DB::table('sound_kit_payments')->insert(array_replace($honest, $wrong));
+                $this->fail('A payment with the wrong '.$case.' was inserted.');
+            } catch (QueryException) {
+            }
+        }
+        $this->assertSame(1, SoundKitPayment::query()->count());
+        DB::table('sound_kit_payments')->insert($honest);
+        $this->assertSame(2, SoundKitPayment::query()->count());
+    }
+
+    /** Changes one column of a ready revision row in place: the identity trigger is dropped in this disposable test database only. */
+    private function tamperRevision(int $revisionId, array $values): void
+    {
+        DB::unprepared('DROP TRIGGER IF EXISTS sound_kit_revisions_identity');
+        DB::table('sound_kit_revisions')->where('id', $revisionId)->update($values);
+    }
+
+    private function refusedGrantAudits(): array
+    {
+        return DB::table('audit_events')->where('action', 'sound_kit.test_grant.refused')->orderBy('id')->pluck('context')
+            ->map(fn (string $context): string => json_decode($context, true)['reason'])->all();
+    }
+
+    public function test_a_grant_refused_after_payment_is_audited_once_and_the_sweep_retries_it_into_exactly_one_grant(): void
+    {
+        $order = $this->order($this->listed());
+        $revision = SoundKitRevision::query()->where('public_id', $order->snapshot['kit_revision']['id'])->sole();
+        $this->paidSession($order);
+        // The archive row no longer matches the purchased snapshot (size, then hash): the payment is kept, no grant is written.
+        $this->tamperRevision($revision->id, ['archive_size_bytes' => $revision->archive_size_bytes + 1]);
+        $receipt = $this->receipt();
+        $this->assertSame('awaiting_grant', app(ProcessStripeReceipt::class)->handle($receipt->id));
+        $this->assertSame([1, 0], [SoundKitPayment::query()->count(), SoundKitGrant::query()->count()]);
+        $this->assertSame(['processed', 'awaiting_grant'], array_values((array) DB::table('stripe_receipt_work')->where('stripe_webhook_receipt_id', $receipt->id)->first(['state', 'outcome'])));
+        $this->assertSame('paid', app(SoundKitCheckout::class)->status($order->public_id, InventoryFixtures::OWNER)['status']);
+        try {
+            app(SoundKitPayments::class)->finalize($order);
+            $this->fail('A grant was written for a changed archive size.');
+        } catch (PaymentVerificationException $error) {
+            $this->assertSame('payment_changed', $error->reason);
+        }
+        $this->tamperRevision($revision->id, ['archive_size_bytes' => $revision->archive_size_bytes, 'archive_sha256' => str_repeat('0', 64)]);
+        $this->assertSame(1, Artisan::call('vasey:finalize-test-kit-grants'));
+        $this->assertStringContainsString($order->public_id.' payment_changed', Artisan::output());
+        $this->assertSame(1, Artisan::call('vasey:finalize-test-kit-grants'));
+        $this->assertSame(0, SoundKitGrant::query()->count());
+        // Audited once per reason, not once per retry.
+        $this->assertSame(['payment_changed'], $this->refusedGrantAudits());
+
+        // Once the evidence matches again, the next sweep grants exactly once and later sweeps select nothing.
+        $this->tamperRevision($revision->id, ['archive_sha256' => $revision->archive_sha256]);
+        $this->assertSame(0, Artisan::call('vasey:finalize-test-kit-grants'));
+        $this->assertStringContainsString($order->public_id.' granted', Artisan::output());
+        $this->assertSame(0, Artisan::call('vasey:finalize-test-kit-grants'));
+        $this->assertSame('', trim(Artisan::output()));
+        $grant = SoundKitGrant::query()->sole();
+        $this->assertSame([$revision->id, $order->snapshot_hash, SoundKitPayment::query()->sole()->id],
+            [$grant->sound_kit_revision_id, $grant->snapshot_hash, $grant->sound_kit_payment_id]);
+        $this->assertSame($grant->public_id, app(SoundKitPayments::class)->finalize($order)->public_id);
+        $this->assertSame('awaiting_contract', app(SoundKitCheckout::class)->status($order->public_id, InventoryFixtures::OWNER)['status']);
+        $this->assertSame(1, SoundKitGrant::query()->count());
+        // The sweep is scheduled and tracked while the lane is admitted, and closed with it.
+        $this->app->make(ConsoleKernel::class)->bootstrap();
+        $event = collect($this->app->make(Schedule::class)->events())->filter(fn (Event $event): bool => str_contains((string) $event->command, 'vasey:finalize-test-kit-grants'))->sole();
+        $this->assertSame(['4-59/10 * * * *', true, true], [$event->expression, $event->withoutOverlapping, $event->filtersPass($this->app)]);
+        $event->finish($this->app, 1);
+        $this->assertSame('failure', DB::table('scheduler_heartbeats')->where('task', 'vasey:finalize-test-kit-grants')->value('last_outcome'));
+        config(['sound-kits.test_checkout_enabled' => false]);
+        $this->assertFalse($event->filtersPass($this->app));
+        $this->assertSame(1, Artisan::call('vasey:finalize-test-kit-grants'));
+    }
+
+    public function test_the_owner_reconcile_at_paid_retries_the_grant_once(): void
+    {
+        $product = $this->listed();
+        $orderId = $this->postJson('/sound-kits/'.$product->slug.'/orders', ['licenseeName' => 'Ada Synthetic', 'idempotencyKey' => 'kit-paid'])->assertCreated()->json('orderId');
+        $this->postJson('/sound-kit-orders/'.$orderId.'/checkout')->assertOk();
+        $this->gateway->session['status'] = 'complete';
+        $this->gateway->session['payment_status'] = 'paid';
+        $this->gateway->session['url'] = null;
+        $this->gateway->session['payment_intent'] = PaymentFixtures::PAYMENT;
+        $this->gateway->payment = PaymentFixtures::payment($this->gateway->session);
+        $revision = $product->archiveRevision;
+        $this->tamperRevision($revision->id, ['archive_sha256' => str_repeat('0', 64)]);
+        $this->postJson('/sound-kit-orders/'.$orderId.'/checkout/reconcile')->assertOk()->assertJsonPath('status', 'paid');
+        $this->postJson('/sound-kit-orders/'.$orderId.'/checkout/reconcile')->assertOk()->assertJsonPath('status', 'paid');
+        $this->assertSame([1, 0], [SoundKitPayment::query()->count(), SoundKitGrant::query()->count()]);
+        $this->assertSame(['payment_changed'], $this->refusedGrantAudits());
+        $this->tamperRevision($revision->id, ['archive_sha256' => $revision->archive_sha256]);
+        $this->postJson('/sound-kit-orders/'.$orderId.'/checkout/reconcile')->assertOk()->assertJsonPath('status', 'awaiting_contract');
+        $this->postJson('/sound-kit-orders/'.$orderId.'/checkout/reconcile')->assertOk()->assertJsonPath('status', 'awaiting_contract');
+        $this->assertSame([1, 1], [SoundKitPayment::query()->count(), SoundKitGrant::query()->count()]);
+        $this->assertSame(1, DB::table('audit_events')->where('action', 'sound_kit.test_grant.created')->count());
+    }
+
+    public function test_an_uncaptured_processing_or_canceled_payment_intent_records_no_payment_and_no_grant(): void
+    {
+        $order = $this->order($this->listed());
+        app(SoundKitCheckout::class)->start($order->public_id, InventoryFixtures::OWNER);
+        $open = $this->gateway->session;
+        foreach (['requires_capture' => 'authorized', 'processing' => 'pending', 'canceled' => 'canceled'] as $status => $outcome) {
+            // The buyer finished Checkout but the money has not settled (or never will).
+            $this->gateway->session = array_replace($open, ['status' => 'complete', 'payment_status' => 'unpaid', 'url' => null,
+                'payment_intent' => PaymentFixtures::PAYMENT]);
+            $this->gateway->payment = array_replace(PaymentFixtures::payment($this->gateway->session), ['status' => $status, 'amount_received' => 0,
+                'amount_capturable' => $status === 'requires_capture' ? $order->price_minor : 0]);
+            $this->assertSame($outcome, app(SoundKitPayments::class)->reconcile($order), $status);
+            $this->assertSame($outcome, app(ProcessStripeReceipt::class)->handle($this->receipt('evt_SYNTHETICKIT'.strtoupper(str_replace('_', '', $status)))->id), $status);
+            // A session reported paid next to an unsettled PaymentIntent is a conflicting read: retried, never confirmed.
+            $this->gateway->session['payment_status'] = 'paid';
+            $this->assertSame('retry', app(SoundKitPayments::class)->reconcile($order), $status);
+            $this->assertSame([0, 0], [SoundKitPayment::query()->count(), SoundKitGrant::query()->count()], $status);
+        }
+        $this->assertSame('checkout_started', app(SoundKitCheckout::class)->status($order->public_id, InventoryFixtures::OWNER)['status']);
+        $this->assertSame(0, Artisan::call('vasey:finalize-test-kit-grants'));
+        $this->assertSame(0, SoundKitGrant::query()->count());
+    }
+
+    public function test_a_session_bound_to_one_order_whose_metadata_names_another_real_order_pays_neither(): void
+    {
+        $product = $this->listed();
+        $first = $this->order($product);
+        $second = $this->order($product);
+        app(SoundKitCheckout::class)->start($first->public_id, InventoryFixtures::OWNER);
+        $sessions = [CheckoutFixtures::SESSION => $this->gateway->session];
+        $this->gateway->onCreate = fn (array $params): array => CheckoutFixtures::session($params, 'cs_test_SECOND');
+        app(SoundKitCheckout::class)->start($second->public_id, InventoryFixtures::OWNER);
+        $sessions['cs_test_SECOND'] = $this->gateway->session;
+        // The first order's session reports paid, but its metadata now names the second (real, checkout-started) order.
+        $sessions[CheckoutFixtures::SESSION] = array_replace($sessions[CheckoutFixtures::SESSION], ['status' => 'complete',
+            'payment_status' => 'paid', 'url' => null, 'payment_intent' => PaymentFixtures::PAYMENT]);
+        $sessions[CheckoutFixtures::SESSION]['metadata']['kit_order_id'] = $second->public_id;
+        $this->gateway->onRetrieve = fn (string $id): array => $sessions[$id];
+        $this->gateway->payment = PaymentFixtures::payment($sessions[CheckoutFixtures::SESSION]);
+        $this->assertSame('payment_changed', app(SoundKitPayments::class)->reconcile($first));
+        // The second order's own bound session is still open and unpaid; the first order's paid session never pays it.
+        $this->assertSame('pending', app(SoundKitPayments::class)->reconcile($second));
+        $receipt = PaymentFixtures::receipt($sessions[CheckoutFixtures::SESSION], 'evt_SYNTHETICKITCROSS');
+        $this->assertSame('payment_changed', app(ProcessStripeReceipt::class)->handle($receipt->id));
+        $this->assertSame('quarantined', DB::table('stripe_receipt_work')->where('stripe_webhook_receipt_id', $receipt->id)->value('state'));
+        // Strongest forgery: the first order's session id carrying every term of the second order's frozen request. Only the
+        // binding (session -> order) tells them apart, and it refuses.
+        $sessions[CheckoutFixtures::SESSION] = array_replace($sessions['cs_test_SECOND'], ['id' => CheckoutFixtures::SESSION, 'status' => 'complete',
+            'payment_status' => 'paid', 'url' => null, 'payment_intent' => PaymentFixtures::PAYMENT]);
+        $this->gateway->onRetrieve = fn (string $id): array => $sessions[$id];
+        $this->gateway->payment = PaymentFixtures::payment($sessions[CheckoutFixtures::SESSION]);
+        $this->assertSame('payment_changed', app(SoundKitPayments::class)->reconcile($first));
+        $forged = PaymentFixtures::receipt($sessions[CheckoutFixtures::SESSION], 'evt_SYNTHETICKITFORGED');
+        $this->assertSame('payment_changed', app(ProcessStripeReceipt::class)->handle($forged->id));
+        $this->assertSame([0, 0], [SoundKitPayment::query()->count(), SoundKitGrant::query()->count()]);
+        foreach ([$first, $second] as $order) {
+            $this->assertSame('checkout_started', app(SoundKitCheckout::class)->status($order->public_id, InventoryFixtures::OWNER)['status']);
+        }
     }
 
     public function test_the_tables_are_classified_for_retention(): void

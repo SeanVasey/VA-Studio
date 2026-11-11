@@ -8,8 +8,10 @@ use App\Support\Environment\TestEnvironment;
  * Admission of the sound-kit Stripe TEST purchase lane (BL-13, FP-007). True only where the track test chain is admitted
  * ({@see TestEnvironment::admitsTestCommerce()}: local, testing, staging) AND `sound-kits.test_checkout_enabled` is exactly
  * `true` (env `VASEY_SOUND_KIT_TEST_CHECKOUT_ENABLED`, default false). Production can never admit it, whatever the flag says.
- * Each step also keeps the track chain's own gates: Stripe test checkout (CheckoutPolicy), GET-only payment processing
- * (PaymentProcessingPolicy) and the test delivery account (operator control). There is no live path.
+ * Checkout and payment verification also keep the track chain's provider gates (CheckoutPolicy for the Stripe test session,
+ * PaymentProcessingPolicy for GET-only reads). Contract issuance and delivery are gated only by this policy plus, for delivery, the
+ * per-order operator control (`vasey:control-test-kit-delivery`, absent means not enabled); they do not read the track chain's
+ * `contracts.test_issuance_enabled` or `VASEY_TEST_DELIVERY_ACCESS_ENABLED`. There is no live path.
  */
 final class SoundKitPurchasePolicy
 {

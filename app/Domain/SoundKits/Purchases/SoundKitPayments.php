@@ -31,6 +31,10 @@ use Throwable;
  * Durable verified payment comes first: the payment row commits (its trigger requires the order's exact price and bound session),
  * then the grant is written in its own transaction from that committed row. One payment and one grant per order (unique keys), so
  * a replayed or duplicated webhook, a reconcile and a webhook racing each other all converge on the same single grant.
+ *
+ * A grant that fails after its payment committed is not lost: {@see settle()} records the refusal once per reason
+ * (`sound_kit.test_grant.refused`), and `vasey:finalize-test-kit-grants` (scheduled, tracked) retries every paid order without a
+ * grant until it is granted or an operator acts. The owner's reconcile action retries too.
  */
 final class SoundKitPayments
 {
@@ -56,9 +60,7 @@ final class SoundKitPayments
                 return 'unmatched';
             }
             if (SoundKitPayment::query()->where('sound_kit_order_id', $order->id)->exists()) {
-                $this->finalize($order);
-
-                return 'granted';
+                return $this->settle($order);
             }
 
             return $this->commit($this->inspect($session->provider_session_id, $order), null);
@@ -178,9 +180,39 @@ final class SoundKitPayments
         if ($outcome !== 'awaiting_grant') {
             return $outcome;
         }
-        $this->finalize(SoundKitOrder::query()->findOrFail($inspection['order_id']));
 
-        return 'granted';
+        // The payment is durable; a grant refused here stays `awaiting_grant` for the sweep and the owner's reconcile to retry.
+        return $this->settle(SoundKitOrder::query()->findOrFail($inspection['order_id'])) === 'granted' ? 'granted' : 'awaiting_grant';
+    }
+
+    /**
+     * Grants a paid order, or records why it could not: `granted`, `payment_changed` (retained evidence no longer matches, so it
+     * needs an operator) or `retry` (anything else). Never throws. Each distinct refusal of an order is audited once, so a sweep
+     * retrying every few minutes does not flood the audit log.
+     */
+    public function settle(SoundKitOrder $order): string
+    {
+        try {
+            $this->finalize($order);
+
+            return 'granted';
+        } catch (Throwable $error) {
+            $reason = $error instanceof PaymentVerificationException && $error->reason === 'payment_changed' ? 'payment_changed' : 'retry';
+            try {
+                $payment = SoundKitPayment::query()->where('sound_kit_order_id', $order->id)->first();
+                $subject = $payment ?? $order;
+                $recorded = AuditEvent::query()->where('action', 'sound_kit.test_grant.refused')->where('subject_type', $subject::class)
+                    ->where('subject_id', $subject->getKey())->get()->contains(fn (AuditEvent $event): bool => ($event->context['reason'] ?? null) === $reason);
+                if (! $recorded) {
+                    AuditEvent::recordAttributed('sound_kit.test_grant.refused', $subject, ['order_public_id' => $order->public_id,
+                        'reason' => $reason, 'test_only' => true], null);
+                }
+            } catch (Throwable) {
+                // The refusal stays visible through the sweep's failing exit; recording it is best effort.
+            }
+
+            return $reason;
+        }
     }
 
     /** The grant, written once from the committed verified payment. Replays return the existing grant and write nothing. */
