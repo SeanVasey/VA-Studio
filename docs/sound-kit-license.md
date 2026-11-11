@@ -1,7 +1,8 @@
 # Sound-kit license (BL-66)
 
-Status: **built, default-off, not selected for any issuance.** There is no kit storefront or kit checkout yet (FP-007 is
-postlaunch by design, DD-05); this is the license kind, its renderer and its pins, ready for when kits are sold. It is part
+Status: **built, default-off.** Its only issuer is the Stripe-test kit purchase lane (BL-13, local/testing/staging only; see
+[sound-kit-storefront.md](sound-kit-storefront.md#kit-checkout-bl-13-stripe-test-purchase-grant-contract-and-delivery)). There is no
+production kit checkout (FP-007 is postlaunch by design, DD-05); this is the license kind, its renderer and its pins. It is part
 of the production contract work in [production-contract-profile.md](production-contract-profile.md) and follows Sean's decision
 of 2026-11-10 ([decision register](architecture/decision-register.md), "Sean's answers, 2026-11-10").
 
@@ -67,8 +68,9 @@ postal address or representative; the licensee is the confirmed legal name).
 - **Re-pinning:** when a tc-lib update (BL-55) or any reviewed change to a pinned file re-pins v1 and v2, the kit profile
   needs one more step, and it is one command: `bash scripts/repin-vasey-kit-license-v1.sh` (after the v1 and v2 `--check`
   scripts pass). It rebuilds the manifest, rewrites `MANIFEST_SHA256` and re-renders the synthetic golden. Review the diff.
-- **Not wired:** no issuer, dispatch or policy names the profile (a test checks this), and it renders in-process only; the
-  isolated-child path that issued v2 originals use would be added with the kit checkout.
+- **Wiring:** only the BL-13 test lane names the profile (`SoundKitOrders` pre-checks a purchase can bind, `SoundKitContracts` issues;
+  a test lists exactly these two files), the profile metadata still says `not_selected` for production, and it renders in-process only; the
+  isolated-child path that issued v2 originals use is a follow-up.
 
 ## What Sean authors privately
 

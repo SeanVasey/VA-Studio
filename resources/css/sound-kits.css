@@ -25,3 +25,12 @@
 .sound-kit-demo { padding: 28px; background: var(--va-canvas); border: 1px solid var(--va-rule); display: grid; gap: 14px; max-width: 68ch; }
 .sound-kit-demo h2 { font-family: var(--va-font-section); font-size: 32px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
 .sound-kit-demo-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+
+/* Stripe-test kit purchase (BL-13). */
+.sound-kit-buy, .sound-kit-order { padding: 28px; background: var(--va-surface); border: 1px solid var(--va-rule); display: grid; gap: 14px; max-width: 68ch; }
+.sound-kit-buy h2, .sound-kit-order h2 { font-family: var(--va-font-section); font-size: 32px; font-weight: 400; letter-spacing: .04em; text-transform: uppercase; }
+.sound-kit-buy form { display: grid; gap: 10px; }
+.sound-kit-buy label { font-family: var(--va-font-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--va-text-muted); }
+.sound-kit-buy input { min-height: 44px; padding: 8px 12px; border: 1px solid var(--va-border); background: var(--va-canvas); color: var(--va-text-strong); font: inherit; }
+.sound-kit-buy .button, .sound-kit-order .button { min-height: 44px; justify-self: start; }
+.sound-kit-order-actions { display: flex; flex-wrap: wrap; gap: 12px; }

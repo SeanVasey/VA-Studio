@@ -6,6 +6,7 @@ import { MetadataHead } from '../components/MetadataHead';
 import { SiteFooter, SiteHeader } from '../components/SiteChrome';
 import { InstallApp } from '../components/InstallApp';
 import { PersistentPlayer } from '../components/PersistentPlayer';
+import { SoundKitBuy } from '../components/SoundKitBuy';
 import { player, useAudio } from '../lib/audio';
 import type { SoundKitDetail } from '../lib/sound-kits';
 import { formatMoney, formatTime, type PageMetadata, type Track } from '../lib/catalog';
@@ -65,6 +66,7 @@ export default function SoundKit({ siteContent, kit, metadata }: SoundKitProps) 
           </dl>
         </section>
         {!kit.purchasable && <p className="sound-kit-notice" role="status">This kit is not available to buy yet.</p>}
+        {kit.purchasable && <SoundKitBuy slug={kit.slug} title={kit.title} priceLabel={formatMoney(kit.priceMinor, kit.currency)} />}
       </article>
     </main>
     <SiteFooter {...chrome}><InstallApp /></SiteFooter>

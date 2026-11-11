@@ -6,6 +6,7 @@ use App\Domain\Commerce\Models\StripeReceiptWork;
 use App\Domain\Commerce\Models\StripeWebhookReceipt;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Services\Invoicing\ServiceInvoiceSettlement;
+use App\Domain\SoundKits\Purchases\SoundKitPayments;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Throwable;
 
@@ -35,6 +36,10 @@ final class ProcessStripeReceipt
             }
             if ($locator['object_type'] !== 'checkout.session' || ! is_string($locator['session_id'])) {
                 throw new PaymentVerificationException('receipt_changed');
+            }
+            // BL-13: a session bound to a kit order is verified and granted by the kit lane, with the same reads and fences.
+            if (app(SoundKitPayments::class)->owns($locator['session_id'])) {
+                return app(SoundKitPayments::class)->process($locator['session_id'], $claim);
             }
             $inspection = app(VerifyTestPayment::class)->inspect($locator['session_id']);
 

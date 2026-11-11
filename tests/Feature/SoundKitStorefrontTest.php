@@ -472,14 +472,14 @@ class SoundKitStorefrontTest extends TestCase
         $this->assertArrayHasKey('sound_kit_demos', RetentionSchedule::NOT_CUSTOMER_DATA);
     }
 
-    public function test_a_kit_still_cannot_be_quoted_or_bought_and_the_purchase_binding_is_only_an_unpayable_pin(): void
+    public function test_a_kit_never_enters_the_track_quote_and_is_unpayable_while_the_test_purchase_lane_is_off(): void
     {
         $product = $this->product();
         $this->enable();
-        $counts = fn (): array => array_map(fn (string $table) => DB::table($table)->count(), ['quotes', 'quote_lines', 'orders', 'order_lines', 'license_grants', 'pending_entitlements', 'tracks', 'offers']);
+        $counts = fn (): array => array_map(fn (string $table) => DB::table($table)->count(), ['quotes', 'quote_lines', 'orders', 'order_lines', 'license_grants', 'pending_entitlements', 'tracks', 'offers', 'sound_kit_orders', 'sound_kit_grants']);
         $before = $counts();
 
-        // The existing checkout chain refuses a kit revision exactly as before.
+        // The track quote refuses a kit revision exactly as before: a kit is bought only through its own lane (BL-13), never in a mixed cart.
         $revision = $product->archiveRevision;
         try {
             app(QuoteSelection::class)->resolveFamily(FamilyRevisionSelection::fromArray(['family' => 'wav_sample_kit', 'revisionId' => $revision->public_id, 'manifestHash' => $revision->manifest_sha256]));
@@ -489,12 +489,12 @@ class SoundKitStorefrontTest extends TestCase
         }
         $this->assertFalse(app(SoundKitStorefrontPolicy::class)->purchasable());
 
-        // The pin is deterministic, unpayable, carries the exact terms, and writes nothing (a replay cannot duplicate anything).
+        // While the test purchase lane is off the pin is unpayable; it is deterministic, carries the exact terms and writes nothing.
         $binding = app(SoundKitPurchaseBinding::class);
         $first = $binding->capture($product);
         $this->assertSame($first, $binding->capture($product->fresh()));
         $this->assertFalse($first['snapshot']['payable']);
-        $this->assertSame(['kit_checkout_unbuilt'], $first['snapshot']['commercial_blockers']);
+        $this->assertSame(['kit_test_checkout_off'], $first['snapshot']['commercial_blockers']);
         $this->assertSame(app(SoundKitProducts::class)->termsHash($product), $first['snapshot']['offer_terms_hash']);
         $this->assertSame([2500, 'USD', 2], [$first['snapshot']['price_minor'], $first['snapshot']['currency'], $first['snapshot']['member_count']]);
         $this->assertSame($counts(), $before);
@@ -504,9 +504,13 @@ class SoundKitStorefrontTest extends TestCase
         $down = $service->unpublish($product, $product->revision, $this->actor);
         $this->assertArrayHasKey('title', $this->messages(fn () => $binding->capture($down)));
 
-        // There is no route that sells, grants or serves a kit: only the two read-only pages and the tagged demo preview exist.
+        // The only purchase routes are the BL-13 test lane's (SoundKitCheckoutTest: each answers 404 while the lane is closed).
         $uris = collect(Route::getRoutes()->getRoutes())->filter(fn ($route) => str_contains($route->uri(), 'sound-kit') && ! str_starts_with($route->uri(), 'admin'));
-        $this->assertSame(['GET|HEAD sound-kits', 'GET|HEAD sound-kits/{slug}', 'GET|HEAD sound-kits/{slug}/demo/{demo}'], $uris->map(fn ($route) => implode('|', $route->methods()).' '.$route->uri())->sort()->values()->all());
+        $this->assertSame(['GET|HEAD sound-kit-orders/{order}', 'GET|HEAD sound-kit-orders/{order}/status', 'GET|HEAD sound-kits', 'GET|HEAD sound-kits/{slug}',
+            'GET|HEAD sound-kits/{slug}/demo/{demo}', 'POST sound-kit-orders/{order}/checkout', 'POST sound-kit-orders/{order}/checkout/reconcile',
+            'POST sound-kit-orders/{order}/delivery/authorizations', 'POST sound-kit-orders/{order}/delivery/download', 'POST sound-kits/{slug}/orders'],
+            $uris->map(fn ($route) => implode('|', $route->methods()).' '.$route->uri())->sort()->values()->all());
+        $this->post('/sound-kits/'.$product->slug.'/orders', ['licenseeName' => 'Synthetic', 'idempotencyKey' => 'k-1'])->assertNotFound();
         foreach (['buy', 'checkout', 'download', 'cart', 'order'] as $verb) {
             $this->get('/sound-kits/'.$product->slug.'/'.$verb)->assertNotFound();
             $this->post('/sound-kits/'.$product->slug.'/'.$verb)->assertStatus(404);
