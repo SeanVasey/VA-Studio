@@ -334,7 +334,7 @@ final class MediaReferenceRegistry
         'track_collection_items.track_collection_id' => 'A collection id, not a track or media id.',
         'track_collection_items.track_id' => self::COLLECTION,
         'track_collections.description' => self::PROSE,
-        'track_publication_schedules.track_id' => 'A staff request to publish the track at a later time (BL-41): mutable set-up that sells and commits nothing. Activation re-runs every publication guard, so a family deleted in the meantime fails the activation and leaves the schedule pending, never publishing without media.',
+        'track_publication_schedules.track_id' => 'A staff request to publish the track at a later time (BL-41): mutable set-up that sells and commits nothing. A PENDING schedule keeps every family of its track attached through `publication:track` (MediaReferenceProof reads the table directly, state = pending); a cancelled, superseded or published schedule adds nothing here (a published one is covered by the track\'s own publication marks). Activation also re-runs every publication guard.',
         'track_metadata_presets.metadata' => self::PROSE,
         'track_collaborator_splits.track_id' => 'Editable collaborator split metadata (BL-05): report-only, feeds no sale, grant or delivery.',
         'tracks.description' => self::PROSE, 'tracks.tags' => self::PROSE, 'tracks.waveform' => 'Display peaks of the track.',

@@ -33,7 +33,8 @@ use InvalidArgumentException;
  *    by the structural pass; snapshots, audit context, site releases, the fulfillment outbox and queued jobs only by the
  *    full proof, which treats a row it cannot parse, or more rows than {@see self::MAX_JSON_ROWS}, as incomplete coverage;
  *  - poly:<table>.<prefix>: registered polymorphic `<prefix>_type`/`<prefix>_id` pairs naming a member;
- *  - publication:track: the family's track is published, scheduled or was ever published;
+ *  - publication:track: the family's track is published, scheduled (status `scheduled` or a pending publication schedule)
+ *    or was ever published;
  *  - content:<table>: any text value containing a member's SHA-256 or private storage path (case-insensitive), except in
  *    the family's own rows and in audit events whose subject is a family row.
  */
@@ -163,8 +164,12 @@ final class MediaReferenceProof
         }
         $published = [];
         foreach (array_chunk($tracks, 500) as $chunk) {
-            foreach (DB::table('tracks')->whereIn('id', $chunk)->where(fn ($query) => $query->where('status', 'published')
-                ->orWhereNotNull('published_at')->orWhereNotNull('published_slug'))->pluck('id') as $id) {
+            // Scheduled, or holding a pending (not cancelled, superseded or published) schedule: a never-published track still
+            // counts, because activation publishes it with the media it has when the schedule falls due.
+            foreach (DB::table('tracks')->whereIn('id', $chunk)->where(fn ($query) => $query->whereIn('status', ['published', 'scheduled'])
+                ->orWhereNotNull('published_at')->orWhereNotNull('published_slug')
+                ->orWhereExists(fn ($schedule) => $schedule->selectRaw('1')->from('track_publication_schedules')
+                    ->whereColumn('track_publication_schedules.track_id', 'tracks.id')->where('track_publication_schedules.state', 'pending')))->pluck('id') as $id) {
                 $published[(int) $id] = true;
             }
         }
