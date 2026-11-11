@@ -168,7 +168,8 @@ class VaseyKitLicensePdfRendererTest extends TestCase
         // The pin is the derived closure, and the profile directory holds a manifest and its provenance, never a font or signature.
         $this->assertSame(VaseyKitLicenseImplementation::closure(base_path()), array_keys($profile['assets']['implementation']));
         $this->assertSame(['PROVENANCE.md', 'profile-assets.json'], array_values(array_diff(scandir(base_path(VaseyKitLicenseProfile::ASSETS_DIRECTORY)), ['.', '..'])));
-        // The kit profile pins no license model, and no issuer, dispatch or policy names it.
+        // The kit profile pins no license model. The only issuer that names it is the BL-13 Stripe-test kit lane (its order
+        // pre-check and its contract issuer), which the profile does not pin; no other issuer, dispatch or policy names it.
         $this->assertSame([], array_values(array_filter(array_keys($profile['assets']['implementation']),
             static fn (string $path): bool => str_contains($path, 'Models/') || str_contains($path, 'Grants/'))));
         $named = [];
@@ -178,7 +179,8 @@ class VaseyKitLicensePdfRendererTest extends TestCase
                 $named[] = substr($file->getPathname(), strlen(base_path()) + 1);
             }
         }
-        $this->assertSame([], $named);
+        sort($named);
+        $this->assertSame(['app/Domain/SoundKits/Purchases/SoundKitContracts.php', 'app/Domain/SoundKits/Purchases/SoundKitOrders.php'], $named);
     }
 
     public function test_the_synthetic_license_renders_in_the_shared_visual_system_with_every_value_bound_and_matches_the_golden_hash(): void
