@@ -24,10 +24,10 @@ class TestCommerceProfileValidatorTest extends TestCase
         '<ASSENT_TEXT>' => 'I accept these synthetic test-only terms.',
     ];
 
-    /** The capability flags the profile must state explicitly as false (validator CAPABILITY_FLAGS). */
+    /** The capability flags the profile must state explicitly as false (validator CAPABILITY_FLAGS); unpaid release is optional since 2026-11-11. */
     private const CAPABILITY_FLAGS = [
         'VASEY_TEST_SERVICE_PROJECTS_ENABLED', 'VASEY_TEST_FREE_GRANTS_ENABLED', 'VASEY_TEST_CUSTOMER_CONSENT_ENABLED',
-        'VASEY_TEST_UNPAID_RELEASE_ENABLED', 'VASEY_TEST_REFUND_RESOLUTION_ENABLED', 'VASEY_TEST_REFUND_DISPUTE_ENABLED',
+        'VASEY_TEST_REFUND_RESOLUTION_ENABLED', 'VASEY_TEST_REFUND_DISPUTE_ENABLED',
         'VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED', 'VASEY_CUSTOMER_DATA_RIGHTS_ENABLED', 'VASEY_TRANSACTIONAL_MAIL_ENABLED',
         'CONTACT_TEST_ORDER_INQUIRIES_ENABLED', 'CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED',
         'VASEY_OPERATIVE_FREE_GRANTS_ENABLED', 'VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED',
@@ -116,9 +116,9 @@ class TestCommerceProfileValidatorTest extends TestCase
         [$exit, $output, $checks] = $this->validateFile(self::root().'/'.self::TEMPLATE, ['--template']);
 
         $this->assertSame(0, $exit, $output);
-        $this->assertCount(39, $checks);
+        $this->assertCount(41, $checks);
         $this->assertNotContains(false, $checks);
-        $this->assertStringContainsString('RESULT: PASS (0 of 39 checks failed; template mode', $output);
+        $this->assertStringContainsString('RESULT: PASS (0 of 41 checks failed; template mode', $output);
         $this->assertNoSecretPrinted($output);
     }
 
@@ -137,7 +137,7 @@ class TestCommerceProfileValidatorTest extends TestCase
         [$exit, $output, $checks] = $this->validate(self::filled());
 
         $this->assertSame(0, $exit, $output);
-        $this->assertCount(39, $checks);
+        $this->assertCount(41, $checks);
         $this->assertNotContains(false, $checks);
         $this->assertStringContainsString('no Stripe request made', $output);
         $this->assertNoSecretPrinted($output);
@@ -294,6 +294,43 @@ class TestCommerceProfileValidatorTest extends TestCase
             [$exit, $output, $checks] = $this->validate(self::set(self::filled(), 'VASEY_TEST_FREE_GRANTS_ENABLED', $refused));
             $this->assertSame(1, $exit, $refused.PHP_EOL.$output);
             $this->assertFalse($checks['profile.capability_flags_explicit'], $refused);
+        }
+    }
+
+    /** Optional on staging (2026-11-11): stated true or false; true passes only with the exact policy the real class accepts. */
+    public function test_unpaid_release_is_optional_and_admitted_only_with_its_exact_policy(): void
+    {
+        $flag = 'VASEY_TEST_UNPAID_RELEASE_ENABLED';
+        $policy = '\'{"schema_version":1,"purpose":"test_unpaid_resource_release","version":"test-unpaid-release-v1","provider":"stripe",'
+            .'"mode":"test","proof":"bound_expired_unpaid_session_and_absent_or_canceled_zero_payment","recovery":"disabled",'
+            .'"resources":"pending_to_released","late_confirmation":"paid_exception_preserve_released","provider_writes":"forbidden"}\'';
+        $this->assertSame(1, preg_match('/^'.$flag.'=false$/m', self::filled()));
+        foreach (['true', '(true)'] as $on) {
+            [$exit, $output, $checks] = $this->validate(self::set(self::set(self::filled(), $flag, $on), 'VASEY_TEST_UNPAID_RELEASE_POLICY', $policy));
+            $this->assertSame(0, $exit, $on.PHP_EOL.$output);
+            $this->assertTrue($checks['boundary.optional_capabilities_admitted'], $on);
+            $this->assertTrue($checks['boundary.out_of_profile_families_off'], $on);
+        }
+        // On without the policy, or with a changed one: refused by the boundary alone.
+        foreach (['', str_replace('forbidden', 'allowed', $policy), str_replace('"recovery":"disabled"', '"recovery":"enabled"', $policy)] as $bad) {
+            $profile = self::set(self::filled(), $flag, 'true');
+            if ($bad !== '') {
+                $profile = self::set($profile, 'VASEY_TEST_UNPAID_RELEASE_POLICY', $bad);
+            }
+            [$exit, $output, $checks] = $this->validate($profile);
+            $this->assertSame(1, $exit, $output);
+            $this->assertSame(['boundary.optional_capabilities_admitted'], self::failedChecks($checks), $output);
+            $this->assertStringContainsString('Optional capability on without an accepted policy (or not a boolean): '.$flag.'.', $output);
+            $this->assertNoSecretPrinted($output);
+        }
+        // Not stated, or stated with anything but a boolean: refused as a statement.
+        [$exit, $output, $checks] = $this->validate((string) preg_replace('/^'.$flag.'=.*\n/m', '', self::filled()));
+        $this->assertSame(1, $exit, $output);
+        $this->assertSame(['profile.optional_flags_explicit'], self::failedChecks($checks), $output);
+        foreach (['yes', '1', ''] as $refused) {
+            [$exit, $output, $checks] = $this->validate(self::set(self::filled(), $flag, $refused));
+            $this->assertSame(1, $exit, $refused.PHP_EOL.$output);
+            $this->assertSame(['profile.optional_flags_explicit', 'boundary.optional_capabilities_admitted'], self::failedChecks($checks), $refused);
         }
     }
 

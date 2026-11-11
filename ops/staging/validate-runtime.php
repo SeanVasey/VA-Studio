@@ -91,7 +91,7 @@ try {
         }
         $check('runtime.production_credentials', in_array(config('production_checkout.secret_key'), [null, ''], true)
             && in_array(config('production_checkout.funds_mode'), [null, ''], true));
-        // Capability profile (docs/verification/production-ops-kit-20261017, batch K3). The thirteen flags and the four stated beside them must
+        // Capability profile (docs/verification/production-ops-kit-20261017, batch K3). The twelve flags and the four stated beside them must
         // be exactly false in the effective configuration: an absent line is fine (every config default is false), but true, "1", blank
         // and "yes" are refused, and so is a config key that no longer exists (null). VASEY_OPERATIVE_FREE_GRANTS_ENABLED and
         // CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED have no environment gate in their policy classes, so here and in the template
@@ -99,6 +99,21 @@ try {
         $notOff = CapabilityBoundary::flagsNotOff(static fn (string $key): mixed => config($key));
         foreach (array_keys(CapabilityBoundary::stagedFlags()) as $flag) {
             $check('runtime.flag_off_'.strtolower($flag), ! in_array($flag, $notOff, true));
+        }
+        // Optional staging capabilities (unpaid release, 2026-11-11): exactly false, or exactly true with the real policy class
+        // accepting this configuration (test-commerce environment, Stripe test mode, `acct_` account, the exact JSON contract).
+        // Any other value, or true with a missing or changed policy, is refused under the flag's own identifier.
+        $refused = CapabilityBoundary::optionalFlagsRefused(static fn (string $key): mixed => config($key), static function (string $policy): bool {
+            try {
+                app($policy)->current();
+
+                return true;
+            } catch (Throwable) {
+                return false;
+            }
+        });
+        foreach (array_keys(CapabilityBoundary::STAGING_OPTIONAL_FLAGS) as $flag) {
+            $check('runtime.optional_'.strtolower($flag), ! in_array($flag, $refused, true));
         }
         // Paid252, Tax255, production customer identity, production free grants and the other production lanes: no enabled or mounted
         // flag may be true, and the named lanes' configuration must still exist.

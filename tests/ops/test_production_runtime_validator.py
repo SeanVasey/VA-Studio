@@ -34,6 +34,13 @@ SERVICE_INVOICING_KEY = "services-invoicing.test_enabled"
 # BL-71: the staging-only BeatStars catalog import flag is held off in production by the same rule.
 BEATSTARS_IMPORT = "VASEY_STAGING_BEATSTARS_IMPORT_ENABLED"
 BEATSTARS_IMPORT_KEY = "staging-beatstars-import.enabled"
+# Test unpaid release became optional on the staging rehearsal (2026-11-11); production holds its flag false by the same rule.
+UNPAID_RELEASE = "VASEY_TEST_UNPAID_RELEASE_ENABLED"
+UNPAID_RELEASE_KEY = "unpaid-release.enabled"
+UNPAID_RELEASE_POLICY = ('\'{"schema_version":1,"purpose":"test_unpaid_resource_release","version":"test-unpaid-release-v1",'
+                         '"provider":"stripe","mode":"test","proof":"bound_expired_unpaid_session_and_absent_or_canceled_zero_payment",'
+                         '"recovery":"disabled","resources":"pending_to_released","late_confirmation":"paid_exception_preserve_released",'
+                         '"provider_writes":"forbidden"}\'')
 # DD-50: code literals, refusal identifier => config key.
 MEMBERSHIP_LITERALS = {
     "holds.production_memberships_enabled": "production-memberships.enabled",
@@ -559,14 +566,15 @@ class ProductionRuntimeValidator(unittest.TestCase):
         block = re.search(r"const LAUNCH_OFF_HOLDS = \[(.*?)\n\];", text, re.S)
         self.assertIsNotNone(block, "LAUNCH_OFF_HOLDS constant block not found")
         self.assertNotIn("=>", block.group(1))
-        self.assertEqual(re.findall(r"'([A-Z0-9_]+)',", block.group(1)), [MARKETING_SEGMENT, SERVICE_INVOICING, BEATSTARS_IMPORT])
+        self.assertEqual(re.findall(r"'([A-Z0-9_]+)',", block.group(1)), [MARKETING_SEGMENT, SERVICE_INVOICING, UNPAID_RELEASE, BEATSTARS_IMPORT])
         self.assertNotIn(f"'{MARKETING_SEGMENT_KEY}'", text, "the config key must come from the boundary, not be restated")
         self.assertRegex(text, r"\$launchOffKeys = array_intersect_key\(CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS, array_flip\(LAUNCH_OFF_HOLDS\)\);"
                                r"\s*if \(count\(\$launchOffKeys\) !== count\(LAUNCH_OFF_HOLDS\)\) \{\s*throw new RuntimeException;")
         script = "require $argv[1]; echo json_encode(Vasey\\Ops\\CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS);"
         run = subprocess.run([PHP, "-r", script, str(REPO / "scripts/ops/capability-boundary.php")], capture_output=True, text=True, timeout=60)
         self.assertEqual(run.returncode, 0, run.stderr)
-        self.assertEqual(json.loads(run.stdout), {MARKETING_SEGMENT: MARKETING_SEGMENT_KEY, SERVICE_INVOICING: SERVICE_INVOICING_KEY, BEATSTARS_IMPORT: BEATSTARS_IMPORT_KEY})
+        self.assertEqual(json.loads(run.stdout), {MARKETING_SEGMENT: MARKETING_SEGMENT_KEY, SERVICE_INVOICING: SERVICE_INVOICING_KEY,
+                                                 UNPAID_RELEASE: UNPAID_RELEASE_KEY, BEATSTARS_IMPORT: BEATSTARS_IMPORT_KEY})
         # Not a staged flag: the staging gates keep their own list, and this hold is production's.
         script = "require $argv[1]; echo json_encode(array_key_exists($argv[2], Vasey\\Ops\\CapabilityBoundary::stagedFlags()));"
         run = subprocess.run([PHP, "-r", script, str(REPO / "scripts/ops/capability-boundary.php"), MARKETING_SEGMENT],
@@ -595,6 +603,49 @@ class ProductionRuntimeValidator(unittest.TestCase):
     def test_a_boundary_without_the_service_invoicing_entry_fails_closed(self):
         source = (REPO / "scripts/ops/capability-boundary.php").read_text()
         entry = f"        '{SERVICE_INVOICING}' => '{SERVICE_INVOICING_KEY}',\n"
+        self.assertEqual(source.count(entry), 1)
+        _, run = self.shadow_project(boundary=source.replace(entry, ""))
+        result = run()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertEqual(result.stderr.split(), ["FAIL", "runtime.unavailable"], result.stderr)
+
+    def test_the_unpaid_release_flag_is_held_off_in_production_even_with_its_exact_policy(self):
+        # Staging may turn test unpaid release on (STAGING_OPTIONAL_FLAGS); production refuses it in every spelling but false,
+        # and the exact policy JSON that admits it on staging does not change that.
+        self.assertNotIn(UNPAID_RELEASE, profile())
+        for value in ("false", "(false)", "FALSE"):
+            with self.subTest(value=value):
+                self.assertEqual(self.validate(profile() + f"{UNPAID_RELEASE}={value}\n").returncode, 0)
+        for value in ("true", "1", "yes", "", "(true)", "TRUE", '"true"', "on", "0", "null"):
+            with self.subTest(value=value):
+                run = self.validate(profile() + f"{UNPAID_RELEASE}={value}\n")
+                self.failed(run, "holds.vasey_test_unpaid_release_enabled")
+                self.assertEqual({line for line in run.stderr.splitlines() if line.startswith("FAIL ")},
+                                 {"FAIL holds.vasey_test_unpaid_release_enabled"}, run.stderr)
+        run = self.validate(profile() + f"{UNPAID_RELEASE}=true\nVASEY_TEST_UNPAID_RELEASE_POLICY={UNPAID_RELEASE_POLICY}\n")
+        self.failed(run, "holds.vasey_test_unpaid_release_enabled")
+        self.assertNotIn("PASS", run.stdout)
+        # The effective configuration is checked too, not only the file line.
+        run = self.validate(profile(**{"PATH": "false", UNPAID_RELEASE: "${PATH}"}))
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertEqual(run.stderr.split(), ["FAIL", "holds.vasey_test_unpaid_release_enabled"], run.stderr)
+        # Optional on staging: not a staged flag (the staging gates would otherwise refuse true), but listed as optional there.
+        script = ("require $argv[1]; echo json_encode([array_key_exists($argv[2], Vasey\\Ops\\CapabilityBoundary::stagedFlags()), "
+                  "Vasey\\Ops\\CapabilityBoundary::STAGING_OPTIONAL_FLAGS[$argv[2]]['config'] ?? null]);")
+        run = subprocess.run([PHP, "-r", script, str(REPO / "scripts/ops/capability-boundary.php"), UNPAID_RELEASE],
+                             capture_output=True, text=True, timeout=60)
+        self.assertEqual(json.loads(run.stdout), [False, UNPAID_RELEASE_KEY], run.stderr)
+        self.assertRegex((REPO / "config/unpaid-release.php").read_text(), r"'enabled'\s*=>\s*env\('" + UNPAID_RELEASE + r"',\s*false\)")
+        self.assertRegex((REPO / "ops/production/env.production.example").read_text(), rf"(?m)^{UNPAID_RELEASE}=false$")
+        # And the application refuses production in code whatever the flag says.
+        self.assertRegex((REPO / "app/Domain/Commerce/UnpaidRelease/UnpaidReleasePolicy.php").read_text(),
+                         r"if \(! TestEnvironment::admitsTestCommerce\(\) \|\| config\('payments\.stripe\.mode'\) !== 'test'")
+        self.assertRegex((REPO / "app/Support/Environment/TestEnvironment.php").read_text(),
+                         r"TEST_COMMERCE = \['local', 'testing', self::STAGING\];")
+
+    def test_a_boundary_without_the_unpaid_release_hold_fails_closed(self):
+        source = (REPO / "scripts/ops/capability-boundary.php").read_text()
+        entry = f"        '{UNPAID_RELEASE}' => '{UNPAID_RELEASE_KEY}',\n"
         self.assertEqual(source.count(entry), 1)
         _, run = self.shadow_project(boundary=source.replace(entry, ""))
         result = run()
