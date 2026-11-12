@@ -1,5 +1,9 @@
 # Ordered development status
 
+## Checkpoint — November 12, 2026 UTC
+
+Main is `9a9f7dc8` (PR #342). Staging serves `ead7368d`, which includes PRs #322 to #340. PRs merged since November 10, with their squash SHAs, are listed in the [2026-11-12 checkpoint](handoff/2026-11-05/HANDOFF.md#checkpoint-2026-11-12): among them the sound-kit test purchase (#328, `7b7d1b2f`), the optional staging unpaid release (#333, `81e9fa61`), the kit staff view (#334, `b5a4cea4`), shared backup sets that cut deploy downtime from about 22 to about 5 minutes (#335, `b18ca08e`), the browser-spec and accessibility repairs (#338 `101c10e8`, #340 `f45755ab`) and the staff page that enables delivery for track test orders (#339, `ead7368d`). Open and not live: #341 (release of a test order never sent to Stripe) and #343 (admin upload button and dropdown fixes). Foundation CI has not run on main since 2026-10-10; preflight runs no PHPUnit. Next items: the same checkpoint. The sections below keep their own dates and are not rewritten.
+
 ## Current status pointer — October 17, 2026 UTC
 
 This file is the dated record of merged increments and their evidence. Every section below describes the state on its own date; none of them is the current status, including the sections that still say "current". For the current state read:
