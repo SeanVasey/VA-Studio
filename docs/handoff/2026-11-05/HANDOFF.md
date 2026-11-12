@@ -4,6 +4,61 @@ Entry point for the next session (Claude's usage resets Saturday). It supersedes
 current state. That checkpoint's archive, bundle and recorded results remain history. `AGENTS.md` governs. Sean's instructions
 override older documents.
 
+## Checkpoint 2026-11-12, 18:30 UTC
+
+Added by the Claude Code harness; it supersedes the 13:00 checkpoint below for current state. Nothing here is acceptance.
+
+**Main** is `daa14cbf` (PR #364). **Staging** still serves `785f47e4` and has not been redeployed: everything merged since is
+default-off or CI/test-only. To use #359 or #363 on staging, deploy main, then set each flag and its exact policy line (the
+test-commerce overlay shows both) and deploy again. A new optional flag is deployed off first (06:30 lesson below).
+
+### Merged since 13:00 (squash SHA on main)
+
+| PR | SHA | What | Review |
+| --- | --- | --- | --- |
+| #360 | `08cf6975` | Test fixtures on Ubuntu 26.04 runners (FFmpeg 8 under the 512 MiB cap: `MALLOC_ARENA_MAX=1`) and #322's missed WAV output count | Codex: none |
+| #359 | `75b5926a` | Optional automatic enabling of test delivery (D-19 amendment; default off) | Codex: none |
+| #361 | `3ddeb956` | Hosted MySQL CI could run no migrating test (see below) | Codex: none |
+| #362 | `f5741682` | Deferred ops P3s: `ctl attach` decides a failed isolated slot by the slot directory; EBADMSG/EUCLEAN at open is a content finding; marker symlink | Independent: one P3 reproduced, fixed, re-review APPROVE; Codex: none |
+| #363 | `038a8d16` | Buyer-side cancel of a never-sent test order (the `claude/bbc-20261112` lane, finished; default off) | Independent APPROVE; Codex and Bugbot: one P2 (fixed in #364) |
+| #364 | `daa14cbf` | #363 follow-ups: Cancel kept after a refused start; customer-account, withdrawn-account and actor tests | Independent APPROVE (P3 fixed); Codex: none |
+
+### CI facts that changed
+
+- **MySQL on hosted CI works again (#361).** The catalog admission (`CatalogSocketBinding`) binds each session to its exact TCP
+  4-tuple, and the service's published port `127.0.0.1:3306` is Docker NAT, so every `migrate:fresh` refused ("Current private
+  catalog admission required") in focused feedback *and* Foundation CI. Both workflows now reach the service container at its bridge
+  address (`database-receipts.py` requires `DB_HOST` to be exactly the inspected container) and set the database to
+  `utf8mb4_unicode_ci` (the image default `utf8mb4_0900_ai_ci` fails the account guard). Foundation CI itself has not run since
+  2026-10-10; its MySQL step is unexercised with this change.
+- **Focused MySQL budget:** about 100 s per migrating test, so a MySQL focused suite fits the 900 s cap only with about eight such
+  tests. Use the small `*-races` selections (`test-delivery-races`, `buyer-cancel-races`); `track-concurrency` and `customer` ran
+  8/8 and 15/15 before the cap.
+- **Runners are Ubuntu 26.04** (`ubuntu-latest`): FFmpeg 8.0.1. The application's media limits (2 GiB) are unaffected.
+- New focused suites: `test-delivery`, `test-delivery-races`, `buyer-cancel`, `buyer-cancel-migrations`, `buyer-cancel-races`.
+
+### Evidence for #359 and #363 (focused feedback only)
+
+- #359: SQLite `test-delivery` 192 OK (2 skipped); MySQL `test-delivery-races` 2/2 OK (22 assertions).
+- #363/#364: SQLite `buyer-cancel` 144 OK (5 MySQL-only skipped); `buyer-cancel-migrations` 64 OK; MySQL `buyer-cancel-races`
+  5/5 OK; frontend 85 files / 1281 tests OK.
+
+### Still deferred
+
+- The re-verification token's age is checked separately by `estimate` and `snapshot` (a token that ages out between them makes the
+  snapshot copy everything; fails closed).
+- The deploy exceeds Forge's ten-minute watch (runbook section 9); optional speed-ups unchanged from 13:00.
+- #359 review P3s (kit hold wording, spoofable "Enabled automatically" label, persistent "needs attention", test gaps) and the
+  #363 notes in its PR body (expired-refusal copy beside Cancel; a principal paired with another account's key, covered by
+  `CustomerAccess::lock`).
+
+### Next, in order
+
+1. If Sean wants either capability on staging: deploy main (off), then switch on `VASEY_TEST_DELIVERY_AUTO_ENABLED` and/or
+   `VASEY_TEST_BUYER_CANCEL_ENABLED` with their exact policy lines and deploy again; rehearse per `docs/ops/staging-test-purchase.md`.
+2. Run one Foundation CI (manual, exact SHA) on a chosen main SHA to prove the #361 MySQL path end to end.
+3. The remaining deferred items above.
+
 ## Checkpoint 2026-11-12, 13:00 UTC
 
 Added by the Claude Code harness; supersedes the 06:30 checkpoint below for current state. Nothing here is acceptance.
