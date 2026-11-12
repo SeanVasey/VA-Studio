@@ -37,7 +37,11 @@ final class ReadUnsentRelease
     public static function for(Order $order, bool $lock = false): ?TestUnsentOrderRelease
     {
         $attempt = $order->attempt()->first();
-        $state = $attempt ? InventoryReservation::whereKey($attempt->inventory_reservation_id)->value('state') : null;
+        // With $lock the caller already holds the Order lock (HostedCheckout::start). Reading the reservation for update
+        // after it keeps the release service's order (Order before reservation) and sees a release committed after this
+        // transaction's snapshot, which a plain REPEATABLE READ read could miss.
+        $reservation = $attempt ? InventoryReservation::whereKey($attempt->inventory_reservation_id) : null;
+        $state = $reservation ? ($lock ? $reservation->lockForUpdate() : $reservation)->value('state') : null;
         if ($state !== 'released' || CheckoutIntent::where('order_id', $order->id)->exists()) {
             return null;
         }

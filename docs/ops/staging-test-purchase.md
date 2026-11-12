@@ -343,6 +343,8 @@ Then **Deploy Now**. The deploy gate (`ops/staging/validate-runtime.php`) accept
 
 ### Never sent to Stripe
 
+The migration that adds this (`2026_11_11_001000`) briefly replaces the reservation guards; it runs inside the deploy's maintenance pause and must never be run against a live site.
+
 An order prepared in the store whose buyer never pressed **Open Stripe test checkout** has no checkout request. The page's **Checkout** column shows it as "Never sent to Stripe", and it offers **Release never-sent order** instead of the Stripe check. Same switch, same staff and MFA requirement.
 
 1. Wait until the order's payment window has closed: it ends with the quote, 15 minutes after the cart review. Before that the result is "Checkout window is still open" (`checkout_open`) and nothing is recorded; the buyer could still open checkout.

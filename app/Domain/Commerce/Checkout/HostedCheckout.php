@@ -21,6 +21,7 @@ use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -60,11 +61,20 @@ final class HostedCheckout
             $publicId = (string) Str::uuid();
             $payload = $this->evidence->request($locked, $captured, $publicId, $policy, $account, $at);
             [$ciphertext, $hash] = $this->evidence->encrypt($payload);
-            $intent = CheckoutIntent::create(['public_id' => $publicId, 'order_id' => $locked->id, 'order_attempt_id' => $attempt->id,
-                'account_id' => $account, 'mode' => 'test', 'idempotency_key' => 'vasey-checkout-v1-'.$publicId,
-                'request_ciphertext' => $ciphertext, 'request_hash' => $hash, 'canonicalization_version' => CanonicalJson::VERSION,
-                'created_at' => $at, 'initiate_before' => $attempt->expires_at, 'retry_before' => $at->addSeconds(900),
-                'provider_expires_at' => $at->addSeconds(3600)]);
+            try {
+                $intent = CheckoutIntent::create(['public_id' => $publicId, 'order_id' => $locked->id, 'order_attempt_id' => $attempt->id,
+                    'account_id' => $account, 'mode' => 'test', 'idempotency_key' => 'vasey-checkout-v1-'.$publicId,
+                    'request_ciphertext' => $ciphertext, 'request_hash' => $hash, 'canonicalization_version' => CanonicalJson::VERSION,
+                    'created_at' => $at, 'initiate_before' => $attempt->expires_at, 'retry_before' => $at->addSeconds(900),
+                    'provider_expires_at' => $at->addSeconds(3600)]);
+            } catch (QueryException $error) {
+                // The database refuses an intent for a released never-sent order (checkout_intents_unsent_release_insert).
+                // The check above reads under the Order lock, so this is a backstop; the buyer still gets the 410.
+                if (str_contains($error->getMessage(), 'Invalid or immutable unsent release evidence')) {
+                    throw new QuoteException('CHECKOUT_EXPIRED', 410);
+                }
+                throw $error;
+            }
             AuditEvent::recordAttributed('commerce.checkout.initiated', $intent, ['public_id' => $publicId, 'order_public_id' => $locked->public_id, 'test_only' => true], $actorId);
             if ($attempt->expires_at->lessThanOrEqualTo(now())) {
                 throw new QuoteException('CHECKOUT_EXPIRED', 410);

@@ -30,7 +30,7 @@ final class TestUnpaidOrderResource extends ReadOnlyCommerceResource
 
     public static function table(Table $table): Table
     {
-        return $table->description('Review original test orders for the configured account. Listing an order does not establish that it is unpaid or eligible for release.')
+        return $table->description('Review original test orders: those whose checkout started for the configured Stripe test account, and those never sent to Stripe. Listing an order does not establish that it is unpaid or eligible for release.')
             ->columns([
                 TextColumn::make('public_id')->label('Order')->searchable()->copyable(),
                 TextColumn::make('created_at')->label('Prepared (UTC)')->dateTime('Y-m-d H:i:s', 'UTC')->sortable(),
@@ -121,7 +121,7 @@ final class TestUnpaidOrderResource extends ReadOnlyCommerceResource
                     }),
             ])->toolbarActions([])
             ->emptyStateHeading('No matching test orders')
-            ->emptyStateDescription('Only retained test orders for the configured account appear here.');
+            ->emptyStateDescription('Only retained test orders appear here: those whose checkout started for the configured Stripe test account, and those never sent to Stripe.');
     }
 
     /** Display only: the service re-establishes the facts under its own locks and decides the proof. */

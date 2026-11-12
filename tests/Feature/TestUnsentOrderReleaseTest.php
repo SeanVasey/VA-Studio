@@ -118,9 +118,13 @@ class TestUnsentOrderReleaseTest extends TestCase
         }
         $audit = AuditEvent::where('action', 'commerce.unpaid_release.unsent_released')->sole();
         $this->assertSame($f['admin']->id, $audit->actor_id);
-        // MySQL's JSON column does not keep key order; the content must match exactly.
-        $this->assertEquals(['order_id' => $order->public_id, 'release_id' => $release->public_id, 'proof' => ReadUnsentRelease::PROOF,
-            'request_id' => $key, 'sequence' => 2, 'test_only' => true], $audit->context);
+        // MySQL's JSON column does not keep key order; compare the exact content in a canonical key order.
+        $expected = ['order_id' => $order->public_id, 'release_id' => $release->public_id, 'proof' => ReadUnsentRelease::PROOF,
+            'request_id' => $key, 'sequence' => 2, 'test_only' => true];
+        $context = $audit->context;
+        ksort($expected);
+        ksort($context);
+        $this->assertSame($expected, $context);
         $review = $service->review($order->public_id, $f['admin']);
         $this->assertSame(['released', $release->public_id], [$review['status'], $review['release']['publicId']]);
         $this->assertNull(TestUnpaidReleaseWork::sole()->claim_token);
@@ -302,34 +306,110 @@ class TestUnsentOrderReleaseTest extends TestCase
         $this->assertSame(0, (int) TestUnpaidReleaseWork::max('sequence'));
     }
 
+    /**
+     * Each refused proof row differs from an accepted one in exactly the field under test, on a second never-sent order with
+     * its own attempt, reservation and event pair, so no duplicate or binding clause can refuse it first.
+     */
     public function test_database_refuses_unproved_never_sent_records_and_resource_rewrites(): void
     {
-        $sent = PaymentFixtures::started($this->gateway);
+        $b = CheckoutFixtures::prepared();
+        $bAttempt = $b['order']->attempt()->sole();
+        $actor = LicenseFixtures::admin();
+        // An observed release event recorded while B's window was still open (only constructible by raw writes).
+        $early = $this->eventPair($b['order']->id, $actor->id, 0);
         $f = $this->abandoned(false, true);
+        $late = $this->eventPair($b['order']->id, $actor->id, 2);
         foreach (['inventory_reservations', 'promotion_uses'] as $table) {
             $this->assertDatabaseRefuses(fn () => DB::table($table)->update(['state' => 'released']));
         }
         $this->assertSame('released', app(ReleaseTestOrderResources::class)->release($f['order']->public_id, $f['admin'], (string) Str::uuid(), 0)['status']);
-        $row = (array) DB::table('test_unsent_order_releases')->sole();
-        $sentAttempt = $sent['order']->attempt()->sole();
-        $copies = [
-            'order with a checkout intent' => ['order_id' => $sent['order']->id, 'order_attempt_id' => $sentAttempt->id, 'inventory_reservation_id' => $sentAttempt->inventory_reservation_id],
-            'released before the window closed' => ['released_at' => $f['attempt']->expires_at->subSecond()->format('Y-m-d H:i:s')],
-            'other proof' => ['proof' => 'expiry_only'],
-            'other policy' => ['policy_version' => 'test-unpaid-release-v1'],
+        // An existing never-sent release does not admit an unrelated pending reservation.
+        $this->assertDatabaseRefuses(fn () => DB::table('inventory_reservations')->where('id', $bAttempt->inventory_reservation_id)->update(['state' => 'released']), 'unrelated reservation');
+
+        $valid = fn (TestUnpaidReleaseEvent $event, array $change = []): array => array_merge(['public_id' => (string) Str::uuid(),
+            'order_id' => $b['order']->id, 'order_attempt_id' => $bAttempt->id, 'event_id' => $event->id, 'request_id' => $event->request_id,
+            'actor_id' => $actor->id, 'mode' => 'test', 'policy_version' => ReadUnsentRelease::POLICY_VERSION, 'proof' => ReadUnsentRelease::PROOF,
+            'inventory_reservation_id' => $bAttempt->inventory_reservation_id, 'promotion_use_id' => null,
+            'checkout_window_closed_at' => $bAttempt->expires_at->format('Y-m-d H:i:s'), 'released_at' => $event->created_at->format('Y-m-d H:i:s'),
+            'evidence_ciphertext' => 'synthetic', 'evidence_hash' => str_repeat('a', 64), 'canonicalization_version' => 'vasey-json-v1'], $change);
+        // Positive control: the unchanged row and an exact release transition are accepted (then rolled back).
+        DB::beginTransaction();
+        try {
+            DB::table('test_unsent_order_releases')->insert($valid($late));
+            $this->assertSame(1, DB::table('inventory_reservations')->where('id', $bAttempt->inventory_reservation_id)->update(['state' => 'released']));
+        } finally {
+            DB::rollBack();
+        }
+        $refused = [
+            'released before the window closed' => $valid($early),
+            'other proof' => $valid($late, ['proof' => 'expiry_only']),
+            'other policy' => $valid($late, ['policy_version' => 'test-unpaid-release-v1']),
+            'other mode' => $valid($late, ['mode' => 'live']),
+            'other window' => $valid($late, ['checkout_window_closed_at' => $bAttempt->expires_at->subSecond()->format('Y-m-d H:i:s')]),
+            'requested event' => $valid($late, ['event_id' => TestUnpaidReleaseEvent::where('request_id', $late->request_id)->where('kind', 'requested')->sole()->id]),
+            'duplicate of the retained release' => array_merge((array) DB::table('test_unsent_order_releases')->sole(), ['id' => null, 'public_id' => (string) Str::uuid()]),
         ];
-        foreach ($copies as $label => $change) {
-            $copy = array_merge($row, ['public_id' => (string) Str::uuid()], $change);
-            unset($copy['id']);
-            $this->assertDatabaseRefuses(fn () => DB::table('test_unsent_order_releases')->insert($copy), $label);
+        foreach ($refused as $label => $row) {
+            unset($row['id']);
+            $this->assertDatabaseRefuses(fn () => DB::table('test_unsent_order_releases')->insert($row), $label);
+        }
+        // With a valid row for B in place, a release that also rewrites the attempt binding is refused.
+        foreach (['attempt_id' => (string) Str::uuid(), 'pending_at' => $bAttempt->expires_at->subSeconds(5)->format('Y-m-d H:i:s'),
+            'expired_at' => now()->format('Y-m-d H:i:s')] as $field => $value) {
+            DB::beginTransaction();
+            try {
+                DB::table('test_unsent_order_releases')->insert($valid($late));
+                $this->assertDatabaseRefuses(fn () => DB::table('inventory_reservations')->where('id', $bAttempt->inventory_reservation_id)
+                    ->update(['state' => 'released', $field => $value]), 'release rewriting '.$field);
+            } finally {
+                DB::rollBack();
+            }
         }
         $this->assertDatabaseRefuses(fn () => DB::table('test_unsent_order_releases')->update(['request_id' => (string) Str::uuid()]));
         $this->assertDatabaseRefuses(fn () => DB::table('test_unsent_order_releases')->delete());
         foreach ([['state' => 'pending'], ['state' => 'consumed', 'consumed_at' => now()]] as $change) {
             $this->assertDatabaseRefuses(fn () => DB::table('inventory_reservations')->where('id', $f['attempt']->inventory_reservation_id)->update($change));
         }
-        $this->assertDatabaseHas('inventory_reservations', ['id' => $sentAttempt->inventory_reservation_id, 'state' => 'pending']);
+        $this->assertDatabaseHas('inventory_reservations', ['id' => $bAttempt->inventory_reservation_id, 'state' => 'pending']);
         $this->assertSame(1, TestUnsentOrderRelease::count());
+    }
+
+    /** A requested/observed `released` pair for an order, written directly at the current time (test fixture only). */
+    private function eventPair(int $orderId, int $actorId, int $sequence): TestUnpaidReleaseEvent
+    {
+        $work = TestUnpaidReleaseWork::firstOrCreate(['order_id' => $orderId], ['sequence' => 0]);
+        $this->assertSame($sequence, $work->sequence);
+        $request = (string) Str::uuid();
+        $at = now()->utc()->startOfSecond();
+        $event = null;
+        foreach ([['requested', 'pending', null], ['observed', 'released', $at]] as $offset => [$kind, $outcome, $observed]) {
+            $event = TestUnpaidReleaseEvent::create(['order_id' => $orderId, 'sequence' => $sequence + $offset + 1, 'review_sequence' => $sequence,
+                'request_id' => $request, 'actor_id' => $actorId, 'kind' => $kind, 'outcome' => $outcome, 'observed_at' => $observed, 'created_at' => $at]);
+            DB::table('test_unpaid_release_work')->where('id', $work->id)->update(['sequence' => $sequence + $offset + 1]);
+        }
+
+        return $event;
+    }
+
+    /** If the code check ever misses a committed release, the database refuses the intent and the buyer still gets a 410. */
+    public function test_database_refusal_of_a_late_intent_is_reported_as_checkout_expired(): void
+    {
+        $f = $this->abandoned();
+        $this->assertSame('released', app(ReleaseTestOrderResources::class)->release($f['order']->public_id, $f['admin'], (string) Str::uuid(), 0)['status']);
+        // Simulate the stale read: the reservation reads as pending again (raw, guard removed in this disposable database only),
+        // so ReadUnsentRelease::for finds nothing and only the checkout_intents guard stands in the way.
+        DB::unprepared('DROP TRIGGER inventory_reservations_transition');
+        DB::table('inventory_reservations')->where('id', $f['attempt']->inventory_reservation_id)->update(['state' => 'pending']);
+        $this->assertNull(ReadUnsentRelease::for($f['order']));
+        $this->travelTo($f['order']->created_at);
+        try {
+            app(HostedCheckout::class)->start($f['order']->public_id, InventoryFixtures::OWNER);
+            $this->fail('A released never-sent order reached checkout.');
+        } catch (QuoteException $error) {
+            $this->assertSame(['CHECKOUT_EXPIRED', 410], [$error->errorCode, $error->status]);
+        }
+        $this->assertDatabaseCount('checkout_intents', 0);
+        $this->assertSame([], $this->gateway->calls);
     }
 
     /** A checkout intent committed by any path before the proof row is inserted makes the database refuse the release. */
