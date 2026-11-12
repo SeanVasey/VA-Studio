@@ -1,9 +1,18 @@
 # Stripe TEST drills (M-07): operator runbook and evidence capture
 
-Status: **prepared, not yet run against Stripe.** The application side of every drill is proven locally with synthetic
-provider fixtures ([verification record](../verification/stripe-test-drills-20261018/README.md)). Nothing here has run on
-the hosted staging host or against a real Stripe test account. The first hosted run is the evidence; expect
-interoperability findings and record them for M-08.
+Status (2026-11-12): **drill 1 has run against Stripe on staging; drills 2 to 4 have not been run as drills.** The
+application side of every drill is proven locally with synthetic provider fixtures
+([verification record](../verification/stripe-test-drills-20261018/README.md)). The hosted runs are the interoperability
+evidence; record findings for M-08.
+
+| Drill | Hosted run | Evidence |
+| --- | --- | --- |
+| 1 Declined card | Passed on staging, 2026-11-11, order `e44f06a0`: Stripe stayed on its page and nothing was verified. The order was left unpaid and staff released it later that day. | Run with the operator's Playwright script, recorded in [Later runs](staging-test-purchase.md#later-runs-2026-11-11-and-2026-11-12). No evidence packet is recorded in the repository. The order was later released unpaid, so step 1.5 (paying the same session with `4242`) was not done. |
+| 2 Expired session | Not run as a drill. The expired-session path was exercised by three abandoned orders (`cf6504d0`, `a2e955f2`, `e44f06a0`): their Stripe sessions expired after 60 minutes, and the unpaid-release check read them as expired and unpaid and released them (2026-11-11). | No `checkout.session.expired` delivery or `stripe post .../expire` was recorded. |
+| 3 Duplicate webhook | Not run. | None. |
+| 4 Reconcile without a webhook | Not run. It disables the webhook endpoint briefly, so do not run it during Sean's testing window. | None. |
+
+Remaining: drills 3 and 4, and drill 2 with its evidence packet. Run them when no deploy is pending.
 
 This runbook covers the four M-07 drills in [`MONDAY-PLAN.md`](../handoff/2026-10-08/MONDAY-PLAN.md): declined card,
 expired session, duplicate webhook and reconcile without a webhook. It adds exact evidence capture to the drills in the
@@ -30,9 +39,12 @@ The drill numbers match.
    Also check that Link is enabled on the Stripe account (the checkout request names `card` and `link`); if it is disabled, session creation or the check that the returned session echoes exactly the requested methods fails closed. The staging sandbox account's default payment method configuration showed Link available and on when read through the Stripe API in test mode on 2026-11-10; no Link payment has been exercised.
 2. The pipeline runner is installed and logging ([setup step 4](staging-test-purchase.md#4-start-the-pipeline-runner)).
 3. A **dedicated drill offer** is published and linked to its rights scope. Drill 2, and drill 1 if abandoned, leave
-   that offer revision reserved for good, because the staging profile has no unpaid release
-   (`VASEY_TEST_UNPAID_RELEASE_ENABLED` is set to `false`, and the validator requires that line). Buy the success paths from a different offer, or use one
-   drill offer per drill.
+   that offer's rights scope reserved until staff release the order. Staging has had the optional unpaid release
+   switched on since 2026-11-11 (`VASEY_TEST_UNPAID_RELEASE_ENABLED=true` with the exact policy; see
+   [Releasing an abandoned test order](staging-test-purchase.md#releasing-an-abandoned-test-order)). The release needs the
+   Stripe session to be expired and unpaid, and it cannot release an order that never reached Stripe or one paid late. A
+   profile with the flag `false` has no release at all. Buy the success paths from a different offer, or use one drill
+   offer per drill.
 4. The operator machine has the Stripe CLI logged in to the drill account (`stripe login`) for drills 2–4. CLI commands
    run in test mode unless `--live` is given: never pass `--live`. The Dashboard works too where noted.
 5. Use the staging runbook's alias, as the application user in the served release:
@@ -117,7 +129,7 @@ Locally proven: [matrix row (b)](../verification/stripe-test-drills-20261018/REA
 | 2.2 | Expire it from the operator machine (test-mode write): `stripe post /v1/checkout/sessions/cs_test_…/expire`. Or wait until `provider_expires_at`. | CLI returns the session with `"status": "expired"`. Dashboard → Webhooks: one `checkout.session.expired` delivery answered `200`. | CLI output (it contains no secret; drop any customer fields if present), delivery screenshot, `evt_…`, UTC time. |
 | 2.3 | Wait for the next sweep. | Runner: `receipts <id> expired`. If a declined attempt preceded the expiry, Stripe cancels its PaymentIntent and the line reads `canceled`; both are terminal unpaid outcomes. | Snapshot by event: `art vasey:test-commerce-evidence evt_… --json` → `02-expired.json`: `checkout.latest_status=expired`, one receipt `checkout.session.expired` with `work_state=processed`, `work_outcome=expired`, `payment.verified=false`, `grants.count=0`, `finalization=null`, `reservation.state=pending`, `unpaid_release=null`. |
 | 2.4 | Press **Check Stripe test checkout status** on the return page. | Status `expired`; no checkout link. | Screenshot. |
-| 2.5 | Try to prepare a new order for the same offer revision. | `INVENTORY_UNAVAILABLE`. Expected on staging: the reservation stays pending as evidence, and unpaid release is a separate, staff-reviewed path that this profile does not enable. | Screenshot of the error. |
+| 2.5 | Try to prepare a new order for the same offer revision. | `INVENTORY_UNAVAILABLE`. Expected on staging: the reservation stays pending as evidence until staff release the order (unpaid release has been switched on there since 2026-11-11), which is a separate, staff-reviewed step. | Screenshot of the error. |
 | 2.6 | Leave the runner going for a few minutes, then take another snapshot. | Each eligible reconcile sweep reads the expired session again: `reconcile <intent> expired`, and `payment.observation_total` grows by one per sweep. Known behaviour, recorded in the walkthrough; keep drill orders few. | Snapshot `03-later.json`. |
 
 **Late "completed" after expiry.** Stripe cannot complete an expired session, so the hosted run cannot produce one

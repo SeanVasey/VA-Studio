@@ -1,6 +1,8 @@
 # VASEY.AUDIO
 
-**Current state, October 17, 2026 UTC.** Development continues on `main` of [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). When this was written `main` was `34562862` (PR #137, documentation only) over the native fixture lifecycle merge of PR #132 (`efa6eea5`). The [development agenda](docs/handoff/2026-10-15/DEVELOPMENT-AGENDA.md) lists the completed development and the remaining work for each area. The [October 17 resumption note](docs/handoff/2026-10-17/RESUMPTION.md) records the open work lanes, the CI cost posture and the items that wait on Sean. The [Claude Code plan and merge ledger](docs/handoff/2026-10-07/CLAUDE-PLAN.md) remains the long record of every merged batch.
+**Current state: see the [November 12 checkpoint](docs/handoff/2026-11-05/HANDOFF.md#checkpoint-2026-11-12) and the [staging alpha test guide](docs/alpha/staging-alpha-test-guide.md). The paragraph that follows records October 17, 2026 UTC and is kept for provenance.**
+
+**October 17, 2026 UTC.** Development continues on `main` of [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). When this was written `main` was `34562862` (PR #137, documentation only) over the native fixture lifecycle merge of PR #132 (`efa6eea5`). The [development agenda](docs/handoff/2026-10-15/DEVELOPMENT-AGENDA.md) lists the completed development and the remaining work for each area. The [October 17 resumption note](docs/handoff/2026-10-17/RESUMPTION.md) records the open work lanes, the CI cost posture and the items that wait on Sean. The [Claude Code plan and merge ledger](docs/handoff/2026-10-07/CLAUDE-PLAN.md) remains the long record of every merged batch.
 
 Commerce, customer identity, memberships, paid and free delivery and tax run only behind default-off, test-only policies. They are admitted in `local` and `testing`, and the Stripe-test chain also in the hosted `staging` rehearsal (Stripe test mode only, staff MFA required); some rehearsals stay `local` and `testing` only. BeatStars remains the live store. No live payment, production deployment, DNS change, customer import or launch acceptance is claimed. The [remaining development plan](docs/remaining-development-plan.md#parity-status-source-read-october-17-2026) records a source-read status for each of the 103 parity requirements; that table is a reading of the code on October 17, not test or release acceptance.
 
@@ -155,8 +157,10 @@ Routine PRs run **Development preflight**: frontend tests/build, client secret
 scans, dependency audits and PHP/tooling quality checks. Pushes and merges do not
 start full database/browser matrices. Sean's October 6 policy in [AGENTS.md](AGENTS.md)
 allows development merges using meaningful focused evidence with untested
-conditions recorded. Prefer local affected checks; manually request
-[focused feedback](docs/verification/focused-ci.md) only when needed.
+conditions recorded. Preflight runs no PHPUnit: PHP tests run locally per change and in the
+manual final verification. Prefer local affected checks; manually request
+[focused feedback](docs/verification/focused-ci.md) only when needed. Its browser specs are
+split into nine `browser-*` suites plus `accessibility-browser` (the single `browser` suite no longer exists).
 
 **Foundation CI** is manual final verification through
 `.github/workflows/final-verification.yml`, requiring the exact reviewed

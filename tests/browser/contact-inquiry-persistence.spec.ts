@@ -108,7 +108,8 @@ test('real customer inquiry persists encrypted and ordinary staff can read and a
     const inbox = await operator.goto('/admin/customer-inquiries');
     expect(inbox?.status()).toBe(200);
     expect(inbox?.headers()['cache-control']).toContain('no-store');
-    await expect(operator.getByText(fixture.values.subject, { exact: true })).toBeVisible();
+    // The inbox is shared with the other projects' and specs' inquiries, so check the subject on this receipt's own row.
+    await expect(operator.getByRole('row').filter({ hasText: receipt }).getByText(fixture.values.subject, { exact: true })).toBeVisible();
     const view = operator.getByRole('row').filter({ hasText: receipt }).getByRole('link', { name: 'View', exact: true });
     await expect(view).toHaveAttribute('href', `http://127.0.0.1:8173/admin/customer-inquiries/${receipt}`);
     await view.click();

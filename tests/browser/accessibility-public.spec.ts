@@ -199,7 +199,30 @@ test('forced colors retain visible keyboard focus and usable license controls', 
   await page.keyboard.press('ArrowDown');
   await expect(extended).toBeChecked();
   await expect(dialog.getByRole('region', { name: 'Published license text', exact: true })).toHaveText(policyText(1));
-  await expectAccessible(page, testInfo, 'forced-colors-license');
+  // axe-core 4.14 has no forced-colors support: it reports the author's brand colours (silver on a forced white Canvas),
+  // a pair that is never painted (run 43122303001 and 43127350343; evidence in docs/verification/browser-focused-20261112.md).
+  // So this one scan disables color-contrast only, and the contrast under forced colors is asserted from the computed
+  // system colours instead. Every other axe rule still runs on this state.
+  const painted = await dialog.evaluate(element => {
+    const parse = (value: string) => (value.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+    const luminance = ([r, g, b]: number[]) => 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
+    const linear = (channel: number) => { const c = channel / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+    const background = parse(getComputedStyle(element).backgroundColor);
+    return ['.eyebrow', '.modal-description', '.offer-files', '.offer-terms', '.fine-print', '.text-link', '.license-source'].map(selector => {
+      const node = element.querySelector(selector);
+      if (!node) return { selector, missing: true as const };
+      const color = getComputedStyle(node).color;
+      const [lighter, darker] = [luminance(parse(color)), luminance(background)].sort((a, b) => b - a);
+      return { selector, color, ratio: (lighter + 0.05) / (darker + 0.05) };
+    });
+  });
+  for (const sample of painted) {
+    expect(sample, `${sample.selector} must exist in the forced-colors dialog`).not.toHaveProperty('missing');
+    // Brand text colours (silver #C9D0D3, muted #AAB4BD, turquoise #00B8D9) must not survive forced colors.
+    expect(['rgb(201, 208, 211)', 'rgb(170, 180, 189)', 'rgb(0, 184, 217)'], `${sample.selector} kept an author colour`).not.toContain((sample as { color: string }).color);
+    expect((sample as { ratio: number }).ratio, `${sample.selector} system-colour contrast`).toBeGreaterThanOrEqual(4.5);
+  }
+  await expectAccessible(page, testInfo, 'forced-colors-license', { disableRules: ['color-contrast'] });
   // Native/system paint still needs human inspection; computed CSS is not contrast proof.
   await page.screenshot({ path: testInfo.outputPath('accessibility-forced-colors-license.png'), fullPage: false });
 });
