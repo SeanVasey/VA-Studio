@@ -246,8 +246,9 @@ Before anything else it compares the root-installed helpers (`vasey-staging-ctl`
 4. The frozen `.env` starts as 0600. The built candidate repeats real Laravel admission before (without the build account)
    `vasey-staging-ctl attach` seals code and environment onto protected inodes, verifies the explicit runtime
    exceptions and bind-mounts private storage.
-0. Before anything is stopped, `ctl space-check --preverify` (the backup helper's `space-check`) first re-hashes the private files
-   of the newest proven backup set (site still up; runbook section 8), then estimates the snapshot (the private bytes it will copy
+0. Before anything is stopped, `ctl space-check --preverify-if-needed` (the backup helper's `space-check`) first re-hashes the private files
+   of the newest proven backup set (site still up; runbook section 8) unless a token younger than 5 hours already names it (the
+   renewal that `ctl activate`/`refresh`, the nightly run and an hourly cron start after the resume, `vasey-staging-backup rearm`), then estimates the snapshot (the private bytes it will copy
    + database + restore proof + margin, plus an encrypted copy of the whole set when off-host hardening is on) against the free
    bytes. It refuses with the served release untouched ("FAILED before the quiesce"), naming the estimate it used, also when the
    re-hash finds a changed backup file. `ctl prepare`, `activate` and `refresh` repeat the space check before their own operation

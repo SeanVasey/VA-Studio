@@ -13,6 +13,9 @@
 #   vasey-staging-backup ship DIR           copy one backup directory off-host now (manual; clears its pending marker on success)
 #   vasey-staging-backup ship-pending       ship every pending set, newest first, with the site up (foreground; own lock; records dashboard evidence)
 #   vasey-staging-backup ship-pending-start start ship-pending detached from the caller's locks (systemd-run, else setsid) and return at once
+#   vasey-staging-backup rearm              re-hash the newest proven set with the site up and renew its re-verification token, unless
+#                                           a token younger than REARM_AFTER_HOURS already names it (waits for the deploy lock; cron, hourly)
+#   vasey-staging-backup rearm-start        start rearm detached from the caller's locks and return at once (after a deploy's resume)
 #   vasey-staging-backup pending            list the sets still waiting for an off-host copy, with their last result
 #   vasey-staging-backup pending-clear SET  abandon one pending set (it is then pruned by ordinary retention)
 #   vasey-staging-backup check-offhost      validate the opt-in age/rclone/retention settings (no network, ships nothing)
@@ -387,8 +390,26 @@ SHIP_PENDING_UNIT=vasey-staging-ship-pending
 # Seconds ship-pending waits for a manual `ship` (a 38 GB one takes ~15 minutes) to release the off-host lock; the site is up,
 # so waiting delays nothing. A timeout is "busy, retry later", never a recorded failure.
 SHIP_PENDING_LOCK_WAIT=3600
+# Seconds the nightly run waits for the deploy lock (a running deploy or token renewal) before it gives the night up.
+NIGHTLY_LOCK_WAIT=1800
 # More pending sets than this means the remote has been failing for days; each one is about a set of disk (ship_pending logs a warning).
 PENDING_WARN=3
+
+# A deploy's early gate skips its re-hash of the newest proven set (about 4 minutes for 38 GB) when a token younger than
+# LINK_ESTIMATE_MAX_AGE_HOURS already names that set. `rearm` keeps one there: started detached after every resume (the snapshot
+# just consumed the token), and hourly from cron when the token is older than REARM_AFTER_HOURS. It re-hashes with the site up,
+# under the deploy lock (preverify deletes the token first, so it must never overlap a deploy's or the nightly run's snapshot).
+REARM_LOG=/var/log/vasey-staging/rearm.log
+REARM_UNIT=vasey-staging-rearm
+# Seconds rearm waits for a deploy (about 12 minutes with its own re-hash) or the nightly run to release the deploy lock.
+REARM_LOCK_WAIT=1800
+# vasey-staging-ctl's action lock. Manual ctl operations (a runbook `ctl refresh`) take only this lock, not the deploy lock: rearm
+# takes it after the deploy lock (the order forge-deploy and the nightly run use), so it never deletes a token a ctl snapshot is
+# about to consume. Other ctl calls, `status` included, wait for a running renewal (about 4 minutes).
+REARM_CTL_LOCK=/etc/vasey-staging/ctl.lock
+# A renewal that finds a backup file changed leaves this marker: the next deploy gate refuses once on it and removes it, as it
+# refused on its own re-hash before renewals existed (the following deploy then copies the whole private store).
+REARM_FINDING=.rearm-finding
 
 # ---- the private tree: which earlier set a snapshot may share unchanged files with ----
 # A snapshot shares files only with the set that this operation's pre-quiesce re-verification hashed in full: preverify writes
@@ -400,6 +421,9 @@ LINK_MAX_AGE_HOURS=6
 # out, with the site already stopped. A deploy's build and pause take minutes; an hour is a wide margin.
 LINK_ESTIMATE_HEADROOM_HOURS=1
 LINK_ESTIMATE_MAX_AGE_HOURS=$((LINK_MAX_AGE_HOURS - LINK_ESTIMATE_HEADROOM_HOURS))
+# The hourly rearm renews a token older than this, so a deploy finds one younger than LINK_ESTIMATE_MAX_AGE_HOURS: at most this
+# age, plus an hour until the next check, plus the re-hash itself.
+REARM_AFTER_HOURS=$((LINK_ESTIMATE_MAX_AGE_HOURS - 2))
 
 # The newest tree set with a restore proof: the one preverify re-hashes. Prints nothing when sharing is off or none qualifies.
 link_source() {
@@ -997,6 +1021,85 @@ ship_pending_start() {
   return 0
 }
 
+# Renews the re-verification token of the newest proven set, with the site up, so the next deploy can skip its own re-hash.
+# Holds the deploy lock (waiting for a running deploy or nightly run) because preverify deletes the token before it re-hashes.
+# A failed re-proof withdraws proofs exactly as before a deploy (exit 1); an operational error leaves them alone (exit 2). Either
+# way no token remains and the next deploy re-hashes in its own gate, which reports the same finding before anything stops.
+rearm() {
+  [ -n "${PRIVATE_SNAPSHOT:-}" ] && [ -f "$PRIVATE_SNAPSHOT" ] || { log "no private snapshot engine installed; nothing to re-arm"; return 0; }
+  [ -d "$VASEY_BACKUP_DIR" ] || { log "no backup directory; nothing to re-arm"; return 0; }
+  exec 9>>"$VASEY_ROOT/.deploy.lock"
+  if ! flock -w "$REARM_LOCK_WAIT" 9; then
+    exec 9>&-
+    log "the deploy lock stayed held for ${REARM_LOCK_WAIT}s; not re-armed (the next deploy re-hashes itself; the next hourly run retries)"
+    return 0
+  fi
+  exec 8>>"$REARM_CTL_LOCK"
+  if ! flock -w "$REARM_LOCK_WAIT" 8; then
+    exec 8>&- 9>&-
+    log "the helper action lock stayed held for ${REARM_LOCK_WAIT}s; not re-armed (the next hourly run retries)"
+    return 0
+  fi
+  local src rc=0 out
+  src=$(link_source)
+  if [ -z "$src" ]; then
+    exec 8>&- 9>&-
+    log "no verified tree set to share files with; nothing to re-arm"
+    return 0
+  fi
+  if [ "$(link_token_set "$REARM_AFTER_HOURS")" = "$src" ]; then
+    exec 8>&- 9>&-
+    log "the re-verification token of $(basename -- "$src") is younger than $REARM_AFTER_HOURS hour(s); nothing to re-arm"
+    return 0
+  fi
+  out=$(preverify_link_source) || rc=$?
+  [ -z "$out" ] || printf '%s\n' "$out"
+  case "$rc" in
+    0) [ -n "$(link_token_set)" ] && log "re-armed: the next deploy within $LINK_ESTIMATE_MAX_AGE_HOURS hour(s) skips its re-hash" ;;
+    1)
+      printf 'found_utc=%s\nset=%s\nreason=%s\n' "$(date -u +%FT%TZ)" "$(basename -- "$src")" \
+        "$(printf '%s\n' "$out" | grep 'failed its private file re-verification' | tail -n 1 | tr -d '\r' | cut -c1-600)" >"$VASEY_BACKUP_DIR/$REARM_FINDING.new" \
+        && mv -f -- "$VASEY_BACKUP_DIR/$REARM_FINDING.new" "$VASEY_BACKUP_DIR/$REARM_FINDING" \
+        || log "WARNING: could not record the finding for the next deploy"
+      log "WARNING: re-arm found a backup set whose private files failed re-verification (reason above); the next deploy refuses once before its quiesce (docs/ops/staging-runbook.md section 8, corruption refusal)" ;;
+    *) log "WARNING: re-arm could not run (an operational error, reason above); the next deploy re-hashes in its own gate" ;;
+  esac
+  exec 8>&- 9>&-
+  return "$rc"
+}
+
+# The deploy gate's half of a renewal finding: refuse once, before anything is stopped, and clear the marker so the next deploy
+# proceeds (its snapshot copies what the withdrawn set no longer shares), exactly as a finding of the gate's own re-hash did.
+refuse_on_rearm_finding() {
+  local marker=$VASEY_BACKUP_DIR/$REARM_FINDING
+  [ -f "$marker" ] && [ ! -L "$marker" ] || return 0
+  local found set reason
+  found=$(sed -n 's/^found_utc=//p' -- "$marker" | head -n 1); set=$(sed -n 's/^set=//p' -- "$marker" | head -n 1)
+  reason=$(sed -n 's/^reason=//p' -- "$marker" | head -n 1)
+  rm -f -- "$marker"
+  die "refused: the backup token renewal at ${found:-unknown time} found private files of ${set:-a backup set} that failed re-verification ($reason); the proofs of the affected sets were withdrawn and nothing was stopped. Check the disk and the sets (docs/ops/staging-runbook.md section 8, corruption refusal), then deploy again: the next snapshot copies what those sets no longer share"
+}
+
+# Starts rearm detached from the caller (ctl activate/refresh after their resume, the nightly run): the caller may still hold
+# the deploy lock, which rearm then waits for. Same mechanics as ship_pending_start. Never fails the caller.
+rearm_start() {
+  [ -n "${PRIVATE_SNAPSHOT:-}" ] && [ -f "$PRIVATE_SNAPSHOT" ] || return 0
+  if command -v systemd-run >/dev/null 2>&1 \
+     && timeout 30 systemd-run --quiet --collect --unit="$REARM_UNIT" --property=Nice=10 \
+          --description="VASEY.AUDIO backup re-verification token renewal" \
+          /bin/bash -c 'exec "$0" rearm >>"$1" 2>&1' "$BACKUP_SELF" "$REARM_LOG" </dev/null >/dev/null 2>&1; then
+    log "re-verification token renewal started as ${REARM_UNIT}.service; progress: $REARM_LOG"
+    return 0
+  fi
+  if [ -x "$BACKUP_SELF" ] && command -v setsid >/dev/null 2>&1 \
+     && ( setsid "$BACKUP_SELF" rearm >>"$REARM_LOG" 2>&1 </dev/null 5>&- 6>&- 7>&- 8>&- 9>&- & ) 2>/dev/null; then
+    log "re-verification token renewal started detached (no systemd unit); progress: $REARM_LOG"
+    return 0
+  fi
+  log "WARNING: could not start the re-verification token renewal; the next deploy re-hashes itself (the hourly run retries)"
+  return 0
+}
+
 pending_report() {
   local n any=0
   while IFS= read -r n; do
@@ -1149,6 +1252,7 @@ nearest_existing() {  # nearest_existing PATH -> PATH or its closest existing an
 # re-hash would only lengthen the deploy).
 space_check() {  # space_check [--preverify|--preverify-if-needed]
   local priv db copy full set_need need restore_need ship_need avail restore_avail backup_at restore_at margin src estimate basis shared_with estimate_total
+  case "${1:-}" in --preverify|--preverify-if-needed) refuse_on_rearm_finding ;; esac
   if [ "${1:-}" = --preverify-if-needed ]; then
     # A token that would expire before the snapshot is as good as none: re-hash now rather than count a full copy.
     if [ -n "$(link_token_set "$LINK_ESTIMATE_MAX_AGE_HOURS")" ]; then set --; else set -- --preverify; fi
@@ -1258,7 +1362,8 @@ case "${1:-}" in
   nightly)
     install -d -m 0700 -o root -g root -- "$VASEY_BACKUP_DIR"
     exec 9>>"$VASEY_ROOT/.deploy.lock"
-    flock -n 9 || die "a deploy or another backup holds the lock; skipping this run"
+    # A deploy (about 12 minutes) or a token renewal (about 4) may hold the lock: wait for it rather than skip the night.
+    flock -w "$NIGHTLY_LOCK_WAIT" 9 || die "a deploy or another backup held the lock for ${NIGHTLY_LOCK_WAIT}s; skipping this run"
     # No space-check, no snapshot: pending sets are never pruned, so a long remote outage fills the disk. Refuse before the
     # quiesce (the site was never stopped), record the failure, and still drain the backlog.
     # Re-prove the set the snapshot will share, with the site up. A failure withdraws the affected proofs and leaves no token, so
@@ -1288,6 +1393,8 @@ case "${1:-}" in
     # Site is up: start the detached shipment of every pending set (tonight's, and any an earlier failure left). Even after a
     # failed snapshot, so earlier sets are retried. It never fails this run, whatever the remote does.
     ship_pending_start
+    # The snapshot consumed the token: renew it for the next deploy (detached; it waits for this run's lock to be released).
+    rearm_start
     [ "$snapshot_status" = 0 ] || die "snapshot or restore proof failed; resume completed if a release was served"
     # Local retention protects every pending set. Remote retention (VASEY_BACKUP_REMOTE_PRUNE) runs at the end of ship-pending.
     prune_local
@@ -1324,6 +1431,8 @@ case "${1:-}" in
     ;;
   ship-pending) ship_pending ;;
   ship-pending-start) ship_pending_start ;;
+  rearm) rearm ;;
+  rearm-start) rearm_start ;;
   pending) pending_report ;;
   pending-clear)
     is_pending "$(basename -- "${2:?set name}")" || die "not a pending set: $2"
@@ -1334,5 +1443,5 @@ case "${1:-}" in
     offhost_config_ok || die "off-host configuration refused"
     log "off-host configuration ok (encryption: $([ -n "$VASEY_BACKUP_AGE_RECIPIENTS_FILE" ] && echo age || { [ -n "$VASEY_BACKUP_REMOTE" ] && echo 'none by this script, explicitly allowed' || echo none; }); transport: $([ -n "$VASEY_BACKUP_REMOTE" ] && echo rclone || { [ -n "$VASEY_BACKUP_DEST" ] && echo rsync || echo none; }); retention: ${VASEY_BACKUP_RETENTION:-flat}; $(retry_copies_summary))"
     ;;
-  *) die "usage: vasey-staging-backup nightly | predeploy | space-check [--preverify] | prune | restore-check DIR | ship DIR | ship-pending | ship-pending-start | pending | pending-clear SET | check-offhost" ;;
+  *) die "usage: vasey-staging-backup nightly | predeploy | space-check [--preverify|--preverify-if-needed] | prune | restore-check DIR | ship DIR | ship-pending | ship-pending-start | rearm | rearm-start | pending | pending-clear SET | check-offhost" ;;
 esac

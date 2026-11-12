@@ -40,6 +40,7 @@ cmd_switch() { :; }
 cmd_resume() { :; }
 operation_finish() { :; }
 start_ship_pending() { :; }   # the detached off-host shipment: covered by test_staging_operation_lease and test_staging_deferred_ship
+start_rearm() { :; }          # the detached token renewal: covered by test_staging_backup_private_tree (TokenRenewal)
 '''
         with tempfile.TemporaryDirectory() as directory:
             for snapshot_ok in ('0', '1'):
