@@ -593,6 +593,44 @@ attach_private() {   # the bind mount and fstab are host state; the hand-over to
         self.assertNotIn("attach", self.trace_lines())
         self.assertEqual(self.mode(self.release), before, "the refused attach changed the slot's owner or mode")
 
+    # Re-review P3 on PR #356: in a failed, unsealed slot the build account can replace bootstrap (or bootstrap/cache) with
+    # a symlink to a tree the application user owns, so the owner check would read the application user and hand the
+    # slot to the legacy sealer, which opens it to traversal. Any symlink there refuses, before anything changes.
+    def test_attach_refuses_a_failed_slot_whose_bootstrap_is_a_symlink(self):
+        (self.bin / "npm").write_text("#!/bin/bash\nexit 7\n")
+        run = self.prepare()
+        self.assertNotEqual(run.returncode, 0)
+        self.operation.unlink()
+        decoy = self.root / "decoy"
+        (decoy / "cache").mkdir(parents=True)
+        for path in (decoy, decoy / "cache"):
+            os.chown(path, self.app_uid, self.app_gid)
+        # Independent review of PR #362 (reproduced): removing bootstrap, or making it a file, also hid the owner. The slot
+        # directory itself, which only root changes, now decides.
+        for link in ("bootstrap", "bootstrap/cache", "missing", "file"):
+            with self.subTest(link=link):
+                bootstrap = self.release / "bootstrap"
+                if bootstrap.is_symlink() or bootstrap.is_file():
+                    bootstrap.unlink()
+                elif bootstrap.exists():
+                    shutil.rmtree(bootstrap)
+                if link == "bootstrap":
+                    bootstrap.symlink_to(decoy)
+                elif link == "bootstrap/cache":
+                    bootstrap.mkdir()
+                    os.chown(bootstrap, self.app_uid, self.app_gid)
+                    (bootstrap / "cache").symlink_to(decoy / "cache")
+                elif link == "file":
+                    bootstrap.write_text("")
+                before = self.mode(self.release)
+                self.trace.write_text("")
+                run = self.ctl("attach", self.sha)
+                self.assertNotEqual(run.returncode, 0, run.stdout)
+                self.assertRegex(run.stderr, "bootstrap|isolated build")
+                self.assertNotIn("attach", self.trace_lines())
+                self.assertEqual(self.mode(self.release), before, "the refused attach changed the slot's owner or mode")
+
+
 class SmokeScriptMatchesTheBuildUnit(unittest.TestCase):
     """ops/staging/smoke-build-unit.sh proves the real unit on the host; it is worth nothing if its properties drift from
     build_in_unit's. Every property must be the same, except the slot path and the shorter run limit; the limits must match
@@ -628,6 +666,11 @@ class SmokeScriptMatchesTheBuildUnit(unittest.TestCase):
         self.assertIn("RestrictSUIDSGID", actual)
         self.assertIn("$BUILD", actual["ReadWritePaths"].split()[-1])
         environment = lambda body: set(re.findall(r'-E "?([A-Z_]+)=', body))
+        # Same for environment flags: --setenv=, -ENAME= or a quoted -E would escape the comparison above.
+        for body in (build, smoke):
+            self.assertEqual(len(re.findall(r"(?:^|\s)(?:-E|--setenv)(?=[\s=]|[A-Za-z_'\"])", body)),
+                             len(re.findall(r'-E "?([A-Z_]+)=', body)))
+        self.assertNotIn("--setenv", build + smoke)
         self.assertEqual(environment(smoke) - {"HOME"}, environment(build))
         for flag in ("--pipe", "--wait", "--collect", "--service-type=exec"):
             self.assertIn(flag, smoke)

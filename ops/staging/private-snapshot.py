@@ -13,7 +13,8 @@ only by the backup helper, as root, with `python3 -I`:
 Exit status of every command: 0 success, 1 the set or the store failed a check (Refused), 3 operational error (OSError,
 ValueError, or any unexpected exception): the helper must not treat 3 as evidence about a backup's content. One rule decides:
   * A finding about one set file's content (that inode, and so every set holding it): its bytes, identity, mode or owner differ
-    from the index, or reading its bytes failed with EIO, EBADMSG or EUCLEAN (ext4 reports a corrupt block as EBADMSG/EUCLEAN).
+    from the index, or reading its bytes failed with EIO, EBADMSG or EUCLEAN (ext4 reports a corrupt block as EBADMSG/EUCLEAN),
+    or opening it failed with EBADMSG or EUCLEAN (a corrupt inode; EIO opening a file stays operational).
   * A finding about the set alone (no other set's proof is touched, because no inode of it was shown to be bad): its own
     manifests (private.index, private.sha256, private.dirs) are missing, empty, truncated, malformed or unreadable (the same
     three errnos), or disagree with each other; its tree's names or directories differ from them; its tree holds a link or a
@@ -90,6 +91,8 @@ class Refused(Exception):
 
 # Reading a set file's bytes failed: the medium returned an error (EIO) or ext4 found the block corrupt (EBADMSG, EUCLEAN).
 CONTENT_ERRNOS = frozenset({errno.EIO, errno.EBADMSG, errno.EUCLEAN})
+# Opening a set file whose inode the walker already named: only the corruption reports count (EIO there stays operational).
+CORRUPT_INODE_ERRNOS = frozenset({errno.EBADMSG, errno.EUCLEAN})
 # A name that is not there, or not the kind of object the listing reported: a finding about the tree that holds it.
 MISSING_ERRNOS = frozenset({errno.ENOENT, errno.ENOTDIR, errno.ELOOP})
 
@@ -252,8 +255,13 @@ def hash_file(parent_fd, name, expected):
     try:
         fd = _open_file(parent_fd, name)
     except OSError as error:
+        if error.errno in CORRUPT_INODE_ERRNOS:
+            # ext4 usually reports a corrupt inode at lookup (the walker's stat, which stays operational), but it can also
+            # report it at open; the walker has already named this inode, so that is the same content finding as a failed
+            # read. A corrupt directory block met here instead would withdraw too much, never too little.
+            raise Mismatch(f"a set file cannot be opened ({describe(error)}): its content cannot be proven", {expected})
         if error.errno not in MISSING_ERRNOS:
-            raise  # an I/O error opening a file is operational (module docstring)
+            raise  # any other error opening a file, EIO included, is operational (module docstring)
         raise Refused("a set file changed while it was verified (removed or replaced by a link)")
     try:
         st = os.fstat(fd)
