@@ -1217,6 +1217,26 @@ class ReviewBatch337(PrivateTreeBase):
         second = self.predeploy(preverify=False)
         self.assertEqual(fields(second / "MANIFEST")["private_copied_files"], "1")
 
+    # Deferred finding (re-review of PR #353): the token's age was judged twice, by the space estimate and again by the snapshot
+    # after the build and the quiesce. A token near its 6-hour limit passed the estimate (only changed files counted) and then
+    # failed the snapshot (every file copied), which could overrun the space the estimate allowed with the site stopped. The
+    # estimate now counts sharing only for a token that stays fresh an hour longer; a nearly expired token is re-hashed instead.
+    def test_a_token_expiring_within_the_hour_is_re_hashed_not_trusted_by_the_estimate(self):
+        self.predeploy()
+        self.write("masters/new/master.wav", b"RIFF" + b"z" * 20_000)
+        run = self.check("--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.age_token(5.5)  # the snapshot would still accept it, but not after a build and pause that take longer than 30 minutes
+        total = sum((self.live / f).stat().st_size for f in self.live_files())
+        run = self.check(T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn(f"({total} of {total} private bytes to copy;", run.stdout)
+        self.assertIn("expires within the hour", run.stdout)
+        run = self.check("--preverify-if-needed", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("re-verified the private files of", run.stdout, "a nearly expired token must not stand in for a re-hash")
+        self.assertIn("(20004 of", run.stdout)
+
     def test_f2_the_estimate_names_a_basis_only_when_something_is_shared(self):
         self.predeploy()
         run = self.check("--preverify", T_FREE=10**15)
