@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Vasey\Ops;
 
+use App\Domain\Commerce\Inventory\ExclusiveSelectionPolicy;
 use App\Domain\Commerce\UnpaidRelease\UnpaidReleasePolicy;
 use Illuminate\Support\Arr;
 
@@ -52,6 +53,20 @@ final class CapabilityBoundary
     public const STAGING_OPTIONAL_FLAGS = [
         'VASEY_TEST_UNPAID_RELEASE_ENABLED' => ['config' => 'unpaid-release.enabled',
             'policy' => UnpaidReleasePolicy::class],
+    ];
+
+    /**
+     * Optional JSON test policies on staging: environment key => the config key holding the policy and the class whose current()
+     * must accept it. Unlike the flags above, the policy value itself is the switch: blank (unset or empty) is off, and any other
+     * value is admitted only when the class accepts the effective configuration. The Exclusive selection policy is in use on the
+     * hosted rehearsal by Sean's decision (32 active Exclusive offers, docs/ops/staging-placeholders.md); ExclusiveSelectionPolicy
+     * accepts it only where TestEnvironment admits test commerce and only in its one exact shape. Production holds it blank:
+     * scripts/ops/private-server-preflight.php (`inactive_vasey_test_exclusive_selection_policy`), and the class refuses there in
+     * code. Review: docs/ops/exclusive-rehearsal.md.
+     */
+    public const STAGING_OPTIONAL_POLICIES = [
+        'VASEY_TEST_EXCLUSIVE_SELECTION_POLICY' => ['config' => 'commerce.test_exclusive_selection_policy',
+            'policy' => ExclusiveSelectionPolicy::class],
     ];
 
     /**
@@ -142,6 +157,39 @@ final class CapabilityBoundary
         }
 
         return $refused;
+    }
+
+    /**
+     * The optional staging policies the effective configuration does not admit: a value other than null or the empty string,
+     * unless the policy class accepts the configuration. A config key that was renamed or removed reads as null and so as off;
+     * the class reading the same key then finds no policy and refuses the capability it governs, so nothing opens silently.
+     *
+     * @param  callable(string): mixed  $read  reads one config key, normally `config(...)`
+     * @param  callable(string): bool  $admits  given a policy class, true only when its current() accepts the configuration
+     * @return list<string> environment keys
+     */
+    public static function optionalPoliciesRefused(callable $read, callable $admits): array
+    {
+        $refused = [];
+        foreach (self::STAGING_OPTIONAL_POLICIES as $environmentKey => $policy) {
+            if (! in_array($read($policy['config']), [null, ''], true) && $admits($policy['policy']) !== true) {
+                $refused[] = $environmentKey;
+            }
+        }
+
+        return $refused;
+    }
+
+    /**
+     * The optional staging policies that are set (neither null nor empty), so a validator can say which are on.
+     *
+     * @param  callable(string): mixed  $read  reads one config key, normally `config(...)`
+     * @return list<string> environment keys
+     */
+    public static function optionalPoliciesSet(callable $read): array
+    {
+        return array_keys(array_filter(self::STAGING_OPTIONAL_POLICIES,
+            static fn (array $policy): bool => ! in_array($read($policy['config']), [null, ''], true)));
     }
 
     /**

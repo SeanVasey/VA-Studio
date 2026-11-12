@@ -19,7 +19,8 @@ declare(strict_types=1);
  * other out-of-profile families may be enabled in the booted configuration, and no enabled or mounted flag may be true in any
  * production-lane configuration file (Paid252, Tax255, production customer identity, production free grants and the rest).
  * The optional staging capabilities (unpaid release) must be stated explicitly as false or true, and true only with the
- * policy class accepting the booted configuration.
+ * policy class accepting the booted configuration. The optional Exclusive selection policy may be empty (off) or set; when set
+ * it must pass ExclusiveSelectionPolicy, the same rule the staging deploy gate applies.
  * Exit codes: 0 every check passed, 1 at least one check failed, 2 usage or unreadable file.
  */
 
@@ -277,8 +278,24 @@ if ($booted) {
     $attempt('commerce.inventory', 'VASEY_TEST_INVENTORY_POLICY passes InventoryPolicy::current().', fn () => app(InventoryPolicy::class)->current());
     $attempt('commerce.inventory_ttl_covers_quote', 'Inventory ttl_seconds is at least the 900-second quote lifetime.',
         fn () => app(InventoryPolicy::class)->current()['ttl_seconds'] >= 900);
-    $attempt('commerce.exclusive_selection_off', 'VASEY_TEST_EXCLUSIVE_SELECTION_POLICY is empty (exclusive test activation is outside this profile).',
-        fn () => in_array(config('commerce.test_exclusive_selection_policy'), [null, ''], true));
+    // Optional, the same rule as the staging deploy gate (CapabilityBoundary::STAGING_OPTIONAL_POLICIES): empty is off; set passes
+    // only when ExclusiveSelectionPolicy accepts it. The hosted rehearsal sets it by Sean's decision (docs/ops/exclusive-rehearsal.md).
+    $read = static fn (string $key): mixed => config($key);
+    $exclusiveRefused = in_array('VASEY_TEST_EXCLUSIVE_SELECTION_POLICY', CapabilityBoundary::optionalPoliciesRefused($read, static function (string $policy): bool {
+        try {
+            app($policy)->current();
+
+            return true;
+        } catch (Throwable) {
+            return false;
+        }
+    }), true);
+    $exclusiveSet = in_array('VASEY_TEST_EXCLUSIVE_SELECTION_POLICY', CapabilityBoundary::optionalPoliciesSet($read), true);
+    $record('commerce.exclusive_selection', ! $exclusiveRefused, match (true) {
+        $exclusiveRefused => 'VASEY_TEST_EXCLUSIVE_SELECTION_POLICY is set but ExclusiveSelectionPolicy::current() refuses it. Correct it, or leave it empty to keep Exclusive selection off.',
+        $exclusiveSet => 'Optional Exclusive selection is ON: VASEY_TEST_EXCLUSIVE_SELECTION_POLICY passes ExclusiveSelectionPolicy::current(). A paid Exclusive test purchase permanently locks its track (docs/ops/exclusive-rehearsal.md).',
+        default => 'Optional Exclusive selection is off: VASEY_TEST_EXCLUSIVE_SELECTION_POLICY is empty.',
+    });
     $attempt('commerce.order', 'VASEY_TEST_ORDER_POLICY passes OrderPolicy::current().', fn () => app(OrderPolicy::class)->current());
     $attempt('commerce.checkout', 'VASEY_TEST_CHECKOUT_POLICY passes CheckoutPolicy::current() and checkout is enabled.',
         fn () => app(CheckoutPolicy::class)->current() !== [] && app(CheckoutPolicy::class)->enabled());
