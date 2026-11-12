@@ -73,3 +73,17 @@ Answers:
 the computed `color` is not one of the three brand text colours and its contrast against the dialog's computed (system) background is at least 4.5:1. All other axe rules
 still run on that state. The assertion discriminates (local Chromium: forced colors gives black on white, 21:1; forced colors off gives the brand colours, which the
 assertion would reject). If CI's Chromium reports author colours from `getComputedStyle` under forced colors, this assertion fails and shows it. Keep or drop is the coordinator's call.
+
+## Round four: runs on `main` a20a332f (#345), sqlite
+
+| Suite | Run | Result | Chromium | Webkit | Test step |
+| --- | --- | --- | --- | --- | --- |
+| `accessibility-browser` | 43130273902 | fail | 7 pass (forced-colors assertion included) | 6 pass / 1 fail (forced colors) | 87 s |
+| `browser-site` | 43130277347 | pass | 22 pass | 21 pass, 1 skipped by design | 433 s |
+| `browser-customer` | 43130281373 | pass | 9 pass | 9 pass | 480 s |
+| `browser-operator-uploads` | 43130284400 | pass | 4 pass | 4 pass | 138 s |
+
+Nine of ten suites are green on a20a332f; the tenth, `accessibility-browser`, has one failure, fixed in the commit that adds this table (unconfirmed until re-dispatched).
+
+- Chromium forced colors passed with the new assertion: the computed text colours were not the brand colours and met 4.5:1 against the forced background. The log does not print the measured values (they were 0/0/0 on 255/255/255, 21:1, in the local Chromium check). That confirms the earlier verdict: the axe report was a tool artifact, and the dialog really is painted with system colours.
+- Webkit forced colors failed: `.eyebrow kept an author colour` (`rgb(201, 208, 211)`). WebKit matches `(forced-colors: active)` under emulation but does not apply forced colours, so the assertion cannot hold there. Class D (test assumed engine support). Fix: the system-colour assertion and the `color-contrast` exemption apply to chromium only; webkit runs the full axe scan including `color-contrast`, as it did (and passed) in rounds one to three.
