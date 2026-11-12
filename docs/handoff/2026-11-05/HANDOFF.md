@@ -4,6 +4,68 @@ Entry point for the next session (Claude's usage resets Saturday). It supersedes
 current state. That checkpoint's archive, bundle and recorded results remain history. `AGENTS.md` governs. Sean's instructions
 override older documents.
 
+## Checkpoint 2026-11-12, 06:30 UTC
+
+Added by the Claude Code harness (session resumed from the stood-down 2026-11-12 session). It supersedes the checkpoint below
+for current state. Nothing here is acceptance.
+
+**Main** is `37aabf22` (PR #354). **Staging** serves `3d1782d1` (Forge deploy 82769209, 04:12 UTC) with the test refund/dispute
+capability on; the refund rehearsal passed (Stripe test refund on order `84c07059`, staff check `refundState=full`). Lesson from
+that deploy: the gate that runs first is the served release's, so a new optional flag is deployed off first, then switched on and
+deployed again.
+
+### Merged this session
+
+| PR | SHA | What | Review |
+| --- | --- | --- | --- |
+| #353 | `1cb85f81` | Backup kit findings from #335/#337 (off-host modes, stale link token, error rule; a finding is never hidden by a later set-level finding or operational error) | Two reviews found the same P2 (reproduced) at `ccd5cc16`; fixed; re-review APPROVE WITH CONDITIONS (P3s); Codex: no findings |
+| #354 | `37aabf22` | Build before the pause under `vasey-staging-build`, inside a hardened transient systemd unit; leftover scan; atomic reap | Two reviews rejected `435079b0` (P1 reproduced: set-id helper let the app write into a later candidate); fixed; re-review P2 (logind/linger over unix sockets) fixed; final delta APPROVE WITH CONDITIONS; Codex: no findings |
+
+### Before the next staging deploy (operator, in order)
+
+1. Re-provision staging (`ops/staging/provision.sh` as root). Both PRs change installed helpers; the deploy refuses on helper
+   drift until then. Re-provisioning also creates `vasey-staging-build` and checks systemd, cgroup v2 and that composer, npm, node,
+   git and PHP resolve outside `/home`.
+2. Run the smoke probes in runbook section 8 inside a unit with `build_in_unit`'s exact properties. **No real systemd unit has run
+   yet** (the tests use a stand-in). Add a network operation to probe (v), for example `git ls-remote https://github.com/laravel/framework HEAD`
+   (review condition). Then deploy and record the first measured pause in runbook section 8. A failed isolated build leaves the site up.
+
+### Deferred findings (freeze-and-batch; next ops follow-up PR)
+
+- #354 (Cursor Bugbot, both fail closed): `ctl attach` reseals an isolated candidate with the legacy sealer and refuses; `verify_held`
+  refuses symlinks because it tests mode bits before `S_ISLNK`.
+- #354 (reviews): tests for the lingering refusal and the reap guard; a deterministic test that the reap kills before it looks;
+  `sleep "0.$attempt"` is not monotonic (0.10 on attempt 10); the comment and runbook say "no local daemon" but loopback TCP stays
+  open (wording should say unix sockets; consider `IPAddressDeny=localhost` with the 127.0.0.53 stub allowed); scan errors are
+  suppressed (`2>/dev/null || true`), so an unreadable mount passes silently; an apport crash file or `/dev/shm` object left by a
+  build blocks later deploys until root removes it (runbook note); a killed root ctl leaves the unit running until
+  `RuntimeMaxSec`; Node `os.networkInterfaces()` throws under `RestrictAddressFamilies` (no current dependency calls it).
+- #353 (re-review): a message regression appends "(0 file(s))" to an EIO finding with no earlier failure, and calls a mode-only
+  failure a hash mismatch; no tests for the Walker `entry.stat` ENOENT guard or the three-set `error.inodes` union; EBADMSG/EUCLEAN
+  outside a byte read stay operational; no test that `restore-check` withdraws nothing on engine exit 3 or a nameless exit 1; the
+  token age is checked at two moments; a runbook note that the off-host destination must honour POSIX modes.
+
+### Unpublished lanes
+
+- `claude/bae-20261112` @ `11bf6f09`: optional automatic delivery enabling (D-19 amendment), merged with main after #352. Its
+  post-merge PHP re-run is still owed. This container has PHP 8.3.6 and adding the PHP 8.4 package source was refused by the
+  session's permission classifier, and no focused CI suite selects its tests (`TestTrackOrderResourceTest`,
+  `TestKitOrderResourceTest`, `TestDeliveryAutoEnableConcurrencyTest`, `StagingRuntimeValidatorTest`,
+  `TestCommerceProfileValidatorTest`). Needs a PHP 8.4 environment (and native MySQL for the race test), then independent review and a PR.
+- `claude/bbc-20261112` @ `b6740e1d`: WIP buyer-side cancel for never-sent test orders; not finished, tested or reviewed; will
+  conflict with #352 in `scripts/ops/capability-boundary.php`.
+
+### Review-bot threads still to answer and resolve (fixes merged)
+
+#341 PRRT_kwDOU5febs62bGiq (by #350); #336 PRRT_kwDOU5febs62VTwD (by #351); #335 PRRT_kwDOU5febs62XUzG (by #337); #345
+PRRT_kwDOU5febs62a4Fk (by #346); #335 62XSn4, 62XSn_, 62XUzL and #337 62Z2Mv, 62Z3Xr (by #353).
+
+### Sean's standing decisions (2026-11-12)
+
+No Exclusive test buy on staging. Refund/dispute on staging: done. B2 master key: regenerated. Buyer cancel, automatic delivery
+enabling and the build account: delegated. Stripe drill 3's real "Resend" needs the Dashboard or CLI. The off-host restore drill
+needs Sean's age key on his Mac.
+
 ## Checkpoint 2026-11-12
 
 Added 2026-11-12 by the Claude Code harness. It is the current state; the sections below describe 2026-11-05 and are kept as history.
