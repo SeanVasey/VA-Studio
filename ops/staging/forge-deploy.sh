@@ -191,7 +191,7 @@ if [ -e "$REL" ]; then
     runtime_gate "$REL" "$RUNTIME_ENV"
     [ "$(envget APP_KEY)" = "$(grep '^APP_KEY=' "$REL/.env" | cut -d= -f2- | sed -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'$/\1/")" ] \
       || die "APP_KEY changes require a separately reviewed key-custody/rotation procedure"
-    "${CTL[@]}" space-check || die "not enough free disk space for the pre-deploy snapshot; nothing was stopped (docs/ops/staging-runbook.md section 9, out of disk during snapshot)"
+    "${CTL[@]}" space-check --preverify || die "refused before the quiesce by the backup space/re-verification gate (reason above); nothing was stopped (docs/ops/staging-runbook.md sections 8 and 9)"
     ACTIVATION_STARTED=1
     "${CTL[@]}" refresh "$SHA" "$RUNTIME_ENV"
     cmp -s "$RUNTIME_ENV" "$REL/.env" || die ".env not installed"
@@ -209,9 +209,13 @@ if [ -L "$CURRENT" ]; then
   runtime_gate "$previous_release" "$RUNTIME_ENV"
   FIRST_INSTALL=0
 fi
-# Prepare quiesces, and activation then takes a full snapshot (database + private store + env). Refuse now, with the served
-# release untouched, when the disk cannot hold it (2026-11-10: a full disk killed tar after the site was stopped).
-"${CTL[@]}" space-check || die "not enough free disk space for the pre-deploy snapshot; nothing was stopped (docs/ops/staging-runbook.md section 9, out of disk during snapshot)"
+# Prepare quiesces, and activation then takes a snapshot (database + the private files it must copy + env). Refuse now, with the
+# served release untouched, when the disk cannot hold it (2026-11-10: a full disk killed tar after the site was stopped). This is
+# the authoritative check: it first re-hashes the newest proven backup set (site up, about 3 minutes for 38 GB) so the estimate
+# counts only what the snapshot will really copy; a plain check here counted a full copy and refused a deploy that fit
+# (2026-11-11: 91.3 GB asked, 88.7 GB free, 45.9 GB really needed). Nothing is stopped, built or allocated before it, and the
+# re-hash leaves a token that ctl prepare reuses instead of hashing again. Its failure is reported as "before the quiesce".
+"${CTL[@]}" space-check --preverify || die "refused before the quiesce by the backup space/re-verification gate (reason above); nothing was stopped (docs/ops/staging-runbook.md sections 8 and 9)"
 step "prepare under one root-held build lease (quiesce, allocate, build, attach and seal)"
 ACTIVATION_STARTED=1
 install -d -m 0750 "$ROOT/evidence/$STAMP-${SHA:0:12}"

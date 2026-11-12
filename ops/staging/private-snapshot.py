@@ -11,7 +11,10 @@ only by the backup helper, as root, with `python3 -I`:
         error (I/O, no space, an unreadable or unparseable file, a token that cannot be written) withdraws nothing and exits 3.
 
 Exit status of every command: 0 success, 1 the set or the store failed a check (Refused), 3 operational error (OSError,
-ValueError): the helper must not treat 3 as evidence about a backup's content.
+ValueError, or any unexpected exception): the helper must not treat 3 as evidence about a backup's content. Two errors while
+proving a set ARE findings about that set, not operational: an I/O error (EIO) reading one of its files (that inode, and every
+set holding it, cannot be trusted) and its own manifests (private.index, private.sha256, private.dirs) being unparseable (that
+set only). No space, a token that cannot be written and other errors stay operational and withdraw nothing.
     snapshot --live PRIVATE --set SET [--link-from SOURCE_SET --link-token TOKEN] [--link-max-age-hours H]
         Writes SET/private/ (a copy of PRIVATE), SET/private.sha256, SET/private.dirs and SET/private.index.
     verify SET [--full] [--backups DIR] [--strict-modes 0|1]
@@ -228,7 +231,12 @@ def hash_file(parent_fd, name, expected):
             raise Refused("a set file changed while it was verified")
         digest, buffer, total = hashlib.sha256(), bytearray(CHUNK), 0
         while True:
-            n = os.readv(fd, [buffer])
+            try:
+                n = os.readv(fd, [buffer])
+            except OSError as error:
+                if error.errno != errno.EIO:
+                    raise
+                raise Mismatch("an I/O error reading a set file: its content cannot be proven", {(st.st_dev, st.st_ino)})
             if not n:
                 break
             digest.update(memoryview(buffer)[:n])
@@ -472,11 +480,19 @@ def parse_sha256(path):
 def prove(setdir, full, strict_modes):
     """Verifies a set tree. Returns (summary, {rel: full identity}). Raises Mismatch naming the inodes whose content or
     identity is wrong, or Refused when the set is malformed as a whole."""
-    _, index = read_jsonl(os.path.join(setdir, "private.index"), INDEX_FORMAT)
-    manifest = parse_sha256(os.path.join(setdir, "private.sha256"))
-    fd = os.open(os.path.join(setdir, "private.dirs"), os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC)
-    with os.fdopen(fd, "rb") as handle:
-        listed_dirs = [os.fsdecode(line) for line in handle.read().splitlines()]
+    try:
+        _, index = read_jsonl(os.path.join(setdir, "private.index"), INDEX_FORMAT)
+        manifest = parse_sha256(os.path.join(setdir, "private.sha256"))
+        fd = os.open(os.path.join(setdir, "private.dirs"), os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC)
+        with os.fdopen(fd, "rb") as handle:
+            listed_dirs = [os.fsdecode(line) for line in handle.read().splitlines()]
+    except ValueError:
+        # Truncated or garbled manifests: this set cannot be proven (no inode of another set is implicated).
+        raise Mismatch("the set's manifests (private.index, private.sha256 or private.dirs) cannot be parsed", set())
+    except OSError as error:
+        if error.errno in (errno.ENOENT, errno.EIO, errno.ELOOP):
+            raise Mismatch(f"the set's manifests cannot be read ({describe(error)})", set())
+        raise
     uid, gid = os.geteuid(), os.getegid()
     files, dirs, widened, bad, identities, widened_inodes = {}, [], [], {}, {}, set()
     counts = {"rehashed_files": 0, "rehashed_bytes": 0, "trusted_linked_files": 0}
@@ -653,6 +669,9 @@ def main(argv):
         return EXIT_OPERATIONAL
     except (OSError, ValueError) as error:
         print(f"private-snapshot: operational error: {args.command} failed ({describe(error)})", file=sys.stderr)
+        return EXIT_OPERATIONAL
+    except Exception as error:  # noqa: BLE001 - an unexpected crash (RecursionError on a very deep tree, a bug) is not a finding
+        print(f"private-snapshot: operational error: {args.command} stopped unexpectedly ({type(error).__name__})", file=sys.stderr)
         return EXIT_OPERATIONAL
     return 0
 

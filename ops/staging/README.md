@@ -227,12 +227,12 @@ Before anything else it compares the root-installed helpers (`vasey-staging-ctl`
 4. The frozen `.env` starts as 0600. The built candidate repeats real Laravel admission before
    `vasey-staging-ctl attach` seals code and environment onto protected inodes, verifies the explicit runtime
    exceptions and bind-mounts private storage.
-0. Before anything is stopped, `ctl space-check` (the backup helper's `space-check`) estimates the snapshot (the private bytes it
-   will copy + database + restore proof + margin, plus an encrypted copy of the whole set when off-host hardening is on) against
-   the free bytes and refuses with the served release untouched ("FAILED before the quiesce"). `ctl prepare`, `activate` and
-   `refresh` repeat it before their own operation marker; `prepare` and `refresh` first re-hash the private files of the backup
-   set the snapshot will share (`space-check --preverify`, site still up; runbook section 8) and refuse, with nothing stopped,
-   when that re-hash finds a changed backup file. After the snapshot (predeploy) and after a successful deploy, `ctl backup-prune` /
+0. Before anything is stopped, `ctl space-check --preverify` (the backup helper's `space-check`) first re-hashes the private files
+   of the newest proven backup set (site still up; runbook section 8), then estimates the snapshot (the private bytes it will copy
+   + database + restore proof + margin, plus an encrypted copy of the whole set when off-host hardening is on) against the free
+   bytes. It refuses with the served release untouched ("FAILED before the quiesce"), naming the estimate it used, also when the
+   re-hash finds a changed backup file. `ctl prepare`, `activate` and `refresh` repeat the space check before their own operation
+   marker; `prepare` and `refresh` reuse the re-hash's token and re-hash again only when there is none. After the snapshot (predeploy) and after a successful deploy, `ctl backup-prune` /
    `vasey-staging-backup prune` apply `VASEY_BACKUP_KEEP` (or the tiered policy), never the set just taken; see
    `docs/ops/staging-runbook.md` sections 8 and 9.
 5. `ctl activate` obtains one root lease and repeats fresh quiesce/stopped proof immediately before snapshot. It establishes:

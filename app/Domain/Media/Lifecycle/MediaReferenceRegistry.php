@@ -105,6 +105,11 @@ final class MediaReferenceRegistry
      *  - product_draft_versions.manifest: members with `track_id` ({@see ProductDraftManifest}).
      *  - fulfillment_outbox.payload: schema 1 holds only public ids and an evidence hash
      *    ({@see FinalizeTestPayment}).
+     *  - sound_kit_orders.snapshot and .checkout_request, sound_kit_payments.evidence (BL-13): plaintext, hash-pinned and
+     *    immutable. They hold kit and license ids, hashes, the frozen Stripe test request and whitelisted provider facts. A
+     *    kit archive is a sound_kit_revisions file, never a media_assets row, so today none names an asset or track id; they
+     *    are read with `ids` so a later asset or track key would be found, and the archive hash and path they embed are
+     *    found by the content check.
      *  - jobs and failed_jobs: Laravel's queued-command payload; see {@see self::JOBS}.
      */
     public const JSON_DEEP = [
@@ -120,6 +125,9 @@ final class MediaReferenceRegistry
         'quotes.request' => 'ids',
         'quotes.snapshot' => 'ids',
         'site_releases.content' => 'ids',
+        'sound_kit_orders.checkout_request' => 'ids',
+        'sound_kit_orders.snapshot' => 'ids',
+        'sound_kit_payments.evidence' => 'ids',
         'stems_recordings.evidence' => 'assets',
     ];
 
@@ -209,6 +217,9 @@ final class MediaReferenceRegistry
         'test_fulfillment_activations.evidence_ciphertext', 'test_payment_financial_observations.evidence_ciphertext',
         'test_refund_resolutions.evidence_ciphertext', 'test_unpaid_releases.evidence_ciphertext',
         'test_unsent_order_releases.evidence_ciphertext',
+        // Encrypted with Crypt::encryptString and holds only the licensee's confirmed name (SoundKitOrders::create), but the
+        // proof cannot read ciphertext and the schema census requires every ciphertext column here.
+        'sound_kit_orders.licensee_ciphertext',
         'transactional_notices.capture_ciphertext', 'verified_payments.evidence_ciphertext',
         // Plaintext or mixed payloads without a reviewed shape.
         'contract_render_requests.profile', 'customer_data_request_events.detail', 'customer_inquiries.payload',
