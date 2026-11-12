@@ -676,8 +676,10 @@ What changed for an operator:
      front end reads no `VITE_*` variable); no `/tmp`, `forge` cache or environment is shared with it. The build runs as a
      transient systemd service (`vasey-staging-build-<sha>-<pid>`): it can write only its slot and `build/`
      (`ProtectSystem=strict`), has private `/tmp`, `/var/tmp` and `/dev`, sees no `/home`, `/root` or `/run/user`, cannot
-     create set-id files (`RestrictSUIDSGID`) or gain privileges, and is capped at 60% of memory, 150% CPU, 1024 tasks and
-     30 minutes, because the site is live meanwhile. A set-id file of the build account left in a shared directory would
+     create set-id files (`RestrictSUIDSGID`) or gain privileges, can open only IPv4 and IPv6 sockets (no unix socket to
+     logind, D-Bus, MySQL or the application), has a private IPC namespace removed with it, and is capped at 60% of memory,
+     150% CPU, 1024 tasks and 30 minutes, because the site is live meanwhile. A build account with systemd lingering enabled
+     refuses. A set-id file of the build account left in a shared directory would
      otherwise let `forge` act as the build account and write into a later candidate before sealing (independent review of
      PR #354, reproduced); a host without systemd as init and cgroup v2 refuses rather than build unconfined;
   5. when the unit stops, its whole cgroup is killed; root takes the slot back (root:root 0700), kills anything of the build
@@ -693,6 +695,14 @@ What changed for an operator:
   snapshot and its restore check, migrate/caches/doctor, the switch and the healthy resume.** It has **not been measured on
   the host yet**; from the 2026-11-12 phases above (4m45s, of which 3m18s was the build) it should be about one and a half
   minutes. Record the first measurement here.
+- **Before the first isolated deploy, smoke the unit on the host** (the tests replace `systemd-run` with a stand-in; none has
+  run the real unit). As root, run a unit with the same properties as `build_in_unit` in `vasey-staging-ctl` (copy its
+  `systemd-run` line with `--uid=vasey-staging-build`, a scratch `ReadWritePaths`, and a short command) and record:
+  (i) creating a set-id file fails (`python3 -c "import os; open('/dev/shm/x','w'); os.chmod('/dev/shm/x', 0o4755)"` must
+  raise `PermissionError`; remove `/dev/shm/x`); (ii) `busctl call org.freedesktop.login1 /org/freedesktop/login1
+  org.freedesktop.login1.Manager SetUserLinger ubb <build uid> true false` fails (no unix socket); (iii) `exit 3` makes
+  `systemd-run --wait` return 3; (iv) a background `sleep 1000` is gone when `--wait` returns; (v) `composer --version`,
+  `npm --version` and `git --version` run inside it. Then deploy. A failed first isolated build leaves the site up.
 - **Without the build account** (staging.conf has no `VASEY_BUILD_USER`, or the account does not exist yet) `ctl prepare`
   behaves exactly as before: it quiesces, builds as `forge` inside the pause and seals. A build account that exists but is
   unsafe (in `forge`'s group, `forge` or any other account in its group, a shared uid, a login shell, a wrong `build/` mode, a

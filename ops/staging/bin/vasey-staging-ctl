@@ -525,6 +525,8 @@ build_account() {
   # The build runs as a hardened transient systemd service (build_in_unit). Without one, the account's code could leave a
   # set-id file in a shared directory, so a configured account refuses rather than build unconfined with the site up.
   build_unit_ready || die "the build account needs systemd as init with cgroup v2 (systemd-run); none is available"
+  # A lingering user manager would run as the build account outside any build unit, and again at every boot.
+  [ ! -e "/var/lib/systemd/linger/$name" ] || die "the build account has systemd lingering enabled (loginctl disable-linger $name)"
   BUILD_UID=$uid BUILD_GID=$gid
 }
 
@@ -541,7 +543,10 @@ BUILD_TIMEOUT=1800
 # only its slot and $ROOT/build (ProtectSystem=strict), has private /tmp, /var/tmp and /dev, sees no /home, /root or
 # /run/user, cannot create set-id files and gains no privileges. RestrictSUIDSGID is the one that matters most: a set-id
 # file of the build account in a shared directory would let the application act as the build account and write into a
-# later candidate before it is sealed. Every process of the build lives in the unit's cgroup and is killed with it
+# later candidate before it is sealed. Only IPv4 and IPv6 sockets can be created (RestrictAddressFamilies; socketpair is
+# unaffected), so the build reaches no local daemon over a unix socket (logind could otherwise enable lingering for the
+# account, D-Bus or MySQL be reached, or a descriptor be handed to the application), and it gets a private IPC namespace
+# whose objects are removed with it. Every process of the build lives in the unit's cgroup and is killed with it
 # (KillMode=control-group) before --wait returns.
 build_in_unit() {  # build_in_unit SHA
   local sha=$1
@@ -551,6 +556,7 @@ build_in_unit() {  # build_in_unit SHA
     -p "ReadWritePaths=$RELEASES/$sha $ROOT/build" \
     -p PrivateTmp=yes -p PrivateDevices=yes -p ProtectHome=yes -p RestrictNamespaces=yes -p LockPersonality=yes \
     -p ProtectKernelTunables=yes -p ProtectKernelModules=yes -p ProtectControlGroups=yes \
+    -p "RestrictAddressFamilies=AF_INET AF_INET6" -p PrivateIPC=yes -p RemoveIPC=yes \
     -p KillMode=control-group -p "TasksMax=$BUILD_TASKS_MAX" -p "MemoryMax=$BUILD_MEMORY_MAX" \
     -p "CPUQuota=$BUILD_CPU_QUOTA" -p "RuntimeMaxSec=$BUILD_TIMEOUT" -p WorkingDirectory=/ \
     -E PATH=/usr/local/bin:/usr/bin:/bin -E LC_ALL=C \
@@ -563,11 +569,14 @@ build_in_unit() {  # build_in_unit SHA
 # uid is the build account's, a set-id helper of it included; pkill -u adds the effective-uid-only case.
 reap_builder() {
   local attempt
+  [[ "${BUILD_UID:-}" =~ ^[1-9][0-9]*$ ]] && [[ "${BUILD_GID:-}" =~ ^[1-9][0-9]*$ ]] || die "no build account to reap"
+  # Kill first, then look: a process that forks and exits lives for microseconds, so a pgrep that finds nothing proves
+  # nothing on its own and must never be the reason to skip the kill.
   for attempt in 1 2 3 4 5 6 7 8 9 10; do
-    if ! pgrep -U "$BUILD_UID" >/dev/null && ! pgrep -u "$BUILD_UID" >/dev/null; then return 0; fi
     setpriv --reuid="$BUILD_UID" --regid="$BUILD_GID" --clear-groups -- kill -KILL -1 2>/dev/null || true
     pkill -KILL -u "$BUILD_UID" || true
     sleep "0.$attempt"
+    if ! pgrep -U "$BUILD_UID" >/dev/null && ! pgrep -u "$BUILD_UID" >/dev/null; then return 0; fi
   done
   die "processes of the build account survive; refusing to seal (root recovery required)"
 }

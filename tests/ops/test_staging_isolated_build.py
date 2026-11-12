@@ -458,6 +458,7 @@ attach_private() {   # the bind mount and fstab are host state; the hand-over to
         properties = [options[i + 1] for i, value in enumerate(options) if value == "-p"]
         for required in ("NoNewPrivileges=yes", "RestrictSUIDSGID=yes", "ProtectSystem=strict", "PrivateTmp=yes",
                          "PrivateDevices=yes", "ProtectHome=yes", "RestrictNamespaces=yes", "KillMode=control-group",
+                         "RestrictAddressFamilies=AF_INET AF_INET6", "PrivateIPC=yes", "RemoveIPC=yes",
                          f"ReadWritePaths={self.release} {self.root / 'build'}"):
             self.assertIn(required, properties)
         for limit in ("TasksMax=", "MemoryMax=", "CPUQuota=", "RuntimeMaxSec="):
@@ -485,6 +486,16 @@ attach_private() {   # the bind mount and fstab are host state; the hand-over to
         self.assertEqual(self.trace_lines(), [], "a build ran, or the site was stopped, despite the leftover")
         self.assertFalse(self.release.exists())
 
+    def test_a_file_only_in_the_build_group_outside_its_area_also_refuses(self):
+        planted = self.shared / ".group-only"
+        planted.write_text("x")
+        os.chown(planted, 0, self.build_gid)
+        planted.chmod(0o2755)
+        run = self.prepare()
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn(f"the build account owns {planted} outside its build area", run.stderr)
+        self.assertEqual(self.trace_lines(), [])
+
     def test_a_build_that_leaves_a_file_outside_its_area_is_not_sealed(self):
         self.plant_flag.touch()
         run = self.prepare()
@@ -497,14 +508,25 @@ attach_private() {   # the bind mount and fstab are host state; the hand-over to
         self.assertTrue(self.operation.exists(), "root recovery keeps the marker and the unsealed slot")
 
     # Review P2 on PR #354: processes that keep forking escaped a pkill snapshot; kill(-1) as the account cannot be raced.
+    # Each chaser forks and exits, so any one process lives for microseconds and pgrep alone can miss all of them: liveness
+    # is the heartbeat file every generation touches.
     def test_the_reap_kills_processes_that_keep_forking(self):
-        chaser = "import os\nwhile True:\n    if os.fork():\n        os._exit(0)\n"
+        heartbeat = self.root / "heartbeat"
+        heartbeat.touch()
+        heartbeat.chmod(0o666)
+        chaser = ("import os, sys\nwhile True:\n    os.utime(sys.argv[1])\n    if os.fork():\n        os._exit(0)\n")
         for _ in range(4):
-            subprocess.Popen(["runuser", "-u", self.builder, "--", "python3", "-I", "-c", chaser],
+            subprocess.Popen(["setpriv", f"--reuid={self.build_uid}", f"--regid={self.build_gid}", "--clear-groups", "--",
+                              "python3", "-I", "-c", chaser, str(heartbeat)], cwd="/",
                              stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                              start_new_session=True).wait(timeout=10)
-        time.sleep(0.2)
-        self.assertNotEqual(self.builder_processes(), [], "the chasers did not start")
+
+        def beating():
+            before = heartbeat.stat().st_mtime_ns
+            time.sleep(0.3)
+            return heartbeat.stat().st_mtime_ns != before
+
+        self.assertTrue(beating(), "the chasers did not start")
         source = CTL.read_text()
         definitions = source[source.index("valid_sha() {"):source.index("# The sudo entry point")]
         script = ('die() { echo "$*" >&2; exit 1; }\n' + definitions
@@ -513,8 +535,8 @@ attach_private() {   # the bind mount and fstab are host state; the hand-over to
                              env={"PATH": "/usr/sbin:/usr/bin:/sbin:/bin", "LC_ALL": "C"})
         self.assertEqual(run.returncode, 0, run.stderr)
         self.assertIn("REAPED", run.stdout)
-        time.sleep(0.3)
-        self.assertEqual(self.builder_processes(), [], "a forking process of the build account survived the reap")
+        self.assertFalse(beating(), "a forking process of the build account survived the reap")
+        self.assertEqual(self.builder_processes(), [])
 
     # Review P3 on PR #354: an interrupted hand-over (bootstrap/cache already handed, the rest still held) is completed.
     def test_an_interrupted_runtime_hand_over_is_completed_by_the_activation(self):
