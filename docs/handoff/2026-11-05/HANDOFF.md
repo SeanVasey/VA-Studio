@@ -4,6 +4,28 @@ Entry point for the next session (Claude's usage resets Saturday). It supersedes
 current state. That checkpoint's archive, bundle and recorded results remain history. `AGENTS.md` governs. Sean's instructions
 override older documents.
 
+## Checkpoint 2026-11-12, 13:00 UTC
+
+Added by the Claude Code harness; supersedes the 06:30 checkpoint below for current state. Nothing here is acceptance.
+
+**Main** is `785f47e4` (PR #357). **Staging** serves `785f47e4`: re-provisioned at 12:33 UTC (Forge recipe "vasey-staging
+reprovision (main)", run 669321: `vasey-staging-build` created, systemd/cgroup v2 and toolchain checks passed), the build
+unit smoke test passed all five probes on the host (recipe "vasey-staging smoke build unit", 12:35), then the first isolated
+deploy (Forge deployment 82807668) finished healthy at 12:46:24 (`GET /` 200, workers running, nothing to migrate). Forge
+shows that deploy as "failed": it outlasted Forge's ten-minute watch (runbook section 9). Measured pause about 4m, not the
+1.5m estimated (runbook section 8). The Forge firewall allows only 22, 80 and 443 (provision warns that MySQL binds `*`).
+
+Merged since 06:30: #356 (`09178f10`: deferred #353/#354 findings; `ctl activate` re-runs the runtime admission; `ctl
+attach` refuses isolated candidates; held runtime trees refuse symlinks) and #357 (`785f47e4`: `smoke-build-unit.sh`). The
+review threads listed below are answered and resolved (#335, #336, #337, #341, #345, #354).
+
+Deferred (in addition to the list below, minus what #356 fixed): #357 re-review P3s (the operation-marker check should also
+refuse a symlink; the drift guard misses `--setenv=`); #356 re-review P3s (a symlinked `bootstrap` in a failed unsealed slot
+sidesteps the attach owner check and leaves the slot 0755; compare numeric owners); EBADMSG/EUCLEAN outside a byte read; the
+three-set `error.inodes` test; the two-moment token age; the deploy now exceeds Forge's ten-minute window (consider
+skipping the pre-quiesce re-hash when a fresh token exists, or a shorter restore check). `claude/bae-20261112` still needs a
+PHP 8.4 environment (this container could not install one); `claude/bbc-20261112` is unfinished.
+
 ## Checkpoint 2026-11-12, 06:30 UTC
 
 Added by the Claude Code harness (session resumed from the stood-down 2026-11-12 session). It supersedes the checkpoint below
