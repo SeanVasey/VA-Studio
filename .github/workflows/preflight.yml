@@ -70,7 +70,7 @@ jobs:
     needs: scope
     if: needs.scope.outputs.mode != 'docs'
     runs-on: ubuntu-24.04  # ondrej/php has no packages for newer images yet
-    timeout-minutes: 15
+    timeout-minutes: 35  # the persistent-content node tests take ~9 minutes and the ops kit suite ~8 (2026-11-12: 15 cancelled Foundation CI)
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
