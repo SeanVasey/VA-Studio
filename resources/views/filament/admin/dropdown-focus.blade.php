@@ -29,6 +29,13 @@
             if (component.$el !== dropdown || typeof component.syncAria !== 'function' || ! component.panelId) {
                 return;
             }
+            // Filament 5.11 keeps a replaced trigger and panel in step itself (menu, menuitem and group roles, aria-haspopup="menu",
+            // an observer that survives a Livewire morph). Replacing its observer and syncAria with the ones below left menus
+            // morphed in after page load without those roles, so arrow-key navigation and the menuitem role were lost. Only older
+            // Filament, which has no setUpMenu, needs this binding.
+            if (typeof component.setUpMenu === 'function') {
+                return;
+            }
             const previous = ariaBindings.get(dropdown);
             if (previous?.observer === component.observer) {
                 return;

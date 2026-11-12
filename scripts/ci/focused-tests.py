@@ -282,44 +282,43 @@ FRONTEND_SUBSETS = {
 }
 # The runner caps a browser command at BROWSER_TIMEOUT_SECONDS and each spec runs in both the chromium-desktop and
 # webkit-mobile projects (one worker), so one suite per domain keeps the selection finishing with room to spare.
-# Estimated minutes assume 3 s per fast journey and 50 s per heavy journey/test with measured values from run
-# 43115861337 where one existed (docs/verification/focused-ci.md); every suite runs BOTH projects for its files.
+# Measured test-step times for every suite are in docs/verification/focused-ci.md; every suite runs BOTH projects.
 BROWSER_TIMEOUT_SECONDS = 720
 BROWSER_SUITES = {
-    "browser-storefront": (  # about 7 minutes
+    "browser-storefront": (
         "tests/browser/storefront.spec.ts", "tests/browser/player-controls.spec.ts",
         "tests/browser/public-track-embed.spec.ts",
     ),
-    "browser-customer": (  # about 8 minutes
+    "browser-customer": (
         "tests/browser/customer-account.spec.ts", "tests/browser/customer-identity.spec.ts",
         "tests/browser/customer-library-browsing.spec.ts", "tests/browser/customer-order-items.spec.ts",
         "tests/browser/customer-order-reference.spec.ts", "tests/browser/customer-purchase-claim.spec.ts",
         "tests/browser/owned-order-history.spec.ts", "tests/browser/product-member-refresh.spec.ts",
     ),
-    "browser-site": (  # about 8 minutes
+    "browser-site": (
         "tests/browser/editorial-content.spec.ts", "tests/browser/editorial-video-consent.spec.ts",
         "tests/browser/site-content.spec.ts", "tests/browser/site-schedule.spec.ts",
         "tests/browser/site-release-menu-readiness.spec.ts", "tests/browser/contact-inquiry.spec.ts",
         "tests/browser/contact-inquiry-persistence.spec.ts", "tests/browser/inquiry-conversation.spec.ts",
     ),
-    "browser-checkout": (  # about 6 minutes
+    "browser-checkout": (
         "tests/browser/test-checkout.spec.ts",
     ),
-    "browser-delivery": (  # about 7 minutes
+    "browser-delivery": (
         "tests/browser/test-owner-delivery.spec.ts",
     ),
-    "browser-payment-exceptions": (  # about 4 minutes
+    "browser-payment-exceptions": (
         "tests/browser/test-refunded-exception-resolution.spec.ts", "tests/browser/test-unpaid-release.spec.ts",
     ),
-    "browser-operator-tracks": (  # about 7 minutes
+    "browser-operator-tracks": (
         "tests/browser/track-bulk-tags.spec.ts", "tests/browser/track-metadata-presets.spec.ts",
         "tests/browser/bulk-track-metadata.spec.ts",
     ),
-    "browser-operator-uploads": (  # about 7 minutes
+    "browser-operator-uploads": (
         "tests/browser/operator.spec.ts", "tests/browser/resumable-kit-upload.spec.ts",
         "tests/browser/resumable-media-upload.spec.ts",
     ),
-    "browser-operator-publication": (  # about 6 minutes
+    "browser-operator-publication": (
         "tests/browser/license-template-authoring.spec.ts", "tests/browser/private-track-review.spec.ts",
         "tests/browser/track-publication-guard.spec.ts",
     ),

@@ -5,7 +5,14 @@ export const accessibilityTags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'w
 
 /** Scan the whole rendered document. No excludes, disabled rules or result filtering. */
 export async function expectAccessible(page: Page, testInfo: TestInfo, state: string) {
-  await page.evaluate(async () => { await document.fonts.ready; });
+  // Scan the settled page: a hover or focus transition still running would be sampled at an in-between colour
+  // (run 43122303001: a button mid-way between its action and hover colours). Finite animations end on their own.
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await Promise.all(document.getAnimations()
+      .filter(animation => Number.isFinite(animation.effect?.getComputedTiming().endTime as number))
+      .map(animation => animation.finished.catch(() => undefined)));
+  });
   const results = await new AxeBuilder({ page }).withTags(accessibilityTags).analyze();
   await testInfo.attach(`axe-${state}`, {
     body: JSON.stringify({
