@@ -50,7 +50,7 @@ test('operator resumes real eight MiB transport after a lost response and saves 
 
   // Filament 5.11: a searchable select's trigger is a plain button; the role combobox moved to its search input.
   await page.getByRole('button', { name: /^Track\b/ }).click();
-  await page.getByRole('combobox', { name: /^Search/ }).fill(trackTitle);
+  await page.getByRole('combobox', { name: /^Track\b.*: Search$/ }).fill(trackTitle);
   await page.getByRole('option', { name: trackTitle, exact: true }).click();
   await page.getByLabel('Role', { exact: false }).selectOption('artwork');
   const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aZuoAAAAASUVORK5CYII=', 'base64');
