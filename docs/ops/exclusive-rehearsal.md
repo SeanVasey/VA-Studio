@@ -72,7 +72,7 @@ Owner decision 3 (Sean, 2026-11-12): the test refund and dispute lifecycle is an
 
 ### Turning it on
 
-Set these five lines in the host's private `.env` (the test-commerce overlay, section 6, shows the four values commented), with Stripe in test mode and the own `acct_` account already configured, then deploy:
+Set these five lines in the host's private `.env` (the test-commerce overlay, section 6, shows the four values commented), with Stripe in test mode, the own `acct_` account and test payment processing (`STRIPE_TEST_PAYMENT_PROCESSING_ENABLED=true`) already configured, then deploy. Without payment processing, "Check refunds and disputes" only records `unavailable`:
 
 ```
 VASEY_TEST_REFUND_DISPUTE_ENABLED=true
@@ -82,7 +82,7 @@ VASEY_TEST_REFUND_DISPUTE_DISPUTE_ACCESS=temporarily_block_while_reconciling
 VASEY_TEST_REFUND_DISPUTE_EXCLUSIVE_REOPENING=qualified_operator_review
 ```
 
-The staging deploy gate (`runtime.optional_vasey_test_refund_dispute_enabled` in `ops/staging/validate-runtime.php`) and the profile validator (`boundary.optional_capabilities_admitted` in `scripts/ops/validate-test-commerce-profile.php`) both apply `CapabilityBoundary::STAGING_OPTIONAL_FLAGS`: the flag passes as exactly `false`, or as exactly `true` when the real `RefundDisputePolicy::current()` accepts the configuration (test-commerce environment, Stripe test mode, `acct_` account, all four values set) **and** each value equals its DD-16 choice above. The class also supports `operator_review` and `remain_sold` for the test chain; staging refuses them, so the rehearsal runs the decided policy. A missing, blank, misspelled or other value, or any other spelling of the flag, refuses the deploy. To turn it off, set the flag back to `false` (the four values may stay; they do nothing while the flag is off).
+The staging deploy gate (`runtime.optional_vasey_test_refund_dispute_enabled` in `ops/staging/validate-runtime.php`) and the profile validator (`boundary.optional_capabilities_admitted` in `scripts/ops/validate-test-commerce-profile.php`) both apply `CapabilityBoundary::STAGING_OPTIONAL_FLAGS`: the flag passes as exactly `false`, or as exactly `true` when the real `RefundDisputePolicy::current()` accepts the configuration (test-commerce environment, Stripe test mode, `acct_` account, all four values set) **and** each value equals its DD-16 choice above. The class also supports `operator_review` and `remain_sold` for the test chain; staging refuses them, so the rehearsal runs the decided policy. A missing, blank, misspelled or other value refuses the deploy. Another spelling of the flag itself (`TRUE`, `True`) is refused by the profile validator's file check (`profile.optional_flags_explicit`) only: Laravel reads it as true, so the deploy gate and the application both treat it as on. Before turning it off, release any active download holds: a hold keeps blocking its downloads while the flag is off, and "Release a download hold" works only while the flag is on. To turn it off, set the flag back to `false` (the four values may stay; they do nothing while the flag is off).
 
 Production is unchanged: `ops/production/validate-runtime.php` refuses the flag unless it is `false` (`holds.vasey_test_refund_dispute_enabled`, `LAUNCH_OFF_HOLDS`), and `RefundDisputePolicy` refuses production in code for both chains. `VASEY_TEST_REFUND_RESOLUTION_ENABLED` stays held false on staging.
 
