@@ -132,6 +132,7 @@ PHP_TARGETS = {
         "tests/Feature/MediaWorkflowBudgetTest.php", "tests/Feature/PrivateMediaRevisionRootsTest.php",
         "tests/Feature/SiteImageLibraryTest.php", "tests/Feature/SiteImageHttpTest.php", "tests/Feature/StemsArchivePolicyTest.php",
         "tests/Feature/StemsArchiveTest.php",
+        "tests/Feature/MediaLifecycle/MediaReferenceProofTest.php", "tests/Feature/MediaLifecycle/MediaReferenceRegistryTest.php",
     ),
     "commerce": (
         "tests/Feature/ProductionCommerceReadinessTest.php",

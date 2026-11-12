@@ -15,6 +15,7 @@ use App\Jobs\ProcessSoundKit;
 use App\Models\User;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -412,6 +413,50 @@ final class MediaReferenceRegistryTest extends TestCase
         }
         $result = $this->prove([$master]);
         $this->assertSame([['json_bound:audit_events.context'], 'unknown'], [$result['blockers'], $result['families'][$master]['state']]);
+    }
+
+    public function test_sound_kit_purchase_evidence_is_read_for_ids_and_hashes_and_its_licensee_ciphertext_blocks_conservatively(): void
+    {
+        [$clean] = $this->family('synthetic-kit-clean', 480);
+        [$hashed] = $this->family('synthetic-kit-hashed', 520);
+        [$named, , $namedOutputs] = $this->family('synthetic-kit-named', 560);
+        [$evidenced, , $evidencedOutputs] = $this->family('synthetic-kit-evidence', 600);
+        [$requested, , $requestedOutputs] = $this->family('synthetic-kit-request', 640);
+        $roots = [$clean, $hashed, $named, $evidenced, $requested];
+        $this->assertSame('complete', $this->prove($roots)['coverage']);
+
+        // A kit order is written as the purchase flow writes it: its snapshot pins the kit archive by hash and carries no media id.
+        $order = fn (array $snapshot, array $request = ['params' => ['metadata' => ['schema_version' => 'kit-1']]]): int => $this->raw('sound_kit_orders', [
+            'snapshot' => json_encode($snapshot), 'checkout_request' => json_encode($request), 'licensee_ciphertext' => '']);
+        $archive = fn (string $sha): array => ['schema' => 'sound-kit-test-order-v1', 'kit_revision' => ['id' => (string) Str::uuid(), 'number' => 1],
+            'archive' => ['sha256' => $sha, 'size_bytes' => 10, 'mime_type' => 'application/zip']];
+        $order($archive(hash('sha256', 'synthetic kit archive')));
+        $result = $this->prove($roots);
+        $this->assertSame(['complete', []], [$result['coverage'], $result['blockers']]);
+        foreach ($roots as $root) {
+            $this->assertSame('unattached', $result['families'][$root]['state']);
+        }
+
+        // Shared bytes: an order whose archive hash is a media file's hash is found by the content check.
+        $order($archive(MediaAsset::findOrFail($hashed)->sha256));
+        // An id-only reference in the snapshot, in the frozen checkout request, and in the payment evidence is read as JSON.
+        $order($archive(hash('sha256', 'another synthetic archive')) + ['asset_ids' => [(int) $namedOutputs['master_wav']->id]]);
+        $order($archive(hash('sha256', 'a third synthetic archive')), ['params' => ['metadata' => ['preview_asset_id' => (int) $requestedOutputs['preview_tagged']->id]]]);
+        $this->raw('sound_kit_payments', ['evidence' => json_encode(['payment' => ['id' => 'pi_synthetic'], 'asset' => ['id' => (int) $evidencedOutputs['master_wav']->id]])]);
+        $result = $this->prove($roots);
+        $this->assertSame(['complete', []], [$result['coverage'], $result['blockers']]);
+        $this->assertSame('unattached', $result['families'][$clean]['state']);
+        $this->assertSame(['attached', ['content:sound_kit_orders']], [$result['families'][$hashed]['state'], $this->attached($result, $hashed)]);
+        $this->assertSame(['attached', ['json:sound_kit_orders.snapshot']], [$result['families'][$named]['state'], $this->attached($result, $named)]);
+        $this->assertSame(['attached', ['json:sound_kit_payments.evidence']], [$result['families'][$evidenced]['state'], $this->attached($result, $evidenced)]);
+        $this->assertSame(['attached', ['json:sound_kit_orders.checkout_request']], [$result['families'][$requested]['state'], $this->attached($result, $requested)]);
+
+        // The licensee ciphertext cannot be read: once an order holds one, no family is proven unattached.
+        DB::table('sound_kit_orders')->update(['licensee_ciphertext' => Crypt::encryptString('Synthetic Licensee')]);
+        $result = $this->prove($roots);
+        $this->assertSame('incomplete', $result['coverage']);
+        $this->assertContains('opaque:sound_kit_orders.licensee_ciphertext', $result['blockers']);
+        $this->assertSame('unknown', $result['families'][$clean]['state']);
     }
 
     public function test_the_json_vocabulary_reads_assets_runs_and_tracks_and_nothing_else(): void
