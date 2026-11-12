@@ -123,5 +123,14 @@ case "$MODE" in
     env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C "$PHP" "$REL/ops/staging/validate-runtime.php" "${args[@]}" \
       || die "built runtime profile refused"
     ;;
+  revalidate)
+    # The application account, before activate stops anything: the same runtime admission again, on the candidate about to be
+    # served (admit or the legacy build ran it at prepare; nothing records that it passed). It writes nothing.
+    [ "$#" = 2 ] || die "revalidate requires only the SHA"
+    args=("$REL/.env" "$VASEY_EXPECTED_APP_ENV" "$VASEY_STAGING_HOST" "$VASEY_DB_NAME")
+    if [ -L "$VASEY_ROOT/current" ]; then args+=("$(readlink -f "$VASEY_ROOT/current")/.env"); fi
+    env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C "$PHP" "$REL/ops/staging/validate-runtime.php" "${args[@]}" \
+      || die "runtime profile refused"
+    ;;
   *) die "unsupported release step" ;;
 esac

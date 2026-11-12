@@ -904,9 +904,11 @@ RECOVER
 **A failed isolated build** (site up, `GET /` still 200, an operation marker, an unsealed `releases/<SHA>` owned by
 root:`vasey-staging-build` 0770, or root:root 0700 when the build finished and the checks after it refused). Nothing was
 stopped or attached, so no quiesce or resume is needed. The script refuses when the candidate was already attached (a failure
-after `attach`): use the recovery script above for that case. A prepare that stopped after sealing but before attaching
-private storage can instead be resumed: `sudo -n /usr/local/sbin/vasey-staging-ctl attach <SHA>` verifies the isolated seal
-(held runtime directories included) and attaches; it never reseals an isolated candidate, and it refuses an unsealed slot. **If prepare said the build account owns a file outside its
+after `attach`): use the recovery script above for that case. A candidate from an isolated build is never resumed by hand:
+`ctl attach` refuses it, sealed or not, before changing anything (only prepare attaches it, after the runtime admission), so
+discard it with the script below and deploy again; the site stays up meanwhile. `ctl activate` also re-runs the runtime
+admission (`release-step.sh revalidate`) before it stops anything, so a candidate refused at admission never reaches the
+quiesce, the snapshot or its migrations. **If prepare said the build account owns a file outside its
 build area**, treat the host as possibly compromised by a build dependency: do not delete the file before inspecting it (who
 created it, set-id bits, what `forge` could have run with it), then remove it and anything else the account owns outside
 `/srv/vasey-staging/build` (`find / -xdev -user vasey-staging-build`, for each local filesystem) before the next deploy, which

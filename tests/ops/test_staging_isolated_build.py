@@ -552,27 +552,45 @@ attach_private() {   # the bind mount and fstab are host state; the hand-over to
         for runtime in ("storage/framework", "storage/logs"):
             self.assertEqual(self.mode(self.release / runtime), (self.app_uid, self.app_gid, 0o700), runtime)
 
-    # Cursor Bugbot on PR #354: a prepare that stopped after sealing (before the private attach) resumes with `ctl attach`,
-    # which verifies the isolated seal instead of resealing the candidate with the legacy sealer.
-    def test_an_isolated_candidate_sealed_before_attach_resumes_with_attach(self):
+    # Review of PR #356: a candidate from an isolated build is never attached by hand. Only prepare attaches it, after the
+    # runtime admission, and nothing later repeats that admission, so a hand attach could carry a refused candidate to
+    # activate. Refused before anything about the release changes.
+    def test_attach_refuses_an_isolated_candidate_even_once_sealed(self):
         run = self.prepare()
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
         self.trace.write_text("")
         run = self.ctl("attach", self.sha)
-        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
-        self.assertEqual(self.trace_lines(), ["attach"])
-        for held in ("bootstrap/cache", "storage/framework", "storage/logs"):
-            self.assertEqual(self.mode(self.release / held), (0, 0, 0o755), held)
-        self.assertEqual(self.mode(self.release / "vendor/autoload.php"), (0, 0, 0o444))
+        self.assertNotEqual(run.returncode, 0, run.stdout)
+        self.assertIn("comes from an isolated build and is not attached by hand", run.stderr)
+        self.assertEqual(self.trace_lines(), [])
+        self.assertEqual(self.mode(self.release), (0, 0, 0o755))
 
-    def test_attach_still_refuses_an_unsealed_isolated_slot(self):
-        (self.bin / "npm").write_text("#!/bin/bash\nexit 7\n")
+    def test_a_candidate_refused_by_admission_cannot_be_attached_and_activated(self):
+        self.candidate.write_text("APP_ENV=staging\nAPP_KEY=refused-by-admission\n")
         run = self.prepare()
         self.assertNotEqual(run.returncode, 0)
+        self.assertIn("built candidate refused", run.stderr)
+        self.operation.unlink()   # root clears the marker but keeps the slot (the case the review reproduced)
         self.trace.write_text("")
         run = self.ctl("attach", self.sha)
         self.assertNotEqual(run.returncode, 0, run.stdout)
         self.assertNotIn("attach", self.trace_lines())
+        run = self.ctl("activate", self.sha, str(self.evidence))
+        self.assertNotEqual(run.returncode, 0, run.stdout)
+        self.assertFalse((self.root / "current").exists())
+
+    def test_attach_refuses_an_unsealed_isolated_slot_without_opening_it(self):
+        (self.bin / "npm").write_text("#!/bin/bash\nexit 7\n")
+        run = self.prepare()
+        self.assertNotEqual(run.returncode, 0)
+        before = self.mode(self.release)
+        self.operation.unlink()
+        self.trace.write_text("")
+        run = self.ctl("attach", self.sha)
+        self.assertNotEqual(run.returncode, 0, run.stdout)
+        self.assertIn("comes from an isolated build", run.stderr)
+        self.assertNotIn("attach", self.trace_lines())
+        self.assertEqual(self.mode(self.release), before, "the refused attach changed the slot's owner or mode")
 
 class BuildAccountGuards(unittest.TestCase):
     """The account checks in build_account(), with name-service answers as fixtures: each unsafe shape refuses."""
@@ -757,6 +775,15 @@ class SealBuiltTree(unittest.TestCase):
         self.module.run(self.release, self.APP, self.APP, False)
         self.module.release_runtime(self.release, self.APP, self.APP)
         self.assertEqual(os.lstat(link).st_uid, self.APP)
+
+    def test_a_symlink_in_a_held_runtime_tree_must_still_be_root_owned(self):
+        link = self.release / "bootstrap/cache/current.php"
+        link.symlink_to("packages.php")
+        os.chown(link, self.BUILD, self.BUILD, follow_symlinks=False)
+        self.seal()
+        os.chown(link, self.APP, self.APP, follow_symlinks=False)
+        with self.assertRaises(ValueError):
+            self.module.run(self.release, self.APP, self.APP, False)
 
     def test_the_release_stays_closed_to_everyone_but_root_until_the_walk_is_done(self):
         seen = []

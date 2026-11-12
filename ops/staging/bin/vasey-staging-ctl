@@ -219,15 +219,16 @@ persist_private_bind() {
 }
 
 cmd_attach() {
-  local sha=${1:-}; valid_sha "$sha" || die "attach needs a 40-hex SHA"
-  # A candidate sealed by an isolated build holds its runtime directories root-owned until activate; the legacy sealer
-  # would refuse it. Verify that seal instead (a prepare that stopped after sealing resumes here); anything else is resealed.
-  if [ "$(stat -c %u -- "$RELEASES/$sha" 2>/dev/null)" = 0 ] \
-     && [ "$(stat -c %u -- "$RELEASES/$sha/bootstrap/cache" 2>/dev/null)" = 0 ]; then
-    sealed_release "$sha"
-  else
-    seal_release "$sha"
+  local sha=${1:-} owner; valid_sha "$sha" || die "attach needs a 40-hex SHA"
+  # A candidate from an isolated build (runtime directories root-held once sealed, the build account's before) is never
+  # attached by hand: only prepare attaches it, after the runtime admission, which nothing later repeats, so an attach here
+  # could carry a refused candidate to activate. It is refused before anything about it changes (the legacy sealer would
+  # first open an unsealed slot to traversal). Discard it and deploy again; the site stays up meanwhile.
+  owner=$(stat -c %U -- "$RELEASES/$sha/bootstrap/cache" 2>/dev/null) || owner=''
+  if [ "$owner" = root ] || { [ -n "${VASEY_BUILD_USER:-}" ] && [ "$owner" = "$VASEY_BUILD_USER" ]; }; then
+    die "release $sha comes from an isolated build and is not attached by hand; discard it and deploy again (docs/ops/staging-runbook.md section 9)"
   fi
+  seal_release "$sha"
   attach_private "$sha"
 }
 
@@ -674,6 +675,11 @@ cmd_activate() {
     served_release >/dev/null || die "served release is invalid"
     first_install=0
   fi
+  # The runtime admission (test-mode payments, production checkout off, the database and host) runs again before anything
+  # stops: a candidate whose prepare was refused at admission, or that reached here any other way, is refused now rather
+  # than after the quiesce, the snapshot and its migrations. It writes nothing.
+  as_app env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C /bin/bash "$RELEASE_STEP" revalidate "$sha" \
+    || die "candidate $sha refused by the runtime admission; nothing was stopped"
   cmd_space_check   # refuse before the snapshot starts rather than die inside it (a legacy prepare already stopped the site)
   operation_begin activate "$sha"
   cmd_quiesce
