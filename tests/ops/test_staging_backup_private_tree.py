@@ -1147,6 +1147,392 @@ class FollowUps(PrivateTreeBase):
         self.assertTrue((s0 / "RESTORE_CHECK").exists())
 
 
+class ReviewBatch337(PrivateTreeBase):
+    """Unanswered review findings on PR #335/#337 (2026-11-12): the rsync copy's modes, the token's age, and which errors are
+    findings about which sets."""
+
+    def check(self, *arguments, **extra):
+        return self.run_helper("space-check", *arguments, T_DB_BYTES=40_000, **extra)
+
+    def linked_pair(self):
+        """S1 (its own copies) and S2 (sharing every unchanged file with S1), both proven."""
+        s1 = self.predeploy(VASEY_BACKUP_LINK=0)
+        s2 = self.predeploy()
+        self.assertEqual(fields(s2 / "MANIFEST")["private_link_source"], s1.name)
+        return s1, s2
+
+    # Finding 1: the plain rsync shipment.
+    def test_f1_an_rsync_off_host_copy_keeps_the_recorded_modes_and_passes_the_full_proof(self):
+        dest = self.root / "dest"
+        dest.mkdir(mode=0o700)
+        key = self.root / "ssh-key"
+        key.write_text("synthetic")
+        _, s2 = self.linked_pair()
+        run = self.run_helper("ship", str(s2), VASEY_BACKUP_DEST=dest, VASEY_BACKUP_SSH_KEY=key)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        copy = dest / s2.name
+        self.assertEqual(stat.S_IMODE(copy.stat().st_mode), 0o700, "the copy is reachable by its owner only")
+        self.assertEqual(stat.S_IMODE((copy / "private/.gitignore").stat().st_mode), 0o644)
+        self.assertEqual(stat.S_IMODE((copy / "private/contracts/c1.pdf").stat().st_mode), 0o400)
+        self.assertEqual(tree(copy / "private", seconds=True), tree(s2 / "private", seconds=True))
+        run = self.run_helper("restore-check", str(copy), VASEY_BACKUP_DIR=dest)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertEqual(fields(copy / "RESTORE_CHECK")["private_proof"], "full")
+        # The proof still notices a real permission change on a private file of the copy.
+        os.chmod(copy / "private/contracts/c1.pdf", 0o600)
+        run = self.run_helper("restore-check", str(copy), VASEY_BACKUP_DIR=dest)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("index recorded", run.stderr)
+
+    def test_f1_a_set_directory_that_is_not_owner_only_is_not_shipped(self):
+        dest = self.root / "dest"
+        dest.mkdir(mode=0o700)
+        key = self.root / "ssh-key"
+        key.write_text("synthetic")
+        s1 = self.predeploy()
+        s1.chmod(0o755)
+        run = self.run_helper("ship", str(s1), VASEY_BACKUP_DEST=dest, VASEY_BACKUP_SSH_KEY=key)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("owner-only", run.stderr)
+        self.assertFalse((dest / s1.name).exists())
+
+    # Finding 2: a token older than the link age.
+    def age_token(self, hours):
+        lines = self.token().read_text().splitlines()
+        header = json.loads(lines[0])
+        header["verified_ns"] -= int(hours * 3600 * 10**9)
+        self.token().write_text("\n".join([json.dumps(header, sort_keys=True)] + lines[1:]) + "\n")
+
+    def test_f2_a_stale_token_is_not_reused_the_set_is_re_hashed_and_shared(self):
+        self.predeploy()
+        self.write("masters/new/master.wav", b"RIFF" + b"z" * 20_000)
+        run = self.check("--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.age_token(7)  # an aborted deploy left it 7 hours ago; the link age is 6
+        run = self.check("--preverify-if-needed", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("re-verified the private files of", run.stdout, "a stale token must not stand in for a re-hash")
+        self.assertIn("estimate: sharing with the re-verified set", run.stdout)
+        self.assertIn("(20004 of", run.stdout)
+        second = self.predeploy(preverify=False)
+        self.assertEqual(fields(second / "MANIFEST")["private_copied_files"], "1")
+
+    def test_f2_the_estimate_names_a_basis_only_when_something_is_shared(self):
+        self.predeploy()
+        run = self.check("--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        lines = self.token().read_text().splitlines()
+        self.token().write_text(lines[0] + "\n{not json\n")  # the header still names a proven set; the body is unusable
+        run = self.check(T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertNotIn("sharing with the re-verified set", run.stdout)
+        total = sum((self.live / f).stat().st_size for f in self.live_files())
+        self.assertIn(f"({total} of {total} private bytes to copy; estimate: the re-verification token of", run.stdout)
+        self.assertIn("was refused: the whole private store is counted", run.stdout)
+
+    # Finding 3a: a set's own manifests.
+    def test_f3a_an_unreadable_own_manifest_withdraws_that_set_only(self):
+        def empty_index(bk):
+            (bk / "private.index").write_bytes(b"")
+
+        def empty_sha256(bk):
+            (bk / "private.sha256").write_bytes(b"")
+
+        def truncated_sha256(bk):
+            data = (bk / "private.sha256").read_bytes()
+            (bk / "private.sha256").write_bytes(data[:40])
+
+        def malformed_entry(bk):
+            lines = (bk / "private.index").read_text().splitlines()
+            entry = json.loads(lines[1])
+            del entry["how"]
+            (bk / "private.index").write_text("\n".join([lines[0], json.dumps(entry, sort_keys=True)] + lines[2:]) + "\n")
+
+        for damage in (empty_index, empty_sha256, truncated_sha256, malformed_entry):
+            with self.subTest(damage.__name__):
+                for name in self.sets():
+                    shutil.rmtree(self.backups / name)
+                s1, s2 = self.linked_pair()
+                damage(s2)
+                run = self.check("--preverify", T_FREE=10**15)
+                self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+                self.assertFalse((s2 / "RESTORE_CHECK").exists())
+                self.assertTrue((s1 / "RESTORE_CHECK").exists(), "no inode S1 holds was shown to be bad")
+                time.sleep(1.1)
+
+    # Finding 3b: one rule for I/O errors.
+    def test_f3b_an_io_error_opening_the_sets_tree_or_listing_a_directory_is_operational(self):
+        for label, body in (
+                ("open private/", "_open = os.open\n"
+                                  "def failing(path, *a, **k):\n"
+                                  "    if isinstance(path, str) and path.endswith('/private'):\n"
+                                  "        raise OSError(errno.EIO, 'synthetic EIO')\n"
+                                  "    return _open(path, *a, **k)\nos.open = failing\n"),
+                ("open a directory", "_open = os.open\n"
+                                     "def failing(path, flags, *a, **k):\n"
+                                     "    if path == 'masters' and flags & os.O_DIRECTORY:\n"
+                                     "        raise OSError(errno.EIO, 'synthetic EIO')\n"
+                                     "    return _open(path, flags, *a, **k)\nos.open = failing\n"),
+                ("list a directory", "_scandir = os.scandir\n"
+                                     "def failing(*a, **k):\n"
+                                     "    raise OSError(errno.EUCLEAN, 'synthetic EUCLEAN')\nos.scandir = failing\n")):
+            with self.subTest(label):
+                for name in self.sets():
+                    shutil.rmtree(self.backups / name)
+                s1, s2 = self.linked_pair()
+                engine_file = wrapped_engine(self.root, body)
+                run = self.check("--preverify", T_FREE=10**15, PRIVATE_SNAPSHOT=engine_file)
+                self.assertEqual(run.returncode, 3, run.stdout + run.stderr)
+                self.assertIn("an operational error, not a corruption finding", run.stdout)
+                self.assertIn(f"restore-check {s2}", run.stdout)
+                self.assertTrue((s2 / "RESTORE_CHECK").exists())
+                self.assertTrue((s1 / "RESTORE_CHECK").exists())
+                time.sleep(1.1)
+
+    def test_f3b_ebadmsg_or_euclean_reading_a_shared_file_is_a_finding_for_every_holder(self):
+        for code in ("EBADMSG", "EUCLEAN"):
+            with self.subTest(code):
+                for name in self.sets():
+                    shutil.rmtree(self.backups / name)
+                independent = self.predeploy(preverify=False, VASEY_BACKUP_LINK=0)
+                s1, s2 = self.linked_pair()
+                failing = wrapped_engine(self.root, f"def failing(fd, buffers):\n    raise OSError(errno.{code}, 'synthetic')\n"
+                                                    "os.readv = failing\n")
+                run = self.check("--preverify", T_FREE=10**15, PRIVATE_SNAPSHOT=failing)
+                self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+                self.assertIn("I/O error reading a set file", run.stdout)
+                self.assertFalse((s2 / "RESTORE_CHECK").exists())
+                self.assertFalse((s1 / "RESTORE_CHECK").exists())
+                self.assertTrue((independent / "RESTORE_CHECK").exists())
+                time.sleep(1.1)
+
+    def test_f3b_the_engine_maps_errno_classes_the_same_way_everywhere(self):
+        s1 = self.predeploy()
+        for errname, expected in (("EIO", 3), ("EBADMSG", 3), ("EUCLEAN", 3), ("ENOENT", 1), ("ELOOP", 1)):
+            with self.subTest(errname):
+                body = ("_open = os.open\n"
+                        "def failing(path, *a, **k):\n"
+                        "    if isinstance(path, str) and path.endswith('/private'):\n"
+                        f"        raise OSError(errno.{errname}, 'synthetic')\n"
+                        "    return _open(path, *a, **k)\nos.open = failing\n")
+                run = subprocess.run([sys.executable, "-I", str(wrapped_engine(self.root, body)), "verify", str(s1), "--full",
+                                      "--backups", str(self.backups)], capture_output=True, text=True)
+                self.assertEqual(run.returncode, expected, run.stdout + run.stderr)
+                self.assertEqual("withdraw=" in run.stdout, expected == 1, run.stdout)
+        # A content error reading the set's own manifest is a finding about that set alone.
+        s2 = self.predeploy()
+        body = ("_open = os.open\n"
+                "def failing(path, *a, **k):\n"
+                "    if isinstance(path, str) and path.endswith('/private.sha256'):\n"
+                "        raise OSError(errno.EUCLEAN, 'synthetic')\n"
+                "    return _open(path, *a, **k)\nos.open = failing\n")
+        run = subprocess.run([sys.executable, "-I", str(wrapped_engine(self.root, body)), "verify", str(s2), "--full",
+                              "--backups", str(self.backups)], capture_output=True, text=True)
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertEqual(run.stdout.split(), [f"withdraw={s2.name}"], "S1 shares its inodes but none was shown to be bad")
+
+    # Finding 4: the restore-check path (verify --full) with a shared inode.
+    def test_f4_a_corrupt_or_chmodded_shared_file_found_by_restore_check_withdraws_both_holders(self):
+        rel = "masters/track-one/stems.zip"
+        for damage in ("corrupt", "chmod"):
+            with self.subTest(damage):
+                for name in self.sets():
+                    shutil.rmtree(self.backups / name)
+                independent = self.predeploy(preverify=False, VASEY_BACKUP_LINK=0)
+                s1, s2 = self.linked_pair()
+                self.assertEqual(inodes(s1 / "private")[rel], inodes(s2 / "private")[rel])
+                if damage == "corrupt":
+                    self.corrupt(s1 / "private" / rel)
+                else:
+                    os.chmod(s1 / "private" / rel, 0o640)
+                run = self.run_helper("restore-check", str(s1))
+                self.assertNotEqual(run.returncode, 0)
+                self.assertFalse((s1 / "RESTORE_CHECK").exists())
+                self.assertFalse((s2 / "RESTORE_CHECK").exists(), "S2 holds the same inode")
+                self.assertTrue((independent / "RESTORE_CHECK").exists())
+                time.sleep(1.1)
+
+
+class ReviewPR353(PrivateTreeBase):
+    """Independent review of PR #353 (2026-11-12): a finding is never hidden by what follows it in the same proof."""
+
+    SHARED = "masters/track-one/master.wav"
+
+    def verify(self, bk, engine_file=ENGINE):
+        return subprocess.run([sys.executable, "-I", str(engine_file), "verify", str(bk), "--full", "--backups", str(self.backups)],
+                              capture_output=True, text=True)
+
+    def withdrawn(self, run):
+        return sorted(line.split("=", 1)[1] for line in run.stdout.splitlines() if line.startswith("withdraw="))
+
+    def fresh_pair(self):
+        for name in self.sets():
+            shutil.rmtree(self.backups / name)
+        s1 = self.predeploy(VASEY_BACKUP_LINK=0)
+        s2 = self.predeploy()
+        self.assertEqual(inodes(s1 / "private")[self.SHARED], inodes(s2 / "private")[self.SHARED])
+        return s1, s2
+
+    def test_p2_1_a_set_level_finding_after_a_failed_shared_file_still_withdraws_its_holders(self):
+        def extra_file(bk):
+            (bk / "private/zzz-extra.bin").write_bytes(b"x")
+            os.chmod(bk / "private/zzz-extra.bin", 0o600)
+
+        def symlink(bk):
+            (bk / "private/zzz-link").symlink_to("masters")  # an unmanifested entry, walked after masters/
+
+        def malformed_entry(bk):
+            lines = (bk / "private.index").read_text().splitlines()
+            entries = [json.loads(l) for l in lines[1:]]
+            later = next(e for e in entries if e["p"] > "./" + self.SHARED)  # walked after the corrupt file
+            del later["how"]
+            (bk / "private.index").write_text("\n".join([lines[0]] + [json.dumps(e, sort_keys=True) for e in entries]) + "\n")
+
+        for damage in (extra_file, symlink, malformed_entry):
+            with self.subTest(damage.__name__):
+                s1, s2 = self.fresh_pair()
+                self.corrupt(s2 / "private" / self.SHARED)
+                damage(s2)
+                run = self.verify(s2)
+                self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+                self.assertEqual(self.withdrawn(run), sorted([s1.name, s2.name]), "S1 holds the corrupt file")
+                time.sleep(1.1)
+
+    def test_p2_2_an_operational_error_after_a_failed_shared_file_still_withdraws_its_holders(self):
+        for label, target, directory in (("directory open", "processing", True), ("file open", "stems.zip", False)):
+            with self.subTest(label):
+                s1, s2 = self.fresh_pair()
+                self.corrupt(s2 / "private" / self.SHARED)  # masters/track-one/master.wav is walked before both targets
+                # Once only: the proof of S2 meets it; the later scan of S1 for the failed inode reads normally.
+                body = ("_open = os.open\nfired = []\n"
+                        "def failing(path, flags, *a, **k):\n"
+                        f"    if path == {target!r} and bool(flags & os.O_DIRECTORY) == {directory!r} and not fired:\n"
+                        "        fired.append(1)\n"
+                        "        raise OSError(errno.EIO, 'synthetic EIO')\n"
+                        "    return _open(path, flags, *a, **k)\nos.open = failing\n")
+                run = self.verify(s2, wrapped_engine(self.root, body))
+                self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+                self.assertEqual(self.withdrawn(run), sorted([s1.name, s2.name]))
+                self.assertIn("operational error (OSError, EIO)", run.stderr)
+                time.sleep(1.1)
+
+    def test_eio_opening_a_regular_file_is_operational_and_enoent_is_a_finding_about_the_set(self):
+        s1, s2 = self.fresh_pair()
+        for code, expected in (("EIO", 3), ("ENOENT", 1)):
+            with self.subTest(code):
+                body = ("_open = os.open\n"
+                        "def failing(path, flags, *a, **k):\n"
+                        "    if path == 'stems.zip' and not flags & os.O_DIRECTORY:\n"
+                        f"        raise OSError(errno.{code}, 'synthetic')\n"
+                        "    return _open(path, flags, *a, **k)\nos.open = failing\n")
+                run = self.verify(s2, wrapped_engine(self.root, body))
+                self.assertEqual(run.returncode, expected, run.stdout + run.stderr)
+                self.assertEqual(self.withdrawn(run), [s2.name] if expected == 1 else [], "no file was shown to be bad")
+
+    def test_a_backup_directory_that_cannot_be_listed_keeps_the_finding_for_the_failing_set(self):
+        _, s2 = self.fresh_pair()
+        self.corrupt(s2 / "private" / self.SHARED)
+        body = "def failing(*a, **k):\n    raise OSError(errno.EIO, 'synthetic EIO')\nos.listdir = failing\n"
+        run = self.verify(s2, wrapped_engine(self.root, body))
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertEqual(self.withdrawn(run), [s2.name])
+        self.assertIn("could not list the backup directory", run.stderr)
+
+    def test_a_file_whose_size_changes_while_it_is_hashed_is_a_finding_about_that_inode(self):
+        s1 = self.predeploy()
+        target = s1 / "private" / self.SHARED
+        st = target.lstat()
+        directory = os.open(target.parent, os.O_RDONLY | os.O_DIRECTORY)
+        original = engine.os.readv
+        engine.os.readv = lambda fd, buffers: 0
+        try:
+            with self.assertRaises(engine.Mismatch) as caught:
+                engine.hash_file(directory, target.name, (st.st_dev, st.st_ino))
+        finally:
+            engine.os.readv = original
+            os.close(directory)
+        self.assertEqual(caught.exception.inodes, {(st.st_dev, st.st_ino)})
+
+    def test_a_token_dated_in_the_future_is_not_reused(self):
+        self.predeploy()
+        run = self.run_helper("space-check", "--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        lines = self.token().read_text().splitlines()
+        header = json.loads(lines[0])
+        header["verified_ns"] += 400 * 10**9  # beyond the 300 s the engine allows
+        self.token().write_text("\n".join([json.dumps(header, sort_keys=True)] + lines[1:]) + "\n")
+        run = self.run_helper("space-check", "--preverify-if-needed", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("re-verified the private files of", run.stdout)
+
+    def test_an_accepted_token_that_shares_nothing_is_not_called_sharing(self):
+        self.predeploy()
+        for path in self.live.rglob("*"):
+            if path.is_file():
+                os.chmod(path, stat.S_IMODE(path.stat().st_mode))  # same mode: only the ctime moves
+        time.sleep(2.1)
+        run = self.run_helper("space-check", "--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertNotIn("sharing with the re-verified set", run.stdout)
+        self.assertIn("was accepted, but no file is unchanged since it: the whole private store is counted", run.stdout)
+
+
+class FollowUpPR353(PrivateTreeBase):
+    """Re-review of PR #353 at 3261844d (P3s): finding wording, the entry-stat guard, restore-check's exit handling."""
+
+    SHARED = ReviewPR353.SHARED
+    verify, withdrawn, fresh_pair = ReviewPR353.verify, ReviewPR353.withdrawn, ReviewPR353.fresh_pair
+
+    SCANDIR_FAILURE = ("_scandir = os.scandir\n"
+                       "class _Entry:\n"
+                       "    def __init__(self, entry): self._entry, self.name = entry, entry.name\n"
+                       "    def stat(self, follow_symlinks=True):\n"
+                       "        if self.name == 'stems.zip': raise OSError(errno.{code}, 'synthetic')\n"
+                       "        return self._entry.stat(follow_symlinks=follow_symlinks)\n"
+                       "    def __getattr__(self, attribute): return getattr(self._entry, attribute)\n"
+                       "class _Listing:\n"
+                       "    def __init__(self, listing): self._listing = listing\n"
+                       "    def __enter__(self): self._listing.__enter__(); return (_Entry(e) for e in self._listing)\n"
+                       "    def __exit__(self, *a): return self._listing.__exit__(*a)\n"
+                       "os.scandir = lambda *a, **k: _Listing(_scandir(*a, **k))\n")
+
+    def test_an_entry_that_vanishes_before_its_stat_is_a_finding_about_the_set_and_eio_is_operational(self):
+        _, s2 = self.fresh_pair()
+        for code, expected in (("ENOENT", 1), ("ELOOP", 1), ("EIO", 3)):
+            with self.subTest(code):
+                run = self.verify(s2, wrapped_engine(self.root, self.SCANDIR_FAILURE.format(code=code)))
+                self.assertEqual(run.returncode, expected, run.stdout + run.stderr)
+                self.assertEqual(self.withdrawn(run), [s2.name] if expected == 1 else [])
+
+    def test_an_io_error_on_the_first_file_is_worded_as_itself(self):
+        s1, s2 = self.fresh_pair()
+        body = ("_readv = os.readv\nfired = []\n"
+                "def failing(fd, buffers):\n"
+                "    if not fired:\n"
+                "        fired.append(1)\n"
+                "        raise OSError(errno.EIO, 'synthetic EIO')\n"
+                "    return _readv(fd, buffers)\nos.readv = failing\n")
+        run = self.verify(s2, wrapped_engine(self.root, body))
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertIn("an I/O error reading a set file", run.stderr)
+        self.assertNotIn("0 file(s)", run.stderr)
+        self.assertNotIn("hash mismatch", run.stderr)
+
+    def test_restore_check_withdraws_nothing_when_the_engine_could_not_run(self):
+        for label, code, lines in (("exit 3 naming a set", 3, True), ("exit 1 naming no set", 1, False)):
+            with self.subTest(label):
+                s1, s2 = self.fresh_pair()
+                self.assertEqual(fields(s1 / "RESTORE_CHECK")["result"], "RESTORE_VERIFIED")
+                fake = self.root / f"fake-engine-{code}.py"
+                fake.write_text("import sys\n"
+                                + (f"print('withdraw={s1.name}')\n" if lines else "")
+                                + f"print('synthetic failure', file=sys.stderr)\nsys.exit({code})\n")
+                run = self.run_helper("restore-check", str(s2), PRIVATE_SNAPSHOT=str(fake))
+                self.assertNotEqual(run.returncode, 0)
+                self.assertIn("could not run", run.stdout + run.stderr)
+                self.assertEqual(fields(s1 / "RESTORE_CHECK")["result"], "RESTORE_VERIFIED", "another set lost its proof")
+                time.sleep(1.1)
+
 class DeployGate(unittest.TestCase):
     """G1 and Q4 in ops/staging/forge-deploy.sh: one authoritative space gate, before anything is stopped, reported truthfully."""
 
