@@ -226,7 +226,17 @@ cmd_attach() {
   # first open an unsealed slot to traversal). Discard it and deploy again; the site stays up meanwhile.
   # A legacy release never has a symlink there; in a failed isolated slot the build account could plant one pointing at an
   # application-owned tree, so the owner read below would pass. Owners compare as numbers, not names.
-  local builder_uid=''
+  local builder_uid='' builder_gid='' slot
+  if [ -n "${VASEY_BUILD_USER:-}" ]; then builder_gid=$(id -g -- "$VASEY_BUILD_USER" 2>/dev/null) || builder_gid=''; fi
+  # The slot directory itself, which only root changes, comes first: an isolated slot is created root:<build group> 0770 and
+  # stays so on a failed build, or is root 0700 until the sealer has walked it. The build account owns what is inside, so it
+  # could remove bootstrap or make it a file, and the owner read below would then find nothing (independent review, PR #362).
+  slot=$(stat -c '%u %g %a' -- "$RELEASES/$sha" 2>/dev/null) || die "release $sha not found"
+  case "$slot" in
+    "0 "*" 700"|"0 "*" 770") die "release $sha comes from an isolated build and is not attached by hand; discard it and deploy again (docs/ops/staging-runbook.md section 9)" ;;
+  esac
+  [ -z "$builder_gid" ] || [ "$(cut -d' ' -f2 <<< "$slot")" != "$builder_gid" ] \
+    || die "release $sha comes from an isolated build and is not attached by hand; discard it and deploy again (docs/ops/staging-runbook.md section 9)"
   [ ! -L "$RELEASES/$sha/bootstrap" ] && [ ! -L "$RELEASES/$sha/bootstrap/cache" ] \
     || die "release $sha has a symlinked bootstrap or bootstrap/cache; discard it and deploy again"
   owner=$(stat -c %u -- "$RELEASES/$sha/bootstrap/cache" 2>/dev/null) || owner=''

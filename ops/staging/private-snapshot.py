@@ -256,8 +256,9 @@ def hash_file(parent_fd, name, expected):
         fd = _open_file(parent_fd, name)
     except OSError as error:
         if error.errno in CORRUPT_INODE_ERRNOS:
-            # ext4 reports a corrupt inode when the file is opened, not only when its bytes are read; the walker has
-            # already named this inode, so it is the same content finding as a failed read.
+            # ext4 usually reports a corrupt inode at lookup (the walker's stat, which stays operational), but it can also
+            # report it at open; the walker has already named this inode, so that is the same content finding as a failed
+            # read. A corrupt directory block met here instead would withdraw too much, never too little.
             raise Mismatch(f"a set file cannot be opened ({describe(error)}): its content cannot be proven", {expected})
         if error.errno not in MISSING_ERRNOS:
             raise  # any other error opening a file, EIO included, is operational (module docstring)

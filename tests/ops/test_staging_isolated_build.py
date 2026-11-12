@@ -605,7 +605,9 @@ attach_private() {   # the bind mount and fstab are host state; the hand-over to
         (decoy / "cache").mkdir(parents=True)
         for path in (decoy, decoy / "cache"):
             os.chown(path, self.app_uid, self.app_gid)
-        for link in ("bootstrap", "bootstrap/cache"):
+        # Independent review of PR #362 (reproduced): removing bootstrap, or making it a file, also hid the owner. The slot
+        # directory itself, which only root changes, now decides.
+        for link in ("bootstrap", "bootstrap/cache", "missing", "file"):
             with self.subTest(link=link):
                 bootstrap = self.release / "bootstrap"
                 if bootstrap.is_symlink() or bootstrap.is_file():
@@ -614,15 +616,17 @@ attach_private() {   # the bind mount and fstab are host state; the hand-over to
                     shutil.rmtree(bootstrap)
                 if link == "bootstrap":
                     bootstrap.symlink_to(decoy)
-                else:
+                elif link == "bootstrap/cache":
                     bootstrap.mkdir()
                     os.chown(bootstrap, self.app_uid, self.app_gid)
                     (bootstrap / "cache").symlink_to(decoy / "cache")
+                elif link == "file":
+                    bootstrap.write_text("")
                 before = self.mode(self.release)
                 self.trace.write_text("")
                 run = self.ctl("attach", self.sha)
                 self.assertNotEqual(run.returncode, 0, run.stdout)
-                self.assertIn("bootstrap", run.stderr)
+                self.assertRegex(run.stderr, "bootstrap|isolated build")
                 self.assertNotIn("attach", self.trace_lines())
                 self.assertEqual(self.mode(self.release), before, "the refused attach changed the slot's owner or mode")
 
