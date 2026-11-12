@@ -170,6 +170,10 @@ PHP_TARGETS = {
         "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
         "tests/Unit/StagingRuntimeValidatorTest.php", "tests/Unit/TestCommerceProfileValidatorTest.php",
     ),
+    # The native race alone: the whole test-delivery suite does not fit the 900-second runner cap on MySQL.
+    "test-delivery-races": (
+        "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
+    ),
     "customer": (
         "tests/Feature/InquiryBrowserCatalogCleanupTest.php",
         "tests/Feature/OrderInquiryTest.php", "tests/Feature/OrderInquiryHttpTest.php",
