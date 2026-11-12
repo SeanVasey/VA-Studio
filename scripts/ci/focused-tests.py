@@ -160,7 +160,6 @@ PHP_TARGETS = {
         "tests/Feature/TestUnpaidReleaseTest.php", "tests/Feature/TestUnpaidReleaseMigrationTest.php",
         "tests/Feature/TestUnpaidReleaseConcurrencyTest.php", "tests/Feature/TestUnpaidOrderResourceTest.php",
         "tests/Feature/TestUnsentOrderReleaseTest.php", "tests/Feature/TestUnsentOrderReleaseConcurrencyTest.php",
-        "tests/Feature/TestBuyerOrderCancellationTest.php", "tests/Feature/TestBuyerOrderCancellationConcurrencyTest.php",
         "tests/Feature/TestPaymentFinancialObservationTest.php", "tests/Feature/TestPaymentExceptionOperationsTest.php",
         "tests/Feature/TestPaymentExceptionOperationsConcurrencyTest.php",
         "tests/Feature/TestPaymentProcessingTest.php", "tests/Feature/TestOrderFinalizationTest.php",
@@ -172,6 +171,19 @@ PHP_TARGETS = {
         "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
         "tests/Unit/StagingRuntimeValidatorTest.php", "tests/Unit/TestCommerceProfileValidatorTest.php",
     ),
+    # The buyer's cancellation of a never-sent test order (2026-11-12) and what it touches; its races run on MySQL only.
+    "buyer-cancel": (
+        "tests/Feature/TestBuyerOrderCancellationTest.php", "tests/Feature/TestBuyerOrderCancellationConcurrencyTest.php",
+        "tests/Feature/TestUnsentOrderReleaseTest.php", "tests/Unit/StagingRuntimeValidatorTest.php",
+    ),
+    "buyer-cancel-migrations": (
+        "tests/Feature/HostedCheckoutMigrationTest.php", "tests/Feature/OrderPreparationMigrationTest.php",
+        "tests/Feature/PromotionMigrationTest.php", "tests/Feature/QuotePricingMigrationTest.php",
+        "tests/Feature/SharedInventoryMigrationTest.php", "tests/Feature/TestOrderFinalizationMigrationTest.php",
+        "tests/Feature/TestPaymentEvidenceMigrationTest.php", "tests/Feature/TestRefundResolutionMigrationTest.php",
+        "tests/Feature/TestUnpaidReleaseMigrationTest.php",
+    ),
+    "buyer-cancel-races": ("tests/Feature/TestBuyerOrderCancellationConcurrencyTest.php",),
     # The native race alone: the whole test-delivery suite does not fit the 900-second runner cap on MySQL.
     "test-delivery-races": (
         "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
