@@ -1637,7 +1637,7 @@ class DeployGate(unittest.TestCase):
                 self.assertLess(check, body.index(later), (action, later))
             if action == "prepare":
                 self.assertLess(check, body.index("cmd_allocate"))
-        self.assertIn('[ "$#" = 2 ] && [ "$2" = --preverify ]', self.CTL)
+        self.assertIn('[ "$#" = 2 ] && { [ "$2" = --preverify ] || [ "$2" = --preverify-if-needed ]; }', self.CTL)
         self.assertIn('space-check) cmd_space_check "${2:-}" ;;', self.CTL)
 
     def run_deploy_tail(self, fail_at):
@@ -1674,6 +1674,190 @@ class DeployGate(unittest.TestCase):
         self.assertIn("service and writer state is unconfirmed", run.stderr)
         self.assertIn("establish quiesce before recovery", run.stderr)
         self.assertNotIn("the served release was not touched", run.stderr)
+
+
+class TokenRenewal(PrivateTreeBase):
+    """`rearm` renews the token with the site up so a deploy's early gate can skip its own re-hash (Forge's 10-minute limit)."""
+
+    def rearm(self, lock_wait=None, **extra):
+        env = dict(self.env, **{k: str(v) for k, v in extra.items()})
+        functions = FUNCTIONS
+        self.assertIn("REARM_CTL_LOCK=/etc/vasey-staging/ctl.lock\n", functions)
+        functions = functions.replace("REARM_CTL_LOCK=/etc/vasey-staging/ctl.lock\n", f"REARM_CTL_LOCK={self.root / 'ctl.lock'}\n")
+        if lock_wait is not None:
+            self.assertIn("REARM_LOCK_WAIT=1800\n", functions)
+            functions = functions.replace("REARM_LOCK_WAIT=1800\n", f"REARM_LOCK_WAIT={int(lock_wait)}\n")
+        script = PRELUDE + DEFAULTS + functions + OVERRIDES + DISPATCH
+        return subprocess.run(["bash", "-c", script, "vasey-staging-backup", "rearm"], env=env,
+                              capture_output=True, text=True, timeout=180)
+
+    def age_token(self, hours):
+        lines = self.token().read_text().splitlines()
+        header = json.loads(lines[0])
+        header["verified_ns"] -= int(hours * 3600 * 10**9)
+        self.token().write_text("\n".join([json.dumps(header, sort_keys=True)] + lines[1:]) + "\n")
+
+    def test_after_a_snapshot_rearm_writes_a_token_that_lets_the_deploy_gate_skip_its_re_hash(self):
+        first = self.predeploy()
+        self.assertFalse(self.token().exists(), "the snapshot consumed the token")
+        run = self.rearm()
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn(f"re-verified the private files of {first.name}", run.stdout)
+        self.assertIn("re-armed", run.stdout)
+        self.assertIn(f'"set": "{first.name}"', self.token().read_text().splitlines()[0])
+        gate = self.run_helper("space-check", "--preverify-if-needed", T_FREE=10**15)
+        self.assertEqual(gate.returncode, 0, gate.stdout + gate.stderr)
+        self.assertNotIn("re-verified the private files", gate.stdout, "a fresh token skips the deploy's re-hash")
+        self.assertIn(f"sharing with the re-verified set {first.name}", gate.stdout)
+        second = self.predeploy(preverify=False)
+        manifest = fields(second / "MANIFEST")
+        self.assertEqual((manifest["private_link_source"], manifest["private_copied_files"]), (first.name, "0"))
+
+    def test_a_token_younger_than_the_renewal_age_naming_the_newest_set_is_left_alone(self):
+        self.predeploy()
+        self.assertEqual(self.rearm().returncode, 0)
+        before = self.token().read_bytes()
+        run = self.rearm()
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("nothing to re-arm", run.stdout)
+        self.assertNotIn("re-verified the private files", run.stdout)
+        self.assertEqual(self.token().read_bytes(), before)
+
+    def test_a_token_older_than_the_renewal_age_is_renewed(self):
+        first = self.predeploy()
+        self.assertEqual(self.rearm().returncode, 0)
+        self.age_token(3.5)
+        run = self.rearm()
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn(f"re-verified the private files of {first.name}", run.stdout)
+        gate = self.run_helper("space-check", "--preverify-if-needed", T_FREE=10**15)
+        self.assertNotIn("re-verified the private files", gate.stdout)
+
+    def test_a_token_naming_an_older_set_is_renewed_for_the_newest(self):
+        first = self.predeploy()
+        self.assertEqual(self.run_helper("space-check", "--preverify", T_FREE=10**15).returncode, 0)
+        shutil.copy2(self.token(), self.root / "old-token")
+        second = self.predeploy(preverify=False)
+        shutil.copy2(self.root / "old-token", self.token())  # a leftover token for the first set
+        run = self.rearm()
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn(f"re-verified the private files of {second.name}", run.stdout)
+        self.assertIn(f'"set": "{second.name}"', self.token().read_text().splitlines()[0])
+        self.assertTrue(first.is_dir())
+
+    def test_without_a_proven_tree_set_there_is_nothing_to_re_arm(self):
+        run = self.rearm()
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("nothing to re-arm", run.stdout)
+        self.assertFalse(self.token().exists())
+
+    def test_rearm_waits_for_the_deploy_lock(self):
+        self.predeploy()
+        lock = self.root / "app/.deploy.lock"
+        holder = subprocess.Popen(["flock", "-x", str(lock), "sleep", "3"])
+        self.addCleanup(holder.wait)
+        time.sleep(0.5)
+        started = time.monotonic()
+        run = self.rearm()
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertGreaterEqual(time.monotonic() - started, 2, "it waited for the deploy to release the lock")
+        self.assertIn("re-armed", run.stdout)
+
+    def test_rearm_gives_up_without_touching_the_token_when_the_lock_stays_held(self):
+        self.predeploy()
+        self.assertEqual(self.rearm().returncode, 0)
+        self.age_token(3.5)
+        before = self.token().read_bytes()
+        lock = self.root / "app/.deploy.lock"
+        holder = subprocess.Popen(["flock", "-x", str(lock), "sleep", "4"])
+        self.addCleanup(holder.wait)
+        time.sleep(0.5)
+        run = self.rearm(lock_wait=1)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("stayed held", run.stdout)
+        self.assertEqual(self.token().read_bytes(), before, "a deploy may be using it")
+
+    def test_rearm_also_waits_for_the_helper_action_lock_of_a_manual_ctl_operation(self):
+        self.predeploy()
+        holder = subprocess.Popen(["flock", "-x", str(self.root / "ctl.lock"), "sleep", "3"])
+        self.addCleanup(holder.wait)
+        time.sleep(0.5)
+        started = time.monotonic()
+        run = self.rearm()
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertGreaterEqual(time.monotonic() - started, 2, "it waited for the ctl operation")
+        self.assertIn("re-armed", run.stdout)
+
+    def test_a_failed_re_proof_withdraws_like_the_deploy_gate_and_exits_1(self):
+        first = self.predeploy()
+        self.corrupt(first / "private/masters/track-one/master.wav")
+        run = self.rearm()
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertIn("failed its private file re-verification", run.stdout)
+        self.assertFalse((first / "RESTORE_CHECK").exists())
+        self.assertFalse(self.token().exists())
+
+    def test_a_renewal_finding_makes_the_next_deploy_gate_refuse_once_before_anything_stops(self):
+        first = self.predeploy()
+        self.corrupt(first / "private/masters/track-one/master.wav")
+        self.assertEqual(self.rearm().returncode, 1)
+        marker = self.backups / ".rearm-finding"
+        self.assertTrue(marker.is_file())
+        self.assertEqual(fields(marker)["set"], first.name)
+        self.assertIn("failed its private file re-verification", fields(marker)["reason"])
+        gate = self.run_helper("space-check", "--preverify-if-needed", T_FREE=10**15)
+        self.assertEqual(gate.returncode, 1, gate.stdout + gate.stderr)
+        self.assertIn("token renewal", gate.stderr)
+        self.assertIn(first.name, gate.stderr)
+        self.assertIn("corruption refusal", gate.stderr)
+        self.assertNotIn("free space ok", gate.stdout, "refused before the estimate, nothing stopped")
+        self.assertFalse(marker.exists(), "the refusal is one-shot, as the gate's own finding was")
+        again = self.run_helper("space-check", "--preverify-if-needed", T_FREE=10**15)
+        self.assertEqual(again.returncode, 0, again.stdout + again.stderr)
+
+    def test_a_plain_space_check_and_the_nightly_gate_ignore_the_finding(self):
+        first = self.predeploy()
+        self.corrupt(first / "private/masters/track-one/master.wav")
+        self.assertEqual(self.rearm().returncode, 1)
+        run = self.run_helper("space-check", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertTrue((self.backups / ".rearm-finding").is_file(), "kept for the next deploy")
+
+    def test_an_operational_error_withdraws_nothing_and_exits_2(self):
+        first = self.predeploy()
+        run = self.rearm(PRIVATE_SNAPSHOT=OperationalErrors.eio_engine(self))
+        self.assertEqual(run.returncode, 2, run.stdout + run.stderr)
+        self.assertIn("could not run", run.stdout)
+        self.assertEqual(fields(first / "RESTORE_CHECK")["result"], "RESTORE_VERIFIED")
+        self.assertFalse(self.token().exists())
+
+
+class TokenRenewalWiring(unittest.TestCase):
+    def test_every_resume_starts_a_detached_renewal_and_the_deploy_reuses_a_fresh_token(self):
+        ctl = (REPO / "ops/staging/bin/vasey-staging-ctl").read_text()
+        for action in ("activate", "refresh"):
+            body = ctl[ctl.index(f"cmd_{action}() {{"):]
+            body = body[:body.index("\n}\n")]
+            self.assertLess(body.index("cmd_resume"), body.index("start_rearm"), action)
+        self.assertIn('"$BACKUP_BIN" rearm-start 8>&- 7<&- </dev/null', ctl)
+        self.assertIn('[ "$2" = --preverify-if-needed ]', ctl)
+        nightly = SOURCE[SOURCE.index("  nightly)"):SOURCE.index("  predeploy)")]
+        self.assertLess(nightly.index('"$CTL" resume'), nightly.index("rearm_start"))
+        self.assertIn('flock -w "$NIGHTLY_LOCK_WAIT" 9', nightly)
+        self.assertNotIn("flock -n 9", nightly)
+        deploy = (REPO / "ops/staging/forge-deploy.sh").read_text()
+        self.assertNotIn("space-check --preverify ", deploy)
+        self.assertEqual(deploy.count("space-check --preverify-if-needed ||"), 2)
+        self.assertIn("flock -w 900 9 ||", deploy)
+        self.assertNotIn("flock -n 9", deploy)
+        start = SOURCE[SOURCE.index("rearm_start() {"):]
+        start = start[:start.index("\n}\n")]
+        self.assertIn("5>&- 6>&- 7>&- 8>&- 9>&-", start, "the setsid fallback holds no caller lock")
+        self.assertIn('--unit="$REARM_UNIT"', start)
+        provision = (REPO / "ops/staging/provision.sh").read_text()
+        self.assertIn("47 * * * * root /usr/local/sbin/vasey-staging-backup rearm >> /var/log/vasey-staging/rearm.log 2>&1", provision)
+        self.assertIn("/var/log/vasey-staging/rearm.log", provision[provision.index("/etc/logrotate.d/vasey-staging"):])
+
 
 if __name__ == "__main__":
     unittest.main()

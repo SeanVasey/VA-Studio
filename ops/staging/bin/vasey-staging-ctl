@@ -425,6 +425,15 @@ start_ship_pending() {
   return 0
 }
 
+# The snapshot just taken consumed the backup re-verification token; renewing it (a re-hash of the new set with the site up)
+# lets the next deploy skip that re-hash inside Forge's time limit. Detached like the shipment; it waits for the deploy lock.
+start_rearm() {
+  [ -x "$BACKUP_BIN" ] || { echo "vasey-staging-ctl: WARNING: missing $BACKUP_BIN; the re-verification token was not renewed" >&2; return 0; }
+  timeout -k 10 90 "$BACKUP_BIN" rearm-start 8>&- 7<&- </dev/null \
+    || echo "vasey-staging-ctl: WARNING: could not start the re-verification token renewal; the next deploy re-hashes itself" >&2
+  return 0
+}
+
 cmd_ship_pending() {
   [ -x "$BACKUP_BIN" ] || die "missing $BACKUP_BIN"
   "$BACKUP_BIN" ship-pending-start 8>&- 7<&-
@@ -707,6 +716,7 @@ cmd_activate() {
   cmd_resume
   operation_finish
   start_ship_pending   # site healthy and the recovery marker cleared; the off-host copy of the snapshot just taken ships now
+  start_rearm          # likewise after the resume: the next deploy's re-hash, done now with the site up
 }
 
 # An isolated build's runtime directories stay root-held while the previous release serves: the live application must not
@@ -735,6 +745,7 @@ cmd_refresh() {
   cmd_resume
   operation_finish
   start_ship_pending   # as in activate: after the resume, never part of the downtime, never fatal
+  start_rearm
 }
 
 public_quiesce() {
@@ -811,7 +822,8 @@ case "${1:-}" in
   prepare) [ "$#" = 4 ] || die "prepare requires SHA, private environment and evidence directory" ;;
   activate|refresh) [ "$#" = 3 ] || die "activation action requires SHA and evidence/environment" ;;
   quiesce|resume|snapshot|prune|status|backup-prune|ship-pending) [ "$#" = 1 ] || die "action does not accept extra arguments" ;;
-  space-check) [ "$#" = 1 ] || { [ "$#" = 2 ] && [ "$2" = --preverify ]; } || die "space-check accepts only --preverify" ;;
+  space-check) [ "$#" = 1 ] || { [ "$#" = 2 ] && { [ "$2" = --preverify ] || [ "$2" = --preverify-if-needed ]; }; } \
+    || die "space-check accepts only --preverify or --preverify-if-needed" ;;
 esac
 case "${1:-}" in
   allocate) cmd_allocate "${2:-}" ;;

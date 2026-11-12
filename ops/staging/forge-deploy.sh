@@ -96,7 +96,9 @@ freeze_runtime_environment() {
 }
 
 exec 9>>"$ROOT/.deploy.lock"
-flock -n 9 || die "another deploy or the nightly backup is running"
+# The nightly backup or a backup token renewal (about 4 minutes, started after each deploy and hourly) may hold the lock: wait
+# for it, with the site up and nothing touched, rather than refuse. Another deploy holding it this long is refused.
+flock -w 900 9 || die "another deploy or the nightly backup held the deploy lock for 15 minutes; nothing was touched"
 
 on_exit() {
   local code=$?
@@ -198,7 +200,7 @@ if [ -e "$REL" ]; then
     runtime_gate "$REL" "$RUNTIME_ENV"
     [ "$(envget APP_KEY)" = "$(grep '^APP_KEY=' "$REL/.env" | cut -d= -f2- | sed -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'$/\1/")" ] \
       || die "APP_KEY changes require a separately reviewed key-custody/rotation procedure"
-    "${CTL[@]}" space-check --preverify || die "refused before the quiesce by the backup space/re-verification gate (reason above); nothing was stopped (docs/ops/staging-runbook.md sections 8 and 9)"
+    "${CTL[@]}" space-check --preverify-if-needed || die "refused before the quiesce by the backup space/re-verification gate (reason above); nothing was stopped (docs/ops/staging-runbook.md sections 8 and 9)"
     ACTIVATION_STARTED=1
     "${CTL[@]}" refresh "$SHA" "$RUNTIME_ENV"
     cmp -s "$RUNTIME_ENV" "$REL/.env" || die ".env not installed"
@@ -222,7 +224,10 @@ fi
 # counts only what the snapshot will really copy; a plain check here counted a full copy and refused a deploy that fit
 # (2026-11-11: 91.3 GB asked, 88.7 GB free, 45.9 GB really needed). Nothing is stopped, built or allocated before it, and the
 # re-hash leaves a token that ctl prepare reuses instead of hashing again. Its failure is reported as "before the quiesce".
-"${CTL[@]}" space-check --preverify || die "refused before the quiesce by the backup space/re-verification gate (reason above); nothing was stopped (docs/ops/staging-runbook.md sections 8 and 9)"
+# The re-hash is skipped when a token younger than five hours already names that set: the previous deploy's (or the nightly
+# run's) token renewal re-hashed it with the site up, so the deploy fits inside Forge's 10-minute output limit (2026-11-12:
+# re-hash ~4, build ~5, pause ~2.5 minutes). The snapshot still refuses to share any inode changed since that re-hash.
+"${CTL[@]}" space-check --preverify-if-needed || die "refused before the quiesce by the backup space/re-verification gate (reason above); nothing was stopped (docs/ops/staging-runbook.md sections 8 and 9)"
 # ctl decides the build mode from the same staging.conf; this only chooses the step and failure messages. With the build
 # account nothing is stopped until activate, so the pause is snapshot + restore proof + migrate/caches + switch + resume.
 if [ -n "${VASEY_BUILD_USER:-}" ] && getent passwd "$VASEY_BUILD_USER" >/dev/null; then

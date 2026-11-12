@@ -589,7 +589,7 @@ that are new or changed since the newest verified set and hard-links the unchang
   changed within two seconds of the earlier snapshot's start is never trusted, and a file that changes while it is copied
   refuses the snapshot.
 - **A file is shared only with the set this operation re-hashed in full, and only while it is still that inode.** Before every
-  quiesce (the deploy's own early `ctl space-check --preverify`, which `ctl prepare` and `ctl refresh` reuse; the nightly run),
+  quiesce (the deploy's own early `ctl space-check --preverify-if-needed`, which `ctl prepare` and `ctl refresh` reuse; the nightly run),
   with the site still up, the helper re-hashes every file of the newest tree set that holds a restore proof (3m17s for 37.9 GB
   measured on staging on 2026-11-11). Success
   writes a token, `backups/.link-token`, outside every set: the identity of each verified inode, ctime included. The next snapshot
@@ -598,6 +598,24 @@ that are new or changed since the newest verified set and hard-links the unchang
   A token older than 6 hours (an aborted deploy leaves one) is ignored everywhere: `ctl prepare` and `ctl refresh` re-hash
   instead of reusing it, and the space check names "sharing with the re-verified set" only when the estimate actually shares
   bytes; otherwise it says the token was refused, or was accepted with no file unchanged since, and counts the whole store.
+- **Token renewal (`vasey-staging-backup rearm`, since 2026-11-12).** A deploy re-hashed about 4 minutes, built about 5 and paused
+  about 2.5: 11 to 12 minutes, past Forge's 10-minute output limit, so Forge marked deploys that completed as failed. Now the
+  deploy's early gate re-hashes only when no token younger than 5 hours names the newest proven set. `ctl activate`, `ctl
+  refresh` and the nightly run start a detached renewal after their resume (systemd unit `vasey-staging-rearm`, log
+  `/var/log/vasey-staging/rearm.log`): it waits for the deploy lock, re-hashes the set just taken with the site up and writes a
+  fresh token. Cron runs it hourly at :47 and it renews a token older than 3 hours, so a deploy normally finds one. It takes the
+  deploy lock and then the helper's action lock, so it never deletes a token that a deploy, the nightly run or a manual `ctl`
+  operation is about to consume; other `ctl` calls, `status` included, wait for a running renewal (about 4 minutes).
+  Not covered: a deploy pushed within about 4 minutes of the previous one, or during an hourly renewal, waits for the renewal
+  (the deploy lock, up to 15 minutes, nothing touched) and can still pass Forge's 10 minutes; read the host log
+  (`$EVIDENCE/forge-deploy.log`, or the last-deploy-log recipe) before acting on Forge's label, as before.
+  A renewal that finds a changed backup file withdraws proofs exactly like the deploy gate (exit 1 in `rearm.log`) and records
+  `backups/.rearm-finding`: the next deploy's gate refuses once on it before anything stops (corruption refusal below) and clears
+  it, so the following deploy proceeds, as a finding of the gate's own re-hash always did. Trade-off accepted: a shared inode is
+  trusted on a re-hash up to 5 hours old (it was minutes) inside the unchanged 6-hour token limit; any write to it moves its
+  ctime and makes the snapshot copy it, but silent media corruption since the re-hash would go unnoticed until the next
+  restore-check. Renewals re-read the newest set (about 38 GB) every 3 to 4 hours even without deploys, at Nice 10.
+  The nightly run now also waits (up to 30 minutes) for a deploy or renewal instead of skipping the night.
   The space check judges the token against 5 hours, not 6: it runs before the build and the pause, and the snapshot judges the
   token again afterwards, so a token the estimate trusted must still be fresh then. A token between 5 and 6 hours old is
   re-hashed by `ctl prepare` and `ctl refresh` (`--preverify-if-needed`), and a plain space check counts the whole store and
@@ -660,7 +678,7 @@ that are new or changed since the newest verified set and hard-links the unchang
 What changed for an operator:
 - The deploy (and the nightly run) re-hashes the previous set **before** it stops the site, then the maintenance window holds
   only the dump, the copy of new files, their re-hash and the database proof. The re-hash runs in the deploy's early
-  `ctl space-check --preverify`, so it holds the helper's action lock: other `vasey-staging-ctl` calls, `status` included, wait
+  `ctl space-check --preverify-if-needed` (when no fresh token exists; see token renewal above), so it holds the helper's action lock: other `vasey-staging-ctl` calls, `status` included, wait
   for it. Measured on staging, 2026-11-11 (the second deploy after re-provisioning): re-hash with the site up 3m17s; snapshot 4 s
   (copied 10 bytes / 1 file, linked 37,902,871,534 bytes / 1,048 files); restore proof 47 s; backup part of the window about 58 s;
   the whole maintenance window about 5.5 minutes, of which about 4m07s is the build that `ctl prepare` runs inside its quiesce;
@@ -738,7 +756,7 @@ What changed for an operator:
 - The **first** snapshot after re-provisioning has nothing to share and copies the whole store inside the window. Measured on
   staging, 2026-11-11: 37.9 GB / 1,049 files copied in 4m52s, proof 4m33s, maintenance about 9.8 minutes. Let the 03:17 nightly
   run take it, or deploy at a quiet time; every later snapshot shares.
-- The early free-space gate is the authoritative one: `forge-deploy.sh` runs `ctl space-check --preverify` before anything is
+- The early free-space gate is the authoritative one: `forge-deploy.sh` runs `ctl space-check --preverify-if-needed` before anything is
   stopped, so the estimate counts only what the snapshot will really copy. (Until 2026-11-11 it ran a plain check that counted a
   full copy: it asked for 91,344,719,852 bytes with 88,657,883,136 free and refused a deploy that needed 45,861,274,012.) Its
   refusal names the estimate it used ("estimate: sharing with the re-verified set ..." or "no re-verified set to share with: the
@@ -795,7 +813,7 @@ once and watch `ship-pending.log`; the failed row on the dashboard is replaced b
 **Disk space and retention.** Every deploy takes a snapshot (database dump + the private files that changed since the newest
 verified set + `.env`; the first one after re-provisioning copies the whole store, about 14 GB on 2026-11-10 and 38 GB on
 2026-11-11), and the restore proof needs a disposable datadir (about the database's size) under `/var/lib/mysql-restore-check`.
-Before it stops anything, `forge-deploy.sh` runs `vasey-staging-ctl space-check --preverify` (the backup helper's `space-check`): it
+Before it stops anything, `forge-deploy.sh` runs `vasey-staging-ctl space-check --preverify-if-needed` (the backup helper's `space-check`): it
 estimates the need from the bytes the snapshot will copy (`private-snapshot.py estimate`; the whole store when no set can be
 shared), the schema's data and index bytes (else the newest set's `database.sql`), the encrypted copy of the whole set that age/rclone shipping stages in the backup directory after the deploy (counted as the larger
 of that copy and the restore proof's scratch when they share a filesystem, because they never coexist; plus one more set while an

@@ -574,6 +574,8 @@ cat > /etc/cron.d/vasey-staging-backup <<'EOF'
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 17 3 * * * root /usr/local/sbin/vasey-staging-backup nightly >> /var/log/vasey-staging/backup.log 2>&1
+# Hourly: renew the backup re-verification token when it is older than three hours, so a deploy skips its own re-hash.
+47 * * * * root /usr/local/sbin/vasey-staging-backup rearm >> /var/log/vasey-staging/rearm.log 2>&1
 EOF
 chmod 0644 /etc/cron.d/vasey-staging-backup
 
@@ -588,7 +590,7 @@ EOF
 chmod 0644 /etc/cron.d/vasey-staging-scheduler-watch
 
 cat > /etc/logrotate.d/vasey-staging <<'EOF'
-/var/log/php8.4-fpm-vasey-*.log /var/log/vasey-staging/backup.log /var/log/vasey-staging/ship-pending.log /var/log/vasey-staging/scheduler-watch.log /var/log/nginx/vasey-staging-*.log {
+/var/log/php8.4-fpm-vasey-*.log /var/log/vasey-staging/backup.log /var/log/vasey-staging/ship-pending.log /var/log/vasey-staging/rearm.log /var/log/vasey-staging/scheduler-watch.log /var/log/nginx/vasey-staging-*.log {
     weekly
     rotate 8
     missingok
@@ -665,7 +667,7 @@ provision: done for $HOST
   build account       $BUILD_USER (no login, no sudo): builds each release before the pause, in $ROOT/build and releases/
   PHP-FPM pools       vasey-staging (/run/php/vasey-staging.sock), vasey-paid-delivery (/run/php/vasey-paid-delivery.sock)
   supervisor          vasey-staging:{media,payments,contracts,default,scheduler} (start on first deploy)
-  helpers             /usr/local/sbin/vasey-staging-ctl (sudo for $APP_USER), /usr/local/sbin/vasey-staging-backup (cron 03:17 UTC)
+  helpers             /usr/local/sbin/vasey-staging-ctl (sudo for $APP_USER), /usr/local/sbin/vasey-staging-backup (cron 03:17 UTC nightly, :47 hourly token renewal)
   MySQL               schema $DB_NAME; DB_HOST=127.0.0.1 DB_USERNAME=vasey_app
   secrets (root only) $SECRETS/db-app.env (paste DB_PASSWORD into Forge > Environment), $BACKUP_CNF, $HTPASSWD, /etc/vasey-staging/probe.netrc
   nginx http helpers  $NGINX_HTTP_CONF (installed, nginx -t passed, reloaded)
