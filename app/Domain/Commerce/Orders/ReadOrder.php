@@ -2,6 +2,7 @@
 
 namespace App\Domain\Commerce\Orders;
 
+use App\Domain\Commerce\BuyerCancel\ReadBuyerCancellation;
 use App\Domain\Commerce\Finalization\ReadFinalization;
 use App\Domain\Commerce\Finalization\ReadPaymentState;
 use App\Domain\Commerce\Models\InventoryReservation;
@@ -152,6 +153,10 @@ final class ReadOrder
             $unsent = ReadUnsentRelease::for($order);
             if ($unsent) {
                 app(ReadUnsentRelease::class)->verify($unsent, $order);
+            }
+            $cancellation = ReadBuyerCancellation::for($order);
+            if ($cancellation) {
+                app(ReadBuyerCancellation::class)->verify($cancellation, $order);
             }
             $finalization = OrderFinalization::where('order_id', $order->id)->first();
             if ($finalization) {

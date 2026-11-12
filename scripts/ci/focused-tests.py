@@ -159,6 +159,7 @@ PHP_TARGETS = {
         "tests/Feature/TestUnpaidReleaseTest.php", "tests/Feature/TestUnpaidReleaseMigrationTest.php",
         "tests/Feature/TestUnpaidReleaseConcurrencyTest.php", "tests/Feature/TestUnpaidOrderResourceTest.php",
         "tests/Feature/TestUnsentOrderReleaseTest.php", "tests/Feature/TestUnsentOrderReleaseConcurrencyTest.php",
+        "tests/Feature/TestBuyerOrderCancellationTest.php", "tests/Feature/TestBuyerOrderCancellationConcurrencyTest.php",
         "tests/Feature/TestPaymentFinancialObservationTest.php", "tests/Feature/TestPaymentExceptionOperationsTest.php",
         "tests/Feature/TestPaymentExceptionOperationsConcurrencyTest.php",
         "tests/Feature/TestPaymentProcessingTest.php", "tests/Feature/TestOrderFinalizationTest.php",

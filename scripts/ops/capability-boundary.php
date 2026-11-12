@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Vasey\Ops;
 
+use App\Domain\Commerce\BuyerCancel\BuyerCancelPolicy;
 use App\Domain\Commerce\Inventory\ExclusiveSelectionPolicy;
 use App\Domain\Commerce\UnpaidRelease\UnpaidReleasePolicy;
 use Illuminate\Support\Arr;
@@ -53,6 +54,9 @@ final class CapabilityBoundary
     public const STAGING_OPTIONAL_FLAGS = [
         'VASEY_TEST_UNPAID_RELEASE_ENABLED' => ['config' => 'unpaid-release.enabled',
             'policy' => UnpaidReleasePolicy::class],
+        // 2026-11-12: the buyer's cancellation of a never-sent test order, under the same rule (BuyerCancelPolicy::CONTRACT).
+        'VASEY_TEST_BUYER_CANCEL_ENABLED' => ['config' => 'buyer-cancel.enabled',
+            'policy' => BuyerCancelPolicy::class],
     ];
 
     /**
@@ -96,6 +100,8 @@ final class CapabilityBoundary
         'VASEY_TEST_SERVICE_INVOICING_ENABLED' => 'services-invoicing.test_enabled',
         // Unpaid release is optional on staging (STAGING_OPTIONAL_FLAGS) and has no production path; production holds it false.
         'VASEY_TEST_UNPAID_RELEASE_ENABLED' => 'unpaid-release.enabled',
+        // Buyer cancellation of a never-sent test order is optional on staging (STAGING_OPTIONAL_FLAGS); production holds it false.
+        'VASEY_TEST_BUYER_CANCEL_ENABLED' => 'buyer-cancel.enabled',
         // BL-71: the BeatStars catalog import is a staging console command that refuses production in code; the hold keeps the flag
         // from ever being set on the production host, as the staging deploy gate cannot (it must be true for the import run).
         'VASEY_STAGING_BEATSTARS_IMPORT_ENABLED' => 'staging-beatstars-import.enabled',

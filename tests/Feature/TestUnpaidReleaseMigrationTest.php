@@ -23,6 +23,7 @@ class TestUnpaidReleaseMigrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        (require database_path('migrations/2026_11_12_001000_test_buyer_order_cancellations.php'))->down();
         (require database_path('migrations/2026_11_11_001000_test_unsent_order_releases.php'))->down();
         (require database_path('migrations/2026_10_06_000047_test_refund_resolutions.php'))->down();
     }

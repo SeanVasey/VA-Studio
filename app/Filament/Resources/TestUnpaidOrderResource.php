@@ -35,7 +35,8 @@ final class TestUnpaidOrderResource extends ReadOnlyCommerceResource
                 TextColumn::make('public_id')->label('Order')->searchable()->copyable(),
                 TextColumn::make('created_at')->label('Prepared (UTC)')->dateTime('Y-m-d H:i:s', 'UTC')->sortable(),
                 TextColumn::make('checkout_started')->label('Checkout')->badge()
-                    ->formatStateUsing(fn ($state): string => (bool) $state ? 'Checkout started' : 'Never sent to Stripe'),
+                    ->formatStateUsing(fn ($state, Order $record): string => (bool) $state ? 'Checkout started'
+                        : ((bool) $record->getAttribute('buyer_cancelled') ? 'Cancelled by buyer' : 'Never sent to Stripe')),
             ])->defaultSort('orders.id', 'desc')->paginated([10, 25, 50])->defaultPaginationPageOption(25)
             ->recordUrl(null)->recordActions([
                 Action::make('releaseHistory')->label('Release history')->modalHeading('Test unpaid release history')
@@ -111,6 +112,7 @@ final class TestUnpaidOrderResource extends ReadOnlyCommerceResource
                         }
                         [$title, $body] = match ($status) {
                             'checkout_open' => ['Checkout window is still open', 'The buyer can still start checkout for this order. Retry after the window closes. No release is confirmed by this response.'],
+                            'buyer_cancelled' => ['Cancelled by the buyer', 'The buyer cancelled this order before it was sent to Stripe. Its pending inventory and promotion are already free; nothing was released by this request.'],
                             'stale' => ['Release review is out of date', 'Checkout may have started since this review. Close this dialog and review the order again. No release is confirmed by this response.'],
                             'payment_recorded' => ['Payment is already recorded', 'This check cannot authorize release. Inspect current release history and the retained payment workflow.'],
                             'busy' => ['Release check is in progress', 'Retry this same request or inspect release history. No release is confirmed by this response.'],

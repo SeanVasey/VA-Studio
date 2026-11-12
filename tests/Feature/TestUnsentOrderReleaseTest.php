@@ -488,16 +488,21 @@ class TestUnsentOrderReleaseTest extends TestCase
         $resources = fn () => DB::table('sqlite_master')->whereIn('name', ['inventory_reservations_transition', 'promotion_uses_guard_update'])
             ->orderBy('name')->pluck('sql')->all();
         $installed = DB::getDriverName() === 'sqlite' ? $resources() : null;
+        // The empty buyer cancellation child extends these guards; it is rolled back first and restored last.
+        $cancellations = require database_path('migrations/2026_11_12_001000_test_buyer_order_cancellations.php');
+        $cancellations->down();
         $migration->down();
         $this->assertFalse(DB::getSchemaBuilder()->hasTable('test_unsent_order_releases'));
         (require database_path('migrations/2026_10_06_000047_test_refund_resolutions.php'))->down();
         (require database_path('migrations/2026_10_06_000047_test_refund_resolutions.php'))->up();
         $migration->up();
+        $cancellations->up();
         if ($installed !== null) {
             $this->assertSame($installed, $resources());
         }
         $f = $this->abandoned();
         $this->assertSame('released', app(ReleaseTestOrderResources::class)->release($f['order']->public_id, $f['admin'], (string) Str::uuid(), 0)['status']);
+        $cancellations->down();
         try {
             $migration->down();
             $this->fail('Retained unsent release history was dropped.');

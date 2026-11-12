@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Domain\Commerce\BuyerCancel\BuyerCancelPolicy;
 use App\Domain\Commerce\UnpaidRelease\UnpaidReleasePolicy;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -130,7 +131,7 @@ class StagingRuntimeValidatorTest extends TestCase
     {
         $this->assertSame(self::STAGED_FLAGS, array_keys(CapabilityBoundary::stagedFlags()));
         $this->assertSame(12, count(CapabilityBoundary::CAPABILITY_FLAGS));
-        $this->assertSame(['VASEY_TEST_UNPAID_RELEASE_ENABLED'], array_keys(CapabilityBoundary::STAGING_OPTIONAL_FLAGS));
+        $this->assertSame(['VASEY_TEST_UNPAID_RELEASE_ENABLED', 'VASEY_TEST_BUYER_CANCEL_ENABLED'], array_keys(CapabilityBoundary::STAGING_OPTIONAL_FLAGS));
         foreach (self::UNGATED_FLAGS as $flag) {
             $this->assertArrayHasKey($flag, CapabilityBoundary::CAPABILITY_FLAGS);
         }
@@ -334,7 +335,8 @@ class StagingRuntimeValidatorTest extends TestCase
             $reader = static fn (string $key): mixed => $key === $flag['config'] ? $value : false;
             $this->assertSame($value === true ? [] : [$environmentKey], CapabilityBoundary::optionalFlagsRefused($reader, $admits), $environmentKey);
             $this->assertSame([$environmentKey], CapabilityBoundary::optionalFlagsRefused($reader, $refuses), $environmentKey);
-            $this->assertSame(UnpaidReleasePolicy::class, $flag['policy']);
+            $this->assertSame(['VASEY_TEST_UNPAID_RELEASE_ENABLED' => UnpaidReleasePolicy::class,
+                'VASEY_TEST_BUYER_CANCEL_ENABLED' => BuyerCancelPolicy::class][$environmentKey], $flag['policy']);
         }
         $this->assertSame([], CapabilityBoundary::optionalFlagsRefused(static fn (string $key): bool => false, $refuses));
     }

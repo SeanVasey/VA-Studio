@@ -2,6 +2,7 @@
 
 namespace App\Domain\Commerce\Orders;
 
+use App\Domain\Commerce\BuyerCancel\ReadBuyerCancellation;
 use App\Domain\Commerce\Finalization\FinalizationEvidence;
 use App\Domain\Commerce\Models\InventoryReservation;
 use App\Domain\Commerce\Models\Order;
@@ -44,6 +45,10 @@ final class OrderEvidence
         if ($unsent) {
             app(ReadUnsentRelease::class)->resourceDisposition($unsent, $order, $attempt, $reservation, $use);
         }
+        $cancellation = ReadBuyerCancellation::for($order);
+        if ($cancellation) {
+            app(ReadBuyerCancellation::class)->resourceDisposition($cancellation, $order, $attempt, $reservation, $use);
+        }
         $finalization = OrderFinalization::where('order_id', $order->id)->first();
         if ($finalization) {
             app(FinalizationEvidence::class)->resourceDisposition($finalization, $order, $attempt, $reservation, $use);
@@ -53,7 +58,7 @@ final class OrderEvidence
         // Only this historical path can reconstruct a proved consumed or released resource as its original pending state.
         $originalReservation = clone $reservation;
         $originalUse = $use === null ? null : clone $use;
-        if ($release || $unsent || $finalization?->outcome === 'paid'
+        if ($release || $unsent || $cancellation || $finalization?->outcome === 'paid'
             || ($finalization && TestRefundResolution::where('order_finalization_id', $finalization->id)->exists())) {
             $originalReservation->state = 'pending';
             if ($originalUse) {
