@@ -4,6 +4,65 @@ Entry point for the next session (Claude's usage resets Saturday). It supersedes
 current state. That checkpoint's archive, bundle and recorded results remain history. `AGENTS.md` governs. Sean's instructions
 override older documents.
 
+## Checkpoint 2026-11-12
+
+Added 2026-11-12 by the Claude Code harness. It is the current state; the sections below describe 2026-11-05 and are kept as history.
+Sources: `git log origin/main`, the staging host's deploy logs, and the harness's running notes for 2026-11-11. Measurements marked
+"measured" were taken on the staging host by the operator; nothing here is acceptance.
+
+**Main** is `9a9f7dc8` (PR #342). **Staging** serves `ead7368d` (Forge deployment 82759032, live since 2026-11-12 00:02 UTC) and so includes PRs #322 to #340. It does not include #342 (the registry classification of the sound-kit purchase columns). Nothing is live outside staging; no live keys, payments, DNS or customer data are involved.
+
+### Merged since 2026-11-10 (squash SHA on main)
+
+| PR | SHA | What |
+| --- | --- | --- |
+| #322 | `0307dd72` | Per-track and store-default control of the seller tag on public previews |
+| #324 | `67b4c020` | Public listing no longer hashes private deliverables (pages were 10 to 50 s) |
+| #325 | `23f9680c` | Public renders read each eligibility row once per request (about 1.1 to 1.4 s warm, measured) |
+| #326 | `076cbf0f` | Off-host backup shipping after the site resumes |
+| #328 | `7b7d1b2f` | Sound-kit Stripe-test purchase, grant, contract and delivery (BL-13) |
+| #327, #330 | `089ccdcf`, `9e29270d` | Checkout return page refreshes itself; stale-closure fix |
+| #329, #332 | `c7307262`, `6233f462` | Migration roundtrip test fix; CI ops-kit step no longer needs Launchpad |
+| #333 | `81e9fa61` | Test unpaid release admitted as an optional staging capability |
+| #334 | `b5a4cea4` | Staff view of kit test orders, scheduled kit contract issuance, fair grant sweep |
+| #331, #336 | `c9a114cf`, `7dac3969` | Staging alpha test guide; follow-ups (kit order page refresh every 10 s for up to 15 min) |
+| #335 | `b18ca08e` | Backup sets share unchanged private files: deploy downtime about 22 min to about 5 min |
+| #338 | `101c10e8` | Browser specs collected no tests (bare JSON import, broken since #268); `accessibility-browser` suite |
+| #337 | `d61d90de` | Early backup space gate counts only what will be copied |
+| #340 | `f45755ab` | Accessibility defects and stale browser helpers; nine `browser-*` suites |
+| #339 | `ead7368d` | Staff page to enable and block delivery for track test orders |
+| #342 | `9a9f7dc8` | Sound-kit purchase columns classified in the media reference registry |
+
+### Live on staging (verified)
+
+- **Track purchase**, order `84857de0`, 2026-11-12: payment, grant and contract happen by themselves; the order reads "Contract issued, activation pending" for about 2 to 3 minutes, then "Ready, delivery not enabled"; staff enable delivery (admin **Test commerce > Test track orders**, or the console command); the buyer then downloaded the contract PDF and the MP3. Enabling stays a deliberate per-order step (D-19). The Filament page was not driven in a browser with a TOTP sign-in.
+- **Kit purchase**, 2026-11-11: grant within seconds; the schedule `vasey:issue-test-kit-contracts` issues the contract within about 10 minutes; delivery is enabled per order from **Test kit orders**. Two kit orders (`776b948f`, `eb82325a`) are waiting with delivery not enabled.
+- **Unpaid release** is on: three abandoned orders were released and one of those tracks was bought again (`900b628f`). Limits: a late-paid order cannot be released, and an order never sent to Stripe cannot be released until #341 is merged and deployed.
+- **Exclusive**: 32 active offers whose license template and offer snapshot are type exclusive. A test purchase permanently locks that track's other licenses and there is no release path. None has been bought.
+- **Stripe drills**: drill 1 (declined card) passed (order `e44f06a0`, later released). Drills 3 and 4 have not been run. The expired-session path was exercised by the three released orders.
+- **Deploy downtime**, measured on the 2026-11-12 deploy: 4 min 45 s of maintenance, 8 min 01 s for the whole deploy; the backup part inside the window about 1 minute; about 3 minutes of re-hashing run before the site is paused; the rest is the build, which runs inside the pause because the candidate is built as the application user (Codex finding 4226283468 on PR #63). Before #335 each deploy took about 22 minutes of downtime.
+- **Browser specs**: collection was broken from #268 until #338. The first complete results are in [`browser-focused-20261111.md`](../../verification/browser-focused-20261111.md); a second round (`browser-focused-20261112.md`) arrives with PR #343.
+
+### Open
+
+- **#341**: staff release of a test order never sent to Stripe (new migration with triggers; independent review was running at the last record; needs main merged before it can merge). Not live.
+- **#343**: admin upload buttons (kit and media upload Finish, Cancel and Pause were swallowed by Filament 5.11's `aria-disabled` guard) and dropdown fixes in browser specs, plus the second browser-results note. Draft; not live.
+- **Foundation CI** has not run on main since 2026-10-10 (run 38077166247 on `0f23e63f`). Preflight runs static checks, audits, frontend unit tests, the build and the ops kit tests; it runs no PHPUnit. PHP tests run locally per change and in the manual final verification.
+- Forced-colors contrast in the licence dialog (browser run 2026-11-11) is undecided: real defect or axe emulation artefact.
+- Reviewer P3 findings deferred under the freeze-and-batch rule (from #322, #324 to #326, #328, #333, #334, #335 and #337) are not yet batched into a PR.
+
+### Next, in order
+
+1. Merge #341 (after review and main merged) and #343; re-provision and deploy staging once for both; re-run the five browser suites that were red.
+2. NEW-04: pass the buyer email to Stripe Checkout (`customer_email`) and stop re-reconciling an already-verified order on each status click. NEW-03: a reversible Exclusive rehearsal and an operator-validator that agrees with the deploy gate.
+3. BL-27: Stripe drills 3 and 4 (and drill 2 with an evidence packet) on staging; do not run drill 4 during Sean's test window.
+4. BL-01: a full local sweep on a quiet machine before the one Foundation CI run; then BL-14 (held paid orders), BL-11 (resumable downloads for the production chains), BL-21 (TypeScript lint gate), NEW-05 (sound-kit production parity), NEW-06 (dependency PRs).
+5. Build before the maintenance pause needs a dedicated build account (deferred; the pause is about 5 minutes).
+
+### Waiting on Sean
+
+Regenerate the Backblaze B2 master key that was pasted in chat; an off-host restore drill with his age key; whether a Stripe-test Exclusive may be bought on staging; the official logo SVG and icon source; the postal city and ZIP for the legal pages; counsel review of the Exclusive clauses before any live exclusive sale; mail, tax, payout and BeatStars export inputs. Standing boundaries are unchanged: no live payments, production deploy, DNS or customer imports without his explicit authorization.
+
 ## Where things stand
 
 - **Main:** `f766e354` (PR #191 merged 2026-11-05). B is done. Publication order continues **C → D → E → F**.

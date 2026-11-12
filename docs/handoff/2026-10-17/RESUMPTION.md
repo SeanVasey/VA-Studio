@@ -1,5 +1,7 @@
 # Resumption after the stopped Codex session — 2026-10-17
 
+> **2026-11-12:** the lane table below is history. The current state, what is live on staging, what is open and the next items are in the [2026-11-12 checkpoint](../2026-11-05/HANDOFF.md#checkpoint-2026-11-12). Main is `9a9f7dc8`; staging serves `ead7368d`; open PRs are #341 and #343 (both not live).
+
 > **2026-10-29:** Sean cancelled the Codex handoff; the Claude harness resumed the lead. The [handoff note](../2026-10-26/CODEX-HANDOFF.md) is history. The lane rows below are current.
 >
 > **2026-10-26:** the Claude harness handed the remaining work to Codex at main `dd587603` (PR #174). Start at [`docs/handoff/2026-10-26/CODEX-HANDOFF.md`](../2026-10-26/CODEX-HANDOFF.md); the lane rows below are current through that checkpoint.
