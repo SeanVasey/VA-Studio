@@ -256,4 +256,33 @@ describe('kit order page automatic refresh', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Test downloads open once delivery is enabled');
     expect(screen.queryByRole('alert')).toBeNull();
   });
+
+  it('drops a slow reconcile response that arrives after a newer poll result, keeping the download buttons', async () => {
+    vi.useFakeTimers();
+    let pollDone: (value: Response) => void = () => undefined;
+    let reconcileDone: (value: Response) => void = () => undefined;
+    const reply = (body: unknown) => new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    vi.spyOn(globalThis, 'fetch')
+      .mockImplementationOnce(() => new Promise<Response>(resolve => { pollDone = resolve; }))
+      .mockImplementationOnce(() => new Promise<Response>(resolve => { reconcileDone = resolve; }));
+    render(<SoundKitOrder siteContent={defaultSiteContent} order={at('paid')} />);
+    await flush(10_000); // poll starts and stays in flight
+    fireEvent.click(screen.getByRole('button', { name: 'Check payment status' })); // reconcile starts after the poll
+    await flush(0);
+    await act(async () => { pollDone(reply({ ...at('downloadable'), deliverables: ['archive', 'contract'] })); await vi.advanceTimersByTimeAsync(0); });
+    expect(screen.getByRole('button', { name: 'Download the kit (ZIP)' })).toBeInTheDocument();
+    await act(async () => { reconcileDone(reply(at('paid'))); await vi.advanceTimersByTimeAsync(0); });
+    expect(screen.getByRole('status')).toHaveTextContent('Each download link is single-use');
+    expect(screen.getByRole('button', { name: 'Download the kit (ZIP)' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Check payment status' })).toBeNull();
+  });
+
+  it('applies a reconcile response when no status read landed meanwhile', async () => {
+    vi.useFakeTimers();
+    vi.spyOn(globalThis, 'fetch').mockImplementationOnce(() => json(at('awaiting_contract')));
+    render(<SoundKitOrder siteContent={defaultSiteContent} order={at('paid')} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Check payment status' }));
+    await flush(0);
+    expect(screen.getByRole('status')).toHaveTextContent('license contract is being prepared');
+  });
 });
