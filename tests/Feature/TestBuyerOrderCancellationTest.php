@@ -16,6 +16,7 @@ use App\Domain\Commerce\Payments\StripePaymentGateway;
 use App\Domain\Commerce\PriceQuote;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\UnpaidRelease\ReleaseTestOrderResources;
+use App\Domain\Customers\CustomerAccessException;
 use App\Filament\Resources\TestUnpaidOrderResource\Pages\ListTestUnpaidOrders;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -32,6 +33,7 @@ use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Tests\Support\CheckoutFixtures;
+use Tests\Support\CustomerFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InventoryFixtures;
 use Tests\Support\LicenseFixtures;
@@ -250,6 +252,51 @@ class TestBuyerOrderCancellationTest extends TestCase
         $this->assertSame($before, PaymentFixtures::unchangedBusinessEvidence());
         $this->assertDatabaseCount('test_buyer_order_cancellations', 0);
         $this->assertSame(0, AuditEvent::where('action', 'commerce.order.buyer_cancelled')->count());
+    }
+
+    // Review of PR #363 (P2): the signed-in customer account path. Ownership is the account's owner key and locked principal,
+    // exactly as for the checkout start; a guest key, another account or a withdrawn account never cancels.
+    public function test_only_the_owning_customer_account_cancels_its_order(): void
+    {
+        $owner = CustomerFixtures::account();
+        $other = CustomerFixtures::account(['email' => 'other-buyer@example.test']);
+        $order = CustomerFixtures::prepared($owner['user'], configured: true);
+        $cancel = app(CancelTestOrder::class);
+        $this->refused('ORDER_NOT_FOUND', 404, fn () => $cancel->cancel($order->public_id, $other['principal']->ownerKey,
+            $other['user'], $other['principal']));
+        $this->refused('ORDER_NOT_FOUND', 404, fn () => $cancel->cancel($order->public_id, InventoryFixtures::OWNER));
+        $this->assertDatabaseCount('test_buyer_order_cancellations', 0);
+
+        $result = $cancel->cancel($order->public_id, $owner['principal']->ownerKey, $owner['user'], $owner['principal']);
+        $this->assertSame(['not_started', 'cancelled'], [$result['status'], $result['buyerCancel']]);
+        $this->assertSame($order->id, TestBuyerOrderCancellation::sole()->order_id);
+        $this->assertSame($owner['user']->id, AuditEvent::where('action', 'commerce.order.buyer_cancelled')->sole()->actor_id);
+    }
+
+    public function test_a_withdrawn_customer_account_cannot_cancel_and_nothing_is_recorded(): void
+    {
+        $owner = CustomerFixtures::account();
+        $order = CustomerFixtures::prepared($owner['user'], configured: true);
+        $reservation = $order->attempt()->sole()->inventory_reservation_id;
+        CustomerFixtures::withdraw($owner);
+        try {
+            app(CancelTestOrder::class)->cancel($order->public_id, $owner['principal']->ownerKey, $owner['user'], $owner['principal']);
+            $this->fail('A withdrawn account cancelled its order.');
+        } catch (CustomerAccessException) {
+        }
+        $this->assertDatabaseCount('test_buyer_order_cancellations', 0);
+        $this->assertDatabaseHas('inventory_reservations', ['id' => $reservation, 'state' => 'pending']);
+        $this->assertSame(0, AuditEvent::where('action', 'commerce.order.buyer_cancelled')->count());
+    }
+
+    // Review of PR #363 (P3): a signed-in staff user browsing as a guest buyer is the attributed actor of the cancellation.
+    public function test_a_staff_actor_is_attributed_on_a_guest_order_cancellation(): void
+    {
+        $f = CheckoutFixtures::prepared();
+        $admin = LicenseFixtures::admin();
+        app(CancelTestOrder::class)->cancel($f['order']->public_id, InventoryFixtures::OWNER, $admin);
+        $this->assertSame($admin->id, AuditEvent::where('action', 'commerce.order.buyer_cancelled')->sole()->actor_id);
+        $this->assertSame($f['order']->id, TestBuyerOrderCancellation::sole()->order_id);
     }
 
     public static function admissions(): array

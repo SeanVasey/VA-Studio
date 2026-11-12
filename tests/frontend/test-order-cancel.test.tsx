@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TestCheckout } from '../../resources/js/components/TestCheckout';
@@ -104,5 +104,47 @@ describe('buyer cancellation of a never-sent test order', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('could not be loaded');
     expect(screen.queryByRole('button', { name: 'Cancel this order' })).not.toBeInTheDocument();
     expect(screen.queryByText(/You cancelled this test order/)).not.toBeInTheDocument();
+  });
+  // Review of PR #363 (Codex P2, Cursor Bugbot): a refused start latched `rejected`, which hid Cancel while the server still
+  // reported buyerCancel available, the very case (a window past its 15 minutes) where cancelling helps most.
+  it.each([['CHECKOUT_EXPIRED', 410], ['CHECKOUT_UNSUPPORTED', 409]] as const)(
+    'still offers cancel after the start is refused with %s, through a reload, and cancels', async (code, httpStatus) => {
+      const user = userEvent.setup();
+      const fetcher = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(json(fixture('available')))
+        .mockResolvedValueOnce(failure(code, httpStatus))
+        .mockResolvedValueOnce(json(fixture('available')))
+        .mockResolvedValueOnce(json(fixture('cancelled')));
+      render(<TestCheckout orderId={orderId} enabled />);
+      await user.click(await screen.findByRole('button', { name: 'Open Stripe test checkout' }));
+      expect(await screen.findByRole('alert')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Open Stripe test checkout' })).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Cancel this order' })).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Check Stripe test checkout status' }));
+      await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(3));
+      await user.click(screen.getByRole('button', { name: 'Cancel this order' }));
+      await user.click(screen.getByRole('button', { name: 'Yes, cancel this order' }));
+      expect(await screen.findByText(/You cancelled this test order/)).toBeInTheDocument();
+      expect(posts(fetcher).map(([url]) => String(url))).toEqual([
+        `/orders/${orderId}/checkout`, `/orders/${orderId}/cancel`]);
+    });
+
+  it('sends one cancel while a cancel is in flight, however often it is confirmed', async () => {
+    const user = userEvent.setup();
+    let settle: (response: Response) => void = () => undefined;
+    const fetcher = vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(json(fixture('available')))
+      .mockImplementationOnce(() => new Promise<Response>(resolve => { settle = resolve; }));
+    render(<TestCheckout orderId={orderId} enabled />);
+    await user.click(await screen.findByRole('button', { name: 'Cancel this order' }));
+    const confirm = screen.getByRole('button', { name: 'Yes, cancel this order' });
+    // Two clicks in one act reach the handler before React re-renders the button disabled, so this exercises the
+    // request guard itself rather than the disabled attribute.
+    act(() => { confirm.click(); confirm.click(); });
+    await waitFor(() => expect(confirm).toBeDisabled());
+    expect(posts(fetcher)).toHaveLength(1);
+    settle(json(fixture('cancelled')));
+    expect(await screen.findByText(/You cancelled this test order/)).toBeInTheDocument();
+    expect(posts(fetcher)).toHaveLength(1);
   });
 });

@@ -217,7 +217,9 @@ function Checkout({ orderId, enabled = false, expectedTotalMinor, retainedProgre
   const link = !verified && status?.status === 'open' && status.url && !busy && !message && !uncertain && !rejected && !expired && Date.parse(status.expiresAt!) > Date.now() ? status.url : null;
   const retry = !verified && !rejected && (uncertain === 'create' || status?.status === 'pending');
   const cancelled = !verified && status?.buyerCancel === 'cancelled';
-  const cancellable = !verified && !cancelled && status?.status === 'not_started' && status.buyerCancel === 'available' && !uncertain && !rejected;
+  // A refused start (expired window, unsupported order) still leaves a never-sent order cancellable: that is when the buyer needs it
+  // most. Eligibility is the server's answer; the cancel itself decides again under its locks.
+  const cancellable = !verified && !cancelled && status?.status === 'not_started' && status.buyerCancel === 'available' && !uncertain;
   async function cancelOrder(): Promise<boolean> {
     const ok = await request('cancel');
     // Move focus to the new state so keyboard and screen reader users land on the result, not on a removed button.
