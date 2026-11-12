@@ -609,6 +609,11 @@ class SmokeScriptMatchesTheBuildUnit(unittest.TestCase):
         smoke = (REPO / "ops/staging/smoke-build-unit.sh").read_text()
         smoke = smoke[smoke.index("unit() {"):]
         smoke = smoke[:smoke.index("\n}\n")]
+        # Every property flag must be one the parser understood: a property written another way (--property=,
+        # single quotes, -pName=) would otherwise be invisible on both sides and the units could drift unnoticed.
+        for body in (build, smoke):
+            self.assertEqual(len(re.findall(r"(?:^|\s)(?:-p|--property)(?=[\s=]|[A-Za-z'\"])", body)), len(self.properties(body)))
+        self.assertNotIn("--property", build + smoke)
         constants = dict(re.findall(r"^(BUILD_[A-Z_]+)=(\S+)$", ctl, re.M))
         expected = {}
         for prop in self.properties(build):
@@ -621,6 +626,9 @@ class SmokeScriptMatchesTheBuildUnit(unittest.TestCase):
                 continue
             self.assertEqual(actual[name], value, name)
         self.assertIn("RestrictSUIDSGID", actual)
+        self.assertIn("$BUILD", actual["ReadWritePaths"].split()[-1])
+        environment = lambda body: set(re.findall(r'-E "?([A-Z_]+)=', body))
+        self.assertEqual(environment(smoke) - {"HOME"}, environment(build))
         for flag in ("--pipe", "--wait", "--collect", "--service-type=exec"):
             self.assertIn(flag, smoke)
 
