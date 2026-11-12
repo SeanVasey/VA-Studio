@@ -2,6 +2,8 @@
 
 namespace App\Domain\Commerce\Checkout;
 
+use App\Domain\Commerce\BuyerCancel\CancelTestOrder;
+use App\Domain\Commerce\BuyerCancel\ReadBuyerCancellation;
 use App\Domain\Commerce\CommerceAuditActor;
 use App\Domain\Commerce\Finalization\ReadPaymentState;
 use App\Domain\Commerce\Models\CheckoutIntent;
@@ -40,8 +42,9 @@ final class HostedCheckout
             $actorId = app(CommerceAuditActor::class)->lock($actor);
             // A short order lock serializes one durable provider intent; never includes provider I/O.
             $locked = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();
+            // A buyer cancellation committed before this lock was granted is read for update, so this transaction sees it.
             if (TestUnpaidRelease::where('order_id', $locked->id)->lockForUpdate()->exists()
-                || ReadUnsentRelease::for($locked, lock: true)) {
+                || ReadUnsentRelease::for($locked, lock: true) || ReadBuyerCancellation::for($locked, lock: true)) {
                 throw new QuoteException('CHECKOUT_EXPIRED', 410);
             }
             $existing = CheckoutIntent::where('order_id', $locked->id)->first();
@@ -70,7 +73,9 @@ final class HostedCheckout
             } catch (QueryException $error) {
                 // The database refuses an intent for a released never-sent order (checkout_intents_unsent_release_insert).
                 // The check above reads under the Order lock, so this is a backstop; the buyer still gets the 410.
-                if (str_contains($error->getMessage(), 'Invalid or immutable unsent release evidence')) {
+                // Likewise for a buyer-cancelled order (checkout_intents_buyer_cancellation_insert).
+                if (str_contains($error->getMessage(), 'Invalid or immutable unsent release evidence')
+                    || str_contains($error->getMessage(), 'Invalid or immutable buyer cancellation evidence')) {
                     throw new QuoteException('CHECKOUT_EXPIRED', 410);
                 }
                 throw $error;
@@ -254,6 +259,8 @@ final class HostedCheckout
         $data['finalizationStatus'] = $paymentState['finalizationStatus'];
         $data['contractStatus'] = $paymentState['contractStatus'];
         $data['fulfillmentStatus'] = $paymentState['fulfillmentStatus'];
+        // Display only (`available`, `cancelled` or `unavailable`); a cancelled order keeps `not_started`: it never reached Stripe.
+        $data['buyerCancel'] = app(CancelTestOrder::class)->availability($order, $intent);
         if (TestUnpaidRelease::where('order_id', $order->id)->exists()
             || ReadUnsentRelease::for($order)) {
             $data['status'] = 'expired';

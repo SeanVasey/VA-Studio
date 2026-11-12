@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Commerce\BuyerCancel\CancelTestOrder;
 use App\Domain\Commerce\Checkout\HostedCheckout;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\SiteBuilder\EditorialContent;
@@ -33,6 +34,16 @@ final class TestCheckoutController
             $this->emptyBody($request);
 
             return $checkout->reconcile($order, $owner->forRequest($request), $owner->actor($request), $owner->principal($request));
+        });
+    }
+
+    /** The buyer cancels their own never-sent order; the answer is the same checkout projection, now `buyerCancel: cancelled`. */
+    public function cancel(string $order, Request $request, CommerceRequestIdentity $owner, CancelTestOrder $cancel): JsonResponse
+    {
+        return $this->run(function () use ($order, $request, $owner, $cancel): array {
+            $this->emptyBody($request);
+
+            return $cancel->cancel($order, $owner->forRequest($request), $owner->actor($request), $owner->principal($request));
         });
     }
 

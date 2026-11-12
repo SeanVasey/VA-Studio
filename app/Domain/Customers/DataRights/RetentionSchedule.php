@@ -471,6 +471,7 @@ final class RetentionSchedule
         ['table' => 'test_unpaid_release_events', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
         ['table' => 'test_unpaid_release_work', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
         ['table' => 'test_unsent_order_releases', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
+        ['table' => 'test_buyer_order_cancellations', 'family' => null, 'class' => 'not_applicable', 'clock' => null, 'rationale' => self::TEST_COMMERCE],
         // Review evidence held indefinitely (DD-47): staff-reported buyer assent observations. They are not keyed to an account.
         ['table' => 'production_buyer_assent_observations', 'family' => null, 'class' => 'indefinite', 'clock' => null,
             'rationale' => 'Staff-reported production buyer assent, sealed and held indefinitely as review evidence (DD-47); no account key, so closure leaves it as it is.'],

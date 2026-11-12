@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Domain\Commerce\BuyerCancel\BuyerCancelPolicy;
 use App\Domain\Commerce\RefundDispute\RefundDisputePolicy;
 use App\Domain\Commerce\UnpaidRelease\UnpaidReleasePolicy;
 use App\Domain\Delivery\TestDeliveryAutoEnablePolicy;
@@ -133,7 +134,8 @@ class StagingRuntimeValidatorTest extends TestCase
     {
         $this->assertSame(self::STAGED_FLAGS, array_keys(CapabilityBoundary::stagedFlags()));
         $this->assertSame(11, count(CapabilityBoundary::CAPABILITY_FLAGS));
-        $this->assertSame(['VASEY_TEST_UNPAID_RELEASE_ENABLED', 'VASEY_TEST_REFUND_DISPUTE_ENABLED', 'VASEY_TEST_DELIVERY_AUTO_ENABLED'],
+        $this->assertSame(['VASEY_TEST_UNPAID_RELEASE_ENABLED', 'VASEY_TEST_REFUND_DISPUTE_ENABLED', 'VASEY_TEST_DELIVERY_AUTO_ENABLED',
+            'VASEY_TEST_BUYER_CANCEL_ENABLED'],
             array_keys(CapabilityBoundary::STAGING_OPTIONAL_FLAGS));
         foreach (self::UNGATED_FLAGS as $flag) {
             $this->assertArrayHasKey($flag, CapabilityBoundary::CAPABILITY_FLAGS);
@@ -345,6 +347,8 @@ class StagingRuntimeValidatorTest extends TestCase
         $this->assertSame(RefundDisputePolicy::class, CapabilityBoundary::STAGING_OPTIONAL_FLAGS['VASEY_TEST_REFUND_DISPUTE_ENABLED']['policy']);
         $this->assertSame(TestDeliveryAutoEnablePolicy::class, CapabilityBoundary::STAGING_OPTIONAL_FLAGS['VASEY_TEST_DELIVERY_AUTO_ENABLED']['policy']);
         $this->assertArrayNotHasKey('values', CapabilityBoundary::STAGING_OPTIONAL_FLAGS['VASEY_TEST_DELIVERY_AUTO_ENABLED']);
+        $this->assertSame(BuyerCancelPolicy::class, CapabilityBoundary::STAGING_OPTIONAL_FLAGS['VASEY_TEST_BUYER_CANCEL_ENABLED']['policy']);
+        $this->assertArrayNotHasKey('values', CapabilityBoundary::STAGING_OPTIONAL_FLAGS['VASEY_TEST_BUYER_CANCEL_ENABLED']);
         $this->assertSame([], CapabilityBoundary::optionalFlagsRefused(static fn (string $key): bool => false, $refuses));
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Domain\Commerce\UnpaidRelease;
 
+use App\Domain\Commerce\BuyerCancel\ReadBuyerCancellation;
 use App\Domain\Commerce\Checkout\CheckoutEvidence;
 use App\Domain\Commerce\Models\CheckoutIntent;
 use App\Domain\Commerce\Models\CheckoutSession;
@@ -11,6 +12,7 @@ use App\Domain\Commerce\Models\OrderFinalization;
 use App\Domain\Commerce\Models\PromotionCampaign;
 use App\Domain\Commerce\Models\PromotionUse;
 use App\Domain\Commerce\Models\RightsScope;
+use App\Domain\Commerce\Models\TestBuyerOrderCancellation;
 use App\Domain\Commerce\Models\TestUnpaidRelease;
 use App\Domain\Commerce\Models\TestUnpaidReleaseEvent;
 use App\Domain\Commerce\Models\TestUnpaidReleaseWork;
@@ -59,6 +61,7 @@ final class ReleaseTestOrderResources
         $started = fn ($query) => $query->selectRaw('1')->from('checkout_intents')->whereColumn('checkout_intents.order_id', 'orders.id');
 
         return $query->selectRaw('EXISTS (SELECT 1 FROM checkout_intents started WHERE started.order_id = orders.id) AS checkout_started')
+            ->selectRaw('EXISTS (SELECT 1 FROM test_buyer_order_cancellations cancelled WHERE cancelled.order_id = orders.id) AS buyer_cancelled')
             ->where(fn ($query) => $query->whereExists(fn ($query) => $started($query)->where('mode', 'test')->where('account_id', $account))
                 ->orWhereNotExists($started));
     }
@@ -72,6 +75,7 @@ final class ReleaseTestOrderResources
             $release = TestUnpaidRelease::where('order_id', $order->id)->lockForUpdate()->first();
             $paid = VerifiedPayment::where('order_id', $order->id)->lockForUpdate()->exists();
             $unsent = $intent ? null : TestUnsentOrderRelease::where('order_id', $order->id)->lockForUpdate()->first();
+            $cancelled = $intent ? null : TestBuyerOrderCancellation::where('order_id', $order->id)->lockForUpdate()->first();
             $original = app(ReadOrder::class)->verify($order);
             if ($release) {
                 app(ReadUnpaidRelease::class)->verify($release, $order, $original);
@@ -79,15 +83,19 @@ final class ReleaseTestOrderResources
             if ($unsent) {
                 app(ReadUnsentRelease::class)->verify($unsent, $order);
             }
+            if ($cancelled) {
+                app(ReadBuyerCancellation::class)->verify($cancelled, $order);
+            }
             $release ??= $unsent;
             AuditEvent::recordAttributed('commerce.unpaid_release.reviewed', $order,
                 ['order_id' => $order->public_id, 'sequence' => $work->sequence, 'test_only' => true], $current->id);
 
             return ['orderId' => $order->public_id, 'sequence' => $work->sequence,
-                'status' => $release ? 'released' : ($paid ? 'payment_recorded' : 'unverified'),
+                'status' => $release ? 'released' : ($cancelled ? 'buyer_cancelled' : ($paid ? 'payment_recorded' : 'unverified')),
                 'history' => $this->events($order)->orderByDesc('sequence')->limit(20)->get()->map(fn ($event) => ['sequence' => $event->sequence, 'kind' => $event->kind, 'outcome' => $event->outcome,
                     'createdAt' => $event->created_at->toIso8601ZuluString()])->all(),
                 'release' => $release ? ['publicId' => $release->public_id, 'releasedAt' => $release->released_at->toIso8601ZuluString()] : null,
+                'buyerCancellation' => $cancelled ? ['publicId' => $cancelled->public_id, 'cancelledAt' => $cancelled->cancelled_at->toIso8601ZuluString()] : null,
                 'checkout' => $intent ? 'started' : self::NEVER_SENT,
                 'checkoutWindowClosesAt' => $order->attempt()->sole()->expires_at->toIso8601ZuluString()];
         }, 5));
@@ -288,6 +296,10 @@ final class ReleaseTestOrderResources
         if ($payment || $finalization || TestUnpaidRelease::where('order_id', $order->id)->lockForUpdate()->exists()) {
             return $this->result('payment_recorded', $work->sequence);
         }
+        // The buyer already cancelled this never-sent order: its resources are released and nothing remains to release.
+        if (TestBuyerOrderCancellation::where('order_id', $order->id)->lockForUpdate()->exists()) {
+            return $this->result('buyer_cancelled', $work->sequence);
+        }
         $attempt = $order->attempt()->sole();
         // While the attempt window is open the buyer may still start checkout; never cut off a live order.
         if ($attempt->expires_at->greaterThan(now()->toImmutable()->utc()->startOfSecond())) {
@@ -316,8 +328,11 @@ final class ReleaseTestOrderResources
         return $this->result('released', $work->sequence);
     }
 
-    /** Lock promotion campaign/use, sorted rights scopes, then reservation/claims, and require the original pending pair. */
-    private function lockPendingResources($attempt, array $original): array
+    /**
+     * Lock promotion campaign/use, sorted rights scopes, then reservation/claims, and require the original pending pair.
+     * Caller holds the Order lock in its own transaction; the buyer cancellation (CancelTestOrder) uses the same order.
+     */
+    public function lockPendingResources($attempt, array $original): array
     {
         $use = null;
         if ($attempt->promotion_use_id !== null) {
@@ -339,7 +354,8 @@ final class ReleaseTestOrderResources
         return [$reservation, $use];
     }
 
-    private function releaseResources(InventoryReservation $reservation, ?PromotionUse $use): void
+    /** pending -> released for exactly the locked pair; the database guards require the retained proof row first. */
+    public function releaseResources(InventoryReservation $reservation, ?PromotionUse $use): void
     {
         if (DB::table('inventory_reservations')->where('id', $reservation->id)->where('state', 'pending')->update(['state' => 'released']) !== 1
             || ($use && DB::table('promotion_uses')->where('id', $use->id)->where('state', 'pending')->update(['state' => 'released']) !== 1)) {

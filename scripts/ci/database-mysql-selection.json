@@ -222,6 +222,7 @@
     "tests/Feature/ServiceProjectRecoveryTest.php",
     "tests/Feature/SiteContentDamagedPublicationTest.php",
     "tests/Feature/SupportAttachmentRegistrationTest.php",
+    "tests/Feature/TestBuyerOrderCancellationTest.php",
     "tests/Feature/TestPaymentExceptionOperationsTest.php",
     "tests/Feature/TestUnpaidReleaseTest.php",
     "tests/Feature/TestUnsentOrderReleaseTest.php",

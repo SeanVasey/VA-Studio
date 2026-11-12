@@ -1453,6 +1453,18 @@
     [
       "Tests\\Feature\\TestDeliveryAutoEnableConcurrencyTest",
       "test_a_concurrent_staff_enable_and_automatic_enable_end_with_one_enabled_control_and_one_change"
+    ],
+    [
+      "Tests\\Feature\\TestBuyerOrderCancellationConcurrencyTest",
+      "test_cancel_and_first_checkout_start_serialize_on_the_order_and_exactly_one_wins"
+    ],
+    [
+      "Tests\\Feature\\TestBuyerOrderCancellationConcurrencyTest",
+      "test_a_second_cancel_waits_and_records_nothing_more"
+    ],
+    [
+      "Tests\\Feature\\TestBuyerOrderCancellationConcurrencyTest",
+      "test_cancel_and_staff_never_sent_release_record_exactly_one_release"
     ]
   ]
 }

@@ -1,5 +1,7 @@
 <?php
 
+use App\Domain\Commerce\BuyerCancel\BuyerCancelPolicy;
+use App\Domain\Commerce\BuyerCancel\CancelTestOrder;
 use App\Domain\Commerce\Checkout\HostedCheckout;
 use App\Domain\Commerce\Inventory\ReserveQuoteInventory;
 use App\Domain\Commerce\Models\CheckoutIntent;
@@ -97,6 +99,15 @@ try {
         'start' => (function () use ($input) {
             try {
                 return app(HostedCheckout::class)->start($input['public_id'], InventoryFixtures::OWNER)['status'];
+            } catch (QuoteException $error) {
+                return $error->errorCode;
+            }
+        })(),
+        // The buyer's cancellation of a never-sent order (TestBuyerOrderCancellationConcurrencyTest): its projection or refusal code.
+        'cancel' => (function () use ($input) {
+            config(['buyer-cancel.enabled' => true, 'buyer-cancel.policy' => json_encode(BuyerCancelPolicy::CONTRACT, JSON_THROW_ON_ERROR)]);
+            try {
+                return app(CancelTestOrder::class)->cancel($input['public_id'], InventoryFixtures::OWNER)['buyerCancel'];
             } catch (QuoteException $error) {
                 return $error->errorCode;
             }

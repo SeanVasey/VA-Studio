@@ -137,6 +137,7 @@ final class CutoverLedgerChecks
         'VASEY_TEST_CUSTOMER_CONSENT_ENABLED' => 'customer-preferences.test_grants_enabled',
         'VASEY_TEST_UNPAID_RELEASE_ENABLED' => 'unpaid-release.enabled',
         'VASEY_TEST_DELIVERY_AUTO_ENABLED' => 'delivery.test_auto_enable_enabled',
+        'VASEY_TEST_BUYER_CANCEL_ENABLED' => 'buyer-cancel.enabled',
         'VASEY_TEST_REFUND_RESOLUTION_ENABLED' => 'refund-resolution.enabled',
         'VASEY_TEST_REFUND_DISPUTE_ENABLED' => 'refund-dispute.enabled',
         'VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED' => 'transactional-notifications.test_enabled',

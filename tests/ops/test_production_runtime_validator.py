@@ -37,6 +37,8 @@ BEATSTARS_IMPORT_KEY = "staging-beatstars-import.enabled"
 # Test unpaid release became optional on the staging rehearsal (2026-11-11); production holds its flag false by the same rule.
 UNPAID_RELEASE = "VASEY_TEST_UNPAID_RELEASE_ENABLED"
 UNPAID_RELEASE_KEY = "unpaid-release.enabled"
+BUYER_CANCEL = "VASEY_TEST_BUYER_CANCEL_ENABLED"
+BUYER_CANCEL_KEY = "buyer-cancel.enabled"
 UNPAID_RELEASE_POLICY = ('\'{"schema_version":1,"purpose":"test_unpaid_resource_release","version":"test-unpaid-release-v1",'
                          '"provider":"stripe","mode":"test","proof":"bound_expired_unpaid_session_and_absent_or_canceled_zero_payment",'
                          '"recovery":"disabled","resources":"pending_to_released","late_confirmation":"paid_exception_preserve_released",'
@@ -585,7 +587,7 @@ class ProductionRuntimeValidator(unittest.TestCase):
         block = re.search(r"const LAUNCH_OFF_HOLDS = \[(.*?)\n\];", text, re.S)
         self.assertIsNotNone(block, "LAUNCH_OFF_HOLDS constant block not found")
         self.assertNotIn("=>", block.group(1))
-        self.assertEqual(re.findall(r"'([A-Z0-9_]+)',", block.group(1)), [MARKETING_SEGMENT, SERVICE_INVOICING, UNPAID_RELEASE, REFUND_DISPUTE,
+        self.assertEqual(re.findall(r"'([A-Z0-9_]+)',", block.group(1)), [MARKETING_SEGMENT, SERVICE_INVOICING, UNPAID_RELEASE, REFUND_DISPUTE, BUYER_CANCEL,
                                                                           BEATSTARS_IMPORT, DELIVERY_AUTO])
         self.assertNotIn(f"'{MARKETING_SEGMENT_KEY}'", text, "the config key must come from the boundary, not be restated")
         self.assertRegex(text, r"\$launchOffKeys = array_intersect_key\(CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS, array_flip\(LAUNCH_OFF_HOLDS\)\);"
@@ -594,7 +596,7 @@ class ProductionRuntimeValidator(unittest.TestCase):
         run = subprocess.run([PHP, "-r", script, str(REPO / "scripts/ops/capability-boundary.php")], capture_output=True, text=True, timeout=60)
         self.assertEqual(run.returncode, 0, run.stderr)
         self.assertEqual(json.loads(run.stdout), {MARKETING_SEGMENT: MARKETING_SEGMENT_KEY, SERVICE_INVOICING: SERVICE_INVOICING_KEY,
-                                                 UNPAID_RELEASE: UNPAID_RELEASE_KEY, REFUND_DISPUTE: REFUND_DISPUTE_KEY,
+                                                 UNPAID_RELEASE: UNPAID_RELEASE_KEY, REFUND_DISPUTE: REFUND_DISPUTE_KEY, BUYER_CANCEL: BUYER_CANCEL_KEY,
                                                  BEATSTARS_IMPORT: BEATSTARS_IMPORT_KEY, DELIVERY_AUTO: DELIVERY_AUTO_KEY})
         # Not a staged flag: the staging gates keep their own list, and this hold is production's.
         script = "require $argv[1]; echo json_encode(array_key_exists($argv[2], Vasey\\Ops\\CapabilityBoundary::stagedFlags()));"
@@ -684,6 +686,27 @@ class ProductionRuntimeValidator(unittest.TestCase):
         self.assertRegex((REPO / "config/delivery.php").read_text(), r"'test_auto_enable_enabled'\s*=>\s*env\('" + DELIVERY_AUTO + r"',\s*false\)")
         self.assertRegex((REPO / "ops/production/env.production.example").read_text(), rf"(?m)^{DELIVERY_AUTO}=false$")
         self.assertRegex((REPO / "app/Domain/Delivery/TestDeliveryAutoEnablePolicy.php").read_text(),
+                         r"if \(! TestEnvironment::admitsTestCommerce\(\) \|\| config\('payments\.stripe\.mode'\) !== 'test'")
+
+    def test_the_buyer_cancel_flag_is_held_off_in_production_even_with_its_exact_policy(self):
+        # Staging may turn the buyer's cancellation of a never-sent test order on (STAGING_OPTIONAL_FLAGS); production refuses it
+        # in every spelling but false, with or without the exact policy JSON, from the file line and from the effective configuration.
+        self.assertNotIn(BUYER_CANCEL, profile())
+        self.assertEqual(self.validate(profile() + f"{BUYER_CANCEL}=false\n").returncode, 0)
+        policy = ('\'{"schema_version":1,"purpose":"test_buyer_order_cancellation","version":"test-buyer-cancel-v1","mode":"test",'
+                  '"actor":"order_owner","proof":"no_checkout_intent_buyer_owner_v1","resources":"pending_to_released","provider_calls":"none"}\'')
+        for extra in ("true", "1", "", "(true)", f"true\nVASEY_TEST_BUYER_CANCEL_POLICY={policy}"):
+            with self.subTest(value=extra):
+                run = self.validate(profile() + f"{BUYER_CANCEL}={extra}\n")
+                self.failed(run, "holds.vasey_test_buyer_cancel_enabled")
+                self.assertEqual({line for line in run.stderr.splitlines() if line.startswith("FAIL ")},
+                                 {"FAIL holds.vasey_test_buyer_cancel_enabled"}, run.stderr)
+        run = self.validate(profile(**{"PATH": "false", BUYER_CANCEL: "${PATH}"}))
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertEqual(run.stderr.split(), ["FAIL", "holds.vasey_test_buyer_cancel_enabled"], run.stderr)
+        self.assertRegex((REPO / "config/buyer-cancel.php").read_text(), r"'enabled'\s*=>\s*env\('" + BUYER_CANCEL + r"',\s*false\)")
+        self.assertRegex((REPO / "ops/production/env.production.example").read_text(), rf"(?m)^{BUYER_CANCEL}=false$")
+        self.assertRegex((REPO / "app/Domain/Commerce/BuyerCancel/BuyerCancelPolicy.php").read_text(),
                          r"if \(! TestEnvironment::admitsTestCommerce\(\) \|\| config\('payments\.stripe\.mode'\) !== 'test'")
 
     def test_a_boundary_without_the_unpaid_release_hold_fails_closed(self):

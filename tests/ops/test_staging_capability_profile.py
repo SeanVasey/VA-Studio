@@ -41,6 +41,8 @@ OPTIONAL = {
     "VASEY_TEST_REFUND_DISPUTE_ENABLED": ("refund-dispute", "enabled", "App\\Domain\\Commerce\\RefundDispute\\RefundDisputePolicy"),
     # D-19 amendment (2026-11-12, under Sean's delegation): automatic enabling of test delivery for never-controlled ready orders.
     "VASEY_TEST_DELIVERY_AUTO_ENABLED": ("delivery", "test_auto_enable_enabled", "App\\Domain\\Delivery\\TestDeliveryAutoEnablePolicy"),
+    # 2026-11-12: the buyer's cancellation of a never-sent test order.
+    "VASEY_TEST_BUYER_CANCEL_ENABLED": ("buyer-cancel", "enabled", "App\\Domain\\Commerce\\BuyerCancel\\BuyerCancelPolicy"),
 }
 # The exact values an optional flag also requires on staging, beyond its policy class: environment key -> {policy key: value}. Refund
 # and dispute must run the DD-16 choices (RefundDisputePolicy::PRODUCTION_CONFIRMED), read from config/refund-dispute.php.
@@ -259,6 +261,21 @@ class TheTenFlagsAreExplicit(unittest.TestCase):
         self.assertNotIn("VASEY_TEST_DELIVERY_AUTO_POLICY", {name for name, entries in assignments(BASE).items()
                                                             if any(not commented for commented, _ in entries)})
 
+    def test_the_overlay_shows_the_exact_buyer_cancel_policy_commented(self):
+        # As for unpaid release: the one line the operator uncomments must be the contract BuyerCancelPolicy accepts.
+        policy = source("app/Domain/Commerce/BuyerCancel/BuyerCancelPolicy.php")
+        contract = re.search(r"public const CONTRACT = \[(.*?)\];", policy, re.S).group(1)
+        expected = dict(re.findall(r"'([a-z_]+)' => '([a-z0-9_-]+)'", contract))
+        expected["schema_version"] = int(re.search(r"'schema_version' => (\d+)", contract).group(1))
+        lines = [value for commented, value in assignments(OVERLAY).get("VASEY_TEST_BUYER_CANCEL_POLICY", []) if commented]
+        self.assertEqual(len(lines), 1, "the overlay must show the policy once, commented")
+        self.assertEqual(assignments(OVERLAY)["VASEY_TEST_BUYER_CANCEL_POLICY"], [(True, lines[0])])
+        self.assertTrue(lines[0].startswith("'") and lines[0].endswith("'"))
+        self.assertEqual(json.loads(lines[0][1:-1]), expected)
+        self.assertEqual(len(expected), 8)
+        self.assertNotIn("VASEY_TEST_BUYER_CANCEL_POLICY", {name for name, entries in assignments(BASE).items()
+                                                           if any(not commented for commented, _ in entries)})
+
     def test_the_deploy_gate_checks_every_staged_flag_before_it_passes(self):
         gate = source("ops/staging/validate-runtime.php")
         self.assertLess(gate.index("CapabilityBoundary::flagsNotOff("), gate.index('echo "PASS runtime.profile'))
@@ -284,6 +301,7 @@ class AdmissionMatchesTheValues(unittest.TestCase):
         self.assert_source("app/Domain/Notifications/TransactionalNotificationPolicy.php", r"! TestEnvironment::admitsTestCommerce\(\).*?config\('transactional-notifications\.test_enabled'\) !== true")
         self.assert_source("app/Domain/Commerce/UnpaidRelease/UnpaidReleasePolicy.php", r"! TestEnvironment::admitsTestCommerce\(\).*?config\('unpaid-release\.enabled'\) !== true")
         self.assert_source("app/Domain/Delivery/TestDeliveryAutoEnablePolicy.php", r"! TestEnvironment::admitsTestCommerce\(\).*?config\('delivery\.test_auto_enable_enabled'\) !== true")
+        self.assert_source("app/Domain/Commerce/BuyerCancel/BuyerCancelPolicy.php", r"! TestEnvironment::admitsTestCommerce\(\).*?config\('buyer-cancel\.enabled'\) !== true")
         self.assert_source("app/Domain/Commerce/RefundResolution/RefundResolutionPolicy.php", r"app\(UnpaidReleasePolicy::class\)->account\(\).*?config\('refund-resolution\.enabled'\) !== true")
         self.assert_source("app/Domain/Commerce/RefundDispute/RefundDisputePolicy.php",
                            r"\$this->account\(\);\s*RefundDisputeException::require\(config\('refund-dispute\.enabled'\) === true.*?TestEnvironment::admitsTestCommerce\(\)")
