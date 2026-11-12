@@ -1,6 +1,6 @@
 # Staging guest test purchase (Stripe test mode)
 
-Status: **run end to end on staging in Stripe test mode on 2026-11-10, 2026-11-11 and 2026-11-12** (see [First real run](#first-real-run-2026-11-10) and [Later runs](#later-runs-2026-11-11-and-2026-11-12)). Before that, every step was exercised only with synthetic provider fixtures (see [Evidence](#evidence)). Of the failure drills below, only drill 1 (declined card) has a recorded real run (2026-11-11); drills 3 and 4 have not been run against real Stripe, and drill 2 (expired session) was exercised only through the three abandoned orders that were released on 2026-11-11 (no drill record). The runbook fixes and [known follow-ups](#known-follow-ups) from the runs are recorded here.
+Status: **run end to end on staging in Stripe test mode on 2026-11-10, 2026-11-11 and 2026-11-12** (see [First real run](#first-real-run-2026-11-10) and [Later runs](#later-runs-2026-11-11-and-2026-11-12)). Before that, every step was exercised only with synthetic provider fixtures (see [Evidence](#evidence)). Of the failure drills below, only drill 1 (declined card) has a recorded real run (2026-11-11); drills 3 and 4 have not been run against real Stripe, and drill 2 (expired session) was exercised only through the three abandoned orders that were released on 2026-11-11 (no drill record). The runbook fixes and the [two follow-ups fixed on 2026-11-12](#buyer-email-on-stripes-page-and-status-checks-after-payment) are recorded here.
 
 This guide is for Sean and the staging operator. It covers one guest purchase on the private staging host, from the storefront to downloading the purchased files, plus four failure drills. Everything here is **test mode only**. No real card is charged, no live key is used and no production path is turned on.
 
@@ -409,12 +409,12 @@ Run on staging in Stripe test mode, partly with the operator's Playwright script
 
 Not run: drills 3 (duplicate webhook) and 4 (reconcile without a webhook), a Link payment, a late payment, and a purchase of an Exclusive license (32 Exclusive offers are active; a purchase would lock its track permanently, and none has been bought).
 
-## Known follow-ups
+## Buyer email on Stripe's page and status checks after payment
 
-Found on the first run and not yet fixed (re-checked against the code on 2026-11-12: `customer_email` is still not sent). Neither changes payment evidence.
+Both follow-ups found on the first run were fixed on 2026-11-12:
 
-- The buyer's email is not passed to Stripe Checkout (`customer_email`), so the buyer types it again on the Stripe page.
-- Each **Check Stripe test checkout status** click on an already-verified order makes another reconcile read of Stripe.
+- **Email pre-filled.** A checkout opened after this change sends Stripe the email the buyer entered for this order (`customer_email`), so Stripe's page shows it already filled in; the buyer can still change it there. Only an address with a plain ASCII shape is sent (`CheckoutEvidence::buyerEmail`; the part before `@` may hold only letters, digits and `. _ % + ' -`); anything else is left for the buyer to type, as before. No Stripe customer id is sent. The address Stripe returns is never read: payment verification, the order's account and any mail still use the address held on the order, so an edit on Stripe's page changes nothing here. The request keeps the email inside its existing encrypted column (`checkout_intents.request_ciphertext`, held with the order like `orders.payload_ciphertext`, which already holds it). A checkout created before the change replays its stored request without the email. A stored email replays as stored, bound to the order's own address, so a later change to which addresses are sent never alters an existing checkout.
+- **No Stripe read after verification.** **Check Stripe test checkout status** on an order whose payment is already verified answers from the stored, re-verified evidence and makes no Stripe call. Before verification it reads Stripe as before. That read never reported refunds or disputes: they are read only by staff **Reconcile** on the test payment exception, and `vasey:reconcile-test-checkout <intent>` still re-reads a session on request.
 
 ## Evidence
 
