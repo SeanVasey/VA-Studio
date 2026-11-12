@@ -67,3 +67,9 @@ Answers:
 | `browser-site` | `contact-inquiry-persistence`: inbox row | webkit | strict mode violation: `getByText('Service request')` matched 2 rows | D | The inbox is shared across projects and specs (chromium's unarchived `contact-inquiry` rows remain), so the subject is now asserted on the row of this test's own receipt. |
 | `accessibility-browser` | `:75` 320 px detail, full terms and cart | webkit | `color-contrast` on `Check checkout availability`: fg `#3c5c65` on bg `#0da9c6` (2.57) | D | Still a transition sampled mid-way (hover left under the pointer): the round-two wait ran before the transition began. The helper now moves the pointer off the page, lets two frames pass, then waits for finite animations, repeating up to five rounds. |
 | `accessibility-browser` | `:174` forced colors | chromium | as round two | tool artifact | See the separate commit. |
+
+### Forced colors: proposed test change (separate commit)
+`accessibility-public.spec.ts:174` now disables only `color-contrast` for the forced-colors state, and asserts the real thing instead: for seven dialog text samples
+the computed `color` is not one of the three brand text colours and its contrast against the dialog's computed (system) background is at least 4.5:1. All other axe rules
+still run on that state. The assertion discriminates (local Chromium: forced colors gives black on white, 21:1; forced colors off gives the brand colours, which the
+assertion would reject). If CI's Chromium reports author colours from `getComputedStyle` under forced colors, this assertion fails and shows it. Keep or drop is the coordinator's call.

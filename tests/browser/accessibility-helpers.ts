@@ -3,8 +3,8 @@ import { expect, type Locator, type Page, type TestInfo } from '@playwright/test
 
 export const accessibilityTags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
-/** Scan the whole rendered document. No excludes, disabled rules or result filtering. */
-export async function expectAccessible(page: Page, testInfo: TestInfo, state: string) {
+/** Scan the whole rendered document. No excludes or result filtering; a rule is disabled only when a caller names it and says why. */
+export async function expectAccessible(page: Page, testInfo: TestInfo, state: string, options: { disableRules?: string[] } = {}) {
   // Scan the settled page. A hover left under a control by an earlier click starts a colour transition at the next
   // frame (runs 43122303001 and 43127350343: a button sampled between its action and hover colours), so take the pointer
   // off the page first, let the style change land, then wait for every finite animation and transition to end.
@@ -19,7 +19,9 @@ export async function expectAccessible(page: Page, testInfo: TestInfo, state: st
       await Promise.all(running.map(animation => animation.finished.catch(() => undefined)));
     }
   });
-  const results = await new AxeBuilder({ page }).withTags(accessibilityTags).analyze();
+  const builder = new AxeBuilder({ page }).withTags(accessibilityTags);
+  if (options.disableRules?.length) builder.disableRules(options.disableRules);
+  const results = await builder.analyze();
   await testInfo.attach(`axe-${state}`, {
     body: JSON.stringify({
       state,
