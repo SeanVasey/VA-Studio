@@ -395,6 +395,11 @@ PENDING_WARN=3
 # its token (backups/.link-token, outside every set: the identity of each verified inode) and the next snapshot consumes it. The
 # token is refused after this many hours (a build between prepare's re-verification and activate's snapshot fits well inside).
 LINK_MAX_AGE_HOURS=6
+# The space estimate (before the build and the quiesce) counts sharing only for a token that will still be fresh this much later,
+# when the snapshot judges it again: a token that expired in between would make the snapshot copy every file the estimate left
+# out, with the site already stopped. A deploy's build and pause take minutes; an hour is a wide margin.
+LINK_ESTIMATE_HEADROOM_HOURS=1
+LINK_ESTIMATE_MAX_AGE_HOURS=$((LINK_MAX_AGE_HOURS - LINK_ESTIMATE_HEADROOM_HOURS))
 
 # The newest tree set with a restore proof: the one preverify re-hashes. Prints nothing when sharing is off or none qualifies.
 link_source() {
@@ -425,22 +430,22 @@ link_token_name() {
 # True while the current token's re-verification is younger than LINK_MAX_AGE_HOURS (and not more than five minutes in the
 # future), the window private-snapshot.py accepts. A token an aborted deploy left behind ages out here, so the next operation
 # re-hashes instead of reusing it (the engine would refuse it and copy everything).
-link_token_fresh() {
-  local token=$VASEY_BACKUP_DIR/.link-token verified now age
+link_token_fresh() {  # link_token_fresh [MAX_AGE_HOURS]: LINK_MAX_AGE_HOURS unless the space estimate asks for less
+  local token=$VASEY_BACKUP_DIR/.link-token verified now age max_hours=${1:-$LINK_MAX_AGE_HOURS}
   [ -f "$token" ] && [ ! -L "$token" ] || return 1
   verified=$(sed -n '1s/.*"verified_ns": \([0-9]\{1,19\}\)[,}].*/\1/p' -- "$token")
   [[ "$verified" =~ ^[0-9]+$ ]] || return 1
   now=$(date +%s%N)
   [[ "$now" =~ ^[0-9]+$ ]] || return 1
   age=$((now - verified))
-  [ "$age" -ge $((-300 * 1000000000)) ] && [ "$age" -le $((LINK_MAX_AGE_HOURS * 3600 * 1000000000)) ]
+  [ "$age" -ge $((-300 * 1000000000)) ] && [ "$age" -le $((max_hours * 3600 * 1000000000)) ]
 }
 
 # The set the current token names, while the token is fresh and that set still holds its restore proof; else nothing.
-link_token_set() {
+link_token_set() {  # link_token_set [MAX_AGE_HOURS]
   local name
   name=$(link_token_name)
-  [[ "$name" =~ $SET_NAME_RE ]] && link_token_fresh && grep -qx 'result=RESTORE_VERIFIED' "$VASEY_BACKUP_DIR/$name/RESTORE_CHECK" 2>/dev/null \
+  [[ "$name" =~ $SET_NAME_RE ]] && link_token_fresh "${1:-$LINK_MAX_AGE_HOURS}" && grep -qx 'result=RESTORE_VERIFIED' "$VASEY_BACKUP_DIR/$name/RESTORE_CHECK" 2>/dev/null \
     && [ -d "$VASEY_BACKUP_DIR/$name/private" ] && [ ! -L "$VASEY_BACKUP_DIR/$name/private" ] || return 0
   printf '%s\n' "$VASEY_BACKUP_DIR/$name"
 }
@@ -1145,7 +1150,8 @@ nearest_existing() {  # nearest_existing PATH -> PATH or its closest existing an
 space_check() {  # space_check [--preverify|--preverify-if-needed]
   local priv db copy full set_need need restore_need ship_need avail restore_avail backup_at restore_at margin src estimate basis shared_with estimate_total
   if [ "${1:-}" = --preverify-if-needed ]; then
-    if [ -n "$(link_token_set)" ]; then set --; else set -- --preverify; fi
+    # A token that would expire before the snapshot is as good as none: re-hash now rather than count a full copy.
+    if [ -n "$(link_token_set "$LINK_ESTIMATE_MAX_AGE_HOURS")" ]; then set --; else set -- --preverify; fi
   fi
   # Re-proving the shared set first (site still up) decides what the snapshot may share, and so what it must copy. A deploy
   # refuses on a failed re-proof, before anything is stopped: a backup set's files changed on disk, which needs a person.
@@ -1168,9 +1174,12 @@ space_check() {  # space_check [--preverify|--preverify-if-needed]
   basis="no re-verified set to share with: the whole private store is counted"
   if [ -n "${PRIVATE_SNAPSHOT:-}" ] && [ -f "$PRIVATE_SNAPSHOT" ]; then
     src=''
-    [ "${VASEY_BACKUP_LINK:-1}" != 1 ] || src=$(link_token_set) || src=''
+    [ "${VASEY_BACKUP_LINK:-1}" != 1 ] || src=$(link_token_set "$LINK_ESTIMATE_MAX_AGE_HOURS") || src=''
+    if [ -z "$src" ] && [ "${VASEY_BACKUP_LINK:-1}" = 1 ] && [ -n "$(link_token_set)" ]; then
+      basis="the re-verification token of $(link_token_name) expires within $LINK_ESTIMATE_HEADROOM_HOURS hour(s), before the snapshot would use it: the whole private store is counted"
+    fi
     if [ -n "$src" ] && estimate=$(python3 -I "$PRIVATE_SNAPSHOT" estimate --live "$PRIVATE" --link-from "$src" \
-         --link-token "$VASEY_BACKUP_DIR/.link-token" --link-max-age-hours "$LINK_MAX_AGE_HOURS" 2>/dev/null); then
+         --link-token "$VASEY_BACKUP_DIR/.link-token" --link-max-age-hours "$LINK_ESTIMATE_MAX_AGE_HOURS" 2>/dev/null); then
       shared_with=$(printf '%s\n' "$estimate" | sed -n 's/^link_source=//p')
       estimate_total=$(printf '%s\n' "$estimate" | sed -n 's/^total_bytes=//p')
       estimate=$(printf '%s\n' "$estimate" | sed -n 's/^copy_bytes=//p')

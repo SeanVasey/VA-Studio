@@ -1217,6 +1217,42 @@ class ReviewBatch337(PrivateTreeBase):
         second = self.predeploy(preverify=False)
         self.assertEqual(fields(second / "MANIFEST")["private_copied_files"], "1")
 
+    # Deferred finding (re-review of PR #353): the token's age was judged twice, by the space estimate and again by the snapshot
+    # after the build and the quiesce. A token near its 6-hour limit passed the estimate (only changed files counted) and then
+    # failed the snapshot (every file copied), which could overrun the space the estimate allowed with the site stopped. The
+    # estimate now counts sharing only for a token that stays fresh an hour longer; a nearly expired token is re-hashed instead.
+    def test_a_token_expiring_within_the_hour_is_re_hashed_not_trusted_by_the_estimate(self):
+        self.predeploy()
+        self.write("masters/new/master.wav", b"RIFF" + b"z" * 20_000)
+        run = self.check("--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.age_token(5.5)  # the snapshot would still accept it, but not after a build and pause that take longer than 30 minutes
+        total = sum((self.live / f).stat().st_size for f in self.live_files())
+        run = self.check(T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn(f"({total} of {total} private bytes to copy;", run.stdout)
+        self.assertIn("expires within 1 hour(s)", run.stdout)
+        run = self.check("--preverify-if-needed", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("re-verified the private files of", run.stdout, "a nearly expired token must not stand in for a re-hash")
+        self.assertIn("(20004 of", run.stdout)
+
+    # Independent review of PR #367 (P3): the boundaries on either side. A token inside the estimate's 5 hours is trusted
+    # without a re-hash, and the snapshot's own 6-hour rule is unchanged, so a 5.5-hour token is still shared by the snapshot.
+    def test_a_token_inside_five_hours_is_trusted_and_the_snapshot_still_shares_at_five_and_a_half(self):
+        self.predeploy()
+        self.write("masters/new/master.wav", b"RIFF" + b"z" * 20_000)
+        run = self.check("--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.age_token(4.5)
+        run = self.check("--preverify-if-needed", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertNotIn("re-verified the private files of", run.stdout, "a token inside the window needs no re-hash")
+        self.assertIn("(20004 of", run.stdout)
+        self.age_token(1)  # now 5.5 hours: past the estimate's window, inside the snapshot's
+        second = self.predeploy(preverify=False)
+        self.assertEqual(fields(second / "MANIFEST")["private_copied_files"], "1", "the snapshot still shares at 5.5 hours")
+
     def test_f2_the_estimate_names_a_basis_only_when_something_is_shared(self):
         self.predeploy()
         run = self.check("--preverify", T_FREE=10**15)
