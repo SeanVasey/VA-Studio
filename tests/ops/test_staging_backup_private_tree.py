@@ -1429,6 +1429,52 @@ class ReviewPR353(PrivateTreeBase):
                 self.assertEqual(run.returncode, expected, run.stdout + run.stderr)
                 self.assertEqual(self.withdrawn(run), [s2.name] if expected == 1 else [], "no file was shown to be bad")
 
+    # Re-review P3 on PR #353: ext4 reports a corrupt inode as EBADMSG or EUCLEAN when the file is opened, not only when its
+    # bytes are read. The walker has already named that inode, so it is the same content finding as a failed read: every
+    # set holding the file loses its proof. EIO opening a file stays operational (the test above).
+    def test_ebadmsg_or_euclean_opening_a_shared_file_withdraws_every_holder(self):
+        for code in ("EBADMSG", "EUCLEAN"):
+            with self.subTest(code):
+                s1, s2 = self.fresh_pair()
+                body = ("_open = os.open\n"
+                        "def failing(path, flags, *a, **k):\n"
+                        "    if path == 'master.wav' and not flags & os.O_DIRECTORY:\n"
+                        f"        raise OSError(errno.{code}, 'synthetic')\n"
+                        "    return _open(path, flags, *a, **k)\nos.open = failing\n")
+                run = self.verify(s2, wrapped_engine(self.root, body))
+                self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+                self.assertEqual(self.withdrawn(run), sorted([s1.name, s2.name]), "S1 holds the same inode")
+                self.assertIn("cannot be opened", run.stdout + run.stderr)
+                time.sleep(1.1)
+
+    # Re-review P3 on PR #353: the withdrawal after a later content error is the union of the files that had already failed
+    # and the inodes the later error names. Three sets tell the two apart: S3 holds only the later file.
+    def test_a_later_content_error_adds_its_holders_to_those_of_an_earlier_failed_file(self):
+        s1, s2 = self.fresh_pair()
+        self.write(self.SHARED, b"RIFF" + b"c" * 5000)  # the live master changes, so S3 copies it and links only stems.zip
+        time.sleep(1.1)
+        s3 = self.predeploy()
+        a, b = self.SHARED, "masters/track-one/stems.zip"
+        self.assertEqual(inodes(s1 / "private")[a], inodes(s2 / "private")[a])
+        self.assertNotEqual(inodes(s3 / "private")[a], inodes(s2 / "private")[a])
+        self.assertEqual({inodes(s / "private")[b] for s in (s1, s2, s3)}, {inodes(s2 / "private")[b]})
+        self.corrupt(s2 / "private" / a)  # walked first: a failed file held by S1 and S2
+        # Then reading stems.zip (held by all three) fails with EIO: a content error naming its inode.
+        body = ("_open = os.open\n_readv = os.readv\ntargets = set()\n"
+                "def opening(path, flags, *a, **k):\n"
+                "    fd = _open(path, flags, *a, **k)\n"
+                "    if path == 'stems.zip':\n"
+                "        targets.add(fd)\n"
+                "    return fd\n"
+                "def failing(fd, buffers):\n"
+                "    if fd in targets:\n"
+                "        raise OSError(errno.EIO, 'synthetic EIO')\n"
+                "    return _readv(fd, buffers)\n"
+                "os.open = opening\nos.readv = failing\n")
+        run = self.verify(s2, wrapped_engine(self.root, body))
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertEqual(self.withdrawn(run), sorted([s1.name, s2.name, s3.name]), "S3 holds stems.zip only")
+
     def test_a_backup_directory_that_cannot_be_listed_keeps_the_finding_for_the_failing_set(self):
         _, s2 = self.fresh_pair()
         self.corrupt(s2 / "private" / self.SHARED)

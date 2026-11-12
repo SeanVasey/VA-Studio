@@ -44,7 +44,9 @@ LOCK=/etc/vasey-staging/ctl.lock
 [ -f "$LOCK" ] && [ ! -L "$LOCK" ] && [ "$(stat -c '%u %a' "$LOCK")" = "0 600" ] || die "$LOCK must be root-owned 0600"
 exec 8>>"$LOCK"
 flock -xn 8 || die "a vasey-staging-ctl action (a deploy?) holds $LOCK; run this when it has finished"
-[ ! -e /etc/vasey-staging/operation-in-progress ] || die "an operation marker is present (a deploy stopped mid-way); recover first"
+# -e follows a symlink, so a dangling link would read as absent: refuse any entry at the marker path, link or not.
+MARKER=/etc/vasey-staging/operation-in-progress
+[ ! -e "$MARKER" ] && [ ! -L "$MARKER" ] || die "an operation marker is present (a deploy stopped mid-way); recover first"
 
 BUILD=$VASEY_ROOT/build
 [ "$(stat -c '%u %g %a' -- "$BUILD")" = "0 $GID_ 770" ] || die "$BUILD must be root:$USER_ 0770"
