@@ -1,6 +1,6 @@
 # Staging guest test purchase (Stripe test mode)
 
-Status: **run once end to end on 2026-11-10 on staging, in Stripe test mode** (see [First real run](#first-real-run-2026-11-10)). Before that, every step was exercised only with synthetic provider fixtures (see [Evidence](#evidence)). One run is not a soak: the four failure drills below have not been run against real Stripe, and the runbook fixes and [known follow-ups](#known-follow-ups) from that run are recorded here.
+Status: **run end to end on staging in Stripe test mode on 2026-11-10, 2026-11-11 and 2026-11-12** (see [First real run](#first-real-run-2026-11-10) and [Later runs](#later-runs-2026-11-11-and-2026-11-12)). Before that, every step was exercised only with synthetic provider fixtures (see [Evidence](#evidence)). Of the failure drills below, only drill 1 (declined card) has a recorded real run (2026-11-11); drills 3 and 4 have not been run against real Stripe, and drill 2 (expired session) was exercised only through the three abandoned orders that were released on 2026-11-11 (no drill record). The runbook fixes and [known follow-ups](#known-follow-ups) from the runs are recorded here.
 
 This guide is for Sean and the staging operator. It covers one guest purchase on the private staging host, from the storefront to downloading the purchased files, plus four failure drills. Everything here is **test mode only**. No real card is charged, no live key is used and no production path is turned on.
 
@@ -168,7 +168,7 @@ Use one browser, signed in to nothing. The guest's order ownership lives in that
 | 4 | Press **Open Stripe test checkout**, then **Continue to Stripe test checkout**. | Stripe's hosted page shows "VASEY.AUDIO test license 1", the same amount and card payment (Link, and Apple Pay or Google Pay where the browser offers them, may also appear; bank debit, Klarna and similar are not requested. See "Payment methods seen on 2026-11-11" below). | The Stripe page address contains the `cs_test_…` session ID; Dashboard → Developers → Logs shows the `POST /v1/checkout/sessions` request. |
 | 5 | Pay with card `4242 4242 4242 4242`, any future expiry, any CVC, any postcode. | Stripe redirects back to the store's return page. It says the result is not verified yet. | `php artisan vasey:stripe-inbox --limit=5` lists a `checkout.session.completed` receipt. Dashboard → Webhooks shows a `200` delivery. |
 | 6 | Wait up to two minutes, then press **Check Stripe test checkout status** or reload. | Payment `verified`; contract and fulfillment progress. | Runner log, only for the work the runner itself does: `receipts <id> awaiting_finalization`, `finalize <order> paid`, `contracts <grant> ready`. The queue workers usually get there first, as on the 2026-11-10 run, and then the runner log shows only `activate <order> activated`. In that case the evidence is `php artisan vasey:stripe-inbox`, Studio → Test commerce → Test contract issuance ("Original recorded") and the order status on the return page. |
-| 7 | Staff enable delivery for this order in Studio → Test commerce → Test track orders, or the operator runs the command (below). | The row reads "Delivery enabled". | Notice "Delivery is now enabled (version 1).", or command output `<control id> enabled version=1`. |
+| 7 | Staff enable delivery for this order in Studio → Test commerce → Test track orders, or the operator runs the command (below). The row shows "Contract issued, activation pending" for about 2 to 3 minutes after payment (observed 2026-11-12); the button appears at "Ready, delivery not enabled". | The row reads "Delivery enabled". | Notice "Delivery is now enabled (version 1).", or command output `<control id> enabled version=1`. |
 | 8 | On the return page (or the cart's order status), press **Check Stripe test checkout status**. The downloads section appears once payment is verified, the order is paid and the contract is issued. Download the contract and each file. | `<grant>-contract.pdf` and the purchased files (`master_wav`, `download_mp3`, `stems_zip` as the license requires). Each click gives one 60-second, single-use authorization; at most three per minute per order. | The server re-hashes every file before streaming. Optional check below. |
 
 **The return page refreshes itself.** After payment the order can stay at "finalization pending" for up to about a minute while the server finishes, because the page catches up only once activation has run. While the order is waiting on the server, the page re-reads its status about every 5 seconds for up to 3 minutes and announces the change; it stops when the order settles, when a read fails or after 3 minutes. The **Refresh test order status** and **Check Stripe test checkout status** buttons still work at any time, and after an automatic stop you press one of them to check again.
@@ -179,7 +179,7 @@ Use one browser, signed in to nothing. The guest's order ownership lives in that
 
 ### Enable delivery for one order
 
-Enabling downloads is a deliberate per-order decision and is never automatic (D-19: an explicitly provisioned blocked control, then an explicit enable). The order must already be activated (runner log `activate <order> activated`).
+Enabling downloads is a deliberate per-order decision and is never automatic (D-19: an explicitly provisioned blocked control, then an explicit enable). The order must already be activated (runner log `activate <order> activated`). Activation follows the contract by one runner sweep: on 2026-11-12 the order read "Contract issued, activation pending" for about 2 to 3 minutes, and the staff service refuses an enable in that state with a message saying so.
 
 **From the admin (staff).** Studio → Test commerce → **Test track orders** lists every track order that reached Stripe test checkout for the configured account, with its payment, grant, contract, activation and delivery state; the "Awaiting delivery" filter shows activated orders whose downloads are not enabled. On the order's row press **Enable delivery**, enter a reference (1–192 letters, digits or `._:/-`) and confirm. For an order that was never enabled this records the same two transitions as the commands below (blocked version 0, then enabled version 1), through the same control service (`ManageTestDeliveryControl`), so the same environment, Stripe test mode, account, owner-delivery policy, complete-activation and expected-version checks apply. **Block delivery** withdraws access. The page exists only where the command can act (local, testing or staging with Stripe test mode and an `acct_` account; never production), and the service itself requires `administer-catalog` and enrolled admin MFA wherever the panel requires it. Every attempt on a listed order by an authorized staff member adds a `commerce.delivery.staff_action.delivery_enable` or `..._block` audit event (a caller refused as not authorized, or naming an order outside the list, is refused without one) with the staff member, the result (`accepted`, `unchanged` or `refused`), the resulting version and the reference hash; the control service's own `commerce.delivery.control_provisioned` / `control_changed` events are recorded as for the command. Asking for the state an order already has changes nothing and says so; unlike the command, that answer does not check the expected version or the owner-delivery switch. If enabling fails after the page provisioned the control, the notice says the control was recorded as blocked (version 0). With `VASEY_TEST_DELIVERY_ACCESS_ENABLED=false` the page still opens and can block, but enabling is refused before anything is recorded.
 
@@ -295,7 +295,7 @@ Optional, off by default (Sean authorized it for the staging alpha on 2026-11-11
 
 All of these must hold, and the application checks each one itself; staff cannot override any of them:
 
-- The order belongs to the configured Stripe test account and has a recorded Stripe Checkout Session, that is, the buyer pressed **Open Stripe test checkout**. An order that was prepared but never sent to Stripe has no session and cannot be released (result `unavailable`).
+- The order belongs to the configured Stripe test account and has a recorded Stripe Checkout Session, that is, the buyer pressed **Open Stripe test checkout**. An order that was prepared but never sent to Stripe has no session and cannot be released (result `unavailable`); a staff release for that case is PR #341, open and not live on staging as of 2026-11-12.
 - No verified payment and no finalization is recorded for the order (otherwise `payment_recorded`). A late-paid order (paid exception) keeps its reservation; this path refuses it.
 - Two reads of the session from Stripe both show `status: expired` and `payment_status: unpaid`, with `after_expiration` and `recovered_from` both null, and the same order, attempt, amount, currency, payment methods and line items as the retained request. Its PaymentIntent is absent, or `canceled` with nothing received or capturable.
 
@@ -382,9 +382,24 @@ One guest purchase was run end to end on the staging host in Stripe test mode wi
 
 Only a card payment was exercised: no Link payment, no declined-card, expired-session, duplicate-webhook or late-payment drill has run against real Stripe. The queue workers finalized and issued the contract before the runner did, so the runner log showed only the activation line (see step 6).
 
+## Later runs (2026-11-11 and 2026-11-12)
+
+Run on staging in Stripe test mode, partly with the operator's Playwright scripts on the host, partly by hand. Order references are the first eight characters of the order UUID.
+
+| Date (UTC) | Run | Result |
+| --- | --- | --- |
+| 2026-11-11 | Track purchases `6cdf3b8a` (Automaton, Basic) and `76b59fa8` (Cocaine, Premium Plus with stems) | Passed; for the Premium Plus order every downloaded file hash matched. |
+| 2026-11-11 | Drill 1, declined card, order `e44f06a0` | Passed: Stripe stayed on its page, nothing was verified. The order was left unpaid and later released. |
+| 2026-11-11 | Sound-kit purchase `17e6883d` | Grant within 8 seconds, contract issued, delivery enabled, kit ZIP and contract PDF hashes matched the order snapshot. |
+| 2026-11-11 | Unpaid release enabled on staging (PR #333); orders `cf6504d0`, `a2e955f2` and `e44f06a0` released; Wide Awake bought again (order `900b628f`) | Passed. |
+| 2026-11-11 | Kit orders `776b948f` and `eb82325a` | Contract issued by the schedule `vasey:issue-test-kit-contracts` within about 10 minutes (`776b948f`: bought 19:21:48, contract 19:26:03). On `eb82325a` the order page, left open, changed from "contract is being prepared" to "kit granted and license issued" without a click or reload. Both are still waiting with delivery not enabled. |
+| 2026-11-12 | Track purchase `84857de0` (Automaton, Basic) on the build with the staff page (PR #339) | Payment, grant and contract by themselves; "Contract issued, activation pending" for about 2 to 3 minutes; then "Ready, delivery not enabled"; delivery enabled through the staff service ("Delivery is now enabled (version 1)"), a repeat said nothing changed; the buyer downloaded the contract PDF (998,137 bytes) and the MP3 (8,709,268 bytes). The Filament page itself was not driven in a browser with a TOTP sign-in. |
+
+Not run: drills 3 (duplicate webhook) and 4 (reconcile without a webhook), a Link payment, a late payment, and a purchase of an Exclusive license (32 Exclusive offers are active; a purchase would lock its track permanently, and none has been bought).
+
 ## Known follow-ups
 
-Found on that run and not yet fixed. Docs only for now; neither changes payment evidence.
+Found on the first run and not yet fixed (re-checked against the code on 2026-11-12: `customer_email` is still not sent). Neither changes payment evidence.
 
 - The buyer's email is not passed to Stripe Checkout (`customer_email`), so the buyer types it again on the Stripe page.
 - Each **Check Stripe test checkout status** click on an already-verified order makes another reconcile read of Stripe.

@@ -639,6 +639,11 @@ What changed for an operator:
   (copied 10 bytes / 1 file, linked 37,902,871,534 bytes / 1,048 files); restore proof 47 s; backup part of the window about 58 s;
   the whole maintenance window about 5.5 minutes, of which about 4m07s is the build that `ctl prepare` runs inside its quiesce;
   the whole deploy 8m54s. The new set used 25 MB on disk. Before the change the window was about 22 minutes.
+  Measured again on the deploy of 2026-11-12 (deployment 82759032, main `ead7368d`): re-hash with the site up 3m07s; maintenance
+  4m45s (quiesce 23:57:55, resumed about 00:02:40), of which about 3m18s ran from the quiesce to the activate step (the build); snapshot 7 s (copied 3
+  files / 1.2 MB, linked 37.9 GB); restore check 48 s; the whole deploy 8m01s. The build runs inside the pause on purpose:
+  `ctl prepare` builds the candidate as the application user, so the site is stopped first (Codex finding 4226283468 on
+  PR #63). Building before the quiesce needs a dedicated build account and is not done.
 - The **first** snapshot after re-provisioning has nothing to share and copies the whole store inside the window. Measured on
   staging, 2026-11-11: 37.9 GB / 1,049 files copied in 4m52s, proof 4m33s, maintenance about 9.8 minutes. Let the 03:17 nightly
   run take it, or deploy at a quiet time; every later snapshot shares.
