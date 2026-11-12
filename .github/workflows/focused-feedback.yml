@@ -82,7 +82,6 @@ jobs:
       DB_CONNECTION: ${{ needs.focused-selection.outputs.engine }}
       DB_DATABASE: ${{ needs.focused-selection.outputs.engine == 'mysql' && 'vaseyaudio_focused' || ':memory:' }}
       VA_CI_DISPOSABLE_MYSQL: ${{ needs.focused-selection.outputs.engine == 'mysql' && '1' || '' }}
-      DB_HOST: 127.0.0.1
       DB_PORT: 3306
       DB_USERNAME: root
       DB_PASSWORD: ci-only-password
@@ -113,6 +112,19 @@ jobs:
       - run: composer install --no-interaction --prefer-dist
       - run: cp .env.example .env
       - run: php artisan key:generate
+      # The identity catalog admission binds the MySQL session to its exact TCP 4-tuple. The published port
+      # (127.0.0.1:3306) is NAT: the server would see the bridge gateway and the client 127.0.0.1, so every
+      # migrate:fresh refused. Reach the service container at its own bridge address, where both ends agree.
+      - name: Address the MySQL service container directly
+        if: needs.focused-selection.outputs.engine == 'mysql'
+        env:
+          MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
+        run: |
+          [[ "$MYSQL_CONTAINER_ID" =~ ^[0-9a-f]{12,64}$ ]] || { echo "::error::missing MySQL service identity"; exit 1; }
+          read -r -a addresses <<< "$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' "$MYSQL_CONTAINER_ID")"
+          [ "${#addresses[@]}" = 1 ] && [[ "${addresses[0]}" =~ ^[0-9]{1,3}(\.[0-9]{1,3}){3}$ ]] \
+            || { echo "::error::the MySQL service must have exactly one IPv4 bridge address"; exit 1; }
+          echo "DB_HOST=${addresses[0]}" >> "$GITHUB_ENV"
       - name: Run the selected PHP files and record outcomes
         run: python3 scripts/ci/focused-tests.py
       - name: Retain focused PHP evidence
