@@ -1433,6 +1433,18 @@
     [
       "Tests\\Feature\\TrackSchedulingConcurrencyTest",
       "test_native_status_comparisons_are_byte_exact_under_the_case_and_space_insensitive_collation"
+    ],
+    [
+      "Tests\\Feature\\TestUnsentOrderReleaseConcurrencyTest",
+      "test_first_checkout_start_and_never_sent_release_serialize_on_the_order_fence"
+    ],
+    [
+      "Tests\\Feature\\TestUnsentOrderReleaseConcurrencyTest",
+      "test_second_staff_release_waits_and_cannot_record_a_second_release"
+    ],
+    [
+      "Tests\\Feature\\TestUnsentOrderReleaseConcurrencyTest",
+      "test_new_hold_on_the_shared_scope_waits_for_the_release_commit"
     ]
   ]
 }

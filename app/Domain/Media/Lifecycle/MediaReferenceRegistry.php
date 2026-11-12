@@ -216,6 +216,7 @@ final class MediaReferenceRegistry
         'test_delivery_authorizations.evidence_ciphertext', 'test_delivery_redemptions.evidence_ciphertext',
         'test_fulfillment_activations.evidence_ciphertext', 'test_payment_financial_observations.evidence_ciphertext',
         'test_refund_resolutions.evidence_ciphertext', 'test_unpaid_releases.evidence_ciphertext',
+        'test_unsent_order_releases.evidence_ciphertext',
         // Encrypted with Crypt::encryptString and holds only the licensee's confirmed name (SoundKitOrders::create), but the
         // proof cannot read ciphertext and the schema census requires every ciphertext column here.
         'sound_kit_orders.licensee_ciphertext',

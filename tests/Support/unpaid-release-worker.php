@@ -1,11 +1,13 @@
 <?php
 
+use App\Domain\Commerce\Checkout\HostedCheckout;
 use App\Domain\Commerce\Inventory\ReserveQuoteInventory;
 use App\Domain\Commerce\Models\CheckoutIntent;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
 use App\Domain\Commerce\Payments\VerifyTestPayment;
 use App\Domain\Commerce\PriceQuote;
+use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\UnpaidRelease\ReleaseTestOrderResources;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -91,7 +93,14 @@ try {
     file_put_contents($directory.'/ready-'.$worker, (string) $connection);
     $wait($directory.'/start-'.$worker);
     $result = match ($input['operation']) {
-        'release' => app(ReleaseTestOrderResources::class)->release($input['public_id'], User::findOrFail($input['actor_id']), $input['request_id'], 0)['status'],
+        'release' => app(ReleaseTestOrderResources::class)->release($input['public_id'], User::findOrFail($input['actor_id']), $input['request_id'], 0, $input['expected_proof'] ?? null)['status'],
+        'start' => (function () use ($input) {
+            try {
+                return app(HostedCheckout::class)->start($input['public_id'], InventoryFixtures::OWNER)['status'];
+            } catch (QuoteException $error) {
+                return $error->errorCode;
+            }
+        })(),
         'payment' => app(VerifyTestPayment::class)->commit($inspection, null),
         'hold' => app(ReserveQuoteInventory::class)->hold($input['quote_id'], InventoryFixtures::OWNER)->state,
         'price' => (function () use ($input) {
