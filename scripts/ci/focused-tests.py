@@ -162,6 +162,10 @@ PHP_TARGETS = {
         "tests/Feature/TestPaymentFinancialObservationTest.php", "tests/Feature/TestPaymentExceptionOperationsTest.php",
         "tests/Feature/TestPaymentExceptionOperationsConcurrencyTest.php",
         "tests/Feature/TestPaymentProcessingTest.php", "tests/Feature/TestOrderFinalizationTest.php",
+        # Test delivery enabling, manual and optional automatic (D-19 amendment), and the staging profile it is admitted by.
+        "tests/Feature/TestTrackOrderResourceTest.php", "tests/Feature/TestKitOrderResourceTest.php",
+        "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
+        "tests/Unit/StagingRuntimeValidatorTest.php", "tests/Unit/TestCommerceProfileValidatorTest.php",
     ),
     "customer": (
         "tests/Feature/InquiryBrowserCatalogCleanupTest.php",
