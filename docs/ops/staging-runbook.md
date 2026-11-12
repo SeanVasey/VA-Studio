@@ -597,7 +597,7 @@ that are new or changed since the newest verified set and hard-links the unchang
   that identity. Any write to it since, by anyone, moves the ctime, so it is copied instead. Without a token nothing is shared.
   A token older than 6 hours (an aborted deploy leaves one) is ignored everywhere: `ctl prepare` and `ctl refresh` re-hash
   instead of reusing it, and the space check names "sharing with the re-verified set" only when the estimate actually shares
-  files; otherwise it says the token was refused and counts the whole store.
+  bytes; otherwise it says the token was refused, or was accepted with no file unchanged since, and counts the whole store.
 - **Two kinds of refusal before the quiesce.** The deploy log tells them apart; neither stops anything.
   - **Corruption refusal** ("a backup set's private files failed re-verification ... corruption refusal"; the backup log says
     "failed its private file re-verification" and "withdrew the restore proof of ..."). Two kinds, and they withdraw different
@@ -607,8 +607,11 @@ that are new or changed since the newest verified set and hard-links the unchang
       tree set that holds that same file (inode) is removed; sets that do not hold it keep theirs.
     - *The set itself is malformed*: its own manifests (`private.index`, `private.sha256`, `private.dirs`) are missing, empty,
       truncated, malformed, disagree with each other or cannot be read (the same three errors); or its tree's names,
-      directories or entry kinds differ from them. Only that set's `RESTORE_CHECK` is removed: no file was shown to be bad, so a
+      directories or entry kinds differ from them; or a listed name is gone or is not the kind of object listed when it is
+      opened or stat-ed (ENOENT, ENOTDIR, ELOOP). Only that set's `RESTORE_CHECK` is removed: no file was shown to be bad, so a
       set sharing its files keeps its proof (its own re-proof decides).
+    - Both at once: a file that already failed is never hidden by a later set-level finding or by an operational error later in
+      the same proof; every set holding that file still loses its proof.
 
     What to do: check `dmesg`
     and the disk; run `sudo /usr/local/sbin/vasey-staging-backup restore-check <set>` on the sets that still hold a proof; keep
@@ -618,9 +621,9 @@ that are new or changed since the newest verified set and hard-links the unchang
   - **Operational refusal** ("the re-verification of the backup set could not run (an operational error ... not corruption) ...
     operational refusal", exit status 3; the backup log says "an operational error, not a corruption finding" and "No restore
     proof was withdrawn"). The re-hash could not run or its token could not be written: no space (the host has been at 96%),
-    out of memory, a crash of the helper (exit 1 that names no set counts as one too), or an I/O error that is not about a
-    file's bytes: opening the set's `private/`, opening or listing one of its directories, or opening a file (the block may read
-    on the next attempt). **Every proof is kept.** What to do: fix the cause (free space with
+    out of memory, a crash of the helper (exit 1 that names no set counts as one too), or an I/O error (anything but ENOENT,
+    ENOTDIR or ELOOP) that is not about a file's bytes: opening the set's `private/`, opening or listing one of its directories,
+    or opening or stat-ing a file (the block may read on the next attempt), provided no file had already failed. **Every proof is kept.** What to do: fix the cause (free space with
     `sudo /usr/local/sbin/vasey-staging-ctl backup-prune`; read `dmesg`), then deploy again. If the same operational refusal
     repeats for the same set, prove that set by hand: `sudo /usr/local/sbin/vasey-staging-backup restore-check <set>` (named in
     the log line); a set that fails it loses its proof as a corruption finding.

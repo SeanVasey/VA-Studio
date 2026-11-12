@@ -17,11 +17,14 @@ ValueError, or any unexpected exception): the helper must not treat 3 as evidenc
   * A finding about the set alone (no other set's proof is touched, because no inode of it was shown to be bad): its own
     manifests (private.index, private.sha256, private.dirs) are missing, empty, truncated, malformed or unreadable (the same
     three errnos), or disagree with each other; its tree's names or directories differ from them; its tree holds a link or a
-    special file; a name in it is missing or not the kind of object listed (ENOENT, ENOTDIR, ELOOP).
+    special file; opening its tree's root or one of its directories, stat-ing a listed entry or opening one of its files fails
+    with ENOENT, ENOTDIR or ELOOP (the name is gone or is not the kind of object listed).
   * Operational, never a finding: any other error, including an I/O error opening the tree's root, opening or listing one of its
     directories, or opening or stat-ing a file (the block may read on the next attempt): no proof is withdrawn, and the message
     says to prove the set again with restore-check once the cause is fixed. No space, a token that cannot be written and an
     unexpected exception (a RecursionError on a very deep tree, a bug) are operational too.
+  * A finding is never hidden by what comes after it in the same proof: once a file has failed, a later set-level finding or an
+    operational error still withdraws every set holding that file (and the operational error is named in the message).
     snapshot --live PRIVATE --set SET [--link-from SOURCE_SET --link-token TOKEN] [--link-max-age-hours H]
         Writes SET/private/ (a copy of PRIVATE), SET/private.sha256, SET/private.dirs and SET/private.index.
     verify SET [--full] [--backups DIR] [--strict-modes 0|1]
@@ -166,7 +169,12 @@ class Walker:
         for entry in entries:
             child = rel + "/" + entry.name
             check_name(child)
-            st = entry.stat(follow_symlinks=False)
+            try:
+                st = entry.stat(follow_symlinks=False)
+            except OSError as error:
+                if error.errno not in MISSING_ERRNOS:
+                    raise  # an I/O error stat-ing an entry is operational (module docstring)
+                raise Refused("an entry changed during the walk (removed or replaced); nothing was published")
             if stat.S_ISDIR(st.st_mode):
                 try:
                     fd = _open_dir(dir_fd, entry.name)
@@ -241,7 +249,12 @@ def jsonl(header, entries):
 
 def hash_file(parent_fd, name, expected):
     """SHA-256 of a set file opened under its directory descriptor, refusing anything but the expected regular inode."""
-    fd = _open_file(parent_fd, name)
+    try:
+        fd = _open_file(parent_fd, name)
+    except OSError as error:
+        if error.errno not in MISSING_ERRNOS:
+            raise  # an I/O error opening a file is operational (module docstring)
+        raise Refused("a set file changed while it was verified (removed or replaced by a link)")
     try:
         st = os.fstat(fd)
         if not stat.S_ISREG(st.st_mode) or (st.st_dev, st.st_ino) != expected:
@@ -554,18 +567,38 @@ def prove(setdir, full, strict_modes):
             counts["trusted_linked_files"] += 1
         identities[rel] = full_identity(st)
 
+    def failed_inodes():
+        """The inodes already shown to be bad: content or identity, and under strict modes a widened file."""
+        return set(bad) | (widened_inodes if strict_modes else set())
+
+    def file_failures():
+        return ("restored file hash mismatch, or a set file is not the inode, size, time or mode its index recorded "
+                f"({len(bad)} file(s))")
+
+    # A failure later in the walk (a set-level finding, or an operational error) must not hide a file that already failed: the
+    # sets holding it still lose their proof.
     tree_fd = open_root(os.path.join(setdir, "private"), "the set's private tree")
     try:
-        Walker(False, on_dir, on_file).run(tree_fd)
-    finally:
-        os.close(tree_fd)
-    if set(files) != set(index) or set(files) != set(manifest):
-        raise Refused("the set's private file names differ from its manifest")
-    if sorted(dirs, key=key) != listed_dirs:
-        raise Refused("the set's private directories differ from its manifest")
+        try:
+            Walker(False, on_dir, on_file).run(tree_fd)
+        finally:
+            os.close(tree_fd)
+    except Refused as error:
+        inodes = failed_inodes() | (error.inodes if isinstance(error, Mismatch) else set())
+        if not inodes:
+            raise
+        raise Mismatch(f"{error}; {file_failures()}", inodes) from error
+    except OSError as error:
+        if not failed_inodes():
+            raise
+        raise Mismatch(f"{file_failures()}; the rest of the walk then stopped on an operational error ({describe(error)})",
+                       failed_inodes()) from error
     if bad:
-        raise Mismatch("restored file hash mismatch, or a set file is not the inode, size, time or mode its index recorded "
-                       f"({len(bad)} file(s))", set(bad))
+        raise Mismatch(file_failures(), set(bad) | (widened_inodes if strict_modes else set()))
+    if set(files) != set(index) or set(files) != set(manifest):
+        raise Mismatch("the set's private file names differ from its manifest", failed_inodes())
+    if sorted(dirs, key=key) != listed_dirs:
+        raise Mismatch("the set's private directories differ from its manifest", failed_inodes())
     mode_result = "pass"
     if widened:
         mode_result = f"fail ({len(widened)} entries outside 0600/0400 files, 0700 dirs or this user's ownership)"
@@ -594,7 +627,14 @@ def withdrawals(setdir, backups, error):
     suspect = error.inodes if isinstance(error, Mismatch) else set()
     if backups is None or not suspect:
         return names
-    for name in sorted(os.listdir(backups)):
+    try:
+        listed = sorted(os.listdir(backups))
+    except OSError as error:
+        # The finding stands for the set already known; the others cannot be checked now (their own re-proof decides).
+        print(f"private-snapshot: could not list the backup directory to find other sets holding the failed files "
+              f"({describe(error)}); withdrawing this set only", file=sys.stderr)
+        return names
+    for name in listed:
         other = os.path.join(backups, name)
         if name in names or not SET_NAME.match(name) or os.path.islink(other) or not os.path.isdir(os.path.join(other, "private")):
             continue

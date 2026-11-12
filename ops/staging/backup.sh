@@ -1143,7 +1143,7 @@ nearest_existing() {  # nearest_existing PATH -> PATH or its closest existing an
 # yet (ctl prepare and refresh: the deploy's own `ctl space-check --preverify` has normally just made one, and a second 3-minute
 # re-hash would only lengthen the deploy).
 space_check() {  # space_check [--preverify|--preverify-if-needed]
-  local priv db copy full set_need need restore_need ship_need avail restore_avail backup_at restore_at margin src estimate basis shared_with
+  local priv db copy full set_need need restore_need ship_need avail restore_avail backup_at restore_at margin src estimate basis shared_with estimate_total
   if [ "${1:-}" = --preverify-if-needed ]; then
     if [ -n "$(link_token_set)" ]; then set --; else set -- --preverify; fi
   fi
@@ -1172,14 +1172,17 @@ space_check() {  # space_check [--preverify|--preverify-if-needed]
     if [ -n "$src" ] && estimate=$(python3 -I "$PRIVATE_SNAPSHOT" estimate --live "$PRIVATE" --link-from "$src" \
          --link-token "$VASEY_BACKUP_DIR/.link-token" --link-max-age-hours "$LINK_MAX_AGE_HOURS" 2>/dev/null); then
       shared_with=$(printf '%s\n' "$estimate" | sed -n 's/^link_source=//p')
+      estimate_total=$(printf '%s\n' "$estimate" | sed -n 's/^total_bytes=//p')
       estimate=$(printf '%s\n' "$estimate" | sed -n 's/^copy_bytes=//p')
       if [[ "$estimate" =~ ^[0-9]+$ ]]; then
         copy=$estimate
-        # The engine refused the token (link_source=none): the count is a full copy, so say so rather than name a basis.
-        if [ "$shared_with" = "$(basename -- "$src")" ]; then
+        # Name the sharing basis only when the estimate really shares bytes; otherwise the count is a full copy.
+        if [ "$shared_with" != "$(basename -- "$src")" ]; then
+          basis="the re-verification token of $(basename -- "$src") was refused: the whole private store is counted"
+        elif [[ "$estimate_total" =~ ^[0-9]+$ ]] && [ "$estimate" -lt "$estimate_total" ]; then
           basis="sharing with the re-verified set $shared_with"
         else
-          basis="the re-verification token of $(basename -- "$src") was refused: the whole private store is counted"
+          basis="the re-verification token of $shared_with was accepted, but no file is unchanged since it: the whole private store is counted"
         fi
       fi
     fi

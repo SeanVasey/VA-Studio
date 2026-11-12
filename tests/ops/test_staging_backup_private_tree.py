@@ -1353,6 +1353,130 @@ class ReviewBatch337(PrivateTreeBase):
                 time.sleep(1.1)
 
 
+class ReviewPR353(PrivateTreeBase):
+    """Independent review of PR #353 (2026-11-12): a finding is never hidden by what follows it in the same proof."""
+
+    SHARED = "masters/track-one/master.wav"
+
+    def verify(self, bk, engine_file=ENGINE):
+        return subprocess.run([sys.executable, "-I", str(engine_file), "verify", str(bk), "--full", "--backups", str(self.backups)],
+                              capture_output=True, text=True)
+
+    def withdrawn(self, run):
+        return sorted(line.split("=", 1)[1] for line in run.stdout.splitlines() if line.startswith("withdraw="))
+
+    def fresh_pair(self):
+        for name in self.sets():
+            shutil.rmtree(self.backups / name)
+        s1 = self.predeploy(VASEY_BACKUP_LINK=0)
+        s2 = self.predeploy()
+        self.assertEqual(inodes(s1 / "private")[self.SHARED], inodes(s2 / "private")[self.SHARED])
+        return s1, s2
+
+    def test_p2_1_a_set_level_finding_after_a_failed_shared_file_still_withdraws_its_holders(self):
+        def extra_file(bk):
+            (bk / "private/zzz-extra.bin").write_bytes(b"x")
+            os.chmod(bk / "private/zzz-extra.bin", 0o600)
+
+        def symlink(bk):
+            (bk / "private/zzz-link").symlink_to("masters")  # an unmanifested entry, walked after masters/
+
+        def malformed_entry(bk):
+            lines = (bk / "private.index").read_text().splitlines()
+            entries = [json.loads(l) for l in lines[1:]]
+            later = next(e for e in entries if e["p"] > "./" + self.SHARED)  # walked after the corrupt file
+            del later["how"]
+            (bk / "private.index").write_text("\n".join([lines[0]] + [json.dumps(e, sort_keys=True) for e in entries]) + "\n")
+
+        for damage in (extra_file, symlink, malformed_entry):
+            with self.subTest(damage.__name__):
+                s1, s2 = self.fresh_pair()
+                self.corrupt(s2 / "private" / self.SHARED)
+                damage(s2)
+                run = self.verify(s2)
+                self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+                self.assertEqual(self.withdrawn(run), sorted([s1.name, s2.name]), "S1 holds the corrupt file")
+                time.sleep(1.1)
+
+    def test_p2_2_an_operational_error_after_a_failed_shared_file_still_withdraws_its_holders(self):
+        for label, target, directory in (("directory open", "processing", True), ("file open", "stems.zip", False)):
+            with self.subTest(label):
+                s1, s2 = self.fresh_pair()
+                self.corrupt(s2 / "private" / self.SHARED)  # masters/track-one/master.wav is walked before both targets
+                # Once only: the proof of S2 meets it; the later scan of S1 for the failed inode reads normally.
+                body = ("_open = os.open\nfired = []\n"
+                        "def failing(path, flags, *a, **k):\n"
+                        f"    if path == {target!r} and bool(flags & os.O_DIRECTORY) == {directory!r} and not fired:\n"
+                        "        fired.append(1)\n"
+                        "        raise OSError(errno.EIO, 'synthetic EIO')\n"
+                        "    return _open(path, flags, *a, **k)\nos.open = failing\n")
+                run = self.verify(s2, wrapped_engine(self.root, body))
+                self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+                self.assertEqual(self.withdrawn(run), sorted([s1.name, s2.name]))
+                self.assertIn("operational error (OSError, EIO)", run.stderr)
+                time.sleep(1.1)
+
+    def test_eio_opening_a_regular_file_is_operational_and_enoent_is_a_finding_about_the_set(self):
+        s1, s2 = self.fresh_pair()
+        for code, expected in (("EIO", 3), ("ENOENT", 1)):
+            with self.subTest(code):
+                body = ("_open = os.open\n"
+                        "def failing(path, flags, *a, **k):\n"
+                        "    if path == 'stems.zip' and not flags & os.O_DIRECTORY:\n"
+                        f"        raise OSError(errno.{code}, 'synthetic')\n"
+                        "    return _open(path, flags, *a, **k)\nos.open = failing\n")
+                run = self.verify(s2, wrapped_engine(self.root, body))
+                self.assertEqual(run.returncode, expected, run.stdout + run.stderr)
+                self.assertEqual(self.withdrawn(run), [s2.name] if expected == 1 else [], "no file was shown to be bad")
+
+    def test_a_backup_directory_that_cannot_be_listed_keeps_the_finding_for_the_failing_set(self):
+        _, s2 = self.fresh_pair()
+        self.corrupt(s2 / "private" / self.SHARED)
+        body = "def failing(*a, **k):\n    raise OSError(errno.EIO, 'synthetic EIO')\nos.listdir = failing\n"
+        run = self.verify(s2, wrapped_engine(self.root, body))
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertEqual(self.withdrawn(run), [s2.name])
+        self.assertIn("could not list the backup directory", run.stderr)
+
+    def test_a_file_whose_size_changes_while_it_is_hashed_is_a_finding_about_that_inode(self):
+        s1 = self.predeploy()
+        target = s1 / "private" / self.SHARED
+        st = target.lstat()
+        directory = os.open(target.parent, os.O_RDONLY | os.O_DIRECTORY)
+        original = engine.os.readv
+        engine.os.readv = lambda fd, buffers: 0
+        try:
+            with self.assertRaises(engine.Mismatch) as caught:
+                engine.hash_file(directory, target.name, (st.st_dev, st.st_ino))
+        finally:
+            engine.os.readv = original
+            os.close(directory)
+        self.assertEqual(caught.exception.inodes, {(st.st_dev, st.st_ino)})
+
+    def test_a_token_dated_in_the_future_is_not_reused(self):
+        self.predeploy()
+        run = self.run_helper("space-check", "--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        lines = self.token().read_text().splitlines()
+        header = json.loads(lines[0])
+        header["verified_ns"] += 400 * 10**9  # beyond the 300 s the engine allows
+        self.token().write_text("\n".join([json.dumps(header, sort_keys=True)] + lines[1:]) + "\n")
+        run = self.run_helper("space-check", "--preverify-if-needed", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("re-verified the private files of", run.stdout)
+
+    def test_an_accepted_token_that_shares_nothing_is_not_called_sharing(self):
+        self.predeploy()
+        for path in self.live.rglob("*"):
+            if path.is_file():
+                os.chmod(path, stat.S_IMODE(path.stat().st_mode))  # same mode: only the ctime moves
+        time.sleep(2.1)
+        run = self.run_helper("space-check", "--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertNotIn("sharing with the re-verified set", run.stdout)
+        self.assertIn("was accepted, but no file is unchanged since it: the whole private store is counted", run.stdout)
+
+
 class DeployGate(unittest.TestCase):
     """G1 and Q4 in ops/staging/forge-deploy.sh: one authoritative space gate, before anything is stopped, reported truthfully."""
 
