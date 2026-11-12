@@ -24,4 +24,27 @@ final class MigrationRecompilationTest extends TestCase
 
         $this->assertSame($declared, count(get_declared_classes()));
     }
+
+    /**
+     * The runtime check above sees only the paths the current engine takes (a MySQL-only branch never runs on SQLite), so
+     * every source that reads another migration must go through MigrationDefinitions. Two migrations of 2026-11-09/10
+     * required one directly and brought the leak back on Foundation's SQLite shards (run 43304362814).
+     */
+    public function test_no_source_requires_a_migration_file_directly(): void
+    {
+        $offenders = [];
+        foreach ([app_path(), database_path('migrations')] as $root) {
+            $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS));
+            foreach ($files as $file) {
+                if ($file->getExtension() !== 'php' || $file->getPathname() === app_path('Support/MigrationDefinitions.php')) {
+                    continue;
+                }
+                if (preg_match('/\b(?:require|include)(?:_once)?\b[^;]*migrations/', (string) file_get_contents($file->getPathname())) === 1) {
+                    $offenders[] = str_replace(base_path().'/', '', $file->getPathname());
+                }
+            }
+        }
+
+        $this->assertSame([], $offenders, 'Use App\\Support\\MigrationDefinitions::load() to read another migration.');
+    }
 }

@@ -46,7 +46,7 @@ return new class extends Migration
             return;
         }
         // The creating migration's own byte-for-byte rewrite, so MySQL compares slots and paths exactly as it always has.
-        $original = require base_path('database/migrations/2026_09_30_000027_site_images.php');
+        $original = \App\Support\MigrationDefinitions::load('2026_09_30_000027_site_images.php');
         $valid = $original->bytewise($valid);
         DB::unprepared("CREATE TRIGGER site_images_valid_insert BEFORE insert ON site_images FOR EACH ROW BEGIN IF NOT COALESCE(({$valid}), 0) THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Site image evidence is invalid or immutable'; END IF; END");
     }
