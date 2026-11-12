@@ -108,14 +108,14 @@ final class SiteImageFixtures
             touch($input);
             chmod($input, 0600);
             imagepng($image, $input);
+            // One malloc arena: FFmpeg 8 (Ubuntu 26.04 runners) runs demux, decode, filter, encode and mux on their own threads,
+            // and a 64 MiB arena reservation per thread exceeds the 512 MiB address-space cap before any pixel is encoded.
             (new Process([
                 config('media.prlimit'), '--cpu=30', '--as=536870912', '--fsize=33554432', '--nofile=64', '--',
                 config('media.ffmpeg'), '-nostdin', '-hide_banner', '-loglevel', 'error', '-xerror', '-n',
                 '-threads', '1', '-filter_threads', '1', '-protocol_whitelist', 'file,pipe', '-f', 'png_pipe', '-i', $input,
                 '-map', '0:v:0', '-map_metadata', '-1', '-frames:v', '1', '-c:v', 'mjpeg', '-threads:v', '1', '-q:v', '3', '-pix_fmt', 'yuvj444p',
                 '-flags:v', '+bitexact', '-fflags', '+bitexact', '-f', 'image2', '-update', '1', $output,
-            // One malloc arena: FFmpeg 8 (Ubuntu 26.04 runners) runs demux, decode, filter, encode and mux on their own threads,
-            // and a 64 MiB arena reservation per thread exceeds the 512 MiB address-space cap before any pixel is encoded.
             ], $directory, ['TMPDIR' => $directory, 'FFREPORT' => false, 'OMP_NUM_THREADS' => '1', 'OPENBLAS_NUM_THREADS' => '1', 'MALLOC_ARENA_MAX' => '1']))
                 ->setTimeout(30)->mustRun();
 
