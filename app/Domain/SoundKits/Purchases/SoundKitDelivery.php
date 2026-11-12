@@ -3,6 +3,7 @@
 namespace App\Domain\SoundKits\Purchases;
 
 use App\Domain\Contracts\ContractIssuanceException;
+use App\Domain\Delivery\TestDeliveryAutoEnablePolicy;
 use App\Domain\Media\MediaFailure;
 use App\Domain\Media\PrivateMediaFiles;
 use App\Domain\SoundKits\Models\SoundKitRevision;
@@ -56,6 +57,44 @@ final class SoundKitDelivery
             }
             AuditEvent::recordAttributed('sound_kit.test_delivery.'.$values['state'], $control, ['order_public_id' => $order->public_id,
                 'version' => $values['version'], 'test_only' => true], null);
+
+            return $control;
+        }, 5);
+    }
+
+    /**
+     * The optional automatic enable ({@see TestDeliveryAutoEnablePolicy}, D-19 amendment 2026-11-12): under the order lock, an order
+     * whose grant matches its purchase snapshot and whose contract original is recorded (the staff page's "Contract issued, delivery
+     * not enabled") and that never had a control is enabled through {@see control()} from version 0, the same audited step staff take,
+     * plus one `sound_kit.test_delivery.auto_enabled` event naming the policy, attributed to no actor. An existing control (enabled or
+     * blocked by anyone) or an order not yet at that state returns null and changes nothing; a person's decision is final.
+     */
+    public function enableAutomatically(string $orderPublicId): ?SoundKitDeliveryControl
+    {
+        app(SoundKitPurchasePolicy::class)->require();
+        $automatic = app(TestDeliveryAutoEnablePolicy::class);
+        $automatic->current();
+        if (! Str::isUuid($orderPublicId)) {
+            throw new SoundKitPurchaseException('INVALID_REQUEST', 422);
+        }
+
+        return DB::transaction(function () use ($orderPublicId, $automatic): ?SoundKitDeliveryControl {
+            $order = SoundKitOrder::query()->where('public_id', $orderPublicId)->lockForUpdate()->first();
+            if (! $order) {
+                throw new SoundKitPurchaseException('NOT_FOUND', 404);
+            }
+            $automatic->current();
+            if (SoundKitDeliveryControl::query()->where('sound_kit_order_id', $order->id)->lockForUpdate()->exists()) {
+                return null;
+            }
+            $grant = SoundKitGrant::query()->where('sound_kit_order_id', $order->id)->first();
+            if (! $grant || $grant->snapshot_hash !== $order->snapshot_hash
+                || ! SoundKitContract::query()->where('sound_kit_grant_id', $grant->id)->exists()) {
+                return null;
+            }
+            $control = $this->control($order->public_id, 'enable', 0, TestDeliveryAutoEnablePolicy::REFERENCE);
+            AuditEvent::recordAttributed('sound_kit.test_delivery.auto_enabled', $control, ['order_public_id' => $order->public_id,
+                'version' => $control->version, 'policy_version' => TestDeliveryAutoEnablePolicy::VERSION, 'test_only' => true], null);
 
             return $control;
         }, 5);

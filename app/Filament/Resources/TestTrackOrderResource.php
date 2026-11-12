@@ -57,7 +57,7 @@ final class TestTrackOrderResource extends ReadOnlyCommerceResource
     {
         $operations = app(TestDeliveryStaffOperations::class);
 
-        return $table->description('Stripe TEST-mode track orders. No real money moves. Payment, grant, contract and activation happen by themselves; enabling downloads is a deliberate step per order. Actions here run the same step as the vasey:control-test-delivery command and are recorded against your account.')
+        return $table->description('Stripe TEST-mode track orders. No real money moves. Payment, grant, contract and activation happen by themselves; enabling downloads is a deliberate step per order unless the optional automatic test policy is on, which enables only orders nobody has enabled or blocked yet (audited as commerce.delivery.auto_enabled, with no actor). Actions here run the same step as the vasey:control-test-delivery command and are recorded against your account.')
             ->columns([
                 TextColumn::make('public_id')->label('Order')->searchable(['orders.public_id'])->copyable(),
                 TextColumn::make('created_at')->label('Created (UTC)')->dateTime('Y-m-d H:i:s', 'UTC')->sortable(['orders.id']),

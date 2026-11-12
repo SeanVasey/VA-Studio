@@ -57,7 +57,7 @@ final class TestKitOrderResource extends ReadOnlyCommerceResource
     {
         $operations = app(SoundKitStaffOperations::class);
 
-        return $table->description('Stripe TEST-mode kit orders. No real money moves. Actions here run the same steps as the kit console commands and are recorded against your account.')
+        return $table->description('Stripe TEST-mode kit orders. No real money moves. Actions here run the same steps as the kit console commands and are recorded against your account. With the optional automatic test policy on, delivery of an order nobody has enabled or blocked yet is enabled by the system (shown as Enabled automatically).')
             ->columns([
                 TextColumn::make('public_id')->label('Order')->searchable()->copyable(),
                 TextColumn::make('kit_title')->label('Kit')->state(fn (SoundKitOrder $record): string => (string) ($record->snapshot['product']['title'] ?? '—')),
@@ -66,7 +66,8 @@ final class TestKitOrderResource extends ReadOnlyCommerceResource
                 TextColumn::make('has_payment')->label('Paid')->formatStateUsing(fn (mixed $state): string => (int) $state > 0 ? 'Yes' : 'No'),
                 TextColumn::make('has_grant')->label('Granted')->formatStateUsing(fn (mixed $state): string => (int) $state > 0 ? 'Yes' : 'No'),
                 TextColumn::make('has_contract')->label('Contract')->formatStateUsing(fn (mixed $state): string => (int) $state > 0 ? 'Issued' : 'None'),
-                TextColumn::make('delivery_state')->label('Delivery')->placeholder('Not enabled')->formatStateUsing(fn (?string $state): string => ucfirst((string) $state)),
+                TextColumn::make('delivery_state')->label('Delivery')->placeholder('Not enabled')
+                    ->formatStateUsing(fn (SoundKitOrder $record): string => (string) $operations->deliveryLabel($record)),
                 TextColumn::make('created_at')->label('Created (UTC)')->dateTime('Y-m-d H:i:s', 'UTC')->sortable(),
             ])->defaultSort('sound_kit_orders.id', 'desc')->paginated([10, 25, 50])->defaultPaginationPageOption(25)
             ->recordUrl(null)->recordActions([

@@ -6,6 +6,7 @@ namespace Vasey\Ops;
 
 use App\Domain\Commerce\Inventory\ExclusiveSelectionPolicy;
 use App\Domain\Commerce\UnpaidRelease\UnpaidReleasePolicy;
+use App\Domain\Delivery\TestDeliveryAutoEnablePolicy;
 use Illuminate\Support\Arr;
 
 /**
@@ -49,10 +50,15 @@ final class CapabilityBoundary
      * when the policy's current() accepts the effective configuration. For unpaid release that means TestEnvironment admits test
      * commerce (never production), Stripe test mode, an `acct_` account and VASEY_TEST_UNPAID_RELEASE_POLICY equal to the exact
      * UnpaidReleasePolicy::CONTRACT. Production holds it false (PRODUCTION_LAUNCH_OFF_FLAGS). Review: docs/test-unpaid-release.md.
+     * Automatic test delivery enabling (D-19 amendment, 2026-11-12, under Sean's delegation) follows the same rule with
+     * TestDeliveryAutoEnablePolicy::CONTRACT in VASEY_TEST_DELIVERY_AUTO_POLICY; production holds it false and its policy blank
+     * (scripts/ops/private-server-preflight.php). Review: docs/ops/staging-test-purchase.md.
      */
     public const STAGING_OPTIONAL_FLAGS = [
         'VASEY_TEST_UNPAID_RELEASE_ENABLED' => ['config' => 'unpaid-release.enabled',
             'policy' => UnpaidReleasePolicy::class],
+        'VASEY_TEST_DELIVERY_AUTO_ENABLED' => ['config' => 'delivery.test_auto_enable_enabled',
+            'policy' => TestDeliveryAutoEnablePolicy::class],
     ];
 
     /**
@@ -99,6 +105,8 @@ final class CapabilityBoundary
         // BL-71: the BeatStars catalog import is a staging console command that refuses production in code; the hold keeps the flag
         // from ever being set on the production host, as the staging deploy gate cannot (it must be true for the import run).
         'VASEY_STAGING_BEATSTARS_IMPORT_ENABLED' => 'staging-beatstars-import.enabled',
+        // Automatic test delivery enabling is optional on staging (STAGING_OPTIONAL_FLAGS) and has no production path.
+        'VASEY_TEST_DELIVERY_AUTO_ENABLED' => 'delivery.test_auto_enable_enabled',
     ];
 
     /**

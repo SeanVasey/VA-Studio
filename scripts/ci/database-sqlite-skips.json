@@ -1445,6 +1445,14 @@
     [
       "Tests\\Feature\\TestUnsentOrderReleaseConcurrencyTest",
       "test_new_hold_on_the_shared_scope_waits_for_the_release_commit"
+    ],
+    [
+      "Tests\\Feature\\TestDeliveryAutoEnableConcurrencyTest",
+      "test_two_concurrent_automatic_enables_record_one_control_at_version_one"
+    ],
+    [
+      "Tests\\Feature\\TestDeliveryAutoEnableConcurrencyTest",
+      "test_a_concurrent_staff_enable_and_automatic_enable_end_with_one_enabled_control_and_one_change"
     ]
   ]
 }

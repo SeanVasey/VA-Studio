@@ -27,6 +27,15 @@ final class RefundDisputeAccess
         }
     }
 
+    /**
+     * Any active hold on the order, order-wide or on one grant, as a current locking read. For callers that already hold the Order row
+     * lock (automatic delivery enabling skips a held order rather than enabling it); issuance and redemption keep {@see assertClear()}.
+     */
+    public static function anyHeld(int $orderId, string $source = RefundDisputeSource::TEST): bool
+    {
+        return RefundDisputeHold::where('order_id', $orderId)->where('order_source', $source)->whereNull('released_at')->lockForUpdate()->exists();
+    }
+
     /** Non-locking projection read for owner download listings; issuance and redemption still enforce the gate. */
     public static function heldGrantIds(int $orderId, string $source = RefundDisputeSource::TEST): array
     {
