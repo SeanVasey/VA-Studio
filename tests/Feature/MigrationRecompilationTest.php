@@ -17,12 +17,18 @@ final class MigrationRecompilationTest extends TestCase
         // The first two runs compile everything the migrations and their admission checks load.
         $this->artisan('migrate:fresh')->assertSuccessful();
         $this->artisan('migrate:fresh')->assertSuccessful();
-        $declared = count(get_declared_classes());
+        $declared = get_declared_classes();
 
         $this->artisan('migrate:fresh')->assertSuccessful();
         $this->artisan('migrate:fresh')->assertSuccessful();
 
-        $this->assertSame($declared, count(get_declared_classes()));
+        // Name the classes and the files that declared them, so a failure points at its source.
+        $new = array_map(function (string $class): string {
+            $file = (new \ReflectionClass($class))->getFileName();
+
+            return $file === false ? $class : str_replace(base_path().'/', '', $file);
+        }, array_values(array_diff(get_declared_classes(), $declared)));
+        $this->assertSame([], $new, 'Repeated migration runs declared new classes.');
     }
 
     /**
@@ -39,7 +45,8 @@ final class MigrationRecompilationTest extends TestCase
                 if ($file->getExtension() !== 'php' || $file->getPathname() === app_path('Support/MigrationDefinitions.php')) {
                     continue;
                 }
-                if (preg_match('/\b(?:require|include)(?:_once)?\b[^;]*migrations/', (string) file_get_contents($file->getPathname())) === 1) {
+                // A require/include statement whose operand names the migrations directory (not the word in a string).
+                if (preg_match('/(?:^|[=(,\s])(?:require|include)(?:_once)?\s*\(?\s*(?:base_path|database_path|__DIR__|[\'"])[^;\n]*migrations/m', (string) file_get_contents($file->getPathname())) === 1) {
                     $offenders[] = str_replace(base_path().'/', '', $file->getPathname());
                 }
             }
