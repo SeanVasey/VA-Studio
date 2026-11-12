@@ -44,3 +44,26 @@ Whether CI's Chromium reports the author `color` through `getComputedStyle` whil
 
 ## Re-dispatch to confirm
 `browser-site`, `browser-customer`, `browser-operator-uploads`, `browser-operator-publication`, `accessibility-browser` (expect only the forced-colors case red). The six other suites passed unchanged; no need to repeat them.
+
+## Round three: confirming runs on `main` 1f11bd94 (#343), sqlite, none near the cap
+
+| Suite | Run | Result | Chromium | Webkit | Test step |
+| --- | --- | --- | --- | --- | --- |
+| `accessibility-browser` | 43127350343 | fail | 6 pass / 1 fail (forced colors) | 6 pass / 1 fail (`:75` 320 px cart) | 93 s |
+| `browser-site` | 43127354078 | fail | 22 pass | 20 pass / 1 fail (`contact-inquiry-persistence`) / 1 skipped by design | 432 s |
+| `browser-customer` | 43127358316 | fail | 8 pass / 1 fail | 8 pass / 1 fail (both `product-member-refresh`) | 550 s |
+| `browser-operator-uploads` | 43127362460 | fail | 3 pass / 1 fail | 3 pass / 1 fail (both `resumable-media-upload`) | 273 s |
+| `browser-operator-publication` | 43127366463 | pass | 4 pass | 4 pass | 236 s |
+
+Answers:
+1. The upload Finish/Cancel/Pause fix worked: `resumable-kit-upload` passes on both projects. The dropdown shim fix worked: every release-menu test passes (the chromium keyboard test included).
+2. The webkit contact/inquiry failures were the cascade and are gone (20 of 21 webkit `browser-site` cases pass). One new, unrelated failure surfaced (below).
+3. `track-publication-guard:27` on webkit did not reproduce (`browser-operator-publication` 8/8). Not a confirmed defect; treat the first failure as a flake.
+4. Forced colors was not the only accessibility failure: webkit `:75` still failed on the 320 px cart button.
+
+| Suite | Spec: test | Project | First error | Class | Fix |
+| --- | --- | --- | --- | --- | --- |
+| `browser-operator-uploads`, `browser-customer` | `resumable-media-upload`, `product-member-refresh` | both | `getByRole('combobox', { name: /^Search/ })` not found | A | Round two guessed the search input's name. The page snapshot gives `combobox "Track*: Search"`, so both specs now match `/^Track\b.*: Search$/`. |
+| `browser-site` | `contact-inquiry-persistence`: inbox row | webkit | strict mode violation: `getByText('Service request')` matched 2 rows | D | The inbox is shared across projects and specs (chromium's unarchived `contact-inquiry` rows remain), so the subject is now asserted on the row of this test's own receipt. |
+| `accessibility-browser` | `:75` 320 px detail, full terms and cart | webkit | `color-contrast` on `Check checkout availability`: fg `#3c5c65` on bg `#0da9c6` (2.57) | D | Still a transition sampled mid-way (hover left under the pointer): the round-two wait ran before the transition began. The helper now moves the pointer off the page, lets two frames pass, then waits for finite animations, repeating up to five rounds. |
+| `accessibility-browser` | `:174` forced colors | chromium | as round two | tool artifact | See the separate commit. |

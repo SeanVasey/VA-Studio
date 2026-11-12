@@ -55,7 +55,7 @@ test('operator reviews changed member snapshots and retains the earlier private 
   await dialog.getByLabel('Description', { exact: false }).fill('Synthetic retained collection notes');
   // Filament 5.11: a searchable select's trigger is a plain button; the role combobox moved to its search input.
   await dialog.getByRole('button', { name: /^Track\b/ }).click();
-  await page.getByRole('combobox', { name: /^Search/ }).fill(title);
+  await page.getByRole('combobox', { name: /^Track\b.*: Search$/ }).fill(title);
   await page.getByRole('option', { name: new RegExp(`^${title} \\(#\\d+\\)$`) }).click();
   await syncSuccessNotification(page, 'Created', () => dialog.getByRole('button', { name: 'Save draft version', exact: true }).click());
   await expect(row(page, draftTitle)).toBeVisible();
