@@ -170,7 +170,8 @@ class MediaWorkflowBudgetTest extends TestCase
         $timing->scanSeconds = $timing->toolSeconds = 0;
         $next = app(QueueMediaProcessing::class)->handle(MediaFixtures::source($track), $actor);
         $this->assertSame('completed', app(MediaProcessor::class)->handle($next->id)->status);
-        $this->assertSame(3, $next->outputs()->count());
+        // A WAV master yields four outputs since #322 added preview_untagged beside the tagged preview.
+        $this->assertSame(4, $next->outputs()->count());
     }
 
     public function test_site_image_scan_and_variants_share_one_budget_and_remain_retryable(): void
