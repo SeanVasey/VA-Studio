@@ -113,7 +113,8 @@ class CheckoutBuyerEmailPrefillTest extends TestCase
 
     public static function unsentShapes(): array
     {
-        return ['ip literal domain' => ['buyer@[127.0.0.1]'], 'one-letter top-level label' => ['buyer@example.c'], 'digit in top-level label' => ['buyer@example.x1']];
+        return ['ip literal domain' => ['buyer@[127.0.0.1]'], 'one-letter top-level label' => ['buyer@example.c'], 'digit in top-level label' => ['buyer@example.x1'],
+            'exclamation in local part' => ['buyer!tag@example.com'], 'braces in local part' => ['{buyer}@example.com']];
     }
 
     #[DataProvider('unsentShapes')]
@@ -129,10 +130,12 @@ class CheckoutBuyerEmailPrefillTest extends TestCase
 
     public function test_buyer_email_shape(): void
     {
-        foreach (['buyer@example.com', "o'brien+tag@mail.example.co.uk", 'A.B@example.museum'] as $email) {
+        foreach (['buyer@example.com', "o'brien+tag@mail.example.co.uk", 'A.B@example.museum', 'first_last%x-y@example.com'] as $email) {
             $this->assertSame($email, CheckoutEvidence::buyerEmail($email));
         }
-        foreach ([null, 7, '', 'buyer@localhost', 'buyer@[127.0.0.1]', 'buyer@example.123', 'bü@example.com', '"a b"@example.com',
+        foreach (['a/b@example.com', 'a=b@example.com', 'a{b}@example.com', 'a|b@example.com', 'a`b@example.com', 'a?b@example.com',
+            'a^b@example.com', 'a$b@example.com', 'a&b@example.com', 'a!b@example.com', 'a#b@example.com', 'a*b@example.com', 'a~b@example.com',
+            null, 7, '', 'buyer@localhost', 'buyer@[127.0.0.1]', 'buyer@example.123', 'bü@example.com', '"a b"@example.com',
             'buyer@-example.com', 'buyer@example.com ', str_repeat('a', 65).'@example.com', 'a@'.str_repeat('b', 250).'.com'] as $email) {
             $this->assertNull(CheckoutEvidence::buyerEmail($email), var_export($email, true));
         }
@@ -156,7 +159,7 @@ class CheckoutBuyerEmailPrefillTest extends TestCase
 
     public static function alteredStored(): array
     {
-        return ['different address' => ['other@example.com'], 'null' => [null], 'empty' => ['']];
+        return ['different address' => ['other@example.com'], 'different case' => ['ORDER-PRIVACY-MARKER@example.invalid'], 'null' => [null], 'empty' => ['']];
     }
 
     #[DataProvider('alteredStored')]
@@ -167,11 +170,25 @@ class CheckoutBuyerEmailPrefillTest extends TestCase
         $this->expectRefused(fn () => app(CheckoutEvidence::class)->verifyIntent($intent, $f['order']));
     }
 
-    public function test_stored_email_is_refused_when_the_order_address_would_not_be_sent(): void
+    /**
+     * Stored requests bind to the order snapshot, not to today's shape check. `buyer!tag@example.com` was sent by the first
+     * version of the check and is refused by the narrower one, which stands in for any later tightening: the stored intent
+     * must still verify and replay byte for byte, or paid orders would become unreadable and unfinalizable.
+     */
+    public function test_stored_order_address_replays_after_the_shape_check_tightens(): void
     {
-        $f = $this->preparedWithEmail('buyer@[127.0.0.1]');
-        $intent = $this->legacyIntent($f, 'buyer@[127.0.0.1]', true);
-        $this->expectRefused(fn () => app(CheckoutEvidence::class)->verifyIntent($intent, $f['order']));
+        $email = 'buyer!tag@example.com';
+        $this->assertNull(CheckoutEvidence::buyerEmail($email));
+        $f = $this->preparedWithEmail($email);
+        $intent = $this->legacyIntent($f, $email, true);
+        $stored = app(CheckoutEvidence::class)->decrypt($intent->request_ciphertext, $intent->request_hash, $intent->canonicalization_version);
+        $this->assertSame($email, $stored['params']['customer_email']);
+        $this->assertSame(CanonicalJson::encode($stored), CanonicalJson::encode(app(CheckoutEvidence::class)->verifyIntent($intent, $f['order'])));
+        app(HostedCheckout::class)->start($f['order']->public_id, InventoryFixtures::OWNER);
+        $creates = $this->creates();
+        $this->assertCount(1, $creates);
+        $this->assertSame(CanonicalJson::encode($stored['params']), CanonicalJson::encode($creates[0]['params']));
+        $this->assertSame('vasey-checkout-v1-'.$intent->public_id, $creates[0]['key']);
     }
 
     private function expectRefused(callable $operation): void
