@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 import re
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -865,11 +866,43 @@ class CollectorTests(unittest.TestCase):
 
 
 class SyntheticEnvironmentTests(unittest.TestCase):
+    def test_service_address_is_the_containers_single_private_ipv4(self):
+        for inspected, expected in ((b"172.18.0.2 \n", "172.18.0.2"), (b"10.1.0.7\n", "10.1.0.7")):
+            with patch.object(receipt, "run", return_value=inspected):
+                self.assertEqual(receipt.service_address(Path(ROOT), "a" * 64), expected)
+        for inspected in (b"", b"\n", b"172.18.0.2 10.0.0.2 \n", b"8.8.8.8 \n", b"fd00::2 \n", b"0.0.0.0 \n"):
+            with self.subTest(inspected=inspected), patch.object(receipt, "run", return_value=inspected), \
+                    self.assertRaises(receipt.ReceiptError):
+                receipt.service_address(Path(ROOT), "a" * 64)
+
+    def test_mysql_host_must_be_the_jobs_service_container_before_any_database_probe(self):
+        env = {"APP_ENV": "testing", "DB_CONNECTION": "mysql", "DB_HOST": "172.18.0.2", "DB_PORT": "3306",
+               "DB_DATABASE": "vaseyaudio_test", "DB_URL": "", "DB_SOCKET": "", "MYSQL_CONTAINER_ID": "a" * 64}
+        runtime = json.dumps({"version": "8.4.27", "integer_size": 8, "memory_limit": "512M", "extensions": {}}).encode()
+        for inspected in (b"172.18.0.3 \n", b"127.0.0.1 \n"):
+            labels = []
+
+            def fake_run(root, argv, label, inspected=inspected, labels=labels):
+                labels.append(label)
+                return {"MySQL service address": inspected, "PHP runtime": runtime}.get(label, b"")
+            completed = subprocess.CompletedProcess([], 0, b"version 1\n", b"")
+            with self.subTest(inspected=inspected), patch.object(receipt, "run", side_effect=fake_run), \
+                    patch.object(receipt.shutil, "which", return_value=sys.executable), \
+                    patch.object(receipt.subprocess, "run", return_value=completed), \
+                    self.assertRaisesRegex(receipt.ReceiptError, "not the job's MySQL service container"):
+                try:
+                    receipt.runtime_identity(Path(ROOT), "mysql", env)
+                finally:
+                    self.assertIn("MySQL service address", labels)
+                    self.assertNotIn("MySQL settings", labels)
+
     def test_non_synthetic_database_target_rejects_before_any_probe(self):
-        baseline = {"APP_ENV": "testing", "DB_CONNECTION": "mysql", "DB_HOST": "127.0.0.1",
+        baseline = {"APP_ENV": "testing", "DB_CONNECTION": "mysql", "DB_HOST": "172.18.0.2",
                     "DB_PORT": "3306", "DB_DATABASE": "vaseyaudio_test", "DB_URL": "", "DB_SOCKET": ""}
         receipt.validate_test_environment("mysql", baseline)
+        receipt.validate_test_environment("mysql", baseline | {"DB_HOST": "127.0.0.1"})
         for change in ({"APP_ENV": "production"}, {"DB_CONNECTION": "sqlite"}, {"DB_HOST": "database.example.invalid"},
+                       {"DB_HOST": "8.8.8.8"}, {"DB_HOST": "0.0.0.0"}, {"DB_HOST": "fd00::2"}, {"DB_HOST": "172.18.0.02"},
                        {"DB_PORT": "3307"}, {"DB_DATABASE": "production"}, {"DB_URL": "mysql://synthetic.invalid"},
                        {"DB_SOCKET": "/tmp/foreign.sock"}):
             with self.subTest(change=change), patch.object(receipt, "run") as probe, self.assertRaises(receipt.ReceiptError):
