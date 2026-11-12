@@ -505,7 +505,7 @@ class TestTrackOrderResourceTest extends TestCase
         $this->assertSame(['* * * * *', true], [$event->expression, $event->withoutOverlapping]);
 
         // Default off: no flag, no policy. The schedule does not run it and a manual run refuses and records nothing.
-        $this->assertNull(config('delivery.test_auto_enable_policy'));
+        $this->assertContains(config('delivery.test_auto_enable_policy'), [null, ''], 'the policy ships blank (.env.example sets it empty)');
         $this->assertFalse(config('delivery.test_auto_enable_enabled'));
         $this->assertFalse($event->filtersPass($this->app));
         $this->assertSame(1, $this->sweep()[0]);
