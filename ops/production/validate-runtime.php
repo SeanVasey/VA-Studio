@@ -81,10 +81,15 @@ const LAUNCH_OFF_HOLDS = [
     'VASEY_TEST_SERVICE_INVOICING_ENABLED',
     // Test unpaid release (Stripe test mode only): optional on the staging rehearsal since 2026-11-11, never in production; the flag is refused unless false.
     'VASEY_TEST_UNPAID_RELEASE_ENABLED',
+    // Test refund and dispute lifecycle (Stripe test mode only): optional on the staging rehearsal since 2026-11-12, never in production;
+    // the flag is refused unless false. The production tax chain that reuses it refuses outside literal local/testing in code as well.
+    'VASEY_TEST_REFUND_DISPUTE_ENABLED',
     // Test buyer cancellation of a never-sent order (Stripe test chain only): optional on the staging rehearsal since 2026-11-12, never in production.
     'VASEY_TEST_BUYER_CANCEL_ENABLED',
     // BL-71: the staging-only BeatStars catalog import (`vasey:staging-beatstars-import`) refuses production in code; this hold keeps its flag off the production host.
     'VASEY_STAGING_BEATSTARS_IMPORT_ENABLED',
+    // Automatic test delivery enabling (Stripe test mode only, D-19 amendment 2026-11-12): optional on staging, never in production; refused unless false.
+    'VASEY_TEST_DELIVERY_AUTO_ENABLED',
 ];
 
 ini_set('display_errors', '0');

@@ -18,6 +18,10 @@ use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
+use Illuminate\Console\Scheduling\Event;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
@@ -456,5 +460,239 @@ class TestTrackOrderResourceTest extends TestCase
         $this->assertSame([$this->staffAudit($id, 'refused', 0, 'ALPHA-STEP2')], $this->audit('commerce.delivery.staff_action.delivery_enable'));
         $this->deliveryRefused($f, 'unavailable');
         $this->trackList()->assertSee('Blocked (version 0)')->assertSee('Delivery blocked');
+    }
+
+    /** Exactly TestDeliveryAutoEnablePolicy::CONTRACT, spelled out so a drift in the contract fails here. */
+    private static function autoPolicy(array $changes = []): string
+    {
+        return json_encode([...['schema_version' => 1, 'purpose' => 'test_delivery_auto_enable', 'version' => 'test-delivery-auto-enable-v1',
+            'provider' => 'stripe', 'mode' => 'test', 'scope' => 'ready_orders_never_controlled', 'lanes' => 'track_and_sound_kit',
+            'holds' => 'skip_while_refund_dispute_held', 'staff_decisions' => 'final', 'actor' => 'system'], ...$changes], JSON_THROW_ON_ERROR);
+    }
+
+    private function automatic(mixed $on = true, array $changes = []): void
+    {
+        config(['delivery.test_auto_enable_enabled' => $on, 'delivery.test_auto_enable_policy' => self::autoPolicy($changes)]);
+    }
+
+    /** Runs the scheduled command once and returns [exit code, "<order> <outcome>" lines]. */
+    private function sweep(): array
+    {
+        $code = Artisan::call('vasey:auto-enable-test-delivery');
+
+        return [$code, array_values(array_filter(explode("\n", trim(Artisan::output()))))];
+    }
+
+    /** A synthetic active refund/dispute hold on the order (the test chain's existence guards are removed for this planted row). */
+    private function hold(array $f): void
+    {
+        foreach (['refund_dispute_effects_insert', 'refund_dispute_holds_insert'] as $guard) {
+            DB::unprepared('DROP TRIGGER IF EXISTS '.$guard);
+        }
+        $now = now();
+        DB::table('refund_dispute_effects')->insert(['public_id' => (string) Str::uuid(), 'order_id' => $f['order']->id, 'order_source' => 'test',
+            'sequence' => 1, 'effect_key' => 'planted', 'kind' => 'dispute_hold_applied', 'policy_hash' => str_repeat('a', 64), 'context' => '{}', 'created_at' => $now]);
+        DB::table('refund_dispute_holds')->insert(['public_id' => (string) Str::uuid(), 'order_id' => $f['order']->id, 'order_source' => 'test',
+            'license_grant_id' => null, 'reason' => 'dispute_reconciling', 'applied_effect_id' => DB::table('refund_dispute_effects')->max('id'), 'created_at' => $now]);
+    }
+
+    public function test_automatic_enabling_is_off_by_default_scheduled_tracked_and_admitted_only_by_its_exact_policy(): void
+    {
+        $f = $this->order('ready');
+        $this->app->make(Kernel::class)->bootstrap();
+        $event = collect($this->app->make(Schedule::class)->events())
+            ->filter(fn (Event $event): bool => str_contains((string) $event->command, 'vasey:auto-enable-test-delivery'))->sole();
+        $this->assertSame(['* * * * *', true], [$event->expression, $event->withoutOverlapping]);
+
+        // Default off: no flag, no policy. The schedule does not run it and a manual run refuses and records nothing.
+        $this->assertContains(config('delivery.test_auto_enable_policy'), [null, ''], 'the policy ships blank (.env.example sets it empty)');
+        $this->assertFalse(config('delivery.test_auto_enable_enabled'));
+        $this->assertFalse($event->filtersPass($this->app));
+        $this->assertSame(1, $this->sweep()[0]);
+        // Any changed policy, the flag off, a non-boolean flag, live mode, a bad account or production refuses the same way.
+        foreach ([[true, ['staff_decisions' => 'overridable']], [true, ['holds' => 'ignore']], [true, ['lanes' => 'track']],
+            [true, ['extra' => 'x']], [false, []], ['true', []]] as [$on, $changes]) {
+            $this->automatic($on, $changes);
+            $this->assertFalse($event->filtersPass($this->app), json_encode([$on, $changes]));
+            $this->assertSame(1, $this->sweep()[0]);
+        }
+        $this->automatic();
+        foreach ([fn () => config(['payments.stripe.mode' => 'live']), fn () => config(['payments.stripe.account_id' => 'not-an-account']),
+            fn () => $this->app->instance('env', 'production')] as $close) {
+            $close();
+            $this->assertFalse($event->filtersPass($this->app));
+            $this->assertSame(1, $this->sweep()[0]);
+            $this->app->instance('env', $this->originalEnv);
+            config(['payments.stripe.mode' => 'test', 'payments.stripe.account_id' => CheckoutFixtures::ACCOUNT]);
+        }
+        $this->assertSame(0, TestDeliveryControl::query()->count());
+
+        // On with the exact policy: the schedule runs it and its outcome is tracked.
+        $this->assertTrue($event->filtersPass($this->app));
+        $event->finish($this->app, 1);
+        $this->assertSame('failure', DB::table('scheduler_heartbeats')->where('task', 'vasey:auto-enable-test-delivery')->value('last_outcome'));
+        $this->assertSame([0, [$f['order']->public_id.' enabled']], $this->sweep());
+        // With owner delivery access off the track lane enables nothing and says so.
+        $g = $this->order('ready');
+        config(['delivery.test_access_enabled' => false]);
+        $this->assertSame(1, $this->sweep()[0]);
+        $this->assertNull(TestDeliveryControl::query()->where('order_id', $g['order']->id)->first());
+    }
+
+    public function test_automatic_enabling_enables_each_ready_never_controlled_order_once_as_the_system_and_never_overrides_staff(): void
+    {
+        $ready = $this->order('ready');
+        $contracted = $this->order('contracted');
+        $paid = $this->order('paid');
+        $unpaid = $this->order('unpaid');
+        $blocked = $this->order('ready');
+        $staffEnabled = $this->order('ready');
+        $held = $this->order('ready');
+        $service = app(TestDeliveryStaffOperations::class);
+        $this->assertTrue($service->controlDelivery($this->actor, $blocked['order']->public_id, 'block', 0, 'ALPHA-HOLD-BACK')['ok']);
+        $this->assertTrue($service->controlDelivery($this->actor, $staffEnabled['order']->public_id, 'enable', 0, 'ALPHA-STAFF')['ok']);
+        $this->hold($held);
+        $before = DB::table('audit_events')->count();
+        $this->automatic();
+
+        // Only the ready order nobody controlled is enabled; the others are not even selected.
+        $this->assertSame([0, [$ready['order']->public_id.' enabled']], $this->sweep());
+        $control = TestDeliveryControl::query()->where('order_id', $ready['order']->id)->sole();
+        $this->assertSame([false, 1], [$control->blocked, $control->control_version]);
+        foreach ([$contracted, $paid, $unpaid, $held] as $f) {
+            $this->assertNull(TestDeliveryControl::query()->where('order_id', $f['order']->id)->first());
+        }
+        $this->assertSame([true, 0], [TestDeliveryControl::query()->where('order_id', $blocked['order']->id)->value('blocked'),
+            TestDeliveryControl::query()->where('order_id', $blocked['order']->id)->value('control_version')]);
+        // The same two control events staff and the console record, by no actor, plus one event naming the policy.
+        $reference = hash('sha256', 'auto.test-delivery-auto-enable-v1');
+        $events = DB::table('audit_events')->where('id', '>', $before)->orderBy('id')->get()
+            ->map(fn (object $row): array => [$row->action, $row->actor_id, $row->subject_id, json_decode($row->context, true)])->all();
+        $this->assertSame([
+            ['commerce.delivery.control_provisioned', null, $control->id, ['order_public_id' => $ready['order']->public_id, 'blocked' => true,
+                'control_version' => 0, 'reference_hash' => $reference, 'test_only' => true]],
+            ['commerce.delivery.control_changed', null, $control->id, ['order_public_id' => $ready['order']->public_id, 'blocked' => false,
+                'control_version' => 1, 'reference_hash' => $reference, 'test_only' => true]],
+            ['commerce.delivery.auto_enabled', null, $control->id, ['order_public_id' => $ready['order']->public_id, 'control_version' => 1,
+                'policy_version' => 'test-delivery-auto-enable-v1', 'test_only' => true]],
+        ], $events);
+
+        // The buyer can now authorize a download; the held order stays refused at issuance whatever happens to its control.
+        $this->issue($ready);
+        $this->deliveryRefused($held, 'blocked');
+        // Called directly (as a run that selected it just before the hold committed would), the held order is still left alone.
+        $this->assertNull(app(ManageTestDeliveryControl::class)->enableAutomatically($held['order']->public_id));
+        $this->assertNull(TestDeliveryControl::query()->where('order_id', $held['order']->id)->first());
+        // The staff page shows the state; the audit names the policy.
+        $this->trackList()->assertSee('Enabled (version 1)')->assertSee('Blocked (version 0)');
+
+        // Replay changes nothing.
+        $count = DB::table('audit_events')->count();
+        $this->assertSame([0, []], $this->sweep());
+        $this->assertSame($count, DB::table('audit_events')->count());
+
+        // Staff block the automatically enabled order: it stays blocked, and the label follows the staff change.
+        $this->assertTrue($service->controlDelivery($this->actor, $ready['order']->public_id, 'block', 1, 'ALPHA-WITHDRAW')['ok']);
+        $this->assertSame([0, []], $this->sweep());
+        $this->assertSame([true, 2], [TestDeliveryControl::query()->where('order_id', $ready['order']->id)->value('blocked'),
+            TestDeliveryControl::query()->where('order_id', $ready['order']->id)->value('control_version')]);
+        $this->trackList()->assertSee('Blocked (version 2)');
+
+        // Once the hold is released the held order becomes ready and is enabled on the next run.
+        DB::unprepared('DROP TRIGGER IF EXISTS refund_dispute_holds_update');
+        DB::table('refund_dispute_holds')->where('order_id', $held['order']->id)->update(['released_at' => now()]);
+        $this->assertSame([0, [$held['order']->public_id.' enabled']], $this->sweep());
+    }
+
+    public function test_a_staff_click_racing_the_automatic_enable_ends_with_one_change(): void
+    {
+        $f = $this->order('ready');
+        $id = $f['order']->public_id;
+        $this->automatic();
+        // Sequential interleavings (the concurrent one runs on native MySQL): staff first, then the automatic enable that had
+        // already selected the order.
+        $manage = app(ManageTestDeliveryControl::class);
+        $this->assertTrue(app(TestDeliveryStaffOperations::class)->controlDelivery($this->actor, $id, 'enable', 0, 'ALPHA-FIRST')['ok']);
+        $this->assertNull($manage->enableAutomatically($id));
+        $this->assertSame([false, 1], [TestDeliveryControl::query()->sole()->blocked, TestDeliveryControl::query()->sole()->control_version]);
+        $this->assertSame(0, DB::table('audit_events')->where('action', 'commerce.delivery.auto_enabled')->count());
+
+        // The other order: the automatic enable first, then a staff enable from a dialog opened before it (version 0) changes nothing.
+        $g = $this->order('ready');
+        $this->assertSame(1, $manage->enableAutomatically($g['order']->public_id)?->control_version);
+        $this->assertSame(['ok' => true, 'message' => 'Delivery is already enabled (version 1). Nothing changed.'],
+            app(TestDeliveryStaffOperations::class)->controlDelivery($this->actor, $g['order']->public_id, 'enable', 0, 'ALPHA-LATE'));
+        // A staff block from the stale dialog is refused as a conflict, so the order is not silently flipped.
+        $this->assertFalse(app(TestDeliveryStaffOperations::class)->controlDelivery($this->actor, $g['order']->public_id, 'block', 0, 'ALPHA-STALE')['ok']);
+        $this->assertSame([false, 1], [TestDeliveryControl::query()->where('order_id', $g['order']->id)->value('blocked'),
+            TestDeliveryControl::query()->where('order_id', $g['order']->id)->value('control_version')]);
+    }
+
+    public function test_the_automatic_enable_refuses_changed_evidence_and_an_unready_order_without_recording_a_control(): void
+    {
+        $this->automatic();
+        $manage = app(ManageTestDeliveryControl::class);
+        $contracted = $this->order('contracted');
+        try {
+            $manage->enableAutomatically($contracted['order']->public_id);
+            $this->fail('An order without activation was enabled.');
+        } catch (DeliveryException $error) {
+            $this->assertSame('blocked', $error->reason);
+        }
+        foreach (['not-a-uuid', (string) Str::uuid()] as $id) {
+            try {
+                $manage->enableAutomatically($id);
+                $this->fail('An unknown order was enabled.');
+            } catch (DeliveryException $error) {
+                $this->assertSame('not_found', $error->reason);
+            }
+        }
+        // Called inside an open transaction it refuses, as every control change does.
+        $f = $this->order('ready');
+        DB::beginTransaction();
+        try {
+            $manage->enableAutomatically($f['order']->public_id);
+            $this->fail('The automatic enable ran inside a transaction.');
+        } catch (\Throwable) {
+            $this->assertTrue(true);
+        } finally {
+            DB::rollBack();
+        }
+        $this->assertSame(0, TestDeliveryControl::query()->count());
+
+        // Owner delivery access switched off: refused, nothing recorded.
+        config(['delivery.test_access_enabled' => false]);
+        $this->refusedAutomatically($f, 'unavailable');
+        config(['delivery.test_access_enabled' => true]);
+
+        // The automatic policy withdrawn after the order was read but before it was locked: refused under the lock.
+        $withdrawn = false;
+        DB::listen(function (QueryExecuted $query) use (&$withdrawn): void {
+            if (! $withdrawn && DB::transactionLevel() > 0 && str_starts_with(strtolower(str_replace(['"', '`'], '', $query->sql)), 'select * from orders where orders.id =')) {
+                $withdrawn = true;
+                config(['delivery.test_auto_enable_enabled' => false]);
+            }
+        });
+        $this->refusedAutomatically($f, 'unavailable');
+        $this->assertTrue($withdrawn);
+        $this->assertSame(0, TestDeliveryControl::query()->count());
+
+        // Called while a staff member is signed in, the change is still attributed to no actor.
+        $this->automatic();
+        $this->actingAs($this->actor);
+        $this->assertSame(1, $manage->enableAutomatically($f['order']->public_id)?->control_version);
+        $this->assertSame([null], DB::table('audit_events')->whereIn('action', ['commerce.delivery.control_provisioned', 'commerce.delivery.control_changed',
+            'commerce.delivery.auto_enabled'])->distinct()->pluck('actor_id')->all());
+    }
+
+    private function refusedAutomatically(array $f, string $reason): void
+    {
+        try {
+            app(ManageTestDeliveryControl::class)->enableAutomatically($f['order']->public_id);
+            $this->fail('The automatic enable was not refused.');
+        } catch (DeliveryException $error) {
+            $this->assertSame($reason, $error->reason);
+        }
+        $this->assertNull(TestDeliveryControl::query()->where('order_id', $f['order']->id)->first());
     }
 }

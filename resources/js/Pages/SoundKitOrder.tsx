@@ -43,6 +43,12 @@ export default function SoundKitOrder({ siteContent, order: initial, navigate = 
   // Counts every write to `order`, so a read that began before a newer write cannot overwrite it.
   const version = useRef(0);
   const commit = (next: SoundKitOrderState) => { version.current += 1; setOrder(next); };
+  /**
+   * An owner action's response replaces the order only if nothing was written since it was sent. A status read that was already in flight
+   * can land while the action is still pending; the later-arriving action response would then be the older view, so it is dropped (the
+   * poll or a repeated click shows the current state). Returns whether the response was applied.
+   */
+  const commitIfCurrent = (startedAt: number, next: SoundKitOrderState) => { if (version.current !== startedAt) return false; commit(next); return true; };
   const href = (path: string) => siteContentHref(path, null);
   function go(event: MouseEvent<HTMLAnchorElement>) {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
@@ -60,12 +66,16 @@ export default function SoundKitOrder({ siteContent, order: initial, navigate = 
   }
   // Starting and continuing both ask the server: it creates the session once, then re-reads it and returns its URL only while open.
   const checkout = () => run(async () => {
+    const startedAt = version.current;
     const state = await soundKitPost<SoundKitOrderState>(`${base}/checkout`);
-    commit(state);
+    commitIfCurrent(startedAt, state);
     if (stripeTestCheckoutUrl(state.checkoutUrl)) navigate(state.checkoutUrl);
     else if (state.status === 'checkout_started') setMessage('This Stripe test checkout is no longer open. Check the payment status instead.');
   });
-  const reconcile = () => run(async () => { commit(await soundKitPost<SoundKitOrderState>(`${base}/checkout/reconcile`)); });
+  const reconcile = () => run(async () => {
+    const startedAt = version.current;
+    commitIfCurrent(startedAt, await soundKitPost<SoundKitOrderState>(`${base}/checkout/reconcile`));
+  });
   const download = (kind: 'archive' | 'contract') => run(async () => {
     const grant = await soundKitPost<{ authorizationId: string; token: string }>(`${base}/delivery/authorizations`, { kind });
     const form = document.createElement('form');

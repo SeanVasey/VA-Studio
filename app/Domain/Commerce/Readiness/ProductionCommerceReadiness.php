@@ -28,6 +28,7 @@ final class ProductionCommerceReadiness
         'payments.stripe.finalization_enabled', 'contracts.test_issuance_enabled', 'delivery.test_activation_enabled',
         'delivery.test_access_enabled', 'customer.test_accounts_enabled', 'customer.test_identity_enabled',
         'customer.test_purchase_claims_enabled', 'inquiries.test_order_inquiries_enabled', 'unpaid-release.enabled', 'refund-resolution.enabled',
+        'delivery.test_auto_enable_enabled',
         'buyer-cancel.enabled',
     ];
 
@@ -36,6 +37,7 @@ final class ProductionCommerceReadiness
         'commerce.test_exclusive_selection_policy', 'commerce.test_order_policy', 'commerce.test_checkout_policy',
         'payments.stripe.finalization_policy', 'contracts.test_issuance_policy', 'delivery.test_activation_policy',
         'delivery.test_access_policy', 'customer.identity_transport', 'unpaid-release.policy', 'refund-resolution.policy',
+        'delivery.test_auto_enable_policy',
         'buyer-cancel.policy',
     ];
 

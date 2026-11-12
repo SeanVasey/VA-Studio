@@ -3,7 +3,9 @@
 namespace Tests\Unit;
 
 use App\Domain\Commerce\BuyerCancel\BuyerCancelPolicy;
+use App\Domain\Commerce\RefundDispute\RefundDisputePolicy;
 use App\Domain\Commerce\UnpaidRelease\UnpaidReleasePolicy;
+use App\Domain\Delivery\TestDeliveryAutoEnablePolicy;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -15,14 +17,15 @@ require_once dirname(__DIR__, 2).'/scripts/ops/capability-boundary.php';
 class StagingRuntimeValidatorTest extends TestCase
 {
     /**
-     * The twelve capability flags and the four stated beside them (batches K2 and K3, lane PCC). Written out here on purpose: removing one from
+     * The eleven capability flags and the four stated beside them (batches K2 and K3, lane PCC). Written out here on purpose: removing one from
      * scripts/ops/capability-boundary.php must fail a test, not silently shrink what the test checks. Unpaid release left this list on
      * 2026-11-11 for STAGING_OPTIONAL_FLAGS (Sean's authorization for the staging alpha); tests/ops/test_staging_unpaid_release_admission.py
-     * runs the gate for it.
+     * runs the gate for it. The test refund and dispute lifecycle followed on 2026-11-12 (Sean's decision);
+     * tests/ops/test_staging_refund_dispute_admission.py runs the gate for it.
      */
     private const STAGED_FLAGS = [
         'VASEY_TEST_SERVICE_PROJECTS_ENABLED', 'VASEY_TEST_FREE_GRANTS_ENABLED', 'VASEY_TEST_CUSTOMER_CONSENT_ENABLED',
-        'VASEY_TEST_REFUND_RESOLUTION_ENABLED', 'VASEY_TEST_REFUND_DISPUTE_ENABLED',
+        'VASEY_TEST_REFUND_RESOLUTION_ENABLED',
         'VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED', 'VASEY_CUSTOMER_DATA_RIGHTS_ENABLED', 'VASEY_TRANSACTIONAL_MAIL_ENABLED',
         'CONTACT_TEST_ORDER_INQUIRIES_ENABLED', 'CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED',
         'VASEY_OPERATIVE_FREE_GRANTS_ENABLED', 'VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED',
@@ -127,11 +130,13 @@ class StagingRuntimeValidatorTest extends TestCase
         return array_combine(self::STAGED_FLAGS, array_map(static fn (string $flag): array => [$flag], self::STAGED_FLAGS));
     }
 
-    public function test_the_shared_boundary_lists_exactly_the_sixteen_flags(): void
+    public function test_the_shared_boundary_lists_exactly_the_fifteen_flags(): void
     {
         $this->assertSame(self::STAGED_FLAGS, array_keys(CapabilityBoundary::stagedFlags()));
-        $this->assertSame(12, count(CapabilityBoundary::CAPABILITY_FLAGS));
-        $this->assertSame(['VASEY_TEST_UNPAID_RELEASE_ENABLED', 'VASEY_TEST_BUYER_CANCEL_ENABLED'], array_keys(CapabilityBoundary::STAGING_OPTIONAL_FLAGS));
+        $this->assertSame(11, count(CapabilityBoundary::CAPABILITY_FLAGS));
+        $this->assertSame(['VASEY_TEST_UNPAID_RELEASE_ENABLED', 'VASEY_TEST_REFUND_DISPUTE_ENABLED', 'VASEY_TEST_DELIVERY_AUTO_ENABLED',
+            'VASEY_TEST_BUYER_CANCEL_ENABLED'],
+            array_keys(CapabilityBoundary::STAGING_OPTIONAL_FLAGS));
         foreach (self::UNGATED_FLAGS as $flag) {
             $this->assertArrayHasKey($flag, CapabilityBoundary::CAPABILITY_FLAGS);
         }
@@ -190,7 +195,7 @@ class StagingRuntimeValidatorTest extends TestCase
         $this->assertStringContainsString('PASS runtime.profile', $process->getOutput());
     }
 
-    public function test_all_twelve_enabled_at_once_are_each_named_once_and_nothing_else_fails(): void
+    public function test_all_fifteen_enabled_at_once_are_each_named_once_and_nothing_else_fails(): void
     {
         $lines = array_map(static fn (string $flag): string => $flag.'=true', self::STAGED_FLAGS);
         $process = $this->validate($this->profile().implode("\n", $lines)."\n");
@@ -332,13 +337,56 @@ class StagingRuntimeValidatorTest extends TestCase
         $admits = static fn (string $policy): bool => true;
         $refuses = static fn (string $policy): bool => false;
         foreach (CapabilityBoundary::STAGING_OPTIONAL_FLAGS as $environmentKey => $flag) {
-            $reader = static fn (string $key): mixed => $key === $flag['config'] ? $value : false;
+            // Every other key reads false, except the flag's own stated values, which read exactly as stated.
+            $reader = static fn (string $key): mixed => $key === $flag['config'] ? $value : ($flag['values'][$key] ?? false);
             $this->assertSame($value === true ? [] : [$environmentKey], CapabilityBoundary::optionalFlagsRefused($reader, $admits), $environmentKey);
             $this->assertSame([$environmentKey], CapabilityBoundary::optionalFlagsRefused($reader, $refuses), $environmentKey);
-            $this->assertSame(['VASEY_TEST_UNPAID_RELEASE_ENABLED' => UnpaidReleasePolicy::class,
-                'VASEY_TEST_BUYER_CANCEL_ENABLED' => BuyerCancelPolicy::class][$environmentKey], $flag['policy']);
         }
+        $this->assertSame(UnpaidReleasePolicy::class, CapabilityBoundary::STAGING_OPTIONAL_FLAGS['VASEY_TEST_UNPAID_RELEASE_ENABLED']['policy']);
+        $this->assertArrayNotHasKey('values', CapabilityBoundary::STAGING_OPTIONAL_FLAGS['VASEY_TEST_UNPAID_RELEASE_ENABLED']);
+        $this->assertSame(RefundDisputePolicy::class, CapabilityBoundary::STAGING_OPTIONAL_FLAGS['VASEY_TEST_REFUND_DISPUTE_ENABLED']['policy']);
+        $this->assertSame(TestDeliveryAutoEnablePolicy::class, CapabilityBoundary::STAGING_OPTIONAL_FLAGS['VASEY_TEST_DELIVERY_AUTO_ENABLED']['policy']);
+        $this->assertArrayNotHasKey('values', CapabilityBoundary::STAGING_OPTIONAL_FLAGS['VASEY_TEST_DELIVERY_AUTO_ENABLED']);
+        $this->assertSame(BuyerCancelPolicy::class, CapabilityBoundary::STAGING_OPTIONAL_FLAGS['VASEY_TEST_BUYER_CANCEL_ENABLED']['policy']);
+        $this->assertArrayNotHasKey('values', CapabilityBoundary::STAGING_OPTIONAL_FLAGS['VASEY_TEST_BUYER_CANCEL_ENABLED']);
         $this->assertSame([], CapabilityBoundary::optionalFlagsRefused(static fn (string $key): bool => false, $refuses));
+    }
+
+    /**
+     * Refund and dispute on staging runs only the DD-16 policy: each of the four values must read exactly its confirmed choice, even
+     * when the policy class (which also admits `operator_review` and `remain_sold`) accepts the configuration.
+     */
+    public function test_refund_and_dispute_on_staging_is_admitted_only_with_the_four_dd16_values(): void
+    {
+        $flag = CapabilityBoundary::STAGING_OPTIONAL_FLAGS['VASEY_TEST_REFUND_DISPUTE_ENABLED'];
+        $this->assertSame('refund-dispute.enabled', $flag['config']);
+        $expected = [];
+        foreach (RefundDisputePolicy::PRODUCTION_CONFIRMED as $key => $choice) {
+            $expected['refund-dispute.policy.'.$key] = $choice;
+        }
+        $this->assertSame($expected, $flag['values']);
+        $this->assertSame(['authoritative_provider_operator_review', 'exact_line_allocation', 'temporarily_block_while_reconciling',
+            'qualified_operator_review'], array_values($flag['values']));
+        $admits = static fn (string $policy): bool => true;
+        $only = static fn (array $values): array => array_values(array_intersect(['VASEY_TEST_REFUND_DISPUTE_ENABLED'],
+            CapabilityBoundary::optionalFlagsRefused(static fn (string $key): mixed => match (true) {
+                $key === 'refund-dispute.enabled' => true,
+                array_key_exists($key, $values) => $values[$key],
+                default => false,
+            }, $admits)));
+        $this->assertSame([], $only($expected));
+        $alternatives = ['refund-dispute.policy.dispute_access' => 'operator_review', 'refund-dispute.policy.exclusive_reopening' => 'remain_sold'];
+        foreach ($expected as $key => $choice) {
+            foreach ([null, '', strtoupper($choice), $choice.' ', $alternatives[$key] ?? 'other', true] as $other) {
+                $this->assertSame(['VASEY_TEST_REFUND_DISPUTE_ENABLED'], $only([...$expected, $key => $other]), $key.'='.var_export($other, true));
+            }
+            $partial = $expected;
+            unset($partial[$key]);
+            $this->assertSame(['VASEY_TEST_REFUND_DISPUTE_ENABLED'], $only($partial), 'without '.$key);
+        }
+        // Off is off whatever the values say.
+        $this->assertSame([], array_values(array_intersect(['VASEY_TEST_REFUND_DISPUTE_ENABLED'],
+            CapabilityBoundary::optionalFlagsRefused(static fn (string $key): mixed => $key === 'refund-dispute.enabled' ? false : 'remain_sold', $admits))));
     }
 
     public function test_a_byte_order_mark_is_refused_with_its_own_clear_check(): void

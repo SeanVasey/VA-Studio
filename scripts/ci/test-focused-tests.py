@@ -654,6 +654,19 @@ class SelectionTests(unittest.TestCase):
             without_ci = focused.runner_environment(selected, {})
             self.assertNotIn("CI", without_ci, "The runner must not invent GitHub CI authority.")
 
+    def test_mysql_runner_reaches_the_service_at_a_private_or_loopback_ipv4_literal_only(self):
+        mysql = focused.selection({"FOCUSED_SUITE": "media", "FOCUSED_ENGINE": "mysql"})
+        sqlite = focused.selection({"FOCUSED_SUITE": "media", "FOCUSED_ENGINE": "sqlite"})
+        self.assertEqual(focused.runner_environment(mysql, {})["DB_HOST"], "127.0.0.1")
+        for host in ("127.0.0.1", "172.18.0.2", "10.1.0.5", "192.168.5.9"):
+            self.assertEqual(focused.runner_environment(mysql, {"DB_HOST": host})["DB_HOST"], host)
+            self.assertEqual(focused.runner_environment(sqlite, {"DB_HOST": host})["DB_HOST"], "127.0.0.1")
+        for host in ("localhost", "mysql", "8.8.8.8", "0.0.0.0", "169.254.1.1", "::1", "fd00::1", "172.18.0.02",
+                     " 172.18.0.2", "172.18.0.2:3306"):
+            with self.assertRaises(focused.FocusedError, msg=host):
+                focused.runner_environment(mysql, {"DB_HOST": host})
+            self.assertEqual(focused.runner_environment(sqlite, {"DB_HOST": host})["DB_HOST"], "127.0.0.1")
+
     def test_local_mysql_runner_preserves_only_its_exact_operator_declaration(self):
         for engine in ("mysql", "sqlite"):
             selected = focused.selection({"FOCUSED_SUITE": "media", "FOCUSED_ENGINE": engine})

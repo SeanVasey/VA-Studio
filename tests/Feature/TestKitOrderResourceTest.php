@@ -39,6 +39,7 @@ use Illuminate\Support\Str;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Tests\Support\CheckoutFixtures;
+use Tests\Support\DeliveryFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\InventoryFixtures;
 use Tests\Support\LicenseFixtures;
@@ -371,6 +372,76 @@ class TestKitOrderResourceTest extends TestCase
         $this->assertSame(0, Artisan::call('vasey:issue-test-kit-contracts'));
         $this->assertSame(1, SoundKitContract::query()->count());
         $this->assertSame($order->public_id, SoundKitOrder::query()->sole()->public_id);
+    }
+
+    /** The optional automatic test-delivery policy (D-19 amendment, 2026-11-12), with the track lane's access policy beside it. */
+    private function automatic(): void
+    {
+        DeliveryFixtures::configure();
+        config(['delivery.test_auto_enable_enabled' => true, 'delivery.test_auto_enable_policy' => json_encode(['schema_version' => 1,
+            'purpose' => 'test_delivery_auto_enable', 'version' => 'test-delivery-auto-enable-v1', 'provider' => 'stripe', 'mode' => 'test',
+            'scope' => 'ready_orders_never_controlled', 'lanes' => 'track_and_sound_kit', 'holds' => 'skip_while_refund_dispute_held',
+            'staff_decisions' => 'final', 'actor' => 'system'], JSON_THROW_ON_ERROR)]);
+    }
+
+    private function contracted(): SoundKitOrder
+    {
+        $order = $this->granted();
+        app(SoundKitContracts::class)->issue(SoundKitGrant::query()->where('sound_kit_order_id', $order->id)->sole());
+
+        return $order;
+    }
+
+    public function test_automatic_enabling_enables_a_contracted_never_controlled_kit_order_once_and_never_overrides_staff(): void
+    {
+        $ready = $this->contracted();
+        $pending = $this->granted();
+        $blocked = $this->contracted();
+        app(SoundKitDelivery::class)->control($blocked->public_id, 'block', 0, 'STAFF-HOLD-BACK');
+        // Off by default: nothing is enabled and the run refuses.
+        $this->assertSame(1, Artisan::call('vasey:auto-enable-test-delivery'));
+        $this->assertSame(1, SoundKitDeliveryControl::query()->count());
+
+        $this->automatic();
+        $this->assertSame(0, Artisan::call('vasey:auto-enable-test-delivery'));
+        $this->assertSame([$ready->public_id.' enabled'], array_values(array_filter(explode("\n", trim(Artisan::output())))));
+        $control = SoundKitDeliveryControl::query()->where('sound_kit_order_id', $ready->id)->sole();
+        $this->assertSame(['enabled', 1, hash('sha256', 'auto.test-delivery-auto-enable-v1')], [$control->state, $control->version, $control->reference_hash]);
+        $this->assertNull(SoundKitDeliveryControl::query()->where('sound_kit_order_id', $pending->id)->first());
+        // Called directly, an order without its contract original is left alone too.
+        $this->assertNull(app(SoundKitDelivery::class)->enableAutomatically($pending->public_id));
+        $this->assertNull(SoundKitDeliveryControl::query()->where('sound_kit_order_id', $pending->id)->first());
+        $this->assertSame(['blocked', 1], [SoundKitDeliveryControl::query()->where('sound_kit_order_id', $blocked->id)->value('state'),
+            SoundKitDeliveryControl::query()->where('sound_kit_order_id', $blocked->id)->value('version')]);
+        // The control's own event (as from the console, no actor) plus one naming the policy.
+        $this->assertSame([null, ['order_public_id' => $ready->public_id, 'version' => 1, 'test_only' => true]], array_slice($this->audit('sound_kit.test_delivery.enabled'), -1)[0]);
+        $this->assertSame([[null, ['order_public_id' => $ready->public_id, 'version' => 1, 'policy_version' => 'test-delivery-auto-enable-v1',
+            'test_only' => true]]], $this->audit('sound_kit.test_delivery.auto_enabled'));
+        // The buyer can authorize a download; the page says it was automatic.
+        $this->assertSame('contract', app(SoundKitDelivery::class)->authorize($ready->public_id, $ready->owner_key, 'contract')['kind']);
+        $this->kitList()->assertSee('Enabled automatically')->assertSee('Blocked');
+
+        // Replay changes nothing; a contract issued later makes the pending order ready for the next run.
+        $events = DB::table('audit_events')->count();
+        $this->assertSame(0, Artisan::call('vasey:auto-enable-test-delivery'));
+        $this->assertSame($events, DB::table('audit_events')->count());
+        app(SoundKitContracts::class)->issue(SoundKitGrant::query()->where('sound_kit_order_id', $pending->id)->sole());
+        $this->assertSame(0, Artisan::call('vasey:auto-enable-test-delivery'));
+        $this->assertSame('enabled', SoundKitDeliveryControl::query()->where('sound_kit_order_id', $pending->id)->value('state'));
+
+        // Staff block the automatic enable from a dialog carrying its version: blocked for good.
+        app(SoundKitDelivery::class)->control($ready->public_id, 'block', 1, 'STAFF-WITHDRAW');
+        $this->assertSame(0, Artisan::call('vasey:auto-enable-test-delivery'));
+        $this->assertSame(['blocked', 2], [SoundKitDeliveryControl::query()->where('sound_kit_order_id', $ready->id)->value('state'),
+            SoundKitDeliveryControl::query()->where('sound_kit_order_id', $ready->id)->value('version')]);
+        $this->assertSame(['blocked', null], [SoundKitDeliveryControl::query()->where('sound_kit_order_id', $ready->id)->value('state'),
+            app(SoundKitDelivery::class)->enableAutomatically($ready->public_id)]);
+
+        // With the kit lane closed the kit lane is skipped entirely.
+        $closed = $this->contracted();
+        config(['sound-kits.test_checkout_enabled' => false]);
+        $this->assertSame(0, Artisan::call('vasey:auto-enable-test-delivery'));
+        $this->assertNull(SoundKitDeliveryControl::query()->where('sound_kit_order_id', $closed->id)->first());
     }
 
     /** A paid order with fabricated payment evidence (distinct provider ids), so many can exist beside the one-session fake gateway. */

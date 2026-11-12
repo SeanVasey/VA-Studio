@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Delivery\TestDeliveryAutoEnablePolicy;
 use App\Domain\Operations\OperationalSignals;
 use App\Domain\SoundKits\Purchases\SoundKitPurchasePolicy;
 use Illuminate\Foundation\Inspiring;
@@ -57,6 +58,13 @@ OperationalSignals::track(Schedule::command('vasey:finalize-test-kit-grants')->c
 // is unset) exits non-zero, which the tracked signal shows as Needs attention. Idempotent: a recorded original is never re-rendered.
 OperationalSignals::track(Schedule::command('vasey:issue-test-kit-contracts')->cron('6-59/10 * * * *')->withoutOverlapping(10)
     ->when(fn (): bool => app(SoundKitPurchasePolicy::class)->admitted()), 'vasey:issue-test-kit-contracts');
+
+// D-19 amendment (2026-11-12): optional automatic enabling of Stripe-test delivery for ready orders that never had a delivery control.
+// Runs only while TestDeliveryAutoEnablePolicy admits it (default off; local, testing and staging, never production). Every minute,
+// so a buyer waits about as long as the pipeline's activation sweep; with nothing ready it is two indexed selects. A person's block
+// or enable is never overridden. A refused order exits non-zero, which the tracked signal shows as Needs attention.
+OperationalSignals::track(Schedule::command('vasey:auto-enable-test-delivery')->everyMinute()->withoutOverlapping(5)
+    ->when(fn (): bool => app(TestDeliveryAutoEnablePolicy::class)->admitted()), 'vasey:auto-enable-test-delivery');
 
 // FP-028 dashboard: one upserted row a minute proves the scheduler itself runs (OperationalSignals; "Scheduler last run" turns
 // Needs attention after `reporting.health.scheduler_heartbeat_stale_seconds`). The tracked commands above record their latest

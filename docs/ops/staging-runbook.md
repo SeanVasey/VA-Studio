@@ -555,7 +555,7 @@ order appears under Fulfillment, Held paid orders ("Contract render"). Reset opc
 1. `ops/staging/validate-runtime.php` (run by every deploy and `ctl refresh`) fails `runtime.php_cli_binary` unless the
    configured binary passes the same probe the FPM pool will run.
 2. Free grants stay off on staging: `VASEY_TEST_FREE_GRANTS_ENABLED` must be `false`, and the deploy gate refuses any other value
-   (as it does for the other staged flags; unpaid release is the one optional capability, admitted only with its exact policy). Enabling them is a reviewed change to `scripts/ops/capability-boundary.php`,
+   (as it does for the other staged flags; unpaid release, the test refund and dispute lifecycle and automatic test delivery enabling are the optional capabilities, each admitted only with its exact policy). Enabling them is a reviewed change to `scripts/ops/capability-boundary.php`,
    the templates and their tests. That change should include rendering one synthetic document through the real FPM pool and
    confirming a PDF, not `render_failed`, before the flag is true on any host. The harness used for the evidence is in
    `docs/verification/php-cli-resolver-20261009/`.
@@ -595,13 +595,25 @@ that are new or changed since the newest verified set and hard-links the unchang
   writes a token, `backups/.link-token`, outside every set: the identity of each verified inode, ctime included. The next snapshot
   consumes it (one use; refused after 6 hours or when it names another set) and shares only files whose inode still has exactly
   that identity. Any write to it since, by anyone, moves the ctime, so it is copied instead. Without a token nothing is shared.
+  A token older than 6 hours (an aborted deploy leaves one) is ignored everywhere: `ctl prepare` and `ctl refresh` re-hash
+  instead of reusing it, and the space check names "sharing with the re-verified set" only when the estimate actually shares
+  bytes; otherwise it says the token was refused, or was accepted with no file unchanged since, and counts the whole store.
 - **Two kinds of refusal before the quiesce.** The deploy log tells them apart; neither stops anything.
   - **Corruption refusal** ("a backup set's private files failed re-verification ... corruption refusal"; the backup log says
-    "failed its private file re-verification" and "withdrew the restore proof of ..."). A file's bytes, identity, mode or owner,
-    or the set's names or directories, no longer match the manifest; or the set's own manifests (`private.index`,
-    `private.sha256`, `private.dirs`) are truncated or unreadable; or reading one of its files failed with an I/O error (EIO).
-    The `RESTORE_CHECK` of that set and of every tree set that
-    holds a failed file is removed (a mode or owner change withdraws only the sets that hold that file). What to do: check `dmesg`
+    "failed its private file re-verification" and "withdrew the restore proof of ..."). Two kinds, and they withdraw different
+    proofs:
+    - *A file is bad*: its bytes, identity, mode or owner no longer match the index, or reading its bytes failed with EIO,
+      EBADMSG or EUCLEAN (ext4 reports a corrupt block as one of the last two). The `RESTORE_CHECK` of that set and of every
+      tree set that holds that same file (inode) is removed; sets that do not hold it keep theirs.
+    - *The set itself is malformed*: its own manifests (`private.index`, `private.sha256`, `private.dirs`) are missing, empty,
+      truncated, malformed, disagree with each other or cannot be read (the same three errors); or its tree's names,
+      directories or entry kinds differ from them; or a listed name is gone or is not the kind of object listed when it is
+      opened or stat-ed (ENOENT, ENOTDIR, ELOOP). Only that set's `RESTORE_CHECK` is removed: no file was shown to be bad, so a
+      set sharing its files keeps its proof (its own re-proof decides).
+    - Both at once: a file that already failed is never hidden by a later set-level finding or by an operational error later in
+      the same proof; every set holding that file still loses its proof.
+
+    What to do: check `dmesg`
     and the disk; run `sudo /usr/local/sbin/vasey-staging-backup restore-check <set>` on the sets that still hold a proof; keep
     the withdrawn sets for inspection (do not delete them by hand); then deploy again. The next deploy re-verifies the newest set
     that still holds a proof, or copies everything. Rollback case B needs a set with `RESTORE_VERIFIED`: use the newest one that
@@ -609,7 +621,9 @@ that are new or changed since the newest verified set and hard-links the unchang
   - **Operational refusal** ("the re-verification of the backup set could not run (an operational error ... not corruption) ...
     operational refusal", exit status 3; the backup log says "an operational error, not a corruption finding" and "No restore
     proof was withdrawn"). The re-hash could not run or its token could not be written: no space (the host has been at 96%),
-    out of memory, a crash of the helper. **Every proof is kept.** What to do: fix the cause (free space with
+    out of memory, a crash of the helper (exit 1 that names no set counts as one too), or an I/O error (anything but ENOENT,
+    ENOTDIR or ELOOP) that is not about a file's bytes: opening the set's `private/`, opening or listing one of its directories,
+    or opening or stat-ing a file (the block may read on the next attempt), provided no file had already failed. **Every proof is kept.** What to do: fix the cause (free space with
     `sudo /usr/local/sbin/vasey-staging-ctl backup-prune`; read `dmesg`), then deploy again. If the same operational refusal
     repeats for the same set, prove that set by hand: `sudo /usr/local/sbin/vasey-staging-backup restore-check <set>` (named in
     the log line); a set that fails it loses its proof as a corruption finding.
@@ -621,13 +635,20 @@ that are new or changed since the newest verified set and hard-links the unchang
 - **Inside the window** the proof re-hashes every file the snapshot copied and checks that every shared file is still the exact
   inode it linked (device, inode, size, mtime, mode, owner, ctime). `restore-check DIR` (manual, case B below, a set moved to
   another disk or extracted from an off-host copy) re-hashes every file and compares size, mode and the mtime in whole seconds,
-  because a copy has new inodes and tar keeps whole seconds.
+  because a copy has new inodes and tar keeps whole seconds. The same rules decide what it withdraws; when it cannot run (an
+  operational error) it says "could not run (an operational error, not a corruption finding ...)", withdraws no other set's
+  proof and leaves the set unproven until `restore-check` succeeds.
 - **Symlinks and FIFOs swapped in during a snapshot are refused**: every directory and file is opened relative to its parent's
   descriptor without following links and must be the inode the listing reported; a file is opened non-blocking and must be a
   regular file. An application process that kept running through the quiesce cannot point the snapshot outside the store.
 - **Pruning a set never changes another.** Removing a set unlinks its own names; an inode shared with a newer set keeps its data.
 - **Off-host copies are whole.** The shipment tars one set at a time, so the archive holds every file in full (no hard-link
-  entries) and `du` sizes it fully; an rsync destination receives whole files.
+  entries) and `du` sizes it fully; an rsync destination receives whole files. The plain rsync shipment (`VASEY_BACKUP_DEST`
+  without age) keeps every mode as recorded (`.gitignore` 0644, contracts 0400), so a copy brought back with `rsync -a` passes
+  `restore-check`; before 2026-11-12 it rewrote them to 0600 and such a copy failed its proof. The copy is protected by its
+  top directory, which keeps the set's root-only 0700: a set directory with any other mode or owner is not shipped. That
+  protection needs a destination filesystem that honours POSIX modes and owners (ext4, xfs, btrfs, ZFS); on one that does
+  not (SMB, some FUSE mounts) use the encrypted shipment instead.
 - Sharing needs the sets on one filesystem (they always are: one backup directory). If the previous set is elsewhere, or the
   kernel refuses a link, the file is copied. `VASEY_BACKUP_LINK=0` in `backup.conf` turns sharing off (a full copy every time).
 
@@ -641,9 +662,74 @@ What changed for an operator:
   the whole deploy 8m54s. The new set used 25 MB on disk. Before the change the window was about 22 minutes.
   Measured again on the deploy of 2026-11-12 (deployment 82759032, main `ead7368d`): re-hash with the site up 3m07s; maintenance
   4m45s (quiesce 23:57:55, resumed about 00:02:40), of which about 3m18s ran from the quiesce to the activate step (the build); snapshot 7 s (copied 3
-  files / 1.2 MB, linked 37.9 GB); restore check 48 s; the whole deploy 8m01s. The build runs inside the pause on purpose:
-  `ctl prepare` builds the candidate as the application user, so the site is stopped first (Codex finding 4226283468 on
-  PR #63). Building before the quiesce needs a dedicated build account and is not done.
+  files / 1.2 MB, linked 37.9 GB); restore check 48 s; the whole deploy 8m01s. Those deploys built inside the pause on purpose:
+  `ctl prepare` built the candidate as the application user, so the site was stopped first (Codex finding 4226283468 on
+  PR #63).
+- **The build moves before the quiesce once the host is re-provisioned (2026-11-12).** `provision.sh` now creates a dedicated
+  build account, `vasey-staging-build` (no login shell, no password, no sudo, denied cron and at, a group of its own that
+  `forge` is not in). With it, `ctl prepare` runs entirely with the site up, under its operation marker:
+  1. root captures the frozen `.env` into a root:`forge` 0440 file the build account cannot read;
+  2. root creates `releases/<SHA>` as root:`vasey-staging-build` 0770: the build account can write it, `forge` (the running
+     application) cannot even traverse it, and the build account cannot open it up because it does not own it;
+  3. `forge` writes a git bundle of the mirror's `HEAD` into a pipe and the build account imports it: git hashes every object,
+     so the checkout is exactly the requested SHA (proven clean, as before) whatever bytes arrived;
+  4. the build account runs `composer install` and `npm ci && npm run build` with a fresh private home, caches and `TMPDIR`
+     under `/srv/vasey-staging/build` (root:`vasey-staging-build` 0770) and **no `.env`** (the Composer hooks need none, and the
+     front end reads no `VITE_*` variable); no `/tmp`, `forge` cache or environment is shared with it. The build runs as a
+     transient systemd service (`vasey-staging-build-<sha>-<pid>`): it can write only its slot and `build/`
+     (`ProtectSystem=strict`), has private `/tmp`, `/var/tmp` and `/dev`, sees no `/home`, `/root` or `/run/user`, cannot
+     create set-id files (`RestrictSUIDSGID`) or gain privileges, can open only IPv4 and IPv6 sockets (no unix socket to
+     logind, D-Bus, MySQL or the application; loopback TCP stays reachable, so no local service may listen on it without
+     authentication), has a private IPC namespace removed with it, and is capped at 60% of memory,
+     150% CPU, 1024 tasks and 30 minutes, because the site is live meanwhile. A build account with systemd lingering enabled
+     refuses. A set-id file of the build account left in a shared directory would
+     otherwise let `forge` act as the build account and write into a later candidate before sealing (independent review of
+     PR #354, reproduced); a host without systemd as init and cgroup v2 refuses rather than build unconfined;
+  5. when the unit stops, its whole cgroup is killed; root takes the slot back (root:root 0700), kills anything of the build
+     account that still runs (`kill(-1)` as the account, which no forking process escapes), and refuses to seal if the build
+     account owns any file outside its slot and `build/` on a local filesystem (the same check also runs before each build).
+     Then it seals the release while it is still 0700: code onto fresh
+     root-owned read-only inodes, the private mount target handed to `forge`, and `bootstrap/cache`, `storage/framework` and
+     `storage/logs` **held** root-owned and read-only, so the live application cannot plant generated PHP in the candidate;
+  6. root installs the captured `.env` (root:`forge` 0440), `forge` runs the real runtime admission and writes `build.sha256`,
+     and root attaches private storage.
+  `ctl activate` then verifies the seal (a changed candidate refuses before anything stops), quiesces, hands the held runtime
+  directories to `forge` (`seal-release.py release-runtime`) and continues as before. **The pause is now the quiesce, the
+  snapshot and its restore check, migrate/caches/doctor, the switch and the healthy resume.** Measured on the first isolated
+  deploy (2026-11-12, `785f47e4`, evidence `20261112T123526Z-785f47e42752`, nothing to migrate): re-hash with the site up
+  12:35:26 to 12:38:49 (3m23s); isolated build with the site up 12:38:49 to 12:42:15 (3m26s); **pause about 4m** (quiesce
+  just after 12:42:17, snapshot written 12:44:32, restore check passed 12:45:48, switched and resumed 12:46:19); whole
+  deploy 10m58s. The pause is shorter than the 4m45s before, but not the one and a half minutes estimated: the snapshot
+  and its restore check took about 3.5 of the 4 minutes in this run (about 1 minute in the 2026-11-12 measurement above).
+  The whole deploy is longer, so Forge now reports "failed" for a successful deploy (see section 9, Forge's ten-minute
+  limit): judge every deploy by its `forge-deploy.log`.
+- **Before the first isolated deploy, smoke the unit on the host** (the tests replace `systemd-run` with a stand-in; none has
+  run the real unit). After re-provisioning, run as root
+  `bash /home/forge/vasey-staging.on-forge.com/ops/staging/smoke-build-unit.sh` (a Forge recipe as root works; it exits 0
+  only if every probe passes and removes its scratch directory). It runs each probe in a unit with exactly
+  `build_in_unit`'s properties (a test fails if the two drift), a scratch directory in place of the slot, and checks
+  (it refuses while a deploy holds the ctl lock or an operation marker exists, and validates the build account before it
+  kills anything; if it is itself killed, remove `/dev/shm/vasey-smoke-setid` if present, or the next prepare refuses it
+  as a leftover):
+  (i) creating a set-id file fails (`python3 -c "import os; open('/dev/shm/x','w'); os.chmod('/dev/shm/x', 0o4755)"` must
+  raise `PermissionError`; remove `/dev/shm/x`); (ii) `busctl call org.freedesktop.login1 /org/freedesktop/login1
+  org.freedesktop.login1.Manager SetUserLinger ubb <build uid> true false` fails (no unix socket); (iii) `exit 3` makes
+  `systemd-run --wait` return 3; (iv) a background `sleep 1000` is gone when `--wait` returns; (v) `composer --version`,
+  `npm --version` and `git --version` run inside it, and so does a network operation that resolves a name
+  (`git ls-remote https://github.com/laravel/framework HEAD`): the unit allows only IPv4 and IPv6 sockets. Better still,
+  let the first isolated `ctl prepare` be the full proof and watch it. Then deploy. A failed first isolated build leaves the
+  site up.
+- **Two things that make the next prepare refuse until root acts.** A file the build account left anywhere outside its build
+  area, even an innocent one (an apport crash report in `/var/crash` from a crashing `node` or `php`), refuses every later
+  build until it is inspected and removed; see "A failed isolated build" in section 9. And a root `ctl prepare` killed while
+  its build runs does not stop the build unit: it runs on, sandboxed, until it ends or reaches its 30-minute limit, and the
+  next prepare refuses on the slot it left (recover as in section 9).
+- **Without the build account** (staging.conf has no `VASEY_BUILD_USER`, or the account does not exist yet) `ctl prepare`
+  behaves exactly as before: it quiesces, builds as `forge` inside the pause and seals. A build account that exists but is
+  unsafe (in `forge`'s group, `forge` or any other account in its group, a shared uid, a login shell, a wrong `build/` mode, a
+  kit root under `/home`, no systemd) refuses before anything starts; it
+  never falls back to building early as `forge`. Re-provisioning is required to get the account: the deploy refuses on helper
+  drift until `provision.sh` installs the changed `vasey-staging-ctl`, `release-step.sh` and `seal-release.py` anyway.
 - The **first** snapshot after re-provisioning has nothing to share and copies the whole store inside the window. Measured on
   staging, 2026-11-11: 37.9 GB / 1,049 files copied in 4m52s, proof 4m33s, maintenance about 9.8 minutes. Let the 03:17 nightly
   run take it, or deploy at a quiet time; every later snapshot shares.
@@ -761,8 +847,9 @@ retains the maintenance marker and closed gate, and does not require HTTP503 fro
 A Forge "failed" after exactly ten minutes is Forge's deployment time limit, not necessarily a failed deploy: Forge
 stops reading the output but leaves the processes running, and a first install's migrations take longer than that. Forge
 documents the limit as fixed ("Deployments are limited to 10 minutes"; there is no site setting for it, only Envoyer's own
-limits replace it). Since the 2026-11-11 shared-tree snapshot a normal deploy should finish well inside it; the first snapshot
-after re-provisioning (a full copy) and a long build can still pass it.
+limits replace it). Since the isolated build (2026-11-12) a normal deploy takes about 11 minutes (re-hash and build run with
+the site up before the pause; section 8), so **Forge marks a successful deploy "failed"**: the first isolated deploy
+(`785f47e4`, Forge deployment 82807668) did, and finished healthy at 12:46:24. Always read `forge-deploy.log`.
 `forge-deploy.sh` keeps writing everything to `forge-deploy.log` in the deploy's evidence directory. Wait until no
 `vasey-staging-ctl` or `release-step.sh` process remains, then read that log's last lines and `ctl status`: a log that
 ends with `deployed <sha>` and a status without an operation marker is a completed deploy; anything else is a recovery case below.
@@ -771,8 +858,10 @@ Decide which case applies by comparing `migrate-status-before.txt` and `migrate-
 failed deploy's evidence directory.
 
 **A. The deploy failed before migration and before replacing the served configuration.** Confirm `current`
-still points at the previous release. New-release deployments quiesce before allocating/building a candidate,
-so Composer/npm failure can leave the old site in maintenance with writer admission closed. Inspect service
+still points at the previous release. Without the build account, new-release deployments quiesce before allocating/building
+a candidate, so Composer/npm failure can leave the old site in maintenance with writer admission closed. With it, a failed
+prepare ("FAILED ... while the build account prepared the candidate with the site up") stopped nothing: see "A failed
+isolated build" below. Inspect service
 state before recovery; downtime includes the build. Stop any uncontrolled manual/rogue app-account process
 separately; controlled service quiescence is not a builder attestation. Confirm the old
 environment is unchanged. A failed quiesce or partial resume
@@ -820,6 +909,38 @@ rm -- /etc/vasey-staging/operation-in-progress               # explicit root rec
 rm -rf --one-file-system -- "$REL"
 /usr/local/sbin/vasey-staging-ctl resume                     # previous release: 503 proof, workers, up, 200
 /usr/local/sbin/vasey-staging-ctl healthy "$(basename "$(readlink -f /srv/vasey-staging/current)")"
+RECOVER
+```
+
+**A failed isolated build** (site up, `GET /` still 200, an operation marker, an unsealed `releases/<SHA>` owned by
+root:`vasey-staging-build` 0770, or root:root 0700 when the build finished and the checks after it refused). Nothing was
+stopped or attached, so no quiesce or resume is needed. The script refuses when the candidate was already attached (a failure
+after `attach`): use the recovery script above for that case. A candidate from an isolated build is never resumed by hand:
+`ctl attach` refuses it, sealed or not, before changing anything (only prepare attaches it, after the runtime admission), so
+discard it with the script below and deploy again; the site stays up meanwhile. `ctl activate` also re-runs the runtime
+admission (`release-step.sh revalidate`) before it stops anything, so a candidate refused at admission never reaches the
+quiesce, the snapshot or its migrations through `activate`. `ctl switch` (the rollback in step 5) does not re-run it: switch
+only to a release that was admitted and served before. On the legacy path the application account builds the candidate
+itself, so the admission catches operator mistakes, not a hostile application account. **If prepare said the build account owns a file outside its
+build area**, treat the host as possibly compromised by a build dependency: do not delete the file before inspecting it (who
+created it, set-id bits, what `forge` could have run with it), then remove it and anything else the account owns outside
+`/srv/vasey-staging/build` (`find / -xdev -user vasey-staging-build`, for each local filesystem) before the next deploy, which
+refuses until it is gone.
+
+```sh
+sudo NEW=<40-hex SHA of the failed candidate> bash -euo pipefail <<'RECOVER'
+[[ "$NEW" =~ ^[0-9a-f]{40}$ ]] || { echo "NEW is not a SHA" >&2; exit 1; }
+REL="/srv/vasey-staging/releases/$NEW"
+[ "$(readlink -f /srv/vasey-staging/current)" != "$REL" ] || { echo "$NEW is the served release; stop" >&2; exit 1; }
+! pgrep -f 'vasey-staging-ctl|release-step' >/dev/null || { echo "a helper still runs; stop" >&2; exit 1; }
+setpriv --reuid=vasey-staging-build --regid=vasey-staging-build --clear-groups -- kill -KILL -1 2>/dev/null || true
+pkill -KILL -u vasey-staging-build || true; sleep 1
+! pgrep -u vasey-staging-build >/dev/null || { echo "a build-account process survives; stop" >&2; exit 1; }
+! mountpoint -q "$REL/storage/app/private" && ! grep -qF " $REL/storage/app/private " /etc/fstab \
+  || { echo "the candidate is attached; use the recovery script above" >&2; exit 1; }
+rm -f -- /etc/vasey-staging/operation-in-progress            # explicit root recovery, after the checks above
+rm -rf --one-file-system -- "$REL"
+[ ! -L /srv/vasey-staging/current ] || /usr/local/sbin/vasey-staging-ctl healthy "$(basename "$(readlink -f /srv/vasey-staging/current)")"
 RECOVER
 ```
 

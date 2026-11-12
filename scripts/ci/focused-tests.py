@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 from copy import deepcopy
 from dataclasses import dataclass
+import ipaddress
 import json
 import os
 from pathlib import Path
@@ -163,6 +164,17 @@ PHP_TARGETS = {
         "tests/Feature/TestPaymentFinancialObservationTest.php", "tests/Feature/TestPaymentExceptionOperationsTest.php",
         "tests/Feature/TestPaymentExceptionOperationsConcurrencyTest.php",
         "tests/Feature/TestPaymentProcessingTest.php", "tests/Feature/TestOrderFinalizationTest.php",
+    ),
+    # Test delivery enabling, manual and optional automatic (D-19 amendment), and the staging profile that admits it. Its own
+    # suite: added to financial it pushed that run past the 900-second runner cap.
+    "test-delivery": (
+        "tests/Feature/TestTrackOrderResourceTest.php", "tests/Feature/TestKitOrderResourceTest.php",
+        "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
+        "tests/Unit/StagingRuntimeValidatorTest.php", "tests/Unit/TestCommerceProfileValidatorTest.php",
+    ),
+    # The native race alone: the whole test-delivery suite does not fit the 900-second runner cap on MySQL.
+    "test-delivery-races": (
+        "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
     ),
     "customer": (
         "tests/Feature/InquiryBrowserCatalogCleanupTest.php",
@@ -454,12 +466,33 @@ def junit_counts(path: Path) -> dict[str, int]:
             "errors": sum(case.find("error") is not None for case in cases), "assertions": sum(values)}
 
 
+def mysql_host(env: Mapping[str, str]) -> str:
+    """The disposable MySQL service address: loopback by default, or the job's private IPv4 literal.
+
+    The production identity catalog admission binds the session to its exact TCP 4-tuple, which a Docker
+    published port rewrites (the server sees the bridge gateway, the client sees 127.0.0.1). CI therefore
+    reaches the service container at its own bridge address. Any other value (a name, a public or IPv6
+    address) refuses rather than pointing migrate:fresh somewhere unexpected.
+    """
+    value = env.get("DB_HOST", "")
+    if value == "":
+        return "127.0.0.1"
+    try:
+        address = ipaddress.ip_address(value)
+    except ValueError as error:
+        raise FocusedError("DB_HOST must be a literal IPv4 address") from error
+    if (address.version != 4 or str(address) != value or address.is_unspecified or address.is_link_local
+            or not (address.is_loopback or address.is_private)):
+        raise FocusedError("DB_HOST must be a loopback or private IPv4 address")
+    return value
+
+
 def runner_environment(selected: Selection, env: Mapping[str, str]) -> dict[str, str]:
     result = dict(env)
     if selected.kind == "php":
         result.update(APP_ENV="testing", APP_DEBUG="false", DB_CONNECTION=selected.engine, DB_URL="",
                       DB_DATABASE="vaseyaudio_focused" if selected.engine == "mysql" else ":memory:",
-                      DB_HOST="127.0.0.1", DB_PORT="3306", DB_SOCKET="", DB_USERNAME="root", DB_PASSWORD="ci-only-password",
+                      DB_HOST=mysql_host(env) if selected.engine == "mysql" else "127.0.0.1", DB_PORT="3306", DB_SOCKET="", DB_USERNAME="root", DB_PASSWORD="ci-only-password",
                       VA_CI_DISPOSABLE_MYSQL="1" if selected.engine == "mysql" else "",
                       VA_LOCAL_DISPOSABLE_MYSQL="vaseyaudio_focused" if selected.engine == "mysql" and env.get("VA_LOCAL_DISPOSABLE_MYSQL") == "vaseyaudio_focused" else "",
                       CACHE_STORE="array", SESSION_DRIVER="array", QUEUE_CONNECTION="sync", MAIL_MAILER="array")
