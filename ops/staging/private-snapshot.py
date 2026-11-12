@@ -572,8 +572,16 @@ def prove(setdir, full, strict_modes):
         return set(bad) | (widened_inodes if strict_modes else set())
 
     def file_failures():
-        return ("restored file hash mismatch, or a set file is not the inode, size, time or mode its index recorded "
-                f"({len(bad)} file(s))")
+        """What already failed before the walk ended: files whose content or identity is wrong, and under strict modes
+        files whose mode or ownership is wider than allowed (named apart: a mode is not a hash mismatch)."""
+        parts = []
+        if bad:
+            parts.append("restored file hash mismatch, or a set file is not the inode, size, time or mode its index "
+                         f"recorded ({len(bad)} file(s))")
+        widened_only = (widened_inodes - set(bad)) if strict_modes else set()
+        if widened_only:
+            parts.append(f"a set file's mode or ownership is wider than allowed ({len(widened_only)} file(s))")
+        return "; ".join(parts)
 
     # A failure later in the walk (a set-level finding, or an operational error) must not hide a file that already failed: the
     # sets holding it still lose their proof.
@@ -584,9 +592,9 @@ def prove(setdir, full, strict_modes):
         finally:
             os.close(tree_fd)
     except Refused as error:
+        if not failed_inodes():
+            raise  # nothing failed before it: the error is the whole finding, worded as it was raised
         inodes = failed_inodes() | (error.inodes if isinstance(error, Mismatch) else set())
-        if not inodes:
-            raise
         raise Mismatch(f"{error}; {file_failures()}", inodes) from error
     except OSError as error:
         if not failed_inodes():

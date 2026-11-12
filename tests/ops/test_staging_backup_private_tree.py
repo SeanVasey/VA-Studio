@@ -1477,6 +1477,62 @@ class ReviewPR353(PrivateTreeBase):
         self.assertIn("was accepted, but no file is unchanged since it: the whole private store is counted", run.stdout)
 
 
+class FollowUpPR353(PrivateTreeBase):
+    """Re-review of PR #353 at 3261844d (P3s): finding wording, the entry-stat guard, restore-check's exit handling."""
+
+    SHARED = ReviewPR353.SHARED
+    verify, withdrawn, fresh_pair = ReviewPR353.verify, ReviewPR353.withdrawn, ReviewPR353.fresh_pair
+
+    SCANDIR_FAILURE = ("_scandir = os.scandir\n"
+                       "class _Entry:\n"
+                       "    def __init__(self, entry): self._entry, self.name = entry, entry.name\n"
+                       "    def stat(self, follow_symlinks=True):\n"
+                       "        if self.name == 'stems.zip': raise OSError(errno.{code}, 'synthetic')\n"
+                       "        return self._entry.stat(follow_symlinks=follow_symlinks)\n"
+                       "    def __getattr__(self, attribute): return getattr(self._entry, attribute)\n"
+                       "class _Listing:\n"
+                       "    def __init__(self, listing): self._listing = listing\n"
+                       "    def __enter__(self): self._listing.__enter__(); return (_Entry(e) for e in self._listing)\n"
+                       "    def __exit__(self, *a): return self._listing.__exit__(*a)\n"
+                       "os.scandir = lambda *a, **k: _Listing(_scandir(*a, **k))\n")
+
+    def test_an_entry_that_vanishes_before_its_stat_is_a_finding_about_the_set_and_eio_is_operational(self):
+        _, s2 = self.fresh_pair()
+        for code, expected in (("ENOENT", 1), ("ELOOP", 1), ("EIO", 3)):
+            with self.subTest(code):
+                run = self.verify(s2, wrapped_engine(self.root, self.SCANDIR_FAILURE.format(code=code)))
+                self.assertEqual(run.returncode, expected, run.stdout + run.stderr)
+                self.assertEqual(self.withdrawn(run), [s2.name] if expected == 1 else [])
+
+    def test_an_io_error_on_the_first_file_is_worded_as_itself(self):
+        s1, s2 = self.fresh_pair()
+        body = ("_readv = os.readv\nfired = []\n"
+                "def failing(fd, buffers):\n"
+                "    if not fired:\n"
+                "        fired.append(1)\n"
+                "        raise OSError(errno.EIO, 'synthetic EIO')\n"
+                "    return _readv(fd, buffers)\nos.readv = failing\n")
+        run = self.verify(s2, wrapped_engine(self.root, body))
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertIn("an I/O error reading a set file", run.stderr)
+        self.assertNotIn("0 file(s)", run.stderr)
+        self.assertNotIn("hash mismatch", run.stderr)
+
+    def test_restore_check_withdraws_nothing_when_the_engine_could_not_run(self):
+        for label, code, lines in (("exit 3 naming a set", 3, True), ("exit 1 naming no set", 1, False)):
+            with self.subTest(label):
+                s1, s2 = self.fresh_pair()
+                self.assertEqual(fields(s1 / "RESTORE_CHECK")["result"], "RESTORE_VERIFIED")
+                fake = self.root / f"fake-engine-{code}.py"
+                fake.write_text("import sys\n"
+                                + (f"print('withdraw={s1.name}')\n" if lines else "")
+                                + f"print('synthetic failure', file=sys.stderr)\nsys.exit({code})\n")
+                run = self.run_helper("restore-check", str(s2), PRIVATE_SNAPSHOT=str(fake))
+                self.assertNotEqual(run.returncode, 0)
+                self.assertIn("could not run", run.stdout + run.stderr)
+                self.assertEqual(fields(s1 / "RESTORE_CHECK")["result"], "RESTORE_VERIFIED", "another set lost its proof")
+                time.sleep(1.1)
+
 class DeployGate(unittest.TestCase):
     """G1 and Q4 in ops/staging/forge-deploy.sh: one authoritative space gate, before anything is stopped, reported truthfully."""
 

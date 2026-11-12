@@ -220,7 +220,14 @@ persist_private_bind() {
 
 cmd_attach() {
   local sha=${1:-}; valid_sha "$sha" || die "attach needs a 40-hex SHA"
-  seal_release "$sha"
+  # A candidate sealed by an isolated build holds its runtime directories root-owned until activate; the legacy sealer
+  # would refuse it. Verify that seal instead (a prepare that stopped after sealing resumes here); anything else is resealed.
+  if [ "$(stat -c %u -- "$RELEASES/$sha" 2>/dev/null)" = 0 ] \
+     && [ "$(stat -c %u -- "$RELEASES/$sha/bootstrap/cache" 2>/dev/null)" = 0 ]; then
+    sealed_release "$sha"
+  else
+    seal_release "$sha"
+  fi
   attach_private "$sha"
 }
 
@@ -526,12 +533,13 @@ build_account() {
   # set-id file in a shared directory, so a configured account refuses rather than build unconfined with the site up.
   build_unit_ready || die "the build account needs systemd as init with cgroup v2 (systemd-run); none is available"
   # A lingering user manager would run as the build account outside any build unit, and again at every boot.
-  [ ! -e "/var/lib/systemd/linger/$name" ] || die "the build account has systemd lingering enabled (loginctl disable-linger $name)"
+  ! build_account_lingers "$name" || die "the build account has systemd lingering enabled (loginctl disable-linger $name)"
   BUILD_UID=$uid BUILD_GID=$gid
 }
 
 build_unit_ready() { [ -d /run/systemd/system ] && [ -f /sys/fs/cgroup/cgroup.controllers ] && command -v systemd-run >/dev/null; }
 systemd_run() { systemd-run "$@"; }
+build_account_lingers() { [ -e "/var/lib/systemd/linger/$1" ]; }
 
 # Limits for a build that now runs beside the live site (PHP-FPM, MySQL and the workers keep their memory and CPU).
 BUILD_MEMORY_MAX=60%
@@ -568,14 +576,14 @@ build_in_unit() {  # build_in_unit SHA
 # kill(-1) as the build account is atomic in the kernel (no fork escapes it) and reaches every process whose real or saved
 # uid is the build account's, a set-id helper of it included; pkill -u adds the effective-uid-only case.
 reap_builder() {
-  local attempt
+  local delay
   [[ "${BUILD_UID:-}" =~ ^[1-9][0-9]*$ ]] && [[ "${BUILD_GID:-}" =~ ^[1-9][0-9]*$ ]] || die "no build account to reap"
   # Kill first, then look: a process that forks and exits lives for microseconds, so a pgrep that finds nothing proves
   # nothing on its own and must never be the reason to skip the kill.
-  for attempt in 1 2 3 4 5 6 7 8 9 10; do
+  for delay in 0.1 0.2 0.3 0.5 0.5 1 1 1 1 1; do   # about 6.6 s in all for a process in uninterruptible sleep to exit
     setpriv --reuid="$BUILD_UID" --regid="$BUILD_GID" --clear-groups -- kill -KILL -1 2>/dev/null || true
     pkill -KILL -u "$BUILD_UID" || true
-    sleep "0.$attempt"
+    sleep "$delay"
     if ! pgrep -U "$BUILD_UID" >/dev/null && ! pgrep -u "$BUILD_UID" >/dev/null; then return 0; fi
   done
   die "processes of the build account survive; refusing to seal (root recovery required)"
@@ -589,17 +597,29 @@ fusectl,mqueue,hugetlbfs,autofs,binfmt_misc,squashfs,efivarfs,nfs,nfs4,cifs,fuse
 }
 
 # The build account owns nothing outside its slot and $ROOT/build, ever. Anything else it owns (a set-id copy of a shell in
-# /tmp, a planted file) was left by a build and is refused before a build starts and again before sealing.
+# /tmp, a planted file) was left by a build and is refused before a build starts and again before sealing. A directory the
+# scan cannot read could hide such a file, so any error but a file vanishing mid-walk refuses too.
 refuse_build_leftovers() {  # refuse_build_leftovers SHA
-  local mount found
+  local mount found errors unexpected
+  errors=$(mktemp) || die "cannot create a scan error log"
   while IFS= read -r mount; do
     mount=$(printf '%b' "$mount")   # findmnt -r escapes blanks as \x20
     [ -d "$mount" ] || continue
+    : > "$errors"
     found=$(find "$mount" -xdev \( -path "$RELEASES/$1" -o -path "$ROOT/build" \) -prune \
-              -o \( -uid "$BUILD_UID" -o -gid "$BUILD_GID" \) -print -quit 2>/dev/null) || true
-    [ -z "$found" ] || die "the build account owns $found outside its build area; inspect and remove it, and anything it \
-may have written, before deploying (root recovery required)"
+              -o \( -uid "$BUILD_UID" -o -gid "$BUILD_GID" \) -print -quit 2>"$errors") || true
+    unexpected=$(grep -v ': No such file or directory$' "$errors" | head -n 1) || true
+    if [ -n "$found" ]; then
+      rm -f -- "$errors"
+      die "the build account owns $found outside its build area; inspect and remove it, and anything it may have written, \
+before deploying (root recovery required)"
+    fi
+    if [ -n "$unexpected" ]; then
+      rm -f -- "$errors"
+      die "cannot scan $mount for files of the build account ($unexpected); refusing (root recovery required)"
+    fi
   done < <(build_scan_mounts)
+  rm -f -- "$errors"
 }
 
 prepare_isolated() {

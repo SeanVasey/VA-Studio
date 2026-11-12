@@ -646,7 +646,9 @@ that are new or changed since the newest verified set and hard-links the unchang
   entries) and `du` sizes it fully; an rsync destination receives whole files. The plain rsync shipment (`VASEY_BACKUP_DEST`
   without age) keeps every mode as recorded (`.gitignore` 0644, contracts 0400), so a copy brought back with `rsync -a` passes
   `restore-check`; before 2026-11-12 it rewrote them to 0600 and such a copy failed its proof. The copy is protected by its
-  top directory, which keeps the set's root-only 0700: a set directory with any other mode or owner is not shipped.
+  top directory, which keeps the set's root-only 0700: a set directory with any other mode or owner is not shipped. That
+  protection needs a destination filesystem that honours POSIX modes and owners (ext4, xfs, btrfs, ZFS); on one that does
+  not (SMB, some FUSE mounts) use the encrypted shipment instead.
 - Sharing needs the sets on one filesystem (they always are: one backup directory). If the previous set is elsewhere, or the
   kernel refuses a link, the file is copied. `VASEY_BACKUP_LINK=0` in `backup.conf` turns sharing off (a full copy every time).
 
@@ -677,7 +679,8 @@ What changed for an operator:
      transient systemd service (`vasey-staging-build-<sha>-<pid>`): it can write only its slot and `build/`
      (`ProtectSystem=strict`), has private `/tmp`, `/var/tmp` and `/dev`, sees no `/home`, `/root` or `/run/user`, cannot
      create set-id files (`RestrictSUIDSGID`) or gain privileges, can open only IPv4 and IPv6 sockets (no unix socket to
-     logind, D-Bus, MySQL or the application), has a private IPC namespace removed with it, and is capped at 60% of memory,
+     logind, D-Bus, MySQL or the application; loopback TCP stays reachable, so no local service may listen on it without
+     authentication), has a private IPC namespace removed with it, and is capped at 60% of memory,
      150% CPU, 1024 tasks and 30 minutes, because the site is live meanwhile. A build account with systemd lingering enabled
      refuses. A set-id file of the build account left in a shared directory would
      otherwise let `forge` act as the build account and write into a later candidate before sealing (independent review of
@@ -702,7 +705,15 @@ What changed for an operator:
   raise `PermissionError`; remove `/dev/shm/x`); (ii) `busctl call org.freedesktop.login1 /org/freedesktop/login1
   org.freedesktop.login1.Manager SetUserLinger ubb <build uid> true false` fails (no unix socket); (iii) `exit 3` makes
   `systemd-run --wait` return 3; (iv) a background `sleep 1000` is gone when `--wait` returns; (v) `composer --version`,
-  `npm --version` and `git --version` run inside it. Then deploy. A failed first isolated build leaves the site up.
+  `npm --version` and `git --version` run inside it, and so does a network operation that resolves a name
+  (`git ls-remote https://github.com/laravel/framework HEAD`): the unit allows only IPv4 and IPv6 sockets. Better still,
+  let the first isolated `ctl prepare` be the full proof and watch it. Then deploy. A failed first isolated build leaves the
+  site up.
+- **Two things that make the next prepare refuse until root acts.** A file the build account left anywhere outside its build
+  area, even an innocent one (an apport crash report in `/var/crash` from a crashing `node` or `php`), refuses every later
+  build until it is inspected and removed; see "A failed isolated build" in section 9. And a root `ctl prepare` killed while
+  its build runs does not stop the build unit: it runs on, sandboxed, until it ends or reaches its 30-minute limit, and the
+  next prepare refuses on the slot it left (recover as in section 9).
 - **Without the build account** (staging.conf has no `VASEY_BUILD_USER`, or the account does not exist yet) `ctl prepare`
   behaves exactly as before: it quiesces, builds as `forge` inside the pause and seals. A build account that exists but is
   unsafe (in `forge`'s group, `forge` or any other account in its group, a shared uid, a login shell, a wrong `build/` mode, a
@@ -893,7 +904,9 @@ RECOVER
 **A failed isolated build** (site up, `GET /` still 200, an operation marker, an unsealed `releases/<SHA>` owned by
 root:`vasey-staging-build` 0770, or root:root 0700 when the build finished and the checks after it refused). Nothing was
 stopped or attached, so no quiesce or resume is needed. The script refuses when the candidate was already attached (a failure
-after `attach`): use the recovery script above for that case. **If prepare said the build account owns a file outside its
+after `attach`): use the recovery script above for that case. A prepare that stopped after sealing but before attaching
+private storage can instead be resumed: `sudo -n /usr/local/sbin/vasey-staging-ctl attach <SHA>` verifies the isolated seal
+(held runtime directories included) and attaches; it never reseals an isolated candidate, and it refuses an unsealed slot. **If prepare said the build account owns a file outside its
 build area**, treat the host as possibly compromised by a build dependency: do not delete the file before inspecting it (who
 created it, set-id bits, what `forge` could have run with it), then remove it and anything else the account owns outside
 `/srv/vasey-staging/build` (`find / -xdev -user vasey-staging-build`, for each local filesystem) before the next deploy, which

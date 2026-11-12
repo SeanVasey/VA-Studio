@@ -129,7 +129,9 @@ def verify_held(descriptor):
         raise ValueError("held runtime directory is not protected")
     for name in os.listdir(descriptor):
         entry = os.stat(name, dir_fd=descriptor, follow_symlinks=False)
-        if entry.st_uid != ROOT_UID or entry.st_mode & (0o022 | stat.S_ISUID | stat.S_ISGID):
+        # A symlink's mode is always 0777 on Linux and carries no permission: only its owner matters (adopt re-owns it).
+        writable = 0 if stat.S_ISLNK(entry.st_mode) else 0o022
+        if entry.st_uid != ROOT_UID or entry.st_mode & (writable | stat.S_ISUID | stat.S_ISGID):
             raise ValueError("held runtime entry is not protected")
         if stat.S_ISDIR(entry.st_mode):
             child = os.open(name, DIRECTORY_FLAGS, dir_fd=descriptor)
