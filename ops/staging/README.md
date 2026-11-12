@@ -58,6 +58,7 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
   current -> releases/<SHA>          what nginx, PHP-FPM and the workers run
   private/                           masters, stems, contracts, seller tag, site images, uploads (forge 0700)
   tmp/php-upload, tmp/php-sys        PHP upload and temp directories (forge 0700)
+  build/                             the build account's per-build homes and caches (root:vasey-staging-build 0770)
   backups/                           local backup sets (root 0700)
   evidence/<UTC>-<sha12>/            per-deploy evidence: build hashes, migrate output, doctor and readiness JSON
 /var/lib/nginx/vasey-staging-fastcgi nginx FastCGI temp (private, 0700; buffered downloads; never backed up)
@@ -67,10 +68,14 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 ```
 
 One OS user, Forge's `forge`, runs PHP-FPM, every worker and the scheduler. It also owns
-`private/`. `vasey:doctor` and every private-file adapter require this.
+`private/`. `vasey:doctor` and every private-file adapter require this. A second, dedicated account,
+`vasey-staging-build` (created by `provision.sh`: no login shell, no password, no sudo, denied cron and at, its own group
+only), runs nothing but the release build. It cannot read `.env`, the evidence, `private/` or `tmp/`, and `forge` cannot
+reach anything it writes before root has sealed it.
 
-The root and `releases/` parents remain root-owned and unwritable by the app. `ctl allocate` creates a
-checkout slot for the app; `ctl attach` seals the release, `storage/` and `storage/app/` parents as root-owned
+The root and `releases/` parents remain root-owned and unwritable by the app. With the build account, `ctl prepare` creates
+the slot root:`vasey-staging-build` 0770 (the application cannot traverse it) and seals it while it is still 0700. Without
+it, `ctl allocate` creates a checkout slot for the app; `ctl attach` seals the release, `storage/` and `storage/app/` parents as root-owned
 before mounting. The sealer walks through no-follow directory descriptors, closes each parent before
 opening children and copies regular code/vendor/build files onto fresh root-owned read-only inodes.
 Hard links, external/runtime code symlinks and special files refuse; an old writable descriptor cannot
@@ -79,7 +84,9 @@ The configured application account must be nonroot; provisioning and privileged 
 under closed writer admission, after real runtime admission and unchanged-key validation.
 
 Explicit runtime trust exceptions are `bootstrap/cache`, `storage/framework`, `storage/logs` and
-`storage/app/private`: application-owned 0700 directories. Generated PHP caches, compiled views and
+`storage/app/private`: application-owned 0700 directories. A candidate from the build account keeps the first three root-owned
+and read-only ("held") until `ctl activate` has quiesced, so the previous, still-running release cannot plant generated PHP in
+it; activate then hands them to the application. Generated PHP caches, compiled views and
 maintenance files remain application writable. This protects deployed source/vendor/build/environment
 bytes after sealing; it does not certify an uncompromised builder or immutable runtime PHP execution.
 Private bind-mounted contents are never traversed or changed by sealing.
@@ -161,7 +168,11 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
 ### What provision.sh does
 
 1. **Checks:** Ubuntu 24.04; RAM (refuses under about 3.7 GB, warns under 8 GB); swap; PHP extensions in the CLI and in FPM; ffmpeg encoders; `prlimit` limits; tool paths; ClamAV signature age and readability by the app user.
-2. **Directories:** as in [Server layout](#server-layout), with the stated owners and modes. App/nginx runtime paths use retained no-follow directory handles and descriptor-only ownership/mode changes. Symlinks and special files refuse without changing their targets; a detected directory entry replacement refuses after changes to the pinned directory. A new private `.gitignore` is created exclusively through its directory handle with the tracked bytes. Existing ordinary files are preserved; links and special files refuse. Failure can leave partial initialization inside admitted runtime directories, so inspect state before retrying. Inode safety does not certify a healthy visible path if an independent writer replaces an entry after its check.
+2. **Directories and the build account:** as in [Server layout](#server-layout), with the stated owners and modes. It creates
+   `vasey-staging-build` if missing and refuses when it is unsafe (a login shell, sudo rights, `forge` in its group or it in
+   `forge`'s, readable application secrets), adds it to `/etc/cron.deny` and `/etc/at.deny`, creates `build/` and checks that
+   the account can run composer, npm, node, git and PHP, that systemd (cgroup v2) can run the build unit, and that neither
+   those tools nor the kit root resolve under `/home`, `/root` or `/run/user`, which the unit hides. App/nginx runtime paths use retained no-follow directory handles and descriptor-only ownership/mode changes. Symlinks and special files refuse without changing their targets; a detected directory entry replacement refuses after changes to the pinned directory. A new private `.gitignore` is created exclusively through its directory handle with the tracked bytes. Existing ordinary files are preserved; links and special files refuse. Failure can leave partial initialization inside admitted runtime directories, so inspect state before retrying. Inode safety does not certify a healthy visible path if an independent writer replaces an entry after its check.
 3. **MySQL** (as root over the local socket, or with `--mysql-admin-defaults FILE`):
    The optional admin file must be a canonical absolute, root-owned 0600 regular single-link
    file with no symlinks and root-owned parent directories that are not group/world writable.
@@ -220,11 +231,18 @@ Before anything else it compares the root-installed helpers (`vasey-staging-ctl`
    settings and foreign configuration caches excluded. Duplicate keys, DB URL/socket overrides, production
    credentials and an `APP_KEY` change from the served release refuse before quiesce. The temporary copy is
    removed on exit; a later Forge edit waits for the next deploy attempt.
-2. `ctl prepare` holds one root lease while it quiesces controlled web, workers, scheduler and gated pipeline writers **before allocating any
-   app-writable candidate**. It then makes a fresh checkout of the exact SHA in `releases/<SHA>` and proves
-   it clean (status and tree hash). Downtime includes dependency installation and asset compilation.
-3. It installs the captured private environment as `.env` mode0600 before Composer can boot Laravel package discovery or Filament upgrade. It then runs `composer install --no-dev --classmap-authoritative` from `composer.lock`, followed by `npm ci && npm run build`. The Vite manifest must exist.
-4. The frozen `.env` starts as 0600. The built candidate repeats real Laravel admission before
+2. `ctl prepare` holds one root lease for the checkout, build and sealing. **With the build account** (re-provisioned host)
+   nothing is stopped: the build account checks the exact SHA out of a git bundle that `forge` writes from the mirror into a
+   pipe, proves it clean (status and tree hash) and builds it in a slot `forge` cannot reach, with a fresh private home and no
+   `.env`, as a hardened transient systemd service (writes only its slot and `build/`, no set-id files, private `/tmp`, no
+   `/home`, memory/CPU/task/time limits). Root then kills the unit's cgroup and any build-account process, refuses if the
+   account owns any file outside its build area, seals the release (runtime directories held), installs the captured
+   environment root:app 0440, lets `forge` run the real runtime admission and attaches private storage. Downtime no longer
+   includes dependency installation and asset compilation (runbook section 8). **Without it** prepare quiesces controlled web,
+   workers, scheduler and gated pipeline writers **before allocating any app-writable candidate**, then makes the fresh
+   checkout as `forge` and proves it clean; downtime includes the build (steps 3 and 4).
+3. Without the build account it installs the captured private environment as `.env` mode0600 before Composer can boot Laravel package discovery or Filament upgrade. Both paths run `composer install --no-dev --classmap-authoritative` from `composer.lock`, followed by `npm ci && npm run build`. The Vite manifest must exist.
+4. The frozen `.env` starts as 0600. The built candidate repeats real Laravel admission before (without the build account)
    `vasey-staging-ctl attach` seals code and environment onto protected inodes, verifies the explicit runtime
    exceptions and bind-mounts private storage.
 0. Before anything is stopped, `ctl space-check --preverify` (the backup helper's `space-check`) first re-hashes the private files
@@ -235,7 +253,9 @@ Before anything else it compares the root-installed helpers (`vasey-staging-ctl`
    marker; `prepare` and `refresh` reuse the re-hash's token and re-hash again only when there is none. After the snapshot (predeploy) and after a successful deploy, `ctl backup-prune` /
    `vasey-staging-backup prune` apply `VASEY_BACKUP_KEEP` (or the tiered policy), never the set just taken; see
    `docs/ops/staging-runbook.md` sections 8 and 9.
-5. `ctl activate` obtains one root lease and repeats fresh quiesce/stopped proof immediately before snapshot. It establishes:
+5. `ctl activate` obtains one root lease, verifies the seal (a candidate changed since sealing refuses before anything stops) and
+   repeats fresh quiesce/stopped proof immediately before snapshot, then hands a held candidate's runtime directories to the
+   application. The quiesce establishes:
    - `artisan down` in that release, proven by an exact 503;
    - workers and scheduler stopped;
    - PHP-FPM stopped, and no PHP process left.
