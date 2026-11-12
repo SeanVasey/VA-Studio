@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TestCheckout } from '../../resources/js/components/TestCheckout';
@@ -138,9 +138,10 @@ describe('buyer cancellation of a never-sent test order', () => {
     render(<TestCheckout orderId={orderId} enabled />);
     await user.click(await screen.findByRole('button', { name: 'Cancel this order' }));
     const confirm = screen.getByRole('button', { name: 'Yes, cancel this order' });
-    await user.click(confirm);
-    await user.click(confirm);
-    expect(confirm).toBeDisabled();
+    // Two clicks in one act reach the handler before React re-renders the button disabled, so this exercises the
+    // request guard itself rather than the disabled attribute.
+    act(() => { confirm.click(); confirm.click(); });
+    await waitFor(() => expect(confirm).toBeDisabled());
     expect(posts(fetcher)).toHaveLength(1);
     settle(json(fixture('cancelled')));
     expect(await screen.findByText(/You cancelled this test order/)).toBeInTheDocument();
