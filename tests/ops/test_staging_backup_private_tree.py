@@ -1231,11 +1231,27 @@ class ReviewBatch337(PrivateTreeBase):
         run = self.check(T_FREE=10**15)
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
         self.assertIn(f"({total} of {total} private bytes to copy;", run.stdout)
-        self.assertIn("expires within the hour", run.stdout)
+        self.assertIn("expires within 1 hour(s)", run.stdout)
         run = self.check("--preverify-if-needed", T_FREE=10**15)
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
         self.assertIn("re-verified the private files of", run.stdout, "a nearly expired token must not stand in for a re-hash")
         self.assertIn("(20004 of", run.stdout)
+
+    # Independent review of PR #367 (P3): the boundaries on either side. A token inside the estimate's 5 hours is trusted
+    # without a re-hash, and the snapshot's own 6-hour rule is unchanged, so a 5.5-hour token is still shared by the snapshot.
+    def test_a_token_inside_five_hours_is_trusted_and_the_snapshot_still_shares_at_five_and_a_half(self):
+        self.predeploy()
+        self.write("masters/new/master.wav", b"RIFF" + b"z" * 20_000)
+        run = self.check("--preverify", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.age_token(4.5)
+        run = self.check("--preverify-if-needed", T_FREE=10**15)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertNotIn("re-verified the private files of", run.stdout, "a token inside the window needs no re-hash")
+        self.assertIn("(20004 of", run.stdout)
+        self.age_token(1)  # now 5.5 hours: past the estimate's window, inside the snapshot's
+        second = self.predeploy(preverify=False)
+        self.assertEqual(fields(second / "MANIFEST")["private_copied_files"], "1", "the snapshot still shares at 5.5 hours")
 
     def test_f2_the_estimate_names_a_basis_only_when_something_is_shared(self):
         self.predeploy()

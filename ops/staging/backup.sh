@@ -1176,7 +1176,7 @@ space_check() {  # space_check [--preverify|--preverify-if-needed]
     src=''
     [ "${VASEY_BACKUP_LINK:-1}" != 1 ] || src=$(link_token_set "$LINK_ESTIMATE_MAX_AGE_HOURS") || src=''
     if [ -z "$src" ] && [ "${VASEY_BACKUP_LINK:-1}" = 1 ] && [ -n "$(link_token_set)" ]; then
-      basis="the re-verification token of $(link_token_name) expires within the hour, before the snapshot would use it: the whole private store is counted"
+      basis="the re-verification token of $(link_token_name) expires within $LINK_ESTIMATE_HEADROOM_HOURS hour(s), before the snapshot would use it: the whole private store is counted"
     fi
     if [ -n "$src" ] && estimate=$(python3 -I "$PRIVATE_SNAPSHOT" estimate --live "$PRIVATE" --link-from "$src" \
          --link-token "$VASEY_BACKUP_DIR/.link-token" --link-max-age-hours "$LINK_ESTIMATE_MAX_AGE_HOURS" 2>/dev/null); then

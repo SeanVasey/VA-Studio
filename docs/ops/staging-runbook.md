@@ -601,7 +601,7 @@ that are new or changed since the newest verified set and hard-links the unchang
   The space check judges the token against 5 hours, not 6: it runs before the build and the pause, and the snapshot judges the
   token again afterwards, so a token the estimate trusted must still be fresh then. A token between 5 and 6 hours old is
   re-hashed by `ctl prepare` and `ctl refresh` (`--preverify-if-needed`), and a plain space check counts the whole store and
-  says the token "expires within the hour, before the snapshot would use it" (fixed 2026-11-12; before, such a token could
+  says the token "expires within 1 hour(s), before the snapshot would use it" (fixed 2026-11-12; before, such a token could
   pass the estimate and then fail the snapshot, which copied every file the estimate had left out with the site stopped).
 - **Two kinds of refusal before the quiesce.** The deploy log tells them apart; neither stops anything.
   - **Corruption refusal** ("a backup set's private files failed re-verification ... corruption refusal"; the backup log says
