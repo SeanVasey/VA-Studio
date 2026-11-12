@@ -552,13 +552,53 @@ attach_private() {   # the bind mount and fstab are host state; the hand-over to
         for runtime in ("storage/framework", "storage/logs"):
             self.assertEqual(self.mode(self.release / runtime), (self.app_uid, self.app_gid, 0o700), runtime)
 
+    # Review of PR #356: a candidate from an isolated build is never attached by hand. Only prepare attaches it, after the
+    # runtime admission, and nothing later repeats that admission, so a hand attach could carry a refused candidate to
+    # activate. Refused before anything about the release changes.
+    def test_attach_refuses_an_isolated_candidate_even_once_sealed(self):
+        run = self.prepare()
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.trace.write_text("")
+        run = self.ctl("attach", self.sha)
+        self.assertNotEqual(run.returncode, 0, run.stdout)
+        self.assertIn("comes from an isolated build and is not attached by hand", run.stderr)
+        self.assertEqual(self.trace_lines(), [])
+        self.assertEqual(self.mode(self.release), (0, 0, 0o755))
+
+    def test_a_candidate_refused_by_admission_cannot_be_attached_and_activated(self):
+        self.candidate.write_text("APP_ENV=staging\nAPP_KEY=refused-by-admission\n")
+        run = self.prepare()
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("built candidate refused", run.stderr)
+        self.operation.unlink()   # root clears the marker but keeps the slot (the case the review reproduced)
+        self.trace.write_text("")
+        run = self.ctl("attach", self.sha)
+        self.assertNotEqual(run.returncode, 0, run.stdout)
+        self.assertNotIn("attach", self.trace_lines())
+        run = self.ctl("activate", self.sha, str(self.evidence))
+        self.assertNotEqual(run.returncode, 0, run.stdout)
+        self.assertFalse((self.root / "current").exists())
+
+    def test_attach_refuses_an_unsealed_isolated_slot_without_opening_it(self):
+        (self.bin / "npm").write_text("#!/bin/bash\nexit 7\n")
+        run = self.prepare()
+        self.assertNotEqual(run.returncode, 0)
+        before = self.mode(self.release)
+        self.operation.unlink()
+        self.trace.write_text("")
+        run = self.ctl("attach", self.sha)
+        self.assertNotEqual(run.returncode, 0, run.stdout)
+        self.assertIn("comes from an isolated build", run.stderr)
+        self.assertNotIn("attach", self.trace_lines())
+        self.assertEqual(self.mode(self.release), before, "the refused attach changed the slot's owner or mode")
+
 class BuildAccountGuards(unittest.TestCase):
     """The account checks in build_account(), with name-service answers as fixtures: each unsafe shape refuses."""
 
     def run_guard(self, **overrides):
         values = {"name": "vasey-staging-build", "exists": "1", "uid": "990", "gid": "990", "groups": "990",
                   "shell": "/usr/sbin/nologin", "app_uid": "1000", "app_gid": "1000", "app_groups": "1000 27",
-                  "build_dir": "0 990 770", "members": "", "others": "", "unit": "1", "root": None}
+                  "build_dir": "0 990 770", "members": "", "others": "", "unit": "1", "root": None, "linger": "0"}
         values.update(overrides)
         source = CTL.read_text()
         function = source[source.index("build_account() {"):source.index("build_unit_ready() {")]
@@ -584,13 +624,14 @@ id() {
 }
 stat() { echo "$BUILD_DIR"; }
 build_unit_ready() { [ "$UNIT" = 1 ]; }
+build_account_lingers() { [ "$LINGER" = 1 ]; }
 '''
         script = shell + function + '\nif build_account; then echo "usable $BUILD_UID $BUILD_GID"; else echo legacy; fi\n'
         with tempfile.TemporaryDirectory() as directory:
             Path(directory, "build").mkdir()
             return subprocess.run(["bash", "-eu", "-c", script], capture_output=True, text=True, env={
                 "PATH": "/usr/bin:/bin", "ROOT": values["root"] or directory, "B_MEMBERS": values["members"],
-                "OTHERS": values["others"], "UNIT": values["unit"], "VASEY_BUILD_USER": values["name"], "EXISTS": values["exists"],
+                "OTHERS": values["others"], "UNIT": values["unit"], "LINGER": values["linger"], "VASEY_BUILD_USER": values["name"], "EXISTS": values["exists"],
                 "B_UID": values["uid"], "B_GID": values["gid"], "B_GROUPS": values["groups"], "SHELL_FIXTURE": values["shell"],
                 "VASEY_APP_USER": "forge", "VASEY_APP_GROUP": "forge", "A_UID": values["app_uid"], "A_GID": values["app_gid"],
                 "A_GROUPS": values["app_groups"], "BUILD_DIR": values["build_dir"]})
@@ -619,6 +660,7 @@ build_unit_ready() { [ "$UNIT" = 1 ]; }
                 ({"others": "www-data:x:33:990::/var/www:/usr/sbin/nologin"}, "shares the build account's uid or group"),
                 ({"others": "twin:x:990:33::/:/usr/sbin/nologin"}, "shares the build account's uid or group"),
                 ({"unit": "0"}, "needs systemd as init"),
+                ({"linger": "1"}, "lingering enabled"),
                 ({"root": "/home/forge/vasey"}, "must not be under /home")):
             with self.subTest(**overrides):
                 run = self.run_guard(**overrides)
@@ -626,6 +668,54 @@ build_unit_ready() { [ "$UNIT" = 1 ]; }
                 self.assertIn(message, run.stderr)
                 self.assertNotIn("usable", run.stdout)
 
+
+class ReapAndScanUnits(unittest.TestCase):
+    """reap_builder and refuse_build_leftovers with their system commands replaced by recording functions."""
+
+    def run_functions(self, stubs, call, environment=None):
+        source = CTL.read_text()
+        definitions = source[source.index("valid_sha() {"):source.index("# The sudo entry point")]
+        script = 'die() { echo "$*" >&2; exit 1; }\n' + definitions + "\n" + stubs + "\n" + call + "\n"
+        with tempfile.TemporaryDirectory() as directory:
+            log = Path(directory) / "log"
+            env = {"PATH": "/usr/bin:/bin", "LC_ALL": "C", "LOG": str(log), "SCRATCH": directory}
+            env.update(environment or {})
+            run = subprocess.run(["bash", "-eu", "-c", script], capture_output=True, text=True, timeout=60, env=env)
+            return run, (log.read_text().splitlines() if log.exists() else [])
+
+    KILL_STUBS = ('setpriv() { echo "setpriv $*" >> "$LOG"; }\npkill() { echo "pkill $*" >> "$LOG"; }\n'
+                  'pgrep() { echo "pgrep $*" >> "$LOG"; return 1; }\nsleep() { :; }')
+
+    def test_the_reap_refuses_without_a_build_account_and_kills_nothing(self):
+        for uid, gid in (("0", "990"), ("990", "0"), ("", "990"), ("abc", "990")):
+            with self.subTest(uid=uid, gid=gid):
+                run, log = self.run_functions(self.KILL_STUBS, f'BUILD_UID="{uid}" BUILD_GID="{gid}"\nreap_builder\necho REAPED')
+                self.assertNotEqual(run.returncode, 0)
+                self.assertIn("no build account to reap", run.stderr)
+                self.assertEqual(log, [], "something was signalled without a valid build account")
+
+    def test_the_reap_kills_before_it_looks(self):
+        # pgrep finds nothing (a chaser can always slip between snapshots): the kill must still have been sent.
+        run, log = self.run_functions(self.KILL_STUBS, "BUILD_UID=990 BUILD_GID=991\nreap_builder\necho REAPED")
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertIn("REAPED", run.stdout)
+        self.assertEqual(log[0], "setpriv --reuid=990 --regid=991 --clear-groups -- kill -KILL -1")
+        self.assertLess(log.index(log[0]), next(i for i, line in enumerate(log) if line.startswith("pgrep")))
+
+    def scan(self, find_stub):
+        stubs = ('build_scan_mounts() { printf "%s\\n" "$SCRATCH"; }\n' + find_stub)
+        return self.run_functions(stubs, "BUILD_UID=990 BUILD_GID=991 RELEASES=/nonexistent/releases ROOT=/nonexistent\n"
+                                         f"refuse_build_leftovers {'a' * 40}\necho CLEAN")
+
+    def test_a_scan_error_refuses_but_a_vanished_file_does_not(self):
+        run, _ = self.scan('find() { echo "find: \'$SCRATCH/x\': Permission denied" >&2; return 1; }')
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("cannot scan", run.stderr)
+        self.assertIn("Permission denied", run.stderr)
+        self.assertNotIn("CLEAN", run.stdout)
+        run, _ = self.scan('find() { echo "find: \'$SCRATCH/gone\': No such file or directory" >&2; return 1; }')
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertIn("CLEAN", run.stdout)
 
 @unittest.skipUnless(IS_ROOT, "the sealer's ownership changes need root (the CI step runs as root)")
 class SealBuiltTree(unittest.TestCase):
@@ -674,6 +764,21 @@ class SealBuiltTree(unittest.TestCase):
         self.assertEqual(self.owner("storage/framework/views/v.php")[0], self.APP)
         self.module.release_runtime(self.release, self.APP, self.APP)   # idempotent once released
         self.assertEqual(self.owner("vendor/autoload.php"), (0, 0o444))
+
+    # Codex review of PR #356: a symlink in a held runtime tree could resolve outside the candidate, to a file the running
+    # application can change after sealing, so a held tree may contain none (refused at sealing and at every verification).
+    def test_a_symlink_in_a_held_runtime_tree_is_refused(self):
+        outside = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, outside)
+        (outside / "packages.php").write_text("<?php return [];")
+        for target in ("packages.php", str(outside / "packages.php")):
+            with self.subTest(target=target):
+                link = self.release / "bootstrap/cache/current.php"
+                link.symlink_to(target)
+                os.chown(link, self.BUILD, self.BUILD, follow_symlinks=False)
+                with self.assertRaises(ValueError):
+                    self.seal()
+                link.unlink()
 
     def test_the_release_stays_closed_to_everyone_but_root_until_the_walk_is_done(self):
         seen = []

@@ -39,6 +39,7 @@ class OperationLeaseTest(unittest.TestCase):
         php = self.root / "php-fixture"
         php.write_text('''#!/bin/bash
 if [ "$1" = -r ]; then exit 0; fi
+case "$1" in */ops/staging/validate-runtime.php) exit 0 ;; esac   # activate's revalidation: covered in test_staging_isolated_build
 printf '%s\\n' "$2" >> TRACE_PATH
 if [ "$2" = down ]; then mkdir -p RELEASE_PATH/storage/framework; touch RELEASE_PATH/storage/framework/maintenance.php; fi
 if [ "$2" = install ]; then

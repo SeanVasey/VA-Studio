@@ -35,7 +35,7 @@ operation_begin() { :; }
 cmd_space_check() { :; }   # covered by test_staging_backup_offhost.SpaceCheck
 cmd_quiesce() { :; }
 cmd_snapshot() { echo snapshot; [ "$SNAPSHOT_OK" = 1 ]; }
-as_app() { echo migration; }
+as_app() { case " $* " in *' revalidate '*) echo revalidate; [ "${REVALIDATE_OK:-1}" = 1 ] ;; *) echo migration ;; esac; }
 cmd_switch() { :; }
 cmd_resume() { :; }
 operation_finish() { :; }
@@ -48,7 +48,16 @@ start_ship_pending() { :; }   # the detached off-host shipment: covered by test_
                                           "RELEASES": str(Path(directory) / 'releases'), "VASEY_APP_USER": "fixture-app",
                                           "SHA": 'a' * 40, "EVIDENCE": directory, "RELEASE_STEP": 'fixture-step', "SNAPSHOT_OK": snapshot_ok})
                 self.assertEqual(run.returncode == 0, snapshot_ok == '1', run.stderr)
-                self.assertEqual(run.stdout.splitlines(), ['snapshot', 'migration'] if snapshot_ok == '1' else ['snapshot'])
+                self.assertEqual(run.stdout.splitlines(),
+                                 ['revalidate', 'snapshot', 'migration'] if snapshot_ok == '1' else ['revalidate', 'snapshot'])
+            # A candidate the runtime admission refuses stops activate before anything: no snapshot, no migration.
+            run = subprocess.run(["bash", "-eu", "-c", shell + body + '\ncmd_activate "$SHA" "$EVIDENCE"'], capture_output=True, text=True,
+                                 env={"PATH": "/usr/bin:/bin", "CURRENT": str(Path(directory) / 'absent-current'),
+                                      "RELEASES": str(Path(directory) / 'releases'), "VASEY_APP_USER": "fixture-app",
+                                      "SHA": 'a' * 40, "EVIDENCE": directory, "RELEASE_STEP": 'fixture-step',
+                                      "SNAPSHOT_OK": '1', "REVALIDATE_OK": '0'})
+            self.assertNotEqual(run.returncode, 0)
+            self.assertEqual(run.stdout.splitlines(), ['revalidate'])
 
     def test_healthy_checks_admission_maintenance_bind_services_path_and_http_without_repair(self):
         source = (REPO / "ops/staging/bin/vasey-staging-ctl").read_text()
