@@ -217,7 +217,7 @@ class TestCommerceProfileValidatorTest extends TestCase
             'pricing for another account' => [$json('"account":"acct_StagingSyntheticOnly"', '"account":"acct_OtherSynthetic"'), 'commerce.pricing_zero_test_tax'],
             'pricing window closed' => [$json('"effective_until":"2027-01-01T00:00:00Z"', '"effective_until":"2026-10-02T00:00:00Z"'), 'commerce.pricing'],
             'short inventory hold' => [$json('"ttl_seconds":900', '"ttl_seconds":60'), 'commerce.inventory_ttl_covers_quote'],
-            'exclusive selection enabled' => [$set('VASEY_TEST_EXCLUSIVE_SELECTION_POLICY', '\'{"schema_version":1,"purpose":"test_exclusive_selection","non_exclusive_cutoff":"block_while_reserved","existing_pending":"retain_until_verified_resolution","discounts":"explicit_revision_only"}\''), 'commerce.exclusive_selection_off'],
+            'exclusive selection policy malformed' => [$set('VASEY_TEST_EXCLUSIVE_SELECTION_POLICY', '\'{"schema_version":1,"purpose":"test_exclusive_selection","non_exclusive_cutoff":"allow","existing_pending":"retain_until_verified_resolution","discounts":"explicit_revision_only"}\''), 'commerce.exclusive_selection'],
             'order policy extra field' => [$json('"buyer_identity":"unverified_guest"}\'', '"buyer_identity":"unverified_guest","extra":1}\''), 'commerce.order'],
             'checkout disabled' => [$set('STRIPE_TEST_CHECKOUT_ENABLED', 'false'), 'commerce.checkout'],
             'checkout lifetime changed' => [$json('"provider_lifetime_seconds":3600', '"provider_lifetime_seconds":1800'), 'commerce.checkout'],
@@ -331,6 +331,43 @@ class TestCommerceProfileValidatorTest extends TestCase
             [$exit, $output, $checks] = $this->validate(self::set(self::filled(), $flag, $refused));
             $this->assertSame(1, $exit, $refused.PHP_EOL.$output);
             $this->assertSame(['profile.optional_flags_explicit', 'boundary.optional_capabilities_admitted'], self::failedChecks($checks), $refused);
+        }
+    }
+
+    /**
+     * Optional on staging (the hosted rehearsal sets it by Sean's decision): empty is off, set passes only with the exact shape the
+     * real ExclusiveSelectionPolicy accepts. The staging deploy gate applies the same rule (tests/ops/test_staging_exclusive_selection_admission.py).
+     */
+    public function test_exclusive_selection_is_optional_and_admitted_only_with_its_exact_policy(): void
+    {
+        $key = 'VASEY_TEST_EXCLUSIVE_SELECTION_POLICY';
+        $policy = '\'{"schema_version":1,"purpose":"test_exclusive_selection","non_exclusive_cutoff":"block_while_reserved",'
+            .'"existing_pending":"retain_until_verified_resolution","discounts":"explicit_revision_only"}\'';
+        $this->assertSame(1, preg_match('/^'.$key.'=$/m', self::filled()));
+
+        [$exit, $output, $checks] = $this->validate(self::filled());
+        $this->assertSame(0, $exit, $output);
+        $this->assertTrue($checks['commerce.exclusive_selection']);
+        $this->assertStringContainsString('PASS commerce.exclusive_selection - Optional Exclusive selection is off', $output);
+
+        [$exit, $output, $checks] = $this->validate(self::set(self::filled(), $key, $policy));
+        $this->assertSame(0, $exit, $output);
+        $this->assertNotContains(false, $checks);
+        $this->assertStringContainsString('PASS commerce.exclusive_selection - Optional Exclusive selection is ON', $output);
+        $this->assertStringContainsString('permanently locks its track', $output);
+
+        $changed = [
+            str_replace('block_while_reserved', 'allow', $policy),
+            str_replace('"discounts":"explicit_revision_only"', '"discounts":"explicit_revision_only","extra":1', $policy),
+            str_replace('"schema_version":1', '"schema_version":2', $policy),
+            "'not json'",
+        ];
+        foreach ($changed as $bad) {
+            [$exit, $output, $checks] = $this->validate(self::set(self::filled(), $key, $bad));
+            $this->assertSame(1, $exit, $bad.PHP_EOL.$output);
+            $this->assertSame(['commerce.exclusive_selection'], self::failedChecks($checks), $bad.PHP_EOL.$output);
+            $this->assertStringContainsString('is set but ExclusiveSelectionPolicy::current() refuses it', $output);
+            $this->assertNoSecretPrinted($output);
         }
     }
 

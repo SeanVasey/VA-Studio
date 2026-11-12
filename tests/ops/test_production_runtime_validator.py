@@ -157,6 +157,10 @@ class ProductionRuntimeValidator(unittest.TestCase):
             ({"MEDIA_TAG_SHA256": "nope"}, "preflight.media_tag_hash_shape_only"),
             ({"CONTACT_INQUIRIES_ENABLED": "true"}, "preflight.baseline_contact_inquiries_enabled"),
             ({"VASEY_TEST_PRICING_POLICY": "'{}'"}, "preflight.inactive_vasey_test_pricing_policy"),
+            # Optional on staging (CapabilityBoundary::STAGING_OPTIONAL_POLICIES), always blank in production, even in its exact shape.
+            ({"VASEY_TEST_EXCLUSIVE_SELECTION_POLICY": "'{\"schema_version\":1,\"purpose\":\"test_exclusive_selection\","
+              "\"non_exclusive_cutoff\":\"block_while_reserved\",\"existing_pending\":\"retain_until_verified_resolution\","
+              "\"discounts\":\"explicit_revision_only\"}'"}, "preflight.inactive_vasey_test_exclusive_selection_policy"),
         ):
             with self.subTest(identifier=identifier):
                 self.failed(self.validate(profile(**override)), "preflight.result", identifier)

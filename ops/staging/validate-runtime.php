@@ -115,6 +115,21 @@ try {
         foreach (array_keys(CapabilityBoundary::STAGING_OPTIONAL_FLAGS) as $flag) {
             $check('runtime.optional_'.strtolower($flag), ! in_array($flag, $refused, true));
         }
+        // Optional staging policies (the Exclusive selection policy, in use on the hosted rehearsal): blank is off; any other value
+        // passes only when the real policy class accepts it, so a malformed policy is refused here instead of at the first quote.
+        // The operator profile validator applies the same rule (scripts/ops/validate-test-commerce-profile.php).
+        $refusedPolicies = CapabilityBoundary::optionalPoliciesRefused(static fn (string $key): mixed => config($key), static function (string $policy): bool {
+            try {
+                app($policy)->current();
+
+                return true;
+            } catch (Throwable) {
+                return false;
+            }
+        });
+        foreach (array_keys(CapabilityBoundary::STAGING_OPTIONAL_POLICIES) as $policy) {
+            $check('runtime.optional_'.strtolower($policy), ! in_array($policy, $refusedPolicies, true));
+        }
         // Paid252, Tax255, production customer identity, production free grants and the other production lanes: no enabled or mounted
         // flag may be true, and the named lanes' configuration must still exist.
         $lanes = CapabilityBoundary::productionLanes(dirname(__DIR__, 2).'/config', static fn (string $stem): array => (array) config($stem));
