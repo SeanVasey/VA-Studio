@@ -695,9 +695,14 @@ What changed for an operator:
      and root attaches private storage.
   `ctl activate` then verifies the seal (a changed candidate refuses before anything stops), quiesces, hands the held runtime
   directories to `forge` (`seal-release.py release-runtime`) and continues as before. **The pause is now the quiesce, the
-  snapshot and its restore check, migrate/caches/doctor, the switch and the healthy resume.** It has **not been measured on
-  the host yet**; from the 2026-11-12 phases above (4m45s, of which 3m18s was the build) it should be about one and a half
-  minutes. Record the first measurement here.
+  snapshot and its restore check, migrate/caches/doctor, the switch and the healthy resume.** Measured on the first isolated
+  deploy (2026-11-12, `785f47e4`, evidence `20261112T123526Z-785f47e42752`, nothing to migrate): re-hash with the site up
+  12:35:26 to 12:38:49 (3m23s); isolated build with the site up 12:38:49 to 12:42:15 (3m26s); **pause about 4m** (quiesce
+  just after 12:42:17, snapshot written 12:44:32, restore check passed 12:45:48, switched and resumed 12:46:19); whole
+  deploy 10m58s. The pause is shorter than the 4m45s before, but not the one and a half minutes estimated: the snapshot
+  and its restore check took about 3.5 of the 4 minutes in this run (about 1 minute in the 2026-11-12 measurement above).
+  The whole deploy is longer, so Forge now reports "failed" for a successful deploy (see section 9, Forge's ten-minute
+  limit): judge every deploy by its `forge-deploy.log`.
 - **Before the first isolated deploy, smoke the unit on the host** (the tests replace `systemd-run` with a stand-in; none has
   run the real unit). After re-provisioning, run as root
   `bash /home/forge/vasey-staging.on-forge.com/ops/staging/smoke-build-unit.sh` (a Forge recipe as root works; it exits 0
@@ -842,8 +847,9 @@ retains the maintenance marker and closed gate, and does not require HTTP503 fro
 A Forge "failed" after exactly ten minutes is Forge's deployment time limit, not necessarily a failed deploy: Forge
 stops reading the output but leaves the processes running, and a first install's migrations take longer than that. Forge
 documents the limit as fixed ("Deployments are limited to 10 minutes"; there is no site setting for it, only Envoyer's own
-limits replace it). Since the 2026-11-11 shared-tree snapshot a normal deploy should finish well inside it; the first snapshot
-after re-provisioning (a full copy) and a long build can still pass it.
+limits replace it). Since the isolated build (2026-11-12) a normal deploy takes about 11 minutes (re-hash and build run with
+the site up before the pause; section 8), so **Forge marks a successful deploy "failed"**: the first isolated deploy
+(`785f47e4`, Forge deployment 82807668) did, and finished healthy at 12:46:24. Always read `forge-deploy.log`.
 `forge-deploy.sh` keeps writing everything to `forge-deploy.log` in the deploy's evidence directory. Wait until no
 `vasey-staging-ctl` or `release-step.sh` process remains, then read that log's last lines and `ctl status`: a log that
 ends with `deployed <sha>` and a status without an operation marker is a completed deploy; anything else is a recovery case below.
