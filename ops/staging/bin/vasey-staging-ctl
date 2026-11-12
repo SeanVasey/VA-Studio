@@ -22,7 +22,9 @@
 #   vasey-staging-ctl space-check            refuse unless the disk has room for a pre-deploy snapshot (run before any quiesce;
 #                                             prepare and refresh also re-verify the backup files the snapshot will share)
 #   vasey-staging-ctl backup-prune            apply local backup retention (VASEY_BACKUP_KEEP; tiered if configured); never the newest set
-#   vasey-staging-ctl prepare <SHA> <env> <evidence>   root lease across quiesce, checkout/build and sealing
+#   vasey-staging-ctl prepare <SHA> <env> <evidence>   root lease across checkout/build and sealing: with the dedicated
+#                                             build account (VASEY_BUILD_USER) the site stays up; without it (host not
+#                                             re-provisioned) it quiesces first and builds as the application, as before
 #   vasey-staging-ctl activate <SHA> <evidence>        root lease across quiesce, snapshot, migration, switch/resume
 #   vasey-staging-ctl refresh <SHA> <env>             root lease across snapshot, protected config and resume
 #   vasey-staging-ctl prune                   detach and delete releases beyond VASEY_KEEP_RELEASES
@@ -141,23 +143,29 @@ cmd_allocate() {
   echo "allocated $sha"
 }
 
-seal_release() {
-  local sha=$1 expected=$RELEASES/$1 part
+seal_release() {  # seal_release SHA [BUILD_USER]: without BUILD_USER the application account built the candidate
+  local sha=$1 builder=${2:-} expected=$RELEASES/$1 part
   protected_dir "$RELEASES"
   # The protected releases parent prevents the app from renaming the release itself. Seal each
   # directory before following its child, so the app cannot swap the next component after checking.
+  # An isolated build keeps the release itself 0700 until the sealer has walked all of it (the site is up meanwhile).
   cd -P -- "$expected" 2>/dev/null || die "release not found"
   for part in release storage app; do
     [ "$(pwd -P)" = "$expected" ] || die "release ancestry contains a symlink"
-    case "$(stat -c %U .)" in "$VASEY_APP_USER"|root) ;; *) die "release ancestry has an unexpected owner" ;; esac
-    chown root:root .; chmod 0755 .
+    case "$(stat -c %U .)" in "${builder:-$VASEY_APP_USER}"|root) ;; *) die "release ancestry has an unexpected owner" ;; esac
+    chown root:root .
+    if [ -n "$builder" ] && [ "$part" = release ]; then chmod 0700 .; else chmod 0755 .; fi
     case "$part" in
       release) expected=$expected/storage; cd -P -- storage 2>/dev/null || die "release storage missing" ;;
       storage) expected=$expected/app; cd -P -- app 2>/dev/null || die "release storage/app missing" ;;
     esac
   done
   cd /
-  seal_tool seal "$RELEASES/$sha" "$VASEY_APP_USER" "$VASEY_APP_GROUP"
+  if [ -n "$builder" ]; then
+    seal_tool seal-built "$RELEASES/$sha" "$VASEY_APP_USER" "$VASEY_APP_GROUP" "$builder"
+  else
+    seal_tool seal "$RELEASES/$sha" "$VASEY_APP_USER" "$VASEY_APP_GROUP"
+  fi
   sealed_release "$sha"
 }
 
@@ -212,8 +220,12 @@ persist_private_bind() {
 
 cmd_attach() {
   local sha=${1:-}; valid_sha "$sha" || die "attach needs a 40-hex SHA"
-  local rel=$RELEASES/$sha target=$RELEASES/$sha/storage/app/private
   seal_release "$sha"
+  attach_private "$sha"
+}
+
+attach_private() {  # the release is sealed (seal_release or an isolated build's sealing just verified it)
+  local sha=$1 rel=$RELEASES/$1 target=$RELEASES/$1/storage/app/private
   [ -d "$PRIVATE" ] && [ ! -L "$PRIVATE" ] || die "persistent private root missing"
   [ "$(stat -c '%U %a' "$PRIVATE")" = "$VASEY_APP_USER 700" ] || die "persistent private root must be $VASEY_APP_USER 0700"
   if mountpoint -q "$target"; then
@@ -458,6 +470,12 @@ cmd_prepare() {
   release_step_file
   operation_evidence "$evidence"
   cmd_space_check --preverify-if-needed   # before any quiesce: a full disk must refuse here, not mid-snapshot with the site stopped
+  if build_account; then
+    prepare_isolated "$sha" "$candidate" "$evidence"
+    return
+  fi
+  # No dedicated build account: the application account builds, so nothing it runs may be live meanwhile (Codex finding
+  # 4226283468 on PR #63). Quiesce first and build inside the pause, exactly as before the build account existed.
   operation_begin prepare "$sha"
   cmd_quiesce
   OPERATION_ENV=$(mktemp "$ROOT/.build-env.XXXXXXXX") || die "cannot stage protected build environment"
@@ -473,6 +491,85 @@ cmd_prepare() {
   operation_finish
 }
 
+# The dedicated build account (provision.sh creates it; VASEY_BUILD_USER in staging.conf). Returns 1, and the deploy builds
+# inside the pause as the application, when none is configured or it does not exist yet. An account that exists but could
+# share a write path with the application refuses instead: that is a host fault to fix, not a reason to build differently.
+build_account() {
+  local name=${VASEY_BUILD_USER:-} uid gid group app_gid shell member
+  [ -n "$name" ] || return 1
+  if ! getent passwd "$name" >/dev/null; then
+    echo "vasey-staging-ctl: build account $name does not exist (re-run provision.sh); building inside the maintenance pause as the application"
+    return 1
+  fi
+  [[ "$name" =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] || die "invalid build account name"
+  uid=$(id -u -- "$name") gid=$(id -g -- "$name") group=$(id -gn -- "$name")
+  app_gid=$(getent group "$VASEY_APP_GROUP" | cut -d: -f3)
+  [ "$uid" -gt 0 ] && [ "$uid" != "$(id -u -- "$VASEY_APP_USER")" ] || die "the build account must be nonroot and not the application account"
+  [ -n "$app_gid" ] && [ "$gid" -gt 0 ] && [ "$gid" != "$app_gid" ] && [ "$(id -G -- "$name")" = "$gid" ] \
+    || die "the build account must belong to its own group only"
+  for member in $(id -G -- "$VASEY_APP_USER"); do
+    [ "$member" != "$gid" ] || die "the application account must not be a member of the build group"
+  done
+  shell=$(getent passwd "$name" | cut -d: -f7)
+  case "$shell" in /usr/sbin/nologin|/sbin/nologin|/bin/false|/usr/bin/false) ;; *) die "the build account must have no login shell" ;; esac
+  protected_dir "$ROOT"
+  [ -d "$ROOT/build" ] && [ ! -L "$ROOT/build" ] && [ "$(stat -c '%u %g %a' -- "$ROOT/build")" = "0 $gid 770" ] \
+    || die "$ROOT/build must be root:$group 0770 (re-run provision.sh)"
+  BUILD_UID=$uid BUILD_GID=$gid
+}
+
+as_builder() { runuser -u "$VASEY_BUILD_USER" -- "$@" 8>&- 7<&-; }
+
+# No process of the build account may outlive its step: a survivor could still write before or while root seals.
+reap_builder() {
+  local attempt
+  for attempt in 1 2 3 4 5 6 7 8 9 10; do
+    if ! pgrep -U "$BUILD_UID" >/dev/null && ! pgrep -u "$BUILD_UID" >/dev/null; then return 0; fi
+    pkill -KILL -U "$BUILD_UID" || true
+    pkill -KILL -u "$BUILD_UID" || true
+    sleep "0.$attempt"
+  done
+  die "processes of the build account survive; refusing to seal (root recovery required)"
+}
+
+prepare_isolated() {
+  local sha=$1 candidate=$2 evidence=$3 rel=$RELEASES/$1 staged
+  cd /   # the caller's directory (the Forge checkout) is not the build account's to read
+  operation_begin prepare "$sha"
+  echo "vasey-staging-ctl: building $sha as $VASEY_BUILD_USER with the site up; the pause starts at activate"
+  # Capture the frozen environment now, root:app-group 0440 in the root-owned kit root: the build account cannot read it.
+  OPERATION_ENV=$(mktemp "$ROOT/.build-env.XXXXXXXX") || die "cannot stage protected build environment"
+  trap 'rm -f -- "$OPERATION_ENV"' EXIT
+  seal_tool stage-env "$ROOT/evidence" "$candidate" "$OPERATION_ENV" "$VASEY_APP_USER" "$VASEY_APP_GROUP"
+  chown "root:$VASEY_APP_GROUP" "$OPERATION_ENV"; chmod 0440 "$OPERATION_ENV"
+  reap_builder
+  # Leftovers of an interrupted build (its homes) go before a new one starts; nothing of the build account runs now.
+  find "$ROOT/build" -mindepth 1 -maxdepth 1 -exec rm -rf --one-file-system -- {} +
+  protected_dir "$RELEASES"
+  [ ! -e "$rel" ] && [ ! -L "$rel" ] || die "release slot already exists"
+  # root:<build group> 0770: the build account writes it, the application cannot even traverse it, and the build account
+  # cannot open it to anyone (it does not own it). Nothing inside is reachable by the application until sealing ends.
+  install -d -m 0770 -o root -g "$BUILD_GID" -- "$rel"
+  [ "$(stat -c '%u %g %a' -- "$rel")" = "0 $BUILD_GID 770" ] || die "build slot has the wrong owner or mode"
+  as_app env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C git -C "$VASEY_MIRROR" bundle create -q - HEAD </dev/null \
+    | as_builder env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C /bin/bash "$RELEASE_STEP" build-isolated "$sha" \
+    || { reap_builder; die "isolated build failed with the site up (served release untouched); root recovery is required"; }
+  reap_builder
+  # Code onto fresh root-owned inodes, runtime directories held root-owned (handed over by activate under its quiesce), the
+  # private mount target handed to the application. Then the protected environment, on a fresh inode in the sealed release.
+  seal_release "$sha" "$VASEY_BUILD_USER"
+  staged=$(mktemp "$rel/.env-candidate.XXXXXXXX") || die "cannot stage protected environment"
+  cat -- "$OPERATION_ENV" > "$staged" && chown "root:$VASEY_APP_GROUP" "$staged" && chmod 0440 "$staged" \
+    && mv -T -- "$staged" "$rel/.env" || { rm -f -- "$staged"; die "cannot install protected environment"; }
+  sealed_release "$sha"
+  as_app env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C /bin/bash "$RELEASE_STEP" admit "$sha" "$evidence" \
+    || die "built candidate refused; admission unchanged and the served release untouched; root recovery is required"
+  attach_private "$sha"
+  rm -- "$OPERATION_ENV"
+  trap - EXIT
+  operation_finish
+}
+
 cmd_activate() {
   local sha=$1 evidence=$2 first_install=1
   valid_sha "$sha" || die "activate needs a 40-hex SHA"
@@ -483,9 +580,10 @@ cmd_activate() {
     served_release >/dev/null || die "served release is invalid"
     first_install=0
   fi
-  cmd_space_check   # prepare already stopped the site; refuse before the snapshot starts rather than die inside it
+  cmd_space_check   # refuse before the snapshot starts rather than die inside it (a legacy prepare already stopped the site)
   operation_begin activate "$sha"
   cmd_quiesce
+  release_held_runtime "$sha"
   cmd_snapshot
   as_app env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C /bin/bash "$RELEASE_STEP" activate "$sha" "$evidence" "$first_install" \
     || die "activation failed; remain quiesced, stop surviving children and recover the verified snapshot as root"
@@ -493,6 +591,16 @@ cmd_activate() {
   cmd_resume
   operation_finish
   start_ship_pending   # site healthy and the recovery marker cleared; the off-host copy of the snapshot just taken ships now
+}
+
+# An isolated build's runtime directories stay root-held while the previous release serves: the live application must not
+# plant generated PHP (bootstrap/cache) in the candidate. Hand them over only now, with every writer stopped.
+release_held_runtime() {
+  local sha=$1
+  if [ "$(stat -c %u -- "$RELEASES/$sha/bootstrap/cache" 2>/dev/null)" = 0 ]; then   # a legacy build is the application's already
+    seal_tool release-runtime "$RELEASES/$sha" "$VASEY_APP_USER" "$VASEY_APP_GROUP"
+    echo "vasey-staging-ctl: runtime directories of $sha handed to $VASEY_APP_USER under quiesce"
+  fi
 }
 
 cmd_refresh() {

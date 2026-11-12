@@ -641,9 +641,35 @@ What changed for an operator:
   the whole deploy 8m54s. The new set used 25 MB on disk. Before the change the window was about 22 minutes.
   Measured again on the deploy of 2026-11-12 (deployment 82759032, main `ead7368d`): re-hash with the site up 3m07s; maintenance
   4m45s (quiesce 23:57:55, resumed about 00:02:40), of which about 3m18s ran from the quiesce to the activate step (the build); snapshot 7 s (copied 3
-  files / 1.2 MB, linked 37.9 GB); restore check 48 s; the whole deploy 8m01s. The build runs inside the pause on purpose:
-  `ctl prepare` builds the candidate as the application user, so the site is stopped first (Codex finding 4226283468 on
-  PR #63). Building before the quiesce needs a dedicated build account and is not done.
+  files / 1.2 MB, linked 37.9 GB); restore check 48 s; the whole deploy 8m01s. Those deploys built inside the pause on purpose:
+  `ctl prepare` built the candidate as the application user, so the site was stopped first (Codex finding 4226283468 on
+  PR #63).
+- **The build moves before the quiesce once the host is re-provisioned (2026-11-12).** `provision.sh` now creates a dedicated
+  build account, `vasey-staging-build` (no login shell, no password, no sudo, denied cron and at, a group of its own that
+  `forge` is not in). With it, `ctl prepare` runs entirely with the site up, under its operation marker:
+  1. root captures the frozen `.env` into a root:`forge` 0440 file the build account cannot read;
+  2. root creates `releases/<SHA>` as root:`vasey-staging-build` 0770: the build account can write it, `forge` (the running
+     application) cannot even traverse it, and the build account cannot open it up because it does not own it;
+  3. `forge` writes a git bundle of the mirror's `HEAD` into a pipe and the build account imports it: git hashes every object,
+     so the checkout is exactly the requested SHA (proven clean, as before) whatever bytes arrived;
+  4. the build account runs `composer install` and `npm ci && npm run build` with a fresh private home, caches and `TMPDIR`
+     under `/srv/vasey-staging/build` (root:`vasey-staging-build` 0770) and **no `.env`** (the Composer hooks need none, and the
+     front end reads no `VITE_*` variable); no `/tmp`, `forge` cache or environment is shared with it;
+  5. root kills every remaining process of the build account, then seals the release while it is still 0700: code onto fresh
+     root-owned read-only inodes, the private mount target handed to `forge`, and `bootstrap/cache`, `storage/framework` and
+     `storage/logs` **held** root-owned and read-only, so the live application cannot plant generated PHP in the candidate;
+  6. root installs the captured `.env` (root:`forge` 0440), `forge` runs the real runtime admission and writes `build.sha256`,
+     and root attaches private storage.
+  `ctl activate` then verifies the seal (a changed candidate refuses before anything stops), quiesces, hands the held runtime
+  directories to `forge` (`seal-release.py release-runtime`) and continues as before. **The pause is now the quiesce, the
+  snapshot and its restore check, migrate/caches/doctor, the switch and the healthy resume.** It has **not been measured on
+  the host yet**; from the 2026-11-12 phases above (4m45s, of which 3m18s was the build) it should be about one and a half
+  minutes. Record the first measurement here.
+- **Without the build account** (staging.conf has no `VASEY_BUILD_USER`, or the account does not exist yet) `ctl prepare`
+  behaves exactly as before: it quiesces, builds as `forge` inside the pause and seals. A build account that exists but is
+  unsafe (in `forge`'s group, `forge` in its group, a login shell, a wrong `build/` mode) refuses before anything starts; it
+  never falls back to building early as `forge`. Re-provisioning is required to get the account: the deploy refuses on helper
+  drift until `provision.sh` installs the changed `vasey-staging-ctl`, `release-step.sh` and `seal-release.py` anyway.
 - The **first** snapshot after re-provisioning has nothing to share and copies the whole store inside the window. Measured on
   staging, 2026-11-11: 37.9 GB / 1,049 files copied in 4m52s, proof 4m33s, maintenance about 9.8 minutes. Let the 03:17 nightly
   run take it, or deploy at a quiet time; every later snapshot shares.
@@ -771,8 +797,10 @@ Decide which case applies by comparing `migrate-status-before.txt` and `migrate-
 failed deploy's evidence directory.
 
 **A. The deploy failed before migration and before replacing the served configuration.** Confirm `current`
-still points at the previous release. New-release deployments quiesce before allocating/building a candidate,
-so Composer/npm failure can leave the old site in maintenance with writer admission closed. Inspect service
+still points at the previous release. Without the build account, new-release deployments quiesce before allocating/building
+a candidate, so Composer/npm failure can leave the old site in maintenance with writer admission closed. With it, a failed
+prepare ("FAILED ... while the build account prepared the candidate with the site up") stopped nothing: see "A failed
+isolated build" below. Inspect service
 state before recovery; downtime includes the build. Stop any uncontrolled manual/rogue app-account process
 separately; controlled service quiescence is not a builder attestation. Confirm the old
 environment is unchanged. A failed quiesce or partial resume
@@ -820,6 +848,26 @@ rm -- /etc/vasey-staging/operation-in-progress               # explicit root rec
 rm -rf --one-file-system -- "$REL"
 /usr/local/sbin/vasey-staging-ctl resume                     # previous release: 503 proof, workers, up, 200
 /usr/local/sbin/vasey-staging-ctl healthy "$(basename "$(readlink -f /srv/vasey-staging/current)")"
+RECOVER
+```
+
+**A failed isolated build** (site up, `GET /` still 200, an operation marker, an unsealed `releases/<SHA>` owned by
+root:`vasey-staging-build` 0770). Nothing was stopped or attached, so no quiesce or resume is needed. The script refuses
+when the candidate was already attached (a failure after `attach`): use the recovery script above for that case.
+
+```sh
+sudo NEW=<40-hex SHA of the failed candidate> bash -euo pipefail <<'RECOVER'
+[[ "$NEW" =~ ^[0-9a-f]{40}$ ]] || { echo "NEW is not a SHA" >&2; exit 1; }
+REL="/srv/vasey-staging/releases/$NEW"
+[ "$(readlink -f /srv/vasey-staging/current)" != "$REL" ] || { echo "$NEW is the served release; stop" >&2; exit 1; }
+! pgrep -f 'vasey-staging-ctl|release-step' >/dev/null || { echo "a helper still runs; stop" >&2; exit 1; }
+pkill -KILL -u vasey-staging-build || true; sleep 1
+! pgrep -u vasey-staging-build >/dev/null || { echo "a build-account process survives; stop" >&2; exit 1; }
+! mountpoint -q "$REL/storage/app/private" && ! grep -qF " $REL/storage/app/private " /etc/fstab \
+  || { echo "the candidate is attached; use the recovery script above" >&2; exit 1; }
+rm -f -- /etc/vasey-staging/operation-in-progress            # explicit root recovery, after the checks above
+rm -rf --one-file-system -- "$REL"
+[ ! -L /srv/vasey-staging/current ] || /usr/local/sbin/vasey-staging-ctl healthy "$(basename "$(readlink -f /srv/vasey-staging/current)")"
 RECOVER
 ```
 

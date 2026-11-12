@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Seal code without following links or retaining application-writable file descriptors."""
+"""Seal code without following links or retaining application-writable file descriptors.
+
+Two build owners exist. The legacy build runs as the application account inside the maintenance pause, so `seal` trusts
+files owned by root or the application. The isolated build (`seal-built`) runs as a dedicated build account while the site
+is up: then only root or that account may own anything in the candidate, the release directory stays root 0700 until the
+whole walk is done, the private mount target is handed to the application, and the other runtime directories are held
+root-owned and read-only (`release-runtime` hands them to the application later, under the activation's quiesce)."""
 import os
 from pathlib import Path
 import pwd
@@ -12,6 +18,8 @@ ROOT_UID = 0
 ROOT_GID = 0
 RUNTIME = frozenset(("bootstrap/cache", "storage/framework", "storage/logs", "storage/app/private"))
 DIRECTORY_FLAGS = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+PRIVATE_TARGET = "storage/app/private"
+HELD = tuple(sorted(RUNTIME - {PRIVATE_TARGET}))
 
 
 def runtime_path(relative):
@@ -33,13 +41,13 @@ def checked_link(root, relative):
         raise ValueError("code symlink points into writable runtime storage")
 
 
-def copy_file(parent, name, relative, app_uid, app_gid):
+def copy_file(parent, name, relative, app_uid, app_gid, owner):
     source = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=parent)
     staged = ".sealed-" + secrets.token_hex(16)
     output = None
     try:
         before = os.fstat(source)
-        if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or before.st_uid not in (ROOT_UID, app_uid):
+        if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or before.st_uid not in (ROOT_UID, owner):
             raise ValueError("code requires a singly linked regular file with a trusted owner")
         if before.st_mode & (stat.S_ISUID | stat.S_ISGID):
             raise ValueError("privileged executable modes are forbidden")
@@ -74,11 +82,89 @@ def copy_file(parent, name, relative, app_uid, app_gid):
             pass
 
 
-def walk(root, descriptor, relative, app_uid, app_gid, sealing):
+def adopt(descriptor, owner, uid, gid, held):
+    """Give every entry below a runtime directory, then the directory itself, to uid:gid (postorder, no links followed).
+
+    Every entry must belong to `owner`; until the directory itself changes hands nobody else can rename inside it. Held
+    entries (root-owned) also lose group/world write, so the running application can read but not change them."""
     info = os.fstat(descriptor)
-    if info.st_uid not in (ROOT_UID, app_uid):
+    if info.st_uid != owner:
+        raise ValueError("runtime directory has an unexpected owner")
+    for name in sorted(os.listdir(descriptor)):
+        entry = os.stat(name, dir_fd=descriptor, follow_symlinks=False)
+        if entry.st_uid != owner or entry.st_mode & (stat.S_ISUID | stat.S_ISGID):
+            raise ValueError("runtime entry has an unexpected owner or mode")
+        if stat.S_ISLNK(entry.st_mode):
+            os.chown(name, uid, gid, dir_fd=descriptor, follow_symlinks=False)
+            continue
+        if stat.S_ISDIR(entry.st_mode):
+            child = os.open(name, DIRECTORY_FLAGS, dir_fd=descriptor)
+        elif stat.S_ISREG(entry.st_mode):
+            child = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=descriptor)
+        else:
+            raise ValueError("special files are forbidden in runtime directories")
+        try:
+            opened = os.fstat(child)
+            if (opened.st_dev, opened.st_ino) != (entry.st_dev, entry.st_ino) or opened.st_dev != info.st_dev:
+                raise ValueError("runtime entry changed or crosses a filesystem boundary")
+            if stat.S_ISDIR(entry.st_mode):
+                adopt(child, owner, uid, gid, held)
+            else:
+                if opened.st_nlink != 1:
+                    raise ValueError("runtime file must be singly linked")
+                os.fchown(child, uid, gid)
+                if held:
+                    os.fchmod(child, stat.S_IMODE(opened.st_mode) & ~0o022 | 0o444)
+        finally:
+            os.close(child)
+    os.fchown(descriptor, uid, gid)
+    if held:
+        os.fchmod(descriptor, stat.S_IMODE(info.st_mode) & ~0o022 | 0o755)
+
+
+def verify_held(descriptor):
+    """A held runtime tree: root-owned, nothing group/world writable, no links to other inodes, no special files."""
+    info = os.fstat(descriptor)
+    if info.st_uid != ROOT_UID or info.st_mode & 0o022:
+        raise ValueError("held runtime directory is not protected")
+    for name in os.listdir(descriptor):
+        entry = os.stat(name, dir_fd=descriptor, follow_symlinks=False)
+        if entry.st_uid != ROOT_UID or entry.st_mode & (0o022 | stat.S_ISUID | stat.S_ISGID):
+            raise ValueError("held runtime entry is not protected")
+        if stat.S_ISDIR(entry.st_mode):
+            child = os.open(name, DIRECTORY_FLAGS, dir_fd=descriptor)
+            try:
+                if os.fstat(child).st_dev != info.st_dev:
+                    raise ValueError("held runtime crosses a filesystem boundary")
+                verify_held(child)
+            finally:
+                os.close(child)
+        elif stat.S_ISREG(entry.st_mode):
+            if entry.st_nlink != 1:
+                raise ValueError("held runtime file must be singly linked")
+        elif not stat.S_ISLNK(entry.st_mode):
+            raise ValueError("special files are forbidden in runtime directories")
+
+
+def walk(root, descriptor, relative, app_uid, app_gid, sealing, build_uid=None):
+    info = os.fstat(descriptor)
+    # The account that built the candidate. The legacy build (inside the pause) is the application itself.
+    owner = app_uid if build_uid is None else build_uid
+    if info.st_uid not in ((ROOT_UID, owner) if sealing else (ROOT_UID, app_uid)):
         raise ValueError("unexpected directory owner")
     if relative in RUNTIME:
+        if sealing and build_uid is not None:
+            if info.st_uid != build_uid:
+                raise ValueError("runtime directory must be owned by the build account")
+            if relative == PRIVATE_TARGET:
+                adopt(descriptor, build_uid, app_uid, app_gid, False)  # the mount target; attach requires it empty
+                os.fchmod(descriptor, 0o700)
+            else:
+                adopt(descriptor, build_uid, ROOT_UID, ROOT_GID, True)  # held until the activation's quiesce
+            return
+        if info.st_uid == ROOT_UID and relative != PRIVATE_TARGET and not sealing:
+            verify_held(descriptor)
+            return
         if info.st_uid != app_uid:
             raise ValueError("runtime directory must be owned by the application")
         if sealing:
@@ -88,7 +174,9 @@ def walk(root, descriptor, relative, app_uid, app_gid, sealing):
         return  # In particular, never traverse or change retained private bind-mounted files.
     if sealing:
         os.fchown(descriptor, ROOT_UID, ROOT_GID)
-        os.fchmod(descriptor, 0o755)  # Close parent rename authority before opening its children.
+        # Close parent rename authority before opening its children. An isolated build keeps the release itself 0700 until
+        # the whole tree is sealed: the live application must not reach any not-yet-sealed directory the build left open.
+        os.fchmod(descriptor, 0o700 if build_uid is not None and relative == "" else 0o755)
     elif info.st_uid != ROOT_UID or info.st_mode & 0o022:
         raise ValueError("code directory is not sealed")
     for name in sorted(os.listdir(descriptor)):
@@ -96,12 +184,14 @@ def walk(root, descriptor, relative, app_uid, app_gid, sealing):
         entry = os.stat(name, dir_fd=descriptor, follow_symlinks=False)
         if child == ".env" and not stat.S_ISREG(entry.st_mode):
             raise ValueError("environment must be a regular file")
+        if child == ".env" and sealing and build_uid is not None:
+            raise ValueError("an isolated build never holds the environment")
         if stat.S_ISDIR(entry.st_mode):
             nested = os.open(name, DIRECTORY_FLAGS, dir_fd=descriptor)
             try:
                 if child not in RUNTIME and os.fstat(nested).st_dev != info.st_dev:
                     raise ValueError("unexpected code filesystem boundary")
-                walk(root, nested, child, app_uid, app_gid, sealing)
+                walk(root, nested, child, app_uid, app_gid, sealing, build_uid)
             finally:
                 os.close(nested)
         elif stat.S_ISLNK(entry.st_mode):
@@ -112,7 +202,7 @@ def walk(root, descriptor, relative, app_uid, app_gid, sealing):
                 raise ValueError("code symlink is not sealed")
         elif stat.S_ISREG(entry.st_mode):
             if sealing:
-                copy_file(descriptor, name, child, app_uid, app_gid)
+                copy_file(descriptor, name, child, app_uid, app_gid, owner)
             else:
                 mode = stat.S_IMODE(entry.st_mode)
                 allowed = (0o440,) if child == ".env" else (0o444, 0o555)
@@ -124,21 +214,53 @@ def walk(root, descriptor, relative, app_uid, app_gid, sealing):
             raise ValueError("special files are forbidden in code")
 
 
-def run(root, app_uid, app_gid, sealing):
+def run(root, app_uid, app_gid, sealing, build_uid=None):
     root = Path(root)
     if not root.is_absolute() or root.resolve(strict=True) != root:
         raise ValueError("release must be canonical")
+    if build_uid is not None and build_uid in (ROOT_UID, app_uid):
+        raise ValueError("the build account must be distinct from root and the application")
     descriptor = os.open(root, DIRECTORY_FLAGS)
     try:
-        walk(root, descriptor, "", app_uid, app_gid, sealing)
+        walk(root, descriptor, "", app_uid, app_gid, sealing, build_uid)
+        if sealing and build_uid is not None:
+            os.fchmod(descriptor, 0o755)  # every directory below is sealed or held: open the release for reading
     finally:
         os.close(descriptor)
     if sealing:
         run(root, app_uid, app_gid, False)
 
 
-def seal_release(root, app_uid, app_gid):
-    run(root, app_uid, app_gid, True)
+def seal_release(root, app_uid, app_gid, build_uid=None):
+    run(root, app_uid, app_gid, True, build_uid)
+
+
+def release_runtime(root, app_uid, app_gid):
+    """Hand held runtime directories of a sealed isolated build to the application (no-op for a legacy build)."""
+    run(root, app_uid, app_gid, False)
+    root = Path(root)
+    descriptor = os.open(root, DIRECTORY_FLAGS)
+    try:
+        for relative in HELD:
+            parent = os.dup(descriptor)
+            try:
+                for part in relative.split("/")[:-1]:
+                    nested = os.open(part, DIRECTORY_FLAGS, dir_fd=parent)
+                    os.close(parent)
+                    parent = nested
+                held = os.open(relative.split("/")[-1], DIRECTORY_FLAGS, dir_fd=parent)
+                try:
+                    if os.fstat(held).st_uid == ROOT_UID:
+                        verify_held(held)
+                        adopt(held, ROOT_UID, app_uid, app_gid, False)
+                        os.fchmod(held, 0o700)
+                finally:
+                    os.close(held)
+            finally:
+                os.close(parent)
+    finally:
+        os.close(descriptor)
+    run(root, app_uid, app_gid, False)
 
 
 def stage_environment(base, source, target, app_uid, app_gid):
@@ -207,11 +329,21 @@ def main():
             raise ValueError("application account must be nonroot")
         stage_environment(sys.argv[2], sys.argv[3], sys.argv[4], app_uid, grp.getgrnam(sys.argv[6]).gr_gid)
         return
-    if len(sys.argv) != 5 or sys.argv[1] not in ("seal", "verify"):
+    if len(sys.argv) == 6 and sys.argv[1] == "seal-built":
+        app_uid = pwd.getpwnam(sys.argv[3]).pw_uid
+        build_uid = pwd.getpwnam(sys.argv[5]).pw_uid
+        if app_uid == 0 or build_uid in (0, app_uid):
+            raise ValueError("application and build accounts must be nonroot and distinct")
+        seal_release(sys.argv[2], app_uid, grp.getgrnam(sys.argv[4]).gr_gid, build_uid)
+        return
+    if len(sys.argv) != 5 or sys.argv[1] not in ("seal", "verify", "release-runtime"):
         raise ValueError("root seal/verify requires one release and the configured account")
     app_uid = pwd.getpwnam(sys.argv[3]).pw_uid
     if app_uid == 0:
         raise ValueError("application account must be nonroot")
+    if sys.argv[1] == "release-runtime":
+        release_runtime(sys.argv[2], app_uid, grp.getgrnam(sys.argv[4]).gr_gid)
+        return
     run(sys.argv[2], app_uid, grp.getgrnam(sys.argv[4]).gr_gid, sys.argv[1] == "seal")
 
 

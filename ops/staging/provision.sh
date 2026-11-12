@@ -23,7 +23,7 @@
 #      qpdf, poppler-utils, util-linux (prlimit), supervisor, rsync, Node 24 for the build
 #   2. ClamAV: freshclam enabled and current; the unused clamd stopped (clamscan is the configured engine)
 #   3. tool checks: required ffmpeg encoders, prlimit limits, signature age
-#   4. private directories with modes; nginx FastCGI temp path (private, 0700)
+#   4. private directories with modes; nginx FastCGI temp path (private, 0700); the dedicated build account
 #   5. MySQL: schema, least-privilege app account, backup-only account, binlog trigger setting
 #   6. PHP-FPM pools (default + paid-delivery), supervisor workers + scheduler, sudoers, backup cron, logrotate
 #   7. basic-auth file, probe credentials, rendered nginx site for Forge
@@ -312,6 +312,41 @@ for file in /etc/vasey-staging/writer.lock /etc/vasey-staging/writer-admission; 
 done
 info "directories under $ROOT ready (private 0700 $APP_USER)"
 
+# The dedicated build account: the deploy builds each release as this account, before the quiesce, in a slot the
+# application can neither traverse nor write, and seals it before the application can touch it (docs/ops/staging-runbook.md
+# section 8). No login shell, no password, no sudo, no cron or at jobs, a group of its own that the application is not in,
+# and no read access to the application's environment, evidence, private store or credentials.
+BUILD_USER=vasey-staging-build
+if ! getent passwd "$BUILD_USER" >/dev/null; then
+  ! getent group "$BUILD_USER" >/dev/null || die "group $BUILD_USER exists without its account; inspect it, remove it, then re-run"
+  useradd --system --user-group --no-create-home --home-dir /nonexistent --shell /usr/sbin/nologin \
+    --comment "VASEY.AUDIO release builder" "$BUILD_USER"
+  info "created the build account $BUILD_USER"
+fi
+usermod --lock "$BUILD_USER" >/dev/null 2>&1 || true
+BUILD_UID=$(id -u "$BUILD_USER") BUILD_GID=$(id -g "$BUILD_USER")
+[ "$BUILD_UID" -gt 0 ] && [ "$BUILD_UID" != "$(id -u "$APP_USER")" ] || die "$BUILD_USER must be nonroot and not $APP_USER"
+[ "$BUILD_GID" -gt 0 ] && [ "$BUILD_GID" != "$(id -g "$APP_USER")" ] && [ "$(id -G "$BUILD_USER")" = "$BUILD_GID" ] \
+  || die "$BUILD_USER must belong to its own group only"
+for gid in $(id -G "$APP_USER"); do
+  [ "$gid" != "$BUILD_GID" ] || die "$APP_USER must not be a member of $BUILD_USER's group"
+done
+case "$(getent passwd "$BUILD_USER" | cut -d: -f7)" in
+  /usr/sbin/nologin|/sbin/nologin|/bin/false|/usr/bin/false) ;;
+  *) die "$BUILD_USER must have no login shell" ;;
+esac
+! sudo -n -l -U "$BUILD_USER" 2>/dev/null | grep 'may run the following' >/dev/null || die "$BUILD_USER must not have sudo rights"
+for deny in /etc/cron.deny /etc/at.deny; do
+  [ ! -L "$deny" ] || die "$deny must not be a symlink"
+  [ -e "$deny" ] || install -m 0644 -o root -g root /dev/null "$deny"
+  grep -qxF -- "$BUILD_USER" "$deny" || printf '%s\n' "$BUILD_USER" >> "$deny"
+done
+install -d -m 0770 -o root -g "$BUILD_GID" "$ROOT/build"
+runuser -u "$BUILD_USER" -- env -i PATH=/usr/local/bin:/usr/bin:/bin sh -c \
+  'command -v composer && command -v npm && command -v node && command -v git' >/dev/null \
+  && runuser -u "$BUILD_USER" -- test -x "$PHP_BIN" || die "$BUILD_USER cannot run composer, npm, node, git or $PHP_BIN"
+info "build account $BUILD_USER ready (build area $ROOT/build root:$BUILD_USER 0770)"
+
 # ---------------------------------------------------------------- 5. MySQL
 MYSQL=(mysql --protocol=socket -uroot)
 [ -n "$MYSQL_ADMIN_DEFAULTS" ] && MYSQL=(mysql --defaults-extra-file="$MYSQL_ADMIN_DEFAULTS")
@@ -480,6 +515,7 @@ VASEY_PHP_FPM_SERVICE=$FPM_SERVICE
 VASEY_EXPECTED_APP_ENV=$APP_ENV_EXPECTED
 VASEY_DB_NAME=$DB_NAME
 VASEY_PROBE_NETRC=/etc/vasey-staging/probe.netrc
+VASEY_BUILD_USER=$BUILD_USER
 VASEY_KEEP_RELEASES=3
 VASEY_BACKUP_KEEP=7
 # Off-host backup target for rsync over SSH (user@host:/path), with the key below. Empty = local copies only.
@@ -605,12 +641,19 @@ fi
 [ -z "$nginx_previous" ] || rm -f "$nginx_previous"
 systemctl reload nginx || die "nginx reload failed after a passing nginx -t"
 
+# The build account must not read anything the application keeps secret (the build needs none of it).
+for secret in "$MIRROR/.env" "$ROOT/private" "$ROOT/evidence" "$ROOT/tmp" "$ROOT/backups" "$SECRETS" "$BACKUP_CNF" \
+              "$APP_HOME/.ssh"; do
+  [ ! -e "$secret" ] || ! runuser -u "$BUILD_USER" -- test -r "$secret" || die "$BUILD_USER can read $secret; fix its mode"
+done
+
 # ---------------------------------------------------------------- summary
 cat <<EOF
 
 provision: done for $HOST
   kit root            $ROOT (releases/, private/ 0700 $APP_USER, backups/ root 0700)
   app/worker user     $APP_USER:$APP_GROUP   nginx user $NGINX_USER
+  build account       $BUILD_USER (no login, no sudo): builds each release before the pause, in $ROOT/build and releases/
   PHP-FPM pools       vasey-staging (/run/php/vasey-staging.sock), vasey-paid-delivery (/run/php/vasey-paid-delivery.sock)
   supervisor          vasey-staging:{media,payments,contracts,default,scheduler} (start on first deploy)
   helpers             /usr/local/sbin/vasey-staging-ctl (sudo for $APP_USER), /usr/local/sbin/vasey-staging-backup (cron 03:17 UTC)
