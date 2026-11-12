@@ -595,13 +595,22 @@ that are new or changed since the newest verified set and hard-links the unchang
   writes a token, `backups/.link-token`, outside every set: the identity of each verified inode, ctime included. The next snapshot
   consumes it (one use; refused after 6 hours or when it names another set) and shares only files whose inode still has exactly
   that identity. Any write to it since, by anyone, moves the ctime, so it is copied instead. Without a token nothing is shared.
+  A token older than 6 hours (an aborted deploy leaves one) is ignored everywhere: `ctl prepare` and `ctl refresh` re-hash
+  instead of reusing it, and the space check names "sharing with the re-verified set" only when the estimate actually shares
+  files; otherwise it says the token was refused and counts the whole store.
 - **Two kinds of refusal before the quiesce.** The deploy log tells them apart; neither stops anything.
   - **Corruption refusal** ("a backup set's private files failed re-verification ... corruption refusal"; the backup log says
-    "failed its private file re-verification" and "withdrew the restore proof of ..."). A file's bytes, identity, mode or owner,
-    or the set's names or directories, no longer match the manifest; or the set's own manifests (`private.index`,
-    `private.sha256`, `private.dirs`) are truncated or unreadable; or reading one of its files failed with an I/O error (EIO).
-    The `RESTORE_CHECK` of that set and of every tree set that
-    holds a failed file is removed (a mode or owner change withdraws only the sets that hold that file). What to do: check `dmesg`
+    "failed its private file re-verification" and "withdrew the restore proof of ..."). Two kinds, and they withdraw different
+    proofs:
+    - *A file is bad*: its bytes, identity, mode or owner no longer match the index, or reading its bytes failed with EIO,
+      EBADMSG or EUCLEAN (ext4 reports a corrupt block as one of the last two). The `RESTORE_CHECK` of that set and of every
+      tree set that holds that same file (inode) is removed; sets that do not hold it keep theirs.
+    - *The set itself is malformed*: its own manifests (`private.index`, `private.sha256`, `private.dirs`) are missing, empty,
+      truncated, malformed, disagree with each other or cannot be read (the same three errors); or its tree's names,
+      directories or entry kinds differ from them. Only that set's `RESTORE_CHECK` is removed: no file was shown to be bad, so a
+      set sharing its files keeps its proof (its own re-proof decides).
+
+    What to do: check `dmesg`
     and the disk; run `sudo /usr/local/sbin/vasey-staging-backup restore-check <set>` on the sets that still hold a proof; keep
     the withdrawn sets for inspection (do not delete them by hand); then deploy again. The next deploy re-verifies the newest set
     that still holds a proof, or copies everything. Rollback case B needs a set with `RESTORE_VERIFIED`: use the newest one that
@@ -609,7 +618,9 @@ that are new or changed since the newest verified set and hard-links the unchang
   - **Operational refusal** ("the re-verification of the backup set could not run (an operational error ... not corruption) ...
     operational refusal", exit status 3; the backup log says "an operational error, not a corruption finding" and "No restore
     proof was withdrawn"). The re-hash could not run or its token could not be written: no space (the host has been at 96%),
-    out of memory, a crash of the helper. **Every proof is kept.** What to do: fix the cause (free space with
+    out of memory, a crash of the helper (exit 1 that names no set counts as one too), or an I/O error that is not about a
+    file's bytes: opening the set's `private/`, opening or listing one of its directories, or opening a file (the block may read
+    on the next attempt). **Every proof is kept.** What to do: fix the cause (free space with
     `sudo /usr/local/sbin/vasey-staging-ctl backup-prune`; read `dmesg`), then deploy again. If the same operational refusal
     repeats for the same set, prove that set by hand: `sudo /usr/local/sbin/vasey-staging-backup restore-check <set>` (named in
     the log line); a set that fails it loses its proof as a corruption finding.
@@ -621,13 +632,18 @@ that are new or changed since the newest verified set and hard-links the unchang
 - **Inside the window** the proof re-hashes every file the snapshot copied and checks that every shared file is still the exact
   inode it linked (device, inode, size, mtime, mode, owner, ctime). `restore-check DIR` (manual, case B below, a set moved to
   another disk or extracted from an off-host copy) re-hashes every file and compares size, mode and the mtime in whole seconds,
-  because a copy has new inodes and tar keeps whole seconds.
+  because a copy has new inodes and tar keeps whole seconds. The same rules decide what it withdraws; when it cannot run (an
+  operational error) it says "could not run (an operational error, not a corruption finding ...)", withdraws no other set's
+  proof and leaves the set unproven until `restore-check` succeeds.
 - **Symlinks and FIFOs swapped in during a snapshot are refused**: every directory and file is opened relative to its parent's
   descriptor without following links and must be the inode the listing reported; a file is opened non-blocking and must be a
   regular file. An application process that kept running through the quiesce cannot point the snapshot outside the store.
 - **Pruning a set never changes another.** Removing a set unlinks its own names; an inode shared with a newer set keeps its data.
 - **Off-host copies are whole.** The shipment tars one set at a time, so the archive holds every file in full (no hard-link
-  entries) and `du` sizes it fully; an rsync destination receives whole files.
+  entries) and `du` sizes it fully; an rsync destination receives whole files. The plain rsync shipment (`VASEY_BACKUP_DEST`
+  without age) keeps every mode as recorded (`.gitignore` 0644, contracts 0400), so a copy brought back with `rsync -a` passes
+  `restore-check`; before 2026-11-12 it rewrote them to 0600 and such a copy failed its proof. The copy is protected by its
+  top directory, which keeps the set's root-only 0700: a set directory with any other mode or owner is not shipped.
 - Sharing needs the sets on one filesystem (they always are: one backup directory). If the previous set is elsewhere, or the
   kernel refuses a link, the file is copied. `VASEY_BACKUP_LINK=0` in `backup.conf` turns sharing off (a full copy every time).
 

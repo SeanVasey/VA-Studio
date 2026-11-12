@@ -6,15 +6,22 @@ only by the backup helper, as root, with `python3 -I`:
 
     preverify SET --token TOKEN --backups DIR [--strict-modes 0|1]
         Re-hashes every file of SET (the site is still up). Success writes TOKEN, outside every set: the identity of each
-        verified inode, which is what a snapshot may then share. A proof failure (content, identity, names, directories, modes)
-        prints `withdraw=NAME` for SET and for every set in DIR that holds an inode that failed, and exits 1. An operational
-        error (I/O, no space, an unreadable or unparseable file, a token that cannot be written) withdraws nothing and exits 3.
+        verified inode, which is what a snapshot may then share. A proof failure prints `withdraw=NAME` for SET and exits 1;
+        when particular inodes failed (content, identity, mode or owner, or a content error reading them) it also names every
+        set in DIR that holds one of them. An operational error withdraws nothing and exits 3.
 
 Exit status of every command: 0 success, 1 the set or the store failed a check (Refused), 3 operational error (OSError,
-ValueError, or any unexpected exception): the helper must not treat 3 as evidence about a backup's content. Two errors while
-proving a set ARE findings about that set, not operational: an I/O error (EIO) reading one of its files (that inode, and every
-set holding it, cannot be trusted) and its own manifests (private.index, private.sha256, private.dirs) being unparseable (that
-set only). No space, a token that cannot be written and other errors stay operational and withdraw nothing.
+ValueError, or any unexpected exception): the helper must not treat 3 as evidence about a backup's content. One rule decides:
+  * A finding about one set file's content (that inode, and so every set holding it): its bytes, identity, mode or owner differ
+    from the index, or reading its bytes failed with EIO, EBADMSG or EUCLEAN (ext4 reports a corrupt block as EBADMSG/EUCLEAN).
+  * A finding about the set alone (no other set's proof is touched, because no inode of it was shown to be bad): its own
+    manifests (private.index, private.sha256, private.dirs) are missing, empty, truncated, malformed or unreadable (the same
+    three errnos), or disagree with each other; its tree's names or directories differ from them; its tree holds a link or a
+    special file; a name in it is missing or not the kind of object listed (ENOENT, ENOTDIR, ELOOP).
+  * Operational, never a finding: any other error, including an I/O error opening the tree's root, opening or listing one of its
+    directories, or opening or stat-ing a file (the block may read on the next attempt): no proof is withdrawn, and the message
+    says to prove the set again with restore-check once the cause is fixed. No space, a token that cannot be written and an
+    unexpected exception (a RecursionError on a very deep tree, a bug) are operational too.
     snapshot --live PRIVATE --set SET [--link-from SOURCE_SET --link-token TOKEN] [--link-max-age-hours H]
         Writes SET/private/ (a copy of PRIVATE), SET/private.sha256, SET/private.dirs and SET/private.index.
     verify SET [--full] [--backups DIR] [--strict-modes 0|1]
@@ -78,6 +85,12 @@ class Refused(Exception):
     pass
 
 
+# Reading a set file's bytes failed: the medium returned an error (EIO) or ext4 found the block corrupt (EBADMSG, EUCLEAN).
+CONTENT_ERRNOS = frozenset({errno.EIO, errno.EBADMSG, errno.EUCLEAN})
+# A name that is not there, or not the kind of object the listing reported: a finding about the tree that holds it.
+MISSING_ERRNOS = frozenset({errno.ENOENT, errno.ENOTDIR, errno.ELOOP})
+
+
 EXIT_REFUSED = 1
 EXIT_OPERATIONAL = 3
 
@@ -129,6 +142,8 @@ def open_root(path, what):
     try:
         return os.open(path, DIR_FLAGS)
     except OSError as error:
+        if error.errno not in MISSING_ERRNOS:
+            raise  # an I/O error opening a directory is operational (module docstring)
         raise Refused(f"{what} is missing, not a directory or a symlink ({errno.errorcode.get(error.errno, error.errno)})")
 
 
@@ -155,7 +170,9 @@ class Walker:
             if stat.S_ISDIR(st.st_mode):
                 try:
                     fd = _open_dir(dir_fd, entry.name)
-                except OSError:
+                except OSError as error:
+                    if error.errno not in MISSING_ERRNOS:
+                        raise  # an I/O error opening a directory is operational (module docstring)
                     raise Refused("a private directory changed during the walk (replaced by a link or removed); nothing was published")
                 try:
                     opened = os.fstat(fd)
@@ -234,15 +251,16 @@ def hash_file(parent_fd, name, expected):
             try:
                 n = os.readv(fd, [buffer])
             except OSError as error:
-                if error.errno != errno.EIO:
+                if error.errno not in CONTENT_ERRNOS:
                     raise
-                raise Mismatch("an I/O error reading a set file: its content cannot be proven", {(st.st_dev, st.st_ino)})
+                raise Mismatch(f"an I/O error reading a set file ({describe(error)}): its content cannot be proven",
+                               {(st.st_dev, st.st_ino)})
             if not n:
                 break
             digest.update(memoryview(buffer)[:n])
             total += n
         if total != st.st_size:
-            raise Refused("a set file changed size while it was verified")
+            raise Mismatch("a set file changed size while it was verified", {(st.st_dev, st.st_ino)})
         return digest.hexdigest()
     finally:
         os.close(fd)
@@ -479,7 +497,7 @@ def parse_sha256(path):
 
 def prove(setdir, full, strict_modes):
     """Verifies a set tree. Returns (summary, {rel: full identity}). Raises Mismatch naming the inodes whose content or
-    identity is wrong, or Refused when the set is malformed as a whole."""
+    identity is wrong, or Refused (Mismatch with no inodes) when the set itself is malformed: that finding is about this set only."""
     try:
         _, index = read_jsonl(os.path.join(setdir, "private.index"), INDEX_FORMAT)
         manifest = parse_sha256(os.path.join(setdir, "private.sha256"))
@@ -490,7 +508,7 @@ def prove(setdir, full, strict_modes):
         # Truncated or garbled manifests: this set cannot be proven (no inode of another set is implicated).
         raise Mismatch("the set's manifests (private.index, private.sha256 or private.dirs) cannot be parsed", set())
     except OSError as error:
-        if error.errno in (errno.ENOENT, errno.EIO, errno.ELOOP):
+        if error.errno in MISSING_ERRNOS | CONTENT_ERRNOS:
             raise Mismatch(f"the set's manifests cannot be read ({describe(error)})", set())
         raise
     uid, gid = os.geteuid(), os.getegid()
@@ -569,18 +587,12 @@ def set_inodes(setdir):
 
 
 def withdrawals(setdir, backups, error):
-    """The sets whose proof no longer holds: this one, and every tree set in backups that shares a failed inode with it (all of
-    this set's inodes when the failure is not about particular files)."""
+    """The sets whose proof no longer holds: this one, and every tree set in backups that holds an inode shown to be bad. A
+    finding about the set itself (its manifests, names, directories or entry kinds) names no inode: another set holding the same
+    inodes was not shown to be wrong, and keeps its proof (its own re-proof decides)."""
     names = {os.path.basename(setdir.rstrip("/"))}
-    if backups is None:
-        return names
-    suspect = error.inodes if isinstance(error, Mismatch) else None
-    if suspect is None:
-        try:
-            suspect = set_inodes(setdir)
-        except (OSError, Refused):
-            suspect = set()
-    if not suspect:
+    suspect = error.inodes if isinstance(error, Mismatch) else set()
+    if backups is None or not suspect:
         return names
     for name in sorted(os.listdir(backups)):
         other = os.path.join(backups, name)
@@ -604,7 +616,8 @@ def proved(setdir, full, strict_modes, backups):
             print(f"withdraw={name}")
         raise
     except (OSError, ValueError) as error:
-        raise Operational(f"the proof could not run ({describe(error)}); this says nothing about the set's content") from error
+        raise Operational(f"the proof could not run ({describe(error)}); this says nothing about the set's content: once the cause "
+                          "is fixed, prove the set again with restore-check") from error
 
 
 def verify(args):

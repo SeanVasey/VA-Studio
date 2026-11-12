@@ -251,12 +251,18 @@ restore_check() {  # restore_check DIR [incremental]
   # A tree set is verified in place first: it is the cheaper failure, and nothing of it is extracted.
   if [ "$format" = tree ]; then
     [ -f "$PRIVATE_SNAPSHOT" ] && [ ! -L "$PRIVATE_SNAPSHOT" ] || die "missing $PRIVATE_SNAPSHOT; re-run provision.sh"
-    if ! private_proof=$(python3 -I "$PRIVATE_SNAPSHOT" verify "$bk" ${depth:+"$depth"} --backups "$VASEY_BACKUP_DIR" \
-           --strict-modes "$([ "$VASEY_RESTORE_STRICT_MODES" = 1 ] && echo 1 || echo 0)"); then
+    local proof_rc=0
+    private_proof=$(python3 -I "$PRIVATE_SNAPSHOT" verify "$bk" ${depth:+"$depth"} --backups "$VASEY_BACKUP_DIR" \
+      --strict-modes "$([ "$VASEY_RESTORE_STRICT_MODES" = 1 ] && echo 1 || echo 0)") || proof_rc=$?
+    if [ "$proof_rc" != 0 ]; then
       local -a withdrawn=()
       mapfile -t withdrawn < <(printf '%s\n' "$private_proof" | sed -n 's/^withdraw=//p')
-      [ "${#withdrawn[@]}" = 0 ] || withdraw_proofs "${withdrawn[@]}"
-      die "private tree verification failed (reason above); no restore proof published"
+      # As in preverify_link_source: a finding is exit 1 WITH the sets it affects; anything else says nothing about content.
+      if [ "$proof_rc" = 1 ] && [ "${#withdrawn[@]}" -gt 0 ]; then
+        withdraw_proofs "${withdrawn[@]}"
+        die "private tree verification failed (reason above); no restore proof published"
+      fi
+      die "private tree verification could not run (an operational error, not a corruption finding; reason above); no other set's proof was withdrawn and no restore proof was published. Fix the cause (dmesg, free space), then run restore-check $bk again"
     fi
   fi
 
@@ -416,11 +422,25 @@ link_token_name() {
   sed -n '1s/.*"set": "\([^"]*\)".*/\1/p' -- "$token"
 }
 
-# The set the current token names, while that set still holds its restore proof; else nothing.
+# True while the current token's re-verification is younger than LINK_MAX_AGE_HOURS (and not more than five minutes in the
+# future), the window private-snapshot.py accepts. A token an aborted deploy left behind ages out here, so the next operation
+# re-hashes instead of reusing it (the engine would refuse it and copy everything).
+link_token_fresh() {
+  local token=$VASEY_BACKUP_DIR/.link-token verified now age
+  [ -f "$token" ] && [ ! -L "$token" ] || return 1
+  verified=$(sed -n '1s/.*"verified_ns": \([0-9]\{1,19\}\)[,}].*/\1/p' -- "$token")
+  [[ "$verified" =~ ^[0-9]+$ ]] || return 1
+  now=$(date +%s%N)
+  [[ "$now" =~ ^[0-9]+$ ]] || return 1
+  age=$((now - verified))
+  [ "$age" -ge $((-300 * 1000000000)) ] && [ "$age" -le $((LINK_MAX_AGE_HOURS * 3600 * 1000000000)) ]
+}
+
+# The set the current token names, while the token is fresh and that set still holds its restore proof; else nothing.
 link_token_set() {
   local name
   name=$(link_token_name)
-  [[ "$name" =~ $SET_NAME_RE ]] && grep -qx 'result=RESTORE_VERIFIED' "$VASEY_BACKUP_DIR/$name/RESTORE_CHECK" 2>/dev/null \
+  [[ "$name" =~ $SET_NAME_RE ]] && link_token_fresh && grep -qx 'result=RESTORE_VERIFIED' "$VASEY_BACKUP_DIR/$name/RESTORE_CHECK" 2>/dev/null \
     && [ -d "$VASEY_BACKUP_DIR/$name/private" ] && [ ! -L "$VASEY_BACKUP_DIR/$name/private" ] || return 0
   printf '%s\n' "$VASEY_BACKUP_DIR/$name"
 }
@@ -751,7 +771,13 @@ ship() {
     return 0
   fi
   [ -f "$VASEY_BACKUP_SSH_KEY" ] || die "missing $VASEY_BACKUP_SSH_KEY for rsync to the backup destination"
-  rsync -a --chmod=D700,F600 -e "ssh -i $VASEY_BACKUP_SSH_KEY -o BatchMode=yes -o StrictHostKeyChecking=yes" \
+  # Modes travel unchanged: the full proof of the copy (restore-check, rollback case B) compares every private file's mode with
+  # the one its index recorded (.gitignore 0644, contracts 0400), so rewriting them would make every copy fail its proof. The
+  # copy is protected by its top directory instead: the set directory is root-only 0700 (snapshot creates it so) and rsync -a
+  # gives the copy that same mode, so nothing inside it is reachable by anyone else on the destination.
+  [ ! -L "$bk" ] && [ "$(stat -c '%u %a' -- "$bk")" = '0 700' ] \
+    || die "refusing to ship $(basename "$bk"): the set directory must be root-owned and owner-only (0700), because its copy keeps that mode and it is what protects the copy"
+  rsync -a -e "ssh -i $VASEY_BACKUP_SSH_KEY -o BatchMode=yes -o StrictHostKeyChecking=yes" \
     -- "$bk" "$VASEY_BACKUP_DEST/" || die "rsync to the backup destination failed"
   log "shipped $(basename "$bk")"
 }
@@ -1117,7 +1143,7 @@ nearest_existing() {  # nearest_existing PATH -> PATH or its closest existing an
 # yet (ctl prepare and refresh: the deploy's own `ctl space-check --preverify` has normally just made one, and a second 3-minute
 # re-hash would only lengthen the deploy).
 space_check() {  # space_check [--preverify|--preverify-if-needed]
-  local priv db copy full set_need need restore_need ship_need avail restore_avail backup_at restore_at margin src estimate basis
+  local priv db copy full set_need need restore_need ship_need avail restore_avail backup_at restore_at margin src estimate basis shared_with
   if [ "${1:-}" = --preverify-if-needed ]; then
     if [ -n "$(link_token_set)" ]; then set --; else set -- --preverify; fi
   fi
@@ -1145,8 +1171,17 @@ space_check() {  # space_check [--preverify|--preverify-if-needed]
     [ "${VASEY_BACKUP_LINK:-1}" != 1 ] || src=$(link_token_set) || src=''
     if [ -n "$src" ] && estimate=$(python3 -I "$PRIVATE_SNAPSHOT" estimate --live "$PRIVATE" --link-from "$src" \
          --link-token "$VASEY_BACKUP_DIR/.link-token" --link-max-age-hours "$LINK_MAX_AGE_HOURS" 2>/dev/null); then
+      shared_with=$(printf '%s\n' "$estimate" | sed -n 's/^link_source=//p')
       estimate=$(printf '%s\n' "$estimate" | sed -n 's/^copy_bytes=//p')
-      if [[ "$estimate" =~ ^[0-9]+$ ]]; then copy=$estimate; basis="sharing with the re-verified set $(basename -- "$src")"; fi
+      if [[ "$estimate" =~ ^[0-9]+$ ]]; then
+        copy=$estimate
+        # The engine refused the token (link_source=none): the count is a full copy, so say so rather than name a basis.
+        if [ "$shared_with" = "$(basename -- "$src")" ]; then
+          basis="sharing with the re-verified set $shared_with"
+        else
+          basis="the re-verification token of $(basename -- "$src") was refused: the whole private store is counted"
+        fi
+      fi
     fi
   fi
   full=$((priv + db))      # the whole set: what an encrypted copy of it holds
