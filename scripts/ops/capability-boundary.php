@@ -7,6 +7,7 @@ namespace Vasey\Ops;
 use App\Domain\Commerce\Inventory\ExclusiveSelectionPolicy;
 use App\Domain\Commerce\RefundDispute\RefundDisputePolicy;
 use App\Domain\Commerce\UnpaidRelease\UnpaidReleasePolicy;
+use App\Domain\Delivery\TestDeliveryAutoEnablePolicy;
 use Illuminate\Support\Arr;
 
 /**
@@ -57,6 +58,10 @@ final class CapabilityBoundary
      * one production will not use. The four values are literal here, so this file stays readable without the application's autoloader;
      * tests pin them to that constant. Production holds the flag false (PRODUCTION_LAUNCH_OFF_FLAGS), and the production tax chain's own
      * admission (RefundDisputePolicy::productionAccount, literal `local`/`testing`) is unchanged. Review: docs/ops/exclusive-rehearsal.md.
+     *
+     * Automatic test delivery enabling (D-19 amendment, 2026-11-12, under Sean's delegation) follows the same rule with
+     * TestDeliveryAutoEnablePolicy::CONTRACT in VASEY_TEST_DELIVERY_AUTO_POLICY; production holds it false and its policy blank
+     * (scripts/ops/private-server-preflight.php). Review: docs/ops/staging-test-purchase.md.
      */
     public const STAGING_OPTIONAL_FLAGS = [
         'VASEY_TEST_UNPAID_RELEASE_ENABLED' => ['config' => 'unpaid-release.enabled',
@@ -69,6 +74,8 @@ final class CapabilityBoundary
                 'refund-dispute.policy.dispute_access' => 'temporarily_block_while_reconciling',
                 'refund-dispute.policy.exclusive_reopening' => 'qualified_operator_review',
             ]],
+        'VASEY_TEST_DELIVERY_AUTO_ENABLED' => ['config' => 'delivery.test_auto_enable_enabled',
+            'policy' => TestDeliveryAutoEnablePolicy::class],
     ];
 
     /**
@@ -118,6 +125,8 @@ final class CapabilityBoundary
         // BL-71: the BeatStars catalog import is a staging console command that refuses production in code; the hold keeps the flag
         // from ever being set on the production host, as the staging deploy gate cannot (it must be true for the import run).
         'VASEY_STAGING_BEATSTARS_IMPORT_ENABLED' => 'staging-beatstars-import.enabled',
+        // Automatic test delivery enabling is optional on staging (STAGING_OPTIONAL_FLAGS) and has no production path.
+        'VASEY_TEST_DELIVERY_AUTO_ENABLED' => 'delivery.test_auto_enable_enabled',
     ];
 
     /**

@@ -12,6 +12,10 @@ return [
     ],
     // Started-but-incomplete v2 authorizations per grant per rolling 24 hours (1..1000); beyond it issuance is refused.
     'test_incomplete_authorizations_per_grant_24h' => env('VASEY_TEST_DELIVERY_INCOMPLETE_PER_GRANT_24H', 10),
+    // Optional automatic enabling of test delivery (D-19 amendment, 2026-11-12): local, testing and staging only, default off,
+    // admitted only with the exact TestDeliveryAutoEnablePolicy::CONTRACT. Staff blocks and enables stay final.
+    'test_auto_enable_enabled' => env('VASEY_TEST_DELIVERY_AUTO_ENABLED', false),
+    'test_auto_enable_policy' => env('VASEY_TEST_DELIVERY_AUTO_POLICY'),
     'test_activation_enabled' => env('VASEY_TEST_FULFILLMENT_ACTIVATION_ENABLED', false),
     'test_activation_policy' => env('VASEY_TEST_FULFILLMENT_ACTIVATION_POLICY'),
 ];

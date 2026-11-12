@@ -163,6 +163,17 @@ PHP_TARGETS = {
         "tests/Feature/TestPaymentExceptionOperationsConcurrencyTest.php",
         "tests/Feature/TestPaymentProcessingTest.php", "tests/Feature/TestOrderFinalizationTest.php",
     ),
+    # Test delivery enabling, manual and optional automatic (D-19 amendment), and the staging profile that admits it. Its own
+    # suite: added to financial it pushed that run past the 900-second runner cap.
+    "test-delivery": (
+        "tests/Feature/TestTrackOrderResourceTest.php", "tests/Feature/TestKitOrderResourceTest.php",
+        "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
+        "tests/Unit/StagingRuntimeValidatorTest.php", "tests/Unit/TestCommerceProfileValidatorTest.php",
+    ),
+    # The native race alone: the whole test-delivery suite does not fit the 900-second runner cap on MySQL.
+    "test-delivery-races": (
+        "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
+    ),
     "customer": (
         "tests/Feature/InquiryBrowserCatalogCleanupTest.php",
         "tests/Feature/OrderInquiryTest.php", "tests/Feature/OrderInquiryHttpTest.php",

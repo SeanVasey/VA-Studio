@@ -100,8 +100,8 @@ try {
         foreach (array_keys(CapabilityBoundary::stagedFlags()) as $flag) {
             $check('runtime.flag_off_'.strtolower($flag), ! in_array($flag, $notOff, true));
         }
-        // Optional staging capabilities (unpaid release, 2026-11-11; the test refund and dispute lifecycle, 2026-11-12): exactly false,
-        // or exactly true with the real policy class accepting this configuration (test-commerce environment, Stripe test mode, `acct_`
+        // Optional staging capabilities (unpaid release, 2026-11-11; the test refund and dispute lifecycle and automatic test
+        // delivery enabling, 2026-11-12): exactly false, or exactly true with the real policy class accepting this configuration (test-commerce environment, Stripe test mode, `acct_`
         // account, its exact policy) and, for refund and dispute, each of the four policy values equal to its DD-16 choice.
         // Any other value, or true with a missing, partial or changed policy, is refused under the flag's own identifier.
         $refused = CapabilityBoundary::optionalFlagsRefused(static fn (string $key): mixed => config($key), static function (string $policy): bool {

@@ -300,6 +300,41 @@ class TestCommerceProfileValidatorTest extends TestCase
         }
     }
 
+    /** Optional on staging (D-19 amendment, 2026-11-12): the same rule as unpaid release, with the exact automatic-enable policy. */
+    public function test_automatic_delivery_enabling_is_optional_and_admitted_only_with_its_exact_policy(): void
+    {
+        $flag = 'VASEY_TEST_DELIVERY_AUTO_ENABLED';
+        $policy = '\'{"schema_version":1,"purpose":"test_delivery_auto_enable","version":"test-delivery-auto-enable-v1","provider":"stripe",'
+            .'"mode":"test","scope":"ready_orders_never_controlled","lanes":"track_and_sound_kit","holds":"skip_while_refund_dispute_held",'
+            .'"staff_decisions":"final","actor":"system"}\'';
+        $this->assertSame(1, preg_match('/^'.$flag.'=false$/m', self::filled()));
+        foreach (['true', '(true)'] as $on) {
+            [$exit, $output, $checks] = $this->validate(self::set(self::set(self::filled(), $flag, $on), 'VASEY_TEST_DELIVERY_AUTO_POLICY', $policy));
+            $this->assertSame(0, $exit, $on.PHP_EOL.$output);
+            $this->assertTrue($checks['boundary.optional_capabilities_admitted'], $on);
+            $this->assertTrue($checks['boundary.out_of_profile_families_off'], $on);
+        }
+        // On without the policy, or with a changed one (staff decisions not final, holds ignored): refused by the boundary alone.
+        foreach (['', str_replace('"final"', '"overridable"', $policy), str_replace('skip_while_refund_dispute_held', 'ignore', $policy)] as $bad) {
+            $profile = self::set(self::filled(), $flag, 'true');
+            if ($bad !== '') {
+                $profile = self::set($profile, 'VASEY_TEST_DELIVERY_AUTO_POLICY', $bad);
+            }
+            [$exit, $output, $checks] = $this->validate($profile);
+            $this->assertSame(1, $exit, $output);
+            $this->assertSame(['boundary.optional_capabilities_admitted'], self::failedChecks($checks), $output);
+            $this->assertStringContainsString('Optional capability on without an accepted policy (or not a boolean): '.$flag.'.', $output);
+            $this->assertNoSecretPrinted($output);
+        }
+        // Not stated, or stated with anything but a boolean: refused as a statement.
+        [$exit, $output, $checks] = $this->validate((string) preg_replace('/^'.$flag.'=.*\n/m', '', self::filled()));
+        $this->assertSame(1, $exit, $output);
+        $this->assertSame(['profile.optional_flags_explicit'], self::failedChecks($checks), $output);
+        [$exit, $output, $checks] = $this->validate(self::set(self::filled(), $flag, 'yes'));
+        $this->assertSame(1, $exit, $output);
+        $this->assertSame(['profile.optional_flags_explicit', 'boundary.optional_capabilities_admitted'], self::failedChecks($checks));
+    }
+
     /** Optional on staging (2026-11-11): stated true or false; true passes only with the exact policy the real class accepts. */
     public function test_unpaid_release_is_optional_and_admitted_only_with_its_exact_policy(): void
     {

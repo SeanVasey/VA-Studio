@@ -3,6 +3,7 @@
 namespace App\Domain\SoundKits\Purchases;
 
 use App\Domain\Contracts\ContractIssuanceException;
+use App\Domain\Delivery\TestDeliveryAutoEnablePolicy;
 use App\Domain\SoundKits\Purchases\Models\SoundKitContract;
 use App\Domain\SoundKits\Purchases\Models\SoundKitDeliveryControl;
 use App\Domain\SoundKits\Purchases\Models\SoundKitGrant;
@@ -52,7 +53,23 @@ final class SoundKitStaffOperations
             ->selectRaw('(select count(*) from sound_kit_grants g where g.sound_kit_order_id = sound_kit_orders.id) as has_grant')
             ->selectRaw('(select count(*) from sound_kit_contracts c join sound_kit_grants g2 on g2.id = c.sound_kit_grant_id where g2.sound_kit_order_id = sound_kit_orders.id) as has_contract')
             ->selectRaw('(select d.state from sound_kit_delivery_controls d where d.sound_kit_order_id = sound_kit_orders.id) as delivery_state')
-            ->selectRaw('(select d2.version from sound_kit_delivery_controls d2 where d2.sound_kit_order_id = sound_kit_orders.id) as delivery_version');
+            ->selectRaw('(select d2.version from sound_kit_delivery_controls d2 where d2.sound_kit_order_id = sound_kit_orders.id) as delivery_version')
+            ->selectRaw('(select d3.reference_hash from sound_kit_delivery_controls d3 where d3.sound_kit_order_id = sound_kit_orders.id) as delivery_reference_hash');
+    }
+
+    /**
+     * The Delivery column: the control's state, and "automatically" while it is still the enable the optional automatic policy recorded
+     * (version 1 under the policy's fixed reference, whose hash the control row keeps; a later change replaces both).
+     */
+    public function deliveryLabel(SoundKitOrder $order): ?string
+    {
+        if ($order->delivery_state === null) {
+            return null;
+        }
+        $automatic = $order->delivery_state === 'enabled' && (int) $order->delivery_version === 1
+            && hash_equals(hash('sha256', TestDeliveryAutoEnablePolicy::REFERENCE), (string) $order->delivery_reference_hash);
+
+        return ucfirst((string) $order->delivery_state).($automatic ? ' automatically' : '');
     }
 
     /** One plain-language stage from the recorded flags (see {@see orders()}). */

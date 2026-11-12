@@ -120,7 +120,7 @@ class UnpaidReleaseIsOptionalOnStaging(unittest.TestCase):
             with self.subTest(value=value):
                 self.refused(self.validate(enabled(**{FLAG: value})), REFUSAL)
 
-    def test_the_twelve_held_flags_are_still_refused_beside_it(self):
+    def test_the_eleven_held_flags_are_still_refused_beside_it(self):
         run = self.validate(enabled(VASEY_TEST_REFUND_RESOLUTION_ENABLED="true"))
         self.refused(run, "runtime.flag_off_vasey_test_refund_resolution_enabled")
 

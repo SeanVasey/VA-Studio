@@ -18,7 +18,7 @@ declare(strict_types=1);
  * Boundary checks: the profile must state eleven capability flags explicitly as false (scripts/ops/capability-boundary.php), none of them or of the
  * other out-of-profile families may be enabled in the booted configuration, and no enabled or mounted flag may be true in any
  * production-lane configuration file (Paid252, Tax255, production customer identity, production free grants and the rest).
- * The optional staging capabilities (unpaid release; the test refund and dispute lifecycle) must be stated explicitly as false
+ * The optional staging capabilities (unpaid release; the test refund and dispute lifecycle; automatic test delivery enabling) must be stated explicitly as false
  * or true, and true only with the policy class accepting the booted configuration (for refund and dispute, with the four DD-16
  * policy values exactly), the same rule the staging deploy gate applies. The optional Exclusive selection policy may be empty (off) or set; when set
  * it must pass ExclusiveSelectionPolicy, the same rule the staging deploy gate applies.

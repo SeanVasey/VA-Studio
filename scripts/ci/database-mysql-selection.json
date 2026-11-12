@@ -266,6 +266,7 @@
     "tests/Support/customer-data-rights-worker.php",
     "tests/Support/customer-identity-worker.php",
     "tests/Support/customer-purchase-claim-worker.php",
+    "tests/Support/delivery-auto-enable-race-worker.php",
     "tests/Support/delivery-race-worker.php",
     "tests/Support/discovery-snapshot-worker.php",
     "tests/Support/exclusivity-authority-race-worker.php",
