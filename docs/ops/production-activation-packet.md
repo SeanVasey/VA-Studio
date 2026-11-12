@@ -87,7 +87,8 @@ already refuses production by itself.
 
 **Off through launch (decision register, 2026-11-10).** The same validator refuses `VASEY_TEST_SERVICE_INVOICING_ENABLED`
 (BL-70, Stripe test-mode service invoicing; no production path), `VASEY_TEST_UNPAID_RELEASE_ENABLED` (test unpaid release,
-optional on staging since 2026-11-11; no production path) and `REPORTING_MARKETING_SEGMENT_ENABLED`
+optional on staging since 2026-11-11; no production path), `VASEY_TEST_REFUND_DISPUTE_ENABLED` (the test refund and dispute
+lifecycle, optional on staging since 2026-11-12; refused in production in code as well) and `REPORTING_MARKETING_SEGMENT_ENABLED`
 (DD-44) by the rule above: it is named in `LAUNCH_OFF_HOLDS`, its config key comes from
 `CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS` (not a staged flag, so the staging gates are unchanged) and a refusal is
 `holds.reporting_marketing_segment_enabled`. It also refuses the DD-50 membership code literals unless they read strictly
