@@ -510,26 +510,87 @@ build_account() {
   for member in $(id -G -- "$VASEY_APP_USER"); do
     [ "$member" != "$gid" ] || die "the application account must not be a member of the build group"
   done
+  # Nobody else may hold the build account's group or uid: any member (nginx, a second account) could write into the slot.
+  [ -z "$(getent group "$gid" | cut -d: -f4)" ] || die "the build group must have no members"
+  [ -z "$(getent passwd | awk -F: -v n="$name" -v u="$uid" -v g="$gid" '$1 != n && ($3 == u || $4 == g)')" ] \
+    || die "another account shares the build account's uid or group"
   shell=$(getent passwd "$name" | cut -d: -f7)
   case "$shell" in /usr/sbin/nologin|/sbin/nologin|/bin/false|/usr/bin/false) ;; *) die "the build account must have no login shell" ;; esac
   protected_dir "$ROOT"
+  case "$ROOT/" in
+    /home/*|/root/*|/run/user/*) die "the kit root must not be under /home, /root or /run/user (the build unit hides them)" ;;
+  esac
   [ -d "$ROOT/build" ] && [ ! -L "$ROOT/build" ] && [ "$(stat -c '%u %g %a' -- "$ROOT/build")" = "0 $gid 770" ] \
     || die "$ROOT/build must be root:$group 0770 (re-run provision.sh)"
+  # The build runs as a hardened transient systemd service (build_in_unit). Without one, the account's code could leave a
+  # set-id file in a shared directory, so a configured account refuses rather than build unconfined with the site up.
+  build_unit_ready || die "the build account needs systemd as init with cgroup v2 (systemd-run); none is available"
   BUILD_UID=$uid BUILD_GID=$gid
 }
 
-as_builder() { runuser -u "$VASEY_BUILD_USER" -- "$@" 8>&- 7<&-; }
+build_unit_ready() { [ -d /run/systemd/system ] && [ -f /sys/fs/cgroup/cgroup.controllers ] && command -v systemd-run >/dev/null; }
+systemd_run() { systemd-run "$@"; }
 
-# No process of the build account may outlive its step: a survivor could still write before or while root seals.
+# Limits for a build that now runs beside the live site (PHP-FPM, MySQL and the workers keep their memory and CPU).
+BUILD_MEMORY_MAX=60%
+BUILD_CPU_QUOTA=150%
+BUILD_TASKS_MAX=1024
+BUILD_TIMEOUT=1800
+
+# The isolated build step as a transient service; stdin (the git bundle) passes through --pipe. The build account can write
+# only its slot and $ROOT/build (ProtectSystem=strict), has private /tmp, /var/tmp and /dev, sees no /home, /root or
+# /run/user, cannot create set-id files and gains no privileges. RestrictSUIDSGID is the one that matters most: a set-id
+# file of the build account in a shared directory would let the application act as the build account and write into a
+# later candidate before it is sealed. Every process of the build lives in the unit's cgroup and is killed with it
+# (KillMode=control-group) before --wait returns.
+build_in_unit() {  # build_in_unit SHA
+  local sha=$1
+  systemd_run --quiet --pipe --wait --collect --service-type=exec --unit="vasey-staging-build-${sha:0:12}-$$" \
+    --uid="$VASEY_BUILD_USER" --gid="$BUILD_GID" \
+    -p NoNewPrivileges=yes -p RestrictSUIDSGID=yes -p ProtectSystem=strict \
+    -p "ReadWritePaths=$RELEASES/$sha $ROOT/build" \
+    -p PrivateTmp=yes -p PrivateDevices=yes -p ProtectHome=yes -p RestrictNamespaces=yes -p LockPersonality=yes \
+    -p ProtectKernelTunables=yes -p ProtectKernelModules=yes -p ProtectControlGroups=yes \
+    -p KillMode=control-group -p "TasksMax=$BUILD_TASKS_MAX" -p "MemoryMax=$BUILD_MEMORY_MAX" \
+    -p "CPUQuota=$BUILD_CPU_QUOTA" -p "RuntimeMaxSec=$BUILD_TIMEOUT" -p WorkingDirectory=/ \
+    -E PATH=/usr/local/bin:/usr/bin:/bin -E LC_ALL=C \
+    -- /bin/bash "$RELEASE_STEP" build-isolated "$sha" 8>&- 7<&-
+}
+
+# No process of the build account may outlive its step: a survivor could still write before or while root seals. The
+# unit's cgroup kill is the primary guarantee; this is the check, and the fallback for anything that ran outside the unit.
+# kill(-1) as the build account is atomic in the kernel (no fork escapes it) and reaches every process whose real or saved
+# uid is the build account's, a set-id helper of it included; pkill -u adds the effective-uid-only case.
 reap_builder() {
   local attempt
   for attempt in 1 2 3 4 5 6 7 8 9 10; do
     if ! pgrep -U "$BUILD_UID" >/dev/null && ! pgrep -u "$BUILD_UID" >/dev/null; then return 0; fi
-    pkill -KILL -U "$BUILD_UID" || true
+    setpriv --reuid="$BUILD_UID" --regid="$BUILD_GID" --clear-groups -- kill -KILL -1 2>/dev/null || true
     pkill -KILL -u "$BUILD_UID" || true
     sleep "0.$attempt"
   done
   die "processes of the build account survive; refusing to seal (root recovery required)"
+}
+
+# Local filesystems a build-owned file could hide on: everything mounted except pseudo, read-only image and network
+# filesystems (a single leading "no" negates the whole list).
+build_scan_mounts() {
+  findmnt -rn -o TARGET -t nosysfs,proc,devtmpfs,devpts,cgroup,cgroup2,pstore,bpf,securityfs,debugfs,tracefs,configfs,\
+fusectl,mqueue,hugetlbfs,autofs,binfmt_misc,squashfs,efivarfs,nfs,nfs4,cifs,fuse.sshfs
+}
+
+# The build account owns nothing outside its slot and $ROOT/build, ever. Anything else it owns (a set-id copy of a shell in
+# /tmp, a planted file) was left by a build and is refused before a build starts and again before sealing.
+refuse_build_leftovers() {  # refuse_build_leftovers SHA
+  local mount found
+  while IFS= read -r mount; do
+    mount=$(printf '%b' "$mount")   # findmnt -r escapes blanks as \x20
+    [ -d "$mount" ] || continue
+    found=$(find "$mount" -xdev \( -path "$RELEASES/$1" -o -path "$ROOT/build" \) -prune \
+              -o \( -uid "$BUILD_UID" -o -gid "$BUILD_GID" \) -print -quit 2>/dev/null) || true
+    [ -z "$found" ] || die "the build account owns $found outside its build area; inspect and remove it, and anything it \
+may have written, before deploying (root recovery required)"
+  done < <(build_scan_mounts)
 }
 
 prepare_isolated() {
@@ -543,6 +604,7 @@ prepare_isolated() {
   seal_tool stage-env "$ROOT/evidence" "$candidate" "$OPERATION_ENV" "$VASEY_APP_USER" "$VASEY_APP_GROUP"
   chown "root:$VASEY_APP_GROUP" "$OPERATION_ENV"; chmod 0440 "$OPERATION_ENV"
   reap_builder
+  refuse_build_leftovers "$sha"
   # Leftovers of an interrupted build (its homes) go before a new one starts; nothing of the build account runs now.
   find "$ROOT/build" -mindepth 1 -maxdepth 1 -exec rm -rf --one-file-system -- {} +
   protected_dir "$RELEASES"
@@ -552,9 +614,12 @@ prepare_isolated() {
   install -d -m 0770 -o root -g "$BUILD_GID" -- "$rel"
   [ "$(stat -c '%u %g %a' -- "$rel")" = "0 $BUILD_GID 770" ] || die "build slot has the wrong owner or mode"
   as_app env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C git -C "$VASEY_MIRROR" bundle create -q - HEAD </dev/null \
-    | as_builder env -i PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C /bin/bash "$RELEASE_STEP" build-isolated "$sha" \
+    | build_in_unit "$sha" \
     || { reap_builder; die "isolated build failed with the site up (served release untouched); root recovery is required"; }
+  # Take the slot from the build group at once, then make sure nothing of the build account survives or was left behind.
+  chown root:root -- "$rel"; chmod 0700 -- "$rel"
   reap_builder
+  refuse_build_leftovers "$sha"
   # Code onto fresh root-owned inodes, runtime directories held root-owned (handed over by activate under its quiesce), the
   # private mount target handed to the application. Then the protected environment, on a fresh inode in the sealed release.
   seal_release "$sha" "$VASEY_BUILD_USER"
@@ -596,11 +661,16 @@ cmd_activate() {
 # An isolated build's runtime directories stay root-held while the previous release serves: the live application must not
 # plant generated PHP (bootstrap/cache) in the candidate. Hand them over only now, with every writer stopped.
 release_held_runtime() {
-  local sha=$1
-  if [ "$(stat -c %u -- "$RELEASES/$sha/bootstrap/cache" 2>/dev/null)" = 0 ]; then   # a legacy build is the application's already
-    seal_tool release-runtime "$RELEASES/$sha" "$VASEY_APP_USER" "$VASEY_APP_GROUP"
-    echo "vasey-staging-ctl: runtime directories of $sha handed to $VASEY_APP_USER under quiesce"
-  fi
+  local sha=$1 held
+  # Any held directory not yet the application's (an interrupted hand-over included) runs the hand-over, which is
+  # idempotent. A legacy build's are the application's already.
+  for held in bootstrap/cache storage/framework storage/logs; do
+    if [ -d "$RELEASES/$sha/$held" ] && [ "$(stat -c %U -- "$RELEASES/$sha/$held")" != "$VASEY_APP_USER" ]; then
+      seal_tool release-runtime "$RELEASES/$sha" "$VASEY_APP_USER" "$VASEY_APP_GROUP"
+      echo "vasey-staging-ctl: runtime directories of $sha handed to $VASEY_APP_USER under quiesce"
+      return
+    fi
+  done
 }
 
 cmd_refresh() {

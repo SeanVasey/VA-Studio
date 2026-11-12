@@ -654,8 +654,17 @@ What changed for an operator:
      so the checkout is exactly the requested SHA (proven clean, as before) whatever bytes arrived;
   4. the build account runs `composer install` and `npm ci && npm run build` with a fresh private home, caches and `TMPDIR`
      under `/srv/vasey-staging/build` (root:`vasey-staging-build` 0770) and **no `.env`** (the Composer hooks need none, and the
-     front end reads no `VITE_*` variable); no `/tmp`, `forge` cache or environment is shared with it;
-  5. root kills every remaining process of the build account, then seals the release while it is still 0700: code onto fresh
+     front end reads no `VITE_*` variable); no `/tmp`, `forge` cache or environment is shared with it. The build runs as a
+     transient systemd service (`vasey-staging-build-<sha>-<pid>`): it can write only its slot and `build/`
+     (`ProtectSystem=strict`), has private `/tmp`, `/var/tmp` and `/dev`, sees no `/home`, `/root` or `/run/user`, cannot
+     create set-id files (`RestrictSUIDSGID`) or gain privileges, and is capped at 60% of memory, 150% CPU, 1024 tasks and
+     30 minutes, because the site is live meanwhile. A set-id file of the build account left in a shared directory would
+     otherwise let `forge` act as the build account and write into a later candidate before sealing (independent review of
+     PR #354, reproduced); a host without systemd as init and cgroup v2 refuses rather than build unconfined;
+  5. when the unit stops, its whole cgroup is killed; root takes the slot back (root:root 0700), kills anything of the build
+     account that still runs (`kill(-1)` as the account, which no forking process escapes), and refuses to seal if the build
+     account owns any file outside its slot and `build/` on a local filesystem (the same check also runs before each build).
+     Then it seals the release while it is still 0700: code onto fresh
      root-owned read-only inodes, the private mount target handed to `forge`, and `bootstrap/cache`, `storage/framework` and
      `storage/logs` **held** root-owned and read-only, so the live application cannot plant generated PHP in the candidate;
   6. root installs the captured `.env` (root:`forge` 0440), `forge` runs the real runtime admission and writes `build.sha256`,
@@ -667,7 +676,8 @@ What changed for an operator:
   minutes. Record the first measurement here.
 - **Without the build account** (staging.conf has no `VASEY_BUILD_USER`, or the account does not exist yet) `ctl prepare`
   behaves exactly as before: it quiesces, builds as `forge` inside the pause and seals. A build account that exists but is
-  unsafe (in `forge`'s group, `forge` in its group, a login shell, a wrong `build/` mode) refuses before anything starts; it
+  unsafe (in `forge`'s group, `forge` or any other account in its group, a shared uid, a login shell, a wrong `build/` mode, a
+  kit root under `/home`, no systemd) refuses before anything starts; it
   never falls back to building early as `forge`. Re-provisioning is required to get the account: the deploy refuses on helper
   drift until `provision.sh` installs the changed `vasey-staging-ctl`, `release-step.sh` and `seal-release.py` anyway.
 - The **first** snapshot after re-provisioning has nothing to share and copies the whole store inside the window. Measured on
@@ -852,8 +862,13 @@ RECOVER
 ```
 
 **A failed isolated build** (site up, `GET /` still 200, an operation marker, an unsealed `releases/<SHA>` owned by
-root:`vasey-staging-build` 0770). Nothing was stopped or attached, so no quiesce or resume is needed. The script refuses
-when the candidate was already attached (a failure after `attach`): use the recovery script above for that case.
+root:`vasey-staging-build` 0770, or root:root 0700 when the build finished and the checks after it refused). Nothing was
+stopped or attached, so no quiesce or resume is needed. The script refuses when the candidate was already attached (a failure
+after `attach`): use the recovery script above for that case. **If prepare said the build account owns a file outside its
+build area**, treat the host as possibly compromised by a build dependency: do not delete the file before inspecting it (who
+created it, set-id bits, what `forge` could have run with it), then remove it and anything else the account owns outside
+`/srv/vasey-staging/build` (`find / -xdev -user vasey-staging-build`, for each local filesystem) before the next deploy, which
+refuses until it is gone.
 
 ```sh
 sudo NEW=<40-hex SHA of the failed candidate> bash -euo pipefail <<'RECOVER'
@@ -861,6 +876,7 @@ sudo NEW=<40-hex SHA of the failed candidate> bash -euo pipefail <<'RECOVER'
 REL="/srv/vasey-staging/releases/$NEW"
 [ "$(readlink -f /srv/vasey-staging/current)" != "$REL" ] || { echo "$NEW is the served release; stop" >&2; exit 1; }
 ! pgrep -f 'vasey-staging-ctl|release-step' >/dev/null || { echo "a helper still runs; stop" >&2; exit 1; }
+setpriv --reuid=vasey-staging-build --regid=vasey-staging-build --clear-groups -- kill -KILL -1 2>/dev/null || true
 pkill -KILL -u vasey-staging-build || true; sleep 1
 ! pgrep -u vasey-staging-build >/dev/null || { echo "a build-account process survives; stop" >&2; exit 1; }
 ! mountpoint -q "$REL/storage/app/private" && ! grep -qF " $REL/storage/app/private " /etc/fstab \

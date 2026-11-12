@@ -345,6 +345,15 @@ install -d -m 0770 -o root -g "$BUILD_GID" "$ROOT/build"
 runuser -u "$BUILD_USER" -- env -i PATH=/usr/local/bin:/usr/bin:/bin sh -c \
   'command -v composer && command -v npm && command -v node && command -v git' >/dev/null \
   && runuser -u "$BUILD_USER" -- test -x "$PHP_BIN" || die "$BUILD_USER cannot run composer, npm, node, git or $PHP_BIN"
+# The build runs as a transient systemd unit that hides /home, /root and /run/user (vasey-staging-ctl build_in_unit): the
+# kit root and every build tool must live outside them (a per-user nvm or Composer install would vanish inside the unit).
+[ -d /run/systemd/system ] && [ -f /sys/fs/cgroup/cgroup.controllers ] && command -v systemd-run >/dev/null \
+  || die "the build account needs systemd as init with cgroup v2 (systemd-run)"
+for tool in composer npm node git "$PHP_BIN"; do
+  resolved=$(readlink -f -- "$(PATH=/usr/local/bin:/usr/bin:/bin command -v "$tool")")
+  case "$resolved/" in /home/*|/root/*|/run/user/*) die "$tool resolves to $resolved, which the build unit cannot see" ;; esac
+done
+case "$ROOT/" in /home/*|/root/*|/run/user/*) die "the kit root $ROOT must not be under /home, /root or /run/user" ;; esac
 info "build account $BUILD_USER ready (build area $ROOT/build root:$BUILD_USER 0770)"
 
 # ---------------------------------------------------------------- 5. MySQL

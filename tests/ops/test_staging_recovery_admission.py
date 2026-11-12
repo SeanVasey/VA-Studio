@@ -45,6 +45,7 @@ start_ship_pending() { :; }   # the detached off-host shipment: covered by test_
             for snapshot_ok in ('0', '1'):
                 run = subprocess.run(["bash", "-eu", "-c", shell + body + '\ncmd_activate "$SHA" "$EVIDENCE"'], capture_output=True, text=True,
                                      env={"PATH": "/usr/bin:/bin", "CURRENT": str(Path(directory) / 'absent-current'),
+                                          "RELEASES": str(Path(directory) / 'releases'), "VASEY_APP_USER": "fixture-app",
                                           "SHA": 'a' * 40, "EVIDENCE": directory, "RELEASE_STEP": 'fixture-step', "SNAPSHOT_OK": snapshot_ok})
                 self.assertEqual(run.returncode == 0, snapshot_ok == '1', run.stderr)
                 self.assertEqual(run.stdout.splitlines(), ['snapshot', 'migration'] if snapshot_ok == '1' else ['snapshot'])

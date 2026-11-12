@@ -44,19 +44,19 @@
 +         workers/vasey-production-workers.conf bin/vasey-production-ctl backup.sh scheduler-watch.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh forge-deploy.sh; do
    [ -f "$KIT/$f" ] || die "kit file missing: ops/production/$f"
  done
-@@ -515,5 +513,4 @@
+@@ -524,5 +522,4 @@
  VASEY_EXPECTED_APP_ENV=$APP_ENV_EXPECTED
  VASEY_DB_NAME=$DB_NAME
 -VASEY_PROBE_NETRC=/etc/vasey-production/probe.netrc
  VASEY_BUILD_USER=$BUILD_USER
  VASEY_KEEP_RELEASES=3
-@@ -534,4 +531,5 @@
+@@ -543,4 +540,5 @@
  install -m 0644 -o root -g root "$KIT/seal-release.py" /usr/local/libexec/vasey-production/seal-release.py
  install -m 0644 -o root -g root "$KIT/release-step.sh" /usr/local/libexec/vasey-production/release-step.sh
 +install -m 0755 -o root -g root "$KIT/forge-deploy.sh" /usr/local/libexec/vasey-production/forge-deploy.sh
  install -m 0644 -o root -g root "$KIT/tls/origin-ca.pem" /usr/local/libexec/vasey-production/origin-ca.pem
  
-@@ -591,24 +589,5 @@
+@@ -600,24 +598,5 @@
  EOF
  
 -# ---------------------------------------------------------------- 7. access credentials and nginx template
@@ -82,7 +82,7 @@
 +# ---------------------------------------------------------------- 7. nginx template (no basic auth, no probe credentials)
  render "$KIT/nginx/vasey-production.conf" /etc/vasey-production/nginx-site.conf 0644
  render "$KIT/nginx/vasey-production-classic.conf" /etc/vasey-production/nginx-classic.conf 0644
-@@ -622,8 +601,9 @@
+@@ -631,8 +610,9 @@
  grep -Eq '^[[:space:]]*include[[:space:]]+(/etc/nginx/)?conf\.d/\*\.conf;' /etc/nginx/nginx.conf \
    || die "/etc/nginx/nginx.conf does not include conf.d/*.conf at http level; the site's rate-limit zones and header maps live there"
 -nginx_dupes=$(grep -rlE --exclude-dir=conf.d -e 'zone=vasey_production_(general|webhook):' \
@@ -96,7 +96,7 @@
 +  is the older whole-file site template. Put Forge's default site config back (README step 7), then re-run"
  nginx_previous=""
  if [ -e "$NGINX_HTTP_CONF" ]; then
-@@ -659,8 +639,8 @@
+@@ -668,8 +648,8 @@
    helpers             /usr/local/sbin/vasey-production-ctl (sudo for $APP_USER), /usr/local/sbin/vasey-production-backup (cron 03:17 UTC)
    MySQL               schema $DB_NAME; DB_HOST=127.0.0.1 DB_USERNAME=vasey_app
 -  secrets (root only) $SECRETS/db-app.env (paste DB_PASSWORD into Forge > Environment), $BACKUP_CNF, $HTPASSWD, /etc/vasey-production/probe.netrc

@@ -171,7 +171,8 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
 2. **Directories and the build account:** as in [Server layout](#server-layout), with the stated owners and modes. It creates
    `vasey-staging-build` if missing and refuses when it is unsafe (a login shell, sudo rights, `forge` in its group or it in
    `forge`'s, readable application secrets), adds it to `/etc/cron.deny` and `/etc/at.deny`, creates `build/` and checks that
-   the account can run composer, npm, node, git and PHP. App/nginx runtime paths use retained no-follow directory handles and descriptor-only ownership/mode changes. Symlinks and special files refuse without changing their targets; a detected directory entry replacement refuses after changes to the pinned directory. A new private `.gitignore` is created exclusively through its directory handle with the tracked bytes. Existing ordinary files are preserved; links and special files refuse. Failure can leave partial initialization inside admitted runtime directories, so inspect state before retrying. Inode safety does not certify a healthy visible path if an independent writer replaces an entry after its check.
+   the account can run composer, npm, node, git and PHP, that systemd (cgroup v2) can run the build unit, and that neither
+   those tools nor the kit root resolve under `/home`, `/root` or `/run/user`, which the unit hides. App/nginx runtime paths use retained no-follow directory handles and descriptor-only ownership/mode changes. Symlinks and special files refuse without changing their targets; a detected directory entry replacement refuses after changes to the pinned directory. A new private `.gitignore` is created exclusively through its directory handle with the tracked bytes. Existing ordinary files are preserved; links and special files refuse. Failure can leave partial initialization inside admitted runtime directories, so inspect state before retrying. Inode safety does not certify a healthy visible path if an independent writer replaces an entry after its check.
 3. **MySQL** (as root over the local socket, or with `--mysql-admin-defaults FILE`):
    The optional admin file must be a canonical absolute, root-owned 0600 regular single-link
    file with no symlinks and root-owned parent directories that are not group/world writable.
@@ -233,7 +234,9 @@ Before anything else it compares the root-installed helpers (`vasey-staging-ctl`
 2. `ctl prepare` holds one root lease for the checkout, build and sealing. **With the build account** (re-provisioned host)
    nothing is stopped: the build account checks the exact SHA out of a git bundle that `forge` writes from the mirror into a
    pipe, proves it clean (status and tree hash) and builds it in a slot `forge` cannot reach, with a fresh private home and no
-   `.env`. Root then kills every build-account process, seals the release (runtime directories held), installs the captured
+   `.env`, as a hardened transient systemd service (writes only its slot and `build/`, no set-id files, private `/tmp`, no
+   `/home`, memory/CPU/task/time limits). Root then kills the unit's cgroup and any build-account process, refuses if the
+   account owns any file outside its build area, seals the release (runtime directories held), installs the captured
    environment root:app 0440, lets `forge` run the real runtime admission and attaches private storage. Downtime no longer
    includes dependency installation and asset compilation (runbook section 8). **Without it** prepare quiesces controlled web,
    workers, scheduler and gated pipeline writers **before allocating any app-writable candidate**, then makes the fresh

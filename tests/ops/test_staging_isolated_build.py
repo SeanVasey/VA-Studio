@@ -59,6 +59,11 @@ file_put_contents('vendor/autoload.php', '<?php // approved');
 file_put_contents('vendor/composer/installed.json', '{}');
 file_put_contents('bootstrap/cache/packages.php', '<?php return [];');
 file_put_contents(TRACE_PATH, "build $uid\n", FILE_APPEND);
+if ($uid === BUILDER_UID && file_exists(PLANT_FLAG)) {
+    // A malicious dependency leaves a set-id file of the build account in a shared directory (review P1 on PR #354).
+    file_put_contents(PLANT_DIR . '/.helper', 'helper');
+    chmod(PLANT_DIR . '/.helper', 06755);
+}
 if ($uid === BUILDER_UID) {
     $home = getenv('HOME');
     $target = getcwd() . '/vendor/autoload.php';
@@ -146,6 +151,10 @@ class IsolatedBuildIntegration(unittest.TestCase):
         private.mkdir()
         (private / ".gitignore").write_text("*\n!.gitignore\n")
         self.give(private, 0o700)
+        self.shared = self.root / "shared"   # a world-writable directory like /tmp, inside the scanned tree
+        self.shared.mkdir()
+        self.shared.chmod(0o1777)
+        self.plant_flag = self.root / "plant"
         temporary = self.root / "tmp"
         temporary.mkdir()
         self.give(temporary, 0o700)
@@ -190,7 +199,8 @@ class IsolatedBuildIntegration(unittest.TestCase):
         secrets_list = [str(self.mirror / ".env"), str(self.candidate), str(private / ".gitignore"), str(evidence)]
         composer = (COMPOSER.replace("SECRETS_JSON", repr(json.dumps(secrets_list)))
                     .replace("ROOT_PATH", repr(str(self.root))).replace("TRACE_PATH", repr(str(self.trace)))
-                    .replace("BUILDER_UID", str(self.build_uid)))
+                    .replace("BUILDER_UID", str(self.build_uid)).replace("PLANT_FLAG", repr(str(self.plant_flag)))
+                    .replace("PLANT_DIR", repr(str(self.shared))))
         (self.bin / "composer").write_text(composer)
         (self.bin / "npm").write_text('#!/bin/bash\nset -eu\nmkdir -p public/build\nprintf "{}" > public/build/manifest.json\n')
         for name in ("composer", "npm"):
@@ -220,6 +230,17 @@ cmd_space_check() { :; }
 cmd_quiesce() { writer_gate_write closed; writer_barrier; echo quiesce >> "$TRACE"; }
 cmd_switch() { echo switch >> "$TRACE"; ln -s "$RELEASES/$1" "$CURRENT"; }
 cmd_resume() { echo resume >> "$TRACE"; writer_gate_write open; }
+build_unit_ready() { [ ! -e "$ROOT/no-systemd" ]; }
+build_scan_mounts() { printf '%s\\n' "$ROOT"; }   # the sandbox stands in for the host's local filesystems
+systemd_run() {   # no systemd here: record the unit's command line, then run its command as the unit's user
+  local user="" ; local -a envs=()
+  printf '%s\\n' "$@" > "$ROOT/unit-args"
+  while [ "$#" -gt 0 ]; do
+    case "$1" in --) shift; break ;; --uid=*) user=${1#--uid=} ;; -E) envs+=("$2"); shift ;; -p) shift ;; esac
+    shift
+  done
+  runuser -u "$user" -- env -i "${envs[@]}" "$@"
+}
 attach_private() {   # the bind mount and fstab are host state; the hand-over to the application is not
   [ "$(stat -c %U -- "$RELEASES/$1/storage/app/private")" = "$VASEY_APP_USER" ] || die "private mount target is not the application's"
   echo attach >> "$TRACE"
@@ -423,22 +444,111 @@ attach_private() {   # the bind mount and fstab are host state; the hand-over to
         self.assertEqual(self.mode(self.release)[0], 0)
 
 
+    # Review P1 on PR #354: the build runs in a hardened unit that can write only its slot and build area, cannot make
+    # set-id files and is killed as a whole cgroup.
+    def test_the_build_runs_as_a_hardened_transient_unit(self):
+        run = self.prepare()
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        arguments = (self.root / "unit-args").read_text().splitlines()
+        command = arguments[arguments.index("--") + 1:]
+        self.assertEqual(command, ["/bin/bash", str(self.helper), "build-isolated", self.sha])
+        options = arguments[:arguments.index("--")]
+        for flag in ("--pipe", "--wait", "--collect", f"--uid={self.builder}", f"--gid={self.build_gid}"):
+            self.assertIn(flag, options)
+        properties = [options[i + 1] for i, value in enumerate(options) if value == "-p"]
+        for required in ("NoNewPrivileges=yes", "RestrictSUIDSGID=yes", "ProtectSystem=strict", "PrivateTmp=yes",
+                         "PrivateDevices=yes", "ProtectHome=yes", "RestrictNamespaces=yes", "KillMode=control-group",
+                         f"ReadWritePaths={self.release} {self.root / 'build'}"):
+            self.assertIn(required, properties)
+        for limit in ("TasksMax=", "MemoryMax=", "CPUQuota=", "RuntimeMaxSec="):
+            self.assertTrue([p for p in properties if p.startswith(limit)], limit)
+        self.assertEqual([p for p in properties if p.startswith("ReadWritePaths=")],
+                         [f"ReadWritePaths={self.release} {self.root / 'build'}"])
+
+    def test_a_configured_build_account_without_systemd_refuses_before_anything_starts(self):
+        (self.root / "no-systemd").touch()
+        run = self.prepare()
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("needs systemd as init", run.stderr)
+        self.assertEqual(self.trace_lines(), [])
+        self.assertFalse(self.release.exists())
+        self.assertFalse(self.operation.exists())
+
+    def test_a_file_the_build_account_left_outside_its_area_refuses_the_next_build(self):
+        helper = self.shared / ".helper"
+        helper.write_text("helper")
+        os.chown(helper, self.build_uid, self.build_gid)
+        helper.chmod(0o6755)
+        run = self.prepare()
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn(f"the build account owns {helper} outside its build area", run.stderr)
+        self.assertEqual(self.trace_lines(), [], "a build ran, or the site was stopped, despite the leftover")
+        self.assertFalse(self.release.exists())
+
+    def test_a_build_that_leaves_a_file_outside_its_area_is_not_sealed(self):
+        self.plant_flag.touch()
+        run = self.prepare()
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn(f"the build account owns {self.shared / '.helper'} outside its build area", run.stderr)
+        self.assertEqual(self.trace_lines(), [f"build {self.build_uid}"], "sealed, attached or stopped despite the leftover")
+        self.assertEqual(self.mode(self.release), (0, 0, 0o700), "the slot was not taken from the build group")
+        self.assertNotIn("attach", self.trace_lines())
+        self.assertEqual(self.builder_processes(), [])
+        self.assertTrue(self.operation.exists(), "root recovery keeps the marker and the unsealed slot")
+
+    # Review P2 on PR #354: processes that keep forking escaped a pkill snapshot; kill(-1) as the account cannot be raced.
+    def test_the_reap_kills_processes_that_keep_forking(self):
+        chaser = "import os\nwhile True:\n    if os.fork():\n        os._exit(0)\n"
+        for _ in range(4):
+            subprocess.Popen(["runuser", "-u", self.builder, "--", "python3", "-I", "-c", chaser],
+                             stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                             start_new_session=True).wait(timeout=10)
+        time.sleep(0.2)
+        self.assertNotEqual(self.builder_processes(), [], "the chasers did not start")
+        source = CTL.read_text()
+        definitions = source[source.index("valid_sha() {"):source.index("# The sudo entry point")]
+        script = ('die() { echo "$*" >&2; exit 1; }\n' + definitions
+                  + f"\nBUILD_UID={self.build_uid} BUILD_GID={self.build_gid}\nreap_builder\necho REAPED\n")
+        run = subprocess.run(["bash", "-eu", "-c", script], capture_output=True, text=True, timeout=60,
+                             env={"PATH": "/usr/sbin:/usr/bin:/sbin:/bin", "LC_ALL": "C"})
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertIn("REAPED", run.stdout)
+        time.sleep(0.3)
+        self.assertEqual(self.builder_processes(), [], "a forking process of the build account survived the reap")
+
+    # Review P3 on PR #354: an interrupted hand-over (bootstrap/cache already handed, the rest still held) is completed.
+    def test_an_interrupted_runtime_hand_over_is_completed_by_the_activation(self):
+        run = self.prepare()
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        cache = self.release / "bootstrap/cache"
+        for path in [cache, *cache.rglob("*")]:
+            os.chown(path, self.app_uid, self.app_gid)
+        cache.chmod(0o700)
+        self.trace.write_text("")
+        run = self.ctl("activate", self.sha, str(self.evidence))
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        for runtime in ("storage/framework", "storage/logs"):
+            self.assertEqual(self.mode(self.release / runtime), (self.app_uid, self.app_gid, 0o700), runtime)
+
 class BuildAccountGuards(unittest.TestCase):
     """The account checks in build_account(), with name-service answers as fixtures: each unsafe shape refuses."""
 
     def run_guard(self, **overrides):
         values = {"name": "vasey-staging-build", "exists": "1", "uid": "990", "gid": "990", "groups": "990",
                   "shell": "/usr/sbin/nologin", "app_uid": "1000", "app_gid": "1000", "app_groups": "1000 27",
-                  "build_dir": "0 990 770"}
+                  "build_dir": "0 990 770", "members": "", "others": "", "unit": "1", "root": None}
         values.update(overrides)
         source = CTL.read_text()
-        function = source[source.index("build_account() {"):source.index("as_builder() {")]
+        function = source[source.index("build_account() {"):source.index("build_unit_ready() {")]
         shell = '''die() { echo "$*" >&2; exit 1; }
 protected_dir() { :; }
 getent() {
-  case "$1:$2" in
+  case "$1:${2:-}" in
     "passwd:$VASEY_BUILD_USER") [ "$EXISTS" = 1 ] || return 2; echo "$VASEY_BUILD_USER:x:$B_UID:$B_GID::/nonexistent:$SHELL_FIXTURE" ;;
+    "passwd:") echo "$VASEY_BUILD_USER:x:$B_UID:$B_GID::/nonexistent:$SHELL_FIXTURE"; echo "forge:x:$A_UID:$A_GID::/home/forge:/bin/bash"
+               [ -z "$OTHERS" ] || echo "$OTHERS" ;;
     "group:$VASEY_APP_GROUP") echo "$VASEY_APP_GROUP:x:$A_GID:" ;;
+    "group:$B_GID") echo "build:x:$B_GID:$B_MEMBERS" ;;
     *) return 2 ;;
   esac
 }
@@ -451,12 +561,14 @@ id() {
   esac
 }
 stat() { echo "$BUILD_DIR"; }
+build_unit_ready() { [ "$UNIT" = 1 ]; }
 '''
         script = shell + function + '\nif build_account; then echo "usable $BUILD_UID $BUILD_GID"; else echo legacy; fi\n'
         with tempfile.TemporaryDirectory() as directory:
             Path(directory, "build").mkdir()
             return subprocess.run(["bash", "-eu", "-c", script], capture_output=True, text=True, env={
-                "PATH": "/usr/bin:/bin", "ROOT": directory, "VASEY_BUILD_USER": values["name"], "EXISTS": values["exists"],
+                "PATH": "/usr/bin:/bin", "ROOT": values["root"] or directory, "B_MEMBERS": values["members"],
+                "OTHERS": values["others"], "UNIT": values["unit"], "VASEY_BUILD_USER": values["name"], "EXISTS": values["exists"],
                 "B_UID": values["uid"], "B_GID": values["gid"], "B_GROUPS": values["groups"], "SHELL_FIXTURE": values["shell"],
                 "VASEY_APP_USER": "forge", "VASEY_APP_GROUP": "forge", "A_UID": values["app_uid"], "A_GID": values["app_gid"],
                 "A_GROUPS": values["app_groups"], "BUILD_DIR": values["build_dir"]})
@@ -480,7 +592,12 @@ stat() { echo "$BUILD_DIR"; }
                 ({"app_groups": "1000 990"}, "must not be a member of the build group"),
                 ({"shell": "/bin/bash"}, "no login shell"), ({"build_dir": "0 990 775"}, "0770"),
                 ({"build_dir": "990 990 770"}, "0770"), ({"build_dir": "0 1000 770"}, "0770"),
-                ({"name": "bad name"}, "invalid build account name")):
+                ({"name": "bad name"}, "invalid build account name"),
+                ({"members": "www-data"}, "the build group must have no members"),
+                ({"others": "www-data:x:33:990::/var/www:/usr/sbin/nologin"}, "shares the build account's uid or group"),
+                ({"others": "twin:x:990:33::/:/usr/sbin/nologin"}, "shares the build account's uid or group"),
+                ({"unit": "0"}, "needs systemd as init"),
+                ({"root": "/home/forge/vasey"}, "must not be under /home")):
             with self.subTest(**overrides):
                 run = self.run_guard(**overrides)
                 self.assertNotEqual(run.returncode, 0, run.stdout)
