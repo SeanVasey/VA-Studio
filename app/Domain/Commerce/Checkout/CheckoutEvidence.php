@@ -14,7 +14,11 @@ use Throwable;
 /** Versioned provider mapping; no payment confirmation or rights decision. */
 final class CheckoutEvidence
 {
-    public function request(Order $order, array $orderEvidence, string $intentId, array $policy, string $account, CarbonImmutable $at, ?array $paymentMethodTypes = null): array
+    /**
+     * `$prefillEmail` is false only to replay a stored request that predates the buyer-email prefill: such a request has no
+     * `customer_email` key and must rebuild byte for byte without one. New requests always pass true.
+     */
+    public function request(Order $order, array $orderEvidence, string $intentId, array $policy, string $account, CarbonImmutable $at, ?array $paymentMethodTypes = null, bool $prefillEmail = true): array
     {
         app(CheckoutPolicy::class)->validate($policy);
         $pricing = $orderEvidence['pricing']['snapshot'];
@@ -39,6 +43,12 @@ final class CheckoutEvidence
             'automatic_tax' => ['enabled' => false], 'adaptive_pricing' => ['enabled' => false], 'allow_promotion_codes' => false,
             'customer_creation' => 'if_required', 'success_url' => $return, 'cancel_url' => $return,
             'expires_at' => $at->addSeconds($policy['provider_lifetime_seconds'])->timestamp, 'expand' => ['line_items']];
+        // Pre-fills Stripe's email field with the address the buyer gave for this order, nothing else. No `customer` id is ever
+        // sent (Stripe refuses both together). The address Stripe returns is never read back as identity or a mail recipient.
+        $email = $prefillEmail ? self::buyerEmail($orderEvidence['request']['buyer']['email'] ?? null) : null;
+        if ($email !== null) {
+            $params['customer_email'] = $email;
+        }
 
         return ['schema_version' => 1, 'purpose' => 'stripe_test_checkout', 'mapping' => 'post_discount_zero_test_tax_v1',
             'api_version' => CheckoutPolicy::API_VERSION, 'order_id' => $order->public_id,
@@ -52,7 +62,8 @@ final class CheckoutEvidence
         // The finalization reader already verified the original order; this avoids recursive graph reads.
         $evidence = $verifiedOrderEvidence ?? app(ReadOrder::class)->verify($order);
         $expected = $this->request($order, $evidence, $intent->public_id, $payload['policy'] ?? [], $intent->account_id, $intent->created_at,
-            CheckoutPaymentMethods::forStored($payload['params']['payment_method_types'] ?? null));
+            CheckoutPaymentMethods::forStored($payload['params']['payment_method_types'] ?? null),
+            is_array($payload['params'] ?? null) && array_key_exists('customer_email', $payload['params']));
         if ($intent->order_id !== $order->id || $intent->order_attempt_id !== $order->attempt()->sole()->id || $intent->mode !== 'test' ||
             ! $intent->initiate_before->equalTo(CarbonImmutable::parse($evidence['attempt']['expires_at'])) ||
             ! $intent->created_at->lessThan($intent->initiate_before) || $intent->created_at->lessThan($order->created_at) ||
@@ -63,6 +74,20 @@ final class CheckoutEvidence
         }
 
         return $expected;
+    }
+
+    /**
+     * The order's buyer email only when it has a conservative ASCII shape Stripe accepts; otherwise null and the buyer types
+     * it on Stripe's page as before. A refused address would fail the frozen create on every retry, so doubt means omit.
+     */
+    public static function buyerEmail(mixed $email): ?string
+    {
+        if (! is_string($email) || strlen($email) > 254 || filter_var($email, FILTER_VALIDATE_EMAIL) === false
+            || preg_match('/\A[A-Za-z0-9.!#$%&\'*+\/=?^_`{|}~-]{1,64}@(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}\z/D', $email) !== 1) {
+            return null;
+        }
+
+        return $email;
     }
 
     public function encrypt(array $payload): array

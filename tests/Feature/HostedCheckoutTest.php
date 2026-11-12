@@ -143,7 +143,9 @@ class HostedCheckoutTest extends TestCase
         $this->assertSame(OrderAttempt::sole()->public_id, $params['metadata']['attempt_id']);
         $this->assertSame(CheckoutIntent::sole()->public_id, $params['metadata']['intent_id']);
         $this->assertSame('1', $params['metadata']['schema_version']);
-        foreach (['customer_email', 'customer', 'discounts', 'shipping_options', 'shipping_address_collection'] as $forbidden) {
+        // The only buyer detail sent is the email the buyer gave for this order, as a prefill; never a Stripe customer id.
+        $this->assertSame(OrderFixtures::buyer()['email'], $params['customer_email']);
+        foreach (['customer', 'discounts', 'shipping_options', 'shipping_address_collection'] as $forbidden) {
             $this->assertArrayNotHasKey($forbidden, $params);
         }
         $this->assertFalse($params['allow_promotion_codes']);
@@ -155,7 +157,9 @@ class HostedCheckoutTest extends TestCase
         $this->assertSame(hash('sha256', $intent->request_ciphertext), $intent->request_hash);
         $this->assertSame(hash('sha256', CheckoutSession::sole()->evidence_ciphertext), CheckoutSession::sole()->evidence_hash);
         $this->assertIsArray(json_decode(Crypt::decryptString($intent->request_ciphertext), true, 128, JSON_THROW_ON_ERROR));
-        $safe = json_encode([$result, $params, CheckoutIntent::sole()->toArray(), CheckoutSession::sole()->toArray(), DB::table('audit_events')->get()], JSON_THROW_ON_ERROR);
+        $sent = $params;
+        unset($sent['customer_email']);
+        $safe = json_encode([$result, $sent, CheckoutIntent::sole()->toArray(), CheckoutSession::sole()->toArray(), DB::table('audit_events')->get()], JSON_THROW_ON_ERROR);
         foreach ([...array_values(OrderFixtures::buyer()), config('payments.stripe.secret_key')] as $private) {
             $this->assertStringNotContainsString($private, $safe);
         }

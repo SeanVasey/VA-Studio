@@ -109,7 +109,9 @@ final class HostedCheckout
         }
         $order = $this->owned($id, $ownerKey);
         $intent = CheckoutIntent::where('order_id', $order->id)->first();
-        if ($intent) {
+        // Durable verified payment (the evidence finalization trusts, re-verified here) answers from local state. A session read
+        // carries no refund or dispute (the staff test-exception reconcile reads those); `recover()` still re-reads the session.
+        if ($intent && app(ReadPaymentState::class)->projection($order, app(ReadOrder::class)->verify($order))['paymentStatus'] !== 'verified') {
             $this->dispatch($intent, true, null, $principal);
         }
 
