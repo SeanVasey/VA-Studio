@@ -9,6 +9,7 @@ services (quiesce, PHP-FPM, supervisor, the bind mount, the snapshot) are fixtur
 They need root and useradd, like the CI step that runs this directory (which allows no skip)."""
 import importlib.util
 import json
+import re
 import os
 from pathlib import Path
 import secrets
@@ -591,6 +592,37 @@ attach_private() {   # the bind mount and fstab are host state; the hand-over to
         self.assertIn("comes from an isolated build", run.stderr)
         self.assertNotIn("attach", self.trace_lines())
         self.assertEqual(self.mode(self.release), before, "the refused attach changed the slot's owner or mode")
+
+class SmokeScriptMatchesTheBuildUnit(unittest.TestCase):
+    """ops/staging/smoke-build-unit.sh proves the real unit on the host; it is worth nothing if its properties drift from
+    build_in_unit's. Every property must be the same, except the slot path and the shorter run limit; the limits must match
+    the constants ctl uses."""
+
+    @staticmethod
+    def properties(body):
+        return re.findall(r'-p "?([A-Za-z]+=[^"\\]*?)"?(?= -p| -E|\s*\\\n|\s*$)', body, re.M)
+
+    def test_the_smoke_unit_has_the_build_units_properties(self):
+        ctl = CTL.read_text()
+        build = ctl[ctl.index("build_in_unit() {"):]
+        build = build[:build.index("\n}\n")]
+        smoke = (REPO / "ops/staging/smoke-build-unit.sh").read_text()
+        smoke = smoke[smoke.index("unit() {"):]
+        smoke = smoke[:smoke.index("\n}\n")]
+        constants = dict(re.findall(r"^(BUILD_[A-Z_]+)=(\S+)$", ctl, re.M))
+        expected = {}
+        for prop in self.properties(build):
+            name, value = prop.split("=", 1)
+            expected[name] = re.sub(r"\$(BUILD_[A-Z_]+)", lambda m: constants[m.group(1)], value)
+        actual = dict(prop.split("=", 1) for prop in self.properties(smoke))
+        self.assertEqual(set(actual), set(expected), "the smoke unit sets different properties")
+        for name, value in expected.items():
+            if name in ("ReadWritePaths", "RuntimeMaxSec"):
+                continue
+            self.assertEqual(actual[name], value, name)
+        self.assertIn("RestrictSUIDSGID", actual)
+        for flag in ("--pipe", "--wait", "--collect", "--service-type=exec"):
+            self.assertIn(flag, smoke)
 
 class BuildAccountGuards(unittest.TestCase):
     """The account checks in build_account(), with name-service answers as fixtures: each unsafe shape refuses."""

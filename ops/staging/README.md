@@ -32,6 +32,7 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 | File | What it is | Installed to |
 | --- | --- | --- |
 | `provision.sh` | One-time root provisioning for everything Forge does not do | run in place |
+| `smoke-build-unit.sh` | Root smoke test of the isolated build unit on the real host before the first isolated deploy (runbook section 8) | run in place |
 | `nginx/vasey-staging.conf` | Site body (the inside of Forge's server block): basic auth with the webhook exemption, limits, headers, long paid routes, the release root in every location | rendered to `/etc/vasey-staging/nginx-site.conf`, then installed as Forge's site configuration (step 7) |
 | `nginx/vasey-staging-http.conf` | http-level helpers the body uses: the two `limit_req_zone`s and three header `map`s | `/etc/nginx/conf.d/vasey-staging.conf` (provision.sh, checked with `nginx -t`) |
 | `nginx/vasey-staging-classic.conf` | Whole-file wrapper (listen, TLS, Forge includes) that includes the body, for a host whose site file is edited as a whole | rendered to `/etc/vasey-staging/nginx-classic.conf`; not used on the current Forge layout |

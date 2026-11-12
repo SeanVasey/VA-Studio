@@ -699,8 +699,10 @@ What changed for an operator:
   the host yet**; from the 2026-11-12 phases above (4m45s, of which 3m18s was the build) it should be about one and a half
   minutes. Record the first measurement here.
 - **Before the first isolated deploy, smoke the unit on the host** (the tests replace `systemd-run` with a stand-in; none has
-  run the real unit). As root, run a unit with the same properties as `build_in_unit` in `vasey-staging-ctl` (copy its
-  `systemd-run` line with `--uid=vasey-staging-build`, a scratch `ReadWritePaths`, and a short command) and record:
+  run the real unit). After re-provisioning, run as root
+  `bash /home/forge/vasey-staging.on-forge.com/ops/staging/smoke-build-unit.sh` (a Forge recipe as root works; it exits 0
+  only if every probe passes and removes its scratch directory). It runs each probe in a unit with exactly
+  `build_in_unit`'s properties (a test fails if the two drift), a scratch directory in place of the slot, and checks:
   (i) creating a set-id file fails (`python3 -c "import os; open('/dev/shm/x','w'); os.chmod('/dev/shm/x', 0o4755)"` must
   raise `PermissionError`; remove `/dev/shm/x`); (ii) `busctl call org.freedesktop.login1 /org/freedesktop/login1
   org.freedesktop.login1.Manager SetUserLinger ubb <build uid> true false` fails (no unix socket); (iii) `exit 3` makes
