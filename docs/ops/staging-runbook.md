@@ -908,7 +908,9 @@ after `attach`): use the recovery script above for that case. A candidate from a
 `ctl attach` refuses it, sealed or not, before changing anything (only prepare attaches it, after the runtime admission), so
 discard it with the script below and deploy again; the site stays up meanwhile. `ctl activate` also re-runs the runtime
 admission (`release-step.sh revalidate`) before it stops anything, so a candidate refused at admission never reaches the
-quiesce, the snapshot or its migrations. **If prepare said the build account owns a file outside its
+quiesce, the snapshot or its migrations through `activate`. `ctl switch` (the rollback in step 5) does not re-run it: switch
+only to a release that was admitted and served before. On the legacy path the application account builds the candidate
+itself, so the admission catches operator mistakes, not a hostile application account. **If prepare said the build account owns a file outside its
 build area**, treat the host as possibly compromised by a build dependency: do not delete the file before inspecting it (who
 created it, set-id bits, what `forge` could have run with it), then remove it and anything else the account owns outside
 `/srv/vasey-staging/build` (`find / -xdev -user vasey-staging-build`, for each local filesystem) before the next deploy, which
