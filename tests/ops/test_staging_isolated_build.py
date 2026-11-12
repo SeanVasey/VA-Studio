@@ -765,25 +765,20 @@ class SealBuiltTree(unittest.TestCase):
         self.module.release_runtime(self.release, self.APP, self.APP)   # idempotent once released
         self.assertEqual(self.owner("vendor/autoload.php"), (0, 0o444))
 
-    # Cursor Bugbot on PR #354: a symlink's mode is always 0777; a held tree may contain one.
-    def test_a_symlink_in_a_held_runtime_tree_verifies_and_is_released(self):
-        link = self.release / "bootstrap/cache/current.php"
-        link.symlink_to("packages.php")
-        os.chown(link, self.BUILD, self.BUILD, follow_symlinks=False)
-        self.seal()
-        self.assertEqual(os.lstat(link).st_uid, 0)
-        self.module.run(self.release, self.APP, self.APP, False)
-        self.module.release_runtime(self.release, self.APP, self.APP)
-        self.assertEqual(os.lstat(link).st_uid, self.APP)
-
-    def test_a_symlink_in_a_held_runtime_tree_must_still_be_root_owned(self):
-        link = self.release / "bootstrap/cache/current.php"
-        link.symlink_to("packages.php")
-        os.chown(link, self.BUILD, self.BUILD, follow_symlinks=False)
-        self.seal()
-        os.chown(link, self.APP, self.APP, follow_symlinks=False)
-        with self.assertRaises(ValueError):
-            self.module.run(self.release, self.APP, self.APP, False)
+    # Codex review of PR #356: a symlink in a held runtime tree could resolve outside the candidate, to a file the running
+    # application can change after sealing, so a held tree may contain none (refused at sealing and at every verification).
+    def test_a_symlink_in_a_held_runtime_tree_is_refused(self):
+        outside = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, outside)
+        (outside / "packages.php").write_text("<?php return [];")
+        for target in ("packages.php", str(outside / "packages.php")):
+            with self.subTest(target=target):
+                link = self.release / "bootstrap/cache/current.php"
+                link.symlink_to(target)
+                os.chown(link, self.BUILD, self.BUILD, follow_symlinks=False)
+                with self.assertRaises(ValueError):
+                    self.seal()
+                link.unlink()
 
     def test_the_release_stays_closed_to_everyone_but_root_until_the_walk_is_done(self):
         seen = []
