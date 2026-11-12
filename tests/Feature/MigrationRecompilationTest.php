@@ -45,8 +45,8 @@ final class MigrationRecompilationTest extends TestCase
                 if ($file->getExtension() !== 'php' || $file->getPathname() === app_path('Support/MigrationDefinitions.php')) {
                     continue;
                 }
-                // A require/include statement whose operand names the migrations directory (not the word in a string).
-                if (preg_match('/(?:^|[=(,\s])(?:require|include)(?:_once)?\s*\(?\s*(?:base_path|database_path|__DIR__|[\'"])[^;\n]*migrations/m', (string) file_get_contents($file->getPathname())) === 1) {
+                // A require/include statement whose operand names the migrations directory or is relative to the file itself.
+                if (preg_match('/(?:^|[=(,\s])(?:require|include)(?:_once)?\s*\(?\s*(?:(?:base_path|database_path|[\'"])[^;\n]*migrations|__DIR__)/m', (string) file_get_contents($file->getPathname())) === 1) {
                     $offenders[] = str_replace(base_path().'/', '', $file->getPathname());
                 }
             }
