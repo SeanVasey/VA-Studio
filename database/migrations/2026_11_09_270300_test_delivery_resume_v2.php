@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\MigrationDefinitions;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Collection;
@@ -158,7 +159,8 @@ return new class extends Migration
      */
     private function statements(): array
     {
-        $original = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
+        // Loaded once per process: requiring it again redeclares its anonymous class on every migration run (a leak).
+        $original = MigrationDefinitions::load('2026_09_26_000023_test_owner_delivery.php');
         $build = Closure::bind(function (bool $both): string {
             $binding = 'EXISTS (SELECT 1 FROM test_delivery_controls d JOIN test_fulfillment_activations a ON a.id = d.test_fulfillment_activation_id'
                 .' JOIN order_finalizations f ON f.id = a.order_finalization_id JOIN orders o ON o.id = a.order_id'

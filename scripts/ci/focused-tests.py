@@ -184,6 +184,11 @@ PHP_TARGETS = {
         "tests/Feature/TestUnpaidReleaseMigrationTest.php",
     ),
     "buyer-cancel-races": ("tests/Feature/TestBuyerOrderCancellationConcurrencyTest.php",),
+    # Migrations that read another migration's definitions (the 2026-11-12 recurrence of the Oct 9 SQLite-shard memory leak).
+    "migration-recompilation": (
+        "tests/Feature/MigrationRecompilationTest.php", "tests/Feature/TestDeliveryResumeMigrationTest.php",
+        "tests/Feature/SiteImageMigrationTest.php",
+    ),
     # The native race alone: the whole test-delivery suite does not fit the 900-second runner cap on MySQL.
     "test-delivery-races": (
         "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",

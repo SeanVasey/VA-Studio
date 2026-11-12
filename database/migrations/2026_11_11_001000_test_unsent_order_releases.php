@@ -1,5 +1,6 @@
 <?php
 
+use App\Support\MigrationDefinitions;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
@@ -127,7 +128,7 @@ return new class extends Migration
      */
     private function resourceDefinitions(bool $unsent): array
     {
-        $refund = require __DIR__.'/2026_10_06_000047_test_refund_resolutions.php';
+        $refund = MigrationDefinitions::load('2026_10_06_000047_test_refund_resolutions.php');
         $definitions = (new ReflectionMethod($refund, 'resourceDefinitions'))->invoke($refund, true);
         if (array_keys($definitions) !== ['inventory_reservations_transition', 'promotion_uses_guard_update']) {
             throw new LogicException('Unexpected resource guard set.');

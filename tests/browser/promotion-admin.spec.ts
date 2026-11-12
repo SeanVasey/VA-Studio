@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
+import { isNotificationResponse } from './notification-match';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
@@ -130,11 +131,7 @@ test('real monetary inputs, immutable copying and enable/disable changes persist
   await persisted.screenshot({ path: testInfo.outputPath('promotion-lifecycle.png'), fullPage: false });
   // The success notification has its own Livewire request after the action renders.
   // Finish that request before reloading, which otherwise aborts it in WebKit.
-  const notificationSync = persisted.waitForResponse(response => {
-    if (!response.url().endsWith('/update') || response.request().method() !== 'POST') return false;
-    const payload = response.request().postDataJSON() as { components?: { calls?: { method?: string; params?: unknown[] }[] }[] };
-    return payload.components?.some(component => component.calls?.some(call => call.method === '__dispatch' && call.params?.[0] === 'notificationsSent')) ?? false;
-  });
+  const notificationSync = persisted.waitForResponse(response => isNotificationResponse(response, 'notificationsSent'));
   await changeAvailability(persisted, secondCode, 'Disable promotion');
   const notificationResponse = await notificationSync;
   expect(notificationResponse.status()).toBe(200);
