@@ -202,7 +202,11 @@ These are application or review items this kit deliberately does not do:
    BL-70 adds `VASEY_TEST_SERVICE_INVOICING_ENABLED` (Stripe test-mode service invoicing) to the same list
    (`holds.vasey_test_service_invoicing_enabled`); it has no production path at all. `VASEY_TEST_UNPAID_RELEASE_ENABLED`
    joins it (`holds.vasey_test_unpaid_release_enabled`, 2026-11-11): the staging rehearsal may now turn test unpaid release on,
-   production never does, and `UnpaidReleasePolicy` also refuses production in code.
+   production never does, and `UnpaidReleasePolicy` also refuses production in code. `VASEY_TEST_REFUND_DISPUTE_ENABLED` joins
+   it too (`holds.vasey_test_refund_dispute_enabled`, 2026-11-12): the staging rehearsal may turn the test refund and dispute
+   lifecycle on, production does not, and `RefundDisputePolicy` refuses production in code for both of its chains (the production
+   tax chain's admission is literal `local`/`testing`). A future production refund lifecycle lifts this hold in its own reviewed
+   change with Sean's authorization.
 
 ## What was and was not verified
 

@@ -24,10 +24,13 @@ class TestCommerceProfileValidatorTest extends TestCase
         '<ASSENT_TEXT>' => 'I accept these synthetic test-only terms.',
     ];
 
-    /** The capability flags the profile must state explicitly as false (validator CAPABILITY_FLAGS); unpaid release is optional since 2026-11-11. */
+    /**
+     * The capability flags the profile must state explicitly as false (validator CAPABILITY_FLAGS); unpaid release is optional since
+     * 2026-11-11 and the test refund and dispute lifecycle since 2026-11-12.
+     */
     private const CAPABILITY_FLAGS = [
         'VASEY_TEST_SERVICE_PROJECTS_ENABLED', 'VASEY_TEST_FREE_GRANTS_ENABLED', 'VASEY_TEST_CUSTOMER_CONSENT_ENABLED',
-        'VASEY_TEST_REFUND_RESOLUTION_ENABLED', 'VASEY_TEST_REFUND_DISPUTE_ENABLED',
+        'VASEY_TEST_REFUND_RESOLUTION_ENABLED',
         'VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED', 'VASEY_CUSTOMER_DATA_RIGHTS_ENABLED', 'VASEY_TRANSACTIONAL_MAIL_ENABLED',
         'CONTACT_TEST_ORDER_INQUIRIES_ENABLED', 'CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED',
         'VASEY_OPERATIVE_FREE_GRANTS_ENABLED', 'VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED',
@@ -364,6 +367,85 @@ class TestCommerceProfileValidatorTest extends TestCase
         $this->assertSame(['profile.optional_flags_explicit'], self::failedChecks($checks), $output);
         foreach (['yes', '1', ''] as $refused) {
             [$exit, $output, $checks] = $this->validate(self::set(self::filled(), $flag, $refused));
+            $this->assertSame(1, $exit, $refused.PHP_EOL.$output);
+            $this->assertSame(['profile.optional_flags_explicit', 'boundary.optional_capabilities_admitted'], self::failedChecks($checks), $refused);
+        }
+    }
+
+    /** The four DD-16 values the staging rehearsal must state to turn the test refund and dispute lifecycle on. */
+    private const REFUND_DISPUTE_VALUES = [
+        'VASEY_TEST_REFUND_DISPUTE_REFUND_AUTHORITY' => 'authoritative_provider_operator_review',
+        'VASEY_TEST_REFUND_DISPUTE_PARTIAL_REFUNDS' => 'exact_line_allocation',
+        'VASEY_TEST_REFUND_DISPUTE_DISPUTE_ACCESS' => 'temporarily_block_while_reconciling',
+        'VASEY_TEST_REFUND_DISPUTE_EXCLUSIVE_REOPENING' => 'qualified_operator_review',
+    ];
+
+    /** The filled profile with refund and dispute switched on and the given policy values set (null leaves a key out). */
+    private static function refundDispute(array $values, string $flag = 'true'): string
+    {
+        $profile = self::set(self::filled(), 'VASEY_TEST_REFUND_DISPUTE_ENABLED', $flag);
+        foreach ($values as $key => $value) {
+            if ($value !== null) {
+                $profile = self::set($profile, $key, $value);
+            }
+        }
+
+        return $profile;
+    }
+
+    /**
+     * Optional on staging (Sean's decision, 2026-11-12): stated true or false; true passes only with Stripe test mode, the real
+     * RefundDisputePolicy accepting the configuration and each of the four values equal to its DD-16 choice. The deploy gate applies
+     * the same rule (tests/ops/test_staging_refund_dispute_admission.py).
+     */
+    public function test_refund_and_dispute_is_optional_and_admitted_only_with_the_four_dd16_values(): void
+    {
+        $flag = 'VASEY_TEST_REFUND_DISPUTE_ENABLED';
+        $this->assertSame(1, preg_match('/^'.$flag.'=false$/m', self::filled()));
+        foreach (array_keys(self::REFUND_DISPUTE_VALUES) as $key) {
+            // Shown in the template, commented, with its exact DD-16 value; never set uncommented.
+            $this->assertSame(1, preg_match('/^# '.$key.'='.self::REFUND_DISPUTE_VALUES[$key].'$/m', self::filled()), $key);
+            $this->assertSame(0, preg_match('/^'.$key.'=/m', self::filled()), $key);
+        }
+        foreach (['true', '(true)'] as $on) {
+            [$exit, $output, $checks] = $this->validate(self::refundDispute(self::REFUND_DISPUTE_VALUES, $on));
+            $this->assertSame(0, $exit, $on.PHP_EOL.$output);
+            $this->assertNotContains(false, $checks);
+            $this->assertTrue($checks['boundary.optional_capabilities_admitted'], $on);
+            $this->assertTrue($checks['boundary.out_of_profile_families_off'], $on);
+        }
+        // Off with the values present is still off and passes.
+        [$exit, $output] = $this->validate(self::refundDispute(self::REFUND_DISPUTE_VALUES, 'false'));
+        $this->assertSame(0, $exit, $output);
+        // On with a value missing, blank, unknown, or supported by the class but not the DD-16 choice: refused by the boundary alone.
+        $bad = [];
+        foreach (array_keys(self::REFUND_DISPUTE_VALUES) as $key) {
+            $bad['without '.$key] = [...self::REFUND_DISPUTE_VALUES, $key => null];
+            $bad['blank '.$key] = [...self::REFUND_DISPUTE_VALUES, $key => ''];
+            $bad['unknown '.$key] = [...self::REFUND_DISPUTE_VALUES, $key => 'refund_everything'];
+        }
+        $bad['none'] = [];
+        $bad['operator_review dispute access'] = [...self::REFUND_DISPUTE_VALUES, 'VASEY_TEST_REFUND_DISPUTE_DISPUTE_ACCESS' => 'operator_review'];
+        $bad['remain_sold exclusive'] = [...self::REFUND_DISPUTE_VALUES, 'VASEY_TEST_REFUND_DISPUTE_EXCLUSIVE_REOPENING' => 'remain_sold'];
+        $bad['upper case'] = [...self::REFUND_DISPUTE_VALUES, 'VASEY_TEST_REFUND_DISPUTE_PARTIAL_REFUNDS' => 'EXACT_LINE_ALLOCATION'];
+        foreach ($bad as $name => $values) {
+            [$exit, $output, $checks] = $this->validate(self::refundDispute($values));
+            $this->assertSame(1, $exit, $name.PHP_EOL.$output);
+            $this->assertSame(['boundary.optional_capabilities_admitted'], self::failedChecks($checks), $name.PHP_EOL.$output);
+            $this->assertStringContainsString('Optional capability on without an accepted policy (or not a boolean): '.$flag.'.', $output);
+            $this->assertStringNotContainsString('refund_everything', $output);
+            $this->assertNoSecretPrinted($output);
+        }
+        // On outside Stripe test mode is refused too (beside the profile's own Stripe check).
+        [$exit, $output, $checks] = $this->validate(self::set(self::refundDispute(self::REFUND_DISPUTE_VALUES), 'STRIPE_MODE', 'live'));
+        $this->assertSame(1, $exit, $output);
+        $this->assertFalse($checks['boundary.optional_capabilities_admitted'], $output);
+        // Not stated, or stated with anything but a boolean: refused as a statement.
+        [$exit, $output, $checks] = $this->validate((string) preg_replace('/^'.$flag.'=.*\n/m', '', self::filled()));
+        $this->assertSame(1, $exit, $output);
+        $this->assertSame(['profile.optional_flags_explicit'], self::failedChecks($checks), $output);
+        foreach (['yes', '1', ''] as $refused) {
+            [$exit, $output, $checks] = $this->validate(self::refundDispute(self::REFUND_DISPUTE_VALUES, $refused));
             $this->assertSame(1, $exit, $refused.PHP_EOL.$output);
             $this->assertSame(['profile.optional_flags_explicit', 'boundary.optional_capabilities_admitted'], self::failedChecks($checks), $refused);
         }

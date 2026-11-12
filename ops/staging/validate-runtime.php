@@ -91,7 +91,7 @@ try {
         }
         $check('runtime.production_credentials', in_array(config('production_checkout.secret_key'), [null, ''], true)
             && in_array(config('production_checkout.funds_mode'), [null, ''], true));
-        // Capability profile (docs/verification/production-ops-kit-20261017, batch K3). The twelve flags and the four stated beside them must
+        // Capability profile (docs/verification/production-ops-kit-20261017, batch K3). The eleven flags and the four stated beside them must
         // be exactly false in the effective configuration: an absent line is fine (every config default is false), but true, "1", blank
         // and "yes" are refused, and so is a config key that no longer exists (null). VASEY_OPERATIVE_FREE_GRANTS_ENABLED and
         // CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED have no environment gate in their policy classes, so here and in the template
@@ -100,9 +100,10 @@ try {
         foreach (array_keys(CapabilityBoundary::stagedFlags()) as $flag) {
             $check('runtime.flag_off_'.strtolower($flag), ! in_array($flag, $notOff, true));
         }
-        // Optional staging capabilities (unpaid release, 2026-11-11): exactly false, or exactly true with the real policy class
-        // accepting this configuration (test-commerce environment, Stripe test mode, `acct_` account, the exact JSON contract).
-        // Any other value, or true with a missing or changed policy, is refused under the flag's own identifier.
+        // Optional staging capabilities (unpaid release, 2026-11-11; the test refund and dispute lifecycle and automatic test
+        // delivery enabling, 2026-11-12): exactly false, or exactly true with the real policy class accepting this configuration (test-commerce environment, Stripe test mode, `acct_`
+        // account, its exact policy) and, for refund and dispute, each of the four policy values equal to its DD-16 choice.
+        // Any other value, or true with a missing, partial or changed policy, is refused under the flag's own identifier.
         $refused = CapabilityBoundary::optionalFlagsRefused(static fn (string $key): mixed => config($key), static function (string $policy): bool {
             try {
                 app($policy)->current();

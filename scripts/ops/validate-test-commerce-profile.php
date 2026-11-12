@@ -15,11 +15,12 @@ declare(strict_types=1);
  * --template replaces each documented placeholder with a synthetic value first, so the committed
  * template can be checked for shape. --probe additionally makes one read-only GET /v1/account with
  * the configured test key, and only after every other check passed.
- * Boundary checks: the profile must state twelve capability flags explicitly as false (scripts/ops/capability-boundary.php), none of them or of the
+ * Boundary checks: the profile must state eleven capability flags explicitly as false (scripts/ops/capability-boundary.php), none of them or of the
  * other out-of-profile families may be enabled in the booted configuration, and no enabled or mounted flag may be true in any
  * production-lane configuration file (Paid252, Tax255, production customer identity, production free grants and the rest).
- * The optional staging capabilities (unpaid release) must be stated explicitly as false or true, and true only with the
- * policy class accepting the booted configuration. The optional Exclusive selection policy may be empty (off) or set; when set
+ * The optional staging capabilities (unpaid release; the test refund and dispute lifecycle; automatic test delivery enabling) must be stated explicitly as false
+ * or true, and true only with the policy class accepting the booted configuration (for refund and dispute, with the four DD-16
+ * policy values exactly), the same rule the staging deploy gate applies. The optional Exclusive selection policy may be empty (off) or set; when set
  * it must pass ExclusiveSelectionPolicy, the same rule the staging deploy gate applies.
  * Exit codes: 0 every check passed, 1 at least one check failed, 2 usage or unreadable file.
  */
@@ -104,7 +105,7 @@ if (! is_file($file) || is_link($file) || ! is_readable($file) || filesize($file
 
 $root = dirname(__DIR__, 2);
 require $root.'/vendor/autoload.php';
-// The twelve capability flags, the optional staging capabilities and the production-lane rule, shared with the staging deploy gate (ops/staging/validate-runtime.php).
+// The eleven capability flags, the optional staging capabilities and the production-lane rule, shared with the staging deploy gate (ops/staging/validate-runtime.php).
 require_once __DIR__.'/capability-boundary.php';
 $raw = (string) file_get_contents($file);
 if ($template) {

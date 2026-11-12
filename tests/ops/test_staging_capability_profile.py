@@ -17,14 +17,13 @@ VALIDATOR = REPO / "scripts/ops/validate-test-commerce-profile.php"
 ENV_CALL = re.compile(r"""env\(\s*['"]([A-Za-z0-9_]+)['"]""")
 ASSIGNMENT = re.compile(r"^(#?)\s*([A-Z][A-Z0-9_]*)=(.*)$")
 
-# Environment key -> (config file, config key). The ten flags of batch K2 plus A5's refund/dispute flag and lane CX's data rights and
-# order-ready email flags, in the validator's CAPABILITY_FLAGS, less unpaid release, which moved to OPTIONAL on 2026-11-11.
+# Environment key -> (config file, config key). The ten flags of batch K2 plus lane CX's data rights and order-ready email flags, in the
+# validator's CAPABILITY_FLAGS, less unpaid release (OPTIONAL since 2026-11-11). A5's refund/dispute flag moved to OPTIONAL on 2026-11-12.
 FLAGS = {
     "VASEY_TEST_SERVICE_PROJECTS_ENABLED": ("services-projects", "test_enabled"),
     "VASEY_TEST_FREE_GRANTS_ENABLED": ("free-grants", "test_enabled"),
     "VASEY_TEST_CUSTOMER_CONSENT_ENABLED": ("customer-preferences", "test_grants_enabled"),
     "VASEY_TEST_REFUND_RESOLUTION_ENABLED": ("refund-resolution", "enabled"),
-    "VASEY_TEST_REFUND_DISPUTE_ENABLED": ("refund-dispute", "enabled"),
     "VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED": ("transactional-notifications", "test_enabled"),
     "VASEY_CUSTOMER_DATA_RIGHTS_ENABLED": ("customer-data-rights", "enabled"),
     "VASEY_TRANSACTIONAL_MAIL_ENABLED": ("transactional-mail", "enabled"),
@@ -39,10 +38,15 @@ FLAGS = {
 # with the policy class accepting the effective configuration.
 OPTIONAL = {
     "VASEY_TEST_UNPAID_RELEASE_ENABLED": ("unpaid-release", "enabled", "App\\Domain\\Commerce\\UnpaidRelease\\UnpaidReleasePolicy"),
+    "VASEY_TEST_REFUND_DISPUTE_ENABLED": ("refund-dispute", "enabled", "App\\Domain\\Commerce\\RefundDispute\\RefundDisputePolicy"),
     # D-19 amendment (2026-11-12, under Sean's delegation): automatic enabling of test delivery for never-controlled ready orders.
     "VASEY_TEST_DELIVERY_AUTO_ENABLED": ("delivery", "test_auto_enable_enabled", "App\\Domain\\Delivery\\TestDeliveryAutoEnablePolicy"),
 }
-# Stated explicitly but outside the twelve: production-lane or one-way, so never left to a default on staging.
+# The exact values an optional flag also requires on staging, beyond its policy class: environment key -> {policy key: value}. Refund
+# and dispute must run the DD-16 choices (RefundDisputePolicy::PRODUCTION_CONFIRMED), read from config/refund-dispute.php.
+REFUND_DISPUTE_DD16 = {"refund_authority": "authoritative_provider_operator_review", "partial_refunds": "exact_line_allocation",
+                       "dispute_access": "temporarily_block_while_reconciling", "exclusive_reopening": "qualified_operator_review"}
+# Stated explicitly but outside the eleven: production-lane or one-way, so never left to a default on staging.
 EXTRA_FALSE = ("DISCOVERY_SITEMAP_ENABLED", "VASEY_LISTENING_V2_PROMOTION_ENABLED", "VASEY_PRODUCTION_REAL_MAIL_ADMITTED",
                "VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED")
 
@@ -176,7 +180,7 @@ class TheTenFlagsAreExplicit(unittest.TestCase):
         text = source("scripts/ops/capability-boundary.php")
         block = re.search(r"const STAGING_OPTIONAL_FLAGS = \[(.*?)\n    \];", text, re.S)
         self.assertIsNotNone(block)
-        found = re.findall(r"'([A-Z0-9_]+)' => \['config' => '([a-z-]+)\.([a-z0-9_]+)',\s*'policy' => \\?([A-Za-z\\]+)::class\]", block.group(1))
+        found = re.findall(r"'([A-Z0-9_]+)' => \['config' => '([a-z-]+)\.([a-z0-9_]+)',\s*'policy' => \\?([A-Za-z\\]+)::class[,\]]", block.group(1))
         uses = dict((name.rsplit("\\", 1)[-1], name) for name in re.findall(r"(?m)^use ([A-Za-z\\]+);$", text))
         self.assertEqual({flag: (config, key, uses.get(policy, policy.lstrip("\\"))) for flag, config, key, policy in found}, OPTIONAL)
         for flag in OPTIONAL:
@@ -187,7 +191,29 @@ class TheTenFlagsAreExplicit(unittest.TestCase):
                           re.search(r"const PRODUCTION_LAUNCH_OFF_FLAGS = \[(.*?)\n    \];", text, re.S).group(1))
             self.assertRegex(source("ops/production/validate-runtime.php"), rf"const LAUNCH_OFF_HOLDS = \[[^\]]*'{flag}',")
         # An optional flag passes only as exactly false, or exactly true with the policy accepting.
-        self.assertRegex(text, r"if \(\$value !== false && \(\$value !== true \|\| \$admits\(\$flag\['policy'\]\) !== true\)\) \{\s*\$refused\[\] = \$environmentKey;")
+        self.assertRegex(text, r"if \(\$value !== false && \(\$value !== true \|\| \$admits\(\$flag\['policy'\]\) !== true"
+                               r" \|\| ! self::valuesMatch\(\$flag\['values'\] \?\? \[\], \$read\)\)\) \{\s*\$refused\[\] = \$environmentKey;")
+        self.assertRegex(text, r"if \(\$read\(\$configKey\) !== \$expected\) \{\s*return false;")
+
+    def test_refund_and_dispute_on_staging_requires_the_dd16_values_pinned_to_the_policy_class(self):
+        text = source("scripts/ops/capability-boundary.php")
+        entry = re.search(r"'VASEY_TEST_REFUND_DISPUTE_ENABLED' => \['config' => 'refund-dispute\.enabled',\s*'policy' => RefundDisputePolicy::class,"
+                          r"\s*'values' => \[(.*?)\]\],", text, re.S)
+        self.assertIsNotNone(entry, "the refund/dispute optional entry must state its exact values")
+        values = re.findall(r"'refund-dispute\.policy\.([a-z_]+)' => '([a-z_]+)',", entry.group(1))
+        self.assertEqual(values, list(REFUND_DISPUTE_DD16.items()))
+        policy = source("app/Domain/Commerce/RefundDispute/RefundDisputePolicy.php")
+        confirmed = re.search(r"public const PRODUCTION_CONFIRMED = \[(.*?)\];", policy, re.S).group(1)
+        self.assertEqual(dict(re.findall(r"'([a-z_]+)' => '([a-z_]+)'", confirmed)), REFUND_DISPUTE_DD16)
+        config = source("config/refund-dispute.php")
+        for key in REFUND_DISPUTE_DD16:
+            self.assertRegex(config, rf"'{key}' => env\('VASEY_TEST_REFUND_DISPUTE_{key.upper()}'\),")
+        # The overlay shows each value once, commented and exact; neither template sets one uncommented.
+        overlay = assignments(OVERLAY)
+        for key, value in REFUND_DISPUTE_DD16.items():
+            name = f"VASEY_TEST_REFUND_DISPUTE_{key.upper()}"
+            self.assertEqual(overlay.get(name), [(True, value)], name)
+            self.assertTrue(all(commented for commented, _ in assignments(BASE).get(name, [])), name)
 
     def test_the_deploy_gate_and_the_profile_validator_admit_an_optional_flag_only_through_its_policy(self):
         admits = (r"static function \(string \$policy\): bool \{\s*try \{\s*app\(\$policy\)->current\(\);\s*return true;"

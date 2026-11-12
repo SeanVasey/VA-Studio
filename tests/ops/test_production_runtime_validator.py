@@ -41,6 +41,13 @@ UNPAID_RELEASE_POLICY = ('\'{"schema_version":1,"purpose":"test_unpaid_resource_
                          '"provider":"stripe","mode":"test","proof":"bound_expired_unpaid_session_and_absent_or_canceled_zero_payment",'
                          '"recovery":"disabled","resources":"pending_to_released","late_confirmation":"paid_exception_preserve_released",'
                          '"provider_writes":"forbidden"}\'')
+# The test refund and dispute lifecycle became optional on the staging rehearsal (2026-11-12); production holds its flag false too.
+REFUND_DISPUTE = "VASEY_TEST_REFUND_DISPUTE_ENABLED"
+REFUND_DISPUTE_KEY = "refund-dispute.enabled"
+REFUND_DISPUTE_DD16 = {"VASEY_TEST_REFUND_DISPUTE_REFUND_AUTHORITY": "authoritative_provider_operator_review",
+                       "VASEY_TEST_REFUND_DISPUTE_PARTIAL_REFUNDS": "exact_line_allocation",
+                       "VASEY_TEST_REFUND_DISPUTE_DISPUTE_ACCESS": "temporarily_block_while_reconciling",
+                       "VASEY_TEST_REFUND_DISPUTE_EXCLUSIVE_REOPENING": "qualified_operator_review"}
 # Automatic test delivery enabling became optional on the staging rehearsal (D-19 amendment, 2026-11-12); production holds it false.
 DELIVERY_AUTO = "VASEY_TEST_DELIVERY_AUTO_ENABLED"
 DELIVERY_AUTO_KEY = "delivery.test_auto_enable_enabled"
@@ -578,7 +585,8 @@ class ProductionRuntimeValidator(unittest.TestCase):
         block = re.search(r"const LAUNCH_OFF_HOLDS = \[(.*?)\n\];", text, re.S)
         self.assertIsNotNone(block, "LAUNCH_OFF_HOLDS constant block not found")
         self.assertNotIn("=>", block.group(1))
-        self.assertEqual(re.findall(r"'([A-Z0-9_]+)',", block.group(1)), [MARKETING_SEGMENT, SERVICE_INVOICING, UNPAID_RELEASE, BEATSTARS_IMPORT, DELIVERY_AUTO])
+        self.assertEqual(re.findall(r"'([A-Z0-9_]+)',", block.group(1)), [MARKETING_SEGMENT, SERVICE_INVOICING, UNPAID_RELEASE, REFUND_DISPUTE,
+                                                                          BEATSTARS_IMPORT, DELIVERY_AUTO])
         self.assertNotIn(f"'{MARKETING_SEGMENT_KEY}'", text, "the config key must come from the boundary, not be restated")
         self.assertRegex(text, r"\$launchOffKeys = array_intersect_key\(CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS, array_flip\(LAUNCH_OFF_HOLDS\)\);"
                                r"\s*if \(count\(\$launchOffKeys\) !== count\(LAUNCH_OFF_HOLDS\)\) \{\s*throw new RuntimeException;")
@@ -586,8 +594,8 @@ class ProductionRuntimeValidator(unittest.TestCase):
         run = subprocess.run([PHP, "-r", script, str(REPO / "scripts/ops/capability-boundary.php")], capture_output=True, text=True, timeout=60)
         self.assertEqual(run.returncode, 0, run.stderr)
         self.assertEqual(json.loads(run.stdout), {MARKETING_SEGMENT: MARKETING_SEGMENT_KEY, SERVICE_INVOICING: SERVICE_INVOICING_KEY,
-                                                 UNPAID_RELEASE: UNPAID_RELEASE_KEY, BEATSTARS_IMPORT: BEATSTARS_IMPORT_KEY,
-                                                 DELIVERY_AUTO: DELIVERY_AUTO_KEY})
+                                                 UNPAID_RELEASE: UNPAID_RELEASE_KEY, REFUND_DISPUTE: REFUND_DISPUTE_KEY,
+                                                 BEATSTARS_IMPORT: BEATSTARS_IMPORT_KEY, DELIVERY_AUTO: DELIVERY_AUTO_KEY})
         # Not a staged flag: the staging gates keep their own list, and this hold is production's.
         script = "require $argv[1]; echo json_encode(array_key_exists($argv[2], Vasey\\Ops\\CapabilityBoundary::stagedFlags()));"
         run = subprocess.run([PHP, "-r", script, str(REPO / "scripts/ops/capability-boundary.php"), MARKETING_SEGMENT],
@@ -681,6 +689,54 @@ class ProductionRuntimeValidator(unittest.TestCase):
     def test_a_boundary_without_the_unpaid_release_hold_fails_closed(self):
         source = (REPO / "scripts/ops/capability-boundary.php").read_text()
         entry = f"        '{UNPAID_RELEASE}' => '{UNPAID_RELEASE_KEY}',\n"
+        self.assertEqual(source.count(entry), 1)
+        _, run = self.shadow_project(boundary=source.replace(entry, ""))
+        result = run()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertEqual(result.stderr.split(), ["FAIL", "runtime.unavailable"], result.stderr)
+
+    def test_the_refund_dispute_flag_is_held_off_in_production_even_with_the_dd16_values(self):
+        # Staging may turn the test refund and dispute lifecycle on (STAGING_OPTIONAL_FLAGS, 2026-11-12); production refuses it in
+        # every spelling but false, and the exact DD-16 values that admit it on staging do not change that.
+        self.assertNotIn(REFUND_DISPUTE, profile())
+        for value in ("false", "(false)", "FALSE"):
+            with self.subTest(value=value):
+                self.assertEqual(self.validate(profile() + f"{REFUND_DISPUTE}={value}\n").returncode, 0)
+        for value in ("true", "1", "yes", "", "(true)", "TRUE", '"true"', "on", "0", "null"):
+            with self.subTest(value=value):
+                run = self.validate(profile() + f"{REFUND_DISPUTE}={value}\n")
+                self.failed(run, "holds.vasey_test_refund_dispute_enabled")
+                self.assertEqual({line for line in run.stderr.splitlines() if line.startswith("FAIL ")},
+                                 {"FAIL holds.vasey_test_refund_dispute_enabled"}, run.stderr)
+        values = "".join(f"{key}={value}\n" for key, value in REFUND_DISPUTE_DD16.items())
+        run = self.validate(profile() + f"{REFUND_DISPUTE}=true\n" + values)
+        self.failed(run, "holds.vasey_test_refund_dispute_enabled")
+        self.assertNotIn("PASS", run.stdout)
+        # The effective configuration is checked too, not only the file line.
+        run = self.validate(profile(**{"PATH": "false", REFUND_DISPUTE: "${PATH}"}))
+        self.assertEqual(run.returncode, 1, run.stdout + run.stderr)
+        self.assertEqual(run.stderr.split(), ["FAIL", "holds.vasey_test_refund_dispute_enabled"], run.stderr)
+        # Optional on staging: not a staged flag, but listed as optional there with the DD-16 values.
+        script = ("require $argv[1]; $flag = Vasey\\Ops\\CapabilityBoundary::STAGING_OPTIONAL_FLAGS[$argv[2]] ?? []; "
+                  "echo json_encode([array_key_exists($argv[2], Vasey\\Ops\\CapabilityBoundary::stagedFlags()), $flag['config'] ?? null, "
+                  "array_values($flag['values'] ?? [])]);")
+        run = subprocess.run([PHP, "-r", script, str(REPO / "scripts/ops/capability-boundary.php"), REFUND_DISPUTE],
+                             capture_output=True, text=True, timeout=60)
+        self.assertEqual(json.loads(run.stdout), [False, REFUND_DISPUTE_KEY, list(REFUND_DISPUTE_DD16.values())], run.stderr)
+        self.assertRegex((REPO / "config/refund-dispute.php").read_text(), r"'enabled'\s*=>\s*env\('" + REFUND_DISPUTE + r"',\s*false\)")
+        template = (REPO / "ops/production/env.production.example").read_text()
+        self.assertRegex(template, rf"(?m)^{REFUND_DISPUTE}=false$")
+        for key in REFUND_DISPUTE_DD16:
+            self.assertNotRegex(template, rf"(?m)^{key}=", key)
+        # And the application refuses production in code whatever the flag says: the test chain through TestEnvironment, the
+        # production tax chain through its literal local/testing admission.
+        policy = (REPO / "app/Domain/Commerce/RefundDispute/RefundDisputePolicy.php").read_text()
+        self.assertRegex(policy, r"RefundDisputeException::require\(TestEnvironment::admitsTestCommerce\(\) && config\('payments\.stripe\.mode'\) === 'test'")
+        self.assertRegex(policy, r"config\('refund-dispute\.enabled'\) === true && in_array\(app\(\)->environment\(\), \['local', 'testing'\], true\)")
+
+    def test_a_boundary_without_the_refund_dispute_hold_fails_closed(self):
+        source = (REPO / "scripts/ops/capability-boundary.php").read_text()
+        entry = f"        '{REFUND_DISPUTE}' => '{REFUND_DISPUTE_KEY}',\n"
         self.assertEqual(source.count(entry), 1)
         _, run = self.shadow_project(boundary=source.replace(entry, ""))
         result = run()

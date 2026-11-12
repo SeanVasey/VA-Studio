@@ -12,12 +12,8 @@ The feature is off unless `VASEY_TEST_UNPAID_RELEASE_ENABLED=true` and `VASEY_TE
 
 **Known limits.** Each is enforced in `ReleaseTestOrderResources::release()` and checked against the code on 2026-11-11.
 
-<<<<<<< HEAD
 - An order that was prepared but never sent to Stripe (no checkout intent at all) is released by a separate, local proof (below, since 2026-11-11). Before that it was not even listed, and its reservation stayed `pending` with no expiry: `pending` never expires in `ReserveQuoteInventory`, `InventoryPolicy` and the exclusive selection policy both say `retain_until_verified_resolution`, and no scheduled job touches reservations.
 - It cannot release an order whose checkout started but has no recorded Checkout Session (the create request failed, timed out or crashed before the session was recorded). The result is `unavailable`: the provider may hold a session for it, and nothing local can show otherwise. If the session exists at Stripe, `php artisan vasey:reconcile-test-checkout <intent> --session=cs_test_…` binds it (`HostedCheckout::recover`), after which the provider proof applies. If Stripe has no session for it, the order stays held (owner decision pending).
-=======
-- It cannot release an order that was prepared but never sent to Stripe. With no recorded Checkout Session the result is `unavailable`, because there is nothing to prove unpaid. Such an order keeps its reservation. A separate staff release for that case (PR #341) is open and not merged or deployed as of 2026-11-12.
->>>>>>> origin/main
 - It cannot release a late-paid order. Any recorded verified payment or finalization, including a paid exception, gives `payment_recorded` and the reservation is left as it is.
 - A held order blocks the whole rights scope of its track, which means every linked tier of that track, not only the offer in the cart (inventory claims are per rights scope, `ReserveQuoteInventory`). Releasing the one order frees them all.
 

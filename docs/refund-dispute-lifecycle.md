@@ -21,6 +21,8 @@ Lane A5 (T19/T21, parity rows FP-040 and FP-068) built a refund and dispute stat
 | `exclusive_reopening` | `remain_sold` | A refunded or lost exclusive line records that the sale is retained. Reopening decisions refuse. |
 | | `qualified_operator_review` | Staff may record a reopening decision only when the exclusive line is fully refunded or the dispute lost, no dispute is open, and the grant's downloads are held. The decision lists every other grant on the same rights scope as retained. The exclusive sale stays recorded and catalog availability is not changed; that is owner decision U-08. |
 
+**Staging (2026-11-12).** Optional and default-off on the hosted staging rehearsal (`CapabilityBoundary::STAGING_OPTIONAL_FLAGS`): the staging deploy gate and the profile validator accept the flag as `false`, or as `true` only when this policy accepts the configuration and each of the four values equals its DD-16 choice (`PRODUCTION_CONFIRMED`). Production holds the flag false (`holds.vasey_test_refund_dispute_enabled`). Operator steps: [Rehearsing a refund on staging](ops/exclusive-rehearsal.md#5-rehearsing-a-refund-on-staging).
+
 The proposed refund terms in `docs/legal/TERMS.md` section 10 are not approved and are not encoded. No supported value authorizes license revocation or inventory restock.
 
 ## State machine

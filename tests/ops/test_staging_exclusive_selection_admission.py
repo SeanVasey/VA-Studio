@@ -98,8 +98,8 @@ class ExclusiveSelectionIsOptionalOnStaging(unittest.TestCase):
                 self.refused(self.validate(candidate(**{KEY: raw})), REFUSAL)
 
     def test_the_held_flags_are_still_refused_beside_it(self):
-        run = self.validate(candidate(**{KEY: policy(), "VASEY_TEST_REFUND_DISPUTE_ENABLED": "true"}))
-        self.refused(run, "runtime.flag_off_vasey_test_refund_dispute_enabled")
+        run = self.validate(candidate(**{KEY: policy(), "VASEY_TEST_REFUND_RESOLUTION_ENABLED": "true"}))
+        self.refused(run, "runtime.flag_off_vasey_test_refund_resolution_enabled")
 
 
 if __name__ == "__main__":
