@@ -193,6 +193,7 @@ PHP_TARGETS = {
     "proof-frame-baseline": ("tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php",),
     "reservation-race-baseline": ("tests/Feature/ProductionMembershipBilling/MembershipNativeReservationRaceTest.php",),
     "glyph-drift": ("tests/Unit/ZzGlyphDriftTest.php",),
+    "member-grant-baseline": ("tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php",),
     # The native race alone: the whole test-delivery suite does not fit the 900-second runner cap on MySQL.
     "test-delivery-races": (
         "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
