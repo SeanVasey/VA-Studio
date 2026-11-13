@@ -21,23 +21,35 @@ trait FinalizationDatabaseMigrations
         $connection = $this->requireFixtureDatabase($options['--database'] ?? null);
         $name = $connection->getName();
         $options['--database'] = $name;
-        $result = $this->artisan('migrate:fresh', $options);
-        $status = $result instanceof PendingCommand ? $result->run() : $result;
-        $this->app[Kernel::class]->setArtisan(null);
-        if ($status !== 0) {
-            throw new LogicException('Disposable finalization fixture setup failed.');
+        // MySQL: reuse this process's migrated schema when it is unchanged (MysqlSchemaSnapshot); otherwise migrate fresh.
+        $reuse = MysqlSchemaSnapshot::enabled($connection);
+        if (! $reuse || ! MysqlSchemaSnapshot::restore($connection)) {
+            $result = $this->artisan('migrate:fresh', $options);
+            $status = $result instanceof PendingCommand ? $result->run() : $result;
+            $this->app[Kernel::class]->setArtisan(null);
+            if ($status !== 0) {
+                MysqlSchemaSnapshot::forget();
+                throw new LogicException('Disposable finalization fixture setup failed.');
+            }
+            if ($reuse) {
+                MysqlSchemaSnapshot::capture($this->requireFixtureDatabase($name));
+            }
         }
         $this->afterRefreshingDatabase();
 
         $cleanup = array_intersect_key($options, array_flip(['--database', '--drop-views', '--drop-types']));
         $identity = array_intersect_key($connection->getConfig(), array_flip(['driver', 'database', 'host', 'port', 'unix_socket', 'url']));
-        $this->beforeApplicationDestroyed(function () use ($name, $cleanup, $identity) {
+        $this->beforeApplicationDestroyed(function () use ($name, $cleanup, $identity, $reuse) {
             // Drop disposable fixtures without rebuilding a schema that the next setup rebuilds.
             // Never call the guarded operational down(), and retain the setup's connection/options.
             try {
                 $current = $this->requireFixtureDatabase($name);
                 if (array_intersect_key($current->getConfig(), array_flip(array_keys($identity))) !== $identity) {
                     throw new LogicException('Disposable test database admission refused.');
+                }
+                if ($reuse) {
+                    // The next test resets this schema's data, or migrates fresh when the schema changed.
+                    return;
                 }
                 $result = $this->artisan('db:wipe', $cleanup);
                 $status = $result instanceof PendingCommand ? $result->run() : $result;

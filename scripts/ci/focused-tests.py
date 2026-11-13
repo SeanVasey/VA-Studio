@@ -189,6 +189,12 @@ PHP_TARGETS = {
         "tests/Feature/MigrationRecompilationTest.php", "tests/Feature/TestDeliveryResumeMigrationTest.php",
         "tests/Feature/SiteImageMigrationTest.php",
     ),
+    # The per-process MySQL schema reuse and the MySQL-only fixes of Foundation run 43304362814 (2026-11-13).
+    "mysql-schema-snapshot": (
+        "tests/Feature/MysqlSchemaSnapshotTest.php", "tests/Feature/OrderPreparationMigrationTest.php",
+        "tests/Feature/CustomerComms/TransactionalMailRecoveryNativeTest.php",
+        "tests/Feature/ProductionIdentity/CurrentCatalogAdmissionTest.php",
+    ),
     # The native race alone: the whole test-delivery suite does not fit the 900-second runner cap on MySQL.
     "test-delivery-races": (
         "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
