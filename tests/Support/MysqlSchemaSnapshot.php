@@ -32,10 +32,10 @@ final class MysqlSchemaSnapshot
     }
 
     /** Resets the database to the recorded post-migration state; false (and the baseline forgotten) when it cannot. */
-    public static function restore(Connection $connection): bool
+    public static function restore(Connection $connection, array $options = []): bool
     {
-        if (self::$baseline === null || ! self::enabled($connection) || self::$baseline['identity'] !== self::identity($connection)) {
-            self::note(self::$baseline === null ? 'no baseline yet' : 'connection identity or opt-out changed');
+        if (self::$baseline === null || ! self::enabled($connection) || self::$baseline['identity'] !== self::identity($connection, $options)) {
+            self::note(self::$baseline === null ? 'no baseline yet' : 'connection, migrate options or opt-out changed');
             self::$baseline = null;
 
             return false;
@@ -43,6 +43,8 @@ final class MysqlSchemaSnapshot
         $started = microtime(true);
         $pdo = $connection->getPdo();
         try {
+            // A transaction or lock another connection still holds must refuse the reset, not hang it.
+            $pdo->exec('SET SESSION lock_wait_timeout = 20');
             $sections = self::sections($pdo);
             if (! hash_equals(self::$baseline['fingerprint'], self::digest($sections))) {
                 $changed = array_keys(array_diff_assoc(self::$baseline['sections'], $sections));
@@ -92,7 +94,7 @@ final class MysqlSchemaSnapshot
     }
 
     /** Records the state a successful migrate:fresh left behind. */
-    public static function capture(Connection $connection): void
+    public static function capture(Connection $connection, array $options = []): void
     {
         self::$baseline = null;
         if (! self::enabled($connection)) {
@@ -103,7 +105,8 @@ final class MysqlSchemaSnapshot
         $tables = self::baseTables($pdo);
         $generated = [];
         foreach ($pdo->query('SELECT TABLE_NAME, COLUMN_NAME, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME, ORDINAL_POSITION')->fetchAll(PDO::FETCH_NUM) as [$table, $column, $extra]) {
-            $generated[$table][$column] = stripos((string) $extra, 'GENERATED') !== false;
+            // VIRTUAL/STORED GENERATED columns cannot be written; DEFAULT_GENERATED (useCurrent, DEFAULT (expr)) columns can.
+            $generated[$table][$column] = preg_match('/\b(?:VIRTUAL|STORED) GENERATED\b/i', (string) $extra) === 1;
         }
         $rows = [];
         foreach (array_keys(self::occupied($pdo, $tables)) as $table) {
@@ -113,7 +116,7 @@ final class MysqlSchemaSnapshot
             $rows[$table] = ['columns' => $columns, 'rows' => $pdo->query("SELECT {$list} FROM ".self::quote($table).$order)->fetchAll(PDO::FETCH_NUM)];
         }
         $sections = self::sections($pdo);
-        self::$baseline = ['identity' => self::identity($connection), 'fingerprint' => self::digest($sections), 'sections' => $sections,
+        self::$baseline = ['identity' => self::identity($connection, $options), 'fingerprint' => self::digest($sections), 'sections' => $sections,
             'rows' => $rows, 'increments' => self::increments($pdo)];
         self::note(sprintf('captured: %d tables, %d with migration rows', count($tables), count($rows)));
     }
@@ -123,9 +126,16 @@ final class MysqlSchemaSnapshot
         self::$baseline = null;
     }
 
-    private static function identity(Connection $connection): string
+    /**
+     * The connection and the exact migrate:fresh options: a class that migrates a subset (--path, --realpath) or seeds must
+     * never reuse a schema built with other options, nor leave one for tests that expect the full migration.
+     */
+    private static function identity(Connection $connection, array $options): string
     {
-        return json_encode(array_intersect_key($connection->getConfig(), array_flip(['driver', 'host', 'port', 'database', 'unix_socket', 'prefix'])), JSON_THROW_ON_ERROR);
+        ksort($options);
+
+        return json_encode([array_intersect_key($connection->getConfig(), array_flip(['driver', 'host', 'port', 'database', 'unix_socket', 'prefix'])),
+            $options], JSON_THROW_ON_ERROR);
     }
 
     /** Every schema object the migrations own, canonically ordered; counters and statistics excluded. */

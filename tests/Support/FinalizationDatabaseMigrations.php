@@ -23,7 +23,7 @@ trait FinalizationDatabaseMigrations
         $options['--database'] = $name;
         // MySQL: reuse this process's migrated schema when it is unchanged (MysqlSchemaSnapshot); otherwise migrate fresh.
         $reuse = MysqlSchemaSnapshot::enabled($connection);
-        if (! $reuse || ! MysqlSchemaSnapshot::restore($connection)) {
+        if (! $reuse || ! MysqlSchemaSnapshot::restore($connection, $options)) {
             $result = $this->artisan('migrate:fresh', $options);
             $status = $result instanceof PendingCommand ? $result->run() : $result;
             $this->app[Kernel::class]->setArtisan(null);
@@ -32,7 +32,7 @@ trait FinalizationDatabaseMigrations
                 throw new LogicException('Disposable finalization fixture setup failed.');
             }
             if ($reuse) {
-                MysqlSchemaSnapshot::capture($this->requireFixtureDatabase($name));
+                MysqlSchemaSnapshot::capture($this->requireFixtureDatabase($name), $options);
             }
         }
         $this->afterRefreshingDatabase();
@@ -48,7 +48,13 @@ trait FinalizationDatabaseMigrations
                     throw new LogicException('Disposable test database admission refused.');
                 }
                 if ($reuse) {
-                    // The next test resets this schema's data, or migrates fresh when the schema changed.
+                    // The next test resets this schema's data, or migrates fresh when the schema changed. db:wipe used to
+                    // commit a transaction a failed test left open (DDL); end it here so it cannot hold locks a reset waits on.
+                    if ($current->getPdo()->inTransaction()) {
+                        $current->getPdo()->rollBack();
+                    }
+                    $current->disconnect();
+
                     return;
                 }
                 $result = $this->artisan('db:wipe', $cleanup);

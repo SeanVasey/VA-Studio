@@ -1477,6 +1477,10 @@
     [
       "Tests\\Feature\\MysqlSchemaSnapshotTest",
       "test_the_opt_out_disables_reuse"
+    ],
+    [
+      "Tests\\Feature\\MysqlSchemaSnapshotTest",
+      "test_a_schema_built_with_other_migrate_options_is_never_reused"
     ]
   ]
 }

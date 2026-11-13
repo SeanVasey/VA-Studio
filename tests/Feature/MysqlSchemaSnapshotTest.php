@@ -38,7 +38,7 @@ class MysqlSchemaSnapshotTest extends TestCase
         DB::table('migrations')->where('id', $migrations[0]['id'])->update(['batch' => 999]);
         $this->assertGreaterThan($jobsIncrement, $this->nextIncrement('jobs'));
 
-        $this->assertTrue(MysqlSchemaSnapshot::restore(DB::connection()));
+        $this->assertTrue(MysqlSchemaSnapshot::restore(DB::connection(), $this->setupOptions()));
 
         $this->assertSame(0, DB::table('cache')->count());
         $this->assertSame(0, DB::table('jobs')->count());
@@ -50,9 +50,16 @@ class MysqlSchemaSnapshotTest extends TestCase
     {
         Schema::create('zz_snapshot_probe', fn ($table) => $table->id());
 
-        $this->assertFalse(MysqlSchemaSnapshot::restore(DB::connection()));
+        $this->assertFalse(MysqlSchemaSnapshot::restore(DB::connection(), $this->setupOptions()));
         // The baseline is forgotten, so the next test's setup migrates fresh (which also drops this table).
-        $this->assertFalse(MysqlSchemaSnapshot::restore(DB::connection()));
+        $this->assertFalse(MysqlSchemaSnapshot::restore(DB::connection(), $this->setupOptions()));
+    }
+
+    public function test_a_schema_built_with_other_migrate_options_is_never_reused(): void
+    {
+        // A class migrating a subset (--path/--realpath, as the legacy billing upgrade tests do) must migrate fresh.
+        $this->assertFalse(MysqlSchemaSnapshot::restore(DB::connection(), $this->setupOptions() + [
+            '--path' => [database_path('migrations/0001_01_01_000000_create_users_table.php')], '--realpath' => true]));
     }
 
     public function test_the_opt_out_disables_reuse(): void
@@ -60,11 +67,20 @@ class MysqlSchemaSnapshotTest extends TestCase
         putenv('VA_TEST_MIGRATE_EACH_TEST=1');
         try {
             $this->assertFalse(MysqlSchemaSnapshot::enabled(DB::connection()));
-            $this->assertFalse(MysqlSchemaSnapshot::restore(DB::connection()));
+            $this->assertFalse(MysqlSchemaSnapshot::restore(DB::connection(), $this->setupOptions()));
         } finally {
             putenv('VA_TEST_MIGRATE_EACH_TEST');
         }
         $this->assertTrue(MysqlSchemaSnapshot::enabled(DB::connection()));
+    }
+
+    /** The options FinalizationDatabaseMigrations migrated with, so only the property under test differs. */
+    private function setupOptions(): array
+    {
+        $options = $this->migrateFreshUsing();
+        $options['--database'] = DB::connection()->getName();
+
+        return $options;
     }
 
     private function nextIncrement(string $table): int
