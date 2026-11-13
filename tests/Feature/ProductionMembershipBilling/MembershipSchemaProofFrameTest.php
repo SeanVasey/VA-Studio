@@ -227,6 +227,18 @@ class MembershipSchemaProofFrameTest extends TestCase
                 $second->exec('PRAGMA foreign_keys=OFF');
             } else {
                 $second->exec('SET SESSION foreign_key_checks=0');
+                // MySQL: the current-catalog admission compares the companion's session with this one, foreign_key_checks
+                // included, so a frame on a session with foreign keys off is refused before any proof can be used at all.
+                try {
+                    $this->ownedFrame();
+                    $this->fail('A frame on a session with foreign keys off was admitted.');
+                } catch (LogicException $refused) {
+                    $this->assertSame('Current private catalog admission required.', $refused->getMessage());
+                } finally {
+                    DB::rollBack();
+                }
+
+                return;
             }
             $secondFrame = $this->ownedFrame();
             try {

@@ -82,6 +82,11 @@ final class MysqlSchemaSnapshot
                 }
             }
 
+            // Leave the session exactly as a fresh migration would: the bounded wait above was for the reset only.
+            $pdo->exec('SET SESSION lock_wait_timeout = DEFAULT');
+            // migrate:fresh leaves the connection's schema grammar initialised (getSchemaBuilder()); code that builds a
+            // Blueprint directly, as several migrations' own helpers do, depends on it (Foundation 43347699757, shard 15).
+            $connection->getSchemaBuilder();
             self::note(sprintf('reused the migrated schema in %.2f s (%d tables reset)', microtime(true) - $started, count($reset)));
 
             return true;

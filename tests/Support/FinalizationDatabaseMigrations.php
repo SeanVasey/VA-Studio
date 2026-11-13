@@ -5,6 +5,7 @@ namespace Tests\Support;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\PendingCommand;
 use LogicException;
 
@@ -23,7 +24,11 @@ trait FinalizationDatabaseMigrations
         $options['--database'] = $name;
         // MySQL: reuse this process's migrated schema when it is unchanged (MysqlSchemaSnapshot); otherwise migrate fresh.
         $reuse = MysqlSchemaSnapshot::enabled($connection);
-        if (! $reuse || ! MysqlSchemaSnapshot::restore($connection, $options)) {
+        if ($reuse && MysqlSchemaSnapshot::restore($connection, $options)) {
+            // Leave the application as migrate:fresh does: its migrations resolve the DB facade, which some admission
+            // checks require (RetrievalPolicy::admitFacade; Foundation 43347699757, FinancialReadPlanTest).
+            DB::getFacadeRoot();
+        } else {
             $result = $this->artisan('migrate:fresh', $options);
             $status = $result instanceof PendingCommand ? $result->run() : $result;
             $this->app[Kernel::class]->setArtisan(null);

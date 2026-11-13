@@ -52,18 +52,22 @@ class TestFulfillmentActivationMigrationTest extends TestCase
         $before = ContractFixtures::retained();
         $migration = require database_path('migrations/2026_09_26_000022_test_fulfillment_activation.php');
         $delivery = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
+        // The empty v2 resume child (Nov 9) references test_delivery_redemptions; MySQL refuses to drop that table under it.
+        $deliveryResume = require database_path('migrations/2026_11_09_270300_test_delivery_resume_v2.php');
         $notices = require database_path('migrations/2026_10_06_231000_test_transactional_notifications.php');
         $this->assertDatabaseCount('transactional_notices', 0);
         $this->assertDatabaseCount('transactional_notice_attempts', 0);
         // The empty lane CX mail-delivery child names transactional_notices in its insert guard; dispose of it first.
         TransactionalMailFixtures::dropEmptyDeliveries();
         $notices->down();
+        $deliveryResume->down();
         $delivery->down();
         $migration->down();
         $this->assertFalse(Schema::hasTable('test_fulfillment_activations'));
         $this->assertSame($before, ContractFixtures::retained());
         $migration->up();
         $delivery->up();
+        $deliveryResume->up();
         $this->assertDatabaseCount('test_fulfillment_activations', 0);
         $notices->up();
         TransactionalMailFixtures::restoreDeliveries();

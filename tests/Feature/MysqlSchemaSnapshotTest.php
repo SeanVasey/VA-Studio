@@ -38,7 +38,12 @@ class MysqlSchemaSnapshotTest extends TestCase
         DB::table('migrations')->where('id', $migrations[0]['id'])->update(['batch' => 999]);
         $this->assertGreaterThan($jobsIncrement, $this->nextIncrement('jobs'));
 
-        $this->assertTrue(MysqlSchemaSnapshot::restore(DB::connection(), $this->setupOptions()));
+        // A fresh connection object, as the next test's application has: its schema grammar is not initialised yet.
+        $options = $this->setupOptions();
+        DB::purge(DB::connection()->getName());
+        $this->assertNull(DB::connection()->getSchemaGrammar());
+        $this->assertTrue(MysqlSchemaSnapshot::restore(DB::connection(), $options));
+        $this->assertNotNull(DB::connection()->getSchemaGrammar(), 'as after migrate:fresh, a Blueprint can be built directly');
 
         $this->assertSame(0, DB::table('cache')->count());
         $this->assertSame(0, DB::table('jobs')->count());

@@ -147,14 +147,14 @@ backend-mysql:
 
 backend-sqlite:
   extends: .database
-  # Same 2-shard partition as GitHub, where the busiest shard measured 80 minutes (Foundation 38037183233)
-  # and the regenerated timings balance both at about 61; 100 minutes stays under GitLab.com's hosted 3-hour cap.
+  # Same 6-shard partition as GitHub (2026-11-13: two shards reached only 60-69% in 100 minutes, Foundation
+  # 43347699757); 100 minutes stays under GitLab.com's hosted 3-hour cap.
   timeout: 100m
   parallel:
     matrix:
-      - SHARD: ['1', '2']
+      - SHARD: ['1', '2', '3', '4', '5', '6']
   variables:
-    SHARD_COUNT: '2'
+    SHARD_COUNT: '6'
     DB_CONNECTION: sqlite
     DB_DATABASE: ':memory:'
     DB_URL: ''

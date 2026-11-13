@@ -195,6 +195,19 @@ PHP_TARGETS = {
         "tests/Feature/CustomerComms/TransactionalMailRecoveryNativeTest.php",
         "tests/Feature/ProductionIdentity/CurrentCatalogAdmissionTest.php",
     ),
+    # The test fixes from Foundation run 43347699757 (2026-11-13): fixtures that roll back early migrations under later
+    # children (MySQL refuses to drop a referenced parent), fixture order and MySQL-specific injected errors.
+    "foundation-20261113-fixes": (
+        "tests/Feature/SoundKitMigrationTest.php", "tests/Feature/OrderPreparationMigrationTest.php",
+        "tests/Feature/CustomerInquiryMigrationTest.php", "tests/Feature/SharedInventoryMigrationTest.php",
+        "tests/Feature/QuotePricingMigrationTest.php", "tests/Feature/HostedCheckoutMigrationTest.php",
+        "tests/Feature/TestPaymentEvidenceMigrationTest.php", "tests/Feature/PromotionMigrationTest.php",
+        "tests/Feature/ProductionFinancialRetrieval/FinancialReadPlanTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php",
+        "tests/Feature/BulkReplaceLicenseDraftSourceConcurrencyTest.php", "tests/Feature/CustomerComms/CustomerDataRightsTest.php",
+        "tests/Feature/TestContractIssuanceMigrationTest.php", "tests/Feature/TestFulfillmentActivationMigrationTest.php",
+        "tests/Feature/InquiryMessageMigrationTest.php",
+    ),
     # The native race alone: the whole test-delivery suite does not fit the 900-second runner cap on MySQL.
     "test-delivery-races": (
         "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
