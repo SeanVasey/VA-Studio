@@ -7,6 +7,7 @@ use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Testing\Fakes\MailFake;
+use Tests\Support\DisposableNativeDatabase;
 
 ini_set('display_errors', '0');
 ini_set('log_errors', '0');
@@ -18,8 +19,7 @@ try {
     $input = json_decode(stream_get_contents(STDIN), true, 64, JSON_THROW_ON_ERROR);
     $directory = $input['directory'];
     $database = DB::getDatabaseName();
-    $declared = getenv('VA_LOCAL_DISPOSABLE_MYSQL') === $database
-        || (getenv('CI') === 'true' && getenv('VA_CI_DISPOSABLE_MYSQL') === $database);
+    $declared = DisposableNativeDatabase::isAdmitted((string) getenv('VA_LOCAL_DISPOSABLE_MYSQL'), $database);
     if (! $app->environment('testing') || DB::getDriverName() !== 'mysql' || $database !== getenv('DB_DATABASE')
         || ! $declared || ! in_array($input['mode'], ['reserve', 'deliver'], true)
         || ! is_string($directory) || ! str_starts_with($directory, storage_path('framework/testing/cx-mail-native-'))
