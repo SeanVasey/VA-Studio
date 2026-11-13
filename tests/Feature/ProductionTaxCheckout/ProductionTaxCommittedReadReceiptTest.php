@@ -219,7 +219,9 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
         $callbacks = 0;
         $pdo = DB::getPdo();
         $delegate = DB::connection()->getEventDispatcher();
-        $deadline = hrtime(true) + ($kind === 'expiry' ? 500_000_000 : 60_000_000_000);
+        // The expiring budget must outlast the locked read and receipt, then lapse inside the committing listener. Half a second
+        // does that on SQLite; MySQL's read admits its catalog over a companion connection first and spent it before the receipt.
+        $deadline = hrtime(true) + ($kind === 'expiry' ? (DB::getDriverName() === 'mysql' ? 10_000_000_000 : 500_000_000) : 60_000_000_000);
         try {
             DB::transaction(function () use ($f, $locator, $pdo, $delegate, $deadline, $kind, &$source, &$callbacks): void {
                 $reader = $this->reader();
@@ -977,12 +979,19 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
             try {
                 $source = $this->source($f, $locator, $reader);
                 $source->committedReadReceipt($reader, hrtime(true) + 60_000_000_000);
-            } catch (CheckoutException $failure) {
+            } catch (CheckoutException|IdentityException $failure) {
                 $error = $failure;
             }
             $this->assertSame(0, $peer->calls, 'Original identity witness invoked callback-capable peer metadata.');
-            $this->assertInstanceOf(CheckoutException::class, $error);
-            $this->assertSame('committed_read_frame', $error->reason);
+            if (DB::getDriverName() === 'mysql') {
+                // MySQL's catalog admission admits only the framework's own connection classes
+                // (IdentityMetadataAdmission::inspect), so the peer is refused at the locked read, before any receipt.
+                $this->assertInstanceOf(IdentityException::class, $error);
+                $this->assertNull($source);
+            } else {
+                $this->assertInstanceOf(CheckoutException::class, $error);
+                $this->assertSame('committed_read_frame', $error->reason);
+            }
         } finally {
             $source?->abortOwnedFrame();
             $property->setValue($manager, $original);
