@@ -74,7 +74,9 @@ class IsolatedContractRendererAcceptanceTest extends TestCase
             $this->assertStringContainsString('FIRST TERMS SENTINEL', $text);
             $this->assertStringContainsString('FINAL TERMS SENTINEL', $text);
         } finally {
-            if (is_file($path)) { unlink($path); }
+            if (is_file($path)) {
+                unlink($path);
+            }
         }
     }
 }
