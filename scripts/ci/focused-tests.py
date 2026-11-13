@@ -206,7 +206,9 @@ PHP_TARGETS = {
         "tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php",
         "tests/Feature/BulkReplaceLicenseDraftSourceConcurrencyTest.php", "tests/Feature/CustomerComms/CustomerDataRightsTest.php",
         "tests/Feature/TestContractIssuanceMigrationTest.php", "tests/Feature/TestFulfillmentActivationMigrationTest.php",
-        "tests/Feature/InquiryMessageMigrationTest.php",
+        "tests/Feature/InquiryMessageMigrationTest.php", "tests/Feature/SiteImageMigrationTest.php",
+        "tests/Feature/MediaLifecycle/MediaReferenceRegistryTest.php", "tests/Feature/TrackSchedulingConcurrencyTest.php",
+        "tests/Feature/CollaboratorSplitsTest.php",
     ),
     # The native race alone: the whole test-delivery suite does not fit the 900-second runner cap on MySQL.
     "test-delivery-races": (
