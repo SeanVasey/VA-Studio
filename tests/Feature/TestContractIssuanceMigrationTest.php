@@ -20,6 +20,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\FinalizationFixtures as F;
 use Tests\Support\PaymentFixtures;
+use Tests\Support\TransactionalMailFixtures;
 use Tests\TestCase;
 
 /** Synthetic manifests test schema invariants; domain tests separately execute the renderer/storage. */
@@ -32,7 +33,9 @@ class TestContractIssuanceMigrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->fakePrivateMediaStorage(); $this->travelTo(now()->startOfSecond()); F::configure();
+        $this->fakePrivateMediaStorage();
+        $this->travelTo(now()->startOfSecond());
+        F::configure();
         $this->contractSchemaGateway = PaymentFixtures::gateway();
         $this->app->instance(StripeCheckoutGateway::class, $this->contractSchemaGateway);
         $this->app->instance(StripePaymentGateway::class, $this->contractSchemaGateway);
@@ -49,15 +52,23 @@ class TestContractIssuanceMigrationTest extends TestCase
         $this->assertDatabaseCount('transactional_notices', 0);
         $this->assertDatabaseCount('transactional_notice_attempts', 0);
         // The empty lane CX mail-delivery child names transactional_notices in its insert guard; dispose of it first.
-        \Tests\Support\TransactionalMailFixtures::dropEmptyDeliveries();
+        TransactionalMailFixtures::dropEmptyDeliveries();
         $notices->down();
-        $delivery->down(); $fulfillmentActivations->down(); $migration->down();
-        foreach ($this->contractSchemaTables() as $table) { $this->assertFalse(Schema::hasTable($table)); }
+        $delivery->down();
+        $fulfillmentActivations->down();
+        $migration->down();
+        foreach ($this->contractSchemaTables() as $table) {
+            $this->assertFalse(Schema::hasTable($table));
+        }
         $this->assertSame($retained, F::retained());
-        $migration->up(); $fulfillmentActivations->up(); $delivery->up();
+        $migration->up();
+        $fulfillmentActivations->up();
+        $delivery->up();
         $notices->up();
-        \Tests\Support\TransactionalMailFixtures::restoreDeliveries();
-        foreach ($this->contractSchemaTables() as $table) { $this->assertDatabaseCount($table, 0); }
+        TransactionalMailFixtures::restoreDeliveries();
+        foreach ($this->contractSchemaTables() as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
         $this->assertSame($retained, F::retained());
         $this->assertSame('pending', DB::table('pending_entitlements')->sole()->state);
         $this->assertSame('pending', DB::table('fulfillment_outbox')->sole()->state);
@@ -69,9 +80,15 @@ class TestContractIssuanceMigrationTest extends TestCase
         $request = ContractRenderRequest::create($this->contractSchemaRequestAttributes($grant));
         $before = $request->refresh()->getAttributes();
         $migration = require database_path('migrations/2026_09_26_000021_test_contract_issuance.php');
-        try { $migration->down(); $this->fail('Rollback erased an initiated original-document request.'); }
-        catch (LogicException $error) { $this->assertStringContainsString('retained', $error->getMessage()); }
-        foreach ($this->contractSchemaTables() as $table) { $this->assertTrue(Schema::hasTable($table)); }
+        try {
+            $migration->down();
+            $this->fail('Rollback erased an initiated original-document request.');
+        } catch (LogicException $error) {
+            $this->assertStringContainsString('retained', $error->getMessage());
+        }
+        foreach ($this->contractSchemaTables() as $table) {
+            $this->assertTrue(Schema::hasTable($table));
+        }
         $this->assertSame($before, $request->fresh()->getAttributes());
         $this->contractSchemaRejected(fn () => DB::table('contract_render_requests')->where('id', $request->id)->delete());
     }
@@ -86,7 +103,8 @@ class TestContractIssuanceMigrationTest extends TestCase
     {
         $graph = $this->contractSchemaGraph();
         foreach (['request', 'contract'] as $key) {
-            $model = $graph[$key]; $before = $model->refresh()->getAttributes();
+            $model = $graph[$key];
+            $before = $model->refresh()->getAttributes();
             $changes = $key === 'request' ? ['profile_hash' => str_repeat('b', 64)] : ['pdf_hash' => str_repeat('b', 64)];
             try {
                 match ($operation) {
@@ -137,15 +155,25 @@ class TestContractIssuanceMigrationTest extends TestCase
             ['next_attempt_at' => now()->addMinute()], ['contract_render_request_id' => 999999], ['updated_at' => now()->subSecond()]] as $invalid) {
             $this->contractSchemaRejected(fn () => DB::table('contract_render_work')->insert([...$attributes, ...$invalid]));
         }
-        $work = ContractRenderWork::create($attributes); $before = $work->refresh()->getAttributes();
+        $work = ContractRenderWork::create($attributes);
+        $before = $work->refresh()->getAttributes();
         foreach (['contract_render_request_id' => $other->id, 'created_at' => now()->addSecond()] as $field => $value) {
             $this->contractSchemaRejected(fn () => DB::table('contract_render_work')->where('id', $work->id)->update([$field => $value]));
-            try { $work->forceFill([$field => $value])->save(); $this->fail('Work identity changed through the model.'); }
-            catch (LogicException $error) { $this->assertStringContainsString('immutable', $error->getMessage()); $work->refresh(); }
+            try {
+                $work->forceFill([$field => $value])->save();
+                $this->fail('Work identity changed through the model.');
+            } catch (LogicException $error) {
+                $this->assertStringContainsString('immutable', $error->getMessage());
+                $work->refresh();
+            }
         }
         $this->contractSchemaRejected(fn () => DB::table('contract_render_work')->where('id', $work->id)->delete());
-        try { $work->delete(); $this->fail('Work evidence was deleted through the model.'); }
-        catch (LogicException $error) { $this->assertStringContainsString('retained', $error->getMessage()); }
+        try {
+            $work->delete();
+            $this->fail('Work evidence was deleted through the model.');
+        } catch (LogicException $error) {
+            $this->assertStringContainsString('retained', $error->getMessage());
+        }
         $this->assertSame($before, $work->fresh()->getAttributes());
         $this->contractSchemaRejected(fn () => ContractRenderWork::create($attributes));
     }
@@ -161,10 +189,12 @@ class TestContractIssuanceMigrationTest extends TestCase
             ['reason' => 'render_failed'], ['next_attempt_at' => now()->addMinute()]] as $invalid) {
             $this->contractSchemaRejected(fn () => DB::table('contract_render_work')->where('id', $work->id)->update([...$claim, ...$invalid]));
         }
-        $work->update($claim); $token = $work->claim_token;
+        $work->update($claim);
+        $token = $work->claim_token;
         $this->contractSchemaRejected(fn () => $work->update($this->contractSchemaClaimAttributes(2)));
         $terminal = ['state' => 'completed', 'claim_token' => null, 'lease_expires_at' => null, 'reason' => null, 'next_attempt_at' => null];
-        $this->contractSchemaRejected(fn () => $work->update($terminal)); $work->refresh();
+        $this->contractSchemaRejected(fn () => $work->update($terminal));
+        $work->refresh();
         foreach (['made_up', 'evidence_changed'] as $reason) {
             $this->contractSchemaRejected(fn () => DB::table('contract_render_work')->where('id', $work->id)
                 ->update([...$terminal, 'state' => 'retry', 'reason' => $reason, 'next_attempt_at' => now()->addMinute()]));
@@ -173,20 +203,26 @@ class TestContractIssuanceMigrationTest extends TestCase
             ->update([...$terminal, 'state' => 'retry', 'reason' => 'render_failed', 'next_attempt_at' => now()->addSeconds(59)]));
         $work->update([...$terminal, 'state' => 'retry', 'reason' => 'render_failed', 'next_attempt_at' => now()->addMinute()]);
         $this->contractSchemaRejected(fn () => DB::table('contract_render_work')->where('id', $work->id)->update($this->contractSchemaClaimAttributes(2)));
-        $this->travelTo(now()->addMinute()); $work->refresh()->update($this->contractSchemaClaimAttributes(2));
+        $this->travelTo(now()->addMinute());
+        $work->refresh()->update($this->contractSchemaClaimAttributes(2));
         $this->assertNotSame($token, $work->claim_token);
         $this->travelTo(now()->addSecond());
         $contract = GrantContract::create($this->contractSchemaResultAttributes($request, $work));
         $this->contractSchemaRejected(fn () => DB::table('contract_render_work')->where('id', $work->id)
             ->update([...$terminal, 'state' => 'quarantined', 'reason' => 'invalid_pdf', 'updated_at' => now()]));
-        $work->update($terminal); $this->assertSame('completed', $work->fresh()->state);
+        $work->update($terminal);
+        $this->assertSame('completed', $work->fresh()->state);
         $this->assertSame($work->request->document_public_id, $contract->public_id);
         foreach ([$this->contractSchemaClaimAttributes(3), ['updated_at' => now()->addSecond()],
             ['state' => 'pending', 'attempts' => 0]] as $invalid) {
             $this->contractSchemaRejected(fn () => DB::table('contract_render_work')->where('id', $work->id)->update($invalid));
         }
-        try { $work->update(['updated_at' => now()->addSecond()]); $this->fail('Completed work was changed.'); }
-        catch (LogicException $error) { $this->assertStringContainsString('immutable', $error->getMessage()); }
+        try {
+            $work->update(['updated_at' => now()->addSecond()]);
+            $this->fail('Completed work was changed.');
+        } catch (LogicException $error) {
+            $this->assertStringContainsString('immutable', $error->getMessage());
+        }
     }
 
     public function test_expired_claim_cannot_write_an_original_and_fifth_expiry_quarantines_without_reset(): void
@@ -250,7 +286,9 @@ class TestContractIssuanceMigrationTest extends TestCase
         $this->assertSame('contract_render_work', $graph['work']->getTable());
         foreach (['request' => ['input_hash', 'profile', 'profile_hash'], 'work' => ['claim_token'],
             'contract' => ['input_hash', 'profile_hash', 'disk', 'storage_path', 'claim_token', 'pdf_hash']] as $key => $fields) {
-            foreach ($fields as $field) { $this->assertArrayNotHasKey($field, $graph[$key]->attributesToArray()); }
+            foreach ($fields as $field) {
+                $this->assertArrayNotHasKey($field, $graph[$key]->attributesToArray());
+            }
         }
         $this->assertSame('pending', DB::table('pending_entitlements')->sole()->state);
         $this->assertSame('pending', $graph['outbox']->fresh()->state);
@@ -259,8 +297,11 @@ class TestContractIssuanceMigrationTest extends TestCase
     public function test_contract_foreign_keys_restrict_deletion_and_all_logical_effects_have_unique_indexes(): void
     {
         foreach (['contract_render_requests' => 2, 'contract_render_work' => 1, 'grant_contracts' => 2] as $table => $count) {
-            $keys = Schema::getForeignKeys($table); $this->assertCount($count, $keys);
-            foreach ($keys as $key) { $this->assertContains(strtolower($key['on_delete']), ['restrict', 'no action']); }
+            $keys = Schema::getForeignKeys($table);
+            $this->assertCount($count, $keys);
+            foreach ($keys as $key) {
+                $this->assertContains(strtolower($key['on_delete']), ['restrict', 'no action']);
+            }
         }
         foreach (['contract_render_requests' => [['public_id'], ['license_grant_id'], ['fulfillment_outbox_id'], ['document_public_id']],
             'contract_render_work' => [['contract_render_request_id']],
@@ -305,7 +346,8 @@ class TestContractIssuanceMigrationTest extends TestCase
 
     private function contractSchemaGraph(): array
     {
-        $grant = $this->contractSchemaGrants()[0]; $outbox = FulfillmentOutbox::where('license_grant_id', $grant->id)->sole();
+        $grant = $this->contractSchemaGrants()[0];
+        $outbox = FulfillmentOutbox::where('license_grant_id', $grant->id)->sole();
         $request = ContractRenderRequest::create($this->contractSchemaRequestAttributes($grant));
         $work = ContractRenderWork::create(['contract_render_request_id' => $request->id]);
         $work->update($this->contractSchemaClaimAttributes(1));
@@ -322,7 +364,11 @@ class TestContractIssuanceMigrationTest extends TestCase
 
     private function contractSchemaRejected(callable $operation): void
     {
-        try { $operation(); $this->fail('Contradictory contract schema write was accepted.'); }
-        catch (QueryException $error) { $this->assertNotSame('', $error->getMessage()); }
+        try {
+            $operation();
+            $this->fail('Contradictory contract schema write was accepted.');
+        } catch (QueryException $error) {
+            $this->assertNotSame('', $error->getMessage());
+        }
     }
 }

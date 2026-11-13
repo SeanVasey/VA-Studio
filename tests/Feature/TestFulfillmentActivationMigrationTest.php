@@ -13,6 +13,7 @@ use App\Domain\Contracts\Models\ContractRenderWork;
 use App\Domain\Contracts\Models\GrantContract;
 use App\Domain\Delivery\Models\TestFulfillmentActivation;
 use App\Support\CanonicalJson;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,7 @@ use Tests\Support\ContractFixtures;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\FinalizationFixtures as F;
 use Tests\Support\PaymentFixtures;
+use Tests\Support\TransactionalMailFixtures;
 use Tests\TestCase;
 
 /** Synthetic manifests prove schema guards only; domain tests prove encrypted graph and physical-file checks. */
@@ -35,7 +37,9 @@ class TestFulfillmentActivationMigrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->fakePrivateMediaStorage(); $this->travelTo(now()->startOfSecond()); F::configure();
+        $this->fakePrivateMediaStorage();
+        $this->travelTo(now()->startOfSecond());
+        F::configure();
         $this->activationSchemaGateway = PaymentFixtures::gateway();
         $this->app->instance(StripeCheckoutGateway::class, $this->activationSchemaGateway);
         $this->app->instance(StripePaymentGateway::class, $this->activationSchemaGateway);
@@ -52,13 +56,17 @@ class TestFulfillmentActivationMigrationTest extends TestCase
         $this->assertDatabaseCount('transactional_notices', 0);
         $this->assertDatabaseCount('transactional_notice_attempts', 0);
         // The empty lane CX mail-delivery child names transactional_notices in its insert guard; dispose of it first.
-        \Tests\Support\TransactionalMailFixtures::dropEmptyDeliveries();
+        TransactionalMailFixtures::dropEmptyDeliveries();
         $notices->down();
-        $delivery->down(); $migration->down(); $this->assertFalse(Schema::hasTable('test_fulfillment_activations'));
+        $delivery->down();
+        $migration->down();
+        $this->assertFalse(Schema::hasTable('test_fulfillment_activations'));
         $this->assertSame($before, ContractFixtures::retained());
-        $migration->up(); $delivery->up(); $this->assertDatabaseCount('test_fulfillment_activations', 0);
+        $migration->up();
+        $delivery->up();
+        $this->assertDatabaseCount('test_fulfillment_activations', 0);
         $notices->up();
-        \Tests\Support\TransactionalMailFixtures::restoreDeliveries();
+        TransactionalMailFixtures::restoreDeliveries();
         $this->assertSame($before, ContractFixtures::retained());
         $this->assertSame('pending', DB::table('pending_entitlements')->sole()->state);
         $this->assertSame('pending', DB::table('fulfillment_outbox')->sole()->state);
@@ -66,12 +74,18 @@ class TestFulfillmentActivationMigrationTest extends TestCase
 
     public function test_populated_rollback_and_model_or_sql_mutations_cannot_erase_recorded_decision(): void
     {
-        $fixture = $this->activationSchemaPaid(); $this->activationSchemaOriginal($fixture['grants'][0]);
+        $fixture = $this->activationSchemaPaid();
+        $this->activationSchemaOriginal($fixture['grants'][0]);
         $activation = TestFulfillmentActivation::create($this->activationSchemaAttributes($fixture));
-        $before = $activation->refresh()->getAttributes(); $retained = ContractFixtures::retained();
+        $before = $activation->refresh()->getAttributes();
+        $retained = ContractFixtures::retained();
         $migration = require database_path('migrations/2026_09_26_000022_test_fulfillment_activation.php');
-        try { $migration->down(); $this->fail('Populated activation rollback erased evidence.'); }
-        catch (LogicException $error) { $this->assertStringContainsString('retained', $error->getMessage()); }
+        try {
+            $migration->down();
+            $this->fail('Populated activation rollback erased evidence.');
+        } catch (LogicException $error) {
+            $this->assertStringContainsString('retained', $error->getMessage());
+        }
         $this->assertTrue(Schema::hasTable('test_fulfillment_activations'));
         foreach (['orm_update', 'orm_delete', 'sql_update', 'sql_delete'] as $operation) {
             $activation->refresh();
@@ -93,7 +107,8 @@ class TestFulfillmentActivationMigrationTest extends TestCase
 
     public function test_every_line_requires_a_completed_original_before_one_whole_order_decision(): void
     {
-        $fixture = $this->activationSchemaPaid(true); $attributes = $this->activationSchemaAttributes($fixture);
+        $fixture = $this->activationSchemaPaid(true);
+        $attributes = $this->activationSchemaAttributes($fixture);
         $this->activationSchemaRejected(fn () => TestFulfillmentActivation::create($attributes));
         $first = $this->activationSchemaOriginal($fixture['grants'][0], false);
         $this->activationSchemaRejected(fn () => TestFulfillmentActivation::create($attributes));
@@ -111,7 +126,8 @@ class TestFulfillmentActivationMigrationTest extends TestCase
 
     public function test_shape_and_observation_bounds_reject_invalid_or_stale_evidence_and_accept_exact_300_seconds(): void
     {
-        $fixture = $this->activationSchemaPaid(); $this->activationSchemaOriginal($fixture['grants'][0]);
+        $fixture = $this->activationSchemaPaid();
+        $this->activationSchemaOriginal($fixture['grants'][0]);
         $attributes = $this->activationSchemaAttributes($fixture);
         foreach ([['public_id' => 'not-a-uuid'], ['public_id' => str_repeat('a', 36)],
             ['public_id' => 'AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA'], ['evidence_hash' => 'short'],
@@ -137,8 +153,10 @@ class TestFulfillmentActivationMigrationTest extends TestCase
 
     public function test_observation_cannot_predate_the_last_original_even_after_paid_finalization(): void
     {
-        $fixture = $this->activationSchemaPaid(); $attributes = $this->activationSchemaAttributes($fixture);
-        $this->travelTo(now()->addSecond()); $this->activationSchemaOriginal($fixture['grants'][0]);
+        $fixture = $this->activationSchemaPaid();
+        $attributes = $this->activationSchemaAttributes($fixture);
+        $this->travelTo(now()->addSecond());
+        $this->activationSchemaOriginal($fixture['grants'][0]);
         $this->activationSchemaRejected(fn () => TestFulfillmentActivation::create([...$attributes,
             'verified_through' => now(), 'activated_at' => now()]));
         TestFulfillmentActivation::create($this->activationSchemaAttributes($fixture));
@@ -158,23 +176,29 @@ class TestFulfillmentActivationMigrationTest extends TestCase
 
     public function test_model_relations_casts_and_hidden_evidence_do_not_activate_pending_rows(): void
     {
-        $fixture = $this->activationSchemaPaid(); $this->activationSchemaOriginal($fixture['grants'][0]);
+        $fixture = $this->activationSchemaPaid();
+        $this->activationSchemaOriginal($fixture['grants'][0]);
         $activation = TestFulfillmentActivation::create($this->activationSchemaAttributes($fixture));
         $this->assertTrue($activation->order->is($fixture['order']));
         $this->assertTrue($activation->finalization->is($fixture['finalization']));
         foreach (['verified_from', 'verified_through', 'activated_at'] as $field) {
-            $this->assertInstanceOf(\Carbon\CarbonImmutable::class, $activation->{$field});
+            $this->assertInstanceOf(CarbonImmutable::class, $activation->{$field});
             $this->assertTrue($activation->{$field}->equalTo(now()));
         }
-        foreach (['evidence_ciphertext', 'evidence_hash'] as $field) { $this->assertArrayNotHasKey($field, $activation->attributesToArray()); }
+        foreach (['evidence_ciphertext', 'evidence_hash'] as $field) {
+            $this->assertArrayNotHasKey($field, $activation->attributesToArray());
+        }
         $this->assertSame('pending', DB::table('pending_entitlements')->sole()->state);
         $this->assertSame('pending', DB::table('fulfillment_outbox')->sole()->state);
     }
 
     public function test_parent_keys_restrict_deletion_and_one_decision_has_unique_order_finalization_and_public_identity(): void
     {
-        $keys = Schema::getForeignKeys('test_fulfillment_activations'); $this->assertCount(2, $keys);
-        foreach ($keys as $key) { $this->assertContains(strtolower($key['on_delete']), ['restrict', 'no action']); }
+        $keys = Schema::getForeignKeys('test_fulfillment_activations');
+        $this->assertCount(2, $keys);
+        foreach ($keys as $key) {
+            $this->assertContains(strtolower($key['on_delete']), ['restrict', 'no action']);
+        }
         foreach ([['public_id'], ['order_id'], ['order_finalization_id']] as $columns) {
             $this->assertCount(1, array_filter(Schema::getIndexes('test_fulfillment_activations'), fn ($index) => $index['unique'] && $index['columns'] === $columns));
         }
@@ -203,7 +227,9 @@ class TestFulfillmentActivationMigrationTest extends TestCase
             'contract_render_request_id' => $request->id, 'input_hash' => $request->input_hash, 'profile_hash' => $request->profile_hash,
             'disk' => 'local', 'storage_path' => 'contracts/test/'.$request->public_id.'/'.$work->claim_token.'/original.pdf',
             'claim_token' => $work->claim_token, 'pdf_hash' => str_repeat('a', 64), 'size_bytes' => 1024, 'page_count' => 1, 'issued_at' => now()]);
-        if ($completed) { $this->activationSchemaComplete($work); }
+        if ($completed) {
+            $this->activationSchemaComplete($work);
+        }
 
         return compact('request', 'work', 'contract');
     }
@@ -225,7 +251,11 @@ class TestFulfillmentActivationMigrationTest extends TestCase
 
     private function activationSchemaRejected(callable $operation): void
     {
-        try { $operation(); $this->fail('Contradictory activation schema write was accepted.'); }
-        catch (QueryException $error) { $this->assertNotSame('', $error->getMessage()); }
+        try {
+            $operation();
+            $this->fail('Contradictory activation schema write was accepted.');
+        } catch (QueryException $error) {
+            $this->assertNotSame('', $error->getMessage());
+        }
     }
 }
