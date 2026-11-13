@@ -3,6 +3,7 @@
 namespace Tests\Support;
 
 use Illuminate\Database\Connection;
+use Illuminate\Support\Facades\DB;
 use PDO;
 use Throwable;
 
@@ -129,6 +130,26 @@ final class MysqlSchemaSnapshot
     public static function forget(): void
     {
         self::$baseline = null;
+    }
+
+    /**
+     * For a test that runs its own migrate:fresh instead of using FinalizationDatabaseMigrations (a class with 60 cases
+     * spent two hours migrating: Foundation 43386670021, shard 4). On MySQL, reset to this process's migrated schema when
+     * it is unchanged; otherwise run $migrate, which must perform the caller's own migrate:fresh, and record the result.
+     * Either way the test starts on committed rows with no outer transaction, exactly as after a fresh migration.
+     */
+    public static function migrateFresh(Connection $connection, array $options, callable $migrate): void
+    {
+        if (self::enabled($connection) && self::restore($connection, $options)) {
+            // As FinalizationDatabaseMigrations does: migrate:fresh leaves the DB facade resolved.
+            DB::getFacadeRoot();
+
+            return;
+        }
+        $migrate();
+        if (self::enabled($connection)) {
+            self::capture(DB::connection($connection->getName()), $options);
+        }
     }
 
     /**
