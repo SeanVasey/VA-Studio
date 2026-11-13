@@ -1,6 +1,7 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
 import { syncSuccessNotification } from './notification-sync';
+import { modalReady } from './modal-ready';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
@@ -94,6 +95,7 @@ async function cancelDialog(page: Page, dialog: Locator) {
 
 async function createDraft(page: Page, title: string, slug: string, data: Metadata): Promise<Draft> {
   const dialog = await openDialog(page, page.getByRole('button', { name: 'New track', exact: true }));
+  await modalReady(dialog);
   await dialog.getByLabel('Title', { exact: false }).fill(title);
   await dialog.getByLabel('Slug', { exact: false }).fill(slug);
   await dialog.getByLabel('Artist', { exact: false }).fill(data.artist);
