@@ -393,7 +393,8 @@ class VaseyLicenseIssuanceTest extends TestCase
             $this->assertLessThan(strpos($source, $frame), $prepare, $path);
             $this->assertSame(1, substr_count($source, 'VaseyLicenseIssuance::decide('), $path);
             $this->assertSame(1, preg_match('/VaseyLicenseIssuance::decide\(Paid(?:Grant|Tax)RenderInput::fromOrigin\(\$payload\), \$v2Prepared\)/', $source), $path);
-            $this->assertSame(1, preg_match('/function \([^)]*\) use \(\$v2Prepared,/', $source), $path);
+            // The origin frame's closure captures the preparation; its place in the use() list is not the property (#308 put $financial first).
+            $this->assertSame(1, preg_match('/function \([^)]*\) use \((?:\$\w+, )*\$v2Prepared[,)]/', $source), $path);
         }
     }
 
