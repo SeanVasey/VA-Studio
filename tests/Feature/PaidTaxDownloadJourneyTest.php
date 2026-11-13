@@ -384,12 +384,14 @@ class PaidTaxDownloadJourneyTest extends TestCase
         $f['batch'] = (new PaidTaxGrants)->finalize($f['buyer']['principal'], $f['buyer']['user'], $f['order']['orderId']);
         $f['batch'] = (new PaidTaxDocuments)->prepare($f['batch']['id'], $f['buyer']['principal'], $f['buyer']['user']);
         $a = $this->authorize($f);
-        config(['paid-tax-grants.transfer_base_seconds' => 0, 'paid-tax-grants.transfer_min_bytes_per_second' => 1073741824]);
+        // A five-second window (4 s base plus 1 s for the bytes): the first chunk's closure proofs query the
+        // database after the system clock is sampled, and took over one second on a slow MySQL runner.
+        config(['paid-tax-grants.transfer_base_seconds' => 4, 'paid-tax-grants.transfer_min_bytes_per_second' => 1073741824]);
         $start = hrtime(true);
         $calls = 0;
         $d = new PaidTaxDownloads(static function () use ($start, &$calls): int {
             if (++$calls === 3) {
-                usleep(1_100_000);
+                usleep(5_100_000);
             }
 
             return $start;
