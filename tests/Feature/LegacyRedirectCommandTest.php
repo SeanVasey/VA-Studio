@@ -29,7 +29,7 @@ class LegacyRedirectCommandTest extends TestCase
     {
         $this->artisan('vasey:redirects-validate')
             ->expectsOutputToContain('activation flag legacy-redirects.enabled is off')
-            ->expectsOutputToContain('Inventory rows: 20 · map entries: 20 · redirect: 7 · gone: 0 · retained: 6 · unresolved: 7')
+            ->expectsOutputToContain('Inventory rows: 20 · map entries: 20 · redirect: 6 · gone: 0 · retained: 6 · unresolved: 8')
             ->expectsOutputToContain('Query strings: dropped on redirect. Matching: exact path only.')
             ->expectsOutputToContain('RETAINED URL-010 /blog served by editorial.show')
             ->expectsOutputToContain('REDIRECT URL-002 /music/tracks -> / (301)')

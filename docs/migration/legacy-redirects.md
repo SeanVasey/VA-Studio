@@ -74,14 +74,13 @@ A read-only crawl of `https://www.vasey.audio` (the BeatStars-hosted store) fed 
 
 ## Current reconciliation (2026-11-10, BL-51 and the crawl; first reviewed 2026-10-24 at base 786fb7c7)
 
-20 inventory rows, 20 entries: 7 redirect, 0 gone, 6 retained (URL-001 `/`, URL-006 `/services`, URL-009 `/videos`, URL-010 `/blog`, URL-011 `/about`, URL-012 `/contact`) and 7 unresolved. The inventory CSV is unchanged, so its pinned hash and row count are unchanged.
+20 inventory rows, 20 entries: 6 redirect, 0 gone, 6 retained (URL-001 `/`, URL-006 `/services`, URL-009 `/videos`, URL-010 `/blog`, URL-011 `/about`, URL-012 `/contact`) and 8 unresolved (URL-005 since 2026-11-13, below). The inventory CSV is unchanged, so its pinned hash and row count are unchanged.
 
 Reviewed dispositions for rows that point into a family with no live public page, each to a page that exists and never to one that does not:
 
 | Row | Legacy path | Target | Why |
 | --- | --- | --- | --- |
 | URL-002 | `/music/tracks` | catalog (`home`) | Crawl: the live BEATS listing. The catalog is the home page; the proposed `/beats` route does not exist. |
-| URL-005 | `/sound-kits` | catalog (`home`) | No kit storefront page exists (FP-007). |
 | URL-007 | `/merch` | catalog (`home`) | No merchandise page exists and none is sold. |
 | URL-008 | `/memberships` | contact (`editorial` section `contact`) | No membership is sold at launch (DD-50); the contact page reaches the owner. |
 | URL-013 | `/licensing-info` | `/legal/licenses` (`legal` page `licenses`) | The live footer link "Licensing Info"; the store's generated license comparison. |
@@ -92,6 +91,7 @@ URL-006 `/services` is `retained`: the route serves it, with the contact fallbac
 
 Rows left unresolved on purpose, with the crawl evidence for each (URL-013, URL-014 and URL-015 were resolved by the `legal` target type and are in the table above):
 
+- URL-005 `/sound-kits` (2026-11-13): its 301 to the catalog became dead configuration once the sound-kit storefront route (`sound-kits.index`) was added, because a route always wins over a redirect. The storefront flag is a code-literal `false`, so the route answers 404 today. As with `/services` (BL-64), the owner decides: enable the storefront (the row is then `retained`) or give the route a fallback while it is off.
 - URL-003 `/music/albums` and URL-004 `/music/collections`: the live navigation links COLLECTIONS but nothing links `/music/albums`, and the content could not be read. `/collections` has no route (Q-2) and `/albums` is default-off (BL-67).
 - URL-016 `/account/purchases`, URL-017 `/account/offers`, URL-018 `/account/membership`, URL-019 `/account/faves`, URL-020 `/account/lyrics`: signed-in buyer pages that the crawl could see only as menu links. Each is an `/account/*` source, so the customer-privacy middleware would change its behaviour (see the cautions above), and the targets depend on the production identity decision (U-07, open question Q-1). URL-019 and URL-020 would map to the private listening library (FP-079), which is not a public page; URL-017 has no equivalent feature.
 

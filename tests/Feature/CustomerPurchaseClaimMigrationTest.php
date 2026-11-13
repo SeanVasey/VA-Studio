@@ -49,6 +49,14 @@ class CustomerPurchaseClaimMigrationTest extends TestCase
         $this->migration()->up();
         // Recreated owned triggers have fresh creation times; all structural bytes and unrelated timestamps remain exact.
         $structure = function (array $snapshot): array {
+            // SQLite: a recreated table or index gets whatever b-tree page is free; the page number is storage, not schema.
+            if (! isset($snapshot['guards'])) {
+                return array_map(function (array $row): array {
+                    unset($row['rootpage']);
+
+                    return $row;
+                }, $snapshot);
+            }
             if (isset($snapshot['guards'])) {
                 foreach ($snapshot['guards'] as &$guard) {
                     if (in_array($guard['EVENT_OBJECT_TABLE'], ['customer_purchase_challenges', 'customer_purchase_claims'], true)) {
