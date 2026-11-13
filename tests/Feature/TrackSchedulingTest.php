@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Application\Media\MediaIntegrity;
 use App\Domain\Catalog\DeactivateOffer;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\Models\TrackPublicationSchedule;
 use App\Domain\Catalog\PublishTrack;
 use App\Domain\Catalog\TrackPublicationSchedules;
+use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\VerifiedMedia;
 use App\Domain\Rights\Models\RightsDeclaration;
 use App\Models\User;
@@ -18,6 +20,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use LogicException;
@@ -50,6 +53,16 @@ class TrackSchedulingTest extends TestCase
         $fixture['track'] = app(PublishTrack::class)->unpublish($fixture['track'], $fixture['actor']);
 
         return $fixture;
+    }
+
+    /** MediaIntegrity's cache key for this asset and the file's current identity. */
+    private function availabilityKey(MediaAsset $asset, string $path): string
+    {
+        $integrity = app(MediaIntegrity::class);
+        $identity = (new ReflectionMethod($integrity, 'identity'))->invoke($integrity, $asset, $path);
+        $this->assertIsArray($identity);
+
+        return 'media-integrity:'.(new ReflectionMethod($integrity, 'digest'))->invoke($integrity, $asset, $path, $identity);
     }
 
     private function chicago(CarbonImmutable $utc): string
@@ -437,11 +450,16 @@ class TrackSchedulingTest extends TestCase
         // Warm the 60-second availability cache with a passing readiness read, then change the bytes inside that window.
         $this->assertSame([], app(TrackPublicationSchedules::class)->advisories($fixture['track']->fresh()));
         $preview = app(VerifiedMedia::class)->path($fixture['media']['preview_tagged']);
+        $this->assertTrue(Cache::get($this->availabilityKey($fixture['media']['preview_tagged'], $preview)), 'the readiness read must cache the availability');
         $original = file_get_contents($preview);
         // Same size, different bytes: only a fresh hash notices, which is what manual publication does too.
         chmod($preview, 0600); // Verified files are stored read-only; tamper as an outside writer would.
         file_put_contents($preview, strrev($original));
         $this->assertNotSame($original, file_get_contents($preview));
+        // The cache entry is keyed by the file's identity, whose times have one-second resolution. A tamper within the second the
+        // file was written keeps the entry; a later one drops it, and then the readiness read refuses before the fresh hash is
+        // reached (Foundation run 43505345035). Cache the tampered file as available, so the outcome never depends on the clock.
+        Cache::put($this->availabilityKey($fixture['media']['preview_tagged'], $preview), true, MediaIntegrity::CACHE_SECONDS);
         [$code, $output] = $this->runCommand();
         $this->assertSame(1, $code, $output);
         $this->assertStringContainsString('fresh unchanged bytes', $output);

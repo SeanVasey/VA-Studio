@@ -213,7 +213,7 @@ class MediaUploadCommitRecoveryTest extends TestCase
         }
     }
 
-    public function test_nested_lock_wait_failure_keeps_bytes_when_laravel_restores_depth_without_rollback(): void
+    public function test_nested_lock_wait_failure_keeps_bytes_because_laravel_does_not_confirm_its_savepoint_rollback(): void
     {
         $connection = DB::connection();
         $connection->beginTransaction();
@@ -241,13 +241,18 @@ class MediaUploadCommitRecoveryTest extends TestCase
 
             $this->assertTrue($raised);
             $this->assertSame(1, $connection->transactionLevel());
-            $asset = MediaAsset::sole();
-            $this->assertQuarantinedSource($asset, $upload);
-            $this->assertUploadAudit($asset);
+            // Laravel 13.42 rolls the savepoint back in this handler (earlier releases skipped it) but swallows a failure of
+            // that rollback, so the service cannot tell a clean rollback from rows that can still commit: it keeps the bytes.
+            $this->assertSame(0, MediaAsset::count());
+            $this->assertSame(0, AuditEvent::count());
+            $disk = Storage::disk('local');
+            $retained = $disk->allFiles('quarantine');
+            $this->assertCount(1, $retained);
+            $this->assertSame(hash_file('sha256', $upload->getRealPath()), hash_file('sha256', $disk->path($retained[0])));
             $connection->commit();
             $this->assertSame(0, $connection->transactionLevel());
-            $this->assertQuarantinedSource($asset->fresh(), $upload);
-            $this->assertUploadAudit($asset);
+            $this->assertSame(0, MediaAsset::count());
+            $this->assertSame($retained, $disk->allFiles('quarantine'));
         } finally {
             Event::forget($eventName);
             if ($connection->transactionLevel() > 0) {

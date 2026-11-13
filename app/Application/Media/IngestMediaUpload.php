@@ -148,8 +148,8 @@ final class IngestMediaUpload
                 return $asset;
             });
         } catch (Throwable $exception) {
-            // A commit error can follow a durable write. A failed rollback can leave rows
-            // pending, as can Laravel's nested DeadlockException path, which skips rollback.
+            // A commit error can follow a durable write. A failed rollback can leave rows pending, as can Laravel's
+            // nested DeadlockException path, which swallows a failed savepoint rollback (and skipped it before 13.42).
             if ($sessionId === null && ! $committing && ! $exception instanceof DeadlockException && DB::transactionLevel() === $transactionLevel) {
                 $disk->delete($path);
             }
