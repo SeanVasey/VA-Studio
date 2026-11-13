@@ -47,6 +47,12 @@ class OrderPreparationMigrationTest extends TestCase
         $refundResolution = require database_path('migrations/2026_10_06_000047_test_refund_resolutions.php');
         $orderInquiries = require database_path('migrations/2026_10_06_000049_inquiry_order_contexts.php');
         $orderInquiries->down();
+        // The empty merch fulfillment child holds foreign keys to orders and verified_payments; MySQL refuses to drop those
+        // parents while it exists (SQLite does not check), so it goes first and returns last.
+        $merchFulfillment = require database_path('migrations/2026_11_10_286300_merch_printful_fulfillment.php');
+        $this->assertDatabaseCount('merch_fulfillment_events', 0);
+        $this->assertDatabaseCount('merch_fulfillments', 0);
+        $merchFulfillment->down();
         // Remove the empty additive notification child before its retained parents.
         $notices = require database_path('migrations/2026_10_06_231000_test_transactional_notifications.php');
         // Drop the empty, forward-only A5 refund/dispute child first; its guards name the order tables rebuilt below.
@@ -110,6 +116,7 @@ class OrderPreparationMigrationTest extends TestCase
         TransactionalMailFixtures::restoreDeliveries();
         $refundDispute->up();
         $orderInquiries->up();
+        $merchFulfillment->up();
         foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) {
             $this->assertDatabaseCount($table, 0);
         }

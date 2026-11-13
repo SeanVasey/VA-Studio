@@ -1465,6 +1465,22 @@
     [
       "Tests\\Feature\\TestBuyerOrderCancellationConcurrencyTest",
       "test_cancel_and_staff_never_sent_release_record_exactly_one_release"
+    ],
+    [
+      "Tests\\Feature\\MysqlSchemaSnapshotTest",
+      "test_a_reset_restores_the_migrated_rows_and_counters_and_removes_everything_else"
+    ],
+    [
+      "Tests\\Feature\\MysqlSchemaSnapshotTest",
+      "test_a_changed_schema_is_never_reused"
+    ],
+    [
+      "Tests\\Feature\\MysqlSchemaSnapshotTest",
+      "test_the_opt_out_disables_reuse"
+    ],
+    [
+      "Tests\\Feature\\MysqlSchemaSnapshotTest",
+      "test_a_schema_built_with_other_migrate_options_is_never_reused"
     ]
   ]
 }

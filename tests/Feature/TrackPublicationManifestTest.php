@@ -549,7 +549,9 @@ class TrackPublicationManifestTest extends TestCase
         $original = ini_get('serialize_precision');
         try {
             ini_set('serialize_precision', '-1');
-            $fixture = QuoteFixtures::selection();
+            // A master length that is no whole number of 44.1 kHz samples. FFmpeg 8 measures the 1.2 s default preview as exactly
+            // 1.2, which every precision prints alike, so the default no longer exercises the defect (Foundation 43386670021).
+            $fixture = QuoteFixtures::selection(masterWav: MediaFixtures::wav(1.234567));
             $preview = $fixture['media']['preview_tagged'];
             $duration = $preview->technical_metadata['duration_seconds'];
             $baselineNumericToken = json_encode($duration, JSON_THROW_ON_ERROR | JSON_PRESERVE_ZERO_FRACTION);

@@ -54,9 +54,19 @@ final class CurrentCatalogAdmissionTest extends TestCase
             $inner->close();
         }
         self::assertNull($weak->get());
+        // Dropping the companion sends COM_QUIT; the server removes its thread asynchronously, so wait (bounded) for the release.
         $statement = $pdo->prepare('SELECT COUNT(*) FROM performance_schema.threads WHERE PROCESSLIST_ID=?');
-        $statement->execute([$id]);
-        self::assertSame(0, (int) $statement->fetchColumn());
+        $deadline = microtime(true) + 5;
+        while (true) {
+            $statement->execute([$id]);
+            $remaining = (int) $statement->fetchColumn();
+            $statement->closeCursor();
+            if ($remaining === 0 || microtime(true) >= $deadline) {
+                break;
+            }
+            usleep(50_000);
+        }
+        self::assertSame(0, $remaining);
     }
 
     public function test_native_companion_statement_accounting_matches_server_including_constructor_setup_and_context(): void

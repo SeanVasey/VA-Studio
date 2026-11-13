@@ -252,6 +252,7 @@
     "tests/Support/DeliveryRace.php",
     "tests/Support/DisposableTestDatabase.php",
     "tests/Support/FinalizationLifecycleFixture.php",
+    "tests/Support/MysqlSchemaSnapshot.php",
     "tests/Support/NativeExplainNoteTransport.php",
     "tests/Support/PaidGrantCommitFrameProbe.php",
     "tests/Support/PaidGrantDependencyFixtures.php",

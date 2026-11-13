@@ -254,7 +254,11 @@ jobs:
           MYSQL_ROOT_PASSWORD: ci-only-password
         ports:
           - 3306:3306
+        # A disposable server: its data directory lives in memory (no disk syncs). Each test rebuilds the
+        # schema with about 300 migrations, and on a disk-backed datadir every DDL commit synced to disk
+        # (Foundation 43304362814: 85-100 s per MySQL test, 18 of 24 shards cancelled at 210 minutes).
         options: >-
+          --tmpfs /var/lib/mysql:rw
           --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-only-password"
           --health-interval=10s
           --health-timeout=5s
@@ -314,6 +318,10 @@ jobs:
           # (provision.sh) create it utf8mb4_unicode_ci, which the account admission guard requires.
           docker exec -e MYSQL_PWD=ci-only-password "$MYSQL_CONTAINER_ID" \
             mysql -uroot -e 'ALTER DATABASE `vaseyaudio_test` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
+          # Durability buys nothing on a disposable test server; locking, isolation and the native race behaviour
+          # under test are unchanged. sync_binlog and the redo-log flush are dynamic; the receipts do not pin them.
+          docker exec -e MYSQL_PWD=ci-only-password "$MYSQL_CONTAINER_ID" \
+            mysql -uroot -e 'SET GLOBAL innodb_flush_log_at_trx_commit = 0; SET GLOBAL sync_binlog = 0'
           echo "DB_HOST=${addresses[0]}" >> "$GITHUB_ENV"
       - name: Record source and MySQL runtime before tests
         env:
@@ -344,17 +352,17 @@ jobs:
     # Do not start costly suites for a candidate that already fails preflight.
     needs: [scope, backend-quality, frontend]
     if: needs.scope.outputs.mode != 'docs'
-    name: backend-sqlite (${{ matrix.shard }}/2)
+    name: backend-sqlite (${{ matrix.shard }}/6)
     runs-on: ubuntu-latest
-    # Foundation 38037183233 measured 80.2 minutes for shard 1 (3,917 tests) and 43.4 for shard 2 (3,725) on
-    # the stale timings; scripts/ci/phpunit-timings-sqlite.json is regenerated from both JUnit logs, which
-    # balances the two shards at about 61 minutes each: about 25% headroom over the busiest measured shard
-    # (80.2) and about 40% over the balanced estimate. A hung test still cannot hold a runner for 6 hours.
-    timeout-minutes: 100
+    # Six shards since 2026-11-13: the suite grew to about 12,100 cases, and Foundation 43347699757's two shards
+    # reached 60% and 69% in 100 minutes. Six shards of about 2,000 cases measured 52-99 minutes in 43386670021, where
+    # shard 5 was cancelled at 96%; 140 minutes leaves about 35% over the busiest, and a hung test still cannot hold a
+    # runner for hours.
+    timeout-minutes: 140
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2]
+        shard: [1, 2, 3, 4, 5, 6]
     env:
       APP_ENV: testing
       APP_DEBUG: 'false'
@@ -388,7 +396,7 @@ jobs:
       - name: Record source and SQLite runtime before tests
         run: python3 scripts/ci/database-receipts.py start --engine=sqlite --shard=${{ matrix.shard }}
       - name: Prove the complete SQLite test partition
-        run: python3 scripts/ci/phpunit-shards.py --shards=2 --prefix=phpunit-ci-sqlite --timings=scripts/ci/phpunit-timings-sqlite.json
+        run: python3 scripts/ci/phpunit-shards.py --shards=6 --prefix=phpunit-ci-sqlite --timings=scripts/ci/phpunit-timings-sqlite.json
       - name: Run all tests assigned to this SQLite shard
         id: database_tests
         run: php vendor/bin/phpunit --configuration=phpunit-ci-sqlite-${{ matrix.shard }}.xml --log-junit=phpunit-ci-sqlite-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings
@@ -425,7 +433,7 @@ jobs:
         env:
           NEEDS_JSON: ${{ toJSON(needs) }}
         run: python3 scripts/ci/ci-scope.py gate
-      - name: Verify all twenty-six current-run database receipts without enabling reuse
+      - name: Verify all thirty current-run database receipts without enabling reuse
         if: needs.scope.outputs.mode == 'full'
         env:
           RECEIPT_GITHUB_TOKEN: ${{ github.token }}

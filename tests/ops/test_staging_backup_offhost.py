@@ -638,7 +638,10 @@ fi""")
         self.assertNotEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients,
                                       **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=self.flaky_rclone())).returncode, 0)
         kept = self.backups / f".offhost-retry.{bk.name}" / f"{bk.name}.tar.age"
-        kept.write_bytes(kept.read_bytes()[:-1] + b"!")  # no longer matches its recorded digest
+        data = kept.read_bytes()
+        # Flip the last byte so it always differs (replacing it with a fixed byte left the copy intact whenever the random
+        # ciphertext already ended in that byte, 1 run in 256: Foundation 43383590812).
+        kept.write_bytes(data[:-1] + bytes([data[-1] ^ 0xFF]))  # no longer matches its recorded digest
         (self.remote_dir / f"{bk.name}.tar.age").unlink()
         run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)

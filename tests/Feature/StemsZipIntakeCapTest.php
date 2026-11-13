@@ -167,12 +167,18 @@ class StemsZipIntakeCapTest extends TestCase
         $this->assertSame([512 * self::MIB, 200 * self::MIB], [$kit['archive_max_total_bytes'], $kit['source_max_bytes']]);
     }
 
-    /** Declared member sizes in MiB; each member carries $dataBytes (a bit over the 100:1 minimum) of stored data. */
+    /**
+     * Declared member sizes in MiB; each member carries $dataBytes (a bit over the 100:1 minimum) of incompressible deflated data.
+     * Deflated, not stored: a stored member whose data is shorter than its declared size is structurally inconsistent, and the
+     * libzip of the Ubuntu 26.04 runners refuses such an archive at open (invalid_archive, Foundation 43422126942) before the
+     * directory limits this test is about are reached.
+     */
     private function inspect(array $declaredMib, ?int $dataBytes = null): string
     {
         $members = [];
         foreach ($declaredMib as $index => $mib) {
-            $members[] = ['name' => 'Stem'.$index.'.wav', 'bytes' => str_repeat('a', $dataBytes ?? (int) ceil($mib * self::MIB / 100) + 1), 'size' => $mib * self::MIB, 'crc' => 0];
+            $members[] = ['name' => 'Stem'.$index.'.wav', 'bytes' => random_bytes($dataBytes ?? (int) ceil($mib * self::MIB / 100) + 1),
+                'method' => 8, 'size' => $mib * self::MIB, 'crc' => 0];
         }
         $path = tempnam(sys_get_temp_dir(), 'cap-zip-');
         file_put_contents($path, StemsFixtures::zip($members));

@@ -117,10 +117,10 @@ class FakeGitlab:
 
 
 class NativeCollectorTests(unittest.TestCase):
-    def test_native_policy_matches_githubs_twenty_four_plus_two_under_the_hosted_three_hour_cap(self):
-        self.assertEqual({'mysql': 24, 'sqlite': 2}, native.COUNTS)
+    def test_native_policy_matches_githubs_twenty_four_plus_six_under_the_hosted_three_hour_cap(self):
+        self.assertEqual({'mysql': 24, 'sqlite': 6}, native.COUNTS)
         self.assertEqual(proof.COUNTS, native.COUNTS)
-        self.assertEqual(26, len(native.DATABASE_JOBS))
+        self.assertEqual(30, len(native.DATABASE_JOBS))
         workflow = (Path(__file__).parents[2] / '.gitlab-ci.yml').read_text()
         for engine, count in native.COUNTS.items():
             block = workflow.split(f'backend-{engine}:\n', 1)[1].split('\n\n', 1)[0]
@@ -170,10 +170,10 @@ class NativeCollectorTests(unittest.TestCase):
                 patch.object(proof, 'validate_discovered_files'), patch.object(proof, 'locked_dependencies', return_value=({}, runtime('mysql')['dependencies'])):
             return native.collect(ROOT, env(), api)
 
-    def test_twenty_six_complete_native_archives_without_legacy_metadata_remain_outer_pending(self):
+    def test_thirty_complete_native_archives_without_legacy_metadata_remain_outer_pending(self):
         value = self.collect(FakeGitlab())
-        self.assertEqual(26, len(value['database_receipts']))
-        self.assertEqual(32, len(value['upstream_jobs']))
+        self.assertEqual(30, len(value['database_receipts']))
+        self.assertEqual(36, len(value['upstream_jobs']))
         self.assertFalse(value['reuse_enabled'])
         self.assertIn('pending', value['outer_acceptance'])
         self.assertTrue(all('authenticated exact-job' in a['digest_origin'] for a in value['artifacts']))
@@ -309,7 +309,7 @@ class NativeCollectorTests(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises(proof.ReceiptError): self.collect(api)
         api = FakeGitlab(); metadata = api.rows[0]['artifacts'][0]
         api.rows[0]['artifacts_file'] = {'filename':metadata['filename'],'size':metadata['size']}
-        self.assertEqual(26,len(self.collect(api)['artifacts']))
+        self.assertEqual(30,len(self.collect(api)['artifacts']))
 
     def test_receipt_wrong_source_job_runner_runtime_dependencies_time_or_start_rejects(self):
         for mutation in ('source','job','runner','image','mysql_version','mysql_schema','mysql_isolation','php','dependencies','runtime_hash','time','start'):

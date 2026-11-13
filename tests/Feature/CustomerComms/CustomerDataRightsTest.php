@@ -488,16 +488,21 @@ class CustomerDataRightsTest extends TestCase
         $customer = F::account();
         $thrown = 0;
         $limit = 2;
-        DB::connection()->beforeExecuting(function (string $query) use (&$thrown, &$limit): void {
-            if (str_starts_with($query, 'insert into "customer_data_requests"') && $thrown < $limit) {
+        // The contention each engine really raises: SQLITE_BUSY, or a MySQL deadlock (both quote the table differently).
+        $connection = DB::connection();
+        $contention = $connection->getDriverName() === 'mysql'
+            ? ['40001', 1213, 'Deadlock found when trying to get lock; try restarting transaction']
+            : ['HY000', 5, 'database is locked'];
+        $connection->beforeExecuting(function (string $query) use (&$thrown, &$limit, $connection, $contention): void {
+            if (preg_match('/\Ainsert into [`"]customer_data_requests[`"]/', $query) === 1 && $thrown < $limit) {
                 $thrown++;
-                $busy = new \PDOException('SQLSTATE[HY000]: General error: 5 database is locked');
-                $busy->errorInfo = ['HY000', 5, 'database is locked'];
-                throw new QueryException('sqlite', $query, [], $busy);
+                $busy = new \PDOException('SQLSTATE['.$contention[0].']: '.$contention[2]);
+                $busy->errorInfo = $contention;
+                throw new QueryException($connection->getName(), $query, [], $busy);
             }
         });
         $principal = fn () => app(CustomerAccess::class)->principal($customer['user']->fresh());
-        // Two lock failures (SQLITE_BUSY), then success on the third attempt: one request, events 1..1.
+        // Two contention failures, then success on the third attempt: one request, events 1..1.
         $result = app(CustomerDataRights::class)->requestDeletion($principal(), $customer['user']);
         $this->assertSame([2, false, 1], [$thrown, $result['replayed'], DB::table('customer_data_requests')->count()]);
         $this->assertSame(1, (int) DB::table('customer_data_requests')->value('last_event_sequence'));

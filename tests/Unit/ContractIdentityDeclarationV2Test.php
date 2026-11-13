@@ -412,6 +412,7 @@ class ContractIdentityDeclarationV2Test extends TestCase
         $regular = json_decode((string) file_get_contents($fonts.'dejavusans.json'), true)['cw'];
         $bold = json_decode((string) file_get_contents($fonts.'dejavusansb.json'), true)['cw'];
         $accepted = 0;
+        $reversedSemicolon = false;
         foreach (array_keys(array_intersect_key($regular, $bold)) as $codepoint) {
             $character = mb_chr($codepoint, 'UTF-8');
             try {
@@ -420,13 +421,16 @@ class ContractIdentityDeclarationV2Test extends TestCase
                 continue;
             }
             $accepted++;
+            $reversedSemicolon = $reversedSemicolon || $codepoint === 0x204F;
             $this->assertTrue(\Normalizer::isNormalized($character, \Normalizer::FORM_C), sprintf('U+%04X', $codepoint));
             $this->assertGreaterThan(0, $regular[$codepoint], sprintf('U+%04X', $codepoint));
             $this->assertGreaterThan(0, $bold[$codepoint], sprintf('U+%04X', $codepoint));
             $this->assertSame(0, preg_match('/[\p{C}\p{M}\p{Z}]/u', str_replace(' ', '', $character)), sprintf('U+%04X', $codepoint));
         }
-        // The accepted repertoire is pinned: a face, PCRE or list change must be reviewed, not absorbed.
-        $this->assertSame(4899, $accepted);
+        // The accepted repertoire is pinned: a face, PCRE or list change must be reviewed, not absorbed. Reviewed 2026-11-13:
+        // U+204F REVERSED SEMICOLON alone depends on the runtime (PCRE2 10.47's Unicode data gives it the refused Arabic
+        // script extension; 10.42's does not). Pinning it needs a new contract profile version (the class is hash-frozen).
+        $this->assertSame(4899 - ($reversedSemicolon ? 0 : 1), $accepted);
     }
 
     public function test_every_pinned_country_name_is_printable_in_the_pinned_faces(): void

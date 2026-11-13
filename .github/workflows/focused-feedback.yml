@@ -9,7 +9,7 @@ on:
         required: true
         type: choice
         default: unit
-        options: [track-discovery, unit, media, commerce, financial, test-delivery, test-delivery-races, buyer-cancel, buyer-cancel-migrations, buyer-cancel-races, migration-recompilation, customer, operator, licensing, publication, track-concurrency, seller, store-foundations, membership-migrations, production-preparation, private-continuation, frontend, membership-history-frontend, browser-storefront, browser-customer, browser-site, browser-checkout, browser-delivery, browser-payment-exceptions, browser-operator-tracks, browser-operator-uploads, browser-operator-publication, bulk-license-browser, accessibility-browser]
+        options: [track-discovery, unit, media, commerce, financial, test-delivery, test-delivery-races, buyer-cancel, buyer-cancel-migrations, buyer-cancel-races, migration-recompilation, mysql-schema-snapshot, foundation-20261113-fixes, customer, operator, licensing, publication, track-concurrency, seller, store-foundations, membership-migrations, production-preparation, private-continuation, frontend, membership-history-frontend, browser-storefront, browser-customer, browser-site, browser-checkout, browser-delivery, browser-payment-exceptions, browser-operator-tracks, browser-operator-uploads, browser-operator-publication, bulk-license-browser, accessibility-browser]
       engine:
         description: PHP database engine; frontend/browser require sqlite
         required: true
@@ -71,7 +71,11 @@ jobs:
           MYSQL_ROOT_PASSWORD: ci-only-password
         ports:
           - 3306:3306
+        # A disposable server: its data directory lives in memory (no disk syncs). Each test rebuilds the
+        # schema with about 300 migrations, and on a disk-backed datadir every DDL commit synced to disk
+        # (Foundation 43304362814: 85-100 s per MySQL test, 18 of 24 shards cancelled at 210 minutes).
         options: >-
+          --tmpfs /var/lib/mysql:rw
           --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-only-password"
           --health-interval=10s
           --health-timeout=5s
@@ -128,6 +132,10 @@ jobs:
           # (provision.sh) create it utf8mb4_unicode_ci, which the account admission guard requires.
           docker exec -e MYSQL_PWD=ci-only-password "$MYSQL_CONTAINER_ID" \
             mysql -uroot -e 'ALTER DATABASE `vaseyaudio_focused` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
+          # Durability buys nothing on a disposable test server; locking, isolation and the native race behaviour
+          # under test are unchanged. sync_binlog and the redo-log flush are dynamic; the receipts do not pin them.
+          docker exec -e MYSQL_PWD=ci-only-password "$MYSQL_CONTAINER_ID" \
+            mysql -uroot -e 'SET GLOBAL innodb_flush_log_at_trx_commit = 0; SET GLOBAL sync_binlog = 0'
           echo "DB_HOST=${addresses[0]}" >> "$GITHUB_ENV"
       - name: Run the selected PHP files and record outcomes
         run: python3 scripts/ci/focused-tests.py

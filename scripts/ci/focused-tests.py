@@ -189,6 +189,30 @@ PHP_TARGETS = {
         "tests/Feature/MigrationRecompilationTest.php", "tests/Feature/TestDeliveryResumeMigrationTest.php",
         "tests/Feature/SiteImageMigrationTest.php",
     ),
+    # The per-process MySQL schema reuse and the MySQL-only fixes of Foundation run 43304362814 (2026-11-13).
+    "mysql-schema-snapshot": (
+        "tests/Feature/MysqlSchemaSnapshotTest.php", "tests/Feature/OrderPreparationMigrationTest.php",
+        "tests/Feature/CustomerComms/TransactionalMailRecoveryNativeTest.php",
+        "tests/Feature/ProductionIdentity/CurrentCatalogAdmissionTest.php",
+    ),
+    # The test fixes from Foundation run 43347699757 (2026-11-13): fixtures that roll back early migrations under later
+    # children (MySQL refuses to drop a referenced parent), fixture order and MySQL-specific injected errors.
+    "foundation-20261113-fixes": (
+        "tests/Feature/SoundKitMigrationTest.php", "tests/Feature/OrderPreparationMigrationTest.php",
+        "tests/Feature/CustomerInquiryMigrationTest.php", "tests/Feature/SharedInventoryMigrationTest.php",
+        "tests/Feature/QuotePricingMigrationTest.php", "tests/Feature/HostedCheckoutMigrationTest.php",
+        "tests/Feature/TestPaymentEvidenceMigrationTest.php", "tests/Feature/PromotionMigrationTest.php",
+        "tests/Feature/ProductionFinancialRetrieval/FinancialReadPlanTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php",
+        "tests/Feature/BulkReplaceLicenseDraftSourceConcurrencyTest.php", "tests/Feature/CustomerComms/CustomerDataRightsTest.php",
+        "tests/Feature/TestContractIssuanceMigrationTest.php", "tests/Feature/TestFulfillmentActivationMigrationTest.php",
+        "tests/Feature/InquiryMessageMigrationTest.php", "tests/Feature/SiteImageMigrationTest.php",
+        "tests/Feature/MediaLifecycle/MediaReferenceRegistryTest.php", "tests/Feature/TrackSchedulingConcurrencyTest.php",
+        "tests/Feature/CollaboratorSplitsTest.php", "tests/Feature/PreviewTagTest.php",
+        "tests/Feature/IsolatedContractRendererAcceptanceTest.php", "tests/Feature/CustomerPurchaseClaimMigrationTest.php",
+        "tests/Unit/VaseyLicenseGlyphCoverageTest.php", "tests/Feature/LegacyRedirectMapTest.php",
+        "tests/Feature/LegacyRedirectCommandTest.php",
+    ),
     # The native race alone: the whole test-delivery suite does not fit the 900-second runner cap on MySQL.
     "test-delivery-races": (
         "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
