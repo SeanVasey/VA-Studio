@@ -104,7 +104,8 @@ final class CurrentCatalog
             if ($this->transport($this->catalog, true) !== $this->transportIdentity) {
                 self::refuse();
             }
-        } catch (Throwable) {
+        } catch (Throwable $diag) {
+            fwrite(STDERR, 'DIAG CurrentCatalog: '.get_class($diag).': '.$diag->getMessage().' @ '.$diag->getFile().':'.$diag->getLine().PHP_EOL.implode(PHP_EOL, array_slice(explode(PHP_EOL, $diag->getTraceAsString()), 0, 8)).PHP_EOL);
             $this->catalog = null;
             $this->failed = true;
             // No previous exception/DSN/options/credentials in a public failure chain.
