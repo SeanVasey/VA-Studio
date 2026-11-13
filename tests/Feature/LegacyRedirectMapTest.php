@@ -70,7 +70,8 @@ class LegacyRedirectMapTest extends TestCase
         // URL-006 is retained: BL-64's /services route serves the path and answers the contact fallback while the catalog is off.
         $this->assertSame(['URL-003', 'URL-004', 'URL-005', 'URL-016', 'URL-017', 'URL-018', 'URL-019', 'URL-020'], array_column($report['unresolved'], 'route_id'));
         foreach ($report['unresolved'] as $row) {
-            $this->assertNull($row['served_by'], $row['route_id']);
+            // URL-005 is unresolved because the (flag-gated) sound-kit storefront route serves it; every other row has no route.
+            $this->assertSame($row['route_id'] === 'URL-005' ? 'sound-kits.index' : null, $row['served_by'], $row['route_id']);
             $this->assertNotSame('', trim($row['reason']));
         }
         $this->assertFalse(config('legacy-redirects.enabled'));

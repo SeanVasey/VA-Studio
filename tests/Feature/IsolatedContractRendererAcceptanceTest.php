@@ -51,11 +51,7 @@ class IsolatedContractRendererAcceptanceTest extends TestCase
             $this->assertStringNotContainsString($activeContent, $first->pdfBytes);
         }
 
-        // Under the application's own storage rather than the system temp directory: on the CI runners qpdf was refused
-        // a 0600 file of this process's own in /tmp (Foundation 43368454156, "Permission denied").
-        $directory = storage_path('framework/testing');
-        @mkdir($directory, 0700, true);
-        $path = tempnam($directory, 'vasey-contract-acceptance-');
+        $path = tempnam(sys_get_temp_dir(), 'vasey-contract-acceptance-');
         $this->assertIsString($path);
         try {
             $this->assertTrue(chmod($path, 0600));

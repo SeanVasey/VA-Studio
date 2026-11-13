@@ -41,7 +41,7 @@ class LegacyRedirectCommandTest extends TestCase
             ->expectsOutputToContain('Map valid: no errors.')
             ->assertSuccessful();
         $this->artisan('vasey:redirects-validate', ['--require-resolved' => true])
-            ->expectsOutputToContain('7 inventory row(s) are unresolved; the cutover gate requires none.')
+            ->expectsOutputToContain('8 inventory row(s) are unresolved; the cutover gate requires none.')
             ->assertFailed();
     }
 
