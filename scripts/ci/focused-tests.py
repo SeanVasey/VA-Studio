@@ -190,6 +190,7 @@ PHP_TARGETS = {
         "tests/Feature/SiteImageMigrationTest.php",
     ),
     "migration-recompilation-profile": ("tests/Feature/ZzMigrationProfileTest.php",),
+    "proof-frame-baseline": ("tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php",),
     # The native race alone: the whole test-delivery suite does not fit the 900-second runner cap on MySQL.
     "test-delivery-races": (
         "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
