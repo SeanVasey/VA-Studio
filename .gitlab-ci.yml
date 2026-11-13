@@ -148,8 +148,8 @@ backend-mysql:
 backend-sqlite:
   extends: .database
   # Same 6-shard partition as GitHub (2026-11-13: two shards reached only 60-69% in 100 minutes, Foundation
-  # 43347699757); 100 minutes stays under GitLab.com's hosted 3-hour cap.
-  timeout: 100m
+  # 43347699757; six measured 52-99 minutes, one cancelled at 96%); 140 minutes stays under GitLab.com's 3-hour cap.
+  timeout: 140m
   parallel:
     matrix:
       - SHARD: ['1', '2', '3', '4', '5', '6']

@@ -395,6 +395,7 @@ class TrackSchedulingTest extends TestCase
                 break;
             case 'bytes':
                 $path = app(VerifiedMedia::class)->path($fixture['media']['master_wav']);
+                chmod($path, 0600); // Verified files are stored read-only; tamper as an outside writer would.
                 file_put_contents($path, 'tampered after scheduling');
                 break;
             case 'rights':
@@ -438,6 +439,7 @@ class TrackSchedulingTest extends TestCase
         $preview = app(VerifiedMedia::class)->path($fixture['media']['preview_tagged']);
         $original = file_get_contents($preview);
         // Same size, different bytes: only a fresh hash notices, which is what manual publication does too.
+        chmod($preview, 0600); // Verified files are stored read-only; tamper as an outside writer would.
         file_put_contents($preview, strrev($original));
         $this->assertNotSame($original, file_get_contents($preview));
         [$code, $output] = $this->runCommand();
@@ -484,11 +486,14 @@ class TrackSchedulingTest extends TestCase
         [$schedule, $fixture, $at] = $this->scheduled();
         $path = app(VerifiedMedia::class)->path($fixture['media']['master_wav']);
         $original = file_get_contents($path);
+        $mode = fileperms($path) & 0777;
+        chmod($path, 0600); // Verified files are stored read-only; tamper as an outside writer would, then restore the mode.
         file_put_contents($path, 'tampered');
         $this->travelTo($at->addMinute());
         $this->assertSame(1, $this->runCommand()[0]);
         $this->assertSame('scheduled', $fixture['track']->fresh()->status);
         file_put_contents($path, $original);
+        chmod($path, $mode);
         $this->travelTo($at->addMinutes(2 + TrackPublicationSchedules::RETRY_MINUTES));
         $this->assertSame(0, $this->runCommand()[0]);
         $this->assertSame('published', $fixture['track']->fresh()->status);

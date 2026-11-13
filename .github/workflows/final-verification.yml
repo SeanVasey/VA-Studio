@@ -355,9 +355,10 @@ jobs:
     name: backend-sqlite (${{ matrix.shard }}/6)
     runs-on: ubuntu-latest
     # Six shards since 2026-11-13: the suite grew to about 12,100 cases, and Foundation 43347699757's two shards
-    # reached 60% and 69% in 100 minutes (projected 145-165 each). Six shards of about 2,000 cases each project to
-    # about 50 minutes; 100 minutes stays the cap, so a hung test still cannot hold a runner for hours.
-    timeout-minutes: 100
+    # reached 60% and 69% in 100 minutes. Six shards of about 2,000 cases measured 52-99 minutes in 43386670021, where
+    # shard 5 was cancelled at 96%; 140 minutes leaves about 35% over the busiest, and a hung test still cannot hold a
+    # runner for hours.
+    timeout-minutes: 140
     strategy:
       fail-fast: false
       matrix:

@@ -864,6 +864,7 @@ class SoundKitMediaTest extends TestCase
     private function damage(string $path): void
     {
         $this->assertFileExists($path);
+        chmod($path, 0600); // Verified files are stored read-only; tamper as an outside writer would.
         file_put_contents($path, str_repeat('x', max(1, (int) filesize($path))));
     }
 
