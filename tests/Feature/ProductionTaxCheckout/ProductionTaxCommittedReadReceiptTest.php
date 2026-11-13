@@ -985,8 +985,10 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
             $this->assertSame(0, $peer->calls, 'Original identity witness invoked callback-capable peer metadata.');
             if (DB::getDriverName() === 'mysql') {
                 // MySQL's catalog admission admits only the framework's own connection classes
-                // (IdentityMetadataAdmission::inspect), so the peer is refused at the locked read, before any receipt.
+                // (IdentityMetadataAdmission::inspect), so the peer is refused when the historical buyer binding is verified
+                // (IdentityRows::assertPermanent, observed in focused run 43447930982), before any locked read or receipt.
                 $this->assertInstanceOf(IdentityException::class, $error);
+                $this->assertSame('permanent_primary_required', $error->reason);
                 $this->assertNull($source);
             } else {
                 $this->assertInstanceOf(CheckoutException::class, $error);
