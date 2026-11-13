@@ -189,6 +189,7 @@ PHP_TARGETS = {
         "tests/Feature/MigrationRecompilationTest.php", "tests/Feature/TestDeliveryResumeMigrationTest.php",
         "tests/Feature/SiteImageMigrationTest.php",
     ),
+    "migration-recompilation-profile": ("tests/Feature/ZzMigrationProfileTest.php",),
     # The native race alone: the whole test-delivery suite does not fit the 900-second runner cap on MySQL.
     "test-delivery-races": (
         "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
