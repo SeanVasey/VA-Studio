@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
+use Tests\Support\DisposableNativeDatabase;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\TransactionalMailFixtures as M;
 use Tests\Support\TransactionalNotificationFixtures as N;
@@ -117,8 +118,9 @@ class TransactionalMailRecoveryNativeTest extends TestCase
         $directory = storage_path('framework/testing/cx-mail-native-'.Str::uuid());
         (new Filesystem)->makeDirectory($directory, 0700, true);
         $configuration = DB::connection()->getConfig();
-        $this->assertTrue(getenv('VA_LOCAL_DISPOSABLE_MYSQL') === DB::getDatabaseName()
-            || (getenv('CI') === 'true' && getenv('VA_CI_DISPOSABLE_MYSQL') === DB::getDatabaseName()),
+        // The shared declaration rule: a local schema named by VA_LOCAL_DISPOSABLE_MYSQL, or CI's VA_CI_DISPOSABLE_MYSQL=1 marker on
+        // the job's own disposable DB_DATABASE (the marker was once the schema name; Foundation run 43304362814 refused it).
+        $this->assertTrue(DisposableNativeDatabase::isAdmitted((string) getenv('VA_LOCAL_DISPOSABLE_MYSQL')),
             'The parent must already hold its genuine disposable-native declaration.');
         $environment = ['APP_ENV' => 'testing', 'APP_DEBUG' => 'false', 'APP_KEY' => config('app.key'), 'DB_CONNECTION' => 'mysql',
             'DB_URL' => '', 'DB_SOCKET' => (string) ($configuration['unix_socket'] ?? ''), 'CACHE_STORE' => 'array', 'SESSION_DRIVER' => 'array',

@@ -64,7 +64,7 @@ class MediaFixtures
     }
 
     /** Returns immutable outputs indexed by role; never creates offers or rights. */
-    public static function readyTrackMedia(Track $track, User $actor, ?MalwareScanner $scanner = null): array
+    public static function readyTrackMedia(Track $track, User $actor, ?MalwareScanner $scanner = null, ?string $masterWav = null): array
     {
         $defaultScanner = self::configure();
         // The native customer fixture opts into the genuine scanner before any immutable media evidence.
@@ -75,7 +75,7 @@ class MediaFixtures
         try {
             $outputs = [];
             foreach (['master_wav', 'artwork'] as $role) {
-                $source = self::source($track, $role);
+                $source = self::source($track, $role, $role === 'master_wav' ? $masterWav : null);
                 $run = app(QueueMediaProcessing::class)->handle($source, $actor);
                 $processed = app(MediaProcessor::class)->handle($run->id);
                 if ($scanner !== null && $processed->status !== 'completed') {

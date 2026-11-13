@@ -22,6 +22,15 @@ class SiteImageMigrationTest extends TestCase
         // back first and run again last.
         $cover = require database_path('migrations/2026_11_10_286700_site_image_release_cover_slot.php');
         $albums = require database_path('migrations/2026_11_10_286710_album_releases.php');
+        // Sound-kit product media (Nov 11) also references site_images (cover_image_id). MySQL refuses to drop site_images under
+        // that foreign key, so its empty columns roll back first and return last; SQLite does not check, and rebuilding the
+        // products table there would drop its triggers.
+        $media = require database_path('migrations/2026_11_11_000601_sound_kit_product_media.php');
+        $mysql = DB::connection()->getDriverName() === 'mysql';
+        if ($mysql) {
+            $this->assertSame(0, DB::table('sound_kit_products')->count());
+            $media->down();
+        }
         $albums->down();
         $this->assertFalse(Schema::hasTable('album_releases'));
         // The release image index references site_images, so it rolls back first, as migrate:rollback would; MySQL refuses to
@@ -64,6 +73,9 @@ class SiteImageMigrationTest extends TestCase
             $this->addToAssertionCount(1);
         }
         $albums->up();
+        if ($mysql) {
+            $media->up();
+        }
         $this->assertTrue(Schema::hasTable('album_releases'));
         $uploader = User::factory()->create()->id;
         $row = fn (array $overrides = []): array => $overrides + [

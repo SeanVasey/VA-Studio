@@ -6,6 +6,7 @@ use App\Domain\SoundKits\Models\SoundKitRevision;
 use App\Domain\SoundKits\SoundKitDrafts;
 use App\Domain\SoundKits\SoundKitIntake;
 use App\Domain\SoundKits\SoundKitProcessor;
+use App\Support\MigrationDefinitions;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\UploadedFile;
@@ -29,7 +30,13 @@ class SoundKitMigrationTest extends TestCase
 
     private function clearEmpty(): void
     {
-        // Disposable fixture reset: remove the transport child before its retained kit parents.
+        // Disposable fixture reset: the empty Nov 11 product, demo, media and purchase children hold foreign keys to the kit
+        // drafts and revisions, which MySQL refuses to drop under them (SQLite does not check); remove them first, newest
+        // first, through their own empty-only rollbacks. Then the transport child before its retained kit parents.
+        foreach (['2026_11_11_000800_sound_kit_test_purchases', '2026_11_11_000601_sound_kit_product_media',
+            '2026_11_11_000600_sound_kit_demos', '2026_11_11_000500_sound_kit_products'] as $child) {
+            MigrationDefinitions::load($child.'.php')->down();
+        }
         // Operational rollback still retains these tables and is exercised separately below.
         foreach (['sound_kit_upload_sessions', 'sound_kit_revisions', 'sound_kit_drafts'] as $table) {
             $this->assertSame(0, DB::table($table)->count());

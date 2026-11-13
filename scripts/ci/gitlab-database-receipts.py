@@ -21,7 +21,7 @@ spec = importlib.util.spec_from_file_location("database_proofs", ROOT / "scripts
 proof = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(proof)
 # Twenty-four MySQL shards keep each GitLab job under the hosted 3-hour cap at projected hosted speed; the partition matches GitHub's.
-COUNTS = {"mysql": 24, "sqlite": 2}
+COUNTS = {"mysql": 24, "sqlite": 6}
 PROJECT = 87181037
 PATH = "vaseydev/va-studio"
 API = "https://gitlab.com/api/v4"

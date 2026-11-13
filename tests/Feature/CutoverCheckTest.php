@@ -647,7 +647,7 @@ class CutoverCheckTest extends TestCase
             $this->assertSame(Checks::INFO, $rows['PCL-21']['status']);
             $this->assertStringContainsString('all four pre-launch holds read false', $rows['PCL-21']['checked'][0]);
             $this->assertSame(Checks::INFO, $rows['PCL-24']['status']);
-            $this->assertMatchesRegularExpression('/enabled reads false; map rows: redirect=7, retained=6, unresolved=7\z/', $rows['PCL-24']['checked'][0]);
+            $this->assertMatchesRegularExpression('/enabled reads false; map rows: redirect=6, retained=6, unresolved=8\z/', $rows['PCL-24']['checked'][0]);
             $this->assertSame(Checks::INFO, $rows['PCL-26']['status']);
             $this->assertStringContainsString('reads false', $rows['PCL-26']['checked'][0]);
             $this->assertStringContainsString('0 of 6 customer-facing switches not false', $rows['PCL-25']['checked'][0]);

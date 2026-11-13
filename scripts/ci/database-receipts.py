@@ -55,7 +55,7 @@ POLICY_FILES = (
     "composer.json", "composer.lock", "package.json", "package-lock.json",
     "scripts/ci/phpunit-timings-mysql.json", "scripts/ci/phpunit-timings-sqlite.json",
 )
-COUNTS = {"mysql": 24, "sqlite": 2}
+COUNTS = {"mysql": 24, "sqlite": 6}
 SQLITE_SKIP_POLICY = "scripts/ci/database-sqlite-skips.json"
 SELECTION_POLICY = "scripts/ci/database-mysql-selection.json"
 MYSQL_SKIP_POLICY = "scripts/ci/database-mysql-skips.json"

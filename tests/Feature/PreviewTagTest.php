@@ -102,6 +102,18 @@ class PreviewTagTest extends TestCase
         Storage::disk('local')->delete($untagged->storage_path);
     }
 
+    /**
+     * Verified media is stored read-only, and the local disk's put() returns false rather than throwing when it cannot write
+     * (as for a non-root CI runner), so the file must be made writable and the write proven before the test relies on it.
+     */
+    private function tamper(MediaAsset $asset, string $bytes): void
+    {
+        $path = Storage::disk('local')->path($asset->storage_path);
+        chmod($path, 0600);
+        $this->assertTrue(Storage::disk('local')->put($asset->storage_path, $bytes));
+        $this->assertSame($bytes, file_get_contents($path));
+    }
+
     private function bytes(MediaAsset $asset): string
     {
         return file_get_contents(Storage::disk('local')->path($asset->storage_path));
@@ -325,7 +337,7 @@ class PreviewTagTest extends TestCase
         app(PreviewTagPolicy::class)->setTrack($track, false, 0, $fixture['actor']);
         $this->assertSame((string) $fixture['untagged']->id, $this->catalogPreviewId($track));
         // The stored bytes no longer match their recorded digest.
-        Storage::disk('local')->put($fixture['untagged']->storage_path, 'not the verified bytes');
+        $this->tamper($fixture['untagged'], 'not the verified bytes');
         $this->assertFalse(app(VerifiedMedia::class)->available($fixture['untagged']));
         $this->assertSame((string) $fixture['tagged']->id, $this->catalogPreviewId($track));
         $this->assertSame($this->bytes($fixture['tagged']), $this->served($fixture['tagged']));
@@ -356,8 +368,8 @@ class PreviewTagTest extends TestCase
             }
         }
         // Both previews unavailable: the public gets nothing, not the delivery MP3.
-        Storage::disk('local')->put($fixture['tagged']->storage_path, 'tampered');
-        Storage::disk('local')->put($fixture['untagged']->storage_path, 'tampered');
+        $this->tamper($fixture['tagged'], 'tampered');
+        $this->tamper($fixture['untagged'], 'tampered');
         $this->assertSame($fixture['tagged']->id, $resolver->publicPreview($track->fresh())->id);
         foreach ([$fixture['tagged'], $fixture['untagged']] as $asset) {
             $response = $this->get(route('media.public', $asset->id, false));
