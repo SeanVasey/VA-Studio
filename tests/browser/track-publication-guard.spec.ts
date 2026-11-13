@@ -2,6 +2,7 @@ import { test, expect, type Locator, type Page } from '@playwright/test';
 import { actionResponse, closeDialog, expectModalFits, login, publicationReview, row, searchTracks } from './publication-fixture';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
 import { syncSuccessNotification } from './notification-sync';
+import { modalReady } from './modal-ready';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
@@ -45,6 +46,7 @@ test('publication refuses an unready draft before opening confirmation and prese
   await page.getByRole('button', { name: 'New track', exact: true }).click();
   let dialog = page.getByRole('dialog');
   await expect(dialog.getByRole('heading')).toBeVisible();
+  await modalReady(dialog);
   for (const [label, value] of [
     ['Title', data.title], ['Slug', data.slug], ['Artist', data.artist], ['Bpm', data.bpm],
     ['Musical key', data.musicalKey], ['Genre', data.genre], ['Mood', data.mood], ['Description', data.description],

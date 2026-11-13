@@ -1,5 +1,6 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
+import { modalReady } from './modal-ready';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
@@ -43,6 +44,7 @@ async function draft(page: Page, title: string, slug: string, oldTag: string): P
   const dialog = page.getByRole('dialog');
   const heading = dialog.getByRole('heading');
   await expect(heading).toBeVisible();
+  await modalReady(dialog);
   await dialog.getByLabel('Title', { exact: false }).fill(title);
   await dialog.getByLabel('Slug', { exact: false }).fill(slug);
   await addTags(dialog, 'Tags', [oldTag]);
