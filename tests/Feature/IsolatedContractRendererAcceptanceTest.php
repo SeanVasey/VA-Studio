@@ -51,10 +51,13 @@ class IsolatedContractRendererAcceptanceTest extends TestCase
             $this->assertStringNotContainsString($activeContent, $first->pdfBytes);
         }
 
-        $path = tempnam(sys_get_temp_dir(), 'vasey-contract-acceptance-');
-        $this->assertIsString($path);
+        // A .pdf name in a private directory: qpdf refused an extensionless 0600 temp file of this process's own on the
+        // CI runners, in /tmp and under storage alike (Foundation 43368454156, 43386670021: "Permission denied").
+        $directory = sys_get_temp_dir().'/vasey-contract-acceptance-'.bin2hex(random_bytes(8));
+        $this->assertTrue(mkdir($directory, 0700));
+        $path = $directory.'/contract.pdf';
         try {
-            $this->assertTrue(chmod($path, 0600));
+            $this->assertTrue(touch($path) && chmod($path, 0600));
             $this->assertSame($first->sizeBytes, file_put_contents($path, $first->pdfBytes));
             $check = new Process(['qpdf', '--check', $path], timeout: 30);
             $check->mustRun();
@@ -77,6 +80,7 @@ class IsolatedContractRendererAcceptanceTest extends TestCase
             if (is_file($path)) {
                 unlink($path);
             }
+            rmdir($directory);
         }
     }
 }
