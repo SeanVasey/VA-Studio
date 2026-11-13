@@ -23,7 +23,7 @@ use Throwable;
  */
 final class MysqlSchemaSnapshot
 {
-    /** @var array{identity: string, fingerprint: string, rows: array<string, array{columns: list<string>, rows: list<array>}>, increments: array<string, int>}|null */
+    /** @var array{identity: string, fingerprint: string, sections: array<string, string>, rows: array<string, array{columns: list<string>, rows: list<array>}>, increments: array<string, int>}|null */
     private static ?array $baseline = null;
 
     public static function enabled(Connection $connection): bool
@@ -35,13 +35,18 @@ final class MysqlSchemaSnapshot
     public static function restore(Connection $connection): bool
     {
         if (self::$baseline === null || ! self::enabled($connection) || self::$baseline['identity'] !== self::identity($connection)) {
+            self::note(self::$baseline === null ? 'no baseline yet' : 'connection identity or opt-out changed');
             self::$baseline = null;
 
             return false;
         }
+        $started = microtime(true);
         $pdo = $connection->getPdo();
         try {
-            if (! hash_equals(self::$baseline['fingerprint'], self::fingerprint($pdo))) {
+            $sections = self::sections($pdo);
+            if (! hash_equals(self::$baseline['fingerprint'], self::digest($sections))) {
+                $changed = array_keys(array_diff_assoc(self::$baseline['sections'], $sections));
+                self::note('schema changed ('.implode(', ', $changed).')');
                 self::$baseline = null;
 
                 return false;
@@ -75,10 +80,12 @@ final class MysqlSchemaSnapshot
                 }
             }
 
+            self::note(sprintf('reused the migrated schema in %.2f s (%d tables reset)', microtime(true) - $started, count($reset)));
+
             return true;
         } catch (Throwable $exception) {
             self::$baseline = null;
-            fwrite(STDERR, 'MysqlSchemaSnapshot: reset refused ('.get_class($exception).': '.substr($exception->getMessage(), 0, 240).'); migrating fresh.'.PHP_EOL);
+            self::note('reset refused ('.get_class($exception).': '.substr($exception->getMessage(), 0, 240).'); migrating fresh');
 
             return false;
         }
@@ -105,8 +112,10 @@ final class MysqlSchemaSnapshot
             $order = in_array('id', $columns, true) ? ' ORDER BY `id`' : '';
             $rows[$table] = ['columns' => $columns, 'rows' => $pdo->query("SELECT {$list} FROM ".self::quote($table).$order)->fetchAll(PDO::FETCH_NUM)];
         }
-        self::$baseline = ['identity' => self::identity($connection), 'fingerprint' => self::fingerprint($pdo), 'rows' => $rows,
-            'increments' => self::increments($pdo)];
+        $sections = self::sections($pdo);
+        self::$baseline = ['identity' => self::identity($connection), 'fingerprint' => self::digest($sections), 'sections' => $sections,
+            'rows' => $rows, 'increments' => self::increments($pdo)];
+        self::note(sprintf('captured: %d tables, %d with migration rows', count($tables), count($rows)));
     }
 
     public static function forget(): void
@@ -120,7 +129,8 @@ final class MysqlSchemaSnapshot
     }
 
     /** Every schema object the migrations own, canonically ordered; counters and statistics excluded. */
-    private static function fingerprint(PDO $pdo): string
+    /** @return array<string, string> one digest per schema object kind */
+    private static function sections(PDO $pdo): array
     {
         $queries = [
             'SELECT TABLE_NAME, TABLE_TYPE, ENGINE, TABLE_COLLATION, CREATE_OPTIONS, TABLE_COMMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME',
@@ -135,12 +145,25 @@ final class MysqlSchemaSnapshot
             'SELECT TABLE_NAME, VIEW_DEFINITION, CHECK_OPTION, SECURITY_TYPE FROM information_schema.VIEWS WHERE TABLE_SCHEMA = DATABASE() ORDER BY TABLE_NAME',
             'SELECT EVENT_NAME, EVENT_DEFINITION, STATUS FROM information_schema.EVENTS WHERE EVENT_SCHEMA = DATABASE() ORDER BY EVENT_NAME',
         ];
-        $context = hash_init('sha256');
+        $sections = [];
         foreach ($queries as $query) {
-            hash_update($context, json_encode($pdo->query($query)->fetchAll(PDO::FETCH_NUM), JSON_THROW_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE).PHP_EOL);
+            preg_match('/FROM information_schema\.(\w+)/', $query, $match);
+            $sections[$match[1]] = hash('sha256', json_encode($pdo->query($query)->fetchAll(PDO::FETCH_NUM), JSON_THROW_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE));
         }
 
-        return hash_final($context);
+        return $sections;
+    }
+
+    private static function digest(array $sections): string
+    {
+        return hash('sha256', json_encode($sections, JSON_THROW_ON_ERROR));
+    }
+
+    private static function note(string $message): void
+    {
+        if (getenv('VA_TEST_SNAPSHOT_TRACE') === '1' || getenv('CI') === 'true') {
+            fwrite(STDERR, 'MysqlSchemaSnapshot: '.$message.PHP_EOL);
+        }
     }
 
     /** @return list<string> */
