@@ -5,6 +5,7 @@ namespace Tests\Feature\ProductionMembershipBilling;
 use App\Domain\Memberships\Billing\BillingAwardFence;
 use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipPeriodRecords;
+use App\Domain\Memberships\Production\MembershipRedemptionWorkflowLock;
 use App\Domain\Memberships\Production\MembershipReservationOperations;
 use App\Domain\Memberships\Production\MembershipReservationRecords;
 use App\Support\CanonicalJson;
@@ -196,9 +197,18 @@ class MembershipNativeReservationRaceTest extends TestCase
             'table' => BillingAwardFence::TABLE, 'primary_key' => 1, 'observed_ns' => hrtime(true)];
         $this->start($second);
         $userId = (int) $fixture['buyer']['user']->id;
-        $this->await(fn (): bool => $this->waiting($second['connection_id'], $first['connection_id'], 'users', $userId), [$first, $second]);
-        $this->transcript['barriers'][] = ['requester' => $second['connection_id'], 'blocker' => $first['connection_id'],
-            'table' => 'users', 'primary_key' => $userId, 'observed_ns' => hrtime(true)];
+        if (isset($one['redemption_id']) && ($two['redemption_id'] ?? null) === $one['redemption_id']) {
+            // Two operations on one redemption queue on its native workflow lock, which each takes before any identity row
+            // (MembershipReservationOperations); the second never reaches the users row while the first holds that lock.
+            $lockName = MembershipRedemptionWorkflowLock::name(DB::getDatabaseName(), $one['redemption_id']);
+            $this->await(fn (): bool => $this->coordinationWaiting($second['connection_id'], $first['connection_id'], $lockName), [$first, $second]);
+            $this->transcript['barriers'][] = ['requester' => $second['connection_id'], 'blocker' => $first['connection_id'],
+                'lock_type' => 'USER LEVEL LOCK', 'lock_name' => $lockName, 'observed_ns' => hrtime(true)];
+        } else {
+            $this->await(fn (): bool => $this->waiting($second['connection_id'], $first['connection_id'], 'users', $userId), [$first, $second]);
+            $this->transcript['barriers'][] = ['requester' => $second['connection_id'], 'blocker' => $first['connection_id'],
+                'table' => 'users', 'primary_key' => $userId, 'observed_ns' => hrtime(true)];
+        }
         $this->writeReceipt();
         // Identity/fixed-fence locks order these operations before their period lock; never attribute this solely to the period.
         DB::commit();
@@ -284,6 +294,23 @@ SQL);
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
 
         return $row !== false && trim($row['row_key'], "'\"") === (string) $id;
+    }
+
+    /** The requester's GET_LOCK is pending on the named user-level lock that the blocker holds. */
+    private function coordinationWaiting(int $requester, int $blocker, string $name): bool
+    {
+        $statement = DB::connection()->getPdo()->prepare(<<<'SQL'
+SELECT pending.OBJECT_NAME FROM performance_schema.metadata_locks pending
+JOIN performance_schema.threads requester ON requester.THREAD_ID = pending.OWNER_THREAD_ID
+JOIN performance_schema.metadata_locks granted ON granted.OBJECT_TYPE = pending.OBJECT_TYPE AND granted.OBJECT_NAME = pending.OBJECT_NAME
+JOIN performance_schema.threads blocker ON blocker.THREAD_ID = granted.OWNER_THREAD_ID
+WHERE pending.OBJECT_TYPE = 'USER LEVEL LOCK' AND pending.OBJECT_NAME = ? AND pending.OBJECT_SCHEMA IS NULL
+AND pending.LOCK_STATUS = 'PENDING' AND granted.LOCK_STATUS = 'GRANTED'
+AND requester.PROCESSLIST_ID = ? AND blocker.PROCESSLIST_ID = ? LIMIT 1
+SQL);
+        $statement->execute([$name, $requester, $blocker]);
+
+        return $statement->fetchColumn() === $name;
     }
 
     private function await(callable $condition, array $workers, int $seconds = 20): void
