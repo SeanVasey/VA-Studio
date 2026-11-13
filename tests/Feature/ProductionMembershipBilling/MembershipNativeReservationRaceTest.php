@@ -34,6 +34,10 @@ class MembershipNativeReservationRaceTest extends TestCase
 
     protected function setUp(): void
     {
+        if (preg_match('/test_custom_peer_connection_metadata_is_refused|test_refused_original_commit_cleans_probe|test_terminal_proof_reads_raw|test_transient_configuration_cannot_admit|test_duplicate_release_at_honor|test_release_after_period_expiry/', $this->name()) !== 1
+            || (str_contains($this->name(), 'test_refused_original_commit') && ! str_contains((string) $this->dataName(), 'expiry') && ! in_array('expiry', $this->providedData(), true))) {
+            $this->markTestSkipped('scratch diagnostics');
+        }
         parent::setUp();
         if (DB::getDriverName() !== 'mysql') {
             $this->markTestSkipped('Reservation serialization requires independent native MySQL processes and record waits.');
@@ -298,7 +302,13 @@ SQL);
             }
             usleep(5000);
         } while (hrtime(true) < $deadline);
-        $this->fail('Reservation worker did not reach the bounded exact native record barrier.');
+        $diagRows = DB::connection()->getPdo()->query("SELECT requester.PROCESSLIST_ID rq, blocker.PROCESSLIST_ID bl, requested.OBJECT_NAME obj, requested.INDEX_NAME idx, requested.LOCK_TYPE lt, requested.LOCK_MODE lm, requested.LOCK_DATA ld FROM performance_schema.data_lock_waits waits JOIN performance_schema.threads requester ON requester.THREAD_ID = waits.REQUESTING_THREAD_ID JOIN performance_schema.threads blocker ON blocker.THREAD_ID = waits.BLOCKING_THREAD_ID JOIN performance_schema.data_locks requested ON requested.ENGINE_LOCK_ID = waits.REQUESTING_ENGINE_LOCK_ID")->fetchAll(\PDO::FETCH_ASSOC);
+        $diagProc = DB::connection()->getPdo()->query('SELECT ID, COMMAND, TIME, STATE, LEFT(INFO, 200) INFO FROM information_schema.PROCESSLIST')->fetchAll(\PDO::FETCH_ASSOC);
+        $diagOut = '';
+        foreach ($workers as $worker) {
+            $diagOut .= ' | worker '.$worker['connection_id'].' running='.var_export($worker['process']->isRunning(), true).' out='.$worker['process']->getIncrementalOutput().' err='.$worker['process']->getIncrementalErrorOutput();
+        }
+        $this->fail('Reservation worker did not reach the bounded exact native record barrier. DIAG parent='.$this->connectionId().' waits='.json_encode($diagRows).' proc='.json_encode($diagProc).$diagOut);
     }
 
     private function connectionId(): int

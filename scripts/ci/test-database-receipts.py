@@ -448,10 +448,10 @@ class NativeSelectionTests(unittest.TestCase):
             self.verify(files)
 
     def test_sqlite_path_is_unchanged_complete_and_rejects_a_selection(self):
-        for shard in (1, 2):
+        for shard in range(1, receipt.COUNTS["sqlite"] + 1):
             value = self.verify(evidence("sqlite", shard), engine="sqlite", shard=shard, selection=None)
             self.assertEqual(value["source_census"], receipt.census(receipt.inventory(listing(ROWS), ROOT)))
-        self.assertEqual(len(ROWS) - 1, sum(self.verify(evidence("sqlite", shard), engine="sqlite", shard=shard)["results"]["executed_cases"] for shard in (1, 2)))
+        self.assertEqual(len(ROWS) - 1, sum(self.verify(evidence("sqlite", shard), engine="sqlite", shard=shard)["results"]["executed_cases"] for shard in range(1, receipt.COUNTS["sqlite"] + 1)))
         files = evidence("sqlite", 1)
         manifest = json.loads(files["phpunit-ci-sqlite-manifest.json"])
         manifest["selection"] = selection_block(SELECTED_ROWS)
@@ -526,10 +526,10 @@ class CollectorTests(unittest.TestCase):
                 patch.object(receipt, "validate_discovered_files"), patch.object(receipt, "locked_dependencies", return_value=({}, runtime("mysql")["dependencies"])):
             return receipt.collect(Path(ROOT), {}, api)
 
-    def test_twenty_six_complete_current_attempt_receipts_remain_full_and_outer_pending(self):
+    def test_thirty_complete_current_attempt_receipts_remain_full_and_outer_pending(self):
         value = self.collect(FakeGithub())
-        self.assertEqual(26, len(value["database_receipts"]))
-        self.assertEqual({"mysql": 24, "sqlite": 2}, receipt.COUNTS)
+        self.assertEqual(30, len(value["database_receipts"]))
+        self.assertEqual({"mysql": 24, "sqlite": 6}, receipt.COUNTS)
         # MySQL runs every selected case except its one reviewed SQLite-only skip, which SQLite executed.
         self.assertEqual(len(SELECTED_ROWS) - 1, sum(row["results"]["executed_cases"] for row in value["database_receipts"] if row["engine"] == "mysql"))
         self.assertEqual(1, sum(row["results"]["skipped_cases"] for row in value["database_receipts"] if row["engine"] == "mysql"))
@@ -931,7 +931,7 @@ class WorkflowTests(unittest.TestCase):
             self.assertIn(f"- name: {receipt.PARTITION_STEPS[engine]}\n", block)
             # Only MySQL narrows to the reviewed native selection; SQLite keeps the complete suite.
             self.assertEqual(engine == "mysql", "--mysql-native-selection" in block)
-        self.assertIn("Verify all twenty-six current-run database receipts without enabling reuse", workflow)
+        self.assertIn("Verify all thirty current-run database receipts without enabling reuse", workflow)
 
     def test_native_isolation_variables_are_set_only_on_the_mysql_job(self):
         workflow = (Path(__file__).parents[2] / ".github/workflows/final-verification.yml").read_text()
@@ -947,7 +947,7 @@ class WorkflowTests(unittest.TestCase):
     def test_workflow_preserves_runtime_conditions_matrices_events_and_no_reuse_output(self):
         workflow = (Path(__file__).parents[2] / ".github/workflows/final-verification.yml").read_text()
         self.assertEqual(6, workflow.count("if: needs.scope.outputs.mode != 'docs'"))
-        for retained in ("workflow_dispatch:", "expected_sha:", "shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]", "shard: [1, 2]",
+        for retained in ("workflow_dispatch:", "expected_sha:", "shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]", "shard: [1, 2, 3, 4, 5, 6]",
                          "--fail-on-phpunit-warning --display-warnings", "npm audit --audit-level=high", "npm run test:browser",
                          "needs: [scope, documentation, backend-quality, backend-mysql, backend-sqlite, frontend, operator-browser, related-browser]",
                          "  related-browser:", "run: bash tests/browser/install-related-scanner.sh", "run: node tests/browser/run-related.mjs"):

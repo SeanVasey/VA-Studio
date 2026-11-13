@@ -78,6 +78,9 @@ class TrackSchedulingConcurrencyTest extends TestCase
         // A failed attempt updates only the alert evidence (the update trigger's attempt branch) and keeps the schedule pending.
         $path = app(VerifiedMedia::class)->path($fixture['media']['master_wav']);
         $original = file_get_contents($path);
+        // Verified media is stored read-only; tamper as an outside writer would, then restore the exact mode below.
+        $mode = fileperms($path) & 0777;
+        chmod($path, 0600);
         file_put_contents($path, 'tampered');
         $this->travelTo($now);
         $this->assertSame(1, Artisan::call('vasey:publish-scheduled-tracks'));
@@ -87,6 +90,7 @@ class TrackSchedulingConcurrencyTest extends TestCase
         $this->assertSame('scheduled', $track->fresh()->status);
         // Fixed, and past the retry interval: it publishes, the schedule resolves, and the track guard accepts that exact row.
         file_put_contents($path, $original);
+        chmod($path, $mode);
         $this->travelTo($now->addMinutes(TrackPublicationSchedules::RETRY_MINUTES + 1));
         $this->assertSame(0, Artisan::call('vasey:publish-scheduled-tracks'));
         $this->assertSame('published', $track->fresh()->status);

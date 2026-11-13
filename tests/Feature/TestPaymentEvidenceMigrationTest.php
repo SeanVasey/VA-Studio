@@ -67,6 +67,11 @@ class TestPaymentEvidenceMigrationTest extends TestCase
         $notices->down();
         $purchaseClaims->down();
         // The empty buyer cancellation and never-sent release children replace the refund migration's resource guards; restore them first, newest first.
+        // The empty merch fulfillment child holds foreign keys to orders and verified_payments; MySQL refuses to drop those
+        // parents while it exists (SQLite does not check), so it goes before them and returns after them.
+        $merchFulfillment = require database_path('migrations/2026_11_10_286300_merch_printful_fulfillment.php');
+        $this->assertDatabaseCount('merch_fulfillments', 0);
+        $merchFulfillment->down();
         (require database_path('migrations/2026_11_12_001000_test_buyer_order_cancellations.php'))->down();
         (require database_path('migrations/2026_11_11_001000_test_unsent_order_releases.php'))->down();
         $refundResolution->down();
@@ -103,6 +108,7 @@ class TestPaymentEvidenceMigrationTest extends TestCase
         $refundResolution->up();
         (require database_path('migrations/2026_11_11_001000_test_unsent_order_releases.php'))->up();
         (require database_path('migrations/2026_11_12_001000_test_buyer_order_cancellations.php'))->up();
+        $merchFulfillment->up();
         $purchaseClaims->up();
         $notices->up();
         TransactionalMailFixtures::restoreDeliveries();

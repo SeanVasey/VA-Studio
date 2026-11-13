@@ -331,8 +331,8 @@ async function reviewedPublication(page: Page, browser: Browser, visitor: APIReq
   expect(proof).toMatchObject({ verified: true, project: testInfo.project.name, state: 'publication-ready', evidenceHash: manifest.evidenceHash });
   await page.goto('/admin/tracks');
   await searchTracks(page, track.title);
-  await row(page, track.title).getByRole('button', { name: 'Unpublish', exact: true }).click();
-  const withdrawal = page.getByRole('alertdialog', { name: 'Unpublish', exact: true });
+  await row(page, track.title).getByRole('button', { name: 'Return to draft', exact: true }).click();
+  const withdrawal = page.getByRole('alertdialog', { name: 'Return to draft', exact: true });
   const [withdrawn] = await Promise.all([actionResponse(page, 'callMountedAction'), withdrawal.getByRole('button', { name: 'Confirm', exact: true }).click()]);
   expect(withdrawn.status()).toBe(200);
   expect(await withdrawn.finished()).toBeNull();
@@ -422,7 +422,7 @@ async function reviewedPublication(page: Page, browser: Browser, visitor: APIReq
     await expect(publication.dialog.getByRole('heading')).toBeHidden();
     await expect(row(page, track.title).getByText('published', { exact: true })).toBeVisible();
     await page.reload();
-    await expect(row(page, track.title).getByRole('button', { name: 'Unpublish', exact: true })).toBeVisible();
+    await expect(row(page, track.title).getByRole('button', { name: 'Return to draft', exact: true })).toBeVisible();
     expect((await visitor.get(track.href)).status()).toBe(200);
     await row(page, track.title).getByRole('button', { name: 'Edit', exact: true }).click();
     const retained = page.getByRole('dialog');
@@ -549,8 +549,8 @@ test('ordinary editorial associations and reviewed publication preserve current 
 
     await page.goto('/admin/tracks');
     const trackRow = page.getByRole('row').filter({ has: page.getByText(first.title, { exact: true }) });
-    await trackRow.getByRole('button', { name: 'Unpublish', exact: true }).click();
-    const withdrawal = page.getByRole('alertdialog', { name: 'Unpublish', exact: true });
+    await trackRow.getByRole('button', { name: 'Return to draft', exact: true }).click();
+    const withdrawal = page.getByRole('alertdialog', { name: 'Return to draft', exact: true });
     await withdrawal.getByRole('button', { name: 'Confirm', exact: true }).click();
     await expect(trackRow.getByRole('button', { name: 'Publish', exact: true })).toBeVisible();
     await persisted(testInfo, manifest, 'withdrawn', 'ordinary-withdrawal-evidence');

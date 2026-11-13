@@ -82,7 +82,8 @@ final readonly class IdentityRows
                     throw new IdentityException;
                 }
             }
-        } catch (Throwable) {
+        } catch (Throwable $diag) {
+            fwrite(STDERR, 'DIAG IdentityRows: '.get_class($diag).': '.$diag->getMessage().' @ '.$diag->getFile().':'.$diag->getLine().PHP_EOL.implode(PHP_EOL, array_slice(explode(PHP_EOL, $diag->getTraceAsString()), 0, 14)).PHP_EOL);
             throw new IdentityException('permanent_primary_required');
         }
     }
@@ -118,7 +119,8 @@ final readonly class IdentityRows
                     throw new IdentityException;
                 }
             }
-        } catch (Throwable) {
+        } catch (Throwable $diag) {
+            fwrite(STDERR, 'DIAG IdentityRows: '.get_class($diag).': '.$diag->getMessage().' @ '.$diag->getFile().':'.$diag->getLine().PHP_EOL.implode(PHP_EOL, array_slice(explode(PHP_EOL, $diag->getTraceAsString()), 0, 14)).PHP_EOL);
             throw new IdentityException('permanent_primary_required');
         }
     }

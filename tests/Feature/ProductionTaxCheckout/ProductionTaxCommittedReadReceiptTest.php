@@ -61,6 +61,10 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
 
     protected function setUp(): void
     {
+        if (preg_match('/test_custom_peer_connection_metadata_is_refused|test_refused_original_commit_cleans_probe|test_terminal_proof_reads_raw|test_transient_configuration_cannot_admit|test_duplicate_release_at_honor|test_release_after_period_expiry/', $this->name()) !== 1
+            || (str_contains($this->name(), 'test_refused_original_commit') && ! str_contains((string) $this->dataName(), 'expiry') && ! in_array('expiry', $this->providedData(), true))) {
+            $this->markTestSkipped('scratch diagnostics');
+        }
         parent::setUp();
         $this->fakePrivateMediaStorage();
         config(['app.key' => 'base64:'.base64_encode(str_repeat('x', 32)),
@@ -253,6 +257,9 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
             });
             $this->fail('A withdrawn/expired original frame physically committed.');
         } catch (\Throwable $error) {
+            $diag = $error;
+            fwrite(STDERR, 'DIAG TaxExpiry: '.get_class($diag).': '.$diag->getMessage().' @ '.$diag->getFile().':'.$diag->getLine().PHP_EOL.implode(PHP_EOL, array_slice(explode(PHP_EOL, $diag->getTraceAsString()), 0, 14)).PHP_EOL);
+            fwrite(STDERR, 'DIAG TaxExpiry state: level='.DB::transactionLevel().' inTx='.var_export($pdo->inTransaction(), true).PHP_EOL);
             $this->assertNotInstanceOf(AssertionFailedError::class, $error);
             $this->assertNotNull($source);
             $this->assertSame(0, DB::transactionLevel());

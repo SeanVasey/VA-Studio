@@ -73,7 +73,9 @@ final class MediaReferenceRegistryTest extends TestCase
             $type = strtolower($column['type_name']);
             $length = preg_match('/\((\d+)\)/', (string) $column['type'], $match) === 1 ? (int) $match[1] : 255;
             $value = match (true) {
-                str_ends_with($column['name'], '_at') => now()->format('Y-m-d H:i:s'),
+                // By type, not only by name: MySQL rejects a string in a datetime such as checkout_before (SQLite stores it).
+                in_array($type, ['datetime', 'timestamp'], true) || str_ends_with($column['name'], '_at') => now()->format('Y-m-d H:i:s'),
+                $type === 'date' => now()->format('Y-m-d'),
                 str_contains($type, 'int') => 1,
                 str_ends_with($column['name'], 'public_id') || $column['name'] === 'uuid' => (string) Str::uuid(),
                 str_contains($column['name'], 'hash') || str_contains($column['name'], 'sha256') => hash('sha256', $table.$column['name'].Str::uuid()),

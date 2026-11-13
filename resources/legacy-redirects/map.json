@@ -1,7 +1,7 @@
 {
     "schema": "vasey.legacy-redirects",
     "version": 1,
-    "reviewed_on": "2026-11-10",
+    "reviewed_on": "2026-11-13",
     "inventory": {
         "path": "docs/migration/legacy_route_inventory.csv",
         "sha256": "b86dae621780e46aed55da4b5a536aaf18f3e556df745718b4b0af73c70ebb13",
@@ -19,9 +19,8 @@
             "reason": "Crawl 2026-11-10: the live navigation links COLLECTIONS (/music/collections) but nothing links /music/albums, and the shell answers 200 for any path, so the crawl cannot show that this page has content. The proposed /collections has no route. /albums exists but is default-off (BL-67), and which of Sean's legacy lists it replaces is not decided."},
         {"route_id": "URL-004", "source_host": "www.vasey.audio", "source_path": "/music/collections", "disposition": "unresolved",
             "reason": "Crawl 2026-11-10: this is the live COLLECTIONS navigation link, but its content is rendered client-side and could not be read. The proposed /collections has no route and no current public page lists collections (Q-2: collections launch as browse groupings, not built yet)."},
-        {"route_id": "URL-005", "source_host": "www.vasey.audio", "source_path": "/sound-kits", "disposition": "redirect", "status": 301,
-            "target": {"type": "route", "name": "home"},
-            "note": "Sound kits have no public storefront page, so the catalog (the home page) is the nearest live destination. Revisit when a kit page exists (FP-007)."},
+        {"route_id": "URL-005", "source_host": "www.vasey.audio", "source_path": "/sound-kits", "disposition": "unresolved",
+            "reason": "The sound-kit storefront route (sound-kits.index, 2026-11-11) now serves this path, so the earlier 301 to the catalog is dead configuration: a route always wins over a redirect. The storefront flag is a code-literal false, so the route answers 404 today. Owner decision, as for /services (BL-64): enable the storefront (then retained), or give the route a fallback while it is off."},
         {"route_id": "URL-006", "source_host": "www.vasey.audio", "source_path": "/services", "disposition": "retained",
             "note": "Served by the services route (BL-64). While the catalog flag is off and the redirect layer is on, that route answers a 301 to the canonical contact page (Sean-approved fallback, 2026-11-10) and keeps the 404 when no contact page is public. A map redirect cannot cover it because a real route wins."},
         {"route_id": "URL-007", "source_host": "www.vasey.audio", "source_path": "/merch", "disposition": "redirect", "status": 301,

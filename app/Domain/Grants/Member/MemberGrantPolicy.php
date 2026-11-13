@@ -214,7 +214,8 @@ final class MemberGrantPolicy
         MemberGrantException::require($rows->identity() === $frame['pdo'] && $rows->driver() === $frame['driver'], 'foreign_frame');
         try {
             $rows->assertCurrent();
-        } catch (MembershipException) {
+        } catch (MembershipException $diag) {
+            fwrite(STDERR, 'DIAG MemberGrantPolicy: '.get_class($diag).': '.$diag->getMessage().' @ '.$diag->getFile().':'.$diag->getLine().PHP_EOL.implode(PHP_EOL, array_slice(explode(PHP_EOL, $diag->getTraceAsString()), 0, 14)).PHP_EOL);
             throw new MemberGrantException('changed_primary');
         }
         MemberGrantException::require($frame['pdo']->getAttribute(PDO::ATTR_DRIVER_NAME) === $frame['driver']

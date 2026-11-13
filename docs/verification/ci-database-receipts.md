@@ -1,5 +1,13 @@
 # T01-RECEIPTS-01: database receipts and full-only shadow decisions
 
+## November 13, 2026: twenty-four MySQL and six SQLite receipts
+
+The SQLite suite grew to about 12,100 cases. In Foundation run 43347699757 its two shards reached only 60% and 69% of their
+cases before the 100-minute limit, so GitHub's Foundation workflow and GitLab's native workflow now split it into six
+shards (`COUNTS = {"mysql": 24, "sqlite": 6}` in both receipt collectors); the stable `backend` aggregate verifies thirty
+receipts. The MySQL count is unchanged: per-test cost fell from about 85 s to seconds once the tests reuse one migrated
+schema per process (`tests/Support/MysqlSchemaSnapshot.php`).
+
 ## October 9, 2026: twenty-four MySQL and two SQLite receipts
 
 Foundation run 37967128232 ran the [MySQL native selection](mysql-native-selection-20261009/README.md) on hosted MySQL 8.4 in eight shards under a 210-minute limit, at commit `f57e725`.
