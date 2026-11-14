@@ -146,7 +146,7 @@ Repo-specific facts and invariants. §1–§12 stay byte-identical across repos;
 
 ### Current user-authorized handoff — October 7, 2026
 
-**Current (2026-11-13):** read the checkpoint at the top of `docs/handoff/2026-11-05/HANDOFF.md` (merged work, what staging serves, open PRs, next items).
+**Current (2026-11-14):** read the checkpoint at the top of `docs/handoff/2026-11-05/HANDOFF.md` (first complete Foundation pass at `e09c91a7`, merged work, what staging serves, next items).
 
 **Before that (2026-11-05):** the Claude Code harness resumed from Codex's 2026-11-04 checkpoint, merged B (PR #191) and verified the C/D lanes on pushed `claude/*` branches. Read `docs/handoff/2026-11-05/HANDOFF.md` first. Lane state lives in `docs/handoff/2026-10-17/RESUMPTION.md`.
 
