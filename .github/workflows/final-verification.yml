@@ -62,8 +62,6 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - name: Verify the pinned WebKit backport safeguards
-        run: node --test scripts/ci/apply-playwright-webkit-offline-backport.test.mjs
       - run: npm test
       - run: npm run build
       - name: Scan the built client bundle for server secrets

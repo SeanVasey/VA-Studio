@@ -351,6 +351,10 @@ BROWSER_SUITES = {
         "tests/browser/storefront.spec.ts", "tests/browser/player-controls.spec.ts",
         "tests/browser/public-track-embed.spec.ts",
     ),
+    # The offline reload journey (WebKit and Chromium) that the removed WebKit backport guarded until Playwright 1.65.
+    "browser-offline": (
+        "tests/browser/storefront-offline.spec.ts",
+    ),
     "browser-customer": (
         "tests/browser/customer-account.spec.ts", "tests/browser/customer-identity.spec.ts",
         "tests/browser/customer-library-browsing.spec.ts", "tests/browser/customer-order-items.spec.ts",
