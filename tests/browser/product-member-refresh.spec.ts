@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
 import { actionResponse, closeDialog, expectModalFits, login, row } from './publication-fixture';
 import { syncSuccessNotification } from './notification-sync';
+import { modalReady } from './modal-ready';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
@@ -45,6 +46,8 @@ test('operator reviews changed member snapshots and retains the earlier private 
   await page.goto('/admin/tracks');
   await page.getByRole('button', { name: 'New track', exact: true }).click();
   let dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('heading')).toBeVisible();
+  await modalReady(dialog);
   await dialog.getByLabel('Title', { exact: false }).fill(title);
   await dialog.getByLabel('Slug', { exact: false }).fill(`synthetic-member-refresh-${testInfo.project.name}`);
   await syncSuccessNotification(page, 'Created', () => dialog.getByRole('button', { name: 'Create', exact: true }).click());

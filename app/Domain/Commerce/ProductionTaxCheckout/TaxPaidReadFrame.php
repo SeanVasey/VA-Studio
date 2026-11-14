@@ -102,7 +102,8 @@ final class TaxPaidReadFrame implements \JsonSerializable
             $property = new ReflectionProperty(DatabaseTransactionsManager::class, $name);
             $records = $property->getValue($this->manager);
             if ($records instanceof Collection && $records::class === Collection::class) {
-                // Removal suppresses owned deferred commit AND rollback callbacks.
+                // Removal suppresses owned deferred commit AND rollback callbacks. After a refused commit Laravel 13.42
+                // has already run the rollback callbacks and dropped these records itself; nothing is left to remove.
                 $property->setValue($this->manager, $records->reject(fn ($record): bool => $this->owns($record))->values());
             }
         }

@@ -264,11 +264,13 @@ class ProductionTaxCommittedReadReceiptTest extends TestCase
         $this->assertFalse($pdo->inTransaction());
         $this->assertSame($delegate, DB::connection()->getEventDispatcher());
         $this->assertDatabaseCount('tax_receipt_probe', 0);
-        $this->assertSame(0, $callbacks);
+        // Laravel 13.42 runs the rollback callback itself when the commit is refused, before the frame is aborted (earlier
+        // releases left it for the abort to discard). It ran exactly once; the commit callback never runs.
+        $this->assertSame(100, $callbacks);
         $delegate->forget(TransactionCommitting::class);
         config(['production-tax-checkout.enabled' => true, 'production-customer-identity.historical_receipts_enabled' => true]);
         DB::transaction(fn () => $pdo->exec('INSERT INTO tax_receipt_probe VALUES (2, 4567)'));
-        $this->assertSame(0, $callbacks);
+        $this->assertSame(100, $callbacks);
         $receipt = DB::transaction(function () use ($f, $locator) {
             $reader = $this->reader();
 

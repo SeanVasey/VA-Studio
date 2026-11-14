@@ -141,12 +141,12 @@ Repo-specific facts and invariants. §1–§12 stay byte-identical across repos;
 - **Stack:** Laravel 13 / PHP 8.4, Filament 5 admin, Inertia 3 + React 19 + TypeScript 7, Vite 8; MySQL 8.4 in production and CI, SQLite locally; Stripe in test mode only.
 - **Package manager:** Composer 2 and npm (Node >=24.15 <25).
 - **Commands:** dev `composer run dev` · gate `composer validate --strict && php artisan test && npm test && npm run build && composer audit && npm audit --audit-level=high`
-- **Deploy:** staging runs on a Laravel Forge VPS (serving `785f47e4` since 2026-11-12 12:46 UTC, re-provisioned with the isolated build account; deploy script and ops kit in `ops/staging/`, runbook `docs/ops/staging-runbook.md`). Production is not configured. Staging and production both use Laravel Forge-managed VPSs (staging decided 2026-10-08/09; production platform approved by Sean on 2026-10-18). U-02's region, secrets, backup target and incident ownership remain open (`docs/architecture/decision-register.md`).
+- **Deploy:** staging runs on a Laravel Forge VPS (serving `d4b0955d` since 2026-11-13 20:29 UTC; re-provisioned with the isolated build account on 2026-11-12; deploy script and ops kit in `ops/staging/`, runbook `docs/ops/staging-runbook.md`). Production is not configured. Staging and production both use Laravel Forge-managed VPSs (staging decided 2026-10-08/09; production platform approved by Sean on 2026-10-18). U-02's region, secrets, backup target and incident ownership remain open (`docs/architecture/decision-register.md`).
 - **Invariants** (§1.8 rules land here): none yet.
 
 ### Current user-authorized handoff — October 7, 2026
 
-**Current (2026-11-12):** read the checkpoint at the top of `docs/handoff/2026-11-05/HANDOFF.md` (merged work, what staging serves, open PRs, next items).
+**Current (2026-11-14):** read the checkpoint at the top of `docs/handoff/2026-11-05/HANDOFF.md` (first complete Foundation pass at `e09c91a7`, merged work, what staging serves, next items).
 
 **Before that (2026-11-05):** the Claude Code harness resumed from Codex's 2026-11-04 checkpoint, merged B (PR #191) and verified the C/D lanes on pushed `claude/*` branches. Read `docs/handoff/2026-11-05/HANDOFF.md` first. Lane state lives in `docs/handoff/2026-10-17/RESUMPTION.md`.
 

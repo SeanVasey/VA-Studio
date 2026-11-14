@@ -4,6 +4,89 @@ Entry point for the next session (Claude's usage resets Saturday). It supersedes
 current state. That checkpoint's archive, bundle and recorded results remain history. `AGENTS.md` governs. Sean's instructions
 override older documents.
 
+## Checkpoint 2026-11-14, 02:50 UTC
+
+Added by the Claude Code harness; it supersedes the 2026-11-13 20:30 checkpoint below for current state. A Foundation pass
+applies only to its recorded commit and is not launch or handoff acceptance.
+
+**Main** is `e09c91a7` (PR #382). **Staging** was last deployed at `d4b0955d` (2026-11-13 20:29 UTC) and has not been
+redeployed: #381 and #382 change tests, comments and documents only.
+
+### Foundation CI: first complete pass
+
+**Run 43532215436 on `main` at `e09c91a7f8d082a65fad4bec4da33a893c399ff1` passed in full** (dispatched 2026-11-14 00:09 UTC,
+about 2 h 35 min): 37 jobs succeeded, including all 24 MySQL shards, all 6 SQLite shards and the browser jobs; `documentation`
+is skipped by design. It is the first Foundation run to pass in full.
+
+The two runs before it, for the record:
+
+- Run 43485590174 at `0885d464`: every database shard passed (the `PaidTaxDownloadJourneyTest` window is confirmed on MySQL
+  shard 7); two operator-browser jobs failed on one spec each, fixed in #381.
+- Run 43505345035 at `1aa0495e`: all browser jobs passed (confirms #381); SQLite 1/6, SQLite 5/6 and MySQL 8/24 failed on six
+  cases in three tests, fixed in #382.
+
+### Merged since 20:30 (squash SHA on main)
+
+| PR | SHA | What | Evidence |
+| --- | --- | --- | --- |
+| #381 | `1aa0495e` | Two browser timing races (`tests/browser/modal-ready.ts`; `site-images.spec.ts`) and the 2026-11-13 checkpoint | Preflight green; focused browser suites passed; confirmed by Foundation 43505345035 |
+| #382 | `e09c91a7` | Three tests after `laravel/framework` 13.42: a refused commit now runs rollback callbacks itself (`ProductionTaxCommittedReadReceiptTest`); the nested lock-error handler now rolls the savepoint back (`MediaUploadCommitRecoveryTest`); a whole-second cache-key race in `TrackSchedulingTest`. Tests and two comments; no production behaviour change | Preflight green; focused `foundation-20261113-framework` on SQLite passed (the MySQL run hit the 900 s cap, no verdict); independent review approved with P3 follow-ups; confirmed by Foundation 43532215436 |
+
+### Open
+
+- **Deferred from #382's review** (P3, one follow-up batch): the `Cache::get` assertion in `TrackSchedulingTest` proves only
+  the key formula, and the CHANGELOG repeats the claim; `app/Domain/Grants/PaidTax/PaidTaxOwnedFrame.php:106` carries the same
+  stale comment that #382 corrected in `TaxPaidReadFrame`; that corrected comment ("nothing is left to remove") holds only for
+  a refusal inside `DB::transaction()`; no tax test now pins callback suppression on a held-frame abort; CHANGELOG wording
+  (six cases in three tests; the exact release between 13.39 and 13.42 that changed the behaviour is unverified).
+- **Deferred from #372's review**, the Dependabot PRs (#373, #375 to #380, #100 to #102), the items waiting on Sean
+  (`/sound-kits`; U+204F) and the branch housekeeping are unchanged from the checkpoint below. The last push to main reported
+  six Dependabot alerts (two high, two moderate, two low); the harness still cannot read them (403).
+- Merged branches `claude/browser-timing-20261113` and `claude/framework-1342-tests` can be deleted.
+
+## Checkpoint 2026-11-13, 20:30 UTC
+
+Added by the Claude Code harness; it supersedes the 2026-11-12 18:30 checkpoint below for current state. Nothing here is acceptance.
+
+**Main** is `d4b0955d` (PR #374). **Staging** serves `d4b0955d` (Forge deployment 82951839, finished 20:29 UTC; status recipe
+202998: php-fpm active, five workers running, `GET /` 200).
+
+### Merged today (squash SHA on main)
+
+| PR | SHA | What | Evidence |
+| --- | --- | --- | --- |
+| #372 | `1d26fe40` | MySQL tests reuse one migrated schema per process (`MysqlSchemaSnapshot`); MySQL-only and Ubuntu 26.04 test findings; SQLite in six shards. Test/CI only, except `resources/legacy-redirects/map.json` URL-005 (`/sound-kits`) recorded as unresolved | Preflight green; independent review APPROVE at `a542cb9a` (P2/P3 deferred, listed in the PR); merged on the development-merge rule, not on a full Foundation pass |
+| #374 | `d4b0955d` | Dependabot: `laravel/framework` 13.38.0 to 13.42.0, `filament/filament` 5.11.2, Tinker, Pail. Clears GHSA-63hm-g96r-2m2q (low; published 2026-11-13 18:54 UTC), which had turned `composer audit` red on main and every PR. The app does not use the `Concurrency` facade | Preflight green; focused `unit` and `browser-operator-uploads` (SQLite) and `test-delivery-races` (MySQL) passed; `customer` (SQLite) ran 189 of 338 with no failure before the 900 s cap, the same as main |
+
+### Foundation CI state
+
+- **All database shards now finish.** Run 43455392026 at `2f7f3b9f`: 24 MySQL and 6 SQLite shards inside their limits; 23 MySQL
+  and all SQLite shards passed. Its two failures (MySQL shard 7 `PaidTaxDownloadJourneyTest` late-chunk window; chromium
+  `customer-library-browsing.spec.ts` fixture timeout) were fixed in #372's last two commits.
+- **Run 43485590174 at `0885d464`** (the content merged as #372) was still running at this checkpoint. Its two operator-browser
+  jobs failed on one spec each; the customer-library fix is confirmed there. Read its database shards before relying on the
+  `PaidTaxDownloadJourneyTest` change: it is not yet confirmed on MySQL.
+- **No Foundation run has passed in full.** Each of the last three runs failed on a different timing-sensitive test on a slow
+  runner. Foundation has not run on `d4b0955d` (the framework bump).
+
+### Open
+
+- **PR #381** (`claude/browser-timing-20261113`): the two browser races from run 43485590174. `tests/browser/modal-ready.ts`
+  waits for the New track modal's focus trap before the first fill (five specs); `site-images.spec.ts` leaves the polling
+  table after a poll settles. Focused `browser-operator-publication`, `browser-operator-tracks` and `browser-customer` passed;
+  `site-images.spec.ts` is in no focused suite.
+- **Deferred from #372's review** (one follow-up batch): `MembershipSchemaProofFrameTest` MySQL branch lacks a positive control
+  (P2); `MysqlSchemaSnapshot` leaves `information_schema_stats_expiry` and `lock_wait_timeout` changed on its failure path;
+  stale "Each test rebuilds the schema" comments in `final-verification.yml` and `focused-feedback.yml`; the fingerprint omits
+  PARAMETERS and PARTITIONS; no run compares against `VA_TEST_MIGRATE_EACH_TEST=1`.
+- **Dependabot PRs still open:** #373, #375 to #380 (majors among them: phpunit 13, stripe-php 22, jsdom 31) and the three
+  Actions bumps #100 to #102. GitHub also reports four Dependabot alerts on main (two high, two moderate) that the harness
+  cannot read (403); #374 may have cleared some.
+- **Waiting on Sean:** `/sound-kits` (enable the storefront or add a fallback as `/services` has); U+204F needs a new contract
+  profile version (the profile class is hash-frozen).
+- The session branch `claude/sleepy-ramanujan-pjbo1w` holds only merged history; restarting it needs a force-push, which the
+  harness was not permitted to do. `claude/scratch-mysql-migration-profile` is a diagnostics branch, not for merge.
+
 ## Checkpoint 2026-11-12, 18:30 UTC
 
 Added by the Claude Code harness; it supersedes the 13:00 checkpoint below for current state. Nothing here is acceptance.
