@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Migration\LegacyRedirects\LegacyRedirectResolver;
 use App\Domain\SiteBuilder\EditorialContent;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SoundKits\Products\SoundKitPresentation;
@@ -9,16 +10,25 @@ use App\Domain\SoundKits\Products\SoundKitProduct;
 use App\Domain\SoundKits\Products\SoundKitProductMedia;
 use App\Domain\SoundKits\Products\SoundKitProducts;
 use App\Domain\SoundKits\Products\SoundKitStorefrontPolicy;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-/** Public sound-kit pages (BL-53, FP-007). Read-only; no cart, checkout or download. 404 whenever the flag is off. */
+/**
+ * Public sound-kit pages (BL-53, FP-007). Read-only; no cart, checkout or download. 404 whenever the flag is off, except the
+ * legacy /sound-kits index (URL-005): with the legacy redirect layer on, it answers a 301 to the catalog instead.
+ */
 final class SoundKitStorefrontController extends Controller
 {
-    public function index(): Response
+    public function index(LegacyRedirectResolver $legacy): Response|RedirectResponse
     {
-        abort_unless(app(SoundKitStorefrontPolicy::class)->enabled(), 404);
+        if (! app(SoundKitStorefrontPolicy::class)->enabled()) {
+            $fallback = $legacy->catalogFallback();
+            abort_if($fallback === null, 404);
+
+            return $fallback;
+        }
         $kits = app(SoundKitPresentation::class);
         $metadata = $kits->metadata(null);
 
