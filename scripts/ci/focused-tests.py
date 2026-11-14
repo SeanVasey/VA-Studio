@@ -224,6 +224,18 @@ PHP_TARGETS = {
     "phpunit13-name-clash": (
         "tests/Feature/PaidGrantSpoolReviewAddendum3Test.php", "tests/Feature/TransactionalNotificationMigrationTest.php",
     ),
+    # The 2026-11-14 pre-activation re-pin (tc-lib-pdf 8.84.0 / tc-lib-pdf-font 4.8.0 and the explicit U+204F refusal):
+    # golden renders, profile pins, released registries and the D-30 repertoire counts.
+    "tc-lib-20261114": (
+        "tests/Unit/VaseyLicensePdfRendererTest.php", "tests/Unit/VaseyLicenseV2PdfRendererTest.php",
+        "tests/Unit/VaseyKitLicensePdfRendererTest.php", "tests/Unit/VaseyLicenseV2ProfileTest.php",
+        "tests/Unit/VaseyLicenseGlyphCoverageTest.php", "tests/Unit/ContractIdentityDeclarationV2Test.php",
+        "tests/Unit/ContractRenderProfileRegistryTest.php", "tests/Unit/LicensePdfCheckTest.php",
+        "tests/Feature/TestContractProfileSuccessorTest.php", "tests/Feature/TestContractSuccessorActivationTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantRenderableTest.php",
+        "tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php", "tests/Feature/SoundKitLicenseKindTest.php",
+    ),
     # Route-level legacy fallbacks (URL-005 /sound-kits, URL-006 /services) and the shipped redirect map.
     "legacy-fallbacks": (
         "tests/Feature/SoundKitLegacyFallbackTest.php", "tests/Feature/ServiceLegacyFallbackTest.php",
