@@ -9,7 +9,7 @@ on:
         required: true
         type: choice
         default: unit
-        options: [track-discovery, unit, media, commerce, financial, test-delivery, test-delivery-races, buyer-cancel, buyer-cancel-migrations, buyer-cancel-races, migration-recompilation, mysql-schema-snapshot, foundation-20261113-fixes, foundation-20261113-framework, customer, operator, licensing, publication, track-concurrency, seller, store-foundations, membership-migrations, production-preparation, private-continuation, frontend, membership-history-frontend, browser-storefront, browser-customer, browser-site, browser-checkout, browser-delivery, browser-payment-exceptions, browser-operator-tracks, browser-operator-uploads, browser-operator-publication, bulk-license-browser, accessibility-browser]
+        options: [track-discovery, unit, media, commerce, financial, test-delivery, test-delivery-races, buyer-cancel, buyer-cancel-migrations, buyer-cancel-races, migration-recompilation, mysql-schema-snapshot, foundation-20261113-fixes, foundation-20261113-framework, legacy-fallbacks, customer, operator, licensing, publication, track-concurrency, seller, store-foundations, membership-migrations, production-preparation, private-continuation, frontend, membership-history-frontend, browser-storefront, browser-customer, browser-site, browser-checkout, browser-delivery, browser-payment-exceptions, browser-operator-tracks, browser-operator-uploads, browser-operator-publication, bulk-license-browser, accessibility-browser]
       engine:
         description: PHP database engine; frontend/browser require sqlite
         required: true
@@ -49,7 +49,7 @@ jobs:
         run: python3 scripts/ci/focused-tests.py --plan
       - name: Retain informative selection
         if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: focused-selection-${{ github.run_id }}-${{ github.run_attempt }}
           path: focused-ci-evidence.json
@@ -141,7 +141,7 @@ jobs:
         run: python3 scripts/ci/focused-tests.py
       - name: Retain focused PHP evidence
         if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: focused-php-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
@@ -168,7 +168,7 @@ jobs:
         run: python3 scripts/ci/focused-tests.py
       - name: Retain focused frontend evidence
         if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: focused-frontend-${{ github.run_id }}-${{ github.run_attempt }}
           path: focused-ci-*
@@ -207,7 +207,7 @@ jobs:
         run: python3 scripts/ci/focused-tests.py
       - name: Retain focused synthetic browser evidence
         if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: focused-browser-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
