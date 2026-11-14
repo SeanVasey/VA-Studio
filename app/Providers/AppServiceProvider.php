@@ -87,9 +87,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // stripe-php 21.3.2 (pinned with API 2026-08-26.dahlia) bundles roots Stripe no longer uses, including emSign ECC
-        // Root CA - G3, whose intermediates were compromised. Every Stripe request's CURLOPT_CAINFO comes from this path,
-        // so all clients trust only the Stripe roots that stripe-php 21.3.3 and 22.0.1 ship (byte-identical copy, see
-        // StripeTrustedRootsTest). Remove once the pinned SDK itself is 21.3.3 or later.
+        // Root CA - G3, whose intermediates were compromised. Every Stripe request's CURLOPT_CAINFO comes from this path, so
+        // the bundle the SDK adds is the one stripe-php 21.3.3 and 22.0.1 ship (byte-identical copy, see StripeTrustedRootsTest).
+        // The SDK sets no CURLOPT_CAPATH, so libcurl also trusts the host's system store (/etc/ssl/certs on Ubuntu): keep the
+        // hosts' ca-certificates package current. Remove once the pinned SDK itself is 21.3.3 or later.
         Stripe::setCABundlePath(resource_path('stripe/ca-certificates.crt'));
 
         // Route files are not executed when a cached route collection is loaded.

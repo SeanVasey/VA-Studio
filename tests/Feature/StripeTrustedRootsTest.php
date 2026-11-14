@@ -7,9 +7,10 @@ use Stripe\Stripe;
 use Tests\TestCase;
 
 /**
- * Every Stripe request trusts only Stripe's current roots, not the 144-root bundle stripe-php 21.3.2 ships, which includes
- * emSign ECC Root CA - G3 (compromised intermediates). The bundle is a byte-identical copy of the one stripe-php 21.3.3
- * and 22.0.1 ship (https://docs.stripe.com/tls-certificates).
+ * Every Stripe request's CA bundle is Stripe's current 12 roots instead of the 144-root bundle stripe-php 21.3.2 ships, which
+ * includes emSign ECC Root CA - G3 (compromised intermediates). The bundle is a byte-identical copy of the one stripe-php 21.3.3
+ * and 22.0.1 ship (https://docs.stripe.com/tls-certificates). libcurl also consults the host's system CA store (the SDK sets
+ * no CURLOPT_CAPATH), which this test does not cover.
  */
 class StripeTrustedRootsTest extends TestCase
 {
