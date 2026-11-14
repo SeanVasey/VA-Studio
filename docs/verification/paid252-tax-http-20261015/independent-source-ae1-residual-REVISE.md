@@ -1,0 +1,15 @@
+# Independent corrected Tax HTTP source gate
+
+DECISION: REVISE
+
+Reviewed exact frozen `ae1cfe040f2ccfc8969ce80b58693c93482b2f97` against the original `a565e54a47fd46a3cf62eeab40826674f8c84988` review. No open P0 or P1 found in this corrected scope. This is a bounded source checkpoint, not final packet or merge approval.
+
+One original P2 timing requirement remains incomplete: `PaidTaxRequestContext` now avoids the virtual ServerBag getter, but still reads `$request->server` through ordinary property access before the budget factory samples monotonic time. The API accepts Request subclasses; Symfony8.1 declares a hooked server property. A getter hook can therefore run before the later exact-bag check. Use the declaring Symfony Request property's `ReflectionProperty::getRawValue($request)` before the existing exact ServerBag/raw parameters/primitive time guards. Add a get-hook callback sentinel proving zero callbacks/refusal and retain the standard-bag positive. This finishes the prior requirement to raw-read without hooks; it does not expand the review into adjacent frozen metadata.
+
+The other source repairs are sound: raw maps precede offsets, standard environment binding is authenticated/reflected without invocation, the genuine root fixture uses that representation, the streamed-response clone is public and detaches only the copy, and the constructor retains a mandatory non-null holder stored in nullable clone storage. Original domain/schema/profile/vendor/V1 source remains outside this small correction.
+
+New tests use meaningful seams. Encoding and throwing-header construction own an actual captured read and assert original error/observer restoration plus a fresh command. Clone refusal preserves the original response. The timing test now spends a real500ms after capture against an instant59.7s old. Genuine afterCommit throwing preserves a spent attempt, and the two-line retry now retrieves exact PDF/master bytes for both lines. Late transfer withdrawal, pre-privacy419, bounded headers and once-only producer raw intake add the intended observable coverage. Their source quality is assessed here; the journey selection is still pending and has no passing outcome in this decision.
+
+I independently parsed the completed root JUnit:43 tests,578 assertions, zero failures/errors/skips. PHP/verifier and launch-bound observed recorder OS exit are all0. PID211500/start8542348/UID1000 match the OS witness. The2423-input before/after digest, clean ae1 head/status, runner and autoload stability all agree. This evidence applies only to the completed whole root file.
+
+No reviewer app/test/DB/network/hosted operation or tracked-file edit occurred. Complete the residual focused source control, then reconcile the real journey/producer/V1 execution and final immutable packet. Default-off/unbound/private development scope and all live/provider/host/native/full-suite boundaries remain. Independent final review, cheap exact-head preflight and expected-SHA merge are still required.

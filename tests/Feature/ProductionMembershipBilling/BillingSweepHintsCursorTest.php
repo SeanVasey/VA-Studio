@@ -2,19 +2,17 @@
 
 namespace Tests\Feature\ProductionMembershipBilling;
 
+use App\Domain\Memberships\Billing\BillingEvidenceRecord;
 use App\Domain\Memberships\Billing\BillingHintSweep;
+use App\Domain\Memberships\Billing\BillingLedger;
 use App\Domain\Memberships\Billing\BillingProviderPin;
 use App\Domain\Memberships\Billing\BillingReconciliation;
 use App\Domain\Memberships\Billing\BillingValues;
-use App\Domain\Memberships\Billing\BillingWebhookIntake;
 use App\Jobs\RetrieveMembershipInvoice;
-use Carbon\CarbonImmutable;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Stripe\Event;
-use Stripe\WebhookSignature;
 use Tests\Support\BillingStripeFixtures as F;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\RehearsalBillingGateway;
@@ -24,28 +22,24 @@ use Tests\TestCase;
  * Codex P1 on PR #54 (review L2-2). Hints are retained forever, so a sweep that only ever examined the oldest `--limit` hints
  * stopped reaching new uncovered ones once that many existed. The sweep now advances: a signed keyset cursor over
  * `(received_at, id)` continues where the previous page ended, and `--all` pages until exhausted under a hard overall bound.
+ * Authenticated synthetic pagination rows use controlled receipt timestamps and real native hint allocations. This file does
+ * not prove intake timing or lost-dispatch behavior; those use the real intake in their dedicated feature files.
  */
 class BillingSweepHintsCursorTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
 
-    private const SECRET = 'whsec_SYNTHETICREHEARSAL';
-
     private const T0 = F::PERIOD_START + 3600;
 
     private const OTHER = 'in_SYNTHETICOTHER';
+
+    private int $paginationOffset = 0;
 
     protected function setUp(): void
     {
         parent::setUp();
         F::configure();
-        $this->at(0);
-    }
-
-    protected function tearDown(): void
-    {
-        CarbonImmutable::setTestNow();
-        parent::tearDown();
+        $this->atPaginationOffset(0);
     }
 
     public function test_an_uncovered_hint_beyond_the_first_window_is_reached_by_following_the_cursor(): void
@@ -86,19 +80,19 @@ class BillingSweepHintsCursorTest extends TestCase
     public function test_all_with_dispatch_queues_one_retrieval_per_uncovered_invoice_across_pages(): void
     {
         $binding = F::binding();
-        $this->at(0);
-        $this->lose('evt_SYNTHETICX1', self::OTHER);
+        $this->atPaginationOffset(0);
+        $this->paginationHint('evt_SYNTHETICX1', self::OTHER);
         foreach ([1, 2, 3] as $offset) {
-            $this->at($offset);
-            $this->lose('evt_SYNTHETICCOVERED'.$offset, F::INVOICE);
+            $this->atPaginationOffset($offset);
+            $this->paginationHint('evt_SYNTHETICCOVERED'.$offset, F::INVOICE);
         }
-        $this->at(10);
+        $this->atPaginationOffset(10);
         (new RetrieveMembershipInvoice($binding['id'], F::INVOICE))->handle(new BillingReconciliation(new RehearsalBillingGateway(F::graph())));
-        $this->at(20);
-        $this->lose('evt_SYNTHETICX2', self::OTHER, 'invoice.updated');
-        $this->at(21);
-        $this->lose('evt_SYNTHETICY1', 'in_SYNTHETICYONDER');
-        $this->at(30);
+        $this->atPaginationOffset(20);
+        $this->paginationHint('evt_SYNTHETICX2', self::OTHER, 'invoice.updated');
+        $this->atPaginationOffset(21);
+        $this->paginationHint('evt_SYNTHETICY1', 'in_SYNTHETICYONDER');
+        $this->atPaginationOffset(30);
         Queue::fake();
 
         // Pages of two: [X1, covered1], [covered2, covered3], [X2, Y1]. X has an uncovered hint on the first and on the last page.
@@ -117,10 +111,10 @@ class BillingSweepHintsCursorTest extends TestCase
     {
         F::binding();
         foreach (range(1, 5) as $offset) {
-            $this->at($offset);
-            $this->lose('evt_SYNTHETICBOUND'.$offset, 'in_SYNTHETICBOUND'.$offset);
+            $this->atPaginationOffset($offset);
+            $this->paginationHint('evt_SYNTHETICBOUND'.$offset, 'in_SYNTHETICBOUND'.$offset);
         }
-        $this->at(30);
+        $this->atPaginationOffset(30);
         $this->app->instance(BillingHintSweep::class, new BillingHintSweep(3));
         Queue::fake();
 
@@ -196,12 +190,9 @@ class BillingSweepHintsCursorTest extends TestCase
     public function test_a_forged_hint_beyond_the_first_page_still_fails_the_sweep_closed(): void
     {
         $this->coveredHintsThenOneUncovered(4);
-        // A structurally valid hint row (the guards admit it) whose seal is not its canonical row hash, newest of all.
-        $position = DB::table('production_membership_billing_positions')->insertGetId(['kind' => 'hint', 'created_at' => '2026-10-07 00:00:00']);
-        $row = (array) DB::table('production_membership_billing_events')->orderByDesc('received_at')->orderByDesc('id')->first();
-        DB::table('production_membership_billing_events')->insert([...$row, 'id' => BillingValues::id(), 'hint_position' => $position,
-            'provider_event_ref_hash' => hash('sha256', 'forged synthetic event'), 'received_at' => BillingValues::utc(self::T0 + 25),
-            'created_at' => BillingValues::utc(self::T0 + 25), 'seal' => hash('sha256', 'forged')]);
+        // Real native allocation and otherwise authenticated row; only the seal is invalid at its initial insertion.
+        $this->atPaginationOffset(25);
+        $this->paginationHint('evt_SYNTHETICFORGED', self::OTHER, invalidSeal: true);
         Queue::fake();
 
         $this->assertSame(1, Artisan::call('membership-billing:sweep-hints', ['--limit' => 2, '--all' => true, '--dispatch' => true]));
@@ -213,19 +204,19 @@ class BillingSweepHintsCursorTest extends TestCase
 
     /**
      * Independent review CP-4: the keyset's tie-break `(received_at = ? AND id > ?)` is what continues a page that ended inside one
-     * intake second. Five uncovered hints share one `received_at`; pages of two must examine each exactly once and miss none, and a
+     * receipt second. Five uncovered hints share one synthetic `received_at`; pages of two must examine each exactly once and miss none, and a
      * page of one per hint must reach and dispatch all five. Without the tie-break the second page finds nothing after the first.
      */
     public function test_hints_sharing_one_received_at_second_are_each_examined_exactly_once_across_page_boundaries(): void
     {
         F::binding();
-        $this->at(5);
+        $this->atPaginationOffset(5);
         $events = array_map(fn (int $n): string => 'evt_SYNTHETICSAMESECOND'.$n, range(1, 5));
         foreach ($events as $n => $event) {
-            $this->lose($event, 'in_SYNTHETICSAMESECOND'.$n);
+            $this->paginationHint($event, 'in_SYNTHETICSAMESECOND'.$n);
         }
-        $this->assertSame(1, DB::table('production_membership_billing_events')->distinct()->count('received_at'), 'All five share one intake second.');
-        $this->at(30);
+        $this->assertSame(1, DB::table('production_membership_billing_events')->distinct()->count('received_at'), 'All five share one synthetic receipt second.');
+        $this->atPaginationOffset(30);
         Queue::fake();
 
         $seen = [];
@@ -257,14 +248,14 @@ class BillingSweepHintsCursorTest extends TestCase
     {
         $binding = F::binding();
         foreach (range(1, $covered) as $offset) {
-            $this->at($offset);
-            $this->lose('evt_SYNTHETICCOVERED'.$offset, F::INVOICE);
+            $this->atPaginationOffset($offset);
+            $this->paginationHint('evt_SYNTHETICCOVERED'.$offset, F::INVOICE);
         }
-        $this->at(10);
+        $this->atPaginationOffset(10);
         (new RetrieveMembershipInvoice($binding['id'], F::INVOICE))->handle(new BillingReconciliation(new RehearsalBillingGateway(F::graph())));
-        $this->at(20);
-        $this->lose('evt_SYNTHETICLATEST', self::OTHER);
-        $this->at(30);
+        $this->atPaginationOffset(20);
+        $this->paginationHint('evt_SYNTHETICLATEST', self::OTHER);
+        $this->atPaginationOffset(30);
 
         return $binding;
     }
@@ -288,19 +279,27 @@ class BillingSweepHintsCursorTest extends TestCase
         }
     }
 
-    /** Commits an event hint whose dispatch fails afterwards (this lane binds no gateway), as a queue outage would. */
-    private function lose(string $eventId, string $invoiceRef, string $type = 'invoice.paid'): void
+    /** Pagination fixture only: retain a v2 hint with a controlled sort timestamp and a real database-issued position. */
+    private function paginationHint(string $eventId, string $invoiceRef, string $type = 'invoice.paid', bool $invalidSeal = false): void
     {
-        try {
-            $this->receive($this->event($eventId, $invoiceRef, $type));
-        } catch (BindingResolutionException) {
-            // Expected.
-        }
-    }
-
-    private function receive(string $payload): array
-    {
-        return (new BillingWebhookIntake)->receive($payload, WebhookSignature::generateSignatureHeader($payload, self::SECRET));
+        DB::transaction(function () use ($eventId, $invoiceRef, $type, $invalidSeal): void {
+            $position = (new BillingLedger)->hintPosition();
+            $stamp = BillingValues::utc(self::T0 + $this->paginationOffset);
+            $row = ['id' => BillingValues::id(), 'provider_event_ref_hash' => BillingValues::hash('event', F::ACCOUNT, 'test', $eventId),
+                'type' => $type, 'mode' => 'test', 'provider_account_hash' => BillingValues::hash('provider-account', F::ACCOUNT, 'test', F::ACCOUNT),
+                'invoice_ref_hash' => BillingValues::hash('invoice', F::ACCOUNT, 'test', $invoiceRef), 'received_at' => $stamp,
+                'hint_position' => $position['id'], 'payload_hash' => hash('sha256', $this->event($eventId, $invoiceRef, $type)),
+                'disposition' => 'retrieval_hint', 'created_at' => $stamp];
+            $row['payload_ciphertext'] = BillingEvidenceRecord::encrypt($row, ['purpose' => BillingEvidenceRecord::HINT,
+                'event_ref' => $eventId, 'type' => $type, 'api_version' => BillingProviderPin::API_VERSION,
+                'created' => F::PERIOD_START, 'invoice_ref' => $invoiceRef, 'subscription_ref' => F::SUBSCRIPTION]);
+            $row['seal'] = BillingValues::seal($row);
+            if ($invalidSeal) {
+                $this->assertSame(2, BillingEvidenceRecord::verify($row, BillingEvidenceRecord::HINT)['schema_version']);
+                $row['seal'] = hash('sha256', 'forged');
+            }
+            DB::table('production_membership_billing_events')->insert($row);
+        });
     }
 
     private function event(string $id, string $invoiceRef, string $type): string
@@ -313,8 +312,8 @@ class BillingSweepHintsCursorTest extends TestCase
         return json_encode(F::sdk(Event::class, $values), JSON_THROW_ON_ERROR);
     }
 
-    private function at(int $offset): void
+    private function atPaginationOffset(int $offset): void
     {
-        CarbonImmutable::setTestNow(CarbonImmutable::createFromTimestampUTC(self::T0 + $offset));
+        $this->paginationOffset = $offset;
     }
 }

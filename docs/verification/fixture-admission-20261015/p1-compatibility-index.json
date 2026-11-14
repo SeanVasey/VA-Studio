@@ -1,0 +1,925 @@
+{
+  "archive_sha256": "5e7c05f42806b4360040c3837c52cacdd277fc6c87109c0a56e32d9274db14a0",
+  "archive_bytes": 1509634,
+  "members": [
+    {
+      "name": "bundle-0db6b8709db5-fbefbda5b62d4791/identity.json",
+      "sha256": "6c535b25c20889b05a3b1a25a0ba76f46ada0e23a8318a711667f620523babd3"
+    },
+    {
+      "name": "bundle-0db6b8709db5-fbefbda5b62d4791/manifest.json",
+      "sha256": "2381725f943599f2cc14fe0c718d2b0d63e0e007216d2c1bda10dfc385cd9f07"
+    },
+    {
+      "name": "bundle-0db6b8709db5-fbefbda5b62d4791/public-environment.json",
+      "sha256": "8f1177aa3c9ad824821252fb727fcbd8acf064162b23389774aea889ffbd7afe"
+    },
+    {
+      "name": "bundle-0db6b8709db5-fbefbda5b62d4791/runner.py",
+      "sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1"
+    },
+    {
+      "name": "bundle-0db6b8709db5-fbefbda5b62d4791/runtime.json",
+      "sha256": "e94a0d33c77a6a5e2c3d54d644081fe1566f037c6965a4cf9966ab3761b95309"
+    },
+    {
+      "name": "bundle-305e6522532b-2a7cfd4e4d126814/identity.json",
+      "sha256": "3d90641e8dd6bae54ffc850ca9db76d50f6355fb04b56dc2bec329f1393b7a8d"
+    },
+    {
+      "name": "bundle-305e6522532b-2a7cfd4e4d126814/manifest.json",
+      "sha256": "bac70a6a84a0f34afd6c6bd76aeeab6c050c0f97b3ee87e8f973c885a20ec2c4"
+    },
+    {
+      "name": "bundle-305e6522532b-2a7cfd4e4d126814/public-environment.json",
+      "sha256": "bd392feb6c6dd8fa939d6bb27c6cbe8b82c1bed4bb49496bc42618b73cbdd338"
+    },
+    {
+      "name": "bundle-305e6522532b-2a7cfd4e4d126814/runner.py",
+      "sha256": "d4025c8cdf1d87bced4beb59a55b248ae6547eccef471cd49b1bb76683459ae1"
+    },
+    {
+      "name": "bundle-305e6522532b-2a7cfd4e4d126814/runtime.json",
+      "sha256": "b2d611eec0949d259a086ab2fe55d7d52a9c58ae1bd8792478f718f14bac70f2"
+    },
+    {
+      "name": "bundle-305e6522532b-2b14c4cfb2d2be4f/identity.json",
+      "sha256": "4b33435b152bb274f29c717f729ba4de9ddf38a99b67d9c9d63fe1273fa2c747"
+    },
+    {
+      "name": "bundle-305e6522532b-2b14c4cfb2d2be4f/manifest.json",
+      "sha256": "bac70a6a84a0f34afd6c6bd76aeeab6c050c0f97b3ee87e8f973c885a20ec2c4"
+    },
+    {
+      "name": "bundle-305e6522532b-2b14c4cfb2d2be4f/public-environment.json",
+      "sha256": "8f1177aa3c9ad824821252fb727fcbd8acf064162b23389774aea889ffbd7afe"
+    },
+    {
+      "name": "bundle-305e6522532b-2b14c4cfb2d2be4f/runner.py",
+      "sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1"
+    },
+    {
+      "name": "bundle-305e6522532b-2b14c4cfb2d2be4f/runtime.json",
+      "sha256": "e94a0d33c77a6a5e2c3d54d644081fe1566f037c6965a4cf9966ab3761b95309"
+    },
+    {
+      "name": "bundle-305e6522532b-b409408ea1d78fac/identity.json",
+      "sha256": "5fb8af0417634e96334a05f2fef6463268880216e2666b65461b621f81d4edb7"
+    },
+    {
+      "name": "bundle-305e6522532b-b409408ea1d78fac/manifest.json",
+      "sha256": "bac70a6a84a0f34afd6c6bd76aeeab6c050c0f97b3ee87e8f973c885a20ec2c4"
+    },
+    {
+      "name": "bundle-305e6522532b-b409408ea1d78fac/public-environment.json",
+      "sha256": "5dca95511324b3dbcdabc7ca3b135b18ab6d457cdae5b3b8e93d788a5b33297b"
+    },
+    {
+      "name": "bundle-305e6522532b-b409408ea1d78fac/runner.py",
+      "sha256": "d4025c8cdf1d87bced4beb59a55b248ae6547eccef471cd49b1bb76683459ae1"
+    },
+    {
+      "name": "bundle-305e6522532b-b409408ea1d78fac/runtime.json",
+      "sha256": "b2d611eec0949d259a086ab2fe55d7d52a9c58ae1bd8792478f718f14bac70f2"
+    },
+    {
+      "name": "bundle-305e6522532b-d1495f6aa44eaab9/identity.json",
+      "sha256": "322dd0affee110caf7610d986561ff60dbf2e14fec7198ba6bfd0f16c0bfe170"
+    },
+    {
+      "name": "bundle-305e6522532b-d1495f6aa44eaab9/manifest.json",
+      "sha256": "bac70a6a84a0f34afd6c6bd76aeeab6c050c0f97b3ee87e8f973c885a20ec2c4"
+    },
+    {
+      "name": "bundle-305e6522532b-d1495f6aa44eaab9/public-environment.json",
+      "sha256": "6293c093b2784f8202fecba66e257205d87f37ea82fe234eff352d21caccd07a"
+    },
+    {
+      "name": "bundle-305e6522532b-d1495f6aa44eaab9/runner.py",
+      "sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1"
+    },
+    {
+      "name": "bundle-305e6522532b-d1495f6aa44eaab9/runtime.json",
+      "sha256": "3a3da88ad0378a7460d905f2ff7b8ccf96494f99505ec1f7067348779d360fdc"
+    },
+    {
+      "name": "bundle-9470f1d90870-4a83857ee1015250/identity.json",
+      "sha256": "9e13d7f19744dd44042afac15435ce6ba775fe26dcca265dcc1d66cb2e942d9a"
+    },
+    {
+      "name": "bundle-9470f1d90870-4a83857ee1015250/manifest.json",
+      "sha256": "176362d626bba4feacaf75673d754d9b97ec4073a0df94fd6999dafd14a778da"
+    },
+    {
+      "name": "bundle-9470f1d90870-4a83857ee1015250/public-environment.json",
+      "sha256": "6293c093b2784f8202fecba66e257205d87f37ea82fe234eff352d21caccd07a"
+    },
+    {
+      "name": "bundle-9470f1d90870-4a83857ee1015250/runner.py",
+      "sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1"
+    },
+    {
+      "name": "bundle-9470f1d90870-4a83857ee1015250/runtime.json",
+      "sha256": "3a3da88ad0378a7460d905f2ff7b8ccf96494f99505ec1f7067348779d360fdc"
+    },
+    {
+      "name": "focused-declaration-old-original.json",
+      "sha256": "401f2794df5a3f8467d4df8be9214681af23784047b2057e3fb64ef68c83db81"
+    },
+    {
+      "name": "focused-declaration-old-original.log",
+      "sha256": "d847fa049e5e2db01404cdfbda55e5da38fa95220d5e7920c605c3c897e83921"
+    },
+    {
+      "name": "focused-private-schema-creation-original.json",
+      "sha256": "01f3a31c5a695f13405438c2ada4541772facc55f3beb711d09ad6fe13529c3c"
+    },
+    {
+      "name": "focused-private-schema-creation-original.log",
+      "sha256": "d2deff81880957905c814a10c3de007962c421031efd52eabfe59dc78f957c0f"
+    },
+    {
+      "name": "mysql-standalone/p1-stop-reconciliation.json",
+      "sha256": "0c03540d210598c0accf6959c3d34f7f4f11244b9278200a071302a35f678dc9"
+    },
+    {
+      "name": "mysql-standalone/server-p1-final-shutdown.json",
+      "sha256": "1e05b04c41368aca7b851084c2f741a3c4c24f77827d4b921a59fab2ce5e95ec"
+    },
+    {
+      "name": "mysql-standalone/server-start-p1.json",
+      "sha256": "77ca092cc2b0d5dcfacaea1036523342dc4e465de798f6d871696eb248263365"
+    },
+    {
+      "name": "mysql-standalone/server-version-p1.json",
+      "sha256": "7ad12d0f75026e475825fba46b5a94ec740c552d501ac6f217809c87d2786269"
+    },
+    {
+      "name": "owned-sqlite-under-native-old-original/command.json",
+      "sha256": "764a8c793dbaf5d57567e7e722b41ecaa5e361751070b2b4ccfe3bc8ca498044"
+    },
+    {
+      "name": "owned-sqlite-under-native-old-original/process.exit",
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "name": "owned-sqlite-under-native-old-original/result.json",
+      "sha256": "e5f8076ff95835bc8050089a310711b9fcdf4fe815b85d6e81a2ccd0d4acd1fb"
+    },
+    {
+      "name": "p1-cadence-current-original.json",
+      "sha256": "27e323166a334b5445a0b3e6556973620332594b5700e6377c75435d92b2208b"
+    },
+    {
+      "name": "p1-cadence-current-original.log",
+      "sha256": "416bf32537d4ffc17e47fc9001e09449b734d88682763b59741e1f5b52a25f02"
+    },
+    {
+      "name": "p1-current-native-outer-whole-original/command.json",
+      "sha256": "9fe20e03de6cc112bf955b699b64131e012ca4d512f7737febf99e164334a428"
+    },
+    {
+      "name": "p1-current-native-outer-whole-original/junit.xml",
+      "sha256": "7114daea7566bb90e641a97476d6c81a43b332c92268c4c6782bd0529a45c135"
+    },
+    {
+      "name": "p1-current-native-outer-whole-original/log.txt",
+      "sha256": "ce225756dd6eeb7513730cef263ac72a4b9738beb709a95073f518220af76bb5"
+    },
+    {
+      "name": "p1-current-native-outer-whole-original/process.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "p1-current-native-outer-whole-original/result.json",
+      "sha256": "f778f49dc55e06a919b5d12f8ed2d91eafeaebded22a66f014351418920dafbe"
+    },
+    {
+      "name": "p1-current-sqlite-compatibility-whole-original/command.json",
+      "sha256": "db058db97d867594fd15fe6e90a002cd4d50692ee3eddfe2a008c3af2ddbbfab"
+    },
+    {
+      "name": "p1-current-sqlite-compatibility-whole-original/junit.xml",
+      "sha256": "6ac4d153b6b0b52574101e369cf51b27d48acc6a290185108be5bc49e18c090f"
+    },
+    {
+      "name": "p1-current-sqlite-compatibility-whole-original/log.txt",
+      "sha256": "9a50e18f4f01d5ba5ba8500e8761b76f3dcb863d814ace9814605fb1602055b4"
+    },
+    {
+      "name": "p1-current-sqlite-compatibility-whole-original/process.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "p1-current-sqlite-compatibility-whole-original/result.json",
+      "sha256": "a59a31fb03664324cc1f15cd6019d5247741d439618d2e87e470de44922dc57d"
+    },
+    {
+      "name": "p1-final-focused-safeguards-original.json",
+      "sha256": "79528aa41bf6e943346acb4e1e5ca2884f94d054cbcf10346ff68b0f95bc310d"
+    },
+    {
+      "name": "p1-final-focused-safeguards-original.log",
+      "sha256": "462ff487c4fb10af74ce87b416befff8b81ec0f14713e12fec6b40ff35324ebd"
+    },
+    {
+      "name": "p1-final-native-discovery-original.json",
+      "sha256": "cc39e6fcc44bcc9ed61a197ee22e48133e07c90d33a1f85c3c0097d1aa27e7ad"
+    },
+    {
+      "name": "p1-final-native-discovery-original.log",
+      "sha256": "e0b55d5d4663c70a1712c4b4363b0618c675b3155b21bf8d378fb0dc533e6dd8"
+    },
+    {
+      "name": "p1-final-pint-original.json",
+      "sha256": "abe34b22fb4334434ad188317c4eedca2e1265c9735b9f3bbef55912b57d7057"
+    },
+    {
+      "name": "p1-final-pint-original.log",
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "name": "p1-final-shard-policy-original.json",
+      "sha256": "eacad62e2a633f3fb3e0cc1987ad5927d16a84b35546115158b399c85110d77b"
+    },
+    {
+      "name": "p1-final-shard-policy-original.log",
+      "sha256": "66ce8c9be7d0aedd76445517f90e4248235aa7c9182d620f34e69b39002fcd38"
+    },
+    {
+      "name": "p1-final-sqlite-compatibility-whole-original/command.json",
+      "sha256": "b3d1f0006889ea833230937fba45b5e2e93af0c5739f62911b9266530c6501de"
+    },
+    {
+      "name": "p1-final-sqlite-compatibility-whole-original/junit.xml",
+      "sha256": "714c00cef1a294d4e874adbed6f012b489670aa1465c468aa514d3b3e4d716fb"
+    },
+    {
+      "name": "p1-final-sqlite-compatibility-whole-original/log.txt",
+      "sha256": "ca26a7c1ed5a57bf237f7aef505d72e352836b2b52561461520b20511d155094"
+    },
+    {
+      "name": "p1-final-sqlite-compatibility-whole-original/process.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "p1-final-sqlite-compatibility-whole-original/result.json",
+      "sha256": "1fff47623a52141fdeef9fc78111535078b5e800383ebfc92c8d5e8f5dc71445"
+    },
+    {
+      "name": "p1-focused-ci-marker-missing-original/command.json",
+      "sha256": "2dfb7e7776dff8826bc62d4972c2b7f542beccf53bbb10001ad14a27b2a6ffc8"
+    },
+    {
+      "name": "p1-focused-ci-marker-missing-original/process.exit",
+      "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "name": "p1-focused-ci-marker-missing-original/result.json",
+      "sha256": "09112e449ecf4c78ad57235cc4bfd7014d076235726fcbec29367e042ec39f40"
+    },
+    {
+      "name": "p1-focused-ci-marker-present-original/command.json",
+      "sha256": "70934d1ddd8011ad69dcd5ffeef408eb56b06c5f5665fe967cf2114055e360b3"
+    },
+    {
+      "name": "p1-focused-ci-marker-present-original/junit.xml",
+      "sha256": "281634878b2124edbefe32ba0d0c8aa57ed2fd2df224896c85d61932396305b3"
+    },
+    {
+      "name": "p1-focused-ci-marker-present-original/log.txt",
+      "sha256": "ca1488e38414cef123548132cf134861bc8d58534849e9403c148555d8e2499d"
+    },
+    {
+      "name": "p1-focused-ci-marker-present-original/process.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "name": "p1-focused-ci-marker-present-original/result.json",
+      "sha256": "35971595a033e9d8dc971096972b3274a843f8b680a8a05a77a2f28ac7aff805"
+    },
+    {
+      "name": "p1-focused-safeguards-current-original.json",
+      "sha256": "31378bcc03116f85e50febedcf89101ecc0d37b66297af3d77272057d58ee5de"
+    },
+    {
+      "name": "p1-focused-safeguards-current-original.log",
+      "sha256": "0130ef17faa177d8c00807695c961a0f9198cb1be4665e6deeb66689fec112cb"
+    },
+    {
+      "name": "p1-native-discovery-generated-originals.json",
+      "sha256": "7bb12f1e121e862daafe00e941a7570fd14c8d3dfd1fcc1d2732757d6e8ba0b6"
+    },
+    {
+      "name": "p1-native-discovery-generated-originals.zip",
+      "sha256": "7b7d86a5b5f404f52ecc8797784ec2b6f7dd83ffeb8ad34d31b25fe8825f1790"
+    },
+    {
+      "name": "p1-shard-policy-current-original.json",
+      "sha256": "79034a9a918e283929c8a4b5293c70190b50ebab6737ec357ef6af079304b585"
+    },
+    {
+      "name": "p1-shard-policy-current-original.log",
+      "sha256": "e3e0590971794c655928bbe15f30998a5ec91f8b8805aece2b5fb08dce5c9f92"
+    },
+    {
+      "name": "prepare-standalone-mysql-p1.py",
+      "sha256": "46ec41a7f78ae13d0a879951303ee51c2a7b9316a01a3d3ab245588c4b08309e"
+    },
+    {
+      "name": "run-focused-ci-declaration.py",
+      "sha256": "d4025c8cdf1d87bced4beb59a55b248ae6547eccef471cd49b1bb76683459ae1"
+    },
+    {
+      "name": "source/0db6b8709db5084d0d8113a81184286738afee75/.github/workflows/focused-feedback.yml",
+      "sha256": "7736593ab9303763809e9856c613eecefb774d11bdc4f3e74125462459291be9"
+    },
+    {
+      "name": "source/0db6b8709db5084d0d8113a81184286738afee75/scripts/ci/database-sqlite-skips.json",
+      "sha256": "1bf3b0e6c962c6ffbde6a625790ba6b39af55d4a7aba78ca555f4589839bc596"
+    },
+    {
+      "name": "source/0db6b8709db5084d0d8113a81184286738afee75/scripts/ci/focused-tests.py",
+      "sha256": "032de31ccc1901f72c750bb0e8f9b274f27a1a2f74917f3d9b21ebebc94e67fb"
+    },
+    {
+      "name": "source/0db6b8709db5084d0d8113a81184286738afee75/scripts/ci/test-focused-tests.py",
+      "sha256": "36edeacff0f933877a777e985c7168e01621bde4377144c71426c13dbc70947c"
+    },
+    {
+      "name": "source/0db6b8709db5084d0d8113a81184286738afee75/tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "sha256": "fc72fbe6fdfe4f3c0ca627a2393deffb260621e06464b6315f465301897a1625"
+    },
+    {
+      "name": "source/0db6b8709db5084d0d8113a81184286738afee75/tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11"
+    },
+    {
+      "name": "source/0db6b8709db5084d0d8113a81184286738afee75/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+      "sha256": "e06982164d4f0b615fd37990b4a6a7843b9a0ab64992f183caf919edbd1c32ff"
+    },
+    {
+      "name": "source/0db6b8709db5084d0d8113a81184286738afee75/tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+      "sha256": "4b245c4907b8b27596fc13fc28bb91480187254ee186a5eef1e61ebc67047484"
+    },
+    {
+      "name": "source/0db6b8709db5084d0d8113a81184286738afee75/tests/Support/DisposableTestDatabase.php",
+      "sha256": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f"
+    },
+    {
+      "name": "source/0db6b8709db5084d0d8113a81184286738afee75/tests/TestCase.php",
+      "sha256": "756a363cc1c36f7c39b654226259e6c26d4b79832abf4e227b8dcc820a2980d2"
+    },
+    {
+      "name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/.github/workflows/focused-feedback.yml",
+      "sha256": "f56079eb23bedcbdb6216ac354ec37f426bdd5ef5cd5e8a03b6b9e88221043d1"
+    },
+    {
+      "name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/scripts/ci/database-sqlite-skips.json",
+      "sha256": "7ad5fd46debc14d75eb2e70dae48eaf5d29ce900697ecf4ad81184ad5b87b4ce"
+    },
+    {
+      "name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/scripts/ci/focused-tests.py",
+      "sha256": "3f72a644c15916956326b49a37b47a616382a5e4989bc8e04442ee552cf41812"
+    },
+    {
+      "name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/scripts/ci/test-focused-tests.py",
+      "sha256": "196dc65854eab43978e7a9c51be48bbd485647f1f3f2ee111734bb39601c8329"
+    },
+    {
+      "name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "sha256": "546e470d08963e90c0be98ebbf29f47a18796ba4e46ba35294f089b9b8b6700d"
+    },
+    {
+      "name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "8f56915967152669c485dae058594fbbabafdf34c2be40875c7e2847bb130509"
+    },
+    {
+      "name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+      "sha256": "86893301244d24893a0650770cd11d8081d5f7afa159c98d517e8a75ab51476a"
+    },
+    {
+      "name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+      "sha256": "8c98eef065ec084927b805b9bcf07753b6a68a7fca61941c21eacfb63a8fa551"
+    },
+    {
+      "name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/tests/Support/DisposableTestDatabase.php",
+      "sha256": "9abbdf0f76a1ff1ec5f314cae5ad950dfb64c8c6552f16841b8489497fb66bc0"
+    },
+    {
+      "name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/tests/TestCase.php",
+      "sha256": "f5d22f5214be700108734c4dbc2b8f6bfa6f8502c6c2ad0eeca0e7aebf2810d0"
+    },
+    {
+      "name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/.github/workflows/focused-feedback.yml",
+      "sha256": "f56079eb23bedcbdb6216ac354ec37f426bdd5ef5cd5e8a03b6b9e88221043d1"
+    },
+    {
+      "name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/scripts/ci/database-sqlite-skips.json",
+      "sha256": "1bf3b0e6c962c6ffbde6a625790ba6b39af55d4a7aba78ca555f4589839bc596"
+    },
+    {
+      "name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/scripts/ci/focused-tests.py",
+      "sha256": "3f72a644c15916956326b49a37b47a616382a5e4989bc8e04442ee552cf41812"
+    },
+    {
+      "name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/scripts/ci/test-focused-tests.py",
+      "sha256": "196dc65854eab43978e7a9c51be48bbd485647f1f3f2ee111734bb39601c8329"
+    },
+    {
+      "name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "sha256": "fc72fbe6fdfe4f3c0ca627a2393deffb260621e06464b6315f465301897a1625"
+    },
+    {
+      "name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "8f56915967152669c485dae058594fbbabafdf34c2be40875c7e2847bb130509"
+    },
+    {
+      "name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+      "sha256": "86893301244d24893a0650770cd11d8081d5f7afa159c98d517e8a75ab51476a"
+    },
+    {
+      "name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+      "sha256": "8c98eef065ec084927b805b9bcf07753b6a68a7fca61941c21eacfb63a8fa551"
+    },
+    {
+      "name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/tests/Support/DisposableTestDatabase.php",
+      "sha256": "9abbdf0f76a1ff1ec5f314cae5ad950dfb64c8c6552f16841b8489497fb66bc0"
+    },
+    {
+      "name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/tests/TestCase.php",
+      "sha256": "db17d4806f145e1affd57e7af8312f2cd43c49b48b624734ee573b65d8f10351"
+    }
+  ],
+  "original_php_invocations": [
+    {
+      "name": "owned-sqlite-under-native-old-original",
+      "source": "0db6b8709db5084d0d8113a81184286738afee75",
+      "result": {
+        "after_digest": "69db17cbcda1370eacd9d32cb5a3abf747343e4fff45b7c068ecbd143b09cfba",
+        "autoload_unchanged": true,
+        "bundle": "bundle-0db6b8709db5-fbefbda5b62d4791",
+        "ended_utc": "2026-10-15T23:21:04.021676+00:00",
+        "junit": {
+          "assertions": 0,
+          "errors": 46,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 46
+        },
+        "junit_error": null,
+        "log_sha256": "b91313f1ede48a5f9cc593ae51ca7e13985cce278900b941f4bade8db1dc108d",
+        "process_exit": 2,
+        "runner_after_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1",
+        "runner_unchanged": true,
+        "source_after": {
+          "head": "0db6b8709db5084d0d8113a81184286738afee75",
+          "status": ""
+        },
+        "source_head_unchanged": true,
+        "source_input_count": 2467,
+        "source_status_unchanged": true,
+        "source_unchanged": true,
+        "started_utc": "2026-10-15T23:21:02.904961+00:00",
+        "verifier_exit": 1,
+        "wall_seconds": 1.1166155969985994
+      }
+    },
+    {
+      "name": "p1-current-sqlite-compatibility-whole-original",
+      "source": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+      "result": {
+        "after_digest": "806654718ca7554fa046c164415603f604b05b4234a93dd479aa4852b6727ce0",
+        "autoload_unchanged": true,
+        "bundle": "bundle-9470f1d90870-4a83857ee1015250",
+        "ended_utc": "2026-10-15T23:26:40.530145+00:00",
+        "junit": {
+          "assertions": 1318,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 103
+        },
+        "junit_error": null,
+        "log_sha256": "9a50e18f4f01d5ba5ba8500e8761b76f3dcb863d814ace9814605fb1602055b4",
+        "process_exit": 0,
+        "runner_after_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1",
+        "runner_unchanged": true,
+        "source_after": {
+          "head": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+          "status": ""
+        },
+        "source_head_unchanged": true,
+        "source_input_count": 2467,
+        "source_status_unchanged": true,
+        "source_unchanged": true,
+        "started_utc": "2026-10-15T23:23:46.014915+00:00",
+        "verifier_exit": 0,
+        "wall_seconds": 174.51512525900034
+      }
+    },
+    {
+      "name": "p1-current-native-outer-whole-original",
+      "source": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "result": {
+        "after_digest": "20f32f7d707012674d2fab6169cef6e1cb64508ee78179da10bdd698e44337ec",
+        "autoload_unchanged": true,
+        "bundle": "bundle-305e6522532b-2b14c4cfb2d2be4f",
+        "ended_utc": "2026-10-15T23:29:18.920501+00:00",
+        "junit": {
+          "assertions": 1105,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 74
+        },
+        "junit_error": null,
+        "log_sha256": "ce225756dd6eeb7513730cef263ac72a4b9738beb709a95073f518220af76bb5",
+        "process_exit": 0,
+        "runner_after_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1",
+        "runner_unchanged": true,
+        "source_after": {
+          "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+          "status": ""
+        },
+        "source_head_unchanged": true,
+        "source_input_count": 2467,
+        "source_status_unchanged": true,
+        "source_unchanged": true,
+        "started_utc": "2026-10-15T23:26:53.661170+00:00",
+        "verifier_exit": 0,
+        "wall_seconds": 145.25922999400063
+      }
+    },
+    {
+      "name": "p1-focused-ci-marker-missing-original",
+      "source": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "result": {
+        "after_digest": "20f32f7d707012674d2fab6169cef6e1cb64508ee78179da10bdd698e44337ec",
+        "autoload_unchanged": true,
+        "bundle": "bundle-305e6522532b-b409408ea1d78fac",
+        "ended_utc": "2026-10-15T23:29:28.635902+00:00",
+        "junit": {
+          "assertions": 0,
+          "errors": 1,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 1
+        },
+        "junit_error": null,
+        "log_sha256": "2d1bfabeeae8528dbde23bcc12f9b52ff5eadfbfcbdaab8a0f564563c6fb51c1",
+        "process_exit": 2,
+        "runner_after_sha256": "d4025c8cdf1d87bced4beb59a55b248ae6547eccef471cd49b1bb76683459ae1",
+        "runner_unchanged": true,
+        "source_after": {
+          "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+          "status": ""
+        },
+        "source_head_unchanged": true,
+        "source_input_count": 2467,
+        "source_status_unchanged": true,
+        "source_unchanged": true,
+        "started_utc": "2026-10-15T23:29:28.321013+00:00",
+        "verifier_exit": 1,
+        "wall_seconds": 0.3147870989923831
+      }
+    },
+    {
+      "name": "p1-focused-ci-marker-present-original",
+      "source": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "result": {
+        "after_digest": "20f32f7d707012674d2fab6169cef6e1cb64508ee78179da10bdd698e44337ec",
+        "autoload_unchanged": true,
+        "bundle": "bundle-305e6522532b-2a7cfd4e4d126814",
+        "ended_utc": "2026-10-15T23:29:33.290467+00:00",
+        "junit": {
+          "assertions": 2,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 1
+        },
+        "junit_error": null,
+        "log_sha256": "ca1488e38414cef123548132cf134861bc8d58534849e9403c148555d8e2499d",
+        "process_exit": 0,
+        "runner_after_sha256": "d4025c8cdf1d87bced4beb59a55b248ae6547eccef471cd49b1bb76683459ae1",
+        "runner_unchanged": true,
+        "source_after": {
+          "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+          "status": ""
+        },
+        "source_head_unchanged": true,
+        "source_input_count": 2467,
+        "source_status_unchanged": true,
+        "source_unchanged": true,
+        "started_utc": "2026-10-15T23:29:32.975787+00:00",
+        "verifier_exit": 0,
+        "wall_seconds": 0.31457319400215056
+      }
+    },
+    {
+      "name": "p1-final-sqlite-compatibility-whole-original",
+      "source": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "result": {
+        "after_digest": "20f32f7d707012674d2fab6169cef6e1cb64508ee78179da10bdd698e44337ec",
+        "autoload_unchanged": true,
+        "bundle": "bundle-305e6522532b-d1495f6aa44eaab9",
+        "ended_utc": "2026-10-15T23:32:34.699634+00:00",
+        "junit": {
+          "assertions": 1318,
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 103
+        },
+        "junit_error": null,
+        "log_sha256": "ca26a7c1ed5a57bf237f7aef505d72e352836b2b52561461520b20511d155094",
+        "process_exit": 0,
+        "runner_after_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1",
+        "runner_unchanged": true,
+        "source_after": {
+          "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+          "status": ""
+        },
+        "source_head_unchanged": true,
+        "source_input_count": 2467,
+        "source_status_unchanged": true,
+        "source_unchanged": true,
+        "started_utc": "2026-10-15T23:29:39.102355+00:00",
+        "verifier_exit": 0,
+        "wall_seconds": 175.5971737229993
+      }
+    }
+  ],
+  "bundles": [
+    "bundle-0db6b8709db5-fbefbda5b62d4791",
+    "bundle-305e6522532b-2a7cfd4e4d126814",
+    "bundle-305e6522532b-2b14c4cfb2d2be4f",
+    "bundle-305e6522532b-b409408ea1d78fac",
+    "bundle-305e6522532b-d1495f6aa44eaab9",
+    "bundle-9470f1d90870-4a83857ee1015250"
+  ],
+  "source_bindings": [
+    {
+      "head": "0db6b8709db5084d0d8113a81184286738afee75",
+      "path": ".github/workflows/focused-feedback.yml",
+      "sha256": "7736593ab9303763809e9856c613eecefb774d11bdc4f3e74125462459291be9",
+      "archive_name": "source/0db6b8709db5084d0d8113a81184286738afee75/.github/workflows/focused-feedback.yml"
+    },
+    {
+      "head": "0db6b8709db5084d0d8113a81184286738afee75",
+      "path": "scripts/ci/database-sqlite-skips.json",
+      "sha256": "1bf3b0e6c962c6ffbde6a625790ba6b39af55d4a7aba78ca555f4589839bc596",
+      "archive_name": "source/0db6b8709db5084d0d8113a81184286738afee75/scripts/ci/database-sqlite-skips.json"
+    },
+    {
+      "head": "0db6b8709db5084d0d8113a81184286738afee75",
+      "path": "scripts/ci/focused-tests.py",
+      "sha256": "032de31ccc1901f72c750bb0e8f9b274f27a1a2f74917f3d9b21ebebc94e67fb",
+      "archive_name": "source/0db6b8709db5084d0d8113a81184286738afee75/scripts/ci/focused-tests.py"
+    },
+    {
+      "head": "0db6b8709db5084d0d8113a81184286738afee75",
+      "path": "scripts/ci/test-focused-tests.py",
+      "sha256": "36edeacff0f933877a777e985c7168e01621bde4377144c71426c13dbc70947c",
+      "archive_name": "source/0db6b8709db5084d0d8113a81184286738afee75/scripts/ci/test-focused-tests.py"
+    },
+    {
+      "head": "0db6b8709db5084d0d8113a81184286738afee75",
+      "path": "tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "sha256": "fc72fbe6fdfe4f3c0ca627a2393deffb260621e06464b6315f465301897a1625",
+      "archive_name": "source/0db6b8709db5084d0d8113a81184286738afee75/tests/Feature/FixtureDatabaseAdmissionNativeTest.php"
+    },
+    {
+      "head": "0db6b8709db5084d0d8113a81184286738afee75",
+      "path": "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11",
+      "archive_name": "source/0db6b8709db5084d0d8113a81184286738afee75/tests/Feature/FixtureDatabaseAdmissionTest.php"
+    },
+    {
+      "head": "0db6b8709db5084d0d8113a81184286738afee75",
+      "path": "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+      "sha256": "e06982164d4f0b615fd37990b4a6a7843b9a0ab64992f183caf919edbd1c32ff",
+      "archive_name": "source/0db6b8709db5084d0d8113a81184286738afee75/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php"
+    },
+    {
+      "head": "0db6b8709db5084d0d8113a81184286738afee75",
+      "path": "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+      "sha256": "4b245c4907b8b27596fc13fc28bb91480187254ee186a5eef1e61ebc67047484",
+      "archive_name": "source/0db6b8709db5084d0d8113a81184286738afee75/tests/Feature/ProductionTrackPreparationPacketMigrationTest.php"
+    },
+    {
+      "head": "0db6b8709db5084d0d8113a81184286738afee75",
+      "path": "tests/Support/DisposableTestDatabase.php",
+      "sha256": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f",
+      "archive_name": "source/0db6b8709db5084d0d8113a81184286738afee75/tests/Support/DisposableTestDatabase.php"
+    },
+    {
+      "head": "0db6b8709db5084d0d8113a81184286738afee75",
+      "path": "tests/TestCase.php",
+      "sha256": "756a363cc1c36f7c39b654226259e6c26d4b79832abf4e227b8dcc820a2980d2",
+      "archive_name": "source/0db6b8709db5084d0d8113a81184286738afee75/tests/TestCase.php"
+    },
+    {
+      "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "path": ".github/workflows/focused-feedback.yml",
+      "sha256": "f56079eb23bedcbdb6216ac354ec37f426bdd5ef5cd5e8a03b6b9e88221043d1",
+      "archive_name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/.github/workflows/focused-feedback.yml"
+    },
+    {
+      "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "path": "scripts/ci/database-sqlite-skips.json",
+      "sha256": "7ad5fd46debc14d75eb2e70dae48eaf5d29ce900697ecf4ad81184ad5b87b4ce",
+      "archive_name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/scripts/ci/database-sqlite-skips.json"
+    },
+    {
+      "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "path": "scripts/ci/focused-tests.py",
+      "sha256": "3f72a644c15916956326b49a37b47a616382a5e4989bc8e04442ee552cf41812",
+      "archive_name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/scripts/ci/focused-tests.py"
+    },
+    {
+      "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "path": "scripts/ci/test-focused-tests.py",
+      "sha256": "196dc65854eab43978e7a9c51be48bbd485647f1f3f2ee111734bb39601c8329",
+      "archive_name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/scripts/ci/test-focused-tests.py"
+    },
+    {
+      "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "path": "tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "sha256": "546e470d08963e90c0be98ebbf29f47a18796ba4e46ba35294f089b9b8b6700d",
+      "archive_name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/tests/Feature/FixtureDatabaseAdmissionNativeTest.php"
+    },
+    {
+      "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "path": "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "8f56915967152669c485dae058594fbbabafdf34c2be40875c7e2847bb130509",
+      "archive_name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/tests/Feature/FixtureDatabaseAdmissionTest.php"
+    },
+    {
+      "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "path": "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+      "sha256": "86893301244d24893a0650770cd11d8081d5f7afa159c98d517e8a75ab51476a",
+      "archive_name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php"
+    },
+    {
+      "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "path": "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+      "sha256": "8c98eef065ec084927b805b9bcf07753b6a68a7fca61941c21eacfb63a8fa551",
+      "archive_name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/tests/Feature/ProductionTrackPreparationPacketMigrationTest.php"
+    },
+    {
+      "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "path": "tests/Support/DisposableTestDatabase.php",
+      "sha256": "9abbdf0f76a1ff1ec5f314cae5ad950dfb64c8c6552f16841b8489497fb66bc0",
+      "archive_name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/tests/Support/DisposableTestDatabase.php"
+    },
+    {
+      "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "path": "tests/TestCase.php",
+      "sha256": "f5d22f5214be700108734c4dbc2b8f6bfa6f8502c6c2ad0eeca0e7aebf2810d0",
+      "archive_name": "source/305e6522532b7e54b62b10ca7314011fdffc3916/tests/TestCase.php"
+    },
+    {
+      "head": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+      "path": ".github/workflows/focused-feedback.yml",
+      "sha256": "f56079eb23bedcbdb6216ac354ec37f426bdd5ef5cd5e8a03b6b9e88221043d1",
+      "archive_name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/.github/workflows/focused-feedback.yml"
+    },
+    {
+      "head": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+      "path": "scripts/ci/database-sqlite-skips.json",
+      "sha256": "1bf3b0e6c962c6ffbde6a625790ba6b39af55d4a7aba78ca555f4589839bc596",
+      "archive_name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/scripts/ci/database-sqlite-skips.json"
+    },
+    {
+      "head": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+      "path": "scripts/ci/focused-tests.py",
+      "sha256": "3f72a644c15916956326b49a37b47a616382a5e4989bc8e04442ee552cf41812",
+      "archive_name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/scripts/ci/focused-tests.py"
+    },
+    {
+      "head": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+      "path": "scripts/ci/test-focused-tests.py",
+      "sha256": "196dc65854eab43978e7a9c51be48bbd485647f1f3f2ee111734bb39601c8329",
+      "archive_name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/scripts/ci/test-focused-tests.py"
+    },
+    {
+      "head": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+      "path": "tests/Feature/FixtureDatabaseAdmissionNativeTest.php",
+      "sha256": "fc72fbe6fdfe4f3c0ca627a2393deffb260621e06464b6315f465301897a1625",
+      "archive_name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/tests/Feature/FixtureDatabaseAdmissionNativeTest.php"
+    },
+    {
+      "head": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+      "path": "tests/Feature/FixtureDatabaseAdmissionTest.php",
+      "sha256": "8f56915967152669c485dae058594fbbabafdf34c2be40875c7e2847bb130509",
+      "archive_name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/tests/Feature/FixtureDatabaseAdmissionTest.php"
+    },
+    {
+      "head": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+      "path": "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+      "sha256": "86893301244d24893a0650770cd11d8081d5f7afa159c98d517e8a75ab51476a",
+      "archive_name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php"
+    },
+    {
+      "head": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+      "path": "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+      "sha256": "8c98eef065ec084927b805b9bcf07753b6a68a7fca61941c21eacfb63a8fa551",
+      "archive_name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/tests/Feature/ProductionTrackPreparationPacketMigrationTest.php"
+    },
+    {
+      "head": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+      "path": "tests/Support/DisposableTestDatabase.php",
+      "sha256": "9abbdf0f76a1ff1ec5f314cae5ad950dfb64c8c6552f16841b8489497fb66bc0",
+      "archive_name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/tests/Support/DisposableTestDatabase.php"
+    },
+    {
+      "head": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+      "path": "tests/TestCase.php",
+      "sha256": "db17d4806f145e1affd57e7af8312f2cd43c49b48b624734ee573b65d8f10351",
+      "archive_name": "source/9470f1d90870c7f6b7b101b6361fc52aadf5a45d/tests/TestCase.php"
+    }
+  ],
+  "private_originals": [
+    {
+      "path": "/tmp/fixture-admission-evidence-20261015/owned-sqlite-under-native-old-original/junit.xml",
+      "sha256": "840d1cde8c64a31fe29fb123b40cfac6979a234f1b1f017050a13134d8f285f5",
+      "reason": "Failed original output retained privately; original result/counts remain public."
+    },
+    {
+      "path": "/tmp/fixture-admission-evidence-20261015/owned-sqlite-under-native-old-original/log.txt",
+      "sha256": "b91313f1ede48a5f9cc593ae51ca7e13985cce278900b941f4bade8db1dc108d",
+      "reason": "Failed original output retained privately; original result/counts remain public."
+    },
+    {
+      "path": "/tmp/fixture-admission-evidence-20261015/p1-focused-ci-marker-missing-original/junit.xml",
+      "sha256": "0aad36794a7f87ab20a9e76d026591a2490b0a8bf6128b098e5474eada666e29",
+      "reason": "Failed original output retained privately; original result/counts remain public."
+    },
+    {
+      "path": "/tmp/fixture-admission-evidence-20261015/p1-focused-ci-marker-missing-original/log.txt",
+      "sha256": "2d1bfabeeae8528dbde23bcc12f9b52ff5eadfbfcbdaab8a0f564563c6fb51c1",
+      "reason": "Failed original output retained privately; original result/counts remain public."
+    }
+  ],
+  "frozen_members_and_manifests_equal_pr130": {
+    "resources/contracts/test-v2/profile-assets.json": "29e0b1b33abc78ab48c6669579dbb3296eb9e282f2a16b0fb337db8417b68dac",
+    "app/Domain/Contracts/ContractText.php": "46d145c921ff5a94b3d2928c9b7d9caf0697d33f8ba5c5c30ca65598e1d68a08",
+    "app/Domain/Contracts/TcpdfV2ContractRenderer.php": "36f8454d055bae4b20f9eb67a861d4a4709fc1708acb4a47d353c4ba061e70d2",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.ctg.z": "e32a1fea0a049ccf1c687eba84f804339c4599eba4eedb1ff4ee4427aee34b93",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.json": "4912381c5c0baccdca18246cb5ffb8d234fae48de71d002a523d082859bbfde4",
+    "resources/contracts/test-v2/fonts/generated/dejavusans.z": "bf01c0d0a4d745951b355b0d253b4076d5e0da2aef8114d42c0f2ab83ec257fe",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.ctg.z": "e59d2256ed0a75d999d124c994c42bb025efa782c3e77e251f7497f4f539e089",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.json": "5128b3fcdd515b6fc80cceca16f0b0118be333aa1558cf193c487c4ad3144a10",
+    "resources/contracts/test-v2/fonts/generated/dejavusansb.z": "34fa710f984b43306f89abd2458a213a63ecfecd59976154a03183b65a8f1554",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans-Bold.ttf": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
+    "resources/contracts/test-v2/fonts/source/DejaVuSans.ttf": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
+    "resources/contracts/test-v2/fonts/source/LICENSE": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93",
+    "resources/contracts/test-v1/profile-assets.json": "44533c186a3b1350163025256a9ced519a6395ba8001541193d1d51b51688e50",
+    "app/Domain/Contracts/TcpdfContractRenderer.php": "620b66766143ab72532e8fa3a161d3eb1012368bbf195cea70b9b8907cdd763a",
+    "resources/contracts/test-v1/fonts/generated/dejavusans.ctg.z": "e32a1fea0a049ccf1c687eba84f804339c4599eba4eedb1ff4ee4427aee34b93",
+    "resources/contracts/test-v1/fonts/generated/dejavusans.json": "4912381c5c0baccdca18246cb5ffb8d234fae48de71d002a523d082859bbfde4",
+    "resources/contracts/test-v1/fonts/generated/dejavusans.z": "bf01c0d0a4d745951b355b0d253b4076d5e0da2aef8114d42c0f2ab83ec257fe",
+    "resources/contracts/test-v1/fonts/generated/dejavusansb.ctg.z": "e59d2256ed0a75d999d124c994c42bb025efa782c3e77e251f7497f4f539e089",
+    "resources/contracts/test-v1/fonts/generated/dejavusansb.json": "5128b3fcdd515b6fc80cceca16f0b0118be333aa1558cf193c487c4ad3144a10",
+    "resources/contracts/test-v1/fonts/generated/dejavusansb.z": "34fa710f984b43306f89abd2458a213a63ecfecd59976154a03183b65a8f1554",
+    "resources/contracts/test-v1/fonts/source/DejaVuSans-Bold.ttf": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
+    "resources/contracts/test-v1/fonts/source/DejaVuSans.ttf": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
+    "resources/contracts/test-v1/fonts/source/LICENSE": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93",
+    "resources/contracts/production-member-v1/profile-assets.json": "caa3218c162ef3c9192785858e6cd9fad89ab828a345466652dda21e74a1c852",
+    "app/Domain/Grants/Member/MemberOriginalRenderInput.php": "6b470c6d2dfadbb74d24bc7263e347985ce92864c29b236aac50d70bd379e3c7",
+    "app/Domain/Grants/Member/MemberOriginalText.php": "959d90054dfb6513dff278359d4d27709da4b0131faef674e2cdd6a6689902da",
+    "app/Domain/Grants/Member/MemberOriginalPdfRenderer.php": "f3acf36fcf4938b14a8efb742ad46a17dc7c3001a478833d36a48d09ce5c7ed2",
+    "app/Domain/Grants/Member/MemberOriginalRendererProcess.php": "f0470e91b122b23588088a7361971b9e009f2098d86e9d1321a3cea47c610085",
+    "scripts/member-original-renderer-autoload.php": "adca75e6c55194265c0395df088cf77b8aab37a30923435e3b5e2704ada7193c",
+    "scripts/render-member-original.php": "880ec7590bba84b24c0944986b9c71e6484cd0b63f25b0e55add1b6a7f4be0c3",
+    "resources/contracts/production-free-v1/profile-assets.json": "b909c5fa80e882d7d6f2ab4bf8b05f315f46695d4a9acb621b0350a02d7f7b1f",
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php": "93af5758af8c646ba794a6864701db2771f23040ad537953794b434ab16fb522",
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantPdfRenderer.php": "eea4bc7e5ba7a7df18eac0ac2dd85720813372d94b19d1dc303e789cf9b7b261",
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantRendererProcess.php": "ce40e9b1a1bb85c7924b21951488ab54b24baa042be2df1e5a1b4fd9a1a85921",
+    "app/Domain/Grants/ProductionFree/ProductionFreeGrantRenderInput.php": "16566e3fca45b7e8ad0d25393632f035711e26a3b6acfd0edb8fc4ee7e55d93f",
+    "scripts/render-production-free-grant.php": "ecf6cf22f902a180b7dbcb3ae771fe9fcb0e5282b74274a6d53e08412e6a3199",
+    "resources/contracts/paid-v1/profile-assets.json": "4a2221b64384c226e72cf16811e31f512a8a8f63c65081a04487ec5f7a573940",
+    "app/Domain/Grants/Paid/PaidGrantText.php": "9eabe757ed8daa9618de7af7cd22911fd971a0f5174d5cb6eac7294c1e0c5411",
+    "app/Domain/Grants/Paid/PaidGrantPdfRenderer.php": "8a0fce94ed52d65eb31ebf67941976cd31676a47300d9a5ed4b7289d64209c44",
+    "app/Domain/Grants/Paid/PaidGrantRendererProcess.php": "d138d616268483762beb2f45ffcd9489eddcdb59c0f4568852d7a40a485ad64f",
+    "app/Domain/Grants/Paid/PaidGrantRenderInput.php": "b3d2eb372fce8d87cc9cfea0cd1f35d18b609ef2636cef4b77a29e4c5541c5cc",
+    "app/Domain/Grants/Paid/PaidGrantFiles.php": "f37bcf56475596b4e41e03512520b7a002d196c772d5257801d40088d52cc418",
+    "scripts/render-paid-grant.php": "90c6dccdadabc117d7a11b6a21e4043cbe22e8616faa79141852e56ab14623fc",
+    "resources/contracts/paid-tax-v2/profile-assets.json": "9cc50e19608a11be4db4648b49aa5ccf234945a63fced68d95f6b42bf2e048b4",
+    "app/Domain/Grants/PaidTax/PaidTaxText.php": "7a6d6ccbf3df1292604e680038abe9f64be418ae4bbe667dfe487147f89f291d",
+    "app/Domain/Grants/PaidTax/PaidTaxPdfRenderer.php": "74bf8bdb62afdb4d3f8c91bb6b1836f93268dbc583c5b82703d0d85199125f9a",
+    "app/Domain/Grants/PaidTax/PaidTaxRendererProcess.php": "6111d9af2a37eee594054754ab299657a85724a040f8a9f528ec38882c4c4ea3",
+    "app/Domain/Grants/PaidTax/PaidTaxRenderInput.php": "3a755533c1a8e68dee51ef7db7db77c72211915ef24d00f5f0694a9d81abc6a1",
+    "app/Domain/Grants/PaidTax/PaidTaxFiles.php": "afda6760090cde95ee623223fe4899d65e5bc4e09fc0c3d96d57171cdede21db",
+    "scripts/render-paid-tax-grant.php": "eab7d2adcc5170f1d638b4ed2d79c330023c9163cfe1c7af55e980c5fa1d81f8",
+    "resources/contracts/free-v1/profile-assets.json": "570f6a023927228e0ac6def670df603b5b595ffd916acf69bf569fecaeab74c8",
+    "app/Domain/Grants/Free/FreeGrantText.php": "ef6f23c3d65039fd138a6a459bfe448624e391997af69d3637eb88d132ebe883",
+    "app/Domain/Grants/Free/FreeGrantPdfRenderer.php": "2ca8a4fd59b2934d3ea0fa06aae8337339fe7adbc6ff42a57b01e07e5e0fef63",
+    "app/Domain/Grants/Free/FreeGrantRendererProcess.php": "af3031bf9c37f6c528d7dcb48b1a347708520aab038b8a27e21a33d10ef31732",
+    "app/Domain/Grants/Free/FreeGrantRenderInput.php": "efd1b3dae37efdeaf91d61fc96216532fa92ea43ea08fbbac1e524e3635a9060",
+    "scripts/render-free-grant.php": "c8c39861757f565242b375149acde5ee906996b45078aec8d6d7842f59eb4c2f"
+  },
+  "limits": "Source305e current SQLite103/1318, native-outer74/1105 and CI-marker1/2 are separate passing scopes. Native74 includes46SQLitecanaries; no native lifecycle pass. Original controls46/E46 and1/E1 and focused52/2fail retained. Only transport remapped for actual focused environment local proof, no hosted dispatch/fullF2/host/activation acceptance."
+}

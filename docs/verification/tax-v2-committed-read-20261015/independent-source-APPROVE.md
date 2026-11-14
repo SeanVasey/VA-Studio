@@ -1,0 +1,37 @@
+DECISION: APPROVE BOUNDED SOURCE AND NARROW DEVELOPMENT EVIDENCE CARRY
+Reviewed SHA: e455c2871ade602653bd0f59b20e151b57afe57d
+Reviewer: independent non-author; original runtime-only artifact, 2026-10-15 UTC.
+
+No open P0/P1 or further required source repair was found in this bounded actual-source/test review. The two previously required V2 final-pure metadata P2 repairs are resolved. This is not final sealed-packet, development-merge, Paid252 consumer integration, release or activation approval. Final evidence reconciliation and exact-head independent decision remain pending.
+
+The implementation admits reflected Facade::$resolvedInstance as an actual array before frozen generic/identity entries. The captured exact standard primary Connection's raw config is actual-array admitted with flat driver/name actual strings, and raw database/tablePrefix are actual strings before typed capture/frame birth and at the start of every prove. Short-circuit array checks precede offsets; Reflection reads do not call getters or resolve bindings. Existing proof ordering brackets the frozen callback-free methods without an intervening callback. The new guards are driver-independent and retain the original reader, native primary, birth clock, generic context, deadline, private markers, owner, raw plans and consumer capsule. They do not renew authority, change temporal caps, add SQL, or move callback/commit phases. Frozen shared/V1/identity/Fresh code is unchanged.
+
+The new tests use the real paid fixture and existing Source/root-transaction APIs. Two late ordinary committing delegates replace either the static facade cache or captured primary config with an ArrayObject preserving its contents. Their sentinel counts offsets specifically on the final IdentityOriginalCommitWitness::prepareOriginalCommit stack, distinguishing allowed earlier callback phases. Current refusal checks the controlled reason, zero sentinel calls, original probe rollback/idle frame, no owned deferred callback, preserved subsequent transaction callback and restored dispatcher. Metadata is restored before owned cleanup in these fixtures; that step is not itself proof of cleanup under arbitrary metadata corruption. Two genuine birth cases use a Stringable original database/tablePrefix value and require zero coercion before refusal. The positive standard descriptor/peer, normal siblings, historical password change and late consumer-withdrawal cases remain meaningful supported-path coverage.
+
+Original closed evidence was independently parsed and hash/exit/source reconciled:
+
+| Receipt/source | Cases/assertions | Failures/errors/skips | PHP/verifier/observed recorder OS exit |
+| --- | --- | --- | --- |
+| b1 whole SQLite, b1a5447beb8c07d002f341250a97e396bbb31792 | 211/1523 | 0/0/25 | 0/0/0 |
+| 9d native driver pair, 9d602626ddf1abcb700cf3165e4bfdfb33fb8c78 | 2/19 | 0/0/0 | 0/0/0 |
+| 9d native callback/source, same exact 9d | 10/71 | 0/0/0 | 0/0/0 |
+| e455 focused SQLite metadata/lifecycle, reviewed exact head | 11/62 | 0/0/0 | 0/0/not yet recorded at this checkpoint |
+| old facade terminal oracle, eaf906498c2208930259b9ff74baee5ce3cdeb29 | 1/3 | 1/0/0 | 1/1/1 |
+| old primary-config terminal oracle, same exact eaf | 1/3 | 1/0/0 | 1/1/1 |
+| old database coercion oracle, same exact eaf | 1/2 | 1/0/0 | 1/1/1 |
+| old prefix coercion oracle, same exact eaf | 1/2 | 1/0/0 | 1/1/1 |
+
+The four old failures are genuine callback/coercion detections (facade terminal count 1, primary-config terminal count 2, database and prefix coercion count 1 each), with zero API/compiler errors or skips. Application/config/routes at eaf are byte-identical to 9d. The repaired 11 cases directly execute all four failures plus environment/connection-map refusals and supported lifecycle checks. Original e455 result, JUnit, log hash and process.exit close at 0 with all recorded source/head/status/runner/loader stability checks true. Its recorder OS witness was absent when inspected; no OS success is inferred, and final packet verification must reconcile its actual witness. Both native launch PID/start-tick/UID identities match their original observed OS-exit records. Actual native callback/source case identities total 10, covering the intended filters; an earlier plan estimate of 11 is not an executed count. Overlapping evidence totals are not summed.
+
+I independently recomputed every declared Git input hash at b1, 9d, eaf and e455: 2351 inputs at each, including 16 routes, with zero Git mismatches. All current e455 input bytes and all 13 loader hashes match. From either b1 or 9d to e455, 2349 inputs are identical; only TaxPaidReadContext and the receipt test differ. Frozen generic/identity/migrations have no batch diff. Current receipt discovery is 32 methods/41 expanded cases; the 11-case execution is not a whole receipt-file or whole-13-file pass.
+
+Narrow carry is accepted for focused development under AGENTS' cost policy. Keep the whole 211/1523/25 and its real >300-second source-age execution bound only to b1. Keep native 2/19 and 10/71 bound only to 9d. Label e455 11/62 as the current repaired-source focused evidence. Exact input comparisons, unchanged earlier methods, the driver-independent guard delta, meaningful old/new failures and supported positives justify carrying those bounded earlier results; a duplicate whole-13-file or native run is not required solely for these raw shape guards. This is neither whole-application byte equality nor a fresh current-native/whole-current claim. Any new product delta or failure can require new affected checks.
+
+Specification and engineering-quality source dispositions both pass for this bounded repair. The reviewed transitive final-pure surface has no remaining concrete extension callback path within V2's admitted composition. This does not claim that shared existing paths are repaired globally: analogous noncanonical facade/primary metadata P2 remains frozen in generic/identity/V1 composition for its related batch. The OLD NEW-write Fresh env-descriptor P2 also remains deferred to the next related Tax-admission batch, and ordinary membership's afterCommit durable-effect/refusal P2 remains open.
+
+All prior conditions remain: cleanup uses captured original authority rather than policy/deadline renewal or idle-PDO commit inference; durable post-commit errors never authorize retry/compensation or a successful receipt; unrelated reopened/peer callbacks remain owned elsewhere. Actual isolation/healthy schema conditions, no READ COMMITTED gap claim, bounded lock wait without generalized SQL interruption, and no arbitrary damaged-restore/blind-writer proof remain explicit. Paid252 forward schema/render/consumer/terminal work, existing-request final provider I/O, mounting, host/provider/live/full-suite acceptance and release activation remain open. Final portable packet/source review, any explicit receipt-only head carry, cheap exact-published-head preflight and protected expected-SHA merge remain necessary.
+
+Actions: read-only source/vendor/Git inspection and immutable completed receipt parsing/hashing only. No application, database/test, CI, hosted/network operation, tracked edit, delegation or publication was performed.
+
+Verification report: /workspace/runtime/tax-v2-committed-read-independent-source-review-e455c287-20261015.json
+Verification report SHA-256: b814e6448afc71d36caed08b58716a7c5bb118c9bada9f92dcd32a81b015150f

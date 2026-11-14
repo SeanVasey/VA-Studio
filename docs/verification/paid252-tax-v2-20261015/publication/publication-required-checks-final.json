@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "gh",
+    "pr",
+    "checks",
+    "122",
+    "--repo",
+    "SeanVasey/VA-Studio",
+    "--required",
+    "--json",
+    "name,state,bucket,link,workflow"
+  ],
+  "observed_at": "2026-10-15T08:05:58.671528+00:00",
+  "process_exit": 1,
+  "stdout": "",
+  "stderr": "unknown flag: --json\n\nUsage:  gh pr checks [<number> | <url> | <branch>] [flags]\n\nFlags:\n      --fail-fast          Exit watch mode on first check failure\n  -i, --interval --watch   Refresh interval in seconds when using --watch flag (default 10)\n      --required           Only show checks that are required\n      --watch              Watch checks until they finish\n  -w, --web                Open the web browser to show details about checks\n  \n"
+}

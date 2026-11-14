@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Runtime\AwardUpgrade\NewWriterAwardReplayTest" file="/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/NewWriterAwardReplayTest.php" tests="1" assertions="103" errors="0" failures="0" skipped="0" time="4.768387">
+    <testcase name="test_forward_upgrade_reconciles_fresh_authority_and_replays_original_award_bytes" file="/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/NewWriterAwardReplayTest.php" line="38" class="Runtime\AwardUpgrade\NewWriterAwardReplayTest" classname="Runtime.AwardUpgrade.NewWriterAwardReplayTest" assertions="103" time="4.768387"/>
+  </testsuite>
+</testsuites>

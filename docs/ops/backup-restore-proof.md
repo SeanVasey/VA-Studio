@@ -5,6 +5,13 @@ Prepared October 7, 2026 by the production-preparation-1 lane. This page describ
 not been run. Nothing here backs up or restores a real installation, production
 database, customer file or credential, and none of it chooses a host (U-02 is still open).
 
+
+> **Kit format since 2026-11-11.** The staging and production backup helpers no longer write `private.tar`: a set holds the
+> private store as a root-only `private/` tree with the same `private.sha256` and `private.dirs` manifests, sharing unchanged files
+> with the previous verified set by hard link (never with the live store) and verified in place (`ops/staging/private-snapshot.py`,
+> `docs/ops/staging-runbook.md` section 8). The archive procedure below remains the reference for sets taken before that date and
+> for a manual proof.
+
 ## What the synthetic proof does
 
 `scripts/ops/backup-restore-proof.php` makes its own data. It does not boot Laravel, read

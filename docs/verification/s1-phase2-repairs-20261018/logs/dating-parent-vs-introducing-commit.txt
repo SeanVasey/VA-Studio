@@ -1,0 +1,12 @@
+1/2 parent @ 8b2cd56c: OK (2 tests, 6 assertions)
+1/2 commit @ 11ab36d7: ERRORS! Tests: 2, Assertions: 0, Errors: 2.
+1/2 OrderInquiryTest parent @ 8b2cd56c: OK (5 tests, 11 assertions)
+1/2 OrderInquiryTest commit @ 11ab36d7: ERRORS! Tests: 5, Assertions: 3, Errors: 4.
+6 parent @ 1631ed60: OK (1 test, 42 assertions)
+6 commit @ 952fb9e3: FAILURES! Tests: 1, Assertions: 1, Failures: 1.
+5 parent @ ca20e351: OK (1 test, 5 assertions)
+5 commit @ f1d5fb1f: FAILURES! Tests: 1, Assertions: 3, Failures: 1.
+4 parent @ 24f6fd14: OK (3 tests, 21 assertions)
+4 commit @ cbe111ec: FAILURES! Tests: 3, Assertions: 9, Failures: 3.
+3 parent @ 71c4e7a7: OK (1 test, 4 assertions)
+3 commit @ 67fa03a7: FAILURES! Tests: 1, Assertions: 4, Failures: 1.

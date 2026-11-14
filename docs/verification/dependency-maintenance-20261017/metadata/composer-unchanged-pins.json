@@ -1,0 +1,34 @@
+{
+  "stripe/stripe-php": {
+    "same_record": true,
+    "version": "v21.3.2"
+  },
+  "tecnickcom/tc-lib-pdf": {
+    "same_record": true,
+    "version": "8.76.3"
+  },
+  "tecnickcom/tc-lib-pdf-font": {
+    "same_record": true,
+    "version": "4.4.1"
+  },
+  "phpunit/phpunit": {
+    "same_record": true,
+    "version": "12.5.34"
+  },
+  "filament/filament": {
+    "same_record": true,
+    "version": "v5.8.4"
+  },
+  "inertiajs/inertia-laravel": {
+    "same_record": true,
+    "version": "v3.5.1"
+  },
+  "laravel/prompts": {
+    "same_record": true,
+    "version": "v0.3.25"
+  },
+  "symfony/console": {
+    "same_record": true,
+    "version": "v7.4.20"
+  }
+}

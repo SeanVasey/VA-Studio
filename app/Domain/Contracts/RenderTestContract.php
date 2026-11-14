@@ -58,8 +58,10 @@ final class RenderTestContract
                     'input_hash' => $locked->input_hash, 'profile_hash' => $locked->profile_hash,
                     'disk' => $file['disk'], 'storage_path' => $file['storage_path'], 'claim_token' => $claim['token'],
                     'pdf_hash' => $file['pdf_hash'], 'size_bytes' => $file['size_bytes'], 'page_count' => $file['page_count'], 'issued_at' => $at]);
-                $work->forceFill(['state' => 'completed', 'claim_token' => null, 'lease_expires_at' => null,
-                    'next_attempt_at' => null, 'reason' => null, 'updated_at' => $at])->save();
+                // ReadGrantContract requires issued_at = work.updated_at. If claim and completion share a second, updated_at
+                // is not dirty and Eloquent would stamp the save with the clock, which may already be in the next second.
+                ContractRenderWork::withoutTimestamps(fn () => $work->forceFill(['state' => 'completed', 'claim_token' => null,
+                    'lease_expires_at' => null, 'next_attempt_at' => null, 'reason' => null, 'updated_at' => $at])->save());
                 AuditEvent::record('commerce.contract.test_issued', $document, ['grant_public_id' => $fresh['grant']->public_id,
                     'document_public_id' => $document->public_id, 'test_only' => true]);
                 app(ReadGrantContract::class)->forRequest($locked, $account);

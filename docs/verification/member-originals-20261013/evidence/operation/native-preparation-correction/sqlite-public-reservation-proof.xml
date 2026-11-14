@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php" tests="1" assertions="20" errors="0" failures="0" skipped="0" time="15.887464">
+    <testcase name="test_reservation_proof_is_issuer_owned_and_cannot_be_serialized_or_adopted_by_a_new_frame" file="/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php" line="97" class="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipReservationOwnershipTest" assertions="20" time="15.887464"/>
+  </testsuite>
+</testsuites>

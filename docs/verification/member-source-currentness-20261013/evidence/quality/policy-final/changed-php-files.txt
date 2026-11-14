@@ -1,0 +1,8 @@
+app/Domain/Grants/Member/MemberGrantPolicy.php
+app/Domain/Memberships/Production/MembershipCatalogDefinition.php
+app/Domain/Memberships/Production/MembershipCatalogEvidence.php
+tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php
+tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php
+tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php
+tests/Feature/StagingEnvironmentAdmissionTest.php
+tests/Unit/MembershipCatalogDefinitionTest.php

@@ -67,6 +67,77 @@ Once a release that uses an image is published, the image is public at its own c
 
 A release without images is saved exactly as before, so code that predates site images can still read it.
 
+## Legal pages
+
+Lane CX (FP-005) adds three optional legal pages to a release: **Privacy policy**, **Terms** and **License comparison**, public at `/legal/privacy`, `/legal/terms` and `/legal/licenses` once a release that includes them is published. A release with any legal page is saved as schema version 5 (version 4 plus `legal`); leaving every legal page out keeps the existing v2/v3/v4 choice, and retained releases keep their hashes. Evidence: [lane CX packet](verification/customer-comms-cx-20261024/README.md).
+
+1. In a content draft, open **Privacy policy page**, **Terms page** or **License comparison page** and select **Include … page**. Paste only text that has been approved for publication: the drafts in `docs/legal/` are not approved and must not be pasted until Sean approves them.
+2. Enter a page title (120) and description (300), a **Version** (a short label such as `1` or `2026-11`, shown on the page), an **Effective date** (`YYYY-MM-DD`, shown on the page) and an **Approval reference** (who approved this exact text and where that is recorded; kept with the release for staff and never shown publicly).
+3. Add sections: a heading (160) and one to forty paragraphs (4,000 each), up to sixty sections and 120,000 characters per page. Text is plain: markup, `<`, `>` and control characters are refused, and there are no links. Line breaks inside a paragraph are kept. The postal address, once complete, is pasted here at publication, never committed to the repository.
+4. Preview at `/admin/site-releases/{release}/preview/legal/{privacy|terms|licenses}` (private, no-store, noindex), then publish as usual. Navigation can link an included legal page; the footer lists every published legal page.
+
+Until a release with legal pages is published, every legal route answers `404`. Restoring an older release withdraws them.
+
+### License comparison: generated from the published license versions (schema 6)
+
+BL-38 (DD-31, 2026-11-10). The license comparison can no longer be typed. A release that includes it is saved as schema
+version 6, which is version 5 with one change: `legal.licenses` holds only a `title` (120) and an introduction (`description`,
+300). Everything else on the page is read at request time from the license versions themselves
+(`App\Domain\Rights\PublishedLicenseComparison`):
+
+- **Which versions.** Every license version that is `published` and inside its offer availability window
+  (`effective_from` to `effective_until`, end exclusive; `VerifiedLicense::available()` decides, including the reviewed-evidence
+  chain), with typed terms (license schemas 2 to 5). Schema 1 versions hold reviewer-attested prose with no typed meaning,
+  so they are left out even when an offer sells one. Sound-kit licenses (template type `sound-kit`, BL-66) print only on a
+  kit and never on a track card, so they are left out too. Drafts, approved-but-unpublished, not-yet-available and expired versions
+  are never listed.
+- **Order.** By license template identity, then by version identity. Names and publication times do not change the order.
+- **Wording.** One section per version, carrying exactly the storefront's license tier for that version (`id`, `name`,
+  `version`, `type`, `features`, `requiredAssetRoles`): the lines are `LicenseVersion::features()`, the generator whose output
+  the cards and offer snapshots carry, and the file line uses the one deliverable label map
+  (`resources/js/lib/deliverable-labels.json`, DD-30). No license text, cap or price is authored by the release.
+- **When it shows.** Only from an active schema 6 release that includes the page, and only while at least one version is
+  listed; otherwise `/legal/licenses` answers `404` and the footer does not link it. Publishing a successor version, or a
+  version's window opening or closing, changes the page with no site release edit. The footer link uses an inexpensive
+  existence check, so a version whose review evidence later fails verification can leave a link to a `404` until it is
+  withdrawn. The staff preview shows the generated page even when it is empty, with a note that it is not public.
+- **Older releases.** Schema 1 to 5 releases still load, preview, publish and restore as before. A schema 5 comparison is
+  hand-typed text that can drift from what is sold, so it is never rendered, in public or in preview, and publication,
+  restoring and scheduling refuse a release that still holds one (class `hand_typed_license_comparison`, below). A new draft
+  made from such a release keeps its title and introduction and drops the typed sections. A release without the comparison
+  keeps schema 5, so older application code can still read it.
+- **Editor.** **License comparison page** now has only **Include License comparison page**, the page title and the
+  introduction.
+- **Database.** Migration `2026_11_10_283800_site_release_images_schema_v6.php` admits schema 6 releases to the site image
+  insert guard (successor of `2026_10_24_268100`, otherwise byte-identical). Its rollback is refused while a schema 6
+  release exists.
+
+The legal publication guard still reads the comparison's title and introduction.
+
+### Publication guard: placeholders and review markers
+
+A release may be saved and previewed with unfinished legal text, but the domain refuses to make it public while a legal page still shows drafting material (`App\Domain\SiteBuilder\LegalPublicationGuard`, reason code `legal_unresolved_markers`). The rule runs in `SiteContent` itself, on **Publish release**, **Restore previous release**, **Schedule publication** and the scheduler's own activation, so no screen or command can skip it. It reads only the public text of the three legal pages: title, description, section headings and paragraphs. It does not read the approval reference, which is never public, and it never fills, removes or rewrites anything.
+
+| Class | What is refused | Where the convention comes from |
+| --- | --- | --- |
+| `legal_review_marker` | "for legal review", with or without brackets | `[For legal review]` on TERMS sections 15 to 17 and LICENSE-TIERS 4.14 |
+| `owner_decision` | "Sean to confirm", "Sean to choose", "Sean to decide", "Sean to set" | `[county — Sean to confirm]`, the provider rows of PRIVACY section 5, the price cells of LICENSE-TIERS |
+| `publication_value` | "set on publication", "inserted at publication", "entered at publication" | `[set on publication]`, `[registered postal address — inserted at publication]` |
+| `draft_notice` | "not yet published", "DRAFT for … approval" or "… review", "Reviewer appendix", "remove before publication", "Draft version label" | the status banner and reviewer appendix of each draft |
+| `template_variable` | an unsubstituted license source variable such as `{{deliverables}}` | LICENSE-TIERS 6.3 |
+| `bracketed_placeholder` | any other text in square brackets, and any unpaired `[` or `]` | "Text still in square brackets is a placeholder or a choice that must be filled before publication" (PRIVACY and TERMS banners) |
+| `hand_typed_license_comparison` | a license comparison that still holds typed sections (schema 5) | DD-31: the comparison is generated from the published license versions (schema 6, above) |
+
+Because every square bracket counts, approved legal text must not use square brackets; use parentheses. Matching is on these exact conventions only, so the guard cannot tell whether a filled-in value is correct or whether counsel has in fact reviewed the wording: removing a marker is a statement by the operator, recorded in the approval reference.
+
+What staff see:
+
+- Saving a draft that holds markers succeeds and adds a warning, **This draft cannot be published yet**, listing the first eight markers by page, section and class.
+- **Publish release**, **Restore previous release** and **Schedule publication** answer **Publication blocked** or **Scheduling blocked** with the same list; the live site and the schedule are unchanged.
+- A pending schedule made before this rule existed is resolved `failed` when it comes due. The schedule table's transition trigger admits only its existing outcomes, so the row stores `integrity`; the reason travels in the `site.schedule.failed` audit event (`reason`, and `legal_markers` as counts per page and class, never page text), in the command output (`FAILED integrity schedule=… reason=legal_unresolved_markers`) and in **Schedule history** ("Not published: the legal pages still hold unresolved placeholders or review markers").
+
+To publish, save a new draft with the approved final text. A release that was refused is immutable like any other and stays available as a private draft.
+
 ## Original schema-v1 fields
 
 All values are bounded plain text, with no markup or unsupported keys. Label length is at most 120 characters. These are the original integer schema-version `1` fields; new editor copies use schema version `2` and its additional bounded fields, or version `3`, which adds site image references ([D-25](architecture/D-25-editable-site-images.md)), when they use an image.

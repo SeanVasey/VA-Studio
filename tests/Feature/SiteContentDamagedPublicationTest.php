@@ -12,6 +12,7 @@ use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\FilamentNotifications;
 use Tests\Support\LicenseFixtures;
 use Tests\TestCase;
 
@@ -92,9 +93,7 @@ class SiteContentDamagedPublicationTest extends TestCase
 
         $this->actingAs($actor);
         $page = Livewire::test(ListSiteReleases::class)->mountAction('createDraft');
-        $notification = collect(session('filament.claimed_notifications', session('filament.notifications', [])))
-            ->firstWhere('title', 'The published site content is unavailable');
-        $this->assertNotNull($notification);
+        $notification = FilamentNotifications::sole('The published site content is unavailable');
         $this->assertStringContainsString('Restore verified data from a backup', (string) $notification['body']);
         $page->assertSet('mountedActions', []);
         $this->assertDatabaseCount('site_releases', $releases);

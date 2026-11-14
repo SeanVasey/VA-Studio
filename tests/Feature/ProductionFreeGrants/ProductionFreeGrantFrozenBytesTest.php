@@ -12,20 +12,20 @@ use Tests\TestCase;
 final class ProductionFreeGrantFrozenBytesTest extends TestCase
 {
     private const MAIN = [
-        'app/Domain/Contracts/ContractRenderProfileRegistry.php' => 'd6718f8f0d962679da3b6429c0edcfba76db223df216c03c99d0710f03e272e7',
+        'app/Domain/Contracts/ContractRenderProfileRegistry.php' => '67e2f192cfe5b507d1d11993191c14e5d360e042567165626d8cc90d3090d0b6', // 2026-11-10 and 2026-11-14 (SQ-14): only the test-buyer-pdf-v2 manifest_sha256 constant, for the tc-lib re-pins
         'app/Domain/Contracts/ContractRenderProfile.php' => '8b51ac91c35e9809a6040d32519a166d4652a759e265b97c32d205c865e95d40',
         'app/Domain/Contracts/ContractRenderer.php' => '4ef17678b4c8fd48b255e3a72eb26a32fe7f0d8da7d6ffe29ef5f4de8d141c4a',
         'app/Domain/Contracts/RenderedContract.php' => 'b3fa57b8c8cc8e354597a5fc5f12b7942aa734e9d1bab9f0d2014358dd1d249f',
-        'app/Domain/Contracts/ContractRenderWorkspace.php' => '61cd991e9389fcca6b04fc4d0e5ec2c2c0f75266979dfa64af5e305f754e61ad',
-        'app/Domain/Contracts/ContractFiles.php' => '3ab16f6dd6e71221de3925101329ec53807fe927fa3688188999a531e5763f1c',
+        'app/Domain/Contracts/ContractRenderWorkspace.php' => '44304d9f76a5972e03f3d6f29e1c3cd6d0c09fb0a20137af835adbdf93a788a0', // #251: adds sweep(); create()/close() unchanged but for removeContents becoming static
+        'app/Domain/Contracts/ContractFiles.php' => '5012bfd35819e0e83ada68eb8ae6856529cffa111ce8c6d065fb880481ec055a', // #251 and the 2026-11-09 follow-up: add RENDER_CACHES and sweepRendererWorkspaces(); createRendererWorkspace()/store()/verify() unchanged
         'app/Domain/Contracts/ContractIo.php' => '245cce48509e9df21a8cbc3d4cac625c1a446044d27d03bee5203a1b735138c8',
         'app/Domain/Contracts/ContractIssuanceException.php' => '9df97742776ba51f031b088ade0fde06e2a73ad1d90284141b91ee6e3eb8a8be',
         'scripts/contract-renderer-autoload.php' => '09a810e87b0f499bcf738dd35c1ebc60b27eeab2c5b6499be102c133bd72be01',
         'app/Domain/Delivery/DeliveryAssetFiles.php' => '3a3771443bf527d56c4a521c01b9840c847b33a9da23b7ad455c96d52820764c',
-        'app/Domain/Delivery/PreparedDeliveryStream.php' => 'e976fc7d0803cde84a769d83f1ca28b2449f7c1dcdd7effda0b8bf42e8c12e13',
+        'app/Domain/Delivery/PreparedDeliveryStream.php' => 'bde3e442b1050cfc7fc8d23ec49dc09c58e30796dd0168f9dfdcb9e7790702f0', // FP-077 #258: adds writeRangeTo() and SQ-18 Pint formatting; prepare/writeTo/close/stream token-identical
         'app/Domain/Delivery/ActivationPolicy.php' => '38d51e78fbdec221671b909f961ea4965fbc11f18543fab91b16f2ebf9106c95', // B2: account()'s environment gate only; outsideTransactions() unchanged
         'app/Domain/Delivery/DeliveryException.php' => 'a43ad378c7b5cb199471caa882e3fe0e276cd91d69800f5861eb202aa6070adc',
-        'app/Domain/Customers/ProductionCustomerAccess.php' => 'f0fc0b70a058954ecc0c2853b0836af547b5f4cd4654d1ba71116a03d18b20f7',
+        'app/Domain/Customers/ProductionCustomerAccess.php' => 'ce24d7d2fcf77b89b728a54e681fcdd5137748f576bfa21836584299c0a559f7', // B4 metadata admission, independently reassessed for Free256 on 2026-10-15.
         'app/Domain/Customers/ProductionCustomerPrincipal.php' => 'd49b587d1a4c22bda4797b90c65d15ee0e41f3fb3a01dda5a599bb817425457b',
         'app/Domain/Customers/ProductionIdentity/ProductionCustomerSessions.php' => '73efe65ab06626178fc1aa6ecd6ff426b30a04d58acd68b164acaa31c9a5d1d6',
         'app/Domain/Customers/ProductionIdentity/IdentityException.php' => '91259fe2f5e59549b8f385edc2194b51ea70266fbe2a8992fce3615696661563',

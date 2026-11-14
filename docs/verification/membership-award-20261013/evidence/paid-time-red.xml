@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php" tests="11" assertions="13" errors="0" failures="11" skipped="0" time="0.405073">
+    <testcase name="test_projection_retains_only_the_documented_payment_timestamp" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php" line="14" class="Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingPaidTimeTest" assertions="1" time="0.220691">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_projection_retains_only_the_documented_payment_timestamp
+Failed asserting that null is identical to Array &amp;0 [
+    'paid_at' =&gt; 1791331200,
+].
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:19
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testcase name="test_a_late_retrieval_keeps_the_actual_on_time_payment_fact" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php" line="22" class="Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingPaidTimeTest" assertions="2" time="0.020455">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_a_late_retrieval_keeps_the_actual_on_time_payment_fact
+Failed asserting that null is identical to 'membership-paid-invoice-v2'.
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:26
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle" tests="8" assertions="8" errors="0" failures="8" skipped="0" time="0.146225">
+      <testcase name="test_missing_or_invalid_payment_time_cannot_settle with data set &quot;missing&quot;" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php" line="40" class="Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingPaidTimeTest" assertions="1" time="0.018291">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle with data set "missing"
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    0 =&gt; 'refused',
+-    1 =&gt; 'payment_time',
++    0 =&gt; 'settled',
++    1 =&gt; null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_missing_or_invalid_payment_time_cannot_settle with data set &quot;null&quot;" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php" line="40" class="Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingPaidTimeTest" assertions="1" time="0.017914">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle with data set "null"
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    0 =&gt; 'refused',
+-    1 =&gt; 'payment_time',
++    0 =&gt; 'settled',
++    1 =&gt; null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_missing_or_invalid_payment_time_cannot_settle with data set &quot;string&quot;" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php" line="40" class="Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingPaidTimeTest" assertions="1" time="0.016699">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle with data set "string"
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    0 =&gt; 'refused',
+-    1 =&gt; 'payment_time',
++    0 =&gt; 'settled',
++    1 =&gt; null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_missing_or_invalid_payment_time_cannot_settle with data set &quot;zero&quot;" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php" line="40" class="Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingPaidTimeTest" assertions="1" time="0.016357">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle with data set "zero"
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    0 =&gt; 'refused',
+-    1 =&gt; 'payment_time',
++    0 =&gt; 'settled',
++    1 =&gt; null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_missing_or_invalid_payment_time_cannot_settle with data set &quot;negative&quot;" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php" line="40" class="Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingPaidTimeTest" assertions="1" time="0.020343">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle with data set "negative"
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    0 =&gt; 'refused',
+-    1 =&gt; 'payment_time',
++    0 =&gt; 'settled',
++    1 =&gt; null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_missing_or_invalid_payment_time_cannot_settle with data set &quot;out_of_range&quot;" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php" line="40" class="Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingPaidTimeTest" assertions="1" time="0.017797">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle with data set "out_of_range"
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    0 =&gt; 'refused',
+-    1 =&gt; 'payment_time',
++    0 =&gt; 'settled',
++    1 =&gt; null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_missing_or_invalid_payment_time_cannot_settle with data set &quot;fractional&quot;" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php" line="40" class="Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingPaidTimeTest" assertions="1" time="0.017833">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle with data set "fractional"
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    0 =&gt; 'refused',
+-    1 =&gt; 'payment_time',
++    0 =&gt; 'settled',
++    1 =&gt; null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_missing_or_invalid_payment_time_cannot_settle with data set &quot;after_retrieval&quot;" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php" line="40" class="Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingPaidTimeTest" assertions="1" time="0.020990">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_missing_or_invalid_payment_time_cannot_settle with data set "after_retrieval"
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &amp;0 [
+-    0 =&gt; 'refused',
+-    1 =&gt; 'payment_time',
++    0 =&gt; 'settled',
++    1 =&gt; null,
+ ]
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:44
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+    </testsuite>
+    <testcase name="test_an_explicit_prepayment_is_not_relabelled_as_the_service_start" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php" line="47" class="Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest" classname="Tests.Feature.ProductionMembershipBilling.BillingPaidTimeTest" assertions="2" time="0.017701">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingPaidTimeTest::test_an_explicit_prepayment_is_not_relabelled_as_the_service_start
+Failed asserting that null is identical to '2026-10-06 00:00:00'.
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingPaidTimeTest.php:52
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

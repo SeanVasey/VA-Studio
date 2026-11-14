@@ -19,16 +19,14 @@ class ProductionTrackCapabilitiesMigrationOwnershipTest extends TestCase
         // intrinsically SQLite. Their isolated connection remains SQLite when
         // the surrounding suite selects MySQL; they are not native lock proof.
         $original = DB::getDefaultConnection();
-        config(['database.connections.production_capability_ownership_fixture' => array_replace(config('database.connections.sqlite'),
-            ['database' => ':memory:', 'url' => null])]);
-        DB::setDefaultConnection('production_capability_ownership_fixture');
+        $fixture = $this->createInMemorySqliteFixture()->getName();
+        DB::setDefaultConnection($fixture);
         Schema::clearResolvedInstance('db.schema');
         $this->beforeApplicationDestroyed(function () use ($original): void {
-            DB::purge('production_capability_ownership_fixture');
             DB::setDefaultConnection($original);
             Schema::clearResolvedInstance('db.schema');
         });
-        $this->artisan('migrate:fresh', ['--database' => 'production_capability_ownership_fixture', '--force' => true])->assertExitCode(0);
+        $this->artisan('migrate:fresh', ['--database' => $fixture, '--force' => true])->assertExitCode(0);
         // Remove the explicitly empty later dependents (derived from the catalog) before testing
         // retained capability ownership. Explicit disposable-fixture cleanup, FK enforcement unchanged.
         CapabilityRollbackFixture::isolateCapabilityTables();

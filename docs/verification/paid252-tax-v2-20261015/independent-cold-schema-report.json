@@ -1,0 +1,313 @@
+{
+  "schema_version": 1,
+  "kind": "Independent narrow cold-schema source/test repair recheck; not final packet approval",
+  "decision": "APPROVE SOURCE REPAIR; FINAL EVIDENCE PENDING",
+  "reviewed_commit": "5ed4f8d01b54eb9ee23d6856d23c5866a42020ca",
+  "prior_full_source_commit": "8a35c90f84052531f4f1189fcd806d6afdda4e43",
+  "observed_head": "81e6af2ddaae6e8355bd6d7f2b7c41d21748a6cf",
+  "observed_status": "",
+  "changed_paths": [
+    ".github/workflows/final-verification.yml",
+    ".gitlab-ci.yml",
+    "app/Domain/Grants/PaidTax/PaidTaxSchema.php",
+    "docs/verification/paid252-tax-v2-20261015/independent-full-source-DECISION.md",
+    "docs/verification/paid252-tax-v2-20261015/independent-full-source-report.json",
+    "scripts/ci/database-mysql-selection.json",
+    "scripts/ci/database-mysql-skips.json",
+    "scripts/ci/database-sqlite-skips.json",
+    "tests/Feature/PaidTaxAdversarialJourneyTest.php",
+    "tests/Feature/PaidTaxNativeBoundaryTest.php",
+    "tests/Feature/PaidTaxSchemaRecoveryTest.php",
+    "tests/Support/paid-tax-origin-race-worker.php"
+  ],
+  "product_delta": [
+    "app/Domain/Grants/PaidTax/PaidTaxSchema.php"
+  ],
+  "product_delta_patch": "diff --git a/app/Domain/Grants/PaidTax/PaidTaxSchema.php b/app/Domain/Grants/PaidTax/PaidTaxSchema.php\nindex 61fa1e42..3afee46b 100644\n--- a/app/Domain/Grants/PaidTax/PaidTaxSchema.php\n+++ b/app/Domain/Grants/PaidTax/PaidTaxSchema.php\n@@ -221,6 +221,7 @@ final class PaidTaxSchema\n     public static function assertInstalled(): void\n     {\n         $connection = DB::connection();\n+        $connection->getSchemaBuilder();\n         [$steps, $states, $names] = self::plan($connection->getDriverName(), $connection->getTablePrefix());\n         if (self::preflight($connection->getPdo(), $connection->getDriverName(), $connection->getTablePrefix(), $states, $names) !== count($steps)) {\n             throw new LogicException('Tax paid schema is not completely installed.');\n",
+  "source_bindings": [
+    {
+      "path": ".github/workflows/final-verification.yml",
+      "git_blob": "8ec9d6598c3ab60d0a65515d1362846741f506c5",
+      "sha256": "dff00b6e68907dd65a3fda82b629a49d47c03427c70f289d0470fd63bcc289f2"
+    },
+    {
+      "path": ".gitlab-ci.yml",
+      "git_blob": "beaf681896683a0df75d9549f53cf5f230e54af4",
+      "sha256": "10b6a69c58b7abf24432a9b00192c6bd3a46e1f567e90690d2a59795eb4a3c18"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxSchema.php",
+      "git_blob": "3afee46b99b78b9c7f87037bae34f611b7295e3b",
+      "sha256": "44ed9d8a83221a386db3fa4f79c64fb580b4a8eef5dbddca92a3ca5f2e16254f"
+    },
+    {
+      "path": "docs/verification/paid252-tax-v2-20261015/independent-full-source-DECISION.md",
+      "git_blob": "5246548e2a2788cf6c67acb2ef34f98e10287ee9",
+      "sha256": "2c0250dc0fce05df8220eecefbedf4427c06dc13b14f58d3782e3f1674b0385f"
+    },
+    {
+      "path": "docs/verification/paid252-tax-v2-20261015/independent-full-source-report.json",
+      "git_blob": "72e5e81b8937d0065da2188eac240317075a10b8",
+      "sha256": "185beaa28fee1b10cd08163b9d330a5597db81f188e3c37c7ad3a60228a980cf"
+    },
+    {
+      "path": "scripts/ci/database-mysql-selection.json",
+      "git_blob": "b5eacf6f92d0ec74035267f0ea8bd1f4b571ac47",
+      "sha256": "86c57de29f707e38a9324fee4cf40f3d7af6e5d9ed09a867442868e9fb628f25"
+    },
+    {
+      "path": "scripts/ci/database-mysql-skips.json",
+      "git_blob": "9dcde76df4ae46428f7a5193073747acb61e5852",
+      "sha256": "13938f2b8495c4c85e232383ea964d4b7b0fa3fdbb2d37cc5fcf797af8cca017"
+    },
+    {
+      "path": "scripts/ci/database-sqlite-skips.json",
+      "git_blob": "316c6627f93062405871a68c761a419d37b9d4ce",
+      "sha256": "686e3612968e84c2e65c51592b533d55a92bed28392902a1baef8e5da8bbc142"
+    },
+    {
+      "path": "tests/Feature/PaidTaxAdversarialJourneyTest.php",
+      "git_blob": "1364230604d8ff7bedb8a33ff3bca1075e84f1f3",
+      "sha256": "9957c4ef763fce32d2445a63721585a327ba943c6294c7da0d11aec21a16317e"
+    },
+    {
+      "path": "tests/Feature/PaidTaxNativeBoundaryTest.php",
+      "git_blob": "9ede936d48bb38ebb9eaaf1e576b9d4fd2f8c2f4",
+      "sha256": "20a40b223afb869e557667f0dabecb3f37853a6936dcd96d0def6c6833cf4f45"
+    },
+    {
+      "path": "tests/Feature/PaidTaxSchemaRecoveryTest.php",
+      "git_blob": "48843ca8c0aa738745c42841885118c42082bbe1",
+      "sha256": "97751f750a32277e672d0fd5cfcf238fd0675c388b5032bf3ac41890a2aceb90"
+    },
+    {
+      "path": "tests/Support/paid-tax-origin-race-worker.php",
+      "git_blob": "a425722c39842ae2745b517646cdddf0ce4dcddf",
+      "sha256": "4442bca61fe7bd1661d2470b267f8f42fe9e29ae2179e9f414a2eb55a85cf0d4"
+    }
+  ],
+  "finding": {
+    "id": "PTV2-COLD-SCHEMA",
+    "severity": "P2 product availability defect",
+    "old_result": "Real independent cold consumer fails when Laravel standard nullable schemaGrammar has not been warmed by migration; Blueprint typed grammar assignment throws before owner row lock.",
+    "fix_result": "Closed at5ed in inspected source and focused SQLite regression; getSchemaBuilder initializes only null standard grammar before plan in callback-capable birth phase, as install already does. It performs no DDL, retains non-null grammar, and does not enter terminal raw proof.",
+    "new_material_source_findings": [],
+    "open_p0_p1": false,
+    "required_source_repairs": []
+  },
+  "regression_assessment": "Reflection resets only the actual standard constructor-null schemaGrammar after genuine installation; asserts same captured PDO, exact objects and retained populated rows after admission. Real native cold worker independently exposed the condition, so this is not a missing-API or fixture oracle.",
+  "closed_receipts": [
+    {
+      "name": "sqlite-cold-schema-old-source",
+      "source_head": "2f181f55796e4e51fc754461b0095c23887a5c36",
+      "counts": {
+        "tests": 1,
+        "assertions": 3,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "php_marker": 1,
+      "php_exit": 1,
+      "recorder_verifier_exit": 1,
+      "observed_recorder_os_exit": 1,
+      "launch_os_identity_matches": true,
+      "log_hash_matches": true,
+      "stability": {
+        "autoload_unchanged": true,
+        "runner_unchanged": true,
+        "source_head_unchanged": true,
+        "source_status_unchanged": true,
+        "source_unchanged": true
+      },
+      "case_names": [
+        "test_installed_schema_admits_the_standard_uninitialized_schema_grammar_of_a_fresh_application"
+      ],
+      "failure_excerpt": [
+        [
+          "Tests\\Feature\\PaidTaxSchemaRecoveryTest::test_installed_schema_admits_the_standard_uninitialized_schema_grammar_of_a_fresh_application",
+          "Installed-schema admission requires a migration-warmed connection.",
+          "Failed asserting that TypeError Object #2579 (",
+          "    'message' => 'Cannot assign null to property Illuminate\\Database\\Schema\\Blueprint::$grammar of type Illuminate\\Database\\Schema\\Grammars\\Grammar',"
+        ]
+      ],
+      "receipt_hashes": {
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-cold-schema-old-source/result.json": "e83c018346fb5fea653635f9ec04d7169bdc90c0eb742e6450e92a22363f73c9",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-cold-schema-old-source/junit.xml": "aaa0f2be9122a0b729bf3d0094783a5479902cccfa28f6e5d8e77da6b822d86f",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-cold-schema-old-source/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-cold-schema-old-source/log.txt": "1db62678a506cebc3faa61a4f05fdba06960e537b3a5f4231422a530fc16ed21",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/launch-sqlite-cold-schema-old-source.json": "9d4c2a809d610281830a260ffc9d7ba6f837a2a1974c3686a8451dd9cd930a5e",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/observed-os-exit-sqlite-cold-schema-old-source.json": "a1e93ee8dbd4e8377bca8d23d407743054954c5589784ee6d1e6025253773f10"
+      }
+    },
+    {
+      "name": "sqlite-cold-schema-fixed",
+      "source_head": "5ed4f8d01b54eb9ee23d6856d23c5866a42020ca",
+      "counts": {
+        "tests": 1,
+        "assertions": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "php_marker": 0,
+      "php_exit": 0,
+      "recorder_verifier_exit": 0,
+      "observed_recorder_os_exit": 0,
+      "launch_os_identity_matches": true,
+      "log_hash_matches": true,
+      "stability": {
+        "autoload_unchanged": true,
+        "runner_unchanged": true,
+        "source_head_unchanged": true,
+        "source_status_unchanged": true,
+        "source_unchanged": true
+      },
+      "case_names": [
+        "test_installed_schema_admits_the_standard_uninitialized_schema_grammar_of_a_fresh_application"
+      ],
+      "failure_excerpt": [],
+      "receipt_hashes": {
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-cold-schema-fixed/result.json": "9e33b16f83efb20073f465ca0ab91a38cdf673bab02be69618daad66fb8443d5",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-cold-schema-fixed/junit.xml": "a060fc3114c7b6c1f8f33cbddee2304a1a1756e7058005990a19a459f45806d5",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-cold-schema-fixed/process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/sqlite-cold-schema-fixed/log.txt": "9bef3f979ecb0fa9484d7ddbd5854681492b950e8b47fd1aa77c10024dcc4d95",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/launch-sqlite-cold-schema-fixed.json": "fbc6b2eb09abd48bf9958554d28dcc5c343baf2bfb042a39aad47f4cf10f3f37",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/observed-os-exit-sqlite-cold-schema-fixed.json": "173b55183e764999121644da330a8da237d372d952b5fdf14860a8113f50e0a9"
+      }
+    },
+    {
+      "name": "mysql-origin-race-gated-and-recovery",
+      "source_head": "fee317f1ab46a4350d41be630911d5b0edf3fd85",
+      "counts": {
+        "tests": 1,
+        "assertions": 33,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0
+      },
+      "php_marker": 1,
+      "php_exit": 1,
+      "recorder_verifier_exit": 1,
+      "observed_recorder_os_exit": 1,
+      "launch_os_identity_matches": true,
+      "log_hash_matches": true,
+      "stability": {
+        "autoload_unchanged": true,
+        "runner_unchanged": true,
+        "source_head_unchanged": true,
+        "source_status_unchanged": true,
+        "source_unchanged": true
+      },
+      "case_names": [
+        "test_native_provider_replays_serialize_one_origin_and_refuse_temporary_or_nontransactional_owned_objects"
+      ],
+      "failure_excerpt": [
+        [
+          "Tests\\Feature\\PaidTaxNativeBoundaryTest::test_native_provider_replays_serialize_one_origin_and_refuse_temporary_or_nontransactional_owned_objects",
+          "Native worker ended before the expected barrier: {\"result\":\"unexpected\",\"error_class\":\"TypeError\",\"status\":null,\"location\":\"Blueprint.php:106\",\"phase\":\"command-started\",\"transaction_level\":0,\"in_transaction\":false}",
+          "",
+          "/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/PaidTaxNativeBoundaryTest.php:204"
+        ]
+      ],
+      "receipt_hashes": {
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-origin-race-gated-and-recovery/result.json": "4d5027a28b3a8686d4916219d24c3ef89c84e3a4bd46d049f79935bd83a3b460",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-origin-race-gated-and-recovery/junit.xml": "fe6777795922a3e4ea96334d166d28ac167b95bf4f4a6ef893942b9e8b1d9614",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-origin-race-gated-and-recovery/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-origin-race-gated-and-recovery/log.txt": "b29611a30d474b404925c25ed5eac9f7685f3814f390d517aa38be4d676c0be6",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/launch-mysql-origin-race-gated-and-recovery.json": "f858e056b8f7f8e7ca66fbd3345ea816419df9ae6521b3f789b263ead8287e0e",
+        "/workspace/runtime/paid252-tax-v2-evidence-20261015/observed-os-exit-mysql-origin-race-gated-and-recovery.json": "d362d48cf5a7a4df80bbf97b9f2cfe431b1e41dd8d3574db5806933c23ed8fc0"
+      }
+    }
+  ],
+  "old_baseline_product_diff_vs_8a": [],
+  "classification_limits": [
+    "Nativefee1/33 failure is a product defect with recorded command-started TypeError Blueprint.php:106 and closed PDO/framework, not fixture error.",
+    "Earlier625 unknown-barrier failure remains unresolved on its own original evidence; no unrecorded child stdout or same-cause inference is added.",
+    "Current focused SQLite1/6 is not a fresh native race/install/recovery or whole affected compatibility pass."
+  ],
+  "prior_test_conditions": {
+    "different_buyer_oracle": "Corrected to404 in successor test source; not a source defect.",
+    "routine_survivor_helper": "Corrected to after[table] in5ed, preserving exact retained routines/guards sets. No application rerun needed solely for prior empty branch correction.",
+    "reciprocal_skip_pairs": "Exact one SQLite-only method in mysql registry and two named native methods in sqlite registry; no existing entries removed.",
+    "selection_lists": "All selection lists and mysql skip pairs sorted and duplicate-free; sqlite registry is historically unsorted and remains duplicate-free with exact additions, not globally reordered."
+  },
+  "policies": {
+    "scripts/ci/database-mysql-selection.json": {
+      "sha256": "86c57de29f707e38a9324fee4cf40f3d7af6e5d9ed09a867442868e9fb628f25",
+      "lists": {
+        "pattern_files": {
+          "count": 50,
+          "sorted": true,
+          "duplicates": false
+        },
+        "include_files": {
+          "count": 65,
+          "sorted": true,
+          "duplicates": false
+        },
+        "residual_files": {
+          "count": 49,
+          "sorted": true,
+          "duplicates": false
+        },
+        "branching_helper_files": {
+          "count": 102,
+          "sorted": true,
+          "duplicates": false
+        }
+      }
+    },
+    "scripts/ci/database-mysql-skips.json": {
+      "sha256": "13938f2b8495c4c85e232383ea964d4b7b0fa3fdbb2d37cc5fcf797af8cca017",
+      "lists": {
+        "methods": {
+          "count": 24,
+          "sorted": true,
+          "duplicates": false
+        }
+      }
+    },
+    "scripts/ci/database-sqlite-skips.json": {
+      "sha256": "686e3612968e84c2e65c51592b533d55a92bed28392902a1baef8e5da8bbc142",
+      "lists": {
+        "methods": {
+          "count": 257,
+          "sorted": false,
+          "duplicates": false
+        }
+      }
+    }
+  },
+  "census_manifest_observation": {
+    "path": "/workspace/runtime/paid252-tax-v2-evidence-20261015/census-5ed4f8d0-phpunit-ci-mysql-manifest.json",
+    "sha256": "cd32cc0960c455b94ce5c50199fb32b74c08ec01ab62253013d75e1f88117593",
+    "declared_source_cases": 8854,
+    "declared_source_files": 659,
+    "declared_selected_cases": 2307,
+    "declared_selected_files": 226,
+    "exact_policy_hashes_match_reviewed_head": true,
+    "scope": "Manifest read/hash/policy binding only in this narrow source pass; discovery, not executed application counts."
+  },
+  "ci_comments": {
+    "changes": "Two count comments only; actual gates/triggers unchanged. At5ed comments remain2306/8853 while same-head discovery manifest declares2307/8854.",
+    "required": "Correct count prose on later docs/comments-only head before final packet. No product/app rerun is justified solely by that correction."
+  },
+  "manifest": {
+    "sha256": "9cc50e19608a11be4db4648b49aa5ccf234945a63fced68d95f6b42bf2e048b4",
+    "all_six_members_match": true,
+    "changed_paths": []
+  },
+  "prior_full_source_note": {
+    "path": "/workspace/runtime/paid252-tax-v2-independent-full-source-DECISION-8a35c90f-20261015.md",
+    "sha256": "2c0250dc0fce05df8220eecefbedf4427c06dc13b14f58d3782e3f1674b0385f",
+    "status": "Historical unchanged approval scope; cold bug was discovered later and this narrow fix supersedes that defect, not original evidence."
+  },
+  "actions": "Read-only Git/framework/source and closed-receipt inspection; Python standard-library parsing/hashing; own runtime notes only. No test/DB/CI/network or tracked edits.",
+  "pending": [
+    "Fresh selected native cold consumers/duplicate serialization/schema recovery and full affected current SQLite/V1/physical results, exact current policy/local quality and source/head/runner/loader receipts.",
+    "Sealed portable final packet and independent exact final-head decision/carry, cheap preflight and expected-head merge.",
+    "No current native whole/source-age/host/provider/SAPI/proxy/cache capacity/isolation/deadlock/general SQL/DDL/trigger/restore proof; no live/mount/operative enabling or HTTP/download redemption acceptance.",
+    "Existing frozen shared V1/generic/identity metadata and ordinary membership afterCommit P2 remain outside scope; budget/cap/profile bytes unchanged."
+  ]
+}

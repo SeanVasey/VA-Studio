@@ -1,8 +1,11 @@
+import deliverableLabels from './deliverable-labels.json' with { type: 'json' };
+
+// Delivery labels come from the one deliverable label map (DD-30); the contract is not a license deliverable role.
 export const deliveryRoles = {
   contract: { label: 'Original contract', extension: 'pdf', mime: 'application/pdf' },
-  master_wav: { label: 'Master WAV', extension: 'wav', mime: 'audio/wav' },
-  download_mp3: { label: 'MP3', extension: 'mp3', mime: 'audio/mpeg' },
-  stems_zip: { label: 'Stems ZIP', extension: 'zip', mime: 'application/zip' },
+  master_wav: { label: deliverableLabels.master_wav, extension: 'wav', mime: 'audio/wav' },
+  download_mp3: { label: deliverableLabels.download_mp3, extension: 'mp3', mime: 'audio/mpeg' },
+  stems_zip: { label: deliverableLabels.stems_zip, extension: 'zip', mime: 'application/zip' },
 } as const;
 export type DeliveryKind = keyof typeof deliveryRoles;
 export interface DeliveryItem { grantId: string; kind: DeliveryKind; filename: string; mimeType: string; sizeBytes: number }

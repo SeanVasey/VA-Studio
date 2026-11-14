@@ -1,0 +1,35 @@
+{
+    "schema_version": 1,
+    "purpose": "vasey-beatstars-history-mapping-v1",
+    "snapshot_id": "synthetic-history-later",
+    "source_system": "synthetic/beatstars-history",
+    "operator_reference": "SYNTHETIC fixture written by hand for lane MIG; not an export",
+    "acquisition_method": "synthetic_fixture",
+    "acquired_at": "2026-10-01T01:00:00Z",
+    "source_as_of": "2026-10-01T00:00:00Z",
+    "currency": "USD",
+    "customers": {
+        "columns": {"source_customer_id": "Customer ID", "email": "Email", "display_name": "Name"},
+        "ignored_columns": ["Marketing Opt-In"]
+    },
+    "orders": {
+        "columns": {
+            "source_order_id": "Order ID", "source_line_id": "Line ID", "source_customer_id": "Customer ID",
+            "ordered_at": "Ordered At", "status": "Status", "track_source_id": "Track ID", "license": "License",
+            "amount": "Amount", "refunded_amount": "Refunded", "payment_reference": "Payment Ref", "currency": "Currency"
+        },
+        "status_values": {"Completed": "paid", "Refunded": "refunded", "Partially Refunded": "partially_refunded", "Pending": "unpaid"}
+    },
+    "contracts": {
+        "columns": {
+            "source_contract_id": "Contract ID", "source_order_id": "Order ID", "source_line_id": "Line ID",
+            "file_name": "File", "declared_sha256": "SHA-256"
+        },
+        "media_types": {"txt": "text/plain", "pdf": "application/pdf"}
+    },
+    "licenses": {
+        "Basic Lease": {"label": "basic-lease", "exclusive": false},
+        "Premium Lease": {"label": "premium-lease", "exclusive": false},
+        "Exclusive Rights": {"label": "exclusive-rights", "exclusive": true}
+    }
+}

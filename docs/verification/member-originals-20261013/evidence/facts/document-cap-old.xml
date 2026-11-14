@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Unit\ProductionMemberOriginals\MemberGrantDocumentsTest" file="/workspace/VA-Studio-member-original-facts/tests/Unit/ProductionMemberOriginals/MemberGrantDocumentsTest.php" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="0.007672">
+    <testsuite name="Tests\Unit\ProductionMemberOriginals\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused" tests="1" assertions="1" errors="0" failures="1" skipped="0" time="0.007672">
+      <testcase name="test_unknown_or_conflicting_retained_values_are_refused with data set &quot;source exceeds member renderer capacity&quot;" file="/workspace/VA-Studio-member-original-facts/tests/Unit/ProductionMemberOriginals/MemberGrantDocumentsTest.php" line="65" class="Tests\Unit\ProductionMemberOriginals\MemberGrantDocumentsTest" classname="Tests.Unit.ProductionMemberOriginals.MemberGrantDocumentsTest" assertions="1" time="0.007672">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Unit\ProductionMemberOriginals\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused with data set "source exceeds member renderer capacity"
+Failed asserting that exception of type "App\Domain\Grants\Member\MemberGrantException" is thrown.</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

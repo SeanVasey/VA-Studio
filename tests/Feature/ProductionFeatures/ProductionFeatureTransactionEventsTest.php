@@ -61,8 +61,9 @@ class ProductionFeatureTransactionEventsTest extends TestCase
             $this->assertSame(503, $refusal->status);
             $this->assertTrue($primary->inTransaction());
             $this->assertSame(1, (int) $primary->query('SELECT COUNT(*) FROM feature_begin_foreign')->fetchColumn());
-            $this->assertSame(0, $connection->transactionLevel());
+            $this->assertSame(1, $connection->transactionLevel());
             $primary->rollBack();
+            $connection->setPdo($primary); // Foreign frame owner reconciles its stale depth.
             $this->assertSame(0, (int) $primary->query('SELECT COUNT(*) FROM feature_begin_foreign')->fetchColumn());
             $this->assertSame(0, (int) DB::table('production_listening_libraries')->value('version'));
         } finally {
@@ -125,6 +126,109 @@ class ProductionFeatureTransactionEventsTest extends TestCase
         $result = $library->change($owner, ['action' => 'create-playlist', 'version' => 0, 'name' => 'SYNTHETIC normal events']);
         $this->assertSame(1, $result['library']['version']);
         $this->assertSame(['began', 'committing', 'after_commit', 'committed'], $events);
+    }
+
+    public static function commitPhaseChannels(): array
+    {
+        return [
+            'TransactionCommitting listener' => ['committing'],
+            'afterCommit callback' => ['after_commit'],
+            'TransactionCommitted listener' => ['committed'],
+        ];
+    }
+
+    #[DataProvider('commitPhaseChannels')]
+    public function test_hook_appended_during_the_commit_phase_keeps_the_list_and_later_operations_available(string $channel): void
+    {
+        $owner = $this->featureIdentity();
+        $library = new ProductionListeningLibrary;
+        $connection = DB::connection();
+        $property = new ReflectionProperty(Connection::class, 'beforeStartingTransaction');
+        $earlier = static function (): void {};
+        $connection->beforeStartingTransaction($earlier);
+        $baseline = $property->getValue($connection);
+        $calls = 0;
+        $appended = function () use (&$calls): void {
+            $calls++;
+        };
+        $registered = 0;
+        $append = function () use ($connection, $appended, &$registered): void {
+            if ($registered === 0) {
+                $registered++;
+                $connection->beforeStartingTransaction($appended);
+            }
+        };
+        match ($channel) {
+            'committing' => Event::listen(TransactionCommitting::class, $append),
+            'committed' => Event::listen(TransactionCommitted::class, $append),
+            default => Event::listen(TransactionBeginning::class, function () use ($connection, $append): void {
+                $connection->afterCommit($append);
+            }),
+        };
+        try {
+            $this->assertTrue($library->initialize($owner)['initialized']);
+            $this->assertSame(1, $registered, 'The commit-phase channel must have appended its hook during the operation.');
+            $afterFirst = $property->getValue($connection);
+
+            $refusal = null;
+            $second = null;
+            try {
+                $second = $library->change($owner, ['action' => 'create-playlist', 'version' => 0, 'name' => 'SYNTHETIC hook continuity']);
+            } catch (Throwable $error) {
+                $refusal = $error;
+            }
+            $this->assertNull(
+                $refusal === null ? null : $refusal::class,
+                'The next feature operation must not be refused by the hook list the previous operation left behind. Stored hook keys: '.json_encode(array_keys($afterFirst)).'.'
+            );
+            $this->assertSame(1, $second['library']['version']);
+            $this->assertSame(1, $library->read($owner)['library']['version']);
+
+            // Only the owned tail is removed: order is kept and the list has no numeric gap.
+            $this->assertSame([...$baseline, $appended], $afterFirst);
+            $this->assertTrue(array_is_list($afterFirst));
+            $this->assertSame([...$baseline, $appended], $property->getValue($connection));
+            $this->assertSame(2, $calls, 'The foreign hook must keep running at each later transaction start.');
+            $this->assertSame(0, $connection->transactionLevel());
+            $this->assertFalse($connection->getRawPdo()->inTransaction());
+        } finally {
+            $property->setValue($connection, []);
+        }
+    }
+
+    public static function commitPhaseAssociativeReplacements(): array
+    {
+        return [
+            'owned tail kept under a string key beside a foreign hook' => [true],
+            'foreign associative replacement without the owned tail' => [false],
+        ];
+    }
+
+    #[DataProvider('commitPhaseAssociativeReplacements')]
+    public function test_commit_phase_associative_hook_replacement_keeps_its_keys_and_closures(bool $keepsOwnedTail): void
+    {
+        $owner = $this->featureIdentity();
+        $connection = DB::connection();
+        $property = new ReflectionProperty(Connection::class, 'beforeStartingTransaction');
+        $foreign = static function (): void {};
+        $replaced = 0;
+        Event::listen(TransactionCommitted::class, function () use ($connection, $property, $foreign, $keepsOwnedTail, &$replaced): void {
+            if ($replaced === 0) {
+                $replaced++;
+                $hooks = $property->getValue($connection);
+                $property->setValue($connection, ($keepsOwnedTail ? ['owned' => end($hooks)] : []) + ['foreign' => $foreign]);
+            }
+        });
+        try {
+            $this->assertTrue((new ProductionListeningLibrary)->initialize($owner)['initialized']);
+            $this->assertSame(1, $replaced);
+            // Reindexing is only for a list: an associative replacement keeps its own key and closure.
+            $this->assertSame(['foreign' => $foreign], $property->getValue($connection));
+            $this->assertSame(0, $connection->transactionLevel());
+            $this->assertFalse($connection->getRawPdo()->inTransaction());
+        } finally {
+            $property->setValue($connection, []);
+        }
     }
 
     public function test_pre_start_foreign_transaction_is_refused_without_rollback_or_source_adoption(): void
@@ -198,9 +302,10 @@ class ProductionFeatureTransactionEventsTest extends TestCase
                 $this->assertTrue($fired);
                 $this->assertTrue($primary->inTransaction());
                 $this->assertSame(1, (int) $primary->query('SELECT COUNT(*) FROM feature_commit_foreign')->fetchColumn());
-                $this->assertSame(0, $connection->transactionLevel());
+                $this->assertSame(1, $connection->transactionLevel());
                 $this->assertSame(0, $afterCommit);
                 $primary->rollBack();
+                $connection->setPdo($primary); // Explicit cleanup by the foreign frame owner.
                 Event::forget(TransactionBeginning::class);
                 $this->assertSame(1, $library->read($owner)['library']['version']);
                 $this->assertSame(0, $afterCommit, 'The aborted frame must not run its queued callback in a later successful operation.');
@@ -220,7 +325,7 @@ class ProductionFeatureTransactionEventsTest extends TestCase
     }
 
     #[DataProvider('driftingBindings')]
-    public function test_committing_manager_or_dispatcher_drift_refuses_and_restores_original_bindings(string $which): void
+    public function test_committing_manager_or_dispatcher_drift_refuses_and_preserves_callback_owned_bindings(string $which): void
     {
         $owner = $this->featureIdentity();
         $library = new ProductionListeningLibrary;
@@ -230,12 +335,13 @@ class ProductionFeatureTransactionEventsTest extends TestCase
         $manager = $property->getValue($connection);
         $dispatcher = $connection->getEventDispatcher();
         $fired = false;
-        Event::listen(TransactionCommitting::class, function () use ($which, $connection, &$fired): void {
+        $replacement = $which === 'manager' ? new DatabaseTransactionsManager : new Dispatcher;
+        Event::listen(TransactionCommitting::class, function () use ($which, $connection, $replacement, &$fired): void {
             $fired = true;
             if ($which === 'manager') {
-                $connection->setTransactionManager(new DatabaseTransactionsManager);
+                $connection->setTransactionManager($replacement);
             } else {
-                $connection->setEventDispatcher(new Dispatcher);
+                $connection->setEventDispatcher($replacement);
             }
         });
         try {
@@ -245,9 +351,14 @@ class ProductionFeatureTransactionEventsTest extends TestCase
             $this->assertSame(503, $error->status);
             $this->assertTrue($fired);
             $this->assertSame(0, (int) DB::table('production_listening_libraries')->value('version'));
-            $this->assertSame($manager, $property->getValue($connection));
-            $this->assertSame($dispatcher, $connection->getEventDispatcher());
+            $this->assertSame($which === 'manager' ? $replacement : $manager, $property->getValue($connection));
+            $this->assertSame($which === 'dispatcher' ? $replacement : $dispatcher, $connection->getEventDispatcher());
+            $this->assertSame(1, $connection->transactionLevel(), 'Native cleanup cannot reset callback-owned framework state.');
             $this->assertFalse($connection->getRawPdo()->inTransaction());
+        } finally {
+            $connection->setEventDispatcher($dispatcher);
+            $manager === null ? $connection->unsetTransactionManager() : $connection->setTransactionManager($manager);
+            $connection->setPdo($connection->getRawPdo()); // Caller reconciles preserved framework state.
         }
     }
 

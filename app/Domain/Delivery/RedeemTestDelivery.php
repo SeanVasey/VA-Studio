@@ -3,6 +3,7 @@
 namespace App\Domain\Delivery;
 
 use App\Domain\Commerce\Models\Order;
+use App\Domain\Commerce\RefundDispute\RefundDisputeAccess;
 use App\Domain\Customers\CustomerAccess;
 use App\Domain\Customers\CustomerPrincipal;
 use App\Domain\Customers\PurchaseAccess;
@@ -37,6 +38,11 @@ final class RedeemTestDelivery
         $source = $read['source'];
         $target = $read['target'];
         $authorization = $read['authorization'];
+        // v1 only: one POST stream under the literal it was issued with. A v2 authorization is served by the session-bound
+        // GET (TransferTestDelivery), and neither is served while the current policy is the other literal.
+        if ($authorization->policy_version !== TestAccessPolicy::V1 || $policy['version'] !== TestAccessPolicy::V1) {
+            throw new DeliveryException($authorization->policy_version === TestAccessPolicy::V1 ? 'unavailable' : 'not_found');
+        }
         $evidence = app(DeliveryAccessEvidence::class);
         $control = $evidence->control($source, TestDeliveryControl::where('order_id', $order->id)->first(), $authorization->control_version);
         $from = now()->toImmutable()->utc()->startOfSecond();
@@ -65,7 +71,7 @@ final class RedeemTestDelivery
                 $control = TestDeliveryControl::where('order_id', $locked->id)->lockForUpdate()->first();
                 $current = TestDeliveryAuthorization::whereKey($authorization->id)->lockForUpdate()->first();
                 if (! $current || $current->order_id !== $locked->id || ! hash_equals($current->owner_key, $ownerKey)
-                    || ! hash_equals($current->token_hash, $authorization->token_hash)) {
+                    || ! hash_equals($current->token_hash, $authorization->token_hash) || $current->policy_version !== TestAccessPolicy::V1) {
                     throw new DeliveryException('not_found');
                 }
                 if ($policies->account() !== $account || CanonicalJson::encode($policies->current()) !== CanonicalJson::encode($policy)) {
@@ -78,6 +84,7 @@ final class RedeemTestDelivery
                     throw new DeliveryException('changed');
                 }
                 $control = $evidence->control($fresh, $control, $current->control_version);
+                RefundDisputeAccess::assertClear($locked->id, (int) $current->license_grant_id);
                 $redemption = TestDeliveryRedemption::where('test_delivery_authorization_id', $current->id)->lockForUpdate()->first();
                 if ($redemption) {
                     $evidence->verifyRedemption($redemption, $current, $fresh, $freshTarget);

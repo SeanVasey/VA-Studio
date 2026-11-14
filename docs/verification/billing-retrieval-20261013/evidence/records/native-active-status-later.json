@@ -1,0 +1,6 @@
+
+Fatal error: Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vaseyaudio_billing_retrieval_producer.migrations' doesn't exist in /workspace/runtime/billing-retrieval-records-evidence/native-active-status.php:4
+Stack trace:
+#0 /workspace/runtime/billing-retrieval-records-evidence/native-active-status.php(4): PDO->query('SELECT migratio...')
+#1 {main}
+  thrown in /workspace/runtime/billing-retrieval-records-evidence/native-active-status.php on line 4

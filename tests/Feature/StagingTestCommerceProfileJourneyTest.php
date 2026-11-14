@@ -211,9 +211,16 @@ class StagingTestCommerceProfileJourneyTest extends TestCase
         $fields = ['authorizationId' => $authorization['authorizationId'], 'token' => $authorization['token'], '_token' => $this->csrf];
         $response = $this->call('POST', '/orders/'.$order.'/delivery/download', $fields, [], [], [
             'CONTENT_TYPE' => 'application/x-www-form-urlencoded', 'HTTP_ACCEPT' => 'text/html',
-        ], http_build_query($fields, '', '&', PHP_QUERY_RFC3986))->assertOk();
+        ], http_build_query($fields, '', '&', PHP_QUERY_RFC3986));
+        // The staging profile uses test-owner-delivery-v2 (FP-077): the token POST answers 303 to a session-bound GET
+        // whose URL carries only the authorization ID; the browser follows it in the same session.
+        $response->assertStatus(303);
+        $location = (string) parse_url((string) $response->headers->get('Location'), PHP_URL_PATH);
+        $this->assertSame('/orders/'.$order.'/delivery/downloads/'.$authorization['authorizationId'], $location);
+        $this->assertStringNotContainsString($authorization['token'], (string) $response->headers->get('Location'));
+        $transfer = $this->call('GET', $location, [], [], [], ['HTTP_ACCEPT' => 'text/html'])->assertOk();
 
-        return $response->streamedContent();
+        return $transfer->streamedContent();
     }
 
     public function test_guest_purchase_runs_from_quote_to_exact_file_download_using_only_the_staging_profile(): void

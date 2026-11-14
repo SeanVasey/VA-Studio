@@ -1,0 +1,28 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.27
+Configuration: /workspace/VA-Studio-mig/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:00.009, Memory: 24.50 MB
+
+There was 1 failure:
+
+1) Tests\Unit\Migration\HistoryDeltaTest::test_payment_completion_and_skipped_refund_exports_preserve_reference_boundaries
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+ Array &0 [
+-    0 => 'payment_completed',
+-    1 => false,
++    0 => 'order_terms_changed',
++    1 => true,
+ ]
+
+/workspace/VA-Studio-mig/tests/Unit/Migration/HistoryDeltaTest.php:199
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 2, Failures: 1.

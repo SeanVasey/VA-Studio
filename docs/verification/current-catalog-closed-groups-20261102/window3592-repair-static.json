@@ -1,0 +1,61 @@
+{
+  "checks": [
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "-l",
+        "app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php"
+      ],
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "-l",
+        "tests/Unit/ProductionIdentity/CatalogGroupContractTest.php"
+      ],
+      "exit": 0,
+      "stdout": "No syntax errors detected in tests/Unit/ProductionIdentity/CatalogGroupContractTest.php\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "/workspace/VA-Studio/vendor/laravel/pint/builds/pint",
+        "--test",
+        "app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php",
+        "tests/Unit/ProductionIdentity/CatalogGroupContractTest.php"
+      ],
+      "exit": 0,
+      "stdout": "\n  ..\n\n  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 Laravel  \n    PASS   ........................................................... 2 files  \n\n",
+      "stderr": ""
+    }
+  ],
+  "source_sha256": {
+    "app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php": "253cfeee23f3076c663f3cf3f0f77c47f005253894b437dd0bb70d788e28a3f0",
+    "tests/Unit/ProductionIdentity/CatalogGroupContractTest.php": "b94d4e7bdad4e32d38ca6a25ff93430b1dc1ccfc94a641498e9e46f8e22f5f79"
+  }
+}

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Unit\MembershipLicenseBindingTest" file="/workspace/VA-Studio-membership-eligibility/tests/Unit/MembershipLicenseBindingTest.php" tests="7" assertions="7" errors="0" failures="0" skipped="0" time="0.001266">
+    <testcase name="test_legacy_values_have_no_catalog_rule_identity" file="/workspace/VA-Studio-membership-eligibility/tests/Unit/MembershipLicenseBindingTest.php" line="13" class="Tests\Unit\MembershipLicenseBindingTest" classname="Tests.Unit.MembershipLicenseBindingTest" assertions="1" time="0.000529"/>
+    <testcase name="test_complete_bounded_catalog_identity_is_retained_exactly" file="/workspace/VA-Studio-membership-eligibility/tests/Unit/MembershipLicenseBindingTest.php" line="19" class="Tests\Unit\MembershipLicenseBindingTest" classname="Tests.Unit.MembershipLicenseBindingTest" assertions="1" time="0.000112"/>
+    <testsuite name="Tests\Unit\MembershipLicenseBindingTest::test_incomplete_or_unbounded_catalog_identity_is_refused" tests="5" assertions="5" errors="0" failures="0" skipped="0" time="0.000625">
+      <testcase name="test_incomplete_or_unbounded_catalog_identity_is_refused with data set &quot;partial&quot;" file="/workspace/VA-Studio-membership-eligibility/tests/Unit/MembershipLicenseBindingTest.php" line="27" class="Tests\Unit\MembershipLicenseBindingTest" classname="Tests.Unit.MembershipLicenseBindingTest" assertions="1" time="0.000144"/>
+      <testcase name="test_incomplete_or_unbounded_catalog_identity_is_refused with data set &quot;gap&quot;" file="/workspace/VA-Studio-membership-eligibility/tests/Unit/MembershipLicenseBindingTest.php" line="27" class="Tests\Unit\MembershipLicenseBindingTest" classname="Tests.Unit.MembershipLicenseBindingTest" assertions="1" time="0.000121"/>
+      <testcase name="test_incomplete_or_unbounded_catalog_identity_is_refused with data set &quot;zero&quot;" file="/workspace/VA-Studio-membership-eligibility/tests/Unit/MembershipLicenseBindingTest.php" line="27" class="Tests\Unit\MembershipLicenseBindingTest" classname="Tests.Unit.MembershipLicenseBindingTest" assertions="1" time="0.000133"/>
+      <testcase name="test_incomplete_or_unbounded_catalog_identity_is_refused with data set &quot;negative&quot;" file="/workspace/VA-Studio-membership-eligibility/tests/Unit/MembershipLicenseBindingTest.php" line="27" class="Tests\Unit\MembershipLicenseBindingTest" classname="Tests.Unit.MembershipLicenseBindingTest" assertions="1" time="0.000116"/>
+      <testcase name="test_incomplete_or_unbounded_catalog_identity_is_refused with data set &quot;overflow&quot;" file="/workspace/VA-Studio-membership-eligibility/tests/Unit/MembershipLicenseBindingTest.php" line="27" class="Tests\Unit\MembershipLicenseBindingTest" classname="Tests.Unit.MembershipLicenseBindingTest" assertions="1" time="0.000110"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

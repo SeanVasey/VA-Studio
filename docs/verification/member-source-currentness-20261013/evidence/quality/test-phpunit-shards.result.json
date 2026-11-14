@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/ci/test-phpunit-shards.py"
+  ],
+  "completed_at_utc": "2026-10-13T07:28:25.501006+00:00",
+  "cwd": "/workspace/VA-Studio-member-source-currentness",
+  "duration_seconds": 0.370925,
+  "exit": 1,
+  "head_at_start": "cc612650217830d2972efeafa12d4d9652c48524",
+  "log_sha256": "bbe9d4b919890748c281ecd82ebe3f9d0689c00229f598e8cb350246180a7bec",
+  "runner_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+  "selected_php_files": null,
+  "started_at_utc": "2026-10-13T07:28:25.129858+00:00",
+  "unittest_reported_tests": 52
+}

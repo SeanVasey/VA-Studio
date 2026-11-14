@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/workspace/runtime/paid-financial-retrieval-final-verifier-d172b006-20261015.py", line 13, in <module>
+    require(not git('status','--porcelain').decode().strip(),'candidate not clean')
+  File "/workspace/runtime/paid-financial-retrieval-final-verifier-d172b006-20261015.py", line 11, in require
+    if not v:raise AssertionError(message)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: candidate not clean

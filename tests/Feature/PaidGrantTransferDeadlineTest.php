@@ -11,6 +11,7 @@ use App\Domain\Grants\Paid\PaidGrantDownloads;
 use App\Domain\Grants\Paid\PaidGrantException;
 use App\Domain\Grants\Paid\PaidGrantPolicy;
 use App\Domain\Grants\Paid\PaidGrantPrepareStream;
+use App\Domain\Grants\Paid\PaidGrantRequestBudget;
 use App\Domain\Grants\Paid\PaidGrants;
 use Carbon\CarbonImmutable;
 use Closure;
@@ -135,6 +136,26 @@ final class PaidGrantTransferDeadlineTest extends TestCase
             });
         }, 410);
         $this->assertSame(2 * self::MIB, $received, 'Chunk 2 starts inside the derived deadline; the check before chunk 3 is past it.');
+        $this->assertDatabaseCount('paid_redemptions', 1);
+    }
+
+    public function test_the_request_first_byte_cap_does_not_replace_the_later_chunk_transfer_allowance(): void
+    {
+        $f = $this->complete();
+        $auth = $this->authorize($f);
+        $budget = PaidGrantRequestBudget::capture((float) CarbonImmutable::now('UTC')->format('U.u'));
+        $transfer = $this->downloads()->redeem($auth['id'], $auth['token'], $f['buyer']['principal'], $f['buyer']['user'], $budget->receivedAt, $budget);
+        $bytes = '';
+        $chunks = 0;
+        $transfer->writeTo(function (string $chunk) use ($budget, &$bytes, &$chunks): void {
+            $bytes .= $chunk;
+            if (++$chunks === 1) {
+                $budget->shortenTo(\hrtime(true) - 1);
+            }
+        });
+
+        $this->assertSame(3, $chunks, 'The physical synthetic master has three bounded chunks.');
+        $this->assertSame($this->masterBytes($f), $bytes);
         $this->assertDatabaseCount('paid_redemptions', 1);
     }
 

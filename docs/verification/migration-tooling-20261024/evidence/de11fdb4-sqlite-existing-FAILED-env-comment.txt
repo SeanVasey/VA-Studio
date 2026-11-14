@@ -1,0 +1,27 @@
+HEAD de11fdb4da122da1cf576633ee3871d49074e5a3
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/mig/phpunit.xml
+
+...............................................................  63 / 360 ( 17%)
+............................................................... 126 / 360 ( 35%)
+............................................................... 189 / 360 ( 52%)
+............................................................... 252 / 360 ( 70%)
+..............................................F................ 315 / 360 ( 87%)
+.............................................                   360 / 360 (100%)
+
+Time: 06:44.690, Memory: 112.00 MB
+
+There was 1 failure:
+
+1) Tests\Unit\ProductionEnvironmentTemplateTest::test_every_config_env_key_is_a_literal_and_covered_by_the_two_ops_templates
+legacy-archive.php has a non-literal env() key.
+Failed asserting that 1 is identical to 0.
+
+/home/user/wt/mig/tests/Unit/ProductionEnvironmentTemplateTest.php:94
+/home/user/wt/mig/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 360, Assertions: 3799, Failures: 1.
+exit=1

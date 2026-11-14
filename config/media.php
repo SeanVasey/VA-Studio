@@ -11,9 +11,12 @@ return [
     'tag_path' => env('MEDIA_TAG_PATH'), // Relative to the private local disk; approved WAV only.
     'tag_sha256' => env('MEDIA_TAG_SHA256'),
     'tag_interval_seconds' => 30,
+    // WAV masters. Stems ZIPs have their own bound below; intake itself caps masters at 200 MiB (IngestMediaUpload::MAX_BYTES).
     'max_source_bytes' => 536870912,
+    // Stems ZIPs: 1 GiB, the intake cap (IngestMediaUpload::MAX_BYTES). A lower value narrows processing only.
+    'max_stems_bytes' => 1073741824,
     // Lower these for a smaller worker; StemsArchive enforces these hard ceilings.
-    'stems' => ['max_entries' => 128, 'max_member_bytes' => 134217728, 'max_total_bytes' => 536870912, 'max_ratio' => 100, 'max_seconds' => 360],
+    'stems' => ['max_entries' => 128, 'max_member_bytes' => 134217728, 'max_total_bytes' => 804257792, 'max_ratio' => 100, 'max_seconds' => 360],
     'max_artwork_bytes' => 20971520,
     'max_duration_seconds' => 1200,
     'max_tag_duration_seconds' => 15,
@@ -24,12 +27,16 @@ return [
     'memory_bytes' => 2147483648,
     'max_output_bytes' => 1073741824,
     'max_process_log_bytes' => 262144,
-    // clamscan loads its whole signature database on every call and scans an archive against a budget of up to 1280 MiB
+    // clamscan loads its whole signature database on every call and scans an archive against a budget of up to 2047 MiB
     // (MalwareScanner::limitMebibytes(), derived from the stems policy above), so clamscan, and only clamscan, has the CPU and
     // address-space limits below, and a file-size limit of that budget. ffmpeg, every other tool and clamdscan, which only relays
     // the file to its daemon, keep the ones above. Every scan, clamdscan too, has the wall-clock limit.
     'scanner' => ['cpu_seconds' => 180, 'memory_bytes' => 3221225472, 'timeout_seconds' => 300],
     // Exceeds the job timeout; a crashed worker can be retried after this lease.
     'claim_lease_seconds' => 960,
+    // FP-034: `vasey:upload-sessions-sweep` cleans chunk files of resumable uploads that expired (or whose cancel cleanup was
+    // interrupted) and have been idle at least this long; never below the 24-hour upload lifetime. The hourly scheduled
+    // `--execute` run stays off until a reviewed change sets `scheduled` to true; the command can always be run by hand.
+    'upload_session_sweep' => ['min_age_seconds' => 172800, 'scheduled' => false],
     'queue' => 'media',
 ];

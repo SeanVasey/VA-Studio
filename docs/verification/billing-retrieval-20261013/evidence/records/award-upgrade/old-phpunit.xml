@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Runtime\AwardUpgrade\OldWriterAwardTest" file="/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/OldWriterAwardTest.php" tests="1" assertions="25" errors="0" failures="0" skipped="0" time="8.578075">
+    <testcase name="test_old_writer_retains_an_actual_public_award_for_forward_upgrade" file="/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/OldWriterAwardTest.php" line="29" class="Runtime\AwardUpgrade\OldWriterAwardTest" classname="Runtime.AwardUpgrade.OldWriterAwardTest" assertions="25" time="8.578075"/>
+  </testsuite>
+</testsuites>

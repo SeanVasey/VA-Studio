@@ -21,6 +21,16 @@ use Throwable;
 /** Identifier-only HTTP commands. Amounts, provenance, payment and owner bindings are server evidence. */
 final class ProductionCheckoutController
 {
+    /**
+     * D-30: the licensee types and confirmation statements to display before a review; the review echoes the displayed
+     * `statementVersion`. Served through run() like every checkout route, so it needs the signed-in production customer and
+     * answers the private 503 while `http_enabled` or the contract identity gate is off.
+     */
+    public function contractIdentity(Request $request): Response
+    {
+        return $this->run($request, fn (): array => ProductionCheckout::contractIdentityOffer());
+    }
+
     public function review(Request $request): Response
     {
         return $this->run($request, function (ProductionCustomerAccess $access, User $buyer, array $body, ProductionCustomerPrincipal $principal): array {

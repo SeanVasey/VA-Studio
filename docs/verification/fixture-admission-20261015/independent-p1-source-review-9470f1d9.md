@@ -1,0 +1,15 @@
+# F2a corrective source review
+
+Reviewed `9470f1d90870c7f6b7b101b6361fc52aadf5a45d` against `0db6b8709db5084d0d8113a81184286738afee75` (eight changed files). Read-only independent review; no shared edits or application/database/network/CI execution.
+
+**DECISION: APPROVE BOUNDED CORRECTIVE SOURCE WITH FINAL CLOSURE CONDITIONS.** No new source P0/P1 found. Existing remote P1s: 2, still open until completed evidence and final review support closure.
+
+The owned-memory path creates an internal random alias with literal SQLite memory configuration, admits the current selected connection first, and registers strong Connection/PDO references only after actual driver/main-database validation. Admission keeps the existing live configuration/cache comparison, then enforces exact owned Connection/PDO identity and actual SQLite memory. All unregistered aliases retain unchanged captured external admission. Cleanup purges only the created alias. New controls exercise actual `db:wipe`, distinct owned memory databases and preserved sentinels under memory-PDO/file-PDO/config/purge changes.
+
+Both existing canary files change only setup/teardown connection plumbing: method bodies after setup and assertion-call inventories are mechanically unchanged. The packet's compile-only MySQL grammar case remains byte-original and must never contact MySQL. The native selection must retain both whole files and label their eventual results SQLite canaries rather than native DDL.
+
+The focused runner clears inherited socket/local marker, sets the CI declaration only for MySQL (empty for SQLite), and preserves actual `CI`; workflow declaration matches. Read original stable-head receipts/log hashes: focused safeguards 52, cadence 14 and shard policy 52 tests, all process exit 0. Original focused controls failed twice as recorded. This report does not infer outcomes for the current eight-file SQLite invocation or forthcoming native invocations.
+
+Required small contract correction: creation currently checks configuration collision but omits the approved DatabaseManager `getConnections()` cache-absence check. Add that direct check in this coherent repair after active runs close. The internally generated 128-bit alias makes natural collision extremely unlikely; this is not classified as a new P1. Final native admission evidence should additionally prove an arbitrary unregistered named SQLite memory alias still refuses under MySQL selection; current new redirect datasets exercise registered aliases.
+
+Closure requires completed source-bound SQLite compatibility, both whole canary files under actual private MySQL outer selection, owned/refused alias controls and focused declaration/admission evidence, then final independent sealed-evidence review and exact-publication-head carry. Original native lifecycle whole 4/8/E4 and old default 1/2/E1 remain failed/open. Fresh exact-head cheap preflight/current review inventory and expected-SHA merge remain required. No full F2, native lifecycle/concurrency, host/provider or release claim follows. Mechanical source/receipt hashes are in the companion JSON.

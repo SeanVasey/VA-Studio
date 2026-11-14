@@ -1,0 +1,6 @@
+RR1 newest-export segment actors not excluded: killed ['Tests: 14, Assertions: 260, Failures: 1.']
+RR2 duplicate exclusive read from newest members only: killed ['Tests: 14, Assertions: 245, Failures: 1.']
+RR3 ambiguity read from newest members only: killed ['Tests: 14, Assertions: 250, Failures: 1.']
+RR4 newest batch creator not excluded (equivalent: the creator always runs the first segment, so it is a recorded segment actor): SURVIVED ['OK (14 tests, 264 assertions)']
+RR5 contract multiplicity read from newest members only: SURVIVED ['OK (14 tests, 264 assertions)']
+RR5 contract multiplicity read from newest members only (rerun with the added test): killed ['Tests: 7, Assertions: 199, Failures: 1.']

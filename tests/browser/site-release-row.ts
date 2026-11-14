@@ -9,6 +9,12 @@ export const releaseMenuTrigger = (page: Page, label: string) =>
   releaseRow(page, label).getByRole('button', { name: `More actions for “${label}”`, exact: true });
 
 /**
+ * Filament 5.11 marks every dropdown entry role="menuitem" (even a button), so a release action in the
+ * More menu is a menu item, not a button. Standalone row actions such as Publish release remain buttons.
+ */
+export const releaseMenuItem = (row: Locator, action: ReleaseMenuAction) => row.getByRole('menuitem', { name: action, exact: true });
+
+/**
  * Secondary release actions live in each row's More menu. Opening it first means an absent action is really absent,
  * not merely hidden inside a closed menu.
  */
@@ -45,13 +51,13 @@ export async function openReleaseMenu(page: Page, label: string): Promise<Locato
   })).toBe(true);
   // Clicking a menu that is already open would close it.
   if (await trigger.getAttribute('aria-expanded') !== 'true') await trigger.click();
-  await expect(row.getByRole('button', { name: 'Edit as new draft', exact: true })).toBeVisible();
+  await expect(releaseMenuItem(row, 'Edit as new draft')).toBeVisible();
   await expect(trigger).toHaveAttribute('aria-expanded', 'true');
   return row;
 }
 
 export async function releaseMenuAction(page: Page, label: string, action: ReleaseMenuAction): Promise<Locator> {
-  return (await openReleaseMenu(page, label)).getByRole('button', { name: action, exact: true });
+  return releaseMenuItem(await openReleaseMenu(page, label), action);
 }
 
 /** The desktop admin fits every release action: neither the table nor the page scrolls sideways. */

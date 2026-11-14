@@ -11,7 +11,7 @@ final class LicenseSourceVariables
     {
         // A policy bundle can contain 60 KB. Bound expansion before performing any substitution.
         // Historical schemas retain their existing repetition behavior.
-        if (($terms['schema_version'] ?? null) === 4 && substr_count($source, '{{policy_texts}}') !== 1) {
+        if (in_array($terms['schema_version'] ?? null, [4, 5], true) && substr_count($source, '{{policy_texts}}') !== 1) {
             throw ValidationException::withMessages(['authored_source' => 'Include {{policy_texts}} exactly once to retain the complete policy bundle.']);
         }
         $values = app(LicenseTerms::class)->sourceValues($terms);

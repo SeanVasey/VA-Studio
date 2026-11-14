@@ -1,0 +1,14 @@
+{
+  "observed_at": "2026-10-15T08:09:54.990798+00:00",
+  "failed_tool": "exec_command CreateProcess",
+  "diagnostic": "Failed to create unified exec process: exec-server transport disconnected",
+  "original_command_process_exit": null,
+  "read_only_recovery": {
+    "exit": 0,
+    "head": "0fc2391cfd624cfa97fb5d02cc8be94492d8df36",
+    "branch": "harness/paid252-tax-delivery-20261015",
+    "status": ""
+  },
+  "original_write_did_not_start": true,
+  "application_rerun": false
+}

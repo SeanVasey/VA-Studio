@@ -1,0 +1,615 @@
+{
+  "bundles": [
+    {
+      "database": {
+        "database_name": "vaseyaudio_focused",
+        "version": "8.4.11"
+      },
+      "head": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+      "inputs": 2467,
+      "loaders": 13,
+      "name": "bundle-1f7b6705f4a7-1fece3ca5f6a1a2f",
+      "runner_sha256": "d4025c8cdf1d87bced4beb59a55b248ae6547eccef471cd49b1bb76683459ae1"
+    },
+    {
+      "database": {
+        "database_name": ":memory:",
+        "driver": "sqlite",
+        "version": "3.46.1"
+      },
+      "head": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+      "inputs": 2467,
+      "loaders": 13,
+      "name": "bundle-1f7b6705f4a7-4b99bc90f2d689d5",
+      "runner_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1"
+    },
+    {
+      "database": {
+        "database_name": "vaseyaudio_focused",
+        "version": "8.4.11"
+      },
+      "head": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+      "inputs": 2467,
+      "loaders": 13,
+      "name": "bundle-1f7b6705f4a7-936cbfa23f7610a2",
+      "runner_sha256": "379bd298b7f344bc6b9840473a839a32572c5043aca8d4017baaf2cdd349e20c"
+    },
+    {
+      "database": {
+        "database_name": "vaseyaudio_focused",
+        "version": "8.4.11"
+      },
+      "head": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+      "inputs": 2467,
+      "loaders": 13,
+      "name": "bundle-1f7b6705f4a7-b2a1c6fa4527805b",
+      "runner_sha256": "379bd298b7f344bc6b9840473a839a32572c5043aca8d4017baaf2cdd349e20c"
+    },
+    {
+      "database": {
+        "database_name": ":memory:",
+        "driver": "sqlite",
+        "version": "3.46.1"
+      },
+      "head": "27b998fe95e481c4b114b2047164b0ed2e5e9581",
+      "inputs": 2467,
+      "loaders": 13,
+      "name": "bundle-27b998fe95e4-819b2ab9adc3b344",
+      "runner_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1"
+    },
+    {
+      "database": {
+        "database_name": "vaseyaudio_fixture_admission",
+        "version": "8.4.11"
+      },
+      "head": "27b998fe95e481c4b114b2047164b0ed2e5e9581",
+      "inputs": 2467,
+      "loaders": 13,
+      "name": "bundle-27b998fe95e4-91a93ee265b59264",
+      "runner_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1"
+    },
+    {
+      "database": {
+        "database_name": "vaseyaudio_fixture_admission",
+        "version": "8.4.11"
+      },
+      "head": "936a5c50241b6104180a54ed2513117075f0836a",
+      "inputs": 2467,
+      "loaders": 13,
+      "name": "bundle-936a5c50241b-2be5e36f15cc963f",
+      "runner_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1"
+    },
+    {
+      "database": {
+        "database_name": ":memory:",
+        "driver": "sqlite",
+        "version": "3.46.1"
+      },
+      "head": "d2cc24163af391e6e22b6364a1747eb47639e661",
+      "inputs": 2467,
+      "loaders": 13,
+      "name": "bundle-d2cc24163af3-65cb563606474e4b",
+      "runner_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1"
+    }
+  ],
+  "class_scope_counts": {
+    "focused-local-marker-exact-original": {
+      "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest": {
+        "assertions": 2,
+        "tests": 1
+      }
+    },
+    "focused-local-marker-missing-original": {
+      "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest": {
+        "assertions": 0,
+        "tests": 1
+      }
+    },
+    "focused-local-marker-wrong-original": {
+      "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest": {
+        "assertions": 0,
+        "tests": 1
+      }
+    },
+    "owned-file-admission-and-restore-fixed-original": {
+      "Tests\\Feature\\FixtureDatabaseAdmissionTest": {
+        "assertions": 190,
+        "tests": 26
+      },
+      "Tests\\Feature\\SyntheticPrivateRestoreTest": {
+        "assertions": 527,
+        "tests": 5
+      }
+    },
+    "owned-file-admission-and-restore-recipe-corrected-original": {
+      "Tests\\Feature\\FixtureDatabaseAdmissionTest": {
+        "assertions": 195,
+        "tests": 26
+      },
+      "Tests\\Feature\\SyntheticPrivateRestoreTest": {
+        "assertions": 527,
+        "tests": 5
+      }
+    },
+    "owned-file-current-focused-ci-original": {
+      "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest": {
+        "assertions": 2,
+        "tests": 1
+      }
+    },
+    "owned-file-current-native-compatibility-whole-original": {
+      "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest": {
+        "assertions": 17,
+        "tests": 9
+      },
+      "Tests\\Feature\\FixtureDatabaseAdmissionTest": {
+        "assertions": 195,
+        "tests": 26
+      },
+      "Tests\\Feature\\ProductionTrackCapabilitiesMigrationOwnershipTest": {
+        "assertions": 606,
+        "tests": 23
+      },
+      "Tests\\Feature\\ProductionTrackPreparationPacketMigrationTest": {
+        "assertions": 326,
+        "tests": 23
+      },
+      "Tests\\Feature\\SyntheticPrivateRestoreTest": {
+        "assertions": 527,
+        "tests": 5
+      }
+    },
+    "owned-file-guards-four-entrypoints-exact-native-original": {
+      "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest": {
+        "assertions": 13,
+        "tests": 4
+      }
+    },
+    "owned-file-restore-old-original": {
+      "Tests\\Feature\\SyntheticPrivateRestoreTest": {
+        "assertions": 0,
+        "tests": 5
+      }
+    },
+    "owned-file-sqlite-surrounding-whole-original": {
+      "Tests\\Feature\\FinalizationDatabaseLifecycleTest": {
+        "assertions": 70,
+        "tests": 4
+      },
+      "Tests\\Feature\\OperatorMfaTest": {
+        "assertions": 95,
+        "tests": 5
+      },
+      "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest": {
+        "assertions": 126,
+        "tests": 28
+      },
+      "Tests\\Feature\\ProductionTrackCapabilitiesMigrationOwnershipTest": {
+        "assertions": 606,
+        "tests": 23
+      },
+      "Tests\\Feature\\ProductionTrackPreparationPacketMigrationTest": {
+        "assertions": 326,
+        "tests": 23
+      },
+      "Tests\\Feature\\StagingOperatorMfaTest": {
+        "assertions": 16,
+        "tests": 3
+      },
+      "Tests\\Unit\\DisposableNativeDatabaseTest": {
+        "assertions": 25,
+        "tests": 8
+      },
+      "Tests\\Unit\\DisposableTestDatabaseTest": {
+        "assertions": 24,
+        "tests": 18
+      }
+    },
+    "owned-memory-guards-old-native-original": {
+      "Tests\\Feature\\ProductionTrackCapabilitiesGuardsTest": {
+        "assertions": 0,
+        "tests": 1
+      }
+    }
+  },
+  "decision": "APPROVE BOUNDED OWNED-FIXTURE/LOCAL-RUNNER SOURCE AND SEALED EVIDENCE WITH MINOR DOCUMENTATION CONDITION; CURRENT P1/P2 ELIGIBLE FOR CLOSURE",
+  "exact_guard_representatives": [
+    "test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers with data set \"production_track_capability_candidates update\"",
+    "test_adapter_source_edit_is_rolled_back_with_every_adapter_side_effect",
+    "test_audit_created_callback_source_edit_cannot_escape_post_callback_graph_proof",
+    "test_authenticated_history_refuses_current_and_retained_raw_evidence_damage with data set \"current candidate hash\""
+  ],
+  "limits": [
+    "Native Guards4/13 is partial representative coverage; SQLite body DDL/rollback is not native proof.",
+    "Native-outer86/1671 comprises26 shared admission/195,5 SQLite restore/527,46 SQLite migration canaries/932,9 native identity/refusal/17.",
+    "Whole SQLite31/722 and disjoint112/1288 are distinct selections, not one global suite.",
+    "Interrupted mistaken15-case selection remainsPHP-15/recorder1/emptyXML/NULLcounts, no partial pass; first31/E1 and all original refusal failures stay failed.",
+    "Native90s lifecycle whole4/8/E4 and olddefault1/2/E1 remain failed/unaccepted; fullF2/25counterparts/raw-workers/later-hooks/native concurrency/host/provider/activation/release remain open.",
+    "No reviewer application/database/network/CI execution/shared edit/duplicate test/Foundation/GitLab/host action/platform-classifier repair claim."
+  ],
+  "open_p0": 0,
+  "open_p1": 0,
+  "open_p2": 0,
+  "original_runs": [
+    {
+      "command_sha256": "d0f81f594a340ab5b559195f2d727952839c815c6cc2fb3d083ffbe9be4b6a6f",
+      "counts": {
+        "assertions": 0,
+        "errors": 5,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 5
+      },
+      "filter": null,
+      "log_sha256": "ebed62acc0bf51f389aad10b6c98cfbfee81dc72865b1b9ae719caeaa819d412",
+      "name": "owned-file-restore-old-original",
+      "php_exit": 2,
+      "recorder_exit": 1,
+      "result_sha256": "5764faabc62b3e3b46a22a3efed66edce75781e0b0933bf0eca25eae733460df",
+      "seconds": 0.4150479039963102,
+      "selected_files": [
+        "tests/Feature/SyntheticPrivateRestoreTest.php"
+      ],
+      "source": "27b998fe95e481c4b114b2047164b0ed2e5e9581",
+      "xml_sha256": "30cde485c80890939551dad4044ceefa673e44075e2adb1b5c63cca33bfc9b1a"
+    },
+    {
+      "command_sha256": "afc11da7e660737181b0f0f9514d061dead37dc0cfc876fc399073dcfdd380fc",
+      "counts": {
+        "assertions": 0,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "filter": "test_adapter_source_edit_is_rolled_back_with_every_adapter_side_effect",
+      "log_sha256": "05ef35e768ec44d8aa4d0209debf38b93535bc72632940f039d1b20236bac95a",
+      "name": "owned-memory-guards-old-native-original",
+      "php_exit": 2,
+      "recorder_exit": 1,
+      "result_sha256": "4796df246dd25269767202aa525dec7ca211c19a6405d4736934a3363c7f07e5",
+      "seconds": 219.5005128440098,
+      "selected_files": [
+        "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php"
+      ],
+      "source": "27b998fe95e481c4b114b2047164b0ed2e5e9581",
+      "xml_sha256": "8ce988669c4b3ce0d4954e7aa2ced8d451412728932c61eba61c9b74dbe7e511"
+    },
+    {
+      "command_sha256": "6cf8973170bf3121abe58ba04e3b3081172d0aba9e5c89153c6cca777ebd4f11",
+      "counts": {
+        "assertions": 717,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 31
+      },
+      "filter": null,
+      "log_sha256": "a3c593344cd43da7af53a720124c6e44c41f2da0765523b701bb3aa7775594f9",
+      "name": "owned-file-admission-and-restore-fixed-original",
+      "php_exit": 2,
+      "recorder_exit": 1,
+      "result_sha256": "89984279d60f400f95d4013ebd7d2103f2add07a5dca3bc3b83788f99c527d98",
+      "seconds": 43.55263733801257,
+      "selected_files": [
+        "tests/Feature/FixtureDatabaseAdmissionTest.php",
+        "tests/Feature/SyntheticPrivateRestoreTest.php"
+      ],
+      "source": "d2cc24163af391e6e22b6364a1747eb47639e661",
+      "xml_sha256": "e57a46deca54b0022749d277eaad1b498d6d92fd6a57fd7a0ab23d971d5267a7"
+    },
+    {
+      "command_sha256": "27969529b4109b75512ed63a6655862dbff03fd38c2b27d3127f66eb574fca78",
+      "counts": {
+        "assertions": 722,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 31
+      },
+      "filter": null,
+      "log_sha256": "16341c70b25b16606cf72e88758eecb96d1469b25c806a4ed1a4df29a002e4ad",
+      "name": "owned-file-admission-and-restore-recipe-corrected-original",
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "result_sha256": "6429657f0caeae2c15059c4e04615db9847f7f745b3826e0992c62d69859c2b2",
+      "seconds": 46.85041144999559,
+      "selected_files": [
+        "tests/Feature/FixtureDatabaseAdmissionTest.php",
+        "tests/Feature/SyntheticPrivateRestoreTest.php"
+      ],
+      "source": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+      "xml_sha256": "4936d73e913640e7ee795464959e506ee1cfa81f50b40e46a67dabbf84b0f0cd"
+    },
+    {
+      "command_sha256": "5331e723d0daf78e7dfc82b62e7ca2c163b0b2557ff54275876a4e63640ff5d7",
+      "counts": {
+        "assertions": 0,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "filter": "test_an_alias_of_the_selected_native_database_is_admitted",
+      "log_sha256": "f89086aff946fdeaf65a8da0bc264dc49b38ee62f4dfead1a9e387b037ce1947",
+      "name": "focused-local-marker-missing-original",
+      "php_exit": 2,
+      "recorder_exit": 1,
+      "result_sha256": "ecd45d2941602d1a8aa4894ccebbf1ec558220369caf60e17370f26889767781",
+      "seconds": 0.31465268599276897,
+      "selected_files": [
+        "tests/Feature/FixtureDatabaseAdmissionNativeTest.php"
+      ],
+      "source": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+      "xml_sha256": "0b1c8d696f3e12d7bd2a3d4572c09f7f8a15f16bd3a2f44f0a21e6c4097cbbbc"
+    },
+    {
+      "command_sha256": "188c04fe421a589b1fcb516b1f79ba5bf1e0adb57e917eeef85c6d7df930df6c",
+      "counts": {
+        "assertions": 0,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "filter": "test_an_alias_of_the_selected_native_database_is_admitted",
+      "log_sha256": "f3397e7110b9c847f36be3d6a79f68bb91f25e157eb226bc3fac787202448ce1",
+      "name": "focused-local-marker-wrong-original",
+      "php_exit": 2,
+      "recorder_exit": 1,
+      "result_sha256": "0b65278d49c2b4d941a2e5d8d6c393593d2ed82d62957d2db79968f082deefea",
+      "seconds": 0.3146593639976345,
+      "selected_files": [
+        "tests/Feature/FixtureDatabaseAdmissionNativeTest.php"
+      ],
+      "source": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+      "xml_sha256": "0b1c8d696f3e12d7bd2a3d4572c09f7f8a15f16bd3a2f44f0a21e6c4097cbbbc"
+    },
+    {
+      "command_sha256": "773d1bfd589d1b4ff8ee899b1e43eb8c27c01665a2f0445f58a40426e46e6002",
+      "counts": {
+        "assertions": 2,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "filter": "test_an_alias_of_the_selected_native_database_is_admitted",
+      "log_sha256": "25a74be6a8a9d6d2427896f9a87eeb776d8551a83579ff2d59af532affd8bee1",
+      "name": "focused-local-marker-exact-original",
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "result_sha256": "4cb8021d11cfa0fca70cb5285ccd11933faaca89e8e46b93c04a71119384ee81",
+      "seconds": 0.31460857299680356,
+      "selected_files": [
+        "tests/Feature/FixtureDatabaseAdmissionNativeTest.php"
+      ],
+      "source": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+      "xml_sha256": "f1899fc4249c84ffbd53798443ddab401d5c06d746dd835bbcf3dbc0330d6d38"
+    },
+    {
+      "command_sha256": "b05f26c9adc6ee117cfbe0618df0fd3ba553a9154d611306007276d85e3edca5",
+      "counts": {
+        "assertions": 2,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "filter": "test_an_alias_of_the_selected_native_database_is_admitted",
+      "log_sha256": "492fa3c102819d29346d8a781b4d28f9a3b5b98f77a40382bba4d74ef9799510",
+      "name": "owned-file-current-focused-ci-original",
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "result_sha256": "8c667249a5bf758c6a6d295ecda6d736b08cb1a416948f3f732bd1611b5b9bf0",
+      "seconds": 0.31489492100081407,
+      "selected_files": [
+        "tests/Feature/FixtureDatabaseAdmissionNativeTest.php"
+      ],
+      "source": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+      "xml_sha256": "07b65d7efdc1d7b97234218f0545e90183fc76b3697d3bfe8d7c67266b6a1b94"
+    },
+    {
+      "command_sha256": "a385313a9a78b9fc4f3ef85a2ec5d25835b427ab7c6259e99dfd6df91fb8780b",
+      "counts": {
+        "assertions": 1288,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 112
+      },
+      "filter": null,
+      "log_sha256": "1abce6dfc53b29bdfb289239e308ffbd996bbd3dd910d6bd3437b3264ccf361f",
+      "name": "owned-file-sqlite-surrounding-whole-original",
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "result_sha256": "dc109c280110389a129844c362dd15a716df52335d4e5919359294701c85dbee",
+      "seconds": 311.2833767240081,
+      "selected_files": [
+        "tests/Unit/DisposableTestDatabaseTest.php",
+        "tests/Unit/DisposableNativeDatabaseTest.php",
+        "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+        "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+        "tests/Feature/OperatorMfaTest.php",
+        "tests/Feature/StagingOperatorMfaTest.php",
+        "tests/Feature/FinalizationDatabaseLifecycleTest.php",
+        "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php"
+      ],
+      "source": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+      "xml_sha256": "2f6cda7648e9676cd8294f4721ed35c160256f610e32b02b74301cafa6820bac"
+    },
+    {
+      "command_sha256": "4d39e76f1712c7a563a2ec623b4f1613dafac95ff3e5c4298f573c3ecdd58258",
+      "counts": null,
+      "filter": "test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers|test_adapter_source_edit_is_rolled_back_with_every_adapter_side_effect|test_audit_created_callback_source_edit_cannot_escape_post_callback_graph_proof|test_authenticated_history_refuses_current_and_retained_raw_evidence_damage.*current candidate hash",
+      "log_sha256": "778d74ee354e79be5e15abaf809c0997da8d13665c5d7e7f200e6d4d53c0c15e",
+      "name": "owned-file-guards-four-entrypoints-native-original",
+      "php_exit": -15,
+      "recorder_exit": 1,
+      "result_sha256": "112b7647f81790d6d196f34ec2d38bd929d658f972d7f8a440e4895733999394",
+      "seconds": 709.895664458003,
+      "selected_files": [
+        "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php"
+      ],
+      "source": "936a5c50241b6104180a54ed2513117075f0836a",
+      "xml_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command_sha256": "7e32e36456669e1b39485b594f663d457f1f861bb8b6ce24f032aa301c17004c",
+      "counts": {
+        "assertions": 13,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 4
+      },
+      "filter": "test_sql_history_cannot_update_delete_or_replace_even_without_recursive_triggers.*production_track_capability_candidates update|test_adapter_source_edit_is_rolled_back_with_every_adapter_side_effect|test_audit_created_callback_source_edit_cannot_escape_post_callback_graph_proof|test_authenticated_history_refuses_current_and_retained_raw_evidence_damage.*current candidate hash",
+      "log_sha256": "9c82af3055611d4e4f528eb1948f164892482ea0fd1ee719e1cbdf5699a4b630",
+      "name": "owned-file-guards-four-entrypoints-exact-native-original",
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "result_sha256": "9839aa3d02143a476155a55e79ef0168fd7186bf569c83adc3646598e3d50ae1",
+      "seconds": 834.0358003510191,
+      "selected_files": [
+        "tests/Feature/ProductionTrackCapabilitiesGuardsTest.php"
+      ],
+      "source": "936a5c50241b6104180a54ed2513117075f0836a",
+      "xml_sha256": "61da71f8589440857b1c41c7250e8e0fd1f9429b6e420c8a86a798c4483df4eb"
+    },
+    {
+      "command_sha256": "c047286f8e369253dd98f066b18bd6a2a54b79050efc559171dfd0959d8ce77d",
+      "counts": {
+        "assertions": 1671,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 86
+      },
+      "filter": null,
+      "log_sha256": "1fdf59604f9e90f3762fd577f412cdbefb152c6b5f3761d7f9cd4385328997b8",
+      "name": "owned-file-current-native-compatibility-whole-original",
+      "php_exit": 0,
+      "recorder_exit": 0,
+      "result_sha256": "6e025454f3353242406aa39f71e683d696bc037ff6308809e1e7596e20f2e700",
+      "seconds": 188.80304363701725,
+      "selected_files": [
+        "tests/Feature/FixtureDatabaseAdmissionTest.php",
+        "tests/Feature/SyntheticPrivateRestoreTest.php",
+        "tests/Feature/ProductionTrackCapabilitiesMigrationOwnershipTest.php",
+        "tests/Feature/ProductionTrackPreparationPacketMigrationTest.php",
+        "tests/Feature/FixtureDatabaseAdmissionNativeTest.php"
+      ],
+      "source": "936a5c50241b6104180a54ed2513117075f0836a",
+      "xml_sha256": "a8eaa994efd6e5e1b8f8e1962627998f209636aab02831b1eb8f006215b71989"
+    }
+  ],
+  "publication_conditions": [
+    "Minor README wording correction, byte-original final import and exact documentary-head carry.",
+    "Current finding evidence-backed replies/resolution, fresh exact-head cheap preflight/full inventory/protections, expected-SHA merge and actual merge-ledger update."
+  ],
+  "quality": {
+    "focused-local-marker-fixed-original": {
+      "exit": 0,
+      "failures": 0,
+      "source": "d2cc24163af391e6e22b6364a1747eb47639e661",
+      "tests": 53
+    },
+    "focused-local-marker-old-original": {
+      "exit": 1,
+      "failures": 1,
+      "source": "646b53bd970effdfd2b6885bc3314fd6c91a7120",
+      "tests": 53
+    },
+    "owned-file-declared-cadence-original": {
+      "exit": 0,
+      "failures": 0,
+      "source": "936a5c50241b6104180a54ed2513117075f0836a",
+      "tests": 14
+    },
+    "owned-file-declared-shard-policy-original": {
+      "exit": 0,
+      "failures": 0,
+      "source": "936a5c50241b6104180a54ed2513117075f0836a",
+      "tests": 52
+    },
+    "owned-file-final-focused-safeguards-original": {
+      "exit": 0,
+      "failures": 0,
+      "source": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+      "tests": 53
+    },
+    "owned-file-final-shard-policy-original": {
+      "exit": 1,
+      "failures": 1,
+      "source": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+      "tests": 52
+    },
+    "pint": {
+      "exit": 0,
+      "files": 4,
+      "source": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57"
+    }
+  },
+  "remote_status_limit": "Current P1/P2 still remotely open until owner posts evidence-backed replies/resolution; closure eligibility is not remote completion.",
+  "required_corrections": [
+    "During planned final-review import, replace README 'Old renderer safeguard53/1failure' with 'Old focused-runner safeguard53/1failure'; no source/test rerun needed."
+  ],
+  "reviewed_sha": "4de9e2b921dee71342179dd63d2d94844b1ecb64",
+  "shutdown": {
+    "current_start_shutdown_log_verified": true,
+    "datadir_retained": "/tmp/va-studio-fixture-admission-mysql-data-standalone-20261015",
+    "failed_receipt_is_labeled_derived": true,
+    "first_reconciliation_foreground_exit": 1,
+    "later_read_only_disappearance_confirmed": true,
+    "mysql_version": "8.4.11",
+    "nonfatal_startup_stderr_retained": "mysqld: Can't open shared library '/tmp/fixture-admission-mysql-runtime-20261015/lib64/mysql/plugin/component_reference_cache.so' (errno: 22 /tmp/fixture-admission-mysql-runtime-20261015/lib64/mysql/plugin/component_reference_cache.so: cannot open shared object file: N)\nmysqld: Cannot load component from specified URN: 'file://component_reference_cache'.\n",
+    "port": 33524,
+    "repeated_shutdown_claimed": false,
+    "socket_pid_absent": true,
+    "sql_shutdown_exit": 0,
+    "version_regex_probe_stderr_empty": true
+  },
+  "tested_native_policy_sha": "936a5c50241b6104180a54ed2513117075f0836a",
+  "tested_php_sqlite_sha": "1f7b6705f4a7d1a346779d87ec52c9080cf4ec57",
+  "thread_verdicts": {
+    "r4289377653": {
+      "basis": "Helper-created private file ownership/config/Connection/PDO/main-path admission, explicit strong source release and existing memory helper. Whole restore passes5 cases in native outer and SQLite scopes; each four memory entrypoints passes a representative native-outer dataset, with full SQLite Guards28/provider scope. Unregistered file/memory exception not introduced.",
+      "severity": "P1",
+      "thread_id": "PRRT_kwDOU5febs6tAcqF",
+      "verdict": "FIXED; ELIGIBLE FOR CLOSURE"
+    },
+    "r4289377661": {
+      "basis": "Retains only exact vaseyaudio_focused MySQL local marker; actual no-CI exact1/2 succeeds, missing/wrong1/E1 refuse, existing CI1/2 succeeds. Actual CI never manufactured; docs give fixed service/declaration recipe.",
+      "severity": "P2",
+      "thread_id": "PRRT_kwDOU5febs6tAcqK",
+      "verdict": "FIXED; ELIGIBLE FOR CLOSURE"
+    }
+  },
+  "verification": {
+    "archive_bytes": 1834854,
+    "archive_sha256": "b165eb65c82920b1bbb57bfa00ea244860b7102e4b1bcd17c7902cdda03395b0",
+    "bundles": 8,
+    "current_native_inputs_equal_reviewed_head": 2467,
+    "discovery_generated_files_hashed_removed": 18,
+    "earlier271_eight112_seals_unchanged": true,
+    "frozen_paths_equal_pr130": 56,
+    "guards_bodies_and_captured_cleanup_byte_original": true,
+    "index_sha256": "32b98fb476a0a985998866319bc82cfcb23b4774e9b1a9382ea5880d4ee3ee8a",
+    "later_delta_only_docs_and_one_census_comment": true,
+    "manifest_to_git_bindings": 19736,
+    "members": 156,
+    "new_review_imports_byte_original": 7,
+    "nonzero_primary_invocations": 6,
+    "one_reviewed_policy_input_differs_between_sqlite_and_native_heads": true,
+    "passing_primary_invocations": 6,
+    "physical_loader_bindings": 104,
+    "primary_php_invocations": 12,
+    "private_failed_originals": 12,
+    "restore_body_only_explicit_release_assertion_and_formatting_change": true,
+    "runtime_members_byte_original": 124,
+    "source_bindings": 32,
+    "unique_git_blobs": 2420,
+    "unique_manifest_heads": 4
+  },
+  "verifier_preparation_note": "One earlier read-only verification guessed the agenda-import path under verification; actual immutable diff located it under handoff. That read failed before any report/shared mutation; corrected exact path is verified here."
+}

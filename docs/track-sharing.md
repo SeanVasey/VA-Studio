@@ -33,3 +33,17 @@ Next within WP-05: bounded server-side discovery/pagination with selection recon
 ## Published URL continuity
 
 The [catalog metadata command](catalog-administration.md) permits slug changes only before first publication. The saved `published_slug` and database guards keep that identity after unpublishing, including records with older publication evidence. Unpublished links return 404; republishing restores the same URL. Renames with redirects require a future explicit continuity workflow.
+
+## Structured data (JSON-LD)
+
+Added 2026-10-24 (lane T36, FP-014). `PublicStructuredData` adds one `<script type="application/ld+json" data-inertia="structured-data">` block, carried as `metadata.structuredData`, to three public page kinds:
+
+| Page | schema.org types | Source |
+| --- | --- | --- |
+| Home | `Organization` (VASEY.AUDIO, parent organization Vasey Multimedia, the existing `/brand/vasey-audio-logo.png`) and `WebSite` | Brand constants and the page metadata description |
+| Public track | `MusicRecording` (title, artist as `MusicGroup`, genre, canonical URL, verified artwork) and a two-item `BreadcrumbList` | The filtered public catalog projection and the page metadata |
+| Blog entry | `BlogPosting` (headline, description, canonical URL, publisher) and a three-item `BreadcrumbList` | The active verified site release |
+
+The exclusion rule is the sitemap's: nothing is emitted outside `production`, where the synthetic rehearsal catalog is refused; drafts, unpublished, withdrawn and ineligible tracks already answer 404 before metadata is built; tracks carrying the synthetic rehearsal marker, title prefix or artist are skipped as well; and the staff release preview never asks for structured data. About, contact, the blog and video listings and video entries carry none, because no truthful type with the required fields (for example a video upload date) is available. No `Offer`, price or availability is emitted: public checkout is disabled, so an offer would claim something that is not true. Durations are omitted because the stored duration is the tagged preview's, not the recording's.
+
+The JSON is encoded with `JSON_HEX_TAG | JSON_HEX_AMP` and default Unicode escaping, so it is ASCII and every `<`, `>` and `&` is a `\u` escape; the encoder refuses output that breaks this. Blade prints it raw inside the script element and React's `MetadataHead` passes the same string through the Inertia head manager (which writes script children raw), dropping any value that contains `<`, `>` or `&`. Inertia adopts the server block on load, replaces it during navigation and removes it on pages without one. `PublicStructuredDataTest` and `tests/frontend/structured-data.test.tsx` cover shape, escaping, navigation and the exclusions.

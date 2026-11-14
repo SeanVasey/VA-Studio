@@ -1,3 +1,4 @@
+import { setButtonDisabled } from './disabled-button';
 export interface KitUploadSession {
   id: string; kitId: number; expectedVersion: number; originalName: string;
   sizeBytes: number; sha256: string; receivedBytes: number; chunkBytes: number;
@@ -201,10 +202,10 @@ function mountUpload(element: HTMLElement) {
       details.textContent = session ? `${session.originalName} · Kit #${session.kitId} · Draft version ${session.expectedVersion} · ${session.status} · Expires ${session.expiresAt}` : '';
       progress.max = session?.sizeBytes ?? 1; progress.value = session?.receivedBytes ?? 0;
       file.disabled = state.busy; id.disabled = state.busy;
-      for (const name of ['start', 'inspect', 'resume']) action(name).disabled = state.busy;
-      action('pause').disabled = !state.busy;
-      action('finish').disabled = state.busy || state.needsInspection || !session || !((session.status === 'completed' && session.cleanupPending) || (session.status === 'uploading' && session.receivedBytes === session.sizeBytes));
-      action('cancel').disabled = state.busy || !session || session.status === 'completed' || (session.status === 'cancelled' && !session.cleanupPending);
+      for (const name of ['start', 'inspect', 'resume']) setButtonDisabled(action(name), state.busy);
+      setButtonDisabled(action('pause'), !state.busy);
+      setButtonDisabled(action('finish'), state.busy || state.needsInspection || !session || !((session.status === 'completed' && session.cleanupPending) || (session.status === 'uploading' && session.receivedBytes === session.sizeBytes)));
+      setButtonDisabled(action('cancel'), state.busy || !session || session.status === 'completed' || (session.status === 'cancelled' && !session.cleanupPending));
     },
   });
   const selected = (): File | null => { if (file.files?.[0]) return file.files[0]; status.textContent = 'Choose the file from your device before starting or continuing.'; file.focus(); return null; };

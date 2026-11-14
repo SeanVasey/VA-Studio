@@ -1,0 +1,15 @@
+{
+  "actual_merge": {
+    "headRefOid": "3dc5a5af043a1e254fab895541d93d25223a8a0e",
+    "mergeCommit": {
+      "oid": "0fc2391cfd624cfa97fb5d02cc8be94492d8df36"
+    },
+    "mergedAt": "2026-10-15T08:06:37Z",
+    "state": "MERGED",
+    "url": "https://github.com/SeanVasey/VA-Studio/pull/122"
+  },
+  "head_tree": "4c47c56ae40531d5530a4010b53bd9cf2621c95b",
+  "merge_tree": "4c47c56ae40531d5530a4010b53bd9cf2621c95b",
+  "tree_equal": true,
+  "origin_main": "0fc2391cfd624cfa97fb5d02cc8be94492d8df36"
+}

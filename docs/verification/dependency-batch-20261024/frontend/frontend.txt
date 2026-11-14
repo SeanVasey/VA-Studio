@@ -1,0 +1,333 @@
+
+ RUN  v5.0.5 /home/user/wt/m4
+
+ ✓ tests/frontend/audio.test.tsx (23 tests) 5765ms
+   ✓ single native audio owner (3)
+     ✓ uses one audio element for successive tracks and follows native playback state 588ms
+   ✓ keeps first-load and next-track playback off until the listener explicitly enables it 328ms
+   ✓ follows the reordered queue on end, preserves it through navigation, and stops at its end 1545ms
+   ✓ repeats the queue only after explicit selection and clears that mode when automatic next is disabled 310ms
+   ✓ keeps loop markers accessible, rejects reversed bounds, loops within the preview and can clear them 747ms
+   ✓ changes and resets preview speed without starting a paused player, requests native pitch preservation, and rejects invalid rates 507ms
+ ✓ tests/frontend/test-checkout.test.tsx (84 tests) 7040ms
+   ✓ hosted Stripe test checkout (84)
+     ✓ shows verified awaiting_finalization without payment actions, fulfillment claims or private evidence 1178ms
+     ✓ rejects stale pending status after issuance but accepts a server-reported contract issue while retaining verified payment 374ms
+ ✓ tests/frontend/paid-grant-journey.test.tsx (23 tests) 8046ms
+   ✓ mounted original paid-purpose journey (17)
+     ✓ clears every private field on a sealed body denial after successful HTTP headers 805ms
+     ✓ retains original accepted terms, waits for all-line preparation and requires explicit native token POST without storage or URLs 349ms
+     ✓ clears selected original terms, entered references and all capabilities on a 403 read denial 328ms
+     ✓ clears selected original terms, entered references and all capabilities on a 404 read denial 595ms
+     ✓ clears selected original terms, entered references and all capabilities on a 419 read denial 535ms
+     ✓ keeps every issued authorization with its order until it is submitted, across reads, other orders and other authorizations 551ms
+     ✓ keeps an unrelated uncertain authorize replay when another download is refused 306ms
+     ✓ drops issued authorizations when the page is left 555ms
+     ✓ keeps a refused download retryable only after a later saved read shows that exact authorization still unused 877ms
+     ✓ records a download refusal that arrives while the tab is hidden, so a later saved read can still offer the exact retry 429ms
+     ✓ keeps the retry for an earlier refused download when a later download was submitted before the earlier frame answered 406ms
+   ✓ per-operation request timeouts (6)
+     ✓ recovers the same server authorization when a timed-out authorize is deliberately replayed 313ms
+     ✓ lets a lost authorize be set aside only after a later saved read shows no live authorization of that file 321ms
+ ✓ tests/frontend/test-owner-delivery.test.tsx (61 tests) 4663ms
+   ✓ stalled delivery request recovery (9)
+     ✓ releases a stalled status fetch at the effective deadline 526ms
+ ✓ tests/frontend/contact-inquiry.test.tsx (37 tests) 8039ms
+   ✓ private contact inquiry (37)
+     ✓ renders escaped approved privacy copy and labelled fields without network or browser storage 692ms
+     ✓ focuses an accessible validation summary and links to invalid fields without sending 425ms
+     ✓ accepts only an explicit private saved receipt from status 200 and clears the draft 350ms
+     ✓ accepts only an explicit private saved receipt from status 201 and clears the draft 507ms
+     ✓ keeps the exact key and serialized payload through lost and malformed responses 367ms
+     ✓ allows a definitive validation rejection to be edited under a new key, without rendering server details 478ms
+     ✓ releases a definitive first hidden website rejection and clears the honeypot without losing the visible draft 370ms
+     ✓ requires an explicitly refreshed notice before a first stale-notice rejection can be resubmitted 308ms
+     ✓ freezes the displayed notice and original token through uncertain retries after notice props change 315ms
+ ✓ tests/frontend/order-preparation.test.tsx (27 tests) 11762ms
+   ✓ test order preparation (27)
+     ✓ checks recovery first and displays complete server pricing, frozen escaped terms and exact assent without browser PII storage 1537ms
+     ✓ requires explicit assent and valid bounded buyer identity 997ms
+     ✓ deduplicates submission and retries the identical body and key after an unknown outcome even after expiry 782ms
+     ✓ rejects a mismatched successful order response without clearing the captured retry 598ms
+     ✓ unlocks a definitive validation rejection and requires fresh assent with a new request key 1255ms
+     ✓ discards a definitively changed review and requires acceptance of the newly displayed terms 926ms
+     ✓ recovers the durable order for ORDER_ALREADY_PREPARED without creating a new quote 642ms
+     ✓ recovers the durable order for IDEMPOTENCY_CONFLICT without creating a new quote 586ms
+     ✓ keeps 409 ORDER_CHANGED uncertain and retries its exact body and key 561ms
+     ✓ keeps 409 UNRECOGNIZED_CONFLICT uncertain and retries its exact body and key 636ms
+     ✓ keeps 422 UNRECOGNIZED_REJECTION uncertain and retries its exact body and key 579ms
+     ✓ keeps 500 INVALID_ORDER_REQUEST uncertain and retries its exact body and key 654ms
+     ✓ does not submit a newly expired review 618ms
+     ✓ does not display an old prepared order or buyer identity after selection changes during submission 638ms
+ ✓ tests/frontend/owned-order-history.test.tsx (41 tests) 3340ms
+   ✓ current session owned test order history (18)
+     ✓ requests no history until selected and needs no persisted tab locators or identity 599ms
+     ✓ pages through the server cursor without appending stale pages and refreshes from newest 429ms
+   ✓ recognizable original purchases and fresh cursor navigation (22)
+     ✓ freshly fetches three pages in both directions and Newest observes a later insertion 833ms
+     ✓ withdrawal after an older-page request clears rows, details and all page navigation 308ms
+ ✓ tests/frontend/customer-identity.test.tsx (72 tests) 6241ms
+   ✓ customer identity proof handling (13)
+     ✓ removes the fragment and query before actual app bootstrap can save Inertia history 1579ms
+     ✓ rejects malformed proof  and leaves a clean native recovery path 592ms
+   ✓ customer access request (5)
+     ✓ preserves exact request bytes after uncertainty and a later rejection, with fresh CSRF on retry 339ms
+   ✓ customer access completion (17)
+     ✓ completes enroll only once without authenticating or persisting secrets 329ms
+ ✓ tests/frontend/production-account-features.test.tsx (21 tests) 4114ms
+   ✓ sign-out aborts a pending feature request and clears private state immediately 772ms
+   ✓ requires fresh read after an uncertain version conflict and never resends the mutation 437ms
+   ✓ keeps the keyboard path: Enter never sends a blank or padded-blank name and creates once for a valid name 437ms
+ ✓ tests/frontend/paid-tax-journey.test.tsx (18 tests) 3455ms
+   ✓ Tax journey (15)
+     ✓ renders a shell with headings and no private data before any explicit read 470ms
+     ✓ lists newest saved orders, reports the sentinel, opens one and moves focus to it 682ms
+     ✓ prepares, authorizes and redeems by native form only: no token in a URL, history, storage or the page 499ms
+     ✓ keeps an uncertain authorize as an exact replay until saved status is reviewed, and can discard it 326ms
+     ✓ offers a refused download again only when saved status shows that authorization unused 533ms
+ ✓ tests/frontend/order-inquiry.test.tsx (39 tests) 3062ms
+   ✓ strict order inquiry boundary (27)
+     ✓ keeps private HTTP 403 bodies out of the UI 645ms
+   ✓ owned order inquiry flow (8)
+     ✓ rejects a broader success acknowledgement while preserving the same request 486ms
+ ✓ tests/frontend/install-app.test.tsx (20 tests) 3003ms
+   ✓ keeps manual guidance accessible without support and never treats accepted choice as installed 1164ms
+   ✓ adopts server keys and removes/re-adds installation head and state across real Inertia private return navigation 1123ms
+ ✓ tests/frontend/customer-exception-resolution.test.tsx (47 tests) 3971ms
+   ✓ recorded test-order resolution panel (14)
+     ✓ loads only by explicit keyboard action, explains retained dates and hides private memory without storage 904ms
+     ✓ clears retained history before a failed refresh and requires fresh access after denial 314ms
+     ✓ shares a lazy read through library history and clears it immediately on sign-out 1001ms
+     ✓ shares a lazy read through library reference and clears it immediately on sign-out 957ms
+ ✓ tests/frontend/paid-grant-continuation.test.tsx (12 tests) 4378ms
+   ✓ continuing paid preparation after one click (12)
+     ✓ keeps posting while each request makes progress, at least 10 s apart, until the order is fulfilled 1107ms
+     ✓ waits on another request's claim by polling saved status every 15 s, then continues 300ms
+     ✓ recovers from a document timeout by polling saved status instead of stopping 510ms
+     ✓ never sends more than 20 document requests for one click 355ms
+     ✓ keeps the progress region outside the busy subtree and offers a Stop control that ends the continuation (A11-I5) 536ms
+     ✓ stops a request in flight when Stop is chosen and sends nothing more 303ms
+ ✓ tests/frontend/customer-listening-library.test.tsx (24 tests) 2880ms
+   ✓ saved tracks and named playlists (14)
+     ✓ loads deliberately with private requests and persists a named playlist using a version and current CSRF cookie 621ms
+     ✓ renames, reorders, removes and deletes a selected playlist with the current server revision 553ms
+ ✓ tests/frontend/customer-listening-notes.test.tsx (27 tests) 3730ms
+   ✓ V2 private listening inputs (17)
+     ✓ keeps export and version-fenced clear available for V1 while note promotion is unavailable 1064ms
+   ✓ actual private note and data controls (10)
+     ✓ saves, edits and deletes a private note on an unavailable owned reference with fresh versions 685ms
+     ✓ requires an explicit clear choice and sends the current version, then removes all private drafts 373ms
+ ✓ tests/frontend/customer-account.test.tsx (31 tests) 6113ms
+   ✓ customer sign-in (21)
+     ✓ posts only credentials with CSRF and replaces the document after strict success, without storage or Inertia navigation 1404ms
+     ✓ clears the password and permits a deliberate retry after generic 422 without reflecting server details 796ms
+     ✓ clears the password and permits a deliberate retry after generic 429 without reflecting server details 638ms
+     ✓ requires fresh session state after 419 rather than retrying the old form 623ms
+     ✓ requires fresh session state after 403 rather than retrying the old form 549ms
+     ✓ requires fresh session state after 500 rather than retrying the old form 413ms
+     ✓ prevents duplicate requests and ignores a successful response after unmount 558ms
+ ✓ tests/frontend/order-items.test.tsx (44 tests) 3048ms
+   ✓ original test-order items panel (11)
+     ✓ loads only on explicit keyboard action, displays frozen prices and clears on hide without storage 833ms
+     ✓ clears previously loaded items before a failed refresh and focuses a generic error 430ms
+     ✓ shares the lazy panel through the history path and discards it immediately on sign-out 367ms
+     ✓ shares the lazy panel through the reference path and discards it immediately on sign-out 934ms
+ ✓ tests/frontend/order-recovery.test.tsx (20 tests) 8032ms
+   ✓ storefront durable order recovery (20)
+     ✓ recovers a verified prepared order despite an unavailable checkout read 1543ms
+     ✓ recovers a verified paid order despite an unavailable checkout read 755ms
+     ✓ recovers a verified paid order despite an unavailable checkout read 557ms
+     ✓ recovers a verified paid_exception order despite an unavailable checkout read 352ms
+     ✓ rejects an incoherent recovered order: paid order awaiting finalization 337ms
+     ✓ recovers checkout for an order marked not_verified even when new checkout is disabled 504ms
+     ✓ threads the separate checkout flag to a recovered prepared order 317ms
+     ✓ recovers an old order after reload despite an expired quote, withdrawn creation policy and unavailable cart selections 650ms
+     ✓ checks again after closing and reopening the cart and allows interrupted recovery retry 519ms
+     ✓ ignores stale recovery responses after the cart closes and rejects mismatched status 418ms
+     ✓ never uses real order recovery in the isolated design preview 395ms
+ ✓ tests/frontend/metadata.test.tsx (5 tests) 2384ms
+   ✓ removes public sharing metadata on a real private return visit and restores it while retaining one audio owner 854ms
+   ✓ adopts server fallback tags and replaces track metadata on real Inertia navigation and return home 826ms
+ ✓ tests/frontend/paid-grant-review-addendum1.test.tsx (7 tests) 4472ms
+   ✓ review addendum 1: set-aside gate for a lost authorize (4)
+     ✓ a failed exact retry invalidates the earlier saved status read for setting the request aside 1559ms
+     ✓ a saved status read of a different origin cannot satisfy the gate 626ms
+     ✓ a stale status object for the pending origin is cleared by open and refresh, so the gate needs a new read 548ms
+     ✓ documents that pagehide drops the pending authorize without a saved status read 788ms
+   ✓ review addendum 1: a hidden tab keeps the exact replay (c0a68b2d) (3)
+     ✓ renders no request key, nonce or private origin field while hidden, and a denial after return drops the kept replay 407ms
+ ✓ tests/frontend/free-grant-journey.test.tsx (8 tests) 2518ms
+   ✓ mounted explicit free purpose journey (8)
+     ✓ requires server review and affirmative assent before saving, prepares an original and submits only an explicit native download 1174ms
+     ✓ holds the same assent request after a lost response, refreshes saved state, and retries only deliberately with the same immutable body 376ms
+     ✓ uses fresh server retry admission for an expired claimed preparation and displays token-free consumed attempt status 450ms
+ ✓ tests/frontend/inquiry-history.test.tsx (27 tests) 2762ms
+   ✓ original-session inquiry history (8)
+     ✓ loads only on intent, shows minimal escaped summaries and opens the selected receipt without storage 824ms
+     ✓ freshly fetches Older, Newer and Newest pages and never retains earlier summary payloads 1056ms
+ ✓ tests/frontend/customer-order-reference.test.tsx (48 tests) 3152ms
+   ✓ account library order lookup (9)
+     ✓ finds an exact order by keyboard without loading history, storage access or URL changes 1469ms
+ ✓ tests/frontend/quote-review.test.tsx (13 tests) 2238ms
+   ✓ server selection review (13)
+     ✓ uses server display values and sends only the selected identities with a retry key 1173ms
+ ✓ tests/frontend/customer-communication-preferences.test.tsx (27 tests) 2261ms
+   ✓ actual customer consent choice (16)
+     ✓ starts unchecked, shows exact notice, persists explicit opt in then withdrawal with fresh versions 769ms
+ ✓ tests/frontend/inquiry-conversation.test.tsx (12 tests) 3127ms
+   ✓ private inquiry conversation (12)
+     ✓ offers receipt-only reading on published contact when collection is disabled, without enabling other routes or previews 877ms
+     ✓ opens a newly saved receipt only after the visitor asks to read replies 544ms
+     ✓ opens a retained receipt only by explicit intent without storing it or private draft content 349ms
+     ✓ retries exactly the uncertain body and key even after a later validation rejection or archived refresh 475ms
+ ✓ tests/frontend/resumable-kit-upload.test.ts (15 tests) 130ms
+ ✓ tests/frontend/paid-grant-reopen-issued.test.tsx (4 tests) 1577ms
+   ✓ reopening the order of an issued authorization (4)
+     ✓ reopens an order older than the index after a hidden tab, so its issued authorization can still be downloaded 765ms
+     ✓ reopens the order of a refused download kept for retry, so the unused authorization can be retried 531ms
+ ✓ tests/frontend/membership-history.test.tsx (31 tests) 1650ms
+   ✓ read-only synthetic membership history (13)
+     ✓ is absent by default and requires an explicit server capability plus scope 328ms
+     ✓ distinguishes empty ownership from unavailable and clears all earlier details on rejected refresh 376ms
+ ✓ tests/frontend/support-attachments.test.tsx (17 tests) 1553ms
+   ✓ real private upload, scan and retained-original actions (8)
+     ✓ loads deliberately, sends one file with stable request identity and only shows confirmed progress 544ms
+ ✓ tests/frontend/resumable-media-upload.test.ts (11 tests) 282ms
+Not implemented: navigation to another Document
+ ✓ tests/frontend/storefront-worker.test.ts (48 tests) 468ms
+ ✓ tests/frontend/editorial-content.test.tsx (14 tests) 2812ms
+   ✓ editorial content and shared navigation (14)
+     ✓ renders supplied plain text and fixed identity without injecting markup 552ms
+     ✓ passes the displayed notice token into the enabled public contact form without changing the email fallback 639ms
+ ✓ tests/frontend/paid-grant-review-addendum5.test.tsx (4 tests) 2787ms
+   ✓ review addendum 5: retry only after its own refusal (4)
+     ✓ offers the retry after the own refusal and a later read, hides it while the retry is in flight, and needs that retry to refuse again 1083ms
+     ✓ records a refusal that arrives after a status read started during the submission, without touching the page 844ms
+     ✓ ignores a frame answer after a denial or departure has removed the frame 365ms
+     ✓ offers only refused submissions: an authorization whose frame has not answered is not offered even when listed unused 493ms
+ ✓ tests/frontend/paid-grant-reopen-pending.test.tsx (3 tests) 1653ms
+   ✓ reopening the order of a pending authorize (3)
+     ✓ reopens an order older than the index, so an expired request can be set aside after a saved read 1035ms
+     ✓ keeps the newer-order path unchanged: the index reopens it and the banner offers no duplicate once it is shown 537ms
+ ✓ tests/frontend/production-customer-identity.test.tsx (13 tests) 1399ms
+   ✓ new account access privacy and replay (13)
+     ✓ retries identical request after uncertain response and accepts only the fixed minimal envelope 939ms
+ ✓ tests/frontend/paid-grant-review-addendum10.test.tsx (2 tests) 1884ms
+   ✓ review addendum 10 (2)
+     ✓ offers no prepare control for an order whose lines are all prepared but which is not fulfilled 865ms
+     ✓ offers one retry per refused authorization, each submitting its own token, and never the same authorization twice 1016ms
+Not implemented: Window's scrollTo() method
+ ✓ tests/frontend/checkout-return.test.tsx (7 tests) 2109ms
+   ✓ read-only checkout return (5)
+     ✓ displays retained verification despite contradictory redirect parameters without performing a payment operation 904ms
+   ✓ private return page chrome (2)
+     ✓ reuses approved chrome, a named focusable main and inert public text without another request 364ms
+     ✓ keeps modified clicks native and gives ordinary Inertia visits a reachable destination heading 367ms
+ ✓ tests/frontend/paid-grant-review-addendum6.test.tsx (3 tests) 3324ms
+   ✓ review addendum 6: issued authorizations (3)
+     ✓ shows issued tokens only under their own order, never renders them, and a denial drops every one 1780ms
+     ✓ renders nothing while hidden and shows the kept tokens again only after the order is read again 598ms
+     ✓ documents that an expired issued authorization stays listed and a frame refusal keeps the other issued tokens 943ms
+ ✓ tests/frontend/paid-grant-review-addendum14.test.tsx (4 tests) 1689ms
+   ✓ review addendum 14: reopening a pending authorize order (4)
+     ✓ A: reopening sends one GET only, keeps the identical replay, and a saved read under 80 s after the send cannot set it aside 1133ms
+ ✓ tests/frontend/paid-grant-review-addendum7.test.tsx (3 tests) 1892ms
+   ✓ review addendum 7 (3)
+     ✓ keeps an in-flight download frame through a hidden tab without rendering any private field, and pagehide removes it 1060ms
+     ✓ keeps an unrelated pending authorize across a download refusal, inert until a read, and a denied read drops it 476ms
+     ✓ never evicts an unresolved download frame when a fourth download is submitted 351ms
+ ✓ tests/frontend/paid-grant-review-addendum9.test.tsx (3 tests) 2676ms
+   ✓ review addendum 9: refusals recorded independently of the request generation (3)
+     ✓ offers the retry from a read that completed before a non-current refusal arrived 1850ms
+     ✓ offers the retry from a read still in flight when the refusal arrived, and not when that read lists the authorization attempted 680ms
+ ✓ tests/frontend/paid-grant-review-addendum11.test.tsx (3 tests) 1795ms
+   ✓ review addendum 11: continuation edges (3)
+     ✓ keeps the progress live region outside any aria-busy="true" ancestor while continuing (fixed in round 20) 716ms
+     ✓ gives up on a long completion held by its own lost request, leaving the order to a later manual finish 513ms
+     ✓ no longer stalls the next document request after a backward wall-clock step (fixed in round 20) 413ms
+ ✓ tests/frontend/paid-grant-review-addendum4.test.tsx (3 tests) 1475ms
+   ✓ review addendum 4: retry of a refused download (3)
+     ✓ never renders the kept token and drops it on a denial even if a later read would list it unused 697ms
+     ✓ a refusal removes only its own frame, never another download still waiting for its response 534ms
+ ✓ tests/frontend/catalog-pagination.test.tsx (9 tests) 3853ms
+   ✓ restores and changes a selection outside the current page using current server data 1724ms
+   ✓ retains stored choices on network failure and retries before permitting a quote review 622ms
+   ✓ submits server filters and preserves cursor/query state on page and track navigation 917ms
+ ✓ tests/frontend/service-project-journey.test.tsx (7 tests) 1262ms
+   ✓ mounted service buyer journey (7)
+     ✓ accepts the exact displayed immutable quote and never describes acceptance as paid or delivered 377ms
+ ✓ tests/frontend/license-disclosure.test.tsx (13 tests) 1344ms
+   ✓ loads terms only when requested and renders the entire policy as inert text 556ms
+A12 P3 stopped after 620000 ms
+ ✓ tests/frontend/paid-grant-review-addendum12.test.tsx (2 tests) 2416ms
+   ✓ review addendum 12: continuation edges (2)
+     ✓ ends a wait on its own lost completion by the 20-request cap, before the 660 s window 2097ms
+ ✓ tests/frontend/paid-grant-finish-completion.test.tsx (3 tests) 1018ms
+   ✓ finishing a prepared but unfulfilled paid order (3)
+     ✓ offers to finish an order whose lines are all prepared, sends the same document request and shows the fulfilled order 558ms
+ ✓ tests/frontend/storefront.test.tsx (9 tests) 6651ms
+   ✓ storefront user flows (7)
+     ✓ renders an honest empty production catalog without invented products, prices or playback 492ms
+     ✓ filters the catalog and recovers from an empty search 1605ms
+     ✓ disables playback for missing previews with a reason 317ms
+     ✓ adds, changes and removes an exact product-license selection 1925ms
+     ✓ handles checkout unavailability without producing a success state or losing the cart 716ms
+   ✓ removes a saved selection when updated catalog props publish a different revision 582ms
+   ✓ requires a fresh choice if an open license dialog refers to a replaced offer 666ms
+ ✓ tests/frontend/support-attachment-registration.test.tsx (5 tests) 2312ms
+   ✓ mounts the actual private page with its server audience and closes an old pending request on fresh scope 869ms
+   ✓ offers service attachments only after an authorized project load and explicit server flag false 357ms
+   ✓ offers service attachments only after an authorized project load and explicit server flag true 410ms
+   ✓ passes the contact attachment flag through receipt-only conversation reading false 385ms
+ ✓ tests/frontend/customer-purchase-claim.test.tsx (17 tests) 1247ms
+   ✓ explicit guest purchase claim (17)
+     ✓ stages only one exact reference after a deliberate action and carries no proof or account fields 494ms
+ ✓ tests/frontend/site-images.test.tsx (4 tests) 1361ms
+   ✓ site images (4)
+     ✓ keeps the built-in hero and studio files when the release sets no images 938ms
+Not implemented: navigation to another Document
+ ✓ tests/frontend/editorial-related-tracks.test.tsx (5 tests) 1094ms
+   ✓ manual editorial related tracks (5)
+     ✓ preserves saved order, renders only summaries and starts no media/provider requests 611ms
+ ✓ tests/frontend/cloud-listening-independent.test.tsx (10 tests) 1073ms
+ ✓ tests/frontend/editorial-video.test.tsx (12 tests) 1690ms
+   ✓ visitor-controlled editorial videos (12)
+     ✓ loads only after intent and removes the provider frame with keyboard focus recovery 963ms
+ ✓ tests/frontend/design-preview.test.tsx (4 tests) 3790ms
+   ✓ isolated storefront preview (4)
+     ✓ starts with the real empty state and exposes keyboard-accessible, reloadable views 1712ms
+     ✓ exposes real search, license selection and cart interactions with explicit sample limits 1737ms
+ ✓ tests/frontend/customer-communication-registration.test.tsx (5 tests) 1165ms
+   ✓ authenticated communication preference registration (5)
+     ✓ keeps the affirmative choice unchecked and erases the mounted notice before sign-out completes 763ms
+ ✓ tests/frontend/site-content.test.tsx (4 tests) 1625ms
+   ✓ versioned storefront content (4)
+     ✓ renders one supplied content snapshot while retaining fixed identity and artwork 905ms
+     ✓ isolates private preview from cart persistence, selection POSTs and purchase controls 444ms
+ ✓ tests/frontend/inertia-page-registry.test.ts (3 tests) 219ms
+ ✓ tests/frontend/catalog.test.ts (6 tests) 38ms
+ ✓ tests/frontend/track-detail.test.tsx (2 tests) 2447ms
+   ✓ renders a directly selected track outside the current catalog page and preserves the return query 1561ms
+   ✓ opens the chosen published offer with full terms and saves only its exact identifiers 876ms
+ ✓ tests/frontend/embed-font-assets.test.ts (5 tests) 1648ms
+   ✓ standalone preview font assets (5)
+     ✓ Noto Sans Display retains exact approved and locked package bytes with its license 873ms
+     ✓ Reddit Sans retains exact approved and locked package bytes with its license 447ms
+ ✓ tests/frontend/storefront-offline.test.ts (29 tests) 33ms
+ ✓ tests/frontend/cms-navigation.test.tsx (4 tests) 1431ms
+   ✓ Main navigation retains the player and catalog query when licensing returns from a track to the homepage 816ms
+ ✓ tests/frontend/customer-suppression-status.test.tsx (7 tests) 385ms
+ ✓ tests/frontend/production-identity-registration.test.tsx (1 test) 322ms
+   ✓ erases completion credentials on page departure and ignores the pending acknowledgement 321ms
+
+ Test Files  68 passed (68)
+      Tests  1172 passed (1172)
+   Start at  10:42:27
+   Duration  131.69s (tests 53%, environment 33%, setup 6%, import 6%, transform 2%)
+
+Environment  jsdom was created 68 times · 121.84s total, 33% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+JUNIT report written to /home/user/wt/m4/docs/verification/dependency-batch-20261024/frontend/frontend.xml
+exit 0

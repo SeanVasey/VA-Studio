@@ -4,6 +4,7 @@ namespace App\Domain\Rights;
 
 use App\Domain\Rights\Models\LicenseTemplate;
 use App\Domain\Rights\Models\LicenseVersion;
+use App\Domain\Staff\StaffWriteAuthority;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -22,6 +23,7 @@ final class CreateLicenseDraft
                 throw new AuthorizationException;
             }
             Gate::forUser($currentActor)->authorize('administer-catalog', [true]);
+            StaffWriteAuthority::require($currentActor);
             $content = app(LicenseContent::class)->validate($content);
             $locked = LicenseTemplate::query()->lockForUpdate()->findOrFail($template->id);
             if ($predecessor !== null) {

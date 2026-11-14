@@ -1,0 +1,15 @@
+{
+  "status": "SETUP/STATIC ONLY; no application bootstrap",
+  "locked_packages": 160,
+  "package_version_source_dist_tuples_equal": true,
+  "immutable_package_files_same_inode_and_size": 41183,
+  "lockfile_sha256": "254ed9b69326c8d8d02735b40fa4d61cbad560f73bc72cab47255a986a743ce8",
+  "member_lockfile_equal": true,
+  "own_composer_autoload_bin_materialized_before_dump": true,
+  "no_external_vendor_symlinks": true,
+  "dump_command": "composer dump-autoload --no-plugins --no-scripts --no-interaction",
+  "dump_exit": 0,
+  "dump_notes": "Expected preexisting ambiguous/fixture PSR4 warnings; initial default container-root Git discovery warned dubious ownership, no safe.directory/global change; optimized metadata generated. No package install/update/network/dependency write.",
+  "pint_first_attempt": "vendor/bin/pint absent in source bin metadata; exit1 cannot open input file, not a feature test failure",
+  "pint_actual": "php vendor/laravel/pint/builds/pint --test (five owned PHP files): PASS exit0"
+}

@@ -3,6 +3,13 @@ import { createRoot } from 'react-dom/client';
 import Storefront from './Pages/Storefront';
 import CheckoutReturn from './Pages/CheckoutReturn';
 import Editorial from './Pages/Editorial';
+import Albums from './Pages/Albums';
+import Album from './Pages/Album';
+import Collections from './Pages/Collections';
+import Collection from './Pages/Collection';
+import SoundKits from './Pages/SoundKits';
+import SoundKit from './Pages/SoundKit';
+import SoundKitOrder from './Pages/SoundKitOrder';
 import CustomerSignIn from './Pages/CustomerSignIn';
 import CustomerLibrary from './Pages/CustomerLibrary';
 import FreeGrants from './Pages/FreeGrants';
@@ -24,6 +31,13 @@ createInertiaApp({
     if (name === 'Storefront') return Storefront;
     if (name === 'CheckoutReturn') return CheckoutReturn;
     if (name === 'Editorial') return Editorial;
+    if (name === 'Albums') return Albums;
+    if (name === 'Album') return Album;
+    if (name === 'Collections') return Collections;
+    if (name === 'Collection') return Collection;
+    if (name === 'SoundKits') return SoundKits;
+    if (name === 'SoundKit') return SoundKit;
+    if (name === 'SoundKitOrder') return SoundKitOrder;
     if (name === 'CustomerSignIn') return CustomerSignIn;
     if (name === 'CustomerLibrary') return CustomerLibrary;
     if (name === 'FreeGrants') return FreeGrants;
@@ -32,6 +46,11 @@ createInertiaApp({
     if (name === 'ProductionCustomerIdentity') return ProductionCustomerIdentity;
     if (name === 'ServiceProjects') return ServiceProjects;
     if (name === 'PrivateSupportAttachments') return PrivateSupportAttachments;
+    // Default-off private pages load as separate lazy chunks: their code is fetched only when one of them is opened.
+    if (name === 'PaidTaxLicenses') return import('./Pages/PaidTaxLicenses').then(page => page.default);
+    if (name === 'PaidGrants') return import('./Pages/PaidGrants').then(page => page.default);
+    if (name === 'ServiceCatalog') return import('./Pages/ServiceCatalog').then(page => page.default);
+    if (name === 'ProductionCustomerFeatures') return import('./Pages/ProductionCustomerFeatures').then(page => page.default);
     throw new Error(`Unknown page: ${name}`);
   },
   setup({ el, App, props }) { createRoot(el).render(<App {...props} />); },

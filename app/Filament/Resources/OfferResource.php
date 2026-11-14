@@ -27,7 +27,7 @@ class OfferResource extends OperatorResource
     {
         return $schema->components([
             Select::make('track_id')->relationship('track', 'title')->searchable()->required()->live()->disabled(fn (?Offer $record) => $record !== null),
-            Select::make('license_version_id')->options(fn () => LicenseVersion::query()->where('status', 'published')->with('template')->get()->mapWithKeys(fn ($version) => [$version->id => $version->template->name.' v'.$version->version]))->required(),
+            Select::make('license_version_id')->options(fn () => LicenseVersion::query()->where('status', 'published')->whereHas('template', fn ($template) => $template->where('type', '!=', 'sound-kit'))->with('template')->get()->mapWithKeys(fn ($version) => [$version->id => $version->template->name.' v'.$version->version]))->required(),
             TextInput::make('price_minor')->label('Draft price in cents')->integer()->minValue(1)->required()->helperText('Saving a draft keeps the published price. Publish a revision to make changes available.'),
             Select::make('currency')->options(['USD' => 'USD'])->default('USD')->required(),
             Select::make('deliverable_asset_ids')->label('Exact verified asset revisions')->multiple()->options(fn (Get $get) => MediaAsset::query()->where('track_id', $get('track_id'))->where('status', 'ready')->whereIn('role', ['download_mp3', 'master_wav', 'stems_zip'])->get()->mapWithKeys(fn ($asset) => [$asset->id => $asset->role.' #'.$asset->id.' '.$asset->original_name]))->required(),

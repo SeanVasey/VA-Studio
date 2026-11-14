@@ -16,7 +16,8 @@ final class BillingHintRecovery
      * The retrieval an event's hint still needs, or null when the event is not a hint, names no bound subscription or invoice
      * identity, or is already covered. "Covered" means the invoice's identity row has a definitive observation (see observedAfter())
      * from a retrieval that began after the hint was received. An older retrieval, an `unknown` or `provider_incomplete`
-     * observation, and an identity row with no observation do not cover it.
+     * observation, legacy observation, or an identity row with no observation do not cover it. Coverage requires the upgraded
+     * authenticated observation and its exact retained database-issued read interval.
      *
      * @return array{binding_id: string, invoice_ref: string}|null
      */
@@ -67,8 +68,8 @@ final class BillingHintRecovery
      * not_settled, refused and reversed (each a retrieved provider state, so each covers a hint) and unknown (a timeout or
      * ambiguous response). `unknown` never covers, and neither does a `refused` observation whose reason is `provider_incomplete`:
      * the provider's unbounded list meant no state was read. Otherwise a transient provider outage would hide the hint, leaving a
-     * paid invoice unreconciled until some different event arrived. This reads the reason from the encrypted payload, so only
-     * `refused` rows are decrypted.
+     * paid invoice unreconciled until some different event arrived. Every candidate's complete authenticated row and original
+     * retained endpoint identities are checked; a legacy envelope or a reissued integer position cannot suppress recovery.
      *
      * Order (Addendum 1, A1-3; Codex P1 on PR #54, review L2-3): the observation's retrieval position against the hint's position,
      * both issued by the database from one counter, never the append time and never an application clock. A retrieval whose provider
@@ -84,20 +85,22 @@ final class BillingHintRecovery
         $hintPosition = is_string($hintPosition) && preg_match('/\A[1-9][0-9]{0,18}\z/D', $hintPosition) === 1 ? (int) $hintPosition : $hintPosition;
         BillingException::require(is_int($hintPosition) && $hintPosition > 0, 'tampered_ledger');
         $schema = new BillingSchema;
-        $statement = DB::connection()->getPdo()->prepare('SELECT o.outcome, o.payload_ciphertext FROM '.$schema->table(BillingSchema::TABLES[2]).' o JOIN '
+        $pdo = DB::connection()->getPdo();
+        (new BillingRetrievalSchema)->assertOwned($pdo);
+        $statement = $pdo->prepare('SELECT o.* FROM '.$schema->table(BillingSchema::TABLES[2]).' o JOIN '
             .$schema->table(BillingSchema::TABLES[1]).' i ON i.id = o.invoice_id WHERE i.invoice_ref_hash = ? AND o.retrieval_position > ? AND o.outcome <> ? '
             .'ORDER BY o.sequence LIMIT '.BillingLedger::MAX_OBSERVATIONS);
         $statement->execute([$invoiceRefHash, $hintPosition, 'unknown']);
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            if ($row['outcome'] !== 'refused') {
-                return true;
-            }
             try {
-                if ((BillingValues::decrypt($row['payload_ciphertext'])['reason'] ?? null) !== 'provider_incomplete') {
+                $row = BillingValues::integers($row, ['sequence', 'amount_minor', 'retrieval_position', 'retrieval_end_position']);
+                $payload = BillingEvidenceRecord::verify($row, BillingEvidenceRecord::OBSERVATION);
+                (new BillingLedger)->assertRetainedObservationInterval($row);
+                if ($row['outcome'] !== 'refused' || ($payload['reason'] ?? null) !== 'provider_incomplete') {
                     return true;
                 }
             } catch (BillingException) {
-                // An unreadable payload proves nothing; retrieving again is safe and the job audits the chain.
+                // Legacy, changed or unreadable evidence proves no upgraded coverage. The retrieval job audits the full chain.
             }
         }
 

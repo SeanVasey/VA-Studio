@@ -6,7 +6,7 @@ use App\Domain\Commerce\ProductionCheckout\OwnAccountStripeGateway;
 use App\Domain\Commerce\ProductionCheckout\ProviderGateway;
 use Illuminate\Support\ServiceProvider;
 
-/** Registration and private route integration are separate root-owned composition steps. */
+/** Registered by AppServiceProvider only when ProductionCheckoutMount admits (lane PCC); tests may register it directly. */
 final class ProductionCheckoutServiceProvider extends ServiceProvider
 {
     public function register(): void

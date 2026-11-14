@@ -1,0 +1,9 @@
+# Tax255 V2 consumer prerequisites
+
+Base: actual PR #118 merge `cfce548b4f0893a3634422062099d930428856a3`, plus its post-merge receipt-only commit `291a0d90ee3c8199a366bf79da4f58a4992cccf9`.
+
+This coherent prerequisite batch owns `ProductionTaxPaidLineAdapterV2.php`, its adapter/source/admission tests, the five missing `ProductionTaxCheckoutJourneyTest` payment cases and this verification packet. It addresses the existing independent Tax255 conditions A1-1 and A1-2 before V2 is wired into Paid252 or a transport is activated. The adapter will require the caller's `CurrentRows`, prove the exact held source is current, and require the caller's expected order ID before returning the authenticated line. Self-consistency remains a non-authenticating internal check used by isolated tests.
+
+Acceptance: genuine same-order/current-frame lines preserve exact bytes; autocommit, a subsequent frame on the same primary, another primary, nesting and wrong expected order refuse. Closed-frame and wrong-order cases must fail against the old source for behavioral reasons, then pass after the fix. Missing provider checks for PaymentIntent livemode, metadata, on_behalf_of, line currency and non-succeeded intent status must refuse retention and admit the unchanged positive session afterward. Run the affected files on SQLite, meaningful source/payment cases on a new private MySQL 8.4 datadir/port/socket, changed-file Pint and fresh independent exact-source review.
+
+No migration, frozen V1 reader/source, contract profile member, provider implementation, route registration, application flag, asset or logo change. V2 consumer committed-read/write admission and subsequent Paid252 schema/consumer integration remain separate dependency-ready slices; this prerequisite is not completed V2 fulfillment or activation. Synthetic fixture transport results establish no merchant/provider/host facts. Full Foundation/GitLab and production/live actions remain outside this batch.

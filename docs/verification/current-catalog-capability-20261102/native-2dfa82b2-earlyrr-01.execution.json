@@ -1,0 +1,41 @@
+{
+  "source": "2dfa82b2b4998beae84793f5f303a1d3aac773db",
+  "command": [
+    "docker",
+    "exec",
+    "--user",
+    "1000:1000",
+    "--workdir",
+    "/workspace/VA-Studio-account-guard-v2",
+    "va-pcc-runtime-20261101",
+    "bash",
+    "/workspace/account-guard-evidence-20261101/run-case.sh",
+    "2dfa82b2b4998beae84793f5f303a1d3aac773db",
+    "mysql",
+    "native-2dfa82b2-earlyrr-01",
+    "^.*::test_native_early_repeatable_read_snapshot_refuses_new_reserved_namespace_on_memo_hit$",
+    "172.17.0.5",
+    "tests/Feature/ProductionIdentity/AccountAdmissionGuardUpgradeTest.php"
+  ],
+  "server": {
+    "container": "va-account-guard-mysql-20261101",
+    "version": "8.4.11",
+    "uuid": "48da0917-d649-11f1-99f5-f2985e3ab22b",
+    "address": "172.17.0.5",
+    "internal_port": 3306,
+    "host_port": 33089,
+    "memory": 2147483648,
+    "initial_other_clients": 0
+  },
+  "scope": "Correctness only; overlapping DEFOPS; no budget or latency acceptance",
+  "exit": 2,
+  "started": "2026-11-02T01:51:16Z",
+  "finished": "2026-11-02T01:52:10Z",
+  "phpunit_elapsed_seconds": 54.155,
+  "result": "STOP_SETUP_TYPEERROR",
+  "assertions": 0,
+  "test_body_reached": false,
+  "next_seven_cases": "UNRUN",
+  "cleanup_exit": 0,
+  "cleanup": "clients\t0\ntransactions\t0\ndata_locks\t0\ndata_waits\t0\nother_metadata\t0\npending_metadata\t0\nreserved_table\t0\n"
+}

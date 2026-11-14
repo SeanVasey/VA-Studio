@@ -1,0 +1,26 @@
+{
+  "design-APPROVE.md": {
+    "original": "/workspace/runtime/paid-delivery-a2-request-start-design-APPROVE-05f9d503-20261014.md",
+    "sha256": "be961905b93208cea44c4db7ad9e4e39958954b6e1cea75ab65b2ce528f5fae4"
+  },
+  "design-review.md": {
+    "original": "/workspace/runtime/paid-delivery-a2-request-start-design-review-98bb9a91-20261014.md",
+    "sha256": "bf3d1f5ebc8ab3ea72d022bc83e8fdd4a1c18d3af91333d154b2a8f775f54cd5"
+  },
+  "repair-APPROVE-b682e121.md": {
+    "original": "/workspace/runtime/paid-delivery-a2-repair-source-review-APPROVE-b682e121-20261014.md",
+    "sha256": "6dba1fa44e175d8b05172262c2ae08b461bfe1aaafaf7247cbd98e75102d87bd"
+  },
+  "root-handlers-carry-bd5ec10a.md": {
+    "original": "/workspace/runtime/paid-delivery-a2-root-handlers-primary-carry-review-bd5ec10a-20261014.md",
+    "sha256": "b8e95faa37a2074666c5ee7563bdca346f7979babad96aaa5c6f36c4947558f2"
+  },
+  "root-http-review-09890cdf.md": {
+    "original": "/workspace/runtime/paid-delivery-a2-root-http-source-review-09890cdf-20261014.md",
+    "sha256": "a2eedc0310e6b7b253c63e7cdfd642c43f98e5b4156b8dbc95c8f8fa734a839d"
+  },
+  "source-REVISE-627743d0.md": {
+    "original": "/workspace/runtime/paid-delivery-a2-source-review-REVISE-627743d0-20261014.md",
+    "sha256": "439a2b8cc3e798673a6b3c1c9bf8c530a69241d1870b0c0033a33ed939d4d19f"
+  }
+}

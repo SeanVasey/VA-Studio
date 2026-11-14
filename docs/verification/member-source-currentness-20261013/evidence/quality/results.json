@@ -1,0 +1,90 @@
+[
+  {
+    "argv": [
+      "python3",
+      "scripts/ci/test-phpunit-shards.py"
+    ],
+    "completed_at_utc": "2026-10-13T07:28:25.501006+00:00",
+    "cwd": "/workspace/VA-Studio-member-source-currentness",
+    "duration_seconds": 0.370925,
+    "exit": 1,
+    "head_at_start": "cc612650217830d2972efeafa12d4d9652c48524",
+    "log_sha256": "bbe9d4b919890748c281ecd82ebe3f9d0689c00229f598e8cb350246180a7bec",
+    "runner_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+    "selected_php_files": null,
+    "started_at_utc": "2026-10-13T07:28:25.129858+00:00",
+    "unittest_reported_tests": 52
+  },
+  {
+    "argv": [
+      "python3",
+      "scripts/ci/test-database-receipts.py"
+    ],
+    "completed_at_utc": "2026-10-13T07:29:15.857117+00:00",
+    "cwd": "/workspace/VA-Studio-member-source-currentness",
+    "duration_seconds": 50.352702,
+    "exit": 0,
+    "head_at_start": "cc612650217830d2972efeafa12d4d9652c48524",
+    "log_sha256": "9d5296b3420fb5db5d97df585c451520d0f497130f6dca4ebcc6a300b6d8db51",
+    "runner_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+    "selected_php_files": null,
+    "started_at_utc": "2026-10-13T07:28:25.504230+00:00",
+    "unittest_reported_tests": 61
+  },
+  {
+    "argv": [
+      "python3",
+      "scripts/ci/test-ci-scope.py"
+    ],
+    "completed_at_utc": "2026-10-13T07:29:16.790614+00:00",
+    "cwd": "/workspace/VA-Studio-member-source-currentness",
+    "duration_seconds": 0.931015,
+    "exit": 0,
+    "head_at_start": "cc612650217830d2972efeafa12d4d9652c48524",
+    "log_sha256": "37acda06308aec11e88944ce508224ad7d6e721eb000eebd5c69eb31e428f225",
+    "runner_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+    "selected_php_files": null,
+    "started_at_utc": "2026-10-13T07:29:15.859442+00:00",
+    "unittest_reported_tests": 27
+  },
+  {
+    "argv": [
+      "python3",
+      "scripts/ci/test-workflow-cadence.py"
+    ],
+    "completed_at_utc": "2026-10-13T07:29:16.879962+00:00",
+    "cwd": "/workspace/VA-Studio-member-source-currentness",
+    "duration_seconds": 0.087045,
+    "exit": 0,
+    "head_at_start": "cc612650217830d2972efeafa12d4d9652c48524",
+    "log_sha256": "dd818658e9c8008cb354da9371485cb574dabd3d7c356cdfa1c694608942fdca",
+    "runner_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+    "selected_php_files": null,
+    "started_at_utc": "2026-10-13T07:29:16.792747+00:00",
+    "unittest_reported_tests": 14
+  },
+  {
+    "argv": [
+      "vendor/bin/pint",
+      "--test",
+      "app/Domain/Grants/Member/MemberGrantPolicy.php",
+      "app/Domain/Memberships/Production/MembershipCatalogDefinition.php",
+      "app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+      "tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php",
+      "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php",
+      "tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+      "tests/Feature/StagingEnvironmentAdmissionTest.php",
+      "tests/Unit/MembershipCatalogDefinitionTest.php"
+    ],
+    "completed_at_utc": "2026-10-13T07:29:18.081635+00:00",
+    "cwd": "/workspace/VA-Studio-member-source-currentness",
+    "duration_seconds": 1.199139,
+    "exit": 0,
+    "head_at_start": "cc612650217830d2972efeafa12d4d9652c48524",
+    "log_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+    "runner_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+    "selected_php_files": 8,
+    "started_at_utc": "2026-10-13T07:29:16.882309+00:00",
+    "unittest_reported_tests": null
+  }
+]

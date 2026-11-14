@@ -1,0 +1,28 @@
+# Private MySQL 8.4.11 lifecycle (lane F3)
+# initialize.log
+2026-10-18T03:51:04.861750Z 0 [System] [MY-015017] [Server] MySQL Server Initialization - start.
+2026-10-18T03:51:04.863109Z 0 [System] [MY-013169] [Server] /opt/mysql-8.4.11/bin/mysqld (mysqld 8.4.11) initializing of server in progress as process 24521
+2026-10-18T03:51:04.869309Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-18T03:51:05.176082Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-18T03:51:05.765239Z 5 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+2026-10-18T03:51:07.858354Z 0 [System] [MY-015018] [Server] MySQL Server Initialization - end.
+# server.log
+2026-10-18T03:51:07.995351Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-10-18T03:51:08.267358Z 0 [System] [MY-010116] [Server] /opt/mysql-8.4.11/bin/mysqld (mysqld 8.4.11) starting as process 24585
+2026-10-18T03:51:08.291983Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-18T03:51:08.499494Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-18T03:51:08.725408Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-10-18T03:51:08.725438Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-10-18T03:51:08.748267Z 0 [System] [MY-010931] [Server] /opt/mysql-8.4.11/bin/mysqld: ready for connections. Version: '8.4.11'  socket: '/var/lib/va-mysql84-f3-run/mysqld.sock'  port: 33595  MySQL Community Server - GPL.
+2026-10-18T05:32:22.493039Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+2026-10-18T05:32:23.600150Z 0 [System] [MY-010116] [Server] /opt/mysql-8.4.11/bin/mysqld (mysqld 8.4.11) starting as process 3823
+2026-10-18T05:32:23.672689Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2026-10-18T05:32:28.637470Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2026-10-18T05:32:29.987915Z 0 [System] [MY-010229] [Server] Starting XA crash recovery...
+2026-10-18T05:32:30.006214Z 0 [System] [MY-010232] [Server] XA crash recovery finished.
+2026-10-18T05:32:30.088803Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2026-10-18T05:32:30.088834Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2026-10-18T05:32:30.108350Z 0 [System] [MY-010931] [Server] /opt/mysql-8.4.11/bin/mysqld: ready for connections. Version: '8.4.11'  socket: '/var/lib/va-mysql84-f3-run/mysqld.sock'  port: 33595  MySQL Community Server - GPL.
+2026-10-18T05:32:30.289347Z 7 [System] [MY-013172] [Server] Received SHUTDOWN from user root. Shutting down mysqld (Version: 8.4.11).
+2026-10-18T05:32:31.775774Z 0 [System] [MY-010910] [Server] /opt/mysql-8.4.11/bin/mysqld: Shutdown complete (mysqld 8.4.11)  MySQL Community Server - GPL.
+2026-10-18T05:32:31.775796Z 0 [System] [MY-015016] [Server] MySQL Server - end.

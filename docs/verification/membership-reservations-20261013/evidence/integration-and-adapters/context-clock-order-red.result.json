@@ -1,0 +1,15 @@
+{
+  "exit": 1,
+  "duration_seconds": 11.218,
+  "changed_sources": [],
+  "junit": {
+    "name": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationClockClosureTest",
+    "file": "/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipReservationClockClosureTest.php",
+    "tests": "1",
+    "assertions": "15",
+    "errors": "0",
+    "failures": "1",
+    "skipped": "0",
+    "time": "10.965660"
+  }
+}

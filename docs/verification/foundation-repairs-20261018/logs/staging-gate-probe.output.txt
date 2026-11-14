@@ -1,0 +1,14 @@
+# meta (runner start/end, HEAD, dirty count, args)
+start 2026-10-18T03:46:16Z head=efb22df3850ba8500b6d424ceedef64649896fe8 dirty=6 args=/tmp/claude-0/-home-user-VA-Studio/b5dc44df-c06e-5677-8541-57d7464f9ccc/scratchpad/f3/probe/StagingGateProbeTest.php
+end 2026-10-18T03:46:16Z rc=0 secs=0
+# PHPUnit output
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/f3/phpunit.xml
+
+......                                                              6 / 6 (100%)
+
+Time: 00:00.296, Memory: 61.00 MB
+
+OK (6 tests, 34 assertions)

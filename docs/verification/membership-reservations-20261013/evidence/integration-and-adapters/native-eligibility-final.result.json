@@ -1,0 +1,15 @@
+{
+  "exit": 0,
+  "duration_seconds": 226.797,
+  "changed_sources": [],
+  "junit": {
+    "name": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+    "file": "/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+    "tests": "2",
+    "assertions": "12",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "226.550235"
+  }
+}

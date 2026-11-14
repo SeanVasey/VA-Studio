@@ -1,0 +1,71 @@
+{
+  "approved_but_preflight_blocked_sha": "2ff3299111005e2c4bf6a50478e7214edc9cf435",
+  "decision": "APPROVE PRECISE SQLITE CENSUS ORDER REPAIR; FINAL GATES PENDING",
+  "exact_changed_path": "scripts/ci/database-sqlite-skips.json",
+  "historical_census_base": "0fc2391cfd624cfa97fb5d02cc8be94492d8df36",
+  "limits": [
+    "No current pure checks/discovery outcomes are asserted by this source-only repair note.",
+    "Prior failed preflight, dependency failed original/components/continuation and old native runtime evidence remain unchanged.",
+    "All existing default-off/unmounted/host/provider/activation/release/frozen P2 boundaries remain."
+  ],
+  "not_performed": [
+    "No application/tests/DB/network/CI/Composer execution or shared mutation"
+  ],
+  "open_P0_P1_product_findings": [],
+  "prior_preflight": {
+    "exact_head": "2ff3299111005e2c4bf6a50478e7214edc9cf435",
+    "failure": "Parent-provided test-focused-tests50/F1, independently confirmed parser/hash mechanism; existing final job summary shows backend and aggregate failure. Audit now passed per root; do not relabel overall pass.",
+    "run_id": 38722106052,
+    "status": "failed"
+  },
+  "read_commands": [
+    "Read-only Git diff/show, censusJSON set/sequence/SHA comparison and parser/golden-source reading; no execution of checks."
+  ],
+  "recorded_utc": "2026-10-15T10:48:42.375581+00:00",
+  "repair_checks": {
+    "application_dependency_tests_loaders_caps_profiles_not_changed_by_commit": true,
+    "golden_assertion_and_test_bytes_unchanged": true,
+    "historical_sequence_exactly_retained": true,
+    "new_pairs": [
+      [
+        "Tests\\Feature\\PaidTaxDownloadNativeTest",
+        "test_native_duplicate_authorizations_join_one_immutable_result_after_current_buyer_serialization"
+      ],
+      [
+        "Tests\\Feature\\PaidTaxDownloadNativeTest",
+        "test_native_redemption_duplicate_and_last_attempt_races_keep_one_spent_attempt"
+      ]
+    ],
+    "original_first150_SHA256": "d93da4e7a13a8c6aff8f97f363eb6d93dde884bad53c9ae50eeb0ed32514c71c",
+    "retained_historical_pairs": 257,
+    "set_equal_to_previous_reviewed_policy": true,
+    "total_unique_pairs": 259
+  },
+  "required_next_evidence": {
+    "actual_source_loader_manifest_carry": true,
+    "complete_preflight_Python_checks": [
+      "scripts/ci/test-phpunit-shards.py",
+      "scripts/ci/test-ci-scope.py",
+      "scripts/ci/test-workflow-cadence.py",
+      "scripts/ci/test-focused-tests.py",
+      "scripts/ci/test-database-receipts.py",
+      "scripts/ci/test-gitlab-database-receipts.py",
+      "scripts/ci/test-gitlab-writer-feedback.py",
+      "scripts/ci/test-php-test-runtime.py"
+    ],
+    "expected_discovery_case_set": "Unchanged selection membership because pair set is identical; recompute actual source/config/policy/case/group bindings instead of claiming old raw manifest equality.",
+    "extra_app_native_rerun_solely_for_order_delta_required": false,
+    "final_immutable_metadata_evidence_and_publication_head_review": true,
+    "fresh_clean_native_discovery": true,
+    "new_same_head_preflight_expected_SHA_merge": true
+  },
+  "reviewed_sha": "2f3ef182635fbeb1c3b8d0c7c3b277f491c6e9c3",
+  "reviewer_correction": {
+    "actual_contract": "read_selection explicitly sets require_sorted=False for SQLite, True for MySQL; historical first150 pair order is protected by an unchanged test-focused-tests golden hash.",
+    "consequence": "Whole-list sorting disturbed the protected prefix and later genuine preflight failed; the limited52/14/27 policy checks I reviewed did not establish this missing focused-test invariant.",
+    "earlier_error": "My earlier source/metadata assessment required sorting the whole SQLite skip census along with the MySQL policies. That requirement was incorrect.",
+    "preservation": "Earlier review originals remain immutable historical assessments. This additive note corrects the requirement; their earlier canonical-SQLite wording is superseded by the explicit parser/prefix contract.",
+    "severity": "P2, high confidence: development-preflight metadata blocker, caught before merge; not an app authorization/cap change."
+  },
+  "reviewer_role": "Independent non-author"
+}

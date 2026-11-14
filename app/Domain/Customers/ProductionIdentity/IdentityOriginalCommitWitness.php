@@ -23,6 +23,8 @@ final class IdentityOriginalCommitWitness implements JsonSerializable
 
     private SplObjectStorage $receipts;
 
+    private readonly IdentityMetadataAdmission $metadata;
+
     private readonly DatabaseManager $manager;
 
     private readonly Connection $connection;
@@ -48,12 +50,13 @@ final class IdentityOriginalCommitWitness implements JsonSerializable
         $this->primary = $reader->identityPrimary();
         $this->driver = $reader->identityDriver();
         $this->statementAdmission();
+        $this->metadata = IdentityMetadataAdmission::capture($this->primary);
         $this->manager = DB::getFacadeRoot();
         $this->container = app();
         $this->config = config();
         $this->configuration = $this->configuration();
         // Even default connection selection can dereference database configuration. Admit parents first.
-        $this->connection = $this->manager->connection();
+        $this->connection = $this->metadata->connection();
         $this->schema = $this->driver === 'sqlite' ? 'main' : $this->connection->getDatabaseName();
         $this->databaseName = $this->connection->getDatabaseName();
         $this->name = $this->connection->getName();
@@ -162,6 +165,7 @@ final class IdentityOriginalCommitWitness implements JsonSerializable
 
     private function context(int $depth): void
     {
+        $this->metadata->requireCurrent($this->primary);
         $this->statementAdmission();
         $resolved = (new ReflectionProperty(Facade::class, 'resolvedInstance'))->getValue();
         $instances = $this->property(Container::class, 'instances', $this->container);

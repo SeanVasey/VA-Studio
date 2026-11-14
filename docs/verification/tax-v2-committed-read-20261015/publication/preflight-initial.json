@@ -1,0 +1,21 @@
+{
+  "recorded_utc": "2026-10-15T04:09:11.125097+00:00",
+  "argv": [
+    "gh",
+    "run",
+    "list",
+    "--repo",
+    "SeanVasey/VA-Studio",
+    "--workflow",
+    "Development preflight",
+    "--branch",
+    "harness/tax-v2-committed-read-20261015",
+    "--limit",
+    "8",
+    "--json",
+    "databaseId,headSha,status,conclusion,event,url"
+  ],
+  "exit": 0,
+  "stdout": "[{\"conclusion\":\"\",\"databaseId\":38679773420,\"event\":\"pull_request\",\"headSha\":\"78e2c7e773f4fa0a310360b67e50fe24cb6cfa62\",\"status\":\"in_progress\",\"url\":\"https://github.com/SeanVasey/VA-Studio/actions/runs/38679773420\"}]\n",
+  "stderr": ""
+}

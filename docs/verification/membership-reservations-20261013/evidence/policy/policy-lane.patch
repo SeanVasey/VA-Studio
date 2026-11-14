@@ -1,0 +1,646 @@
+diff --git a/app/Domain/Memberships/Production/MembershipPolicyBinding.php b/app/Domain/Memberships/Production/MembershipPolicyBinding.php
+index cd7a9b27..f75cc5d5 100644
+--- a/app/Domain/Memberships/Production/MembershipPolicyBinding.php
++++ b/app/Domain/Memberships/Production/MembershipPolicyBinding.php
+@@ -23,6 +23,7 @@ final readonly class MembershipPolicyBinding
+         public ?string $eligibleLicensePolicyHash,
+         public ?MembershipAwardTerms $awardTerms = null,
+         public array $supportedOperations = [],
++        public ?MembershipRedemptionTerms $redemptionTerms = null,
+     ) {
+         MembershipValues::id($planVersionId);
+         foreach ([$policyHash, $originalTermsHash, $rolloverPolicyHash, $lateInvoicePolicyHash, $cancellationPolicyHash,
+@@ -31,9 +32,18 @@ final readonly class MembershipPolicyBinding
+                 MembershipValues::hash($hash);
+             }
+         }
+-        MembershipException::require($supportedOperations === [] || ($supportedOperations === ['paid_period_award'] && $awardTerms !== null), 'unsupported_policy');
++        MembershipException::require($redemptionTerms === null
++            ? $supportedOperations === [] || ($supportedOperations === ['paid_period_award'] && $awardTerms !== null)
++            : $supportedOperations === ['paid_period_award', 'reserve', 'release', 'expire'] && $awardTerms !== null
++                && $eligibleLicensePolicyHash === $redemptionTerms->eligibilityHash()
++                && $reservationHonorPolicyHash === $redemptionTerms->honorHash(), 'unsupported_policy');
+         MembershipValues::provenance($provenance);
+         MembershipException::require($creditAllowance >= 1 && $creditAllowance <= MembershipPolicy::MAX_CREDITS
+             && $billingPriceMinor >= 0 && preg_match('/\A[A-Z]{3}\z/D', $billingCurrency) === 1, 'invalid_policy_value');
+     }
++
++    public function supports(string $operation): bool
++    {
++        return in_array($operation, $this->supportedOperations, true);
++    }
+ }
+diff --git a/app/Domain/Memberships/Production/MembershipPolicyDocument.php b/app/Domain/Memberships/Production/MembershipPolicyDocument.php
+index 38dd4a0e..3442dec3 100644
+--- a/app/Domain/Memberships/Production/MembershipPolicyDocument.php
++++ b/app/Domain/Memberships/Production/MembershipPolicyDocument.php
+@@ -4,18 +4,23 @@ namespace App\Domain\Memberships\Production;
+ 
+ use App\Support\CanonicalJson;
+ 
+-/** Strict award-policy document. Unsupported benefit/lifecycle operations have no implied rules. */
++/** Strict versioned policy documents. V1 remains award-only; unsupported operations have no implied rules. */
+ final readonly class MembershipPolicyDocument
+ {
+     public const VERSION = 'membership-award-policy-v1';
+ 
+-    private function __construct(public array $facts, public MembershipAwardTerms $awardTerms) {}
++    public const CREDIT_VERSION = 'membership-credit-policy-v2';
++
++    private function __construct(public array $facts, public MembershipAwardTerms $awardTerms,
++        public ?MembershipRedemptionTerms $redemptionTerms) {}
+ 
+     public static function from(array $facts): self
+     {
+-        self::keys($facts, ['schema_version', 'scope', 'provenance', 'plan_name', 'terms_reference', 'terms_text',
+-            'credit_allowance', 'billing_price_minor', 'billing_currency', 'period_source', 'award_terms']);
+-        MembershipException::require($facts['schema_version'] === self::VERSION && $facts['scope'] === 'paid_period_award'
++        $credit = ($facts['schema_version'] ?? null) === self::CREDIT_VERSION;
++        self::keys($facts, [...['schema_version', 'scope', 'provenance', 'plan_name', 'terms_reference', 'terms_text',
++            'credit_allowance', 'billing_price_minor', 'billing_currency', 'period_source', 'award_terms'], ...($credit ? ['redemption_terms'] : [])]);
++        MembershipException::require(($credit ? $facts['scope'] === 'paid_period_credit_lifecycle'
++            : $facts['schema_version'] === self::VERSION && $facts['scope'] === 'paid_period_award')
+             && $facts['period_source'] === 'verified_invoice_line_service_period', 'unsupported_policy');
+         MembershipException::require(is_string($facts['provenance']), 'invalid_policy_value');
+         MembershipValues::provenance($facts['provenance']);
+@@ -29,9 +34,15 @@ final readonly class MembershipPolicyDocument
+             && is_string($facts['billing_currency']) && preg_match('/\A[A-Z]{3}\z/D', $facts['billing_currency']) === 1
+             && is_array($facts['award_terms']), 'invalid_policy_value');
+         $terms = MembershipAwardTerms::from($facts['award_terms']);
+-        CanonicalJson::encode($facts);
++        if ($credit) {
++            MembershipException::require(is_array($facts['redemption_terms']), 'invalid_policy_value');
++        }
++        $redemption = $credit ? MembershipRedemptionTerms::from($facts['redemption_terms']) : null;
++        $canonical = CanonicalJson::encode($facts);
++        // Leave space for the retained author/record envelope under its existing 131072-byte cap.
++        MembershipException::require(! $credit || strlen($canonical) <= 122880, 'invalid_policy_value');
+ 
+-        return new self($facts, $terms);
++        return new self($facts, $terms, $redemption);
+     }
+ 
+     public function hash(): string
+@@ -49,11 +60,13 @@ final readonly class MembershipPolicyDocument
+         return new MembershipPolicyBinding(
+             planVersionId: $id, policyHash: $this->hash(), originalTermsHash: $this->termsHash(),
+             rolloverPolicyHash: null, lateInvoicePolicyHash: hash('sha256', CanonicalJson::encode($this->awardTerms->facts['late_payment'])),
+-            cancellationPolicyHash: null, reservationHonorPolicyHash: null, grandfatherPolicyHash: null, retentionPolicyHash: null,
++            cancellationPolicyHash: null, reservationHonorPolicyHash: $this->redemptionTerms?->honorHash(), grandfatherPolicyHash: null, retentionPolicyHash: null,
+             provenance: $this->facts['provenance'], creditAllowance: $this->facts['credit_allowance'],
+             billingPriceMinor: $this->facts['billing_price_minor'], billingCurrency: $this->facts['billing_currency'],
+             periodPolicyHash: hash('sha256', CanonicalJson::encode(['source' => $this->facts['period_source'], 'expiry' => $this->awardTerms->facts['expiry']])),
+-            eligibleLicensePolicyHash: null, awardTerms: $this->awardTerms, supportedOperations: ['paid_period_award'],
++            eligibleLicensePolicyHash: $this->redemptionTerms?->eligibilityHash(), awardTerms: $this->awardTerms,
++            supportedOperations: $this->redemptionTerms === null ? ['paid_period_award'] : ['paid_period_award', 'reserve', 'release', 'expire'],
++            redemptionTerms: $this->redemptionTerms,
+         );
+     }
+ 
+diff --git a/app/Domain/Memberships/Production/MembershipRedemptionTerms.php b/app/Domain/Memberships/Production/MembershipRedemptionTerms.php
+new file mode 100644
+index 00000000..6ab08984
+--- /dev/null
++++ b/app/Domain/Memberships/Production/MembershipRedemptionTerms.php
+@@ -0,0 +1,124 @@
++<?php
++
++namespace App\Domain\Memberships\Production;
++
++use App\Support\CanonicalJson;
++use DateTimeImmutable;
++use DateTimeZone;
++
++/** Explicit per-period credit rules. These values neither prove catalog facts nor authorize a write. */
++final readonly class MembershipRedemptionTerms
++{
++    public const MAX_RULES = 256;
++
++    public const MAX_HONOR_SECONDS = 315360000;
++
++    private function __construct(public array $facts) {}
++
++    public static function from(array $facts): self
++    {
++        MembershipPolicyDocument::keys($facts, ['eligibility_rules', 'honor', 'release', 'available_expiry']);
++        MembershipException::require(is_array($facts['eligibility_rules']) && array_is_list($facts['eligibility_rules'])
++            && count($facts['eligibility_rules']) >= 1 && count($facts['eligibility_rules']) <= self::MAX_RULES, 'invalid_policy_value');
++        $ids = [];
++        $targets = [];
++        foreach ($facts['eligibility_rules'] as $rule) {
++            MembershipException::require(is_array($rule), 'invalid_policy_value');
++            MembershipPolicyDocument::keys($rule, ['rule_id', 'track_id', 'offer_id', 'offer_revision_id', 'license_version_id',
++                'license_manifest_hash', 'asset_manifest_hash', 'original_terms_hash', 'credit_amount']);
++            MembershipException::require(is_string($rule['rule_id'])
++                && preg_match('/\A[a-z][a-z0-9_-]{0,63}\z/D', $rule['rule_id']) === 1, 'invalid_policy_value');
++            foreach (['track_id', 'offer_id', 'offer_revision_id', 'license_version_id'] as $key) {
++                MembershipException::require(is_int($rule[$key]) && $rule[$key] >= 1 && $rule[$key] <= 2147483647, 'invalid_policy_value');
++            }
++            foreach (['license_manifest_hash', 'asset_manifest_hash', 'original_terms_hash'] as $key) {
++                MembershipException::require(is_string($rule[$key]), 'invalid_policy_value');
++                MembershipValues::hash($rule[$key]);
++            }
++            MembershipException::require(is_int($rule['credit_amount']) && $rule['credit_amount'] >= 1
++                && $rule['credit_amount'] <= MembershipPolicy::MAX_CREDITS, 'invalid_policy_value');
++            $target = implode(':', [$rule['track_id'], $rule['offer_id'], $rule['offer_revision_id'], $rule['license_version_id']]);
++            MembershipException::require(! isset($ids[$rule['rule_id']]) && ! isset($targets[$target]), 'ambiguous_eligibility_rule');
++            $ids[$rule['rule_id']] = $targets[$target] = true;
++        }
++        foreach (['honor', 'release', 'available_expiry'] as $key) {
++            MembershipException::require(is_array($facts[$key]), 'invalid_policy_value');
++        }
++        MembershipPolicyDocument::keys($facts['honor'], ['duration_seconds', 'expiry_mode']);
++        MembershipException::require(is_int($facts['honor']['duration_seconds']) && $facts['honor']['duration_seconds'] >= 1
++            && $facts['honor']['duration_seconds'] <= self::MAX_HONOR_SECONDS
++            && in_array($facts['honor']['expiry_mode'], ['cap_at_credit_expiry', 'allow_beyond_credit_expiry'], true), 'invalid_policy_value');
++        MembershipPolicyDocument::keys($facts['release'], ['before_credit_expiry', 'at_or_after_credit_expiry']);
++        MembershipException::require($facts['release']['before_credit_expiry'] === 'available'
++            && $facts['release']['at_or_after_credit_expiry'] === 'expired', 'unsupported_policy');
++        MembershipPolicyDocument::keys($facts['available_expiry'], ['mode']);
++        MembershipException::require($facts['available_expiry']['mode'] === 'expire_available_at_credit_expiry', 'unsupported_policy');
++
++        return new self($facts);
++    }
++
++    public function rule(string $ruleId): array
++    {
++        foreach ($this->facts['eligibility_rules'] as $rule) {
++            if ($rule['rule_id'] === $ruleId) {
++                return $rule;
++            }
++        }
++        throw new MembershipException('ineligible_license');
++    }
++
++    /** Match only current, producer-authenticated identities; no caller credit amount is accepted. */
++    public function ruleFor(int $trackId, int $offerId, int $offerRevisionId, int $licenseVersionId,
++        string $licenseManifestHash, string $assetManifestHash, string $originalTermsHash): array
++    {
++        foreach ($this->facts['eligibility_rules'] as $rule) {
++            if ([$rule['track_id'], $rule['offer_id'], $rule['offer_revision_id'], $rule['license_version_id'],
++                $rule['license_manifest_hash'], $rule['asset_manifest_hash'], $rule['original_terms_hash']]
++                === [$trackId, $offerId, $offerRevisionId, $licenseVersionId, $licenseManifestHash, $assetManifestHash, $originalTermsHash]) {
++                return $rule;
++            }
++        }
++        throw new MembershipException('ineligible_license');
++    }
++
++    /** An explicit beyond-expiry honor window never permits reserving already expired credits. */
++    public function honorDeadline(string $reservedAt, ?string $creditExpiresAt): string
++    {
++        MembershipValues::utc($reservedAt);
++        if ($creditExpiresAt !== null) {
++            MembershipValues::utc($creditExpiresAt);
++            MembershipException::require($reservedAt < $creditExpiresAt, 'credit_expired');
++        }
++        $deadline = (new DateTimeImmutable($reservedAt, new DateTimeZone('UTC')))
++            ->modify('+'.$this->facts['honor']['duration_seconds'].' seconds')->format('Y-m-d H:i:s');
++        MembershipException::require(strlen($deadline) === 19, 'invalid_policy_value');
++        MembershipValues::utc($deadline);
++        if ($creditExpiresAt !== null && $this->facts['honor']['expiry_mode'] === 'cap_at_credit_expiry') {
++            $deadline = min($deadline, $creditExpiresAt);
++        }
++        MembershipException::require($reservedAt < $deadline, 'invalid_policy_value');
++
++        return $deadline;
++    }
++
++    /** Destination only; this does not authorize an early, voluntary, staff or cancellation release. */
++    public function releaseDestination(string $at, ?string $creditExpiresAt): string
++    {
++        MembershipValues::utc($at);
++        if ($creditExpiresAt !== null) {
++            MembershipValues::utc($creditExpiresAt);
++        }
++
++        return $creditExpiresAt !== null && $at >= $creditExpiresAt ? 'expired' : 'available';
++    }
++
++    public function eligibilityHash(): string
++    {
++        return CanonicalJson::hash($this->facts['eligibility_rules']);
++    }
++
++    public function honorHash(): string
++    {
++        return CanonicalJson::hash($this->facts['honor']);
++    }
++}
+diff --git a/tests/Feature/ProductionMembership/MembershipRedemptionPolicyFactsTest.php b/tests/Feature/ProductionMembership/MembershipRedemptionPolicyFactsTest.php
+new file mode 100644
+index 00000000..cfc0230a
+--- /dev/null
++++ b/tests/Feature/ProductionMembership/MembershipRedemptionPolicyFactsTest.php
+@@ -0,0 +1,128 @@
++<?php
++
++namespace Tests\Feature\ProductionMembership;
++
++use App\Domain\Memberships\Production\MembershipException;
++use App\Domain\Memberships\Production\MembershipPolicy;
++use App\Domain\Memberships\Production\MembershipPolicyDocument;
++use App\Domain\Memberships\Production\MembershipPolicyVersions;
++use App\Domain\Memberships\Production\MembershipRecords;
++use App\Domain\Memberships\Production\MembershipRows;
++use App\Domain\Memberships\Production\SealedMembershipPolicyFacts;
++use App\Support\CanonicalJson;
++use Illuminate\Database\QueryException;
++use Illuminate\Support\Facades\DB;
++use Tests\Support\FinalizationDatabaseMigrations;
++use Tests\Support\MembershipPolicyFixtures;
++use Tests\TestCase;
++
++class MembershipRedemptionPolicyFactsTest extends TestCase
++{
++    use FinalizationDatabaseMigrations;
++    use MembershipPolicyFixtures;
++
++    protected function setUp(): void
++    {
++        parent::setUp();
++        $this->policySetup();
++    }
++
++    public function test_current_mfa_author_retains_v2_and_real_producer_preserves_v1_without_mutating_or_upgrading_it(): void
++    {
++        $author = $this->policyStaff();
++        $v1 = $this->createPolicy($author);
++        $old = (array) DB::table(MembershipRecords::TABLE)->where('id', $v1['id'])->sole();
++        $v2 = $this->createPolicy($author, $this->creditInput());
++        $this->assertNotSame($v1['id'], $v2['id']);
++        $this->assertNotSame($v1['policy_hash'], $v2['policy_hash']);
++        $this->assertSame($v2, $this->createPolicy($author, $this->creditInput()));
++        $this->assertSame(2, DB::table(MembershipRecords::TABLE)->count());
++        foreach ([$v1, $v2] as $retained) {
++            config(['production-memberships.enabled' => true, 'production-memberships.approved_policy_hash' => $retained['policy_hash']]);
++            DB::transaction(function () use ($retained, $v2): void {
++                $rows = new MembershipRows;
++                $source = new SealedMembershipPolicyFacts;
++                $proof = $source->lock($retained['id'], $rows);
++                $source->proveCurrent($proof, $rows);
++                $binding = $proof->binding();
++                $this->assertSame($retained['policy_hash'], $binding->policyHash);
++                $this->assertTrue($binding->supports('paid_period_award'));
++                $this->assertSame($retained === $v2, $binding->supports('reserve'));
++                $this->assertFalse($binding->supports('consume'));
++                if ($retained === $v2) {
++                    $this->assertSame(2, $binding->redemptionTerms->rule('synthetic-wav')['credit_amount']);
++                    $this->assertSame('2026-10-13 00:30:00', $binding->redemptionTerms->honorDeadline('2026-10-13 00:00:00', '2026-10-13 00:30:00'));
++                } else {
++                    $this->assertNull($binding->redemptionTerms);
++                    $this->assertNull($binding->eligibleLicensePolicyHash);
++                    $this->assertNull($binding->reservationHonorPolicyHash);
++                }
++            });
++        }
++        $this->assertSame($old, (array) DB::table(MembershipRecords::TABLE)->where('id', $v1['id'])->sole());
++        $new = (array) DB::table(MembershipRecords::TABLE)->where('id', $v2['id'])->sole();
++        $document = MembershipPolicyVersions::document($new);
++        $this->assertSame(CanonicalJson::encode($this->creditInput()['redemption_terms']), CanonicalJson::encode($document->redemptionTerms->facts));
++        $this->assertStringNotContainsString('synthetic-wav', $new['payload_ciphertext']);
++        foreach (['production_membership_paid_periods', 'production_membership_redemptions', 'production_membership_credit_events'] as $table) {
++            $this->assertSame(0, DB::table($table)->count());
++        }
++        try {
++            (new MembershipPolicy)->current();
++            $this->fail('Authoring real terms cannot replace the complete operative capability gate.');
++        } catch (MembershipException $error) {
++            $this->assertSame('source_capability_absent', $error->reason);
++        }
++        foreach (['update', 'delete'] as $verb) {
++            try {
++                $query = DB::table(MembershipRecords::TABLE)->where('id', $v2['id']);
++                $verb === 'update' ? $query->update(['created_at' => '2026-01-01 00:00:00']) : $query->delete();
++                $this->fail('Retained v2 policy remains immutable.');
++            } catch (QueryException) {
++                $this->addToAssertionCount(1);
++            }
++        }
++    }
++
++    public function test_v2_authoring_requires_current_staff_mfa_and_does_not_gain_an_exception_from_explicit_terms(): void
++    {
++        foreach ([$this->policyStaff(false), $this->policyStaff(true, ['is_admin' => false])] as $author) {
++            try {
++                $this->createPolicy($author, $this->creditInput());
++                $this->fail('Explicit terms never replace current staff authorization.');
++            } catch (MembershipException $error) {
++                $this->assertContains($error->reason, ['mfa_required', 'staff_refused']);
++            }
++        }
++        $this->assertSame(0, DB::table(MembershipRecords::TABLE)->count());
++    }
++
++    public function test_a_different_credit_policy_is_not_approved_by_the_old_hash_and_new_approval_does_not_upgrade_v1(): void
++    {
++        $v1 = $this->createPolicy();
++        $v2 = $this->createPolicy(overrides: $this->creditInput());
++        foreach ([[$v1['policy_hash'], $v2['id']], [$v2['policy_hash'], $v1['id']]] as [$approved, $id]) {
++            config(['production-memberships.enabled' => true, 'production-memberships.approved_policy_hash' => $approved]);
++            try {
++                DB::transaction(fn () => (new SealedMembershipPolicyFacts)->lock($id, new MembershipRows));
++                $this->fail('A different retained version cannot inherit approval.');
++            } catch (MembershipException $error) {
++                $this->assertSame('policy_not_approved', $error->reason);
++            }
++        }
++        $row = (array) DB::table(MembershipRecords::TABLE)->where('id', $v1['id'])->sole();
++        $this->assertNull(MembershipPolicyVersions::document($row)->redemptionTerms);
++        $this->assertSame(2, DB::table(MembershipRecords::TABLE)->count());
++    }
++
++    private function creditInput(): array
++    {
++        return ['schema_version' => MembershipPolicyDocument::CREDIT_VERSION, 'scope' => 'paid_period_credit_lifecycle',
++            'redemption_terms' => ['eligibility_rules' => [['rule_id' => 'synthetic-wav', 'track_id' => 1, 'offer_id' => 2,
++                'offer_revision_id' => 3, 'license_version_id' => 4, 'license_manifest_hash' => str_repeat('a', 64),
++                'asset_manifest_hash' => str_repeat('b', 64), 'original_terms_hash' => str_repeat('c', 64), 'credit_amount' => 2]],
++                'honor' => ['duration_seconds' => 3600, 'expiry_mode' => 'cap_at_credit_expiry'],
++                'release' => ['before_credit_expiry' => 'available', 'at_or_after_credit_expiry' => 'expired'],
++                'available_expiry' => ['mode' => 'expire_available_at_credit_expiry']]];
++    }
++}
+diff --git a/tests/Unit/MembershipRedemptionPolicyTest.php b/tests/Unit/MembershipRedemptionPolicyTest.php
+new file mode 100644
+index 00000000..43abbd57
+--- /dev/null
++++ b/tests/Unit/MembershipRedemptionPolicyTest.php
+@@ -0,0 +1,277 @@
++<?php
++
++namespace Tests\Unit;
++
++use App\Domain\Memberships\Production\MembershipException;
++use App\Domain\Memberships\Production\MembershipPolicyDocument;
++use App\Domain\Memberships\Production\MembershipRecords;
++use App\Domain\Memberships\Production\MembershipRedemptionTerms;
++use App\Support\CanonicalJson;
++use Illuminate\Support\Arr;
++use PHPUnit\Framework\Attributes\DataProvider;
++use PHPUnit\Framework\TestCase;
++use Tests\Support\MembershipPolicyFixtures;
++
++class MembershipRedemptionPolicyTest extends TestCase
++{
++    use MembershipPolicyFixtures;
++
++    public function test_v1_canonical_bytes_hashes_and_record_seal_are_unchanged_and_no_redemption_is_implied(): void
++    {
++        $document = MembershipPolicyDocument::from($this->policyInput());
++        $canonical = '{"award_terms":{"expiry":{"mode":"after_period_end","seconds":86400},"late_payment":{"mode":"grace","seconds":3600}},"billing_currency":"USD","billing_price_minor":1700,"credit_allowance":3,"period_source":"verified_invoice_line_service_period","plan_name":"SYNTHETIC policy fixture","provenance":"synthetic_rehearsal","schema_version":"membership-award-policy-v1","scope":"paid_period_award","terms_reference":"synthetic-policy-20261013","terms_text":"SYNTHETIC TEST TERMS. Not a customer offer or legal text."}';
++        $this->assertSame($canonical, CanonicalJson::encode($document->facts));
++        $this->assertSame('6a473aff176f624108bdd1d741de307aba7c05195b0e7aa52cdd74e9af0e1aef', $document->hash());
++        $this->assertSame('1e8cd3e4d59f973284f18ea8762b48619ffea1a3ea8eebd2a95709bfcfe22366', $document->termsHash());
++        // This fixed synthetic ciphertext only tests unchanged keyed-seal bytes, never a valid retained record.
++        $row = ['id' => '00000000-0000-4000-8000-000000000001', 'policy_hash' => $document->hash(),
++            'original_terms_hash' => $document->termsHash(), 'provenance' => 'synthetic_rehearsal',
++            'payload_ciphertext' => 'SYNTHETIC fixed retained ciphertext bytes', 'created_at' => '2026-10-13 00:00:00'];
++        $this->assertSame('5b12aa933d15f7a8bed87e5d3720c689ecc9193d23823d482ec6bd09c2cf2f74', MembershipRecords::seal($row, 'SYNTHETIC fixed policy seal key 32+'));
++        $binding = $document->binding($row['id']);
++        $this->assertNull($document->redemptionTerms);
++        $this->assertNull($binding->redemptionTerms);
++        $this->assertNull($binding->eligibleLicensePolicyHash);
++        $this->assertNull($binding->reservationHonorPolicyHash);
++        $this->assertSame(['paid_period_award'], $binding->supportedOperations);
++        $this->assertTrue($binding->supports('paid_period_award'));
++        foreach (['reserve', 'release', 'expire', 'consume'] as $operation) {
++            $this->assertFalse($binding->supports($operation));
++        }
++    }
++
++    public function test_v2_exposes_only_explicit_credit_operations_and_retained_exact_cost_rules(): void
++    {
++        $input = $this->creditInput();
++        $document = MembershipPolicyDocument::from($input);
++        $binding = $document->binding('00000000-0000-4000-8000-000000000002');
++        $this->assertSame($input, $document->facts);
++        $this->assertSame($document->redemptionTerms, $binding->redemptionTerms);
++        $this->assertSame(['paid_period_award', 'reserve', 'release', 'expire'], $binding->supportedOperations);
++        $this->assertFalse($binding->supports('consume'));
++        $this->assertFalse($binding->supports('cancellation'));
++        $this->assertSame(CanonicalJson::hash($input['redemption_terms']['eligibility_rules']), $binding->eligibleLicensePolicyHash);
++        $this->assertSame(CanonicalJson::hash($input['redemption_terms']['honor']), $binding->reservationHonorPolicyHash);
++        $rule = $document->redemptionTerms->rule('synthetic-wav');
++        $this->assertSame(2, $rule['credit_amount']);
++        $this->assertSame($rule, $document->redemptionTerms->ruleFor(1, 2, 3, 4, str_repeat('a', 64), str_repeat('b', 64), str_repeat('c', 64)));
++        $this->assertNull($binding->rolloverPolicyHash);
++        $this->assertNull($binding->cancellationPolicyHash);
++        $this->assertNull($binding->grandfatherPolicyHash);
++        $this->assertNull($binding->retentionPolicyHash);
++        $rule['credit_amount'] = 999;
++        $this->assertSame(2, $document->redemptionTerms->rule('synthetic-wav')['credit_amount']);
++    }
++
++    public static function invalidDocuments(): array
++    {
++        return [
++            ['schema_version', 'membership-credit-policy-v3'], ['scope', 'paid_period_award'],
++            ['redemption_terms', null], ['redemption_terms.eligibility_rules', []],
++            ['redemption_terms.eligibility_rules', ['named' => []]], ['redemption_terms.eligibility_rules.0', false],
++            ['redemption_terms.eligibility_rules.0.rule_id', ''], ['redemption_terms.eligibility_rules.0.rule_id', 'UPPER'],
++            ['redemption_terms.eligibility_rules.0.rule_id', str_repeat('a', 65)], ['redemption_terms.eligibility_rules.0.rule_id', 'has space'],
++            ['redemption_terms.eligibility_rules.0.track_id', '1'], ['redemption_terms.eligibility_rules.0.track_id', 0],
++            ['redemption_terms.eligibility_rules.0.offer_id', 1.0], ['redemption_terms.eligibility_rules.0.offer_id', 2147483648],
++            ['redemption_terms.eligibility_rules.0.offer_revision_id', -1], ['redemption_terms.eligibility_rules.0.license_version_id', true],
++            ['redemption_terms.eligibility_rules.0.license_manifest_hash', str_repeat('A', 64)],
++            ['redemption_terms.eligibility_rules.0.asset_manifest_hash', str_repeat('b', 63)],
++            ['redemption_terms.eligibility_rules.0.original_terms_hash', null],
++            ['redemption_terms.eligibility_rules.0.credit_amount', 0], ['redemption_terms.eligibility_rules.0.credit_amount', 1000001],
++            ['redemption_terms.eligibility_rules.0.credit_amount', '2'], ['redemption_terms.eligibility_rules.0.extra', true],
++            ['redemption_terms.honor', null], ['redemption_terms.honor.duration_seconds', 0],
++            ['redemption_terms.honor.duration_seconds', '3600'], ['redemption_terms.honor.duration_seconds', 315360001],
++            ['redemption_terms.honor.expiry_mode', 'default'], ['redemption_terms.honor.extra', true],
++            ['redemption_terms.release', []], ['redemption_terms.release.before_credit_expiry', 'consumed'],
++            ['redemption_terms.release.at_or_after_credit_expiry', 'available'],
++            ['redemption_terms.available_expiry.mode', 'expire_reserved'], ['redemption_terms.consume', true],
++            ['supported_operations', ['consume']],
++        ];
++    }
++
++    #[DataProvider('invalidDocuments')]
++    public function test_v2_refuses_missing_typed_facts_unknown_rules_and_unsupported_operations(string $path, mixed $value): void
++    {
++        $input = $this->creditInput();
++        Arr::set($input, $path, $value);
++        $this->expectException(MembershipException::class);
++        MembershipPolicyDocument::from($input);
++    }
++
++    public function test_each_redemption_term_and_each_rule_member_is_required_without_a_default(): void
++    {
++        $input = $this->creditInput();
++        $paths = ['redemption_terms'];
++        foreach (array_keys($input['redemption_terms']) as $key) {
++            $paths[] = 'redemption_terms.'.$key;
++        }
++        foreach (array_keys($input['redemption_terms']['eligibility_rules'][0]) as $key) {
++            $paths[] = 'redemption_terms.eligibility_rules.0.'.$key;
++        }
++        foreach (['honor', 'release', 'available_expiry'] as $group) {
++            foreach (array_keys($input['redemption_terms'][$group]) as $key) {
++                $paths[] = 'redemption_terms.'.$group.'.'.$key;
++            }
++        }
++        foreach ($paths as $path) {
++            $missing = $input;
++            Arr::forget($missing, $path);
++            try {
++                MembershipPolicyDocument::from($missing);
++                $this->fail('Missing explicit field admitted: '.$path);
++            } catch (MembershipException) {
++                $this->addToAssertionCount(1);
++            }
++        }
++    }
++
++    public function test_v1_cannot_be_augmented_with_redemption_terms_and_an_unknown_version_is_not_inferred(): void
++    {
++        foreach ([['redemption_terms' => $this->terms()], ['schema_version' => 'membership-credit-policy-v2']] as $override) {
++            try {
++                MembershipPolicyDocument::from($this->policyInput($override));
++                $this->fail('An old policy cannot gain implied redemption authority.');
++            } catch (MembershipException) {
++                $this->addToAssertionCount(1);
++            }
++        }
++    }
++
++    public function test_duplicate_rule_ids_or_duplicate_exact_revision_targets_are_refused(): void
++    {
++        foreach (['duplicate_id', 'duplicate_target'] as $kind) {
++            $facts = $this->terms();
++            $other = $facts['eligibility_rules'][0];
++            $other[$kind === 'duplicate_id' ? 'track_id' : 'rule_id'] = $kind === 'duplicate_id' ? 99 : 'other-synthetic-rule';
++            $other['credit_amount'] = 7;
++            $facts['eligibility_rules'][] = $other;
++            try {
++                MembershipRedemptionTerms::from($facts);
++                $this->fail('Conflicting rule must not be selected by array order.');
++            } catch (MembershipException $error) {
++                $this->assertSame('ambiguous_eligibility_rule', $error->reason);
++            }
++        }
++    }
++
++    public function test_changed_cost_hash_or_honor_is_a_new_document_and_authored_rule_order_is_preserved(): void
++    {
++        $original = MembershipPolicyDocument::from($this->creditInput());
++        foreach (['redemption_terms.eligibility_rules.0.credit_amount' => 3,
++            'redemption_terms.eligibility_rules.0.original_terms_hash' => str_repeat('d', 64),
++            'redemption_terms.honor.duration_seconds' => 7200,
++            'redemption_terms.honor.expiry_mode' => 'allow_beyond_credit_expiry'] as $path => $value) {
++            $changed = $this->creditInput();
++            Arr::set($changed, $path, $value);
++            $this->assertNotSame($original->hash(), MembershipPolicyDocument::from($changed)->hash());
++        }
++        $facts = $this->terms();
++        $other = [...$facts['eligibility_rules'][0], 'rule_id' => 'another-synthetic-rule', 'offer_revision_id' => 9];
++        $facts['eligibility_rules'][] = $other;
++        $this->assertSame($facts, MembershipRedemptionTerms::from($facts)->facts);
++        $reverse = $facts;
++        $reverse['eligibility_rules'] = array_reverse($reverse['eligibility_rules']);
++        $this->assertNotSame(MembershipRedemptionTerms::from($facts)->eligibilityHash(), MembershipRedemptionTerms::from($reverse)->eligibilityHash());
++    }
++
++    public static function changedSelectionFields(): array
++    {
++        return [[0, 99], [1, 99], [2, 99], [3, 99], [4, str_repeat('d', 64)], [5, str_repeat('e', 64)], [6, str_repeat('f', 64)]];
++    }
++
++    #[DataProvider('changedSelectionFields')]
++    public function test_every_current_identity_and_manifest_must_match_the_retained_rule(int $index, int|string $replacement): void
++    {
++        $selection = [1, 2, 3, 4, str_repeat('a', 64), str_repeat('b', 64), str_repeat('c', 64)];
++        $selection[$index] = $replacement;
++        try {
++            MembershipRedemptionTerms::from($this->terms())->ruleFor(...$selection);
++            $this->fail('Changed current selection was admitted.');
++        } catch (MembershipException $error) {
++            $this->assertSame('ineligible_license', $error->reason);
++        }
++    }
++
++    public function test_unknown_rule_does_not_fall_back_to_another_cost(): void
++    {
++        $this->expectException(MembershipException::class);
++        MembershipRedemptionTerms::from($this->terms())->rule('missing');
++    }
++
++    public function test_explicit_honor_modes_and_release_destinations_observe_exact_expiry_boundaries(): void
++    {
++        $at = '2026-10-13 00:00:00';
++        $expiry = '2026-10-13 00:30:00';
++        $cap = MembershipRedemptionTerms::from($this->terms());
++        $beyond = MembershipRedemptionTerms::from([...$this->terms(), 'honor' => ['duration_seconds' => 3600, 'expiry_mode' => 'allow_beyond_credit_expiry']]);
++        $this->assertSame($expiry, $cap->honorDeadline($at, $expiry));
++        $this->assertSame('2026-10-13 01:00:00', $beyond->honorDeadline($at, $expiry));
++        foreach ([$cap, $beyond] as $terms) {
++            $this->assertSame('2026-10-13 01:00:00', $terms->honorDeadline($at, null));
++            $this->assertSame('2026-10-13 01:00:00', $terms->honorDeadline($at, '2026-10-13 02:00:00'));
++            $this->assertSame('available', $terms->releaseDestination('2026-10-13 00:29:59', $expiry));
++            $this->assertSame('expired', $terms->releaseDestination($expiry, $expiry));
++            $this->assertSame('expired', $terms->releaseDestination('2026-10-13 00:30:01', $expiry));
++            $this->assertSame('available', $terms->releaseDestination('9999-12-31 23:59:59', null));
++            foreach ([$expiry, '2026-10-13 00:30:01'] as $late) {
++                try {
++                    $terms->honorDeadline($late, $expiry);
++                    $this->fail('Beyond-expiry honor does not create new credits.');
++                } catch (MembershipException $error) {
++                    $this->assertSame('credit_expired', $error->reason);
++                }
++            }
++        }
++    }
++
++    public function test_date_overflow_and_noncanonical_utc_values_refuse(): void
++    {
++        $terms = MembershipRedemptionTerms::from($this->terms());
++        foreach ([['9999-12-31 23:59:59', null], ['2026-02-30 00:00:00', null],
++            ['2026-10-13T00:00:00Z', null], ['2026-10-13 00:00:00', 'not-a-date']] as [$at, $expiry]) {
++            try {
++                $terms->honorDeadline($at, $expiry);
++                $this->fail('Unrepresentable or noncanonical deadline admitted.');
++            } catch (MembershipException) {
++                $this->addToAssertionCount(1);
++            }
++        }
++    }
++
++    public function test_rule_count_and_retained_document_size_are_bounded(): void
++    {
++        $facts = $this->terms();
++        $rule = $facts['eligibility_rules'][0];
++        $facts['eligibility_rules'] = [];
++        for ($i = 1; $i <= 256; $i++) {
++            $facts['eligibility_rules'][] = [...$rule, 'rule_id' => 'synthetic-'.$i, 'offer_revision_id' => $i];
++        }
++        $this->assertCount(256, MembershipRedemptionTerms::from($facts)->facts['eligibility_rules']);
++        $tooMany = $facts;
++        $tooMany['eligibility_rules'][] = [...$rule, 'rule_id' => 'synthetic-257', 'offer_revision_id' => 257];
++        foreach ([['redemption_terms' => $tooMany], ['redemption_terms' => $facts, 'terms_text' => str_repeat('S', 65536)]] as $override) {
++            try {
++                MembershipPolicyDocument::from([...$this->creditInput(), ...$override]);
++                $this->fail('Oversized retained policy admitted.');
++            } catch (MembershipException) {
++                $this->addToAssertionCount(1);
++            }
++        }
++    }
++
++    private function creditInput(): array
++    {
++        return $this->policyInput(['schema_version' => MembershipPolicyDocument::CREDIT_VERSION,
++            'scope' => 'paid_period_credit_lifecycle', 'redemption_terms' => $this->terms()]);
++    }
++
++    private function terms(): array
++    {
++        return ['eligibility_rules' => [['rule_id' => 'synthetic-wav', 'track_id' => 1, 'offer_id' => 2,
++            'offer_revision_id' => 3, 'license_version_id' => 4, 'license_manifest_hash' => str_repeat('a', 64),
++            'asset_manifest_hash' => str_repeat('b', 64), 'original_terms_hash' => str_repeat('c', 64), 'credit_amount' => 2]],
++            'honor' => ['duration_seconds' => 3600, 'expiry_mode' => 'cap_at_credit_expiry'],
++            'release' => ['before_credit_expiry' => 'available', 'at_or_after_credit_expiry' => 'expired'],
++            'available_expiry' => ['mode' => 'expire_available_at_credit_expiry']];
++    }
++}

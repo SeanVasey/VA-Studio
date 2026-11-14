@@ -47,7 +47,7 @@ class BillingNativeIntervalRetrievalRaceTest extends TestCase
         $ledger = new BillingLedger;
         $chain = $ledger->observations($seed['invoice_id']);
         $this->assertSame(['settled', 'reversed'], array_column($chain, 'outcome'));
-        $this->assertNull($ledger->currentSettled($seed['invoice_id'], time()), 'The older settled read must never become the tail.');
+        $this->assertNull($ledger->currentSettled($seed['invoice_id']), 'The older settled read must never become the tail.');
         // B's two positions were issued (start after A's start, end after A's end) but back no observation.
         $this->assertSame(6, DB::table('production_membership_billing_positions')->where('kind', 'retrieval')->count());
         $this->assertSame(1, DB::table('production_membership_billing_invoices')->count());
@@ -76,7 +76,7 @@ class BillingNativeIntervalRetrievalRaceTest extends TestCase
         $this->assertSame(['reversed', 3], [$retry['outcome'], $retry['sequence']]);
         $ledger = new BillingLedger;
         $this->assertSame(['settled', 'settled', 'reversed'], array_column($ledger->observations($seed['invoice_id']), 'outcome'));
-        $this->assertNull($ledger->currentSettled($seed['invoice_id'], time()));
+        $this->assertNull($ledger->currentSettled($seed['invoice_id']));
         $this->assertSame(0, DB::table('production_membership_credit_events')->count());
     }
 

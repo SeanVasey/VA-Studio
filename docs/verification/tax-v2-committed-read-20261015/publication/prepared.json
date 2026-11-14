@@ -1,0 +1,7 @@
+{
+  "prepared_utc": "2026-10-15T04:05:35.655976+00:00",
+  "expected_head": "78e2c7e773f4fa0a310360b67e50fe24cb6cfa62",
+  "body_file": "/workspace/runtime/tax-v2-committed-read-publication-20261015/pr-body.md",
+  "title": "Add Tax V2 receipts for original committed-source reads",
+  "status": "Prepared only, not yet pushed/created. Independent exact-head carry pending."
+}

@@ -5,6 +5,7 @@ namespace App\Domain\Rights;
 use App\Domain\Rights\Models\LicenseReviewEvidence;
 use App\Domain\Rights\Models\LicenseVersion;
 use App\Support\CanonicalJson;
+use App\Support\PublicReadMemo;
 use Carbon\CarbonInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -15,11 +16,30 @@ final class VerifiedLicense
 {
     public function available(LicenseVersion $version, ?CarbonInterface $at = null): bool
     {
-        try {
-            return $this->availableVersion($version->fresh(), $at);
-        } catch (Throwable) {
-            return false;
+        if (! PublicReadMemo::active() || $version->getKey() === null) {
+            try {
+                return $this->availableVersion($version->fresh(), $at);
+            } catch (Throwable) {
+                return false;
+            }
         }
+        // Within one public read decision the current row and its review evidence are read and checked once; the effective window is
+        // still judged at every call, so the answer is the same as availableVersion() above.
+        $current = PublicReadMemo::remember('license-reviewed:'.$version->getKey(), function () use ($version): ?LicenseVersion {
+            try {
+                $fresh = $version->fresh();
+                if (! $fresh || $fresh->status !== 'published' || ! $fresh->published_at) {
+                    return null;
+                }
+                $this->assertReviewed($fresh);
+
+                return $fresh;
+            } catch (Throwable) {
+                return null;
+            }
+        });
+
+        return $current !== null && $this->effective($current, $at);
     }
 
     /** Publication callers already hold actor, track and offer locks before this license fence. */
@@ -45,6 +65,12 @@ final class VerifiedLicense
             return false;
         }
         $this->assertReviewed($version);
+
+        return $this->effective($version, $at);
+    }
+
+    private function effective(LicenseVersion $version, ?CarbonInterface $at): bool
+    {
         $at ??= now();
 
         return (! $version->effective_from || $at->greaterThanOrEqualTo($version->effective_from))

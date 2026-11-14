@@ -4,6 +4,7 @@ namespace App\Domain\Commerce\ProductionPreparation;
 
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Catalog\TrackVisibility;
 use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Commerce\ProductionPolicy\MachinePolicyV1 as Check;
 use App\Domain\Media\MediaProfile;
@@ -84,7 +85,7 @@ final class PreparationSelection
         $lines = [];
         foreach ($items as $item) {
             $track = self::one($graph['tracks'], $item['trackId']);
-            Check::require($track['status'] === 'published' && $track['published_at'] !== null && $track['publication_version'] >= 1
+            Check::require(TrackVisibility::isLive($track['status']) && $track['published_at'] !== null && $track['publication_version'] >= 1
                 && is_int($track['metadata_version']) && $track['metadata_version'] >= 0 && $track['metadata_version'] <= 2147483647
                 && $track['published_slug'] === $track['slug'] && $track['bpm'] >= 20 && $track['bpm'] <= 400);
             foreach (['title', 'slug', 'artist', 'genre', 'musical_key'] as $field) {
@@ -228,7 +229,7 @@ final class PreparationSelection
     private static function media(array $graph, array $asset): void
     {
         Check::require($asset['status'] === 'ready' && $asset['disk'] === 'local' && $asset['verified_at'] !== null && $asset['verified_by'] > 0
-            && $asset['parent_asset_id'] > 0 && $asset['processing_run_id'] > 0 && preg_match('~\Amedia/revisions/[a-f0-9-]{36}/(?:master\.wav|delivery\.mp3|preview\.mp3|artwork\.png|stems\.zip)\z~D', $asset['storage_path']) === 1);
+            && $asset['parent_asset_id'] > 0 && $asset['processing_run_id'] > 0 && preg_match('~\Amedia/revisions/[a-f0-9-]{36}/(?:master\.wav|delivery\.mp3|preview\.mp3|preview-untagged\.mp3|artwork\.png|stems\.zip)\z~D', $asset['storage_path']) === 1);
         $source = self::one($graph['media'], $asset['parent_asset_id']);
         $run = self::one($graph['runs'], $asset['processing_run_id']);
         $profile = self::json($run['profile']);
@@ -238,8 +239,10 @@ final class PreparationSelection
             && $run['status'] === 'completed' && $run['completed_at'] !== null && $run['input_sha256'] === $source['sha256']
             && $run['profile_fingerprint'] === (new MediaProfile)->fingerprint($profile) && in_array($asset['id'], $ids, true));
         self::scan($evidence['source_scan'] ?? [], $run['input_sha256']);
+        // As VerifiedMedia: a master run from before the untagged preview existed has three outputs, a current one four.
         $expected = match ($source['role']) {
-            'master_wav' => ['download_mp3', 'master_wav', 'preview_tagged'], 'artwork' => ['artwork'], 'stems_zip' => ['stems_zip'], default => []
+            'master_wav' => [['download_mp3', 'master_wav', 'preview_tagged'], ['download_mp3', 'master_wav', 'preview_tagged', 'preview_untagged']],
+            'artwork' => [['artwork']], 'stems_zip' => [['stems_zip']], default => []
         };
         $outputs = array_values(array_filter($graph['outputs'], fn (array $r): bool => $r['processing_run_id'] === $run['id']));
         $roles = array_column($outputs, 'role');
@@ -247,7 +250,7 @@ final class PreparationSelection
         $actualIds = array_column($outputs, 'id');
         sort($actualIds);
         sort($ids);
-        Check::require($expected !== [] && $roles === $expected && $actualIds === $ids);
+        Check::require($expected !== [] && in_array($roles, $expected, true) && $actualIds === $ids);
         foreach ($outputs as $output) {
             Check::require($output['track_id'] === $source['track_id'] && $output['parent_asset_id'] === $source['id'] && $output['status'] === 'ready');
         }
@@ -260,6 +263,10 @@ final class PreparationSelection
         $metadata = self::json($asset['technical_metadata']);
         if ($source['role'] === 'stems_zip') {
             Check::require((new StemsArchive)->hasEvidence($metadata, $asset['sha256'], $profile));
+        }
+        if ($asset['role'] === 'preview_untagged') {
+            Check::require(! empty($metadata['waveform']) && ($metadata['waveform_sha256'] ?? null) === hash('sha256', json_encode($metadata['waveform'], JSON_THROW_ON_ERROR))
+                && ($metadata['tagged'] ?? null) === false && ($metadata['full_length'] ?? null) === true && ! array_key_exists('tag_sha256', $metadata));
         }
         if ($asset['role'] === 'preview_tagged') {
             Check::require(! empty($metadata['waveform']) && ($metadata['waveform_sha256'] ?? null) === hash('sha256', json_encode($metadata['waveform'], JSON_THROW_ON_ERROR))

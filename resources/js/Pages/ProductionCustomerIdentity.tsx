@@ -4,7 +4,7 @@ import { identityRequestKey, productionIdentityRequest, takeProductionIdentityPr
 import '../../css/customer-account.css';
 
 type Mode = 'enroll' | 'recover' | 'complete' | 'sign-in' | 'account';
-export default function ProductionCustomerIdentity({ mode, rehearsal }: { mode: Mode; rehearsal: boolean }) {
+export default function ProductionCustomerIdentity({ mode, rehearsal, featuresMounted = false }: { mode: Mode; rehearsal: boolean; featuresMounted?: boolean }) {
   const id = useId(), [email, setEmail] = useState(''), [password, setPassword] = useState(''), [name, setName] = useState('');
   const [message, setMessage] = useState(''), [busy, setBusy] = useState(false), [saved, setSaved] = useState(false), [closed, setClosed] = useState(false);
   const proof = useRef<IdentityProof | null>(null), captured = useRef(false), pending = useRef(false), active = useRef(true);
@@ -65,6 +65,7 @@ export default function ProductionCustomerIdentity({ mode, rehearsal }: { mode: 
       {(mode === 'enroll' || mode === 'recover') && <p>Use your own email address. {mode === 'recover' ? 'Recovery keeps your original account and purchases.' : 'Choose a password after opening your private link.'}</p>}
       {mode === 'complete' && <p>Choose a password with at least twelve characters, including letters and numbers. The name you enter is your declaration.</p>}
       {mode === 'account' && <p>Your account is signed in.</p>}
+      {mode === 'account' && featuresMounted && !closed && <a className="text-link customer-account-back" href="/customer/features">Listening library and communication preferences</a>}
       {message && <div className="customer-account-message" role={saved ? 'status' : 'alert'} tabIndex={-1} ref={summary}>{message}</div>}
       {!saved && <form ref={form} className="customer-sign-in" onSubmit={event => void submit(event)} aria-busy={busy}>
         {(mode === 'enroll' || mode === 'recover' || mode === 'sign-in') && <div className="customer-account-field"><label htmlFor={`${id}-email`}>Email address</label><input id={`${id}-email`} type="email" autoComplete="email" required maxLength={254} value={email} readOnly={locked} disabled={busy || closed} onChange={event => setEmail(event.target.value)} /></div>}

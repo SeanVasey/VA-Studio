@@ -20,7 +20,7 @@ review commands mint only `test_only: true` definitions in `local`, `testing` or
 (`TestEnvironment::admitsTestCommerce()`; staging was admitted by PR #68).
 Their buyer binding explicitly says `synthetic-local-account` and
 `legal_identity_verified: false`. Enabling the test flag in production cannot
-admit this provenance.
+admit this provenance. On a hosted staging server the deploy gate (`ops/staging/validate-runtime.php`, through `scripts/ops/capability-boundary.php`) refuses a candidate `.env` that sets either flag to anything but `false`; enabling it there is a reviewed change to that boundary.
 
 The operative policy has an explicit `FreeGrantIdentity` adapter seam and an
 `approved-free-terms-v1` definition prerequisite. The current source contains no

@@ -1,0 +1,23 @@
+{
+  "cwd": "/workspace/VA-Studio-membership-c2",
+  "argv": [
+    "php",
+    "-r",
+    "$GLOBALS[\"_composer_autoload_path\"]=getcwd().\"/vendor/autoload.php\"; require \"vendor/laravel/pint/builds/pint\";",
+    "--",
+    "--test",
+    "app/Domain/Memberships/Billing/BillingHintSweep.php",
+    "app/Domain/Memberships/Billing/BillingReconciliation.php",
+    "app/Domain/Memberships/Billing/BillingRetrievalAttempts.php",
+    "app/Domain/Memberships/Billing/BillingSchema.php",
+    "app/Domain/Memberships/Billing/BillingWebhookIntake.php",
+    "app/Jobs/RetrieveMembershipInvoice.php",
+    "database/migrations/2026_10_12_260000_membership_billing_retrieval_attempts.php",
+    "tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php",
+    "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+    "tests/Feature/ProductionMembershipBilling/BillingRetrievalJobTest.php",
+    "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+    "tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php",
+    "tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php"
+  ]
+}

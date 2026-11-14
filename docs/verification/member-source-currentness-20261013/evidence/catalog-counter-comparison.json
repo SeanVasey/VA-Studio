@@ -1,0 +1,50 @@
+{
+  "scope": "Completed old-class regression; fixed selection separately verified at the same candidate input hashes. Native raw definitions independently differ only in the table allocation counter. Selected-plan equality is the executed test assertion/logged observation, not an independently archived row replay.",
+  "run": "catalog/native-old-source-red-v2",
+  "mysql_version": "8.4.11",
+  "connection_ids": [
+    224,
+    225
+  ],
+  "counter_before": 2,
+  "counter_after": 3,
+  "raw_before_sha256": "83d0acc970edffebe88453d00bf441acb2a7bfb2dcfb08976fd1c2f63d6d8b63",
+  "raw_after_sha256": "f16a6d6578622092e2ef0b415f4eabe080b40bbbfac4fca32fd2735c0ee31db4",
+  "selected_plans_unchanged": true,
+  "observed_refusal": "changed_catalog_source",
+  "junit_errors": 1,
+  "junit_assertion_failures": 0,
+  "exit": 2,
+  "fixed_run": "catalog/native-fixed-five",
+  "captured_candidate_inputs_identical": 1961,
+  "fixed_overlay": null,
+  "fixed_mutation": {
+    "case": "test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses",
+    "stage": "unrelated_insert_committed",
+    "mysql_version": "8.4.11",
+    "primary_connection_id": 226,
+    "other_connection_id": 227,
+    "inserted_id": 2,
+    "counter_before": 2,
+    "counter_after": 3,
+    "raw_before_sha256": "83d0acc970edffebe88453d00bf441acb2a7bfb2dcfb08976fd1c2f63d6d8b63",
+    "raw_after_sha256": "f16a6d6578622092e2ef0b415f4eabe080b40bbbfac4fca32fd2735c0ee31db4",
+    "selected_plans_unchanged": true,
+    "phase": "original_snapshot_after_commit"
+  },
+  "fixed_logged_stages": [
+    "unrelated_insert_committed",
+    "original_committed_snapshot_retained",
+    "selected_change_refused_in_fresh_current_frame",
+    "real_comment_change_refused",
+    "identical_row_temporary_shadow_refused"
+  ],
+  "fixed_counts": {
+    "tests": 5,
+    "assertions": 46,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "exit": 0
+  }
+}

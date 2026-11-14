@@ -1,0 +1,25 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-member-catalog-currentness/phpunit.xml
+
+
+CATALOG_CURRENTNESS {"case":"test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses","stage":"unrelated_insert_committed","mysql_version":"8.4.11","primary_connection_id":224,"other_connection_id":225,"inserted_id":2,"counter_before":2,"counter_after":3,"raw_before":"CREATE TABLE `tracks` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT,\n  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `artist` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'VASEY.AUDIO',\n  `description` text COLLATE utf8mb4_unicode_ci,\n  `bpm` smallint unsigned DEFAULT NULL,\n  `musical_key` varchar(24) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `genre` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `mood` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `duration_seconds` int unsigned DEFAULT NULL,\n  `tags` json DEFAULT NULL,\n  `waveform` json DEFAULT NULL,\n  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',\n  `published_at` timestamp NULL DEFAULT NULL,\n  `created_at` timestamp NULL DEFAULT NULL,\n  `updated_at` timestamp NULL DEFAULT NULL,\n  `published_slug` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `metadata_version` int unsigned NOT NULL DEFAULT '0',\n  `publication_version` int NOT NULL DEFAULT '0',\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `tracks_slug_unique` (`slug`),\n  KEY `tracks_status_index` (`status`)\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci","raw_after":"CREATE TABLE `tracks` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT,\n  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `slug` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `artist` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'VASEY.AUDIO',\n  `description` text COLLATE utf8mb4_unicode_ci,\n  `bpm` smallint unsigned DEFAULT NULL,\n  `musical_key` varchar(24) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `genre` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `mood` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `duration_seconds` int unsigned DEFAULT NULL,\n  `tags` json DEFAULT NULL,\n  `waveform` json DEFAULT NULL,\n  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',\n  `published_at` timestamp NULL DEFAULT NULL,\n  `created_at` timestamp NULL DEFAULT NULL,\n  `updated_at` timestamp NULL DEFAULT NULL,\n  `published_slug` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `metadata_version` int unsigned NOT NULL DEFAULT '0',\n  `publication_version` int NOT NULL DEFAULT '0',\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `tracks_slug_unique` (`slug`),\n  KEY `tracks_status_index` (`status`)\n) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci","raw_before_sha256":"83d0acc970edffebe88453d00bf441acb2a7bfb2dcfb08976fd1c2f63d6d8b63","raw_after_sha256":"f16a6d6578622092e2ef0b415f4eabe080b40bbbfac4fca32fd2735c0ee31db4","selected_plans_unchanged":true,"phase":"original_snapshot_after_commit"}
+
+CATALOG_CURRENTNESS {"case":"test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses","stage":"original_snapshot_reproof_refused","refusal":"changed_catalog_source"}
+[31;1mE[0m                                                                   1 / 1 (100%)
+
+Time: 01:18.982, Memory: 90.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipNativeCatalogCurrentnessTest::test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+/workspace/VA-Studio-member-catalog-currentness/app/Domain/Memberships/Production/MembershipException.php:16
+/workspace/runtime/membership-catalog-currentness-evidence/native-red-planned-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php:87
+/workspace/VA-Studio-member-catalog-currentness/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php:103
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 12[0m[37;41m, Errors: 1[0m[37;41m.[0m

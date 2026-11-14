@@ -66,7 +66,7 @@ class AdminPanelProvider extends PanelProvider
                     ->middleware(['can:administer-catalog', ...Dashboard::getRouteMiddleware($panel), 'throttle:60,1'])
                     ->name('site-releases.preview');
                 Route::get('/site-releases/{release}/preview/{section}/{slug?}', SiteReleasePreviewController::class)
-                    ->where('section', 'about|contact|blog|videos')
+                    ->where('section', 'about|contact|blog|videos|legal')
                     ->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*')
                     ->middleware(['can:administer-catalog', ...Dashboard::getRouteMiddleware($panel), 'throttle:60,1'])
                     ->name('site-releases.editorial-preview');

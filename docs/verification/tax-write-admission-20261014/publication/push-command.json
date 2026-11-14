@@ -1,0 +1,14 @@
+{
+  "recorded_utc": "2026-10-15T00:45:03.518693+00:00",
+  "head": "baf46747cbd5ae3e16d2657a34bf8ab708eb4822",
+  "argv": [
+    "git",
+    "push",
+    "-u",
+    "origin",
+    "harness/tax-write-admission-20261014"
+  ],
+  "process_exit": 0,
+  "stdout": "branch 'harness/tax-write-admission-20261014' set up to track 'origin/harness/tax-write-admission-20261014'.\n",
+  "stderr": "remote: \nremote: Create a pull request for 'harness/tax-write-admission-20261014' on GitHub by visiting:        \nremote:      https://github.com/SeanVasey/VA-Studio/pull/new/harness/tax-write-admission-20261014        \nremote: \nTo https://github.com/SeanVasey/VA-Studio.git\n * [new branch]        harness/tax-write-admission-20261014 -> harness/tax-write-admission-20261014\n"
+}

@@ -1,0 +1,2262 @@
+{
+  "scope": "Completed owner-released public artifacts only. This checkpoint excludes active native/schema work and private DB/key/env/row captures.",
+  "artifacts": [
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/helpers-final-source-check.json",
+      "path": "records/helpers-final-source-check.json",
+      "released_sha256": "c207dbd63cab72e180136c6d2be3b077ed007d250e738428d116038d5e49dd6d"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/helpers-final.exit",
+      "path": "records/helpers-final.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/helpers-final.sh",
+      "path": "records/helpers-final.sh",
+      "released_sha256": "6f4fbc4e46191f3501b08d59aa8cab202c1130026d75f0f5c3c8552bd5ed907d"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/helpers-final.sources.json",
+      "path": "records/helpers-final.sources.json",
+      "released_sha256": "de1bb820cb9f658a04fbef6ccb2694a3d7298d6d436427d568a659298a2d12ce"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/helpers-final.txt",
+      "path": "records/helpers-final.txt",
+      "released_sha256": "1479a03125311efad7b0407f2c7dce189a813a8b2e923da67521ca9ffd3bcd0e"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/helpers-final.xml",
+      "path": "records/helpers-final.xml",
+      "released_sha256": "22bcbac8f75bf04baa7202ab692ccae3e9c56ed59368e72c7157be0d5a2623d2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/helpers-initial.base",
+      "path": "records/helpers-initial.base",
+      "released_sha256": "7ec7dd51641337216d5a60eac6514e504c0df11556a253735f4eb09df126cf11"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/helpers-initial.exit",
+      "path": "records/helpers-initial.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/helpers-initial.sh",
+      "path": "records/helpers-initial.sh",
+      "released_sha256": "9eb6300a297e7e13178f0bf502263fe7121dbd46e1b5d1c61ba352d3cf9ec328"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/helpers-initial.sources.json",
+      "path": "records/helpers-initial.sources.json",
+      "released_sha256": "6813aae483941828ea41619bfc1b9c37f222a919b7d69938313638c14122d9ff"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/helpers-initial.txt",
+      "path": "records/helpers-initial.txt",
+      "released_sha256": "ac1e29b789fd193d5e2aefbf8be0224a3da383f4a3213e0e38232c767c7193f9"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/helpers-initial.xml",
+      "path": "records/helpers-initial.xml",
+      "released_sha256": "a733c1cd51f399648e9289ee98572bc80e9457df7e9ce6b75b03a485e09b587a"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-canary-source-check.json",
+      "path": "records/issuer-canary-source-check.json",
+      "released_sha256": "689fd50d242b5b94edba144fd669e67dde860b96b0f10e6f08134087b33cb81c"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-canary.exit",
+      "path": "records/issuer-canary.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-canary.sh",
+      "path": "records/issuer-canary.sh",
+      "released_sha256": "4dcd7df0884c4723a514cd13153d21c227cabd87c613df16a099307bca4d52fb"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-canary.sources.json",
+      "path": "records/issuer-canary.sources.json",
+      "released_sha256": "c9534a8d7f142697e9aa9fa7c666e68e6c833e6ef6f2e4c5ae46b8f82a036bf9"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-canary.txt",
+      "path": "records/issuer-canary.txt",
+      "released_sha256": "e4bf58a4bfe4157a0d50465aa494918415ff844f3288b702223b2f761ebd9528"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-canary.xml",
+      "path": "records/issuer-canary.xml",
+      "released_sha256": "df43c9f6d70061dc932a3782c53e0c5196110132927d35fab2c4fa39632c5070"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-final-commit.json",
+      "path": "records/issuer-final-commit.json",
+      "released_sha256": "ba9a8c929ac005c8d6dc50b5b876ce01fb3d3b5757e0b1eeba128a702e2a09bf"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-final-helper-carry.json",
+      "path": "records/issuer-final-helper-carry.json",
+      "released_sha256": "26e8084a78e430a2e613dd1ddffe8fc296a02713800285923622714a69f70787"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-final-source-check.json",
+      "path": "records/issuer-final-source-check.json",
+      "released_sha256": "689fd50d242b5b94edba144fd669e67dde860b96b0f10e6f08134087b33cb81c"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-final.exit",
+      "path": "records/issuer-final.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-final.sh",
+      "path": "records/issuer-final.sh",
+      "released_sha256": "04e25cde0243ad3e411c9d4f83055e5f022bb40460de6b36e58d9bad01fe8e9b"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-final.sources.json",
+      "path": "records/issuer-final.sources.json",
+      "released_sha256": "7e3e4ea6cc0b6009c6bc7646525530c37ed922012f31bd4ff07a5e651c7e0f71"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-final.txt",
+      "path": "records/issuer-final.txt",
+      "released_sha256": "f0d41ff89017226cfd724d76f05b8e194180a9601c0a19a66849fbd1cab1e9c7"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-final.xml",
+      "path": "records/issuer-final.xml",
+      "released_sha256": "23863e62b07dafba974625e6231d83ac052d723a9349a9756ed2fbc33c82fa51"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-full-source-check.json",
+      "path": "records/issuer-full-source-check.json",
+      "released_sha256": "689fd50d242b5b94edba144fd669e67dde860b96b0f10e6f08134087b33cb81c"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-full.exit",
+      "path": "records/issuer-full.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-full.sh",
+      "path": "records/issuer-full.sh",
+      "released_sha256": "7212e31388f532054764a371cb858b9db5df67195a8b8cea6e90a0d34672b304"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-full.sources.json",
+      "path": "records/issuer-full.sources.json",
+      "released_sha256": "c9534a8d7f142697e9aa9fa7c666e68e6c833e6ef6f2e4c5ae46b8f82a036bf9"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-full.txt",
+      "path": "records/issuer-full.txt",
+      "released_sha256": "6a96d37a9ed1ccac761bbce197bdb124c7b2be3b0be2e0250c63b4af153ceb67"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/issuer-full.xml",
+      "path": "records/issuer-full.xml",
+      "released_sha256": "d1ba04ebedab7256ddf513f099bd85a57f32af98a31a5f8d5b983fd00375d8cd"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/legacy-transition-source-check.json",
+      "path": "records/legacy-transition-source-check.json",
+      "released_sha256": "823bbe424aa506167fe673fd46fbd207616844d05744f2f90bed812858d22863"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/legacy-transition.exit",
+      "path": "records/legacy-transition.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/legacy-transition.sh",
+      "path": "records/legacy-transition.sh",
+      "released_sha256": "4c47aa8b6aa695ce3250c5faf705f63729b0b2ce0de13bd1ae0c4ada4fb69272"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/legacy-transition.sources.json",
+      "path": "records/legacy-transition.sources.json",
+      "released_sha256": "1dcfa915c912d728fbcf9ae14431f8f970ad46e047f276c93f073441138ae813"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/legacy-transition.txt",
+      "path": "records/legacy-transition.txt",
+      "released_sha256": "0cb8b5cf21abd7fdd141dbc0263c8fb6185fe65dd213a0f1d5bc97c02a24dd7b"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/legacy-transition.xml",
+      "path": "records/legacy-transition.xml",
+      "released_sha256": "94929f4ac6e92774ada9b9ac094febaa2d56a35068b56c99ec8cf025b3ee2fae"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-canary.exit",
+      "path": "records/native-producer-canary.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-canary.source-check.json",
+      "path": "records/native-producer-canary.source-check.json",
+      "released_sha256": "9daa7ad239b9c30cd3fb770b1a74005983a29f81cbec57fdb9999ab153cbd37d"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-canary.source.json",
+      "path": "records/native-producer-canary.source.json",
+      "released_sha256": "294758abfb8e80c0f9c356756f28d40c5588b7ac302762054f478c01b138e91f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-canary.txt",
+      "path": "records/native-producer-canary.txt",
+      "released_sha256": "5fe2bce3a98720998fcab140b878162d8924dd22aa29a6b9332d3d1394207583"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-canary.xml",
+      "path": "records/native-producer-canary.xml",
+      "released_sha256": "4a3c5e9a911ce89285c84ce9f82a3e35766dc0d2c9d12a62be64a5fce8ea6d87"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/commands.md",
+      "path": "records/commands.md",
+      "released_sha256": "47de38c313b7b01a8dde77b12a1acae27cdcd75fcf02a258f01157a7cacdeee5"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/run-native.py",
+      "path": "records/run-native.py",
+      "released_sha256": "aa26ff769f5d6124626c686faceec9f57698649ae39b9f91869648482a46c65b"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer.metadata.json",
+      "path": "records/native-producer.metadata.json",
+      "released_sha256": "46623df5fc5e49cfaa8c19eecda682002cbfd2f766523aa9639273231a4eaf9e"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-setup-initial.php",
+      "path": "records/native-producer-setup-initial.php",
+      "released_sha256": "ac82441e07eb90a4e15cf9782bfa3f8cf8e247b1faa1d8cbf1a3190b38e87737"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-setup-initial.exit",
+      "path": "records/native-producer-setup-initial.exit",
+      "released_sha256": "ce8bafb38615aeb5d44ebbabe78ec14ac35a5de87bdc5ad5ea82a72656024ce4"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-setup-diagnostic.txt",
+      "path": "records/native-producer-setup-diagnostic.txt",
+      "released_sha256": "d18eb285f6769d7a42240a1fbadfd4c73f99fbd946ad986dcd826061242c8233"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-instance-diagnostic.json",
+      "path": "records/native-instance-diagnostic.json",
+      "released_sha256": "9128f12d81ea960087ead03e9e3c2405dbf05e266f4f8dbe7427a796befec957"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-instance-diagnostic.php",
+      "path": "records/native-instance-diagnostic.php",
+      "released_sha256": "353de65412ed9363e1f0ca336aab7f46b4cb9b73284281055bb0c3786b349c5d"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-setup.php",
+      "path": "records/native-producer-setup.php",
+      "released_sha256": "1753f5326227663222fddfaa53702358cd578e9d32de899642f13dd5a37568f3"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-setup.exit",
+      "path": "records/native-producer-setup.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/baseline/BillingPreC3RegressionTest.php",
+      "path": "records/baseline/BillingPreC3RegressionTest.php",
+      "released_sha256": "1cb898473c7f7c659c18322f712b04e3fe53ab55ede993d81462be0319e7c71a"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/baseline/README.md",
+      "path": "records/baseline/README.md",
+      "released_sha256": "66dee0540db4a3dadc3f55b7336a0af882eb0c7bb31b7cb22e2056c5ff1d4a81"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/baseline/artifacts.json",
+      "path": "records/baseline/artifacts.json",
+      "released_sha256": "bd763bd548fc4cc60be89d2678c9f0b48a53d569aaeb0d5c7cf54a9017440f27"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/baseline/cp2-end.json",
+      "path": "records/baseline/cp2-end.json",
+      "released_sha256": "a3a6e69614070d684b8b6fa7208488e3e3f5dcc48ff1cc0defc516b7692c7a37"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/baseline/cp2-start.json",
+      "path": "records/baseline/cp2-start.json",
+      "released_sha256": "18dc8a24baf8969aa7190b79cff0be60e6bfdddb8ef9e4866d9acd96beae310c"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/baseline/cp3-freshness.json",
+      "path": "records/baseline/cp3-freshness.json",
+      "released_sha256": "0951c71148979019047038287788fa29a4f6ca91d43b64be92a612fd5648ae68"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/baseline/cp3-reversal.json",
+      "path": "records/baseline/cp3-reversal.json",
+      "released_sha256": "abeba11559dab8b8fc3f0f9dc85f995102b39425757e789a70e07a46139c4cf0"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/baseline/phpunit.exit",
+      "path": "records/baseline/phpunit.exit",
+      "released_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/baseline/phpunit.log",
+      "path": "records/baseline/phpunit.log",
+      "released_sha256": "d54cad21099947c7e5eb1660589d7575248e2b432799215446f3f8bc1f886b6e"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/baseline/phpunit.xml",
+      "path": "records/baseline/phpunit.xml",
+      "released_sha256": "9b9259f1f072238c823d97cf9792a0f82379c9823587dd50e91285e5d9da4fbf"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/baseline/run.sh",
+      "path": "records/baseline/run.sh",
+      "released_sha256": "2872ae75486dc155e59d7f590259e40875cbb59c10e064cc92cc94d7795e7cc6"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/baseline/runtime.txt",
+      "path": "records/baseline/runtime.txt",
+      "released_sha256": "cae0e24ef608b4bebc8f7e0e8973c5fdf9d11ac6559ee3f1beebb00306a5b574"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/baseline/source-after.json",
+      "path": "records/baseline/source-after.json",
+      "released_sha256": "8ca51aee0cf2d5566eabea685948eb0a32f67af25c8d9913f891d5682a20a39f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/baseline/source-before.json",
+      "path": "records/baseline/source-before.json",
+      "released_sha256": "8ca51aee0cf2d5566eabea685948eb0a32f67af25c8d9913f891d5682a20a39f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/baseline/source_receipt.py",
+      "path": "records/baseline/source_receipt.py",
+      "released_sha256": "b95dfb81e9d114e6a61fc3128bf6037398984e0c15d913d90ac785a8ebafa388"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/README.md",
+      "path": "records/award-upgrade/README.md",
+      "released_sha256": "f7db843fac2536e8fadc482a548dd428e038248c29134b386463b4bb922d3e4c"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/verification.json",
+      "path": "records/award-upgrade/verification.json",
+      "released_sha256": "887eb6abb42f971e2d695a40b983401f1b49671481ff1f51462f95c9b9225bcb"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/artifacts.json",
+      "path": "records/award-upgrade/artifacts.json",
+      "released_sha256": "63f372c30cf53ee5ea1869a154e90508e3a23752aee4d5b138182aaf30504436"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/AwardUpgradeRuntime.php",
+      "path": "records/award-upgrade/AwardUpgradeRuntime.php",
+      "released_sha256": "c18942f0d091914a3c46bfe06443b439ad7b94eff6d14e8d9277ead7e7a17e40"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/OldWriterAwardTest.php",
+      "path": "records/award-upgrade/OldWriterAwardTest.php",
+      "released_sha256": "4b17531fa165c65374529fb30875c87a4252b9fe8f7c2dbf15f58b678646f6b9"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/NewWriterAwardReplayTest.php",
+      "path": "records/award-upgrade/NewWriterAwardReplayTest.php",
+      "released_sha256": "3740761e6f19d4fb5f89be678c122c52ca59cd181020f56983fcd0361209499f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/run-phase.sh",
+      "path": "records/award-upgrade/run-phase.sh",
+      "released_sha256": "d2bc83484ee4c5aaf45fca80895755641480786f6389f855b15e29ef190e9095"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/source_receipt.py",
+      "path": "records/award-upgrade/source_receipt.py",
+      "released_sha256": "ce3aaa7ef3280c777b4d97c446a18e1d1399bbbd479b89806fa5907b83b4a14a"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/new-result.json",
+      "path": "records/award-upgrade/new-result.json",
+      "released_sha256": "e5aff88b71695f8c701f92cb19c5ae1c524618982746ca1b9e39102fae8accd9"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/old-phpunit.exit",
+      "path": "records/award-upgrade/old-phpunit.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/old-phpunit.log",
+      "path": "records/award-upgrade/old-phpunit.log",
+      "released_sha256": "daa4cc454134491ca7166b9f49cdf500af94b8f460ba62f324d46eee6c735006"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/old-phpunit.xml",
+      "path": "records/award-upgrade/old-phpunit.xml",
+      "released_sha256": "1d4af901f964c0bb066fb71b9ea2e1deeea362572f8efa3fc62296eec72096e6"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/old-runtime.txt",
+      "path": "records/award-upgrade/old-runtime.txt",
+      "released_sha256": "a1eca3b3d140350671d99e417bc15a8e2af10597de154faa38044a1254dc86a5"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/old-source-before.json",
+      "path": "records/award-upgrade/old-source-before.json",
+      "released_sha256": "6afb5707cfac21f518fc206aef3a3988a21ed9b7030ffbd7d5b4e5886fe48f40"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/old-source-after.json",
+      "path": "records/award-upgrade/old-source-after.json",
+      "released_sha256": "6afb5707cfac21f518fc206aef3a3988a21ed9b7030ffbd7d5b4e5886fe48f40"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/old-database-before.sha256",
+      "path": "records/award-upgrade/old-database-before.sha256",
+      "released_sha256": "fb01345c51ec8c8e901681a12fb606ee50e6079dbcc81796b84cff64c177bfbf"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/old-database-after.sha256",
+      "path": "records/award-upgrade/old-database-after.sha256",
+      "released_sha256": "3c7b0ab3a61bc941626f226fe71a74a7806d400bf57a0bb5fab9d1536cbf84b2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/new-phpunit.exit",
+      "path": "records/award-upgrade/new-phpunit.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/new-phpunit.log",
+      "path": "records/award-upgrade/new-phpunit.log",
+      "released_sha256": "9fb902e6a490dc5f8c1d54ce11dc653ffaf1ba5f6dabc8e1b26684cf7477ec83"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/new-phpunit.xml",
+      "path": "records/award-upgrade/new-phpunit.xml",
+      "released_sha256": "12a85ebab1f3e8fe30460966c96826d97dc97567c6ce84c798ee98a2a8465527"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/new-runtime.txt",
+      "path": "records/award-upgrade/new-runtime.txt",
+      "released_sha256": "fa38c2cb3a03bc9b84ef1eec37be190ddbc73a99a9608d757f12fb00533ce327"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/new-source-before.json",
+      "path": "records/award-upgrade/new-source-before.json",
+      "released_sha256": "ea35b4de20bb11bcce1b0ef812427c5de1c2efe412e1f02fc1458eb1688fbf53"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/new-source-after.json",
+      "path": "records/award-upgrade/new-source-after.json",
+      "released_sha256": "ea35b4de20bb11bcce1b0ef812427c5de1c2efe412e1f02fc1458eb1688fbf53"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/new-database-before.sha256",
+      "path": "records/award-upgrade/new-database-before.sha256",
+      "released_sha256": "3c7b0ab3a61bc941626f226fe71a74a7806d400bf57a0bb5fab9d1536cbf84b2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/award-upgrade/new-database-after.sha256",
+      "path": "records/award-upgrade/new-database-after.sha256",
+      "released_sha256": "dd5dd190f7e8fec52be39051c1f65a2286cfa31fd09321f6e96389e60aa1c9c2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-canary-diagnostic.exit",
+      "path": "schema/mysql-canary-diagnostic.exit",
+      "released_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-canary-diagnostic.source.json",
+      "path": "schema/mysql-canary-diagnostic.source.json",
+      "released_sha256": "613ff31435d5ec43267bb63cfebfa9f4c098988976c579d20e18700f3b92ad12"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-canary-diagnostic.txt",
+      "path": "schema/mysql-canary-diagnostic.txt",
+      "released_sha256": "8364ad1068b65ceb2e65b078b6d3ce1dc62f5576ec5f7e8ff7bc5160aaf86f66"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-canary-diagnostic.unchanged.json",
+      "path": "schema/mysql-canary-diagnostic.unchanged.json",
+      "released_sha256": "a344b81ddcd45bb29b2c5ed37771d663056ccfb0ec62caaf4e3b51471d4d7acc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-canary-diagnostic.xml",
+      "path": "schema/mysql-canary-diagnostic.xml",
+      "released_sha256": "47280d1a9199377b532beb1a35e4aa656a71b07979a9e8a2e812d0a9b243dcaf"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-canary-fixed.exit",
+      "path": "schema/mysql-canary-fixed.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-canary-fixed.source.json",
+      "path": "schema/mysql-canary-fixed.source.json",
+      "released_sha256": "014db56e0feac64ef42f3f5e97568d0836dfafe12550f35a336cb293e575294f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-canary-fixed.txt",
+      "path": "schema/mysql-canary-fixed.txt",
+      "released_sha256": "ddf4df22801c767577cc177f3352175b1220f3c47cd2964a69ed08f43959a5e7"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-canary-fixed.unchanged.json",
+      "path": "schema/mysql-canary-fixed.unchanged.json",
+      "released_sha256": "a344b81ddcd45bb29b2c5ed37771d663056ccfb0ec62caaf4e3b51471d4d7acc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-canary-fixed.xml",
+      "path": "schema/mysql-canary-fixed.xml",
+      "released_sha256": "a1d59a86f3afa45f634741440281652229ff38f3c30857bb5ddb3f8d3171242b"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-canary.exit",
+      "path": "schema/mysql-canary.exit",
+      "released_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-canary.source.json",
+      "path": "schema/mysql-canary.source.json",
+      "released_sha256": "797f1c191258177addf767ae8b5d203bba5557458c9d78e4ef2d1383cb99e9c7"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-canary.txt",
+      "path": "schema/mysql-canary.txt",
+      "released_sha256": "18a17ad00646cf151e80cdc0e4fecead515ecd0e977ba9169b1653c5f838ccf2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-canary.unchanged.json",
+      "path": "schema/mysql-canary.unchanged.json",
+      "released_sha256": "a344b81ddcd45bb29b2c5ed37771d663056ccfb0ec62caaf4e3b51471d4d7acc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-canary.xml",
+      "path": "schema/mysql-canary.xml",
+      "released_sha256": "a209497053f3f3283ae24c1e57a57806f6fb3ac7882e134e933aa5db749f3cf2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-identity-final.exit",
+      "path": "schema/mysql-identity-final.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-identity-final.source.json",
+      "path": "schema/mysql-identity-final.source.json",
+      "released_sha256": "f4fe00fb59025d611fe7cf03d8c62b01b462dd78dca124274a3c36882bf7ece9"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-identity-final.txt",
+      "path": "schema/mysql-identity-final.txt",
+      "released_sha256": "3a461c7c87fee15e0ef79068c50220d0a66d975778090925cdf26134e64075de"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-identity-final.unchanged.json",
+      "path": "schema/mysql-identity-final.unchanged.json",
+      "released_sha256": "a344b81ddcd45bb29b2c5ed37771d663056ccfb0ec62caaf4e3b51471d4d7acc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-identity-final.xml",
+      "path": "schema/mysql-identity-final.xml",
+      "released_sha256": "397fb55c00a3421c5b822dafeaefde7444cea50b68fd2beb6e0f9845e4c8be45"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-final.commit-map.json",
+      "path": "schema/sqlite-final.commit-map.json",
+      "released_sha256": "8b1d020760a6e0d7a1b5a23999731de4e0c6373a7ff9f56709e7c797b98d3771"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-final.exit",
+      "path": "schema/sqlite-final.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-final.source.json",
+      "path": "schema/sqlite-final.source.json",
+      "released_sha256": "4a3a6189852daf570479887d9436b052c9d1e470baded48a2c7067b8e4799630"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-final.txt",
+      "path": "schema/sqlite-final.txt",
+      "released_sha256": "47b44f6c64c934a5596e6fa12cb6f509ad49cce52cff9a4e7b800a771270543b"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-final.unchanged.json",
+      "path": "schema/sqlite-final.unchanged.json",
+      "released_sha256": "a344b81ddcd45bb29b2c5ed37771d663056ccfb0ec62caaf4e3b51471d4d7acc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-final.xml",
+      "path": "schema/sqlite-final.xml",
+      "released_sha256": "cedb9e80a904bda67703ef73b79a58cf47117716889ad95c26e7539cee1a851e"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-identity-initial.exit",
+      "path": "schema/sqlite-identity-initial.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-identity-initial.source.json",
+      "path": "schema/sqlite-identity-initial.source.json",
+      "released_sha256": "f18d99da4ddb2498abd791eae0068b8bc61eda7ecdb9612c541498a8bbcd7018"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-identity-initial.txt",
+      "path": "schema/sqlite-identity-initial.txt",
+      "released_sha256": "feba2e3f0b94d94e0fabef4480fc37bc5e36af7d01d737722d8e39ad455c2215"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-identity-initial.unchanged.json",
+      "path": "schema/sqlite-identity-initial.unchanged.json",
+      "released_sha256": "a344b81ddcd45bb29b2c5ed37771d663056ccfb0ec62caaf4e3b51471d4d7acc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-identity-initial.xml",
+      "path": "schema/sqlite-identity-initial.xml",
+      "released_sha256": "0f0324b631a451614ced695714c66df868a0ba91ae357ce576346ddd2c36bdc1"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-upgrade-initial.exit",
+      "path": "schema/sqlite-upgrade-initial.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-upgrade-initial.source.json",
+      "path": "schema/sqlite-upgrade-initial.source.json",
+      "released_sha256": "7b9d99e5b26e5cb4123e9ab21d10abe77d97aac6ebea426a85ebabfff30dba7e"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-upgrade-initial.txt",
+      "path": "schema/sqlite-upgrade-initial.txt",
+      "released_sha256": "19bd31f9875e79c472337aa5e3e42c15bd3ebbaa09f9e8984066ff81f1c1ad9c"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-upgrade-initial.unchanged.json",
+      "path": "schema/sqlite-upgrade-initial.unchanged.json",
+      "released_sha256": "a344b81ddcd45bb29b2c5ed37771d663056ccfb0ec62caaf4e3b51471d4d7acc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-upgrade-initial.xml",
+      "path": "schema/sqlite-upgrade-initial.xml",
+      "released_sha256": "365307de8776e171c1c95a09adbedd64bc83528068648fe084c62926f8264cc6"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/commands.md",
+      "path": "schema/commands.md",
+      "released_sha256": "91616962e92a9acdd79f9a95559a64b22b50eb7181f3633a4cfcd5a1fba426be"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/cursor-diff-check.exit",
+      "path": "fixture/cursor-diff-check.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/cursor-diff-check.log",
+      "path": "fixture/cursor-diff-check.log",
+      "released_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/cursor-pint.exit",
+      "path": "fixture/cursor-pint.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/cursor-pint.log",
+      "path": "fixture/cursor-pint.log",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/cursor-syntax.exit",
+      "path": "fixture/cursor-syntax.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/cursor-syntax.log",
+      "path": "fixture/cursor-syntax.log",
+      "released_sha256": "0e85cfb9b1298d301d95877e6bc6a8c7b5bb9491f07696ead83e09a707af5048"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/cursor.patch",
+      "path": "fixture/cursor.patch",
+      "released_sha256": "b9949dba0de5c176087e375b226591e76a94ab0d0cadd4862be5b5ae64e2ea87"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/schema-preparation.patch",
+      "path": "fixture/schema-preparation.patch",
+      "released_sha256": "2f81156b25da8450195c020a5bde4afd87c0d55ddbfa0d8b72d40549884980f5"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/schema-static.after.sha256",
+      "path": "fixture/schema-static.after.sha256",
+      "released_sha256": "dba7e7797a9b5d0d36d40e214f87ad9be675f0faaa85be4d4ad08b68d8a63742"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/schema-static.before.sha256",
+      "path": "fixture/schema-static.before.sha256",
+      "released_sha256": "dba7e7797a9b5d0d36d40e214f87ad9be675f0faaa85be4d4ad08b68d8a63742"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/schema-static.diff-check.exit",
+      "path": "fixture/schema-static.diff-check.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/schema-static.diff-check.log",
+      "path": "fixture/schema-static.diff-check.log",
+      "released_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/schema-static.pint.exit",
+      "path": "fixture/schema-static.pint.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/schema-static.pint.log",
+      "path": "fixture/schema-static.pint.log",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/schema-static.sh",
+      "path": "fixture/schema-static.sh",
+      "released_sha256": "676944d39f75ab1e589dc3a32d33b58b80a76d0f8081c89c363bd246d1acdfac"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/schema-static.syntax.exit",
+      "path": "fixture/schema-static.syntax.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/schema-static.syntax.log",
+      "path": "fixture/schema-static.syntax.log",
+      "released_sha256": "ef815ef524b678b1bab4868243d0710981a4af3f6a8333526e5dcf6e3d7c0a68"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-cursor.exit",
+      "path": "fixture/sqlite-cursor.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-cursor.log",
+      "path": "fixture/sqlite-cursor.log",
+      "released_sha256": "b3b30a7abfdd147a1e095016d0f1455f90079e56ad571a7d0c3ffee8f8e993a0"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-cursor.result.json",
+      "path": "fixture/sqlite-cursor.result.json",
+      "released_sha256": "7c6768aa547e3e429cbe3ea70f28320e8da45fc3fb6a21affe775e6fa399cc99"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-cursor.source.json",
+      "path": "fixture/sqlite-cursor.source.json",
+      "released_sha256": "3066c1be6a8fb43db40b8ae309a4d589aeeb51e036e2b26f37bea6cd3e9bcac1"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-cursor.verification.json",
+      "path": "fixture/sqlite-cursor.verification.json",
+      "released_sha256": "2c7cc0fcb19e5190af4520fa9aeeef69dcd49039f9930ad9445bd6a60b2b67e7"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-cursor.xml",
+      "path": "fixture/sqlite-cursor.xml",
+      "released_sha256": "0f9744c0e129a7011976898a091bc380c9d7c0d333c078055dd3b0869e10a53a"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-fixtures-initial.exit",
+      "path": "fixture/sqlite-fixtures-initial.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-fixtures-initial.log",
+      "path": "fixture/sqlite-fixtures-initial.log",
+      "released_sha256": "840911701bdbd86c32d009c17a5ff04b39e13b657b13d0c78792d5a1bd83014b"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-fixtures-initial.result.json",
+      "path": "fixture/sqlite-fixtures-initial.result.json",
+      "released_sha256": "45e915b5dc59c1e85791d8b3c634c6f4f872ff4b4aadd46a63f94fddb3dcec70"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-fixtures-initial.source.json",
+      "path": "fixture/sqlite-fixtures-initial.source.json",
+      "released_sha256": "81470623def8b6dda07e1864b0941cf35cc65430d32b971e3d82b81aac2c970c"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-fixtures-initial.verification.json",
+      "path": "fixture/sqlite-fixtures-initial.verification.json",
+      "released_sha256": "15025d151bf53e90cf0a1c6e44dd94a45a4e20876b1b2a91d0b3dd565ae8b40f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-fixtures-initial.xml",
+      "path": "fixture/sqlite-fixtures-initial.xml",
+      "released_sha256": "d370b220c352fea789933a0a649b89ddffc4d567bc1d99a4cff66d61d0758fb3"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-schema-preparation.exit",
+      "path": "fixture/sqlite-schema-preparation.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-schema-preparation.log",
+      "path": "fixture/sqlite-schema-preparation.log",
+      "released_sha256": "03f4e0c3491955da6b0df832f2cf51dc0075c5dc91f5984e7f4a3f4f848bc796"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-schema-preparation.result.json",
+      "path": "fixture/sqlite-schema-preparation.result.json",
+      "released_sha256": "0baaeb15ffba521336df63e5f6892186801287fc7c469a4c151896aa7a7199ff"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-schema-preparation.source.json",
+      "path": "fixture/sqlite-schema-preparation.source.json",
+      "released_sha256": "fdf272a680e931c66e22d42910fdb8db1015b8dece28dc8021771c29fc92bd4f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-schema-preparation.verification.json",
+      "path": "fixture/sqlite-schema-preparation.verification.json",
+      "released_sha256": "75abb79374b4fe5011bbbd146805352dc3a203e7835e75581542d9ee747c504c"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/sqlite-schema-preparation.xml",
+      "path": "fixture/sqlite-schema-preparation.xml",
+      "released_sha256": "f7f94df1d8f063b3756ae9e36c2c435aefc19ba32737dbe7ba15a87aeec6ae3f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static-v2.after.sha256",
+      "path": "fixture/static-v2.after.sha256",
+      "released_sha256": "77be84650c83bc51280ee86264d85ac8bd2725aff92887eab2c78db2e4d5af6f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static-v2.base",
+      "path": "fixture/static-v2.base",
+      "released_sha256": "61e097d76af7dec919a43abe75054a1657bb158b28f574190b7fcdf6a69331fe"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static-v2.before.sha256",
+      "path": "fixture/static-v2.before.sha256",
+      "released_sha256": "77be84650c83bc51280ee86264d85ac8bd2725aff92887eab2c78db2e4d5af6f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static-v2.diff-check.exit",
+      "path": "fixture/static-v2.diff-check.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static-v2.diff-check.log",
+      "path": "fixture/static-v2.diff-check.log",
+      "released_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static-v2.patch",
+      "path": "fixture/static-v2.patch",
+      "released_sha256": "c0fdf897fd90afda2058247bcbab2952f85c768e77781e56926c34cf0bce7be7"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static-v2.pint.exit",
+      "path": "fixture/static-v2.pint.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static-v2.pint.log",
+      "path": "fixture/static-v2.pint.log",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static-v2.sh",
+      "path": "fixture/static-v2.sh",
+      "released_sha256": "590e73e7be04115863460d2c2111add2d1a8d5d7c7094d37e94db799e06c2253"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static-v2.syntax.exit",
+      "path": "fixture/static-v2.syntax.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static-v2.syntax.log",
+      "path": "fixture/static-v2.syntax.log",
+      "released_sha256": "c15a93b0f6fa8852fb4198e3ad671185313f730961fb9fa1279a86412702872b"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static.after.sha256",
+      "path": "fixture/static.after.sha256",
+      "released_sha256": "351f4e2f015012ea09dec1fc34562b1d8f5a4e1148dd5c5b5867d6710e2c6675"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static.base",
+      "path": "fixture/static.base",
+      "released_sha256": "61e097d76af7dec919a43abe75054a1657bb158b28f574190b7fcdf6a69331fe"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static.before.sha256",
+      "path": "fixture/static.before.sha256",
+      "released_sha256": "351f4e2f015012ea09dec1fc34562b1d8f5a4e1148dd5c5b5867d6710e2c6675"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static.diff-check.exit",
+      "path": "fixture/static.diff-check.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static.diff-check.log",
+      "path": "fixture/static.diff-check.log",
+      "released_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static.patch",
+      "path": "fixture/static.patch",
+      "released_sha256": "df6524b4f3b35283167a9929033447eeeabc2eb4a4171185bf8def409175b1e0"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static.pint.exit",
+      "path": "fixture/static.pint.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static.pint.log",
+      "path": "fixture/static.pint.log",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static.sh",
+      "path": "fixture/static.sh",
+      "released_sha256": "63ff85d087ed2750ac10c8001f2b0bc736bbf6e8478860b92116926898a0a990"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static.syntax.exit",
+      "path": "fixture/static.syntax.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/static.syntax.log",
+      "path": "fixture/static.syntax.log",
+      "released_sha256": "eda341ed4cf3156f9dacd83a5eead641077415750a7301e9743001216e69c8be"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/commands.md",
+      "path": "fixture/commands.md",
+      "released_sha256": "9584f359256eb66a5f0c395046cebc3d61865a06645ace505acb1a162fee6ea6"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/run-fixture-sqlite.py",
+      "path": "fixture/run-fixture-sqlite.py",
+      "released_sha256": "d10fdd2ea4f0c69b050634aea278ee4200fcffef5a271fb49ba8b41c07765ba8"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/schema-preparation-source/tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+      "path": "fixture/schema-preparation-source/tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+      "released_sha256": "f01af9e27431b92a6f97484b8dc5a46df65f741180b78764281df66754c66b3e"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/schema-preparation-source/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+      "path": "fixture/schema-preparation-source/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+      "released_sha256": "0953d3f1f9225712355753d2a81dd2ffdd89280c782aaa66dcacdb929a8a5bee"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-fixture-evidence/cursor-source/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php",
+      "path": "fixture/cursor-source/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php",
+      "released_sha256": "4bc385367ea1cac19c38a7485bc6d0e8105c782df46a5b381c5b19cf6dfad7e2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-award-proof-integration.exit",
+      "path": "root/sqlite-award-proof-integration.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-award-proof-integration.log",
+      "path": "root/sqlite-award-proof-integration.log",
+      "released_sha256": "eb2180f1c64e6c1b57457e64e5a0fb1f64038a9e59852eb43e32daf1f0bac5dc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-award-proof-integration.result.json",
+      "path": "root/sqlite-award-proof-integration.result.json",
+      "released_sha256": "7b7808cdd1eab0ad0419c2f41bf5fb0502c143aaf436cdde786d0ff6d48740ce"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-award-proof-integration.source.json",
+      "path": "root/sqlite-award-proof-integration.source.json",
+      "released_sha256": "9acabaf4659cc2520e8677c76b7796c702ada809440a6ed3b7fc4857be7249b1"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-award-proof-integration.xml",
+      "path": "root/sqlite-award-proof-integration.xml",
+      "released_sha256": "71a3c914e807c9a9d7b68678976cbe1188dbabb49e111f6c9a02b7693d6451e4"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-billing-api-integration.exit",
+      "path": "root/sqlite-billing-api-integration.exit",
+      "released_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-billing-api-integration.log",
+      "path": "root/sqlite-billing-api-integration.log",
+      "released_sha256": "73d61de5c0d619a068439677789d8dbad79ef5903874dec31359bea02bd8ac1d"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-billing-api-integration.result.json",
+      "path": "root/sqlite-billing-api-integration.result.json",
+      "released_sha256": "343728a9d5c2962679a8e8918a2fb125cd29ee58f6f2fb93b91a42908fd2c7bb"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-billing-api-integration.source.json",
+      "path": "root/sqlite-billing-api-integration.source.json",
+      "released_sha256": "67361d896028347141f852bcf403961a783190eb30714a486199561072dab40b"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-billing-api-integration.xml",
+      "path": "root/sqlite-billing-api-integration.xml",
+      "released_sha256": "ea85eee30ef32f616a582032881d902afeaeaf17e119c0f722de4b1be40f2df6"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-hint-job-integration.exit",
+      "path": "root/sqlite-hint-job-integration.exit",
+      "released_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-hint-job-integration.log",
+      "path": "root/sqlite-hint-job-integration.log",
+      "released_sha256": "648f6d949af0f2de6f769b5231f2f56e73a269df5dc30439593f09731926f6bc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-hint-job-integration.result.json",
+      "path": "root/sqlite-hint-job-integration.result.json",
+      "released_sha256": "970f44d7c9beedfd5a6dc121e32442814a75ea6e4c17484254c0481fe5e3f901"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-hint-job-integration.source.json",
+      "path": "root/sqlite-hint-job-integration.source.json",
+      "released_sha256": "bd82e86669e29efc42129b424f3ab6f0fe7d414d781422736f132c6c939cd5ac"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-hint-job-integration.xml",
+      "path": "root/sqlite-hint-job-integration.xml",
+      "released_sha256": "e4403769af4ebbf8d14e63620fac114bd8493665b2ba3edaa9d89f24d5974efa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-historical-migrations.exit",
+      "path": "root/sqlite-historical-migrations.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-historical-migrations.log",
+      "path": "root/sqlite-historical-migrations.log",
+      "released_sha256": "12e26f662dfe5c1e78dff57ad26c5ec9a4d6515abe1e75de6d8bafb72a60d543"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-historical-migrations.result.json",
+      "path": "root/sqlite-historical-migrations.result.json",
+      "released_sha256": "3f5606398b355ea3b231a8a6c182778396627e46aa0dd819bd73e370650e0b4b"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-historical-migrations.source.json",
+      "path": "root/sqlite-historical-migrations.source.json",
+      "released_sha256": "b617f52f7e9b806414200595627c44f37dfc242afed750d8f9040c99433f462a"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-historical-migrations.xml",
+      "path": "root/sqlite-historical-migrations.xml",
+      "released_sha256": "d6e27233dac75c85c24bc4356764f46ed89fb7c861e1a397f48a7a3528bb1bd2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-membership-admission-integration.exit",
+      "path": "root/sqlite-membership-admission-integration.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-membership-admission-integration.log",
+      "path": "root/sqlite-membership-admission-integration.log",
+      "released_sha256": "b5776dc4e69143aca1fa957f6764cd073e716aa599a0cadff49b285528d2bcae"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-membership-admission-integration.result.json",
+      "path": "root/sqlite-membership-admission-integration.result.json",
+      "released_sha256": "0d1ca3ba09f4f5420abea60c852f285bfcdb19dca077b91735252766f0a5f47f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-membership-admission-integration.source.json",
+      "path": "root/sqlite-membership-admission-integration.source.json",
+      "released_sha256": "20c088ba0e2a3384ed063d43251cfa81284a8324a41dad0e664e19ea26625f31"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/sqlite-membership-admission-integration.xml",
+      "path": "root/sqlite-membership-admission-integration.xml",
+      "released_sha256": "3873baf0b3f463ade36acb563282502f11fe3c81d13a7f3385c26c2f3c22f0c3"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/run-focused.py",
+      "path": "root/run-focused.py",
+      "released_sha256": "f9174d262dcd36fae21be188dcc0d75ab38df942499764eac31911480ffebdf0"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-hint-evidence/legacy260-static-0.log",
+      "path": "hints/legacy260-static-0.log",
+      "released_sha256": "3c8f03804d4951a59b9219d55e9c0a99f2ccb00cee0b2662bf7cc675ac230fcd"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-hint-evidence/legacy260-static-1.log",
+      "path": "hints/legacy260-static-1.log",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-hint-evidence/legacy260-static-2.log",
+      "path": "hints/legacy260-static-2.log",
+      "released_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-hint-evidence/legacy260-static-receipt.json",
+      "path": "hints/legacy260-static-receipt.json",
+      "released_sha256": "c8152b106bb716d5a6c10f4288df514d13bda19ccf0b6059eec52fce6d48022f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-hint-evidence/static-0.log",
+      "path": "hints/static-0.log",
+      "released_sha256": "3e9e854404edb1b7b5de7ca349db2471f27299fc385677274bd5b557809716fd"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-hint-evidence/static-1.log",
+      "path": "hints/static-1.log",
+      "released_sha256": "f5e82c236472b706906c5504eb9d2ebc3edca7a949b685b9214e4b5245a5d360"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-hint-evidence/static-2.log",
+      "path": "hints/static-2.log",
+      "released_sha256": "d649a0e6de20d468745fc0229d1fd29d3d7fd56fd711e26cec7dc72a309e1970"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-hint-evidence/static-3.log",
+      "path": "hints/static-3.log",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-hint-evidence/static-4.log",
+      "path": "hints/static-4.log",
+      "released_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-hint-evidence/static-receipt.json",
+      "path": "hints/static-receipt.json",
+      "released_sha256": "1db81a4acbbfb8fe481c0cab571a41379d06af93a522b755f8a7ad474489ff54"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/commands.md",
+      "path": "consumer/commands.md",
+      "released_sha256": "740331aedc537adc1e615fe2d61ef50c8d6c323d76d43afc79a4d9e592cc830c"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/native-arbitration-static.after.sha256",
+      "path": "consumer/native-arbitration-static.after.sha256",
+      "released_sha256": "97ee99b245b67629bd4b9fe0c1899ff2834dbd3c590767eebcc06437aff86553"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/native-arbitration-static.base",
+      "path": "consumer/native-arbitration-static.base",
+      "released_sha256": "e7817060551913c0837897cc5f10fd1ec864e168f50087e6abccffb532576e87"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/native-arbitration-static.before.sha256",
+      "path": "consumer/native-arbitration-static.before.sha256",
+      "released_sha256": "97ee99b245b67629bd4b9fe0c1899ff2834dbd3c590767eebcc06437aff86553"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/native-arbitration-static.discovery.exit",
+      "path": "consumer/native-arbitration-static.discovery.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/native-arbitration-static.discovery.txt",
+      "path": "consumer/native-arbitration-static.discovery.txt",
+      "released_sha256": "b6896d4b50bb7f32fa648ab3b3b37a553c740451a680e38983bc34c839e432e7"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/native-arbitration-static.pint.exit",
+      "path": "consumer/native-arbitration-static.pint.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/native-arbitration-static.pint.txt",
+      "path": "consumer/native-arbitration-static.pint.txt",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/native-arbitration-static.sh",
+      "path": "consumer/native-arbitration-static.sh",
+      "released_sha256": "4237b1158a86ea72f0e6cf8cd479fdc8701cd3a7c29b1392b643ee6a895f149f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/native-arbitration-static.syntax.exit",
+      "path": "consumer/native-arbitration-static.syntax.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/native-arbitration-static.syntax.txt",
+      "path": "consumer/native-arbitration-static.syntax.txt",
+      "released_sha256": "2c07e7aec8508b22aacdccf04b073f081a25f00debd80acd0a6468582104c5bc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/owned-files.txt",
+      "path": "consumer/owned-files.txt",
+      "released_sha256": "93690582a5628dc3d48914d6bf819acf7d9b4fb51e25cb919f6ab9c9d414d47d"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/static.after.sha256",
+      "path": "consumer/static.after.sha256",
+      "released_sha256": "2f9cc6ce3cec12450e697e0be7d1bb8d86ede61e9dccd0b7b575f4a155309d39"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/static.base",
+      "path": "consumer/static.base",
+      "released_sha256": "7ec7dd51641337216d5a60eac6514e504c0df11556a253735f4eb09df126cf11"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/static.before.sha256",
+      "path": "consumer/static.before.sha256",
+      "released_sha256": "2f9cc6ce3cec12450e697e0be7d1bb8d86ede61e9dccd0b7b575f4a155309d39"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/static.diff-check.exit",
+      "path": "consumer/static.diff-check.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/static.diff-check.txt",
+      "path": "consumer/static.diff-check.txt",
+      "released_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/static.finished",
+      "path": "consumer/static.finished",
+      "released_sha256": "418d17b7335f8958251e6405d58bb8b42889fbc5b65b13a0bf621caf8166178e"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/static.pint.exit",
+      "path": "consumer/static.pint.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/static.pint.txt",
+      "path": "consumer/static.pint.txt",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/static.sh",
+      "path": "consumer/static.sh",
+      "released_sha256": "6436cedddfbb8d7250f29b4e3f5714daa45ddfbcb032d6d2ac99f018420415d2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/static.started",
+      "path": "consumer/static.started",
+      "released_sha256": "5e943b16fe647558d1d318eff35019a598242e4ef8cbb2106bfe162f8d20c55d"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/static.syntax.exit",
+      "path": "consumer/static.syntax.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/static.syntax.txt",
+      "path": "consumer/static.syntax.txt",
+      "released_sha256": "2dc4978f205e2ec6927f750a4ee8e0a4e3b86deb4a64f85a6775434138fe5247"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-check.sh",
+      "path": "consumer/terminal-check.sh",
+      "released_sha256": "11de9acc0fe255551d53a6b228ed1dda48f5d7fe964af4157eda8ade800579da"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-omission-red.after.sha256",
+      "path": "consumer/terminal-omission-red.after.sha256",
+      "released_sha256": "7bc578da76edd38f444c0670f149c23497ec0931524838249c9c5af1769c7412"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-omission-red.base",
+      "path": "consumer/terminal-omission-red.base",
+      "released_sha256": "1f37dd48d2fd2c884dc934641c1b4fc8005645a9fc4b142ce708226c52539c71"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-omission-red.before.sha256",
+      "path": "consumer/terminal-omission-red.before.sha256",
+      "released_sha256": "7bc578da76edd38f444c0670f149c23497ec0931524838249c9c5af1769c7412"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-omission-red.exit",
+      "path": "consumer/terminal-omission-red.exit",
+      "released_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-omission-red.finished",
+      "path": "consumer/terminal-omission-red.finished",
+      "released_sha256": "dc938cfd854101209e993ac3d1fdaa679cc14a2572d59f4294004b790c5225bd"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-omission-red.started",
+      "path": "consumer/terminal-omission-red.started",
+      "released_sha256": "7e249eea945a4e5698b561ad029916f2c66a9ace7713c734405ba6f494d9ee18"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-omission-red.txt",
+      "path": "consumer/terminal-omission-red.txt",
+      "released_sha256": "c79b4535193d8cbeb4f2c76a1d2ec3663757598e217fa169e04bae9bd29891e6"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-omission-red.xml",
+      "path": "consumer/terminal-omission-red.xml",
+      "released_sha256": "8eaaff06ff6c43eb80f45e590aea201a76910cead26bacf97fe72b2feb467855"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-omission.overlay.patch",
+      "path": "consumer/terminal-omission.overlay.patch",
+      "released_sha256": "64888fff5ab50c308e7751707cb0d87a9c3770cdf7d40b232eb1fbdeed570ebb"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-restored-green.after.sha256",
+      "path": "consumer/terminal-restored-green.after.sha256",
+      "released_sha256": "da25756b32f31a5116eff9ac940bc2852a257b6d91d5e77c0741c42fc4b0950c"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-restored-green.base",
+      "path": "consumer/terminal-restored-green.base",
+      "released_sha256": "1f37dd48d2fd2c884dc934641c1b4fc8005645a9fc4b142ce708226c52539c71"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-restored-green.before.sha256",
+      "path": "consumer/terminal-restored-green.before.sha256",
+      "released_sha256": "da25756b32f31a5116eff9ac940bc2852a257b6d91d5e77c0741c42fc4b0950c"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-restored-green.exit",
+      "path": "consumer/terminal-restored-green.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-restored-green.final-diff.exit",
+      "path": "consumer/terminal-restored-green.final-diff.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-restored-green.final-diff.txt",
+      "path": "consumer/terminal-restored-green.final-diff.txt",
+      "released_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-restored-green.final-status.txt",
+      "path": "consumer/terminal-restored-green.final-status.txt",
+      "released_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-restored-green.finished",
+      "path": "consumer/terminal-restored-green.finished",
+      "released_sha256": "309281a0c3be511b5a9073fd04cc8064e670eecd1336f214bfcd2af0fa017bc3"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-restored-green.started",
+      "path": "consumer/terminal-restored-green.started",
+      "released_sha256": "87a44ad9452f44b3a7e4e7672679781ead354511851baf469d070dd82ccb448e"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-restored-green.txt",
+      "path": "consumer/terminal-restored-green.txt",
+      "released_sha256": "d0b40438cc7a7750a2f77a8a5558b0d6ae30c2865d5f32432f358fbc30c38e47"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-restored-green.xml",
+      "path": "consumer/terminal-restored-green.xml",
+      "released_sha256": "1cdc8edd5936bb6e8cdb6e06842de7803bdde336557eedf4663d55605519c3de"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/terminal-source-files.txt",
+      "path": "consumer/terminal-source-files.txt",
+      "released_sha256": "94b6a7501ba5a67d00e54d3fe197b7af6f1341c0a176e7170a77f3f6a86dc395"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/unit.after.sha256",
+      "path": "consumer/unit.after.sha256",
+      "released_sha256": "3746919e072d18e0357b5475dd19986b679c9ccb22cdff1846d01f85ca1e26ac"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/unit.base",
+      "path": "consumer/unit.base",
+      "released_sha256": "d01983fffb7fa04292f889cab5e614424d8ae4fcc96ce81352e5c8f7acc80b54"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/unit.before.sha256",
+      "path": "consumer/unit.before.sha256",
+      "released_sha256": "3746919e072d18e0357b5475dd19986b679c9ccb22cdff1846d01f85ca1e26ac"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/unit.exit",
+      "path": "consumer/unit.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/unit.finished",
+      "path": "consumer/unit.finished",
+      "released_sha256": "bd9efd1ef1c763ce5610f40abc84298608c60be5844afd6e84b02866a0a6c62c"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/unit.overlay.patch",
+      "path": "consumer/unit.overlay.patch",
+      "released_sha256": "efb5da5f49a0cfa865c3d620a1354737e44ee774894163a84c290912ed296751"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/unit.sh",
+      "path": "consumer/unit.sh",
+      "released_sha256": "cf048abe2762eb6c39c6bbee4a3f70497cd7ef001e9c0142877195d5c4b17209"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/unit.started",
+      "path": "consumer/unit.started",
+      "released_sha256": "bd9efd1ef1c763ce5610f40abc84298608c60be5844afd6e84b02866a0a6c62c"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/unit.txt",
+      "path": "consumer/unit.txt",
+      "released_sha256": "207fc89152e30d1e2b7327734d8d9d996923381df86d87f2ddfb956a41c7b27e"
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-c3-consumer-evidence/unit.xml",
+      "path": "consumer/unit.xml",
+      "released_sha256": "c254afa40ff268cce6cc255c1506f4f7efbb0921ae17e21d3db219eebbab84e2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/ci-initial-test-ci-scope.exit",
+      "path": "root/ci-initial-test-ci-scope.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/ci-initial-test-ci-scope.log",
+      "path": "root/ci-initial-test-ci-scope.log",
+      "released_sha256": "acbd0c30f7415203e9735d6f25c621481b16a8cd504ebc4f1596c8c421ffaa6a"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/ci-initial-test-database-receipts.exit",
+      "path": "root/ci-initial-test-database-receipts.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/ci-initial-test-database-receipts.log",
+      "path": "root/ci-initial-test-database-receipts.log",
+      "released_sha256": "1501e2c02123a07ae0f648687cd5aa162d9b3b655ffd36c4e4a7ae7897bf252f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/ci-initial-test-phpunit-shards.exit",
+      "path": "root/ci-initial-test-phpunit-shards.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/ci-initial-test-phpunit-shards.log",
+      "path": "root/ci-initial-test-phpunit-shards.log",
+      "released_sha256": "1fd83ccd30444b11a4a7c59efa54a4f8f063e62e1f77695b13aa1a2b6de18c9b"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/ci-policy-initial.source.json",
+      "path": "root/ci-policy-initial.source.json",
+      "released_sha256": "10278c7a06f1b50ac45662d7a0cd026abef38ec903b1465b224dd26b04d1312c"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/ci-policy-initial.unchanged.json",
+      "path": "root/ci-policy-initial.unchanged.json",
+      "released_sha256": "de6817e8d8aeb619c581dc6c36de832ff68c03a059ef8be2e4a4fd5cec0654d9"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-remainder.source.json",
+      "path": "records/native-producer-remainder.source.json",
+      "released_sha256": "2fb71e18b2ed5703c75e9e61aee4b6b28dd46c0b8b0f838caeec5d1d486c3180"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-remainder.source-check.json",
+      "path": "records/native-producer-remainder.source-check.json",
+      "released_sha256": "9daa7ad239b9c30cd3fb770b1a74005983a29f81cbec57fdb9999ab153cbd37d"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-remainder.txt",
+      "path": "records/native-producer-remainder.txt",
+      "released_sha256": "cdc6c26d0646118c8a73c16e3e783404a207b48e3c3bc2f9d69290ca692aaa72"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-remainder.xml",
+      "path": "records/native-producer-remainder.xml",
+      "released_sha256": "bc7361d2df3bf78e1c8373e0be384b7308ff807e824ec621a8edb439e13a80ea"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-remainder.exit",
+      "path": "records/native-producer-remainder.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-active-status-later.json",
+      "path": "records/native-active-status-later.json",
+      "released_sha256": "dbaa806188ee6e2b6ad98cf325e54dd88953b5807ffc2452a6ef9bdf8913821b",
+      "verbatim_non_json": true,
+      "scope": "Read-only observer failed between migration refresh phases; PHP error text despite .json suffix, not a test invocation."
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-active-status.json",
+      "path": "records/native-active-status.json",
+      "released_sha256": "e00d82baa6c8382ce180d133857d0c44fe84c5ffbe6eb643227cffa840bef653"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-active-status.php",
+      "path": "records/native-active-status.php",
+      "released_sha256": "ef3a76dc3af603851beb44302a7ad1b70c43a7d85a6808b69d2f780fb4552640"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-migration-progress.php",
+      "path": "records/native-migration-progress.php",
+      "released_sha256": "a8c18f92d013932c04db9f8350ef29e210125a42325c1c39317910d716caa934"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-prefix-diagnostic.php",
+      "path": "records/native-prefix-diagnostic.php",
+      "released_sha256": "b1dafda645ce99e2d6ce75404417d72992d39686471b71b5ac633c6606ff695e"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-final-source-check.json",
+      "path": "records/native-producer-final-source-check.json",
+      "released_sha256": "897474695ab4d29801b18e515d14aa3cfac17d59d36eed9926ebdffe73449696"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-producer-results.json",
+      "path": "records/native-producer-results.json",
+      "released_sha256": "e9df72568e19f462ff96058ce0cb24b60bb8f0c0a0034874a543e9fa59f2d490"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-progress.php",
+      "path": "records/native-progress.php",
+      "released_sha256": "1c218f6e00e515b973290dca316cd21ab5ddce8b2f7c74b04f38f60b6588e43c"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-remainder-selection.txt",
+      "path": "records/native-remainder-selection.txt",
+      "released_sha256": "1f94bbba76ad33e31e0e3c02fbf59ca18dc27faf39d69010381fc75391e3a66e"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-table-definitions-capture.exit",
+      "path": "records/native-table-definitions-capture.exit",
+      "released_sha256": "ce8bafb38615aeb5d44ebbabe78ec14ac35a5de87bdc5ad5ea82a72656024ce4"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-table-definitions-capture.txt",
+      "path": "records/native-table-definitions-capture.txt",
+      "released_sha256": "df26150f2c24d94ccf794c12ecc2f7a898d8ad47968e6679dba14b3ea2a21eb8"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-table-definitions-diagnostic.txt",
+      "path": "records/native-table-definitions-diagnostic.txt",
+      "released_sha256": "78bf64a761390e694adee950725bc35903a22791c4907d6b53831c6a6f696e39"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-table-definitions-final.exit",
+      "path": "records/native-table-definitions-final.exit",
+      "released_sha256": "ce8bafb38615aeb5d44ebbabe78ec14ac35a5de87bdc5ad5ea82a72656024ce4"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-table-definitions-final.txt",
+      "path": "records/native-table-definitions-final.txt",
+      "released_sha256": "df26150f2c24d94ccf794c12ecc2f7a898d8ad47968e6679dba14b3ea2a21eb8"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-table-definitions-observed.exit",
+      "path": "records/native-table-definitions-observed.exit",
+      "released_sha256": "ce8bafb38615aeb5d44ebbabe78ec14ac35a5de87bdc5ad5ea82a72656024ce4"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-table-definitions-observed.txt",
+      "path": "records/native-table-definitions-observed.txt",
+      "released_sha256": "df26150f2c24d94ccf794c12ecc2f7a898d8ad47968e6679dba14b3ea2a21eb8"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-table-definitions-retry.exit",
+      "path": "records/native-table-definitions-retry.exit",
+      "released_sha256": "ce8bafb38615aeb5d44ebbabe78ec14ac35a5de87bdc5ad5ea82a72656024ce4"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-table-definitions-retry.txt",
+      "path": "records/native-table-definitions-retry.txt",
+      "released_sha256": "df26150f2c24d94ccf794c12ecc2f7a898d8ad47968e6679dba14b3ea2a21eb8"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-table-definitions.exit",
+      "path": "records/native-table-definitions.exit",
+      "released_sha256": "ce8bafb38615aeb5d44ebbabe78ec14ac35a5de87bdc5ad5ea82a72656024ce4"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/native-table-definitions.php",
+      "path": "records/native-table-definitions.php",
+      "released_sha256": "e9c8cfefdf40722697e5a571c27fee0f78629c87a20bb1c8de107e9e7967f96e"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/records-artifacts.json",
+      "path": "records/records-artifacts.json",
+      "released_sha256": "354c361206988c19768ca011faab4871280d23aecd8b3d4fe2d798ba67d79685"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-records-evidence/commands.md",
+      "path": "records/commands-final.md",
+      "released_sha256": "f7fd38586fb124f781f5ee293506bea2cbf0f83d1f552356b93413749ca43d4a"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-currentness-red.exit",
+      "path": "schema/mysql-currentness-red.exit",
+      "released_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-currentness-red.source.json",
+      "path": "schema/mysql-currentness-red.source.json",
+      "released_sha256": "213fcb133dad992a022c68906f1349b88f54fc33a6bfa6dca544d677bcf456f5"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-currentness-red.txt",
+      "path": "schema/mysql-currentness-red.txt",
+      "released_sha256": "a6140cf674a16eb4a57e9c04e768ec910a3a200ccf18b55b09c2a24de438cfc1"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-currentness-red.unchanged.json",
+      "path": "schema/mysql-currentness-red.unchanged.json",
+      "released_sha256": "a344b81ddcd45bb29b2c5ed37771d663056ccfb0ec62caaf4e3b51471d4d7acc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-currentness-red.xml",
+      "path": "schema/mysql-currentness-red.xml",
+      "released_sha256": "42d5be1af0f5763a7f68cdc9528fa0e5987a073a77259590e85945f9ef6da0ef"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-currentness-fixed.commit-map.json",
+      "path": "schema/mysql-currentness-fixed.commit-map.json",
+      "released_sha256": "a5cac87a654639cbdad2a6b4f5c6d8d3789fc99d554fb8ad17a339e6ec4ab6ec"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-currentness-fixed.exit",
+      "path": "schema/mysql-currentness-fixed.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-currentness-fixed.source.json",
+      "path": "schema/mysql-currentness-fixed.source.json",
+      "released_sha256": "7090e70f61d1a0b43e7d0afa371999899609b2bcdca171df90d9ce4ee88e9a30"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-currentness-fixed.txt",
+      "path": "schema/mysql-currentness-fixed.txt",
+      "released_sha256": "35d0a20173705ddd6b615821289fab464a9d8dfab209816f666028ba8a4bccdb"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-currentness-fixed.unchanged.json",
+      "path": "schema/mysql-currentness-fixed.unchanged.json",
+      "released_sha256": "a344b81ddcd45bb29b2c5ed37771d663056ccfb0ec62caaf4e3b51471d4d7acc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-currentness-fixed.xml",
+      "path": "schema/mysql-currentness-fixed.xml",
+      "released_sha256": "f7f8ea54dbf0014dd481fc71175d9b82d6e3a6808be9cf2d57744aa91b58c5c1"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-currentness-final.commit-map.json",
+      "path": "schema/sqlite-currentness-final.commit-map.json",
+      "released_sha256": "a5cac87a654639cbdad2a6b4f5c6d8d3789fc99d554fb8ad17a339e6ec4ab6ec"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-currentness-final.exit",
+      "path": "schema/sqlite-currentness-final.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-currentness-final.source.json",
+      "path": "schema/sqlite-currentness-final.source.json",
+      "released_sha256": "a725048d7c796d3d86661f0dfddb5fbb793cbd60af7eaafab1f9fc5643ef32a9"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-currentness-final.txt",
+      "path": "schema/sqlite-currentness-final.txt",
+      "released_sha256": "3918e769720b4c92aa9b13ef3d6d6cf08be56c9cd8d3ac6352f273358ad97450"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-currentness-final.unchanged.json",
+      "path": "schema/sqlite-currentness-final.unchanged.json",
+      "released_sha256": "a344b81ddcd45bb29b2c5ed37771d663056ccfb0ec62caaf4e3b51471d4d7acc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/sqlite-currentness-final.xml",
+      "path": "schema/sqlite-currentness-final.xml",
+      "released_sha256": "3d4b804b67cb6254eef49b9947cd5c63ba4177b118ff6ae3a678ee0b57fa83fc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/currentness-red-test-source.php.txt",
+      "path": "schema/currentness-red-test-source.php.txt",
+      "released_sha256": "5b7df00e31673933fa579a9d13795ca1490dba6ec672768fb7abfbb1a0786f23"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/native-owned-table-definitions.json",
+      "path": "schema/native-owned-table-definitions.json",
+      "released_sha256": "a32f2427196c89d0d431f0b69ace69c6b36659ab6643b648d86c4036585e6e92"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/commands.md",
+      "path": "schema/commands-currentness.md",
+      "released_sha256": "d5ef5922cd7844ef5719e3744b2bcb380e3a4d6be3d4e7896befedaa87e6ea63"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-selection-evidence/discovery-source-check.json",
+      "path": "selection/discovery-source-check.json",
+      "released_sha256": "2f4339494ebe36d1d99d703174dce4bc80f3fcb5b0b5881d116f30f25204d396"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-selection-evidence/discovery.base",
+      "path": "selection/discovery.base",
+      "released_sha256": "5d0c22949a54a7206adb658a3c381f901b8672a524ffa023ed3ec33434f5b5bc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-selection-evidence/discovery.exit",
+      "path": "selection/discovery.exit",
+      "released_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-selection-evidence/discovery.sh",
+      "path": "selection/discovery.sh",
+      "released_sha256": "f2393966dfffed7ca8f9e744d0a4f5a5a2619c0075a70475ef59be60702dc432"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-selection-evidence/discovery.sources.json",
+      "path": "selection/discovery.sources.json",
+      "released_sha256": "02dad8ed1af516cccb268210d35ac2e6830fe4ca9f92e3b720663e2d7340ea35"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-selection-evidence/discovery.txt",
+      "path": "selection/discovery.txt",
+      "released_sha256": "951df2d8fca8ab39652f110e9a8d7873364fe5ff68677b7bebd81fad9b53193d"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-selection-evidence/final-67d85d6e/discovery-source-check.json",
+      "path": "selection/final-67d85d6e/discovery-source-check.json",
+      "released_sha256": "2f4339494ebe36d1d99d703174dce4bc80f3fcb5b0b5881d116f30f25204d396"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-selection-evidence/final-67d85d6e/discovery.base",
+      "path": "selection/final-67d85d6e/discovery.base",
+      "released_sha256": "5d0c22949a54a7206adb658a3c381f901b8672a524ffa023ed3ec33434f5b5bc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-selection-evidence/final-67d85d6e/discovery.exit",
+      "path": "selection/final-67d85d6e/discovery.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-selection-evidence/final-67d85d6e/discovery.sh",
+      "path": "selection/final-67d85d6e/discovery.sh",
+      "released_sha256": "9ef84d8f865e867dfd3876fa9689d89d177dc15e9bffae8921b3defb68dce422"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-selection-evidence/final-67d85d6e/discovery.sources.json",
+      "path": "selection/final-67d85d6e/discovery.sources.json",
+      "released_sha256": "02dad8ed1af516cccb268210d35ac2e6830fe4ca9f92e3b720663e2d7340ea35"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-selection-evidence/final-67d85d6e/discovery.txt",
+      "path": "selection/final-67d85d6e/discovery.txt",
+      "released_sha256": "50bcdad498e7062aa500265bd82db15ce757c62dfdee787cf4a576c0bc8dfb32"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-selection-evidence/local-bin-correction.json",
+      "path": "selection/local-bin-correction.json",
+      "released_sha256": "32e7ef8047415128d1794a247980cea56fa95882cfa1dc313ae6f67b85347338"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-1-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-1-tests.xml",
+      "released_sha256": "a6398268a1ab6576d26e8df66d127343bc351ff94f5a2ac4c5aa8b0f66ca37ee"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-10-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-10-tests.xml",
+      "released_sha256": "36d1bf323a5c3d04f63ee047ccd1a8ac493a762f99425139c4a17f08164e0d7a"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-11-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-11-tests.xml",
+      "released_sha256": "f20401f64359cd83d750ad9c86cab6c039b88814591354023c5c1d88586b42c3"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-12-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-12-tests.xml",
+      "released_sha256": "a107cbff47e4126a8b9ceb7e4da7556b09d356711844494ee398b0a114a3272e"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-13-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-13-tests.xml",
+      "released_sha256": "3a2f9b0f972a1445d8282b5bb5b24bcecd61ba353a9bb8868fae79163c87ee81"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-14-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-14-tests.xml",
+      "released_sha256": "af266f7ce53525602d31fb8f07a2707da84366228a5d489e7863b60344ac040d"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-15-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-15-tests.xml",
+      "released_sha256": "1a48ab482858139b00ef65aad9a5021b3b28ad431de90f5137b48179ecc918e1"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-16-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-16-tests.xml",
+      "released_sha256": "b89505ad2b17f70fbc3d8bb15a39f889890ff5e770dd5d0941b7d625b00861c6"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-17-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-17-tests.xml",
+      "released_sha256": "7fe29a3ec48ae14df8eef17c1a9db5484d37db396af23346d70441d34dd81fdf"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-18-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-18-tests.xml",
+      "released_sha256": "06d1218f008ec4c9494ec5cdb1380d448cfde61f6d7ef383ae4e196a6e9af2ab"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-19-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-19-tests.xml",
+      "released_sha256": "138f0542d70536fd13ee2a9bffc333919f2507667f35a35c796f944c2efc5623"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-2-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-2-tests.xml",
+      "released_sha256": "c76e4ce861903343ba496bfd6f6a2f1a216b719cc8ee36ac76c0011a6d5f317b"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-20-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-20-tests.xml",
+      "released_sha256": "c58db992b58334ad26a198c4168a4d4a3bc498e0b6ecbdae6cc49fa4002958fa"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-21-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-21-tests.xml",
+      "released_sha256": "02321d7f549f25ca0ddfbb7215b20fd21b0fb623744bd143e071620cb4ad976d"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-22-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-22-tests.xml",
+      "released_sha256": "873c535ea7e0257b563c4af2fd1160e89fb87176ac9d677978df7827f378d026"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-23-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-23-tests.xml",
+      "released_sha256": "210cb7e040335540a20734f55a33e7ab10c0ddd1fecc5d3cbdf627854133f5eb"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-24-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-24-tests.xml",
+      "released_sha256": "ea908c0093075e092fa583f6bca0e67c5a8ef2d323722a9f66babff1b44bbe4a"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-3-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-3-tests.xml",
+      "released_sha256": "d4e87add64935bd5852ed5859351f58406ff0a65fe2400d9c3a66eee8af65bb8"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-4-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-4-tests.xml",
+      "released_sha256": "138ca0a66e2e6ab726dd57f751778f071417008b2f67855fa071a97884c934cb"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-5-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-5-tests.xml",
+      "released_sha256": "71cf189d65f8ce5fcde05fb6b71040c1c20d785e7a7de7432f72ccea1246d352"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-6-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-6-tests.xml",
+      "released_sha256": "b6ac16d95c16fcd9c75527d960f998551490904837d0845945bcce02a1b09f6c"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-7-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-7-tests.xml",
+      "released_sha256": "eef73f41258376b5957a3a3fc2dbda3fd73a7b3be4d2b8a3a34771dccde9002c"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-8-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-8-tests.xml",
+      "released_sha256": "92b5d02fbda82be27e73e2d35f719ca83c6f0e0b67330fec363fd6d6da1431a7"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-9-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-9-tests.xml",
+      "released_sha256": "0ca1c5c47ad0935196d3a8f32aa8a9ed8052300916672538c321e898667d83af"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-source-tests.xml",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-source-tests.xml",
+      "released_sha256": "55a02ecf44abf9dbe5597cc7ed40a497877d18d8e9511f17ca9578505acfc0f4"
+    },
+    {
+      "runtime_path": "/workspace/VA-Studio-billing-retrieval/phpunit-ci-mysql-manifest.json",
+      "path": "selection/final-67d85d6e/listings/phpunit-ci-mysql-manifest.json",
+      "released_sha256": "42cb41eb2c7c3598490128d8e97ab602e047fb28817c7aef28e6ab72b578c1dc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/runbook-facts.md",
+      "path": "schema/runbook-facts.md",
+      "released_sha256": "421a760d8d6642eb2187a8fd23322321692b6845d40d3756eb3d92398b6bb04a"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/artifact-digests.json",
+      "path": "quality/artifact-digests.json",
+      "released_sha256": "e0fbb28ce33fad292c4c8281a07d11acf6a8e8db96a6c08de98c102ce2a6f8bd"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/changed-php-files.txt",
+      "path": "quality/changed-php-files.txt",
+      "released_sha256": "bb9abc938eedb757710ef31199fdf387071031249a85a5832155570585ecc6c2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/commands.md",
+      "path": "quality/commands.md",
+      "released_sha256": "640a8898643b8fdb091838e88ef488e85b9c57f2aedce6abce7ecdb8c72aeb1f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/metadata.json",
+      "path": "quality/metadata.json",
+      "released_sha256": "5b449a46f961cdcb94bc1cd13fc67d26d3fdff647e88e075c6e56bf5718e2ab2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint-v2/artifact-digests.json",
+      "path": "quality/pint-v2/artifact-digests.json",
+      "released_sha256": "384f57100ecb4d5f2274a090f80a3d1c328278a624627556e6a56c4bcfbf1b4a"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint-v2/commands.md",
+      "path": "quality/pint-v2/commands.md",
+      "released_sha256": "43f60f8ee43f72b50fe586be217a44be9a4ff93f2466ea8676d7b65a5dd8ad0b"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint-v2/pint.command.json",
+      "path": "quality/pint-v2/pint.command.json",
+      "released_sha256": "d2a49c12cd8ab8969df3fac22b9319ac730964e4f5a2e60da1cb20cf56335c30"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint-v2/pint.exit",
+      "path": "quality/pint-v2/pint.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint-v2/pint.log",
+      "path": "quality/pint-v2/pint.log",
+      "released_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint-v2/pint.result.json",
+      "path": "quality/pint-v2/pint.result.json",
+      "released_sha256": "2d63ea26341bd9d70282e42c2225feeef43500c8219029c3f4df64af38ff2525"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint-v2/policy-carry.json",
+      "path": "quality/pint-v2/policy-carry.json",
+      "released_sha256": "bd5f60b826db327b6c91c5f5b28783fe472027020e371d8fa8a2f47ca7b54144"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint-v2/run-pint.py",
+      "path": "quality/pint-v2/run-pint.py",
+      "released_sha256": "7b218e06022feceda8f1f153934cc3138e4148208ec0331587c44740e6e06f20"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint-v2/runner.exit",
+      "path": "quality/pint-v2/runner.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint-v2/runner.log",
+      "path": "quality/pint-v2/runner.log",
+      "released_sha256": "57961fb78e2ca4dcd094f444c79c421cd874c5cf17969b89a9b1e036000483d3"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint-v2/source-check.json",
+      "path": "quality/pint-v2/source-check.json",
+      "released_sha256": "bc30e54d5e5188a720c6a230c251a6e0a2d955021bd9b4029690dc01f6846b6d"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint-v2/source-delta.patch",
+      "path": "quality/pint-v2/source-delta.patch",
+      "released_sha256": "084a58ce83c0e08dd2c070d1f936253d32927f1399082d6bac13051f4460c32a"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint-v2/sources-after.json",
+      "path": "quality/pint-v2/sources-after.json",
+      "released_sha256": "f17e13d7a3e6d8401e2f06f4f1ba61cbb8c0ab54ebddefd35348797e62f91d7a"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint-v2/sources-before.json",
+      "path": "quality/pint-v2/sources-before.json",
+      "released_sha256": "f17e13d7a3e6d8401e2f06f4f1ba61cbb8c0ab54ebddefd35348797e62f91d7a"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint.command.json",
+      "path": "quality/pint.command.json",
+      "released_sha256": "d2a8a27a2b5e68fb555882d762a11b2dc53401e0ac8f07b9d1570460059ccbbe"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint.exit",
+      "path": "quality/pint.exit",
+      "released_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint.log",
+      "path": "quality/pint.log",
+      "released_sha256": "a8e893866e0f1ce475399fd069ca4a282c930bd4be73168fa9b2add8ad06ad2f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/pint.result.json",
+      "path": "quality/pint.result.json",
+      "released_sha256": "f7d1b5dc6dc0753beaa40d0d0cf6c081ace1aa8ee2dc8f97f95f4ded57b17268"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/results.json",
+      "path": "quality/results.json",
+      "released_sha256": "2dbcbeec0ba46c154ca2d42b9f8583d5d3d60108d947fe050037726f942bd647"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/run-quality.py",
+      "path": "quality/run-quality.py",
+      "released_sha256": "f677c515014bd920aa1dc71155ba80bc0a531d7e3cc5a479782462c736de656a"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/runner.exit",
+      "path": "quality/runner.exit",
+      "released_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/runner.log",
+      "path": "quality/runner.log",
+      "released_sha256": "e8985536f93157f2d636d16bd6c61a2a7d479fb4fb731abcdb4482e0a4ccb5c9"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/source-check.json",
+      "path": "quality/source-check.json",
+      "released_sha256": "62b521b0a4400ab8a81e9b8860ebf2df6ed4e9fc1b5c4bb9c4d562f7a17ec986"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/sources-after.json",
+      "path": "quality/sources-after.json",
+      "released_sha256": "ca4ca32fdb9e898decd3e3a2521e18b3e098b3a5b37adc490db4f9f476aa3199"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/sources-before.json",
+      "path": "quality/sources-before.json",
+      "released_sha256": "ca4ca32fdb9e898decd3e3a2521e18b3e098b3a5b37adc490db4f9f476aa3199"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-ci-scope.command.json",
+      "path": "quality/test-ci-scope.command.json",
+      "released_sha256": "796b32677723581205f6d527f742046b66f0c4481afa68d61f4fd780e3f7c17f"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-ci-scope.exit",
+      "path": "quality/test-ci-scope.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-ci-scope.log",
+      "path": "quality/test-ci-scope.log",
+      "released_sha256": "59e7848ce6d6866d4bc0004e5096ca24c1fbed0af67d77427232f0ab14908f3d"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-ci-scope.result.json",
+      "path": "quality/test-ci-scope.result.json",
+      "released_sha256": "07eff125be89d729528d544bd48d7e0287038a7c6814cef5963d540d9e72eb67"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-database-receipts.command.json",
+      "path": "quality/test-database-receipts.command.json",
+      "released_sha256": "9659b00d3ee1724b192e7e78d70b2c170b91a5fdcbeb5a61cdbbab49fbb450ec"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-database-receipts.exit",
+      "path": "quality/test-database-receipts.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-database-receipts.log",
+      "path": "quality/test-database-receipts.log",
+      "released_sha256": "053f57c81e32b3bea92e7bd77737cea566da82de74a4abc8dd770b0d3f27bfe4"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-database-receipts.result.json",
+      "path": "quality/test-database-receipts.result.json",
+      "released_sha256": "807cef6091a4198280be3b437943d019e2553458c4208cb86f6b265b4ff7e5e8"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-phpunit-shards.command.json",
+      "path": "quality/test-phpunit-shards.command.json",
+      "released_sha256": "e6f361f9cdcc8a56ffe329419a2c3fcccd35e8183b9ab401bf28599be1d5492a"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-phpunit-shards.exit",
+      "path": "quality/test-phpunit-shards.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-phpunit-shards.log",
+      "path": "quality/test-phpunit-shards.log",
+      "released_sha256": "070a1a5eb0bdd74076bf02325050061b3ba8d31fa60c26bcd78ade4cc8e9dd0e"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-phpunit-shards.result.json",
+      "path": "quality/test-phpunit-shards.result.json",
+      "released_sha256": "0436e25a016f9d20fa86a254b6fe2f80fa68db33f0239cc2a2ba4876b92b100e"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-workflow-cadence.command.json",
+      "path": "quality/test-workflow-cadence.command.json",
+      "released_sha256": "fc87ef9fb2f0d6773df8180c181faebdca84704222315956e3a4a2cfa03e61a9"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-workflow-cadence.exit",
+      "path": "quality/test-workflow-cadence.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-workflow-cadence.log",
+      "path": "quality/test-workflow-cadence.log",
+      "released_sha256": "dd818658e9c8008cb354da9371485cb574dabd3d7c356cdfa1c694608942fdca"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-quality-final/test-workflow-cadence.result.json",
+      "path": "quality/test-workflow-cadence.result.json",
+      "released_sha256": "498c485f229ecd45aa392fe508ff4099cd1e822204a2135ea12c9719109a3748"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-upgrade-final.commit-map.json",
+      "path": "schema/mysql-upgrade-final.commit-map.json",
+      "released_sha256": "a5cac87a654639cbdad2a6b4f5c6d8d3789fc99d554fb8ad17a339e6ec4ab6ec"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-upgrade-final.exit",
+      "path": "schema/mysql-upgrade-final.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-upgrade-final.source.json",
+      "path": "schema/mysql-upgrade-final.source.json",
+      "released_sha256": "3019c3e4d8f9f3fefe0f9aff0ca281dc779b4905bb54903ed618f81c8b70d5d7"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-upgrade-final.txt",
+      "path": "schema/mysql-upgrade-final.txt",
+      "released_sha256": "f2e1b43d58fbc1655202b23bca7f73c0fe82562a7831ab0fa2c6b4c90b7c9937"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-upgrade-final.unchanged.json",
+      "path": "schema/mysql-upgrade-final.unchanged.json",
+      "released_sha256": "a344b81ddcd45bb29b2c5ed37771d663056ccfb0ec62caaf4e3b51471d4d7acc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/mysql-upgrade-final.xml",
+      "path": "schema/mysql-upgrade-final.xml",
+      "released_sha256": "699edb4fbf2f68e1958600685a29bf97cdcd6f1f5437afd874f3e9b5d6f2562d"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/commands.md",
+      "path": "schema/commands-final.md",
+      "released_sha256": "8c5c46528af1936dca9efeaa82a58a4b46a01f1fa050daee430279a8557026e3"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/runbook-facts.md",
+      "path": "schema/runbook-facts-final.md",
+      "released_sha256": "4ae26c7dfc0cf7f1f95674550cdb0ab51f55065c47433d71785f979d7cdcf2e2"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-schema-evidence/component-release-digests.json",
+      "path": "schema/component-release-digests.json",
+      "released_sha256": "ca726be39893858d455496dba907cf6b869b11cfb98e27de25453536826df500"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/native-canaries-final.source.json",
+      "path": "root/native-canaries-final.source.json",
+      "released_sha256": "30799dc9a4c2beb398f99a2dd07d317c36006d7cb74e617f34482e6e4d3798a0"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/native-canaries-final.log",
+      "path": "root/native-canaries-final.log",
+      "released_sha256": "32b956063dd43ab9bd1438e5c515f4fc728f0df7269c2150e55b6847669fffe0"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/native-canaries-final.xml",
+      "path": "root/native-canaries-final.xml",
+      "released_sha256": "b37b1aed1839e4034f15d0c54ab69f970dc2daba2348d08b2723cc4dcdd41580"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/native-canaries-final.exit",
+      "path": "root/native-canaries-final.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/native-canaries-final.result.json",
+      "path": "root/native-canaries-final.result.json",
+      "released_sha256": "0dda3b189a431905b60031ff7bbcba963fda78fc0e91762de2349aa92af5d836"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/native-setup.json",
+      "path": "root/native-setup.json",
+      "released_sha256": "fbf053c96e4f56c82a704e593956b44dc989cac15facb4ee9f7919046a6a46a6"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/native-setup.log",
+      "path": "root/native-setup.log",
+      "released_sha256": "0b2a96275d1e40b5c551e9ade90312bd5a294a5c4cce37f71368e9603853ece3"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/native-setup.exit",
+      "path": "root/native-setup.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/setup-private-native.py",
+      "path": "root/setup-private-native.py",
+      "released_sha256": "6bc18a825e6eef5af3ecf1f35f7086da5b2f2788743f02dc9d6161c6ca841339"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/run-native-focused.py",
+      "path": "root/run-native-focused.py",
+      "released_sha256": "008e4870ed7bac728d802da880a9d8f3486922e507505abe9ed366a093122e53"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/run-native-integration.sh",
+      "path": "root/run-native-integration.sh",
+      "released_sha256": "99bdcc6f00fee949e303b395c14b7e5a84db2bad3886e08ce849c721dc1d0c5b"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-selection-evidence/generated-file-cleanup.json",
+      "path": "selection/generated-file-cleanup.json",
+      "released_sha256": "a94e0e8a3e6ed70bd3dafe9fce8654018d249b731758e2eb2584b16fa23774cc"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/native-races-final.source.json",
+      "path": "root/native-races-final.source.json",
+      "released_sha256": "63f7c5f44e12ce9c7f7c80eb09d79d738bd6701a308d6300429ec15464a57ee7"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/native-races-final.log",
+      "path": "root/native-races-final.log",
+      "released_sha256": "2d0ecf7a5554fafa51ecf94d8e54db986b3b48d39bc1b2fac00ae0100b86c6eb"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/native-races-final.xml",
+      "path": "root/native-races-final.xml",
+      "released_sha256": "c68b2655e3b8f38135621bbece07e47a943093d8f9114026637ec7fe5c4236fa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/native-races-final.exit",
+      "path": "root/native-races-final.exit",
+      "released_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/native-races-final.result.json",
+      "path": "root/native-races-final.result.json",
+      "released_sha256": "85a4a0e8d315b60f1d2b1737d71e0630274060f1c68237b4b0cf71643ba5369e"
+    },
+    {
+      "runtime_path": "/workspace/runtime/billing-retrieval-root-evidence/native-races-final-interval-workers/test_two_older_snapshots_cannot_claim_the_same_valid_database_interval_across_ledgers-01fe8f8c-7dcc-40da-985e-1d222a2ec8e8.json",
+      "path": "root/native-races-final-interval-workers/test_two_older_snapshots_cannot_claim_the_same_valid_database_interval_across_ledgers-01fe8f8c-7dcc-40da-985e-1d222a2ec8e8.json",
+      "released_sha256": "796b61893df7d4f882f2802181de67e231fee81cb056d41fee885c5f9292b145"
+    }
+  ]
+}

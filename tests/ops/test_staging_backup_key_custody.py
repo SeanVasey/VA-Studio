@@ -27,7 +27,9 @@ class BackupKeyCustodyTest(unittest.TestCase):
                             "VASEY_BACKUP_DIR": str(self.root / "backups"),
                             "PRIVATE": str(self.root / "private"), "VASEY_DB_NAME": "synthetic",
                             "VASEY_BACKUP_MYCNF": str(self.root / "fake-my.cnf"),
-                            "VASEY_PHP": PHP, "VASEY_APP_GROUP": grp.getgrgid(os.getgid()).gr_name}
+                            "VASEY_PHP": PHP, "VASEY_APP_GROUP": grp.getgrgid(os.getgid()).gr_name,
+                            # The installed helper's path, here the kit's copy: the snapshot writes its private tree with it.
+                            "PRIVATE_SNAPSHOT": str(REPO / "ops/staging/private-snapshot.py")}
         self.shell = """set -eu
 umask 077
 die() { echo "$*" >&2; exit 1; }

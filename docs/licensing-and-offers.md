@@ -1,6 +1,6 @@
 > Typed usage terms are now available for new drafts. See [typed license terms](typed-license-terms.md) for the current editor, required variables, explicit legacy mapping and compatible migration. The v1 workflow below remains supported for retained revisions; it is not silently upgraded.
 
-Current authoring uses [ownership and economic policy schema v4](license-economic-policies.md), retaining the historical workflows below.
+Current authoring uses [tier usage schema v5](license-usage-v5.md): the [schema v4](license-economic-policies.md) declarations with one usage slot per tier limit. The historical workflows below are retained.
 
 # Licensing and published offers
 
@@ -91,4 +91,46 @@ For operational rollback, deactivate affected offers or unpublish affected track
 
 ## Ownership and economic policy declarations
 
-New drafts now use [schema v4](license-economic-policies.md): explicit ownership policy references, publishing income and recording royalties, plus complete retained policy text. Earlier v1–v3 evidence and ordinary successor schemas remain compatible. **Define economic policies** deliberately maps a v3 predecessor without default rights or rates. Full policy bytes are frozen with review and commercial evidence; buyer disclosure and contracts remain WP-05/WP-08 dependencies. See [verification](verification/license-economics.md).
+Schema v4 drafts use [these declarations](license-economic-policies.md): explicit ownership policy references, publishing income and recording royalties, plus complete retained policy text. Earlier v1–v3 evidence and ordinary successor schemas remain compatible. **Define economic policies** deliberately maps a v3 predecessor without default rights or rates. Full policy bytes are frozen with review and commercial evidence; buyer disclosure and contracts remain WP-05/WP-08 dependencies. See [verification](verification/license-economics.md).
+
+## Tier usage limits (schema v5)
+
+New drafts use [schema v5](license-usage-v5.md). It keeps every v4 declaration and replaces the usage vocabulary with ten
+slots, so audio streams, monetized and non-monetized video streams, free downloads and the two kinds of performance are
+separate limits. **Define tier usage limits** maps a v4 predecessor and copies only the declarations whose meaning is unchanged.
+Versions on schemas 1 to 4 keep their validation, statements, previews and review evidence byte for byte.
+
+## Summary reconciliation
+
+`tests/Feature/PublicLicenseSummaryReconciliationTest.php` (FP-005) checks that what a buyer reads on a license card is the
+typed term of the published version. It does not reuse the generator: each public line is read back into a typed value with
+the wording pinned in the test, and the result must equal `structured_terms` field for field, with exactly one line per typed
+field. It covers schemas 2 to 5, both sides of every mode, the `licenseTiers` cards of `/api/catalog` and the disclosure at
+`/tracks/{slug}/offers/{revision}/license`, where every line must also stand once in the license text shown with it.
+Fixtures are synthetic and nonbinding.
+
+Not covered, and why:
+
+- **The License comparison page (`/legal/licenses`)** is no longer a gap (BL-38, DD-31, 2026-11-10): it is generated from
+  the published, in-window license versions with typed terms, one section per version identical to that version's
+  `licenseTiers` card (`tests/Feature/CustomerComms/GeneratedLicenseComparisonTest.php` asserts the equality), and a release
+  that still holds a hand-typed comparison is refused at publication (`docs/site-content-releases.md`, "License comparison").
+  Schema 1 versions are not listed there, for the reason below.
+- **Schema 1 licenses.** Their summaries are free prose a reviewer attested (`summary_consistency_confirmed`). The test only
+  proves they are shown unchanged.
+- **`docs/legal/LICENSE-TIERS.md`.** The unapproved tier draft maps its limits to the schema 2 to 4 usage slots
+  (`monetized_streams`, `live_performances`). New drafts use schema 5, which has no such slots and has slots the draft gives
+  no value for (`audio_streams`, `free_downloads`, the two performance kinds). The draft's comparison copy therefore cannot
+  be generated from a schema 5 license as written.
+
+**Resolved 2026-11-10 (DD-30): one wording for a file role.** The card's file line used storefront labels ("Untagged MP3",
+"WAV master", "Track stems") while the generated line under it used the license vocabulary. The generated, typed-term wording
+is now the only one: "MP3", "WAV master", "Stems ZIP". "Untagged" is gone because no typed term states it. The server still
+sends role keys, not labels, so the client keeps one map, `resources/js/lib/deliverable-labels.json`, which the reconciliation
+test pins to `TypedLicenseTerms::DELIVERABLES`, role for role and in order. `deliverableNames()` in `resources/js/lib/catalog.ts`
+is the only reader for the license cards, the track page offers, the license chooser, quote review and order preparation, and
+it lists files in the generated order; the purchased-file labels in `resources/js/lib/test-delivery.ts` read the same map (they
+said "Master WAV" before). The test also requires each card's file line to stand inside its generated Deliverables line and
+refuses the old words anywhere under `resources/js`; `tests/frontend/deliverable-wording.test.tsx` checks the two rendered
+lines against each other. No term, payload or stored license text changed.
+

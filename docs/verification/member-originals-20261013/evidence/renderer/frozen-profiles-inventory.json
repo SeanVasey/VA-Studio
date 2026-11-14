@@ -1,0 +1,428 @@
+{
+  "baseline": "7edd614497b930c5bc02141537cc7e24dce6fb27",
+  "manifests": 5,
+  "member_entries": 38,
+  "all_match": true,
+  "entries": [
+    {
+      "family": "test-v1",
+      "kind": "manifest",
+      "path": "resources/contracts/test-v1/profile-assets.json",
+      "sha256": "44533c186a3b1350163025256a9ced519a6395ba8001541193d1d51b51688e50",
+      "baseline_sha256": "44533c186a3b1350163025256a9ced519a6395ba8001541193d1d51b51688e50",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v1",
+      "kind": "member",
+      "path": "app/Domain/Contracts/ContractText.php",
+      "sha256": "46d145c921ff5a94b3d2928c9b7d9caf0697d33f8ba5c5c30ca65598e1d68a08",
+      "declared_sha256": "46d145c921ff5a94b3d2928c9b7d9caf0697d33f8ba5c5c30ca65598e1d68a08",
+      "matches_declared": true,
+      "baseline_sha256": "46d145c921ff5a94b3d2928c9b7d9caf0697d33f8ba5c5c30ca65598e1d68a08",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v1",
+      "kind": "member",
+      "path": "app/Domain/Contracts/TcpdfContractRenderer.php",
+      "sha256": "620b66766143ab72532e8fa3a161d3eb1012368bbf195cea70b9b8907cdd763a",
+      "declared_sha256": "620b66766143ab72532e8fa3a161d3eb1012368bbf195cea70b9b8907cdd763a",
+      "matches_declared": true,
+      "baseline_sha256": "620b66766143ab72532e8fa3a161d3eb1012368bbf195cea70b9b8907cdd763a",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v1",
+      "kind": "member",
+      "path": "resources/contracts/test-v1/fonts/generated/dejavusans.ctg.z",
+      "sha256": "e32a1fea0a049ccf1c687eba84f804339c4599eba4eedb1ff4ee4427aee34b93",
+      "declared_sha256": "e32a1fea0a049ccf1c687eba84f804339c4599eba4eedb1ff4ee4427aee34b93",
+      "matches_declared": true,
+      "baseline_sha256": "e32a1fea0a049ccf1c687eba84f804339c4599eba4eedb1ff4ee4427aee34b93",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v1",
+      "kind": "member",
+      "path": "resources/contracts/test-v1/fonts/generated/dejavusans.json",
+      "sha256": "4912381c5c0baccdca18246cb5ffb8d234fae48de71d002a523d082859bbfde4",
+      "declared_sha256": "4912381c5c0baccdca18246cb5ffb8d234fae48de71d002a523d082859bbfde4",
+      "matches_declared": true,
+      "baseline_sha256": "4912381c5c0baccdca18246cb5ffb8d234fae48de71d002a523d082859bbfde4",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v1",
+      "kind": "member",
+      "path": "resources/contracts/test-v1/fonts/generated/dejavusans.z",
+      "sha256": "bf01c0d0a4d745951b355b0d253b4076d5e0da2aef8114d42c0f2ab83ec257fe",
+      "declared_sha256": "bf01c0d0a4d745951b355b0d253b4076d5e0da2aef8114d42c0f2ab83ec257fe",
+      "matches_declared": true,
+      "baseline_sha256": "bf01c0d0a4d745951b355b0d253b4076d5e0da2aef8114d42c0f2ab83ec257fe",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v1",
+      "kind": "member",
+      "path": "resources/contracts/test-v1/fonts/generated/dejavusansb.ctg.z",
+      "sha256": "e59d2256ed0a75d999d124c994c42bb025efa782c3e77e251f7497f4f539e089",
+      "declared_sha256": "e59d2256ed0a75d999d124c994c42bb025efa782c3e77e251f7497f4f539e089",
+      "matches_declared": true,
+      "baseline_sha256": "e59d2256ed0a75d999d124c994c42bb025efa782c3e77e251f7497f4f539e089",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v1",
+      "kind": "member",
+      "path": "resources/contracts/test-v1/fonts/generated/dejavusansb.json",
+      "sha256": "5128b3fcdd515b6fc80cceca16f0b0118be333aa1558cf193c487c4ad3144a10",
+      "declared_sha256": "5128b3fcdd515b6fc80cceca16f0b0118be333aa1558cf193c487c4ad3144a10",
+      "matches_declared": true,
+      "baseline_sha256": "5128b3fcdd515b6fc80cceca16f0b0118be333aa1558cf193c487c4ad3144a10",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v1",
+      "kind": "member",
+      "path": "resources/contracts/test-v1/fonts/generated/dejavusansb.z",
+      "sha256": "34fa710f984b43306f89abd2458a213a63ecfecd59976154a03183b65a8f1554",
+      "declared_sha256": "34fa710f984b43306f89abd2458a213a63ecfecd59976154a03183b65a8f1554",
+      "matches_declared": true,
+      "baseline_sha256": "34fa710f984b43306f89abd2458a213a63ecfecd59976154a03183b65a8f1554",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v1",
+      "kind": "member",
+      "path": "resources/contracts/test-v1/fonts/source/DejaVuSans-Bold.ttf",
+      "sha256": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
+      "declared_sha256": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
+      "matches_declared": true,
+      "baseline_sha256": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v1",
+      "kind": "member",
+      "path": "resources/contracts/test-v1/fonts/source/DejaVuSans.ttf",
+      "sha256": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
+      "declared_sha256": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
+      "matches_declared": true,
+      "baseline_sha256": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v1",
+      "kind": "member",
+      "path": "resources/contracts/test-v1/fonts/source/LICENSE",
+      "sha256": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93",
+      "declared_sha256": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93",
+      "matches_declared": true,
+      "baseline_sha256": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v2",
+      "kind": "manifest",
+      "path": "resources/contracts/test-v2/profile-assets.json",
+      "sha256": "29e0b1b33abc78ab48c6669579dbb3296eb9e282f2a16b0fb337db8417b68dac",
+      "baseline_sha256": "29e0b1b33abc78ab48c6669579dbb3296eb9e282f2a16b0fb337db8417b68dac",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v2",
+      "kind": "member",
+      "path": "app/Domain/Contracts/ContractText.php",
+      "sha256": "46d145c921ff5a94b3d2928c9b7d9caf0697d33f8ba5c5c30ca65598e1d68a08",
+      "declared_sha256": "46d145c921ff5a94b3d2928c9b7d9caf0697d33f8ba5c5c30ca65598e1d68a08",
+      "matches_declared": true,
+      "baseline_sha256": "46d145c921ff5a94b3d2928c9b7d9caf0697d33f8ba5c5c30ca65598e1d68a08",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v2",
+      "kind": "member",
+      "path": "app/Domain/Contracts/TcpdfV2ContractRenderer.php",
+      "sha256": "36f8454d055bae4b20f9eb67a861d4a4709fc1708acb4a47d353c4ba061e70d2",
+      "declared_sha256": "36f8454d055bae4b20f9eb67a861d4a4709fc1708acb4a47d353c4ba061e70d2",
+      "matches_declared": true,
+      "baseline_sha256": "36f8454d055bae4b20f9eb67a861d4a4709fc1708acb4a47d353c4ba061e70d2",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v2",
+      "kind": "member",
+      "path": "resources/contracts/test-v2/fonts/generated/dejavusans.ctg.z",
+      "sha256": "e32a1fea0a049ccf1c687eba84f804339c4599eba4eedb1ff4ee4427aee34b93",
+      "declared_sha256": "e32a1fea0a049ccf1c687eba84f804339c4599eba4eedb1ff4ee4427aee34b93",
+      "matches_declared": true,
+      "baseline_sha256": "e32a1fea0a049ccf1c687eba84f804339c4599eba4eedb1ff4ee4427aee34b93",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v2",
+      "kind": "member",
+      "path": "resources/contracts/test-v2/fonts/generated/dejavusans.json",
+      "sha256": "4912381c5c0baccdca18246cb5ffb8d234fae48de71d002a523d082859bbfde4",
+      "declared_sha256": "4912381c5c0baccdca18246cb5ffb8d234fae48de71d002a523d082859bbfde4",
+      "matches_declared": true,
+      "baseline_sha256": "4912381c5c0baccdca18246cb5ffb8d234fae48de71d002a523d082859bbfde4",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v2",
+      "kind": "member",
+      "path": "resources/contracts/test-v2/fonts/generated/dejavusans.z",
+      "sha256": "bf01c0d0a4d745951b355b0d253b4076d5e0da2aef8114d42c0f2ab83ec257fe",
+      "declared_sha256": "bf01c0d0a4d745951b355b0d253b4076d5e0da2aef8114d42c0f2ab83ec257fe",
+      "matches_declared": true,
+      "baseline_sha256": "bf01c0d0a4d745951b355b0d253b4076d5e0da2aef8114d42c0f2ab83ec257fe",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v2",
+      "kind": "member",
+      "path": "resources/contracts/test-v2/fonts/generated/dejavusansb.ctg.z",
+      "sha256": "e59d2256ed0a75d999d124c994c42bb025efa782c3e77e251f7497f4f539e089",
+      "declared_sha256": "e59d2256ed0a75d999d124c994c42bb025efa782c3e77e251f7497f4f539e089",
+      "matches_declared": true,
+      "baseline_sha256": "e59d2256ed0a75d999d124c994c42bb025efa782c3e77e251f7497f4f539e089",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v2",
+      "kind": "member",
+      "path": "resources/contracts/test-v2/fonts/generated/dejavusansb.json",
+      "sha256": "5128b3fcdd515b6fc80cceca16f0b0118be333aa1558cf193c487c4ad3144a10",
+      "declared_sha256": "5128b3fcdd515b6fc80cceca16f0b0118be333aa1558cf193c487c4ad3144a10",
+      "matches_declared": true,
+      "baseline_sha256": "5128b3fcdd515b6fc80cceca16f0b0118be333aa1558cf193c487c4ad3144a10",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v2",
+      "kind": "member",
+      "path": "resources/contracts/test-v2/fonts/generated/dejavusansb.z",
+      "sha256": "34fa710f984b43306f89abd2458a213a63ecfecd59976154a03183b65a8f1554",
+      "declared_sha256": "34fa710f984b43306f89abd2458a213a63ecfecd59976154a03183b65a8f1554",
+      "matches_declared": true,
+      "baseline_sha256": "34fa710f984b43306f89abd2458a213a63ecfecd59976154a03183b65a8f1554",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v2",
+      "kind": "member",
+      "path": "resources/contracts/test-v2/fonts/source/DejaVuSans-Bold.ttf",
+      "sha256": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
+      "declared_sha256": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
+      "matches_declared": true,
+      "baseline_sha256": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v2",
+      "kind": "member",
+      "path": "resources/contracts/test-v2/fonts/source/DejaVuSans.ttf",
+      "sha256": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
+      "declared_sha256": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
+      "matches_declared": true,
+      "baseline_sha256": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
+      "matches_baseline": true
+    },
+    {
+      "family": "test-v2",
+      "kind": "member",
+      "path": "resources/contracts/test-v2/fonts/source/LICENSE",
+      "sha256": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93",
+      "declared_sha256": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93",
+      "matches_declared": true,
+      "baseline_sha256": "7a083b136e64d064794c3419751e5c7dd10d2f64c108fe5ba161eae5e5958a93",
+      "matches_baseline": true
+    },
+    {
+      "family": "free-v1",
+      "kind": "manifest",
+      "path": "resources/contracts/free-v1/profile-assets.json",
+      "sha256": "570f6a023927228e0ac6def670df603b5b595ffd916acf69bf569fecaeab74c8",
+      "baseline_sha256": "570f6a023927228e0ac6def670df603b5b595ffd916acf69bf569fecaeab74c8",
+      "matches_baseline": true
+    },
+    {
+      "family": "free-v1",
+      "kind": "member",
+      "path": "app/Domain/Grants/Free/FreeGrantText.php",
+      "sha256": "ef6f23c3d65039fd138a6a459bfe448624e391997af69d3637eb88d132ebe883",
+      "declared_sha256": "ef6f23c3d65039fd138a6a459bfe448624e391997af69d3637eb88d132ebe883",
+      "matches_declared": true,
+      "baseline_sha256": "ef6f23c3d65039fd138a6a459bfe448624e391997af69d3637eb88d132ebe883",
+      "matches_baseline": true
+    },
+    {
+      "family": "free-v1",
+      "kind": "member",
+      "path": "app/Domain/Grants/Free/FreeGrantPdfRenderer.php",
+      "sha256": "2ca8a4fd59b2934d3ea0fa06aae8337339fe7adbc6ff42a57b01e07e5e0fef63",
+      "declared_sha256": "2ca8a4fd59b2934d3ea0fa06aae8337339fe7adbc6ff42a57b01e07e5e0fef63",
+      "matches_declared": true,
+      "baseline_sha256": "2ca8a4fd59b2934d3ea0fa06aae8337339fe7adbc6ff42a57b01e07e5e0fef63",
+      "matches_baseline": true
+    },
+    {
+      "family": "free-v1",
+      "kind": "member",
+      "path": "app/Domain/Grants/Free/FreeGrantRendererProcess.php",
+      "sha256": "af3031bf9c37f6c528d7dcb48b1a347708520aab038b8a27e21a33d10ef31732",
+      "declared_sha256": "af3031bf9c37f6c528d7dcb48b1a347708520aab038b8a27e21a33d10ef31732",
+      "matches_declared": true,
+      "baseline_sha256": "af3031bf9c37f6c528d7dcb48b1a347708520aab038b8a27e21a33d10ef31732",
+      "matches_baseline": true
+    },
+    {
+      "family": "free-v1",
+      "kind": "member",
+      "path": "app/Domain/Grants/Free/FreeGrantRenderInput.php",
+      "sha256": "efd1b3dae37efdeaf91d61fc96216532fa92ea43ea08fbbac1e524e3635a9060",
+      "declared_sha256": "efd1b3dae37efdeaf91d61fc96216532fa92ea43ea08fbbac1e524e3635a9060",
+      "matches_declared": true,
+      "baseline_sha256": "efd1b3dae37efdeaf91d61fc96216532fa92ea43ea08fbbac1e524e3635a9060",
+      "matches_baseline": true
+    },
+    {
+      "family": "free-v1",
+      "kind": "member",
+      "path": "scripts/render-free-grant.php",
+      "sha256": "c8c39861757f565242b375149acde5ee906996b45078aec8d6d7842f59eb4c2f",
+      "declared_sha256": "c8c39861757f565242b375149acde5ee906996b45078aec8d6d7842f59eb4c2f",
+      "matches_declared": true,
+      "baseline_sha256": "c8c39861757f565242b375149acde5ee906996b45078aec8d6d7842f59eb4c2f",
+      "matches_baseline": true
+    },
+    {
+      "family": "paid-v1",
+      "kind": "manifest",
+      "path": "resources/contracts/paid-v1/profile-assets.json",
+      "sha256": "4a2221b64384c226e72cf16811e31f512a8a8f63c65081a04487ec5f7a573940",
+      "baseline_sha256": "4a2221b64384c226e72cf16811e31f512a8a8f63c65081a04487ec5f7a573940",
+      "matches_baseline": true
+    },
+    {
+      "family": "paid-v1",
+      "kind": "member",
+      "path": "app/Domain/Grants/Paid/PaidGrantText.php",
+      "sha256": "9eabe757ed8daa9618de7af7cd22911fd971a0f5174d5cb6eac7294c1e0c5411",
+      "declared_sha256": "9eabe757ed8daa9618de7af7cd22911fd971a0f5174d5cb6eac7294c1e0c5411",
+      "matches_declared": true,
+      "baseline_sha256": "9eabe757ed8daa9618de7af7cd22911fd971a0f5174d5cb6eac7294c1e0c5411",
+      "matches_baseline": true
+    },
+    {
+      "family": "paid-v1",
+      "kind": "member",
+      "path": "app/Domain/Grants/Paid/PaidGrantPdfRenderer.php",
+      "sha256": "8a0fce94ed52d65eb31ebf67941976cd31676a47300d9a5ed4b7289d64209c44",
+      "declared_sha256": "8a0fce94ed52d65eb31ebf67941976cd31676a47300d9a5ed4b7289d64209c44",
+      "matches_declared": true,
+      "baseline_sha256": "8a0fce94ed52d65eb31ebf67941976cd31676a47300d9a5ed4b7289d64209c44",
+      "matches_baseline": true
+    },
+    {
+      "family": "paid-v1",
+      "kind": "member",
+      "path": "app/Domain/Grants/Paid/PaidGrantRendererProcess.php",
+      "sha256": "d138d616268483762beb2f45ffcd9489eddcdb59c0f4568852d7a40a485ad64f",
+      "declared_sha256": "d138d616268483762beb2f45ffcd9489eddcdb59c0f4568852d7a40a485ad64f",
+      "matches_declared": true,
+      "baseline_sha256": "d138d616268483762beb2f45ffcd9489eddcdb59c0f4568852d7a40a485ad64f",
+      "matches_baseline": true
+    },
+    {
+      "family": "paid-v1",
+      "kind": "member",
+      "path": "app/Domain/Grants/Paid/PaidGrantRenderInput.php",
+      "sha256": "b3d2eb372fce8d87cc9cfea0cd1f35d18b609ef2636cef4b77a29e4c5541c5cc",
+      "declared_sha256": "b3d2eb372fce8d87cc9cfea0cd1f35d18b609ef2636cef4b77a29e4c5541c5cc",
+      "matches_declared": true,
+      "baseline_sha256": "b3d2eb372fce8d87cc9cfea0cd1f35d18b609ef2636cef4b77a29e4c5541c5cc",
+      "matches_baseline": true
+    },
+    {
+      "family": "paid-v1",
+      "kind": "member",
+      "path": "app/Domain/Grants/Paid/PaidGrantFiles.php",
+      "sha256": "f37bcf56475596b4e41e03512520b7a002d196c772d5257801d40088d52cc418",
+      "declared_sha256": "f37bcf56475596b4e41e03512520b7a002d196c772d5257801d40088d52cc418",
+      "matches_declared": true,
+      "baseline_sha256": "f37bcf56475596b4e41e03512520b7a002d196c772d5257801d40088d52cc418",
+      "matches_baseline": true
+    },
+    {
+      "family": "paid-v1",
+      "kind": "member",
+      "path": "scripts/render-paid-grant.php",
+      "sha256": "90c6dccdadabc117d7a11b6a21e4043cbe22e8616faa79141852e56ab14623fc",
+      "declared_sha256": "90c6dccdadabc117d7a11b6a21e4043cbe22e8616faa79141852e56ab14623fc",
+      "matches_declared": true,
+      "baseline_sha256": "90c6dccdadabc117d7a11b6a21e4043cbe22e8616faa79141852e56ab14623fc",
+      "matches_baseline": true
+    },
+    {
+      "family": "production-free-v1",
+      "kind": "manifest",
+      "path": "resources/contracts/production-free-v1/profile-assets.json",
+      "sha256": "b909c5fa80e882d7d6f2ab4bf8b05f315f46695d4a9acb621b0350a02d7f7b1f",
+      "baseline_sha256": "b909c5fa80e882d7d6f2ab4bf8b05f315f46695d4a9acb621b0350a02d7f7b1f",
+      "matches_baseline": true
+    },
+    {
+      "family": "production-free-v1",
+      "kind": "member",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantText.php",
+      "sha256": "93af5758af8c646ba794a6864701db2771f23040ad537953794b434ab16fb522",
+      "declared_sha256": "93af5758af8c646ba794a6864701db2771f23040ad537953794b434ab16fb522",
+      "matches_declared": true,
+      "baseline_sha256": "93af5758af8c646ba794a6864701db2771f23040ad537953794b434ab16fb522",
+      "matches_baseline": true
+    },
+    {
+      "family": "production-free-v1",
+      "kind": "member",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantPdfRenderer.php",
+      "sha256": "eea4bc7e5ba7a7df18eac0ac2dd85720813372d94b19d1dc303e789cf9b7b261",
+      "declared_sha256": "eea4bc7e5ba7a7df18eac0ac2dd85720813372d94b19d1dc303e789cf9b7b261",
+      "matches_declared": true,
+      "baseline_sha256": "eea4bc7e5ba7a7df18eac0ac2dd85720813372d94b19d1dc303e789cf9b7b261",
+      "matches_baseline": true
+    },
+    {
+      "family": "production-free-v1",
+      "kind": "member",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantRendererProcess.php",
+      "sha256": "ce40e9b1a1bb85c7924b21951488ab54b24baa042be2df1e5a1b4fd9a1a85921",
+      "declared_sha256": "ce40e9b1a1bb85c7924b21951488ab54b24baa042be2df1e5a1b4fd9a1a85921",
+      "matches_declared": true,
+      "baseline_sha256": "ce40e9b1a1bb85c7924b21951488ab54b24baa042be2df1e5a1b4fd9a1a85921",
+      "matches_baseline": true
+    },
+    {
+      "family": "production-free-v1",
+      "kind": "member",
+      "path": "app/Domain/Grants/ProductionFree/ProductionFreeGrantRenderInput.php",
+      "sha256": "16566e3fca45b7e8ad0d25393632f035711e26a3b6acfd0edb8fc4ee7e55d93f",
+      "declared_sha256": "16566e3fca45b7e8ad0d25393632f035711e26a3b6acfd0edb8fc4ee7e55d93f",
+      "matches_declared": true,
+      "baseline_sha256": "16566e3fca45b7e8ad0d25393632f035711e26a3b6acfd0edb8fc4ee7e55d93f",
+      "matches_baseline": true
+    },
+    {
+      "family": "production-free-v1",
+      "kind": "member",
+      "path": "scripts/render-production-free-grant.php",
+      "sha256": "ecf6cf22f902a180b7dbcb3ae771fe9fcb0e5282b74274a6d53e08412e6a3199",
+      "declared_sha256": "ecf6cf22f902a180b7dbcb3ae771fe9fcb0e5282b74274a6d53e08412e6a3199",
+      "matches_declared": true,
+      "baseline_sha256": "ecf6cf22f902a180b7dbcb3ae771fe9fcb0e5282b74274a6d53e08412e6a3199",
+      "matches_baseline": true
+    }
+  ]
+}

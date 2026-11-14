@@ -16,6 +16,7 @@ use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Tests\Support\FilamentNotifications;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\LicenseFixtures;
 use Tests\TestCase;
@@ -310,11 +311,14 @@ class RightsDeclarationWriterActionTest extends TestCase
         $before = $this->evidence();
         Log::spy();
         AuditEvent::creating(fn () => throw new RuntimeException('Synthetic private failure '.$data['provenance_reference']));
-        $page->callMountedTableAction()->assertNotified('The save result could not be confirmed.')->assertSet('mountedActions', []);
+        $page->callMountedTableAction();
+        // Read the queue while it is still full, and require the expected notification so the privacy check cannot pass on nothing.
+        FilamentNotifications::sole('The save result could not be confirmed.', 'danger');
+        FilamentNotifications::assertNoneContain([$data['provenance_reference']]);
+        $page->assertNotified('The save result could not be confirmed.')->assertSet('mountedActions', []);
         $this->assertConsumed($page);
         $this->assertSame($before, $this->evidence());
         Log::shouldHaveReceived('warning')->once()->with('Rights declaration UI could not confirm the result.', ['exception_class' => RuntimeException::class]);
-        $this->assertStringNotContainsString($data['provenance_reference'], json_encode(session('filament.notifications'), JSON_THROW_ON_ERROR));
         $page->callMountedAction();
         $this->assertSame($before, $this->evidence());
     }

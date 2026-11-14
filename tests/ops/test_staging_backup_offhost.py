@@ -1,0 +1,1325 @@
+"""Opt-in off-host backup hardening in ops/staging/backup.sh: age encryption, an rclone remote, tiered retention.
+
+The functions under test are sliced out of the shipped script (the style of the other tests/ops files) and run in
+bash with real `age`, `rsync` and `rclone` against throwaway local directories and a generated test key pair that is
+never kept. Nothing here touches a network, a database or a real host."""
+import datetime
+import fcntl
+import hashlib
+import os
+import random
+import shutil
+import subprocess
+import tempfile
+import threading
+import time
+import unittest
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[2]
+BACKUP = REPO / "ops/staging/backup.sh"
+SOURCE = BACKUP.read_text()
+DEFAULTS = SOURCE[SOURCE.index(': "${VASEY_BACKUP_AGE_RECIPIENTS_FILE:=}"'):SOURCE.index('[ "$(id -u "$VASEY_APP_USER")" -gt 0 ]')]
+DEFINITIONS = SOURCE[SOURCE.index("SET_NAME_RE="):SOURCE.index('\ncase "${1:-}" in')]
+CONF_LOADER = SOURCE[SOURCE.index(': "${VASEY_BACKUP_CONF:='):SOURCE.index(': "${VASEY_BACKUP_DIR:=')]
+HAVE = {tool: shutil.which(tool) for tool in ("age", "age-keygen", "rsync", "rclone")}
+
+# The script requires root ownership of its configuration files; a test runs as whatever user it has, so the shim
+# reports the current user's files as root-owned. The ownership refusal itself is exercised only when really root.
+PRELUDE = r"""set -euo pipefail
+umask 077
+die() { echo "DIE: $*" >&2; exit 1; }
+log() { echo "LOG: $*"; }
+stat() {
+  local fmt=""; [ "${1:-}" = -c ] && fmt=${2:-}
+  local out; out=$(command stat "$@") || return $?
+  if [[ "$fmt" == *%u* ]] && [ "$(id -u)" != 0 ]; then out=${out/#$(id -u)/0}; fi
+  printf '%s\n' "$out"
+}
+: "${VASEY_BACKUP_KEEP:=7}" "${VASEY_BACKUP_DEST:=}" "${VASEY_BACKUP_SSH_KEY:=/nonexistent}"
+"""
+
+
+def set_name(day, hour="030000", sha="a" * 12):
+    return f"{day}T{hour}Z-{sha}"
+
+
+class OffhostBase(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(prefix="va-offhost-")
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.backups = self.root / "backups"
+        self.backups.mkdir(mode=0o700)
+        self.env = {"PATH": "/usr/local/bin:/usr/bin:/bin", "VASEY_BACKUP_DIR": str(self.backups),
+                    "HOME": str(self.root), "LC_ALL": "C"}
+
+    def bash(self, script, **extra):
+        env = dict(self.env, **{k: str(v) for k, v in extra.items()})
+        return subprocess.run(["bash", "-c", PRELUDE + DEFAULTS + DEFINITIONS + "\n" + script],
+                              env=env, capture_output=True, text=True, timeout=120)
+
+    def make_set(self, name=None, proof=True, payload=b"p" * 4096):
+        name = name or set_name("20261015")
+        bk = self.backups / name
+        bk.mkdir(mode=0o700)
+        (bk / "database.sql").write_text("-- synthetic dump SYNTHETIC_DATABASE_MARKER\n")
+        (bk / "private.tar").write_bytes(payload)
+        (bk / "env.backup").write_text("APP_KEY=base64:SYNTHETIC_KEY_MARKER\n")
+        (bk / "MANIFEST").write_text("release_sha=none\n")
+        if proof:
+            (bk / "RESTORE_CHECK").write_text("result=RESTORE_VERIFIED\n")
+        return bk
+
+    def recipients(self, content=None, mode=0o600):
+        path = self.root / "recipients.txt"
+        if content is None:
+            keyfile = self.root / "test-identity.txt"
+            subprocess.run(["age-keygen", "-o", str(keyfile)], check=True, capture_output=True)
+            content = subprocess.run(["age-keygen", "-y", str(keyfile)], check=True, capture_output=True, text=True).stdout
+        path.write_text(content)
+        path.chmod(mode)
+        return path
+
+
+@unittest.skipUnless(HAVE["age"] and HAVE["age-keygen"], "age is not installed")
+class ConfigurationValidation(OffhostBase):
+    def refused(self, run, reason):
+        self.assertNotEqual(run.returncode, 0, run.stdout)
+        self.assertIn(reason, run.stdout + run.stderr)
+
+    def test_defaults_request_nothing(self):
+        run = self.bash("hardening_requested && echo REQUESTED || echo INERT; offhost_config_ok && echo CONFIG_OK")
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertIn("INERT", run.stdout)
+        self.assertIn("CONFIG_OK", run.stdout)
+
+    def test_public_recipients_are_accepted(self):
+        run = self.bash("offhost_config_ok && echo OK", VASEY_BACKUP_AGE_RECIPIENTS_FILE=self.recipients(),
+                        VASEY_BACKUP_AGE_BIN=HAVE["age"])
+        self.assertIn("OK", run.stdout, run.stdout + run.stderr)
+
+    def test_private_key_material_on_the_host_is_refused(self):
+        identity = self.root / "test-identity.txt"
+        subprocess.run(["age-keygen", "-o", str(identity)], check=True, capture_output=True)
+        run = self.bash("offhost_config_ok", VASEY_BACKUP_AGE_RECIPIENTS_FILE=identity, VASEY_BACKUP_AGE_BIN=HAVE["age"])
+        self.refused(run, "private key material")
+        secret = next(line for line in identity.read_text().splitlines() if line.startswith("AGE-SECRET-KEY-"))
+        self.assertNotIn(secret, run.stdout + run.stderr)
+
+    def test_malformed_missing_and_empty_recipients_are_refused(self):
+        for content in ("not-a-key\n", "ssh-ed25519 AAAA\n", "age1tooshort\n", "# only a comment\n\n", ""):
+            with self.subTest(content=content[:20]):
+                run = self.bash("offhost_config_ok", VASEY_BACKUP_AGE_RECIPIENTS_FILE=self.recipients(content),
+                                VASEY_BACKUP_AGE_BIN=HAVE["age"])
+                self.assertNotEqual(run.returncode, 0)
+
+    def test_writable_or_linked_recipients_file_is_refused(self):
+        good = self.recipients()
+        good.chmod(0o666)
+        self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_AGE_RECIPIENTS_FILE=good, VASEY_BACKUP_AGE_BIN=HAVE["age"]),
+                     "not group/world writable")
+        good.chmod(0o600)
+        link = self.root / "link.txt"
+        link.symlink_to(good)
+        self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_AGE_RECIPIENTS_FILE=link, VASEY_BACKUP_AGE_BIN=HAVE["age"]),
+                     "root-owned regular file")
+
+    @unittest.skipUnless(os.geteuid() == 0, "needs root to create a file owned by someone else")
+    def test_recipients_file_owned_by_another_user_is_refused(self):
+        good = self.recipients()
+        os.chown(good, 65534, 65534)
+        self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_AGE_RECIPIENTS_FILE=good, VASEY_BACKUP_AGE_BIN=HAVE["age"]),
+                     "root-owned regular file")
+
+    def test_missing_age_binary_is_refused(self):
+        self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_AGE_RECIPIENTS_FILE=self.recipients(),
+                               VASEY_BACKUP_AGE_BIN=self.root / "no-age"), "age is not installed")
+
+    def test_require_encryption_without_recipients_is_refused(self):
+        self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_REQUIRE_ENCRYPTION=1), "VASEY_BACKUP_AGE_RECIPIENTS_FILE is not set")
+        self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_REQUIRE_ENCRYPTION="yes"), "must be 0 or 1")
+
+    def test_a_remote_without_recipients_is_refused_unless_explicitly_allowed(self):
+        config = self.root / "rclone.conf"
+        config.write_text("[r]\ntype = local\n")
+        config.chmod(0o600)
+        remote = dict(VASEY_BACKUP_REMOTE="r:p", VASEY_BACKUP_RCLONE_BIN="/bin/true", VASEY_BACKUP_RCLONE_CONFIG=config)
+        run = self.bash("offhost_config_ok", **remote)
+        self.refused(run, "would leave this host unencrypted")
+        self.assertIn("VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1", run.stdout + run.stderr)
+        self.assertNotIn("r:p", run.stdout + run.stderr)
+        # The explicit opt-in, and only the literal 1, lifts it; recipients make it unnecessary.
+        self.assertIn("OK", self.bash("offhost_config_ok && echo OK", VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1, **remote).stdout)
+        for value in ("0", "", "true", "yes", "2"):
+            with self.subTest(value=value):
+                self.assertNotEqual(self.bash("offhost_config_ok", VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=value, **remote).returncode, 0)
+        self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE="true", **remote), "must be 0 or 1")
+        self.assertIn("OK", self.bash("offhost_config_ok && echo OK", VASEY_BACKUP_AGE_RECIPIENTS_FILE=self.recipients(),
+                                      VASEY_BACKUP_AGE_BIN=HAVE["age"], **remote).stdout)
+
+    def test_the_opt_in_does_not_apply_without_a_remote(self):
+        # Nothing to allow: the default path and rsync with recipients are unaffected, and the opt-in cannot weaken REQUIRE_ENCRYPTION.
+        self.assertIn("OK", self.bash("offhost_config_ok && echo OK", VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1).stdout)
+        self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1, VASEY_BACKUP_REQUIRE_ENCRYPTION=1),
+                     "VASEY_BACKUP_AGE_RECIPIENTS_FILE is not set")
+
+    def test_rsync_and_rclone_are_alternatives(self):
+        self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_DEST="u@h:/p", VASEY_BACKUP_REMOTE="r:p"), "alternatives")
+
+    def test_remote_must_be_a_named_remote_with_a_private_config(self):
+        for remote in (":s3,access_key_id=AKIA:bucket", "has space:p", "r", "r:p;rm", "-flag:p"):
+            with self.subTest(remote=remote):
+                self.assertNotEqual(self.bash("offhost_config_ok", VASEY_BACKUP_REMOTE=remote).returncode, 0)
+        config = self.root / "rclone.conf"
+        config.write_text("[r]\ntype = local\n")
+        config.chmod(0o644)
+        self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_REMOTE="r:p", VASEY_BACKUP_RCLONE_BIN="/bin/true",
+                               VASEY_BACKUP_RCLONE_CONFIG=config), "0600")
+
+    def test_retention_values_are_validated(self):
+        for retention, extra in (("weekly", {}), ("tiered", {"VASEY_BACKUP_KEEP_DAILY": "x"}),
+                                 ("tiered", {"VASEY_BACKUP_KEEP": "0"}), ("tiered", {"VASEY_BACKUP_KEEP_MONTHLY": "-1"})):
+            with self.subTest(retention=retention, extra=extra):
+                self.assertNotEqual(self.bash("offhost_config_ok", VASEY_BACKUP_RETENTION=retention, **extra).returncode, 0)
+        self.assertEqual(self.bash("offhost_config_ok", VASEY_BACKUP_RETENTION="tiered").returncode, 0)
+
+    def test_remote_pruning_needs_a_remote_and_tiered_retention(self):
+        self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_REMOTE_PRUNE=1), "VASEY_BACKUP_REMOTE_PRUNE=1 needs")
+        self.refused(self.bash("offhost_config_ok", VASEY_BACKUP_REMOTE_PRUNE=1, VASEY_BACKUP_DEST="u@h:/p",
+                               VASEY_BACKUP_RETENTION="tiered"), "never pruned from this host")
+
+
+@unittest.skipUnless(HAVE["age"] and HAVE["age-keygen"] and HAVE["rsync"], "age or rsync is not installed")
+class DefaultsAndEncryptedRsync(OffhostBase):
+    def setUp(self):
+        super().setUp()
+        self.dest = self.root / "dest"
+        self.dest.mkdir(mode=0o700)
+        self.key = self.root / "ssh-key"
+        self.key.write_text("synthetic")
+
+    def test_default_ship_is_the_unchanged_plain_rsync_of_the_whole_set(self):
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_DEST=self.dest, VASEY_BACKUP_SSH_KEY=self.key)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertIn(f"shipped {bk.name}", run.stdout)
+        self.assertEqual({p.name for p in (self.dest / bk.name).iterdir()},
+                         {"database.sql", "private.tar", "env.backup", "MANIFEST", "RESTORE_CHECK"})
+        self.assertFalse(list(self.dest.glob("*.age")))
+        # Nothing of the hardened path appears: no lock, no staging directory, no kept retry copy.
+        self.assertEqual([p.name for p in self.backups.iterdir()], [bk.name])
+
+    def test_default_ship_without_a_destination_only_warns(self):
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"')
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertIn("NOT an off-host backup", run.stdout)
+
+    def test_default_ship_does_not_require_a_restore_proof_as_before(self):
+        bk = self.make_set(proof=False)
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_DEST=self.dest, VASEY_BACKUP_SSH_KEY=self.key)
+        self.assertEqual(run.returncode, 0, run.stderr)
+
+    def test_encrypted_ship_round_trips_and_leaves_no_plaintext_off_host(self):
+        recipients = self.recipients()
+        identity = self.root / "test-identity.txt"
+        payload = os.urandom(300_000)
+        bk = self.make_set(payload=payload)
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_DEST=self.dest, VASEY_BACKUP_SSH_KEY=self.key,
+                        VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, VASEY_BACKUP_AGE_BIN=HAVE["age"])
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("age-encrypted via rsync", run.stdout)
+        shipped = sorted(p.name for p in self.dest.iterdir())
+        self.assertEqual(shipped, [f"{bk.name}.tar.age", f"{bk.name}.tar.age.sha256"])
+        ciphertext = (self.dest / f"{bk.name}.tar.age").read_bytes()
+        self.assertTrue(ciphertext.startswith(b"age-encryption.org/v1"))
+        for marker in (b"SYNTHETIC_DATABASE_MARKER", b"SYNTHETIC_KEY_MARKER", payload[:64]):
+            self.assertNotIn(marker, ciphertext)
+        # The recorded digest matches the shipped bytes.
+        check = subprocess.run(["sha256sum", "--check", "--status", f"{bk.name}.tar.age.sha256"], cwd=self.dest)
+        self.assertEqual(check.returncode, 0)
+        # No staging directory is left behind, and the local set is untouched.
+        self.assertEqual([p.name for p in self.backups.iterdir() if p.name.startswith(".ship")], [])
+        self.assertEqual((bk / "private.tar").read_bytes(), payload)
+        # Decrypting needs the private key, which only this test (standing in for the operator's machine) holds.
+        restore = self.root / "restore"
+        restore.mkdir()
+        decrypt = subprocess.run(f'age -d -i "{identity}" "{self.dest}/{bk.name}.tar.age" | tar -x -C "{restore}"',
+                                 shell=True, capture_output=True, text=True, env={"PATH": "/usr/bin:/bin"})
+        self.assertEqual(decrypt.returncode, 0, decrypt.stderr)
+        self.assertEqual((restore / bk.name / "private.tar").read_bytes(), payload)
+        self.assertIn("SYNTHETIC_KEY_MARKER", (restore / bk.name / "env.backup").read_text())
+        self.assertEqual((restore / bk.name / "RESTORE_CHECK").read_text(), "result=RESTORE_VERIFIED\n")
+
+    def test_a_set_without_a_verified_restore_proof_is_never_shipped_when_hardened(self):
+        recipients = self.recipients()
+        for proof_text in (None, "result=FAILED\n"):
+            with self.subTest(proof=proof_text):
+                bk = self.make_set(name=set_name("20261016" if proof_text else "20261017"), proof=False)
+                if proof_text:
+                    (bk / "RESTORE_CHECK").write_text(proof_text)
+                run = self.bash(f'ship "{bk}"', VASEY_BACKUP_DEST=self.dest, VASEY_BACKUP_SSH_KEY=self.key,
+                                VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, VASEY_BACKUP_AGE_BIN=HAVE["age"])
+                self.assertNotEqual(run.returncode, 0)
+                self.assertIn("no verified restore proof", run.stderr)
+                self.assertEqual(list(self.dest.iterdir()), [])
+
+    def test_a_bad_configuration_ships_nothing_even_as_plaintext(self):
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_DEST=self.dest, VASEY_BACKUP_SSH_KEY=self.key,
+                        VASEY_BACKUP_REQUIRE_ENCRYPTION=1)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertEqual(list(self.dest.iterdir()), [])
+
+    def test_encryption_failure_cleans_up_and_ships_nothing(self):
+        recipients = self.recipients()
+        broken = self.root / "age"
+        broken.write_text("#!/bin/sh\ncat >/dev/null\nexit 1\n")
+        broken.chmod(0o755)
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_DEST=self.dest, VASEY_BACKUP_SSH_KEY=self.key,
+                        VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, VASEY_BACKUP_AGE_BIN=broken)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertEqual(list(self.dest.iterdir()), [])
+        self.assertEqual([p.name for p in self.backups.iterdir() if p.name.startswith(".ship")], [])
+        self.assertTrue((bk / "database.sql").exists())
+
+    def test_an_empty_or_foreign_output_is_not_accepted_as_ciphertext(self):
+        recipients = self.recipients()
+        fake = self.root / "age"
+        fake.write_text("#!/bin/sh\ncat >/dev/null\nwhile [ $# -gt 0 ]; do [ \"$1\" = -o ] && out=$2; shift; done\necho plaintext > \"$out\"\n")
+        fake.chmod(0o755)
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_DEST=self.dest, VASEY_BACKUP_SSH_KEY=self.key,
+                        VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, VASEY_BACKUP_AGE_BIN=fake)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertEqual(list(self.dest.iterdir()), [])
+
+    def test_insufficient_free_space_refuses_before_encrypting(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        stubs = self.root / "stubs"
+        stubs.mkdir()
+        (stubs / "df").write_text("#!/bin/sh\nprintf 'Avail\\n1024\\n'\n")
+        (stubs / "df").chmod(0o755)
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_DEST=self.dest, VASEY_BACKUP_SSH_KEY=self.key,
+                        VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, VASEY_BACKUP_AGE_BIN=HAVE["age"],
+                        PATH=f"{stubs}:/usr/local/bin:/usr/bin:/bin")
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("not enough free space", run.stdout)
+        self.assertEqual(list(self.dest.iterdir()), [])
+
+    def test_only_well_formed_set_directories_are_shipped_when_hardened(self):
+        recipients = self.recipients()
+        odd = self.backups / "not-a-set"
+        odd.mkdir()
+        run = self.bash(f'ship "{odd}"', VASEY_BACKUP_DEST=self.dest, VASEY_BACKUP_SSH_KEY=self.key,
+                        VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, VASEY_BACKUP_AGE_BIN=HAVE["age"])
+        self.assertNotEqual(run.returncode, 0)
+        self.assertEqual(list(self.dest.iterdir()), [])
+
+    def test_hardened_without_a_destination_only_warns_like_the_default(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, VASEY_BACKUP_AGE_BIN=HAVE["age"])
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertIn("NOT an off-host backup", run.stdout)
+
+
+@unittest.skipUnless(HAVE["age"] and HAVE["age-keygen"] and HAVE["rclone"], "age or rclone is not installed")
+class RcloneRemote(OffhostBase):
+    def setUp(self):
+        super().setUp()
+        self.remote_dir = self.root / "remote"
+        self.remote_dir.mkdir()
+        self.config = self.root / "rclone.conf"
+        self.config.write_text("[vasey-backup]\ntype = local\n")
+        self.config.chmod(0o600)
+        self.settings = {"VASEY_BACKUP_REMOTE": f"vasey-backup:{self.remote_dir}", "VASEY_BACKUP_RCLONE_BIN": HAVE["rclone"],
+                         "VASEY_BACKUP_RCLONE_CONFIG": self.config, "VASEY_BACKUP_AGE_BIN": HAVE["age"]}
+
+    def test_encrypted_set_goes_to_the_remote_and_decrypts(self):
+        recipients = self.recipients()
+        identity = self.root / "test-identity.txt"
+        bk = self.make_set(payload=os.urandom(100_000))
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("age-encrypted via rclone", run.stdout)
+        self.assertEqual(sorted(p.name for p in self.remote_dir.iterdir()), [f"{bk.name}.tar.age", f"{bk.name}.tar.age.sha256"])
+        restore = self.root / "restore"
+        restore.mkdir()
+        decrypt = subprocess.run(f'age -d -i "{identity}" "{self.remote_dir}/{bk.name}.tar.age" | tar -x -C "{restore}"',
+                                 shell=True, capture_output=True, env={"PATH": "/usr/bin:/bin"})
+        self.assertEqual(decrypt.returncode, 0)
+        self.assertEqual((restore / bk.name / "private.tar").read_bytes(), (bk / "private.tar").read_bytes())
+        # Shipping the same set again: this host recorded the verified transfer and the remote digest still matches, so it exits 0
+        # with "already shipped", sends nothing, encrypts nothing and leaves no kept copy.
+        shipped = self.remote_digests()
+        again = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertEqual(again.returncode, 0, again.stdout + again.stderr)
+        self.assertIn(f"{bk.name} is already shipped", again.stdout)
+        self.assertNotIn("age-encrypted via rclone", again.stdout)
+        self.assertEqual(self.remote_digests(), shipped)
+        self.assertEqual([p.name for p in self.backups.iterdir() if p.name.startswith((".ship.", ".offhost-retry."))], [])
+
+    def test_already_shipped_needs_the_record_and_a_matching_remote_digest(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        self.assertEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings).returncode, 0)
+        record = self.backups / f".offhost-shipped.{bk.name}"
+        digest = self.remote_dir / f"{bk.name}.tar.age.sha256"
+        good = digest.read_bytes()
+        for case in ("remote digest replaced", "record missing"):
+            with self.subTest(case=case):
+                if case == "remote digest replaced":
+                    digest.write_bytes(b"0" * 64 + b"  something else\n")
+                else:
+                    digest.write_bytes(good)
+                    record.unlink()
+                shipped = self.remote_digests()
+                run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+                self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+                self.assertNotIn("already shipped", run.stdout)
+                self.assertIn("remove that object first", run.stdout)
+                self.assertEqual(self.remote_digests(), shipped)
+                self.assertEqual(self.retry_copies(), [], "refused before encrypting: no unusable copy")
+
+    def remote_digests(self):
+        return {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in self.remote_dir.iterdir()}
+
+    def test_a_differing_object_already_on_the_remote_is_refused_and_never_overwritten(self):
+        # Before a fresh encryption the remote must hold neither name (rclone lsf, any backend): refused, nothing sent or encrypted.
+        recipients = self.recipients()
+        bk = self.make_set()
+        for suffix in (".tar.age", ".tar.age.sha256"):
+            with self.subTest(existing=suffix):
+                shutil.rmtree(self.remote_dir)
+                self.remote_dir.mkdir()
+                planted = self.remote_dir / f"{bk.name}{suffix}"
+                planted.write_bytes(b"an earlier, different object under this name\n")
+                run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+                self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+                self.assertIn(f"the remote already holds {bk.name}{suffix}", run.stdout)
+                self.assertNotIn("shipped", run.stdout.replace("already holds", ""))
+                self.assertEqual(planted.read_bytes(), b"an earlier, different object under this name\n", "refused, not overwritten")
+                self.assertEqual(sorted(p.name for p in self.remote_dir.iterdir()), [planted.name])
+                self.assertEqual(self.retry_copies(), [], "refused before encrypting: no copy is made")
+
+    def test_a_kept_copy_meeting_a_changed_remote_object_is_refused_by_rclone_immutable(self):
+        # The real rclone 1.60.1, local-filesystem remote: re-sending a kept copy never replaces a remote object that differs.
+        recipients = self.recipients()
+        bk = self.make_set()
+        settings = dict(self.settings, VASEY_BACKUP_RCLONE_BIN=self.flaky_rclone())
+        self.assertNotEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **settings).returncode, 0)
+        remote = self.remote_dir / f"{bk.name}.tar.age"
+        changed = bytes(b ^ 0xFF for b in remote.read_bytes())  # same size, different bytes
+        remote.write_bytes(changed)
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **settings)
+        self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("kept from an earlier attempt", run.stdout)
+        self.assertIn("immutable file modified", run.stderr)
+        self.assertEqual(remote.read_bytes(), changed)
+        self.assertEqual(self.retry_copies(), [f".offhost-retry.{bk.name}"])
+
+    def test_an_identical_remote_object_with_another_mtime_is_accepted_as_present(self):
+        # --checksum compares content: without it rclone would compare modification times and refuse the identical object.
+        recipients = self.recipients()
+        bk = self.make_set()
+        settings = dict(self.settings, VASEY_BACKUP_RCLONE_BIN=self.flaky_rclone())
+        self.assertNotEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **settings).returncode, 0)
+        old = time.time() - 10 * 86400
+        os.utime(self.remote_dir / f"{bk.name}.tar.age", (old, old))
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **settings)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("kept from an earlier attempt", run.stdout)
+
+    def no_hash_remote(self):
+        """A chunker remote with hash_type = none over a temp dir: a real rclone backend with no hash in common with the local disk."""
+        store = self.root / "nohash-store"
+        store.mkdir()
+        config = self.root / "nohash.conf"
+        config.write_text(f"[base]\ntype = local\n\n[nohash]\ntype = chunker\nremote = base:{store}\nhash_type = none\n")
+        config.chmod(0o600)
+        return store, dict(self.settings, VASEY_BACKUP_REMOTE="nohash:", VASEY_BACKUP_RCLONE_CONFIG=config)
+
+    def test_a_partial_upload_then_a_rotation_on_a_backend_without_hashes_is_refused(self):
+        # The reviewer's case: rclone falls back to sizes, and every age output of one set has the same size.
+        store, settings = self.no_hash_remote()
+        settings["VASEY_BACKUP_RCLONE_BIN"] = self.flaky_rclone()
+        bk = self.make_set()
+        first = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=self.recipients(), **settings)
+        self.assertNotEqual(first.returncode, 0, first.stdout + first.stderr)
+        self.assertEqual(sorted(p.name for p in store.iterdir()), [f"{bk.name}.tar.age"])
+        old_ciphertext = (store / f"{bk.name}.tar.age").read_bytes()
+        newkey = self.root / "rotated-identity.txt"
+        subprocess.run(["age-keygen", "-o", str(newkey)], check=True, capture_output=True)
+        rotated = self.root / "rotated.txt"
+        rotated.write_text(subprocess.run(["age-keygen", "-y", str(newkey)], check=True, capture_output=True, text=True).stdout)
+        rotated.chmod(0o600)
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=rotated, **settings)
+        self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertNotIn("age-encrypted via rclone", run.stdout)
+        self.assertIn("remove that object first", run.stdout)
+        self.assertEqual(sorted(p.name for p in store.iterdir()), [f"{bk.name}.tar.age"])
+        self.assertEqual((store / f"{bk.name}.tar.age").read_bytes(), old_ciphertext)
+
+    def test_a_backend_without_hashes_still_ships_and_checks_the_remote_digest(self):
+        store, settings = self.no_hash_remote()
+        identity = self.root / "test-identity.txt"
+        recipients = self.recipients()
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **settings)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("age-encrypted via rclone", run.stdout)
+        self.assertEqual(subprocess.run(["age", "-d", "-i", str(identity), "-o", os.devnull, str(store / f"{bk.name}.tar.age")],
+                                        capture_output=True).returncode, 0)
+        self.assertEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **settings).returncode, 0)
+
+    def test_rclone_without_age_refuses_to_ship_and_sends_nothing(self):
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"', **self.settings)
+        self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("would leave this host unencrypted", run.stdout + run.stderr)
+        self.assertEqual(list(self.remote_dir.iterdir()), [])
+        self.assertEqual([p.name for p in self.backups.iterdir() if p.name.startswith(".ship")], [])
+        self.assertTrue((bk / "env.backup").exists(), "the local set must stay intact")
+        for marker in ("SYNTHETIC_KEY_MARKER", "SYNTHETIC_DATABASE_MARKER"):
+            self.assertNotIn(marker, run.stdout + run.stderr)
+
+    def test_rclone_without_age_ships_only_with_the_explicit_opt_in_and_says_so(self):
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1, **self.settings)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=1 and no age recipients", run.stdout)
+        self.assertIn("unencrypted by this script", run.stdout)
+        self.assertTrue((self.remote_dir / bk.name / "database.sql").exists())
+
+    def test_the_opt_in_does_not_change_encrypted_shipping(self):
+        recipients = self.recipients()
+        for allow in (0, 1):
+            with self.subTest(allow=allow):
+                shutil.rmtree(self.remote_dir)
+                self.remote_dir.mkdir()
+                bk = self.backups / set_name("20261015")
+                if not bk.exists():
+                    bk = self.make_set()
+                run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients,
+                                VASEY_BACKUP_ALLOW_UNENCRYPTED_REMOTE=allow, **self.settings)
+                self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+                self.assertIn("age-encrypted via rclone", run.stdout)
+                self.assertNotIn("sent as stored", run.stdout)
+                self.assertEqual(sorted(p.name for p in self.remote_dir.iterdir()), [f"{bk.name}.tar.age", f"{bk.name}.tar.age.sha256"])
+                for artefact in self.remote_dir.iterdir():
+                    self.assertNotIn(b"SYNTHETIC_KEY_MARKER", artefact.read_bytes())
+
+    def test_stale_shipping_directories_are_cleared_and_fresh_ones_are_not(self):
+        recipients = self.recipients()
+        stale, fresh = self.backups / ".ship.OLD123", self.backups / ".ship.NEW456"
+        # Decoys: another name, and one character too many for `.ship.??????` (a broadened `.ship.*` would take it).
+        decoy, longer, link_target = self.backups / ".ship-not-ours", self.backups / ".ship.ABCDEFG", self.root / "outside"
+        for directory in (stale, fresh, decoy, longer, link_target):
+            directory.mkdir()
+            (directory / "leftover.tar.age").write_bytes(b"x")
+        (self.backups / ".ship.LINK00").symlink_to(link_target, target_is_directory=True)
+        old = time.time() - 3 * 86400
+        # The link's target is old too, so `find -L` (which tests the target, not the link) would match it and remove the link.
+        for directory in (stale, decoy, longer, link_target, self.backups / ".ship.LINK00"):
+            os.utime(directory, (old, old), follow_symlinks=False)
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertFalse(stale.exists(), "a staging directory untouched for days is removed")
+        self.assertTrue(fresh.exists(), "a recent one could be a transfer in progress")
+        self.assertTrue(decoy.exists(), "only the exact .ship.XXXXXX name shape is touched")
+        self.assertTrue(longer.exists(), "a seven-character suffix is not the .ship.XXXXXX shape")
+        self.assertTrue((self.backups / ".ship.LINK00").is_symlink() and (link_target / "leftover.tar.age").exists(), "a link is never followed")
+
+    def wrapped_rclone(self, name, prelude):
+        """The real rclone behind a bash prelude that may answer or fail one kind of call first ("${args[2]}" is the subcommand)."""
+        wrapper = self.root / name
+        wrapper.write_text('#!/bin/bash\nargs=("$@")\n' + prelude + f'\nexec "{HAVE["rclone"]}" "$@"\n')
+        wrapper.chmod(0o755)
+        return wrapper
+
+    def flaky_rclone(self, suffix=".tar.age.sha256"):
+        """The real rclone, except that the first upload of the file ending in SUFFIX fails, as an interrupted transfer would.
+
+        Only the failure is simulated. Whether an existing remote object may be replaced is decided by the real rclone: the script's
+        `rclone copy --immutable` refuses a differing object (and accepts an identical one) on this container's 1.60.1."""
+        failed_once = self.root / f"rclone-failed-once{suffix}"
+        return self.wrapped_rclone(f"flaky-rclone{suffix}", f"""if [ "${{args[2]:-}}" = copy ] && [ ! -e "{failed_once}" ]; then
+  for ((i = 3; i < ${{#args[@]}} - 1; i++)); do
+    if [ "${{args[i]}}" = --include ] && [[ "${{args[i + 1]}}" == *"{suffix}" ]]; then
+      : > "{failed_once}"; echo "flaky-rclone: simulated interrupted upload" >&2; exit 1
+    fi
+  done
+fi""")
+
+    def retry_copies(self):
+        return sorted(p.name for p in self.backups.iterdir() if p.name.startswith(".offhost-retry."))
+
+    def test_a_failed_checksum_upload_is_completed_by_a_retry_with_the_same_ciphertext(self):
+        recipients = self.recipients()
+        identity = self.root / "test-identity.txt"
+        bk = self.make_set(payload=os.urandom(100_000))
+        settings = dict(self.settings, VASEY_BACKUP_RCLONE_BIN=self.flaky_rclone())
+        first = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **settings)
+        self.assertNotEqual(first.returncode, 0, first.stdout + first.stderr)
+        self.assertIn("the local set is intact", first.stderr)
+        self.assertEqual(sorted(p.name for p in self.remote_dir.iterdir()), [f"{bk.name}.tar.age"], "the first file arrived, its checksum did not")
+        sent = (self.remote_dir / f"{bk.name}.tar.age").read_bytes()
+        # The retry (a manual `ship DIR`) must converge although --immutable refuses changed bytes under an existing name.
+        retry = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **settings)
+        self.assertEqual(retry.returncode, 0, retry.stdout + retry.stderr)
+        self.assertIn("kept from an earlier attempt", retry.stdout)
+        self.assertIn("age-encrypted via rclone", retry.stdout)
+        self.assertEqual(sorted(p.name for p in self.remote_dir.iterdir()), [f"{bk.name}.tar.age", f"{bk.name}.tar.age.sha256"])
+        self.assertEqual((self.remote_dir / f"{bk.name}.tar.age").read_bytes(), sent, "the retry re-sent the exact bytes of the first attempt")
+        check = subprocess.run(["sha256sum", "--check", "--status", f"{bk.name}.tar.age.sha256"], cwd=self.remote_dir)
+        self.assertEqual(check.returncode, 0)
+        restore = self.root / "restore"
+        restore.mkdir()
+        decrypt = subprocess.run(f'age -d -i "{identity}" "{self.remote_dir}/{bk.name}.tar.age" | tar -x -C "{restore}"',
+                                 shell=True, capture_output=True, env={"PATH": "/usr/bin:/bin"})
+        self.assertEqual(decrypt.returncode, 0)
+        self.assertEqual((restore / bk.name / "private.tar").read_bytes(), (bk / "private.tar").read_bytes())
+        # Once `rclone check` has passed nothing is kept: no retry copy and no staging directory.
+        self.assertEqual([p.name for p in self.backups.iterdir() if p.name.startswith((".ship", ".offhost-retry"))], [])
+
+    def test_the_kept_copy_is_private_ciphertext_and_never_the_plaintext_set(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients,
+                        **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=self.flaky_rclone()))
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("kept the encrypted copy", run.stdout)
+        self.assertEqual(self.retry_copies(), [f".offhost-retry.{bk.name}"])
+        kept = self.backups / f".offhost-retry.{bk.name}"
+        self.assertEqual(oct(kept.stat().st_mode & 0o777), "0o700")
+        self.assertEqual(sorted(p.name for p in kept.iterdir()), [f"{bk.name}.tar.age", f"{bk.name}.tar.age.sha256", "recipients.sha256"])
+        for artefact in kept.iterdir():
+            self.assertNotIn(b"SYNTHETIC_KEY_MARKER", artefact.read_bytes())
+            self.assertNotIn(b"SYNTHETIC_DATABASE_MARKER", artefact.read_bytes())
+        self.assertTrue((kept / f"{bk.name}.tar.age").read_bytes().startswith(b"age-encryption.org/v1"))
+        self.assertEqual([p.name for p in self.backups.iterdir() if p.name.startswith(".ship.")], [], "the staging directory itself is gone")
+
+    def test_a_kept_copy_for_other_recipients_is_never_sent(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        settings = dict(self.settings, VASEY_BACKUP_RCLONE_BIN=self.flaky_rclone())
+        self.assertNotEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **settings).returncode, 0)
+        old_ciphertext = (self.remote_dir / f"{bk.name}.tar.age").read_bytes()
+        # The operator rotates the recipients (say a key was lost) before retrying. The kept copy is for the old key: not reused.
+        newkey = self.root / "rotated-identity.txt"
+        subprocess.run(["age-keygen", "-o", str(newkey)], check=True, capture_output=True)
+        rotated = self.root / "rotated.txt"
+        rotated.write_text(subprocess.run(["age-keygen", "-y", str(newkey)], check=True, capture_output=True, text=True).stdout)
+        rotated.chmod(0o600)
+        refused = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=rotated, **settings)
+        # The remote still holds the old partial object, which --immutable will not replace: the ship fails closed and says so.
+        self.assertNotEqual(refused.returncode, 0)
+        self.assertNotIn("kept from an earlier attempt", refused.stdout)
+        self.assertIn("remove that object first", refused.stdout)
+        self.assertEqual((self.remote_dir / f"{bk.name}.tar.age").read_bytes(), old_ciphertext)
+        # Once that object is removed, the retry sends ciphertext for the rotated key only.
+        (self.remote_dir / f"{bk.name}.tar.age").unlink()
+        done = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=rotated, **settings)
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertEqual(subprocess.run(["age", "-d", "-i", str(newkey), "-o", os.devnull, str(self.remote_dir / f"{bk.name}.tar.age")],
+                                        capture_output=True).returncode, 0)
+        self.assertNotEqual(subprocess.run(["age", "-d", "-i", str(self.root / "test-identity.txt"), "-o", os.devnull,
+                                            str(self.remote_dir / f"{bk.name}.tar.age")], capture_output=True).returncode, 0)
+
+    def test_a_damaged_kept_copy_is_discarded_and_the_set_encrypted_again(self):
+        recipients = self.recipients()
+        identity = self.root / "test-identity.txt"
+        bk = self.make_set()
+        self.assertNotEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients,
+                                      **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=self.flaky_rclone())).returncode, 0)
+        kept = self.backups / f".offhost-retry.{bk.name}" / f"{bk.name}.tar.age"
+        data = kept.read_bytes()
+        # Flip the last byte so it always differs (replacing it with a fixed byte left the copy intact whenever the random
+        # ciphertext already ended in that byte, 1 run in 256: Foundation 43383590812).
+        kept.write_bytes(data[:-1] + bytes([data[-1] ^ 0xFF]))  # no longer matches its recorded digest
+        (self.remote_dir / f"{bk.name}.tar.age").unlink()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertNotIn("kept from an earlier attempt", run.stdout)
+        self.assertEqual(subprocess.run(["age", "-d", "-i", str(identity), "-o", os.devnull, str(self.remote_dir / f"{bk.name}.tar.age")],
+                                        capture_output=True).returncode, 0)
+        self.assertEqual(self.retry_copies(), [])
+
+    def test_a_kept_copy_that_is_not_age_ciphertext_is_never_sent(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        self.assertNotEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients,
+                                      **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=self.flaky_rclone())).returncode, 0)
+        kept = self.backups / f".offhost-retry.{bk.name}"
+        # Replaced by plaintext with a digest that matches it: the copy is consistent, but it is not ciphertext.
+        (kept / f"{bk.name}.tar.age").write_bytes(b"plaintext SYNTHETIC_KEY_MARKER\n")
+        digest = subprocess.run(["sha256sum", "--", f"{bk.name}.tar.age"], cwd=kept, check=True, capture_output=True).stdout
+        (kept / f"{bk.name}.tar.age.sha256").write_bytes(digest)
+        (self.remote_dir / f"{bk.name}.tar.age").unlink()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertNotIn("kept from an earlier attempt", run.stdout)
+        for artefact in self.remote_dir.iterdir():
+            self.assertNotIn(b"SYNTHETIC_KEY_MARKER", artefact.read_bytes())
+        self.assertTrue((self.remote_dir / f"{bk.name}.tar.age").read_bytes().startswith(b"age-encryption.org/v1"))
+
+    def test_a_kept_copy_whose_set_is_gone_is_removed(self):
+        recipients = self.recipients()
+        gone, odd = self.backups / f".offhost-retry.{set_name('20261001')}", self.backups / ".offhost-retry.not-a-set"
+        for directory in (gone, odd):
+            directory.mkdir()
+            (directory / "leftover.tar.age").write_bytes(b"x")
+        survivor = self.make_set(set_name("20261002"))
+        kept = self.backups / f".offhost-retry.{survivor.name}"
+        kept.mkdir()
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertFalse(gone.exists(), "its set was pruned, so nothing can ever ship it")
+        self.assertTrue(kept.exists(), "its set is still here and may be retried")
+        self.assertTrue(odd.exists(), "only well-formed set names are touched")
+
+    def test_a_concurrent_hardened_ship_refuses_before_it_cleans_up_anything(self):
+        recipients = self.recipients()
+        stale = self.backups / ".ship.OLD123"
+        stale.mkdir()
+        old = time.time() - 3 * 86400
+        os.utime(stale, (old, old))
+        bk = self.make_set()
+        with open(self.backups / ".offhost.lock", "a") as held:
+            fcntl.flock(held, fcntl.LOCK_EX)  # another hardened ship (nightly, a deploy or a manual one) is running
+            run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("another off-host ship is running", run.stderr)
+        self.assertTrue(stale.exists(), "a refused ship removes nothing, not even a stale-looking directory")
+        self.assertEqual(list(self.remote_dir.iterdir()), [])
+        self.assertEqual(self.retry_copies(), [])
+        after = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertEqual(after.returncode, 0, after.stdout + after.stderr)
+        self.assertFalse(stale.exists())
+
+    def test_the_first_ship_to_a_remote_path_that_does_not_exist_yet_succeeds(self):
+        # rclone lsf exits 3 for a missing directory: that is an empty remote, not a listing failure.
+        recipients = self.recipients()
+        bk = self.make_set()
+        fresh = self.remote_dir / "not" / "created"
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients,
+                        **dict(self.settings, VASEY_BACKUP_REMOTE=f"vasey-backup:{fresh}"))
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertEqual(sorted(p.name for p in fresh.iterdir()), [f"{bk.name}.tar.age", f"{bk.name}.tar.age.sha256"])
+
+    def test_an_outage_during_the_digest_upload_keeps_the_copy_and_the_retry_converges(self):
+        # The digest upload fails because the remote went away, and listing it fails too while the outage lasts. Not knowing whether
+        # the ciphertext landed, the copy must stay, so the retry after the outage re-sends the same bytes.
+        recipients = self.recipients()
+        bk = self.make_set()
+        outage, over = self.root / "outage", self.root / "outage-happened"
+        flaky = self.wrapped_rclone("outage-rclone", f"""if [ "${{args[2]:-}}" = copy ] && [ ! -e "{over}" ]; then
+  for ((i = 3; i < ${{#args[@]}} - 1; i++)); do
+    if [ "${{args[i]}}" = --include ] && [[ "${{args[i + 1]}}" == *.tar.age.sha256 ]]; then
+      : > "{outage}"; : > "{over}"; echo "outage: connection reset" >&2; exit 1
+    fi
+  done
+fi
+if [ "${{args[2]:-}}" = lsf ] && [ -e "{outage}" ]; then echo "outage: connection refused" >&2; exit 1; fi""")
+        settings = dict(self.settings, VASEY_BACKUP_RCLONE_BIN=flaky)
+        first = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **settings)
+        self.assertNotEqual(first.returncode, 0, first.stdout + first.stderr)
+        self.assertIn("could not be listed", first.stdout)
+        self.assertEqual(self.retry_copies(), [f".offhost-retry.{bk.name}"])
+        sent = (self.remote_dir / f"{bk.name}.tar.age").read_bytes()
+        outage.unlink()  # the remote is back
+        retry = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **settings)
+        self.assertEqual(retry.returncode, 0, retry.stdout + retry.stderr)
+        self.assertIn("kept from an earlier attempt", retry.stdout)
+        self.assertEqual((self.remote_dir / f"{bk.name}.tar.age").read_bytes(), sent)
+
+    def test_already_shipped_checks_the_remote_ciphertext_size_and_presence(self):
+        # On a backend without hashes this is a size check, not a content check; here a replaced (other size) or deleted
+        # ciphertext must make a repeat ship refuse, not report "already shipped".
+        recipients = self.recipients()
+        for case in ("replaced", "deleted"):
+            with self.subTest(case=case):
+                bk = self.make_set(set_name("20261011" if case == "replaced" else "20261012"))
+                self.assertEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings).returncode, 0)
+                ciphertext = self.remote_dir / f"{bk.name}.tar.age"
+                if case == "replaced":
+                    ciphertext.write_bytes(b"x" * 34)
+                else:
+                    ciphertext.unlink()
+                run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+                self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+                self.assertNotIn("already shipped", run.stdout)
+                self.assertIn("remove that object first", run.stdout)
+
+    def test_a_record_without_a_size_is_not_a_match_when_the_size_listing_fails(self):
+        # Two empty sizes used to compare equal: a record that lost its size line and a size listing that failed (nothing printed)
+        # passed "already shipped" on the digest alone. Both sizes must be digits.
+        recipients = self.recipients()
+        bk = self.make_set()
+        self.assertEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings).returncode, 0)
+        record = self.backups / f".offhost-shipped.{bk.name}"
+        self.assertRegex(record.read_text(), r"\nsize=[0-9]+\n\Z")
+        record.write_text(record.read_text().splitlines()[0] + "\n")
+        blind = self.wrapped_rclone("no-size-rclone", """for a in "${args[@]}"; do
+  if [ "$a" = --format ]; then echo "listing failed" >&2; exit 1; fi
+done""")
+        shipped = self.remote_digests()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=blind))
+        self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertNotIn("already shipped", run.stdout)
+        self.assertIn("remove that object first", run.stdout)
+        self.assertEqual(self.remote_digests(), shipped)
+        # The same record, with a working size listing, still does not match: the recorded size is not digits.
+        again = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertNotEqual(again.returncode, 0, again.stdout + again.stderr)
+        self.assertNotIn("already shipped", again.stdout)
+
+    def test_equal_malformed_record_and_remote_sizes_are_not_trusted(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        self.assertEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings).returncode, 0)
+        record = self.backups / f".offhost-shipped.{bk.name}"
+        digest = record.read_text().splitlines()[0]
+        shipped = self.remote_digests()
+        for malformed in ("not-a-size", "12x", "-1", " 12"):
+            with self.subTest(size=malformed):
+                record.write_text(digest + "\nsize=" + malformed + "\n")
+                blind = self.wrapped_rclone("malformed-size-rclone", """for a in "${args[@]}"; do
+  if [ "$a" = --format ]; then printf '%s;%s\\n' "$MALFORMED_SIZE" "$CIPHERTEXT_NAME"; exit 0; fi
+done""")
+                run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients,
+                                MALFORMED_SIZE=malformed, CIPHERTEXT_NAME=f"{bk.name}.tar.age", **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=blind))
+                self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+                self.assertNotIn("already shipped", run.stdout)
+                self.assertEqual(self.remote_digests(), shipped)
+
+    def test_failed_or_malformed_ciphertext_stat_never_leaves_a_shipped_record(self):
+        recipients = self.recipients()
+        for index, (value, status) in enumerate((("", 1), ("", 0), ("not-a-size", 0))):
+            with self.subTest(value=value, status=status):
+                bk = self.make_set(set_name(f"202610{index + 11}"))
+                record = self.backups / f".offhost-shipped.{bk.name}"
+                script = r'''eval "$(declare -f stat | sed '1s/stat/working_stat/')"
+stat() {
+  if [ "${1:-}" = -c ] && [ "${2:-}" = %s ] && [[ "${@: -1}" == *.tar.age ]]; then
+    echo "synthetic ciphertext stat result" >&2
+    printf '%s\n' "$STAT_VALUE"
+    return "$STAT_STATUS"
+  fi
+  working_stat "$@"
+}
+''' + f'ship "{bk}"'
+                run = self.bash(script, STAT_VALUE=value, STAT_STATUS=status,
+                                VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+                self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+                self.assertIn("synthetic ciphertext stat result", run.stderr)
+                self.assertIn(f"WARNING: could not record {bk.name} as shipped", run.stdout)
+                self.assertFalse(record.exists())
+                self.assertFalse(record.with_name(record.name + ".new").exists())
+                self.assertTrue((self.remote_dir / f"{bk.name}.tar.age").is_file())
+                self.assertFalse((self.backups / f".offhost-retry.{bk.name}").exists())
+
+    def test_a_record_that_cannot_be_written_is_reported_and_leaves_no_partial_record(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        record = self.backups / f".offhost-shipped.{bk.name}"
+        (self.backups / f"{record.name}.new").mkdir()  # the temporary record name is taken, so the write fails
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn(f"WARNING: could not record {bk.name} as shipped", run.stdout)
+        self.assertFalse(record.exists())
+
+    def test_a_linked_shipped_record_is_not_trusted(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        self.assertEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings).returncode, 0)
+        record = self.backups / f".offhost-shipped.{bk.name}"
+        outside = self.root / "record-elsewhere"
+        record.rename(outside)
+        record.symlink_to(outside)
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertNotIn("already shipped", run.stdout)
+
+    def test_the_cap_never_drops_a_reusable_copy_of_the_set_being_shipped(self):
+        recipients = self.recipients()
+        oldest = self.make_set(set_name("20261001"))
+        self.assertNotEqual(self.bash(f'ship "{oldest}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients,
+                                      **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=self.flaky_rclone())).returncode, 0)
+        for day in ("20261002", "20261003"):
+            newer = self.make_set(set_name(day))
+            kept = self.backups / f".offhost-retry.{newer.name}"
+            kept.mkdir()
+            (kept / "leftover").write_bytes(b"x")
+        run = self.bash(f'ship "{oldest}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn(f"re-sending the encrypted copy of {oldest.name}", run.stdout)
+        self.assertIn(f"dropped the kept copy of {set_name('20261002')}", run.stdout)
+        self.assertEqual(self.retry_copies(), [f".offhost-retry.{set_name('20261003')}"])
+
+    def test_a_retry_copy_is_kept_only_when_the_ciphertext_reached_the_remote(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients,
+                        **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=self.flaky_rclone(".tar.age")))
+        self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("so no copy is kept", run.stdout)
+        self.assertEqual(list(self.remote_dir.iterdir()), [])
+        self.assertEqual(self.retry_copies(), [], "nothing reached the remote, so a fresh encryption on retry is safe")
+        retry = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertEqual(retry.returncode, 0, retry.stdout + retry.stderr)
+
+    def test_kept_copies_are_capped_newest_first_and_never_the_set_being_shipped(self):
+        recipients = self.recipients()
+        sets = [self.make_set(set_name(day)) for day in ("20261001", "20261002", "20261003", "20261004")]
+        for bk in sets:
+            kept = self.backups / f".offhost-retry.{bk.name}"
+            kept.mkdir()
+            (kept / "leftover").write_bytes(b"x" * 100)
+        oldest, newest = sets[0], sets[-1]
+        run = self.bash(f'ship "{oldest}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients,
+                        **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=self.flaky_rclone()))
+        self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertEqual(self.retry_copies(), sorted([f".offhost-retry.{oldest.name}", f".offhost-retry.{newest.name}"]))
+        for dropped in sets[1:3]:
+            self.assertIn(f"dropped the kept copy of {dropped.name}", run.stdout)
+        self.assertIn("off-host retry copies on this host: 2 kept retry copies, ", run.stdout)
+
+    def test_kept_copies_are_reported_for_check_offhost(self):
+        for day in ("20261001", "20261002"):
+            kept = self.backups / f".offhost-retry.{set_name(day)}"
+            kept.mkdir()
+            (kept / "x.tar.age").write_bytes(b"x" * 1000)
+        run = self.bash("retry_copies_summary")
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertRegex(run.stdout, r"^2 kept retry copies, [0-9]+ bytes$")
+        check_offhost = SOURCE[SOURCE.index("  check-offhost)"):SOURCE.index("  *) die \"usage")]
+        self.assertIn("$(retry_copies_summary)", check_offhost)
+
+    def test_a_failed_rclone_check_fails_the_ship(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        failing = self.wrapped_rclone("check-fails", 'if [ "${args[2]:-}" = check ]; then echo "check: 1 differences found" >&2; exit 1; fi')
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=failing))
+        self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertNotIn("age-encrypted via rclone", run.stdout)
+        self.assertFalse((self.backups / f".offhost-shipped.{bk.name}").exists())
+
+    def test_a_remote_digest_file_that_differs_fails_the_ship(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        forged = self.wrapped_rclone("cat-forged", 'if [ "${args[2]:-}" = cat ]; then echo "0000  forged"; exit 0; fi')
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=forged))
+        self.assertNotEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertNotIn("age-encrypted via rclone", run.stdout)
+
+    def test_the_lock_is_held_through_the_transfer(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        probe_log = self.root / "lock-probe.log"
+        probe = self.wrapped_rclone("lock-probe", f"""if [ "${{args[2]:-}}" = copy ]; then
+  if flock -n "{self.backups}/.offhost.lock" true; then echo free >> "{probe_log}"; else echo held >> "{probe_log}"; fi
+fi""")
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=probe))
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertEqual(probe_log.read_text().split(), ["held", "held"])
+
+    def test_a_symlinked_lock_is_refused(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        elsewhere = self.root / "elsewhere.lock"
+        elsewhere.write_text("")
+        (self.backups / ".offhost.lock").symlink_to(elsewhere)
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("refusing a symlinked", run.stderr)
+        self.assertEqual(list(self.remote_dir.iterdir()), [])
+
+    def test_symlinks_in_or_as_a_kept_copy_are_never_reused(self):
+        recipients = self.recipients()
+        for case in ("file link", "directory link"):
+            with self.subTest(case=case):
+                bk = self.make_set(set_name("20261014" if case == "file link" else "20261013"))
+                self.assertNotEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients,
+                                              **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=self.flaky_rclone())).returncode, 0)
+                (self.root / f"rclone-failed-once.tar.age.sha256").unlink()
+                kept = self.backups / f".offhost-retry.{bk.name}"
+                outside = self.root / f"outside-{bk.name}"
+                if case == "file link":
+                    outside.mkdir()
+                    (kept / f"{bk.name}.tar.age").rename(outside / f"{bk.name}.tar.age")
+                    (kept / f"{bk.name}.tar.age").symlink_to(outside / f"{bk.name}.tar.age")
+                else:
+                    kept.rename(outside)
+                    kept.symlink_to(outside, target_is_directory=True)
+                (self.remote_dir / f"{bk.name}.tar.age").unlink()
+                run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+                self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+                self.assertNotIn("kept from an earlier attempt", run.stdout)
+                self.assertTrue(any(outside.iterdir()), "a link is removed, never what it points to")
+
+    def test_a_ship_from_ship_pending_waits_a_bounded_time_for_the_lock(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        # The site is up when pending sets ship, so waiting for a manual ship is harmless. predeploy (quiesced) never ships at all.
+        self.assertIn("SHIP_PENDING_LOCK_WAIT=3600", SOURCE)
+        self.assertIn("SHIP_LOCK_WAIT=$SHIP_PENDING_LOCK_WAIT; ship", SOURCE)
+        predeploy = SOURCE[SOURCE.index("  predeploy)"):SOURCE.index("  space-check)")]
+        self.assertNotIn("SHIP_LOCK_WAIT", predeploy)
+        held = open(self.backups / ".offhost.lock", "a")
+        fcntl.flock(held, fcntl.LOCK_EX)
+        threading.Timer(2, held.close).start()  # the other ship finishes after two seconds
+        started = time.monotonic()
+        run = self.bash(f'SHIP_LOCK_WAIT=30; ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertGreater(time.monotonic() - started, 1.5)
+        with open(self.backups / ".offhost.lock", "a") as again:
+            fcntl.flock(again, fcntl.LOCK_EX)
+            bounded = self.bash(f'SHIP_LOCK_WAIT=1; ship "{self.make_set(set_name("20261016"))}"',
+                                VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
+        self.assertNotEqual(bounded.returncode, 0)
+        self.assertIn("waited 1s", bounded.stderr)
+
+    def test_require_encryption_blocks_the_plain_rclone_path(self):
+        bk = self.make_set()
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_REQUIRE_ENCRYPTION=1, **self.settings)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertEqual(list(self.remote_dir.iterdir()), [])
+
+    def test_a_failing_remote_fails_the_ship_and_cleans_the_staging_copy(self):
+        recipients = self.recipients()
+        bk = self.make_set()
+        settings = dict(self.settings, VASEY_BACKUP_REMOTE="missing-remote:path")
+        run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **settings)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertEqual([p.name for p in self.backups.iterdir() if p.name.startswith(".ship")], [])
+        # The remote cannot even be listed: nothing is encrypted, sent or kept.
+        self.assertIn("could not list the remote", run.stdout)
+        self.assertEqual(self.retry_copies(), [])
+        self.assertTrue((bk / "env.backup").exists())
+
+    def test_remote_pruning_follows_the_tiered_policy_and_spares_everything_else(self):
+        names = [set_name(f"202610{day:02d}") for day in range(1, 16)]
+        for name in names:
+            (self.remote_dir / f"{name}.tar.age").write_bytes(b"x")
+            (self.remote_dir / f"{name}.tar.age.sha256").write_bytes(b"x")
+        (self.remote_dir / "README-keep-me.txt").write_text("not a backup set")
+        (self.remote_dir / "20261001T000000Z-ffffffffffff.FAILED").mkdir()
+        run = self.bash("prune_remote", VASEY_BACKUP_RETENTION="tiered", VASEY_BACKUP_REMOTE_PRUNE=1, VASEY_BACKUP_KEEP=3,
+                        VASEY_BACKUP_KEEP_DAILY=3, VASEY_BACKUP_KEEP_WEEKLY=0, VASEY_BACKUP_KEEP_MONTHLY=0,
+                        VASEY_BACKUP_AGE_RECIPIENTS_FILE=self.recipients(), **self.settings)
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        remaining = sorted(p.name for p in self.remote_dir.iterdir())
+        self.assertEqual(remaining, sorted([f"{n}.tar.age{s}" for n in names[-3:] for s in ("", ".sha256")]
+                                           + ["README-keep-me.txt", "20261001T000000Z-ffffffffffff.FAILED"]))
+        self.assertIn("pruned 12 set(s)", run.stdout)
+
+    def test_remote_pruning_is_off_by_default(self):
+        (self.remote_dir / f"{set_name('20261001')}.tar.age").write_bytes(b"x")
+        run = self.bash("prune_remote", VASEY_BACKUP_RETENTION="tiered", VASEY_BACKUP_KEEP=1, **self.settings)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(len(list(self.remote_dir.iterdir())), 1)
+
+
+class RetentionPlanner(OffhostBase):
+    def plan(self, names, keep, daily, weekly, monthly, protect=""):
+        run = subprocess.run(["bash", "-c", PRELUDE + DEFAULTS + DEFINITIONS + f"\nretention_plan {keep} {daily} {weekly} {monthly} {protect}"],
+                             input="\n".join(names) + "\n", env=self.env, capture_output=True, text=True, timeout=60)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        return set(run.stdout.split())
+
+    def test_flat_floor_is_always_kept(self):
+        names = [set_name(f"202610{day:02d}") for day in range(1, 21)]
+        pruned = self.plan(names, 7, 0, 0, 0)
+        self.assertEqual(pruned, set(names[:13]))
+
+    def test_daily_weekly_and_monthly_representatives_are_added(self):
+        names = [set_name("20260915"), set_name("20260920"), set_name("20260930"), set_name("20261001"),
+                 set_name("20261006"), set_name("20261007"), set_name("20261008"), set_name("20261014"),
+                 set_name("20261015", "030000"), set_name("20261015", "150000"), set_name("20261016")]
+        kept = set(names) - self.plan(names, 2, 3, 2, 2)
+        self.assertIn(set_name("20261016"), kept)             # newest two
+        self.assertIn(set_name("20261015", "150000"), kept)
+        self.assertNotIn(set_name("20261015", "030000"), kept)  # a second set on a kept day is not a daily representative
+        self.assertIn(set_name("20260930"), kept)             # newest of September (monthly)
+        self.assertNotIn(set_name("20260915"), kept)
+
+    def test_the_protected_set_survives(self):
+        names = [set_name(f"202610{day:02d}") for day in range(1, 21)]
+        self.assertNotIn(names[0], self.plan(names, 1, 0, 0, 0, protect=names[0]))
+
+    def test_malformed_names_are_never_pruned(self):
+        names = [set_name("20261001"), "README", "20261001T000000Z-zzzzzzzzzzzz", "20261002T000000Z-ffffffffffff.FAILED",
+                 "../../etc", "20261003T000000Z-abcdefabcdef/x", "", " "]
+        self.assertEqual(self.plan(names, 1, 0, 0, 0), set())
+
+    def test_it_never_keeps_less_than_the_flat_rule_and_is_deterministic(self):
+        rng = random.Random(1247)
+        base = datetime.date(2025, 9, 1)
+        for _ in range(40):
+            days = sorted(rng.sample(range(0, 400), rng.randint(1, 60)))
+            names = [set_name((base + datetime.timedelta(days=d)).strftime("%Y%m%d"), f"{rng.randint(0, 23):02d}0000",
+                              "%012x" % rng.getrandbits(48)) for d in days]
+            keep, daily, weekly, monthly = rng.randint(1, 10), rng.randint(0, 10), rng.randint(0, 6), rng.randint(0, 12)
+            pruned = self.plan(names, keep, daily, weekly, monthly)
+            newest = sorted(names, reverse=True)[:keep]
+            self.assertTrue(pruned.isdisjoint(newest), (names, keep))
+            self.assertLessEqual(len(pruned), max(len(names) - keep, 0))
+            self.assertEqual(pruned, self.plan(list(reversed(names)), keep, daily, weekly, monthly))
+            self.assertTrue(pruned <= set(names))
+
+
+class LocalPruning(OffhostBase):
+    def test_default_pruning_is_the_flat_newest_n_rule_and_ignores_failed_sets(self):
+        names = [set_name(f"202610{day:02d}") for day in range(1, 11)]
+        for name in names:
+            self.make_set(name)
+        failed = self.backups / "20261001T000000Z-ffffffffffff.FAILED"
+        failed.mkdir()
+        run = self.bash("prune_local")
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(sorted(p.name for p in self.backups.iterdir()), sorted(names[3:] + [failed.name]))
+
+    def test_tiered_pruning_keeps_the_newest_proven_set(self):
+        names = [set_name(f"202610{day:02d}") for day in range(1, 11)]
+        for index, name in enumerate(names):
+            self.make_set(name, proof=index == 0)  # only the oldest carries a restore proof
+        run = self.bash("prune_local", VASEY_BACKUP_RETENTION="tiered", VASEY_BACKUP_KEEP=2, VASEY_BACKUP_KEEP_DAILY=0,
+                        VASEY_BACKUP_KEEP_WEEKLY=0, VASEY_BACKUP_KEEP_MONTHLY=0)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(sorted(p.name for p in self.backups.iterdir()), sorted([names[0], names[-2], names[-1]]))
+
+    def test_invalid_tiered_configuration_prunes_nothing(self):
+        for name in (set_name(f"202610{day:02d}") for day in range(1, 6)):
+            self.make_set(name)
+        run = self.bash("prune_local", VASEY_BACKUP_RETENTION="tiered", VASEY_BACKUP_KEEP_DAILY="lots")
+        self.assertNotEqual(run.returncode, 0)
+        self.assertEqual(len(list(self.backups.iterdir())), 5)
+
+
+class DeployRetention(OffhostBase):
+    """Deploy snapshots are pruned to VASEY_BACKUP_KEEP right after the snapshot, protecting the set just taken."""
+
+    def sets(self, count):
+        names = [set_name(f"202611{day:02d}") for day in range(1, count + 1)]
+        for name in names:
+            self.make_set(name)
+        return names
+
+    def names(self):
+        return sorted(p.name for p in self.backups.iterdir() if p.is_dir())
+
+    def test_flat_prune_keeps_the_newest_keep_sets(self):
+        names = self.sets(8)
+        run = self.bash("prune_local", VASEY_BACKUP_KEEP=3)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(self.names(), names[-3:])
+
+    def test_the_named_set_and_the_last_pointer_are_never_pruned(self):
+        names = self.sets(8)
+        (self.backups / ".last").write_text(str(self.backups / names[1]) + "\n")
+        run = self.bash(f'prune_local "{names[0]}"', VASEY_BACKUP_KEEP=3)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(self.names(), sorted([names[0], names[1]] + names[-3:]))
+
+    def test_tiered_prune_also_protects_the_named_set_and_keeps_the_newest_proven_set(self):
+        names = self.sets(8)
+        env = dict(VASEY_BACKUP_RETENTION="tiered", VASEY_BACKUP_KEEP=2, VASEY_BACKUP_KEEP_DAILY=0,
+                   VASEY_BACKUP_KEEP_WEEKLY=0, VASEY_BACKUP_KEEP_MONTHLY=0)
+        run = self.bash(f'prune_local "{names[2]}"', **env)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        # newest two, the protected deploy set, and the newest set carrying a verified proof (the newest one here)
+        self.assertEqual(self.names(), sorted([names[2], names[-2], names[-1]]))
+
+    def test_a_keep_below_one_is_refused_and_removes_nothing(self):
+        self.sets(4)
+        for keep in ("0", "many"):
+            with self.subTest(keep=keep):
+                run = self.bash("prune_local", VASEY_BACKUP_KEEP=keep)
+                self.assertNotEqual(run.returncode, 0)
+                self.assertEqual(len(self.names()), 4)
+
+    def test_a_malformed_protect_name_is_refused(self):
+        self.sets(4)
+        self.assertNotEqual(self.bash('prune_local "../x"', VASEY_BACKUP_KEEP=1).returncode, 0)
+        self.assertEqual(len(self.names()), 4)
+
+    def test_failed_sets_staging_directories_and_files_outside_the_backup_directory_are_untouched(self):
+        self.sets(6)
+        failed = self.backups / "20261001T000000Z-ffffffffffff.FAILED"
+        staging = self.backups / ".ship.abc123"
+        failed.mkdir()
+        staging.mkdir()
+        retained = self.root / "retained-backups" / set_name("20260101")
+        retained.mkdir(parents=True)
+        (retained / "database.sql").write_text("x")
+        run = self.bash("prune_local", VASEY_BACKUP_KEEP=1)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertTrue(failed.is_dir() and staging.is_dir() and (retained / "database.sql").exists())
+
+    def test_predeploy_prunes_after_queuing_the_ship_and_never_fails_the_deploy_for_it(self):
+        predeploy = SOURCE[SOURCE.index("  predeploy)"):SOURCE.index("  space-check)")]
+        self.assertLess(predeploy.index('mark_pending "$(cat'), predeploy.index("prune_local"))
+        self.assertIn('prune_local "$(basename -- "$(cat "$VASEY_BACKUP_DIR/.last")")" )', predeploy)
+        self.assertIn("|| log \"WARNING", predeploy)
+
+    def test_the_prune_subcommand_runs_the_same_function(self):
+        branch = SOURCE[SOURCE.index("  prune)"):SOURCE.index("  restore-check)")]
+        self.assertIn("prune_local", branch)
+
+
+class SpaceCheck(OffhostBase):
+    """The pre-deploy free-space check: runs before any quiesce and refuses when the snapshot would not fit."""
+
+    def setUp(self):
+        super().setUp()
+        self.private = self.root / "private"
+        self.private.mkdir()
+        (self.private / "media.bin").write_bytes(b"m" * 100_000)
+        self.restore = self.root / "restore-check"
+
+    def check(self, free, db=50_000, preamble="", **extra):
+        """Runs space_check with df reporting FREE bytes and the database query answering DB (or failing when None)."""
+        mysql = 'mysql() { return 1; }' if db is None else f'mysql() {{ echo {db}; }}'
+        script = f'''{preamble}PRIVATE="{self.private}"; VASEY_DB_NAME=vasey_staging; VASEY_BACKUP_MYCNF=/nonexistent
+VASEY_RESTORE_CHECK_DIR="{self.restore}"
+{mysql}
+df() {{ printf 'Avail\\n%s\\n' "{free}"; }}
+space_check'''
+        return self.bash(script, **extra)
+
+    def test_enough_space_proceeds(self):
+        run = self.check(free=1_000_000_000)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertIn("free space ok", run.stdout)
+
+    def test_insufficient_space_refuses_naming_free_and_needed_bytes_and_the_runbook(self):
+        run = self.check(free=1_000_000)
+        self.assertNotEqual(run.returncode, 0)
+        message = run.stdout + run.stderr
+        self.assertIn("1000000 bytes free", message)
+        self.assertRegex(message, r"about \d+ bytes needed")
+        self.assertIn("nothing was stopped", message)
+        self.assertIn("out of disk during snapshot", message)
+        self.assertIn("backup-prune", message)
+
+    def test_the_need_covers_private_store_database_and_margin(self):
+        # private 100000 (no set to share files with, and no estimator here: the whole store is counted) + database 50000, plus
+        # the restore proof's disposable datadir (50000) on the same filesystem: since 2026-11-11 a tree set is verified in place
+        # and nothing is extracted, so the private store is not counted twice; then 20% and 256 MiB of margin
+        need = (150_000 + 50_000) + (150_000 + 50_000) * 20 // 100 + 268_435_456
+        self.assertEqual(self.check(free=need).returncode, 0)
+        self.assertNotEqual(self.check(free=need - 1).returncode, 0)
+
+    def test_hardened_shipping_is_counted_after_the_deploy_not_on_top_of_the_restore_proof(self):
+        # The encrypted copy is staged after the resume (ship-pending), when the restore proof's scratch is already gone, so on a
+        # shared filesystem the peak is the set plus the larger of the two, which here are equal: the plain need, not a third set.
+        base = (150_000 * 2) + (150_000 * 2) * 20 // 100 + 268_435_456
+        self.assertEqual(self.check(free=base, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        self.assertNotEqual(self.check(free=base - 1, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+
+    def test_hardened_shipping_on_its_own_filesystem_still_needs_the_encrypted_copy_there(self):
+        # Backups and restore scratch on different filesystems: the backup filesystem holds the set and, later, its encrypted copy.
+        shim = 'stat() { if [ "${1:-}" = -c ] && [ "${2:-}" = %d ]; then case "${@: -1}" in */backups) echo 1 ;; *) echo 2 ;; esac; else command stat "$@"; fi; }\n'
+        need_backup_fs = (150_000 * 2) + (150_000 * 2) * 20 // 100 + 268_435_456
+        run = lambda free, **extra: self.check(free=free, preamble=shim, **extra)
+        self.assertEqual(run(need_backup_fs, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        self.assertNotEqual(run(need_backup_fs - 1, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        # Without hardening the backup filesystem needs only the set (150000), so the same free space is plenty.
+        self.assertEqual(run(150_000 + 150_000 * 20 // 100 + 268_435_456).returncode, 0)
+
+    def test_an_earlier_shipment_still_staging_its_encrypted_copy_is_counted(self):
+        base = (150_000 * 2) + (150_000 * 2) * 20 // 100 + 268_435_456
+        held = open(self.backups / ".offhost.lock", "a")
+        self.addCleanup(held.close)
+        fcntl.flock(held, fcntl.LOCK_EX)  # ship-pending of the previous deploy is still encrypting
+        self.assertNotEqual(self.check(free=base, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        extra = base + 150_000 + 150_000 * 20 // 100
+        self.assertEqual(self.check(free=extra, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        self.assertEqual(self.check(free=base).returncode, 0, "an unhardened host has no staging copy to wait for")
+
+    def test_a_ship_pending_run_between_two_sets_is_counted_like_a_running_ship(self):
+        base = (150_000 * 2) + (150_000 * 2) * 20 // 100 + 268_435_456
+        held = open(self.backups / ".ship-pending.lock", "a")  # only the run lock is held: .offhost.lock is free between sets
+        self.addCleanup(held.close)
+        fcntl.flock(held, fcntl.LOCK_EX)
+        self.assertNotEqual(self.check(free=base, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        self.assertEqual(self.check(free=base + 150_000 + 150_000 * 20 // 100, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+
+    def test_the_database_size_falls_back_to_the_newest_set_and_unknown_size_refuses(self):
+        self.make_set(set_name("20261101"))
+        (self.backups / set_name("20261101") / "database.sql").write_bytes(b"d" * 70_000)
+        self.assertEqual(self.check(free=1_000_000_000, db=None).returncode, 0)
+        shutil.rmtree(self.backups / set_name("20261101"))
+        run = self.check(free=1_000_000_000, db=None)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("cannot estimate the database size", run.stdout + run.stderr)
+
+    def test_it_changes_nothing(self):
+        before = sorted(p.name for p in self.root.rglob("*"))
+        self.check(free=1)
+        self.check(free=1_000_000_000)
+        self.assertEqual(sorted(p.name for p in self.root.rglob("*")), before)
+
+    def test_the_deploy_checks_before_it_stops_anything(self):
+        deploy = (REPO / "ops/staging/forge-deploy.sh").read_text()
+        prepare = deploy.index('step "prepare under one root-held build lease')
+        started = deploy.index("ACTIVATION_STARTED=1", prepare)
+        self.assertLess(deploy.index('"${CTL[@]}" space-check', prepare - 700), prepare)
+        self.assertLess(prepare, started)
+        refresh = deploy.index('"${CTL[@]}" refresh')
+        self.assertLess(deploy.rindex('"${CTL[@]}" space-check', 0, refresh), deploy.rindex("ACTIVATION_STARTED=1", 0, refresh))
+        self.assertLess(deploy.index('"${CTL[@]}" prune'), deploy.index('"${CTL[@]}" backup-prune'))
+
+    def test_the_root_helper_checks_before_its_operation_marker_and_quiesce(self):
+        ctl = (REPO / "ops/staging/bin/vasey-staging-ctl").read_text()
+        for action in ("prepare", "activate", "refresh"):
+            body = ctl[ctl.index(f"cmd_{action}() {{"):]
+            body = body[:body.index("\n}\n")]
+            self.assertLess(body.index("cmd_space_check"), body.index(f"operation_begin {action}"), action)
+        self.assertIn("space-check) cmd_space_check", ctl)
+        self.assertIn("backup-prune) cmd_backup_prune", ctl)
+
+
+@unittest.skipUnless(os.geteuid() == 0, "the script's own preamble refuses to run as another user")
+class ConfigFileCustody(OffhostBase):
+    """The optional backup.conf is sourced as root, so it must be as trusted as staging.conf."""
+
+    def loader(self, conf_path):
+        return subprocess.run(["bash", "-c", PRELUDE + f'VASEY_BACKUP_CONF="{conf_path}"\n' + CONF_LOADER + '\necho "REMOTE=${VASEY_BACKUP_REMOTE:-unset}"'],
+                              env=self.env, capture_output=True, text=True)
+
+    def test_absent_file_changes_nothing(self):
+        run = self.loader(self.root / "absent.conf")
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertIn("REMOTE=unset", run.stdout)
+
+    def test_a_trusted_file_is_sourced(self):
+        conf = self.root / "backup.conf"
+        conf.write_text("VASEY_BACKUP_REMOTE=vasey-backup:bucket\n")
+        conf.chmod(0o600)
+        self.assertIn("REMOTE=vasey-backup:bucket", self.loader(conf).stdout)
+
+    def test_writable_linked_or_foreign_files_are_refused_and_never_sourced(self):
+        conf = self.root / "backup.conf"
+        conf.write_text("VASEY_BACKUP_REMOTE=evil:x\n")
+        conf.chmod(0o666)
+        run = self.loader(conf)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertNotIn("evil", run.stdout)
+        conf.chmod(0o600)
+        link = self.root / "link.conf"
+        link.symlink_to(conf)
+        self.assertNotEqual(self.loader(link).returncode, 0)
+        os.chown(conf, 65534, 65534)
+        self.assertNotEqual(self.loader(conf).returncode, 0)
+
+
+if __name__ == "__main__":
+    unittest.main()

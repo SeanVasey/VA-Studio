@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "docker",
+    "exec",
+    "va-studio-private-mysql-policy-20261013",
+    "mysql",
+    "--socket=/run/mysql-policy/mysql.sock",
+    "-uroot",
+    "--batch",
+    "--skip-column-names",
+    "-e",
+    "SELECT ID, COMMAND, TIME, STATE FROM information_schema.PROCESSLIST WHERE DB = 'vaseyaudio_member_currentness_root'"
+  ],
+  "observed_utc": "2026-10-13T07:41:38Z",
+  "scope": "One read-only own-schema progress observation; not a test or pass receipt.",
+  "stdout_file": "native-progress-observer.txt",
+  "exit": 0
+}

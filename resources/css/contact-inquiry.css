@@ -6,7 +6,7 @@
 .contact-inquiry-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 .contact-inquiry-field label { font-weight: 600; font-size: 15px; }
 .contact-inquiry-field label span { color: var(--va-text-muted); font-weight: 400; font-size: 13px; }
-.contact-inquiry-field input, .contact-inquiry-field textarea { width: 100%; min-height: 48px; padding: 12px 14px; border: 1px solid var(--va-border); border-radius: var(--va-radius-control); background: var(--va-canvas); color: var(--va-text-strong); font: inherit; font-size: 16px; line-height: 1.5; }
+.contact-inquiry-field input, .contact-inquiry-field select, .contact-inquiry-field textarea { width: 100%; min-height: 48px; padding: 12px 14px; border: 1px solid var(--va-border); border-radius: var(--va-radius-control); background: var(--va-canvas); color: var(--va-text-strong); font: inherit; font-size: 16px; line-height: 1.5; }
 .contact-inquiry-field textarea { resize: vertical; min-height: 180px; outline-offset: 5px; }
 .contact-inquiry-field [aria-invalid=true] { border: 2px solid var(--va-text-strong); }
 .contact-inquiry-field [readonly] { background: var(--va-surface); }

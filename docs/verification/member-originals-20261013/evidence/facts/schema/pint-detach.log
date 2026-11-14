@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"tests\/Unit\/MemberGrantExpectedPlanTest.php","fixers":["class_attributes_separation"]}]}

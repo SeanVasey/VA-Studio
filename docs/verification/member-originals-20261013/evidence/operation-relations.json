@@ -1,0 +1,56 @@
+{
+  "scope": "Independent receipt-to-receipt comparisons. Original wrapper invocation remains at its original source; old Inspection is one class overlay.",
+  "wrapper_original_inputs": 2006,
+  "wrapper_changed_inputs": [
+    {
+      "path": "app/Domain/Grants/Member/MemberGrantDocumentValues.php",
+      "tested_sha256": "8da46f30b9bc511ec92728d717e1e255fd15445e9261999d789ac76ff7037179",
+      "current_sha256": "5371b90f0a74bb9f2d3bc010aec651b7fe7016eee16d8557e395fb27b85463b0"
+    },
+    {
+      "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalCompositionTest.php",
+      "tested_sha256": "a95781f152e46665a10011f6d95e1088a3201f41c5c8b0381f90a8e15df2689c",
+      "current_sha256": "30f47d2875e5150266bdfb809d9c544d4b30f5c9f7e4bc90d34ec4b029868658"
+    },
+    {
+      "path": "tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php",
+      "tested_sha256": "da2fb1b3dad03de24f6171565ea5275dc7fd01a67f30686ff1372923a1aa55ae",
+      "current_sha256": "daa2e4734d855f8135770ffa79ea2d3bd32b4e2a5331ec8699c66407b0d25d2c"
+    }
+  ],
+  "wrapper_selected_unchanged_files": {
+    "app/Domain/Memberships/Production/MembershipReservations.php": "491df724395f74fe91a066b56e77e7811e678734138b0b1a5c8fb5912caa11b2",
+    "app/Domain/Memberships/Production/MembershipReservationContext.php": "8645feeb3e020f71a66f741e6e45f22a81e0a751898a6305d94e11822325d37a",
+    "app/Domain/Memberships/Production/MembershipBillingEvidence.php": "7ba5b6e56d2511cc1b4fd277b83204d33fbe01eea650b86be02af79fd763e189",
+    "tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php": "5d7e644e8d6a746dd7b138a756b0c72be8b828863686278e2890b13114600eb2",
+    "tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php": "30f1d35896a9ee9367fd09ca24c3b9d05918c1e57710e47db3c2ccee0e04e970",
+    "tests/Feature/ProductionMembershipBilling/MembershipReservationEntryTest.php": "ffa8ca97c2c37acf823bfd75732094dfeeb0d8bae871dccc1477edbdd04c93f2",
+    "tests/Support/MembershipReservationFixtures.php": "624ab63508768c0ec2f9acfa52208fa2d664f755c159efd148be94de965046f9"
+  },
+  "retained_deadline_same_test_inputs": {
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalRetainedDeadlineTest.php": "daa2e4734d855f8135770ffa79ea2d3bd32b4e2a5331ec8699c66407b0d25d2c",
+    "tests/Support/MemberOriginalCommittedClock.php": "f319b86eee45731fe3fa6c17faa3dc8c6f0550eef1c973a0f4388d23fadf6b8c"
+  },
+  "retained_deadline_cases": {
+    "Tests.Feature.ProductionMemberOriginals.MemberOriginalRetainedDeadlineTest::test_original_honor_cap_survives_retirement_and_backward_wall_time_before_detached_work": {
+      "old": {
+        "assertions": 22,
+        "outcome": "failure"
+      },
+      "fixed": {
+        "assertions": 29,
+        "outcome": "passed"
+      }
+    },
+    "Tests.Feature.ProductionMemberOriginals.MemberOriginalRetainedDeadlineTest::test_original_invoice_window_expiring_during_shared_finish_refuses_the_source_ticket": {
+      "old": {
+        "assertions": 21,
+        "outcome": "failure"
+      },
+      "fixed": {
+        "assertions": 27,
+        "outcome": "passed"
+      }
+    }
+  }
+}

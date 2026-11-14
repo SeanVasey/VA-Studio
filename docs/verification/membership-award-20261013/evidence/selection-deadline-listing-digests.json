@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "note": "Large generated test listings and shard configs remain in runtime storage; initial and final compact manifests are archived. These are discovery outputs, not functional tests.",
+  "artifacts": [
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-1-tests.xml",
+      "bytes": 99234,
+      "sha256": "92ee074f0c8c5c062bb63af57c55716cdefb91f1e286a741b37ca4cda5d61f05",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-1.xml",
+      "bytes": 80015,
+      "sha256": "f87bf9fa418b2f5fadc1f209dfddd72beb50fd2e33833e34cd2017cc3f5ce5d9",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-2-tests.xml",
+      "bytes": 100378,
+      "sha256": "5c9cbd6ff6079c41c5c8af8b94f23395ed3b4d233042774839a50432e13142c9",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-2.xml",
+      "bytes": 79853,
+      "sha256": "d5902dfebed2e8910a5a7668bcdc81066cede85b9ec3d22b2acd452acf00a357",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-3-tests.xml",
+      "bytes": 101630,
+      "sha256": "eab12b6af21e015330e816a93434f59e4c33849a4c19fb2f9184f6ec0091ea55",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-3.xml",
+      "bytes": 79813,
+      "sha256": "b940a88da9f316aaaf71d34bf71f092df6ade3f7f3a7fa875d00e0b0d147e5ff",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-4-tests.xml",
+      "bytes": 86988,
+      "sha256": "4a567cacdcb8d11d0882b1a8358889668c73f093c72e3351d0ff6dd474937d7b",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-4.xml",
+      "bytes": 80041,
+      "sha256": "d1e6e7e2b1e522474277d609f9a6c53831b285a0db74fa5b920c2990d91abe91",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-5-tests.xml",
+      "bytes": 112528,
+      "sha256": "2e4a5f1d436e956a4ecdbbc953c01cb25efa85a94d83845b2aa018393bd3e71f",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-5.xml",
+      "bytes": 79299,
+      "sha256": "eaeb693dbcb86acf3e174ccce35b3913be6e0c8be349eb86bd4688facbe7a03d",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-6-tests.xml",
+      "bytes": 98171,
+      "sha256": "0781e7c7b0b7061a8df2086cc2f0ae65dec0894f76344bc90342b3018f6212f6",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-6.xml",
+      "bytes": 79179,
+      "sha256": "20f17da1d2885e461e8c48c4e85baf7f68ad9b60aa00c43dd9eb2d78d75e4c4c",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-7-tests.xml",
+      "bytes": 107329,
+      "sha256": "f78a7846c1d54b6eb9fc9c0dc0a0d44b1db689b87cc59166a0281bab2e5a1cd4",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-7.xml",
+      "bytes": 79779,
+      "sha256": "cc81c7a140775b0d94efe696242ec1a63ea35fef48ae2175008d04f9d22321e8",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-8-tests.xml",
+      "bytes": 100828,
+      "sha256": "a58f9700025009f11068470a46465675527239a26e57bbe5f2748a4c59f83d6b",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-8.xml",
+      "bytes": 79669,
+      "sha256": "5aed3ed057bf7cf6d2b3a21f7e741bf9bdcffc01145a7fec808c9b1e47c00b8e",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-manifest.json",
+      "bytes": 15878,
+      "sha256": "b7891dea11fe362b935fdf3f21685678e22e791efe3015ddaeabf53e58d7d1af",
+      "retained_in_packet": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-initial/census-files/phpunit-ci-mysql-source-tests.xml",
+      "bytes": 3056634,
+      "sha256": "c5b9c62df33e751ade8690b02b6348a07b8f2d71733ba2956b21e72695b2b0ec",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-1-tests.xml",
+      "bytes": 99234,
+      "sha256": "92ee074f0c8c5c062bb63af57c55716cdefb91f1e286a741b37ca4cda5d61f05",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-1.xml",
+      "bytes": 80015,
+      "sha256": "f87bf9fa418b2f5fadc1f209dfddd72beb50fd2e33833e34cd2017cc3f5ce5d9",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-2-tests.xml",
+      "bytes": 100378,
+      "sha256": "5c9cbd6ff6079c41c5c8af8b94f23395ed3b4d233042774839a50432e13142c9",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-2.xml",
+      "bytes": 79853,
+      "sha256": "d5902dfebed2e8910a5a7668bcdc81066cede85b9ec3d22b2acd452acf00a357",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-3-tests.xml",
+      "bytes": 101630,
+      "sha256": "eab12b6af21e015330e816a93434f59e4c33849a4c19fb2f9184f6ec0091ea55",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-3.xml",
+      "bytes": 79813,
+      "sha256": "b940a88da9f316aaaf71d34bf71f092df6ade3f7f3a7fa875d00e0b0d147e5ff",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-4-tests.xml",
+      "bytes": 86988,
+      "sha256": "4a567cacdcb8d11d0882b1a8358889668c73f093c72e3351d0ff6dd474937d7b",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-4.xml",
+      "bytes": 80041,
+      "sha256": "d1e6e7e2b1e522474277d609f9a6c53831b285a0db74fa5b920c2990d91abe91",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-5-tests.xml",
+      "bytes": 112528,
+      "sha256": "2e4a5f1d436e956a4ecdbbc953c01cb25efa85a94d83845b2aa018393bd3e71f",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-5.xml",
+      "bytes": 79299,
+      "sha256": "eaeb693dbcb86acf3e174ccce35b3913be6e0c8be349eb86bd4688facbe7a03d",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-6-tests.xml",
+      "bytes": 98171,
+      "sha256": "0781e7c7b0b7061a8df2086cc2f0ae65dec0894f76344bc90342b3018f6212f6",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-6.xml",
+      "bytes": 79179,
+      "sha256": "20f17da1d2885e461e8c48c4e85baf7f68ad9b60aa00c43dd9eb2d78d75e4c4c",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-7-tests.xml",
+      "bytes": 107329,
+      "sha256": "f78a7846c1d54b6eb9fc9c0dc0a0d44b1db689b87cc59166a0281bab2e5a1cd4",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-7.xml",
+      "bytes": 79779,
+      "sha256": "cc81c7a140775b0d94efe696242ec1a63ea35fef48ae2175008d04f9d22321e8",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-8-tests.xml",
+      "bytes": 100828,
+      "sha256": "a58f9700025009f11068470a46465675527239a26e57bbe5f2748a4c59f83d6b",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-8.xml",
+      "bytes": 79669,
+      "sha256": "5aed3ed057bf7cf6d2b3a21f7e741bf9bdcffc01145a7fec808c9b1e47c00b8e",
+      "retained_in_packet": false
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-manifest.json",
+      "bytes": 15878,
+      "sha256": "b7891dea11fe362b935fdf3f21685678e22e791efe3015ddaeabf53e58d7d1af",
+      "retained_in_packet": true
+    },
+    {
+      "runtime_path": "/workspace/runtime/membership-award-evidence/selection-deadline-census-files/phpunit-ci-mysql-source-tests.xml",
+      "bytes": 3056634,
+      "sha256": "c5b9c62df33e751ade8690b02b6348a07b8f2d71733ba2956b21e72695b2b0ec",
+      "retained_in_packet": false
+    }
+  ]
+}

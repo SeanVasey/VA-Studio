@@ -1,0 +1,32 @@
+{
+  "old_head": "15a65e0761382a9ad50c4b279605a644a4eeb285",
+  "merged_base": "7edd614497b930c5bc02141537cc7e24dce6fb27",
+  "empty_relevant_diff": true,
+  "blobs": {
+    "app/Domain/Grants/Member/MemberGrantSchema.php": {
+      "old_sha256": "e520833125be2f8d382db2065e2714ee942f0e32dc339b3311e7745d53196ad4",
+      "base_sha256": "e520833125be2f8d382db2065e2714ee942f0e32dc339b3311e7745d53196ad4",
+      "identical": true
+    },
+    "app/Domain/Memberships/Production/MembershipRows.php": {
+      "old_sha256": "3284fde61868cb7cf1a0427f53ae991183782383917e51bf94034174ba9caff4",
+      "base_sha256": "3284fde61868cb7cf1a0427f53ae991183782383917e51bf94034174ba9caff4",
+      "identical": true
+    },
+    "tests/Support/FinalizationDatabaseMigrations.php": {
+      "old_sha256": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff",
+      "base_sha256": "38d248d182fffb7aa6c0583ebb8235c5b60b03fe8865d679b9eb804728a792ff",
+      "identical": true
+    },
+    "composer.json": {
+      "old_sha256": "132cb2a16c6ce2960d059cfddecae8e1accf6138a258dd8bab2c0c7b822f5607",
+      "base_sha256": "132cb2a16c6ce2960d059cfddecae8e1accf6138a258dd8bab2c0c7b822f5607",
+      "identical": true
+    },
+    "composer.lock": {
+      "old_sha256": "ef380eba2d55aa74970f5267f273202ec455334d426460d282c56b30902bcb06",
+      "base_sha256": "ef380eba2d55aa74970f5267f273202ec455334d426460d282c56b30902bcb06",
+      "identical": true
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "recorded_utc": "2026-10-15T04:42:28.083221+00:00",
+  "reviewed_head": "208a4a90acc2631c31a055815d17c671ff6ae8c2",
+  "base": "8297b8c46f26a4d972df9ae56de152af3905a1b1",
+  "decision": "REVISE BEFORE IMPLEMENTATION",
+  "scope": "Independent design review only, no product code existed at this original design head.",
+  "design_sha256": "ebd99496bee6db5aa3c4d14fbc6f447acb21a6b4613867d8d551202301b2f5df",
+  "required_clarifications": [
+    {
+      "id": "D1",
+      "requirement": "Separate claim, physical work, publication and fulfillment transaction authority. New Source/receipts only inside each fresh independently authorized command; never carry prior Source or extend its claim lease."
+    },
+    {
+      "id": "D2",
+      "requirement": "Specify owned current five-table identities/unique/FK map and runtime pre-DML permanent InnoDB/shadow refusal. Keep Tax/V1 producer and immutable identity evidence references outside the family; validate allowed user/account parents through real inspectors."
+    },
+    {
+      "id": "D3",
+      "requirement": "Preserve60s command,300s call/claim/per-line physical allowances,5 attempts and660s account lock. Derive original truncated lease end; retain live min-only caps and honestly expired claims. Share V1 account lock discipline across versions."
+    },
+    {
+      "id": "D4",
+      "requirement": "Physical observation binds exact retained artifact/master/assets and origin/claim/profile/input/text/PDF/manifest facts; fresh publication closes same-order/current-owner state. Pure PDO closure performs no physicalI/O; no filesystem atomic/permanent validity claim."
+    },
+    {
+      "id": "D5",
+      "requirement": "Pure actor closure compares raw admitted original/attributes/id and boolean exists without Eloquent getters/casts. Callback-capable closed work precedes Source sibling closure; serialized projection is trusted primitive typed data."
+    },
+    {
+      "id": "D6",
+      "requirement": "Meaningful two-valid-orders target-swap, late current/metadata withdrawal, cross-family replay, V1 pending/completed compatibility, real Tax two-line physical failure/retry, native duplicate origin and pre-DML refusal coverage. No missing-API old oracle or fixture-derived host acceptance."
+    }
+  ],
+  "coherence": "Separate Tax family/profile and original current/producer fences form a coherent domain/schema/original-preparation PR. HTTP/download/root/authorization/redemption remains subsequent. Internal staged author commits are appropriate; no unrelated source repin or endpoint scaffold.",
+  "frozen_v1_profile_hashes": {
+    "resources/contracts/paid-v1/profile-assets.json": "4a2221b64384c226e72cf16811e31f512a8a8f63c65081a04487ec5f7a573940",
+    "app/Domain/Grants/Paid/PaidGrantText.php": "9eabe757ed8daa9618de7af7cd22911fd971a0f5174d5cb6eac7294c1e0c5411",
+    "app/Domain/Grants/Paid/PaidGrantPdfRenderer.php": "8a0fce94ed52d65eb31ebf67941976cd31676a47300d9a5ed4b7289d64209c44",
+    "app/Domain/Grants/Paid/PaidGrantRendererProcess.php": "d138d616268483762beb2f45ffcd9489eddcdb59c0f4568852d7a40a485ad64f",
+    "app/Domain/Grants/Paid/PaidGrantRenderInput.php": "b3d2eb372fce8d87cc9cfea0cd1f35d18b609ef2636cef4b77a29e4c5541c5cc",
+    "app/Domain/Grants/Paid/PaidGrantFiles.php": "f37bcf56475596b4e41e03512520b7a002d196c772d5257801d40088d52cc418",
+    "scripts/render-paid-grant.php": "90c6dccdadabc117d7a11b6a21e4043cbe22e8616faa79141852e56ab14623fc"
+  },
+  "actions": "Read-only source/design/vendor/contract inspection; runtime reviewer artifacts only. No product/test/database/CI/hosted/network action or delegation."
+}

@@ -1,0 +1,24 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-member-original-operation/phpunit.xml
+
+E                                                                   1 / 1 (100%)
+
+Time: 00:13.513, Memory: 91.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMemberOriginals\MemberOriginalPreparationIntegrationTest::test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects
+App\Domain\Grants\Member\MemberGrantException: Member original unavailable.
+
+/workspace/VA-Studio-member-original-operation/app/Domain/Grants/Member/MemberGrantException.php:15
+/workspace/VA-Studio-member-original-operation/app/Domain/Grants/Member/MemberGrantDocumentValues.php:90
+/workspace/VA-Studio-member-original-operation/app/Domain/Grants/Member/MemberGrantDocumentValues.php:261
+/workspace/VA-Studio-member-original-operation/app/Domain/Grants/Member/MemberGrantDefinitionDocument.php:23
+/workspace/VA-Studio-member-original-operation/tests/Support/MemberOriginalFixtures.php:75
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationIntegrationTest.php:40
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 1, Assertions: 16, Errors: 1.

@@ -10,8 +10,10 @@ use App\Domain\Grants\Free\FreeGrantRendererProcess;
 use Closure;
 use Illuminate\Support\Facades\DB;
 use ReflectionProperty;
+use Symfony\Component\Process\Process;
 use Tests\Support\FinalizationDatabaseMigrations;
 use Tests\Support\FreeGrantFixtures;
+use Tests\Support\OpenBasedirProbe;
 use Tests\Support\PhpCliWrapperFixture;
 use Tests\TestCase;
 
@@ -65,6 +67,34 @@ final class FreeGrantCliRendererTest extends TestCase
         }
         $this->assertDatabaseCount('free_originals', 0);
         $this->assertSame('failed', DB::table('free_document_work')->value('state'));
+    }
+
+    /**
+     * Follow-up of #251: each open_basedir directory ends with the separator and a prefix-sharing sibling is unreadable.
+     * (PHP 8.4 already checks a component boundary, so the entry-format assertion is what pins the separator.)
+     */
+    public function test_the_child_open_basedir_admits_no_prefix_sharing_sibling_and_still_renders(): void
+    {
+        $this->fakePrivateMediaStorage();
+        $probe = $workspace = null;
+        // A plain closure: an arrow function would capture copies of the probe variables.
+        $this->app->instance(FreeGrantRendererProcess::class, new FreeGrantRendererProcess(
+            function (array $command, string $cwd, array $environment, string $payload) use (&$probe, &$workspace): Process {
+                $workspace = $environment['TMPDIR'];
+                $probe = OpenBasedirProbe::run($command, $cwd, $environment, $payload);
+
+                return new Process($command, $cwd, $environment, $payload, 60);
+            }));
+        $f = FreeGrantFixtures::source();
+        $accepted = FreeGrantFixtures::accept($f, FreeGrantFixtures::publish($f))['origin'];
+        $issued = (new FreeGrantDocuments)->issue($accepted['id'], $accepted['originHash'], $f['customer']['principal'], $f['customer']['user']);
+        $this->assertSame('complete', $issued['documentStatus']);
+        $this->assertSame([false, true, true], [$probe['sibling_read'], $probe['workspace_list'], $probe['app_read']]);
+        $entries = explode(PATH_SEPARATOR, $probe['basedir']);
+        $this->assertSame([base_path().'/', $workspace.'/'], array_slice($entries, 0, 2));
+        foreach ($entries as $entry) {
+            $this->assertStringEndsWith('/', $entry);
+        }
     }
 
     private function factoryOf(FreeGrantRendererProcess $renderer): ?Closure

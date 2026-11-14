@@ -9,6 +9,7 @@ use App\Support\PhpCliBinary;
 use Illuminate\Support\Facades\DB;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\Process;
+use Tests\Support\OpenBasedirProbe;
 use Tests\TestCase;
 
 /** Subprocess transport and containment tests; direct renderer tests prove the document itself. */
@@ -57,7 +58,7 @@ class TestIsolatedContractRendererTest extends TestCase
                 $this->assertContains('memory_limit=128M', $command);
                 $this->assertContains('allow_url_fopen=0', $command);
                 $this->assertContains('allow_url_include=0', $command);
-                $this->assertContains('open_basedir='.$root.PATH_SEPARATOR.$environment['TMPDIR'], $command);
+                $this->assertContains('open_basedir='.$root.'/'.PATH_SEPARATOR.$environment['TMPDIR'].'/', $command);
                 $this->assertContains('upload_tmp_dir='.$environment['TMPDIR'], $command);
                 $this->assertContains('sys_temp_dir='.$environment['TMPDIR'], $command);
                 $this->assertSame(0700, fileperms($environment['TMPDIR']) & 0777);
@@ -73,6 +74,25 @@ class TestIsolatedContractRendererTest extends TestCase
             $this->assertSame($reply['sha256'], $rendered->sha256);
             $this->assertSame(1, $rendered->pageCount);
         } finally { putenv('CONTRACT_PRIVATE_MARKER'); }
+    }
+
+    /**
+     * Follow-up of #251: each open_basedir directory ends with the separator and a prefix-sharing sibling is unreadable.
+     * (PHP 8.4 already checks a component boundary, so the entry-format assertion is what pins the separator.)
+     */
+    public function test_the_child_open_basedir_admits_no_prefix_sharing_sibling(): void
+    {
+        $profile = ['test' => 'synthetic-profile']; $reply = $this->reply($profile);
+        $probe = $workspace = null;
+        $renderer = new IsolatedContractRenderer(function ($command, $root, $environment, $payload) use ($reply, &$probe, &$workspace) {
+            $workspace = $environment['TMPDIR'];
+            $probe = OpenBasedirProbe::run($command, $root, $environment, $payload);
+
+            return new Process([PHP_BINARY, '-r', $this->outputCode($reply)], $root, $environment, $payload, 60);
+        });
+        $renderer->render(['test' => 'synthetic-input'], $profile);
+        $this->assertSame([false, true, true], [$probe['sibling_read'], $probe['workspace_list'], $probe['app_read']]);
+        $this->assertSame([base_path().'/', $workspace.'/'], explode(PATH_SEPARATOR, $probe['basedir']));
     }
 
     public static function malformedReplies(): array

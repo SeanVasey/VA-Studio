@@ -10,7 +10,8 @@ use PDO;
 /** Current consumer write admission, separate from the original producer/history proof. */
 final readonly class PaidGrantConsumerCommitAdmission implements JsonSerializable, ProductionPaidOrderConsumerCommitAdmissionV1
 {
-    private function __construct(private PaidGrantReadReceipt $receipt, private int $originalDeadlineNs) {}
+    private function __construct(private PaidGrantReadReceipt $receipt, private PaidGrantDeadline $originalBudget,
+        private int $originalDeadlineNs) {}
 
     /** Trusted original in-frame receipt and existing budget only; no browser evidence or replacement deadline. */
     public static function capture(PaidGrantReadReceipt $receipt, PaidGrantDeadline $originalBudget): self
@@ -18,14 +19,16 @@ final readonly class PaidGrantConsumerCommitAdmission implements JsonSerializabl
         $receipt->requireCommitAdmissionMint();
         $originalBudget->proveCurrent();
 
-        return new self($receipt, $originalBudget->value());
+        return new self($receipt, $originalBudget, $originalBudget->value());
     }
 
     public function proveCurrent(PDO $capturedPrimary): void
     {
         PaidGrantException::require(hrtime(true) <= $this->originalDeadlineNs, 410);
+        $this->originalBudget->proveCurrent();
         $this->receipt->proveCommitAdmission($capturedPrimary);
         PaidGrantException::require(hrtime(true) <= $this->originalDeadlineNs, 410);
+        $this->originalBudget->proveCurrent();
     }
 
     public function __serialize(): array

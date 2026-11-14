@@ -1,0 +1,79 @@
+{
+  "changed_sources": [],
+  "completed_utc": "2026-10-13T07:35:02.125640+00:00",
+  "duration_seconds": 552.033,
+  "exit": 0,
+  "head_after": "982f4ea69ed8d2191345cd8c752377da19780a89",
+  "junit": {
+    "assertions": "46",
+    "errors": "0",
+    "failures": "0",
+    "name": "CLI Arguments",
+    "skipped": "0",
+    "tests": "5",
+    "time": "551.746875"
+  },
+  "leaves": [
+    {
+      "assertions": "18",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest",
+      "classname": "Tests.Feature.ProductionMembershipBilling.MembershipNativeCatalogCurrentnessTest",
+      "errors": 0,
+      "failures": 0,
+      "file": "/workspace/VA-Studio-member-catalog-currentness/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+      "line": "52",
+      "name": "test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses",
+      "skips": 0,
+      "time": "134.455040"
+    },
+    {
+      "assertions": "11",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest",
+      "classname": "Tests.Feature.ProductionMembershipBilling.MembershipNativeCatalogCurrentnessTest",
+      "errors": 0,
+      "failures": 0,
+      "file": "/workspace/VA-Studio-member-catalog-currentness/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+      "line": "134",
+      "name": "test_real_table_comment_change_is_not_erased_by_counter_projection_in_committed_read_only_frame",
+      "skips": 0,
+      "time": "67.677676"
+    },
+    {
+      "assertions": "7",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest",
+      "classname": "Tests.Feature.ProductionMembershipBilling.MembershipNativeCatalogCurrentnessTest",
+      "errors": 0,
+      "failures": 0,
+      "file": "/workspace/VA-Studio-member-catalog-currentness/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+      "line": "170",
+      "name": "test_identical_row_local_temporary_shadow_remains_refused_after_a_positive_original_proof",
+      "skips": 0,
+      "time": "113.868645"
+    },
+    {
+      "assertions": "5",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+      "classname": "Tests.Feature.ProductionMembershipBilling.MembershipEligibleLicenseProofTest",
+      "errors": 0,
+      "failures": 0,
+      "file": "/workspace/VA-Studio-member-catalog-currentness/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+      "line": "143",
+      "name": "test_private_bytes_are_rechecked_without_minting_a_new_readiness_deadline",
+      "skips": 0,
+      "time": "102.146735"
+    },
+    {
+      "assertions": "5",
+      "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+      "classname": "Tests.Feature.ProductionMembershipBilling.MembershipEligibleLicenseProofTest",
+      "errors": 0,
+      "failures": 0,
+      "file": "/workspace/VA-Studio-member-catalog-currentness/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+      "line": "228",
+      "name": "test_catalog_snapshot_is_verified_nonlocking_inside_committed_read_only_frame",
+      "skips": 0,
+      "time": "133.598779"
+    }
+  ],
+  "source_count": 1961
+}

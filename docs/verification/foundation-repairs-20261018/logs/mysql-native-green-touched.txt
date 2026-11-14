@@ -1,0 +1,22 @@
+# meta (runner start/end, HEAD, dirty count, args)
+start 2026-10-18T04:16:14Z head=30cca9b6d444755ee106221bcc4b56638e4a783d dirty=0 engine=mysql-8.4.11:33595 args=--filter /(test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs|test_remaining_config_resolution_hook_refuses_committed_authoring_receipt)/ tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php
+end 2026-10-18T04:38:48Z rc=0 secs=1354
+# PHPUnit output
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/f3/phpunit.xml
+
+.......                                                             7 / 7 (100%)
+
+Time: 22:33.315, Memory: 89.00 MB
+
+OK (7 tests, 38 assertions)
+# per-case results from PHPUnit JUnit XML
+MemberGrantFactsCallbackClosureTest test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set "current identity_configuration" assertions 5 time_s 139.1 ok
+MemberGrantFactsCallbackClosureTest test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set "current actor_id_reference" assertions 5 time_s 252.9 ok
+MemberGrantFactsCallbackClosureTest test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set "current actor_exists" assertions 5 time_s 142.5 ok
+MemberGrantFactsCallbackClosureTest test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set "committed identity_configuration" assertions 7 time_s 190.0 ok
+MemberGrantFactsCallbackClosureTest test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set "committed actor_id_reference" assertions 5 time_s 283.9 ok
+MemberGrantFactsCallbackClosureTest test_late_record_decrypt_callback_cannot_change_admitted_owner_inputs with data set "committed actor_exists" assertions 5 time_s 235.0 ok
+MemberGrantDefinitionsTest test_remaining_config_resolution_hook_refuses_committed_authoring_receipt assertions 6 time_s 109.9 ok

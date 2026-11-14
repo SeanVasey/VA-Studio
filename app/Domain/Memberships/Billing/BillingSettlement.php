@@ -152,6 +152,10 @@ final class BillingSettlement
         if (($payment['amount_paid'] ?? null) !== $amount) {
             return $refuse('amount');
         }
+        $paidAt = $payment['status_transitions']['paid_at'] ?? null;
+        if (! is_int($paidAt) || $paidAt <= 0 || $paidAt >= 253402300800 || $paidAt > $s->retrievedAt) {
+            return $refuse('payment_time');
+        }
         $intentRef = BillingValues::ref($payment['payment']['payment_intent'] ?? null);
         $intent = $intentRef === null ? null : ($s->paymentIntents[$intentRef] ?? null);
         if ($intent === null || ($intent['object'] ?? null) !== 'payment_intent' || ($intent['id'] ?? null) !== $intentRef) {
@@ -232,7 +236,7 @@ final class BillingSettlement
         }
 
         return new BillingVerdict('settled', null, $facts + ['line_period_start' => BillingValues::utc($start), 'line_period_end' => BillingValues::utc($end),
-            'amount_minor' => $amount, 'currency' => $e->currency]);
+            'amount_minor' => $amount, 'currency' => $e->currency, 'paid_facts_version' => 'membership-paid-invoice-v2', 'paid_at' => BillingValues::utc($paidAt)]);
     }
 
     /**

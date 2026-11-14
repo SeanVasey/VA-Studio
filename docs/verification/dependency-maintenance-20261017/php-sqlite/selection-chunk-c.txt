@@ -1,0 +1,17 @@
+tests/Feature/FoundationTest.php
+tests/Feature/CatalogPaginationTest.php
+tests/Feature/StorefrontMetadataTest.php
+tests/Feature/SiteContentHttpTest.php
+tests/Feature/PublicTrackEmbedTest.php
+tests/Feature/CustomerPurchaseClaimTest.php
+tests/Feature/CustomerSessionHttpTest.php
+tests/Feature/CustomerIdentityHttpTest.php
+tests/Feature/CustomerIdentityTest.php
+tests/Feature/PublicPagesSitemapTest.php
+tests/Feature/TestOwnerDeliveryHttpTest.php
+tests/Feature/SupportAttachmentHttpTest.php
+tests/Feature/PaidTaxHttpJourneyTest.php
+tests/Feature/TrackPublicationGuardTest.php
+tests/Feature/LicenseTemplateAuthoringActionTest.php
+tests/Feature/OperatorMfaTest.php
+tests/Feature/RightsScopeStaffMfaTest.php

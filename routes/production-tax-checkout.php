@@ -4,7 +4,7 @@ use App\Http\Controllers\ProductionTaxCheckoutController;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Support\Facades\Route;
 
-// Not mounted. Root composition registers this file, the provider and the early privacy middleware.
+// Root registers this file only with an exact rehearsal mount; commerce policy and transport stay separate.
 Route::withoutMiddleware(HandleInertiaRequests::class)->prefix('production/tax-checkout')->name('production.tax-checkout.')->group(function (): void {
     Route::post('previews', [ProductionTaxCheckoutController::class, 'preview'])->middleware('throttle:10,1,production-tax-checkout-write')->block(20, 5)->name('previews');
     Route::post('orders', [ProductionTaxCheckoutController::class, 'order'])->middleware('throttle:10,1,production-tax-checkout-write')->block(20, 5)->name('orders');

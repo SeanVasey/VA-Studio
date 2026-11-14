@@ -1,0 +1,9 @@
+[
+  "php",
+  "vendor/bin/pint",
+  "app/Domain/Memberships/Production/MembershipPolicyDocument.php",
+  "app/Domain/Memberships/Production/MembershipPolicyBinding.php",
+  "app/Domain/Memberships/Production/MembershipRedemptionTerms.php",
+  "tests/Unit/MembershipRedemptionPolicyTest.php",
+  "tests/Feature/ProductionMembership/MembershipRedemptionPolicyFactsTest.php"
+]

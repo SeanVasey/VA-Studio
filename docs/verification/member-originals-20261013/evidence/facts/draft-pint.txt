@@ -1,0 +1,1 @@
+{"tool":"pint","result":"fixed","files":[{"path":"app\/Domain\/Grants\/Member\/MemberGrantAuthoringObserver.php","fixers":["unary_operator_spaces","braces_position","statement_indentation","not_operator_with_successor_space","single_line_empty_body"]}]}

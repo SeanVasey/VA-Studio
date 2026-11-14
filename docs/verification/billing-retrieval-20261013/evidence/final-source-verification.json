@@ -1,0 +1,1410 @@
+{
+  "final_source_reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+  "scope": "Every captured hash for each explicitly selected successful invocation compared with the actual frozen root Git tree. Differences are retained by category. Comparison is limited to each captured inventory; it does not establish unlisted inputs or rerun component cases on the final source. External runtime probe programs have their own before/after verification.",
+  "comparisons": [
+    {
+      "run": "records/helpers-final",
+      "component_reference": "a8facf90b1360f5c9b593b4bad40a5962be423b6",
+      "captured_files": 8,
+      "all_captured_hashes_match_final": true,
+      "differences": []
+    },
+    {
+      "run": "records/issuer-final",
+      "component_reference": "7ed9ef471a6a4717636c919833d43296519c39e7",
+      "captured_files": 1204,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingHintRecovery.php",
+          "category": "application",
+          "captured_sha256": "26da27585a52865a17c66453aa210438af476dcde1c69fc8df4336d90f01d942",
+          "final_sha256": "093e631ad358ccfc72353ee602d6c7b6dbfe6198498a55fbb6128dc7582cd37a"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "category": "application",
+          "captured_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9",
+          "final_sha256": "5fa3fd6cb746c93ae1e24617fc437cfa755600b35aca4fce026d711f90b1666b"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingWebhookIntake.php",
+          "category": "application",
+          "captured_sha256": "326e9bab29f98da9944554d69aa1d0aa975f964e7aa45d858402a19de11b3c8a",
+          "final_sha256": "3b4569abfb72a0aefa56c6326f1cd6905bf72c7458b8de626b2c027848a880ec"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipAwardContext.php",
+          "category": "application",
+          "captured_sha256": "91569cb32f0dc2101ea9c2b9108ea52ce295b042486aa2d7fb7cfc6e01d7fff7",
+          "final_sha256": "af9136988eb12239f9cb84015bfb44c92527364a1bf8424c4b0b2feebd6c221e"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "category": "application",
+          "captured_sha256": "dfd820697ba3f0382aeb4d3b5d477cda12f58020a17c1e0ba3b7d6b3fe390b93",
+          "final_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php",
+          "category": "application",
+          "captured_sha256": "a68625cee763c934fe74234fd98d9756dbdc10fe905f00b0b3551b0875380628",
+          "final_sha256": "86236407c0e992a3a7cd871d0a90c96cb86600e3ed1d5ac32b4559e0fa4d398d"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "category": "application",
+          "captured_sha256": "1e9a1726c5687bf414d4fee60d8c08f865d574a6b489745c3f3303ab358d5abb",
+          "final_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/SealedMembershipPaidInvoice.php",
+          "category": "application",
+          "captured_sha256": "dec13a200276fc78f4dcc6718c03d96aff003c4de53fed2eb70fbcf04319c809",
+          "final_sha256": "1beaaefb30176da813f6c494cca7be48b8458887e93b64c59d8288c5753c0ba5"
+        },
+        {
+          "path": "tests/Support/BillingIntervalFixtures.php",
+          "category": "test_support",
+          "captured_sha256": "fe873d90bb914c7b3ebd41302bd1db57d00b6f44e06e6531350f626663a755a5",
+          "final_sha256": "1664cab0acc080aedc59f18dacbc8bed4adf52c20219902c4af5ee7cc620f86e"
+        },
+        {
+          "path": "tests/Support/MembershipAwardFixtures.php",
+          "category": "test_support",
+          "captured_sha256": "72faf08308697029fc12dc5866d8335666bb232ccdade4f543d7b7dbe4842c03",
+          "final_sha256": "3fa1eda6da8130b03d3b81648e9e79e3e290285e6c9b2f44c9ddf500d644236d"
+        },
+        {
+          "path": "tests/Support/MembershipReservationFixtures.php",
+          "category": "test_support",
+          "captured_sha256": "0ba553792a2c10e0ea33eeaa493015d21f00e98d040eeb36a91f9145c611388f",
+          "final_sha256": "624ab63508768c0ec2f9acfa52208fa2d664f755c159efd148be94de965046f9"
+        },
+        {
+          "path": "tests/Support/membership-interval-race-worker.php",
+          "category": "test_support",
+          "captured_sha256": "19bcbc8fdb0bacf933d4359f1d37dde6046ceb4fa54daa0465ea8d331295ac13",
+          "final_sha256": "56bf3f56e7afc9926ac7dde1f057352a5af33ef86712843215b67b84a6f418c2"
+        }
+      ]
+    },
+    {
+      "run": "records/legacy-transition",
+      "component_reference": "5dc1169156287bfa22ae91339aaeccbfe13674f7",
+      "captured_files": 1203,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "category": "application",
+          "captured_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9",
+          "final_sha256": "5fa3fd6cb746c93ae1e24617fc437cfa755600b35aca4fce026d711f90b1666b"
+        }
+      ]
+    },
+    {
+      "run": "records/award-upgrade-new",
+      "component_reference": "5dc1169156287bfa22ae91339aaeccbfe13674f7",
+      "captured_files": 10631,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": ".github/workflows/final-verification.yml",
+          "category": "tooling",
+          "captured_sha256": "2b1d5f8ddd7033d17b8169b2b4ec89aa216f1e73828470f91fd820abca1a1fa2",
+          "final_sha256": "b02fb0db41b7585122cdbfcc3eecbee5b9975710dbf00aa5f98d45fa60d44d4a"
+        },
+        {
+          "path": ".gitlab-ci.yml",
+          "category": "tooling",
+          "captured_sha256": "d7dc08da0c44b900fc5f8cd7ea113883e94258ef3732d41b5def1c555ce98fef",
+          "final_sha256": "5f30b7369a1072e78ecc1061a5f5a5d0a2946c84cf701bcd7074d5bbb97d5629"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "category": "application",
+          "captured_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9",
+          "final_sha256": "5fa3fd6cb746c93ae1e24617fc437cfa755600b35aca4fce026d711f90b1666b"
+        },
+        {
+          "path": "docs/verification/billing-retrieval-20261013/README.md",
+          "category": "other_tracked_input",
+          "captured_sha256": "bbe2e2aae710edf5a254bd8b89f2853eed229204eecf7c3abb84d6407a5691df",
+          "final_sha256": "91d0984a755c637964243c386dc2e65348aee43bc0d7db6d3ff42df36106b66c"
+        },
+        {
+          "path": "scripts/ci/database-mysql-selection.json",
+          "category": "tooling",
+          "captured_sha256": "590590e4c73e62f0e33e20b428885042d4d2797a1ba6222e3491b31c38b9d549",
+          "final_sha256": "1d8e2a324a51897b6db7f54b3fe27f94c36a3e8717fcfa152da862d714a32888"
+        },
+        {
+          "path": "scripts/ci/database-sqlite-skips.json",
+          "category": "tooling",
+          "captured_sha256": "53e97d5a5f65bb9607f0464cccdfe4970fb931d8184e4559dff96f29a65b906c",
+          "final_sha256": "1e726b57cd614631cd53dea27fe48cc548e4c178d9a63a9c7387f65d8f0e4a50"
+        },
+        {
+          "path": "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "7414fc6be274240122106b52134b3666216fd309b89dea3a64381dcebb1de2ef",
+          "final_sha256": "04a983c3d976b6914203a40998cea009b34acc1b02416a118d1d01807800b8ba"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+          "category": "other_test",
+          "captured_sha256": "4239debe2ef24773e18c810a944a333b782bd1518e1251ea048e0513545d700f",
+          "final_sha256": "f01af9e27431b92a6f97484b8dc5a46df65f741180b78764281df66754c66b3e"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php",
+          "category": "other_test",
+          "captured_sha256": "2d803e0ce55b8455eeb65ac74c2b4a643a35a02e3beb0678d565c1871319728a",
+          "final_sha256": "382838f150f214b686c210b24b829df37317cba1c8500a1f87ab71dc5b44fa26"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+          "category": "other_test",
+          "captured_sha256": "fcee79b8144eb5722c7afffbc0871c7c8ea429614f25dd73abfd865503982284",
+          "final_sha256": "e0f58a958f51928f5d857e30f9c7d7bd54214f4b4e667951400b277bb35d3f0b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "43f4d5bd71f37fbdcc1cb3692e0550f96d3b4da41c0a1e7282903b5c8f4db33e",
+          "final_sha256": "0953d3f1f9225712355753d2a81dd2ffdd89280c782aaa66dcacdb929a8a5bee"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php",
+          "category": "other_test",
+          "captured_sha256": "b76a251fb965c662f1c311558460d0786d6d5586d1c1d8bad56e14bcd2e0db49",
+          "final_sha256": "4bc385367ea1cac19c38a7485bc6d0e8105c782df46a5b381c5b19cf6dfad7e2"
+        }
+      ]
+    },
+    {
+      "run": "fixture/sqlite-fixtures-initial",
+      "component_reference": "a063e38067193562593a6e560db01c9daf4cf8c6",
+      "captured_files": 1956,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "category": "application",
+          "captured_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9",
+          "final_sha256": "5fa3fd6cb746c93ae1e24617fc437cfa755600b35aca4fce026d711f90b1666b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "7414fc6be274240122106b52134b3666216fd309b89dea3a64381dcebb1de2ef",
+          "final_sha256": "04a983c3d976b6914203a40998cea009b34acc1b02416a118d1d01807800b8ba"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+          "category": "other_test",
+          "captured_sha256": "4239debe2ef24773e18c810a944a333b782bd1518e1251ea048e0513545d700f",
+          "final_sha256": "f01af9e27431b92a6f97484b8dc5a46df65f741180b78764281df66754c66b3e"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php",
+          "category": "other_test",
+          "captured_sha256": "2d803e0ce55b8455eeb65ac74c2b4a643a35a02e3beb0678d565c1871319728a",
+          "final_sha256": "382838f150f214b686c210b24b829df37317cba1c8500a1f87ab71dc5b44fa26"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+          "category": "other_test",
+          "captured_sha256": "fcee79b8144eb5722c7afffbc0871c7c8ea429614f25dd73abfd865503982284",
+          "final_sha256": "e0f58a958f51928f5d857e30f9c7d7bd54214f4b4e667951400b277bb35d3f0b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "43f4d5bd71f37fbdcc1cb3692e0550f96d3b4da41c0a1e7282903b5c8f4db33e",
+          "final_sha256": "0953d3f1f9225712355753d2a81dd2ffdd89280c782aaa66dcacdb929a8a5bee"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php",
+          "category": "other_test",
+          "captured_sha256": "b76a251fb965c662f1c311558460d0786d6d5586d1c1d8bad56e14bcd2e0db49",
+          "final_sha256": "4bc385367ea1cac19c38a7485bc6d0e8105c782df46a5b381c5b19cf6dfad7e2"
+        }
+      ]
+    },
+    {
+      "run": "fixture/sqlite-schema-preparation",
+      "component_reference": "822408d2a840a1de2154f5adcd63671f2b839e34",
+      "captured_files": 1956,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "category": "application",
+          "captured_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9",
+          "final_sha256": "5fa3fd6cb746c93ae1e24617fc437cfa755600b35aca4fce026d711f90b1666b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "7414fc6be274240122106b52134b3666216fd309b89dea3a64381dcebb1de2ef",
+          "final_sha256": "04a983c3d976b6914203a40998cea009b34acc1b02416a118d1d01807800b8ba"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php",
+          "category": "other_test",
+          "captured_sha256": "2d803e0ce55b8455eeb65ac74c2b4a643a35a02e3beb0678d565c1871319728a",
+          "final_sha256": "382838f150f214b686c210b24b829df37317cba1c8500a1f87ab71dc5b44fa26"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+          "category": "other_test",
+          "captured_sha256": "fcee79b8144eb5722c7afffbc0871c7c8ea429614f25dd73abfd865503982284",
+          "final_sha256": "e0f58a958f51928f5d857e30f9c7d7bd54214f4b4e667951400b277bb35d3f0b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php",
+          "category": "other_test",
+          "captured_sha256": "b76a251fb965c662f1c311558460d0786d6d5586d1c1d8bad56e14bcd2e0db49",
+          "final_sha256": "4bc385367ea1cac19c38a7485bc6d0e8105c782df46a5b381c5b19cf6dfad7e2"
+        }
+      ]
+    },
+    {
+      "run": "fixture/sqlite-cursor",
+      "component_reference": "a4c68a506ef6ef8a73533d342ca9d8c8c15a064a",
+      "captured_files": 1956,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "category": "application",
+          "captured_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9",
+          "final_sha256": "5fa3fd6cb746c93ae1e24617fc437cfa755600b35aca4fce026d711f90b1666b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "7414fc6be274240122106b52134b3666216fd309b89dea3a64381dcebb1de2ef",
+          "final_sha256": "04a983c3d976b6914203a40998cea009b34acc1b02416a118d1d01807800b8ba"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php",
+          "category": "other_test",
+          "captured_sha256": "2d803e0ce55b8455eeb65ac74c2b4a643a35a02e3beb0678d565c1871319728a",
+          "final_sha256": "382838f150f214b686c210b24b829df37317cba1c8500a1f87ab71dc5b44fa26"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+          "category": "other_test",
+          "captured_sha256": "fcee79b8144eb5722c7afffbc0871c7c8ea429614f25dd73abfd865503982284",
+          "final_sha256": "e0f58a958f51928f5d857e30f9c7d7bd54214f4b4e667951400b277bb35d3f0b"
+        }
+      ]
+    },
+    {
+      "run": "root/sqlite-historical-migrations",
+      "component_reference": "67fa03a72798997f95ffd1f0358707ca051b3dc9",
+      "captured_files": 1275,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingLedger.php",
+          "category": "application",
+          "captured_sha256": "83d3ecbe5c300cb45f7e5b82ea0484aaf214c4a6dab1819d434392903ee0dd98",
+          "final_sha256": "c143b3514b20a4b0e557ae48dc0c03a94413b5220e2d1cdc7094fdd53b510a43"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingReconciliation.php",
+          "category": "application",
+          "captured_sha256": "ec8a84ebd47d71a6dd5875f5282acf61889808e6483c2d0925a1d71bf8361f58",
+          "final_sha256": "7909e5855c2c98266f7a3d7aa013c1ad36646789f2f2fae1bb2cfe91421321ea"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingRetrievalAttempts.php",
+          "category": "application",
+          "captured_sha256": "3d62d6a653140e85ae57d29620b48540d0280c87348380d7e902698eddd95549",
+          "final_sha256": "17fd049922867fa7094e261dec72415fd3d4fa595e55dc7903b0a6186e0e27f9"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "category": "application",
+          "captured_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9",
+          "final_sha256": "5fa3fd6cb746c93ae1e24617fc437cfa755600b35aca4fce026d711f90b1666b"
+        }
+      ]
+    },
+    {
+      "run": "root/sqlite-award-proof-integration",
+      "component_reference": "bea13e9cf4f6d50fe4c51023186afd6e846ccefc",
+      "captured_files": 1278,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "category": "application",
+          "captured_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9",
+          "final_sha256": "5fa3fd6cb746c93ae1e24617fc437cfa755600b35aca4fce026d711f90b1666b"
+        }
+      ]
+    },
+    {
+      "run": "root/sqlite-membership-admission-integration",
+      "component_reference": "e050e7200e1ffe76b66b486e74383261fed1229d",
+      "captured_files": 1276,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "category": "application",
+          "captured_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9",
+          "final_sha256": "5fa3fd6cb746c93ae1e24617fc437cfa755600b35aca4fce026d711f90b1666b"
+        }
+      ]
+    },
+    {
+      "run": "consumer/unit",
+      "component_reference": "cd58ada94e4e88c82d1d565dabc92cbaa01e112d",
+      "captured_files": 11,
+      "all_captured_hashes_match_final": true,
+      "differences": []
+    },
+    {
+      "run": "consumer/terminal-restored-green",
+      "component_reference": "bea13e9cf4f6d50fe4c51023186afd6e846ccefc",
+      "captured_files": 1243,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php",
+          "category": "other_test",
+          "captured_sha256": "b76a251fb965c662f1c311558460d0786d6d5586d1c1d8bad56e14bcd2e0db49",
+          "final_sha256": "4bc385367ea1cac19c38a7485bc6d0e8105c782df46a5b381c5b19cf6dfad7e2"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "43f4d5bd71f37fbdcc1cb3692e0550f96d3b4da41c0a1e7282903b5c8f4db33e",
+          "final_sha256": "0953d3f1f9225712355753d2a81dd2ffdd89280c782aaa66dcacdb929a8a5bee"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+          "category": "other_test",
+          "captured_sha256": "4239debe2ef24773e18c810a944a333b782bd1518e1251ea048e0513545d700f",
+          "final_sha256": "f01af9e27431b92a6f97484b8dc5a46df65f741180b78764281df66754c66b3e"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php",
+          "category": "other_test",
+          "captured_sha256": "2d803e0ce55b8455eeb65ac74c2b4a643a35a02e3beb0678d565c1871319728a",
+          "final_sha256": "382838f150f214b686c210b24b829df37317cba1c8500a1f87ab71dc5b44fa26"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+          "category": "other_test",
+          "captured_sha256": "fcee79b8144eb5722c7afffbc0871c7c8ea429614f25dd73abfd865503982284",
+          "final_sha256": "e0f58a958f51928f5d857e30f9c7d7bd54214f4b4e667951400b277bb35d3f0b"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "category": "application",
+          "captured_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9",
+          "final_sha256": "5fa3fd6cb746c93ae1e24617fc437cfa755600b35aca4fce026d711f90b1666b"
+        }
+      ]
+    },
+    {
+      "run": "schema/sqlite-currentness-final",
+      "component_reference": "71f545bde74b30dab5398d9e4b4848856358b487",
+      "captured_files": 1914,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Memberships/Production/SealedMembershipPaidInvoice.php",
+          "category": "application",
+          "captured_sha256": "dec13a200276fc78f4dcc6718c03d96aff003c4de53fed2eb70fbcf04319c809",
+          "final_sha256": "1beaaefb30176da813f6c494cca7be48b8458887e93b64c59d8288c5753c0ba5"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php",
+          "category": "application",
+          "captured_sha256": "a68625cee763c934fe74234fd98d9756dbdc10fe905f00b0b3551b0875380628",
+          "final_sha256": "86236407c0e992a3a7cd871d0a90c96cb86600e3ed1d5ac32b4559e0fa4d398d"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipAwardContext.php",
+          "category": "application",
+          "captured_sha256": "91569cb32f0dc2101ea9c2b9108ea52ce295b042486aa2d7fb7cfc6e01d7fff7",
+          "final_sha256": "af9136988eb12239f9cb84015bfb44c92527364a1bf8424c4b0b2feebd6c221e"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "category": "application",
+          "captured_sha256": "1e9a1726c5687bf414d4fee60d8c08f865d574a6b489745c3f3303ab358d5abb",
+          "final_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "category": "application",
+          "captured_sha256": "dfd820697ba3f0382aeb4d3b5d477cda12f58020a17c1e0ba3b7d6b3fe390b93",
+          "final_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingEvidenceRecord.php",
+          "category": "application",
+          "captured_sha256": "cc356a5f2f6ff6cc1a28e98994b898677a7e4ece509fd3bb5bdbfd007546b261",
+          "final_sha256": "5d3af20944cbd7c3192001d10268b9236502a3a545b486e126bae142ec1ce36c"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingHintRecovery.php",
+          "category": "application",
+          "captured_sha256": "26da27585a52865a17c66453aa210438af476dcde1c69fc8df4336d90f01d942",
+          "final_sha256": "093e631ad358ccfc72353ee602d6c7b6dbfe6198498a55fbb6128dc7582cd37a"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingRetrievalAttempts.php",
+          "category": "application",
+          "captured_sha256": "3d62d6a653140e85ae57d29620b48540d0280c87348380d7e902698eddd95549",
+          "final_sha256": "17fd049922867fa7094e261dec72415fd3d4fa595e55dc7903b0a6186e0e27f9"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingWebhookIntake.php",
+          "category": "application",
+          "captured_sha256": "326e9bab29f98da9944554d69aa1d0aa975f964e7aa45d858402a19de11b3c8a",
+          "final_sha256": "3b4569abfb72a0aefa56c6326f1cd6905bf72c7458b8de626b2c027848a880ec"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingReconciliation.php",
+          "category": "application",
+          "captured_sha256": "ec8a84ebd47d71a6dd5875f5282acf61889808e6483c2d0925a1d71bf8361f58",
+          "final_sha256": "7909e5855c2c98266f7a3d7aa013c1ad36646789f2f2fae1bb2cfe91421321ea"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingLedger.php",
+          "category": "application",
+          "captured_sha256": "83d3ecbe5c300cb45f7e5b82ea0484aaf214c4a6dab1819d434392903ee0dd98",
+          "final_sha256": "c143b3514b20a4b0e557ae48dc0c03a94413b5220e2d1cdc7094fdd53b510a43"
+        },
+        {
+          "path": "tests/Support/BillingIntervalFixtures.php",
+          "category": "test_support",
+          "captured_sha256": "fe873d90bb914c7b3ebd41302bd1db57d00b6f44e06e6531350f626663a755a5",
+          "final_sha256": "1664cab0acc080aedc59f18dacbc8bed4adf52c20219902c4af5ee7cc620f86e"
+        },
+        {
+          "path": "tests/Support/MembershipReservationFixtures.php",
+          "category": "test_support",
+          "captured_sha256": "0ba553792a2c10e0ea33eeaa493015d21f00e98d040eeb36a91f9145c611388f",
+          "final_sha256": "624ab63508768c0ec2f9acfa52208fa2d664f755c159efd148be94de965046f9"
+        },
+        {
+          "path": "tests/Support/MembershipAwardFixtures.php",
+          "category": "test_support",
+          "captured_sha256": "72faf08308697029fc12dc5866d8335666bb232ccdade4f543d7b7dbe4842c03",
+          "final_sha256": "3fa1eda6da8130b03d3b81648e9e79e3e290285e6c9b2f44c9ddf500d644236d"
+        },
+        {
+          "path": "tests/Support/membership-interval-race-worker.php",
+          "category": "test_support",
+          "captured_sha256": "19bcbc8fdb0bacf933d4359f1d37dde6046ceb4fa54daa0465ea8d331295ac13",
+          "final_sha256": "56bf3f56e7afc9926ac7dde1f057352a5af33ef86712843215b67b84a6f418c2"
+        },
+        {
+          "path": "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "7414fc6be274240122106b52134b3666216fd309b89dea3a64381dcebb1de2ef",
+          "final_sha256": "04a983c3d976b6914203a40998cea009b34acc1b02416a118d1d01807800b8ba"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalRetrievalRaceTest.php",
+          "category": "other_test",
+          "captured_sha256": "5f572843ea3411ee48de3914f2eb011bb309803c45e587c71c2336640224d581",
+          "final_sha256": "93ec5ed5fe277e8a0711ba6dc55c864d20ecd491d1a5f25d2570de7da3c3590f"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php",
+          "category": "other_test",
+          "captured_sha256": "689f5a9eed933f4c669d0efc4908c45434611d287b24ec151f074e9bce347307",
+          "final_sha256": "92819dff5952585ebd9bdd776d94f8c3fd598e6f135c84720e7d49b6a6bab250"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php",
+          "category": "other_test",
+          "captured_sha256": "72d9f0a5a6038aeff74d0e0ed109f15e382e750845c1191664d5bd2b8f49ac76",
+          "final_sha256": "47b817335745543f14975a1cef85490a2d28d3924f4c7a0d30886f991ba4d2b3"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php",
+          "category": "other_test",
+          "captured_sha256": "892d3770b665abffa877d6ae130bdb1e6bac957a09616ad2fccf8e2ed4ab6ca1",
+          "final_sha256": "595666872016856645e10dd611d38b69126eaeef6902ec5978813d76506eff84"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+          "category": "other_test",
+          "captured_sha256": "8644416563f9bf971c9314d9c37e6719056c5afd3770bdec5eca214c183a2867",
+          "final_sha256": "50488bdb0fc2350727548ae848e713d562f97687bb1f5b2d27098d814878517d"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipPaidInvoiceProofTest.php",
+          "category": "other_test",
+          "captured_sha256": "eac215b479a34dccdc2290db072af5b690ec58e990948065452c529c84243ecd",
+          "final_sha256": "4bd74d40fba029570014416e953b56bbd60f3c39b1d8266c1bca0e257b39a973"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+          "category": "other_test",
+          "captured_sha256": "dc6b63f69806825935dde538435b241c969f796481e3ece3c2f45cbcb41b5ebb",
+          "final_sha256": "e0f58a958f51928f5d857e30f9c7d7bd54214f4b4e667951400b277bb35d3f0b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalSnapshotTest.php",
+          "category": "other_test",
+          "captured_sha256": "a6054ef0524c91e64399d7cca9e71fd28c54982cf14a0976ee54e22c3b497317",
+          "final_sha256": "1a60fa12c60b42b062df9e5f00f45adab273db6f62e721f5cf8b96ff4cefb54a"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php",
+          "category": "other_test",
+          "captured_sha256": "aff2532b5385ff195820b2ec0ef86e55391407fb635c4829fbb35792afe2c922",
+          "final_sha256": "2ec70399b007013a8505c9cc23299a610d8b70439ee2162e67ac6540a4968545"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php",
+          "category": "other_test",
+          "captured_sha256": "9ad3b0fdf91bd0e442e36e3e83901f6dd4f13cf1b283821006b0f1928292f2e5",
+          "final_sha256": "b316cea75f131d8f8ae2be946e63fedd3dd5aa6e7c04fe5943a5076ac2c19ab4"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php",
+          "category": "other_test",
+          "captured_sha256": "9f4ffc51ff8f5fd719e528c6d6642f7be336b05ed0d7ca01ec738ed39b0dcccd",
+          "final_sha256": "ed02478b915cc023d790521af5e69aa935578072dc35cfa53de23b86559a6fca"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php",
+          "category": "other_test",
+          "captured_sha256": "5f961a43df623f7e4f3390f1e868cc41f6c9073535ea021ef27840c1c321aca8",
+          "final_sha256": "382838f150f214b686c210b24b829df37317cba1c8500a1f87ab71dc5b44fa26"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalOwnershipRaceTest.php",
+          "category": "other_test",
+          "captured_sha256": "3c0294fd272514ccdadae4e1dc5c99a678178d0db37dc32badd3bb199d9b943f",
+          "final_sha256": "ec94496d66ed8f4e4e2c3b0bfd5cfa30b7e26409a9b58e20e884784355c2c54b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+          "category": "other_test",
+          "captured_sha256": "4239debe2ef24773e18c810a944a333b782bd1518e1251ea048e0513545d700f",
+          "final_sha256": "f01af9e27431b92a6f97484b8dc5a46df65f741180b78764281df66754c66b3e"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php",
+          "category": "other_test",
+          "captured_sha256": "77aec214b03230904ef29af224e4b8843dd96a7d0c2be4e0728275db959c62a2",
+          "final_sha256": "70c808b9deceef1541cf78d463bfe1f387cd8dcf60178c424a0d460989c9a05f"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeStaleRetrievalRaceTest.php",
+          "category": "other_test",
+          "captured_sha256": "c87ef03ed989e97b61e053ca7015b0259514679dcd9b648b5521a703f4e2d3cc",
+          "final_sha256": "bfe9a40cde878d781e128dce9e4082385316a8f2dcb8f549362cb4d9daf537e0"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php",
+          "category": "other_test",
+          "captured_sha256": "18281b65570615ec260377f1559bd9ef7dcfe045380e012525ca8d64e8427c25",
+          "final_sha256": "2affb92547b31160935f23464171f2169d0289bb9d39ee4a2ecf2ce3888b4aac"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "43f4d5bd71f37fbdcc1cb3692e0550f96d3b4da41c0a1e7282903b5c8f4db33e",
+          "final_sha256": "0953d3f1f9225712355753d2a81dd2ffdd89280c782aaa66dcacdb929a8a5bee"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php",
+          "category": "other_test",
+          "captured_sha256": "b76a251fb965c662f1c311558460d0786d6d5586d1c1d8bad56e14bcd2e0db49",
+          "final_sha256": "4bc385367ea1cac19c38a7485bc6d0e8105c782df46a5b381c5b19cf6dfad7e2"
+        }
+      ]
+    },
+    {
+      "run": "schema/mysql-identity-final",
+      "component_reference": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+      "captured_files": 1913,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Memberships/Production/SealedMembershipPaidInvoice.php",
+          "category": "application",
+          "captured_sha256": "dec13a200276fc78f4dcc6718c03d96aff003c4de53fed2eb70fbcf04319c809",
+          "final_sha256": "1beaaefb30176da813f6c494cca7be48b8458887e93b64c59d8288c5753c0ba5"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php",
+          "category": "application",
+          "captured_sha256": "a68625cee763c934fe74234fd98d9756dbdc10fe905f00b0b3551b0875380628",
+          "final_sha256": "86236407c0e992a3a7cd871d0a90c96cb86600e3ed1d5ac32b4559e0fa4d398d"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipAwardContext.php",
+          "category": "application",
+          "captured_sha256": "91569cb32f0dc2101ea9c2b9108ea52ce295b042486aa2d7fb7cfc6e01d7fff7",
+          "final_sha256": "af9136988eb12239f9cb84015bfb44c92527364a1bf8424c4b0b2feebd6c221e"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "category": "application",
+          "captured_sha256": "1e9a1726c5687bf414d4fee60d8c08f865d574a6b489745c3f3303ab358d5abb",
+          "final_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "category": "application",
+          "captured_sha256": "dfd820697ba3f0382aeb4d3b5d477cda12f58020a17c1e0ba3b7d6b3fe390b93",
+          "final_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingEvidenceRecord.php",
+          "category": "application",
+          "captured_sha256": "cc356a5f2f6ff6cc1a28e98994b898677a7e4ece509fd3bb5bdbfd007546b261",
+          "final_sha256": "5d3af20944cbd7c3192001d10268b9236502a3a545b486e126bae142ec1ce36c"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingHintRecovery.php",
+          "category": "application",
+          "captured_sha256": "26da27585a52865a17c66453aa210438af476dcde1c69fc8df4336d90f01d942",
+          "final_sha256": "093e631ad358ccfc72353ee602d6c7b6dbfe6198498a55fbb6128dc7582cd37a"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingRetrievalAttempts.php",
+          "category": "application",
+          "captured_sha256": "3d62d6a653140e85ae57d29620b48540d0280c87348380d7e902698eddd95549",
+          "final_sha256": "17fd049922867fa7094e261dec72415fd3d4fa595e55dc7903b0a6186e0e27f9"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingWebhookIntake.php",
+          "category": "application",
+          "captured_sha256": "326e9bab29f98da9944554d69aa1d0aa975f964e7aa45d858402a19de11b3c8a",
+          "final_sha256": "3b4569abfb72a0aefa56c6326f1cd6905bf72c7458b8de626b2c027848a880ec"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "category": "application",
+          "captured_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9",
+          "final_sha256": "5fa3fd6cb746c93ae1e24617fc437cfa755600b35aca4fce026d711f90b1666b"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingReconciliation.php",
+          "category": "application",
+          "captured_sha256": "ec8a84ebd47d71a6dd5875f5282acf61889808e6483c2d0925a1d71bf8361f58",
+          "final_sha256": "7909e5855c2c98266f7a3d7aa013c1ad36646789f2f2fae1bb2cfe91421321ea"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingLedger.php",
+          "category": "application",
+          "captured_sha256": "83d3ecbe5c300cb45f7e5b82ea0484aaf214c4a6dab1819d434392903ee0dd98",
+          "final_sha256": "c143b3514b20a4b0e557ae48dc0c03a94413b5220e2d1cdc7094fdd53b510a43"
+        },
+        {
+          "path": "tests/Support/BillingIntervalFixtures.php",
+          "category": "test_support",
+          "captured_sha256": "fe873d90bb914c7b3ebd41302bd1db57d00b6f44e06e6531350f626663a755a5",
+          "final_sha256": "1664cab0acc080aedc59f18dacbc8bed4adf52c20219902c4af5ee7cc620f86e"
+        },
+        {
+          "path": "tests/Support/MembershipReservationFixtures.php",
+          "category": "test_support",
+          "captured_sha256": "0ba553792a2c10e0ea33eeaa493015d21f00e98d040eeb36a91f9145c611388f",
+          "final_sha256": "624ab63508768c0ec2f9acfa52208fa2d664f755c159efd148be94de965046f9"
+        },
+        {
+          "path": "tests/Support/MembershipAwardFixtures.php",
+          "category": "test_support",
+          "captured_sha256": "72faf08308697029fc12dc5866d8335666bb232ccdade4f543d7b7dbe4842c03",
+          "final_sha256": "3fa1eda6da8130b03d3b81648e9e79e3e290285e6c9b2f44c9ddf500d644236d"
+        },
+        {
+          "path": "tests/Support/membership-interval-race-worker.php",
+          "category": "test_support",
+          "captured_sha256": "19bcbc8fdb0bacf933d4359f1d37dde6046ceb4fa54daa0465ea8d331295ac13",
+          "final_sha256": "56bf3f56e7afc9926ac7dde1f057352a5af33ef86712843215b67b84a6f418c2"
+        },
+        {
+          "path": "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "7414fc6be274240122106b52134b3666216fd309b89dea3a64381dcebb1de2ef",
+          "final_sha256": "04a983c3d976b6914203a40998cea009b34acc1b02416a118d1d01807800b8ba"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalRetrievalRaceTest.php",
+          "category": "other_test",
+          "captured_sha256": "5f572843ea3411ee48de3914f2eb011bb309803c45e587c71c2336640224d581",
+          "final_sha256": "93ec5ed5fe277e8a0711ba6dc55c864d20ecd491d1a5f25d2570de7da3c3590f"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php",
+          "category": "other_test",
+          "captured_sha256": "689f5a9eed933f4c669d0efc4908c45434611d287b24ec151f074e9bce347307",
+          "final_sha256": "92819dff5952585ebd9bdd776d94f8c3fd598e6f135c84720e7d49b6a6bab250"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php",
+          "category": "other_test",
+          "captured_sha256": "72d9f0a5a6038aeff74d0e0ed109f15e382e750845c1191664d5bd2b8f49ac76",
+          "final_sha256": "47b817335745543f14975a1cef85490a2d28d3924f4c7a0d30886f991ba4d2b3"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php",
+          "category": "other_test",
+          "captured_sha256": "892d3770b665abffa877d6ae130bdb1e6bac957a09616ad2fccf8e2ed4ab6ca1",
+          "final_sha256": "595666872016856645e10dd611d38b69126eaeef6902ec5978813d76506eff84"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+          "category": "other_test",
+          "captured_sha256": "8644416563f9bf971c9314d9c37e6719056c5afd3770bdec5eca214c183a2867",
+          "final_sha256": "50488bdb0fc2350727548ae848e713d562f97687bb1f5b2d27098d814878517d"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipPaidInvoiceProofTest.php",
+          "category": "other_test",
+          "captured_sha256": "eac215b479a34dccdc2290db072af5b690ec58e990948065452c529c84243ecd",
+          "final_sha256": "4bd74d40fba029570014416e953b56bbd60f3c39b1d8266c1bca0e257b39a973"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+          "category": "other_test",
+          "captured_sha256": "dc6b63f69806825935dde538435b241c969f796481e3ece3c2f45cbcb41b5ebb",
+          "final_sha256": "e0f58a958f51928f5d857e30f9c7d7bd54214f4b4e667951400b277bb35d3f0b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalSnapshotTest.php",
+          "category": "other_test",
+          "captured_sha256": "a6054ef0524c91e64399d7cca9e71fd28c54982cf14a0976ee54e22c3b497317",
+          "final_sha256": "1a60fa12c60b42b062df9e5f00f45adab273db6f62e721f5cf8b96ff4cefb54a"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php",
+          "category": "other_test",
+          "captured_sha256": "aff2532b5385ff195820b2ec0ef86e55391407fb635c4829fbb35792afe2c922",
+          "final_sha256": "2ec70399b007013a8505c9cc23299a610d8b70439ee2162e67ac6540a4968545"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php",
+          "category": "other_test",
+          "captured_sha256": "9ad3b0fdf91bd0e442e36e3e83901f6dd4f13cf1b283821006b0f1928292f2e5",
+          "final_sha256": "b316cea75f131d8f8ae2be946e63fedd3dd5aa6e7c04fe5943a5076ac2c19ab4"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php",
+          "category": "other_test",
+          "captured_sha256": "9f4ffc51ff8f5fd719e528c6d6642f7be336b05ed0d7ca01ec738ed39b0dcccd",
+          "final_sha256": "ed02478b915cc023d790521af5e69aa935578072dc35cfa53de23b86559a6fca"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php",
+          "category": "other_test",
+          "captured_sha256": "5f961a43df623f7e4f3390f1e868cc41f6c9073535ea021ef27840c1c321aca8",
+          "final_sha256": "382838f150f214b686c210b24b829df37317cba1c8500a1f87ab71dc5b44fa26"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalOwnershipRaceTest.php",
+          "category": "other_test",
+          "captured_sha256": "3c0294fd272514ccdadae4e1dc5c99a678178d0db37dc32badd3bb199d9b943f",
+          "final_sha256": "ec94496d66ed8f4e4e2c3b0bfd5cfa30b7e26409a9b58e20e884784355c2c54b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+          "category": "other_test",
+          "captured_sha256": "4239debe2ef24773e18c810a944a333b782bd1518e1251ea048e0513545d700f",
+          "final_sha256": "f01af9e27431b92a6f97484b8dc5a46df65f741180b78764281df66754c66b3e"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php",
+          "category": "other_test",
+          "captured_sha256": "77aec214b03230904ef29af224e4b8843dd96a7d0c2be4e0728275db959c62a2",
+          "final_sha256": "70c808b9deceef1541cf78d463bfe1f387cd8dcf60178c424a0d460989c9a05f"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeStaleRetrievalRaceTest.php",
+          "category": "other_test",
+          "captured_sha256": "c87ef03ed989e97b61e053ca7015b0259514679dcd9b648b5521a703f4e2d3cc",
+          "final_sha256": "bfe9a40cde878d781e128dce9e4082385316a8f2dcb8f549362cb4d9daf537e0"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php",
+          "category": "other_test",
+          "captured_sha256": "18281b65570615ec260377f1559bd9ef7dcfe045380e012525ca8d64e8427c25",
+          "final_sha256": "2affb92547b31160935f23464171f2169d0289bb9d39ee4a2ecf2ce3888b4aac"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "43f4d5bd71f37fbdcc1cb3692e0550f96d3b4da41c0a1e7282903b5c8f4db33e",
+          "final_sha256": "0953d3f1f9225712355753d2a81dd2ffdd89280c782aaa66dcacdb929a8a5bee"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php",
+          "category": "other_test",
+          "captured_sha256": "b76a251fb965c662f1c311558460d0786d6d5586d1c1d8bad56e14bcd2e0db49",
+          "final_sha256": "4bc385367ea1cac19c38a7485bc6d0e8105c782df46a5b381c5b19cf6dfad7e2"
+        }
+      ]
+    },
+    {
+      "run": "records/native-producer-canary",
+      "component_reference": "5dc1169156287bfa22ae91339aaeccbfe13674f7",
+      "captured_files": 2105,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "category": "application",
+          "captured_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9",
+          "final_sha256": "5fa3fd6cb746c93ae1e24617fc437cfa755600b35aca4fce026d711f90b1666b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "7414fc6be274240122106b52134b3666216fd309b89dea3a64381dcebb1de2ef",
+          "final_sha256": "04a983c3d976b6914203a40998cea009b34acc1b02416a118d1d01807800b8ba"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+          "category": "other_test",
+          "captured_sha256": "4239debe2ef24773e18c810a944a333b782bd1518e1251ea048e0513545d700f",
+          "final_sha256": "f01af9e27431b92a6f97484b8dc5a46df65f741180b78764281df66754c66b3e"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php",
+          "category": "other_test",
+          "captured_sha256": "2d803e0ce55b8455eeb65ac74c2b4a643a35a02e3beb0678d565c1871319728a",
+          "final_sha256": "382838f150f214b686c210b24b829df37317cba1c8500a1f87ab71dc5b44fa26"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+          "category": "other_test",
+          "captured_sha256": "fcee79b8144eb5722c7afffbc0871c7c8ea429614f25dd73abfd865503982284",
+          "final_sha256": "e0f58a958f51928f5d857e30f9c7d7bd54214f4b4e667951400b277bb35d3f0b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "43f4d5bd71f37fbdcc1cb3692e0550f96d3b4da41c0a1e7282903b5c8f4db33e",
+          "final_sha256": "0953d3f1f9225712355753d2a81dd2ffdd89280c782aaa66dcacdb929a8a5bee"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php",
+          "category": "other_test",
+          "captured_sha256": "b76a251fb965c662f1c311558460d0786d6d5586d1c1d8bad56e14bcd2e0db49",
+          "final_sha256": "4bc385367ea1cac19c38a7485bc6d0e8105c782df46a5b381c5b19cf6dfad7e2"
+        }
+      ]
+    },
+    {
+      "run": "records/native-producer-remainder",
+      "component_reference": "5dc1169156287bfa22ae91339aaeccbfe13674f7",
+      "captured_files": 2105,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Memberships/Billing/BillingSchema.php",
+          "category": "application",
+          "captured_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9",
+          "final_sha256": "5fa3fd6cb746c93ae1e24617fc437cfa755600b35aca4fce026d711f90b1666b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "7414fc6be274240122106b52134b3666216fd309b89dea3a64381dcebb1de2ef",
+          "final_sha256": "04a983c3d976b6914203a40998cea009b34acc1b02416a118d1d01807800b8ba"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+          "category": "other_test",
+          "captured_sha256": "4239debe2ef24773e18c810a944a333b782bd1518e1251ea048e0513545d700f",
+          "final_sha256": "f01af9e27431b92a6f97484b8dc5a46df65f741180b78764281df66754c66b3e"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php",
+          "category": "other_test",
+          "captured_sha256": "2d803e0ce55b8455eeb65ac74c2b4a643a35a02e3beb0678d565c1871319728a",
+          "final_sha256": "382838f150f214b686c210b24b829df37317cba1c8500a1f87ab71dc5b44fa26"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+          "category": "other_test",
+          "captured_sha256": "fcee79b8144eb5722c7afffbc0871c7c8ea429614f25dd73abfd865503982284",
+          "final_sha256": "e0f58a958f51928f5d857e30f9c7d7bd54214f4b4e667951400b277bb35d3f0b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "43f4d5bd71f37fbdcc1cb3692e0550f96d3b4da41c0a1e7282903b5c8f4db33e",
+          "final_sha256": "0953d3f1f9225712355753d2a81dd2ffdd89280c782aaa66dcacdb929a8a5bee"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php",
+          "category": "other_test",
+          "captured_sha256": "b76a251fb965c662f1c311558460d0786d6d5586d1c1d8bad56e14bcd2e0db49",
+          "final_sha256": "4bc385367ea1cac19c38a7485bc6d0e8105c782df46a5b381c5b19cf6dfad7e2"
+        }
+      ]
+    },
+    {
+      "run": "schema/mysql-currentness-fixed",
+      "component_reference": "71f545bde74b30dab5398d9e4b4848856358b487",
+      "captured_files": 1914,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Memberships/Production/SealedMembershipPaidInvoice.php",
+          "category": "application",
+          "captured_sha256": "dec13a200276fc78f4dcc6718c03d96aff003c4de53fed2eb70fbcf04319c809",
+          "final_sha256": "1beaaefb30176da813f6c494cca7be48b8458887e93b64c59d8288c5753c0ba5"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php",
+          "category": "application",
+          "captured_sha256": "a68625cee763c934fe74234fd98d9756dbdc10fe905f00b0b3551b0875380628",
+          "final_sha256": "86236407c0e992a3a7cd871d0a90c96cb86600e3ed1d5ac32b4559e0fa4d398d"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipAwardContext.php",
+          "category": "application",
+          "captured_sha256": "91569cb32f0dc2101ea9c2b9108ea52ce295b042486aa2d7fb7cfc6e01d7fff7",
+          "final_sha256": "af9136988eb12239f9cb84015bfb44c92527364a1bf8424c4b0b2feebd6c221e"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "category": "application",
+          "captured_sha256": "1e9a1726c5687bf414d4fee60d8c08f865d574a6b489745c3f3303ab358d5abb",
+          "final_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "category": "application",
+          "captured_sha256": "dfd820697ba3f0382aeb4d3b5d477cda12f58020a17c1e0ba3b7d6b3fe390b93",
+          "final_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingEvidenceRecord.php",
+          "category": "application",
+          "captured_sha256": "cc356a5f2f6ff6cc1a28e98994b898677a7e4ece509fd3bb5bdbfd007546b261",
+          "final_sha256": "5d3af20944cbd7c3192001d10268b9236502a3a545b486e126bae142ec1ce36c"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingHintRecovery.php",
+          "category": "application",
+          "captured_sha256": "26da27585a52865a17c66453aa210438af476dcde1c69fc8df4336d90f01d942",
+          "final_sha256": "093e631ad358ccfc72353ee602d6c7b6dbfe6198498a55fbb6128dc7582cd37a"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingRetrievalAttempts.php",
+          "category": "application",
+          "captured_sha256": "3d62d6a653140e85ae57d29620b48540d0280c87348380d7e902698eddd95549",
+          "final_sha256": "17fd049922867fa7094e261dec72415fd3d4fa595e55dc7903b0a6186e0e27f9"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingWebhookIntake.php",
+          "category": "application",
+          "captured_sha256": "326e9bab29f98da9944554d69aa1d0aa975f964e7aa45d858402a19de11b3c8a",
+          "final_sha256": "3b4569abfb72a0aefa56c6326f1cd6905bf72c7458b8de626b2c027848a880ec"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingReconciliation.php",
+          "category": "application",
+          "captured_sha256": "ec8a84ebd47d71a6dd5875f5282acf61889808e6483c2d0925a1d71bf8361f58",
+          "final_sha256": "7909e5855c2c98266f7a3d7aa013c1ad36646789f2f2fae1bb2cfe91421321ea"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingLedger.php",
+          "category": "application",
+          "captured_sha256": "83d3ecbe5c300cb45f7e5b82ea0484aaf214c4a6dab1819d434392903ee0dd98",
+          "final_sha256": "c143b3514b20a4b0e557ae48dc0c03a94413b5220e2d1cdc7094fdd53b510a43"
+        },
+        {
+          "path": "tests/Support/BillingIntervalFixtures.php",
+          "category": "test_support",
+          "captured_sha256": "fe873d90bb914c7b3ebd41302bd1db57d00b6f44e06e6531350f626663a755a5",
+          "final_sha256": "1664cab0acc080aedc59f18dacbc8bed4adf52c20219902c4af5ee7cc620f86e"
+        },
+        {
+          "path": "tests/Support/MembershipReservationFixtures.php",
+          "category": "test_support",
+          "captured_sha256": "0ba553792a2c10e0ea33eeaa493015d21f00e98d040eeb36a91f9145c611388f",
+          "final_sha256": "624ab63508768c0ec2f9acfa52208fa2d664f755c159efd148be94de965046f9"
+        },
+        {
+          "path": "tests/Support/MembershipAwardFixtures.php",
+          "category": "test_support",
+          "captured_sha256": "72faf08308697029fc12dc5866d8335666bb232ccdade4f543d7b7dbe4842c03",
+          "final_sha256": "3fa1eda6da8130b03d3b81648e9e79e3e290285e6c9b2f44c9ddf500d644236d"
+        },
+        {
+          "path": "tests/Support/membership-interval-race-worker.php",
+          "category": "test_support",
+          "captured_sha256": "19bcbc8fdb0bacf933d4359f1d37dde6046ceb4fa54daa0465ea8d331295ac13",
+          "final_sha256": "56bf3f56e7afc9926ac7dde1f057352a5af33ef86712843215b67b84a6f418c2"
+        },
+        {
+          "path": "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "7414fc6be274240122106b52134b3666216fd309b89dea3a64381dcebb1de2ef",
+          "final_sha256": "04a983c3d976b6914203a40998cea009b34acc1b02416a118d1d01807800b8ba"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalRetrievalRaceTest.php",
+          "category": "other_test",
+          "captured_sha256": "5f572843ea3411ee48de3914f2eb011bb309803c45e587c71c2336640224d581",
+          "final_sha256": "93ec5ed5fe277e8a0711ba6dc55c864d20ecd491d1a5f25d2570de7da3c3590f"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php",
+          "category": "other_test",
+          "captured_sha256": "689f5a9eed933f4c669d0efc4908c45434611d287b24ec151f074e9bce347307",
+          "final_sha256": "92819dff5952585ebd9bdd776d94f8c3fd598e6f135c84720e7d49b6a6bab250"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php",
+          "category": "other_test",
+          "captured_sha256": "72d9f0a5a6038aeff74d0e0ed109f15e382e750845c1191664d5bd2b8f49ac76",
+          "final_sha256": "47b817335745543f14975a1cef85490a2d28d3924f4c7a0d30886f991ba4d2b3"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php",
+          "category": "other_test",
+          "captured_sha256": "892d3770b665abffa877d6ae130bdb1e6bac957a09616ad2fccf8e2ed4ab6ca1",
+          "final_sha256": "595666872016856645e10dd611d38b69126eaeef6902ec5978813d76506eff84"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+          "category": "other_test",
+          "captured_sha256": "8644416563f9bf971c9314d9c37e6719056c5afd3770bdec5eca214c183a2867",
+          "final_sha256": "50488bdb0fc2350727548ae848e713d562f97687bb1f5b2d27098d814878517d"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipPaidInvoiceProofTest.php",
+          "category": "other_test",
+          "captured_sha256": "eac215b479a34dccdc2290db072af5b690ec58e990948065452c529c84243ecd",
+          "final_sha256": "4bd74d40fba029570014416e953b56bbd60f3c39b1d8266c1bca0e257b39a973"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+          "category": "other_test",
+          "captured_sha256": "dc6b63f69806825935dde538435b241c969f796481e3ece3c2f45cbcb41b5ebb",
+          "final_sha256": "e0f58a958f51928f5d857e30f9c7d7bd54214f4b4e667951400b277bb35d3f0b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalSnapshotTest.php",
+          "category": "other_test",
+          "captured_sha256": "a6054ef0524c91e64399d7cca9e71fd28c54982cf14a0976ee54e22c3b497317",
+          "final_sha256": "1a60fa12c60b42b062df9e5f00f45adab273db6f62e721f5cf8b96ff4cefb54a"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php",
+          "category": "other_test",
+          "captured_sha256": "aff2532b5385ff195820b2ec0ef86e55391407fb635c4829fbb35792afe2c922",
+          "final_sha256": "2ec70399b007013a8505c9cc23299a610d8b70439ee2162e67ac6540a4968545"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php",
+          "category": "other_test",
+          "captured_sha256": "9ad3b0fdf91bd0e442e36e3e83901f6dd4f13cf1b283821006b0f1928292f2e5",
+          "final_sha256": "b316cea75f131d8f8ae2be946e63fedd3dd5aa6e7c04fe5943a5076ac2c19ab4"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php",
+          "category": "other_test",
+          "captured_sha256": "9f4ffc51ff8f5fd719e528c6d6642f7be336b05ed0d7ca01ec738ed39b0dcccd",
+          "final_sha256": "ed02478b915cc023d790521af5e69aa935578072dc35cfa53de23b86559a6fca"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php",
+          "category": "other_test",
+          "captured_sha256": "5f961a43df623f7e4f3390f1e868cc41f6c9073535ea021ef27840c1c321aca8",
+          "final_sha256": "382838f150f214b686c210b24b829df37317cba1c8500a1f87ab71dc5b44fa26"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalOwnershipRaceTest.php",
+          "category": "other_test",
+          "captured_sha256": "3c0294fd272514ccdadae4e1dc5c99a678178d0db37dc32badd3bb199d9b943f",
+          "final_sha256": "ec94496d66ed8f4e4e2c3b0bfd5cfa30b7e26409a9b58e20e884784355c2c54b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+          "category": "other_test",
+          "captured_sha256": "4239debe2ef24773e18c810a944a333b782bd1518e1251ea048e0513545d700f",
+          "final_sha256": "f01af9e27431b92a6f97484b8dc5a46df65f741180b78764281df66754c66b3e"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php",
+          "category": "other_test",
+          "captured_sha256": "77aec214b03230904ef29af224e4b8843dd96a7d0c2be4e0728275db959c62a2",
+          "final_sha256": "70c808b9deceef1541cf78d463bfe1f387cd8dcf60178c424a0d460989c9a05f"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeStaleRetrievalRaceTest.php",
+          "category": "other_test",
+          "captured_sha256": "c87ef03ed989e97b61e053ca7015b0259514679dcd9b648b5521a703f4e2d3cc",
+          "final_sha256": "bfe9a40cde878d781e128dce9e4082385316a8f2dcb8f549362cb4d9daf537e0"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php",
+          "category": "other_test",
+          "captured_sha256": "18281b65570615ec260377f1559bd9ef7dcfe045380e012525ca8d64e8427c25",
+          "final_sha256": "2affb92547b31160935f23464171f2169d0289bb9d39ee4a2ecf2ce3888b4aac"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "43f4d5bd71f37fbdcc1cb3692e0550f96d3b4da41c0a1e7282903b5c8f4db33e",
+          "final_sha256": "0953d3f1f9225712355753d2a81dd2ffdd89280c782aaa66dcacdb929a8a5bee"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php",
+          "category": "other_test",
+          "captured_sha256": "b76a251fb965c662f1c311558460d0786d6d5586d1c1d8bad56e14bcd2e0db49",
+          "final_sha256": "4bc385367ea1cac19c38a7485bc6d0e8105c782df46a5b381c5b19cf6dfad7e2"
+        }
+      ]
+    },
+    {
+      "run": "schema/mysql-upgrade-final",
+      "component_reference": "71f545bde74b30dab5398d9e4b4848856358b487",
+      "captured_files": 1914,
+      "all_captured_hashes_match_final": false,
+      "differences": [
+        {
+          "path": "app/Domain/Memberships/Production/SealedMembershipPaidInvoice.php",
+          "category": "application",
+          "captured_sha256": "dec13a200276fc78f4dcc6718c03d96aff003c4de53fed2eb70fbcf04319c809",
+          "final_sha256": "1beaaefb30176da813f6c494cca7be48b8458887e93b64c59d8288c5753c0ba5"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipPaidInvoiceAuthority.php",
+          "category": "application",
+          "captured_sha256": "a68625cee763c934fe74234fd98d9756dbdc10fe905f00b0b3551b0875380628",
+          "final_sha256": "86236407c0e992a3a7cd871d0a90c96cb86600e3ed1d5ac32b4559e0fa4d398d"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipAwardContext.php",
+          "category": "application",
+          "captured_sha256": "91569cb32f0dc2101ea9c2b9108ea52ce295b042486aa2d7fb7cfc6e01d7fff7",
+          "final_sha256": "af9136988eb12239f9cb84015bfb44c92527364a1bf8424c4b0b2feebd6c221e"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipReservationContext.php",
+          "category": "application",
+          "captured_sha256": "1e9a1726c5687bf414d4fee60d8c08f865d574a6b489745c3f3303ab358d5abb",
+          "final_sha256": "d2367d8166262a926e03cfd1e832c406dc1e0e621b0ff5df4c3db80203dfa9f6"
+        },
+        {
+          "path": "app/Domain/Memberships/Production/MembershipBillingEvidence.php",
+          "category": "application",
+          "captured_sha256": "dfd820697ba3f0382aeb4d3b5d477cda12f58020a17c1e0ba3b7d6b3fe390b93",
+          "final_sha256": "aea9c888aee8a16d9731eec5c4c4ac4a7b37992136b9e85d8c0e669e68aef824"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingEvidenceRecord.php",
+          "category": "application",
+          "captured_sha256": "cc356a5f2f6ff6cc1a28e98994b898677a7e4ece509fd3bb5bdbfd007546b261",
+          "final_sha256": "5d3af20944cbd7c3192001d10268b9236502a3a545b486e126bae142ec1ce36c"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingHintRecovery.php",
+          "category": "application",
+          "captured_sha256": "26da27585a52865a17c66453aa210438af476dcde1c69fc8df4336d90f01d942",
+          "final_sha256": "093e631ad358ccfc72353ee602d6c7b6dbfe6198498a55fbb6128dc7582cd37a"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingRetrievalAttempts.php",
+          "category": "application",
+          "captured_sha256": "3d62d6a653140e85ae57d29620b48540d0280c87348380d7e902698eddd95549",
+          "final_sha256": "17fd049922867fa7094e261dec72415fd3d4fa595e55dc7903b0a6186e0e27f9"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingWebhookIntake.php",
+          "category": "application",
+          "captured_sha256": "326e9bab29f98da9944554d69aa1d0aa975f964e7aa45d858402a19de11b3c8a",
+          "final_sha256": "3b4569abfb72a0aefa56c6326f1cd6905bf72c7458b8de626b2c027848a880ec"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingReconciliation.php",
+          "category": "application",
+          "captured_sha256": "ec8a84ebd47d71a6dd5875f5282acf61889808e6483c2d0925a1d71bf8361f58",
+          "final_sha256": "7909e5855c2c98266f7a3d7aa013c1ad36646789f2f2fae1bb2cfe91421321ea"
+        },
+        {
+          "path": "app/Domain/Memberships/Billing/BillingLedger.php",
+          "category": "application",
+          "captured_sha256": "83d3ecbe5c300cb45f7e5b82ea0484aaf214c4a6dab1819d434392903ee0dd98",
+          "final_sha256": "c143b3514b20a4b0e557ae48dc0c03a94413b5220e2d1cdc7094fdd53b510a43"
+        },
+        {
+          "path": "tests/Support/BillingIntervalFixtures.php",
+          "category": "test_support",
+          "captured_sha256": "fe873d90bb914c7b3ebd41302bd1db57d00b6f44e06e6531350f626663a755a5",
+          "final_sha256": "1664cab0acc080aedc59f18dacbc8bed4adf52c20219902c4af5ee7cc620f86e"
+        },
+        {
+          "path": "tests/Support/MembershipReservationFixtures.php",
+          "category": "test_support",
+          "captured_sha256": "0ba553792a2c10e0ea33eeaa493015d21f00e98d040eeb36a91f9145c611388f",
+          "final_sha256": "624ab63508768c0ec2f9acfa52208fa2d664f755c159efd148be94de965046f9"
+        },
+        {
+          "path": "tests/Support/MembershipAwardFixtures.php",
+          "category": "test_support",
+          "captured_sha256": "72faf08308697029fc12dc5866d8335666bb232ccdade4f543d7b7dbe4842c03",
+          "final_sha256": "3fa1eda6da8130b03d3b81648e9e79e3e290285e6c9b2f44c9ddf500d644236d"
+        },
+        {
+          "path": "tests/Support/membership-interval-race-worker.php",
+          "category": "test_support",
+          "captured_sha256": "19bcbc8fdb0bacf933d4359f1d37dde6046ceb4fa54daa0465ea8d331295ac13",
+          "final_sha256": "56bf3f56e7afc9926ac7dde1f057352a5af33ef86712843215b67b84a6f418c2"
+        },
+        {
+          "path": "tests/Feature/ProductionMembership/MembershipPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "7414fc6be274240122106b52134b3666216fd309b89dea3a64381dcebb1de2ef",
+          "final_sha256": "04a983c3d976b6914203a40998cea009b34acc1b02416a118d1d01807800b8ba"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalRetrievalRaceTest.php",
+          "category": "other_test",
+          "captured_sha256": "5f572843ea3411ee48de3914f2eb011bb309803c45e587c71c2336640224d581",
+          "final_sha256": "93ec5ed5fe277e8a0711ba6dc55c864d20ecd491d1a5f25d2570de7da3c3590f"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php",
+          "category": "other_test",
+          "captured_sha256": "689f5a9eed933f4c669d0efc4908c45434611d287b24ec151f074e9bce347307",
+          "final_sha256": "92819dff5952585ebd9bdd776d94f8c3fd598e6f135c84720e7d49b6a6bab250"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipAwardOwnershipTest.php",
+          "category": "other_test",
+          "captured_sha256": "72d9f0a5a6038aeff74d0e0ed109f15e382e750845c1191664d5bd2b8f49ac76",
+          "final_sha256": "47b817335745543f14975a1cef85490a2d28d3924f4c7a0d30886f991ba4d2b3"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalIntervalOrderingTest.php",
+          "category": "other_test",
+          "captured_sha256": "892d3770b665abffa877d6ae130bdb1e6bac957a09616ad2fccf8e2ed4ab6ca1",
+          "final_sha256": "595666872016856645e10dd611d38b69126eaeef6902ec5978813d76506eff84"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php",
+          "category": "other_test",
+          "captured_sha256": "8644416563f9bf971c9314d9c37e6719056c5afd3770bdec5eca214c183a2867",
+          "final_sha256": "50488bdb0fc2350727548ae848e713d562f97687bb1f5b2d27098d814878517d"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/MembershipPaidInvoiceProofTest.php",
+          "category": "other_test",
+          "captured_sha256": "eac215b479a34dccdc2290db072af5b690ec58e990948065452c529c84243ecd",
+          "final_sha256": "4bd74d40fba029570014416e953b56bbd60f3c39b1d8266c1bca0e257b39a973"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php",
+          "category": "other_test",
+          "captured_sha256": "dc6b63f69806825935dde538435b241c969f796481e3ece3c2f45cbcb41b5ebb",
+          "final_sha256": "e0f58a958f51928f5d857e30f9c7d7bd54214f4b4e667951400b277bb35d3f0b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalSnapshotTest.php",
+          "category": "other_test",
+          "captured_sha256": "a6054ef0524c91e64399d7cca9e71fd28c54982cf14a0976ee54e22c3b497317",
+          "final_sha256": "1a60fa12c60b42b062df9e5f00f45adab273db6f62e721f5cf8b96ff4cefb54a"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingUnknownOutcomeTest.php",
+          "category": "other_test",
+          "captured_sha256": "aff2532b5385ff195820b2ec0ef86e55391407fb635c4829fbb35792afe2c922",
+          "final_sha256": "2ec70399b007013a8505c9cc23299a610d8b70439ee2162e67ac6540a4968545"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingWebhookRedeliveryTest.php",
+          "category": "other_test",
+          "captured_sha256": "9ad3b0fdf91bd0e442e36e3e83901f6dd4f13cf1b283821006b0f1928292f2e5",
+          "final_sha256": "b316cea75f131d8f8ae2be946e63fedd3dd5aa6e7c04fe5943a5076ac2c19ab4"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingClockSkewOrderingTest.php",
+          "category": "other_test",
+          "captured_sha256": "9f4ffc51ff8f5fd719e528c6d6642f7be336b05ed0d7ca01ec738ed39b0dcccd",
+          "final_sha256": "ed02478b915cc023d790521af5e69aa935578072dc35cfa53de23b86559a6fca"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingOverlappingRetrievalTest.php",
+          "category": "other_test",
+          "captured_sha256": "5f961a43df623f7e4f3390f1e868cc41f6c9073535ea021ef27840c1c321aca8",
+          "final_sha256": "382838f150f214b686c210b24b829df37317cba1c8500a1f87ab71dc5b44fa26"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeIntervalOwnershipRaceTest.php",
+          "category": "other_test",
+          "captured_sha256": "3c0294fd272514ccdadae4e1dc5c99a678178d0db37dc32badd3bb199d9b943f",
+          "final_sha256": "ec94496d66ed8f4e4e2c3b0bfd5cfa30b7e26409a9b58e20e884784355c2c54b"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingAwardFenceTest.php",
+          "category": "other_test",
+          "captured_sha256": "4239debe2ef24773e18c810a944a333b782bd1518e1251ea048e0513545d700f",
+          "final_sha256": "f01af9e27431b92a6f97484b8dc5a46df65f741180b78764281df66754c66b3e"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php",
+          "category": "other_test",
+          "captured_sha256": "77aec214b03230904ef29af224e4b8843dd96a7d0c2be4e0728275db959c62a2",
+          "final_sha256": "70c808b9deceef1541cf78d463bfe1f387cd8dcf60178c424a0d460989c9a05f"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingNativeStaleRetrievalRaceTest.php",
+          "category": "other_test",
+          "captured_sha256": "c87ef03ed989e97b61e053ca7015b0259514679dcd9b648b5521a703f4e2d3cc",
+          "final_sha256": "bfe9a40cde878d781e128dce9e4082385316a8f2dcb8f549362cb4d9daf537e0"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php",
+          "category": "other_test",
+          "captured_sha256": "18281b65570615ec260377f1559bd9ef7dcfe045380e012525ca8d64e8427c25",
+          "final_sha256": "2affb92547b31160935f23464171f2169d0289bb9d39ee4a2ecf2ce3888b4aac"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php",
+          "category": "other_test",
+          "captured_sha256": "43f4d5bd71f37fbdcc1cb3692e0550f96d3b4da41c0a1e7282903b5c8f4db33e",
+          "final_sha256": "0953d3f1f9225712355753d2a81dd2ffdd89280c782aaa66dcacdb929a8a5bee"
+        },
+        {
+          "path": "tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php",
+          "category": "other_test",
+          "captured_sha256": "b76a251fb965c662f1c311558460d0786d6d5586d1c1d8bad56e14bcd2e0db49",
+          "final_sha256": "4bc385367ea1cac19c38a7485bc6d0e8105c782df46a5b381c5b19cf6dfad7e2"
+        }
+      ]
+    },
+    {
+      "run": "root/native-canaries-final",
+      "component_reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+      "captured_files": 1276,
+      "all_captured_hashes_match_final": true,
+      "differences": []
+    },
+    {
+      "run": "root/native-races-final",
+      "component_reference": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+      "captured_files": 1278,
+      "all_captured_hashes_match_final": true,
+      "differences": []
+    }
+  ]
+}

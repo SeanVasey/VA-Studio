@@ -1,34 +1,48 @@
 <?php
 
+use App\Http\AccountFeatures\AccountFeatureHttpKernel;
+use App\Http\AccountFeatures\AccountFeaturePrivacy;
+use App\Http\Membership\MembershipPrivacy;
 use App\Http\Middleware\CustomerPrivacy;
+use App\Http\Middleware\ExplicitTrustProxies;
 use App\Http\Middleware\FreeGrantPrivacy;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InquiryPrivacy;
+use App\Http\Middleware\LegacyRedirects;
+use App\Http\Middleware\PaidGrantPrivacy;
+use App\Http\Middleware\PaidTaxPrivacy;
+use App\Http\Middleware\PrintfulWebhookBodyLimit;
 use App\Http\Middleware\PrivateTrackReviewPrivacy;
+use App\Http\Middleware\ProductionCheckoutPrivacy;
 use App\Http\Middleware\ProductionIdentity\IdentityPrivacy;
 use App\Http\Middleware\ResumableUploadPrivacy;
 use App\Http\Middleware\ServiceProjectPrivacy;
 use App\Http\Middleware\SitePreviewPrivacy;
 use App\Http\Middleware\StripeWebhookBodyLimit;
 use App\Http\Middleware\SupportAttachmentPrivacy;
+use App\Http\Middleware\TaxRootPrivacy;
 use App\Http\Middleware\TestDeliveryPrivacy;
 use App\Http\Middleware\TestExceptionResolutionPrivacy;
+use App\Http\ProductionFree\ProductionFreePrivacy;
 use App\Http\Responses\InquiryResponse;
+use App\Http\Responses\ProductionCheckoutResponse;
 use App\Http\Responses\PublicTrackEmbedResponse;
 use App\Http\Responses\SupportAttachmentResponse;
 use App\Http\Responses\TestDeliveryResponse;
 use App\Http\Responses\TestExceptionResolutionResponse;
 use Illuminate\Contracts\Cache\LockTimeoutException;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
-return Application::configure(basePath: dirname(__DIR__))
+$application = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
@@ -41,6 +55,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(StripeWebhookBodyLimit::class);
+        $middleware->prepend(PrintfulWebhookBodyLimit::class);
         $middleware->prepend(TestDeliveryPrivacy::class);
         $middleware->prepend(TestExceptionResolutionPrivacy::class);
         $middleware->prepend(SitePreviewPrivacy::class);
@@ -51,16 +66,63 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(ServiceProjectPrivacy::class);
         $middleware->prepend(IdentityPrivacy::class);
         $middleware->prepend(FreeGrantPrivacy::class);
+        $middleware->prepend(PaidGrantPrivacy::class);
         $middleware->prepend(SupportAttachmentPrivacy::class);
+        $middleware->prepend(TaxRootPrivacy::class);
+        $middleware->prepend(AccountFeaturePrivacy::class);
+        $middleware->prepend(ProductionFreePrivacy::class);
+        $middleware->prepend(MembershipPrivacy::class);
+        $middleware->prepend(ProductionCheckoutPrivacy::class); // lane PCC: unmounted is the private 404 before any session or SQL
+        // Explicit, non-permissive proxy trust (PCC), outermost so every seam above sees the same client address and scheme.
+        $middleware->remove(TrustProxies::class);
+        $middleware->prepend(ExplicitTrustProxies::class);
+        $middleware->append(LegacyRedirects::class); // FP-100, default-off: config/legacy-redirects.php
         $middleware->redirectGuestsTo(fn () => route('filament.admin.auth.login'));
         $middleware->web(append: [HandleInertiaRequests::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'proof', 'requestKey']);
+        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'proof', 'requestKey', 'token', 'nonce', 'declarations', 'name', 'body', 'trackIds', 'noticeVersion', 'noticeHash', 'affirmative']);
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => ((CustomerPrivacy::matches($request) || ServiceProjectPrivacy::matches($request)) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
+            fn (Request $request) => ProductionCheckoutResponse::matches($request) || MembershipPrivacy::matches($request) || ProductionFreePrivacy::matches($request) || AccountFeaturePrivacy::matches($request) || TaxRootPrivacy::matches($request) || ((CustomerPrivacy::matches($request) || ServiceProjectPrivacy::matches($request)) && $request->isMethod('POST')) || ResumableUploadPrivacy::endpoint($request) || $request->is('api/*', 'quotes', 'quotes/*', 'orders', 'orders/*', 'webhooks/stripe') || $request->expectsJson(),
         );
         $exceptions->report(function (Throwable $exception) {
+            if (ProductionCheckoutResponse::matches(request())) {
+                try {
+                    // Never exception text, SQL bindings, provider bodies or identity proofs.
+                    Log::error('Production checkout request failed.', ['exception_class' => $exception::class]);
+                } catch (Throwable) { /* Preserve the private response. */
+                }
+
+                return false;
+            }
+            if (MembershipPrivacy::matches(request())) {
+                MembershipPrivacy::report($exception);
+
+                return false;
+            }
+            if (ProductionFreePrivacy::matches(request())) {
+                ProductionFreePrivacy::report($exception);
+
+                return false;
+            }
+            if (AccountFeaturePrivacy::matches(request())) {
+                try {
+                    Log::error('Account feature request failed.', ['exception_class' => $exception::class]);
+                } catch (Throwable) { /* Preserve the private generic response. */
+                }
+
+                return false;
+            }
+            if (TaxRootPrivacy::matches(request())) {
+                PaidTaxPrivacy::report($exception);
+
+                return false;
+            }
+            if (PaidGrantPrivacy::matches(request())) {
+                PaidGrantPrivacy::report($exception);
+
+                return false;
+            }
             if (SupportAttachmentPrivacy::matches(request())) {
                 try {
                     Log::error('Private attachment request failed.', ['exception_class' => $exception::class]);
@@ -169,6 +231,34 @@ return Application::configure(basePath: dirname(__DIR__))
         // Middleware failures occur before the controller. Keep those private and
         // generic too, including in debug mode, without changing other routes.
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request): Response {
+            if (ProductionCheckoutResponse::matches($request)) {
+                $status = $exception instanceof LockTimeoutException ? 503 : ($exception instanceof ValidationException ? 422 : $response->getStatusCode());
+
+                return $status >= 400 ? ProductionCheckoutResponse::error($status) : ProductionCheckoutResponse::protect($response);
+            }
+            if (MembershipPrivacy::matches($request)) {
+                $status = $exception instanceof LockTimeoutException ? 503 : ($exception instanceof ValidationException ? 422 : $response->getStatusCode());
+
+                return $status >= 400 ? MembershipPrivacy::error($status, $response->headers->all()) : MembershipPrivacy::protect($response);
+            }
+            if (ProductionFreePrivacy::matches($request)) {
+                $status = $exception instanceof LockTimeoutException ? 503 : ($exception instanceof ValidationException ? 422 : $response->getStatusCode());
+
+                return $status >= 400 ? ProductionFreePrivacy::error($status, $response->headers->all()) : ProductionFreePrivacy::protect($response);
+            }
+            if (AccountFeaturePrivacy::matches($request)) {
+                return AccountFeaturePrivacy::error($exception instanceof LockTimeoutException ? 503 : $response->getStatusCode());
+            }
+            if (TaxRootPrivacy::matches($request)) {
+                $status = $exception instanceof LockTimeoutException ? 503 : ($exception instanceof ValidationException ? 422 : $response->getStatusCode());
+
+                return $status >= 400 ? PaidTaxPrivacy::error($status, $response->headers->all()) : PaidTaxPrivacy::protect($response);
+            }
+            if (PaidGrantPrivacy::matches($request)) {
+                $status = $exception instanceof LockTimeoutException ? 503 : $response->getStatusCode();
+
+                return $status >= 400 ? PaidGrantPrivacy::error($status) : PaidGrantPrivacy::protect($response);
+            }
             if (SupportAttachmentPrivacy::matches($request)) {
                 return $response->getStatusCode() >= 400 ? SupportAttachmentResponse::error($response->getStatusCode(), $response->headers->all()) : SupportAttachmentResponse::protect($response);
             }
@@ -285,3 +375,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json(['code' => $code, 'message' => $message], $status, $headers);
         });
     })->create();
+
+$application->singleton(Kernel::class, AccountFeatureHttpKernel::class);
+
+return $application;

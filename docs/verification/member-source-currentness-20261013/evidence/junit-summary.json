@@ -1,0 +1,2934 @@
+{
+  "scope": "Completed invocations including original failures/errors. Counts overlap; no integrated/full-suite claim.",
+  "runs": [
+    {
+      "id": "r4/configuration",
+      "driver": "sqlite",
+      "expected": {
+        "tests": 22,
+        "assertions": 56,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "r4/configuration.xml",
+      "exit": 0,
+      "source": "r4/configuration-source.json",
+      "scope": "Configuration only, no Laravel migration/Rows/database body.",
+      "tests": 22,
+      "assertions": 56,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_new_member_family_remains_default_off_without_actual_original_facts",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_claimed_enablement_hashes_do_not_supply_an_actual_member_original_capability",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_pure_policy_baseline_refuses_an_overloaded_parent_without_invoking_it",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_verified_member_and_rehearsal_membership_on_configured_sqlite_refuse_before_factories",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_all_capabilities_must_exist_before_a_factory_can_supply_a_missing_one",
+          "assertions": 6,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_configuration_only_admission_rechecks_after_each_factory",
+          "assertions": 6,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #0",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #1",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #2",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #3",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #4",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #5",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #6",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #7",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #8",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #9",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #10",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_captured_scalar_configuration_is_detached_from_repository_references",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_manifest_values_never_admit_private_paths_or_duplicate_roles",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyEnvironmentTest::test_membership_rehearsal_is_admitted_in_testing_and_refused_in_production",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyEnvironmentTest::test_member_grant_rehearsal_is_admitted_in_testing_and_refused_in_production",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyEnvironmentTest::test_replaced_environment_binding_is_refused_without_being_invoked",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        }
+      ]
+    },
+    {
+      "id": "r4/staging-configuration",
+      "driver": "sqlite",
+      "expected": {
+        "tests": 1,
+        "assertions": 4,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "r4/staging-configuration.xml",
+      "exit": 0,
+      "source": "r4/configuration-source.json",
+      "scope": "Migration-backed forced SQLite in-memory; overlaps C3 native phase2.931s; not configuration-only.",
+      "tests": 1,
+      "assertions": 4,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_staging_never_admits_verified_production_membership_or_member_grant_provenance",
+          "assertions": 4,
+          "status": "passed",
+          "detail": null
+        }
+      ]
+    },
+    {
+      "id": "r4/frame-initial",
+      "driver": "sqlite",
+      "expected": {
+        "tests": 12,
+        "assertions": 51,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 1,
+        "exit": 2
+      },
+      "xml": "r4/frame-initial.xml",
+      "exit": 2,
+      "source": "r4/frame-initial-source.json.gz",
+      "scope": "Original real frame invocation; one teardown error from retained Rows fixture pin, one native skip.",
+      "tests": 12,
+      "assertions": 51,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 1,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_rehearsal_admission_binds_the_real_frame_and_terminal_checks_do_not_resolve_factories",
+          "assertions": 7,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_native_verified_member_provenance_requires_and_binds_actual_mysql_despite_rehearsal_membership",
+          "assertions": 0,
+          "status": "skipped",
+          "detail": ""
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_sqlite_verified_member_refuses_both_honest_and_mislabeled_configuration_before_factories",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_capability_callback_configuration_drift_refuses_before_the_remaining_factories",
+          "assertions": 12,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_each_callback_boundary_checks_the_frame_before_resolving_later_factories",
+          "assertions": 6,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_replaced_repository_or_container_is_refused_before_other_factories",
+          "assertions": 4,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_callback_cannot_withdraw_a_later_capability_and_run_intervening_factories",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_transient_configuration_cannot_admit_a_nested_mismatched_frame",
+          "assertions": 3,
+          "status": "error",
+          "detail": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_transient_configuration_cannot_admit_a_nested_mismatched_frame\nIlluminate\\Database\\QueryException: SQLSTATE[HY000]: General error: 1 cannot VACUUM - SQL statements in progress (Connection: sqlite, Database: :memory:, SQL: vacuum \"main\")\n\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Connection.php:857\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Connection.php:813\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Connection.php:590\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Schema/SQLiteBuilder.php:116\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:78\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Console/WipeCommand.php:53\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:36\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/Util.php:43\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:96\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php:35\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Container/Container.php:803\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Command.php:292\n/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Command/Command.php:341\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Command.php:261\n/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Application.php:1094\n/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Application.php:356\n/workspace/VA-Studio-dependency-adapters/vendor/symfony/console/Application.php:195\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Console/Application.php:165\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php:447\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Testing/PendingCommand.php:452\n/workspace/VA-Studio-member-policy-admission/tests/Support/FinalizationDatabaseMigrations.php:32\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:333\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Testing/Concerns/InteractsWithTestCaseLifecycle.php:129\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php:101"
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_equal_configuration_cannot_transfer_an_issued_frame_to_another_policy_or_rows",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_terminal_reproof_rejects_policy_connection_name_and_capability_drift_without_callbacks",
+          "assertions": 4,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_terminal_proof_reads_raw_capability_maps_without_virtual_container_getters",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_commit_and_reopen_on_the_same_pdo_cannot_reuse_an_original_admission",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        }
+      ]
+    },
+    {
+      "id": "r4/sqlite-final",
+      "driver": "sqlite",
+      "expected": {
+        "tests": 50,
+        "assertions": 322,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 1,
+        "exit": 0
+      },
+      "xml": "r4/sqlite-final.xml",
+      "exit": 0,
+      "source": "r4/sqlite-final-source.json.gz",
+      "scope": "Whole new frame and affected preparation/policy/staging files; one native-only skip.",
+      "tests": 50,
+      "assertions": 322,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 1,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_rehearsal_admission_binds_the_real_frame_and_terminal_checks_do_not_resolve_factories",
+          "assertions": 7,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_native_verified_member_provenance_requires_and_binds_actual_mysql_despite_rehearsal_membership",
+          "assertions": 0,
+          "status": "skipped",
+          "detail": ""
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_sqlite_verified_member_refuses_both_honest_and_mislabeled_configuration_before_factories",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_capability_callback_configuration_drift_refuses_before_the_remaining_factories",
+          "assertions": 12,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_each_callback_boundary_checks_the_frame_before_resolving_later_factories",
+          "assertions": 6,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_replaced_repository_or_container_is_refused_before_other_factories",
+          "assertions": 4,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_callback_cannot_withdraw_a_later_capability_and_run_intervening_factories",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_transient_configuration_cannot_admit_a_nested_mismatched_frame",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_equal_configuration_cannot_transfer_an_issued_frame_to_another_policy_or_rows",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_terminal_reproof_rejects_policy_connection_name_and_capability_drift_without_callbacks",
+          "assertions": 4,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_terminal_proof_reads_raw_capability_maps_without_virtual_container_getters",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_commit_and_reopen_on_the_same_pdo_cannot_reuse_an_original_admission",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_new_member_family_remains_default_off_without_actual_original_facts",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_claimed_enablement_hashes_do_not_supply_an_actual_member_original_capability",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_pure_policy_baseline_refuses_an_overloaded_parent_without_invoking_it",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_verified_member_and_rehearsal_membership_on_configured_sqlite_refuse_before_factories",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_all_capabilities_must_exist_before_a_factory_can_supply_a_missing_one",
+          "assertions": 6,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_capability_aliases_are_refused_before_any_factory_is_resolved",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_configuration_only_admission_rechecks_after_each_factory",
+          "assertions": 6,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #0",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #1",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #2",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #3",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #4",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #5",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #6",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #7",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #8",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #9",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_malformed_database_configuration_refuses_without_overloaded_access with data set #10",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_captured_scalar_configuration_is_detached_from_repository_references",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberOriginalPreparationTest::test_manifest_values_never_admit_private_paths_or_duplicate_roles",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyEnvironmentTest::test_membership_rehearsal_is_admitted_in_testing_and_refused_in_production",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyEnvironmentTest::test_member_grant_rehearsal_is_admitted_in_testing_and_refused_in_production",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembership\\MembershipPolicyEnvironmentTest::test_replaced_environment_binding_is_refused_without_being_invoked",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_admits_local_testing_and_staging with data set \"local\"",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_admits_local_testing_and_staging with data set \"testing\"",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_admits_local_testing_and_staging with data set \"staging\"",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_refuses_any_other_environment with data set \"production\"",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_refuses_any_other_environment with data set \"an unlisted environment\"",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_refuses_any_other_environment with data set \"a staging prefix\"",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_every_test_commerce_and_test_capability_gate_refuses_any_other_environment with data set \"a cased variant\"",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_test_payment_exception_operations_reach_their_record_lookup_only_in_admitted_environments",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_staging_never_admits_stripe_live_mode_or_a_live_or_restricted_key",
+          "assertions": 37,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_staging_never_admits_production_identity_or_production_live_funds",
+          "assertions": 10,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_staging_never_enables_the_operative_paid_grant_lane",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_staging_never_admits_verified_production_membership_or_member_grant_provenance",
+          "assertions": 4,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_development_only_and_testing_only_conveniences_still_refuse_staging",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_the_helper_names_exactly_three_test_commerce_environments_and_two_mfa_environments",
+          "assertions": 31,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\StagingEnvironmentAdmissionTest::test_source_census_routes_every_admitting_gate_through_the_helper_and_leaves_local_only_gates_explicit",
+          "assertions": 90,
+          "status": "passed",
+          "detail": null
+        }
+      ]
+    },
+    {
+      "id": "r4/baseline-fail",
+      "driver": "none",
+      "expected": {
+        "tests": 1,
+        "assertions": 10,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": 1
+      },
+      "xml": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/phpunit.xml",
+      "exit": 1,
+      "source": "r4/baseline/fail-0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371/source-before.json.gz",
+      "scope": "Same pure external existing-current API probe; no app bootstrap or database. Corrected component sourcea4 is not final R4 source.",
+      "tests": 1,
+      "assertions": 10,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 0,
+      "cases": [
+        {
+          "identity": "Runtime\\MemberPolicyAdmission\\MemberGrantMixedProvenanceRegressionTest::test_verified_258_with_rehearsal_257_on_configured_sqlite_refuses_before_factory_callbacks",
+          "assertions": 10,
+          "status": "failure",
+          "detail": "Runtime\\MemberPolicyAdmission\\MemberGrantMixedProvenanceRegressionTest::test_verified_258_with_rehearsal_257_on_configured_sqlite_refuses_before_factory_callbacks\nVerified member grant configuration must refuse SQLite before any authority factory callback.\nFailed asserting that two arrays are identical.\n--- Expected\n+++ Actual\n@@ @@\n Array &0 [\n-    'decision' => 'provenance_driver',\n-    'factory_calls' => Array &1 [],\n+    'decision' => 'admitted',\n+    'factory_calls' => Array &1 [\n+        0 => 'App\\Domain\\Grants\\Member\\MemberGrantFactsAuthority',\n+        1 => 'App\\Domain\\Grants\\Member\\MemberOriginalArtifactAuthority',\n+        2 => 'App\\Domain\\Memberships\\Production\\MembershipReservationAuthority',\n+    ],\n ]\n\n/workspace/runtime/member-policy-admission-evidence/baseline/MemberGrantMixedProvenanceRegressionTest.php:83"
+        }
+      ]
+    },
+    {
+      "id": "r4/baseline-pass",
+      "driver": "none",
+      "expected": {
+        "tests": 1,
+        "assertions": 10,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/phpunit.xml",
+      "exit": 0,
+      "source": "r4/baseline/pass-a4e37cdc222ccea13ae65fb983c6d5fd89a25e29/source-before.json.gz",
+      "scope": "Same pure external existing-current API probe; no app bootstrap or database. Corrected component sourcea4 is not final R4 source.",
+      "tests": 1,
+      "assertions": 10,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "identity": "Runtime\\MemberPolicyAdmission\\MemberGrantMixedProvenanceRegressionTest::test_verified_258_with_rehearsal_257_on_configured_sqlite_refuses_before_factory_callbacks",
+          "assertions": 10,
+          "status": "passed",
+          "detail": null
+        }
+      ]
+    },
+    {
+      "id": "catalog/pure-initial",
+      "driver": "none",
+      "expected": {
+        "tests": 60,
+        "assertions": 70,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "catalog/pure-initial.xml",
+      "exit": 0,
+      "source": "catalog/pure-initial.source.json",
+      "scope": "Pure PHPUnit parser corpus; no Laravel application/database. Filename is not a result claim.",
+      "tests": 60,
+      "assertions": 70,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #0",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #1",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #2",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #3",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #4",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"single quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"double quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"doubled quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"backslash quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"literal backslash\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"quoted identifier\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"nested expression\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"block comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"version comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"optimizer comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"hash comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash expression\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"partition options\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column allocation attribute\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column type\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column nullable\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal counter text\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal engine text\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"default\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"table comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"collation\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"index\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"check\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"foreign action\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"format\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"compression\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"tablespace\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal whitespace\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"structural whitespace\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"temporary\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"foreign name\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"invalid expected identifier\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"view\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine in comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine suffix\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate engine\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter after options\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"signed counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"negative counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"decimal counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"exponent counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter tail\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"missing counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed suffix quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unbalanced suffix\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"extra close\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"another statement\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"nul\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        }
+      ]
+    },
+    {
+      "id": "catalog/pure-quote-boundary",
+      "driver": "none",
+      "expected": {
+        "tests": 61,
+        "assertions": 71,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "catalog/pure-quote-boundary.xml",
+      "exit": 0,
+      "source": "catalog/pure-quote-boundary.source.json",
+      "scope": "Pure PHPUnit parser corpus; no Laravel application/database. Filename is not a result claim.",
+      "tests": 61,
+      "assertions": 71,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #0",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #1",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #2",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #3",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #4",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"single quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"double quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"doubled quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"backslash quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"literal backslash\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"quoted identifier\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"nested expression\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"block comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"version comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"optimizer comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"hash comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash expression\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"partition options\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column allocation attribute\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column type\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column nullable\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal counter text\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal engine text\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"default\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"table comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"collation\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"index\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"check\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"foreign action\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"format\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"compression\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"tablespace\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal whitespace\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"structural whitespace\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"temporary\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"foreign name\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"invalid expected identifier\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"view\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine in comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine suffix\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate engine\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter after options\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"signed counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"negative counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"decimal counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"exponent counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter tail\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"missing counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed suffix quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unbalanced suffix\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"extra close\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"another statement\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"nul\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"different complete quote-mode boundaries\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        }
+      ]
+    },
+    {
+      "id": "catalog/pure-engine-boundary-red",
+      "driver": "none",
+      "expected": {
+        "tests": 62,
+        "assertions": 72,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "exit": 1
+      },
+      "xml": "catalog/pure-engine-boundary-red.xml",
+      "exit": 1,
+      "source": "catalog/pure-engine-boundary-red.source.json",
+      "scope": "Pure PHPUnit parser corpus; no Laravel application/database. Filename is not a result claim.",
+      "tests": 62,
+      "assertions": 72,
+      "errors": 0,
+      "failures": 1,
+      "skipped": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #0",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #1",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #2",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #3",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #4",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"single quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"double quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"doubled quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"backslash quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"literal backslash\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"quoted identifier\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"nested expression\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"block comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"version comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"optimizer comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"hash comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash expression\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"partition options\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column allocation attribute\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column type\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column nullable\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal counter text\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal engine text\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"default\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"table comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"collation\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"index\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"check\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"foreign action\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"format\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"compression\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"tablespace\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal whitespace\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"structural whitespace\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"temporary\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"foreign name\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"invalid expected identifier\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"view\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine in comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine suffix\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate engine\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter after options\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"signed counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"negative counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"decimal counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"exponent counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter tail\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"missing counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed suffix quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unbalanced suffix\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"extra close\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"another statement\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"nul\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"different complete quote-mode boundaries\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"quote boundary cannot hide nontransactional engine\"",
+          "assertions": 1,
+          "status": "failure",
+          "detail": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"quote boundary cannot hide nontransactional engine\"\nUnsupported catalog DDL must not produce a comparison value.\n\n/workspace/VA-Studio-member-catalog-currentness/tests/Unit/MembershipCatalogDefinitionTest.php:100\n/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104"
+        }
+      ]
+    },
+    {
+      "id": "catalog/pure-engine-boundary-green",
+      "driver": "none",
+      "expected": {
+        "tests": 62,
+        "assertions": 71,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      },
+      "xml": "catalog/pure-engine-boundary-green.xml",
+      "exit": 2,
+      "source": "catalog/pure-engine-boundary-green.source.json",
+      "scope": "Pure PHPUnit parser corpus; no Laravel application/database. Filename is not a result claim.",
+      "tests": 62,
+      "assertions": 71,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #0",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #1",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #2",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #3",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #4",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"single quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"double quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"doubled quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"backslash quote\"",
+          "assertions": 0,
+          "status": "error",
+          "detail": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"backslash quote\"\nApp\\Domain\\Memberships\\Production\\MembershipException: Production membership preparation unavailable.\n\n/workspace/VA-Studio-member-catalog-currentness/app/Domain/Memberships/Production/MembershipException.php:16\n/workspace/VA-Studio-member-catalog-currentness/app/Domain/Memberships/Production/MembershipCatalogDefinition.php:16\n/workspace/VA-Studio-member-catalog-currentness/tests/Unit/MembershipCatalogDefinitionTest.php:39\n/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104"
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"literal backslash\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"quoted identifier\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"nested expression\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"block comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"version comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"optimizer comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"hash comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash expression\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"partition options\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column allocation attribute\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column type\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column nullable\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal counter text\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal engine text\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"default\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"table comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"collation\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"index\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"check\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"foreign action\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"format\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"compression\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"tablespace\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal whitespace\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"structural whitespace\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"temporary\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"foreign name\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"invalid expected identifier\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"view\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine in comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine suffix\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate engine\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter after options\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"signed counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"negative counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"decimal counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"exponent counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter tail\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"missing counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed suffix quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unbalanced suffix\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"extra close\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"another statement\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"nul\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"different complete quote-mode boundaries\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"quote boundary cannot hide nontransactional engine\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        }
+      ]
+    },
+    {
+      "id": "catalog/pure-final",
+      "driver": "none",
+      "expected": {
+        "tests": 63,
+        "assertions": 73,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "catalog/pure-final.xml",
+      "exit": 0,
+      "source": "catalog/pure-final.source.json",
+      "scope": "Pure PHPUnit parser corpus; no Laravel application/database. Filename is not a result claim.",
+      "tests": 63,
+      "assertions": 73,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #0",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #1",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #2",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #3",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_only_the_native_table_counter_changes_the_equivalence_class with data set #4",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"single quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"double quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"doubled quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"backslash quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"literal backslash\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"quoted identifier\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"nested expression\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"block comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"version comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"optimizer comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"hash comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash expression\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"partition options\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column allocation attribute\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column type\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column nullable\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal counter text\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal engine text\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"default\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"column comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"table comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"collation\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"index\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"check\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"foreign action\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"format\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"compression\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"tablespace\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"literal whitespace\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_every_non_counter_byte_remains_significant with data set \"structural whitespace\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"temporary\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"foreign name\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"invalid expected identifier\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"view\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine in comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine suffix\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate engine\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter after options\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"signed counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"negative counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"decimal counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"exponent counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter tail\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"missing counter\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed suffix quote\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed comment\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unbalanced suffix\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"extra close\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"another statement\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"nul\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"different complete quote-mode boundaries\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"quote boundary cannot hide nontransactional engine\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Unit\\MembershipCatalogDefinitionTest::test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"escaped literal with competing outer close\"",
+          "assertions": 1,
+          "status": "passed",
+          "detail": null
+        }
+      ]
+    },
+    {
+      "id": "catalog/native-old-source-red",
+      "driver": "mysql",
+      "expected": {
+        "tests": 1,
+        "assertions": 4,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      },
+      "xml": "catalog/native-old-source-red.xml",
+      "exit": 2,
+      "source": "catalog/native-old-source-red.source.json.gz",
+      "scope": "Initial native1205 setup error, counter mutation/reproof not reached; not intended P2red.",
+      "tests": 1,
+      "assertions": 4,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest::test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses",
+          "assertions": 4,
+          "status": "error",
+          "detail": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest::test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses\nPDOException: SQLSTATE[HY000]: General error: 1205 Lock wait timeout exceeded; try restarting transaction\n\n/workspace/VA-Studio-member-catalog-currentness/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php:72\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502\n/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364\n/workspace/VA-Studio-member-catalog-currentness/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php:56\n/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104"
+        }
+      ]
+    },
+    {
+      "id": "r4/native-four",
+      "driver": "mysql",
+      "expected": {
+        "tests": 4,
+        "assertions": 14,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "r4/native-four.xml",
+      "exit": 0,
+      "source": "r4/native-four.source.json.gz",
+      "scope": "Four selected real MySQL8.4.11 policy/frame cases at15a65e07; eight unselected frame methods not native-executed in this batch.",
+      "tests": 4,
+      "assertions": 14,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_native_verified_member_provenance_requires_and_binds_actual_mysql_despite_rehearsal_membership",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_each_callback_boundary_checks_the_frame_before_resolving_later_factories",
+          "assertions": 6,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_terminal_proof_reads_raw_capability_maps_without_virtual_container_getters",
+          "assertions": 2,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest::test_commit_and_reopen_on_the_same_pdo_cannot_reuse_an_original_admission",
+          "assertions": 3,
+          "status": "passed",
+          "detail": null
+        }
+      ]
+    },
+    {
+      "id": "catalog/native-old-source-red-v2",
+      "driver": "mysql",
+      "expected": {
+        "tests": 1,
+        "assertions": 12,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 2
+      },
+      "xml": "catalog/native-old-source-red-v2.xml",
+      "exit": 2,
+      "source": "catalog/native-old-source-red-v2.source.json.gz",
+      "scope": "Intended old-Evidence currentness refusal reached after independent committed counter2\u21923 with same selected plans; uncaught changed_catalog_source is JUnit error, not assertion failure. Single old class overlay on candidate982.",
+      "tests": 1,
+      "assertions": 12,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest::test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses",
+          "assertions": 12,
+          "status": "error",
+          "detail": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest::test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses\nApp\\Domain\\Memberships\\Production\\MembershipException: Production membership preparation unavailable.\n\n/workspace/VA-Studio-member-catalog-currentness/app/Domain/Memberships/Production/MembershipException.php:16\n/workspace/runtime/membership-catalog-currentness-evidence/native-red-planned-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php:87\n/workspace/VA-Studio-member-catalog-currentness/tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php:103\n/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104"
+        }
+      ]
+    },
+    {
+      "id": "catalog/native-fixed-five",
+      "driver": "mysql",
+      "expected": {
+        "tests": 5,
+        "assertions": 46,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "catalog/native-fixed-five.xml",
+      "exit": 0,
+      "source": "catalog/native-fixed-five.source.json.gz",
+      "scope": "Five focused MySQL8.4.11 cases at982: current counter/real definition/identical shadow plus existing file/deadline and committed snapshot cases. Corrected-red captured inputs identical; original class preload removed.",
+      "tests": 5,
+      "assertions": 46,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest::test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses",
+          "assertions": 18,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest::test_real_table_comment_change_is_not_erased_by_counter_projection_in_committed_read_only_frame",
+          "assertions": 11,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest::test_identical_row_local_temporary_shadow_remains_refused_after_a_positive_original_proof",
+          "assertions": 7,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_private_bytes_are_rechecked_without_minting_a_new_readiness_deadline",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_catalog_snapshot_is_verified_nonlocking_inside_committed_read_only_frame",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        }
+      ]
+    },
+    {
+      "id": "catalog/sqlite-eligibility-whole",
+      "driver": "sqlite",
+      "expected": {
+        "tests": 16,
+        "assertions": 123,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "catalog/sqlite-eligibility-whole.xml",
+      "exit": 0,
+      "source": "catalog/sqlite-eligibility-whole.source.json.gz",
+      "scope": "Whole existing eligibility file at982; revision/rights/private bytes/callback/current-frame cases. SQLite does not prove native counter/DDL behavior.",
+      "tests": 16,
+      "assertions": 123,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_real_current_catalog_derives_exact_identity_manifest_and_member_license_terms",
+          "assertions": 12,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_locator_and_expected_revision_have_one_unambiguous_bounded_encoding",
+          "assertions": 13,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_tokens_require_original_issuer_owner_rows_and_frame_and_cannot_be_copied",
+          "assertions": 13,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_a_new_published_revision_does_not_admit_an_old_selection_locator",
+          "assertions": 6,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_unpublished_track_and_new_unverified_rights_refuse_catalog_authority",
+          "assertions": 6,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_private_bytes_are_rechecked_without_minting_a_new_readiness_deadline",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_storage_callback_cannot_authenticate_a_later_graph_instead_of_the_selected_graph",
+          "assertions": 6,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_temporary_catalog_shadow_is_refused_even_when_its_rows_are_identical",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_terminal_raw_evidence_uses_no_file_callback_and_refuses_changed_complete_footprint",
+          "assertions": 6,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_catalog_snapshot_is_verified_nonlocking_inside_committed_read_only_frame",
+          "assertions": 5,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_original_readiness_boundary_and_configuration_change_refuse_existing_proof",
+          "assertions": 6,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_original_license_effective_until_caps_wall_and_monotonic_readiness",
+          "assertions": 11,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_clock_callback_after_file_proof_cannot_change_private_bytes_before_authority_returns",
+          "assertions": 7,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_committed_snapshot_checks_native_bytes_after_later_clock_callback",
+          "assertions": 7,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_final_clock_callback_cannot_withdraw_the_current_buyer_after_identity_proof",
+          "assertions": 7,
+          "status": "passed",
+          "detail": null
+        },
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest::test_terminal_file_admission_refuses_a_one_shot_non_native_stat_wrapper",
+          "assertions": 8,
+          "status": "passed",
+          "detail": null
+        }
+      ]
+    },
+    {
+      "id": "root/native-reservation-integration",
+      "driver": "mysql",
+      "expected": {
+        "tests": 1,
+        "assertions": 21,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "exit": 0
+      },
+      "xml": "root/native-reservation-integration.xml",
+      "exit": 0,
+      "source": "root/native-reservation-integration.source.json.gz",
+      "scope": "Actual frozen0095 root: real sources reserve once, exact retry and original award replay retain identity. One native integration case, not a full suite or operative258 grant.",
+      "tests": 1,
+      "assertions": 21,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "identity": "Tests\\Feature\\ProductionMembershipBilling\\MembershipReservationLifecycleTest::test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity",
+          "assertions": 21,
+          "status": "passed",
+          "detail": null
+        }
+      ]
+    }
+  ]
+}

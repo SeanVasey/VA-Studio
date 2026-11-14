@@ -6,6 +6,7 @@ use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityCommittedFrame;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
+use App\Domain\Customers\ProductionIdentity\IdentityMetadataAdmission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PDO;
@@ -21,6 +22,8 @@ final class ProductionAccountFeatureAccess
     /** Call before module/catalog locks, using that module's captured primary reader. */
     public function lock(ProductionAccountFeatureIdentity $identity, CurrentRows $reader): array
     {
+        IdentityMetadataAdmission::admit($reader->identityPrimary());
+        IdentityMetadataAdmission::actorId($identity->actor());
         $policy = $this->policy($identity);
         $configuration = $policy->current();
         $raw = (new ProductionCustomerAccess)->lock($identity->principal(), $identity->actor(), $reader);
@@ -47,6 +50,8 @@ final class ProductionAccountFeatureAccess
     /** Read-only admission before module validation; deliberately no FOR UPDATE or new identity. */
     public function lockCommitted(ProductionAccountFeatureIdentity $identity, IdentityCommittedFrame $frame, array $expectedRaw): void
     {
+        $frame->assertActive();
+        IdentityMetadataAdmission::actorId($identity->actor());
         if (array_keys($expectedRaw) !== ['configuration', 'identity'] || ! is_array($expectedRaw['identity'])
             || $this->policy($identity)->current() !== $expectedRaw['configuration']) {
             throw new IdentityException;
@@ -128,6 +133,7 @@ final class ProductionAccountFeatureAccess
     private function resolvedConnections(CurrentRows $reader): void
     {
         $primary = $reader->identityPrimary();
+        IdentityMetadataAdmission::admit($primary);
         $connection = DB::connection();
         if ($connection->getRawPdo() !== $primary || $connection->getDriverName() !== $reader->identityDriver()
             || $connection->transactionLevel() !== 1 || ! $primary->inTransaction()) {

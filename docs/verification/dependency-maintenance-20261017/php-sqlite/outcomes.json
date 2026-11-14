@@ -1,0 +1,60 @@
+{
+  "per_run": {
+    "probe": {
+      "files": 2,
+      "tests": 62,
+      "assertions": 390,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "sqlite-chunkA": {
+      "files": 15,
+      "tests": 345,
+      "assertions": 2267,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 11
+    },
+    "sqlite-chunkB": {
+      "files": 21,
+      "tests": 629,
+      "assertions": 6244,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 12
+    },
+    "sqlite-chunkC": {
+      "files": 17,
+      "tests": 294,
+      "assertions": 5801,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total": {
+    "files": 55,
+    "tests": 1330,
+    "assertions": 14702,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 23
+  },
+  "skipped_methods": [
+    "Tests.Feature.ExclusiveOfferConcurrencyTest::test_independent_connections_preserve_preparation_identity_and_scope_controls",
+    "Tests.Feature.HostedCheckoutTest::test_provider_create_observes_a_committed_intent_from_an_independent_mysql_connection",
+    "Tests.Feature.OrderPreparationConcurrencyTest::test_price_expiry_during_owner_mutex_wait_cannot_create_an_order_or_extend_capacity",
+    "Tests.Feature.OrderPreparationConcurrencyTest::test_real_mysql_contention_commits_only_one_order_and_resource_attempt",
+    "Tests.Feature.OrderPreparationConcurrencyTest::test_scope_block_committed_before_owner_mutex_acquisition_prevents_both_orders",
+    "Tests.Feature.SiteScheduleConcurrencyTest::test_overlapping_scheduler_runs_publish_the_schedule_once",
+    "Tests.Feature.SiteScheduleConcurrencyTest::test_scheduler_and_cancellation_serialize_to_one_consistent_outcome",
+    "Tests.Feature.SiteScheduleConcurrencyTest::test_scheduler_and_manual_publication_serialize_to_one_consistent_outcome",
+    "Tests.Feature.TransactionalNotificationConcurrencyTest::test_a_late_completion_waits_for_the_reconciliation_winner_and_cannot_add_an_attempt_audit_or_file_write",
+    "Tests.Feature.TransactionalNotificationConcurrencyTest::test_two_independent_dispatches_claim_once_and_the_loser_never_invokes_private_storage",
+    "Tests.Feature.TransactionalNotificationConcurrencyTest::test_two_independent_enqueues_share_one_intent_and_the_exact_loser_replays_without_writes",
+    "Tests.Feature.TransactionalNotificationConcurrencyTest::test_withdrawal_committed_after_an_exact_user_wait_blocks_every_notification_entrypoint_without_capture"
+  ],
+  "all_skips_in_reviewed_census": true,
+  "skipped_cases": 23
+}

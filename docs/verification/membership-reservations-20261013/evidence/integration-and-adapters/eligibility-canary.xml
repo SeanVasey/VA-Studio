@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest" file="/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php" tests="1" assertions="12" errors="0" failures="0" skipped="0" time="4.159016">
+    <testcase name="test_real_current_catalog_derives_exact_identity_manifest_and_member_license_terms" file="/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php" line="57" class="Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipEligibleLicenseProofTest" assertions="12" time="4.159016"/>
+  </testsuite>
+</testsuites>

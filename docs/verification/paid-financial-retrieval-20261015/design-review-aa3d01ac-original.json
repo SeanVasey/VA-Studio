@@ -1,0 +1,101 @@
+{
+  "reviewed_sha": "aa3d01acdc8ae9fc5c3a05b98aba09b02a52de1f",
+  "decision": "REVISE BEFORE IMPLEMENTATION",
+  "review_kind": "independent non-author bounded design feasibility",
+  "clean_before_and_after": true,
+  "design_only_delta_from_receipt_head": "docs/verification/paid-financial-retrieval-20261015/design.md",
+  "base_actual_merge": "0d7a7da24db2ef6dca76cd1f14ce1294bc1c7bb5",
+  "confirmed_mechanics": [
+    "Both paid source observers and the shared identity witness admit at most two receipts for the exact original source/reader/effective deadline/admission.",
+    "First successful proveClosed consumes one receipt but leaves the second registered and the original observer installed.",
+    "Second successful proveClosed settles both; a refusal invalidates the original observations and conditionally restores or retains the observer under the existing frozen API.",
+    "Positive original framework commit, depth0 and historical frozen row/identity comparisons are required; idle PDO alone supplies no commit proof.",
+    "Existing gateway financialState performs the six bounded GETs through pinned SDK and strips payment client_secret; source exports no original Charge ID.",
+    "Candidate remains unattested input consistency with providerAuthenticated=false; no new source, commit, provider, grant/refund/access/rights/inventory authority."
+  ],
+  "required_design_changes": [
+    {
+      "id": "D1",
+      "severity": "material planning condition",
+      "topic": "Effective original source deadline",
+      "finding": "Caller originalDeadlineNs can exceed the privately clamped source lifetime. A guard using only that caller value or a fresh plan-start budget can permit a GET after the original source cap, then refuse only at terminal proof.",
+      "required": "Specify an internal exact typed capture of the already-established effective observer/context deadline while held, and retain it unchanged for every request pre/post and publication check. No source recapture, caller-created budget authority or frozen source edit. If no admissible path is chosen, narrow the claimed timing guarantee before implementation.",
+      "tests": "Almost-expired original source, deliberately later caller deadline, callback delaying past effective cap: no subsequent GET and terminal refusal without renewal."
+    },
+    {
+      "id": "D2",
+      "severity": "material planning condition",
+      "topic": "All-path receipt settlement and abandonment",
+      "finding": "The current always-consume clause addresses terminal SDK paths but does not explicitly cover first proof, policy/setup failure or an unused plan left after original commit.",
+      "required": "Claim once before callback-capable work; try/finally must attempt every remaining owned receipt at most once on early refusal as well as SDK success/failure. Specify idempotent abandonment/close for unused observations and best-effort cleanup that preserves the initiating redacted error. It must not commit/rollback/abort/retry a caller or reopened frame. Held and failed-factory physical cleanup remains with the caller retaining original source/frame handles; clarify source-kind-specific poisoned-observer behavior.",
+      "tests": "First-proof failure, disabled policy before SDK, SDK throw, abandoned committed plan, failed second mint and reopened/peer frame preservation; fresh authorized source retry after proper original-owner cleanup."
+    },
+    {
+      "id": "D3",
+      "severity": "material planning condition",
+      "topic": "SDK callbacks outside ClientInterface guard",
+      "finding": "ApiRequestor calls _maybeEmitStripeNotice after guarded request() returns; Stripe-Notice can trigger an error handler that replaces the global transport slot. The next _requestRaw retrieves that slot again and could bypass the guard.",
+      "required": "Reject or suppress callback-producing response notice headers before returning to SDK; admit exact raw slot identity at guard entry/exit and explicitly bound the SDK post-guard callback surface. Keep exact sequence/response/body limits. Existing gateway finally unconditionally restores its saved transport slot, so do not claim preservation of a callback-owned replacement of that slot; TLS/config/connection mutations remain unmodified and must cause refusal.",
+      "tests": "Real error-handler sentinel plus attempted transport-slot displacement, no seventh/unguarded request, terminal receipt settlement and exact existing saved-slot restoration."
+    }
+  ],
+  "remaining_implementation_conditions": [
+    "Raw Container/Facade/Repository/DB maps and exact native connection/statement metadata must be admitted by the new wrapper before frozen entries and before zero-transaction checks; no invocation of resolver/ArrayAccess/subclass hooks.",
+    "Per-request guards include every admitted current application connection, both Laravel depth and native PDO transaction state; reject unsupported/lazy peer shapes rather than resolving them.",
+    "Synthetic transport provenance remains explicitly testing/local as designed; default false/nonboolean/staging/production/unbound paths dispatch nothing.",
+    "Request authorization includes exact GET order/path/params/headers/version, own account/no context, retry0/filefalse, PI-returned bounded charge locator, cumulative raw response budget and primitive shape refusal before SDK decoding.",
+    "Only captured pure comparisons remain after terminal source proof and before candidate return; no newly resolved source or authority.",
+    "SDK/global/transport restoration and late failure do not imply transaction cleanup ownership or positive financial state."
+  ],
+  "execution_limits": {
+    "product_implementation_exists": false,
+    "tests_executed_by_reviewer": false,
+    "database_operations_by_reviewer": false,
+    "provider_or_network_operations_by_reviewer": false,
+    "hosted_ci_by_reviewer": false,
+    "tracked_edits_by_reviewer": false,
+    "native_feasibility_executed": false
+  },
+  "approval_limits": "Planning REVISE only. No source/test/native/provider/host/full acceptance approval. Actual implementation, focused SQLite/native evidence, sealed exact-head independent decision and cheap preflight/inventory/expected-SHA merge remain required.",
+  "adjacent_deferred": "Frozen V1/Identity metadata and ordinary membership afterCommit P2s stay outside this batch; new composition must guard its own reached surfaces without claiming those helpers repaired.",
+  "reviewer_preparation_failures": [
+    {
+      "command": "rg -n function/receipt/observer search app/Domain/Commerce app/Domain/Grants app/Infrastructure tests/Feature/ProductionFinancialInspection -g *.php",
+      "exit_code": 2,
+      "reason": "app/Infrastructure directory does not exist; relevant existing paths still searched. Subsequent direct reads exited0. Not an application or execution failure."
+    }
+  ],
+  "read_only_commands": [
+    "pwd; git rev-parse HEAD; git status --short; cat AGENTS.md; cat docs/verification/paid-financial-retrieval-20261015/design.md",
+    "rg source/receipt/observer/financialState APIs in app/Domain/Commerce app/Domain/Grants and tests/Feature/ProductionFinancialInspection",
+    "cat V1 source/receipt/dispatcher/context and Tax V2 receipt/dispatcher/source; cat StripeSdkCheckoutGateway.php",
+    "sed TaxPaidReadContext.php and HeldSourceTransaction.php; cat FinancialExpectation/FinancialCandidate/FinancialInspectionPolicy and TestEnvironment",
+    "cat Stripe ClientInterface; sed ApiRequestor request preparation/raw-request/notice/slot methods",
+    "sed IdentityHistoricalCommittedReceipt and IdentityOriginalCommitWitness; sed existing StripeFinancialInspectionGatewayTest",
+    "git diff --name-status 107ab400..HEAD; git status --short",
+    "Python read-only exact HEAD/status and inspected-file SHA256 capture; runtime-only reviewer artifact writes"
+  ],
+  "inspected_file_sha256": {
+    "AGENTS.md": "87737fbd65a37de56cd55de13ef97f773466620fa814cb783d7c0328ce7e0ac8",
+    "docs/verification/paid-financial-retrieval-20261015/design.md": "db4aa4c272507bd881c50e37f037a0219930af3fa9f8bfeccc8dfd3e21afcb84",
+    "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderSourceV1.php": "ca7ce0c8f6fd1d90b6ec299770947fe9117a30d268457db706adfae3eeff2983",
+    "app/Domain/Commerce/ProductionCheckout/ProductionPaidOrderCommittedReadReceiptV1.php": "190aa5e356bdcd2f719e85277632c87911d99b0f7e4eb9eb8977f539d85c75e0",
+    "app/Domain/Commerce/ProductionCheckout/OriginalCommitDispatcher.php": "ed529e8f69b2ae6733d767aeae6bebd693faa114c55cd1c5c3a3a5824ddcd372",
+    "app/Domain/Commerce/ProductionCheckout/CommittedReadContext.php": "99f00ee5251072fa9c257e96bb65e2370e40806f85dc7885523e1f4e9e99aabd",
+    "app/Domain/Commerce/ProductionCheckout/HeldSourceTransaction.php": "4c666b7d13aa4d341ce23310a909d47d5a9e6797da2ea8dd80f398f64a65fe8b",
+    "app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidOrderSourceV2.php": "42ee6d412217a8e72938f4af70a16e0bac38fb7f237b3ef1a95237a132211052",
+    "app/Domain/Commerce/ProductionTaxCheckout/ProductionTaxPaidOrderCommittedReadReceiptV2.php": "e51cfbd62dd3b3a0286867d5b0c5bc1291e1df2d86cfbef8830a95e7e599c625",
+    "app/Domain/Commerce/ProductionTaxCheckout/TaxPaidOriginalCommitDispatcher.php": "a0cbdd54dd90f5edf13050fcc66e52882b4cc01b0689ada920edd18ef2b0ec91",
+    "app/Domain/Commerce/ProductionTaxCheckout/TaxPaidReadContext.php": "ef1c234d5b61c2d45cc22c39e56bc64c35cbedf81d72ce401f5c68eac6c41dd3",
+    "app/Domain/Customers/ProductionIdentity/IdentityOriginalCommitWitness.php": "0d6a2026e00763caba67fcf3cd8391e4d0d774c00bd97208ece36c3746490cb0",
+    "app/Domain/Customers/ProductionIdentity/IdentityHistoricalCommittedReceipt.php": "e446fae4857af2cd3737e465fbe1dee7e5fbfca2a799d16f00396e988ad2e3cb",
+    "app/Domain/Commerce/Payments/StripeSdkCheckoutGateway.php": "a7413ed91ee549a2e4a7a1f6bd1cabd2c2e1b9f433fa76a736961b6e20671326",
+    "app/Domain/Commerce/ProductionFinancialInspection/FinancialExpectation.php": "04b307b724f6a0fefb34e74a9532055f1a6ebd1fea04f8b4b4549c577a684fea",
+    "app/Domain/Commerce/ProductionFinancialInspection/FinancialCandidate.php": "fa5599557597ee4fdd7a35322745a72b172299a72332f6eaf76c598f5f18278f",
+    "app/Domain/Commerce/ProductionFinancialInspection/FinancialInspectionPolicy.php": "ec9070b73b9b8c7ad91625d0977faa3b942965b0a6ffd2f1badbe64286706cf0",
+    "app/Support/Environment/TestEnvironment.php": "98566cea59214cb6d9ab1852eef7d9a6e2020048b46b02fbc1b882439ba2d948",
+    "vendor/stripe/stripe-php/lib/ApiRequestor.php": "b4a89152b30bdeb661561d678b4ca07ded8b5a8831a063e08ad7ff72ec5d9322",
+    "vendor/stripe/stripe-php/lib/HttpClient/ClientInterface.php": "e287d60499636d9b0ec160771a42d5e7e0d264c6be5e2a57ca5715a84a59c833",
+    "tests/Unit/StripeFinancialInspectionGatewayTest.php": "2baa841c3e176e294e88db39138f72cc0c59020e2dded7cf1baaa4d4cbf9c80a"
+  }
+}

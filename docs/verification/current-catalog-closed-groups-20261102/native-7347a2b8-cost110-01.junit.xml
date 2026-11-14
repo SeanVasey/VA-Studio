@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionIdentity\IdentityInspectionCostTest" file="/workspace/VA-Studio-account-guard-v2/tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php" tests="1" assertions="8" errors="0" failures="1" skipped="0" time="107.509583">
+    <testcase name="test_one_native_inspection_issues_a_small_fixed_number_of_statements" file="/workspace/VA-Studio-account-guard-v2/tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php" line="22" class="Tests\Feature\ProductionIdentity\IdentityInspectionCostTest" classname="Tests.Feature.ProductionIdentity.IdentityInspectionCostTest" assertions="8" time="107.509583">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionIdentity\IdentityInspectionCostTest::test_one_native_inspection_issues_a_small_fixed_number_of_statements
+Failed asserting that 133 is equal to 110 or is less than 110.
+
+/workspace/VA-Studio-account-guard-v2/tests/Feature/ProductionIdentity/IdentityInspectionCostTest.php:52
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

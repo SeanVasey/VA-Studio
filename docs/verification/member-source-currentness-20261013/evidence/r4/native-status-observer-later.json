@@ -1,0 +1,11 @@
+{
+    "observed_at_utc": "2026-10-13T07:21:21+00:00",
+    "scope": "read-only own-schema progress, not test results",
+    "threads": [
+        {
+            "command": "Execute",
+            "seconds": 0,
+            "state": "waiting for handler commit"
+        }
+    ]
+}

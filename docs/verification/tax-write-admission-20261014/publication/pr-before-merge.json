@@ -1,0 +1,77 @@
+{
+  "recorded_utc": "2026-10-15T00:55:30.486515+00:00",
+  "argv": [
+    "gh",
+    "pr",
+    "view",
+    "120",
+    "--repo",
+    "SeanVasey/VA-Studio",
+    "--json",
+    "number,url,state,isDraft,headRefOid,baseRefName,mergeable,mergeStateStatus,statusCheckRollup"
+  ],
+  "process_exit": 0,
+  "fetched_main": "cd73b3226531abb6f7a79cc779becb61ea5d166a",
+  "pr": {
+    "baseRefName": "main",
+    "headRefOid": "baf46747cbd5ae3e16d2657a34bf8ab708eb4822",
+    "isDraft": false,
+    "mergeStateStatus": "CLEAN",
+    "mergeable": "MERGEABLE",
+    "number": 120,
+    "state": "OPEN",
+    "statusCheckRollup": [
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T00:49:15Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/SeanVasey/VA-Studio/actions/runs/38662171292/job/116185765575",
+        "name": "scope",
+        "startedAt": "2026-10-15T00:49:08Z",
+        "status": "COMPLETED",
+        "workflowName": "Development preflight"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T00:49:15Z",
+        "conclusion": "SKIPPED",
+        "detailsUrl": "https://github.com/SeanVasey/VA-Studio/actions/runs/38662171292/job/116185819661",
+        "name": "documentation",
+        "startedAt": "2026-10-15T00:49:16Z",
+        "status": "COMPLETED",
+        "workflowName": "Development preflight"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T00:50:43Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/SeanVasey/VA-Studio/actions/runs/38662171292/job/116185817270",
+        "name": "frontend",
+        "startedAt": "2026-10-15T00:49:18Z",
+        "status": "COMPLETED",
+        "workflowName": "Development preflight"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T00:53:01Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/SeanVasey/VA-Studio/actions/runs/38662171292/job/116185817325",
+        "name": "backend-quality",
+        "startedAt": "2026-10-15T00:49:18Z",
+        "status": "COMPLETED",
+        "workflowName": "Development preflight"
+      },
+      {
+        "__typename": "CheckRun",
+        "completedAt": "2026-10-15T00:53:11Z",
+        "conclusion": "SUCCESS",
+        "detailsUrl": "https://github.com/SeanVasey/VA-Studio/actions/runs/38662171292/job/116186937524",
+        "name": "Development preflight result",
+        "startedAt": "2026-10-15T00:53:04Z",
+        "status": "COMPLETED",
+        "workflowName": "Development preflight"
+      }
+    ],
+    "url": "https://github.com/SeanVasey/VA-Studio/pull/120"
+  }
+}

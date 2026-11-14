@@ -10,7 +10,7 @@ The workflow is disabled by default. `VASEY_TEST_SERVICE_PROJECTS_ENABLED=true`
 activates it only in `local`, `testing` or `staging` (`TestEnvironment::admitsTestCommerce()`;
 staging was admitted by PR #68), and requires existing synthetic customer
 accounts. The buyer page is `/services/projects`; staff opens `/admin/service-projects`.
-The default-off flag and production environment barrier apply to reads and writes.
+The default-off flag and production environment barrier apply to reads and writes. On a hosted staging server the deploy gate (`ops/staging/validate-runtime.php`, through `scripts/ops/capability-boundary.php`) refuses a candidate `.env` that sets this flag to anything but `false`; enabling it there is a reviewed change to that boundary.
 Retained records are never deleted when access or preparation is withdrawn.
 
 The operator first supplies a private service definition through the existing
@@ -30,8 +30,11 @@ can be followed by another retained quote; superseded quotes stay intact.
 Acceptance binds the project's current quote UUID and canonical hash, freezes
 that supplied scope and prepares its milestone states. It cannot create an order,
 charge, collect a deposit, grant rights, authorize attachments or delivery, issue
-an invoice, or mark the project paid/completed. Every customer/staff projection
-continues to say `paymentState=not_collected` and `deliveryAuthorized=false`.
+an invoice, or mark the project paid/completed. No project command can do any of
+these. Every projection says `deliveryAuthorized=false`, and `paymentState` is
+`not_collected` unless the separate, default-off Stripe test-mode invoicing lane
+(`docs/service-invoicing.md`, BL-70) has recorded a verified service payment
+against the accepted quote.
 
 Staff begins a pending milestone and then records it ready for customer review.
 The buyer supplies a reason to approve that milestone's scope review or request
@@ -108,7 +111,7 @@ suffix, and preserve prior service definitions and bookkeeping. Independent
 review also verifies exact completed table/guard definitions survive a retry.
 
 There is no real customer/service source import, private file intake/scanning,
-service payment/deposit collection, deliverable entitlement, operative booking,
+live service payment/deposit collection (test-mode invoicing is `docs/service-invoicing.md`), deliverable entitlement, operative booking,
 invoice/tax calculation, notification delivery or production launch in this
 increment. Historical service/customer obligations, approved terms, privacy
 retention policy, attachment/payment retry proof and final browser/device/release

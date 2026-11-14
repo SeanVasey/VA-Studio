@@ -1,0 +1,307 @@
+{
+  "scope": "50 generated paths removed by root after26 public listings/manifest were archived;24 generated configs intentionally omitted, with original names/digests/lengths retained. No application-source removal.",
+  "archived_members": [
+    {
+      "path": "phpunit-ci-mysql-1-tests.xml",
+      "sha256": "0b45660a308af673afd832b58b91492d6f70f4f1de126faa579d8577bd37f255",
+      "bytes": 34033,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-10-tests.xml",
+      "sha256": "1cafe0acca7ba18b74cfa342c6a806f64bf970c7940cb3e0e94d987835965ec4",
+      "bytes": 35192,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-11-tests.xml",
+      "sha256": "800ad1c917575afa2a602f6d12ebaa5152c166260be173875f59b35ba361169f",
+      "bytes": 31537,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-12-tests.xml",
+      "sha256": "6525585b36d83c71cc6f6a4927e956e030052f37493bbb1761ad426b0cf0ab04",
+      "bytes": 30188,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-13-tests.xml",
+      "sha256": "037010ba96373688745e21f5ae5f258fc6fe53b09967b799b86bb3200615647e",
+      "bytes": 37331,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-14-tests.xml",
+      "sha256": "93e881500adb4d7d548096a623a6d4578fb9da25b375451210f2f861f1d1f3f4",
+      "bytes": 38647,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-15-tests.xml",
+      "sha256": "d5397c52eb1f5ca873dabe986f906cd773131efb940e250a86b591af32ea92d0",
+      "bytes": 42688,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-16-tests.xml",
+      "sha256": "60d76bfcb6f5924c0b0ea829120d82d395ba8ebdbebbbbfd17036ec651662b52",
+      "bytes": 36073,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-17-tests.xml",
+      "sha256": "a9f983977a961da56d7a6738e51d7d7f1273ab18b89c639afeab934473bacfad",
+      "bytes": 43368,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-18-tests.xml",
+      "sha256": "52f8e5d849cbb4c7547baea4a50092b727bb3ea1f0bb4a008dbf0fa79d1af10d",
+      "bytes": 34146,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-19-tests.xml",
+      "sha256": "dfe51e38fece6253b6934ce4c974c97ab55c4db705ebf6dccd836ceb05b91350",
+      "bytes": 30963,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-2-tests.xml",
+      "sha256": "206a9f6433aacbf7d094a122aff39758460a92ceb3ca277b71c1f3325df55aec",
+      "bytes": 37136,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-20-tests.xml",
+      "sha256": "9583cf3e81d65830cfa698995cbfc64d3090b23f795bf2d6e1e2f8d932683d8d",
+      "bytes": 35632,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-21-tests.xml",
+      "sha256": "928753e7d8719b9ff738c1a7f1e5caf831e75bd153c75e5d1dffb7ba7ecfdf46",
+      "bytes": 44349,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-22-tests.xml",
+      "sha256": "6c396a724f91dc59c4924379e4d81658b3f0b5362833042b0c7ac2fdbb349eed",
+      "bytes": 35119,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-23-tests.xml",
+      "sha256": "da58b5385eeeb580a135e76f71329f20e24cc25714309992165f0358197cdae6",
+      "bytes": 37519,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-24-tests.xml",
+      "sha256": "f17752a384da8653edce21115369019892ccd311d769e7d4060e5a3381148afc",
+      "bytes": 47377,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-3-tests.xml",
+      "sha256": "6ba0e4aac46c310d08e479140472269fc03bc83fec771bd5a8c9aa04d8b12af6",
+      "bytes": 41142,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-4-tests.xml",
+      "sha256": "c9e0da2992f6eb8a5c787b0f73b4d1a9c023e01f1fd90f437f4640fd9e7f22c4",
+      "bytes": 29952,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-5-tests.xml",
+      "sha256": "44b6afa615f034c8c4683cf709885dc46e477b9aeada590c78daa3466ba8db34",
+      "bytes": 45010,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-6-tests.xml",
+      "sha256": "20ac764536048a9d6b50804b8ac8686fa5c47239d1d7fe02c37de1382388511e",
+      "bytes": 33548,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-7-tests.xml",
+      "sha256": "dcc93ad63b8296bb6ab0f0f53ea1ef85aaf0358b7d98c700f7a46c92ef011b21",
+      "bytes": 38240,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-8-tests.xml",
+      "sha256": "4d8618bc293d72f1d658d805950061c0a852fe130b670636d70f240ca6c1b1c1",
+      "bytes": 34952,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-9-tests.xml",
+      "sha256": "4999b440e08fb2c2e62983436457f6b83620e89ff9865dec82639e7f85f8e30b",
+      "bytes": 39166,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-manifest.json",
+      "sha256": "a2a1ca8620eec679985fee118a17a742ca0601597bbd796593dbc97566302860",
+      "bytes": 22315,
+      "archived": true
+    },
+    {
+      "path": "phpunit-ci-mysql-source-tests.xml",
+      "sha256": "5dbd1b658474c3b383666f55276e31ca959f0e6e6c33a5a081bca70593da38e0",
+      "bytes": 3196749,
+      "archived": true
+    }
+  ],
+  "omitted_configuration_members": [
+    {
+      "path": "phpunit-ci-mysql-1.xml",
+      "sha256": "91c8aeb1d470c3b10d0af9a699377c5d26d67b0def4d2d37b42325dad6ff176b",
+      "bytes": 87279,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-10.xml",
+      "sha256": "e9c80564c41a6193fc9097675da2245ae9366404e0baeb209b2a33a8f288d996",
+      "bytes": 86233,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-11.xml",
+      "sha256": "e05c2762b3d41791b713cf491052f70e12e0c8466a029c17b24396edc670869f",
+      "bytes": 86191,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-12.xml",
+      "sha256": "8e22f9fbef3d408c8dfdfb087f4d52938e908d27ee8ee75c19f4109569b1506c",
+      "bytes": 86219,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-13.xml",
+      "sha256": "837ac489e7fe01091b8cc72fa017384a20fee512bea5185e9d3fcb9189331e51",
+      "bytes": 85363,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-14.xml",
+      "sha256": "952eb5aa87b34c0adb22cc3a4f8a5b5e44ef3b836bf3b9818b653ecb3c6d9f01",
+      "bytes": 86063,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-15.xml",
+      "sha256": "0ac539188ad4912eb566000e415e9fcf8c6071b9ad210133cf5f325601a91296",
+      "bytes": 86113,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-16.xml",
+      "sha256": "44351b45efacc342e2ab843647aacdbcdba546b9d507eef3805c7c3db7e575d1",
+      "bytes": 86027,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-17.xml",
+      "sha256": "c801c4d046a7019437dab7e6fa3548e1ee75436a3c8b2a6d2d258cca96fc509a",
+      "bytes": 85447,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-18.xml",
+      "sha256": "69afd43c20838ad14b9c620988831f57b8771058b09046b85e91b3b83ab557a2",
+      "bytes": 86093,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-19.xml",
+      "sha256": "1bdeef1f05c9c5a3ec98a03c9a66516053c53835ff664c8677c10e42e48886a1",
+      "bytes": 86145,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-2.xml",
+      "sha256": "0a2bb5629a6bc82367c64247debe9ee43cd1ad9dc907cab02e0d3a204032a777",
+      "bytes": 86211,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-20.xml",
+      "sha256": "b5e949e4fb942df08dd1c060ead0c87605dbf033c2200cdbe1e9aaf313909450",
+      "bytes": 85885,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-21.xml",
+      "sha256": "49fc9554d39ec29c8e715493667ee365430c7a75172cf1783eb586fc5ea6cf6b",
+      "bytes": 86145,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-22.xml",
+      "sha256": "f72ba291c951f406bed2142376a986f7b6bf311e2f285b44cc904da0bdd4ab71",
+      "bytes": 86141,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-23.xml",
+      "sha256": "a94d3c1ca42170c0a9531c38caddb22922b1898305fe9880a3bee28eec3f0c78",
+      "bytes": 86099,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-24.xml",
+      "sha256": "4eaed6598c282d423e36dc8e097eadfd7583768fb172881c0b853038dc5ed93b",
+      "bytes": 86027,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-3.xml",
+      "sha256": "7a97643b0d74a4c611a1b545e381d84009bcb1bd17ac37a44671bfae360fb258",
+      "bytes": 86345,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-4.xml",
+      "sha256": "6e73373809f9911971e13e62f75cf5c8397ccef69fac9cc6c0d2d6bc1a35e074",
+      "bytes": 86411,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-5.xml",
+      "sha256": "928cd71ed13720458b34baada6a0326ae277ee172cf80959a16cd5d67db99945",
+      "bytes": 86363,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-6.xml",
+      "sha256": "94751865a2334799c15fef14c90a500d5b67ec91486c7980d9a9ce85a49e0c93",
+      "bytes": 86195,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-7.xml",
+      "sha256": "242ef22c2b549932251d2e03b4ac4e20da81d1aab60d7d22da3248dfdde0e532",
+      "bytes": 86085,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-8.xml",
+      "sha256": "2c6ccd97d69ebe761718c3597ee2fefa3db8726bd657692b2deb2f162ec68ce2",
+      "bytes": 86181,
+      "archived": false
+    },
+    {
+      "path": "phpunit-ci-mysql-9.xml",
+      "sha256": "61d6758d56056a7de9d862e853885bc883783a5bd82fa3d0227043849de6b6ff",
+      "bytes": 86145,
+      "archived": false
+    }
+  ]
+}

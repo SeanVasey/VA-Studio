@@ -1,0 +1,18 @@
+      1 K1 restored identical
+      1 K2 restored identical
+      1 P1 restored identical
+      1 P1 restored identical (native)
+      1 P2 restored identical
+      1 P2 restored identical (native)
+      1 P3 restored identical
+      1 P3 restored identical (native)
+      1 P4 restored identical
+      1 P4 restored identical (native)
+      1 T1 restored identical
+      1 T1 restored identical (native)
+      2 T2 restored identical
+      1 T2 restored identical (native)
+      2 T3 restored identical
+      2 T3 restored identical (native)
+      2 T4 restored identical
+      1 T4 restored identical (native)

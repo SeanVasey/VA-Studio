@@ -10,6 +10,8 @@ Retain the original local/testing policy and its separately enabled order contro
 
 Use an ephemeral token returned only by a newly committed authorization, then submitted in a CSRF-protected POST body. A native attachment preserves bounded server/browser handling for files up to the existing adapter limit. Token-bearing GET links risk URL/history/referrer leakage; public or signed storage URLs bypass this boundary; JavaScript blob downloads buffer the attachment and weaken truthful interruption handling. Those alternatives are excluded from this increment.
 
+> **Amended 2026-11-09 (FP-077, Sean's decision).** Under `test-owner-delivery-v2` the token POST answers 303 to a GET that holds only the opaque authorization ID and works only in the creating session; that GET serves single ranges with a strong-ETag `If-Range`. No secret enters a URL and blob downloads stay excluded. See the [D-20 amendment](decision-register.md#d-20-amendment--2026-11-09-resumable-test-delivery-fp-077).
+
 ## Interface and effects
 
 | Operation | Public contract | Durable or external effect |

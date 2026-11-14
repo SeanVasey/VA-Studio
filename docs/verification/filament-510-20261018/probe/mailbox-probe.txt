@@ -1,0 +1,9 @@
+pending in memory only, rows before flush: 0
+key=laravel-cache-filament:notifications:e0cf29d885a297982bc76d4a088b07f78866e320235f8f1b48932307557ff00e
+expires_in_min=120
+value=a:1:{i:0;a:12:{s:2:"id";s:36:"a3031a8b-56b9-4557-9fba-0fe18b0fb548";s:7:"actions";a:0:{}s:4:"body";s:24:"PROBE-BODY operator text";s:5:"color";N;s:8:"duration";i:6000;s:4:"icon";s:19:"heroicon-o-x-circle";s:9:"iconColor";s:6:"danger";s:8:"iconSize";N;s:6:"status";s:6:"danger";s:5:"title";s:11:"PROBE-TITLE";s:4:"view";N;s:8:"viewData";a:0:{}}}
+session keys: ["_token","filament"]
+session mailbox value: e0cf29d885a297982bc76d4a088b07f78866e320235f8f1b48932307557ff00e
+pull -> [["PROBE-TITLE","PROBE-BODY operator text"]]
+rows after pull: 0
+expired-but-unread rows still present: 1

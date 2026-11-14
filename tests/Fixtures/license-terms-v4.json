@@ -1,0 +1,137 @@
+{
+    "terms": {
+        "schema_version": 4,
+        "required_asset_roles": [
+            "master_wav"
+        ],
+        "usage": {
+            "audio_releases": {
+                "mode": "limited",
+                "limit": 2
+            },
+            "copies_downloads": {
+                "mode": "limited",
+                "limit": 1500
+            },
+            "monetized_streams": {
+                "mode": "limited",
+                "limit": 250000
+            },
+            "non_monetized_streams": {
+                "mode": "unlimited"
+            },
+            "music_videos": {
+                "mode": "limited",
+                "limit": 1
+            },
+            "live_performances": {
+                "mode": "unlimited"
+            },
+            "radio_stations": {
+                "mode": "prohibited"
+            }
+        },
+        "permissions": {
+            "content_id": "prohibited",
+            "paid_advertising": "permitted",
+            "sublicensing": "prohibited",
+            "standalone_resale": "prohibited"
+        },
+        "credit": {
+            "mode": "required",
+            "text": "<SYNTHETIC> & PRODUCER"
+        },
+        "territory": {
+            "mode": "countries",
+            "country_codes": [
+                "US",
+                "CA"
+            ]
+        },
+        "duration": {
+            "mode": "fixed_months",
+            "starts_at": "grant",
+            "months": 120
+        },
+        "ownership": {
+            "source_recording": {
+                "policy_key": "economic-fixture"
+            },
+            "source_composition": {
+                "policy_key": "economic-fixture"
+            },
+            "resulting_recording": {
+                "policy_key": "economic-fixture"
+            },
+            "resulting_composition": {
+                "policy_key": "economic-fixture"
+            }
+        },
+        "publishing_income": {
+            "mode": "share",
+            "policy_key": "economic-fixture",
+            "licensor_bps": 1234
+        },
+        "recording_royalty": {
+            "mode": "rate",
+            "policy_key": "economic-fixture",
+            "rate_bps": 567,
+            "basis": "gross_receipts"
+        },
+        "policies": [
+            {
+                "key": "economic-fixture",
+                "version": "test-v1",
+                "text": "NONBINDING SYNTHETIC economic policy. No real rights or payment obligation.\n<script>synthetic & 'quoted'</script>"
+            }
+        ]
+    },
+    "statements": {
+        "usage.audio_releases": "Audio releases: up to 2.",
+        "usage.copies_downloads": "Copies / downloads: up to 1,500.",
+        "usage.monetized_streams": "Monetized streams: up to 250,000.",
+        "usage.non_monetized_streams": "Non-monetized streams: unlimited.",
+        "usage.music_videos": "Music videos: up to 1.",
+        "usage.live_performances": "Live performances: unlimited.",
+        "usage.radio_stations": "Radio stations: not permitted.",
+        "permissions.content_id": "Content ID registration: not permitted.",
+        "permissions.paid_advertising": "Paid advertising: permitted.",
+        "permissions.sublicensing": "Sublicensing: not permitted.",
+        "permissions.standalone_resale": "Standalone resale: not permitted.",
+        "credit": "Producer credit required: <SYNTHETIC> & PRODUCER",
+        "deliverables": "Deliverables: WAV master.",
+        "territory": "Territory: CA, US (ISO 3166-1 alpha-2).",
+        "duration": "License duration: 120 calendar months from the grant timestamp (UTC; end-of-month clamping).",
+        "ownership.source_recording": "Licensed source recording ownership: defined by retained policy economic-fixture @ test-v1.",
+        "ownership.source_composition": "Licensed source composition ownership: defined by retained policy economic-fixture @ test-v1.",
+        "ownership.resulting_recording": "Resulting recording ownership: defined by retained policy economic-fixture @ test-v1.",
+        "ownership.resulting_composition": "Resulting composition ownership: defined by retained policy economic-fixture @ test-v1.",
+        "publishing_income": "Publishing income: licensor share is 12.34% of total publishing income attributable to the resulting composition, as defined by retained policy economic-fixture @ test-v1.",
+        "recording_royalty": "Recording royalty: licensee pays licensor 5.67% of gross receipts from the resulting recording, as defined by retained policy economic-fixture @ test-v1."
+    },
+    "source_values": {
+        "usage.audio_releases": "Audio releases: up to 2.",
+        "usage.copies_downloads": "Copies / downloads: up to 1,500.",
+        "usage.monetized_streams": "Monetized streams: up to 250,000.",
+        "usage.non_monetized_streams": "Non-monetized streams: unlimited.",
+        "usage.music_videos": "Music videos: up to 1.",
+        "usage.live_performances": "Live performances: unlimited.",
+        "usage.radio_stations": "Radio stations: not permitted.",
+        "permissions.content_id": "Content ID registration: not permitted.",
+        "permissions.paid_advertising": "Paid advertising: permitted.",
+        "permissions.sublicensing": "Sublicensing: not permitted.",
+        "permissions.standalone_resale": "Standalone resale: not permitted.",
+        "credit": "Producer credit required: <SYNTHETIC> & PRODUCER",
+        "deliverables": "Deliverables: WAV master.",
+        "territory": "Territory: CA, US (ISO 3166-1 alpha-2).",
+        "duration": "License duration: 120 calendar months from the grant timestamp (UTC; end-of-month clamping).",
+        "ownership.source_recording": "Licensed source recording ownership: defined by retained policy economic-fixture @ test-v1.",
+        "ownership.source_composition": "Licensed source composition ownership: defined by retained policy economic-fixture @ test-v1.",
+        "ownership.resulting_recording": "Resulting recording ownership: defined by retained policy economic-fixture @ test-v1.",
+        "ownership.resulting_composition": "Resulting composition ownership: defined by retained policy economic-fixture @ test-v1.",
+        "publishing_income": "Publishing income: licensor share is 12.34% of total publishing income attributable to the resulting composition, as defined by retained policy economic-fixture @ test-v1.",
+        "recording_royalty": "Recording royalty: licensee pays licensor 5.67% of gross receipts from the resulting recording, as defined by retained policy economic-fixture @ test-v1.",
+        "policy_texts": "Retained policy economic-fixture @ test-v1; SHA-256 161d3f5188236fa17fcd7fc792bdc64cd5f22bbb71c934332f8c9c70069c5a31\nNONBINDING SYNTHETIC economic policy. No real rights or payment obligation.\n<script>synthetic & 'quoted'</script>"
+    },
+    "rendered": "<script>synthetic</script>SYNTHETIC NONBINDING REVIEW FIXTURE. Not an actual license.\nAudio releases: up to 2.\nCopies / downloads: up to 1,500.\nMonetized streams: up to 250,000.\nNon-monetized streams: unlimited.\nMusic videos: up to 1.\nLive performances: unlimited.\nRadio stations: not permitted.\nContent ID registration: not permitted.\nPaid advertising: permitted.\nSublicensing: not permitted.\nStandalone resale: not permitted.\nProducer credit required: <SYNTHETIC> & PRODUCER\nDeliverables: WAV master.\nTerritory: CA, US (ISO 3166-1 alpha-2).\nLicense duration: 120 calendar months from the grant timestamp (UTC; end-of-month clamping).\nLicensed source recording ownership: defined by retained policy economic-fixture @ test-v1.\nLicensed source composition ownership: defined by retained policy economic-fixture @ test-v1.\nResulting recording ownership: defined by retained policy economic-fixture @ test-v1.\nResulting composition ownership: defined by retained policy economic-fixture @ test-v1.\nPublishing income: licensor share is 12.34% of total publishing income attributable to the resulting composition, as defined by retained policy economic-fixture @ test-v1.\nRecording royalty: licensee pays licensor 5.67% of gross receipts from the resulting recording, as defined by retained policy economic-fixture @ test-v1.\nRetained policy economic-fixture @ test-v1; SHA-256 161d3f5188236fa17fcd7fc792bdc64cd5f22bbb71c934332f8c9c70069c5a31\nNONBINDING SYNTHETIC economic policy. No real rights or payment obligation.\n<script>synthetic & 'quoted'</script>"
+}

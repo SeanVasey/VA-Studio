@@ -1,0 +1,16 @@
+{
+  "source": "45d1299406821627f4ba02af186e324a70c6ade0",
+  "native_cases": 1973,
+  "native_files": 187,
+  "source_cases": 8047,
+  "source_files": 587,
+  "shards": 24,
+  "source_files_checked": 2091,
+  "policy_files_unchanged": 9,
+  "branch_errors": [],
+  "source_delta": [
+    "tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php",
+    "tests/Feature/ProductionMembershipBilling/MembershipNativeReservationRaceTest.php"
+  ],
+  "generated_files_retained": 50
+}

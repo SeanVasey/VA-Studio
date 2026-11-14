@@ -1,0 +1,30 @@
+# Independent final dependency-supplement development review
+
+**DECISION: APPROVE WITH CONDITIONS.** Reviewed exact clean SHA: `c80972717cf8323e794245fa45e150539d4b2792`. No open P0/P1 or required source/evidence correction. The focused default-off delivery batch, with this minimal dependency remediation, is ready for a new cheap exact-publication-head preflight and expected-SHA development merge. Importing this decision requires a separate receipt-only successor carry. This is not a passing hosted preflight or actual merge receipt.
+
+The actual dependency/application/test runtime remains tested `bb86ceec1f1106890f4ab605009fb67091ca35f3`; subsequent tracked changes are documentation and the supplemental seal. Only HttpFoundation 8.0.15→8.1.9 changes among locked package records, with consistent root PHP `^8.4.1`/platform `8.4.1` and documented minimum. Stripe 21.3.2, other dependencies, application/tests/config/migrations/policies/routes and frozen profiles are unchanged. Regenerated loaders and the changed Composer inputs are explicitly new runtime evidence, not an unchanged-manifest carry from the earlier approval. Recorded locked audit, strict validation and real platform checks exit 0 without ignored requirements or advisory exceptions. Local PHP 8.4.26 compatibility does not establish a host runtime.
+
+The genuine original audit/preflight failure on `089fba7b8e66a85de8393755e9e416725a3154dd` remains: PKSA-xmwy-rmx5-m7h4/CVE-2026-108082. The initial incompatible-platform update also remains failed. The independently reviewed upstream/installed HeaderUtils fix and narrow Request/Response compatibility changes, supported pin and new affected evidence justify this remediation. No broader dependency, cap, setting or profile change was used.
+
+Both new invocations are preserved independently:
+
+| Actual invocation on bb86 | Tests/assertions | F/E/S | PHP/recorder/launch-bound OS |
+| --- | --- | --- | --- |
+| Original eight-file stop-on-defect selection | 72/3261 | 0/1/3 | 2/1/1 |
+| Whole unfinished StorefrontMetadata + RootRegistration | 14/227 | 0/0/0 | 0/0/0 |
+
+The failed invocation contains six complete current-runtime components: Tax journey 18/185, Tax schema 5/2179, three declared native skips, V1 paid HTTP 19/648, Tax checkout HTTP 17/131 and customer session HTTP 9/118. Their component total is 71/3261/F0E0S3 inside a failed process. The first Storefront case fails with an actual MissingAppKeyException and zero assertions; RootRegistration was unexecuted. That is missing synthetic testing configuration, not a library/source repair or old-behavior regression oracle. The continuation directly completes Storefront 7/150 and RootRegistration 7/77 under its separately recorded ephemeral-key environment. No whole-eight-file green invocation or synthetic combined 85-case run is claimed. These exact components plus continuation are sufficient affected evidence under AGENTS' cost policy.
+
+The new runner differs only by generating a host-only random 32-byte testing APP_KEY, excluding its raw value from public receipts and recording a nonsecret presence descriptor. Original failed runner/launcher/bundle remain untouched; separate identities and the preparation syntax error are retained. I independently verified original JUnit/class counts, command selection, logs/process markers, source/head/status/runner/loaders before-after and direct PID/UID/startticks-bound OS witnesses for both runs. No raw generated key is serialized by this receipt path.
+
+Supplement archive SHA256 `ba852919ae3c5a8f7fe62cf89751adb33493801402624a18f48713f5d4133dee`, 6,481,088 bytes: all 2,406 unique regular members match the index; 2,353 source objects and 4,818 exact Git path bindings across two inventories reconcile. All 2,409 actual current inputs, 16 routes and 13 loader hashes match tested source. I independently checked 2,231 installed critical-package file hashes, all 120 Foundation files against its pristine cached dist, and six decoded immutable Git-body bindings to the identical old/new locked database/container/event/process refs. These are current provenance, not invented historical vendor snapshots. The earlier 13-run archive/index and independent source decisions remain byte unchanged.
+
+The log-access receipt is explicitly a redacted derivative. Its host-only original hash and the audit excerpt's full original log hash match retained originals; the raw expiring-URL receipt is omitted from the archive. Access limitations, genuine failed/cancelled preflight history and actual audit excerpt stay distinct. No unavailable protection settings are inferred or bypassed.
+
+Old native schema 5/2893 and race 3/76 remain observations on the old dependency runtime. Only reviewed unchanged application/test/schema/SQL/PDO/selector/wait components carry with current critical-body provenance and fresh Tax/bootstrap/private-byte evidence. There is no current native execution, whole-vendor/runtime equality, or broad SQL/isolation/deadlock/physical acceptance claim. No expensive native repeat is necessary solely for this isolated HTTP-library change.
+
+Conditions: new cheap preflight must pass on the exact published successor; complete actual review/check/protection inventory and merge with expected SHA; record actual merge and next dependency. Default-off/unmounted typed Tax HTTP/root/auth/redemption composition remains next. Host/provider/live commercial/account, activation/release, Foundation/GitLab/full-matrix, wider SQL/DDL/isolation/deadlock/physical, distributed caches, uninterruptible I/O and representative FPM/performance boundaries remain open. Shared V1/Identity metadata P2 and ordinary membership throwing-afterCommit P2 remain frozen outside this batch.
+
+Only read-only Git and standard-library archive/JSON/XML/SHA/Base64/zip inspection was performed. No app tests, database, network, Composer/container/CI operation or shared mutation. The final supplemental verifier completed without error; historical reviewer preparation errors remain in their original notes.
+
+Verification report SHA256: `e2dea70f5807d4bad3331d32165186544892a22f6441d1f0f91076627d393785`.

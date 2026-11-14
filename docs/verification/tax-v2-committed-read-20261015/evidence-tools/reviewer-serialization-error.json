@@ -1,0 +1,7 @@
+{
+  "classification": "Reviewer-only report serialization error after all read-only verification assertions passed; loop variable p referred to PosixPath instead of preparation record. No product/test failure or database execution.",
+  "original_verifier_sha256": "2a03bc04df37df739e2dc8efeccf15735b5bed87f044f95f21c0c27524c37b79",
+  "original_exit": 1,
+  "original_error": "TypeError: Object of type PosixPath is not JSON serializable",
+  "repair": "Serialize the actual prep[0] original record. Retained original verifier unchanged."
+}

@@ -7,6 +7,8 @@ final class PaidGrantDeadline
 {
     private int $deadline;
 
+    private ?PaidGrantRequestBudget $requestBudget = null;
+
     private function __construct(private readonly int $original)
     {
         $this->deadline = $original;
@@ -24,14 +26,23 @@ final class PaidGrantDeadline
         $this->deadline = min($this->deadline, $deadline);
     }
 
+    /** The same request's live min-only ceiling; the ordinary 60 s allowance is unchanged. */
+    public static function forRequest(PaidGrantRequestBudget $budget): self
+    {
+        $deadline = self::start();
+        $deadline->requestBudget = $budget;
+
+        return $deadline;
+    }
+
     public function value(): int
     {
-        return $this->deadline;
+        return min($this->deadline, $this->requestBudget?->value() ?? $this->deadline);
     }
 
     public function proveCurrent(): void
     {
-        PaidGrantException::require(hrtime(true) <= $this->deadline, 410);
+        PaidGrantException::require(hrtime(true) <= $this->value(), 410);
     }
 
     public function __serialize(): array

@@ -8,6 +8,7 @@ use App\Jobs\NotifyInquiryOperatorJob;
 use App\Models\User;
 use App\Support\Access\AdminMultiFactor;
 use App\Support\Audit\AuditEvent;
+use Carbon\CarbonInterface;
 use Filament\Facades\Filament;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Builder;
@@ -24,6 +25,8 @@ final class InquiryNotificationWork
     public const LEASE_SECONDS = 120;
 
     public const MAX_ATTEMPTS = 3;
+
+    public const MAX_AGE_LIMIT_MINUTES = 10080;
 
     public function retain(CustomerInquiry $inquiry): InquiryNotificationIntent
     {
@@ -73,6 +76,11 @@ final class InquiryNotificationWork
             }
             if (! in_array($intent->state, ['pending', 'retry'], true)
                 || ($intent->next_attempt_at !== null && $intent->next_attempt_at->greaterThan(now()))) {
+                return null;
+            }
+            // A stale intent is skipped, never sent: enabling alerts later must not release a backlog (FP-013 review P2-4).
+            $oldest = $this->oldestSendable();
+            if ($oldest === null || $intent->created_at->lessThan($oldest)) {
                 return null;
             }
             if (! $this->enabled()) {
@@ -225,11 +233,29 @@ final class InquiryNotificationWork
             throw new LogicException('Inquiry notification scan limit is invalid.');
         }
 
-        return InquiryNotificationIntent::where(function (Builder $query): void {
-            $query->where('state', 'pending')
-                ->orWhere(fn (Builder $retry) => $retry->where('state', 'retry')->where('next_attempt_at', '<=', now()))
-                ->orWhere(fn (Builder $expired) => $expired->where('state', 'processing')->where('lease_expires_at', '<=', now()));
+        // Stale pending and retry intents are left out so they cannot hold the bounded scan; expired claims are always
+        // settled (as unknown, never sent) whatever their age.
+        $oldest = $this->oldestSendable();
+
+        return InquiryNotificationIntent::where(function (Builder $query) use ($oldest): void {
+            $query->where(fn (Builder $expired) => $expired->where('state', 'processing')->where('lease_expires_at', '<=', now()));
+            if ($oldest !== null) {
+                $query->orWhere(fn (Builder $fresh) => $fresh->where('created_at', '>=', $oldest)->where(fn (Builder $due) => $due
+                    ->where('state', 'pending')
+                    ->orWhere(fn (Builder $retry) => $retry->where('state', 'retry')->where('next_attempt_at', '<=', now()))));
+            }
         })->orderBy('id')->limit($limit)->pluck('id')->map(fn ($id): int => (int) $id)->all();
+    }
+
+    /**
+     * The creation time before which a pending or retry intent is never claimed (`inquiries.operator_alert_max_age_minutes`).
+     * Null when the window is not a whole number of minutes from 1 to MAX_AGE_LIMIT_MINUTES: then nothing is sendable.
+     */
+    public function oldestSendable(): ?CarbonInterface
+    {
+        $minutes = config('inquiries.operator_alert_max_age_minutes');
+
+        return is_int($minutes) && $minutes >= 1 && $minutes <= self::MAX_AGE_LIMIT_MINUTES ? now()->subMinutes($minutes) : null;
     }
 
     private function operator(InquiryNotificationIntent $intent, bool $lockForUpdate = false): ?User

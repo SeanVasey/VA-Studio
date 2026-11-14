@@ -1,0 +1,175 @@
+{
+  "reviewed_head": "9d602626ddf1abcb700cf3165e4bfdfb33fb8c78",
+  "baseline": "b1a5447beb8c07d002f341250a97e396bbb31792",
+  "status": "",
+  "source_inventories": [
+    {
+      "head": "b1a5447beb8c07d002f341250a97e396bbb31792",
+      "input_count": 2351,
+      "routes": 16,
+      "git_blob_hash_mismatches": [],
+      "loader_count": 13,
+      "current_loader_mismatches": [],
+      "runtime_sha256": "345672214f4787647c7f1b3d6763607e5dccb77d80210631ab06b335dcd097c2"
+    },
+    {
+      "head": "9d602626ddf1abcb700cf3165e4bfdfb33fb8c78",
+      "input_count": 2351,
+      "routes": 16,
+      "git_blob_hash_mismatches": [],
+      "loader_count": 13,
+      "current_loader_mismatches": [],
+      "runtime_sha256": "345672214f4787647c7f1b3d6763607e5dccb77d80210631ab06b335dcd097c2"
+    }
+  ],
+  "source_input_differences": {
+    "app/Domain/Commerce/ProductionTaxCheckout/TaxPaidReadContext.php": [
+      "ba9d4478f93434d89ea027a0ff835a5a7e8d9daef47e5379029d4b35ac1800ba",
+      "db5cdaacb8416cfa29225c048a83d3b53689bf9e3863ed08988f96a6ac5ca4e9"
+    ],
+    "tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php": [
+      "6ef35e64ad16f1207aca757810d4fd23b991c13315702770c37ac4b79554569b",
+      "c26f576171ea8531e763ae2324b8745085194b8a6c31ba695f4a41ba53b80eb0"
+    ]
+  },
+  "identical_inputs": 2349,
+  "current_local_hash_mismatches": [],
+  "receipt_method_count": 29,
+  "receipt_expanded_case_count": 37,
+  "receipts": [
+    {
+      "name": "sqlite-whole-tax-final-source",
+      "head": "b1a5447beb8c07d002f341250a97e396bbb31792",
+      "junit": {
+        "assertions": 1523,
+        "tests": 211,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 25
+      },
+      "junit_matches_record": true,
+      "php_exit": 0,
+      "verifier_exit": 0,
+      "process_exit_marker": 0,
+      "recorded_os_exit": 0,
+      "os_bound_to_launch": true,
+      "log_hash_matches": true,
+      "no_overlays": true,
+      "before_git_equal": true,
+      "stability": {
+        "source_unchanged": true,
+        "source_head_unchanged": true,
+        "source_status_unchanged": true,
+        "runner_unchanged": true,
+        "autoload_unchanged": true
+      },
+      "age_cases": [
+        {
+          "name": "test_original_source_age_cannot_be_renewed_by_a_later_caller_deadline",
+          "file": "/workspace/VA-Studio-tax-v2-committed-read/tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php",
+          "line": "854",
+          "class": "Tests\\Feature\\ProductionTaxCheckout\\ProductionTaxCommittedReadReceiptTest",
+          "classname": "Tests.Feature.ProductionTaxCheckout.ProductionTaxCommittedReadReceiptTest",
+          "assertions": "7",
+          "time": "305.844272"
+        }
+      ],
+      "hashes": {
+        "result.json": "188b5ee4ccb909fa0ed1091da021648ca4c10c2bc7ee69ac6ee3c594429f3d47",
+        "command.json": "3a7516679f3efb5d690a5056d23624d0b8888c34bb7e42bef1d8959ac72e59c4",
+        "junit.xml": "3af3166f7fb6a8b4925418f3ec984a5e0970420ecb91a63414d69b4a465af856",
+        "log.txt": "d9cabff505b437acc5c170b6cf36d12f143c1046cd3e1d7b981a40f6b40917c7",
+        "process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "name": "sqlite-environment-descriptor-repair",
+      "head": "9d602626ddf1abcb700cf3165e4bfdfb33fb8c78",
+      "junit": {
+        "assertions": 26,
+        "tests": 5,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "junit_matches_record": true,
+      "php_exit": 0,
+      "verifier_exit": 0,
+      "process_exit_marker": 0,
+      "recorded_os_exit": 0,
+      "os_bound_to_launch": true,
+      "log_hash_matches": true,
+      "no_overlays": true,
+      "before_git_equal": true,
+      "stability": {
+        "source_unchanged": true,
+        "source_head_unchanged": true,
+        "source_status_unchanged": true,
+        "runner_unchanged": true,
+        "autoload_unchanged": true
+      },
+      "age_cases": [],
+      "hashes": {
+        "result.json": "c13e251d5b102c5d10b0650e2f473b98ac3daa9967d90ec4edbee0c2761f6b6a",
+        "command.json": "02cc78edb0c4185e238ec00331095ef86bbbe2737ae55d61c19f28f833b28ba9",
+        "junit.xml": "b8a54593506c5a878d416e3bb98e4910b36a083e937b168905465d60a00bf294",
+        "log.txt": "396864be5a738d5df6955ad6da28da94051dc507f2cf84e6f973532814c6f10a",
+        "process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "name": "old-environment-descriptor-gap-activated",
+      "head": "1ecd7c829ec31a59a5c59956cf2cb9a0473a544a",
+      "junit": {
+        "assertions": 2,
+        "tests": 1,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "junit_matches_record": true,
+      "php_exit": 1,
+      "verifier_exit": 1,
+      "process_exit_marker": 1,
+      "recorded_os_exit": 1,
+      "os_bound_to_launch": true,
+      "log_hash_matches": true,
+      "no_overlays": true,
+      "before_git_equal": true,
+      "stability": {
+        "source_unchanged": true,
+        "source_head_unchanged": true,
+        "source_status_unchanged": true,
+        "runner_unchanged": true,
+        "autoload_unchanged": true
+      },
+      "age_cases": [],
+      "hashes": {
+        "result.json": "dc60724e821fa9152c5d718fda32c90e576b8b8c43802ac88057346d35cb2c92",
+        "command.json": "4c0a6c078984d6f33953fa9856242daf059822ca04e5915fe1ecfdbecc71f582",
+        "junit.xml": "589b389b59669af19ee1a971cbf0a1b30e1246445452d40f5aaef44da5642339",
+        "log.txt": "3d569eeea741a47e58df7dd59d76e4fbccde95accec66561e60832f19dc947a8",
+        "process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      }
+    }
+  ],
+  "scope": "Read-only source/receipt checkpoint. No application, test, database, CI, or hosted execution. No final packet or merge approval.",
+  "recorded_utc": "2026-10-15T03:27:29.252530+00:00",
+  "decision": "REVISE SOURCE BEFORE APPROVAL; NOT FINAL EVIDENCE OR MERGE APPROVAL",
+  "open_p0_p1": "No open P0/P1 established in this bounded source/receipt review; two high-confidence source-confirmed P2 final-fence metadata requirements remain.",
+  "required_repairs": [
+    {
+      "id": "V2-FACADE-CACHE",
+      "severity": "P2",
+      "confidence": "high: source-confirmed; new regression pending",
+      "direction": "Admit reflected Facade resolvedInstance as actual array in V2 wrapper before all frozen witness entries."
+    },
+    {
+      "id": "V2-PRIMARY-METADATA",
+      "severity": "P2",
+      "confidence": "high: source-confirmed; new regression pending",
+      "direction": "Admit captured standard primary Connection raw config as actual array with flat driver/name strings; admit raw database/tablePrefix strings before typed birth/generic capture and every proof."
+    }
+  ],
+  "carry_disposition": "Narrow b1 development evidence carry is acceptable under AGENTS cost policy with exact later input delta plus meaningful current focused regressions/positives and required native evidence. Earlier whole run and real source-age execution remain bound only to b1; no current whole-run claim or final approval."
+}

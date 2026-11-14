@@ -1,0 +1,27 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/m3/phpunit.xml
+
+FF                                                                  2 / 2 (100%)
+
+Time: 00:05.903, Memory: 95.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\RightsDeclarationWriterActionTest::test_uncertain_audit_failure_consumes_review_leaves_every_row_unchanged_and_logs_only_exception_class@edit with data ('edit')
+Failed asserting that '[{"id":"a3031864-e86d-4171-87cb-8916ac3151d2","actions":[],"body":"Reload declarations and review current evidence before trying again.Synthetic private failure SYNTHETIC-PRIVATE-UI-REFERENCE","color":null,"duration":"persistent","icon":"heroicon-o-x-circle","iconColor":"danger","iconSize":null,"status":"danger","title":"The save result could not be confirmed.","view":null,"viewData":[]}]' [ASCII](length: 391) does not contain "SYNTHETIC-PRIVATE-UI-REFERENCE" [ASCII](length: 30).
+
+/home/user/wt/m3/tests/Support/FilamentNotifications.php:88
+/home/user/wt/m3/tests/Feature/RightsDeclarationWriterActionTest.php:317
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\RightsDeclarationWriterActionTest::test_uncertain_audit_failure_consumes_review_leaves_every_row_unchanged_and_logs_only_exception_class@verify with data ('verify')
+Failed asserting that '[{"id":"a3031869-1996-4bb2-8340-7dfee6bc2163","actions":[],"body":"Reload declarations and review current evidence before trying again.Synthetic private failure SYNTHETIC-PRIVATE-UI-REFERENCE","color":null,"duration":"persistent","icon":"heroicon-o-x-circle","iconColor":"danger","iconSize":null,"status":"danger","title":"The save result could not be confirmed.","view":null,"viewData":[]}]' [ASCII](length: 391) does not contain "SYNTHETIC-PRIVATE-UI-REFERENCE" [ASCII](length: 30).
+
+/home/user/wt/m3/tests/Support/FilamentNotifications.php:88
+/home/user/wt/m3/tests/Feature/RightsDeclarationWriterActionTest.php:317
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 2, Assertions: 9, Failures: 2.

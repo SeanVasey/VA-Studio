@@ -1,0 +1,39 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/f4/phpunit.xml
+
+F.......                                                            8 / 8 (100%)
+
+Time: 00:51.112, Memory: 100.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\OrderInquiryMigrationTest::test_empty_owned_roundtrip_and_repeat_install_preserve_unrelated_schema
+Failed asserting that two arrays are identical.
+--- Expected
++++ Actual
+@@ @@
+         'type' => 'index',
+         'name' => 'inquiry_order_contexts_inquiry_id_unique',
+         'tbl_name' => 'inquiry_order_contexts',
+-        'rootpage' => 331,
++        'rootpage' => 793,
+         'sql' => 'CREATE UNIQUE INDEX "inquiry_order_contexts_inquiry_id_unique" on "inquiry_order_contexts" ("inquiry_id")',
+     ],
+     293 => Array &294 [
+@@ @@
+         'type' => 'index',
+         'name' => 'inquiry_order_contexts_order_id_index',
+         'tbl_name' => 'inquiry_order_contexts',
+-        'rootpage' => 330,
++        'rootpage' => 331,
+         'sql' => 'CREATE INDEX "inquiry_order_contexts_order_id_index" on "inquiry_order_contexts" ("order_id")',
+     ],
+     295 => Array &296 [
+
+/home/user/wt/f4/tests/Feature/OrderInquiryMigrationTest.php:63
+/home/user/wt/t1/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 8, Assertions: 33, Failures: 1.

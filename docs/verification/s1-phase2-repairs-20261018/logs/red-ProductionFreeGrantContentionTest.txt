@@ -1,0 +1,49 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/f4/phpunit.xml
+
+...FFF.                                                             7 / 7 (100%)
+
+Time: 00:47.492, Memory: 87.00 MB
+
+There were 3 failures:
+
+1) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantContentionTest::test_a_deadlock_after_the_customer_write_is_a_fixed_refusal_and_nothing_is_written@mysql deadlock 1213 with data ('40001', 1213, 'Deadlock found when trying to...action')
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'contention'
++'identity_refused'
+
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:140
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:67
+/home/user/wt/t1/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantContentionTest::test_a_deadlock_after_the_customer_write_is_a_fixed_refusal_and_nothing_is_written@mysql lock wait timeout 1205 with data ('HY000', 1205, 'Lock wait timeout exceeded; t...action')
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'contention'
++'identity_refused'
+
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:140
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:67
+/home/user/wt/t1/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionFreeGrants\ProductionFreeGrantContentionTest::test_a_deadlock_after_the_customer_write_is_a_fixed_refusal_and_nothing_is_written@serialization failure 40001 with data ('40001', 0, 'could not serialize access du...update')
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'contention'
++'identity_refused'
+
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:140
+/home/user/wt/f4/tests/Feature/ProductionFreeGrants/ProductionFreeGrantContentionTest.php:67
+/home/user/wt/t1/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 7, Assertions: 32, Failures: 3.

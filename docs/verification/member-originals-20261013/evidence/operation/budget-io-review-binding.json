@@ -1,0 +1,15 @@
+{
+  "old_application_commit": "c7310cdad4154e662270736a4ecaeeef2e7cf64d",
+  "red": "io-review-red",
+  "red_application_sha256": "8321845574b88ea52f561c19a4d01dfe93005f17f276a088417956a56854d12d",
+  "red_test_capsule_sha256": "f8742de610ee8733c0dccb3808614ffbf4177050e32301a7e14b420a1fb6be93",
+  "fixed_commit": "d3aafa1b1563353fe56a1eef54c4f477a50f0d61",
+  "final_run": "budget-io-final",
+  "files": {
+    "app/Domain/Grants/Member/MemberOriginalBudget.php": "fc8d0306fdec3f0235e2b225ff6789f31301490cded976330cffb700036aff2a",
+    "app/Domain/Grants/Member/MemberOriginalIoFrame.php": "09f8eb47e127688e076f005226b9c23e631137dea9bb06b6d3deff69534cf561",
+    "tests/Unit/MemberOriginalBudgetTest.php": "341b1a0e457f7583839688d89f8ef4af2c8497b8d8a122eca829224fc43b4fa3",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalIoFrameTest.php": "11bd2c7d3e6c46f668d8e84c9203c6f67a46eab86d18c6cbd15bb3b88f0f702e"
+  },
+  "limits": "Focused classes only. Other unexecuted operation drafts are included in the broad runtime inventory, not represented as committed source."
+}

@@ -20,6 +20,8 @@ use LogicException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Support\CheckoutFixtures as F;
 use Tests\Support\FinalizationDatabaseMigrations;
+use Tests\Support\RefundDisputeFixtures;
+use Tests\Support\TransactionalMailFixtures;
 use Tests\TestCase;
 
 /** Synthetic storage-only evidence. Domain/payment tests separately prove real application decisions. */
@@ -45,33 +47,68 @@ class TestOrderFinalizationMigrationTest extends TestCase
         $contracts = require database_path('migrations/2026_09_26_000021_test_contract_issuance.php');
         $fulfillmentActivations = require database_path('migrations/2026_09_26_000022_test_fulfillment_activation.php');
         $delivery = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
+        $deliveryResume = require database_path('migrations/2026_11_09_270300_test_delivery_resume_v2.php');
         $financialObservations = require database_path('migrations/2026_10_06_000039_test_payment_financial_observations.php');
         $unpaidRelease = require database_path('migrations/2026_10_06_000042_test_unpaid_releases.php');
         $purchaseClaims = require database_path('migrations/2026_10_06_000048_customer_purchase_claims.php');
         $refundResolution = require database_path('migrations/2026_10_06_000047_test_refund_resolutions.php');
         // Remove the empty additive notification child before its retained parents.
         $notices = require database_path('migrations/2026_10_06_231000_test_transactional_notifications.php');
+        // Drop the empty, forward-only A5 refund/dispute child first; its guards name the order tables rebuilt below.
+        $refundDispute = require database_path('migrations/2026_10_24_264100_refund_dispute_lifecycle.php');
         $this->assertDatabaseCount('transactional_notices', 0);
         $this->assertDatabaseCount('transactional_notice_attempts', 0);
+        RefundDisputeFixtures::dropEmptyTables();
+        // The empty lane CX mail-delivery child names transactional_notices in its insert guard; dispose of it first.
+        TransactionalMailFixtures::dropEmptyDeliveries();
         $notices->down();
         $purchaseClaims->down();
+        // The empty buyer cancellation and never-sent release children replace the refund migration's resource guards; restore them first, newest first.
+        (require database_path('migrations/2026_11_12_001000_test_buyer_order_cancellations.php'))->down();
+        (require database_path('migrations/2026_11_11_001000_test_unsent_order_releases.php'))->down();
         $refundResolution->down();
         $unpaidRelease->down();
         $financialObservations->down();
         $exceptionOperations = require database_path('migrations/2026_10_02_000036_test_payment_exception_operations.php');
-        foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
-        $exceptionOperations->down(); $delivery->down(); $fulfillmentActivations->down(); $contracts->down(); $migration->down();
-        foreach ($this->finalizationSchemaTables() as $table) { $this->assertFalse(Schema::hasTable($table)); }
-        foreach (['inventory_reservations', 'promotion_uses'] as $table) { $this->assertFalse(Schema::hasColumn($table, 'consumed_at')); }
-        $migration->up(); $contracts->up(); $fulfillmentActivations->up(); $delivery->up(); $exceptionOperations->up();
+        foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
+        // The empty v2 resume child (admissions and coverage, plus the v2 authorization guard) names test_delivery_redemptions
+        // in its triggers; SQLite revalidates them when a parent table is rebuilt, so it is removed before 000023 is.
+        $deliveryResume->down();
+        $exceptionOperations->down();
+        $delivery->down();
+        $fulfillmentActivations->down();
+        $contracts->down();
+        $migration->down();
+        foreach ($this->finalizationSchemaTables() as $table) {
+            $this->assertFalse(Schema::hasTable($table));
+        }
+        foreach (['inventory_reservations', 'promotion_uses'] as $table) {
+            $this->assertFalse(Schema::hasColumn($table, 'consumed_at'));
+        }
+        $migration->up();
+        $contracts->up();
+        $fulfillmentActivations->up();
+        $delivery->up();
+        $deliveryResume->up();
+        $exceptionOperations->up();
         $financialObservations->up();
         $unpaidRelease->up();
         $refundResolution->up();
+        (require database_path('migrations/2026_11_11_001000_test_unsent_order_releases.php'))->up();
+        (require database_path('migrations/2026_11_12_001000_test_buyer_order_cancellations.php'))->up();
         $purchaseClaims->up();
         $notices->up();
-        foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) { $this->assertDatabaseCount($table, 0); }
+        TransactionalMailFixtures::restoreDeliveries();
+        $refundDispute->up();
+        foreach (['test_payment_exception_events', 'test_payment_exception_work'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
         $this->assertSame($before, $this->finalizationSchemaRows($tables));
-        foreach ($this->finalizationSchemaTables() as $table) { $this->assertDatabaseCount($table, 0); }
+        foreach ($this->finalizationSchemaTables() as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
         $this->assertSame('pending', DB::table('inventory_reservations')->where('id', $f['attempt']->inventory_reservation_id)->value('state'));
     }
 
@@ -81,8 +118,12 @@ class TestOrderFinalizationMigrationTest extends TestCase
         $tables = [...$this->finalizationSchemaTables(), 'inventory_reservations', 'promotion_uses'];
         $before = $this->finalizationSchemaRows($tables);
         $migration = require database_path('migrations/2026_09_26_000020_test_order_finalization.php');
-        try { $migration->down(); $this->fail('Populated finalization rollback was accepted.'); }
-        catch (LogicException $error) { $this->assertStringContainsString('retained', $error->getMessage()); }
+        try {
+            $migration->down();
+            $this->fail('Populated finalization rollback was accepted.');
+        } catch (LogicException $error) {
+            $this->assertStringContainsString('retained', $error->getMessage());
+        }
         $this->assertSame($before, $this->finalizationSchemaRows($tables));
         $this->finalizationSchemaRejected(fn () => DB::table('order_finalizations')->where('id', $f['finalization']->id)->delete());
     }
@@ -97,7 +138,8 @@ class TestOrderFinalizationMigrationTest extends TestCase
     {
         $f = $this->finalizationSchemaGraph();
         foreach (['finalization', 'grant', 'entitlement', 'outbox', 'sale'] as $key) {
-            $model = $f[$key]; $before = $model->refresh()->getAttributes();
+            $model = $f[$key];
+            $before = $model->refresh()->getAttributes();
             $change = $key === 'finalization' ? ['finalized_at' => now()->addSecond()] : ['created_at' => now()->addSecond()];
             try {
                 match ($operation) {
@@ -143,7 +185,8 @@ class TestOrderFinalizationMigrationTest extends TestCase
 
     public function test_finalization_rejects_incoherent_payment_attempt_time_mode_policy_and_reason(): void
     {
-        $a = $this->finalizationSchemaFixture(); $b = $this->finalizationSchemaFixture();
+        $a = $this->finalizationSchemaFixture();
+        $b = $this->finalizationSchemaFixture();
         $valid = $this->finalizationSchemaAttributes($a);
         foreach ([['order_id' => $b['order']->id], ['verified_payment_id' => $b['payment']->id],
             ['order_attempt_id' => $b['attempt']->id], ['mode' => 'live'], ['mode' => 'TEST'],
@@ -187,12 +230,15 @@ class TestOrderFinalizationMigrationTest extends TestCase
         $this->assertSame('pending', DB::table('inventory_reservations')->where('id', $f['attempt']->inventory_reservation_id)->value('state'));
         $this->finalizationSchemaRejected(fn () => DB::table('inventory_reservations')->where('id', $f['attempt']->inventory_reservation_id)
             ->update(['state' => 'consumed', 'consumed_at' => $finalization->finalized_at]));
-        foreach (['license_grants', 'pending_entitlements', 'exclusive_sales'] as $table) { $this->assertDatabaseCount($table, 0); }
+        foreach (['license_grants', 'pending_entitlements', 'exclusive_sales'] as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
     }
 
     public function test_grants_cannot_mix_orders_revisions_licenses_or_scopes(): void
     {
-        $a = $this->finalizationSchemaFixture(); $b = $this->finalizationSchemaFixture();
+        $a = $this->finalizationSchemaFixture();
+        $b = $this->finalizationSchemaFixture();
         $finalization = OrderFinalization::create($this->finalizationSchemaAttributes($a));
         $attributes = $this->finalizationSchemaGrantAttributes($a, $finalization);
         foreach ([['order_line_id' => $b['order']->lines()->sole()->id], ['offer_revision_id' => $b['revision']->id],
@@ -230,7 +276,8 @@ class TestOrderFinalizationMigrationTest extends TestCase
 
     public function test_outbox_rejects_private_or_extra_payload_fields_and_incoherent_effect_bindings(): void
     {
-        $f = $this->finalizationSchemaFixture(); $other = $this->finalizationSchemaFixture();
+        $f = $this->finalizationSchemaFixture();
+        $other = $this->finalizationSchemaFixture();
         $finalization = OrderFinalization::create($this->finalizationSchemaAttributes($f));
         $otherFinalization = OrderFinalization::create($this->finalizationSchemaAttributes($other));
         $grant = LicenseGrant::create($this->finalizationSchemaGrantAttributes($f, $finalization));
@@ -254,14 +301,16 @@ class TestOrderFinalizationMigrationTest extends TestCase
 
     public function test_resource_consumption_requires_matching_paid_attempt_and_preserves_original_binding(): void
     {
-        $f = $this->finalizationSchemaFixture(promoted: true); $other = $this->finalizationSchemaFixture();
+        $f = $this->finalizationSchemaFixture(promoted: true);
+        $other = $this->finalizationSchemaFixture();
         foreach (['inventory_reservations' => 'inventory_reservation_id', 'promotion_uses' => 'promotion_use_id'] as $table => $field) {
             $this->finalizationSchemaRejected(fn () => DB::table($table)->where('id', $f['attempt']->{$field})
                 ->update(['state' => 'consumed', 'consumed_at' => now()]));
         }
         $finalization = OrderFinalization::create($this->finalizationSchemaAttributes($f));
         foreach (['inventory_reservations' => 'inventory_reservation_id', 'promotion_uses' => 'promotion_use_id'] as $table => $field) {
-            $id = $f['attempt']->{$field}; $before = (array) DB::table($table)->where('id', $id)->sole();
+            $id = $f['attempt']->{$field};
+            $before = (array) DB::table($table)->where('id', $id)->sole();
             foreach ([['consumed_at' => null], ['consumed_at' => now()->addSecond()], ['attempt_id' => $other['attempt']->public_id],
                 ['pending_at' => now()->addSecond()], ['expires_at' => now()->addHours(2)], ['state' => 'released'],
                 ['state' => 'CONSUMED'], ['attempt_id' => strtoupper($f['attempt']->public_id)]] as $invalid) {
@@ -288,8 +337,11 @@ class TestOrderFinalizationMigrationTest extends TestCase
     {
         foreach (['order_finalizations' => 3, 'license_grants' => 5, 'pending_entitlements' => 2,
             'fulfillment_outbox' => 2, 'exclusive_sales' => 4] as $table => $count) {
-            $keys = Schema::getForeignKeys($table); $this->assertCount($count, $keys);
-            foreach ($keys as $key) { $this->assertContains(strtolower($key['on_delete']), ['restrict', 'no action']); }
+            $keys = Schema::getForeignKeys($table);
+            $this->assertCount($count, $keys);
+            foreach ($keys as $key) {
+                $this->assertContains(strtolower($key['on_delete']), ['restrict', 'no action']);
+            }
         }
         foreach (['order_finalizations' => [['order_id'], ['verified_payment_id'], ['order_attempt_id'], ['public_id']],
             'license_grants' => [['order_line_id'], ['public_id']],
@@ -308,7 +360,9 @@ class TestOrderFinalizationMigrationTest extends TestCase
 
     private function finalizationSchemaFixture(bool $exclusive = false, bool $promoted = false, int $confirmedOffset = 0): array
     {
-        $f = F::prepared($exclusive, $promoted); $order = $f['order']; $attempt = $order->attempt()->sole();
+        $f = F::prepared($exclusive, $promoted);
+        $order = $f['order'];
+        $attempt = $order->attempt()->sole();
         $private = $this->finalizationSchemaPrivate();
         $intent = CheckoutIntent::create(['public_id' => (string) Str::uuid(), 'order_id' => $order->id,
             'order_attempt_id' => $attempt->id, 'account_id' => F::ACCOUNT, 'mode' => 'test', 'idempotency_key' => 'Request-'.$order->public_id,
@@ -392,14 +446,20 @@ class TestOrderFinalizationMigrationTest extends TestCase
     private function finalizationSchemaRows(array $tables): array
     {
         $rows = [];
-        foreach ($tables as $table) { $rows[$table] = DB::table($table)->orderBy('id')->get()->map(fn ($row) => (array) $row)->all(); }
+        foreach ($tables as $table) {
+            $rows[$table] = DB::table($table)->orderBy('id')->get()->map(fn ($row) => (array) $row)->all();
+        }
 
         return $rows;
     }
 
     private function finalizationSchemaRejected(callable $operation): void
     {
-        try { $operation(); $this->fail('Contradictory finalization storage was accepted.'); }
-        catch (QueryException $error) { $this->assertNotSame('', $error->getMessage()); }
+        try {
+            $operation();
+            $this->fail('Contradictory finalization storage was accepted.');
+        } catch (QueryException $error) {
+            $this->assertNotSame('', $error->getMessage());
+        }
     }
 }

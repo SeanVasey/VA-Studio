@@ -1,0 +1,66 @@
+{
+  "base": "45d1299406821627f4ba02af186e324a70c6ade0",
+  "cwd": "/workspace/VA-Studio-billing-retrieval-hints",
+  "source_before": {
+    "app/Domain/Memberships/Billing/BillingWebhookIntake.php": "3b4569abfb72a0aefa56c6326f1cd6905bf72c7458b8de626b2c027848a880ec",
+    "app/Domain/Memberships/Billing/BillingHintRecovery.php": "093e631ad358ccfc72353ee602d6c7b6dbfe6198498a55fbb6128dc7582cd37a",
+    "tests/Feature/ProductionMembershipBilling/BillingHintRetrievalUpgradeTest.php": "724a413df0d216c1712856d59d74d76fd83e25cbd4981afd74227880dafc834f"
+  },
+  "results": [
+    {
+      "argv": [
+        "php",
+        "-l",
+        "app/Domain/Memberships/Billing/BillingWebhookIntake.php"
+      ],
+      "exit": 0,
+      "log": "static-0.log"
+    },
+    {
+      "argv": [
+        "php",
+        "-l",
+        "app/Domain/Memberships/Billing/BillingHintRecovery.php"
+      ],
+      "exit": 0,
+      "log": "static-1.log"
+    },
+    {
+      "argv": [
+        "php",
+        "-l",
+        "tests/Feature/ProductionMembershipBilling/BillingHintRetrievalUpgradeTest.php"
+      ],
+      "exit": 0,
+      "log": "static-2.log"
+    },
+    {
+      "argv": [
+        "php",
+        "/workspace/VA-Studio-membership-reservations/vendor/bin/pint",
+        "--test",
+        "app/Domain/Memberships/Billing/BillingWebhookIntake.php",
+        "app/Domain/Memberships/Billing/BillingHintRecovery.php",
+        "tests/Feature/ProductionMembershipBilling/BillingHintRetrievalUpgradeTest.php"
+      ],
+      "exit": 0,
+      "log": "static-3.log"
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "log": "static-4.log"
+    }
+  ],
+  "untested": "No test body or database command has run in this lane; coherent schema/record dependencies pending.",
+  "source_after": {
+    "app/Domain/Memberships/Billing/BillingWebhookIntake.php": "3b4569abfb72a0aefa56c6326f1cd6905bf72c7458b8de626b2c027848a880ec",
+    "app/Domain/Memberships/Billing/BillingHintRecovery.php": "093e631ad358ccfc72353ee602d6c7b6dbfe6198498a55fbb6128dc7582cd37a",
+    "tests/Feature/ProductionMembershipBilling/BillingHintRetrievalUpgradeTest.php": "724a413df0d216c1712856d59d74d76fd83e25cbd4981afd74227880dafc834f"
+  },
+  "source_unchanged": true
+}

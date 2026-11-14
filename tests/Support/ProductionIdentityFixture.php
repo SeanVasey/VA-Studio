@@ -24,7 +24,9 @@ trait ProductionIdentityFixture
         $isolatedNative = getenv('VA_IDENTITY_ISOLATED_NATIVE') === '1' && app()->environment('testing')
             && DB::getDriverName() === 'mysql' && DB::connection()->getDatabaseName() === 'vaseyaudio_production_identity';
         if (! $isolatedNative || ! $nativePrepared) {
-            $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0);
+            // On MySQL an unchanged migrated schema is reset instead of rebuilt (MysqlSchemaSnapshot).
+            MysqlSchemaSnapshot::migrateFresh(DB::connection(), ['--force' => true],
+                fn () => $this->artisan('migrate:fresh', ['--force' => true])->assertExitCode(0)->run());
             $nativePrepared = true;
         } else {
             $pdo = DB::connection()->getPdo();

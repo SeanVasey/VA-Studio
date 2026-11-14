@@ -21,13 +21,13 @@ class SiteReleasePreviewController extends Controller
         $content = app(SiteContent::class)->preview($release->id, $request->user());
         $base = route('filament.admin.site-releases.preview', $release, false);
         if ($section !== null) {
-            $page = app(EditorialContent::class)->page($content, $section, $slug, false);
+            $page = app(EditorialContent::class)->page($content, $section, $slug, false, true);
             abort_if($page === null, 404);
             $metadata = app(StorefrontMetadata::class)->forEditorial($page, app(SiteImagePresentation::class)->share($content, true));
             $metadata['robots'] = 'noindex, nofollow';
 
             return SitePreviewPrivacy::protect(Inertia::render('Editorial', [
-                'siteContent' => app(EditorialContent::class)->chrome($content), 'editorial' => $page,
+                'siteContent' => app(EditorialContent::class)->chrome($content, families: false), 'editorial' => $page,
                 'sitePreview' => true, 'sitePreviewBase' => $base, 'metadata' => $metadata,
                 'commerceEnabled' => false, 'testOrderPreparationEnabled' => false, 'testCheckoutEnabled' => false,
             ])->withViewData(['metadata' => $metadata])->toResponse($request));
@@ -37,7 +37,7 @@ class SiteReleasePreviewController extends Controller
         $metadata['robots'] = 'noindex, nofollow';
 
         return SitePreviewPrivacy::protect(Inertia::render('Storefront', app(PublicCatalog::class)->page($request) + [
-            'siteContent' => app(EditorialContent::class)->chrome($content), 'siteImages' => $images->storefront($content, true),
+            'siteContent' => app(EditorialContent::class)->chrome($content, families: false), 'siteImages' => $images->storefront($content, true),
             'sitePreview' => true, 'sitePreviewBase' => $base, 'selectedTrack' => null,
             'commerceEnabled' => false, 'testOrderPreparationEnabled' => false, 'testCheckoutEnabled' => false,
             'metadata' => $metadata,

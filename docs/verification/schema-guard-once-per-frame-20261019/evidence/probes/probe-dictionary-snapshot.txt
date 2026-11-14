@@ -1,0 +1,4 @@
+first: consistent read of a user table              {"I_S.VIEWS":0,"I_S.TABLES(view)":0,"I_S.TABLES(table)":0,"I_S.TRIGGERS":0,"SHOW CREATE TABLE t_new":1,"SHOW CREATE VIEW v_new":1,"SHOW CREATE TRIGGER trg_new":1}
+first: information_schema read only                 {"I_S.VIEWS":0,"I_S.TABLES(view)":0,"I_S.TABLES(table)":0,"I_S.TRIGGERS":0,"SHOW CREATE TABLE t_new":1,"SHOW CREATE VIEW v_new":1,"SHOW CREATE TRIGGER trg_new":1}
+first: nothing (BEGIN only)                         {"I_S.VIEWS":1,"I_S.TABLES(view)":1,"I_S.TABLES(table)":1,"I_S.TRIGGERS":1,"SHOW CREATE TABLE t_new":1,"SHOW CREATE VIEW v_new":1,"SHOW CREATE TRIGGER trg_new":1}
+first: START TRANSACTION WITH CONSISTENT SNAPSHOT   {"I_S.VIEWS":0,"I_S.TABLES(view)":0,"I_S.TABLES(table)":0,"I_S.TRIGGERS":0,"SHOW CREATE TABLE t_new":1,"SHOW CREATE VIEW v_new":1,"SHOW CREATE TRIGGER trg_new":1}

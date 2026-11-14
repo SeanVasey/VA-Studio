@@ -1,0 +1,20 @@
+{
+  "scope": "Final evidence-only check against all 484 staged packet-owned files, including explicitly staged public .log receipts. Verbatim archived patches and the log quoting their warnings are excluded; their exact hashes are independently checked.",
+  "argv": [
+    "git",
+    "diff",
+    "--cached",
+    "--check",
+    "--",
+    ".",
+    ":(exclude)docs/verification/billing-retrieval-20261013/evidence/consumer/terminal-omission.overlay.patch",
+    ":(exclude)docs/verification/billing-retrieval-20261013/evidence/consumer/unit.overlay.patch",
+    ":(exclude)docs/verification/billing-retrieval-20261013/evidence/fixture/cursor.patch",
+    ":(exclude)docs/verification/billing-retrieval-20261013/evidence/fixture/schema-preparation.patch",
+    ":(exclude)docs/verification/billing-retrieval-20261013/evidence/fixture/static-v2.patch",
+    ":(exclude)docs/verification/billing-retrieval-20261013/evidence/fixture/static.patch",
+    ":(exclude)docs/verification/billing-retrieval-20261013/evidence/quality/pint-v2/source-delta.patch",
+    ":(exclude)docs/verification/billing-retrieval-20261013/evidence/assembly-whitespace-initial.log"
+  ],
+  "exit": 0
+}

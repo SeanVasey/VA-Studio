@@ -1,0 +1,28 @@
+Working directory: /workspace/VA-Studio-membership-award
+Source HEAD during discovery: 3d2197c09779327984af93e05b1e1a22e920e0a9
+The three reviewed JSON manifests were edited but uncommitted during discovery. Exact resulting policy hashes are retained in selection-summary.json and selection-native-manifest.json. The workflow census comment was updated from actual discovery afterwards. No application/test-source edits were made by this selection task.
+
+python3 scripts/ci/test-focused-tests.py
+Observed exit 0: 50 tests, OK. Full output: selection-focused.txt.
+
+python3 scripts/ci/test-phpunit-shards.py
+Observed exit 0: 52 tests, OK. Full output: selection-shards.txt.
+
+source /workspace/.va-studio-toolchain/activate.sh
+TMPDIR=/tmp/va-studio-membership-policy-20261013 APP_ENV=testing APP_DEBUG=false DB_CONNECTION=mysql DB_DATABASE=selection_discovery_only DB_URL= DB_SOCKET= CACHE_STORE=array SESSION_DRIVER=array QUEUE_CONNECTION=sync python3 scripts/ci/phpunit-shards.py --shards 8 --prefix phpunit-ci-mysql --mysql-native-selection --timings scripts/ci/phpunit-timings-mysql.json
+Observed exit 0. This invokes PHPUnit --list-tests-xml, never executes functional tests or a database migration.
+Proved 1921 selected MySQL-native expanded cases in 178 files, from 7891 discovered cases in 575 files, across 8 nonempty local discovery shards. All selected expanded cases/files/groups appear exactly once. Hosted workflow remains 24 shards. Fifteen untimed files use existing fallback weights; no timings fabricated or regenerated.
+Generated configurations, source listing and eight shard listings were moved from repository root to selection-census-files/. Original manifest additionally retained as selection-native-manifest.json.
+
+Explicit source-list validation with phpunit-shards.py read_inventory/read_selection/select_native:
+BillingAwardFenceDefinitionTest 2 cases, automatically selected through SQLite skip census.
+BillingAwardFenceTest 7 cases, explicit include; one declared SQLite-only method.
+BillingSubscriptionApprovalTest 11 cases, explicit include; one declared SQLite-only method.
+MembershipFirstAwardTest 9 cases, explicit include.
+MembershipNativeAwardRaceTest 3 cases, automatically selected through SQLite skip census.
+MembershipPaidInvoiceProofTest 8 cases, explicit include.
+Forty new selected expanded cases across six files, no duplicate explicit inclusions for the two native-only files. New membership-award-race-worker.php is included in the reviewed driver-branching helper census.
+Resulting reviewed skip inventories: 16 MySQL-skip methods, 225 SQLite-skip methods. These are policy/discovery counts, not claims that tests were executed or skipped locally.
+
+git diff --check -- scripts/ci/database-mysql-selection.json scripts/ci/database-mysql-skips.json scripts/ci/database-sqlite-skips.json .github/workflows/final-verification.yml
+Observed exit 0. The workflow change is only the census comment. No triggers, cost policy or hosted checks changed. No commits, pushes or hosted CI dispatches performed.

@@ -12,14 +12,16 @@ use App\Support\PhpCliProcess;
 use Closure;
 use Illuminate\Support\Facades\DB;
 use ReflectionProperty;
+use Symfony\Component\Process\Process;
+use Tests\Support\OpenBasedirProbe;
 use Tests\Support\PhpCliWrapperFixture;
 use Tests\Support\ProductionFreeGrantFixtures;
 use Tests\TestCase;
 
 /**
- * M-16 for family 256. Nothing ships binding this family (ProductionFreeGrantApprovalTest), so the container builds its
- * renderer plainly even outside the CLI. The step that composes and mounts the family adds the PhpCliProcess binding;
- * these tests bind it the same way to prove the pinned renderer's child then runs the validated CLI binary.
+ * M-16 for family 256. The step that mounts the family's HTTP (D1) binds its renderer like the other grant families: the
+ * container builds it plainly in the CLI and with the PhpCliProcess factory outside it. These tests also bind it
+ * explicitly to prove the pinned renderer's child then runs the validated CLI binary.
  */
 final class ProductionFreeGrantCliRendererTest extends TestCase
 {
@@ -32,11 +34,11 @@ final class ProductionFreeGrantCliRendererTest extends TestCase
         $this->freeSetup();
     }
 
-    public function test_the_shipped_container_never_binds_the_family_256_renderer(): void
+    public function test_the_shipped_container_binds_the_family_256_renderer_like_the_other_families(): void
     {
         $this->assertNull($this->factoryOf(app(ProductionFreeGrantRendererProcess::class)));
         $this->simulateFpm(PHP_BINARY);
-        $this->assertNull($this->factoryOf(app(ProductionFreeGrantRendererProcess::class)));
+        $this->assertInstanceOf(Closure::class, $this->factoryOf(app(ProductionFreeGrantRendererProcess::class)));
     }
 
     /** What the composition step binds: the same outside-the-CLI factory the shipped families use. */
@@ -67,6 +69,34 @@ final class ProductionFreeGrantCliRendererTest extends TestCase
         $this->assertSame([$wrapper, '-n'], array_slice($render, 0, 2));
         $this->assertSame(base_path('scripts/render-production-free-grant.php'), end($render));
         $this->assertCount(2, $this->wrapperRuns($wrapper));
+    }
+
+    /**
+     * Follow-up of #251: each open_basedir directory ends with the separator and a prefix-sharing sibling is unreadable.
+     * (PHP 8.4 already checks a component boundary, so the entry-format assertion is what pins the separator.)
+     */
+    public function test_the_child_open_basedir_admits_no_prefix_sharing_sibling_and_still_renders(): void
+    {
+        $origin = $this->origin();
+        $probe = $workspace = null;
+        // A plain closure: an arrow function would capture copies of the probe variables.
+        $this->app->instance(ProductionFreeGrantRendererProcess::class, new ProductionFreeGrantRendererProcess(
+            function (array $command, string $cwd, array $environment, string $payload) use (&$probe, &$workspace): Process {
+                $workspace = $environment['TMPDIR'];
+                $probe = OpenBasedirProbe::run($command, $cwd, $environment, $payload);
+
+                return new Process($command, $cwd, $environment, $payload, 60);
+            }));
+        (new ProductionFreeGrantDocuments)->render($origin['id']);
+        $original = (array) DB::table('production_free_originals')->sole();
+        $bytes = file_get_contents($this->privateRoot.'/'.ProductionFreeGrantFiles::path($origin['id'], $original['claim_id']));
+        $this->assertStringStartsWith('%PDF-1.', $bytes);
+        $this->assertSame([false, true, true], [$probe['sibling_read'], $probe['workspace_list'], $probe['app_read']]);
+        $entries = explode(PATH_SEPARATOR, $probe['basedir']);
+        $this->assertSame([base_path().'/', $workspace.'/'], array_slice($entries, 0, 2));
+        foreach ($entries as $entry) {
+            $this->assertStringEndsWith('/', $entry);
+        }
     }
 
     public function test_outside_the_cli_without_a_configured_cli_the_render_fails_closed(): void

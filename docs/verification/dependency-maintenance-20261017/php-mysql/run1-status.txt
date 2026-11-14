@@ -1,0 +1,1 @@
+mysql exit 2 seconds 3486

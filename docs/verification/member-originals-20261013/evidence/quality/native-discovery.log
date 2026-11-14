@@ -1,0 +1,26 @@
+warning: 47 test file(s) have no entry in scripts/ci/phpunit-timings-mysql.json and use the fallback weight; refresh it with scripts/ci/phpunit-timings.py: tests/Feature/PersistentCatalogDraftImportTest.php, tests/Feature/ProductionMemberOriginals/MemberGrantDefinitionsTest.php, tests/Feature/ProductionMemberOriginals/MemberGrantFactsCallbackClosureTest.php, tests/Feature/ProductionMemberOriginals/MemberGrantFactsTest.php, tests/Feature/ProductionMemberOriginals/MemberGrantNativeCurrentSchemaTest.php, ...
+Proved 2143 selected MySQL-native tests in 210 files (of 8475 discovered tests in 625 files) across 24 nonempty shards.
+Shard 1: 85 tests; 1 complete files; estimated 122m 57s.
+Shard 2: 92 tests; 9 complete files; estimated 106m 44s.
+Shard 3: 95 tests; 8 complete files; estimated 106m 44s.
+Shard 4: 85 tests; 7 complete files; estimated 106m 46s.
+Shard 5: 84 tests; 8 complete files; estimated 107m 01s.
+Shard 6: 87 tests; 9 complete files; estimated 106m 44s.
+Shard 7: 86 tests; 8 complete files; estimated 106m 44s.
+Shard 8: 82 tests; 8 complete files; estimated 106m 46s.
+Shard 9: 91 tests; 8 complete files; estimated 106m 50s.
+Shard 10: 84 tests; 8 complete files; estimated 106m 45s.
+Shard 11: 86 tests; 9 complete files; estimated 106m 56s.
+Shard 12: 75 tests; 9 complete files; estimated 106m 46s.
+Shard 13: 105 tests; 12 complete files; estimated 106m 44s.
+Shard 14: 104 tests; 10 complete files; estimated 107m 08s.
+Shard 15: 106 tests; 9 complete files; estimated 106m 51s.
+Shard 16: 86 tests; 9 complete files; estimated 106m 49s.
+Shard 17: 89 tests; 9 complete files; estimated 106m 50s.
+Shard 18: 80 tests; 9 complete files; estimated 106m 47s.
+Shard 19: 77 tests; 9 complete files; estimated 106m 48s.
+Shard 20: 115 tests; 9 complete files; estimated 106m 46s.
+Shard 21: 86 tests; 9 complete files; estimated 106m 47s.
+Shard 22: 79 tests; 10 complete files; estimated 107m 07s.
+Shard 23: 88 tests; 14 complete files; estimated 106m 44s.
+Shard 24: 96 tests; 9 complete files; estimated 106m 48s.

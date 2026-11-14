@@ -2,6 +2,7 @@
 
 namespace App\Domain\Delivery;
 
+use App\Domain\Commerce\RefundDispute\RefundDisputeAccess;
 use App\Domain\Delivery\Models\TestDeliveryAuthorization;
 use App\Domain\Delivery\Models\TestDeliveryControl;
 use App\Domain\Delivery\Models\TestFulfillmentActivation;
@@ -70,6 +71,8 @@ final class ReadTestOwnerDelivery
             try {
                 $evidence->control($source, $control);
                 $policy->current();
+                // An order-wide refund/dispute hold makes the order unavailable; per-grant holds are enforced at issuance.
+                if (RefundDisputeAccess::heldGrantIds($order->id)['order']) { throw new DeliveryException('blocked'); }
                 $result['status'] = 'available';
             } catch (DeliveryException $error) {
                 if (! in_array($error->reason, ['blocked', 'unavailable'], true)) { throw $error; }

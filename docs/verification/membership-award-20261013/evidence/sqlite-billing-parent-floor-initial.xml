@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="3" assertions="12" errors="1" failures="0" skipped="0" time="4.875992">
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingParentFloorCompatibilityTest" file="/workspace/runtime/membership-award-evidence/BillingParentFloorCompatibilityTest.php" tests="2" assertions="4" errors="1" failures="0" skipped="0" time="3.265314">
+      <testcase name="test_missing_identity_guard_retains_the_billing_parent_floor_refusal_without_repair" file="/workspace/runtime/membership-award-evidence/BillingParentFloorCompatibilityTest.php" line="18" class="Tests\Feature\ProductionMembershipBilling\BillingParentFloorCompatibilityTest" classname="Tests.Feature.ProductionMembershipBilling.BillingParentFloorCompatibilityTest" assertions="1" time="1.787063">
+        <error type="LogicException">Tests\Feature\ProductionMembershipBilling\BillingParentFloorCompatibilityTest::test_missing_identity_guard_retains_the_billing_parent_floor_refusal_without_repair
+LogicException: Unexpected production identity schema or retained evidence; refused before DDL.
+
+/workspace/VA-Studio-membership-award/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:627
+/workspace/VA-Studio-membership-award/app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php:218
+/workspace/VA-Studio-membership-award/app/Domain/Memberships/Production/MembershipSchema.php:35
+/workspace/VA-Studio-membership-award/app/Domain/Memberships/Production/MembershipSchema.php:27
+/workspace/VA-Studio-membership-award/app/Domain/Memberships/Billing/BillingSchema.php:76
+/workspace/VA-Studio-membership-award/app/Domain/Memberships/Billing/BillingSchema.php:63
+/workspace/runtime/membership-award-evidence/BillingParentFloorCompatibilityTest.php:25
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+      <testcase name="test_an_unrelated_membership_refusal_keeps_its_class_and_reason" file="/workspace/runtime/membership-award-evidence/BillingParentFloorCompatibilityTest.php" line="34" class="Tests\Feature\ProductionMembershipBilling\BillingParentFloorCompatibilityTest" classname="Tests.Feature.ProductionMembershipBilling.BillingParentFloorCompatibilityTest" assertions="3" time="1.478251"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php" tests="1" assertions="8" errors="0" failures="0" skipped="0" time="1.610678">
+      <testcase name="test_fresh_schema_is_owned_without_identity_child_dependencies_and_retry_is_idempotent" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php" line="24" class="Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest" classname="Tests.Feature.ProductionMembershipBilling.BillingSchemaPreparationTest" assertions="8" time="1.610678"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

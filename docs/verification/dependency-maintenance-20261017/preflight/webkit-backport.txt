@@ -1,0 +1,47 @@
+## node --test scripts/ci/apply-playwright-webkit-offline-backport.test.mjs
+✔ exact upstream two-line patch produces only the known patched full SDK bytes (100.840669ms)
+✔ idempotence accepts only the exact known patched digest without another write (77.092113ms)
+▶ every installed and lockfile SDK version is pinned before any mutation
+  ✔ project  (17.964552ms)
+  ✔ lock-root  (20.323691ms)
+  ✔ installed @playwright/test (20.4778ms)
+  ✔ lock-package @playwright/test (12.287054ms)
+  ✔ installed playwright (14.541183ms)
+  ✔ lock-package playwright (13.944792ms)
+  ✔ installed playwright-core (13.875989ms)
+  ✔ lock-package playwright-core (9.1347ms)
+  ✔ test-dependency  (9.202212ms)
+  ✔ core-dependency  (8.324057ms)
+✔ every installed and lockfile SDK version is pinned before any mutation (144.026965ms)
+▶ unknown bytes, duplicated old snippet and a partial patch are refused unchanged
+  ✔ unrelated appended bytes (15.731944ms)
+  ✔ duplicate old snippet (18.361744ms)
+  ✔ condition-only partial patch (15.707721ms)
+  ✔ truncated SDK (18.935036ms)
+✔ unknown bytes, duplicated old snippet and a partial patch are refused unchanged (89.088038ms)
+▶ shared node_modules, SDK directories, bundle and SDK CLI symlinks are refused
+  ✔ node_modules (17.356048ms)
+  ✔ node_modules/playwright-core (25.738564ms)
+  ✔ node_modules/playwright-core/lib (12.312164ms)
+  ✔ node_modules/playwright-core/lib/coreBundle.js (13.336723ms)
+  ✔ node_modules/@playwright/test/cli.js (14.375884ms)
+✔ shared node_modules, SDK directories, bundle and SDK CLI symlinks are refused (84.003857ms)
+✔ atomic replacement leaves a hard-linked external stock bundle untouched (38.138239ms)
+▶ malformed or missing identity files fail closed
+  ✔ package.json malformed (14.285484ms)
+  ✔ package-lock.json missing (12.016279ms)
+  ✔ node_modules/playwright-core/package.json malformed (7.344578ms)
+  ✔ node_modules/playwright/package.json missing (7.501729ms)
+✔ malformed or missing identity files fail closed (42.046987ms)
+✔ standalone CLI emits only a public pinned receipt and refuses all arguments (172.70283ms)
+✔ actual ordinary wrapper refuses unexpected SDK before PHP or private fixture setup (102.653024ms)
+✔ copied fixture tests never mutate their installed SDK source (5.885447ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1027.200958
+exit 0

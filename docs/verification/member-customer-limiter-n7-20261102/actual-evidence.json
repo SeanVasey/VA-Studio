@@ -1,0 +1,759 @@
+{
+  "status": "FOCUSED_EVIDENCE_COMPLETE; final independent actual-evidence/head review pending",
+  "tested_source_sha": "fbb802782c51c790fb4dcfcbb9f052fd9d9dfced",
+  "main_base_sha": "a7bc63cc5c5785353f13e882f49d0ab9dcff55b3",
+  "sqlite_carry": {
+    "source_sha": "25e5a7c2e77d50645f457b63c90b2c0337b12613",
+    "total_tests": 46,
+    "total_assertions": 2045,
+    "source_carry": "Exact product/controller/HTTP/worker and main regression consumers unchanged at fbb; not46 new executions on fbb",
+    "selections": [
+      {
+        "evidence_id": "sqlite-limiter-25e5-first",
+        "source_sha": "25e5a7c2e77d50645f457b63c90b2c0337b12613",
+        "selection": "limiter",
+        "counts": {
+          "tests": 6,
+          "assertions": 437,
+          "errors": 0,
+          "failures": 0,
+          "skips": 0
+        },
+        "phpunit_seconds": 80.290101,
+        "outer_seconds": 80.70963031700012,
+        "outer_exit": 0,
+        "timeout": false,
+        "source_prepost_clean_equal": true,
+        "own_process_completed_and_absent": true,
+        "artifacts_sha256": {
+          "junit.xml": "7b503dce404dbc6052023c99016323664d6641fe559d618d61165595c153f359",
+          "command.json": "76d79051ed6984880c15ae4db7ec3c571ca9f0279647bb4839cc86a67899973d",
+          "before.json": "0ddafdb947a6b13b776b4dd016ceb2cf5688a41e7e5cf941385a90661ecd16c5",
+          "after.json": "0ddafdb947a6b13b776b4dd016ceb2cf5688a41e7e5cf941385a90661ecd16c5"
+        }
+      },
+      {
+        "evidence_id": "sqlite-http-25e5-first",
+        "source_sha": "25e5a7c2e77d50645f457b63c90b2c0337b12613",
+        "selection": "main-http",
+        "counts": {
+          "tests": 6,
+          "assertions": 516,
+          "errors": 0,
+          "failures": 0,
+          "skips": 0
+        },
+        "phpunit_seconds": 80.62263,
+        "outer_seconds": 80.9681341659998,
+        "outer_exit": 0,
+        "timeout": false,
+        "source_prepost_clean_equal": true,
+        "own_process_completed_and_absent": true,
+        "artifacts_sha256": {
+          "junit.xml": "6de10a5a590a6c0429e70547955266cdb35b21666c2aa89af9c7dd7f8d2b4cc9",
+          "command.json": "7482619bb45bad525eb7cc39a6085e6c02d5a24fa5dbb8bd25ac3cd23269d984",
+          "before.json": "0ddafdb947a6b13b776b4dd016ceb2cf5688a41e7e5cf941385a90661ecd16c5",
+          "after.json": "0ddafdb947a6b13b776b4dd016ceb2cf5688a41e7e5cf941385a90661ecd16c5"
+        }
+      },
+      {
+        "evidence_id": "sqlite-mount-25e5-first",
+        "source_sha": "25e5a7c2e77d50645f457b63c90b2c0337b12613",
+        "selection": "main-mount",
+        "counts": {
+          "tests": 34,
+          "assertions": 1092,
+          "errors": 0,
+          "failures": 0,
+          "skips": 0
+        },
+        "phpunit_seconds": 0.931169,
+        "outer_seconds": 1.2620687379967421,
+        "outer_exit": 0,
+        "timeout": false,
+        "source_prepost_clean_equal": true,
+        "own_process_completed_and_absent": true,
+        "artifacts_sha256": {
+          "junit.xml": "943d61764cde564eb121ce22cb49924693126856c7cf1a73d66cf0619ea4b918",
+          "command.json": "530b94cb907f6e54dca2a3970e4ec8a0db4d1e1848b46a42a1261f4fe8baf1e3",
+          "before.json": "0ddafdb947a6b13b776b4dd016ceb2cf5688a41e7e5cf941385a90661ecd16c5",
+          "after.json": "0ddafdb947a6b13b776b4dd016ceb2cf5688a41e7e5cf941385a90661ecd16c5"
+        }
+      }
+    ]
+  },
+  "native_runs": [
+    {
+      "evidence_id": "native-cap-25e5-RUN01",
+      "source_sha": "25e5a7c2e77d50645f457b63c90b2c0337b12613",
+      "result": "FAIL",
+      "counts": {
+        "tests": 1,
+        "assertions": 672,
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0
+      },
+      "phpunit_seconds": 138.869295,
+      "outer_seconds": 139.23480048700003,
+      "outer_exit": 1,
+      "timeout": false,
+      "epoch": {
+        "classification": "ONE_LIVE_60S_EPOCH",
+        "samples": 28,
+        "seconds": 5.203665347,
+        "outcome_counts": {
+          "200": 10,
+          "429": 8,
+          "503": 10
+        }
+      },
+      "body": {
+        "concurrent_outcomes": {
+          "503": 10,
+          "200": 6
+        },
+        "total_admissions": 10,
+        "held_lock_outcomes": [
+          503,
+          503
+        ],
+        "lock_available_after_admissions": true
+      },
+      "worker_observations": [
+        {
+          "worker": 0,
+          "terminal": false,
+          "exit": 0,
+          "running": false,
+          "signaled": null,
+          "signal": null,
+          "observation_error": "Error"
+        },
+        {
+          "worker": 1,
+          "terminal": false,
+          "exit": 0,
+          "running": false,
+          "signaled": null,
+          "signal": null,
+          "observation_error": "Error"
+        },
+        {
+          "worker": 2,
+          "terminal": false,
+          "exit": 0,
+          "running": false,
+          "signaled": null,
+          "signal": null,
+          "observation_error": "Error"
+        },
+        {
+          "worker": 3,
+          "terminal": false,
+          "exit": 0,
+          "running": false,
+          "signaled": null,
+          "signal": null,
+          "observation_error": "Error"
+        }
+      ],
+      "test_process_cleanup_verified": false,
+      "test_cleanup_errors": [
+        {
+          "stage": "worker-terminal-unknown",
+          "worker": 0
+        },
+        {
+          "stage": "worker-terminal-unknown",
+          "worker": 1
+        },
+        {
+          "stage": "worker-terminal-unknown",
+          "worker": 2
+        },
+        {
+          "stage": "worker-terminal-unknown",
+          "worker": 3
+        }
+      ],
+      "external_audit": {
+        "identity_matched": true,
+        "real_peers": 0,
+        "transactions": 0,
+        "data_locks": 0,
+        "data_waits": 0,
+        "pending_mdl": 0,
+        "all_other_mdl_including_null": 0,
+        "php_processes": 0,
+        "source_clean_and_five_hashes_equal": true,
+        "cgroup_caps_unchanged_and_no_oom": true
+      },
+      "artifacts_sha256": {
+        "junit.xml": "7e6d91c20f55bc6a87e29d8f8899b294ecee7b792350447b734fc90e5770e363",
+        "command.json": "e05737661b1679b3ff89407102642853100d0d2ef8b77ae7dee6577ba3e831da",
+        "result.json": "a345ef02c4075223ee312dc8ed691ba04da943af1cca4b6b52970dd866a28ee3",
+        "worker-cleanup.private.json": "b77cf78ba4eb8df48ffef05d3312ade2f636721143dd32ad4817844126962d8d",
+        "external-final-audit.json": "be872a63c617326bd90555ed2d97bcfa7b636349cbbfb4fdd9e48e3d0b33ec16",
+        "verified-summary.json": "905347897274a06da9c6be840b0145aa862931f36130f3b38a702f22437e3863"
+      }
+    },
+    {
+      "evidence_id": "native-cap-fbb-RUN02",
+      "source_sha": "fbb802782c51c790fb4dcfcbb9f052fd9d9dfced",
+      "result": "PASS",
+      "counts": {
+        "tests": 1,
+        "assertions": 724,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0
+      },
+      "phpunit_seconds": 200.183545,
+      "outer_seconds": 200.61620697599938,
+      "outer_exit": 0,
+      "timeout": false,
+      "epoch": {
+        "classification": "ONE_LIVE_60S_EPOCH",
+        "samples": 28,
+        "seconds": 5.359513842,
+        "outcome_counts": {
+          "200": 10,
+          "429": 7,
+          "503": 11
+        }
+      },
+      "body": {
+        "concurrent_outcomes": {
+          "200": 5,
+          "503": 11
+        },
+        "total_admissions": 10,
+        "held_lock_outcomes": [
+          503,
+          503
+        ],
+        "lock_available_after_admissions": true
+      },
+      "worker_observations": [
+        {
+          "worker": 0,
+          "terminal": true,
+          "exit": 0,
+          "running": false,
+          "signaled": false,
+          "signal": null,
+          "observation_error": null
+        },
+        {
+          "worker": 1,
+          "terminal": true,
+          "exit": 0,
+          "running": false,
+          "signaled": false,
+          "signal": null,
+          "observation_error": null
+        },
+        {
+          "worker": 2,
+          "terminal": true,
+          "exit": 0,
+          "running": false,
+          "signaled": false,
+          "signal": null,
+          "observation_error": null
+        },
+        {
+          "worker": 3,
+          "terminal": true,
+          "exit": 0,
+          "running": false,
+          "signaled": false,
+          "signal": null,
+          "observation_error": null
+        }
+      ],
+      "test_process_cleanup_verified": true,
+      "test_cleanup_errors": [],
+      "external_audit": {
+        "identity_matched": true,
+        "real_peers": 0,
+        "transactions": 0,
+        "data_locks": 0,
+        "data_waits": 0,
+        "pending_mdl": 0,
+        "all_other_mdl_including_null": 0,
+        "php_processes": 0,
+        "source_clean_and_five_hashes_equal": true,
+        "cgroup_caps_unchanged_and_no_oom": true
+      },
+      "artifacts_sha256": {
+        "junit.xml": "d36aee79f2a271c40248ccde5ba570a16721bc9a7bc15816743f3f9ee2e617cd",
+        "command.json": "e2d6e20023d3be4ed371497a28880881ed54e632715b09f844178d3a41ef72ba",
+        "result.json": "c8ee2501250c7706381b78f19ac6963db0096a6ed62bc9401224aad47c310f36",
+        "worker-cleanup.private.json": "f2c7c594e4d0518d4d9d2311b75652bd64c96581b8613e104d226949da1ddb4f",
+        "external-final-audit.json": "2ab1da2a34f7fdda8fc0401bf91ef8749c7cf3f5f1cae3518672977ee2c12803",
+        "verified-summary.json": "7aaa5420e290f26ce350ad93bea95b489f603c39293319378f08eae69a9c814e"
+      }
+    }
+  ],
+  "setup_stop": {
+    "evidence_id": "native-cap-25e5-first",
+    "native_invocations": 0,
+    "result": "STOP",
+    "reason": "Original foreground counter included Daemon threads. Later one-shot metadata snapshot: zero real peers/twoDaemon/allrequiredresourcecounts0; original clientIDs absent so no identity/transience inference.",
+    "original_stop_preserved": true,
+    "artifacts_sha256": {
+      "preflight.json": "9cc6cf0d0f18b915493b0dd52b19fdb1d12551faf10fbb2f2acea11f1e8a2365",
+      "STOP.json": "759eeebd33bcb7ba91e20757769621933f6033a4ebcd1711f51b7b02151766f0",
+      "attribution-once.json": "22998fa79a0512edac935f8a7f32411536ca8833070959ce430e786f2effd194"
+    }
+  },
+  "sandbox_baseline": {
+    "source_sha": "fbb802782c51c790fb4dcfcbb9f052fd9d9dfced",
+    "tests": 6,
+    "assertions": 437,
+    "exit": 0,
+    "result": "PASS",
+    "seconds": 77.2100536830003,
+    "source_restored_clean": true,
+    "process_completed": true,
+    "artifacts_sha256": {
+      "receipt.json": "e34d0daa0b52a610d5d177f49254a17ff383dbcbe8a4cf49cd26e3e54ea1d2de",
+      "command.json": "c576905b3e129df3c0f9be6767f8ce5418368bf23da58a02a41e199b399480c7",
+      "junit.xml": "dd4395d66e5621cb7cee635b10cd9f9c0a2246bbf29e41d776f6d40d152cf9bb",
+      "log.private": "d5b7938a0a366b37f7dbad74696a8a5be2d3dd88363de8fd119fdc58c02fa05e",
+      "process-result.json": "597c146220460bfbb99198b4af4f2e7bd0803091f40054bfeb5d5d56b3397132",
+      "before.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883",
+      "after.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883"
+    }
+  },
+  "mutations": {
+    "source_sha": "fbb802782c51c790fb4dcfcbb9f052fd9d9dfced",
+    "runner_sha256": "9d9d508b38baf4f9627042d587bbf9ffa405f6d0c5ffb1ee0d9fc4ed6c50b105",
+    "plans_sha256": "0db0eb45f749fd88b643e69af6357cf36b2d3770fd0418ef4eb44aa1701fbc03",
+    "contract_sha256": "9d6a17f171dad463874b5aa02a1f7749e0f7beb59ec2383f24ca3d62f1764172",
+    "killed": 14,
+    "survived": 0,
+    "unexpected": 0,
+    "scope": "14 selected counterfactual plans, not independent operand kills or exhaustive coverage",
+    "cases": [
+      {
+        "name": "key-ip",
+        "selection": {
+          "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+          "filter": "test_read_bucket_survives_ip_session_and_recovery_changes_and_expires"
+        },
+        "classification": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION",
+        "tests": 1,
+        "assertions": 23,
+        "errors": 0,
+        "failures": 1,
+        "skips": 0,
+        "exit": 1,
+        "seconds": 17.26618505299848,
+        "edit_operands": 1,
+        "composed": false,
+        "restore_verified": true,
+        "process_completed": true,
+        "artifacts_sha256": {
+          "receipt.json": "4236b76b3fa4e2a2486e727558840f427c742c1c8c479212f6022e2b812e1325",
+          "command.json": "a0ed83523dbd994d2492e0a9f6985b554dcad2fe84b37958200332a85cc5c88b",
+          "junit.xml": "e015c348437611ba6ac2219d6bf861ea89062aa7a1005a2fcfc84dade7eac8f5",
+          "log.private": "01f5e30a62fc54d0d1fc347615946e0592f79206e662db15a1f24dd75f2aa4a1",
+          "process-result.json": "ed7821dc1183f50c6d55639f94c56fa622a4834dfb3e0112c953b5fd6a07f4e3",
+          "before.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883",
+          "after.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883"
+        }
+      },
+      {
+        "name": "key-session",
+        "selection": {
+          "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+          "filter": "test_read_bucket_survives_ip_session_and_recovery_changes_and_expires"
+        },
+        "classification": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION",
+        "tests": 1,
+        "assertions": 23,
+        "errors": 0,
+        "failures": 1,
+        "skips": 0,
+        "exit": 1,
+        "seconds": 16.37180288200034,
+        "edit_operands": 1,
+        "composed": false,
+        "restore_verified": true,
+        "process_completed": true,
+        "artifacts_sha256": {
+          "receipt.json": "4614e83cc2479c5b34349bb64fd4e7cd5e80be196bcf5e2a9ea85ee3871eb854",
+          "command.json": "80623c130e821607ff22caeffc364448a134ba06e0a2dd306be1125f9ab715a4",
+          "junit.xml": "ff66a83b2401e4aafc62c34d1bc529bb145583b7b338b6ffaedb48d007b9d2d6",
+          "log.private": "b494ab8159a35b8b7ab6d5521e33d9e01ea03ec1f96c49e36e5ab1b93544e8e9",
+          "process-result.json": "d66719cc9423025e501ad93a264b2c44f25d7de4b304f07b96dae17de9c0198b",
+          "before.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883",
+          "after.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883"
+        }
+      },
+      {
+        "name": "key-access-version",
+        "selection": {
+          "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+          "filter": "test_read_bucket_survives_ip_session_and_recovery_changes_and_expires"
+        },
+        "classification": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION",
+        "tests": 1,
+        "assertions": 61,
+        "errors": 0,
+        "failures": 1,
+        "skips": 0,
+        "exit": 1,
+        "seconds": 17.1128383940013,
+        "edit_operands": 1,
+        "composed": false,
+        "restore_verified": true,
+        "process_completed": true,
+        "artifacts_sha256": {
+          "receipt.json": "9955c4fc5896f15bea541b5ac29c95dcad4d92d489593ffddd15f63154224560",
+          "command.json": "b491f7e127316d1d1a3a7239ff12bfd0b1fa49784d42247467fa342d6cf42897",
+          "junit.xml": "62bb3bfc5039e9fc7c1482ff3fbf30ee3256f327fd1424254bd79f237daa6cfe",
+          "log.private": "c21b96d0c28ce4542e34ab9cb902b6e51d7c36d817ebf7baabdbcd6499fd67fe",
+          "process-result.json": "5a4cb3196c69bf996cf49ae41361a0874a07549ed8088ba9c0d0d1de83fb70e8",
+          "before.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883",
+          "after.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883"
+        }
+      },
+      {
+        "name": "omit-tier",
+        "selection": {
+          "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+          "filter": "test_customers_and_read_write_tiers_have_distinct_buckets_and_all_write_routes_share_one"
+        },
+        "classification": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION",
+        "tests": 1,
+        "assertions": 33,
+        "errors": 0,
+        "failures": 1,
+        "skips": 0,
+        "exit": 1,
+        "seconds": 16.358167553000385,
+        "edit_operands": 1,
+        "composed": false,
+        "restore_verified": true,
+        "process_completed": true,
+        "artifacts_sha256": {
+          "receipt.json": "71c9d08d64bb695fad99e2af8ceb9cc84b4d575386c9e2e25bc85dc09e94a522",
+          "command.json": "7cb43341e7f001c119792907713e1f9190fbecedb484439bd55e375f74333ca5",
+          "junit.xml": "faf4ba8c787aa9c83c9b62801620630468d9db21191a508d893f42b66d93722c",
+          "log.private": "a79ed4bf47756b64fe1a1d8fa2f5c01bc13486969bb370c9f5dd38614a9fd3c0",
+          "process-result.json": "7e46209f59173de8bc674233b1354eab630a2f0d9dbbbe766b2e7c03bedbdc45",
+          "before.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883",
+          "after.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883"
+        }
+      },
+      {
+        "name": "omit-read-admission",
+        "selection": {
+          "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+          "filter": "test_read_bucket_survives_ip_session_and_recovery_changes_and_expires"
+        },
+        "classification": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION",
+        "tests": 1,
+        "assertions": 23,
+        "errors": 0,
+        "failures": 1,
+        "skips": 0,
+        "exit": 1,
+        "seconds": 16.440407967998908,
+        "edit_operands": 1,
+        "composed": false,
+        "restore_verified": true,
+        "process_completed": true,
+        "artifacts_sha256": {
+          "receipt.json": "a51482436eac1eab12f2ecd02c09f80555390b10e79a9e2a5ea977a3183408b6",
+          "command.json": "2fcba4700138c22ccfad13a95c0b3ae39d9d89fed8df4084a416ad02b679466e",
+          "junit.xml": "0969055fc102afef0341ddd7e2528fc6e99369a988cd91c6a9d5a2739dc1fb41",
+          "log.private": "e0a0d029a35b325abd2a7566e0ba853960015f07a181d755d2faf7f9229813f4",
+          "process-result.json": "74940b556388bb42b843f44980d5d789be9e40a9be2684559a323d66fa4053a2",
+          "before.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883",
+          "after.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883"
+        }
+      },
+      {
+        "name": "omit-write-admission",
+        "selection": {
+          "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+          "filter": "test_customers_and_read_write_tiers_have_distinct_buckets_and_all_write_routes_share_one"
+        },
+        "classification": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION",
+        "tests": 1,
+        "assertions": 43,
+        "errors": 0,
+        "failures": 1,
+        "skips": 0,
+        "exit": 1,
+        "seconds": 18.714523201000702,
+        "edit_operands": 1,
+        "composed": false,
+        "restore_verified": true,
+        "process_completed": true,
+        "artifacts_sha256": {
+          "receipt.json": "ed05a9711b2dee8f162a01318d2628206f528ff343bed61b8d27d3c2c0ff4311",
+          "command.json": "0713f9d7bfd877efd14522f12072ca599be1022606aa2c2ec408a8818710e13b",
+          "junit.xml": "aa5127889ffdea8419f9d0dc37e9b149abd50f844dcbbf7f06d2ed0257c051af",
+          "log.private": "c6c157fb14ee416d8b478cde97c0c67ce366ae22397b58546db30fd1288589a2",
+          "process-result.json": "96eb91f92c7a7c49a2561a76b34b5322816029d6e1f5c31f174724b14a575098",
+          "before.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883",
+          "after.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883"
+        }
+      },
+      {
+        "name": "charge-write-after-domain",
+        "selection": {
+          "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+          "filter": "test_customers_and_read_write_tiers_have_distinct_buckets_and_all_write_routes_share_one"
+        },
+        "classification": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION",
+        "tests": 1,
+        "assertions": 43,
+        "errors": 0,
+        "failures": 1,
+        "skips": 0,
+        "exit": 1,
+        "seconds": 17.816344260001642,
+        "edit_operands": 2,
+        "composed": true,
+        "restore_verified": true,
+        "process_completed": true,
+        "artifacts_sha256": {
+          "receipt.json": "36087942c41578821ab6cf5e15fc0f436dfe7e325bf7943021d8df75ec622b36",
+          "command.json": "0d92d1cec217fadbd01691b38772587a7daeee58ec635f37075de3e9eced6aa4",
+          "junit.xml": "0e9fbbff228b1fd13a605038275e2f51c3a858697a76e5769ac1d0a895fc530e",
+          "log.private": "0f8b34c3250869e8382e1790ca87cdefaa5363bc6a0d3dc0fe5aba539d3b7512",
+          "process-result.json": "de62a957e8d643740d811de85afec28e86fcab87c419290cfe275464dde727b5",
+          "before.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883",
+          "after.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883"
+        }
+      },
+      {
+        "name": "charge-read-after-domain",
+        "selection": {
+          "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+          "filter": "test_refused_first_page_domain_reads_still_consume_admission_before_domain"
+        },
+        "classification": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION",
+        "tests": 1,
+        "assertions": 133,
+        "errors": 0,
+        "failures": 1,
+        "skips": 0,
+        "exit": 1,
+        "seconds": 10.648378477999358,
+        "edit_operands": 2,
+        "composed": true,
+        "restore_verified": true,
+        "process_completed": true,
+        "artifacts_sha256": {
+          "receipt.json": "6ca0d2e70f9652a88f30ff1c11757acbbc87ea501b226fd492c87dedcc258d92",
+          "command.json": "9afd06c29ffe18249ea6c054823861c43fd0d21d1046fa55cb35e79d05af5f92",
+          "junit.xml": "3f926afef58af0e5417fa6e81807f616c8f0246eb93860c02dd5ec6ac4f87b4a",
+          "log.private": "5988b0b7fe6b7834ef172898c54716808ad373312aa920d34ff8c2daf2a6c6e2",
+          "process-result.json": "2e1634aabee18afa025d25371617b4f7d00cefda41a5af3dd861991740761b43",
+          "before.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883",
+          "after.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883"
+        }
+      },
+      {
+        "name": "cache-errors-fail-open",
+        "selection": {
+          "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+          "filter": "test_cache_exception_is_a_private_pre_operation_failure_for_reads_and_writes"
+        },
+        "classification": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION",
+        "tests": 1,
+        "assertions": 13,
+        "errors": 0,
+        "failures": 1,
+        "skips": 0,
+        "exit": 1,
+        "seconds": 9.894762979001825,
+        "edit_operands": 1,
+        "composed": false,
+        "restore_verified": true,
+        "process_completed": true,
+        "artifacts_sha256": {
+          "receipt.json": "01236f5a566ff413506f4c7e6a58f8666b4dcdaf68f52398e06133bf5bd9fe4d",
+          "command.json": "0f78cb34a2cd86e7dcf8604fe1cded6e3c7ea97007e85d70361543ee8064b2e7",
+          "junit.xml": "17cd85140a191e8acdb651ae73f66ae89d13df43b23dd0eb7d680b79bf779afc",
+          "log.private": "44344a7ea290b5901ed7ed54d75135b37cb1890fa0b448df13947200a0f43ffc",
+          "process-result.json": "b0d2f7d4bf8244b9158b901cbca876c19aa697854330e8986428b8a1fed7844d",
+          "before.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883",
+          "after.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883"
+        }
+      },
+      {
+        "name": "omit-post-cache-reproof",
+        "selection": {
+          "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+          "filter": "test_cache_callbacks_cannot_change_identity_or_steal_the_admission_lease_before_domain_work"
+        },
+        "classification": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION",
+        "tests": 1,
+        "assertions": 13,
+        "errors": 0,
+        "failures": 1,
+        "skips": 0,
+        "exit": 1,
+        "seconds": 9.388191389996791,
+        "edit_operands": 1,
+        "composed": false,
+        "restore_verified": true,
+        "process_completed": true,
+        "artifacts_sha256": {
+          "receipt.json": "f6b35c591d1828a9bf3fc159af82fba6d3033b03d806a8d828080909889f601a",
+          "command.json": "353045deb20221a847d889957a3aa84b8d82970ec59480adf6e77b8ad448b23e",
+          "junit.xml": "1c0ebbb87ef7364587a05abb6727eabd06b45182e2d8896e84f908d39840c389",
+          "log.private": "3bd9a2a766df6dcf4a88fa8af4e7320c2d6ad9b887610b5bad089c0103c236ba",
+          "process-result.json": "68ad20c0801bf550bfb02f714090d8ff78913d121fdc37d253e1be26c7115a03",
+          "before.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883",
+          "after.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883"
+        }
+      },
+      {
+        "name": "ignore-configured-store",
+        "selection": {
+          "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+          "filter": "test_configured_store_is_used_and_a_contended_admission_lock_fails_before_domain"
+        },
+        "classification": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION",
+        "tests": 1,
+        "assertions": 15,
+        "errors": 0,
+        "failures": 1,
+        "skips": 0,
+        "exit": 1,
+        "seconds": 9.694814055001189,
+        "edit_operands": 1,
+        "composed": false,
+        "restore_verified": true,
+        "process_completed": true,
+        "artifacts_sha256": {
+          "receipt.json": "5204e8576f9e752377c088a86eb61a5fa9c5b7a4b03daa134e54f7ce6dbaa76e",
+          "command.json": "8173adf786b26de8f5702090a8a48b796fcfdaa256bb33b2167d9b76d8542f6a",
+          "junit.xml": "8efa29feb58099ed38379cd6b7ce3b15dae0e8adc482412eaef2526682482933",
+          "log.private": "e45d30002d0d2455181fb2312621cdf37a3d55864ab5e189850843a87da73b61",
+          "process-result.json": "57f6f2d9b8b564f2fac2539f080c410d0ffc459b6e7108093849b4de512cc59c",
+          "before.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883",
+          "after.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883"
+        }
+      },
+      {
+        "name": "truthy-store-fallback",
+        "selection": {
+          "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+          "filter": "test_configured_store_is_used_and_a_contended_admission_lock_fails_before_domain"
+        },
+        "classification": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION",
+        "tests": 1,
+        "assertions": 34,
+        "errors": 0,
+        "failures": 1,
+        "skips": 0,
+        "exit": 1,
+        "seconds": 11.561819303999073,
+        "edit_operands": 1,
+        "composed": false,
+        "restore_verified": true,
+        "process_completed": true,
+        "artifacts_sha256": {
+          "receipt.json": "25646a0532c6b3ced2762848bfdf0e6a79185879e05656648fe0811831b9d44f",
+          "command.json": "f7297d4b16c1d71f0f8b609fa2a19ce99fd3c34324f2d443ea889384bcfe0e44",
+          "junit.xml": "8b6c72e2ce71fbc2bee1ad1d55e28a8a9444901aa84ff662e5309ec2e129f3b6",
+          "log.private": "4354614bd560131e2c0c29eee83246181cff997e9342e6a869c9e82a35afc099",
+          "process-result.json": "47d38f73bac48f523f0d6b76c1f37928f3a93803c9546847deb65e894f37cad5",
+          "before.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883",
+          "after.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883"
+        }
+      },
+      {
+        "name": "omit-critical-section",
+        "selection": {
+          "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+          "filter": "test_configured_store_is_used_and_a_contended_admission_lock_fails_before_domain"
+        },
+        "classification": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION",
+        "tests": 1,
+        "assertions": 15,
+        "errors": 0,
+        "failures": 1,
+        "skips": 0,
+        "exit": 1,
+        "seconds": 9.843206163001014,
+        "edit_operands": 3,
+        "composed": true,
+        "restore_verified": true,
+        "process_completed": true,
+        "artifacts_sha256": {
+          "receipt.json": "bd448d043edf37fe96384711b9da5352152cb44d41ad3b08975c0bda38184dfa",
+          "command.json": "df64530ff6cabb73fc79e593b0d422356771d36ff0bac6bf37c811479dcedad3",
+          "junit.xml": "edfc6c123cd49680364d9ad5ba9f49e4fe15591dfc48894c76529977df8f44cb",
+          "log.private": "d9830c59f65355623d8a85dd82c67f6235f52bc5324bd642b3dbbf85660b5060",
+          "process-result.json": "c6de830090de11db6154cc32ff3de6f2afb75b814475b3695dc956083fd932a3",
+          "before.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883",
+          "after.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883"
+        }
+      },
+      {
+        "name": "unbounded-retry-after",
+        "selection": {
+          "file": "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php",
+          "filter": "test_configured_store_is_used_and_a_contended_admission_lock_fails_before_domain"
+        },
+        "classification": "KILLED_EXPECTED_BEHAVIORAL_ASSERTION",
+        "tests": 1,
+        "assertions": 55,
+        "errors": 0,
+        "failures": 1,
+        "skips": 0,
+        "exit": 1,
+        "seconds": 10.595576234998589,
+        "edit_operands": 1,
+        "composed": false,
+        "restore_verified": true,
+        "process_completed": true,
+        "artifacts_sha256": {
+          "receipt.json": "4cf236b222fad3071f85bb0f68f587683cf674ade0a0f854a1f932c5d3660f63",
+          "command.json": "7e7aab61631cb7a098b0fff641f6394014d93f7b5aba47d31f8f52a7313c4396",
+          "junit.xml": "dda3325643a2a062dcb52b4f628835ddfd282ba5a095ccfe54e60d927a54cd79",
+          "log.private": "cb571980237844b323969b87bd8416f2ff30bfa6d4a1f65ba6586b8250ccad5a",
+          "process-result.json": "645eeb0b14c18253b6d56b78e0f4ef476f36f28a9429aa9473bda43e1196e65e",
+          "before.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883",
+          "after.json": "bd7de4b29fab71745d126a47686386c054a9d1d4901ff3100d1be4cf628cc883"
+        }
+      }
+    ],
+    "final_both_trees_source_sha": "fbb802782c51c790fb4dcfcbb9f052fd9d9dfced",
+    "final_both_trees_clean": true,
+    "final_empty_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final_five_hashes_digest": "9089f28795ccfe753076ddef0bb86f963b6382bbfab62a656e6643c84f029d59",
+    "final_php_processes": 0,
+    "artifacts_sha256": {
+      "summary.json": "13cc9b877a8520a76e810fc3dc35b27f20aa7f7b9d3b3dfbc7f3f0a9868ddc4d",
+      "verified-final.json": "096d8fec3d86e1931bcf05db3fb05014cd4ebd6175df35a6bc8c6c6f4137191d"
+    }
+  },
+  "limits": [
+    "Native1/724 contains barrier polls: ONE epoch/held-lock case, not724race trials or all schedules.",
+    "No multi-host/deployment-cache certification, malicious-backend guarantee, end-to-end latency/headroom or F9/account/history closure.",
+    "Controlled read-domain transaction-entry refusal is not full execution of a failing domain body.",
+    "Mutation operands2/3 are composed; meaningful14 assertion reds are not independent coverage of every operand.",
+    "Full Foundation/browser/other domain matrix not run for this isolated change.",
+    "Mount remains literal false; final independent tested-head review and root-owned publication gates remain open."
+  ],
+  "tested_five_source_hashes": {
+    "app/Http/Membership/MembershipCustomerLimiter.php": "a59113347b9114269ad109660e200999d5201faad5b6aa6acb8cadeb80ff4571",
+    "app/Http/Membership/MembershipController.php": "abe30eb9abaf67d766bf736a97ebd0e0410b6ebfb3ccff7aecd75910182a1a2b",
+    "tests/Feature/ProductionMembershipHttp/MembershipCustomerRateLimitTest.php": "e0a522b2033c9363209f4dd4229ea2e31b530ef068a4d750288285f55419275b",
+    "tests/Feature/ProductionMembershipHttp/MembershipNativeCustomerRateLimitTest.php": "ed67665e038e5448fb10d5cf35cb02df0cb873a4c7d01b4258386e75bdf5914f",
+    "tests/Support/membership-customer-limiter-worker.php": "45a8cec53891c170374b61232aca607d84e0f98baee613cdc5f57b1bf72c200a"
+  }
+}

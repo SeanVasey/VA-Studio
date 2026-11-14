@@ -158,4 +158,36 @@ class CustomerListeningFreshnessTest extends TestCase
         }
         $this->assertSame($selection['track']->title, $pdo->query('SELECT title FROM main.tracks')->fetchColumn());
     }
+
+    public function test_native_session_temporary_catalog_shadow_is_refused_before_release(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native MySQL session temporary-table shadow; the SQLite main/temp case is the sibling SQLite-only test.');
+        }
+        $this->fakePrivateMediaStorage();
+        $customer = CustomerFixtures::account();
+        $selection = QuoteFixtures::selection();
+        $library = app(ListeningLibrary::class);
+        $library->change($customer['principal'], $customer['user'], ['action' => 'save-track', 'version' => 0, 'trackId' => (string) $selection['track']->id]);
+        $pdo = DB::connection()->getPdo();
+        $database = '`'.str_replace('`', '``', DB::connection()->getDatabaseName()).'`';
+        $before = $pdo->query('SELECT * FROM '.$database.'.`customer_saved_tracks`')->fetchAll(PDO::FETCH_ASSOC);
+        // A MySQL session temporary table shadows even schema-qualified names, so framework and proof reads both see it.
+        $pdo->exec('CREATE TEMPORARY TABLE `tracks` AS SELECT * FROM '.$database.'.`tracks`');
+        $pdo->exec("UPDATE `tracks` SET title='PRIVATE temporary catalog metadata'");
+        try {
+            try {
+                $library->read($customer['principal'], $customer['user']);
+                $this->fail('A session temporary catalog shadow was treated as captured primary evidence.');
+            } catch (ListeningException $error) {
+                $this->assertSame(503, $error->status);
+                $this->assertSame($before, $pdo->query('SELECT * FROM '.$database.'.`customer_saved_tracks`')->fetchAll(PDO::FETCH_ASSOC));
+                $this->assertStringStartsWith('CREATE TEMPORARY TABLE', $pdo->query('SHOW CREATE TABLE '.$database.'.`tracks`')->fetch(PDO::FETCH_NUM)[1]);
+                $this->assertSame('PRIVATE temporary catalog metadata', $pdo->query('SELECT title FROM `tracks`')->fetchColumn());
+            }
+        } finally {
+            $pdo->exec('DROP TEMPORARY TABLE `tracks`');
+        }
+        $this->assertSame($selection['track']->title, $pdo->query('SELECT title FROM '.$database.'.`tracks`')->fetchColumn());
+    }
 }

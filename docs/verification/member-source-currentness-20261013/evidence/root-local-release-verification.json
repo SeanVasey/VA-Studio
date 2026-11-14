@@ -1,0 +1,420 @@
+{
+  "scope": "Every explicitly released local check/listing artifact retained; five large source receipts compressed without losing full public maps.",
+  "members": [
+    {
+      "original_target": "quality/carry.json",
+      "archived_path": "quality/carry.json",
+      "original_sha256": "587188ab4774555dc50a45157a9f515ddf8ae8a0504bbf36b7b6630befc4d244"
+    },
+    {
+      "original_target": "quality/changed-php-files.txt",
+      "archived_path": "quality/changed-php-files.txt",
+      "original_sha256": "cde40205e40020b36daad899db56922e8fc6941536f334299b0986c762f0f81b"
+    },
+    {
+      "original_target": "quality/metadata.json",
+      "archived_path": "quality/metadata.json",
+      "original_sha256": "a01352e6fd3a85cc4beecf04d675ba5fcbfade028ca33ef266ff384ffae6450e"
+    },
+    {
+      "original_target": "quality/pint.command.json",
+      "archived_path": "quality/pint.command.json",
+      "original_sha256": "c80e19a29bf45302798292ebb6f547f2f6f429d189d699f1daf0eeab2e2bf10b"
+    },
+    {
+      "original_target": "quality/pint.exit",
+      "archived_path": "quality/pint.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_target": "quality/pint.log",
+      "archived_path": "quality/pint.log",
+      "original_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    {
+      "original_target": "quality/pint.result.json",
+      "archived_path": "quality/pint.result.json",
+      "original_sha256": "0584e98ca90a587e3106629e78cc9c3320c57669479b5e4fba5d6469a7892d4a"
+    },
+    {
+      "original_target": "quality/policy-final/changed-php-files.txt",
+      "archived_path": "quality/policy-final/changed-php-files.txt",
+      "original_sha256": "cde40205e40020b36daad899db56922e8fc6941536f334299b0986c762f0f81b"
+    },
+    {
+      "original_target": "quality/policy-final/metadata.json",
+      "archived_path": "quality/policy-final/metadata.json",
+      "original_sha256": "91904632340608d658755e28861181e1f3640889e98828f0ca62c4108d4ac253"
+    },
+    {
+      "original_target": "quality/policy-final/results.json",
+      "archived_path": "quality/policy-final/results.json",
+      "original_sha256": "3741689353b0b40af3eca1e4f89da7e2c53b17f146ba2ac635ec7382c1b92602"
+    },
+    {
+      "original_target": "quality/policy-final/run-quality.py",
+      "archived_path": "quality/policy-final/run-quality.py",
+      "original_sha256": "0cbc9dc13566b6b276963c5611fd8fb8ce29f96c497359afad43f576300f92ca"
+    },
+    {
+      "original_target": "quality/policy-final/source-check.json",
+      "archived_path": "quality/policy-final/source-check.json",
+      "original_sha256": "56c3f173681fda4211b5b4783e3c04ffafdac599dc0b9681f239a0258f7649e7"
+    },
+    {
+      "original_target": "quality/policy-final/sources-after.json",
+      "archived_path": "quality/policy-final/sources-after.json.gz",
+      "original_sha256": "3b1d0882511cbb1bd1df531b0692497f2c24587abed39920adbdb7e3a6b32f80"
+    },
+    {
+      "original_target": "quality/policy-final/sources-before.json",
+      "archived_path": "quality/policy-final/sources-before.json.gz",
+      "original_sha256": "3b1d0882511cbb1bd1df531b0692497f2c24587abed39920adbdb7e3a6b32f80"
+    },
+    {
+      "original_target": "quality/policy-final/test-ci-scope.command.json",
+      "archived_path": "quality/policy-final/test-ci-scope.command.json",
+      "original_sha256": "2dbb5c19f6699637f0985bbce5322dd0b770817f2c8394682cc2ed63d0d248c9"
+    },
+    {
+      "original_target": "quality/policy-final/test-ci-scope.exit",
+      "archived_path": "quality/policy-final/test-ci-scope.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_target": "quality/policy-final/test-ci-scope.log",
+      "archived_path": "quality/policy-final/test-ci-scope.log",
+      "original_sha256": "29d7556fd1e509233345b5a6b54e2915fd33fdb75f92a2a4c10ab934f1e6e5f9"
+    },
+    {
+      "original_target": "quality/policy-final/test-ci-scope.result.json",
+      "archived_path": "quality/policy-final/test-ci-scope.result.json",
+      "original_sha256": "c438947cc6a5d39195bb8d2225335fcc3801aa726b6458aec12af46558a5367f"
+    },
+    {
+      "original_target": "quality/policy-final/test-database-receipts.command.json",
+      "archived_path": "quality/policy-final/test-database-receipts.command.json",
+      "original_sha256": "d87a3cd65a38c020013db39cd2e45e23dfb021967844199a9a3d85c7348cd28b"
+    },
+    {
+      "original_target": "quality/policy-final/test-database-receipts.exit",
+      "archived_path": "quality/policy-final/test-database-receipts.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_target": "quality/policy-final/test-database-receipts.log",
+      "archived_path": "quality/policy-final/test-database-receipts.log",
+      "original_sha256": "1af98951f66faff8d4c9a63769a9099e35c8dd5e84f57a661c90469984228ea8"
+    },
+    {
+      "original_target": "quality/policy-final/test-database-receipts.result.json",
+      "archived_path": "quality/policy-final/test-database-receipts.result.json",
+      "original_sha256": "78c0c5c252def65a67f810b123e16635535eb342097128b2c39767ce88d918b8"
+    },
+    {
+      "original_target": "quality/policy-final/test-phpunit-shards.command.json",
+      "archived_path": "quality/policy-final/test-phpunit-shards.command.json",
+      "original_sha256": "add3ec1988cc1cc145853d7147184afe58d6c58e027c6fddf02661260d4c3f82"
+    },
+    {
+      "original_target": "quality/policy-final/test-phpunit-shards.exit",
+      "archived_path": "quality/policy-final/test-phpunit-shards.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_target": "quality/policy-final/test-phpunit-shards.log",
+      "archived_path": "quality/policy-final/test-phpunit-shards.log",
+      "original_sha256": "28e9ff86f6ee868eb7e12044c0cb985e10dc00796b09083bac46024b855b965f"
+    },
+    {
+      "original_target": "quality/policy-final/test-phpunit-shards.result.json",
+      "archived_path": "quality/policy-final/test-phpunit-shards.result.json",
+      "original_sha256": "bf120eaba7efc8b2b3268f39ea03941495fdecb1f3e8f26afffc3b287f9e1b2e"
+    },
+    {
+      "original_target": "quality/policy-final/test-workflow-cadence.command.json",
+      "archived_path": "quality/policy-final/test-workflow-cadence.command.json",
+      "original_sha256": "0328dbbc08167d5454a7acab88eba30b8059591cdc6fc24b69e0f3738832f0bf"
+    },
+    {
+      "original_target": "quality/policy-final/test-workflow-cadence.exit",
+      "archived_path": "quality/policy-final/test-workflow-cadence.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_target": "quality/policy-final/test-workflow-cadence.log",
+      "archived_path": "quality/policy-final/test-workflow-cadence.log",
+      "original_sha256": "dd818658e9c8008cb354da9371485cb574dabd3d7c356cdfa1c694608942fdca"
+    },
+    {
+      "original_target": "quality/policy-final/test-workflow-cadence.result.json",
+      "archived_path": "quality/policy-final/test-workflow-cadence.result.json",
+      "original_sha256": "6b78b1e522ca8b26031908587c08c20a5a8d63a4504578f5fe0a867787520823"
+    },
+    {
+      "original_target": "quality/results.json",
+      "archived_path": "quality/results.json",
+      "original_sha256": "bd73c21753db6a8404ba594dc410a95fa860999c8d4d844e1312656aa828149a"
+    },
+    {
+      "original_target": "quality/run-quality.py",
+      "archived_path": "quality/run-quality.py",
+      "original_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506"
+    },
+    {
+      "original_target": "quality/source-check.json",
+      "archived_path": "quality/source-check.json",
+      "original_sha256": "2df63f7188a861b1859306e65d2d0138e5f9183df011f43df53f9eaa1c3e0162"
+    },
+    {
+      "original_target": "quality/sources-after.json",
+      "archived_path": "quality/sources-after.json.gz",
+      "original_sha256": "87c2a6d6840cdd48338508846b962ed7c8399b4cecdd8fba9c3ca371b254c76a"
+    },
+    {
+      "original_target": "quality/sources-before.json",
+      "archived_path": "quality/sources-before.json.gz",
+      "original_sha256": "87c2a6d6840cdd48338508846b962ed7c8399b4cecdd8fba9c3ca371b254c76a"
+    },
+    {
+      "original_target": "quality/test-ci-scope.command.json",
+      "archived_path": "quality/test-ci-scope.command.json",
+      "original_sha256": "d615228040772604908ad0bdc7e57fecff7b65aa194777753b936530cd095c78"
+    },
+    {
+      "original_target": "quality/test-ci-scope.exit",
+      "archived_path": "quality/test-ci-scope.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_target": "quality/test-ci-scope.log",
+      "archived_path": "quality/test-ci-scope.log",
+      "original_sha256": "37acda06308aec11e88944ce508224ad7d6e721eb000eebd5c69eb31e428f225"
+    },
+    {
+      "original_target": "quality/test-ci-scope.result.json",
+      "archived_path": "quality/test-ci-scope.result.json",
+      "original_sha256": "21df5ec88851903b27164c06f7debfbe7c24d3f0d9f62259f5e34719327bdcd5"
+    },
+    {
+      "original_target": "quality/test-database-receipts.command.json",
+      "archived_path": "quality/test-database-receipts.command.json",
+      "original_sha256": "00270a80a47ccf14ace591f51dd8902f6ffd36f775c9e6fdac428eba463462c1"
+    },
+    {
+      "original_target": "quality/test-database-receipts.exit",
+      "archived_path": "quality/test-database-receipts.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_target": "quality/test-database-receipts.log",
+      "archived_path": "quality/test-database-receipts.log",
+      "original_sha256": "9d5296b3420fb5db5d97df585c451520d0f497130f6dca4ebcc6a300b6d8db51"
+    },
+    {
+      "original_target": "quality/test-database-receipts.result.json",
+      "archived_path": "quality/test-database-receipts.result.json",
+      "original_sha256": "c613c4151977f20efcbc55a598e27a4511c57002460be2f8e2bab145ad2a5442"
+    },
+    {
+      "original_target": "quality/test-phpunit-shards.command.json",
+      "archived_path": "quality/test-phpunit-shards.command.json",
+      "original_sha256": "01ffa0f7393c4700a03bedbdd586efb77100b93bf52755a00845fe364d300f73"
+    },
+    {
+      "original_target": "quality/test-phpunit-shards.exit",
+      "archived_path": "quality/test-phpunit-shards.exit",
+      "original_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "original_target": "quality/test-phpunit-shards.log",
+      "archived_path": "quality/test-phpunit-shards.log",
+      "original_sha256": "bbe9d4b919890748c281ecd82ebe3f9d0689c00229f598e8cb350246180a7bec"
+    },
+    {
+      "original_target": "quality/test-phpunit-shards.result.json",
+      "archived_path": "quality/test-phpunit-shards.result.json",
+      "original_sha256": "7e89967c437d5dc2331b9eabdf03c0701c481a3fd7da2dce6fbbba23535194f9"
+    },
+    {
+      "original_target": "quality/test-workflow-cadence.command.json",
+      "archived_path": "quality/test-workflow-cadence.command.json",
+      "original_sha256": "497c9072fdf9d8c2dc24c0f9b20222d09340a690fdebf8d08eed76608151a356"
+    },
+    {
+      "original_target": "quality/test-workflow-cadence.exit",
+      "archived_path": "quality/test-workflow-cadence.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_target": "quality/test-workflow-cadence.log",
+      "archived_path": "quality/test-workflow-cadence.log",
+      "original_sha256": "dd818658e9c8008cb354da9371485cb574dabd3d7c356cdfa1c694608942fdca"
+    },
+    {
+      "original_target": "quality/test-workflow-cadence.result.json",
+      "archived_path": "quality/test-workflow-cadence.result.json",
+      "original_sha256": "0034333aec12860a87f895106b2e3a9f086b18a91dfd9b93f9d5dd6262af177b"
+    },
+    {
+      "original_target": "selection/discovery-source-check.json",
+      "archived_path": "selection/discovery-source-check.json",
+      "original_sha256": "00f33a29428821264789e3ab032c13d97642fa2ea9ac2b1d7dc794c62791918b"
+    },
+    {
+      "original_target": "selection/discovery.base",
+      "archived_path": "selection/discovery.base",
+      "original_sha256": "6e009a0f5a668365726558b027a05824b6fd6e1b11eaa996af55621b2af24043"
+    },
+    {
+      "original_target": "selection/discovery.exit",
+      "archived_path": "selection/discovery.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_target": "selection/discovery.sh",
+      "archived_path": "selection/discovery.sh",
+      "original_sha256": "6ee2db288de6f7530bb2bd67f7d3ccc1ecc77cf658e3a18144b1c5a76bf4f043"
+    },
+    {
+      "original_target": "selection/discovery.sources.json",
+      "archived_path": "selection/discovery.sources.json.gz",
+      "original_sha256": "ce7282010123769765c1805bc5e8ba61494120934c74f683eba1c81e2a8e882a"
+    },
+    {
+      "original_target": "selection/discovery.txt",
+      "archived_path": "selection/discovery.txt",
+      "original_sha256": "d5cecf88cce5d9da0777a40e61c3a4fd0e50e0d134977cc11475789a1bc2df41"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-1-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-1-tests.xml",
+      "original_sha256": "0b45660a308af673afd832b58b91492d6f70f4f1de126faa579d8577bd37f255"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-10-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-10-tests.xml",
+      "original_sha256": "1cafe0acca7ba18b74cfa342c6a806f64bf970c7940cb3e0e94d987835965ec4"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-11-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-11-tests.xml",
+      "original_sha256": "800ad1c917575afa2a602f6d12ebaa5152c166260be173875f59b35ba361169f"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-12-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-12-tests.xml",
+      "original_sha256": "6525585b36d83c71cc6f6a4927e956e030052f37493bbb1761ad426b0cf0ab04"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-13-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-13-tests.xml",
+      "original_sha256": "037010ba96373688745e21f5ae5f258fc6fe53b09967b799b86bb3200615647e"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-14-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-14-tests.xml",
+      "original_sha256": "93e881500adb4d7d548096a623a6d4578fb9da25b375451210f2f861f1d1f3f4"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-15-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-15-tests.xml",
+      "original_sha256": "d5397c52eb1f5ca873dabe986f906cd773131efb940e250a86b591af32ea92d0"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-16-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-16-tests.xml",
+      "original_sha256": "60d76bfcb6f5924c0b0ea829120d82d395ba8ebdbebbbbfd17036ec651662b52"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-17-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-17-tests.xml",
+      "original_sha256": "a9f983977a961da56d7a6738e51d7d7f1273ab18b89c639afeab934473bacfad"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-18-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-18-tests.xml",
+      "original_sha256": "52f8e5d849cbb4c7547baea4a50092b727bb3ea1f0bb4a008dbf0fa79d1af10d"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-19-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-19-tests.xml",
+      "original_sha256": "dfe51e38fece6253b6934ce4c974c97ab55c4db705ebf6dccd836ceb05b91350"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-2-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-2-tests.xml",
+      "original_sha256": "206a9f6433aacbf7d094a122aff39758460a92ceb3ca277b71c1f3325df55aec"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-20-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-20-tests.xml",
+      "original_sha256": "9583cf3e81d65830cfa698995cbfc64d3090b23f795bf2d6e1e2f8d932683d8d"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-21-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-21-tests.xml",
+      "original_sha256": "928753e7d8719b9ff738c1a7f1e5caf831e75bd153c75e5d1dffb7ba7ecfdf46"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-22-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-22-tests.xml",
+      "original_sha256": "6c396a724f91dc59c4924379e4d81658b3f0b5362833042b0c7ac2fdbb349eed"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-23-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-23-tests.xml",
+      "original_sha256": "da58b5385eeeb580a135e76f71329f20e24cc25714309992165f0358197cdae6"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-24-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-24-tests.xml",
+      "original_sha256": "f17752a384da8653edce21115369019892ccd311d769e7d4060e5a3381148afc"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-3-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-3-tests.xml",
+      "original_sha256": "6ba0e4aac46c310d08e479140472269fc03bc83fec771bd5a8c9aa04d8b12af6"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-4-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-4-tests.xml",
+      "original_sha256": "c9e0da2992f6eb8a5c787b0f73b4d1a9c023e01f1fd90f437f4640fd9e7f22c4"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-5-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-5-tests.xml",
+      "original_sha256": "44b6afa615f034c8c4683cf709885dc46e477b9aeada590c78daa3466ba8db34"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-6-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-6-tests.xml",
+      "original_sha256": "20ac764536048a9d6b50804b8ac8686fa5c47239d1d7fe02c37de1382388511e"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-7-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-7-tests.xml",
+      "original_sha256": "dcc93ad63b8296bb6ab0f0f53ea1ef85aaf0358b7d98c700f7a46c92ef011b21"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-8-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-8-tests.xml",
+      "original_sha256": "4d8618bc293d72f1d658d805950061c0a852fe130b670636d70f240ca6c1b1c1"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-9-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-9-tests.xml",
+      "original_sha256": "4999b440e08fb2c2e62983436457f6b83620e89ff9865dec82639e7f85f8e30b"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-manifest.json",
+      "archived_path": "selection/listings/phpunit-ci-mysql-manifest.json",
+      "original_sha256": "a2a1ca8620eec679985fee118a17a742ca0601597bbd796593dbc97566302860"
+    },
+    {
+      "original_target": "selection/listings/phpunit-ci-mysql-source-tests.xml",
+      "archived_path": "selection/listings/phpunit-ci-mysql-source-tests.xml",
+      "original_sha256": "5dbd1b658474c3b383666f55276e31ca959f0e6e6c33a5a081bca70593da38e0"
+    }
+  ]
+}

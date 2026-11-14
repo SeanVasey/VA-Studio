@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="8" assertions="75" errors="0" failures="1" skipped="0" time="6.933626">
+    <testsuite name="Tests\Feature\SiteContentDamagedPublicationTest" file="{worktree}/tests/Feature/SiteContentDamagedPublicationTest.php" tests="1" assertions="16" errors="0" failures="0" skipped="0" time="3.238017">
+      <testcase name="test_a_damaged_publication_record_refuses_publishing_and_sends_staff_to_a_backup" file="{worktree}/tests/Feature/SiteContentDamagedPublicationTest.php" line="77" class="Tests\Feature\SiteContentDamagedPublicationTest" classname="Tests.Feature.SiteContentDamagedPublicationTest" assertions="16" time="3.238017"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\SiteContentUnavailableHttpTest" file="{worktree}/tests/Feature/SiteContentUnavailableHttpTest.php" tests="1" assertions="5" errors="0" failures="1" skipped="0" time="2.809756">
+      <testcase name="test_new_content_draft_reports_unavailable_published_content_instead_of_opening" file="{worktree}/tests/Feature/SiteContentUnavailableHttpTest.php" line="153" class="Tests\Feature\SiteContentUnavailableHttpTest" classname="Tests.Feature.SiteContentUnavailableHttpTest" assertions="5" time="2.809756">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\SiteContentUnavailableHttpTest::test_new_content_draft_reports_unavailable_published_content_instead_of_opening
+A notification was not sent
+Failed asserting that null is not null.
+
+{worktree}/vendor/filament/notifications/src/Notification.php:287
+{worktree}/vendor/filament/notifications/src/Testing/TestsNotifications.php:20
+{worktree}/vendor/laravel/framework/src/Illuminate/Macroable/Traits/Macroable.php:132
+{worktree}/vendor/livewire/livewire/src/Features/SupportTesting/Testable.php:418
+{worktree}/tests/Feature/SiteContentUnavailableHttpTest.php:166
+{worktree}/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+    </testsuite>
+    <testsuite name="Tests\Feature\SiteScheduleHttpTest" file="{worktree}/tests/Feature/SiteScheduleHttpTest.php" tests="6" assertions="54" errors="0" failures="0" skipped="0" time="0.885853">
+      <testsuite name="Tests\Feature\SiteScheduleHttpTest::test_open_schedule_confirmation_reports_a_publication_or_schedule_made_meanwhile" tests="3" assertions="30" errors="0" failures="0" skipped="0" time="0.505007">
+        <testcase name="test_open_schedule_confirmation_reports_a_publication_or_schedule_made_meanwhile with data set &quot;another release was published&quot;" file="{worktree}/tests/Feature/SiteScheduleHttpTest.php" line="117" class="Tests\Feature\SiteScheduleHttpTest" classname="Tests.Feature.SiteScheduleHttpTest" assertions="10" time="0.182004"/>
+        <testcase name="test_open_schedule_confirmation_reports_a_publication_or_schedule_made_meanwhile with data set &quot;this release was published&quot;" file="{worktree}/tests/Feature/SiteScheduleHttpTest.php" line="117" class="Tests\Feature\SiteScheduleHttpTest" classname="Tests.Feature.SiteScheduleHttpTest" assertions="10" time="0.162155"/>
+        <testcase name="test_open_schedule_confirmation_reports_a_publication_or_schedule_made_meanwhile with data set &quot;another release was scheduled&quot;" file="{worktree}/tests/Feature/SiteScheduleHttpTest.php" line="117" class="Tests\Feature\SiteScheduleHttpTest" classname="Tests.Feature.SiteScheduleHttpTest" assertions="10" time="0.160849"/>
+      </testsuite>
+      <testsuite name="Tests\Feature\SiteScheduleHttpTest::test_open_cancel_confirmation_reports_a_schedule_resolved_meanwhile_with_nothing_else_pending" tests="2" assertions="18" errors="0" failures="0" skipped="0" time="0.282368">
+        <testcase name="test_open_cancel_confirmation_reports_a_schedule_resolved_meanwhile_with_nothing_else_pending with data set &quot;cancelled by another administrator&quot;" file="{worktree}/tests/Feature/SiteScheduleHttpTest.php" line="177" class="Tests\Feature\SiteScheduleHttpTest" classname="Tests.Feature.SiteScheduleHttpTest" assertions="9" time="0.137845"/>
+        <testcase name="test_open_cancel_confirmation_reports_a_schedule_resolved_meanwhile_with_nothing_else_pending with data set &quot;replaced by a staff publication&quot;" file="{worktree}/tests/Feature/SiteScheduleHttpTest.php" line="177" class="Tests\Feature\SiteScheduleHttpTest" classname="Tests.Feature.SiteScheduleHttpTest" assertions="9" time="0.144523"/>
+      </testsuite>
+      <testcase name="test_open_publish_confirmation_reports_its_release_becoming_active_meanwhile" file="{worktree}/tests/Feature/SiteScheduleHttpTest.php" line="261" class="Tests\Feature\SiteScheduleHttpTest" classname="Tests.Feature.SiteScheduleHttpTest" assertions="6" time="0.098478"/>
+    </testsuite>
+  </testsuite>
+</testsuites>

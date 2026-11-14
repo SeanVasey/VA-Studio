@@ -1,0 +1,135 @@
+{
+  "scope": "Completed native schema-only old/fixed evidence. Old failures remain failures; no facts/authoring native proof.",
+  "old_head": "15a65e0761382a9ad50c4b279605a644a4eeb285",
+  "fixed_head": "bd3661ec02e3004fef3ae3d8a990e44ef5c6ce08",
+  "old_result": {
+    "tests": 2,
+    "assertions": 10,
+    "failures": 2,
+    "errors": 0,
+    "skips": 0,
+    "phpunit_exit": 1
+  },
+  "fixed_result": {
+    "tests": 4,
+    "assertions": 19,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "phpunit_exit": 0
+  },
+  "files": {
+    "schema/native/MemberGrantNativeCurrentSchemaTest.php": {
+      "bytes": 6034,
+      "sha256": "92031df931efdd9aa0def8d63718a64509c0fb366ef7d2c989f2633f2cc0a4cd"
+    },
+    "schema/native/native-fixed-01/artifacts.json": {
+      "bytes": 1260,
+      "sha256": "219ea2726d816a36b5b507ba01e3ed29e6b25e526557ae83a8f520d939dd5f75"
+    },
+    "schema/native/native-fixed-01/command.json": {
+      "bytes": 1394,
+      "sha256": "05bb5b3d45c25612c2b37a52b15a3fed6df66a4e11e5731a267b05c8b8637360"
+    },
+    "schema/native/native-fixed-01/metadata.json": {
+      "bytes": 686,
+      "sha256": "4fc93f73c54019d5496d51046913bca6fd1de79f27c17d14964e72b16f2427c6"
+    },
+    "schema/native/native-fixed-01/phpunit.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "schema/native/native-fixed-01/phpunit.log": {
+      "bytes": 299,
+      "sha256": "4fd0d261d58de826c7deae4f3d16b18bab713a72d2489deb2c7c1b3090d7d8ca"
+    },
+    "schema/native/native-fixed-01/phpunit.xml": {
+      "bytes": 2390,
+      "sha256": "7bcb9dd9cef7b6c06e257cc02ce09887284a67bd567aee3389b04bbba3ba6408"
+    },
+    "schema/native/native-fixed-01/setup.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "schema/native/native-fixed-01/setup.log": {
+      "bytes": 758,
+      "sha256": "c82766892eab9b779452d95178e96236c20336f278a0df588f89efd365566745"
+    },
+    "schema/native/native-fixed-01/source-after.json": {
+      "bytes": 1858146,
+      "sha256": "8bef7929a9da47c08f6b023f75e47cad312defa3eb36eebae05b8939e7f6807f"
+    },
+    "schema/native/native-fixed-01/source-before.json": {
+      "bytes": 1858146,
+      "sha256": "8bef7929a9da47c08f6b023f75e47cad312defa3eb36eebae05b8939e7f6807f"
+    },
+    "schema/native/native-fixed-01/verification.json": {
+      "bytes": 1421,
+      "sha256": "eeb4c37013f60620231b8dd220a4c4ef5ac84a450530507d9ad6acb09c7c5d7a"
+    },
+    "schema/native/native-fixed-01-runner.log": {
+      "bytes": 1295,
+      "sha256": "cb6779695c6f3a5da769070a477b75c59da93145c084656a883d8035e85e91e4"
+    },
+    "schema/native/native-old-01/artifacts.json": {
+      "bytes": 1528,
+      "sha256": "00b0f3b364d319c94ef02579f214aea0a5a9ba614354057a3967cae939399359"
+    },
+    "schema/native/native-old-01/command.json": {
+      "bytes": 1503,
+      "sha256": "b379129184dfc9f54877d5fc60c29c5f1ff445280e7c926b78cf8c31b619addc"
+    },
+    "schema/native/native-old-01/metadata.json": {
+      "bytes": 623,
+      "sha256": "42eba5e969e432ea1c810dfde8b216775a3cf73e9111333fa4092e2f89b6dc55"
+    },
+    "schema/native/native-old-01/old-base-identity.json": {
+      "bytes": 1432,
+      "sha256": "2cb16ce44cafd8b47f7825d204457af423bfac81778c1fef3d573c7ed4d857c3"
+    },
+    "schema/native/native-old-01/old-base-relevant.diff": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "schema/native/native-old-01/phpunit.exit": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "schema/native/native-old-01/phpunit.log": {
+      "bytes": 1178,
+      "sha256": "d2aabf7df4ce3e10ea731926653ad8948a168074cbc0596f8e624cce62062cf8"
+    },
+    "schema/native/native-old-01/phpunit.xml": {
+      "bytes": 2535,
+      "sha256": "da5d10f993ef2367eb6b804e83052d528ca5eb83e2f6363e1966fff638ded7fa"
+    },
+    "schema/native/native-old-01/setup.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "schema/native/native-old-01/setup.log": {
+      "bytes": 686,
+      "sha256": "ed46c99b7b16755848310ce590537ba650e670d21e5aa11f8f145d3ec9f48286"
+    },
+    "schema/native/native-old-01/source-after.json": {
+      "bytes": 1713167,
+      "sha256": "1faffb81b3712a6334210c27dd41f98505996819487fe75d7e03c963b2c71644"
+    },
+    "schema/native/native-old-01/source-before.json": {
+      "bytes": 1713167,
+      "sha256": "1faffb81b3712a6334210c27dd41f98505996819487fe75d7e03c963b2c71644"
+    },
+    "schema/native/native-old-01/verification.json": {
+      "bytes": 1179,
+      "sha256": "b8857be2d47b981d80f39089f8d322be7c72c55954c6c68c781f0e5c323c5b90"
+    },
+    "schema/native/native-old-01-runner.log": {
+      "bytes": 1067,
+      "sha256": "9b071395969f590c4037b0e48e93d590e4188ce8b198397d130b13f1e2d69350"
+    },
+    "schema/native/run.py": {
+      "bytes": 10814,
+      "sha256": "54ecffa7f45a2e4da169f2314e6dce10897d18c2db8f0eb0a84c2163c8995bf8"
+    }
+  }
+}

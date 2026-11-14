@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
-import { openReleaseMenu, releaseMenuTrigger } from './site-release-row';
+import { openReleaseMenu, releaseMenuItem, releaseMenuTrigger } from './site-release-row';
 
 const dropdownView = readFileSync(new URL('../../resources/views/filament/admin/dropdown-focus.blade.php', import.meta.url), 'utf8');
 const dropdownScript = dropdownView.match(/<script>([\s\S]*?)<\/script>/)?.[1];
@@ -13,7 +13,7 @@ test('release menu opening waits for replaced-panel identity and visibility to a
   const label = 'Synthetic replaced panel';
   await page.setContent(`<table><tbody><tr><td>${label}</td><td><div class="fi-dropdown">
     <div class="fi-dropdown-trigger"><button aria-label="More actions for “${label}”" aria-controls="old-panel" aria-expanded="true">More</button></div>
-    <div class="fi-dropdown-panel" style="display: none"><button>Edit as new draft</button></div>
+    <div class="fi-dropdown-panel" style="display: none"><button role="menuitem">Edit as new draft</button></div>
     </div></td></tr></tbody></table>`);
   await page.evaluate(() => {
     const trigger = document.querySelector<HTMLButtonElement>('.fi-dropdown-trigger button')!;
@@ -32,13 +32,37 @@ test('release menu opening waits for replaced-panel identity and visibility to a
     setTimeout(() => { trigger.setAttribute('aria-expanded', 'false'); }, 300);
   });
   const row = await openReleaseMenu(page, label);
-  await expect(row.getByRole('button', { name: 'Edit as new draft', exact: true })).toBeVisible();
+  await expect(releaseMenuItem(row, 'Edit as new draft')).toBeVisible();
   await expect(releaseMenuTrigger(page, label)).toHaveAttribute('aria-controls', 'replacement-panel');
   await expect(page.locator('body')).toHaveAttribute('data-early-clicks', '0');
   await expect(page.locator('body')).toHaveAttribute('data-clicks', '1');
   // A second call must preserve a menu that is already open, rather than toggle it closed.
   await openReleaseMenu(page, label);
   await expect(page.locator('body')).toHaveAttribute('data-clicks', '1');
+});
+
+test('production dropdown ARIA leaves Filament 5.11 menu synchronisation in place', async ({ page }) => {
+  // Filament 5.11 keeps menu roles, aria-haspopup="menu" and its morph-surviving observer itself (it has setUpMenu).
+  // Replacing its observer and syncAria dropped the menu/menuitem roles from menus morphed in after page load.
+  await page.setContent(`<div class="fi-dropdown" x-data="filamentDropdown">
+    <div class="fi-dropdown-trigger"><button>More</button></div>
+    <div class="fi-dropdown-panel" style="display: none"><button>Edit as new draft</button></div>
+  </div>`);
+  await page.evaluate(() => {
+    const dropdown = document.querySelector('.fi-dropdown')!;
+    const filamentObserver = { disconnected: 0, disconnect() { this.disconnected++; } };
+    const filamentSync = () => {};
+    const component = { $el: dropdown, panelId: 'native-panel', observer: filamentObserver, syncAria: filamentSync, setUpMenu() {}, destroy() {} };
+    Object.assign(window, { __filamentComponent: component, __filamentObserver: filamentObserver, __filamentSync: filamentSync,
+      Alpine: { $data: (element: Element | null): unknown => (element === dropdown ? component : {}) } });
+  });
+  await page.addScriptTag({ content: dropdownScript });
+  await page.evaluate(() => document.dispatchEvent(new CustomEvent('alpine:initialized')));
+  const untouched = await page.evaluate(() => {
+    const w = window as unknown as { __filamentComponent: { observer: unknown; syncAria: unknown }; __filamentObserver: { disconnected: number }; __filamentSync: unknown };
+    return { observer: w.__filamentComponent.observer === w.__filamentObserver, sync: w.__filamentComponent.syncAria === w.__filamentSync, disconnected: w.__filamentObserver.disconnected };
+  });
+  expect(untouched).toEqual({ observer: true, sync: true, disconnected: 0 });
 });
 
 test('production dropdown ARIA follows replaced trigger and panel nodes and keeps the existing destroy lifecycle', async ({ page }) => {

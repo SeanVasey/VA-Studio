@@ -43,7 +43,7 @@ describe('isolated storefront preview', () => {
     expect(screen.getByRole('heading', { name: fixtureTracks[2].title, level: 1 })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Track detail' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getAllByRole('button', { name: 'Read terms & choose' })).toHaveLength(3);
-    expect(screen.getByRole('button', { name: `Play ${fixtureTracks[2].title}` })).toBeDisabled();
+    expect(screen.getByRole('button', { name: `Play preview of ${fixtureTracks[2].title}` })).toBeDisabled();
     expect(screen.getByText('This preview is unavailable.')).toBeInTheDocument();
   });
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Customers\ProductionIdentity\AccountAdmissionUpgrade;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +20,8 @@ class CustomerAccountMigrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // The historical rollback contract is exercised only after the late guard version is restored.
+        (new AccountAdmissionUpgrade)->down(DB::connection());
         // Roll back the empty additive child before exercising the retained account parent.
         $this->assertDatabaseCount('transactional_notices', 0);
         $this->assertDatabaseCount('transactional_notice_attempts', 0);

@@ -1,0 +1,24 @@
+# Independent fresh native terminal acceptance review — 3543b71f
+
+Reviewer: `/root/activation_final_evidence_review`, separate non-author reviewer applying AGENTS and the Code Verification skill. Read-only bounded review of `mysql-activation-consume-release-recovered-runner` and its12 explicit public release members. No application/DB/test workload, broad archive/source audit, hosted action or source edit was performed. Only this new runtime note was written.
+
+**Pass for the exact named two-provider native terminal selection at `3543b71fed3c8dd4b05aefb3b6fc9cf6d7bfd56d`.** Actual process.exit0, result process/verifier0, matching testcase/suite/result JUnit2/129, zero failures/errors/skips, PHP8.4.26/MySQL8.4.11. Started17:38:33UTC, ended17:50:59UTC,745.729699s runner time. Before/after input digest `12c23058132c8b8979ad1eca4783d1483a21c7934d3c9872ddb19cc58ad902ac`,2320 inputs, clean source HEAD/status, runner and autoload are recorded unchanged. The12 explicit release byte/hash entries independently match, release manifest SHA-256 `1b515487bcf880beaee84b4a6a64042a316ee249f39754d2192082682c45a229`. Captured source identity/count/digest and observed process marker independently reconcile. This reviewer assessed the real receipts; it did not rerun the application selection or independently perform every input-after capture.
+
+Read the two full fresh parent transcripts and mapped their data to the previously inspected test-body oracle:
+
+| Scheduled writer | Filename suffix | Bytes | SHA-256 |
+| --- | --- | ---: | --- |
+| activation | `d7e17466-a5fb-4946-a749-a87611207d69.json` |14626|`a619deb8d1493a35d98c1bbfd6c3b653ef1882aa47c5f0c0db6a0fe6611bc287`|
+| release | `7dc1ae60-fa94-47f2-9bb2-4c9d452beedd.json` |14047|`e66b046f1eaf0acf4cfec73341a4917ae1beb9022bef8d3559cf6a10b0d74052`|
+
+Both use prefix `parent-test_actual_consume_and_release_serialize_at_the_authored_honor_boundary-` under the fresh runtime run directory.
+
+Activation-wins: parent/session66 actually observes release/session68's exact pending/granted USER LEVEL LOCK wait on activation/session67 while it holds the normal committing transaction (framework level1/native PDO true). Activation returns its real activated receipt with empty errors. Release returns null with actual `reservation_terminal`, no committing hold. Award/reserve/consume and one origin/artifact/activation are verified; available2/reserved0/consumed1/expired0 conserves3 credits. Exact retained authorization/document/receipt relationships, original hash/unchanged inode, explicit historical readback with unchanged graph/audit and final parent idle are reached by the70-assertion case. Synthetic activation wall12:00 and release wall12:05 remain explicitly different.
+
+Release-wins: parent/session69 actually observes activation/session71's exact native advisory wait on release/session70 and its owned normal committing hold. Release returns its real released receipt with empty errors. Activation returns null with actual `reservation_terminal` from the retained-history probe and no committing hold. Exactly one release terminal, zero origin/artifact/activation rows and no original paths are verified; available3/reserved0/consumed0/expired0 conserves3. The59-assertion case completes. Both operation walls are exactly12:05 after confirmation12:00; no-terminal honor equality remains a separately covered portable case.
+
+All four workers have actual exit0, empty stderr, `stopped_by_teardown:false`, framework transaction level0 and native PDO false; independent PID/connection identities and idle are asserted. Both transcript terminal/conservation markers are true only after the full graph-tail oracle. Afterworker lock absence is asserted by each passing case. This is real successful terminal-writer/terminal-loser evidence, with disclosed synthetic business walls; it is not current host support or representative latency acceptance.
+
+The original interrupted2/129 attempt retains its independent Partial verdict and null original exits. The fresh unique run supplies its own complete observed receipt and does not alter that history. Together with the previously independently reviewed early race1/78, the required native race selections now have completed direct evidence on3543. No new product P0/P1 or test-oracle defect was established in this bounded review. Final overall C4c approval remains pending the lead's current-source native rollback/postcommit selection, final portable packet/source mapping and exact-candidate cheap preflight. Historical4c rollback4/940 and8f postcommit1/30 remain their own exact-source results.
+
+Commands: bounded receipt cat, Python JSON/XML parsing, SHA-256 of the12 explicit release members and full fresh public transcripts. No check output, exit or source execution was invented. No merge, complete matrix, production/provider/payment/host/legal approval follows.

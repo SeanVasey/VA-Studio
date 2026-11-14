@@ -1,0 +1,101 @@
+{
+  "decision": "APPROVE WITH CONDITIONS",
+  "reviewed_head": "baf46747cbd5ae3e16d2657a34bf8ab708eb4822",
+  "carried_from_approved_head": "ad4bf751a3302a816eda49dd7951000610fe736c",
+  "tested_operative_head": "d4b331039336450e65fd0263820e60ae6a7ad071",
+  "verification_utc": "2026-10-15T00:47:49.872677+00:00",
+  "scope": "Independent receipt-only publication-head carry; no new application execution or full release acceptance.",
+  "specification_verdict": "Pass for source-preserving receipt-only carry",
+  "engineering_quality_verdict": "Acceptable with unchanged original conditions; complete release acceptance remains Partial.",
+  "open_P0_P1": [],
+  "required_repairs": [],
+  "exact_changed_paths": {
+    "docs/handoff/2026-10-07/CLAUDE-PLAN.md": "M",
+    "docs/handoff/2026-10-07/codex-deferred-20261011.md": "M",
+    "docs/verification/tax-write-admission-20261014/README.md": "M",
+    "docs/verification/tax-write-admission-20261014/independent-packet-verification.json": "A",
+    "docs/verification/tax-write-admission-20261014/independent-review-DECISION.md": "A"
+  },
+  "diff_sha256": "c256c537c302f47dfad4ef4663fe66332f7fc4d6fcce5e603dc9337ae393a4ca",
+  "diff_check_exit": 0,
+  "clean_head_before_and_after": true,
+  "copied_approval_artifacts": {
+    "decision": {
+      "original_runtime": "/workspace/runtime/tax-write-admission-independent-final-DECISION-ad4bf751-20261015.md",
+      "committed_path": "docs/verification/tax-write-admission-20261014/independent-review-DECISION.md",
+      "sha256": "8309e866cadf75e53e8d99bc90f776437fca2cbe2d1ba2bb224b2f8cea77b781",
+      "bytes": 9051,
+      "identical_to_original": true
+    },
+    "verification_report": {
+      "original_runtime": "/workspace/runtime/tax-write-admission-independent-final-DECISION-ad4bf751-20261015.json",
+      "committed_path": "docs/verification/tax-write-admission-20261014/independent-packet-verification.json",
+      "sha256": "197c783ca4a7669399da86be59e7f3634c9376cca8384d8b61fcf2bc7c07b149",
+      "bytes": 139301,
+      "identical_to_original": true
+    }
+  },
+  "unchanged_packet_files": {
+    "docs/verification/tax-write-admission-20261014/independent-design-review.md": {
+      "sha256": "23868e6ad1341b3cedd50259a5f42aac6e27478069633db373bcd24c83e3f6e9",
+      "bytes": 13787
+    },
+    "docs/verification/tax-write-admission-20261014/design.md": {
+      "sha256": "5b4bf2214fbfa7b220a5f4958c218ce3f9a07fb91e98101855c8a81dffd76907",
+      "bytes": 5545
+    },
+    "docs/verification/tax-write-admission-20261014/recorded-evidence-index.json": {
+      "sha256": "636ee7acfafca6a5bcc4e987ff2a543151d4fcdd84fb43a36270bc019f6353b5",
+      "bytes": 413961
+    },
+    "docs/verification/tax-write-admission-20261014/ci-policy-self-tests.json": {
+      "sha256": "995b5426da87c8526beb0b671b090a53bf9fd20a89ceff667212a7d5efc9cdbd",
+      "bytes": 1707
+    },
+    "docs/verification/tax-write-admission-20261014/recorded-evidence.tar.gz": {
+      "sha256": "b35525aebbd244c18ba91bfba0a1f648808bacf8850510dbb4b8a52cb35e27f0",
+      "bytes": 9040998
+    }
+  },
+  "archive": {
+    "sha256": "b35525aebbd244c18ba91bfba0a1f648808bacf8850510dbb4b8a52cb35e27f0",
+    "bytes": 9040998,
+    "members": 2646,
+    "all_safe_unique_regular_members_and_original_index_hashes_verified": true,
+    "source_inventories": 18,
+    "exact_source_objects": 2307,
+    "original_invocations": 28,
+    "original_approval_path_bindings": 42189,
+    "index_sha256": "636ee7acfafca6a5bcc4e987ff2a543151d4fcdd84fb43a36270bc019f6353b5"
+  },
+  "actual_current_source_carry": {
+    "manifest_bundle": "bundle-d4b331039336-0617ce833847a47e",
+    "manifest_canonical_sha256": "3b715f6996369493a55fd23146389cbc97ec0367e5c3bc49ee5c646f2388a7df",
+    "actual_inputs": 2344,
+    "routes": 16,
+    "loaders": 13,
+    "actual_set_equals_original_inventory": true,
+    "all_actual_input_hashes_equal_original": true,
+    "all_current_loader_hashes_equal_original": true,
+    "all_input_Git_modes_types_oids_equal_tested_approved_publication_heads": true,
+    "all_other_tracked_bytes_unchanged": true
+  },
+  "CI_registry_hashes_unchanged": {
+    ".github/workflows/final-verification.yml": "b645aafce488a4a5dca3d32a73ae6926811faac5c5e3d951c82299aba23e1169",
+    ".gitlab-ci.yml": "f6749c2e6eb03cc381cc3d0fb427861835af0c62ac30ebe0a6beec0092436b0d",
+    "scripts/ci/database-mysql-skips.json": "348db09c5003885a6f975cde6a3f62a7d745e11e1edbd5ac7639069230c1ab4d",
+    "scripts/ci/database-sqlite-skips.json": "07fc9bf848b9fd353f1fd534e93b9b69c31f21ee0c27c3db05d6554cba352197",
+    "scripts/ci/test-ci-scope.py": "fc1b01c137d20b0b6f0cabaa60e299742e78acd4659a8801288be8cb0fa455d4",
+    "scripts/ci/test-workflow-cadence.py": "5913073b2e4cd7364d914d77aed3cea60fdcebdfe93c67489bad150a21c83cc5"
+  },
+  "receipt_wording_review": "README and both ledger addenda accurately quote exact original approval and retain carry/preflight/protections as pending, including original evidence limits and adjacent ordinary membership P2.",
+  "conditions_unchanged": [
+    "Cheap preflight and protections must pass on this exact published head, followed by expected-SHA merge; no gate bypass or Foundation/GitLab dispatch approved.",
+    "Actual effective RR/Serializable gap behavior without transaction overrides or verified canonical uniqueness remains required; RC phantom, complete restored schema, unexpected trigger/index, arbitrary blind writer and overlapping DDL acceptance remain unproved.",
+    "1205 wait has executed evidence;1213 restoration is source-reviewed only. Row/metadata waits do not interrupt arbitrary SQL or prove whole-operation wall time; lost-anchor refusal is not undo or compensation.",
+    "Existing-request pre-create READ/final provider-I/O admission, V2 committed-source/terminal consumer, Paid252 forward wiring and root registration remain next work.",
+    "Default-off/unmounted/unregistered/test-funds/refusing transport and all host/provider/merchant/tax/live/deploy/import/DNS/cutover/activation/release gates remain open.",
+    "Adjacent pre-existing ordinary membership/ReservationOperations throwing afterCommit P2 remains open for an owned positive physical-commit witness and genuine callback regression."
+  ],
+  "actions": "Read-only Git/diff/source/archive/JSON/hash inspection only; no application, test, database, CI, hosted, publication, merge, or tracked-file write."
+}

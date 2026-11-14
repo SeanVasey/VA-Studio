@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicCatalog;
+use App\Domain\SiteBuilder\LegalPublicationGuard;
 use App\Domain\SiteBuilder\Models\SiteImage;
 use App\Domain\SiteBuilder\Models\SitePublication;
 use App\Domain\SiteBuilder\Models\SitePublicationRevision;
@@ -17,6 +18,7 @@ use App\Domain\SiteBuilder\SiteRelatedTracks;
 use App\Filament\Forms\PreserveTrackIdState;
 use App\Filament\Resources\SiteReleaseResource\Pages\ListSiteReleases;
 use App\Models\User;
+use App\Support\Audit\AuditEvent;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -38,6 +40,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use UnitEnum;
@@ -115,11 +118,13 @@ class SiteReleaseResource extends OperatorResource
                     Select::make('href')->label('Destination')->options([
                         '/' => 'Home', '/#catalog' => 'Catalog', '/#licenses' => 'Licensing', '/#studio' => 'Studio',
                         '/about' => 'About', '/contact' => 'Contact', '/blog' => 'Blog', '/videos' => 'Videos',
+                        '/legal/privacy' => 'Privacy policy', '/legal/terms' => 'Terms', '/legal/licenses' => 'License comparison',
                     ])->required(),
                 ])->minItems(1)->maxItems(8)->helperText('A page must be included in this release before linking to it.'),
                 Textarea::make('content.footer.description')->label('Footer description')->required()->maxLength(300)->rows(2),
             ]),
             ...static::editorialFields(),
+            ...static::legalFields(),
             Section::make('Homepage sharing metadata')->description('Published track pages retain their own title, description and canonical URL.')->schema([
                 TextInput::make('content.seo.title')->label('Page title')->required()->maxLength(120),
                 Textarea::make('content.seo.description')->label('Page description')->required()->maxLength(300)->rows(3),
@@ -179,6 +184,58 @@ class SiteReleaseResource extends OperatorResource
                 Checkbox::make("enabled.{$key}")->label("Include {$label} page")->live(),
                 Group::make($fields)->visible(fn (Get $get): bool => (bool) $get("enabled.{$key}")),
             ]);
+        }
+
+        return $sections;
+    }
+
+    /** Labels of the legal page slots, in SiteContentSchema::LEGAL_DOCUMENTS order. */
+    private const LEGAL_LABELS = ['privacy' => 'Privacy policy', 'terms' => 'Terms', 'licenses' => 'License comparison'];
+
+    /**
+     * Legal pages carry approved text pasted by staff. Saving keeps the release private; the text is public only once the
+     * release is published, at /legal/privacy, /legal/terms and /legal/licenses.
+     */
+    private static function legalFields(): array
+    {
+        $sections = [];
+        foreach (self::LEGAL_LABELS as $key => $label) {
+            if ($key === 'licenses') {
+                // DD-31: the comparison itself is generated from the published license versions; staff write only its frame.
+                $sections[] = Section::make("{$label} page")->collapsible()->collapsed()
+                    ->description('The comparison lists every published license version in its availability window, with the terms generated from that version, as the track cards show them. Write only the page title and introduction; the page is absent while no version is published.')
+                    ->schema([
+                        Checkbox::make("enabled_legal.{$key}")->label("Include {$label} page")->live(),
+                        Group::make([
+                            TextInput::make("content.legal.{$key}.title")->label("{$label} page title")->required()->maxLength(120),
+                            Textarea::make("content.legal.{$key}.description")->label("{$label} introduction")->required()->maxLength(300)->rows(2),
+                        ])->visible(fn (Get $get): bool => (bool) $get("enabled_legal.{$key}")),
+                    ]);
+
+                continue;
+            }
+            $sections[] = Section::make("{$label} page")->collapsible()->collapsed()
+                ->description('Paste only text that has been approved for publication. Plain text: headings and paragraphs, without markup or links.')
+                ->schema([
+                    Checkbox::make("enabled_legal.{$key}")->label("Include {$label} page")->live(),
+                    Group::make([
+                        TextInput::make("content.legal.{$key}.title")->label("{$label} page title")->required()->maxLength(120),
+                        Textarea::make("content.legal.{$key}.description")->label("{$label} page description")->required()->maxLength(300)->rows(2),
+                        TextInput::make("content.legal.{$key}.version")->label('Version')->required()->maxLength(32)
+                            ->helperText('A short label for this approved text, such as 1 or 2026-11. Shown on the page.'),
+                        TextInput::make("content.legal.{$key}.effective_date")->label('Effective date')->required()->maxLength(10)->placeholder('YYYY-MM-DD')
+                            ->helperText('Shown on the page as the date this text takes effect.'),
+                        TextInput::make("content.legal.{$key}.approval_reference")->label('Approval reference')->required()->maxLength(200)
+                            ->helperText('Who approved this exact text and where that is recorded. Kept with the release for staff; never shown publicly.'),
+                        Repeater::make("content.legal.{$key}.sections")->label("{$label} sections")->schema([
+                            TextInput::make('heading')->label('Section heading')->required()->maxLength(160),
+                            Repeater::make('paragraphs')->label('Section paragraphs')
+                                ->simple(Textarea::make('text')->label('Paragraph')->required()->maxLength(4000)->rows(5))
+                                ->minItems(1)->maxItems(40)->defaultItems(1),
+                        ])->itemLabel(fn (array $state): string => ($state['heading'] ?? '') ?: 'New section')
+                            ->minItems(1)->maxItems(60)->defaultItems(1)->collapsible()->reorderableWithButtons(),
+                    ])->visible(fn (Get $get): bool => (bool) $get("enabled_legal.{$key}")),
+                ]);
         }
 
         return $sections;
@@ -270,7 +327,16 @@ class SiteReleaseResource extends OperatorResource
     {
         $content = SiteContentSchema::forEditing($content);
         $images = static::imageForm($content);
-        unset($content['images']);
+        $legal = is_array($content['legal'] ?? null) ? $content['legal'] : SiteContentSchema::NO_LEGAL;
+        unset($content['images'], $content['legal']);
+        $enabledLegal = [];
+        foreach (SiteContentSchema::LEGAL_DOCUMENTS as $key) {
+            $enabledLegal[$key] = is_array($legal[$key]);
+            $content['legal'][$key] = $legal[$key] ?? ['title' => '', 'description' => '', 'version' => '', 'effective_date' => '',
+                'approval_reference' => '', 'sections' => [['heading' => '', 'paragraphs' => ['']]]];
+        }
+        // A copy of a schema 5 comparison keeps its title and introduction; its typed sections are not carried forward.
+        $content['legal']['licenses'] = Arr::only($content['legal']['licenses'], ['title', 'description']);
         $enabled = [];
         foreach (['about', 'contact', 'blog', 'videos'] as $key) {
             $enabled[$key] = $content[$key] !== null;
@@ -297,7 +363,7 @@ class SiteReleaseResource extends OperatorResource
             }
         }
 
-        return ['label' => $label, 'content' => $content, 'enabled' => $enabled, 'images' => $images];
+        return ['label' => $label, 'content' => $content, 'enabled' => $enabled, 'enabled_legal' => $enabledLegal, 'images' => $images];
     }
 
     public static function createDraftAction(): Action
@@ -334,20 +400,40 @@ class SiteReleaseResource extends OperatorResource
                 }
             }
             $content = SiteRelatedTracks::fromForm($content);
-            // Only enabled associations need v4. Clearing them restores the existing image-based v2/v3 choice without
-            // changing retained releases or losing an image. Empty new keys do not enter older schemas.
-            $version = SiteRelatedTracks::used($content) ? 4 : (array_filter($images) === [] ? 2 : 3);
-            if ($version !== 4) {
+            $legal = SiteContentSchema::NO_LEGAL;
+            foreach (SiteContentSchema::LEGAL_DOCUMENTS as $key) {
+                if (($data['enabled_legal'][$key] ?? false) === true) {
+                    $legal[$key] = $content['legal'][$key] ?? null;
+                }
+            }
+            if (is_array($legal['licenses'])) {
+                $legal['licenses'] = Arr::only($legal['licenses'], ['title', 'description']);
+            }
+            // Only the generated comparison needs v6, only included legal pages need v5, and only enabled associations need
+            // v4. Clearing them restores the existing image-based v2/v3 choice without changing retained releases or losing
+            // an image. Empty new keys do not enter older schemas.
+            $version = is_array($legal['licenses']) ? SiteContentSchema::GENERATED_LICENSES_VERSION
+                : (array_filter($legal, 'is_array') !== [] ? SiteContentSchema::LEGAL_VERSION
+                : (SiteRelatedTracks::used($content) ? 4 : (array_filter($images) === [] ? 2 : 3)));
+            if (! in_array($version, SiteContentSchema::RELATED_TRACK_VERSIONS, true)) {
                 foreach (['blog', 'videos'] as $section) {
                     foreach ($content[$section]['entries'] ?? [] as $index => $entry) {
                         unset($content[$section]['entries'][$index]['related_track_ids']);
                     }
                 }
             }
-            unset($content['schema_version'], $content['images']);
-            $content = ['schema_version' => $version] + $content + (in_array($version, [3, 4], true) ? ['images' => $images] : []);
-            app(SiteContent::class)->create($content, $data['label'], static::actor());
+            unset($content['schema_version'], $content['images'], $content['legal']);
+            $content = ['schema_version' => $version] + $content
+                + (in_array($version, SiteContentSchema::IMAGE_VERSIONS, true) ? ['images' => $images] : [])
+                + (in_array($version, SiteContentSchema::LEGAL_VERSIONS, true) ? ['legal' => $legal] : []);
+            $release = app(SiteContent::class)->create($content, $data['label'], static::actor());
             Notification::make()->success()->title('Private draft saved')->body('Preview the release before publishing.')->send();
+            // A draft may hold drafting marks for private review; say at once that the domain will refuse to publish it.
+            $markers = LegalPublicationGuard::findings($release->content);
+            if ($markers !== []) {
+                Notification::make()->warning()->title('This draft cannot be published yet')
+                    ->body(LegalPublicationGuard::describe($markers))->persistent()->send();
+            }
         } catch (ValidationException $exception) {
             $path = $livewire->getSchema($livewire->getMountedActionSchemaName())->getStatePath();
             $errors = [];
@@ -533,11 +619,19 @@ class SiteReleaseResource extends OperatorResource
                 $schedules = app(SiteContent::class)->recentSchedules(20);
                 $labels = SiteRelease::query()->whereIn('id', $schedules->pluck('release_id'))->pluck('label', 'id');
                 $users = User::query()->whereIn('id', $schedules->pluck('created_by')->merge($schedules->pluck('resolved_by'))->filter())->pluck('name', 'id');
+                // The schedule row stores one of its fixed outcomes; a legal-marker refusal names its reason in the audit event.
+                $legal = AuditEvent::query()->where('action', 'site.schedule.failed')->where('subject_type', SitePublicationSchedule::class)
+                    ->whereIn('subject_id', $schedules->where('outcome', 'integrity')->pluck('id'))->get()
+                    ->filter(fn (AuditEvent $event): bool => ($event->context['reason'] ?? null) === LegalPublicationGuard::REASON)
+                    ->pluck('subject_id')->flip();
 
                 return view('admin.site-schedule-history', ['rows' => $schedules->map(fn (SitePublicationSchedule $schedule): array => [
                     'id' => $schedule->id, 'release' => ($labels[$schedule->release_id] ?? 'Unavailable').' (#'.$schedule->release_id.')',
                     'publish_at' => static::utc($schedule->publish_at), 'state' => ucfirst($schedule->state),
-                    'reason' => static::scheduleOutcome($schedule->outcome), 'scheduled_by' => $users[$schedule->created_by] ?? 'Unavailable',
+                    'reason' => $legal->has($schedule->id)
+                        ? 'Not published: the legal pages still hold unresolved placeholders or review markers ('.LegalPublicationGuard::REASON.')'
+                        : static::scheduleOutcome($schedule->outcome),
+                    'scheduled_by' => $users[$schedule->created_by] ?? 'Unavailable',
                     'resolved' => $schedule->resolved_at === null ? '—' : static::utc($schedule->resolved_at)
                         .($schedule->resolved_by === null ? ' by the scheduler' : ' by '.($users[$schedule->resolved_by] ?? 'Unavailable')),
                     'revision' => $schedule->publication_revision,

@@ -1,0 +1,60 @@
+{
+  "head_at_discovery": "bf498055a5917172f930c877ffcff5f220dc4d4d",
+  "discovery_only": true,
+  "working_tree_uncommitted": true,
+  "selected_cases": 1930,
+  "selected_files": 180,
+  "all_cases": 7900,
+  "all_files": 577,
+  "local_discovery_shards": 8,
+  "hosted_shards_unchanged": 24,
+  "untimed_files_fallback": 17,
+  "policy_tests": {
+    "focused": 50,
+    "shards": 52
+  },
+  "observed_exit_codes": {
+    "focused": 0,
+    "shards": 0,
+    "census": 0
+  },
+  "new_cases_selected_exactly_once": [
+    "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest::test_twenty_seconds_before_proof_mint_remains_inside_the_original_admission_deadline",
+    "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest::test_later_producer_lease_cannot_renew_the_original_operation_deadline",
+    "Tests\\Feature\\ProductionMembershipBilling\\MembershipAwardDeadlineTest::test_post_commit_deadline_refuses_a_receipt_without_claiming_the_durable_award_rolled_back"
+  ],
+  "source_inputs_unchanged_during_discovery": {
+    "scripts/ci/database-mysql-selection.json": "155b8f2c7255f5028446c2257dc20897ed63cf716c26822d93dd346b8ef812be",
+    "scripts/ci/database-mysql-skips.json": "587426386f3273ff485b1dc27e5bd4fe14511b5e211af3579db57b6a9dd4a93c",
+    "scripts/ci/database-sqlite-skips.json": "fa9d520524915c779eec183694b5cf48f71aee5073a499ad021123e78b12cbbc",
+    "tests/Feature/ProductionMembershipBilling/MembershipAwardDeadlineTest.php": "e8df808fa1b4a5a3767cc4f8554127e10102a3f4a859504a87af04a754dfdb5b",
+    "tests/Support/MembershipAwardMonotonicClock.php": "8e11c40ba38bd03e7ae696ff8f2479602c7a145c220ecc76e2204d56a5fe12bf"
+  },
+  "policy_files": {
+    "scripts/ci/database-mysql-selection.json": "155b8f2c7255f5028446c2257dc20897ed63cf716c26822d93dd346b8ef812be",
+    "scripts/ci/database-mysql-skips.json": "587426386f3273ff485b1dc27e5bd4fe14511b5e211af3579db57b6a9dd4a93c",
+    "scripts/ci/database-sqlite-skips.json": "fa9d520524915c779eec183694b5cf48f71aee5073a499ad021123e78b12cbbc",
+    ".github/workflows/final-verification.yml": "2b1d5f8ddd7033d17b8169b2b4ec89aa216f1e73828470f91fd820abca1a1fa2"
+  },
+  "discovery_files": {
+    "phpunit-ci-mysql-1-tests.xml": "92ee074f0c8c5c062bb63af57c55716cdefb91f1e286a741b37ca4cda5d61f05",
+    "phpunit-ci-mysql-1.xml": "f87bf9fa418b2f5fadc1f209dfddd72beb50fd2e33833e34cd2017cc3f5ce5d9",
+    "phpunit-ci-mysql-2-tests.xml": "5c9cbd6ff6079c41c5c8af8b94f23395ed3b4d233042774839a50432e13142c9",
+    "phpunit-ci-mysql-2.xml": "d5902dfebed2e8910a5a7668bcdc81066cede85b9ec3d22b2acd452acf00a357",
+    "phpunit-ci-mysql-3-tests.xml": "eab12b6af21e015330e816a93434f59e4c33849a4c19fb2f9184f6ec0091ea55",
+    "phpunit-ci-mysql-3.xml": "b940a88da9f316aaaf71d34bf71f092df6ade3f7f3a7fa875d00e0b0d147e5ff",
+    "phpunit-ci-mysql-4-tests.xml": "4a567cacdcb8d11d0882b1a8358889668c73f093c72e3351d0ff6dd474937d7b",
+    "phpunit-ci-mysql-4.xml": "d1e6e7e2b1e522474277d609f9a6c53831b285a0db74fa5b920c2990d91abe91",
+    "phpunit-ci-mysql-5-tests.xml": "2e4a5f1d436e956a4ecdbbc953c01cb25efa85a94d83845b2aa018393bd3e71f",
+    "phpunit-ci-mysql-5.xml": "eaeb693dbcb86acf3e174ccce35b3913be6e0c8be349eb86bd4688facbe7a03d",
+    "phpunit-ci-mysql-6-tests.xml": "0781e7c7b0b7061a8df2086cc2f0ae65dec0894f76344bc90342b3018f6212f6",
+    "phpunit-ci-mysql-6.xml": "20f17da1d2885e461e8c48c4e85baf7f68ad9b60aa00c43dd9eb2d78d75e4c4c",
+    "phpunit-ci-mysql-7-tests.xml": "f78a7846c1d54b6eb9fc9c0dc0a0d44b1db689b87cc59166a0281bab2e5a1cd4",
+    "phpunit-ci-mysql-7.xml": "cc81c7a140775b0d94efe696242ec1a63ea35fef48ae2175008d04f9d22321e8",
+    "phpunit-ci-mysql-8-tests.xml": "a58f9700025009f11068470a46465675527239a26e57bbe5f2748a4c59f83d6b",
+    "phpunit-ci-mysql-8.xml": "5aed3ed057bf7cf6d2b3a21f7e741bf9bdcffc01145a7fec808c9b1e47c00b8e",
+    "phpunit-ci-mysql-manifest.json": "b7891dea11fe362b935fdf3f21685678e22e791efe3015ddaeabf53e58d7d1af",
+    "phpunit-ci-mysql-source-tests.xml": "c5b9c62df33e751ade8690b02b6348a07b8f2d71733ba2956b21e72695b2b0ec"
+  },
+  "prior_discovery": "selection-deadline-initial/status.json (exit 0, superseded because the test file changed during discovery)"
+}

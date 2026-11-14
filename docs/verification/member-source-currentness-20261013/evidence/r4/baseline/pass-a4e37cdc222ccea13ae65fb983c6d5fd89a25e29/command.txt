@@ -1,0 +1,2 @@
+Working directory: /workspace/VA-Studio-member-policy-admission
+DB_CONNECTION=sqlite DB_DATABASE=:memory: DB_HOST=127.0.0.1 DB_PORT=1 bash /workspace/runtime/member-policy-admission-evidence/baseline/run.sh /workspace/VA-Studio-member-policy-admission a4e37cdc222ccea13ae65fb983c6d5fd89a25e29 pass

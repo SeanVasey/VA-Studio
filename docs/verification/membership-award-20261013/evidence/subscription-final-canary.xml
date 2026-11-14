@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php" tests="1" assertions="9" errors="0" failures="0" skipped="0" time="3.432275">
+    <testcase name="test_current_staff_approves_policy_derived_terms_and_original_buyer_without_awarding" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php" line="50" class="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingSubscriptionApprovalTest" assertions="9" time="3.432275"/>
+  </testsuite>
+</testsuites>

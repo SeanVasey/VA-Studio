@@ -1,0 +1,73 @@
+{
+  "scope": "Completed pure actual-catalog timestamp compatibility correction, no DB bodies",
+  "files": {
+    "timestamp-compatibility/MemberGrantDocumentTimestampTest.php": {
+      "bytes": 4613,
+      "sha256": "f3e16aab83fcf2a11560855e31480311a09b4cd28c22c2b4fd2135dccbe78766"
+    },
+    "timestamp-compatibility/README.md": {
+      "bytes": 4558,
+      "sha256": "2ab14fe2eed74bd8de09ea54ac5f5cea485d36c260ffecb8d64990d5174e6f65"
+    },
+    "timestamp-compatibility/external-to-repository.diff": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "timestamp-compatibility/final-source.json": {
+      "bytes": 1856923,
+      "sha256": "afb08986e046ef2fcab0b45f43ccceb4c6a5dd62afcb611d581ec1e5f0e402e2"
+    },
+    "timestamp-compatibility/fixed-MemberGrantDocumentValues.php": {
+      "bytes": 17184,
+      "sha256": "5371b90f0a74bb9f2d3bc010aec651b7fe7016eee16d8557e395fb27b85463b0"
+    },
+    "timestamp-compatibility/fixed.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "timestamp-compatibility/fixed.txt": {
+      "bytes": 300,
+      "sha256": "2de571dd47d1ea8e6c17a876a01750b5fed9d9b15eecbd1e1b139859bc2ef06a"
+    },
+    "timestamp-compatibility/fixed.xml": {
+      "bytes": 23357,
+      "sha256": "14ecff9bef11c56d04f55122bbbcae7532f2d4a97ed2b2b044ff78d6b19d93ec"
+    },
+    "timestamp-compatibility/old-MemberGrantDocumentValues.php": {
+      "bytes": 16832,
+      "sha256": "8da46f30b9bc511ec92728d717e1e255fd15445e9261999d789ac76ff7037179"
+    },
+    "timestamp-compatibility/old-source.json": {
+      "bytes": 820,
+      "sha256": "59e21a1e28845f19ebf074c54a9eb2f5fddd8181aa3127ddb90a14b27355a42f"
+    },
+    "timestamp-compatibility/old.exit": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "timestamp-compatibility/old.txt": {
+      "bytes": 669,
+      "sha256": "643f31e9e6cb711b0c72534b11af386b4878769508ce6db220107431b8d67505"
+    },
+    "timestamp-compatibility/old.xml": {
+      "bytes": 1194,
+      "sha256": "3e9e641fd89a3954cbe0b4298d2e9c8b152ed4ab0c61c50c306a7d5bdb2a59b4"
+    },
+    "timestamp-compatibility/pint.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "timestamp-compatibility/pint.txt": {
+      "bytes": 33,
+      "sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2"
+    },
+    "timestamp-compatibility/repository-test-source.php": {
+      "bytes": 4613,
+      "sha256": "f3e16aab83fcf2a11560855e31480311a09b4cd28c22c2b4fd2135dccbe78766"
+    },
+    "timestamp-compatibility/source-change.diff": {
+      "bytes": 7893,
+      "sha256": "3e0f002daa90e7450bc2707008c5c4386794f34ce5a34311056a1c5dfe8cf627"
+    }
+  }
+}

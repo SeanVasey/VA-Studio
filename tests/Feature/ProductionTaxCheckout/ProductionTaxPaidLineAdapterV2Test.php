@@ -3,6 +3,7 @@
 namespace Tests\Feature\ProductionTaxCheckout;
 
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
+use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidLineAdapterV2;
 use App\Domain\Commerce\ProductionTaxCheckout\ProductionTaxPaidOrderSourceV2;
 use App\Support\CanonicalJson;
@@ -107,8 +108,11 @@ class ProductionTaxPaidLineAdapterV2Test extends TestCase
     public function test_the_only_acceptance_path_requires_the_held_source(): void
     {
         $parameters = (new \ReflectionMethod(ProductionTaxPaidLineAdapterV2::class, 'accept'))->getParameters();
-        $this->assertSame(['source', 'position', 'line', 'provenance'], array_map(fn ($p) => $p->getName(), $parameters));
+        $this->assertSame(['source', 'position', 'line', 'provenance', 'reader', 'expectedOrderId'], array_map(fn ($p) => $p->getName(), $parameters));
         $this->assertSame(ProductionTaxPaidOrderSourceV2::class, (string) $parameters[0]->getType());
+        $this->assertSame(CurrentRows::class, (string) $parameters[4]->getType());
+        $this->assertFalse($parameters[4]->isOptional());
+        $this->assertFalse($parameters[5]->isOptional());
     }
 
     public static function refusals(): array

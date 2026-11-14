@@ -1,0 +1,17 @@
+{
+  "scope": "Exact archived policy/script/workflow/dependency hashes across the style-only correction. This verifies carry, not rerunning checks on a later head.",
+  "receipts": [
+    {
+      "receipt": "quality/pint-v2/policy-carry.json",
+      "before": "quality/sources-before.json",
+      "after": "quality/pint-v2/sources-before.json",
+      "original_results": "quality/results.json",
+      "unchanged_paths": 39,
+      "changed_inventory_paths": [
+        "tests/Feature/ProductionMembershipBilling/BillingRetrievalAttemptsTest.php"
+      ],
+      "original_results_match": true,
+      "tests_rerun": false
+    }
+  ]
+}

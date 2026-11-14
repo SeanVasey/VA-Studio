@@ -1,0 +1,85 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/f4/phpunit.xml
+
+......................EEEE.                                       27 / 27 (100%)
+
+Time: 02:26.285, Memory: 100.00 MB
+
+There were 4 errors:
+
+1) Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit#0 with data ('read', 'role')
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+/home/user/wt/f4/app/Domain/Staff/StaffWriteAuthority.php:122
+/home/user/wt/f4/app/Domain/Rights/ReviewLicense.php:59
+/home/user/wt/t1/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/wt/t1/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/wt/t1/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/wt/f4/app/Domain/Rights/ReviewLicense.php:52
+/home/user/wt/f4/tests/Support/LicenseFixtures.php:42
+/home/user/wt/f4/tests/Support/LicenseFixtures.php:51
+/home/user/wt/f4/tests/Support/QuoteFixtures.php:24
+/home/user/wt/f4/tests/Support/InventoryFixtures.php:28
+/home/user/wt/f4/tests/Support/OrderFixtures.php:42
+/home/user/wt/f4/tests/Support/OrderInquiryFixtures.php:26
+/home/user/wt/f4/tests/Feature/OrderInquiryTest.php:349
+/home/user/wt/t1/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit#1 with data ('read', 'mfa')
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+/home/user/wt/f4/app/Domain/Staff/StaffWriteAuthority.php:122
+/home/user/wt/f4/app/Domain/Rights/ReviewLicense.php:59
+/home/user/wt/t1/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/wt/t1/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/wt/t1/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/wt/f4/app/Domain/Rights/ReviewLicense.php:52
+/home/user/wt/f4/tests/Support/LicenseFixtures.php:42
+/home/user/wt/f4/tests/Support/LicenseFixtures.php:51
+/home/user/wt/f4/tests/Support/QuoteFixtures.php:24
+/home/user/wt/f4/tests/Support/InventoryFixtures.php:28
+/home/user/wt/f4/tests/Support/OrderFixtures.php:42
+/home/user/wt/f4/tests/Support/OrderInquiryFixtures.php:26
+/home/user/wt/f4/tests/Feature/OrderInquiryTest.php:349
+/home/user/wt/t1/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit#2 with data ('audit', 'role')
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+/home/user/wt/f4/app/Domain/Staff/StaffWriteAuthority.php:122
+/home/user/wt/f4/app/Domain/Rights/ReviewLicense.php:59
+/home/user/wt/t1/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/wt/t1/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/wt/t1/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/wt/f4/app/Domain/Rights/ReviewLicense.php:52
+/home/user/wt/f4/tests/Support/LicenseFixtures.php:42
+/home/user/wt/f4/tests/Support/LicenseFixtures.php:51
+/home/user/wt/f4/tests/Support/QuoteFixtures.php:24
+/home/user/wt/f4/tests/Support/InventoryFixtures.php:28
+/home/user/wt/f4/tests/Support/OrderFixtures.php:42
+/home/user/wt/f4/tests/Support/OrderInquiryFixtures.php:26
+/home/user/wt/f4/tests/Feature/OrderInquiryTest.php:349
+/home/user/wt/t1/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit#3 with data ('audit', 'mfa')
+Illuminate\Auth\Access\AuthorizationException: Staff multi-factor authentication is required for this write.
+
+/home/user/wt/f4/app/Domain/Staff/StaffWriteAuthority.php:122
+/home/user/wt/f4/app/Domain/Rights/ReviewLicense.php:59
+/home/user/wt/t1/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/home/user/wt/t1/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/home/user/wt/t1/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/home/user/wt/f4/app/Domain/Rights/ReviewLicense.php:52
+/home/user/wt/f4/tests/Support/LicenseFixtures.php:42
+/home/user/wt/f4/tests/Support/LicenseFixtures.php:51
+/home/user/wt/f4/tests/Support/QuoteFixtures.php:24
+/home/user/wt/f4/tests/Support/InventoryFixtures.php:28
+/home/user/wt/f4/tests/Support/OrderFixtures.php:42
+/home/user/wt/f4/tests/Support/OrderInquiryFixtures.php:26
+/home/user/wt/f4/tests/Feature/OrderInquiryTest.php:349
+/home/user/wt/t1/vendor/phpunit/phpunit/phpunit:104
+
+ERRORS!
+Tests: 27, Assertions: 97, Errors: 4.

@@ -1,0 +1,13 @@
+{
+  "source": "98ca4f0a64e82ee49a7d4b310d60a5095214c3c9",
+  "selected_executed_inputs": {
+    "app/Domain/Grants/Member/MemberOriginalIoFrame.php": "09f8eb47e127688e076f005226b9c23e631137dea9bb06b6d3deff69534cf561",
+    "app/Domain/Grants/Member/MemberOriginalBudget.php": "fc8d0306fdec3f0235e2b225ff6789f31301490cded976330cffb700036aff2a",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalNativeIoFrameTest.php": "1c007fdd97452396d1dfc21f4aac4a692cae7b76eaad641865ee848c56ec5a75",
+    "composer.lock": "ef380eba2d55aa74970f5267f273202ec455334d426460d282c56b30902bcb06",
+    "phpunit.xml": "493369cfb7feea104da4bec214c2cc6526ca2f1b9d937c50a2961fc59cb61aaf"
+  },
+  "inventory_count": 1297,
+  "changed_sources": [],
+  "scope": "Selected actual barrier/budget/test/dependency inputs match committed source; unrelated composition drafts in broad inventory are unexecuted and not promoted to committed source."
+}

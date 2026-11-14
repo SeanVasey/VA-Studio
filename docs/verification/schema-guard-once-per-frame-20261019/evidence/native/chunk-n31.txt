@@ -1,0 +1,12 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/g1/phpunit.xml
+
+
+CATALOG_CURRENTNESS {"case":"{closure:Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest::test_identical_row_local_temporary_shadow_remains_refused_after_a_positive_original_proof():173}","stage":"identical_row_temporary_shadow_refused","shadow_definition":"CREATE TEMPORARY TABLE `tracks` (\n  `id` bigint unsigned NOT NULL AUTO_INCREMENT,\n  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,\n  `slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,\n  `artist` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'VASEY.AUDIO',\n  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,\n  `bpm` smallint unsigned DEFAULT NULL,\n  `musical_key` varchar(24) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `genre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `mood` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `duration_seconds` int unsigned DEFAULT NULL,\n  `tags` json DEFAULT NULL,\n  `waveform` json DEFAULT NULL,\n  `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft',\n  `published_at` timestamp NULL DEFAULT NULL,\n  `created_at` timestamp NULL DEFAULT NULL,\n  `updated_at` timestamp NULL DEFAULT NULL,\n  `published_slug` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `metadata_version` int unsigned NOT NULL DEFAULT '0',\n  `publication_version` int NOT NULL DEFAULT '0',\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `tracks_slug_unique` (`slug`),\n  KEY `tracks_status_index` (`status`)\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci","identical_row_count":1,"identical_rows_sha256":"c61b7f14d34825da7bd70dd5a1996944504329e773432a141742ac1cda9d229e","refusal":"catalog_shadow_or_engine"}
+.                                                                   1 / 1 (100%)
+
+Time: 02:01.335, Memory: 90.00 MB
+
+OK (1 test, 7 assertions)

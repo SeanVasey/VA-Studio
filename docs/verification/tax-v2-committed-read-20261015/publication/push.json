@@ -1,0 +1,14 @@
+{
+  "recorded_utc": "2026-10-15T04:06:57.534198+00:00",
+  "expected_head": "78e2c7e773f4fa0a310360b67e50fe24cb6cfa62",
+  "argv": [
+    "git",
+    "push",
+    "--set-upstream",
+    "origin",
+    "harness/tax-v2-committed-read-20261015"
+  ],
+  "process_exit": 0,
+  "stdout": "branch 'harness/tax-v2-committed-read-20261015' set up to track 'origin/harness/tax-v2-committed-read-20261015'.\n",
+  "stderr": "remote: \nremote: Create a pull request for 'harness/tax-v2-committed-read-20261015' on GitHub by visiting:        \nremote:      https://github.com/SeanVasey/VA-Studio/pull/new/harness/tax-v2-committed-read-20261015        \nremote: \nTo https://github.com/SeanVasey/VA-Studio.git\n * [new branch]        harness/tax-v2-committed-read-20261015 -> harness/tax-v2-committed-read-20261015\n"
+}

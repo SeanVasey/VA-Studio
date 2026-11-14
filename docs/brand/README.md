@@ -27,7 +27,7 @@ Semantic CSS tokens are in `public/brand/theme.css`. Components should use seman
 | Role | Family | Treatment |
 | --- | --- | --- |
 | Impact display | Noto Sans Display ExtraCondensed 700/900 | Condensed font face or supported width axis, uppercase, no CSS scale compression |
-| Short section heading | Bebas Neue 400 | Short uppercase headings |
+| Short section heading and signage | Bebas Neue 400 | Short uppercase headings, header and footer links, cart label, license names; 20–26 px with 0.08em tracking for links (no bolder cut exists, so size and tracking carry weight). The hero headline alone stays on the impact face |
 | Body and controls | Reddit Sans 400–700 | Readable live text |
 | Music metadata | JetBrains Mono 400–700 | BPM, key, time, identifiers, tabular figures |
 

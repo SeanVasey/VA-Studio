@@ -1,0 +1,6 @@
+
+Fatal error: Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vaseyaudio_billing_retrieval_producer.production_membership_billing_positions' doesn't exist in /workspace/runtime/billing-retrieval-records-evidence/native-table-definitions.php:11
+Stack trace:
+#0 /workspace/runtime/billing-retrieval-records-evidence/native-table-definitions.php(11): PDO->query('SELECT * FROM `...')
+#1 {main}
+  thrown in /workspace/runtime/billing-retrieval-records-evidence/native-table-definitions.php on line 11

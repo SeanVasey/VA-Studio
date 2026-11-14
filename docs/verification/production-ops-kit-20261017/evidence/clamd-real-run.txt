@@ -1,0 +1,37 @@
+Real clamd 1.5.4 with the limits of ops/clamav/clamd.conf (paths, the database directory and the log file overridden for a private
+run as the clamav user; the limits, socket mode and scan options are the template's). Signatures from freshclam, 2026-10-17.
+
+$ ls -l <private>/clamd.ctl
+srw-rw---- 1 clamav clamav 0 Oct 17 18:56 /tmp/o1-clamd-run/clamd.ctl
+
+$ bash ops/clamav/verify-clamd.sh --clamdscan <wrapper>                      (as root; real daemon)
+PASS 1 signature date is fresh (12 h old)
+SKIP 1 clamscan printed no signature date; the time-zone comparison was not made      (default clamscan database dir empty here)
+PASS 2 a clean file reads OK
+PASS 2 the EICAR test file is FOUND (Eicar-Test-Signature)
+PASS 3 a ZIP over 25 MiB with an EICAR member is FOUND
+PASS 4 a file over 1280M is refused as Heuristics.Limits.Exceeded.MaxFileSize
+verify-clamd: automated acceptance steps 1-4 passed. ...
+
+$ bash ops/clamav/verify-clamd.sh --clamdscan <wrapper> --clamscan <wrapper with --database>     (UTC daemon)
+PASS 1 signature date is fresh (12 h old)
+PASS 1 the daemon and TZ=UTC clamscan report the same signature time
+PASS 2 a clean file reads OK
+PASS 2 the EICAR test file is FOUND (Eicar-Test-Signature)
+
+$ bash ops/clamav/verify-clamd.sh --as nobody ...                     (a user outside the group clamav)
+FAIL 1 'clamdscan --version' printed no signature date (daemon not running, or EnableVersionCommand no)
+FAIL 2 a clean file did not read OK (exit 2)   [and steps 3 and 4 FAIL the same way]
+
+$ TZ=Asia/Tokyo clamd -c <config> --foreground=true                    (daemon in a zone east of UTC)
+PASS 1 signature date is fresh (3 h old)                              <- the shifted date looks younger than it is
+FAIL 1 the daemon and TZ=UTC clamscan report different signature times (time zone drop-in missing, or a reload is still pending: wait for SelfCheck and rerun)
+
+$ freshclam (observed while fetching the signatures)
+WARNING: Clamd was NOT notified: The RELOAD command is disabled. Consider enabling it in the clamd configuration!
+
+Packaging observations on Ubuntu 24.04 (dpkg/apt-cache on the container):
+ - apt-cache show clamav-daemon: `Recommends: clamdscan` and no Depends on it; `which clamdscan` printed nothing after
+   `apt-get install --no-install-recommends clamav clamav-daemon`; `apt-get install clamdscan` provided /usr/bin/clamdscan.
+ - /usr/lib/systemd/system/clamav-daemon.socket: SocketUser=clamav, SocketGroup=clamav, no SocketMode.
+ - /etc/apparmor.d/usr.sbin.clamd: allows /tmp/**, /var/lib/clamav/**, /var/log/clamav/*, /run/clamav/clamd.ctl and a few spool directories; no /var/tmp/clamd, no /srv.

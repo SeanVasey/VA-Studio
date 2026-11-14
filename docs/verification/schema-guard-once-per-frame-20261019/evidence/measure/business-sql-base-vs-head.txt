@@ -1,0 +1,3 @@
+txn 0: business statements base=505 head=505 identical_multiset=True
+txn 1: business statements base=804 head=876 identical_multiset=False
+txn 1: base business multiset contained in head (excluding the end statement): True; base-only={}

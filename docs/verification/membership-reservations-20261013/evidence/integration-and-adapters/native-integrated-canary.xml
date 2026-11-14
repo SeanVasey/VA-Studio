@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipReservationLifecycleTest" file="/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php" tests="1" assertions="21" errors="0" failures="0" skipped="0" time="262.375136">
+    <testcase name="test_real_sources_reserve_once_and_exact_retry_and_award_replay_preserve_the_retained_identity" file="/workspace/VA-Studio-membership-reservations/tests/Feature/ProductionMembershipBilling/MembershipReservationLifecycleTest.php" line="34" class="Tests\Feature\ProductionMembershipBilling\MembershipReservationLifecycleTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipReservationLifecycleTest" assertions="21" time="262.375136"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,12 @@
+HEAD de11fdb4da122da1cf576633ee3871d49074e5a3 mysqld 8.4.11
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/mig/phpunit.xml
+
+......................                                            22 / 22 (100%)
+
+Time: 03:30.333, Memory: 89.00 MB
+
+OK (22 tests, 284 assertions)
+exit=0

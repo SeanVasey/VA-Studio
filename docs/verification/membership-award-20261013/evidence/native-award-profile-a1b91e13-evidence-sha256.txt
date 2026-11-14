@@ -1,0 +1,6 @@
+048231705530634bda02726888f5d3f7ed39b8e1c3da649227c9105549817b22  /workspace/runtime/membership-award-evidence/native-award-profile-a1b91e13.json
+f80cbd453d7ad8d6592b3ae0242a8172fbf171e4eca70473406067cb3b7c2ef5  /workspace/runtime/membership-award-evidence/native-award-profile-a1b91e13.txt
+dc312a9dac0e9989534b441554ebfd6833fdab1d081e0bf5d428d58577eda298  /workspace/runtime/membership-award-evidence/native-award-profile-a1b91e13.xml
+53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3  /workspace/runtime/membership-award-evidence/native-award-profile-a1b91e13.exit
+245a6a33d3d41061165abce133f4024416d8ad32488cf57357259c4d6ac0ae03  /workspace/runtime/membership-award-evidence/native-award-profile-a1b91e13-whole-process-digests.tsv
+7b2c3c5b1d837f1ba85e24f3b1b3e7760207dd89bcc1680646515949445b517c  /workspace/runtime/membership-award-evidence/native-award-profile-a1b91e13-digest-availability.tsv

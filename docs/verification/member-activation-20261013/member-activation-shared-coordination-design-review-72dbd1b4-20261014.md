@@ -1,0 +1,68 @@
+# C4c shared native coordination design review — 2026-10-14
+
+Reviewer: `/root/activation_deadline_independent_review`, separate non-author reviewer. Bounded ordinary application correctness review under AGENTS and the previously read Code Verification instructions. No implementation/test/configuration edits, application/DB workloads, provider actions or hosted checks were run. Only read-only source/existing-evidence inspection and this new runtime note were performed.
+
+## Concrete design conclusion
+
+Reviewed the proposed unpublished C4c design against clean `72dbd1b45d547d2be608cd77e7f3fe15528dead5`. **Shared captured-native-PDO coordination for activation and ordinary release is a coherent narrow design, accepted subject to the exact protocol and source/runtime gates below.** Activation-only coordination is insufficient for the newly demonstrated release/readback interference. The shared guard is preferable here to adding a new ordinary-release terminal-refusal proof lane: it keeps existing source/graph/owner/audit proofs and replay semantics intact.
+
+This is acceptance of the concrete design, not its unimplemented source, a passing race or the final C4c DECISION. Preserve original contracts with an explicit coordination/cleanup addendum, C4b's separate independent boundary, C4c default-off/unmounted state and all failed evidence. No merge, production enablement, provider, payment, host or legal claim follows.
+
+## Independently reconciled early-race traces
+
+Read the preserved third transcript at `runtime/member-activation-root-evidence/mysql-activation-same-redemption-race-refusal-locations/parent-race-transcript.json`: 31376 bytes, SHA-256 `5b72ee59bee4a0adefb6017e743303988154108ef501d7de09d717388cb2299b`. This exact copy is present and intact; the earlier failed runtime directory lookup does not establish artifact loss. Its result/log independently report one test / 33 assertions / one failure, zero errors/skips, process/verifier 1, 509.498069 seconds and all 2318 captured inputs/runner/autoload/source state unchanged.
+
+Both exact chains are `source_refused -> MembershipReservationContext::proveSources -> admit:779 operation_deadline` in the actual `completeActivation` path. Worker 0 reaches that via the normal `MemberActivationObserver` committing proof after actual insertion; worker 1 reaches it via the mandatory `proveGrantPlan -> SealedMemberGrants::proveReadyCurrent -> insertActivation` preinsert proof. This closes the earlier location uncertainty; the second run's `committed_frame_required` outcome is not silently substituted.
+
+Their effective finish Budget deadlines have shortened from the entry sample and are expired by approximately 5.612313s and 2.593713s. This establishes exhausted effective min-only allowance, not original nominal 300 seconds elapsed. Exact source-frame/authority attribution within Context's minimum is not separately timestamped. The parent's raw post-worker observation reports zero origin/artifact/activation rows and only award/reserve events. That is real observed rollback metadata, not the unexecuted complete authenticated audit/graph/original proof after the strict successful-writer gate.
+
+The three historical early-race failures remain distinct: preparation-only outer60 timeout, genuine two-owner-wait failure without sites, and this traced completion-phase failure. They must all remain in the final packet.
+
+## Independently reconciled consume/release failure
+
+Read the preserved first terminal-order transcript at `runtime/member-activation-root-evidence/mysql-activation-consume-release-orders/parent-test_actual_consume_and_release_serialize_at_the_authored_honor_boundary-9eb7f89a-b268-43b3-89d1-37a7c86aaad5.json`: 18093 bytes, SHA-256 `d2d61de2fb60fe421c6d698cf12f4bf05bcf08917d7a29df45944e7f4c096ae3`.
+
+The genuine consume winner reaches its owned normal committing hold and parent observes an actual users.PRIMARY wait by the release loser. Winner operation totals 104.269656s. Entry-to-held is about 75.495259s; the **actual held delegate duration is only 1.411486s**, not 75 seconds or its maximum20. Release loser spends 27.004247s and returns null with the expected `reservation_terminal` after constructing the ordinary Context through its expensive current invoice/policy lane. The winner returns null `committed_activation_receipt_refused -> Budget workflow_deadline` in the final after-I/O `HistoryInspection` constructor/admission, 1.612120s past its effective shortened Budget. Completion returned before this final read failure, but the test's post-winner persisted graph assertions were not reached and must not be claimed executed.
+
+This demonstrates why an activation-only mutex leaves the ordinary release free to occupy the owner row during the winner's final historical read. Moving release's wait ahead of its owned source transaction removes that specific overlap. Wait plus release's existing proof work must still fit its one original60; the measured times make the proposal plausible, not a passing result. The first provider failed and stop-on-defect left release-wins unrun.
+
+## Scope and acquisition protocol
+
+Use one fixed helper, proposed `MembershipRedemptionWorkflowLock`, on native MySQL only. Its deterministic key is domain-separated from other locks and binds the actual captured schema and canonical redemption ID; it must serialize differing confirmation/definition instances of the same redemption. Keep the native name within MySQL's supported limit, for example a full 64-character hex digest over the fixed domain/schema/redemption tuple. Do not accept arbitrary names or SQL. SQLite retains its existing atomic guards. Reserve, expire and standalone historical `readActivated` retain their original paths; this lock is not global account/ledger serialization or grant authority.
+
+Activation consumes the genuine claim before acquisition and retains the same original Budget. Capture the complete resolved idle route/plain native PDO and actual schema/session identity before the initial historical probe or any new source frame. Acquisition wait is bounded by at most60 and the original effective ticket deadline; check original elapsed admission after the native wait before entering a new frame. No prior producer/ticket clock is renewed, and no source clock is moved later after its own wait already began. A failed/busy activation retires the consumed ticket/entry/workflow normally.
+
+Ordinary release starts its existing single60 deadline at the same original `run()` entry, then acquires the same key before any owned source transaction/owner-row lock. Its Context and distinct committed proof receive that **same** deadline; neither acquisition completion nor frame entry resets it. Existing owner/configuration/locator/current invoice/policy/ledger gates still decide all release success/replay. Successful release replay retains original IDs and current full audit balances; v1/v2 bytes/semantic behavior and SQLite paths must remain covered.
+
+Use direct captured plain PDO/prepared fixed session-lock queries only, without facade resolution, arbitrary PDO statement classes or business-row SQL. Require actual schema/session/PDO/driver identity. Reject a same-session preexisting key before GET_LOCK, and exclude local reentrancy on the captured PDO, so this operation owns one acquisition rather than incrementing a foreign/reentrant count. Bounded null/timeout/error outcomes are refusals; never treat them as acquisition or silently perform source work. Existing business row locking and complete current/committed proofs remain the authority regardless of advisory coordination.
+
+## Explicit successful unlock and terminal admission
+
+The native unlock is a new, explicitly documented **coordination cleanup phase**, not another business source closure or frame. Prefer this exact success ordering inside the private activation-owned final read path:
+
+1. Unchanged full final after-I/O historical inspection: exact graph/state/original/result, normal delegates/current proof, distinct committed proof, one finish and all postfinish checks.
+2. Verify the exact captured session/key ownership, issue one `RELEASE_LOCK` for this acquisition, validate its successful result, and check that the key is no longer owned by **this session**.
+3. Callback-free admission of the captured route/idle/finish and same original Budget.
+4. Existing retained original `assertCurrent` **last**, then return the already built result.
+
+Do not require the key to be globally free after release: a legitimate waiting workflow may immediately own it. Do not use `RELEASE_ALL_LOCKS`, repeat decrements to clear recursive counts, transfer ownership, adopt a new connection or query business rows during cleanup. Any ambiguous ownership/release outcome refuses the receipt; it cannot be reported as successful unlock. The private owner/read permit must bind the exact guard instance/operation/primary/redemption/deadline transitively or directly; no caller-supplied generic finish callback, release flag or shaped guard may select this terminal hook.
+
+Apply this to both newly completed activation verify and an activation-owned retained replay's final after-I/O read. A genuine absent initial probe keeps the guard for the subsequent live path. Standalone public read remains unchanged. Do not unlock within an earlier proof as a shortcut: that changes how long coordination protects the workflow and would need separate design/measurement. The proposed explicit cleanup tail avoids reusing a closed Rows/frame and leaves all business callback/raw/committed ordering intact.
+
+For successful ordinary release: unchanged current/normal commit/distinct committed Context proof and frame close -> exact own native unlock -> Context callback-free terminal admission -> return the prebuilt projection. That final Context admission must preserve finish/configuration, original operation deadline, private authorityDeadline and invoiceFreshness deadline, rather than checking only the runner's nominal60. It must not call closed Rows current proof, a producer, Carbon, a resolver or a new frame.
+
+## Failure cleanup and error outcomes
+
+All failures require one-use local registry retirement and attempted cleanup of only the captured operation's proved own acquisition. Never roll back a callback-created foreign transaction, release another session's/name's acquisition, repeatedly clear recursive ownership or replace an uncertain PDO. Captured-session-only named-lock cleanup may be separate from successful idle-route admission, but must not adopt the foreign transaction as a source frame or alter its business state. If ownership cannot be proved or release verified, retain/report an explicit cleanup refusal; do not claim that every failure physically released a lock. Connection loss/unknown native state cannot justify a fabricated successful cleanup.
+
+A successful candidate activation or retained replay must become `committed_activation_receipt_refused` if its terminal cleanup/admission fails. Successful ordinary mutation/replay must similarly refuse its committed receipt after cleanup failure. Preserve the primary refusal and cleanup information in a reviewable exception chain/outcome, and never compensate, retry a writer, delete the original, release consumed credit or renew a deadline. A later explicit historical read remains the existing recovery route when its genuine conditions permit.
+
+## Required exact-source and runtime gates
+
+The root owns implementation. Independently review the new helper's complete acquisition/reentrant/native-owner/release/registry paths, exact guard binding into private read permits, both activation terminal branches, unchanged public read/absent probe behavior, original ordinary60 carry and final Context caps. Inspect the explicit addendum and any error-mapping change; no source success is inferred from this design note.
+
+Both native tests must adapt to **actual coordination**, preserving strict successful-writer and graph/audit/bytes/idle/registry checks. Same-redemption must establish the first worker's real parent users-row wait and the second's actual pending USER_LEVEL_LOCK against the first's granted exact key/session. Terminal orders retain the genuine scheduled winner's owned writing transaction/hold and observe the loser's actual pending advisory key rather than demanding the owner-row wait that coordination intentionally prevents. Use `performance_schema.metadata_locks`/thread identities with exact key, pending/granted statuses and captured connection IDs; do not substitute polling a marker for a real server wait.
+
+The first actual writer must return its full receipt. A loser exhausting its original capped coordination wait may retain its precise bounded refusal; elapsed/reason evidence must match the actual limiter and must not waive the winner-success assertion. Terminal expected winner/loser semantics, graph iff consume, one terminal, complete audit/conservation/originals and release-wins dataset still require actual executions within unchanged caps. Include meaningful native no-reentrant/own-release/cleanup checks and focused ordinary release continuity, not merely shaped helper construction. Earlier positive/denial/postcommit receipts keep their own exact sources; shared product changes require explicit final source/evidence reconciliation and affected focused results.
+
+No final C4c application/evidence DECISION is issued yet. Read-only commands used: `git rev-parse`, `rg`, `cat`, `sed`, and Python parsing/hashing of the two preserved public transcripts. Only this runtime note was written.

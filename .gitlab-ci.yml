@@ -39,7 +39,6 @@ frontend:
     - bash scripts/ci/setup-gitlab-node.sh
   script:
     - npm ci
-    - node --test scripts/ci/apply-playwright-webkit-offline-backport.test.mjs
     - npm test
     - npm run build
     - python3 scripts/ci/scan-client-bundle.py
@@ -110,10 +109,11 @@ backend-quality:
 
 backend-mysql:
   extends: .database
-  # Twenty-four shards of the reviewed native selection (1846 cases; 1765 when GitHub run 38037183233 ran), the same partition as GitHub's. GitHub
+  # Twenty-four shards of the reviewed native selection (2826 of 10341 cases in 278 files; 1765 when GitHub run 38037183233 ran), the same partition as GitHub's. GitHub
   # Foundation run 38037183233 ran all 24 on hosted MySQL 8.4: 58 to 109 minutes each and 124.5 minutes for
   # shard 1, which is BulkReplaceLicenseDraftSourceTest alone, so more shards cannot shorten it; with the
-  # timings regenerated from that run the other shards balance at about 87 minutes at GitHub's speed.
+  # timings regenerated from that run the then-selected other shards balanced at about 87 minutes.
+  # C4a discovery uses fallback weights for 72 newer files; its estimates are not executed timings.
   # GitLab.com hosted runners kill any job at 3 hours regardless of this setting, so the limit stays
   # 175 minutes. GitLab's small runners are unmeasured: dispatch GitLab only after this measured shard 1 is
   # judged to fit them, and split that test file if GitLab would exceed this limit.
@@ -146,14 +146,14 @@ backend-mysql:
 
 backend-sqlite:
   extends: .database
-  # Same 2-shard partition as GitHub, where the busiest shard measured 80 minutes (Foundation 38037183233)
-  # and the regenerated timings balance both at about 61; 100 minutes stays under GitLab.com's hosted 3-hour cap.
-  timeout: 100m
+  # Same 6-shard partition as GitHub (2026-11-13: two shards reached only 60-69% in 100 minutes, Foundation
+  # 43347699757; six measured 52-99 minutes, one cancelled at 96%); 140 minutes stays under GitLab.com's 3-hour cap.
+  timeout: 140m
   parallel:
     matrix:
-      - SHARD: ['1', '2']
+      - SHARD: ['1', '2', '3', '4', '5', '6']
   variables:
-    SHARD_COUNT: '2'
+    SHARD_COUNT: '6'
     DB_CONNECTION: sqlite
     DB_DATABASE: ':memory:'
     DB_URL: ''

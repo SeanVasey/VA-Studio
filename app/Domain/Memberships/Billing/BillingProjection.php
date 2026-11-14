@@ -58,6 +58,8 @@ final class BillingProjection
             $payment = is_array($value['payment'] ?? null) ? $value['payment'] : [];
             $result['payment'] = ['type' => $payment['type'] ?? null, 'payment_intent' => BillingValues::ref($payment['payment_intent'] ?? null),
                 'charge' => BillingValues::ref($payment['charge'] ?? null)];
+            $transitions = is_array($value['status_transitions'] ?? null) ? $value['status_transitions'] : [];
+            $result['status_transitions'] = ['paid_at' => $transitions['paid_at'] ?? null];
         } elseif ($object === 'subscription') {
             $result['items'] = self::collection($value['items'] ?? null, 'subscription_item');
         }

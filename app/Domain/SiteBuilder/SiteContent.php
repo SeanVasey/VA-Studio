@@ -50,7 +50,7 @@ final class SiteContent
             ]);
             $images->index($release, $content);
             AuditEvent::record('site.release.created', $release, ['content_hash' => $release->content_hash, 'schema_version' => $release->schema_version]
-                + (in_array($release->schema_version, [3, 4], true) ? ['images' => array_map(fn (array $reference): int => $reference['id'], SiteImageReferences::of($content))] : []), $actor->id);
+                + (in_array($release->schema_version, SiteContentSchema::IMAGE_VERSIONS, true) ? ['images' => array_map(fn (array $reference): int => $reference['id'], SiteImageReferences::of($content))] : []), $actor->id);
 
             return $release;
         });
@@ -113,7 +113,8 @@ final class SiteContent
             $this->verifyPointer($publication);
             $this->expectRevision($publication, $expectedVersion, 'The published site changed. Refresh the release list before scheduling a publication.');
             $release = SiteRelease::findOrFail($releaseId);
-            $this->content($release);
+            // A release that could not be published now is not queued to be published later.
+            LegalPublicationGuard::assertPublishable($this->content($release));
             if ($publication->active_release_id === $releaseId) {
                 throw ValidationException::withMessages(['publication' => 'This release is already active.']);
             }
@@ -164,7 +165,7 @@ final class SiteContent
      * Trusted scheduler entry point with no public route. It reads the application clock, activates at most one due
      * schedule through the same guarded path as staff publication, and commits any fail-closed outcome.
      *
-     * @return array{schedule_id: int, outcome: string, publication_revision?: int}|null
+     * @return array{schedule_id: int, outcome: string, publication_revision?: int, reason?: string}|null
      */
     public function runDueSchedule(): ?array
     {
@@ -211,9 +212,17 @@ final class SiteContent
                 if ($release === null || ! hash_equals($schedule->release_content_hash, $release->content_hash) || ! $filesIntact) {
                     throw ValidationException::withMessages(['publication' => 'The scheduled release changed.']);
                 }
-                $this->content($release);
+                $content = $this->content($release);
             } catch (ValidationException) {
                 return $this->resolveSchedule($schedule, 'failed', 'integrity');
+            }
+            // Scheduling already refuses such a release; this covers a schedule that predates the rule. The schedule
+            // table's transition trigger admits no further outcome, so the reason travels in the audit event and the result.
+            $markers = LegalPublicationGuard::findings($content);
+            if ($markers !== []) {
+                return $this->resolveSchedule($schedule, 'failed', 'integrity', null, [
+                    'reason' => LegalPublicationGuard::REASON, 'legal_markers' => LegalPublicationGuard::summary($markers),
+                ]) + ['reason' => LegalPublicationGuard::REASON];
             }
             // Staff changes supersede schedules, so a moved pointer means code that predates scheduling published meanwhile.
             if ($publication->revision !== $schedule->expected_revision || $publication->revision >= 2147483646
@@ -259,7 +268,8 @@ final class SiteContent
                 throw ValidationException::withMessages(['publication' => 'The scheduled publication changed after you opened this confirmation. Refresh the release list before publishing or rolling back.']);
             }
             $release = SiteRelease::findOrFail($releaseId);
-            $this->content($release);
+            // Publishing and restoring both make the release public, so neither may show unresolved legal drafting marks.
+            LegalPublicationGuard::assertPublishable($this->content($release));
             if ($publication->active_release_id === $releaseId) {
                 throw ValidationException::withMessages(['publication' => 'This release is already active.']);
             }
@@ -369,7 +379,7 @@ final class SiteContent
     {
         $this->actor($actor);
         $release = SiteRelease::find($releaseId);
-        if (in_array($release?->schema_version, [3, 4], true) && is_array($release->content)) {
+        if (in_array($release?->schema_version, SiteContentSchema::IMAGE_VERSIONS, true) && is_array($release->content)) {
             app(SiteImageReferences::class)->verifyFiles($release->content);
         }
     }
@@ -377,7 +387,7 @@ final class SiteContent
     private function imageFilesIntact(int $releaseId): bool
     {
         $release = SiteRelease::find($releaseId);
-        if (! in_array($release?->schema_version, [3, 4], true) || ! is_array($release->content)) {
+        if (! in_array($release?->schema_version, SiteContentSchema::IMAGE_VERSIONS, true) || ! is_array($release->content)) {
             return true;
         }
         try {
@@ -392,13 +402,13 @@ final class SiteContent
     private function content(SiteRelease $release): array
     {
         $content = $release->content;
-        if (! in_array($release->schema_version, [1, 2, 3, 4], true) || $release->canonicalization_version !== CanonicalJson::VERSION
+        if (! in_array($release->schema_version, [1, ...SiteContentSchema::EDITORIAL_VERSIONS], true) || $release->canonicalization_version !== CanonicalJson::VERSION
             || ! is_array($content) || ($content['schema_version'] ?? null) !== $release->schema_version
             || ! hash_equals($release->content_hash, CanonicalJson::hash($content))) {
             throw ValidationException::withMessages(['publication' => 'The retained site release failed its integrity check.']);
         }
         $content = SiteContentSchema::validate($content);
-        if (in_array($release->schema_version, [3, 4], true)) {
+        if (in_array($release->schema_version, SiteContentSchema::IMAGE_VERSIONS, true)) {
             app(SiteImageReferences::class)->verify($release, $content);
         }
 

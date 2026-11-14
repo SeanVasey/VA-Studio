@@ -8,9 +8,7 @@ use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionIdentity\IdentityPolicy;
 use App\Domain\Customers\ProductionIdentity\Notifications\LoopbackSmtp;
 use App\Domain\Customers\ProductionIdentity\ProductionCustomerSessions;
-use App\Http\Middleware\ProductionTaxCheckoutPrivacy;
 use App\Providers\ProductionTaxCheckoutServiceProvider;
-use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Route;
@@ -37,8 +35,8 @@ class ProductionTaxCheckoutHttpBoundaryTest extends TestCase
 
     private function mount(): void
     {
+        config(['production-tax-checkout.http_mounted' => true]);
         $this->app->register(ProductionTaxCheckoutServiceProvider::class);
-        $this->app[Kernel::class]->prependMiddleware(ProductionTaxCheckoutPrivacy::class);
         Route::middleware('web')->group(base_path('routes/production-tax-checkout.php'));
     }
 

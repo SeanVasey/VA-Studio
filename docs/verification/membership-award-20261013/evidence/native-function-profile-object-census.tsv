@@ -1,0 +1,5 @@
+object_schema	object_type	object_count
+sys	ROUTINE	48
+sys	TRIGGER	2
+sys	VIEW	100
+vaseyaudio_interval_probe	TRIGGER	1

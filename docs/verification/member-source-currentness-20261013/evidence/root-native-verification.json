@@ -1,0 +1,90 @@
+{
+  "scope": "Fifteen released root artifacts; exact frozen source, recorded unchanged-source receipt and independently verified runner/setup bytes. One integrated native case, not full-suite/host/provider acceptance.",
+  "members": [
+    {
+      "original_target": "root/README.md",
+      "archived_path": "root/README.md",
+      "original_sha256": "130f47ac6cef9e70816991adee5dd7f908996e74a62ec42ff88764ed5a925a52"
+    },
+    {
+      "original_target": "root/native-progress-observer.command.json",
+      "archived_path": "root/native-progress-observer.command.json",
+      "original_sha256": "fc7b0c0fdcaabcdbe7f15ad2f4ecbd9780b383b6a3457d1ec4c3cc89b05dfdf8"
+    },
+    {
+      "original_target": "root/native-progress-observer.txt",
+      "archived_path": "root/native-progress-observer.txt",
+      "original_sha256": "ebc2424cc5469655b71dc3ce14ae696ff7c2a951af94d4584417ee63d119ad63"
+    },
+    {
+      "original_target": "root/native-reservation-integration.exit",
+      "archived_path": "root/native-reservation-integration.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_target": "root/native-reservation-integration.log",
+      "archived_path": "root/native-reservation-integration.log",
+      "original_sha256": "edbe29474a498b4d480a913732833e3b9b987c07dfaea928179f4237a2d59d8a"
+    },
+    {
+      "original_target": "root/native-reservation-integration.result.json",
+      "archived_path": "root/native-reservation-integration.result.json",
+      "original_sha256": "ab39402b24d4b16203d90f49183ec65ca99abde67e7afb78d01053709bcd4f95"
+    },
+    {
+      "original_target": "root/native-reservation-integration.source.json",
+      "archived_path": "root/native-reservation-integration.source.json.gz",
+      "original_sha256": "be02300e128173b1d97bcf01cb195f02840fb9faed1e1033896bff1425f5771e"
+    },
+    {
+      "original_target": "root/native-reservation-integration.xml",
+      "archived_path": "root/native-reservation-integration.xml",
+      "original_sha256": "4d467b8ff2011d46e62e9d25488c281ca66ade298a5dae370559986a8e220212"
+    },
+    {
+      "original_target": "root/native-setup.exit",
+      "archived_path": "root/native-setup.exit",
+      "original_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "original_target": "root/native-setup.json",
+      "archived_path": "root/native-setup.json",
+      "original_sha256": "adbfaad500be7afe5bcf8d143b1131ca5c2c1415f31c7a98a7545836ec7cd54f"
+    },
+    {
+      "original_target": "root/native-setup.log",
+      "archived_path": "root/native-setup.log",
+      "original_sha256": "f6cef2580d913eab053fbdcbac6faccaf4c7ab021fb932fc031a517c713538e4"
+    },
+    {
+      "original_target": "root/run-native-focused.py",
+      "archived_path": "root/run-native-focused.py",
+      "original_sha256": "4575ced928e10fe429c360ad90de87cca4056fc65e079997869b33f0063f7fc7"
+    },
+    {
+      "original_target": "root/run-native-integration.sh",
+      "archived_path": "root/run-native-integration.sh",
+      "original_sha256": "f75e8312d0be3721313cf4ec4cac3bf14d77f7209d07a6264efe0f3fac9cdf93"
+    },
+    {
+      "original_target": "root/setup-private-native.py",
+      "archived_path": "root/setup-private-native.py",
+      "original_sha256": "6fa6c18e3c676ba968c18f6f91acf883f73f14fe1f5637e453e960b999804401"
+    },
+    {
+      "original_target": "root/source-verification.json",
+      "archived_path": "root/source-verification.json",
+      "original_sha256": "553994d8ed9334fb7abc7afbbf4541f90424570015da59ca5a9e2e0e2b69f874"
+    }
+  ],
+  "source": "0095e46aefa85463268027d89c829a4886537ad6",
+  "captured_inputs": 1275,
+  "mysql_version": "8.4.11",
+  "tests": 1,
+  "assertions": 21,
+  "errors": 0,
+  "failures": 0,
+  "skipped": 0,
+  "exit": 0,
+  "wall_seconds": 279.991
+}

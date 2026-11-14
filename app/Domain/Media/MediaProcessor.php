@@ -4,6 +4,7 @@ namespace App\Domain\Media;
 
 use App\Application\Media\MediaIntegrity;
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Catalog\TrackVisibility;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\Models\MediaProcessingRun;
 use App\Support\Audit\AuditEvent;
@@ -18,6 +19,16 @@ class MediaProcessor
      * better without two more calls of the 120 seconds every tool has.
      */
     private const VERSION_CALL_SECONDS = 15;
+
+    /** The config key bounding a source of this role: artwork, stems ZIPs and WAV masters each have their own. */
+    public static function sourceLimitKey(string $role): string
+    {
+        return match ($role) {
+            'artwork' => 'media.max_artwork_bytes',
+            'stems_zip' => 'media.max_stems_bytes',
+            default => 'media.max_source_bytes',
+        };
+    }
 
     public function handle(int $runId): MediaProcessingRun
     {
@@ -52,7 +63,7 @@ class MediaProcessor
             }
             $workspace = $files->workspace();
             $input = $workspace.'/source.bin';
-            $integrity = $files->snapshot($source->storage_path, $input, (int) config($source->role === 'artwork' ? 'media.max_artwork_bytes' : 'media.max_source_bytes'));
+            $integrity = $files->snapshot($source->storage_path, $input, (int) config(self::sourceLimitKey($source->role)));
             if (! hash_equals($run->input_sha256, $integrity['sha256']) || ! hash_equals($source->sha256 ?? '', $integrity['sha256']) || (int) $source->size_bytes !== $integrity['size_bytes'] || $source->mime_type !== $integrity['mime_type']) {
                 throw new MediaFailure('source_changed', 'Source hash, size, or MIME no longer matches its intake evidence.');
             }
@@ -70,6 +81,10 @@ class MediaProcessor
                 $tagIntegrity = $files->snapshot($profile['tag_path'], $tag, 16777216);
                 if (! hash_equals($profile['tag_sha256'], $tagIntegrity['sha256'])) {
                     throw new MediaFailure('tag_hash_mismatch', 'The seller tag does not match its approved SHA-256.');
+                }
+                // The synthetic staging tag stands in for the approved one on rehearsal hosts only (docs/ops/staging-placeholders.md).
+                if (StagingSellerTag::refused($profile['tag_path'], $tag)) {
+                    throw new MediaFailure('staging_tag_refused', 'The configured seller tag is the synthetic staging placeholder. Install the approved seller tag and its SHA-256.');
                 }
                 $evidence['tag_scan'] = $this->scan($tag);
                 $outputs = app(AudioDerivatives::class)->build($input, $tag, $profile, $workspace);
@@ -95,7 +110,7 @@ class MediaProcessor
                 app(MediaWriterActor::class)->requester((int) $run->requested_by);
                 $lockedSource = MediaAsset::query()->lockForUpdate()->findOrFail($source->id);
                 $track = Track::query()->lockForUpdate()->findOrFail($source->track_id);
-                if ($track->status === 'published') {
+                if (TrackVisibility::isLive($track->status)) {
                     throw new MediaFailure('track_published', 'Unpublish the track before processing a replacement media revision.');
                 }
                 $locked = MediaProcessingRun::query()->lockForUpdate()->findOrFail($run->id);

@@ -1,0 +1,25 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-c2-sqlite/phpunit.xml
+
+Time: 04:30.002, Memory: 97.00 MB
+
+There were 2 errors:
+
+1) Tests\Feature\ProductionMembershipBilling\BillingObservationLedgerTest::test_another_invoice_returned_for_a_matching_binding_records_a_refusal_without_claiming_the_requested_invoice
+Error: Class "Tests\Feature\ProductionMembershipBilling\BillingValues" not found
+
+/workspace/VA-Studio-membership-c2-sqlite/tests/Feature/ProductionMembershipBilling/BillingObservationLedgerTest.php:238
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\BillingSchemaPreparationTest::test_contiguous_empty_tail_restarts_but_a_data_bearing_unguarded_prefix_is_not_adopted
+App\Domain\Memberships\Billing\BillingException: Production membership billing unavailable (schema_prefix).
+
+/workspace/VA-Studio-membership-c2-sqlite/app/Domain/Memberships/Billing/BillingException.php:19
+/workspace/VA-Studio-membership-c2-sqlite/app/Domain/Memberships/Billing/BillingSchema.php:116
+/workspace/VA-Studio-membership-c2-sqlite/tests/Feature/ProductionMembershipBilling/BillingSchemaPreparationTest.php:220
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 195[0m[37;41m, Assertions: 1048[0m[37;41m, Errors: 2[0m[37;41m, Skipped: 5[0m[37;41m.[0m

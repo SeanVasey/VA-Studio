@@ -1,0 +1,89 @@
+{
+  "aggregate_diagnostic_scope": {
+    "aggregate_execute_seconds": "325.452",
+    "max_execute_seconds": "2.024",
+    "prepared_executes": 42955,
+    "scope": "Own private instance since startup includes interrupted52 and failed300 trials; not isolated current-run attribution or a proven bottleneck."
+  },
+  "calibration_observation": {
+    "420_margin_over_extrapolation_seconds": "112.221412218",
+    "interpretation": "Wall/mtime observation includes parent startup; only first reset completed and second setup began. No completed two-cycle profile or throughput acceptance.",
+    "parent_start_to_first_reset_receipt_seconds": "153.889293891",
+    "two_times_observed_interval_seconds": "307.778587782"
+  },
+  "decision": "APPROVE ONE EVIDENCE-BASED FIXED MYSQL420/SQLITE90 CANDIDATE FOR EVALUATION",
+  "design_conditions": [
+    "Only literal admitted-MySQL allowance300\u2192420; SQLite90, all four datasets, same two-method child, two complete migration/cleanup cycles, warning/assertion/receipt/exits/declarations and product deadlines unchanged.",
+    "Existing native default calibration uses child420/outer480; inspect complete XML/two receipts/events and actual parent result before expansion.",
+    "After complete calibration, whole four native cases use child420/outer1800=4*420+120; sufficiency/other dataset durations remain unproven.",
+    "If420 fails, preserve it and stop increasing; obtain per-run phase attribution before a new optimization/design.",
+    "No Foundation/GitLab/whole-CI dispatch or workflow cap increase. Existing focused PHP900 cap cannot guarantee whole4\u00d7420; use bounded private local runner."
+  ],
+  "immutable_sha256": {
+    "aggregate_statement_diagnosis": "6f2088086545d835f1e7786e323039815a52db8cd3303ecf0e325f8286968884",
+    "native_capture": "dbdbdd61fb26224c9eb53366ac239c9f05e223dadaa96273297da91d96f5f12d",
+    "native_child_events.log": "f4387ddd39210aac217921164b5f01b0528c7eab2d108f04c864886cfa9afc8b",
+    "native_child_junit.xml": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native_child_receipt.jsonl": "36869ff5f1645cfadafe1bdde6e9eba3c3630a3351245150a0a4a158b73807ff",
+    "native_command": "48b0ef0fe67a9dd21b3d3e8ef3a7fc87b93a6b855020a490e382431699e1b1f0",
+    "native_parent_xml": "a23a320cf4763d1ba603148f0926fa1fb079cb67a14e75841a2ba42614e42683",
+    "native_result": "b89aa6c7048842ca27d6f1d10608b1954a6c38b026e66c0a981d9c061ab90365",
+    "prior_contract": "c317e7d708ad1d961e70d419bef7cfa1ecbf48acaf55227f2fc4d990e023dc42",
+    "sqlite_capture": "84abbf5629d7e87126527d24321cab3aa5337fd3283b628bffc7e023ea648cb3",
+    "sqlite_parent_xml": "1bac8ada1698e8fa923aacbdceb1c8c7d9fb3387ccc85d1b19c763f2f8419d66",
+    "sqlite_result": "f3e6730082ff150c72b44633558e4d890930eda0ba4628abc2d3315778e5e6c5"
+  },
+  "limits": [
+    "Read-only artifact/source/hash/JUnit reconciliation, no app/tests/DB/network/CI/shared edits or agents.",
+    "Design advice only; not implementation/final source/native acceptance. Current300 failure and prior90/interrupted/capture originals retained; whole native lifecycle remains open.",
+    "No full F2/native counterpart/concurrency/host/provider/activation/release acceptance."
+  ],
+  "observed_worktree_source_sha256": {
+    "tests/Feature/FinalizationDatabaseLifecycleTest.php": "c06cabe288752a474f0c0084dbc673fd79154a99f67fd20cdf943784bbbe5dd5",
+    "tests/Support/FinalizationLifecycleFixture.php": "7ef29a58fae5d0ce0a81b5c381d9261824b773432bd6051de93b120d91f852f6"
+  },
+  "open_p0": 0,
+  "open_p1": 0,
+  "preparation_notes": [
+    "Read-only search used two nonexistent native policy filenames and returned2; actual policy inventory then located, no application result inferred.",
+    "Initial report write check found parent worktree had advanced from c96 after preliminary advice; failed before report creation. Advice binds immutable c96 source/receipts; observed moving-source hashes are separate and do not grant that new head approval."
+  ],
+  "required_corrections": [],
+  "retained_native300_failure": {
+    "child_xml_bytes": 0,
+    "child_xml_usable_counts": null,
+    "cleanup_receipts": 1,
+    "directory_removed": true,
+    "no_live_writers": true,
+    "outer_timeout": false,
+    "parent_counts": {
+      "assertions": 2,
+      "errors": 1,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 1
+    },
+    "php_exit": 2,
+    "recorder_exit": 1,
+    "wall_seconds": 300.3667853230145
+  },
+  "reviewed_sha": "c96da8e29999838ca14477e7dc8f236d6f00ad4a",
+  "source_sha256": {
+    "tests/Feature/FinalizationDatabaseLifecycleTest.php": "d571195075cd5dff116a04057bc094f65ad171e046d4b50e1d80709d28473fd7",
+    "tests/Support/FinalizationLifecycleFixture.php": "7ef29a58fae5d0ce0a81b5c381d9261824b773432bd6051de93b120d91f852f6"
+  },
+  "sqlite_carry_eligibility": {
+    "captured_child_sets": 4,
+    "condition": "Future immutable diff must be exactly literal MySQL300\u2192420 plus documents, with every other executable input/child/writer/SQLite90 unchanged. State executed at c96 plus mechanical carry, not a new-head rerun; final exact source/evidence review checks this condition.",
+    "counts": {
+      "assertions": 181,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 12
+    },
+    "executed_sha": "c96da8e29999838ca14477e7dc8f236d6f00ad4a",
+    "php_exit": 0,
+    "recorder_exit": 0
+  }
+}

@@ -3,6 +3,7 @@
 namespace App\Domain\Commerce\ProductionTaxCheckout;
 
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
+use App\Domain\Commerce\ProductionPolicy\CurrentRows;
 use App\Support\CanonicalJson;
 
 /**
@@ -32,16 +33,20 @@ final class ProductionTaxPaidLineAdapterV2
      *
      * Authentication is binding to the HELD source: `$line` must be byte-identical to what the held
      * `ProductionTaxPaidOrderSourceV2::line($position)` mints from the retained, APP_KEY-sealed rows. The caller
-     * therefore calls this inside the same held transaction in which it read the source, and keeps its own
-     * `proveRetainedCurrent` after use. `source_hash` is an unkeyed self-hash and proves nothing about origin, so it is
+     * supplies its current reader and independently selected expected order. Acceptance proves that the exact
+     * source frame is still held and the line belongs to that order. The consumer takes its grant target only from
+     * the returned line and keeps its terminal currentness proof after use. `source_hash` is an unkeyed self-hash and proves nothing about origin, so it is
      * only one of the consistency checks that run after the binding. Provenance other than `synthetic_rehearsal`
      * (live funds) is refused outright: no reviewed live producer exists in this family.
      */
-    public static function accept(ProductionTaxPaidOrderSourceV2 $source, int $position, array $line, string $provenance): array
+    public static function accept(ProductionTaxPaidOrderSourceV2 $source, int $position, array $line, string $provenance,
+        CurrentRows $reader, string $expectedOrderId): array
     {
         CheckoutException::require($provenance === 'synthetic_rehearsal', 'live_unsupported');
+        $source->proveRetainedCurrent($reader);
         self::requireV2Shape($line);
         CheckoutException::require(CanonicalJson::encode($source->line($position)) === CanonicalJson::encode($line), 'source_binding');
+        CheckoutException::require($line['order_id'] === $expectedOrderId, 'source_order');
         self::assertSelfConsistent($line, $provenance);
 
         return $line;
@@ -51,6 +56,8 @@ final class ProductionTaxPaidLineAdapterV2
      * Shape, hash, arithmetic, execution-context and ceiling consistency of one line. This is NOT authentication: a
      * forger who can compute SHA-256 can pass it. It exists so `accept` and tests share one set of checks, and no
      * consumer may use it as an acceptance path.
+     *
+     * @internal This pure consistency check supplies no source, frame or order authentication.
      */
     public static function assertSelfConsistent(array $line, string $provenance): void
     {

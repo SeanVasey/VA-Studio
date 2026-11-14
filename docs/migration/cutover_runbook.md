@@ -6,7 +6,7 @@ Status: **planned; no live cutover authorized or performed**. Prepared 2026-09-0
 
 The launch operator, incident decision maker, finance/rights reviewers and support owner must be named in the launch record. Sean is the product owner; do not fabricate other role assignments. Pin the exact repository commit, schema version, source batch IDs, transformation version and parity-matrix revision proposed for launch.
 
-Use `source_ledger.csv`, `migration_field_map.csv`, `authenticated_studio_audit_checklist.csv`, `known_unknowns_and_validation.csv` and the repository decision register as the working control records. Keep their IDs stable. Every changed source class must have a mapped destination or an explicit preservation/disposition decision.
+Use `source_ledger.csv`, `migration_field_map.csv`, `authenticated_studio_audit_checklist.csv`, `known_unknowns_and_validation.csv` and the repository decision register as the working control records. The [production cleanup ledger](../production-cleanup-ledger.md) lists every staging placeholder, synthetic value and default-off switch that must be replaced, decided or flipped before production; no entry may be open at the launch approval record (section 8) unless that record names it and why it may stay open. Keep their IDs stable. Every changed source class must have a mapped destination or an explicit preservation/disposition decision.
 
 Prefer seller-owned originals, official exports, authorized read-only screens, owner-controlled payment/fulfillment records and public routes, in that order. No undocumented private endpoints, token extraction, guessed account settings or destructive source operations. Retain confidential source data only in approved private storage, encrypted and access controlled, with hashes and opaque pointers in the project evidence.
 
@@ -94,11 +94,13 @@ Real-money canary purchases and refunds require the applicable owner authorizati
 
 Before any canary or dual-platform interval, choose one authoritative checkout/exclusive-inventory channel or a demonstrably reliable serialization mechanism. Cached availability is not synchronization. If another seller/collaborator copy can still sell the same exclusive elsewhere, inventory is not controlled and exclusive launch remains blocked.
 
+**T-72h: switch off exclusive offers on BeatStars (SQ-17, Sean, 2026-11-10).** BeatStars keeps selling non-exclusive licenses until the DNS switch (section 9). Seventy-two hours before the planned cutover, Sean switches off every exclusive offer on BeatStars, so only VA Studio can sell an exclusive afterwards. This is an owner action on BeatStars: nothing in this repository touches BeatStars, and no session performs it. Record it as evidence in the launch packet (dated, with the offers affected, as a screenshot or export that carries no credential) and check at cutover that no exclusive sale occurred after it. If the cutover date moves later, the switch-off stays in force; if it moves earlier than 72 hours from the switch-off, the window is shorter than decided and Sean confirms before proceeding. The delta capture (FP-101) covers the non-exclusive BeatStars sales made between the snapshot and the DNS switch. The cleanup ledger entry is PCL-31.
+
 Record the migration source watermark and every later change. Immediately before cutover, use an authorized freeze or capture/reconcile a complete delta covering orders, refunds, customers, consent, licenses, visibility, offer changes and exclusive state. Reconcile until there is no unaccounted interval. Do not simply re-run the initial catalog export while orders continue changing elsewhere.
 
 ## 8. Concrete launch approval record
 
-The final launch packet contains the exact commit/deployment, approved parity disposition, source manifests and reconciliations, legal/merchant/tax decisions, successful tests and canary evidence, monitoring dashboards, backup/restore proof, domain plan, named incident owner, rollback thresholds and customer-support path. The live launch authorization applies to this packet, not to an earlier generic intention to replace BeatStars.
+The final launch packet contains the exact commit/deployment, approved parity disposition, source manifests and reconciliations, legal/merchant/tax decisions, successful tests and canary evidence, monitoring dashboards, backup/restore proof, domain plan, named incident owner, the T-72h BeatStars exclusive switch-off record (section 7), the 4-hour recovery time objective and the SQ-17 rollback thresholds (section 10), and customer-support path. The live launch authorization applies to this packet, not to an earlier generic intention to replace BeatStars.
 
 Required gates:
 
@@ -109,9 +111,18 @@ Required gates:
 | Commerce | Actual merchant/provider configured; paid confirmation, contract, grant, delivery and recovery proven |
 | Rights | Active and historic agreements preserved; applicable legal decisions recorded |
 | Reliability | Restore, retries, monitoring and rollback rehearsed |
+| Cleanup ledger | `vasey:cutover-check --expect=production` exits 0 on the production host at the packet's commit; every "by hand" and `NOT_CHECKABLE` entry has its recorded evidence |
 | Domain | Verified zone/control; certificates; apex/www; redirects; mail/integrations preserved |
 | Authority | One checkout/exclusive source of truth and reconciled final delta |
 | Approval | Named owner approval for the precise production operation |
+
+Before the approval record is signed, run the cleanup ledger check on the production host at the exact commit of the packet, as the user that owns private storage:
+
+```bash
+php artisan vasey:cutover-check --expect=production --json
+```
+
+It is read-only and contacts no provider. PCL-09 fails until Sean's official SVG mark is committed under `assets/`; that is expected, not a placeholder to remove. Exit code 0 is required: any `FAIL` line names a staging placeholder, synthetic value or test-only state still present, and the launch is not approved while one remains. Attach the output to the launch packet with the command, exit code, UTC time, commit and operator. Exit code 0 is necessary and not sufficient: each "by hand" line and each `NOT_CHECKABLE` entry is verified by a person as the [production cleanup ledger](../production-cleanup-ledger.md) describes, each `INFO` line is compared with the switches the packet intends to have on, and `ops/production/validate-runtime.php` is run separately on the environment file. The command changes nothing and authorizes nothing. Run it again after the domain switch (section 9) and before retiring the source platform, since a later deploy or configuration change can bring a placeholder back.
 
 Keep BeatStars available while these gates are prepared. Avoid cancelling the source subscription or removing source originals as part of a first switch.
 
@@ -120,12 +131,24 @@ Keep BeatStars available while these gates are prepared. Avoid cancelling the so
 1. At the approved window, verify current source/target status and acquire the final delta; pause if any gate changed.
 2. Apply only the approved domain records and routing settings. Use the rehearsed TTL/certificate/apex/www plan. Preserve MX, SPF, DKIM, DMARC and unrelated records.
 3. Purge only relevant cache entries. Verify canonical host, SSL, legacy redirects, robots/sitemap and provider callback endpoints.
-4. Run the approved synthetic/canary checks from independent clients. Observe playback failures, checkout errors, payment-to-grant lag, fulfillment lag, signed-download failures and support incidents against thresholds defined before launch.
+4. Run the approved synthetic/canary checks from independent clients. Observe playback failures, checkout errors, payment-to-grant lag, fulfillment lag, signed-download failures and support incidents against the SQ-17 rollback thresholds (section 10).
 5. Record new target order/payment IDs and source events throughout the window. Reconcile post-switch transactions before declaring success.
 
 ## 10. Rollback and forward recovery
 
-Rollback triggers include unexplained duplicate exclusive grants, exposed private assets, failed paid-order fulfillment above the approved threshold, critical money/hash drift, unavailable contract evidence, broken critical routing or an unrecoverable processing backlog. Numerical thresholds and observation duration must be selected and rehearsed in the launch packet; none are invented here.
+Recovery objectives (SQ-17): **recovery time objective 4 hours, recovery point objective 24 hours** at launch (nightly backup plus a backup before every deploy; binlog shipping is not built). The 4-hour clock starts when the incident owner decides to roll back or recover.
+
+Rollback thresholds (SQ-17), in force for the first 48 hours after the domain switch. Roll back if any one holds:
+
+| Signal | Threshold |
+| --- | --- |
+| Checkout error rate | above 5% over 30 minutes |
+| Paid order undelivered | any, for more than 1 hour without a known cause |
+| Webhook signature failures | sustained for 15 minutes |
+| HTTP 5xx rate | above 2% over 15 minutes |
+| Data-integrity alarm | any |
+
+These are the only numeric thresholds Sean has decided. Rollback also remains warranted for the non-numeric triggers already listed here: unexplained duplicate exclusive grants, exposed private assets, critical money/hash drift, unavailable contract evidence, broken critical routing or an unrecoverable processing backlog. The alerts that measure each threshold are an owner input under PCL-27: where they page, and who is on call, is Sean's choice and is not recorded in this repository yet. Rehearse the rollback against these thresholds before the packet is signed.
 
 The named incident owner decides rollback. Preserve logs and affected IDs. Disable new target checkout before switching authority, while continuing to honor and process already-accepted payments, receipts and legitimate downloads. Do not delete target orders or reset a database over paid transactions.
 

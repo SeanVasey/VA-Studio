@@ -1,0 +1,12 @@
+{
+  "commit": "a58d53ef0a8303e59b984e5c5a4a0222f815a66b",
+  "base": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+  "files": {
+    "app/Domain/Memberships/Production/MembershipCatalogDefinition.php": "e72bc203013e553d89d32dbdd92a89e02445e5b4ac35f5e2d06daab9800898f6",
+    "app/Domain/Memberships/Production/MembershipCatalogEvidence.php": "6b33144f493d1d6304382168b24dfa81adc75c8fc5f0579b5e08afb31a401afd",
+    "tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php": "4a76bf71cdb429ddae4a216b4b0ffe09d2b5e33e4849dd776e8bd9c4dc021670",
+    "tests/Unit/MembershipCatalogDefinitionTest.php": "08db30501e6cac342154750a723b3be1abdee3066e0d102da1892b35674fe937"
+  },
+  "pure_final_matches_commit": true,
+  "native_status": "not executed; three native methods syntax/Pint only"
+}

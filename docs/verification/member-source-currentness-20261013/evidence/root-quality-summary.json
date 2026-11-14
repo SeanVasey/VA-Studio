@@ -1,0 +1,190 @@
+{
+  "scope": "Nine executed local policy/style commands at their exact source; initial shard failure retained. Pint eight inputs carried unchanged; later CI delta is exact comment-only diff, not rerun.",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-phpunit-shards.py"
+      ],
+      "completed_at_utc": "2026-10-13T07:28:25.501006+00:00",
+      "cwd": "/workspace/VA-Studio-member-source-currentness",
+      "duration_seconds": 0.370925,
+      "exit": 1,
+      "head_at_start": "cc612650217830d2972efeafa12d4d9652c48524",
+      "log_sha256": "bbe9d4b919890748c281ecd82ebe3f9d0689c00229f598e8cb350246180a7bec",
+      "runner_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+      "selected_php_files": null,
+      "started_at_utc": "2026-10-13T07:28:25.129858+00:00",
+      "unittest_reported_tests": 52,
+      "receipt_prefix": "quality/test-phpunit-shards",
+      "observed_exit": 1
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-database-receipts.py"
+      ],
+      "completed_at_utc": "2026-10-13T07:29:15.857117+00:00",
+      "cwd": "/workspace/VA-Studio-member-source-currentness",
+      "duration_seconds": 50.352702,
+      "exit": 0,
+      "head_at_start": "cc612650217830d2972efeafa12d4d9652c48524",
+      "log_sha256": "9d5296b3420fb5db5d97df585c451520d0f497130f6dca4ebcc6a300b6d8db51",
+      "runner_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+      "selected_php_files": null,
+      "started_at_utc": "2026-10-13T07:28:25.504230+00:00",
+      "unittest_reported_tests": 61,
+      "receipt_prefix": "quality/test-database-receipts",
+      "observed_exit": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-ci-scope.py"
+      ],
+      "completed_at_utc": "2026-10-13T07:29:16.790614+00:00",
+      "cwd": "/workspace/VA-Studio-member-source-currentness",
+      "duration_seconds": 0.931015,
+      "exit": 0,
+      "head_at_start": "cc612650217830d2972efeafa12d4d9652c48524",
+      "log_sha256": "37acda06308aec11e88944ce508224ad7d6e721eb000eebd5c69eb31e428f225",
+      "runner_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+      "selected_php_files": null,
+      "started_at_utc": "2026-10-13T07:29:15.859442+00:00",
+      "unittest_reported_tests": 27,
+      "receipt_prefix": "quality/test-ci-scope",
+      "observed_exit": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-workflow-cadence.py"
+      ],
+      "completed_at_utc": "2026-10-13T07:29:16.879962+00:00",
+      "cwd": "/workspace/VA-Studio-member-source-currentness",
+      "duration_seconds": 0.087045,
+      "exit": 0,
+      "head_at_start": "cc612650217830d2972efeafa12d4d9652c48524",
+      "log_sha256": "dd818658e9c8008cb354da9371485cb574dabd3d7c356cdfa1c694608942fdca",
+      "runner_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+      "selected_php_files": null,
+      "started_at_utc": "2026-10-13T07:29:16.792747+00:00",
+      "unittest_reported_tests": 14,
+      "receipt_prefix": "quality/test-workflow-cadence",
+      "observed_exit": 0
+    },
+    {
+      "argv": [
+        "vendor/bin/pint",
+        "--test",
+        "app/Domain/Grants/Member/MemberGrantPolicy.php",
+        "app/Domain/Memberships/Production/MembershipCatalogDefinition.php",
+        "app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+        "tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php",
+        "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php",
+        "tests/Feature/StagingEnvironmentAdmissionTest.php",
+        "tests/Unit/MembershipCatalogDefinitionTest.php"
+      ],
+      "completed_at_utc": "2026-10-13T07:29:18.081635+00:00",
+      "cwd": "/workspace/VA-Studio-member-source-currentness",
+      "duration_seconds": 1.199139,
+      "exit": 0,
+      "head_at_start": "cc612650217830d2972efeafa12d4d9652c48524",
+      "log_sha256": "cd1a94fc2cf6a965b86e1a4809d6c7fb9148b1ee374e1010ed2ac96ff4876ec2",
+      "runner_sha256": "d045ebd0e6249e6d219eb5296d9587ce933eb53390a5344f49dd306a339f7506",
+      "selected_php_files": 8,
+      "started_at_utc": "2026-10-13T07:29:16.882309+00:00",
+      "unittest_reported_tests": null,
+      "receipt_prefix": "quality/pint",
+      "observed_exit": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-phpunit-shards.py"
+      ],
+      "completed_at_utc": "2026-10-13T07:29:53.125687+00:00",
+      "cwd": "/workspace/VA-Studio-member-source-currentness",
+      "duration_seconds": 0.367455,
+      "exit": 0,
+      "head_at_start": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+      "log_sha256": "28e9ff86f6ee868eb7e12044c0cb985e10dc00796b09083bac46024b855b965f",
+      "runner_sha256": "0cbc9dc13566b6b276963c5611fd8fb8ce29f96c497359afad43f576300f92ca",
+      "selected_php_files": null,
+      "started_at_utc": "2026-10-13T07:29:52.758027+00:00",
+      "unittest_reported_tests": 52,
+      "receipt_prefix": "quality/policy-final/test-phpunit-shards",
+      "observed_exit": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-database-receipts.py"
+      ],
+      "completed_at_utc": "2026-10-13T07:30:42.436776+00:00",
+      "cwd": "/workspace/VA-Studio-member-source-currentness",
+      "duration_seconds": 49.308459,
+      "exit": 0,
+      "head_at_start": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+      "log_sha256": "1af98951f66faff8d4c9a63769a9099e35c8dd5e84f57a661c90469984228ea8",
+      "runner_sha256": "0cbc9dc13566b6b276963c5611fd8fb8ce29f96c497359afad43f576300f92ca",
+      "selected_php_files": null,
+      "started_at_utc": "2026-10-13T07:29:53.128078+00:00",
+      "unittest_reported_tests": 61,
+      "receipt_prefix": "quality/policy-final/test-database-receipts",
+      "observed_exit": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-ci-scope.py"
+      ],
+      "completed_at_utc": "2026-10-13T07:30:43.279017+00:00",
+      "cwd": "/workspace/VA-Studio-member-source-currentness",
+      "duration_seconds": 0.837515,
+      "exit": 0,
+      "head_at_start": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+      "log_sha256": "29d7556fd1e509233345b5a6b54e2915fd33fdb75f92a2a4c10ab934f1e6e5f9",
+      "runner_sha256": "0cbc9dc13566b6b276963c5611fd8fb8ce29f96c497359afad43f576300f92ca",
+      "selected_php_files": null,
+      "started_at_utc": "2026-10-13T07:30:42.441240+00:00",
+      "unittest_reported_tests": 27,
+      "receipt_prefix": "quality/policy-final/test-ci-scope",
+      "observed_exit": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/ci/test-workflow-cadence.py"
+      ],
+      "completed_at_utc": "2026-10-13T07:30:43.366841+00:00",
+      "cwd": "/workspace/VA-Studio-member-source-currentness",
+      "duration_seconds": 0.085762,
+      "exit": 0,
+      "head_at_start": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+      "log_sha256": "dd818658e9c8008cb354da9371485cb574dabd3d7c356cdfa1c694608942fdca",
+      "runner_sha256": "0cbc9dc13566b6b276963c5611fd8fb8ce29f96c497359afad43f576300f92ca",
+      "selected_php_files": null,
+      "started_at_utc": "2026-10-13T07:30:43.280921+00:00",
+      "unittest_reported_tests": 14,
+      "receipt_prefix": "quality/policy-final/test-workflow-cadence",
+      "observed_exit": 0
+    }
+  ],
+  "initial_pint_source": "cc612650217830d2972efeafa12d4d9652c48524",
+  "policy_pass_source": "ca0fe30b6614d64a8b9050a39d6944256f170d69",
+  "carried_to": "0095e46aefa85463268027d89c829a4886537ad6",
+  "pint_unchanged_files": {
+    "app/Domain/Grants/Member/MemberGrantPolicy.php": "3bea0da5495aa6a45ced33527399701325a353ddec2a1b7c092917efa42d88b6",
+    "app/Domain/Memberships/Production/MembershipCatalogDefinition.php": "e72bc203013e553d89d32dbdd92a89e02445e5b4ac35f5e2d06daab9800898f6",
+    "app/Domain/Memberships/Production/MembershipCatalogEvidence.php": "6b33144f493d1d6304382168b24dfa81adc75c8fc5f0579b5e08afb31a401afd",
+    "tests/Feature/ProductionMemberOriginals/MemberGrantSourceAdmissionTest.php": "e7314f8b2ceccab1a0d4737a9c2c2d99fcebe337f413c5bd92f2a846228d4a7f",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationTest.php": "4c33c52da247fbf346525cf15aa882d2d4e085ea79b8bbf9459b32a12e4f1e65",
+    "tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php": "d02bd82587987818ddd96e5c44df6a723be10e194b56b6bf613aa841d1e916bd",
+    "tests/Feature/StagingEnvironmentAdmissionTest.php": "a6e2462269adc67db98b4716ebd4060b704e706e72af072b8355e9fd163f4f7a",
+    "tests/Unit/MembershipCatalogDefinitionTest.php": "08db30501e6cac342154750a723b3be1abdee3066e0d102da1892b35674fe937"
+  },
+  "policy_tests_passed": 154,
+  "comment_only_later_diff_verified": true
+}

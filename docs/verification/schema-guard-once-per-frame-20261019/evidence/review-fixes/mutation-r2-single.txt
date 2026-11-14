@@ -1,0 +1,17 @@
+== single mutation: MemberGrantAuthoringObserver
+1) Tests\Feature\ProductionMemberGrants\MemberObserverTerminalProofTest::test_the_authoring_terminal_phase_proves_in_full_after_remembered_proofs
+FAILURES!
+Tests: 4, Assertions: 92, Failures: 1.
+== single mutation: MemberOriginalObserver
+1) Tests\Feature\ProductionMemberGrants\MemberObserverTerminalProofTest::test_the_original_terminal_phase_proves_in_full_after_remembered_proofs
+FAILURES!
+Tests: 4, Assertions: 88, Failures: 1.
+== single mutation: MemberActivationObserver
+1) Tests\Feature\ProductionMemberGrants\MemberObserverTerminalProofTest::test_the_activation_terminal_phase_proves_in_full_after_remembered_proofs
+FAILURES!
+Tests: 4, Assertions: 87, Failures: 1.
+== single mutation: MemberActivationReadObserver
+1) Tests\Feature\ProductionMemberGrants\MemberObserverTerminalProofTest::test_the_activation_read_terminal_phase_proves_in_full_after_remembered_proofs
+FAILURES!
+Tests: 4, Assertions: 93, Failures: 1.
+DONE

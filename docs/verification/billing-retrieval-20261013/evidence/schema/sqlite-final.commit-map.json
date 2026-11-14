@@ -1,0 +1,25 @@
+{
+  "commit": "57c9bf9fc3dc5e326248abc8baa3e1b14e4a5ece",
+  "source": {
+    "app/Domain/Memberships/Billing/BillingRetrievalSchema.php": {
+      "run_sha256": "b75248f5fa288e77532d2a05f431c8e58b1a6650ff1ff79b310c3187e408009c",
+      "committed_sha256": "b75248f5fa288e77532d2a05f431c8e58b1a6650ff1ff79b310c3187e408009c"
+    },
+    "app/Domain/Memberships/Billing/BillingSchema.php": {
+      "run_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9",
+      "committed_sha256": "88aca00dfa4c989073026830bcd019b0e4e157dcb1736bac49faee4c543df2a9"
+    },
+    "database/migrations/2026_10_13_263000_membership_billing_retrieval_identity.php": {
+      "run_sha256": "069bea54bb39804d5c1ef96a0b1cd62dcbaf7bb9356657c6adc4d604aa1df12c",
+      "committed_sha256": "069bea54bb39804d5c1ef96a0b1cd62dcbaf7bb9356657c6adc4d604aa1df12c"
+    },
+    "tests/Feature/ProductionMembershipBilling/BillingRetrievalIdentitySchemaTest.php": {
+      "run_sha256": "bbfb96cb76ca082d0d894c90087dfabf2507d4412fb9eb3ae6b3541a048e09e2",
+      "committed_sha256": "bbfb96cb76ca082d0d894c90087dfabf2507d4412fb9eb3ae6b3541a048e09e2"
+    },
+    "tests/Feature/ProductionMembershipBilling/BillingRetrievalSchemaUpgradeTest.php": {
+      "run_sha256": "eb121cf82ea572fed19b0c1c719fb211dbec61002ad44e2f4c538b12b51e0817",
+      "committed_sha256": "eb121cf82ea572fed19b0c1c719fb211dbec61002ad44e2f4c538b12b51e0817"
+    }
+  }
+}

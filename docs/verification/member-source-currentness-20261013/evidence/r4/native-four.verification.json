@@ -1,0 +1,51 @@
+{
+  "source": "15a65e0761382a9ad50c4b279605a644a4eeb285",
+  "mysql_version": "8.4.11",
+  "tests": 4,
+  "assertions": 14,
+  "errors": 0,
+  "failures": 0,
+  "skips": 0,
+  "exit": 0,
+  "seconds": "330.914433",
+  "cases": [
+    {
+      "class": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest",
+      "name": "test_native_verified_member_provenance_requires_and_binds_actual_mysql_despite_rehearsal_membership",
+      "assertions": 3,
+      "seconds": "108.647856",
+      "failure": false,
+      "error": false,
+      "skip": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest",
+      "name": "test_each_callback_boundary_checks_the_frame_before_resolving_later_factories",
+      "assertions": 6,
+      "seconds": "49.346931",
+      "failure": false,
+      "error": false,
+      "skip": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest",
+      "name": "test_terminal_proof_reads_raw_capability_maps_without_virtual_container_getters",
+      "assertions": 2,
+      "seconds": "93.640770",
+      "failure": false,
+      "error": false,
+      "skip": false
+    },
+    {
+      "class": "Tests\\Feature\\ProductionMemberOriginals\\MemberGrantSourceAdmissionTest",
+      "name": "test_commit_and_reopen_on_the_same_pdo_cannot_reuse_an_original_admission",
+      "assertions": 3,
+      "seconds": "79.278876",
+      "failure": false,
+      "error": false,
+      "skip": false
+    }
+  ],
+  "source_file_count": 10633,
+  "source_and_runner_unchanged": true
+}

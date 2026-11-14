@@ -29,6 +29,8 @@ final class ProductionFreeGrantSpoolTest extends TestCase
 
     private string $seal;
 
+    private string $definitionId;
+
     private ProductionFreeGrantDownloads $downloads;
 
     protected function setUp(): void
@@ -37,6 +39,7 @@ final class ProductionFreeGrantSpoolTest extends TestCase
         $this->freeSetup();
         $this->downloads = new ProductionFreeGrantDownloads;
         $definition = $this->openDefinition();
+        $this->definitionId = $definition['id'];
         $this->owner = $this->customer();
         $grants = new ProductionFreeGrants;
         $review = $grants->review($definition['id'], 'Declared Synthetic Buyer', $this->owner['principal'], $this->owner['user']);
@@ -49,6 +52,9 @@ final class ProductionFreeGrantSpoolTest extends TestCase
     {
         $held = [];
         for ($i = 0; $i < 3; $i++) {
+            if ($i > 0) {
+                $this->useCustomerOrigin($this->customer('free-spool-'.$i.'@example.test'), $this->definitionId);
+            }
             $held[] = $this->redeem('master_wav');
         }
         $this->assertSame(3, DB::table('production_free_redemptions')->count());
@@ -57,13 +63,43 @@ final class ProductionFreeGrantSpoolTest extends TestCase
         $this->assertSame(3, DB::table('production_free_redemptions')->count(), 'A refused snapshot records no attempt.');
         $this->assertSame([], $this->snapshots());
 
-        $held[0]->close();
+        $held[2]->close();
         $fourth = $this->redeem('master_wav');
         $this->assertSame($this->sources->bytes['synthetic-master_wav'], $this->bytes($fourth));
         $this->assertSame(4, DB::table('production_free_redemptions')->count());
-        foreach ([1, 2] as $index) {
+        foreach ([0, 1] as $index) {
             $held[$index]->close();
         }
+    }
+
+    public function test_one_account_is_bounded_across_roles_and_origins_before_another_source_open(): void
+    {
+        $first = $this->redeem('master_wav');
+        $opened = 0;
+        $this->sources->opening = function () use (&$opened): void {
+            $opened++;
+        };
+        $this->refuses(fn () => $this->redeem('download_mp3'), 'spool_busy');
+        $this->useCustomerOrigin($this->owner, $this->openDefinition()['id']);
+        $this->refuses(fn () => $this->redeem('stems_zip'), 'spool_busy');
+        $this->assertSame(0, $opened, 'Account admission precedes another source open, regardless of role or origin.');
+        $this->assertSame(1, DB::table('production_free_redemptions')->count());
+        $this->useCustomerOrigin($this->customer('free-other-account@example.test'), $this->definitionId);
+        $other = $this->redeem('download_mp3');
+        $this->assertSame(1, $opened);
+        $this->assertSame(2, DB::table('production_free_redemptions')->count());
+        $this->assertSame($this->sources->bytes['synthetic-download_mp3'], $this->bytes($other));
+        $first->close();
+    }
+
+    private function useCustomerOrigin(array $owner, string $definitionId): void
+    {
+        $this->owner = $owner;
+        $grants = new ProductionFreeGrants;
+        $review = $grants->review($definitionId, 'Declared Synthetic Buyer', $owner['principal'], $owner['user']);
+        $this->origin = $grants->accept($definitionId, $this->assentInput($review), $owner['principal'], $owner['user']);
+        (new ProductionFreeGrantDocuments)->render($this->origin['id']);
+        $this->seal = (new ProductionFreeGrantLibrary)->show($this->origin['id'], $owner['principal'], $owner['user'])['originSeal'];
     }
 
     public function test_the_slot_count_comes_from_configuration(): void

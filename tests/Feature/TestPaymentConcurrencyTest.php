@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Commerce\Models\CheckoutIntent;
 use App\Domain\Commerce\Models\PaymentObservation;
 use App\Domain\Commerce\Models\StripeReceiptWork;
 use App\Domain\Commerce\Models\VerifiedPayment;
@@ -53,6 +54,23 @@ class TestPaymentConcurrencyTest extends TestCase
         $this->assertSame(2, StripeReceiptWork::where('state', 'processed')->count());
         $this->assertSame(F::PAYMENT, VerifiedPayment::sole()->provider_payment_intent_id);
         $this->assertSame($before, F::unchangedBusinessEvidence());
+    }
+
+    public function test_reconciliation_racing_a_receipt_worker_for_one_payment_records_one_confirmation(): void
+    {
+        // M-07 drill 4: the runner's reconcile stage and a webhook (resend or queue worker) observe one paid session.
+        [$inputs, $before] = $this->paymentRaceInput();
+        $inputs[1] = ['intent' => CheckoutIntent::sole()->id] + array_diff_key($inputs[1], ['receipt' => true]);
+        $results = PaymentRace::run($this, $inputs, 'receipt_and_reconciliation');
+        $this->assertSame(['awaiting_finalization', 'awaiting_finalization'], array_column($results, 'outcome'));
+        $this->assertDatabaseCount('verified_payments', 1); $this->assertDatabaseCount('payment_observations', 2);
+        $this->assertSame(2, PaymentObservation::where('outcome', 'confirmed')->count());
+        $this->assertSame(1, PaymentObservation::whereNull('stripe_webhook_receipt_id')->count());
+        $this->assertSame(['processed', 1], [StripeReceiptWork::sole()->state, StripeReceiptWork::sole()->attempts]);
+        $this->assertSame(F::PAYMENT, VerifiedPayment::sole()->provider_payment_intent_id);
+        $this->assertSame(1, PaymentObservation::where('evidence_hash', VerifiedPayment::sole()->evidence_hash)->count());
+        $this->assertSame($before, F::unchangedBusinessEvidence());
+        foreach ($results as $result) { foreach ($result['calls'] as $call) { $this->assertSame(0, $call['transaction_level']); } }
     }
 
     public function test_worker_whose_lease_was_reclaimed_cannot_commit_stale_payment_evidence(): void

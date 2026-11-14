@@ -1,0 +1,50 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-eligibility/phpunit.xml
+
+[41;37mF[0m[31;1mE[0m                                                                  2 / 2 (100%)
+
+Time: 00:07.307, Memory: 96.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest::test_terminal_file_admission_refuses_a_one_shot_non_native_stat_wrapper
+ErrorException: stream_wrapper_restore(): file:// was never changed, nothing to restore
+
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php:265
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:376
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:358
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+Caused by
+Expected current catalog proof refusal.
+
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:435
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:371
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:358
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+--
+
+There was 1 failure:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest::test_final_clock_callback_cannot_withdraw_the_current_buyer_after_identity_proof
+Expected current catalog proof refusal.
+
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:435
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:345
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:327
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 2[0m[37;41m, Assertions: 4[0m[37;41m, Errors: 1[0m[37;41m, Failures: 1[0m[37;41m.[0m

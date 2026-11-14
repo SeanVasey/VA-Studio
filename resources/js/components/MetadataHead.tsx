@@ -24,5 +24,7 @@ export function MetadataHead({ metadata, publicInstallation = false }: { metadat
     <meta head-key="twitter:description" name="twitter:description" content={metadata.description} />
     <meta head-key="twitter:image" name="twitter:image" content={metadata.imageUrl} />
     <meta head-key="twitter:image:alt" name="twitter:image:alt" content={metadata.imageAlt} />
+    {/* Inertia writes script children raw. The server escapes <, > and & in this JSON; anything else is dropped. */}
+    {metadata.structuredData && !/[<>&]/.test(metadata.structuredData) && <script head-key="structured-data" type="application/ld+json">{metadata.structuredData}</script>}
   </Head>;
 }

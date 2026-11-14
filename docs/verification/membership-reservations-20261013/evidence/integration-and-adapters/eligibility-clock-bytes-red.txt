@@ -1,0 +1,31 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-membership-eligibility/phpunit.xml
+
+[41;37mF[0m[41;37mF[0m                                                                  2 / 2 (100%)
+
+Time: 00:07.509, Memory: 94.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest::test_clock_callback_after_file_proof_cannot_change_private_bytes_before_authority_returns
+Expected current catalog proof refusal.
+
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:375
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:287
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/Concerns/ManagesTransactions.php:35
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php:502
+/workspace/VA-Studio-dependency-adapters/vendor/laravel/framework/src/Illuminate/Support/Facades/Facade.php:364
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:281
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\MembershipEligibleLicenseProofTest::test_committed_snapshot_checks_native_bytes_after_later_clock_callback
+Expected current catalog proof refusal.
+
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:375
+/workspace/VA-Studio-membership-eligibility/tests/Feature/ProductionMembershipBilling/MembershipEligibleLicenseProofTest.php:314
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 2[0m[37;41m, Assertions: 5[0m[37;41m, Failures: 2[0m[37;41m.[0m

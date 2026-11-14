@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="10" assertions="64" errors="0" failures="1" skipped="0" time="31.404959">
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php" tests="10" assertions="64" errors="0" failures="1" skipped="0" time="31.404959">
+      <testcase name="test_current_staff_approves_policy_derived_terms_and_original_buyer_without_awarding" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php" line="50" class="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingSubscriptionApprovalTest" assertions="9" time="3.313397"/>
+      <testcase name="test_identical_retry_keeps_original_author_row_and_creation_time" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php" line="69" class="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingSubscriptionApprovalTest" assertions="4" time="3.404586"/>
+      <testcase name="test_changed_customer_price_buyer_or_policy_cannot_reassign_a_subscription" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php" line="79" class="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingSubscriptionApprovalTest" assertions="7" time="4.743680"/>
+      <testcase name="test_legacy_binding_remains_readable_but_cannot_be_adopted_as_approved_authority" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php" line="94" class="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingSubscriptionApprovalTest" assertions="5" time="2.649134"/>
+      <testcase name="test_approval_requires_enabled_authoring_and_exact_approved_policy" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php" line="105" class="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingSubscriptionApprovalTest" assertions="5" time="2.610624"/>
+      <testcase name="test_nonstaff_unenrolled_stale_and_revoked_staff_are_refused_even_on_retry" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php" line="117" class="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingSubscriptionApprovalTest" assertions="6" time="3.520533"/>
+      <testcase name="test_authenticated_record_binds_all_columns_even_when_outer_checksum_is_recomputed" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php" line="131" class="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingSubscriptionApprovalTest" assertions="16" time="3.143079"/>
+      <testcase name="test_encryption_callback_staff_revocation_rolls_back_without_an_approval" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php" line="155" class="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingSubscriptionApprovalTest" assertions="5" time="2.547009"/>
+      <testcase name="test_encryption_callback_policy_withdrawal_refuses_before_write" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php" line="166" class="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingSubscriptionApprovalTest" assertions="4" time="2.736656"/>
+      <testcase name="test_encryption_callback_cannot_remove_a_billing_guard_before_the_write" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php" line="174" class="Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest" classname="Tests.Feature.ProductionMembershipBilling.BillingSubscriptionApprovalTest" assertions="3" time="2.736260">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\BillingSubscriptionApprovalTest::test_encryption_callback_cannot_remove_a_billing_guard_before_the_write
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'schema'
++'schema_prefix'
+
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php:241
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingSubscriptionApprovalTest.php:181
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

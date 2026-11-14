@@ -246,6 +246,25 @@ final class FreeGrantSchemaRecoveryTest extends TestCase
         }
     }
 
+    public function test_native_composite_dependency_primary_key_is_not_a_unique_id_target(): void
+    {
+        if (DB::getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Native PRIMARY dictionary shape refusal; the SQLite shape is the sibling SQLite-only test.');
+        }
+        Schema::drop('users');
+        // The id column keeps its exact type and AUTO_INCREMENT; only the PRIMARY key becomes (id, tenant).
+        DB::unprepared('CREATE TABLE users (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, tenant BIGINT UNSIGNED NOT NULL, PRIMARY KEY (id, tenant)) ENGINE=InnoDB');
+        $before = $this->objects();
+        try {
+            $this->migrate();
+            $this->fail('Composite first component cannot be an owned FK target.');
+        } catch (LogicException $error) {
+            $this->assertSame('Free grant dependency primary key changed.', $error->getMessage());
+            $this->assertSame($before, $this->objects());
+            $this->assertDatabaseMissing('migrations', ['migration' => self::MIGRATION]);
+        }
+    }
+
     private function driftGuard(): void
     {
         DB::unprepared('DROP TRIGGER free_definitions_immutable');

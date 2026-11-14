@@ -1,0 +1,1 @@
+PASS: actual prior/candidate Composer lock bytes alone change schema identity; an existing initializing workspace is refused without changing identity/database bytes. No PHP execution, prior-runtime installation, completed ready-installation interoperability or host result is claimed by this probe.

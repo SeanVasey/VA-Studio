@@ -1,0 +1,158 @@
+{
+  "schema": 1,
+  "status": "PASS_SELECTED_DEVELOPMENT_VERIFICATION",
+  "physical_source_sha": "f0f553243e31a128bc08d7f9624d1ffc3a564fd3",
+  "product_and_regression_test_source_sha": "5b001577b0521cf472f14b8ae88fc13ad2567e3b",
+  "discovery_source_sha": "b2b116f9d16875def80677077593b6831619a60a",
+  "targeted_native": {
+    "tests": 5,
+    "assertions": 109,
+    "full_native_suite_claim": false
+  },
+  "selected_sqlite": {
+    "tests": 68,
+    "assertions": 2454,
+    "native_concurrency_claim": false
+  },
+  "discovery": {
+    "listings": 25,
+    "selected_cases": 2709,
+    "discovered_cases": 10178,
+    "selected_files": 269,
+    "product_tests_executed": false,
+    "per_php_raw_streams_retained": false
+  },
+  "ci_safeguards": {
+    "host_tests": 207,
+    "suites": 5,
+    "hosted_foundation_claim": false
+  },
+  "physical_database": "Local admitted Oracle MySQL 8.4.11",
+  "physical_pools": [
+    {
+      "binding_pool": 1,
+      "tests": 1,
+      "assertions": 110,
+      "seconds": 894.683657,
+      "worst_local_sample_seconds": 21.082234219,
+      "samples": 9,
+      "actual_award_workers": 9,
+      "full_100_period_traversal": true,
+      "proof_counts": {
+        "capture": 2,
+        "current": 2,
+        "committed": 2
+      },
+      "outer_exit": 0,
+      "native_exit": 0,
+      "failure_error_skip_warning_counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "warning": 0
+      },
+      "source_and_actual_process_origins_verified": true,
+      "observer_helper_reaped": true,
+      "all_six_cleanup_and_lease_verified": true
+    },
+    {
+      "binding_pool": 2,
+      "tests": 1,
+      "assertions": 112,
+      "seconds": 803.397157,
+      "worst_local_sample_seconds": 20.658891015,
+      "samples": 9,
+      "actual_award_workers": 9,
+      "full_100_period_traversal": true,
+      "proof_counts": {
+        "capture": 4,
+        "current": 4,
+        "committed": 4
+      },
+      "outer_exit": 0,
+      "native_exit": 0,
+      "failure_error_skip_warning_counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "warning": 0
+      },
+      "source_and_actual_process_origins_verified": true,
+      "observer_helper_reaped": true,
+      "all_six_cleanup_and_lease_verified": true
+    },
+    {
+      "binding_pool": 10,
+      "tests": 1,
+      "assertions": 128,
+      "seconds": 1131.192214,
+      "worst_local_sample_seconds": 39.50057313,
+      "samples": 9,
+      "actual_award_workers": 9,
+      "full_100_period_traversal": true,
+      "proof_counts": {
+        "capture": 20,
+        "current": 20,
+        "committed": 20
+      },
+      "outer_exit": 0,
+      "native_exit": 0,
+      "failure_error_skip_warning_counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "warning": 0
+      },
+      "source_and_actual_process_origins_verified": true,
+      "observer_helper_reaped": true,
+      "all_six_cleanup_and_lease_verified": true
+    },
+    {
+      "binding_pool": 12,
+      "tests": 1,
+      "assertions": 132,
+      "seconds": 1110.954043,
+      "worst_local_sample_seconds": 37.534627202,
+      "samples": 9,
+      "actual_award_workers": 9,
+      "full_100_period_traversal": true,
+      "proof_counts": {
+        "capture": 24,
+        "current": 24,
+        "committed": 24
+      },
+      "outer_exit": 0,
+      "native_exit": 0,
+      "failure_error_skip_warning_counts": {
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "warning": 0
+      },
+      "source_and_actual_process_origins_verified": true,
+      "observer_helper_reaped": true,
+      "all_six_cleanup_and_lease_verified": true
+    }
+  ],
+  "physical_totals": {
+    "tests": 4,
+    "assertions": 482,
+    "samples": 36,
+    "actual_award_workers": 36
+  },
+  "aggregate_outer_exit": 0,
+  "php_quiet_after_final_cleanup": true,
+  "original_limits_seconds": {
+    "php_per_pool": 1800,
+    "outer_per_pool": 1855,
+    "domain_read_and_pre_bytes": 60
+  },
+  "independent_source_decision_sha256": "a0295e61cc9ca8a8257c6ff1c8de62be859940352cbbeec6fb05176027bea826",
+  "existing_four_pool_runtime_conditions_fulfilled": true,
+  "original_failures_preserved": true,
+  "target_host_or_production_acceptance": false,
+  "tls_acceptance_claim": false,
+  "membership_mounted": false,
+  "live_activation": false,
+  "verified_utc": "2026-11-03T20:43:31.987582+00:00"
+}

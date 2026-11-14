@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "reviewed_and_physical_source_sha": "f0f553243e31a128bc08d7f9624d1ffc3a564fd3",
+  "product_test_source_sha": "5b001577b0521cf472f14b8ae88fc13ad2567e3b",
+  "documentation_only_publication": "The enclosing commit and PR identify the later publication head; no new executable or test source is claimed.",
+  "unchanged_objects": {
+    "app": {
+      "kind": "tree",
+      "git_oid": "809fc7124ce21147501627918316acc0ba949987"
+    },
+    "bootstrap": {
+      "kind": "tree",
+      "git_oid": "51e11b6bffaf8d364fe73d7424280144a173c07a"
+    },
+    "config": {
+      "kind": "tree",
+      "git_oid": "290997a4743c4eb5c1ee5f51eee673e7172238a1"
+    },
+    "database": {
+      "kind": "tree",
+      "git_oid": "9c8c786688bca6950579182374879ebb9d04c772"
+    },
+    "routes": {
+      "kind": "tree",
+      "git_oid": "508e57a8281f682ff0049445f25c21f1b7c83924"
+    },
+    "resources": {
+      "kind": "tree",
+      "git_oid": "fe903d7498a6aa754fb1090b735055cfb49ec3a7"
+    },
+    "tests": {
+      "kind": "tree",
+      "git_oid": "ba9f9b851db7b6e4fb265f932180b79066d26f03"
+    },
+    "public": {
+      "kind": "tree",
+      "git_oid": "7c321ce20a8937bd9908e239bac289a2a562858e"
+    },
+    "storage": {
+      "kind": "tree",
+      "git_oid": "a7e8f4929271ac18e39af5a480eebcb31cd2750e"
+    },
+    "scripts": {
+      "kind": "tree",
+      "git_oid": "0a750bce9daef61ff3868c12cbe09013c4994a1e"
+    },
+    "composer.json": {
+      "kind": "blob",
+      "git_oid": "84d352112ba54e6c42c81e19786a0c8dee990400"
+    },
+    "composer.lock": {
+      "kind": "blob",
+      "git_oid": "0564aa8274a46f743cf97f656c090f66898f6501"
+    },
+    "phpunit.xml": {
+      "kind": "blob",
+      "git_oid": "e7f0a48df619422a48dd39ceac63c30f998fe389"
+    },
+    "artisan": {
+      "kind": "blob",
+      "git_oid": "c35e31d6a29f62921a8621944eb20ad162f5b2bb"
+    }
+  },
+  "manual_probe_sources": {
+    "docs/verification/member-mount-gates-20261101/MemberIndexLatencyProbeTest.php": {
+      "sha256": "ba1366040339fe27716eec4af7eecb2f0e89b5a826d97806e117f6976903d96d",
+      "bytes": 17495,
+      "git_blob": "d83d9b56a1c48affb3acd783d2c2a722f9a6c993"
+    },
+    "docs/verification/member-mount-gates-20261101/HistoricalProofCounter.php": {
+      "sha256": "b9648d950b564fab3e978e52ddb32c5651e05456a841f5693336a7f8781ef2cf",
+      "bytes": 2471,
+      "git_blob": "98bdc7e103f782f0ccab0d3d95ddb4964a865c9e"
+    }
+  },
+  "original_vendor_controls": {
+    "metadata_files_verified": 14,
+    "package_links_verified": 160,
+    "package_php_digests_verified": 160,
+    "unchanged": true
+  },
+  "source_review_conditions_fulfilled": true,
+  "verification_method": "Original source-bound filesystem and vendor controls, Git object comparison, exact manual source digests; no PHP or product execution for publication."
+}

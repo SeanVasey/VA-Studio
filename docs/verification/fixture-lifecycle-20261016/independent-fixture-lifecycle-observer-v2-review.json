@@ -1,0 +1,40 @@
+{
+  "decision": "REVISE TWO PRIVATE CAPTURE GAPS BEFORE RETRY; BOUNDED PARENT SOURCE CARRY ACCEPTED",
+  "execution_conditions": [
+    "Preserve immutable v2 bytes before correction; separately bind corrected capture before retry.",
+    "After capture correction, evaluate actual existing SQLite compatibility and bounded native calibration; neither is currently accepted by this report.",
+    "Fixed mysql300/sqlite90 parent source remains unchanged; prior native whole4/8/E4 and old matching1/2/E1 remain failed/open."
+  ],
+  "immutable_sha256": {
+    "observer_v1_original": "7eb4a7017a7e60daeee24239861a5ba8f094202bcdd2f1b9407b476ef2874395",
+    "observer_v2": "afa5e90b5ec29cc8eda2a8de346dae3208217a33437cdfb8d916fd0bd9a80dc2",
+    "runner_v1_original": "75878802ca6dd46e3fef2c364dd2df1cbbd3b28ee30793cad24e6d00cb90277c",
+    "runner_v2": "da4341cb2a88b472cda15e38aad097fad479cc9cbc379c752c102b899bfe3b14"
+  },
+  "limits": [
+    "No passing or partial result inferred from interrupted v1 calibration (-15, recorder1, NULL counts, zero observed groups).",
+    "No full F2/native counterpart/throughput/host/provider/activation/release acceptance."
+  ],
+  "open_p0": 0,
+  "open_p1": 0,
+  "originals_preserved": true,
+  "required_corrections": [
+    "Reconcile/terminate and wait the verified owned process group and captured child birth identities on every failed/interrupted launch, including after the PHP leader has already exited; catch vanished-group cleanup races and retain the original terminal result plus cleanup outcome.",
+    "Record final descriptor mtime and link count, verify copied bytes equal the final size, and re-fstat after copying to reject a changing original before accepting complete bytes."
+  ],
+  "review_method": "Read-only code/artifact inspection and Python AST parsing only; no collector/application/test/database/network/CI execution, shared edits or delegation.",
+  "reviewed_sha": "c96da8e29999838ca14477e7dc8f236d6f00ad4a",
+  "source_sha256": {
+    "tests/Feature/FinalizationDatabaseLifecycleTest.php": "d571195075cd5dff116a04057bc094f65ad171e046d4b50e1d80709d28473fd7",
+    "tests/Support/FinalizationLifecycleFixture.php": "7ef29a58fae5d0ce0a81b5c381d9261824b773432bd6051de93b120d91f852f6"
+  },
+  "v1_correction_assessment": {
+    "constructor_before_launch": "Repaired: observer roots/baseline validate before Popen; constructor/open partial failures close descriptors.",
+    "copied_content_and_mapping": "Repaired: ordered two child methods, expected first-method error/no failures/skips, exact two cleanup receipts, unchanged warning rule, unique throw/alias/view signature reconciled with successful parent datasets.",
+    "exact_provenance": "Repaired for this owned fixture: canonical PHP executable/phpunit/config/flags/cwd, PID start ticks and ancestry recheck at directory acquisition, pinned no-follow directories/files, baseline exclusion and bounded child diagnostics.",
+    "finally_descriptor_cleanup": "Repaired: finish/close are idempotent and finally-close groups/files/root descriptors; copying failure becomes explicit capture error.",
+    "finite_bounds": "Bounded: four groups, three files per group, three pinned root descriptors (19 retained descriptors), 8 MiB/file, 64 MiB total, 32 child observations and outer timeout. Final byte-completeness metadata/checks remain incomplete.",
+    "owned_process_cleanup": "Incomplete: both exceptional and finally termination are conditional on proc.poll() is None; a surviving owned child after leader exit is left running. Unguarded killpg/wait cleanup errors can also prevent a terminal receipt.",
+    "raw_child_result": "Accurate limitation retained: child exit is derived from completed parent assertions; no raw child stdout/stderr or independent child wait status."
+  }
+}

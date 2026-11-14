@@ -1,0 +1,14 @@
+{
+  "recorded_utc": "2026-10-14T21:02:01.722477+00:00",
+  "argv": [
+    "docker",
+    "stop",
+    "--time",
+    "10",
+    "va-studio-private-mysql-paid-a2-20261014"
+  ],
+  "process_exit": 0,
+  "stdout": "Flag --time has been deprecated, use --timeout instead\nva-studio-private-mysql-paid-a2-20261014\n",
+  "stderr": "",
+  "scope": "Only the owned A2 synthetic server stopped after completed tests; its named datadir volume retained, previous C4 server and all source/evidence untouched."
+}

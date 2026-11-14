@@ -1,0 +1,1 @@
+PHPUnit partition rejected: [Errno 17] File exists: '/workspace/VA-Studio-membership-c2/phpunit-ci-mysql-1.xml'

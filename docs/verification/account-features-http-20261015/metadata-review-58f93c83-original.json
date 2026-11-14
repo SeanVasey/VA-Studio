@@ -1,0 +1,53 @@
+{
+  "decision": "REVISE COMPONENT: ONE RELATED RAW-MAP GUARD REMAINS",
+  "reviewed_sha": "58f93c83bff044e1ce2db23bf1f6ae579ef0807b",
+  "observed_utc": "2026-10-15T17:15:34.719061+00:00",
+  "clean_head": true,
+  "scope": "Bounded follow-up of cbe111ec resolver metadata and early call-site P2 groups; no integrated HTTP/context/cleanup approval",
+  "sha256": {
+    "app/Domain/Customers/ProductionIdentity/IdentityMetadataAdmission.php": "67d5fad341fbd4bf2a10b6c7b033bb2da89f36ebab93919c68f03437727ad92c",
+    "app/Domain/Customers/ProductionCustomerAccess.php": "ce24d7d2fcf77b89b728a54e681fcdd5137748f576bfa21836584299c0a559f7",
+    "app/Domain/Customers/ProductionIdentity/Features/ProductionAccountFeatureAccess.php": "89123f7a5f905ad88e7ebe70745b733fad1c7fad9ca028aeb55f9ef6a8373b1d",
+    "app/Domain/Customers/ProductionIdentity/IdentityCommittedFrame.php": "57ee1e61f2c7eb525356f57cc1e4bdec85ea3dacb10ff460b5ffa397c4f61c8d",
+    "tests/Feature/ProductionIdentityAdapters/ProductionFeatureMetadataAdmissionTest.php": "8945147f7f000bbec0f7271dcde8def9ff2ab9b06219769314fb80ba401855c5"
+  },
+  "closed_repairs": [
+    "buildStack actual list/string admission; critical abstractAliases actual lists; contextual outer/nested arrays with critical overrides refused; Application deferredServices actual array before resolution",
+    "CustomerAccess.lock and FeatureAccess.lock raw reader/actor admission before facade/policy; FeatureAccess.lockCommitted original frame and actor admission before policy",
+    "Corrected committed test now passes exact expected configuration/identity envelope, reaching the intended old policy path; its prior [] short circuit remains ineffective evidence rather than a behavioral oracle"
+  ],
+  "remaining_finding": {
+    "id": "B4-M1-continuation",
+    "severity": "P2",
+    "path": "app/Domain/Customers/ProductionIdentity/IdentityMetadataAdmission.php",
+    "method": "resolverMetadata",
+    "title": "Supported literal env resolution writes two still-unadmitted raw maps",
+    "path_evidence": "IdentityPolicy.enabled -> Application.environment -> Container.offsetGet/make -> Container.resolve. For the supported offsetSet env binding without an env instance, resolve appends $this->with[] (installed Container.php line 929), executes the proven literal closure, and assigns $this->resolved[$abstract] (line 964). Both properties are untyped and absent from resolverMetadata admission. An ArrayAccess replacement can execute offsetSet callbacks before the later source/frame proof refuses.",
+    "required_correction": "Require raw Container with and resolved actual arrays before allowing this delegated literal env path. This does not require changing frozen source/identity authority, invoking the env resolver during admission, or altering policy flags/deadlines.",
+    "meaningful_control": "Use the genuine standard Container offsetSet literal env descriptor with no env instance; individually replace with/resolved with setter-counting ArrayObject sentinels. Old source must reach setters; fixed source must refuse with zero setters and no transaction/frame effects. Retain a supported literal-descriptor positive.",
+    "verification_level": "Static source trace only; reviewer ran no counterexample."
+  },
+  "open_P0_P1": [],
+  "execution_evidence_limits": {
+    "prior_cbe_fixed_four": "Parent reports completed 4/25, all exits0; historical report correctly left it pending. Not independently rerun/reconciled here.",
+    "new_controls": "Parent reports original 7/24/F6 plus corrected committed red1/3/F1; old [] committed control explicitly ineffective. Test bodies and changed expected shape reviewed; runtime receipts not independently recomputed in this source checkpoint.",
+    "current_58_whole_metadata": "Executing when requested; no completed count/exit assertion in this artifact."
+  },
+  "reviewer_actions": {
+    "source_changes": false,
+    "application_tests": false,
+    "database": false,
+    "network_CI": false
+  },
+  "conditions": [
+    "Integrated HTTP/Operation/context/observer cleanup and final source/evidence gates remain pending.",
+    "Adjacent frozen V1/generic/OriginalCommitWitness/membership scopes remain deferred."
+  ],
+  "read_commands": [
+    "git rev-parse HEAD; git status --short",
+    "git diff cbe111eccc9ecbdfe5967b832eb155df2fc9af9d..58f93c83bff044e1ce2db23bf1f6ae579ef0807b on the scoped component and test",
+    "sed/rg of installed Application.environment and Container.resolve/build/offsetSet path previously inspected",
+    "Offline immutable Git byte hashing and exclusive runtime artifact creation"
+  ],
+  "preparation_errors": []
+}

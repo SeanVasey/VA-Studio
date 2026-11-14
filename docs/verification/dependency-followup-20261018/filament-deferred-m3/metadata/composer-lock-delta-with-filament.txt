@@ -1,0 +1,16 @@
+packages ADDED composer/class-map-generator 1.8.0 (c0efbeb2)
+packages ADDED composer/pcre 3.4.0 (d5a341b3)
+packages CHANGED filament/actions v5.8.4 (d52683c6) -> v5.10.2 (48e29611)
+packages CHANGED filament/filament v5.8.4 (b5aad586) -> v5.10.2 (aaa2a4fc)
+packages CHANGED filament/forms v5.8.4 (d7567d2d) -> v5.10.2 (5844d590)
+packages CHANGED filament/infolists v5.8.4 (1046d42c) -> v5.10.2 (31519c68)
+packages CHANGED filament/notifications v5.8.4 (1e4c9d6a) -> v5.10.2 (814a681a)
+packages CHANGED filament/query-builder v5.8.4 (f6aa1da1) -> v5.10.2 (8c53f99b)
+packages CHANGED filament/schemas v5.8.4 (59406389) -> v5.10.2 (c0dcdf9b)
+packages CHANGED filament/support v5.8.4 (c39b26bb) -> v5.10.2 (012f8ea6)
+packages CHANGED filament/tables v5.8.4 (e07361e1) -> v5.10.2 (4eb168dd)
+packages CHANGED filament/widgets v5.8.4 (93f6f102) -> v5.10.2 (289a91f1)
+packages CHANGED laravel/framework v13.36.0 (e5626e38) -> v13.37.0 (685f8d6c)
+packages CHANGED livewire/livewire v4.4.6 (c6b7db7a) -> v4.4.7 (5976d18b)
+counts 158 -> 160
+content-hash same: True

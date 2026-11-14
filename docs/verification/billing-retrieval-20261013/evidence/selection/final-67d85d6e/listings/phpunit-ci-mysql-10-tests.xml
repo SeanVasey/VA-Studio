@@ -1,0 +1,181 @@
+<?xml version="1.0"?>
+<testSuite xmlns="https://xml.phpunit.de/testSuite">
+ <tests>
+  <testClass name="Tests\Feature\CustomerPurchaseClaimMigrationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/CustomerPurchaseClaimMigrationTest.php">
+   <testMethod id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_empty_owned_roundtrip_preserves_exact_schema_and_repeat_install_refuses_without_ddl" name="test_empty_owned_roundtrip_preserves_exact_schema_and_repeat_install_refuses_without_ddl"/>
+   <testMethod id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_empty_foreign_or_altered_schema_is_preserved_when_rollback_refuses#0" name="test_empty_foreign_or_altered_schema_is_preserved_when_rollback_refuses"/>
+   <testMethod id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_empty_foreign_or_altered_schema_is_preserved_when_rollback_refuses#1" name="test_empty_foreign_or_altered_schema_is_preserved_when_rollback_refuses"/>
+   <testMethod id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_empty_foreign_or_altered_schema_is_preserved_when_rollback_refuses#2" name="test_empty_foreign_or_altered_schema_is_preserved_when_rollback_refuses"/>
+   <testMethod id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_empty_foreign_or_altered_schema_is_preserved_when_rollback_refuses#3" name="test_empty_foreign_or_altered_schema_is_preserved_when_rollback_refuses"/>
+   <testMethod id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_empty_foreign_or_altered_schema_is_preserved_when_rollback_refuses#4" name="test_empty_foreign_or_altered_schema_is_preserved_when_rollback_refuses"/>
+   <testMethod id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_foreign_guard_collision_is_refused_before_either_table_is_created" name="test_foreign_guard_collision_is_refused_before_either_table_is_created"/>
+   <testMethod id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_temporary_table_shadow_is_refused_before_permanent_ddl" name="test_temporary_table_shadow_is_refused_before_permanent_ddl"/>
+  </testClass>
+  <testClass name="Tests\Feature\InquiryNotificationConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/InquiryNotificationConcurrencyTest.php">
+   <testMethod id="Tests\Feature\InquiryNotificationConcurrencyTest::test_independent_workers_serialize_one_handoff_without_duplicate_attempt_or_submission" name="test_independent_workers_serialize_one_handoff_without_duplicate_attempt_or_submission"/>
+  </testClass>
+  <testClass name="Tests\Feature\MembershipCreditMigrationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/MembershipCreditMigrationTest.php">
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plans update" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plans delete" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plans replace" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plans ignore" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plan_versions update" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plan_versions delete" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plan_versions replace" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plan_versions ignore" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_buckets update" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_buckets delete" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_buckets replace" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_buckets ignore" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_events update" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_events delete" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_events replace" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_events ignore" name="test_sql_retention_and_replace_guards_cover_every_membership_table"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#negative balance" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#minted balance" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#wrong before" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#missing field" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#extra field" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#float balance" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#zero amount" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#wrong amount" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#wrong resource" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#missing reservation" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#wrong predecessor" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#wrong predecessor hash" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#another grant" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#duplicate sequence" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#wrong actor" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#stale account version" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#unknown kind" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#foreign source" name="test_sql_balance_floor_sequence_resource_and_current_ownership_guards"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_partial_existing_schema_is_never_adopted_or_dropped_and_down_retains_evidence" name="test_partial_existing_schema_is_never_adopted_or_dropped_and_down_retains_evidence"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_temporary_shadow_or_case_variant_is_refused_before_any_new_object" name="test_temporary_shadow_or_case_variant_is_refused_before_any_new_object"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_actual_artisan_rollback_preserves_migration_bookkeeping_and_exact_retained_evidence#empty retained schema" name="test_actual_artisan_rollback_preserves_migration_bookkeeping_and_exact_retained_evidence"/>
+   <testMethod id="Tests\Feature\MembershipCreditMigrationTest::test_actual_artisan_rollback_preserves_migration_bookkeeping_and_exact_retained_evidence#populated retained schema" name="test_actual_artisan_rollback_preserves_migration_bookkeeping_and_exact_retained_evidence"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/BillingIntervalOwnershipTest.php">
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest::test_both_insert_directions_refuse_every_cross_ledger_endpoint_combination" name="test_both_insert_directions_refuse_every_cross_ledger_endpoint_combination"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest::test_exact_legacy_upgrade_and_each_interrupted_guard_state_preserve_every_row" name="test_exact_legacy_upgrade_and_each_interrupted_guard_state_preserve_every_row"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest::test_legacy_cross_ledger_duplicates_are_refused_without_rewriting_or_resealing_them" name="test_legacy_cross_ledger_duplicates_are_refused_without_rewriting_or_resealing_them"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest::test_upgrade_refuses_foreign_guard_drift_and_an_outer_transaction" name="test_upgrade_refuses_foreign_guard_drift_and_an_outer_transaction"/>
+  </testClass>
+  <testClass name="Tests\Feature\PromotionConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/PromotionConcurrencyTest.php">
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#last_use" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#same_quote" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#conflicting_policy" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#expired_hold" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#pending_hold" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#same_attempt" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#different_attempt" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+   <testMethod id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#clock_skew" name="test_independent_requests_serialize_capacity_retries_and_attempts"/>
+  </testClass>
+  <testClass name="Tests\Feature\RightsScopeWriterConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/RightsScopeWriterConcurrencyTest.php">
+   <testMethod id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row#link first" name="test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row"/>
+   <testMethod id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row#rights before link" name="test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row"/>
+   <testMethod id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row#block first" name="test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row"/>
+   <testMethod id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row#rights before block" name="test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row"/>
+   <testMethod id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot#register / role" name="test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot"/>
+   <testMethod id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot#register / email" name="test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot"/>
+   <testMethod id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot#link / role" name="test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot"/>
+   <testMethod id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot#link / email" name="test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot"/>
+   <testMethod id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot#block / role" name="test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot"/>
+   <testMethod id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot#block / email" name="test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot"/>
+   <testMethod id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_write_refuses_attestation_consumed_after_its_repeatable_read_snapshot" name="test_nested_scope_write_refuses_attestation_consumed_after_its_repeatable_read_snapshot"/>
+  </testClass>
+  <testClass name="Tests\Feature\StripeWebhookConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/StripeWebhookConcurrencyTest.php">
+   <testMethod id="Tests\Feature\StripeWebhookConcurrencyTest::test_simultaneous_equivalent_deliveries_acknowledge_one_committed_receipt" name="test_simultaneous_equivalent_deliveries_acknowledge_one_committed_receipt"/>
+   <testMethod id="Tests\Feature\StripeWebhookConcurrencyTest::test_simultaneous_conflicting_deliveries_retain_one_winner_and_reject_the_conflict" name="test_simultaneous_conflicting_deliveries_retain_one_winner_and_reject_the_conflict"/>
+  </testClass>
+  <testClass name="Tests\Feature\TransactionalNotificationConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/TransactionalNotificationConcurrencyTest.php">
+   <testMethod id="Tests\Feature\TransactionalNotificationConcurrencyTest::test_two_independent_enqueues_share_one_intent_and_the_exact_loser_replays_without_writes" name="test_two_independent_enqueues_share_one_intent_and_the_exact_loser_replays_without_writes"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationConcurrencyTest::test_two_independent_dispatches_claim_once_and_the_loser_never_invokes_private_storage" name="test_two_independent_dispatches_claim_once_and_the_loser_never_invokes_private_storage"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationConcurrencyTest::test_withdrawal_committed_after_an_exact_user_wait_blocks_every_notification_entrypoint_without_capture#enqueue" name="test_withdrawal_committed_after_an_exact_user_wait_blocks_every_notification_entrypoint_without_capture"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationConcurrencyTest::test_withdrawal_committed_after_an_exact_user_wait_blocks_every_notification_entrypoint_without_capture#dispatch" name="test_withdrawal_committed_after_an_exact_user_wait_blocks_every_notification_entrypoint_without_capture"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationConcurrencyTest::test_withdrawal_committed_after_an_exact_user_wait_blocks_every_notification_entrypoint_without_capture#reconcile" name="test_withdrawal_committed_after_an_exact_user_wait_blocks_every_notification_entrypoint_without_capture"/>
+   <testMethod id="Tests\Feature\TransactionalNotificationConcurrencyTest::test_a_late_completion_waits_for_the_reconciliation_winner_and_cannot_add_an_attempt_audit_or_file_write" name="test_a_late_completion_waits_for_the_reconciliation_winner_and_cannot_add_an_attempt_audit_or_file_write"/>
+  </testClass>
+ </tests>
+ <groups>
+  <group name="default">
+   <test id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_empty_owned_roundtrip_preserves_exact_schema_and_repeat_install_refuses_without_ddl"/>
+   <test id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_empty_foreign_or_altered_schema_is_preserved_when_rollback_refuses#0"/>
+   <test id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_empty_foreign_or_altered_schema_is_preserved_when_rollback_refuses#1"/>
+   <test id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_empty_foreign_or_altered_schema_is_preserved_when_rollback_refuses#2"/>
+   <test id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_empty_foreign_or_altered_schema_is_preserved_when_rollback_refuses#3"/>
+   <test id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_empty_foreign_or_altered_schema_is_preserved_when_rollback_refuses#4"/>
+   <test id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_foreign_guard_collision_is_refused_before_either_table_is_created"/>
+   <test id="Tests\Feature\CustomerPurchaseClaimMigrationTest::test_temporary_table_shadow_is_refused_before_permanent_ddl"/>
+   <test id="Tests\Feature\InquiryNotificationConcurrencyTest::test_independent_workers_serialize_one_handoff_without_duplicate_attempt_or_submission"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plans update"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plans delete"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plans replace"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plans ignore"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plan_versions update"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plan_versions delete"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plan_versions replace"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_plan_versions ignore"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_buckets update"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_buckets delete"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_buckets replace"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_buckets ignore"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_events update"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_events delete"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_events replace"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_retention_and_replace_guards_cover_every_membership_table#membership_credit_events ignore"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#negative balance"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#minted balance"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#wrong before"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#missing field"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#extra field"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#float balance"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#zero amount"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#wrong amount"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#wrong resource"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#missing reservation"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#wrong predecessor"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#wrong predecessor hash"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#another grant"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#duplicate sequence"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#wrong actor"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#stale account version"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#unknown kind"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_sql_balance_floor_sequence_resource_and_current_ownership_guards#foreign source"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_partial_existing_schema_is_never_adopted_or_dropped_and_down_retains_evidence"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_temporary_shadow_or_case_variant_is_refused_before_any_new_object"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_actual_artisan_rollback_preserves_migration_bookkeeping_and_exact_retained_evidence#empty retained schema"/>
+   <test id="Tests\Feature\MembershipCreditMigrationTest::test_actual_artisan_rollback_preserves_migration_bookkeeping_and_exact_retained_evidence#populated retained schema"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest::test_both_insert_directions_refuse_every_cross_ledger_endpoint_combination"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest::test_exact_legacy_upgrade_and_each_interrupted_guard_state_preserve_every_row"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest::test_legacy_cross_ledger_duplicates_are_refused_without_rewriting_or_resealing_them"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\BillingIntervalOwnershipTest::test_upgrade_refuses_foreign_guard_drift_and_an_outer_transaction"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#last_use"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#same_quote"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#conflicting_policy"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#expired_hold"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#pending_hold"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#same_attempt"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#different_attempt"/>
+   <test id="Tests\Feature\PromotionConcurrencyTest::test_independent_requests_serialize_capacity_retries_and_attempts#clock_skew"/>
+   <test id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row#link first"/>
+   <test id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row#rights before link"/>
+   <test id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row#block first"/>
+   <test id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_scope_control_and_reviewed_rights_writers_serialize_on_the_exact_actor_row#rights before block"/>
+   <test id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot#register / role"/>
+   <test id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot#register / email"/>
+   <test id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot#link / role"/>
+   <test id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot#link / email"/>
+   <test id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot#block / role"/>
+   <test id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_writes_deny_authority_withdrawn_after_an_old_repeatable_read_snapshot#block / email"/>
+   <test id="Tests\Feature\RightsScopeWriterConcurrencyTest::test_nested_scope_write_refuses_attestation_consumed_after_its_repeatable_read_snapshot"/>
+   <test id="Tests\Feature\StripeWebhookConcurrencyTest::test_simultaneous_equivalent_deliveries_acknowledge_one_committed_receipt"/>
+   <test id="Tests\Feature\StripeWebhookConcurrencyTest::test_simultaneous_conflicting_deliveries_retain_one_winner_and_reject_the_conflict"/>
+   <test id="Tests\Feature\TransactionalNotificationConcurrencyTest::test_two_independent_enqueues_share_one_intent_and_the_exact_loser_replays_without_writes"/>
+   <test id="Tests\Feature\TransactionalNotificationConcurrencyTest::test_two_independent_dispatches_claim_once_and_the_loser_never_invokes_private_storage"/>
+   <test id="Tests\Feature\TransactionalNotificationConcurrencyTest::test_withdrawal_committed_after_an_exact_user_wait_blocks_every_notification_entrypoint_without_capture#enqueue"/>
+   <test id="Tests\Feature\TransactionalNotificationConcurrencyTest::test_withdrawal_committed_after_an_exact_user_wait_blocks_every_notification_entrypoint_without_capture#dispatch"/>
+   <test id="Tests\Feature\TransactionalNotificationConcurrencyTest::test_withdrawal_committed_after_an_exact_user_wait_blocks_every_notification_entrypoint_without_capture#reconcile"/>
+   <test id="Tests\Feature\TransactionalNotificationConcurrencyTest::test_a_late_completion_waits_for_the_reconciliation_winner_and_cannot_add_an_attempt_audit_or_file_write"/>
+  </group>
+ </groups>
+</testSuite>

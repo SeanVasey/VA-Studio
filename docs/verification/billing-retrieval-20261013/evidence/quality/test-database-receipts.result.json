@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "python3",
+    "scripts/ci/test-database-receipts.py"
+  ],
+  "completed_at_utc": "2026-10-13T06:32:22.394470+00:00",
+  "cwd": "/workspace/VA-Studio-billing-retrieval",
+  "duration_seconds": 50.358298,
+  "exit": 0,
+  "head_at_start": "874d57fe1897569a520b4627acd4f34d5c3e6d80",
+  "log_sha256": "053f57c81e32b3bea92e7bd77737cea566da82de74a4abc8dd770b0d3f27bfe4",
+  "runner_sha256": "f677c515014bd920aa1dc71155ba80bc0a531d7e3cc5a479782462c736de656a",
+  "selected_php_files": null,
+  "started_at_utc": "2026-10-13T06:31:32.035994+00:00",
+  "unittest_reported_tests": 61
+}

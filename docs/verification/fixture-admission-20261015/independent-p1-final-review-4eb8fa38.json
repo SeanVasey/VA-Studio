@@ -1,0 +1,378 @@
+{
+  "bundle_summary": [
+    {
+      "bundle": "bundle-0db6b8709db5-fbefbda5b62d4791",
+      "database": {
+        "database_name": "vaseyaudio_fixture_admission",
+        "version": "8.4.11"
+      },
+      "head": "0db6b8709db5084d0d8113a81184286738afee75",
+      "inputs": 2467,
+      "loaders": 13,
+      "runner_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1"
+    },
+    {
+      "bundle": "bundle-305e6522532b-2a7cfd4e4d126814",
+      "database": {
+        "database_name": "vaseyaudio_focused",
+        "version": "8.4.11"
+      },
+      "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "inputs": 2467,
+      "loaders": 13,
+      "runner_sha256": "d4025c8cdf1d87bced4beb59a55b248ae6547eccef471cd49b1bb76683459ae1"
+    },
+    {
+      "bundle": "bundle-305e6522532b-2b14c4cfb2d2be4f",
+      "database": {
+        "database_name": "vaseyaudio_fixture_admission",
+        "version": "8.4.11"
+      },
+      "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "inputs": 2467,
+      "loaders": 13,
+      "runner_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1"
+    },
+    {
+      "bundle": "bundle-305e6522532b-b409408ea1d78fac",
+      "database": {
+        "database_name": "vaseyaudio_focused",
+        "version": "8.4.11"
+      },
+      "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "inputs": 2467,
+      "loaders": 13,
+      "runner_sha256": "d4025c8cdf1d87bced4beb59a55b248ae6547eccef471cd49b1bb76683459ae1"
+    },
+    {
+      "bundle": "bundle-305e6522532b-d1495f6aa44eaab9",
+      "database": {
+        "database_name": ":memory:",
+        "driver": "sqlite",
+        "version": "3.46.1"
+      },
+      "head": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "inputs": 2467,
+      "loaders": 13,
+      "runner_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1"
+    },
+    {
+      "bundle": "bundle-9470f1d90870-4a83857ee1015250",
+      "database": {
+        "database_name": ":memory:",
+        "driver": "sqlite",
+        "version": "3.46.1"
+      },
+      "head": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+      "inputs": 2467,
+      "loaders": 13,
+      "runner_sha256": "358decc78c0f3a2a066612f2f56c2a3631519095b18b54dfe3360972a137c4d1"
+    }
+  ],
+  "class_scope_counts": {
+    "owned-sqlite-under-native-old-original": {
+      "Tests\\Feature\\ProductionTrackCapabilitiesMigrationOwnershipTest": {
+        "assertions": 0,
+        "tests": 23
+      },
+      "Tests\\Feature\\ProductionTrackPreparationPacketMigrationTest": {
+        "assertions": 0,
+        "tests": 23
+      }
+    },
+    "p1-current-native-outer-whole-original": {
+      "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest": {
+        "assertions": 17,
+        "tests": 9
+      },
+      "Tests\\Feature\\FixtureDatabaseAdmissionTest": {
+        "assertions": 156,
+        "tests": 19
+      },
+      "Tests\\Feature\\ProductionTrackCapabilitiesMigrationOwnershipTest": {
+        "assertions": 606,
+        "tests": 23
+      },
+      "Tests\\Feature\\ProductionTrackPreparationPacketMigrationTest": {
+        "assertions": 326,
+        "tests": 23
+      }
+    },
+    "p1-current-sqlite-compatibility-whole-original": {
+      "Tests\\Feature\\FinalizationDatabaseLifecycleTest": {
+        "assertions": 70,
+        "tests": 4
+      },
+      "Tests\\Feature\\FixtureDatabaseAdmissionTest": {
+        "assertions": 156,
+        "tests": 19
+      },
+      "Tests\\Feature\\OperatorMfaTest": {
+        "assertions": 95,
+        "tests": 5
+      },
+      "Tests\\Feature\\ProductionTrackCapabilitiesMigrationOwnershipTest": {
+        "assertions": 606,
+        "tests": 23
+      },
+      "Tests\\Feature\\ProductionTrackPreparationPacketMigrationTest": {
+        "assertions": 326,
+        "tests": 23
+      },
+      "Tests\\Feature\\StagingOperatorMfaTest": {
+        "assertions": 16,
+        "tests": 3
+      },
+      "Tests\\Unit\\DisposableNativeDatabaseTest": {
+        "assertions": 25,
+        "tests": 8
+      },
+      "Tests\\Unit\\DisposableTestDatabaseTest": {
+        "assertions": 24,
+        "tests": 18
+      }
+    },
+    "p1-final-sqlite-compatibility-whole-original": {
+      "Tests\\Feature\\FinalizationDatabaseLifecycleTest": {
+        "assertions": 70,
+        "tests": 4
+      },
+      "Tests\\Feature\\FixtureDatabaseAdmissionTest": {
+        "assertions": 156,
+        "tests": 19
+      },
+      "Tests\\Feature\\OperatorMfaTest": {
+        "assertions": 95,
+        "tests": 5
+      },
+      "Tests\\Feature\\ProductionTrackCapabilitiesMigrationOwnershipTest": {
+        "assertions": 606,
+        "tests": 23
+      },
+      "Tests\\Feature\\ProductionTrackPreparationPacketMigrationTest": {
+        "assertions": 326,
+        "tests": 23
+      },
+      "Tests\\Feature\\StagingOperatorMfaTest": {
+        "assertions": 16,
+        "tests": 3
+      },
+      "Tests\\Unit\\DisposableNativeDatabaseTest": {
+        "assertions": 25,
+        "tests": 8
+      },
+      "Tests\\Unit\\DisposableTestDatabaseTest": {
+        "assertions": 24,
+        "tests": 18
+      }
+    },
+    "p1-focused-ci-marker-missing-original": {
+      "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest": {
+        "assertions": 0,
+        "tests": 1
+      }
+    },
+    "p1-focused-ci-marker-present-original": {
+      "Tests\\Feature\\FixtureDatabaseAdmissionNativeTest": {
+        "assertions": 2,
+        "tests": 1
+      }
+    }
+  },
+  "decision": "APPROVE BOUNDED CORRECTIVE SOURCE AND SEALED EVIDENCE; BOTH P1 FINDINGS ELIGIBLE FOR CLOSURE",
+  "limits": [
+    "Native74/1105 consists46SQLitecanaries/932,19shared admission/156,9native identity/refusal/17; no74-native-DDL/race claim.",
+    "Original native lifecycle whole4/8/E4 and olddefault1/2/E1 remain failed/unaccepted; current scopes do not replace them.",
+    "Final exact documentation-head carry, evidence-backed remote P1 replies/resolution, fresh cheap preflight/current complete inventory/protections and expected-SHA merge remain pending.",
+    "No reviewer application/database/network/CI execution or shared edits; no hosted Focused feedback/Foundation/GitLab/fullF2/SQL-sandbox/custom-worker/native-concurrency/host/provider/activation/release acceptance.",
+    "Agenda uses103acceptance requirements as scope, no completion percentage; no platform-banner repair, exposed diagnostic or guarantee claimed."
+  ],
+  "open_p0": 0,
+  "open_p1": 0,
+  "original_runs": [
+    {
+      "command_sha256": "764a8c793dbaf5d57567e7e722b41ecaa5e361751070b2b4ccfe3bc8ca498044",
+      "counts": {
+        "assertions": 0,
+        "errors": 46,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 46
+      },
+      "name": "owned-sqlite-under-native-old-original",
+      "php_exit": 2,
+      "private_or_public_log_sha256": "b91313f1ede48a5f9cc593ae51ca7e13985cce278900b941f4bade8db1dc108d",
+      "private_or_public_xml_sha256": "840d1cde8c64a31fe29fb123b40cfac6979a234f1b1f017050a13134d8f285f5",
+      "recorder_exit": 1,
+      "result_sha256": "e5f8076ff95835bc8050089a310711b9fcdf4fe815b85d6e81a2ccd0d4acd1fb",
+      "source": "0db6b8709db5084d0d8113a81184286738afee75",
+      "wall_seconds": 1.1166155969985994
+    },
+    {
+      "command_sha256": "db058db97d867594fd15fe6e90a002cd4d50692ee3eddfe2a008c3af2ddbbfab",
+      "counts": {
+        "assertions": 1318,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 103
+      },
+      "name": "p1-current-sqlite-compatibility-whole-original",
+      "php_exit": 0,
+      "private_or_public_log_sha256": "9a50e18f4f01d5ba5ba8500e8761b76f3dcb863d814ace9814605fb1602055b4",
+      "private_or_public_xml_sha256": "6ac4d153b6b0b52574101e369cf51b27d48acc6a290185108be5bc49e18c090f",
+      "recorder_exit": 0,
+      "result_sha256": "a59a31fb03664324cc1f15cd6019d5247741d439618d2e87e470de44922dc57d",
+      "source": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+      "wall_seconds": 174.51512525900034
+    },
+    {
+      "command_sha256": "9fe20e03de6cc112bf955b699b64131e012ca4d512f7737febf99e164334a428",
+      "counts": {
+        "assertions": 1105,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 74
+      },
+      "name": "p1-current-native-outer-whole-original",
+      "php_exit": 0,
+      "private_or_public_log_sha256": "ce225756dd6eeb7513730cef263ac72a4b9738beb709a95073f518220af76bb5",
+      "private_or_public_xml_sha256": "7114daea7566bb90e641a97476d6c81a43b332c92268c4c6782bd0529a45c135",
+      "recorder_exit": 0,
+      "result_sha256": "f778f49dc55e06a919b5d12f8ed2d91eafeaebded22a66f014351418920dafbe",
+      "source": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "wall_seconds": 145.25922999400063
+    },
+    {
+      "command_sha256": "2dfb7e7776dff8826bc62d4972c2b7f542beccf53bbb10001ad14a27b2a6ffc8",
+      "counts": {
+        "assertions": 0,
+        "errors": 1,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "name": "p1-focused-ci-marker-missing-original",
+      "php_exit": 2,
+      "private_or_public_log_sha256": "2d1bfabeeae8528dbde23bcc12f9b52ff5eadfbfcbdaab8a0f564563c6fb51c1",
+      "private_or_public_xml_sha256": "0aad36794a7f87ab20a9e76d026591a2490b0a8bf6128b098e5474eada666e29",
+      "recorder_exit": 1,
+      "result_sha256": "09112e449ecf4c78ad57235cc4bfd7014d076235726fcbec29367e042ec39f40",
+      "source": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "wall_seconds": 0.3147870989923831
+    },
+    {
+      "command_sha256": "70934d1ddd8011ad69dcd5ffeef408eb56b06c5f5665fe967cf2114055e360b3",
+      "counts": {
+        "assertions": 2,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 1
+      },
+      "name": "p1-focused-ci-marker-present-original",
+      "php_exit": 0,
+      "private_or_public_log_sha256": "ca1488e38414cef123548132cf134861bc8d58534849e9403c148555d8e2499d",
+      "private_or_public_xml_sha256": "281634878b2124edbefe32ba0d0c8aa57ed2fd2df224896c85d61932396305b3",
+      "recorder_exit": 0,
+      "result_sha256": "35971595a033e9d8dc971096972b3274a843f8b680a8a05a77a2f28ac7aff805",
+      "source": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "wall_seconds": 0.31457319400215056
+    },
+    {
+      "command_sha256": "b3d1f0006889ea833230937fba45b5e2e93af0c5739f62911b9266530c6501de",
+      "counts": {
+        "assertions": 1318,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 103
+      },
+      "name": "p1-final-sqlite-compatibility-whole-original",
+      "php_exit": 0,
+      "private_or_public_log_sha256": "ca26a7c1ed5a57bf237f7aef505d72e352836b2b52561461520b20511d155094",
+      "private_or_public_xml_sha256": "714c00cef1a294d4e874adbed6f012b489670aa1465c468aa514d3b3e4d716fb",
+      "recorder_exit": 0,
+      "result_sha256": "1fff47623a52141fdeef9fc78111535078b5e800383ebfc92c8d5e8f5dc71445",
+      "source": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "wall_seconds": 175.5971737229993
+    }
+  ],
+  "quality_scopes": {
+    "p1-cadence-current-original": {
+      "exit": 0,
+      "source": "9470f1d90870c7f6b7b101b6361fc52aadf5a45d",
+      "tests": 14
+    },
+    "p1-final-focused-safeguards-original": {
+      "exit": 0,
+      "source": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "tests": 52
+    },
+    "p1-final-shard-policy-original": {
+      "exit": 0,
+      "source": "305e6522532b7e54b62b10ca7314011fdffc3916",
+      "tests": 52
+    },
+    "pint": {
+      "exit": 0,
+      "files": 6,
+      "source": "305e6522532b7e54b62b10ca7314011fdffc3916"
+    }
+  },
+  "remote_status_limit": "Both remote P1 threads remain open until owner evidence-backed replies/resolution; this review confirms closure eligibility, not remote completion.",
+  "required_corrections": [],
+  "reviewed_sha": "4eb8fa38b0dec78965ea00f81a7d82539a1b9968",
+  "server": {
+    "datadir_retained": "/tmp/va-studio-fixture-admission-mysql-data-standalone-20261015",
+    "mysql_version": "8.4.11",
+    "normal_shutdown_exit": 0,
+    "port": 33524,
+    "socket_pid_absent": true,
+    "startup_stderr_warning_retained": "mysqld: Can't open shared library '/tmp/fixture-admission-mysql-runtime-20261015/lib64/mysql/plugin/component_reference_cache.so' (errno: 22 /tmp/fixture-admission-mysql-runtime-20261015/lib64/mysql/plugin/component_reference_cache.so: cannot open shared object file: N)\nmysqld: Cannot load component from specified URN: 'file://component_reference_cache'.\n",
+    "version_regex_probe_stderr_empty": true
+  },
+  "tested_sha": "305e6522532b7e54b62b10ca7314011fdffc3916",
+  "thread_verdicts": {
+    "r4289240899": {
+      "basis": "Explicit owned memory creation, fresh configuration/cache name, Connection/PDO identity and actual memory validation. Original whole canary bodies/assertions preserved;46/932 pass inside MySQL outer lane. Registered redirection refusals preserve sentinels; unregistered memory alias refuses in actual native scope.",
+      "verdict": "FIXED; ELIGIBLE FOR CLOSURE"
+    },
+    "r4289240904": {
+      "basis": "Conditional service CI marker/empty socket; runner sanitizes inherited socket/local marker and preserves actual CI. Actual runner environment marker absence1/0/E1 refuses2/1; present1/2 passes0/0. Only private transport remapped, not hosted execution.",
+      "verdict": "FIXED; ELIGIBLE FOR CLOSURE"
+    }
+  },
+  "verification": {
+    "archive_bytes": 1509634,
+    "archive_sha256": "5e7c05f42806b4360040c3837c52cacdd277fc6c87109c0a56e32d9274db14a0",
+    "bundles": 6,
+    "canary_bodies_assertion_inventories_unchanged": true,
+    "current_tested_inputs_equal_reviewed_head": 2467,
+    "discovered_cases_files": [
+      9195,
+      677
+    ],
+    "discovery_generated_files_verified_and_owned_paths_removed": 18,
+    "earlier271_and8_member_archives_unchanged": true,
+    "frozen_paths_equal_pr130": 56,
+    "index_sha256": "6ee15cef38a7e6932cffc45ff9e1d73f0179759bfe5dbdba83256e149d41528e",
+    "manifest_to_git_bindings": 14802,
+    "members": 112,
+    "native_selected_cases_files": [
+      2432,
+      233
+    ],
+    "original_php_invocations": 6,
+    "physical_loader_bindings": 78,
+    "post_tested_delta_only_docs_and_two_workflow_comments": true,
+    "private_failed_outputs": 4,
+    "review_imports_byte_original": 6,
+    "runtime_original_members_byte_equal": 82,
+    "source_bindings": 30,
+    "unique_git_blobs": 2422,
+    "unique_manifest_heads": 3
+  },
+  "verifier_preparation_note": "One earlier read-only verifier treated frozen-path dictionary as a pair-list, raising ValueError before creating reports; corrected dictionary schema used here. No application check or shared file changed."
+}

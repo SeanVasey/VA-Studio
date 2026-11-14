@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "gh",
+    "pr",
+    "checks",
+    "122",
+    "--repo",
+    "SeanVasey/VA-Studio",
+    "--required"
+  ],
+  "observed_at": "2026-10-15T08:06:14.445197+00:00",
+  "process_exit": 1,
+  "stdout": "",
+  "stderr": "no required checks reported on the 'harness/paid252-tax-v2-20261015' branch\n"
+}

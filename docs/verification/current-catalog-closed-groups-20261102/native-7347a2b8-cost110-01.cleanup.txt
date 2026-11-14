@@ -1,0 +1,6 @@
+clients	0
+transactions	0
+data_locks	0
+data_waits	0
+other_metadata	0
+pending_metadata	0

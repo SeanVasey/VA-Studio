@@ -1,0 +1,231 @@
+<?xml version="1.0"?>
+<testSuite xmlns="https://xml.phpunit.de/testSuite">
+ <tests>
+  <testClass name="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/LicenseTemplateAuthoringConcurrencyTest.php">
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_template_edit_and_review_submission_serialize_on_the_exact_template_row_in_both_orders#edit first" name="test_template_edit_and_review_submission_serialize_on_the_exact_template_row_in_both_orders"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_template_edit_and_review_submission_serialize_on_the_exact_template_row_in_both_orders#submission first" name="test_template_edit_and_review_submission_serialize_on_the_exact_template_row_in_both_orders"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_competing_reviewed_template_edits_reject_the_stale_loser_after_an_exact_template_row_wait#first editor wins" name="test_competing_reviewed_template_edits_reject_the_stale_loser_after_an_exact_template_row_wait"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_competing_reviewed_template_edits_reject_the_stale_loser_after_an_exact_template_row_wait#second editor wins" name="test_competing_reviewed_template_edits_reject_the_stale_loser_after_an_exact_template_row_wait"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_template_creation_and_reviewed_edit_serialize_role_withdrawal_on_the_exact_user_row#create / writer first" name="test_template_creation_and_reviewed_edit_serialize_role_withdrawal_on_the_exact_user_row"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_template_creation_and_reviewed_edit_serialize_role_withdrawal_on_the_exact_user_row#create / withdrawal first" name="test_template_creation_and_reviewed_edit_serialize_role_withdrawal_on_the_exact_user_row"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_template_creation_and_reviewed_edit_serialize_role_withdrawal_on_the_exact_user_row#edit / writer first" name="test_template_creation_and_reviewed_edit_serialize_role_withdrawal_on_the_exact_user_row"/>
+   <testMethod id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_template_creation_and_reviewed_edit_serialize_role_withdrawal_on_the_exact_user_row#edit / withdrawal first" name="test_template_creation_and_reviewed_edit_serialize_role_withdrawal_on_the_exact_user_row"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionCheckoutCommittedRowsTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionCheckoutCommittedRowsTest.php">
+   <testMethod id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_explicit_reader_reads_original_committed_rows_without_opening_a_transaction" name="test_explicit_reader_reads_original_committed_rows_without_opening_a_transaction"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_capturing_readonly_mode_inside_physical_transaction_is_refused" name="test_capturing_readonly_mode_inside_physical_transaction_is_refused"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_original_readonly_reader_refuses_later_physical_transaction" name="test_original_readonly_reader_refuses_later_physical_transaction"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_explicit_reader_refuses_wrong_driver_claim_for_actual_core_pdo" name="test_explicit_reader_refuses_wrong_driver_claim_for_actual_core_pdo"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_application_pdo_subclass_is_refused_before_its_write_capable_metadata_override" name="test_application_pdo_subclass_is_refused_before_its_write_capable_metadata_override"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_factory_refuses_statement_constructor_that_writes_original_committed_row" name="test_factory_refuses_statement_constructor_that_writes_original_committed_row"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_original_plain_reader_refuses_later_statement_constructor_before_prepare" name="test_original_plain_reader_refuses_later_statement_constructor_before_prepare"/>
+   <testMethod id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_native_plain_reader_does_not_wait_for_foreign_row_lock_while_default_reader_still_locks" name="test_native_plain_reader_does_not_wait_for_foreign_row_lock_while_default_reader_still_locks"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionFeatures/ProductionFeatureNativeAdmissionTest.php">
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest::test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl#exact" name="test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest::test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl#native uppercase alias" name="test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl"/>
+   <testMethod id="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest::test_temporary_table_using_an_owned_guard_name_refuses_before_ddl" name="test_temporary_table_using_an_owned_guard_name_refuses_before_ddl"/>
+  </testClass>
+  <testClass name="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ProductionMembershipBilling/MembershipReservationOwnershipTest.php">
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest::test_direct_context_construction_cannot_mutate_even_with_real_source_capabilities" name="test_direct_context_construction_cannot_mutate_even_with_real_source_capabilities"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest::test_committing_configuration_change_rolls_back_redemption_and_event" name="test_committing_configuration_change_rolls_back_redemption_and_event"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest::test_after_commit_configuration_change_refuses_response_but_preserves_durable_effects" name="test_after_commit_configuration_change_refuses_response_but_preserves_durable_effects"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest::test_committing_at_honor_deadline_cannot_commit_new_reservation" name="test_committing_at_honor_deadline_cannot_commit_new_reservation"/>
+   <testMethod id="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest::test_reservation_proof_is_issuer_owned_and_cannot_be_serialized_or_adopted_by_a_new_frame" name="test_reservation_proof_is_issuer_owned_and_cannot_be_serialized_or_adopted_by_a_new_frame"/>
+  </testClass>
+  <testClass name="Tests\Feature\ReviewedOfferDraftTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ReviewedOfferDraftTest.php">
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_two_full_forms_preserve_the_winning_price_and_require_explicit_reopen" name="test_two_full_forms_preserve_the_winning_price_and_require_explicit_reopen"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_review_and_semantic_no_op_are_write_free_and_changed_audit_contains_only_identity" name="test_review_and_semantic_no_op_are_write_free_and_changed_audit_contains_only_identity"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_original_draft_bounds_currency_and_exists_only_policy_are_preserved#zero remains a valid draft" name="test_original_draft_bounds_currency_and_exists_only_policy_are_preserved"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_original_draft_bounds_currency_and_exists_only_policy_are_preserved#maximum minor units" name="test_original_draft_bounds_currency_and_exists_only_policy_are_preserved"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#float" name="test_invalid_full_form_fields_fail_without_any_domain_effect"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#decimal string" name="test_invalid_full_form_fields_fail_without_any_domain_effect"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#negative" name="test_invalid_full_form_fields_fail_without_any_domain_effect"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#overflow" name="test_invalid_full_form_fields_fail_without_any_domain_effect"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#lower currency" name="test_invalid_full_form_fields_fail_without_any_domain_effect"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#long currency" name="test_invalid_full_form_fields_fail_without_any_domain_effect"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#missing license" name="test_invalid_full_form_fields_fail_without_any_domain_effect"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#unknown license" name="test_invalid_full_form_fields_fail_without_any_domain_effect"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#missing price" name="test_invalid_full_form_fields_fail_without_any_domain_effect"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#missing currency" name="test_invalid_full_form_fields_fail_without_any_domain_effect"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#missing assets" name="test_invalid_full_form_fields_fail_without_any_domain_effect"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#unknown asset" name="test_invalid_full_form_fields_fail_without_any_domain_effect"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#duplicate assets" name="test_invalid_full_form_fields_fail_without_any_domain_effect"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#too many assets" name="test_invalid_full_form_fields_fail_without_any_domain_effect"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_fixed_track_and_publication_or_identity_fields_cannot_be_injected" name="test_fixed_track_and_publication_or_identity_fields_cannot_be_injected"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#unknown key" name="test_invalid_or_changed_review_shape_cannot_authorize_a_save"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#schema" name="test_invalid_or_changed_review_shape_cannot_authorize_a_save"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#intent" name="test_invalid_or_changed_review_shape_cannot_authorize_a_save"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#string offer id" name="test_invalid_or_changed_review_shape_cannot_authorize_a_save"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#negative cursor" name="test_invalid_or_changed_review_shape_cannot_authorize_a_save"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#float cursor" name="test_invalid_or_changed_review_shape_cannot_authorize_a_save"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#malformed hash" name="test_invalid_or_changed_review_shape_cannot_authorize_a_save"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#changed display" name="test_invalid_or_changed_review_shape_cannot_authorize_a_save"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#changed track context" name="test_invalid_or_changed_review_shape_cannot_authorize_a_save"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#missing track" name="test_invalid_or_changed_review_shape_cannot_authorize_a_save"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_participating_writes_invalidate_the_original_review_even_after_same_second_restore#legacy changed" name="test_participating_writes_invalidate_the_original_review_even_after_same_second_restore"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_participating_writes_invalidate_the_original_review_even_after_same_second_restore#legacy no-op still audited" name="test_participating_writes_invalidate_the_original_review_even_after_same_second_restore"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_participating_writes_invalidate_the_original_review_even_after_same_second_restore#same-second ABA" name="test_participating_writes_invalidate_the_original_review_even_after_same_second_restore"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_participating_writes_invalidate_the_original_review_even_after_same_second_restore#track metadata" name="test_participating_writes_invalidate_the_original_review_even_after_same_second_restore"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_publication_and_deactivation_drift_require_reopening_without_rewriting_revisions" name="test_publication_and_deactivation_drift_require_reopening_without_rewriting_revisions"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_both_entry_points_require_current_persisted_actor_authority#role" name="test_both_entry_points_require_current_persisted_actor_authority"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_both_entry_points_require_current_persisted_actor_authority#verified email" name="test_both_entry_points_require_current_persisted_actor_authority"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_both_entry_points_require_current_persisted_actor_authority#required MFA" name="test_both_entry_points_require_current_persisted_actor_authority"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_both_entry_points_require_current_persisted_actor_authority#deleted" name="test_both_entry_points_require_current_persisted_actor_authority"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_both_entry_points_require_current_persisted_actor_authority#unsaved" name="test_both_entry_points_require_current_persisted_actor_authority"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_both_entry_points_require_current_persisted_actor_authority#locally elevated customer" name="test_both_entry_points_require_current_persisted_actor_authority"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_a_review_cannot_be_used_by_a_different_valid_actor" name="test_a_review_cannot_be_used_by_a_different_valid_actor"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects#saved / role" name="test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects#saved / email" name="test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects#saved / mfa" name="test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects#audit / role" name="test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects#audit / email" name="test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects#audit / mfa" name="test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit#persisted offer" name="test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit#persisted track" name="test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit#track audit identity" name="test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit#newer offer audit" name="test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit#changed own audit context" name="test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit#changed own audit action" name="test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_exact_returned_audit_identity_allows_unrelated_auto_increment_gaps" name="test_exact_returned_audit_identity_allows_unrelated_auto_increment_gaps"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_draft_edits_preserve_the_active_revision_and_real_purchased_original_graph" name="test_draft_edits_preserve_the_active_revision_and_real_purchased_original_graph"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_strict_entry_points_own_their_transaction_while_legacy_partial_edits_and_audit_context_remain_unchanged" name="test_strict_entry_points_own_their_transaction_while_legacy_partial_edits_and_audit_context_remain_unchanged"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_failed_audit_rolls_back_the_strict_save" name="test_failed_audit_rolls_back_the_strict_save"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_asset_list_order_is_retained_while_numeric_string_ids_are_semantic_no_ops" name="test_asset_list_order_is_retained_while_numeric_string_ids_are_semantic_no_ops"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_no_op_rechecks_current_rows_and_authority_after_validation_reads#row" name="test_no_op_rechecks_current_rows_and_authority_after_validation_reads"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_no_op_rechecks_current_rows_and_authority_after_validation_reads#track" name="test_no_op_rechecks_current_rows_and_authority_after_validation_reads"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_no_op_rechecks_current_rows_and_authority_after_validation_reads#authority" name="test_no_op_rechecks_current_rows_and_authority_after_validation_reads"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_saving_observers_cannot_substitute_input_or_change_public_activity#draft field" name="test_saving_observers_cannot_substitute_input_or_change_public_activity"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_saving_observers_cannot_substitute_input_or_change_public_activity#activity" name="test_saving_observers_cannot_substitute_input_or_change_public_activity"/>
+   <testMethod id="Tests\Feature\ReviewedOfferDraftTest::test_resource_fences_precede_the_first_snapshot_and_validation_reads" name="test_resource_fences_precede_the_first_snapshot_and_validation_reads"/>
+  </testClass>
+  <testClass name="Tests\Feature\ScopedLicenseMigrationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/ScopedLicenseMigrationTest.php">
+   <testMethod id="Tests\Feature\ScopedLicenseMigrationTest::test_scope_guard_upgrade_retains_existing_v1_and_v2_records_evidence_and_preview_bytes" name="test_scope_guard_upgrade_retains_existing_v1_and_v2_records_evidence_and_preview_bytes"/>
+  </testClass>
+  <testClass name="Tests\Feature\SiteImageConcurrencyTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/SiteImageConcurrencyTest.php">
+   <testMethod id="Tests\Feature\SiteImageConcurrencyTest::test_competing_processors_claim_a_waiting_image_once_in_either_lock_order" name="test_competing_processors_claim_a_waiting_image_once_in_either_lock_order"/>
+   <testMethod id="Tests\Feature\SiteImageConcurrencyTest::test_competing_processors_take_over_an_expired_claim_once" name="test_competing_processors_take_over_an_expired_claim_once"/>
+   <testMethod id="Tests\Feature\SiteImageConcurrencyTest::test_a_scheduled_image_release_and_a_manual_publication_serialize_and_only_the_winner_is_served#scheduler takes the lock first" name="test_a_scheduled_image_release_and_a_manual_publication_serialize_and_only_the_winner_is_served"/>
+   <testMethod id="Tests\Feature\SiteImageConcurrencyTest::test_a_scheduled_image_release_and_a_manual_publication_serialize_and_only_the_winner_is_served#staff take the lock first" name="test_a_scheduled_image_release_and_a_manual_publication_serialize_and_only_the_winner_is_served"/>
+   <testMethod id="Tests\Feature\SiteImageConcurrencyTest::test_a_release_created_while_its_image_completes_pins_the_whole_manifest_or_is_refused" name="test_a_release_created_while_its_image_completes_pins_the_whole_manifest_or_is_refused"/>
+   <testMethod id="Tests\Feature\SiteImageConcurrencyTest::test_a_release_pinning_a_ready_image_and_one_completing_does_not_deadlock" name="test_a_release_pinning_a_ready_image_and_one_completing_does_not_deadlock"/>
+  </testClass>
+  <testClass name="Tests\Feature\SiteImageMigrationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/SiteImageMigrationTest.php">
+   <testMethod id="Tests\Feature\SiteImageMigrationTest::test_empty_tables_roll_back_and_the_migration_runs_again_with_its_guards" name="test_empty_tables_roll_back_and_the_migration_runs_again_with_its_guards"/>
+  </testClass>
+  <testClass name="Tests\Feature\SupportAttachmentSchemaTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/SupportAttachmentSchemaTest.php">
+   <testMethod id="Tests\Feature\SupportAttachmentSchemaTest::test_complete_unlogged_schema_retry_is_exact_and_prefix_safe" name="test_complete_unlogged_schema_retry_is_exact_and_prefix_safe"/>
+   <testMethod id="Tests\Feature\SupportAttachmentSchemaTest::test_empty_atomic_table_and_each_owned_guard_prefix_can_resume" name="test_empty_atomic_table_and_each_owned_guard_prefix_can_resume"/>
+   <testMethod id="Tests\Feature\SupportAttachmentSchemaTest::test_schema_drift_and_unknown_guards_refuse_before_mutation" name="test_schema_drift_and_unknown_guards_refuse_before_mutation"/>
+   <testMethod id="Tests\Feature\SupportAttachmentSchemaTest::test_retained_missing_guard_refuses_and_down_never_discards_originals" name="test_retained_missing_guard_refuses_and_down_never_discards_originals"/>
+  </testClass>
+  <testClass name="Tests\Feature\TypedLicenseMigrationTest" file="/workspace/VA-Studio-billing-retrieval/tests/Feature/TypedLicenseMigrationTest.php">
+   <testMethod id="Tests\Feature\TypedLicenseMigrationTest::test_guard_upgrade_preserves_existing_review_evidence_and_never_infers_typed_rights" name="test_guard_upgrade_preserves_existing_review_evidence_and_never_infers_typed_rights"/>
+  </testClass>
+ </tests>
+ <groups>
+  <group name="default">
+   <test id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_template_edit_and_review_submission_serialize_on_the_exact_template_row_in_both_orders#edit first"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_template_edit_and_review_submission_serialize_on_the_exact_template_row_in_both_orders#submission first"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_competing_reviewed_template_edits_reject_the_stale_loser_after_an_exact_template_row_wait#first editor wins"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_competing_reviewed_template_edits_reject_the_stale_loser_after_an_exact_template_row_wait#second editor wins"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_template_creation_and_reviewed_edit_serialize_role_withdrawal_on_the_exact_user_row#create / writer first"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_template_creation_and_reviewed_edit_serialize_role_withdrawal_on_the_exact_user_row#create / withdrawal first"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_template_creation_and_reviewed_edit_serialize_role_withdrawal_on_the_exact_user_row#edit / writer first"/>
+   <test id="Tests\Feature\LicenseTemplateAuthoringConcurrencyTest::test_template_creation_and_reviewed_edit_serialize_role_withdrawal_on_the_exact_user_row#edit / withdrawal first"/>
+   <test id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_explicit_reader_reads_original_committed_rows_without_opening_a_transaction"/>
+   <test id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_capturing_readonly_mode_inside_physical_transaction_is_refused"/>
+   <test id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_original_readonly_reader_refuses_later_physical_transaction"/>
+   <test id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_explicit_reader_refuses_wrong_driver_claim_for_actual_core_pdo"/>
+   <test id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_application_pdo_subclass_is_refused_before_its_write_capable_metadata_override"/>
+   <test id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_factory_refuses_statement_constructor_that_writes_original_committed_row"/>
+   <test id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_original_plain_reader_refuses_later_statement_constructor_before_prepare"/>
+   <test id="Tests\Feature\ProductionCheckoutCommittedRowsTest::test_native_plain_reader_does_not_wait_for_foreign_row_lock_while_default_reader_still_locks"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest::test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl#exact"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest::test_schemawide_foreign_constraint_and_dictionary_alias_refuse_before_ddl#native uppercase alias"/>
+   <test id="Tests\Feature\ProductionFeatures\ProductionFeatureNativeAdmissionTest::test_temporary_table_using_an_owned_guard_name_refuses_before_ddl"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest::test_direct_context_construction_cannot_mutate_even_with_real_source_capabilities"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest::test_committing_configuration_change_rolls_back_redemption_and_event"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest::test_after_commit_configuration_change_refuses_response_but_preserves_durable_effects"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest::test_committing_at_honor_deadline_cannot_commit_new_reservation"/>
+   <test id="Tests\Feature\ProductionMembershipBilling\MembershipReservationOwnershipTest::test_reservation_proof_is_issuer_owned_and_cannot_be_serialized_or_adopted_by_a_new_frame"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_two_full_forms_preserve_the_winning_price_and_require_explicit_reopen"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_review_and_semantic_no_op_are_write_free_and_changed_audit_contains_only_identity"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_original_draft_bounds_currency_and_exists_only_policy_are_preserved#zero remains a valid draft"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_original_draft_bounds_currency_and_exists_only_policy_are_preserved#maximum minor units"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#float"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#decimal string"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#negative"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#overflow"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#lower currency"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#long currency"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#missing license"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#unknown license"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#missing price"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#missing currency"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#missing assets"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#unknown asset"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#duplicate assets"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_full_form_fields_fail_without_any_domain_effect#too many assets"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_fixed_track_and_publication_or_identity_fields_cannot_be_injected"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#unknown key"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#schema"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#intent"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#string offer id"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#negative cursor"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#float cursor"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#malformed hash"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#changed display"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#changed track context"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_invalid_or_changed_review_shape_cannot_authorize_a_save#missing track"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_participating_writes_invalidate_the_original_review_even_after_same_second_restore#legacy changed"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_participating_writes_invalidate_the_original_review_even_after_same_second_restore#legacy no-op still audited"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_participating_writes_invalidate_the_original_review_even_after_same_second_restore#same-second ABA"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_participating_writes_invalidate_the_original_review_even_after_same_second_restore#track metadata"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_publication_and_deactivation_drift_require_reopening_without_rewriting_revisions"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_both_entry_points_require_current_persisted_actor_authority#role"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_both_entry_points_require_current_persisted_actor_authority#verified email"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_both_entry_points_require_current_persisted_actor_authority#required MFA"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_both_entry_points_require_current_persisted_actor_authority#deleted"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_both_entry_points_require_current_persisted_actor_authority#unsaved"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_both_entry_points_require_current_persisted_actor_authority#locally elevated customer"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_a_review_cannot_be_used_by_a_different_valid_actor"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects#saved / role"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects#saved / email"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects#saved / mfa"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects#audit / role"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects#audit / email"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_authority_withdrawal_during_save_or_audit_rolls_back_all_effects#audit / mfa"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit#persisted offer"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit#persisted track"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit#track audit identity"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit#newer offer audit"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit#changed own audit context"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_final_persisted_row_track_and_exact_own_audit_are_verified_before_commit#changed own audit action"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_exact_returned_audit_identity_allows_unrelated_auto_increment_gaps"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_draft_edits_preserve_the_active_revision_and_real_purchased_original_graph"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_strict_entry_points_own_their_transaction_while_legacy_partial_edits_and_audit_context_remain_unchanged"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_failed_audit_rolls_back_the_strict_save"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_asset_list_order_is_retained_while_numeric_string_ids_are_semantic_no_ops"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_no_op_rechecks_current_rows_and_authority_after_validation_reads#row"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_no_op_rechecks_current_rows_and_authority_after_validation_reads#track"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_no_op_rechecks_current_rows_and_authority_after_validation_reads#authority"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_saving_observers_cannot_substitute_input_or_change_public_activity#draft field"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_saving_observers_cannot_substitute_input_or_change_public_activity#activity"/>
+   <test id="Tests\Feature\ReviewedOfferDraftTest::test_resource_fences_precede_the_first_snapshot_and_validation_reads"/>
+   <test id="Tests\Feature\ScopedLicenseMigrationTest::test_scope_guard_upgrade_retains_existing_v1_and_v2_records_evidence_and_preview_bytes"/>
+   <test id="Tests\Feature\SiteImageConcurrencyTest::test_competing_processors_claim_a_waiting_image_once_in_either_lock_order"/>
+   <test id="Tests\Feature\SiteImageConcurrencyTest::test_competing_processors_take_over_an_expired_claim_once"/>
+   <test id="Tests\Feature\SiteImageConcurrencyTest::test_a_scheduled_image_release_and_a_manual_publication_serialize_and_only_the_winner_is_served#scheduler takes the lock first"/>
+   <test id="Tests\Feature\SiteImageConcurrencyTest::test_a_scheduled_image_release_and_a_manual_publication_serialize_and_only_the_winner_is_served#staff take the lock first"/>
+   <test id="Tests\Feature\SiteImageConcurrencyTest::test_a_release_created_while_its_image_completes_pins_the_whole_manifest_or_is_refused"/>
+   <test id="Tests\Feature\SiteImageConcurrencyTest::test_a_release_pinning_a_ready_image_and_one_completing_does_not_deadlock"/>
+   <test id="Tests\Feature\SiteImageMigrationTest::test_empty_tables_roll_back_and_the_migration_runs_again_with_its_guards"/>
+   <test id="Tests\Feature\SupportAttachmentSchemaTest::test_complete_unlogged_schema_retry_is_exact_and_prefix_safe"/>
+   <test id="Tests\Feature\SupportAttachmentSchemaTest::test_empty_atomic_table_and_each_owned_guard_prefix_can_resume"/>
+   <test id="Tests\Feature\SupportAttachmentSchemaTest::test_schema_drift_and_unknown_guards_refuse_before_mutation"/>
+   <test id="Tests\Feature\SupportAttachmentSchemaTest::test_retained_missing_guard_refuses_and_down_never_discards_originals"/>
+   <test id="Tests\Feature\TypedLicenseMigrationTest::test_guard_upgrade_preserves_existing_review_evidence_and_never_infers_typed_rights"/>
+  </group>
+ </groups>
+</testSuite>

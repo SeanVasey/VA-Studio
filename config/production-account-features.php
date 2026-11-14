@@ -5,6 +5,7 @@
 // consumer versions are named; any other feature (including service_projects) stays refused.
 return [
     'enabled' => false,
+    'http_mounted' => false,
     'provenance' => null,
     'versions' => [
         'listening_library' => 'production-listening-library-identity-v1',

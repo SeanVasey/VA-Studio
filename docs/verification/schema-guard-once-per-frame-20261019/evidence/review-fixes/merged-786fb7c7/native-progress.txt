@@ -1,0 +1,7 @@
+lifecycle started 2026-10-24T15:19:03Z head=7b21cc76 dirty=0 load=0.56 1.21 2.07 server=8.4.11/3417/2/0/536870912/ps=0/REPEATABLE-READ
+lifecycle finished 2026-10-24T15:23:44Z exit=0 seconds=281 tests=1 assertions=21 failures=0 errors=0 skipped=0 txns: 19.2s statements=28075 end=COMMIT;22.9s statements=36676 end=COMMIT;20.9s statements=32941 end=COMMIT;17.6s statements=25990 end=COMMIT;
+frame started 2026-10-24T15:23:44Z head=7b21cc76 dirty=0 load=3.96 2.59 2.40 server=8.4.11/3417/2/0/536870912/ps=0/REPEATABLE-READ
+frame finished 2026-10-24T15:52:06Z exit=0 seconds=1702 tests=8 assertions=66 failures=0 errors=0 skipped=0
+observers started 2026-10-24T15:52:06Z head=7b21cc76 dirty=0 load=2.30 2.16 2.39 server=8.4.11/3417/2/0/536870912/ps=0/REPEATABLE-READ
+observers finished 2026-10-24T16:14:25Z exit=0 seconds=1339 tests=4 assertions=92 failures=0 errors=0 skipped=0
+all done 2026-10-24T16:14:25Z

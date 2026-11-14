@@ -3,7 +3,6 @@
 namespace App\Domain\Memberships\Billing;
 
 use App\Jobs\RetrieveMembershipInvoice;
-use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use PDO;
 use PDOException;
@@ -25,6 +24,13 @@ final class BillingWebhookIntake
 
     private const INVOICE_TYPES = ['invoice.created', 'invoice.finalized', 'invoice.paid', 'invoice.payment_succeeded', 'invoice.payment_failed',
         'invoice.payment_action_required', 'invoice.updated', 'invoice.voided', 'invoice.marked_uncollectible', 'invoice_payment.paid'];
+
+    /**
+     * Subscription lifecycle events (BL-69). They name no invoice, are retained as `no_invoice_hint` for operator reconciliation and
+     * never settle, observe, award or schedule a retrieval: a period is settled only by `invoice.paid` re-read from Stripe. Because
+     * nothing is derived from their content, updated/deleted may arrive in any order, twice, or after the invoice, with the same effect.
+     */
+    private const SUBSCRIPTION_TYPES = ['customer.subscription.updated', 'customer.subscription.deleted'];
 
     /** These name no invoice in this API version; they are retained as hints for operator reconciliation. */
     private const CHARGE_TYPES = ['charge.refunded', 'charge.dispute.created', 'charge.dispute.closed', 'charge.dispute.funds_withdrawn'];
@@ -58,6 +64,11 @@ final class BillingWebhookIntake
             $invoiceRef = $type === 'invoice_payment.paid' ? BillingValues::ref($object['invoice'] ?? null) : BillingValues::ref($object['id'] ?? null);
             $subscriptionRef = BillingValues::ref($object['parent']['subscription_details']['subscription'] ?? null);
             $disposition = BillingValues::is('invoice', $invoiceRef) ? 'retrieval_hint' : 'no_invoice_hint';
+        } elseif (in_array($type, self::SUBSCRIPTION_TYPES, true)) {
+            // The embedded object must be a subscription in the event's own mode; a mismatch is a scope error, not a hint.
+            BillingException::require(($object['object'] ?? null) === 'subscription' && ($object['livemode'] ?? null) === ($mode === 'live'), 'event_scope');
+            $subscriptionRef = BillingValues::ref($object['id'] ?? null);
+            $disposition = 'no_invoice_hint';
         } else {
             $disposition = in_array($type, self::CHARGE_TYPES, true) ? 'no_invoice_hint' : 'ignored_type';
         }
@@ -66,23 +77,25 @@ final class BillingWebhookIntake
         $row = ['id' => BillingValues::id(), 'provider_event_ref_hash' => $eventHash, 'type' => $type, 'mode' => $mode,
             'provider_account_hash' => BillingValues::hash('provider-account', $account, $mode, $account),
             'invoice_ref_hash' => $invoiceRef === null ? null : BillingValues::hash('invoice', $account, $mode, $invoiceRef),
-            'received_at' => BillingValues::utc(CarbonImmutable::now('UTC')->timestamp), 'payload_hash' => hash('sha256', $payload),
-            'disposition' => $disposition,
-            'payload_ciphertext' => BillingValues::encrypt(['schema_version' => 1, 'purpose' => 'production_membership_billing_event_hint',
-                'event_ref' => $event['id'], 'type' => $type, 'api_version' => is_string($event['api_version'] ?? null) ? $event['api_version'] : null,
-                'created' => is_int($event['created'] ?? null) ? $event['created'] : null, 'invoice_ref' => $invoiceRef,
-                'subscription_ref' => BillingValues::is('subscription', $subscriptionRef) ? $subscriptionRef : null])];
-        $row['created_at'] = $row['received_at'];
+            'payload_hash' => hash('sha256', $payload),
+            'disposition' => $disposition];
+        $hintPayload = ['purpose' => 'production_membership_billing_event_hint',
+            'event_ref' => $event['id'], 'type' => $type, 'api_version' => is_string($event['api_version'] ?? null) ? $event['api_version'] : null,
+            'created' => is_int($event['created'] ?? null) ? $event['created'] : null, 'invoice_ref' => $invoiceRef,
+            'subscription_ref' => BillingValues::is('subscription', $subscriptionRef) ? $subscriptionRef : null];
         $existing = $this->event($eventHash);
         if ($existing !== null) {
             return ['event' => $existing, 'duplicate' => true, 'scheduled' => $this->recoverLostDispatch($existing, $configuration, $policy)];
         }
         try {
-            $row = DB::transaction(function () use ($row): array {
+            $row = DB::transaction(function () use ($row, $hintPayload): array {
                 // The hint's database-issued position, allocated after the hint arrived and in the same transaction as its row, so a
-                // retrieval covers the hint only if its own position (committed before its provider reads) is larger. `received_at`
-                // is the intake host's clock and is information only (Codex P1 on PR #54, review L2-3).
-                $row['hint_position'] = (new BillingLedger)->position('hint');
+                // retrieval covers the hint only if its own position (committed before its provider reads) is larger. Receipt
+                // time comes from that allocation's native database clock; coverage still uses the position, never that time.
+                $position = (new BillingLedger)->hintPosition();
+                $row['hint_position'] = $position['id'];
+                $row['received_at'] = $row['created_at'] = $position['created_at'];
+                $row['payload_ciphertext'] = BillingEvidenceRecord::encrypt($row, $hintPayload);
                 $row['seal'] = BillingValues::seal($row);
                 $statement = DB::connection()->getPdo()->prepare('INSERT INTO '.(new BillingSchema)->table(BillingSchema::TABLES[3])
                     .' ('.implode(', ', array_keys($row)).') VALUES ('.implode(', ', array_fill(0, count($row), '?')).')');
@@ -103,7 +116,7 @@ final class BillingWebhookIntake
             $binding = (new BillingHintRecovery)->bindingForHint($type, $invoiceRef, $subscriptionRef, $account, $mode);
             if ($binding !== null) {
                 $scheduled = ['binding_id' => $binding, 'invoice_ref' => $invoiceRef];
-                RetrieveMembershipInvoice::dispatch($binding, $invoiceRef);
+                RetrieveMembershipInvoice::dispatch($binding, $invoiceRef, $row['id']);
             }
         }
 
@@ -126,7 +139,7 @@ final class BillingWebhookIntake
             return null;
         }
         $policy->proveConfiguration($configuration);
-        RetrieveMembershipInvoice::dispatch($pending['binding_id'], $pending['invoice_ref']);
+        RetrieveMembershipInvoice::dispatch($pending['binding_id'], $pending['invoice_ref'], $event['id']);
 
         return $pending;
     }

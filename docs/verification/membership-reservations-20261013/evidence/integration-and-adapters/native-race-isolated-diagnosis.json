@@ -1,0 +1,32 @@
+{
+  "kind": "Read-only differences of retained monotonic timestamps",
+  "source": "defe95802e7d09e7df12c61a98c1ebf1caee99c0",
+  "nanoseconds": {
+    "first_operation": 45284010462,
+    "second_operation": 63448939786,
+    "first_entry_to_fence_wait": 2733151389,
+    "second_entry_to_buyer_wait": 1351778201,
+    "first_entry_to_second_wait": 4088310363,
+    "first_return_to_second_return": 20901461486
+  },
+  "seconds": {
+    "first_operation": 45.284010462,
+    "second_operation": 63.448939786,
+    "first_entry_to_fence_wait": 2.733151389,
+    "second_entry_to_buyer_wait": 1.351778201,
+    "first_entry_to_second_wait": 4.088310363,
+    "first_return_to_second_return": 20.901461486
+  },
+  "first_outcome": "reserved",
+  "second_outcome": "operation_deadline",
+  "original_admission_budget_seconds": 60,
+  "both_transactions_closed": true,
+  "both_processes_completed": true,
+  "conclusion": "Repeating without a competing full suite did not admit both requests. Full-suite competition is not a sufficient explanation. The initial dual-success test still fails; do not report acceptance.",
+  "overlap": "Standalone SQL shadow probe in separate disposable schema at approximately05:05:26UTC; exact elapsed duration was not measured. No full fixture/feature suite ran concurrently.",
+  "unknowns": [
+    "Exact commit and lock-release timestamps, wait/work split and causal contribution of the short probe are not recorded.",
+    "The failed case did not reach its final parent full-ledger audit.",
+    "The remaining three selected methods did not execute."
+  ]
+}

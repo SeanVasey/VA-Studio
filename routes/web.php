@@ -10,13 +10,19 @@ use App\Http\Controllers\StorefrontController;
 use App\Http\Controllers\TestCheckoutController;
 use App\Http\Controllers\TestExceptionResolutionController;
 use App\Http\Controllers\TestOwnerDeliveryController;
+use App\Http\Membership\MembershipHttpMount;
 use App\Http\Middleware\CustomerCommerceAccess;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\ProductionCheckout\ProductionCheckoutMount;
+use App\Http\ProductionFree\ProductionFreeHttpMount;
+use App\Http\Tax\TaxHttpMount;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__.'/production-customer-identity.php';
+require __DIR__.'/production-account-features.php';
 require __DIR__.'/support-attachments.php';
 require __DIR__.'/support-attachment-pages.php';
+require __DIR__.'/legal-pages.php';
 
 Route::get('/', [StorefrontController::class, 'index'])->middleware('throttle:120,1')->name('home');
 Route::get('/{section}/{slug?}', EditorialController::class)
@@ -53,9 +59,13 @@ Route::withoutMiddleware(HandleInertiaRequests::class)->middleware(CustomerComme
     Route::post('/orders/{order}/checkout', [TestCheckoutController::class, 'start'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.checkout');
     Route::get('/orders/{order}/checkout', [TestCheckoutController::class, 'status'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.checkout-status');
     Route::post('/orders/{order}/checkout/reconcile', [TestCheckoutController::class, 'reconcile'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.checkout-reconcile');
+    // The buyer's cancellation of a never-sent test order (default-off; BuyerCancelPolicy). Same budget as the checkout start.
+    Route::post('/orders/{order}/cancel', [TestCheckoutController::class, 'cancel'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.cancel');
     Route::get('/orders/{order}/delivery', [TestOwnerDeliveryController::class, 'show'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.delivery');
     Route::post('/orders/{order}/delivery/authorizations', [TestOwnerDeliveryController::class, 'issue'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.delivery-authorizations');
     Route::post('/orders/{order}/delivery/download', [TestOwnerDeliveryController::class, 'download'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.delivery-download');
+    // test-owner-delivery-v2 (FP-077): the token POST above answers 303 here. Opaque ID only; the session binding is the access.
+    Route::get('/orders/{order}/delivery/downloads/{authorization}', [TestOwnerDeliveryController::class, 'transfer'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.delivery-transfer');
 });
 Route::get('/orders/{order}/checkout/return', [TestCheckoutController::class, 'returned'])->middleware([CustomerCommerceAccess::class, 'throttle:60,1,quotes-read'])->block(120, 10)->name('orders.checkout-return');
 Route::post('/checkout', fn () => response()->json([
@@ -70,3 +80,29 @@ require __DIR__.'/inquiry-conversations.php';
 require __DIR__.'/public-discovery.php';
 
 require __DIR__.'/free-grants.php';
+
+if (config('paid-grants.http_mounted') === true) {
+    require __DIR__.'/paid-grants.php';
+}
+
+if (TaxHttpMount::admitted('paid-tax-grants.http_mounted')) {
+    require __DIR__.'/paid-tax-grants.php';
+}
+if (TaxHttpMount::admitted('production-tax-checkout.http_mounted')) {
+    require __DIR__.'/production-tax-checkout.php';
+}
+// Family 256 (production free grants): registered only for the literal `production-free-grants.http_mounted` true in
+// local/testing. The shipped value is false; ProductionFreePrivacy repeats the check on every request.
+if (ProductionFreeHttpMount::admitted()) {
+    require __DIR__.'/production-free-grants.php';
+}
+// Member HTTP (C4e): registered only for the literal `production-memberships.http_mounted` true in local/testing. The
+// shipped value is false; MembershipPrivacy repeats the check on every request.
+if (MembershipHttpMount::admitted()) {
+    require __DIR__.'/production-memberships.php';
+}
+// Production checkout (lane PCC): registered only for the literal `production_checkout.mounted` true in local, testing or
+// production. The shipped value is false; ProductionCheckoutPrivacy repeats the check on every request.
+if (ProductionCheckoutMount::admitted()) {
+    require __DIR__.'/production-checkout.php';
+}

@@ -1,0 +1,26 @@
+{
+  "prior_head": "78ef16be7626c81de49d103d581551b707201eda",
+  "current_head": "32f083d28db0609a52cade793849a8767a855ae3",
+  "prior_source_count": 2254,
+  "current_source_count": 2360,
+  "inventory_difference_note": "Followup inventory includes all tracked resources rather than only the prior resource subset; shared paths are compared exactly.",
+  "prior_source_changes": [
+    ".github/workflows/final-verification.yml",
+    ".gitlab-ci.yml",
+    "app/Domain/Grants/Member/MemberOriginalInspection.php",
+    "app/Domain/Memberships/Production/MembershipReservationContext.php",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalCompositionTest.php",
+    "tests/Feature/ProductionMemberOriginals/MemberOriginalIssuerOwnershipTest.php"
+  ],
+  "prior_pint_selected": 78,
+  "prior_pint_unchanged_files": 74,
+  "current_pint_selected_files": 4,
+  "historical_comment_only_paths": [
+    ".github/workflows/final-verification.yml",
+    ".gitlab-ci.yml"
+  ],
+  "comment_stripped_workflow_bytes_unchanged": true,
+  "ci_script_and_policy_files_unchanged": 31,
+  "prior159_selftests_rerun": false,
+  "prior159_scope": "Historical result retained; no new selftest execution or broadened behavioral claim."
+}

@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.27
+Configuration: /workspace/VA-Studio-mig/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:00.005, Memory: 24.50 MB
+
+There was 1 failure:
+
+1) Tests\Unit\Migration\HistoryNormalizerTest::test_v2_preserves_actual_v1_records_and_records_every_missing_original_declaration
+Failed asserting that actual size 4 matches expected size 5.
+
+/workspace/VA-Studio-mig/tests/Unit/Migration/HistoryNormalizerTest.php:195
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 7, Failures: 1.

@@ -1,0 +1,50 @@
+Inherited-environment scrub in ops/staging/forge-deploy.sh against every env() key in config/*.php, source 34562862.
+Distinct env() keys in config/*.php: 196. Not matched by any unset pattern before K1: 43. After K1: 0.
+
+Keys outside every pattern before K1 (key, config file):
+  AUTH_GUARD                                     config/auth.php
+  AUTH_MODEL                                     config/auth.php
+  AUTH_PASSWORD_BROKER                           config/auth.php
+  AUTH_PASSWORD_RESET_TOKEN_TABLE                config/auth.php
+  AUTH_PASSWORD_TIMEOUT                          config/auth.php
+  BEANSTALKD_QUEUE                               config/queue.php
+  BEANSTALKD_QUEUE_HOST                          config/queue.php
+  BEANSTALKD_QUEUE_RETRY_AFTER                   config/queue.php
+  DISCOVERY_SITEMAP_ENABLED                      config/discovery-sitemap.php
+  DYNAMODB_CACHE_TABLE                           config/cache.php
+  DYNAMODB_ENDPOINT                              config/cache.php
+  LOG_CHANNEL                                    config/logging.php
+  LOG_DAILY_DAYS                                 config/logging.php
+  LOG_DEPRECATIONS_CHANNEL                       config/logging.php
+  LOG_DEPRECATIONS_TRACE                         config/logging.php
+  LOG_LEVEL                                      config/logging.php
+  LOG_PAPERTRAIL_HANDLER                         config/logging.php
+  LOG_SLACK_EMOJI                                config/logging.php
+  LOG_SLACK_USERNAME                             config/logging.php
+  LOG_SLACK_WEBHOOK_URL                          config/logging.php
+  LOG_STACK                                      config/logging.php
+  LOG_STDERR_FORMATTER                           config/logging.php
+  LOG_SYSLOG_FACILITY                            config/logging.php
+  MEMCACHED_HOST                                 config/cache.php
+  MEMCACHED_PASSWORD                             config/cache.php
+  MEMCACHED_PERSISTENT_ID                        config/cache.php
+  MEMCACHED_PORT                                 config/cache.php
+  MEMCACHED_USERNAME                             config/cache.php
+  MYSQL_ATTR_SSL_CA                              config/database.php
+  PAPERTRAIL_PORT                                config/logging.php
+  PAPERTRAIL_URL                                 config/logging.php
+  POSTMARK_API_KEY                               config/services.php
+  POSTMARK_MESSAGE_STREAM_ID                     config/mail.php
+  RESEND_API_KEY                                 config/services.php
+  SLACK_BOT_USER_DEFAULT_CHANNEL                 config/services.php
+  SLACK_BOT_USER_OAUTH_TOKEN                     config/services.php
+  SQS_PREFIX                                     config/queue.php
+  SQS_QUEUE                                      config/queue.php
+  SQS_SUFFIX                                     config/queue.php
+  VASEY_LISTENING_V2_PROMOTION_ENABLED           config/customer-listening.php
+  VASEY_LISTENING_V2_ROLLOUT_REVIEW_REFERENCE    config/customer-listening.php
+  VASEY_PHP_CLI_BINARY                           config/app.php
+  VASEY_SUPPORT_ATTACHMENTS_FIXTURE_ENABLED      config/support-attachments.php
+
+Patterns before K1: APP_* DB_* STRIPE_* PRODUCTION_* VASEY_TEST_* VASEY_OPERATIVE_* SESSION_* CACHE_* QUEUE_* MAIL_* FILESYSTEM_DISK MEDIA_* CONTACT_* REDIS_* AWS_* BROADCAST_*
+Patterns after K1:  APP_* DB_* STRIPE_* PRODUCTION_* VASEY_TEST_* VASEY_OPERATIVE_* SESSION_* CACHE_* QUEUE_* MAIL_* FILESYSTEM_DISK MEDIA_* CONTACT_* REDIS_* AWS_* BROADCAST_* LOG_* AUTH_* DISCOVERY_* MYSQL_ATTR_* MEMCACHED_* SQS_* DYNAMODB_* BEANSTALKD_* PAPERTRAIL_* SLACK_* POSTMARK_* RESEND_* VASEY_PHP_CLI_BINARY VASEY_SUPPORT_* VASEY_LISTENING_*

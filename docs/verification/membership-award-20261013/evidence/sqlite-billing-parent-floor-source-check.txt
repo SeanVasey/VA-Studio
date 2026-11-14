@@ -1,0 +1,4 @@
+app/Domain/Memberships/Production/MembershipSchema.php: OK
+app/Domain/Memberships/Production/MembershipSchemaCatalog.php: OK
+app/Domain/Memberships/Billing/BillingSchema.php: OK
+/workspace/runtime/membership-award-evidence/BillingParentFloorCompatibilityTest.php: OK

@@ -1,0 +1,2766 @@
+{
+  "head": "982f4ea69ed8d2191345cd8c752377da19780a89",
+  "limitations": [
+    "Native counter positive is the original snapshot post-commit receipt window, not an unrelated insert while its original locking transaction remains open.",
+    "Native engine transition not executed; engine distinctions are pure corpus only.",
+    "Other eligibility revision, rights and callback variants executed on SQLite only in this batch.",
+    "No host, provider, production, HTTP activation or runtime grant readiness claim."
+  ],
+  "native_red_and_green_all_captured_sources_equal": true,
+  "native_red_overlay": {
+    "class": "App\\Domain\\Memberships\\Production\\MembershipCatalogEvidence",
+    "exact_source_commit": "0d2f06c716c6eb21d1ccbb9af6c8e0d7b1924371",
+    "file": "/workspace/runtime/membership-catalog-currentness-evidence/native-red-planned-source/app/Domain/Memberships/Production/MembershipCatalogEvidence.php",
+    "scope": "Single historical class preloaded, all other source uses candidate. New helper unused by this old class.",
+    "sha256": "79cc5e7a443f4af4dd7b002b316090d9d889b14c5ecfdb73e25e3b682ae411a9"
+  },
+  "owned": {
+    "app/Domain/Memberships/Production/MembershipCatalogDefinition.php": "e72bc203013e553d89d32dbdd92a89e02445e5b4ac35f5e2d06daab9800898f6",
+    "app/Domain/Memberships/Production/MembershipCatalogEvidence.php": "6b33144f493d1d6304382168b24dfa81adc75c8fc5f0579b5e08afb31a401afd",
+    "tests/Feature/ProductionMembershipBilling/MembershipNativeCatalogCurrentnessTest.php": "d02bd82587987818ddd96e5c44df6a723be10e194b56b6bf613aa841d1e916bd",
+    "tests/Unit/MembershipCatalogDefinitionTest.php": "08db30501e6cac342154750a723b3be1abdee3066e0d102da1892b35674fe937"
+  },
+  "runs": {
+    "native-fixed-five": {
+      "assertions": 46,
+      "cases": [
+        {
+          "assertions": 18,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses",
+          "skips": 0
+        },
+        {
+          "assertions": 11,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_real_table_comment_change_is_not_erased_by_counter_projection_in_committed_read_only_frame",
+          "skips": 0
+        },
+        {
+          "assertions": 7,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_identical_row_local_temporary_shadow_remains_refused_after_a_positive_original_proof",
+          "skips": 0
+        },
+        {
+          "assertions": 5,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_private_bytes_are_rechecked_without_minting_a_new_readiness_deadline",
+          "skips": 0
+        },
+        {
+          "assertions": 5,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_catalog_snapshot_is_verified_nonlocking_inside_committed_read_only_frame",
+          "skips": 0
+        }
+      ],
+      "current_source_hashes_verified": 1961,
+      "errors": 0,
+      "exit": 0,
+      "failures": 0,
+      "skips": 0,
+      "tests": 5
+    },
+    "native-old-source-red": {
+      "assertions": 4,
+      "cases": [
+        {
+          "assertions": 4,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest",
+          "errors": 1,
+          "failures": 0,
+          "name": "test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses",
+          "skips": 0
+        }
+      ],
+      "errors": 1,
+      "exit": 2,
+      "failures": 0,
+      "skips": 0,
+      "tests": 1
+    },
+    "native-old-source-red-v2": {
+      "assertions": 12,
+      "cases": [
+        {
+          "assertions": 12,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipNativeCatalogCurrentnessTest",
+          "errors": 1,
+          "failures": 0,
+          "name": "test_unrelated_auto_allocated_insert_preserves_original_proof_but_selected_row_change_refuses",
+          "skips": 0
+        }
+      ],
+      "errors": 1,
+      "exit": 2,
+      "failures": 0,
+      "skips": 0,
+      "tests": 1
+    },
+    "pure-engine-boundary-green": {
+      "assertions": 71,
+      "cases": [
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #0",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #1",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #2",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #3",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #4",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"single quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"double quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"doubled quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 0,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 1,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"backslash quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"literal backslash\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"quoted identifier\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"nested expression\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"block comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"version comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"optimizer comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"hash comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash expression\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"partition options\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column allocation attribute\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column type\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column nullable\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"literal counter text\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"literal engine text\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"default\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"table comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"collation\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"index\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"check\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"foreign action\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"format\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"compression\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"tablespace\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"literal whitespace\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"structural whitespace\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"temporary\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"foreign name\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"invalid expected identifier\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"view\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine in comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine suffix\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate engine\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter after options\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"signed counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"negative counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"decimal counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"exponent counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter tail\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"missing counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed suffix quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unbalanced suffix\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"extra close\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"another statement\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"nul\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"different complete quote-mode boundaries\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"quote boundary cannot hide nontransactional engine\"",
+          "skips": 0
+        }
+      ],
+      "errors": 1,
+      "exit": 2,
+      "failures": 0,
+      "skips": 0,
+      "tests": 62
+    },
+    "pure-engine-boundary-red": {
+      "assertions": 72,
+      "cases": [
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #0",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #1",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #2",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #3",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #4",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"single quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"double quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"doubled quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"backslash quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"literal backslash\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"quoted identifier\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"nested expression\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"block comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"version comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"optimizer comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"hash comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash expression\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"partition options\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column allocation attribute\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column type\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column nullable\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"literal counter text\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"literal engine text\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"default\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"table comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"collation\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"index\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"check\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"foreign action\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"format\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"compression\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"tablespace\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"literal whitespace\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"structural whitespace\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"temporary\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"foreign name\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"invalid expected identifier\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"view\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine in comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine suffix\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate engine\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter after options\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"signed counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"negative counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"decimal counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"exponent counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter tail\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"missing counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed suffix quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unbalanced suffix\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"extra close\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"another statement\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"nul\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"different complete quote-mode boundaries\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 1,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"quote boundary cannot hide nontransactional engine\"",
+          "skips": 0
+        }
+      ],
+      "errors": 0,
+      "exit": 1,
+      "failures": 1,
+      "skips": 0,
+      "tests": 62
+    },
+    "pure-final": {
+      "assertions": 73,
+      "cases": [
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #0",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #1",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #2",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #3",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #4",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"single quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"double quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"doubled quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"backslash quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"literal backslash\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"quoted identifier\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"nested expression\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"block comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"version comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"optimizer comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"hash comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash expression\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"partition options\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column allocation attribute\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column type\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column nullable\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"literal counter text\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"literal engine text\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"default\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"table comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"collation\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"index\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"check\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"foreign action\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"format\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"compression\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"tablespace\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"literal whitespace\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"structural whitespace\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"temporary\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"foreign name\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"invalid expected identifier\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"view\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine in comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine suffix\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate engine\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter after options\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"signed counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"negative counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"decimal counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"exponent counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter tail\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"missing counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed suffix quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unbalanced suffix\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"extra close\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"another statement\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"nul\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"different complete quote-mode boundaries\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"quote boundary cannot hide nontransactional engine\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"escaped literal with competing outer close\"",
+          "skips": 0
+        }
+      ],
+      "current_source_hashes_verified": 5,
+      "errors": 0,
+      "exit": 0,
+      "failures": 0,
+      "skips": 0,
+      "tests": 63
+    },
+    "pure-initial": {
+      "assertions": 70,
+      "cases": [
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #0",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #1",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #2",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #3",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #4",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"single quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"double quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"doubled quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"backslash quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"literal backslash\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"quoted identifier\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"nested expression\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"block comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"version comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"optimizer comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"hash comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash expression\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"partition options\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column allocation attribute\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column type\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column nullable\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"literal counter text\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"literal engine text\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"default\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"table comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"collation\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"index\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"check\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"foreign action\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"format\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"compression\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"tablespace\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"literal whitespace\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"structural whitespace\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"temporary\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"foreign name\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"invalid expected identifier\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"view\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine in comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine suffix\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate engine\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter after options\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"signed counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"negative counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"decimal counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"exponent counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter tail\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"missing counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed suffix quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unbalanced suffix\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"extra close\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"another statement\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"nul\"",
+          "skips": 0
+        }
+      ],
+      "errors": 0,
+      "exit": 0,
+      "failures": 0,
+      "skips": 0,
+      "tests": 60
+    },
+    "pure-quote-boundary": {
+      "assertions": 71,
+      "cases": [
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #0",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #1",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #2",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #3",
+          "skips": 0
+        },
+        {
+          "assertions": 3,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_only_the_native_table_counter_changes_the_equivalence_class with data set #4",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"single quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"double quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"doubled quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"backslash quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"literal backslash\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"quoted identifier\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"nested expression\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"block comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"version comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"optimizer comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"hash comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"dash expression\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_quoted_text_comments_and_nested_expressions_remain_byte_exact with data set \"partition options\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column allocation attribute\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column type\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column nullable\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"literal counter text\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"literal engine text\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"default\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"column comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"table comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"collation\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"index\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"check\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"foreign action\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"format\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"compression\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"tablespace\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"literal whitespace\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_every_non_counter_byte_remains_significant with data set \"structural whitespace\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"temporary\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"foreign name\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"invalid expected identifier\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"view\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine in comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"engine suffix\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate engine\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"duplicate counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter after options\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"signed counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"negative counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"decimal counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"exponent counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"counter tail\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"missing counter\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed suffix quote\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed comment\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unclosed body\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"unbalanced suffix\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"extra close\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"another statement\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"nul\"",
+          "skips": 0
+        },
+        {
+          "assertions": 1,
+          "class": "Tests\\Unit\\MembershipCatalogDefinitionTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_malformed_ambiguous_or_foreign_definition_is_refused with data set \"different complete quote-mode boundaries\"",
+          "skips": 0
+        }
+      ],
+      "errors": 0,
+      "exit": 0,
+      "failures": 0,
+      "skips": 0,
+      "tests": 61
+    },
+    "sqlite-eligibility-whole": {
+      "assertions": 123,
+      "cases": [
+        {
+          "assertions": 12,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_real_current_catalog_derives_exact_identity_manifest_and_member_license_terms",
+          "skips": 0
+        },
+        {
+          "assertions": 13,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_locator_and_expected_revision_have_one_unambiguous_bounded_encoding",
+          "skips": 0
+        },
+        {
+          "assertions": 13,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_tokens_require_original_issuer_owner_rows_and_frame_and_cannot_be_copied",
+          "skips": 0
+        },
+        {
+          "assertions": 6,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_a_new_published_revision_does_not_admit_an_old_selection_locator",
+          "skips": 0
+        },
+        {
+          "assertions": 6,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_unpublished_track_and_new_unverified_rights_refuse_catalog_authority",
+          "skips": 0
+        },
+        {
+          "assertions": 5,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_private_bytes_are_rechecked_without_minting_a_new_readiness_deadline",
+          "skips": 0
+        },
+        {
+          "assertions": 6,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_storage_callback_cannot_authenticate_a_later_graph_instead_of_the_selected_graph",
+          "skips": 0
+        },
+        {
+          "assertions": 5,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_temporary_catalog_shadow_is_refused_even_when_its_rows_are_identical",
+          "skips": 0
+        },
+        {
+          "assertions": 6,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_terminal_raw_evidence_uses_no_file_callback_and_refuses_changed_complete_footprint",
+          "skips": 0
+        },
+        {
+          "assertions": 5,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_catalog_snapshot_is_verified_nonlocking_inside_committed_read_only_frame",
+          "skips": 0
+        },
+        {
+          "assertions": 6,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_original_readiness_boundary_and_configuration_change_refuse_existing_proof",
+          "skips": 0
+        },
+        {
+          "assertions": 11,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_original_license_effective_until_caps_wall_and_monotonic_readiness",
+          "skips": 0
+        },
+        {
+          "assertions": 7,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_clock_callback_after_file_proof_cannot_change_private_bytes_before_authority_returns",
+          "skips": 0
+        },
+        {
+          "assertions": 7,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_committed_snapshot_checks_native_bytes_after_later_clock_callback",
+          "skips": 0
+        },
+        {
+          "assertions": 7,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_final_clock_callback_cannot_withdraw_the_current_buyer_after_identity_proof",
+          "skips": 0
+        },
+        {
+          "assertions": 8,
+          "class": "Tests\\Feature\\ProductionMembershipBilling\\MembershipEligibleLicenseProofTest",
+          "errors": 0,
+          "failures": 0,
+          "name": "test_terminal_file_admission_refuses_a_one_shot_non_native_stat_wrapper",
+          "skips": 0
+        }
+      ],
+      "current_source_hashes_verified": 1961,
+      "errors": 0,
+      "exit": 0,
+      "failures": 0,
+      "skips": 0,
+      "tests": 16
+    }
+  }
+}

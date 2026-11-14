@@ -20,15 +20,17 @@ class ProductionFreeGrantSpool
     /**
      * @param  callable(resource):void  $fill  Writes exactly `$bytes` bytes into the writable spool handle.
      */
-    public function prepare(string $directory, int $slots, int $reserveBytes, string $sha256, int $bytes, int $deadline, callable $fill): PreparedDeliveryStream
+    public function prepare(string $directory, int $slots, int $reserveBytes, string $sha256, int $bytes, int $deadline, callable $fill,
+        ?string $holder = null): PreparedDeliveryStream
     {
         $lease = $output = $reader = $path = $owned = $reservation = null;
         try {
             if (DIRECTORY_SEPARATOR !== '/' || $slots < 1 || $reserveBytes < 0 || $bytes < 1 || realpath($directory) !== $directory
-                || preg_match('/\A[a-f0-9]{64}\z/D', $sha256) !== 1) {
+                || preg_match('/\A[a-f0-9]{64}\z/D', $sha256) !== 1
+                || ($holder !== null && (preg_match('/\A[a-f0-9]{64}\z/D', $holder) !== 1 || $holder === str_repeat('0', 64)))) {
                 throw new \UnexpectedValueException;
             }
-            [$lease, $path, $reservation] = $this->admit($directory, $slots, $reserveBytes, $bytes);
+            [$lease, $path, $reservation] = $this->admit($directory, $slots, $reserveBytes, $bytes, $holder);
             $mask = umask(0077);
             try {
                 $output = @fopen($path, 'x+b');
@@ -126,7 +128,7 @@ class ProductionFreeGrantSpool
      *
      * @return array{0:resource,1:string,2:resource} the slot lease, its snapshot path and its reservation handle
      */
-    private function admit(string $directory, int $slots, int $reserveBytes, int $bytes): array
+    private function admit(string $directory, int $slots, int $reserveBytes, int $bytes, ?string $holder): array
     {
         $gate = $this->lease($directory.'/admission.lock');
         try {
@@ -136,9 +138,20 @@ class ProductionFreeGrantSpool
             [$lease, $snapshot, $number] = $this->slot($directory, $slots);
             $reservation = null;
             try {
+                if ($holder !== null) {
+                    $this->accountAvailable($directory, $number, $holder);
+                }
                 $space = $this->freeBytes($directory);
                 $pending = $this->pending($directory, $number);
                 ProductionFreeGrantException::require(is_numeric($space) && is_finite((float) $space) && $space - $pending >= $bytes + $reserveBytes, 'spool_space');
+                $mark = $this->reservation($directory.'/slot-'.$number.'.holder', 64);
+                try {
+                    if (fseek($mark, 0) !== 0 || fwrite($mark, $holder ?? str_repeat('0', 64)) !== 64 || ! fflush($mark)) {
+                        throw new \UnexpectedValueException;
+                    }
+                } finally {
+                    fclose($mark);
+                }
                 $reservation = $this->reservation($directory.'/slot-'.$number.'.reserve');
                 $this->reserve($reservation, $bytes);
             } catch (Throwable $error) {
@@ -186,11 +199,18 @@ class ProductionFreeGrantSpool
                     continue;
                 }
             }
-            $sidecar = $directory.'/slot-'.$slot.'.reserve';
-            clearstatcache(true, $sidecar);
-            $reserve = @lstat($sidecar);
-            if ($reserve !== false && (($reserve['mode'] & 0170000) !== 0100000 || $reserve['nlink'] !== 1 || $reserve['uid'] !== $owner
-                || ($reserve['size'] !== 20 && ! @unlink($sidecar)))) {
+            $usable = true;
+            foreach (['reserve' => 20, 'holder' => 64] as $suffix => $length) {
+                $sidecar = $directory.'/slot-'.$slot.'.'.$suffix;
+                clearstatcache(true, $sidecar);
+                $reserve = @lstat($sidecar);
+                if ($reserve !== false && (($reserve['mode'] & 0170000) !== 0100000 || $reserve['nlink'] !== 1 || $reserve['uid'] !== $owner
+                    || ($reserve['size'] !== $length && ! @unlink($sidecar)))) {
+                    $usable = false;
+                    break;
+                }
+            }
+            if (! $usable) {
                 fclose($candidate);
 
                 continue;
@@ -200,6 +220,51 @@ class ProductionFreeGrantSpool
         }
 
         throw new ProductionFreeGrantException('spool_busy');
+    }
+
+    /** Global admission and own slot are held. Unknown held marks never establish an available account. */
+    private function accountAvailable(string $directory, int $own, string $holder): void
+    {
+        $locks = glob($directory.'/slot-*.lock');
+        ProductionFreeGrantException::require(is_array($locks), 'spool_busy');
+        foreach ($locks as $lock) {
+            if (preg_match('~/slot-(0|[1-9][0-9]*)\.lock\z~D', $lock, $match) !== 1 || $match[1] === (string) $own) {
+                continue;
+            }
+            $probe = $this->lease($lock);
+            try {
+                if (@flock($probe, LOCK_EX | LOCK_NB)) {
+                    @flock($probe, LOCK_UN);
+
+                    continue;
+                }
+            } finally {
+                fclose($probe);
+            }
+            $path = $directory.'/slot-'.$match[1].'.holder';
+            try {
+                clearstatcache(true, $path);
+                $before = @lstat($path);
+                $this->sameFile($path, $before, 0600, 64);
+                $input = @fopen($path, 'rb');
+                if (! is_resource($input)) {
+                    throw new \UnexpectedValueException;
+                }
+                try {
+                    $this->sameFile($path, fstat($input), 0600, 64);
+                    if ($this->identity($before) !== $this->identity(fstat($input))) {
+                        throw new \UnexpectedValueException;
+                    }
+                    $known = fread($input, 65);
+                    ProductionFreeGrantException::require(is_string($known) && preg_match('/\A[a-f0-9]{64}\z/D', $known) === 1
+                        && $known !== str_repeat('0', 64) && ! hash_equals($holder, $known), 'spool_busy');
+                } finally {
+                    fclose($input);
+                }
+            } catch (Throwable) {
+                throw new ProductionFreeGrantException('spool_busy');
+            }
+        }
     }
 
     /** Bytes still to be written by every other slot that is held right now. */
@@ -256,11 +321,11 @@ class ProductionFreeGrantSpool
      * by an older crash is reclaimed under the same rule as a residual snapshot (regular, single-link, owned by this
      * process user) and recreated. Anything else keeps the slot unusable.
      */
-    private function reservation(string $path)
+    private function reservation(string $path, int $length = 20)
     {
         clearstatcache(true, $path);
         $residual = @lstat($path);
-        if ($residual !== false && $residual['size'] !== 20) {
+        if ($residual !== false && $residual['size'] !== $length) {
             $owner = function_exists('posix_geteuid') ? posix_geteuid() : getmyuid();
             if (($residual['mode'] & 0170000) !== 0100000 || $residual['nlink'] !== 1 || $residual['uid'] !== $owner || ! @unlink($path)) {
                 throw new \UnexpectedValueException;
@@ -278,7 +343,7 @@ class ProductionFreeGrantSpool
             if (! is_resource($created)) {
                 throw new \UnexpectedValueException;
             }
-            $written = @fwrite($created, str_repeat('0', 20)) === 20 && @fflush($created);
+            $written = @fwrite($created, str_repeat('0', $length)) === $length && @fflush($created);
             fclose($created);
             if (! $written || ! @rename($temporary, $path)) {
                 @unlink($temporary);
@@ -290,7 +355,7 @@ class ProductionFreeGrantSpool
             throw new \UnexpectedValueException;
         }
         try {
-            $this->sameFile($path, fstat($handle), 0600, 20);
+            $this->sameFile($path, fstat($handle), 0600, $length);
 
             return $handle;
         } catch (Throwable $error) {

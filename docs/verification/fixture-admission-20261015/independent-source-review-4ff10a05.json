@@ -1,0 +1,261 @@
+{
+  "assessment": [
+    "External testing driver/database/local/CI declaration is captured before parent setup; actual PDO driver/schema is checked independently of mutable product boot mode.",
+    "The cached connection is compared to fresh configuration; nonempty URLs and driver/database/endpoint mismatch refuse before admission. Supported aliases remain valid by underlying identity.",
+    "Pre-parent trait admission checks default and declared transaction/truncation targets; listed artisan commands have an additional effective-target check.",
+    "Finalization checks again after its pre-refresh hook; setup options are computed once and fixed to the admitted connection, with supported cleanup options and identity captured for teardown.",
+    "Cleanup revalidates current configuration and PDO against the captured selection and connection identity; changed default or recipe does not redirect it. Bookkeeping resets in finally on cleanup refusal.",
+    "Local standalone server runner exports the exact schema-valued marker; existing narrower DisposableNativeDatabase admission remains unchanged.",
+    "Five native-only method skip declarations cover eight native cases, including the four application-mode datasets; they add no unrelated exclusions.",
+    "Child spies establish real PHPUnit pre-trait refusal with retained SQLite sentinel bytes; finalization probe verifies recipe/config/PDO drift and bookkeeping. Actual native cases verify USE of another owned schema, driver mismatch, aliases and mode/CI admission."
+  ],
+  "baseline_sha": "b132f53df88896f01250cafbed8e4d2ab3cd9774",
+  "compatibility_note": "The actual existing MFA/lifecycle whole-file scope completed 12/181 at 4ff and was independently read. Native mode datasets modify the application environment binding after bootstrap; they are not additional provider route-boot or host claims.",
+  "conditions": [
+    "Finish/reconcile remaining original preparation warnings/failures and owned native server lifecycle; do not infer full native lifecycle/migration or host acceptance.",
+    "Seal all original outcomes, including intermediate nonzero runs, and obtain independent final source/evidence review and exact documentation-head carry.",
+    "Require cheap preflight, complete current review/check/protection inventory and expected-head development merge.",
+    "Do not claim complete F2, counterpart census, all SQL interception or product/host/session/provider/release acceptance."
+  ],
+  "contract_sha256": "79e53b9934d5851dfe9fe2820c2c8458613b023e2a4233d4525a7026e2baef9c",
+  "decision": "APPROVE_BOUNDED_SOURCE_WITH_FINAL_EVIDENCE_CONDITIONS",
+  "engineering_quality_verdict": "Pass for bounded implementation and controls",
+  "evidence_verdict": "Focused originals inspected; final packet, preparation/lifecycle and publication gates remain pending",
+  "limits": [
+    "Guard boundaries are pre-trait/declared target, finalization and listed artisan-command admission; raw DDL, arbitrary test-authored SQL and a custom standard DatabaseTruncation hook redirecting after the initial boundary are outside this proof.",
+    "No full native lifecycle or native counterpart census; existing SQLite lifecycle/MFA compatibility does not establish MySQL concurrency.",
+    "A local marker is an explicit disposable-schema declaration, not private-host isolation proof."
+  ],
+  "open_p0": 0,
+  "open_p1": 0,
+  "original_receipts": [
+    {
+      "argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/tmp/fixture-admission-evidence-20261015/invalid-selection-old-corrected-fixture-original/junit.xml\", \"tests/Feature/FixtureDatabaseAdmissionTest.php\"]"
+      ],
+      "counts": {
+        "assertions": 8,
+        "errors": 0,
+        "failures": 8,
+        "skipped": 0,
+        "tests": 8
+      },
+      "hashes": {
+        "command.json": "d2464bab10357dfcf427be5f7b0f6b9fd81816ae740a11eafa08de0011504a12",
+        "junit.xml": "48e41997e02e7b0730df85c4546c0218524772c764798f99d19bc3d882f2eeef",
+        "log.txt": "d375957ab9c3aac23964fe15c0f7d6fa05ffd200af3411f2c3e5df57c61774bc",
+        "process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "result.json": "1e2640e7162264e3d8724e65a7f8e002fc8e9fd4657844af87de3223c9a29e7a"
+      },
+      "input_count": 2463,
+      "loader_stable": true,
+      "name": "invalid-selection-old-corrected-fixture-original",
+      "php_exit": 1,
+      "reached_paths_identical_at_reviewed_sha": [],
+      "recorder_exit": 1,
+      "runner_stable": true,
+      "selected_files": [
+        "tests/Feature/FixtureDatabaseAdmissionTest.php"
+      ],
+      "source_stable": true,
+      "tested_sha": "0d307a57484caeda68a4f19f67a5f2389135826a"
+    },
+    {
+      "argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/tmp/fixture-admission-evidence-20261015/finalization-admission-identity-fixed-original/junit.xml\", \"tests/Feature/FixtureDatabaseAdmissionTest.php\"]"
+      ],
+      "counts": {
+        "assertions": 135,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 14
+      },
+      "hashes": {
+        "command.json": "f3383051ad678c14aa6ebe27bcba350f860ba84921cda2e63ab339e7d9ef62e2",
+        "junit.xml": "81756a4410deb1a4a0fc63a8a47020f1285cd17e7ebc84b9dec33503ed4bb14e",
+        "log.txt": "96326f30b62efb1477be339d530cc392dd49fc63cbb6cc60c332477fc0fee22e",
+        "process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "result.json": "1d6b50c4c0f9414897f0652bc56cb44a2e37c82d4e2ac0b9b7e9c7c679ec0e52"
+      },
+      "input_count": 2465,
+      "loader_stable": true,
+      "name": "finalization-admission-identity-fixed-original",
+      "php_exit": 0,
+      "reached_paths_identical_at_reviewed_sha": [
+        "tests/TestCase.php",
+        "tests/Support/DisposableTestDatabase.php",
+        "tests/Support/FinalizationDatabaseMigrations.php",
+        "tests/Feature/FixtureDatabaseAdmissionTest.php"
+      ],
+      "recorder_exit": 0,
+      "runner_stable": true,
+      "selected_files": [
+        "tests/Feature/FixtureDatabaseAdmissionTest.php"
+      ],
+      "source_stable": true,
+      "tested_sha": "aeee2f4d5867718a23b30f0d74ad96e7116d26be"
+    },
+    {
+      "argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/tmp/fixture-admission-evidence-20261015/selection-unit-original/junit.xml\", \"tests/Unit/DisposableTestDatabaseTest.php\", \"tests/Unit/DisposableNativeDatabaseTest.php\"]"
+      ],
+      "counts": {
+        "assertions": 49,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 26
+      },
+      "hashes": {
+        "command.json": "fbd3ec44d4a455a4be300e7444281b5171a5bd28cbaf30e14a7a50fc5fa97c17",
+        "junit.xml": "b64ca2a332309084ab7d6b556eaa8e79c1a3aefde0ed7030447d34b9472c1bf2",
+        "log.txt": "cfb2c22dd5de9fc471d9b9432337b25fd81828784cd6fb14844a9934480b4b45",
+        "process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "result.json": "7c77011fbd55f116bec11d8cc5586623adf0dfb5ebba29c01c83d1522a403dfd"
+      },
+      "input_count": 2466,
+      "loader_stable": true,
+      "name": "selection-unit-original",
+      "php_exit": 0,
+      "reached_paths_identical_at_reviewed_sha": [
+        "tests/TestCase.php",
+        "tests/Support/DisposableTestDatabase.php",
+        "tests/Support/FinalizationDatabaseMigrations.php",
+        "tests/Unit/DisposableTestDatabaseTest.php",
+        "tests/Unit/DisposableNativeDatabaseTest.php"
+      ],
+      "recorder_exit": 0,
+      "runner_stable": true,
+      "selected_files": [
+        "tests/Unit/DisposableTestDatabaseTest.php",
+        "tests/Unit/DisposableNativeDatabaseTest.php"
+      ],
+      "source_stable": true,
+      "tested_sha": "4dd6bc19547798aeeaf9e4ca49f2d9341ee5851a"
+    },
+    {
+      "argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/tmp/fixture-admission-evidence-20261015/native-admission-original/junit.xml\", \"tests/Feature/FixtureDatabaseAdmissionNativeTest.php\"]"
+      ],
+      "counts": {
+        "assertions": 15,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 8
+      },
+      "hashes": {
+        "command.json": "c6e4176644347e0ea7146058e61f163fc19acc00c4888027163f70c22b75e9a4",
+        "junit.xml": "8c74997fb9880a4662ce557d0f9dff8a3933a9ed820d0bf20c5c3408bfddfe93",
+        "log.txt": "bc557012de3107390f6dd64e12a5b3f2bacf6b8683645bd75af59ac047a73d1d",
+        "process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "result.json": "d04a3710e7a15c9aaf58c44ff4a1a80ddc7aa2e1071e5839ad91e8d3a7b489cf"
+      },
+      "input_count": 2467,
+      "loader_stable": true,
+      "name": "native-admission-original",
+      "php_exit": 0,
+      "reached_paths_identical_at_reviewed_sha": [
+        "tests/TestCase.php",
+        "tests/Support/DisposableTestDatabase.php",
+        "tests/Support/FinalizationDatabaseMigrations.php",
+        "tests/Feature/FixtureDatabaseAdmissionNativeTest.php"
+      ],
+      "recorder_exit": 0,
+      "runner_stable": true,
+      "selected_files": [
+        "tests/Feature/FixtureDatabaseAdmissionNativeTest.php"
+      ],
+      "source_stable": true,
+      "tested_sha": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158"
+    },
+    {
+      "argv": [
+        "php",
+        "-d",
+        "memory_limit=512M",
+        "-r",
+        "require \"vendor/autoload.php\"; exit((new PHPUnit\\TextUI\\Application)->run(json_decode($argv[1], true, 32, JSON_THROW_ON_ERROR)));",
+        "[\"phpunit\", \"--do-not-cache-result\", \"--colors=never\", \"--log-junit\", \"/tmp/fixture-admission-evidence-20261015/existing-mfa-lifecycle-sqlite-original/junit.xml\", \"tests/Feature/OperatorMfaTest.php\", \"tests/Feature/StagingOperatorMfaTest.php\", \"tests/Feature/FinalizationDatabaseLifecycleTest.php\"]"
+      ],
+      "counts": {
+        "assertions": 181,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 12
+      },
+      "hashes": {
+        "command.json": "4cde3a3290b9eec43f6d38c46a69897fafd098c33a0809e71fcdd0439881868f",
+        "junit.xml": "8b0b354573a91954264733e1ad03d0209ae18c03eff224893e1bedf1bc5463a3",
+        "log.txt": "0a0d6cef06580705947024abffe2db6e8e21d89766140c542b66b2d4c73279d7",
+        "process.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "result.json": "ef7519cfdaedc80469b71b6c7065dd46cb5a0ea8ecf00d924112bc16179c5aeb"
+      },
+      "input_count": 2467,
+      "loader_stable": true,
+      "name": "existing-mfa-lifecycle-sqlite-original",
+      "php_exit": 0,
+      "reached_paths_identical_at_reviewed_sha": [
+        "tests/TestCase.php",
+        "tests/Support/DisposableTestDatabase.php",
+        "tests/Support/FinalizationDatabaseMigrations.php",
+        "tests/Feature/OperatorMfaTest.php",
+        "tests/Feature/StagingOperatorMfaTest.php",
+        "tests/Feature/FinalizationDatabaseLifecycleTest.php"
+      ],
+      "recorder_exit": 0,
+      "runner_stable": true,
+      "selected_files": [
+        "tests/Feature/OperatorMfaTest.php",
+        "tests/Feature/StagingOperatorMfaTest.php",
+        "tests/Feature/FinalizationDatabaseLifecycleTest.php"
+      ],
+      "source_stable": true,
+      "tested_sha": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158"
+    }
+  ],
+  "preparation_errors": [
+    "A runtime filename search under /tmp encountered permissions on unrelated retained datadirs; subsequent reads used the exact owned evidence directory. No application/test result was affected."
+  ],
+  "required_corrections": [],
+  "review_execution": "Read-only immutable source/diff/control and original hash/XML receipt inspection. No application checks, DB/network/CI actions or shared edits; only this exclusive reviewer MD/JSON pair created.",
+  "reviewed_sha": "4ff10a05498079cbcb5b9b65c4c546a0d1d6d158",
+  "reviewed_utc": "2026-10-15T22:44:28.918173+00:00",
+  "scope": "F2a process-selected disposable test database admission, framework trait boundary, finalization captured recipe/recheck, and focused controls",
+  "source_bindings": {
+    "scripts/ci/database-sqlite-skips.json": "ca52be4227899e44ea4dd4da67185c9847c0b50c7ad74b506159ec4b988955cf",
+    "scripts/dev/with-mysql-test-server.sh": "6d5c73efc5d618965c19365837ee6d45fdf6cd54a65b6d94e76908d336efc449",
+    "tests/Feature/FixtureDatabaseAdmissionNativeTest.php": "fc72fbe6fdfe4f3c0ca627a2393deffb260621e06464b6315f465301897a1625",
+    "tests/Feature/FixtureDatabaseAdmissionTest.php": "00b6b52daf9c338345c9ddd1942787418ae1fd24adb97fa17eb7becb223e9d11",
+    "tests/Support/DisposableNativeDatabase.php": "34399fe6bbb82344636f8e81b9b588ad892fa2b6377bde516c68253d048e3e01",
+    "tests/Support/DisposableTestDatabase.php": "51fe8838b5d7d40d0a2e05b1ba0b3bec30e32dc37ebcfe9c9de5f223297f135f",
+    "tests/Support/FinalizationDatabaseAdmissionProbe.php": "64ce905b33141629109b0935360a58caf3f016d9fd128e4acfeabb91e333e7da",
+    "tests/Support/FinalizationDatabaseMigrations.php": "f5c7620cb30cd55ddccf6f5f596f745d87b09d598ff1f5e4023348ccc3f99597",
+    "tests/Support/FixtureDatabaseAdmissionProbe.php": "ac7702f0438a57b84c64adaaa8c908be89b551dd818de33576201d4e36a1a92c",
+    "tests/TestCase.php": "756a363cc1c36f7c39b654226259e6c26d4b79832abf4e227b8dcc820a2980d2",
+    "tests/Unit/DisposableTestDatabaseTest.php": "2bfae5d76dc21d7fdedadbc275065983d8bc3ef5cf8a81371cfd2bc854fc7aa0"
+  },
+  "specification_verdict": "Pass for bounded contract"
+}

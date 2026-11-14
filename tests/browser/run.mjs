@@ -3,7 +3,6 @@ import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { applyPinnedWebkitOfflineBackport } from '../../scripts/ci/apply-playwright-webkit-offline-backport.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 if (!existsSync(join(root, 'vendor/autoload.php')) || !existsSync(join(root, 'public/build/manifest.json'))) {
@@ -12,7 +11,6 @@ if (!existsSync(join(root, 'vendor/autoload.php')) || !existsSync(join(root, 'pu
 if (existsSync(join(root, 'public/hot')) || existsSync(join(root, 'storage/framework/maintenance.php'))) {
   throw new Error('Stop the Vite development server and use a checkout outside maintenance mode.');
 }
-const playwrightBackport = applyPinnedWebkitOfflineBackport(root);
 const directory = mkdtempSync(join(tmpdir(), 'vasey-browser-'));
 const env = {
   ...process.env,
@@ -69,7 +67,6 @@ try {
     console.error('Isolated browser fixture setup failed.');
     process.exitCode = 1;
   } else {
-    console.log(JSON.stringify(playwrightBackport));
     writeFileSync(join(directory, 'inquiry-fixture-marker.json'), JSON.stringify({
       marker: env.VASEY_BROWSER_INQUIRY_MARKER, database: env.DB_DATABASE,
       origin: env.APP_URL, operatorId: 1,

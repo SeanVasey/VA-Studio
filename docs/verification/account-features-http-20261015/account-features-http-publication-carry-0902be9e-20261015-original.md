@@ -1,0 +1,9 @@
+DECISION: APPROVE DOCUMENTATION-ONLY PUBLICATION CARRY
+
+Reviewed exact clean `0902be9ed5c3202444521d697f79ce8641f1fa89`. Its eight changed paths from approved `6fdabe77b839eb821fa418f53057707898f5eb3c` are documentation only. Actual tested `68d22b7e0db7bf60a5f8e46f3878c205f7289129` application/UI/test bytes remain unchanged: all2,455 captured inputs,37 previously reviewed changed source files and13 actual physical loaders match. The sealed14,095,635-byte archive is unchanged at SHA256 `0f2bf4219c5333c4671adbb8a874a969d44868e0cf4c2241055a73e4e534fd60`.
+
+The three final decision/report/mechanical receipt imports match the reviewer's byte-original runtime files. The new `npm run typecheck` original records process0 at clean6fd with identical before/after source; its log hash and versioned appendix bindings match. This now covers the unchanged final UI, while the historical028 typecheck and sealed archive remain original. package.json's normal build includes tsc; the recorded direct external-directory Vite invocation itself is not relabeled a typecheck.
+
+README and both ledgers accurately distinguish completed final independent source/evidence review from pending publication carry/preflight/inventory/expected-SHA merge. No material finding/openP0/P1 or required correction is established. The prior focused-development approval carries to0902 without another application run.
+
+Green cheap exact-head preflight, complete current inventory/protections/no openP0/P1 and expected-SHA merge still govern publication; record actual merge receipt and both ledgers afterward. Any subsequent head needs explicit source-identical carry. Full/native-concurrency/browser/SAPI/FPM/host/provider/commercial/activation/release and frozen adjacent conditions remain unapproved. Only read-only verification and these exclusive runtime artifacts occurred, with no app/DB/network/CI execution, shared edit or preparation error.

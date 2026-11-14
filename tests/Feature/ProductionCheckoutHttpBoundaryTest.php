@@ -21,7 +21,8 @@ class ProductionCheckoutHttpBoundaryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        config(['app.key' => 'base64:'.base64_encode(str_repeat('h', 32))]);
+        // The routes are mounted by hand below, so the composition gate is opened the same way (lane PCC).
+        config(['app.key' => 'base64:'.base64_encode(str_repeat('h', 32)), 'production_checkout.mounted' => true]);
         $this->app->register(ProductionCheckoutServiceProvider::class);
         $this->app[Kernel::class]->prependMiddleware(ProductionCheckoutPrivacy::class);
         Route::middleware('web')->group(base_path('routes/production-checkout.php'));

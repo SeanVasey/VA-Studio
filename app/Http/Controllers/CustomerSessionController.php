@@ -116,7 +116,7 @@ final class CustomerSessionController
         $this->body($request, []);
         // Logout is still usable after feature/access withdrawal. It never logs into or out of the staff guard.
         Auth::guard('customer')->logoutCurrentDevice();
-        $request->session()->forget(['_customer_access', '_quote_owner', '_customer_purchase_claim']);
+        $request->session()->forget(['_customer_access', '_quote_owner', '_customer_purchase_claim', TestOwnerDeliveryController::SESSION_KEY]);
         $request->session()->migrate(true);
         $request->session()->regenerateToken();
         Inertia::clearHistory();

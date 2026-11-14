@@ -13,7 +13,7 @@ final class CustomerCommerceAccess
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->is('quotes', 'quotes/*', 'orders', 'orders/*')) {
+        if (! $request->is('quotes', 'quotes/*', 'orders', 'orders/*', 'sound-kit-orders/*', 'sound-kits/*/orders')) {
             return $next($request);
         }
         try {

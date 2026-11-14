@@ -1,0 +1,67 @@
+{
+ "php-reflection.xml": {
+  "files": 20,
+  "tests": 191,
+  "assertions": 1448,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 13,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "php-filament-00.xml": {
+  "files": 41,
+  "tests": 837,
+  "assertions": 9138,
+  "failures": 0,
+  "errors": 6,
+  "skipped": 124,
+  "skipped_outside_census": [],
+  "problems": [
+   "ERROR Tests\\Feature\\OrderInquiryStaffContextTest::test_actual_retained_context_entry_rechecks_authority_even_after_filament_cached_its_state with data set #0",
+   "ERROR Tests\\Feature\\OrderInquiryStaffContextTest::test_actual_retained_context_entry_rechecks_authority_even_after_filament_cached_its_state with data set #1",
+   "ERROR Tests\\Feature\\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #0",
+   "ERROR Tests\\Feature\\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #1",
+   "ERROR Tests\\Feature\\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #2",
+   "ERROR Tests\\Feature\\OrderInquiryTest::test_staff_context_rechecks_authority_after_reconstruction_and_audit with data set #3"
+  ]
+ },
+ "php-filament-01.xml": {
+  "files": 39,
+  "tests": 753,
+  "assertions": 4902,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 88,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "php-filament-02.xml": {
+  "files": 42,
+  "tests": 720,
+  "assertions": 10342,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 59,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "php-cross.xml": {
+  "files": 42,
+  "tests": 560,
+  "assertions": 3338,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 51,
+  "skipped_outside_census": [],
+  "problems": []
+ },
+ "total": {
+  "files": 184,
+  "tests": 3061,
+  "assertions": 29168,
+  "failures": 0,
+  "errors": 6,
+  "skipped": 335
+ }
+}

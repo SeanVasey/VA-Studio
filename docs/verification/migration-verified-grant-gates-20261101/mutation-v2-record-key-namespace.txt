@@ -1,0 +1,25 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.27
+Configuration: /workspace/VA-Studio-mig/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:00.005, Memory: 24.50 MB
+
+There was 1 failure:
+
+1) Tests\Unit\Migration\HistoryNormalizerTest::test_v2_preserves_actual_v1_records_and_records_every_missing_original_declaration
+customers
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+-'[{"display_name":"SYNTHETIC Buyer One","email":"buyer.one@example.invalid","email_normalized":"buyer.one@example.invalid","marketing_consent":"unknown","record_key":"4b55a4433f48aa8527751baec3256dcc9dcb42f52ee1f8416f267ac00824838e","record_sha256":"5ae85b60bfe583372dbf6a16d479df5ac6885286da394531eead5c83ed68fda1","row":2,"row_sha256":"52a28623a8bc1c2a94bcdf94291a4e54e5c6cf723cd75d8db7d6a67f1963616b","source_customer_id":"synthetic-cust-001"},{"display_name":"SYNTHETIC Buyer Four","email":"Shared.Buyer@example.invalid","email_normalized":"shared.buyer@example.invalid","marketing_consent":"unknown","record_key":"c6099daecbaaaa07f884dd70be903453259f75f44d086c216e6fe0a2e8eaa435","record_sha256":"5a09748c70e4fe8b961e8eb9e9c109c409ffb70464a6b986d4a8a554d70c29ae","row":5,"row_sha256":"deeacfff8fa5a2cca06d940509869a473c815b19eafb2bd866f3dbea49b6d1a8","source_customer_id":"synthetic-cust-004"},{"display_name":"SYNTHETIC Buyer Three","email":"shared.buyer@example.invalid","email_normalized":"shared.buyer@example.invalid","marketing_consent":"unknown","record_key":"de1f7fcaf1dc9818e80e34f8dba1ff3e74e897b7f569077cf728bfb7ff75819a","record_sha256":"eb246f07e6bc4f3aff2a52076077653f41bad3d74da1a795572fbdcf114ec450","row":4,"row_sha256":"a49c76f74f431f378100558f2706b3f5c1871363a328df1375eb79620805711b","source_customer_id":"synthetic-cust-003"},{"display_name":"SYNTHETIC Buyer Two","email":"buyer.two@example.invalid","email_normalized":"buyer.two@example.invalid","marketing_consent":"unknown","record_key":"ec9f75b1276deef2b0c7a1091f9d8fe579861eb7d5eabd6a1140c24a1a3adf70","record_sha256":"d1322dea57005c393f5d5f4ccac63896dbe82a39cdbbbcf0c37561ad2652b1fc","row":3,"row_sha256":"dbd7394e4815288fba071e70a12ec083c094f1ebdfb743d836848a49a696ae14","source_customer_id":"synthetic-cust-002"}]'
++'[{"display_name":"SYNTHETIC Buyer Two","email":"buyer.two@example.invalid","email_normalized":"buyer.two@example.invalid","marketing_consent":"unknown","record_key":"4cb152f12a8f917ca9111e29cc8955a8d880b8b0ad143070fa0c53e5969eb069","record_sha256":"fe516e0b03772c8b7d1126ece80318a6d35ba81d1fac8d519c4f9656d6f9fbc0","row":3,"row_sha256":"dbd7394e4815288fba071e70a12ec083c094f1ebdfb743d836848a49a696ae14","source_customer_id":"synthetic-cust-002"},{"display_name":"SYNTHETIC Buyer Four","email":"Shared.Buyer@example.invalid","email_normalized":"shared.buyer@example.invalid","marketing_consent":"unknown","record_key":"684c0c47f6fa1ee7703e2d5526636dd407585721e55f43a8d9973c6a9566040b","record_sha256":"1934bd252123687f3bb84fa59821d684f30dbb60192c4a56994f431f097c1853","row":5,"row_sha256":"deeacfff8fa5a2cca06d940509869a473c815b19eafb2bd866f3dbea49b6d1a8","source_customer_id":"synthetic-cust-004"},{"display_name":"SYNTHETIC Buyer Three","email":"shared.buyer@example.invalid","email_normalized":"shared.buyer@example.invalid","marketing_consent":"unknown","record_key":"9a916a12c56f2cde2bf7215051d9058d1b708a06b3a72d6f82d9afc229ac369e","record_sha256":"96cfc9406c451aecc9e90420cd07188afd28ba4a477ac6c8137859f28f2c6b66","row":4,"row_sha256":"a49c76f74f431f378100558f2706b3f5c1871363a328df1375eb79620805711b","source_customer_id":"synthetic-cust-003"},{"display_name":"SYNTHETIC Buyer One","email":"buyer.one@example.invalid","email_normalized":"buyer.one@example.invalid","marketing_consent":"unknown","record_key":"dd9ac9cfb142651eae4b07a7c67acb7e02b628d9aa8f8704d33ac21bb12a9287","record_sha256":"da2a5c3472fd3edbe0f2cd363086b48e7ac41014914afdc7db8467057f678fd2","row":2,"row_sha256":"52a28623a8bc1c2a94bcdf94291a4e54e5c6cf723cd75d8db7d6a67f1963616b","source_customer_id":"synthetic-cust-001"}]'
+
+/workspace/VA-Studio-mig/tests/Unit/Migration/HistoryNormalizerTest.php:191
+/workspace/VA-Studio/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 1, Failures: 1.

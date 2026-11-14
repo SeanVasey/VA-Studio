@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="CLI Arguments" tests="3" assertions="14" errors="1" failures="0" skipped="0" time="363.748657">
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\BillingAwardFenceDefinitionTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php" tests="2" assertions="9" errors="0" failures="0" skipped="0" time="203.271130">
+      <testcase name="test_old_trigger_snapshot_cannot_admit_a_removed_current_hint_guard" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php" line="16" class="Tests\Feature\ProductionMembershipBilling\BillingAwardFenceDefinitionTest" classname="Tests.Feature.ProductionMembershipBilling.BillingAwardFenceDefinitionTest" assertions="5" time="99.540496"/>
+      <testcase name="test_old_catalog_snapshot_cannot_admit_a_fence_moved_to_myisam_before_its_open" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/BillingAwardFenceDefinitionTest.php" line="53" class="Tests\Feature\ProductionMembershipBilling\BillingAwardFenceDefinitionTest" classname="Tests.Feature.ProductionMembershipBilling.BillingAwardFenceDefinitionTest" assertions="4" time="103.730633"/>
+    </testsuite>
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipFirstAwardTest" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php" tests="1" assertions="5" errors="1" failures="0" skipped="0" time="160.477527">
+      <testcase name="test_owned_award_commits_one_period_and_one_event_and_replays_the_original_result" file="/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php" line="35" class="Tests\Feature\ProductionMembershipBilling\MembershipFirstAwardTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipFirstAwardTest" assertions="5" time="160.477527">
+        <error type="App\Domain\Memberships\Production\MembershipException">Tests\Feature\ProductionMembershipBilling\MembershipFirstAwardTest::test_owned_award_commits_one_period_and_one_event_and_replays_the_original_result
+App\Domain\Memberships\Production\MembershipException: Production membership preparation unavailable.
+
+/workspace/VA-Studio-membership-award/app/Domain/Memberships/Production/MembershipException.php:16
+/workspace/VA-Studio-membership-award/app/Domain/Memberships/Production/MembershipAwardContext.php:172
+/workspace/VA-Studio-membership-award/app/Domain/Memberships/Production/MembershipAwardContext.php:145
+/workspace/VA-Studio-membership-award/app/Domain/Memberships/Production/MembershipAwardContext.php:78
+/workspace/VA-Studio-membership-award/app/Domain/Memberships/Production/MembershipAwards.php:52
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php:179
+/workspace/VA-Studio-membership-award/tests/Feature/ProductionMembershipBilling/MembershipFirstAwardTest.php:39
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</error>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>

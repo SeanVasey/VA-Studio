@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "kind": "Independent bounded early original-buyer lock source delta review; execution still active at request",
+  "decision": "APPROVE BOUNDED SOURCE DELTA; NATIVE/WHOLE EVIDENCE PENDING",
+  "reviewed_commit": "a051ac2e5044269e415ee147ca7bc3063ca54c5d",
+  "baseline_commit": "04f45bc6b8e0f8a69d96255271281e23836c1e42",
+  "observed_head": "a051ac2e5044269e415ee147ca7bc3063ca54c5d",
+  "observed_status": "",
+  "changed_paths": [
+    "app/Domain/Grants/PaidTax/PaidTaxActor.php",
+    "app/Domain/Grants/PaidTax/PaidTaxCommands.php",
+    "app/Domain/Grants/PaidTax/PaidTaxGrants.php",
+    "app/Domain/Grants/PaidTax/PaidTaxTransaction.php",
+    "tests/Feature/PaidTaxAdversarialJourneyTest.php",
+    "tests/Feature/PaidTaxGrantJourneyTest.php",
+    "tests/Feature/PaidTaxNativeBoundaryTest.php",
+    "tests/Support/paid-tax-origin-race-worker.php"
+  ],
+  "source_bindings": [
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxActor.php",
+      "git_blob": "09d93a592d7304a5270eb706b6aa35f07aa05282",
+      "sha256": "efd1f873ac7cfc26eec99100924e067803b4470847a8baca685db5f157afecac"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxCommands.php",
+      "git_blob": "dcf00f01ed95f141b38fa868053dfc12c6762170",
+      "sha256": "808986674554e7b344559b6334ccd1c6f296eb292a15745701f3b9b3e221f8a6"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxGrants.php",
+      "git_blob": "37f92954545040ae2fbe268ddb5588d3e46feea1",
+      "sha256": "971f1c71831579ecb1d1a24a55e95f9beafa746929613ba7e6c7239d7b7bc942"
+    },
+    {
+      "path": "app/Domain/Grants/PaidTax/PaidTaxTransaction.php",
+      "git_blob": "471963ca904695edb830a6a90d97a55d2c61776c",
+      "sha256": "6d3190d7a49db6c2d2fd175abdfb3bf7e237bbc391bae474e6af858c73081619"
+    },
+    {
+      "path": "tests/Feature/PaidTaxAdversarialJourneyTest.php",
+      "git_blob": "f84774057c3dc742a84ddae9de8f3de71c490971",
+      "sha256": "bf28475b7fac07b96ae9025a7cdf3d5ddc88871045f650b103df457547495622"
+    },
+    {
+      "path": "tests/Feature/PaidTaxGrantJourneyTest.php",
+      "git_blob": "1bfdcaddaba5f15ad5aa4df9f5528a344c29a8f2",
+      "sha256": "25aee7d044b8e62a158c424b2e74c64d47f5b79711f4ad018ebbf178ff3e97bc"
+    },
+    {
+      "path": "tests/Feature/PaidTaxNativeBoundaryTest.php",
+      "git_blob": "29d0c1eded8d7533c3ba406500ffe696835bd55a",
+      "sha256": "b34bded1f3c461040b0054e37e0efe5a3a52a3de5c0dd9744816dbcd1ad8b204"
+    },
+    {
+      "path": "tests/Support/paid-tax-origin-race-worker.php",
+      "git_blob": "1a600df908ca91a73f16a0aa80953c315e2e2d02",
+      "sha256": "7fac4c94ae6ee3126292e5c57bda2fcbf1f4fac60639ed2469e50a9a3f9e391e"
+    }
+  ],
+  "product_source_findings": [],
+  "open_p0_p1": false,
+  "required_product_repairs_in_delta": [],
+  "closed_source_finding": {
+    "id": "PTV2-RR-EARLY-SNAPSHOT",
+    "severity": "P2 valid replay false refusal",
+    "mechanism": "Dictionary enumeration before owner serialization can establish an old RR view; a waiting replay later sees the winner via FOR UPDATE but terminal plain reads still omit the committed winner row and refuse403. Exact failed selector is not named in original output; source path and raw diagnostic support the ownership-order mechanism.",
+    "repair": "Capture and retain original frame, raw-prove captured actor/runtime/frame, then MySQL-only current SHOW CREATE users + qualified primary-user locking read before ordinary TransactionBeginning delegates and all subsequent dictionary enumeration. No isolation/read-view reset or terminal FOR UPDATE added."
+  },
+  "ordering_assessment": [
+    "Both Grants/Commands pass mandatory original PaidTaxActor, captured before transaction; two direct test callers adapted.",
+    "Birth retain closure assigns original frame by reference BEFORE Actor::lockOriginal can block or refuse.",
+    "Prelock runtime proof uses original maps/config/native/deadline and SELECT DATABASE/system variables, not dictionary/table enumeration; raw actor proof has no Eloquent getter.",
+    "SHOW CREATE refuses temporary/view/non-InnoDB users; database identifier is bounded; parameter is original positive actor ID. The row grants serialization only, not authentication or a retained row authority.",
+    "Saved metadata and row waits each shorten to min(original,5) and restore on the same captured PDO in finally;1205/1213 map to refusal. Existing general SQL/deadlock/restore limitations remain.",
+    "Full current owner/historical/schema/SourceV2 and consumer capsule admission still follow before owned DML; no clock/source renewal, private marker-cycle or final lock acquisition was added.",
+    "SQLite remains raw actor/runtime/frame proof only; native prelock is not synthesized with a SQLite write."
+  ],
+  "race_test_assessment": [
+    "Both workers authenticate before ready; parent holds original users row before commands start, then observes each distinct native connection waiting on that exact parent/user primary-record key.",
+    "Worker ordinary TransactionBeginning delegate performs a real information_schema.TRIGGERS read, so successful same-origin outcomes test lock-before-snapshot even in callback.",
+    "Recorded command budgets remain original60; before-policy coordination gates removed, no deadline increased.",
+    "Third real worker must refuse while parent retains its row lock, restore both waits/closed transaction, execute no begun dictionary delegate, retain exact origin counts and allow fresh explicit replay.",
+    "Unconditional two saved remains a behavioral target within the unchanged bounds; an actual later410/503 needs truthful classification, not a cap increase or silent retry."
+  ],
+  "closed_diagnostic_evidence": {
+    "name": "mysql-origin-race-retained-diagnostics",
+    "head": "04f45bc6b8e0f8a69d96255271281e23836c1e42",
+    "counts": {
+      "tests": 1,
+      "assertions": 39,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    },
+    "exits": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "launch_os_matches": true,
+    "log_hash_matches": true,
+    "stability": {
+      "autoload_unchanged": true,
+      "runner_unchanged": true,
+      "source_head_unchanged": true,
+      "source_status_unchanged": true,
+      "source_unchanged": true
+    },
+    "workers": [
+      {
+        "result": "saved",
+        "id": "ae6a7dda-9e8f-433b-969a-4ce138a1d61f",
+        "order_id": "23b73101-0324-48cf-ae33-5419b642a768",
+        "error_class": null,
+        "status": null,
+        "location": null,
+        "phase": "owner-lock-released",
+        "trace": [],
+        "command_elapsed_seconds": 9.547769132,
+        "connection_id": 110,
+        "pid": 160299,
+        "transaction_level": 0,
+        "in_transaction": false
+      },
+      {
+        "result": "unexpected",
+        "id": null,
+        "order_id": null,
+        "error_class": "App\\Domain\\Grants\\PaidTax\\PaidTaxException",
+        "status": 403,
+        "location": "PaidTaxException.php:17",
+        "phase": "owner-lock-released",
+        "trace": [
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxException::require",
+            "site": "PaidTaxReadReceipt.php:54"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxReadReceipt::{closure:App\\Domain\\Grants\\PaidTax\\PaidTaxReadReceipt::capture():48}",
+            "site": "PaidTaxReadReceipt.php:95"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxReadReceipt->proveCommitAdmission",
+            "site": "PaidTaxConsumerCommitAdmission.php:29"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxConsumerCommitAdmission->proveCurrent",
+            "site": "TaxPaidOriginalCommitDispatcher.php:171"
+          },
+          {
+            "call": "App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidOriginalCommitDispatcher->{closure:App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidOriginalCommitDispatcher::dispatch():170}",
+            "site": "TaxPaidReadContext.php:207"
+          },
+          {
+            "call": "App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidReadContext->held",
+            "site": "TaxPaidOriginalCommitDispatcher.php:170"
+          },
+          {
+            "call": "App\\Domain\\Commerce\\ProductionTaxCheckout\\TaxPaidOriginalCommitDispatcher->dispatch",
+            "site": "Connection.php:1129"
+          },
+          {
+            "call": "Illuminate\\Database\\Connection->fireConnectionEvent",
+            "site": "ManagesTransactions.php:206"
+          },
+          {
+            "call": "Illuminate\\Database\\Connection->commit",
+            "site": "PaidTaxTransaction.php:29"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxTransaction::run",
+            "site": "PaidTaxGrants.php:50"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxGrants->finalizeOwned",
+            "site": "PaidTaxGrants.php:26"
+          },
+          {
+            "call": "App\\Domain\\Grants\\PaidTax\\PaidTaxGrants->finalize",
+            "site": "paid-tax-origin-race-worker.php:57"
+          }
+        ],
+        "command_elapsed_seconds": 13.44201976,
+        "connection_id": 111,
+        "pid": 160305,
+        "transaction_level": 0,
+        "in_transaction": false
+      }
+    ],
+    "interpretation": "One saved at9.5478 seconds; another403 at13.4420 with preparedRows equality trace. The04f failure is not deadline exhaustion.81e has no same status/trace, so its cause remains unresolved, not retroactively inferred.",
+    "receipt_hashes": {
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-origin-race-retained-diagnostics/result.json": "0184f8e0d7ce28806d32105ffe952a0691dd55ad749b9d2d1deeb702cb57ffea",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-origin-race-retained-diagnostics/junit.xml": "3cb1d2fe047c9adb0156a6e9637848c5c0336d802da5dcd4c9c3036eb4492e8c",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-origin-race-retained-diagnostics/process.exit": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/mysql-origin-race-retained-diagnostics/log.txt": "8b5dd1c1ab1978ec02ec4751b5a7f1ca10e31c030996a3e0ffba62df7709bfdd",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/launch-mysql-origin-race-retained-diagnostics.json": "ece6458c9645221ad8481bfd6ef5bc6dc968ec3ec8223d3e329770ed8f11b75c",
+      "/workspace/runtime/paid252-tax-v2-evidence-20261015/observed-os-exit-mysql-origin-race-retained-diagnostics.json": "39ce820856780d166f1bc8da63f5ccc76113026e0fefb04b501673ecd06c9aae"
+    }
+  },
+  "raw_probe": {
+    "receipt_path": "/workspace/runtime/paid252-tax-v2-evidence-20261015/native-snapshot-diagnostic.json",
+    "receipt_sha256": "0209d521ce83331f9697111c600ae643cff359f0fb33b08c3a68df159a7b5ec9",
+    "script_sha256_declared": "8ec487d5ead4da5afec616de51c4cab1aef09b9552f1f491e649ced86ec1103a",
+    "preserved_script_matches": true,
+    "recorded_process_exit": 0,
+    "observations": {
+      "version": "8.4.11",
+      "schema": "vaseyaudio_paid252_tax_v2",
+      "isolation": "REPEATABLE-READ",
+      "observations": {
+        "none": {
+          "locking_read": 1,
+          "plain_read": 1,
+          "repeat_current_read": 1
+        },
+        "limit-zero": {
+          "locking_read": 1,
+          "plain_read": 1,
+          "repeat_current_read": 1
+        },
+        "show-create": {
+          "locking_read": 1,
+          "plain_read": 1,
+          "repeat_current_read": 1
+        },
+        "information-schema-tables": {
+          "locking_read": 1,
+          "plain_read": 0,
+          "repeat_current_read": 1
+        },
+        "information-schema-triggers": {
+          "locking_read": 1,
+          "plain_read": 0,
+          "repeat_current_read": 1
+        },
+        "show-triggers": {
+          "locking_read": 1,
+          "plain_read": 0,
+          "repeat_current_read": 1
+        }
+      },
+      "owned_probe_removed": true
+    },
+    "scope": "Root-executed raw two-connection private-schema diagnostic, not an application pass; reviewer read only. Statement controls distinguish no-query/LIMIT0/SHOWCREATE from dictionary/TRIGGERS snapshot reads. No current session-default-only RC/isolation proof is inferred."
+  },
+  "manifest": {
+    "sha256": "9cc50e19608a11be4db4648b49aa5ccf234945a63fced68d95f6b42bf2e048b4",
+    "all_six_members_match": true,
+    "changed_paths": []
+  },
+  "protected_delta": [],
+  "limits": [
+    "Current mysql-original-buyer-before-snapshot-fixed recorder was active at request; no current passing result is claimed in this source delta review.",
+    "No final family/affected SQLite/native Schema/physical/portable packet or merge approval.",
+    "The fix targets same-owner consumer replay ordering; unrelated mutable/media sets, trigger/DDL, RC gap/effective isolation, general SQL/reconnect/restore and invisible empty post-closure reopen remain unproved.",
+    "No frozen V1/shared identity edits, new terminal row locks, isolation changes, clock/cap increases, live/provider/HTTP/download/mount activation or host/release claim.",
+    "Source positive prelock is not current authentication; full independent current authority remains required."
+  ],
+  "actions": "Read-only exact Git/source/framework and closed original diagnostic receipt parsing/hash checks; own runtime notes only. No test/DB/CI/network or tracked edit."
+}

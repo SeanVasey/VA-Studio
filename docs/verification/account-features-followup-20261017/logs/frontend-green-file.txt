@@ -1,0 +1,10 @@
+
+ RUN  v5.0.3 /home/user/wt/b4f
+
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  17:33:29
+   Duration  2.98s (tests 56%, environment 26%, transform 12%, setup 3%, import 3%)
+
+exit=0

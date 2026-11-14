@@ -1,0 +1,10 @@
+Debug run, 2026-10-19 ~02:25Z, branch code b192f0ef + uncommitted test 855999c0-draft, MySQL 8.4.11 with performance_schema=ON (restarted for this probe only).
+Test test_definitions_proven_in_the_frame_cannot_change_under_it, first draft: its MembershipAwardTransaction was not kept referenced
+(`$this->ownedFrame();` result discarded), so the weak registry entry was empty and both guards ran their COMPLETE proofs (the main code path).
+After `(new MembershipSchema)->assertOwned($pdo); IdentityRows::from(...)` inside DB::beginTransaction(), performance_schema.metadata_locks for
+the test connection (OBJECT_TYPE, OBJECT_SCHEMA, OBJECT_NAME, LOCK_TYPE, LOCK_DURATION, PROCESSLIST_ID) showed, for vaseyaudio_g1 objects only:
+  production_identity_addresses/challenges/origins/verifications/notices/attempts/outcomes  SHARED_READ TRANSACTION
+  production_membership_plan_versions/paid_periods/redemptions/credit_events                 SHARED_READ TRANSACTION
+and NO lock on users, customer_accounts, quote_owners or audit_events (the rest were mysql.* and information_schema.* dictionary tables).
+Another session's ALTER TABLE quote_owners COMMENT='synthetic' then succeeded (the draft test failed: "DDL passed a held frame").
+After the fix (frame kept referenced, so the memo path pins every inspected table first), the same test passes natively (all three DDL statements time out with 1205).

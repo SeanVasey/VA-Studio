@@ -1,0 +1,21 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-member-original-facts/phpunit.xml
+
+...F........................                                      28 / 28 (100%)
+
+Time: 00:00.283, Memory: 50.50 MB
+
+There was 1 failure:
+
+1) Tests\Unit\ProductionMemberOriginals\MemberGrantDocumentsTest::test_unknown_or_conflicting_retained_values_are_refused@technical descriptor changed with data ('profile', ['render_profile', 'template'], 'another')
+Failed asserting that exception of type "App\Domain\Contracts\ContractIssuanceException" matches expected exception "App\Domain\Grants\Member\MemberGrantException". Message was: "Test contract issuance is unavailable." at
+/workspace/VA-Studio-member-original-facts/app/Domain/Grants/Member/MemberGrantRenderProfileRegistry.php:243
+/workspace/VA-Studio-member-original-facts/app/Domain/Grants/Member/MemberGrantRenderProfile.php:20
+/workspace/VA-Studio-member-original-facts/app/Domain/Grants/Member/MemberGrantProfileDocument.php:20
+/workspace/VA-Studio-member-original-facts/tests/Unit/ProductionMemberOriginals/MemberGrantDocumentsTest.php:66
+.
+
+FAILURES!
+Tests: 28, Assertions: 64, Failures: 1.

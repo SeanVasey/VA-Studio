@@ -1,0 +1,8 @@
+base-e3e2a180-r1 started 2026-10-19T01:50:32Z head=e3e2a180 dirty=0 load=3.08 2.84 2.64 other_mysqld=0 server=8.4.11/2/0/0/536870912/ps=0
+base-e3e2a180-r1 finished 2026-10-19T01:59:02Z exit=2 seconds=510 tests=1 assertions=13 failures=0 errors=1 txns: 48.0s statements=70253 end=COMMIT;65.1s statements=90255 end=ROLLBACK;
+head-b192f0ef-r1 started 2026-10-19T02:04:04Z head=b192f0ef dirty=0 load=3.56 3.75 3.40 other_mysqld=0 server=8.4.11/2/0/0/536870912/ps=0
+head-b192f0ef-r1 finished 2026-10-19T02:09:32Z exit=0 seconds=328 tests=1 assertions=21 failures=0 errors=0 txns: 17.7s statements=28075 end=COMMIT;24.5s statements=36676 end=COMMIT;20.0s statements=32941 end=COMMIT;15.1s statements=25990 end=COMMIT;
+base-e3e2a180-r2 started 2026-10-19T06:43:46Z head= dirty=0 load=0.41 1.43 1.89 other_mysqld=0 server=8.4.11/2/0/0/536870912/ps=0
+base-e3e2a180-r2 finished 2026-10-19T06:50:11Z exit=2 seconds=385 tests=1 assertions=13 failures=0 errors=1 txns: 55.5s statements=70253 end=COMMIT;64.8s statements=83405 end=ROLLBACK;
+head-ee18412a-r2 started 2026-10-19T06:50:11Z head=ee18412a dirty=0 load=1.05 1.18 1.61 other_mysqld=0 server=8.4.11/2/0/0/536870912/ps=0
+head-ee18412a-r2 finished 2026-10-19T06:57:38Z exit=0 seconds=447 tests=1 assertions=21 failures=0 errors=0 txns: 18.0s statements=28075 end=COMMIT;22.7s statements=36676 end=COMMIT;21.3s statements=32941 end=COMMIT;16.5s statements=25990 end=COMMIT;

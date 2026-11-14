@@ -1,0 +1,5 @@
+/workspace/VA-Studio-membership-clock/app/Domain/Memberships/Production/MembershipAwards.php
+MySQL 8.4.11
+schema vaseyaudio_membership_award_profile
+socket /run/mysql-policy/mysql.sock
+port 3306

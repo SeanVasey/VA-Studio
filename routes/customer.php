@@ -39,3 +39,5 @@ Route::withoutMiddleware(HandleInertiaRequests::class)->group(function (): void 
     Route::get('/account/membership-credits/{bucket}', [CustomerMembershipHistoryController::class, 'show'])
         ->where('bucket', '[1-9][0-9]{0,17}')->middleware('throttle:60,1,customer-pages')->block(20, 5)->name('customer.membership-credits.show');
 });
+
+require __DIR__.'/customer-data-rights.php';

@@ -61,8 +61,8 @@ final class ProductionFreeGrantTransferDeadlineTest extends TestCase
         $received = 0;
         $this->transfer()->writeTo(function (string $chunk) use (&$received): void {
             $received += strlen($chunk);
-            // 400 s elapse once: past the 300 s authorization, inside the 542 s derived deadline.
-            $this->offset = 400_000_000_000;
+            // Eight returning chunks make progress over 400 s, past authorization but inside its transfer budget.
+            $this->offset += 50_000_000_000;
         });
         $this->assertSame(8 * self::MIB, $received);
     }
@@ -76,7 +76,7 @@ final class ProductionFreeGrantTransferDeadlineTest extends TestCase
                 $this->offset += 300_000_000_000;
             });
         }, 'expired');
-        $this->assertSame(2 * self::MIB, $received, 'Chunk 1 ends at 300 s and chunk 2 at 600 s; the check before chunk 3 is past 542 s.');
+        $this->assertSame(self::MIB, $received, 'The first returning chunk misses its 30+64 s progress budget; no second chunk leaves.');
         $this->assertSame(1, DB::table('production_free_redemptions')->count());
     }
 

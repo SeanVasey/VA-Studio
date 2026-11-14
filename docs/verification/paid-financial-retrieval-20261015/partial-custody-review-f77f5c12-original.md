@@ -1,0 +1,13 @@
+# Independent partial-custody control review
+
+DECISION: **APPROVE TEST-CONTROL AND UNCHANGED APPLICATION CARRY WITH CONDITIONS**
+
+Reviewed clean exact `f77f5c12e590b2d9295ebff582b142b4091ff8c2`. Only the focused test and new test-support clock file changed from source-approveda796; app/config/schema/policies/routes/resources/dependency/CI operational Git scopes are unchanged. This carries the application source decision only, not whole-manifest equality or final evidence/merge approval. No app/PHP diagnostics, DB/native/provider/network or hosted CI execution and no shared edit by reviewer.
+
+The control follows the approved bounded mechanism. File-scope test-only load establishes a new-module namespaced clock forwarder before namespace resolution caches. It returns real global hrtime unchanged. A bounded argument-free stack inspection triggers a one-shot callback in actual ReadOwnership::attach, after retaining the real first receipt; the withdrawal separately checks the original observer has exactly one receipt. Probe is cleared before invocation and in setup/teardown/finally. No original source/observer/identity namespace, private graph or production binding is changed. V1 is explicitly synthetic new-wrapper fault injection; Tax retains genuine original decrypt forwarding. Neither label implies native elapsed timing or provider authentication.
+
+Both controls require exactly one probe, actual first receipt used, observer receipt count1, original framework/native frame still held until caller rollback, no SDK sentinel calls, preserved saved slot, flag restoration and fresh actual source/read frame retry producing six guarded GETs and providerAuthenticated=false. The focused original is now closed **2tests/38assertions/F0/E0/S0**, PHP0/recorder0; JUnit and result independently agree with2438 stable source/HEAD/status/runner/loaders. Its separate launch-bound OS receipt remains a condition and is not yet claimed here.
+
+Priora796 whole64/549/F1/E0/S2 and PHP/recorder/OS1 stays failed: the V1 genuine decrypt seam did not exist at the intended boundary; Tax counterpart passed. Do not relabel that aggregate green or sum overlapping focused cases. The reported duplicate OS-close overwrite refusal is recorder preparation, with the original OS receipt preserved.
+
+Fresh wholeSQLite, owned focused native original-commit/two-receipt/callback/actual age controls, canonical policy/Pint/cheap checks and sealed exact-candidate independent evidence review remain required before publication preflight/full inventory/expected-SHA merge. Default-off/nonbinding/unattested output and future provider/host/durable financial/right/access policy gates remain unchanged.

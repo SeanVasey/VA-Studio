@@ -1,0 +1,139 @@
+{
+  "checks": [
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "/workspace/VA-Studio/vendor/laravel/pint/builds/pint",
+        "app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php",
+        "app/Domain/Customers/ProductionIdentity/CurrentCatalog.php",
+        "tests/Unit/ProductionIdentity/CatalogGroupContractTest.php",
+        "tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php"
+      ],
+      "exit": 0,
+      "stdout": "\n  ....\n\n  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 Laravel  \n    PASS   ........................................................... 4 files  \n\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "-l",
+        "app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php"
+      ],
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "-l",
+        "app/Domain/Customers/ProductionIdentity/CurrentCatalog.php"
+      ],
+      "exit": 0,
+      "stdout": "No syntax errors detected in app/Domain/Customers/ProductionIdentity/CurrentCatalog.php\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "-l",
+        "tests/Unit/ProductionIdentity/CatalogGroupContractTest.php"
+      ],
+      "exit": 0,
+      "stdout": "No syntax errors detected in tests/Unit/ProductionIdentity/CatalogGroupContractTest.php\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "-l",
+        "tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php"
+      ],
+      "exit": 0,
+      "stdout": "No syntax errors detected in tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "/workspace/VA-Studio/vendor/laravel/pint/builds/pint",
+        "--test",
+        "app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php",
+        "app/Domain/Customers/ProductionIdentity/CurrentCatalog.php",
+        "tests/Unit/ProductionIdentity/CatalogGroupContractTest.php",
+        "tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php"
+      ],
+      "exit": 0,
+      "stdout": "\n  ....\n\n  \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 Laravel  \n    PASS   ........................................................... 4 files  \n\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "docker",
+        "exec",
+        "--user",
+        "1000:1000",
+        "--workdir",
+        "/workspace/VA-Studio-account-guard-v2",
+        "va-pcc-runtime-20261101",
+        "php",
+        "/workspace/account-guard-evidence-20261101/catalog-pure-phpunit.php",
+        "--no-configuration",
+        "tests/Unit/ProductionIdentity",
+        "tests/Unit/AccountAdmissionGuardDefinitionTest.php"
+      ],
+      "exit": 0,
+      "stdout": "PHPUnit 12.5.34 by Sebastian Bergmann and contributors.\n\nRuntime:       PHP 8.4.27\n\n...........................................                       43 / 43 (100%)\n\nTime: 00:01.308, Memory: 26.50 MB\n\nOK (43 tests, 1100 assertions)\n",
+      "stderr": ""
+    }
+  ],
+  "source_sha256": {
+    "app/Domain/Customers/ProductionIdentity/CatalogGroupPlan.php": "1ab54cebbab65133c7f8ebb869071052088bebc2b16ced7e6e657694587d27c5",
+    "app/Domain/Customers/ProductionIdentity/CurrentCatalog.php": "a4d1aaf2e4e731b689b20c6e1994beef7dfa96c9f26ffdeb81f26ec4f3de0d70",
+    "tests/Unit/ProductionIdentity/CatalogGroupContractTest.php": "29d48f4dd379cbd9bc3115611a8d5e246db6980f5c3f905c1c1a73c4efa4dacd",
+    "tests/Feature/ProductionIdentity/CatalogGroupDifferentialTest.php": "b6fa4f4af1505caf673e5fe4f065fc93a8de241f781430c655c25ef434b0de33"
+  },
+  "native_executed": false
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "profile_base_commit": "36fc22d0d94585ba13724e14093ceabc725c762a",
+  "application_variant": "native-batch-2 plus three diagnostic timing wrappers",
+  "reconstruction": "git archive the profile base app and tests/Support into a disposable directory; git apply --check and git apply native-batch-2.patch, then native-function-profile-instrumentation.patch; compare SHA256 of every recorded source file.",
+  "patches": {
+    "native-batch-2.patch": "c12677963e57bf056f48bb1aa4085b136da3575840f181e453f730f1304019f2",
+    "native-function-profile-instrumentation.patch": "f2943d649799b48f197689b3e0dec9f119bf081dc4a91e97373a48c1a00a706a"
+  },
+  "released_receipt_entries_verified": 10,
+  "released_receipt_sha256": "5a5c114f0686550c213b2e85ed03f3a501da610c5220d278b723df40fc806001",
+  "before_after_source_hashes_equal": true,
+  "reconstructed_source_hashes_match_report": 363,
+  "source_hash_scope": "Recorded app and tests/Support files only; not a complete environment/vendor/source-tree inventory.",
+  "original_wrapper_sources_verified": {
+    "app/Domain/Customers/ProductionIdentity/IdentityMigrationOwnership.php": {
+      "before": "656fab100558cc915df8ce2a30714a12ca0c66165ad594e060f5a8dabd6789c4",
+      "instrumented": "1a6b26455cfca6e51bd08ba30824dc7e91f2ab0bb70683bd85cb5b6d3d511fd3"
+    },
+    "app/Domain/Memberships/Production/MembershipSchema.php": {
+      "before": "cc5d5ed89c11db96a6ab4a90b30871de700c27fb988a4eb59bfa96b1352db8bf",
+      "instrumented": "6b43f08c243c7b16b7ac4563c3596a39f177ec742a28413b5a150b831d1fc7b3"
+    },
+    "app/Domain/Memberships/Billing/BillingSchema.php": {
+      "before": "0318f1831f5670aa666c91762e931b89f73d7ec8a4066423fd248a9aafa38d79",
+      "instrumented": "575aabf2b37b934b37376847697b79f1f15f9fddb06fdbdf36d0145824d00308"
+    }
+  },
+  "diagnostic_test_sha256": "ec4b45e13eb05b024fb749db4fd1daa76866a35c5728e85d4d55e12e173a89ba",
+  "diagnostic_source_is_committed_candidate": false
+}

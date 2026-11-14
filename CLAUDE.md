@@ -141,22 +141,30 @@ Repo-specific facts and invariants. §1–§12 stay byte-identical across repos;
 - **Stack:** Laravel 13 / PHP 8.4, Filament 5 admin, Inertia 3 + React 19 + TypeScript 7, Vite 8; MySQL 8.4 in production and CI, SQLite locally; Stripe in test mode only.
 - **Package manager:** Composer 2 and npm (Node >=24.15 <25).
 - **Commands:** dev `composer run dev` · gate `composer validate --strict && php artisan test && npm test && npm run build && composer audit && npm audit --audit-level=high`
-- **Deploy:** none configured; the production host is undecided (U-02 in `docs/architecture/decision-register.md`).
+- **Deploy:** staging runs on a Laravel Forge VPS (serving `d4b0955d` since 2026-11-13 20:29 UTC; re-provisioned with the isolated build account on 2026-11-12; deploy script and ops kit in `ops/staging/`, runbook `docs/ops/staging-runbook.md`). Production is not configured. Staging and production both use Laravel Forge-managed VPSs (staging decided 2026-10-08/09; production platform approved by Sean on 2026-10-18). U-02's region, secrets, backup target and incident ownership remain open (`docs/architecture/decision-register.md`).
 - **Invariants** (§1.8 rules land here): none yet.
 
 ### Current user-authorized handoff — October 7, 2026
 
-**Superseded for current work (2026-10-11):** the development lead passed to Codex. Read `docs/handoff/2026-10-11/CODEX-HANDOFF.md` first. PR #96 is a draft with an independent-review REJECT; see `docs/handoff/2026-10-11/importer-h1/README.md`.
+**Current (2026-11-14):** read the checkpoint at the top of `docs/handoff/2026-11-05/HANDOFF.md` (first complete Foundation pass at `e09c91a7`, merged work, what staging serves, next items).
+
+**Before that (2026-11-05):** the Claude Code harness resumed from Codex's 2026-11-04 checkpoint, merged B (PR #191) and verified the C/D lanes on pushed `claude/*` branches. Read `docs/handoff/2026-11-05/HANDOFF.md` first. Lane state lives in `docs/handoff/2026-10-17/RESUMPTION.md`.
+
+**Superseded (2026-11-01):** the Claude Code harness handed the lead to Codex because of usage limits (`docs/handoff/2026-11-01/CODEX-HANDOFF.md`).
+
+**Superseded (2026-10-29):** Sean cancelled the Codex handoff and the Claude Code harness resumed the lead; `docs/handoff/2026-10-26/CODEX-HANDOFF.md` is history (still accurate for the routine, the merge discipline and the owner inputs).
+
+**Superseded for current work (2026-10-17):** the Codex session stopped after merging PR #132, and the Claude Code harness resumed the lead. Read `docs/handoff/2026-10-17/RESUMPTION.md` first, then the October 15 agenda. The October 11 Codex handoff is history: PR #96 merged as `92f940cc` after its rejection was fixed and re-reviewed (`docs/handoff/2026-10-12/CODEX-CHECKPOINT.md`).
 
 Read `docs/handoff/2026-10-07/CLAUDE-PLAN.md` first (plan, lane protocol, state ledger), then `docs/handoff/2026-10-07/README.md` and its branch inventory. Sean requested completion/push of current development batches and handoff of remaining implementation to another harness. Preserve reviewed main, unfinished branches, original failures and immutable originals as separately attributed source.
 
-Sean's current `AGENTS.md` CI cost policy supersedes earlier gate adaptations here: focused affected checks, independent sensitive review and cheap preflight authorize development merges. Foundation remains one manual final integrated exact-SHA verification; do not restore automatic database/browser matrices or weaken security/protections. Current partitioning uses twenty-four MySQL/two SQLite shards with an exact native-only SQLite method census, which still needs normalization after new families. No final handoff acceptance is claimed.
+Sean's current `AGENTS.md` CI cost policy supersedes earlier gate adaptations here: focused affected checks, independent sensitive review and cheap preflight authorize development merges. Foundation remains one manual final integrated exact-SHA verification; do not restore automatic database/browser matrices or weaken security/protections. Current partitioning uses twenty-four MySQL/six SQLite shards (six since 2026-11-13) with an exact native-only SQLite method census, which still needs normalization after new families. No final handoff acceptance is claimed.
 
 Synthetic membership test setup is explicitly approved. Live credentials/payments, real money, purchased services, production deployment and DNS/cutover still require separate authorization. The production preparation queue records developed versus queued work. Direct PHPUnit with worktree-specific Composer autoload avoids the restored Artisan Collision issue; see the handoff for exact source-bound commands and engine limitations.
 
-### Adaptations of §1–§12 (pending Sean's confirmation)
+### Adaptations of §1–§12 (decided 2026-11-10: DD-64 under Sean's delegation; lint preset set by Sean's SQ-18)
 
-- **§3 gate:** no linter is enforced yet. SQLite runs skip MySQL-only race tests by design (reviewed census `scripts/ci/database-sqlite-skips.json`); the twenty-four MySQL CI shards run the reviewed native selection and skip only the reviewed SQLite-only census (`scripts/ci/database-mysql-skips.json`), each engine's skips exactly matching its census.
+- **§3 gate:** Pint (`laravel` preset) is enforced on changed PHP files in preflight (SQ-18); no TypeScript linter yet. SQLite runs skip MySQL-only race tests by design (reviewed census `scripts/ci/database-sqlite-skips.json`); the twenty-four MySQL CI shards run the reviewed native selection and skip only the reviewed SQLite-only census (`scripts/ci/database-mysql-skips.json`), each engine's skips exactly matching its census.
 - **§5 auth:** staff sign in through Filament's built-in auth with TOTP MFA (required in staging and production); the production customer account path (`routes/production-customer-identity.php`, `CompleteIdentity`) is implemented but default-off and unconfigured, and its production policy is U-07; synthetic test accounts run behind default-off flags in `local`, `testing` and `staging`. MySQL has no row-level security, so authorization lives in server-side domain policies and owner checks.
 - **§6 audit:** `npm audit` stays at `--audit-level=high`, stricter than the critical-only minimum.
 - **§7 license and layout:** the project is proprietary, so `LICENSE` reserves all rights instead of granting MIT. `docs/architecture/` (README plus D-xx decision records) holds architecture and ADRs; runbooks are `docs/migration/cutover_runbook.md` and the operator guides.
@@ -169,8 +177,9 @@ Synthetic membership test setup is explicitly approved. Live credentials/payment
 - Codex review findings follow Sean's freeze-and-batch rule (2026-10-11): merge at the exact SHA once preflight is green, the independent review approves and no P0/P1 is open; defer P2s with one thread reply to a per-lane follow-up batch (`docs/handoff/2026-10-07/codex-deferred-20261011.md`); no single-finding pushes.
 - Cloud container setup: `. /opt/nvm/nvm.sh && nvm install 24` (re-source nvm.sh in each new shell; otherwise an older Node comes first on PATH); `apt-get update && apt-get install -y --no-install-recommends ffmpeg qpdf poppler-utils php8.4-bcmath`; `COMPOSER_ALLOW_SUPERUSER=1 composer install` (about 7 minutes, because GitHub archive hosts are blocked); `npm ci`; `cp .env.example .env && php artisan key:generate`. These commands don't install MySQL. A session that has a native MySQL 8.4 (the Claude harness ran 8.4.11; see `docs/handoff/2026-10-07/CLAUDE-PLAN.md`) runs native checks against a private `mysqld` on its own datadir and port, never a shared instance; without one, CI is the evidence for MySQL races. The preinstalled Playwright browsers don't match the pinned version, so CI is the evidence for browser specs.
 - Full PHP suite: `python3 scripts/ci/phpunit-shards.py --shards=4 --prefix=phpunit-ci-local` (the prefix must match `phpunit-ci-*`), run `php vendor/bin/phpunit --configuration=phpunit-ci-local-<n>.xml` for each shard, then delete the generated `phpunit-ci-local-*` files. Under Claude Code, laravel/pao prints one JSON summary per run.
+- `.env.example` sets `SESSION_ENCRYPT=true` and Foundation CI copies it to `.env`, so run local PHP tests with a `.env` copied from `.env.example` to match CI. PR #127's guard rejected the encrypted session store and passed locally only because the local environment differed.
 - Run PHP tests while `public/build` is absent: seven HTTP tests send Inertia requests without an asset-version header and fail with 409 once a Vite manifest exists.
 
 ### Standard adoption gaps (open)
 
-Lint gate (Pint's default preset flags 243 of 477 PHP files; there's no TypeScript linter) · README §8 layout · official SVG mark and icon suite (AGENTS.md forbids recreating the logo) · `docs/legal/` PRIVACY and TERMS for owner review · deploy target.
+Lint gate (changed-files Laravel Pint gate in preflight since SQ-18, 2026-11-10; the whole-repo format sweep is a post-freeze PR; Pint's default preset flags 243 of 477 PHP files; there's no TypeScript linter) · README §8 layout · official SVG mark and icon suite (AGENTS.md forbids recreating the logo) · `docs/legal/` PRIVACY and TERMS for owner review · deploy target.

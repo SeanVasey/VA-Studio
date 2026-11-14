@@ -1,0 +1,37 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-billing-retrieval-consumers/phpunit.xml
+
+[41;37mF[0m[41;37mF[0m[41;37mF[0m[41;37mF[0m                                                                4 / 4 (100%)
+
+Time: 00:38.723, Memory: 102.00 MB
+
+There were 4 failures:
+
+1) Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission@award before commit with data ('award', false)
+Failed asserting that null is identical to 'expired_invoice_proof'.
+
+/workspace/VA-Studio-billing-retrieval-consumers/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php:137
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+2) Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission@award after commit with data ('award', true)
+Failed asserting that null is identical to 'expired_invoice_proof'.
+
+/workspace/VA-Studio-billing-retrieval-consumers/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php:137
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+3) Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission@reserve before commit with data ('reserve', false)
+Failed asserting that null is identical to 'expired_invoice_proof'.
+
+/workspace/VA-Studio-billing-retrieval-consumers/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php:137
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+4) Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission@reserve after commit with data ('reserve', true)
+Failed asserting that null is identical to 'expired_invoice_proof'.
+
+/workspace/VA-Studio-billing-retrieval-consumers/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php:137
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mFAILURES![0m
+[37;41mTests: 4[0m[37;41m, Assertions: 56[0m[37;41m, Failures: 4[0m[37;41m.[0m

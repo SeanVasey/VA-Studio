@@ -13,6 +13,7 @@ Baseline prepared 2026-09-04 from all three owner-provided attachments, public V
 | `legacy_route_inventory.csv` | 20 proposed legacy route mappings requiring actual browser/catalog verification |
 | `cutover_runbook.md` | Acquisition, dry-run, reconciliation, launch gates and rollback procedure |
 | `beatstars-export-normalization.md` | Operator guide for the BeatStars CSV normalizer and read-only dry run (M-09/M-10): mapping file, findings, exit codes and the 1 MiB snapshot limit |
+| `legacy-history-archive.md` | Operator guide for the history archive (orders, lines, customers, original contracts; M-033 to M-037), delta capture (M-050) and the exclusivity authority ledger (M-023): synthetic-tested only, `archive_only` by default, no entitlement import |
 
 ## Reading the records
 
@@ -29,6 +30,8 @@ The feature matrix's `evidence_status` concerns the benchmark/source claim. `tar
 All imported material requires source identity, acquired-at time, raw hash or value, transform version, target identity, batch and reconciliation outcome. Values such as `not_acquired` and blank resolution fields are intentional. No customer list, executed contract, original attachment binary, provider credential or raw account export belongs in git. Acquire those through approved private storage and reference them by opaque identifier and hash.
 
 The route file contains proposals, not deployed redirects. Preserve paths when useful and avoid redirecting authenticated routes into public pages. BeatStars-owned hostnames cannot be redirected without verified control.
+
+The reviewed decision for each row lives in `resources/legacy-redirects/map.json` and is checked with `php artisan vasey:redirects-validate`; the redirect layer is default-off. See [legacy-redirects.md](legacy-redirects.md).
 
 
 ## Editorial implementation checkpoint — September 29, 2026

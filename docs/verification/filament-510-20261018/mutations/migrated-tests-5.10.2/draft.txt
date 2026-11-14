@@ -1,0 +1,19 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /home/user/wt/m3/phpunit.xml
+
+F                                                                   1 / 1 (100%)
+
+Time: 00:03.334, Memory: 95.00 MB
+
+There was 1 failure:
+
+1) Tests\Feature\LicenseDraftAuthoringActionTest::test_uncertain_failure_retains_inputs_without_success_or_exception_content_and_requires_reopen
+Failed asserting that '[{"id":"a3031852-f17b-4b99-8936-39810f377f2d","actions":[],"body":"Keep a copy of your changes, then close and reopen to inspect the saved draft before trying again.Synthetic private failure detail","color":null,"duration":"persistent","icon":"heroicon-o-x-circle","iconColor":"danger","iconSize":null,"status":"danger","title":"The save result could not be confirmed.","view":null,"viewData":[]}]' [ASCII](length: 397) does not contain "Synthetic private failure detail" [ASCII](length: 32).
+
+/home/user/wt/m3/tests/Feature/LicenseDraftAuthoringActionTest.php:305
+/home/user/wt/m3/vendor/phpunit/phpunit/phpunit:104
+
+FAILURES!
+Tests: 1, Assertions: 22, Failures: 1.

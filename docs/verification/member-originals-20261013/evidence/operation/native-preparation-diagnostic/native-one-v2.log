@@ -1,0 +1,55 @@
+PHPUnit 12.5.34 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.26
+Configuration: /workspace/VA-Studio-member-original-operation/phpunit.xml
+
+MEMBER_DIAGNOSTIC {"phase":"inspect.start","elapsed_ms":0,"remaining_ms":59999.999}
+MEMBER_DIAGNOSTIC {"phase":"after.begin","elapsed_ms":673.19,"remaining_ms":59326.808}
+MEMBER_DIAGNOSTIC {"phase":"after.rows","elapsed_ms":901.564,"remaining_ms":59098.435}
+MEMBER_DIAGNOSTIC {"phase":"before.initial.reservation","elapsed_ms":901.793,"remaining_ms":59098.206}
+MEMBER_DIAGNOSTIC {"phase":"after.initial.reservation","elapsed_ms":30124.494,"remaining_ms":29875.505}
+MEMBER_DIAGNOSTIC {"phase":"before.initial.facts","elapsed_ms":30124.554,"remaining_ms":29875.444}
+MEMBER_DIAGNOSTIC {"phase":"after.initial.facts","elapsed_ms":33605.895,"remaining_ms":26394.104}
+MEMBER_DIAGNOSTIC {"phase":"before.current.facts-callbacks","elapsed_ms":34988.595,"remaining_ms":25011.404}
+MEMBER_DIAGNOSTIC {"phase":"after.current.facts-callbacks","elapsed_ms":36288.371,"remaining_ms":23711.627}
+MEMBER_DIAGNOSTIC {"phase":"before.current.reservation-callbacks","elapsed_ms":36288.4,"remaining_ms":23711.598}
+MEMBER_DIAGNOSTIC {"phase":"after.current.reservation-callbacks","elapsed_ms":45891.203,"remaining_ms":14108.795}
+MEMBER_DIAGNOSTIC {"phase":"before.current.facts-raw","elapsed_ms":45891.353,"remaining_ms":14108.645}
+MEMBER_DIAGNOSTIC {"phase":"after.current.facts-raw","elapsed_ms":45936.111,"remaining_ms":14063.887}
+MEMBER_DIAGNOSTIC {"phase":"before.current.reservation-raw","elapsed_ms":45936.134,"remaining_ms":14063.865}
+MEMBER_DIAGNOSTIC {"phase":"after.current.reservation-raw","elapsed_ms":46195.096,"remaining_ms":13804.902}
+MEMBER_DIAGNOSTIC {"phase":"after.inspection-values","elapsed_ms":46429.027,"remaining_ms":13570.972}
+MEMBER_DIAGNOSTIC {"phase":"after.observer-prepare","elapsed_ms":46904.851,"remaining_ms":13095.148}
+MEMBER_DIAGNOSTIC {"phase":"before.current.facts-callbacks","elapsed_ms":47385.899,"remaining_ms":12614.099}
+MEMBER_DIAGNOSTIC {"phase":"after.current.facts-callbacks","elapsed_ms":48644.16,"remaining_ms":11355.839}
+MEMBER_DIAGNOSTIC {"phase":"before.current.reservation-callbacks","elapsed_ms":48644.184,"remaining_ms":11355.815}
+MEMBER_DIAGNOSTIC {"phase":"after.current.reservation-callbacks","elapsed_ms":58536.971,"remaining_ms":1463.028}
+MEMBER_DIAGNOSTIC {"phase":"before.current.facts-raw","elapsed_ms":58537.093,"remaining_ms":1462.906}
+MEMBER_DIAGNOSTIC {"phase":"after.current.facts-raw","elapsed_ms":58594.557,"remaining_ms":1405.441}
+MEMBER_DIAGNOSTIC {"phase":"before.current.reservation-raw","elapsed_ms":58594.586,"remaining_ms":1405.412}
+MEMBER_DIAGNOSTIC {"phase":"after.current.reservation-raw","elapsed_ms":58880.205,"remaining_ms":1119.794}
+MEMBER_DIAGNOSTIC {"phase":"after.normal-commit","elapsed_ms":59141.574,"remaining_ms":858.425}
+MEMBER_DIAGNOSTIC {"phase":"after.normal-commit-owned","elapsed_ms":59141.94,"remaining_ms":858.058}
+MEMBER_DIAGNOSTIC {"phase":"after.committed-frame-begin","elapsed_ms":59142.809,"remaining_ms":857.19}
+MEMBER_DIAGNOSTIC {"phase":"before.committed.facts-callbacks","elapsed_ms":59142.83,"remaining_ms":857.168}
+MEMBER_DIAGNOSTIC {"phase":"after.committed.facts-callbacks","elapsed_ms":59734.641,"remaining_ms":265.357}
+MEMBER_DIAGNOSTIC {"phase":"before.committed.reservation-callbacks","elapsed_ms":59734.668,"remaining_ms":265.33}
+MEMBER_DIAGNOSTIC {"phase":"committed.refusal","elapsed_ms":60366.539,"remaining_ms":-366.541,"exception_class":"App\\Domain\\Customers\\ProductionIdentity\\IdentityException","reason":"committed_frame_required","site":"IdentityCommittedFrame.php:81","frames":["App\\Domain\\Customers\\ProductionIdentity\\IdentityCommittedFrame->assertActive","App\\Domain\\Memberships\\Production\\MembershipBillingEvidence::committed","App\\Domain\\Memberships\\Production\\MembershipReservationContext->committedCallbacks","App\\Domain\\Memberships\\Production\\MembershipReservationContext->memberCommittedCallbacks","App\\Domain\\Memberships\\Production\\MembershipReservations->memberCommittedCallbacks","App\\Domain\\Grants\\Member\\MemberOriginalInspection->proveCommitted","App\\Domain\\Grants\\Member\\MemberOriginalCommittedProof->prove","App\\Domain\\Grants\\Member\\MemberOriginalSourceCapture->inspect","App\\Domain\\Grants\\Member\\MemberOriginalSourceCapture->capture","App\\Domain\\Grants\\Member\\MemberOriginals->prepare"]}
+[31;1mE[0m                                                                   1 / 1 (100%)
+
+Time: 04:02.978, Memory: 93.00 MB
+
+There was 1 error:
+
+1) Tests\Feature\ProductionMemberOriginals\MemberOriginalPreparationIntegrationTest::test_real_authored_sources_prepare_an_exact_repeat_without_original_or_credit_effects
+App\Domain\Grants\Member\MemberGrantException: Member original unavailable.
+
+/workspace/runtime/member-original-operation-evidence/native-preparation-diagnostic/MemberOriginalSourceCapture.php:219
+/workspace/runtime/member-original-operation-evidence/native-preparation-diagnostic/MemberOriginalSourceCapture.php:60
+/workspace/VA-Studio-member-original-operation/app/Domain/Grants/Member/MemberOriginals.php:37
+/workspace/VA-Studio-member-original-operation/tests/Support/MemberOriginalFixtures.php:106
+/workspace/VA-Studio-member-original-operation/tests/Feature/ProductionMemberOriginals/MemberOriginalPreparationIntegrationTest.php:43
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104
+
+[37;41mERRORS![0m
+[37;41mTests: 1[0m[37;41m, Assertions: 16[0m[37;41m, Errors: 1[0m[37;41m.[0m

@@ -1,0 +1,165 @@
+{
+  "actual_CSRF_control": {
+    "PHP_recorder_observed_OS_exits": [
+      0,
+      0,
+      0
+    ],
+    "bindings": [
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/producer-csrf-original-red/result.json",
+        "sha256": "9c3f703cca844be9a2c462a683c84633322afba7518c28cdb0f52fdea5a1b71c"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/producer-csrf-original-red/command.json",
+        "sha256": "afd74747caaccd37a8e7596395033f6ece373beaa24bee22ba30198a1018c18d"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/producer-csrf-original-red/junit.xml",
+        "sha256": "13a2438b3737e6c3396d2046b2f221c93059a93e391099674cb466e37bf0a677"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/producer-csrf-original-red/os-exit.json",
+        "sha256": "fa0a8d9f2e5a7467aabcc43aa6b5fde2a479021b8091e558a9da3b1d827cea8d"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/launch-producer-csrf-original-red.json",
+        "sha256": "39d26f43d22dbd54e1b1f8e15e959ec514bd40e6b8240d0e95bc2a835a6c9e64"
+      }
+    ],
+    "case_names": [
+      "test_real_producer_csrf_equality_and_rotation_return_private_419_without_input_flash"
+    ],
+    "counts": {
+      "assertions": 17,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 1
+    },
+    "input_count": 2423,
+    "launch_identity": {
+      "pid": 213660,
+      "start_ticks": "8608813",
+      "uid": 1000
+    },
+    "name": "producer-csrf-original-red",
+    "source": "bb3d29983d6d225cfb62d9607beaa54874f3aa03",
+    "source_head_status_runner_autoload_unchanged": true
+  },
+  "app_runtime_routes_config_schema_CI_profiles_dependency_delta": [],
+  "carry_assessment": "All application/runtime source is byte-identical to e3. Only a new root regression is added. e3 source approval and direct2/40 completion carry to bb; earlier ae1 producer/V1/other Tax case component carries remain narrowly qualified by the already reviewed raw-read change. Original ae1 whole48/970/E1 remains failed. No current freshly executed whole journey/native/full-suite claim follows.",
+  "conditions": [
+    "Reconcile final whole-root OS, formatting/static receipts, unchanged source/loader/component carries and all original invocation classifications in sealed packet.",
+    "Final independent immutable source/evidence decision on actual integrated head before publication readiness.",
+    "Cheap exact-head preflight and expected-SHA merge, no bypass/settings change.",
+    "Default-off/unbound synthetic scope and original host/provider/live/full-suite/native/frozen-domain conditions remain."
+  ],
+  "correction": "The parent/reviewer exchange anticipated that the producer privacy generic catch would transform a real TokenMismatch to503. That composition assumption was wrong. The mounted Laravel Routing Pipeline handles the exception inside the route slice through the actual root handler, which maps TokenMismatch to HttpException419 and applies the private JSON response. Delegated privacy receives the resulting Response. No producer/root mapping patch is necessary.",
+  "created_utc": "2026-10-15T11:56:17.558242+00:00",
+  "current_e3_focused_continuation": {
+    "PHP_recorder_observed_OS_exits": [
+      0,
+      0,
+      0
+    ],
+    "bindings": [
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/unfinished-two-line-and-current-timing/result.json",
+        "sha256": "d7179200be36c84eb4f1381cdf6581fece797330bc390c43e494ee5f31b0ea61"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/unfinished-two-line-and-current-timing/command.json",
+        "sha256": "6c641e90d14c514cbd348cca4ffae751afa86c6b20bcd2f7981372a240d779fe"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/unfinished-two-line-and-current-timing/junit.xml",
+        "sha256": "68a90b759bc141649bdf00f95cc0822b501630d655a0f1f3705816a108cadc75"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/unfinished-two-line-and-current-timing/os-exit.json",
+        "sha256": "7a6d4eca1cfc4f7eb967a032ed117a93cbf45ae16627f0a4ef1dd904f7b4b3dd"
+      },
+      {
+        "path": "/workspace/runtime/paid252-tax-http-evidence-20261015/launch-unfinished-two-line-and-current-timing.json",
+        "sha256": "7b2c81439a9b6989010e7dfd79926043fe534140551dc9044f2f42d184937ba9"
+      }
+    ],
+    "case_names": [
+      "test_identity_delay_cannot_replace_the_original_request_budget_and_expiry_prevents_attempt",
+      "test_two_line_physical_failure_retains_first_original_then_retries_whole_order"
+    ],
+    "counts": {
+      "assertions": 40,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "tests": 2
+    },
+    "input_count": 2423,
+    "launch_identity": {
+      "pid": 213285,
+      "start_ticks": "8595806",
+      "uid": 1000
+    },
+    "name": "unfinished-two-line-and-current-timing",
+    "source": "e3f06b084538dac11665ff9be77c74228bdab64d",
+    "source_head_status_runner_autoload_unchanged": true
+  },
+  "decision": "APPROVE SOURCE AND NARROW CARRY WITH CONDITIONS",
+  "execution_boundary": {
+    "reviewer_app_tests_DB_network_hosted_operations": 0,
+    "reviewer_tracked_edits": 0
+  },
+  "historical_records": "All prior REVISE/APPROVE artifacts stay unchanged. The file/run name producer-csrf-original-red records an anticipated red selection, but its actual result is PASS and cannot be called a behavioral defect oracle.",
+  "observed_additional_receipt_without_OS_claim": {
+    "name": "whole-root-with-real-producer-csrf",
+    "result": {
+      "after_digest": "55114d641950032e6300af9b87940424a88307119c46bdca094470df45652d6c",
+      "autoload_unchanged": true,
+      "bundle": "bundle-bb3d29983d6d-bce93778e8ac0e0f",
+      "ended_utc": "2026-10-15T11:54:42.723302+00:00",
+      "junit": {
+        "assertions": 597,
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 45
+      },
+      "junit_error": null,
+      "log_sha256": "7a26582f7c287591c051cc54e7044c94c24046baeb954aa68569429c14ac53e0",
+      "process_exit": 0,
+      "runner_after_sha256": "a5908e958759cd394bdf1743197af64c5d6ed40c08cc997710181c8699688427",
+      "runner_unchanged": true,
+      "source_after": {
+        "head": "bb3d29983d6d225cfb62d9607beaa54874f3aa03",
+        "status": ""
+      },
+      "source_head_unchanged": true,
+      "source_input_count": 2423,
+      "source_status_unchanged": true,
+      "source_unchanged": true,
+      "started_utc": "2026-10-15T11:54:41.505958+00:00",
+      "verifier_exit": 0,
+      "wall_seconds": 1.2171652919932967
+    },
+    "scope": "Result/JUnit45/597 PHP/recorder0 observed; no OS witness read in this correction note. Reconcile in final seal.",
+    "source": "bb3d29983d6d225cfb62d9607beaa54874f3aa03"
+  },
+  "open_P0": false,
+  "open_P1": false,
+  "preparation_failures": [],
+  "previous_approved_source_sha": "e3f06b084538dac11665ff9be77c74228bdab64d",
+  "read_commands": [
+    "git head/status; e3..bb app/test diff",
+    "Installed Illuminate Routing Pipeline::handleException and Handler TokenMismatch mapping",
+    "Root bootstrap response handler and existing producer privacy next/catch",
+    "Direct result/command/JUnit/launch/OS receipts for producer-CSRF and focused continuation"
+  ],
+  "required_source_repairs": [],
+  "reviewed_sha": "bb3d29983d6d225cfb62d9607beaa54874f3aa03",
+  "source_delta": [
+    "tests/Feature/PaidTaxRootHttpBoundaryTest.php"
+  ],
+  "test_quality": "Disables PreventRequestForgery runningUnitTests bypass. Exact session token reaches guest403, invalid token419, rotation invalidates old token419, fresh token reaches guest403; private headers/no Location/no private marker/no flashed input are asserted. This is a genuine supported positive plus negative comparison, not a mock419."
+}

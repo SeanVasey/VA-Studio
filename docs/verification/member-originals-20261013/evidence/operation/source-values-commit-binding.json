@@ -1,0 +1,8 @@
+{
+  "commit": "cff76302f11661c44a4583d2f20d5e368b0b6aa1",
+  "files": {
+    "app/Domain/Grants/Member/MemberOriginalSourceValues.php": "3aaf06cf5d36fe419e300e4413933edb12ee3ecec705b6e71116c89284de7748",
+    "tests/Unit/MemberOriginalSourceValuesTest.php": "3008d747bfa2be41ccb992b128d6e910a7e9c84921b1fee07406f4a53c146ce9"
+  },
+  "source": "Precommit two-file overlay; all1975 captured inputs unchanged. Other unexecuted composition drafts are not committed-source claims."
+}

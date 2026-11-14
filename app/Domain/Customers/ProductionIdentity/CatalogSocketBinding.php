@@ -1,0 +1,414 @@
+<?php
+
+namespace App\Domain\Customers\ProductionIdentity;
+
+use LogicException;
+use PDO;
+use ReflectionClass;
+use ReflectionFunction;
+use Throwable;
+
+/** Linux/mysqlnd direct literal-IP TCP only; no connection, packet IO, provider injection or other PID. */
+final class CatalogSocketBinding
+{
+    private static bool $tainted = false;
+
+    private const MAX_BYTES = 1048576;
+
+    private const MAX_ROWS = 8192;
+
+    private const MAX_FDS = 4096;
+
+    private const SNAPSHOT_ATTEMPTS = 3;
+
+    /** The IPv6 table of a kernel built or booted without IPv6: it holds no socket, so it adds no row to the proof. */
+    public const ABSENT_IPV6_TABLE = "  sl  local_address remote_address st tx_queue rx_queue tr tm->when retrnsmt uid timeout inode\n";
+
+    public static function requireUntainted(): void
+    {
+        if (self::$tainted) {
+            self::refuse();
+        }
+        self::internalFunctions();
+    }
+
+    private static function internalFunctions(): void
+    {
+        // Disabled functions may be redeclared in PHP. Qualification alone does not make them native.
+        foreach (['stream_wrapper_restore', 'set_error_handler', 'restore_error_handler', 'stream_context_create',
+            'stream_context_get_options', 'stream_context_get_params', 'opendir', 'readdir', 'readlink', 'closedir',
+            'fopen', 'file_exists', 'stream_get_meta_data', 'stream_get_contents', 'feof', 'fclose', 'is_resource', 'is_string',
+            'is_int', 'is_array', 'is_object', 'is_numeric', 'in_array', 'count', 'array_is_list', 'array_all',
+            'array_values', 'array_unique', 'array_shift', 'array_slice', 'array_map', 'array_keys', 'array_column',
+            'array_fill', 'array_fill_keys', 'array_merge', 'array_combine', 'array_diff', 'array_key_exists',
+            'preg_match', 'preg_split', 'preg_replace_callback', 'inet_pton', 'inet_ntop', 'pack', 'hexdec',
+            'explode', 'implode', 'rtrim', 'trim', 'str_split', 'strlen', 'substr', 'substr_count', 'str_replace',
+            'strpbrk', 'str_contains', 'str_starts_with', 'str_ends_with', 'filter_var', 'ksort', 'hrtime', 'version_compare'] as $name) {
+            try {
+                if (! (new ReflectionFunction($name))->isInternal()) {
+                    self::$tainted = true;
+                    self::refuse();
+                }
+            } catch (Throwable) {
+                self::$tainted = true;
+                self::refuse();
+            }
+        }
+    }
+
+    public static function attest(PDO $primary, #[\SensitiveParameter] array $writer, array $context, string $status): array
+    {
+        self::requireUntainted();
+        if (! self::supportedPhp(\PHP_VERSION, \PHP_MAJOR_VERSION, \PHP_MINOR_VERSION) || \PHP_OS_FAMILY !== 'Linux' || ! \in_array($primary::class, [PDO::class, 'Pdo\\Mysql'], true)
+            || ! (new ReflectionClass($primary))->isInternal()
+            || ! \str_starts_with((string) $primary->getAttribute(PDO::ATTR_CLIENT_VERSION), 'mysqlnd ')) {
+            self::refuse();
+        }
+        // Refuse unsupported descriptor/provider profiles before any filesystem access or constructor.
+        self::requested($writer, $context, $status);
+
+        return self::retrying(self::snapshot(...), self::prove(...), $writer, $context, $status);
+    }
+
+    /**
+     * The proven PHP 8.4 series from 8.4.27 onward: a routine 8.4 patch update (Forge, CI setup-php '8.4') keeps the proof
+     * running. Another minor or major version (8.5+, or anything older) refuses until its native behaviour is proven.
+     */
+    private static function supportedPhp(string $version, int $major, int $minor): bool
+    {
+        return \version_compare($version, '8.4.27', '>=') && $major === 8 && $minor === 4;
+    }
+
+    /**
+     * procfs regenerates the TCP table per read() chunk and resumes by bucket offset, so concurrent socket churn can repeat
+     * or skip a row. A torn read only ever refuses; a fresh complete snapshot must still prove the binding. Only a proof
+     * refusal is retried, at most SNAPSHOT_ATTEMPTS times in all: a snapshot failure (taint, provider, or a TCP table over
+     * its read cap) propagates at once, so an oversized table refuses this attempt without a retry.
+     * The writer is passed as its own redacted parameter, never captured by a closure: SensitiveParameter redacts
+     * parameters in exception traces, not variables a closure holds.
+     */
+    private static function retrying(\Closure $snapshot, \Closure $prove, #[\SensitiveParameter] array $writer, array $context, string $status): array
+    {
+        for ($attempt = 1; ; $attempt++) {
+            [$inodes, $tcp, $tcp6] = $snapshot();
+            try {
+                return $prove($writer, $context, $status, $inodes, $tcp, $tcp6);
+            } catch (LogicException $error) {
+                if ($attempt >= self::SNAPSHOT_ATTEMPTS) {
+                    throw $error;
+                }
+            }
+        }
+    }
+
+    /** Pure proof over bounded native snapshots. This method never constructs a PDO or accepts a provider/path. */
+    public static function prove(#[\SensitiveParameter] array $writer, array $context, string $status, array $inodes, string $tcp, string $tcp6): array
+    {
+        [$host, $port, $client, $sourcePort] = self::requested($writer, $context, $status);
+        if ($inodes === [] || \count($inodes) > self::MAX_FDS || ! \array_is_list($inodes)) {
+            self::refuse();
+        }
+        $owned = [];
+        foreach ($inodes as $inode) {
+            if (! \is_string($inode) || \preg_match('/\A[1-9][0-9]{0,19}\z/D', $inode) !== 1) {
+                self::refuse();
+            }
+            $owned[$inode] = true;
+        }
+        $matches = [];
+        $seen = [];
+        foreach ([...self::table($tcp, 8, $owned), ...self::table($tcp6, 32, $owned)] as $row) {
+            if (isset($seen[$row['inode']])) {
+                self::refuse();
+            }
+            $seen[$row['inode']] = true;
+            // Never choose primary by whichever socket matches the request: the server-reported client endpoint must match.
+            // That endpoint alone is not unique: Linux connect() reuses an ephemeral local port for sockets with DIFFERENT
+            // peers (only the 4-tuple must be unique), so an owned SMTP/HTTP client socket can share it. The endpoint
+            // plus the literal requested peer is the TCP 4-tuple of the primary session, unique among established sockets in this
+            // network namespace.
+            if ($row['state'] === '01' && $row['local_port'] === $sourcePort && \inet_pton($row['local_ip']) === \inet_pton($client)
+                && $row['remote_port'] === $port && \inet_pton($row['remote_ip']) === \inet_pton($host)) {
+                $matches[$row['inode']] = $row;
+            }
+        }
+        if (\count($matches) !== 1) {
+            self::refuse();
+        }
+        $actual = \array_values($matches)[0];
+        if (\inet_pton($actual['remote_ip']) !== \inet_pton($host) || $actual['remote_port'] !== $port) {
+            self::refuse();
+        }
+
+        return $actual;
+    }
+
+    private static function requested(#[\SensitiveParameter] array $writer, array $context, string $status): array
+    {
+        $host = $writer['host'] ?? null;
+        $port = $writer['port'] ?? null;
+        $clientEndpoint = $context['client_endpoint'] ?? null;
+        $serverPort = $context['server_port'] ?? null;
+        if (($writer['socket'] ?? null) !== '' || ! \is_string($host) || \filter_var($host, \FILTER_VALIDATE_IP) === false
+            || ! \is_int($port) || $port < 1 || $port > 65535 || ! \is_int($serverPort) || $serverPort !== $port
+            || ! \str_ends_with($status, ' via TCP/IP') || ! \is_string($clientEndpoint)
+            || \preg_match('/\A(.+):([1-9][0-9]{0,4})\z/D', $clientEndpoint, $match) !== 1 || (int) $match[2] > 65535) {
+            self::refuse();
+        }
+        $client = $match[1];
+        if (\str_starts_with($client, '[') && \str_ends_with($client, ']')) {
+            $client = \substr($client, 1, -1);
+        }
+        $statusHost = \substr($status, 0, -\strlen(' via TCP/IP'));
+        if (\filter_var($client, \FILTER_VALIDATE_IP) === false || \filter_var($statusHost, \FILTER_VALIDATE_IP) === false
+            || \inet_pton($statusHost) !== \inet_pton($host)) {
+            self::refuse();
+        }
+
+        return [$host, $port, $client, (int) $match[2]];
+    }
+
+    private static function table(string $text, int $width, array $owned): array
+    {
+        if (\strlen($text) > self::MAX_BYTES || \str_contains($text, "\0")) {
+            self::refuse();
+        }
+        $lines = \explode("\n", \rtrim($text, "\n"));
+        if (\count($lines) > self::MAX_ROWS || \preg_match('/\A\s*sl\s+local_address\s+(?:rem_address|remote_address)\s+st\s+tx_queue\s+rx_queue\s+tr\s+tm->when\s+retrnsmt\s+uid\s+timeout\s+inode\s*\z/D', \array_shift($lines)) !== 1) {
+            self::refuse();
+        }
+        $rows = [];
+        foreach ($lines as $line) {
+            if (\strlen($line) > 512) {
+                self::refuse();
+            }
+            $fields = \preg_split('/\s+/', \trim($line));
+            if (\count($fields) < 10 || \count($fields) > 20 || \preg_match('/\A[0-9]+:\z/D', $fields[0]) !== 1
+                || \preg_match('/\A[0-9]+\z/D', $fields[9]) !== 1) {
+                self::refuse();
+            }
+            if (! isset($owned[$fields[9]])) {
+                continue;
+            }
+            if (\preg_match('/\A[0-9A-F]{2}\z/D', $fields[3]) !== 1
+                || \preg_match('/\A[0-9A-F]{8}:[0-9A-F]{8}\z/D', $fields[4]) !== 1
+                || \preg_match('/\A[0-9A-F]{2}:[0-9A-F]{8}\z/D', $fields[5]) !== 1
+                || \preg_match('/\A[0-9A-F]{8}\z/D', $fields[6]) !== 1
+                || \preg_match('/\A[0-9]+\z/D', $fields[7]) !== 1 || \preg_match('/\A[0-9]+\z/D', $fields[8]) !== 1) {
+                self::refuse();
+            }
+            if ($fields[3] === '01') {
+                if (\count($fields) !== 17 || \preg_match('/\A[0-9]+\z/D', $fields[10]) !== 1 || \preg_match('/\A[0-9A-Fa-f]{8,16}\z/D', $fields[11]) !== 1) {
+                    self::refuse();
+                }
+                foreach (\array_slice($fields, 12) as $extra) {
+                    if (\preg_match('/\A-?[0-9]+\z/D', $extra) !== 1) {
+                        self::refuse();
+                    }
+                }
+            }
+            [$local, $localPort] = self::endpoint($fields[1], $width);
+            [$remote, $remotePort] = self::endpoint($fields[2], $width);
+            $rows[] = ['inode' => $fields[9], 'state' => $fields[3], 'local_ip' => $local, 'local_port' => $localPort, 'remote_ip' => $remote, 'remote_port' => $remotePort];
+        }
+
+        return $rows;
+    }
+
+    private static function endpoint(string $value, int $width): array
+    {
+        if (\preg_match('/\A([0-9A-F]{'.$width.'}):([0-9A-F]{4})\z/D', $value, $parts) !== 1) {
+            self::refuse();
+        }
+        $binary = '';
+        foreach (\str_split($parts[1], 8) as $word) {
+            // /proc prints each native-endian 32-bit address word; pack restores network bytes.
+            $binary .= \pack('L', \hexdec($word));
+        }
+        $ip = \inet_ntop($binary);
+        $port = \hexdec($parts[2]);
+        if ($ip === false || $port > 65535) {
+            self::refuse();
+        }
+
+        return [$ip, $port];
+    }
+
+    private static function nativeProvider(): void
+    {
+        self::requireUntainted();
+        $seen = false;
+        \set_error_handler(static function (int $severity, string $message) use (&$seen): bool {
+            return self::providerNotice($severity, $message, $seen);
+        });
+        try {
+            $result = \stream_wrapper_restore('file');
+            self::providerOutcome($result, $seen);
+        } catch (Throwable) {
+            self::$tainted = true;
+            self::refuse();
+        } finally {
+            if (! \restore_error_handler()) {
+                self::$tainted = true;
+                self::refuse();
+            }
+        }
+    }
+
+    private static function providerNotice(int $severity, string $message, bool &$seen): bool
+    {
+        if (! $seen && $severity === \E_NOTICE && $message === 'stream_wrapper_restore(): file:// was never changed, nothing to restore') {
+            $seen = true;
+
+            return true;
+        }
+        self::$tainted = true;
+        self::refuse();
+    }
+
+    private static function providerOutcome(mixed $result, bool $seen): void
+    {
+        if ($result !== true || ! $seen) {
+            // PHP may ALREADY have restored an altered request-local wrapper on this unsupported branch.
+            // Poison survives repair: no later no-op can authorize a retry in this execution lifetime.
+            self::$tainted = true;
+            self::refuse();
+        }
+    }
+
+    private static function freshContext(): mixed
+    {
+        self::requireUntainted();
+        $context = \stream_context_create([]);
+        if (! \is_resource($context) || \stream_context_get_options($context) !== []
+            || \stream_context_get_params($context) !== ['options' => []]) {
+            self::refuse();
+        }
+
+        return $context;
+    }
+
+    /**
+     * Any snapshot failure taints the worker, except a TCP table over its read cap: the table is the whole network
+     * namespace's, so a busy host can exceed the cap and shrink again. That refuses this attempt only, after the same
+     * cleanup, and a later attempt reads a fresh table. $read replaces the native table read in tests only.
+     */
+    private static function snapshot(?\Closure $read = null): array
+    {
+        self::requireUntainted();
+        $read ??= self::fixedFile(...);
+        // Fixed own handler covers provider attestation AND every proc operation; caller handler is never invoked.
+        \set_error_handler(static function (): never {
+            self::$tainted = true;
+            self::refuse();
+        });
+        $directory = null;
+        try {
+            self::nativeProvider();
+            $context = self::freshContext();
+            $directory = \opendir('/proc/self/fd', $context);
+            if (! \is_resource($directory) || (\stream_get_meta_data($directory)['wrapper_type'] ?? null) !== 'plainfile') {
+                self::refuse();
+            }
+            $inodes = [];
+            $count = 0;
+            while (($entry = \readdir($directory)) !== false) {
+                if ($entry === '.' || $entry === '..') {
+                    continue;
+                }
+                if (++$count > self::MAX_FDS || \preg_match('/\A[0-9]+\z/D', $entry) !== 1) {
+                    self::refuse();
+                }
+                $target = \readlink('/proc/self/fd/'.$entry);
+                if (! \is_string($target)) {
+                    self::refuse();
+                }
+                if (\preg_match('/\Asocket:\[([1-9][0-9]{0,19})\]\z/D', $target, $match) === 1) {
+                    $inodes[] = $match[1];
+                }
+            }
+
+            $tcp = $read(false, $context);
+            $tcp6 = $tcp === null ? null : self::ipv6Table($context, $read);
+            if ($tcp !== null && $tcp6 !== null) {
+                return [\array_values(\array_unique($inodes)), $tcp, $tcp6];
+            }
+        } catch (Throwable) {
+            self::$tainted = true;
+            self::refuse();
+        } finally {
+            try {
+                if (\is_resource($directory)) {
+                    \closedir($directory);
+                }
+            } finally {
+                if (! \restore_error_handler()) {
+                    self::$tainted = true;
+                    self::refuse();
+                }
+            }
+        }
+        // Reached only when a table exceeded its read cap: refuse this attempt, outside the catch, so it does not taint.
+        self::refuse();
+    }
+
+    /**
+     * Without the IPv6 stack the kernel exposes neither if_inet6 nor tcp6, and no IPv6 socket can exist, so the empty
+     * table is the complete snapshot. A present IPv4 table is still required, and any present IPv6 file is read in full.
+     * The empty table can never cause a false binding: prove() compares addresses byte for byte, tcp rows decode to four
+     * bytes and tcp6 rows (IPv4-mapped included) to sixteen, so an IPv4 primary never matches a tcp6 row and an IPv6
+     * primary finds no match and refuses. The IPv6 module cannot be unloaded, so absent now means absent when the primary
+     * socket and the fd snapshot were made. This relies on a real Linux procfs (not WSL1, gVisor or a FUSE /proc).
+     */
+    private static function ipv6Table(mixed $context, \Closure $read): ?string
+    {
+        if (! \file_exists('/proc/self/net/tcp6') && ! \file_exists('/proc/self/net/if_inet6') && \file_exists('/proc/self/net/tcp')) {
+            return self::ABSENT_IPV6_TABLE;
+        }
+
+        return $read(true, $context);
+    }
+
+    /** The whole table, or null when it exceeds MAX_BYTES; any other read anomaly refuses (and taints, in snapshot). */
+    private static function fixedFile(bool $ipv6, mixed $context): ?string
+    {
+        $file = \fopen($ipv6 ? '/proc/self/net/tcp6' : '/proc/self/net/tcp', 'rb', false, $context);
+        if (! \is_resource($file)) {
+            self::refuse();
+        }
+        try {
+            if ((\stream_get_meta_data($file)['wrapper_type'] ?? null) !== 'plainfile') {
+                self::refuse();
+            }
+            $text = \stream_get_contents($file, self::MAX_BYTES + 1);
+
+            return self::capped($text, \is_string($text) && \feof($file));
+        } finally {
+            if (! \fclose($file)) {
+                self::$tainted = true;
+                self::refuse();
+            }
+        }
+    }
+
+    /** Only a read that ran past the cap is transient (null); a failed read, or a short one without EOF, is suspicious. */
+    private static function capped(mixed $text, bool $eof): ?string
+    {
+        if (! \is_string($text)) {
+            self::refuse();
+        }
+        if (\strlen($text) > self::MAX_BYTES) {
+            return null;
+        }
+        if (! $eof) {
+            self::refuse();
+        }
+
+        return $text;
+    }
+
+    private static function refuse(): never
+    {
+        throw new LogicException('Provable owned direct TCP metadata target required.');
+    }
+}

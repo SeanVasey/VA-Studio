@@ -1,0 +1,38 @@
+Public-safe carry of the existing independent decision; original SHA256
+`f45c2c4dad5dd118ceb13c690e71586c95ee0d9a0d7616fe2bca2d7b136ad2e1`.
+Only the absolute local execution path is replaced below; the original verdict,
+evidence limits and historical status are retained. This is not a new review.
+See [current timer results](timer-actual-results.md) for later status.
+
+---
+
+Independent six N7 v3 mutant actual assessment
+
+Verdict: **ACCEPT six bounded KILLED classifications for the six frozen SQLite experiments; no supported P0–P2 evidence discrepancy.** This establishes the specified selected-test sensitivity and first-failure scopes below. It is not exhaustive guard coverage, native/backend/concurrency evidence, full N7 acceptance or any new operation/PR/mount authority.
+
+Reviewed original safe owner-receipt.json, worker-receipt.json and origin-observation.json for all M01–M06 under `<local-source-root>/member-timer-epoch-mutants-source-20261102-03`, their frozen specs/helpers/patches and reviewed classifier source. All45 frozen source/projection inventory pins remain unchanged at INVENTORY SHA256 `8563ea9a372089b3bca31c9863e51dce36e86d2637a79633d27de27944db7393`. Safe actual pin record `independent-n7-mutants-v3-six-actual-PINS.json` SHA256 `287da726cc9c9c28a799cd0464b74ed59d54ddbcf0190e892a61465e7130f108` binds all18 original safe files and canonical source hashes.
+
+Carried exact-source reviews: code/selected baseline decision `81a89e2742db3ad2f966514261116cf27bf3352955a270657e9518d09bff8fbe`, v3 suppression-semantic source decision `9ac54378d461251cd582117d6ab8e48a464a8eb80faab3a4ac2e5b461937c7e4`. Canonical0159 helper435317c4/new test4cd42613/unchanged test e0a522b2 bytes remain unchanged. Canonical selected20 PASS/1,323assertions remains separate positive evidence.
+
+ROOT reports six exact owning sessions terminalnormal0 and leases closed: M01/5108, M02/17665, M03/69356, M04/66975, M05/20409, M06/54705. Reviewer did not poll/re-wait them. Each original outside owner records normal0, owned reap, actual bothEOF+closed, no stderr/timeout/overflow/failure and KILLED status. The target PHPUnit exit is deliberately1, distinct from the successful outside capture/classification exit0.
+
+| Case | Selected target result | Accepted demonstrated scope |
+| --- | --- | --- |
+| M01 | 1test/19assertions/1specified failure; expected200/actual503 | Changing snapshot timer `<now` to `<=now` is detected at the first fractional-tail read refusal. It does not establish completion of later read/write-loop branches in that mutated run. |
+| M02 | 1/13/1; expected503/actual200 | Removing the whole post-hit snapshot/acceptance block is detected by the first missing-timer branch. Corrupt/replaced timer, changed/missing count and individual acceptance conjuncts are not separately credited from this first failure. |
+| M03 | 1/13/1; expected503/actual200 | Removing immutable wall-deadline refusal is detected at expired ArrayLock without a successor before hit. The later during-hit branch is not credited. |
+| M04 | 1/13/1; expected503/actual200 | Removing the four-second monotonic bound is detected after the selected4.01s real stall with frozen wall time. Exact4s equality/type/overflow behavior is not newly demonstrated by this result. |
+| M05 | 1/27/1; expected503/actual200 | Removing the false-release/residual-owner refusal is detected at the first false-release branch after preceding takeover setup/control. The subsequent still-owned branch is not separately credited. |
+| M06 | 1/13/1; expected403/actual404 | Removing final identity proof is detected by the first identity-withdrawal status assertion. The later reauthenticated successful-domain/lock-released control is not reached and not credited. |
+
+Every target records exactly one selected class::method, one failure/zero errors/zero skips/positive assertions and all four fixed mutation predicates true: specified ExpectationFailedException, fixed expected/actual status literal, fixed assertSame literal and specific assertion match. Those exact private JUnit-body predicates were evaluated by the unchanged reviewed source in RAM. This reviewer accepts them as source/receipt-backed facts and did not manually reopen/hash raw JUnit/failure/debug/log bodies or stacks. There are six intended assertion failures across six separate processes, not six passing product tests.
+
+Each original worker safe lifecycle projection independently shows the one selected method, loaded20/filtered1/executed1, normal setup and teardown, the specified TestFailed, TestFinished and runner-final shell exit1. No setup/teardown error, risky/incomplete/skip, unexpected processed diagnostic or ambiguous lifecycle appears. Each has one exact suppressed PHPWarning trace marked was_suppressedtrue/processed_by_canonical_issue_filterfalse and canonical config respected. This is the previously reviewed pinned public PHPUnit filtering semantics, not a new warning-message waiver or retrospective warning-free claim.
+
+All six origin files equal their worker origin projections and fixed selected specs: actual helper loaded from exact mutant file, only helper classmap entry changed, canonical helper source unchanged, owned physical PHPUnit/vendor origin, PHP8.4.27, all13 module pins, SQLite-only PDO and bootstrap-not-yet-run. Before/after profile and PHP/known fixture-tool absence flags are true; source/vendor/HEAD closure is true. All30 inner command records have complete transport/reap/actual bothEOF+closed, stderr0, no timeout/overflow/failure; the five per-case exits are0,0,1,0,0. No original classification is accepted from an exit code alone; the positive assertion, origin, lifecycle and closure conjunction is present.
+
+Historical boundaries remain explicit: original v2 M01 owner/worker still classify UNKNOWN, even though its safe offline projection indicated the intended failure; no retroactive kill credit. Original single-process20 attempt remains TIMEOUT_UNCLASSIFIED/exit124/empty JUnit/UNKNOWN completed counts/cause, unchanged by later passing processes. Fourteen older N7 mutations apply to frozen e883 source and are not credited as current0159 coverage. No inference is made about every guard, intended production cache/server TTLs/clocks, hidden ABA, arbitrary custom providers, independent-process concurrency, native transitions, F9 physical headroom or full application readiness.
+
+These six results satisfy the six frozen experiments. For broader current-delta sensitivity, meaningful next SOURCE groups would isolate post-hit counter progression and epoch continuity while retaining the snapshot, and separately isolate residual-owner and final post-release timing refusal while retaining false-release/other timing guards. Fresh-epoch60s bracket and canonical/partial snapshot validation should remain explicitly outside any claimed mutation coverage until independently selected evidence exists. These are possible focused next work, not invented results or automatic rerun authority; any such packet needs its own exact review/ROOT lease. No exhaustive mutation score is asserted or required by this bounded acceptance.
+
+Membership mount remains literalfalse; frozen PR188/security quota, account/history/host prerequisites and deployment/live/provider boundaries remain unchanged. This independent actual assessment grants no push/merge, additional test, target operation or new runtime lease. Only original safe receipts and public/source references were read/hashed and own external decision/pin report written. No raw private/JUnit/debug/log/body read/hash, test repeat, actual Docker/PHP/SQL/probe/network/target action, source/receipt change or new agent occurred.

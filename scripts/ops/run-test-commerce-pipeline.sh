@@ -17,7 +17,9 @@
 # because processed, quarantined and not-yet-due receipts leave its selection.
 #
 # Deliberately NOT run here:
-#   - vasey:control-test-delivery: enabling downloads stays a per-order operator decision.
+#   - vasey:control-test-delivery: enabling downloads stays a per-order operator decision, unless the optional
+#     automatic test policy is on (VASEY_TEST_DELIVERY_AUTO_ENABLED, D-19 amendment 2026-11-12); the Laravel
+#     scheduler then runs vasey:auto-enable-test-delivery every minute, never this script.
 #   - vasey:reconcile-test-checkout: it can re-send Checkout Session creation (a provider write).
 # Every command here makes only Stripe GET requests (stages 1-2) or local database/file work (3-5).
 #

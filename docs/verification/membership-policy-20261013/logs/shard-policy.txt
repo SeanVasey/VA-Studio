@@ -1,0 +1,27 @@
+.E...........................E......................
+======================================================================
+ERROR: test_committed_policy_covers_every_driver_branching_file_under_tests_exactly (__main__.PartitionProofTest.test_committed_policy_covers_every_driver_branching_file_under_tests_exactly)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-membership-policy/scripts/ci/test-phpunit-shards.py", line 267, in test_committed_policy_covers_every_driver_branching_file_under_tests_exactly
+    selection = module.read_selection(repository)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/VA-Studio-membership-policy/scripts/ci/phpunit-shards.py", line 298, in read_selection
+    raise PartitionError("MySQL selection include_files must be sorted, unique repository test paths")
+phpunit_shards.PartitionError: MySQL selection include_files must be sorted, unique repository test paths
+
+======================================================================
+ERROR: test_selection_policy_rejects_unknown_shapes_and_the_committed_policy_selects_migration_files (__main__.PartitionProofTest.test_selection_policy_rejects_unknown_shapes_and_the_committed_policy_selects_migration_files)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/VA-Studio-membership-policy/scripts/ci/test-phpunit-shards.py", line 400, in test_selection_policy_rejects_unknown_shapes_and_the_committed_policy_selects_migration_files
+    committed = module.read_selection(repository)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/VA-Studio-membership-policy/scripts/ci/phpunit-shards.py", line 298, in read_selection
+    raise PartitionError("MySQL selection include_files must be sorted, unique repository test paths")
+phpunit_shards.PartitionError: MySQL selection include_files must be sorted, unique repository test paths
+
+----------------------------------------------------------------------
+Ran 52 tests in 0.052s
+
+FAILED (errors=2)

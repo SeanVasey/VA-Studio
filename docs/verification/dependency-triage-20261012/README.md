@@ -8,14 +8,14 @@ policy, focused local checks and exact-head cheap preflight. No Foundation or Gi
 | --- | --- | --- |
 | #71 | stripe/stripe-php 21.3.2 → 22.0.0 | Deferred to a dedicated SDK/API compatibility change. Do not merge as-is. `BillingProviderPin` and `StripeCapabilityPreflight` require SDK 21.3.2; the reviewed API is 2026-08-26.dahlia. |
 | #72 | tc-lib-pdf 8.76.3 → 8.78.2 | Deferred to a separately reviewed successor rendering profile. Current frozen test-v2 identities require the existing package versions and references. |
-| #73 | Vite 8.3.0 → 8.3.3 | Included in the tooling batch. Close the stale bot PR only after that batch merges. |
-| #74 | Laravel 13.34.0 → 13.35.0 | Queue with the Laravel/Inertia compatibility batch; #75 also carries this update. |
-| #75 | inertia-laravel 3.3.4 → 3.5.1 | Queue with #74 and the Inertia React update, including its Laravel/prompts dependency change. |
-| #76 | @types/node 24.13.3 → 26.6.4 | Reject this major for the Node >=24.15 <25 runtime. The tooling batch ignores automated types-major updates; a future runtime-major change must review that rule. Close the bot PR after this disposition merges. |
+| #73 | Vite 8.3.0 → 8.3.3 | Merged via #99; stale bot PR closed. |
+| #74 | Laravel 13.34.0 → 13.35.0 | Merged via #108; bot PR closed. |
+| #75 | inertia-laravel 3.3.4 → 3.5.1 | Merged via #108 with its Laravel/prompts change; bot PR closed. |
+| #76 | @types/node 24.13.3 → 26.6.4 | Reject this major for the Node >=24.15 <25 runtime. The tooling batch ignores automated types-major updates; a future runtime-major change must review that rule. Bot PR closed after #99 merged. |
 | #77 | tc-lib-pdf-font 4.4.1 → 4.5.1 | Deferred with #72; it also changes the frozen renderer identity. |
-| #78 | Vitest 5.0.1 → 5.0.3 | Included in the tooling batch, preserving the exact root pin. |
-| #79 | @vitejs/plugin-react 6.1.1 → 6.1.2 | Included in the tooling batch. |
-| #80 | @inertiajs/react 3.7.1 → 3.8.0 | Queue with #74/#75 so client and Laravel adapter behavior are checked together. |
+| #78 | Vitest 5.0.1 → 5.0.3 | Merged via #99, preserving the exact root pin; bot PR closed. |
+| #79 | @vitejs/plugin-react 6.1.1 → 6.1.2 | Merged via #99; bot PR closed. |
+| #80 | @inertiajs/react 3.7.1 → 3.8.0 | Merged via #108 with the Laravel adapter; bot PR closed. |
 
 No frozen `resources/contracts/*/profile-assets.json` member is edited or re-pinned. The PDF/font and Stripe bot
 PRs remain unmerged. This triage does not authorize a new rendering profile, provider version change, live account,
@@ -53,12 +53,15 @@ not evidence of the installed graph. Outdated's exit 1 means available updates, 
 | npm outdated before and after | Both exit 1 because updates are available; retained reports, not a failure-free freshness claim |
 
 Exact commands and source identity: [tooling/commands.md](tooling/commands.md). Console output and JUnit are retained,
-with only worktree paths, ANSI colour and trailing whitespace normalized. Source-bound independent review and
-exact-head cheap preflight are still required before the tooling merge. No browser, PHP, native MySQL or full
+with only worktree paths, ANSI colour and trailing whitespace normalized. Independent review APPROVE was carried to exact receipt-only head `027c674194c1b8b5c5a20231a6d805523413f855`.
+PR #99 merged at `0b4a2e76fd2ffc414863a1ba97b9354c9ec4cde8` after preflight `38319085298` passed. No browser, PHP, native MySQL or full
 Foundation execution is claimed for this npm-only batch; the PHP graph and frozen assets are unchanged.
 
-## Next batch
+## Laravel/Inertia batch
 
-Complete Laravel/Inertia #74/#75/#80 with their public release notes, installed graph/audit evidence, focused
-request and staff/contract consumer tests, and the actual stopped-copy upgrade tests required when Composer lock
-identity changes. Keep the SDK and all frozen renderer package identities unchanged. Then continue C2.
+The paired #74/#75/#80 targets are verified at dependency source `30c4f7ca`:
+[graph, exact commands, results and limits](adapters/README.md). Frontend 1,130; SQLite 260/3,474; MySQL 23/399;
+actual stopped-copy 14/14, builds/scans and audits passed. Stripe and frozen renderer identities stay unchanged.
+Independent APPROVE carried to exact head `c28fb81b`; preflight `38320089400` passed. PR #108 merged at
+`3ab71dd354199e86625ac6878564b9c7334fba43`; #74/#75/#80 are closed as superseded. Continue C2, beginning
+with its durable first-attempt billing evidence prerequisite.

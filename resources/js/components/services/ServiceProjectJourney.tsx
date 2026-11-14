@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 export type ServiceDefinition = { versionId: number; version: number; hash: string; title: string; description: string; questions: string[] };
 export type ServiceQuote = { id: string; hash: string; title: string; scope: string; currency: string; totalMinor: number; depositMinor: number; revisionAllowance: number; cancellation: string; milestones: { id: string; label: string; scope: string }[] };
 export type ServiceProjectSummary = { id: string; title: string; version: number; status: string; submittedAt: string };
-export type ServiceProject = ServiceProjectSummary & { testOnly: true; summary: string; answers: { question: string; answer: string }[]; quoteId: string | null; quoteHash: string | null; quotes: ServiceQuote[]; milestones: Record<string, string>; revisionsUsed: number; scopeFrozen: boolean; paymentState: 'not_collected'; deliveryAuthorized: false; history: { id: string; version: number; action: string; actor: 'staff' | 'buyer'; at: string; reason: string | null }[] };
+export type ServiceProject = ServiceProjectSummary & { testOnly: true; summary: string; answers: { question: string; answer: string }[]; quoteId: string | null; quoteHash: string | null; quotes: ServiceQuote[]; milestones: Record<string, string>; revisionsUsed: number; scopeFrozen: boolean; paymentState: 'not_collected' | 'partially_paid' | 'paid_in_full'; deliveryAuthorized: false; history: { id: string; version: number; action: string; actor: 'staff' | 'buyer'; at: string; reason: string | null }[] };
 export type ServiceProjectIndex = { schema: 1; testOnly: true; services: ServiceDefinition[]; projects: ServiceProjectSummary[] };
 type Pending = { path: string; body: Record<string, unknown> };
 

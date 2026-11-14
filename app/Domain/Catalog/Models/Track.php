@@ -3,10 +3,12 @@
 namespace App\Domain\Catalog\Models;
 
 use App\Domain\Catalog\PublicationReadiness;
+use App\Domain\Catalog\TrackVisibility;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Rights\Models\RightsDeclaration;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Validation\ValidationException;
 
 class Track extends Model
@@ -25,10 +27,11 @@ class Track extends Model
             if ($reserved !== null && ($track->slug !== $reserved || $track->published_slug !== $reserved)) {
                 throw ValidationException::withMessages(['slug' => 'A published track URL cannot change, including after unpublishing.']);
             }
-            if ($track->status === 'published' || $track->published_at !== null) {
+            if (TrackVisibility::isLive($track->status) || $track->published_at !== null) {
                 $track->published_slug ??= $track->slug;
             }
-            if ($track->status === 'published') {
+            // Unlisted tracks are sold like published ones, so they must keep qualifying exactly like published ones.
+            if (TrackVisibility::isLive($track->status)) {
                 $blockers = app(PublicationReadiness::class)->blockers($track);
                 if ($blockers !== []) {
                     throw ValidationException::withMessages(['status' => implode(' ', $blockers)]);
@@ -36,7 +39,7 @@ class Track extends Model
             }
         });
         static::deleting(function (Track $track) {
-            if ($track->published_slug !== null || $track->status === 'published') {
+            if ($track->published_slug !== null || TrackVisibility::isLive($track->status)) {
                 throw ValidationException::withMessages(['track' => 'Retain this track to preserve its published URL. Unpublish it to remove it from the catalog.']);
             }
         });
@@ -55,5 +58,11 @@ class Track extends Model
     public function offers(): HasMany
     {
         return $this->hasMany(Offer::class);
+    }
+
+    /** The one outstanding activation request, present exactly while the track is scheduled. */
+    public function pendingSchedule(): HasOne
+    {
+        return $this->hasOne(TrackPublicationSchedule::class)->where('state', 'pending');
     }
 }

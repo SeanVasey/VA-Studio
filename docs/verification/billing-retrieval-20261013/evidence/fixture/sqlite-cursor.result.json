@@ -1,0 +1,16 @@
+{
+  "exit": 0,
+  "duration_seconds": 29.528,
+  "source_count": 1956,
+  "changed_sources": [],
+  "junit": {
+    "name": "Tests\\Feature\\ProductionMembershipBilling\\BillingSweepHintsCursorTest",
+    "file": "/workspace/VA-Studio-billing-retrieval-fixtures/tests/Feature/ProductionMembershipBilling/BillingSweepHintsCursorTest.php",
+    "tests": "8",
+    "assertions": "123",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "time": "29.189951"
+  }
+}

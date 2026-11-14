@@ -3,13 +3,16 @@
 namespace App\Domain\Grants\Paid;
 
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
+use App\Domain\Commerce\ProductionCheckout\ProductionCheckout;
 use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderCommittedReadReceiptV1;
 use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderLocatorV1;
 use App\Domain\Commerce\ProductionCheckout\ProductionPaidOrderSourceV1;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\ProductionIdentity\IdentityException;
+use App\Domain\Grants\ContractIdentityHolds;
 use App\Domain\Grants\Paid\Models\PaidOrderOrigin;
+use App\Domain\Grants\VaseyLicenseIssuance;
 use App\Domain\Rights\LicenseDisclosure;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
@@ -24,6 +27,12 @@ final class PaidGrants
     {
         try {
             return $this->finalizeOwned($principal, $actor, $orderId, $projectionRead);
+        } catch (PaidGrantException $error) {
+            if ($error->reason === ContractIdentityHolds::REASON) {
+                // D-30: the hold's transaction has rolled back; leave the durable staff record outside it.
+                ContractIdentityHolds::recordAfterHold('production_checkout_v1', $orderId);
+            }
+            throw $error;
         } catch (IdentityException) {
             throw new PaidGrantException(403);
         } catch (CheckoutException $error) {
@@ -37,12 +46,15 @@ final class PaidGrants
         $deadline = PaidGrantDeadline::start();
         $this->outsideTransactions();
         $locator = ProductionPaidOrderLocatorV1::locate($orderId);
+        // Contract increment 5: the v2 selection's file reads (manifest, metrics, signature) happen here, before the locked
+        // origin transaction; inside it the selection only re-checks them without file I/O. Null, reading nothing, while the gate is off.
+        $v2Prepared = VaseyLicenseIssuance::prepare();
         $receipt = null;
         $heldRows = null;
         $producerRead = null;
         $producerSecond = null;
         try {
-            $projection = DB::transaction(function () use ($principal, $actor, $orderId, $locator, $deadline, $projectionRead,
+            $projection = DB::transaction(function () use ($v2Prepared, $principal, $actor, $orderId, $locator, $deadline, $projectionRead,
                 &$receipt, &$heldRows, &$producerRead, &$producerSecond): array {
                 $rows = new PaidGrantRows;
                 $heldRows = $rows;
@@ -64,6 +76,11 @@ final class PaidGrants
                     $lines[] = $line;
                 }
                 PaidGrantException::require(count($lines) >= 1 && count($lines) <= 10, 409);
+                // D-30 (decided 2026-11-08): a paid order whose frozen v2 declaration no longer verifies stays paid, but no grant
+                // origin is created; fulfillment is held for staff. Every line carries the order's one declaration.
+                foreach ($lines as $line) {
+                    PaidGrantException::require(! ProductionCheckout::contractIdentityHeld($line['buyer_declarations']), 409, ContractIdentityHolds::REASON);
+                }
                 $batch = $rows->one('paid_order_origins', 'producer = ? AND order_public_id = ?', ['production_checkout_v1', $orderId]);
                 if ($batch === []) {
                     $at = now()->utc()->startOfSecond();
@@ -77,6 +94,7 @@ final class PaidGrants
                         'producer' => 'production_checkout_v1', 'order_public_id' => $orderId, 'order_hash' => $lines[0]['order_hash'],
                         'payment_public_id' => $lines[0]['payment_id'], 'payment_hash' => $lines[0]['payment_hash'], 'line_count' => count($lines),
                         ...PaidGrantRecords::encode($batchPayload), 'created_at' => $at->format('Y-m-d H:i:s')], $rows);
+                    $selections = [];
                     foreach ($lines as $index => $line) {
                         $originId = (string) Str::uuid();
                         PaidGrantException::require($line['order_id'] === $orderId && $line['buyer'] === $original
@@ -85,7 +103,11 @@ final class PaidGrants
                         $payload = ['schema_version' => 'paid-grant-origin-v1', 'purpose' => 'paid-license-grant', 'origin_id' => $originId,
                             'batch_id' => $batchId, 'position' => $index + 1, 'source' => $line, 'assets' => $assets,
                             'disclosure' => app(LicenseDisclosure::class)->fromSnapshot($line['license']), 'delivery_policy' => $policy,
-                            'profile' => PaidGrantRenderProfile::current($line['provenance'])];
+                            'profile' => null];
+                        // Contract increment 5: the v2 license renderer for new originals only, behind its own gate; the
+                        // choice is frozen here and every render, retry and replay uses it (VaseyLicenseIssuance).
+                        [$selected, $selections[]] = VaseyLicenseIssuance::decide(PaidGrantRenderInput::fromOrigin($payload), $v2Prepared);
+                        $payload['profile'] = $selected ?? PaidGrantRenderProfile::current($line['provenance']);
                         (new PaidGrantText)->build(PaidGrantRenderInput::fromOrigin($payload));
                         $origin = PaidGrantRecords::insert('paid_grant_origins', ['public_id' => $originId, 'batch_id' => (int) $batch['id'], 'position' => $index + 1,
                             'line_public_id' => $line['line_id'], 'line_hash' => $line['line_hash'], 'source_hash' => $line['source_hash'],
@@ -96,7 +118,9 @@ final class PaidGrants
                     $subject = new PaidOrderOrigin;
                     $subject->setRawAttributes($batch, true);
                     $subject->exists = true;
-                    AuditEvent::recordAttributed('paid_origin.retained', $subject, ['origin_hash' => $batch['payload_hash']], (int) $current['user_id']);
+                    AuditEvent::recordAttributed('paid_origin.retained', $subject, ['origin_hash' => $batch['payload_hash'],
+                        // Contract increment 5: each line's profile selection branch (a code, never buyer data); absent while the gate is off.
+                        ...(array_unique($selections) === ['gate_off'] ? [] : ['contract_profile_selection' => $selections])], (int) $current['user_id']);
                 }
                 PaidGrantException::require((int) $batch['account_id'] === $current['account_id'] && (int) $batch['actor_id'] === $current['user_id'], 404);
                 $graph = $this->graph($batch['public_id'], $current['account_id'], $rows);
@@ -160,13 +184,14 @@ final class PaidGrants
                 && ($work['state'] === 'complete') === ($original !== []));
             $manifest = $original === [] ? null : PaidGrantRecords::decode($original);
             if ($manifest !== null) {
-                $text = (new PaidGrantText)->build(PaidGrantRenderInput::fromOrigin($body));
+                $text = VaseyLicenseIssuance::selected($body['profile']) ? VaseyLicenseIssuance::expected($body['profile'])
+                    : (new PaidGrantText)->build(PaidGrantRenderInput::fromOrigin($body));
                 PaidGrantException::require($manifest['schema_version'] === 'paid-first-original-v1' && $manifest['origin_hash'] === $origin['payload_hash']
                     && $original['claim_id'] === $work['claim_id'] && $manifest['claim_id'] === $work['claim_id']
                     && $manifest['profile_hash'] === CanonicalJson::hash($body['profile'])
                     && $manifest['input_hash'] === $text['input_hash'] && $manifest['text_digest'] === $text['text_digest']
                     && $manifest['asset_manifest_hash'] === CanonicalJson::hash($body['assets'])
-                    && $manifest['artifact']['profile_hash'] === $manifest['profile_hash']
+                    && $manifest['artifact']['profile_hash'] === VaseyLicenseIssuance::artifactProfileHash($body['profile'])
                     && $manifest['artifact']['purpose'] === 'paid-license-grant' && $manifest['artifact']['provenance'] === $source['provenance']
                     && $manifest['artifact']['storage_path'] === 'contracts/paid/'.$source['provenance'].'/'.$origin['public_id'].'/'.$work['claim_id'].'/original.pdf');
             }

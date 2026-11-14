@@ -1,0 +1,13 @@
+Found 1 security vulnerability advisory affecting 1 package:
++-------------------+----------------------------------------------------------------------------------+
+| Package           | livewire/livewire                                                                |
+| Severity          | medium                                                                           |
+| CVE               | NO CVE                                                                           |
+| Title             | Livewire: Authorization bypass in #[Authorize] via reordered parameter keys and  |
+|                   | #[Json] execution order                                                          |
+| URL               | https://github.com/advisories/GHSA-mhf7-xp6r-6qrc                                |
+| Affected versions | >=4.3.0,<4.4.8                                                                   |
+| Reported at       | 2026-10-23T20:51:30+00:00                                                        |
+| Advisory ID       | PKSA-xhv3-nr94-h8db                                                              |
++-------------------+----------------------------------------------------------------------------------+
+exit 1

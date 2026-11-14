@@ -62,8 +62,6 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
-      - name: Verify the pinned WebKit backport safeguards
-        run: node --test scripts/ci/apply-playwright-webkit-offline-backport.test.mjs
       - run: npm test
       - run: npm run build
       - name: Scan the built client bundle for server secrets
@@ -77,10 +75,12 @@ jobs:
   backend-quality:
     needs: scope
     if: needs.scope.outputs.mode != 'docs'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    runs-on: ubuntu-24.04  # ondrej/php has no packages for newer images yet
+    timeout-minutes: 35  # the persistent-content node tests take ~9 minutes and the ops kit suite ~8 (2026-11-12: 15 cancelled Foundation CI)
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0  # the changed-files Pint step diffs against the base branch
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24'
@@ -116,6 +116,16 @@ jobs:
         env:
           PERSISTENT_CATALOG_REQUIRE_PHP: '1'
         run: node --test scripts/migration/persistent-catalog.test.mjs
+      # A pinned render profile refuses at runtime once any file in its implementation closure changes (#216 broke
+      # vasey-license-pdf-v1 this way unnoticed); rebuild it and compare byte for byte.
+      - name: Verify pinned contract render profiles
+        # The font decoder refuses any fontTools/brotli other than the versions the manifest records.
+        run: |
+          python3 -m venv "$RUNNER_TEMP/contract-fonts"
+          "$RUNNER_TEMP/contract-fonts/bin/pip" install --quiet --disable-pip-version-check fonttools==4.68.0 brotli==1.2.1
+          PATH="$RUNNER_TEMP/contract-fonts/bin:$PATH" php scripts/build-contract-profile-vasey-license-v1.php --check
+          PATH="$RUNNER_TEMP/contract-fonts/bin:$PATH" php scripts/build-contract-profile-vasey-license-v2.php --check
+          php scripts/build-contract-profile-vasey-kit-license-v1.php --check
       - run: composer validate --strict
       - run: vendor/bin/pint --version
       - name: Verify private store foundations formatting
@@ -126,6 +136,13 @@ jobs:
         run: php vendor/bin/pint --test app/Domain/Catalog/ReviewedOfferDraft.php app/Domain/Catalog/OfferDraftInput.php app/Filament/Resources/OfferResource.php app/Filament/Resources/OfferResource/Pages/ManageOffers.php tests/Feature/ReviewedOfferDraftTest.php tests/Feature/ReviewedOfferDraftConcurrencyTest.php tests/Feature/OfferDraftAuthoringActionTest.php tests/Unit/OfferDraftBrowserEvidenceTest.php tests/Support/ReviewedOfferDraftFixtures.php tests/Support/reviewed-offer-draft-worker.php tests/browser/prepare-offer-draft.php
       - name: Verify private authoring and commerce readiness formatting
         run: php vendor/bin/pint --test app/Domain/Rights/BulkReplaceLicenseDraftSource.php app/Filament/Resources/LicenseVersionResource.php app/Filament/Resources/LicenseVersionResource/Pages/ManageLicenseVersions.php tests/Feature/BulkReplaceLicenseDraftSourceTest.php tests/Feature/BulkReplaceLicenseDraftSourceConcurrencyTest.php tests/Feature/BulkLicenseDraftSourceAuthoringActionTest.php tests/Unit/BulkLicenseDraftSourceBrowserEvidenceTest.php tests/Support/BulkReplaceLicenseDraftSourceFixtures.php tests/Support/bulk-replace-license-draft-source-worker.php tests/browser/prepare-bulk-license-draft-source.php app/Domain/Commerce/Readiness/ProductionCommerceReadiness.php app/Console/Commands/CommerceReadiness.php tests/Feature/ProductionCommerceReadinessTest.php scripts/dev/persistent-content-bootstrap.php
+      # SQ-18 (2026-11-10): Pint's laravel preset (pint.json) is enforced on the PHP files this change adds, modifies or
+      # renames relative to the base branch; the repository-wide format sweep is a separate later PR. Pint lists
+      # committed, staged, unstaged and untracked .php files (deleted files excluded) and passes with nothing to check.
+      - name: Verify changed PHP files formatting (Pint, laravel preset)
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
+        run: php vendor/bin/pint --test --diff="origin/$BASE_REF"
       - run: composer audit
       - name: Verify shard partition safeguards
         run: python3 scripts/ci/test-phpunit-shards.py
@@ -140,6 +157,72 @@ jobs:
           python3 scripts/ci/test-php-test-runtime.py
           python3 scripts/dev/test-bootstrap-macos.py
           python3 scripts/test-publish-github.py
+      # The staging/production ops kits (tests/ops, build-kit) had no CI: PR #223 left three of their checks red on main.
+      # They need the Composer dependencies above. They run last: installing php8.4-fpm from Ondrej Sury's packages can
+      # replace setup-php's CLI binary, so no later step may depend on it. The tests exercise real tools and root-only
+      # paths (installers, root-owned files) and skip without them, so the runner is provisioned like a host (service
+      # starts disabled while installing, needrestart suspended), they run as root, and a skipped test
+      # fails the step: no check passes by skipping.
+      # The test's real `php-fpm8.4 -t` needs PHP 8.4 FPM. setup-php's prebuilt PHP may already provide php-fpm8.4 outside
+      # apt (run 43067147563 found it on PATH, while dpkg had listed php8.4-fpm as "previously unselected" in run
+      # 43012360621); when it reports 8.4 it is used as is. Otherwise the apt package is installed. The old line
+      # `add-apt-repository ppa:ondrej/php` asks api.launchpad.net for the PPA's metadata, and that API was down on
+      # 2026-11-11 (every PR's backend-quality failed here). The same packages are published at packages.sury.org, which
+      # needs no Launchpad service: the signing key is fetched from there and accepted only when its full fingerprint
+      # matches the pin below (a mismatch or fetch failure is a loud warning, never a silent skip). The Launchpad PPA
+      # remains only as a fallback, and the step fails unless `php-fpm8.4 -v` then reports 8.4.
+      - name: Verify the staging and production ops kits
+        run: |
+          printf '#!/bin/sh\nexit 101\n' | sudo tee /usr/sbin/policy-rc.d >/dev/null
+          sudo chmod 0755 /usr/sbin/policy-rc.d
+          # php8.4-fpm for the production pool's `php-fpm8.4 -t` check: noble's own archive only has PHP 8.3.
+          SURY_FPR=15058500A0235D97F5D10063B188E2B695BD4743  # DEB.SURY.ORG Automatic Signing Key <deb@sury.org>
+          sury_ok=0
+          # setup-php's prebuilt PHP can already provide php-fpm8.4 (it is not an apt package, so dpkg does not list it).
+          # Use it when it really is 8.4; only otherwise install the apt package, which needs the extra source.
+          fpm_packages=php8.4-fpm
+          if command -v php-fpm8.4 >/dev/null 2>&1 && php-fpm8.4 -v | head -n 1 | grep -Eq '^PHP 8\.4\.'; then
+            echo "php-fpm8.4 already present at $(command -v php-fpm8.4): $(php-fpm8.4 -v | head -n 1)"
+            fpm_packages=
+          fi
+          if [ -n "$fpm_packages" ] && ! [ -e /etc/apt/sources.list.d/sury-php.sources ]; then
+            keydir="$(mktemp -d)"
+            if curl -fsSL --retry 5 --retry-delay 3 --retry-all-errors --max-time 60 -o "$keydir/sury.key" https://packages.sury.org/php/apt.gpg; then
+              export GNUPGHOME="$keydir/gnupg"; mkdir -m 0700 "$GNUPGHOME"
+              if [ "$(gpg --show-keys --with-colons "$keydir/sury.key" | grep -c '^pub:')" = 1 ] \
+                 && [ "$(gpg --show-keys --with-colons "$keydir/sury.key" | awk -F: '$1=="fpr"{print $10; exit}')" = "$SURY_FPR" ]; then
+                gpg --batch --quiet --import "$keydir/sury.key"
+                sudo install -d -m 0755 /etc/apt/keyrings
+                gpg --batch --export "$SURY_FPR" | sudo tee /etc/apt/keyrings/sury-php.gpg >/dev/null
+                printf 'Types: deb\nURIs: https://packages.sury.org/php/\nSuites: noble\nComponents: main\nSigned-By: /etc/apt/keyrings/sury-php.gpg\n' | sudo tee /etc/apt/sources.list.d/sury-php.sources >/dev/null
+                sury_ok=1
+              else
+                echo "::warning::packages.sury.org signing key does not match the pinned fingerprint $SURY_FPR; not trusting it"
+              fi
+              unset GNUPGHOME
+            else
+              echo "::warning::could not fetch the packages.sury.org signing key"
+            fi
+            if [ "$sury_ok" != 1 ]; then
+              echo "::warning::falling back to ppa:ondrej/php through the Launchpad API"
+              sudo add-apt-repository -y -n ppa:ondrej/php
+            fi
+          fi
+          sudo apt-get update -qq
+          if [ -n "$fpm_packages" ]; then apt-cache policy php8.4-fpm | head -n 3; fi
+          # $fpm_packages is deliberately unquoted: it is empty when php-fpm8.4 is already present.
+          sudo NEEDRESTART_SUSPEND=1 apt-get install -y -qq --no-install-recommends nginx age rsync rclone supervisor clamav-daemon apparmor $fpm_packages
+          sudo rm -f /usr/sbin/policy-rc.d
+          # The tests must run the real PHP 8.4 FPM, never another version and never a skip.
+          php-fpm8.4 -v | head -n 1 | tee /dev/stderr | grep -Eq '^PHP 8\.4\.'
+          sudo env "PATH=$PATH" PYTHONDONTWRITEBYTECODE=1 python3 - <<'PY'
+          import sys, unittest
+          result = unittest.TextTestRunner(verbosity=1).run(unittest.defaultTestLoader.discover("tests/ops"))
+          for test, reason in result.skipped:
+              print(f"SKIPPED (not allowed in CI): {test.id()}: {reason}")
+          sys.exit(0 if result.wasSuccessful() and not result.skipped else 1)
+          PY
+          python3 ops/production/build-kit.py --check
 
   backend-mysql:
     # Do not start costly suites for a candidate that already fails preflight.
@@ -148,13 +231,13 @@ jobs:
     name: backend-mysql (${{ matrix.shard }}/24)
     runs-on: ubuntu-latest
     # MySQL runs only the reviewed native selection (scripts/ci/database-mysql-selection.json): files owning
-    # SQLite-skipped methods, migration test files and a reviewed include list, 1846 of 7801 cases in 166 files (1765 in 163 when run 38037183233 ran).
+    # SQLite-skipped methods, migration test files and a reviewed include list, 2826 of 10341 cases in 278 files (1765 in 163 when run 38037183233 ran).
     # Run 37921309772 showed the complete suite cannot finish in 8 x 90 minutes, and run 37967128232 showed
     # 8 shards of this selection cannot either (186 minutes for the two that finished). Run 38037183233 ran
     # all 24 shards to completion on hosted MySQL 8.4: 58 to 109 minutes each, 124.5 minutes for shard 1
     # (BulkReplaceLicenseDraftSourceTest alone, which no partition can shorten), 127,466 s of test time in
-    # all. scripts/ci/phpunit-timings-mysql.json is regenerated from those 24 JUnit logs, so every selected
-    # file is now measured and the other 23 shards balance at about 87 minutes. The limit stays 210 minutes.
+    # all. scripts/ci/phpunit-timings-mysql.json retains those 24 JUnit logs' measurements. C4a discovery
+    # uses fallback weights for 72 newer files; its estimates are not executed timings. The limit stays 210 minutes.
     # A hung test still cannot hold a runner for 6 hours.
     timeout-minutes: 210
     strategy:
@@ -169,7 +252,11 @@ jobs:
           MYSQL_ROOT_PASSWORD: ci-only-password
         ports:
           - 3306:3306
+        # A disposable server: its data directory lives in memory (no disk syncs). Each test rebuilds the
+        # schema with about 300 migrations, and on a disk-backed datadir every DDL commit synced to disk
+        # (Foundation 43304362814: 85-100 s per MySQL test, 18 of 24 shards cancelled at 210 minutes).
         options: >-
+          --tmpfs /var/lib/mysql:rw
           --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-only-password"
           --health-interval=10s
           --health-timeout=5s
@@ -178,7 +265,6 @@ jobs:
       APP_ENV: testing
       APP_DEBUG: 'false'
       DB_CONNECTION: mysql
-      DB_HOST: 127.0.0.1
       DB_PORT: 3306
       DB_DATABASE: vaseyaudio_test
       DB_URL: ''
@@ -214,6 +300,27 @@ jobs:
       - run: composer install --no-interaction --prefer-dist
       - run: cp .env.example .env
       - run: php artisan key:generate
+      # The identity catalog admission binds the MySQL session to its exact TCP 4-tuple. The published port
+      # (127.0.0.1:3306) is NAT: the server would see the bridge gateway and the client 127.0.0.1, so every
+      # migrate:fresh refused. Reach the service container at its own bridge address, where both ends agree;
+      # database-receipts.py requires DB_HOST to be exactly this address.
+      - name: Address the MySQL service container directly and match its database collation
+        env:
+          MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
+        run: |
+          [[ "$MYSQL_CONTAINER_ID" =~ ^[0-9a-f]{12,64}$ ]] || { echo "::error::missing MySQL service identity"; exit 1; }
+          read -r -a addresses <<< "$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' "$MYSQL_CONTAINER_ID")"
+          [ "${#addresses[@]}" = 1 ] && [[ "${addresses[0]}" =~ ^[0-9]{1,3}(\.[0-9]{1,3}){3}$ ]] \
+            || { echo "::error::the MySQL service must have exactly one IPv4 bridge address"; exit 1; }
+          # The image creates MYSQL_DATABASE with the server default utf8mb4_0900_ai_ci; staging and production
+          # (provision.sh) create it utf8mb4_unicode_ci, which the account admission guard requires.
+          docker exec -e MYSQL_PWD=ci-only-password "$MYSQL_CONTAINER_ID" \
+            mysql -uroot -e 'ALTER DATABASE `vaseyaudio_test` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
+          # Durability buys nothing on a disposable test server; locking, isolation and the native race behaviour
+          # under test are unchanged. sync_binlog and the redo-log flush are dynamic; the receipts do not pin them.
+          docker exec -e MYSQL_PWD=ci-only-password "$MYSQL_CONTAINER_ID" \
+            mysql -uroot -e 'SET GLOBAL innodb_flush_log_at_trx_commit = 0; SET GLOBAL sync_binlog = 0'
+          echo "DB_HOST=${addresses[0]}" >> "$GITHUB_ENV"
       - name: Record source and MySQL runtime before tests
         env:
           MYSQL_CONTAINER_ID: ${{ job.services.mysql.id }}
@@ -243,17 +350,17 @@ jobs:
     # Do not start costly suites for a candidate that already fails preflight.
     needs: [scope, backend-quality, frontend]
     if: needs.scope.outputs.mode != 'docs'
-    name: backend-sqlite (${{ matrix.shard }}/2)
+    name: backend-sqlite (${{ matrix.shard }}/6)
     runs-on: ubuntu-latest
-    # Foundation 38037183233 measured 80.2 minutes for shard 1 (3,917 tests) and 43.4 for shard 2 (3,725) on
-    # the stale timings; scripts/ci/phpunit-timings-sqlite.json is regenerated from both JUnit logs, which
-    # balances the two shards at about 61 minutes each: about 25% headroom over the busiest measured shard
-    # (80.2) and about 40% over the balanced estimate. A hung test still cannot hold a runner for 6 hours.
-    timeout-minutes: 100
+    # Six shards since 2026-11-13: the suite grew to about 12,100 cases, and Foundation 43347699757's two shards
+    # reached 60% and 69% in 100 minutes. Six shards of about 2,000 cases measured 52-99 minutes in 43386670021, where
+    # shard 5 was cancelled at 96%; 140 minutes leaves about 35% over the busiest, and a hung test still cannot hold a
+    # runner for hours.
+    timeout-minutes: 140
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2]
+        shard: [1, 2, 3, 4, 5, 6]
     env:
       APP_ENV: testing
       APP_DEBUG: 'false'
@@ -287,7 +394,7 @@ jobs:
       - name: Record source and SQLite runtime before tests
         run: python3 scripts/ci/database-receipts.py start --engine=sqlite --shard=${{ matrix.shard }}
       - name: Prove the complete SQLite test partition
-        run: python3 scripts/ci/phpunit-shards.py --shards=2 --prefix=phpunit-ci-sqlite --timings=scripts/ci/phpunit-timings-sqlite.json
+        run: python3 scripts/ci/phpunit-shards.py --shards=6 --prefix=phpunit-ci-sqlite --timings=scripts/ci/phpunit-timings-sqlite.json
       - name: Run all tests assigned to this SQLite shard
         id: database_tests
         run: php vendor/bin/phpunit --configuration=phpunit-ci-sqlite-${{ matrix.shard }}.xml --log-junit=phpunit-ci-sqlite-${{ matrix.shard }}-results.xml --fail-on-phpunit-warning --display-warnings
@@ -324,7 +431,7 @@ jobs:
         env:
           NEEDS_JSON: ${{ toJSON(needs) }}
         run: python3 scripts/ci/ci-scope.py gate
-      - name: Verify all twenty-six current-run database receipts without enabling reuse
+      - name: Verify all thirty current-run database receipts without enabling reuse
         if: needs.scope.outputs.mode == 'full'
         env:
           RECEIPT_GITHUB_TOKEN: ${{ github.token }}

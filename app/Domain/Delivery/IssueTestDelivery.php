@@ -3,11 +3,15 @@
 namespace App\Domain\Delivery;
 
 use App\Domain\Commerce\Models\Order;
+use App\Domain\Commerce\RefundDispute\RefundDisputeAccess;
 use App\Domain\Customers\CustomerAccess;
 use App\Domain\Customers\CustomerPrincipal;
 use App\Domain\Customers\PurchaseAccess;
+use App\Domain\Delivery\Models\TestDeliveryAdmission;
 use App\Domain\Delivery\Models\TestDeliveryAuthorization;
 use App\Domain\Delivery\Models\TestDeliveryControl;
+use App\Domain\Delivery\Models\TestDeliveryCoverage;
+use App\Domain\Delivery\Models\TestDeliveryRedemption;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
@@ -19,7 +23,8 @@ use SensitiveParameter;
 final class IssueTestDelivery
 {
     public function handle(string $orderPublicId, #[SensitiveParameter] string $ownerKey, string $grantPublicId,
-        string $kind, string $idempotencyKey, ?User $actor = null, ?CustomerPrincipal $principal = null): IssuedTestDelivery
+        string $kind, string $idempotencyKey, ?User $actor = null, ?CustomerPrincipal $principal = null,
+        #[SensitiveParameter] ?string $sessionSecret = null): IssuedTestDelivery
     {
         ActivationPolicy::outsideTransactions();
         if ($principal) {
@@ -29,6 +34,10 @@ final class IssueTestDelivery
         $policies = app(TestAccessPolicy::class);
         $policy = $policies->current();
         $account = $policies->account();
+        // A v2 authorization is bound to the server-side session that creates it; without one there is nothing to bind.
+        if ($policy['version'] === TestAccessPolicy::V2 && (! is_string($sessionSecret) || preg_match('/\A[a-f0-9]{64}\z/D', $sessionSecret) !== 1)) {
+            throw new DeliveryException('session_required');
+        }
         $evidence = app(DeliveryAccessEvidence::class);
         $order = $evidence->owned($orderPublicId, $ownerKey);
         $source = $evidence->source($order, $account);
@@ -38,7 +47,7 @@ final class IssueTestDelivery
         $requestHash = $evidence->requestHash($order, $ownerKey, $grantPublicId, $kind);
         $this->replay($order, $keyHash, $requestHash, $source);
         $from = now()->toImmutable()->utc()->startOfSecond();
-        $this->budget($order, $source, $control, $from);
+        $this->budget($order, $source, $control, $from, $policy, $target);
         if ($principal) {
             app(CustomerAccess::class)->current($principal);
         }
@@ -56,7 +65,7 @@ final class IssueTestDelivery
         }
 
         return DB::transaction(function () use ($order, $ownerKey, $source, $target, $control, $keyHash, $requestHash, $through,
-            $policies, $policy, $account, $evidence, $actor, $principal): IssuedTestDelivery {
+            $policies, $policy, $account, $evidence, $actor, $principal, $sessionSecret): IssuedTestDelivery {
             app(CustomerAccess::class)->lock($principal, $principal?->ownerKey ?? $ownerKey, $actor);
             // The order mutex serializes every target and every idempotency key, including the last rolling-budget slot.
             $locked = Order::whereKey($order->id)->lockForUpdate()->first();
@@ -75,12 +84,13 @@ final class IssueTestDelivery
                 throw new DeliveryException('changed');
             }
             $currentControl = $evidence->control($fresh, $currentControl, $control->control_version);
+            RefundDisputeAccess::assertClear($locked->id, (int) $target['license_grant_id']);
             $this->replay($locked, $keyHash, $requestHash, $fresh);
             $at = now()->toImmutable()->utc()->startOfSecond();
             if ($at->lessThan($through)) {
                 throw new DeliveryException('retry');
             }
-            $this->budget($locked, $fresh, $currentControl, $at);
+            $this->budget($locked, $fresh, $currentControl, $at, $policy, $freshTarget);
             $token = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
             $columns = ['public_id' => (string) Str::uuid(), 'order_id' => $locked->id,
                 'test_fulfillment_activation_id' => $fresh['activation']->id, 'test_delivery_control_id' => $currentControl->id,
@@ -89,7 +99,11 @@ final class IssueTestDelivery
                 'license_grant_id' => $target['license_grant_id'], 'grant_contract_id' => $target['grant_contract_id'],
                 'pending_entitlement_id' => $target['pending_entitlement_id'], 'policy_version' => $policy['version'],
                 'issued_at' => $at, 'expires_at' => $at->addSeconds(60)];
-            [$ciphertext, $hash] = $evidence->encrypt($evidence->capture($fresh, $target, $currentControl, $columns));
+            $transfer = $policy['version'] === TestAccessPolicy::V2 ? [
+                'resume_window_seconds' => TestAccessPolicy::resumeWindowSeconds($target['file']['size_bytes'], $policies->resumeWindows()),
+                'session_binding_hash' => DeliveryAccessEvidence::sessionBinding($columns['public_id'], (string) $sessionSecret),
+            ] : null;
+            [$ciphertext, $hash] = $evidence->encrypt($evidence->capture($fresh, $target, $currentControl, $columns, $transfer));
             $authorization = TestDeliveryAuthorization::create($columns + ['evidence_ciphertext' => $ciphertext,
                 'evidence_hash' => $hash, 'canonicalization_version' => CanonicalJson::VERSION]);
             $auditContext = ['order_public_id' => $locked->public_id,
@@ -127,7 +141,7 @@ final class IssueTestDelivery
         throw new DeliveryException(hash_equals($existing->request_hash, $requestHash) ? 'already_issued' : 'conflict');
     }
 
-    private function budget(Order $order, array $source, TestDeliveryControl $control, CarbonImmutable $at): void
+    private function budget(Order $order, array $source, TestDeliveryControl $control, CarbonImmutable $at, array $policy, array $target): void
     {
         $query = TestDeliveryAuthorization::where('order_id', $order->id);
         if ($at->lessThan($source['activation']->activated_at) || $at->lessThan($control->updated_at)
@@ -137,5 +151,45 @@ final class IssueTestDelivery
         if ($query->where('issued_at', '>', $at->subSeconds(60))->count() >= 3) {
             throw new DeliveryException('budget_exhausted');
         }
+        if ($policy['version'] === TestAccessPolicy::V2 && $this->incomplete($order, (int) $target['license_grant_id'], $at)
+            >= app(TestAccessPolicy::class)->incompleteCap()) {
+            throw new DeliveryException('incomplete_limit');
+        }
+    }
+
+    /**
+     * Operational abuse bound, not a license term: this grant's v2 authorizations that started within the rolling 24 hours
+     * and never covered their file, plus those issued, unexpired and not yet started (which could still start, so
+     * concurrent issuance cannot overshoot the cap). Under the order lock every read is a locking read, so a snapshot fixed
+     * by an earlier plain read in this transaction cannot hide a start or completion committed meanwhile.
+     */
+    private function incomplete(Order $order, int $grantId, CarbonImmutable $at): int
+    {
+        $lock = fn ($query) => DB::transactionLevel() > 0 ? $query->lockForUpdate() : $query;
+        $authorizations = $lock(TestDeliveryAuthorization::where('order_id', $order->id)->where('license_grant_id', $grantId)
+            ->where('policy_version', TestAccessPolicy::V2)->where('issued_at', '>', $at->subDay()->subSeconds(60)))
+            ->get(['id', 'expires_at']);
+        if ($authorizations->isEmpty()) {
+            return 0;
+        }
+        $ids = $authorizations->pluck('id')->all();
+        $started = $lock(TestDeliveryAdmission::whereIn('test_delivery_authorization_id', $ids))
+            ->pluck('test_delivery_authorization_id')->unique()->all();
+        $startedAt = $lock(TestDeliveryRedemption::whereIn('test_delivery_authorization_id', $ids))
+            ->pluck('redeemed_at', 'test_delivery_authorization_id');
+        $completed = $lock(TestDeliveryCoverage::whereIn('completed_authorization_id', $ids))->pluck('completed_authorization_id')->all();
+        $count = 0;
+        foreach ($authorizations as $authorization) {
+            if (in_array($authorization->id, $completed, true)) {
+                continue;
+            }
+            $begun = in_array($authorization->id, $started, true) || $startedAt->has($authorization->id);
+            if ($begun ? CarbonImmutable::parse($startedAt[$authorization->id] ?? $at)->utc()->greaterThan($at->subDay())
+                : $authorization->expires_at->greaterThan($at)) {
+                $count++;
+            }
+        }
+
+        return $count;
     }
 }

@@ -2,6 +2,9 @@
 
 namespace App\Domain\Commerce\ProductionTaxCheckout;
 
+use App\Domain\Commerce\ContractIdentity\ContractIdentityDeclarationV2;
+use App\Domain\Commerce\ContractIdentity\ContractIdentityStatements;
+use App\Domain\Commerce\ContractIdentity\ContractPrintableSet;
 use App\Domain\Commerce\ProductionCheckout\CheckoutException;
 use App\Domain\Commerce\ProductionCheckout\CommandTransaction;
 use App\Domain\Commerce\ProductionCheckout\CurrentSelection;
@@ -12,6 +15,7 @@ use App\Domain\Commerce\ProductionCheckout\Records;
 use App\Domain\Commerce\ProductionPreparation\PreparationSelection;
 use App\Domain\Customers\ProductionCustomerAccess;
 use App\Domain\Customers\ProductionCustomerPrincipal;
+use App\Domain\Grants\ContractIdentityHolds;
 use App\Models\User;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
@@ -30,22 +34,23 @@ final class ProductionTaxCheckout
     public function preview(ProductionCustomerPrincipal $principal, User $buyer, int $candidateId, array $items): array
     {
         TaxCheckoutPolicy::requireEnabled();
+        $identity = TaxCheckoutPolicy::contractIdentityV2();
         $items = PreparationSelection::items($items);
-        $result = CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $candidateId, $items): array {
+        $result = CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $candidateId, $items, $identity): array {
             $tax = TaxCheckoutRecords::writer($rows);
             $access = $this->access->lock($principal, $buyer, $tax->current);
             $binding = $this->access->durableBinding($principal);
             $candidate = TaxCandidate::load($tax->current, $candidateId);
             $candidate['context']->requireBuyer($binding);
             $selection = CurrentSelection::load($tax->current, $items, CarbonImmutable::now('UTC'));
-            $commitment = TaxCheckoutEvidence::commitment($binding, $candidate['binding'], $candidate['context'], $selection, $candidate['machine']);
+            $commitment = TaxCheckoutEvidence::commitment($binding, $candidate['binding'], $candidate['context'], $selection, $candidate['machine'], $identity);
             CurrentSelection::proveBytes($selection);
             CurrentSelection::proveCurrent($tax->current, $selection, CarbonImmutable::now('UTC'));
             TaxCandidate::proveCurrent($tax->current, $candidate);
             $this->access->proveCurrent($principal, $buyer, $tax->current, $access);
             TaxCheckoutPolicy::requireEnabled();
 
-            return self::termsProjection($commitment, $selection) + ['previewHash' => CanonicalJson::hash($commitment)];
+            return self::termsProjection($commitment, $selection, $identity) + ['previewHash' => CanonicalJson::hash($commitment)];
         });
         $this->access->current($principal, $buyer);
 
@@ -56,16 +61,19 @@ final class ProductionTaxCheckout
         bool $accepted, array $buyerDeclarations, string $key): array
     {
         TaxCheckoutPolicy::requireEnabled();
+        $fresh = FreshTaxCheckoutPolicy::capture();
         CheckoutException::require($accepted === true && Evidence::hash($previewHash), 'invalid', 422);
-        Evidence::keys($buyerDeclarations, ['legalName']);
-        CheckoutException::require(is_string($buyerDeclarations['legalName']) && strlen($buyerDeclarations['legalName']) <= 255
-            && trim($buyerDeclarations['legalName']) !== '' && mb_check_encoding($buyerDeclarations['legalName'], 'UTF-8')
-            && ! preg_match('/[\x00-\x1f\x7f]/u', $buyerDeclarations['legalName']), 'invalid', 422);
-        $declarations = ['legal_name' => trim($buyerDeclarations['legalName']), 'identity_meaning' => 'buyer_declared_legal_name'];
+        $identity = TaxCheckoutPolicy::contractIdentityV2();
+        $declarations = $identity
+            // D-30: the licensee identity a production contract binds, confirmed against the statement version the preview
+            // displayed. This checkout sells non-exclusive licenses only.
+            ? ContractIdentityDeclarationV2::fromDisplayedInput($buyerDeclarations, false, ContractIdentityStatements::current(),
+                ContractPrintableSet::checkout())
+            : self::legacyDeclarations($buyerDeclarations);
         $items = PreparationSelection::items($items);
         $digest = Evidence::key($key);
 
-        $result = CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $candidateId, $items, $previewHash, $declarations, $digest): array {
+        $result = CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $candidateId, $items, $previewHash, $declarations, $digest, $fresh, $identity): array {
             $tax = TaxCheckoutRecords::writer($rows);
             $access = $this->access->lock($principal, $buyer, $tax->current);
             $binding = $this->access->durableBinding($principal);
@@ -87,7 +95,8 @@ final class ProductionTaxCheckout
             $context->requireBuyer($binding);
             $at = CarbonImmutable::now('UTC');
             $selection = CurrentSelection::load($tax->current, $items, $at);
-            $commitment = TaxCheckoutEvidence::commitment($binding, $candidate['binding'], $context, $selection, $candidate['machine']);
+            // With the gate on, the commitment also names the contract identity schema, so a gate flip between preview and order refuses.
+            $commitment = TaxCheckoutEvidence::commitment($binding, $candidate['binding'], $context, $selection, $candidate['machine'], $identity);
             // The buyer assents only to the exact terms and pre-tax prices previewed; any change refuses.
             CheckoutException::require(hash_equals(CanonicalJson::hash($commitment), $previewHash), 'changed');
             $subtotal = $selection['selection']['advertised_subtotal_minor'];
@@ -118,6 +127,7 @@ final class ProductionTaxCheckout
             Evidence::same([$record], $tax->selector('order', 'buyer_origin_id = ? AND request_key = ?', [$binding['origin_id'], $digest]));
             $this->access->proveCurrent($principal, $buyer, $tax->current, $access);
             TaxCheckoutPolicy::requireEnabled();
+            TaxCheckoutWriteAdmission::current($rows, $fresh, $this->access, $principal, $buyer, 'order', $public);
 
             return self::orderProjection($order);
         });
@@ -157,7 +167,7 @@ final class ProductionTaxCheckout
                 ? $error : new CheckoutException('provider_uncertain', 503);
         }
         if ($prepared['intent']['binding'] === null) {
-            $this->bind($prepared['intent']['row']['public_id'], $sessionId);
+            $this->bind($prepared['intent']['row']['public_id'], $sessionId, $orderId);
         }
         $status = $this->status($principal, $buyer, $orderId);
 
@@ -170,11 +180,16 @@ final class ProductionTaxCheckout
         TaxCheckoutPolicy::requireEnabled();
         $prepared = $this->prepare($principal, $buyer, $orderId, false);
         if ($prepared['intent']['reviewed'] !== null) {
+            // Already retained: a repeated reconcile retries the hold record a failed earlier write may have missed.
+            self::holdAfterPayment($prepared['order']['row']['public_id'], $prepared['order']['body']['buyer_declarations']);
+
             return $this->status($principal, $buyer, $orderId);
         }
         $sessionId = $prepared['intent']['binding']['provider_session_id'] ?? null;
         CheckoutException::require($sessionId !== null, 'session_required');
         $transport = TaxCheckoutPolicy::transport($this->transport);
+        $transportIdentity = $transport->boundTo();
+        CheckoutException::require($transportIdentity === config('production-tax-checkout.provider'), 'provider_unbound', 503);
         $context = $prepared['order']['context'];
         $request = $prepared['intent']['body'];
         try {
@@ -188,7 +203,8 @@ final class ProductionTaxCheckout
             throw $error instanceof CheckoutException && in_array($error->reason, ['tax_ceiling', 'session_mismatch'], true) ? $error : new CheckoutException('provider_uncertain', 503);
         }
         if ($financial['outcome'] === 'confirmed') {
-            $this->retain($prepared['intent']['row']['public_id'], $financial, CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z'), $transport->boundTo());
+            $retained = $this->retain($prepared['intent']['row']['public_id'], $financial, CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z'), $transportIdentity, $orderId);
+            self::holdAfterPayment($orderId, $retained);
         }
         $status = $this->status($principal, $buyer, $orderId);
 
@@ -201,7 +217,8 @@ final class ProductionTaxCheckout
         $result = CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $orderId): array {
             $tax = TaxCheckoutRecords::writer($rows);
             $access = $this->access->lock($principal, $buyer, $tax->current);
-            $order = TaxCheckoutEvidence::order($tax, $tax->one('order', $orderId));
+            // D-30 (decided 2026-11-08): status reports a recorded payment whether or not the declaration still verifies.
+            $order = TaxCheckoutEvidence::order($tax, $tax->one('order', $orderId), false);
             ProductionCheckout::requireOwner($this->access->durableBinding($principal), $order['body']['buyer']);
             $result = self::orderProjection($order);
             $records = $tax->selector('request', 'order_id = ?', [$order['row']['id']]);
@@ -225,17 +242,30 @@ final class ProductionTaxCheckout
 
     private function prepare(ProductionCustomerPrincipal $principal, User $buyer, string $orderId, bool $create): array
     {
-        $prepared = CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $orderId, $create): array {
+        $fresh = FreshTaxCheckoutPolicy::capture();
+        $prepared = CommandTransaction::run(function (Records $rows) use ($principal, $buyer, $orderId, $create, $fresh): array {
             $tax = TaxCheckoutRecords::writer($rows);
             $access = $this->access->lock($principal, $buyer, $tax->current);
-            $order = TaxCheckoutEvidence::order($tax, $tax->one('order', $orderId));
+            // D-30 (decided 2026-11-08): initiate re-verifies a v2 declaration; reconcile records a captured payment regardless.
+            $order = TaxCheckoutEvidence::order($tax, $tax->one('order', $orderId), $create);
             ProductionCheckout::requireOwner($this->access->durableBinding($principal), $order['body']['buyer']);
             $requests = $tax->selector('request', 'order_id = ?', [$order['row']['id']]);
             CheckoutException::require(count($requests) <= 1);
+            $statusOnly = false;
+            if ($create) {
+                // D-30 step 8: TaxCheckoutEvidence::order() has re-verified a v2 declaration; a declaration that does not match the
+                // gate refuses before any request row or provider call. A name-only order already paid while the gate is on passes
+                // here, and initiate() answers it with its status (the existing `reviewed` early return), never a provider call.
+                $paid = $requests !== [] && TaxCheckoutEvidence::intent($tax, $order, $requests[0])['reviewed'] !== null;
+                $statusOnly = ProductionCheckout::requirePayableIdentity($order['body']['buyer_declarations'], TaxCheckoutPolicy::contractIdentityV2(), $paid);
+            }
+            $newRequest = $requests === [];
             CheckoutException::require($create || $requests !== [], 'request_required');
             $candidate = null;
             $selection = null;
-            if ($create) {
+            // A status-only answer never reaches the provider, so it skips the create-only proofs (current candidate and
+            // selection) that would otherwise refuse a paid order whose listing changed after payment (review P3-4).
+            if ($create && ! $statusOnly) {
                 // Never send stale terms or prices to the provider: the approved candidate and the selection must be current.
                 $candidate = TaxCandidate::load($tax->current, $order['row']['candidate_id']);
                 Evidence::same($order['body']['candidate'], $candidate['binding']);
@@ -259,13 +289,16 @@ final class ProductionTaxCheckout
                 $record = $requests[0];
             }
             $intent = TaxCheckoutEvidence::intent($tax, $order, $record);
-            if ($create) {
+            if ($create && ! $statusOnly) {
                 CurrentSelection::proveBytes($selection);
                 CurrentSelection::proveCurrent($tax->current, $selection, CarbonImmutable::now('UTC'));
                 TaxCandidate::proveCurrent($tax->current, $candidate);
             }
             $this->access->proveCurrent($principal, $buyer, $tax->current, $access);
             TaxCheckoutPolicy::requireEnabled();
+            if ($newRequest) {
+                TaxCheckoutWriteAdmission::current($rows, $fresh, $this->access, $principal, $buyer, 'request', $record['public_id']);
+            }
 
             return compact('order', 'intent');
         });
@@ -275,12 +308,17 @@ final class ProductionTaxCheckout
     }
 
     /** Internal persistence of the provider locator returned by the authoritative read; no buyer input. */
-    private function bind(string $requestId, string $sessionId): void
+    private function bind(string $requestId, string $sessionId, string $orderId): void
     {
-        CommandTransaction::run(function (Records $rows) use ($requestId, $sessionId): void {
+        $fresh = FreshTaxCheckoutPolicy::capture();
+        $locator = ProductionTaxPaidOrderLocatorV2::locate($orderId);
+        CommandTransaction::run(function (Records $rows) use ($requestId, $sessionId, $fresh, $locator): void {
+            $this->access->verifyHistoricalBinding($locator->historicalBuyerBinding(), $rows->current);
             $tax = TaxCheckoutRecords::writer($rows);
             $record = $tax->one('request', $requestId);
             $order = TaxCheckoutEvidence::order($tax, $tax->byId('order', $record['order_id']));
+            CheckoutException::require($order['row']['public_id'] === $locator->orderId && $order['row']['payload_hash'] === $locator->orderHash, 'write_source_changed');
+            Evidence::same($locator->historicalBuyerBinding(), $order['body']['buyer']);
             $intent = TaxCheckoutEvidence::intent($tax, $order, $record);
             if ($intent['binding'] !== null) {
                 CheckoutException::require($intent['binding']['provider_session_id'] === $sessionId);
@@ -293,23 +331,45 @@ final class ProductionTaxCheckout
             $tax->insert('binding', ['public_id' => $public, 'created_at' => $created, ...Evidence::seal($body), 'request_id' => $record['id'],
                 'account_id' => $order['context']->accountId, 'funds_mode' => $order['context']->fundsMode, 'provider_session_id' => $sessionId]);
             TaxCheckoutEvidence::intent($tax, $order, $record);
+            TaxCheckoutWriteAdmission::retained($rows, $fresh, $locator, 'binding', $public);
         });
     }
 
-    /** Retain the buyer-reviewed, provider-calculated paid session exactly once. */
-    private function retain(string $requestId, array $financial, string $observedAt, string $transport): void
+    /**
+     * D-30 (decided 2026-11-08): once the paid session is retained (committed), a verified payment of an order whose frozen
+     * v2 declaration no longer verifies leaves the staff hold record at once, not only when the buyer finalizes. Outside
+     * the retain transaction: a failure is reported and swallowed by ContractIdentityHolds and changes neither the
+     * retained payment nor the result.
+     */
+    private static function holdAfterPayment(string $orderId, array $declarations): void
     {
-        CommandTransaction::run(function (Records $rows) use ($requestId, $financial, $observedAt, $transport): void {
+        ContractIdentityHolds::recordAfterPayment('production_tax_checkout_v2', $orderId, $declarations);
+    }
+
+    /**
+     * Retain the buyer-reviewed, provider-calculated paid session exactly once. Returns the frozen declarations of the order
+     * whose payment is retained.
+     */
+    private function retain(string $requestId, array $financial, string $observedAt, string $transport, string $orderId): array
+    {
+        $fresh = FreshTaxCheckoutPolicy::capture();
+        $locator = ProductionTaxPaidOrderLocatorV2::locate($orderId);
+
+        return CommandTransaction::run(function (Records $rows) use ($requestId, $financial, $observedAt, $transport, $fresh, $locator): array {
+            $this->access->verifyHistoricalBinding($locator->historicalBuyerBinding(), $rows->current);
             $tax = TaxCheckoutRecords::writer($rows);
             $record = $tax->one('request', $requestId);
-            $order = TaxCheckoutEvidence::order($tax, $tax->byId('order', $record['order_id']));
+            // D-30 (decided 2026-11-08): a captured payment is always recorded; finalization holds an unverifiable declaration.
+            $order = TaxCheckoutEvidence::order($tax, $tax->byId('order', $record['order_id']), false);
+            CheckoutException::require($order['row']['public_id'] === $locator->orderId && $order['row']['payload_hash'] === $locator->orderHash, 'write_source_changed');
+            Evidence::same($locator->historicalBuyerBinding(), $order['body']['buyer']);
             $intent = TaxCheckoutEvidence::intent($tax, $order, $record);
             CheckoutException::require($intent['binding'] !== null && $intent['binding']['provider_session_id'] === $financial['session']['session_id']);
             Evidence::same($financial, TaxCheckoutEvidence::financial($financial['retained_session'], $financial['payment'], $intent['body']));
             if ($intent['reviewed'] !== null) {
                 CheckoutException::require($intent['reviewed']['provider_payment_id'] === $financial['payment']['id']);
 
-                return;
+                return $order['body']['buyer_declarations'];
             }
             $public = (string) Str::uuid();
             $created = CarbonImmutable::now('UTC')->format('Y-m-d\TH:i:s\Z');
@@ -323,12 +383,31 @@ final class ProductionTaxCheckout
                 'amount_subtotal_minor' => $amounts['subtotal_minor'], 'amount_tax_minor' => $amounts['tax_minor'],
                 'amount_total_minor' => $amounts['total_minor'], 'observed_at' => $observedAt]);
             TaxCheckoutEvidence::intent($tax, $order, $record);
+            TaxCheckoutWriteAdmission::retained($rows, $fresh, $locator, 'reviewed', $public);
+
+            return $order['body']['buyer_declarations'];
         });
     }
 
-    private static function termsProjection(array $commitment, array $selection): array
+    /** The original name-only declaration, unchanged while contract identity capture is off. */
+    private static function legacyDeclarations(array $buyerDeclarations): array
     {
-        return ['candidateId' => $commitment['candidate']['candidate_id'], 'seller' => $commitment['seller'], 'assent' => $commitment['assent'],
+        Evidence::keys($buyerDeclarations, ['legalName']);
+        CheckoutException::require(is_string($buyerDeclarations['legalName']) && strlen($buyerDeclarations['legalName']) <= 255
+            && trim($buyerDeclarations['legalName']) !== '' && mb_check_encoding($buyerDeclarations['legalName'], 'UTF-8')
+            && ! preg_match('/[\x00-\x1f\x7f]/u', $buyerDeclarations['legalName']), 'invalid', 422);
+
+        return ['legal_name' => trim($buyerDeclarations['legalName']), 'identity_meaning' => 'buyer_declared_legal_name'];
+    }
+
+    private static function termsProjection(array $commitment, array $selection, bool $identity): array
+    {
+        $contractIdentity = $identity
+            ? ['contractIdentity' => ['licenseeTypes' => ContractIdentityDeclarationV2::LICENSEE_TYPES,
+                'statements' => ContractIdentityStatements::offered()]]
+            : [];
+
+        return $contractIdentity + ['candidateId' => $commitment['candidate']['candidate_id'], 'seller' => $commitment['seller'], 'assent' => $commitment['assent'],
             'amounts' => $commitment['amounts'], 'fundsMode' => $commitment['execution_context']['funds_mode'],
             'taxBehavior' => $commitment['execution_context']['tax']['behavior'],
             'licenses' => array_map(fn (array $line): array => ['position' => $line['position'], 'trackId' => $line['track_id'],

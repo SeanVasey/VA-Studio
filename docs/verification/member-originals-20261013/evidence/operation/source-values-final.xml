@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Unit\MemberOriginalSourceValuesTest" file="/workspace/VA-Studio-member-original-operation/tests/Unit/MemberOriginalSourceValuesTest.php" tests="5" assertions="20" errors="0" failures="0" skipped="0" time="0.012988">
+    <testcase name="test_complete_source_projects_exact_child_values_without_private_rows_or_live_authority" file="/workspace/VA-Studio-member-original-operation/tests/Unit/MemberOriginalSourceValuesTest.php" line="13" class="Tests\Unit\MemberOriginalSourceValuesTest" classname="Tests.Unit.MemberOriginalSourceValuesTest" assertions="9" time="0.005859"/>
+    <testcase name="test_nested_caller_references_and_returned_arrays_cannot_mutate_retained_source" file="/workspace/VA-Studio-member-original-operation/tests/Unit/MemberOriginalSourceValuesTest.php" line="29" class="Tests\Unit\MemberOriginalSourceValuesTest" classname="Tests.Unit.MemberOriginalSourceValuesTest" assertions="2" time="0.001291"/>
+    <testcase name="test_historical_identity_observation_remains_in_the_semantic_source_hash" file="/workspace/VA-Studio-member-original-operation/tests/Unit/MemberOriginalSourceValuesTest.php" line="44" class="Tests\Unit\MemberOriginalSourceValuesTest" classname="Tests.Unit.MemberOriginalSourceValuesTest" assertions="2" time="0.002118"/>
+    <testcase name="test_fresh_observation_fields_are_not_accepted_as_render_source_members" file="/workspace/VA-Studio-member-original-operation/tests/Unit/MemberOriginalSourceValuesTest.php" line="56" class="Tests\Unit\MemberOriginalSourceValuesTest" classname="Tests.Unit.MemberOriginalSourceValuesTest" assertions="1" time="0.000602"/>
+    <testcase name="test_changed_definition_profile_selection_and_owner_relations_refuse" file="/workspace/VA-Studio-member-original-operation/tests/Unit/MemberOriginalSourceValuesTest.php" line="64" class="Tests\Unit\MemberOriginalSourceValuesTest" classname="Tests.Unit.MemberOriginalSourceValuesTest" assertions="6" time="0.003119"/>
+  </testsuite>
+</testsuites>

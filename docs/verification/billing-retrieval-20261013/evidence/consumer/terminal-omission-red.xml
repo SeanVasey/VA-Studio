@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest" file="/workspace/VA-Studio-billing-retrieval-consumers/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php" tests="4" assertions="56" errors="0" failures="4" skipped="0" time="38.721549">
+    <testsuite name="Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission" tests="4" assertions="56" errors="0" failures="4" skipped="0" time="38.721549">
+      <testcase name="test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set &quot;award before commit&quot;" file="/workspace/VA-Studio-billing-retrieval-consumers/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php" line="97" class="Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipBillingFreshnessTest" assertions="10" time="6.720853">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set "award before commit"
+Failed asserting that null is identical to 'expired_invoice_proof'.
+
+/workspace/VA-Studio-billing-retrieval-consumers/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php:137
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set &quot;award after commit&quot;" file="/workspace/VA-Studio-billing-retrieval-consumers/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php" line="97" class="Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipBillingFreshnessTest" assertions="10" time="6.892814">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set "award after commit"
+Failed asserting that null is identical to 'expired_invoice_proof'.
+
+/workspace/VA-Studio-billing-retrieval-consumers/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php:137
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set &quot;reserve before commit&quot;" file="/workspace/VA-Studio-billing-retrieval-consumers/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php" line="97" class="Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipBillingFreshnessTest" assertions="18" time="12.323597">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set "reserve before commit"
+Failed asserting that null is identical to 'expired_invoice_proof'.
+
+/workspace/VA-Studio-billing-retrieval-consumers/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php:137
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+      <testcase name="test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set &quot;reserve after commit&quot;" file="/workspace/VA-Studio-billing-retrieval-consumers/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php" line="97" class="Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest" classname="Tests.Feature.ProductionMembershipBilling.MembershipBillingFreshnessTest" assertions="18" time="12.784285">
+        <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\ProductionMembershipBilling\MembershipBillingFreshnessTest::test_owned_context_carries_the_original_cap_through_precommit_and_committed_admission with data set "reserve after commit"
+Failed asserting that null is identical to 'expired_invoice_proof'.
+
+/workspace/VA-Studio-billing-retrieval-consumers/tests/Feature/ProductionMembershipBilling/MembershipBillingFreshnessTest.php:137
+/workspace/VA-Studio-dependency-adapters/vendor/phpunit/phpunit/phpunit:104</failure>
+      </testcase>
+    </testsuite>
+  </testsuite>
+</testsuites>
