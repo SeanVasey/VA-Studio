@@ -26,3 +26,12 @@ indent_style = unset
 indent_size = unset
 insert_final_newline = unset
 trim_trailing_whitespace = unset
+
+# Owner-supplied brand vectors are hash-pinned (assets/brand/vasey-audio/SHA256SUMS); editors must not rewrite them on save.
+[assets/brand/**]
+charset = unset
+end_of_line = unset
+indent_style = unset
+indent_size = unset
+insert_final_newline = unset
+trim_trailing_whitespace = unset
