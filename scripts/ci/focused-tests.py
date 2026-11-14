@@ -213,6 +213,12 @@ PHP_TARGETS = {
         "tests/Unit/VaseyLicenseGlyphCoverageTest.php", "tests/Feature/LegacyRedirectMapTest.php",
         "tests/Feature/LegacyRedirectCommandTest.php",
     ),
+    # The three tests from Foundation run 43505345035 (2026-11-13): two pinned transaction behaviour that Laravel 13.42
+    # changed (rollback callbacks at a refused commit; a savepoint rollback on a nested lock error), one depended on the clock.
+    "foundation-20261113-framework": (
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php",
+        "tests/Feature/MediaUploadCommitRecoveryTest.php", "tests/Feature/TrackSchedulingTest.php",
+    ),
     # The native race alone: the whole test-delivery suite does not fit the 900-second runner cap on MySQL.
     "test-delivery-races": (
         "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
