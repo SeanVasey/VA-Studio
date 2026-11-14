@@ -75,16 +75,32 @@ final class LegacyRedirectResolver
      */
     public function contactFallback(): ?RedirectResponse
     {
+        return $this->routeFallback(['type' => 'editorial', 'section' => 'contact', 'slug' => null],
+            fn (): string => route('editorial.show', ['section' => 'contact'], false));
+    }
+
+    /**
+     * Route-level fallback for the legacy /sound-kits path while the sound-kit storefront is switched off (URL-005, Sean's
+     * decision 2026-11-14): a 301 to the catalog, where the legacy path pointed before the storefront route existed. Same
+     * switch, origin, single hop and private caching as the contact fallback.
+     */
+    public function catalogFallback(): ?RedirectResponse
+    {
+        return $this->routeFallback(['type' => 'route', 'name' => 'home'], fn (): string => route('home', [], false));
+    }
+
+    /** @param  callable(): string  $path */
+    private function routeFallback(array $target, callable $path): ?RedirectResponse
+    {
         if (config('legacy-redirects.enabled') !== true) {
             return null;
         }
-        $target = ['type' => 'editorial', 'section' => 'contact', 'slug' => null];
         if (! $this->targets->currentlyPublic($target)) {
             return null;
         }
 
         return new RedirectResponse(
-            app(PublicPagesSitemap::class)->canonicalOrigin().route('editorial.show', ['section' => 'contact'], false),
+            app(PublicPagesSitemap::class)->canonicalOrigin().$path(),
             301,
             ['Cache-Control' => self::FALLBACK_CACHE_CONTROL],
         );

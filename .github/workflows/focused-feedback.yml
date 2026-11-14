@@ -9,7 +9,7 @@ on:
         required: true
         type: choice
         default: unit
-        options: [track-discovery, unit, media, commerce, financial, test-delivery, test-delivery-races, buyer-cancel, buyer-cancel-migrations, buyer-cancel-races, migration-recompilation, mysql-schema-snapshot, foundation-20261113-fixes, foundation-20261113-framework, customer, operator, licensing, publication, track-concurrency, seller, store-foundations, membership-migrations, production-preparation, private-continuation, frontend, membership-history-frontend, browser-storefront, browser-customer, browser-site, browser-checkout, browser-delivery, browser-payment-exceptions, browser-operator-tracks, browser-operator-uploads, browser-operator-publication, bulk-license-browser, accessibility-browser]
+        options: [track-discovery, unit, media, commerce, financial, test-delivery, test-delivery-races, buyer-cancel, buyer-cancel-migrations, buyer-cancel-races, migration-recompilation, mysql-schema-snapshot, foundation-20261113-fixes, foundation-20261113-framework, legacy-fallbacks, customer, operator, licensing, publication, track-concurrency, seller, store-foundations, membership-migrations, production-preparation, private-continuation, frontend, membership-history-frontend, browser-storefront, browser-customer, browser-site, browser-checkout, browser-delivery, browser-payment-exceptions, browser-operator-tracks, browser-operator-uploads, browser-operator-publication, bulk-license-browser, accessibility-browser]
       engine:
         description: PHP database engine; frontend/browser require sqlite
         required: true
