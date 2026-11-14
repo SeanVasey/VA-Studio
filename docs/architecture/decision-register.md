@@ -992,3 +992,19 @@ Not decided here and left open: how loud the untagged preview should be relative
 - **Never overrides a person.** Only an order that never had a control is selected, and the check is repeated under the order lock. A block or enable that staff or the console recorded is final: the automatic run never re-enables it. Staff and automatic changes serialize on the order row and the expected version, so a simultaneous staff click and automatic run end with one enable (native MySQL race test). The kit page shows "Enabled automatically" while the order is still at the automatic enable (the control keeps the reference hash); the track page shows the plain state, and the audit event names the policy.
 - **What the automatic run cannot know (independent review of PR #359).** A refund/dispute hold exists only once staff have observed the case (`RefundDisputeLedger::observe` runs as staff); nothing ingests Stripe refunds or disputes into holds by itself, so a test payment refunded or disputed at Stripe and not yet observed is enabled within about a minute of activation. And a person cannot block an order before it is activated (the control needs the activation evidence), so with the policy on, the earliest a person can block is after the automatic enable, and a block does not recall bytes from a redemption that already committed (D-19). On a test environment this trade is accepted; it is a reason, among others, why this is not production delivery policy.
 - **Limits.** The kit lane has no refund/dispute hold model (none exists for kits today, for staff or for the automatic run); staff block a kit order after a refund. ProductionCheckout and production delivery are untouched. Automatic enabling grants no right, and it is not production delivery policy.
+
+## Register update — 2026-11-14: U+204F refused in place, before activation (PR #394)
+
+**Decided 2026-11-14 by the Claude Code harness under Sean's approval of that day ("I approve all the items waiting for me"),
+which covered the U+204F item.** The waiting item read "U+204F needs a new contract profile version (the profile class is
+hash-frozen)". That requirement follows from profile immutability after a contract is activated. No contract is activated, so
+SQ-14's pre-activation path applies: PR #394 adds U+204F to `ContractIdentityDeclarationV2::REFUSED` and re-pins the existing
+v1, v2, kit and `test-buyer-pdf-v2` profiles in place, together with the tc-lib 8.84.0 / font 4.8.0 update (DD-26), instead of
+introducing a successor profile. Earlier `ProductionFreeGrantRenderProfile` and `MemberGrantRenderProfileRegistry` `RELEASED`
+entries are kept byte for byte. Independent review approved the frozen bytes (P2: record this decision here).
+
+- **Effect.** U+204F is refused on every PCRE2 runtime (it was already refused on 10.47, used by CI and staging). Accepted
+  counts: 4,898 for the identity rule, 3,798 for the `test-v2` DejaVu set.
+- **For Sean to confirm or reverse.** If Sean wanted a new profile version even before activation, the in-place change can be
+  replaced by a successor before any contract is activated; nothing stored depends on it.
+

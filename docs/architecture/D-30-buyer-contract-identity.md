@@ -104,7 +104,10 @@ digit. A value is printable only when all of the following hold:
   - U+2800 BRAILLE PATTERN BLANK, which draws as a visible-width blank;
   - U+204F REVERSED SEMICOLON, listed explicitly since 2026-11-14: newer Unicode data gives it the Arabic script extension,
     so the Arabic refusal alone caught it under PCRE2 10.47 but not 10.42, and the list keeps the outcome independent of
-    the runtime;
+    the runtime. Sealed checkout evidence is re-verified against this rule (`verifyRetained`, through
+    `ContractPrintableSet::verifyRetained` in `ProductionCheckout` and `TaxCheckoutEvidence`), so a declaration containing
+    U+204F sealed on a PCRE2 10.42 runtime would now read as changed and hold finalization. None can exist: no contract is
+    activated, `contract_identity_v2` is local/testing only, and CI and staging (10.47) already refused it;
   - U+FFFC or U+FFFD;
   - one of the 26 covered codepoints that NFC replaces, such as the Kelvin and Ångström signs and the Greek oxia forms.
 

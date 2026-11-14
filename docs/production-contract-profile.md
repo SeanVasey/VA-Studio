@@ -96,7 +96,8 @@ graph 2.18.2 to 2.18.7, parser 3.16.2 to 3.16.7, sign 2.0.5 to 2.0.10; barcode, 
 unicode-data unchanged). The same re-pin carries the D-30 rule change that refuses U+204F REVERSED SEMICOLON explicitly in
 `ContractIdentityDeclarationV2` (newer Unicode data gives it the Arabic script extension, so `\p{Arabic}` refused it under
 PCRE2 10.47 but not 10.42); that class is in the v1, v2 and kit implementation pins. No contract is activated, so the profiles
-were re-pinned in place with their build scripts, which again rebuilt every generated font file byte for byte: v1 manifest
+were re-pinned in place (as in #286, an in-flight staging test-v2 profile stops matching the runtime; stored profiles still
+validate because earlier `RELEASED` entries are kept) with their build scripts, which again rebuilt every generated font file byte for byte: v1 manifest
 `d1db00a2…` to `e4f44cbe…`, v2 `a8208d10…` to `bd822058…` (fixed point after one pass), `test-buyer-pdf-v2` `ce6d39e2…` to
 `0605065d…`, and `vasey-kit-license-pdf-v1` `0d0b4e1d…` to `c616ff04…` (`scripts/repin-vasey-kit-license-v1.sh`). Golden
 renders: v1 `df32c9ea…` to `0a6f2fc4…`, v2 `f9b7895f…` to `8a2d07f9…`, kit `52334cb8…` to `41a0d6d1…`, `test-buyer-pdf-v2`
