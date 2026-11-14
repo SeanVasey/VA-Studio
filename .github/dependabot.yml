@@ -25,8 +25,7 @@ updates:
     groups:
       npm-minor-patch:
         update-types: ["minor", "patch"]
-        # Exact pins are reviewed one at a time: Playwright must match the pinned WebKit backport
-        # (scripts/ci/apply-playwright-webkit-offline-backport.mjs), so a bump would fail the whole group.
+        # Exact pins are reviewed one at a time: test-runner and type-checker majors change behaviour the group would hide.
         exclude-patterns: ["@playwright/test", "playwright", "playwright-core", "vitest", "typescript", "jsdom", "@testing-library/dom", "@testing-library/jest-dom"]
   - package-ecosystem: github-actions
     directory: /

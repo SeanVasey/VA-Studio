@@ -39,7 +39,6 @@ frontend:
     - bash scripts/ci/setup-gitlab-node.sh
   script:
     - npm ci
-    - node --test scripts/ci/apply-playwright-webkit-offline-backport.test.mjs
     - npm test
     - npm run build
     - python3 scripts/ci/scan-client-bundle.py

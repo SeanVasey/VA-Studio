@@ -397,6 +397,8 @@ BROWSER_SUBSETS = {
     **BROWSER_SUITES,
     "bulk-license-browser": ("tests/browser/bulk-license-draft-source.spec.ts",),
     "accessibility-browser": ("tests/browser/accessibility-public.spec.ts",),
+    # The offline reload journey (WebKit and Chromium) that the removed WebKit backport guarded until Playwright 1.65.
+    "browser-offline": ("tests/browser/storefront-offline.spec.ts",),
 }
 SUITES = (*PHP_TARGETS, *FRONTEND_SUBSETS, *BROWSER_SUBSETS)
 ENGINES = ("sqlite", "mysql")
