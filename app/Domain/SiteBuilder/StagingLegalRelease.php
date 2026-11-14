@@ -30,10 +30,10 @@ final class StagingLegalRelease
     public const SOURCES = ['privacy' => 'docs/legal/PRIVACY.md', 'terms' => 'docs/legal/TERMS.md'];
 
     /**
-     * The draft's exact bracketed spans and what staging shows instead, applied in this order. Values: DD-33 for the effective
-     * date, postal address, backup and email providers ("set at production"), hosting (Laravel Forge on a
-     * DigitalOcean server), storage (the server's private disk) and region (the United States); DD-34 for the minimum age
-     * ("18, or the age of majority where you live", as drafted); SQ-07 for the venue county (Polk County, Iowa, Sean 2026-11-10);
+     * The draft's exact bracketed spans, and the draft's production provider and region wording, with what staging shows
+     * instead, applied in this order. Values: DD-33 for the effective date, postal address, backup and email providers
+     * ("set at production"), storage (the server's private disk) and region (the United States); hosting (DigitalOcean), the
+     * minimum age (DD-34) and the venue county (SQ-07, Polk County, Iowa) are filled in the drafts themselves since 2026-11-14;
      * DD-35 for the DMCA agent sentence (removed); the legal-review
      * tags are dropped from the headings because DD-36 keeps production publication behind counsel anyway.
      *
@@ -43,16 +43,15 @@ final class StagingLegalRelease
         'Postal address: [registered postal address — inserted at publication]' => 'Postal address: '.self::UNSET,
         '[registered postal address — inserted at publication]' => 'Postal address: '.self::UNSET,
         '[set on publication]' => self::UNSET,
-        '[**DigitalOcean** — Sean to confirm for production]' => 'DigitalOcean',
-        '[our own server\'s private disk / Cloudflare R2 / an Amazon S3-compatible service — Sean to choose]' => 'our own server\'s private disk',
-        '[off-site backup provider — Sean to choose]' => self::UNSET,
-        '[name of email/SMTP provider — Sean to choose]' => self::UNSET,
-        '[the United States — Sean to confirm the production server region]' => 'the United States',
-        '[18, or the age of majority where you live — Proposed, Sean to confirm]' => '18, or the age of majority where you live',
-        '[18, or the age of majority where you live — Sean to confirm]' => '18, or the age of majority where you live',
+        // The drafts carry the production dates since 2026-11-14 (Sean: effective November 15, 2026); staging pages are not in effect.
+        '**Effective date:** November 15, 2026' => '**Effective date:** '.self::UNSET,
+        '**Last updated:** November 15, 2026' => '**Last updated:** '.self::UNSET,
+        // The drafts now carry the production values (SQ-07, SQ-08, SQ-09, SQ-01, DD-34); staging shows its own DD-33 facts.
+        '**File storage provider**: **Cloudflare R2**' => '**File storage provider**: our own server\'s private disk',
+        '**Backup storage**: **Backblaze B2**' => '**Backup storage**: '.self::UNSET,
+        '**Email delivery provider**: **Postmark**' => '**Email delivery provider**: '.self::UNSET,
+        'located in the United States (New York)' => 'located in the United States',
         ' [Sean to decide whether to register a DMCA designated agent with the U.S. Copyright Office.]' => '',
-        'Iowa [county — Sean to confirm]' => 'Polk County, Iowa',
-        '[county — Sean to confirm]' => '(Polk County, Iowa)',
         ' [For legal review]' => '',
     ];
 

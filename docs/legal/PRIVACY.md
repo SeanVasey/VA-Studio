@@ -1,12 +1,12 @@
 # VASEY.AUDIO Privacy Policy
 
-> **Approved by Sean Vasey on 2026-11-07 — not yet published — not legal advice; qualified legal review recommended before publication.**
+> **Approved by Sean Vasey on 2026-11-07. Legal review: approved by Sean Vasey on 2026-11-14 (business law certification, Drake University). Not yet published — not legal advice.**
 >
 > Draft date: 2026-10-24. Written against source `786fb7c755291184f9e01b4faaab28dbd430d698` (`origin/main`). Draft version label: `privacy-draft-2026-10-24`.
-> Approved 2026-11-07 against source `534b686b`; the proposals in earlier drafts (cookie lifetime, retention periods) are approved as written. Text still in square brackets is a placeholder or a choice that must be filled before publication (appendix A). The reviewer appendix at the end (sections A to C) is for Sean and the reviewer and is removed before publication.
+> Approved 2026-11-07 against source `534b686b`; the proposals in earlier drafts (cookie lifetime, retention periods) are approved as written. Text still in square brackets is a placeholder or a choice that must be filled before publication (appendix A). Placeholder fills of 2026-11-14: the bracketed values that recorded decisions answer were filled from them (approved text otherwise unchanged); the remaining brackets stay open (`README.md` in this folder lists each, with its decision and owner). The reviewer appendix at the end (sections A to C) is for Sean and the reviewer and is removed before publication.
 
-**Effective date:** [set on publication]
-**Last updated:** [set on publication]
+**Effective date:** November 15, 2026
+**Last updated:** November 15, 2026
 
 This policy explains what personal information VASEY.AUDIO collects when you visit the store, create an account, buy or download a license, or contact us; why we collect it; who we share it with; how long we keep it; and the choices and rights you have.
 
@@ -107,10 +107,10 @@ We share personal information only with the service providers below, who process
 | Recipient | What they do | What they receive |
 | --- | --- | --- |
 | **Stripe, Inc.** and its affiliates | Payment processing, fraud checks and tax calculation on Stripe's hosted checkout page | The amounts, item names and order references we send; everything you enter on Stripe's page. Stripe acts as an independent controller for some purposes, such as fraud prevention and its legal duties. |
-| **Hosting provider**: our servers are managed with **Laravel Forge** on a virtual private server from [**DigitalOcean** — Sean to confirm for production] | Runs the store, its database and its private file storage | All data stored by the store, held on our servers |
-| **File storage provider**: [our own server's private disk / Cloudflare R2 / an Amazon S3-compatible service — Sean to choose] | Stores purchased files, license PDFs and backups | Files and backups |
-| **Backup storage**: [off-site backup provider — Sean to choose] | Keeps copies of the database and private files so we can recover from failures | Backup files of the database and private files |
-| **Email delivery provider**: [name of email/SMTP provider — Sean to choose] | Sends account verification, password recovery and order messages, and marketing email only if you opted in | Your email address and the message content |
+| **Hosting provider**: our servers are managed with **Laravel Forge** on a virtual private server from **DigitalOcean** | Runs the store, its database and its private file storage | All data stored by the store, held on our servers |
+| **File storage provider**: **Cloudflare R2** | Stores purchased files, license PDFs and backups | Files and backups |
+| **Backup storage**: **Backblaze B2** | Keeps copies of the database and private files so we can recover from failures | Backup files of the database and private files |
+| **Email delivery provider**: **Postmark** | Sends account verification, password recovery and order messages, and marketing email only if you opted in | Your email address and the message content |
 | **YouTube (Google) / Vimeo** | Video playback, only after you press "Load video" | Your IP address and what their player collects |
 | **Professional advisers** (accountants, lawyers) | Accounting, tax and legal advice | What they need for the task, under confidentiality duties |
 | **Authorities and others where required** | Compliance with law, court orders, tax audits, or to protect rights, safety and property | What the law requires or allows |
@@ -162,7 +162,7 @@ No method of storage or transmission is completely secure. If a breach affects y
 
 ## 9. International transfers
 
-Vasey Multimedia is based in the United States, and our servers are located in [the United States — Sean to confirm the production server region]. If you use the store from outside the United States, your information is transferred to and processed in the United States, which may not have the same data protection laws as your country.
+Vasey Multimedia is based in the United States, and our servers are located in the United States (New York). If you use the store from outside the United States, your information is transferred to and processed in the United States, which may not have the same data protection laws as your country.
 
 Where the GDPR or UK GDPR applies, we rely on the European Commission's and UK's standard contractual clauses (or the EU-U.S. Data Privacy Framework and UK Extension, where a provider is certified) for transfers to our service providers, and on the transfer being necessary to perform our contract with you when you buy from us. You can ask us for more information about these safeguards.
 
@@ -210,7 +210,7 @@ Email **support@vasey.audio** from the address on your account, or tell us which
 
 ## 11. Children
 
-The store is not directed to children. You must be at least [18, or the age of majority where you live — Sean to confirm] to create an account or buy a license (see the Terms of Sale and Use). We do not knowingly collect personal information from children under 13 (or under 16 in the EEA and UK). If you believe a child has given us personal information, email support@vasey.audio and we will delete it.
+The store is not directed to children. You must be at least 18, or the age of majority where you live, to create an account or buy a license (see the Terms of Sale and Use). We do not knowingly collect personal information from children under 13 (or under 16 in the EEA and UK). If you believe a child has given us personal information, email support@vasey.audio and we will delete it.
 
 ## 12. Changes to this policy
 
@@ -229,12 +229,12 @@ Vasey Multimedia, doing business as VASEY.AUDIO
 ### A. Open items for Sean
 
 1. **Postal address:** supplied by Sean on 2026-10-24 (street line only; city and ZIP still needed); kept out of the public repository and inserted when the page is published through the site content system.
-2. **Production hosting provider and server region:** Forge is approved for production (decision register, 2026-10-18); the VPS provider (DigitalOcean is the staging choice) and region are part of U-02. Sections 5 and 9 name them.
-3. **File storage provider:** private server disk, Cloudflare R2 or an S3-compatible service (U-03).
-4. **Off-site backup provider** (S-10).
-5. **Email/SMTP provider name** for account and order messages, and whether a marketing email provider will be used (U-13). Until chosen, the code sends no email (`config/mail.php` defaults to `log`; `config/production-identity-smtp.php` is null).
+2. **Production hosting provider and server region: filled 2026-11-14** (DigitalOcean, NYC3, SQ-09). Forge is approved for production (decision register, 2026-10-18); the VPS provider (DigitalOcean is the staging choice) and region are part of U-02. Sections 5 and 9 name them.
+3. **File storage provider: filled 2026-11-14** as Cloudflare R2 (SQ-09; the adapter is not built, open question Q-4, and staging uses the private disk).
+4. **Off-site backup provider: filled 2026-11-14** as Backblaze B2 (SQ-01, SQ-09).
+5. **Email/SMTP provider: filled 2026-11-14** as Postmark (SQ-08; no marketing provider at launch). Original item: name for account and order messages, and whether a marketing email provider will be used (U-13). Until chosen, the code sends no email (`config/mail.php` defaults to `log`; `config/production-identity-smtp.php` is null).
 6. **Retention periods in section 7: approved by Sean on 2026-11-07** with this policy. The reviewed deletion workflow that enforces them is still open (appendix B).
-7. **Minimum age** (18 / age of majority proposed) in section 11, matching `TERMS.md`.
+7. **Minimum age: filled 2026-11-14** (DD-34, SQ-07) in section 11, matching `TERMS.md`.
 8. **Session lifetime: 120 minutes, approved by Sean on 2026-11-07** (the code default; the staging template still uses 480 for testing).
 9. **Marketing notice text** for `email_marketing` (`config/customer-preferences.php` is null) and the contact-form privacy notice and retention reference (`CONTACT_INQUIRIES_PRIVACY_NOTICE`, `CONTACT_INQUIRIES_RETENTION_REFERENCE`). Both can quote sections 3.5, 6 and 7 of this draft.
 10. **Customers imported from BeatStars** (U-09): no import code exists. If customer records are imported, add a short section telling those customers how their data arrived; consent stays unknown.
@@ -285,3 +285,4 @@ The earlier evidence-cited description of the data flows (draft of 2026-10-10, s
 - 2026-11-07 (D-30 step 2): sections 3.3, 7 and 10.3 disclose the legal-name confirmation, postal address and Exclusive artist name that order review will collect (Sean's decisions C-1, C-2 and D-1), and that the address is never taken from Stripe or account data. Appendix B records that collection is not implemented yet. Still not approved.
 - 2026-11-07 (later): sections 3.3 and the license-document row add the name of the person accepting a license for a business, after Sean decided that a business may be the licensee. Still not approved.
 - 2026-11-07: **approved by Sean Vasey** ("I approve privacy and terms"), including the proposed cookie lifetime and the section 7 retention periods. Placeholders and the choices listed in appendix A (postal address, hosting provider and region, storage, backup and email providers, minimum age, notice texts) must still be filled before publication, and appendix B gaps still constrain what may be published. Publication goes through the site content legal page type.
+- 2026-11-14: placeholders answered by recorded decisions were filled: hosting DigitalOcean and server region the United States (New York) (SQ-09, NYC3), file storage Cloudflare R2 (SQ-09), backup storage Backblaze B2 (SQ-01, SQ-09), email delivery Postmark (SQ-08), minimum age (DD-34, SQ-07). Still open: postal city and ZIP, effective and last-updated dates.

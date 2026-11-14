@@ -84,6 +84,21 @@ Each draft ends with its own open-items list. In one place, the launch-blocking 
 - U-13: retention schedule, consent purposes and notice text, analytics and email processors, account-deletion exemptions (`docs/architecture/decision-register.md`).
 - U-04: currency, tax registration, tax settings and payout reconciliation (merchant of record now known: `docs/architecture/decision-register.md`, 2026-10-24 entry).
 - U-07: production buyer identity, guest versus account purchasing, recovery (`docs/architecture/decision-register.md`).
-- Venue county in Iowa, liability wording and minimum age (governing law is Iowa, set by Sean on 2026-10-24).
+- **Answered by recorded decisions and filled in the drafts on 2026-11-14** (the register entries are the authority; the public text cites none):
+  - Venue county: Polk County, Iowa (SQ-07, Sean 2026-11-10); TERMS section 18 and LICENSE-TIERS section 4.14.
+  - Minimum age: "18, or the age of majority where you live" (DD-34; SQ-07 confirms 18); TERMS section 2 and PRIVACY section 11.
+  - Hosting provider and server region: DigitalOcean via Laravel Forge, NYC3, so "the United States (New York)" (SQ-09); PRIVACY sections 5 and 9.
+  - File storage provider: Cloudflare R2 (SQ-09; DD-58 superseded). The R2 adapter is not built (register open question Q-4); staging uses the private disk.
+  - Off-site backup provider: Backblaze B2 (SQ-01, SQ-09). R2 is storage, B2 is backups; the two are not interchangeable.
+  - Email delivery provider: Postmark, transactional stream only (SQ-08, SQ-07).
+- **Decided by Sean on 2026-11-14** (decision register, "Register update — 2026-11-14: legal review, effective date and email provider"):
+  - Legal review of the "For legal review" sections (TERMS 15 to 17, LICENSE-TIERS 4.14) and the no-samples warranty (DD-36): approved by Sean Vasey on review (business law certification, Drake University). The markers are removed; the wording is unchanged.
+  - Effective date and last-updated date: November 15, 2026 (PRIVACY and TERMS). Staging pages still read "set at production" (DD-33).
+  - Email delivery provider: Postmark (confirms SQ-08).
+- **Still open, with owners:**
+  - Postal address: Sean supplied the city, state and ZIP privately on 2026-11-14 (the street line on 2026-10-24). The address stays out of the repository and is entered through the site content system at publication.
+  - DMCA designated agent sentence in TERMS section 13: SQ-07 decides to designate VASEY.AUDIO (Sean Vasey) in the U.S. Copyright Office directory, but registration is Sean's action and has not happened, so the sentence cannot yet name an agent (DD-35 earlier chose not to register).
+  - Owner choices in LICENSE-TIERS (numbers, prices, producer credit, exclusive ownership, and the rest of section 8), which no decision answers.
+  - Text drift to reconcile before publication (not changed here, approved text): PRIVACY section 5 says the file storage provider stores "backups" and the email row mentions marketing email, while SQ-09 puts backups on B2 and SQ-09/SQ-11 set no marketing provider at launch; `docs/sound-kit-license.md` still calls the Polk County venue unconfirmed (item 4).
 - The contact-form privacy notice and retention reference (`docs/contact-inquiries.md`); the marketing-consent notice (`config/customer-preferences.php`).
 - Approval of the text to publish through the legal page mechanism (above); the mechanism itself exists.

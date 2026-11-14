@@ -992,3 +992,22 @@ Not decided here and left open: how loud the untagged preview should be relative
 - **Never overrides a person.** Only an order that never had a control is selected, and the check is repeated under the order lock. A block or enable that staff or the console recorded is final: the automatic run never re-enables it. Staff and automatic changes serialize on the order row and the expected version, so a simultaneous staff click and automatic run end with one enable (native MySQL race test). The kit page shows "Enabled automatically" while the order is still at the automatic enable (the control keeps the reference hash); the track page shows the plain state, and the audit event names the policy.
 - **What the automatic run cannot know (independent review of PR #359).** A refund/dispute hold exists only once staff have observed the case (`RefundDisputeLedger::observe` runs as staff); nothing ingests Stripe refunds or disputes into holds by itself, so a test payment refunded or disputed at Stripe and not yet observed is enabled within about a minute of activation. And a person cannot block an order before it is activated (the control needs the activation evidence), so with the policy on, the earliest a person can block is after the automatic enable, and a block does not recall bytes from a redemption that already committed (D-19). On a test environment this trade is accepted; it is a reason, among others, why this is not production delivery policy.
 - **Limits.** The kit lane has no refund/dispute hold model (none exists for kits today, for staff or for the automatic run); staff block a kit order after a refund. ProductionCheckout and production delivery are untouched. Automatic enabling grants no right, and it is not production delivery policy.
+
+## Register update — 2026-11-14: legal review, effective date and email provider
+
+Sean's words on 2026-11-14, recorded verbatim:
+
+- "I have a business law certification from Drake Universify - I approve it on review"
+- "Use Postmark for email, keep going - <postal city, state and ZIP, withheld from the repository> - effective date 11/15/2026"
+- On the effective date: "It's the date I gave you which as of the future dates will be a date in the past. It will have been."
+
+What they decide:
+
+- **DD-36 (legal review) is satisfied by Sean's own review.** The wording marked "For legal review" (TERMS sections 15 to 17,
+  LICENSE-TIERS 4.14) and the no-samples warranty are approved as written; the markers are removed and no wording changed.
+- **Effective date: November 15, 2026** for the privacy policy and the terms (also their "last updated" date), kept even if
+  publication happens later.
+- **Email delivery provider: Postmark** (confirms SQ-08).
+- **Postal address:** the city, state and ZIP were supplied in the conversation. Like the street line, they stay out of the
+  repository (withheld from the quote above) and are entered through the site content system at publication.
+
