@@ -219,6 +219,12 @@ PHP_TARGETS = {
         "tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php",
         "tests/Feature/MediaUploadCommitRecoveryTest.php", "tests/Feature/TrackSchedulingTest.php",
     ),
+    # Route-level legacy fallbacks (URL-005 /sound-kits, URL-006 /services) and the shipped redirect map.
+    "legacy-fallbacks": (
+        "tests/Feature/SoundKitLegacyFallbackTest.php", "tests/Feature/ServiceLegacyFallbackTest.php",
+        "tests/Feature/LegacyRedirectMapTest.php", "tests/Feature/LegacyRedirectCacheTest.php",
+        "tests/Feature/SoundKitStorefrontTest.php",
+    ),
     # The native race alone: the whole test-delivery suite does not fit the 900-second runner cap on MySQL.
     "test-delivery-races": (
         "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
