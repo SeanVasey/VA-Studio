@@ -25,8 +25,8 @@ class TestContractProfileSuccessorTest extends TestCase
 
     private function successorRuntime(): bool
     {
-        return InstalledVersions::getReference('tecnickcom/tc-lib-pdf') === 'a0626686715391dd4210c5622aee849d033b8baf'
-            && InstalledVersions::getReference('tecnickcom/tc-lib-pdf-font') === '668d73e853c6027afd9cdaae8ea042957ba11e08';
+        return InstalledVersions::getReference('tecnickcom/tc-lib-pdf') === '2be3a522329df9d2941381ce8315b6647d620c69'
+            && InstalledVersions::getReference('tecnickcom/tc-lib-pdf-font') === '30804d3d493ddcf13dbb0a78c76c95b788c8948a';
     }
 
     private function v2(): array
@@ -69,12 +69,12 @@ class TestContractProfileSuccessorTest extends TestCase
         $a = (new VersionedContractRenderer)->render($input, $profile);
         $b = (new VersionedContractRenderer)->render($input, $profile);
         $this->assertSame($a->pdfBytes, $b->pdfBytes);
-        $this->assertSame('536171e3b691fdb337c07522042ad339f1b378c11349f168dda7d7a2cba75548', $a->sha256);
+        $this->assertSame('63050151a84185a965f589d8b5493df4bd38cfef484aa35e7b639078a56fcaf1', $a->sha256);
         $this->assertNotSame($this->v1()['pdf_sha256'], $a->sha256);
         $this->assertSame(751575, $a->sizeBytes);
         $this->assertSame(ContractRenderProfile::hash($profile), $a->profileHash);
         $this->assertSame(1, $a->pageCount);
-        $this->assertStringContainsString('8.81.1', $a->pdfBytes);
+        $this->assertStringContainsString('8.84.0', $a->pdfBytes);
     }
 
     public function test_real_scrubbed_child_dispatches_only_the_trusted_successor_implementation(): void
@@ -84,7 +84,7 @@ class TestContractProfileSuccessorTest extends TestCase
             $this->expectException(ContractIssuanceException::class);
         }
         $result = (new IsolatedContractRenderer)->render(ContractRendererFixtures::input(), $this->v2());
-        $this->assertSame('536171e3b691fdb337c07522042ad339f1b378c11349f168dda7d7a2cba75548', $result->sha256);
+        $this->assertSame('63050151a84185a965f589d8b5493df4bd38cfef484aa35e7b639078a56fcaf1', $result->sha256);
         $this->assertSame(751575, $result->sizeBytes);
         $this->assertSame(ContractRenderProfile::hash($this->v2()), $result->profileHash);
     }

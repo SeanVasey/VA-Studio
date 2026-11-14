@@ -44,12 +44,11 @@ class VaseyLicenseGlyphCoverageTest extends TestCase
     {
         $brand = self::accepted(ContractGlyphCoverage::vaseyLicenseFaces());
         $dejavu = self::accepted(ContractGlyphCoverage::pinnedContractFaces());
-        // 3,799 accepted, except U+204F REVERSED SEMICOLON, which depends on the runtime's Unicode data: newer data gives it
-        // the Arabic script extension, so the frozen refusal of \p{Arabic} also refuses it under PCRE2 10.47 (PHP 8.4.27 on
-        // the CI runners) but not under 10.42. The class is frozen by the contract profiles' implementation hashes, so the
-        // rule cannot be pinned without a new profile version; that decision is open (2026-11-13). Every other codepoint is
-        // still pinned exactly.
-        $this->assertCount(3799 - (in_array(0x204F, $dejavu, true) ? 0 : 1), $dejavu);
+        // 3,798 accepted on every runtime. U+204F REVERSED SEMICOLON is refused explicitly (2026-11-14): newer Unicode data
+        // gives it the Arabic script extension, so \p{Arabic} alone refused it under PCRE2 10.47 but not under 10.42.
+        $this->assertCount(3798, $dejavu);
+        $this->assertNotContains(0x204F, $dejavu);
+        $this->assertContains(0x204F, ContractGlyphCoverage::pinnedContractFaces()->codepoints());
         $this->assertSame([], array_values(array_diff($brand, $dejavu)));
         // What the brand faces would newly refuse, by example: Latin Extended-A/B and Additional, Greek and Cyrillic.
         foreach (['Łukasz Żółć', 'Đorđe Đorđević', 'Ștefan Țepeș', 'Nguyễn Văn An', 'Ἀλέξανδρος', 'Иван Петров', 'Gülşen Kılıç'] as $name) {

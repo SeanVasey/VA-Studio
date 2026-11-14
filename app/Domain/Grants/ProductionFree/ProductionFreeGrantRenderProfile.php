@@ -43,6 +43,11 @@ final class ProductionFreeGrantRenderProfile
             'synthetic_rehearsal' => '277f97427267ec3842f6c18863e4aeca8923d45dacb32283c3d271642d9f9f22',
             'verified_production' => 'e10fee4f0a08b92259577fa50b5712636046e82aec2bef71942250e570bcc4c4',
         ],
+        // r4 (2026-11-14, SQ-14): the retained test-buyer-pdf-v2 base re-pinned to tc-lib-pdf 8.84.0 and tc-lib-pdf-font 4.8.0.
+        'r4' => [
+            'synthetic_rehearsal' => '1303cb5dfedebef93824f30f3b62271001afee847d30687cf5bdf9d7cbe77001',
+            'verified_production' => '8a361fcc423876cdb3ae8caa6d0f6715e5d0ed5b735b87b7cce4b18a696e688e',
+        ],
     ];
 
     private const MANIFEST_HASH = '1ad3da2a7af0048681763de94e7698c58fa2c53ba0554918b8d6899b9bbb2213';

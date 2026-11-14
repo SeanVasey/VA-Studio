@@ -89,6 +89,24 @@ Released-profile registries gained entries and kept the old ones readable: `Prod
 document's extracted text is identical before and after except the printed profile digest; the pages differ in raster only in
 that line. `scripts/build-contract-profile.php` (test-v1 resolver) still expects the old graph, as it did on main.
 
+**Re-pinned again before activation (2026-11-14, SQ-14; Dependabot #379/#380, which failed preflight on the pinned graph).**
+tc-lib-pdf 8.81.1 to 8.84.0 (`a0626686…` to `2be3a522…`) and tc-lib-pdf-font 4.6.2 to 4.8.0 (`668d73e8…` to `30804d3d…`),
+with the dependencies Composer resolved for them (color 3.0.7 to 3.0.14, file 3.9.4 to 3.9.10, filter 2.11.4 to 2.11.9,
+graph 2.18.2 to 2.18.7, parser 3.16.2 to 3.16.7, sign 2.0.5 to 2.0.10; barcode, encrypt, image, page, unicode and
+unicode-data unchanged). The same re-pin carries the D-30 rule change that refuses U+204F REVERSED SEMICOLON explicitly in
+`ContractIdentityDeclarationV2` (newer Unicode data gives it the Arabic script extension, so `\p{Arabic}` refused it under
+PCRE2 10.47 but not 10.42); that class is in the v1, v2 and kit implementation pins. No contract is activated, so the profiles
+were re-pinned in place with their build scripts, which again rebuilt every generated font file byte for byte: v1 manifest
+`d1db00a2…` to `e4f44cbe…`, v2 `a8208d10…` to `bd822058…` (fixed point after one pass), `test-buyer-pdf-v2` `ce6d39e2…` to
+`0605065d…`, and `vasey-kit-license-pdf-v1` `0d0b4e1d…` to `c616ff04…` (`scripts/repin-vasey-kit-license-v1.sh`). Golden
+renders: v1 `df32c9ea…` to `0a6f2fc4…`, v2 `f9b7895f…` to `8a2d07f9…`, kit `52334cb8…` to `41a0d6d1…`, `test-buyer-pdf-v2`
+`536171e3…` to `63050151…` (751575 bytes, unchanged). Each new golden has the same size and extracted text as the old one
+except the printed profile digest (v1, v2, kit); at 100 dpi their rasters differ only inside that digest line, and the
+`test-buyer-pdf-v2` render is pixel-identical (its bytes differ only in the producer version, keywords and document IDs).
+`ProductionFreeGrantRenderProfile::RELEASED` gains `r4` (glyph equivalence repeated, 1,112,032 code points, 0 differences:
+`docs/verification/tc-lib-update-20261114/`) and `MemberGrantRenderProfileRegistry::RELEASED` gains `r3`; earlier entries
+stay readable.
+
 ## Variable map (increment 3 design, 2026-11-07)
 
 The six templates use 22 placeholders, and each one needs exactly one source. Two layers already exist:
@@ -343,7 +361,8 @@ own hash must be pinned, with review.
 
 **Glyph coverage, compared with DejaVu.** The v1 brand files are Fontsource **Latin subsets**. The four faces share 214
 positive-width codepoints, all Latin or Common, and the D-30 rule accepts 212 of them (U+000D and U+00A0 are refused). The
-`test-v2` DejaVu set the paid renderers use accepts 3,799 under its own script restriction, and the v1 set is a strict subset
+`test-v2` DejaVu set the paid renderers use accepts 3,798 under its own script restriction (3,799 before U+204F REVERSED
+SEMICOLON was refused explicitly on 2026-11-14), and the v1 set is a strict subset
 of it. v1 covers Basic Latin, Latin-1 Supplement, ı, Œ, œ, the typographic quotes and dashes, € and ™, but not Latin
 Extended-A and B (Ł, Ż, Ș, Ț, ğ, ş and others), Latin Extended Additional (Vietnamese), Greek or Cyrillic. Every pinned
 country name prints.
