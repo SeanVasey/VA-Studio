@@ -1005,6 +1005,5 @@ entries are kept byte for byte. Independent review approved the frozen bytes (P2
 
 - **Effect.** U+204F is refused on every PCRE2 runtime (it was already refused on 10.47, used by CI and staging). Accepted
   counts: 4,898 for the identity rule, 3,798 for the `test-v2` DejaVu set.
-- **For Sean to confirm or reverse.** If Sean wanted a new profile version even before activation, the in-place change can be
-  replaced by a successor before any contract is activated; nothing stored depends on it.
+- **Confirmed by Sean on 2026-11-14** (recorded on PR #394): the refusal stays an in-place change; no successor profile.
 
