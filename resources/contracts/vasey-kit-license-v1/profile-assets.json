@@ -17,32 +17,32 @@
             "reference": "2fd80f8b4d2cb5f31ac20b784e2516f20c71fd61"
         },
         "tecnickcom/tc-lib-color": {
-            "version": "3.0.7",
-            "reference": "8455d371882d2e3eb2742d4d6fb82ca5aebb95db"
+            "version": "3.0.14",
+            "reference": "99057a58e02c11bf1a826d09833059187edea4a5"
         },
         "tecnickcom/tc-lib-file": {
-            "version": "3.9.4",
-            "reference": "02089faaaed42cb5137d23ba2236e6809124999e"
+            "version": "3.9.10",
+            "reference": "a26615b711c7fa76672a0391bc9af863e5558ee5"
         },
         "tecnickcom/tc-lib-pdf": {
-            "version": "8.81.1",
-            "reference": "a0626686715391dd4210c5622aee849d033b8baf"
+            "version": "8.84.0",
+            "reference": "2be3a522329df9d2941381ce8315b6647d620c69"
         },
         "tecnickcom/tc-lib-pdf-encrypt": {
             "version": "2.12.2",
             "reference": "887921e1fef98dc9885b33b85cbcd1b222b4b7dc"
         },
         "tecnickcom/tc-lib-pdf-filter": {
-            "version": "2.11.4",
-            "reference": "2b0e0f9f56ae8e8baeda9a7aebd8e8321b493e30"
+            "version": "2.11.9",
+            "reference": "7759b1a803d2423e9f3bb8d3fa32b5f14c183b9d"
         },
         "tecnickcom/tc-lib-pdf-font": {
-            "version": "4.6.2",
-            "reference": "668d73e853c6027afd9cdaae8ea042957ba11e08"
+            "version": "4.8.0",
+            "reference": "30804d3d493ddcf13dbb0a78c76c95b788c8948a"
         },
         "tecnickcom/tc-lib-pdf-graph": {
-            "version": "2.18.2",
-            "reference": "bb87e68d21792e5722e8395a3ef471c74b81d70d"
+            "version": "2.18.7",
+            "reference": "d023027a7f89e63aa50fda127571f5b86d1d6f1f"
         },
         "tecnickcom/tc-lib-pdf-image": {
             "version": "3.15.3",
@@ -53,12 +53,12 @@
             "reference": "86f854489301a79533454d3ca8d9d918cec95cb9"
         },
         "tecnickcom/tc-lib-pdf-parser": {
-            "version": "3.16.2",
-            "reference": "074599a52f1ef8cbac67dcb9b10dd2a730760c70"
+            "version": "3.16.7",
+            "reference": "f83cadbc3b347732ed928cd7b654589688812c5f"
         },
         "tecnickcom/tc-lib-pdf-sign": {
-            "version": "2.0.5",
-            "reference": "cc3d9afc536a5878326a5d34d08492c1d475960a"
+            "version": "2.0.10",
+            "reference": "b7c757b1a2eec90014c296bd5317a545c24be177"
         },
         "tecnickcom/tc-lib-unicode": {
             "version": "3.2.3",
@@ -71,12 +71,12 @@
     },
     "implementation": {
         "app/Domain/Commerce/ContractIdentity/ContractGlyphCoverage.php": "fae4b3c5fa2a7841a5a09440ca42ddac545553fa32524770b91e156b42cbd4c9",
-        "app/Domain/Commerce/ContractIdentity/ContractIdentityDeclarationV2.php": "f5839782350513762734cef72ec786dc57057976557e377580bf778646ddba6f",
+        "app/Domain/Commerce/ContractIdentity/ContractIdentityDeclarationV2.php": "f2be9836e9a5efb1c74e48be41386455d21912fb1232dd6f6e957b4877fd0a02",
         "app/Domain/Commerce/ContractIdentity/ContractPrintableSet.php": "18df1fb1430463d56df4e791f36f645871567cfa2b04e7024112eae6d9648f3e",
         "app/Domain/Commerce/ProductionCheckout/CheckoutException.php": "271e6eaf728665edf521b64daadbdcf00b5c2f432c344138b648bc9f61140241",
         "app/Domain/Contracts/ContractIssuanceException.php": "9df97742776ba51f031b088ade0fde06e2a73ad1d90284141b91ee6e3eb8a8be",
         "app/Domain/Contracts/ContractIssuancePolicy.php": "3aa15f4485ad5cdf8d71a59f2b244abdbfe0ab0d1c2b799264041986b086dac0",
-        "app/Domain/Contracts/ContractRenderProfileRegistry.php": "51d879e904b3b8352c578c10a582b621d76f48c149189ede1ed0c2bcd970bbac",
+        "app/Domain/Contracts/ContractRenderProfileRegistry.php": "67e2f192cfe5b507d1d11993191c14e5d360e042567165626d8cc90d3090d0b6",
         "app/Domain/Contracts/Production/ContractBindingException.php": "a0746b6b67ab9ab75c8db28c8700bd523675fd8db6ff6207ada17a3552f747b8",
         "app/Domain/Contracts/Production/ContractLicenseConstants.php": "3b4e7a96638b0944e5eb2cdc88604013192dc32099b2219ee47d1c6a1c180ba7",
         "app/Domain/Contracts/Production/ContractNumberWords.php": "3c86e2b247fabcafeea88f740e50cb15fb35db88d712a3a2e776e2f141ce971f",
@@ -90,10 +90,10 @@
         "app/Domain/Contracts/Production/VaseyLicenseDocument.php": "57a2b080a3f0ba445261f2e36c7569352cd5bbe2a81a697672b3e2faed2f3a2d",
         "app/Domain/Contracts/Production/VaseyLicenseLayout.php": "9999d2fa2a9df75d5724b2a5807c5fe8e4b9b1ebcdc2bdfd5310455f446412a1",
         "app/Domain/Contracts/Production/VaseyLicensePdfRenderer.php": "f81ae57e04616d77cb9e0dd25b894d00e336ec5db1718f5b6272df59fbd4d0bc",
-        "app/Domain/Contracts/Production/VaseyLicenseProfile.php": "b7863c34cba02dccf19d803d0ad166d40360dd8a6e373646a994522051a01fa8",
+        "app/Domain/Contracts/Production/VaseyLicenseProfile.php": "ef3e4fcf5a27af725fd7a25212452df139204c7cac1282716e2e2aef64fa7d31",
         "app/Domain/Contracts/Production/VaseyLicenseProfileDefinition.php": "8afaf0ce8cefb1b728689d130f9f4c54fe725ec20a8d6ff3153e7db78329587f",
         "app/Domain/Contracts/Production/VaseyLicenseSignature.php": "e8aae2e91522c273bc500b873cf8b762aadf9e0babe07d5a361f5377785b2376",
-        "app/Domain/Contracts/Production/VaseyLicenseV2Profile.php": "75b4ef0cd57abbcf22071d4d6a34216aa53163c573c5b8365fedc6a201f9e7ba",
+        "app/Domain/Contracts/Production/VaseyLicenseV2Profile.php": "18f25d5557283a00778f792ea9a41d44317589f764f5ba4097c92e8a080fefc0",
         "app/Domain/Contracts/Production/VaseyLicenseV2ProfileDefinition.php": "791e6f9656dcc0a28d649fd3f1e72684c0719270140ee53da75e995f5a53b379",
         "app/Domain/Contracts/RenderedContract.php": "b3fa57b8c8cc8e354597a5fc5f12b7942aa734e9d1bab9f0d2014358dd1d249f",
         "app/Domain/Rights/EconomicLicenseTerms.php": "070a5b2e07887a713dd603803de5c330d34dc1d0b27b633dfe6c4eaaba87f0b4",

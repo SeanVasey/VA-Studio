@@ -12,7 +12,9 @@ class ReportingCsvTest extends TestCase
     public static function cells(): iterable
     {
         foreach (['=HYPERLINK("http://example.invalid")', '+1+1', '-2+3', '@SUM(A1)', "\tcmd", "\rcmd"] as $text) {
-            yield $text => [$text, "'".$text];
+            // PHPUnit 13 escapes a control character in a data-set name in its JUnit output (\u{000D}) but not in --list-tests-xml,
+            // so CI receipts could not match "\rcmd" by name. The name is JSON-encoded, as below; the values tested are unchanged.
+            yield json_encode($text) => [$text, "'".$text];
         }
         foreach ([' =1+1', "\n=1+1", "  \n@SUM(A1)", " \t=1+1", "\t =1+1", " \r\n-2+3", "\x0B+1", "\f@SUM(A1)", " \t \n\r=1"] as $text) {
             yield 'leading whitespace '.json_encode($text) => [$text, "'".$text];

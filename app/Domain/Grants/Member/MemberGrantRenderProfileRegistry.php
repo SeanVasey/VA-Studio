@@ -32,6 +32,11 @@ final class MemberGrantRenderProfileRegistry
             'synthetic_rehearsal' => '944b4095f4bc8ed2f787206bc3ce446612aaf106fa32e279b0a7ae8232d8d6fa',
             'verified_production' => '8e5451632ac672ae7907b5a0d194f0ed9d3c3c6061dee8a224318263e17035d5',
         ],
+        // r3 (2026-11-14, SQ-14): the embedded test-buyer-pdf-v2 base re-pinned to tc-lib-pdf 8.84.0 / tc-lib-pdf-font 4.8.0.
+        'r3' => [
+            'synthetic_rehearsal' => '585faf4595c3d050330f14e85d3074a7c8337532959b5afbfb2fdd5c317c4839',
+            'verified_production' => '4c5e40a42239a386e2dc32c7a3080742870f3a6a89bd466be9aeefa708cc941c',
+        ],
     ];
 
     private const DESCRIPTOR = [
@@ -109,32 +114,32 @@ final class MemberGrantRenderProfileRegistry
                         'reference' => '2fd80f8b4d2cb5f31ac20b784e2516f20c71fd61',
                     ],
                     'tecnickcom/tc-lib-color' => [
-                        'version' => '3.0.7',
-                        'reference' => '8455d371882d2e3eb2742d4d6fb82ca5aebb95db',
+                        'version' => '3.0.14',
+                        'reference' => '99057a58e02c11bf1a826d09833059187edea4a5',
                     ],
                     'tecnickcom/tc-lib-file' => [
-                        'version' => '3.9.4',
-                        'reference' => '02089faaaed42cb5137d23ba2236e6809124999e',
+                        'version' => '3.9.10',
+                        'reference' => 'a26615b711c7fa76672a0391bc9af863e5558ee5',
                     ],
                     'tecnickcom/tc-lib-pdf' => [
-                        'version' => '8.81.1',
-                        'reference' => 'a0626686715391dd4210c5622aee849d033b8baf',
+                        'version' => '8.84.0',
+                        'reference' => '2be3a522329df9d2941381ce8315b6647d620c69',
                     ],
                     'tecnickcom/tc-lib-pdf-encrypt' => [
                         'version' => '2.12.2',
                         'reference' => '887921e1fef98dc9885b33b85cbcd1b222b4b7dc',
                     ],
                     'tecnickcom/tc-lib-pdf-filter' => [
-                        'version' => '2.11.4',
-                        'reference' => '2b0e0f9f56ae8e8baeda9a7aebd8e8321b493e30',
+                        'version' => '2.11.9',
+                        'reference' => '7759b1a803d2423e9f3bb8d3fa32b5f14c183b9d',
                     ],
                     'tecnickcom/tc-lib-pdf-font' => [
-                        'version' => '4.6.2',
-                        'reference' => '668d73e853c6027afd9cdaae8ea042957ba11e08',
+                        'version' => '4.8.0',
+                        'reference' => '30804d3d493ddcf13dbb0a78c76c95b788c8948a',
                     ],
                     'tecnickcom/tc-lib-pdf-graph' => [
-                        'version' => '2.18.2',
-                        'reference' => 'bb87e68d21792e5722e8395a3ef471c74b81d70d',
+                        'version' => '2.18.7',
+                        'reference' => 'd023027a7f89e63aa50fda127571f5b86d1d6f1f',
                     ],
                     'tecnickcom/tc-lib-pdf-image' => [
                         'version' => '3.15.3',
@@ -145,12 +150,12 @@ final class MemberGrantRenderProfileRegistry
                         'reference' => '86f854489301a79533454d3ca8d9d918cec95cb9',
                     ],
                     'tecnickcom/tc-lib-pdf-parser' => [
-                        'version' => '3.16.2',
-                        'reference' => '074599a52f1ef8cbac67dcb9b10dd2a730760c70',
+                        'version' => '3.16.7',
+                        'reference' => 'f83cadbc3b347732ed928cd7b654589688812c5f',
                     ],
                     'tecnickcom/tc-lib-pdf-sign' => [
-                        'version' => '2.0.5',
-                        'reference' => 'cc3d9afc536a5878326a5d34d08492c1d475960a',
+                        'version' => '2.0.10',
+                        'reference' => 'b7c757b1a2eec90014c296bd5317a545c24be177',
                     ],
                     'tecnickcom/tc-lib-unicode' => [
                         'version' => '3.2.3',

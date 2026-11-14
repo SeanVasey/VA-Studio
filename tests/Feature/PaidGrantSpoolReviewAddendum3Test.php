@@ -43,7 +43,7 @@ final class PaidGrantSpoolReviewAddendum3Test extends TestCase
             unlink($reserve);
             symlink($outside, $reserve);
         };
-        $this->assertSame('target_unavailable', $this->attempt($spool, $buyer));
+        $this->assertSame('target_unavailable', $this->handleOutcome($spool, $buyer));
         $spool->afterProbe = null;
         $this->assertSame($buyer, file_get_contents($this->dir().'/slot-0.holder'), 'holder written before the reservation failed');
         $this->assertTrue(is_link($reserve), 'never repaired');
@@ -53,7 +53,7 @@ final class PaidGrantSpoolReviewAddendum3Test extends TestCase
         $spool->during = function () use ($spool, $buyer, &$held): void {
             $spool->during = null;
             // While buyer A holds slot 1, A is refused, and B is admitted on slot 2 despite B's stale digest in slot 1's past.
-            $held = ['same' => $this->attempt($spool, $buyer), 'other' => $this->attempt($spool, hash('sha256', 'buyer-b'))];
+            $held = ['same' => $this->handleOutcome($spool, $buyer), 'other' => $this->handleOutcome($spool, hash('sha256', 'buyer-b'))];
         };
         $spool->handle($this->target(), null, $buyer)->close();
         $this->assertSame(['same' => 'target_unavailable', 'other' => null], $held);
@@ -72,7 +72,7 @@ final class PaidGrantSpoolReviewAddendum3Test extends TestCase
             $spool->during = null;
             // Same inode, mode and size, but not hex: unreadable as a holder while slot 0 is held.
             file_put_contents($this->dir().'/slot-0.holder', str_repeat('Z', 64));
-            $results = [$this->attempt($spool, hash('sha256', 'buyer-b')), $this->attempt($spool, null)];
+            $results = [$this->handleOutcome($spool, hash('sha256', 'buyer-b')), $this->handleOutcome($spool, null)];
         };
         $spool->handle($this->target(), null, $buyer)->close();
         // A null holder (no account; tests only) does not read other holders, so it is still admitted.
@@ -87,7 +87,7 @@ final class PaidGrantSpoolReviewAddendum3Test extends TestCase
         $this->assertSame($buyer, file_get_contents($this->dir().'/slot-1.holder'));
     }
 
-    private function attempt(PaidGrantPrepareStream $spool, ?string $holder): ?string
+    private function handleOutcome(PaidGrantPrepareStream $spool, ?string $holder): ?string
     {
         try {
             $spool->handle($this->target(), null, $holder)->close();

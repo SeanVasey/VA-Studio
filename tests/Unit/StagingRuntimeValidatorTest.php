@@ -164,7 +164,10 @@ class StagingRuntimeValidatorTest extends TestCase
     {
         $spellings = ['true', '"true"', "'true'", '(true)', 'TRUE', 'True', '1', 'yes', 'on', '', '(null)', 'null', 'empty', '"1"', '0', 'no'];
 
-        return array_combine($spellings, array_map(static fn (string $spelling): array => [$spelling], $spellings));
+        // PHPUnit 13 refuses an empty data-set name, so the blank value is named `blank`; the values tested are unchanged.
+        $names = array_map(static fn (string $spelling): string => $spelling === '' ? 'blank' : $spelling, $spellings);
+
+        return array_combine($names, array_map(static fn (string $spelling): array => [$spelling], $spellings));
     }
 
     /**

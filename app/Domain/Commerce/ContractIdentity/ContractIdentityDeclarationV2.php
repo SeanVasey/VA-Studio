@@ -43,10 +43,12 @@ final class ContractIdentityDeclarationV2
      * scripts, U+2800 BRAILLE PATTERN BLANK (a visible-width blank), U+FFFC and U+FFFD, and the 26 covered codepoints
      * that NFC replaces with another (Kelvin and Ångström signs, Greek oxia forms and similar), which print like their
      * canonical spelling but store different bytes. The list is pinned rather than computed so that re-verifying frozen
-     * evidence does not depend on the runtime's normalization tables.
+     * evidence does not depend on the runtime's normalization tables. U+204F REVERSED SEMICOLON is listed explicitly
+     * (2026-11-14): newer Unicode data gives it the Arabic script extension, so \p{Arabic} refuses it under PCRE2 10.47
+     * but not 10.42; listing it refuses it on every runtime.
      */
     private const REFUSED = '/[\p{C}\p{M}\p{Z}\p{Hebrew}\p{Arabic}\p{Syriac}\p{Thaana}\p{Nko}\p{Samaritan}\p{Mandaic}'
-        .'\x{2800}\x{FFFC}\x{FFFD}'
+        .'\x{204F}\x{2800}\x{FFFC}\x{FFFD}'
         .'\x{0374}\x{037E}\x{0387}\x{1F71}\x{1F73}\x{1F75}\x{1F77}\x{1F79}\x{1F7B}\x{1F7D}\x{1FBB}\x{1FBE}\x{1FC9}'
         .'\x{1FCB}\x{1FD3}\x{1FDB}\x{1FE3}\x{1FEB}\x{1FEE}\x{1FEF}\x{1FF9}\x{1FFB}\x{1FFD}\x{2126}\x{212A}\x{212B}]/u';
 

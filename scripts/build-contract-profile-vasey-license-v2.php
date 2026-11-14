@@ -61,8 +61,8 @@ $fail = static function (string $message): never {
 };
 
 $expected = [
-    'tecnickcom/tc-lib-pdf' => ['8.81.1', 'a0626686715391dd4210c5622aee849d033b8baf'],
-    'tecnickcom/tc-lib-pdf-font' => ['4.6.2', '668d73e853c6027afd9cdaae8ea042957ba11e08'],
+    'tecnickcom/tc-lib-pdf' => ['8.84.0', '2be3a522329df9d2941381ce8315b6647d620c69'],
+    'tecnickcom/tc-lib-pdf-font' => ['4.8.0', '30804d3d493ddcf13dbb0a78c76c95b788c8948a'],
 ];
 foreach ($expected as $name => [$version, $reference]) {
     if (ltrim((string) InstalledVersions::getPrettyVersion($name), 'v') !== $version || InstalledVersions::getReference($name) !== $reference) {
