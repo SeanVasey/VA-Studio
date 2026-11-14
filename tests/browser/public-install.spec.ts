@@ -72,11 +72,10 @@ test('public installation guidance and real assets survive private preview navig
   const manifestResponse = await page.request.get('/manifest.webmanifest');
   expect(manifestResponse.status()).toBe(200);
   const manifest = await manifestResponse.json();
-  expect(manifest).toEqual({ id: '/', name: 'VASEY.AUDIO', short_name: 'VASEY.AUDIO', start_url: '/', scope: '/', display: 'standalone', background_color: '#052e3a', theme_color: '#052e3a', icons: [
-    { src: '/brand/app-icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-    { src: '/brand/app-icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-  ] });
-  for (const [path, size] of [['/brand/app-icon-192.png', 192], ['/brand/app-icon-512.png', 512], ['/brand/apple-touch-icon.png', 180]] as const) {
+  const manifestIcons = [96, 144, 192, 384, 512].map(size => ({ src: `/brand/app-icon-${size}.png`, sizes: `${size}x${size}`, type: 'image/png', purpose: 'any' }))
+    .concat([192, 384, 512].map(size => ({ src: `/brand/app-icon-maskable-${size}.png`, sizes: `${size}x${size}`, type: 'image/png', purpose: 'maskable' })));
+  expect(manifest).toEqual({ id: '/', name: 'VASEY.AUDIO', short_name: 'VASEY.AUDIO', start_url: '/', scope: '/', display: 'standalone', background_color: '#052e3a', theme_color: '#052e3a', icons: manifestIcons });
+  for (const [path, size] of [...manifestIcons.map(icon => [icon.src, Number(icon.sizes.split('x')[0])] as const), ['/brand/apple-touch-icon.png', 180] as const]) {
     const response = await page.request.get(path); expect(response.status()).toBe(200);
     expect(response.headers()['content-type']).toContain('image/png');
     const bytes = await response.body();

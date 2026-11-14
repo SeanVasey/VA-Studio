@@ -155,6 +155,7 @@ jobs:
           python3 scripts/ci/test-gitlab-database-receipts.py
           python3 scripts/ci/test-gitlab-writer-feedback.py
           python3 scripts/ci/test-php-test-runtime.py
+          python3 scripts/ci/test-brand-icons.py
           python3 scripts/dev/test-bootstrap-macos.py
           python3 scripts/test-publish-github.py
       # The staging/production ops kits (tests/ops, build-kit) had no CI: PR #223 left three of their checks red on main.

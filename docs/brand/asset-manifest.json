@@ -67,85 +67,64 @@
     }
   ],
   "total_asset_bytes": 1913452,
-  "identity_svg_status": "unverified: official source package retrieval failed; do not trace raster",
+  "identity_svg_status": "verified: owner-supplied VASEY.AUDIO vector kit (built 2026-11-10, handed over 2026-11-14), 16 SVGs recorded with SHA-256 in docs/brand/README.md; the navbar raster remains pinned unchanged",
   "installation_derivatives": [
     {
       "path": "public/brand/app-icon-192.png",
       "width": 192,
       "height": 192,
-      "bytes": 6670,
-      "sha256": "7f5f8f04ee485e5942f8bf9670d419a4461541b742d9fd49d2bf1aa11f134d91",
-      "source_path": "public/brand/vasey-audio-logo.png",
-      "source_sha256": "7b0ffd26d5ddffab9695fdd3e0a4bb306d50642dc6a51e25233fd1626ff07571",
+      "bytes": 5183,
+      "sha256": "4de078d3b9a7937dc66de03a84ea78a716b4538be519639599fd8a4c7a98d75c",
+      "source_path": "assets/brand/vasey-audio/vasey-audio-icon-white.svg",
+      "source_sha256": "d5ef1ebd6e3e9b8576301b2103cf8ad4232a60bf8851119e50d465b7fff69636",
       "source_dimensions": [
-        420,
-        100
+        1024,
+        1024
       ],
-      "contained_dimensions": [
-        168,
-        40
-      ],
-      "offset": [
-        12,
-        76
-      ],
+      "mark_scale": 1,
       "background": "#052e3a",
       "purpose": "any",
-      "transformation": "Complete original lockup, proportional Lanczos downscale when smaller, centered on opaque square; no crop, redraw or upscale.",
-      "generator": "Pillow 12.3.0; RGB PNG, compress_level=9, optimize=false",
-      "acceptance": "Source-preserving derivative only; physical launcher legibility and OS installation remain unverified."
+      "transformation": "Official white icon path read unmodified from the owner-supplied SVG and rasterized by Chromium at the output size on an opaque full-bleed #052e3a tile; mark at the kit's 768/1024 live area, bbox-centred; no crop, redraw or resample.",
+      "generator": "scripts/brand/build-app-icons.mjs; RGB PNG (no alpha channel)",
+      "acceptance": "Full-bleed opaque tile asserted by scripts/ci/test-brand-icons.py; physical launcher legibility and OS installation remain unverified."
     },
     {
       "path": "public/brand/app-icon-512.png",
       "width": 512,
       "height": 512,
-      "bytes": 24459,
-      "sha256": "66f16d1ae19df41927011fd3c618039b2d5572c5855b1968170b679d7248e416",
-      "source_path": "public/brand/vasey-audio-logo.png",
-      "source_sha256": "7b0ffd26d5ddffab9695fdd3e0a4bb306d50642dc6a51e25233fd1626ff07571",
+      "bytes": 14084,
+      "sha256": "a12d96bf071ee19323ba936289fa4bf509bb20ba71ac9c40f84b1f5433bb29f6",
+      "source_path": "assets/brand/vasey-audio/vasey-audio-icon-white.svg",
+      "source_sha256": "d5ef1ebd6e3e9b8576301b2103cf8ad4232a60bf8851119e50d465b7fff69636",
       "source_dimensions": [
-        420,
-        100
+        1024,
+        1024
       ],
-      "contained_dimensions": [
-        420,
-        100
-      ],
-      "offset": [
-        46,
-        206
-      ],
+      "mark_scale": 1,
       "background": "#052e3a",
       "purpose": "any",
-      "transformation": "Complete original lockup, proportional Lanczos downscale when smaller, centered on opaque square; no crop, redraw or upscale.",
-      "generator": "Pillow 12.3.0; RGB PNG, compress_level=9, optimize=false",
-      "acceptance": "Source-preserving derivative only; physical launcher legibility and OS installation remain unverified."
+      "transformation": "Official white icon path read unmodified from the owner-supplied SVG and rasterized by Chromium at the output size on an opaque full-bleed #052e3a tile; mark at the kit's 768/1024 live area, bbox-centred; no crop, redraw or resample.",
+      "generator": "scripts/brand/build-app-icons.mjs; RGB PNG (no alpha channel)",
+      "acceptance": "Full-bleed opaque tile asserted by scripts/ci/test-brand-icons.py; physical launcher legibility and OS installation remain unverified."
     },
     {
       "path": "public/brand/apple-touch-icon.png",
       "width": 180,
       "height": 180,
-      "bytes": 6618,
-      "sha256": "e15fe8023d6434e1afbdd23e7279f088664f833cd8d5cbe9fc4f95cd40e36020",
-      "source_path": "public/brand/vasey-audio-logo.png",
-      "source_sha256": "7b0ffd26d5ddffab9695fdd3e0a4bb306d50642dc6a51e25233fd1626ff07571",
+      "bytes": 4781,
+      "sha256": "9352e023aa3439962c865987310f3c10363ab9b1160c9d97116fbb67253b3497",
+      "source_path": "assets/brand/vasey-audio/vasey-audio-icon-white.svg",
+      "source_sha256": "d5ef1ebd6e3e9b8576301b2103cf8ad4232a60bf8851119e50d465b7fff69636",
       "source_dimensions": [
-        420,
-        100
+        1024,
+        1024
       ],
-      "contained_dimensions": [
-        168,
-        40
-      ],
-      "offset": [
-        6,
-        70
-      ],
+      "mark_scale": 1,
       "background": "#052e3a",
       "purpose": "any",
-      "transformation": "Complete original lockup, proportional Lanczos downscale when smaller, centered on opaque square; no crop, redraw or upscale.",
-      "generator": "Pillow 12.3.0; RGB PNG, compress_level=9, optimize=false",
-      "acceptance": "Source-preserving derivative only; physical launcher legibility and OS installation remain unverified."
+      "transformation": "Official white icon path read unmodified from the owner-supplied SVG and rasterized by Chromium at the output size on an opaque full-bleed #052e3a tile; mark at the kit's 768/1024 live area, bbox-centred; no crop, redraw or resample.",
+      "generator": "scripts/brand/build-app-icons.mjs; RGB PNG (no alpha channel)",
+      "acceptance": "Full-bleed opaque tile asserted by scripts/ci/test-brand-icons.py; physical launcher legibility and OS installation remain unverified."
     }
   ]
 }
