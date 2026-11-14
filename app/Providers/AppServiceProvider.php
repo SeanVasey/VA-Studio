@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Stripe\Stripe;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -85,6 +86,13 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // stripe-php 21.3.2 (pinned with API 2026-08-26.dahlia) bundles roots Stripe no longer uses, including emSign ECC
+        // Root CA - G3, whose intermediates were compromised. Every Stripe request's CURLOPT_CAINFO comes from this path, so
+        // the bundle the SDK adds is the one stripe-php 21.3.3 and 22.0.1 ship (byte-identical copy, see StripeTrustedRootsTest).
+        // The SDK sets no CURLOPT_CAPATH, so libcurl also trusts the host's system store (/etc/ssl/certs on Ubuntu): keep the
+        // hosts' ca-certificates package current. Remove once the pinned SDK itself is 21.3.3 or later.
+        Stripe::setCABundlePath(resource_path('stripe/ca-certificates.crt'));
+
         // Route files are not executed when a cached route collection is loaded.
         // Keep these IP-only named budgets available on every application boot.
         RateLimiter::for('public-track-embed', fn (Request $request) => Limit::perMinute(120)->by($request->ip()));
