@@ -1,6 +1,6 @@
 # VASEY.AUDIO License Tiers
 
-> **DRAFT for Sean Vasey's approval — not yet published — not legal advice; qualified legal review recommended before publication.**
+> **DRAFT for Sean Vasey's approval — not yet published — not legal advice. Legal review of section 4.14: approved by Sean Vasey on 2026-11-14 (business law certification, Drake University).**
 >
 > Draft date: 2026-10-24. Written against source `786fb7c755291184f9e01b4faaab28dbd430d698` (`origin/main`). Draft version label: `license-tiers-draft-2026-10-24`.
 > Every number marked **proposed — Sean to confirm** is a common industry figure offered as a starting point, not a decision. **Prices are not set here: Sean sets every price.** Nothing in this document creates a license version, offer or contract; licenses become operative only after they are authored, independently reviewed and published in the administration panel and Sean has approved the text and prices.
@@ -168,8 +168,8 @@ Unless the tier is the Exclusive Rights license:
 ### 4.14 Promises, liability and general terms
 
 - Licensor promises that Licensor owns or controls the Beat and has the right to grant this license. The Licensee promises that the Licensee's contributions to the New Song do not infringe anyone's rights.
-- Except for those promises, the Beat is licensed "as is". To the extent the law allows, Licensor's total liability under this license is limited to the price paid for it, and neither party is liable for indirect or consequential losses. **[For legal review.]**
-- This license is governed by the laws of the State of Iowa, USA. Courts located in Iowa have jurisdiction, without removing any consumer's mandatory rights in their home country. **[Venue county: Sean to confirm.]**
+- Except for those promises, the Beat is licensed "as is". To the extent the law allows, Licensor's total liability under this license is limited to the price paid for it, and neither party is liable for indirect or consequential losses.
+- This license is governed by the laws of the State of Iowa, USA. Courts located in Polk County, Iowa have jurisdiction, without removing any consumer's mandatory rights in their home country.
 - This license, the license document and the VASEY.AUDIO Terms of Sale and Use are the whole agreement for this purchase. If they conflict about the use of the Beat or the New Song, this license controls. If any part is unenforceable, the rest remains in effect.
 - Notices to Licensor go to support@vasey.audio; notices to the Licensee go to the email address on the license document or account.
 
@@ -427,8 +427,9 @@ Schema 2 to 4 licenses generate their card statements from the typed fields; edi
 8. **Free tier delivery and caps:** whether the free license should exist at launch, and its availability limits per track (authored on each free definition).
 9. **Sync scope for leases** (own videos only) and for the Unlimited Lease (own audiovisual works, no third-party licensing).
 10. **Per-track disclosures for exclusives:** any earlier releases Sean made of a Beat himself (section 5.6).
-11. **Iowa venue county** for section 4.14.
+11. **Iowa venue county** for section 4.14: **filled 2026-11-14** as Polk County, Iowa (SQ-07).
 
 ## Change log
 
 - 2026-10-24: first draft from source `786fb7c755291184f9e01b4faaab28dbd430d698`, after Sean named the merchant (Vasey Multimedia dba VASEY.AUDIO), the licensor (Sean Vasey) and Iowa governing law, and assigned the license tiers to the development lead. Not approved; no license version, offer or contract was created.
+- 2026-11-14: the Iowa venue county was filled from SQ-07 (Polk County, Iowa) in section 4.14. Prices, caps, the other section 8 items and the legal-review marker are unchanged.

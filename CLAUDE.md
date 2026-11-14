@@ -182,4 +182,4 @@ Synthetic membership test setup is explicitly approved. Live credentials/payment
 
 ### Standard adoption gaps (open)
 
-Lint gate (changed-files Laravel Pint gate in preflight since SQ-18, 2026-11-10; the whole-repo format sweep is a post-freeze PR; Pint's default preset flags 243 of 477 PHP files; there's no TypeScript linter) · README §8 layout · official SVG mark and icon suite (AGENTS.md forbids recreating the logo) · `docs/legal/` PRIVACY and TERMS for owner review · deploy target.
+Lint gate (changed-files Laravel Pint gate in preflight since SQ-18, 2026-11-10; the whole-repo format sweep is a post-freeze PR; Pint's default preset flags 243 of 477 PHP files; there's no TypeScript linter) · README §8 layout · official SVG mark and icon suite (AGENTS.md forbids recreating the logo) · `docs/legal/` publication (drafts approved 2026-11-07; provider, region, venue and minimum-age placeholders filled 2026-11-14 from recorded decisions; legal review approved by Sean and effective date November 15, 2026 set on 2026-11-14; still needed: the postal address entered at publication, the DMCA agent sentence and the LICENSE-TIERS owner choices) · deploy target.

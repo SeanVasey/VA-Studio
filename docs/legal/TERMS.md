@@ -1,12 +1,12 @@
 # VASEY.AUDIO Terms of Sale and Use
 
-> **Approved by Sean Vasey on 2026-11-07 — not yet published — not legal advice; qualified legal review recommended before publication.**
+> **Approved by Sean Vasey on 2026-11-07. Legal review: approved by Sean Vasey on 2026-11-14 (business law certification, Drake University). Not yet published — not legal advice.**
 >
 > Draft date: 2026-10-24. Written against source `786fb7c755291184f9e01b4faaab28dbd430d698` (`origin/main`). Draft version label: `terms-draft-2026-10-24`.
-> Approved 2026-11-07 against source `534b686b`; the proposals in earlier drafts (re-download period, exclusive reservation time, refund policy, buyer assent text) are approved as written. Text still in square brackets is a placeholder or a choice that must be filled before publication (appendix A); sections marked **[For legal review]** use standard protective wording that a qualified reviewer should still check. The reviewer appendix at the end is removed before publication.
+> Approved 2026-11-07 against source `534b686b`; the proposals in earlier drafts (re-download period, exclusive reservation time, refund policy, buyer assent text) are approved as written. Text still in square brackets is a placeholder or a choice that must be filled before publication (appendix A); sections marked **[For legal review]** use standard protective wording that a qualified reviewer should still check. Placeholder fills of 2026-11-14: the bracketed values that recorded decisions answer were filled from them (approved text otherwise unchanged); the remaining brackets stay open (`README.md` in this folder lists each, with its decision and owner). The reviewer appendix at the end is removed before publication.
 
-**Effective date:** [set on publication]
-**Last updated:** [set on publication]
+**Effective date:** November 15, 2026
+**Last updated:** November 15, 2026
 
 These terms apply when you use the VASEY.AUDIO store at vasey.audio, create an account, or buy or claim a license. Please read them with the license for anything you buy: the license sets out what you may do with the music; these terms cover the store and the purchase.
 
@@ -22,7 +22,7 @@ VASEY.AUDIO is a single-seller store: everything in it is Sean Vasey's own catal
 
 By using the store you agree to these terms and to our [Privacy Policy](PRIVACY.md). When you buy or claim a license you also agree to that license, which you see in full before you confirm. If you do not agree, please do not use the store.
 
-You must be at least **[18, or the age of majority where you live — Proposed, Sean to confirm]** to create an account or buy a license. If you are younger, a parent or guardian must make the purchase and accept the license on your behalf.
+You must be at least **18, or the age of majority where you live** to create an account or buy a license. If you are younger, a parent or guardian must make the purchase and accept the license on your behalf.
 
 ## 3. Your account
 
@@ -121,26 +121,26 @@ You must not:
 
 When you send us a message, attachment or listening note, you keep ownership of it. You give us permission to store and use it only to provide the store, answer you and keep records. Do not send anything you do not have the right to share.
 
-## 15. Disclaimers [For legal review]
+## 15. Disclaimers
 
 - The store and previews are provided "as is" and "as available". We do not promise that the store will always be available or error-free.
 - Except as stated in your license, we make no promise that a track will suit your purpose or bring you commercial success.
 - Nothing in these terms limits any rights you have under consumer protection laws that cannot be limited.
 
-## 16. Limitation of liability [For legal review]
+## 16. Limitation of liability
 
 - To the fullest extent the law allows, neither Vasey Multimedia nor Sean Vasey is liable for indirect, incidental, special or consequential losses, or for lost profits, revenue, data or opportunities, arising from the store or these terms.
 - To the fullest extent the law allows, our total liability arising from the store or a purchase is limited to the amount you paid for the license concerned, or USD 100 if you paid nothing.
 - These limits do not apply to liability that cannot be limited by law, such as for fraud, or for death or personal injury caused by negligence. A license may set its own liability terms for use of the music.
 
-## 17. Indemnity [For legal review]
+## 17. Indemnity
 
 You agree to compensate Vasey Multimedia and Sean Vasey for reasonable losses and legal costs arising from your breach of these terms or of a license, including releasing music beyond your license's limits, or from material you add to a work (such as lyrics, vocals or samples) that infringes someone else's rights.
 
 ## 18. Governing law and disputes
 
 - These terms, and any dispute about the store or a purchase, are governed by the **laws of the State of Iowa, USA**, without regard to its conflict-of-law rules.
-- Any court proceedings must be brought in the state or federal courts located in Iowa [county — Sean to confirm], and you and we agree to their jurisdiction.
+- Any court proceedings must be brought in the state or federal courts located in Polk County, Iowa, and you and we agree to their jurisdiction.
 - If you are a consumer living in the EEA, the UK or another country whose laws give you the right to bring proceedings at home or to rely on mandatory local protections, nothing in this section takes those rights away.
 - Before starting proceedings, please email support@vasey.audio so we can try to resolve the issue informally.
 
@@ -170,8 +170,8 @@ Vasey Multimedia, doing business as VASEY.AUDIO
 ### A. Open items for Sean
 
 1. **Postal address:** supplied by Sean on 2026-10-24 (street line only; city and ZIP still needed); kept out of the public repository and inserted when the page is published through the site content system.
-2. **Iowa venue county** (section 18). Governing law is Iowa, as Sean stated on 2026-10-24.
-3. **Minimum age** (section 2), matching `PRIVACY.md` section 11.
+2. **Iowa venue county** (section 18): **filled 2026-11-14 as Polk County, Iowa** (SQ-07, Sean 2026-11-10). Governing law is Iowa, as Sean stated on 2026-10-24.
+3. **Minimum age** (section 2): **filled 2026-11-14** as "18, or the age of majority where you live" (DD-34; SQ-07: 18), matching `PRIVACY.md` section 11.
 4. **Refund policy** (section 10): **approved by Sean on 2026-11-07** (the 14-day window, the "no download" rule and the exclusive review). Machine-policy values that match this draft: `refund_authority = authoritative_provider_operator_review`, `partial_refunds = exact_line_allocation`, `dispute_access = temporarily_block_while_reconciling`, `exclusive_reopening = qualified_operator_review` (`app/Domain/Commerce/ProductionPolicy/MachinePolicyV1.php`). If Sean prefers that a refunded exclusive is never resold, choose `remain_sold` and change the exclusive bullet.
 5. **Exclusive reservation time** (section 9; **30 minutes, approved by Sean on 2026-11-07**) and late-payment handling (U-08). Matching machine-policy values: `reservation_seconds = 1800`, `provider_lifetime_seconds` at most Stripe's Checkout session lifetime, `pending_cutoff = block_new_nonexclusive_on_pending_exclusive`, `late_action = paid_exception_operator_reconciliation` (the only supported value), `late_time_basis` to choose.
 6. **Re-download availability** (section 8; **12 months, approved by Sean on 2026-11-07**).
@@ -207,3 +207,4 @@ Vasey Multimedia, doing business as VASEY.AUDIO
 - 2026-11-07: Sean approved the section 7 order-review wording and the individual confirmation statement (A.10), and decided that a business may be the licensee. Section 7 adds a proposed "Buying for a business" paragraph, and A.10 proposes the business statement; both await approval. The rest of the draft is still not approved.
 - 2026-11-07 (later): Sean approved the business confirmation statement (A.10) and the section 7 "Buying for a business" paragraph. The rest of the draft is still not approved.
 - 2026-11-07: **approved by Sean Vasey** ("I approve privacy and terms"), including the refund policy, the 30-minute exclusive reservation, 12-month re-download availability and the buyer assent text. Still to fill before publication: postal address, Iowa venue county, minimum age and the DMCA agent decision (appendix A); the **[For legal review]** wording awaits a qualified reviewer, and appendix B gaps still constrain what may be published.
+- 2026-11-14: placeholders answered by recorded decisions were filled (venue Polk County, Iowa, SQ-07; minimum age, DD-34 and SQ-07). Still open: postal city and ZIP, effective and last-updated dates, the DMCA agent sentence (SQ-07 decides to designate; registration is Sean's action and has not happened), and the For-legal-review sections.
