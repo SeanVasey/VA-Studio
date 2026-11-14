@@ -10,9 +10,9 @@ use App\Http\Controllers\StorefrontController;
 use App\Http\Controllers\TestCheckoutController;
 use App\Http\Controllers\TestExceptionResolutionController;
 use App\Http\Controllers\TestOwnerDeliveryController;
+use App\Http\Membership\MembershipHttpMount;
 use App\Http\Middleware\CustomerCommerceAccess;
 use App\Http\Middleware\HandleInertiaRequests;
-use App\Http\Membership\MembershipHttpMount;
 use App\Http\ProductionCheckout\ProductionCheckoutMount;
 use App\Http\ProductionFree\ProductionFreeHttpMount;
 use App\Http\Tax\TaxHttpMount;
@@ -59,9 +59,13 @@ Route::withoutMiddleware(HandleInertiaRequests::class)->middleware(CustomerComme
     Route::post('/orders/{order}/checkout', [TestCheckoutController::class, 'start'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.checkout');
     Route::get('/orders/{order}/checkout', [TestCheckoutController::class, 'status'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.checkout-status');
     Route::post('/orders/{order}/checkout/reconcile', [TestCheckoutController::class, 'reconcile'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.checkout-reconcile');
+    // The buyer's cancellation of a never-sent test order (default-off; BuyerCancelPolicy). Same budget as the checkout start.
+    Route::post('/orders/{order}/cancel', [TestCheckoutController::class, 'cancel'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.cancel');
     Route::get('/orders/{order}/delivery', [TestOwnerDeliveryController::class, 'show'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.delivery');
     Route::post('/orders/{order}/delivery/authorizations', [TestOwnerDeliveryController::class, 'issue'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.delivery-authorizations');
     Route::post('/orders/{order}/delivery/download', [TestOwnerDeliveryController::class, 'download'])->middleware('throttle:10,1,quotes-create')->block(120, 10)->name('orders.delivery-download');
+    // test-owner-delivery-v2 (FP-077): the token POST above answers 303 here. Opaque ID only; the session binding is the access.
+    Route::get('/orders/{order}/delivery/downloads/{authorization}', [TestOwnerDeliveryController::class, 'transfer'])->middleware('throttle:60,1,quotes-read')->block(120, 10)->name('orders.delivery-transfer');
 });
 Route::get('/orders/{order}/checkout/return', [TestCheckoutController::class, 'returned'])->middleware([CustomerCommerceAccess::class, 'throttle:60,1,quotes-read'])->block(120, 10)->name('orders.checkout-return');
 Route::post('/checkout', fn () => response()->json([

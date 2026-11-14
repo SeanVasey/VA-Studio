@@ -30,8 +30,11 @@ can be followed by another retained quote; superseded quotes stay intact.
 Acceptance binds the project's current quote UUID and canonical hash, freezes
 that supplied scope and prepares its milestone states. It cannot create an order,
 charge, collect a deposit, grant rights, authorize attachments or delivery, issue
-an invoice, or mark the project paid/completed. Every customer/staff projection
-continues to say `paymentState=not_collected` and `deliveryAuthorized=false`.
+an invoice, or mark the project paid/completed. No project command can do any of
+these. Every projection says `deliveryAuthorized=false`, and `paymentState` is
+`not_collected` unless the separate, default-off Stripe test-mode invoicing lane
+(`docs/service-invoicing.md`, BL-70) has recorded a verified service payment
+against the accepted quote.
 
 Staff begins a pending milestone and then records it ready for customer review.
 The buyer supplies a reason to approve that milestone's scope review or request
@@ -108,7 +111,7 @@ suffix, and preserve prior service definitions and bookkeeping. Independent
 review also verifies exact completed table/guard definitions survive a retry.
 
 There is no real customer/service source import, private file intake/scanning,
-service payment/deposit collection, deliverable entitlement, operative booking,
+live service payment/deposit collection (test-mode invoicing is `docs/service-invoicing.md`), deliverable entitlement, operative booking,
 invoice/tax calculation, notification delivery or production launch in this
 increment. Historical service/customer obligations, approved terms, privacy
 retention policy, attachment/payment retry proof and final browser/device/release

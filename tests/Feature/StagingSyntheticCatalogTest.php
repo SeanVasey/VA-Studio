@@ -287,7 +287,7 @@ class StagingSyntheticCatalogTest extends TestCase
             $this->assertStringContainsString(SyntheticRehearsalCatalog::LABEL, $rights->sample_disclosure);
 
             $ready = $track->assets()->where('status', 'ready')->pluck('role')->sort()->values()->all();
-            $this->assertSame(['artwork', 'download_mp3', 'master_wav', 'preview_tagged', 'stems_zip'], $ready);
+            $this->assertSame(['artwork', 'download_mp3', 'master_wav', 'preview_tagged', 'preview_untagged', 'stems_zip'], $ready);
             $stems = $track->assets()->where('role', 'stems_zip')->where('status', 'ready')->sole();
             $this->assertTrue(app(RecordingAssociation::class)->matches($stems, $track->assets()->where('role', 'preview_tagged')->sole()));
             $this->assertCount(count($definition['sources']), $stems->technical_metadata['manifest']);

@@ -1,4 +1,4 @@
-import deliverableLabelMap from './deliverable-labels.json';
+import deliverableLabelMap from './deliverable-labels.json' with { type: 'json' };
 import type { SiteContent, SiteImages } from './site-content';
 
 export interface Offer {
@@ -40,6 +40,8 @@ export interface Track {
   durationSeconds: number;
   artworkUrl: string | null;
   previewUrl: string | null;
+  /** Whether the served preview carries the tag. Absent when the source does not say, which renders neutral wording. */
+  previewTagged?: boolean;
   waveform: number[];
   tags: string[];
   offers: Offer[];
@@ -93,6 +95,8 @@ export interface StorefrontProps {
   testOrderPreparationEnabled?: boolean;
   testCheckoutEnabled?: boolean;
   customerAccountEnabled?: boolean;
+  /** Links of default-off product families whose own server policy is on (BL-50). */
+  familyLinks?: { label: string; href: string }[];
   metadata?: PageMetadata;
 }
 

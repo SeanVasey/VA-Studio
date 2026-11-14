@@ -146,7 +146,7 @@ final class RefundDisputeEffects
             && ! isset($case->allocations[$object->id]) && ($case->statuses()[$object->id] ?? null) === 'succeeded', 'invalid');
         ksort($split);
         foreach ($split as $lineId => $amount) {
-            RefundLineAllocation::create(['public_id' => (string) Str::uuid(), 'order_id' => $case->order->id,
+            RefundLineAllocation::create(['public_id' => (string) Str::uuid(), 'order_id' => $case->order->id, 'order_source' => $case->source(),
                 'refund_dispute_object_id' => $object->id, 'order_line_id' => $lineId, 'amount_minor' => $amount, 'currency' => 'USD',
                 'source' => $source, 'actor_id' => $actorId, 'sequence' => $sequence, 'created_at' => $at]);
         }
@@ -181,23 +181,23 @@ final class RefundDisputeEffects
     public function effect(RefundDisputeCase $case, int $sequence, string $key, string $kind, array $policy, CarbonImmutable $at,
         array $columns, array $context): ?RefundDisputeEffect
     {
-        if (RefundDisputeEffect::where('order_id', $case->order->id)->where('effect_key', $key)->lockForUpdate()->exists()) {
+        if (RefundDisputeEffect::forOrder($case->order)->where('effect_key', $key)->lockForUpdate()->exists()) {
             return null;
         }
         $effect = RefundDisputeEffect::create(array_merge(['order_line_id' => null, 'license_grant_id' => null,
             'refund_dispute_object_id' => null, 'observation_id' => null, 'actor_id' => null, 'request_id' => null, 'request_hash' => null],
-            $columns, ['public_id' => (string) Str::uuid(), 'order_id' => $case->order->id, 'sequence' => $sequence,
+            $columns, ['public_id' => (string) Str::uuid(), 'order_id' => $case->order->id, 'order_source' => $case->source(), 'sequence' => $sequence,
                 'effect_key' => $key, 'kind' => $kind, 'policy_hash' => RefundDisputePolicy::hash($policy),
                 'context' => $context + ['test_only' => true], 'created_at' => $at]));
         AuditEvent::recordAttributed('commerce.refund_dispute.'.$kind, $case->order, ['order_public_id' => $case->order->public_id,
-            'effect_public_id' => $effect->public_id, 'sequence' => $sequence, 'test_only' => true], $effect->actor_id);
+            'effect_public_id' => $effect->public_id, 'sequence' => $sequence, 'test_only' => true, 'chain' => $case->source()], $effect->actor_id);
 
         return $effect;
     }
 
     public function hold(RefundDisputeCase $case, RefundDisputeEffect $effect, string $reason, ?int $grantId, CarbonImmutable $at): RefundDisputeHold
     {
-        return RefundDisputeHold::create(['public_id' => (string) Str::uuid(), 'order_id' => $case->order->id,
+        return RefundDisputeHold::create(['public_id' => (string) Str::uuid(), 'order_id' => $case->order->id, 'order_source' => $case->source(),
             'license_grant_id' => $grantId, 'reason' => $reason, 'applied_effect_id' => $effect->id, 'created_at' => $at]);
     }
 

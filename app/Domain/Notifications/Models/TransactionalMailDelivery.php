@@ -15,7 +15,7 @@ final class TransactionalMailDelivery extends Model
 
     protected function casts(): array
     {
-        return ['notice_id' => 'integer', 'version' => 'integer', 'queued_at' => 'immutable_datetime',
+        return ['notice_id' => 'integer', 'version' => 'integer', 'attempt' => 'integer', 'queued_at' => 'immutable_datetime',
             'started_at' => 'immutable_datetime', 'finished_at' => 'immutable_datetime'];
     }
 }

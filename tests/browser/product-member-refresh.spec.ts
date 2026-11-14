@@ -2,6 +2,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
 import { actionResponse, closeDialog, expectModalFits, login, row } from './publication-fixture';
 import { syncSuccessNotification } from './notification-sync';
+import { modalReady } from './modal-ready';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
@@ -45,6 +46,8 @@ test('operator reviews changed member snapshots and retains the earlier private 
   await page.goto('/admin/tracks');
   await page.getByRole('button', { name: 'New track', exact: true }).click();
   let dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('heading')).toBeVisible();
+  await modalReady(dialog);
   await dialog.getByLabel('Title', { exact: false }).fill(title);
   await dialog.getByLabel('Slug', { exact: false }).fill(`synthetic-member-refresh-${testInfo.project.name}`);
   await syncSuccessNotification(page, 'Created', () => dialog.getByRole('button', { name: 'Create', exact: true }).click());
@@ -53,8 +56,9 @@ test('operator reviews changed member snapshots and retains the earlier private 
   dialog = page.getByRole('dialog');
   await dialog.getByLabel('Title', { exact: false }).fill(draftTitle);
   await dialog.getByLabel('Description', { exact: false }).fill('Synthetic retained collection notes');
-  await dialog.getByRole('combobox', { name: 'Track', exact: false }).click();
-  await page.getByRole('textbox', { name: 'Search', exact: true }).fill(title);
+  // Filament 5.11: a searchable select's trigger is a plain button; the role combobox moved to its search input.
+  await dialog.getByRole('button', { name: /^Track\b/ }).click();
+  await page.getByRole('combobox', { name: /^Track\b.*: Search$/ }).fill(title);
   await page.getByRole('option', { name: new RegExp(`^${title} \\(#\\d+\\)$`) }).click();
   await syncSuccessNotification(page, 'Created', () => dialog.getByRole('button', { name: 'Save draft version', exact: true }).click());
   await expect(row(page, draftTitle)).toBeVisible();

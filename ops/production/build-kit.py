@@ -14,11 +14,11 @@ that touches an anchor forces a conscious re-review here and never silently prod
 The review surface is the delta (`--delta`): the staging file after renames versus the production file, nothing else.
 
 What is derived, copied or written for production:
-    derived  provision.sh, forge-deploy.sh, release-step.sh, backup.sh, bin/vasey-production-ctl,
+    derived  provision.sh, forge-deploy.sh, release-step.sh, backup.sh, scheduler-watch.sh, bin/vasey-production-ctl,
              php-fpm/vasey-production.conf, workers/vasey-production-workers.conf, and the three nginx files: the site body
              nginx/vasey-production.conf, its http-level helpers nginx/vasey-production-http.conf and the whole-file wrapper
              nginx/vasey-production-classic.conf
-    copied   seal-release.py, normalize-mysql-dump.py and tls/origin-ca.pem (byte for byte), php-fpm/vasey-paid-delivery.conf (the paid-delivery
+    copied   seal-release.py, normalize-mysql-dump.py, private-snapshot.py and tls/origin-ca.pem (byte for byte), php-fpm/vasey-paid-delivery.conf (the paid-delivery
              pool is generic and identical), validate-runtime.php (a production file in this directory)
     not shipped  anything under ops/staging/test-commerce/ and the basic-auth files: production has neither.
 Nothing here installs anything: the output is a directory of files, and provision.sh (run by an operator, as root, on a
@@ -171,8 +171,8 @@ PROVISION = [
                    'render "$KIT/nginx/vasey-staging.conf" /etc/vasey-staging/nginx-site.conf 0644\n',
                    "# ---------------------------------------------------------------- 7. nginx template (no basic auth, no probe credentials)\n",
                    "no htpasswd or netrc", removed_sha256="82f8b71e143dbf7b98c5948df79aeb9219c228c3f7942dd83ecca46a7f661d2d"),
-    Replace("workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh; do",
-            "workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh forge-deploy.sh; do",
+    Replace("workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh scheduler-watch.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh; do",
+            "workers/vasey-staging-workers.conf bin/vasey-staging-ctl backup.sh scheduler-watch.sh normalize-mysql-dump.py seal-release.py validate-runtime.php release-step.sh forge-deploy.sh; do",
             "the kit includes the deploy script"),
     Replace('install -m 0644 -o root -g root "$KIT/release-step.sh" /usr/local/libexec/vasey-staging/release-step.sh\n',
             'install -m 0644 -o root -g root "$KIT/release-step.sh" /usr/local/libexec/vasey-staging/release-step.sh\n'
@@ -338,6 +338,7 @@ DERIVED = [
     Derived("forge-deploy.sh", "forge-deploy.sh", 0o755, "#", FORGE_DEPLOY),
     Derived("release-step.sh", "release-step.sh", 0o644, "#", []),
     Derived("backup.sh", "backup.sh", 0o755, "#", []),
+    Derived("scheduler-watch.sh", "scheduler-watch.sh", 0o755, "#", []),
     Derived("bin/vasey-production-ctl", "bin/vasey-staging-ctl", 0o755, "#", CTL),
     Derived("php-fpm/vasey-production.conf", "php-fpm/vasey-staging.conf", 0o644, ";", []),
     Derived("workers/vasey-production-workers.conf", "workers/vasey-staging-workers.conf", 0o644, ";", WORKERS),
@@ -349,6 +350,7 @@ DERIVED = [
 COPIED = [
     Copied("seal-release.py", "seal-release.py", 0o644),
     Copied("normalize-mysql-dump.py", "normalize-mysql-dump.py", 0o644),
+    Copied("private-snapshot.py", "private-snapshot.py", 0o644),
     Copied("tls/origin-ca.pem", "tls/origin-ca.pem", 0o644),
     Copied("php-fpm/vasey-paid-delivery.conf", "php-fpm/vasey-paid-delivery.conf", 0o644),
     Copied("validate-runtime.php", "production:validate-runtime.php", 0o644),

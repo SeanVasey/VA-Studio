@@ -58,6 +58,10 @@ class BulkReplaceLicenseDraftSourceConcurrencyTest extends TestCase
         ['actor' => $editor, 'versions' => $versions] = $this->selection();
         $ids = array_map(fn ($row) => $row->id, $versions);
         $other = in_array($operation, ['role', 'email', 'mfa'], true) ? $editor : LicenseFixtures::admin();
+        // The unrelated published history is created before the MFA rule is switched on: its fixture author is a plain
+        // admin, whom the staff write authority refuses once the panel requires MFA (Foundation 43347699757, shard 18).
+        $history = LicenseFixtures::published();
+        $retained = $this->history($history);
         $this->requireMfa($operation);
         $target = $versions[2];
         $template = $target->template;
@@ -65,8 +69,6 @@ class BulkReplaceLicenseDraftSourceConcurrencyTest extends TestCase
         $review = $command->review(array_reverse($versions), Fixtures::replacement(), $editor);
         $singleReview = app(ReviewedLicenseDraft::class)->review($target, $other);
         $data = Arr::only($singleReview['display'], ReviewedLicenseDraft::FIELDS);
-        $history = LicenseFixtures::published();
-        $retained = $this->history($history);
         $before = array_map(fn ($row) => $row->fresh()->getAttributes(), $versions);
         $audits = AuditEvent::count();
         $otherSource = 'NONBINDING OTHER SYNTHETIC SOURCE';

@@ -141,12 +141,14 @@ Repo-specific facts and invariants. §1–§12 stay byte-identical across repos;
 - **Stack:** Laravel 13 / PHP 8.4, Filament 5 admin, Inertia 3 + React 19 + TypeScript 7, Vite 8; MySQL 8.4 in production and CI, SQLite locally; Stripe in test mode only.
 - **Package manager:** Composer 2 and npm (Node >=24.15 <25).
 - **Commands:** dev `composer run dev` · gate `composer validate --strict && php artisan test && npm test && npm run build && composer audit && npm audit --audit-level=high`
-- **Deploy:** none configured. Staging and production will both use Laravel Forge-managed VPSs (staging decided 2026-10-08/09; production platform approved by Sean on 2026-10-18). U-02's region, secrets, backup target and incident ownership remain open (`docs/architecture/decision-register.md`).
+- **Deploy:** staging runs on a Laravel Forge VPS (serving `d4b0955d` since 2026-11-13 20:29 UTC; re-provisioned with the isolated build account on 2026-11-12; deploy script and ops kit in `ops/staging/`, runbook `docs/ops/staging-runbook.md`). Production is not configured. Staging and production both use Laravel Forge-managed VPSs (staging decided 2026-10-08/09; production platform approved by Sean on 2026-10-18). U-02's region, secrets, backup target and incident ownership remain open (`docs/architecture/decision-register.md`).
 - **Invariants** (§1.8 rules land here): none yet.
 
 ### Current user-authorized handoff — October 7, 2026
 
-**Current (2026-11-05):** the Claude Code harness resumed from Codex's 2026-11-04 checkpoint, merged B (PR #191) and verified the C/D lanes on pushed `claude/*` branches. Read `docs/handoff/2026-11-05/HANDOFF.md` first. Lane state lives in `docs/handoff/2026-10-17/RESUMPTION.md`.
+**Current (2026-11-14):** read the checkpoint at the top of `docs/handoff/2026-11-05/HANDOFF.md` (first complete Foundation pass at `e09c91a7`, merged work, what staging serves, next items).
+
+**Before that (2026-11-05):** the Claude Code harness resumed from Codex's 2026-11-04 checkpoint, merged B (PR #191) and verified the C/D lanes on pushed `claude/*` branches. Read `docs/handoff/2026-11-05/HANDOFF.md` first. Lane state lives in `docs/handoff/2026-10-17/RESUMPTION.md`.
 
 **Superseded (2026-11-01):** the Claude Code harness handed the lead to Codex because of usage limits (`docs/handoff/2026-11-01/CODEX-HANDOFF.md`).
 
@@ -156,11 +158,11 @@ Repo-specific facts and invariants. §1–§12 stay byte-identical across repos;
 
 Read `docs/handoff/2026-10-07/CLAUDE-PLAN.md` first (plan, lane protocol, state ledger), then `docs/handoff/2026-10-07/README.md` and its branch inventory. Sean requested completion/push of current development batches and handoff of remaining implementation to another harness. Preserve reviewed main, unfinished branches, original failures and immutable originals as separately attributed source.
 
-Sean's current `AGENTS.md` CI cost policy supersedes earlier gate adaptations here: focused affected checks, independent sensitive review and cheap preflight authorize development merges. Foundation remains one manual final integrated exact-SHA verification; do not restore automatic database/browser matrices or weaken security/protections. Current partitioning uses twenty-four MySQL/two SQLite shards with an exact native-only SQLite method census, which still needs normalization after new families. No final handoff acceptance is claimed.
+Sean's current `AGENTS.md` CI cost policy supersedes earlier gate adaptations here: focused affected checks, independent sensitive review and cheap preflight authorize development merges. Foundation remains one manual final integrated exact-SHA verification; do not restore automatic database/browser matrices or weaken security/protections. Current partitioning uses twenty-four MySQL/six SQLite shards (six since 2026-11-13) with an exact native-only SQLite method census, which still needs normalization after new families. No final handoff acceptance is claimed.
 
 Synthetic membership test setup is explicitly approved. Live credentials/payments, real money, purchased services, production deployment and DNS/cutover still require separate authorization. The production preparation queue records developed versus queued work. Direct PHPUnit with worktree-specific Composer autoload avoids the restored Artisan Collision issue; see the handoff for exact source-bound commands and engine limitations.
 
-### Adaptations of §1–§12 (pending Sean's confirmation)
+### Adaptations of §1–§12 (decided 2026-11-10: DD-64 under Sean's delegation; lint preset set by Sean's SQ-18)
 
 - **§3 gate:** Pint (`laravel` preset) is enforced on changed PHP files in preflight (SQ-18); no TypeScript linter yet. SQLite runs skip MySQL-only race tests by design (reviewed census `scripts/ci/database-sqlite-skips.json`); the twenty-four MySQL CI shards run the reviewed native selection and skip only the reviewed SQLite-only census (`scripts/ci/database-mysql-skips.json`), each engine's skips exactly matching its census.
 - **§5 auth:** staff sign in through Filament's built-in auth with TOTP MFA (required in staging and production); the production customer account path (`routes/production-customer-identity.php`, `CompleteIdentity`) is implemented but default-off and unconfigured, and its production policy is U-07; synthetic test accounts run behind default-off flags in `local`, `testing` and `staging`. MySQL has no row-level security, so authorization lives in server-side domain policies and owner checks.

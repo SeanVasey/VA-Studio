@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 from copy import deepcopy
 from dataclasses import dataclass
+import ipaddress
 import json
 import os
 from pathlib import Path
@@ -132,6 +133,7 @@ PHP_TARGETS = {
         "tests/Feature/MediaWorkflowBudgetTest.php", "tests/Feature/PrivateMediaRevisionRootsTest.php",
         "tests/Feature/SiteImageLibraryTest.php", "tests/Feature/SiteImageHttpTest.php", "tests/Feature/StemsArchivePolicyTest.php",
         "tests/Feature/StemsArchiveTest.php",
+        "tests/Feature/MediaLifecycle/MediaReferenceProofTest.php", "tests/Feature/MediaLifecycle/MediaReferenceRegistryTest.php",
     ),
     "commerce": (
         "tests/Feature/ProductionCommerceReadinessTest.php",
@@ -157,9 +159,92 @@ PHP_TARGETS = {
         "tests/Feature/TestRefundResolutionConcurrencyTest.php", "tests/Feature/TestRefundResolutionResourceTest.php",
         "tests/Feature/TestUnpaidReleaseTest.php", "tests/Feature/TestUnpaidReleaseMigrationTest.php",
         "tests/Feature/TestUnpaidReleaseConcurrencyTest.php", "tests/Feature/TestUnpaidOrderResourceTest.php",
+        "tests/Feature/TestUnsentOrderReleaseTest.php", "tests/Feature/TestUnsentOrderReleaseConcurrencyTest.php",
         "tests/Feature/TestPaymentFinancialObservationTest.php", "tests/Feature/TestPaymentExceptionOperationsTest.php",
         "tests/Feature/TestPaymentExceptionOperationsConcurrencyTest.php",
         "tests/Feature/TestPaymentProcessingTest.php", "tests/Feature/TestOrderFinalizationTest.php",
+    ),
+    # Test delivery enabling, manual and optional automatic (D-19 amendment), and the staging profile that admits it. Its own
+    # suite: added to financial it pushed that run past the 900-second runner cap.
+    "test-delivery": (
+        "tests/Feature/TestTrackOrderResourceTest.php", "tests/Feature/TestKitOrderResourceTest.php",
+        "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
+        "tests/Unit/StagingRuntimeValidatorTest.php", "tests/Unit/TestCommerceProfileValidatorTest.php",
+    ),
+    # The buyer's cancellation of a never-sent test order (2026-11-12) and what it touches; its races run on MySQL only.
+    "buyer-cancel": (
+        "tests/Feature/TestBuyerOrderCancellationTest.php", "tests/Feature/TestBuyerOrderCancellationConcurrencyTest.php",
+        "tests/Feature/TestUnsentOrderReleaseTest.php", "tests/Unit/StagingRuntimeValidatorTest.php",
+    ),
+    "buyer-cancel-migrations": (
+        "tests/Feature/HostedCheckoutMigrationTest.php", "tests/Feature/OrderPreparationMigrationTest.php",
+        "tests/Feature/PromotionMigrationTest.php", "tests/Feature/QuotePricingMigrationTest.php",
+        "tests/Feature/SharedInventoryMigrationTest.php", "tests/Feature/TestOrderFinalizationMigrationTest.php",
+        "tests/Feature/TestPaymentEvidenceMigrationTest.php", "tests/Feature/TestRefundResolutionMigrationTest.php",
+        "tests/Feature/TestUnpaidReleaseMigrationTest.php",
+    ),
+    "buyer-cancel-races": ("tests/Feature/TestBuyerOrderCancellationConcurrencyTest.php",),
+    # Migrations that read another migration's definitions (the 2026-11-12 recurrence of the Oct 9 SQLite-shard memory leak).
+    "migration-recompilation": (
+        "tests/Feature/MigrationRecompilationTest.php", "tests/Feature/TestDeliveryResumeMigrationTest.php",
+        "tests/Feature/SiteImageMigrationTest.php",
+    ),
+    # The per-process MySQL schema reuse and the MySQL-only fixes of Foundation run 43304362814 (2026-11-13).
+    "mysql-schema-snapshot": (
+        "tests/Feature/MysqlSchemaSnapshotTest.php", "tests/Feature/OrderPreparationMigrationTest.php",
+        "tests/Feature/CustomerComms/TransactionalMailRecoveryNativeTest.php",
+        "tests/Feature/ProductionIdentity/CurrentCatalogAdmissionTest.php",
+    ),
+    # The test fixes from Foundation run 43347699757 (2026-11-13): fixtures that roll back early migrations under later
+    # children (MySQL refuses to drop a referenced parent), fixture order and MySQL-specific injected errors.
+    "foundation-20261113-fixes": (
+        "tests/Feature/SoundKitMigrationTest.php", "tests/Feature/OrderPreparationMigrationTest.php",
+        "tests/Feature/CustomerInquiryMigrationTest.php", "tests/Feature/SharedInventoryMigrationTest.php",
+        "tests/Feature/QuotePricingMigrationTest.php", "tests/Feature/HostedCheckoutMigrationTest.php",
+        "tests/Feature/TestPaymentEvidenceMigrationTest.php", "tests/Feature/PromotionMigrationTest.php",
+        "tests/Feature/ProductionFinancialRetrieval/FinancialReadPlanTest.php",
+        "tests/Feature/ProductionMembershipBilling/MembershipSchemaProofFrameTest.php",
+        "tests/Feature/BulkReplaceLicenseDraftSourceConcurrencyTest.php", "tests/Feature/CustomerComms/CustomerDataRightsTest.php",
+        "tests/Feature/TestContractIssuanceMigrationTest.php", "tests/Feature/TestFulfillmentActivationMigrationTest.php",
+        "tests/Feature/InquiryMessageMigrationTest.php", "tests/Feature/SiteImageMigrationTest.php",
+        "tests/Feature/MediaLifecycle/MediaReferenceRegistryTest.php", "tests/Feature/TrackSchedulingConcurrencyTest.php",
+        "tests/Feature/CollaboratorSplitsTest.php", "tests/Feature/PreviewTagTest.php",
+        "tests/Feature/IsolatedContractRendererAcceptanceTest.php", "tests/Feature/CustomerPurchaseClaimMigrationTest.php",
+        "tests/Unit/VaseyLicenseGlyphCoverageTest.php", "tests/Feature/LegacyRedirectMapTest.php",
+        "tests/Feature/LegacyRedirectCommandTest.php",
+    ),
+    # The three tests from Foundation run 43505345035 (2026-11-13): two pinned transaction behaviour that Laravel 13.42
+    # changed (rollback callbacks at a refused commit; a savepoint rollback on a nested lock error), one depended on the clock.
+    "foundation-20261113-framework": (
+        "tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php",
+        "tests/Feature/MediaUploadCommitRecoveryTest.php", "tests/Feature/TrackSchedulingTest.php",
+    ),
+    # The two test classes whose private attempt() helpers collided with PHPUnit 13's final TestCase::attempt()
+    # (Foundation 43566257853: a fatal at class load stopped every database shard).
+    "phpunit13-name-clash": (
+        "tests/Feature/PaidGrantSpoolReviewAddendum3Test.php", "tests/Feature/TransactionalNotificationMigrationTest.php",
+    ),
+    # The 2026-11-14 pre-activation re-pin (tc-lib-pdf 8.84.0 / tc-lib-pdf-font 4.8.0 and the explicit U+204F refusal):
+    # golden renders, profile pins, released registries and the D-30 repertoire counts.
+    "tc-lib-20261114": (
+        "tests/Unit/VaseyLicensePdfRendererTest.php", "tests/Unit/VaseyLicenseV2PdfRendererTest.php",
+        "tests/Unit/VaseyKitLicensePdfRendererTest.php", "tests/Unit/VaseyLicenseV2ProfileTest.php",
+        "tests/Unit/VaseyLicenseGlyphCoverageTest.php", "tests/Unit/ContractIdentityDeclarationV2Test.php",
+        "tests/Unit/ContractRenderProfileRegistryTest.php", "tests/Unit/LicensePdfCheckTest.php",
+        "tests/Feature/TestContractProfileSuccessorTest.php", "tests/Feature/TestContractSuccessorActivationTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantFrozenBytesTest.php",
+        "tests/Feature/ProductionFreeGrants/ProductionFreeGrantRenderableTest.php",
+        "tests/Feature/ProductionMemberOriginals/MemberOriginalRendererTest.php", "tests/Feature/SoundKitLicenseKindTest.php",
+    ),
+    # Route-level legacy fallbacks (URL-005 /sound-kits, URL-006 /services) and the shipped redirect map.
+    "legacy-fallbacks": (
+        "tests/Feature/SoundKitLegacyFallbackTest.php", "tests/Feature/ServiceLegacyFallbackTest.php",
+        "tests/Feature/LegacyRedirectMapTest.php", "tests/Feature/LegacyRedirectCacheTest.php",
+        "tests/Feature/SoundKitStorefrontTest.php",
+    ),
+    # The native race alone: the whole test-delivery suite does not fit the 900-second runner cap on MySQL.
+    "test-delivery-races": (
+        "tests/Feature/TestDeliveryAutoEnableConcurrencyTest.php",
     ),
     "customer": (
         "tests/Feature/InquiryBrowserCatalogCleanupTest.php",
@@ -280,35 +365,57 @@ FRONTEND_SUBSETS = {
         "tests/frontend/owned-order-history.test.tsx",
     ),
 }
-BROWSER_TARGETS = (
-    "tests/browser/license-template-authoring.spec.ts",
-    "tests/browser/customer-library-browsing.spec.ts",
-    "tests/browser/customer-purchase-claim.spec.ts", "tests/browser/test-refunded-exception-resolution.spec.ts",
-    "tests/browser/customer-identity.spec.ts", "tests/browser/resumable-kit-upload.spec.ts",
-    "tests/browser/test-unpaid-release.spec.ts",
-    "tests/browser/inquiry-conversation.spec.ts",
-    "tests/browser/customer-account.spec.ts",
-    "tests/browser/customer-order-reference.spec.ts",
-    "tests/browser/product-member-refresh.spec.ts",
-
-    "tests/browser/customer-order-items.spec.ts",
-    "tests/browser/storefront.spec.ts", "tests/browser/operator.spec.ts",
-    "tests/browser/test-checkout.spec.ts", "tests/browser/test-owner-delivery.spec.ts",
-    "tests/browser/player-controls.spec.ts", "tests/browser/owned-order-history.spec.ts",
-    "tests/browser/editorial-video-consent.spec.ts", "tests/browser/site-release-menu-readiness.spec.ts",
-    "tests/browser/contact-inquiry.spec.ts", "tests/browser/contact-inquiry-persistence.spec.ts",
-    "tests/browser/public-track-embed.spec.ts",
-    "tests/browser/track-bulk-tags.spec.ts",
-    "tests/browser/track-metadata-presets.spec.ts",
-    "tests/browser/bulk-track-metadata.spec.ts",
-    "tests/browser/private-track-review.spec.ts",
-    "tests/browser/track-publication-guard.spec.ts",
-    "tests/browser/editorial-content.spec.ts", "tests/browser/site-content.spec.ts", "tests/browser/site-schedule.spec.ts",
-    "tests/browser/resumable-media-upload.spec.ts",
-)
+# The runner caps a browser command at BROWSER_TIMEOUT_SECONDS and each spec runs in both the chromium-desktop and
+# webkit-mobile projects (one worker), so one suite per domain keeps the selection finishing with room to spare.
+# Measured test-step times for every suite are in docs/verification/focused-ci.md; every suite runs BOTH projects.
+BROWSER_TIMEOUT_SECONDS = 720
+BROWSER_SUITES = {
+    "browser-storefront": (
+        "tests/browser/storefront.spec.ts", "tests/browser/player-controls.spec.ts",
+        "tests/browser/public-track-embed.spec.ts",
+    ),
+    "browser-customer": (
+        "tests/browser/customer-account.spec.ts", "tests/browser/customer-identity.spec.ts",
+        "tests/browser/customer-library-browsing.spec.ts", "tests/browser/customer-order-items.spec.ts",
+        "tests/browser/customer-order-reference.spec.ts", "tests/browser/customer-purchase-claim.spec.ts",
+        "tests/browser/owned-order-history.spec.ts", "tests/browser/product-member-refresh.spec.ts",
+    ),
+    "browser-site": (
+        "tests/browser/editorial-content.spec.ts", "tests/browser/editorial-video-consent.spec.ts",
+        "tests/browser/site-content.spec.ts", "tests/browser/site-schedule.spec.ts",
+        "tests/browser/site-release-menu-readiness.spec.ts", "tests/browser/contact-inquiry.spec.ts",
+        "tests/browser/contact-inquiry-persistence.spec.ts", "tests/browser/inquiry-conversation.spec.ts",
+    ),
+    "browser-checkout": (
+        "tests/browser/test-checkout.spec.ts",
+    ),
+    "browser-delivery": (
+        "tests/browser/test-owner-delivery.spec.ts",
+    ),
+    "browser-payment-exceptions": (
+        "tests/browser/test-refunded-exception-resolution.spec.ts", "tests/browser/test-unpaid-release.spec.ts",
+    ),
+    "browser-operator-tracks": (
+        "tests/browser/track-bulk-tags.spec.ts", "tests/browser/track-metadata-presets.spec.ts",
+        "tests/browser/bulk-track-metadata.spec.ts",
+    ),
+    "browser-operator-uploads": (
+        "tests/browser/operator.spec.ts", "tests/browser/resumable-kit-upload.spec.ts",
+        "tests/browser/resumable-media-upload.spec.ts",
+    ),
+    "browser-operator-publication": (
+        "tests/browser/license-template-authoring.spec.ts", "tests/browser/private-track-review.spec.ts",
+        "tests/browser/track-publication-guard.spec.ts",
+    ),
+}
+# The files the former single "browser" suite selected: it could not finish inside the cap, so it was split above.
+BROWSER_TARGETS = tuple(name for files in BROWSER_SUITES.values() for name in files)
 BROWSER_SUBSETS = {
-    "browser": BROWSER_TARGETS,
+    **BROWSER_SUITES,
     "bulk-license-browser": ("tests/browser/bulk-license-draft-source.spec.ts",),
+    "accessibility-browser": ("tests/browser/accessibility-public.spec.ts",),
+    # The offline reload journey (WebKit and Chromium) that the removed WebKit backport guarded until Playwright 1.65.
+    "browser-offline": ("tests/browser/storefront-offline.spec.ts",),
 }
 SUITES = (*PHP_TARGETS, *FRONTEND_SUBSETS, *BROWSER_SUBSETS)
 ENGINES = ("sqlite", "mysql")
@@ -431,12 +538,33 @@ def junit_counts(path: Path) -> dict[str, int]:
             "errors": sum(case.find("error") is not None for case in cases), "assertions": sum(values)}
 
 
+def mysql_host(env: Mapping[str, str]) -> str:
+    """The disposable MySQL service address: loopback by default, or the job's private IPv4 literal.
+
+    The production identity catalog admission binds the session to its exact TCP 4-tuple, which a Docker
+    published port rewrites (the server sees the bridge gateway, the client sees 127.0.0.1). CI therefore
+    reaches the service container at its own bridge address. Any other value (a name, a public or IPv6
+    address) refuses rather than pointing migrate:fresh somewhere unexpected.
+    """
+    value = env.get("DB_HOST", "")
+    if value == "":
+        return "127.0.0.1"
+    try:
+        address = ipaddress.ip_address(value)
+    except ValueError as error:
+        raise FocusedError("DB_HOST must be a literal IPv4 address") from error
+    if (address.version != 4 or str(address) != value or address.is_unspecified or address.is_link_local
+            or not (address.is_loopback or address.is_private)):
+        raise FocusedError("DB_HOST must be a loopback or private IPv4 address")
+    return value
+
+
 def runner_environment(selected: Selection, env: Mapping[str, str]) -> dict[str, str]:
     result = dict(env)
     if selected.kind == "php":
         result.update(APP_ENV="testing", APP_DEBUG="false", DB_CONNECTION=selected.engine, DB_URL="",
                       DB_DATABASE="vaseyaudio_focused" if selected.engine == "mysql" else ":memory:",
-                      DB_HOST="127.0.0.1", DB_PORT="3306", DB_SOCKET="", DB_USERNAME="root", DB_PASSWORD="ci-only-password",
+                      DB_HOST=mysql_host(env) if selected.engine == "mysql" else "127.0.0.1", DB_PORT="3306", DB_SOCKET="", DB_USERNAME="root", DB_PASSWORD="ci-only-password",
                       VA_CI_DISPOSABLE_MYSQL="1" if selected.engine == "mysql" else "",
                       VA_LOCAL_DISPOSABLE_MYSQL="vaseyaudio_focused" if selected.engine == "mysql" and env.get("VA_LOCAL_DISPOSABLE_MYSQL") == "vaseyaudio_focused" else "",
                       CACHE_STORE="array", SESSION_DRIVER="array", QUEUE_CONNECTION="sync", MAIL_MAILER="array")
@@ -490,7 +618,7 @@ def main(argv: list[str] | None = None) -> int:
             environment["PLAYWRIGHT_JUNIT_OUTPUT_FILE"] = str(results)
         for index, command in enumerate(evidence["commands"]):
             result = subprocess.run(command, cwd=root, env=environment, shell=False, check=False,
-                                    timeout=900 if selected.kind == "php" else 720 if selected.kind == "browser" else 300)
+                                    timeout=900 if selected.kind == "php" else BROWSER_TIMEOUT_SECONDS if selected.kind == "browser" else 300)
             evidence["command_results"].append({"argv": command, "exit_code": result.returncode})
             if index == 0 and results.is_file():
                 evidence["test_counts"] = junit_counts(results)
@@ -503,7 +631,12 @@ def main(argv: list[str] | None = None) -> int:
                     raise FocusedError("Successful process did not prove a nonempty passing focused test run")
         evidence["status"] = "passed"
         return 0
-    except (OSError, subprocess.TimeoutExpired, ET.ParseError, FocusedError) as error:
+    except subprocess.TimeoutExpired as error:
+        # A capped run proves nothing about the tests it never reached; say so rather than leave a bare timeout.
+        evidence.update(status="failed", error=f"Runner cap of {int(error.timeout)} s reached before the run finished: "
+                        "the result is incomplete, not a pass or a verdict on the unexecuted tests")
+        return 1
+    except (OSError, ET.ParseError, FocusedError) as error:
         evidence.update(status="failed", error=str(error))
         return 1
     finally:

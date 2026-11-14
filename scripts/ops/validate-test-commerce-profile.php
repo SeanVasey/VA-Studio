@@ -15,9 +15,13 @@ declare(strict_types=1);
  * --template replaces each documented placeholder with a synthetic value first, so the committed
  * template can be checked for shape. --probe additionally makes one read-only GET /v1/account with
  * the configured test key, and only after every other check passed.
- * Boundary checks: the profile must state thirteen capability flags explicitly as false (scripts/ops/capability-boundary.php), none of them or of the
+ * Boundary checks: the profile must state eleven capability flags explicitly as false (scripts/ops/capability-boundary.php), none of them or of the
  * other out-of-profile families may be enabled in the booted configuration, and no enabled or mounted flag may be true in any
  * production-lane configuration file (Paid252, Tax255, production customer identity, production free grants and the rest).
+ * The optional staging capabilities (unpaid release; the test refund and dispute lifecycle; automatic test delivery enabling) must be stated explicitly as false
+ * or true, and true only with the policy class accepting the booted configuration (for refund and dispute, with the four DD-16
+ * policy values exactly), the same rule the staging deploy gate applies. The optional Exclusive selection policy may be empty (off) or set; when set
+ * it must pass ExclusiveSelectionPolicy, the same rule the staging deploy gate applies.
  * Exit codes: 0 every check passed, 1 at least one check failed, 2 usage or unreadable file.
  */
 
@@ -62,7 +66,7 @@ const OUT_OF_PROFILE_FLAGS = [
     'production_checkout.reconciliation_enabled', 'production_checkout.provider_io_enabled',
     'production_checkout.exemption_authoring_enabled', 'production_checkout.committed_read_receipts_enabled',
     'production-tax-checkout.enabled', 'free-grants.test_enabled', 'free-grants.operative_enabled',
-    'memberships.test_mode_enabled', 'refund-resolution.enabled', 'unpaid-release.enabled',
+    'memberships.test_mode_enabled', 'refund-resolution.enabled',
     'transactional-notifications.test_enabled', 'services-projects.test_enabled',
     'customer-preferences.test_grants_enabled',
 ];
@@ -101,7 +105,7 @@ if (! is_file($file) || is_link($file) || ! is_readable($file) || filesize($file
 
 $root = dirname(__DIR__, 2);
 require $root.'/vendor/autoload.php';
-// The thirteen capability flags and the production-lane rule, shared with the staging deploy gate (ops/staging/validate-runtime.php).
+// The eleven capability flags, the optional staging capabilities and the production-lane rule, shared with the staging deploy gate (ops/staging/validate-runtime.php).
 require_once __DIR__.'/capability-boundary.php';
 $raw = (string) file_get_contents($file);
 if ($template) {
@@ -156,6 +160,11 @@ if ($entries !== null) {
     $record('profile.capability_flags_explicit', $notFalse === [], $notFalse === []
         ? 'All '.count(CapabilityBoundary::CAPABILITY_FLAGS).' capability flags are stated explicitly as false.'
         : 'Capability flags missing or not exactly false: '.implode(', ', $notFalse).'. State each as KEY=false (template section 6).');
+    $unstated = array_values(array_filter(array_keys(CapabilityBoundary::STAGING_OPTIONAL_FLAGS), static fn (string $name): bool => ! array_key_exists($name, $values)
+        || ! in_array($values[$name], ['false', '(false)', 'true', '(true)'], true)));
+    $record('profile.optional_flags_explicit', $unstated === [], $unstated === []
+        ? 'Every optional staging capability is stated explicitly as true or false.'
+        : 'Optional capability flags missing or not exactly true or false: '.implode(', ', $unstated).'. State each (template section 6).');
 }
 
 // ---- Boot the real application with this file as its only dotenv source.
@@ -270,8 +279,24 @@ if ($booted) {
     $attempt('commerce.inventory', 'VASEY_TEST_INVENTORY_POLICY passes InventoryPolicy::current().', fn () => app(InventoryPolicy::class)->current());
     $attempt('commerce.inventory_ttl_covers_quote', 'Inventory ttl_seconds is at least the 900-second quote lifetime.',
         fn () => app(InventoryPolicy::class)->current()['ttl_seconds'] >= 900);
-    $attempt('commerce.exclusive_selection_off', 'VASEY_TEST_EXCLUSIVE_SELECTION_POLICY is empty (exclusive test activation is outside this profile).',
-        fn () => in_array(config('commerce.test_exclusive_selection_policy'), [null, ''], true));
+    // Optional, the same rule as the staging deploy gate (CapabilityBoundary::STAGING_OPTIONAL_POLICIES): empty is off; set passes
+    // only when ExclusiveSelectionPolicy accepts it. The hosted rehearsal sets it by Sean's decision (docs/ops/exclusive-rehearsal.md).
+    $read = static fn (string $key): mixed => config($key);
+    $exclusiveRefused = in_array('VASEY_TEST_EXCLUSIVE_SELECTION_POLICY', CapabilityBoundary::optionalPoliciesRefused($read, static function (string $policy): bool {
+        try {
+            app($policy)->current();
+
+            return true;
+        } catch (Throwable) {
+            return false;
+        }
+    }), true);
+    $exclusiveSet = in_array('VASEY_TEST_EXCLUSIVE_SELECTION_POLICY', CapabilityBoundary::optionalPoliciesSet($read), true);
+    $record('commerce.exclusive_selection', ! $exclusiveRefused, match (true) {
+        $exclusiveRefused => 'VASEY_TEST_EXCLUSIVE_SELECTION_POLICY is set but ExclusiveSelectionPolicy::current() refuses it. Correct it, or leave it empty to keep Exclusive selection off.',
+        $exclusiveSet => 'Optional Exclusive selection is ON: VASEY_TEST_EXCLUSIVE_SELECTION_POLICY passes ExclusiveSelectionPolicy::current(). A paid Exclusive test purchase permanently locks its track (docs/ops/exclusive-rehearsal.md).',
+        default => 'Optional Exclusive selection is off: VASEY_TEST_EXCLUSIVE_SELECTION_POLICY is empty.',
+    });
     $attempt('commerce.order', 'VASEY_TEST_ORDER_POLICY passes OrderPolicy::current().', fn () => app(OrderPolicy::class)->current());
     $attempt('commerce.checkout', 'VASEY_TEST_CHECKOUT_POLICY passes CheckoutPolicy::current() and checkout is enabled.',
         fn () => app(CheckoutPolicy::class)->current() !== [] && app(CheckoutPolicy::class)->enabled());
@@ -290,8 +315,12 @@ if ($booted) {
         fn () => ContractRenderProfile::current()['version'] === 'test-buyer-pdf-v2');
     $attempt('delivery.activation', 'VASEY_TEST_FULFILLMENT_ACTIVATION_POLICY equals ActivationPolicy::CONTRACT and activation is enabled.',
         fn () => app(ActivationPolicy::class)->current());
-    $attempt('delivery.access', 'VASEY_TEST_DELIVERY_ACCESS_POLICY equals TestAccessPolicy::CONTRACT and owner delivery is enabled.',
+    $attempt('delivery.access', 'VASEY_TEST_DELIVERY_ACCESS_POLICY equals TestAccessPolicy::CONTRACT_V2 (or the retained v1 CONTRACT), v2 resume limits are valid, and owner delivery is enabled.',
         fn () => app(TestAccessPolicy::class)->current());
+    // v2 binds downloads to a secret in the server-side session; a cookie (or any client-held) session would let a copied
+    // pre-logout cookie replay it, so v2 is refused unless sessions are stored in the database.
+    $attempt('delivery.v2_session_database', 'A test-owner-delivery-v2 policy runs only with SESSION_DRIVER=database.',
+        fn () => app(TestAccessPolicy::class)->current()['version'] !== TestAccessPolicy::V2 || config('session.driver') === 'database');
 
     // ---- Test customer accounts
     $attempt('customer.accounts', 'Test customer accounts are enabled (CustomerAccessPolicy).', fn () => app(CustomerAccessPolicy::class)->enabled());
@@ -306,6 +335,18 @@ if ($booted) {
     $record('boundary.out_of_profile_families_off', $enabled === [], $enabled === []
         ? 'Production checkout, production tax checkout and the other test families are off.'
         : 'Enabled outside this profile: '.implode(', ', $enabled).'.');
+    $refused = CapabilityBoundary::optionalFlagsRefused(static fn (string $key): mixed => config($key), static function (string $policy): bool {
+        try {
+            app($policy)->current();
+
+            return true;
+        } catch (Throwable) {
+            return false;
+        }
+    });
+    $record('boundary.optional_capabilities_admitted', $refused === [], $refused === []
+        ? 'Each optional staging capability is off, or on with its exact policy accepted.'
+        : 'Optional capability on without an accepted policy (or not a boolean): '.implode(', ', $refused).'.');
     $lanes = CapabilityBoundary::productionLanes($root.'/config', static fn (string $stem): array => (array) config($stem));
     $record('boundary.production_lanes_closed', $lanes['open'] === [] && $lanes['missing'] === [], match (true) {
         $lanes['missing'] !== [] => 'Production lane configuration not found (renamed? update CapabilityBoundary): '.implode(', ', $lanes['missing']).'.',

@@ -7,36 +7,47 @@ use App\Domain\Commerce\Checkout\CheckoutPolicy;
 use App\Domain\Commerce\Orders\OrderPolicy;
 use App\Domain\Customers\CustomerAccessPolicy;
 use App\Domain\SiteBuilder\EditorialContent;
+use App\Domain\SiteBuilder\FamilyEntryPoints;
 use App\Domain\SiteBuilder\SiteContent;
 use App\Domain\SiteBuilder\SiteImagePresentation;
+use App\Support\PublicReadMemo;
 use App\Support\PublicStructuredData;
 use App\Support\StorefrontMetadata;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class StorefrontController extends Controller
 {
-    public function index(Request $request, ?string $slug = null): Response
+    public function index(Request $request, ?string $slug = null): Response|SymfonyResponse
     {
         $service = app(PublicCatalog::class);
-        $selected = $slug === null ? null : $service->track($slug);
-        $catalog = $service->page($request);
+        // One read scope for the selected track and the catalog page, so a track judged for both is read once (PublicReadMemo).
+        [$direct, $catalog] = PublicReadMemo::scope(fn (): array => [$slug === null ? null : $service->direct($slug), $service->page($request)]);
+        $selected = $direct['projection'] ?? null;
+        $unlisted = $direct['unlisted'] ?? false;
         $selectedTrack = $selected['tracks'][0] ?? null;
         $catalog['licenseTiers'] = collect(array_merge($catalog['licenseTiers'], $selected['licenseTiers'] ?? []))->unique('id')->values()->all();
         $siteContent = app(SiteContent::class)->current();
         $images = app(SiteImagePresentation::class);
-        $metadata = app(StorefrontMetadata::class)->forPage($selectedTrack, $siteContent, $images->share($siteContent));
+        $metadata = app(StorefrontMetadata::class)->forPage($selectedTrack, $siteContent, $images->share($siteContent), $unlisted);
         $structured = app(PublicStructuredData::class);
-        $metadata['structuredData'] = $selectedTrack === null ? $structured->forHome($metadata) : $structured->forTrack($selectedTrack, $metadata);
+        // An unlisted page is reachable but not promoted: no structured data, so no rich result can describe it.
+        $metadata['structuredData'] = $selectedTrack === null ? $structured->forHome($metadata) : ($unlisted ? null : $structured->forTrack($selectedTrack, $metadata));
 
-        return Inertia::render('Storefront', $catalog + ['siteContent' => app(EditorialContent::class)->chrome($siteContent), 'siteImages' => $images->storefront($siteContent),
+        $response = Inertia::render('Storefront', $catalog + ['siteContent' => app(EditorialContent::class)->chrome($siteContent), 'siteImages' => $images->storefront($siteContent),
             'selectedTrack' => $selectedTrack, 'selectedTrackSlug' => $slug, 'commerceEnabled' => false,
             'testOrderPreparationEnabled' => app(OrderPolicy::class)->enabled(),
             'customerAccountEnabled' => app(CustomerAccessPolicy::class)->enabled(),
-            'testCheckoutEnabled' => app(CheckoutPolicy::class)->enabled(), 'metadata' => $metadata])
+            'testCheckoutEnabled' => app(CheckoutPolicy::class)->enabled(), 'metadata' => $metadata,
+            // Entry points of default-off families appear only while their own policy is on (BL-50).
+            'familyLinks' => app(FamilyEntryPoints::class)->links()])
             ->withViewData(['metadata' => $metadata]);
+
+        // The header repeats the page's robots meta so crawlers that read only headers also skip it.
+        return $unlisted ? $response->toResponse($request)->header('X-Robots-Tag', 'noindex, nofollow') : $response;
     }
 
     public function json(Request $request): JsonResponse

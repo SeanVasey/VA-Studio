@@ -2,6 +2,8 @@
 
 namespace App\Domain\SiteBuilder;
 
+use App\Support\Environment\TestEnvironment;
+
 /**
  * A release may not become public while a legal page still shows drafting material. The marker classes are the
  * conventions of the drafts in docs/legal ("Text still in square brackets is a placeholder or a choice that must be filled
@@ -30,17 +32,33 @@ final class LegalPublicationGuard
     /** Any other square-bracketed text, such as "[Tier name]", and any unpaired square bracket. */
     public const BRACKETED_PLACEHOLDER = 'bracketed_placeholder';
 
+    /**
+     * A license comparison typed as sections (schema 5). DD-31: the comparison is generated from the published license
+     * versions (schema 6), so typed comparison text, which can drift from what is sold, is never made public.
+     */
+    public const HAND_TYPED_COMPARISON = 'hand_typed_license_comparison';
+
+    /**
+     * DD-33 staging stand-in text: the "STAGING PLACEHOLDER — not in effect" banner and "set at production" values. It is
+     * admitted only where the application is local, testing or staging (stagingPlaceholderAdmitted()) and refuses publication
+     * everywhere else, production included, under the same reason code as every other marker.
+     */
+    public const STAGING_PLACEHOLDER = 'staging_placeholder';
+
     public const LABELS = [
+        self::STAGING_PLACEHOLDER => 'staging placeholder',
         self::LEGAL_REVIEW => 'legal-review marker',
         self::OWNER_DECISION => 'undecided owner choice',
         self::PUBLICATION_VALUE => 'value still to be entered at publication',
         self::DRAFT_NOTICE => 'draft notice',
         self::TEMPLATE_VARIABLE => 'unsubstituted template variable',
         self::BRACKETED_PLACEHOLDER => 'square-bracket placeholder',
+        self::HAND_TYPED_COMPARISON => 'hand-typed license comparison; the comparison is now generated from the published license versions',
     ];
 
     /** Phrase classes in precedence order; they apply inside and outside square brackets. */
     private const PHRASES = [
+        self::STAGING_PLACEHOLDER => '/\bSTAGING\s+PLACEHOLDER\b|\bset\s+at\s+production\b/iu',
         self::LEGAL_REVIEW => '/\bfor\s+legal\s+review\b/iu',
         self::OWNER_DECISION => '/\bSean\s+to\s+(?:confirm|choose|decide|set)\b/iu',
         self::PUBLICATION_VALUE => '/\b(?:set|inserted|entered)\s+(?:on|at)\s+publication\b/iu',
@@ -52,18 +70,25 @@ final class LegalPublicationGuard
 
     /**
      * Every unresolved marker in the public text of the legal pages: title, description, headings and paragraphs. The
-     * version and effective date cannot hold one (SiteContentSchema), and the approval reference is never public.
+     * version and effective date cannot hold one (SiteContentSchema), and the approval reference is never public. A license
+     * comparison that still holds typed sections is one finding of its own, reported before the markers in its text.
      *
      * @return list<array{document: string, field: string, class: string, excerpt: string}>
      */
     public static function findings(array $content): array
     {
+        $stagingAdmitted = self::stagingPlaceholderAdmitted();
         $legal = is_array($content['legal'] ?? null) ? $content['legal'] : [];
         $findings = [];
         foreach (SiteContentSchema::LEGAL_DOCUMENTS as $document) {
             $page = $legal[$document] ?? null;
             if (! is_array($page)) {
                 continue;
+            }
+            if ($document === 'licenses' && array_key_exists('sections', $page)) {
+                $count = is_array($page['sections']) ? count($page['sections']) : 0;
+                $findings[] = ['document' => $document, 'field' => 'sections', 'class' => self::HAND_TYPED_COMPARISON,
+                    'excerpt' => $count.' typed '.($count === 1 ? 'section' : 'sections')];
             }
             $fields = ['title' => $page['title'] ?? null, 'description' => $page['description'] ?? null];
             foreach (is_array($page['sections'] ?? null) ? $page['sections'] : [] as $index => $section) {
@@ -74,12 +99,28 @@ final class LegalPublicationGuard
             }
             foreach ($fields as $field => $text) {
                 foreach (is_string($text) ? self::scan($text) : [] as [$class, $excerpt]) {
+                    if ($class === self::STAGING_PLACEHOLDER && $stagingAdmitted) {
+                        continue;
+                    }
                     $findings[] = ['document' => $document, 'field' => $field, 'class' => $class, 'excerpt' => $excerpt];
                 }
             }
         }
 
         return $findings;
+    }
+
+    /**
+     * Whether staging placeholder text may stand: local, testing or staging by exact name, and only when the configured and
+     * the running environment agree. Production, an unknown name and a disagreement all refuse it (the pattern of
+     * StagingSellerTag::admitted()).
+     */
+    public static function stagingPlaceholderAdmitted(): bool
+    {
+        $configured = config('app.env');
+
+        return is_string($configured) && $configured === app()->environment() && ! app()->isProduction()
+            && TestEnvironment::admitsTestCommerce();
     }
 
     public static function assertPublishable(array $content): void
@@ -169,6 +210,9 @@ final class LegalPublicationGuard
         $page = ['privacy' => 'Privacy policy', 'terms' => 'Terms', 'licenses' => 'License comparison'][$finding['document']];
         if (preg_match('/\Asections\.(\d+)\.(heading|paragraphs\.(\d+))\z/', $finding['field'], $match) === 1) {
             return $page.', section '.((int) $match[1] + 1).(isset($match[3]) ? ' paragraph '.((int) $match[3] + 1) : ' heading');
+        }
+        if ($finding['field'] === 'sections') {
+            return $page.' sections';
         }
 
         return $page.' '.$finding['field'];

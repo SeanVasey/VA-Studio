@@ -138,7 +138,10 @@ describe('owned order inquiry flow', () => {
     await act(async () => finish(response({ orderInquiry: setup }))); expect(screen.queryByText(orderId)).not.toBeInTheDocument(); expect(screen.queryByLabelText(/^Name/)).not.toBeInTheDocument();
   });
   it('expires a stalled availability read at the existing 20-second limit and ignores late data', async () => {
-    vi.useFakeTimers(); let finish!: (response: Response) => void;
+    // Only the timeouts this deadline uses. jsdom 31 drives requestAnimationFrame and focus fixup from one global setInterval;
+    // a faked interval would be dropped by useRealTimers while jsdom still holds its handle, so later rAF focus restores in
+    // this file would never run.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] }); let finish!: (response: Response) => void;
     const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
     render(<OrderInquiry orderId={orderId} />); fireEvent.click(screen.getByRole('button', { name: 'Ask about this test order' }));
     await act(async () => vi.advanceTimersByTime(20_000)); expect(screen.getByRole('alert')).toHaveFocus(); expect(fetcher.mock.calls[0][1]?.signal?.aborted).toBe(true);

@@ -29,7 +29,7 @@ final class ContractRenderProfileRegistry
         ],
         'test-buyer-pdf-v2' => [
             'assets_directory' => 'resources/contracts/test-v2',
-            'manifest_sha256' => '29e0b1b33abc78ab48c6669579dbb3296eb9e282f2a16b0fb337db8417b68dac',
+            'manifest_sha256' => '0605065d0d56b3466024048324769f9cf158ff97dd24b5a11d890c82bf0da811',
             'metadata' => ['schema_version' => 1, 'version' => 'test-buyer-pdf-v2', 'test_only' => true,
                 'issuance_policy' => ContractIssuancePolicy::V2_CONTRACT, 'renderer' => 'tecnickcom/tc-lib-pdf', 'template' => 'frozen-grant-sections-v1',
                 'php_runtime' => '8.4', 'timezone' => 'UTC', 'pdf_conformance' => 'plain-pdf',

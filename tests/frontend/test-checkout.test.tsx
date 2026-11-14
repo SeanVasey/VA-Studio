@@ -110,6 +110,114 @@ describe('hosted Stripe test checkout', () => {
     expect(postCalls(fetcher)).toHaveLength(0);
   });
 
+  describe('automatic refresh of a pending order', () => {
+    const awaiting = { ...fixture('complete'), paymentStatus: 'verified', finalizationStatus: 'awaiting_finalization' };
+    const finalized = { ...fixture('complete'), paymentStatus: 'verified', finalizationStatus: 'paid', contractStatus: 'issued', fulfillmentStatus: 'pending_activation' };
+    const flush = async (ms: number) => { await act(async () => { await vi.advanceTimersByTimeAsync(ms); }); };
+
+    it('polls the read endpoint every 5 seconds until the order settles, announcing it politely', async () => {
+      vi.useFakeTimers();
+      const fetcher = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(json(awaiting)).mockResolvedValueOnce(json(awaiting)).mockResolvedValueOnce(json(finalized));
+      render(<TestCheckout orderId={orderId} enabled />);
+      await flush(0);
+      expect(screen.getByTestId('checkout-auto-refresh')).toHaveTextContent('Checking for updates automatically');
+      expect(screen.getByTestId('checkout-auto-refresh')).toHaveAttribute('aria-live', 'polite');
+      expect(fetcher).toHaveBeenCalledTimes(1);
+      await flush(4_999);
+      expect(fetcher).toHaveBeenCalledTimes(1);
+      await flush(1);
+      expect(fetcher).toHaveBeenCalledTimes(2);
+      await flush(5_000);
+      expect(fetcher).toHaveBeenCalledTimes(3);
+      expect(screen.getByRole('status')).toHaveTextContent('Test contracts have been issued');
+      expect(screen.queryByTestId('checkout-auto-refresh')).not.toBeInTheDocument();
+      await flush(60_000);
+      expect(fetcher).toHaveBeenCalledTimes(3);
+      expect(fetcher.mock.calls.every(([url, init]) => url === checkoutPath() && init?.method === 'GET')).toBe(true);
+      expect(screen.getByRole('button', { name: 'Refresh test order status' })).toBeInTheDocument();
+    });
+
+    it('keeps the payment-regression guard once a poll that started unverified has seen a verified payment', async () => {
+      vi.useFakeTimers();
+      const unverified = fixture('complete');
+      const fetcher = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(json(unverified)).mockResolvedValueOnce(json(awaiting)).mockResolvedValueOnce(json(unverified));
+      render(<TestCheckout orderId={orderId} enabled />);
+      await flush(0);
+      expect(screen.getByTestId('checkout-auto-refresh')).toHaveTextContent('Checking for updates automatically');
+      await flush(5_000);
+      expect(screen.getByRole('status')).toHaveTextContent('Test payment verified');
+      await flush(5_000);
+      expect(fetcher).toHaveBeenCalledTimes(3);
+      // The stale unverified read is refused: verified progress stays and nothing reopens payment.
+      expect(screen.getByRole('status')).toHaveTextContent('Test payment verified');
+      expect(screen.getByText(/previously verified test payment remains recorded/)).toBeInTheDocument();
+      expect(screen.queryByText(/No payment or fulfillment is confirmed/)).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: 'Continue to Stripe test checkout' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Open Stripe|Retry Stripe|Check Stripe/ })).not.toBeInTheDocument();
+      expect(screen.getByTestId('checkout-auto-refresh')).toHaveTextContent('Automatic checking has stopped because the status could not be loaded');
+    });
+
+    it('reports a failed poll after verification as a status problem, never as an unconfirmed payment', async () => {
+      vi.useFakeTimers();
+      vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(json(fixture('complete'))).mockResolvedValueOnce(json(awaiting)).mockRejectedValueOnce(new Error('offline'));
+      render(<TestCheckout orderId={orderId} enabled />);
+      await flush(0);
+      await flush(5_000);
+      await flush(5_000);
+      expect(screen.getByRole('status')).toHaveTextContent('Test payment verified');
+      expect(screen.getByText(/previously verified test payment remains recorded/)).toBeInTheDocument();
+      expect(screen.queryByText(/No payment or fulfillment is confirmed/)).not.toBeInTheDocument();
+    });
+
+    it('stops after about three minutes and keeps the manual button', async () => {
+      vi.useFakeTimers();
+      const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => json(awaiting));
+      render(<TestCheckout orderId={orderId} enabled />);
+      await flush(0);
+      await flush(180_000);
+      const calls = fetcher.mock.calls.length;
+      expect(calls).toBeGreaterThanOrEqual(36);
+      expect(calls).toBeLessThanOrEqual(38);
+      await flush(60_000);
+      expect(fetcher).toHaveBeenCalledTimes(calls);
+      expect(screen.getByTestId('checkout-auto-refresh')).toHaveTextContent('Automatic checking has stopped after 3 minutes');
+      expect(screen.getByRole('button', { name: 'Refresh test order status' })).toBeInTheDocument();
+    });
+
+    it('stops on the first error and announces that polling has stopped', async () => {
+      vi.useFakeTimers();
+      const fetcher = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(json(awaiting)).mockResolvedValueOnce(new Response('{}', { status: 500 })).mockResolvedValue(json(awaiting));
+      render(<TestCheckout orderId={orderId} enabled />);
+      await flush(0);
+      await flush(5_000);
+      expect(fetcher).toHaveBeenCalledTimes(2);
+      expect(screen.getByRole('alert')).toHaveTextContent('could not be loaded');
+      expect(screen.getByTestId('checkout-auto-refresh')).toHaveTextContent('Automatic checking has stopped because the status could not be loaded');
+      await flush(60_000);
+      expect(fetcher).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not poll an order that is not awaiting the server, nor unmount into a leaked timer', async () => {
+      vi.useFakeTimers();
+      const fetcher = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => json(fixture('open')));
+      const view = render(<TestCheckout orderId={orderId} enabled />);
+      await flush(30_000);
+      expect(fetcher).toHaveBeenCalledTimes(1);
+      view.unmount();
+      const pending = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => json(awaiting));
+      const second = render(<TestCheckout orderId={orderId} enabled />);
+      await flush(0);
+      second.unmount();
+      pending.mockClear();
+      await flush(30_000);
+      expect(pending).not.toHaveBeenCalled();
+    });
+  });
+
   it('allows a historical open observation only without a payment URL after verification', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(json({ ...fixture('open'), url: null, paymentStatus: 'verified', finalizationStatus: 'awaiting_finalization' }));
     render(<TestCheckout orderId={orderId} enabled />);

@@ -29,6 +29,15 @@ class TestRefundResolutionMigrationTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // The empty buyer cancellation and never-sent release children extend this migration's resource guards; restore this
+        // migration as their owner, newest child first.
+        (require database_path('migrations/2026_11_12_001000_test_buyer_order_cancellations.php'))->down();
+        (require database_path('migrations/2026_11_11_001000_test_unsent_order_releases.php'))->down();
+    }
+
     private function fixture(bool $exception = true): array
     {
         $this->fakePrivateMediaStorage();

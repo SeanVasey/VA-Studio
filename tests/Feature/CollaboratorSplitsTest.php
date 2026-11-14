@@ -115,8 +115,13 @@ class CollaboratorSplitsTest extends TestCase
         $track = $this->track();
         $split = $this->split($actor, $track, $collaborator, 'master', 4000);
         $added = AuditEvent::where('action', 'rights.collaborator_split.added')->sole();
-        $this->assertSame(['schema_version' => 1, 'track_id' => $track->id, 'collaborator_id' => $collaborator->id, 'split_type' => 'master',
-            'before_share_bps' => null, 'after_share_bps' => 4000, 'set_total_bps' => 4000, 'set_complete' => false], $added->context);
+        // Keys compared in a fixed order: MySQL's JSON type stores object keys in its own canonical order; values stay strict.
+        $expected = ['schema_version' => 1, 'track_id' => $track->id, 'collaborator_id' => $collaborator->id, 'split_type' => 'master',
+            'before_share_bps' => null, 'after_share_bps' => 4000, 'set_total_bps' => 4000, 'set_complete' => false];
+        $context = $added->context;
+        ksort($expected);
+        ksort($context);
+        $this->assertSame($expected, $context);
         $this->assertSame([TrackCollaboratorSplit::class, $split->id, $actor->id], [$added->subject_type, $added->subject_id, $added->actor_id]);
 
         $command->updateShare($split, 4000, 4000, $actor);
@@ -468,6 +473,8 @@ class CollaboratorSplitsTest extends TestCase
             'app/Domain/Catalog/ReadTrackPublicationManifest.php', 'app/Filament/Resources/TrackResource.php',
             // Classification of the two tables as staff catalog data.
             'app/Domain/Customers/DataRights/RetentionSchedule.php',
+            // Media-reference classification only: names the split table's track_id column as metadata that holds no media.
+            'app/Domain/Media/Lifecycle/MediaReferenceRegistry.php',
         ];
         $found = [];
         foreach ((new Finder)->files()->in([app_path(), base_path('routes'), base_path('config'), resource_path()])->name(['*.php', '*.ts', '*.tsx']) as $file) {

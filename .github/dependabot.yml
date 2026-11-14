@@ -13,6 +13,12 @@ updates:
         # also covers the transitive renderers (barcode, color, file, unicode and the other tc-lib-pdf-* parts) that
         # resources/contracts/*/profile-assets.json pin, so each of them gets its own PR too.
         exclude-patterns: ["tecnickcom/tc-lib-*"]
+    ignore:
+      # stripe-php 22 pins API 2026-09-30.endive or later, which removes payment_method_types from Checkout Session
+      # create: the BL-68 payment-method allowlist (CheckoutPaymentMethods) and its stored-request replay depend on it.
+      # Moving needs a designed payment-method migration, not a version bump (decision 2026-11-14, Dependabot #376).
+      - dependency-name: "stripe/stripe-php"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: npm
     directory: /
     schedule:
@@ -25,8 +31,7 @@ updates:
     groups:
       npm-minor-patch:
         update-types: ["minor", "patch"]
-        # Exact pins are reviewed one at a time: Playwright must match the pinned WebKit backport
-        # (scripts/ci/apply-playwright-webkit-offline-backport.mjs), so a bump would fail the whole group.
+        # Exact pins are reviewed one at a time: test-runner and type-checker majors change behaviour the group would hide.
         exclude-patterns: ["@playwright/test", "playwright", "playwright-core", "vitest", "typescript", "jsdom", "@testing-library/dom", "@testing-library/jest-dom"]
   - package-ecosystem: github-actions
     directory: /

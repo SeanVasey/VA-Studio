@@ -1,6 +1,8 @@
 # VASEY.AUDIO
 
-**Current state, October 17, 2026 UTC.** Development continues on `main` of [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). When this was written `main` was `34562862` (PR #137, documentation only) over the native fixture lifecycle merge of PR #132 (`efa6eea5`). The [development agenda](docs/handoff/2026-10-15/DEVELOPMENT-AGENDA.md) lists the completed development and the remaining work for each area. The [October 17 resumption note](docs/handoff/2026-10-17/RESUMPTION.md) records the open work lanes, the CI cost posture and the items that wait on Sean. The [Claude Code plan and merge ledger](docs/handoff/2026-10-07/CLAUDE-PLAN.md) remains the long record of every merged batch.
+**Current state: see the [November 12 checkpoint](docs/handoff/2026-11-05/HANDOFF.md#checkpoint-2026-11-12) and the [staging alpha test guide](docs/alpha/staging-alpha-test-guide.md). The paragraph that follows records October 17, 2026 UTC and is kept for provenance.**
+
+**October 17, 2026 UTC.** Development continues on `main` of [SeanVasey/VA-Studio](https://github.com/SeanVasey/VA-Studio). When this was written `main` was `34562862` (PR #137, documentation only) over the native fixture lifecycle merge of PR #132 (`efa6eea5`). The [development agenda](docs/handoff/2026-10-15/DEVELOPMENT-AGENDA.md) lists the completed development and the remaining work for each area. The [October 17 resumption note](docs/handoff/2026-10-17/RESUMPTION.md) records the open work lanes, the CI cost posture and the items that wait on Sean. The [Claude Code plan and merge ledger](docs/handoff/2026-10-07/CLAUDE-PLAN.md) remains the long record of every merged batch.
 
 Commerce, customer identity, memberships, paid and free delivery and tax run only behind default-off, test-only policies. They are admitted in `local` and `testing`, and the Stripe-test chain also in the hosted `staging` rehearsal (Stripe test mode only, staff MFA required); some rehearsals stay `local` and `testing` only. BeatStars remains the live store. No live payment, production deployment, DNS change, customer import or launch acceptance is claimed. The [remaining development plan](docs/remaining-development-plan.md#parity-status-source-read-october-17-2026) records a source-read status for each of the 103 parity requirements; that table is a reading of the code on October 17, not test or release acceptance.
 
@@ -51,6 +53,7 @@ Recovery checkpoint, September 30: [PR #84](https://github.com/VASEYDEV/VASEYAUD
 - [Brand evidence](docs/brand/): current published theme, exact identity assets, and source provenance.
 - [Verification](docs/verification/): actual local checks and remaining gates.
 - [Media operations](docs/media-processing.md): worker prerequisites, approved preview tag, processing and recovery.
+- [Staging alpha test guide](docs/alpha/staging-alpha-test-guide.md): browser test scripts for the owner on the staging store (Stripe test mode), with expected results and known limits.
 - [Licensing and offers](docs/licensing-and-offers.md): review submission, successor versions, published prices/files and legacy upgrade steps.
 - [Provisional selection reviews](docs/provisional-quotes.md): server snapshots, session ownership, retries, expiry and the boundary before payable checkout.
 - [Quote license disclosure](docs/quote-license-disclosure.md): full frozen terms tied to the owning selection review, disclosure identity and recovery.
@@ -70,6 +73,7 @@ Recovery checkpoint, September 30: [PR #84](https://github.com/VASEYDEV/VASEYAUD
 - [Shared rights inventory](docs/shared-rights-inventory.md): internal scope/revision linkage, guarded test reservations and the boundary before exclusive sales.
 - [Promotion pricing](docs/promotion-pricing.md): versioned discount allocations, shared test campaign limits and guarded usage holds.
 - [Collaborator splits](docs/collaborator-splits.md): credited collaborators and per-track shares in basis points as staff metadata; database-held totals, audited edits, reported to publication readiness without blocking; no payouts.
+- [Albums page](docs/albums.md): default-off public page for Sean's own releases with staff-entered tracklists, allow-listed https listening links and cover art through the site image pipeline; no purchase path.
 - [Catalog administration](docs/catalog-administration.md): audited metadata saves, edit conflicts and stable published track URLs.
 - [Reusable metadata presets](docs/verification/track-metadata-presets.md): named descriptive defaults, stale-edit protection and explicit copied-value review before private draft creation.
 - [Reviewed bulk metadata edits](docs/verification/bulk-track-metadata.md): current-page Keep/Set/Clear choices, exact before/after review and atomic optimistic saves.
@@ -88,7 +92,7 @@ Recovery checkpoint, September 30: [PR #84](https://github.com/VASEYDEV/VASEYAUD
 | --- | --- | --- |
 | Storefront | Paginated catalog/search/sort, dedicated track pages, frozen full license disclosure, reconciled cart, social metadata and persistent audio transport | Production catalog import; public collection and album pages and checkout (private drafts exist); a legal page type, structured data (JSON-LD) and legacy-URL redirects; physical-device, screen-reader and broader accessibility/performance acceptance |
 | Admin | Authenticated Filament catalog/licensing management, audited metadata edits, permanent published track URLs, accepted versioned site-content publication/rollback, test promotion administration and persisted contact/about/blog/video content; scheduled site publication; a private contact inbox with in-app replies; video embeds that load a provider only after a visitor's explicit choice | Media delete, orphan and quota tooling, dashboard widgets, granular production permissions, customer administration and fulfillment operations, and restore verification on a real host. Contact inquiries stay in the private inbox: nothing is sent by email or any other outbound channel |
-| Media | Private WAV/artwork and bounded WAV-stems ZIP intake, queued verification, immutable master/MP3 revisions, tagged previews, measured waveforms, admin retry controls and audited stems/master associations frozen in offers; resumable private uploads for track media and sound kits (sequential 8 MiB parts, 24-hour sessions, 200 MiB source ceiling) | Production scanner acceptance, worker isolation, real stems alignment acceptance and managed object storage. The resumable limits are application bounds: that a production proxy and PHP configuration admit them is not demonstrated |
+| Media | Private WAV/artwork and bounded WAV-stems ZIP intake, queued verification, immutable master/MP3 revisions, tagged previews with an untagged variant that staff switch on per track or by a store default (default on), measured waveforms, admin retry controls and audited stems/master associations frozen in offers; resumable private uploads for track media and sound kits (sequential 8 MiB parts, 24-hour sessions, 200 MiB source ceiling) | Production scanner acceptance, worker isolation, real stems alignment acceptance and managed object storage. The resumable limits are application bounds: that a production proxy and PHP configuration admit them is not demonstrated |
 | Licensing | Exact submitted review payloads, independent approval evidence, source/summary preview, successor diffs and effective dates | Approved production terms, a complete typed rights schema and production archival/legal validation |
 | Offers | Editable drafts separated from immutable published price/license/file revisions; revision history and cart invalidation; scope-bound exclusive preparation and explicit test activation/selection | Production exclusive policy and fulfillment |
 | Commerce | Immutable selection/disclosure/pricing, promotion limits/shared inventory, private order/assent, hosted test sessions and verified payments; merged #64 adds terminal resource effects, grants and pending fulfillment; merged #66 adds read-only staff visibility. In VA-Studio, default-off whole-order paid delivery and typed Tax V2 composition (PRs #118 to #124) and default-off, unattested refund and dispute prerequisites (PRs #125 and #126) are merged | Operator exception/refund resolution beyond the narrow test cases: the refund and dispute lifecycle has no provider acceptance, durable observation ledger or financial, access, rights or inventory effect yet. Also production identity/legal/tax policy |
@@ -153,8 +157,10 @@ Routine PRs run **Development preflight**: frontend tests/build, client secret
 scans, dependency audits and PHP/tooling quality checks. Pushes and merges do not
 start full database/browser matrices. Sean's October 6 policy in [AGENTS.md](AGENTS.md)
 allows development merges using meaningful focused evidence with untested
-conditions recorded. Prefer local affected checks; manually request
-[focused feedback](docs/verification/focused-ci.md) only when needed.
+conditions recorded. Preflight runs no PHPUnit: PHP tests run locally per change and in the
+manual final verification. Prefer local affected checks; manually request
+[focused feedback](docs/verification/focused-ci.md) only when needed. Its browser specs are
+split into nine `browser-*` suites plus `accessibility-browser` (the single `browser` suite no longer exists).
 
 **Foundation CI** is manual final verification through
 `.github/workflows/final-verification.yml`, requiring the exact reviewed

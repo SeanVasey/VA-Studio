@@ -11,11 +11,15 @@ use Illuminate\Mail\Mailables\Headers;
 /** Plain text, test-labelled order-ready notice. It carries an order reference only: no link, token, price or legal text. */
 final class OrderReadyMail extends Mailable
 {
-    public function __construct(public readonly string $orderReference, private readonly string $fromAddress, public readonly string $deliveryId) {}
+    public function __construct(public readonly string $orderReference, private readonly string $fromAddress, public readonly string $deliveryId, private readonly ?string $replyToAddress = null) {}
 
     public function envelope(): Envelope
     {
-        return new Envelope(from: new Address($this->fromAddress, 'VASEY.AUDIO'), subject: 'Your VASEY.AUDIO test order is ready');
+        return new Envelope(
+            from: new Address($this->fromAddress, 'VASEY.AUDIO'),
+            replyTo: $this->replyToAddress === null ? [] : [new Address($this->replyToAddress)],
+            subject: 'Your VASEY.AUDIO test order is ready',
+        );
     }
 
     public function content(): Content

@@ -3,11 +3,13 @@
 namespace Tests\Feature\MediaLifecycle;
 
 use App\Domain\Catalog\Models\Track;
+use App\Domain\Catalog\TrackPublicationSchedules;
 use App\Domain\Commerce\Models\PendingEntitlement;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\Payments\StripePaymentGateway;
 use App\Domain\Media\Lifecycle\MediaLifecycleInventory;
 use App\Domain\Media\Lifecycle\MediaReferenceProof;
+use App\Domain\Media\Lifecycle\MediaReferenceRegistry;
 use App\Domain\Media\MediaProcessor;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\QueueMediaProcessing;
@@ -66,9 +68,10 @@ final class MediaReferenceProofTest extends TestCase
         return [$roots[0], $roots[1] ?? null, $outputs, $track];
     }
 
-    private function prove(array $roots): array
+    /** $extra registers the columns of a probe table, as a migration adding such a table would have to. */
+    private function prove(array $roots, array $extra = []): array
     {
-        return app(MediaReferenceProof::class)->prove($roots);
+        return (new MediaReferenceProof(new MediaReferenceRegistry($extra)))->prove($roots);
     }
 
     private function snapshot(): array
@@ -142,10 +145,54 @@ final class MediaReferenceProofTest extends TestCase
         $this->assertSame('attached', $result['families'][$offered]['state']);
         $this->assertContains('json:offers.deliverable_asset_ids', $attached($offered));
         $this->assertSame('attached', $result['families'][$revised]['state']);
-        $this->assertSame(['json:offer_revisions.snapshot'], $attached($revised));
+        // The frozen revision names the preview by id and, as a published commercial row, its track.
+        $this->assertSame(['json:offer_revisions.snapshot', 'track:offer_revisions.track_id'], $attached($revised));
         $this->assertSame(['publication:track'], $attached($published));
         $this->assertSame(['content:site_images'], $attached($shared));
         $this->assertSame('unattached', $result['families'][$free]['state']);
+    }
+
+    public function test_a_pending_publication_schedule_keeps_a_never_published_tracks_families_attached_until_it_is_cancelled(): void
+    {
+        [$scheduled, , , $scheduledTrack] = $this->family('synthetic-scheduled', 240, false);
+        [$cancelled, , , $cancelledTrack] = $this->family('synthetic-cancelled', 350, false);
+        [$pending, , , $pendingTrack] = $this->family('synthetic-pending-draft', 460, false);
+        [$none] = $this->family('synthetic-no-schedule', 570, false);
+        $at = CarbonImmutable::now('UTC')->startOfMinute()->addMinutes(10)->setTimezone('America/Chicago')->format('Y-m-d\TH:i');
+        $service = app(TrackPublicationSchedules::class);
+        $schedule = function (Track $track) use ($service, $at): Track {
+            $track->refresh();
+            $service->schedule($track, $this->actor, $at, 'published', $track->metadata_version, $track->publication_version);
+
+            return $track->refresh();
+        };
+
+        // Through the real service: the track is `scheduled`, was never published and holds a pending row.
+        $scheduledTrack = $schedule($scheduledTrack);
+        $this->assertSame(['scheduled', null, null], [$scheduledTrack->status, $scheduledTrack->published_at, $scheduledTrack->published_slug]);
+        $cancelledTrack = $schedule($cancelledTrack);
+        // A pending row on a track that is still `draft` (the trigger allows it): the schedule alone must count.
+        DB::table('track_publication_schedules')->insert(['track_id' => $pendingTrack->id, 'target_status' => 'published',
+            'publish_at' => now()->addHour()->startOfMinute(), 'entry_zone' => 'America/Chicago', 'entry_local' => '2030-01-01 00:00',
+            'created_by' => $this->actor->id, 'created_at' => now(), 'state' => 'pending', 'pending_slot' => 1]);
+        $this->assertSame('draft', $pendingTrack->refresh()->status);
+
+        $result = $this->prove([$scheduled, $cancelled, $pending, $none]);
+        $this->assertSame('complete', $result['coverage']);
+        foreach ([$scheduled, $cancelled, $pending] as $root) {
+            $this->assertSame(['attached', ['publication:track']], [$result['families'][$root]['state'],
+                array_keys(array_filter($result['families'][$root]['checks']))], (string) $root);
+        }
+        $this->assertSame('unattached', $result['families'][$none]['state']);
+        $this->assertSame(1, app(MediaReferenceProof::class)->structural([$scheduled])[$scheduled]['checks']['publication:track']);
+
+        // Cancelling releases the track to draft and resolves the row: nothing was ever published, so nothing keeps the family.
+        $service->cancel($cancelledTrack, $this->actor, $cancelledTrack->metadata_version, $cancelledTrack->publication_version);
+        $this->assertSame(['draft', 'cancelled'], [$cancelledTrack->refresh()->status,
+            DB::table('track_publication_schedules')->where('track_id', $cancelledTrack->id)->value('state')]);
+        $result = $this->prove([$scheduled, $cancelled]);
+        $this->assertSame(['attached', 'unattached'], [$result['families'][$scheduled]['state'], $result['families'][$cancelled]['state']]);
+        $this->assertSame(0, array_sum($result['families'][$cancelled]['checks']));
     }
 
     public function test_a_purchased_and_contracted_asset_is_never_unattached_and_its_payload_is_not_changed(): void
@@ -260,19 +307,20 @@ final class MediaReferenceProofTest extends TestCase
             $table->string('subject_type')->nullable();
             $table->unsignedBigInteger('subject_id')->nullable();
         });
-        $this->assertSame(['complete', 'unattached'], [$this->prove([$master])['coverage'], $this->prove([$master])['families'][$master]['state']]);
+        $extra = ['manifest_digests' => ['fp034_probe.asset_manifest_hash' => 'digest'], 'polymorphic' => ['fp034_probe.subject' => 'poly']];
+        $this->assertSame(['complete', 'unattached'], [$this->prove([$master], $extra)['coverage'], $this->prove([$master], $extra)['families'][$master]['state']]);
 
         DB::table('fp034_probe')->insert(['asset_manifest_hash' => str_repeat('d', 64)]);
-        $this->assertSame(['hash_only_manifest:fp034_probe.asset_manifest_hash'], $this->prove([$master])['blockers']);
-        $this->assertSame('unknown', $this->prove([$master])['families'][$master]['state']);
+        $this->assertSame(['hash_only_manifest:fp034_probe.asset_manifest_hash'], $this->prove([$master], $extra)['blockers']);
+        $this->assertSame('unknown', $this->prove([$master], $extra)['families'][$master]['state']);
         DB::table('fp034_probe')->delete();
 
         DB::table('fp034_probe')->insert(['payload' => "\x00synthetic"]);
-        $this->assertSame(['uninspected_type:fp034_probe.payload'], $this->prove([$master])['blockers']);
+        $this->assertSame(['uninspected_type:fp034_probe.payload'], $this->prove([$master], $extra)['blockers']);
         DB::table('fp034_probe')->delete();
 
         DB::table('fp034_probe')->insert(['subject_type' => MediaAsset::class, 'subject_id' => $outputs['download_mp3']->id]);
-        $result = $this->prove([$master]);
+        $result = $this->prove([$master], $extra);
         $this->assertSame('complete', $result['coverage']);
         $this->assertSame('attached', $result['families'][$master]['state']);
         $this->assertSame(1, $result['families'][$master]['checks']['poly:fp034_probe.subject']);
@@ -291,7 +339,8 @@ final class MediaReferenceProofTest extends TestCase
         $note = json_encode(['file' => MediaAsset::findOrFail($outputs['master_wav']->id)->storage_path]);
         $this->assertStringContainsString('\\/', $note);
         DB::table('fp034_notes')->insert(['note' => $note]);
-        $result = $this->prove([$master]);
+        $extra = ['reviewed' => ['fp034_notes.note' => 'A synthetic note: only the content check reads it.']];
+        $result = $this->prove([$master], $extra);
         $this->assertSame('attached', $result['families'][$master]['state']);
         $this->assertSame(1, $result['families'][$master]['checks']['content:fp034_notes']);
 
@@ -300,7 +349,7 @@ final class MediaReferenceProofTest extends TestCase
         foreach (array_chunk(range(1, MediaReferenceProof::MAX_CONTENT_ROWS + 1), 200) as $chunk) {
             DB::table('fp034_notes')->insert(array_map(fn (int $i): array => ['note' => 'synthetic '.$i.' '.$sha], $chunk));
         }
-        $result = $this->prove([$master]);
+        $result = $this->prove([$master], $extra);
         $this->assertSame(['incomplete', ['content_bound:fp034_notes']], [$result['coverage'], $result['blockers']]);
         $this->assertNotSame('unattached', $result['families'][$master]['state']);
     }

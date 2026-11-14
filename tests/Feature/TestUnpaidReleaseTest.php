@@ -146,6 +146,34 @@ class TestUnpaidReleaseTest extends TestCase
         $this->assertDatabaseCount('payment_observations', 1);
     }
 
+    public function test_status_check_on_a_released_order_with_a_retained_late_confirmation_reads_no_provider_and_stays_expired(): void
+    {
+        $f = F::started($this->gateway);
+        $expired = $this->gateway->session;
+        $this->gateway->session['status'] = 'complete';
+        $this->gateway->session['payment_status'] = 'paid';
+        $this->gateway->payment = PaymentFixtures::payment($this->gateway->session);
+        $inspection = app(VerifyTestPayment::class)->inspect($f['session']->provider_session_id, $f['intent']);
+        $this->gateway->session = $expired;
+        $this->gateway->payment['status'] = 'canceled';
+        $this->gateway->payment['amount_received'] = 0;
+        // Before verification the status check still reads the provider: it retains the expired observation the release needs.
+        $before = count($this->gateway->calls);
+        app(HostedCheckout::class)->reconcile($f['order']->public_id, InventoryFixtures::OWNER);
+        $this->assertContains('retrieve', array_column(array_slice($this->gateway->calls, $before), 'operation'));
+        $this->assertSame('released', app(ReleaseTestOrderResources::class)->release($f['order']->public_id, $f['admin'], (string) Str::uuid(), 0)['status']);
+        $this->assertSame('awaiting_finalization', app(VerifyTestPayment::class)->commit($inspection, null));
+        $this->assertSame('paid_exception', app(FinalizeTestPayment::class)->handle(VerifiedPayment::sole()->id));
+        $calls = count($this->gateway->calls);
+        $observations = DB::table('checkout_observations')->count();
+        $this->gateway->onRetrieve = fn () => $this->fail('A released order with a verified payment was re-read from the provider.');
+        $result = app(HostedCheckout::class)->reconcile($f['order']->public_id, InventoryFixtures::OWNER);
+        $this->assertSame(['expired', 'verified', null], [$result['status'], $result['paymentStatus'], $result['url']]);
+        $this->assertSame($result, app(HostedCheckout::class)->status($f['order']->public_id, InventoryFixtures::OWNER));
+        $this->assertSame($calls, count($this->gateway->calls));
+        $this->assertSame($observations, DB::table('checkout_observations')->count());
+    }
+
     public static function nonProofs(): array
     {
         $cases = ['open', 'complete', 'processing', 'requires_capture', 'succeeded', 'received', 'capturable',

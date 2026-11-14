@@ -12,6 +12,9 @@ return [
     // The From address; it must equal the declared planned sender.
     'sender' => env('VASEY_TRANSACTIONAL_MAIL_SENDER'),
 
+    // Reply-To for the order-ready message (support@vasey.audio per Sean, 2026-11-10); unset sends no Reply-To header.
+    'reply_to' => env('VASEY_TRANSACTIONAL_MAIL_REPLY_TO'),
+
     // Absolute paths and SHA-256 values of the operator facts file and of the preflight's JSON report on that file.
     'preflight' => [
         'facts_path' => env('VASEY_TRANSACTIONAL_MAIL_FACTS_PATH'),

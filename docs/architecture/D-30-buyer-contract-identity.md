@@ -102,6 +102,9 @@ digit. A value is printable only when all of the following hold:
   - a space other than U+0020;
   - a right-to-left script (Hebrew, Arabic, Syriac, Thaana, N'Ko, Samaritan, Mandaic);
   - U+2800 BRAILLE PATTERN BLANK, which draws as a visible-width blank;
+  - U+204F REVERSED SEMICOLON, listed explicitly since 2026-11-14: newer Unicode data gives it the Arabic script extension,
+    so the Arabic refusal alone caught it under PCRE2 10.47 but not 10.42, and the list keeps the outcome independent of
+    the runtime;
   - U+FFFC or U+FFFD;
   - one of the 26 covered codepoints that NFC replaces, such as the Kelvin and Ångström signs and the Greek oxia forms.
 
@@ -112,7 +115,7 @@ digit. A value is printable only when all of the following hold:
 - Every codepoint has a positive-width glyph in every pinned face (`ContractGlyphCoverage`).
 
 With the `test-v2` regular and bold faces, 5,562 codepoints have a positive-width glyph in both faces, and the rule accepts
-4,899 of them. That count is pinned by a test. The accepted set covers Latin, Greek and Cyrillic and every pinned country
+4,898 of them (4,899 before U+204F was listed). That count is pinned by a test. The accepted set covers Latin, Greek and Cyrillic and every pinned country
 name; CJK is not covered.
 
 **Checkout's set since 2026-11-08** is the `vasey-license-pdf-v2` faces instead (`ContractPrintableSet`): 359 codepoints

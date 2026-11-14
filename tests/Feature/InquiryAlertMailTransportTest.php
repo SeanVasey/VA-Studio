@@ -42,7 +42,7 @@ class InquiryAlertMailTransportTest extends TestCase
 {
     use FinalizationDatabaseMigrations;
 
-    private const PRIVATE = ['Private sender', 'private-sender@example.test', 'Private subject', 'Private message',
+    private const PRIVATE = ['Private sender', 'private-sender@example.test', 'Service request', 'Private message',
         'SYNTHETIC NOTIFICATION NOTICE', 'SYNTHETIC-TEST-POLICY'];
 
     private User $operator;
@@ -70,7 +70,7 @@ class InquiryAlertMailTransportTest extends TestCase
             'inquiries.retention_policy_reference' => 'SYNTHETIC-TEST-POLICY', 'inquiries.operator_user_id' => $this->operator->id]);
         $release = app(SiteContent::class)->create(SiteEditorialFixtures::content(), 'Synthetic alert fixture', $this->operator);
         app(SiteContent::class)->publish($release->id, 0, $this->operator);
-        $this->body = ['name' => 'Private sender', 'email' => 'private-sender@example.test', 'subject' => 'Private subject',
+        $this->body = ['name' => 'Private sender', 'email' => 'private-sender@example.test', 'subject' => 'Service request',
             'message' => 'Private message', 'website' => '', 'requestKey' => (string) Str::uuid(),
             'noticeToken' => app(InquiryPolicy::class)->publicSetup(app(SiteContent::class)->current())['noticeToken']];
     }
@@ -516,7 +516,8 @@ class InquiryAlertMailTransportTest extends TestCase
         };
         $receipt = (string) Str::uuid();
         $this->enable();
-        M::configure([], ['timeout' => 60]);
+        // Production transactional mail must be implicit TLS on 465 (BL-47, DD-43), so the synthetic facts declare exactly that.
+        M::configure(['port' => 465, 'security' => 'implicit_tls'], ['timeout' => 60, 'port' => 465, 'scheme' => 'smtps']);
         config(['inquiries.operator_alert_mail_production_admitted' => true]);
         $this->in('production');
         $manager = new MailManager($this->app);

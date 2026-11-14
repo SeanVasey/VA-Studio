@@ -28,6 +28,7 @@ lands, the stage that depends on it stays blocked whatever the environment conta
 | A3: Tax255 (`automatic_tax`, SourceV2, V2 consumer) | S3 unless every order qualifies for declared exemption; that alternative itself needs the exemption-authoring step in §6 (a reviewed owner allowlist commit plus `PRODUCTION_CHECKOUT_EXEMPTION_AUTHORING_ENABLED`), because every new order's review requires a `basis_public_id` | CLAUDE-PLAN §3 A3; `HostedCheckout::prepare()`, `TaxExemptions::basis()` |
 | No live webhook receiver. `VerifyStripeWebhook` refuses production environments and any mode other than test; production checkout reconciles only by authoritative retrieval | S3 webhook drills | `app/Domain/Commerce/Payments/VerifyStripeWebhook.php`; `vasey:stripe-preflight` check `production_webhook_receiver` |
 | **Code composed, default-off (lane PCC).** `ProductionCheckoutServiceProvider` is registered by `AppServiceProvider` and `routes/production-checkout.php` is required by `routes/web.php` only when `ProductionCheckoutMount` admits: the code literal `production_checkout.mounted` (shipped `false`) and an environment of `local`, `testing` or `production` (staging never mounts). `ProductionCheckoutPrivacy` is prepended globally and answers an unmounted or withdrawn route with the private 404 before any SQL. Still blocking: the literal is false and `ops/production/validate-runtime.php` holds it (`holds.production_checkout_mounted`), so mounting is a reviewed change to both, with Sean's authorization | S2b production-checkout test funds (not the test checkout chain), S3 | `app/Http/ProductionCheckout/ProductionCheckoutMount.php`; `docs/verification/production-checkout-pcc-20261029/` |
+| **One production chain (DD-14, BL-45).** v1 sells through the tax-calculating chain (Tax V2, `ProductionTaxCheckout`, mount `production-tax-checkout.http_mounted`); S2 and S3 rehearse that chain, not the tax-refusing `ProductionCheckout` chain (`production_checkout.mounted`) described in the rows above, which stays a frozen, default-off alternative. Both mounts remain the literal `false`. `ProductionChainExclusivity` is the fail-closed guard: when both literals are `true`, `ProductionCheckoutMount` and `TaxHttpMount` (for the checkout key) both refuse, so neither registers a provider or routes and stale routes answer the private 404, in every environment. The guard reads the tax mount through the same `PaidTaxConfiguration::read` as `TaxHttpMount` (nested or flat dotted key). It covers the mount/composition layer only: the policy flags of the two chains are not made exclusive (the reconcile command is refused by the mount check when both literals are `true`). `ops/production/validate-runtime.php` holds both literals false (`holds.production_checkout_mounted`, `holds.production_tax_checkout_http_mounted`). Flipping either literal is still a reviewed change with Sean's authorization | S2, S3 | `app/Http/ProductionCheckout/ProductionChainExclusivity.php`; `tests/Feature/ProductionCheckoutComposition/ProductionChainExclusivityTest.php` |
 | `ExecutionContextV1` refuses `funds_mode=test` outside `local`/`testing`. The test checkout/processing policies no longer refuse a staging host: since PR #68 at `d8aba146` they admit `APP_ENV=staging` through `App\Support\Environment\TestEnvironment`, which requires staff MFA and refuses live mode (corrected 2026-10-10; `docs/private-server-readiness.md`, "First sale and cutover remain separate gates") | Production-checkout test funds on a staging host (S2b) | `ExecutionContextV1::make`; `TestEnvironment::admitsTestCommerce` in `CheckoutPolicy`, `PaymentProcessingPolicy` |
 | **Closed in code (lane PCC):** `vasey:production-checkout-reconcile {order} [--session=]` retrieves and retains one order's provider state through the reconcile route's persistence (retrieval only, idempotent, buyer-independent). It refuses unless the mount admits and `PRODUCTION_CHECKOUT_OPERATOR_RECONCILIATION_ENABLED`, `..._RECONCILIATION_ENABLED` and `..._PROVIDER_IO_ENABLED` are true, all held false in production by the validator. No sweep mode yet | S2b production-checkout test funds (not the test checkout chain), S3 recovery drills | `app/Console/Commands/ReconcileProductionCheckout.php`, `HostedCheckout::operatorReconcile` |
 | A5: refunds and disputes (T21). The A5 mechanism exists for the test chain only; production checkout's `FinancialReadPlan` output is **not** wired into its ledger (lane PCC pushed it back: the ledger keys rows by test-chain `orders.id` and acts on test-chain grants, and `FinancialReadPlan` is pinned to Stripe test mode; it needs a schema decision and a production read path) | S3 refunds | CLAUDE-PLAN §3 A5; `docs/verification/production-checkout-pcc-20261029/` |
@@ -84,6 +85,18 @@ and let the deploy refresh the environment. `PRE_LAUNCH_HOLDS` in `tests/ops/tes
 with the validator and the boundary. `VASEY_STAGING_SYNTHETIC_CATALOG_ENABLED` is not in this list because its command
 already refuses production by itself.
 
+**Off through launch (decision register, 2026-11-10).** The same validator refuses `VASEY_TEST_SERVICE_INVOICING_ENABLED`
+(BL-70, Stripe test-mode service invoicing; no production path), `VASEY_TEST_UNPAID_RELEASE_ENABLED` (test unpaid release,
+optional on staging since 2026-11-11; no production path), `VASEY_TEST_REFUND_DISPUTE_ENABLED` (the test refund and dispute
+lifecycle, optional on staging since 2026-11-12; refused in production in code as well) and `REPORTING_MARKETING_SEGMENT_ENABLED`
+(DD-44) by the rule above: it is named in `LAUNCH_OFF_HOLDS`, its config key comes from
+`CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS` (not a staged flag, so the staging gates are unchanged) and a refusal is
+`holds.reporting_marketing_segment_enabled`. It also refuses the DD-50 membership code literals unless they read strictly
+`false`: `production-memberships.enabled` (`holds.production_memberships_enabled`), `production-memberships.http_mounted`
+(`holds.production_memberships_http_mounted`, the literal `MembershipHttpMount` reads) and `member-grants.enabled`
+(`holds.member_grants_enabled`). Lifting any of them is a reviewed change to the validator with Sean's authorization
+(`docs/production-cleanup-ledger.md`, PCL-23 and PCL-25).
+
 ## 2. Inputs only Sean can supply
 
 These come from the `docs/handoff/2026-10-07/CLAUDE-PLAN.md` §4 list. Placeholders in this packet look like `<...>`; none
@@ -100,6 +113,8 @@ of them has a value here.
 | Legal pages (privacy, terms) | S3 | `docs/legal/` (open adoption gap) |
 | Production host, region, topology, backups, incident owner (U-02) and storage choice (U-03) | S1 | `ops/private-server/env.example` inputs; this packet's S1 commands |
 | Storefront origin and DNS plan | S1 staging subdomain, S3 cutover | `APP_URL`, `PRODUCTION_CHECKOUT_RETURN_ORIGIN`; cutover runbook DNS section |
+
+The decided values for the machine-policy rows above (currency DD-11, refund and dispute DD-16, exclusive reservation and late payment DD-17, account-first identity DD-42, and the approved assent text and seller name in `docs/legal/TERMS.md` appendix A.8) are pinned by `tests/Unit/DecidedMachinePolicyConformanceTest.php` against `MachinePolicyV1` and the decision register, using synthetic account, origin and hash values. The test commits no production value and approves nothing; the account id, return origin, tax strategy and ceiling, storage, delivery and retention choices still come from the host. DD-42 is conditionally superseded by SQ-08 (open question Q-1): the policy accepts both `verified_account` and `verified_guest_claim`, and the test pins only the decided `verified_account`.
 | Sender domain, DNS (SPF/DKIM/DMARC) and SMTP provider | Customer identity and notices | `PRODUCTION_IDENTITY_SMTP_*` and `MAIL_*` (host secret store), `VASEY_PRODUCTION_REAL_MAIL_ADMITTED=true`, and flipping the `$enabled` literal in `config/production-identity-smtp.php` (a reviewed code change) |
 | BeatStars exports | Migration (D2) | Content onboarding packet |
 | Review lifetime (30–3600 s) | S2b production-checkout test funds, S3 | `PRODUCTION_CHECKOUT_REVIEW_LIFETIME_SECONDS` |
@@ -336,7 +351,8 @@ fi
    archive with it: the backup captured database and private storage as one moment, and an
    upload, contract or media job that wrote the bind-mounted private root after the snapshot
    would otherwise leave the earlier database with a later tree (orphaned files, missing
-   references). With writers still stopped, extract `private.tar` into a fresh directory as
+   references). With writers still stopped, extract `private.tar` (or, for a set whose private store is a
+   `private/` tree, the 2026-11-11 kit format, stream that tree with `tar` as in the staging runbook's case B) into a fresh directory as
    the application user and verify it exactly as the backup procedure's step 4 does (digest,
    manifest, names, modes, ownership); then replace the *contents* of
    `<PERSISTENT_ROOT>/private` while keeping that directory object in place: every release's

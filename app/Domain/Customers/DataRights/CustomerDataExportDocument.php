@@ -8,6 +8,7 @@ use App\Domain\Customers\CustomerPrincipal;
 use App\Domain\Customers\CustomerPurchaseClaimPolicy;
 use App\Domain\Customers\Models\CustomerAccount;
 use App\Domain\Customers\Models\CustomerPurchaseClaim;
+use App\Domain\Customers\ProductionCustomerPrincipal;
 use App\Domain\Customers\PurchaseAccess;
 use App\Domain\Inquiries\Models\CustomerInquiry;
 use App\Domain\Inquiries\Models\InquiryOrderContext;
@@ -27,19 +28,25 @@ final class CustomerDataExportDocument
     /** 2 adds the production checkout sections (D-30); 3 adds exemption bases and the paid-grant sections. */
     public const SCHEMA = 3;
 
+    /** 4: a production account's document also holds `productionAccount` (BL-44). Test-account documents stay at 3. */
+    public const PRODUCTION_SCHEMA = 4;
+
     public const MAX_ORDERS = 500;
 
     public const MAX_ROWS = 2000;
 
-    public function build(CustomerPrincipal $principal, User $user, CustomerAccount $account, string $requestId, CarbonImmutable $at): array
+    public function build(CustomerPrincipal|ProductionCustomerPrincipal $principal, User $user, CustomerAccount $account, string $requestId, CarbonImmutable $at): array
     {
-        if ($account->id !== $principal->accountId || $user->id !== $principal->userId || ! hash_equals($account->owner_key, $principal->ownerKey)) {
+        // A production principal holds no owner key: the caller has locked this account row and re-proved it against the production
+        // origin, so the row's key is the verified owner. A test principal carries its own key, which must match the row.
+        if ($account->id !== $principal->accountId || $user->id !== $principal->userId
+            || ($principal instanceof CustomerPrincipal && ! hash_equals($account->owner_key, $principal->ownerKey))) {
             throw new DataRightsException(403, 'principal_changed');
         }
-        $orders = $this->orders($principal);
+        $production = $principal instanceof ProductionCustomerPrincipal;
+        $orders = $this->orders($principal, $account->owner_key);
         $orderIds = array_keys($orders);
-
-        return [
+        $document = [
             'exportSchema' => self::SCHEMA, 'brand' => 'VASEY.AUDIO', 'requestId' => $requestId,
             'generatedAt' => $at->utc()->toIso8601ZuluString(), 'contact' => 'support@vasey.audio',
             'account' => [
@@ -51,14 +58,20 @@ final class CustomerDataExportDocument
             'consent' => $this->consent($account->id),
             'inquiries' => $this->inquiries($orderIds),
         ] + app(ProductionCheckoutExportSection::class)->build($account->id) + app(PaidGrantExportSection::class)->build($account->id);
+        if ($production) {
+            $document['exportSchema'] = self::PRODUCTION_SCHEMA;
+            $document['productionAccount'] = app(ProductionAccountExportSection::class)->build($account->id);
+        }
+
+        return $document;
     }
 
     /** @return array<int, array> keyed by internal order id */
-    private function orders(CustomerPrincipal $principal): array
+    private function orders(CustomerPrincipal|ProductionCustomerPrincipal $principal, string $ownerKey): array
     {
-        $query = Order::where(function ($query) use ($principal): void {
-            $query->where('owner_key', $principal->ownerKey);
-            if (app(CustomerPurchaseClaimPolicy::class)->enabled()) {
+        $query = Order::where(function ($query) use ($principal, $ownerKey): void {
+            $query->where('owner_key', $ownerKey);
+            if ($principal instanceof CustomerPrincipal && app(CustomerPurchaseClaimPolicy::class)->enabled()) {
                 $query->orWhereIn('id', CustomerPurchaseClaim::where('account_id', $principal->accountId)->select('order_id'));
             }
         });
@@ -68,8 +81,13 @@ final class CustomerDataExportDocument
         }
         $orders = [];
         foreach ($rows as $order) {
-            // Database collation alone must not decide ownership: reconstruct each frozen graph, as order history does.
-            app(PurchaseAccess::class)->assertOrder($order, $principal->ownerKey, $principal);
+            // Database collation alone must not decide ownership: reconstruct each frozen graph, as order history does. A production
+            // principal has no test-access claim to check, so the exact key comparison is the check.
+            if ($principal instanceof CustomerPrincipal) {
+                app(PurchaseAccess::class)->assertOrder($order, $principal->ownerKey, $principal);
+            } elseif (! hash_equals($ownerKey, $order->owner_key)) {
+                throw new DataRightsException(503, 'order_unavailable');
+            }
             $entry = app(ReadOrder::class)->historyEntry($order);
             $orders[$order->id] = array_intersect_key($entry['order'], array_flip(['id', 'createdAt', 'testOnly', 'currency',
                 'totalMinor', 'status', 'paymentStatus', 'finalizationStatus', 'contractStatus', 'fulfillmentStatus']))

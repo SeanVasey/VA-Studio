@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { writeFile } from 'node:fs/promises';
 import { expect, test, type BrowserContext } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
-import { fixtureOperation, type InquiryFixture, type OrderInquiryFixture } from './contact-inquiry-fixture';
+import { fillInquiryField, fixtureOperation, type InquiryFixture, type OrderInquiryFixture } from './contact-inquiry-fixture';
 
 // This file intercepts a lost acknowledgement; retries and retained inquiry graphs use the actual server.
 test.use({ serviceWorkers: 'block' });
@@ -16,7 +16,7 @@ test('visitor reads an in-app staff reply, retries one real follow-up and retain
   const followUp = `Synthetic visitor follow-up ${testInfo.project.name}`;
   try {
     await page.goto('/contact');
-    for (const label of ['Name', 'Email', 'Subject', 'Message'] as const) await page.getByLabel(new RegExp(`^${label}`)).fill(fixture.values[label.toLowerCase() as keyof InquiryFixture['values']]);
+    for (const label of ['Name', 'Email', 'Subject', 'Message'] as const) await fillInquiryField(page.getByLabel(new RegExp(`^${label}`)), fixture.values[label.toLowerCase() as keyof InquiryFixture['values']]);
     const submitted = page.waitForResponse(response => response.url().endsWith('/contact/inquiries') && response.request().method() === 'POST');
     await page.getByRole('button', { name: 'Send inquiry', exact: true }).click();
     const accepted = await submitted; expect(accepted.status()).toBe(201);
@@ -144,7 +144,7 @@ test('visitor reads an in-app staff reply, retries one real follow-up and retain
     const orderInquiry = cart.getByRole('region', { name: 'Test order inquiry', exact: true });
     await orderInquiry.getByRole('button', { name: 'Ask about this test order', exact: true }).press('Enter');
     await expect(orderInquiry.getByText(`Linked test order ${orderId}`, { exact: true })).toBeVisible(); expect(setupRequests).toHaveLength(1);
-    for (const label of ['Name', 'Email', 'Subject', 'Message'] as const) await orderInquiry.getByLabel(new RegExp(`^${label}`)).fill(fixture.values[label.toLowerCase() as keyof InquiryFixture['values']]);
+    for (const label of ['Name', 'Email', 'Subject', 'Message'] as const) await fillInquiryField(orderInquiry.getByLabel(new RegExp(`^${label}`)), fixture.values[label.toLowerCase() as keyof InquiryFixture['values']]);
     const linkedBodies: string[] = []; const linkedReceipts: string[] = [];
     await page.route('**' + orderEndpoint, async route => {
       if (route.request().method() !== 'POST') { await route.continue(); return; }

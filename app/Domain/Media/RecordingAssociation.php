@@ -5,6 +5,7 @@ namespace App\Domain\Media;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\Models\StemsRecording;
 use App\Support\CanonicalJson;
+use App\Support\PublicReadMemo;
 use Illuminate\Support\Facades\DB;
 use LogicException;
 use Throwable;
@@ -28,7 +29,8 @@ class RecordingAssociation
     public function retained(MediaAsset $stems): ?StemsRecording
     {
         try {
-            $binding = StemsRecording::where('stems_asset_id', $stems->id)->first();
+            // Read once per PublicReadMemo scope (a plain read outside one); retainedBinding() below still checks it in full every time.
+            $binding = PublicReadMemo::remember('stems-binding:'.$stems->id, fn () => StemsRecording::where('stems_asset_id', $stems->id)->first());
 
             return $this->retainedBinding($stems, $binding);
         } catch (Throwable) {
@@ -85,7 +87,9 @@ class RecordingAssociation
 
     private function availableBinding(MediaAsset $stems, ?StemsRecording $binding): ?StemsRecording
     {
-        if (! $binding) { return null; }
+        if (! $binding) {
+            return null;
+        }
         foreach ([$stems, $binding->master, $binding->preview] as $asset) {
             if (! app(VerifiedMedia::class)->available($asset)) {
                 return null;

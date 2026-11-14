@@ -155,7 +155,7 @@ final class ListeningEvidence
         $proof['files'] = [];
         foreach ($proof['assets'] as $asset) {
             if ($asset['disk'] === 'local' && $asset['status'] === 'ready'
-                && preg_match('~\Amedia/revisions/[a-f0-9-]{36}/(?:master\.wav|delivery\.mp3|preview\.mp3|artwork\.png|stems\.zip)\z~D', $asset['storage_path'])) {
+                && preg_match('~\Amedia/revisions/[a-f0-9-]{36}/(?:master\.wav|delivery\.mp3|preview\.mp3|preview-untagged\.mp3|artwork\.png|stems\.zip)\z~D', $asset['storage_path'])) {
                 $path = rtrim($proof['root'], '/');
                 // Directory identities and links count too; atime changes from reading do not.
                 foreach (['', ...explode('/', $asset['storage_path'])] as $component) {

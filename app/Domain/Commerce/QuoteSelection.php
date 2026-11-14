@@ -7,6 +7,7 @@ use App\Domain\Catalog\FamilyRevisionSelection;
 use App\Domain\Catalog\Models\Offer;
 use App\Domain\Catalog\Models\Track;
 use App\Domain\Catalog\PublicationReadiness;
+use App\Domain\Catalog\TrackVisibility;
 use App\Domain\Media\Models\MediaAsset;
 use App\Domain\Media\RecordingAssociation;
 use App\Domain\Media\VerifiedMedia;
@@ -29,7 +30,7 @@ final class QuoteSelection
         foreach ($items as $item) {
             $track = $tracks->get($item['trackId']);
             $offer = $offers->get($item['offerId']);
-            if (! $track || $track->status !== 'published' || ! $offer || $offer->track_id !== $track->id || ! $offer->is_active || $offer->current_revision_id !== $item['offerRevisionId']) {
+            if (! $track || ! TrackVisibility::isLive($track->status) || ! $offer || $offer->track_id !== $track->id || ! $offer->is_active || $offer->current_revision_id !== $item['offerRevisionId']) {
                 throw new QuoteException('SELECTION_CHANGED', 409);
             }
             $revision = $offer->currentRevision()->first();

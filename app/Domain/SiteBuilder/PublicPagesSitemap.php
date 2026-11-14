@@ -2,6 +2,13 @@
 
 namespace App\Domain\SiteBuilder;
 
+use App\Domain\Albums\AlbumPresentation;
+use App\Domain\Albums\AlbumsPolicy;
+use App\Domain\Collections\CollectionPresentation;
+use App\Domain\Collections\CollectionsPolicy;
+use App\Domain\SoundKits\Products\SoundKitPresentation;
+use App\Domain\SoundKits\Products\SoundKitStorefrontPolicy;
+
 /** Public URL discovery from one verified current release; never private preview content. */
 final class PublicPagesSitemap
 {
@@ -25,7 +32,25 @@ final class PublicPagesSitemap
             }
             // Verified editorial schema permits at most thirty entries per collection.
             abort_if(count($paths) > 65, 503);
-            $urls = array_map(fn (string $path): string => rtrim($origin, '/').$path, array_unique($paths));
+            // Published releases only while the albums page is on (BL-67); bounded separately from the editorial schema.
+            if (app(AlbumsPolicy::class)->enabled()) {
+                $albums = app(AlbumPresentation::class)->paths();
+                $paths = [...$paths, ...($albums === [] ? [] : ['/albums', ...$albums])];
+            }
+            // Published collections that still have a listed track, only while the collections pages are on (BL-54).
+            if (app(CollectionsPolicy::class)->enabled()) {
+                $collections = app(CollectionPresentation::class)->paths();
+                $paths = [...$paths, ...($collections === [] ? [] : ['/collections', ...$collections])];
+            }
+            // Listed sound kits, only while the sound-kit pages are on (BL-53).
+            if (app(SoundKitStorefrontPolicy::class)->enabled()) {
+                $kits = app(SoundKitPresentation::class)->paths();
+                $paths = [...$paths, ...($kits === [] ? [] : ['/sound-kits', ...$kits])];
+            }
+            // Fail closed on a path into a product family whose own policy is off (FP-001, BL-50).
+            $families = app(FamilyEntryPoints::class);
+            $paths = array_filter(array_unique($paths), fn (string $path): bool => $families->admits($path));
+            $urls = array_map(fn (string $path): string => rtrim($origin, '/').$path, array_values($paths));
         }
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
         foreach ($urls as $url) {

@@ -7,6 +7,7 @@ use App\Domain\Grants\Member\MemberGrantException;
 use App\Domain\Grants\Member\MemberGrantFactsAuthority;
 use App\Domain\Grants\Member\MemberGrantPolicy;
 use App\Domain\Grants\Member\MemberOriginalArtifactAuthority;
+use App\Domain\Memberships\Production\MembershipException;
 use App\Domain\Memberships\Production\MembershipReservationAuthority;
 use App\Domain\Memberships\Production\MembershipRows;
 use Illuminate\Config\Repository;
@@ -193,7 +194,9 @@ class MemberGrantSourceAdmissionTest extends TestCase
                 }
             });
             try {
-                $this->refused(fn () => (new MemberGrantPolicy)->currentFor($rows), 'provenance_driver');
+                // MySQL's catalog admission refuses any admission attempted while the container is building a binding
+                // (IdentityMetadataAdmission::resolverMetadata), so the nested frame is refused before the driver comparison.
+                $this->refused(fn () => (new MemberGrantPolicy)->currentFor($rows), $driver === 'mysql' ? 'changed_primary' : 'provenance_driver');
                 $this->assertSame($driver, config($key));
                 $this->assertSame([1, 0, 0], $this->calls);
             } finally {
@@ -284,6 +287,23 @@ class MemberGrantSourceAdmissionTest extends TestCase
         Container::setInstance($container);
         try {
             DB::transaction(function () use ($container) {
+                if (DB::getDriverName() === 'mysql') {
+                    // MySQL's catalog admission accepts only the real Application as the current container
+                    // (IdentityMetadataAdmission::applicationMetadata), so no frame can be issued under this alternate
+                    // container at all; the refusal itself must not go through a virtual getter either.
+                    $container->armed = true;
+                    try {
+                        new MembershipRows;
+                        $this->fail('MySQL admitted a membership frame under an alternate container.');
+                    } catch (MembershipException $refusal) {
+                        $this->assertSame('changed_primary_or_schema', $refusal->reason);
+                    } finally {
+                        $container->armed = false;
+                    }
+                    $this->assertSame([], $container->getterCalls);
+
+                    return;
+                }
                 $rows = new MembershipRows;
                 $policy = new MemberGrantPolicy;
                 $baseline = $policy->currentFor($rows);

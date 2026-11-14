@@ -118,6 +118,8 @@ final class CutoverLedgerChecks
             'manual' => 'The alert list shows only alerts from the shipped lockfiles; composer audit and npm audit --audit-level=high pass on the candidate SHA.'],
         'PCL-30' => ['subject' => 'Held tc-lib updates', 'check' => 'contractPackagePins',
             'manual' => 'The held tc-lib update pull requests stay unmerged until after activation.'],
+        'PCL-31' => ['subject' => 'Cutover window and rollback terms (SQ-17)', 'check' => null,
+            'manual' => 'Sean switched off every exclusive offer on BeatStars at or before 72 hours before cutover and the dated record is in the launch packet (an owner action on BeatStars; nothing in this repository touches it); the recovery time objective is 4 hours (recovery point 24 hours); roll back in the first 48 hours on any of: checkout error rate above 5% over 30 minutes, a paid order undelivered for more than 1 hour without a known cause, webhook signature failures sustained for 15 minutes, HTTP 5xx above 2% over 15 minutes, any data-integrity alarm.'],
     ];
 
     /**
@@ -130,9 +132,12 @@ final class CutoverLedgerChecks
         'STRIPE_TEST_FINALIZATION_ENABLED' => 'payments.stripe.finalization_enabled',
         'VASEY_TEST_CONTRACT_ISSUANCE_ENABLED' => 'contracts.test_issuance_enabled',
         'VASEY_TEST_SERVICE_PROJECTS_ENABLED' => 'services-projects.test_enabled',
+        'VASEY_TEST_SERVICE_INVOICING_ENABLED' => 'services-invoicing.test_enabled',
         'VASEY_TEST_FREE_GRANTS_ENABLED' => 'free-grants.test_enabled',
         'VASEY_TEST_CUSTOMER_CONSENT_ENABLED' => 'customer-preferences.test_grants_enabled',
         'VASEY_TEST_UNPAID_RELEASE_ENABLED' => 'unpaid-release.enabled',
+        'VASEY_TEST_DELIVERY_AUTO_ENABLED' => 'delivery.test_auto_enable_enabled',
+        'VASEY_TEST_BUYER_CANCEL_ENABLED' => 'buyer-cancel.enabled',
         'VASEY_TEST_REFUND_RESOLUTION_ENABLED' => 'refund-resolution.enabled',
         'VASEY_TEST_REFUND_DISPUTE_ENABLED' => 'refund-dispute.enabled',
         'VASEY_TEST_TRANSACTIONAL_NOTIFICATIONS_ENABLED' => 'transactional-notifications.test_enabled',

@@ -25,8 +25,8 @@ foreach ($source as $path => &$identity) {
 unset($identity);
 
 $expected = [
-    'tecnickcom/tc-lib-pdf' => ['8.76.3', 'd417129fad37d49dc9fc0d1e229e9740e1c774a3'],
-    'tecnickcom/tc-lib-pdf-font' => ['4.4.1', 'a78b8e0ac9284d1594b6ba68488cf65c3e958f7b'],
+    'tecnickcom/tc-lib-pdf' => ['8.84.0', '2be3a522329df9d2941381ce8315b6647d620c69'],
+    'tecnickcom/tc-lib-pdf-font' => ['4.8.0', '30804d3d493ddcf13dbb0a78c76c95b788c8948a'],
 ];
 foreach ($expected as $name => [$version, $ref]) {
     if (ltrim((string) InstalledVersions::getPrettyVersion($name), 'v') !== $version

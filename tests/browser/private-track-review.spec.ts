@@ -1,6 +1,7 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import { resetBrowserLoginRateLimit } from './auth-fixture';
 import { syncSuccessNotification } from './notification-sync';
+import { modalReady } from './modal-ready';
 
 test.beforeEach(() => resetBrowserLoginRateLimit());
 
@@ -124,6 +125,7 @@ test('ordinary private track review shows persisted metadata and honest missing-
   await page.getByRole('button', { name: 'New track', exact: true }).click();
   let dialog = page.getByRole('dialog');
   await expect(dialog.getByRole('heading')).toBeVisible();
+  await modalReady(dialog);
   for (const [label, value] of [['Title', data.title], ['Slug', data.slug], ['Artist', data.artist], ['Bpm', data.bpm],
     ['Musical key', data.musicalKey], ['Genre', data.genre], ['Mood', data.mood], ['Description', data.description]]) {
     await dialog.getByLabel(label, { exact: false }).fill(value);

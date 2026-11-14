@@ -13,6 +13,7 @@ use App\Domain\Delivery\Models\TestDeliveryControl;
 use App\Domain\Delivery\Models\TestDeliveryRedemption;
 use App\Domain\Delivery\Models\TestFulfillmentActivation;
 use App\Support\CanonicalJson;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -34,7 +35,10 @@ class TestOwnerDeliveryMigrationTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp(); $this->fakePrivateMediaStorage(); $this->travelTo(now()->startOfSecond()); ActivationFixtures::configure();
+        parent::setUp();
+        $this->fakePrivateMediaStorage();
+        $this->travelTo(now()->startOfSecond());
+        ActivationFixtures::configure();
         $this->deliverySchemaGateway = PaymentFixtures::gateway();
         $this->app->instance(StripeCheckoutGateway::class, $this->deliverySchemaGateway);
         $this->app->instance(StripePaymentGateway::class, $this->deliverySchemaGateway);
@@ -43,13 +47,22 @@ class TestOwnerDeliveryMigrationTest extends TestCase
 
     public function test_empty_delivery_roundtrip_retains_complete_activation_originals_and_pending_rights(): void
     {
-        $fixture = $this->fixture(); $retained = $this->retained();
+        $fixture = $this->fixture();
+        $retained = $this->retained();
         $migration = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
+        // The later v2 migration references these tables and replaces the authorization guard: roll it back first, empty.
+        $resume = require database_path('migrations/2026_11_09_270300_test_delivery_resume_v2.php');
+        $resume->down();
         $migration->down();
-        foreach ($this->tables() as $table) { $this->assertFalse(Schema::hasTable($table)); }
+        foreach ($this->tables() as $table) {
+            $this->assertFalse(Schema::hasTable($table));
+        }
         $this->assertSame($retained, $this->retained());
         $migration->up();
-        foreach ($this->tables() as $table) { $this->assertDatabaseCount($table, 0); }
+        $resume->up();
+        foreach ($this->tables() as $table) {
+            $this->assertDatabaseCount($table, 0);
+        }
         $this->assertSame($retained, $this->retained());
         $this->assertSame('pending', PendingEntitlement::sole()->state);
         $this->assertSame('pending', DB::table('fulfillment_outbox')->sole()->state);
@@ -57,13 +70,15 @@ class TestOwnerDeliveryMigrationTest extends TestCase
 
     public function test_control_starts_blocked_with_exact_parent_and_only_versioned_toggles_are_allowed(): void
     {
-        $fixture = $this->fixture(); $attributes = $this->controlAttributes($fixture);
+        $fixture = $this->fixture();
+        $attributes = $this->controlAttributes($fixture);
         foreach ([['blocked' => false], ['control_version' => 1], ['control_version' => 4294967295], ['order_id' => 999999],
             ['test_fulfillment_activation_id' => 999999], ['public_id' => 'not-a-uuid'],
             ['created_at' => now()->subSecond(), 'updated_at' => now()->subSecond()], ['updated_at' => now()->addSecond()]] as $invalid) {
             $this->rejected(fn () => TestDeliveryControl::create([...$attributes, ...$invalid]));
         }
-        $control = TestDeliveryControl::create($attributes); $before = $control->refresh()->getAttributes();
+        $control = TestDeliveryControl::create($attributes);
+        $before = $control->refresh()->getAttributes();
         foreach ([['blocked' => false], ['control_version' => 1], ['blocked' => false, 'control_version' => 2],
             ['blocked' => 2, 'control_version' => 1], ['blocked' => false, 'control_version' => 4294967295], ['public_id' => (string) Str::uuid()],
             ['order_id' => 999999], ['created_at' => now()->subSecond()], ['updated_at' => now()->addSecond()]] as $invalid) {
@@ -75,23 +90,33 @@ class TestOwnerDeliveryMigrationTest extends TestCase
         }
         $this->assertSame($before, $control->fresh()->getAttributes());
         foreach ([['public_id' => (string) Str::uuid()], ['control_version' => 1]] as $invalid) {
-            try { $control->forceFill($invalid)->save(); $this->fail('Control changed without a valid versioned toggle.'); }
-            catch (LogicException) { $control->refresh(); }
+            try {
+                $control->forceFill($invalid)->save();
+                $this->fail('Control changed without a valid versioned toggle.');
+            } catch (LogicException) {
+                $control->refresh();
+            }
         }
-        $this->toggle($control, false); $this->assertSame(1, $control->fresh()->control_version);
-        $this->travelTo(now()->addSecond()); $this->toggle($control, true);
-        $this->assertTrue($control->fresh()->blocked); $this->assertSame(2, $control->control_version);
+        $this->toggle($control, false);
+        $this->assertSame(1, $control->fresh()->control_version);
+        $this->travelTo(now()->addSecond());
+        $this->toggle($control, true);
+        $this->assertTrue($control->fresh()->blocked);
+        $this->assertSame(2, $control->control_version);
         $this->rejected(fn () => DB::table('test_delivery_controls')->where('id', $control->id)
             ->update(['blocked' => false, 'control_version' => 3, 'updated_at' => now()->subSecond()]));
     }
 
     public function test_authorization_binds_enabled_control_owner_grant_exact_target_and_strict_sixty_second_lifetime(): void
     {
-        $fixture = $this->fixture(true); $control = TestDeliveryControl::create($this->controlAttributes($fixture));
+        $fixture = $this->fixture(true);
+        $control = TestDeliveryControl::create($this->controlAttributes($fixture));
         $attributes = $this->authorizationAttributes($fixture, $control);
         $this->rejected(fn () => TestDeliveryAuthorization::create($attributes));
-        $this->toggle($control, false); $attributes['control_version'] = $control->control_version;
-        $otherGrant = $fixture['grants'][1]; $otherContract = GrantContract::where('license_grant_id', $otherGrant->id)->sole();
+        $this->toggle($control, false);
+        $attributes['control_version'] = $control->control_version;
+        $otherGrant = $fixture['grants'][1];
+        $otherContract = GrantContract::where('license_grant_id', $otherGrant->id)->sole();
         $entitlement = PendingEntitlement::where('license_grant_id', $fixture['grants'][0]->id)->firstOrFail();
         foreach ([['owner_key' => str_repeat('f', 64)], ['test_delivery_control_id' => 999999],
             ['test_fulfillment_activation_id' => 999999], ['order_id' => 999999], ['control_version' => 0], ['control_version' => 2],
@@ -125,7 +150,9 @@ class TestOwnerDeliveryMigrationTest extends TestCase
 
     public function test_redemption_requires_exact_bytes_matching_target_and_is_single_use_before_expiry(): void
     {
-        $fixture = $this->fixture(); $control = TestDeliveryControl::create($this->controlAttributes($fixture)); $this->toggle($control, false);
+        $fixture = $this->fixture();
+        $control = TestDeliveryControl::create($this->controlAttributes($fixture));
+        $this->toggle($control, false);
         $authorization = TestDeliveryAuthorization::create($this->authorizationAttributes($fixture, $control));
         $attributes = $this->redemptionAttributes($authorization);
         foreach ([['test_delivery_authorization_id' => 999999], ['control_version' => 2], ['control_version' => 4294967294],
@@ -147,27 +174,38 @@ class TestOwnerDeliveryMigrationTest extends TestCase
 
     public function test_blocking_and_reenabling_never_revives_authorizations_from_an_older_control_version(): void
     {
-        $fixture = $this->fixture(); $control = TestDeliveryControl::create($this->controlAttributes($fixture)); $this->toggle($control, false);
+        $fixture = $this->fixture();
+        $control = TestDeliveryControl::create($this->controlAttributes($fixture));
+        $this->toggle($control, false);
         $authorization = TestDeliveryAuthorization::create($this->authorizationAttributes($fixture, $control));
         $attributes = $this->redemptionAttributes($authorization);
         $this->toggle($control, true);
         $this->rejected(fn () => TestDeliveryRedemption::create($attributes));
         $this->rejected(fn () => TestDeliveryAuthorization::create($this->authorizationAttributes($fixture, $control)));
-        $this->toggle($control, false); $this->assertSame(3, $control->control_version);
+        $this->toggle($control, false);
+        $this->assertSame(3, $control->control_version);
         $this->rejected(fn () => TestDeliveryRedemption::create($attributes));
         $this->rejected(fn () => TestDeliveryRedemption::create([...$attributes, 'control_version' => 3]));
         $new = TestDeliveryAuthorization::create($this->authorizationAttributes($fixture, $control));
         TestDeliveryRedemption::create($this->redemptionAttributes($new));
-        $this->assertDatabaseCount('test_delivery_authorizations', 2); $this->assertDatabaseCount('test_delivery_redemptions', 1);
+        $this->assertDatabaseCount('test_delivery_authorizations', 2);
+        $this->assertDatabaseCount('test_delivery_redemptions', 1);
     }
 
     public function test_populated_rollback_and_orm_or_sql_changes_cannot_erase_controls_authorizations_or_redemptions(): void
     {
-        $fixture = $this->fixture(); $control = TestDeliveryControl::create($this->controlAttributes($fixture));
+        $fixture = $this->fixture();
+        $control = TestDeliveryControl::create($this->controlAttributes($fixture));
         $migration = require database_path('migrations/2026_09_26_000023_test_owner_delivery.php');
-        try { $migration->down(); $this->fail('Even a retained blocked control must prevent rollback.'); }
-        catch (LogicException $error) { $this->assertStringContainsString('retained', $error->getMessage()); }
-        foreach ($this->tables() as $table) { $this->assertTrue(Schema::hasTable($table)); }
+        try {
+            $migration->down();
+            $this->fail('Even a retained blocked control must prevent rollback.');
+        } catch (LogicException $error) {
+            $this->assertStringContainsString('retained', $error->getMessage());
+        }
+        foreach ($this->tables() as $table) {
+            $this->assertTrue(Schema::hasTable($table));
+        }
         $this->toggle($control, false);
         $authorization = TestDeliveryAuthorization::create($this->authorizationAttributes($fixture, $control));
         $redemption = TestDeliveryRedemption::create($this->redemptionAttributes($authorization));
@@ -191,28 +229,44 @@ class TestOwnerDeliveryMigrationTest extends TestCase
             }
         }
         $this->rejected(fn () => DB::table('test_delivery_controls')->where('id', $control->id)->delete());
-        try { $control->delete(); $this->fail('Control evidence was deleted.'); }
-        catch (LogicException $error) { $this->assertStringContainsString('retained', $error->getMessage()); }
+        try {
+            $control->delete();
+            $this->fail('Control evidence was deleted.');
+        } catch (LogicException $error) {
+            $this->assertStringContainsString('retained', $error->getMessage());
+        }
         $this->assertSame($retained, $this->retained());
     }
 
     public function test_storage_contract_hides_private_evidence_and_keeps_relationships_and_restrictive_uniqueness(): void
     {
-        $fixture = $this->fixture(); $control = TestDeliveryControl::create($this->controlAttributes($fixture)); $this->toggle($control, false);
+        $fixture = $this->fixture();
+        $control = TestDeliveryControl::create($this->controlAttributes($fixture));
+        $this->toggle($control, false);
         $authorization = TestDeliveryAuthorization::create($this->authorizationAttributes($fixture, $control));
         $redemption = TestDeliveryRedemption::create($this->redemptionAttributes($authorization));
-        $this->assertTrue($control->order->is($fixture['order']->fresh())); $this->assertTrue($control->activation->is($fixture['activation']));
-        $this->assertTrue($authorization->order->is($fixture['order']->fresh())); $this->assertTrue($authorization->activation->is($fixture['activation']));
-        $this->assertTrue($authorization->control->is($control)); $this->assertTrue($authorization->grant->is($fixture['grants'][0]));
-        $this->assertTrue($authorization->contract->is(GrantContract::sole())); $this->assertNull($authorization->entitlement);
-        $this->assertTrue($authorization->redemption->is($redemption)); $this->assertTrue($redemption->authorization->is($authorization));
+        $this->assertTrue($control->order->is($fixture['order']->fresh()));
+        $this->assertTrue($control->activation->is($fixture['activation']));
+        $this->assertTrue($authorization->order->is($fixture['order']->fresh()));
+        $this->assertTrue($authorization->activation->is($fixture['activation']));
+        $this->assertTrue($authorization->control->is($control));
+        $this->assertTrue($authorization->grant->is($fixture['grants'][0]));
+        $this->assertTrue($authorization->contract->is(GrantContract::sole()));
+        $this->assertNull($authorization->entitlement);
+        $this->assertTrue($authorization->redemption->is($redemption));
+        $this->assertTrue($redemption->authorization->is($authorization));
         foreach (['owner_key', 'token_hash', 'idempotency_key_hash', 'request_hash', 'evidence_ciphertext', 'evidence_hash'] as $field) {
             $this->assertArrayNotHasKey($field, $authorization->attributesToArray());
         }
-        foreach (['content_hash', 'evidence_ciphertext', 'evidence_hash'] as $field) { $this->assertArrayNotHasKey($field, $redemption->attributesToArray()); }
+        foreach (['content_hash', 'evidence_ciphertext', 'evidence_hash'] as $field) {
+            $this->assertArrayNotHasKey($field, $redemption->attributesToArray());
+        }
         foreach (['test_delivery_controls' => 2, 'test_delivery_authorizations' => 6, 'test_delivery_redemptions' => 1] as $table => $count) {
-            $keys = Schema::getForeignKeys($table); $this->assertCount($count, $keys);
-            foreach ($keys as $key) { $this->assertContains(strtolower($key['on_delete']), ['restrict', 'no action']); }
+            $keys = Schema::getForeignKeys($table);
+            $this->assertCount($count, $keys);
+            foreach ($keys as $key) {
+                $this->assertContains(strtolower($key['on_delete']), ['restrict', 'no action']);
+            }
         }
         foreach (['test_delivery_controls' => [['public_id'], ['order_id'], ['test_fulfillment_activation_id']],
             'test_delivery_authorizations' => [['public_id'], ['token_hash'], ['order_id', 'idempotency_key_hash']],
@@ -221,14 +275,15 @@ class TestOwnerDeliveryMigrationTest extends TestCase
                 $this->assertCount(1, array_filter(Schema::getIndexes($table), fn ($index) => $index['unique'] && $index['columns'] === $columns));
             }
         }
-        $this->assertInstanceOf(\Carbon\CarbonImmutable::class, $authorization->issued_at);
-        $this->assertInstanceOf(\Carbon\CarbonImmutable::class, $redemption->redeemed_at);
+        $this->assertInstanceOf(CarbonImmutable::class, $authorization->issued_at);
+        $this->assertInstanceOf(CarbonImmutable::class, $redemption->redeemed_at);
     }
 
     private function fixture(bool $mixed = false): array
     {
         $fixture = ActivationFixtures::issued($this->deliverySchemaGateway, $mixed);
         $this->assertSame('activated', app(ActivateTestFulfillment::class)->handle($fixture['order']->id));
+
         return array_replace($fixture, ['activation' => TestFulfillmentActivation::sole()]);
     }
 
@@ -248,6 +303,7 @@ class TestOwnerDeliveryMigrationTest extends TestCase
     private function authorizationAttributes(array $fixture, TestDeliveryControl $control, string $kind = 'contract'): array
     {
         $grant = $fixture['grants'][0];
+
         return ['public_id' => (string) Str::uuid(), 'order_id' => $fixture['order']->id,
             'test_fulfillment_activation_id' => $fixture['activation']->id, 'test_delivery_control_id' => $control->id,
             'control_version' => $control->control_version, 'owner_key' => $fixture['order']->owner_key,
@@ -261,6 +317,7 @@ class TestOwnerDeliveryMigrationTest extends TestCase
     private function redemptionAttributes(TestDeliveryAuthorization $authorization): array
     {
         $target = $authorization->kind === 'contract' ? $authorization->contract : $authorization->entitlement;
+
         return ['public_id' => (string) Str::uuid(), 'test_delivery_authorization_id' => $authorization->id,
             'control_version' => $authorization->control_version, 'content_hash' => $authorization->kind === 'contract' ? $target->pdf_hash : $target->asset_hash,
             'size_bytes' => $target->size_bytes, 'redeemed_at' => now()] + $this->evidence();
@@ -269,6 +326,7 @@ class TestOwnerDeliveryMigrationTest extends TestCase
     private function evidence(): array
     {
         $ciphertext = Crypt::encryptString(CanonicalJson::encode(['purpose' => 'synthetic_delivery_schema_only']));
+
         return ['evidence_ciphertext' => $ciphertext, 'evidence_hash' => hash('sha256', $ciphertext), 'canonicalization_version' => CanonicalJson::VERSION];
     }
 
@@ -277,11 +335,18 @@ class TestOwnerDeliveryMigrationTest extends TestCase
         return ContractFixtures::retained() + ['activation' => json_encode(DB::table('test_fulfillment_activations')->orderBy('id')->get(), JSON_THROW_ON_ERROR)];
     }
 
-    private function tables(): array { return ['test_delivery_controls', 'test_delivery_authorizations', 'test_delivery_redemptions']; }
+    private function tables(): array
+    {
+        return ['test_delivery_controls', 'test_delivery_authorizations', 'test_delivery_redemptions'];
+    }
 
     private function rejected(callable $operation): void
     {
-        try { $operation(); $this->fail('Contradictory delivery schema write was accepted.'); }
-        catch (QueryException $error) { $this->assertNotSame('', $error->getMessage()); }
+        try {
+            $operation();
+            $this->fail('Contradictory delivery schema write was accepted.');
+        } catch (QueryException $error) {
+            $this->assertNotSame('', $error->getMessage());
+        }
     }
 }

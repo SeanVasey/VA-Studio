@@ -19,6 +19,10 @@ class TrackPublicationGuardMigrationTest extends TestCase
 
     private const GUARDS = ['tracks_publication_version_insert', 'tracks_publication_version_update'];
 
+    /** BL-41 triggers postdate the simulated schema and read `tracks.publication_version`, so they are removed with the older guards. */
+    private const LATER_GUARDS = ['tracks_visibility_insert', 'tracks_visibility_update', 'track_publication_schedules_retain',
+        'track_publication_schedules_valid_insert', 'track_publication_schedules_transition'];
+
     private function migration(): object
     {
         return require database_path('migrations/2026_10_02_000034_track_publication_version.php');
@@ -26,7 +30,7 @@ class TrackPublicationGuardMigrationTest extends TestCase
 
     private function dropGuards(): void
     {
-        foreach (self::GUARDS as $guard) {
+        foreach ([...self::LATER_GUARDS, ...self::GUARDS] as $guard) {
             DB::unprepared('DROP TRIGGER IF EXISTS '.$guard);
         }
     }

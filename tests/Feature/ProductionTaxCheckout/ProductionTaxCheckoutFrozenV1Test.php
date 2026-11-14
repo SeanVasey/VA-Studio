@@ -33,8 +33,18 @@ class ProductionTaxCheckoutFrozenV1Test extends TestCase
      * The change adds two nonunique single-column indexes plus a migration-only upgrade preflight
      * (assertReportingUpgrade); strict installer admission is unchanged apart from now requiring the two indexes.
      * No column, uniqueness, foreign key, trigger or payment path changed.
+     *
+     * HostedEvidence.php (BL-68): the request now offers payment_method_types ['card','link'] and the session and
+     * PaymentIntent checks call CheckoutPaymentMethods::matchesRequest (exact unordered set equal to the stored request,
+     * which must itself be {card, link} or the pre-BL-68 ['card']) instead of requiring ['card']. The independent review
+     * of the BL-68 PR returned REQUEST CHANGES (P1: stored ['card'] intents could not be verified through intent()); the
+     * fix adds an optional payment-methods argument to request() and makes intent() replay a stored request with
+     * CheckoutPaymentMethods::forStored(), so a stored ['card'] row rebuilds in its legacy shape (legacy-shape replay)
+     * while any other stored list still fails the byte comparison. The mapping label stays
+     * 'qualified_exemption_exact_usd_v1'. The hash pins the bytes after that fix.
      */
     public const REVIEWED_SUCCESSORS = [
+        'app/Domain/Commerce/ProductionCheckout/HostedEvidence.php' => '22a944df395b312510b144efab17bc28e9fe6ee6aeef5b9d2a8a65f1021fed1b',
         'app/Domain/Commerce/ProductionCheckout/CheckoutSchema.php' => 'ecbb168a283213666380d21a4d89430c289fb95e4be9fd77e6cf78de6e3f2357',
         'app/Domain/Commerce/ProductionCheckout/CheckoutSchemaInstaller.php' => '6d770ecb9b2b9ff2d38c3bf04a8f1f81221e2fed9ea54ec6a9ad5af071b52ef8',
     ];

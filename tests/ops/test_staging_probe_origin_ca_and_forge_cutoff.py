@@ -134,8 +134,8 @@ class ForgeCutoff(unittest.TestCase):
         redirect = DEPLOY.index(TEE)
         self.assertLess(DEPLOY.index("trap on_exit EXIT"), redirect)
         self.assertLess(DEPLOY.index('install -d -m 0750 "$EVIDENCE"\n'), redirect)
-        calls = [m.start() for m in re.finditer(r'"\$\{CTL\[@\]\}" (healthy|refresh|prepare|activate|prune)', DEPLOY)]
-        self.assertEqual(len(calls), 5)
+        calls = [m.start() for m in re.finditer(r'"\$\{CTL\[@\]\}" (healthy|space-check|refresh|prepare|activate|prune|backup-prune)', DEPLOY)]
+        self.assertEqual(len(calls), 8)
         self.assertTrue(all(redirect < call for call in calls))
 
     def lock_free_after_exit(self, redirect):

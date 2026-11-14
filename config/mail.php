@@ -49,6 +49,21 @@ return [
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 
+        // BL-47 / DD-43: the order-ready mailer. SMTP over implicit TLS on port 465 by default; every value is per host and
+        // none is committed. With no host set the transactional-mail policy refuses, so nothing can be sent. It is kept apart
+        // from MAIL_MAILER (which stays `log`) so the transactional stream can use its own provider credentials.
+        'transactional' => [
+            'transport' => 'smtp',
+            'scheme' => env('VASEY_TRANSACTIONAL_MAIL_SMTP_SCHEME', 'smtps'),
+            'url' => null,
+            'host' => env('VASEY_TRANSACTIONAL_MAIL_SMTP_HOST'),
+            'port' => env('VASEY_TRANSACTIONAL_MAIL_SMTP_PORT', 465),
+            'username' => env('VASEY_TRANSACTIONAL_MAIL_SMTP_USERNAME'),
+            'password' => env('VASEY_TRANSACTIONAL_MAIL_SMTP_PASSWORD'),
+            'timeout' => 30,
+            'local_domain' => env('VASEY_TRANSACTIONAL_MAIL_SMTP_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        ],
+
         'ses' => [
             'transport' => 'ses',
         ],

@@ -8,6 +8,9 @@ below).** It narrows the production part of
 [dry-run record](verification/beatstars-catalog-dry-run-20261107/README.md)). Buyer contracts stay test-only until each gate
 below is met.
 
+The sound-kit license (a generic license for kits and sample packs, rendered by the new `vasey-kit-license-pdf-v1` profile
+in this same visual system) is described in [sound-kit-license.md](sound-kit-license.md).
+
 ## Current state
 
 - Every issued test contract is rendered from frozen grant sections by a pinned, test-only TCPDF profile
@@ -66,8 +69,43 @@ Existing originals stay byte-preserved, and v1 and v2 stay registered for retain
 
 The current `tc-lib` pins and the held `tc-lib` updates (Dependabot #162/#164) are re-evaluated in increment 4. A new profile is
 the one place a renderer upgrade can land safely. **Increment 4 kept the current pins** (tc-lib-pdf 8.76.3, tc-lib-pdf-font
-4.4.1, the same graph as `test-buyer-pdf-v2`); #162/#164 stay held and must be decided before activation, because an upgrade
+4.4.1, the same graph as `test-buyer-pdf-v2`); #162/#164 stayed held until the decision below, because an upgrade
 after activation needs a successor profile.
+
+**Re-pinned before activation (2026-11-10, Sean's SQ-14, superseding DD-26).** tc-lib-pdf 8.76.3 to 8.81.1 (`d417129f…` to
+`a0626686…`) and tc-lib-pdf-font 4.4.1 to 4.6.2 (`a78b8e0a…` to `668d73e8…`), with the dependencies they require
+(barcode 2.16.4 to 2.17.3, encrypt 2.11.4 to 2.12.2, image 3.14.4 to 3.15.3, page 4.16.5 to 4.18.1, unicode 3.0.9 to 3.2.3,
+unicode-data 3.0.9 to 3.1.3). No contract was activated, so the existing profiles were re-pinned in place rather than given
+successors; after activation any further renderer change needs a successor profile. The generated font metric and program
+files rebuilt byte for byte, so only each manifest's package graph changed. Regenerated with the profile build scripts (their
+expected package tables moved first): `vasey-license-pdf-v1` manifest `cd9215c8…` to `d1db00a2…`,
+`vasey-license-pdf-v2` `fe8c02e6…` to `a8208d10…` (its implementation closure includes the registry and v1 profile pins, so
+the three were iterated to a fixed point), `test-buyer-pdf-v2` `29e0b1b3…` to `ce6d39e2…`. Golden renders: v2 `81f228d8…`
+to `f9b7895f…`, v1 `a359163e…` to `df32c9ea…`, `test-buyer-pdf-v2` `790fd796…` to `536171e3…` (751516 to 751575 bytes).
+Released-profile registries gained entries and kept the old ones readable: `ProductionFreeGrantRenderProfile::RELEASED` `r3`
+(the glyph equivalence was repeated, 1,112,032 code points, 0 differences:
+`docs/verification/tc-lib-update-20261110/`) and `MemberGrantRenderProfileRegistry::RELEASED` `r2`. The retained
+`test-buyer-pdf-v1` graph (8.76.2/4.4.0) was already unrenderable on the 8.76.3 graph and stays frozen. The v2 golden
+document's extracted text is identical before and after except the printed profile digest; the pages differ in raster only in
+that line. `scripts/build-contract-profile.php` (test-v1 resolver) still expects the old graph, as it did on main.
+
+**Re-pinned again before activation (2026-11-14, SQ-14; Dependabot #379/#380, which failed preflight on the pinned graph).**
+tc-lib-pdf 8.81.1 to 8.84.0 (`a0626686…` to `2be3a522…`) and tc-lib-pdf-font 4.6.2 to 4.8.0 (`668d73e8…` to `30804d3d…`),
+with the dependencies Composer resolved for them (color 3.0.7 to 3.0.14, file 3.9.4 to 3.9.10, filter 2.11.4 to 2.11.9,
+graph 2.18.2 to 2.18.7, parser 3.16.2 to 3.16.7, sign 2.0.5 to 2.0.10; barcode, encrypt, image, page, unicode and
+unicode-data unchanged). The same re-pin carries the D-30 rule change that refuses U+204F REVERSED SEMICOLON explicitly in
+`ContractIdentityDeclarationV2` (newer Unicode data gives it the Arabic script extension, so `\p{Arabic}` refused it under
+PCRE2 10.47 but not 10.42); that class is in the v1, v2 and kit implementation pins. No contract is activated, so the profiles
+were re-pinned in place with their build scripts, which again rebuilt every generated font file byte for byte: v1 manifest
+`d1db00a2…` to `e4f44cbe…`, v2 `a8208d10…` to `bd822058…` (fixed point after one pass), `test-buyer-pdf-v2` `ce6d39e2…` to
+`0605065d…`, and `vasey-kit-license-pdf-v1` `0d0b4e1d…` to `c616ff04…` (`scripts/repin-vasey-kit-license-v1.sh`). Golden
+renders: v1 `df32c9ea…` to `0a6f2fc4…`, v2 `f9b7895f…` to `8a2d07f9…`, kit `52334cb8…` to `41a0d6d1…`, `test-buyer-pdf-v2`
+`536171e3…` to `63050151…` (751575 bytes, unchanged). Each new golden has the same size and extracted text as the old one
+except the printed profile digest (v1, v2, kit); at 100 dpi their rasters differ only inside that digest line, and the
+`test-buyer-pdf-v2` render is pixel-identical (its bytes differ only in the producer version, keywords and document IDs).
+`ProductionFreeGrantRenderProfile::RELEASED` gains `r4` (glyph equivalence repeated, 1,112,032 code points, 0 differences:
+`docs/verification/tc-lib-update-20261114/`) and `MemberGrantRenderProfileRegistry::RELEASED` gains `r3`; earlier entries
+stay readable.
 
 ## Variable map (increment 3 design, 2026-11-07)
 
@@ -323,7 +361,8 @@ own hash must be pinned, with review.
 
 **Glyph coverage, compared with DejaVu.** The v1 brand files are Fontsource **Latin subsets**. The four faces share 214
 positive-width codepoints, all Latin or Common, and the D-30 rule accepts 212 of them (U+000D and U+00A0 are refused). The
-`test-v2` DejaVu set the paid renderers use accepts 3,799 under its own script restriction, and the v1 set is a strict subset
+`test-v2` DejaVu set the paid renderers use accepts 3,798 under its own script restriction (3,799 before U+204F REVERSED
+SEMICOLON was refused explicitly on 2026-11-14), and the v1 set is a strict subset
 of it. v1 covers Basic Latin, Latin-1 Supplement, ı, Œ, œ, the typographic quotes and dashes, € and ™, but not Latin
 Extended-A and B (Ł, Ż, Ș, Ț, ğ, ş and others), Latin Extended Additional (Vietnamese), Greek or Cyrillic. Every pinned
 country name prints.
@@ -398,7 +437,7 @@ byte-identical.
   reviews the rendered layout, the block labels and the acceptance block wording.
 - Install the real signature on the private disk with its pin. Confirm the golden hash on the Forge host (above), and reset
   opcache on every deploy of pinned files.
-- Decide on the held tc-lib updates (#162/#164).
+- [x] Decide on the held tc-lib updates (#162/#164): taken before activation, 2026-11-10 (SQ-14; see the render profile section).
 - [x] Wire the v2 renderer into the paid and paid-tax issuers for new issuance only, **behind a local/testing gate**
   (2026-11-08, below). Activation still needs independent review, the D-30 prerequisites (steps 2, 3a and 3b and the U-13
   retention values), contract increment 1 (the license versions' v2 contract text) and the items below.

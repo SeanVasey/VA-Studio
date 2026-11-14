@@ -50,7 +50,10 @@ use App\Domain\Memberships\Production\MembershipPaidInvoiceAuthority;
 use App\Domain\Memberships\Production\MembershipPolicy as ProductionMembershipPolicy;
 use App\Domain\Memberships\Production\MembershipPolicyFactsAuthority;
 use App\Domain\Memberships\Production\MembershipReservationAuthority;
+use App\Domain\Merch\Fulfillment\MerchFulfillmentPolicy;
 use App\Domain\Notifications\TransactionalNotificationPolicy;
+use App\Domain\Services\Invoicing\ServiceInvoicePolicy;
+use App\Domain\Services\Invoicing\StripeSdkInvoiceGateway;
 use App\Domain\Services\Projects\ServiceProjectPolicy;
 use App\Domain\SupportAttachments\FixtureAttachmentPolicy;
 use App\Filament\Resources\TestPromotionResource;
@@ -119,6 +122,11 @@ class StagingEnvironmentAdmissionTest extends TestCase
         // FP-013: the operator alert mail transport is admitted in local, testing and staging; production needs its code literal.
         'app/Domain/Inquiries/Notifications/MailInquiryAlertTransport.php',
         'app/Domain/Services/Projects/ServiceProjectPolicy.php',
+        // BL-70: Stripe test-mode service invoicing (policy and gateway) is admitted wherever test commerce is; production holds its flag false.
+        'app/Domain/Services/Invoicing/ServiceInvoicePolicy.php',
+        'app/Domain/Services/Invoicing/StripeSdkInvoiceGateway.php',
+        // BL-63: Printful merch fulfillment is admitted in local, testing and staging behind its own default-off flag.
+        'app/Domain/Merch/Fulfillment/MerchFulfillmentPolicy.php',
         'app/Domain/Memberships/MembershipPolicy.php',
         'app/Domain/Grants/Free/FreeGrantPolicy.php',
         'app/Domain/Grants/Free/TestFreeGrantIdentity.php',
@@ -126,6 +134,8 @@ class StagingEnvironmentAdmissionTest extends TestCase
         'app/Http/Controllers/FreeGrantController.php',
         // #266: the synthetic STAGING seller tag is admitted through the helper; production refuses it.
         'app/Domain/Media/StagingSellerTag.php',
+        // BL-71: the BeatStars catalog import (drafts and media only) is admitted through the helper; production refuses it.
+        'app/Domain/Migration/BeatStarsImport/BeatStarsImportPolicy.php',
     ];
 
     /**
@@ -191,11 +201,12 @@ class StagingEnvironmentAdmissionTest extends TestCase
         InventoryFixtures::configure();
         config([
             'customer.test_accounts_enabled' => true, 'free-grants.test_enabled' => true,
-            'customer-preferences.test_grants_enabled' => true, 'services-projects.test_enabled' => true,
+            'customer-preferences.test_grants_enabled' => true, 'services-projects.test_enabled' => true, 'services-invoicing.test_enabled' => true,
             'memberships.test_mode_enabled' => true, 'unpaid-release.enabled' => true,
             'transactional-notifications.test_enabled' => true, 'transactional-notifications.transport' => 'private_capture',
             'transactional-notifications.policy_version' => TransactionalNotificationPolicy::VERSION,
             'support-attachments.fixture_enabled' => true, 'commerce.test_promotions' => '[]',
+            'merch.printful_enabled' => true,
             // The real SDK gateway admits only an exact sk_test_ credential shape.
             'payments.stripe.secret_key' => 'sk_test_SYNTHETICONLY12345',
         ]);
@@ -302,6 +313,23 @@ class StagingEnvironmentAdmissionTest extends TestCase
                 }
             },
             'test service projects' => fn () => app(ServiceProjectPolicy::class)->enabled(),
+            'test service invoicing' => fn () => app(ServiceInvoicePolicy::class)->enabled(),
+            'service invoice gateway reaches the provider transport' => function (): bool {
+                $transport = new StagingAccountTransport;
+                $previous = ApiRequestor::httpClient();
+                try {
+                    (new StripeSdkInvoiceGateway($transport))->retrieve('in_StagingProbe');
+                } catch (RuntimeException $error) {
+                    self::assertSame('STRIPE_INVOICE_UNAVAILABLE', $error->getMessage());
+                } finally {
+                    ApiRequestor::setHttpClient($previous);
+                }
+
+                // The transport answers the account proof and nothing else, so an admitted gateway stops at the invoice read
+                // after sending at least the account request; a refused one sends nothing at all.
+                return $transport->requests !== [];
+            },
+            'merch printful fulfillment' => fn () => app(MerchFulfillmentPolicy::class)->enabled(),
             'synthetic memberships' => fn () => app(MembershipPolicy::class)->enabled(),
             'test free grants' => fn () => app(FreeGrantPolicy::class)->enabled(),
             'test free grant definitions' => fn () => self::completes(fn () => app(FreeGrantPolicy::class)
@@ -414,6 +442,7 @@ class StagingEnvironmentAdmissionTest extends TestCase
             'absent mode' => ['payments.stripe.mode' => null],
         ];
         $stripeGates = ['checkout account', 'payment processing', 'checkout gateway reaches the provider transport', 'stripe test webhook',
+            'test service invoicing', 'service invoice gateway reaches the provider transport',
             'finalization', 'contract issuance', 'fulfillment activation', 'owner delivery access', 'test unpaid release'];
         foreach ($live as $label => $settings) {
             config($settings);
@@ -425,6 +454,7 @@ class StagingEnvironmentAdmissionTest extends TestCase
         foreach (['sk_'.'live_SYNTHETICONLY12345', 'rk_'.'test_SYNTHETICONLY12345', 'rk_'.'live_SYNTHETICONLY12345', 'pk_'.'test_SYNTHETICONLY12345'] as $key) {
             config(['payments.stripe.secret_key' => $key]);
             $this->assertFalse($this->in('staging', self::gates()['checkout gateway reaches the provider transport']), 'gateway admitted '.substr($key, 0, 8));
+            $this->assertFalse($this->in('staging', self::gates()['service invoice gateway reaches the provider transport']), 'invoice gateway admitted '.substr($key, 0, 8));
         }
         config(['payments.stripe.secret_key' => 'sk_test_SYNTHETICONLY12345']);
 

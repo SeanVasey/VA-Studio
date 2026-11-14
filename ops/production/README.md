@@ -90,7 +90,7 @@ The **Who** column says whether Sean does the step in the Forge UI or a script d
 | 7 | **Sean, Forge** | **Install the nginx site**, as on staging. Forge generates the site file as a wrapper (listen, `http2`, `server_name`, the certificate, a `root` that is the git checkout, and its `forge-conf/<site id>/` includes) and lets you edit only the inside of its server block. Provisioning (step 6) has already installed and loaded the http-level helpers in `/etc/nginx/conf.d/vasey-production.conf` and rendered the server-block body at `/etc/vasey-production/nginx-site.conf`, with no placeholders left (`grep -n '__[A-Z_]*__'` prints nothing). Replace the whole content of Site → Edit Nginx Configuration with that file, or send it as `config` to the site API (`PUT .../sites/<site>/nginx`). Forge writes it **without** `nginx -t`, so run `sudo nginx -t`, then load `https://<HOST>/` and confirm the site answers without credentials and sends no `X-Robots-Tag`. Every location in the body sets `root <kit root>/current/public`, so the wrapper's checkout root is never used; do not add a location without its own `root`. If provisioning refused because another nginx file already defines the `vasey_production_general` zone, a `vasey_production_*` map or the `vasey_production` log format (the older whole-file template), put Forge's default site configuration back first, then re-run step 6. On a host whose site file is edited as a whole, use `/etc/vasey-production/nginx-classic.conf` instead: fill `__SSL_CERT__`, `__SSL_KEY__` and `__FORGE_CONF__` from Forge's config and paste it as the whole file. |
 | 8 | **Sean, Forge** | **Environment.** On the host, `python3 -I ops/production/compose-env.py --host <HOST>` prints a template with no secrets. Paste it into Site → Environment and fill only `APP_KEY` (generate it once on the server: `php8.4 -r 'echo "base64:".base64_encode(random_bytes(32)), PHP_EOL;'`), `DB_PASSWORD` (`sudo cat /root/vasey-production-secrets/db-app.env`), `MEDIA_TAG_PATH` and `MEDIA_TAG_SHA256`, in Forge. The template is BLOCKED by the private-server preflight until those four are set. The first deploy checks the filled environment twice: the cheap frozen-environment check, then the validator on the built candidate. The mirror checkout has no `vendor/`, so the preflight itself cannot run there; to check earlier, run it from any built checkout as the application user. |
 | 9 | **Sean, Forge** | **Deployment script** (replace Forge's default with exactly this), then **Deploy Now**: `set -euo pipefail`, `cd "$FORGE_SITE_PATH"`, `git fetch --prune origin "$FORGE_SITE_BRANCH"`, `git checkout --detach --force FETCH_HEAD`, `bash /usr/local/libexec/vasey-production/forge-deploy.sh "$(git rev-parse HEAD)"`. |
-| 10 | **Script** (Forge runs it) | First deploy, the same sequence as staging: frozen environment check, quiesce, protected build, the production validator, snapshot and restore proof, migrate, caches, `vasey:doctor`, switch, healthy resume. |
+| 10 | **Script** (Forge runs it) | First deploy, the same sequence as staging: frozen environment check, the protected build by the dedicated build account `vasey-production-build` with the site up (or, without it, quiesce then the build as the application), the production validator, quiesce, snapshot and restore proof, migrate, caches, `vasey:doctor`, switch, healthy resume. |
 | 11 | **Sean, SSH** | First-run setup as in `docs/ops/staging-runbook.md` with production names: operators with TOTP, the seller tag, `vasey:doctor`, the backup destination. |
 
 A failed first deploy leaves no served release and a closed writer gate, exactly as on staging; read the end of the output and
@@ -192,6 +192,21 @@ These are application or review items this kit deliberately does not do:
    or `synthetic`, and a tag file in the attached private storage whose bytes carry the marker of the synthetic STAGING tag
    (`vasey:staging-seller-tag`, staging rehearsal only). The media pipeline and `vasey:doctor` refuse it too. Production needs
    Sean's approved seller tag; see `docs/ops/staging-placeholders.md` (P-1).
+8. **Off through launch (DD-44, DD-50).** `validate-runtime.php` also refuses `REPORTING_MARKETING_SEGMENT_ENABLED` unless it is
+   false, by the pre-launch hold's rule (`LAUNCH_OFF_HOLDS`, config key from `scripts/ops/capability-boundary.php`;
+   `holds.reporting_marketing_segment_enabled`), `VASEY_STAGING_BEATSTARS_IMPORT_ENABLED` by the same rule
+   (`holds.vasey_staging_beatstars_import_enabled`; the staging-only catalog import refuses production in code as well), and the membership code literals `production-memberships.enabled`,
+   `production-memberships.http_mounted` and `member-grants.enabled` unless they read strictly false
+   (`holds.production_memberships_enabled`, `holds.production_memberships_http_mounted`, `holds.member_grants_enabled`), and the tax chain's mount literal `production-tax-checkout.http_mounted` (`holds.production_tax_checkout_http_mounted`, DD-14; `production_checkout.mounted` was already held). Lifting
+   one is a reviewed change to the validator with Sean's authorization (ledger PCL-23, PCL-25).
+   BL-70 adds `VASEY_TEST_SERVICE_INVOICING_ENABLED` (Stripe test-mode service invoicing) to the same list
+   (`holds.vasey_test_service_invoicing_enabled`); it has no production path at all. `VASEY_TEST_UNPAID_RELEASE_ENABLED`
+   joins it (`holds.vasey_test_unpaid_release_enabled`, 2026-11-11): the staging rehearsal may now turn test unpaid release on,
+   production never does, and `UnpaidReleasePolicy` also refuses production in code. `VASEY_TEST_REFUND_DISPUTE_ENABLED` joins
+   it too (`holds.vasey_test_refund_dispute_enabled`, 2026-11-12): the staging rehearsal may turn the test refund and dispute
+   lifecycle on, production does not, and `RefundDisputePolicy` refuses production in code for both of its chains (the production
+   tax chain's admission is literal `local`/`testing`). A future production refund lifecycle lifts this hold in its own reviewed
+   change with Sean's authorization.
 
 ## What was and was not verified
 

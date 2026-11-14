@@ -638,7 +638,10 @@ fi""")
         self.assertNotEqual(self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients,
                                       **dict(self.settings, VASEY_BACKUP_RCLONE_BIN=self.flaky_rclone())).returncode, 0)
         kept = self.backups / f".offhost-retry.{bk.name}" / f"{bk.name}.tar.age"
-        kept.write_bytes(kept.read_bytes()[:-1] + b"!")  # no longer matches its recorded digest
+        data = kept.read_bytes()
+        # Flip the last byte so it always differs (replacing it with a fixed byte left the copy intact whenever the random
+        # ciphertext already ended in that byte, 1 run in 256: Foundation 43383590812).
+        kept.write_bytes(data[:-1] + bytes([data[-1] ^ 0xFF]))  # no longer matches its recorded digest
         (self.remote_dir / f"{bk.name}.tar.age").unlink()
         run = self.bash(f'ship "{bk}"', VASEY_BACKUP_AGE_RECIPIENTS_FILE=recipients, **self.settings)
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
@@ -961,11 +964,14 @@ fi""")
                 self.assertNotIn("kept from an earlier attempt", run.stdout)
                 self.assertTrue(any(outside.iterdir()), "a link is removed, never what it points to")
 
-    def test_a_ship_from_predeploy_waits_a_bounded_time_for_the_lock(self):
+    def test_a_ship_from_ship_pending_waits_a_bounded_time_for_the_lock(self):
         recipients = self.recipients()
         bk = self.make_set()
-        predeploy = SOURCE[SOURCE.index("  predeploy)"):SOURCE.index("  restore-check)")]
-        self.assertLess(predeploy.index("SHIP_LOCK_WAIT=600"), predeploy.index('ship "$(cat'))
+        # The site is up when pending sets ship, so waiting for a manual ship is harmless. predeploy (quiesced) never ships at all.
+        self.assertIn("SHIP_PENDING_LOCK_WAIT=3600", SOURCE)
+        self.assertIn("SHIP_LOCK_WAIT=$SHIP_PENDING_LOCK_WAIT; ship", SOURCE)
+        predeploy = SOURCE[SOURCE.index("  predeploy)"):SOURCE.index("  space-check)")]
+        self.assertNotIn("SHIP_LOCK_WAIT", predeploy)
         held = open(self.backups / ".offhost.lock", "a")
         fcntl.flock(held, fcntl.LOCK_EX)
         threading.Timer(2, held.close).start()  # the other ship finishes after two seconds
@@ -1095,6 +1101,190 @@ class LocalPruning(OffhostBase):
         run = self.bash("prune_local", VASEY_BACKUP_RETENTION="tiered", VASEY_BACKUP_KEEP_DAILY="lots")
         self.assertNotEqual(run.returncode, 0)
         self.assertEqual(len(list(self.backups.iterdir())), 5)
+
+
+class DeployRetention(OffhostBase):
+    """Deploy snapshots are pruned to VASEY_BACKUP_KEEP right after the snapshot, protecting the set just taken."""
+
+    def sets(self, count):
+        names = [set_name(f"202611{day:02d}") for day in range(1, count + 1)]
+        for name in names:
+            self.make_set(name)
+        return names
+
+    def names(self):
+        return sorted(p.name for p in self.backups.iterdir() if p.is_dir())
+
+    def test_flat_prune_keeps_the_newest_keep_sets(self):
+        names = self.sets(8)
+        run = self.bash("prune_local", VASEY_BACKUP_KEEP=3)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(self.names(), names[-3:])
+
+    def test_the_named_set_and_the_last_pointer_are_never_pruned(self):
+        names = self.sets(8)
+        (self.backups / ".last").write_text(str(self.backups / names[1]) + "\n")
+        run = self.bash(f'prune_local "{names[0]}"', VASEY_BACKUP_KEEP=3)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(self.names(), sorted([names[0], names[1]] + names[-3:]))
+
+    def test_tiered_prune_also_protects_the_named_set_and_keeps_the_newest_proven_set(self):
+        names = self.sets(8)
+        env = dict(VASEY_BACKUP_RETENTION="tiered", VASEY_BACKUP_KEEP=2, VASEY_BACKUP_KEEP_DAILY=0,
+                   VASEY_BACKUP_KEEP_WEEKLY=0, VASEY_BACKUP_KEEP_MONTHLY=0)
+        run = self.bash(f'prune_local "{names[2]}"', **env)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        # newest two, the protected deploy set, and the newest set carrying a verified proof (the newest one here)
+        self.assertEqual(self.names(), sorted([names[2], names[-2], names[-1]]))
+
+    def test_a_keep_below_one_is_refused_and_removes_nothing(self):
+        self.sets(4)
+        for keep in ("0", "many"):
+            with self.subTest(keep=keep):
+                run = self.bash("prune_local", VASEY_BACKUP_KEEP=keep)
+                self.assertNotEqual(run.returncode, 0)
+                self.assertEqual(len(self.names()), 4)
+
+    def test_a_malformed_protect_name_is_refused(self):
+        self.sets(4)
+        self.assertNotEqual(self.bash('prune_local "../x"', VASEY_BACKUP_KEEP=1).returncode, 0)
+        self.assertEqual(len(self.names()), 4)
+
+    def test_failed_sets_staging_directories_and_files_outside_the_backup_directory_are_untouched(self):
+        self.sets(6)
+        failed = self.backups / "20261001T000000Z-ffffffffffff.FAILED"
+        staging = self.backups / ".ship.abc123"
+        failed.mkdir()
+        staging.mkdir()
+        retained = self.root / "retained-backups" / set_name("20260101")
+        retained.mkdir(parents=True)
+        (retained / "database.sql").write_text("x")
+        run = self.bash("prune_local", VASEY_BACKUP_KEEP=1)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertTrue(failed.is_dir() and staging.is_dir() and (retained / "database.sql").exists())
+
+    def test_predeploy_prunes_after_queuing_the_ship_and_never_fails_the_deploy_for_it(self):
+        predeploy = SOURCE[SOURCE.index("  predeploy)"):SOURCE.index("  space-check)")]
+        self.assertLess(predeploy.index('mark_pending "$(cat'), predeploy.index("prune_local"))
+        self.assertIn('prune_local "$(basename -- "$(cat "$VASEY_BACKUP_DIR/.last")")" )', predeploy)
+        self.assertIn("|| log \"WARNING", predeploy)
+
+    def test_the_prune_subcommand_runs_the_same_function(self):
+        branch = SOURCE[SOURCE.index("  prune)"):SOURCE.index("  restore-check)")]
+        self.assertIn("prune_local", branch)
+
+
+class SpaceCheck(OffhostBase):
+    """The pre-deploy free-space check: runs before any quiesce and refuses when the snapshot would not fit."""
+
+    def setUp(self):
+        super().setUp()
+        self.private = self.root / "private"
+        self.private.mkdir()
+        (self.private / "media.bin").write_bytes(b"m" * 100_000)
+        self.restore = self.root / "restore-check"
+
+    def check(self, free, db=50_000, preamble="", **extra):
+        """Runs space_check with df reporting FREE bytes and the database query answering DB (or failing when None)."""
+        mysql = 'mysql() { return 1; }' if db is None else f'mysql() {{ echo {db}; }}'
+        script = f'''{preamble}PRIVATE="{self.private}"; VASEY_DB_NAME=vasey_staging; VASEY_BACKUP_MYCNF=/nonexistent
+VASEY_RESTORE_CHECK_DIR="{self.restore}"
+{mysql}
+df() {{ printf 'Avail\\n%s\\n' "{free}"; }}
+space_check'''
+        return self.bash(script, **extra)
+
+    def test_enough_space_proceeds(self):
+        run = self.check(free=1_000_000_000)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertIn("free space ok", run.stdout)
+
+    def test_insufficient_space_refuses_naming_free_and_needed_bytes_and_the_runbook(self):
+        run = self.check(free=1_000_000)
+        self.assertNotEqual(run.returncode, 0)
+        message = run.stdout + run.stderr
+        self.assertIn("1000000 bytes free", message)
+        self.assertRegex(message, r"about \d+ bytes needed")
+        self.assertIn("nothing was stopped", message)
+        self.assertIn("out of disk during snapshot", message)
+        self.assertIn("backup-prune", message)
+
+    def test_the_need_covers_private_store_database_and_margin(self):
+        # private 100000 (no set to share files with, and no estimator here: the whole store is counted) + database 50000, plus
+        # the restore proof's disposable datadir (50000) on the same filesystem: since 2026-11-11 a tree set is verified in place
+        # and nothing is extracted, so the private store is not counted twice; then 20% and 256 MiB of margin
+        need = (150_000 + 50_000) + (150_000 + 50_000) * 20 // 100 + 268_435_456
+        self.assertEqual(self.check(free=need).returncode, 0)
+        self.assertNotEqual(self.check(free=need - 1).returncode, 0)
+
+    def test_hardened_shipping_is_counted_after_the_deploy_not_on_top_of_the_restore_proof(self):
+        # The encrypted copy is staged after the resume (ship-pending), when the restore proof's scratch is already gone, so on a
+        # shared filesystem the peak is the set plus the larger of the two, which here are equal: the plain need, not a third set.
+        base = (150_000 * 2) + (150_000 * 2) * 20 // 100 + 268_435_456
+        self.assertEqual(self.check(free=base, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        self.assertNotEqual(self.check(free=base - 1, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+
+    def test_hardened_shipping_on_its_own_filesystem_still_needs_the_encrypted_copy_there(self):
+        # Backups and restore scratch on different filesystems: the backup filesystem holds the set and, later, its encrypted copy.
+        shim = 'stat() { if [ "${1:-}" = -c ] && [ "${2:-}" = %d ]; then case "${@: -1}" in */backups) echo 1 ;; *) echo 2 ;; esac; else command stat "$@"; fi; }\n'
+        need_backup_fs = (150_000 * 2) + (150_000 * 2) * 20 // 100 + 268_435_456
+        run = lambda free, **extra: self.check(free=free, preamble=shim, **extra)
+        self.assertEqual(run(need_backup_fs, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        self.assertNotEqual(run(need_backup_fs - 1, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        # Without hardening the backup filesystem needs only the set (150000), so the same free space is plenty.
+        self.assertEqual(run(150_000 + 150_000 * 20 // 100 + 268_435_456).returncode, 0)
+
+    def test_an_earlier_shipment_still_staging_its_encrypted_copy_is_counted(self):
+        base = (150_000 * 2) + (150_000 * 2) * 20 // 100 + 268_435_456
+        held = open(self.backups / ".offhost.lock", "a")
+        self.addCleanup(held.close)
+        fcntl.flock(held, fcntl.LOCK_EX)  # ship-pending of the previous deploy is still encrypting
+        self.assertNotEqual(self.check(free=base, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        extra = base + 150_000 + 150_000 * 20 // 100
+        self.assertEqual(self.check(free=extra, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        self.assertEqual(self.check(free=base).returncode, 0, "an unhardened host has no staging copy to wait for")
+
+    def test_a_ship_pending_run_between_two_sets_is_counted_like_a_running_ship(self):
+        base = (150_000 * 2) + (150_000 * 2) * 20 // 100 + 268_435_456
+        held = open(self.backups / ".ship-pending.lock", "a")  # only the run lock is held: .offhost.lock is free between sets
+        self.addCleanup(held.close)
+        fcntl.flock(held, fcntl.LOCK_EX)
+        self.assertNotEqual(self.check(free=base, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+        self.assertEqual(self.check(free=base + 150_000 + 150_000 * 20 // 100, VASEY_BACKUP_REMOTE="vasey-backup:bucket").returncode, 0)
+
+    def test_the_database_size_falls_back_to_the_newest_set_and_unknown_size_refuses(self):
+        self.make_set(set_name("20261101"))
+        (self.backups / set_name("20261101") / "database.sql").write_bytes(b"d" * 70_000)
+        self.assertEqual(self.check(free=1_000_000_000, db=None).returncode, 0)
+        shutil.rmtree(self.backups / set_name("20261101"))
+        run = self.check(free=1_000_000_000, db=None)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn("cannot estimate the database size", run.stdout + run.stderr)
+
+    def test_it_changes_nothing(self):
+        before = sorted(p.name for p in self.root.rglob("*"))
+        self.check(free=1)
+        self.check(free=1_000_000_000)
+        self.assertEqual(sorted(p.name for p in self.root.rglob("*")), before)
+
+    def test_the_deploy_checks_before_it_stops_anything(self):
+        deploy = (REPO / "ops/staging/forge-deploy.sh").read_text()
+        prepare = deploy.index('step "prepare under one root-held build lease')
+        started = deploy.index("ACTIVATION_STARTED=1", prepare)
+        self.assertLess(deploy.index('"${CTL[@]}" space-check', prepare - 700), prepare)
+        self.assertLess(prepare, started)
+        refresh = deploy.index('"${CTL[@]}" refresh')
+        self.assertLess(deploy.rindex('"${CTL[@]}" space-check', 0, refresh), deploy.rindex("ACTIVATION_STARTED=1", 0, refresh))
+        self.assertLess(deploy.index('"${CTL[@]}" prune'), deploy.index('"${CTL[@]}" backup-prune'))
+
+    def test_the_root_helper_checks_before_its_operation_marker_and_quiesce(self):
+        ctl = (REPO / "ops/staging/bin/vasey-staging-ctl").read_text()
+        for action in ("prepare", "activate", "refresh"):
+            body = ctl[ctl.index(f"cmd_{action}() {{"):]
+            body = body[:body.index("\n}\n")]
+            self.assertLess(body.index("cmd_space_check"), body.index(f"operation_begin {action}"), action)
+        self.assertIn("space-check) cmd_space_check", ctl)
+        self.assertIn("backup-prune) cmd_backup_prune", ctl)
 
 
 @unittest.skipUnless(os.geteuid() == 0, "the script's own preamble refuses to run as another user")

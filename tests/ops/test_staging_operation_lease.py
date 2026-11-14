@@ -39,6 +39,7 @@ class OperationLeaseTest(unittest.TestCase):
         php = self.root / "php-fixture"
         php.write_text('''#!/bin/bash
 if [ "$1" = -r ]; then exit 0; fi
+case "$1" in */ops/staging/validate-runtime.php) exit 0 ;; esac   # activate's revalidation: covered in test_staging_isolated_build
 printf '%s\\n' "$2" >> TRACE_PATH
 if [ "$2" = down ]; then mkdir -p RELEASE_PATH/storage/framework; touch RELEASE_PATH/storage/framework/maintenance.php; fi
 if [ "$2" = install ]; then
@@ -83,6 +84,7 @@ stat() {
   elif [ "$2" = '%u %a' ]; then printf '0 %s\\n' "$(command stat -c %a "$path")";
   else command stat "$@"; fi
 }
+cmd_space_check() { :; }   # covered by test_staging_backup_offhost.SpaceCheck
 cmd_quiesce() { writer_gate_write closed; writer_barrier; echo quiesce >> "$TRACE"; }
 cmd_switch() { echo switch >> "$TRACE"; ln -s "$RELEASES/$1" "$CURRENT"; }
 cmd_resume() { echo resume >> "$TRACE"; writer_gate_write open; }
@@ -95,11 +97,15 @@ cmd_attach() { echo attach >> "$TRACE"; }
         self.control.write_text(self.control.read_text().replace("/etc/vasey-staging", str(self.conf))
                                 .replace("/usr/local/libexec/vasey-staging", str(self.root)))
         backup = self.root / "backup"
-        backup.write_text('#!/bin/bash\necho snapshot >> "$TRACE"\n')
+        # predeploy (the snapshot) and ship-pending-start (the detached off-host shipment) are the only calls ctl makes.
+        backup.write_text('#!/bin/bash\nif [ "${1:-}" = ship-pending-start ]; then\n  echo ship-start >> "$TRACE"\n'
+                          '  [ ! -e "$SHIP_START_FAIL" ] || { echo "synthetic: storage_cap_exceeded" >&2; exit 7; }\n  exit 0\nfi\n'
+                          '[ "${1:-}" = predeploy ] || { echo "unexpected backup call: $*" >&2; exit 9; }\necho snapshot >> "$TRACE"\n')
         backup.chmod(0o755)
         self.environment = {"PATH": "/usr/bin:/bin", "ROOT": str(self.root), "RELEASES": str(self.root / "releases"),
                             "CURRENT": str(self.root / "current"), "RELEASE_STEP": str(self.helper),
-                            "OPERATION_MARKER": str(self.operation), "BACKUP_BIN": str(backup), "TRACE": str(self.trace)}
+                            "OPERATION_MARKER": str(self.operation), "BACKUP_BIN": str(backup), "TRACE": str(self.trace),
+                            "SHIP_START_FAIL": str(self.root / "ship-start-fails")}
         self.environment.update(VASEY_APP_USER=pwd.getpwuid(os.getuid()).pw_name, VASEY_APP_GROUP="fixture-group")
         self.environment.update(VASEY_PHP=str(php), VASEY_PHP_FPM_SERVICE="fixture-fpm")
 
@@ -249,6 +255,62 @@ cmd_attach() { echo attach >> "$TRACE"; }
         finally:
             self.cleanup_process(operation)
             if resume is not None: self.cleanup_process(resume)
+
+    def run_operation(self, *arguments):
+        self.finish.touch()  # the fixture's migration/build child does not wait
+        return subprocess.run(["bash", str(self.control), *arguments], env=self.environment, capture_output=True, text=True, timeout=10)
+
+    def test_the_off_host_shipment_starts_only_after_the_healthy_resume_and_the_marker_is_cleared(self):
+        for operation, arguments in (("activate", ("activate", self.sha, str(self.evidence))),
+                                     ("refresh", ("refresh", self.sha, str(self.root / "candidate.env")))):
+            with self.subTest(operation=operation):
+                self.trace.unlink(missing_ok=True)
+                (self.root / "current").unlink(missing_ok=True)
+                (self.conf / "writer-admission").write_text("closed\n")
+                if operation == "refresh":
+                    (self.root / "current").symlink_to(self.release)
+                    fixture = '\ncmd_configure() { echo configure >> "$TRACE"; }\n'
+                    if fixture not in self.control.read_text():
+                        self.control.write_text(self.control.read_text().replace('# The sudo entry point', fixture + '\n# The sudo entry point'))
+                run = self.run_operation(*arguments)
+                self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+                trace = self.trace.read_text().splitlines()
+                self.assertEqual(trace[0:2], ["quiesce", "snapshot"])
+                self.assertEqual(trace[-2:], ["resume", "ship-start"], trace)
+                self.assertEqual(trace.count("ship-start"), 1)
+                self.assertFalse(self.operation.exists(), "the shipment must start after the recovery marker is cleared")
+
+    def test_a_failing_or_missing_shipment_start_never_fails_the_activation_or_the_refresh(self):
+        (self.root / "ship-start-fails").touch()
+        run = self.run_operation("activate", self.sha, str(self.evidence))
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("WARNING: could not start the off-host shipment", run.stderr)
+        self.assertFalse(self.operation.exists())
+        self.assertEqual(self.trace.read_text().splitlines()[-2:], ["resume", "ship-start"])
+        self.assertEqual((self.conf / "writer-admission").read_text(), "open\n")
+        # Even a helper that disappeared after the snapshot (and would be a hard failure for the snapshot itself).
+        (self.root / "ship-start-fails").unlink()
+        self.operation.unlink(missing_ok=True)
+        self.control.write_text(self.control.read_text().replace(
+            "cmd_snapshot() {", 'cmd_snapshot() { echo snapshot >> "$TRACE"; return 0; }\n_unused_snapshot() {', 1))
+        Path(self.environment["BACKUP_BIN"]).unlink()
+        (self.root / "current").unlink(missing_ok=True)
+        (self.conf / "writer-admission").write_text("closed\n")
+        run = self.run_operation("activate", self.sha, str(self.evidence))
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertIn("WARNING: missing", run.stderr)
+
+    def test_ctl_offers_the_operator_a_shipment_start_and_prepare_never_starts_one(self):
+        run = self.run_operation("ship-pending")
+        self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
+        self.assertEqual(self.trace.read_text().splitlines(), ["ship-start"])
+        self.assertNotEqual(self.run_operation("ship-pending", "extra").returncode, 0)
+        source = self.source.read_text()
+        prepare = source[source.index("cmd_prepare() {"):source.index("cmd_activate() {")]
+        self.assertNotIn("ship", prepare)
+        for name in ("cmd_snapshot", "cmd_quiesce", "cmd_resume"):
+            body = source[source.index(f"{name}() {{"):]
+            self.assertNotIn("start_ship_pending", body[:body.index("\n}\n")], name)
 
     def test_public_stop_and_start_keep_recovery_marker_after_root_parent_death(self):
         (self.root / "current").symlink_to(self.release)

@@ -12,7 +12,7 @@ class StemsArchive
     public function policy(): array
     {
         $policy = ['archive_version' => self::VERSION, 'archive_max_duration_seconds' => max(1, min(1200, (int) config('media.max_duration_seconds')))];
-        foreach (['entries' => 128, 'member_bytes' => 134217728, 'total_bytes' => 536870912, 'ratio' => 100, 'seconds' => 360] as $key => $ceiling) {
+        foreach (['entries' => 128, 'member_bytes' => 134217728, 'total_bytes' => 804257792, 'ratio' => 100, 'seconds' => 360] as $key => $ceiling) {
             $policy['archive_max_'.$key] = max(1, min($ceiling, (int) config('media.stems.max_'.$key, $ceiling)));
         }
 

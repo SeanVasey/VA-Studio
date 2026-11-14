@@ -53,6 +53,16 @@ return [
             'lock_path' => storage_path('framework/cache/data'),
         ],
 
+        // MediaIntegrity's mismatch records only. A file store is outside every database connection, so a record written while a
+        // caller's transaction is open (checkout runs readiness inside one) survives that transaction's rollback. Never the default store.
+        'media-integrity' => [
+            'driver' => 'file',
+            'path' => storage_path('framework/cache/media-integrity'),
+            'lock_path' => storage_path('framework/cache/media-integrity'),
+            // No 'permission' here: Laravel's file store applies it to the hash subdirectories too, and a directory without
+            // its execute bit cannot be entered by a non-root PHP user (php-fpm as forge), so no record could ever be written.
+        ],
+
         'storage' => [
             'driver' => 'storage',
             'disk' => env('CACHE_STORAGE_DISK'),

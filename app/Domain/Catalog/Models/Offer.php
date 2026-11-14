@@ -3,6 +3,7 @@
 namespace App\Domain\Catalog\Models;
 
 use App\Domain\Rights\Models\LicenseVersion;
+use App\Domain\Rights\SoundKitLicenseAttachment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -43,6 +44,10 @@ class Offer extends Model
             $price = $offer->getAttributes()['price_minor'] ?? null;
             if ((! is_int($price) && (! is_string($price) || ! preg_match('/\A[0-9]+\z/D', $price))) || $price < 0 || $price > 2147483647 || ! preg_match('/\A[A-Z]{3}\z/D', $offer->currency ?? '')) {
                 throw ValidationException::withMessages(['price_minor' => 'Use integer minor units from 0 to 2147483647 and a three-letter ISO currency.']);
+            }
+            if (! $offer->exists || $offer->isDirty('license_version_id')) {
+                // Defense in depth: no write path may put a sound-kit license on a beat offer.
+                SoundKitLicenseAttachment::assertBeatOfferable(LicenseVersion::query()->with('template')->find($offer->license_version_id));
             }
             if ($offer->exists && $offer->isDirty('track_id')) {
                 throw ValidationException::withMessages(['track_id' => 'An offer belongs to one track. Create a new offer to change the track.']);

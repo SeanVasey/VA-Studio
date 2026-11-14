@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Domain\Commerce\Checkout\CheckoutPaymentMethods;
 use App\Domain\Commerce\Payments\StripeSdkCheckoutGateway;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\DB;
@@ -75,6 +76,18 @@ class StripeCheckoutGatewayTest extends TestCase
         $this->assertSame($this->previousTransport, ApiRequestor::httpClient());
         $this->assertSame('2000-01-01', Stripe::$apiVersion);
         $this->assertSame(9, Stripe::$maxNetworkRetries);
+    }
+
+    public function test_create_sends_the_requested_payment_method_types_so_the_dashboard_defaults_never_apply(): void
+    {
+        $http = new CheckoutHttpFixture([$this->account(), $this->providerSessionFixture()]);
+        $params = ['mode' => 'payment', 'payment_method_types' => CheckoutPaymentMethods::offered(), 'expand' => ['line_items']];
+
+        (new StripeSdkCheckoutGateway($http))->create($params, 'order:synthetic-methods-v1');
+
+        $create = $http->requests[1];
+        $this->assertSame('https://api.stripe.com/v1/checkout/sessions', $create['url']);
+        $this->assertSame(['card', 'link'], $create['params']['payment_method_types']);
     }
 
     public function test_account_reads_the_credential_owner_and_returns_only_identity(): void

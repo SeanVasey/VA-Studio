@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page, type Response } from '@playwright/test';
+import { modalReady } from './modal-ready';
 
 export const row = (page: Page, title: string) => page.getByRole('row').filter({ has: page.getByText(title, { exact: true }) });
 
@@ -41,6 +42,9 @@ export async function expectModalFits(page: Page, dialog: Locator) {
 
 export async function closeDialog(page: Page, dialog: Locator, label: 'Cancel' | 'Close') {
   const close = dialog.locator('.fi-modal-footer').getByRole('button', { name: label, exact: true });
+  // Let the modal's focus trap take focus first; a focus() that lands before it is moved off the button
+  // (Foundation 43566257853, webkit-mobile, after reading the Edit dialog straight after it opened).
+  await modalReady(dialog);
   await close.focus();
   await expect(close).toBeFocused();
   const [closed] = await Promise.all([actionResponse(page, 'unmountAction'), close.press('Enter')]);

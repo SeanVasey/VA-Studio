@@ -13,6 +13,7 @@ from collections import Counter
 from datetime import datetime, timezone
 import hashlib
 import io
+import ipaddress
 import json
 import math
 import os
@@ -54,7 +55,7 @@ POLICY_FILES = (
     "composer.json", "composer.lock", "package.json", "package-lock.json",
     "scripts/ci/phpunit-timings-mysql.json", "scripts/ci/phpunit-timings-sqlite.json",
 )
-COUNTS = {"mysql": 24, "sqlite": 2}
+COUNTS = {"mysql": 24, "sqlite": 6}
 SQLITE_SKIP_POLICY = "scripts/ci/database-sqlite-skips.json"
 SELECTION_POLICY = "scripts/ci/database-mysql-selection.json"
 MYSQL_SKIP_POLICY = "scripts/ci/database-mysql-skips.json"
@@ -216,12 +217,36 @@ def validate_discovered_files(root: Path, files: set[str]) -> None:
             "Discovered tests include an untracked or non-ordinary source file")
 
 
+def private_ipv4(value: object) -> bool:
+    """A loopback or private IPv4 literal: the job's own service container, never a name or a public host."""
+    if not isinstance(value, str):
+        return False
+    try:
+        address = ipaddress.ip_address(value)
+    except ValueError:
+        return False
+    return (address.version == 4 and str(address) == value and not address.is_unspecified
+            and not address.is_link_local and (address.is_loopback or address.is_private))
+
+
+def service_address(root: Path, container: str) -> str:
+    """The MySQL service container's single IPv4 bridge address.
+
+    The identity catalog admission binds each session to its exact TCP 4-tuple, which the published port's NAT
+    rewrites, so the job reaches the container directly and DB_HOST must be exactly this address.
+    """
+    output = run(root, ["docker", "inspect", "--format={{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}", container],
+                 "MySQL service address").decode().split()
+    require(len(output) == 1 and private_ipv4(output[0]), "The MySQL service must have exactly one private IPv4 address")
+    return output[0]
+
+
 def validate_test_environment(engine: str, env: dict) -> None:
     require(env.get("APP_ENV") == "testing" and env.get("DB_CONNECTION") == engine
             and env.get("DB_URL", "") == env.get("DB_SOCKET", "") == "",
             "Explicit synthetic testing database required")
     if engine == "mysql":
-        require(env.get("DB_HOST") == "127.0.0.1" and str(env.get("DB_PORT")) == "3306"
+        require(private_ipv4(env.get("DB_HOST")) and str(env.get("DB_PORT")) == "3306"
                 and env.get("DB_DATABASE") == "vaseyaudio_test", "Unexpected synthetic MySQL target")
     else:
         require(engine == "sqlite" and env.get("DB_DATABASE") == ":memory:", "Only synthetic in-memory SQLite supported")
@@ -246,11 +271,12 @@ echo json_encode(['version'=>PHP_VERSION,'integer_size'=>PHP_INT_SIZE,'memory_li
         tools[name] = {"binary_sha256": digest(Path(path).resolve().read_bytes()), "version_output_sha256": digest(output)}
     if engine == "mysql":
         require(env.get("DB_CONNECTION") == "mysql", "MySQL receipt uses the wrong configured driver")
+        container = env.get("MYSQL_CONTAINER_ID", "")
+        require(re.fullmatch(r"[0-9a-f]{12,64}", container) is not None, "Missing MySQL service identity")
+        require(service_address(root, container) == env.get("DB_HOST"), "DB_HOST is not the job's MySQL service container")
         probe = r'''$p=new PDO('mysql:host='.getenv('DB_HOST').';port='.getenv('DB_PORT').';dbname='.getenv('DB_DATABASE'),getenv('DB_USERNAME'),getenv('DB_PASSWORD'),[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
 $r=$p->query("SELECT @@version AS version, @@version_comment AS version_comment, @@sql_mode AS sql_mode, @@character_set_server AS character_set_server, @@collation_server AS collation_server, @@transaction_isolation AS transaction_isolation, @@default_storage_engine AS default_storage_engine, @@lower_case_table_names AS lower_case_table_names, @@innodb_strict_mode AS innodb_strict_mode, @@performance_schema AS performance_schema")->fetch(PDO::FETCH_ASSOC); echo json_encode($r,JSON_THROW_ON_ERROR);'''
         database = json_data(run(root, ["php", "-r", probe], "MySQL settings"))
-        container = env.get("MYSQL_CONTAINER_ID", "")
-        require(re.fullmatch(r"[0-9a-f]{12,64}", container) is not None, "Missing MySQL service identity")
         image_id = run(root, ["docker", "inspect", "--format={{.Image}}", container], "MySQL image identity").decode().strip()
         require(re.fullmatch(r"sha256:[0-9a-f]{64}", image_id) is not None, "Invalid MySQL image identity")
         database["container_image_id"] = image_id

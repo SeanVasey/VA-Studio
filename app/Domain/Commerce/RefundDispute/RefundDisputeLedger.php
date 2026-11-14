@@ -41,8 +41,8 @@ final class RefundDisputeLedger
         RefundDisputeAuthority::request($requestId, $expectedSequence);
         $authority = app(RefundDisputeAuthority::class);
         $claim = $this->safe(fn (): array => DB::transaction(function () use ($authority, $orderPublicId, $actor, $requestId, $expectedSequence): array {
-            [$current, $order, $finalization, , $work, $policy] = $authority->lock($orderPublicId, $actor);
-            $existing = RefundDisputeObservation::where('order_id', $order->id)->where('request_id', $requestId)->lockForUpdate()->first();
+            [$current, $order, $finalization, $original, $work, $policy] = $authority->lock($orderPublicId, $actor);
+            $existing = RefundDisputeObservation::forOrder($order)->where('request_id', $requestId)->lockForUpdate()->first();
             if ($existing !== null) {
                 RefundDisputeException::require($existing->actor_id === $current->id, 'conflict');
 
@@ -57,6 +57,12 @@ final class RefundDisputeLedger
             $token = (string) Str::uuid();
             $work->fill(['request_id' => $requestId, 'claim_token' => $token,
                 'lease_expires_at' => $now->addSeconds(self::LEASE_SECONDS)->utc(), 'updated_at' => $now->utc()->startOfSecond()])->save();
+            if ($finalization === null) {
+                // Production tax chain: the PaymentIntent and gross total are the retained, proven batch facts.
+                return ['token' => $token, 'policy_hash' => RefundDisputePolicy::hash($policy), 'intent_id' => null,
+                    'payment_id' => $original['provider_payment_id'], 'payment_row' => $original['batch_id'], 'actor_id' => $current->id,
+                    'expected' => app(ProductionTaxOrders::class)->expectation($original)];
+            }
             $payment = $finalization->payment;
 
             return ['token' => $token, 'policy_hash' => RefundDisputePolicy::hash($policy), 'intent_id' => $payment->checkout_intent_id,
@@ -77,9 +83,14 @@ final class RefundDisputeLedger
                 || RefundDisputePolicy::hash($policy) !== $claim['policy_hash'] || $now->lessThan($observedAt)) {
                 return ['testOnly' => true, 'status' => 'stale', 'sequence' => $work->sequence];
             }
-            RefundDisputeException::require($finalization->payment->id === $claim['payment_row']
-                && $finalization->payment->provider_payment_intent_id === $claim['payment_id'], 'unavailable');
-            $case = RefundDisputeCase::load($order, $finalization, $original);
+            if ($finalization === null) {
+                RefundDisputeException::require($original['batch_id'] === $claim['payment_row'] && $original['provider_payment_id'] === $claim['payment_id'], 'unavailable');
+                $case = RefundDisputeCase::loadProductionTax($order, $original);
+            } else {
+                RefundDisputeException::require($finalization->payment->id === $claim['payment_row']
+                    && $finalization->payment->provider_payment_intent_id === $claim['payment_id'], 'unavailable');
+                $case = RefundDisputeCase::load($order, $finalization, $original);
+            }
             $sequence = $work->sequence + 1;
             $objects = $financial === null ? null : $this->normalize($financial);
             $evaluation = $objects === null ? null : RefundDisputeState::evaluate($case->paidMinor, $case->currency, $case->snapshot, $objects);
@@ -89,12 +100,12 @@ final class RefundDisputeLedger
             $accepted = $evaluation !== null && $evaluation['valid'] && $outcome === 'observed';
             $publicId = (string) Str::uuid();
             $policyHash = RefundDisputePolicy::hash($policy);
-            $payload = ['schema_version' => 1, 'purpose' => 'test_refund_dispute_observation', 'order_id' => $order->public_id,
+            $payload = ['schema_version' => 1, 'purpose' => RefundDisputeCase::observationPurpose($order), 'order_id' => $order->public_id,
                 'observation_id' => $publicId, 'request_id' => $requestId, 'sequence' => $sequence, 'outcome' => $outcome,
                 'policy_hash' => $policyHash, 'policy' => $policy, 'observed_at' => $observedAt->toIso8601ZuluString(),
                 'objects' => $accepted ? $objects : [], 'evaluation' => $evaluation, 'financial' => $financial];
             [$ciphertext, $hash] = app(CheckoutEvidence::class)->encrypt($payload);
-            $observation = RefundDisputeObservation::create(['public_id' => $publicId, 'order_id' => $order->id, 'actor_id' => $current->id,
+            $observation = RefundDisputeObservation::create(['public_id' => $publicId, 'order_id' => $order->id, 'order_source' => $case->source(), 'actor_id' => $current->id,
                 'request_id' => $requestId, 'sequence' => $sequence, 'outcome' => $outcome,
                 'refund_state' => $accepted ? $evaluation['refund_state'] : null, 'dispute_state' => $accepted ? $evaluation['dispute_state'] : null,
                 'paid_minor' => $case->paidMinor, 'currency' => $case->currency,
@@ -102,12 +113,13 @@ final class RefundDisputeLedger
                 'policy_hash' => $policyHash, 'evidence_ciphertext' => $ciphertext, 'evidence_hash' => $hash,
                 'canonicalization_version' => CanonicalJson::VERSION, 'observed_at' => $observedAt, 'created_at' => $observedAt]);
             AuditEvent::recordAttributed('commerce.refund_dispute.observed', $order, ['order_public_id' => $order->public_id,
-                'observation_public_id' => $publicId, 'sequence' => $sequence, 'outcome' => $outcome, 'test_only' => true], $current->id);
+                'observation_public_id' => $publicId, 'sequence' => $sequence, 'outcome' => $outcome, 'test_only' => true,
+                'chain' => $case->source()], $current->id);
             $effects = app(RefundDisputeEffects::class);
             if ($accepted) {
                 foreach ($objects as $object) {
                     $row = $case->objects[$object['kind'].':'.$object['hash']] ?? RefundDisputeObject::create([
-                        'public_id' => (string) Str::uuid(), 'order_id' => $order->id, 'kind' => $object['kind'], 'object_hash' => $object['hash'],
+                        'public_id' => (string) Str::uuid(), 'order_id' => $order->id, 'order_source' => $case->source(), 'kind' => $object['kind'], 'object_hash' => $object['hash'],
                         'amount_minor' => $object['amount'], 'currency' => $object['currency'], 'first_observation_id' => $observation->id,
                         'created_at' => $observedAt]);
                     if (! RefundDisputeStatus::where('refund_dispute_object_id', $row->id)->where('status', $object['status'])->lockForUpdate()->exists()) {
@@ -131,19 +143,30 @@ final class RefundDisputeLedger
     /** Current sequence and history for staff review. Reads only; no locks, provider call or write. */
     public function review(string $orderPublicId, ?User $actor): array
     {
-        app(RefundDisputeAuthority::class)->staff($actor);
+        $authority = app(RefundDisputeAuthority::class);
+        $authority->staff($actor);
         $policy = app(RefundDisputePolicy::class);
-        [$order] = app(RefundDisputeAuthority::class)->paidOrder($orderPublicId, $policy->account());
-        $work = RefundDisputeWork::where('order_id', $order->id)->first();
+        [$source, $batch] = $authority->resolve($orderPublicId);
+        if ($source === RefundDisputeSource::PRODUCTION_TAX) {
+            $account = $policy->productionAccount();
+            RefundDisputeException::require($batch->funds_mode === 'test' && hash_equals($account, $batch->provider_account), 'not_found');
+            $order = $batch;
+        } else {
+            [$order] = $authority->paidOrder($orderPublicId, $policy->account());
+        }
+        $work = RefundDisputeWork::forOrder($order)->first();
 
         return ['testOnly' => true, 'sequence' => $work?->sequence ?? 0,
-            'history' => RefundDisputeObservation::where('order_id', $order->id)->orderByDesc('sequence')->limit(20)->get()
+            'history' => RefundDisputeObservation::forOrder($order)->orderByDesc('sequence')->limit(20)->get()
                 ->map(fn (RefundDisputeObservation $row): array => $this->project($row, false))->all()];
     }
 
     /** @return array{0: string, 1: ?array} outcome and the validated financial observation when one was captured */
     private function retrieve(array $claim): array
     {
+        if ($claim['intent_id'] === null) {
+            return $this->retrieveProductionTax($claim);
+        }
         try {
             $intent = CheckoutIntent::findOrFail($claim['intent_id']);
             $inspection = app(VerifyTestPayment::class)->inspect($intent->session()->sole()->provider_session_id, $intent);
@@ -168,8 +191,28 @@ final class RefundDisputeLedger
         }
     }
 
+    /**
+     * Production tax chain: the same authenticated own-account GET path, bound to the retained account, PaymentIntent and gross total
+     * of the finalized batch. There is no checkout-session inspection here; the batch already carries the reconciled payment.
+     *
+     * @return array{0: string, 1: ?array}
+     */
+    private function retrieveProductionTax(array $claim): array
+    {
+        try {
+            $financial = app(PaymentFinancialEvidence::class)->capture(
+                app(StripeFinancialInspectionGateway::class)->financialState($claim['payment_id']), $claim['expected']);
+
+            return ['observed', $financial];
+        } catch (PaymentVerificationException $error) {
+            return [$error->reason === 'financial_incomplete' ? 'incomplete' : ($error->reason === 'financial_attention' ? 'attention' : 'unavailable'), null];
+        } catch (Throwable) {
+            return ['unavailable', null];
+        }
+    }
+
     /** Provider identifiers become hashes; only kind, amount, currency and status take part in the state machine. */
-    private function normalize(array $financial): array
+    public function normalize(array $financial): array
     {
         $objects = [];
         foreach (['refund' => 'refunds', 'dispute' => 'disputes'] as $kind => $list) {

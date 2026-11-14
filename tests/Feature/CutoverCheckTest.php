@@ -647,7 +647,7 @@ class CutoverCheckTest extends TestCase
             $this->assertSame(Checks::INFO, $rows['PCL-21']['status']);
             $this->assertStringContainsString('all four pre-launch holds read false', $rows['PCL-21']['checked'][0]);
             $this->assertSame(Checks::INFO, $rows['PCL-24']['status']);
-            $this->assertMatchesRegularExpression('/enabled reads false; map rows: retained=5, unresolved=15\z/', $rows['PCL-24']['checked'][0]);
+            $this->assertMatchesRegularExpression('/enabled reads false; map rows: redirect=6, retained=7, unresolved=7\z/', $rows['PCL-24']['checked'][0]);
             $this->assertSame(Checks::INFO, $rows['PCL-26']['status']);
             $this->assertStringContainsString('reads false', $rows['PCL-26']['checked'][0]);
             $this->assertStringContainsString('0 of 6 customer-facing switches not false', $rows['PCL-25']['checked'][0]);
@@ -700,7 +700,7 @@ class CutoverCheckTest extends TestCase
     {
         $rows = $this->check()['rows'];
         $manual = array_keys(array_filter(Checks::LEDGER, fn (array $entry): bool => $entry['check'] === null));
-        $this->assertSame(['PCL-04', 'PCL-15', 'PCL-17', 'PCL-27', 'PCL-28', 'PCL-29'], $manual);
+        $this->assertSame(['PCL-04', 'PCL-15', 'PCL-17', 'PCL-27', 'PCL-28', 'PCL-29', 'PCL-31'], $manual);
         foreach ($manual as $id) {
             $this->assertSame(Checks::NOT_CHECKABLE, $rows[$id]['status']);
             $this->assertSame([], $rows[$id]['checked']);
@@ -713,6 +713,31 @@ class CutoverCheckTest extends TestCase
             }
         }
         $this->assertSame(array_keys(Checks::LEDGER), array_keys($rows));
+    }
+
+    public function test_pcl_31_carries_the_sq_17_window_rto_and_rollback_thresholds_exactly(): void
+    {
+        $manual = $this->check()['rows']['PCL-31']['manual'];
+        foreach ([
+            'every exclusive offer on BeatStars',
+            '72 hours before cutover',
+            'an owner action on BeatStars',
+            'nothing in this repository touches it',
+            'recovery time objective is 4 hours',
+            'recovery point 24 hours',
+            'checkout error rate above 5% over 30 minutes',
+            'undelivered for more than 1 hour',
+            'webhook signature failures sustained for 15 minutes',
+            'HTTP 5xx above 2% over 15 minutes',
+            'any data-integrity alarm',
+        ] as $phrase) {
+            $this->assertStringContainsString($phrase, $manual);
+        }
+        // DD-59's superseded 8-hour RTO must not reappear.
+        $this->assertDoesNotMatchRegularExpression('/\\b8[- ]hours?\\b/', $manual);
+        $this->assertSame([], $this->check()['rows']['PCL-31']['checked']);
+        Artisan::call('vasey:cutover-check', ['--expect' => Checks::PRODUCTION]);
+        $this->assertMatchesRegularExpression('/^PCL-31 NOT_CHECKABLE Cutover window and rollback terms \(SQ-17\)\n\s+by hand: Sean switched off/m', Artisan::output());
     }
 
     // ---- output, exit codes, read-only ----
@@ -754,7 +779,7 @@ class CutoverCheckTest extends TestCase
             $this->assertSame(1, preg_match_all('/^'.preg_quote($id, '/').'\s+(PASS|FAIL|INFO|NOT_CHECKABLE)\s/m', $output), $id);
         }
         $this->assertMatchesRegularExpression('/^PCL-04 NOT_CHECKABLE Publishing details and exclusive disclosures\n\s+by hand: Sean reviews/m', $output);
-        $this->assertMatchesRegularExpression('/^FAIL=\d+ PASS=\d+ INFO=\d+ NOT_CHECKABLE=6$/m', $output);
+        $this->assertMatchesRegularExpression('/^FAIL=\d+ PASS=\d+ INFO=\d+ NOT_CHECKABLE=7$/m', $output);
         $this->assertStringContainsString('Profile: production; APP_ENV: testing (the profile differs from the environment)', $output);
         $this->assertStringContainsString('A clean run closes no ledger entry and authorizes no activation.', $output);
     }

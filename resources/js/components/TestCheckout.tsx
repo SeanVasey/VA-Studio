@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { formatMoney } from '../lib/catalog';
 import { TestOwnerDelivery } from './TestOwnerDelivery';
 import { OrderExceptionResolution } from './OrderExceptionResolution';
@@ -30,9 +30,11 @@ interface CheckoutStatus extends PaymentProgress {
   status: 'not_started' | 'pending' | 'open' | 'complete' | 'expired' | 'reconciliation_required';
   testOnly: true; paymentStatus: 'not_verified' | 'verified';
   url: string | null; expiresAt: string | null; observedAt: string | null;
+  /** Display only; the server decides again under its locks. Absent from older responses. */
+  buyerCancel?: 'available' | 'cancelled' | 'unavailable';
 }
 interface Props { orderId: string; enabled?: boolean; expectedTotalMinor?: number; retainedProgress?: PaymentProgress }
-type Action = 'read' | 'create' | 'reconcile';
+type Action = 'read' | 'create' | 'reconcile' | 'cancel';
 const statuses = ['not_started', 'pending', 'open', 'complete', 'expired', 'reconciliation_required'];
 const timestamp = (value: unknown) => value === null || (typeof value === 'string' && Number.isFinite(Date.parse(value)));
 
@@ -53,7 +55,11 @@ function validStatus(value: unknown, orderId: string, expectedTotalMinor?: numbe
     && Number.isSafeInteger(s.totalMinor) && s.totalMinor >= 0 && (expectedTotalMinor === undefined || s.totalMinor === expectedTotalMinor)
     && timestamp(s.expiresAt) && timestamp(s.observedAt)
     && (s.status === 'not_started' ? s.id === null && s.url === null && s.paymentStatus === 'not_verified' : typeof s.id === 'string' && s.id.length > 0 && s.id.length <= 128)
-    && (s.paymentStatus === 'not_verified' && s.status === 'open' ? stripeUrl(s.url) && s.expiresAt !== null : s.url === null);
+    && (s.paymentStatus === 'not_verified' && s.status === 'open' ? stripeUrl(s.url) && s.expiresAt !== null : s.url === null)
+    && (s.buyerCancel === undefined || ['available', 'cancelled', 'unavailable'].includes(s.buyerCancel))
+    // A cancelled order was never sent to Stripe: no checkout, no payment.
+    && (s.buyerCancel !== 'cancelled' || (s.status === 'not_started' && s.paymentStatus === 'not_verified'))
+    && (s.buyerCancel !== 'available' || s.status === 'not_started');
 }
 
 const descriptions: Record<CheckoutStatus['status'], string> = {
@@ -83,6 +89,22 @@ const rejectionMessages = {
   expired: 'This order’s checkout preparation window has expired. Review your selection again and prepare a new test order.',
 };
 
+/** The status endpoint allows 60 reads a minute per client; one read every 5 s leaves room for manual refreshes. */
+export const POLL_INTERVAL_MS = 5_000;
+export const POLL_MAX_MS = 180_000;
+
+type PollState = 'active' | 'timed_out' | 'error';
+
+/** True while the server is expected to advance the order without buyer action. Terminal states (issued, attention, exception) are not polled. */
+function awaitingServer(status: CheckoutStatus | null, progress: PaymentProgress | undefined): boolean {
+  if (!progress) return false;
+  if (progress.paymentStatus === 'verified') {
+    return progress.finalizationStatus === 'awaiting_finalization'
+      || (progress.finalizationStatus === 'paid' && progress.contractStatus === 'pending');
+  }
+  return status?.status === 'complete';
+}
+
 export function TestCheckout(props: Props) {
   return <Checkout key={`${props.orderId}:${props.expectedTotalMinor ?? ''}`} {...props} />;
 }
@@ -94,19 +116,24 @@ function Checkout({ orderId, enabled = false, expectedTotalMinor, retainedProgre
   const [uncertain, setUncertain] = useState<Exclude<Action, 'read'> | null>(null);
   const [rejected, setRejected] = useState<keyof typeof rejectionMessages | null>(null);
   const [expired, setExpired] = useState(false);
+  const [pollState, setPollState] = useState<PollState>('active');
   const active = useRef(false);
+  const pollStartedAt = useRef<number | null>(null);
+  const cancelledHeading = useRef<HTMLParagraphElement>(null);
   const inFlight = useRef(false);
   const progress = status ?? retainedProgress;
   const verified = progress?.paymentStatus === 'verified';
 
-  async function request(action: Action) {
+  async function request(action: Action): Promise<boolean | undefined> {
     if (inFlight.current || (action !== 'read' && verified)) return;
     if (action === 'create' && rejected) return;
     if (action === 'create' && status?.status === 'not_started' && !enabled && uncertain !== 'create') return;
+    if (action === 'cancel' && status?.buyerCancel !== 'available') return;
     inFlight.current = true; setBusy(true); setMessage('');
     try {
       const csrf = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content;
-      const endpoint = `/orders/${encodeURIComponent(orderId)}/checkout${action === 'reconcile' ? '/reconcile' : ''}`;
+      const endpoint = action === 'cancel' ? `/orders/${encodeURIComponent(orderId)}/cancel`
+        : `/orders/${encodeURIComponent(orderId)}/checkout${action === 'reconcile' ? '/reconcile' : ''}`;
       const response = await fetch(endpoint, { method: action === 'read' ? 'GET' : 'POST', credentials: 'same-origin', cache: 'no-store',
         headers: { Accept: 'application/json', ...(action === 'read' ? {} : { 'Content-Type': 'application/json', ...(csrf ? { 'X-CSRF-TOKEN': csrf } : {}) }) },
         ...(action === 'read' ? {} : { body: '{}' }),
@@ -118,13 +145,14 @@ function Checkout({ orderId, enabled = false, expectedTotalMinor, retainedProgre
         const code = failure && typeof failure === 'object' && 'code' in failure ? failure.code : null;
         const rejection = response.status === 409 && code === 'CHECKOUT_UNSUPPORTED' ? 'unsupported'
           : response.status === 410 && code === 'CHECKOUT_EXPIRED' ? 'expired' : null;
-        if (rejection && !verified) { setRejected(rejection); setUncertain(null); setMessage(rejectionMessages[rejection]); return; }
+        if (rejection && !verified) { setRejected(rejection); setUncertain(null); setMessage(rejectionMessages[rejection]); return false; }
         throw new Error('Checkout status unavailable');
       }
       const body = await response.json();
       if (!active.current) return;
       if (!validStatus(body?.checkout, orderId, expectedTotalMinor)) throw new Error('Invalid checkout status');
       const next: CheckoutStatus = body.checkout;
+      if (action === 'cancel' && next.buyerCancel !== 'cancelled') throw new Error('Cancellation unconfirmed');
       // A later unavailable or stale response cannot reopen payment after retained verification.
       if (verified && (next.paymentStatus !== 'verified'
         || (progress.finalizationStatus !== 'awaiting_finalization' && next.finalizationStatus !== progress.finalizationStatus)
@@ -134,17 +162,27 @@ function Checkout({ orderId, enabled = false, expectedTotalMinor, retainedProgre
       setStatus(next); setUncertain(null);
       if (rejected && body.checkout.status === 'not_started') setMessage(rejectionMessages[rejected]);
       else setRejected(null);
+      return true;
     } catch {
       if (!active.current) return;
+      if (action === 'cancel') {
+        setMessage('The cancellation could not be confirmed. Reload the checkout status to see whether this order is still open.');
+        return false;
+      }
       if (action !== 'read') setUncertain(action);
       setMessage(verified ? 'The latest test order status could not be loaded. The previously verified test payment remains recorded. Refresh its status again.' : action === 'read'
         ? 'The Stripe test checkout status could not be loaded. No payment or fulfillment is confirmed.'
         : 'The Stripe test checkout result is unconfirmed. Retry the same operation or reload its saved status. No payment or fulfillment is confirmed.');
+      return false;
     } finally {
       inFlight.current = false;
       if (active.current) setBusy(false);
     }
   }
+
+  // Timers outlive the render that started them; they call the latest request so its payment-regression guard sees current progress.
+  const latestRequest = useRef(request);
+  latestRequest.current = request;
 
   useEffect(() => {
     active.current = true;
@@ -161,9 +199,41 @@ function Checkout({ orderId, enabled = false, expectedTotalMinor, retainedProgre
     return () => window.clearTimeout(timer);
   }, [status]);
 
+  const watching = awaitingServer(status, progress);
+  const polling = pollState === 'active' && watching;
+  // Bounded automatic refresh through the same read-only endpoint; it stops on an error, on a settled order and after POLL_MAX_MS.
+  useEffect(() => {
+    if (!polling) return;
+    pollStartedAt.current ??= Date.now();
+    const timer = window.setInterval(() => {
+      if (Date.now() - (pollStartedAt.current ?? Date.now()) >= POLL_MAX_MS) { setPollState('timed_out'); return; }
+      void latestRequest.current('read').then(ok => { if (ok === false && active.current) setPollState('error'); });
+    }, POLL_INTERVAL_MS);
+    return () => window.clearInterval(timer);
+  // The interval reads the request through latestRequest, so it never holds a stale closure; the keyed component fixes the order identity.
+  }, [polling]);
+
   // URLs stay only in this component's memory and disappear while an observation is uncertain or expired.
   const link = !verified && status?.status === 'open' && status.url && !busy && !message && !uncertain && !rejected && !expired && Date.parse(status.expiresAt!) > Date.now() ? status.url : null;
   const retry = !verified && !rejected && (uncertain === 'create' || status?.status === 'pending');
+  const cancelled = !verified && status?.buyerCancel === 'cancelled';
+  // A refused start (expired window, unsupported order) still leaves a never-sent order cancellable: that is when the buyer needs it
+  // most. Eligibility is the server's answer; the cancel itself decides again under its locks.
+  const cancellable = !verified && !cancelled && status?.status === 'not_started' && status.buyerCancel === 'available' && !uncertain;
+  async function cancelOrder(): Promise<boolean> {
+    const ok = await request('cancel');
+    // Move focus to the new state so keyboard and screen reader users land on the result, not on a removed button.
+    if (ok) window.setTimeout(() => cancelledHeading.current?.focus(), 0);
+    return ok === true;
+  }
+  if (cancelled) {
+    return <section className="quote-review" aria-label="Stripe test checkout">
+      <h3>TEST ORDER CANCELLED</h3>
+      <p role="status" tabIndex={-1} ref={cancelledHeading}>You cancelled this test order. It was never sent to Stripe and can no longer be paid. Its reserved items are free again.</p>
+      <p>Test order total: {formatMoney(status.totalMinor, status.currency)} {status.currency}</p>
+      <a className="button full-width" href="/">Back to the catalog</a>
+    </section>;
+  }
   return <><section className="quote-review" aria-label="Stripe test checkout" aria-busy={busy}>
     <h3>STRIPE TEST CHECKOUT</h3>
     <p className="checkout-advisory">{verified ? 'Test mode only. This status does not make contracts or downloads available.' : 'Test mode only. This page does not verify payment, issue a license or grant download access.'}</p>
@@ -174,6 +244,9 @@ function Checkout({ orderId, enabled = false, expectedTotalMinor, retainedProgre
       {status.observedAt && <p className="fine-print">Last observed: <time dateTime={status.observedAt}>{new Date(status.observedAt).toLocaleString()}</time>.</p>}
     </>}
     {message && <p role="alert">{message}</p>}
+    {watching && <p className="fine-print" aria-live="polite" data-testid="checkout-auto-refresh">{polling ? 'Checking for updates automatically. This page refreshes about every 5 seconds for up to 3 minutes.'
+      : pollState === 'timed_out' ? 'Automatic checking has stopped after 3 minutes. Use the refresh button to check again.'
+        : 'Automatic checking has stopped because the status could not be loaded. Use the refresh button to check again.'}</p>}
     {link && <a className="button full-width" href={link} rel="noreferrer noopener" referrerPolicy="no-referrer">Continue to Stripe test checkout</a>}
     {!verified && status?.status === 'not_started' && enabled && !uncertain && !rejected && <button type="button" className="button full-width" disabled={busy} onClick={() => void request('create')}>Open Stripe test checkout</button>}
     {retry && <button type="button" className="button button-outline full-width" disabled={busy} onClick={() => void request('create')}>Retry Stripe test checkout</button>}
@@ -182,8 +255,27 @@ function Checkout({ orderId, enabled = false, expectedTotalMinor, retainedProgre
     {verified && <button type="button" className="button button-outline full-width" disabled={busy} onClick={() => void request('read')}>Refresh test order status</button>}
     {!verified && (!status || message) && <button type="button" className="button button-outline full-width" disabled={busy} onClick={() => void request('read')}>{busy && !status ? 'Loading checkout status…' : 'Reload checkout status'}</button>}
     {!verified && status?.status === 'not_started' && !enabled && !uncertain && <p className="fine-print">Starting a new Stripe test checkout is currently unavailable.</p>}
+    {cancellable && <CancelOrder busy={busy} onConfirm={cancelOrder} />}
   </section>
     {verified && progress.finalizationStatus === 'paid_exception' && <OrderExceptionResolution orderId={orderId} />}
     {verified && progress.finalizationStatus === 'paid' && progress.contractStatus === 'issued' && <TestOwnerDelivery orderId={orderId} />}
   </>;
+}
+
+/** Two-step, keyboard-reachable cancel: the confirm step takes focus and "Keep this order" returns it to the first button. */
+function CancelOrder({ busy, onConfirm }: { busy: boolean; onConfirm: () => Promise<boolean> }) {
+  const [confirming, setConfirming] = useState(false);
+  const opener = useRef<HTMLButtonElement>(null);
+  const keep = useRef<HTMLButtonElement>(null);
+  const descriptionId = useId();
+  useEffect(() => { if (confirming) keep.current?.focus(); }, [confirming]);
+  if (!confirming) {
+    return <button type="button" ref={opener} className="button button-outline full-width" disabled={busy} onClick={() => setConfirming(true)}>Cancel this order</button>;
+  }
+  return <div role="group" aria-label="Confirm cancelling this test order" aria-describedby={descriptionId}>
+    <p id={descriptionId}>Cancel this test order? It has not been sent to Stripe. Cancelling frees its reserved items for other buyers and cannot be undone.</p>
+    <button type="button" className="button full-width" disabled={busy} onClick={() => void onConfirm().then(ok => { if (!ok) setConfirming(false); })}>Yes, cancel this order</button>
+    <button type="button" ref={keep} className="button button-outline full-width" disabled={busy}
+      onClick={() => { setConfirming(false); window.setTimeout(() => opener.current?.focus(), 0); }}>Keep this order</button>
+  </div>;
 }

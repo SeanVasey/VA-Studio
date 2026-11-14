@@ -376,6 +376,12 @@ each table to an existing §7 row and add two rows where §7 had none.
 The test-delivery chain is phase 1. Paid, paid-tax, free and production-free follow in their own phases, each with native
 MySQL race evidence and independent review. #252 and #253 are closed as superseded.
 
+*Addendum, 2026-11-09 (delegated; from the independent review of #258, P2-1).* Count-on-complete per authorization can be
+split across authorizations (A serves `0..N-2`, B serves `-1`). Decided 2026-11-09, delegated by Sean: from Phase 2
+(where `max_downloads` applies), a download counts once when the grant's union coverage across its authorizations in a
+rolling 24 h window reaches 90% of the file (which includes any single authorization reaching 90%); each window counts at
+most once. Phase 1 test delivery has no `max_downloads` and keeps count-on-complete. Phase 2 implements this.
+
 **Unpaid order snapshots (retention).** An order snapshot is created before payment. One with no verified payment,
 whose provider session has expired or been cancelled and reconciled, counts as "did not become an order": it falls under
 the 30-day abandoned-checkout row from that point. Any paid, refunded, disputed or held order stays with the orders row.
@@ -418,6 +424,10 @@ Still Sean's, not delegable:
   `docs/verification/member-source-currentness-20261013/` and not from the shipped `composer.lock`;
 - the staging step 11 inputs;
 - every live-payment, DNS, production and customer-import authorization.
+
+## D-20 amendment — 2026-11-09: resumable test delivery (FP-077)
+
+The decision is the "Large-download resume (FP-077)" item of the register update above; this entry records only how it amends D-20 and D-19. D-20 rejected token-bearing GET links because a secret in a URL leaks through history, logs and referrers. That rule stands: under `test-owner-delivery-v2` the token is still presented once in the CSRF-protected POST body, which answers 303 to a GET whose URL holds only the opaque authorization ID and which works only in the server-side session that created the authorization (a random session secret hash-bound into its evidence). JavaScript blob downloads stay excluded. D-19's "one committed stream attempt" holds for v1 only; a v2 authorization counts one download when served bytes cover the file. Phase 1 (test-delivery chain) and the remaining phases: [delivery-range-requests.md](../delivery-range-requests.md).
 
 ## Register update — 2026-11-10: delegated decisions and staging placeholders
 
@@ -499,7 +509,7 @@ recorded it, so the move is visibly a 2026-11-10 decision and is undone by resto
 | DD-23 | Publishing details (PRO, IPI, designee) and per-track exclusive disclosures | C | Sean's own facts, given to a licensee on request and entered per track by him. Never committed. PCL-04. |
 | DD-24 | Free downloads (FP-055) | A + B + C | **A:** free downloads are in v1, delivered untagged as built. **B:** no template of the six is a free license, so staging uses the LICENSE-TIERS section 5.1 draft marked `STAGING PLACEHOLDER`; the production text needs Sean's approval. PCL-05. **C:** lifting `VASEY_OPERATIVE_FREE_GRANTS_ENABLED` is a live activation. |
 | DD-25 | Contract renderer and archival standard (U-06) | A | Closed as built: the pinned offline TCPDF profile `vasey-license-pdf-v2`, the original PDF kept byte-exact with its SHA-256. PDF/A is not claimed at v1. |
-| DD-26 | Held tc-lib updates (#162, #164) | A | Not merged before launch. The contract profiles pin those bytes; `composer audit` remains the security gate. An update after activation ships as a successor profile with its own golden. |
+| DD-26 | Held tc-lib updates (#162, #164) | A | **Superseded 2026-11-10 by Sean (SQ-14):** taken now, before contract activation, so the existing profiles are re-pinned (tc-lib-pdf 8.81.1, tc-lib-pdf-font 4.6.2; again on 2026-11-14 to 8.84.0 and 4.8.0, Dependabot #379/#380, still before activation). Originally: not merged before launch. After activation any renderer change ships as a successor profile with its own golden; `composer audit` remains the security gate. |
 | DD-27 | Licensor signature image | B + C | **B:** staging renders with a specimen image that reads `STAGING SPECIMEN — NOT A SIGNATURE`; nothing resembling a signature is drawn. **C:** Sean installs his real signature PNG on the production host. PCL-06. |
 
 ### Legal pages — SQ-07, U-05 (open questions from PR #261)
@@ -535,7 +545,7 @@ recorded it, so the move is visibly a 2026-11-10 decision and is undone by resto
 | DD-44 | Marketing email, ESP and analytics processors (FP-081, FP-090, FP-091) | A | None at v1. No ESP, no suppression sync and no third-party analytics; reporting is first-party. PRIVACY then names fewer processors. The built consent ledger stays, and unknown consent stays unknown. |
 | DD-45 | Marketing consent notice text | A | Stays `null`. With no marketing mail there is nothing to consent to, and a null notice keeps the preference page from collecting consent. |
 | DD-46 | Retention class of order-ready notices (`transactional_notices`) | A | `correspondence`, 2 years, as scheduled. The order itself keeps the purchase evidence; two years covers the dispute window for "I never received it". |
-| DD-47 | The three unclassified tables | A | `production_account_feature_bindings` and `production_listening_libraries` follow the account lifecycle and are erased by a deletion approval once production accounts can be closed (D-30 step 3b). `production_buyer_assent_observations` is held indefinitely as review evidence. Each moves into the schedule, with its pinned test, in the change that builds step 3b; until then the report keeps listing all three. |
+| DD-47 | The three unclassified tables | A | `production_account_feature_bindings` and `production_listening_libraries` follow the account lifecycle and are erased by a deletion approval once production accounts can be closed (D-30 step 3b). **Owner-decided amendment, 2026-11-10 (Sean):** account closure KEEPS both the feature bindings and the listening library row, with the library's contents erased (the rows are retained by the database and the bindings key the retained consent ledger); the rows are not deleted. Closure also requires the customer's explicit acknowledgment that it may end access to remaining downloads (`closure-download-forfeiture-v1`; licenses themselves are not revoked). `production_buyer_assent_observations` is held indefinitely as review evidence. Each moves into the schedule, with its pinned test, in the change that builds step 3b; until then the report keeps listing all three. |
 | DD-48 | Consent clock signal | A | The 3-year clock starts at deletion approval for an account with no retained order. While an order snapshot or contract still holds the address, consent and suppression records stay held with it. |
 | DD-49 | Reviewed deletion workflow (U-13) | A | The built workflow is the workflow: customer request, staff approval under MFA, erasure of the profile and library, retention of the financial and license record. U-13 is closed except for the purge, which is DD-67. |
 | DD-50 | Membership policy (U-10, FP-009, FP-083, FP-085) | A + C | **A:** no membership is sold at v1 and no recurring billing runs; `MembershipHttpMount`, both `enabled` flags and every approved hash stay as shipped. No legacy member is imported into an active entitlement automatically. BeatStars is not retired while any legacy member is active: each is honored there until it lapses, or by a reviewed manual grant. Plans, prices and allowances are not invented; none is needed while nothing is sold. **C:** the BeatStars membership inventory (DD-66). The three rows keep their status. |
@@ -762,6 +772,14 @@ review, full refund if the exclusive is no longer available (§9); pending non-e
 blocks new non-exclusive sales on that track (§9); availability after refund → reviewed individually, never reopened
 while there is any sign of use (§10). **U-08 resolved.**
 
+### FP-068 follow-up — C1 and C4 (Sean, 2026-11-10)
+
+Owner decisions on the review of PR #297 (BL-42, refund and dispute lifecycle on the production tax chain). They amend DD-16; they do not change its four values.
+
+- **C1.** A dispute ends download access while the license itself is kept, with the dispute noted on the record. A lost dispute keeps the hold. Staff suspension ends access with the license record retained. Nothing revokes a license, order, contract or authorization. (Checked against the code on 2026-11-10; see `docs/refund-dispute-lifecycle.md`, "Owner decisions".) Staff can lift a dispute hold, including after a lost dispute, with the existing explicit audited `hold_released_by_staff` command (Sean, 2026-11-10; amends DD-16). Nothing restores access automatically. A refused unfinalized order has no batch, so it is resolved with the refused-order command (next bullet).
+- **C4.** The exclusive acceptance items for FP-068 are not applicable on the production tax chain, because no production line is exclusive. Recorded as N/A with that reason; DD-17 and U-08 are unchanged.
+- **Refused unfinalized order (Sean, 2026-11-10).** When the production tax chain's paid order is refused at finalization (`ProductionTaxFinalizeGuard` returned HOLD because committed refunds cover the gross, or a dispute is lost), staff "restore the instrumental for sale and resolve it". Built as the staff command `ResolveRefusedProductionOrder` (Filament list "Unfinalized paid production orders"): same authority as `RefundDisputeActions` (administer role, MFA under lock, audited), proceeds only when a fresh provider read is HOLD for a fully succeeded refund or a lost dispute, records one append-only resolution (`production_tax_refused_order_resolutions`: reason `full_refund` | `dispute_lost`, actor, times, sealed evidence and hash) and closes the order to finalization for good. It refuses finalized orders (those keep the hold/release path), a clear or partially refunded payment, an open dispute (the hold stays until the outcome), refunds still in flight, a failed read and an unpaid order. It creates no grant, license, contract or download authorization and rewrites nothing. "Restore for sale" needs no release: the tax chain reserves no inventory and has no exclusive line (DD-14; C4), so the track and offer are never made unavailable; a test pins that the catalog is unchanged and the offer can be ordered again. See `docs/refund-dispute-lifecycle.md`, "Resolve refused order".
+
 ### SQ-14 — Dependencies
 
 - **tc-lib #162/#164: take them now**, before contract activation, through normal CI and review. After activation a
@@ -848,6 +866,64 @@ and the visual appearance more in line with other generated legal documents such
   placeholder with "Polk County, Iowa", and a court is named only in a governing-law or dispute clause (as the kit
   license does), never elsewhere. Postal city and ZIP stay Sean's and out of the repository.
 
+### Sean's answers, 2026-11-11: seller tag, preview-tag control, kit price and license
+
+- **Seller tag (S-6) answered.** The approved preview tag is a **4-second** cut of Sean's vocoded anti-theft vocal tag
+  (the first phrase and its delay tail, faded out from 3.5 s). The 34.5 s source exceeds the 15 s tag limit and the 30 s
+  repeat interval; Sean chose 4 s over 7 s and 11 s cuts. The file stays private (staging `branding/VASEY.AUDIO-seller-tag.wav`,
+  SHA-256 828e0b7b…); every preview mixes it every 30 seconds.
+- **Preview tag control.** Sean: a per-track on/off with a store-wide default, the default **on**. Both the tagged and
+  an untagged preview are kept per processing run so switching is immediate; a track set to off without an untagged
+  variant keeps serving the tagged one. Staff with MFA only, audited, and never changes sold licenses or deliverables.
+- **Kit price.** IMPERIAL DRVMZ: $14.99.
+- **Kit license.** The licensor line reads **VASEY.AUDIO** (`VASEY_KIT_LICENSE_LICENSOR_NAME`). The only change to
+  Sean's Sample Pack License text is a purchase-details block under the title carrying the six placeholders; the
+  wording is otherwise unchanged and stays out of Git. On staging it is published as the sound-kit license
+  (authored by Sean's account, approved and published by the review account).
+
+### Sean's answers, 2026-11-11 (later): SQ-05 prices and license-tier terms
+
+- **SQ-05 prices answered (USD).** Basic $40, Premium $75, Premium Plus $100, Unlimited $500, Custom Beat $1,000,
+  Exclusive $1,500 (Sean's BeatStars prices, confirmed for the new store). Files: Basic MP3; Premium MP3 + WAV;
+  Premium Plus, Unlimited, Custom Beat and Exclusive MP3 + WAV + stems.
+- **Tier terms: Sean accepted the recommended defaults** for every conflict and missing value found between the
+  BeatStars export settings and his private templates:
+  - monetized video streams on leases equal the audio-stream cap (250,000 Basic; 500,000 Premium, Premium Plus,
+    Unlimited), as BeatStars showed buyers, not the stored value of 1;
+  - lease publishing follows the contract text: the producer keeps a 50% writer share and 100% of the publisher
+    share; the single publishing-rate field stores the beat-only rate and the contract text keeps all three rates;
+  - free downloads unlimited on every tier (Premium Plus included); no separate audio-release cap (the copies cap
+    governs); credit "Produced by Sean Vasey" on every tier;
+  - leases: no paid advertising; Content ID, sublicensing and resale prohibited; worldwide; 10 years; no royalty on
+    the licensee's receipts;
+  - Exclusive: perpetual; a license, not an assignment (SQ-05: Sean keeps the copyright and 50% publishing);
+    for-profit performances and broadcasting allowed; Content ID and paid advertising allowed; sublicensing and
+    standalone resale not allowed; the contract's video-program and mechanical royalty share is kept;
+  - Custom Beat: unlimited music videos; authored with the others but not offered per track.
+- **Per-track enablement stays as SQ-05**, not the BeatStars per-track settings: every published track offers the four
+  leases, Exclusive is on by default per track, and stem tiers are unavailable on tracks without stems.
+- `docs/legal/LICENSE-TIERS.md` remains a superseded draft wherever it differs (DD-21). Contract text stays private.
+
+### Sean's answers, 2026-11-11 (later): what an Exclusive grants, and catalog rights
+
+- **Exclusive is an exclusive license, never a sale of the instrumental master** (refines SQ-05). Sean always owns the
+  instrumental: its sound recording (the instrumental master) and its composition. The buyer may use, adapt and
+  commercially exploit the instrumental in new works that add the buyer's own significant, substantial and original
+  contribution, and owns that contribution. The buyer may not exploit the instrumental as Sean made it, or with only
+  minor changes, and may register their works, not the bare instrumental, with content-identification systems.
+  "Produced by Sean Vasey" is a condition of the license on every work, release, video, listing and metadata entry.
+- After an exclusive sale Sean grants no new licenses on that beat. Licenses sold before the sale stay valid for their
+  terms. Sean always keeps the right to play and share the instrumental in his portfolio, showreels, website and social
+  media, but not to sell or license new use.
+- Selling the instrumental master or composition outright is a separate, directly negotiated written agreement; the
+  store never sells it.
+- Publishing on an exclusive is 50% Sean and 50% the buyer, with the matching writer and publisher shares, replacing
+  the template's 45/35/25 split by use.
+- Sean's Exclusive template clauses 1, 2 and 5 are rewritten to match (private; the contract text stays out of Git).
+  The rewrite is a draft for his attorney's review before any live exclusive sale.
+- **Catalog rights attestation:** Sean states that all 99 imported tracks are his original productions. Staging
+  records this as each track's rights declaration (no third-party samples, Sean 100%).
+
 ### Reconciliation with the delegated decisions (DD-xx)
 
 | DD row | Status | Governing decision |
@@ -864,7 +940,7 @@ and the visual appearance more in line with other generated legal documents such
 | DD-35 DMCA agent | Superseded | SQ-07: Sean registers VASEY.AUDIO as DMCA designated agent. |
 | DD-39 scheduling, unlisted | Refined | SQ-15: adds a `private` state; scheduled instants entered in America/Chicago and stored UTC; a failed check leaves the track **scheduled** with a staff alert (DD-39 said draft). |
 | DD-42 customer identity | Superseded, conditional | SQ-08: email-verified guest checkout, account optional. See open question Q-1. |
-| DD-43 mail | Refined | SQ-08: Postmark transactional stream on `mail.vasey.audio`; From `orders@vasey.audio`, Reply-To `support@vasey.audio`. |
+| DD-43 mail | Refined | SQ-08: Postmark transactional stream on `mail.vasey.audio`; From `orders@vasey.audio`, Reply-To `support@vasey.audio`. Sean confirmed the From address `orders@vasey.audio` on 2026-11-10 (BL-47), superseding DD-43's dedicated-subdomain sender. |
 | DD-44 analytics | Superseded | SQ-12: cookieless Plausible; still no marketing ESP. PRIVACY must name the processor before it runs. |
 | DD-46 order-ready notices | Unchanged | SQ-12 "class `transactional`" is read as the mail class (not marketing); the retention class stays `correspondence`, 2 years. |
 | DD-53 off-host backup | Superseded | SQ-01/SQ-09: Backblaze B2 via rclone, no-delete key, age-encrypted, tiered retention. |
@@ -893,3 +969,26 @@ All other DD rows stand.
 - **Q-4 R2 scope.** Private storage on R2 is a new storage adapter, signed-delivery path and backup change; it is not
   built. It becomes development work before production; the server's private disk remains the tested path until it
   lands.
+
+## Register update — 2026-11-11: seller tag on public previews is a setting
+
+**Decision (Sean, 2026-11-11).** Whether a track's public preview carries the seller tag is a per-track setting with a store-wide default. The default is **on** (tagged). Both variants are kept, so the switch is instant and reprocesses nothing.
+
+**Implemented as** (`App\Domain\Media\PreviewTag\PreviewTagPolicy`, `PreviewTagResolver`; `docs/media-processing.md`, "Preview tag"):
+
+- Processing makes `preview_untagged` beside `preview_tagged` in the same run, from the same master, with the tagged preview's duration and waveform. The tagged preview is the preview identity: offer snapshots, publication readiness and recording bindings still pin it, so a switch cannot void an offer or block publication.
+- `preview_tag_settings` holds the store default and per-track overrides (null follows the default) with a revision, beside `tracks` so a change never bumps publication versions. Writes need catalog authority and enrolled admin MFA re-read under lock, an expected revision, and are audited with actor and old/new values.
+- The public route reads the setting per request. If the untagged preview is effective but missing or unverified, the tagged preview is served; the delivery MP3 and master are never public. A track cannot be switched off until a verified untagged preview exists.
+- Existing drafts gain the untagged variant by processing the master again (`vasey:media-retag-previews --add-untagged`); live tracks need the usual unpublish-reprocess-republish. Sound-kit demos are not covered (follow-up).
+
+Not decided here and left open: how loud the untagged preview should be relative to the tagged mix (it uses the same gain stage), and whether a full-length untagged 192 kbps preview should be public at all for tracks still on sale; Sean chose both variants and the default, so this register records the choice and the exposure, not a reversal.
+
+## D-19 amendment — 2026-11-12: optional automatic delivery enabling on test environments
+
+**Amended 2026-11-12 under Sean's delegation ("handle it"): optional automatic enabling on test environments.** D-19 requires an explicitly provisioned blocked control, then an explicit enable, per order. That rule stands; this amendment adds a second, optional way to take that explicit step on the Stripe test chain only. D-19 gave no safety or legal reason for a human click: the enable step itself checks nothing a person would see that the code does not (the person never queried Stripe either). The staff page shows only the recorded stage, and enabling is offered only once activation exists, which itself required a verified test payment, a paid finalization, every grant, every committed contract original and a fresh SHA-256 re-verification of every purchased file (D-18). Issuance and redemption then re-check the owner, the complete activation evidence, the current control version, refund/dispute holds and the file bytes on every download. A contract identity hold or a paid exception stops the chain before activation, so it never reaches the enable step. Rights holds govern publication, not delivery of a completed purchase.
+
+- **Switch.** `VASEY_TEST_DELIVERY_AUTO_ENABLED` (default false) with `VASEY_TEST_DELIVERY_AUTO_POLICY` equal to the exact `TestDeliveryAutoEnablePolicy::CONTRACT` (`test-delivery-auto-enable-v1`). Admitted only where `TestEnvironment::admitsTestCommerce()` admits (local, testing, the hosted staging rehearsal), in Stripe test mode with an `acct_` account. An optional staging capability in `scripts/ops/capability-boundary.php` (`STAGING_OPTIONAL_FLAGS`, the unpaid-release precedent): the staging deploy gate and the profile validator accept it only as false, or true with the exact policy. Production refuses the flag unless false (`LAUNCH_OFF_HOLDS`) and the policy unless blank (the private-server preflight).
+- **What runs.** The Laravel scheduler runs `vasey:auto-enable-test-delivery` every minute while the policy admits it. Tracks: an activated order of the configured test account that never had a delivery control and has no active refund/dispute hold goes through `ManageTestDeliveryControl::enableAutomatically()`. Under the order lock it re-checks the access policy, the automatic policy and the activation evidence, then records the same two audited transitions staff and the console record (provisioned blocked at version 0, enabled at version 1) plus one `commerce.delivery.auto_enabled` event naming the policy. All three are attributed to no actor. Sound kits (only while the kit lane is admitted): an order whose grant matches its purchase snapshot and whose contract original is recorded, with no control, goes through `SoundKitDelivery::control()` from version 0, plus one `sound_kit.test_delivery.auto_enabled` event.
+- **Never overrides a person.** Only an order that never had a control is selected, and the check is repeated under the order lock. A block or enable that staff or the console recorded is final: the automatic run never re-enables it. Staff and automatic changes serialize on the order row and the expected version, so a simultaneous staff click and automatic run end with one enable (native MySQL race test). The kit page shows "Enabled automatically" while the order is still at the automatic enable (the control keeps the reference hash); the track page shows the plain state, and the audit event names the policy.
+- **What the automatic run cannot know (independent review of PR #359).** A refund/dispute hold exists only once staff have observed the case (`RefundDisputeLedger::observe` runs as staff); nothing ingests Stripe refunds or disputes into holds by itself, so a test payment refunded or disputed at Stripe and not yet observed is enabled within about a minute of activation. And a person cannot block an order before it is activated (the control needs the activation evidence), so with the policy on, the earliest a person can block is after the automatic enable, and a block does not recall bytes from a redemption that already committed (D-19). On a test environment this trade is accepted; it is a reason, among others, why this is not production delivery policy.
+- **Limits.** The kit lane has no refund/dispute hold model (none exists for kits today, for staff or for the automatic run); staff block a kit order after a refund. ProductionCheckout and production delivery are untouched. Automatic enabling grants no right, and it is not production delivery policy.

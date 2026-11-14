@@ -11,13 +11,21 @@
 #
 # The Forge site checkout ($FORGE_SITE_PATH) is only a git mirror and the home of the Forge-managed .env.
 # It is never served. Each deploy follows docs/ops/production-activation-packet.md §4 (stage S1):
-#   1. frozen environment checked; controlled services/writers quiesced before a candidate is allocated;
-#      then a fresh checkout of the exact SHA in <root>/releases/<SHA>, proven clean;
+#   1. frozen environment checked; then a fresh checkout of the exact SHA in <root>/releases/<SHA>, proven clean.
+#      With the dedicated build account (provision.sh creates it) the site stays up: that account checks out and builds
+#      in a slot the application can neither traverse nor write, and root seals it before the application can touch it.
+#      Without it (host not re-provisioned) controlled services/writers are quiesced before a candidate is allocated
+#      and the application account builds inside the pause, as before;
 #   2. composer install --no-dev from composer.lock, npm ci && npm run build, Vite manifest present;
 #   3. persistent private storage attached by bind mount (never a symlink), proven by inode;
-#   4. the Forge .env validated for the staging profile and installed 0600;
+#   4. the Forge .env validated for the staging profile and installed root:app 0440 (never visible to the build account);
 #   5. one root lease encloses build/sealing; activation freshly quiesces under its own retained lease;
-#   6. a backup of the database, private storage and .env, and an isolated restore proof, before migrating;
+#   6. a free-space check before any quiesce (prepare and refresh first re-hash the backup files the snapshot will share with
+#      the previous set, site still up), then a backup of the database, private storage (new or changed files copied, unchanged
+#      ones shared with the previous verified set) and .env, and an isolated restore proof, before migrating; local backup
+#      retention is applied after the snapshot and after a successful deploy.
+#      The snapshot never ships off-host: it only queues a "pending ship" marker. After the healthy resume ctl starts the
+#      off-host shipment detached (site up, own lock, /var/log/vasey-staging/ship-pending.log); its failure never fails a deploy;
 #   7. maintenance in the new release, migrate --force (no --pretend: raw-PDO DDL ignores it), config/route/view/event caches,
 #      vasey:doctor, redacted readiness reports;
 #   8. atomic switch of `current`, PHP-FPM and workers started on it and proven, maintenance lifted, GET / = 200.
@@ -55,15 +63,16 @@ PHP=$VASEY_PHP
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
 EVIDENCE=$ROOT/evidence/$STAMP-${SHA:0:12}
 ACTIVATION_STARTED=0
+ISOLATED_BUILD=0
 ENV_SNAPSHOT=''
 
 # Composer's artisan hooks and every cache/migration command must use the candidate .env, not
 # application settings inherited from Forge's deployment shell. Preserve ordinary OS/tool state.
 while IFS= read -r name; do
   case "$name" in
-    APP_*|DB_*|STRIPE_*|PRODUCTION_*|VASEY_TEST_*|VASEY_OPERATIVE_*|VASEY_LICENSE_*|SESSION_*|CACHE_*|QUEUE_*|MAIL_*|FILESYSTEM_DISK|MEDIA_*|CONTACT_*|REDIS_*|AWS_*|BROADCAST_*) unset "$name" ;;
+    APP_*|DB_*|STRIPE_*|PRODUCTION_*|VASEY_TEST_*|VASEY_OPERATIVE_*|VASEY_LICENSE_*|VASEY_KIT_LICENSE_*|VASEY_SOUND_KIT_*|SESSION_*|CACHE_*|QUEUE_*|MAIL_*|FILESYSTEM_DISK|MEDIA_*|CONTACT_*|REDIS_*|AWS_*|BROADCAST_*) unset "$name" ;;
     # The remaining families config/*.php reads with env(); tests/ops/test_staging_code_drift.py fails when a new one is not covered here.
-    LOG_*|AUTH_*|DISCOVERY_*|REPORTING_*|MYSQL_ATTR_*|MEMCACHED_*|SQS_*|DYNAMODB_*|BEANSTALKD_*|PAPERTRAIL_*|SLACK_*|POSTMARK_*|RESEND_*|VASEY_PHP_CLI_BINARY|VASEY_SUPPORT_*|VASEY_LISTENING_*|VASEY_CUSTOMER_DATA_*|VASEY_TRANSACTIONAL_MAIL_*|VASEY_*_SYNTHETIC_*|VASEY_PRODUCTION_*_ADMITTED|TRUSTED_PROXIES) unset "$name" ;;
+    LOG_*|AUTH_*|DISCOVERY_*|REPORTING_*|MYSQL_ATTR_*|MEMCACHED_*|SQS_*|DYNAMODB_*|BEANSTALKD_*|PAPERTRAIL_*|SLACK_*|POSTMARK_*|RESEND_*|VASEY_PHP_CLI_BINARY|VASEY_SUPPORT_*|VASEY_LISTENING_*|VASEY_CUSTOMER_DATA_*|VASEY_TRANSACTIONAL_MAIL_*|VASEY_*_SYNTHETIC_*|VASEY_*_BEATSTARS_*|VASEY_PRODUCTION_*_ADMITTED|TRUSTED_PROXIES|MERCH_*|PRINTFUL_*) unset "$name" ;;
   esac
 done < <(compgen -e)
 
@@ -87,7 +96,9 @@ freeze_runtime_environment() {
 }
 
 exec 9>>"$ROOT/.deploy.lock"
-flock -n 9 || die "another deploy or the nightly backup is running"
+# The nightly backup or a backup token renewal (about 4 minutes, started after each deploy and hourly) may hold the lock: wait
+# for it, with the site up and nothing touched, rather than refuse. Another deploy holding it this long is refused.
+flock -w 900 9 || die "another deploy or the nightly backup held the deploy lock for 15 minutes; nothing was touched"
 
 on_exit() {
   local code=$?
@@ -96,6 +107,9 @@ on_exit() {
   if [ "$ACTIVATION_STARTED" = 1 ]; then
     echo "forge-deploy: FAILED (exit $code) during an activation/configuration attempt; service and writer state is unconfirmed." >&2
     echo "forge-deploy: inspect ctl status and establish quiesce before recovery: docs/ops/staging-runbook.md#rollback" >&2
+  elif [ "${ISOLATED_BUILD:-0}" = 1 ]; then
+    echo "forge-deploy: FAILED (exit $code) while the build account prepared the candidate with the site up: the served release was not touched." >&2
+    echo "forge-deploy: a candidate slot and an operation marker may remain; inspect ctl status: docs/ops/staging-runbook.md#rollback (case A)" >&2
   else
     echo "forge-deploy: FAILED (exit $code) before the quiesce: the served release was not touched." >&2
   fi
@@ -128,9 +142,11 @@ if [ "${KIT_DIR#"$MIRROR_DIR"/}" != "$KIT_DIR" ]; then
   done <<'HELPERS'
 required bin/vasey-staging-ctl /usr/local/sbin/vasey-staging-ctl
 required backup.sh /usr/local/sbin/vasey-staging-backup
+required scheduler-watch.sh /usr/local/sbin/vasey-staging-scheduler-watch
 required release-step.sh /usr/local/libexec/vasey-staging/release-step.sh
 required seal-release.py /usr/local/libexec/vasey-staging/seal-release.py
 required normalize-mysql-dump.py /usr/local/libexec/vasey-staging/normalize-mysql-dump.py
+required private-snapshot.py /usr/local/libexec/vasey-staging/private-snapshot.py
 required tls/origin-ca.pem /usr/local/libexec/vasey-staging/origin-ca.pem
 optional nginx/vasey-staging-http.conf /etc/nginx/conf.d/vasey-staging.conf
 HELPERS
@@ -184,6 +200,7 @@ if [ -e "$REL" ]; then
     runtime_gate "$REL" "$RUNTIME_ENV"
     [ "$(envget APP_KEY)" = "$(grep '^APP_KEY=' "$REL/.env" | cut -d= -f2- | sed -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'$/\1/")" ] \
       || die "APP_KEY changes require a separately reviewed key-custody/rotation procedure"
+    "${CTL[@]}" space-check --preverify-if-needed || die "refused before the quiesce by the backup space/re-verification gate (reason above); nothing was stopped (docs/ops/staging-runbook.md sections 8 and 9)"
     ACTIVATION_STARTED=1
     "${CTL[@]}" refresh "$SHA" "$RUNTIME_ENV"
     cmp -s "$RUNTIME_ENV" "$REL/.env" || die ".env not installed"
@@ -201,8 +218,25 @@ if [ -L "$CURRENT" ]; then
   runtime_gate "$previous_release" "$RUNTIME_ENV"
   FIRST_INSTALL=0
 fi
-step "prepare under one root-held build lease (quiesce, allocate, build, attach and seal)"
-ACTIVATION_STARTED=1
+# Prepare quiesces, and activation then takes a snapshot (database + the private files it must copy + env). Refuse now, with the
+# served release untouched, when the disk cannot hold it (2026-11-10: a full disk killed tar after the site was stopped). This is
+# the authoritative check: it first re-hashes the newest proven backup set (site up, about 3 minutes for 38 GB) so the estimate
+# counts only what the snapshot will really copy; a plain check here counted a full copy and refused a deploy that fit
+# (2026-11-11: 91.3 GB asked, 88.7 GB free, 45.9 GB really needed). Nothing is stopped, built or allocated before it, and the
+# re-hash leaves a token that ctl prepare reuses instead of hashing again. Its failure is reported as "before the quiesce".
+# The re-hash is skipped when a token younger than five hours already names that set: the previous deploy's (or the nightly
+# run's) token renewal re-hashed it with the site up, so the deploy fits inside Forge's 10-minute output limit (2026-11-12:
+# re-hash ~4, build ~5, pause ~2.5 minutes). The snapshot still refuses to share any inode changed since that re-hash.
+"${CTL[@]}" space-check --preverify-if-needed || die "refused before the quiesce by the backup space/re-verification gate (reason above); nothing was stopped (docs/ops/staging-runbook.md sections 8 and 9)"
+# ctl decides the build mode from the same staging.conf; this only chooses the step and failure messages. With the build
+# account nothing is stopped until activate, so the pause is snapshot + restore proof + migrate/caches + switch + resume.
+if [ -n "${VASEY_BUILD_USER:-}" ] && getent passwd "$VASEY_BUILD_USER" >/dev/null; then
+  step "prepare under one root-held lease with the site up ($VASEY_BUILD_USER builds; sealed before the application can touch it)"
+  ISOLATED_BUILD=1
+else
+  step "prepare under one root-held build lease (quiesce, allocate, build, attach and seal)"
+  ACTIVATION_STARTED=1
+fi
 install -d -m 0750 "$ROOT/evidence/$STAMP-${SHA:0:12}"
 "${CTL[@]}" prepare "$SHA" "$RUNTIME_ENV" "$EVIDENCE"
 [ "$(stat -c %d:%i "$REL/storage/app/private")" = "$(stat -c %d:%i "$ROOT/private")" ] && [ ! -L "$REL/storage/app/private" ] \
@@ -215,6 +249,7 @@ SEALED_GIT=(env -i PATH=/usr/bin:/bin LC_ALL=C GIT_NO_REPLACE_OBJECTS=1 GIT_CONF
 
 # ---------------------------------------------------------------- 5-6. activation holds one root lease across fresh quiesce and snapshot
 step "activate under one root-held lease (fresh quiesce, snapshot/proof, migrate/cache, switch, healthy resume)"
+ACTIVATION_STARTED=1
 "${CTL[@]}" activate "$SHA" "$EVIDENCE"
 [ "$(readlink -f "$CURRENT")" = "$REL" ] || die "current does not point at $SHA"
 {
@@ -225,4 +260,7 @@ step "activate under one root-held lease (fresh quiesce, snapshot/proof, migrate
 } > "$EVIDENCE/DEPLOY"
 step "pruning old releases"
 "${CTL[@]}" prune || echo "forge-deploy: WARNING: prune failed; old releases kept" >&2
+step "applying local backup retention"
+"${CTL[@]}" backup-prune || echo "forge-deploy: WARNING: backup retention failed; old deploy snapshots kept (run: sudo vasey-staging-ctl backup-prune)" >&2
+step "off-host backup shipment (when configured) was started detached after the resume; it never holds this deploy: tail /var/log/vasey-staging/ship-pending.log, list with: sudo vasey-staging-backup pending"
 step "deployed $SHA; evidence in $EVIDENCE"

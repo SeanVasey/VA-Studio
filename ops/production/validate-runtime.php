@@ -27,6 +27,9 @@ declare(strict_types=1);
 //   5. the seller tag is not the synthetic staging placeholder: neither MEDIA_TAG_PATH nor, when the file is present in the
 //      attached private storage, its content carries the staging marker (holds.staging_seller_tag).
 //
+//   6. what DD-44 and DD-50 keep off through launch: the marketing segment flag (LAUNCH_OFF_HOLDS) and the membership literals
+//      production-memberships.enabled and http_mounted and member-grants.enabled.
+//
 // Admissions (lane PCC). MAIL_MAILER and STRIPE_MODE are the preflight's: `log` and `test` unless the candidate file sets
 // VASEY_PRODUCTION_REAL_MAIL_ADMITTED or VASEY_PRODUCTION_LIVE_STRIPE_ADMITTED to exactly `true` (then `smtp` with implicit TLS,
 // and `live`). This file adds only what the live flag changes in its holds: an `sk_live_` value is admitted as
@@ -65,6 +68,30 @@ const PRE_LAUNCH_HOLDS = [
     'VASEY_LISTENING_V2_PROMOTION_ENABLED',
 ];
 
+/**
+ * Off through launch (decision register, 2026-11-10): DD-44 keeps marketing email off at v1, so the marketing customer segment
+ * flag is refused unless false, exactly as the pre-launch holds above are (file value and effective configuration). Its config
+ * key comes from CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS; a key the boundary no longer holds fails closed
+ * (runtime.unavailable). The DD-50 membership switches are code literals and are held below, beside the other literal holds.
+ * Lifting one is a reviewed change to this file together with Sean's authorization. Never printed with a value.
+ */
+const LAUNCH_OFF_HOLDS = [
+    'REPORTING_MARKETING_SEGMENT_ENABLED',
+    // BL-70: Stripe test-mode service invoicing has no production path; the flag is refused unless false (file value and effective config).
+    'VASEY_TEST_SERVICE_INVOICING_ENABLED',
+    // Test unpaid release (Stripe test mode only): optional on the staging rehearsal since 2026-11-11, never in production; the flag is refused unless false.
+    'VASEY_TEST_UNPAID_RELEASE_ENABLED',
+    // Test refund and dispute lifecycle (Stripe test mode only): optional on the staging rehearsal since 2026-11-12, never in production;
+    // the flag is refused unless false. The production tax chain that reuses it refuses outside literal local/testing in code as well.
+    'VASEY_TEST_REFUND_DISPUTE_ENABLED',
+    // Test buyer cancellation of a never-sent order (Stripe test chain only): optional on the staging rehearsal since 2026-11-12, never in production.
+    'VASEY_TEST_BUYER_CANCEL_ENABLED',
+    // BL-71: the staging-only BeatStars catalog import (`vasey:staging-beatstars-import`) refuses production in code; this hold keeps its flag off the production host.
+    'VASEY_STAGING_BEATSTARS_IMPORT_ENABLED',
+    // Automatic test delivery enabling (Stripe test mode only, D-19 amendment 2026-11-12): optional on staging, never in production; refused unless false.
+    'VASEY_TEST_DELIVERY_AUTO_ENABLED',
+];
+
 ini_set('display_errors', '0');
 ini_set('log_errors', '0');
 $arguments = array_slice($argv, 1);
@@ -97,6 +124,10 @@ try {
     require_once $boundary;
     $holdKeys = array_intersect_key(CapabilityBoundary::stagedFlags(), array_flip(PRE_LAUNCH_HOLDS));
     if (count($holdKeys) !== count(PRE_LAUNCH_HOLDS)) {
+        throw new RuntimeException;
+    }
+    $launchOffKeys = array_intersect_key(CapabilityBoundary::PRODUCTION_LAUNCH_OFF_FLAGS, array_flip(LAUNCH_OFF_HOLDS));
+    if (count($launchOffKeys) !== count(LAUNCH_OFF_HOLDS)) {
         throw new RuntimeException;
     }
     // The preflight demands a canonical absolute path itself; refuse anything else before it is asked.
@@ -137,11 +168,20 @@ try {
     }
     // The pre-launch capability flags follow the same rule: only the literal false, or unset (the config default is false).
     // A blank or any other value fails here, before the preflight child and the configuration check below are asked.
-    foreach (PRE_LAUNCH_HOLDS as $name) {
+    foreach ([...PRE_LAUNCH_HOLDS, ...LAUNCH_OFF_HOLDS] as $name) {
         if (array_key_exists($name, $values)) {
             $check('holds.'.strtolower($name), in_array(strtolower((string) $values[$name]), ['false', '(false)'], true));
         }
     }
+    // ---- BEGIN BL-63 merch/Printful hold (own block; lifting it is a reviewed change with Sean's authorization, U-12) ----
+    // Merchandise fulfillment ships default-off and is admitted only in local, testing and staging. In production both switches
+    // may only be the literal false, or unset. A blank or any other value fails here, before the configuration check below.
+    foreach (['MERCH_PRINTFUL_ENABLED', 'MERCH_PRINTFUL_CONFIRM_ENABLED'] as $name) {
+        if (array_key_exists($name, $values)) {
+            $check('holds.'.strtolower($name), in_array(strtolower((string) $values[$name]), ['false', '(false)'], true));
+        }
+    }
+    // ---- END BL-63 merch/Printful hold ----
     if (isset($arguments[4])) {
         $previous = $arguments[4];
         if (! is_file($previous) || is_link($previous) || filesize($previous) > 262144) {
@@ -231,6 +271,9 @@ try {
         }
         // The composition gate is a code literal (lane PCC); lifting it is a reviewed change here too, with Sean's authorization.
         $check('holds.production_checkout_mounted', config('production_checkout.mounted') === false);
+        // DD-14: the tax-calculating chain's customer HTTP mount is the same kind of code literal (TaxHttpMount admits only a literal true),
+        // and v1's one production chain, so lifting it is a reviewed change here with Sean's authorization.
+        $check('holds.production_tax_checkout_http_mounted', config('production-tax-checkout.http_mounted') === false);
         // D-30 contract identity capture is a code literal on each checkout; its policies also refuse outside local/testing.
         $check('holds.production_checkout_contract_identity_v2', config('production_checkout.contract_identity_v2') === false);
         $check('holds.production_tax_checkout_contract_identity_v2', config('production-tax-checkout.contract_identity_v2') === false);
@@ -260,6 +303,19 @@ try {
         // FP-013: the operator alert mail transport refuses production in code unless this literal is true. It is lifted only
         // together with the CONTACT_INQUIRY_OPERATOR_NOTIFICATIONS_ENABLED hold above, in one reviewed change.
         $check('holds.operator_alert_mail_production_admitted', config('inquiries.operator_alert_mail_production_admitted') === false);
+        // ---- BEGIN BL-63 merch/Printful hold (config as the application reads it; strictly false, so a renamed key fails closed) ----
+        $check('holds.merch_printful_enabled', config('merch.printful_enabled') === false);
+        $check('holds.merch_printful_confirm_enabled', config('merch.confirm_orders') === false);
+        // ---- END BL-63 merch/Printful hold ----
+        // DD-44: the marketing segment stays off through launch. Strictly false, so a renamed or removed key fails closed.
+        foreach ($launchOffKeys as $name => $key) {
+            $check('holds.'.strtolower($name), config($key) === false);
+        }
+        // DD-50: no membership is sold at v1. Code literals with no environment switch: the production membership lane, its customer
+        // HTTP mount (MembershipHttpMount admits only a literal true, in local or testing) and the member license grant lane.
+        $check('holds.production_memberships_enabled', config('production-memberships.enabled') === false);
+        $check('holds.production_memberships_http_mounted', config('production-memberships.http_mounted') === false);
+        $check('holds.member_grants_enabled', config('member-grants.enabled') === false);
         // Renderer children started inside FPM requests need a genuine CLI PHP of this exact version and build (M-16).
         // Validate the configured binary as the FPM pool will, with a real probe; the path itself is never printed.
         try {

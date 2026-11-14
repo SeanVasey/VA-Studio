@@ -420,13 +420,19 @@ class ContractIdentityDeclarationV2Test extends TestCase
                 continue;
             }
             $accepted++;
+            $this->assertNotSame(0x204F, $codepoint);
             $this->assertTrue(\Normalizer::isNormalized($character, \Normalizer::FORM_C), sprintf('U+%04X', $codepoint));
             $this->assertGreaterThan(0, $regular[$codepoint], sprintf('U+%04X', $codepoint));
             $this->assertGreaterThan(0, $bold[$codepoint], sprintf('U+%04X', $codepoint));
             $this->assertSame(0, preg_match('/[\p{C}\p{M}\p{Z}]/u', str_replace(' ', '', $character)), sprintf('U+%04X', $codepoint));
         }
-        // The accepted repertoire is pinned: a face, PCRE or list change must be reviewed, not absorbed.
-        $this->assertSame(4899, $accepted);
+        // The accepted repertoire is pinned: a face, PCRE or list change must be reviewed, not absorbed. U+204F REVERSED
+        // SEMICOLON is drawn by both faces but refused explicitly (2026-11-14) on every runtime: PCRE2 10.47's Unicode data
+        // gives it the refused Arabic script extension and 10.42's does not, so \p{Arabic} alone did not pin it.
+        $this->assertArrayHasKey(0x204F, array_intersect_key($regular, $bold));
+        $this->refuses('unsupported_characters', fn () => ContractIdentityDeclarationV2::fromInput(
+            self::input(['legalName' => "A\u{204F}"]), false, self::STATEMENTS, self::coverage()));
+        $this->assertSame(4898, $accepted);
     }
 
     public function test_every_pinned_country_name_is_printable_in_the_pinned_faces(): void

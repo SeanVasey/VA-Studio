@@ -2,23 +2,28 @@
 
 namespace App\Domain\Commerce\Checkout;
 
+use App\Domain\Commerce\BuyerCancel\CancelTestOrder;
+use App\Domain\Commerce\BuyerCancel\ReadBuyerCancellation;
 use App\Domain\Commerce\CommerceAuditActor;
 use App\Domain\Commerce\Finalization\ReadPaymentState;
 use App\Domain\Commerce\Models\CheckoutIntent;
 use App\Domain\Commerce\Models\CheckoutObservation;
 use App\Domain\Commerce\Models\CheckoutSession;
 use App\Domain\Commerce\Models\Order;
+use App\Domain\Commerce\Models\TestUnpaidRelease;
 use App\Domain\Commerce\Orders\OrderRequest;
 use App\Domain\Commerce\Orders\ReadOrder;
 use App\Domain\Commerce\Payments\StripeCheckoutGateway;
 use App\Domain\Commerce\QuoteException;
 use App\Domain\Commerce\QuoteRequest;
+use App\Domain\Commerce\UnpaidRelease\ReadUnsentRelease;
 use App\Domain\Customers\CustomerAccess;
 use App\Domain\Customers\CustomerPrincipal;
 use App\Models\User;
 use App\Support\Audit\AuditEvent;
 use App\Support\CanonicalJson;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -37,7 +42,9 @@ final class HostedCheckout
             $actorId = app(CommerceAuditActor::class)->lock($actor);
             // A short order lock serializes one durable provider intent; never includes provider I/O.
             $locked = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();
-            if (\App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $locked->id)->lockForUpdate()->exists()) {
+            // A buyer cancellation committed before this lock was granted is read for update, so this transaction sees it.
+            if (TestUnpaidRelease::where('order_id', $locked->id)->lockForUpdate()->exists()
+                || ReadUnsentRelease::for($locked, lock: true) || ReadBuyerCancellation::for($locked, lock: true)) {
                 throw new QuoteException('CHECKOUT_EXPIRED', 410);
             }
             $existing = CheckoutIntent::where('order_id', $locked->id)->first();
@@ -57,11 +64,22 @@ final class HostedCheckout
             $publicId = (string) Str::uuid();
             $payload = $this->evidence->request($locked, $captured, $publicId, $policy, $account, $at);
             [$ciphertext, $hash] = $this->evidence->encrypt($payload);
-            $intent = CheckoutIntent::create(['public_id' => $publicId, 'order_id' => $locked->id, 'order_attempt_id' => $attempt->id,
-                'account_id' => $account, 'mode' => 'test', 'idempotency_key' => 'vasey-checkout-v1-'.$publicId,
-                'request_ciphertext' => $ciphertext, 'request_hash' => $hash, 'canonicalization_version' => CanonicalJson::VERSION,
-                'created_at' => $at, 'initiate_before' => $attempt->expires_at, 'retry_before' => $at->addSeconds(900),
-                'provider_expires_at' => $at->addSeconds(3600)]);
+            try {
+                $intent = CheckoutIntent::create(['public_id' => $publicId, 'order_id' => $locked->id, 'order_attempt_id' => $attempt->id,
+                    'account_id' => $account, 'mode' => 'test', 'idempotency_key' => 'vasey-checkout-v1-'.$publicId,
+                    'request_ciphertext' => $ciphertext, 'request_hash' => $hash, 'canonicalization_version' => CanonicalJson::VERSION,
+                    'created_at' => $at, 'initiate_before' => $attempt->expires_at, 'retry_before' => $at->addSeconds(900),
+                    'provider_expires_at' => $at->addSeconds(3600)]);
+            } catch (QueryException $error) {
+                // The database refuses an intent for a released never-sent order (checkout_intents_unsent_release_insert).
+                // The check above reads under the Order lock, so this is a backstop; the buyer still gets the 410.
+                // Likewise for a buyer-cancelled order (checkout_intents_buyer_cancellation_insert).
+                if (str_contains($error->getMessage(), 'Invalid or immutable unsent release evidence')
+                    || str_contains($error->getMessage(), 'Invalid or immutable buyer cancellation evidence')) {
+                    throw new QuoteException('CHECKOUT_EXPIRED', 410);
+                }
+                throw $error;
+            }
             AuditEvent::recordAttributed('commerce.checkout.initiated', $intent, ['public_id' => $publicId, 'order_public_id' => $locked->public_id, 'test_only' => true], $actorId);
             if ($attempt->expires_at->lessThanOrEqualTo(now())) {
                 throw new QuoteException('CHECKOUT_EXPIRED', 410);
@@ -96,7 +114,9 @@ final class HostedCheckout
         }
         $order = $this->owned($id, $ownerKey);
         $intent = CheckoutIntent::where('order_id', $order->id)->first();
-        if ($intent) {
+        // Durable verified payment (the evidence finalization trusts, re-verified here) answers from local state. A session read
+        // carries no refund or dispute (the staff test-exception reconcile reads those); `recover()` still re-reads the session.
+        if ($intent && app(ReadPaymentState::class)->projection($order, app(ReadOrder::class)->verify($order))['paymentStatus'] !== 'verified') {
             $this->dispatch($intent, true, null, $principal);
         }
 
@@ -136,7 +156,9 @@ final class HostedCheckout
             throw new QuoteException('CHECKOUT_UNAVAILABLE', 503);
         }
         $request = $this->evidence->verifyIntent($intent, Order::findOrFail($intent->order_id));
-        if (\App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $intent->order_id)->exists()) { return; }
+        if (TestUnpaidRelease::where('order_id', $intent->order_id)->exists()) {
+            return;
+        }
         $session = CheckoutSession::where('checkout_intent_id', $intent->id)->first();
         if ($candidate !== null && (! preg_match('/\Acs_test_[A-Za-z0-9]{1,120}\z/', $candidate) ||
             ($session && $session->provider_session_id !== $candidate))) {
@@ -237,8 +259,12 @@ final class HostedCheckout
         $data['finalizationStatus'] = $paymentState['finalizationStatus'];
         $data['contractStatus'] = $paymentState['contractStatus'];
         $data['fulfillmentStatus'] = $paymentState['fulfillmentStatus'];
-        if (\App\Domain\Commerce\Models\TestUnpaidRelease::where('order_id', $order->id)->exists()) {
+        // Display only (`available`, `cancelled` or `unavailable`); a cancelled order keeps `not_started`: it never reached Stripe.
+        $data['buyerCancel'] = app(CancelTestOrder::class)->availability($order, $intent);
+        if (TestUnpaidRelease::where('order_id', $order->id)->exists()
+            || ReadUnsentRelease::for($order)) {
             $data['status'] = 'expired';
+
             return $data;
         }
         if (! $intent) {

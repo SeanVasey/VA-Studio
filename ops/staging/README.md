@@ -32,18 +32,20 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 | File | What it is | Installed to |
 | --- | --- | --- |
 | `provision.sh` | One-time root provisioning for everything Forge does not do | run in place |
+| `smoke-build-unit.sh` | Root smoke test of the isolated build unit on the real host before the first isolated deploy (runbook section 8) | run in place |
 | `nginx/vasey-staging.conf` | Site body (the inside of Forge's server block): basic auth with the webhook exemption, limits, headers, long paid routes, the release root in every location | rendered to `/etc/vasey-staging/nginx-site.conf`, then installed as Forge's site configuration (step 7) |
 | `nginx/vasey-staging-http.conf` | http-level helpers the body uses: the two `limit_req_zone`s and three header `map`s | `/etc/nginx/conf.d/vasey-staging.conf` (provision.sh, checked with `nginx -t`) |
 | `nginx/vasey-staging-classic.conf` | Whole-file wrapper (listen, TLS, Forge includes) that includes the body, for a host whose site file is edited as a whole | rendered to `/etc/vasey-staging/nginx-classic.conf`; not used on the current Forge layout |
 | `php-fpm/vasey-staging.conf` | Default pool (300 s, 200 MiB uploads) | `/etc/php/8.4/fpm/pool.d/` |
 | `php-fpm/vasey-paid-delivery.conf` | Dedicated paid-delivery pool (7,800 s, no CPU cap), per `docs/ops/paid-delivery-runtime.md` | `/etc/php/8.4/fpm/pool.d/` |
 | `workers/vasey-staging-workers.conf` | Supervisor programs for the `media`, `payments`, `contracts` and `default`/`inquiry-alerts` workers, plus the scheduler | `/etc/supervisor/conf.d/vasey-staging.conf` |
-| `bin/vasey-staging-ctl` | Root helper: allocate/seal release ancestry, attach/detach storage, switch, quiesce, resume, snapshot, prune. It is the only sudo grant. | `/usr/local/sbin/` |
-| `backup.sh` | Nightly backup: dump, private archive, `.env`, an isolated restore proof, then an off-host copy | `/usr/local/sbin/vasey-staging-backup` |
+| `bin/vasey-staging-ctl` | Root helper: allocate/seal release ancestry, attach/detach storage, switch, quiesce, resume, snapshot, space-check, backup-prune, prune. It is the only sudo grant. | `/usr/local/sbin/` |
+| `backup.sh` | Nightly and pre-deploy backup: dump, private tree, `.env`, an isolated restore proof; the off-host copy ships after the resume | `/usr/local/sbin/vasey-staging-backup` |
+| `private-snapshot.py` | The private tree of a backup set: copies new or changed files, hard-links unchanged ones to the previous verified set (never to the live store), verifies and estimates | `/usr/local/libexec/vasey-staging/` |
 | `seal-release.py` | Parent-first protected code sealing and safe private environment capture | `/usr/local/libexec/vasey-staging/` |
 | `release-step.sh` | Fixed unprivileged build and migration/cache steps under the enclosing root lease | `/usr/local/libexec/vasey-staging/` |
 | `normalize-mysql-dump.py` | Schema-only charset rendering comparison; preserves retained data bytes | `/usr/local/libexec/vasey-staging/` |
-| `validate-runtime.php` | Isolated real Laravel admission: protected current release before quiesce, built candidate before attachment; rejects key changes, any of the twelve capability flags not exactly false (`runtime.flag_off_*`) and any enabled or mounted production-lane flag (`runtime.production_lanes_closed`); shares `scripts/ops/capability-boundary.php` with the profile validator | run from each selected release |
+| `validate-runtime.php` | Isolated real Laravel admission: protected current release before quiesce, built candidate before attachment; rejects key changes, any of the eleven capability flags not exactly false (`runtime.flag_off_*`), an optional capability on without its exact policy (`runtime.optional_*`) and any enabled or mounted production-lane flag (`runtime.production_lanes_closed`); shares `scripts/ops/capability-boundary.php` with the profile validator | run from each selected release |
 | `forge-deploy.sh` | Release and activation; Forge's deployment script calls it | run from the Forge checkout |
 | `env.staging.example` | Every `.env.example` variable with staging-safe values and placeholders | pasted into Forge |
 
@@ -57,6 +59,7 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
   current -> releases/<SHA>          what nginx, PHP-FPM and the workers run
   private/                           masters, stems, contracts, seller tag, site images, uploads (forge 0700)
   tmp/php-upload, tmp/php-sys        PHP upload and temp directories (forge 0700)
+  build/                             the build account's per-build homes and caches (root:vasey-staging-build 0770)
   backups/                           local backup sets (root 0700)
   evidence/<UTC>-<sha12>/            per-deploy evidence: build hashes, migrate output, doctor and readiness JSON
 /var/lib/nginx/vasey-staging-fastcgi nginx FastCGI temp (private, 0700; buffered downloads; never backed up)
@@ -66,10 +69,14 @@ steps, rollback) is in [`docs/ops/staging-runbook.md`](../../docs/ops/staging-ru
 ```
 
 One OS user, Forge's `forge`, runs PHP-FPM, every worker and the scheduler. It also owns
-`private/`. `vasey:doctor` and every private-file adapter require this.
+`private/`. `vasey:doctor` and every private-file adapter require this. A second, dedicated account,
+`vasey-staging-build` (created by `provision.sh`: no login shell, no password, no sudo, denied cron and at, its own group
+only), runs nothing but the release build. It cannot read `.env`, the evidence, `private/` or `tmp/`, and `forge` cannot
+reach anything it writes before root has sealed it.
 
-The root and `releases/` parents remain root-owned and unwritable by the app. `ctl allocate` creates a
-checkout slot for the app; `ctl attach` seals the release, `storage/` and `storage/app/` parents as root-owned
+The root and `releases/` parents remain root-owned and unwritable by the app. With the build account, `ctl prepare` creates
+the slot root:`vasey-staging-build` 0770 (the application cannot traverse it) and seals it while it is still 0700. Without
+it, `ctl allocate` creates a checkout slot for the app; `ctl attach` seals the release, `storage/` and `storage/app/` parents as root-owned
 before mounting. The sealer walks through no-follow directory descriptors, closes each parent before
 opening children and copies regular code/vendor/build files onto fresh root-owned read-only inodes.
 Hard links, external/runtime code symlinks and special files refuse; an old writable descriptor cannot
@@ -78,7 +85,9 @@ The configured application account must be nonroot; provisioning and privileged 
 under closed writer admission, after real runtime admission and unchanged-key validation.
 
 Explicit runtime trust exceptions are `bootstrap/cache`, `storage/framework`, `storage/logs` and
-`storage/app/private`: application-owned 0700 directories. Generated PHP caches, compiled views and
+`storage/app/private`: application-owned 0700 directories. A candidate from the build account keeps the first three root-owned
+and read-only ("held") until `ctl activate` has quiesced, so the previous, still-running release cannot plant generated PHP in
+it; activate then hands them to the application. Generated PHP caches, compiled views and
 maintenance files remain application writable. This protects deployed source/vendor/build/environment
 bytes after sealing; it does not certify an uncompromised builder or immutable runtime PHP execution.
 Private bind-mounted contents are never traversed or changed by sealing.
@@ -160,7 +169,11 @@ The **Who** column says whether Sean does the step in the Forge UI (or at his re
 ### What provision.sh does
 
 1. **Checks:** Ubuntu 24.04; RAM (refuses under about 3.7 GB, warns under 8 GB); swap; PHP extensions in the CLI and in FPM; ffmpeg encoders; `prlimit` limits; tool paths; ClamAV signature age and readability by the app user.
-2. **Directories:** as in [Server layout](#server-layout), with the stated owners and modes. App/nginx runtime paths use retained no-follow directory handles and descriptor-only ownership/mode changes. Symlinks and special files refuse without changing their targets; a detected directory entry replacement refuses after changes to the pinned directory. A new private `.gitignore` is created exclusively through its directory handle with the tracked bytes. Existing ordinary files are preserved; links and special files refuse. Failure can leave partial initialization inside admitted runtime directories, so inspect state before retrying. Inode safety does not certify a healthy visible path if an independent writer replaces an entry after its check.
+2. **Directories and the build account:** as in [Server layout](#server-layout), with the stated owners and modes. It creates
+   `vasey-staging-build` if missing and refuses when it is unsafe (a login shell, sudo rights, `forge` in its group or it in
+   `forge`'s, readable application secrets), adds it to `/etc/cron.deny` and `/etc/at.deny`, creates `build/` and checks that
+   the account can run composer, npm, node, git and PHP, that systemd (cgroup v2) can run the build unit, and that neither
+   those tools nor the kit root resolve under `/home`, `/root` or `/run/user`, which the unit hides. App/nginx runtime paths use retained no-follow directory handles and descriptor-only ownership/mode changes. Symlinks and special files refuse without changing their targets; a detected directory entry replacement refuses after changes to the pinned directory. A new private `.gitignore` is created exclusively through its directory handle with the tracked bytes. Existing ordinary files are preserved; links and special files refuse. Failure can leave partial initialization inside admitted runtime directories, so inspect state before retrying. Inode safety does not certify a healthy visible path if an independent writer replaces an entry after its check.
 3. **MySQL** (as root over the local socket, or with `--mysql-admin-defaults FILE`):
    The optional admin file must be a canonical absolute, root-owned 0600 regular single-link
    file with no symlinks and root-owned parent directories that are not group/world writable.
@@ -209,7 +222,7 @@ renaming that account breaks every guarded write.
 
 `forge-deploy.sh` runs as `forge` and follows `docs/ops/production-activation-packet.md` §4 (S1):
 
-Before anything else it compares the root-installed helpers (`vasey-staging-ctl`, `vasey-staging-backup`, `release-step.sh`, `seal-release.py`, `normalize-mysql-dump.py` and the nginx http file) with the kit at the deployed SHA, and refuses until `provision.sh` is re-run if any differ. A deploy never refreshes them itself.
+Before anything else it compares the root-installed helpers (`vasey-staging-ctl`, `vasey-staging-backup`, `release-step.sh`, `seal-release.py`, `normalize-mysql-dump.py`, `private-snapshot.py` and the nginx http file) with the kit at the deployed SHA, and refuses until `provision.sh` is re-run if any differ. A deploy never refreshes them itself.
 
 1. It freezes one private copy of the Forge `.env` and validates that candidate without printing values:
    - `APP_ENV` equals the configured value; `APP_DEBUG=false`; HTTPS `APP_URL`; secure cookies;
@@ -219,14 +232,32 @@ Before anything else it compares the root-installed helpers (`vasey-staging-ctl`
    settings and foreign configuration caches excluded. Duplicate keys, DB URL/socket overrides, production
    credentials and an `APP_KEY` change from the served release refuse before quiesce. The temporary copy is
    removed on exit; a later Forge edit waits for the next deploy attempt.
-2. `ctl prepare` holds one root lease while it quiesces controlled web, workers, scheduler and gated pipeline writers **before allocating any
-   app-writable candidate**. It then makes a fresh checkout of the exact SHA in `releases/<SHA>` and proves
-   it clean (status and tree hash). Downtime includes dependency installation and asset compilation.
-3. It installs the captured private environment as `.env` mode0600 before Composer can boot Laravel package discovery or Filament upgrade. It then runs `composer install --no-dev --classmap-authoritative` from `composer.lock`, followed by `npm ci && npm run build`. The Vite manifest must exist.
-4. The frozen `.env` starts as 0600. The built candidate repeats real Laravel admission before
+2. `ctl prepare` holds one root lease for the checkout, build and sealing. **With the build account** (re-provisioned host)
+   nothing is stopped: the build account checks the exact SHA out of a git bundle that `forge` writes from the mirror into a
+   pipe, proves it clean (status and tree hash) and builds it in a slot `forge` cannot reach, with a fresh private home and no
+   `.env`, as a hardened transient systemd service (writes only its slot and `build/`, no set-id files, private `/tmp`, no
+   `/home`, memory/CPU/task/time limits). Root then kills the unit's cgroup and any build-account process, refuses if the
+   account owns any file outside its build area, seals the release (runtime directories held), installs the captured
+   environment root:app 0440, lets `forge` run the real runtime admission and attaches private storage. Downtime no longer
+   includes dependency installation and asset compilation (runbook section 8). **Without it** prepare quiesces controlled web,
+   workers, scheduler and gated pipeline writers **before allocating any app-writable candidate**, then makes the fresh
+   checkout as `forge` and proves it clean; downtime includes the build (steps 3 and 4).
+3. Without the build account it installs the captured private environment as `.env` mode0600 before Composer can boot Laravel package discovery or Filament upgrade. Both paths run `composer install --no-dev --classmap-authoritative` from `composer.lock`, followed by `npm ci && npm run build`. The Vite manifest must exist.
+4. The frozen `.env` starts as 0600. The built candidate repeats real Laravel admission before (without the build account)
    `vasey-staging-ctl attach` seals code and environment onto protected inodes, verifies the explicit runtime
    exceptions and bind-mounts private storage.
-5. `ctl activate` obtains one root lease and repeats fresh quiesce/stopped proof immediately before snapshot. It establishes:
+0. Before anything is stopped, `ctl space-check --preverify-if-needed` (the backup helper's `space-check`) first re-hashes the private files
+   of the newest proven backup set (site still up; runbook section 8) unless a token younger than 5 hours already names it (the
+   renewal that `ctl activate`/`refresh`, the nightly run and an hourly cron start after the resume, `vasey-staging-backup rearm`), then estimates the snapshot (the private bytes it will copy
+   + database + restore proof + margin, plus an encrypted copy of the whole set when off-host hardening is on) against the free
+   bytes. It refuses with the served release untouched ("FAILED before the quiesce"), naming the estimate it used, also when the
+   re-hash finds a changed backup file. `ctl prepare`, `activate` and `refresh` repeat the space check before their own operation
+   marker; `prepare` and `refresh` reuse the re-hash's token and re-hash again only when there is none. After the snapshot (predeploy) and after a successful deploy, `ctl backup-prune` /
+   `vasey-staging-backup prune` apply `VASEY_BACKUP_KEEP` (or the tiered policy), never the set just taken; see
+   `docs/ops/staging-runbook.md` sections 8 and 9.
+5. `ctl activate` obtains one root lease, verifies the seal (a candidate changed since sealing refuses before anything stops) and
+   repeats fresh quiesce/stopped proof immediately before snapshot, then hands a held candidate's runtime directories to the
+   application. The quiesce establishes:
    - `artisan down` in that release, proven by an exact 503;
    - workers and scheduler stopped;
    - PHP-FPM stopped, and no PHP process left.
@@ -333,20 +364,23 @@ There is no global CSP: the application sets CSP on the responses that need one.
 
 `vasey-staging-backup nightly` (cron, 03:17 UTC) runs these steps:
 
-1. Quiesces the host. Maintenance lasts through the snapshot, restore proof and optional off-host transfer;
-   duration depends on retained media and database size.
-2. Writes a `mysqldump --single-transaction` of the schema, the private-storage archive with file and
-   directory manifests, and the served `.env` (it holds `APP_KEY`).
-3. Proves the restore inside the serialized `ctl snapshot` action. A disposable `mysqld` on a private socket loads the dump and re-dumps it, the archive is
-   extracted as `forge` into a fresh directory, and hashes, names, directories, modes and ownership are checked.
+1. Re-hashes, with the site still up, the private files of the newest verified set (the one the snapshot will share), then
+   quiesces the host. Maintenance lasts through the snapshot and restore proof; its length depends on the database size and on
+   how many private bytes changed since the previous set (the off-host copy ships after the resume).
+2. Writes a `mysqldump --single-transaction` of the schema, the private tree with file and directory manifests (new or changed
+   files copied, unchanged ones hard-linked to the previous verified set, never to the live store; runbook section 8), and the
+   served `.env` (it holds `APP_KEY`).
+3. Proves the restore inside the serialized `ctl snapshot` action. A disposable `mysqld` on a private socket loads the dump and re-dumps it, and the
+   private tree is verified in place: names, directories, modes and ownership, the SHA-256 of every copied file and the inode identity of every shared one
+   (a set from before 2026-11-11 is still extracted as `forge` and checked).
    Only the immediate charset attribute of a string column in the dump's matching table-definition block
    may be normalized. All row/default/comment/routine bytes remain exact. Reproof invalidates an old success
    marker before checking hashes; a new marker is published atomically after verification and cleanup.
    Delimiter directives count only outside SQL strings/comments. An explicit `NO_BACKSLASH_ESCAPES` mode
    refuses normalization rather than guessing literal boundaries; retain the failed proof for review.
-4. Copies the set off-host with `rsync` over SSH if `VASEY_BACKUP_DEST` is set in `/etc/vasey-staging/staging.conf`.
+4. Off-host copy: only after the resume in step 5, a detached shipment sends the set (`rsync` over SSH if `VASEY_BACKUP_DEST` is set, or age + rclone).
 5. Resumes the site, including after a failed snapshot/proof/transfer, then reports any failure. Successful
-   runs prune old local sets. A failed resume remains an explicit recovery condition.
+   runs prune old local sets (a deploy's pre-deploy snapshot is pruned too, protecting the set just taken). A failed resume remains an explicit recovery condition.
 
 `docs/ops/staging-runbook.md` covers setting the destination, retention, and restoring.
 

@@ -29,14 +29,19 @@ class LegacyRedirectCommandTest extends TestCase
     {
         $this->artisan('vasey:redirects-validate')
             ->expectsOutputToContain('activation flag legacy-redirects.enabled is off')
-            ->expectsOutputToContain('Inventory rows: 20 · map entries: 20 · redirect: 0 · gone: 0 · retained: 5 · unresolved: 15')
+            ->expectsOutputToContain('Inventory rows: 20 · map entries: 20 · redirect: 6 · gone: 0 · retained: 7 · unresolved: 7')
             ->expectsOutputToContain('Query strings: dropped on redirect. Matching: exact path only.')
             ->expectsOutputToContain('RETAINED URL-010 /blog served by editorial.show')
-            ->expectsOutputToContain('UNRESOLVED URL-002 /music/tracks: Proposed target /beats has no route.')
+            ->expectsOutputToContain('REDIRECT URL-002 /music/tracks -> / (301)')
+            ->expectsOutputToContain('RETAINED URL-006 /services served by services.index')
+            ->expectsOutputToContain('REDIRECT URL-013 /licensing-info -> /legal/licenses (301)')
+            ->expectsOutputToContain('REDIRECT URL-014 /terms-of-use -> /legal/terms (301)')
+            ->expectsOutputToContain('REDIRECT URL-015 /privacy-policy -> /legal/privacy (301)')
+            ->expectsOutputToContain('UNRESOLVED URL-016 /account/purchases: Crawl 2026-11-10')
             ->expectsOutputToContain('Map valid: no errors.')
             ->assertSuccessful();
         $this->artisan('vasey:redirects-validate', ['--require-resolved' => true])
-            ->expectsOutputToContain('15 inventory row(s) are unresolved; the cutover gate requires none.')
+            ->expectsOutputToContain('7 inventory row(s) are unresolved; the cutover gate requires none.')
             ->assertFailed();
     }
 
