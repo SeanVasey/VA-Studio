@@ -72,30 +72,33 @@ class PublicInstallMetadataTest extends TestCase
             'start_url' => '/', 'scope' => '/', 'display' => 'standalone',
             'background_color' => '#052e3a', 'theme_color' => '#052e3a',
             'icons' => [
+                ['src' => '/brand/app-icon-96.png', 'sizes' => '96x96', 'type' => 'image/png', 'purpose' => 'any'],
+                ['src' => '/brand/app-icon-144.png', 'sizes' => '144x144', 'type' => 'image/png', 'purpose' => 'any'],
                 ['src' => '/brand/app-icon-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
+                ['src' => '/brand/app-icon-384.png', 'sizes' => '384x384', 'type' => 'image/png', 'purpose' => 'any'],
                 ['src' => '/brand/app-icon-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
+                ['src' => '/brand/app-icon-maskable-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'maskable'],
+                ['src' => '/brand/app-icon-maskable-384.png', 'sizes' => '384x384', 'type' => 'image/png', 'purpose' => 'maskable'],
+                ['src' => '/brand/app-icon-maskable-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable'],
             ],
         ], $manifest);
     }
 
-    public function test_icon_derivatives_pin_the_whole_original_geometry_and_actual_png_bytes(): void
+    public function test_icon_derivatives_pin_the_official_svg_source_and_actual_png_bytes(): void
     {
-        $original = public_path('brand/vasey-audio-logo.png');
-        $hash = '7b0ffd26d5ddffab9695fdd3e0a4bb306d50642dc6a51e25233fd1626ff07571';
-        $this->assertSame($hash, hash_file('sha256', $original));
-        $this->assertSame([420, 100], array_slice(getimagesize($original), 0, 2));
+        $navbar = public_path('brand/vasey-audio-logo.png');
+        $this->assertSame('7b0ffd26d5ddffab9695fdd3e0a4bb306d50642dc6a51e25233fd1626ff07571', hash_file('sha256', $navbar));
+        $this->assertSame([420, 100], array_slice(getimagesize($navbar), 0, 2));
+        $svg = base_path('assets/brand/vasey-audio/vasey-audio-icon-white.svg');
+        $svgHash = hash_file('sha256', $svg);
+        $this->assertStringContainsString($svgHash.'  vasey-audio-icon-white.svg', file_get_contents(base_path('assets/brand/vasey-audio/SHA256SUMS')));
         $provenance = json_decode(file_get_contents(base_path('docs/brand/asset-manifest.json')), true, 32, JSON_THROW_ON_ERROR);
         $this->assertCount(6, $provenance['assets']);
         $this->assertCount(3, $provenance['installation_derivatives']);
         foreach ($provenance['installation_derivatives'] as $asset) {
-            $this->assertSame('public/brand/vasey-audio-logo.png', $asset['source_path']);
-            $this->assertSame($hash, $asset['source_sha256']);
-            $this->assertSame([420, 100], $asset['source_dimensions']);
-            [$width, $height] = $asset['contained_dimensions'];
-            $this->assertSame(420 * $height, 100 * $width, 'The complete lockup retains its intrinsic ratio.');
-            $this->assertLessThanOrEqual(420, $width);
-            $this->assertLessThanOrEqual(100, $height);
-            $this->assertSame([intdiv($asset['width'] - $width, 2), intdiv($asset['height'] - $height, 2)], $asset['offset']);
+            $this->assertSame('assets/brand/vasey-audio/vasey-audio-icon-white.svg', $asset['source_path']);
+            $this->assertSame($svgHash, $asset['source_sha256']);
+            $this->assertSame('#052e3a', $asset['background']);
             $path = base_path($asset['path']);
             $this->assertSame($asset['sha256'], hash_file('sha256', $path));
             $this->assertSame($asset['bytes'], filesize($path));
@@ -103,7 +106,7 @@ class PublicInstallMetadataTest extends TestCase
             $this->assertSame([$asset['width'], $asset['height'], IMAGETYPE_PNG], array_slice($size, 0, 3));
             $this->assertSame('any', $asset['purpose']);
         }
-        $this->assertSame('unverified: official source package retrieval failed; do not trace raster', $provenance['identity_svg_status']);
+        $this->assertStringStartsWith('verified: owner-supplied VASEY.AUDIO vector kit', $provenance['identity_svg_status']);
     }
 
     public function test_public_html_uses_fixed_keyed_install_links_independent_of_host_and_query_values(): void

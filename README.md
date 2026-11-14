@@ -1,4 +1,15 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/vasey-audio/vasey-audio-icon-white.svg">
+    <img src="assets/brand/vasey-audio/vasey-audio-icon-black.svg" alt="VASEY.AUDIO mark: two separate angular shapes interlocking to suggest a V and an A" width="160" height="137">
+  </picture>
+</p>
+
 # VASEY.AUDIO
+
+**First-party music store for Sean Vasey's catalog: licensing, checkout, contracts and secure delivery.**
+
+[![License: proprietary, all rights reserved](https://img.shields.io/badge/license-proprietary-lightgrey)](LICENSE)
 
 **Current state: see the [November 12 checkpoint](docs/handoff/2026-11-05/HANDOFF.md#checkpoint-2026-11-12) and the [staging alpha test guide](docs/alpha/staging-alpha-test-guide.md). The paragraph that follows records October 17, 2026 UTC and is kept for provenance.**
 
@@ -202,3 +213,10 @@ The merchant-of-record, tax, payment methods, storage/hosting, license terms, ex
 ## Ownership
 
 Project code and VASEY.AUDIO assets are proprietary unless a file states otherwise. Third-party dependencies and self-hosted fonts retain their upstream licenses. See the brand provenance records and lockfiles. Never commit secrets, private masters/stems, customer exports, generated contracts, or production databases.
+
+---
+
+<p align="center">
+  <sub>Work protocol: <a href="AGENTS.md">AGENTS.md</a> · Security: <a href="SECURITY.md">SECURITY.md</a> · License: <a href="LICENSE">proprietary, all rights reserved</a><br>
+  VASEY.AUDIO (Sean Vasey Productions) · <a href="mailto:support@vasey.audio">support@vasey.audio</a></sub>
+</p>
