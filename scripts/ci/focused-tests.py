@@ -219,6 +219,11 @@ PHP_TARGETS = {
         "tests/Feature/ProductionTaxCheckout/ProductionTaxCommittedReadReceiptTest.php",
         "tests/Feature/MediaUploadCommitRecoveryTest.php", "tests/Feature/TrackSchedulingTest.php",
     ),
+    # The two test classes whose private attempt() helpers collided with PHPUnit 13's final TestCase::attempt()
+    # (Foundation 43566257853: a fatal at class load stopped every database shard).
+    "phpunit13-name-clash": (
+        "tests/Feature/PaidGrantSpoolReviewAddendum3Test.php", "tests/Feature/TransactionalNotificationMigrationTest.php",
+    ),
     # Route-level legacy fallbacks (URL-005 /sound-kits, URL-006 /services) and the shipped redirect map.
     "legacy-fallbacks": (
         "tests/Feature/SoundKitLegacyFallbackTest.php", "tests/Feature/ServiceLegacyFallbackTest.php",
