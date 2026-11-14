@@ -205,12 +205,16 @@ class LegalPublicationGuardTest extends TestCase
             $excerpts = array_column($findings, 'excerpt');
             // Every square-bracketed span of the draft, Markdown or not, is one finding; the draft says such text must be filled.
             $this->assertSame(preg_match_all('/\[[^\[\]]*\]/u', $draft), count(array_filter($excerpts, fn (string $excerpt): bool => str_starts_with($excerpt, '['))), $file);
-            // PRIVACY carries no "[For legal review]" marker; TERMS sections 15 to 17 and LICENSE-TIERS 4.14 do.
-            $this->assertSame($document !== 'privacy', ($classes[LegalPublicationGuard::LEGAL_REVIEW] ?? 0) > 0, $file.' legal review');
-            $this->assertGreaterThan(0, $classes[LegalPublicationGuard::OWNER_DECISION] ?? 0, $file.' owner decision');
+            // Sean's legal review (2026-11-14, DD-36) removed every "[For legal review]" marker; the guard must find none.
+            $this->assertSame(0, $classes[LegalPublicationGuard::LEGAL_REVIEW] ?? 0, $file.' legal review');
+            // Recorded decisions filled PRIVACY's owner choices (2026-11-14); TERMS keeps the DMCA agent sentence and
+            // LICENSE-TIERS its tier choices.
+            $this->assertSame($document !== 'privacy', ($classes[LegalPublicationGuard::OWNER_DECISION] ?? 0) > 0, $file.' owner decision');
             $this->assertGreaterThan(0, $classes[LegalPublicationGuard::DRAFT_NOTICE] ?? 0, $file.' draft notice');
             if ($document !== 'licenses') {
-                $this->assertSame(4, count(array_keys($excerpts, '[set on publication]', true)) + count(array_keys($excerpts, '[registered postal address — inserted at publication]', true)), $file);
+                // The dates are set (November 15, 2026); the postal address is still entered at publication, twice per draft.
+                $this->assertSame(0, count(array_keys($excerpts, '[set on publication]', true)), $file.' dates');
+                $this->assertSame(2, count(array_keys($excerpts, '[registered postal address — inserted at publication]', true)), $file.' postal address');
             } else {
                 $this->assertContains('[Tier name]', $excerpts);
                 $this->assertContains('{{deliverables}}', $excerpts);
