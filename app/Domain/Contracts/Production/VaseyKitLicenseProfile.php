@@ -28,7 +28,7 @@ final class VaseyKitLicenseProfile
 
     public const LOGO = VaseyKitLicenseProfileDefinition::LOGO;
 
-    public const MANIFEST_SHA256 = '0d0b4e1da59b6f484517724f603eaa91bc102d2332ae8406b06d0d007f9e64e5';
+    public const MANIFEST_SHA256 = 'c616ff041feddf17443778001cab15e4fd52179f468aa6f1c3205120466bd4ee';
 
     /** The profile metadata with its verified asset manifest. Refuses `profile_changed` on any manifest drift. */
     public static function current(?string $projectRoot = null): array

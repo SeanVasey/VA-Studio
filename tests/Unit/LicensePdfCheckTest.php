@@ -23,7 +23,7 @@ use Tests\TestCase;
 
 /**
  * BL-72: the finished original is checked against the document it came from: every inked character drawn once, no run
- * below the page or past the right margin. The pinned tc-lib (8.81.1) hard-breaks an over-long unbroken token at its
+ * below the page or past the right margin. The pinned tc-lib (8.84.0) hard-breaks an over-long unbroken token at its
  * column, so such documents render in full; the check is what keeps that true if a layout ever stops doing so, and what
  * refuses a PDF that lost or displaced text. SYNTHETIC, NONBINDING fixtures only.
  */

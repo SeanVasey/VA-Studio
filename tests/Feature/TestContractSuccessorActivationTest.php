@@ -51,8 +51,8 @@ class TestContractSuccessorActivationTest extends TestCase
 
     private function successorRuntime(): bool
     {
-        return InstalledVersions::getReference('tecnickcom/tc-lib-pdf') === 'a0626686715391dd4210c5622aee849d033b8baf'
-            && InstalledVersions::getReference('tecnickcom/tc-lib-pdf-font') === '668d73e853c6027afd9cdaae8ea042957ba11e08';
+        return InstalledVersions::getReference('tecnickcom/tc-lib-pdf') === '2be3a522329df9d2941381ce8315b6647d620c69'
+            && InstalledVersions::getReference('tecnickcom/tc-lib-pdf-font') === '30804d3d493ddcf13dbb0a78c76c95b788c8948a';
     }
 
     /** Synthetic retained v1 record over a real fixture paid-grant/outbox, without pretending v1 runtime exists. */
@@ -112,7 +112,7 @@ class TestContractSuccessorActivationTest extends TestCase
         $original = app(ReadGrantContract::class)->forRequest($request);
         $bytes = app(ContractFiles::class)->verify($original);
         $this->assertStringStartsWith('%PDF-', $bytes);
-        $this->assertStringContainsString('8.81.1', $bytes);
+        $this->assertStringContainsString('8.84.0', $bytes);
         $this->assertSame(hash('sha256', $bytes), $original->pdf_hash);
         $retained = F::retained();
         $this->assertSame($request->id, app(RequestTestContract::class)->handle($paid['grant']->id)->id);

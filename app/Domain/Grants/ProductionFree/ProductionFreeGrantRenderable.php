@@ -35,9 +35,10 @@ final class ProductionFreeGrantRenderable
      * repeat that comparison before this constant moves; a test fails until it does. Repeated for r2 on 2026-11-09
      * (`docs/verification/render-cache-hardening-20261109/glyph-equivalence-r2.txt`: 1,112,032 checked, 0 differences).
      * Repeated for r3 on 2026-11-10 (`docs/verification/tc-lib-update-20261110/glyph-equivalence-r3.txt`, committed script beside it:
-     * 1,112,032 checked, 0 differences).
+     * 1,112,032 checked, 0 differences). Repeated for r4 on 2026-11-14 (`docs/verification/tc-lib-update-20261114/glyph-equivalence-r4.txt`,
+     * committed script beside it: 1,112,032 checked, 0 differences).
      */
-    public const VERIFIED_REVISION = 'r3';
+    public const VERIFIED_REVISION = 'r4';
 
     /**
      * Characters (newlines included) at or below which the preflight render is skipped. Wrapping never places fewer than
